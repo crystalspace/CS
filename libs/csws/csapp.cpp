@@ -1,6 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Application class
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -40,16 +40,16 @@
 // Archive path of CSWS.CFG
 #define CSWS_CFG "csws.cfg"
 
-TOKEN_DEF_START
-  TOKEN_DEF (MOUSECURSOR)
-  TOKEN_DEF (TITLEBUTTON)
-  TOKEN_DEF (DIALOGBUTTON)
-  TOKEN_DEF (TEXTURE)
-  TOKEN_DEF (TRANSPARENT)
-  TOKEN_DEF (FILE)
-  TOKEN_DEF (MIPMAP)
-  TOKEN_DEF (DITHER)
-TOKEN_DEF_END
+CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (MOUSECURSOR)
+  CS_TOKEN_DEF (TITLEBUTTON)
+  CS_TOKEN_DEF (DIALOGBUTTON)
+  CS_TOKEN_DEF (TEXTURE)
+  CS_TOKEN_DEF (TRANSPARENT)
+  CS_TOKEN_DEF (FILE)
+  CS_TOKEN_DEF (MIPMAP)
+  CS_TOKEN_DEF (DITHER)
+CS_TOKEN_DEF_END
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
 
@@ -196,12 +196,12 @@ void csApp::ShutDown ()
 bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   int iFlags)
 {
-  TOKEN_TABLE_START (texcommands)
-    TOKEN_TABLE (FILE)
-    TOKEN_TABLE (TRANSPARENT)
-    TOKEN_TABLE (MIPMAP)
-    TOKEN_TABLE (DITHER)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (texcommands)
+    CS_TOKEN_TABLE (FILE)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (MIPMAP)
+    CS_TOKEN_TABLE (DITHER)
+  CS_TOKEN_TABLE_END
 
   const char *filename = iTexName;
   char *buffer = strnew (iTexParams);
@@ -214,14 +214,14 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   while ((cmd = csGetObject (&bufptr, texcommands, &name, &params)) > 0)
     switch (cmd)
     {
-      case TOKEN_FILE:
+      case CS_TOKEN_FILE:
         filename = params;
         break;
-      case TOKEN_TRANSPARENT:
+      case CS_TOKEN_TRANSPARENT:
         transp = true;
         ScanStr (params, "%f,%f,%f", &tr, &tg, &tb);
         break;
-      case TOKEN_MIPMAP:
+      case CS_TOKEN_MIPMAP:
         if (strcasecmp (params, "yes") == 0)
           iFlags &= ~CS_TEXTURE_NOMIPMAPS;
         else if (strcasecmp (params, "no") == 0)
@@ -229,7 +229,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
         else
           printf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
         break;
-      case TOKEN_DITHER:
+      case CS_TOKEN_DITHER:
         if (strcasecmp (params, "yes") == 0)
           iFlags |= CS_TEXTURE_DITHER;
         else if (strcasecmp (params, "no") == 0)
@@ -239,7 +239,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
         break;
     }
 
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     printf (MSG_WARNING, "Unknown texture parameter keyword detected: '%s'\n", bufptr);
     delete [] buffer;
@@ -272,12 +272,12 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
 
 void csApp::LoadConfig ()
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MOUSECURSOR)
-    TOKEN_TABLE (TITLEBUTTON)
-    TOKEN_TABLE (DIALOGBUTTON)
-    TOKEN_TABLE (TEXTURE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MOUSECURSOR)
+    CS_TOKEN_TABLE (TITLEBUTTON)
+    CS_TOKEN_TABLE (DIALOGBUTTON)
+    CS_TOKEN_TABLE (TEXTURE)
+  CS_TOKEN_TABLE_END
 
   if (!titlebardefs)
     titlebardefs = new csStrVector (16, 16);
@@ -298,26 +298,26 @@ void csApp::LoadConfig ()
   while ((cmd = csGetObject (&cfg, commands, &name, &params)) > 0)
     switch (cmd)
     {
-      case TOKEN_MOUSECURSOR:
+      case CS_TOKEN_MOUSECURSOR:
       {
         Mouse->NewPointer (name, params);
         break;
       }
-      case TOKEN_TITLEBUTTON:
+      case CS_TOKEN_TITLEBUTTON:
       {
         char *tmp = new char [strlen (name) + 1 + strlen (params) + 1];
         sprintf (tmp, "%s %s", name, params);
         titlebardefs->Push (tmp);
         break;
       }
-      case TOKEN_DIALOGBUTTON:
+      case CS_TOKEN_DIALOGBUTTON:
       {
         char *tmp = new char [strlen (name) + 1 + strlen (params) + 1];
         sprintf (tmp, "%s %s", name, params);
         dialogdefs->Push (tmp);
         break;
       }
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         LoadTexture (name, params, CS_TEXTURE_2D);
         break;
       default:

@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+24-Sep-2000
+	- Eric Sunshine worked around namespace collisions in csUtil/Parser
+	  and csLoader caused by Microsoft Windows' namespace pollution.  All
+	  macros and identifiers defined by csUtil/Parser are now prefixed
+	  with "CS_".  All functions are now prefixed with "cs".  Now
+	  publishes csGetParserLine() and csResetParserLine() instead of
+	  global "parser_line" variable.
 23-Sep-2000
 	- Jerry A. Segler Jr continued work on theme code.
 	- Fixed a bug in csPolygonSet::IntersectSegment introduced yesterday.

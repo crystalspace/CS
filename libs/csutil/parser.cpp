@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,28 +25,26 @@
 // A string containing white spaces (' ', '\t', '\n', '\r')
 static const char *kWhiteSpace = " \t\n\r";
 static char last_offender[255];
-// Current line
-int parser_line;
+static int parser_line;
 
-char* csGetLastOffender ()
-{
-  return last_offender;
-}
+char* csGetLastOffender () { return last_offender; }
+int   csGetParserLine   () { return parser_line;   }
+int   csResetParserLine () { parser_line = 1;      }
 
 long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
 {
-  SkipCharacters (buf, kWhiteSpace);
+  csSkipCharacters (buf, kWhiteSpace);
 
   // skip comment lines.
   while (**buf == ';')
   {
     *buf = strchr (*buf, '\n');
     parser_line++;
-    SkipCharacters (buf, kWhiteSpace);
+    csSkipCharacters (buf, kWhiteSpace);
   }
 
   if (!**buf)                   // at end of file
-    return PARSERR_EOF;
+    return CS_PARSERR_EOF;
 
   // find the token.
   // for now just use brute force.  Improve later.
@@ -66,21 +64,21 @@ long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
     char *p = strchr (*buf, '\n');
     if (p) *p = 0;
     strcpy (last_offender, *buf);
-    return PARSERR_TOKENNOTFOUND;
+    return CS_PARSERR_TOKENNOTFOUND;
   }
   // skip the token
   *buf += strlen (tokens->token);
-  SkipCharacters (buf, kWhiteSpace);
+  csSkipCharacters (buf, kWhiteSpace);
 
   // get optional name
-  *name = GetSubText (buf, '\'', '\''); // single quotes
-  SkipCharacters (buf, kWhiteSpace);
+  *name = csGetSubText (buf, '\'', '\''); // single quotes
+  csSkipCharacters (buf, kWhiteSpace);
 
   // get optional data
   if (**buf == '=') // An assignment rather than a command/object.
-    *data = GetAssignmentText (buf);
+    *data = csGetAssignmentText (buf);
   else
-    *data = GetSubText (buf, '(', ')');
+    *data = csGetSubText (buf, '(', ')');
 
   return tokens->id;
 }
@@ -91,7 +89,7 @@ long csGetCommand (char **buf, csTokenDesc * tokens, char **params)
   return csGetObject (buf, tokens, &name, params);
 }
 
-void SkipCharacters (char **buf, const char *toSkip)
+void csSkipCharacters (char **buf, const char *toSkip)
 {
   char ch;
   while ((ch = **buf) != 0)
@@ -104,7 +102,7 @@ void SkipCharacters (char **buf, const char *toSkip)
   // we must be at the end of the buffer if we get here
 }
 
-char *GetSubText (char **buf, char open, char close)
+char *csGetSubText (char **buf, char open, char close)
 {
   if (**buf == 0 || **buf != open)
     return 0;
@@ -135,10 +133,10 @@ char *GetSubText (char **buf, char open, char close)
   return result;
 }
 
-char *GetAssignmentText (char **buf)
+char *csGetAssignmentText (char **buf)
 {
   ++*buf;                       // skip the '='
-  SkipCharacters (buf, kWhiteSpace);
+  csSkipCharacters (buf, kWhiteSpace);
   char *result = *buf;
 
   // now, we need to find the next whitespace to end the data

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein and Steve Israelson
+    Copyright (C) 1998,2000 by Jorrit Tyberghein and Steve Israelson
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PARSER_H__
-#define __PARSER_H__
+#ifndef __CS_PARSER_H__
+#define __CS_PARSER_H__
 
 /**
  * Structure to describe a single token in a token table that is passed
@@ -34,37 +34,37 @@ struct csTokenDesc
 /**
  * A set of macros for easier building of token tables. Usage example:
  * <pre>
- * TOKEN_DEF_START
- *   TOKEN_DEF (ORIG)
- *   TOKEN_DEF (FIRST_LEN)
- *   TOKEN_DEF (FIRST)
- *   TOKEN_DEF (SECOND_LEN)
- *   TOKEN_DEF (SECOND)
- *   TOKEN_DEF (MATRIX)
- *   TOKEN_DEF (V)
- * TOKEN_DEF_END
+ * CS_TOKEN_DEF_START
+ *   CS_TOKEN_DEF (ORIG)
+ *   CS_TOKEN_DEF (FIRST_LEN)
+ *   CS_TOKEN_DEF (FIRST)
+ *   CS_TOKEN_DEF (SECOND_LEN)
+ *   CS_TOKEN_DEF (SECOND)
+ *   CS_TOKEN_DEF (MATRIX)
+ *   CS_TOKEN_DEF (V)
+ * CS_TOKEN_DEF_END
  * ...
  * void some_func ()
  * {
- *   TOKEN_TABLE_START (tokens)
- *     TOKEN_TABLE (ORIG)
- *     TOKEN_TABLE (FIRST_LEN)
- *     TOKEN_TABLE (FIRST)
- *     TOKEN_TABLE (SECOND_LEN)
- *     TOKEN_TABLE (SECOND)
- *     TOKEN_TABLE (MATRIX)
- *     TOKEN_TABLE (V)
- *   TOKEN_TABLE_END
+ *   CS_TOKEN_TABLE_START (tokens)
+ *     CS_TOKEN_TABLE (ORIG)
+ *     CS_TOKEN_TABLE (FIRST_LEN)
+ *     CS_TOKEN_TABLE (FIRST)
+ *     CS_TOKEN_TABLE (SECOND_LEN)
+ *     CS_TOKEN_TABLE (SECOND)
+ *     CS_TOKEN_TABLE (MATRIX)
+ *     CS_TOKEN_TABLE (V)
+ *   CS_TOKEN_TABLE_END
  *   ...
  *   while ((cmd = csGetObject (&buf, tokens, &name, &params)) > 0)
  *   {
  *     switch (cmd)
  *     {
- *       case TOKEN_ORIG:
+ *       case CS_TOKEN_ORIG:
  *         ...
- *       case TOKEN_FIRST_LEN:
+ *       case CS_TOKEN_FIRST_LEN:
  *         ...
- *       case TOKEN_FIRST:
+ *       case CS_TOKEN_FIRST:
  *         ...
  *     }
  *   }
@@ -72,29 +72,38 @@ struct csTokenDesc
  * }
  * </pre>
  */
-#define TOKEN_DEF_START			\
+#define CS_TOKEN_DEF_START		\
   enum					\
   {					\
-    TOKEN_EMPTY = 0,
-#define TOKEN_DEF(name)			\
-    TOKEN_ ## name,
-#define TOKEN_DEF_END			\
-    TOKEN_TOTAL_COUNT			\
+    CS_TOKEN_EMPTY = 0,
+#define CS_TOKEN_DEF(name)		\
+    CS_TOKEN_ ## name,
+#define CS_TOKEN_DEF_END		\
+    CS_TOKEN_TOTAL_COUNT		\
   };
-#define TOKEN_TABLE_START(name)		\
+#define CS_TOKEN_TABLE_START(name)	\
   static csTokenDesc name [] =		\
   {
-#define TOKEN_TABLE(name)		\
-    { TOKEN_ ## name, #name },
-#define TOKEN_TABLE_END			\
+#define CS_TOKEN_TABLE(name)		\
+    { CS_TOKEN_ ## name, #name },
+#define CS_TOKEN_TABLE_END		\
     { 0, 0 }				\
   };
 
-/// Current line that parser is at.
-extern int parser_line;
+#define CS_PARSERR_EOF			-2
+#define CS_PARSERR_TOKENNOTFOUND	-1
 
-#define PARSERR_EOF		-2
-#define PARSERR_TOKENNOTFOUND	-1
+/**
+ * Get the current line number of the file being parsed.
+ */
+int csGetParserLine ();
+
+/**
+ * Reset the line number of the line being parsed to line one.  This does not
+ * rewind a file pointer or any other such operation.  It merely resets the
+ * internal line number counter which is reported by csGetParserLine().
+ */
+int csResetParserLine ();
 
 /**
  * Get pointer to last offending token.
@@ -112,8 +121,8 @@ char* csGetLastOffender ();
  * <pre>
  *   ROOM 'test room' ( 1, 2, 3 )
  * </pre>
- * <p>returns PARSERR_TOKENNOTFOUND on error.
- * <p>returns PARSERR_EOF on EOF.
+ * <p>returns CS_PARSERR_TOKENNOTFOUND on error.
+ * <p>returns CS_PARSERR_EOF on EOF.
  */
 long csGetObject(char **buf, csTokenDesc *tokens, char **name, char **data);
 /**
@@ -125,8 +134,8 @@ long csGetObject(char **buf, csTokenDesc *tokens, char **name, char **data);
  * <code>
  *   TEXTURE( 1, 2, 3 )
  * </code>
- * <p>returning PARSERR_TOKENNOTFOUND on error.
- * <p>returning PARSERR_EOF on EOF.
+ * <p>returning CS_PARSERR_TOKENNOTFOUND on error.
+ * <p>returning CS_PARSERR_EOF on EOF.
  * <p><b>NOTE</b>: Should be modified to accept assignments like:
  * <code>
  *   LIGHT=1
@@ -140,16 +149,16 @@ long csGetCommand(char **buf, csTokenDesc *tokens, char **params);
  * Skips nested delimiters too.
  * <p><b>NOTE</b>: Should skip quoted text, does not at this time.
  */
-char *GetSubText(char **buf, char open, char close);
+char *csGetSubText(char **buf, char open, char close);
 /**
  * Skips any characters in the toSkip string.
  * Changes the buf pointer.
  */
-void SkipCharacters(char **buf, const char *toSkip);
+void csSkipCharacters(char **buf, const char *toSkip);
 /**
  * Returns the string of text after a = up to the next
  * whitespace. Terminates the string and moves the buf pointer.
  */
-char *GetAssignmentText(char **buf);
+char *csGetAssignmentText(char **buf);
 
-#endif // __PARSER_H__
+#endif // __CS_PARSER_H__

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
     Written by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -98,175 +98,175 @@ int csLoaderStat::sprites_loaded  = 0;
 int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
-TOKEN_DEF_START
-  TOKEN_DEF (ACCEL)
-  TOKEN_DEF (ACTION)
-  TOKEN_DEF (ACTIVATE)
-  TOKEN_DEF (ACTIVE)
-  TOKEN_DEF (ADD)
-  TOKEN_DEF (ALPHA)
-  TOKEN_DEF (AMBIENT)
-  TOKEN_DEF (ATTENUATION)
-  TOKEN_DEF (AZIMUTH)
-  TOKEN_DEF (BECOMING_ACTIVE)
-  TOKEN_DEF (BECOMING_INACTIVE)
-  TOKEN_DEF (BEZIER)
-  TOKEN_DEF (BOX)
-  TOKEN_DEF (BSP)
-  TOKEN_DEF (CAMERA)
-  TOKEN_DEF (CEILING)
-  TOKEN_DEF (CEIL_TEXTURE)
-  TOKEN_DEF (CENTER)
-  TOKEN_DEF (CIRCLE)
-  TOKEN_DEF (CLIP)
-  TOKEN_DEF (COLLDET)
-  TOKEN_DEF (COLLECTION)
-  TOKEN_DEF (COLOR)
-  TOKEN_DEF (COLORS)
-  TOKEN_DEF (COLORSCALE)
-  TOKEN_DEF (CONVEX)
-  TOKEN_DEF (COPY)
-  TOKEN_DEF (COSFACT)
-  TOKEN_DEF (CURVECENTER)
-  TOKEN_DEF (CURVECONTROL)
-  TOKEN_DEF (CURVESCALE)
-  TOKEN_DEF (DETAIL)
-  TOKEN_DEF (DIFFUSE)
-  TOKEN_DEF (DIM)
-  TOKEN_DEF (DITHER)
-  TOKEN_DEF (DROPSIZE)
-  TOKEN_DEF (DYNAMIC)
-  TOKEN_DEF (ELEVATION)
-  TOKEN_DEF (F)
-  TOKEN_DEF (FALLTIME)
-  TOKEN_DEF (FILE)
-  TOKEN_DEF (FILTER)
-  TOKEN_DEF (FIRE)
-  TOKEN_DEF (FIRST)
-  TOKEN_DEF (FIRST_LEN)
-  TOKEN_DEF (FLAT)
-  TOKEN_DEF (FLATCOL)
-  TOKEN_DEF (FLOOR)
-  TOKEN_DEF (FLOOR_CEIL)
-  TOKEN_DEF (FLOOR_HEIGHT)
-  TOKEN_DEF (FLOOR_TEXTURE)
-  TOKEN_DEF (FOG)
-  TOKEN_DEF (FOR_2D)
-  TOKEN_DEF (FOR_3D)
-  TOKEN_DEF (FOUNTAIN)
-  TOKEN_DEF (FRAME)
-  TOKEN_DEF (GOURAUD)
-  TOKEN_DEF (HALO)
-  TOKEN_DEF (HARDMOVE)
-  TOKEN_DEF (HEIGHT)
-  TOKEN_DEF (HEIGHTMAP)
-  TOKEN_DEF (IDENTITY)
-  TOKEN_DEF (KEY)
-  TOKEN_DEF (KEYCOLOR)
-  TOKEN_DEF (LEN)
-  TOKEN_DEF (LIBRARY)
-  TOKEN_DEF (LIGHT)
-  TOKEN_DEF (LIGHTING)
-  TOKEN_DEF (LIGHTMAP)
-  TOKEN_DEF (LIGHTX)
-  TOKEN_DEF (LIMB)
-  TOKEN_DEF (MATERIAL)
-  TOKEN_DEF (MATERIALS)
-  TOKEN_DEF (MATRIX)
-  TOKEN_DEF (MAX_TEXTURES)
-  TOKEN_DEF (MERGE_NORMALS)
-  TOKEN_DEF (MERGE_TEXELS)
-  TOKEN_DEF (MERGE_VERTICES)
-  TOKEN_DEF (MIPMAP)
-  TOKEN_DEF (MIRROR)
-  TOKEN_DEF (MIXMODE)
-  TOKEN_DEF (MOVE)
-  TOKEN_DEF (MOVEABLE)
-  TOKEN_DEF (MULTIPLY)
-  TOKEN_DEF (MULTIPLY2)
-  TOKEN_DEF (NODE)
-  TOKEN_DEF (NONE)
-  TOKEN_DEF (NUMBER)
-  TOKEN_DEF (OPENING)
-  TOKEN_DEF (ORIG)
-  TOKEN_DEF (ORIGIN)
-  TOKEN_DEF (PERSISTENT)
-  TOKEN_DEF (PLANE)
-  TOKEN_DEF (POLYGON)
-  TOKEN_DEF (PORTAL)
-  TOKEN_DEF (POSITION)
-  TOKEN_DEF (PRIMARY_ACTIVE)
-  TOKEN_DEF (PRIMARY_INACTIVE)
-  TOKEN_DEF (PROCEDURAL)
-  TOKEN_DEF (RADIUS)
-  TOKEN_DEF (RAIN)
-  TOKEN_DEF (REFLECTION)
-  TOKEN_DEF (ROOM)
-  TOKEN_DEF (ROT)
-  TOKEN_DEF (ROT_X)
-  TOKEN_DEF (ROT_Y)
-  TOKEN_DEF (ROT_Z)
-  TOKEN_DEF (SCALE)
-  TOKEN_DEF (SCALE_X)
-  TOKEN_DEF (SCALE_Y)
-  TOKEN_DEF (SCALE_Z)
-  TOKEN_DEF (SCRIPT)
-  TOKEN_DEF (SECOND)
-  TOKEN_DEF (SECONDARY_ACTIVE)
-  TOKEN_DEF (SECONDARY_INACTIVE)
-  TOKEN_DEF (SECOND_LEN)
-  TOKEN_DEF (SECTOR)
-  TOKEN_DEF (SHADING)
-  TOKEN_DEF (SIXFACE)
-  TOKEN_DEF (SKELETON)
-  TOKEN_DEF (SKY)
-  TOKEN_DEF (SKYDOME)
-  TOKEN_DEF (SNOW)
-  TOKEN_DEF (SOUND)
-  TOKEN_DEF (SOUNDS)
-  TOKEN_DEF (SPEED)
-  TOKEN_DEF (SPLIT)
-  TOKEN_DEF (SPRITE)
-  TOKEN_DEF (SPRITE2D)
-  TOKEN_DEF (START)
-  TOKEN_DEF (STATBSP)
-  TOKEN_DEF (STATELESS)
-  TOKEN_DEF (STATIC)
-  TOKEN_DEF (SWIRL)
-  TOKEN_DEF (CLONE)
-  TOKEN_DEF (TEMPLATE)
-  TOKEN_DEF (TERRAIN)
-  TOKEN_DEF (TEX)
-  TOKEN_DEF (TEXLEN)
-  TOKEN_DEF (TEXNR)
-  TOKEN_DEF (TEXTURE)
-  TOKEN_DEF (TEXTURES)
-  TOKEN_DEF (TEXTURE_LIGHTING)
-  TOKEN_DEF (TEXTURE_MIPMAP)
-  TOKEN_DEF (TEXTURE_SCALE)
-  TOKEN_DEF (MAT_SET)
-  TOKEN_DEF (MAT_SET_SELECT)
-  TOKEN_DEF (THING)
-  TOKEN_DEF (TOTALTIME)
-  TOKEN_DEF (TRANSFORM)
-  TOKEN_DEF (TRANSPARENT)
-  TOKEN_DEF (TRIANGLE)
-  TOKEN_DEF (TRIGGER)
-  TOKEN_DEF (TWEEN)
-  TOKEN_DEF (TYPE)
-  TOKEN_DEF (UV)
-  TOKEN_DEF (UVA)
-  TOKEN_DEF (UVEC)
-  TOKEN_DEF (UV_SHIFT)
-  TOKEN_DEF (V)
-  TOKEN_DEF (VERTEX)
-  TOKEN_DEF (VERTICES)
-  TOKEN_DEF (VVEC)
-  TOKEN_DEF (W)
-  TOKEN_DEF (WARP)
-  TOKEN_DEF (WORLD)
-  TOKEN_DEF (ZFILL)
-TOKEN_DEF_END
+CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (ACCEL)
+  CS_TOKEN_DEF (ACTION)
+  CS_TOKEN_DEF (ACTIVATE)
+  CS_TOKEN_DEF (ACTIVE)
+  CS_TOKEN_DEF (ADD)
+  CS_TOKEN_DEF (ALPHA)
+  CS_TOKEN_DEF (AMBIENT)
+  CS_TOKEN_DEF (ATTENUATION)
+  CS_TOKEN_DEF (AZIMUTH)
+  CS_TOKEN_DEF (BECOMING_ACTIVE)
+  CS_TOKEN_DEF (BECOMING_INACTIVE)
+  CS_TOKEN_DEF (BEZIER)
+  CS_TOKEN_DEF (BOX)
+  CS_TOKEN_DEF (BSP)
+  CS_TOKEN_DEF (CAMERA)
+  CS_TOKEN_DEF (CEILING)
+  CS_TOKEN_DEF (CEIL_TEXTURE)
+  CS_TOKEN_DEF (CENTER)
+  CS_TOKEN_DEF (CIRCLE)
+  CS_TOKEN_DEF (CLIP)
+  CS_TOKEN_DEF (COLLDET)
+  CS_TOKEN_DEF (COLLECTION)
+  CS_TOKEN_DEF (COLOR)
+  CS_TOKEN_DEF (COLORS)
+  CS_TOKEN_DEF (COLORSCALE)
+  CS_TOKEN_DEF (CONVEX)
+  CS_TOKEN_DEF (COPY)
+  CS_TOKEN_DEF (COSFACT)
+  CS_TOKEN_DEF (CURVECENTER)
+  CS_TOKEN_DEF (CURVECONTROL)
+  CS_TOKEN_DEF (CURVESCALE)
+  CS_TOKEN_DEF (DETAIL)
+  CS_TOKEN_DEF (DIFFUSE)
+  CS_TOKEN_DEF (DIM)
+  CS_TOKEN_DEF (DITHER)
+  CS_TOKEN_DEF (DROPSIZE)
+  CS_TOKEN_DEF (DYNAMIC)
+  CS_TOKEN_DEF (ELEVATION)
+  CS_TOKEN_DEF (F)
+  CS_TOKEN_DEF (FALLTIME)
+  CS_TOKEN_DEF (FILE)
+  CS_TOKEN_DEF (FILTER)
+  CS_TOKEN_DEF (FIRE)
+  CS_TOKEN_DEF (FIRST)
+  CS_TOKEN_DEF (FIRST_LEN)
+  CS_TOKEN_DEF (FLAT)
+  CS_TOKEN_DEF (FLATCOL)
+  CS_TOKEN_DEF (FLOOR)
+  CS_TOKEN_DEF (FLOOR_CEIL)
+  CS_TOKEN_DEF (FLOOR_HEIGHT)
+  CS_TOKEN_DEF (FLOOR_TEXTURE)
+  CS_TOKEN_DEF (FOG)
+  CS_TOKEN_DEF (FOR_2D)
+  CS_TOKEN_DEF (FOR_3D)
+  CS_TOKEN_DEF (FOUNTAIN)
+  CS_TOKEN_DEF (FRAME)
+  CS_TOKEN_DEF (GOURAUD)
+  CS_TOKEN_DEF (HALO)
+  CS_TOKEN_DEF (HARDMOVE)
+  CS_TOKEN_DEF (HEIGHT)
+  CS_TOKEN_DEF (HEIGHTMAP)
+  CS_TOKEN_DEF (IDENTITY)
+  CS_TOKEN_DEF (KEY)
+  CS_TOKEN_DEF (KEYCOLOR)
+  CS_TOKEN_DEF (LEN)
+  CS_TOKEN_DEF (LIBRARY)
+  CS_TOKEN_DEF (LIGHT)
+  CS_TOKEN_DEF (LIGHTING)
+  CS_TOKEN_DEF (LIGHTMAP)
+  CS_TOKEN_DEF (LIGHTX)
+  CS_TOKEN_DEF (LIMB)
+  CS_TOKEN_DEF (MATERIAL)
+  CS_TOKEN_DEF (MATERIALS)
+  CS_TOKEN_DEF (MATRIX)
+  CS_TOKEN_DEF (MAX_TEXTURES)
+  CS_TOKEN_DEF (MERGE_NORMALS)
+  CS_TOKEN_DEF (MERGE_TEXELS)
+  CS_TOKEN_DEF (MERGE_VERTICES)
+  CS_TOKEN_DEF (MIPMAP)
+  CS_TOKEN_DEF (MIRROR)
+  CS_TOKEN_DEF (MIXMODE)
+  CS_TOKEN_DEF (MOVE)
+  CS_TOKEN_DEF (MOVEABLE)
+  CS_TOKEN_DEF (MULTIPLY)
+  CS_TOKEN_DEF (MULTIPLY2)
+  CS_TOKEN_DEF (NODE)
+  CS_TOKEN_DEF (NONE)
+  CS_TOKEN_DEF (NUMBER)
+  CS_TOKEN_DEF (OPENING)
+  CS_TOKEN_DEF (ORIG)
+  CS_TOKEN_DEF (ORIGIN)
+  CS_TOKEN_DEF (PERSISTENT)
+  CS_TOKEN_DEF (PLANE)
+  CS_TOKEN_DEF (POLYGON)
+  CS_TOKEN_DEF (PORTAL)
+  CS_TOKEN_DEF (POSITION)
+  CS_TOKEN_DEF (PRIMARY_ACTIVE)
+  CS_TOKEN_DEF (PRIMARY_INACTIVE)
+  CS_TOKEN_DEF (PROCEDURAL)
+  CS_TOKEN_DEF (RADIUS)
+  CS_TOKEN_DEF (RAIN)
+  CS_TOKEN_DEF (REFLECTION)
+  CS_TOKEN_DEF (ROOM)
+  CS_TOKEN_DEF (ROT)
+  CS_TOKEN_DEF (ROT_X)
+  CS_TOKEN_DEF (ROT_Y)
+  CS_TOKEN_DEF (ROT_Z)
+  CS_TOKEN_DEF (SCALE)
+  CS_TOKEN_DEF (SCALE_X)
+  CS_TOKEN_DEF (SCALE_Y)
+  CS_TOKEN_DEF (SCALE_Z)
+  CS_TOKEN_DEF (SCRIPT)
+  CS_TOKEN_DEF (SECOND)
+  CS_TOKEN_DEF (SECONDARY_ACTIVE)
+  CS_TOKEN_DEF (SECONDARY_INACTIVE)
+  CS_TOKEN_DEF (SECOND_LEN)
+  CS_TOKEN_DEF (SECTOR)
+  CS_TOKEN_DEF (SHADING)
+  CS_TOKEN_DEF (SIXFACE)
+  CS_TOKEN_DEF (SKELETON)
+  CS_TOKEN_DEF (SKY)
+  CS_TOKEN_DEF (SKYDOME)
+  CS_TOKEN_DEF (SNOW)
+  CS_TOKEN_DEF (SOUND)
+  CS_TOKEN_DEF (SOUNDS)
+  CS_TOKEN_DEF (SPEED)
+  CS_TOKEN_DEF (SPLIT)
+  CS_TOKEN_DEF (SPRITE)
+  CS_TOKEN_DEF (SPRITE2D)
+  CS_TOKEN_DEF (START)
+  CS_TOKEN_DEF (STATBSP)
+  CS_TOKEN_DEF (STATELESS)
+  CS_TOKEN_DEF (STATIC)
+  CS_TOKEN_DEF (SWIRL)
+  CS_TOKEN_DEF (CLONE)
+  CS_TOKEN_DEF (TEMPLATE)
+  CS_TOKEN_DEF (TERRAIN)
+  CS_TOKEN_DEF (TEX)
+  CS_TOKEN_DEF (TEXLEN)
+  CS_TOKEN_DEF (TEXNR)
+  CS_TOKEN_DEF (TEXTURE)
+  CS_TOKEN_DEF (TEXTURES)
+  CS_TOKEN_DEF (TEXTURE_LIGHTING)
+  CS_TOKEN_DEF (TEXTURE_MIPMAP)
+  CS_TOKEN_DEF (TEXTURE_SCALE)
+  CS_TOKEN_DEF (MAT_SET)
+  CS_TOKEN_DEF (MAT_SET_SELECT)
+  CS_TOKEN_DEF (THING)
+  CS_TOKEN_DEF (TOTALTIME)
+  CS_TOKEN_DEF (TRANSFORM)
+  CS_TOKEN_DEF (TRANSPARENT)
+  CS_TOKEN_DEF (TRIANGLE)
+  CS_TOKEN_DEF (TRIGGER)
+  CS_TOKEN_DEF (TWEEN)
+  CS_TOKEN_DEF (TYPE)
+  CS_TOKEN_DEF (UV)
+  CS_TOKEN_DEF (UVA)
+  CS_TOKEN_DEF (UVEC)
+  CS_TOKEN_DEF (UV_SHIFT)
+  CS_TOKEN_DEF (V)
+  CS_TOKEN_DEF (VERTEX)
+  CS_TOKEN_DEF (VERTICES)
+  CS_TOKEN_DEF (VVEC)
+  CS_TOKEN_DEF (W)
+  CS_TOKEN_DEF (WARP)
+  CS_TOKEN_DEF (WORLD)
+  CS_TOKEN_DEF (ZFILL)
+CS_TOKEN_DEF_END
 
 //---------------------------------------------------------------------------
 
@@ -277,17 +277,17 @@ void csLoader::SetMode (int iFlags)
 
 bool csLoader::load_matrix (char* buf, csMatrix3 &m)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (IDENTITY)
-    TOKEN_TABLE (ROT_X)
-    TOKEN_TABLE (ROT_Y)
-    TOKEN_TABLE (ROT_Z)
-    TOKEN_TABLE (ROT)
-    TOKEN_TABLE (SCALE_X)
-    TOKEN_TABLE (SCALE_Y)
-    TOKEN_TABLE (SCALE_Z)
-    TOKEN_TABLE (SCALE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (IDENTITY)
+    CS_TOKEN_TABLE (ROT_X)
+    CS_TOKEN_TABLE (ROT_Y)
+    CS_TOKEN_TABLE (ROT_Z)
+    CS_TOKEN_TABLE (ROT)
+    CS_TOKEN_TABLE (SCALE_X)
+    CS_TOKEN_TABLE (SCALE_Y)
+    CS_TOKEN_TABLE (SCALE_Z)
+    CS_TOKEN_TABLE (SCALE)
+  CS_TOKEN_TABLE_END
 
   char* params;
   int cmd, num;
@@ -300,22 +300,22 @@ bool csLoader::load_matrix (char* buf, csMatrix3 &m)
   {
     switch (cmd)
     {
-      case TOKEN_IDENTITY:
+      case CS_TOKEN_IDENTITY:
         m = identity;
         break;
-      case TOKEN_ROT_X:
+      case CS_TOKEN_ROT_X:
         ScanStr (params, "%f", &angle);
         m *= csXRotMatrix3 (angle);
         break;
-      case TOKEN_ROT_Y:
+      case CS_TOKEN_ROT_Y:
         ScanStr (params, "%f", &angle);
         m *= csYRotMatrix3 (angle);
         break;
-      case TOKEN_ROT_Z:
+      case CS_TOKEN_ROT_Z:
         ScanStr (params, "%f", &angle);
         m *= csZRotMatrix3 (angle);
         break;
-      case TOKEN_ROT:
+      case CS_TOKEN_ROT:
         ScanStr (params, "%F", list, &num);
         if (num == 3)
         {
@@ -326,19 +326,19 @@ bool csLoader::load_matrix (char* buf, csMatrix3 &m)
         else
 	  CsPrintf (MSG_WARNING, "Badly formed rotation: '%s'\n", params);
         break;
-      case TOKEN_SCALE_X:
+      case CS_TOKEN_SCALE_X:
         ScanStr (params, "%f", &scaler);
         m *= csXScaleMatrix3(scaler);
         break;
-      case TOKEN_SCALE_Y:
+      case CS_TOKEN_SCALE_Y:
         ScanStr (params, "%f", &scaler);
         m *= csYScaleMatrix3(scaler);
         break;
-      case TOKEN_SCALE_Z:
+      case CS_TOKEN_SCALE_Z:
         ScanStr (params, "%f", &scaler);
         m *= csZScaleMatrix3(scaler);
         break;
-      case TOKEN_SCALE:
+      case CS_TOKEN_SCALE:
         ScanStr (params, "%F", list, &num);
         if (num == 1)      // One scaler; applied to entire matrix.
 	  m *= list[0];
@@ -349,7 +349,7 @@ bool csLoader::load_matrix (char* buf, csMatrix3 &m)
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
     // or the nine values of a 3x3 matrix.
@@ -427,17 +427,17 @@ void csLoader::OptimizePolygon (csPolygon3D *p)
 
 csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (ORIG)
-    TOKEN_TABLE (FIRST_LEN)
-    TOKEN_TABLE (FIRST)
-    TOKEN_TABLE (SECOND_LEN)
-    TOKEN_TABLE (SECOND)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (UVEC)
-    TOKEN_TABLE (VVEC)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (ORIG)
+    CS_TOKEN_TABLE (FIRST_LEN)
+    CS_TOKEN_TABLE (FIRST)
+    CS_TOKEN_TABLE (SECOND_LEN)
+    CS_TOKEN_TABLE (SECOND)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (UVEC)
+    CS_TOKEN_TABLE (VVEC)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* xname;
   long cmd;
@@ -460,39 +460,39 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
     }
     switch (cmd)
     {
-      case TOKEN_ORIG:
+      case CS_TOKEN_ORIG:
         tx1_given = true;
         load_vector (params, tx_orig);
         break;
-      case TOKEN_FIRST:
+      case CS_TOKEN_FIRST:
         tx1_given = true;
         load_vector (params, tx1);
         break;
-      case TOKEN_FIRST_LEN:
+      case CS_TOKEN_FIRST_LEN:
         ScanStr (params, "%f", &tx1_len);
         tx1_given = true;
         break;
-      case TOKEN_SECOND:
+      case CS_TOKEN_SECOND:
         tx2_given = true;
         load_vector (params, tx2);
         break;
-      case TOKEN_SECOND_LEN:
+      case CS_TOKEN_SECOND_LEN:
         ScanStr (params, "%f", &tx2_len);
         tx2_given = true;
         break;
-      case TOKEN_MATRIX:
+      case CS_TOKEN_MATRIX:
         load_matrix (params, tx_matrix);
         break;
-      case TOKEN_V:
+      case CS_TOKEN_V:
         load_vector (params, tx_vector);
         break;
-      case TOKEN_UVEC:
+      case CS_TOKEN_UVEC:
         tx1_given = true;
         load_vector (params, tx1);
         tx1_len = tx1.Norm ();
         tx1 += tx_orig;
         break;
-      case TOKEN_VVEC:
+      case CS_TOKEN_VVEC:
         tx2_given = true;
         load_vector (params, tx2);
         tx2_len = tx2.Norm ();
@@ -500,7 +500,7 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a plane!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -540,14 +540,14 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
 
 csCollection* csLoader::load_collection (char* name, char* buf)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (THING)
-    TOKEN_TABLE (SPRITE)
-    TOKEN_TABLE (COLLECTION)
-    TOKEN_TABLE (LIGHT)
-    TOKEN_TABLE (TRIGGER)
-    TOKEN_TABLE (SECTOR)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (THING)
+    CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (COLLECTION)
+    CS_TOKEN_TABLE (LIGHT)
+    CS_TOKEN_TABLE (TRIGGER)
+    CS_TOKEN_TABLE (SECTOR)
+  CS_TOKEN_TABLE_END
 
   char* xname;
   long cmd;
@@ -567,7 +567,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
     str[0] = 0;
     switch (cmd)
     {
-      case TOKEN_THING:
+      case CS_TOKEN_THING:
         {
           ScanStr (params, "%s", str);
           csThing* th = (csThing*)World->things.FindByName (str);
@@ -579,7 +579,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           collection->AddObject ((csObject*)th);
         }
         break;
-      case TOKEN_SPRITE:
+      case CS_TOKEN_SPRITE:
         {
           ScanStr (params, "%s", str);
           csSprite* spr = (csSprite*)World->sprites.FindByName (str);
@@ -591,7 +591,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           collection->AddObject ((csObject*)spr);
         }
         break;
-      case TOKEN_LIGHT:
+      case CS_TOKEN_LIGHT:
         {
           ScanStr (params, "%s", str);
 	  csStatLight* l = World->FindLight (str);
@@ -601,7 +601,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
 	    collection->AddObject ((csObject*)l);
         }
         break;
-      case TOKEN_SECTOR:
+      case CS_TOKEN_SECTOR:
         {
           ScanStr (params, "%s", str);
           csSector* s = (csSector*)World->sectors.FindByName (str);
@@ -613,7 +613,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           collection->AddObject ((csObject*)s);
         }
         break;
-      case TOKEN_COLLECTION:
+      case CS_TOKEN_COLLECTION:
         {
           ScanStr (params, "%s", str);
           csCollection* th = (csCollection*)World->collections.FindByName (str);
@@ -625,13 +625,13 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           collection->AddObject (th);
         }
         break;
-      case TOKEN_TRIGGER:
+      case CS_TOKEN_TRIGGER:
         CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
                                  " and does not do anything!\n");
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a collection!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -644,15 +644,15 @@ csCollection* csLoader::load_collection (char* name, char* buf)
 
 UInt ParseMixmode (char* buf)
 {
-  TOKEN_TABLE_START (modes)
-    TOKEN_TABLE (COPY)
-    TOKEN_TABLE (MULTIPLY2)
-    TOKEN_TABLE (MULTIPLY)
-    TOKEN_TABLE (ADD)
-    TOKEN_TABLE (ALPHA)
-    TOKEN_TABLE (TRANSPARENT)
-    TOKEN_TABLE (KEYCOLOR)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (modes)
+    CS_TOKEN_TABLE (COPY)
+    CS_TOKEN_TABLE (MULTIPLY2)
+    CS_TOKEN_TABLE (MULTIPLY)
+    CS_TOKEN_TABLE (ADD)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (KEYCOLOR)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -669,11 +669,11 @@ UInt ParseMixmode (char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case TOKEN_ALPHA:
+      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
+      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
+      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
+      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
+      case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
 	int ialpha;
@@ -681,11 +681,11 @@ UInt ParseMixmode (char* buf)
 	ialpha = QInt (alpha * 255.99);
 	Mixmode |= CS_FX_SETALPHA(ialpha);
 	break;
-      case TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
+      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -697,21 +697,21 @@ UInt ParseMixmode (char* buf)
 
 csParticleSystem* csLoader::load_fountain (char* name, char* buf)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (ORIGIN)
-    TOKEN_TABLE (ACCEL)
-    TOKEN_TABLE (SPEED)
-    TOKEN_TABLE (FALLTIME)
-    TOKEN_TABLE (COLOR)
-    TOKEN_TABLE (OPENING)
-    TOKEN_TABLE (AZIMUTH)
-    TOKEN_TABLE (ELEVATION)
-    TOKEN_TABLE (DROPSIZE)
-    TOKEN_TABLE (LIGHTING)
-    TOKEN_TABLE (NUMBER)
-    TOKEN_TABLE (MIXMODE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (ORIGIN)
+    CS_TOKEN_TABLE (ACCEL)
+    CS_TOKEN_TABLE (SPEED)
+    CS_TOKEN_TABLE (FALLTIME)
+    CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (OPENING)
+    CS_TOKEN_TABLE (AZIMUTH)
+    CS_TOKEN_TABLE (ELEVATION)
+    CS_TOKEN_TABLE (DROPSIZE)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (NUMBER)
+    CS_TOKEN_TABLE (MIXMODE)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* params;
@@ -736,10 +736,10 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
   {
     switch (cmd)
     {
-      case TOKEN_NUMBER:
+      case CS_TOKEN_NUMBER:
         ScanStr (params, "%d", &number);
         break;
-      case TOKEN_TEXTURE: //@@@MAT
+      case CS_TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
         material = FindMaterial (str);
         if (material == NULL)
@@ -748,41 +748,41 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_MIXMODE:
+      case CS_TOKEN_MIXMODE:
         mixmode = ParseMixmode (params);
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         ScanStr (params, "%b", &lighted_particles);
         break;
-      case TOKEN_DROPSIZE:
+      case CS_TOKEN_DROPSIZE:
         ScanStr (params, "%f,%f", &drop_width, &drop_height);
 	break;
-      case TOKEN_ORIGIN:
+      case CS_TOKEN_ORIGIN:
         ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
         break;
-      case TOKEN_ACCEL:
+      case CS_TOKEN_ACCEL:
         ScanStr (params, "%f,%f,%f", &accel.x, &accel.y, &accel.z);
         break;
-      case TOKEN_ELEVATION:
+      case CS_TOKEN_ELEVATION:
         ScanStr (params, "%f", &elevation);
         break;
-      case TOKEN_AZIMUTH:
+      case CS_TOKEN_AZIMUTH:
         ScanStr (params, "%f", &azimuth);
         break;
-      case TOKEN_OPENING:
+      case CS_TOKEN_OPENING:
         ScanStr (params, "%f", &opening);
         break;
-      case TOKEN_SPEED:
+      case CS_TOKEN_SPEED:
         ScanStr (params, "%f", &speed);
         break;
-      case TOKEN_FALLTIME:
+      case CS_TOKEN_FALLTIME:
         ScanStr (params, "%f", &fall_time);
         break;
-      case TOKEN_COLOR:
+      case CS_TOKEN_COLOR:
         ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
         break;
     }
-    if (cmd == PARSERR_TOKENNOTFOUND)
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
       fatal_exit (0, false);
@@ -806,18 +806,18 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
 
 csParticleSystem* csLoader::load_fire (char* name, char* buf)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (ORIGIN)
-    TOKEN_TABLE (SPEED)
-    TOKEN_TABLE (COLORSCALE)
-    TOKEN_TABLE (DROPSIZE)
-    TOKEN_TABLE (LIGHTING)
-    TOKEN_TABLE (NUMBER)
-    TOKEN_TABLE (MIXMODE)
-    TOKEN_TABLE (SWIRL)
-    TOKEN_TABLE (TOTALTIME)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (ORIGIN)
+    CS_TOKEN_TABLE (SPEED)
+    CS_TOKEN_TABLE (COLORSCALE)
+    CS_TOKEN_TABLE (DROPSIZE)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (NUMBER)
+    CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (SWIRL)
+    CS_TOKEN_TABLE (TOTALTIME)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* params;
@@ -839,10 +839,10 @@ csParticleSystem* csLoader::load_fire (char* name, char* buf)
   {
     switch (cmd)
     {
-      case TOKEN_NUMBER:
+      case CS_TOKEN_NUMBER:
         ScanStr (params, "%d", &number);
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         material = FindMaterial (str);
         if (material == NULL)
@@ -851,32 +851,32 @@ csParticleSystem* csLoader::load_fire (char* name, char* buf)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_MIXMODE:
+      case CS_TOKEN_MIXMODE:
         mixmode = ParseMixmode (params);
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         ScanStr (params, "%b", &lighted_particles);
         break;
-      case TOKEN_DROPSIZE:
+      case CS_TOKEN_DROPSIZE:
         ScanStr (params, "%f,%f", &drop_width, &drop_height);
 	break;
-      case TOKEN_ORIGIN:
+      case CS_TOKEN_ORIGIN:
         ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
         break;
-      case TOKEN_SWIRL:
+      case CS_TOKEN_SWIRL:
         ScanStr (params, "%f", &swirl);
         break;
-      case TOKEN_TOTALTIME:
+      case CS_TOKEN_TOTALTIME:
         ScanStr (params, "%f", &total_time);
         break;
-      case TOKEN_COLORSCALE:
+      case CS_TOKEN_COLORSCALE:
         ScanStr (params, "%f", &colorscale);
         break;
-      case TOKEN_SPEED:
+      case CS_TOKEN_SPEED:
         ScanStr (params, "%f,%f,%f", &speed.x, &speed.y, &speed.z);
         break;
     }
-    if (cmd == PARSERR_TOKENNOTFOUND)
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
       fatal_exit (0, false);
@@ -898,16 +898,16 @@ csParticleSystem* csLoader::load_fire (char* name, char* buf)
 
 csParticleSystem* csLoader::load_rain (char* name, char* buf)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (BOX)
-    TOKEN_TABLE (SPEED)
-    TOKEN_TABLE (COLOR)
-    TOKEN_TABLE (DROPSIZE)
-    TOKEN_TABLE (LIGHTING)
-    TOKEN_TABLE (NUMBER)
-    TOKEN_TABLE (MIXMODE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (BOX)
+    CS_TOKEN_TABLE (SPEED)
+    CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (DROPSIZE)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (NUMBER)
+    CS_TOKEN_TABLE (MIXMODE)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* params;
@@ -927,10 +927,10 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
   {
     switch (cmd)
     {
-      case TOKEN_NUMBER:
+      case CS_TOKEN_NUMBER:
         ScanStr (params, "%d", &number);
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         material = FindMaterial (str);
         if (material == NULL)
@@ -939,30 +939,30 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_MIXMODE:
+      case CS_TOKEN_MIXMODE:
         mixmode = ParseMixmode (params);
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         ScanStr (params, "%b", &lighted_particles);
         break;
-      case TOKEN_DROPSIZE:
+      case CS_TOKEN_DROPSIZE:
         ScanStr (params, "%f,%f", &drop_width, &drop_height);
 	break;
-      case TOKEN_BOX:
+      case CS_TOKEN_BOX:
       {
         float x1, y1, z1, x2, y2, z2;
         ScanStr (params, "%f,%f,%f,%f,%f,%f", &x1, &y1, &z1, &x2, &y2, &z2);
 	box.Set (x1, y1, z1, x2, y2, z2);
         break;
       }
-      case TOKEN_SPEED:
+      case CS_TOKEN_SPEED:
         ScanStr (params, "%f,%f,%f", &speed.x, &speed.y, &speed.z);
         break;
-      case TOKEN_COLOR:
+      case CS_TOKEN_COLOR:
         ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
         break;
     }
-    if (cmd == PARSERR_TOKENNOTFOUND)
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
       fatal_exit (0, false);
@@ -985,17 +985,17 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
 
 csParticleSystem* csLoader::load_snow (char* name, char* buf)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (BOX)
-    TOKEN_TABLE (SPEED)
-    TOKEN_TABLE (COLOR)
-    TOKEN_TABLE (DROPSIZE)
-    TOKEN_TABLE (LIGHTING)
-    TOKEN_TABLE (NUMBER)
-    TOKEN_TABLE (MIXMODE)
-    TOKEN_TABLE (SWIRL)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (BOX)
+    CS_TOKEN_TABLE (SPEED)
+    CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (DROPSIZE)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (NUMBER)
+    CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (SWIRL)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* params;
@@ -1016,10 +1016,10 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
   {
     switch (cmd)
     {
-      case TOKEN_NUMBER:
+      case CS_TOKEN_NUMBER:
         ScanStr (params, "%d", &number);
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         material = FindMaterial (str);
         if (material == NULL)
@@ -1028,33 +1028,33 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_MIXMODE:
+      case CS_TOKEN_MIXMODE:
         mixmode = ParseMixmode (params);
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         ScanStr (params, "%b", &lighted_particles);
         break;
-      case TOKEN_DROPSIZE:
+      case CS_TOKEN_DROPSIZE:
         ScanStr (params, "%f,%f", &drop_width, &drop_height);
 	break;
-      case TOKEN_SWIRL:
+      case CS_TOKEN_SWIRL:
         ScanStr (params, "%f", &swirl);
 	break;
-      case TOKEN_BOX:
+      case CS_TOKEN_BOX:
       {
         float x1, y1, z1, x2, y2, z2;
         ScanStr (params, "%f,%f,%f,%f,%f,%f", &x1, &y1, &z1, &x2, &y2, &z2);
 	box.Set (x1, y1, z1, x2, y2, z2);
         break;
       }
-      case TOKEN_SPEED:
+      case CS_TOKEN_SPEED:
         ScanStr (params, "%f,%f,%f", &speed.x, &speed.y, &speed.z);
         break;
-      case TOKEN_COLOR:
+      case CS_TOKEN_COLOR:
         ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
         break;
     }
-    if (cmd == PARSERR_TOKENNOTFOUND)
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
       fatal_exit (0, false);
@@ -1077,14 +1077,14 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
 
 csStatLight* csLoader::load_statlight (char* name, char* buf)
 {
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (ATTENUATION)
-    TOKEN_TABLE (CENTER)
-    TOKEN_TABLE (RADIUS)
-    TOKEN_TABLE (DYNAMIC)
-    TOKEN_TABLE (COLOR)
-    TOKEN_TABLE (HALO)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (ATTENUATION)
+    CS_TOKEN_TABLE (CENTER)
+    CS_TOKEN_TABLE (RADIUS)
+    CS_TOKEN_TABLE (DYNAMIC)
+    CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (HALO)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* params;
@@ -1132,19 +1132,19 @@ csStatLight* csLoader::load_statlight (char* name, char* buf)
     {
       switch (cmd)
       {
-        case TOKEN_RADIUS:
+        case CS_TOKEN_RADIUS:
           ScanStr (params, "%f", &dist);
           break;
-        case TOKEN_CENTER:
+        case CS_TOKEN_CENTER:
           ScanStr (params, "%f,%f,%f", &x, &y, &z);
           break;
-        case TOKEN_COLOR:
+        case CS_TOKEN_COLOR:
           ScanStr (params, "%f,%f,%f", &r, &g, &b);
           break;
-        case TOKEN_DYNAMIC:
+        case CS_TOKEN_DYNAMIC:
           dyn = 1;
           break;
-        case TOKEN_HALO:
+        case CS_TOKEN_HALO:
 	  str[0] = 0;
           cnt = ScanStr (params, "%s", str);
           if (cnt == 0 || !strncmp (str, "CROSS", 5))
@@ -1169,7 +1169,7 @@ defaulthalo:
           else
             goto defaulthalo;
           break;
-        case TOKEN_ATTENUATION:
+        case CS_TOKEN_ATTENUATION:
           ScanStr (params, "%s", str);
           if (strcmp (str, "none")      == 0) attenuation = CS_ATTN_NONE;
           if (strcmp (str, "linear")    == 0) attenuation = CS_ATTN_LINEAR;
@@ -1177,7 +1177,7 @@ defaulthalo:
           if (strcmp (str, "realistic") == 0) attenuation = CS_ATTN_REALISTIC;
       }
     }
-    if (cmd == PARSERR_TOKENNOTFOUND)
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a light!\n", csGetLastOffender ());
       fatal_exit (0, false);
@@ -1228,7 +1228,7 @@ csKeyValuePair* csLoader::load_key (char* buf, csObject* pParent)
   else
   {
     CsPrintf (MSG_FATAL_ERROR, "Illegal Syntax for KEY() command in line %d\n",
-    	parser_line);
+    	csGetParserLine());
     fatal_exit (0, false);
     return NULL;
   }
@@ -1236,10 +1236,10 @@ csKeyValuePair* csLoader::load_key (char* buf, csObject* pParent)
 
 csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (KEY)
-    TOKEN_TABLE (POSITION)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (POSITION)
+  CS_TOKEN_TABLE_END
 
    csMapNode* pNode = new csMapNode(name);
   pNode->SetSector(sec);
@@ -1261,10 +1261,10 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
     }
     switch (cmd)
     {
-      case TOKEN_KEY:
+      case CS_TOKEN_KEY:
         load_key(params, pNode);
         break;
-      case TOKEN_POSITION:
+      case CS_TOKEN_POSITION:
         ScanStr (params, "%f,%f,%f", &x, &y, &z);
         break;
       default:
@@ -1272,7 +1272,7 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a thing!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -1288,23 +1288,23 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
     PSLoadInfo& info, int cmd, char* name, char* params)
 {
-  TOKEN_TABLE_START (tok_matvec)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char str[255];
   char* xname;
   switch (cmd)
   {
-    case TOKEN_VERTEX:
+    case CS_TOKEN_VERTEX:
       {
         float x, y, z;
         ScanStr (params, "%f,%f,%f", &x, &y, &z);
         ps.AddVertex (x, y, z);
       }
       break;
-    case TOKEN_CIRCLE:
+    case CS_TOKEN_CIRCLE:
       {
         float x, y, z, rx, ry, rz;
         int num, dir;
@@ -1327,14 +1327,14 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
         }
       }
       break;
-    case TOKEN_FOG:
+    case CS_TOKEN_FOG:
       {
         csFog& f = ps.GetFog ();
         f.enabled = true;
         ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
       }
       break;
-    case TOKEN_POLYGON:
+    case CS_TOKEN_POLYGON:
       {
 	csPolygon3D* poly3d = load_poly3d (name, params,
           info.default_material, info.default_texlen, &ps);
@@ -1346,7 +1346,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
       }
       break;
 
-    case TOKEN_HARDMOVE:
+    case CS_TOKEN_HARDMOVE:
       {
         char* params2;
         while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
@@ -1358,7 +1358,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
     	  }
           switch (cmd)
           {
-            case TOKEN_MATRIX:
+            case CS_TOKEN_MATRIX:
             {
               csMatrix3 m;
               load_matrix (params2, m);
@@ -1366,7 +1366,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
 	      info.do_hard_trans = true;
               break;
             }
-            case TOKEN_V:
+            case CS_TOKEN_V:
             {
               csVector3 v;
               load_vector (params2, v);
@@ -1379,7 +1379,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
       }
       break;
 
-    case TOKEN_BEZIER:
+    case CS_TOKEN_BEZIER:
       {
         csCurveTemplate* ct = load_beziertemplate (name, params,
 	    info.default_material, info.default_texlen,
@@ -1396,18 +1396,18 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
       }
       break;
 
-    case TOKEN_CURVECENTER:
+    case CS_TOKEN_CURVECENTER:
       {
         csVector3 c;
         ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
         ps.curves_center = c;
       }
       break;
-    case TOKEN_CURVESCALE:
+    case CS_TOKEN_CURVESCALE:
       ScanStr (params, "%f", &ps.curves_scale);
       break;
 
-    case TOKEN_CURVECONTROL:
+    case CS_TOKEN_CURVECONTROL:
       {
         csVector3 v;
         csVector2 t;
@@ -1416,9 +1416,9 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
       }
       break;
 
-    case TOKEN_TEXNR:
+    case CS_TOKEN_TEXNR:
       //@@OBSOLETE, retained for backward compatibility
-    case TOKEN_MATERIAL:
+    case CS_TOKEN_MATERIAL:
       ScanStr (params, "%s", str);
       info.default_material = FindMaterial (str);
       if (info.default_material == NULL)
@@ -1427,27 +1427,27 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
         fatal_exit (0, true);
       }
       break;
-    case TOKEN_TEXLEN:
+    case CS_TOKEN_TEXLEN:
       ScanStr (params, "%f", &info.default_texlen);
       break;
-    case TOKEN_MAT_SET_SELECT:
+    case CS_TOKEN_MAT_SET_SELECT:
       ScanStr(params, "%s", str);
       info.SetTextureSet( str );
       info.use_mat_set=true;
       break;
-    case TOKEN_LIGHTX:
+    case CS_TOKEN_LIGHTX:
       CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
                                " and does not do anything!\n");
       break;
-    case TOKEN_ACTIVATE:
+    case CS_TOKEN_ACTIVATE:
       CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
                                  " and does not do anything!\n");
       break;
-    case TOKEN_TRIGGER:
+    case CS_TOKEN_TRIGGER:
       CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
                                  " and does not do anything!\n");
       break;
-    case TOKEN_BSP:
+    case CS_TOKEN_BSP:
       CsPrintf (MSG_FATAL_ERROR,
         "BSP keyword is no longer supported. Use STATBSP instead after putting\n\
 all non-convex polygons in things.\n");
@@ -1460,31 +1460,31 @@ all non-convex polygons in things.\n");
 
 csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MOVEABLE)
-    TOKEN_TABLE (MOVE)
-    TOKEN_TABLE (TEXTURE_SCALE)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (CEIL_TEXTURE)
-    TOKEN_TABLE (DETAIL)
-    TOKEN_TABLE (DIM)
-    TOKEN_TABLE (HEIGHT)
-    TOKEN_TABLE (FLOOR_HEIGHT)
-    TOKEN_TABLE (FLOOR_CEIL)
-    TOKEN_TABLE (FLOOR_TEXTURE)
-    TOKEN_TABLE (FLOOR)
-    TOKEN_TABLE (CEILING)
-    TOKEN_TABLE (TRIGGER)
-    TOKEN_TABLE (ACTIVATE)
-    TOKEN_TABLE (FOG)
-    TOKEN_TABLE (CONVEX)
-    TOKEN_TABLE (KEY)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MOVEABLE)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (TEXTURE_SCALE)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (CEIL_TEXTURE)
+    CS_TOKEN_TABLE (DETAIL)
+    CS_TOKEN_TABLE (DIM)
+    CS_TOKEN_TABLE (HEIGHT)
+    CS_TOKEN_TABLE (FLOOR_HEIGHT)
+    CS_TOKEN_TABLE (FLOOR_CEIL)
+    CS_TOKEN_TABLE (FLOOR_TEXTURE)
+    CS_TOKEN_TABLE (FLOOR)
+    CS_TOKEN_TABLE (CEILING)
+    CS_TOKEN_TABLE (TRIGGER)
+    CS_TOKEN_TABLE (ACTIVATE)
+    CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (CONVEX)
+    CS_TOKEN_TABLE (KEY)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_matvec)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* xname;
 
@@ -1519,23 +1519,23 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
     switch (cmd)
     {
-      case TOKEN_CONVEX:
+      case CS_TOKEN_CONVEX:
         is_convex = true;
         break;
-      case TOKEN_FOG:
+      case CS_TOKEN_FOG:
         {
           csFog& f = thing->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case TOKEN_MOVEABLE:
+      case CS_TOKEN_MOVEABLE:
         thing->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
         break;
-      case TOKEN_DETAIL:
+      case CS_TOKEN_DETAIL:
         thing->flags.Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
         break;
-      case TOKEN_MOVE:
+      case CS_TOKEN_MOVE:
         {
           char* params2;
           obj = csReversibleTransform(); // identity transform
@@ -1548,14 +1548,14 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
     	    }
             switch (cmd)
             {
-              case TOKEN_MATRIX:
+              case CS_TOKEN_MATRIX:
               {
                 csMatrix3 m;
                 load_matrix (params2, m);
                 obj.SetT2O (m);
                 break;
               }
-              case TOKEN_V:
+              case CS_TOKEN_V:
               {
                 csVector3 v;
                 load_vector (params2, v);
@@ -1566,7 +1566,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
           }
         }
         break;
-      case TOKEN_TEXTURE: //@@@MAT
+      case CS_TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
         material = FindMaterial (str);
         if (material == NULL)
@@ -1575,10 +1575,10 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_TEXTURE_SCALE:
+      case CS_TOKEN_TEXTURE_SCALE:
         ScanStr (params, "%f", &tscale);
         break;
-      case TOKEN_DIM:
+      case CS_TOKEN_DIM:
         {
           float rx, ry, rz;
           ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
@@ -1587,7 +1587,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
            v[i] = csVector3((i&1 ? rx : -rx),(i&2 ? -ry : ry),(i&4 ? -rz : rz));
         }
         break;
-      case TOKEN_FLOOR_HEIGHT:
+      case CS_TOKEN_FLOOR_HEIGHT:
         ScanStr (params, "%f", &r);
         v[0].y = r+v[0].y-v[2].y;
         v[1].y = r+v[1].y-v[3].y;
@@ -1598,14 +1598,14 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
         v[6].y = r;
         v[7].y = r;
         break;
-      case TOKEN_HEIGHT:
+      case CS_TOKEN_HEIGHT:
         ScanStr (params, "%f", &r);
         v[0].y = r+v[2].y;
         v[1].y = r+v[3].y;
         v[4].y = r+v[6].y;
         v[5].y = r+v[7].y;
         break;
-      case TOKEN_FLOOR_CEIL:
+      case CS_TOKEN_FLOOR_CEIL:
         ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
                  &v[2].x, &v[2].z, &v[3].x, &v[3].z,
                  &v[7].x, &v[7].z, &v[6].x, &v[6].z);
@@ -1614,30 +1614,30 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
         v[5] = v[7];
         v[4] = v[6];
         break;
-      case TOKEN_FLOOR:
+      case CS_TOKEN_FLOOR:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
                  &v[2].x, &v[2].y, &v[2].z, &v[3].x, &v[3].y, &v[3].z,
                  &v[7].x, &v[7].y, &v[7].z, &v[6].x, &v[6].y, &v[6].z);
         break;
-      case TOKEN_CEILING:
+      case CS_TOKEN_CEILING:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
                  &v[0].x, &v[0].y, &v[0].z, &v[1].x, &v[1].y, &v[1].z,
                  &v[5].x, &v[5].y, &v[5].z, &v[4].x, &v[4].y, &v[4].z);
         break;
-      case TOKEN_KEY:
+      case CS_TOKEN_KEY:
         load_key (params, thing);
         break;
-      case TOKEN_ACTIVATE:
+      case CS_TOKEN_ACTIVATE:
         CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
                                  " and does not do anything!\n");
         break;
-      case TOKEN_TRIGGER:
+      case CS_TOKEN_TRIGGER:
         CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
                                  " and does not do anything!\n");
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a sixface!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -1743,38 +1743,38 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
 csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (VERTEX)
-    TOKEN_TABLE (CIRCLE)
-    TOKEN_TABLE (POLYGON)
-    TOKEN_TABLE (BEZIER)
-    TOKEN_TABLE (CURVECENTER)
-    TOKEN_TABLE (CURVESCALE)
-    TOKEN_TABLE (CURVECONTROL)
-    TOKEN_TABLE (MAT_SET_SELECT)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (TEXLEN)
-    TOKEN_TABLE (TRIGGER)
-    TOKEN_TABLE (ACTIVATE)
-    TOKEN_TABLE (LIGHTX)
-    TOKEN_TABLE (BSP)
-    TOKEN_TABLE (FOG)
-    TOKEN_TABLE (MOVEABLE)
-    TOKEN_TABLE (DETAIL)
-    TOKEN_TABLE (CONVEX)
-    TOKEN_TABLE (MOVE)
-    TOKEN_TABLE (HARDMOVE)
-    TOKEN_TABLE (TEMPLATE)
-    TOKEN_TABLE (CLONE)
-    TOKEN_TABLE (KEY)
-    TOKEN_TABLE (CAMERA)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (VERTEX)
+    CS_TOKEN_TABLE (CIRCLE)
+    CS_TOKEN_TABLE (POLYGON)
+    CS_TOKEN_TABLE (BEZIER)
+    CS_TOKEN_TABLE (CURVECENTER)
+    CS_TOKEN_TABLE (CURVESCALE)
+    CS_TOKEN_TABLE (CURVECONTROL)
+    CS_TOKEN_TABLE (MAT_SET_SELECT)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (TEXLEN)
+    CS_TOKEN_TABLE (TRIGGER)
+    CS_TOKEN_TABLE (ACTIVATE)
+    CS_TOKEN_TABLE (LIGHTX)
+    CS_TOKEN_TABLE (BSP)
+    CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (MOVEABLE)
+    CS_TOKEN_TABLE (DETAIL)
+    CS_TOKEN_TABLE (CONVEX)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (HARDMOVE)
+    CS_TOKEN_TABLE (TEMPLATE)
+    CS_TOKEN_TABLE (CLONE)
+    CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (CAMERA)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_matvec)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* xname;
 
@@ -1800,19 +1800,19 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
     }
     switch (cmd)
     {
-      case TOKEN_MOVEABLE:
+      case CS_TOKEN_MOVEABLE:
         thing->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
         break;
-      case TOKEN_DETAIL:
+      case CS_TOKEN_DETAIL:
         thing->flags.Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
         break;
-      case TOKEN_CONVEX:
+      case CS_TOKEN_CONVEX:
         is_convex = true;
         break;
-      case TOKEN_CAMERA:
+      case CS_TOKEN_CAMERA:
         thing->flags.Set (CS_ENTITY_CAMERA, CS_ENTITY_CAMERA);
         break;
-      case TOKEN_MOVE:
+      case CS_TOKEN_MOVE:
         {
           char* params2;
           while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
@@ -1824,14 +1824,14 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
     	    }
             switch (cmd)
             {
-              case TOKEN_MATRIX:
+              case CS_TOKEN_MATRIX:
               {
                 csMatrix3 m;
                 load_matrix (params2, m);
                 obj.SetT2O (m);
                 break;
               }
-              case TOKEN_V:
+              case CS_TOKEN_V:
               {
                 csVector3 v;
                 load_vector (params2, v);
@@ -1842,7 +1842,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
           }
         }
         break;
-      case TOKEN_TEMPLATE:
+      case CS_TOKEN_TEMPLATE:
         {
           ScanStr (params, "%s", str);
           csThing* t = (csThing*)World->thing_templates.FindByName (str);
@@ -1863,7 +1863,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
           csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
         break;
-      case TOKEN_CLONE:
+      case CS_TOKEN_CLONE:
         {
           ScanStr (params, "%s", str);
           csThing* t = (csThing*)World->things.FindByName (str);
@@ -1884,7 +1884,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
           csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
         break;
-      case TOKEN_KEY:
+      case CS_TOKEN_KEY:
         load_key (params, thing);
         break;
       default:
@@ -1892,7 +1892,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a thing!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -1920,59 +1920,59 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
   csPolygonSet* parent)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (LIGHTING)
-    TOKEN_TABLE (MIPMAP)
-    TOKEN_TABLE (PORTAL)
-    TOKEN_TABLE (WARP)
-    TOKEN_TABLE (LIGHTX)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (SHADING)
-    TOKEN_TABLE (VERTICES)
-    TOKEN_TABLE (UVA)
-    TOKEN_TABLE (UV)
-    TOKEN_TABLE (COLORS)
-    TOKEN_TABLE (COLLDET)
-    TOKEN_TABLE (ALPHA)
-    TOKEN_TABLE (FOG)
-    TOKEN_TABLE (COSFACT)
-    TOKEN_TABLE (GOURAUD)
-    TOKEN_TABLE (MIXMODE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (MIPMAP)
+    CS_TOKEN_TABLE (PORTAL)
+    CS_TOKEN_TABLE (WARP)
+    CS_TOKEN_TABLE (LIGHTX)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (SHADING)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (UVA)
+    CS_TOKEN_TABLE (UV)
+    CS_TOKEN_TABLE (COLORS)
+    CS_TOKEN_TABLE (COLLDET)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (COSFACT)
+    CS_TOKEN_TABLE (GOURAUD)
+    CS_TOKEN_TABLE (MIXMODE)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tex_commands)
-    TOKEN_TABLE (ORIG)
-    TOKEN_TABLE (FIRST_LEN)
-    TOKEN_TABLE (FIRST)
-    TOKEN_TABLE (SECOND_LEN)
-    TOKEN_TABLE (SECOND)
-    TOKEN_TABLE (UVEC)
-    TOKEN_TABLE (VVEC)
-    TOKEN_TABLE (LEN)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (PLANE)
-    TOKEN_TABLE (V)
-    TOKEN_TABLE (UV_SHIFT)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tex_commands)
+    CS_TOKEN_TABLE (ORIG)
+    CS_TOKEN_TABLE (FIRST_LEN)
+    CS_TOKEN_TABLE (FIRST)
+    CS_TOKEN_TABLE (SECOND_LEN)
+    CS_TOKEN_TABLE (SECOND)
+    CS_TOKEN_TABLE (UVEC)
+    CS_TOKEN_TABLE (VVEC)
+    CS_TOKEN_TABLE (LEN)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (PLANE)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (UV_SHIFT)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (portal_commands)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (V)
-    TOKEN_TABLE (W)
-    TOKEN_TABLE (MIRROR)
-    TOKEN_TABLE (STATIC)
-    TOKEN_TABLE (ZFILL)
-    TOKEN_TABLE (CLIP)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (portal_commands)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (W)
+    CS_TOKEN_TABLE (MIRROR)
+    CS_TOKEN_TABLE (STATIC)
+    CS_TOKEN_TABLE (ZFILL)
+    CS_TOKEN_TABLE (CLIP)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (texturing_commands)
-    TOKEN_TABLE (NONE)
-    TOKEN_TABLE (FLAT)
-    TOKEN_TABLE (GOURAUD)
-    TOKEN_TABLE (LIGHTMAP)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (texturing_commands)
+    CS_TOKEN_TABLE (NONE)
+    CS_TOKEN_TABLE (FLAT)
+    CS_TOKEN_TABLE (GOURAUD)
+    CS_TOKEN_TABLE (LIGHTMAP)
+  CS_TOKEN_TABLE_END
 
   char* name;
   int i;
@@ -2010,9 +2010,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     }
     switch (cmd)
     {
-      case TOKEN_TEXNR:
+      case CS_TOKEN_TEXNR:
         //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         mat = FindMaterial (str);
         if (mat == NULL)
@@ -2022,34 +2022,34 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         }
         poly3d->SetMaterial (mat);
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
           poly3d->flags.Set (CS_POLY_LIGHTING, do_lighting ? CS_POLY_LIGHTING : 0);
         }
         break;
-      case TOKEN_MIPMAP:
+      case CS_TOKEN_MIPMAP:
         //@@@ OBSOLETE
         break;
-      case TOKEN_COSFACT:
+      case CS_TOKEN_COSFACT:
         {
           float cosfact;
           ScanStr (params, "%f", &cosfact);
           poly3d->SetCosinusFactor (cosfact);
         }
         break;
-      case TOKEN_ALPHA:
+      case CS_TOKEN_ALPHA:
         {
           int alpha;
           ScanStr (params, "%d", &alpha);
           poly3d->SetAlpha (alpha * 655 / 256);
         }
         break;
-      case TOKEN_FOG:
+      case CS_TOKEN_FOG:
         //@@@ OBSOLETE
         break;
-      case TOKEN_COLLDET:
+      case CS_TOKEN_COLLDET:
         {
           int do_colldet;
           ScanStr (params, "%b", &do_colldet);
@@ -2057,7 +2057,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	  else set_colldet = -1;
         }
         break;
-      case TOKEN_PORTAL:
+      case CS_TOKEN_PORTAL:
         {
           ScanStr (params, "%s", str);
           csSector *s = new csSector (World);
@@ -2066,7 +2066,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
           csLoaderStat::portals_loaded++;
         }
         break;
-      case TOKEN_WARP:
+      case CS_TOKEN_WARP:
         if (poly3d->GetPortal ())
         {
           csMatrix3 m_w; m_w.Identity ();
@@ -2081,30 +2081,30 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     	    }
             switch (cmd)
             {
-              case TOKEN_MATRIX:
+              case CS_TOKEN_MATRIX:
                 load_matrix (params2, m_w);
                 do_mirror = false;
                 break;
-              case TOKEN_V:
+              case CS_TOKEN_V:
                 load_vector (params2, v_w_before);
                 v_w_after = v_w_before;
                 do_mirror = false;
                 break;
-              case TOKEN_W:
+              case CS_TOKEN_W:
                 load_vector (params2, v_w_after);
                 do_mirror = false;
                 break;
-              case TOKEN_MIRROR:
+              case CS_TOKEN_MIRROR:
                 do_mirror = true;
 		if (!set_colldet) set_colldet = 1;
                 break;
-              case TOKEN_STATIC:
+              case CS_TOKEN_STATIC:
                 poly3d->GetPortal ()->flags.Set (CS_PORTAL_STATICDEST);
                 break;
-      	      case TOKEN_ZFILL:
+      	      case CS_TOKEN_ZFILL:
 		poly3d->GetPortal ()->flags.Set (CS_PORTAL_ZFILL);
         	break;
-      	      case TOKEN_CLIP:
+      	      case CS_TOKEN_CLIP:
 		poly3d->GetPortal ()->flags.Set (CS_PORTAL_CLIPDEST);
         	break;
             }
@@ -2113,11 +2113,11 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
             poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
         }
         break;
-      case TOKEN_LIGHTX:
+      case CS_TOKEN_LIGHTX:
         CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
                                " and does not do anything!\n");
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
     	  if (!params2)
@@ -2127,7 +2127,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	  }
           switch (cmd)
           {
-            case TOKEN_ORIG:
+            case CS_TOKEN_ORIG:
               tx1_given = true;
               int num;
               float flist[100];
@@ -2135,53 +2135,53 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
               if (num == 1) tx_orig = parent->Vobj ((int)flist[0]);
               if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_FIRST:
+            case CS_TOKEN_FIRST:
               tx1_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx1 = parent->Vobj ((int)flist[0]);
               if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_FIRST_LEN:
+            case CS_TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
-            case TOKEN_SECOND:
+            case CS_TOKEN_SECOND:
               tx2_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx2 = parent->Vobj ((int)flist[0]);
               if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_SECOND_LEN:
+            case CS_TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
-            case TOKEN_LEN:
+            case CS_TOKEN_LEN:
               ScanStr (params2, "%f", &tx_len);
               break;
-            case TOKEN_MATRIX:
+            case CS_TOKEN_MATRIX:
               load_matrix (params2, tx_matrix);
               tx_len = 0;
               break;
-            case TOKEN_V:
+            case CS_TOKEN_V:
               load_vector (params2, tx_vector);
               tx_len = 0;
               break;
-            case TOKEN_PLANE:
+            case CS_TOKEN_PLANE:
               ScanStr (params2, "%s", str);
               strcpy (plane_name, str);
               tx_len = 0;
               break;
-            case TOKEN_UV_SHIFT:
+            case CS_TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
-            case TOKEN_UVEC:
+            case CS_TOKEN_UVEC:
               tx1_given = true;
               load_vector (params2, tx1);
               tx1_len = tx1.Norm ();
               tx1 += tx_orig;
               break;
-            case TOKEN_VVEC:
+            case CS_TOKEN_VVEC:
               tx2_given = true;
               load_vector (params2, tx2);
               tx2_len = tx2.Norm ();
@@ -2190,7 +2190,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
           }
         }
         break;
-      case TOKEN_VERTICES:
+      case CS_TOKEN_VERTICES:
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
@@ -2203,28 +2203,28 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	  }
         }
         break;
-      case TOKEN_SHADING:
+      case CS_TOKEN_SHADING:
         while ((cmd = csGetObject (&params, texturing_commands, &name, &params2)) > 0)
           switch (cmd)
           {
-            case TOKEN_NONE:
+            case CS_TOKEN_NONE:
               poly3d->SetTextureType (POLYTXT_NONE);
               break;
-            case TOKEN_FLAT:
+            case CS_TOKEN_FLAT:
               poly3d->SetTextureType (POLYTXT_FLAT);
               break;
-            case TOKEN_GOURAUD:
+            case CS_TOKEN_GOURAUD:
               poly3d->SetTextureType (POLYTXT_GOURAUD);
               break;
-            case TOKEN_LIGHTMAP:
+            case CS_TOKEN_LIGHTMAP:
               poly3d->SetTextureType (POLYTXT_LIGHTMAP);
               break;
           }
         break;
-      case TOKEN_GOURAUD:
+      case CS_TOKEN_GOURAUD:
         //@@OBSOLETE, see above
         break;
-      case TOKEN_MIXMODE:
+      case CS_TOKEN_MIXMODE:
         {
           UInt mixmode = ParseMixmode (params);
           csPolyTexNone *notex = poly3d->GetNoTexInfo ();
@@ -2233,7 +2233,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
             poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
           break;
 	}
-      case TOKEN_UV:
+      case CS_TOKEN_UV:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csPolyTexFlat* fs = poly3d->GetFlatInfo ();
@@ -2247,7 +2247,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
             fs->SetUV (j, list [j * 2], list [j * 2 + 1]);
         }
         break;
-      case TOKEN_COLORS:
+      case CS_TOKEN_COLORS:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csPolyTexGouraud* gs = poly3d->GetGouraudInfo ();
@@ -2261,7 +2261,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
             gs->SetColor (j, list [j * 3], list [j * 3 + 1], list [j * 3 + 2]);
         }
         break;
-      case TOKEN_UVA:
+      case CS_TOKEN_UVA:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csPolyTexFlat* fs = poly3d->GetFlatInfo ();
@@ -2281,7 +2281,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a polygon!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -2289,7 +2289,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 
   if (poly3d->GetNumVertices () < 3)
   {
-    CsPrintf (MSG_WARNING, "Polygon in line %d contains just %d vertices!\n", parser_line, poly3d->GetNumVertices());
+    CsPrintf (MSG_WARNING, "Polygon in line %d contains just %d vertices!\n",
+      csGetParserLine(), poly3d->GetNumVertices());
     return NULL;
   }
 
@@ -2398,17 +2399,17 @@ iImage* csLoader::load_image (const char* name)
 
 void csLoader::txt_process (char *name, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TRANSPARENT)
-    TOKEN_TABLE (FILTER)
-    TOKEN_TABLE (FILE)
-    TOKEN_TABLE (MIPMAP)
-    TOKEN_TABLE (DITHER)
-    TOKEN_TABLE (PROCEDURAL)
-    TOKEN_TABLE (PERSISTENT)
-    TOKEN_TABLE (FOR_2D)
-    TOKEN_TABLE (FOR_3D)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (FILTER)
+    CS_TOKEN_TABLE (FILE)
+    CS_TOKEN_TABLE (MIPMAP)
+    CS_TOKEN_TABLE (DITHER)
+    CS_TOKEN_TABLE (PROCEDURAL)
+    CS_TOKEN_TABLE (PERSISTENT)
+    CS_TOKEN_TABLE (FOR_2D)
+    CS_TOKEN_TABLE (FOR_3D)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   const char *filename = name;
@@ -2421,7 +2422,7 @@ void csLoader::txt_process (char *name, char* buf)
   {
     switch (cmd)
     {
-      case TOKEN_FOR_2D:
+      case CS_TOKEN_FOR_2D:
         if (strcasecmp (params, "yes") == 0)
           flags |= CS_TEXTURE_2D;
         else if (strcasecmp (params, "no") == 0)
@@ -2429,7 +2430,7 @@ void csLoader::txt_process (char *name, char* buf)
         else
           CsPrintf (MSG_WARNING, "Warning! Invalid FOR_2D() value, 'yes' or 'no' expected\n");
         break;
-      case TOKEN_FOR_3D:
+      case CS_TOKEN_FOR_3D:
         if (strcasecmp (params, "yes") == 0)
           flags |= CS_TEXTURE_3D;
         else if (strcasecmp (params, "no") == 0)
@@ -2437,24 +2438,24 @@ void csLoader::txt_process (char *name, char* buf)
         else
           CsPrintf (MSG_WARNING, "Warning! Invalid FOR_3D() value, 'yes' or 'no' expected\n");
         break;
-      case TOKEN_PERSISTENT:
+      case CS_TOKEN_PERSISTENT:
         flags |= CS_TEXTURE_PROC_PERSISTENT;
         break;
-      case TOKEN_PROCEDURAL:
+      case CS_TOKEN_PROCEDURAL:
         flags |= CS_TEXTURE_PROC;
         break;
-      case TOKEN_TRANSPARENT:
+      case CS_TOKEN_TRANSPARENT:
         do_transp = true;
         ScanStr (params, "%f,%f,%f", &transp.red, &transp.green, &transp.blue);
         break;
-      case TOKEN_FILTER:
+      case CS_TOKEN_FILTER:
         CsPrintf (MSG_WARNING, "Warning! TEXTURE/FILTER statement is obsolete"
                                " and does not do anything!\n");
         break;
-      case TOKEN_FILE:
+      case CS_TOKEN_FILE:
         filename = params;
         break;
-      case TOKEN_MIPMAP:
+      case CS_TOKEN_MIPMAP:
         if (strcasecmp (params, "yes") == 0)
           flags &= ~CS_TEXTURE_NOMIPMAPS;
         else if (strcasecmp (params, "no") == 0)
@@ -2462,7 +2463,7 @@ void csLoader::txt_process (char *name, char* buf)
         else
           CsPrintf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
         break;
-      case TOKEN_DITHER:
+      case CS_TOKEN_DITHER:
         if (strcasecmp (params, "yes") == 0)
           flags |= CS_TEXTURE_DITHER;
         else if (strcasecmp (params, "no") == 0)
@@ -2473,7 +2474,7 @@ void csLoader::txt_process (char *name, char* buf)
     }
   }
 
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a texture specification!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -2506,13 +2507,13 @@ void csLoader::txt_process (char *name, char* buf)
 
 void csLoader::mat_process (char *name, char* buf, const char *prefix)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (COLOR)
-    TOKEN_TABLE (DIFFUSE)
-    TOKEN_TABLE (AMBIENT)
-    TOKEN_TABLE (REFLECTION)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (DIFFUSE)
+    CS_TOKEN_TABLE (AMBIENT)
+    CS_TOKEN_TABLE (REFLECTION)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char *params;
@@ -2525,7 +2526,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
   {
     switch (cmd)
     {
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
         csTextureWrapper *texh = World->GetTextures ()->FindByName (str);
@@ -2538,25 +2539,25 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
         }
         break;
       }
-      case TOKEN_COLOR:
+      case CS_TOKEN_COLOR:
         load_color (params, material->GetFlatColor ());
         break;
-      case TOKEN_DIFFUSE:
+      case CS_TOKEN_DIFFUSE:
         ScanStr (params, "%f", &tmp);
         material->SetDiffuse (tmp);
         break;
-      case TOKEN_AMBIENT:
+      case CS_TOKEN_AMBIENT:
         ScanStr (params, "%f", &tmp);
         material->SetAmbient (tmp);
         break;
-      case TOKEN_REFLECTION:
+      case CS_TOKEN_REFLECTION:
         ScanStr (params, "%f", &tmp);
         material->SetReflection (tmp);
         break;
     }
   }
 
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a material specification!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -2584,40 +2585,40 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
   csThingTemplate* parent)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (LIGHTING)
-    TOKEN_TABLE (MIPMAP)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (VERTICES)
-    TOKEN_TABLE (FLATCOL)
-    TOKEN_TABLE (GOURAUD)
-    TOKEN_TABLE (COLLDET)
-    TOKEN_TABLE (SHADING)
-    TOKEN_TABLE (COLORS)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (MIPMAP)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (FLATCOL)
+    CS_TOKEN_TABLE (GOURAUD)
+    CS_TOKEN_TABLE (COLLDET)
+    CS_TOKEN_TABLE (SHADING)
+    CS_TOKEN_TABLE (COLORS)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tex_commands)
-    TOKEN_TABLE (ORIG)
-    TOKEN_TABLE (FIRST_LEN)
-    TOKEN_TABLE (FIRST)
-    TOKEN_TABLE (SECOND_LEN)
-    TOKEN_TABLE (SECOND)
-    TOKEN_TABLE (LEN)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (UVEC)
-    TOKEN_TABLE (VVEC)
-    TOKEN_TABLE (V)
-    TOKEN_TABLE (UV_SHIFT)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tex_commands)
+    CS_TOKEN_TABLE (ORIG)
+    CS_TOKEN_TABLE (FIRST_LEN)
+    CS_TOKEN_TABLE (FIRST)
+    CS_TOKEN_TABLE (SECOND_LEN)
+    CS_TOKEN_TABLE (SECOND)
+    CS_TOKEN_TABLE (LEN)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (UVEC)
+    CS_TOKEN_TABLE (VVEC)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (UV_SHIFT)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (texturing_commands)
-    TOKEN_TABLE (NONE)
-    TOKEN_TABLE (FLAT)
-    TOKEN_TABLE (GOURAUD)
-    TOKEN_TABLE (LIGHTMAP)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (texturing_commands)
+    CS_TOKEN_TABLE (NONE)
+    CS_TOKEN_TABLE (FLAT)
+    CS_TOKEN_TABLE (GOURAUD)
+    CS_TOKEN_TABLE (LIGHTMAP)
+  CS_TOKEN_TABLE_END
 
   char* name;
   int i;
@@ -2651,9 +2652,9 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     }
     switch (cmd)
     {
-      case TOKEN_TEXNR:
+      case CS_TOKEN_TEXNR:
         //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         mat = FindMaterial (str);
         if (mat == NULL)
@@ -2663,41 +2664,41 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         }
         ptemplate->SetMaterial (mat);
         break;
-      case TOKEN_SHADING:
+      case CS_TOKEN_SHADING:
         while ((cmd = csGetObject (&params, texturing_commands, &name, &params2)) > 0)
           switch (cmd)
           {
-            case TOKEN_NONE:
+            case CS_TOKEN_NONE:
               ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_NONE);
               break;
-            case TOKEN_FLAT:
+            case CS_TOKEN_FLAT:
               ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_FLAT);
               break;
-            case TOKEN_GOURAUD:
+            case CS_TOKEN_GOURAUD:
               ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_GOURAUD);
               break;
-            case TOKEN_LIGHTMAP:
+            case CS_TOKEN_LIGHTMAP:
               ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_LIGHTMAP);
               break;
           }
         break;
-      case TOKEN_GOURAUD:
+      case CS_TOKEN_GOURAUD:
         //@@OBSOLETE, see above
         break;
-      case TOKEN_FLATCOL:
+      case CS_TOKEN_FLATCOL:
         //@@OBSOLETE, flat color belongs to material not to polygon
         break;
-      case TOKEN_MIPMAP:
+      case CS_TOKEN_MIPMAP:
         //@@@ OBSOLETE
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
           ptemplate->flags.SetBool (CS_POLY_LIGHTING, do_lighting);
         }
         break;
-      case TOKEN_COLLDET:
+      case CS_TOKEN_COLLDET:
         {
           int do_colldet;
           ScanStr (params, "%b", &do_colldet);
@@ -2705,7 +2706,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
             do_colldet ? CS_POLYTPL_COLLDET_ENABLE : CS_POLYTPL_COLLDET_DISABLE);
         }
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
           if (!params2)
@@ -2715,7 +2716,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
           }
           switch (cmd)
           {
-            case TOKEN_ORIG:
+            case CS_TOKEN_ORIG:
               tx1_given = true;
               int num;
               float flist[100];
@@ -2723,48 +2724,48 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
               if (num == 1) tx_orig = parent->Vtex ((int)flist[0]);
               if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_FIRST:
+            case CS_TOKEN_FIRST:
               tx1_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx1 = parent->Vtex ((int)flist[0]);
               if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_FIRST_LEN:
+            case CS_TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
-            case TOKEN_SECOND:
+            case CS_TOKEN_SECOND:
               tx2_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx2 = parent->Vtex ((int)flist[0]);
               if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_SECOND_LEN:
+            case CS_TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
-            case TOKEN_LEN:
+            case CS_TOKEN_LEN:
               ScanStr (params2, "%f", &tx_len);
               break;
-            case TOKEN_MATRIX:
+            case CS_TOKEN_MATRIX:
               load_matrix (params2, tx_matrix);
               tx_len = 0;
               break;
-            case TOKEN_V:
+            case CS_TOKEN_V:
               load_vector (params2, tx_vector);
               tx_len = 0;
               break;
-            case TOKEN_UV_SHIFT:
+            case CS_TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
-            case TOKEN_UVEC:
+            case CS_TOKEN_UVEC:
               tx1_given = true;
               load_vector (params2, tx1);
               tx1_len = tx1.Norm ();
               tx1 += tx_orig;
               break;
-            case TOKEN_VVEC:
+            case CS_TOKEN_VVEC:
               tx2_given = true;
               load_vector (params2, tx2);
               tx2_len = tx2.Norm ();
@@ -2773,14 +2774,14 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
           }
         }
         break;
-      case TOKEN_VERTICES:
+      case CS_TOKEN_VERTICES:
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
           for (i = 0 ; i < num ; i++) ptemplate->AddVertex (list[i]);
         }
         break;
-      case TOKEN_COLORS:
+      case CS_TOKEN_COLORS:
         {
           ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_GOURAUD);
 	  int num, nv = ptemplate->GetNumVertices ();
@@ -2793,7 +2794,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a polygon template!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -2841,26 +2842,26 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
   csVector3* curve_vertices)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (VERTICES)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (VERTICES)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tex_commands)
-    TOKEN_TABLE (ORIG)
-    TOKEN_TABLE (FIRST_LEN)
-    TOKEN_TABLE (FIRST)
-    TOKEN_TABLE (SECOND_LEN)
-    TOKEN_TABLE (SECOND)
-    TOKEN_TABLE (LEN)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (UVEC)
-    TOKEN_TABLE (VVEC)
-    TOKEN_TABLE (V)
-    TOKEN_TABLE (UV_SHIFT)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tex_commands)
+    CS_TOKEN_TABLE (ORIG)
+    CS_TOKEN_TABLE (FIRST_LEN)
+    CS_TOKEN_TABLE (FIRST)
+    CS_TOKEN_TABLE (SECOND_LEN)
+    CS_TOKEN_TABLE (SECOND)
+    CS_TOKEN_TABLE (LEN)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (UVEC)
+    CS_TOKEN_TABLE (VVEC)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (UV_SHIFT)
+  CS_TOKEN_TABLE_END
 
   char *name;
   long cmd;
@@ -2895,9 +2896,9 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
     }
     switch (cmd)
     {
-      case TOKEN_TEXNR:
+      case CS_TOKEN_TEXNR:
         //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         mat = FindMaterial (str);
         if (mat == NULL)
@@ -2907,7 +2908,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
         }
         ptemplate->SetMaterialWrapper (mat);
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
           if (!params2)
@@ -2917,7 +2918,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
           }
           switch (cmd)
           {
-            case TOKEN_ORIG:
+            case CS_TOKEN_ORIG:
               tx1_given = true;
               int num;
               float flist[100];
@@ -2925,48 +2926,48 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
               if (num == 1) tx_orig = curve_vertices[(int)flist[0]];
               if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_FIRST:
+            case CS_TOKEN_FIRST:
               tx1_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx1 = curve_vertices[(int)flist[0]];
               if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_FIRST_LEN:
+            case CS_TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
-            case TOKEN_SECOND:
+            case CS_TOKEN_SECOND:
               tx2_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx2 = curve_vertices[(int)flist[0]];
               if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
               break;
-            case TOKEN_SECOND_LEN:
+            case CS_TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
-            case TOKEN_LEN:
+            case CS_TOKEN_LEN:
               ScanStr (params2, "%f", &tx_len);
               break;
-            case TOKEN_MATRIX:
+            case CS_TOKEN_MATRIX:
               load_matrix (params2, tx_matrix);
               tx_len = 0;
               break;
-            case TOKEN_V:
+            case CS_TOKEN_V:
               load_vector (params2, tx_vector);
               tx_len = 0;
               break;
-            case TOKEN_UV_SHIFT:
+            case CS_TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
-            case TOKEN_UVEC:
+            case CS_TOKEN_UVEC:
               tx1_given = true;
               load_vector (params2, tx1);
               tx1_len = tx1.Norm ();
               tx1 += tx_orig;
               break;
-            case TOKEN_VVEC:
+            case CS_TOKEN_VVEC:
               tx2_given = true;
               load_vector (params2, tx2);
               tx2_len = tx2.Norm ();
@@ -2975,7 +2976,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
           }
         }
         break;
-      case TOKEN_VERTICES:
+      case CS_TOKEN_VERTICES:
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
@@ -2989,7 +2990,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a bezier template!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -3002,29 +3003,29 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
 #if 0
 csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (VERTEX)
-    TOKEN_TABLE (CIRCLE)
-    TOKEN_TABLE (POLYGON)
-    TOKEN_TABLE (BEZIER)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (TEXLEN)
-    TOKEN_TABLE (FOG)
-    TOKEN_TABLE (MOVE)
-    TOKEN_TABLE (FILE)
-    TOKEN_TABLE (CURVECENTER)
-    TOKEN_TABLE (CURVESCALE)
-    TOKEN_TABLE (CURVECONTROL)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (VERTEX)
+    CS_TOKEN_TABLE (CIRCLE)
+    CS_TOKEN_TABLE (POLYGON)
+    CS_TOKEN_TABLE (BEZIER)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (TEXLEN)
+    CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (FILE)
+    CS_TOKEN_TABLE (CURVECENTER)
+    CS_TOKEN_TABLE (CURVESCALE)
+    CS_TOKEN_TABLE (CURVECONTROL)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_matrix)
-    TOKEN_TABLE (MATRIX)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matrix)
+    CS_TOKEN_TABLE (MATRIX)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_vector)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_vector)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* name;
   char str[255];
@@ -3049,14 +3050,14 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_VERTEX:
+      case CS_TOKEN_VERTEX:
         {
           float x, y, z;
           ScanStr (params, "%f,%f,%f", &x, &y, &z);
           tmpl->AddVertex (x, y, z);
         }
         break;
-      case TOKEN_CIRCLE:
+      case CS_TOKEN_CIRCLE:
         {
           float x, y, z, rx, ry, rz;
           int num, dir;
@@ -3079,35 +3080,35 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
           }
         }
         break;
-      case TOKEN_FOG:
+      case CS_TOKEN_FOG:
         {
           csFog& f = tmpl->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case TOKEN_POLYGON:
+      case CS_TOKEN_POLYGON:
         tmpl->AddPolygon (load_ptemplate (name, params, default_material,
           default_texlen, tmpl));
         break;
-      case TOKEN_BEZIER:
+      case CS_TOKEN_BEZIER:
         //CsPrintf(MSG_WARNING,"Encountered template curve!\n");
         tmpl->AddCurve (load_beziertemplate(name, params, default_material,
           default_texlen, tmpl->GetCurveVertices ()));
         break;
 
-      case TOKEN_CURVECENTER:
+      case CS_TOKEN_CURVECENTER:
         {
           csVector3 c;
           ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
           tmpl->curves_center = c;
         }
         break;
-      case TOKEN_CURVESCALE:
+      case CS_TOKEN_CURVESCALE:
         ScanStr (params, "%f", &tmpl->curves_scale);
         break;
 
-      case TOKEN_CURVECONTROL:
+      case CS_TOKEN_CURVECONTROL:
         {
           csVector3 v;
           csVector2 t;
@@ -3116,9 +3117,9 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
         }
         break;
 
-      case TOKEN_TEXNR:
+      case CS_TOKEN_TEXNR:
         //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         default_material = FindMaterial (str);
         if (default_material == NULL)
@@ -3128,11 +3129,11 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
         }
         break;
 
-      case TOKEN_TEXLEN:
+      case CS_TOKEN_TEXLEN:
         ScanStr (params, "%f", &default_texlen);
         break;
 
-      case TOKEN_MOVE:
+      case CS_TOKEN_MOVE:
         {
           char* params2;
           csGetObject (&params, tok_matrix, &name, &params2);
@@ -3142,7 +3143,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
         }
         break;
 
-      case TOKEN_FILE:
+      case CS_TOKEN_FILE:
         {
           ScanStr (params, "%s", str);
 	  converter* filedata = new converter;
@@ -3159,7 +3160,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
 	break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a thing template!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -3176,28 +3177,28 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
 #if 0
 csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MOVE)
-    TOKEN_TABLE (TEXTURE_SCALE)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (CEIL_TEXTURE)
-    TOKEN_TABLE (DIM)
-    TOKEN_TABLE (HEIGHT)
-    TOKEN_TABLE (FLOOR_HEIGHT)
-    TOKEN_TABLE (FLOOR_CEIL)
-    TOKEN_TABLE (FLOOR_TEXTURE)
-    TOKEN_TABLE (FLOOR)
-    TOKEN_TABLE (CEILING)
-    TOKEN_TABLE (FOG)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (TEXTURE_SCALE)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (CEIL_TEXTURE)
+    CS_TOKEN_TABLE (DIM)
+    CS_TOKEN_TABLE (HEIGHT)
+    CS_TOKEN_TABLE (FLOOR_HEIGHT)
+    CS_TOKEN_TABLE (FLOOR_CEIL)
+    CS_TOKEN_TABLE (FLOOR_TEXTURE)
+    CS_TOKEN_TABLE (FLOOR)
+    CS_TOKEN_TABLE (CEILING)
+    CS_TOKEN_TABLE (FOG)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_matrix)
-    TOKEN_TABLE (MATRIX)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matrix)
+    CS_TOKEN_TABLE (MATRIX)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_vector)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_vector)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* name;
   int i;
@@ -3234,14 +3235,14 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_FOG:
+      case CS_TOKEN_FOG:
         {
           csFog& f = tmpl->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case TOKEN_MOVE:
+      case CS_TOKEN_MOVE:
         {
           char* params2;
           csGetObject (&params, tok_matrix, &name, &params2);
@@ -3250,7 +3251,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
           load_vector (params2, v_move);
         }
         break;
-      case TOKEN_TEXTURE: //@@@MAT
+      case CS_TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
         material = FindMaterial (str);
         if (material == NULL)
@@ -3259,10 +3260,10 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_TEXTURE_SCALE:
+      case CS_TOKEN_TEXTURE_SCALE:
         ScanStr (params, "%f", &tscale);
         break;
-      case TOKEN_DIM:
+      case CS_TOKEN_DIM:
         {
           float rx, ry, rz;
           ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
@@ -3277,7 +3278,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
           v7.x =  rx; v7.y = -ry; v7.z = -rz;
         }
         break;
-      case TOKEN_FLOOR_HEIGHT:
+      case CS_TOKEN_FLOOR_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v0.y-v2.y;
         v1.y = r+v1.y-v3.y;
@@ -3288,14 +3289,14 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
         v6.y = r;
         v7.y = r;
         break;
-      case TOKEN_HEIGHT:
+      case CS_TOKEN_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v2.y;
         v1.y = r+v3.y;
         v4.y = r+v6.y;
         v5.y = r+v7.y;
         break;
-      case TOKEN_FLOOR_CEIL:
+      case CS_TOKEN_FLOOR_CEIL:
         ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
                 &v2.x, &v2.z, &v3.x, &v3.z, &v7.x, &v7.z, &v6.x, &v6.z);
         v0 = v2;
@@ -3303,19 +3304,19 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
         v5 = v7;
         v4 = v6;
         break;
-      case TOKEN_FLOOR:
+      case CS_TOKEN_FLOOR:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
                  &v2.x, &v2.y, &v2.z, &v3.x, &v3.y, &v3.z,
                  &v7.x, &v7.y, &v7.z, &v6.x, &v6.y, &v6.z);
         break;
-      case TOKEN_CEILING:
+      case CS_TOKEN_CEILING:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
                  &v0.x, &v0.y, &v0.z, &v1.x, &v1.y, &v1.z,
                  &v5.x, &v5.y, &v5.z, &v4.x, &v4.y, &v4.z);
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a sixface template!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -3505,11 +3506,11 @@ void add_to_todo (Todo* todo, int& todo_end, char* poly,
 
 void csLoader::load_tex (char** buf, Color* colors, int num_colors, char* name)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (PLANE)
-    TOKEN_TABLE (LEN)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (PLANE)
+    CS_TOKEN_TABLE (LEN)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char *params;
@@ -3524,7 +3525,7 @@ void csLoader::load_tex (char** buf, Color* colors, int num_colors, char* name)
   {
     switch (cmd)
     {
-      case TOKEN_TEXTURE://@@@MAT
+      case CS_TOKEN_TEXTURE://@@@MAT
         ScanStr (params, "%s", str);
         colors[num_colors].material = FindMaterial (str);
         if (colors[num_colors].material == NULL)
@@ -3533,16 +3534,16 @@ void csLoader::load_tex (char** buf, Color* colors, int num_colors, char* name)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_PLANE:
+      case CS_TOKEN_PLANE:
         ScanStr (params, "%s", str);
         strcpy (colors[num_colors].plane, str);
         break;
-      case TOKEN_LEN:
+      case CS_TOKEN_LEN:
         ScanStr (params, "%f", &colors[num_colors].len);
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a texture specification!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -3551,64 +3552,64 @@ void csLoader::load_tex (char** buf, Color* colors, int num_colors, char* name)
 
 csSector* csLoader::load_room (char* secname, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MOVE)
-    TOKEN_TABLE (TEXTURE_LIGHTING)
-    TOKEN_TABLE (TEXTURE_MIPMAP)
-    TOKEN_TABLE (TEXTURE_SCALE)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (TEX)
-    TOKEN_TABLE (CEIL_TEXTURE)
-    TOKEN_TABLE (FLOOR_TEXTURE)
-    TOKEN_TABLE (LIGHTX)
-    TOKEN_TABLE (LIGHT)
-    TOKEN_TABLE (DIM)
-    TOKEN_TABLE (HEIGHT)
-    TOKEN_TABLE (FLOOR_HEIGHT)
-    TOKEN_TABLE (FLOOR_CEIL)
-    TOKEN_TABLE (FLOOR)
-    TOKEN_TABLE (CEILING)
-    TOKEN_TABLE (SIXFACE)
-    TOKEN_TABLE (THING)
-    TOKEN_TABLE (SKY)
-    TOKEN_TABLE (PORTAL)
-    TOKEN_TABLE (SPLIT)
-    TOKEN_TABLE (TRIGGER)
-    TOKEN_TABLE (ACTIVATE)
-    TOKEN_TABLE (BSP)
-    TOKEN_TABLE (STATBSP)
-    TOKEN_TABLE (SPRITE2D)
-    TOKEN_TABLE (SPRITE)
-    TOKEN_TABLE (FOG)
-    TOKEN_TABLE (FOUNTAIN)
-    TOKEN_TABLE (RAIN)
-    TOKEN_TABLE (SNOW)
-    TOKEN_TABLE (FIRE)
-    TOKEN_TABLE (KEY)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (TEXTURE_LIGHTING)
+    CS_TOKEN_TABLE (TEXTURE_MIPMAP)
+    CS_TOKEN_TABLE (TEXTURE_SCALE)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (TEX)
+    CS_TOKEN_TABLE (CEIL_TEXTURE)
+    CS_TOKEN_TABLE (FLOOR_TEXTURE)
+    CS_TOKEN_TABLE (LIGHTX)
+    CS_TOKEN_TABLE (LIGHT)
+    CS_TOKEN_TABLE (DIM)
+    CS_TOKEN_TABLE (HEIGHT)
+    CS_TOKEN_TABLE (FLOOR_HEIGHT)
+    CS_TOKEN_TABLE (FLOOR_CEIL)
+    CS_TOKEN_TABLE (FLOOR)
+    CS_TOKEN_TABLE (CEILING)
+    CS_TOKEN_TABLE (SIXFACE)
+    CS_TOKEN_TABLE (THING)
+    CS_TOKEN_TABLE (SKY)
+    CS_TOKEN_TABLE (PORTAL)
+    CS_TOKEN_TABLE (SPLIT)
+    CS_TOKEN_TABLE (TRIGGER)
+    CS_TOKEN_TABLE (ACTIVATE)
+    CS_TOKEN_TABLE (BSP)
+    CS_TOKEN_TABLE (STATBSP)
+    CS_TOKEN_TABLE (SPRITE2D)
+    CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (FOUNTAIN)
+    CS_TOKEN_TABLE (RAIN)
+    CS_TOKEN_TABLE (SNOW)
+    CS_TOKEN_TABLE (FIRE)
+    CS_TOKEN_TABLE (KEY)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (portal_commands)
-    TOKEN_TABLE (POLYGON)
-    TOKEN_TABLE (SECTOR)
-    TOKEN_TABLE (ALPHA)
-    TOKEN_TABLE (WARP)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (portal_commands)
+    CS_TOKEN_TABLE (POLYGON)
+    CS_TOKEN_TABLE (SECTOR)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (WARP)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (mCommands)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (V)
-    TOKEN_TABLE (W)
-    TOKEN_TABLE (MIRROR)
-    TOKEN_TABLE (STATIC)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (mCommands)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (W)
+    CS_TOKEN_TABLE (MIRROR)
+    CS_TOKEN_TABLE (STATIC)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_matrix)
-    TOKEN_TABLE (MATRIX)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matrix)
+    CS_TOKEN_TABLE (MATRIX)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_vector)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_vector)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -3661,15 +3662,15 @@ csSector* csLoader::load_room (char* secname, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_BSP:
+      case CS_TOKEN_BSP:
         CsPrintf (MSG_FATAL_ERROR,
           "BSP keyword is no longer supported. Use STATBSP instead after putting\n"
           "all non-convex polygons in things.\n");
         break;
-      case TOKEN_STATBSP:
+      case CS_TOKEN_STATBSP:
         do_stat_bsp = true;
         break;
-      case TOKEN_MOVE:
+      case CS_TOKEN_MOVE:
         {
           char* params2;
           csGetObject (&params, tok_matrix, &name, &params2);
@@ -3678,7 +3679,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
           load_vector (params2, vm);
         }
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         material = FindMaterial (str);
         if (material == NULL)
@@ -3687,14 +3688,14 @@ csSector* csLoader::load_room (char* secname, char* buf)
           fatal_exit (0, true);
         }
         break;
-      case TOKEN_TEXTURE_LIGHTING:
+      case CS_TOKEN_TEXTURE_LIGHTING:
         ScanStr (params, "%b", &no_lighting); no_lighting = !no_lighting;
         break;
-      case TOKEN_TEXTURE_MIPMAP:
+      case CS_TOKEN_TEXTURE_MIPMAP:
         //@@@ OBSOLETE
         break;
-      case TOKEN_CEIL_TEXTURE:
-      case TOKEN_FLOOR_TEXTURE:
+      case CS_TOKEN_CEIL_TEXTURE:
+      case CS_TOKEN_FLOOR_TEXTURE:
         ScanStr (params, "%s", str);
         colors[num_colors].material = FindMaterial (str);
         if (colors[num_colors].material == NULL)
@@ -3703,7 +3704,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
           fatal_exit (0, true);
         }
         strcpy (colors[num_colors].poly,
-                cmd == TOKEN_CEIL_TEXTURE ? "up" : "down");
+                cmd == CS_TOKEN_CEIL_TEXTURE ? "up" : "down");
         colors[num_colors].plane[0] = 0;
         if (num_colors >= MAX_ROOM_COLORS)
         {
@@ -3712,18 +3713,18 @@ csSector* csLoader::load_room (char* secname, char* buf)
         }
         num_colors++;
         break;
-      case TOKEN_LIGHTX:
+      case CS_TOKEN_LIGHTX:
         CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
                                " and does not do anything!\n");
         break;
-      case TOKEN_TEX:
+      case CS_TOKEN_TEX:
         load_tex (&params, colors, num_colors, name);
         num_colors++;
         break;
-      case TOKEN_TEXTURE_SCALE:
+      case CS_TOKEN_TEXTURE_SCALE:
         ScanStr (params, "%f", &tscale);
         break;
-      case TOKEN_DIM:
+      case CS_TOKEN_DIM:
         {
           float rx, ry, rz;
           ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
@@ -3738,7 +3739,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
           v7.x =  rx; v7.y = -ry; v7.z = -rz;
         }
         break;
-      case TOKEN_FLOOR_HEIGHT:
+      case CS_TOKEN_FLOOR_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v0.y-v2.y;
         v1.y = r+v1.y-v3.y;
@@ -3749,14 +3750,14 @@ csSector* csLoader::load_room (char* secname, char* buf)
         v6.y = r;
         v7.y = r;
         break;
-      case TOKEN_HEIGHT:
+      case CS_TOKEN_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v2.y;
         v1.y = r+v3.y;
         v4.y = r+v6.y;
         v5.y = r+v7.y;
         break;
-      case TOKEN_FLOOR_CEIL:
+      case CS_TOKEN_FLOOR_CEIL:
         ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
                  &v2.x, &v2.z, &v3.x, &v3.z, &v7.x, &v7.z, &v6.x, &v6.z);
         v0 = v2;
@@ -3764,53 +3765,53 @@ csSector* csLoader::load_room (char* secname, char* buf)
         v5 = v7;
         v4 = v6;
         break;
-      case TOKEN_FLOOR:
+      case CS_TOKEN_FLOOR:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
                  &v2.x, &v2.y, &v2.z, &v3.x, &v3.y, &v3.z,
                  &v7.x, &v7.y, &v7.z, &v6.x, &v6.y, &v6.z);
         break;
-      case TOKEN_CEILING:
+      case CS_TOKEN_CEILING:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
                  &v0.x, &v0.y, &v0.z, &v1.x, &v1.y, &v1.z,
                  &v5.x, &v5.y, &v5.z, &v4.x, &v4.y, &v4.z);
         break;
-      case TOKEN_LIGHT:
+      case CS_TOKEN_LIGHT:
         sector->AddLight ( load_statlight(name, params) );
         break;
-      case TOKEN_SIXFACE:
+      case CS_TOKEN_SIXFACE:
         sector->things.Push (load_sixface (name,params,sector));
         break;
-      case TOKEN_FOG:
+      case CS_TOKEN_FOG:
         {
           csFog& f = sector->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case TOKEN_KEY:
+      case CS_TOKEN_KEY:
         load_key (params, sector);
         break;
-      case TOKEN_FIRE:
+      case CS_TOKEN_FIRE:
         partsys = load_fire (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_FOUNTAIN:
+      case CS_TOKEN_FOUNTAIN:
         partsys = load_fountain (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_RAIN:
+      case CS_TOKEN_RAIN:
         partsys = load_rain (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_SNOW:
+      case CS_TOKEN_SNOW:
         partsys = load_snow (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_SPRITE:
+      case CS_TOKEN_SPRITE:
         {
           csSprite3D* sp = new csSprite3D (World);
           sp->SetName (name);
@@ -3820,7 +3821,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
 	  sp->GetMovable ().UpdateMove ();
         }
         break;
-      case TOKEN_SPRITE2D:
+      case CS_TOKEN_SPRITE2D:
         {
           csSprite2D* sp = new csSprite2D (World);
           sp->SetName (name);
@@ -3830,13 +3831,13 @@ csSector* csLoader::load_room (char* secname, char* buf)
 	  sp->GetMovable ().UpdateMove ();
         }
         break;
-      case TOKEN_SKY:
+      case CS_TOKEN_SKY:
         World->skies.Push (load_thing (name, params, sector, true));
         break;
-      case TOKEN_THING:
+      case CS_TOKEN_THING:
         World->things.Push (load_thing (name, params, sector, false));
         break;
-      case TOKEN_PORTAL:
+      case CS_TOKEN_PORTAL:
         {
           if (num_portals >= MAX_ROOM_PORTALS)
           {
@@ -3855,17 +3856,17 @@ csSector* csLoader::load_room (char* secname, char* buf)
             }
             switch (cmd)
             {
-              case TOKEN_POLYGON:
+              case CS_TOKEN_POLYGON:
                 ScanStr (params2, "%s", portals[num_portals].poly);
                 break;
-              case TOKEN_SECTOR:
+              case CS_TOKEN_SECTOR:
                 ScanStr (params2, "%s", portals[num_portals].sector);
                 break;
-              case TOKEN_ALPHA:
+              case CS_TOKEN_ALPHA:
                 ScanStr (params2, "%d", &portals[num_portals].alpha);
                 portals[num_portals].alpha = portals[num_portals].alpha * 655 / 256;
                 break;
-              case TOKEN_WARP:
+              case CS_TOKEN_WARP:
                 {
                   portals[num_portals].do_static = false;
                   char* params3;
@@ -3878,24 +3879,24 @@ csSector* csLoader::load_room (char* secname, char* buf)
                     }
                     switch (cmd)
                     {
-                      case TOKEN_MATRIX:
+                      case CS_TOKEN_MATRIX:
                         load_matrix (params3, portals[num_portals].m_warp);
                         portals[num_portals].do_mirror = false;
                         break;
-                      case TOKEN_V:
+                      case CS_TOKEN_V:
                         load_vector (params3, portals[num_portals].v_warp_before);
                         portals[num_portals].v_warp_after =
                           portals[num_portals].v_warp_before;
                         portals[num_portals].do_mirror = false;
                         break;
-                      case TOKEN_W:
+                      case CS_TOKEN_W:
                         load_vector (params3, portals[num_portals].v_warp_after);
                         portals[num_portals].do_mirror = false;
                         break;
-                      case TOKEN_MIRROR:
+                      case CS_TOKEN_MIRROR:
                         portals[num_portals].do_mirror = true;
                         break;
-                      case TOKEN_STATIC:
+                      case CS_TOKEN_STATIC:
                         portals[num_portals].do_static = true;
                         break;
                     }
@@ -3908,7 +3909,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         }
         num_portals++;
         break;
-      case TOKEN_SPLIT:
+      case CS_TOKEN_SPLIT:
         {
           ScanStr (params, "%s,%s(%F)",
                    to_split[num_splits].poly, str, to_split[num_splits].widA,
@@ -3929,11 +3930,11 @@ csSector* csLoader::load_room (char* secname, char* buf)
           num_splits++;
         }
         break;
-      case TOKEN_ACTIVATE:
+      case CS_TOKEN_ACTIVATE:
         CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
                                  " and does not do anything!\n");
         break;
-      case TOKEN_TRIGGER:
+      case CS_TOKEN_TRIGGER:
         CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
                                  " and does not do anything!\n");
         break;
@@ -3943,7 +3944,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         fatal_exit (0, false);
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a room!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -4124,39 +4125,39 @@ csSector* csLoader::load_room (char* secname, char* buf)
 
 csSector* csLoader::load_sector (char* secname, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (VERTEX)
-    TOKEN_TABLE (CIRCLE)
-    TOKEN_TABLE (POLYGON)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (TEXLEN)
-    TOKEN_TABLE (TRIGGER)
-    TOKEN_TABLE (ACTIVATE)
-    TOKEN_TABLE (LIGHTX)
-    TOKEN_TABLE (FOG)
-    TOKEN_TABLE (BSP)
-    TOKEN_TABLE (STATBSP)
-    TOKEN_TABLE (THING)
-    TOKEN_TABLE (SIXFACE)
-    TOKEN_TABLE (LIGHT)
-    TOKEN_TABLE (SPRITE2D)
-    TOKEN_TABLE (SPRITE)
-    TOKEN_TABLE (SKYDOME)
-    TOKEN_TABLE (SKY)
-    TOKEN_TABLE (TERRAIN)
-    TOKEN_TABLE (NODE)
-    TOKEN_TABLE (KEY)
-    TOKEN_TABLE (FOUNTAIN)
-    TOKEN_TABLE (RAIN)
-    TOKEN_TABLE (SNOW)
-    TOKEN_TABLE (FIRE)
-    TOKEN_TABLE (HARDMOVE)
-    TOKEN_TABLE (BEZIER)
-    TOKEN_TABLE (CURVECENTER)
-    TOKEN_TABLE (CURVESCALE)
-    TOKEN_TABLE (CURVECONTROL)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (VERTEX)
+    CS_TOKEN_TABLE (CIRCLE)
+    CS_TOKEN_TABLE (POLYGON)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (TEXLEN)
+    CS_TOKEN_TABLE (TRIGGER)
+    CS_TOKEN_TABLE (ACTIVATE)
+    CS_TOKEN_TABLE (LIGHTX)
+    CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (BSP)
+    CS_TOKEN_TABLE (STATBSP)
+    CS_TOKEN_TABLE (THING)
+    CS_TOKEN_TABLE (SIXFACE)
+    CS_TOKEN_TABLE (LIGHT)
+    CS_TOKEN_TABLE (SPRITE2D)
+    CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (SKYDOME)
+    CS_TOKEN_TABLE (SKY)
+    CS_TOKEN_TABLE (TERRAIN)
+    CS_TOKEN_TABLE (NODE)
+    CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (FOUNTAIN)
+    CS_TOKEN_TABLE (RAIN)
+    CS_TOKEN_TABLE (SNOW)
+    CS_TOKEN_TABLE (FIRE)
+    CS_TOKEN_TABLE (HARDMOVE)
+    CS_TOKEN_TABLE (BEZIER)
+    CS_TOKEN_TABLE (CURVECENTER)
+    CS_TOKEN_TABLE (CURVESCALE)
+    CS_TOKEN_TABLE (CURVECONTROL)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -4181,42 +4182,42 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_SKYDOME:
+      case CS_TOKEN_SKYDOME:
         skydome_process (*sector, name, params, info.default_material);
         break;
-      case TOKEN_TERRAIN:
+      case CS_TOKEN_TERRAIN:
         terrain_process (*sector, name, params);
         break;
-      case TOKEN_STATBSP:
+      case CS_TOKEN_STATBSP:
         do_stat_bsp = true;
         break;
-      case TOKEN_FIRE:
+      case CS_TOKEN_FIRE:
         partsys = load_fire (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_FOUNTAIN:
+      case CS_TOKEN_FOUNTAIN:
         partsys = load_fountain (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_RAIN:
+      case CS_TOKEN_RAIN:
         partsys = load_rain (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_SNOW:
+      case CS_TOKEN_SNOW:
         partsys = load_snow (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
         break;
-      case TOKEN_SKY:
+      case CS_TOKEN_SKY:
         World->skies.Push (load_thing (name, params, sector, true));
         break;
-      case TOKEN_THING:
+      case CS_TOKEN_THING:
         World->things.Push (load_thing (name, params, sector, false));
         break;
-      case TOKEN_SPRITE:
+      case CS_TOKEN_SPRITE:
         {
           csSprite3D* sp = new csSprite3D (World);
           sp->SetName (name);
@@ -4226,7 +4227,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 	  sp->GetMovable ().UpdateMove ();
         }
         break;
-      case TOKEN_SPRITE2D:
+      case CS_TOKEN_SPRITE2D:
         {
           csSprite2D* sp = new csSprite2D (World);
           sp->SetName (name);
@@ -4236,16 +4237,16 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 	  sp->GetMovable ().UpdateMove ();
         }
         break;
-      case TOKEN_SIXFACE:
+      case CS_TOKEN_SIXFACE:
         sector->things.Push ( load_sixface(name,params,sector) );
         break;
-      case TOKEN_LIGHT:
+      case CS_TOKEN_LIGHT:
         sector->AddLight ( load_statlight(name, params) );
         break;
-      case TOKEN_NODE:
+      case CS_TOKEN_NODE:
         sector->ObjAdd ( load_node(name, params, sector) );
         break;
-      case TOKEN_KEY:
+      case CS_TOKEN_KEY:
       {
         load_key(params, sector);
         break;
@@ -4255,7 +4256,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a sector!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -4274,11 +4275,11 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 void csLoader::skydome_process (csSector& sector, char* name, char* buf,
         csMaterialWrapper* material)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (RADIUS)
-    TOKEN_TABLE (VERTICES)
-    TOKEN_TABLE (LIGHTING)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (RADIUS)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (LIGHTING)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* params;
@@ -4301,13 +4302,13 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
   {
     switch (cmd)
     {
-      case TOKEN_RADIUS:
+      case CS_TOKEN_RADIUS:
         ScanStr (params, "%f", &radius);
         break;
-      case TOKEN_VERTICES:
+      case CS_TOKEN_VERTICES:
         ScanStr (params, "%D", prev_vertices, &num);
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         {
 	  int do_lighting;
           ScanStr (params, "%b", &do_lighting);
@@ -4317,7 +4318,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a skydome!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -4463,12 +4464,12 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 void csLoader::terrain_process (csSector& sector, char* name, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TYPE)
-    TOKEN_TABLE (HEIGHTMAP)
-    TOKEN_TABLE (DETAIL)
-    TOKEN_TABLE (TEXTURE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TYPE)
+    CS_TOKEN_TABLE (HEIGHTMAP)
+    CS_TOKEN_TABLE (DETAIL)
+    CS_TOKEN_TABLE (TEXTURE)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* params;
@@ -4483,22 +4484,22 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
   {
     switch (cmd)
     {
-      case TOKEN_TYPE:
+      case CS_TOKEN_TYPE:
         ScanStr (params, "%s", type);
 	if (!strcasecmp (type, "lod")) lod = true;
         break;
-      case TOKEN_HEIGHTMAP:
+      case CS_TOKEN_HEIGHTMAP:
         ScanStr (params, "%s", heightmapname);
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", texturebasename);
         break;
-      case TOKEN_DETAIL:
+      case CS_TOKEN_DETAIL:
         ScanStr (params, "%d", &detail);
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a terrain!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -4614,30 +4615,30 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
 
 bool csLoader::LoadWorld (char* buf)
 {
-  TOKEN_TABLE_START (tokens)
-    TOKEN_TABLE (WORLD)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (WORLD)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (SECTOR)
-    TOKEN_TABLE (ROOM)
-    TOKEN_TABLE (PLANE)
-    TOKEN_TABLE (COLLECTION)
-    TOKEN_TABLE (SCRIPT)
-    TOKEN_TABLE (TEXTURES)
-    TOKEN_TABLE (MATERIALS)
-    TOKEN_TABLE (MAT_SET)
-    TOKEN_TABLE (LIGHTX)
-    TOKEN_TABLE (THING)
-    TOKEN_TABLE (SIXFACE)
-    TOKEN_TABLE (SPRITE)
-    TOKEN_TABLE (LIBRARY)
-    TOKEN_TABLE (START)
-    TOKEN_TABLE (SOUNDS)
-    TOKEN_TABLE (KEY)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (SECTOR)
+    CS_TOKEN_TABLE (ROOM)
+    CS_TOKEN_TABLE (PLANE)
+    CS_TOKEN_TABLE (COLLECTION)
+    CS_TOKEN_TABLE (SCRIPT)
+    CS_TOKEN_TABLE (TEXTURES)
+    CS_TOKEN_TABLE (MATERIALS)
+    CS_TOKEN_TABLE (MAT_SET)
+    CS_TOKEN_TABLE (LIGHTX)
+    CS_TOKEN_TABLE (THING)
+    CS_TOKEN_TABLE (SIXFACE)
+    CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (LIBRARY)
+    CS_TOKEN_TABLE (START)
+    CS_TOKEN_TABLE (SOUNDS)
+    CS_TOKEN_TABLE (KEY)
+  CS_TOKEN_TABLE_END
 
-  parser_line = 1;
+  csResetParserLine();
   char *name, *data;
 
   if (csGetObject (&buf, tokens, &name, &data))
@@ -4661,7 +4662,7 @@ bool csLoader::LoadWorld (char* buf)
       }
       switch (cmd)
       {
-        case TOKEN_SPRITE:
+        case CS_TOKEN_SPRITE:
           {
             csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
             if (!t)
@@ -4673,63 +4674,63 @@ bool csLoader::LoadWorld (char* buf)
             LoadSpriteTemplate (t, params);
           }
           break;
-        case TOKEN_THING:
+        case CS_TOKEN_THING:
           if (!World->thing_templates.FindByName (name))
             World->thing_templates.Push (load_thing (name, params, NULL, false));
           break;
-        case TOKEN_SIXFACE:
+        case CS_TOKEN_SIXFACE:
           if (!World->thing_templates.FindByName (name))
             World->thing_templates.Push (load_sixface (name, params, NULL));
           break;
-        case TOKEN_SECTOR:
+        case CS_TOKEN_SECTOR:
           if (!World->sectors.FindByName (name))
             World->sectors.Push (load_sector (name, params));
           break;
-        case TOKEN_PLANE:
+        case CS_TOKEN_PLANE:
           World->planes.Push (load_polyplane (params, name));
           break;
-        case TOKEN_COLLECTION:
+        case CS_TOKEN_COLLECTION:
           World->collections.Push (load_collection (name, params));
           break;
-        case TOKEN_SCRIPT:
+        case CS_TOKEN_SCRIPT:
           CsPrintf (MSG_WARNING, "Warning! SCRIPT statement is obsolete"
                                  " and does not do anything!\n");
           break;
-	case TOKEN_MAT_SET:
+	case CS_TOKEN_MAT_SET:
           if (!LoadMaterials (params, name))
             return false;
           break;
-        case TOKEN_TEXTURES:
+        case CS_TOKEN_TEXTURES:
           {
             World->GetTextures ()->DeleteAll ();
             if (!LoadTextures (params))
               return false;
           }
           break;
-        case TOKEN_MATERIALS:
+        case CS_TOKEN_MATERIALS:
           {
             World->GetMaterials ()->DeleteAll ();
             if (!LoadMaterials (params))
               return false;
           }
           break;
-        case TOKEN_SOUNDS:
+        case CS_TOKEN_SOUNDS:
           if (!LoadSounds (params))
             return false;
           break;
-        case TOKEN_ROOM:
+        case CS_TOKEN_ROOM:
           // Not an object but it is translated to a special sector.
           if (!World->sectors.FindByName (name))
             World->sectors.Push (load_room (name, params));
           break;
-        case TOKEN_LIGHTX:
+        case CS_TOKEN_LIGHTX:
           CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
                                  " and does not do anything!\n");
           break;
-        case TOKEN_LIBRARY:
+        case CS_TOKEN_LIBRARY:
           LoadLibraryFile (World, name);
           break;
-        case TOKEN_START:
+        case CS_TOKEN_START:
         {
           char start_sector [100];
           csVector3 pos (0, 0, 0);
@@ -4738,12 +4739,12 @@ bool csLoader::LoadWorld (char* buf)
             start_sector, pos, csVector3 (0, 0, 1), csVector3 (0, 1, 0)));
           break;
         }
-        case TOKEN_KEY:
+        case CS_TOKEN_KEY:
           load_key (params, World);
           break;
       }
     }
-    if (cmd == PARSERR_TOKENNOTFOUND)
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a world!\n", csGetLastOffender ());
       fatal_exit (0, false);
@@ -4838,10 +4839,10 @@ bool csLoader::LoadWorldFile (csWorld* world, const char* file)
 
 bool csLoader::LoadTextures (char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MAX_TEXTURES)
-    TOKEN_TABLE (TEXTURE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MAX_TEXTURES)
+    CS_TOKEN_TABLE (TEXTURE)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -4856,15 +4857,15 @@ bool csLoader::LoadTextures (char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_MAX_TEXTURES:
+      case CS_TOKEN_MAX_TEXTURES:
         // ignored for backward compatibility
         break;
-      case TOKEN_TEXTURE:
+      case CS_TOKEN_TEXTURE:
         txt_process (name, params);
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a matrix!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -4875,9 +4876,9 @@ bool csLoader::LoadTextures (char* buf)
 
 bool csLoader::LoadMaterials (char* buf, const char* prefix)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MATERIAL)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MATERIAL)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -4892,12 +4893,12 @@ bool csLoader::LoadMaterials (char* buf, const char* prefix)
     }
     switch (cmd)
     {
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         mat_process (name, params, prefix);
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing material!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -4910,18 +4911,18 @@ bool csLoader::LoadMaterials (char* buf, const char* prefix)
 
 bool csLoader::LoadLibrary (char* buf)
 {
-  TOKEN_TABLE_START (tokens)
-    TOKEN_TABLE (LIBRARY)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (LIBRARY)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXTURES)
-    TOKEN_TABLE (MATERIALS)
-    TOKEN_TABLE (THING)
-    TOKEN_TABLE (SPRITE)
-    TOKEN_TABLE (SOUNDS)
-    TOKEN_TABLE (PLANE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TEXTURES)
+    CS_TOKEN_TABLE (MATERIALS)
+    CS_TOKEN_TABLE (THING)
+    CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (SOUNDS)
+    CS_TOKEN_TABLE (PLANE)
+  CS_TOKEN_TABLE_END
 
   char *name, *data;
   if (csGetObject (&buf, tokens, &name, &data))
@@ -4945,23 +4946,23 @@ bool csLoader::LoadLibrary (char* buf)
 
       switch (cmd)
       {
-        case TOKEN_PLANE:
+        case CS_TOKEN_PLANE:
           World->planes.Push ( load_polyplane (params, name) );
           break;
-        case TOKEN_TEXTURES:
+        case CS_TOKEN_TEXTURES:
           // Append textures to world.
           if (!LoadTextures (params))
             return false;
           break;
-        case TOKEN_MATERIALS:
+        case CS_TOKEN_MATERIALS:
           if (!LoadMaterials (params))
             return false;
           break;
-        case TOKEN_SOUNDS:
+        case CS_TOKEN_SOUNDS:
           if (!LoadSounds (params))
             return false;
           break;
-        case TOKEN_SPRITE:
+        case CS_TOKEN_SPRITE:
           {
             csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
             if (!t)
@@ -4973,13 +4974,13 @@ bool csLoader::LoadLibrary (char* buf)
             LoadSpriteTemplate (t, params);
           }
           break;
-        case TOKEN_THING:
+        case CS_TOKEN_THING:
           if (!World->thing_templates.FindByName (name))
             World->thing_templates.Push (load_thing (name, params, NULL, false));
           break;
       }
     }
-    if (cmd == PARSERR_TOKENNOTFOUND)
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a library file!\n", csGetLastOffender ());
       return false;
@@ -5031,13 +5032,13 @@ csTextureWrapper* csLoader::LoadTexture (csWorld* world, const char* name, const
 
 bool csLoader::LoadSounds (char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (SOUND)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (SOUND)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (options)
-    TOKEN_TABLE (FILE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (options)
+    CS_TOKEN_TABLE (FILE)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -5052,14 +5053,14 @@ bool csLoader::LoadSounds (char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_SOUND:
+      case CS_TOKEN_SOUND:
       {
         const char* filename = name;
         char* maybename;
         cmd = csGetCommand (&params, options, &maybename);
-        if (cmd == TOKEN_FILE)
+        if (cmd == CS_TOKEN_FILE)
           filename = maybename;
-        else if (cmd == PARSERR_TOKENNOTFOUND)
+        else if (cmd == CS_PARSERR_TOKENNOTFOUND)
         {
           CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
           fatal_exit (0, false);
@@ -5078,7 +5079,7 @@ bool csLoader::LoadSounds (char* buf)
       break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the list of sounds!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -5091,16 +5092,16 @@ bool csLoader::LoadSounds (char* buf)
 
 bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (LIMB)
-    TOKEN_TABLE (VERTICES)
-    TOKEN_TABLE (TRANSFORM)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (LIMB)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (TRANSFORM)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_matvec)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* name;
   char* xname;
@@ -5117,14 +5118,14 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
     }
     switch (cmd)
     {
-      case TOKEN_LIMB:
+      case CS_TOKEN_LIMB:
         {
           csSkeletonConnection* con = new csSkeletonConnection ();
 	  if (!LoadSkeleton (con, params, true)) return false;
 	  limb->AddChild (con);
 	}
         break;
-      case TOKEN_TRANSFORM:
+      case CS_TOKEN_TRANSFORM:
         if (is_connection)
         {
           char* params2;
@@ -5139,10 +5140,10 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
     	    }
             switch (cmd)
             {
-              case TOKEN_MATRIX:
+              case CS_TOKEN_MATRIX:
                 load_matrix (params2, m);
 		break;
-              case TOKEN_V:
+              case CS_TOKEN_V:
                 load_vector (params2, v);
 		break;
             }
@@ -5156,7 +5157,7 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
 	  fatal_exit (0, false);
 	}
 	break;
-      case TOKEN_VERTICES:
+      case CS_TOKEN_VERTICES:
         {
           int list[1000], num;	//@@@ HARDCODED!!!
           ScanStr (params, "%D", list, &num);
@@ -5165,7 +5166,7 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
         csGetLastOffender ());
@@ -5191,9 +5192,9 @@ csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
     return NULL;
   }
 
-  TOKEN_TABLE_START (tokens)
-    TOKEN_TABLE (SPRITE)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (SPRITE)
+  CS_TOKEN_TABLE_END
 
   char *name, *data;
 
@@ -5223,27 +5224,27 @@ csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
 
 bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (FRAME)
-    TOKEN_TABLE (ACTION)
-    TOKEN_TABLE (MERGE_NORMALS)
-    TOKEN_TABLE (MERGE_TEXELS)
-    TOKEN_TABLE (MERGE_VERTICES)
-    TOKEN_TABLE (TRIANGLE)
-    TOKEN_TABLE (SKELETON)
-    TOKEN_TABLE (FILE)
-    TOKEN_TABLE (TWEEN)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (FRAME)
+    CS_TOKEN_TABLE (ACTION)
+    CS_TOKEN_TABLE (MERGE_NORMALS)
+    CS_TOKEN_TABLE (MERGE_TEXELS)
+    CS_TOKEN_TABLE (MERGE_VERTICES)
+    CS_TOKEN_TABLE (TRIANGLE)
+    CS_TOKEN_TABLE (SKELETON)
+    CS_TOKEN_TABLE (FILE)
+    CS_TOKEN_TABLE (TWEEN)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_frame)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_frame)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_frameset)
-    TOKEN_TABLE (F)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_frameset)
+    CS_TOKEN_TABLE (F)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -5260,9 +5261,9 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_TEXNR:
+      case CS_TOKEN_TEXNR:
         //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
           csMaterialWrapper *mat = FindMaterial (str);
@@ -5276,7 +5277,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         }
         break;
 
-      case TOKEN_SKELETON:
+      case CS_TOKEN_SKELETON:
 	{
           csSkeleton* skeleton = new csSkeleton ();
 	  if (!LoadSkeleton (skeleton, params, false)) return false;
@@ -5284,7 +5285,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 	}
         break;
 
-      case TOKEN_ACTION:
+      case CS_TOKEN_ACTION:
         {
           csSpriteAction* act = stemp->AddAction ();
           act->SetName (name);
@@ -5299,7 +5300,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
             }
             switch (cmd)
             {
-              case TOKEN_F:
+              case CS_TOKEN_F:
                 ScanStr (params2, "%s,%d", fn, &d);
                 csFrame * ff = stemp->FindFrame (fn);
                 if(!ff)
@@ -5315,7 +5316,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         }
         break;
 
-      case TOKEN_FRAME:
+      case CS_TOKEN_FRAME:
         {
           csFrame* fr = stemp->AddFrame ();
           fr->SetName (name);
@@ -5332,7 +5333,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
             }
             switch (cmd)
             {
-              case TOKEN_V:
+              case CS_TOKEN_V:
                 ScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
                 // check if it's the first frame
                 if (stemp->GetNumFrames () == 1)
@@ -5351,7 +5352,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                 break;
             }
           }
-          if (cmd == PARSERR_TOKENNOTFOUND)
+          if (cmd == CS_PARSERR_TOKENNOTFOUND)
           {
             CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
                 fr->GetName (), csGetLastOffender ());
@@ -5366,7 +5367,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         }
         break;
 
-      case TOKEN_TRIANGLE:
+      case CS_TOKEN_TRIANGLE:
         {
           int a, b, c;
           ScanStr (params, "%d,%d,%d", &a, &b, &c);
@@ -5374,7 +5375,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         }
         break;
 
-      case TOKEN_FILE:
+      case CS_TOKEN_FILE:
         {
           ScanStr (params, "%s", str);
 	  converter* filedata = new converter;
@@ -5390,25 +5391,25 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         }
         break;
 
-      case TOKEN_MERGE_NORMALS:
+      case CS_TOKEN_MERGE_NORMALS:
         {
 	  CsPrintf (MSG_WARNING, "MERGE_NORMALS is obsolete.\n");
         }
         break;
 
-      case TOKEN_MERGE_TEXELS:
+      case CS_TOKEN_MERGE_TEXELS:
         {
 	  CsPrintf (MSG_WARNING, "MERGE_TEXELS is obsolete.\n");
         }
         break;
 
-      case TOKEN_MERGE_VERTICES:
+      case CS_TOKEN_MERGE_VERTICES:
         {
 	  CsPrintf (MSG_WARNING, "MERGE_VERTICES is obsolete.\n");
         }
         break;
 
-      case TOKEN_TWEEN:
+      case CS_TOKEN_TWEEN:
 	{
 	  bool do_tween;
           ScanStr (params, "%b", &do_tween);
@@ -5417,7 +5418,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 	break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
         csGetLastOffender ());
@@ -5434,16 +5435,16 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
 bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (VERTICES)
-    TOKEN_TABLE (UV)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (MIXMODE)
-    TOKEN_TABLE (MOVE)
-    TOKEN_TABLE (COLORS)
-    TOKEN_TABLE (LIGHTING)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (UV)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (COLORS)
+    CS_TOKEN_TABLE (LIGHTING)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -5464,10 +5465,10 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_MIXMODE:
+      case CS_TOKEN_MIXMODE:
         spr->SetMixmode (ParseMixmode (params));
         break;
-      case TOKEN_VERTICES:
+      case CS_TOKEN_VERTICES:
         {
           float list[100];
 	  int num;
@@ -5483,7 +5484,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	  }
         }
         break;
-      case TOKEN_UV:
+      case CS_TOKEN_UV:
         {
           float list[100];
 	  int num;
@@ -5497,14 +5498,14 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	  }
         }
         break;
-      case TOKEN_LIGHTING:
+      case CS_TOKEN_LIGHTING:
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
           spr->SetLighting (do_lighting);
         }
         break;
-      case TOKEN_COLORS:
+      case CS_TOKEN_COLORS:
         {
           float list[100];
 	  int num;
@@ -5519,7 +5520,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	  }
         }
         break;
-      case TOKEN_MOVE:
+      case CS_TOKEN_MOVE:
         {
 	  float x, y, z;
 	  ScanStr (params, "%f,%f,%f", &x, &y, &z);
@@ -5527,9 +5528,9 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	}
         break;
 
-      case TOKEN_TEXNR:
+      case CS_TOKEN_TEXNR:
         //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
           csMaterialWrapper* mat = FindMaterial (str);
@@ -5543,7 +5544,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the sprite!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -5554,19 +5555,19 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 
 bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MIXMODE)
-    TOKEN_TABLE (TEMPLATE)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (MOVE)
-    TOKEN_TABLE (TWEEN)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (TEMPLATE)
+    CS_TOKEN_TABLE (TEXNR)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (TWEEN)
+  CS_TOKEN_TABLE_END
 
-  TOKEN_TABLE_START (tok_matvec)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (V)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -5585,10 +5586,10 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_MIXMODE:
+      case CS_TOKEN_MIXMODE:
         spr->SetMixmode (ParseMixmode (params));
         break;
-      case TOKEN_MOVE:
+      case CS_TOKEN_MOVE:
         {
           char* params2;
           spr->GetMovable ().SetTransform (csMatrix3 ());     // Identity matrix.
@@ -5602,14 +5603,14 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
             }
             switch (cmd)
             {
-              case TOKEN_MATRIX:
+              case CS_TOKEN_MATRIX:
               {
                 csMatrix3 m;
                 load_matrix (params2, m);
                 spr->GetMovable ().SetTransform (m);
                 break;
               }
-              case TOKEN_V:
+              case CS_TOKEN_V:
               {
                 csVector3 v;
                 load_vector (params2, v);
@@ -5622,7 +5623,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         }
         break;
 
-      case TOKEN_TEMPLATE:
+      case CS_TOKEN_TEMPLATE:
         memset (str, 0, 255);
         memset (str2, 0, 255);
         ScanStr (params, "%s,%s", str, str2);
@@ -5637,7 +5638,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
           spr->SetAction (str2);
         break;
 
-      case TOKEN_TWEEN:
+      case CS_TOKEN_TWEEN:
 	{
 	  bool do_tween;
           ScanStr (params, "%b", &do_tween);
@@ -5645,9 +5646,9 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 	}
 	break;
 
-      case TOKEN_TEXNR:
+      case CS_TOKEN_TEXNR:
         //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         FindMaterial (str);
         csMaterialWrapper *mat = FindMaterial (str);
@@ -5662,7 +5663,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the sprite!\n", csGetLastOffender ());
     fatal_exit (0, false);
@@ -5674,10 +5675,10 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 
 csFrame* csLoader::LoadFrame (csSpriteTemplate* stemp, char* buf)
 {
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (ACTION)
-    TOKEN_TABLE (FRAME)
-  TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ACTION)
+    CS_TOKEN_TABLE (FRAME)
+  CS_TOKEN_TABLE_END
 
   long cmd;
   char* name;
@@ -5695,16 +5696,16 @@ csFrame* csLoader::LoadFrame (csSpriteTemplate* stemp, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_ACTION:
+      case CS_TOKEN_ACTION:
         ScanStr (params, "%s", action);
         action_specified = true;
         break;
-      case TOKEN_FRAME:
+      case CS_TOKEN_FRAME:
         ScanStr (params, "%d", &frame);
         break;
     }
   }
-  if (cmd == PARSERR_TOKENNOTFOUND)
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while getting a frame!\n",
       csGetLastOffender ());
