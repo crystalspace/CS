@@ -157,11 +157,13 @@ private:
   // final comment at the end of the configuration file
   char *EOFComment;
 
+  // load the configuration from a file, ignoring the dirty flag
+  virtual bool LoadNow(const char *Filename, iVFS *vfs, bool overwrite);
   // load the configuration from a data buffer and add it to the current
   // configuration. This may modify the contents of the file buffer but
   // will not delete it. This function will set the dirty flag if any
   // options have been added or modified.
-  void LoadFromBuffer(char *Filedata, bool overwrite);
+  virtual void LoadFromBuffer(char *Filedata, bool overwrite);
   // return a pointer to the named node or the first node of a subsection.
   csConfigNode *FindNode(const char *Name, bool isSubsection = false) const;
   // create a new node in the list
@@ -169,7 +171,7 @@ private:
   // deregister an iterator
   void RemoveIterator(csConfigIterator *it) const;
   // save file without looking for dirty flag
-  bool SaveNow(const char *Filename, iVFS *vfs) const;
+  virtual bool SaveNow(const char *Filename, iVFS *vfs) const;
 };
 
 #endif // __CS_CFGFILE_H__

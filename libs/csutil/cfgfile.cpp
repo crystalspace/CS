@@ -423,29 +423,8 @@ bool csConfigFile::Load(const char* fName, iVFS *vfs, bool Merge, bool NewWins)
     Dirty = true;
   } // else: Only set dirty flag if we really insert something.
 
-  // load the file buffer
-  iDataBuffer *Filedata;
-  if (vfs)
-  {
-    Filedata = vfs->ReadFile(fName);
-    if (!Filedata) return false;
-  }
-  else
-  {
-    FILE *fp = fopen(fName, "rb");
-    if (!fp) return false;
-    fseek(fp, 0, SEEK_END);
-    size_t Size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    Filedata = new csDataBuffer(Size + 1);
-    fread(Filedata->GetData(), sizeof(char), Size, fp);
-    fclose(fp);
-    Filedata->GetInt8()[Size] = 0;
-  }
-
-  // parse the data
-  LoadFromBuffer((char*)Filedata->GetInt8(), NewWins);
-  Filedata->DecRef();
+  if (!LoadNow(fName, vfs, NewWins))
+    return false;
 
   if (!Merge)
   {
@@ -453,7 +432,7 @@ bool csConfigFile::Load(const char* fName, iVFS *vfs, bool Merge, bool NewWins)
     // configuration is in sync with the file, so clear the dirty flag.
     Dirty = false;
   }
-  // else: LoadFromBuffer has already set the dirty flag if any options
+  // else: LoadNow has already set the dirty flag if any options
   // have been inserted.
   return true;
 }
@@ -683,6 +662,35 @@ void csConfigFile::DeleteKey(const char *Name)
   Node->Remove();
   delete Node;
   Dirty = true;
+}
+
+bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
+{
+  // load the file buffer
+  iDataBuffer *Filedata;
+  if (vfs)
+  {
+    Filedata = vfs->ReadFile(fName);
+    if (!Filedata) return false;
+  }
+  else
+  {
+    FILE *fp = fopen(fName, "rb");
+    if (!fp) return false;
+    fseek(fp, 0, SEEK_END);
+    size_t Size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    Filedata = new csDataBuffer(Size + 1);
+    fread(Filedata->GetData(), sizeof(char), Size, fp);
+    fclose(fp);
+    Filedata->GetInt8()[Size] = 0;
+  }
+
+  // parse the data
+  LoadFromBuffer((char*)Filedata->GetInt8(), overwrite);
+  Filedata->DecRef();
+
+  return true;
 }
 
 void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
