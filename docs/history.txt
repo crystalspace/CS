@@ -21,6 +21,8 @@ The history order has been reversed so that new features are at the top.
 	  the unfortunate side-effect of breaking lighting a bit (not
 	  completely, but shadow calculation has more errors now). But
 	  we will fix those later.
+	- Fixed a third bug in csFrustum::Classify which fixes lighting
+	  again :-)
 16-Jul-2000
 	- Samuel Humphreys did the following changes..
             - Added two new procedural textures to dtsimple. This is to complete

@@ -429,9 +429,10 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
   for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
   {
     csVector3 pn = poly [pvp] % poly [pv];
-    if (pn * frustum [0] < 0)
+    if (pn * frustum [0] > 0)
       return CS_FRUST_OUTSIDE;
   }
 
   return CS_FRUST_COVERED;
 }
+
