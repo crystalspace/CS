@@ -3574,7 +3574,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 //---------------------------------------------------------------------------
 
 void csLoader::terrain_process (csSector& sector, char* name, char* buf,
-        csTextureHandle* /*texture*/)
+        csTextureHandle* texture)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (HEIGHTMAP)
@@ -3606,6 +3606,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
 
   CHK (csTerrain* terr = new csTerrain ());
   terr->SetName (name);
+  terr->SetTexture (texture);
 
   // Otherwise read file, if that fails generate a random map.
   if (!terr->Initialize (heightmap))
