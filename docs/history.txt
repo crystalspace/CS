@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Mar-2004
+	- Luca committed the res fix to the problem regarding the lack
+	  of the regex.c file in the CSUtil library. The problem was 
+	  related to the VisualC++ compiler environments only.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader
