@@ -148,6 +148,8 @@ public:
     mixmode = CS_FX_COPY;
   }
 
+  virtual ~csRenderMesh () {}
+
   /// Special attributes. Please don't change, it's used as flags
   typedef enum
   {

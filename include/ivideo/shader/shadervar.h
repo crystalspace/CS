@@ -46,6 +46,7 @@ public:
     type = INT;
     intval = 0;
   }
+  virtual ~csShaderVariable() { }
 
   virtual VariableType GetType() { return type; }
   virtual void SetType(VariableType newtype) { type = newtype; }
@@ -69,3 +70,4 @@ SCF_IMPLEMENT_IBASE( csShaderVariable )
 SCF_IMPLEMENT_IBASE_END
 
 #endif
+
