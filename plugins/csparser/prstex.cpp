@@ -37,6 +37,7 @@
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "iengine/region.h"
+#include "iutil/objreg.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (AMBIENT)
@@ -751,6 +752,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
   int num_txt_layer = 0;
   csTextureLayer layers[4];
   iTextureWrapper* txt_layers[4];
+  
+  csRef<iEffectDefinition> efdef ;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -793,6 +796,24 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
         break;
       case XMLTOKEN_REFLECTION:
 	reflection = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_EFFECT:
+        {
+          csRef<iEffectServer> efs = CS_QUERY_REGISTRY(object_reg, iEffectServer);
+          if(!efs.IsValid())
+          {
+            ReportNotify("Effectserver isn't found. Ignoring effect-directive in material %s",matname);
+            break;
+          }
+          const char* efname = child->GetContentsValue();
+          efdef = efs->GetEffect(efname);
+          if(!efdef.IsValid())
+          {
+            ReportNotify("Effect (%s) couldn't be found for material %s, ignoring it", efname,matname);
+            break;
+          }
+
+        }
         break;
       case XMLTOKEN_LAYER:
 	{
@@ -871,7 +892,12 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
   if (col_set)
     material->SetFlatColor (col);
   material->SetReflection (diffuse, ambient, reflection);
+
+  if(efdef.IsValid())
+    material->SetEffect(efdef);
+
   iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
+ 
   if (prefix)
   {
     char *prefixedname = new char [strlen (matname) + strlen (prefix) + 2];

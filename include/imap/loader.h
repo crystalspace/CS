@@ -124,6 +124,9 @@ struct iLoader : public iBase
    * The mesh object is not automatically added to the engine and sector.
    */
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname) = 0;
+  
+  /// Load and parse a effect from file
+  virtual bool LoadEffectFile (const char* filename) = 0;
 };
 
 /** } */

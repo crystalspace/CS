@@ -32,6 +32,12 @@
 #include "iutil/plugin.h"
 #include "imap/services.h"
 
+#include "ivideo/effects/efserver.h"
+#include "ivideo/effects/efdef.h"
+#include "ivideo/effects/efpass.h"
+#include "ivideo/effects/eflayer.h"
+#include "ivideo/effects/eftech.h"
+
 class csGenerateImageTexture;
 class csGenerateImageValue;
 class csReversibleTransform;
@@ -164,7 +170,37 @@ enum
   XMLTOKEN_SIZE,
   XMLTOKEN_SLOPE,
   XMLTOKEN_SOLID,
-  XMLTOKEN_VALUE
+  XMLTOKEN_VALUE,
+  //effectsystem loader
+  XMLTOKEN_ALPHAMODIFIER1,
+  XMLTOKEN_ALPHAMODIFIER2,
+  XMLTOKEN_ALPHAMODIFIER3,
+  XMLTOKEN_ALPHAOPERATION,
+  XMLTOKEN_ALPHASOURCE1,
+  XMLTOKEN_ALPHASOURCE2,
+  XMLTOKEN_ALPHASOURCE3,
+  XMLTOKEN_BLENDING,
+  XMLTOKEN_COLORMODIFIER1,
+  XMLTOKEN_COLORMODIFIER2,
+  XMLTOKEN_COLORMODIFIER3,
+  XMLTOKEN_COLOROPERATION,
+  XMLTOKEN_COLORSOURCE1,
+  XMLTOKEN_COLORSOURCE2,
+  XMLTOKEN_COLORSOURCE3,
+  XMLTOKEN_DESTINATIONBLEND,
+  XMLTOKEN_EFFECT,
+  XMLTOKEN_EFFECTS,
+  XMLTOKEN_PASS,
+  XMLTOKEN_QUALITY,
+  XMLTOKEN_SHADING,
+  XMLTOKEN_SOURCEBLEND,
+  XMLTOKEN_TECHNIQUE,
+  XMLTOKEN_TEXTURESOURCE,
+  XMLTOKEN_TEXTURECOORDSOURCE,
+  XMLTOKEN_VARIABLE,
+  XMLTOKEN_VERTEXCOLOR,
+  XMLTOKEN_VERTEXPROGRAM,
+  XMLTOKEN_VERTEXPROGRAMCONST
 };
 
 class StdLoaderContext;
@@ -390,6 +426,21 @@ private:
 
   /// -----------------------------------------------------------------------
 
+  /**
+   * Parsse a list of effects and add them to the effectsystem. If effectsystem
+   * isn't loaded, ignore all this 
+   */
+  /// Parse a effectlist and att them to the effectserver
+  bool ParseEffectList (iDocumentNode * node);
+  /// Parse single effect
+  bool ParseEffect (iDocumentNode * node, iEffectServer* pParent);
+  /// Parse effect-technique
+  bool ParseEffectTech (iDocumentNode* node, iEffectTechnique* tech);
+  /// Parse Effect-pass
+  bool ParseEffectPass (iDocumentNode* node, iEffectPass* pass);
+  /// Parse single layer in pass
+  bool ParseEffectLayer (iDocumentNode* node, iEffectLayer* layer);
+
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);
   /// For heightgen.
@@ -551,6 +602,9 @@ public:
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname);
+
+  virtual bool LoadEffectFile (const char* filename);
+
 
   struct eiComponent : public iComponent
   {
