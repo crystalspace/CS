@@ -91,7 +91,7 @@ chronological order.
 	  step.
 	- Eric Sunshine made the following changes to csList<>:
 	    - Renamed Prev() and FetchPrev() to Previous() and FetchPrevious(),
-	      respectively, to complement existing HashPrevious(). (The old
+	      respectively, to complement existing HasPrevious(). (The old
 	      names still exist, however, for backward compatibility.)
 	    - Added FetchCurrent() to complement existing FetchNext() and
 	      FetchPrevious().
