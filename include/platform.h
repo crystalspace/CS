@@ -22,8 +22,6 @@
 // Include volatile.h which contains the volatile configuration macros
 #if defined (WIN32_VOLATILE)
 #  include "cssys/win32/volatile.h"
-#elif defined (MACOS_VOLATILE)
-#  include "cssys/mac/volatile.h"
 #else
 #  include "volatile.h"
 #endif

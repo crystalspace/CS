@@ -26,8 +26,6 @@
 #  include "cssys/next/csosdefs.h"
 #elif defined(OS_BE)		/* Must appear before OS_UNIX */
 #  include "cssys/be/csosdefs.h"
-#elif defined(OS_PS2)		/* Must appear before OS_UNIX */
-#  include "cssys/ps2/csosdefs.h"
 #elif defined(OS_UNIX)
 #  include "cssys/unix/csosdefs.h"
 #elif defined(OS_WIN32)
@@ -36,8 +34,6 @@
 #  else
 #    include "cssys/win32/csosdefs.h"
 #  endif
-#elif defined(OS_MACOS)
-#  include "cssys/mac/csosdefs.h"
 #elif defined(OS_OS2)
 #  include "cssys/os2/csosdefs.h"
 #elif defined(OS_DOS) && defined(COMP_GCC)

@@ -21,7 +21,6 @@ will find a reference to it from within the instructions in this section.
 * MSVC:: Windows using Microsoft Visual C++
 * MinGW:: Windows using MinGW
 * NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
-* MacOS/9::
 * OS2:: @sc{os}/2
 * BeOS:: @sc{b}e@sc{os}
 * MS-DOS:: @sc{ms-dos} - Using @sc{djgpp} Compiler
@@ -30,7 +29,6 @@ will find a reference to it from within the instructions in this section.
 @importss{build,platform,unix.txi}
 @importsss{build,platform,win32,win32.txi}
 @importss{build,platform,next.txi}
-@importss{build,platform,mac.txi}
 @importss{build,platform,os2.txi}
 @importss{build,platform,beos.txi}
 @importss{build,platform,msdos.txi}

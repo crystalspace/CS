@@ -5,7 +5,7 @@
 @sc{n}e@sc{xt}
 @end macro
 
-@node NeXT, MacOS/9, MinGW, Platform Instructions
+@node NeXT, OS2, MinGW, Platform Instructions
 @subsection MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 @cindex @sc{n}e@sc{xt}
 @cindex MacOS/X
@@ -33,8 +33,7 @@ ports is also available (@pxref{NeXT Details}), as well as a list of known bugs
 and future plans (@pxref{NeXT Notes}).
 
 For Macintosh users, the information detailed in this section applies to
-MacOS/X and later.  A port of Crystal Space using the classic Macintosh Toolbox
-(pre-Carbon) API is also available for MacOS/9 and earlier.  @xref{MacOS/9}.
+MacOS/X and later.
 
 If you have downloaded a binary-only package of Crystal Space for MacOS/X,
 MacOS/X Server 1.0 (Rhapsody), OpenStep, or NextStep, you may want to skip over

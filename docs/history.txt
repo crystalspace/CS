@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	  the constants so that they start with GBS_... Several of the
 	  constants were defined in windows include files (i.e. RELATIVE
 	  in wingdi.h).
+	- Eric Sunshine removed the outdated and broken classic Macintosh port,
+	  as well as the incomplete and unsupported PS2 port.
 13-Feb-2002
 	- Added new tutorial app in apps/tutorial/awstut. This is a small
 	  AWS using application that demonstrates how to open and use

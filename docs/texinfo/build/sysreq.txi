@@ -14,7 +14,7 @@ recommended system is a Pentium (133 MHz) or equivalent.
 @item
 Operating System: One of the supported systems. Currently supported
 are: Windows (32 bit), Unix / GNU/Linux, MacOS/X, MacOS/X Server, OpenStep,
-NextStep, OS/2, BeOS, MacOS/9, and MS-DOS.
+NextStep, OS/2, BeOS, and MS-DOS.
 
 @item
 C++ Development Environment: Crystal Space must be built with a C++

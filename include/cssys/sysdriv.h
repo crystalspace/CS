@@ -29,14 +29,10 @@
 #  include "cssys/unix/unix.h"
 #elif defined(OS_WIN32)
 #  include "cssys/win32/win32.h"
-#elif defined(OS_MACOS)
-#  include "cssys/mac/MacSystem.h"
 #elif defined(OS_OS2)
 #  include "cssys/os2/csos2.h"
 #elif defined(OS_DOS) && defined(COMP_GCC)
 #  include "cssys/djgpp/djgpp.h"
-#elif defined(OS_PS2)
-#  include "cssys/ps2/ps2.h"
 #else
 #  error Unable to locate platform-specific driver interface.
 #endif

@@ -481,8 +481,7 @@ parts.
 @item
 Robert Bate (@email{rbate@@mac.com})
 
-Robert is the current pre-Carbon Macintosh port maintainer. He also helps
-with maintenance in general.
+Robert maintained the now-defunct pre-Carbon Macintosh port.
 
 @item
 Norman Kramer (@email{normank@@lycosmail.com})

@@ -117,7 +117,7 @@
 #ifdef CS_SYSDEF_PROVIDE_PATH
 // Path separator character
 #  ifndef PATH_SEPARATOR
-#    if defined(OS_MACOS) || defined(__CYGWIN32__)
+#    if defined(__CYGWIN32__)
 #      define PATH_SEPARATOR '/'
 #    elif defined(OS_OS2) || defined(OS_DOS) || defined(OS_WIN32)
 #      define PATH_SEPARATOR '\\'
@@ -175,29 +175,18 @@
 #endif // CS_SYSDEF_PROVIDE_MKDIR
 
 #ifdef CS_SYSDEF_PROVIDE_GETCWD
-#  if defined(OS_MACOS)
-#    include <unix.h>
-#  else
-#    if !defined(COMP_VC) && !defined(COMP_BC)
-#      include <unistd.h>
-#    endif
+#  if !defined(COMP_VC) && !defined(COMP_BC)
+#    include <unistd.h>
 #  endif
 #endif // CS_SYSDEF_PROVIDE_GETCWD
 
 #ifdef CS_SYSDEF_PROVIDE_DIR
 // For systems without opendir()
 // COMP_GCC has opendir, readdir 
-# if !defined(COMP_GCC) || defined(OS_PS2)
-#  if defined(__NEED_OPENDIR_PROTOTYPE) || defined(OS_PS2)
-#    if defined(OS_MACOS) || defined(OS_PS2)
-       typedef char DIR;
-       typedef struct dirent {
-	  char d_name[ CS_MAXPATHLEN ];
-       } dirent;
-#    else
-       struct DIR;
-       struct dirent;
-#    endif
+# if !defined(COMP_GCC)
+#  if defined(__NEED_OPENDIR_PROTOTYPE)
+     struct DIR;
+     struct dirent;
      extern "C" DIR *opendir (const char *name);
      extern "C" dirent *readdir (DIR *dirp);
      extern "C" int closedir (DIR *dirp);
@@ -208,21 +197,17 @@
 # endif
 // Generic ISDIR needed for COMP_GCC
 #  ifdef __NEED_GENERIC_ISDIR
-#    if !defined (OS_UNIX) && !defined (OS_MACOS) && !defined(OS_PS2)
+#    if defined (OS_WIN32) || defined (OS_DOS)
 #      include <io.h>
 #    endif
-#    if defined(OS_MACOS)
-#      include <stat.h>
-#    else
-#      include <sys/types.h>
-#      if !defined(OS_WIN32) && !defined(OS_PS2)
-#        include <dirent.h>
-#      endif
-#      if defined(__CYGWIN32__)
-#        include <sys/dirent.h>
-#      endif
-#      include <sys/stat.h>
+#    include <sys/types.h>
+#    if !defined(OS_WIN32)
+#      include <dirent.h>
 #    endif
+#    if defined(__CYGWIN32__)
+#      include <sys/dirent.h>
+#    endif
+#    include <sys/stat.h>
      static inline bool isdir (const char *path, struct dirent *de)
      {
        char fullname [CS_MAXPATHLEN];
@@ -238,12 +223,8 @@
 #endif // CS_SYSDEF_PROVIDE_DIR
 
 #ifdef CS_SYSDEF_PROVIDE_UNLINK
-#  if defined (OS_MACOS)
-#    include <unix.h>
-#  else
-#    if !defined(COMP_VC) && !defined(COMP_BC)
-#      include <unistd.h>
-#    endif
+#  if !defined(COMP_VC) && !defined(COMP_BC)
+#    include <unistd.h>
 #  endif
 #endif
 
@@ -254,8 +235,6 @@
 #    include <malloc.h>
 #  elif defined(COMP_GCC) && defined(OS_DOS)
 #    include <stdlib.h>
-#  elif defined(COMP_GCC) && defined(OS_PS2)
-#    include <malloc.h>
 #  elif defined(OS_BSD)
 #    include <stdlib.h>
 #  else
@@ -272,7 +251,7 @@
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_ACCESS
-#  if !defined (OS_MACOS) && !defined(COMP_VC) && !defined(COMP_BC)
+#  if !defined(COMP_VC) && !defined(COMP_BC)
 #    include <unistd.h>
 #  endif
 #  ifndef F_OK
@@ -294,9 +273,6 @@
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SOCKETS
-#  if !defined (OS_MACOS)
-#    include <unistd.h>
-#  endif
 #  include <sys/types.h>
 #  include <sys/socket.h>
 #  if defined (OS_UNIX)
