@@ -28,8 +28,8 @@ struct iTextureHandle;
 struct iTextureWrapper;
 struct iSoundData;
 struct iSoundHandle;
+struct iMeshFactoryWrapper;
 class csSoundDataObject;
-class csMeshFactoryWrapper;
 class csMeshWrapper;
 
 /**
@@ -98,7 +98,7 @@ struct iLoader : public iPlugIn
   virtual bool LoadLibraryFile (const char* filename) = 0;
 
   /// Load a Mesh Object Factory from the map file.
-  virtual csMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname) = 0;
+  virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname) = 0;
   /**
    * Load a mesh object from a file.
    * The mesh object is not automatically added to the engine and sector.

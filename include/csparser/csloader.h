@@ -38,6 +38,7 @@ struct iSoundRender;
 struct iLoaderPlugIn;
 
 struct iObject;
+struct iThing;
 struct iCollection;
 struct iMotion;
 struct iMotionAnim;
@@ -118,8 +119,8 @@ class csLoader : public iLoader
   /// Parse a sector definition and return a new object
   csSector* load_sector (char* secname, char* buf);
 
-  /// Resolve the portals of a csThing
-  void ResolvePortalSectors (iEngine* Engine, csThing* ps);
+  /// Resolve the portals of a thing
+  void ResolvePortalSectors (iThing *Mesh);
 
   /// Load a Mesh Object Factory from the map file.
   bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, char* buf);
@@ -238,7 +239,7 @@ public:
 	bool onlyRegion);
   virtual bool LoadLibraryFile (const char* filename);
 
-  virtual csMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
+  virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
   virtual csMeshWrapper* LoadMeshObject (const char* fname);
 };
 

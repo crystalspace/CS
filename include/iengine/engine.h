@@ -32,6 +32,8 @@ struct iSector;
 struct iStatLight;
 struct iDynLight;
 struct iSprite;
+struct iMeshObject;
+struct iMeshObjectFactory;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshObjectType;
@@ -39,6 +41,8 @@ struct iMaterialWrapper;
 struct iMaterialList;
 struct iTextureWrapper;
 struct iTextureList;
+struct iTerrainObject;
+struct iTerrainObjectFactory;
 struct iTerrainWrapper;
 struct iTerrainFactoryWrapper;
 struct iCameraPosition;
@@ -373,6 +377,13 @@ struct iEngine : public iPlugIn
   virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
   	const char* name) = 0;
 
+  /// Create a mesh factory wrapper for an existing mesh factory
+  virtual iMeshFactoryWrapper* CreateMeshFactory (iMeshObjectFactory *,
+  	const char* name) = 0;
+
+  /// Create an uninitialized mesh factory wrapper
+  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* name) = 0;
+
   /**
    * Conveniance function to load a mesh factory from a given loader plugin.
    */
@@ -390,6 +401,11 @@ struct iEngine : public iPlugIn
    */
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos) = 0;
+  /// Create a mesh wrapper for an existing mesh object
+  virtual iMeshWrapper* CreateMeshObject (iMeshObject*,
+  	const char* name, iSector* sector, const csVector3& pos) = 0;
+  /// Create an uninitialized mesh wrapper
+  virtual iMeshWrapper* CreateMeshObject (const char* name) = 0;
   /**
    * Conveniance function to load a mesh object from a given loader plugin.
    * If sector == NULL the object will not be placed in a sector.
@@ -398,6 +414,7 @@ struct iEngine : public iPlugIn
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
+
   /**
    * Conveniance function to create a terrain factory from a given type.
    * The type plugin will only be loaded if needed. 'classId' is the
@@ -410,6 +427,11 @@ struct iEngine : public iPlugIn
    */
   virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* classId,
   	const char* name) = 0;
+  /// Create a terrain factory wrapper for an existing terrain factory
+  virtual iTerrainFactoryWrapper* CreateTerrainFactory (iTerrainObjectFactory*,
+  	const char* name) = 0;
+  /// Create an uninitialized terrain factory wrapper
+  virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* name) = 0;
 
   /**
    * Conveniance function to create a terrain object for a given factory.
@@ -420,6 +442,11 @@ struct iEngine : public iPlugIn
    */
   virtual iTerrainWrapper* CreateTerrainObject (iTerrainFactoryWrapper* factory,
   	const char* name, iSector* sector) = 0;
+  /// Create a terrain wrapper for an existing terrain object
+  virtual iTerrainWrapper* CreateTerrainObject (iTerrainObject*,
+  	const char* name, iSector* sector) = 0;
+  /// Create an uninitialized terrain wrapper
+  virtual iTerrainWrapper* CreateTerrainObject (const char* name) = 0;
 
   /**
    * @@@ Temporary function to create a polygon plane. This is temporary

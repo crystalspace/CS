@@ -1086,30 +1086,52 @@ public:
   /// Remove a dynamic light.
   virtual void RemoveDynLight (iDynLight*);
 
-  /// Create mesh factory.
+  /// Create a mesh factory wrapper from a mesh plugin
   virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
   	const char* name);
+  /// Create a mesh factory wrapper for an existing mesh factory
+  virtual iMeshFactoryWrapper* CreateMeshFactory (iMeshObjectFactory *,
+  	const char* name);
+  /// Create an uninitialized mesh factory wrapper
+  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* name);
   /// Load mesh factory.
   virtual iMeshFactoryWrapper* LoadMeshFactory (
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input);
-  /// Create mesh object.
+
+  /// Create a mesh wrapper from a mesh factory wrapper
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos);
+  /// Create a mesh wrapper for an existing mesh object
+  virtual iMeshWrapper* CreateMeshObject (iMeshObject*,
+  	const char* name, iSector* sector, const csVector3& pos);
+  /// Create an uninitialized mesh wrapper
+  virtual iMeshWrapper* CreateMeshObject (const char* name);
   /// Load mesh object.
   virtual iMeshWrapper* LoadMeshObject (
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
-  /// Create terrain factory.
+  /// Create a terrain factory wrapper from a terrain plugin
   virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,
 	  const char* pName);
-  /// Create terrain object.
+  /// Create a terrain factory wrapper for an existing terrain factory
+  virtual iTerrainFactoryWrapper* CreateTerrainFactory (iTerrainObjectFactory*,
+  	const char* name);
+  /// Create an uninitialized terrain factory wrapper
+  virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* name);
+
+  /// Create a terrain wrapper from a terrain factory wrapper
   virtual iTerrainWrapper* CreateTerrainObject (
   	iTerrainFactoryWrapper* pFactWrap,
   	const char* name, iSector* sector);
+  /// Create a terrain wrapper for an existing terrain object
+  virtual iTerrainWrapper* CreateTerrainObject (iTerrainObject*,
+  	const char* name, iSector* sector);
+  /// Create an uninitialized terrain wrapper
+  virtual iTerrainWrapper* CreateTerrainObject (const char* name);
 
   virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name,

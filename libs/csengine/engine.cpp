@@ -2034,21 +2034,48 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
     iMeshFactoryWrapper* factwrap = FindMeshFactory (name);
     if (factwrap != NULL) return factwrap;
   }
+
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, classId, "MeshObj", iMeshObjectType);
   if (!type) type = LOAD_PLUGIN (System, classId, "MeshObj", iMeshObjectType);
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();
-  if (!fact) return NULL;
-  csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
-  if (name) mfactwrap->SetName (name);
   type->DecRef ();
+  if (!fact) return NULL;
+  // don't pass the name to avoid a second search
+  iMeshFactoryWrapper *fwrap = CreateMeshFactory (fact, NULL);
+  if (fwrap && name) fwrap->QueryObject()->SetName(name);
   fact->DecRef ();
-  mesh_factories.Push (mfactwrap);
-  iMeshFactoryWrapper* imfw = QUERY_INTERFACE (mfactwrap, iMeshFactoryWrapper);
-  imfw->DecRef ();
-  return imfw;
+  return fwrap;
 }
 
+iMeshFactoryWrapper* csEngine::CreateMeshFactory (iMeshObjectFactory *fact,
+	const char* name)
+{
+  if (name != NULL)
+  {
+    iMeshFactoryWrapper* factwrap = FindMeshFactory (name);
+    if (factwrap != NULL) return factwrap;
+  }
+
+  csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
+  if (name) mfactwrap->SetName (name);
+  mesh_factories.Push (mfactwrap);
+  return &mfactwrap->scfiMeshFactoryWrapper;
+}
+
+iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
+{
+  if (name != NULL)
+  {
+    iMeshFactoryWrapper* factwrap = FindMeshFactory (name);
+    if (factwrap != NULL) return factwrap;
+  }
+
+  csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper ();
+  if (name) mfactwrap->SetName (name);
+  mesh_factories.Push (mfactwrap);
+  return &mfactwrap->scfiMeshFactoryWrapper;
+}
 
 void csEngine::DeleteMeshFactory (const char* iName, bool regionOnly)
 {
@@ -2135,8 +2162,15 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,
 {
   iMeshObjectFactory* fact = factory->GetMeshObjectFactory ();
   iMeshObject* mesh = fact->NewInstance ();
-  csMeshWrapper* meshwrap = new csMeshWrapper (this, mesh);
+  iMeshWrapper* meshwrap = CreateMeshObject (mesh, name, sector, pos);
   mesh->DecRef ();
+  return meshwrap;
+}
+
+iMeshWrapper* csEngine::CreateMeshObject (iMeshObject* mesh,
+  	const char* name, iSector* sector, const csVector3& pos)
+{
+  csMeshWrapper* meshwrap = new csMeshWrapper (this, mesh);
   if (name) meshwrap->SetName (name);
   meshes.Push (meshwrap);
   if (sector)
@@ -2145,9 +2179,15 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }
-  iMeshWrapper* imw = QUERY_INTERFACE (meshwrap, iMeshWrapper);
-  imw->DecRef ();
-  return imw;
+  return &meshwrap->scfiMeshWrapper;
+}
+
+iMeshWrapper* csEngine::CreateMeshObject (const char* name)
+{
+  csMeshWrapper* meshwrap = new csMeshWrapper (this);
+  if (name) meshwrap->SetName (name);
+  meshes.Push (meshwrap);
+  return &meshwrap->scfiMeshWrapper;
 }
 
 iTerrainFactoryWrapper* csEngine::CreateTerrainFactory (const char* pClassId,
@@ -2167,21 +2207,46 @@ iTerrainFactoryWrapper* csEngine::CreateTerrainFactory (const char* pClassId,
     return NULL;
 
   iTerrainObjectFactory *iFactory = iType->NewFactory();
+  iType->DecRef();
   if (!iFactory)
     return NULL;
 
-  csTerrainFactoryWrapper* pTFactWrap = new csTerrainFactoryWrapper( iFactory );
-  if( pName )
-    pTFactWrap->SetName( pName );
-
-  iType->DecRef ();
+  // don't pass the name to avoid a second search
+  iTerrainFactoryWrapper *fwrap = CreateTerrainFactory (iFactory, NULL);
+  if (fwrap && pName) fwrap->QueryObject()->SetName (pName);
   iFactory->DecRef ();
+  return fwrap;
+}
 
-  terrain_factories.Push( pTFactWrap );
-  iTerrainFactoryWrapper *iWrapper = 
-    QUERY_INTERFACE( pTFactWrap, iTerrainFactoryWrapper );
-  iWrapper->DecRef();
-  return iWrapper;
+iTerrainFactoryWrapper* csEngine::CreateTerrainFactory
+	(iTerrainObjectFactory *fact, const char* pName)
+{
+  if (pName != NULL)
+  {
+    iTerrainFactoryWrapper *iFactWrap = FindTerrainFactory (pName, false);
+    if (iFactWrap)
+      return iFactWrap;
+  }
+
+  csTerrainFactoryWrapper* fwrap = new csTerrainFactoryWrapper (fact);
+  if (pName) fwrap->SetName (pName);
+  terrain_factories.Push (fwrap);
+  return &fwrap->scfiTerrainFactoryWrapper;
+}
+
+iTerrainFactoryWrapper* csEngine::CreateTerrainFactory(const char* pName)
+{
+  if (pName != NULL)
+  {
+    iTerrainFactoryWrapper *iFactWrap = FindTerrainFactory (pName, false);
+    if (iFactWrap)
+      return iFactWrap;
+  }
+
+  csTerrainFactoryWrapper* fwrap = new csTerrainFactoryWrapper ();
+  if (pName) fwrap->SetName (pName);
+  terrain_factories.Push (fwrap);
+  return &fwrap->scfiTerrainFactoryWrapper;
 }
 
 iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainFactoryWrapper* pFactWrap,
@@ -2189,20 +2254,30 @@ iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainFactoryWrapper* pFactWra
 {
   iTerrainObjectFactory *iTObjFact = pFactWrap->GetTerrainObjectFactory ();
   iTerrainObject *iTerrObj = iTObjFact->NewInstance ();
-
-  csTerrainWrapper *pTerrWrap = new csTerrainWrapper (this, iTerrObj);
+  iTerrainWrapper *twrap = CreateTerrainObject (iTerrObj, pName, iSector);
   iTerrObj->DecRef ();
-  if (pName)
-    pTerrWrap->SetName (pName);
+  return twrap;
+}
 
-  terrains.Push (pTerrWrap);
+iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainObject *terr,
+  	const char *pName, iSector *iSector)
+{
+  csTerrainWrapper *twrap = new csTerrainWrapper (this, terr);
+  if (pName) twrap->SetName (pName);
+  terrains.Push (twrap);
 
   // add new terrain to sector
-  iSector->AddTerrain (&pTerrWrap->scfiTerrainWrapper);
+  iSector->AddTerrain (&twrap->scfiTerrainWrapper);
 
-  iTerrainWrapper *iWrapper = QUERY_INTERFACE (pTerrWrap, iTerrainWrapper);
-  iWrapper->DecRef ();
-  return iWrapper;
+  return &twrap->scfiTerrainWrapper;
+}
+
+iTerrainWrapper* csEngine::CreateTerrainObject (const char *pName)
+{
+  csTerrainWrapper *twrap = new csTerrainWrapper (this);
+  if (pName) twrap->SetName (pName);
+  terrains.Push (twrap);
+  return &twrap->scfiTerrainWrapper;
 }
 
 iPolyTxtPlane* csEngine::CreatePolyTxtPlane (const char* name)

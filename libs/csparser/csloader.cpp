@@ -39,6 +39,9 @@
 #include "iengine/terrain.h"
 #include "iengine/collectn.h"
 #include "iengine/sector.h"
+#include "iengine/polygon.h"
+#include "iengine/portal.h"
+#include "iengine/movable.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
@@ -58,8 +61,7 @@
 #include "csengine/keyval.h"
 #include "csengine/sector.h"
 #include "csengine/meshobj.h"
-#include "csengine/terrobj.h"
-#include "csengine/polygon.h"
+//#include "csengine/terrobj.h"
 #include "cssys/system.h"
 #include "csengine/lghtmap.h"
 
@@ -848,11 +850,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case CS_TOKEN_MESHOBJ:
         {
-          csMeshWrapper* tmp = new csMeshWrapper (Engine->GetCsEngine());
-          Engine->GetCsEngine()->meshes.Push (tmp);
-	  iMeshWrapper* mesh = &tmp->scfiMeshWrapper;
-
-          mesh->QueryObject ()->SetName (name);
+	  iMeshWrapper* mesh = Engine->CreateMeshObject(name);
           LoadMeshObject (mesh, params);
           mesh->GetMovable ()->SetSector (&sector->scfiSector);
 	  mesh->GetMovable ()->UpdateMove ();
@@ -860,11 +858,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case CS_TOKEN_TERRAINOBJ:
         {
-          csTerrainWrapper *pWrapper = new csTerrainWrapper (Engine);
-          Engine->GetCsEngine()->terrains.Push (pWrapper);
-	  iTerrainWrapper *terr = &pWrapper->scfiTerrainWrapper;
-
-          terr->QueryObject ()->SetName (name);
+	  iTerrainWrapper *terr = Engine->CreateTerrainObject(name);
           LoadTerrainObject (terr, params, sector);
         }
         break;
@@ -902,26 +896,27 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 
 //---------------------------------------------------------------------------
 
-void csLoader::ResolvePortalSectors (iEngine* Engine, csThing* ps)
+void csLoader::ResolvePortalSectors (iThing *th)
 {
-  for (int i=0;  i < ps->GetNumPolygons ();  i++)
+  for (int i=0;  i < th->GetPolygonCount ();  i++)
   {
-    csPolygon3D* p = ps->GetPolygon3D (i);
+    iPolygon3D* p = th->GetPolygon (i);
     if (p && p->GetPortal ())
     {
-      csPortal *portal = p->GetPortal ();
-      csSector *stmp = portal->GetSector ();
-      iSector *snew = Engine->FindSector (stmp->GetName (), ResolveOnlyRegion);
+      iPortal *portal = p->GetPortal ();
+      iSector *stmp = portal->GetPortal ();
+      iSector *snew = Engine->FindSector (stmp->QueryObject ()->GetName (),
+        ResolveOnlyRegion);
       if (!snew)
       {
         System->Printf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
-          " polygon '%s/%s'!\n", stmp->GetName (),
-          ((csObject*)p->GetParent ())->GetName (),
-          p->GetName ());
+          " polygon '%s/%s'!\n", stmp->QueryObject ()->GetName (),
+          p->QueryObject ()->GetObjectParentI ()->GetName (),
+          p->QueryObject ()->GetName ());
         fatal_exit (0, false);
       }
-      portal->SetSector (snew->GetPrivateObject ());
-      delete stmp;
+      portal->SetPortal (snew);
+      stmp->DecRef();
     }
   }
 }
@@ -1006,12 +1001,7 @@ bool csLoader::LoadMap (char* buf)
           {
             iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
             if (!t)
-            {
-              csMeshFactoryWrapper *tmp = new csMeshFactoryWrapper ();
-              Engine->GetCsEngine()->mesh_factories.Push (tmp);
-	      t = &tmp->scfiMeshFactoryWrapper;
-              t->QueryObject ()->SetName (name);
-            }
+	      t = Engine->CreateMeshFactory(name);
             LoadMeshObjectFactory (t, params);
           }
 	  break;
@@ -1020,13 +1010,7 @@ bool csLoader::LoadMap (char* buf)
             iTerrainFactoryWrapper* terr =
 		Engine->FindTerrainFactory (name);
             if (!terr)
-            {
-              csTerrainFactoryWrapper *pWrapper = new csTerrainFactoryWrapper ();
-              Engine->GetCsEngine()->terrain_factories.Push (pWrapper);
-	      terr = &pWrapper->scfiTerrainFactoryWrapper;
-
-              terr->QueryObject ()->SetName (name);
-            }
+	      terr = Engine->CreateTerrainFactory(name);
             LoadTerrainObjectFactory (terr, params);
           }
 	  break; 
@@ -1107,10 +1091,10 @@ bool csLoader::LoadMap (char* buf)
       csMeshWrapper* ps = s->GetMesh (j);
       j++;
       // @@@ UGLY!!!! NEED A MORE GENERAL SOLUTION!
-      iThing* ith = QUERY_INTERFACE (ps->GetMeshObject (), iThing);
+      iThing* ith = QUERY_INTERFACE (ps->GetMeshObject(), iThing);
       if (ith)
       {
-        ResolvePortalSectors (Engine->GetCsEngine(), ith->GetPrivateObject ());
+        ResolvePortalSectors (ith);
 	ith->DecRef ();
       }
     }
@@ -1330,12 +1314,7 @@ bool csLoader::LoadLibrary (char* buf)
           {
             iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
             if (!t)
-            {
-              csMeshFactoryWrapper *tmp = new csMeshFactoryWrapper ();
-              Engine->GetCsEngine()->mesh_factories.Push (tmp);
-	      t = &tmp->scfiMeshFactoryWrapper;
-              t->QueryObject ()->SetName (name);
-            }
+	      t = Engine->CreateMeshFactory(name);
             LoadMeshObjectFactory (t, params);
           }
           break;
@@ -1518,7 +1497,7 @@ void csLoader::csLoadedPluginVector::NewPlugIn
 
 //---------------------------------------------------------------------------
 
-csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
+iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 {
   iDataBuffer *databuff = VFS->ReadFile (fname);
 
@@ -1545,18 +1524,15 @@ csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
       fatal_exit (0, false);
     }
 
-    csMeshFactoryWrapper* tmpl = new csMeshFactoryWrapper ();
-    iMeshFactoryWrapper* t = &tmpl->scfiMeshFactoryWrapper;
-    t->QueryObject ()->SetName (name);
+    iMeshFactoryWrapper* t = Engine->CreateMeshFactory(name);
     if (LoadMeshObjectFactory (t, data))
     {
-      Engine->GetCsEngine()->mesh_factories.Push (tmpl);
       databuff->DecRef ();
-      return tmpl;
+      return t;
     }
     else
     {
-      delete tmpl;
+      Engine->DeleteMeshFactory(name);
       databuff->DecRef ();
       return NULL;
     }
