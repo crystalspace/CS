@@ -127,8 +127,10 @@ void SysSystemDriver::Loop ()
           if (Button == 0)
             Mouse->do_mousemotion (time, x, y);
           else if (Down)
-            Mouse->do_buttonpress (time, Button, x, y, Keyboard->Key.shift,
-              Keyboard->Key.alt, Keyboard->Key.ctrl);
+            Mouse->do_buttonpress (time, Button, x, y,
+              Keyboard->GetKeyState (CSKEY_SHIFT),
+              Keyboard->GetKeyState (CSKEY_ALT),
+              Keyboard->GetKeyState (CSKEY_CTRL));
           else
             Mouse->do_buttonrelease (time, Button, x, y);
           break;
