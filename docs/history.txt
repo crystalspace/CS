@@ -1,5 +1,71 @@
 The history order has been reversed so that new features are at the top.
 
+9-Jan-2001
+	- Eric Sunshine fixed a problem in bmpimage.cpp which caused loading
+	  of BMP files on big-endian Solaris to fail.
+	- Andrew Zabolotny made the following changes:
+	    - Started implementing "hints" at startup.  Actually just wrote a
+	      number of them in MazeD.zip::hints.cfg
+	    - I decided to change a little the ideology of MazeD.  The
+	      ex-"Draft View" will be split now into two different kinds of
+	      windows: Model Editors and World Editors.  In Model Editor you
+	      will edit models (rooms, things, sprites) and in the World Editor
+	      you will place them (without being able to change the models
+	      itselves).  mzDraftView component is the common ancestor now for
+	      both mzModelEditor and mzWorldEditor components, and can draw the
+	      coordinate axis and grid, nothing mode.  The split between
+	      DraftView and ModelEditor is finished.
+	    - Created the mzWorldEditor window.  It doesn't do much yet, but
+	      already has basic functionality.  As the world is loaded, the
+	      rooms are "centered" around origin, and a respective
+	      mzModelInstance with the respective translation transform is set
+	      up.  This allow to edit every room as if it is located in the
+	      origin, which is easier.
+	    - Fixed a bug recently introduced by somebody.  For software
+	      renderer iTextureHandle::Prepare() did no remap_texture() which
+	      results in NULL palette->global palette conversion table.  This
+	      means you cannot use texture after you do Prepare, but can if you
+	      do PrepareAllTextures().  Or alternatively you can call Prepare()
+	      then SetGamma() :-) In short, a mess.
+	    - Fixed a lot of bugs in fullscreen switching logic for all three
+	      X11 canvas plug-ins (x2d, linex2d, glx2d):
+		- Moved all the code relevant to fullscreen switching to two
+		  files, x2dfs.h and x2dfs.inc for easier maintainance.  All
+		  three X11 plugins include them from the relevant .h and .cpp
+		  files.
+		- Fixed a bug: when a fullscreen mode not matching current
+		  canvas size is not available, the canvas may be cleared,
+		  which is not desirable.
+		- Bug: when current XFree86 videomode is the "best match"
+		  videomode for the current canvas size, the canvas driver
+		  would hang (loop forever in XWaitEvent).
+		- Bug: If videomode does not match canvas size, and canvas
+		  resizing is allowed, the canvas size will be adjusted to
+		  match videomode.  It was supposed to work before but it
+		  didn't.  If canvas resizing is not allowed, the canvas is not
+		  resized, but centered instead.
+		- Bug: If an unexpected ConfigureNotify would arrive to our
+		  window, canvas may be suddenly resized to an erroneous size.
+		  I've added a check for ConfigureNotify to be related to our
+		  window.
+	    - Re-implemented "model instances" in MazeD to allow arbitrary
+	      hierarchical structures.  For now the top level of the hierarchy
+	      can contain only rooms, although this is not a MazeD limit, it is
+	      a engine limit.  Each instance has its move vector and space warp
+	      matrix, which are relative to parent object.  Moving/rotating
+	      parent object will move/rotate child objects as well.  Model
+	      instance position and warp are stored either as a MOVE(), or a
+	      HARDMOVE() statement (for rooms and for instances that have the
+	      "LockedPos" flag set).  Alas, for now engine doesn't allow rooms
+	      at any level other than top level, maybe it makes sense to remove
+	      this limitation.  For example, a castle (which would be a room)
+	      would contain a hall (child room of castle) which contains
+	      something even smaller (child of hall).  Also for now we don't
+	      have sector templates, which is bad again (if you duplicate a
+	      room multiple times, you'll get it multiple times in output,
+	      although it could be avoided).
+	- Eric Sunshine fixed several compilation problems in MazeD following
+	  Andrew's changes.
 8-Jan-2001
 	- Wouter Wijngaards fixed procedural sky for OpenGL.
 	- Wouter also optimized it a little to use the new qsqrt().
