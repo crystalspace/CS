@@ -2,11 +2,11 @@ History starts at first public release. The history order has been
 reversed so that new features are at the top.
 
 Short-term cleanups that need to be done:
-	- Resolve config/console/commandline mess.
-	  Several things are broken currently: gamma, dmipmap1, ...
+	- Resolve config/console/commandline mess.  Several things are broken
+	  currently: gamma, dmipmap1, ...
 	- Add to API: absolute versions of Rotate and RotateWorld for csCamera.
-	- Resolve confusion with SetTexture() and SetTextureHandle(). We
-	  need to be consequent.
+	- Resolve confusion with SetTexture() and SetTextureHandle().  We need
+	  to be consequent.
 	- Consider flattening many of the routines that are now structured to
 	  go through all the recursive object layers (csWorld, csSector,
 	  csThing, ...)
@@ -20,21 +20,25 @@ Short-term cleanups that need to be done:
 	  hopefully in a GCC-compatible fashion).  Jorrit's change was simply
 	  incorrect and would have resulted in a crash since those variables
 	  would have been used uninitialized.
+	- Eric Sunshine eliminated a recently introduced compiler warning in
+	  csEngine.
+	- Eric Sunshine worked around an OpenStep compiler bug which was
+	  triggered by recent changes to csBox.
 2-Nov-1999
 	- Added -lmgrid and -lmonly commandline option for software renderer.
-	  -lmgrid adds an extra grid to every lightmap lumel. -lmonly doesn't
-	  do texture mapping but only applies the lightmap. Both are debugging
-	  options. The functionality for those options was still present in CS
-	  but it wasn't possible to enable it anymore.
-	- Added '-cache/-nocache' commandline options to disable caching of lightmaps.
-	  This is useful when testing lighting to speed up the starting process because
-	  caching takes a lot of time.
+	  -lmgrid adds an extra grid to every lightmap lumel.  -lmonly doesn't
+	  do texture mapping but only applies the lightmap.  Both are
+	  debugging options.  The functionality for those options was still
+	  present in CS but it wasn't possible to enable it anymore.
+	- Added '-cache/-nocache' commandline options to disable caching of
+	  lightmaps.  This is useful when testing lighting to speed up the
+	  starting process because caching takes a lot of time.
 	- Added message to initialization that indicates how much seconds were
 	  used to calculate lighting.
-	- Optimized quadtree lighting routines. Now lighting dmburg calculates
-	  in half the time (from 137 seconds to 66 seconds).
-	  Note that I had to disable this optimization because it is not
-	  yet compatible with old style portal levels.
+	- Optimized quadtree lighting routines.  Now lighting dmburg
+	  calculates in half the time (from 137 seconds to 66 seconds).  Note
+	  that I had to disable this optimization because it is not yet
+	  compatible with old style portal levels.
 	- Eric Sunshine fixed a problem which was recently introduced into
 	  csLoader and caused the application to crash during parsing of many
 	  of the standard levels (maze, large, flarge, etc.).  The problem was
@@ -57,9 +61,8 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine eliminated some compiler warnings in csEngine reported
 	  by Furqan Ullah <furqan@writeme.com>.
 	- Brandon Ehle added newdoc directory with LaTeX documentation.
-	- Alex Pfaffe added some fixes to terrain engine.
-	  He fixed an orientation problem with the terrain. It now
-	  renders correctly.
+	- Alex Pfaffe added some fixes to terrain engine.  He fixed an
+	  orientation problem with the terrain.  It now renders correctly.
 	- Updates to Macintosh project files from Robert Bate.
 1-Nov-1999
 	- Eric Sunshine eliminated some compiler warnings issued by
