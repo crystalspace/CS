@@ -120,6 +120,7 @@ GLFontCache::GLFontCache (iFontServer *fs, iGraphics2D *g) : FontCache (8, 8)
   delete_callback = new FontDeleteNotify ();
   ((FontDeleteNotify*)delete_callback)->glyphset = this;
   iFont *font;
+  if (!fs) return;
   while ((font = fs->GetFont (i++)))
     CacheFont (font);
 }

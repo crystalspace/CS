@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	  set and will move them to the new location. At this moment this
 	  only works for objects that are always at 0,0,0 position. This
 	  is also usually the case. This solves the bug in csdemo.
+	- Bugplug no longer depends on the existance of the font server.
+	- OpenGL canvases no longer depend on the existance of the font
+	  server.
 23-Jan-2003
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.

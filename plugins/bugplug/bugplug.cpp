@@ -1149,81 +1149,87 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     iFontServer* fntsvr = G2D->GetFontServer ();
-    CS_ASSERT (fntsvr != NULL);
-    csRef<iFont> fnt (fntsvr->GetFont (0));
-    if (fnt == NULL)
+    if (fntsvr)
     {
-      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      csRef<iFont> fnt (fntsvr->GetFont (0));
+      if (fnt == NULL)
+      {
+        fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      }
+      CS_ASSERT (fnt != NULL);
+      int fw, fh;
+      fnt->GetMaxSize (fw, fh);
+      int sh = G2D->GetHeight ();
+      int x = 150;
+      int y = sh/2 - (fh+5*2)/2;
+      int w = 200;
+      int h = fh+5*2;
+      int bgcolor = G2D->FindRGB (255, 255, 0);
+      G2D->DrawBox (x, y, w, h, bgcolor);
+      int fgcolor = G2D->FindRGB (0, 0, 0);
+      char* msg;
+      if (process_next_key) msg = "Press a BugPlug key...";
+      else msg = "Click on screen...";
+      G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg);
     }
-    CS_ASSERT (fnt != NULL);
-    int fw, fh;
-    fnt->GetMaxSize (fw, fh);
-    int sh = G2D->GetHeight ();
-    int x = 150;
-    int y = sh/2 - (fh+5*2)/2;
-    int w = 200;
-    int h = fh+5*2;
-    int bgcolor = G2D->FindRGB (255, 255, 0);
-    G2D->DrawBox (x, y, w, h, bgcolor);
-    int fgcolor = G2D->FindRGB (0, 0, 0);
-    char* msg;
-    if (process_next_key) msg = "Press a BugPlug key...";
-    else msg = "Click on screen...";
-    G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg);
   }
 
   if (edit_mode)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     iFontServer* fntsvr = G2D->GetFontServer ();
-    CS_ASSERT (fntsvr != NULL);
-    csRef<iFont> fnt (fntsvr->GetFont (0));
-    if (fnt == NULL)
+    if (fntsvr)
     {
-      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      csRef<iFont> fnt (fntsvr->GetFont (0));
+      if (fnt == NULL)
+      {
+        fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      }
+      CS_ASSERT (fnt != NULL);
+      int fw, fh;
+      fnt->GetMaxSize (fw, fh);
+      int sw = G2D->GetWidth ();
+      int sh = G2D->GetHeight ();
+      int x = 10;
+      int y = sh/2 - (fh*2+5*3)/2;
+      int w = sw-20;
+      int h = fh*2+5*3;
+      int bgcolor = G2D->FindRGB (255, 255, 0);
+      G2D->DrawBox (x, y, w, h, bgcolor);
+      int fgcolor = G2D->FindRGB (0, 0, 0);
+      int maxlen = fnt->GetLength (msg_string, w-10);
+      if (maxlen < 80) msg_string[maxlen] = 0;
+      G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg_string);
+      maxlen = fnt->GetLength (edit_string, w-10);
+      if (maxlen < 80) edit_string[maxlen] = 0;
+      G2D->Write (fnt, x+5, y+5+fh+5, fgcolor, bgcolor, edit_string);
+      char cursor[83];
+      strcpy (cursor, edit_string);
+      cursor[edit_cursor] = 0;
+      int cursor_w, cursor_h;
+      fnt->GetDimensions (cursor, cursor_w, cursor_h);
+      G2D->Write (fnt, x+5+cursor_w, y+5+fh+7, fgcolor, -1, "_");
     }
-    CS_ASSERT (fnt != NULL);
-    int fw, fh;
-    fnt->GetMaxSize (fw, fh);
-    int sw = G2D->GetWidth ();
-    int sh = G2D->GetHeight ();
-    int x = 10;
-    int y = sh/2 - (fh*2+5*3)/2;
-    int w = sw-20;
-    int h = fh*2+5*3;
-    int bgcolor = G2D->FindRGB (255, 255, 0);
-    G2D->DrawBox (x, y, w, h, bgcolor);
-    int fgcolor = G2D->FindRGB (0, 0, 0);
-    int maxlen = fnt->GetLength (msg_string, w-10);
-    if (maxlen < 80) msg_string[maxlen] = 0;
-    G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg_string);
-    maxlen = fnt->GetLength (edit_string, w-10);
-    if (maxlen < 80) edit_string[maxlen] = 0;
-    G2D->Write (fnt, x+5, y+5+fh+5, fgcolor, bgcolor, edit_string);
-    char cursor[83];
-    strcpy (cursor, edit_string);
-    cursor[edit_cursor] = 0;
-    int cursor_w, cursor_h;
-    fnt->GetDimensions (cursor, cursor_w, cursor_h);
-    G2D->Write (fnt, x+5+cursor_w, y+5+fh+7, fgcolor, -1, "_");
   }
 
   if (do_fps)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     iFontServer* fntsvr = G2D->GetFontServer ();
-    CS_ASSERT (fntsvr != NULL);
-    csRef<iFont> fnt (fntsvr->GetFont (0));
-    if (fnt == NULL)
+    if (fntsvr)
     {
-      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      csRef<iFont> fnt (fntsvr->GetFont (0));
+      if (fnt == NULL)
+      {
+        fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      }
+      int sh = G2D->GetHeight ();
+      int fw, fh;
+      fnt->GetMaxSize (fw, fh);
+      int fgcolor = G2D->FindRGB (255, 255, 255);
+      GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
+      GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
     }
-    int sh = G2D->GetHeight ();
-    int fw, fh;
-    fnt->GetMaxSize (fw, fh);
-    int fgcolor = G2D->FindRGB (255, 255, 255);
-    GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
-    GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
   }
 
   if (spider_hunting)

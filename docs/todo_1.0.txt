@@ -25,6 +25,9 @@ Bugs to fix:
 	     is choking up the system.  Without the lightmap pass, he says
 	     performance is excellent.  Jorrit suspects that this might be
 	     caused by texture swapping.
+	     Note by Jorrit: DrawPolygonMesh seems to help a lot.
+	     Unfortunatelly this function is still buggy (fog is not implemented
+	     and some transparency effects don't seem to be working).
 	[**] CAMERA entity bug and vis culling causes bizarre HOM effects and
 	     disappearing/reappearing stars in csdemo.  Also probably affects
 	     other programs and maps, in which sudden and drastic pops in
@@ -34,6 +37,8 @@ Bugs to fix:
 	     0.5 and 1.5 fps (on my computer) when facing into the room (not at
 	     a blank wall) and stays low until the light is removed (shift-1).
 	     (optimize mode)
+	     Note by Jorrit: this will most likely not be fixed soon as it is
+	     a rather fundamental problem.
 	[**] Using software renderer, go to the room in flarge with the spinning
 	     blocks and rings.  Add a light with shift-L.  The software
 	     renderer immediately crashes while trying to dereference a null
@@ -67,7 +72,7 @@ Bugs to fix:
 	[S]  mottest crashes dereferencing a null pointer.  To reproduce: 1)
 	     Launch mottest.  2) Press ESC.  3) Crash.
 	     (optimize and debug mode)
-	[S]  OpenGL renderer crashes dereferencing null pointer if font manager
+	[**] OpenGL renderer crashes dereferencing null pointer if font manager
 	     is not present.  To reproduce: 1) Launch netmtst with OpenGL
 	     renderer: ./netmtst -video=opengl.  2) Crash.
 	[S]  perftest crashes dereferencing a null pointer when using OpenGL.
