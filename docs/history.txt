@@ -52,6 +52,19 @@ The history order is reversed so that new features are at the top.
 	      the internal G2D and G3D pointers. It still keeps pointers
 	      to Console and VFS for other reasons. Those will be removed
 	      later.
+	- Added new 'viewmesh' tool which allows one to quickly load a mesh
+	  factory and view one instance of it in a room. It accepts four
+	  parameters of which the last three are optional:
+	    - The first parameter is the VFS filename of the mesh factory.
+	      For example: /lib/std/sprite1
+	    - The second parameter is the filename of the texture to wrap on
+	      the mesh. Example: /lib/std/spark.png
+	    - The third parameter is the name of the material to which the
+	      above texture will be assigned. This must correspond with
+	      the name of the material that is mentioned in the mesh
+	      factory itself (i.e. /lib/std/sprite1).
+	      Example: spark
+	    - The fourth parameter is a scale factor. Default is 1.
 23-Jul-2001
 	- Continued work on the decomposition of the system driver. The
 	  following items were performed:
