@@ -47,5 +47,6 @@ MSVC.PLUGINS.REQUIRED =     \
   video/canvas/ddraw        \
   video/canvas/ddraw61      \
   video/canvas/openglwin    \
+  video/format/avi          \
   video/renderer/direct3d61 \
   video/renderer/opengl
