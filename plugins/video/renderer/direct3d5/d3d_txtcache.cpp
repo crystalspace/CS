@@ -46,7 +46,7 @@ const double TextureGamma      = 1.0; //can be from 0.01   to 1.0 (1.0= no effec
 ///////////////////////////////////
 D3DTextureCache::D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDraw, 
                                  LPDIRECT3DDEVICE2 pDevice, int nBpp, bool bMipmapping,
-				 G3D_CAPS* pRendercaps, int MaxAspectRatio)
+                                 G3D_CAPS* pRendercaps, int MaxAspectRatio)
 : HighColorCache(nMaxSize, HIGHCOLOR_TEXCACHE, nBpp)
 {
   ASSERT(MaxAspectRatio>0);
@@ -197,113 +197,113 @@ void D3DTextureCache::Load(csD3DCacheData *d)
       case 32:
       {
         if ((CurrentWidth == OriginalWidth) && (CurrentHeight == OriginalHeight))
-	{
-	  //No zooming needed, so we can use a rather fast method to add to the cache
-	  for (int j = 0; j < CurrentHeight; j++)
-	  {
-	    unsigned long* lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-	    unsigned long* llpySrc = lpSrc + (j * CurrentWidth);
+        {
+          //No zooming needed, so we can use a rather fast method to add to the cache
+          for (int j = 0; j < CurrentHeight; j++)
+          {
+            unsigned long* lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+            unsigned long* llpySrc = lpSrc + (j * CurrentWidth);
         
-	    for (int i=0; i < CurrentWidth; i++)
-	    {
-	      int r = m_GammaCorrect[R24(*llpySrc)];
-	      int g = m_GammaCorrect[G24(*llpySrc)];
-	      int b = m_GammaCorrect[B24(*llpySrc)];
+            for (int i=0; i < CurrentWidth; i++)
+            {
+              int r = m_GammaCorrect[R24(*llpySrc)];
+              int g = m_GammaCorrect[G24(*llpySrc)];
+              int b = m_GammaCorrect[B24(*llpySrc)];
 
-	      *lpL =  ((r / red_scale)   << red_shift)   |
-		      ((g / green_scale) << green_shift) |
-		      ((b / blue_scale)  << blue_shift);
+              *lpL =  ((r / red_scale)   << red_shift)   |
+                      ((g / green_scale) << green_shift) |
+                      ((b / blue_scale)  << blue_shift);
           
-	      lpL++;
-	      llpySrc++;
-	    }
-	  }
-	}
-	else
-	{
-	  //Original size and Current size do differ, that makes things a bit
-	  //more difficult
-	  for (int j = 0; j < CurrentHeight; j++)
-	  {
-	    unsigned long* lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-	    
-	    //select the proper row.
-	    unsigned long* llpySrc = lpSrc + ((j*OriginalHeight/CurrentHeight) * OriginalWidth);
+              lpL++;
+              llpySrc++;
+            }
+          }
+        }
+        else
+        {
+          //Original size and Current size do differ, that makes things a bit
+          //more difficult
+          for (int j = 0; j < CurrentHeight; j++)
+          {
+            unsigned long* lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+            
+            //select the proper row.
+            unsigned long* llpySrc = lpSrc + ((j*OriginalHeight/CurrentHeight) * OriginalWidth);
         
-	    for (int i=0; i < CurrentWidth; i++)
-	    {
-	      //select the proper texel. (we could do this much nicer by using filtering, but
-	      //this would even cause a greater slowdown, and would be more work to code)
-	      unsigned long * llpxSrc = llpySrc + (i*OriginalWidth/CurrentWidth);
+            for (int i=0; i < CurrentWidth; i++)
+            {
+              //select the proper texel. (we could do this much nicer by using filtering, but
+              //this would even cause a greater slowdown, and would be more work to code)
+              unsigned long * llpxSrc = llpySrc + (i*OriginalWidth/CurrentWidth);
 
-	      int r = m_GammaCorrect[R24(*llpxSrc)];
-	      int g = m_GammaCorrect[G24(*llpxSrc)];
-	      int b = m_GammaCorrect[B24(*llpxSrc)];
+              int r = m_GammaCorrect[R24(*llpxSrc)];
+              int g = m_GammaCorrect[G24(*llpxSrc)];
+              int b = m_GammaCorrect[B24(*llpxSrc)];
 
-	      *lpL =  ((r / red_scale)   << red_shift)   |
-		      ((g / green_scale) << green_shift) |
-		      ((b / blue_scale)  << blue_shift);
+              *lpL =  ((r / red_scale)   << red_shift)   |
+                      ((g / green_scale) << green_shift) |
+                      ((b / blue_scale)  << blue_shift);
           
-	      lpL++;
-	    }
-	  }
-	}
+              lpL++;
+            }
+          }
+        }
         break;
       }  
       case 16:
       {
         if ((CurrentWidth == OriginalWidth) && (CurrentHeight == OriginalHeight))
-	{
-	  //No zooming needed, so we can use a rather fast method to add to the cache
-	  for (int j = 0; j < CurrentHeight; j++)
-	  {
-	    unsigned short* lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-	    unsigned long*  llpySrc = lpSrc + (j * CurrentWidth);
+        {
+          //No zooming needed, so we can use a rather fast method to add to the cache
+          for (int j = 0; j < CurrentHeight; j++)
+          {
+            unsigned short* lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+            unsigned long*  llpySrc = lpSrc + (j * CurrentWidth);
         
-	    for(int i=0; i< CurrentWidth; i++)
-	    {
-	      int r = m_GammaCorrect[R24(*llpySrc)];
-	      int g = m_GammaCorrect[G24(*llpySrc)];
-	      int b = m_GammaCorrect[B24(*llpySrc)];
+            for(int i=0; i< CurrentWidth; i++)
+            {
+              int r = m_GammaCorrect[R24(*llpySrc)];
+              int g = m_GammaCorrect[G24(*llpySrc)];
+              int b = m_GammaCorrect[B24(*llpySrc)];
           
-	      *lpS =  ((r / red_scale)   << red_shift)   |
-		      ((g / green_scale) << green_shift) |
-		      ((b / blue_scale)  << blue_shift);
+              *lpS =  ((r / red_scale)   << red_shift)   |
+                      ((g / green_scale) << green_shift) |
+                      ((b / blue_scale)  << blue_shift);
           
-	      llpySrc++;
-	      lpS++;
-	    }
-	  }
-	}
-	else
-	{
-	  //Original size and Current size do differ, that makes things a bit
-	  //more difficult
-	  for (int j = 0; j < CurrentHeight; j++)
-	  {
-	    unsigned short* lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-	    
-	    //select the proper row.
-	    unsigned long * llpySrc = lpSrc + ((j*OriginalHeight/CurrentHeight) * OriginalWidth);
+              llpySrc++;
+              lpS++;
+            }
+          }
+        }
+        else
+        {
+          //Original size and Current size do differ, that makes things a bit
+          //more difficult
+          for (int j = 0; j < CurrentHeight; j++)
+          {
+            unsigned short* lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+            
+            //select the proper row.
+            unsigned long * llpySrc = lpSrc + ((j*OriginalHeight/CurrentHeight) * OriginalWidth);
         
-	    for (int i=0; i < CurrentWidth; i++)
-	    {
-	      //select the proper texel. (we could do this much nicer by using filtering, but
-	      //this would even cause a greater slowdown, and would be more work to code)
-	      unsigned long * llpxSrc = llpySrc + (i*OriginalWidth/CurrentWidth);
+            for (int i=0; i < CurrentWidth; i++)
+            {
+              //select the proper texel. (we could do this much nicer by using filtering, but
+              //this would even cause a greater slowdown, and would be more work to code)
+              unsigned long * llpxSrc = llpySrc + (i*OriginalWidth/CurrentWidth);
 
-	      int r = m_GammaCorrect[R24(*llpxSrc)];
-	      int g = m_GammaCorrect[G24(*llpxSrc)];
-	      int b = m_GammaCorrect[B24(*llpxSrc)];
+              int r = m_GammaCorrect[R24(*llpxSrc)];
+              int g = m_GammaCorrect[G24(*llpxSrc)];
+              int b = m_GammaCorrect[B24(*llpxSrc)];
 
-	      *lpS =  ((r / red_scale)   << red_shift)   |
-		      ((g / green_scale) << green_shift) |
-		      ((b / blue_scale)  << blue_shift);
+              *lpS =  ((r / red_scale)   << red_shift)   |
+                      ((g / green_scale) << green_shift) |
+                      ((b / blue_scale)  << blue_shift);
           
-	      lpS++;
-	    }
-	  }
-	}
+              lpS++;
+            }
+          }
+        }
         break;
       }
       default:
