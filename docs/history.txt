@@ -13,6 +13,7 @@ chronological order.
 	  few parameters to csReport.
 	- res fixed a the std_foo shaders for the recent xmlshader changes.
 	- res fixed a crash with the terrain level.
+	- res fixed a crash when using the std_lighting_detail shader.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

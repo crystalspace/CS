@@ -562,7 +562,8 @@ static int ParseLayerParam (iDocumentNode* node, iShaderTUResolver* tuResolve)
   const char* layerName = node->GetAttributeValue ("layer");
   if (layerName == 0) return -1;
 
-  int layer = tuResolve->ResolveTextureBinding (layerName);
+  int layer = 
+    tuResolve ? tuResolve->ResolveTextureBinding (layerName) : -1;
   if (layer < 0) layer = node->GetAttributeValueAsInt ("layer");
   return layer;
 }

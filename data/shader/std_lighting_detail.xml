@@ -47,7 +47,7 @@
     <tag>detail texture</tag>
     <tag>multipass detail texture</tag>
     <pass>
-      <buffer name="texture coordinate lightmap" destination="texture coordinate 1" />
+      <buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
       <texture name="tex diffuse" destination="unit 0" />
       <texture name="tex lightmap" destination="unit 1" />
       <fp plugin="glfixed">
