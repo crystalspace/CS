@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+4-Jun-2001
+	- Eric Sunshine updated out-of-date Mingw comment in enginep.mak.
+	- Eric Sunshine fixed the makefiles for map2cs, mdl2spr, scfreg,
+	  scftutor, and gfxtest so that these applications successfully link on
+	  NextStep in `debug' mode.
+	- Eric Sunshine fixed the makefile `clean' target so that it only
+	  strips the trailing slash (/) from the $(OUTBASE) and $(OUTDLL)
+	  variables rather than removing all slashes.
 3-Jun-2001
 	- Eric Sunshine eliminated a couple compilation warnings in isoview.cpp
 	  regarding assignment of float to integer.

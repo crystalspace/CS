@@ -1,8 +1,8 @@
-############################################
+###############################################
 # These are the dependencies for Crystal Space.
 # This is an include file for the makefiles.
 # Don't use this directly as a makefile.
-############################################
+###############################################
 
 # The following two symbols are intended to be used in "echo" commands.
 # config.mak can override them depending on configured platform's requirements.
@@ -21,7 +21,7 @@ include mk/common.mak
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
 
-#--------------- Several definitions to make this file compiler-independent ---#
+#-------------- Several definitions to make this file compiler-independent ---#
 # Flags for C compiler to direct output to the rule target
 CFLAGS.@ = -o $@
 # Flags for linker to direct output to the rule target
@@ -193,9 +193,9 @@ distclean: clean
 	-$(RM) config.mak include/volatile.h
 
 clean:
-	-$(RMDIR) $(subst /,,$(OUTBASE))
+	-$(RMDIR) $(patsubst %/,%,$(OUTBASE))
 ifneq ($(strip $(OUTDLL)),)
-	-$(RMDIR) $(subst /,,$(OUTDLL))
+	-$(RMDIR) $(patsubst %/,%,$(OUTDLL))
 endif
 	-$(RM) debug.txt precalc.zip
 

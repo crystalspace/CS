@@ -60,7 +60,7 @@ engine: $(OUTDIRS) $(ENGINE)
 # not include $(OBJ.CSENGINE).  Unfortunately, there is a bug in `dllwrap',
 # which is employed by Mingw, where it fails to emit symbols into the output
 # DLL which are exported from csengine.lib.  Even though the symbols, such as
-# engine_GetClassTable(), are properly declared with __declspec(dllexport) in
+# engine_scfInitialize(), are properly exported with __declspec(dllexport) in
 # csengine.lib, dllwrap fails to emit them into the generated DLL.  To work
 # around this problem, instead of linking with CSENGINE.LIB as expected, we
 # link individually with the object files from OBJ.CSENGINE.  The real solution

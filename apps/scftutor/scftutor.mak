@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/scftutor
 
-DEP.SCFTUTOR = CSUTIL CSSYS CSUTIL
+DEP.SCFTUTOR = CSUTIL CSSYS CSUTIL CSGEOM
 LIB.SCFTUTOR = $(foreach d,$(DEP.SCFTUTOR),$($d.LIB))
 
 ZOO.EXE = zoo$(EXE)
