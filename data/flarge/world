@@ -4863,7 +4863,7 @@
                 </matrix>
                 <v x="-2.5" y="-1" z="20" />
             </move>
-            <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle" />
+            <!--imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle" /-->
         </meshobj>
         <light>
             <center x="-1.5" y="3" z="17" />
