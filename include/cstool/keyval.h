@@ -23,6 +23,8 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "ivaria/keyval.h"
 
 /**
@@ -35,9 +37,15 @@
  */
 class CS_CSTOOL_EXPORT csKeyValuePair : public csObject, public iKeyValuePair
 {
+private:
+  const char *m_Value;	// Points to a string in the hash below.
+  csHash<csStrKey, csStrKey, csConstCharHashKeyHandler> values;
+
 public:
   /// The constructor. Requires both key and value. Data is being copied!
   csKeyValuePair (const char* Key, const char* Value);
+  /// The constructor. Requires only key.
+  csKeyValuePair (const char* Key);
   /// The destructor as usual
   virtual ~csKeyValuePair ();
 
@@ -47,10 +55,9 @@ public:
   virtual const char *GetKey () const;
   virtual void SetKey (const char* s);
   virtual const char *GetValue () const;
+  virtual const char *GetValue (const char* vname) const;
   virtual void SetValue (const char* value);
-
-private:
-  char *m_Value;
+  virtual void SetValue (const char* vname, const char* value);
 };
 
 #endif // __CS_KEYVAL_H__

@@ -10,6 +10,10 @@ chronological order.
         - Philip Wyett elimenated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 
           file to load when using a socket on a model.
+	- Jorrit extended iKeyValuePair so that you can now attach multiple
+	  values (by name) to a key value pair. GetValue()/SetValue() are
+	  still supported and will set the 'value' value. Also extended the
+	  map loader for this new feature.
 15-May-2004
 	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
 	  jamcompatibility.jam since it is missing in Jam 2.4 but is needed by

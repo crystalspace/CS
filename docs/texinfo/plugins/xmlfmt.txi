@@ -357,7 +357,7 @@ your map file:
 @cindex keys (Map File)
 
 Crystal Space has a system with which you can attach user data to almost
-all Crystal Space objects. This user data has a name and a value (string
+all Crystal Space objects. This user data has a name and several values (string
 based) and in code you can query for those name/value pairs. Crystal Space
 itself doesn't use this. It only stores the information.
 
@@ -365,8 +365,8 @@ When you specify name/value pairs in the world section itself you are
 essentially adding information to the engine class. Here is an example:
 
 @example
-<key name="spawn_monster" value="ghost,mainhall,10,1,12" />
-<key name="spawn_monster" value="goblin,corridor,15,3,10" />
+<key name="spawn_monster" type="ghost" location="mainhall" pos="10,1,12" />
+<key name="spawn_monster" type="goblin" location="corridor" pos="15,3,10" />
 @end example
 
 @node XML World Element Section, XML World Definition Section, XML Init Section, XML File Format

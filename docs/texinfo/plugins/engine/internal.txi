@@ -339,7 +339,16 @@ which is somewhat time-consuming.
 @item
 @code{shadow_receiver}: Interface @samp{iShadowReceiver}.  Some meshes
 implement this interface.  Again, as an optimization, a pointer to this
-information is maintained.
+information is maintained. In case the mesh uses static lod this will actually
+point to a shadow receiver that multiplexes so that the shadows go to
+all children of this mesh.
+
+@item
+@code{shadow_caster}: Interface @samp{iShadowCaster}.  Some meshes
+implement this interface.  Again, as an optimization, a pointer to this
+information is maintained. In case the mesh uses static lod this will actually
+point to a shadow caster that will fetch all shadows from the highest
+detail objects.
 
 @item
 @code{portal_container}: Interface @samp{iPortalContainer}.  A portal container

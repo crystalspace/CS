@@ -29,12 +29,17 @@ SCF_IMPLEMENT_IBASE_EXT_END
 csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
 {
   SetName (Key);
-  m_Value = csStrNew (Value);
+  SetValue (Value);
+}
+
+csKeyValuePair::csKeyValuePair (const char* Key)
+{
+  SetName (Key);
+  m_Value = 0;
 }
 
 csKeyValuePair::~csKeyValuePair ()
 {
-  delete [] m_Value;
 }
 
 const char *csKeyValuePair::GetKey () const
@@ -47,6 +52,11 @@ void csKeyValuePair::SetKey (const char *s)
   SetName (s);
 }
 
+const char *csKeyValuePair::GetValue (const char* vname) const
+{
+  return values.Get (vname, 0);
+}
+
 const char *csKeyValuePair::GetValue () const
 {
   return m_Value;
@@ -54,7 +64,17 @@ const char *csKeyValuePair::GetValue () const
 
 void csKeyValuePair::SetValue (const char* value)
 {
-  delete[] m_Value;
-  m_Value = csStrNew (value);
+  values.Put ("value", value);
+  m_Value = values.Get ("value", 0);
+}
+
+void csKeyValuePair::SetValue (const char* vname, const char* value)
+{
+  if (!strcmp (vname, "value"))
+    SetValue (value);
+  else
+  {
+    values.Put (vname, value);
+  }
 }
 

@@ -4185,16 +4185,14 @@ iKeyValuePair* csLoader::ParseKey (iDocumentNode* node, iObject* pParent)
     	        node, "Missing 'name' attribute for 'key'!");
     return 0;
   }
-  const char* value = node->GetAttributeValue ("value");
-  if (!value)
+  csKeyValuePair* cskvp = new csKeyValuePair (name);
+  csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
+  while (atit->HasNext ())
   {
-    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.key",
-    	        node, "Missing 'value' attribute for 'key'!");
-    return 0;
+    csRef<iDocumentAttribute> at = atit->Next ();
+    cskvp->SetValue (at->GetName (), at->GetValue ());
   }
-  csKeyValuePair* cskvp = new csKeyValuePair (name, value);
-  csRef<iKeyValuePair> kvp (SCF_QUERY_INTERFACE (cskvp, iKeyValuePair));
+  csRef<iKeyValuePair> kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
   if (pParent)
     pParent->ObjAdd (kvp->QueryObject ());
     

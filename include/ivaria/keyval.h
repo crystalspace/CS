@@ -24,10 +24,11 @@
 struct iObject;
 struct iSector;
 
-SCF_VERSION (iKeyValuePair, 0, 0, 1);
+SCF_VERSION (iKeyValuePair, 0, 0, 2);
 
 /**
- * A Key Value pair. This object contains a 'key' string and a 'value' string.
+ * A Key Value pair. This object contains a 'key' string and one or more
+ * 'value' strings.
  * Typically key value pairs are specified in map files (using the <key> tag).
  * They allow a game developer to tag game specific information to any Crystal
  * Space object.
@@ -54,10 +55,26 @@ struct iKeyValuePair : public iBase
   /// Set the key string of the pair
   virtual void SetKey (const char* key) = 0;
 
-  /// Get the value string of the pair
+  /**
+   * Get a value string from the pair.
+   */
+  virtual const char *GetValue (const char* vname) const = 0;
+
+  /**
+   * Get the 'value' string of the pair. This
+   * is the same as calling 'GetValue ("value")'.
+   */
   virtual const char *GetValue () const = 0;
 
-  /// Set the value string of the pair
+  /**
+   * Set a value string of the pair.
+   */
+  virtual void SetValue (const char* vname, const char* value) = 0;
+
+  /**
+   * Set the value string of the pair. This
+   * is the same as calling 'SetValue ("value", value)'.
+   */
   virtual void SetValue (const char* value) = 0;
 };
 
