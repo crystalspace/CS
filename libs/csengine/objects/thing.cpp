@@ -42,6 +42,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/shadcast.h"
+#include "csutil/hashmap.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -850,7 +851,8 @@ void csThing::RemoveCurves ()
 
 void csThing::HardTransform (const csReversibleTransform& t)
 {
-  int i;
+  int i, j;
+
   for (i = 0 ; i < num_vertices ; i++)
   {
     obj_verts[i] = t.This2Other (obj_verts[i]);
@@ -862,6 +864,80 @@ void csThing::HardTransform (const csReversibleTransform& t)
   if (curve_vertices)
     for (i = 0 ; i < num_curve_vertices ; i++)
       curve_vertices[i] = t.This2Other (curve_vertices[i]);
+
+  //-------
+  // First we collect all planes from the set of polygons
+  // and transform each plane one by one. We actually create
+  // new planes and ditch the others (DecRef()) to avoid
+  // sharing planes with polygons that were not affected by
+  // this HardTransform().
+  csHashSet planes (8087);
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* p = GetPolygon3D (i);
+    csPolyTexLightMap* lmi = p->GetLightMapInfo ();
+    if (lmi)
+    {
+      iPolyTxtPlane* pl = lmi->GetPolyTxtPlane ();
+      planes.Add (pl);
+    }
+  }
+  // As a special optimization we don't copy planes that have no
+  // name. This under the assumption that planes with no name
+  // cannot be shared (let's make this a rule!).
+  csHashIterator* hashit = new csHashIterator (planes.GetHashMap ());
+  while (hashit->HasNext ())
+  {
+    iPolyTxtPlane* pl = (iPolyTxtPlane*)hashit->Next ();
+    if (pl->QueryObject ()->GetName () == NULL)
+    {
+      // This is a non-shared plane.
+      pl->GetPrivateObject ()->HardTransform (t);
+    }
+    else
+    {
+      // This plane is potentially shared. We have to make a duplicate
+      // and modify all polygons to use this one. Note that this will
+      // mean that potentially two planes exist with the same name.
+      iPolyTxtPlane* new_pl = csEngine::current_engine->thing_type->
+      	CreatePolyTxtPlane (pl->QueryObject ()->GetName ());
+      csMatrix3 m;
+      csVector3 v;
+      pl->GetTextureSpace (m, v);
+      new_pl->SetTextureSpace (m, v);
+      new_pl->GetPrivateObject ()->HardTransform (t);
+      for (j = 0 ; j < polygons.Length () ; j++)
+      {
+        csPolygon3D* p = GetPolygon3D (j);
+        csPolyTexLightMap* lmi = p->GetLightMapInfo ();
+        if (lmi && lmi->GetPolyTxtPlane () == pl)
+        {
+	  lmi->SetTxtPlane (new_pl->GetPrivateObject ());
+  	  lmi->Setup (p, p->GetMaterialWrapper ());
+        }
+      }
+    }
+  }
+  delete hashit;
+  //-------
+
+  //-------
+  // Now do a similar thing for the normal planes.
+  planes.DeleteAll ();
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* p = GetPolygon3D (i);
+    csPolyPlane* pl = p->GetPlane ();
+    if (!planes.In (pl))
+    {
+      planes.Add (pl);
+      csPlane3 new_plane;
+      t.This2Other (pl->GetObjectPlane (), p->Vobj (0), new_plane);
+      pl->GetObjectPlane () = new_plane;
+      pl->GetWorldPlane () = new_plane;
+    }
+  }
+  //-------
 
   for (i = 0 ; i < polygons.Length () ; i++)
   {

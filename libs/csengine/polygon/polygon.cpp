@@ -760,13 +760,6 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t,
 
 void csPolygon3D::HardTransform (const csReversibleTransform& t)
 {
-  csPlane3 new_plane;
-  t.This2Other (plane->GetObjectPlane (), Vobj (0), new_plane);
-  plane->GetObjectPlane () = new_plane;
-  plane->GetWorldPlane () = new_plane;
-
-  csPolyTexLightMap* lmi = GetLightMapInfo ();
-  if (lmi) lmi->GetTxtPlane ()->HardTransform (t);
   if (portal) portal->HardTransform (t);
 }
 
