@@ -23,6 +23,12 @@ struct iObjectRegistry;
 
 #define DG_ADD_O(object_reg,obj,desc) \
   csDebuggingGraph::AddObject(object_reg,(void*)(obj),__FILE__,__LINE__,desc)
+#define DG_DESCRIBE1_O(object_reg,obj,desc) \
+  csDebuggingGraph::AttachDescription(object_reg,(void*)(obj),desc)
+#define DG_DESCRIBE2_O(object_reg,obj,desc,a) \
+  csDebuggingGraph::AttachDescription(object_reg,(void*)(obj),desc,a)
+#define DG_DESCRIBE3_O(object_reg,obj,desc,a,b) \
+  csDebuggingGraph::AttachDescription(object_reg,(void*)(obj),desc,a,b)
 #define DG_REM_O(object_reg,obj) \
   csDebuggingGraph::RemoveObject(object_reg,(void*)(obj),__FILE__,__LINE__)
 #define DG_ADDCHILD_O(object_reg,parent,child) \
@@ -46,6 +52,12 @@ struct iObjectRegistry;
 #ifdef CS_DEBUG
 #define DG_ADD(obj,desc) \
   csDebuggingGraph::AddObject(NULL,(void*)(obj),__FILE__,__LINE__,desc)
+#define DG_DESCRIBE0(obj,desc) \
+  csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc)
+#define DG_DESCRIBE1(obj,desc,a) \
+  csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc,a)
+#define DG_DESCRIBE2(obj,desc,a,b) \
+  csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc,a,b)
 #define DG_REM(obj) \
   csDebuggingGraph::RemoveObject(NULL,(void*)(obj),__FILE__,__LINE__)
 #define DG_ADDCHILD(parent,child) \
@@ -64,6 +76,9 @@ struct iObjectRegistry;
   csDebuggingGraph::RemoveParent(NULL,(void*)(child),(void*)(parent))
 #else
 #define DG_ADD(obj,desc)
+#define DG_DESCRIBE0(obj,desc)
+#define DG_DESCRIBE1(obj,desc,a)
+#define DG_DESCRIBE2(obj,desc,a,b)
 #define DG_REM(obj)
 #define DG_ADDCHILD(parent,child)
 #define DG_ADDPARENT(child,parent)
@@ -107,6 +122,12 @@ public:
   static void AddObject (iObjectRegistry* object_reg,
   	void* object, char* file, int linenr,
   	char* description, ...);
+
+  /**
+   * Attach a new description to an object in the graph.
+   */
+  static void AttachDescription (iObjectRegistry* object_reg,
+  	void* object, char* description, ...);
 
   /**
    * Remove an object from the debug tree. This will automatically

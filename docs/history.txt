@@ -51,6 +51,8 @@ The history order is reversed so that new features are at the top.
 	  I also added new DB_... macros which don't have an object_reg
 	  pointer. These macros will only work in debug mode. In optimize
 	  or release mode they will produce no code.
+	- Added the ability to attach a new description to an object
+	  in the debug graph.
 13-Nov-2001
 	- Small comment fix in vfs.h.
 	- Fixed a bad bug in csObject destructor. It appears that it could

@@ -265,6 +265,29 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
   el->linenr = linenr;
 }
 
+void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
+  	void* object, char* description, ...)
+{
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
+  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  csDGEL* el = dg->FindEl (object);
+  CS_ASSERT (el != NULL);
+  delete[] el->description;
+  if (description)
+  {
+    char buf[1000];
+    va_list arg;
+    va_start (arg, description);
+    vsprintf (buf, description, arg);
+    va_end (arg);
+    el->description = csStrNew (buf);
+  }
+  else el->description = NULL;
+}
+
 void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
 	void* object, char* file, int linenr)
 {
