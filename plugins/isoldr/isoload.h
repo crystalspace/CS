@@ -24,12 +24,14 @@
 #include "csutil/util.h"
 #include "csutil/plugldr.h"
 #include "csutil/parser.h"
+#include "csutil/strhash.h"
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iutil/objreg.h"
+#include "iutil/document.h"
 
 #include "ivaria/iso.h"
 #include "ivaria/isoldr.h"
@@ -60,6 +62,10 @@ class csIsoLoader : public iIsoLoader
 private:
   csRef<iLoaderContext> ldr_context;
   iLoaderContext* GetLoaderContext ();
+  csStringHash xmltokens;
+
+  bool TestXml (const char* file, iDataBuffer* buf,
+	csRef<iDocument>& doc);
 
   csParser parser;
 
@@ -136,6 +142,33 @@ private:
   /// Parse a basic MESHOBJ definition (uses iLoaderPlugin to
   /// load plugins)
   bool ParseMeshObject (char* buf, const char* prefix);
+
+  // 
+  bool LoadMap (iDocumentNode* node);
+  /// Loads plugins
+  bool LoadPlugins (iDocumentNode* node);
+  /// Parses START definition - (sets iIsoView to POSITION)
+  bool ParseStart(iDocumentNode* node, const char* prefix);
+  /// Parses GRID definition
+  bool ParseGrid (iDocumentNode* node, const char* prefix);
+  /// Parses GRIDS definition (a list of GRID)
+  bool ParseGridList (iDocumentNode* node, const char* prefix);
+  /// Parses MATERIALS definition (a list of MATERIAL)
+  /// Note that the MATERIAL definition is much simpler
+  /// in the iso engine because it has no textures.
+  bool ParseMaterialList (iDocumentNode* node, const char* prefix);
+  /// Parse a LIGHT definition - a light belongs to a GRID
+  bool ParseLight (iDocumentNode* node, const char* prefix);
+  /// Parse a TILE2D defintiion (for tiling an area on a GRID)
+  bool ParseTile2D (iDocumentNode* node, const char* prefix);
+  /// Parse a PLUGINS defintion - This code copied from
+  /// csparser/plgldr.cpp and class defintions changed to csIsoLoader
+  bool ParsePluginList (iDocumentNode* node, const char* prefix);
+  /// Parse a basic MESHFACTORY definition.
+  bool ParseMeshFactory (iDocumentNode* node, const char* prefix);
+  /// Parse a basic MESHOBJ definition (uses iLoaderPlugin to
+  /// load plugins)
+  bool ParseMeshObject (iDocumentNode* node, const char* prefix);
 
   csRef<iIsoWorld> world;
   iIsoGrid *current_grid;

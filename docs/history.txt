@@ -16,6 +16,10 @@ The history order is reversed so that new features are at the top.
 	- iVertexBufferManager->CreateBuffer() now returns a csPtr.
 	- Fixed crash bug in x2d canvas plugin (caused by wrong
 	  csPtr changes).
+	- Iso loader should now be able to load XML files for iso
+	  engine (untested). Note that cs2xml doesn't support these
+	  kinds of files yet and also note that data/isomap/world
+	  hasn't been converted to XML yet.
 14-Sep-2002
 	- Fixed a ref counting bug in picview.
 	- Fixed the bug in the OpenGL state cache (canvas). It was not
