@@ -65,6 +65,7 @@ jmp DONE
 NO_SIMD:
 mov found_simd,0
 DONE:
+}
 #endif
 return found_simd;
 }
