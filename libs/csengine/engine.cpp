@@ -1994,8 +1994,13 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
   char* buf = **input;
   iBase* mof = plug->Parse (buf, this, fact);
   plug->DecRef ();
-  if (!mof) { GetMeshFactories ()->RemoveMeshFactory (fact); return NULL; }
+  if (!mof) 
+  { 
+    GetMeshFactories ()->RemoveMeshFactory (fact); 
+    return NULL; 
+  }
   fact->SetMeshObjectFactory ((iMeshObjectFactory*)mof);
+  mof->DecRef ();
   return fact;
 }
 
@@ -2029,7 +2034,7 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
   plug->DecRef ();
   if (!mof) {GetMeshes ()->RemoveMesh (imw); meshwrap->DecRef(); return NULL; }
   meshwrap->SetMeshObject ((iMeshObject*)mof);
-
+  mof->DecRef ();
   return imw;
 }
 
