@@ -53,6 +53,9 @@ public:
 	// w_f is the angular velocity of inboard handle.
 	virtual void calc_coriolus( const ctVector3 &r, const ctVector3 &w_f, ctSpatialVector &c ) = 0;
 	virtual ctSpatialVector get_spatial_joint_axis() = 0;
+  
+  // internal force generated at joint.  can be used to simulate a robotic
+  // motor or muscle force on a limb.
 	virtual real get_actuator_magnitude( real external_f, real inertail_comp );
 
 	virtual int get_state_size(){ return JOINT_STATESIZE; }// = 0;
