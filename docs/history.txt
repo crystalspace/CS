@@ -15,6 +15,7 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine applied patches to mdl2spr from Matt Keith
 	  <keith@www.keithcom.com> which allow mdl2spr to generate sprite files
 	  which conform to the new mesh plugin architecture.
+	- Eric Sunshine fixed an error in the `motion-anim' rule in mapfmt.txi.
 10-Mar-2001
 	- Cleaned up layout in DDG loader and also made a small fix
 	  in csTerrainWrapper constructor declaration.

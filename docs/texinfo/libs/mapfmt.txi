@@ -839,7 +839,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @prodnext{@nonterm{quaternion}}@*
     @prodnext{@nonterm{matrix}}@*
 @production{motion-anim,
-    @token{ANIM} @LP{} [ @nonterm{anim-comp} @dots{} ] @RP{}}
+    @token{ANIM} @LP{} [ @nonterm{anim-comp} ] @RP{}}
 
 @production{anim-index, @nonterm{pos-integer}}@*
 @production{link, @token{LINK} @nonterm{bone-name} @LP{} @nonterm{anim-index} @RP{}}@*
