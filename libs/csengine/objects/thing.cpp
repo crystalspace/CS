@@ -1732,7 +1732,8 @@ void csThing::DrawPolygonArrayDPM (
   PreparePolygonBuffer ();
 
   iCamera *icam = rview->GetCamera ();
-  csReversibleTransform tr_o2c = icam->GetTransform () / movable->GetFullTransform ();
+  csReversibleTransform tr_o2c = icam->GetTransform ()
+  	/ movable->GetFullTransform ();
 
   G3DPolygonMesh mesh;
   csBox2 bbox;
@@ -3118,10 +3119,7 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
   else
   {
     // This thing has no static tree
-    UpdateTransformation (camtrans, icam->GetCameraNumber ());
-
     Stats::polygons_considered += polygons.Length ();
-
     DrawCurves (rview, movable, zMode);
 
     if (flags.Check (CS_THING_FASTMESH))
@@ -3132,11 +3130,14 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
         movable,
         zMode);
     else
+    {
+      UpdateTransformation (camtrans, icam->GetCameraNumber ());
       DrawPolygonArray (
         polygons.GetArray (),
         polygons.Length (),
         rview,
         zMode);
+    }
   }
 
   draw_busy--;

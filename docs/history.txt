@@ -33,6 +33,10 @@ The history order is reversed so that new features are at the top.
 	  of the camera plane for no particular reason.
 	- Implemented backface culling for writing out objects to the
 	  coverage buffer in Dynavis.
+	- I discovered that meshes rendered with DrawPolygonMesh were
+	  still transforming all the vertices to camera space in the engine.
+	  This is totally unneeded so I removed that. This should make
+	  DPM meshes a little faster again.
 20-May-2002
 	- csThing now implements GetWriteObject(). Currently it will
 	  just return the full detail version of the thing. A lower
