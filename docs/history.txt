@@ -50,6 +50,7 @@ chronological order.
 	  correction and cleanup in the new engine/internal.txi.  Also cleaned
 	  up the grammar and performed some re-writing to make the discussion
 	  more idiomatic.
+	- Jorrit worked a bit further on the internal engine document.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

@@ -795,5 +795,72 @@ place where the recursion through portals occurs.
 The settings for this step are restored.
 @end itemize
 
-@@@@@@TODO: Explain iSector::GetVisibleMeshes().
-@@@@@@TODO: Explain iPortalContainer::Draw().
+One very important function that is called from within @code{iRenderStep::Perform()}
+is @code{iSector::GetVisibleMeshes()}. This function is responsible for finding all
+meshes that are visible. To calculate this the sector will use the visibility
+culler that is in every sector. At this moment we have two possible implementations
+for that visibility culler: @samp{Frustvis} and @samp{Dynavis}. Frustvis will do
+frustum culling alone. That means that every object that is in the view frustum
+is considered visible. Dynavis will do frustum culling and also try to find out which
+objects are visible and which are not by using an occlusion buffer. There is another
+chapter explaining the differences a bit more and also how dynavis works internally.
+Here we only explain what happens in short. The @code{GetVisibleMeshes()} function
+will do the following things:
+
+@itemize @bullet
+@item
+First in every sector we maintain a list of visible mesh lists. The reason for this
+is that sometimes GetVisibleMeshes() is called multiple times in one frame and
+we don't want to redo the visibility culling as that can be expensive (especially
+in the case of Dynavis). So we keep a cache of visible mesh lists and every entry
+in that cache (i.e. every list of meshes in that cache) has an associated current
+frame number and context id number. These two numbers are used to check if the
+cached list can be used for the given frame and context. If there is no such
+cached list then we must proceed to the next step. Otherwise we return the cached
+list that matches the frame and context id.
+
+@item
+If there is no matching list in the cache we find a slot in the list of cached
+mesh lists which was for another frame. We know that that list will never be used
+again since that frame has already been rendered (it is in the past). So if we find
+such an entry we reuse that list and recalculate the visibility culler (we call
+@code{iVisibilityCuller::VisTest()}.
+
+@item
+If we can't find an entry we can reuse we add a new entry to the cache and we
+populate it with the visible meshes by again calling @code{iVisibilityCuller::VisTest()}.
+@end itemize
+
+The @code{iVisibilityCuller::VisTest()} function will internally use a KD-tree
+to traverse the objects in the sector and for all visible objects it will call
+the @code{iVisibilityCullerListener} callback that was given as a parameter of the
+@code{VisTest()} call. I will go into more detail in the actual implementation of
+@code{VisTest()} for both Frustvis and Dynavis in later sections.
+
+The @code{ObjectVisible()} function in the callback is a function that resides
+in the sector again (the culler itself is implemented in another plugin). ObjectVisible
+will mark the given object as visible by adding all @code{csRenderMesh} instances
+as returned by the visible @code{iMeshObject} (through the
+@code{iMeshObject::GetRenderMeshes()} call) to the list of visible meshes that we
+are building. In addition to that it will also do something special if the mesh
+is a hierarchical mesh that uses static lod. In that case it will calculate which
+of the children should be visible for the given distance to the camera (and other
+potential factors) and it will mark that child as visible too.
+
+It is important to note that there is an important difference between normal
+hierarchical meshes and static lod meshes with regards to the visibility culler.
+Both are implemented using hierarchical meshes but in case of a normal hierarchical
+mesh all children are registered to the visibility culler as seperate meshes. That
+means that every mesh in a hierarchical mesh is considered a seperate entity for
+the visibility culler and is also tested for visibility on its own (so a child
+of a hierarchical mesh can be visible even if the parent is not visible). For a static
+lod mesh the situation is completely different. There the children are not registered
+to the visibility culler but instead the mesh object will mark the right child as visible
+when it itself is visible. That means that you must always make sure that with static
+lod the parent is a mesh that is at least as big as the biggest child. Usually a nullmesh
+with an appropriate box is used for that purpose.
+
+@@@@@@TODO: explain iPortalContainer::Draw()
+@@@@@@TODO: explain Frustvis::VisTest()
+@@@@@@TODO: explain Dynavis::VisTest()
+
