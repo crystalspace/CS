@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Sep-2003
-	- DeSigna made the following chanages:
+	- DeSigna made the following changes:
 	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 
 	      accordance to the other SCF macros.
 	    - Fixed all usage of SCF_CREATE_INSTANCE in CS to work correctly.
