@@ -1629,15 +1629,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-#if 1
 // moved this out of main() to make it easier for app developer
 // to override
-void CreateSystem(void)
+static void CreateSystem(void)
 {
   // Create the system driver object
   Sys = new WalkTest ();
 }
-#endif
+
 
 /*---------------------------------------------------------------------*
  * Main function
@@ -1647,7 +1646,6 @@ int main (int argc, char* argv[])
   // Initialize the random number generator
   srand (time (NULL));
 
-  extern void CreateSystem(void);
   CreateSystem();
 
   // Initialize the main system. This will load all needed plugins
