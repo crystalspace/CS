@@ -55,12 +55,14 @@ csSectorLightList::csSectorLightList ()
 
 void csSectorLightList::PrepareItem (iLight* item)
 {
+  csLightList::PrepareItem (item);
   item->SetSector (&(sector->scfiSector));
 }
 
 void csSectorLightList::FreeItem (iLight* item)
 {
   item->SetSector (NULL);
+  csLightList::FreeItem (item);
 }
 
 //---------------------------------------------------------------------------
@@ -72,6 +74,7 @@ csSectorMeshList::csSectorMeshList ()
 void csSectorMeshList::PrepareItem (iMeshWrapper* item)
 {
   CS_ASSERT (sector != NULL);
+  csMeshList::PrepareItem (item);
   sector->PrepareMesh (item);
 }
 
@@ -79,6 +82,7 @@ void csSectorMeshList::FreeItem (iMeshWrapper* item)
 {
   CS_ASSERT (sector != NULL);
   sector->UnprepareMesh (item);
+  csMeshList::FreeItem (item);
 }
 
 //---------------------------------------------------------------------------

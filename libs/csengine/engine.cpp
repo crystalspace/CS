@@ -296,6 +296,7 @@ iCollection *csCollectionList::CollectionList::FindByName (
 void csEngineMeshList::FreeItem (iMeshWrapper* mesh)
 {
   mesh->GetMovable ()->ClearSectors ();
+  csMeshList::FreeItem (mesh);
 }
 
 //---------------------------------------------------------------------------
