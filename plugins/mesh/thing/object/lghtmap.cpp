@@ -220,7 +220,7 @@ struct LightSave
 struct LightHeader
 {
   char header[4];
-  long dyn_cnt;             // Number of dynamic maps
+  int32 dyn_cnt;             // Number of dynamic maps
 };
 
 const char* csLightMap::ReadFromCache (
@@ -462,7 +462,7 @@ void csLightMap::Cache (
   if (file->Write ("lmpn", 4) != 4)
     return;
 
-  ps.lm_size = convert_endian (lm_size);
+  ps.lm_size = convert_endian ((int32)lm_size);
   ps.lm_cnt = 111;          // Dummy!
   ps.lm_cnt = convert_endian (ps.lm_cnt);
 

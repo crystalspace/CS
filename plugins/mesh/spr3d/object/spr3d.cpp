@@ -265,14 +265,14 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
 void csSprite3DMeshObjectFactory::GenerateCacheName ()
 {
   csMemFile mf;
-  long l;
-  l = convert_endian ((long)frames.Length ());
+  int32 l;
+  l = convert_endian ((int32)frames.Length ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)actions.Length ());
+  l = convert_endian ((int32)actions.Length ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)GetVertexCount ());
+  l = convert_endian ((int32)GetVertexCount ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)GetTriangleCount ());
+  l = convert_endian ((int32)GetTriangleCount ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)

@@ -220,14 +220,14 @@ char* csThing::GenerateCacheName ()
   GetBoundingBox (b);
 
   csMemFile mf;
-  long l;
-  l = convert_endian ((long)num_vertices);
+  int32 l;
+  l = convert_endian ((int32)num_vertices);
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)polygons.Length ());
+  l = convert_endian ((int32)polygons.Length ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)num_curve_vertices);
+  l = convert_endian ((int32)num_curve_vertices);
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)curves.Length ());
+  l = convert_endian ((int32)curves.Length ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -245,17 +245,17 @@ char* csThing::GenerateCacheName ()
     }
   }
 
-  l = convert_endian ((long)QInt ((b.MinX () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
