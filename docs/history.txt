@@ -48,6 +48,8 @@ Short-term cleanups that need to be done:
 	  distribute binary distributions of CS (i.e.  'make install').
 	- Jorrit prepared the first steps towards full sprite lighting
 	  support.  It is not finished yet.
+	- Moved Primitive Editor (PrimEdit) to the attic on account of
+	  obsolescence.
 15-Jul-1999
 	- Added support for multi-sector sprites. Also simplified the
 	  rendering process through portals a bit.
