@@ -326,6 +326,12 @@ class csOpenGLProcSoftware2D : public iGraphics2D
     g2d->Write (font, x, y, ConvertColour (fg), cbg, s);
   }
 
+  virtual void WriteBaseline (iFont *font, int x, int y, int fg, int bg, const char *s)
+  {
+    int cbg = (bg != -1) ? ConvertColour (bg) : bg;
+    g2d->WriteBaseline (font, x, y, ConvertColour (fg), cbg, s);
+  }
+
   virtual bool PerformExtensionV (char const* command, va_list args)
   { return g2d->PerformExtensionV (command, args); }
 

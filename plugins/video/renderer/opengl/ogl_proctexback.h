@@ -154,6 +154,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   { g2d->SetRGB (i, r, g, b); }
 
   virtual void Write (iFont*, int x, int y, int fg, int bg, const char *str);
+  virtual void WriteBaseline (iFont*, int x, int y, int fg, int bg, const char *str);
 
   virtual bool PerformExtensionV (char const* command, va_list args)
   { return g2d->PerformExtensionV (command, args); }

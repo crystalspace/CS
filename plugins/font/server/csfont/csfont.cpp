@@ -346,6 +346,20 @@ bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH)
   return true;
 }
 
+bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH, int &, int &, int &)
+{
+  int chr = int (c) - First;
+  if ((chr < 0) || (chr > Glyphs))
+  {
+    oW = oH = 0;
+    return false;
+  }
+
+  oW = IndividualWidth ? IndividualWidth [chr] : Width;
+  oH = Height;
+  return true;
+}
+
 uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
 {
   int chr = int (c) - First;
@@ -360,7 +374,41 @@ uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
   return GlyphBitmap [chr];
 }
 
+uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &, int &, int &)
+{
+  int chr = int (c) - First;
+  if ((chr < 0) || (chr > Glyphs))
+  {
+    oW = oH = 0;
+    return NULL;
+  }
+
+  oW = IndividualWidth ? IndividualWidth [chr] : Width;
+  oH = Height;
+  return GlyphBitmap [chr];
+}
+
 void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH)
+{
+  oH = Height;
+  oW = 0;
+
+  const int n = strlen (text);
+  if (!IndividualWidth)
+    oW = n * Width;
+  else
+  {
+	int i;
+    for (i = 0; i < n; i++)
+    {
+      int chr = (*(uint8 *)text++) - First;
+      if ((chr >= 0) && (chr < Glyphs))
+        oW += IndividualWidth [chr];
+    }
+  }
+}
+
+void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &)
 {
   oH = Height;
   oW = 0;

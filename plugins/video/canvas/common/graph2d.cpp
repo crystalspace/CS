@@ -119,6 +119,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   // Initialize pointers to default drawing methods
   _DrawPixel = DrawPixel8;
   _WriteString = WriteString8;
+  _WriteStringBaseline = WriteStringBaseline8;
   _GetPixelAt = GetPixelAt8;
   // Mark all slots in palette as free
   int i;
@@ -439,14 +440,17 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
 }
 
 #define WR_NAME WriteString8
+#define WR_NAME2 WriteStringBaseline8
 #define WR_PIXTYPE uint8
 #include "writechr.inc"
 
 #define WR_NAME WriteString16
+#define WR_NAME2 WriteStringBaseline16
 #define WR_PIXTYPE uint16
 #include "writechr.inc"
 
 #define WR_NAME WriteString32
+#define WR_NAME2 WriteStringBaseline32
 #define WR_PIXTYPE uint32
 #include "writechr.inc"
 

@@ -377,6 +377,12 @@ void csOpenGLProcBackBuffer2D::Write (iFont *font, int x, int y,
   g2d->Write (font, x, frame_height - height + y, fg, bg, str);
 }
 
+void csOpenGLProcBackBuffer2D::WriteBaseline (iFont *font, int x, int y,
+  int fg, int bg, const char *str)
+{
+  g2d->WriteBaseline (font, x, frame_height - height + y, fg, bg, str);
+}
+
 int csOpenGLProcBackBuffer2D::GetWidth ()
 {
   return width;
