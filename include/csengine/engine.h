@@ -654,6 +654,8 @@ public:
   /// Return the default amount of ambient light
   virtual void GetDefaultAmbientLight (csColor &c) const;
   
+  virtual csPtr<iFrustumView> CreateFrustumView ();
+
   /**
    * Reset a subset of flags/settings (which may differ from one world/map to 
    * another) to its defaults. This currently includes:

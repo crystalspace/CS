@@ -427,12 +427,6 @@ public:
   SCF_DECLARE_IBASE;
 };
 
-class csFrustumView;
-class csObject;
-class csOctreeNode;
-typedef void (csFrustumViewObjectFunc)(iMeshWrapper* mesh,
-	iFrustumView* lview, bool vis);
-
 /**
  * This structure represents all information needed for the frustum
  * visibility calculator.
@@ -492,7 +486,10 @@ public:
   virtual void StartNewShadowBlock ();
 
   /// Set the function that is called for every object.
-  void SetObjectFunction (csFrustumViewObjectFunc* func) { object_func = func; }
+  virtual void SetObjectFunction (csFrustumViewObjectFunc* func)
+  {
+    object_func = func;
+  }
   /// Call the object function.
   virtual void CallObjectFunction (iMeshWrapper* mesh, bool vis)
   {

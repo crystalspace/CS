@@ -48,6 +48,12 @@ struct iFrustumViewUserdata : public iBase
 {
 };
 
+/**
+ * Function that will be called for every visited object (during
+ * CastShadows() procedure from the visibility culler).
+ */
+typedef void (csFrustumViewObjectFunc)(iMeshWrapper* mesh,
+	iFrustumView* lview, bool vis);
 
 /**
  * This structure keeps track of the current frustum context.
@@ -131,7 +137,7 @@ public:
   bool IsFirstTime () { return first_time; }
 };
 
-SCF_VERSION (iFrustumView, 0, 2, 0);
+SCF_VERSION (iFrustumView, 0, 3, 0);
 
 /**
  * This structure represents all information needed for the frustum
@@ -166,6 +172,8 @@ struct iFrustumView : public iBase
    */
   virtual void RestoreFrustumContext (csFrustumContext* original) = 0;
 
+  /// Set the object function.
+  virtual void SetObjectFunction (csFrustumViewObjectFunc* func) = 0;
   /// Call the object function.
   virtual void CallObjectFunction (iMeshWrapper* mesh, bool vis) = 0;
 

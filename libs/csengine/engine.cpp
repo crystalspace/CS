@@ -24,6 +24,7 @@
 #include "csengine/halo.h"
 #include "csengine/camera.h"
 #include "csengine/campos.h"
+#include "csengine/lview.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
@@ -2931,6 +2932,15 @@ void csEngine::GetDefaultAmbientLight (csColor &c) const
   c.red = default_ambient_red / 255.0f;
   c.green = default_ambient_green / 255.0f;
   c.blue = default_ambient_blue / 255.0f;
+}
+
+csPtr<iFrustumView> csEngine::CreateFrustumView ()
+{
+  csFrustumView* lview = new csFrustumView ();
+  lview->EnableThingShadows (CS_LIGHT_THINGSHADOWS);
+  lview->SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
+  lview->SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
+  return csPtr<iFrustumView> (lview);
 }
 
 bool csEngine::DebugCommand (const char* cmd)

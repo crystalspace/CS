@@ -25,6 +25,14 @@ The history order is reversed so that new features are at the top.
 	  view instead of calling shadow receiver directly. The shadow
 	  receiver will now be called from within the object function
 	  that is supplied by the lighting routines.
+	- Added iFrustumView->SetObjectFunction(). This function was
+	  previously private to the csFrustumView class.
+	- Added iEngine->CreateFrustumView() function with which an application
+	  can create a frustum view that can be used with
+	  iVisibilityCuller->CastShadows(). The user can use SetObjectFunction()
+	  and other functions to initialize the frustum view and by doing
+	  that get called for every object that is visible from the given
+	  frustum.
 16-Dec-2002
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both

@@ -39,6 +39,7 @@ class csColor;
 struct csTextureLayer;
 
 struct iSector;
+struct iFrustumView;
 struct iSectorIterator;
 struct iObjectIterator;
 struct iLight;
@@ -172,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 9, 0);
+SCF_VERSION (iEngine, 0, 9, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -778,6 +779,14 @@ struct iEngine : public iBase
 
   /// Return the default amount of ambient light
   virtual void GetDefaultAmbientLight (csColor &c) const = 0;
+
+  /**
+   * Create a iFrustumView instance that you can give to
+   * iVisibilityCuller->CastShadows(). You can initialize that
+   * instance so that your own function is called for every object
+   * that is being visited.
+   */
+  virtual csPtr<iFrustumView> CreateFrustumView () = 0;
 };
 
 /** @} */
