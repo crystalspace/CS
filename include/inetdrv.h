@@ -23,27 +23,6 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
-#if defined(OS_WIN32)
-  #include <winsock.h>
-  typedef SOCKET csNetworkSocket;
-  #define CS_NET_SOCKET_INVALID INVALID_SOCKET
-  #define _WINSOCKAPI_
-#else
-  typedef unsigned int csNetworkSocket;
-  #define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
-  #if defined(OS_MACOS)
-    typedef unsigned long fd_set;
-  #elif defined(OS_NEXT)
-    #include <libc.h>   // For FD_*, select()
-    #include <string.h> // For memset()
-    #define bzero(b,len) memset(b,0,len) /* bzero used by FD_ZERO */
-  #elif defined(OS_BE)
-    #include <socket.h>
-  #else
-    #include <sys/select.h>
-  #endif
-#endif
-
 /**
  * Potential network driver error codes.
  */
@@ -116,7 +95,6 @@ struct iNetworkConnection : public iNetworkEndPoint
    * returns CS_NET_ERR_NO_ERROR.
    */
   virtual size_t Receive(void* buff, size_t maxbytes) = 0;
-  virtual csNetworkSocket Getfd() = 0;
 };
 
 
@@ -139,7 +117,6 @@ struct iNetworkListener : public iNetworkEndPoint
    * an error occurred, and GetLastError() returns the appropriate error code.
    */
   virtual iNetworkConnection* Accept() = 0;
-  virtual csNetworkSocket Getfd() = 0;
 };
 
 
@@ -185,10 +162,6 @@ struct iNetworkDriver : public iPlugIn
 
   /// Retrieve the code for the last error encountered.
   virtual csNetworkDriverError GetLastError() const = 0;
-
-  /// Detect an event.
-  virtual bool DetectEvents(int maxsock, fd_set* ReadMask,
-    fd_set* ExceptMask) = 0;
 
   // iPlugIn interface.
   virtual bool Initialize(iSystem*) = 0;

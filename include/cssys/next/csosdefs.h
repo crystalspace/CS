@@ -46,11 +46,20 @@ static inline char* strdup( char const* s )
 
 
 //-----------------------------------------------------------------------------
-// Pull in definitions for getwd(), ntohl(), htonl(), etc.
+// Pull in definitions for getwd(), ntohl(), htonl(), select(), etc.
 //-----------------------------------------------------------------------------
-#if defined(SYSDEF_GETCWD) || defined(SYSDEF_SOCKETS)
+#if defined(SYSDEF_GETCWD) || defined(SYSDEF_SOCKETS) || defined(SYSDEF_SELECT)
 #include <libc.h>
-typedef int socklen_t;
+#endif
+
+#if defined(SYSDEF_SOCKETS)
+#define DO_FAKE_SOCKLEN_T
+#endif
+
+#if defined(SYSDEF_SELECT)
+#include <string.h> // For memset()
+#define bzero(b,len) memset(b,0,len) /* bzero used by FD_ZERO */
+#undef SYSDEF_SELECT
 #endif
 
 

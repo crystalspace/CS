@@ -155,14 +155,27 @@
 #endif
 
 #ifdef SYSDEF_SOCKETS
-  #define _WINSOCKAPI_
-  #include <winsock2.h>
-  typedef int socklen_t;
-  #undef SYSDEF_SOCKETS
+#  define _WINSOCKAPI_
+#  include <winsock2.h>
+#  include <winsock.h>
+   typedef int socklen_t;
+   typedef SOCKET csNetworkSocket;
+#  define CS_NET_SOCKET_INVALID INVALID_SOCKET
+#  define CS_IOCTLSOCKET ioctlsocket
+#  define CS_CLOSESOCKET closesocket
+#  define EWOULDBLOCK WSAEWOULDBLOCK
+#  define CS_GETSOCKETERROR ::WSAGetLastError()
+#  undef SYSDEF_SOCKETS
+#endif
+
+#ifdef SYSDEF_SELECT
+#  define _WINSOCKAPI_
+#  include <winsock.h>
+#  undef SYSDEF_SELECT
 #endif
 
 #ifdef SYSDEF_ACCESS
-  #include <io.h>
+#  include <io.h>
 #endif
 
 #ifdef COMP_BC

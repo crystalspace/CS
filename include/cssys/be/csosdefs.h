@@ -36,7 +36,14 @@
 #endif
 
 #if defined(SYSDEF_SOCKETS)
-typedef int socklen_t;
+#  include <socket.h>
+#  define CS_CLOSESOCKET closesocket
+#  define DO_FAKE_SOCKLEN_T
+#endif
+
+#if defined(SYSDEF_SELECT)
+#  include <socket.h>
+#  undef SYSDEF_SELECT
 #endif
 
 #include <ByteOrder.h>

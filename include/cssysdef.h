@@ -63,10 +63,24 @@
       Include definition for alloca()
 
     #define SYSDEF_GETOPT
-      for getopt() and GNU getopt_long()
+      For getopt() and GNU getopt_long()
 
     #define SYSDEF_SOCKETS
-      for TCP/IP sockets definitions
+      For TCP/IP sockets definitions.  Specifically, should define the
+      following macros, constants, typedefs, and prototypes:
+	inet_addr(), gethostbyname(), ntohl(), etc.
+	socket(), listen(), bind(), etc. -- the standard socket functions
+	csNetworkSocket -- typedef or macro for socket descriptor type
+	struct sockaddr -- standard socket address type (and cousins)
+	socklen_t -- typedef or macro
+	CS_NET_SOCKET_INVALID -- value representing invalid socket
+	CS_CLOSESOCKET -- name of function to close a socket
+	CS_IOCTLSOCKET -- name of "ioctl" function for sockets
+	CS_GETSOCKETERROR -- name of function or variable for socket error code
+	
+    #define SYSDEF_SELECT
+      Includes definitions required for select(), FD_* macros, and
+      struct timeval.
 
     The system-dependent include files can undefine some or all SYSDEF_xxx
     macros to avoid further definitions in this file. For example, if a
@@ -307,12 +321,33 @@
 #  if defined (OS_UNIX)
 #    define BSD_COMP 1
 #    include <sys/ioctl.h>
+#    if !defined (OS_SOLARIS) && !defined (OS_BEOS)
+#      include <arpa/inet.h>
+#      include <sys/time.h>
+#    endif
 #  endif
 #  include <netinet/in.h>
 #  include <netdb.h>
 #  if defined (DO_FAKE_SOCKLEN_T)
      typedef int socklen_t;
 #  endif
+#  if !defined (CS_IOCTLSOCKET)
+#    define CS_IOCTLSOCKET ioctl
+#  endif
+#  if !defined (CS_CLOSESOCKET)
+#    define CS_CLOSESOCKET close
+#  endif
+#  if !defined (CS_GETSOCKETERROR)
+#    define CS_GETSOCKETERROR errno
+#  endif
+   typedef unsigned int csNetworkSocket;
+#  if !defined (CS_NET_SOCKET_INVALID)
+#    define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
+#  endif
+#endif
+
+#ifdef SYSDEF_SELECT
+#  include <sys/select.h>
 #endif
 
 #ifdef CS_DEBUG

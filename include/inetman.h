@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998, 1999 by Serguei 'Snaar' Narojnyi
-    Copyright (C) 1998, 1999 by Jorrit Tyberghein
-    Written by Serguei 'Snaar' Narojnyi
+    Copyright (C) 2000 by Thomas Riemer
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,10 +25,11 @@
 
 /// This is a pain... the error handling has to match that in inetdrv.h
 /// what a royal pain in the neck.
-/// These have to be synced with the errors in inetdrv.h
+/// These have to be synced with the errors in inetdrv.h (Thomas Riemer)
+/// (Note from ES: Error handling will be revised in the future to be easily
+/// extensible and will be string-based or class-based with string ID's.)
 enum csNetworkManagerError 
 {
-
   /// Errors from netdriver
   CS_NETMAN_ERR_NO_ERROR,
   CS_NETMAN_ERR_CANNOT_RESOLVE_ADDRESS,
@@ -52,7 +51,6 @@ enum csNetworkManagerError
   CS_NETMAN_PROTO_NOT_IMPL,
   CS_NETMAN_NO_PROTOCOL, 
   CS_NETMAN_OUT_OF_PORTS
-
 };
 
 #define NETPORT_PROTO_UNKNOWN (-1)
@@ -110,8 +108,7 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
 
 struct iNetworkManager : public iPlugIn
 {
-
-  virtual void AssignHostName(char *hostname) = 0;
+  virtual void AssignHostName(const char *hostname) = 0;
 
   virtual int AssignServer(int ipPortNumber,  
 			   int ipProtocol,  int maxConnects) =0;
@@ -126,18 +123,18 @@ struct iNetworkManager : public iPlugIn
   virtual int StopServer(int csNetPort) =0;
   virtual int ResignNetPort(int csNetPort) =0;
 
-  virtual int AssignClient(char *hostname, int port, int protocol) =0;
-  virtual int AssignClient(char *hostandport, int protocol) =0;
+  virtual int AssignClient(const char *hostname, int port, int protocol) =0;
+  virtual int AssignClient(const char *hostandport, int protocol) =0;
 
-  virtual void NetControl(int NetPort, int len, char *msg)=0;
+  virtual void NetControl(int NetPort, int len, const char *msg)=0;
 
   virtual void Reset() =0;
   
-  virtual int SendMsg(int csNetPort, int len, char *msg) =0;
-  virtual int SendMsg(int csNetPort, char *hostname, int len, char *msg)=0;
+  virtual int SendMsg(int csNetPort, int len, const char *msg) =0;
+  virtual int SendMsg(int csNetPort, const char *hostname, int len, const char *msg)=0;
 
-  virtual void Broadcast(char *) =0;
-  virtual void Broadcast(int csNetPort, int len, char *msg) =0;
+  virtual void Broadcast(const char *) =0;
+  virtual void Broadcast(int csNetPort, int len, const char *msg) =0;
 
   // Glue to NSTP
   virtual void AssignProtocol(iPROTO *AssignedProtocol) =0;
@@ -150,11 +147,6 @@ struct iNetworkManager : public iPlugIn
   virtual bool Initialize (iSystem*) = 0;
   virtual bool Open () = 0;
   virtual bool Close () = 0;
-
 };
 
 #endif // __CS_INETMAN_H__
-
-
-
-

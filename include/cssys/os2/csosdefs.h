@@ -124,7 +124,7 @@
 #ifdef SYSDEF_SOCKETS
 #  include <sys/ioctl.h>
 #  include <sys/so_ioctl.h>
-typedef int socklen_t;
+#  define DO_FAKE_SOCKLEN_T
 #endif
 
 #ifdef SYSDEF_ACCESS

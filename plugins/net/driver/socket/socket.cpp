@@ -25,27 +25,6 @@
 
 #define CS_NET_LISTEN_QUEUE_SIZE 5
 
-#if defined(OS_SOLARIS)
-extern unsigned long inet_addr(const char*);
-#elif !defined(OS_BE) && !defined(OS_WIN32)
-#include <arpa/inet.h>
-#include <sys/time.h>
-#endif
-
-#if defined(OS_BE)
-#define CS_CLOSESOCKET closesocket
-#define CS_GETSOCKETERROR errno
-#elif defined(OS_WIN32)
-#define CS_IOCTLSOCKET ioctlsocket
-#define CS_CLOSESOCKET closesocket
-#define EWOULDBLOCK WSAEWOULDBLOCK
-#define CS_GETSOCKETERROR ::WSAGetLastError()
-#else
-#define CS_IOCTLSOCKET ioctl
-#define CS_CLOSESOCKET close
-#define CS_GETSOCKETERROR errno
-#endif
-
 IMPLEMENT_FACTORY(csSocketDriver)
 
 EXPORT_CLASS_TABLE(cssocket)
@@ -56,12 +35,22 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE(csSocketConnection)
   IMPLEMENTS_INTERFACE(iNetworkConnection)
   IMPLEMENTS_INTERFACE(iNetworkEndPoint)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iNetworkSocket)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csSocketConnection::csSocket)
+  IMPLEMENTS_INTERFACE(iNetworkSocket)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_IBASE(csSocketListener)
   IMPLEMENTS_INTERFACE(iNetworkListener)
   IMPLEMENTS_INTERFACE(iNetworkEndPoint)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iNetworkSocket)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csSocketListener::csSocket)
+  IMPLEMENTS_INTERFACE(iNetworkSocket)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_IBASE(csSocketDriver)
   IMPLEMENTS_INTERFACE(iNetworkDriver)
@@ -73,13 +62,11 @@ IMPLEMENT_IBASE_END
 
 csSocketEndPoint::~csSocketEndPoint() { CloseSocket(); }
 void csSocketEndPoint::Terminate()    { CloseSocket(); }
-void csSocketEndPoint::ClearError() { LastError = CS_NET_ERR_NO_ERROR; }
-csNetworkDriverError csSocketEndPoint::GetLastError() const {return LastError;}
+void csSocketEndPoint::ClearError()   { LastError = CS_NET_ERR_NO_ERROR; }
 
 csSocketEndPoint::csSocketEndPoint(csNetworkSocket s, bool blocks) :
   Socket(s), LastError(CS_NET_ERR_NO_ERROR)
 {
-
   if (!PlatformSetBlocking(blocks))
   {
     LastError = CS_NET_ERR_CANNOT_SET_BLOCKING_MODE;
@@ -130,8 +117,8 @@ bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
 csSocketConnection::csSocketConnection(
   iBase* p, csNetworkSocket s, bool blocking) : csSocketEndPoint(s, blocking)
 {
-  fd = s;
- CONSTRUCT_IBASE(p);
+  CONSTRUCT_IBASE(p);
+  CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
 }
 
 bool csSocketConnection::Send(const void* data, size_t nbytes)
@@ -163,6 +150,9 @@ size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
   return received;
 }
 
+csNetworkSocket csSocketConnection::csSocket::GetSocket() const
+{ return scfParent->GetSocket(); }
+
 
 // csSocketListener -----------------------------------------------------------
 
@@ -170,9 +160,8 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
   unsigned short port, bool blockingListener, bool blockingConnection) :
   csSocketEndPoint(s, blockingListener), BlockingConnection(blockingConnection)
 {
-
-  fd = s;
   CONSTRUCT_IBASE(p);
+  CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
 
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
@@ -207,6 +196,9 @@ iNetworkConnection* csSocketListener::Accept()
   return connection;
 }
 
+csNetworkSocket csSocketListener::csSocket::GetSocket() const
+{ return scfParent->GetSocket(); }
+
 
 // csSocketDriver -------------------------------------------------------------
 
@@ -214,7 +206,6 @@ csSocketDriver::csSocketDriver(iBase* p) : LastError(CS_NET_ERR_NO_ERROR)
   { CONSTRUCT_IBASE(p); }
 csSocketDriver::~csSocketDriver() {}
 void csSocketDriver::ClearError() { LastError = CS_NET_ERR_NO_ERROR; }
-csNetworkDriverError csSocketDriver::GetLastError() const { return LastError; }
 
 bool csSocketDriver::Open()
 {
@@ -239,7 +230,6 @@ bool csSocketDriver::Initialize(iSystem* p)
 
 csNetworkSocket csSocketDriver::CreateSocket(bool reliable)
 {
-
   csNetworkSocket s = (reliable ?
     socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) :
     socket(AF_INET, SOCK_DGRAM,  IPPROTO_UDP));
@@ -344,29 +334,6 @@ csNetworkDriverCapabilities csSocketDriver::GetCapabilities() const
 bool csSocketDriver::PlatformDriverStart() { return true; }
 bool csSocketDriver::PlatformDriverStop()  { return true; }
 
-// DetectEvents can be called on any connection 
-// It properly belongs in the netmans object
-// However, because of the low level network nature
-// of things - it should really be in the netsdrv object. -triemer
-// Returns true if there are events waiting.
-bool csSocketDriver::DetectEvents(int maxsock, fd_set *ReadMask,fd_set *ExceptMask)
-{
-  // to should be set to 0
-  struct timeval to;
-
-  // under linux you must initialize this.
-  to.tv_sec = 0;
-  to.tv_usec = 0;
-
-  if (select(maxsock +1, ReadMask,(fd_set *) 0,
-	     ExceptMask, &to) <= 0)
-    {
-      return false;
-    }
-
-  return true;
-}
-
 #else
 
 bool csSocketDriver::PlatformDriverStart()
@@ -394,46 +361,4 @@ bool csSocketDriver::PlatformDriverStop()
   return ok;
 }
 
-// DetectEvents can be called on any connection 
-// It properly belongs in the netmans object
-// However, because of the low level network nature
-// of things - it should really be in the netsdrv object. -triemer
-bool csSocketDriver::DetectEvents(int maxsock, fd_set *ReadMask,fd_set *ExceptMask)
-{
-  // to should be set to 0
-  struct timeval to;
-
-  to.tv_sec = 0;
-  to.tv_usec = 0;
-
-  /// Fixme - from example code it looks like select returns SOCKET_ERROR 
-  /// when nothing is ready to be read.
-  /// I am basing this on example code sent to me. 
-  /// believe SOCKET_ERROR to be defined by winsock 
-  /// This code is only going to work on fewer than 16 connections - according to various
-  /// things I've read on the web. 
-  /// There are apparently two version of winsock. version 1.1
-  /// and version 2.0 - and of course one of the differences is in sockets.
-  /// WSAAsyncSelect
-
-  /// FD_SETSIZE can be used to up the number of sockets.
-  /// The magic routine that should probably be used here is WSAAsyncSelect
-  /// If there is someone else with some winsock experience speak up... and 
-  /// offer your vision.
-
-  /// Very clearly this is going to need to be made significantly more robust
-
-  if (select(maxsock +1, ReadMask,(fd_set *) 0,
-	     ExceptMask, &to) == SOCKET_ERROR)
-    {
-      // Try again later.
-      return false;
-    }
-
-  return true;
-
-}
-
-
 #endif
-

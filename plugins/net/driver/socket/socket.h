@@ -17,12 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_NETSDRV_H__
-#define __CS_NETSDRV_H__
+#ifndef __CS_SOCKET_H__
+#define __CS_SOCKET_H__
 
-#include "inetdrv.h"
-
-
+#include "isocket.h"
 
 class csSocketEndPoint
 {
@@ -37,34 +35,34 @@ public:
   csSocketEndPoint(csNetworkSocket s, bool blocks);
   virtual ~csSocketEndPoint();
   virtual void Terminate();
-  virtual csNetworkDriverError GetLastError() const;
+  virtual csNetworkDriverError GetLastError() const { return LastError; }
+  csNetworkSocket GetSocket() const { return Socket; }
 };
 
 
 class csSocketConnection : public iNetworkConnection, public csSocketEndPoint
 {
   typedef csSocketEndPoint superclass;
-
-  csNetworkSocket fd;
-
 public:
   csSocketConnection(iBase* p, csNetworkSocket, bool blocking);
   virtual bool Send(const void* data, size_t nbytes);
   virtual size_t Receive(void* buff, size_t maxbytes);
   virtual void Terminate() { superclass::Terminate(); }
-  virtual csNetworkSocket GetSocket() { return Socket; }
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
-  virtual csNetworkSocket Getfd() { return fd; }
 
   DECLARE_IBASE;
+  struct csSocket : public iNetworkSocket
+  {
+    DECLARE_EMBEDDED_IBASE(csSocketConnection);
+    virtual csNetworkSocket GetSocket() const;
+  } scfiNetworkSocket;
 };
 
 
 class csSocketListener : public iNetworkListener, public csSocketEndPoint
 {
   typedef csSocketEndPoint superclass;
-  csNetworkSocket fd;
 protected:
   bool BlockingConnection;
 public:
@@ -74,9 +72,13 @@ public:
   virtual void Terminate() { superclass::Terminate(); }
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
-  virtual csNetworkSocket Getfd() { return fd; }
 
   DECLARE_IBASE;
+  struct csSocket : public iNetworkSocket
+  {
+    DECLARE_EMBEDDED_IBASE(csSocketListener);
+    virtual csNetworkSocket GetSocket() const;
+  } scfiNetworkSocket;
 };
 
 
@@ -97,9 +99,7 @@ public:
   virtual bool Open();
   virtual bool Close();
   virtual csNetworkDriverCapabilities GetCapabilities() const;
-  virtual csNetworkDriverError GetLastError () const;
-
-  virtual bool DetectEvents(int maxsock, fd_set *ReadMask, fd_set *ExceptMask);
+  virtual csNetworkDriverError GetLastError () const { return LastError; }
     
   /**
    * The target should be a <host,port#> tuple.  It should be a string
@@ -117,10 +117,7 @@ public:
   virtual iNetworkListener* NewListener(const char* source,
     bool reliable, bool blockingListener, bool blockingConnection);
 
-
-
   DECLARE_IBASE;
 };
 
-#endif // __CS_NETSDRV_H__
-
+#endif // __CS_SOCKET_H__

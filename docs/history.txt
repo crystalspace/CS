@@ -1,30 +1,59 @@
 The history order has been reversed so that new features are at the top.
 
 17-May-2000
-	- Thomas Riemer added scaffolding functions to allow loading world 
-	  into NetSpace world.  
+	- Thomas Riemer added scaffolding functions to allow loading world
+	  into NetSpace world.
 	- Paul Garceau updated jpgimage.cpp for Win32/GCC.
-	- Added csPolygon3D::PointOnPolygon to test if a point is on a 
-	  polygon.  
-	- Added csBox3::GetSide() with corresponding BOX_SIDE_??? defines to 
-	  get the side of a box as a 2D box.  
-	- Added csBspNode/csOctreeNode::CountPolygons() that will be used to 
-	  gather statistics about the quality of the generated PVS.  
-	- Added and printed additional statistics gathering for the PVS.  You 
-	  can now see the percentage of polygons culled.  
+	- Added csPolygon3D::PointOnPolygon to test if a point is on a
+	  polygon.
+	- Added csBox3::GetSide() with corresponding BOX_SIDE_??? defines to
+	  get the side of a box as a 2D box.
+	- Added csBspNode/csOctreeNode::CountPolygons() that will be used to
+	  gather statistics about the quality of the generated PVS.
+	- Added and printed additional statistics gathering for the PVS.  You
+	  can now see the percentage of polygons culled.
 	- Did a few compile fixes on terrain engine.
 	- Paul Garceau did a few additional fixes on terrain engine.
-	- Reverted a few problematic changes from Paul Garceau (mk/user.mak 
-	  and terrain engine).  
+	- Reverted a few problematic changes from Paul Garceau (mk/user.mak
+	  and terrain engine).
 	- Wouter Wijngaards fixed the depend target of the terrain engine.
-	- Eric Sunshine reverted more problematic changes and fixed errors or 
-	  potential problems which Paul Garceau introduced.  
+	- Eric Sunshine reverted more problematic changes and fixed errors or
+	  potential problems which Paul Garceau introduced.
 	- Changed a fix from Eric to octree.cpp to make it a bit more
 	  readable.
 	- Eric Sunshine changed the NeXT ports so that they utilize the
-	  makefile's $(OUTDLL) facility to locate dynamic load libraries in
-	  a subdirectory ("components") rather than polluting the root CS
+	  makefile's $(OUTDLL) facility to locate dynamic load libraries in a
+	  subdirectory ("components") rather than polluting the root CS
 	  directory with them.
+	- Eric Sunshine made the following changes to the network interfaces,
+	  socket driver, and network manager.
+	    - Removed socket-specific functionality from inetdrv.h which was
+	      added when NetSpace was introduced into the project and which
+	      completely corrupted the abstract nature of the interface.
+	    - Removed all the junk which was unnecessarily added to the socket
+	      driver when NetSpace was introduced.
+	    - Moved (almost) all of the platform-specific socket configuration
+	      and select()-configuration information out of socket.cpp and
+	      into platform-specific csosdef.h files where it belongs by
+	      expanding the meaning of SYSDEF_SOCKETS.
+	    - Added a new SYSDEF_SELECT to cssysdef.h which is used by
+	      implementations to indicate that they require select() and the
+	      FD_* file-descriptor macros.  Added appropriate configuration
+	      information to platform-specific csosdefs.h files where
+	      necessary.
+	    - Added (potentially temporary) iNetworkSocket interface which
+	      represents an abstract socket-based connection or listener.
+	      This interface provides a clean way for the network manager to
+	      deal with file-descriptor sets and select() without having to
+	      corrupt the pure and abstract inetdrv.h.  I expect this
+	      interface to disappear once the networking system is upgraded to
+	      allow select()-style functionality in a completely generalized
+	      fashion, however in the meantime, this provides a clean solution
+	      to the problem of the network manager wanting to have inside
+	      information about socket-driver specifics.
+	    - Reworked Thomas Riemer's network manager just enough so that it
+	      works via the new iNetworkSocket interface instead of relying
+	      upon the corruption of inetdrv.h (which has been removed).
 16-May-2000
 	- Alex Pfaffe did some minor changes/cleanup to the terrain engine.
 	- Removed a few warnings in terrain.cpp.

@@ -36,6 +36,11 @@ int access (const char *path, int mode);
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined (SYSDEF_SELECT)
+typedef unsigned long fd_set;
+#undef SYSDEF_SELECT
+#endif
+
 #if defined (PROC_M68K) || defined (PROC_POWERPC)
 #  define CS_BIG_ENDIAN
 #else

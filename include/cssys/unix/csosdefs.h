@@ -55,4 +55,8 @@
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined (SYSDEF_SOCKETS) && defined (OS_SOLARIS)
+extern "C" unsigned long inet_addr(const char*);
+#endif
+
 #endif // __CSOSDEFS_H__
