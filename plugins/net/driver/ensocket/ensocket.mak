@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make ensocket       Make the $(DESCRIPTION.ensocket)$"
+  $(NEWLINE)echo $"  make ensocket     Make the $(DESCRIPTION.ensocket)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
