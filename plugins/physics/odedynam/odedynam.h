@@ -112,6 +112,8 @@ private:
 
   bool stepfast;
   int sfiter;
+  bool quickstep;
+  int qsiter;
   bool fastobjects;
 
 public:
@@ -140,17 +142,23 @@ public:
   	dContactGeom *contact, int skip);
   static int CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
         dContactGeom *contact, int skip);
-  static dColliderFn* CollideSelector (int num);
+//  static dColliderFn* CollideSelector (int num);
   static void GetAABB (dGeomID g, dReal aabb[6]);
 
   void SetGlobalERP (float erp);
   float GlobalERP () { return erp; }
   void SetGlobalCFM (float cfm);
   float GlobalCFM () { return cfm; }
+
   void EnableStepFast (bool enable);
   bool StepFastEnabled () { return stepfast; }
   void SetStepFastIterations (int iter);
   int StepFastIterations () { return sfiter; }
+  void EnableQuickStep (bool enable);
+  bool QuickStepEnabled () { return quickstep; };
+  void SetQuickStepIterations (int iter);
+  int QuickStepIterations () { return qsiter; }
+
   void EnableFrameRate (bool enable) { rateenabled = enable; }
   bool FrameRateEnabled () { return rateenabled; }
   void SetFrameRate (float hz) { steptime = 1.0 / hz; }
@@ -183,6 +191,14 @@ public:
     { scfParent->SetStepFastIterations (iter); }
     int StepFastIterations ()
     { return scfParent->StepFastIterations (); }
+    void EnableQuickStep (bool enable)
+    { return scfParent->EnableQuickStep (enable); }
+    bool QuickStepEnabled ()
+    { return scfParent->QuickStepEnabled (); }
+    void SetQuickStepIterations (int iter)
+    { return scfParent->SetQuickStepIterations (iter); }
+    int QuickStepIterations ()
+    { return scfParent->QuickStepIterations (); }
     void EnableFrameRate (bool enable)
     { scfParent->EnableFrameRate (enable); }
     bool FrameRateEnabled ()
@@ -270,7 +286,10 @@ private:
 
   bool stepfast;
   int sfiter;
+  bool quickstep;
+  int qsiter;
   bool fastobjects;
+  bool autodisable;
 
 public:
   SCF_DECLARE_IBASE_EXT (csObject);
@@ -291,6 +310,12 @@ public:
     { scfParent->SetRollingDampener (d); }
     float GetRollingDampener () const 
     { return scfParent->GetRollingDampener (); }
+    void EnableAutoDisable (bool enable)
+    { scfParent->EnableAutoDisable (enable); }
+    bool AutoDisableEnabled ()
+    { return scfParent->AutoDisableEnabled (); }
+    void SetAutoDisableParams (float linear, float angular, int steps, float time)
+    { scfParent->SetAutoDisableParams (linear, angular, steps, time); }
     void Step (float stepsize)
     { scfParent->Step (stepsize); }
     csPtr<iRigidBody> CreateBody ()
@@ -331,10 +356,14 @@ public:
   float ERP () { return dWorldGetERP (worldID); }
   void SetCFM (float cfm) { dWorldSetCFM (worldID, cfm); }
   float CFM () { return dWorldGetCFM (worldID); }
-  void EnableStepFast (bool enable) { stepfast = enable; }
+  void EnableStepFast (bool enable) { stepfast = enable; quickstep = false; };
   bool StepFastEnabled () { return stepfast; }
   void SetStepFastIterations (int iter) { sfiter = iter; }
   int StepFastIterations () { return sfiter; }
+  void EnableQuickStep (bool enable) { quickstep = enable; stepfast = false; };
+  bool QuickStepEnabled () { return quickstep; };
+  void SetQuickStepIterations (int iter) { qsiter = iter; };
+  int QuickStepIterations () { return qsiter; }
   void EnableFrameRate (bool enable) { rateenabled = enable; }
   bool FrameRateEnabled () { return rateenabled; }
   void SetFrameRate (float hz) { steptime = 1.0 / hz; }
@@ -345,6 +374,9 @@ public:
   void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) { updates.Delete (cb); }
   void EnableFastObjects (bool enable) { fastobjects = enable; }
   bool FastObjectsEnabled () { return false; }
+  void EnableAutoDisable (bool enable);
+  bool AutoDisableEnabled () { return autodisable; }
+  void SetAutoDisableParams (float linear, float angular, int steps, float time);
 
   struct ODEDynamicSystemState : public iODEDynamicSystemState
   {
@@ -365,6 +397,14 @@ public:
     { scfParent->SetStepFastIterations (iter); }
     int StepFastIterations ()
     { return scfParent->StepFastIterations (); }
+    void EnableQuickStep (bool enable)
+    { scfParent->EnableQuickStep (enable); }
+    bool QuickStepEnabled ()
+    { return scfParent->QuickStepEnabled (); }
+    void SetQuickStepIterations (int iter)
+    { scfParent->SetQuickStepIterations (iter); }
+    int QuickStepIterations ()
+    { return scfParent->QuickStepIterations (); }
     void EnableFrameRate (bool enable)
     { scfParent->EnableFrameRate (enable); }
     bool FrameRateEnabled ()
@@ -385,6 +425,12 @@ public:
     { scfParent->EnableFastObjects (enable); }
     bool FastObjectsEnabled ()
     { return scfParent->FastObjectsEnabled (); }
+    void EnableAutoDisable (bool enable)
+    { scfParent->EnableAutoDisable (enable); }
+    bool AutoDisableEnabled ()
+    { return scfParent->AutoDisableEnabled (); }
+    void SetAutoDisableParams (float linear, float angular, int steps, float time)
+    { scfParent->SetAutoDisableParams (linear, angular, steps, time); }
   } scfiODEDynamicSystemState;
 
 

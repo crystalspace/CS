@@ -106,6 +106,21 @@ struct iDynamicSystem : public iBase
   /// Get the global rolling dampener setting.
   virtual float GetRollingDampener () const = 0;
 
+  /** Turn on/off AutoDisable functionality.
+      AutoDisable will stop moving objects if they are stable in order
+      to save processing time.
+  */
+  virtual void EnableAutoDisable (bool enable) = 0;
+  virtual bool AutoDisableEnabled () =0;
+  /**
+    Set the parameters for AutoDisable.
+    /param linear Maximum linear movement to disable a body
+    /param angular Maximum angular movement to disable a body
+    /param steps Minimum number of steps the body meets linear and angular requirements before it is disabled.
+    /param time Minimum time the body needs to meet linear and angular movement requirements before it is disabled.
+  */
+  virtual void SetAutoDisableParams (float linear, float angular, int steps, float time)=0;
+
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
 

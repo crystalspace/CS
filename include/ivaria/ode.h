@@ -66,6 +66,11 @@ struct iODEDynamicState : public iBase
   virtual void SetStepFastIterations (int iter) = 0;
   virtual int StepFastIterations () = 0;
 
+  virtual void EnableQuickStep (bool enable) = 0;
+  virtual bool QuickStepEnabled () = 0;
+  virtual void SetQuickStepIterations (int iter) = 0;
+  virtual int QuickStepIterations () = 0;
+
   /**
    * The following code enables a constant framerate on processing
    * this means if you set the frame rate to (default) 50  The stepsize
@@ -151,6 +156,26 @@ struct iODEDynamicSystemState : public iBase
   virtual bool StepFastEnabled () = 0;
   virtual void SetStepFastIterations (int iter) = 0;
   virtual int StepFastIterations () = 0;
+
+  virtual void EnableQuickStep (bool enable) = 0;
+  virtual bool QuickStepEnabled () = 0;
+  virtual void SetQuickStepIterations (int iter) = 0;
+  virtual int QuickStepIterations () = 0;
+
+  /** Turn on/off AutoDisable functionality.
+      AutoDisable will stop moving objects if they are stable in order
+      to save processing time.
+  */
+  virtual void EnableAutoDisable (bool enable) = 0;
+  virtual bool AutoDisableEnabled () =0;
+  /**
+    Set the parameters for AutoDisable.
+    /param linear Maximum linear movement to disable a body
+    /param angular Maximum angular movement to disable a body
+    /param steps Minimum number of steps the body meets linear and angular requirements before it is disabled.
+    /param time Minimum time the body needs to meet linear and angular movement requirements before it is disabled.
+  */
+  virtual void SetAutoDisableParams (float linear, float angular, int steps, float time)=0;
 
   /**
    * NOTE: This should not be done here if its been done in iODEDynamicState

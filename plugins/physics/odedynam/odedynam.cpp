@@ -33,6 +33,7 @@
 #include "iengine/engine.h"
 #include "imesh/object.h"
 #include "csgeom/obb.h"
+#include "csgeom/pmtools.h"
 #include "csqsqrt.h"
 
 #include "odedynam.h"
@@ -118,13 +119,13 @@ csODEDynamics::csODEDynamics (iBase* parent)
   dGeomID id = dCreateSphere (0, 1);
   dGeomDestroy (id);
 
-  dGeomClass c;
-  c.bytes = sizeof (MeshInfo);
-  c.collider = &CollideSelector;
-  c.aabb = &GetAABB;
-  c.aabb_test = 0;
-  c.dtor = 0;
-  geomclassnum = dCreateGeomClass (&c);
+  //dGeomClass c;
+  //c.bytes = sizeof (MeshInfo);
+  //c.collider = &CollideSelector;
+  //c.aabb = &GetAABB;
+  //c.aabb_test = 0;
+  //c.dtor = 0;
+  //geomclassnum = dCreateGeomClass (&c);
 
   erp = 0.2f;
   cfm = 1e-5f;
@@ -136,6 +137,8 @@ csODEDynamics::csODEDynamics (iBase* parent)
 
   stepfast = false;
   sfiter = 10;
+  quickstep = false;
+  qsiter = 10;
   fastobjects = false;
 }
 
@@ -169,6 +172,8 @@ csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
   csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
   systems.Push (isystem);
   isystem->DecRef ();
+  if(stepfast) system->EnableStepFast(true);
+  else if(quickstep) system->EnableQuickStep(true);
   return csPtr<iDynamicSystem> (isystem);
 }
 
@@ -244,8 +249,8 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   if (b1 && b2 && b1->GetGroup() != 0 && b1->GetGroup() == b2->GetGroup()) 
     return;
 
-  dContact contact[10];
-  int a = dCollide (o1, o2, 10, &(contact[0].geom), sizeof (dContact));
+  dContact contact[64];
+  int a = dCollide (o1, o2, 64, &(contact[0].geom), sizeof (dContact));
   if (a > 0)
   {
     /* there is only 1 actual body per set */
@@ -291,61 +296,6 @@ csReversibleTransform GetGeomTransform (dGeomID id)
   return csReversibleTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 
-int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
-    dContactGeom *contact, int skip)
-{
-  return 0;
-  // TODO: Implement collision for meshes
-  // (old code left, but not even close to working)
-  /*colliderdata* cd1 = (colliderdata*)dGeomGetClassData (o1);
-  colliderdata* cd2 = (colliderdata*)dGeomGetClassData (o2);
-
-  if (cd1->collsys != cd2->collsys) return 0;
-
-  const csReversibleTransform t1 = GetGeomTransform(o1);
-  const csReversibleTransform t2 = GetGeomTransform(o2);
-
-  cd1->collsys->SetOneHitOnly (false);
-  cd1->collsys->Collide( cd1->collider, &t1, cd2->collider, &t2);
-
-  csCollisionPair* cp = cd1->collsys->GetCollisionPairs();
-
-  for (int i=0; (i<cd1->collsys->GetCollisionPairCount()) && (i<flags); i++)
-  {
-    csPlane3 plane (cp[i].a1*t1, cp[i].b1*t1, cp[i].c1*t1);
-
-    csVector3 v = cp[i].a2*t2;
-    float depth = plane.Distance(v);
-
-    csVector3 v2 = cp[i].b2*t2;
-    float d = plane.Distance(v2);
-    if (d>depth)
-    {
-      depth = d;
-      v = v2;
-    }
-
-    v2 = cp[i].c2*t2;
-    d = plane.Distance(v2);
-    if (d>depth)
-    {
-      depth = d;
-      v = v2;
-    }
-
-    contact[i].depth = depth;
-    contact[i].g1 = o1;
-    contact[i].g2 = o2;
-    contact[i].normal[0] = plane.norm.x;
-    contact[i].normal[1] = plane.norm.y;
-    contact[i].normal[2] = plane.norm.z;
-    contact[i].pos[0] = v.x;
-    contact[i].pos[1] = v.y;
-    contact[i].pos[2] = v.z;
-  }
-  return i;*/
-}
-
 /*
   The ODE version contained in the win32libs package defines the dCollide*
   functions as extern "C" (otherwise the DLL couldn't be shared by different
@@ -367,513 +317,6 @@ ODE_EXTERN int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags,
 				 dContactGeom *contact, int skip);
 
 typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
-
-int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
-    dContactGeom *outcontacts, int skip)
-{
-  /* need to check aabb's since GeomGroup doesn't */
-  dReal aabb1[6];
-  dReal aabb2[6];
-  dGeomGetAABB (mesh, aabb1);
-  dGeomGetAABB (box, aabb2);
-  if (aabb1[0] > aabb2[1] || aabb1[1] < aabb2[0] ||
-      aabb1[2] > aabb2[3] || aabb1[3] < aabb2[2] ||
-      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4])
-  {
-    return 0;
-  }
-  int N = flags & 0xFF;
-
-  // rotate everything so that box is axis aligned.
-  dVector3 sides;
-  dGeomBoxGetLengths (box, sides);
-  // box is symetric.
-  csVector3 aabb(sides[0]/2, sides[1]/2, sides[2]/2);
-  csBox3 boxbox;
-  boxbox.AddBoundingVertex (aabb);
-  boxbox.AddBoundingVertex (-aabb);
-  csReversibleTransform boxt = GetGeomTransform (box);
-
-  MeshInfo *mi = (MeshInfo*)dGeomGetClassData (mesh);
-  iMeshWrapper *m = mi->mesh;
-  CS_ASSERT (m);
-  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
-  	->GetPolygonMeshColldet();
-  csVector3 *vertex_table = p->GetVertices ();
-  csMeshedPolygon *polygon_list = p->GetPolygons ();
-
-  csReversibleTransform mesht = GetGeomTransform (mesh);
-
-  csPolygonTree* tree = mi->tree;
-  csArray<int> polyidx;
-  csBox3 transformedbox;
-  transformedbox.StartBoundingBox (mesht.Other2This(boxbox.GetCorner(0)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(boxbox.GetCorner(1)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(boxbox.GetCorner(2)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(boxbox.GetCorner(3)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(boxbox.GetCorner(4)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(boxbox.GetCorner(5)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(boxbox.GetCorner(6)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(boxbox.GetCorner(7)));
-  tree->IntersectBox (polyidx, transformedbox);
-  tree->RemoveDoubles (polyidx);
-
-  csPolyMeshList polycollide;
-  // test for overlap
-  size_t i;
-  int j, k;
-  for (i = 0; i < polyidx.Length (); i ++)
-  {
-    csBox3 polybox;
-    csMeshedPolygon& poly = polygon_list[polyidx[i]];
-    for (j = 0; j < poly.num_vertices; j ++)
-    {
-      polybox.AddBoundingVertex (boxt * (vertex_table[poly.vertices[j]]/mesht));
-    }
-    // aabb poly against aabb box for overlap.
-    // Full collision later will weed out the rest;
-
-    if (polybox.Overlap (boxbox))
-    {
-      polycollide.Push (poly);
-    }
-  }
-
-  int outcount = 0;
-  // the value of N should be large, just in case.
-  for (i = 0; i < polycollide.Length() && outcount < N; i ++)
-  {
-    csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
-      vertex_table[polycollide[i].vertices[1]] / mesht,
-      vertex_table[polycollide[i].vertices[2]] / mesht);
-    // dCollideBP only works if box center is on the outside of the plane
-    if (plane.Classify (boxt.GetOrigin()) < 0)
-    {
-      continue;
-    }
-    plane.Normalize ();
-    dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
-      -plane.DD);
-    dContactGeom tempcontacts[5];
-    int count = dCollideBoxPlane (box, odeplane, 5, tempcontacts, sizeof (dContactGeom));
-    dGeomDestroy (odeplane);
-    for (j = 0; j < count; j ++)
-    {
-      dContactGeom *c = &tempcontacts[j];
-      csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
-      // make sure the point lies inside the polygon
-      int vcount = polycollide[i].num_vertices;
-      int ind1 = polycollide[i].vertices[vcount-1];
-      csVector3 v1 = vertex_table[ind1] / mesht;
-      csVector3 v2;
-      for (k = 0; k < vcount; v1 = v2, k++)
-      {
-        int ind2 = polycollide[i].vertices[k];
-        v2 = vertex_table[ind2] / mesht;
-        csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
-        //edgeplane.Normalize();
-        if (edgeplane.Classify (contactpos) < 0)
-        {
-          c->depth = -1;
-          break;
-        }
-      }
-      if (c->depth >= 0)
-      {
-        dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
-        out->pos[0] = c->pos[0];
-        out->pos[1] = c->pos[1];
-        out->pos[2] = c->pos[2];
-        out->normal[0] = -c->normal[0];
-        out->normal[1] = -c->normal[1];
-        out->normal[2] = -c->normal[2];
-        out->depth = c->depth;
-        out->g1 = mesh;
-        out->g2 = box;
-        outcount ++;
-      }
-    }
-  }
-  return outcount;
-}
-
-int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
-    dContactGeom *outcontacts, int skip)
-{
-  /* need to check aabb's since GeomGroup doesn't */
-  dReal aabb1[6];
-  dReal aabb2[6];
-  dGeomGetAABB (mesh, aabb1);
-  dGeomGetAABB (cyl, aabb2);
-  if (aabb1[0] > aabb2[1] || aabb1[1] < aabb2[0] ||
-      aabb1[2] > aabb2[3] || aabb1[3] < aabb2[2] ||
-      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4])
-  {
-    return 0;
-  }
-  int N = flags & 0xFF;
-
-  // rotate everything so that box is axis aligned.
-  dReal length, radius;
-  dGeomCCylinderGetParams (cyl, &length, &radius);
-  // box is symetric.
-  csVector3 aabb(radius, radius, length/2);
-  csBox3 cylbox;
-  cylbox.AddBoundingVertex (aabb);
-  cylbox.AddBoundingVertex (-aabb);
-  csReversibleTransform cylt = GetGeomTransform (cyl);
-
-  MeshInfo *mi = (MeshInfo*)dGeomGetClassData (mesh);
-  iMeshWrapper *m = mi->mesh;
-  CS_ASSERT (m);
-  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
-  	->GetPolygonMeshColldet();
-  csVector3 *vertex_table = p->GetVertices ();
-  csMeshedPolygon *polygon_list = p->GetPolygons ();
-
-  csReversibleTransform mesht = GetGeomTransform (mesh);
-
-  csPolygonTree* tree = mi->tree;
-  csArray<int> polyidx;
-  csBox3 transformedbox;
-  transformedbox.StartBoundingBox (mesht.Other2This(cylbox.GetCorner(0)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(1)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(2)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(3)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(4)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(5)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(6)));
-  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(7)));
-  tree->IntersectBox (polyidx, transformedbox);
-  tree->RemoveDoubles (polyidx);
-
-  csPolyMeshList polycollide;
-  // test for overlap
-  size_t i;
-  int j, k;
-  for (i = 0; i < polyidx.Length (); i ++)
-  {
-    csBox3 polybox;
-    csMeshedPolygon& poly = polygon_list[polyidx[i]];
-    for (j = 0; j < poly.num_vertices; j ++)
-    {
-      polybox.AddBoundingVertex (cylt * (vertex_table[poly.vertices[j]] / mesht));
-    }
-    // aabb poly against aabb box for overlap.
-    // Full collision later will weed out the rest;
-    if (polybox.Overlap (cylbox))
-    {
-      polycollide.Push (poly);
-    }
-  }
-  int outcount = 0;
-  // the value of N should be large, just in case.
-  for (i = 0; i < polycollide.Length() && outcount < N; i ++)
-  {
-    csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
-      vertex_table[polycollide[i].vertices[1]] / mesht,
-      vertex_table[polycollide[i].vertices[2]] / mesht);
-    // dCollideBP only works if box center is on the outside of the plane
-    if (plane.Classify (cylt.GetOrigin()) < 0)
-    {
-      continue;
-    }
-    plane.Normalize ();
-    dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
-      -plane.DD);
-    dContactGeom tempcontacts[5];
-    int count = dCollideCCylinderPlane (cyl, odeplane, 5, tempcontacts, sizeof (dContactGeom));
-    dGeomDestroy (odeplane);
-    for (j = 0; j < count; j ++)
-    {
-      dContactGeom *c = &tempcontacts[j];
-      csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
-      // make sure the point lies inside the polygon
-      int vcount = polycollide[i].num_vertices;
-      int ind1 = polycollide[i].vertices[vcount-1];
-      csVector3 v1 = vertex_table[ind1] / mesht;
-      csVector3 v2;
-      for (k = 0; k < vcount; v1 = v2, k++)
-      {
-        int ind2 = polycollide[i].vertices[k];
-        v2 = vertex_table[ind2] / mesht;
-        csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
-        //edgeplane.Normalize();
-        if (edgeplane.Classify (contactpos) < 0)
-        {
-          c->depth = -1;
-          break;
-        }
-      }
-      if (c->depth >= 0)
-      {
-        dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
-        out->pos[0] = c->pos[0];
-        out->pos[1] = c->pos[1];
-        out->pos[2] = c->pos[2];
-        out->normal[0] = -c->normal[0];
-        out->normal[1] = -c->normal[1];
-        out->normal[2] = -c->normal[2];
-        out->depth = c->depth;
-        out->g1 = mesh;
-        out->g2 = cyl;
-        outcount ++;
-      }
-    }
-  }
-  return outcount;
-}
-
-int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
-    dContactGeom *outcontacts, int skip)
-{
-  /* need to check aabb's since GeomGroup doesn't */
-  dReal aabb1[6];
-  dReal aabb2[6];
-  dGeomGetAABB (mesh, aabb1);
-  dGeomGetAABB (sphere, aabb2);
-  if (aabb1[0] > aabb2[1] || aabb1[1] < aabb2[0] ||
-      aabb1[2] > aabb2[3] || aabb1[3] < aabb2[2] ||
-      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4])
-  {
-    return 0;
-  }
-  int N = flags & 0xFF;
-  const dReal *pos = dGeomGetPosition (sphere);
-  csVector3 center(pos[0], pos[1], pos[2]);
-  dReal rad = dGeomSphereGetRadius (sphere);
-  MeshInfo *mi = (MeshInfo *)dGeomGetClassData (mesh);
-  iMeshWrapper *m = mi->mesh;
-  CS_ASSERT (m);
-  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
-  	->GetPolygonMeshColldet();
-  csVector3 *vertex_table = p->GetVertices ();
-  csMeshedPolygon *polygon_list = p->GetPolygons ();
-
-  csReversibleTransform mesht = GetGeomTransform (mesh);
-
-  int outcount = 0;
-
-  csPolygonTree* tree = mi->tree;
-  csArray<int> polyidx;
-  tree->IntersectSphere (polyidx, mesht.Other2This (center), rad*rad);
-  tree->RemoveDoubles (polyidx);
-  for (size_t i = 0; i < polyidx.Length () && outcount < N; i ++)
-  {
-    csMeshedPolygon& poly = polygon_list[polyidx[i]];
-    csPlane3 plane(vertex_table[poly.vertices[0]] / mesht,
-      vertex_table[poly.vertices[1]] / mesht,
-      vertex_table[poly.vertices[2]] / mesht);
-    if (plane.Classify (center) < 0)
-    {
-      continue;
-    }
-    plane.Normalize();
-    float depth = rad - plane.Distance (center);
-    if (depth < 0)
-    {
-      continue;
-    }
-    int vcount = poly.num_vertices;
-    int ind1 = poly.vertices[vcount-1];
-    csVector3 v1 = vertex_table[ind1] / mesht;
-    csVector3 v2;
-    for (int j = 0; j < vcount; v1 = v2, j++)
-    {
-      int ind2 = poly.vertices[j];
-      v2 = vertex_table[ind2] / mesht;
-      csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
-      //edgeplane.Normalize();
-      if (edgeplane.Classify (center) < SMALL_EPSILON)
-      {
-        csVector3 line = v2 - v1;
-	float linelen = line.SquaredNorm();
-        line.Normalize();
-        float proj = center * line;
-        /* if the point projects on this edge, but outside the poly test
-         * for depth to this edge (especially important on sharp corners)
-         */
-        if ((proj >= (v1 * line)) && (proj <= (v2 * line)))
-        {
-          float t = ((v1 - center) * (v2 - center)) / linelen;
-          csVector3 projpt = v1 + (line * t);
-          csVector3 newnorm = center - projpt;
-          float dist = newnorm.Norm();
-          depth = rad - dist;
-          newnorm /= dist;
-          plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
-          break;
-        }
-        else
-        {
-          /* this is an invalid the ball is outside the poly at this edge */
-          depth = -1;
-        }
-      }
-    }
-    if (depth < 0)
-    {
-      continue;
-    }
-    dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
-    csVector3 cpos = center - (plane.Normal() * rad);
-    out->pos[0] = cpos.x;
-    out->pos[1] = cpos.y;
-    out->pos[2] = cpos.z;
-    out->normal[0] = -plane.Normal().x;
-    out->normal[1] = -plane.Normal().y;
-    out->normal[2] = -plane.Normal().z;
-    out->depth = depth;
-    out->g1 = mesh;
-    out->g2 = sphere;
-    outcount ++;
-  }
-  return outcount;
-}
-
-int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
-    dContactGeom *outcontacts, int skip)
-{
-  int N = flags & 0xFF;
-  
-  //Make a bounding Box
-  MeshInfo *mi = (MeshInfo*)dGeomGetClassData (mesh);
-  iMeshWrapper *m = mi->mesh;
-  CS_ASSERT (m);
-  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
-        ->GetPolygonMeshColldet();
-  csVector3 *vertex_table = p->GetVertices ();
-  csMeshedPolygon *polygon_list = p->GetPolygons ();
-
-  csReversibleTransform mesht = GetGeomTransform (mesh);
- 
-  int i;
-  csBox3 box;
-  box.StartBoundingBox ();
-  for (i = 0; i < p->GetVertexCount(); i ++)
-  {
-    box.AddBoundingVertex (vertex_table[i] / mesht);
-  }
-
-  //Fast Check
-  
-  csVector3 current;
-  int j,k;
-  bool planecut = false;
-  current = box.GetCorner(0);
-  float last = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
-  for(i=1;i<8;i++)
-  {
-    current = box.GetCorner(i);
-    float now = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
-    if((now<0.0f && last>0.0f)||(now>0.0f && last<0.0f))
-    {
-      planecut = true;
-      break;
-    }
-    last = now;
-  }
-  
-  if(!planecut)
-  {
-    return 0;
-  }
-  
-  dVector4 result;
-  dGeomPlaneGetParams (plane, result);
-  
-  //Serious Check
-  int outcount = 0;
-  int polycount = p->GetPolygonCount();
-  for(i=0;i<polycount && outcount < N;i++)
-  {
-    int vcount = polygon_list[i].num_vertices;
-    //Checking if the poly is cut
-    planecut = false;
-    current = vertex_table[polygon_list[i].vertices[0]]/mesht;
-    last = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
-    for (j = 0; j < vcount; j++)
-    {
-      current = vertex_table[polygon_list[i].vertices[j]]/mesht;
-      float now = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
-      if((now<0.0f && last>0.0f)||(now>0.0f && last<0.0f))
-      {
-        planecut = true;
-        break;
-      }
-      last = now;
-    }
-    if(planecut)
-    {
-      //Determining the places where the poly is cut
-      int ind1 = polygon_list[i].vertices[vcount-1];
-      csVector3 v1 = vertex_table[ind1] / mesht;
-      csVector3 v2;
-      for (j = 0; j < vcount && outcount < N; v1 = v2, j++)
-      {
-        int ind2 = polygon_list[i].vertices[j];
-        v2 = vertex_table[ind2] / mesht;
-        csVector3 diff = v2-v1;
-        
-        dGeomID oderay = dCreateRay (0, diff.Norm());
-        dGeomRaySet (oderay, v1.x, v1.y, v1.z,
-                    diff.x, diff.y, diff.z);
-        dContactGeom tempcontacts[1];
-        int count = dCollideRayPlane (oderay, plane, 1, tempcontacts, sizeof (dContactGeom));
-        dGeomDestroy (oderay);
-        if(count==1)
-        {
-          dContactGeom *c = &tempcontacts[0];
-          bool doubles = false;
-          for(k=0;k<outcount;k++)
-          {
-            dContactGeom *kc = (dContactGeom *)((char *)outcontacts + skip * k);
-            if(kc->pos[0] == c->pos[0] &&
-               kc->pos[1] == c->pos[1] &&
-               kc->pos[2] == c->pos[2])
-            {
-              doubles = true;
-              break;
-            }
-          }
-          if(!doubles)
-          {
-            dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
-            out->pos[0] = c->pos[0];
-            out->pos[1] = c->pos[1];
-            out->pos[2] = c->pos[2];
-            out->normal[0] = result[0];
-            out->normal[1] = result[1];
-            out->normal[2] = result[2];
-            float depth1 = dGeomPlanePointDepth(plane,v1.x,v1.y,v1.z);
-            float depth2 = dGeomPlanePointDepth(plane,v2.x,v2.y,v2.z);
-            if(depth1>0.0f)
-              out->depth = depth1;
-            else if (depth2 > 0.0f)
-              out->depth = depth2;
-            else
-              out->depth = 0.0f;
-            out->g1 = mesh;
-            out->g2 = plane;
-            outcount ++;
-          }
-        }
-      }
-    }
-  }
-
-  return outcount;
-}
-
-dColliderFn* csODEDynamics::CollideSelector (int num)
-{
-  if (num == geomclassnum) return (dColliderFn *)&CollideMeshMesh;
-  if (num == dBoxClass) return (dColliderFn *)&CollideMeshBox;
-  if (num == dCCylinderClass) return (dColliderFn *)&CollideMeshCylinder;
-  if (num == dSphereClass) return (dColliderFn *)&CollideMeshSphere;
-  if (num == dPlaneClass) return (dColliderFn *)&CollideMeshPlane;
-  return 0;
-}
 
 void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
 {
@@ -919,6 +362,7 @@ void csODEDynamics::SetGlobalCFM (float cfm)
 void csODEDynamics::EnableStepFast (bool enable)
 {
   stepfast = enable;
+  quickstep = false;
 
   for (size_t i = 0; i < systems.Length(); i ++) 
   {
@@ -937,6 +381,31 @@ void csODEDynamics::SetStepFastIterations (int iter)
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
       iODEDynamicSystemState);
     sys->SetStepFastIterations (iter);
+  }
+}
+
+void csODEDynamics::EnableQuickStep (bool enable)
+{
+  quickstep = enable;
+  stepfast = false;
+
+  for (size_t i = 0; i < systems.Length(); i ++)
+  {
+    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+	   iODEDynamicSystemState);
+  	 sys->EnableQuickStep (enable);
+  }
+}
+
+void csODEDynamics::SetQuickStepIterations (int iter)
+{
+  qsiter = iter;
+
+  for (size_t i = 0; i < systems.Length(); i ++)
+  {
+    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+      iODEDynamicSystemState);
+    sys->SetQuickStepIterations (iter);
   }
 }
 
@@ -1014,7 +483,10 @@ csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
 
   stepfast = false;
   sfiter = 10;
+  quickstep = false;
+  qsiter = 10;
   fastobjects = false;
+  autodisable = false;
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()
@@ -1112,7 +584,14 @@ void csODEDynamicSystem::Step (float elapsed_time)
     total_elapsed -= stepsize;
     if (!stepfast) 
     {
-      dWorldStep (worldID, stepsize);
+      if (!quickstep)
+      {
+        dWorldStep (worldID, stepsize);
+      }
+      else
+      {
+        dWorldQuickStep (worldID, stepsize);
+      }
     } 
     else 
     {
@@ -1140,31 +619,56 @@ void csODEDynamicSystem::Step (float elapsed_time)
 bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  dGeomID id = dCreateGeom (csODEDynamics::GetGeomClassNum());
-  geoms.Push(id);
+  // From Eroroman & Marc Rochel
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
+  csTriangle *c_triangle;
+  int tr_num;
+  csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
 
-  MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (id);
-  gdata->mesh = mesh;
-  gdata->tree = new csPolygonTree ();
-  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
-  	->GetPolygonMeshColldet();
-  gdata->tree->Build (p);
-  dSpaceAdd (spaceID, id);
-
+  // Slight problem here is that we need to keep vertices and indices around
+  // since ODE only uses the pointers. I am not sure if ODE cleans them up
+  // on exit or not. If not, we need some way to keep track of all mesh colliders
+  // and clean them up on destruct.
+  float *vertices = new float[p->GetVertexCount()*3];
+  int *indeces = new int[tr_num*3];
+  csVector3 *c_vertex = p->GetVertices();
+  //fprintf(stderr, "vertex count: %d\n", p->GetVertexCount());
+  //fprintf(stderr, "triangles count: %d\n", tr_num);
+  int i=0, j=0;
+  for (i=0, j=0; i < p->GetVertexCount(); i++)
+  {
+    vertices[j++] = c_vertex[i].x+5.0f;
+    vertices[j++] = c_vertex[i].y;
+    vertices[j++] = c_vertex[i].z;
+    //fprintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
+  }
+  for (i=0, j=0; i < tr_num; i++)
+  {
+    indeces[j++] = c_triangle[i].a;
+    indeces[j++] = c_triangle[i].b;
+    indeces[j++] = c_triangle[i].c;
+    //fprintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
+  }
+  dTriMeshDataID TriData = dGeomTriMeshDataCreate();
+  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
+      p->GetVertexCount(), indeces, tr_num, 3*sizeof(int));
+  dGeomID gid = dCreateTriMesh(spaceID, TriData, 0, 0, 0);
+  dGeomSetPosition (gid, trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
   dMatrix3 mat;
-  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
-  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
-  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
-  dGeomSetRotation (id, mat);
-
-  dGeomSetPosition (id,
-    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
-
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12;
+  mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22;
+  mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32;
+  mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+  
   float *f = new float[3];
   f[0] = friction;
   f[1] = elasticity;
   f[2] = softness;
-  dGeomSetData (id, (void*)f);
+  dGeomSetData (gid, (void*)f);
+  geoms.Push(gid);
 
   return true;
 }
@@ -1242,6 +746,21 @@ bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
   dGeomSetData (id, (void*)f);
 
   return true;
+}
+
+void csODEDynamicSystem::EnableAutoDisable (bool enable)
+{
+  autodisable=enable;
+  dWorldSetAutoDisableFlag (worldID, enable);
+}
+
+void csODEDynamicSystem::SetAutoDisableParams (float linear, float angular,
+    int steps, float time)
+{
+  if(linear!=0.0f) dWorldSetAutoDisableLinearThreshold (worldID, linear);
+  if(angular!=0.0f) dWorldSetAutoDisableAngularThreshold (worldID, angular);
+  if(steps!=0.0f) dWorldSetAutoDisableSteps (worldID, steps);
+  if(time!=0.0f) dWorldSetAutoDisableTime (worldID, time);
 }
 
 csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
@@ -1370,54 +889,79 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
     const csOrthoTransform &trans, float friction, float density,
     float elasticity, float softness)
 {
+  // From Eroroman & Marc Rochel with modifications by Mike Handverger
+
+  dSpaceID spaceID = dynsys->GetSpaceID();
   dMass m, om;
   dMassSetZero (&m);
 
-  dGeomID id = dCreateGeomTransform (0);
-  dGeomTransformSetCleanup (id, 1);
-  geoms.Push(id);
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
+  csTriangle *c_triangle;
+  int tr_num;
+  csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
+  float *vertices = new float[p->GetVertexCount()*3];
+  int *indeces = new int[tr_num*3];
+  csVector3 *c_vertex = p->GetVertices();
+  //fprintf(stderr, "vertex count: %d\n", p->GetVertexCount());
+  //fprintf(stderr, "triangles count: %d\n", tr_num);
+  int i=0, j=0;
+  for (i=0, j=0; i < p->GetVertexCount(); i++)
+  {
+    vertices[j++] = c_vertex[i].x;
+    vertices[j++] = c_vertex[i].y;
+    vertices[j++] = c_vertex[i].z;
+    //fprintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
+  }
+  for (i=0, j=0; i < tr_num; i++)
+  {
+    indeces[j++] = c_triangle[i].c;
+    indeces[j++] = c_triangle[i].b;
+    indeces[j++] = c_triangle[i].a;
+    //fprintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
+  }
+  dTriMeshDataID TriData = dGeomTriMeshDataCreate();
 
-  dGeomID gid = dCreateGeom (csODEDynamics::GetGeomClassNum());
-  MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (gid);
-  gdata->mesh = mesh;
-  gdata->tree = new csPolygonTree ();
-  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
-  	->GetPolygonMeshColldet();
-  gdata->tree->Build (p);
-  dGeomTransformSetGeom (id, gid);
+  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float), p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
 
+  dGeomID gid = dCreateTriMesh(spaceID, TriData, 0, 0, 0);
+  dGeomSetPosition (gid, trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12;
+  mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22;
+  mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32;
+  mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+
+  // set up mass
+
+  // ODE doesn'thave any function to get the mass of arbitrary triangles
+  // so we will just use the OBB
   csOBB b;
   b.FindOBB (p->GetVertices(), p->GetVertexCount());
   dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
 
-  dMatrix3 mat;
   mat[0] = b.GetMatrix().m11; mat[1] = b.GetMatrix().m12; mat[2] = b.GetMatrix().m13;
   mat[3] = b.GetMatrix().m21; mat[4] = b.GetMatrix().m22; mat[5] = b.GetMatrix().m23;
   mat[6] = b.GetMatrix().m31; mat[7] = b.GetMatrix().m32; mat[8] = b.GetMatrix().m33;
   dMassRotate (&m, mat);
 
-  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
-  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
-  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
-  dGeomSetRotation (gid, mat);
-
-  dGeomSetPosition (gid,
-    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
-  dMassTranslate (&m,
-    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
   dBodyGetMass (bodyID, &om);
   dMassAdd (&om, &m);
 
   dBodySetMass (bodyID, &om);
 
-  dGeomSetBody (id, bodyID);
-  dSpaceAdd (groupID, id);
+  dGeomSetBody (gid, bodyID);
+  //dSpaceAdd (groupID, gid);
 
   float *f = new float[3];
   f[0] = friction;
   f[1] = elasticity;
   f[2] = softness;
   dGeomSetData (gid, (void*)f);
+  geoms.Push(gid);
 
   return true;
 }
@@ -2238,3 +1782,4 @@ void csODEDefaultMoveCallback::Execute (csOrthoTransform& t)
 {
   /* do nothing by default */
 }
+
