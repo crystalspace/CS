@@ -2293,6 +2293,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
+	  Engine->GetMeshes ()->AddMesh (mesh);
 	  mesh->DecRef ();
         }
         break;

@@ -573,7 +573,6 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
 {
-  printf ("freeing %s\n", GetName ());
   if (meshFact) meshFact->DecRef ();
 }
 
@@ -601,6 +600,7 @@ csMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
     	&(relchild->scfiMeshWrapper));
     relchild->GetMovable ().SetTransform (childfact->GetTransform ());
     relchild->GetMovable ().UpdateMove ();
+    relchild->DecRef ();
   }
   return meshObj;
 }
@@ -735,7 +735,6 @@ csMeshFactoryList::csMeshFactoryList ()
 bool csMeshFactoryList::FreeItem (csSome Item)
 {
   iMeshFactoryWrapper* mesh = (iMeshFactoryWrapper*)Item;
-  printf ("decrefing %s\n", ((csMeshFactoryWrapper*)mesh->GetPrivateObject ())->GetName ());
   mesh->DecRef ();
   Item = NULL;
   return true;
@@ -743,7 +742,6 @@ bool csMeshFactoryList::FreeItem (csSome Item)
 
 void csMeshFactoryList::AddMeshFactory (iMeshFactoryWrapper *mesh)
 {
-  printf ("+++++++++++++++++++++ adding %s\n", ((csMeshFactoryWrapper*)mesh->GetPrivateObject ())->GetName ());
   Push (mesh);
 }
 
