@@ -76,7 +76,7 @@ awsBarChart::~awsBarChart ()
 
 char *awsBarChart::Type ()
 {
-  return "Group Frame";
+  return "Bar Chart";
 }
 
 bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)

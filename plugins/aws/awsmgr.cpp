@@ -34,6 +34,7 @@
 #include "awslistbx.h"
 #include "awsscrbr.h"
 #include "awsbarct.h"
+#include "awsstbar.h"
 
 #include "awscmpt.h"
 #include "awscscr.h"
@@ -930,9 +931,8 @@ void awsManager::PerformFocusChange (iAwsComponent *cmp, iEvent &Event)
 
 void awsManager::RegisterCommonComponents ()
 {
-  // Components register themselves into the window manager.  Just creating a factory
-
-  //  takes care of all the implementation details.  There's nothing else you need to do.
+  //   Components register themselves into the window manager.  Just creating a factory
+  // takes care of all the implementation details.  There's nothing else you need to do.
   (void)new awsCmdButtonFactory (this);
   (void)new awsLabelFactory (this);
   (void)new awsTextBoxFactory (this);
@@ -942,6 +942,7 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsListBoxFactory (this);
   (void)new awsScrollBarFactory (this);
   (void)new awsBarChartFactory (this);
+  (void)new awsStatusBarFactory (this);
 
   // Standard sink
   GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink ());
