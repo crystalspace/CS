@@ -303,7 +303,7 @@ void csGLTextureHandle::PrepareInt ()
       if (IsTransp())
       {
 	if (!newFace.IsValid()) 
-	  newFace.AttachNew (new csImageMemory (image));
+	  newFace.AttachNew (new csImageMemory (imgFace));
 	// Set the alpha of keycolored images to 0.
 	PrepareKeycolor (newFace, transp_color, newAlphaType);
       }

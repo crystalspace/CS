@@ -77,11 +77,15 @@ STATIC.PLUGINLIST =
   frustvis
   genmesh
   gmeshldr
+  gmeshanim
+  gmeshskelanim
   haze
   hazeldr
   ieplex
   imgplex
   nullmesh
+  protomesh
+  protomeshldr
   rain
   rainldr
   opcode

@@ -520,6 +520,30 @@ rule ConcatDirs
   return $(result) ;
 }
 
+##  SplitToList var
+##    Splits var into a list. Uses spaces as a separator.
+rule SplitToList
+{
+  local list;
+  local unsplit = $(<) ;
+  while $(unsplit) != ""
+  {
+    local split = [ Match "(.*) (.*)" : $(unsplit) ] ;
+    if $(split[1]) = ""
+    {
+      list += $(unsplit) ;
+      unsplit = "" ;
+    }
+    else
+    {
+      list += $(split[2]) ;
+      unsplit = $(split[1]) ;
+    }
+  }
+  
+  return [ Reverse $(list) ] ;
+}
+
 ##  Copy target : source
 ##    Copy source to target.
 actions Copy

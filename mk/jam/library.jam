@@ -191,7 +191,7 @@ rule LibraryStatic
   }
 
   # If we can't scan the library, we have to leave the .o's around.
-  if ! ( $(NOARSCAN) || $(NOARUPDATE) )
+  if ! ( $(NOARSCAN) || $(NOARUPDATE) || $(KEEPOBJS) )
   {
     RmTemps $(target) : $(objects) ;
   }
@@ -215,6 +215,22 @@ rule LibraryShared
   if ! $(target:D)
   {
     MakeLocate $(target) : $(LOCATE.TARGETS) ;
+  }
+
+  # Generate install rules
+  if ! [ IsElem noinstall : $(options) ]
+  {
+    if "$(RANLIB)"
+    {
+      Depends install_lib : [ DoInstall $(target) : $(libdir) : : Ranlib ] ;
+    }
+    else
+    {
+      Depends install_lib : [ DoInstall $(target) : $(libdir)  ] ;
+    }
+    
+    # Add to global library list
+    INSTALLEDLIBS += $(<) ;
   }
 
   Depends $(<) : $(linklib) ;

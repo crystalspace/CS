@@ -664,14 +664,10 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   } Module##_static_init__;
 
 /**
- * Used in conjunction with SCF_REGISTER_STATIC_LIBRARY to ensure that a
- * reference to the class(s) registered via SCF_REGISTER_STATIC_LIBRARY are
- * actually linked into the application.  Invoke this macro once for each
- * \<implementation\> node mentioned in the MetaInfo registered with
- * SCF_REGISTER_STATIC_LIBRARY.  Invocations of this macro must appear after
- * the the invocation of SCF_REGISTER_STATIC_LIBRARY.
+ * Define the C++ class needed to register an SCF class, but don't do any
+ * automatic registration.
  */
-#define SCF_REGISTER_FACTORY_FUNC(Class)				\
+#define SCF_DEFINE_FACTORY_FUNC_REGISTRATION(Class)			\
   CS_EXPORTED_FUNCTION void* CS_EXPORTED_NAME(Class,_Create)(iBase*);	\
   class Class##_StaticInit						\
   {									\
@@ -681,7 +677,30 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
       scfInitialize(0);							\
       iSCF::SCF->RegisterFactoryFunc(CS_EXPORTED_NAME(Class,_Create),#Class); \
     }									\
-  } Class##_static_init__;
+  };
+
+/**
+ * Register a statically linked plugin. The _static version of the plugin 
+ * needs to be linked in, too.
+ */
+#define SCF_USE_STATIC_PLUGIN(Module)					\
+  namespace csStaticPluginInit						\
+  {									\
+    class Module { public: Module(); };					\
+    Module Module##_StaticInit;						\
+  }
+
+/**
+ * Used in conjunction with SCF_REGISTER_STATIC_LIBRARY to ensure that a
+ * reference to the class(es) registered via SCF_REGISTER_STATIC_LIBRARY are
+ * actually linked into the application.  Invoke this macro once for each
+ * \<implementation\> node mentioned in the MetaInfo registered with
+ * SCF_REGISTER_STATIC_LIBRARY.  Invocations of this macro must appear after
+ * the the invocation of SCF_REGISTER_STATIC_LIBRARY.
+ */
+#define SCF_REGISTER_FACTORY_FUNC(Class)				\
+  SCF_DEFINE_FACTORY_FUNC_REGISTRATION(Class)				\
+  Class##_StaticInit Class##_static_init__;
 
 //--------------------------------------------- Class factory interface -----//
 

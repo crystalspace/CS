@@ -38,25 +38,21 @@ LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(VARIANT) ;
 ##  SubVariant variantname
 ##    Specify subvariant which are placed in separate compilation directories.
 SUBVARIANT ?= "" ;
+SAVED_LOCATE_TARGET = "" ;
 rule SubVariant
 {
-  SUBVARIANT = $(<) ;
   if ! $(<)
   {
-    SUBVARIANT = "" ;
-    if $(SAVED_LOCATE_TARGET)
-    {
-      LOCATE_TARGET = $(SAVED_LOCATE_TARGET) ;
-    }
-    SAVED_LOCATE_TARGET = ;
+    SUBVARIANT = $(SUBVARIANT[2]) ;
+    SUBVARIANT ?= "" ;
+    LOCATE_TARGET = $(SAVED_LOCATE_TARGET[1]) ;
+    SAVED_LOCATE_TARGET = $(SAVED_LOCATE_TARGET[2-]) ;
   }
   else
   {
-    if ! $(SAVED_LOCATE_TARGET)
-    {
-      SAVED_LOCATE_TARGET = $(LOCATE_TARGET) ;
-    }
-    LOCATE_TARGET = $(LOCATE_TARGET)/$(SUBVARIANT) ;
+    SUBVARIANT = $(<) $(SUBVARIANT) ;
+    SAVED_LOCATE_TARGET = $(LOCATE_TARGET) $(SAVED_LOCATE_TARGET) ;
+    LOCATE_TARGET = $(LOCATE_TARGET)/$(<) ;
   }
 }
 

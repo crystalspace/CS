@@ -63,9 +63,14 @@ rule Plugin
   if ! $(NO_STATIC_LINKING)
   {
     SubVariant static ;
-    Library $(<)_static : $(>) : $(3) independent noinstall nohelp notest ;
+    local staticreginfoobject = [ BuildStaticRegFile $(<) ] ;
+    
+    Library $(<)_static : $(>) $(staticreginfoobject) : $(3) independent noinstall nohelp notest ;
+    SEARCH on $(<)_static += $(LOCATE_TARGET) ;
+    ExtraObjects $(<)_static : $(staticreginfoobject) : inheritcflags ;
     CFlags $(<)_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
     LFlags $(<)_static : $(LINKLIBS) : nostatic ;
+    
     SubVariant ;
   }
 

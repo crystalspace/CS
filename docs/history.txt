@@ -16,6 +16,13 @@ chronological order.
 	- res fixed endless loops in the $CRYSTAL and other string splitting 
 	  code.
 	- res added the ability to attach shader vars to mesh object factories.
+	- res made the following changes:
+	    - Changed how static plugin information is handled. The metadata
+	      etc. is now kept inside the plugin _static library and referenced
+	      by the SCF_USE_STATIC_PLUGIN macro.
+	    - Made Jam SubVariants nesteable.
+	    - Changed DoSourceGrist to not replace already existing grist.
+	    - Fixed shared libs to also have install rules.
 18-Feb-2005
 	- Jorrit worked further on PVSCalc:
 	    - Some small fixes on kdtree building.

@@ -217,11 +217,22 @@ RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .h .hpp .inc ;
 # SUBVARIANT and SUBDIR variable.
 rule DoObjectGrist
 {
-  return $(<:G=$(SOURCE_GRIST:E)!$(SUBVARIANT)) ;
+  return $(<:G=$(SOURCE_GRIST:E)!$(SUBVARIANT:J=!)) ;
 }
 
 # Generates a grist suitable for source files based on SUBDIR variable.
+# Doesn't change an existing grist.
 rule DoSourceGrist
 {
-  return $(<:G=$(SOURCE_GRIST:E)) ;
+  local gristed ;
+  for g in $(<)
+  {
+    local grist ;
+    if $(g:G)
+    {
+      grist = $(g:G) ;
+    }
+    gristed += $(g:G=$(grist:E=$(SOURCE_GRIST:E))) ;
+  }
+  return $(gristed) ;
 }
