@@ -33,6 +33,7 @@ class csWorld;
 class csThing;
 class csDynLight;
 struct iTextureManager;
+struct iFont;
 
 class KeyMapping
 {
@@ -304,6 +305,9 @@ public:
   csWorld* world;
   iTextureManager* txtmgr;
   static int white, black, red;
+
+  // The font we are typing with
+  iFont *font;
 
 public:
   Blocks ();

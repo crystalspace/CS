@@ -53,6 +53,7 @@
 #include "csparser/snddatao.h"
 #include "isnddata.h"
 #include "inetdrv.h"
+#include "ifontsrv.h"
 
 // ----------------------------------------------------
 // Networking stuff.
@@ -232,18 +233,18 @@ void TextEntryMenu::Draw (cs_time elapsed_time)
     int selcol = selected == i ? Blocks::red : Blocks::black;
     int y = 10+(i-selected+tot_lines/2)*12;
     Gfx2D->DrawBox (10, y-2, 300, 12, selcol);
-    Gfx2D->Write (10, y, Blocks::white, selcol, entry->txt);
+    Gfx2D->Write (Sys->font, 10, y, Blocks::white, selcol, entry->txt);
     if (hisel && selected == i)
     {
       int col;
       if (time_left < .5) col = Blocks::white;
       else col = Blocks::red;
       Gfx2D->DrawBox (190, y-2, 120, 12, col);
-      Gfx2D->Write (200, y, Blocks::black, col, entry->entry);
+      Gfx2D->Write (Sys->font, 200, y, Blocks::black, col, entry->entry);
     }
     else
     {
-      Gfx2D->Write (200, y, Blocks::white, selcol, entry->entry);
+      Gfx2D->Write (Sys->font, 200, y, Blocks::white, selcol, entry->entry);
     }
   }
 }
@@ -2438,7 +2439,7 @@ void Blocks::NextFrame ()
     sprintf (buffer, "Highscores for %s at %dx%d",
     	diff_level == 0 ? "novice" : diff_level == 1 ? "average" : "expert",
 	player1->new_zone_dim, player1->new_zone_dim);
-    Gfx2D->Write (10, 10, white, black, buffer);
+    Gfx2D->Write (font, 10, 10, white, black, buffer);
     int i;
     HighScore& hs = highscores[diff_level][(player1->new_zone_dim)-3];
     bool scores = false;
@@ -2448,16 +2449,16 @@ void Blocks::NextFrame ()
       {
         scores = true;
         if (hs.GetName (i))
-          Gfx2D->Write (10, 30+i*12, white, black, hs.GetName (i));
+          Gfx2D->Write (font, 10, 30+i*12, white, black, hs.GetName (i));
         else
-          Gfx2D->Write (10, 30+i*12, white, black, "?");
+          Gfx2D->Write (font, 10, 30+i*12, white, black, "?");
 	char scorebuf[30];
 	sprintf (scorebuf, "%d", hs.Get (i));
-        Gfx2D->Write (200, 30+i*12, white, black, scorebuf);
+        Gfx2D->Write (font, 200, 30+i*12, white, black, scorebuf);
       }
     }
     if (!scores)
-      Gfx2D->Write (10, Sys->FrameHeight/2, white, black,
+      Gfx2D->Write (font, 10, Sys->FrameHeight/2, white, black,
       	"This screen intentionally left blank");
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
@@ -2485,12 +2486,12 @@ void Blocks::NextFrame ()
   if (pause)
   {
     Gfx2D->Clear (0);
-    Gfx2D->Write (100, Sys->FrameHeight-20, white, black, "PAUSE");
+    Gfx2D->Write (font, 100, Sys->FrameHeight-20, white, black, "PAUSE");
   }
 
   char scorebuf[50];
   sprintf (scorebuf, "%d", player1->score);
-  Gfx2D->Write (10, Sys->FrameHeight-20, white, black, scorebuf);
+  Gfx2D->Write (font, 10, Sys->FrameHeight-20, white, black, scorebuf);
 
   // Game over!
   if (screen == SCREEN_GAMEOVER)
@@ -2504,15 +2505,15 @@ void Blocks::NextFrame ()
     int y = Sys->FrameHeight/2;
     int x = (Sys->FrameWidth-300)/2;
     Gfx2D->DrawBox (x, y, 300, 12, black);
-    Gfx2D->Write (x+10, y+2, white, black, "GAME OVER!");
+    Gfx2D->Write (font, x+10, y+2, white, black, "GAME OVER!");
     if (enter_highscore)
     {
       Gfx2D->DrawBox (x, y+12, 300, 24, black);
-      Gfx2D->Write (x+10, y+12+2, white, black, "Enter name for highscores:");
+      Gfx2D->Write (font, x+10, y+12+2, white, black, "Enter name for highscores:");
       char name[21];
       strcpy (name, hs_name);
       if (time_left < .5) strcat (name, "_");
-      Gfx2D->Write (x+10, y+24+2, white, black, name);
+      Gfx2D->Write (font, x+10, y+24+2, white, black, name);
     }
   }
 
@@ -2949,6 +2950,9 @@ int main (int argc, char* argv[])
   }
   Sys->world = world->GetCsWorld ();
   world->DecRef ();
+
+  // Get a font handle
+  Sys->font = Sys->G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Some settings.
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
