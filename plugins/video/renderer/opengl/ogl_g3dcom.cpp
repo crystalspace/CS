@@ -198,7 +198,6 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 {
   Close ();
   if (G2D) G2D->DecRef ();
-  if (System) System->DecRef ();
 
   // see note above
   tr_verts.DecRef ();
@@ -211,7 +210,7 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 
 bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 {
-  (System = iSys)->IncRef ();
+  System = iSys;
 
   config.AddConfig(System, "/config/opengl.cfg");
 

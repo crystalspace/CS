@@ -61,7 +61,7 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
-  (System = iSys)->IncRef ();
+  System = iSys;
 
   NewInitialize ();
 

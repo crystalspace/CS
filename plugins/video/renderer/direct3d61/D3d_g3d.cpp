@@ -264,14 +264,11 @@ csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
 {
   if (m_piG2D)
     m_piG2D->DecRef ();
-  if (m_piSystem)
-    m_piSystem->DecRef ();
 }
 
 bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
 {
   m_piSystem = iSys;
-  m_piSystem->IncRef ();
 
   config.AddConfig(m_piSystem, "/config/direct3ddx6.cfg");
 

@@ -59,7 +59,7 @@ csSoftProcTexture3D::~csSoftProcTexture3D ()
 
 bool csSoftProcTexture3D::Initialize (iSystem *iSys)
 {
-  (System = iSys)->IncRef();
+  System = iSys;
   return true;
 }
 
@@ -80,7 +80,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman, csText
 {
   csGraphics3DSoftwareCommon* parent_g3d = main_texman->G3D;
   iGraphics2D *g2d = parent_g3d->GetDriver2D ();
-  (System = parent_g3d->System)->IncRef ();
+  System = parent_g3d->System;
 
   main_tcache = parent_g3d->tcache;
   parent_tex_mm = tex_mm;

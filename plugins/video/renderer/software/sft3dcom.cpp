@@ -258,13 +258,14 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   partner = NULL;
   title = NULL;
   is_for_procedural_textures = false;
+
+  System = NULL;
 }
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 {
   Close ();
   if (G2D) G2D->DecRef ();
-  if (System) System->DecRef ();
   if (partner) partner->DecRef ();
 }
 

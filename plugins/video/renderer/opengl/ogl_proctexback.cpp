@@ -68,7 +68,6 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   this->g3d = g3d;
   this->tex_mm = tex_mm;
   System = g3d->System;
-  System->IncRef ();
   g2d = g3d->GetDriver2D ();
 
   tex_mm->GetMipMapDimensions(0, width, height);
