@@ -384,6 +384,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Set = *cspacec::csColor4_Set;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -11762,6 +11763,48 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csIntersectingTriangle ##############
+
+package cspace::csIntersectingTriangle;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_a_get = *cspacec::csIntersectingTriangle_a_get;
+*swig_a_set = *cspacec::csIntersectingTriangle_a_set;
+*swig_b_get = *cspacec::csIntersectingTriangle_b_get;
+*swig_b_set = *cspacec::csIntersectingTriangle_b_set;
+*swig_c_get = *cspacec::csIntersectingTriangle_c_get;
+*swig_c_set = *cspacec::csIntersectingTriangle_c_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csIntersectingTriangle(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csIntersectingTriangle($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iCollider ##############
 
 package cspace::iCollider;
@@ -11804,6 +11847,8 @@ package cspace::iCollideSystem;
 *GetCollisionPairs = *cspacec::iCollideSystem_GetCollisionPairs;
 *GetCollisionPairCount = *cspacec::iCollideSystem_GetCollisionPairCount;
 *ResetCollisionPairs = *cspacec::iCollideSystem_ResetCollisionPairs;
+*CollideRay = *cspacec::iCollideSystem_CollideRay;
+*GetIntersectingTriangles = *cspacec::iCollideSystem_GetIntersectingTriangles;
 *SetOneHitOnly = *cspacec::iCollideSystem_SetOneHitOnly;
 *GetOneHitOnly = *cspacec::iCollideSystem_GetOneHitOnly;
 sub DESTROY {
