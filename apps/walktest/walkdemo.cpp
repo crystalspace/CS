@@ -799,7 +799,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     state->SetMixMode (CS_FX_SETALPHA (0.75));
     iPolygonMesh* mesh = SCF_QUERY_INTERFACE (obj, iPolygonMesh);
     iObject* sprobj = SCF_QUERY_INTERFACE (spr, iObject);
-    (void)new csColliderWrapper (sprobj, Sys->collide_system, mesh);
+    (new csColliderWrapper (sprobj, Sys->collide_system, mesh))->DecRef ();
     GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
     iObject* iobj = SCF_QUERY_INTERFACE (gh_info, iObject);
     sprobj->ObjAdd (iobj);
@@ -1045,7 +1045,6 @@ void HandleDynLight (iDynLight* dyn)
 	iDataObject *ido = CS_GET_CHILD_OBJECT_FAST (dyn->QueryObject (), iDataObject);
         dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
 	ido->DecRef ();
-	ido->DecRef ();
         if (ms->snd)
         {
           ms->snd->Stop();
@@ -1096,7 +1095,6 @@ void HandleDynLight (iDynLight* dyn)
 	{
 	  iDataObject *ido = CS_GET_CHILD_OBJECT_FAST (dyn->QueryObject (), iDataObject);
 	  dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
-	  ido->DecRef ();
 	  ido->DecRef ();
 	  delete es;
           Sys->view->GetEngine ()->RemoveDynLight (dyn);

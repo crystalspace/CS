@@ -137,12 +137,18 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   iMaterialWrapper* t2 = engine->GetMaterialList ()->FindByName ("txt2");
   float s = 1;
 
-  create_one_side (walls_state, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
-  create_one_side (walls_state, "e", t, t2, dx+s,dy+s,dz+s,  dx+s,dy+s,dz-s,  dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
-  create_one_side (walls_state, "w", t, t2, dx-s,dy+s,dz+s,  dx-s,dy-s,dz+s,  dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
-  create_one_side (walls_state, "s", t, t2, dx+s,dy+s,dz-s,  dx-s,dy+s,dz-s,  dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
-  create_one_side (walls_state, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,  dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
-  create_one_side (walls_state, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,  dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
+  create_one_side (walls_state, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  
+		   dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
+  create_one_side (walls_state, "e", t, t2, dx+s,dy+s,dz+s,  dx+s,dy+s,dz-s,  
+		   dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
+  create_one_side (walls_state, "w", t, t2, dx-s,dy+s,dz+s,  dx-s,dy-s,dz+s,  
+		   dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
+  create_one_side (walls_state, "s", t, t2, dx+s,dy+s,dz-s,  dx-s,dy+s,dz-s,  
+		   dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
+  create_one_side (walls_state, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,  
+		   dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
+  create_one_side (walls_state, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,  
+		   dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
 
   iStatLight* light = engine->CreateLight ("",
   	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),
@@ -162,6 +168,10 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   infinite_world->Set (x, y, z, (void*)ird);
   csDataObject* irddata = new csDataObject (ird);
   room->QueryObject ()->ObjAdd (irddata);
+  irddata->DecRef ();
+  walls->DecRef ();
+  walls_state->DecRef ();
+
   return ird;
 }
 
@@ -281,7 +291,9 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     iPolygonMesh* mesh = SCF_QUERY_INTERFACE (ird->walls->GetMeshObject (),
   	iPolygonMesh);
     iObject* io = SCF_QUERY_INTERFACE (ird->walls, iObject);
-    (void)new csColliderWrapper (io, Sys->collide_system, mesh);
+    csColliderWrapper *cw = new csColliderWrapper (io, Sys->collide_system, mesh);
+    cw->SetName ("inf maze");
+    cw->DecRef ();
     io->DecRef ();
     mesh->DecRef ();
     return true;
@@ -345,6 +357,4 @@ void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)
 
 InfRoomData::~InfRoomData ()
 {
-  walls_state->DecRef ();
-  walls->DecRef ();
 }

@@ -207,11 +207,13 @@ WalkTest::~WalkTest ()
   delete infinite_maze;
   delete huge_room;
   delete cslogo;
+  /*
   if (Engine)
   {
     if (plbody) Engine->GetMeshes ()->RemoveMesh (plbody);
     if (pllegs) Engine->GetMeshes ()->RemoveMesh (pllegs);
   }
+  */
   delete [] recorded_perf_stats_name;
   SCF_DEC_REF (perf_stats);
   SCF_DEC_REF (Engine);
@@ -1139,6 +1141,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
 
     iPolygonMesh* mesh;
+    /*
     int sn = engine->GetSectors ()->GetSectorCount ();
     while (sn > 0)
     {
@@ -1154,11 +1157,15 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 	mesh = SCF_QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
 	if (mesh)
 	{
-	  (void)new csColliderWrapper (tp->QueryObject (), collide_system, mesh);
+	  csColliderWrapper *cw = new csColliderWrapper (tp->QueryObject (), 
+							 collide_system, mesh);
+	  cw->SetName (tp->QueryObject ()->GetName());
+	  cw->DecRef ();
 	  mesh->DecRef ();
 	}
       }
     }
+    */
     // Initialize all mesh objects for collision detection.
     int i;
     iMeshList* meshes = engine->GetMeshes ();
@@ -1169,7 +1176,10 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
       mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
       if (mesh)
       {
-	(void)new csColliderWrapper (sp->QueryObject (), collide_system, mesh);
+	csColliderWrapper *cw = new csColliderWrapper (sp->QueryObject (), 
+						       collide_system, mesh);
+	cw->SetName (sp->QueryObject ()->GetName());
+	cw->DecRef ();
 	mesh->DecRef ();
       }
     }

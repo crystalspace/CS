@@ -118,6 +118,7 @@ void WalkTest::CreateColliders ()
 
   mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   body = new csColliderWrapper (plbody->QueryObject (), collide_system, mesh);
+  body->SetName ("player body");
   plbody->GetRadius (body_radius, body_center);
   mesh->DecRef ();
   thing_state->DecRef ();
@@ -170,9 +171,16 @@ void WalkTest::CreateColliders ()
 
   mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   legs = new csColliderWrapper (pllegs->QueryObject (), collide_system, mesh);
+  legs->SetName ("palyer legs");
   pllegs->GetRadius ( legs_radius, legs_center);
   mesh->DecRef ();
   thing_state->DecRef ();
+
+  SCF_DEC_REF (pllegs);
+  SCF_DEC_REF (plbody);
+
+  SCF_DEC_REF (legs);
+  SCF_DEC_REF (body);
 
   if (!body || !legs)
     do_cd = false;
@@ -369,5 +377,6 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
   if(!Sys->do_gravity)
     Sys->velocity.y -= SIGN (Sys->velocity.y) * MIN (0.017, ABS (Sys->velocity.y));
+
 }
 
