@@ -2543,8 +2543,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
               // it is a warping sector.
               portal->CompleteSector (0);
               CS_ASSERT (portal != 0);
-              if (sector != portal->GetSector () && portal->GetSector ()
-                              && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+              if (sector != portal->GetSector () && portal->GetSector ())
               {
                 int l;
                 bool already_visited = false;
@@ -2559,8 +2558,20 @@ void csEngine::GetNearbyObjectList (iSector* sector,
                 if (!already_visited)
                 {
                   visited_sectors.Push (portal->GetSector ());
-                  GetNearbyObjectList (portal->GetSector (), pos, radius, list,
-                                       visited_sectors);
+		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+		  {
+		    csReversibleTransform warp_wor;
+		    portal->ObjectToWorld (
+		    	imw->GetMovable ()->GetFullTransform (), warp_wor);
+		    csVector3 tpos = warp_wor.Other2This (pos);
+                    GetNearbyObjectList (portal->GetSector (), tpos, radius,
+		    	list, visited_sectors);
+		  }
+		  else
+		  {
+                    GetNearbyObjectList (portal->GetSector (), pos, radius,
+		    	list, visited_sectors);
+		  }
                 }
               }
             }
@@ -2646,8 +2657,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
               // it is a warping sector.
               portal->CompleteSector (0);
               CS_ASSERT (portal != 0);
-              if (sector != portal->GetSector () && portal->GetSector ()
-                              && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+              if (sector != portal->GetSector () && portal->GetSector ())
               {
                 int l;
                 bool already_visited = false;
@@ -2662,8 +2672,20 @@ void csEngine::GetNearbyMeshList (iSector* sector,
                 if (!already_visited)
                 {
                   visited_sectors.Push (portal->GetSector ());
-                  GetNearbyMeshList (portal->GetSector (), pos, radius, list,
-                                       visited_sectors);
+		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+		  {
+		    csReversibleTransform warp_wor;
+		    portal->ObjectToWorld (
+		    	imw->GetMovable ()->GetFullTransform (), warp_wor);
+		    csVector3 tpos = warp_wor.Other2This (pos);
+                    GetNearbyMeshList (portal->GetSector (), tpos, radius,
+		    	list, visited_sectors);
+		  }
+		  else
+		  {
+                    GetNearbyMeshList (portal->GetSector (), pos, radius,
+		    	list, visited_sectors);
+		  }
                 }
               }
             }

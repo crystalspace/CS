@@ -9,6 +9,9 @@ chronological order.
 25-Jun-2004
 	- res removed a small but unnecessary condition statement from
 	  particles.cpp.
+	- Jorrit fixed iEngine->GetNearbyObjects() and GetNearbyMeshes() so
+	  that they correctly work for space warping portals too. This is
+	  untested!
 24-Jun-2004
 	- Jorrit fixed a bug in the GL renderer where it would fail to test
 	  for the existance of a clipper in some cases.
