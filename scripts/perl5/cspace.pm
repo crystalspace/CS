@@ -46,6 +46,7 @@ sub this {
 package cspace;
 
 *scfCompatibleVersion = *cspacec::scfCompatibleVersion;
+*__add__ = *cspacec::__add__;
 *fSqr = *cspacec::fSqr;
 *csDefaultRunLoop = *cspacec::csDefaultRunLoop;
 *csPlatformStartup = *cspacec::csPlatformStartup;
@@ -575,25 +576,118 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csStringBase ##############
+
+package cspace::csStringBase;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetCapacity = *cspacec::csStringBase_SetCapacity;
+*GetCapacity = *cspacec::csStringBase_GetCapacity;
+*AppendFmt = *cspacec::csStringBase_AppendFmt;
+*AppendFmtV = *cspacec::csStringBase_AppendFmtV;
+*Append = *cspacec::csStringBase_Append;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csStringBase(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csStringBase($self);
+        delete $OWNER{$self};
+    }
+}
+
+*SetGrowsBy = *cspacec::csStringBase_SetGrowsBy;
+*GetGrowsBy = *cspacec::csStringBase_GetGrowsBy;
+*SetGrowsExponentially = *cspacec::csStringBase_SetGrowsExponentially;
+*GetGrowsExponentially = *cspacec::csStringBase_GetGrowsExponentially;
+*Free = *cspacec::csStringBase_Free;
+*Truncate = *cspacec::csStringBase_Truncate;
+*Empty = *cspacec::csStringBase_Empty;
+*ShrinkBestFit = *cspacec::csStringBase_ShrinkBestFit;
+*Reclaim = *cspacec::csStringBase_Reclaim;
+*Clear = *cspacec::csStringBase_Clear;
+*GetData = *cspacec::csStringBase_GetData;
+*GetDataSafe = *cspacec::csStringBase_GetDataSafe;
+*Length = *cspacec::csStringBase_Length;
+*IsEmpty = *cspacec::csStringBase_IsEmpty;
+*SetAt = *cspacec::csStringBase_SetAt;
+*GetAt = *cspacec::csStringBase_GetAt;
+*DeleteAt = *cspacec::csStringBase_DeleteAt;
+*Insert = *cspacec::csStringBase_Insert;
+*Overwrite = *cspacec::csStringBase_Overwrite;
+*Slice = *cspacec::csStringBase_Slice;
+*SubString = *cspacec::csStringBase_SubString;
+*FindFirst = *cspacec::csStringBase_FindFirst;
+*FindLast = *cspacec::csStringBase_FindLast;
+*FindStr = *cspacec::csStringBase_FindStr;
+*FindReplace = *cspacec::csStringBase_FindReplace;
+*Format = *cspacec::csStringBase_Format;
+*FormatV = *cspacec::csStringBase_FormatV;
+*Replace = *cspacec::csStringBase_Replace;
+*Compare = *cspacec::csStringBase_Compare;
+*CompareNoCase = *cspacec::csStringBase_CompareNoCase;
+*StartsWith = *cspacec::csStringBase_StartsWith;
+*Clone = *cspacec::csStringBase_Clone;
+*LTrim = *cspacec::csStringBase_LTrim;
+*RTrim = *cspacec::csStringBase_RTrim;
+*Trim = *cspacec::csStringBase_Trim;
+*Collapse = *cspacec::csStringBase_Collapse;
+*PadLeft = *cspacec::csStringBase_PadLeft;
+*AsPadLeft = *cspacec::csStringBase_AsPadLeft;
+*PadRight = *cspacec::csStringBase_PadRight;
+*AsPadRight = *cspacec::csStringBase_AsPadRight;
+*PadCenter = *cspacec::csStringBase_PadCenter;
+*AsPadCenter = *cspacec::csStringBase_AsPadCenter;
+*__add__ = *cspacec::csStringBase___add__;
+*__eq__ = *cspacec::csStringBase___eq__;
+*__lt__ = *cspacec::csStringBase___lt__;
+*__gt__ = *cspacec::csStringBase___gt__;
+*__ne__ = *cspacec::csStringBase___ne__;
+*Downcase = *cspacec::csStringBase_Downcase;
+*Upcase = *cspacec::csStringBase_Upcase;
+*Detach = *cspacec::csStringBase_Detach;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csString ##############
 
 package cspace::csString;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*GetData = *cspacec::csString_GetData;
-*GetDataSafe = *cspacec::csString_GetDataSafe;
-*Length = *cspacec::csString_Length;
-*IsEmpty = *cspacec::csString_IsEmpty;
-*FindStr = *cspacec::csString_FindStr;
-*FindReplace = *cspacec::csString_FindReplace;
-*StartsWith = *cspacec::csString_StartsWith;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csString(@_);
     bless $self, $pkg if defined($self);
 }
 
+*__eq__ = *cspacec::csString___eq__;
+*__seq__ = *cspacec::csString___seq__;
+*__string__ = *cspacec::csString___string__;
+*__sv__ = *cspacec::csString___sv__;
+*__av__ = *cspacec::csString___av__;
+*length = *cspacec::csString_length;
+*__add__ = *cspacec::csString___add__;
+*__concat__ = *cspacec::csString___concat__;
+*__concat_ass__ = *cspacec::csString___concat_ass__;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -605,17 +699,6 @@ sub DESTROY {
     }
 }
 
-*__lt__ = *cspacec::csString___lt__;
-*__gt__ = *cspacec::csString___gt__;
-*__eq__ = *cspacec::csString___eq__;
-*__seq__ = *cspacec::csString___seq__;
-*__string__ = *cspacec::csString___string__;
-*__sv__ = *cspacec::csString___sv__;
-*__av__ = *cspacec::csString___av__;
-*length = *cspacec::csString_length;
-*__add__ = *cspacec::csString___add__;
-*__concat__ = *cspacec::csString___concat__;
-*__concat_ass__ = *cspacec::csString___concat_ass__;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
