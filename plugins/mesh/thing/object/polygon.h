@@ -1101,7 +1101,7 @@ public:
     virtual iLightMap *GetLightMap ()
     {
       csPolyTexture *lm = scfParent->txt_info;
-      return lm ? lm->GetLightMap () : (iLightMap*)0;
+      return lm ? (iLightMap*)(lm->GetLightMapFast) () : (iLightMap*)0;
     }
     virtual iPolygonTexture *GetTexture ()
     {
