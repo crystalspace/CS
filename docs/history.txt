@@ -8,6 +8,7 @@ chronological order.
 
 15-Aug-2003
 	- Jorrit did some documentation fixes on the new lod section.
+	- Jorrit added support for <nullmesh> in factories too.
 14-Aug-2003
 	- Jorrit added iSharedVariableListener. With this interface you can
 	  listen to a variable and get notified when its value changes.

@@ -1641,6 +1641,49 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	    return false;
         }
         break;
+      case XMLTOKEN_NULLMESH:
+        {
+	  if (plug)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.load.plugin",
+                child, "Don't specify the plugin if you use <nullmesh>!");
+	    return false;
+	  }
+	  if (stemp->GetMeshObjectFactory ())
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory", child,
+	      "Please don't use <params> in combination with <nullmesh>!");
+	    return false;
+	  }
+	  csRef<iPluginManager> plugin_mgr =
+	  	CS_QUERY_REGISTRY (object_reg, iPluginManager);
+	  csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (
+		plugin_mgr, "crystalspace.mesh.object.nullmesh",
+		iMeshObjectType);
+	  if (!type)
+	    type = CS_LOAD_PLUGIN (plugin_mgr,
+	    	"crystalspace.mesh.object.nullmesh", iMeshObjectType);
+	  if (!type)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.load.plugin",
+                child, "Could not find the nullmesh plugin!");
+	    return false;
+	  }
+	  csRef<iMeshObjectFactory> fact = type->NewFactory ();
+	  stemp->SetMeshObjectFactory (fact);
+	  fact->SetLogicalParent (stemp);
+	  csBox3 b;
+	  if (!SyntaxService->ParseBox (child, b))
+	    return false;
+	  csRef<iNullFactoryState> nullmesh = SCF_QUERY_INTERFACE (
+		fact, iNullFactoryState);
+	  if (nullmesh)
+	    nullmesh->SetBoundingBox (b);
+	}
+        break;
       case XMLTOKEN_PARAMS:
 	if (!plug)
 	{
