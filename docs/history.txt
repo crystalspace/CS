@@ -22,6 +22,20 @@ The history order is reversed so that new features are at the top.
 	  Apple/NeXT system driver and AppKit-based 2D driver.
 	- Eric Sunshine eliminated several compilation warnings from
 	  cmdline.cpp and cmdline.h.
+	- Michael Voasse writes:
+	    - In the ongoing quest to implement HitBeam() in all
+  	      mesh objects, todays victims are cube and surface.
+  	      Both should now respond to bugplug and show their
+  	      bounding boxen and radii. I have optimized surface
+  	      a little by adding a set of corner vertices to
+  	      shortcut the bbox and HitBeamObject() methods.
+	    - Fixed a small bug in csSector::HitBeam(). This now
+  	      returns the closest intersection be it a mesh or
+  	      polygon ( previously, was returning furthest mesh
+  	      or polygon ). Only the intersect vertex was affect,
+  	      no other methods or fields were harmed during this
+  	      procedure...
+	- Martin Geisse updated apimod19.txi with his latest changes.
 1-Jul-2001
 	- Eric Sunshine repaired the new cmdline.cpp and cmdline.h so that they
 	  compile error-free with the NextStep compiler.
