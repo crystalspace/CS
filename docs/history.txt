@@ -38,6 +38,11 @@ The history order is reversed so that new features are at the top.
 	    P 'n' (V (...) LEN (5))
 	- The above modification to TEXLEN and LEN makes the commands
 	  XPLANE, YPLANE, and ZPLANE obsolete so they are now removed.
+	- Added csThing::RemoveUnusedVertices(). This function will remove
+	  all unused vertices for a thing. It is currently always called
+	  when CompressVertices() is called. So by default it is now called.
+	- Optimized csThing::CompressVertices() so that it doesn't do anything
+	  when there are no duplicate vertices.
 19-Sep-2001
 	- Wouter Wijngaards did the following:
 	    - New command: PaintSky for the ball mesh. demosky2 animates it,

@@ -425,6 +425,13 @@ public:
    */
   void CompressVertices ();
 
+  /**
+   * Optimize the vertex table so that all unused vertices are deleted.
+   * Note that calling this function will make the camera vertex array
+   * invalid.
+   */
+  void RemoveUnusedVertices ();
+
   /// Return the object space vector for the vertex.
   const csVector3& Vobj (int idx) const { return obj_verts[idx]; }
 

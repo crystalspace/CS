@@ -278,7 +278,10 @@ void csThing::Prepare ()
   if (prepared) return;
   prepared = true;
   if (!flags.Check (CS_THING_NOCOMPRESS))
+  {
     CompressVertices ();
+    RemoveUnusedVertices ();
+  }
   int i;
   csPolygon3D* p;
   for (i = 0 ; i < polygons.Length () ; i++)
@@ -379,6 +382,7 @@ struct CompressVertex
   int orig_idx;
   float x, y, z;
   int new_idx;
+  bool used;
 };
 
 static int compare_vt (const void* p1, const void* p2)
@@ -408,6 +412,7 @@ void csThing::CompressVertices ()
   if (num_vertices <= 0)
     return;
 
+  // Copy all the vertices.
   CompressVertex* vt = new CompressVertex [num_vertices];
   int i, j;
   for (i = 0 ; i < num_vertices ; i++)
@@ -435,6 +440,13 @@ void csThing::CompressVertices ()
       count_unique++;
     }
     vt[i].new_idx = last_unique;
+  }
+
+  // If count_unique == num_vertices then there is nothing to do.
+  if (count_unique == num_vertices)
+  {
+    delete[] vt;
+    return;
   }
 
   // Now allocate and fill new vertex tables.
@@ -496,6 +508,92 @@ void csThing::CompressVertices ()
   if (bbox) CreateBoundingBox ();
 }
 
+void csThing::RemoveUnusedVertices ()
+{
+  if (num_vertices <= 0)
+    return;
+
+  // Copy all the vertices that are actually used by polygons.
+  bool* used = new bool [num_vertices];
+  int i, j;
+  for (i = 0 ; i < num_vertices ; i++) used[i] = false;
+
+  // Mark all vertices that are used as used.
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* p = polygons.Get (i);
+    csPolyIndexed& pi = p->GetVertices ();
+    int* idx = pi.GetVertexIndices ();
+    for (j = 0 ; j < pi.GetVertexCount () ; j++)
+      used[idx[j]] = true;
+  }
+
+  // Count relevant values.
+  int count_relevant = 0;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (used[i]) count_relevant++;
+  }
+
+  // If all vertices are relevant then there is nothing to do.
+  if (count_relevant == num_vertices)
+  {
+    delete[] used;
+    return;
+  }
+
+  // Now allocate and fill new vertex tables.
+  // Also fill the 'relocate' table.
+  csVector3* new_obj = new csVector3 [count_relevant];
+  csVector3* new_wor = 0;
+  int* relocate = new int [num_vertices];
+  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+    new_wor = new csVector3 [count_relevant];
+  j = 0;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (used[i])
+    {
+      new_obj[j] = obj_verts[i];
+      if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+        new_wor[j] = wor_verts[i];
+      relocate[i] = j;
+      j++;
+    }
+    else
+      relocate[i] = -1;
+  }
+
+  // Replace the old vertex tables.
+  delete [] obj_verts;
+  obj_verts = new_obj;
+  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+  {
+    delete [] wor_verts;
+    wor_verts = new_wor;
+  }
+  else
+    wor_verts = obj_verts;
+printf ("Deleted %d vertices\n", num_vertices-count_relevant); fflush (stdout);
+  num_vertices = max_vertices = count_relevant;
+
+  // Now we can remap the vertices in all polygons.
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* p = polygons.Get (i);
+    csPolyIndexed& pi = p->GetVertices ();
+    int* idx = pi.GetVertexIndices ();
+    for (j = 0 ; j < pi.GetVertexCount () ; j++)
+      idx[j] = relocate[idx[j]];
+  }
+
+  delete [] relocate;
+  delete [] used;
+
+  // If there is a bounding box we recreate it.
+  if (bbox) CreateBoundingBox ();
+}
+
 void csThing::BuildStaticTree (const char* name, int mode)
 {
   //mode = BSP_BALANCE_AND_SPLITS;
@@ -533,6 +631,7 @@ void csThing::BuildStaticTree (const char* name, int mode)
   }
   csEngine::current_engine->Report ("Compress vertices...");
   CompressVertices ();
+  RemoveUnusedVertices ();
   csEngine::current_engine->Report ("Build vertex tables...");
   ((csOctree*)static_tree)->BuildVertexTables ();
 
