@@ -13,3 +13,39 @@ compiler for Windows created by Red Hat Inc. and other third party contributors.
 @uref{http://sources.redhat.com/cygwin/}
 
 @uref{http://sources.redhat.com/cygwin/setup.exe}
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot1}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot2}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot3}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot4}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot5}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot6}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot7}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot8}
+@end ifnotinfo
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot9}
+@end ifnotinfo
