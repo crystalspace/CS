@@ -52,7 +52,6 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
   Listener = NULL;
   memory = NULL;
   memorysize = 0;
-//  Sources = NULL;
   VFS = NULL;
   MusicSource = NULL;
 }
@@ -60,7 +59,7 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
 bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 {
   // copy the system pointer
-  if (iSys == NULL) return false;
+  if (!iSys) return false;
   System = iSys;
 
   // get the VFS interface
@@ -70,18 +69,14 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   // read the config file
   Config = new csIniFile(VFS,"config/sound.cfg");
 
-  const char *drv = Config->GetStr ("Driver","driver");
-  if (drv && strlen (drv) > 0)
-    ;
-  else
-  {    
   // load the sound driver plug-in
+  char *drv;
 #ifdef SOUND_DRIVER
-  drv = SOUND_DRIVER;	// "crystalspace.sound.driver.xxx"
+  drv = SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
 #else
   drv = "crystalspace.sound.driver.null";
 #endif
-  }
+
   SoundDriver = LOAD_PLUGIN (System, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
     System->Printf(MSG_FATAL_ERROR, "Error! Cant find sound driver %s.\n", drv);
@@ -114,7 +109,7 @@ iSoundListener *csSoundRenderSoftware::GetListener()
 
 iSoundSource *csSoundRenderSoftware::CreateSource(iSoundData *snd, bool Is3d)
 {
-  if (snd == NULL) return NULL;
+  if (!snd) return NULL;
   return new csSoundSourceSoftware(snd, Is3d, this, snd);
 }
 
@@ -207,7 +202,7 @@ void csSoundRenderSoftware::MixingFunction()
   SoundDriver->LockMemory(&memory, &memorysize);
   if(!memory || memorysize<1) return;
 
-  // clear the buffer @@@ is this always needed?
+  // clear the buffer
   if (is16Bits()) memset(memory,0,memorysize);
   else memset(memory,128,memorysize);
 

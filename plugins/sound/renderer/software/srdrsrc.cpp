@@ -158,16 +158,19 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
 }
 
 /* helper macros */
-#define MONOSAMP        ((int)(Data[i]))
-#define LEFTSAMP        ((int)(Data[2*i]))
-#define RIGHTSAMP       ((int)(Data[2*i+1]))
-#define READMONO3D      int samp=MONOSAMP;
-#define READSTEREO3D    int samp=(LEFTSAMP+RIGHTSAMP)/2;
-#define WRITEMONO3D     Buffer[i]+=(stype)((samp AddModify)*(CalcVolL+CalcVolR)/2);
-#define WRITESTEREO3D   {                   \
-  Buffer[2*i]+=(stype)((samp AddModify)*CalcVolL);   \
-  Buffer[2*i+1]=(stype)((samp AddModify)*CalcVolR);  \
-}
+#define READMONOSAMP        ((int)(Data[i])-NullSample)
+#define READLEFTSAMP        ((int)(Data[2*i])-NullSample)
+#define READRIGHTSAMP       ((int)(Data[2*i+1])-NullSample)
+
+#define WRITEMONOSAMP(x)    Buffer[i]+=(x)*(CalcVolL+CalcVolR)/2+NullSample;
+#define WRITELEFTSAMP(x)    Buffer[2*i]+=(x)*CalcVolL+NullSample;
+#define WRITERIGHTSAMP(x)   Buffer[2*i+1]+=(x)*CalcVolR+NullSample;
+
+#define READMONO3D      int samp=READMONOSAMP;
+#define READSTEREO3D    int samp=(READLEFTSAMP+READRIGHTSAMP)/2;
+
+#define WRITEMONO3D     WRITEMONOSAMP(samp);
+#define WRITESTEREO3D   {WRITELEFTSAMP(samp); WRITERIGHTSAMP(samp);}
 
 #define LOOP        for (unsigned long i=0;i<NumSamples;i++)
 
@@ -201,25 +204,27 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
         if (SoundRender->isStereo()) {                                      \
           /* stereo -> stereo */                                            \
           LOOP {                                                            \
-            Buffer[2*i]+= (stype)CalcVolL*(LEFTSAMP AddModify);             \
-            Buffer[2*i+1]+= (stype)CalcVolL*(RIGHTSAMP AddModify);          \
+            WRITELEFTSAMP(READLEFTSAMP);                                    \
+            WRITERIGHTSAMP(READRIGHTSAMP);                                  \
           }                                                                 \
         } else {                                                            \
           /* stereo -> mono */                                              \
           LOOP {                                                            \
-            Buffer[i]+=(stype)CalcVolL*((LEFTSAMP + RIGHTSAMP)/2 AddModify);       \
+            WRITEMONOSAMP((READLEFTSAMP + READRIGHTSAMP)/2);                \
           }                                                                 \
         }                                                                   \
       } else {                                                              \
         if (SoundRender->isStereo()) {                                      \
           /* mono -> stereo */                                              \
           LOOP {                                                            \
-            Buffer[2*i]+=(stype)CalcVolL*(MONOSAMP AddModify);                     \
-            Buffer[2*i+1]+=(stype)CalcVolL*(MONOSAMP AddModify);                   \
+            WRITELEFTSAMP(READMONOSAMP);                                    \
+            WRITERIGHTSAMP(READMONOSAMP);                                   \
           }                                                                 \
         } else {                                                            \
+          LOOP {                                                            \
           /* mono -> mono */                                                \
-          LOOP {Buffer[i]+=(stype)CalcVolL*(MONOSAMP AddModify);}                  \
+            WRITEMONOSAMP(READMONOSAMP);                                    \
+          }                                                                 \
         }                                                                   \
       }                                                                     \
     }                                                                       \
@@ -240,16 +245,15 @@ void csSoundSourceSoftware::AddToBuffer(void *Memory, unsigned long MemSize) {
 
   if (SoundRender->is16Bits()) {
     #define stype short
-    #define AddModify
+    #define NullSample  0
     ADDTOBUFFER_BITS
     #undef stype
-    #undef AddModify
+    #undef NullSample
   } else {
     #define stype unsigned char
-    #define AddModify -128
+    #define NullSample 128
     ADDTOBUFFER_BITS
     #undef stype
-    #undef AddModify
+    #undef NullSample
   }
-  
 }

@@ -97,24 +97,16 @@ void csSoundDataWave::ConvertChannels(int Channels) {
 
 // @@@ ConvertFreq() : quality loss! Need to use a filter.
 
-// these macros might seem useless to you now, but will be useful
-// to implement the filter. They simply round the sample position so you
-// don't mess up channels because of non-integer positions.
-#define CONVFREQ_GETMONO(x,samppos)     {x=OldData[samppos];}
-#define CONVFREQ_GETSTEREO(x,y,samppos) {   \
-  x=OldData[2*((int)(samppos))];            \
-  y=OldData[2*((int)(samppos))+1];          \
-}
-
 #define CONVERT_FREQ_TYPE(Type,Channels) {                      \
   Type *NewData=new Type[NewNumSamples*Channels];               \
   Type *OldData=(Type*)Data;                                    \
   for (unsigned long i=0;i<NewNumSamples;i++) {                 \
+    int samppos = i/Factor;                                     \
     if (Channels==1) {                                          \
-      CONVFREQ_GETMONO(NewData[i],i*NumSamples/NewNumSamples)   \
+      NewData[i]=OldData[samppos];                              \
     } else {                                                    \
-      CONVFREQ_GETSTEREO(NewData[2*i],NewData[2*i+1],           \
-        i*NumSamples/NewNumSamples)                             \
+      NewData[2*i]=OldData[2*samppos];                          \
+      NewData[2*i+1]=OldData[2*samppos+1];                      \
     }                                                           \
   }                                                             \
   delete[] OldData;                                             \
@@ -124,11 +116,12 @@ void csSoundDataWave::ConvertChannels(int Channels) {
 
 void csSoundDataWave::ConvertFreq(int NewFreq) {
   if (NewFreq==Format.Freq) return;
-  unsigned long NewNumSamples=NumSamples*NewFreq/Format.Freq;
+  float Factor=NewFreq/Format.Freq;
+  unsigned long NewNumSamples=NumSamples*Factor;
   if (Format.Bits==16) {
     CONVERT_FREQ_TYPE(short,Format.Channels);
   } else {
-    CONVERT_FREQ_TYPE(char,Format.Channels);
+    CONVERT_FREQ_TYPE(unsigned char,Format.Channels);
   }
   Format.Freq=NewFreq;
 }
