@@ -312,6 +312,14 @@ private:
     csPlane3* planes, int num_planes,
     csPlane3* diag_planes, int num_diag_planes);
 
+  /**
+   * Draw the outlines of all triangles. This function accepts
+   * the same arguments as glDrawElements() (but GL_TRIANGLES
+   * is assumed).
+   */
+  static void DebugDrawElements (iGraphics2D* g2d, int num_tri3, int* tris,
+  	GLfloat* verts, int color, bool coords3d, bool transformed);
+
 protected:
   friend class csOpenGLHalo;
 
@@ -336,6 +344,9 @@ protected:
    * is unallocated
    */
   GLuint m_fogtexturehandle;
+
+  /// If true then we show edges around all polygons (for debugging).
+  bool debug_edges;
 
   /// Z Buffer mode to use while rendering next polygon.
   csZBufMode z_buf_mode;

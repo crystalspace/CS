@@ -122,6 +122,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   txtmgr = NULL;
   m_fogtexturehandle = 0;
   fps_limit = 0;
+  debug_edges = false;
 
   /// caps will be read from config or reset to defaults during Initialize.
   Caps.CanClip = false;
@@ -997,6 +998,74 @@ void csGraphics3DOGLCommon::Print (csRect * area)
   G2D->Print (area);
 }
 
+void csGraphics3DOGLCommon::DebugDrawElements (iGraphics2D* g2d,
+	int num_tri3, int* tris,
+  	GLfloat* verts, int color, bool coords3d, bool transformed)
+{
+  glPushAttrib (GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
+  	GL_DEPTH_BUFFER_BIT);
+  glDisable (GL_DEPTH_TEST);
+  num_tri3 /= 3;
+  int i;
+  float x1, y1, x2, y2, x3, y3;
+  for (i = 0 ; i < num_tri3 ; i++)
+  {
+    int a = *tris++;
+    int b = *tris++;
+    int c = *tris++;
+    if (!coords3d)
+    {
+      // We have 2D projected coordinates (in 4 floats).
+      a <<= 2;
+      b <<= 2;
+      c <<= 2;
+      x1 = verts[a] / verts[a+3];
+      y1 = ogl_g3d->height-verts[a+1] / verts[a+3];
+      x2 = verts[b] / verts[b+3];
+      y2 = ogl_g3d->height-verts[b+1] / verts[b+3];
+      x3 = verts[c] / verts[c+3];
+      y3 = ogl_g3d->height-verts[c+1] / verts[c+3];
+    }
+    else
+    {
+      a *= 3;
+      b *= 3;
+      c *= 3;
+      csVector3 va, vb, vc;
+      va.Set (verts[a], verts[a+1], verts[a+2]);
+      vb.Set (verts[b], verts[b+1], verts[b+2]);
+      vc.Set (verts[c], verts[c+1], verts[c+2]);
+      if (transformed)
+      {
+        // We have 3D coordinates that are already transformed to camera space
+        // (in 3 floats).
+      }
+      else
+      {
+        // We have 3D coordinates that are not transformed to camera space
+        // (in 3 floats).
+        va = ogl_g3d->o2c.Other2This (va);
+        vb = ogl_g3d->o2c.Other2This (vb);
+        vc = ogl_g3d->o2c.Other2This (vc);
+      }
+      float iz;
+      iz = ogl_g3d->aspect / va.z;
+      x1 = va.x * iz + ogl_g3d->width2;
+      y1 = ogl_g3d->height2 - va.y * iz;
+      iz = ogl_g3d->aspect / vb.z;
+      x2 = vb.x * iz + ogl_g3d->width2;
+      y2 = ogl_g3d->height2 - vb.y * iz;
+      iz = ogl_g3d->aspect / vc.z;
+      x3 = vc.x * iz + ogl_g3d->width2;
+      y3 = ogl_g3d->height2 - vc.y * iz;
+    }
+    g2d->DrawLine (x1, y1, x2, y2, color);
+    g2d->DrawLine (x2, y2, x3, y3, color);
+    g2d->DrawLine (x3, y3, x1, y1, color);
+  }
+  glPopAttrib ();
+}
+
 static float GetAlpha (UInt mode, float m_alpha, bool txt_alpha)
 {
   switch (mode & CS_FX_MASK_MIXMODE)
@@ -1357,6 +1426,15 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   	  queue.tris);
     }
   }
+
+  glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+  glTexCoordPointer (2, GL_FLOAT, 0, queue.gltxt);
+  glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
+  	  queue.tris);
+  if (debug_edges)
+    DebugDrawElements (G2D,
+	queue.num_triangles*3, queue.tris, queue.glverts,
+		txtmgr->FindRGB (255, 255, 255), false, false);
 
 #if 0
   //@@@ TEMPORARILY DISABLED
@@ -2691,7 +2769,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (m_multimat || mesh.do_fog)
     SetGLZBufferFlagsPass2 (z_buf_mode, true);
 
-
   //===========
   // Here we perform multi-texturing.
   //===========
@@ -2810,6 +2887,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
 
+  if (debug_edges)
+    DebugDrawElements (G2D,
+	num_triangles*3, (int*)triangles, (GLfloat*)& work_verts[0],
+		txtmgr->FindRGB (255, 0, 0), true,
+		mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE);
+
   //===========
   // Disable/cleanup all clipping stuff.
   //===========
@@ -2849,7 +2932,8 @@ void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
   int i;
   for (i = 0 ; i < mat_handle->GetNumTextureLayers () ; i++)
   {
-    iTextureHandle* txt_layer_handle = mat_handle->GetTextureLayer (i)->txt_handle;
+    iTextureHandle* txt_layer_handle = mat_handle->GetTextureLayer (i)->
+    	txt_handle;
     if (txt_layer_handle)
       texture_cache->Cache (txt_layer_handle);
   }
@@ -2900,6 +2984,9 @@ bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
       break;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
       break;
+    case G3DRENDERSTATE_EDGES:
+      debug_edges = value;
+      break;
     default:
       return false;
   }
@@ -2935,6 +3022,8 @@ long csGraphics3DOGLCommon::GetRenderState (G3D_RENDERSTATEOPTION op)
       return m_renderstate.gouraud;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
       return 0;
+    case G3DRENDERSTATE_EDGES:
+      return debug_edges;
     default:
       return 0;
   }

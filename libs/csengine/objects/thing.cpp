@@ -587,11 +587,6 @@ csPolygon3D* csThing::IntersectSegment (const csVector3& start,
 void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	iRenderView* d, csZBufMode zMode)
 {
-  //@@@@@@@@ EDGES if (d->GetCallback ())
-  //{
-    //d->CallCallback (CALLBACK_POLYGON, (void*)p);
-    //d->CallCallback (CALLBACK_POLYGON2D, (void*)poly);
-  //}
   iCamera* icam = d->GetCamera ();
 
   if (d->AddedFogInfo ())
@@ -629,28 +624,25 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // the maximum number that a sector is drawn (for mirrors).
     if (po->Draw (poly, p, d))
     {
-      //@@@@ EDGESif (!d->GetCallback ())
-      {
-	if (filtered) poly->DrawFilled (d, p, keep_plane, zMode);
-	if (is_this_fog)
-	  poly->AddFogPolygon (d->GetGraphics3D (), p, keep_plane,
+      if (filtered) poly->DrawFilled (d, p, keep_plane, zMode);
+      if (is_this_fog)
+	poly->AddFogPolygon (d->GetGraphics3D (), p, keep_plane,
 	  	icam->IsMirrored (), d->GetThisSector ()->QueryObject ()
 			->GetID (),
 		CS_FOG_BACK);
-	// Here we z-fill the portal contents to make sure that sprites
-	// that are drawn outside of this portal cannot accidently cross
-	// into the others sector space (we cannot trust the Z-buffer here).
-	if (po->flags.Check (CS_PORTAL_ZFILL))
-	  poly->FillZBuf (d, p, keep_plane);
-      }
+      // Here we z-fill the portal contents to make sure that sprites
+      // that are drawn outside of this portal cannot accidently cross
+      // into the others sector space (we cannot trust the Z-buffer here).
+      if (po->flags.Check (CS_PORTAL_ZFILL))
+	poly->FillZBuf (d, p, keep_plane);
     }
-    else //@@@@@@@@ EDGES if (!d->GetCallback ())
+    else
       poly->DrawFilled (d, p, p->GetPlane (), zMode);
 
     // Cleanup.
     if (keep_plane) keep_plane->DecRef ();
   }
-  else //@@@@@ EDGES if (!d->GetCallback ())
+  else
     poly->DrawFilled (d, p, p->GetPlane (), zMode);
 }
 
@@ -767,10 +759,7 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // @@@ fog not supported yet.
   // @@@ clipping not supported yet.
 
-  //@@@@@@ EDGESif (!d->GetCallback ())
-    d->GetGraphics3D ()->DrawPolygonMesh (mesh);
-  //else
-  // @@@ Provide functionality for visible edges here...
+  d->GetGraphics3D ()->DrawPolygonMesh (mesh);
 
 cleanup:
   delete [] mesh.polygons;
@@ -779,6 +768,9 @@ cleanup:
   delete [] mesh.normal;
   delete [] mesh.poly_texture;
 }
+
+// @@@ BUSY DEBUGGING SOMETHING! DON'T REMOVE UNLESS BUG IS FIXED!
+#define THING_DEBUG 0
 
 void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
@@ -809,6 +801,9 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csVisObjInfo* obj = bsppol->GetOriginator ();
       bool obj_vis = obj->visobj->IsVisible ();
+#if THING_DEBUG
+printf ("VISOBJ=%08lx visible=%d\n", obj->visobj, obj_vis); fflush (stdout);
+#endif
       csPolyTreeBBox* tbb = obj->bbox;
 
       // If the object is already marked visible then we don't have
@@ -819,6 +814,9 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	// is a csPolyTreeBBox instance.
         if (!tbb->IsTransformed ())
 	{
+#if THING_DEBUG
+printf ("tr\n"); fflush (stdout);
+#endif
 	  // The bbox of this object has not yet been transformed
 	  // to camera space.
 	  tbb->World2Camera (camtrans);
@@ -842,9 +840,15 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	       		num_verts, clip, icam->IsMirrored ()) 
 	          && clip->ClipAgainst (d->GetClipper ()) )
             {
+#if THING_DEBUG
+printf ("test polygon\n");
+for (int ii = 0 ; ii < clip->GetNumVertices () ; ii++)
+printf ("  %d %g,%g\n", ii, clip->GetVertices ()[ii].x, clip->GetVertices ()[ii].y);
+fflush (stdout);
+#endif
 	      if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	   clip->GetNumVertices ()))
-	      mark_vis = true;
+	        mark_vis = true;
             }
 	  }
 	}    
@@ -1332,10 +1336,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     }
     rview->CalculateFogMesh (obj_cam, mesh);
 
-    //@@@@@ EDGESif (rview.GetCallback ())
-      //rview.CallCallback (CALLBACK_MESH, (void*)&mesh);
-    //else
-      rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
+    rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
   }
 
   return true;//@@@ RETURN correct vis info
@@ -1650,7 +1651,6 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
     // This thing has no static tree
     UpdateTransformation (camtrans, icam->GetCameraNumber ());
 
-    //@@@@@ EDGESif (rview.GetCallback ()) rview.CallCallback (CALLBACK_THING, (void*)this);
     Stats::polygons_considered += polygons.Length ();
 
     DrawCurves (rview, movable, zMode);
@@ -1681,7 +1681,6 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
     else
       DrawPolygonArray (polygons.GetArray (), polygons.Length (), rview,
       	zMode);
-    //@@@@@ EDGES if (rview.GetCallback ()) rview.CallCallback (CALLBACK_THINGEXIT, (void*)this);
   }
 
   draw_busy--;
@@ -1704,7 +1703,7 @@ bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
   {
     csVector2 orig_triangle[3];
-    /*@@@@@ EDGES if (!d.GetCallback ())*/ d->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
+    d->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
     Stats::polygons_considered += polygons.Length ();
 
     icam->SetMirrored (!icam->IsMirrored ());
@@ -1726,16 +1725,11 @@ bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
         clip->ClipAgainst (d->GetClipper ()))
       {
         p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-	//@@@@ EDGESif (d.GetCallback ())
-	//{
-          //d.CallCallback (CALLBACK_POLYGON, (void*)p);
-          //d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
-	//}
 
         Stats::polygons_drawn++;
 
-	//@@@ EDGESif (!d.GetCallback ())
-          clip->AddFogPolygon (d->GetGraphics3D (), p, p->GetPlane (), icam->IsMirrored (),
+        clip->AddFogPolygon (d->GetGraphics3D (), p, p->GetPlane (),
+		icam->IsMirrored (),
 	  	GetID (), CS_FOG_BACK);
       }
       render_pool->Free (clip);
@@ -1760,21 +1754,16 @@ bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
         clip->ClipAgainst (d->GetClipper ()))
       {
         p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-	//@@@@@ EDGESif (d.GetCallback ())
-	//{
-          //d.CallCallback (CALLBACK_POLYGON, (void*)p);
-          //d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
-	//}
 
         Stats::polygons_drawn++;
 
-        //@@@@ EDGESif (!d.GetCallback ())
-	  clip->AddFogPolygon (d->GetGraphics3D (), p, p->GetPlane (), icam->IsMirrored (),
+	clip->AddFogPolygon (d->GetGraphics3D (), p, p->GetPlane (),
+		icam->IsMirrored (),
 	  	GetID (), CS_FOG_FRONT);
       }
       render_pool->Free (clip);
     }
-    /*@@@@ EDGES if (!d.GetCallback ())*/ d->GetGraphics3D ()->CloseFogObject (GetID ());
+    d->GetGraphics3D ()->CloseFogObject (GetID ());
   }
 
   draw_busy--;
@@ -1783,6 +1772,9 @@ bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
 
 void csThing::RegisterVisObject (iVisibilityObject* visobj)
 {
+#if THING_DEBUG
+printf ("THING=%08lx VISOBJ=%08lx: RegisterVisObject\n", this, visobj); fflush (stdout);
+#endif
   csVisObjInfo* vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
   iShadowCaster* shadcast = QUERY_INTERFACE (visobj, iShadowCaster);
@@ -1800,6 +1792,9 @@ void csThing::RegisterVisObject (iVisibilityObject* visobj)
 
 void csThing::UnregisterVisObject (iVisibilityObject* visobj)
 {
+#if THING_DEBUG
+printf ("THING=%08lx VISOBJ=%08lx: UnregisterVisObject\n", this, visobj); fflush (stdout);
+#endif
   int idx;
   csVisObjInfo* vinf = NULL;
   for (idx = 0 ; idx < visobjects.Length () ; idx++)
@@ -1818,6 +1813,9 @@ void csThing::UnregisterVisObject (iVisibilityObject* visobj)
 void csThing::CheckVisUpdate (csVisObjInfo* vinf)
 {
   iVisibilityObject* visobj = vinf->visobj;
+#if THING_DEBUG
+printf ("THING=%08lx VISOBJ=%08lx: CheckVisUpdate\n", this, visobj); fflush (stdout);
+#endif
   iMovable* movable = visobj->GetMovable ();
   long movablenr = movable->GetUpdateNumber ();
   long shapenr = visobj->GetShapeNumber ();
@@ -1866,6 +1864,9 @@ bool csThing::VisTest (iRenderView* irview)
     for (i = 0 ; i < visobjects.Length () ; i++)
     {
       csVisObjInfo* vinf = (csVisObjInfo*)visobjects[i];
+#if THING_DEBUG
+printf ("THING=%08lx VISOBJ=%08lx: VisTest\n", this, vinf->visobj); fflush (stdout);
+#endif
       // First update visibility information if object has moved or
       // changed shape fundamentally.
       CheckVisUpdate (vinf);

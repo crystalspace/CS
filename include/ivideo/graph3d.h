@@ -249,7 +249,9 @@ enum G3D_RENDERSTATEOPTION
   /// Enable/disable Gouraud shading (parameter is a bool)
   G3DRENDERSTATE_GOURAUDENABLE,
   /// Gamma correction is passed as a fixed 16.16 value
-  G3DRENDERSTATE_GAMMACORRECTION
+  G3DRENDERSTATE_GAMMACORRECTION,
+  /// Enable/disable edge drawing (debugging) (parameter is a bool)
+  G3DRENDERSTATE_EDGES
 };
 
 // Bit flags for iGraphics3D::BeginDraw ()

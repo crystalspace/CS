@@ -744,13 +744,10 @@ void csSector::Draw (iRenderView* rview)
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
-  //@@@@@ EDGESif (rview.GetCallback ())
-  //{
-    //rview.CallCallback (CALLBACK_SECTOR, (void*)this);
-  //}
-  /*else*/ if (HasFog ())
+  if (HasFog ())
   {
-    if ((fogmethod = csEngine::current_engine->fogmethod) == G3DFOGMETHOD_VERTEX)
+    if ((fogmethod = csEngine::current_engine->fogmethod)
+    	== G3DFOGMETHOD_VERTEX)
     {
       csFogInfo* fog_info = new csFogInfo ();
       fog_info->next = rview->GetFirstFogInfo ();
@@ -897,10 +894,9 @@ void csSector::Draw (iRenderView* rview)
   }
 
   // queue all halos in this sector to be drawn.
-  //@@@@ EDGES if (!rview.GetCallback ())
-    for (i = lights.Length () - 1; i >= 0; i--)
-      // Tell the engine to try to add this light into the halo queue
-      csEngine::current_engine->AddHalo ((csLight *)lights.Get (i));
+  for (i = lights.Length () - 1; i >= 0; i--)
+    // Tell the engine to try to add this light into the halo queue
+    csEngine::current_engine->AddHalo ((csLight *)lights.Get (i));
 
   // Handle the fog, if any
   if (fogmethod != G3DFOGMETHOD_NONE)
@@ -932,8 +928,6 @@ void csSector::Draw (iRenderView* rview)
       delete fog_info;
     }
   }
-
-  //@@@@@ EDGES if (rview.GetCallback ()) rview.CallCallback (CALLBACK_SECTOREXIT, (void*)this);
 
   draw_busy--;
 }

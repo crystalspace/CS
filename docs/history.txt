@@ -16,6 +16,15 @@ The history order is reversed so that new features are at the top.
 	- Made a number of iMeshObjectFactory members const.
 	- Added 'const' to a number of mesh object implementations and
 	  state interfaces.
+	- Added G3DRENDERSTATE_EDGES. This can be used by a 3D renderer
+	  to enable edge drawing for debugging purposes.
+	- OpenGL renderer implements this debugging feature (but software
+	  doesn't right now).
+	- Walktest will now enable edge drawing using this new functionality
+	  instead of with callbacks. This means that with OpenGL the 'e'
+	  command works again. Note that there is a difference compared
+	  to the past. The 'e' command with OpenGL will now show the
+	  resulting triangles that every polygon is triangulated too.
 	- Eric Sunshine implemented iGraphics2D::SetMouseCursor() in the OpenGL
 	  and Glide BeOS drivers.  (This method was already implemented in the
 	  software driver.)

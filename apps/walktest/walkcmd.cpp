@@ -943,7 +943,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "fps"))
     csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");
   else if (!strcasecmp (cmd, "edges"))
+  {
     csCommandProcessor::change_boolean (arg, &Sys->do_edges, "do_edges");
+    Sys->myG3D->SetRenderState (G3DRENDERSTATE_EDGES, Sys->do_edges);
+  }
   else if (!strcasecmp (cmd, "do_gravity"))
     csCommandProcessor::change_boolean (arg, &Sys->do_gravity, "do_gravity");
   else if (!strcasecmp (cmd, "inverse_mouse"))
