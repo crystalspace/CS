@@ -34,7 +34,8 @@ csStringID csStringSet::Request (const char *Name)
   csStringID id = Registry.Request (Name);
   if (id == csInvalidStringID)
   {
-    Registry.Register (Name, IDCounter);
+    const char* registered_name = Registry.Register (Name, IDCounter);
+    reverse_mapping.Put (IDCounter, (void*)registered_name);
     IDCounter++;
     return IDCounter-1;
   }
@@ -46,11 +47,12 @@ csStringID csStringSet::Request (const char *Name)
 
 const char* csStringSet::Request (csStringID id)
 {
-  return Registry.Request (id);
+  return (const char*)reverse_mapping.Get (id);
 }
 
 void csStringSet::Clear ()
 {
   Registry.Clear ();
+  reverse_mapping.DeleteAll ();
 }
 

@@ -465,13 +465,13 @@ void csTinyXmlNode::RemoveAttributes ()
 void csTinyXmlNode::SetAttribute (const char* name, const char* value)
 {
   TiXmlElement* el = node->ToElement ();
-  if (el) el->SetAttribute (name, value);
+  if (el) el->SetAttribute (el->GetDocument (), name, value);
 }
 
 void csTinyXmlNode::SetAttributeAsInt (const char* name, int value)
 {
   TiXmlElement* el = node->ToElement ();
-  if (el) el->SetAttribute (name, value);
+  if (el) el->SetAttribute (el->GetDocument (), name, value);
 }
 
 void csTinyXmlNode::SetAttributeAsFloat (const char* name, float value)
@@ -481,7 +481,7 @@ void csTinyXmlNode::SetAttributeAsFloat (const char* name, float value)
   {
     char v[64];
     sprintf (v, "%g", value);
-    el->SetAttribute (name, v);
+    el->SetAttribute (el->GetDocument (), name, v);
   }
 }
 

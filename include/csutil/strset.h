@@ -33,6 +33,7 @@
 class csStringSet
 {
   csStringHash Registry;
+  csHashMap reverse_mapping;	// Mapping from ID to string.
   csStringID IDCounter;
 public:
   /// Constructor

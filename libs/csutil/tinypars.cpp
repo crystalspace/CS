@@ -87,12 +87,10 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p )
 }
 #endif
 
-const char* TiXmlBase::ReadName( const char* p, char** name)
+const char* TiXmlBase::ReadName( const char* p, char* name)
 {
-	char buf[1000];
-	char* pname = buf;
+	char* pname = name;
 	*pname = 0;
-	int len = 0;
 	//assert( p );
 
 	// Names start with letters or underscores.
@@ -109,16 +107,12 @@ const char* TiXmlBase::ReadName( const char* p, char** name)
 						 || *p == ':' ) )
 		{
 			*pname++ = *p;
-			len++;
-			//CS_ASSERT (len <= 1000);
 			++p;
 		}
 		*pname = 0;
-		*name = new char[len+1];
-		strcpy (*name, buf);
 		return p;
 	}
-	*name = NULL;
+	*name = 0;
 	return 0;
 }
 
@@ -721,7 +715,7 @@ const char* TiXmlElement::Parse( const char* p )
 				if ( document ) document->SetError( TIXML_ERROR_PARSING_ELEMENT );
 				return 0;
 			}
-			SetAttribute( attrib.Name(), attrib.Value() );
+			SetAttributeRegistered (attrib.Name(), attrib.Value());
 		}
 	}
 	attributeSet.set.ShrinkBestFit ();
@@ -896,12 +890,19 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 	if ( !p || !*p ) return 0;
 
 	// Read the name, the '=' and the value.
-	p = TiXmlBase::ReadName( p, &name );
+	char inname[1000];
+	p = TiXmlBase::ReadName( p, inname );
+
 	if ( !p || !*p )
 	{
 		if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
 		return 0;
 	}
+
+	csStringID name_id = document->strings.Request (inname);
+	name = document->strings.Request (name_id);
+	//printf ("inname=%s name_id=%d name=%s\n", inname, name_id, name); fflush (stdout);
+
 	p = TiXmlBase::SkipWhiteSpace( p );
 	if ( !p || !*p || *p != '=' )
 	{

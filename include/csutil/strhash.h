@@ -49,9 +49,10 @@ public:
   ~csStringHash ();
 
   /**
-   * Register a string with an id.
+   * Register a string with an id. Returns the pointer to the copy
+   * of the string in this hash.
    */
-  void Register (const char *s, csStringID id);
+  const char* Register (const char *s, csStringID id);
 
   /**
    * Request the ID for the given string. Return csInvalidStringID

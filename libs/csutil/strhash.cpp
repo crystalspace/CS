@@ -39,7 +39,7 @@ csStringHash::~csStringHash ()
   Clear ();
 }
 
-void csStringHash::Register (const char *Name, csStringID id)
+const char* csStringHash::Register (const char *Name, csStringID id)
 {
   csRegisteredString *itf;
   csHashKey hkey = csHashCompute (Name);
@@ -51,7 +51,7 @@ void csStringHash::Register (const char *Name, csStringID id)
     if (strcmp (itf->String, Name)==0)
     {
       itf->ID = id;
-      return;
+      return itf->String;
     }
   }
 
@@ -60,6 +60,7 @@ void csStringHash::Register (const char *Name, csStringID id)
   itf->ID = id;
 
   Registry.Put (hkey, itf);
+  return itf->String;
 }
 
 csStringID csStringHash::Request (const char *Name)

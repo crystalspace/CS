@@ -480,17 +480,19 @@ const char * TiXmlElement::Attribute( const char * name, int* i ) const
 }
 
 
-void TiXmlElement::SetAttribute( const char * name, int val )
+void TiXmlElement::SetAttribute( TiDocument* document,
+	const char * name, int val )
 {	
 	char buf[64];
 	sprintf( buf, "%d", val );
-	SetAttribute( name, buf );
+	SetAttribute( document, name, buf );
 }
 
 
-void TiXmlElement::SetAttribute( const char * name, const char * value )
+void TiXmlElement::SetAttributeRegistered (const char * reg_name,
+	const char * value)
 {
-	int nodeidx = attributeSet.Find (name);
+	int nodeidx = attributeSet.FindExact (reg_name);
 	if (nodeidx != -1)
 	{
 		attributeSet.set[nodeidx].SetValue (value);
@@ -499,8 +501,16 @@ void TiXmlElement::SetAttribute( const char * name, const char * value )
 
 	TiDocumentAttribute at;
 	int idx = attributeSet.set.Push (at);
-	attributeSet.set[idx].SetName (name);
+	attributeSet.set[idx].SetName (reg_name);
 	attributeSet.set[idx].SetValue (value);
+}
+
+void TiXmlElement::SetAttribute (TiDocument* document,
+	const char * name, const char * value)
+{
+	csStringID name_id = document->strings.Request (name);
+	const char* reg_name = document->strings.Request (name_id);
+	SetAttributeRegistered (reg_name, value);
 }
 
 void TiXmlElement::Print( FILE* cfile, int depth ) const
@@ -598,7 +608,7 @@ TiDocumentNode* TiXmlElement::Clone() const
 	for (i = 0 ; i < attributeSet.set.Length () ; i++)
 	{
 	  const TiDocumentAttribute& attrib = attributeSet.set[i];
-	  clone->SetAttribute (attrib.Name (), attrib.Value ());
+	  clone->SetAttributeRegistered (attrib.Name (), attrib.Value ());
 	}
 
 	TiDocumentNode* node = 0;
@@ -967,6 +977,16 @@ int TiDocumentAttributeSet::Find (const char * name) const
   for (i = 0 ; i < set.Length () ; i++)
   {
     if (strcmp (set[i].name, name) == 0) return i;
+  }
+  return -1;
+}
+
+int TiDocumentAttributeSet::FindExact (const char * reg_name) const
+{
+  int i;
+  for (i = 0 ; i < set.Length () ; i++)
+  {
+    if (set[i].name == reg_name) return i;
   }
   return -1;
 }

@@ -47,6 +47,7 @@ distribution.
 #include "csutil/scfstr.h"
 #include "csutil/array.h"
 #include "csutil/util.h"
+#include "csutil/strset.h"
 #undef FILE
 #define FILE iString
 #define fprintf new_fprintf
@@ -191,7 +192,7 @@ public:
 		or 0 if the function has an error.
 	*/
 	static const char* ReadName( const char* p, TIXML_STRING* name );
-	static const char* ReadName( const char* p, char** name );
+	static const char* ReadName( const char* p, char* name );
 
 	/*	Reads text. Returns a pointer past the given end tag.
 		Wickedly complex options, but it keeps the (sensitive) code in one place.
@@ -544,14 +545,14 @@ class TiDocumentAttribute
 public:
 	/// Construct an empty attribute.
 	TiDocumentAttribute() { name = NULL; value = NULL; }
-	~TiDocumentAttribute () { delete[] name; delete[] value; }
+	~TiDocumentAttribute () { delete[] value; }
 
 	const char* Name()  const		{ return name; }		///< Return the name of this attribute.
 	const char* Value() const		{ return value; }		///< Return the value of this attribute.
 	const int       IntValue() const;									///< Return the value of this attribute, converted to an integer.
 	const double	DoubleValue() const;								///< Return the value of this attribute, converted to a double.
 
-	void SetName( const char* _name )	{ name = csStrNew (_name); }				///< Set the name of this attribute.
+	void SetName( const char* _name )	{ name = _name; }				///< Set the name of this attribute.
 	void SetValue( const char* _value )	{ value = csStrNew (_value); }				///< Set the value.
 
 	void SetIntValue( int value );										///< Set the value from an integer.
@@ -582,7 +583,7 @@ public:
 	void StreamOut( TIXML_OSTREAM * out ) const;
 
 private:
-	char* name;
+	const char* name;
 	char* value;
 };
 
@@ -606,6 +607,7 @@ public:
 
 	TiDocumentAttributeSet() : set (0, 4) { }
 	int Find (const char * name) const;
+	int FindExact (const char * reg_name) const;
 };
 
 
@@ -646,33 +648,14 @@ public:
 	/** Sets an attribute of name to a given value. The attribute
 		will be created if it does not exist, or changed if it does.
 	*/
-	void SetAttribute( const char* name, const char * value );
-
-    #ifdef TIXML_USE_STL
-	const char* Attribute( const std::string& name ) const				{ return Attribute( name.c_str() ); }
-	const char* Attribute( const std::string& name, int* i ) const		{ return Attribute( name.c_str(), i ); }
-
-	/// STL std::string form.
-	void SetAttribute( const std::string& name, const std::string& value )	
-	{	
-		StringToBuffer n( name );
-		StringToBuffer v( value );
-		if ( n.buffer && v.buffer )
-			SetAttribute (n.buffer, v.buffer );	
-	}	
-	///< STL std::string form.
-	void SetAttribute( const std::string& name, int value )	
-	{	
-		StringToBuffer n( name );
-		if ( n.buffer )
-			SetAttribute (n.buffer, value);	
-	}	
-	#endif
+	void SetAttribute(TiDocument* document,
+		const char* reg_name, const char * value );
+	void SetAttributeRegistered ( const char * reg_name, const char* value);
 
 	/** Sets an attribute of name to a given value. The attribute
 		will be created if it does not exist, or changed if it does.
 	*/
-	void SetAttribute( const char * name, int value );
+	void SetAttribute( TiDocument* document, const char * name, int value );
 
 	/// Get number of attributes.
 	int GetAttributeCount () const { return attributeSet.set.Length (); }
@@ -927,6 +910,9 @@ protected:
 class TiDocument : public TiDocumentNode
 {
 public:
+	/// Interned strings.
+	csStringSet strings;
+
 	/// Create an empty document, that has no name.
 	TiDocument();
 	/// Create a document with a name. The name of the document is also the filename of the xml.
