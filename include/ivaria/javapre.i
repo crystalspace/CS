@@ -29,8 +29,8 @@
 %include "enumsimple.swg"
 #endif
 
-// Following are declared as constants here to prevent javac
-// complaining about finding a 'long' where an 'int' is expected.
+// Following are declared as constants here to prevent javac complaining about
+// finding a 'long' where an 'int' is expected.
 %constant int CS_CRYSTAL_PROTOCOL = 0x43533030;
 %constant int CS_MUSCLE_PROTOCOL = 0x504d3030;
 %constant int CS_XML_PROTOCOL = 0x584d4d30;
@@ -112,7 +112,7 @@
 %extend csReversibleTransform
 {
   static csTransform mulrev (const csTransform& t1,
-	                     const csReversibleTransform& t2)
+                             const csReversibleTransform& t2)
   { return t1 * t2; } 
 }
 #endif // CS_MINI_SWIG
@@ -120,7 +120,6 @@
 // iutil/event.h
 %{
     // Workaround for bug in SWIG 1.3.19: reversed accessor functions!
-
     #define iEvent_get_Key iEvent_Key_get
     #define iEvent_get_Mouse iEvent_Mouse_get
     #define iEvent_get_Joystick iEvent_Joystick_get
@@ -128,41 +127,40 @@
 %}
 
 %{
-jobject
-_csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
-    const char * clazz, JNIEnv * jenv)
+jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
+    const char* clazz, JNIEnv* jenv)
 {
-    if (!ref.IsValid())
-      return 0;
-    ref->IncRef();
-    jlong cptr = 0;
-    *(void **)&cptr = ptr; 
-    jclass cls = jenv->FindClass(clazz);
-    jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
-    return jenv->NewObject(cls, mid, cptr, false);
+  if (!ref.IsValid())
+    return 0;
+  ref->IncRef();
+  jlong cptr = 0;
+  *(void **)&cptr = ptr; 
+  jclass cls = jenv->FindClass(clazz);
+  jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
+  return jenv->NewObject(cls, mid, cptr, false);
 }
 %}
 
 /*
-	ptr   : either a csRef<type> or csPtr<type>
-	name  : type name, e.g. "iEngine *"
-	type  : type of pointer
-	clazz : class name, e.g. "com/crystalspace/iEngine"
+  ptr   : either a csRef<type> or csPtr<type>
+  name  : type name, e.g. "iEngine *"
+  type  : type of pointer
+  clazz : class name, e.g. "com/crystalspace/iEngine"
 
-	In actual practice, 'ptr' is really of type SwigValueWrapper<csRef<T>>
-	or SwigValueWrapper<csPtr<T>>.  The SwigValueWrapper wrapper is added
-	automatically by Swig and is outside of our control.  SwigValueWrapper
-	has a cast operator which will return csRef<T>& (or csPtr<T>&), which
-	should allow us to assign a SwigValueWrapper to a csRef.
-	Unfortunately, unlike other compilers, however, MSVC considers
-	assignment of SwigValueWrapper to csRef ambiguous, so we must manually
-	invoke SwigValueWrapper's operator T& before actually assigning the
-	value to a csRef.  This hack is noted by "* explicit cast *".
+  In actual practice, 'ptr' is really of type SwigValueWrapper<csRef<T>> or
+  SwigValueWrapper<csPtr<T>>.  The SwigValueWrapper wrapper is added
+  automatically by Swig and is outside of our control.  SwigValueWrapper has a
+  cast operator which will return csRef<T>& (or csPtr<T>&), which should allow
+  us to assign a SwigValueWrapper to a csRef.  Unfortunately, unlike other
+  compilers, however, MSVC considers assignment of SwigValueWrapper to csRef
+  ambiguous, so we must manually invoke SwigValueWrapper's operator T& before
+  actually assigning the value to a csRef.  This hack is noted by "* explicit
+  cast *".
 */
 %define TYPEMAP_OUT_csRef_BODY(ptr, name, type, wrapper, clazz)
-	csRef<type> ref((wrapper<type>&)ptr); /* explicit cast */
-	$result = _csRef_to_Java(csRef<iBase>(
-		(type *)ref), (void *)(type *)ref, name, clazz, jenv);
+  csRef<type> ref((wrapper<type>&)ptr); /* explicit cast */
+  $result = _csRef_to_Java(csRef<iBase>(
+    (type*)ref), (void*)(type*)ref, name, clazz, jenv);
 %enddef
 
 #undef TYPEMAP_OUT_csRef
@@ -192,20 +190,15 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
   %typemap(javaout) csPtr<T> { return $jnicall; }
 %enddef
 
-
 #undef TYPEMAP_OUT_csWrapPtr
 %define TYPEMAP_OUT_csWrapPtr
   %typemap(out) csWrapPtr
   {
     void * ptr = 0;
     if ($1.VoidPtr)
-    {
       ptr = $1.VoidPtr;
-    }
     else
-    {
       ptr = iBase__DynamicCast((iBase *)$1.Ref, $1.Type).VoidPtr;
-    }
     //ref->IncRef();
     if (ptr == 0)
       $result = 0;
@@ -304,38 +297,38 @@ ICONFIGMANAGER_JAVACODE
 // argc-argv handling
 %typemap(in) (int argc, char const * const argv[])
 {
-    $1 = jenv->GetArrayLength($input) + 1; // +1 for synthesized argv[0].
-    $2 = (char **) malloc(($1 + 1) * sizeof(char *));
-    /* C/C++ functions accepting argc/argv[] expect argv[0] to be the program
-       or script name, but Java's `main(String[] args)' array contains only
-       program arguments. We must, therefore, prepend our own argv[0] to the
-       incoming array. Unfortunately, there does not seem to be any way of
-       determining the location of the .class file in which main() was invoked,
-       so we instead just use "./csjava" as argv[0]. We purposely use the "./"
-       notation so that functions, such as csGetAppPath(), which interpret
-       argv[0] will consider the "current working directory" as the location of
-       the program. (This may not be the best solution for synthesizing
-       argv[0], but it is better than sending a bogus argv[] array to the C/C++
-       function.)
-    */
-    $2[0] = strdup("./csjava");
-    /* make a copy of each string */
-    int i;
-    for (i = 1; i < $1; ++i) {
-        jstring j_string = (jstring)jenv->GetObjectArrayElement($input, i - 1);
-        const char * c_string = jenv->GetStringUTFChars(j_string, 0);
-        $2[i] = strdup(c_string);
-        jenv->ReleaseStringUTFChars(j_string, c_string);
-        jenv->DeleteLocalRef(j_string);
-    }
-    $2[i] = 0;
+  $1 = jenv->GetArrayLength($input) + 1; // +1 for synthesized argv[0].
+  $2 = (char **) malloc(($1 + 1) * sizeof(char *));
+  /* C/C++ functions accepting argc/argv[] expect argv[0] to be the program
+     or script name, but Java's `main(String[] args)' array contains only
+     program arguments. We must, therefore, prepend our own argv[0] to the
+     incoming array. Unfortunately, there does not seem to be any way of
+     determining the location of the .class file in which main() was invoked,
+     so we instead just use "./csjava" as argv[0]. We purposely use the "./"
+     notation so that functions, such as csGetAppPath(), which interpret
+     argv[0] will consider the "current working directory" as the location of
+     the program. (This may not be the best solution for synthesizing
+     argv[0], but it is better than sending a bogus argv[] array to the C/C++
+     function.)
+  */
+  $2[0] = strdup("./csjava");
+  /* make a copy of each string */
+  int i;
+  for (i = 1; i < $1; ++i) {
+    jstring j_string = (jstring)jenv->GetObjectArrayElement($input, i - 1);
+    const char * c_string = jenv->GetStringUTFChars(j_string, 0);
+    $2[i] = strdup(c_string);
+    jenv->ReleaseStringUTFChars(j_string, c_string);
+    jenv->DeleteLocalRef(j_string);
+  }
+  $2[i] = 0;
 }
 
 %typemap(freearg) (int argc, char const * const argv[])
 {
-    for (int i = 0; i < $1 - 1; ++i)
-        free($2[i]);
-    free($2);
+  for (int i = 0; i < $1 - 1; ++i)
+    free($2[i]);
+  free($2);
 }
 
 %typemap(jni) (int argc, char const * const argv []) "jobjectArray"
