@@ -26,6 +26,7 @@
 
 class csColor;
 class csRandomGen;
+class csString;
 struct iMaterialWrapper;
 struct iMeshObject;
 struct iMeshWrapper;
@@ -75,11 +76,16 @@ struct iSpriteCal3DSocket : public iBase
   /// Get the transform of the main mesh
   virtual csReversibleTransform GetTransform () const = 0;
 
-    virtual size_t GetSecondaryCount () const = 0;
-    virtual iMeshWrapper * GetSecondaryMesh (size_t index) = 0;
-    virtual csReversibleTransform GetSecondaryTransform (size_t index) = 0;
-    virtual void AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans) = 0;
-    virtual void DetachSecondary (const csString & mesh_name) = 0;
+  /// Get a count of the secondary attached meshes (this doesn't include the primary mesh)
+  virtual size_t GetSecondaryCount () const = 0;
+  /// Get the attached secondary mesh at the given index
+  virtual iMeshWrapper * GetSecondaryMesh (size_t index) = 0;
+  /// Get the transform of the attached secondary mesh at the given index
+  virtual csReversibleTransform GetSecondaryTransform (size_t index) = 0;
+  /// Attach a secondary mesh
+  virtual void AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans) = 0;
+  /// Detach a secondary mesh
+  virtual void DetachSecondary (const csString & mesh_name) = 0;
 };
 
 
