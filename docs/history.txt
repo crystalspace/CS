@@ -1,6 +1,66 @@
 The history order has been reversed so that new features are at the top.
 
+6-Aug-2000
+	- Jorrit committed the engine plugin which he forgot to do
+	  some time ago. Now simplep should really work.
+	- Wouter Wijngaards did the following changes:
+	    - Make install, and make uninstall for Linux/unices should
+	      work, i.e. copy files and delete files. The install is not
+	      used yet. Also an extremely portable app 'uninst' is added,
+	      that will uninstall. It will also delete empty directories
+	      that held files.
+	      install.mak will install files in several places. In each
+	      apps/libs/plugins.mak file you can add files for
+	      installation. I have already modified all makefiles
+	      correspondingly (for all apps, libs, plugins).
+	      Places you can add for installation:
+		TO_INSTALL.ROOT : files will be added in the
+				$(INSTALL_DIR)/ dir itself.
+		TO_INSTALL.EXE  : files will be put in bin/
+		TO_INSTALL.DATA : files will be put in data/
+		TO_INSTALL.CONFIG: files will be put in data/config/
+		TO_INSTALL.STATIC_LIBS: files will be put in lib/
+		TO_INSTALL.DYNAMIC_LIBS: files could be put in lib/, but
+				could also end up in a platform specific
+				location (e.g. System folder).
+	      TO_INSTALL.INCLUDE does not exist, the entire include/
+	      hierarchy is copied to include/. (max 3 levels deep now)
+	      The INSTALL_DIR is autodetected at 'make <platform>' time,
+	      and saved in config.mak. (It can be overridden, e.g. by make
+	      linux INSTALL_DIR=/usr/crystal) also it can be overridden
+	      when make install is called (or make uninstall)
+	- Norman Kramer fixed metademo so that it works again.
+	- Norman fixed the ndrvdemo and nstp applications.
+	- Norman fixed perftest.
+	- Norman fixed phyztest.
+	- Norman fixed simplep.
+	- Norman fixed wscs3d.
+5-Aug-2000
+	- Wouter Wijngaards did the following:
+	  - install safer for people that do not update config.mak.
+	  - Beginnings of a make install option. Xfree86 (fullscreen
+	    extension) is detected now for unix.
+	- Samuel Humphreys did the following:
+	  - simple.cpp: two Nothing events were emitted each frame, now
+	    only one.
+	  - light.cpp : an unitialised data member, caused walktest to
+	    crash with 'dellights'.
+	- Norman Kramer disabled deleting of the csTextureHandle in
+	  csMaterial since this is done when the csTextureList is deleted
+	  (and crashed when MaterialList was deleted thereafter).
+	- Norman also added DecRef of VFS in destructor of csapp.
+	- Norman removed G3D from funcon since it is now in cscon.
+	- Norman also added IncRef to G2D in cscon, so it wont crash when
+	  its decrefed.
+	- Norman added x11-keys.cpp to the unxglide canvas makefiles.
 4-Aug-2000
+	- Thomas Hieber further extended the new csgame CD system.
+	  Still not functional at all. But given the current CVS status,
+	  I guess I will stop working on it anyway. I think it makes
+	  sense to wait for the release of 1.0 so these permanent API
+	  changes will come to an end, or at least slow down a bit. I
+	  guess I don't have enough time, to keep running after these
+	  changes _and_ add new code.
 	- Wouter Wijngaards fixed unix.cpp for usleep.
 	- Alex Pfaffe fixed various things in the landscape engine
 	  again. Now it is mostly working again except for a few small
