@@ -26,9 +26,9 @@
 int csPrintf(char const* str, ...)
 {
   va_list args;
-  va_start(args, str);
+  va_start (args, str);
   int const rc = vprintf(str, args);
-  va_end(args);
+  va_end (args);
   return rc;
 }
 
@@ -37,3 +37,9 @@ int csPrintfV(char const* str, va_list args)
 {
   return vprintf(str, args);
 }
+
+int csFPutErr (const char* str)
+{
+  return fputs (str, stderr);
+}
+

@@ -10,7 +10,6 @@ case WIN32 :
 		findlib.cpp
 		getopt.cpp
 		pluginpaths.cpp
-		printf.cpp
 		resdir.cpp
 		runloop.cpp ;
 case MACOS_X :

@@ -192,7 +192,7 @@ bool csReporterListener::Report (iReporter*, int severity,
   if (dest_stdout[severity])
     csPrintf ("%s", msg.GetData());
   if (dest_stderr[severity])
-    fputs (msg.GetData(), stderr);
+    csFPutErr (msg.GetData());
   if (dest_console[severity] && console)
     console->PutText ("%s", msg.GetData());
   if (dest_alert[severity] && nativewm)

@@ -81,10 +81,22 @@ bool csPlatformStartup(iObjectRegistry*);
  */
 bool csPlatformShutdown(iObjectRegistry*);
 
-/// CS version of printf
+/**
+ * CS version of printf.
+ * It accepts UTF-8 strings and converts it, if required, to the platforms
+ * native codepage.
+ */
 int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
-/// CS version of vprintf
+/**
+ * CS version of vprintf.
+ * \copydoc csPrintf()
+ */
 int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
+/**
+ * CS version of fputs (&lt;str&gt;, stderr). 
+ * \copydoc csPrintf()
+ */
+int csFPutErr (const char* str);
 
 /**
  * Get the current tick count. Warning! Do NOT use this function for

@@ -20,31 +20,12 @@
 #include "cssys/csunicode.h"
 #include "csutil/util.h"
 #include "csutil/snprintf.h"
+#include "cssys/sysfunc.h"
 
 #include <windows.h>
 #include "cssys/win32/wintools.h"
 
-#ifdef fputs
-#undef fputs
-#endif
-
-#ifdef vprintf
-#undef vprintf
-#endif
-
-#ifdef printf
-#undef printf
-#endif
-
-#ifdef vfprintf
-#undef vfprintf
-#endif
-
-#ifdef fprintf
-#undef fprintf
-#endif
-
-int _cs_fputs (const char* string, FILE* stream)
+static int _cs_fputs (const char* string, FILE* stream)
 {
   int rc;
   if ((stream == stdout) || (stream == stderr))
@@ -70,7 +51,7 @@ int _cs_fputs (const char* string, FILE* stream)
   return rc;
 }
 
-int _cs_vfprintf (FILE* stream, const char* format, va_list args)
+static int _cs_vfprintf (FILE* stream, const char* format, va_list args)
 {
   int rc;
 
@@ -95,26 +76,24 @@ int _cs_vfprintf (FILE* stream, const char* format, va_list args)
   return ((rc >= 0) ? (newsize - 1) : -1);
 }
 
-int _cs_fprintf (FILE* stream, const char* format, ...)
+// Replacement for printf(); exact same prototype/functionality as printf()
+int csPrintf(char const* str, ...)
 {
   va_list args;
-  va_start (args, format);
-  int const rc = _cs_vfprintf (stream, format, args);
-  va_end (args);
+  va_start(args, str);
+  int const rc = _cs_vfprintf (stdout, str, args);
+  va_end(args);
   return rc;
 }
 
-int _cs_vprintf (const char* format, va_list args)
+// Replacement for vprintf()
+int csPrintfV(char const* str, va_list args)
 {
-  return _cs_vfprintf (stdout, format, args);
+  return _cs_vfprintf (stdout, str, args);
 }
 
-int _cs_printf (const char* format, ...)
+int csFPutErr (const char* str)
 {
-  va_list args;
-  va_start (args, format);
-  int const rc = _cs_vfprintf (stdout, format, args);
-  va_end (args);
-  return rc;
+  return _cs_fputs (str, stderr);
 }
 
