@@ -2,6 +2,7 @@
     Crystal Space utility library: MD5 class
     Original C code written by L. Peter Deutsch (see below)
     Adapted for Crystal Space by Michael Dale Long
+    Completely re-engineered by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -41,7 +42,6 @@
   ghost@aladdin.com
 
  */
-/*$Id$ */
 /*
   Independent implementation of MD5 (RFC 1321).
 
@@ -49,123 +49,22 @@
   It is derived directly from the text of the RFC and not from the
   reference implementation.
 
-  The original and principal author of md5.h is L. Peter Deutsch
+  The original and principal author of md5.c is L. Peter Deutsch
   <ghost@aladdin.com>.  Other authors are noted in the change history
   that follows (in reverse chronological order):
 
   1999-11-04 lpd Edited comments slightly for automatic TOC extraction.
-  1999-10-18 lpd Fixed typo in header comment (ansi2knr rather than md5);
-	added conditionalization for C++ compilation from Martin
-	Purschke <purschke@bnl.gov>.
+  1999-10-18 lpd Fixed typo in header comment (ansi2knr rather than md5).
   1999-05-03 lpd Original version.
  */
 
 #include "sysdef.h"
-#include "csutil/csbase.h"
 #include "csutil/csmd5.h"
 
-csMD5::csMD5(char *buffer)
-{
-  if(buffer)
-    SetBuffer(buffer);
-}
-
-void csMD5::SetBuffer(char *buffer)
-{
-  md5_state_t state;
-
-  md5_init(&state);
-  md5_append(&state, (const md5_byte_t *)buffer, strlen(buffer));
-  md5_finish(&state, digest);
-}
-
-unsigned char *csMD5::GetHash()
-{
-  return digest;
-}
-
-unsigned int csMD5::GetReducedHash()
-{
-  unsigned int a, b, c, d;
-  
-  // Convert the hash into four unsigned integers
-  a = *(REINTERPRET_CAST(unsigned int *) (&digest[0]));
-  b = *(REINTERPRET_CAST(unsigned int *) (&digest[4]));
-  c = *(REINTERPRET_CAST(unsigned int *) (&digest[8]));
-  d = *(REINTERPRET_CAST(unsigned int *) (&digest[12]));
-
-  // Return a "mesh" of the 4 values
-  return (a * b * c * d);
-
-}
-
-void csMD5::md5_init(md5_state_t *pms)
-{
-    pms->count[0] = pms->count[1] = 0;
-    pms->abcd[0] = 0x67452301;
-    pms->abcd[1] = 0xefcdab89;
-    pms->abcd[2] = 0x98badcfe;
-    pms->abcd[3] = 0x10325476;
-}
-
-void csMD5::md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
-{
-    const md5_byte_t *p = data;
-    int left = nbytes;
-    int offset = (pms->count[0] >> 3) & 63;
-    md5_word_t nbits = (md5_word_t)(nbytes << 3);
-
-    if (nbytes <= 0)
-	return;
-
-    /* Update the message length. */
-    pms->count[1] += nbytes >> 29;
-    pms->count[0] += nbits;
-    if (pms->count[0] < nbits)
-	pms->count[1]++;
-
-    /* Process an initial partial block. */
-    if (offset) {
-	int copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
-
-	memcpy(pms->buf + offset, p, copy);
-	if (offset + copy < 64)
-	    return;
-	p += copy;
-	left -= copy;
-	md5_process(pms, pms->buf);
-    }
-
-    /* Process full blocks. */
-    for (; left >= 64; p += 64, left -= 64)
-	md5_process(pms, p);
-
-    /* Process a final partial block. */
-    if (left)
-	memcpy(pms->buf, p, left);
-}
-
-void csMD5::md5_finish(md5_state_t *pms, md5_byte_t digest[16])
-{
-    static const md5_byte_t pad[64] = {
-	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-    md5_byte_t data[8];
-    int i;
-
-    /* Save the length before padding. */
-    for (i = 0; i < 8; ++i)
-	data[i] = (md5_byte_t)(pms->count[i >> 2] >> ((i & 3) << 3));
-    /* Pad to 56 bytes mod 64. */
-    md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
-    /* Append the length. */
-    md5_append(pms, data, 8);
-    for (i = 0; i < 16; ++i)
-	digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
-}
+// T-values were computed with this code:
+//   for (int i = 1; i <= 64; ++i) {
+//	unsigned long v = (unsigned long)(4294967296.0 * fabs(sin((double)i)));
+//	printf("#define T%d 0x%08lx\n", i, v); }
 
 #define T1 0xd76aa478
 #define T2 0xe8c7b756
@@ -239,6 +138,19 @@ void csMD5::md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
 	c = pms->abcd[2], d = pms->abcd[3];
     md5_word_t t;
 
+#if defined(CS_BIG_ENDIAN)
+    /*
+     * On big-endian machines, we must arrange the bytes in the right
+     * order.  (This also works on machines of unknown byte order.)
+     */
+    md5_word_t X[16];
+    const md5_byte_t *xp = data;
+    int i;
+
+    for (i = 0; i < 16; ++i, xp += 4)
+	X[i] = xp[0] + (xp[1] << 8) + (xp[2] << 16) + (xp[3] << 24);
+
+#else // !CS_BIG_ENDIAN
     /*
      * On little-endian machines, we can process properly aligned data
      * without copying it.
@@ -254,6 +166,8 @@ void csMD5::md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
 	memcpy(xbuf, data, 64);
 	X = xbuf;
     }
+#endif
+
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
     /* Round 1. */
@@ -367,4 +281,87 @@ void csMD5::md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
     pms->abcd[1] += b;
     pms->abcd[2] += c;
     pms->abcd[3] += d;
+}
+
+void csMD5::md5_init(md5_state_t *pms)
+{
+    pms->count[0] = pms->count[1] = 0;
+    pms->abcd[0] = 0x67452301;
+    pms->abcd[1] = 0xefcdab89;
+    pms->abcd[2] = 0x98badcfe;
+    pms->abcd[3] = 0x10325476;
+}
+
+void csMD5::md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
+{
+    const md5_byte_t *p = data;
+    int left = nbytes;
+    int offset = (pms->count[0] >> 3) & 63;
+    md5_word_t nbits = (md5_word_t)(nbytes << 3);
+
+    if (nbytes <= 0)
+	return;
+
+    /* Update the message length. */
+    pms->count[1] += nbytes >> 29;
+    pms->count[0] += nbits;
+    if (pms->count[0] < nbits)
+	pms->count[1]++;
+
+    /* Process an initial partial block. */
+    if (offset) {
+	int copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
+
+	memcpy(pms->buf + offset, p, copy);
+	if (offset + copy < 64)
+	    return;
+	p += copy;
+	left -= copy;
+	md5_process(pms, pms->buf);
+    }
+
+    /* Process full blocks. */
+    for (; left >= 64; p += 64, left -= 64)
+	md5_process(pms, p);
+
+    /* Process a final partial block. */
+    if (left)
+	memcpy(pms->buf, p, left);
+}
+
+void csMD5::md5_finish(md5_state_t *pms, md5_byte_t digest[16])
+{
+    static const md5_byte_t pad[64] = {
+	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    md5_byte_t data[8];
+    int i;
+
+    /* Save the length before padding. */
+    for (i = 0; i < 8; ++i)
+	data[i] = (md5_byte_t)(pms->count[i >> 2] >> ((i & 3) << 3));
+    /* Pad to 56 bytes mod 64. */
+    md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+    /* Append the length. */
+    md5_append(pms, data, 8);
+    for (i = 0; i < 16; ++i)
+	digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
+}
+
+csMD5::Digest csMD5::Encode(const void* data, int nbytes)
+{
+  Digest digest;
+  md5_state_t state;
+  md5_init(&state);
+  md5_append(&state, (const md5_byte_t*)data, nbytes);
+  md5_finish(&state, digest.data);
+  return digest;
+}
+
+csMD5::Digest csMD5::Encode(const char* s)
+{
+  return Encode(s, strlen(s));
 }

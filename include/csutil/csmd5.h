@@ -2,6 +2,7 @@
     Crystal Space utility library: MD5 class
     Original C code written by L. Peter Deutsch (see below)
     Adapted for Crystal Space by Michael Dale Long
+    Completely re-engineered by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -41,7 +42,6 @@
   ghost@aladdin.com
 
  */
-/*$Id$ */
 /*
   Independent implementation of MD5 (RFC 1321).
 
@@ -60,53 +60,54 @@
   1999-05-03 lpd Original version.
  */
 
-#ifndef __MD5_H__
-#define __MD5_H__
+#ifndef __CS_MD5_H__
+#define __CS_MD5_H__
 
 #include "csutil/csbase.h"
 
 /**
- * This is the CS MD5 Hash generator class.  It is based on code
- * C code from sources noted above.
+ * This is am encapsulation of a C-implementation of MD5 digest algorithm by 
+ * Peter Deutsch <ghost@aladdin.com>.  It provides the exact raw interface as 
+ * Peter's original code except that it is wrapped within a namespace, as well 
+ * as a more convenient interface which allows one to create a digest in a 
+ * single step.  
  */
-class csMD5 : public csBase
+class csMD5
 {
+// Peter's raw interface
 public:
-  /// Passing in a buffer is the same as calling SetBuffer(buffer) after new
-  csMD5(char *buffer = NULL);
-  //virtual ~csMD5();
+  /// 8-bit byte
+  typedef unsigned char md5_byte_t;
+  /// 32-bit word
+  typedef unsigned int md5_word_t;
 
-  /// Give csMD5 the buffer to encode
-  void SetBuffer(char *buffer);
-  /// Retrieve the buffer csMD5 is set to encode (or NULL)
-  char *GetBuffer();
-  /**
-   * Return the resulting code. This string is not NULL ended and
-   * always 16 bytes long.
-   */
-  unsigned char *GetHash();
-  /// Return the resulting code reduced down to an integer
-  unsigned int GetReducedHash();
+  /// Define the state of the MD5 Algorithm
+  struct md5_state_t
+  {
+    md5_word_t count[2]; // message length in bits, lsw first
+    md5_word_t abcd[4];  // digest buffer
+    md5_byte_t buf[64];  // accumulate block
+  };
+
+  /// Initialize the algorithm
+  static void md5_init(md5_state_t*);
+  /// Append a string to the message
+  static void md5_append(md5_state_t*, const md5_byte_t* data, int nbytes);
+  /// Finish the message and return the digest
+  static void md5_finish(md5_state_t*, md5_byte_t digest[16]);
 
 protected:
+  static void md5_process(md5_state_t*, const md5_byte_t* data/*[64]*/);
 
-  typedef unsigned char md5_byte_t; /* 8-bit byte */
-  typedef unsigned int md5_word_t; /* 32-bit word */
+// Our friendly interface
+public:
+  /// An MD5 digest is 16 unsigned characters (not NULL-terminated)
+  struct Digest { md5_byte_t data[16]; };
 
-  /* Define the state of the MD5 Algorithm. */
-  typedef struct md5_state_s {
-    md5_word_t count[2];	/* message length in bits, lsw first */
-    md5_word_t abcd[4];		/* digest buffer */
-    md5_byte_t buf[64];		/* accumulate block */
-  } md5_state_t;
-
-  void md5_init(md5_state_t *pms);
-  void md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes);
-  void md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
-  void md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/);
-
-  md5_byte_t digest[16];
-
+  /// Encode a null-terminated string buffer
+  static Digest Encode(const char*);
+  /// Encode a buffer
+  static Digest Encode(const void*, int nbytes);
 };
 
-#endif // ! __CSMD5_H__
+#endif // __CS_MD5_H__

@@ -1,8 +1,31 @@
 The history order has been reversed so that new features are at the top.
 
 4-May-2000
-	- Eric Sunshine fixed several compilation problems throughout the
+	- Eric Sunshine fixed a slew of compilation problems throughout the
 	  project.
+	- Eric Sunshine fixed a bug in the Dungeon plugin in which virtual
+	  base classes were not used for multiple-inheritance even though it
+	  was required.  In particular, these objects were cast to type csBase
+	  even though they inherited from csBase multiple times, thus the
+	  compiler was (correctly) unable to choose which csBase parent to use.
+	  Now csBase is a virtual parent, so there is only one instance of it
+	  per derived child.
+	- Eric Sunshine made the following changes to csMD5:
+	    - Fixed bug: MD5 algorithm wasn't taking endianess into account at
+	      all.  (The original MD5 implementation by the author -- Peter
+	      Deutsch -- did take endianess into account, but somehow this
+	      code was omitted from the MD5 implementation which ended up in
+	      csutil/csmd5.)
+	    - Performed a complete overhaul of csMD5.  (What else did you
+	      expect from me?)  Not only does this simplify usage but also
+	      exposes Peter Deutsch's original API for people who want super-
+	      fine control over the process.  (The old csMD5 implementation
+	      did not allow access to the original API and was less flexible,
+	      as a result.)
+	    - Fixed bug in Michael Long's GetReducedHash() function.  It
+	      wasn't taking endianess into account.  I also moved this
+	      function to cctest (which is the only place it was used) since
+	      it is inappropriate for a general MD5 class, IMHO.
 3-May-2000
 	- Fixed bug in Blocks which caused the menu not to work
 	  properly (left/right arrows were gone).
@@ -46,7 +69,7 @@ The history order has been reversed so that new features are at the top.
 	      and affect the 'dirty' flag, and those which do not.  Previously,
 	      Save() methods would only actually save the INI if it was dirty.
 	      This made it impossible to save the INI to a new file if you
-	      hadn't made any changes to it.  (In other words, the following
+	      hadn't made any changes to it.  In other words, the following
 	      sequence would fail to emit a new INI file ("b.cfg"):
 	          cfg.Load("a.cfg"); cfg.Save("b.cfg");
 	    - Added IsDirty() and ClearDirty() for finer control by client.
