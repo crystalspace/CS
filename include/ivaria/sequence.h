@@ -97,7 +97,7 @@ struct iSequence : public iBase
 
   /**
    * Add a standard operation to execute another sequence. This function
-   * will call IncRef() on the sequence.
+   * will NOT call IncRef() on the sequence.
    */
   virtual void AddRunSequence (csTicks time, iSequence* sequence,
   	iBase* params = NULL) = 0;
@@ -105,7 +105,7 @@ struct iSequence : public iBase
   /**
    * Add a standard operation to perform a condition and execute the right
    * sequence depending on the result. This function will call
-   * IncRef() on the condition and sequences.
+   * IncRef() on the condition, but NOT on the sequences.
    */
   virtual void AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence,
@@ -113,7 +113,8 @@ struct iSequence : public iBase
 
   /**
    * Perform the sequence for as long as the condition is valid.
-   * This function will call IncRef() on the condition and sequence.
+   * This function will call IncRef() on the condition, but NOT on the 
+   * sequence.
    */
   virtual void AddLoop (csTicks time, iSequenceCondition* condition,
   	iSequence* sequence, iBase* params = NULL) = 0;

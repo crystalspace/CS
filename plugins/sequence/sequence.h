@@ -60,7 +60,7 @@ public:
   class RunSequenceOp : public StandardOperation
   {
   private:
-    csRef<iSequence> sequence;
+    iSequence* sequence;
   protected:
     virtual ~RunSequenceOp () { }
   public:
@@ -79,8 +79,8 @@ public:
   {
   private:
     csRef<iSequenceCondition> condition;
-    csRef<iSequence> trueSequence;
-    csRef<iSequence> falseSequence;
+    iSequence* trueSequence;
+    iSequence* falseSequence;
   protected:
     virtual ~RunCondition () { }
   public:
@@ -101,7 +101,7 @@ public:
   {
   private:
     csRef<iSequenceCondition> condition;
-    csRef<iSequence> sequence;
+    iSequence* sequence;
   protected:
     virtual ~RunLoop () { }
   public:

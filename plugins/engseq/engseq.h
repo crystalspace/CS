@@ -330,11 +330,13 @@ private:
   bool enabled;
   bool enable_onetest;
   uint32 onetest_framenr;	// We test for this frame.
-  csRef<iSequenceWrapper> fire_sequence;
+  iSequenceWrapper* fire_sequence;
   csRef<iEngineSequenceParameters> params;
   csEngineSequenceManager* eseqmgr;
   csTicks fire_delay;
   uint32 framenr;
+  // Sequence created by TestConditions().
+  csRef<iSequence> interval_seq;
 
   csRefArray<csConditionCleanup> condition_cleanups;
 

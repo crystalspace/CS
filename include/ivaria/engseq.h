@@ -402,6 +402,8 @@ struct iSequenceTrigger : public iBase
   /**
    * Attach the sequence that will be fired when all trigger
    * conditions are valid.
+   * \remark \p seq will NOT be IncRef()ed - you'll have to ensure
+   * it's not prematurely destructed.
    */
   virtual void FireSequence (csTicks delay, iSequenceWrapper* seq) = 0;
 

@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "cssysdef.h"
 #include "cssys/csendian.h"
 #include "qint.h"
@@ -81,7 +82,7 @@ SCF_IMPLEMENT_IBASE(csBezierMesh)
     {
 #ifdef CS_DEBUG
       printf ("Deprecated feature use: iPolygonMesh queried from Bezier "
-	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
+	"object; use iObjectModel->GetPolygonMeshColldet() instead.\n");
 #endif
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();						

@@ -1637,12 +1637,16 @@ void csSequenceTrigger::TestConditions (csTicks delay)
   if (delay > 0)
   {
     // Here we already start a new sequence with the new delay.
-    csRef<iSequence> seq (csPtr<iSequence> (
-	eseqmgr->GetSequenceManager ()->NewSequence ()));
+    interval_seq = csPtr<iSequence> (
+	eseqmgr->GetSequenceManager ()->NewSequence ());
     CondTestConditions* cond = new CondTestConditions (this, delay);
-    seq->AddCondition (delay, cond, seq, NULL);
+    interval_seq->AddCondition (delay, cond, interval_seq, NULL);
     cond->DecRef ();
-    eseqmgr->GetSequenceManager ()->RunSequence (0, seq, params);
+    eseqmgr->GetSequenceManager ()->RunSequence (0, interval_seq, params);
+  }
+  else
+  {
+    interval_seq = NULL;
   }
 }
 

@@ -43,7 +43,22 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+  {
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+    {
+#ifdef CS_DEBUG
+      printf ("Deprecated feature use: iPolygonMesh queried from Ball "
+	"object; use iMeshObject->GetObjectModel()->"
+	"GetPolygonMeshColldet() instead.\n");
+#endif
+      (&scfiPolygonMesh)->IncRef ();						
+      return STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
+    }
+  }
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
@@ -58,9 +73,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE(csBallMeshObject::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
 
 csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 {
@@ -68,9 +83,9 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   csBallMeshObject::factory = factory;
 
+  scfiPolygonMesh.SetBall (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (NULL);
@@ -972,28 +987,28 @@ csMeshedPolygon* csBallMeshObject::GetPolygons ()
 
 void csBallMeshObject::PolyMesh::Cleanup ()
 {
-  delete[] scfParent->polygons;
-  scfParent->polygons = NULL;
+  delete[] ball->polygons;
+  ball->polygons = NULL;
 }
 
 int csBallMeshObject::PolyMesh::GetVertexCount ()
 {
-  return scfParent->GetVertexCount ();
+  return ball->GetVertexCount ();
 }
 
 csVector3* csBallMeshObject::PolyMesh::GetVertices ()
 {
-  return scfParent->GetVertices ();
+  return ball->GetVertices ();
 }
 
 int csBallMeshObject::PolyMesh::GetPolygonCount ()
 {
-  return scfParent->GetTriangleCount ();
+  return ball->GetTriangleCount ();
 }
 
 csMeshedPolygon* csBallMeshObject::PolyMesh::GetPolygons ()
 {
-  return scfParent->GetPolygons ();
+  return ball->GetPolygons ();
 }
 
 //----------------------------------------------------------------------

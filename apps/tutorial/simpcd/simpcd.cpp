@@ -53,6 +53,7 @@
 #include "ivaria/stdrep.h"
 #include "ivaria/collider.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "cstool/collider.h"
 #include "csutil/cmdhelp.h"
 
@@ -191,8 +192,8 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 
 iCollider* Simple::InitCollider (iMeshWrapper* mesh)
 {
-  csRef<iPolygonMesh> polmesh (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPolygonMesh));
+  csRef<iPolygonMesh> polmesh = 
+    mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   if (polmesh)
   {
     csColliderWrapper* wrap = new csColliderWrapper

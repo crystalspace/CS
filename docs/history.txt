@@ -9,6 +9,17 @@ The history order is reversed so that new features are at the top.
           both MSVC 6 and 7.
 	- Eric Sunshine eliminated compilation warning about non-virtual
 	  destructor in csScfStringSet.
+	- res fixed the iPolygonMesh issue for the ball plugin.
+	- res changed the Sprite3d and Genmesh objects to emit a notification 
+	  if iPolygonMesh is queried.
+	- res changed the sequence operations working with sequences in the 
+	  'normal' and engine sequence manager to not store references on
+	  sequences. That makes loops etc. possible without causing circular
+	  references. Also updated the interface docs to reflect this change.
+	- res fixed a few cases where iPolygonMesh was queried from a mesh
+	  object to use iObjectModel->"GetPolygonMeshColldet().
+	- res improved the wording on the paragraph about the iPolygonMesh
+	  changes in the api mod documentation a bit.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.

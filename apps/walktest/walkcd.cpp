@@ -22,6 +22,7 @@
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/frustum.h"
+#include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "ivaria/view.h"
 #include "imesh/thing/polygon.h"
@@ -127,7 +128,7 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (0); p->CreateVertex (4);
   p->CreateVertex (7); p->CreateVertex (3);
 
-  mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
+  mesh = mesh_obj->GetObjectModel()->GetPolygonMeshColldet();
   body = new csColliderWrapper (plbody->QueryObject (), collide_system, mesh);
   body->SetName ("player body");
   plbody->GetRadius (body_radius, body_center);
@@ -177,7 +178,7 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (0); p->CreateVertex (4);
   p->CreateVertex (7); p->CreateVertex (3);
 
-  mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
+  mesh = mesh_obj->GetObjectModel()->GetPolygonMeshColldet();
   legs = new csColliderWrapper (pllegs->QueryObject (), collide_system, mesh);
   legs->SetName ("player legs");
   pllegs->GetRadius ( legs_radius, legs_center);

@@ -25,6 +25,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/material.h"
@@ -280,8 +281,8 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       delete lviews;
       lviews = n;
     }
-    csRef<iPolygonMesh> mesh (SCF_QUERY_INTERFACE (ird->walls->GetMeshObject (),
-  	iPolygonMesh));
+    csRef<iPolygonMesh> mesh = 
+      ird->walls->GetMeshObject ()->GetObjectModel()->GetPolygonMeshColldet();
     csRef<iObject> io (SCF_QUERY_INTERFACE (ird->walls, iObject));
     csColliderWrapper *cw = new csColliderWrapper (
     	io, Sys->collide_system, mesh);

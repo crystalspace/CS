@@ -341,7 +341,12 @@ public:
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
+  private:
+    csBallMeshObject* ball;
+  public:
+    SCF_DECLARE_IBASE;
+
+    void SetBall (csBallMeshObject* Ball) { ball = Ball; }
 
     virtual int GetVertexCount ();
     virtual csVector3* GetVertices ();
@@ -352,7 +357,8 @@ public:
     virtual bool IsDeformable () const { return false;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () { }
+    PolyMesh () 
+    { SCF_CONSTRUCT_IBASE (NULL); }
     virtual ~PolyMesh () { }
   } scfiPolygonMesh;
   friend struct PolyMesh;

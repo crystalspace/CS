@@ -63,9 +63,24 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
 #endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralMeshState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
+  {
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+    {
+#ifdef CS_DEBUG
+      printf ("Deprecated feature use: iPolygonMesh queried from Genmesh "
+	"object; use iMeshObject->GetObjectModel()->"
+	"GetPolygonMeshColldet() instead.\n");
+#endif
+      (&scfiPolygonMesh)->IncRef ();						
+      return STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
+    }
+  }
 SCF_IMPLEMENT_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
