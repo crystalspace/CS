@@ -24,7 +24,6 @@
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
 #include "csutil/nobjvec.h"
-#include "csutil/hashmap.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 #include "csutil/refarr.h"
@@ -85,7 +84,6 @@ protected:
   csVector3 direction;
   /// Falloff coefficients for spotlight.
   float spotlightFalloffInner, spotlightFalloffOuter;
-
   
   /// Light number. Changes when the light changes in some way (color/pos).
   uint32 lightnr;
@@ -95,8 +93,12 @@ protected:
    */
   csRefArray<iLightCallback> light_cb_vector;
 
+  /// Type of element contained in \c lightinginfos set.
+  typedef csSet<csRef<iLightingInfo>, csRefHashKeyHandler<iLightingInfo > >
+    LightingInfo;
+
   /// Set of meshes that we are currently affecting.
-  csHashSet lightinginfos;
+  LightingInfo lightinginfos;
 
   /// Get a unique ID for this light. Generate it if needed.
   const char* GenerateUniqueID ();

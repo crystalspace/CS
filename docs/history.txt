@@ -29,6 +29,10 @@ chronological order.
 	  Equivalent functionality was already provided by In(), but Contains()
 	  may be considered more idiomatic by some, and provides better API
 	  consistency with other containers.
+	- Eric Sunshine removed the unused and unnecessary csSet<>::Iterator
+	  class.
+	- Eric Sunshine converted csLight to use csSet<> rather than the
+	  deprecated csHashSet.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is

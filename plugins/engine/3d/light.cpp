@@ -85,12 +85,11 @@ csLight::~csLight ()
   delete halo;
   delete[] light_id;
 
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
+  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
   while (it.HasNext ())
   {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    csRef<iLightingInfo> linfo = it.Next ();
     linfo->LightDisconnect (&scfiLight);
-    linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
 
@@ -99,17 +98,15 @@ csLight::~csLight ()
 
 void csLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
-  if (!lightinginfos.In (li))
-  {
-    lightinginfos.AddNoTest (li);
-    li->IncRef ();
-  }
+  csRef<iLightingInfo> p(li);
+  if (!lightinginfos.In (p))
+    lightinginfos.AddNoTest(p);
 }
 
 void csLight::RemoveAffectedLightingInfo (iLightingInfo* li)
 {
-  lightinginfos.Delete (li);
-  li->DecRef ();
+  csRef<iLightingInfo> p(li);
+  lightinginfos.Delete (p);
 }
 
 const char* csLight::GenerateUniqueID ()
@@ -219,10 +216,10 @@ void csLight::SetColor (const csColor& col)
   color = col; 
   lightnr++;
 
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
+  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
   while (it.HasNext ())
   {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    csRef<iLightingInfo> linfo = it.Next ();
     linfo->LightChanged (&scfiLight);
   }
 }
@@ -334,12 +331,11 @@ void csLight::CalculateLighting ()
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
 
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
+  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
   while (it.HasNext ())
   {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    csRef<iLightingInfo> linfo = it.Next ();
     linfo->LightDisconnect (&scfiLight);
-    linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
 
