@@ -463,7 +463,8 @@ bool csEvent::Print (int level)
     else if (object->type == csEventAttrDatabuffer)
     {
       IndentLevel(level); csPrintf(" Value: 0x%p\n", object->bufferVal);
-      IndentLevel(level); csPrintf(" Length: %d\n", object->dataSize);
+      IndentLevel(level); csPrintf(" Length: %lu\n",
+				   (unsigned long)object->dataSize);
     }
   }
 

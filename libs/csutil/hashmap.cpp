@@ -363,9 +363,13 @@ void csHashMap::DumpStats ()
 	max_elements = bucket.Length ();
     }
   }
-  printf ("buckets=%d null=%d empty=%d el=%d/%d max_el=%d avg_el=%g\n",
-    NumBuckets, count_null, count_empty_but_not_null,
-    count_elements, hash_elements, max_elements,
+  printf ("buckets=%lu null=%lu empty=%lu el=%lu/%lu max_el=%lu avg_el=%g\n",
+    (unsigned long)NumBuckets,
+    (unsigned long)count_null,
+    (unsigned long)count_empty_but_not_null,
+    (unsigned long)count_elements,
+    (unsigned long)hash_elements,
+    (unsigned long)max_elements,
     float (count_elements) / float (NumBuckets));
 }
 

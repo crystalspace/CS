@@ -131,7 +131,7 @@ void csTriangleVerticesCost::Dump ()
     	vertices[i].idx, (int)vertices[i].deleted,
 	vertices[i].cost, vertices[i].to_vertex);
     for (j = 0 ; j < vertices[i].con_triangles.Length () ; j++)
-      printf ("%d ", vertices[i].con_triangles[j]);
+      printf ("%lu ", (unsigned long)vertices[i].con_triangles[j]);
     printf ("] vt=[ ");
     for (j = 0 ; j < vertices[i].con_vertices.Length () ; j++)
       printf ("%d ", vertices[i].con_vertices[j]);
