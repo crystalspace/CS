@@ -47,7 +47,12 @@ class csIntegralHashKeyHandler
 public:
   static unsigned int ComputeHash (const T& key)
   {
-    return (unsigned int)key;
+    /*
+      @@@ FIXME 64bit: possible pointer truncation
+      - not serious (the correct item will still be retrieved from a csHash<>, 
+        as the keys are also compared), but causes a warning.
+     */
+    return (unsigned int)key;  
   }
 
   static bool CompareKeys (const T& key1, const T& key2)

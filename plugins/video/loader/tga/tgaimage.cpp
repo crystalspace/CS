@@ -146,7 +146,7 @@ const csImageIOFileFormatDescriptions& csTGAImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csTGAImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csTGAImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   ImageTgaFile* i = new ImageTgaFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -267,7 +267,7 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, const char *mime,
 
 //---------------------------------------------------------------------------
 
-bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
+bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
 {
   (void)iSize;
   struct TGAheader tga_head;

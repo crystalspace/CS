@@ -52,6 +52,7 @@ csHashMapReversible::~csHashMapReversible ()
 
 void csHashMapReversible::Put (const char *key, csHashObject object)
 {
+  // @@@ FIXME 64bit: pointer truncation
   Reverse->Put ((csHashKey) object, (csHashObject) key);
 
   csHashKey keynum = csHashCompute (key);
@@ -62,6 +63,7 @@ void csHashMapReversible::Put (const char *key, csHashObject object)
 
 const char* csHashMapReversible::GetKey (csHashObject value) const
 {
+  // @@@ FIXME 64bit: pointer truncation
   return (char *) Reverse->Get ((csHashKey) value);
 }
 
@@ -83,6 +85,7 @@ void csHashMapReversible::Delete (const char* key, csHashObject object)
   if (myKey == 0) return; 
   csHashMap::Delete (keynum, object);
   HalfReverse->Delete (keynum, (csHashObject)myKey);
+  // @@@ FIXME 64bit: pointer truncation
   Reverse->Delete ((csHashKey)object, (csHashObject)myKey);
 }
 

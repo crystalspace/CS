@@ -63,7 +63,7 @@ const csImageIOFileFormatDescriptions& csSGIImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csSGIImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csSGIImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   ImageSGIFile* i = new ImageSGIFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -124,7 +124,7 @@ static struct SGIHeader
 
 //---------------------------------------------------------------------------
 
-bool ImageSGIFile::Load (uint8* iBuffer, uint32 iSize)
+bool ImageSGIFile::Load (uint8* iBuffer, size_t iSize)
 {
   (void)iSize;
 

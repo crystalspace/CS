@@ -109,7 +109,7 @@ const csImageIOFileFormatDescriptions& csPNGImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csPNGImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   ImagePngFile* i = new ImagePngFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -430,7 +430,7 @@ void ImagePngRead (png_structp png, png_bytep data, png_size_t size)
   } /* endif */
 }
 
-bool ImagePngFile::Load (uint8 *iBuffer, uint32 iSize)
+bool ImagePngFile::Load (uint8 *iBuffer, size_t iSize)
 {
   size_t rowbytes, exp_rowbytes;
   png_infop info;

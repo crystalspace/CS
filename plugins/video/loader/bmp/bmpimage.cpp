@@ -170,7 +170,7 @@ const csImageIOFileFormatDescriptions& csBMPImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csBMPImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csBMPImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   ImageBMPFile* i = new ImageBMPFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -297,14 +297,14 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, const char *mime,
   return 0;
 }
 
-bool ImageBMPFile::Load (uint8* iBuffer, uint32 iSize)
+bool ImageBMPFile::Load (uint8* iBuffer, size_t iSize)
 {
   if ((memcmp (iBuffer, BM, 2) == 0) && BISIZE(iBuffer) == WinHSize)
     return LoadWindowsBitmap (iBuffer, iSize);
   return false;
 }
 
-bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
+bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
 {
   set_dimensions (BIWIDTH(iBuffer), BIHEIGHT(iBuffer));
   const int bmp_size = Width * Height;

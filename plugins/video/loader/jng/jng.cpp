@@ -130,7 +130,7 @@ const csImageIOFileFormatDescriptions& csJNGImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csJNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csJNGImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   ImageJngFile* i = new ImageJngFile (iFormat, object_reg);
   if (i && !i->Load (iBuffer, iSize))
@@ -830,7 +830,7 @@ ImageJngFile::~ImageJngFile ()
   delete[] NewImage; 
 }
 
-bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
+bool ImageJngFile::Load (uint8 *iBuffer, size_t iSize)
 {
   mng_retcode retcode;
 

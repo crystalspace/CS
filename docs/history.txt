@@ -23,6 +23,9 @@ chronological order.
 	  colldet, viscull, or shadow polygon mesh for the selected mesh.
 	  Commands are assigned to ctrl-alt-c, ctrl-alt-v, ctrl-alt-s,
 	  or ctrl-alt-b.
+	- res fixed a few VC7 64bit portatibility warnings and put down comments
+	  like "@@@ FIXME 64bit" at problematic to-be-fixed places.
+	- res enabled VC7 64bit portatibility warnings for libraries.
 25-Jun-2004
 	- res removed a small but unnecessary condition statement from
 	  particles.cpp.

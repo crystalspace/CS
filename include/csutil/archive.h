@@ -46,6 +46,7 @@ struct csFileTime;
  *     a file is added to archive, its CRC is computed and updated correctly.
  * <li>Several methods of the csArchive class requires approximatively 20K of
  *     stack space when invoked.
+ * <li>Doesn't like files >4GB.
  * </ul>
  */
 class CS_CSUTIL_EXPORT csArchive

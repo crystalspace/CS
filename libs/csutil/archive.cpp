@@ -101,7 +101,7 @@ void csArchive::ResetArchiveEntry (ArchiveEntry *f, size_t size, bool pack)
 {
   f->info.compression_method = (pack) ?
     DEFAULT_COMPRESSION_METHOD : ZIP_STORE;
-  f->info.ucsize = size;
+  f->info.ucsize = (u32)size;
   f->buffer_pos = 0;
 
   time_t curtime = time (0);
@@ -203,7 +203,7 @@ void csArchive::ReadZipDirectory (FILE *infile)
   /* after which follows a two-byte END_CENTRAL_SIG */
   while (cur_offs > min_offs)
   {
-    uint search_pos;
+    size_t search_pos;
 
     if (cur_offs >= sizeof (buff) - step)
       cur_offs -= sizeof (buff) - step;
@@ -221,9 +221,10 @@ void csArchive::ReadZipDirectory (FILE *infile)
             (memcmp (search_ptr, hdr_endcentral, sizeof (hdr_endcentral)) == 0))
         {
           /* Central directory structure found */
-          central_directory_offset = cur_offs + (uint32) search_ptr - (uint32)buff;
+          central_directory_offset = cur_offs + (size_t)(search_ptr - buff);
           LoadECDR (ecdr, &search_ptr[sizeof (hdr_endcentral)]);
-          if (fseek (infile, central_directory_offset + sizeof (hdr_endcentral) + ZIP_END_CENTRAL_DIR_RECORD_SIZE, SEEK_SET)
+          if (fseek (infile, central_directory_offset + sizeof (hdr_endcentral) + 
+	    ZIP_END_CENTRAL_DIR_RECORD_SIZE, SEEK_SET)
            || !ReadArchiveComment (infile, ecdr.zipfile_comment_length)
            || fseek (infile, ecdr.offset_start_central_directory, SEEK_SET))
             goto rebuild_cdr;   /* Broken central directory */
@@ -295,7 +296,7 @@ void csArchive::ReadZipEntries (FILE *infile)
       cdfh.crc32 = lfh.crc32;
       cdfh.csize = lfh.csize;
       cdfh.ucsize = lfh.ucsize;
-      cdfh.relative_offset_local_header = cur_offs;
+      cdfh.relative_offset_local_header = (u32)cur_offs;
 
       ArchiveEntry *curentry = InsertEntry (buff, cdfh);
 
@@ -432,7 +433,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
             size = sizeof (buff);
           else
             size = bytes_left;
-          zs.avail_in = fread (buff, 1, size, infile);
+	  zs.avail_in = (uInt)fread (buff, 1, size, infile);
 
           err = inflate (&zs, bytes_left > size ? Z_PARTIAL_FLUSH : Z_FINISH);
           bytes_left -= size;
@@ -532,7 +533,7 @@ bool csArchive::WriteZipArchive ()
   // Step one: Copy archive file into a temporary file,
   // skipping entries marked as 'deleted'
   strcpy (temp_file, TEMP_DIR);
-  int tmplen = strlen (temp_file);
+  size_t tmplen = strlen (temp_file);
 
   APPEND_SLASH (temp_file, tmplen);
     
@@ -729,9 +730,9 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
   memset (&ecdr, 0, sizeof (ecdr));
   ecdr.num_entries_centrl_dir_ths_disk = count;
   ecdr.total_entries_central_dir = count;
-  ecdr.size_central_directory = ftell (temp) - cdroffs;
-  ecdr.offset_start_central_directory = cdroffs;
-  ecdr.zipfile_comment_length = comment_length;
+  ecdr.size_central_directory = (u32)(ftell (temp) - cdroffs);
+  ecdr.offset_start_central_directory = (u32)cdroffs;
+  ecdr.zipfile_comment_length = (ush)comment_length;
   if (!WriteECDR (ecdr, temp))
     return false;
   return true;
@@ -918,7 +919,7 @@ bool csArchive::ArchiveEntry::Append (const void *data, size_t size)
   } /* endif */
 
   if (info.ucsize < buffer_pos + size)
-    info.ucsize = buffer_pos + size;
+    info.ucsize = (u32)(buffer_pos + size);
 
   memcpy (buffer + buffer_pos, data, size);
   buffer_pos += size;
@@ -939,7 +940,7 @@ bool csArchive::ArchiveEntry::WriteLFH (FILE *outfile)
   BUFF_SET_LONG (L_CRC32, info.crc32);
   BUFF_SET_LONG (L_COMPRESSED_SIZE, info.csize);
   BUFF_SET_LONG (L_UNCOMPRESSED_SIZE, info.ucsize);
-  BUFF_SET_SHORT (L_FILENAME_LENGTH, info.filename_length = strlen (filename));
+  BUFF_SET_SHORT (L_FILENAME_LENGTH, info.filename_length = (ush)strlen (filename));
   BUFF_SET_SHORT (L_EXTRA_FIELD_LENGTH,
                   info.extra_field_length = extrafield ? info.extra_field_length : 0);
 
@@ -949,7 +950,7 @@ bool csArchive::ArchiveEntry::WriteLFH (FILE *outfile)
       || (fwrite (extrafield, 1, info.extra_field_length, outfile) < info.extra_field_length))
     return false;
 
-  info.relative_offset_local_header = lfhpos;
+  info.relative_offset_local_header = (u32)lfhpos;
   return true;
 }
 
@@ -971,7 +972,7 @@ bool csArchive::ArchiveEntry::WriteCDFH (FILE *outfile)
   BUFF_SET_LONG (C_COMPRESSED_SIZE, info.csize);
   BUFF_SET_LONG (C_UNCOMPRESSED_SIZE, info.ucsize);
 
-  BUFF_SET_SHORT (C_FILENAME_LENGTH, info.filename_length = strlen (filename));
+  BUFF_SET_SHORT (C_FILENAME_LENGTH, info.filename_length = (ush)strlen (filename));
   /* We're ignoring extra field for central directory, although InfoZIP puts there a field containing EF_TIME -
      universal timestamp - but for example DOS pkzip/pkunzip does not put nothing there. */
   BUFF_SET_SHORT (C_EXTRA_FIELD_LENGTH, 0);
@@ -998,7 +999,7 @@ bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile, size_t extra_field_l
     delete [] extrafield;
     extrafield = 0;
   }
-  info.extra_field_length = extra_field_length;
+  info.extra_field_length = (ush)extra_field_length;
   if (extra_field_length)
   {
     if (!extrafield)
@@ -1015,7 +1016,7 @@ bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment
     delete [] comment;
     comment = 0;
   }
-  info.file_comment_length = file_comment_length;
+  info.file_comment_length = (ush)file_comment_length;
   if (file_comment_length)
   {
     if (!comment)
@@ -1029,7 +1030,7 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
 {
   size_t lfhoffs = ftell (outfile);
 
-  info.crc32 = crc32 (CRCVAL_INITIAL, (z_Byte *)buffer, buffer_pos);
+  info.crc32 = crc32 (CRCVAL_INITIAL, (z_Byte *)buffer, (uInt)buffer_pos);
   bool finished = false;
 
   while (!finished)
@@ -1044,7 +1045,7 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
         {
           if (fwrite (buffer, 1, buffer_pos, outfile) < buffer_pos)
             return false;       /* Write error */
-          info.csize = info.ucsize = buffer_pos;
+          info.csize = info.ucsize = (u32)buffer_pos;
           finished = true;
           break;
         }
@@ -1055,11 +1056,11 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
           zs.zalloc = (alloc_func) 0;
           zs.zfree = (free_func) 0;
           zs.next_in = (z_Byte *) buffer;
-          zs.avail_in = buffer_pos;
+          zs.avail_in = (uInt)buffer_pos;
           if (deflateInit (&zs, DEFAULT_COMPRESSION_LEVEL) != Z_OK)
             return false;
           info.csize = 0;
-          info.ucsize = buffer_pos;
+          info.ucsize = (u32)buffer_pos;
 
           char buff[16384];
           int buffofs = 2;      /* Skip inflated data header */
@@ -1072,7 +1073,7 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
             int rc = deflate (&zs, Z_FINISH);   /* Do actual compression */
             size_t size = sizeof (buff) - zs.avail_out - buffofs;
 
-            info.csize += size;
+            info.csize += (u32)size;
 
             if (fwrite (&buff[buffofs], 1, size, outfile) != size)
             {

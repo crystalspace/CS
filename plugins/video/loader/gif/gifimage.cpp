@@ -62,7 +62,7 @@ const csImageIOFileFormatDescriptions& csGIFImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csGIFImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csGIFImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   ImageGifFile* i = new ImageGifFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -448,7 +448,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
   return 0;
 }
 
-bool ImageGifFile::Load (uint8* iBuffer, uint32 iSize)
+bool ImageGifFile::Load (uint8* iBuffer, size_t iSize)
 {
   int* Prefix  = new int [4096]; // Hash table used by decompressor.
   int* Suffix  = new int [4096]; // Hash table used by decompressor.

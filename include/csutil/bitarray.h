@@ -109,7 +109,7 @@ public:
     size_t mPos;
   public:
     /// Constructor.
-    BitProxy(csBitArray &array, unsigned pos): mArray(array), mPos(pos)
+    BitProxy(csBitArray &array, size_t pos): mArray(array), mPos(pos)
     {}
 
     /// Boolean assignment.

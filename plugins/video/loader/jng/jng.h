@@ -54,7 +54,7 @@ class csJNGImageIO : public iImageIO
   virtual ~csJNGImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
-  virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
+  virtual csPtr<iImage> Load (uint8* iBuffer, size_t iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
@@ -117,7 +117,7 @@ private:
   virtual ~ImageJngFile();
 
   /// Try to read the JNG file from the buffer and return success status
-  bool Load (uint8* iBuffer, uint32 iSize);
+  bool Load (uint8* iBuffer, size_t iSize);
 public:
   SCF_DECLARE_IBASE_EXT (csImageFile);
 

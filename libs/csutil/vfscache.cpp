@@ -91,7 +91,7 @@ void csVfsCacheManager::SetCurrentScope (const char* scope)
     current_scope = 0;
 }
 
-bool csVfsCacheManager::CacheData (void* data, uint32 size,
+bool csVfsCacheManager::CacheData (void* data, size_t size,
   	const char* type, const char* scope, uint32 id)
 {
   char buf[512];

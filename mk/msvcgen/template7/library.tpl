@@ -38,7 +38,7 @@
 				ProgramDataBaseFileName=".\csrelease\temp\%project%/%project%.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				Detect64BitPortabilityProblems=""
+				Detect64BitPortabilityProblems="TRUE"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -88,7 +88,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
-				Detect64BitPortabilityProblems=""
+				Detect64BitPortabilityProblems="TRUE"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -138,7 +138,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
-				Detect64BitPortabilityProblems=""
+				Detect64BitPortabilityProblems="TRUE"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -191,6 +191,7 @@
 				ProgramDataBaseFileName=".\csrelease\temp\%project%/%project%.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -240,6 +241,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
+				Detect64BitPortabilityProblems="TRUE"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>

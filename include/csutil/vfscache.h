@@ -75,7 +75,7 @@ public:
   /**
    * Cache some data. Returns true if this succeeded.
    */
-  virtual bool CacheData (void* data, uint32 size,
+  virtual bool CacheData (void* data, size_t size,
   	const char* type, const char* scope, uint32 id);
   /**
    * Retrieve some data from the cache. Returns 0 if the

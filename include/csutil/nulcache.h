@@ -59,7 +59,7 @@ public:
   /**
    * Always returns false.
    */
-  virtual bool CacheData (void* data, uint32 size,
+  virtual bool CacheData (void* data, size_t size,
   	const char* type, const char* scope, uint32 id);
   /**
    * Always returns 0.

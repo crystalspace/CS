@@ -435,7 +435,8 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
 	  line << " (" << s << ")";
 	line << "\n";
 
-	reportZip->Write (callstackEntry, line.GetData(), line.Length());
+	reportZip->Write (callstackEntry, line.GetData(), 
+	  (size_t)line.Length());
       }
       reportZip->Flush ();
       stack->Free();

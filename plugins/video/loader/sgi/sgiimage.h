@@ -22,7 +22,7 @@ class csSGIImageIO : public iImageIO
   virtual ~csSGIImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
-  virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
+  virtual csPtr<iImage> Load (uint8* iBuffer, size_t iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage* image, const char* mime,
     const char* extraoptions);
@@ -50,7 +50,7 @@ private:
   /// Initialize the image object
   ImageSGIFile (int iFormat) : csImageFile (iFormat) { };
   /// Try to read the SGI file from the buffer and return success status
-  bool Load (uint8* iBuffer, uint32 iSize);
+  bool Load (uint8* iBuffer, size_t iSize);
 };
 
 #endif // __CS_SGIIMAGE_H__

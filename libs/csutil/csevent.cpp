@@ -384,7 +384,7 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
 bool csEvent::Add(const char *name, const char *v)
 {
   attribute *object = new attribute(attribute::tag_string);
-  object->length = strlen(v);
+  object->length = (uint32)strlen(v);
   object->String = csStrNew(v);
   csArray<attribute *> *v1 =
     (csArray<attribute *> *) attributes.Get(csHashCompute(name));
@@ -844,6 +844,7 @@ bool csEvent::Print(int level)
           }
           if (object->type == attribute::tag_databuffer)
           {
+	    // @@@ FIXME 64bit: pointer truncation
             IndentLevel(level); printf(" Value: 0x%X\n",(int32)object->String);
             IndentLevel(level); printf(" Length: %d\n", object->length);
           }
@@ -902,7 +903,7 @@ uint32 csEvent::FlattenSizeCrystal()
               // 1 for type id
               // 4 for data length
               // X for data
-              size += 7 + strlen(iter.GetKey())
+              size += 7 + (uint32)strlen(iter.GetKey())
 	      	+ object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
             }
           }
@@ -913,7 +914,7 @@ uint32 csEvent::FlattenSizeCrystal()
             // X for name string
             // 1 for type id
             // 1 for data
-            size += 4 + strlen(iter.GetKey());
+            size += 4 + (uint32)strlen(iter.GetKey());
           }
           if ((object->type == attribute::tag_int16)
 	  	|| (object->type == attribute::tag_uint16))
@@ -922,7 +923,7 @@ uint32 csEvent::FlattenSizeCrystal()
             // X for name string
             // 1 for type id
             // 2 for data
-            size += 5 + strlen(iter.GetKey());
+            size += 5 + (uint32)strlen(iter.GetKey());
           }
           if ((object->type == attribute::tag_int32)
 	  	|| (object->type == attribute::tag_uint32)
@@ -932,7 +933,7 @@ uint32 csEvent::FlattenSizeCrystal()
             // X for name string
             // 1 for type id
             // 4 for data
-            size += 7 + strlen(iter.GetKey());
+            size += 7 + (uint32)strlen(iter.GetKey());
           }
           if ((object->type == attribute::tag_double)
             || (object->type == attribute::tag_int64)
@@ -942,7 +943,7 @@ uint32 csEvent::FlattenSizeCrystal()
             // X for name string
             // 1 for type id
             // 8 for data
-            size += 11 + strlen(iter.GetKey());
+            size += 11 + (uint32)strlen(iter.GetKey());
           }
           if (object->type == attribute::tag_bool)
           {
@@ -950,7 +951,7 @@ uint32 csEvent::FlattenSizeCrystal()
             // X for name string
             // 1 for type id
             // 1 for data
-            size += 4 + strlen(iter.GetKey());
+            size += 4 + (uint32)strlen(iter.GetKey());
           }
           if (object->type == attribute::tag_databuffer)
           {
@@ -959,7 +960,7 @@ uint32 csEvent::FlattenSizeCrystal()
             // 1 for type id
             // 4 for length
             // X for data
-            size += 7 + strlen(iter.GetKey()) + object->length;
+            size += 7 + (uint32)strlen(iter.GetKey()) + object->length;
           }
           if (object->type == attribute::tag_string)
           {
@@ -968,7 +969,7 @@ uint32 csEvent::FlattenSizeCrystal()
             // 1 for type id
             // 4 for length
             // X for data
-            size += 7 + strlen(iter.GetKey()) + object->length;
+            size += 7 + (uint32)strlen(iter.GetKey()) + object->length;
           }
           index++;
         }
@@ -1088,7 +1089,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               if (strcmp("_parent", iter.GetKey()) != 0)
               {
                 // 2 byte name length (little endian)
-                ui16 = strlen(iter.GetKey());
+                ui16 = (uint16)strlen(iter.GetKey());
                 ui16 = convert_endian(ui16);
                 b.Write((char *)&ui16, sizeof(int16));
                 // XX byte name
@@ -1109,7 +1110,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_databuffer:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1126,7 +1127,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_string:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1143,7 +1144,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_bool:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1157,7 +1158,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_int8:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1171,7 +1172,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_uint8:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1185,7 +1186,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_int16:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1200,7 +1201,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_uint16:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1215,7 +1216,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_int32:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1230,7 +1231,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_uint32:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1245,7 +1246,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_int64:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1260,7 +1261,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_uint64:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1275,7 +1276,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_float:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
@@ -1290,7 +1291,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               break;
             case attribute::tag_double:
               // 2 byte name length (little endian)
-              ui16 = strlen(iter.GetKey());
+              ui16 = (uint16)strlen(iter.GetKey());
               ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name

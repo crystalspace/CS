@@ -383,12 +383,14 @@ void csHashSet::Add (csHashObject object)
 
 void csHashSet::AddNoTest (csHashObject object)
 {
+  // @@@ FIXME 64bit: pointer truncation
   csHashKey key = (csHashKey)object;
   map.Put (key, object);
 }
 
 bool csHashSet::In (csHashObject object)
 {
+  // @@@ FIXME 64bit: pointer truncation
   csHashKey key = (csHashKey)object;
   csHashIterator it (&map, key);
   while (it.HasNext ())
@@ -407,6 +409,7 @@ void csHashSet::DeleteAll ()
 
 void csHashSet::Delete (csHashObject object)
 {
+  // @@@ FIXME 64bit: pointer truncation
   csHashKey key = (csHashKey)object;
   map.Delete (key, object);
 }

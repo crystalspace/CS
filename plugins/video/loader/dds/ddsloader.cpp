@@ -59,11 +59,11 @@ void csDDSImageIO::SetDithering (bool)
 {
 }
 
-csPtr<iImage> csDDSImageIO::Load (uint8* buffer, uint32 size, int format)
+csPtr<iImage> csDDSImageIO::Load (uint8* buffer, size_t size, int format)
 {
   dds::Loader* loader = new dds::Loader;
 
-  loader->SetSource (buffer, (size_t) size);
+  loader->SetSource (buffer, size);
   if (!loader->IsDDS())                       
   {
     delete loader;

@@ -90,7 +90,7 @@ const csImageIOFileFormatDescriptions& csWALImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csWALImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csWALImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   if (iSize < sizeof(WALHeader))
     return 0;
@@ -129,7 +129,7 @@ csPtr<iDataBuffer> csWALImageIO::Save (iImage *image, const char *mime,
 
 //---------------------------------------------------------------------------
 
-bool ImageWALFile::Load (uint8* iBuffer, uint32 iSize)
+bool ImageWALFile::Load (uint8* iBuffer, size_t iSize)
 {
   WALHeader head = *(WALHeader *)iBuffer;
   head.width = little_endian_long (head.width);
@@ -141,7 +141,7 @@ bool ImageWALFile::Load (uint8* iBuffer, uint32 iSize)
 
   // There's no id-tag in .WAL files, so the only way I know to check
   // if it's a wal, is to use this method. Hope it works
-  uint32 chkfilesize = head.offsets [3] + ((head.height / 8) * (head.width / 8));
+  size_t chkfilesize = head.offsets [3] + ((head.height / 8) * (head.width / 8));
   if (chkfilesize != iSize)
     return false;
 

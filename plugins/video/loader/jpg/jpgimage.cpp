@@ -196,7 +196,7 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
   dest->ds = ds;
 }
 
-csPtr<iImage> csJPGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csJPGImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 {
   ImageJpgFile* i = new ImageJpgFile (iFormat, object_reg);
   if (i && !i->Load (iBuffer, iSize))
@@ -447,7 +447,7 @@ static void jpeg_memory_src (j_decompress_ptr cinfo, char *inbfr, int len)
 
 bool ImageJpgFile::dither = true;
 
-bool ImageJpgFile::Load (uint8* iBuffer, uint32 iSize)
+bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
 {
   struct jpeg_decompress_struct cinfo;
   struct my_error_mgr jerr;
