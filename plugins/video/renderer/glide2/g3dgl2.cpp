@@ -1295,15 +1295,10 @@ void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
       m_vertsize = poly.num;
     }
 
-    float x, y;
     for (int i=0; i<poly.num; i++)
     {
-      x = poly.vertices[i].sx;
-      y = poly.vertices[i].sy;
-      m_verts[i].x = x + SNAP;
-      m_verts[i].y = y + SNAP;
-      x-=m_nHalfWidth;
-      y-=m_nHalfHeight;
+      m_verts[i].x = poly.vertices[i].sx + SNAP;
+      m_verts[i].y = poly.vertices[i].sy + SNAP;
       if (m_dpfx.gouraud)
       {
         m_verts[i].r = poly.vertices[i].r*255;
@@ -1317,8 +1312,6 @@ void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
         m_verts[i].b = 255;
       }
       m_verts[i].oow = poly.vertices[i].z;
-      m_verts[i].x -= SNAP;
-      m_verts[i].y -= SNAP;
       if ( m_renderstate.textured ){
         m_verts[i].tmuvtx[1].sow = m_verts[i].tmuvtx[0].sow = poly.vertices[i].u*m_thTex->width*m_verts[i].oow;
         m_verts[i].tmuvtx[1].tow = m_verts[i].tmuvtx[0].tow = poly.vertices[i].v*m_thTex->height*m_verts[i].oow;
