@@ -65,7 +65,7 @@ public:
    * give the iImage of the texture, as well as the scale and offset.
    * offset is from 0..1, scale is the size respective to total image size.
    * A scale of 1 means the texture will fit exactly onto the entire terrain.
-   * A scale of 0.1 means the texture will be tiled 10x10 times.
+   * A scale of 10 means the texture will be tiled 10x10 times.
    */
   void AddLayer(float height, iImage *image, const csVector2& scale,
     const csVector2& offset);
@@ -102,7 +102,7 @@ public:
   float height;
   /// the image - the texture image
   iImage *image;
-  /// the scale of the image, 1/(nr of times tiled on the terrain)
+  /// the scale of the image, (nr of times tiled on the terrain)
   csVector2 scale;
   /// offset to shift image (0..1)
   csVector2 offset;

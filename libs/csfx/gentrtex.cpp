@@ -27,6 +27,7 @@
 csGenerateTerrainImage::csGenerateTerrainImage()
 {
   baselist = 0;
+  heightfunc = 0;
 }
 
 csGenerateTerrainImage::~csGenerateTerrainImage()
@@ -60,11 +61,11 @@ void csGenerateTerrainImage::AddLayer(float height, iImage *image,
   }
   /// create new
   csGenerateTerrainImagePart *part = new csGenerateTerrainImagePart;
-  p->next = 0;
-  p->height = height;
-  p->scale = scale;
-  p->offset = offset;
-  p->image = image;
+  part->next = 0;
+  part->height = height;
+  part->scale = scale;
+  part->offset = offset;
+  part->image = image;
   if(image) image->IncRef();
   /// insert in list
   if(p==0)
@@ -111,6 +112,7 @@ void csGenerateTerrainImage::GetImagePixel(iImage *image, int x, int y,
     b = ((csRGBpixel*)image->GetImageData())
       [y*image->GetWidth() + x].blue;
   }
+  //printf("Return image pixel %d,%d  %d %d %d\n", x, y, r, g, b);
   res.Set(r,g,b);
 }
 
@@ -128,6 +130,11 @@ csColor csGenerateTerrainImage::ComputeLayerColor(
   csColor col1, col2; /// left & right linear interpolation
   int x = QInt(imagepos.x);
   int y = QInt(imagepos.y);
+  
+  //GetImagePixel(layer->image, x, y, pix);
+  //col1.Set(pix.red, pix.green, pix.blue);
+  //return col1;
+
   float blendy = imagepos.y - float(y);
   float invblendy = 1.f - blendy;
   GetImagePixel(layer->image, x, y+1, pix);
@@ -157,7 +164,8 @@ csColor csGenerateTerrainImage::ComputeLayerColor(
   col.blue = invblendx * col1.blue + blendx * col2.blue;
 
   // return trilinear interpolated value
-  col *= 1./255.;
+  //printf("layercol = %g %g %g\n", col.red, col.green, col.blue);
+  //col *= 1./255.;
   return col;
 }
 
@@ -198,7 +206,9 @@ csRGBpixel csGenerateTerrainImage::ComputeColor(const csVector2& pos)
 
   csColor col(0,0,0);
   col += abovecol * abovefactor;
+  //printf("col = %g %g %g\n", col.red, col.green, col.blue);
   col += belowcol * belowfactor;
+  //printf("col = %g %g %g\n", col.red, col.green, col.blue);
 
   return csRGBpixel (QInt(col.red), QInt(col.green), QInt(col.blue));
 }
@@ -224,9 +234,12 @@ iImage *csGenerateTerrainImage::Generate(int totalw, int totalh,
     {
       /// compute color
       csRGBpixel col = ComputeColor(pos);
+      if(1)if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y, 
+        col.red, col.green, col.blue);
       /// set pixel
       *destpix = col;
       destpix++;
+      pos.x += pixelsize.x;
     }
   }
 
