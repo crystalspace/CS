@@ -43,7 +43,9 @@ enum
   csevJoystickUp,		// A joystick button has been released
   csevCommand,			// Somebody(-thing) sent a command
   csevBroadcast,		// Somebody(-thing) sent a broadcast command
-  csevNetwork			// Something has arrived on network.
+  csevNetwork	,		// Something has arrived on network.
+  csevMouseEnter,		// The mouse has entered a component
+  csevMouseExit		// The mouse has exited a component
 };
 
 /*

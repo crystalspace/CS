@@ -8,15 +8,15 @@ It falls under the GNU copyleft license (LGPL). @xref{License}.
 
 Crystal Space is divided into several libraries. The items in the feature
 list are sorted by the library they belong to. Note that this is not a
-description how these libraries work together. Some libraries are even
-not mentioned here.
+description of how these libraries work together. Some libraries are not
+even mentioned here.
 
 Currently Crystal Space has the following features:
 
 @table @emph
 @item System Driver
 A system library that will perform system-dependent operations for your
-program. This way your program is easily portably to any supported system.
+program. This way your program is easily portable to any supported system.
 It includes a good plug-in system that offers you an interface to
 dynamically loaded drivers (@file{.so} or @file{.dll}), like the 3D rasterizer.
 

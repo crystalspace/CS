@@ -13,8 +13,8 @@ time a person contributed to the project.
 Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})
 
 Jorrit is the main author of Crystal Space.  He wrote the initial engine with
-the main current functionality.  He is still the main driving force after this
-project.  Contact him for any general and strategic question as well as
+the main current functionality.  He is still the main driving force of the
+project.  Contact him for any general and strategic questions as well as
 specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 3020 Veltem Beisem, @sc{belgium}.
 
@@ -22,7 +22,7 @@ specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 Murat Demircioglu (@email{demircio@@boun.edu.tr})
 
 Murat was the first contributor for Crystal Space.  He provided the first
-steps to porting Crystal Space to @sc{dos}.  Parts of his code is still
+steps to porting Crystal Space to @sc{dos}.  Parts of his code are still
 present in the current version.
 
 @item
@@ -40,7 +40,7 @@ dedicated to Crystal Space:
 
 @uref{http://www.bigfoot.com/~noote/CrystalSpace}
 
-He enhanced Arnold's @sc{dos} port again so that it works with the Watcom C++
+He enhanced Arnold's @sc{dos} port again so that it worked with the Watcom C++
 compiler.  He also suggested and implemented a considerable restructering of
 the system-dependent stuff with every port having its own directory.  He is
 also the original author of the input/output console.  Nathaniel was also the
@@ -112,8 +112,8 @@ also added @sc{jpg} support to Crystal Space and support for the mouse in
 @item
 Alessandro Russo (@email{alessandro.russo@@ntt.it})
 
-Alessandro gave me a patch for the X-windows version of Crystal Space which
-allows simultanious keypresses and disables autorepeat.  This makes movement
+Alessandro gave me a patch for the X version of Crystal Space which
+allows simultaneous keypresses and disables autorepeat.  This makes movement
 much more smoother.  Alessandro Russo presented me with a patch to fix the
 autorepeat problem (in X-windows).
 
@@ -121,11 +121,11 @@ autorepeat problem (in X-windows).
 Gary Clark (@email{GaryC@@jeld-wen.com})
 
 Gary designed the basic framework of the Graphics3D class and I helped him
-start implement this.  Gary also made an extension so that Crystal Space can
+start to implement this.  Gary also made an extension so that Crystal Space can
 now use accurate @sc{rgb} light sourcing.  Since this slows down the texture
 cache a bit I have made it optional (using @file{cryst.cfg}).  Also added a
-patch from Gary Clark to fix the problem with the X-windows version of Crystal
-Space that Crystal Space would not immediatelly start drawing but only after
+patch from Gary Clark to fix the problem with the X version of Crystal
+Space that Crystal Space would not immediately start drawing but only after
 an expose event was generated.  He gave me the @file{lin_joy.cpp} file (in the
 @file{contrib} directory) which is an example on how to use the joystick from
 within Linux.
@@ -152,7 +152,7 @@ Windows port.  Dan made the Direct3D port for Windows! He greatly enhanced the
 Windows port and also added 16-bit support for Windows.  His greatest work up
 to now is converting the 3D and 2D graphics subsystems to @sc{com}.  He thus
 provided the foundations for the @sc{com} system (also on non-Windows
-platforms) which Crystal Space was using in the past.  He also contributed the
+platforms) that Crystal Space used in the past.  He also contributed the
 Halo code to Crystal Space.
 
 @item
@@ -167,7 +167,7 @@ Anis Ahmad (@email{anis@@cyberus.ca})
 
 Anis updated the makefiles for Watcom C++ for both Crystal Space and
 @sc{csar}.  He also made the Crystal Space editor for Windows 95 which is
-unfortunatelly no longer supported.
+unfortunately no longer supported.
 
 @item
 Andrew Zabolotny (@email{bit@@eltech.ru})
@@ -304,7 +304,7 @@ optimized away.
 @item
 Doug Rabson (@email{dfr@@nlsystems.com})
 
-Doug helped fixed a possible memory leak in the X-windows port with @sc{shm}
+Doug helped fixed a possible memory leak in the X port with @sc{shm}
 extension.
 
 @item
@@ -380,7 +380,7 @@ Seth also contributed a nice missile and he fixed the texture bug in
 Seth also updated the @sc{dos}/@sc{djgpp} documentation and the tutorial.  He
 also wrote the Squawk (@pxref{Squawk}) demo (using the skybox).  Seth also
 fixed the @code{csCamera} and @code{csView} classes so that the @sc{fov} is no
-longer static and it is also possible to recenter each view separatelly.  Seth
+longer static and it is also possible to recenter each view separately.  Seth
 added sprite vertex tweening and new lighting attenuation settings.  He also
 worked on vertex/texel merging in sprites.
 
@@ -640,7 +640,7 @@ support and render state caching.
 @item
 Brett Hall (@email{swizin@@rain.org})
 
-Brett fixed the X-windows 2D drivers so that they properly exit when the
+Brett fixed the X11 2D drivers so that they properly exit when the
 window is closed by the window manager.
 
 Eric Wigforss (@email{ewigforss@@novametrix.com})
@@ -731,10 +731,19 @@ and also allow shadows.
 Many thanks also for the people at @uref{http://www.grimmware.com, GrimmWare}
 for being the first to offer web space for Crystal Space.
 
-Many thanks to Alessandro Russo for convincing his system manager for creating
+Many thanks to Alessandro Russo for convincing his system manager to create
 a mailing list for Crystal Space.  Thanks to Marco d'Itri (the system manager)
 for creating this list for me.  Also thanks to those people for creating an
 ftp mirror of this site.
+
+@item
+Bob Ham (@email{node@@users.sourceforge.net})
+
+Bob submitted the Makefile changes need to compile on GNU/Hurd.  He proof
+read much of this manual.  He also started working on a level editor for
+Crystal Space but ceased work on it:
+
+@uref{http://sourceforge.net/projects/ticle/}
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
 Please feel free to notify us of errors or omissions.

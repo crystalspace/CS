@@ -4,7 +4,7 @@
 @cindex Introduction
 
 CrystalSpace is a 6@sc{dof} 3D engine, it is not in itself a game and is still
-very much in development.  Everyone who feels inclined can contribute to the
+very much in development.  Anyone who feels inclined can contribute to the
 source.  There are several things that still need to be done.  For more
 information about what is missing and a list of current known bugs, visit the
 Developer's Project page at SourceForge:

@@ -105,6 +105,7 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
   InFrame = false;
   ImageLoader = NULL;
   (System = sys)->IncRef ();
+  LastMouseContainer = NULL;
 
   OldMouseCursorID = csmcNone;
   MouseCursorID = csmcArrow;
@@ -718,6 +719,9 @@ void csApp::NotifyDelete (csComponent *comp)
     CaptureKeyboard (NULL);
   if (FocusOwner == comp)
     CaptureFocus (NULL);
+    
+   if (LastMouseContainer == comp) 
+     LastMouseContainer = NULL;
 
   hints->Remove (comp);
 }

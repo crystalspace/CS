@@ -1,6 +1,63 @@
 The history order has been reversed so that new features are at the top.
 
+2-Apr-2001
+	- Integrated patches from Bob Ham to compile Crystal Space on
+	  the Hurd operating system.
+	- Bob also did some proofreading of the docs and did a few
+	  corrections.
+        - Integrated patches from Christopher Nelson <paradox@BBHC.ORG> for
+	  CSWS. With these patches csws components get a notification when
+	  the mouse enters or leaves a component. There is also a new
+	  notification message that is called when a component is deleted.
+1-Apr-2001
+	- Martin Geisse split up the csgfxldr library into two parts. The
+	  first part contains the image classes and now exists as the csgfx
+	  library. The second part contains the image file loaders and now
+	  exists as a plugin.
+	- Philip Wyett fixed demosky, perftest, pysimp, simple, simplep,
+	  video app, and phyztest for the new image loader plugin.
+	- Philip also added new image loader to required MSVCGEN process.
+	- Norman Kramer added video/loader to the plugins to build by default.
+	- Norman delayed query of imageloader in the fancy concole. Its now
+	  requested on a SystemOpen event.
+	- Norman made destructor in imgload.cpp virtual.
+	  Made a DYNLIB.IMGLOAD where the -lpng and -ljpeg is collected
+	  (bet Eric wont like it, but it works for now).
+	- Norman removed some remaining gfx includes.
+31-Mar-2001
+	- Wouter Wijngaards did the following for the spr3d plugin:
+	    - Added GetChildren to iSkeletonLimb scf interface, to make
+	      complete access possible.
+	    - Added Sprite3DFactorySaver and Sprite3DSaver.
+	      Please note that the SMOOTH(...) information is lost. The
+	      value read is not stored in memory.
+	- Wouter also added FountainFactorySaver, FountainSaver,
+	  RainFactorySaver, RainSaver, SnowFactorySaver, SnowSaver,
+	  SpiralFactorySaver and SpiralSaver plugins.
+	- Wouter added Sprite2DFactorySaver and Sprite2DSaver.
+	- Wouter added a new csfx full screen effects file. It contains
+	  various nice full screen visual effects.
+	    - For drawing interference on the screen.
+	    - For fading out the screen (to black).
+	    - For fading to a picture.
+	    - For fading to a chosen color.
+	    - Emulating the old green-only monitors.
+  	      (als red or blue can be used).
+	    - Creating a white-out effect.
+	    - Creating a vertical shading (nice for backgrounds).
+	    - And a multipurpose screendpfx routine.
+	  All these routines try to use the 3d hardware efficiently.
+	- Martin Geisse first changed the system driver to ignore plugins
+	  with no class ID in the config file instead of printing an error.
+	  This is needed if one plugin loads another by a line in its
+	  config file, so the user can override this line with a no-value
+	  line.
+	- Martin then proceeded to revert the above change because it is
+	  useless. Adding plug-ins in a plugin-specific config file is not
+	  the right way. Sorry for this.
 29-Mar-2001
+	- Martin Geisse added a note about the use of C++ templates
+	  to the documentation.
 	- Let csSector::CheckFrustum() work through iVisibilityCuller::
 	  CastShadows(). This is another stip in the rewrite. Moved all
 	  static_thing specific frustum code (i.e. the traversal of the

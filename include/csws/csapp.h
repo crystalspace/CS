@@ -127,6 +127,8 @@ public:
   csComponent *KeyboardOwner;
   /// The component that captured all focused events (mouse & keyboard)
   csComponent *FocusOwner;
+  /// The component that the mouse was last over
+  csComponent *LastMouseContainer;
   /// The global skin repository
   csSkin *skin;
   /// This is set to TRUE each time top-level window list changes

@@ -28,6 +28,9 @@ case ${SYSTYPE} in
   linux*)
     CPU=`cat /proc/cpuinfo | sed -ne "/^cpu	/p" | sed -e "s/.*://"`
     ;;
+  hurd*)
+    CPU=`dpkg --print-architecture 2>/dev/null`
+    ;;
 esac
 
 # If CPU is empty or unknown set it at least to MACHINE
