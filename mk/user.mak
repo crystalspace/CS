@@ -79,6 +79,7 @@ PLUGINS.DYNAMIC += video/canvas/memory
 PLUGINS.DYNAMIC += video/loader/tga
 PLUGINS.DYNAMIC += video/loader/sgi
 PLUGINS.DYNAMIC += video/loader/wal
+#PLUGINS.DYNAMIC += video/loader/jng
 PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
