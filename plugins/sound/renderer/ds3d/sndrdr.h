@@ -43,8 +43,8 @@ public:
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
 
-  virtual void PlaySound (iSoundData *snd);
-  virtual void PlaySound (iSoundStream *snd);
+  virtual void PlaySound (iSoundData *snd, bool Loop);
+  virtual void PlaySound (iSoundStream *snd, bool Loop);
   virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d);
   virtual iSoundSource *CreateSource (iSoundStream *snd, bool Is3d);
 
