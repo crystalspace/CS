@@ -128,7 +128,7 @@ chronological order.
 	  header was #included, no GLU function was used anyway.
 	- res sanitized line endings in ivideo/custcursor.h and the custom
 	  cursor plugin.
-	- Eric Sunshine fixed copy/paste error in the new partphys_ode.make
+	- Eric Sunshine fixed copy/paste error in the new partphys_ode.mak
 	  which broke the makefile.
 	- Eric Sunshine fixed awsScrollBar::Setup() so that it positions the
 	  components of the horizontal scrollbar properly.  Previously, it was
