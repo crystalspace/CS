@@ -34,6 +34,11 @@
 #define CS_UC_MAX_UTF16_ENCODED		2
 /// An Unicode character encoded as UTF32 is at max encoded to this length
 #define CS_UC_MAX_UTF32_ENCODED		1
+/**
+ * A mapping (uppercase, lowercase, fold) for a Unicode character is at max
+ * this long
+ */
+#define CS_UC_MAX_MAPPED		3
  
 /**
  * Contains functions to convert between several UTF encodings.
@@ -445,6 +450,7 @@ public:
   
 #undef UCTF_CONVERTER
 #undef OUTPUT_CHAR
+#undef _OUTPUT_CHAR
 
 #if (CS_WCHAR_T_SIZE == 1)
   inline static size_t UTF8toWC (wchar_t* dest, size_t destSize, 
@@ -795,7 +801,30 @@ public:
     if (maxRew < 1) return 0;
     return 1;
   }
-   /** @} */
+  /** @} */
+
+  /**
+   * Map a character to its upper case equivalent(s).
+   * \param ch Char to be mapped.
+   * \param dest Destination buffer.
+   * \param destSize Number of characters the destination buffer can hold.
+   * \return Number of characters the complete mapping result would require.
+   */
+  static size_t MapToUpper (const utf32_char ch, utf32_char* dest, 
+    size_t destSize);
+  /**
+   * Map a character to its lower case equivalent(s).
+   * \copydoc MapToUpper(const utf32_ch, utf33_char*, size_t)
+   */
+  static size_t MapToLower (const utf32_char ch, utf32_char* dest, 
+    size_t destSize);
+  /**
+   * Map a character to its fold equivalent(s).
+   * Fold mapping is useful for binary comparison of two Unicode strings.
+   * \copydoc MapToUpper(const utf32_ch, utf33_char*, size_t)
+   */
+  static size_t MapToFold (const utf32_char ch, utf32_char* dest, 
+    size_t destSize);
 };
 
 /** @} */

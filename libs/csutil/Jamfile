@@ -91,3 +91,6 @@ CFlags csutil :
   [ FDefines CS_PLUGINDIR='\"$(plugindir)\"'  ] ;
 ExternalLibs csutil : PTHREAD ZLIB ;
 MsvcDefine csutil : CS_CSUTIL_LIB ;
+
+# Uncomment to build the tool to generate the Unicode mapping tables.
+#SubInclude TOP libs csutil ucmapgen ;
