@@ -19,6 +19,13 @@ The history order is reversed so that new features are at the top.
 	  caused 0 elapsed time, and a redraw of exactly the same frame,
 	  filling up queues inside my bad driver, and causing a tug when
 	  real work needed to be done.
+	- Extended texture layer support in the engine so that maximum
+	  four additional layers are supported (this means one base
+	  texture and four extra). Note that none of the 3D renderers
+	  currently support this.
+	- The material manager in the 3D renderers is now capable of
+	  holding four texture layers too. They are still not used
+	  however.
 30-Apr-2001
 	- Philip Wyett fixed csVector3 up (); so that you/camera
 	  is the right way up in ptlab. :-)

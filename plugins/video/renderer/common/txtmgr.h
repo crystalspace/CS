@@ -221,6 +221,10 @@ class csMaterialHandle : public iMaterialHandle
 protected:
   /// A texture.
   iTextureHandle *texture;
+  /// Numer of texture layers.
+  int num_texture_layers;
+  /// Texture layers.
+  csTextureLayer texture_layers[4];
   /// The flat color of the material
   csRGBpixel flat_color;
   /// Material reflection parameters

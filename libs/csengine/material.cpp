@@ -30,7 +30,6 @@ IMPLEMENT_IBASE_END
 csMaterial::csMaterial () :
   texture(0),
   num_texture_layers (0),
-  texture_layer_wrapper (NULL),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
@@ -42,7 +41,6 @@ csMaterial::csMaterial () :
 csMaterial::csMaterial (csTextureWrapper* w) :
   texture(w),
   num_texture_layers (0),
-  texture_layer_wrapper (NULL),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
@@ -53,7 +51,6 @@ csMaterial::csMaterial (csTextureWrapper* w) :
 
 csMaterial::~csMaterial () 
 {
-//  delete texture;
 }
 
 iTextureHandle *csMaterial::GetTexture ()
@@ -82,22 +79,22 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 void csMaterial::AddTextureLayer (csTextureWrapper* txtwrap, UInt mode,
       	int uscale, int vscale, int ushift, int vshift)
 {
-  if (num_texture_layers >= 1) return;
-  num_texture_layers = 1;
-  texture_layer_wrapper = txtwrap;
-  texture_layer.mode = mode;
-  texture_layer.uscale = uscale;
-  texture_layer.vscale = vscale;
-  texture_layer.ushift = ushift;
-  texture_layer.vshift = vshift;
+  if (num_texture_layers >= 4) return;
+  texture_layer_wrappers[num_texture_layers] = txtwrap;
+  texture_layers[num_texture_layers].mode = mode;
+  texture_layers[num_texture_layers].uscale = uscale;
+  texture_layers[num_texture_layers].vscale = vscale;
+  texture_layers[num_texture_layers].ushift = ushift;
+  texture_layers[num_texture_layers].vshift = vshift;
+  num_texture_layers++;
 }
 
 csTextureLayer* csMaterial::GetTextureLayer (int idx)
 {
-  if (num_texture_layers == 1)
+  if (idx >= 0 && idx < num_texture_layers)
   {
-    texture_layer.txt_handle = texture_layer_wrapper->GetTextureHandle ();
-    return &texture_layer;
+    texture_layers[idx].txt_handle = texture_layer_wrappers[idx]->GetTextureHandle ();
+    return &texture_layers[idx];
   }
   else return NULL;
 }

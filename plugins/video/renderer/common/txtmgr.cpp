@@ -174,6 +174,7 @@ IMPLEMENT_IBASE_END
 csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 {
   CONSTRUCT_IBASE (NULL);
+  num_texture_layers = 0;
   if ((material = m) != 0)
   {
     material->IncRef ();
@@ -181,6 +182,11 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
     if (texture) texture->IncRef ();
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
+    num_texture_layers = material->GetNumTextureLayers ();
+    if (num_texture_layers > 4) num_texture_layers = 4;
+    int i;
+    for (i = 0 ; i < num_texture_layers ; i++)
+      texture_layers[i] = *(material->GetTextureLayer (i));
   }
   (texman = parent)->IncRef ();
 }
@@ -189,6 +195,7 @@ csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
 {
   CONSTRUCT_IBASE (NULL);
   material = NULL;
+  num_texture_layers = 0;
   diffuse = 0.7; ambient = 0; reflection = 0;
   if ((texture = t) != 0)
     texture->IncRef ();

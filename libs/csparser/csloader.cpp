@@ -811,10 +811,6 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
 
   csMaterial* material = new csMaterial ();
 
-  csTextureWrapper* layer_texture = NULL;
-  int layer_uscale = 1, layer_vscale = 1, layer_ushift = 0, layer_vshift = 0;
-  UInt layer_mode = CS_FX_ADD;
-
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
@@ -849,6 +845,10 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
         break;
       case CS_TOKEN_LAYER:
 	{
+	  csTextureWrapper* layer_texture = NULL;
+	  int layer_uscale = 1, layer_vscale = 1;
+	  int layer_ushift = 0, layer_vshift = 0;
+	  UInt layer_mode = CS_FX_ADD;
 	  char* params2;
 	  while ((cmd = csGetObject (&params, layerCommands,
 		&name, &params2)) > 0)
@@ -879,6 +879,8 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
 	        break;
 	    }
 	  }
+	  material->AddTextureLayer (layer_texture, layer_mode,
+	    layer_uscale, layer_vscale, layer_ushift, layer_vshift);
 	}
         break;
     }
@@ -888,12 +890,6 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
   {
     System->Printf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a material specification!\n", csGetLastOffender ());
     fatal_exit (0, false);
-  }
-
-  if (layer_texture)
-  {
-    material->AddTextureLayer (layer_texture, layer_mode,
-	layer_uscale, layer_vscale, layer_ushift, layer_vshift);
   }
 
   iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);

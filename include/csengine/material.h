@@ -40,12 +40,12 @@ private:
   csRGBcolor flat_color;
   /// the texture of the material (can be NULL)
   csTextureWrapper *texture;
-  /// Number of texture layers. Currently only one supported.
+  /// Number of texture layers (currently maximum 4).
   int num_texture_layers;
   /// Optional texture layer.
-  csTextureLayer texture_layer;
+  csTextureLayer texture_layers[4];
   /// Texture wrappers for texture layers.
-  csTextureWrapper* texture_layer_wrapper;
+  csTextureWrapper* texture_layer_wrappers[4];
 
   /// The diffuse reflection value of the material
   float diffuse;
