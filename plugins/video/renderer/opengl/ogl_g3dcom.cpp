@@ -7273,7 +7273,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
       }
       else
       {
-        if(_strnicmp(effectserver->RequestString(pass_state), "vertex program constant", 23) == 0)
+        if(strncasecmp(effectserver->RequestString(pass_state), "vertex program constant", 23) == 0)
         {
           //this is a vertexconstant
           char* constname = (char*) effectserver->RequestString(pass_state);
