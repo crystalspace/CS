@@ -532,6 +532,8 @@ struct iEngine : public iBase
 
   /// Set the drawing context
   virtual void SetContext (iGraphics3D*) = 0;
+  /// Return the current drawing context
+  virtual iGraphics3D *GetContext () const = 0;
 
   /**
    * Set the amount of ambient light. This has no effect until you

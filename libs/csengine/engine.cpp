@@ -2303,6 +2303,11 @@ void csEngine::SetContext (iGraphics3D* g3d)
   }
 }
 
+iGraphics3D *csEngine::GetContext () const
+{
+  return G3D;
+}
+
 iClipper2D* csEngine::GetTopLevelClipper () const
 {
   return top_clipper;

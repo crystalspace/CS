@@ -1122,6 +1122,8 @@ public:
 
   /// Point engine to rendering context
   virtual void SetContext (iGraphics3D* g3d);
+  /// Return the current drawing context
+  virtual iGraphics3D *GetContext () const;
 
 private:
   /// Resizes frame width and height dependent data members
