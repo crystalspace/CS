@@ -41,8 +41,8 @@
 
 MSVC.PLUGINS.REQUIRED =         \
   aws                           \
-  cscript/cspython              \
   cscript/cslua                 \
+  cscript/cspython              \
   font/server/freefont          \
   mesh/impexp/3ds               \
   sound/driver/waveoutsd        \
@@ -50,10 +50,10 @@ MSVC.PLUGINS.REQUIRED =         \
   sound/renderer/eax            \
   sound/renderer/software       \
   video/canvas/ddraw            \
+  video/canvas/ddraw8           \
   video/canvas/openglwin        \
+  video/canvas/sdl              \
   video/format/avi              \
   video/format/codecs/opendivx  \
   video/format/codecs/rle       \
-  video/canvas/ddraw8           \
-  video/canvas/sdl              \
   video/renderer/opengl

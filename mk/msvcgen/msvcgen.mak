@@ -1,7 +1,7 @@
 #==============================================================================
 #
 #    Automatic MSVC-compliant DSW and DSP generation makefile
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -168,7 +168,8 @@ msvcgen:
 	@echo $(SEPARATOR)
 	@echo $"  Generating $(DESCRIPTION.$@)$"
 	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ DO_ASM=no \
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
+	DO_ASM=no USE_MAKEFILE_CACHE=no \
 	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
 
 msvcinst: msvcgen

@@ -195,7 +195,7 @@ my @BINARY = ('(?i)\.(dsw|dsp)$');
 my @TARGETS =
     ({ 'name'   => 'Visual-C++ DSW and DSP files',
        'action' => 'Repairing',
-       'make'   => 'msvcgen USE_MAKEFILE_CACHE=no',
+       'make'   => 'msvcgen',
        'newdir' => 'out/mk/visualc',
        'olddir' => 'mk/visualc',
        'log'    => 'Automated Visual-C++ DSW and DSP project file repair.' },
