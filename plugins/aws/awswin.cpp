@@ -13,14 +13,17 @@
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 
+// makes sure this header file stays consistent with the project.
+#include "iaws/awsecomp.h"
+
 #include <stdio.h>
 #include <string.h>
 
-const unsigned long awsWindow:: sWindowRaised = 0x1;
-const unsigned long awsWindow:: sWindowLowered = 0x2;
-const unsigned long awsWindow:: sWindowShown = 0x3;
-const unsigned long awsWindow:: sWindowHidden = 0x4;
-const unsigned long awsWindow:: sWindowClosed = 0x5;
+const unsigned long awsWindow::sWindowRaised = 0x1;
+const unsigned long awsWindow::sWindowLowered = 0x2;
+const unsigned long awsWindow::sWindowShown = 0x3;
+const unsigned long awsWindow::sWindowHidden = 0x4;
+const unsigned long awsWindow::sWindowClosed = 0x5;
 
 const int awsWindow:: fsNormal = 0x0;
 const int awsWindow:: fsToolbar = 0x1;

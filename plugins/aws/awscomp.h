@@ -191,7 +191,7 @@ public:
   /** Get's this components idea of the window manager.
       * Should be used internally by the component ONLY,
       * or by embedding classes. */
-  iAws *WindowManager ();
+  virtual iAws *WindowManager ();
 
   /// Get's the window that this component resides in.
   virtual iAwsWindow *Window ();
