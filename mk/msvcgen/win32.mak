@@ -65,9 +65,9 @@ SRC.WIN32SYS = \
   $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \
   $(SRCDIR)/libs/cssys/general/getopt.cpp \
+  $(SRCDIR)/libs/cssys/general/pluginpaths.cpp \
   $(SRCDIR)/libs/cssys/general/printf.cpp \
-  $(SRCDIR)/libs/cssys/general/runloop.cpp \
-  $(SRCDIR)/libs/cssys/general/pluginpaths.cpp
+  $(SRCDIR)/libs/cssys/general/runloop.cpp
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.
