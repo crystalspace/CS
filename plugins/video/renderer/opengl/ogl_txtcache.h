@@ -22,6 +22,7 @@
 
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
+#include "ivideo/graph3d.h"
 #include <GL/gl.h>
 
 struct iLightMap;
@@ -29,6 +30,7 @@ struct iTextureHandle;
 struct iPolygonTexture;
 struct iSystem;
 class csSubRectangles;
+class csGraphics3DOGLCommon;
 
 /**
  * Cache element for a texture. This element will be stored
@@ -124,6 +126,51 @@ struct csLMCacheData
 };
 
 /**
+ * A queue for lightmap polygons. Every super-lightmap has
+ * such a queue.
+ */
+class csLightMapQueue
+{
+public:
+  /// Triangles.
+  int num_triangles, max_triangles;
+  int* tris;
+  /// Vertices.
+  int num_vertices, max_vertices;
+  GLfloat* glverts;	// 4*max_vertices
+  GLfloat* gltxt;	// 2*max_vertices
+
+  /// Add some vertices. Return index of the added vertices.
+  int AddVertices (int num);
+  /// Add a triangle.
+  void AddTriangle (int i1, int i2, int i3);
+  /// Reset the queue to empty.
+  void Reset ()
+  {
+    num_triangles = 0;
+    num_vertices = 0;
+  }
+  GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
+  GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
+
+  /// Constructor.
+  csLightMapQueue () :
+  	num_triangles (0), max_triangles (0), tris (NULL),
+	num_vertices (0), max_vertices (0), glverts (NULL), gltxt (NULL)
+  { }
+  /// Destructor.
+  ~csLightMapQueue ()
+  {
+    delete[] tris;
+    delete[] glverts;
+    delete[] gltxt;
+  }
+
+  /// Flush this queue: i.e. render the lightmaps.
+  void Flush (GLuint Handle);
+};
+
+/**
  * This class represents a super-lightmap.
  * A super-lightmap is a collection of smaller lightmaps that
  * fit together in one big texture.
@@ -138,7 +185,15 @@ public:
   /// the head and tail of the cache data
   csLMCacheData *head, *tail;
 
+  /**
+   * The super-lightmap also behaves like a queue for lightmapped polygons.
+   * The following field manage that queue.
+   */
+  csLightMapQueue queue;
+
+  /// Constructor.
   csSuperLightMap ();
+  /// Destructor.
   ~csSuperLightMap ();
 
   /// Try to allocate a lightmap here. Return NULL on failure.
@@ -154,6 +209,8 @@ public:
 class OpenGLLightmapCache
 {
 private:
+  csGraphics3DOGLCommon* g3d;
+
   /// A number of super-lightmaps to contain all other lightmaps.
   csSuperLightMap suplm[SUPER_LM_NUM];	// @@@ Make configurable.
   /// Current super lightmap.
@@ -164,14 +221,39 @@ private:
   void Load (csLMCacheData *d);
   void Setup ();
 
+  /// Flush all the lightmaps in one super lightmap (i.e. render them).
+  void Flush (int sup_idx);
+
+  /// This is the z-buf mode of the current queue.
+  csZBufMode queue_zbuf_mode;
+
 public:
   ///
-  OpenGLLightmapCache ();
+  OpenGLLightmapCache (csGraphics3DOGLCommon* g3d);
   ///
   ~OpenGLLightmapCache ();
 
   /// Cache a lightmap.
   void Cache (iPolygonTexture *polytex);
+
+  /// Get the queue for a cached lightmap.
+  csLightMapQueue* GetQueue (csLMCacheData* clm)
+  {
+    return &(suplm[clm->super_lm_idx].queue);
+  }
+
+  /**
+   * Flush all the lightmaps (i.e. render them).
+   * This will force a flush regardless of render modes.
+   */
+  void Flush ();
+
+  /**
+   * Test if a flush is needed and do flush. This can depend
+   * on various settings like z-buffer mode and so on.
+   */
+  void FlushIfNeeded ();
+
   /// Clear the entire lightmap cache.
   void Clear ();
 };

@@ -14,6 +14,18 @@ The history order is reversed so that new features are at the top.
 	  this to a 64x64 lightmap. This is nearly four times too big!
 	  At this moment there is still some waste though. This is caused
 	  by the (currently unoptimized) csSubRectangles class.
+	- Apparently not all OpenGL drivers correctly support glTexImage2D
+	  with a NULL pointer as input data. OpenGL specs say this is allowed.
+	  So I added a work-around for this by giving a dummy array.
+	- Wouter Wijngaards added some code in the Print method to delay
+	  (using System Sleep()). This is needed for a G400. It needs a
+	  limit of 50 fps. (which is a 40 msec setting, probably due to
+	  bad timers/sleep inaccuracy). This code is currently disabled.
+	  A config option needs to be made to enable this optionally.
+	- Lightmaps are now sorted on lightmap. Every super lightmap has
+	  its own cache and they are rendered one by one when needed.
+	- Fog has its own seperate queue now and this is rendered in a
+	  totally seperate pass.
 21-May-2001
 	- Added non-functional emit loader/saver which Wouter can complete.
 	- Wouter worked on emit loader. I did a small enhancement too.

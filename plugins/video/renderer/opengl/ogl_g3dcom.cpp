@@ -118,8 +118,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   lightmap_cache = NULL;
   txtmgr = NULL;
   m_fogtexturehandle = 0;
-  dbg_max_polygons_to_draw = 2000000000;	// After 2 billion
-  // polygons we give up :-)
 
   /// caps will be read from config or reset to defaults during Initialize.
   Caps.CanClip = false;
@@ -618,16 +616,16 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   // try to match user's blend name with a name in the blendstyles table
   const char *lightmapstyle = config->GetStr
         ("Video.OpenGL.LightmapMode","multiplydouble");
-  int blendstyleindex = 0;
-  while (blendstyles[blendstyleindex].blendstylename != NULL)
+  int bl_idx = 0;
+  while (blendstyles[bl_idx].blendstylename != NULL)
   {
-    if (strcmp (lightmapstyle, blendstyles[blendstyleindex].blendstylename) == 0)
+    if (strcmp (lightmapstyle, blendstyles[bl_idx].blendstylename) == 0)
     {
-      m_config_options.m_lightmap_src_blend = blendstyles[blendstyleindex].srcblend;
-      m_config_options.m_lightmap_dst_blend = blendstyles[blendstyleindex].dstblend;
+      m_config_options.m_lightmap_src_blend = blendstyles[bl_idx].srcblend;
+      m_config_options.m_lightmap_dst_blend = blendstyles[bl_idx].dstblend;
       break;
     }
-    blendstyleindex++;
+    bl_idx++;
   }
 
 #if USE_EXTENSIONS
@@ -643,11 +641,13 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
     if (maxtextures > 1)
     {
       m_config_options.do_multitexture_level = maxtextures;
-      SysPrintf (MSG_INITIALIZATION, "Using multitexture extension with %d texture units\n", maxtextures);
+      SysPrintf (MSG_INITIALIZATION,
+      	"Using multitexture extension with %d texture units\n", maxtextures);
     }
     else
     {
-      SysPrintf (MSG_INITIALIZATION, "WARNING: driver supports multitexture extension but only allows one texture unit!\n");
+      SysPrintf (MSG_INITIALIZATION,
+      	"WARNING: driver supports multitexture extension but only allows one texture unit!\n");
     }
   }
 #endif
@@ -666,8 +666,8 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
     transientfogdata[fogindex * 4 + 0] = (unsigned char) 255;
     transientfogdata[fogindex * 4 + 1] = (unsigned char) 255;
     transientfogdata[fogindex * 4 + 2] = (unsigned char) 255;
-    double fogalpha =
-    (256 * (1.0 - exp (-float (fogindex) * CS_FOGTABLE_MAXDISTANCE / CS_FOGTABLE_SIZE)));
+    double fogalpha = (256 * (1.0 - exp (-float (fogindex)
+    	* CS_FOGTABLE_MAXDISTANCE / CS_FOGTABLE_SIZE)));
     transientfogdata[fogindex * 4 + 3] = (unsigned char) fogalpha;
   }
   // prevent weird effects when 0 distance fog wraps around to the
@@ -697,7 +697,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
 
   int max_cache_size = 1024*1024*16; // 32mb combined cache
   texture_cache = new OpenGLTextureCache (max_cache_size, 24);
-  lightmap_cache = new OpenGLLightmapCache ();
+  lightmap_cache = new OpenGLLightmapCache (this);
   texture_cache->SetBilinearMapping (config->GetBool
         ("Video.OpenGL.EnableBilinearMap", true));
 
@@ -705,20 +705,19 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   errtest = glGetError ();
   if (errtest != GL_NO_ERROR)
   {
-    //SysPrintf (MSG_DEBUG_0, "openGL error string: %s\n", gluErrorString (errtest));
+    //SysPrintf (MSG_DEBUG_0, "openGL error string: %s\n",
+    	//gluErrorString (errtest));
     SysPrintf (MSG_DEBUG_0, "openGL error: %d\n", errtest);
   }
 
-  // if blend style is 'auto' try to determine which mode to use by drawing on the
-  // frame buffer.  We check the results to see if the OpenGL driver provides good
-  // support for multipledouble (2*SRC*DST) blend mode; if not, fallback to the
-  // normal multiply blend mode
+  // If blend style is 'auto' try to determine which mode to use by drawing
+  // on the frame buffer. We check the results to see if the OpenGL driver
+  // provides good support for multipledouble (2*SRC*DST) blend mode; if
+  // not, fallback to the normal multiply blend mode.
   if (strcmp (lightmapstyle, "auto") == 0)
   {
     GLenum srcblend, dstblend;
-
     Guess_BlendMode (&srcblend, &dstblend);
-
     m_config_options.m_lightmap_src_blend = srcblend;
     m_config_options.m_lightmap_dst_blend = dstblend;
   }
@@ -726,7 +725,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   glCullFace (GL_FRONT);
   glEnable (GL_CULL_FACE);
 
-  // now that we know what pixelformat we use, clue the texture manager in
+  // Now that we know what pixelformat we use, clue the texture manager in.
   txtmgr->SetPixelFormat (*G2D->GetPixelFormat ());
 
   PerfTest ();
@@ -752,10 +751,12 @@ void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
   CommonOpen ();
   ARB_multitexture = d->ARB_multitexture;
   m_config_options.do_multitexture_level =
-    d->m_config_options.do_multitexture_level;
+	d->m_config_options.do_multitexture_level;
   m_config_options.do_extra_bright = d->m_config_options.do_extra_bright;
-  m_config_options.m_lightmap_src_blend = d->m_config_options.m_lightmap_src_blend;
-  m_config_options.m_lightmap_dst_blend = d->m_config_options.m_lightmap_dst_blend;
+  m_config_options.m_lightmap_src_blend =
+  	d->m_config_options.m_lightmap_src_blend;
+  m_config_options.m_lightmap_dst_blend =
+  	d->m_config_options.m_lightmap_dst_blend;
   m_fogtexturehandle = d->m_fogtexturehandle;
   texture_cache = d->texture_cache;
   lightmap_cache = d->lightmap_cache;
@@ -770,7 +771,12 @@ void csGraphics3DOGLCommon::Close ()
   delete txtmgr; txtmgr = NULL;
   delete texture_cache; texture_cache = NULL;
   delete lightmap_cache; lightmap_cache = NULL;
-  if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
+  if (clipper)
+  {
+    clipper->DecRef ();
+    clipper = NULL;
+    cliptype = CS_CLIPPER_NONE;
+  }
 
   if (m_fogtexturehandle)
   {
@@ -911,7 +917,11 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 {
   if (DrawMode & CSDRAW_3DGRAPHICS)
+  {
     FlushDrawPolygon ();
+    lightmap_cache->Flush ();
+    FlushDrawFog ();
+  }
 
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
@@ -919,8 +929,6 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
   {
     if (!G2D->BeginDraw ())
       return false;
-
-    dbg_current_polygon = 0;
   }
 
   if (DrawFlags & CSDRAW_CLEARZBUFFER)
@@ -943,8 +951,12 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 
 void csGraphics3DOGLCommon::FinishDraw ()
 {
-  if (DrawMode & CSDRAW_3DGRAPHICS)
+  //if (DrawMode & CSDRAW_3DGRAPHICS)
+  {
     FlushDrawPolygon ();
+    lightmap_cache->Flush ();
+    FlushDrawFog ();
+  }
 
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
   {
@@ -956,22 +968,22 @@ void csGraphics3DOGLCommon::FinishDraw ()
 void csGraphics3DOGLCommon::Print (csRect * area)
 {
 #if 0
+  //@@@ TODO: make config!
   int fps_limit = 40; // for G400, 40 msec ( a fps limit of 50 fps )
   cs_time elapsed_time, current_time;
-  System->GetElapsedTime(elapsed_time, current_time);
-  /// smooth last n frames, to avoid jitter when objects appear/disappear
+  System->GetElapsedTime (elapsed_time, current_time);
+  /// Smooth last n frames, to avoid jitter when objects appear/disappear.
   static int num = 10;
-  static int times[10] = {0};
+  static int times[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   static int cur = 0;
   static int totaltime = 0;
   totaltime -= times[cur];
   times[cur] = elapsed_time;
   totaltime += times[cur];
   cur = (cur+1)%num;
-  if(totaltime/10 < fps_limit) System->Sleep(fps_limit - totaltime/10);
+  if (totaltime/10 < fps_limit) System->Sleep (fps_limit - totaltime/10);
 #endif
   G2D->Print (area);
-  // glClear(GL_COLOR_BUFFER_BIT);
 }
 
 static float GetAlpha (UInt mode, float m_alpha)
@@ -1062,11 +1074,39 @@ static float SetupBlend (UInt mode, float m_alpha, bool has_alpha)
   return m_alpha;
 }
 
+void csGraphics3DOGLCommon::FlushDrawFog ()
+{
+  if (fog_queue.num_triangles <= 0) return;
+
+  SetGLZBufferFlagsPass2 (fog_queue.z_buf_mode, true);
+
+  glEnable (GL_TEXTURE_2D);
+  glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  glShadeModel (GL_SMOOTH);
+  glEnable (GL_BLEND);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  glEnableClientState (GL_VERTEX_ARRAY);
+  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  glEnableClientState (GL_COLOR_ARRAY);
+  glColorPointer (3, GL_FLOAT, 0, fog_queue.fog_color);
+  glVertexPointer (4, GL_FLOAT, 0, fog_queue.glverts);
+  glTexCoordPointer (2, GL_FLOAT, 0, fog_queue.fog_txt);
+  glDrawElements (GL_TRIANGLES, fog_queue.num_triangles*3, GL_UNSIGNED_INT,
+  	  fog_queue.tris);
+  glDisableClientState (GL_COLOR_ARRAY);
+  glDisableClientState (GL_VERTEX_ARRAY);
+  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+
+  fog_queue.Reset ();
+}
+
 void csGraphics3DOGLCommon::FlushDrawPolygon ()
 {
   if (queue.num_triangles <= 0) return;
-  int i, j;
 
+  int i, j;
   csMaterialHandle* mat_handle = (csMaterialHandle*)queue.mat_handle;
   iTextureHandle* txt_handle = NULL;
   csTextureHandleOpenGL *txt_mm = NULL;
@@ -1171,9 +1211,8 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   // If we have need other texture passes (for whatever reason)
   // we set the z-buffer to second pass state.
   //=================
-  if ((queue.do_lightmaps && m_renderstate.lighting) ||
-      m_config_options.do_extra_bright ||
-      queue.use_fog || multimat)
+  if (m_config_options.do_extra_bright ||
+      /*@@@queue.use_fog ||*/ multimat)
   {
     SetGLZBufferFlagsPass2 (queue.z_buf_mode, true);
   }
@@ -1221,6 +1260,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
         p_gltxt = queue.gltxt;
       }
       glTexCoordPointer (2, GL_FLOAT, 0, p_gltxt);
+      glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
       glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
   	  queue.tris);
     }
@@ -1245,61 +1285,10 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     }
   }
 
+#if 0
+  //@@@ TEMPORARILY DISABLED
   //=================
-  // Pass 3: Draw the lightmaps over the texture.  The two are blended
-  // together. If a lightmap exists, extract the proper
-  // data (GL handle, plus texture coordinate bounds)
-  //=================
-  if (queue.do_lightmaps && m_renderstate.lighting)
-  {
-    glEnable (GL_TEXTURE_2D);
-    glEnable (GL_BLEND);
-    // The following blend function is configurable.
-    glBlendFunc (m_config_options.m_lightmap_src_blend,
-		 m_config_options.m_lightmap_dst_blend);
-    GLuint prev_lightmaphandle = 0;
-    for (j = 0 ; j < queue.num_lightmaps ; j++)
-    {
-      // find lightmap information, if any
-      iPolygonTexture *tex = queue.poly_textures[j];
-      iLightMap *thelightmap = tex->GetLightMap ();
-      if (thelightmap && m_renderstate.lighting)
-      {
-        // Initialize our static drawing information and cache
-        // the lightmap.
-        lightmap_cache->Cache (tex);
-
-        csLMCacheData *lightmapcache_data = (csLMCacheData *)
-      	  thelightmap->GetCacheData ();
-        GLuint lightmaphandle = lightmapcache_data->Handle;
-	if (prev_lightmaphandle != lightmaphandle)
-	{
-          glBindTexture (GL_TEXTURE_2D, lightmaphandle);
-	  prev_lightmaphandle = lightmaphandle;
-	}
-        float lm_scale_u = lightmapcache_data->lm_scale_u;
-        float lm_scale_v = lightmapcache_data->lm_scale_v;
-        float lm_offset_u = lightmapcache_data->lm_offset_u;
-        float lm_offset_v = lightmapcache_data->lm_offset_v;
-        int vtidx = queue.start_vt[j];
-        GLfloat* src = queue.GetGLTxt (vtidx);
-        GLfloat* dst = queue.GetLayerGLTxt (vtidx);
-        for (i = 0 ; i < queue.len_vt[j] ; i++)
-        {
-          *dst++ = (*src++ - lm_offset_u) * lm_scale_u;
-          *dst++ = (*src++ - lm_offset_v) * lm_scale_v;
-        }
-        // @@@ Is doing a triangle fan better here?
-        glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
-        glTexCoordPointer (2, GL_FLOAT, 0, queue.layer_gltxt);
-        glDrawElements (GL_TRIANGLES, queue.len_tri[j]*3, GL_UNSIGNED_INT,
-  	    queue.tris+queue.start_tri[j]*3);
-      }
-    }
-  }
-
-  //=================
-  // Pass 4: an extra optional pass which improves the lighting on SRC*DST
+  // Pass 3: an extra optional pass which improves the lighting on SRC*DST
   // so that it looks more like 2*SRC*DST.
   //=================
   if (m_config_options.do_extra_bright)
@@ -1315,32 +1304,53 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
   	  queue.tris);
   }
-
-  //=================
-  // Pass 5: If there is vertex fog then we apply that last.
-  //=================
-  if (queue.use_fog)
-  {
-    glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    glShadeModel (GL_SMOOTH);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glEnableClientState (GL_COLOR_ARRAY);
-    glColorPointer (3, GL_FLOAT, 0, queue.fog_color);
-    glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
-    glTexCoordPointer (2, GL_FLOAT, 0, queue.fog_txt);
-    glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
-  	  queue.tris);
-    glDisableClientState (GL_COLOR_ARRAY);
-  }
+#endif
 
   glDisableClientState (GL_VERTEX_ARRAY);
   glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
   queue.Reset ();
+}
+
+int csFogQueue::AddVertices (int num)
+{
+  num_vertices += num;
+  if (num_vertices > max_vertices)
+  {
+    GLfloat* new_ar;
+    int old_num = num_vertices-num;
+    max_vertices += 40;
+
+    new_ar = new GLfloat [max_vertices*4];
+    if (glverts) memcpy (new_ar, glverts, sizeof (GLfloat)*4*old_num);
+    delete[] glverts; glverts = new_ar;
+
+    new_ar = new GLfloat [max_vertices*3];
+    if (fog_color) memcpy (new_ar, fog_color, sizeof (GLfloat)*3*old_num);
+    delete[] fog_color; fog_color = new_ar;
+
+    new_ar = new GLfloat [max_vertices*2];
+    if (fog_txt) memcpy (new_ar, fog_txt, sizeof (GLfloat)*2*old_num);
+    delete[] fog_txt; fog_txt = new_ar;
+  }
+  return num_vertices-num;
+}
+
+void csFogQueue::AddTriangle (int i1, int i2, int i3)
+{
+  int old_num = num_triangles;
+  num_triangles++;
+  if (num_triangles > max_triangles)
+  {
+    max_triangles += 20;
+    int* new_ar;
+    new_ar = new int [max_triangles*3];
+    if (tris) memcpy (new_ar, tris, sizeof (int) * 3 * old_num);
+    delete[] tris; tris = new_ar;
+  }
+  tris[old_num*3+0] = i1;
+  tris[old_num*3+1] = i2;
+  tris[old_num*3+2] = i3;
 }
 
 int csPolyQueue::AddVertices (int num)
@@ -1367,44 +1377,8 @@ int csPolyQueue::AddVertices (int num)
     new_ar = new GLfloat [max_vertices*2];
     if (layer_gltxt) memcpy (new_ar, layer_gltxt, sizeof (GLfloat)*2*old_num);
     delete[] layer_gltxt; layer_gltxt = new_ar;
-
-    new_ar = new GLfloat [max_vertices*3];
-    if (fog_color) memcpy (new_ar, fog_color, sizeof (GLfloat)*3*old_num);
-    delete[] fog_color; fog_color = new_ar;
-
-    new_ar = new GLfloat [max_vertices*2];
-    if (fog_txt) memcpy (new_ar, fog_txt, sizeof (GLfloat)*2*old_num);
-    delete[] fog_txt; fog_txt = new_ar;
   }
   return num_vertices-num;
-}
-
-int csPolyQueue::AddLightmap ()
-{
-  num_lightmaps++;
-  if (num_lightmaps > max_lightmaps)
-  {
-    int old_num = num_lightmaps-1;
-    max_lightmaps += 10;
-    iPolygonTexture** new_arp = new iPolygonTexture* [max_lightmaps];
-    if (poly_textures) memcpy (new_arp, poly_textures,
-    	sizeof (iPolygonTexture*) * old_num);
-    delete[] poly_textures; poly_textures = new_arp;
-    int* new_ar;
-    new_ar = new int [max_lightmaps];
-    if (start_vt) memcpy (new_ar, start_vt, sizeof (int) * old_num);
-    delete[] start_vt; start_vt = new_ar;
-    new_ar = new int [max_lightmaps];
-    if (len_vt) memcpy (new_ar, len_vt, sizeof (int) * old_num);
-    delete[] len_vt; len_vt = new_ar;
-    new_ar = new int [max_lightmaps];
-    if (start_tri) memcpy (new_ar, start_tri, sizeof (int) * old_num);
-    delete[] start_tri; start_tri = new_ar;
-    new_ar = new int [max_lightmaps];
-    if (len_tri) memcpy (new_ar, len_tri, sizeof (int) * old_num);
-    delete[] len_tri; len_tri = new_ar;
-  }
-  return num_lightmaps-1;
 }
 
 void csPolyQueue::AddTriangle (int i1, int i2, int i3)
@@ -1464,8 +1438,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   // First check if this polygon is different from the current polygons
   // in the queue. If so we need to flush the queue.
   //========
-  if (poly.use_fog != queue.use_fog ||
-      poly.mat_handle != queue.mat_handle ||
+  if (poly.mat_handle != queue.mat_handle ||
       poly.alpha != queue.alpha ||
       poly.mixmode != queue.mixmode ||
       z_buf_mode != queue.z_buf_mode ||
@@ -1474,12 +1447,14 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
       flat_b != queue.flat_color_b)
   {
     FlushDrawPolygon ();
+    lightmap_cache->FlushIfNeeded ();
+    if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
+      FlushDrawFog ();
   }
 
   //========
   // Store information in the queue.
   //========
-  queue.use_fog = poly.use_fog;
   queue.mat_handle = poly.mat_handle;
   queue.alpha = poly.alpha;
   queue.mixmode = poly.mixmode;
@@ -1582,27 +1557,60 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   }
 
   // Triangulate.
-  int triidx = queue.num_triangles;
   for (i = 2 ; i < poly.num ; i++)
   {
     queue.AddTriangle (idx+0, idx+i-1, idx+i);
   }
 
-  int lmidx = queue.AddLightmap ();
-  queue.start_vt[lmidx] = idx;
-  queue.len_vt[lmidx] = poly.num;
-  queue.start_tri[lmidx] = triidx;
-  queue.len_tri[lmidx] = poly.num-2;
   iPolygonTexture *tex = poly.poly_texture;
-  queue.poly_textures[lmidx] = tex;
-  iLightMap *thelightmap = tex->GetLightMap ();
-  if (thelightmap) queue.do_lightmaps = true;
+  iLightMap* lm = tex->GetLightMap ();
+  if (m_renderstate.lighting && lm)
+  {
+    lightmap_cache->Cache (tex);
+    csLMCacheData* clm = (csLMCacheData *)lm->GetCacheData ();
+    if (clm)
+    {
+      csLightMapQueue* lm_queue = lightmap_cache->GetQueue (clm);
+      int lm_idx = lm_queue->AddVertices (poly.num);
+
+      // Copy vertex info.
+      GLfloat* glverts = queue.GetGLVerts (idx);
+      GLfloat* lm_glverts = lm_queue->GetGLVerts (lm_idx);
+      memcpy (lm_glverts, glverts, poly.num*sizeof (GLfloat)*4);
+
+      // Copy lightmap texture info.
+      float lm_scale_u = clm->lm_scale_u;
+      float lm_scale_v = clm->lm_scale_v;
+      float lm_offset_u = clm->lm_offset_u;
+      float lm_offset_v = clm->lm_offset_v;
+      GLfloat* gltxt = queue.GetGLTxt (idx);
+      GLfloat* lm_gltxt = lm_queue->GetGLTxt (lm_idx);
+      for (i = 0; i < poly.num; i++)
+      {
+        *lm_gltxt++ = (*gltxt++ - lm_offset_u) * lm_scale_u;
+        *lm_gltxt++ = (*gltxt++ - lm_offset_v) * lm_scale_v;
+      }
+
+      // Triangulate.
+      for (i = 2 ; i < poly.num ; i++)
+      {
+        lm_queue->AddTriangle (lm_idx+0, lm_idx+i-1, lm_idx+i);
+      }
+    }
+  }
 
   if (poly.use_fog)
   {
-    GLfloat* fog_color = queue.GetFogColor (idx);
-    GLfloat* fog_txt = queue.GetFogTxt (idx);
-    for (i = 0; i < poly.num; i++)
+    fog_queue.z_buf_mode = z_buf_mode;
+    int fog_idx = fog_queue.AddVertices (poly.num);
+
+    // Copy vertex info.
+    GLfloat* glverts = queue.GetGLVerts (idx);
+    GLfloat* fog_glverts = fog_queue.GetGLVerts (fog_idx);
+    memcpy (fog_glverts, glverts, poly.num*sizeof (GLfloat)*4);
+    GLfloat* fog_color = fog_queue.GetFogColor (fog_idx);
+    GLfloat* fog_txt = fog_queue.GetFogTxt (fog_idx);
+    for (i = 0 ; i < poly.num ; i++)
     {
       *fog_color++ = poly.fog_info[i].r;
       *fog_color++ = poly.fog_info[i].g;
@@ -1610,6 +1618,12 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
       *fog_txt++ = poly.fog_info[i].intensity;
       *fog_txt++ = 0.0;
+    }
+
+    // Triangulate.
+    for (i = 2 ; i < poly.num ; i++)
+    {
+      fog_queue.AddTriangle (fog_idx+0, fog_idx+i-1, fog_idx+i);
     }
   }
 }
@@ -1635,6 +1649,8 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
     return;
 
   FlushDrawPolygon ();
+  lightmap_cache->Flush ();
+  FlushDrawFog ();
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -1722,8 +1738,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   // First check if this polygon is different from the current polygons
   // in the queue. If so we need to flush the queue.
   //========
-  if (poly.use_fog != queue.use_fog ||
-      poly.mat_handle != queue.mat_handle ||
+  if (poly.mat_handle != queue.mat_handle ||
       0 != queue.alpha ||
       poly.mixmode != queue.mixmode ||
       z_buf_mode != queue.z_buf_mode ||
@@ -1732,12 +1747,14 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
       flat_b != queue.flat_color_b)
   {
     FlushDrawPolygon ();
+    lightmap_cache->FlushIfNeeded ();
+    if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
+      FlushDrawFog ();
   }
 
   //========
   // Store information in the queue.
   //========
-  queue.use_fog = poly.use_fog;
   queue.mat_handle = poly.mat_handle;
   queue.alpha = 0;
   queue.mixmode = poly.mixmode;
@@ -1788,11 +1805,21 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     queue.AddTriangle (idx+0, idx+i-1, idx+i);
   }
 
+  //========
+  // Add fog info to the fog queue.
+  //========
   if (poly.use_fog)
   {
-    GLfloat* fog_color = queue.GetFogColor (idx);
-    GLfloat* fog_txt = queue.GetFogTxt (idx);
-    for (i = 0; i < poly.num; i++)
+    fog_queue.z_buf_mode = z_buf_mode;
+    int fog_idx = fog_queue.AddVertices (poly.num);
+
+    // Copy vertex info.
+    GLfloat* glverts = queue.GetGLVerts (idx);
+    GLfloat* fog_glverts = fog_queue.GetGLVerts (fog_idx);
+    memcpy (fog_glverts, glverts, poly.num*sizeof (GLfloat)*4);
+    GLfloat* fog_color = fog_queue.GetFogColor (idx);
+    GLfloat* fog_txt = fog_queue.GetFogTxt (idx);
+    for (i = 0 ; i < poly.num ; i++)
     {
       *fog_color++ = poly.fog_info[i].r;
       *fog_color++ = poly.fog_info[i].g;
@@ -1800,6 +1827,12 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 
       *fog_txt++ = poly.fog_info[i].intensity;
       *fog_txt++ = 0.0;
+    }
+
+    // Triangulate.
+    for (i = 2 ; i < poly.num ; i++)
+    {
+      fog_queue.AddTriangle (fog_idx+0, fog_idx+i-1, fog_idx+i);
     }
   }
 }
@@ -2132,6 +2165,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   FlushDrawPolygon ();
+  lightmap_cache->FlushIfNeeded ();
+  if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
+    FlushDrawFog ();
 
   bool stencil_enabled = false;
   bool clip_planes_enabled = false;
@@ -2699,9 +2735,6 @@ bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op, long value
       m_renderstate.gouraud = value;
       break;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
-      dbg_max_polygons_to_draw = value;
-      if (dbg_max_polygons_to_draw < 0)
-        dbg_max_polygons_to_draw = 0;
       break;
     default:
       return false;
@@ -2737,7 +2770,7 @@ long csGraphics3DOGLCommon::GetRenderState (G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_GOURAUDENABLE:
       return m_renderstate.gouraud;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
-      return dbg_max_polygons_to_draw;
+      return 0;
     default:
       return 0;
   }
@@ -2745,12 +2778,13 @@ long csGraphics3DOGLCommon::GetRenderState (G3D_RENDERSTATEOPTION op)
 
 void csGraphics3DOGLCommon::ClearCache ()
 {
-  FlushDrawPolygon ();
-
   // We will clear lightmap cache since when unloading a world lightmaps
   // become invalid. We won't clear texture cache since texture items are
   // cleaned up individually when an iTextureHandle's RefCount reaches zero.
-  if (lightmap_cache) lightmap_cache->Clear ();
+  FlushDrawPolygon ();
+  lightmap_cache->Flush ();
+  FlushDrawFog ();
+  lightmap_cache->Clear ();
 }
 
 void csGraphics3DOGLCommon::DumpCache ()
@@ -2761,6 +2795,8 @@ void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1, const csVector3 & v2
 	float fov, int color)
 {
   FlushDrawPolygon ();
+  lightmap_cache->Flush ();
+  FlushDrawFog ();
 
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
@@ -2796,6 +2832,14 @@ void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1, const csVector3 & v2
   int py2 = height - 1 - QInt (y2 * iz2 + (height / 2));
 
   G2D->DrawLine (px1, py1, px2, py2, color);
+}
+
+bool csGraphics3DOGLCommon::CompatibleZBufModes (csZBufMode m1, csZBufMode m2)
+{
+  if (m1 == m2) return true;
+  if (m1 == CS_ZBUF_FILL || m1 == CS_ZBUF_FILLONLY || m1 == CS_ZBUF_USE)
+    return m2 == CS_ZBUF_FILL || m2 == CS_ZBUF_FILLONLY || m2 == CS_ZBUF_USE;
+  return false;
 }
 
 void csGraphics3DOGLCommon::SetGLZBufferFlags (csZBufMode flags)
@@ -3109,6 +3153,8 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
   FlushDrawPolygon ();
+  lightmap_cache->Flush ();
+  FlushDrawFog ();
 
   int ClipX1, ClipY1, ClipX2, ClipY2;
   G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);

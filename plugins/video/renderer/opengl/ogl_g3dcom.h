@@ -62,7 +62,6 @@ struct csOpenGLCaps
 class csPolyQueue
 {
 public:
-  bool use_fog;		// If true fog_color and fog_txt are used.
   iMaterialHandle* mat_handle;
   int alpha;
   UInt mixmode;
@@ -71,16 +70,6 @@ public:
   float flat_color_g;
   float flat_color_b;
 
-  // For lightmap rendering.
-  bool do_lightmaps;
-  int num_lightmaps;
-  int max_lightmaps;
-  iPolygonTexture** poly_textures;
-  int* start_vt;	// Index in vertex arrays
-  int* len_vt;		// Size of this lightmap
-  int* start_tri;	// Index in triangle arrays
-  int* len_tri;		// Number of triangles in this lightmap
-
   // Vertices.
   int num_vertices;
   int max_vertices;
@@ -88,6 +77,55 @@ public:
   GLfloat* gltxt;	// 2*max_vertices
   GLfloat* glcol;	// 4*max_vertices
   GLfloat* layer_gltxt;	// 2*max_vertices
+
+  // Triangles.
+  int num_triangles;
+  int max_triangles;
+  int* tris;		// 3*max_triangles
+
+  /// Add some vertices. Return index of the added vertices.
+  int AddVertices (int num);
+  /// Add a triangle.
+  void AddTriangle (int i1, int i2, int i3);
+  /// Reset the queue to empty.
+  void Reset ()
+  {
+    num_triangles = 0;
+    num_vertices = 0;
+  }
+
+  GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
+  GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
+  GLfloat* GetGLCol (int idx) { return &glcol[idx<<2]; }
+  GLfloat* GetLayerGLTxt (int idx) { return &layer_gltxt[idx<<1]; }
+
+  csPolyQueue () :
+	num_vertices (0), max_vertices (0),
+	glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
+	num_triangles (0), max_triangles (0),
+	tris (NULL) { }
+  ~csPolyQueue ()
+  {
+    delete[] glverts;
+    delete[] gltxt;
+    delete[] glcol;
+    delete[] layer_gltxt;
+    delete[] tris;
+  }
+};
+
+/**
+ * Queue to optimize fog drawing.
+ */
+class csFogQueue
+{
+public:
+  csZBufMode z_buf_mode;
+
+  // Vertices.
+  int num_vertices;
+  int max_vertices;
+  GLfloat* glverts;	// 4*max_vertices
   GLfloat* fog_color;	// 3*max_vertices
   GLfloat* fog_txt;	// 2*max_vertices
 
@@ -98,50 +136,33 @@ public:
 
   /// Add some vertices. Return index of the added vertices.
   int AddVertices (int num);
-  /// Add a lightmap. Return index of the added lightmap.
-  int AddLightmap ();
   /// Add a triangle.
   void AddTriangle (int i1, int i2, int i3);
   /// Reset the queue to empty.
   void Reset ()
   {
     num_triangles = 0;
-    num_lightmaps = 0;
     num_vertices = 0;
-    do_lightmaps = false;
   }
 
   GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
-  GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
-  GLfloat* GetGLCol (int idx) { return &glcol[idx<<2]; }
-  GLfloat* GetLayerGLTxt (int idx) { return &layer_gltxt[idx<<1]; }
   GLfloat* GetFogColor (int idx) { return &fog_color[idx*3]; }
   GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
 
-  csPolyQueue () : num_lightmaps (0), max_lightmaps (0),
-  	poly_textures (NULL), start_vt (NULL), len_vt (NULL),
-	start_tri (NULL), len_tri (NULL),
+  csFogQueue () :
 	num_vertices (0), max_vertices (0),
-	glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
-	fog_color (NULL), fog_txt (NULL),
+	glverts (NULL), fog_color (NULL), fog_txt (NULL),
 	num_triangles (0), max_triangles (0),
 	tris (NULL) { }
-  ~csPolyQueue ()
+  ~csFogQueue ()
   {
-    delete[] poly_textures;
-    delete[] start_vt;
-    delete[] len_vt;
-    delete[] start_tri;
-    delete[] len_tri;
     delete[] glverts;
-    delete[] gltxt;
-    delete[] glcol;
-    delete[] layer_gltxt;
     delete[] fog_color;
     delete[] fog_txt;
     delete[] tris;
   }
 };
+
 
 #define OPENGL_CLIP_AUTO		'a'	// Used for auto-detection.
 #define OPENGL_CLIP_NONE		'n'
@@ -157,6 +178,8 @@ public:
 /// Crystal Space OpenGL driver.
 class csGraphics3DOGLCommon : public iGraphics3D
 {
+  friend class OpenGLLightmapCache;
+
 private:
   /**
    * Set proper GL flags based on ZBufMode.  This is usually
@@ -186,6 +209,13 @@ private:
    * second pass). In that case we need ZEQUAL mode.
    */
   void SetGLZBufferFlagsPass2 (csZBufMode flags, bool multiPol);
+
+  /**
+   * Return true if two z-buf modes are compatible.
+   * Two z-buf modes can be compatible even if they are different
+   * because we are only interested in second pass rendering here.
+   */
+  bool CompatibleZBufModes (csZBufMode m1, csZBufMode m2);
 
   // Some common shortcut functions that may or may not apply, depending
   // on the underlying hardware
@@ -295,6 +325,8 @@ protected:
 
   /// Polygon queue.
   csPolyQueue queue;
+  /// Fog queue.
+  csFogQueue fog_queue;
 
   /// Current aspect ratio for perspective correction.
   float aspect;
@@ -342,11 +374,6 @@ protected:
      */
     bool do_extra_bright;
   } m_config_options;
-
-  /// For debugging: the maximum number of polygons to draw in a frame.
-  long dbg_max_polygons_to_draw;
-  /// For debugging: the current polygon number.
-  long dbg_current_polygon;
 
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
@@ -605,6 +632,11 @@ public:
    * Flush the DrawPolygon queue if needed.
    */
   void FlushDrawPolygon ();
+  
+  /**
+   * Flush the fog queue if needed.
+   */
+  void FlushDrawFog ();
   
   /**
    * Draw a fully-featured polygon assuming one has an OpenGL renderer

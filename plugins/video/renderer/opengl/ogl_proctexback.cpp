@@ -123,7 +123,6 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     glLoadIdentity ();
     glColor3f (1., 0., 0.);
     glClearColor (0., 0., 0., 0.);
-    dbg_current_polygon = 0;
 
     glViewport(0,0,width,height);
 

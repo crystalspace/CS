@@ -333,6 +333,55 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
 //----------------------------------------------------------------------------//
 
+int csLightMapQueue::AddVertices (int num)
+{
+  num_vertices += num;
+  if (num_vertices > max_vertices)
+  {
+    GLfloat* new_ar;
+    int old_num = num_vertices-num;
+    max_vertices += 40;
+
+    new_ar = new GLfloat [max_vertices*4];
+    if (glverts) memcpy (new_ar, glverts, sizeof (GLfloat)*4*old_num);
+    delete[] glverts; glverts = new_ar;
+
+    new_ar = new GLfloat [max_vertices*2];
+    if (gltxt) memcpy (new_ar, gltxt, sizeof (GLfloat)*2*old_num);
+    delete[] gltxt; gltxt = new_ar;
+  }
+  return num_vertices-num;
+}
+
+void csLightMapQueue::AddTriangle (int i1, int i2, int i3)
+{
+  int old_num = num_triangles;
+  num_triangles++;
+  if (num_triangles > max_triangles)
+  {
+    max_triangles += 20;
+    int* new_ar;
+    new_ar = new int [max_triangles*3];
+    if (tris) memcpy (new_ar, tris, sizeof (int) * 3 * old_num);
+    delete[] tris; tris = new_ar;
+  }
+  tris[old_num*3+0] = i1;
+  tris[old_num*3+1] = i2;
+  tris[old_num*3+2] = i3;
+}
+
+void csLightMapQueue::Flush (GLuint Handle)
+{
+  if (num_triangles <= 0 || num_vertices <= 0) return;
+  glBindTexture (GL_TEXTURE_2D, Handle);
+  glVertexPointer (4, GL_FLOAT, 0, glverts);
+  glTexCoordPointer (2, GL_FLOAT, 0, gltxt);
+  glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, tris);
+  Reset ();
+}
+
+//----------------------------------------------------------------------------//
+
 csSuperLightMap::csSuperLightMap ()
 {
   region = new csSubRectangles (
@@ -376,14 +425,16 @@ void csSuperLightMap::Clear ()
     head = h;
   }
   tail = NULL;
+  queue.Reset ();
 }
 
 //----------------------------------------------------------------------------//
 
-OpenGLLightmapCache::OpenGLLightmapCache ()
+OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
 {
   cur_lm = 0;
   initialized = false;
+  OpenGLLightmapCache::g3d = g3d;
 }
 
 OpenGLLightmapCache::~OpenGLLightmapCache ()
@@ -406,8 +457,12 @@ void OpenGLLightmapCache::Setup ()
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // Normally OpenGL specs say that the last parameter to glTexImage2D
+    // can be a NULL pointer. Unfortunatelly not all drivers seem to
+    // support that. So I give a dummy texture here.
+    char buf[SUPER_LM_SIZE*SUPER_LM_SIZE*4];
     glTexImage2D (GL_TEXTURE_2D, 0, 3, SUPER_LM_SIZE, SUPER_LM_SIZE,
-		    0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		    0, GL_RGBA, GL_UNSIGNED_BYTE, &buf);
   }
 }
 
@@ -424,14 +479,15 @@ void OpenGLLightmapCache::Clear ()
 void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
 {
   Setup ();
-  csLMCacheData* clm;
 
   iLightMap* piLM = polytex->GetLightMap ();
   if (piLM == NULL) return;
 
+  queue_zbuf_mode = g3d->z_buf_mode;
+
   // If lightmap has changed, we don't uncache it but instead
   // we leave it in place and just reload the new data.
-  clm = (csLMCacheData *)piLM->GetCacheData ();
+  csLMCacheData* clm = (csLMCacheData *)piLM->GetCacheData ();
   if (polytex->RecalculateDynamicLights () && clm)
   {
     Load (clm);
@@ -449,7 +505,12 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
       // few older super-lightmaps first.
       cur_lm = (cur_lm+1)%SUPER_LM_NUM;
 printf ("New cur_lm=%d\n", cur_lm); fflush (stdout);
-      // First free all lightmaps previously in this super lightmap.
+      // Make sure all lightmaps are rendered.
+      // If this actually renders lightmap then we might have a problem.
+      // The number of super-lightmaps should be big enough so that
+      // this is never needed.
+      Flush (cur_lm);
+      // Then free all lightmaps previously in this super lightmap.
       suplm[cur_lm].Clear ();
     }
     piLM->SetCacheData (clm);
@@ -498,5 +559,67 @@ void OpenGLLightmapCache::Load (csLMCacheData *d)
   csRect& r = d->super_lm_rect;
   glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
   	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+}
+
+void OpenGLLightmapCache::FlushIfNeeded ()
+{
+  Setup ();
+  if (!g3d->CompatibleZBufModes (g3d->z_buf_mode, queue_zbuf_mode))
+    Flush ();
+}
+
+void OpenGLLightmapCache::Flush ()
+{
+  Setup ();
+
+  int i;
+  bool flush_needed = false;
+  for (i = 0 ; i < SUPER_LM_NUM ; i++)
+  {
+    csLightMapQueue& lm_queue = suplm[i].queue;
+    if (lm_queue.num_triangles > 0 && lm_queue.num_vertices > 0)
+    {
+      flush_needed = true;
+      break;
+    }
+  }
+  if (!flush_needed) return;
+  g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
+  glEnable (GL_TEXTURE_2D);
+  glEnable (GL_BLEND);
+  glColor4f (1, 1, 1, 0);
+  // The following blend function is configurable.
+  glBlendFunc (g3d->m_config_options.m_lightmap_src_blend,
+	       g3d->m_config_options.m_lightmap_dst_blend);
+  glEnableClientState (GL_VERTEX_ARRAY);
+  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  for (i = 0 ; i < SUPER_LM_NUM ; i++)
+  {
+    suplm[i].queue.Flush (suplm[i].Handle);
+  }
+  glDisableClientState (GL_VERTEX_ARRAY);
+  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+}
+
+void OpenGLLightmapCache::Flush (int sup_idx)
+{
+  csLightMapQueue& lm_queue = suplm[sup_idx].queue;
+  if (lm_queue.num_triangles <= 0 || lm_queue.num_vertices <= 0) return;
+
+//@@@ We might want to add code here to save the state of OpenGL.
+//The problem is that this code can be called at unexpected places.
+//Luckily this is rare. It can only happen if one frame needs lightmaps
+//from ALL the super-lightmaps at once.
+  g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
+  glEnable (GL_TEXTURE_2D);
+  glEnable (GL_BLEND);
+  // The following blend function is configurable.
+  glBlendFunc (g3d->m_config_options.m_lightmap_src_blend,
+	       g3d->m_config_options.m_lightmap_dst_blend);
+  glEnableClientState (GL_VERTEX_ARRAY);
+  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  lm_queue.Flush (suplm[sup_idx].Handle);
+  glDisableClientState (GL_VERTEX_ARRAY);
+  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 }
 
