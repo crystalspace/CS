@@ -3,12 +3,16 @@
 # Friendly names for building environment
 DESCRIPTION.mingw = Win32 with Mingw GCC
 
+
 # Choose which drivers you want to build/use
 # cs2d/ddraw6 cs2d/ddraw cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
 #
-DRIVERS+= cs2d/ddraw cs3d/software cssndrdr/software
-
-# Uncomment the following to get an startup console window
+DRIVERS+= cs2d/ddraw cs3d/software
+#  csnetdrv/null csnetman/null csnetman/simple \
+#  cssnddrv/null cssndrdr/null cssndrdr/software \
+# cs2d/ddraw6 cs2d/ddraw cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
+#
+#  Uncomment the following to get a startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE
 
 #---------------------------------------------------- rootdefines & defines ---#
@@ -53,14 +57,20 @@ SOUND_LIBS=
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=
 
+#Accomodate differences between static and dynamic libraries
+ifeq ($(USE_SHARED_PLUGINS),no)
+	CFLAGS.GENERAL=-DCS_STATIC_LINKED
+endif
+
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-fvtable-thunks -DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL+=-Dpentiumpro -fomit-frame-pointer -fvtable-thunks \
+		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-s -O3 -fomit-frame-pointer
+CFLAGS.optimize=-s -O3
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g
@@ -72,7 +82,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=-mwindows
+LFLAGS.GENERAL= -mwindows -ldinput
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=
@@ -83,13 +93,22 @@ LFLAGS.debug=-g
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg
 
+ifeq (USE_SHARED_PLUGINS),yes)
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=
+LFLAGS.DLL=--dll
+endif
 
-# Typical extension for objects and static libraries
+# Typical extension for objects
+O=.o
+
+# Typical extension for static libraries
 LIB=.a
-# Setup 'lib' prefix
+
+LIB_SUFFIX=
+
+# Setup 'lib' prefix for static library references
 LIB_PREFIX=lib
+
 define AR
   @rm -f $@
   ar
