@@ -42,7 +42,6 @@
 MSVC.PLUGINS.REQUIRED =         \
   cscript/cslua                 \
   cscript/cspython              \
-  font/server/freefnt2         \
   mesh/impexp/3ds               \
   sound/driver/waveoutsd        \
   net/driver/ensocket           \
@@ -54,7 +53,6 @@ MSVC.PLUGINS.REQUIRED =         \
   sound/renderer/software       \
   video/canvas/ddraw            \
   video/canvas/openglwin        \
-  video/canvas/sdl              \
   video/format/avi              \
   video/format/codecs/opendivx  \
   video/format/codecs/rle       \
