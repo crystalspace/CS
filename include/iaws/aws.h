@@ -102,7 +102,7 @@ const int AWSF_KeyboardControl = 8;
 
 /** @} */
 
-SCF_VERSION(iAwsKey, 0, 0, 1)
+SCF_VERSION(iAwsKey, 0, 0, 1);
 
 /// Document me!@@@
 struct iAwsKey : public iBase
@@ -114,7 +114,7 @@ struct iAwsKey : public iBase
   virtual unsigned long Name () = 0;
 };
 
-SCF_VERSION(iAwsIntKey, 0, 0, 1)
+SCF_VERSION(iAwsIntKey, 0, 0, 1);
 
 /// Document me!@@@
 struct iAwsIntKey : public iAwsKey
@@ -123,7 +123,7 @@ struct iAwsIntKey : public iAwsKey
   virtual int Value () = 0;
 };
 
-SCF_VERSION(iAwsFloatKey, 0, 0, 1)
+SCF_VERSION(iAwsFloatKey, 0, 0, 1);
 
 /// Document me!@@@
 struct iAwsFloatKey : public iAwsKey

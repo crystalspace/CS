@@ -236,7 +236,7 @@ enum csVertexAttrib
   /// TU 6 texture coordinates
   CS_VATTRIB_TEXCOORD6	      = CS_VATTRIB_SPECIFIC_FIRST + 14,
   /// TU 7 texture coordinates
-  CS_VATTRIB_TEXCOORD7	      = CS_VATTRIB_SPECIFIC_FIRST + 15,
+  CS_VATTRIB_TEXCOORD7	      = CS_VATTRIB_SPECIFIC_FIRST + 15
 };
 
 /// 
@@ -714,7 +714,7 @@ enum csRenderMeshType
    * polygon, you probably want to use CS_MESHTYPE_TRIANGLES or 
    * CS_MESHTYPE_TRIANGLEFAN and triangulate the poly yourself. 
    */
-  CS_MESHTYPE_POLYGON,
+  CS_MESHTYPE_POLYGON
 };
 
 /**
@@ -727,7 +727,7 @@ enum csSimpleMeshFlags
    * replace it with a transformation that effectively lets you specify the
    * vertices in screen space.
    */
-  csSimpleMeshScreenspace     = 0x01,
+  csSimpleMeshScreenspace = 0x01
 };
 
 /**

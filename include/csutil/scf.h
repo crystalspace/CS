@@ -762,7 +762,7 @@ public:									\
   {									\
     return #Name;							\
   }									\
-};
+}
 
 /**
  * Interface query class.  This template class allows you to query static

@@ -48,10 +48,10 @@ CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangle
 
 CS_IMPLEMENT_PLUGIN
 
-CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject)
-CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObjectFactory)
+CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject);
+CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObjectFactory);
 #ifdef CS_USE_NEW_RENDERER
-CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject::eiShaderVariableAccessor)
+CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject::eiShaderVariableAccessor);
 #endif
 
 // Set the default lighting quality.

@@ -30,7 +30,7 @@
 #endif
 #endif
 
-SCF_VERSION(iWxWindow, 0, 0, 0)
+SCF_VERSION(iWxWindow, 0, 0, 0);
 
 struct iWxWindow : public iBase 
 {

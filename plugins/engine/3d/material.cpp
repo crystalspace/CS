@@ -24,8 +24,8 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 
-CS_LEAKGUARD_IMPLEMENT (csMaterial)
-CS_LEAKGUARD_IMPLEMENT (csMaterialWrapper)
+CS_LEAKGUARD_IMPLEMENT (csMaterial);
+CS_LEAKGUARD_IMPLEMENT (csMaterialWrapper);
 
 SCF_IMPLEMENT_IBASE(csMaterial)
   SCF_IMPLEMENTS_INTERFACE(iMaterial)

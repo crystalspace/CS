@@ -41,7 +41,7 @@
 
 #include "tlfunc.h"
 
-CS_LEAKGUARD_IMPLEMENT (csFuncTexLoader)
+CS_LEAKGUARD_IMPLEMENT (csFuncTexLoader);
 
 SCF_IMPLEMENT_IBASE(csFuncTexLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);

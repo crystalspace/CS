@@ -28,7 +28,7 @@
 #include "csutil/util.h"
 #include "csutil/debug.h"
 
-CS_LEAKGUARD_IMPLEMENT (csImageFile)
+CS_LEAKGUARD_IMPLEMENT (csImageFile);
 
 //---------------------- Helper functions ---------------------------
 

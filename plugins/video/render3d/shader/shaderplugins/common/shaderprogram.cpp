@@ -27,7 +27,7 @@
 
 #include "shaderprogram.h"
 
-CS_LEAKGUARD_IMPLEMENT (csShaderProgram)
+CS_LEAKGUARD_IMPLEMENT (csShaderProgram);
 
 SCF_IMPLEMENT_IBASE(csShaderProgram)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)

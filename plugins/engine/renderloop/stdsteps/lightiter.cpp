@@ -36,10 +36,10 @@
 
 #include "lightiter.h"
 
-CS_LEAKGUARD_IMPLEMENT (csLightIterRSType)
-CS_LEAKGUARD_IMPLEMENT (csLightIterRSLoader)
-CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStepFactory)
-CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStep::LightSVAccessor)
+CS_LEAKGUARD_IMPLEMENT (csLightIterRSType);
+CS_LEAKGUARD_IMPLEMENT (csLightIterRSLoader);
+CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStepFactory);
+CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStep::LightSVAccessor);
 
 SCF_IMPLEMENT_FACTORY(csLightIterRSType)
 SCF_IMPLEMENT_FACTORY(csLightIterRSLoader)

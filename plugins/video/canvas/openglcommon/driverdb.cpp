@@ -32,7 +32,7 @@
 #include "driverdb.h"
 #include "glcommon2d.h"
 
-CS_LEAKGUARD_IMPLEMENT (csGLDriverDatabase)
+CS_LEAKGUARD_IMPLEMENT (csGLDriverDatabase);
 
 class csDriverDBReader
 {
@@ -67,7 +67,7 @@ public:
   bool ParseRules (iDocumentNode* node);
 };
 
-CS_LEAKGUARD_IMPLEMENT (csDriverDBReader)
+CS_LEAKGUARD_IMPLEMENT (csDriverDBReader);
 
 csDriverDBReader::csDriverDBReader (csGLDriverDatabase* db, 
 				    iConfigManager* cfgmgr, 

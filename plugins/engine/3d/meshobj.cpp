@@ -30,8 +30,8 @@
 #include "ivideo/graph3d.h"
 
 
-CS_LEAKGUARD_IMPLEMENT (csMeshWrapper)
-CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper)
+CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
+CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper);
 
 // ---------------------------------------------------------------------------
 

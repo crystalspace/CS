@@ -31,7 +31,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/plugin.h"
 
-CS_LEAKGUARD_IMPLEMENT (csGraphicsPipeline)
+CS_LEAKGUARD_IMPLEMENT (csGraphicsPipeline);
 
 #define INCLUDE_MIN_POINT(x, y)						\
 {									\

@@ -46,15 +46,15 @@ struct csLeakGuardInstance \
     leakguard.counter--; \
   } \
 }; \
-csLeakGuardInstance leakguardinstance;
+csLeakGuardInstance leakguardinstance
 
 #define CS_LEAKGUARD_IMPLEMENT(m) \
-  m::csLeakGuard m::leakguard;
+  m::csLeakGuard m::leakguard
 
 #else
-#define CS_LEAKGUARD_DECLARE(m)
+#define CS_LEAKGUARD_DECLARE(m) \
+  struct csLeakGuard /* ignored; pacify -ansi -pedantic */
 #define CS_LEAKGUARD_IMPLEMENT(m)
 #endif
 
 #endif // __CS_LEAKGUARD_H__
-

@@ -86,7 +86,7 @@
 static inline bool isdir (const char *path, struct dirent *de)
 {
   int pathlen = strlen (path);
-  CS_ALLOC_STACK_ARRAY(char, fullname, pathlen + 2 + strlen (de->d_name));
+  char* fullname = new char[pathlen + 2 + strlen (de->d_name)];
   memcpy (fullname, path, pathlen + 1);
   if ((pathlen) && (fullname[pathlen-1] != CS_PATH_SEPARATOR))
   {
@@ -96,6 +96,7 @@ static inline bool isdir (const char *path, struct dirent *de)
   strcat (&fullname [pathlen], de->d_name);
   struct stat st;
   stat (fullname, &st);
+  delete[] fullname;
   return ((st.st_mode & S_IFMT) == S_IFDIR);
 }
 #endif

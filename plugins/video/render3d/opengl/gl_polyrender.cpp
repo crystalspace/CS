@@ -26,11 +26,11 @@
 #include "gl_polyrender.h"
 #include "gl_render3d.h"
 
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer)
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::FogAccesor)
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::NormalAccesor)
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::BiNormalAccesor)
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::TangentAccesor)
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer);
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::FogAccesor);
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::NormalAccesor);
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::BiNormalAccesor);
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::TangentAccesor);
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)

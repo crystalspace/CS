@@ -164,7 +164,7 @@ public:
   /** 
    * Destroys the mmapio object, closes open files, and releases memory.
    */
-  csMemoryMappedIO::~csMemoryMappedIO();
+  ~csMemoryMappedIO();
 
   /** 
    * This pointer will only be valid for a little while.  Read, at least until

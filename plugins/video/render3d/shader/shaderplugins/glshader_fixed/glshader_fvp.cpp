@@ -44,7 +44,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_fvp.h"
 #include "glshader_fixed.h"
 
-CS_LEAKGUARD_IMPLEMENT (csGLShaderFVP)
+CS_LEAKGUARD_IMPLEMENT (csGLShaderFVP);
 
 csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug) :
   csShaderProgram (shaderPlug->object_reg)

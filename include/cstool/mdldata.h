@@ -28,21 +28,21 @@
 
 #define CS_DECLARE_ACCESSOR_METHODS(type,name)				\
   type Get##name () const;						\
-  void Set##name (type);
+  void Set##name (type)
 
 #define CS_DECLARE_ARRAY_INTERFACE_NONUM(type,sing_name)		\
   type Get##sing_name (size_t n) const;					\
-  void Set##sing_name (size_t n, type);
+  void Set##sing_name (size_t n, type)
 
 #define CS_DECLARE_ARRAY_INTERFACE(type,sing_name)			\
-  CS_DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name)			\
+  CS_DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name);			\
   size_t Get##sing_name##Count () const;				\
   size_t Add##sing_name (type obj);					\
-  void Delete##sing_name (size_t n);
+  void Delete##sing_name (size_t n)
 
 #define CS_DECLARE_OBJECT_INTERFACE					\
   CS_DECLARE_EMBEDDED_OBJECT (csObject, iObject);			\
-  iObject *QueryObject ();
+  iObject *QueryObject ()
 
 /**
  * @@@ This macro should be cleaned up and moved to SCF!!! It is useful
@@ -52,7 +52,7 @@
   struct Embedded_##clname : public clname {				\
     typedef clname __scf_superclass__;					\
     SCF_DECLARE_EMBEDDED_IBASE (iBase);					\
-  } scf##itf;
+  } scf##itf
 
 /**
  * @@@ This macro should be cleaned up and moved to SCF!!! It is useful
@@ -66,7 +66,7 @@
   SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY (Class);				\
     void *o = __scf_superclass__::QueryInterface (iInterfaceID, iVersion); \
     if (o) return o;							\
-  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END;
+  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END
 
 typedef csRefArray<iObject> csObjectVector;
 

@@ -39,7 +39,7 @@ extern "C"
 #undef INT32
 }
 
-CS_LEAKGUARD_IMPLEMENT (ImageJpgFile)
+CS_LEAKGUARD_IMPLEMENT (ImageJpgFile);
 
 CS_IMPLEMENT_PLUGIN
 

@@ -167,7 +167,7 @@ static op_args_info optimize_arg_table[] =
   { 0, 0, false }, //  OP_LIMIT
 };
 
-CS_LEAKGUARD_IMPLEMENT (csShaderExpression)
+CS_LEAKGUARD_IMPLEMENT (csShaderExpression);
 
 bool csShaderExpression::loaded = false;
 csStringHash csShaderExpression::xmltokens;

@@ -34,7 +34,7 @@ extern "C"
 
 #include "pngimage.h"
 
-CS_LEAKGUARD_IMPLEMENT (ImagePngFile)
+CS_LEAKGUARD_IMPLEMENT (ImagePngFile);
 
 CS_IMPLEMENT_PLUGIN
 

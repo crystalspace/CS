@@ -34,12 +34,12 @@
 
 #define csQroundSure(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
 
-struct swap_4
+struct csEndianSwap4
 {
   unsigned char b1, b2, b3, b4;
 };
 
-struct swap_8
+struct csEndianSwap8
 {
   unsigned char b1, b2, b3, b4,
                 b5, b6, b7, b8;
@@ -56,8 +56,8 @@ struct swap_8
 static inline uint64 big_endian_longlong (uint64 l)
 {
   uint64 r;
-  swap_8 *p1 = (swap_8 *)&l;
-  swap_8 *p2 = (swap_8 *)&r;
+  csEndianSwap8 *p1 = (csEndianSwap8 *)&l;
+  csEndianSwap8 *p2 = (csEndianSwap8 *)&r;
   p2->b1 = p1->b8;
   p2->b2 = p1->b7;
   p2->b3 = p1->b6;
@@ -83,7 +83,7 @@ static inline uint16 big_endian_short (uint16 s)
 static inline float big_endian_float (float f)
 {
   unsigned char tmp;
-  swap_4 *pf = (swap_4 *)&f;
+  csEndianSwap4 *pf = (csEndianSwap4 *)&f;
   tmp = pf->b1; pf->b1 = pf->b4; pf->b4 = tmp;
   tmp = pf->b2; pf->b2 = pf->b3; pf->b3 = tmp;
   return f;
@@ -102,8 +102,8 @@ static inline float big_endian_float (float f)
 static inline uint64 little_endian_longlong (uint64 l)
 {
   uint64 r;
-  swap_8 *p1 = (swap_8 *)&l;
-  swap_8 *p2 = (swap_8 *)&r;
+  csEndianSwap8 *p1 = (csEndianSwap8 *)&l;
+  csEndianSwap8 *p2 = (csEndianSwap8 *)&r;
   p2->b1 = p1->b8;
   p2->b2 = p1->b7;
   p2->b3 = p1->b6;
@@ -127,7 +127,7 @@ static inline uint16 little_endian_short (uint16 s)
 static inline float little_endian_float (float f)
 {
   unsigned char tmp;
-  swap_4 *pf = (swap_4 *)&f;
+  csEndianSwap4 *pf = (csEndianSwap4 *)&f;
   tmp = pf->b1; pf->b1 = pf->b4; pf->b4 = tmp;
   tmp = pf->b2; pf->b2 = pf->b3; pf->b3 = tmp;
   return f;
@@ -172,15 +172,24 @@ static inline float long2float (int32 l)
   return (float) ldexp (mant, exp);
 }
 
+/* Implementation note: double2longlong() and longlong2double()
+ *
+ * We avoid use of CONST_INT64() because 64-bit constants are illegal with g++
+ * under -ansi -pedantic, and we want this header to be useful to external
+ * projects which use -ansi -pedantic.  Instead, we use bit shifts, such as (1
+ * << 59), and construct `mask' manually.
+ */
+
 /// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
 static inline int64 double2longlong (double d)
 {
   int exp;
-  int64 mant = (int64) (frexp (d, &exp) * CONST_INT64(0x1000000000000));
-  int64 sign = mant & CONST_INT64(0x800000000000000);
+  int64 mant = (int64) (frexp (d, &exp) * ((int64)1 << 48));
+  int64 sign = mant & ((int64)1 << 59);
   if (mant < 0) mant = -mant;
   if (exp > 32767) exp = 32767; else if (exp < -32768) exp = -32768;
-  return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & CONST_INT64(0xffffffffffff));
+  int64 const mask = ((uint64)0xffff << 32) | (uint64)0xffffffff;
+  return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & mask);
 }
 
 /// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
@@ -188,8 +197,9 @@ static inline double longlong2double (int64 i)
 {
   int exp = (i >> 48) & 0x7fff;
   if (exp & 0x4000) exp = exp | ~0x7fff;
-  double mant = double (i & CONST_INT64(0xffffffffffff)) / CONST_INT64(0x1000000000000);
-  if (i & CONST_INT64(0x8000000000000000)) mant = -mant;
+  int64 const mask = ((uint64)0xffff << 32) | (uint64)0xffffffff;
+  double mant = double (i & mask) / ((int64)1 << 48);
+  if (i & ((int64)1 << 59)) mant = -mant;
   return ldexp (mant, exp);
 }
 
@@ -199,7 +209,7 @@ static inline double longlong2double (int64 i)
  * They use the 1.4.12 format. The range of numbers that can be represented
  * in this format is from 2^-8 to 2^7. The precision for numbers near to
  * 2^-8 (0.00390625) is near 0.000001, for numbers near 2^7 (128) is near 0.03.
- */
+ * @{ */
 
 /// Convert a float to a cross-platform 16-bit format (no endianess adjustments!)
 static inline short float2short (float f)
@@ -221,6 +231,8 @@ static inline float short2float (short s)
   if (s & 0x8000) mant = -mant;
   return (float) ldexp (mant, exp);
 }
+
+/** @} */
 
 /// Swap the bytes in a uint64 value.
 static inline uint64 convert_endian (uint64 l)

@@ -31,7 +31,7 @@
 
 #include "rlloader.h"
 
-CS_LEAKGUARD_IMPLEMENT (csRenderLoopLoader)
+CS_LEAKGUARD_IMPLEMENT (csRenderLoopLoader);
 
 // Plugin stuff
 

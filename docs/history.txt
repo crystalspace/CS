@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Oct-2004
+	- Eric Sunshine removed invocation of the non-portable
+	  CS_ALLOC_STACK_ARRAY() from isdir() in cssysdef.h since this is a
+	  public header, and we want it to be usable by projects with strict
+	  requirements (such as those which use gcc's -ansi and -pedantic
+	  options). Variable-size stack-based arrays are not allowed by the
+	  1998 ISO C++ standard.
+	- Eric Sunshine fixed a bunch of problems in the public CS headers
+	  reported by gcc's -ansi and -pedantic options; mostly involving
+	  orphanded semi-colons and commas, and illegal use of 64-bit
+	  constants.
+	- Eric Sunshine removed duplicate definitions of CONST_INT64() and
+	  CONST_UINT64() from cstypes.h for MSVC.
 12-Oct-2004
 	- res changed the Win32 GL canvas to only employ the WGL pixel format
 	  check if really needed (e.g. multisampling was requested), otherwise

@@ -42,7 +42,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 iObjectRegistry* csGLShader_CG::object_reg = 0;
 CGcontext csGLShader_CG::context;
 
-CS_LEAKGUARD_IMPLEMENT (csGLShader_CG)
+CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
 
 CS_IMPLEMENT_PLUGIN
 

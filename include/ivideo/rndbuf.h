@@ -74,7 +74,7 @@ enum csRenderBufferComponentType
 enum csRenderBufferLockType
 {
   CS_BUF_LOCK_NOLOCK,
-  CS_BUF_LOCK_NORMAL,
+  CS_BUF_LOCK_NORMAL
   //CS_BUF_LOCK_RENDER
 };
 

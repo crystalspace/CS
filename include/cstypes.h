@@ -68,10 +68,6 @@ typedef long long int64;
 typedef unsigned __int64 uint64;
 /// signed 64 bit integer
 typedef __int64 int64;
-/// specify 64 bit integer constant
-#define CONST_INT64(x) x##i64
-/// specify 64 bit unsigned integer constant
-#define CONST_UINT64(x) x##ui64
 #else
 #warning Do not know how to declare 64-bit integers
 #endif // CS_COMPILER_GCC

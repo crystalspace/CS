@@ -46,9 +46,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 // STL include required by cal3d
 #include <string>
 
-CS_LEAKGUARD_IMPLEMENT (csCal3DMesh)
-CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObject)
-CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObjectFactory)
+CS_LEAKGUARD_IMPLEMENT (csCal3DMesh);
+CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObject);
+CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObjectFactory);
 
 CS_IMPLEMENT_PLUGIN
 

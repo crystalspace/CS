@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------
 
-CS_LEAKGUARD_IMPLEMENT (csColliderWrapper)
+CS_LEAKGUARD_IMPLEMENT (csColliderWrapper);
 
 SCF_IMPLEMENT_IBASE_EXT (csColliderWrapper)
   SCF_IMPLEMENTS_INTERFACE (csColliderWrapper)

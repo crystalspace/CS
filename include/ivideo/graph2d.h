@@ -53,7 +53,7 @@ enum
   /**
    * Don't use anti-aliased glyphs.
    */
-  CS_WRITE_NOANTIALIAS = (1 << 1), 
+  CS_WRITE_NOANTIALIAS = (1 << 1)
 };
 
 /// Simple 2D pixel coordinate

@@ -86,7 +86,7 @@ struct csParticlesData
   float sort;
 };
 
-SCF_VERSION (iParticlesColorCallback, 0, 0, 1)
+SCF_VERSION (iParticlesColorCallback, 0, 0, 1);
 
 /**
  * Particles state can be set up to retrieve color via a callback.  This

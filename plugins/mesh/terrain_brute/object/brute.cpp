@@ -47,9 +47,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "brute.h"
 #include "csqsqrt.h"
 
-CS_LEAKGUARD_IMPLEMENT (csTerrBlock)
-CS_LEAKGUARD_IMPLEMENT (csTerrainObject)
-CS_LEAKGUARD_IMPLEMENT (csTerrainFactory)
+CS_LEAKGUARD_IMPLEMENT (csTerrBlock);
+CS_LEAKGUARD_IMPLEMENT (csTerrainObject);
+CS_LEAKGUARD_IMPLEMENT (csTerrainFactory);
 
 CS_IMPLEMENT_PLUGIN
 

@@ -952,7 +952,7 @@ STR_SHIFT(short)
 STR_SHIFT(unsigned short)
 STR_SHIFT(int)
 STR_SHIFT(unsigned int)
-STR_SHIFT(long);
+STR_SHIFT(long)
 STR_SHIFT(unsigned long)
 STR_SHIFT(float)
 STR_SHIFT(double)

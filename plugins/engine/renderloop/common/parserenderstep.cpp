@@ -31,7 +31,7 @@
 
 #include "parserenderstep.h"
 
-CS_LEAKGUARD_IMPLEMENT (csRenderStepParser)
+CS_LEAKGUARD_IMPLEMENT (csRenderStepParser);
 
 bool csRenderStepParser::Initialize(iObjectRegistry *object_reg)
 {
