@@ -1,0 +1,348 @@
+This file is intended to explain the general CS directory structure.
+It contains all directories, so maybe some will be missing, if you just
+downloaded the files for a specific port like Linux or Win32.
+
+This description is written using CS 0.13r11. (June 8th, 1999)
+
+Documentation written by Thomas Hieber. (thieber@gmx.net)
+If this doumentation is not clear or even wrong in some points please
+drop me a mail.
+
+
+
+The source tree
+===============
+
+[CS]
+The main directory for Crystal Space. You can choose any path for it, as 
+long as it is supported by your OS.
+This is the path that all executables are being generated to. This should 
+be your working directory for these executables, and there should be all
+configuration files (*.cfg).
+
+[CS/apps]
+Here go all applications developed, using Crystal Space.
+
+    [CS/apps/blocks]
+    Blocks. A simple 3D Tetris clone
+
+    [CS/apps/csregsvr]
+    Tool to register the COM components created within the build process. 
+    Not needed on Win32.
+
+    [CS/apps/cswstest]
+    A simple Hello-World like aplication, to show the use of the Crystal Space
+    Windowing System. (short: CSWS)
+
+    [CS/apps/mazed]
+    MazeD a simple 3D world and sprite editor. Pretty advanced, but not completly
+    usable yet.
+
+    [CS/apps/primedit]
+    A simple 3D editor. Usefull only as example for some code. (Not sure, if it 
+    even still compiles)
+
+    [CS/apps/simple]
+    A kind of Hello World app using Crystal Space. See tutorial.html for details.
+
+    [CS/apps/support]
+    Some files that are potentially needed by all applications.
+
+    [CS/apps/walktest]
+    Walktest. _The_ reference application for Crystal Space. If this application
+    wont work, probably no other application will.
+
+    [CS/apps/ndrvdemo]
+    Demo application for the networkdriver library.
+
+    [CS/apps/metademo]
+    A cool demo showing some metaballs. (Balls that look like quicksilver) 
+    really cool.
+
+[CS/bin]
+Some scripts to support the build process on various platforms.
+
+[CS/data]
+Here you should place your levels like large.zip. You can use any directory
+for this, so this is only a suggestion.
+
+[CS/docs]
+Various docs concerning Crystal Space are here. Though not complete, they 
+will answer a lot of questions.
+
+    [CS/data/Models/Test]
+    Directory containing testdata for the built in converter classes.
+
+[CS/include]
+Here are the headers that can be used from other modules. The path for the
+headers reflect the structure of the modules in the lib directory. So
+for furter explanation of a specific directory see the CS/lib section.
+
+[CS/libs]
+Here are all Modules provided be Crystal Space. Some modules will consist
+of only on subdirectory in libs, some will be a combination of several
+subdirectories.
+
+    [CS/libs/cs2d]
+    2D Driver 
+    This component manages the creation of the Crystal Space window used for 
+    rendering and also supports limited 2D drawing capabilities (including 2D 
+    sprites). It can be used standalone but it is currently very limited and 
+    not very useful (may change in the future). There are several implementations 
+    of this component. All are specific to some 3D Rasterizer (for example, the 
+    OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib Driver). 
+
+        [CS/libs/cs2d/common]     common code for all 2D drivers
+        [CS/libs/cs2d/be]         BeOS version
+        [CS/libs/cs2d/csdive]     OS/2 version
+        [CS/libs/cs2d/ddraw]      Win32 using Direct Draw
+        [CS/libs/cs2d/ddraw6]     Win32 using Direct Draw (DirectX 6)
+        [CS/libs/cs2d/dosraw]     DOS
+        [CS/libs/cs2d/ggi]        Unix, using ggi
+        [CS/libs/cs2d/softx]      Unix, using X
+        [CS/libs/cs2d/svgalib]    Unix, using SVGAlib
+        [CS/libs/cs2d/mac]        Mac
+        [CS/libs/cs2d/next2d]     NeXT
+        [CS/libs/cs2d/macglide2]  Glide2x 2D driver for Mac
+        [CS/libs/cs2d/unxglide2]  Glide2x 2D driver for Unix
+        [CS/libs/cs2d/winglide2]  Glide2x 2D driver for Win32
+        [CS/libs/cs2d/winglide3]  Glide3x 2D driver for Win32
+        [CS/libs/cs2d/openglbe]   OpenGL 2D driver for BeOS
+        [CS/libs/cs2d/openglmac]  OpenGL 2D driver for Max
+        [CS/libs/cs2d/openglwin]  OpenGL 2D driver for Win32
+        [CS/libs/cs2d/openglx]    OpenGL 2D driver for Unix/X Windows
+
+    [CS/libs/cs3d]
+    3D Rasterizer 
+    This component is required by the 3D Engine but is also useful standalone. 
+    It needs a 2D Driver. There are currently four implementations of this 
+    component: Software, OpenGL, Glide, and Direct3D. These rasterizers are
+    mostly OS independant (like OpenGL oder software). Some rasterizer
+    techonolgy is only available on certain OS (like DirectX) so these are
+    limited to their respective OS.
+
+        [CS/libs/cs3d/common]     Common code for all 3D rasterizers
+        [CS/libs/cs3d/direct3d5]  Direct3D rasterizer using DirectX 5
+        [CS/libs/cs3d/direct3d6]  Direct3D rasterizer using DirectX 6
+        [CS/libs/cs3d/glide2]     3D rasterizer using glide2x
+        [CS/libs/cs3d/glide3]     3D rasterizer using glide3x
+        [CS/libs/cs3d/opengl]     3D rasterizer using OpenGL
+        [CS/libs/cs3d/software]   Software based rasterizer 
+
+    [CS/libs/cscom]
+
+
+    [CS/libs/csengine]
+    3D Engine 
+    This is one of the corner stones of Crystal Space and also what originally 
+    sparked the birth of the Crystal Space project. It needs the 3D Rasterizer 
+    component to display output and also requires a number of other libraries 
+    (csutil, csgeom, csgfxldr). The 3D Engine exports a number of COM interfaces 
+    to allow access through the COM mechanism. 
+
+        [CS/libs/csengine/2d]      ???
+        [CS/libs/csengine/basic]   ???
+        [CS/libs/csengine/colldet] Collision detection system
+        [CS/libs/csengine/light]   Lighting system
+        [CS/libs/csengine/objects] Sprites and things
+        [CS/libs/csengine/polygon] ???
+        [CS/libs/csengine/scripts] Scripting
+
+    [CS/libs/csgeom]
+    Geometry library 
+    Various geometry related stuff can be found here: matrices, vectors, 
+    BSP trees, clipper, planes, ... 
+
+    [CS/libs/csgfxldr]
+    Graphics Loader Library 
+    Routines to support loading various graphic file formats and put them 
+    internally in the same format. This library supports JPG, GIF, TGA, 
+    PNG, and BMP. 
+
+    [CS/libs/csinput]
+    Input System 
+    An input library (mouse, keyboard, joystick, ...). 
+
+    [CS/libs/csnetdrv]
+    Network Driver 
+    System dependent network drivers. There is currently only a sockets driver 
+    and a Null driver in case you don't want networking. 
+
+        [CS/libs/csnetdrv/null]    No network
+        [CS/libs/csnetdrv/sockets] Socket based network (TCP/IP)
+
+    [CS/libs/csnetman]
+    Network Manager (component: csnetman). 
+    System dependent network managers. There is currently only a simple manager 
+    and a Null driver in case you don't want a manager. 
+
+        [CS/libs/csnetman/null]    No network manager
+        [CS/libs/csnetman/simple]  An simple network manager
+
+    [CS/libs/csobject]
+    Hierarchy of CS independant classes, that are used as base for most CS
+    classes. The main use for these classes is a system for runtime type
+    information and for management of attributes like names that can 
+    dynamically ba attached to objects at runtime.
+
+    [CS/libs/csparser]
+    World Parser
+    A library which parses ASCII world files and creates a world in the 
+    3D Engine. 
+
+    [CS/libs/cssnddrv]
+    Sound Driver 
+    System dependent sound drivers. There are currently drivers for 
+    Macintosh, OSS (Linux), and Windows. There is also a Null driver for systems 
+    without sound. 
+
+        [CS/libs/cssnddrv/null]      No sound
+        [CS/libs/cssnddrv/macsnd]    Sounddriver for Mac
+        [CS/libs/cssnddrv/oss]       Sounddriver for Unix
+        [CS/libs/cssnddrv/waveoutsd] Sounddriver for Win32
+
+    [CS/libs/cssndldr]
+    Sound Loader Library (library: cssndldr). 
+    Routines to support loading various sound file formats and put them internally 
+    in the same format. This library supports WAV, AIFF, AU, ... 
+
+        [CS/libs/cssndldr/common]    ???
+
+    [CS/libs/cssndrdr]
+    Sound Renderer
+    System dependent sound renderers. There are currently renderers for a3d, 
+    ds3d, eax, and software. There is also a Null renderer used with the Null 
+    sound driver. 
+
+        [CS/libs/cssndrdr/null]      No sound renderer
+        [CS/libs/cssndrdr/software]  Software based sound renderer
+        [CS/libs/cssndrdr/a3d]       3D sound renderer for A3D
+        [CS/libs/cssndrdr/ds3d]      3D sound renderer for Direct Sound 3D
+        [CS/libs/cssndrdr/eax]       3D sound renderer for EAX
+
+    [CS/libs/cssys]
+    System Dependent Stuff (library: cssys). 
+    All system dependent stuff (non-graphics and non-sound related) is in this 
+    library. 
+
+        [CS/libs/cssys/common]       Common code for all system drivers
+        [CS/libs/cssys/general]      ???
+        [CS/libs/cssys/be]           BeOS
+        [CS/libs/cssys/djgpp]        DOS using the djgpp compiler
+        [CS/libs/cssys/wcc]          DOS using the Watcom compiler
+        [CS/libs/cssys/mac]          Mac
+        [CS/libs/cssys/next]         NeXT
+        [CS/libs/cssys/os2]          OS/2
+        [CS/libs/cssys/unix]         Unix
+        [CS/libs/cssys/win32]        Win32
+        [CS/libs/cssys/amiga]        Amiga
+
+    [CS/libs/csutil]
+    Utility library 
+    This library contains various utilities. There is an Archive class which 
+    can read/write ZIP archives. There is a vector class, a sparse matrix class 
+    and some other useful goodies. This library requires the use of the external 
+    ZLib library which is used to read/write ZIP archives. 
+
+        [CS/libs/csutil/IMPEXP]      Import/ Export libraries for various formats.
+
+    [CS/libs/csws]
+    Crystal Space Window System 
+    A window system nicely integrated with Crystal Space. It is also platform 
+    independent. 
+
+    [CS/libs/libjpeg]
+    Library to handle jpeg files. This library is not part of Crystal Space.
+    To get the most current version look at:
+    ftp://ftp.uu.net/graphics/jpeg/jpegsrc.???.tar.gz
+    (as of this writing the current latest version is jpegsrc.v6b.tar.gz)
+    
+    [CS/libs/libpng]
+    Library to handle png files. This library is not part of Crystal Space.
+    To get the most current version look at:
+    ftp://ftp.uu.net/graphics/png/src/libpng-?????.tar.gz
+    (as of this writing the current latest version is libpng-1.0.2.tar.gz)
+    
+    [CS/libs/zlib]
+    Library to handle zip files. This library is not part of Crystal Space.
+    To get the most current version look at:
+    ftp://ftp.uu.net/graphics/png/src/zlib-?????.tar.gz
+    (as of this writing the current latest version is zlib-1.1.3.tar.gz)
+
+[CS/mk]
+This directory contains the common parts of the makefiles for many systems
+
+    [CS/mk/system]        Systemspecific makefiles for most supported systems
+    [CS/mk/be_proj]       Makefiles for BeOS
+    [CS/mk/mwcw]          Projectfiles for Macintosh CodeWarrior
+    [CS/mk/visualc]       Projectfiles for Win32 using MSVC 5.0/ 6.0
+
+[CS/support]
+
+    [CS/support/debug]    Support routines for extensive memory checking 
+    [CS/support/gnu]      Replacement for getopt (missing on some systems)
+
+
+Dependencies
+============
+
+To make sure, some parts of Crystal Space can be used by themselfes, there
+is a philosophy, about whis parts of Crystal Space are allowed to use other
+parts. You can think of the various modules as sitting on a specific level:
+
+level1 (utility - independant of CS):
+  libjpeg
+  libpng
+  zlib
+  csgeom
+  csobject
+  csutil
+
+level2 (basics - common base of various CS parts):
+  cscom
+  csgfxldr
+  cssndldr
+  cssys
+
+level3 (com - various interchangeable COM modules of CS):
+  cs2d
+  cs3d
+  csnetdrv
+  csnetman
+  cssnddrv
+  cssndrdr
+
+level4 (engine - binds togehter all the engines components):
+  csengine
+  csinput
+  csparser
+
+level5 (application support - adds a common layer of engine abstraction):
+  csws
+  (gamelibrary - yet to be done)
+  (console - needs a more general approach IMHO)
+
+level6 (application):
+  walktest
+  metademo
+  MazeD
+
+Every modules is only allowed to include headers from the same modules or
+from lower levels. So for example, csengine may include headers from cscom,
+but not from csws or csparser.
+
+All communication between level 3 libraries happens through COM
+interfaces. Those are defined in the 'cryst/include' directory.
+That's the ONLY way to communicate on level 3.
+'csengine' can use level3 libraries only through COM.
+
+csinput has a special role. Though sitting logically at level 4, it can 
+and must be included in some 2d drivers and some system specific modules,
+because these module will generate the events that are being distributed be
+csinput.
+
+
+
+
+
+
