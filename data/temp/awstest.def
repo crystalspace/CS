@@ -38,6 +38,13 @@ window "Splash"
     Frame: (20, 30) - (200, 45)
     Caption: "This is a test label."
   }
+
+  component "UserName" is "Text Box"
+  {
+    Frame: (20, 50) - (250, 70)
+    Style: tbfsNormal
+    Text: "New user"
+  }
 }
 
 window "Another"
