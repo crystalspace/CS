@@ -269,6 +269,9 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
 csParticlesObject::~csParticlesObject ()
 {
+  if (physics)
+    physics->RemoveParticles (&scfiParticlesObjectState);
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticlesObjectState)
   SCF_DESTRUCT_IBASE ()
