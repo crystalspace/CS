@@ -18,6 +18,10 @@
 */
 
 #include "sysdef.h"
+
+#ifdef NO_STRING_COM
+#include "csutil/csstring.h"
+#else
 #define CS_DISABLE_MODULE_LOCKING
 #include "cscom/com.h"
 #undef  CS_DISABLE_MODULE_LOCKING
@@ -37,4 +41,20 @@ STDMETHODIMP csString::xData(DATA **data) {
 STDMETHODIMP csString::xLength(unsigned long int *size) {
 	*size=Size;
 	return S_OK;
+}
+
+#endif  NO_STRING_COM
+
+const char* csException::GetExceptionMessage() {
+	static csSTR Msg;
+	Msg = "Exception: ";
+	Msg+=Error;
+
+	if(strlen(Hint))
+		Msg+=csSTR("\nHint: ")+Hint;
+
+	if(ErrorVal)
+		Msg+=csSTR("\nErrorValue: ")+IntToStr(ErrorVal);
+
+	return Msg.GetData();
 }
