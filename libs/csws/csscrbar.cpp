@@ -249,42 +249,54 @@ pulse:      if (active_button == SCROLL_UL)
           return true;
       } /* endswitch */
       break;
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_UP:
-        case CSKEY_LEFT:
-        case CSKEY_DOWN:
-        case CSKEY_RIGHT:
-          if (Event.Key.Modifiers & (CSMASK_ALT | CSMASK_SHIFT))
-            break;
-          if (IsHorizontal != ((Event.Key.Code == CSKEY_LEFT) || (Event.Key.Code == CSKEY_RIGHT)))
-            break;
-          if (!app->MouseOwner)
-          {
-            if (!app->KeyboardOwner)
-              app->CaptureKeyboard (this);
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_UP:
+	  case CSKEY_LEFT:
+	  case CSKEY_DOWN:
+	  case CSKEY_RIGHT:
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & 
+	      (CSMASK_ALT | CSMASK_SHIFT))
+	      break;
+	    if (IsHorizontal != 
+	      ((csKeyEventHelper::GetCookedCode (&Event) == CSKEY_LEFT) || 
+	      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_RIGHT)))
+	      break;
+	    if (!app->MouseOwner)
+	    {
+	      if (!app->KeyboardOwner)
+		app->CaptureKeyboard (this);
 
-            int delta = (Event.Key.Code == CSKEY_UP) || (Event.Key.Code == CSKEY_LEFT) ? -1 : +1;
-            delta *= (Event.Key.Modifiers & CSMASK_CTRL) ? status.pagestep : status.step;
+	      int delta = (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_UP) || 
+		(csKeyEventHelper::GetCookedCode (&Event) == CSKEY_LEFT) ? -1 : +1;
+	      delta *= (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL) ? 
+		status.pagestep : status.step;
 
-            SetValue (status.value + delta);
-          } /* endif */
-          return true;
-      } /* endswitch */
-    case csevKeyUp:
-      switch (Event.Key.Code)
+	      SetValue (status.value + delta);
+	    } /* endif */
+	    return true;
+	} /* endswitch */
+      }
+      else
       {
-        case CSKEY_UP:
-        case CSKEY_LEFT:
-        case CSKEY_DOWN:
-        case CSKEY_RIGHT:
-          if (IsHorizontal != ((Event.Key.Code == CSKEY_LEFT) || (Event.Key.Code == CSKEY_RIGHT)))
-            break;
-          if (app->KeyboardOwner == this)
-            app->CaptureKeyboard (0);
-          return true;
-      } /* endswitch */
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_UP:
+	  case CSKEY_LEFT:
+	  case CSKEY_DOWN:
+	  case CSKEY_RIGHT:
+	    if (IsHorizontal != 
+	      ((csKeyEventHelper::GetCookedCode (&Event) == CSKEY_LEFT) || 
+	      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_RIGHT)))
+	      break;
+	    if (app->KeyboardOwner == this)
+	      app->CaptureKeyboard (0);
+	    return true;
+	} /* endswitch */
+      }
   } /* endswitch */
   return csComponent::HandleEvent (Event);
 }

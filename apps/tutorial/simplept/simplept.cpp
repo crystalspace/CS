@@ -416,7 +416,9 @@ bool Simple::Initialize ()
 
 bool Simple::HandleEvent (iEvent& Event)
 {
-  if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
+  if ((Event.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)

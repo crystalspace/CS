@@ -70,8 +70,7 @@ bool ceImageView::HandleEvent (iEvent &Event)
   {
     case csevBroadcast:
       break;
-    case csevKeyDown:
-    case csevKeyUp:
+    case csevKeyboard:
       break;
   }
   return csComponent::HandleEvent (Event);
@@ -200,14 +199,17 @@ bool PicViewApp::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case 'q':
-        {
-          ShutDown ();
-          return true;
-        }
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case 'q':
+	  {
+	    ShutDown ();
+	    return true;
+	  }
+	}
       }
       break;
     case csevCommand:

@@ -485,33 +485,36 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
           }
       }
       break;
-    case csevKeyDown:
-      if (state_sptr)
-        switch (state [state_sptr - 1])
-        {
-          case stWaitKey:
-            lastkey = Event.Key.Char;
-            break;
-          case stTestLinePerf:
-            lastkey2 = Event.Key.Char;
-            break;
-          case stTestTextDraw:
-            lastkey3 = Event.Key.Char;
-            break;
-          case stTestTextDraw2:
-            lastkey4 = Event.Key.Char;
-            break;
-          case stPixelClipTest:
-            lastkey5 = Event.Key.Char;
-          case stLineClipTest:
-            lastkey6 = Event.Key.Char;
-          case stBoxClipTest:
-            lastkey7 = Event.Key.Char;
-	  case stFontClipTest:
-            lastkey8 = Event.Key.Char;
-          default:
-            break;
-        }
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
+      {
+	if (state_sptr)
+	  switch (state [state_sptr - 1])
+	  {
+	    case stWaitKey:
+	      lastkey = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
+	    case stTestLinePerf:
+	      lastkey2 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
+	    case stTestTextDraw:
+	      lastkey3 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
+	    case stTestTextDraw2:
+	      lastkey4 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
+	    case stPixelClipTest:
+	      lastkey5 = csKeyEventHelper::GetCookedCode (&Event);
+	    case stLineClipTest:
+	      lastkey6 = csKeyEventHelper::GetCookedCode (&Event);
+	    case stBoxClipTest:
+	      lastkey7 = csKeyEventHelper::GetCookedCode (&Event);
+	    case stFontClipTest:
+	      lastkey8 = csKeyEventHelper::GetCookedCode (&Event);
+	    default:
+	      break;
+	  }
+      }
       break;
   }
   return false;

@@ -74,52 +74,60 @@ bool csDialog::HandleEvent (iEvent &Event)
       if (HandleDragEvent (Event, BorderWidth, BorderHeight))
         return true;
       break;
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_TAB:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_SHIFT)
-          {
-            SetFocused (PrevGroup ());
-            AdjustFocused (false);
-            return true;
-          }
-          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-          {
-            SetFocused (NextGroup ());
-            AdjustFocused (true);
-            return true;
-          } /* endif */
-          break;
-        case CSKEY_LEFT:
-        case CSKEY_UP:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-          {
-            SetFocused (PrevControl ());
-            AdjustFocused (false);
-            return true;
-          }
-          break;
-        case CSKEY_RIGHT:
-        case CSKEY_DOWN:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-          {
-            SetFocused (NextControl ());
-            AdjustFocused (true);
-            return true;
-          }
-          break;
-        case CSKEY_ENTER:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-          {
-            csComponent *def = GetDefault ();
-            if (def->SendCommand (cscmdActivate, 0) != def)
-              if (def != focused)
-                focused->SendCommand (cscmdActivate, 0);
-            return true;
-          }
-          break;
-      } /* endswitch */
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_TAB:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == CSMASK_SHIFT)
+	    {
+	      SetFocused (PrevGroup ());
+	      AdjustFocused (false);
+	      return true;
+	    }
+	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	    {
+	      SetFocused (NextGroup ());
+	      AdjustFocused (true);
+	      return true;
+	    } /* endif */
+	    break;
+	  case CSKEY_LEFT:
+	  case CSKEY_UP:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	    {
+	      SetFocused (PrevControl ());
+	      AdjustFocused (false);
+	      return true;
+	    }
+	    break;
+	  case CSKEY_RIGHT:
+	  case CSKEY_DOWN:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	    {
+	      SetFocused (NextControl ());
+	      AdjustFocused (true);
+	      return true;
+	    }
+	    break;
+	  case CSKEY_ENTER:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	    {
+	      csComponent *def = GetDefault ();
+	      if (def->SendCommand (cscmdActivate, 0) != def)
+		if (def != focused)
+		  focused->SendCommand (cscmdActivate, 0);
+	      return true;
+	    }
+	    break;
+	} /* endswitch */
+      }
       break;
     case csevCommand:
       if (parent)

@@ -22,6 +22,7 @@
 
 #include "iutil/evdefs.h"
 #include "csutil/scf.h"
+#include "cssys/csunicode.h"
 
 /**\file
  * Event system related interfaces
@@ -37,6 +38,7 @@ enum {
 };
 
 struct iEventHandler;
+struct iEvent;
 
 struct iNetworkConnection;
 struct iNetworkPacket;
@@ -49,16 +51,137 @@ SCF_VERSION (iEvent, 0, 1, 1);
 // Event data structs. Defined outside of iEvent to allow SWIG to
 // handle the nested structs and union. Does not break any code.
 
-/// Key event data in iEvent.
-struct csEventKeyData
+/**\page Keyboard events
+ * Keyboard events are emitted when the user does something with the keyboard -
+ * presses down a key ("key down" events), holds it down (more "key down" 
+ * events in a specific interval - "auto-repeat") and releases it ("key up".)
+ * <p>
+ * Every keyboard event has a bunch of data associated with it. First, there
+ * is a code to identify the key: the 'raw' code. It uniquely identifies the 
+ * key, and every key has a distinct code, independent from any pressed 
+ * modifiers: For example, pressing the "A" key will always result in the raw 
+ * code 'a', holding shift or any other modifier down won't change it. However, 
+ * the 'cooked' code contains such additional information: If Shift+A is 
+ * pressed, the cooked code will be 'A', while the raw code is still 'a'.
+ * Other keys are also normalized; for example keypad keys: pressing "9" will
+ * result in either CSKEY_PGUP or '9', depending on the NumLock state.
+ * So, the same key can result in different 'cooked' codes, and the same 
+ * 'cooked' code can be caused by different keys.
+ * <p>
+ * Other data contained in a keyboard event is:
+ * <ul>
+ * <li>Whether it is a key up or down event</li>
+ * <li>Whether it is an autorepeat of an earlier keypress</li>
+ * <li>Modifiers at the time of the keypress</li>
+ * <li>When it is a character, whether it is a normal or dead character</li>
+ * </ul>
+ * <p>
+ * Keyboard event data is stored as properties of iEvent, accessible thorugh
+ * iEvent->Find() and iEvent->Add().
+ * <table>
+ * <tr><th>Property Name</th><th>Type</th><th>Description</th></tr>
+ * <tr><td>keyEventType</td><td>csKeyEventType (stored as uint8)</td>
+ *  <td>Event type (up vs down)</td></tr>
+ * <tr><td>keyCodeRaw</td><td>uint32</td><td>Raw key code</td></tr>
+ * <tr><td>keyCodeCooked</td><td>uint32</td><td>Cooked key code</td></tr>
+ * <tr><td>keyModifiers</td><td>csKeyModifiers</td><td>Modifiers at time of 
+ *  the key press</td></tr>
+ * <tr><td>keyAutoRepeat</td><td>bool</td><td>Autorepeat flag</td></tr>
+ * <tr><td>keyCharType</td><td>csKeyCharType (stored as uint8)</td>
+ *  <td>Character type</td></tr>
+ * </table>
+ * <p>
+ * A way to retrieve an keyboard event's data without requiring a plethora
+ * of iEvent->Find() invokations provides the csKeyEventHelper class.
+ * <p>
+ * Also see iKeyComposer for informations about composing accented etc.
+ * characters from dead and normal keys.
+ */
+
+/**\name Keyboard event related
+ * @{ */
+struct csKeyEventData;
+
+/**
+ * Helper class to conveniently deal with keyboard events.
+ */
+class csKeyEventHelper
 {
-  /// Key code
-  int Code;
-  /// Character code
-  int Char;
-  /// Control key state
-  int Modifiers;
+public:
+  /// Retrieve the key's raw code.
+  static utf32_char GetRawCode (iEvent* event);
+  /// Retrieve the key's cooked code.
+  static utf32_char GetCookedCode (iEvent* event);
+  /// Retrieve the key's raw code.
+  static void GetModifiers (iEvent* event, csKeyModifiers& modifiers);
+  /// Retrieve the event type (key up or down.)
+  static csKeyEventType GetEventType (iEvent* event);
+  /**
+   * Retrieve whether a keyboard down event was caused by the initial press
+   * (not auto-repeat) or by having it held for a period of time (auto-repeat.)
+   */
+  static bool GetAutoRepeat (iEvent* event);
+  /// Retrieve the character type (dead or normal.)
+  static csKeyCharType GetCharacterType (iEvent* event);
+  /// Get all the information in one compact struct.
+  static bool GetEventData (iEvent* event, csKeyEventData& data);
+  /**
+   * Get a bitmask corresponding to the pressed modifier keys from the
+   * keyboard modifiers struct.
+   * \sa CSMASK_ALT etc.
+   */
+  static uint32 GetModifiersBits (const csKeyModifiers& modifiers);
+  /**
+   * Get a bitmask corresponding to the pressed modifier keys from the event.
+   * \sa CSMASK_ALT etc.
+   */
+  static uint32 GetModifiersBits (iEvent* event);
 };
+
+/**
+ * Structure that collects the data a keyboard event carries.
+ * The event it self doesn't transfer it; it is merely ment to pass around 
+ * keyboard event data in a compact without having to pass  around the event 
+ * itself. 
+ */
+struct csKeyEventData
+{
+  /// Event type
+  csKeyEventType eventType;
+  /// Raw key code
+  utf32_char codeRaw;
+  /// Cooked key code
+  utf32_char codeCooked;
+  /// Modifiers at the time the event was generated
+  csKeyModifiers modifiers;
+  /// Auto-repeat flag
+  bool autoRepeat;
+  /// Type of the key, if it is a character key
+  csKeyCharType charType;
+  
+  /**
+   * Fill the structure with dummy data.
+   * If you construct a csKeyEventData this way, make sure to correctly
+   * set all members afterwards.
+   */
+  csKeyEventData ()
+  {
+    eventType = csKeyEventTypeDown;
+    codeRaw = codeCooked = 0;
+    memset (&modifiers, 0, sizeof (modifiers));
+    autoRepeat = false;
+    charType = csKeyCharTypeNormal;
+  }
+
+  /**
+   * Fill the structure with information from an event.
+   */
+  csKeyEventData (iEvent* event)
+  {
+    csKeyEventHelper::GetEventData (event, *this);
+  }
+};
+/** @} */
 
 /// Mouse event data in iEvent.
 struct csEventMouseData
@@ -148,8 +271,6 @@ struct iEvent : public iBase
   csTicks Time;			
   union
   {
-    /// Key data of event
-    csEventKeyData Key;
     /// Mouse data of event
     csEventMouseData Mouse;
     /// Joystick data of event
@@ -337,7 +458,7 @@ struct iEventOutlet : public iBase
    * National Language Support subsystem so that national characters
    * are properly supported.
    */
-  virtual void Key (int iKey, int iChar, bool iDown) = 0;
+  virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown) = 0;
 
   /**
    * Put a mouse event into event queue.<p>
@@ -373,8 +494,8 @@ struct iEventOutlet : public iBase
    * application is going to be suspended (suspended means "frozen",
    * that is, application is forced to not run for some time). This happens
    * for example when user switches away from a full-screen application on
-   * any OS with MGL canvas driver, or when it presses <Pause> with the OS/2
-   * DIVE driver, or in any other drivers that supports forced pausing of
+   * any OS with MGL canvas driver, or when it presses &lt;Pause&gt; with the 
+   * OS/2 DIVE driver, or in any other drivers that supports forced pausing of
    * applications.<p>
    * This generates a `normal' broadcast event with given command code;
    * the crucial difference is that the event is being delivered to all

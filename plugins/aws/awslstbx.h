@@ -362,7 +362,7 @@ public:
   virtual bool OnMouseEnter ();
 
   /// Triggered when the user presses a key
-  virtual bool OnKeypress (int key, int cha, int modifiers);
+  virtual bool OnKeyboard (const csKeyEventData& eventData);
 
   /// Triggered when the component becomes focused
   virtual void OnSetFocus ();

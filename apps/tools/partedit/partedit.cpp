@@ -213,7 +213,9 @@ void PartEdit::FinishFrame ()
 
 bool PartEdit::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  if ((ev.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&ev) == csevKbdKeyDown) &&
+    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)

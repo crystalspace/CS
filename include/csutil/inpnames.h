@@ -25,6 +25,49 @@
  * Crystal Space input library
  */
 
+#include "iutil/evdefs.h"
+#include "iutil/event.h"
+#include "csutil/csstring.h"
+
+struct iEvent;
+
+class csInputDefinition
+{
+protected:
+  uint32 modifiersHonored;
+  csKeyModifiers modifiers;
+  int containedType;
+  union
+  {
+    struct
+    {
+      utf32_char keyCode;
+      bool codeIsCooked;
+    } k;
+    csEventMouseData m;
+    csEventJoystickData j;
+  };
+
+  /* @@@ Not implemented, but prolly useful
+  int CompareModifiers (const csKeyModifiers& m1, 
+    const csKeyModifiers& m2, uint32 honorModifiers);*/
+public:
+  csInputDefinition ();
+  csInputDefinition (iEvent* event);
+
+  void SetHonoredModifiers (uint32 honorModifiers = CSMASK_ALLSHIFTS);
+  uint32 GetHonoredModifiers ();
+
+  bool Parse (const char* string, bool useCooked = true);
+  csString GetDescription ();
+  bool FromEvent (iEvent* event, bool useCookedKey = true);
+
+  uint32 ComputeHash ();
+  static uint32 ComputeEventHash (iEvent* event);
+  int Compare (const csInputDefinition& def);
+  int Compare (iEvent* event);
+};
+
 /**
  * Use in `int button' for csevXXXMove events
  * with the backward compatible funcs.
@@ -36,7 +79,6 @@
  */
 #define CSAXIS_Y -2
 
-struct iEvent;
 class csEvent;
 
 /**

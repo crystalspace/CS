@@ -1,5 +1,3 @@
-#ifndef __CS_AWS_MULTILINE_EDIT_H__
-#define __CS_AWS_MULTILINE_EDIT_H__
 /*
     Copyright (C) 2002 by Norman Kraemer
   
@@ -18,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CS_AWS_MULTILINE_EDIT_H__
+#define __CS_AWS_MULTILINE_EDIT_H__
 /**
  * This is a simple multiline edit control.
  */
@@ -25,49 +25,38 @@
 #include "awscomp.h"
 #include "awstimer.h"
 #include "awsscr.h"
+#include "iutil/csinput.h"
 #include "csutil/csevent.h"
 #include "csutil/parray.h"
+#include "csutil/inpnames.h"
 
 class awsMultiLineEdit : public awsComponent
 {
  protected:
   struct mlEvent
   {
-    csEvent e;
+    /*csEvent e;
+    csKeyEventData keyData;*/
+    csInputDefinition inputDef;
     void (awsMultiLineEdit::*ring)();
   };
 
   class eventVector : public csPDelArray<mlEvent>
   {
   public:
-    static int DoCompare (const csEvent *e1, const csEvent *e2)
-    {
-      int d = (int)e1->Type - (int)e2->Type;
-      if (d == 0)
-      {
-        if (CS_IS_KEYBOARD_EVENT (*e1))
-          return memcmp (&e1->Key, &e2->Key, sizeof (e1->Key));
-        if (CS_IS_MOUSE_EVENT (*e1))
-          return memcmp (&e1->Mouse, &e2->Mouse, sizeof (e1->Mouse));
-        if (CS_IS_JOYSTICK_EVENT (*e1))
-          return memcmp (&e1->Joystick, &e2->Joystick, sizeof (e1->Joystick));
-        return memcmp (e1, e1, sizeof (*e1));
-      }
-      return d;
-    }
     static int Compare (mlEvent* const& Item1, mlEvent* const& Item2)
     {
-      return DoCompare (&Item1->e, &Item2->e);
+      return (Item1->inputDef.Compare (Item2->inputDef));
     }
-    static int CompareKey (mlEvent* const& Item, void* Key)
+    static int CompareEvent (mlEvent* const& Item, void* Key)
     {
-      return DoCompare (&Item->e, (csEvent*)Key);
+      return (Item->inputDef.Compare ((iEvent*)Key));
     }
     
-    bool Add (const csEvent &e, void (awsMultiLineEdit::*ring)())
+    bool Add (const csInputDefinition &e, void (awsMultiLineEdit::*ring)())
     {
       mlEvent *ev = new mlEvent;
-      ev->e = e;
+      ev->inputDef = e;
       ev->ring = ring;
       if (InsertSorted (ev, Compare) >= 0)
         return true;
@@ -84,6 +73,7 @@ class awsMultiLineEdit : public awsComponent
   csRef<iFont> font;
   iTextureHandle *img;
   int alpha_level;
+  csRef<iKeyComposer> composer;
 
   int style;
   csRect contentRect;
@@ -108,7 +98,7 @@ class awsMultiLineEdit : public awsComponent
   void InsertClipboard (int row, int col);
   bool GetMarked (int theRow, int &from, int &to);
   void MoveCursor (int theRow, int theCol);
-  void InsertChar (int c);
+  void InsertChar (utf32_char c);
   static void BlinkCursor (void *, iAwsSource *source);
 
   void SetDefaultHandler ();

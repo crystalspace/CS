@@ -34,6 +34,8 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "iutil/event.h"
+#include "cssys/csunicode.h"
 
 /// Maximal number of mouse buttons supported
 #define CS_MAX_MOUSE_BUTTONS	10
@@ -42,7 +44,56 @@
 /// Maximal number of joystick buttons supported
 #define CS_MAX_JOYSTICK_BUTTONS	10
 
-SCF_VERSION(iKeyboardDriver, 0, 0, 1);
+SCF_VERSION(iKeyComposer, 0, 0, 1);
+
+
+SCF_VERSION(iKeyboardDriver, 0, 0, 2);
+
+/**
+ * Results for attempts to process a character key.
+ */
+enum csKeyComposeResult
+{
+  /// No character could be retrieved. Possibly the key was dead.
+  csComposeNoChar = -1,
+  /// A single, normal chararacter is retrieved.
+  csComposeNormalChar,
+  /// A single, composed chararacter is retrieved.
+  csComposeComposedChar,
+  /**
+   * A key couldn't be combined with a previously pressed dead key,
+   * and both characters are returned individually.
+   */
+  csComposeUncomposeable
+};
+
+/**
+ * Keyboard input handler.
+ */
+struct iKeyComposer : public iBase
+{
+  /**
+   * Handle keyboard input.
+   * Converts the input to characters, if possible. If the key passed in is a 
+   * dead key, it will be stored internally and affect the returned data of the
+   * subsequent keypress.
+   * \param keyEventData Information from a keyboard event.
+   * \param buf Buffer to store the output in. Should be at least contain 2
+   *  characters (however, the method will work with smaller buffers as well.)
+   * \param bufChars Number of characters the output buffer is actually sized.
+   * \param resultChars If not 0, returns the number of characters written to the
+   *  outpuit buffer.
+   * \return The type of character(s) that has been written to the output buffer.
+   */
+  virtual csKeyComposeResult HandleKey (const csKeyEventData& keyEventData,
+    utf32_char* buf, size_t bufChars, int* resultChars = 0) = 0;
+  /**
+   * Reset the composer's internal state.
+   * Specifically, it will clear any stored dead key - the next key won't be
+   * combined with it.
+   */
+  virtual void ResetState () = 0;
+};
 
 /**
  * Generic Keyboard Driver.<p>
@@ -59,15 +110,37 @@ struct iKeyboardDriver : public iBase
    */
   virtual void Reset () = 0;
 
-  /// Call to add a key down/up event to queue.
-  virtual void DoKey (int iKey, int iChar, bool iDown) = 0;
+  /**
+   * Call this routine to add a key down/up event to queue.
+   * \param codeRaw 'Raw' code of the pressed key.
+   * \param codeCooked 'Cooked' code of the pressed key.
+   * \param iDown Whether the key is up or down.
+   * \param autoRepeat Auto-repeat flag for the key event. Typically only
+   *  used by the platform-specific keyboard agents.
+   * \param charType When the cooked code is a character, it determines
+   *  whether it is a normal, or dead character.
+   */
+  virtual void DoKey (utf32_char codeRaw, utf32_char codeCooked, bool iDown,
+    bool autoRepeat = false, csKeyCharType charType = csKeyCharTypeNormal) = 0;
 
   /**
-   * Query the state of a key. All key codes in range 0..255,
-   * CSKEY_FIRST..CSKEY_LAST are supported. Returns true if
+   * Query the state of a key. All key codes are supported. Returns true if
    * the key is pressed, false if not.
    */
-  virtual bool GetKeyState (int iKey) = 0;
+  virtual bool GetKeyState (utf32_char codeRaw) = 0;
+
+  /**
+   * Get the current state of the modifiers.
+   */
+  virtual uint32 GetModifierState (utf32_char codeRaw) = 0;
+
+  /**
+   * Return an instance of the keyboard composer.
+   * \remark All composers are independent. Specifically, passing a dead key
+   * to one composer won't affect the result after the next keyboard event
+   * of any other composer.
+   */
+  virtual csPtr<iKeyComposer> CreateKeyComposer () = 0;
 };
 
 SCF_VERSION(iMouseDriver, 0, 0, 1);

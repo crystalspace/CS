@@ -185,52 +185,56 @@ bool csSpinBox::HandleEvent (iEvent &Event)
         Invalidate (bound.Width () - SpinBoxSize, 0, bound.Width (), bound.Height ());
       } /* endif */
       break;
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_UP:
-          if (!app->MouseOwner)
-          {
-            if (!app->KeyboardOwner)
-            {
-              app->CaptureKeyboard (this);
-              SpinState = 1;
-              AutoRepeats = -1;
-            } /* endif */
-            Spin ();
-          } /* endif */
-          break;
-        case CSKEY_DOWN:
-          if (!app->MouseOwner)
-          {
-            if (!app->KeyboardOwner)
-            {
-              app->CaptureKeyboard (this);
-              SpinState = 2;
-              AutoRepeats = 0;
-            } /* endif */
-            Spin ();
-          } /* endif */
-          break;
-      } /* endswitch */
-      if (Event.Key.Char)
-        return true;
-      break;
-    case csevKeyUp:
-      switch (Event.Key.Code)
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_UP:
+	    if (!app->MouseOwner)
+	    {
+	      if (!app->KeyboardOwner)
+	      {
+		app->CaptureKeyboard (this);
+		SpinState = 1;
+		AutoRepeats = -1;
+	      } /* endif */
+	      Spin ();
+	    } /* endif */
+	    break;
+	  case CSKEY_DOWN:
+	    if (!app->MouseOwner)
+	    {
+	      if (!app->KeyboardOwner)
+	      {
+		app->CaptureKeyboard (this);
+		SpinState = 2;
+		AutoRepeats = 0;
+	      } /* endif */
+	      Spin ();
+	    } /* endif */
+	    break;
+	} /* endswitch */
+	if (csKeyEventHelper::GetCookedCode (&Event))
+	  return true;
+      }
+      else
       {
-        case CSKEY_UP:
-        case CSKEY_DOWN:
-          if (app->KeyboardOwner == this)
-          {
-            app->CaptureKeyboard (0);
-            SpinState = 0;
-            Invalidate ();
-          } /* endif */
-          break;
-      } /* endswitch */
-      if (Event.Key.Char)
-        return true;
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_UP:
+	  case CSKEY_DOWN:
+	    if (app->KeyboardOwner == this)
+	    {
+	      app->CaptureKeyboard (0);
+	      SpinState = 0;
+	      Invalidate ();
+	    } /* endif */
+	    break;
+	} /* endswitch */
+	if (csKeyEventHelper::GetCookedCode (&Event))
+	  return true;
+      }
       break;
   } /* endswitch */
   return csInputLine::HandleEvent (Event);

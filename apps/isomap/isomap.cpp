@@ -442,14 +442,18 @@ void IsoMap1::FinishFrame ()
 
 bool IsoMap1::HandleEvent (iEvent &Event)
 {
-  if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
+  if ((Event.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
       q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
-  if ((Event.Type == csevKeyDown) && (Event.Key.Code == '\t'))
+  if ((Event.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_TAB))
   {
     static float settings[][5] = {
     // scale should be *displayheight.

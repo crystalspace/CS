@@ -611,37 +611,43 @@ bool csNotebook::HandleEvent (iEvent &Event)
         }
       }
       return false;
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_PGDN:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_ALT)
-          {
-            SelectTab (activetab + 1);
-            return true;
-          }
-          break;
-        case CSKEY_PGUP:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_ALT)
-          {
-            SelectTab (activetab - 1);
-            return true;
-          }
-          break;
-        default:
-          if ((app->KeyboardOwner == 0)
-           && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
-           && (Event.Key.Modifiers & CSMASK_FIRST))
-		  {
-		  int i;
-          for (i = 0; i < pages.Length (); i++)
-            if (pages.Get (i)->IsHotKey (Event.Key.Char))
-            {
-              SelectTab (i);
-              return true;
-            }
-		  }
-          break;
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_PGDN:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == CSMASK_ALT)
+	    {
+	      SelectTab (activetab + 1);
+	      return true;
+	    }
+	    break;
+	  case CSKEY_PGUP:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == CSMASK_ALT)
+	    {
+	      SelectTab (activetab - 1);
+	      return true;
+	    }
+	    break;
+	  default:
+	    if ((app->KeyboardOwner == 0) && 
+	      ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL) == 0) && 
+	      (!csKeyEventHelper::GetAutoRepeat (&Event)))
+	    {
+	      int i;
+	      for (i = 0; i < pages.Length (); i++)
+		if (pages.Get (i)->IsHotKey (
+		  csKeyEventHelper::GetCookedCode (&Event)))
+		{
+		  SelectTab (i);
+		  return true;
+		}
+		    }
+	    break;
+	}
       }
       break;
     case csevCommand:

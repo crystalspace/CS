@@ -118,21 +118,25 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  else if ((ev.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
-    return true;
-  }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == 'l')
-  {
-    csDebuggingGraph::Dump (0);
-    engine->DeleteAll ();
-    csDebuggingGraph::Dump (0);
-    csDebuggingGraph::Clear (0);
-    LoadMap ();
-    return true;
+    if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
+    {
+      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      if (q)
+	q->GetEventOutlet()->Broadcast (cscmdQuit);
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'l')
+    {
+      csDebuggingGraph::Dump (0);
+      engine->DeleteAll ();
+      csDebuggingGraph::Dump (0);
+      csDebuggingGraph::Clear (0);
+      LoadMap ();
+      return true;
+    }
   }
 
   return false;
@@ -147,7 +151,7 @@ bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
-  VFS->ChDir ("/lev/partsys");
+  VFS->ChDir ("/lev/street");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {

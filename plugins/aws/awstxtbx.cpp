@@ -1,4 +1,5 @@
 #include "cssysdef.h"
+#include "cssys/csuctransform.h"
 
 #include <ctype.h>
 
@@ -47,8 +48,8 @@ awsTextBox::awsTextBox () :
   text(0),
   disallow(0),
   maskchar(0),
-  start(0),
-  cursor(0),
+  strStart(0),
+  strCursor(0),
   blink_timer(0),
   blink(true)
 {
@@ -76,6 +77,14 @@ const char *awsTextBox::Type ()
 bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
+
+  csRef<iKeyboardDriver> currentKbd = 
+    CS_QUERY_REGISTRY (wmgr->GetObjectRegistry (), iKeyboardDriver);
+  if (currentKbd == 0)
+  {
+    return false;
+  }
+  composer = currentKbd->CreateKeyComposer ();
 
   // Setup blink event handling
   if (textbox_sink == 0)
@@ -107,11 +116,11 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   int _focusable = 0;
   pm->GetInt (settings, "Focusable", _focusable);
-	focusable = _focusable;
+  focusable = _focusable;
   
-	if (text) {
-      cursor = text->Length ();
-      text = new scfString(*text);
+  if (text) {
+    strCursor = text->Length ();
+    text = new scfString(*text);
   } else
     text = new scfString ();
 
@@ -183,8 +192,8 @@ bool awsTextBox::SetProperty (const char *name, void *parm)
       text = s;
       text->IncRef ();
       Invalidate ();
-      start = 0;
-      cursor = 0;
+      strStart = 0;
+      strCursor = 0;
     }
 
     return true;
@@ -328,20 +337,43 @@ void awsTextBox::OnDraw (csRect /*clip*/)
   if (text && text->Length ())
   {
     int tw, th, tx, ty, mcc;
-    csRef<iString> saved = 0;
+    csRef<iString> saved;
+
+    /*
+      When masking is used, the cursor/start offsets are 
+      different
+     */
+    int usedStrStart = strStart;
+    uint usedStrCursor = strCursor;
 
     if (should_mask && maskchar)
     {
       saved = text->Clone ();
 
-      unsigned int i;
-      for (i = 0; i < text->Length (); ++i)
+      usedStrStart = usedStrCursor = 0;
+
+      unsigned int i = 0;
+      utf8_char* sptr = (utf8_char*)text->GetData ();
+      size_t sl = text->Length ();
+      size_t sch = 0;
+      while (*sptr != 0)
+      {
+	int chSize = csUnicodeTransform::UTF8Skip (sptr, sl);
         text->SetAt (i, maskchar->GetAt (0));
+	sptr += chSize;
+	sl -= chSize;
+
+	sch += chSize;
+	i++;
+	if (sch <= (size_t)strStart) usedStrStart = i;
+	if (sch <= strCursor) usedStrCursor = i;
+      }
+      text->Truncate (i);
     }
 
     // Get the maximum number of characters we can use
     mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetLength (
-        text->GetData () + start,
+        text->GetData () + strStart,
         Frame ().Width () - 10);
 
     if (mcc)
@@ -350,11 +382,11 @@ void awsTextBox::OnDraw (csRect /*clip*/)
       // Check to see if we're getting weird.
       // this was changed to avoid 
       // jittering in the start value
-      if ((int)cursor > start + mcc) start = cursor - mcc;
-      if (start < 0) start = 0;
+      if ((int)usedStrCursor > usedStrStart + mcc) usedStrStart = usedStrCursor - mcc;
+      if (usedStrStart < 0) usedStrStart = 0;
 
       // Make the text the right length
-      scfString tmp (text->GetData () + start);
+      csString tmp (text->GetData () + usedStrStart);
       tmp.Truncate (mcc);
 
       // Get the size of the text
@@ -367,24 +399,24 @@ void awsTextBox::OnDraw (csRect /*clip*/)
 
       // Draw the text
       g2d->Write (
-      WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-      Frame ().xmin + tx,
-      Frame ().ymin + ty,
-      WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
-      -1,
-      tmp.GetData ());
+	WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+	Frame ().xmin + tx,
+	Frame ().ymin + ty,
+	WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+	-1,
+	tmp.GetData ());
 
       if (should_mask && maskchar && saved)
       {
-        text->Clear ();
-        text->Append (saved);
-        saved->Clear ();
+	text->Clear ();
+	text->Append (saved);
+	saved = 0;
       }
 
     if (has_focus && blink)
     {
       int co, cx, tty;
-      co = cursor - start;
+      co = strCursor - strStart;
       tmp.Truncate (co);
       // figure out where to put the cursor
       WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
@@ -415,12 +447,25 @@ bool awsTextBox::OnMouseDown (int, int x, int y)
   if (text && text->Length() > 0)
   {
     // determine how many chars in the mouse was clicked
-    int tp,cp;
-    scfString tmp(text->GetData () + start);
-    tp = x - 4 - Frame ().xmin;
-    cp = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
-      GetLength(tmp,tp);
-    cursor = cp + start;
+    if (should_mask && maskchar)
+    {
+      char mask[2];
+      mask[0] = maskchar->GetAt (0);
+      mask[1] = 0;
+      int mw, mh;
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
+	GetDimensions (mask, mw, mh);
+      strCursor = strStart + ((x - 4 - Frame ().xmin) / mw);
+    }
+    else
+    {
+      int tp,cp;
+      scfString tmp(text->GetData () + strStart);
+      tp = x - 4 - Frame ().xmin;
+      cp = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
+	GetLength (tmp, tp);
+      strCursor = cp + strStart;
+    }
   }
   // This is needed to get keyboard focus for the mouse!
   return true;
@@ -440,9 +485,34 @@ bool awsTextBox::OnMouseEnter ()
   return true;
 }
 
-bool awsTextBox::OnKeypress (int key, int Char, int)
+void awsTextBox::EnsureCursorToStartDistance (int dist)
 {
-  switch (key)
+  int charsToCur = 0;
+  size_t bytesToCur = 0;
+  while (strStart + bytesToCur < strCursor)
+  {
+    bytesToCur += csUnicodeTransform::UTF8Skip (
+      (utf8_char*)text->GetData () + strStart + bytesToCur,
+      strCursor - bytesToCur - strStart);
+    charsToCur++;
+  }
+  if (charsToCur < dist)
+  {
+    strStart = strCursor;
+    charsToCur = 0;
+    while ((charsToCur < dist) && (strStart > 0))
+    {
+      strStart -= csUnicodeTransform::UTF8Rewind (
+	(utf8_char*)text->GetData () + strStart,
+	strStart);
+      charsToCur++;
+    }
+  }
+}
+
+bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
+{
+  switch (eventData.codeCooked)
   {
     case CSKEY_ENTER:
       Broadcast (signalEnterPressed);
@@ -453,9 +523,26 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
       break;
 
     case CSKEY_BACKSPACE:
-      if (cursor > 0) 
+      if (strCursor > 0) 
       {
-        cursor--;
+	int chSize = csUnicodeTransform::UTF8Rewind (
+	  (utf8_char*)text->GetData () + strCursor, 
+	  strCursor);
+
+	strCursor -= chSize;
+	EnsureCursorToStartDistance (5);
+        if (strStart < 0) strStart = 0;
+        if (text && (text->Length () > 1))
+        {
+          csString tmp (text->GetData ());
+          tmp.DeleteAt (strCursor, chSize);
+	  text->Clear ();
+	  text->Append (tmp);
+        }
+        else
+          text->Clear ();
+
+/*        cursor--;
         if (cursor - start < 5) start = cursor - 5;
         if (start < 0) start = 0;
         if (text && (text->Length () > 1))
@@ -465,17 +552,35 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
           {
             scfString tmp(text->GetData());
             tmp.Truncate (cursor);
-            tmp.Append (text->GetData()+cursor+1);
+            tmp.Append (text->GetData() + cursor + 1);
             text->Replace(&tmp);
           }
         else
-          text->Clear ();
+          text->Clear ();*/
       }
 
       break;
 
     case CSKEY_DEL:
-      if (cursor > 0 && cursor == text->Length ()) cursor--;
+      if (strCursor < text->Length ())
+      {
+	int chSize = csUnicodeTransform::UTF8Skip (
+	  (utf8_char*)text->GetData () + strCursor, 
+	  strCursor);
+
+	EnsureCursorToStartDistance (5);
+        if (strStart < 0) strStart = 0;
+        if (text && (text->Length () > 1))
+        {
+          csString tmp (text->GetData ());
+          tmp.DeleteAt (strCursor, chSize);
+	  text->Clear ();
+	  text->Append (tmp);
+        }
+        else
+          text->Clear ();
+      }
+/*      if (cursor > 0 && cursor == text->Length ()) cursor--;
       if (cursor - start < 5) start = cursor - 5;
       if (start < 0) start = 0;
       if (text && (text->Length () > 1))
@@ -489,58 +594,92 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
           text->Replace(&tmp);
         }
       else
-        text->Clear ();
+        text->Clear ();*/
 
       break;
 
     case CSKEY_LEFT:
-      if (cursor > 0) cursor--;
+      if (strCursor > 0)
+      {
+	strCursor -= csUnicodeTransform::UTF8Rewind (
+	  (utf8_char*)text->GetData () + strCursor,
+	  strCursor);
+      }
+      EnsureCursorToStartDistance (5);
+      /*if (cursor > 0) cursor--;
       if (cursor - start < 5) start = cursor - 5;
-      if (start < 0) start = 0;
+      if (start < 0) start = 0;*/
 
       break;
 
     case CSKEY_RIGHT:
-      if (cursor < text->Length ()) {
-        cursor++;
+      if (strCursor < text->Length ())
+      {
+	strCursor += csUnicodeTransform::UTF8Skip (
+	  (utf8_char*)text->GetData () + strCursor,
+	  text->Length () - strCursor);
       }
+      /*if (cursor < text->Length ()) {
+        cursor++;
+      }*/
 
       break;
 
     case CSKEY_HOME:
-      cursor=0;
-      start=0;
+      strCursor=0;
+      strStart=0;
 
       break;
 
     case CSKEY_END:
-      cursor=text->Length();
+      strCursor=text->Length();
 
       break;
 
     default:
       {
-	if (!isprint (Char))
+	//if (!isprint (Char))
+	//  break;
+	if (CSKEY_IS_SPECIAL (eventData.codeCooked))
 	  break;
-	
-	if (disallow && (strchr (disallow->GetData (), Char) != 0))
-	  break;
-	
-	char str[2];
-	str[0] = (char)Char;
-	str[1] = 0;
-        scfString tmp(str);
 
-        if (cursor == text->Length ()) 
-        {
-	  text->Append (str);
-        }
-        else
-        {
-          text->Insert (cursor, &tmp);
-        }
-	cursor++;
-	Broadcast (signalChanged);
+	utf32_char composedCh[2];
+	size_t composedCount;
+	if (composer->HandleKey (eventData, composedCh, 
+	  sizeof (composedCh) / sizeof (utf32_char), 
+	  &composedCount) != csComposeNoChar)
+	{
+	  bool changed = false;
+	  for (size_t n = 0; n < composedCount; n++)
+	  {
+	    utf8_char ch[CS_UC_MAX_UTF8_ENCODED + 1];
+	    size_t chSize = csUnicodeTransform::EncodeUTF8 (composedCh[n],
+	      ch, sizeof (ch) / sizeof (utf8_char));
+	    ch[chSize] = 0;
+
+	    if (disallow && (strstr (disallow->GetData (), (char*)ch) != 0))
+	      continue;
+	    //if (disallow && (strchr (disallow->GetData (), Char) != 0))
+	    //  break;
+    	
+	    /*char str[2];
+	    str[0] = (char)Char;
+	    str[1] = 0;*/
+
+	    if (strCursor == text->Length ()) 
+	    {
+	      text->Append ((char*)ch);
+	    }
+	    else
+	    {
+	      scfString tmp ((char*)ch);
+	      text->Insert (strCursor, &tmp);
+	    }
+	    strCursor += chSize;
+	    changed = true;
+	  }
+	  if (changed) Broadcast (signalChanged);
+	}
       }
   }         // end switch
   Invalidate ();

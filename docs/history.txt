@@ -51,6 +51,17 @@ chronological order.
 	- Wouter fixed awstxtbox, changing a iString* to csRef<iString>,
 	  which stops awstut from crashing when typing a password.
 	  Still, it's fishy that iString::Clone and Slice return a csRef<>.
+	- res made the following changes:
+	    - Tagged everything with OLD_KEYBOARD_EVENTS.
+	    - Overhauled keyboard events. The event data is now stored via
+	      iEvent's property bag mechanism (a helper class can simplify
+	      the access.) The idea of 'scan codes' and 'char codes' has been
+	      replaced with 'raw codes' and 'cooked codes.' Also, there's only
+	      one keyboard event now, and the information whether the key was
+	      pressed or released is now part of the event data. A couple of 
+	      features have been added as well, for example, CS can now 
+	      distinguish between left/right modifiers or keypad and 
+	      non-keypad keys.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of

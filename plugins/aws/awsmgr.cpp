@@ -1067,74 +1067,76 @@ bool awsManager::HandleEvent (iEvent &Event)
       }
       break;
       
-    case csevKeyDown:
-			{
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
+      {
         iAwsComponent *cmp = 0;
 
-				if( flags & AWSF_KeyboardControl)	
-				{
-					  cmp = GetFocusedComponent();
+	if (flags & AWSF_KeyboardControl)	
+	{
+	  cmp = GetFocusedComponent();
 
-						char code = (char)(Event.Key.Code);
+	  csKeyModifiers m;
+	  csKeyEventHelper::GetModifiers (&Event, m);
+	  utf32_char code = csKeyEventHelper::GetCookedCode (&Event);
 
-						if(code == CSKEY_TAB)
-						{
+	  if(code == CSKEY_TAB)
+	  {
+            bool found = false;
+	    while(cmp && !found) 
+	    {
+	      if (m.modifiers[csKeyModifierTypeCtrl] != 0)
+	      {
+		if(cmp->Parent() && 
+		  cmp == cmp->Parent()->GetTabComponent(0) && 
+		  cmp->Parent()->Parent())
+		{
+		  cmp = cmp->Parent();
+		}
 
-             bool found = false;
+		cmp = cmp->Parent()->TabPrev(cmp);
+	      }
+	      else
+	      {
+		if (cmp->Parent() 
+		  && cmp == cmp->Parent()->GetTabComponent(
+		  cmp->Parent()->GetTabLength() - 1) && 
+		  cmp->Parent()->Parent())
+		{
+		  cmp = cmp->Parent();
+		}
 
-						 while(cmp && !found) 
-						 {
-							 if(Event.Key.Modifiers & CSMASK_CTRL)
-							 {
-								 if(cmp->Parent() 
-								 && cmp == cmp->Parent()->GetTabComponent(0)
-								 && cmp->Parent()->Parent())
-									cmp = cmp->Parent();
+		cmp = cmp->Parent()->TabNext(cmp);
+	      }
 
-								 cmp = cmp->Parent()->TabPrev(cmp);
-							 }
-							 else
-							 {
-								 if(cmp->Parent() 
-								 && cmp == cmp->Parent()->GetTabComponent(cmp->Parent()->GetTabLength() - 1)
-								 && cmp->Parent()->Parent())
-									cmp = cmp->Parent();
+	      if (cmp && cmp->Focusable() && !cmp->isHidden())
+		found = true;
+	      else 
+	      {
+		if (cmp && cmp->HasChildren())
+		{
+		  if (m.modifiers[csKeyModifierTypeCtrl] != 0)
+		    cmp = cmp->GetTabComponent(cmp->GetTabLength() - 1);
+		  else cmp = cmp->GetTabComponent(0);
+		  if(cmp && cmp->Focusable() && !cmp->isHidden())
+		    found = true;
+		}
+	      }
+	    }
 
-								cmp = cmp->Parent()->TabNext(cmp);
-							 }
+	    if(cmp)
+	      SetFocusedComponent(cmp);
 
-							 if(cmp && cmp->Focusable() && !cmp->isHidden())
-								 found = true;
-							 else 
-							 {
-								 if(cmp && cmp->HasChildren())
-								 {
-									 if(Event.Key.Modifiers & CSMASK_CTRL)
-										cmp = cmp->GetTabComponent(cmp->GetTabLength() - 1);
-									 else cmp = cmp->GetTabComponent(0);
-									 if(cmp && cmp->Focusable() && !cmp->isHidden())
-										 found = true;
-								 }
+	    return true;
+	  }
 
-							 }
+          ChangeKeyboardFocus(cmp, Event);
+	}
 
-						 }
-
-						 if(cmp)
-							 SetFocusedComponent(cmp);
-
-						 return true;
-						}
-
-            ChangeKeyboardFocus(cmp, Event);
-					}
-
-				if (keyb_focus) 
-					return keyb_focus->HandleEvent (Event);
-			}
-
-	break;
-
+	if (keyb_focus) 
+	  return keyb_focus->HandleEvent (Event);
+      }
+      break;
   }
   
   return false;
@@ -1244,7 +1246,9 @@ void awsManager::ChangeKeyboardFocus(iAwsComponent *cmp, iEvent &Event)
 
   if (et == csevMouseDown 
     ||(et == csevMouseMove && (flags & AWSF_RaiseOnMouseOver))
-    ||(et == csevKeyDown && (flags & AWSF_KeyboardControl) )  )
+    || ((et == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&   
+    (flags & AWSF_KeyboardControl) )  )
   {
     if (keyb_focus != cmp)
     {

@@ -28,7 +28,7 @@
 #include "iutil/objreg.h"
 
 // This array defines first 32..128 character codes with SHIFT key applied
-char ShiftedKey [128-32] =
+static char ShiftedKey [128-32] =
 {
 ' ', '!', '"', '#', '$', '%', '&', '"', '(', ')', '*', '+', '<', '_', '>', '?',
 ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':', '<', '+', '>', '?',
@@ -96,6 +96,202 @@ bool csInputDriver::HandleEvent(iEvent& e)
   return mine;
 }
 
+//-----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csKeyComposer)
+  SCF_IMPLEMENTS_INTERFACE(iKeyComposer)
+SCF_IMPLEMENT_IBASE_END
+
+csKeyComposer::csKeyComposer ()
+{
+  SCF_CONSTRUCT_IBASE(0);
+  lastDead = 0;
+}
+
+csKeyComposer::~csKeyComposer ()
+{
+}
+
+/*
+  Default dead-key handling.
+  Combines a subset of the Unicode diacritical marks(or "dead chars") with a 
+  choice of latin letters.
+ */
+
+/*
+  List of supported diacritical marks.
+  Should be sorted ascending.
+ */
+const utf32_char marks[] = {
+  0x005e, // accent circumflex
+  0x0060, // accent grave
+  0x007e, // tilde
+  0x00a8, // diaresis
+  0x00b4, // accent acute
+  0x02da  // ring
+};
+
+const int numMarks = sizeof (marks) / sizeof (utf32_char);
+
+/*
+  List of supported latin letters.
+  Should be sorted ascending.
+ */
+const utf32_char latinLetters[] = {
+  ' ',
+  'A', 'E', 'I', 'O', 'U', 'Y',
+  'a', 'e', 'i', 'o', 'u', 'y'
+};
+
+const int numLetters = sizeof (latinLetters) / sizeof (utf32_char);
+
+/// A combination is not available.
+#define NOPE	  (utf32_char)-1
+
+/*
+  All combinations of marks and letters we support.
+ */
+const utf32_char combinedChars[numMarks][numLetters] = {
+  {0x005e,
+   0x00c2, 0x00ca, 0x00ce, 0x00d4, 0x00db, 0x0176,
+   0x00e2, 0x00ea, 0x00ee, 0x00f4, 0x00fb, 0x0177},
+  {0x0060,
+   0x00c0, 0x00c8, 0x00cc, 0x00d2, 0x00d9, NOPE,
+   0x00e0, 0x00e8, 0x00ec, 0x00f2, 0x00f9, NOPE},
+  {0x007e,
+   0x00c3, NOPE,   0x0128, 0x00d5, 0x0168, NOPE,
+   0x00e3, NOPE,   0x0129, 0x00f5, 0x0169, NOPE},
+  {0x00a8,
+   0x00c4, 0x00cb, 0x00cf, 0x00d6, 0x00dc, 0x00ff,
+   0x00e4, 0x00eb, 0x00ef, 0x00f6, 0x00fc, 0x0178},
+  {0x00b4,
+   0x00c1, 0x00c9, 0x00cd, 0x00d3, 0x00da, 0x00dd,
+   0x00e2, 0x00e9, 0x00ed, 0x00f3, 0x00fa, 0x00fd},
+  {0x02da,
+   0x00c5, NOPE,   NOPE,   NOPE,   0x016e, NOPE,
+   0x00e5, NOPE,   NOPE,   NOPE,   0x016f, NOPE}
+};
+
+csKeyComposeResult csKeyComposer::HandleKey (
+  const csKeyEventData& keyEventData, utf32_char* buf, size_t bufChars, 
+  int* resultChars)
+{
+
+#define RETURN(ret, bs)			\
+  {					\
+    if (resultChars) *resultChars = bs;	\
+    return ret;				\
+  }
+
+#define RETURN0(ret)	      RETURN(ret, 0)
+
+#define RETURN1(ret, a)	      \
+  {			      \
+    if (bufChars >= 1)	      \
+    {			      \
+      buf[0] = a;	      \
+      RETURN(ret, 1);	      \
+    }			      \
+    else		      \
+      RETURN0(ret);	      \
+  }
+
+#define RETURN2(ret, a, b)    \
+  {			      \
+    if (bufChars >= 2)	      \
+    {			      \
+      buf[0] = a;	      \
+      buf[1] = b;	      \
+      RETURN(ret, 2);	      \
+    }			      \
+    else		      \
+      RETURN1(ret, b);	      \
+  }
+
+  if (CSKEY_IS_SPECIAL (keyEventData.codeRaw))
+    RETURN0(csComposeNoChar)
+
+  if (lastDead != 0)
+  {
+    utf32_char dead = lastDead;
+    lastDead = 0;
+
+    int p = -1;
+    int l = 0, r = numMarks - 1;
+
+    while (l <= r)
+    {
+      int m = (l + r) / 2;
+      if (marks[m] == dead)
+      {
+	p = m;
+	break;
+      }
+      else if (marks[m] > dead)
+	r = m - 1;
+      else
+	l = m + 1;
+    }
+    if (p == -1)
+    {
+      RETURN2(csComposeUncomposeable, dead, keyEventData.codeCooked)
+    }
+    else
+    {
+      const utf32_char* converted = combinedChars[p];
+      p = -1; l = 0; r = numLetters;
+      
+      while (l <= r)
+      {
+	int m = (l + r) / 2;
+	if (latinLetters[m] == keyEventData.codeCooked)
+	{
+	  p = m;
+	  break;
+	}
+	else if (latinLetters[m] > keyEventData.codeCooked)
+	  r = m - 1;
+	else
+	  l = m + 1;
+      }
+      if (p == -1)
+      {
+	RETURN2(csComposeUncomposeable, dead, keyEventData.codeCooked)
+      }
+      else
+      {
+	utf32_char combined = converted[p];
+	if (combined == NOPE)
+	  RETURN2(csComposeUncomposeable, dead, keyEventData.codeCooked)
+	else
+	  RETURN1(csComposeComposedChar, converted[p])
+      }
+    }
+  }
+  else
+  {
+    if (keyEventData.charType == csKeyCharTypeDead)
+    {
+      lastDead = keyEventData.codeCooked;
+      RETURN0(csComposeNoChar)
+    }
+    else
+      RETURN1(csComposeNormalChar, keyEventData.codeCooked)
+  }
+
+#undef RETURN
+#undef RETURN0
+#undef RETURN1
+#undef RETURN2
+}
+
+#undef NOPE
+
+void csKeyComposer::ResetState ()
+{
+  lastDead = 0;
+}
+
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Keyboard driver <--//--/
 
 SCF_IMPLEMENT_IBASE(csKeyboardDriver)
@@ -112,12 +308,11 @@ csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
 {
   SCF_CONSTRUCT_IBASE(0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+
+  memset (&modifiersState, 0, sizeof (modifiersState));
+
   Listener = &scfiEventHandler;
   StartListening();
-  KeyState.SetLength (256 + (CSKEY_LAST - CSKEY_FIRST + 1));
-  int i;
-  for (i = 0 ; i < KeyState.Length () ; i++)
-    KeyState[i] = false;
 }
 
 csKeyboardDriver::~csKeyboardDriver ()
@@ -126,53 +321,168 @@ csKeyboardDriver::~csKeyboardDriver ()
 
 void csKeyboardDriver::Reset ()
 {
-  for (size_t i = 0; i < (size_t)KeyState.Length (); i++)
-    if (KeyState [i])
-      DoKey (i < 256 ? i : i - 256 + CSKEY_FIRST, 0, false);
+  memset (&modifiersState, 0, sizeof (modifiersState));
+
+  csHash<bool, utf32_char>::GlobalIterator keyIter =
+    keyStates.GetIterator ();
+  
+  while (keyIter.HasNext ());
+  {
+    utf32_char rawCode;
+    bool isDown = keyIter.Next (rawCode);
+    if (isDown)
+    {
+      DoKey (rawCode, 0, false);
+    }
+  }
 }
 
-void csKeyboardDriver::DoKey (int iKey, int iChar, bool iDown)
+void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked, 
+			      bool iDown, bool autoRepeat, 
+			      csKeyCharType charType)
 {
-  int smask = (iDown && !GetKeyState (iKey)) ? CSMASK_FIRST : 0;
-
-  SetKeyState (iKey, iDown);
-
-  smask |= (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-        |  (GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0)
-        |  (GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0);
-
-  if (iChar < 0)
+  if (codeCooked == 0)
   {
-    if (smask & CSMASK_ALT)
-      iChar = 0;
-    else if (smask & CSMASK_CTRL)
-      iChar = (iKey > 96 && iKey < 128) ? iKey - 96 : 0;
-    else if (smask & CSMASK_SHIFT)
-      iChar = (iKey >= 32 && iKey <= 127) ? ShiftedKey [iKey - 32] : 0;
-    else
-      iChar = (iKey >= 32 && iKey <= 255) ? iKey : 0;
+    SynthesizeCooked (codeRaw, modifiersState, codeCooked);
   }
 
-  iEvent* event = new csEvent (csGetTicks (),
-    iDown ? csevKeyDown : csevKeyUp, iKey, iChar, smask);
-  Post (event);
-  // Post() IncRef()s event
-  event->DecRef ();
+  SetKeyState (codeRaw, iDown, autoRepeat);
+
+  // @@@ Pooled events, somehow?
+  csRef<iEvent> ev;
+  ev.AttachNew (new csEvent ());
+  ev->Type = csevKeyboard;
+  ev->Category = ev->SubCategory = ev->Flags = 0;
+  ev->Add ("keyEventType", (uint8)(iDown ? csKeyEventTypeDown : csKeyEventTypeUp));
+  ev->Add ("keyCodeRaw", (uint32)codeRaw);
+  ev->Add ("keyCodeCooked", (uint32)codeCooked);
+  ev->Add ("keyModifiers", &modifiersState, sizeof (modifiersState));
+  // For auto-repeat, set a flag
+  ev->Add ("keyAutoRepeat", autoRepeat);
+  ev->Add ("keyCharType", (uint8)charType);
+  ev->Time = csGetTicks ();
+  Post (ev);
 }
 
-void csKeyboardDriver::SetKeyState (int iKey, bool iDown)
+void csKeyboardDriver::SynthesizeCooked (utf32_char codeRaw, 
+					 const csKeyModifiers& modifiers, 
+					 utf32_char& codeCooked)
 {
-  int idx = (iKey < 256) ? iKey : (256 + iKey - CSKEY_FIRST);
-  if (iDown)
-    KeyState.Put (idx, true);
+  if (CSKEY_IS_SPECIAL (codeRaw))
+  {
+    if (CSKEY_IS_MODIFIER (codeRaw))
+      codeCooked = CSKEY_MODIFIER (CSKEY_MODIFIER_TYPE (codeRaw), 
+	csKeyModifierNumAny);
+    else if (CSKEY_IS_PAD_KEY (codeRaw))
+      codeCooked = CSKEY_PAD_TO_NORMAL (codeRaw);
+    else
+      codeCooked = codeRaw;
+  }
   else
-    KeyState.Put (idx, false);
+  {
+    if (modifiers.modifiers[csKeyModifierTypeAlt] != 0)
+      codeCooked = 0;
+    else if (modifiers.modifiers[csKeyModifierTypeCtrl] != 0)
+    {
+      if ((codeRaw >= 'A') && (codeRaw <= 'Z'))
+	codeCooked = codeRaw - 'A' + 1;
+      else if ((codeRaw >= 'a') && (codeRaw <= 'z'))
+	codeCooked = codeRaw - 'a' + 1;
+      else
+	codeCooked = 0;
+    }
+    else if (modifiers.modifiers[csKeyModifierTypeShift] != 0)
+    {
+      if ((codeRaw >= 32) && (codeRaw <= 127))
+	codeCooked = ShiftedKey [codeRaw - 32];
+      else
+	codeCooked = 0;
+    }
+    else
+      codeCooked = 0;
+  }
 }
 
-bool csKeyboardDriver::GetKeyState (int iKey)
+void csKeyboardDriver::SetKeyState (utf32_char codeRaw, bool iDown,
+				    bool autoRepeat)
 {
-  int idx = (iKey < 256) ? iKey : (256 + iKey - CSKEY_FIRST);
-  return KeyState [idx];
+  if (CSKEY_IS_MODIFIER (codeRaw))
+  {
+    int modType = CSKEY_MODIFIER_TYPE(codeRaw);
+    int modNum = CSKEY_MODIFIER_NUM(codeRaw);
+
+    if (modType >= csKeyModifierTypeLast) return;
+
+    // Caps/Scroll/NumLock are treated specially
+    if ((modType == csKeyModifierTypeCapsLock) ||
+      (modType == csKeyModifierTypeNumLock) ||
+      (modType == csKeyModifierTypeScrollLock))
+    {
+      // Toggle their state when the key is pressed down.
+      if (iDown && !autoRepeat)
+      {
+        bool state = modifiersState.modifiers[modType] != 0;
+        modifiersState.modifiers[modType] = state ? 0 : 1;
+      }
+
+      keyStates.PutFirst (codeRaw, iDown);
+    }
+    else
+    {
+      if (modNum == csKeyModifierNumAny)
+      {
+	modifiersState.modifiers[modType] = iDown ? 0xffffffff : 0;
+      }
+      else
+      {
+	if (iDown)
+	  modifiersState.modifiers[modType] |= (1 << modNum);
+	else
+	  modifiersState.modifiers[modType] &= ~(1 << modNum);
+
+	keyStates.PutFirst (codeRaw, iDown);
+      }
+    }
+  }
+  else
+    keyStates.PutFirst (codeRaw, iDown);
+}
+
+bool csKeyboardDriver::GetKeyState (utf32_char codeRaw)
+{
+  if (CSKEY_IS_MODIFIER (codeRaw) && 
+    (CSKEY_MODIFIER_NUM(codeRaw) == csKeyModifierNumAny))
+  {
+    return (GetModifierState (codeRaw) != 0);
+  }
+  else
+    return keyStates.Get (codeRaw);
+}
+
+uint32 csKeyboardDriver::GetModifierState (utf32_char codeRaw)
+{
+  if (CSKEY_IS_MODIFIER (codeRaw))
+  {
+    int modType = CSKEY_MODIFIER_TYPE(codeRaw);
+    int modNum = CSKEY_MODIFIER_NUM(codeRaw);
+
+    if (modType >= csKeyModifierTypeLast) return 0;
+
+    if (modNum == csKeyModifierNumAny)
+    {
+      return modifiersState.modifiers[modType];
+    }
+    else
+    {
+      return (modifiersState.modifiers[modType] & (1 << modNum));
+    }
+  }
+  return 0;
+}
+
+csPtr<iKeyComposer> csKeyboardDriver::CreateKeyComposer ()
+{
+  return csPtr<iKeyComposer> (new csKeyComposer ());
 }
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/

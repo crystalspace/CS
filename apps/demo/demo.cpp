@@ -676,19 +676,23 @@ void Demo::DrawEditInfo ()
 
 bool Demo::DemoHandleEvent (iEvent &Event)
 {
-  if (Event.Type == csevKeyDown)
+  if ((Event.Type == csevKeyboard) &&
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown))
   {
     csTicks elapsed_time, current_time;
     elapsed_time = vc->GetElapsedTicks ();
     current_time = vc->GetCurrentTicks ();
-    bool shift = (Event.Key.Modifiers & CSMASK_SHIFT) != 0;
-    bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
-    bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
+    csKeyModifiers m;
+    csKeyEventHelper::GetModifiers (&Event, m);
+    bool shift = m.modifiers[csKeyModifierTypeShift] != 0;
+    bool alt = m.modifiers[csKeyModifierTypeAlt] != 0;
+    bool ctrl = m.modifiers[csKeyModifierTypeCtrl] != 0;
+    utf32_char keyCode = csKeyEventHelper::GetCookedCode (&Event);
 
 #if 0
     if (do_demo != 3)
     {
-      if (Event.Key.Code == CSKEY_ESC)
+      if (keyCode == CSKEY_ESC)
       {
 	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)
@@ -711,7 +715,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         if (shift) speed = dx / 20.0f;
         else if (ctrl) speed = dx / 600.0f;
         else speed = dx / 100.0f;
-        if (Event.Key.Code == CSKEY_UP)
+        if (keyCode == CSKEY_UP)
         {
           csVector3 v;
 	  np->GetPositionVector (map_selpoint, v);
@@ -720,7 +724,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  ShowMessage ("Y location set at '%g'", v.y);
           return true;
         }
-        if (Event.Key.Code == CSKEY_DOWN)
+        if (keyCode == CSKEY_DOWN)
         {
           csVector3 v;
 	  np->GetPositionVector (map_selpoint, v);
@@ -729,7 +733,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  ShowMessage ("Y location set at '%g'", v.y);
           return true;
         }
-        if (Event.Key.Code == CSKEY_LEFT)
+        if (keyCode == CSKEY_LEFT)
         {
           csVector3 up, forward;
 	  np->GetUpVector (map_selpoint, up);
@@ -742,7 +746,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  ShowMessage ("Up vector set at '%.3g,%.3g,%.3g'", up.x, up.y, up.z);
           return true;
         }
-        if (Event.Key.Code == CSKEY_RIGHT)
+        if (keyCode == CSKEY_RIGHT)
         {
           csVector3 up, forward;
 	  np->GetUpVector (map_selpoint, up);
@@ -756,7 +760,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
           return true;
         }
       }
-      switch (Event.Key.Char)
+      switch (keyCode)
       {
         case 'c':
           map_enabled = MAP_EDIT;
@@ -900,7 +904,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       else speed = dx / 100.0f;
       if (np)
       {
-        if (Event.Key.Code == CSKEY_UP)
+        if (keyCode == CSKEY_UP)
         {
 	  if (alt)
 	  {
@@ -916,7 +920,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  }
           return true;
         }
-        if (Event.Key.Code == CSKEY_DOWN)
+        if (keyCode == CSKEY_DOWN)
         {
 	  if (alt)
 	  {
@@ -932,7 +936,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  }
           return true;
         }
-        if (Event.Key.Code == CSKEY_LEFT)
+        if (keyCode == CSKEY_LEFT)
         {
 	  if (alt)
 	  {
@@ -948,7 +952,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  }
           return true;
         }
-        if (Event.Key.Code == CSKEY_RIGHT)
+        if (keyCode == CSKEY_RIGHT)
         {
 	  if (alt)
 	  {
@@ -965,7 +969,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
           return true;
         }
       }
-      switch (Event.Key.Char)
+      switch (keyCode)
       {
 	case 'm':
           map_enabled = MAP_OFF;
@@ -1224,14 +1228,14 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       //==============================
       // Handle keys in demo or overlay mode.
       //==============================
-      if (Event.Key.Code == CSKEY_ESC)
+      if (keyCode == CSKEY_ESC)
       {
 	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)
 	  q->GetEventOutlet()->Broadcast (cscmdQuit);
         return true;
       }
-      switch (Event.Key.Char)
+      switch (keyCode)
       {
       	case 'R':
 	  ShowMessage ("Restarted sequence manager");

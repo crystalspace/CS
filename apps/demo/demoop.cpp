@@ -207,7 +207,7 @@ void HideMeshOp::Do (csTicks /*dt*/, iBase*)
 
 void TestOp::Do (csTicks dt, iBase*)
 {
-  printf ("dt=%ld fps=%g\n", (long)dt,
+  csPrintf ("dt=%ld fps=%g\n", (long)dt,
   	DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);
 }
 

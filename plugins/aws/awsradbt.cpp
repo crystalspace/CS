@@ -330,11 +330,10 @@ bool awsRadButton::OnMouseEnter ()
   return true;
 }
 
-bool awsRadButton::OnKeypress (int key, int cha, int modifiers)
+bool awsRadButton::OnKeyboard (const csKeyEventData& eventData)
 {
   bool eventEaten = false;
-  char chr = (char)key;
-  switch(chr)
+  switch(eventData.codeCooked)
   {
   case CSKEY_ENTER:
     eventEaten = true;

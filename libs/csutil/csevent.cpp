@@ -24,6 +24,94 @@
 #include "csutil/array.h"
 #include "csutil/memfile.h"
 
+//---------------------------------------------------------------------------
+
+utf32_char csKeyEventHelper::GetRawCode (iEvent* event)
+{
+  uint32 code;
+  if (!event->Find ("keyCodeRaw", code))
+    return 0;
+  return code;
+}
+
+utf32_char csKeyEventHelper::GetCookedCode (iEvent* event)
+{
+  uint32 code;
+  if (!event->Find ("keyCodeCooked", code))
+    return 0;
+  return code;
+}
+
+void csKeyEventHelper::GetModifiers (iEvent* event, 
+				     csKeyModifiers& modifiers)
+{
+  memset (&modifiers, 0, sizeof (modifiers));
+
+  void* mod;
+  uint32 modSize;
+  if (!event->Find ("keyModifiers", &mod, modSize)) return;
+  memcpy (&modifiers, mod, MIN (sizeof (modifiers), modSize));
+}
+
+csKeyEventType csKeyEventHelper::GetEventType (iEvent* event)
+{
+  uint8 type;
+  if (!event->Find ("keyEventType", type))
+    return (csKeyEventType)-1;
+  return (csKeyEventType)type;
+}
+
+bool csKeyEventHelper::GetAutoRepeat (iEvent* event)
+{
+  bool autoRep;
+  if (!event->Find ("keyAutoRepeat", autoRep)) return false;
+  return autoRep;
+}
+				    
+csKeyCharType csKeyEventHelper::GetCharacterType (iEvent* event)
+{
+  uint8 type;
+  if (!event->Find ("keyCharType", type))
+    return (csKeyCharType)-1;
+  return (csKeyCharType)type;
+}
+
+bool csKeyEventHelper::GetEventData (iEvent* event, csKeyEventData& data)
+{
+  if (!CS_IS_KEYBOARD_EVENT (*event)) return false;
+
+  data.autoRepeat = GetAutoRepeat (event);
+  data.charType = GetCharacterType (event);
+  data.codeCooked = GetCookedCode (event);
+  data.codeRaw = GetRawCode (event);
+  data.eventType = GetEventType (event);
+  GetModifiers (event, data.modifiers);
+
+  return true;
+}
+
+uint32 csKeyEventHelper::GetModifiersBits (iEvent* event)
+{
+  csKeyModifiers m;
+  GetModifiers (event, m);
+  return GetModifiersBits (m);
+}
+
+uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
+{
+  uint32 res = 0;
+
+  for (int n = 0; n < csKeyModifierTypeLast; n++)
+  {
+    if (m.modifiers[n] != 0)
+      res |= (1 << n);
+  }
+
+  return res;
+}
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csEvent)
   SCF_IMPLEMENTS_INTERFACE (iEvent)
 SCF_IMPLEMENT_IBASE_END
@@ -60,7 +148,8 @@ typedef struct attribute_tag
   attribute_tag(Type t) { type = t; }
   ~attribute_tag() 
   { 
-    if (type == tag_string) delete String; 
+    if ((type == tag_string) || (type == tag_databuffer)) 
+      delete[] String; 
     if (type == tag_event) Event->DecRef();
   }
 } attribute;
@@ -90,17 +179,6 @@ char *GetTypeName(attribute::Type t)
 csEvent::csEvent ()
 {
   SCF_CONSTRUCT_IBASE (0);
-}
-
-csEvent::csEvent (csTicks iTime,int eType,int kCode,int kChar,int kModifiers)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  Time = iTime;
-  Type = eType;
-  Category = SubCategory = Flags = 0;
-  Key.Code = kCode;
-  Key.Char = kChar;
-  Key.Modifiers = kModifiers;
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
@@ -152,13 +230,7 @@ csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
   Flags = e.Flags;
   Time = e.Time;
 
-  if ((Type & CSMASK_Keyboard) != 0)
-  {
-    Key.Code = e.Key.Code;
-    Key.Char = e.Key.Char;
-    Key.Modifiers = e.Key.Modifiers;
-  }
-  else if ((Type & CSMASK_Mouse) != 0)
+  if ((Type & CSMASK_Mouse) != 0)
   {
     Mouse.x = e.Mouse.x;
     Mouse.y = e.Mouse.y;
@@ -390,7 +462,8 @@ bool csEvent::Add(const char *name, char *v)
 bool csEvent::Add(const char *name, void *v, uint32 size)
 {
   attribute *object = new attribute(attribute::tag_databuffer);
-  object->String = (char *)v;
+  object->String = new char[size];
+  memcpy (object->String, v, size);
   object->length = size;
   csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 

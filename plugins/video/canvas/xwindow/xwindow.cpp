@@ -473,7 +473,8 @@ bool csXWindow::HandleEvent (iEvent &Event)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;
-  KeySym key;
+  KeySym xKey;
+  utf32_char csKeyRaw = 0, csKeyCooked = 0;
   int charcount;
   char charcode [8];
   bool down;
@@ -533,73 +534,100 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	  (XPointer)&event);
         down = (event.type == KeyPress);
         charcount = XLookupString ((XKeyEvent *)&event, charcode,
-				   sizeof (charcode), &key, 0);
-        switch (key)
+				   sizeof (charcode), &xKey, 0);
+#define MAP_KEY(xKey, rawCode, cookedCode)	\
+  case xKey:					\
+    csKeyRaw = rawCode;				\
+    csKeyCooked = cookedCode;			\
+    break
+    
+        switch (xKey)
         {
-          case XK_Meta_L:
-	  case XK_Meta_R:
-	  case XK_Alt_L:
-          case XK_Alt_R:      key = CSKEY_ALT; break;
-          case XK_Control_L:
-          case XK_Control_R:  key = CSKEY_CTRL; break;
-          case XK_Shift_L:
-          case XK_Shift_R:    key = CSKEY_SHIFT; break;
-	  case XK_KP_Up:
-	  case XK_KP_8:
-          case XK_Up:         key = CSKEY_UP; break;
-	  case XK_KP_Down:
-	  case XK_KP_2:
-          case XK_Down:       key = CSKEY_DOWN; break;
-	  case XK_KP_Left:
-	  case XK_KP_4:
-          case XK_Left:       key = CSKEY_LEFT; break;
-	  case XK_KP_Right:
-	  case XK_KP_6:
-          case XK_Right:      key = CSKEY_RIGHT; break;
-          case XK_BackSpace:  key = CSKEY_BACKSPACE; break;
-	  case XK_KP_Insert:
-	  case XK_KP_0:
-          case XK_Insert:     key = CSKEY_INS; break;
-	  case XK_KP_Delete:
-	  case XK_KP_Decimal:
-          case XK_Delete:     key = CSKEY_DEL; break;
-	  case XK_KP_Page_Up:
-	  case XK_KP_9:
-          case XK_Page_Up:    key = CSKEY_PGUP; break;
-	  case XK_KP_Page_Down:
-	  case XK_KP_3:
-          case XK_Page_Down:  key = CSKEY_PGDN; break;
-	  case XK_KP_Home:
-	  case XK_KP_7:
-          case XK_Home:       key = CSKEY_HOME; break;
-	  case XK_KP_End:
-	  case XK_KP_1:
-          case XK_End:        key = CSKEY_END; break;
-          case XK_Escape:     key = CSKEY_ESC; break;
+	  MAP_KEY (XK_Meta_L, CSKEY_ALT_LEFT, CSKEY_ALT);
+	  MAP_KEY (XK_Meta_R, CSKEY_ALT_RIGHT, CSKEY_ALT);
+	  
+	  MAP_KEY (XK_Alt_L, CSKEY_ALT_LEFT, CSKEY_ALT);
+	  MAP_KEY (XK_Alt_R, CSKEY_ALT_RIGHT, CSKEY_ALT);
+	  
+	  MAP_KEY (XK_Control_L, CSKEY_CTRL_LEFT, CSKEY_CTRL);
+	  MAP_KEY (XK_Control_R, CSKEY_CTRL_RIGHT, CSKEY_CTRL);
+	  
+	  MAP_KEY (XK_Shift_L, CSKEY_SHIFT_LEFT, CSKEY_SHIFT);
+	  MAP_KEY (XK_Shift_R, CSKEY_SHIFT_RIGHT, CSKEY_SHIFT);
+	  
+	  MAP_KEY (XK_KP_Up, CSKEY_PAD8, CSKEY_UP);
+	  MAP_KEY (XK_KP_8, CSKEY_PAD8, '8');
+	  MAP_KEY (XK_Up, CSKEY_UP, CSKEY_UP);
+	  
+	  MAP_KEY (XK_KP_Down, CSKEY_PAD2, CSKEY_DOWN);
+	  MAP_KEY (XK_KP_2, CSKEY_PAD8, '2');
+	  MAP_KEY (XK_Down, CSKEY_UP, CSKEY_DOWN);
+	  
+	  MAP_KEY (XK_KP_Left, CSKEY_PAD4, CSKEY_LEFT);
+	  MAP_KEY (XK_KP_4, CSKEY_PAD4, '4');
+	  MAP_KEY (XK_Left, CSKEY_LEFT, CSKEY_LEFT);
+	  
+	  MAP_KEY (XK_KP_Right, CSKEY_PAD6, CSKEY_RIGHT);
+	  MAP_KEY (XK_KP_6, CSKEY_PAD6, '6');
+	  MAP_KEY (XK_Right, CSKEY_RIGHT, CSKEY_RIGHT);
+	  
+	  MAP_KEY (XK_BackSpace, CSKEY_BACKSPACE, CSKEY_BACKSPACE);
+	  
+	  MAP_KEY (XK_KP_Insert, CSKEY_PAD0, CSKEY_INS);
+	  MAP_KEY (XK_KP_0, CSKEY_PAD0, '0');
+	  MAP_KEY (XK_Insert, CSKEY_INS, CSKEY_INS);
+	  
+	  MAP_KEY (XK_KP_Delete, CSKEY_PADDECIMAL, CSKEY_DEL);
+	  MAP_KEY (XK_KP_Decimal, CSKEY_PADDECIMAL, '.'); 
+	    // @@@ Not necessary '.' on non-English keyboards
+	  MAP_KEY (XK_Delete, CSKEY_DEL, CSKEY_DEL);
+	  
+	  MAP_KEY (XK_KP_Page_Up, CSKEY_PAD9, CSKEY_PGUP);
+	  MAP_KEY (XK_KP_9, CSKEY_PAD9, '9');
+	  MAP_KEY (XK_Page_Up, CSKEY_PGUP, CSKEY_PGUP);
+	  
+	  MAP_KEY (XK_KP_Page_Down, CSKEY_PAD3, CSKEY_PGDN);
+	  MAP_KEY (XK_KP_3, CSKEY_PAD3, '3');
+	  MAP_KEY (XK_Page_Down, CSKEY_PGDN, CSKEY_PGDN);
+	  
+	  MAP_KEY (XK_KP_Home, CSKEY_PAD7, CSKEY_HOME);
+	  MAP_KEY (XK_KP_7, CSKEY_PAD7, '7');
+	  MAP_KEY (XK_Home, CSKEY_HOME, CSKEY_HOME);
+	  
+	  MAP_KEY (XK_KP_End, CSKEY_PAD1, CSKEY_END);
+	  MAP_KEY (XK_KP_1, CSKEY_PAD1, '1');
+	  MAP_KEY (XK_End, CSKEY_END, CSKEY_END);
+
+	  MAP_KEY (XK_Escape, CSKEY_ESC, CSKEY_ESC);
 #ifdef XK_ISO_Left_Tab
-          case XK_ISO_Left_Tab:
+	  MAP_KEY (XK_ISO_Left_Tab, CSKEY_TAB, CSKEY_TAB);
 #endif
-          case XK_KP_Tab:
-          case XK_Tab:        key = CSKEY_TAB; break;
-          case XK_F1:         key = CSKEY_F1; break;
-          case XK_F2:         key = CSKEY_F2; break;
-          case XK_F3:         key = CSKEY_F3; break;
-          case XK_F4:         key = CSKEY_F4; break;
-          case XK_F5:         key = CSKEY_F5; break;
-          case XK_F6:         key = CSKEY_F6; break;
-          case XK_F7:         key = CSKEY_F7; break;
-          case XK_F8:         key = CSKEY_F8; break;
-          case XK_F9:         key = CSKEY_F9; break;
-          case XK_F10:        key = CSKEY_F10; break;
-          case XK_F11:        key = CSKEY_F11; break;
-          case XK_F12:        key = CSKEY_F12; break;
+	  MAP_KEY (XK_KP_Tab, CSKEY_TAB, CSKEY_TAB);
+	  MAP_KEY (XK_Tab, CSKEY_TAB, CSKEY_TAB);
+	  
+	  MAP_KEY (XK_F1, CSKEY_F1, CSKEY_F1);
+	  MAP_KEY (XK_F2, CSKEY_F2, CSKEY_F2);
+	  MAP_KEY (XK_F3, CSKEY_F3, CSKEY_F3);
+	  MAP_KEY (XK_F4, CSKEY_F4, CSKEY_F4);
+	  MAP_KEY (XK_F5, CSKEY_F5, CSKEY_F5);
+	  MAP_KEY (XK_F6, CSKEY_F6, CSKEY_F6);
+	  MAP_KEY (XK_F7, CSKEY_F7, CSKEY_F7);
+	  MAP_KEY (XK_F8, CSKEY_F8, CSKEY_F8);
+	  MAP_KEY (XK_F9, CSKEY_F9, CSKEY_F9);
+	  MAP_KEY (XK_F10, CSKEY_F10, CSKEY_F10);
+	  MAP_KEY (XK_F11, CSKEY_F11, CSKEY_F11);
+	  MAP_KEY (XK_F12, CSKEY_F12, CSKEY_F12);
+	  
           case XK_KP_Add:
 	    {
 	      if (xf86vm && xf86vm->IsFullScreen () &&
 		  down && (event.xkey.state & Mod1Mask))
 		SetVideoMode (true, true, false);
 	      else
-		key = CSKEY_PADPLUS;
+	      {
+		csKeyRaw = CSKEY_PADPLUS;
+		csKeyCooked = '+';
+	      }
 	      break;
 	    }
           case XK_KP_Subtract:
@@ -608,7 +636,10 @@ bool csXWindow::HandleEvent (iEvent &Event)
 		  down && (event.xkey.state & Mod1Mask))
 		SetVideoMode (true, false, true);
 	      else
-		key = CSKEY_PADMINUS;
+	      {
+		csKeyRaw = CSKEY_PADMINUS;
+		csKeyCooked = '-';
+	      }
 	      break;
 	    }
           case XK_KP_Multiply:
@@ -618,11 +649,14 @@ bool csXWindow::HandleEvent (iEvent &Event)
 		SetVideoMode (!xf86vm->IsFullScreen (), false, false);
 	      else
 #endif
-		key = CSKEY_PADMULT;
+	      {
+		csKeyRaw = CSKEY_PADMULT;
+		csKeyCooked = '*';
+	      }
 	      break;
 	    }
-          case XK_KP_Divide:  key = CSKEY_PADDIV; break;
-          case XK_KP_Begin:   key = CSKEY_CENTER; break;
+	  MAP_KEY (XK_KP_Divide, CSKEY_PADDIV, '/');
+	  MAP_KEY (XK_KP_Begin, CSKEY_PAD5, '5');
 	  case XK_KP_Enter:
           case XK_Return:
 	    {
@@ -631,13 +665,20 @@ bool csXWindow::HandleEvent (iEvent &Event)
 		SetVideoMode (!xf86vm->IsFullScreen (), false, false);
 	      else
 #endif
-		key = CSKEY_ENTER;
+	      {
+		csKeyRaw = (xKey == XK_Return) ? CSKEY_ENTER : CSKEY_PADENTER;
+		csKeyCooked = CSKEY_ENTER;
+	      }
 	      break;
 	    }
-          default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
+          default:            
+	    csKeyRaw = ScanCodeToChar [xKey]; 
+	      // @@@ Remove scancodes, if possible
+	    csKeyCooked = charcount == 1 ? charcode[0] : 0;
+#undef MAP_KEY
         }
-        if (key)
-          EventOutlet->Key(key, charcount == 1 ? uint8(charcode[0]) : 0, down);
+        if (csKeyRaw || csKeyCooked)
+          EventOutlet->Key(csKeyRaw, csKeyCooked, down);
         break;
       case FocusIn:
 	{

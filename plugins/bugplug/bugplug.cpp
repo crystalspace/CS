@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "cssys/sysfunc.h"
+#include "cssys/csuctransform.h"
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/scanstr.h"
@@ -114,7 +115,6 @@ csBugPlug::csBugPlug (iBase *iParent)
   process_next_key = false;
   process_next_mouse = false;
   edit_mode = false;
-  edit_string[0] = 0;
   initialized = false;
   spider = new csSpider ();
   shadow = new csShadow ();
@@ -190,6 +190,16 @@ csBugPlug::~csBugPlug ()
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 {
   csBugPlug::object_reg = object_reg;
+
+  csRef<iKeyboardDriver> currentKbd = 
+    CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (currentKbd == 0)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
+    return false;
+  }
+  keyComposer = currentKbd->CreateKeyComposer ();
+
   if (!scfiEventHandler)
   {
     scfiEventHandler = new EventHandler (this);
@@ -197,8 +207,8 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler,
-    	CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
-  	CSMASK_MouseUp|CSMASK_MouseDown|CSMASK_MouseMove);
+    	CSMASK_Nothing | CSMASK_Keyboard |
+  	CSMASK_MouseUp | CSMASK_MouseDown | CSMASK_MouseMove);
   return true;
 }
 
@@ -213,7 +223,7 @@ void csBugPlug::SetupPlugin ()
   if (!G3D)
   {
     initialized = true;
-    printf ("No G3D!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No G3D!");
     return;
   }
 
@@ -221,21 +231,21 @@ void csBugPlug::SetupPlugin ()
     G2D = G3D->GetDriver2D ();
   if (!G2D)
   {
-    printf ("No G2D!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No G2D!");
     return;
   }
 
   if (!VFS) VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
-    printf ("No VFS!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No VFS!");
     return;
   }
 
   if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (!vc)
   {
-    printf ("No vc!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No virtual clock!");
     return;
   }
 
@@ -300,7 +310,7 @@ void csBugPlug::SetupPlugin ()
 	char nameForm [6];
 	cs_snprintf (nameForm, 6, "%%0%dd", captureFormatNumberDigits);
 
-	int newlen = strlen(captureFormat)+strlen(nameForm)-
+	size_t newlen = strlen(captureFormat)+strlen(nameForm)-
 	  captureFormatNumberDigits+1;
 	char* newCapForm = new char[newlen];
 	memset (newCapForm, 0, newlen);
@@ -642,40 +652,50 @@ void csBugPlug::CaptureScreen ()
 
 bool csBugPlug::EatKey (iEvent& event)
 {
+  int type = csKeyEventHelper::GetEventType (&event);
   SetupPlugin ();
-  int key = event.Key.Code;
-  bool down = (event.Type == csevKeyDown);
-  bool shift = (event.Key.Modifiers & CSMASK_SHIFT) != 0;
-  bool alt = (event.Key.Modifiers & CSMASK_ALT) != 0;
-  bool ctrl = (event.Key.Modifiers & CSMASK_CTRL) != 0;
+  utf32_char key = csKeyEventHelper::GetRawCode (&event);
+  bool down = (type == csKeyEventTypeDown);
+  csKeyModifiers m;
+  csKeyEventHelper::GetModifiers (&event, m);
+  bool shift = m.modifiers[csKeyModifierTypeShift] != 0;
+  bool alt = m.modifiers[csKeyModifierTypeAlt] != 0;
+  bool ctrl = m.modifiers[csKeyModifierTypeCtrl] != 0;
 
   // If we are in edit mode we do special processing.
   if (edit_mode)
   {
     if (down)
     {
-      int l = strlen (edit_string);
-      if (key == '\n')
+      size_t l = edit_string.Length (); 
+      key = csKeyEventHelper::GetCookedCode (&event);
+      if (key == CSKEY_ENTER)
       {
         // Exit edit_mode.
 	edit_mode = false;
 	ExitEditMode ();
       }
-      else if (key == '\b')
+      else if (key == CSKEY_BACKSPACE)
       {
         // Backspace.
 	if (edit_cursor > 0)
 	{
-	  edit_cursor--;
-	  edit_string[edit_cursor] = 0;
+	  int cs = csUnicodeTransform::UTF8Rewind (
+	    (utf8_char*)edit_string.GetData () + edit_cursor, edit_cursor);
+	  edit_cursor -= cs;
+	  edit_string.DeleteAt (edit_cursor, cs);
 	}
       }
       else if (key == CSKEY_DEL)
       {
         // Delete.
-	int i;
-	for (i = edit_cursor ; i < 79 ; i++)
-	  edit_string[i] = edit_string[i+1];
+	int cs = csUnicodeTransform::UTF8Skip (
+	  (utf8_char*)edit_string.GetData () + edit_cursor, 
+	  l - edit_cursor);
+	if (cs > 0)
+	{
+	  edit_string.DeleteAt (edit_cursor, cs);
+	}
       }
       else if (key == CSKEY_HOME)
       {
@@ -687,25 +707,47 @@ bool csBugPlug::EatKey (iEvent& event)
       }
       else if (key == CSKEY_LEFT)
       {
-        if (edit_cursor > 0) edit_cursor--;
+        if (edit_cursor > 0) 
+	{
+	  int cs = csUnicodeTransform::UTF8Rewind (
+	    (utf8_char*)edit_string.GetData () + edit_cursor, edit_cursor);
+	  edit_cursor -= cs;
+	}
       }
       else if (key == CSKEY_RIGHT)
       {
-        if (edit_cursor < l) edit_cursor++;
+        if (edit_cursor < l) 
+	{
+	  int cs = csUnicodeTransform::UTF8Skip (
+	    (utf8_char*)edit_string.GetData () + edit_cursor, 
+	    l - edit_cursor);
+	  edit_cursor += cs;
+	}
       }
       else if (key == CSKEY_ESC)
       {
         // Cancel.
-	edit_string[0] = 0;
+	edit_string.Replace ("");
 	edit_mode = false;
       }
-      else if (edit_cursor < 79)
+      else //if (edit_cursor < 79)
       {
-        int i;
-	for (i = 78 ; i >= edit_cursor ; i--)
-	  edit_string[i+1] = edit_string[i];
-        edit_string[edit_cursor] = key;
-	edit_cursor++;
+	utf32_char composedChs[3];
+	int composedNum;
+	csKeyEventData eventData (&event);
+
+	keyComposer->HandleKey (eventData, composedChs, 
+	  sizeof (composedChs) / sizeof (utf32_char), &composedNum);
+	
+        if (composedNum > 0)
+	{
+	  utf8_char ch[CS_UC_MAX_UTF8_ENCODED*2 + 1];
+	  size_t chSize = csUnicodeTransform::UTF32to8 (ch, 
+	    sizeof (ch) / sizeof (utf8_char), composedChs,
+	    composedNum) - 1;
+	  edit_string.Insert (edit_cursor, (char*)ch);
+	  edit_cursor += chSize;
+	}
       }
     }
     return true;
@@ -749,9 +791,9 @@ bool csBugPlug::EatKey (iEvent& event)
   {
     process_next_key = false;
   }
+
   if (down)
   {
-    char buf[100];
     switch (cmd)
     {
       case DEBUGCMD_UNKNOWN:
@@ -912,6 +954,7 @@ bool csBugPlug::EatKey (iEvent& event)
         {
 	  if (!G3D) break;
 	  float val = G2D->GetGamma ();
+          char buf[100];
 	  sprintf (buf, "%g", val);
           EnterEditMode (cmd, "Enter new gamma:", buf);
 	}
@@ -1386,13 +1429,16 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       if (maxlen < 80) msg_string[maxlen] = 0;
       G2D->Write (fnt, x+5, y+5, fgcolor, -1, msg_string);
       maxlen = fnt->GetLength (edit_string, w-10);
-      if (maxlen < 80) edit_string[maxlen] = 0;
-      G2D->Write (fnt, x+5, y+5+fh+5, fgcolor, -1, edit_string);
-      char cursor[83];
-      strcpy (cursor, edit_string);
-      cursor[edit_cursor] = 0;
+      csString dispString (edit_string);
+      dispString.Truncate (maxlen);
+      //if (maxlen < 80) edit_string[maxlen] = 0;
+      G2D->Write (fnt, x+5, y+5+fh+5, fgcolor, -1, dispString);
+      //char cursor[83];
+      //strcpy (cursor, edit_string);
+      //cursor[edit_cursor] = 0;
+      dispString.Truncate (edit_cursor);
       int cursor_w, cursor_h;
-      fnt->GetDimensions (cursor, cursor_w, cursor_h);
+      fnt->GetDimensions (dispString, cursor_w, cursor_h);
       G2D->Write (fnt, x+5+cursor_w, y+5+fh+7, fgcolor, -1, "_");
     }
   }
@@ -1449,15 +1495,15 @@ void csBugPlug::EnterEditMode (int cmd, const char* msg, const char* def)
   if (!fntsvr) return;	// No edit mode if no font server
   edit_mode = true;
   strcpy (msg_string, msg);
-  if (def) strcpy (edit_string, def);
-  else edit_string[0] = 0;
-  edit_cursor = strlen (edit_string);
+  if (def) edit_string.Replace (def);// strcpy (edit_string, def);
+  else edit_string.Replace ("");
+  edit_cursor = edit_string.Length ();
   edit_command = cmd;
 }
 
 void csBugPlug::ExitEditMode ()
 {
-  if (edit_string[0] == 0) return;
+  if (edit_string.Length () == 0) return;
   int i;
   float f;
   switch (edit_command)
@@ -1966,11 +2012,7 @@ void csBugPlug::Dump (iThingFactoryState* fact, int polyidx)
 
 bool csBugPlug::HandleEvent (iEvent& event)
 {
-  if (event.Type == csevKeyDown)
-  {
-    return EatKey (event);
-  }
-  else if (event.Type == csevKeyUp)
+  if (event.Type == csevKeyboard)
   {
     return EatKey (event);
   }

@@ -1401,90 +1401,89 @@ bool awsListBox::OnMouseDown (int
   return false;
 }
 
-bool awsListBox::OnKeypress (int key, int cha, int modifiers)
+bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
 {
- ///Changing selected row with arrow keys
- /// !!! Worked correctly only for awsListHotspot.type == hsRow
- if( !(WindowManager()->GetFlags() & AWSF_KeyboardControl) )
-	 return false;
+  ///Changing selected row with arrow keys
+  /// !!! Worked correctly only for awsListHotspot.type == hsRow
+  if( !(WindowManager()->GetFlags() & AWSF_KeyboardControl) )
+    return false;
 
- switch (key)
- {
-	 case CSKEY_DOWN:
-		 {
-			 awsListRow *parent = sel ? sel->parent: 0;
+  switch (eventData.codeCooked)
+  {
+    case CSKEY_DOWN:
+    {
+      awsListRow *parent = sel ? sel->parent: 0;
 
-				if (parent == 0)
-				{ 
-					int i = rows.Find (sel);
-					
-					if(i < rows.Length() -1 && rows.Length() > 0)
-					{
-					 ++i;
-					 sel = (awsListRow *)rows[i];
-					 Broadcast (awsListBox::signalSelected);
+      if (parent == 0)
+      { 
+	int i = rows.Find (sel);
+	
+	if(i < rows.Length() -1 && rows.Length() > 0)
+	{
+	  ++i;
+	  sel = (awsListRow *)rows[i];
+	  Broadcast (awsListBox::signalSelected);
 
-					 /// @@@ HACK ;-]
+	  /// @@@ HACK ;-]
 
-					 /// Change scroll bar position if selected component 
-					 /// is in the bottom of our list box
+	  /// Change scroll bar position if selected component 
+	  /// is in the bottom of our list box
 
-					 awsListRow *row = 0;
-					 UpdateMap ();
-					 if (map)
-						 row = map[drawable_count + scroll_start];
+	  awsListRow *row = 0;
+	  UpdateMap ();
+	  if (map)
+	    row = map[drawable_count + scroll_start];
 
-					 if (sel == row)
-						 awsScrollBar::IncClicked (scrollbar, 0);
+	  if (sel == row)
+	    awsScrollBar::IncClicked (scrollbar, 0);
 
-					 ///@@@ END_HACK
+	  ///@@@ END_HACK
 
-					 return true;
-					}
-				}
-			}
-
-	 return true;
-
-	 case CSKEY_UP:
-		 {
-				awsListRow *parent = sel ? sel->parent: 0;
-
-				if (parent == 0)
-				{ 
-					int i = rows.Find (sel);
-
-					if(i > 0 && rows.Length () > 0)
-					{
-					 --i;
-					 sel = (awsListRow *)rows[i];
-					 Broadcast (awsListBox::signalSelected);
-
-					 /// @@@ HACK ;-]
-
-					 /// Change scroll bar position if selected component 
-					 /// is in the top of our list box
-
-					 awsListRow *row = 0;
-					 UpdateMap ();
-					 if (map)
-						 row = map[scroll_start -1];
-
-					 if (sel == row)
-						 awsScrollBar::DecClicked (scrollbar, 0);
-
-					 ///@@@ END_HACK
-
-					 return true;
-					}
-				}
-			}
-
+	  return true;
 	}
+      }
+    }
 
-	Invalidate ();
+    return true;
 
-	return true;
+    case CSKEY_UP:
+    {
+      awsListRow *parent = sel ? sel->parent: 0;
+
+      if (parent == 0)
+      { 
+	int i = rows.Find (sel);
+
+	if(i > 0 && rows.Length () > 0)
+	{
+	  --i;
+	  sel = (awsListRow *)rows[i];
+	  Broadcast (awsListBox::signalSelected);
+
+	  /// @@@ HACK ;-]
+
+	  /// Change scroll bar position if selected component 
+	  /// is in the top of our list box
+
+	  awsListRow *row = 0;
+	  UpdateMap ();
+	  if (map)
+		  row = map[scroll_start -1];
+
+	  if (sel == row)
+		  awsScrollBar::DecClicked (scrollbar, 0);
+
+	  ///@@@ END_HACK
+
+	  return true;
+	}
+      }
+    }
+  }
+
+  Invalidate ();
+
+  return true;
 }
 
 void awsListBox::OnSetFocus ()

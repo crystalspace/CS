@@ -381,48 +381,55 @@ bool csTreeItem::HandleEvent (iEvent &Event)
       if (ourmev)
         Toggle (2);
       return true;
-    case csevKeyDown:
-      if (treebox->active != this)
-        return false;
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_PADPLUS:
-          switch (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
-          {
-            case 0:
-              Toggle (1);
-              return true;
-            case CSMASK_SHIFT:
-              SendCommand (cscmdTreeItemToggleAll, (void *)1);
-              return true;
-            case CSMASK_CTRL:
-              treebox->ExpandAll ();
-              return true;
-          }
-          break;
-        case CSKEY_PADMINUS:
-          switch (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
-          {
-            case 0:
-              Toggle (0);
-              return true;
-            case CSMASK_SHIFT:
-              SendCommand (cscmdTreeItemToggleAll, (void *)0);
-              return true;
-            case CSMASK_CTRL:
-              treebox->CollapseAll ();
-              return true;
-          }
-          break;
-        case CSKEY_PADMULT:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-          {
-            Toggle (2);
-            return true;
-          }
-          break;
+	if (treebox->active != this)
+	  return false;
+	switch (csKeyEventHelper::GetRawCode (&Event))
+	{
+	  case CSKEY_PADPLUS:
+	    switch (csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS)
+	    {
+	      case 0:
+		Toggle (1);
+		return true;
+	      case CSMASK_SHIFT:
+		SendCommand (cscmdTreeItemToggleAll, (void *)1);
+		return true;
+	      case CSMASK_CTRL:
+		treebox->ExpandAll ();
+		return true;
+	    }
+	    break;
+	  case CSKEY_PADMINUS:
+	    switch (csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS)
+	    {
+	      case 0:
+		Toggle (0);
+		return true;
+	      case CSMASK_SHIFT:
+		SendCommand (cscmdTreeItemToggleAll, (void *)0);
+		return true;
+	      case CSMASK_CTRL:
+		treebox->CollapseAll ();
+		return true;
+	    }
+	    break;
+	  case CSKEY_PADMULT:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	    {
+	      Toggle (2);
+	      return true;
+	    }
+	    break;
+	}
+	return false;
       }
-      return false;
+      break;
     case csevCommand:
       switch (Event.Command.Code)
       {
@@ -813,108 +820,124 @@ bool csTreeBox::HandleEvent (iEvent &Event)
         return true;
       } /* endif */
       break;
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_UP:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            FocusItem ((csTreeItem *)active->SendCommand (cscmdTreeItemGetPrev));
-          return true;
-        case CSKEY_DOWN:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            FocusItem ((csTreeItem *)active->SendCommand (cscmdTreeItemGetNext));
-          return true;
-        case CSKEY_LEFT:
-        {
-          int odx = deltax;
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-            if (deltax > TREE_HORIZONTAL_PAGESTEP)
-              deltax -= TREE_HORIZONTAL_PAGESTEP;
-            else
-              deltax = 0;
-          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            if (deltax > 0)
-              deltax--;
-          if (deltax != odx)
-            PlaceItems ();
-          return true;
-        }
-        case CSKEY_RIGHT:
-        {
-          int odx = deltax;
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-            if (deltax + TREE_HORIZONTAL_PAGESTEP <= maxdeltax)
-              deltax += TREE_HORIZONTAL_PAGESTEP;
-            else
-              deltax = maxdeltax;
-          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            if (deltax < maxdeltax)
-              deltax++;
-          if (deltax != odx)
-            PlaceItems ();
-          return true;
-        }
-        case CSKEY_PGUP:
-        case CSKEY_PGDN:
-        {
-          if (Event.Key.Modifiers & CSMASK_CTRL)
-          {
-            csTreeItem *f = (csTreeItem *)clipview->SendCommand (
-              Event.Key.Code == CSKEY_PGUP ? cscmdTreeItemGetFirst : cscmdTreeItemGetLast);
-            if (f && (Event.Key.Code == CSKEY_PGDN))
-              while (f->GetState (CSS_TREEITEM_OPEN))
-                f = (csTreeItem *)f->SendCommand (cscmdTreeItemGetLast);
-            FocusItem (f);
-          }
-          else
-          {
-            bool setcaret = !(Event.Key.Modifiers & CSMASK_SHIFT);
-            int delta = clipview->bound.Height ();
-            if (Event.Key.Code == CSKEY_PGUP)
-              delta = -delta;
-            VScroll (delta, setcaret);
-          }
-          return true;
-        }
-        case CSKEY_HOME:
-        {
-          int odx = deltax, ody = deltay;
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            deltax = 0;
-          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-            deltay = 0;
-          if (odx != deltax || ody != deltay)
-            PlaceItems ();
-          return true;
-        }
-        case CSKEY_END:
-        {
-          int odx = deltax, ody = deltay;
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            deltax = maxdeltax;
-          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-            deltay = maxdeltay;
-          if (odx != deltax || ody != deltay)
-            PlaceItems ();
-          return true;
-        }
-        default:
-          if (active && (Event.Key.Char > ' ') && (Event.Key.Code < 256))
-          {
-            csTreeItem *cur = active;
-            do
-            {
-              cur = (csTreeItem *)cur->SendCommand (cscmdTreeItemGetNext);
-              if (!cur) cur = (csTreeItem *)clipview->top;
-            } while ((cur != active) && (cur->GetText () [0] != toupper (Event.Key.Char)));
-            if (cur != active)
-            {
-              FocusItem (cur);
-              return true;
-            }
-          }
-          break;
-      } /* endswitch */
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_UP:
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	      FocusItem ((csTreeItem *)active->SendCommand (cscmdTreeItemGetPrev));
+	    return true;
+	  case CSKEY_DOWN:
+	    if (csKeyEventHelper::GetModifiersBits (&Event) == 0)
+	      FocusItem ((csTreeItem *)active->SendCommand (cscmdTreeItemGetNext));
+	    return true;
+	  case CSKEY_LEFT:
+	  {
+	    int odx = deltax;
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+	      if (deltax > TREE_HORIZONTAL_PAGESTEP)
+		deltax -= TREE_HORIZONTAL_PAGESTEP;
+	      else
+		deltax = 0;
+	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	      if (deltax > 0)
+		deltax--;
+	    if (deltax != odx)
+	      PlaceItems ();
+	    return true;
+	  }
+	  case CSKEY_RIGHT:
+	  {
+	    int odx = deltax;
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+	      if (deltax + TREE_HORIZONTAL_PAGESTEP <= maxdeltax)
+		deltax += TREE_HORIZONTAL_PAGESTEP;
+	      else
+		deltax = maxdeltax;
+	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	      if (deltax < maxdeltax)
+		deltax++;
+	    if (deltax != odx)
+	      PlaceItems ();
+	    return true;
+	  }
+	  case CSKEY_PGUP:
+	  case CSKEY_PGDN:
+	  {
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_CTRL)
+	    {
+	      csTreeItem *f = (csTreeItem *)clipview->SendCommand (
+		csKeyEventHelper::GetCookedCode (&Event) == CSKEY_PGUP ? 
+		  cscmdTreeItemGetFirst : cscmdTreeItemGetLast);
+	      if (f && (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_PGDN))
+		while (f->GetState (CSS_TREEITEM_OPEN))
+		  f = (csTreeItem *)f->SendCommand (cscmdTreeItemGetLast);
+	      FocusItem (f);
+	    }
+	    else
+	    {
+	      bool setcaret = !(csKeyEventHelper::GetModifiersBits (&Event) & 
+		CSMASK_SHIFT);
+	      int delta = clipview->bound.Height ();
+	      if (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_PGUP)
+		delta = -delta;
+	      VScroll (delta, setcaret);
+	    }
+	    return true;
+	  }
+	  case CSKEY_HOME:
+	  {
+	    int odx = deltax, ody = deltay;
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	      deltax = 0;
+	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+	      deltay = 0;
+	    if (odx != deltax || ody != deltay)
+	      PlaceItems ();
+	    return true;
+	  }
+	  case CSKEY_END:
+	  {
+	    int odx = deltax, ody = deltay;
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == 0)
+	      deltax = maxdeltax;
+	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+	      deltay = maxdeltay;
+	    if (odx != deltax || ody != deltay)
+	      PlaceItems ();
+	    return true;
+	  }
+	  default:
+	    int keyChar = csKeyEventHelper::GetCookedCode (&Event);
+	    if (active && (keyChar > ' ') && (keyChar < 128))
+	    {
+	      csTreeItem *cur = active;
+	      do
+	      {
+		cur = (csTreeItem *)cur->SendCommand (cscmdTreeItemGetNext);
+		if (!cur) cur = (csTreeItem *)clipview->top;
+	      } while ((cur != active) && (cur->GetText () [0] != toupper (keyChar)));
+	      if (cur != active)
+	      {
+		FocusItem (cur);
+		return true;
+	      }
+	    }
+	    break;
+	} /* endswitch */
+      }
       break;
     case csevCommand:
       switch (Event.Command.Code)

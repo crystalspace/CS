@@ -263,8 +263,7 @@ public:
       CSMASK_MouseUp          |
       CSMASK_MouseDown        |
       CSMASK_MouseMove        |
-      CSMASK_KeyDown          |
-      CSMASK_KeyUp            |
+      CSMASK_Keyboard         |
       CSMASK_MouseClick       |
       CSMASK_MouseDoubleClick |
       CSMASK_JoystickMove     |

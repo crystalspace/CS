@@ -257,7 +257,10 @@ bool TerrBigTut::HandleEvent (iEvent &e)
     FinishFrame ();
 	return true;
   }
-  if (e.Type == csevKeyDown && e.Key.Code == CSKEY_ESC) {
+  if ((e.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&e) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&e) == CSKEY_ESC))
+  {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;

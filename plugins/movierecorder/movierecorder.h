@@ -90,7 +90,7 @@ private:
 
   /// Key bindings
   struct keyBinding {
-    int code;
+    utf32_char code;
     bool shift, alt, ctrl;
   } keyRecord, keyPause;
 

@@ -27,7 +27,7 @@
  * Create a csHashMap key from an iEvent.
  * Used internally by csInputBinder.
  */
-csHashKey csHashComputeEvent (iEvent const&);
+csHashKey csHashComputeEvent (iEvent* const);
 
 /**
  * Bind an input event to a pointer to a variable so that that variable will

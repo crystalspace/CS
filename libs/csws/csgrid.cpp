@@ -796,45 +796,48 @@ bool csGrid::HandleEvent (iEvent &Event)
         break;
       }
       break;
-  case csevKeyDown:
-    switch (Event.Key.Code)
+  case csevKeyboard:
+    if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
     {
-    case CSKEY_DOWN:
-      if (GetCursorStyle () != CSGCS_NONE)
+      switch (csKeyEventHelper::GetCookedCode (&Event))
       {
-	const csRect &rc = GetRootView ()->GetArea ();
-	if (ycur < rc.ymax)
-	  SetCursorPos (ycur+1, xcur);
-	return true;
+      case CSKEY_DOWN:
+	if (GetCursorStyle () != CSGCS_NONE)
+	{
+	  const csRect &rc = GetRootView ()->GetArea ();
+	  if (ycur < rc.ymax)
+	    SetCursorPos (ycur+1, xcur);
+	  return true;
+	}
+	break;
+      case CSKEY_UP:
+	if (GetCursorStyle () != CSGCS_NONE)
+	{
+	  const csRect &rc = GetRootView ()->GetArea ();
+	  if (ycur > rc.ymin)
+	    SetCursorPos (ycur-1, xcur);
+	  return true;
+	}
+	break;
+      case CSKEY_LEFT:
+	if (GetCursorStyle () != CSGCS_NONE)
+	{
+	  const csRect &rc = GetRootView ()->GetArea ();
+	  if (xcur > rc.xmin)
+	    SetCursorPos (ycur, xcur-1);
+	  return true;
+	}
+	break;
+      case CSKEY_RIGHT:
+	if (GetCursorStyle () != CSGCS_NONE)
+	{
+	  const csRect &rc = GetRootView ()->GetArea ();
+	  if (xcur < rc.xmax)
+	    SetCursorPos (ycur, xcur+1);
+	  return true;
+	}
+	break;
       }
-      break;
-    case CSKEY_UP:
-      if (GetCursorStyle () != CSGCS_NONE)
-      {
-	const csRect &rc = GetRootView ()->GetArea ();
-	if (ycur > rc.ymin)
-	  SetCursorPos (ycur-1, xcur);
-	return true;
-      }
-      break;
-    case CSKEY_LEFT:
-      if (GetCursorStyle () != CSGCS_NONE)
-      {
-	const csRect &rc = GetRootView ()->GetArea ();
-	if (xcur > rc.xmin)
-	  SetCursorPos (ycur, xcur-1);
-	return true;
-      }
-      break;
-    case CSKEY_RIGHT:
-      if (GetCursorStyle () != CSGCS_NONE)
-      {
-	const csRect &rc = GetRootView ()->GetArea ();
-	if (xcur < rc.xmax)
-	  SetCursorPos (ycur, xcur+1);
-	return true;
-      }
-      break;
     }
   }
   return csComponent::HandleEvent (Event);

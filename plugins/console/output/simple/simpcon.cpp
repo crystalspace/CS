@@ -23,6 +23,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "cssys/csuctransform.h"
 #include "simpcon.h"
 #include "csutil/util.h"
 #include "csgeom/csrect.h"
@@ -441,17 +442,36 @@ void csSimpleConsole::Draw2D (csRect* area)
         CursorTime = csGetTicks () + 333;
       }
 
-      char cursor [2];
+      utf32_char cursorCh;
       if (CursorState && (CursorStyle != csConNoCursor))
-        cursor [0] = (CursorStyle == csConNormalCursor) ? '\333' : '_';
+        cursorCh = (CursorStyle == csConNormalCursor) ? 0x2588 : '_';
       else
-        cursor [0] = ' ';
-      cursor [1] = 0;
+        cursorCh = ' ';
+
+      utf8_char cursor [CS_UC_MAX_UTF8_ENCODED + 1];
+      size_t cursorSize = csUnicodeTransform::EncodeUTF8 (cursorCh, cursor,
+	sizeof (cursor) / sizeof (utf8_char));
+      cursor[cursorSize] = 0;
 
       char *tmp = csStrNew (Line [LineNumber]);
       int curx = strlen (tmp);
       if ((CursorPos >= 0) && (CursorPos < curx))
-        tmp [CursorPos] = 0;
+      {
+	size_t tl = strlen (tmp);
+	size_t cp = CursorPos;
+	size_t tp = 0;
+	while (cp > 0)
+	{
+	  int skip = csUnicodeTransform::UTF8Skip ((utf8_char*)&tmp[tp],
+	    tl - tp);
+	  tp += skip;
+	  cp--;
+	}
+	tmp[tp] = 0;
+      }
+
+      //if ((CursorPos >= 0) && (CursorPos < curx))
+      //  tmp [CursorPos] = 0;
       int temp_h;
       console_font->GetDimensions (tmp, curx, temp_h);
       delete [] tmp;
@@ -460,7 +480,7 @@ void csSimpleConsole::Draw2D (csRect* area)
       {
         for (i = 0; i <= LineNumber; i++)
           WRITE2 (1, th * i, console_fg, console_bg, Line [i], dblbuff);
-        WRITE2 (1 + curx, th * LineNumber, console_fg, -1, cursor, dblbuff);
+        WRITE2 (1 + curx, th * LineNumber, console_fg, -1, (char*)cursor, dblbuff);
       }
       else
       {
@@ -469,7 +489,7 @@ void csSimpleConsole::Draw2D (csRect* area)
           area->Union (0, 0, FrameWidth - 1, FrameHeight - 1);
         for (i = 0; i <= LineNumber; i++)
           WRITE (1, th * i, console_fg, -1, Line [i], false);
-        WRITE (1 + curx, th * LineNumber, console_fg, -1, cursor, false);
+        WRITE (1 + curx, th * LineNumber, console_fg, -1, (char*)cursor, false);
       }
       break;
     }

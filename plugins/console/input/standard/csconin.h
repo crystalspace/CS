@@ -23,7 +23,9 @@
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
 #include "iutil/eventh.h"
+#include "iutil/csinput.h"
 #include "iutil/comp.h"
+#include "csutil/csstring.h"
 #include "csutil/stringarray.h"
 
 /**
@@ -45,12 +47,20 @@ class csConsoleInput : iConsoleInput
   char *Prompt;
   int PromptLen;
   // Current line
-  char *line;
-  int linemax;
+  csString line;
+  //int linemax;
   // Insert mode
   bool InsertMode;
   // Cursor position
-  int CursorPos;
+  // On the screen (char. num)
+  size_t vCursorPos;
+  // In the string
+  size_t strCursorPos;
+  /**
+   * Dead key logicator.
+   * \remark Logicator is not a real English word.
+   */
+  csRef<iKeyComposer> keyLogicator;
 
   // Refresh the console input on associated console
   void Refresh ();

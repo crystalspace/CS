@@ -68,8 +68,7 @@ bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, unsigned int 
 bool (csBaseEventHandler::*csBaseEventHandler::pmfnTriggers[])(iEvent &event) =
   {
     &csBaseEventHandler::OnUnhandledEvent   /*csevNothing*/,
-    &csBaseEventHandler::OnKeyDown          /*csevKeyDown*/,
-    &csBaseEventHandler::OnKeyUp            /*csevKeyUp*/,
+    &csBaseEventHandler::OnKeyboard         /*csevKeyDown*/,
     &csBaseEventHandler::OnMouseMove        /*csevMouseMove*/,
     &csBaseEventHandler::OnMouseDown        /*csevMouseDown*/,
     &csBaseEventHandler::OnMouseUp          /*csevMouseUp*/,
@@ -103,8 +102,7 @@ bool csBaseEventHandler::HandleEvent (iEvent &event)
   }
 
 DefaultTrigger ( OnUnhandledEvent );
-DefaultTrigger ( OnKeyDown );
-DefaultTrigger ( OnKeyUp );
+DefaultTrigger ( OnKeyboard );
 DefaultTrigger ( OnMouseMove );
 DefaultTrigger ( OnMouseDown );
 DefaultTrigger ( OnMouseUp );

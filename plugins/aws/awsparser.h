@@ -19,7 +19,7 @@ public:
   ~awsParser ();
   bool Initialize (const char* filename);
 
-  int Read (char* buf, size_t maxsize)
+  size_t Read (char* buf, size_t maxsize)
   { return input->Read (buf, maxsize); }
 
   awsKey* MapSourceToSink (unsigned long signal, const char* sinkname, const char* triggername);

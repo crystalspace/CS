@@ -202,7 +202,8 @@ bool csButton::HandleEvent (iEvent &Event)
         case cscmdStaticHotKeyEvent:
         {
           iEvent *ev = (iEvent *)Event.Command.Info;
-          ev->Key.Code = CSKEY_SPACE;
+	  ev->Remove ("keyCodeCooked", 0);
+	  ev->Add ("keyCodeCooked", (uint32)CSKEY_SPACE);
           return csButton::HandleEvent (*ev);
         }
         case cscmdStaticMouseEvent:
@@ -289,22 +290,26 @@ bool csButton::HandleEvent (iEvent &Event)
     return true;
     break;
 
-    case csevKeyDown:
-      return HandleKeyPress (Event);
-    case csevKeyUp:
-      if (app->KeyboardOwner)
-        if (((underline_pos >= 0)
-          && (toupper (Event.Key.Char) == toupper (text [underline_pos])))
-         || ((Event.Key.Code == CSKEY_SPACE)
-          && (GetState (CSS_FOCUSED))))
-        {
-          if (!(ButtonStyle & CSBS_MULTICHOOSE))
-            SetPressed (false);
-          Invalidate ();
-          app->CaptureKeyboard (0);
-          Press ();
-          return true;
-        }
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
+	return HandleKeyPress (Event);
+      else
+      {
+	if (app->KeyboardOwner)
+	  if (((underline_pos >= 0)
+	    && (toupper ((char)csKeyEventHelper::GetCookedCode (&Event)) == 
+	    toupper (text [underline_pos])))
+	  || ((csKeyEventHelper::GetCookedCode (&Event) == CSKEY_SPACE)
+	    && (GetState (CSS_FOCUSED))))
+	  {
+	    if (!(ButtonStyle & CSBS_MULTICHOOSE))
+	      SetPressed (false);
+	    Invalidate ();
+	    app->CaptureKeyboard (0);
+	    Press ();
+	    return true;
+	  }
+      }
       return false;
   } /* endswitch */
   return csComponent::HandleEvent (Event);
@@ -314,22 +319,26 @@ bool csButton::PostHandleEvent (iEvent &Event)
 {
   if (parent->GetState (CSS_FOCUSED)
    && GetState (CSS_VISIBLE)
-   && (Event.Type == csevKeyDown))
+   && (Event.Type == csevKeyboard) &&
+   (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown))
     return HandleKeyPress (Event);
   return csComponent::PostHandleEvent (Event);
 }
 
 bool csButton::HandleKeyPress (iEvent &Event)
 {
+  csKeyModifiers m;
+  csKeyEventHelper::GetModifiers (&Event, m);
   // Check hot key
   if (!GetState (CSS_DISABLED))
     if (((underline_pos >= 0)
       && (app->KeyboardOwner == 0)
       && CheckHotKey (Event, text [underline_pos]))
      || ((GetState (CSS_FOCUSED))
-      && (Event.Key.Code == CSKEY_SPACE)
-      && (Event.Key.Modifiers & CSMASK_FIRST)
-      && (!(Event.Key.Modifiers & (CSMASK_ALLSHIFTS - CSMASK_ALT)))))
+      && (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_SPACE)
+      && (!csKeyEventHelper::GetAutoRepeat (&Event))
+      && ((m.modifiers[csKeyModifierTypeCtrl] == 0) &&
+      (m.modifiers[csKeyModifierTypeShift] == 0))))
     {
       if (!app->KeyboardOwner)
         app->CaptureKeyboard (this);

@@ -20,6 +20,7 @@
 #ifndef __CS_UTIL_EVOUTLET_H__
 #define __CS_UTIL_EVOUTLET_H__
 
+#include "cssys/csunicode.h"
 #include "iutil/event.h"
 struct iJoystickDriver;
 struct iKeyboardDriver;
@@ -65,7 +66,7 @@ public:
   /// Put a previously created event into system event queue.
   virtual void Post (iEvent*);
   /// Put a keyboard event into event queue.
-  virtual void Key (int iKey, int iChar, bool iDown);
+  virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown);
   /// Put a mouse event into event queue.
   virtual void Mouse (int iButton, bool iDown, int x, int y);
   /// Put a joystick event into event queue.

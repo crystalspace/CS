@@ -27,6 +27,7 @@
 #include "csutil/refarr.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
+#include "iutil/event.h"
 #include "iutil/string.h"
 
 struct iAws;
@@ -696,7 +697,7 @@ struct iAwsLayoutManager : public iBase
   virtual void LayoutComponents () = 0;
 };
 
-SCF_VERSION (iAwsComponent, 0, 1, 3);
+SCF_VERSION (iAwsComponent, 0, 1, 4);
 
 /// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
@@ -974,7 +975,7 @@ struct iAwsComponent : public iAwsSource
   virtual bool OnMouseEnter()=0;
 
   /// Triggered when the user presses a key
-  virtual bool OnKeypress(int key, int cha, int modifiers)=0;
+  virtual bool OnKeyboard (const csKeyEventData& eventData) = 0;
 
   /// Triggered when the keyboard focus is lost
   virtual bool OnLostFocus()=0;

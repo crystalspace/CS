@@ -658,9 +658,9 @@ bool awsScrollBar::OnMouseEnter ()
   return true;
 }
 
-bool awsScrollBar::OnKeypress (int key, int cha, int modifiers)
+bool awsScrollBar::OnKeyboard (const csKeyEventData& eventData)
 {
- switch(key)
+  switch(eventData.codeCooked)
  {
   case CSKEY_UP:
     if(orientation == sboVertical)

@@ -46,6 +46,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/natwin.h"
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
@@ -115,7 +116,9 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  else if ((ev.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
@@ -278,6 +281,7 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+  int x = 0;
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
 
   simple = new Simple (object_reg);

@@ -25,7 +25,7 @@
 
 struct csAccElement
 {
-  int Key;
+  utf32_char Key;
   int Shifts;
   csEvent Event;
 };
@@ -67,7 +67,8 @@ bool csKeyboardAccelerator::PostHandleEvent (iEvent &Event)
   if (csComponent::PostHandleEvent (Event))
     return true;
 
-  if ((Event.Type == csevKeyDown)
+  if ((Event.Type == csevKeyboard) &&
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
    && (app->FocusOwner == 0)
    && (app->KeyboardOwner == 0))
   {
@@ -75,8 +76,9 @@ bool csKeyboardAccelerator::PostHandleEvent (iEvent &Event)
     for (i = Accelerators.Length () - 1; i >= 0; i--)
     {
       csAccElement *ae = (csAccElement *)Accelerators [i];
-      if ((ae->Key == Event.Key.Code)
-       && (ae->Shifts == (Event.Key.Modifiers & CSMASK_ALLSHIFTS)))
+      if ((ae->Key == csKeyEventHelper::GetRawCode (&Event))
+       && (ae->Shifts == (csKeyEventHelper::GetModifiersBits (&Event) & 
+       CSMASK_ALLSHIFTS)))
       {
         app->Post (new csEvent (ae->Event));
         return true;

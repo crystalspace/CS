@@ -33,6 +33,7 @@
 #include <windows.h>
 
 #include "cssys/win32/wintools.h"
+#include "win32kbd.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -56,7 +57,8 @@ extern char** CS_WIN32_ARGV;
 void SystemFatalError (const char *s)
 {
   ChangeDisplaySettings (0, 0);  // doesn't hurt
-  fprintf (stderr, "FATAL: %s\n", s);
+  csFPutErr ("FATAL: ");
+  csFPutErr (s);
   MessageBoxW (0, csCtoW (s), L"Fatal Error", MB_OK | MB_ICONSTOP);
 }
 
@@ -83,6 +85,7 @@ private:
   bool cmdline_help_wanted;
   HCURSOR m_hCursor;
   csRef<iEventOutlet> EventOutlet;
+  csRef<csWin32KeyboardDriver> kbdDriver;
 
   // @@@ The following aren't thread-safe. Prolly use TLS.
   /// The "Ok" button text passsed to Alert(),
@@ -118,6 +121,14 @@ public:
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
   virtual HWND GetApplicationWindow();
+
+  /**
+   * Handle a keyboard-related Windows message.
+   */
+  bool HandleKeyMessage (HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam);
+  /// Instruct the keyboard driver to update the modifier flags.
+  void UpdateKeyboardModifiers ();
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -253,15 +264,18 @@ bool csPlatformStartup(iObjectRegistry* r)
   delete pluginpaths;
 
 
-  Win32Assistant* a = new Win32Assistant(r);
+  csRef<Win32Assistant> a = new Win32Assistant(r);
   bool ok = r->Register (static_cast<iWin32Assistant*>(a), "iWin32Assistant");
   if (ok)
+  {
+    a->IncRef ();
     GLOBAL_ASSISTANT = a;
+  }
   else
   {
-    a->DecRef();
     SystemFatalError ("Failed to register iWin32Assistant!");
   }
+
   return ok;
 }
 
@@ -441,6 +455,21 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   CS_ASSERT (q != 0);
   q->RegisterListener (this, CSMASK_Nothing | CSMASK_Broadcast);
+
+  // Put our own keyboard driver in place.
+  kbdDriver.AttachNew (new csWin32KeyboardDriver (r));
+  if (kbdDriver == 0)
+  {
+    SystemFatalError ("Failed to create keyboard driver!");
+  }
+
+  csRef<iBase> currentKbd = 
+    CS_QUERY_REGISTRY_TAG (r, "iKeyboardDriver");
+  if (currentKbd != 0)
+  {
+    r->Unregister (currentKbd, "iKeyboardDriver");
+  }
+  r->Register (kbdDriver, "iKeyboardDriver");
 }
 
 Win32Assistant::~Win32Assistant ()
@@ -558,79 +587,6 @@ int Win32Assistant::GetCmdShow () const
 
 //----------------------------------------// Windows input translator //------//
 
-/*
-    This table does not contain special key codes, since those are
-    handled by the switch() in WinKeyTrans().
-*/
-
-static unsigned char ScanCodeToChar [MAX_SCANCODE] =
-{
-  0,              0,              '1',            '2',
-  '3',            '4',            '5',            '6',		// 00..07
-  '7',            '8',            '9',            '0',
-  '-',            '=',            0,              0,		// 08..0F
-  'q',            'w',            'e',            'r',
-  't',            'y',            'u',            'i',		// 10..17
-  'o',            'p',            '[',            ']',
-  0,              0,              'a',            's',		// 18..1F
-  'd',            'f',            'g',            'h',
-  'j',            'k',            'l',            ';',		// 20..27
-  39,             '`',            0,              '\\',
-  'z',            'x',            'c',            'v',		// 28..2F
-  'b',            'n',            'm',            ',',
-  '.',            '/',            0,              0,            // 30..37
-  0,              ' ',            0,              0
-};
-
-static unsigned char LastCharCode [MAX_SCANCODE];
-
-static bool WinKeyTrans (WPARAM wParam, bool down, iEventOutlet* outlet)
-{
-  int key = 0, chr = 0;
-  switch (wParam)
-  {
-    case VK_MENU:     key = CSKEY_ALT; break;
-    case VK_CONTROL:  key = CSKEY_CTRL; break;
-    case VK_SHIFT:    key = CSKEY_SHIFT; break;
-    case VK_UP:       key = CSKEY_UP; break;
-    case VK_DOWN:     key = CSKEY_DOWN; break;
-    case VK_LEFT:     key = CSKEY_LEFT; break;
-    case VK_RIGHT:    key = CSKEY_RIGHT; break;
-    case VK_CLEAR:    key = CSKEY_CENTER; break;
-    case VK_INSERT:   key = CSKEY_INS; break;
-    case VK_DELETE:   key = CSKEY_DEL; break;
-    case VK_PRIOR:    key = CSKEY_PGUP; break;
-    case VK_NEXT:     key = CSKEY_PGDN; break;
-    case VK_HOME:     key = CSKEY_HOME; break;
-    case VK_END:      key = CSKEY_END; break;
-    case VK_RETURN:   key = CSKEY_ENTER; chr = '\n'; break;
-    case VK_BACK:     key = CSKEY_BACKSPACE; chr = '\b'; break;
-    case VK_TAB:      key = CSKEY_TAB; chr = '\t'; break;
-    case VK_ESCAPE:   key = CSKEY_ESC; chr = 27; break;
-    case VK_F1:       key = CSKEY_F1; break;
-    case VK_F2:       key = CSKEY_F2; break;
-    case VK_F3:       key = CSKEY_F3; break;
-    case VK_F4:       key = CSKEY_F4; break;
-    case VK_F5:       key = CSKEY_F5; break;
-    case VK_F6:       key = CSKEY_F6; break;
-    case VK_F7:       key = CSKEY_F7; break;
-    case VK_F8:       key = CSKEY_F8; break;
-    case VK_F9:       key = CSKEY_F9; break;
-    case VK_F10:      key = CSKEY_F10; break;
-    case VK_F11:      key = CSKEY_F11; break;
-    case VK_F12:      key = CSKEY_F12; break;
-    case VK_ADD:      key = CSKEY_PADPLUS; chr = '+'; break;
-    case VK_SUBTRACT: key = CSKEY_PADMINUS; chr = '-'; break;
-    case VK_MULTIPLY: key = CSKEY_PADMULT; chr = '*'; break;
-    case VK_DIVIDE:   key = CSKEY_PADDIV; chr = '/'; break;
-  }
-
-  if (key)
-    outlet->Key (key, chr, down);
-
-  return (key != 0);
-}
-
 LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
@@ -648,7 +604,6 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	  GLOBAL_ASSISTANT->ApplicationActive = false; 
 	}
       }
-      memset (&LastCharCode, 0, sizeof (LastCharCode));
       break;
     case WM_ACTIVATE:
       if ((GLOBAL_ASSISTANT != 0))
@@ -656,6 +611,8 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
         outlet->Broadcast (cscmdFocusChanged,
           (void *)(LOWORD (wParam) != WA_INACTIVE));
+	if (LOWORD (wParam) != WA_INACTIVE)
+	  GLOBAL_ASSISTANT->UpdateKeyboardModifiers ();
       }
       break;
     case WM_CREATE:
@@ -671,59 +628,27 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       }
       break;
     case WM_DESTROY:
+    {
       PostQuitMessage (0);
       return 0L;
+    }
     case WM_SYSCHAR:
     case WM_CHAR:
-    {
-      if (GLOBAL_ASSISTANT != 0)
-      {	  
-        int scancode = (lParam >> 16) & 0xff;
-        int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
-        if (key || (wParam >= ' '))
-        {
-	  // Don't emit a char for keypad special keys (/*-+),
-	  // as this is already done upon WM_KEYDOWN.
-	  // @@@ Maybe there's a more 'elegant' solution?
-	  UINT vkey = MapVirtualKey (scancode, 1);
-	  bool kpkey = ((vkey == VK_ADD) || (vkey == VK_SUBTRACT) || 
-	    (vkey == VK_DIVIDE) || (vkey == VK_MULTIPLY) ||
-	    ((lParam & (1 << 24)) && (wParam == '/')));
-
-          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-          if (!kpkey) outlet->Key (key, wParam, true);
-          LastCharCode [scancode] = (unsigned char) wParam;
-        }
-      }
-      break;
-    }
+    case WM_UNICHAR:
+    case WM_DEADCHAR:
+    case WM_SYSDEADCHAR:
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-    {
-      if (GLOBAL_ASSISTANT != 0)
-      {
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        WinKeyTrans (wParam, true, outlet);
-        if (wParam == VK_MENU) return 0;
-      }
-      break;
-    }
     case WM_KEYUP:
     case WM_SYSKEYUP:
     {
       if (GLOBAL_ASSISTANT != 0)
-      {
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        WinKeyTrans (wParam, false, outlet);
-        if (wParam == VK_MENU) return 0;
-        // Check if this is the keyup event for a former WM_CHAR
-        int scancode = (lParam >> 16) & 0xff;
-        if ((scancode < MAX_SCANCODE) && LastCharCode [scancode])
-        {
-          int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
-          outlet->Key (key, LastCharCode [scancode], false);
-          LastCharCode [scancode] = 0;
-        }
+      {	  
+	if (GLOBAL_ASSISTANT->HandleKeyMessage (hWnd, message, wParam,
+	  lParam))
+	{
+	  return 0;
+	}
       }
       break;
     }
@@ -956,3 +881,15 @@ HWND Win32Assistant::GetApplicationWindow()
 {
   return ApplicationWnd;
 }
+
+bool Win32Assistant::HandleKeyMessage (HWND hWnd, UINT message, 
+				       WPARAM wParam, LPARAM lParam)
+{
+  return kbdDriver->HandleKeyMessage (hWnd, message, wParam, lParam);
+}
+
+void Win32Assistant::UpdateKeyboardModifiers ()
+{
+  kbdDriver->UpdateModifierState ();
+}
+

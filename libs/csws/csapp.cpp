@@ -620,8 +620,9 @@ bool csApp::HandleEvent (iEvent &Event)
     Invalidate (true);
   }
 
-  if ((Event.Type == csevKeyDown)
-   && (Event.Key.Code == CSKEY_INS))
+  if ((Event.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) && 
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_INS))
     InsertMode = !InsertMode;
 
   // If mouse moves, reset mouse cursor to arrow

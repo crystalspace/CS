@@ -202,18 +202,21 @@ bool R3DTest::HandleEvent (iEvent& ev)
     r3dtest->FinishFrame ();
     return true;
   }
-  else if (ev.Type == csevKeyDown)
+  else if (ev.Type == csevKeyboard)
   {
-    switch (ev.Key.Code)
+    if (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown)
     {
-    case CSKEY_ESC:
+      switch (csKeyEventHelper::GetCookedCode (&ev))
       {
-        csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-        if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
-        return true;
+      case CSKEY_ESC:
+	{
+	  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+	  if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+	  return true;
+	}
+      case CSKEY_TAB:
+	console->SetVisible (!console->GetVisible ());
       }
-    case CSKEY_TAB:
-      console->SetVisible (!console->GetVisible ());
     }
   }
   return false;

@@ -20,7 +20,9 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "csutil/ref.h"
+#include "csutil/databuf.h"
 #include "cstool/initapp.h"
+#include "csutil/csstring.h"
 #include "iutil/vfs.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/plugin.h"
@@ -580,6 +582,10 @@ int main (int argc, char *argv [])
         fprintf (stderr, "vsh: unknown command: [%s]\n", s);
     }
   }
+
+  Cfg = 0;
+  VFS = 0;
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }

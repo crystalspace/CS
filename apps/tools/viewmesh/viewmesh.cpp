@@ -138,8 +138,9 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 
   switch(ev.Type)
   {
-    case csevKeyDown:
-      if (ev.Key.Code == CSKEY_ESC)
+    case csevKeyboard:
+      if ((csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
+	(csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
       {
 	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)

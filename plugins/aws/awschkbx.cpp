@@ -278,11 +278,10 @@ bool awsCheckBox::OnMouseEnter ()
   return true;
 }
 
-bool awsCheckBox::OnKeypress (int key, int cha, int modifiers)
+bool awsCheckBox::OnKeyboard (const csKeyEventData& eventData)
 {
   bool eventEaten = false;
-  char chr = (char)key;
-  switch(chr)
+  switch(eventData.codeCooked)
   {
   case CSKEY_ENTER:
     eventEaten = true;

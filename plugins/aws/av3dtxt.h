@@ -195,5 +195,8 @@ public:
 
   ///
   virtual void UnregisterTexture (csTextureHandleNull *handle);
+
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int w, int)
+  { return 0; }
 };
 #endif // __CS_AWS_AV3DTXT_H__

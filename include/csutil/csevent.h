@@ -81,9 +81,6 @@ public:
    */
   csEvent (csEvent const&);
 
-  /// Create a keyboard event object
-  csEvent (csTicks, int type, int kcode, int kchar, int modifiers);
-
   /// Create a mouse event object
   csEvent (csTicks, int type, int x, int y, int button, int modifiers);
 

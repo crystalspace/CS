@@ -108,7 +108,17 @@ void AwsTutorial::Login (void* awst, iAwsSource *)
 bool AwsTutorial::Initialize (int argc, const char* const argv[])
 {
   object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
+  if (!object_reg)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not create environment!");
+    return false;
+  }
+
+  if (!csInitializer::SetupConfigManager (object_reg, "/config/awstut.cfg"))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not setup config manager!");
+    return false;
+  }
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
@@ -118,7 +128,7 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
 	CS_REQUEST_PLUGIN("crystalspace.window.alternatemanager", iAws),
 	CS_REQUEST_END))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not request plugins!");
     return false;
   }
 
@@ -198,7 +208,9 @@ void AwsTutorial::FinishFrame ()
 
 bool AwsTutorial::HandleEvent (iEvent &Event)
 {
-  if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
+  if ((Event.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
@@ -213,14 +225,8 @@ void AwsTutorial::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.application.awstut", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.application.awstut", 
+    msg, arg);
   va_end (arg);
 }
 

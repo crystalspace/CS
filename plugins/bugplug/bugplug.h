@@ -21,6 +21,7 @@
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/csinput.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/parray.h"
@@ -177,6 +178,10 @@ private:
   csRef<iVirtualClock> vc;
   bool initialized;
   csConfigAccess config;
+  /**
+   * Keyboard input composer
+   */
+  csRef<iKeyComposer> keyComposer;
 
   //------------------------------------------------------------------
   // Specific debugging options.
@@ -310,9 +315,9 @@ private:
   /// If true we are in edit mode.
   bool edit_mode;
   /// The cursor position.
-  int edit_cursor;
+  size_t edit_cursor;
   /// String we are editing.
-  char edit_string[81];
+  csString edit_string;
   /// Message string:
   char msg_string[81];
   /// Command to perform after finishing edit mode.

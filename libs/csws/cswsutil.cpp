@@ -114,8 +114,9 @@ bool csWindowList::HandleEvent (iEvent &Event)
         } /* endif */
       } /* endif */
       break;
-    case csevKeyDown:
-      if (Event.Key.Code == CSKEY_ESC)
+    case csevKeyboard:
+      if ((csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+	(csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
       {
         Close ();
         return true;

@@ -472,8 +472,7 @@ bool csComponent::do_handle_event (csComponent *child, void *param)
       Event->Mouse.y += dY;
       return retc;
     }
-    case csevKeyDown:
-    case csevKeyUp:
+    case csevKeyboard:
       if (!child->GetState (CSS_VISIBLE))
         return false;
       // fallback to default behaviour
@@ -539,8 +538,9 @@ bool csComponent::HandleEvent (iEvent &Event)
   {
     switch (Event.Type)
     {
-      case csevKeyDown:
-        if (Event.Key.Code != CSKEY_ESC)
+      case csevKeyboard:
+	if ((csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+	  (csKeyEventHelper::GetCookedCode (&Event) != CSKEY_ESC))
           break;
         if (app->MouseOwner != this)
           return (ForEach (do_handle_event, &Event, true) != 0);
@@ -669,8 +669,9 @@ AbortDrag:
        && (!bound.ContainsRel (Event.Mouse.x, Event.Mouse.y)))
         app->Dismiss (cscmdCancel);
       break;
-    case csevKeyDown:
-      if ((Event.Key.Code == CSKEY_ESC)
+    case csevKeyboard:
+      if (((csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+	  (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
        && (app->FocusOwner == this))
         app->Dismiss (cscmdCancel);
       break;
@@ -2173,15 +2174,17 @@ void csComponent::FindMaxFreeRect (csRect &area)
 
 bool csComponent::CheckHotKey (iEvent &iEvent, char iHotKey)
 {
-  if ((iEvent.Key.Modifiers & CSMASK_CTRL)
-   || !(iEvent.Key.Modifiers & CSMASK_FIRST))
+  csKeyModifiers m;
+  csKeyEventHelper::GetModifiers (&iEvent, m);
+  if ((m.modifiers[csKeyModifierTypeCtrl] != 0) ||
+    (csKeyEventHelper::GetAutoRepeat (&iEvent)))
     return false;
 
   iHotKey = toupper (iHotKey);
   char Key;
-  if (iEvent.Key.Modifiers & CSMASK_ALT)
-    Key = toupper (iEvent.Key.Code);
+  if (m.modifiers[csKeyModifierTypeAlt] != 0)
+    Key = toupper (csKeyEventHelper::GetRawCode (&iEvent));
   else
-    Key = toupper (iEvent.Key.Char);
+    Key = toupper (csKeyEventHelper::GetCookedCode (&iEvent));
   return Key == iHotKey;
 }

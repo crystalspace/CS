@@ -131,27 +131,32 @@ bool ceEngineView::HandleEvent (iEvent &Event)
         Invalidate ();
       }
       break;
-    case csevKeyDown:
-    case csevKeyUp:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      switch (csKeyEventHelper::GetCookedCode (&Event))
       {
         case CSKEY_UP:
-          SET_BIT (motion, 0x00000001, Event.Type == csevKeyDown);
+          SET_BIT (motion, 0x00000001, 
+	    csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown);
           break;
         case CSKEY_DOWN:
-          SET_BIT (motion, 0x00000002, Event.Type == csevKeyDown);
+          SET_BIT (motion, 0x00000002, 
+	    csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown);
           break;
         case CSKEY_LEFT:
-          SET_BIT (motion, 0x00000004, Event.Type == csevKeyDown);
+          SET_BIT (motion, 0x00000004, 
+	    csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown);
           break;
         case CSKEY_RIGHT:
-          SET_BIT (motion, 0x00000008, Event.Type == csevKeyDown);
+          SET_BIT (motion, 0x00000008, 
+	    csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown);
           break;
         case CSKEY_PGUP:
-          SET_BIT (motion, 0x00000010, Event.Type == csevKeyDown);
+          SET_BIT (motion, 0x00000010, 
+	    csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown);
           break;
         case CSKEY_PGDN:
-          SET_BIT (motion, 0x00000020, Event.Type == csevKeyDown);
+          SET_BIT (motion, 0x00000020, 
+	    csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown);
           break;
       }
       break;
@@ -375,14 +380,17 @@ bool ceCswsEngineApp::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case 'q':
-        {
-          ShutDown ();
-          return true;
-        }
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case 'q':
+	  {
+	    ShutDown ();
+	    return true;
+	  }
+	}
       }
       break;
     case csevCommand:

@@ -19,8 +19,11 @@
 
 #include "cssysdef.h"
 #include "csconin.h"
+#include "cssys/csuctransform.h"
 #include "csutil/util.h"
+#include "csutil/objreg.h"
 #include "ivaria/conout.h"
+#include "ivaria/reporter.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 
@@ -51,12 +54,13 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
   Callback = 0;
   Console = 0;
   Prompt = 0;
-  CursorPos = 0;
+  strCursorPos = 0;
+  vCursorPos = 0;
   Prompt = csStrNew ("# ");
   PromptLen = strlen(Prompt);
   HistoryPos = 0;
   History.Push (csStrNew (""));
-  line = new char [linemax = 80];
+  line.Replace ("");
   InsertMode = true;
   MaxLines = 50;
 }
@@ -71,15 +75,23 @@ csConsoleInput::~csConsoleInput ()
     Console->DecRef ();
   }
   if (Callback) Callback->DecRef ();
-
-  delete [] line;
 }
 
 bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
 {
   // It is not necessary to call iEventQueue::RegisterListener() since
   // application will usually pass events to us directly.
-  (void)object_reg;
+
+  csRef<iKeyboardDriver> currentKbd = 
+    CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (currentKbd == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.console.input.standard", "No iKeyboardDriver!");
+    return false;
+  }
+  keyLogicator = currentKbd->CreateKeyComposer ();
+
   return true;
 }
 
@@ -94,99 +106,196 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_UP:
-          if (HistoryPos > 0)
-	    HistoryPos--;
-	  else
-	    HistoryPos = History.Length () - 1;
-          strcpy (line, History.Get (HistoryPos));
-          CursorPos = strlen (line);
-          break;
-        case CSKEY_DOWN:
-          if (HistoryPos < History.Length () - 1)
-	    HistoryPos++;
-	  else
-	    HistoryPos = 0;
-          strcpy (line, History.Get (HistoryPos));
-          CursorPos = strlen (line);
-          break;
-        case CSKEY_LEFT:
-          if (CursorPos > 0) CursorPos--;
-          break;
-        case CSKEY_RIGHT:
-          if (CursorPos < (int)strlen (line)) CursorPos++;
-          break;
-        case CSKEY_HOME:
-          CursorPos = 0;
-          break;
-        case CSKEY_END:
-          CursorPos = strlen (line);
-          break;
-        case CSKEY_ESC:
-          line [CursorPos = 0] = '\0';
-          break;
-        case CSKEY_INS:
-          InsertMode = !InsertMode;
-          break;
-        case CSKEY_ENTER:
-	  Console->PutText("\n");
-          if (Callback)
-            Callback->Execute (line);
-          if (line [0])
-          {
-            HistoryPos = History.Push (csStrNew (line)) + 1;
-            while (History.Length () > MaxLines)
-              History.Delete (0);
-          }
-          line [CursorPos = 0] = '\0';
-          break;
-        case CSKEY_BACKSPACE:
-          if (CursorPos)
-          {
-            CursorPos--;
-            int sl = strlen (line);
-	    if (CursorPos + 1 == sl)
-	      line[CursorPos] = '\0';
-	    else
-              memmove(line + CursorPos, line + CursorPos + 1,
-	        sl - CursorPos + 1);
-          }
-          break;
-        case CSKEY_DEL:
-          {
-            int sl = strlen (line);
-	    if (CursorPos + 1 == sl)
-	      line[CursorPos] = '\0';
-	    else if (CursorPos < sl)
-              memmove(
-	        line + CursorPos, line + CursorPos + 1, sl - CursorPos + 1);
-          }
-          break;
-        case CSKEY_PGUP:
-          if (Console)
-            Console->ScrollTo ((Event.Key.Modifiers & CSMASK_CTRL) ?
-              csConVeryTop : csConPageUp, true);
-          break;
-        case CSKEY_PGDN:
-          if (Console)
-            Console->ScrollTo ((Event.Key.Modifiers & CSMASK_CTRL) ?
-              csConVeryBottom : csConPageDown, true);
-          break;
-        default:
-          if ((Event.Key.Char >= ' ') && (CursorPos < linemax))
-          {
-            int sl = strlen (line);
-            if (InsertMode && CursorPos < sl)
-              memmove(line + CursorPos + 1, line + CursorPos,
-	        sl - CursorPos + 1);
-            bool needeol = (line [CursorPos] == '\0');
-            line [CursorPos++] = Event.Key.Char;
-            if (needeol) line [CursorPos] = '\0';
-          }
-          break;
+	utf32_char codeCooked = csKeyEventHelper::GetCookedCode (&Event);
+	switch (codeCooked)
+	{
+	  case CSKEY_UP:
+	    {
+	      if (HistoryPos > 0)
+		HistoryPos--;
+	      else
+		HistoryPos = History.Length () - 1;
+	      line.Replace (History.Get (HistoryPos));
+
+	      // Set cursor to end of line
+	      strCursorPos = 0;
+	      vCursorPos = 0;
+	      size_t slen = line.Length ();
+	      char* ch = line.GetData ();
+	      while (*ch)
+	      {
+		size_t skip = csUnicodeTransform::UTF8Skip ((utf8_char*)ch, 
+		  slen - strCursorPos);
+		strCursorPos += skip;
+		vCursorPos++;
+		ch += skip;
+	      }
+	    }
+	    break;
+	  case CSKEY_DOWN:
+	    {
+	      if (HistoryPos < History.Length () - 1)
+		HistoryPos++;
+	      else
+		HistoryPos = 0;
+	      line.Replace (History.Get (HistoryPos));
+
+	      // Set cursor to end of line
+	      strCursorPos = 0;
+	      vCursorPos = 0;
+	      size_t slen = line.Length ();
+	      char* ch = line.GetData ();
+	      while (*ch)
+	      {
+		size_t skip = csUnicodeTransform::UTF8Skip ((utf8_char*)ch, 
+		  slen - strCursorPos);
+		strCursorPos += skip;
+		vCursorPos++;
+		ch += skip;
+	      }
+	    }
+	    break;
+	  case CSKEY_LEFT:
+	    if ((strCursorPos > 0) && (vCursorPos > 0))
+	    {
+	      vCursorPos--;
+	      strCursorPos -= csUnicodeTransform::UTF8Rewind (
+		(utf8_char*)line.GetData () + strCursorPos, strCursorPos);
+	    }
+	    break;
+	  case CSKEY_RIGHT:
+	    {
+	      size_t slen = line.Length ();
+	      if (strCursorPos < slen)
+	      {
+		vCursorPos++;
+		strCursorPos += csUnicodeTransform::UTF8Skip (
+		  (utf8_char*)line.GetData () + strCursorPos, 
+		  slen - strCursorPos);
+	      }
+	    }
+	    break;
+	  case CSKEY_HOME:
+	    strCursorPos = 0;
+	    vCursorPos = 0;
+	    break;
+	  case CSKEY_END:
+	    {
+	      // Set cursor to end of line
+	      strCursorPos = 0;
+	      vCursorPos = 0;
+	      char* ch = line.GetData ();
+	      size_t slen = line.Length ();
+	      while (*ch)
+	      {
+		size_t skip = csUnicodeTransform::UTF8Skip ((utf8_char*)ch, 
+		  slen - strCursorPos);
+		strCursorPos += skip;
+		vCursorPos++;
+		ch += skip;
+	      }
+	    }
+	    break;
+	  case CSKEY_ESC:
+	    line.Replace ("");
+	    strCursorPos = 0;
+	    vCursorPos = 0;
+	    break;
+	  case CSKEY_INS:
+	    InsertMode = !InsertMode;
+	    break;
+	  case CSKEY_ENTER:
+	    Console->PutText("\n");
+	    if (Callback)
+	      Callback->Execute (line);
+	    if (line.Length () > 0)
+	    {
+	      HistoryPos = History.Push (csStrNew (line)) + 1;
+	      while (History.Length () > MaxLines)
+		History.Delete (0);
+	    }
+	    line.Replace ("");
+	    strCursorPos = 0;
+	    vCursorPos = 0;
+	    break;
+	  case CSKEY_BACKSPACE:
+	    if ((vCursorPos > 0) && (strCursorPos > 0))
+	    {
+	      vCursorPos--;
+	      size_t cs = csUnicodeTransform::UTF8Rewind (
+		(utf8_char*)line.GetData () + strCursorPos, 
+		strCursorPos);
+
+	      line.DeleteAt (strCursorPos - cs, cs);
+	      strCursorPos -= cs;
+	    }
+	    break;
+	  case CSKEY_DEL:
+	    {
+	      size_t sl = line.Length ();
+	      size_t cs = csUnicodeTransform::UTF8Skip (
+		(utf8_char*)line.GetData () + strCursorPos, 
+		sl - strCursorPos);
+	      if (strCursorPos < sl)
+		line.DeleteAt (strCursorPos, cs);
+	    }
+	    break;
+	  case CSKEY_PGUP:
+	    if (Console)
+	    {
+	      csKeyModifiers m;
+	      csKeyEventHelper::GetModifiers (&Event, m);
+	      Console->ScrollTo ((m.modifiers[csKeyModifierTypeCtrl] != 0) ?
+		csConVeryTop : csConPageUp, true);
+	    }
+	    break;
+	  case CSKEY_PGDN:
+	    if (Console)
+	    {
+	      csKeyModifiers m;
+	      csKeyEventHelper::GetModifiers (&Event, m);
+	      Console->ScrollTo ((m.modifiers[csKeyModifierTypeCtrl] != 0) ?
+		csConVeryBottom : csConPageDown, true);
+	    }
+	    break;
+	  default:
+	    if ((codeCooked >= ' ') && !CSKEY_IS_SPECIAL(codeCooked))
+	    {
+	      utf32_char newChars[3];
+	      int newCharCount;
+
+	      csKeyEventData eventData (&Event);
+	      if (keyLogicator->HandleKey (eventData, newChars,
+		sizeof (newChars) / sizeof (utf32_char), &newCharCount) ==
+		csComposeNoChar)
+		break;
+
+	      if (newCharCount > 0)
+	      {
+		newChars[newCharCount] = 0;
+
+		size_t sl = line.Length ();
+		utf8_char ch[CS_UC_MAX_UTF8_ENCODED*2 + 1];
+
+		size_t chSize = csUnicodeTransform::UTF32to8 (ch, 
+		  sizeof (ch) / sizeof (utf8_char), newChars) - 1;
+		  // Subtract 1 as the 0 terminator is included
+
+		if ((!InsertMode) && (strCursorPos < sl))
+		  line.DeleteAt (strCursorPos, csUnicodeTransform::UTF8Skip (
+		    (utf8_char*)line.GetData () + strCursorPos, 
+		    sl - strCursorPos));
+		line.Insert (strCursorPos, (char*)ch);
+		strCursorPos += chSize;
+		vCursorPos += newCharCount;
+	      }
+	    }
+	    break;
+	}
+
       }
       Refresh ();
       return true;
@@ -207,10 +316,7 @@ void csConsoleInput::Bind (iConsoleOutput *iCon)
     Console->IncRef ();
     Console->RegisterWatcher (&scfiConsoleWatcher);
   }
-  delete [] line;
-  linemax = Console->GetMaxLineWidth ();
-  line = new char [linemax + 1];
-  line [0] = 0;
+  line.Replace ("");
   Refresh ();
 }
 
@@ -252,7 +358,7 @@ void csConsoleInput::Refresh ()
   Console->PutText ("\r");
   Console->PutText (Prompt);
   Console->PutText (line);
-  Console->SetCursorPos (PromptLen + CursorPos);
+  Console->SetCursorPos (PromptLen + vCursorPos);
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);
   else

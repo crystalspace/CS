@@ -219,8 +219,9 @@ void csStatic::Draw ()
 bool csStatic::IsHotKey (iEvent &Event)
 {
   return ((underline_pos >= 0)
-       && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
-       && (toupper (Event.Key.Code) == toupper (text [underline_pos])));
+    && ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL) == 0)
+       && (toupper (csKeyEventHelper::GetCookedCode (&Event)) == 
+       toupper (text [underline_pos])));
 }
 
 bool csStatic::HandleEvent (iEvent &Event)
@@ -281,29 +282,33 @@ bool csStatic::PostHandleEvent (iEvent &Event)
    || (style == csscsFrameLabel))
     switch (Event.Type)
     {
-      case csevKeyDown:
-        if (!app->KeyboardOwner
-         && parent->GetState (CSS_FOCUSED)
-         && IsHotKey (Event)
-         && link)
-        {
-          link->Select ();
-          oldKO = app->CaptureKeyboard (this);
-          link->SendCommand (cscmdStaticHotKeyEvent, (void *)&Event);
-          CheckUp ();
-          return true;
-        }
-        break;
-      case csevKeyUp:
-        if (app->KeyboardOwner
-         && IsHotKey (Event)
-         && link)
-        {
-          link->SendCommand (cscmdStaticHotKeyEvent, (void *)&Event);
-          app->CaptureKeyboard (oldKO);
-          CheckUp ();
-          return true;
-        }
+      case csevKeyboard:
+	if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
+	{
+	  if (!app->KeyboardOwner
+	  && parent->GetState (CSS_FOCUSED)
+	  && IsHotKey (Event)
+	  && link)
+	  {
+	    link->Select ();
+	    oldKO = app->CaptureKeyboard (this);
+	    link->SendCommand (cscmdStaticHotKeyEvent, (void *)&Event);
+	    CheckUp ();
+	    return true;
+	  }
+	}
+	else
+	{
+	  if (app->KeyboardOwner
+	  && IsHotKey (Event)
+	  && link)
+	  {
+	    link->SendCommand (cscmdStaticHotKeyEvent, (void *)&Event);
+	    app->CaptureKeyboard (oldKO);
+	    CheckUp ();
+	    return true;
+	  }
+	}
         break;
     } /* endswitch */
   return csComponent::PostHandleEvent (Event);

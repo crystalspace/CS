@@ -122,7 +122,9 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  else if ((ev.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);

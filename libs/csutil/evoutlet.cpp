@@ -78,13 +78,13 @@ void csEventOutlet::Post (iEvent *Event)
   }
 }
 
-void csEventOutlet::Key (int iKey, int iChar, bool iDown)
+void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown)
 {
-  if ((iKey || iChar) && (EnableMask & CSEVTYPE_Keyboard))
+  if ((codeRaw || codeCooked) && (EnableMask & CSEVTYPE_Keyboard))
   {
     iKeyboardDriver* k = GetKeyboardDriver();
     if (k != 0)
-      k->DoKey (iKey, iChar, iDown);
+      k->DoKey (codeRaw, codeCooked, iDown, false);
   }
 }
 

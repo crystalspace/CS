@@ -533,22 +533,30 @@ void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .2);
 }
 
-void WalkTest::eatkeypress (iEvent &Event)
+void WalkTest::eatkeypress (iEvent* Event)
 {
-  int key = Event.Key.Code;
-  int status = (Event.Type == csevKeyDown);
-  bool shift = (Event.Key.Modifiers & CSMASK_SHIFT) != 0;
-  bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
-  bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
+  uint32 key = 0;
+  Event->Find ("keyCodeRaw", key);
+
+  uint8 evType = 0;
+  Event->Find ("keyEventType", evType);
+  bool status = (evType == csKeyEventTypeDown);
 
   if (myConsole && myConsole->GetVisible () && status)
   {
     if (ConsoleInput)
-      ConsoleInput->HandleEvent (Event);
+      ConsoleInput->HandleEvent (*Event);
     //@@KLUDGE
     if (key != CSKEY_TAB)
       return;
   }
+
+  csKeyModifiers modifiers;
+  csKeyEventHelper::GetModifiers (Event, modifiers);
+
+  bool shift = modifiers.modifiers[csKeyModifierTypeShift] != 0;
+  bool alt = modifiers.modifiers[csKeyModifierTypeAlt] != 0;
+  bool ctrl = modifiers.modifiers[csKeyModifierTypeCtrl] != 0;
 
   csKeyMap *m = mapping;
   while (m)
@@ -715,10 +723,10 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       #endif
 	break;
       }
+      break;
     }
-    case csevKeyDown:
-    case csevKeyUp:
-      eatkeypress (Event);
+    case csevKeyboard:
+      eatkeypress (&Event);
       break;
     case csevMouseDown:
       {

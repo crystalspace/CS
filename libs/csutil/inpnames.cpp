@@ -19,6 +19,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/csuctransform.h"
 #include "iutil/event.h"
 #include "csutil/csevent.h"
 #include "csutil/inpnames.h"
@@ -27,71 +28,174 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+static struct csKeyModDef
+{
+  const char *key;
+  utf32_char code;
+} KeyModifiers [] =
+{
+  {"ctrl",	CSKEY_CTRL},
+  {"lctrl",	CSKEY_CTRL_LEFT},
+  {"rctrl",	CSKEY_CTRL_RIGHT},
+  {"alt",	CSKEY_ALT},
+  {"lalt",	CSKEY_ALT_LEFT},
+  {"ralt",	CSKEY_ALT_RIGHT},
+  {"shift",	CSKEY_SHIFT},
+  {"lshift",	CSKEY_SHIFT_LEFT},
+  {"rshift",	CSKEY_SHIFT_RIGHT},
+  {"num",	CSKEY_PADNUM},
+  {"scroll", 	CSKEY_SCROLLLOCK},
+  {"caps",	CSKEY_CAPSLOCK},
+  { 0,	0}
+};
+
 static struct csKeyCodeDef
 {
   const char *key;
-  int code;
+  utf32_char codeRaw;
+  utf32_char codeCooked;
 } KeyDefs [] =
 {
-  { "Esc",	CSKEY_ESC	},
-  { "Enter",	CSKEY_ENTER	},
-  { "Return",	CSKEY_ENTER	},
-  { "Tab",	CSKEY_TAB	},
-  { "Back",	CSKEY_BACKSPACE },
-  { "BackSpace",CSKEY_BACKSPACE },
-  { "Up",	CSKEY_UP	},
-  { "Down",	CSKEY_DOWN	},
-  { "Left",	CSKEY_LEFT	},
-  { "Right",	CSKEY_RIGHT	},
-  { "PgUp",	CSKEY_PGUP	},
-  { "PageUp",	CSKEY_PGUP	},
-  { "PgDn",	CSKEY_PGDN	},
-  { "PageDown",	CSKEY_PGDN	},
-  { "Home",	CSKEY_HOME	},
-  { "End",	CSKEY_END	},
-  { "Ins",	CSKEY_INS	},
-  { "Insert",	CSKEY_INS	},
-  { "Del",	CSKEY_DEL	},
-  { "Delete",	CSKEY_DEL	},
-  { "Ctrl",	CSKEY_CTRL	},
-  { "Control",	CSKEY_CTRL	},
-  { "Alt",	CSKEY_ALT	},
-  { "Shift",	CSKEY_SHIFT	},
-  { "Center",	CSKEY_CENTER	},
-  { "F1",	CSKEY_F1	},
-  { "F2",	CSKEY_F2	},
-  { "F3",	CSKEY_F3	},
-  { "F4",	CSKEY_F4	},
-  { "F5",	CSKEY_F5	},
-  { "F6",	CSKEY_F6	},
-  { "F7",	CSKEY_F7	},
-  { "F8",	CSKEY_F8	},
-  { "F9",	CSKEY_F9	},
-  { "F10",	CSKEY_F10	},
-  { "F11",	CSKEY_F11	},
-  { "F12",	CSKEY_F12	},
-  { "PAD+",	CSKEY_PADPLUS	},
-  { "PAD-",	CSKEY_PADMINUS	},
-  { "PAD*",	CSKEY_PADMULT	},
-  { "PAD/",	CSKEY_PADDIV	},
+  { "Esc",	CSKEY_ESC,	   CSKEY_ESC},
+  { "Enter",	CSKEY_ENTER,	   CSKEY_ENTER},
+  { "Return",	CSKEY_ENTER,	   CSKEY_ENTER},
+  { "Tab",	CSKEY_TAB,	   CSKEY_TAB},
+  { "Back",	CSKEY_BACKSPACE,   CSKEY_BACKSPACE},
+  { "BackSpace",CSKEY_BACKSPACE,   CSKEY_BACKSPACE},
+  { "Up",	CSKEY_UP,	   CSKEY_UP},
+  { "Down",	CSKEY_DOWN,	   CSKEY_DOWN},
+  { "Left",	CSKEY_LEFT,	   CSKEY_LEFT},
+  { "Right",	CSKEY_RIGHT,	   CSKEY_RIGHT},
+  { "PgUp",	CSKEY_PGUP,	   CSKEY_PGUP},
+  { "PageUp",	CSKEY_PGUP,	   CSKEY_PGUP},
+  { "PgDn",	CSKEY_PGDN,	   CSKEY_PGDN},
+  { "PageDown",	CSKEY_PGDN,	   CSKEY_PGDN},
+  { "Home",	CSKEY_HOME,	   CSKEY_HOME},
+  { "End",	CSKEY_END,	   CSKEY_END},
+  { "Ins",	CSKEY_INS,	   CSKEY_INS},
+  { "Insert",	CSKEY_INS,	   CSKEY_INS},
+  { "Del",	CSKEY_DEL,	   CSKEY_DEL},
+  { "Delete",	CSKEY_DEL,	   CSKEY_DEL},
+  { "F1",	CSKEY_F1,	   CSKEY_F1},
+  { "F2",	CSKEY_F2,	   CSKEY_F2},
+  { "F3",	CSKEY_F3,	   CSKEY_F3},
+  { "F4",	CSKEY_F4,	   CSKEY_F4},
+  { "F5",	CSKEY_F5,	   CSKEY_F5},
+  { "F6",	CSKEY_F6,	   CSKEY_F6},
+  { "F7",	CSKEY_F7,	   CSKEY_F7},
+  { "F8",	CSKEY_F8,	   CSKEY_F8},
+  { "F9",	CSKEY_F9,	   CSKEY_F9},
+  { "F10",	CSKEY_F10,	   CSKEY_F10},
+  { "F11",	CSKEY_F11,	   CSKEY_F11},
+  { "F12",	CSKEY_F12,	   CSKEY_F12},
+  { "Print",	CSKEY_PRINTSCREEN, CSKEY_PRINTSCREEN},
+  { "PrntScrn", CSKEY_PRINTSCREEN, CSKEY_PRINTSCREEN},
+  { "Pause",    CSKEY_PAUSE,	   CSKEY_PAUSE},
+  { "PAD+",	CSKEY_PADPLUS,	   '+'},
+  { "PAD-",	CSKEY_PADMINUS,	   '-'},
+  { "PAD*",	CSKEY_PADMULT,	   '*'},
+  { "PAD/",	CSKEY_PADDIV,	   '/'},
+  { "PAD0",	CSKEY_PAD0,	   '0'},
+  { "PAD1",	CSKEY_PAD1,	   '1'},
+  { "PAD2",	CSKEY_PAD2,	   '2'},
+  { "PAD3",	CSKEY_PAD3,	   '3'},
+  { "PAD4",	CSKEY_PAD4,	   '4'},
+  { "Center",	CSKEY_CENTER,	   '5'},
+  { "PAD6",	CSKEY_PAD6,	   '6'},
+  { "PAD7",	CSKEY_PAD7,	   '7'},
+  { "PAD8",	CSKEY_PAD8,	   '8'},
+  { "PAD9",	CSKEY_PAD9,	   '9'},
+  { "PADDECIMAL",CSKEY_PADDECIMAL, '.'}, // @@@ Not always '.' on all kbd layouts
   { 0,	0		}
 };
 
-static struct csKeyMaskDef
+csInputDefinition::csInputDefinition ()
 {
-  const char *key;
-  int mask;
-} KeyMasks [] =
-{
-  { "Ctrl+",	CSMASK_CTRL	},
-  { "Alt+",	CSMASK_ALT	},
-  { "Shift+",	CSMASK_SHIFT	},
-  { 0,	0		}
-};
+  modifiersHonored = CSMASK_ALLSHIFTS;
+  /*keyCode = 0;
+  codeIsCooked = false;*/
+  memset (&modifiers, 0, sizeof (modifiers));
+  memset (&k, 0, MAX(sizeof (k), MAX(sizeof (m), sizeof (j))));
+}
 
-bool csParseInputDef (const char *name, iEvent* ev, bool use_shift)
+csInputDefinition::csInputDefinition (iEvent* event)
 {
-  int mod = 0;
+  csInputDefinition ();
+  FromEvent (event);
+}
+
+void csInputDefinition::SetHonoredModifiers (uint32 honorModifiers)
+{
+  modifiersHonored = honorModifiers;
+}
+
+uint32 csInputDefinition::GetHonoredModifiers ()
+{
+  return modifiersHonored;
+}
+
+bool csInputDefinition::Parse (const char* string, bool useCooked)
+{
+  memset (&modifiers, 0, sizeof (modifiers));
+
+  const char* name = string;
+  bool ismask;
+  do
+  {
+    ismask = false;
+    char* sep = strchr (name, '+');
+    if (!sep) break;
+    // Hack: don't run "PAD+" through the modifier check
+    if (*(sep + 1) == 0) break;
+
+    size_t mln = sep - name;
+    CS_ALLOC_STACK_ARRAY(char, modString, mln + 1);
+
+    strncpy (modString, name, mln);
+    modString[mln] = 0;
+
+    for (csKeyModDef *m = KeyModifiers; m->key; m++)
+    {
+      if (CSKEY_MODIFIER_NUM(m->code) == csKeyModifierNumAny)
+      {
+	if (strncasecmp (m->key, modString, strlen (m->key)) == 0)
+        {
+	  char* numStr = modString + strlen (m->key);
+	  if (*numStr == 0)
+	  {
+	    modifiers.modifiers[CSKEY_MODIFIER_TYPE(m->code)] |=
+	      0xffffffff;
+	  }
+	  else
+	  {
+	    int num;
+	    if ((sscanf (numStr, "%d", &num) > 0) && 
+	      (num < csKeyModifierNumAny))
+	    {
+	      modifiers.modifiers[CSKEY_MODIFIER_TYPE(m->code)] |=
+		(1 << num);
+	    }
+	  }
+	  ismask = true;
+	  break;
+        }
+      }
+      else
+      {
+        if (strcasecmp (m->key, modString) == 0)
+	{
+	  modifiers.modifiers[CSKEY_MODIFIER_TYPE(m->code)] |=
+	    1 << CSKEY_MODIFIER_NUM(m->code);
+	  ismask = true;
+	  break;
+	}
+      }
+    }
+
+    name = sep + 1;
+  } while (ismask);
+
+/*  int mod = 0;
   bool ismask;
   do
   {
@@ -103,213 +207,301 @@ bool csParseInputDef (const char *name, iEvent* ev, bool use_shift)
         name += strlen (m->key);
         ismask = true;
       }
-  } while (ismask);
+  } while (ismask);*/
 
   if (! strncasecmp (name, "Mouse", 5))
   {
     name += 5;
+    memset (&m, 0, sizeof (m));
     if (*name == 'X' || *name == 'x')
-      *ev = csEvent (0, csevMouseMove, 1, 0, 0, 0);
+    {
+      //*ev = csEvent (0, csevMouseMove, 1, 0, 0, 0);
+      m.x = 1;
+      containedType = csevMouseMove;
+    }
     else if (*name == 'Y' || *name == 'y')
-      *ev = csEvent (0, csevMouseMove, 0, 1, 0, 0);
-    else *ev = csEvent (0, csevMouseDown, 0, 0, atoi (name), mod);
+    {
+      //*ev = csEvent (0, csevMouseMove, 0, 1, 0, 0);
+      m.y = 1;
+      containedType = csevMouseMove;
+    }
+    else 
+    {
+      if (sscanf (name, "%d", &m.Button) <= 0) return false;
+      //*ev = csEvent (0, csevMouseDown, 0, 0, atoi (name), mod);
+      containedType = csevMouseDown;
+    }
   }
   else if (! strncasecmp (name, "Joystick", 8))
   {
     name += 8;
+    memset (&j, 0, sizeof (m));
+    j.number = 1;
     if (*name == 'X' || *name == 'x')
+    {
+      j.x = 1;
+      containedType = csevJoystickMove;
+    }
+    else if (*name == 'Y' || *name == 'y')
+    {
+      j.y = 1;
+      containedType = csevJoystickMove;
+    }
+    else 
+    {
+      if (sscanf (name, "%d", &j.Button) <= 0) return false;
+      containedType = csevJoystickDown;
+    }
+/*    if (*name == 'X' || *name == 'x')
       *ev = csEvent (0, csevJoystickMove, 1, 1, 0, 0, 0);
     else if (*name == 'Y' || *name == 'y')
       *ev = csEvent (0, csevJoystickMove, 1, 0, 1, 0, 0);
-    else *ev = csEvent (0, csevJoystickDown, 1, 0, 0, atoi (name), mod);
+    else *ev = csEvent (0, csevJoystickDown, 1, 0, 0, atoi (name), mod);*/
   }
   else
   {
-    int code = 0;
+    utf32_char code = 0;
     
     for (csKeyCodeDef *c = KeyDefs; c->key; c++)
-      if (! strcasecmp (c->key, name)) { code = c->code; break; }
+    {
+      if (strcasecmp (c->key, name) == 0) 
+      { 
+	code = useCooked ? c->codeCooked : c->codeRaw; 
+	break; 
+      }
+    }
     
-    if	(code)
-      *ev = csEvent (0, csevKeyDown, code, 0, mod);
+    if (code != 0)
+    {
+      k.keyCode = code;
+      k.codeIsCooked = useCooked;
+    }
     else if (strlen (name) != 1)
       return false;
     else
-      *ev = csEvent (0, csevKeyDown, 0, (int)*name, mod);
+    {
+      if (useCooked)
+      {
+	k.keyCode = (utf32_char)*name;
+	k.codeIsCooked = true;
+      }
+      else
+      {
+	utf32_char ch;
+	bool valid;
+	csUnicodeTransform::UTF8Decode ((utf8_char*)name,
+	  strlen (name), ch, &valid);
+	if (!valid) return false;
+	// @@@ Use I18Ned tolower() (once it's there...)
+	k.keyCode = (ch < 256) ? tolower (ch) : ch;
+	k.codeIsCooked = false;
+      }
+    }
+    containedType = csevKeyboard;
   }
   return true;
 }
 
-bool csParseInputDef (const char* name, csEvent& ev, bool use_shift)
+csString csInputDefinition::GetDescription ()
 {
-  return csParseInputDef (name, &ev, use_shift);
+  // @@@ Implement me
+  return "";
 }
 
-bool csParseKeyDef (const char *name, int &key, int &shift, bool use_shift)
+bool csInputDefinition::FromEvent (iEvent* event, bool useCookedKey)
 {
-  csEvent ev;
-  bool ret = csParseInputDef (name, ev, use_shift);
-  if (ret)
-  {
-    if (ev.Key.Code >= CSKEY_FIRST && ev.Key.Code <= CSKEY_LAST)
-      key = ev.Key.Code;
-    else if (ev.Key.Char < 256 && ev.Key.Char > 0)
-      key = ev.Key.Char;
-    else return false;
-    shift = ev.Key.Modifiers;
-  }
-  return ret;
-}
-
-bool csParseMouseDef (const char *name, int &button, int &shift, bool use_shift)
-{
-  csEvent ev;
-  bool ret = csParseInputDef (name, ev, use_shift);
-  if (ret)
-  {
-    if (ev.Type == csevMouseMove)
-      button = ev.Mouse.x > ev.Mouse.y ? CSAXIS_X : CSAXIS_Y;
-    else button = ev.Mouse.Button;
-    shift = ev.Mouse.Modifiers;
-  }
-  return ret;
-}
-
-bool csParseJoyDef (const char *name, int &button, int &shift, bool use_shift)
-{
-  csEvent ev;
-  bool ret = csParseInputDef (name, ev, use_shift);
-  if (ret)
-  {
-    if (ev.Type == csevJoystickMove)
-      button = ev.Joystick.x > ev.Joystick.y ? CSAXIS_X : CSAXIS_Y;
-    else button = ev.Joystick.Button;
-    shift = ev.Joystick.Modifiers;
-  }
-  return ret;
-}
-
-bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift)
-{
-  if (use_shift)
-  {
-    int mod = 0;
-    switch (ev->Type)
-    {
-      case csevKeyUp:
-      case csevKeyDown:
-        mod = ev->Key.Modifiers;
-        break;
-
-      case csevMouseUp:
-      case csevMouseDown:
-        mod = ev->Mouse.Modifiers;
-        break;
-
-      case csevJoystickUp:
-      case csevJoystickDown:
-        mod = ev->Joystick.Modifiers;
-        break;
-
-      default:
-        break;
-    }
-    for (csKeyMaskDef *mask = KeyMasks; mask->key; mask++)
-    {
-      if (mod & mask->mask)
-      {
-        strcpy (buf, mask->key);
-        buf = strchr (buf, 0);
-      }
-    }
-  }
-
-  const char *key = 0;
-  switch (ev->Type)
-  {
-    case csevKeyUp:
-    case csevKeyDown: 
-    {
-      for (csKeyCodeDef *k = KeyDefs; k->key; k++)
-        if (k->code == ev->Key.Code) key = k->key;
-      if (key)
-      {
-        strcpy (buf, key);
-        return true;
-      }
-      else if (ev->Key.Char < 256 && ev->Key.Char > 0)
-      {
-        *buf = (char)ev->Key.Char;
-        *++buf = 0;
-        return true;
-      }
-    }  break;
-
-    case csevMouseUp:
-    case csevMouseDown:
-      strcpy (buf, "Mouse");
-      sprintf (strchr (buf, 0), "%i", ev->Mouse.Button);
-      return true;
-
-    case csevJoystickUp:
-    case csevJoystickDown:
-      strcpy (buf, "Joystick");
-      sprintf (strchr (buf, 0), "%i", ev->Joystick.Button);
-      return true;
-
-    case csevMouseMove:
-      strcpy (buf, "Mouse");
-      buf = strchr (buf, 0);
-      if (ev->Mouse.x > ev->Mouse.y) *buf++ = 'X';
-      else if (ev->Mouse.x < ev->Mouse.y) *buf++ = 'Y';
-      *buf = 0;
-      return true;
-
-    case csevJoystickMove:
-      strcpy (buf, "Joystick");
-      buf = strchr (buf, 0);
-      if (ev->Joystick.x > ev->Joystick.y) *buf++ = 'X';
-      else if (ev->Joystick.x < ev->Joystick.y) *buf++ = 'Y';
-      *buf = 0;
-      return true;
-
-    default:
-      break;
-  }
+  // @@@ Implement me
   return false;
 }
 
-bool csGetInputDesc (csEvent &ev, char *buf, bool use_shift)
+uint32 csInputDefinition::ComputeHash ()
 {
-  return csGetInputDesc (&ev, buf, use_shift);
+  // @@@ Implement me
+  return 0;
 }
 
-bool csGetKeyDesc (int key, int shift, char *buf, bool use_shift)
+uint32 csInputDefinition::ComputeEventHash (iEvent* event)
 {
-  csEvent ev (0, csevKeyDown,
-    key >= CSKEY_FIRST && key <= CSKEY_LAST ? key : 0,
-    key < 256 && key > 0 ? key : 0,
-    shift);
-  return csGetInputDesc (ev, buf, use_shift);
+  // @@@ Implement me
+  return 0;
 }
 
-bool csGetMouseDesc (int button, int shift, char *buf, bool use_shift)
+static utf32_char RawToCooked (utf32_char raw)
 {
-  csEvent ev (0,
-    button == CSAXIS_X || button == CSAXIS_Y ? csevMouseMove : csevMouseDown,
-    button == CSAXIS_X ? 1 : 0,
-    button == CSAXIS_Y ? 1 : 0,
-    button, shift);
-  return csGetInputDesc (ev, buf, use_shift);
+  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
+  {
+    if (c->codeRaw == raw)
+      return c->codeCooked;
+  }
+  return 0;
 }
 
-bool csGetJoyDesc (int button, int shift, char *buf, bool use_shift)
+int csInputDefinition::Compare (const csInputDefinition& def)
 {
-  csEvent ev (0,
-    button == CSAXIS_X || button == CSAXIS_Y ? csevJoystickMove : csevJoystickDown,
-    button == CSAXIS_X ? 1 : 0,
-    button == CSAXIS_Y ? 1 : 0,
-    button, shift);
-  return csGetInputDesc (ev, buf, use_shift);
+  int d = containedType - def.containedType;
+  
+  if (d == 0)
+  {
+    d = modifiersHonored - def.modifiersHonored;
+    if (d == 0)
+    {
+      d = ((int)(csKeyEventHelper::GetModifiersBits (modifiers) & modifiersHonored)) -
+	((int)(csKeyEventHelper::GetModifiersBits (def.modifiers) & modifiersHonored));
+      if (d == 0)
+      {
+	switch (containedType)
+	{
+	  case csevKeyboard:
+	    {
+	      if (!(k.codeIsCooked ^ def.k.codeIsCooked))
+	      {
+		d = (int)k.keyCode - def.k.keyCode;
+	      }
+	      else
+	      {
+		utf32_char cooked1 = 
+		  k.codeIsCooked ? k.keyCode : RawToCooked (k.keyCode);
+		utf32_char cooked2 = 
+		  def.k.codeIsCooked ? def.k.keyCode : RawToCooked (def.k.keyCode);
+		d = (int)cooked1 - (int)cooked2;
+	      }
+	      if (d == 0)
+	      {
+		const csKeyModifiers& mod = def.modifiers;
+		for (int n = 0; n < csKeyModifierTypeLast; n++)
+		{
+		  if (modifiersHonored & (1 << n))
+		  {
+		    /*
+		      Modifier compare logic:
+		      - If the parsed modifier was generic, allow any modifier of a type.
+		      - If the parsed modifier(s) were specific, only allow those.
+		    */
+		    if (!(((modifiers.modifiers[n] == 0xffffffff) && (mod.modifiers[n] != 0)) || 
+		      (((mod.modifiers[n] & modifiers.modifiers[n]) == modifiers.modifiers[n]) && 
+		      ((mod.modifiers[n] & ~modifiers.modifiers[n]) == 0))))
+		    {
+		      d = n;
+		    }
+		  }
+		  if (d != 0) break;
+		}
+	      }
+	    }
+	    break;
+	  case csevMouseUp:
+	  case csevMouseDown:
+	    d = m.Button - def.m.Button;
+	    break;
+	  case csevMouseMove:
+	    if (((m.x != 0) && (def.m.x != 0)) ||
+	      ((m.y != 0) && (def.m.y != 0)))
+	      d = 0;
+	    else
+	      d = abs (m.y - def.m.y) + abs (m.x - def.m.x);
+	    break;
+	  case csevJoystickUp:
+	  case csevJoystickDown:
+	    d = j.Button - def.j.Button;
+	    if (d == 0)
+	      d =j.number - def.j.number;
+	    break;
+	  case csevJoystickMove:
+	    if (((j.x != 0) && (def.j.x != 0)) ||
+	      ((j.y != 0) && (def.j.y != 0)))
+	      d = 0;
+	    else
+	      d = abs (j.y - def.j.y) + abs (j.x - def.j.x);
+	    break;
+	}
+      }
+    }
+  }
+
+  return d;
+}
+
+int csInputDefinition::Compare (iEvent* event)
+{
+  /*
+    @@@ Very similar to Compare (const csInputDefinition&)
+    -> try to merge both
+   */ 
+  int d = containedType - event->Type;
+  
+  if (d == 0)
+  {
+    d = ((int)(csKeyEventHelper::GetModifiersBits (modifiers) & modifiersHonored)) -
+      ((int)(csKeyEventHelper::GetModifiersBits (event) & modifiersHonored));
+    if (d == 0)
+    {
+      switch (event->Type)
+      {
+	case csevKeyboard:
+	  {
+	    if (k.codeIsCooked)
+	    {
+	      d = (int)k.keyCode - 
+		(int)csKeyEventHelper::GetCookedCode (event);
+	    }
+	    else
+	    {
+	      d = (int)k.keyCode - 
+		(int)csKeyEventHelper::GetRawCode (event);
+	    }
+	    if (d == 0)
+	    {
+	      csKeyModifiers mod;
+	      csKeyEventHelper::GetModifiers (event, mod);
+	      for (int n = 0; n < csKeyModifierTypeLast; n++)
+	      {
+		if (modifiersHonored & (1 << n))
+		{
+		  /*
+		    Modifier compare logic:
+		    - If the parsed modifier was generic, allow any modifier of a type.
+		    - If the parsed modifier(s) were specific, only allow those.
+		   */
+		  if (!(((modifiers.modifiers[n] == 0xffffffff) && (mod.modifiers[n] != 0)) || 
+		    (((mod.modifiers[n] & modifiers.modifiers[n]) == modifiers.modifiers[n]) && 
+		    ((mod.modifiers[n] & ~modifiers.modifiers[n]) == 0))))
+		  {
+		    d = n;
+		  }
+		}
+		if (d != 0) break;
+	      }
+	    }
+	  }
+	  break;
+	case csevMouseUp:
+	case csevMouseDown:
+	  d = m.Button - event->Mouse.Button;
+	  break;
+	case csevMouseMove:
+	  if (((m.x != 0) && (event->Mouse.x != 0)) ||
+	    ((m.y != 0) && (event->Mouse.y != 0)))
+	    d = 0;
+	  else
+	    d = abs (m.y - event->Mouse.y) + abs (m.x - event->Mouse.x);
+	  break;
+	case csevJoystickUp:
+	case csevJoystickDown:
+	  d = j.Button - event->Joystick.Button;
+	  if (d == 0)
+	    d =j.number - event->Joystick.number;
+	  break;
+	case csevJoystickMove:
+	  if (((j.x != 0) && (event->Joystick.x != 0)) ||
+	    ((j.y != 0) && (event->Joystick.y != 0)))
+	    d = 0;
+	  else
+	    d = abs (j.y - event->Joystick.y) + abs (j.x - event->Joystick.x);
+	  break;
+      }
+    }
+  }
+
+  return d;
 }
 

@@ -28,6 +28,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/array.h"
+#include "csutil/hash.h"
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -57,6 +58,22 @@ protected:
   void StopListening();
 };
 
+class csKeyComposer : public iKeyComposer
+{
+protected:
+  utf32_char lastDead;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csKeyComposer ();
+  virtual ~csKeyComposer ();
+
+  virtual csKeyComposeResult HandleKey (const csKeyEventData& keyEventData,
+    utf32_char* buf, size_t bufChars, int* resultChars = 0);
+  virtual void ResetState ();
+};
+
 /**
  * Generic Keyboard Driver.<p>
  * Keyboard driver should generate events and put them into
@@ -66,14 +83,22 @@ class csKeyboardDriver : public csInputDriver, public iKeyboardDriver
 {
 protected:
   /// Key state array.
-  csArray<bool> KeyState;
+  //csArray<bool> KeyState;
+  csHash<bool, utf32_char> keyStates;
+  csKeyModifiers modifiersState;
 
   /**
    * Set key state. For example SetKey (CSKEY_UP, true). Called
    * automatically by do_press and do_release.
    */
-  virtual void SetKeyState (int iKey, bool iDown);
-
+  virtual void SetKeyState (utf32_char codeRaw, bool iDown,
+    bool autoRepeat);
+  /**
+   * Generates a 'cooked' key code for a 'raw' key code from some simple
+   * rules.
+   */
+  virtual void SynthesizeCooked (utf32_char codeRaw,
+    const csKeyModifiers& modifiers, utf32_char& codeCooked);
 public:
   SCF_DECLARE_IBASE;
 
@@ -85,15 +110,47 @@ public:
   /// Call to release all key down flags.
   virtual void Reset ();
 
-  /// Call this routine to add a key down/up event to queue
-  virtual void DoKey (int iKey, int iChar, bool iDown);
+  /**
+   * Call this routine to add a key down/up event to queue.
+   * \param codeRaw 'Raw' code of the pressed key.
+   * \param codeCooked 'Cooked' code of the pressed key.
+   * \param iDown Whether the key is up or down.
+   * \param autoRepeat Auto-repeat flag for the key event. Typically only
+   *  used by the platform-specific keyboard agents.
+   * \param charType When the cooked code is a character, it determines
+   *  whether it is a normal, dead or composed character.
+   */
+  virtual void DoKey (utf32_char codeRaw, utf32_char codeCooked, bool iDown,
+    bool autoRepeat = false, csKeyCharType charType = csKeyCharTypeNormal);
 
   /**
    * Query the state of a key. All key codes in range 0..255,
    * CSKEY_FIRST..CSKEY_LAST are supported. Returns true if
    * the key is pressed, false if not.
    */
-  virtual bool GetKeyState (int iKey);
+  virtual bool GetKeyState (utf32_char codeRaw);
+
+  /**
+   * Query the state of a modifier key.
+   * Returns a bit field, where the nth bit is set if the nth modifier of a
+   * type is pressed. If a specific modifier is requested, e.g. 
+   * #CSKEY_SHIFT_LEFT, only the according bit is set. Otherwise, for a generic
+   * modifier (e.g. #CSKEY_SHIFT), all distinct modifier keys of that type are 
+   * represented.<p>
+   * Example: Test if any Alt key is pressed:
+   * \code
+   *   bool pressed = (KeyboardDriver->GetModifierState (CSKEY_ALT) != 0);
+   * \endcode
+   * Example: Test if the right Ctrl key is pressed:
+   * \code
+   *   bool pressed = (KeyboardDriver->GetModifierState (CSKEY_CTRL_RIGHT) != 0);
+   * \endcode
+   * \param codeRaw Raw code of the modifier key.
+   * \return Bit mask with the pressed modifiers.
+   */
+  virtual uint32 GetModifierState (utf32_char codeRaw);
+
+  virtual csPtr<iKeyComposer> CreateKeyComposer ();
 
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }

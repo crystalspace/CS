@@ -514,11 +514,10 @@ bool awsCmdButton::OnMouseEnter ()
   return true;
 }
 
-bool awsCmdButton::OnKeypress (int key, int cha, int modifiers)
+bool awsCmdButton::OnKeyboard (const csKeyEventData& eventData)
 {
   bool eventEaten = false;
-  char chr = (char)key;
-  switch(chr)
+  switch(eventData.codeCooked)
   {
   case CSKEY_ENTER:
     eventEaten = true;

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/csuctransform.h"
 #include "csutil/csstring.h"
 #include "csutil/inpnames.h"
 #include "ivideo/fontserv.h"
@@ -239,6 +240,14 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (wmgr, settings)) return false;
 
+  csRef<iKeyboardDriver> currentKbd = 
+    CS_QUERY_REGISTRY (wmgr->GetObjectRegistry (), iKeyboardDriver);
+  if (currentKbd == 0)
+  {
+    return false;
+  }
+  composer = currentKbd->CreateKeyComposer ();
+
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
   pm->LookupIntKey ("ButtonTextureAlpha", alpha_level); // global get
@@ -353,26 +362,24 @@ const char *awsMultiLineEdit::Type ()
 bool awsMultiLineEdit::HandleEvent (iEvent &Event)
 {
   int idx;
-  if (CS_IS_KEYBOARD_EVENT (Event))
-  {
-    int mod = Event.Key.Modifiers;
-    int theChar = Event.Key.Char;
-    Event.Key.Modifiers &= ~CSMASK_FIRST;
-    Event.Key.Char = 0;
-    //    if ((Event.Key.Modifiers & CSMASK_ALT) && Event.Key.Code == 'c')
-    //      DEBUG_BREAK;
-    idx = vDispatcher.FindSortedKey ((void*)&Event, vDispatcher.CompareKey);
-    Event.Key.Modifiers = mod;
-    Event.Key.Char = theChar;
-  }
-  else
-    idx = vDispatcher.FindSortedKey ((void*)&Event, vDispatcher.CompareKey);
+  idx = vDispatcher.FindSortedKey ((void*)&Event, vDispatcher.CompareEvent);
   if (idx != -1)
     (this->*vDispatcher.Get (idx)->ring) ();
   else
-    if (Event.Type == csevKeyDown)
+    if ((Event.Type == csevKeyboard) && 
+      (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown))
     {
-      InsertChar (Event.Key.Char);
+      csKeyEventData eventData (&Event);
+      utf32_char Char[2];
+      size_t composedSize;
+
+      if (composer->HandleKey (eventData, Char, 
+	sizeof (Char) / sizeof (utf32_char), &composedSize) != csComposeNoChar)
+      {
+	for (size_t n = 0; n < composedSize; n++)
+	  InsertChar (Char[n]);
+      }
+      //InsertChar (Event.Key.Char);
       return true;
     }
   if (awsComponent::HandleEvent (Event)) return true;
@@ -409,48 +416,47 @@ bool awsMultiLineEdit::SetHandler (const char *action,  const char *event)
   csEvent e;
   bool bSucc = false;
 
-  if (csParseInputDef (event, e))
+  csInputDefinition inputDef;
+  if (inputDef.Parse (event))
   {
-    if (CS_IS_KEYBOARD_EVENT (e) && e.Key.Code == 0) /// @@@ temp hack to get around csParseInputDef weirdness
-      e.Key.Code = e.Key.Char, e.Key.Char = 0;
     if (!strcmp (action, "next char"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::NextChar);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::NextChar);
     else if (!strcmp (action, "prev char"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::PrevChar);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::PrevChar);
     else if (!strcmp (action, "next word"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::NextWord);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::NextWord);
     else if (!strcmp (action, "prev word"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::PrevWord);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::PrevWord);
     else if (!strcmp (action, "next row"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::NextRow);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::NextRow);
     else if (!strcmp (action, "prev row"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::PrevRow);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::PrevRow);
     else if (!strcmp (action, "new row"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::BreakInsertRow);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::BreakInsertRow);
     else if (!strcmp (action, "del next char"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::DeleteForward);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::DeleteForward);
     else if (!strcmp (action, "del prev char"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::DeleteBackward);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::DeleteBackward);
     else if (!strcmp (action, "mark column"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::ColumnMark);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::ColumnMark);
     else if (!strcmp (action, "mark row"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::RowMark);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::RowMark);
     else if (!strcmp (action, "mark rowwrap"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::RowWrapMark);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::RowWrapMark);
     else if (!strcmp (action, "copy"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::CopyToClipboard);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::CopyToClipboard);
     else if (!strcmp (action, "cut"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::CutToClipboard);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::CutToClipboard);
     else if (!strcmp (action, "paste"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::PasteClipboard);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::PasteClipboard);
     else if (!strcmp (action, "eol"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::EndOfLine);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::EndOfLine);
     else if (!strcmp (action, "bol"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::BeginOfLine);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::BeginOfLine);
     else if (!strcmp (action, "eot"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::EndOfText);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::EndOfText);
     else if (!strcmp (action, "bot"))
-      bSucc = vDispatcher.Add (e, &awsMultiLineEdit::BeginOfText);
+      bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::BeginOfText);
   }
   return bSucc;
 }
@@ -541,15 +547,26 @@ void awsMultiLineEdit::OnDraw (csRect)
   g2d->SetClipRect (nr.xmin, nr.ymin, nr.xmax, nr.ymax);
 
   int y=contentRect.ymin;
-  char p[2];
-  p[1] = '\0';
+  char p[CS_UC_MAX_UTF8_ENCODED + 1];
+  //char p[2];
+  //p[1] = '\0';
 
   for (int i=toprow; i < vText.Length () && y < nr.ymax; i++)
   {
     if (y >= nr.ymin)
     {
       csString *s = vText[i];
-      if ((int)s->Length () > leftcol)
+      size_t strOfs = 0;
+      int col = leftcol;
+      while ((strOfs < s->Length ()) && (col > 0))
+      {
+	strOfs += csUnicodeTransform::UTF8Skip (
+	  (utf8_char*)s->GetData () + strOfs, s->Length () - strOfs);
+	col--;
+      }
+
+      //if ((int)s->Length () > leftcol)
+      if (strOfs < s->Length ())
       {
         // check if we have a marked substring to draw
         int m_from=-1, m_to=-1;
@@ -557,8 +574,9 @@ void awsMultiLineEdit::OnDraw (csRect)
 
         // this routine forces the variable width fonts to be displayed as fixed width ones
         int theCol = leftcol;
+	int theOfs = strOfs;
         int fcolor, bcolor;
-        const char *str = s->GetData () + theCol;
+        const char *str = s->GetData () + theOfs;
         int x = contentRect.xmin;
 
         if (m_from < m_to)
@@ -572,10 +590,16 @@ void awsMultiLineEdit::OnDraw (csRect)
           }
         }
 
+	size_t slen = s->Length () - strOfs;
         // @@@ : enhance - only try to write th chars visible inside the nr area
-        while (*str)
+        while (slen > 0)
         {
-          p[0] = *str++;
+	  int chSize = csUnicodeTransform::UTF8Skip ((utf8_char*)str, slen);
+	  memcpy (p, str, chSize);
+	  p[chSize] = 0;
+	  slen -= chSize;
+	  str += chSize;
+          //p[0] = *str++;
           if (theCol >= m_from && theCol < m_to)
             fcolor = bg, bcolor = -1;
           else
@@ -652,14 +676,29 @@ bool awsMultiLineEdit::GetMarked (int theRow, int &from, int &to)
   return false;
 }
 
-void awsMultiLineEdit::InsertChar (int c)
+void awsMultiLineEdit::InsertChar (utf32_char c)
 {
   if (c)
   {
     if (vText.Length () == 0)
       vText.Push (new csString);
-    csString *s=vText[row];
-    s->Insert (col, (const char)c);
+    csString *s = vText[row];
+    utf8_char ch[CS_UC_MAX_UTF8_ENCODED + 1];
+    int chSize = csUnicodeTransform::EncodeUTF8 (c,
+      ch, sizeof (ch) / sizeof (utf8_char));
+    ch[chSize] = 0;
+
+    size_t strOfs = 0;
+    int curCol = col;
+    while ((strOfs < s->Length ()) && (curCol > 0))
+    {
+      strOfs += csUnicodeTransform::UTF8Skip (
+	(utf8_char*)s->GetData () + strOfs, s->Length () - strOfs);
+      curCol--;
+    }
+
+    //s->Insert (col, (const char)c);
+    s->Insert (strOfs, (char*)ch);
     MoveCursor (row, col+1);  
   }
 }

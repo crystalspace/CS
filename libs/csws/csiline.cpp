@@ -242,123 +242,135 @@ bool csInputLine::HandleEvent (iEvent &Event)
         return true;
       }
       break;
-    case csevKeyDown:
-      switch (Event.Key.Code)
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_LEFT:
-        {
-          if (Event.Key.Modifiers & CSMASK_ALT)
-            break;
-          if (cursorpos == 0)
-            return true;
-          int newpos = cursorpos;
-          if (Event.Key.Modifiers & CSMASK_CTRL)
-            newpos = WordLeft (text, newpos);
-          else
-            newpos--;
-          SetCursorPos (newpos, (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
-          return true;
-        }
-        case CSKEY_RIGHT:
-        {
-          if (Event.Key.Modifiers & CSMASK_ALT)
-            break;
-          if (cursorpos >= (int)strlen (text))
-            return true;
-          int newpos = cursorpos;
-          if (Event.Key.Modifiers & CSMASK_CTRL)
-            newpos = WordRight (text, newpos);
-          else
-            newpos++;
-          SetCursorPos (newpos, (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
-          return true;
-        }
-        case CSKEY_HOME:
-          if (Event.Key.Modifiers & CSMASK_ALT)
-            break;
-          SetCursorPos (0, (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
-          return true;
-        case CSKEY_END:
-          if (Event.Key.Modifiers & CSMASK_ALT)
-            break;
-          SetCursorPos (strlen (text), (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
-          return true;
-        case CSKEY_BACKSPACE:
-          if (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
-            break;
-          if (cursorpos == 0)
-            return true;
-          cursorpos--;
-          // fallback to 'Del' key
-        case CSKEY_DEL:
-        {
-          if (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
-            break;
-          bool nosel = selstart == selend;
-          if (selstart == selend)
-            SetSelection (cursorpos, cursorpos + 1);
-          DeleteSelection ();
-          if (nosel)
-            SetSelection (0, 0);
-          return true;
-        } /* endif */
-        case CSKEY_INS:
-          if (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
-            break;
-          cursorvis = true;
-          Invalidate ();
-          return true;
-        case '/':
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-            SetSelection (0, strlen (text));
-          else
-            goto do_key;
-        case '\\':
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-            SetSelection (0, 0);
-          else
-            goto do_key;
-        case CSKEY_TAB:
-          break;
-        default:
-        {
-	  /*
-	    on german keyboards some chars are only available when
-	    pressing AltGr = Ctrl+Alt, so allow that combination.
-	   */
-do_key:   if ((((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT)) 
-	    != (CSMASK_CTRL | CSMASK_ALT))
-	   && ((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT)) != 0))
-           || (Event.Key.Char < 32))
-            return false;
-          if ((Event.Key.Char > 255) || !IsValidChar (Event.Key.Char))
-            return true;
-          DeleteSelection ();
-          CS_ALLOC_STACK_ARRAY (char, tmp, maxlen + 1);
-          strcpy (tmp, text);
-          int sl = strlen (tmp);
-          if (app->InsertMode)
-          {
-            if (sl >= maxlen)
-              return true;
-            tmp [cursorpos] = Event.Key.Char;
-            strcpy (&tmp [cursorpos + 1], &text [cursorpos]);
-          } else
-          {
-            if ((cursorpos > sl) || (cursorpos >= maxlen))
-              return true;
-            tmp [cursorpos] = Event.Key.Char;
-            if (cursorpos == sl)
-              tmp [sl + 1] = 0;
-          } /* endif */
-          if (IsValidString (tmp))
-          {
-            SetTextExt (tmp);
-            SetCursorPos (cursorpos + 1, false);
-          } /* endif */
-          return true;
-        }
-      } /* endswitch */
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_LEFT:
+	  {
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALT)
+	      break;
+	    if (cursorpos == 0)
+	      return true;
+	    int newpos = cursorpos;
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL)
+	      newpos = WordLeft (text, newpos);
+	    else
+	      newpos--;
+	    SetCursorPos (newpos, (csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_SHIFT) != 0);
+	    return true;
+	  }
+	  case CSKEY_RIGHT:
+	  {
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALT)
+	      break;
+	    if (cursorpos >= (int)strlen (text))
+	      return true;
+	    int newpos = cursorpos;
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL)
+	      newpos = WordRight (text, newpos);
+	    else
+	      newpos++;
+	    SetCursorPos (newpos, (csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_SHIFT) != 0);
+	    return true;
+	  }
+	  case CSKEY_HOME:
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALT)
+	      break;
+	    SetCursorPos (0, (csKeyEventHelper::GetModifiersBits (&Event) & 
+	      CSMASK_SHIFT) != 0);
+	    return true;
+	  case CSKEY_END:
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALT)
+	      break;
+	    SetCursorPos (strlen (text), (
+	      csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_SHIFT) != 0);
+	    return true;
+	  case CSKEY_BACKSPACE:
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALLSHIFTS)
+	      break;
+	    if (cursorpos == 0)
+	      return true;
+	    cursorpos--;
+	    // fallback to 'Del' key
+	  case CSKEY_DEL:
+	  {
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALLSHIFTS)
+	      break;
+	    bool nosel = selstart == selend;
+	    if (selstart == selend)
+	      SetSelection (cursorpos, cursorpos + 1);
+	    DeleteSelection ();
+	    if (nosel)
+	      SetSelection (0, 0);
+	    return true;
+	  } /* endif */
+	  case CSKEY_INS:
+	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALLSHIFTS)
+	      break;
+	    cursorvis = true;
+	    Invalidate ();
+	    return true;
+	  case '/':
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALLSHIFTS) == 
+	      CSMASK_CTRL)
+	      SetSelection (0, strlen (text));
+	    else
+	      goto do_key;
+	  case '\\':
+	    if ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALLSHIFTS) == 
+	      CSMASK_CTRL)
+	      SetSelection (0, 0);
+	    else
+	      goto do_key;
+	  case CSKEY_TAB:
+	    break;
+	  default:
+	  {
+	    /*
+	      on german keyboards some chars are only available when
+		pressing AltGr = Ctrl+Alt, so allow that combination.
+	    */
+  do_key:   if ((((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      (CSMASK_CTRL | CSMASK_ALT)) 
+	      != (CSMASK_CTRL | CSMASK_ALT))
+	    && ((csKeyEventHelper::GetModifiersBits (&Event) & 
+	      (CSMASK_CTRL | CSMASK_ALT)) != 0))
+	    || (csKeyEventHelper::GetCookedCode (&Event) < 32))
+	      return false;
+	    if ((csKeyEventHelper::GetCookedCode (&Event) > 255) || 
+	      !IsValidChar (csKeyEventHelper::GetCookedCode (&Event)))
+	      return true;
+	    DeleteSelection ();
+	    CS_ALLOC_STACK_ARRAY (char, tmp, maxlen + 1);
+	    strcpy (tmp, text);
+	    int sl = strlen (tmp);
+	    if (app->InsertMode)
+	    {
+	      if (sl >= maxlen)
+		return true;
+	      tmp [cursorpos] = (char)csKeyEventHelper::GetCookedCode (&Event);
+	      strcpy (&tmp [cursorpos + 1], &text [cursorpos]);
+	    } else
+	    {
+	      if ((cursorpos > sl) || (cursorpos >= maxlen))
+		return true;
+	      tmp [cursorpos] = (char)csKeyEventHelper::GetCookedCode (&Event);
+	      if (cursorpos == sl)
+		tmp [sl + 1] = 0;
+	    } /* endif */
+	    if (IsValidString (tmp))
+	    {
+	      SetTextExt (tmp);
+	      SetCursorPos (cursorpos + 1, false);
+	    } /* endif */
+	    return true;
+	  }
+	} /* endswitch */
+      }
       break;
   } /* endswitch */
   return csComponent::HandleEvent (Event);

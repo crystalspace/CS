@@ -118,7 +118,7 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler,
-			 CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown);
+			 CSMASK_Nothing | CSMASK_Keyboard);
 
   // Unregister the normal virtual clock and register our own
   // replacement, hoping nobody will notice :)
@@ -245,11 +245,7 @@ void csMovieRecorder::SetupPlugin()
 
 bool csMovieRecorder::HandleEvent (iEvent &event)
 {
-  if (event.Type == csevKeyDown)
-  {
-    return EatKey (event);
-  }
-  else if (event.Type == csevKeyUp)
+  if (event.Type == csevKeyboard)
   {
     return EatKey (event);
   }
@@ -271,14 +267,16 @@ bool csMovieRecorder::HandleEvent (iEvent &event)
 bool csMovieRecorder::EatKey (iEvent& event)
 {
   SetupPlugin();
-  bool down = event.Type == csevKeyDown;
-  bool alt = event.Key.Modifiers & CSMASK_ALT;
-  bool ctrl = event.Key.Modifiers & CSMASK_CTRL;
-  bool shift = event.Key.Modifiers & CSMASK_SHIFT;
-  int key = event.Key.Code;
+  bool down = csKeyEventHelper::GetEventType (&event);
+  csKeyModifiers m;
+  csKeyEventHelper::GetModifiers (&event, m);
+  bool alt = m.modifiers[csKeyModifierTypeAlt] != 0;
+  bool ctrl = m.modifiers[csKeyModifierTypeCtrl] != 0;
+  bool shift = m.modifiers[csKeyModifierTypeShift] != 0;
+  utf32_char key = csKeyEventHelper::GetCookedCode (&event);
 
-  if (down && key==keyRecord.code && alt==keyRecord.alt && 
-      ctrl==keyRecord.ctrl && shift==keyRecord.shift) 
+  if (down && (key == keyRecord.code) && (alt == keyRecord.alt) && 
+      (ctrl == keyRecord.ctrl) && (shift == keyRecord.shift)) 
   {
     if (IsRecording())
 	Stop();

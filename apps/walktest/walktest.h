@@ -73,7 +73,8 @@ struct iGraphics2D;
 struct csKeyMap
 {
   csKeyMap* next, * prev;
-  int key, shift, alt, ctrl;
+  utf32_char key;
+  bool shift, alt, ctrl;
   char* cmd;
   int need_status,is_on;
 };
@@ -500,7 +501,7 @@ public:
   void RotateCam(float x, float y);
   
   ///
-  void eatkeypress (iEvent &Event);
+  void eatkeypress (iEvent* Event);
 
   /// Handle mouse click events
   virtual void MouseClick1Handler(iEvent &Event);

@@ -19,6 +19,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 # include "awscomp.h"
+#include "iutil/csinput.h"
 
 class awsTextBox :
   public awsComponent
@@ -51,16 +52,27 @@ class awsTextBox :
   iString *maskchar;
 
   /// Position of first character we display.
-  int start;
+  //int start;
+  int strStart;
 
   /// Position of cursor
-  unsigned int cursor;
+  //unsigned int cursor;
+  uint strCursor;
 
   /// The timer that makes the cursor blink.
   awsTimer *blink_timer;
 
   /// The current blink state.
   bool blink;
+
+  /// The key composer.
+  csRef<iKeyComposer> composer;
+
+  /**
+   * Make sure that the start of the displayed text is \p dist chars before 
+   * the cursor, if possible.
+   */
+  void EnsureCursorToStartDistance (int dist);
 public:
   awsTextBox ();
   virtual ~awsTextBox ();
@@ -117,7 +129,7 @@ public:
   virtual bool OnMouseEnter ();
 
   /// Triggered when the user presses a key
-  virtual bool OnKeypress (int key, int cha, int modifiers);
+  virtual bool OnKeyboard (const csKeyEventData& eventData);
 
   /// Triggered when the keyboard focus is lost
   virtual bool OnLostFocus ();

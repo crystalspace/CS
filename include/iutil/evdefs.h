@@ -41,10 +41,8 @@ enum
 {
   /// Nothing happened	
   csevNothing = 0,
-  /// A key has been pressed
-  csevKeyDown,			
-  /// A key has been released
-  csevKeyUp,			
+  /// A keyboard event (key down/up)			
+  csevKeyboard,
   /// Mouse has been moved
   csevMouseMove,		
   /// A mouse button has been pressed
@@ -84,6 +82,15 @@ enum
   csevFrameStart        
 };
 
+/// Keyboard event type
+enum csKeyEventType
+{
+  /// A 'key down' event
+  csKeyEventTypeUp = 0,
+  /// A 'key up' event
+  csKeyEventTypeDown
+};
+
 /** \name Event masks
  * The event masks can be used by plugins to tell an event queue, via
  * iEventQueue::RegisterListener, which kinds of events they want to receive at
@@ -105,10 +112,8 @@ enum
  * equal to cscmdPreProcess, csProcess, cscmdPostProcess, or cscmdFinalProcess.
  */
 #define CSMASK_FrameProcess	CSMASK_Nothing
-/// Key down events
-#define CSMASK_KeyDown		(1 << csevKeyDown)
-/// Key up events
-#define CSMASK_KeyUp		(1 << csevKeyUp)
+/// Keyboard events
+#define CSMASK_Keyboard		(1 << csevKeyboard)
 /// Mouse move events
 #define CSMASK_MouseMove	(1 << csevMouseMove)
 /// Mouse down events
@@ -132,9 +137,6 @@ enum
 /// Network message events
 #define CSMASK_Network		(1 << csevNetwork)
 
-/// This mask identifies any keyboard event
-#define CSMASK_Keyboard \
-  (CSMASK_KeyDown | CSMASK_KeyUp)
 /// This mask identifies any mouse event
 #define CSMASK_Mouse \
   (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseClick | \
@@ -172,104 +174,315 @@ enum
 #define CSEF_BROADCAST		0x00000001
 /** @} */
 
+/**\name Modifier keys
+ * \sa Keyboard events, Modifier key masks
+ * @{ */
+/// Modifier types
+enum
+{
+  /// 'Shift' is held
+  csKeyModifierTypeShift = 0,
+  /// 'Ctrl' is held
+  csKeyModifierTypeCtrl,
+  /// 'Alt' is held
+  csKeyModifierTypeAlt,
+  /// 'CapsLock' is toggled
+  csKeyModifierTypeCapsLock,
+  /// 'NumLock' is toggled
+  csKeyModifierTypeNumLock,
+  /// 'ScrollLock' is toggled
+  csKeyModifierTypeScrollLock,
+  
+  /// \internal Can be used to get the number of defined modifier types.
+  csKeyModifierTypeLast
+};
+
+/// Modifier numbers
+enum
+{
+  /// The default number for a 'left' version of a key.
+  csKeyModifierNumLeft = 0,
+  /// The default number for a 'right' version of a key.
+  csKeyModifierNumRight,
+  
+  /**
+   * 'Magic' modifier number used if there shouldn't be distinguished between
+   * multiple modifier keys of the same type.
+   */
+  csKeyModifierNumAny = 0x1f
+};
+
+/// Flags for all currently pressed modifiers.
+struct csKeyModifiers
+{
+  /**
+   * Bitmasks for different modifiers.
+   * If the modifier number <i>n></i> was pressed, the <i>n</i>th bit is set.
+   * <p>
+   * Example - testing for a specific modifier:
+   * \code
+   * csKeyModifiers m;
+   * bool rightAlt = m.modifiers[csKeyModifierTypeAlt] & 
+   *   (1 << csKeyModifierNumRight);
+   * \endcode
+   * Example - testing if any modifier of a type is pressed:
+   * \code
+   * csKeyModifiers m;
+   * bool ctrl = m.modifiers[csKeyModifierTypeAlt] != 0;
+   * \endcode
+   */
+  uint32 modifiers[csKeyModifierTypeLast];
+};
+/** @} */
+
 /** \name Modifier key masks
- * Every input event (keyboard, mouse and joystick) contains a Modifiers
- * field which is a bitfield consisting of any combination of the masks
- * below. Having one in one of the bits means that the corresponding
- * modifier was pressed at the time when event happened.
+ * csKeyEventHelper::GetModifiersBits() returns such a bitfields consisting 
+ * of any combination of the masks below. Having one in one of the bits means 
+ * that the corresponding modifier was pressed in the modifier state passed 
+ * in.
  * @{ */
 /// "Shift" key mask
-#define CSMASK_SHIFT		0x00000001
+#define CSMASK_SHIFT		(1 << csKeyModifierTypeShift)
 /// "Ctrl" key mask
-#define CSMASK_CTRL		0x00000002
+#define CSMASK_CTRL		(1 << csKeyModifierTypeCtrl)
 /// "Alt" key mask
-#define CSMASK_ALT		0x00000004
+#define CSMASK_ALT		(1 << csKeyModifierTypeAlt)
 /// All shift keys
 #define CSMASK_ALLSHIFTS	(CSMASK_SHIFT | CSMASK_CTRL | CSMASK_ALT)
-/// Key is pressed for first time or it is an autorepeat?
-#define CSMASK_FIRST		0x80000000
+
+/// "CapsLock" key mask
+#define CSMASK_CAPSLOCK		(1 << csKeyModifierTypeCapsLock)
+/// "NumLock" key mask
+#define CSMASK_NUMLOCK		(1 << csKeyModifierTypeNumLock)
+/// "ScrollLock" key mask
+#define CSMASK_SCROLLLOCK	(1 << csKeyModifierTypeScrollLock)
+/// All modifiers, shift and lock types
+#define CSMASK_ALLMODIFIERS	(CSMASK_CAPSLOCK | CSMASK_NUMLOCK | \
+				 CSMASK_SCROLLLOCK | CSMASK_ALLSHIFTS)
 /** @} */
 
 /** \name Control key codes
  * Not every existing key on any existing platform is supported by
  * Crystal Space. Instead, we tried to list here all the keys that
- * are common among all platforms on which Crystal Space runs.
+ * are common among all platforms on which Crystal Space runs. There
+ * may still be some keys that aren't supported on some platforms, tho.
+ * <p>
+ * Be aware that the range of the special keys has been arbitrarily, but
+ * careful chosen. In particular, all special keys fall into a part of the
+ * Unicode "Supplementary Private Use Area-B", so all keycodes in CS are
+ * always valid Unicode codepoints.
  * @{ */
 /// ESCape key
-#define CSKEY_ESC		27
+#define CSKEY_ESC			27
 /// Enter key
-#define CSKEY_ENTER		'\n'
+#define CSKEY_ENTER			'\n'
 /// Tab key
-#define CSKEY_TAB		'\t'
+#define CSKEY_TAB			'\t'
 /// Back-space key
-#define CSKEY_BACKSPACE		'\b'
+#define CSKEY_BACKSPACE			'\b'
 /// Space key
-#define CSKEY_SPACE		' '
-/// Up arrow key
-#define CSKEY_UP		1000
-/// Down arrow key
-#define CSKEY_DOWN		1001
-/// Left arrow key
-#define CSKEY_LEFT		1002
-/// Right arrow key
-#define CSKEY_RIGHT		1003
-/// PageUp key
-#define CSKEY_PGUP		1004
-/// PageDown key
-#define CSKEY_PGDN		1005
-/// Home key
-#define CSKEY_HOME		1006
-/// End key
-#define CSKEY_END		1007
-/// Insert key
-#define CSKEY_INS		1008
-/// Delete key
-#define CSKEY_DEL		1009
-/// Control key
-#define CSKEY_CTRL		1010
-/// Alternative shift key
-#define CSKEY_ALT		1011
-/// Shift key
-#define CSKEY_SHIFT		1012
-/// Function key F1
-#define CSKEY_F1		1013
-/// Function key F2
-#define CSKEY_F2		1014
-/// Function key F3
-#define CSKEY_F3		1015
-/// Function key F4
-#define CSKEY_F4		1016
-/// Function key F5
-#define CSKEY_F5		1017
-/// Function key F6
-#define CSKEY_F6		1018
-/// Function key F7
-#define CSKEY_F7		1019
-/// Function key F8
-#define CSKEY_F8		1020
-/// Function key F9
-#define CSKEY_F9		1021
-/// Function key F10
-#define CSKEY_F10		1022
-/// Function key F11
-#define CSKEY_F11		1023
-/// Function key F12
-#define CSKEY_F12		1024
-/// The "center" key ("5" on numeric keypad)
-#define CSKEY_CENTER		1025
-/// Numeric keypad '+'
-#define CSKEY_PADPLUS		1026
-/// Numeric keypad '-'
-#define CSKEY_PADMINUS		1027
-/// Numeric keypad '*'
-#define CSKEY_PADMULT		1028
-/// Numeric keypad '/'
-#define CSKEY_PADDIV		1029
+#define CSKEY_SPACE			' '
 
-/// First control key code
-#define CSKEY_FIRST		1000
-/// Last control key code
-#define CSKEY_LAST		1029
+/// The lowest code of a special key.
+#define CSKEY_SPECIAL_FIRST		0x108000
+/// The highest code of a special key.
+#define CSKEY_SPECIAL_LAST		0x10fffd
+/// Helper macro to construct a special key code.
+#define CSKEY_SPECIAL(code)		(CSKEY_SPECIAL_FIRST + (code))
+/// Helper macro to determine whether a key code identifies a special key.
+#define CSKEY_IS_SPECIAL(rawCode)	\
+  ((rawCode >= CSKEY_SPECIAL_FIRST) && (rawCode <= CSKEY_SPECIAL_LAST))
+/// Helper macro to determine the parameter that was given to #CSKEY_SPECIAL.
+#define CSKEY_SPECIAL_NUM(rawCode)	(rawCode - CSKEY_SPECIAL_FIRST)
+
+/// Up arrow key
+#define CSKEY_UP			CSKEY_SPECIAL(0x00)
+/// Down arrow key
+#define CSKEY_DOWN			CSKEY_SPECIAL(0x01)
+/// Left arrow key
+#define CSKEY_LEFT			CSKEY_SPECIAL(0x02)
+/// Right arrow key
+#define CSKEY_RIGHT			CSKEY_SPECIAL(0x03)
+/// PageUp key
+#define CSKEY_PGUP			CSKEY_SPECIAL(0x04)
+/// PageDown key
+#define CSKEY_PGDN			CSKEY_SPECIAL(0x05)
+/// Home key
+#define CSKEY_HOME			CSKEY_SPECIAL(0x06)
+/// End key
+#define CSKEY_END			CSKEY_SPECIAL(0x07)
+/// Insert key
+#define CSKEY_INS			CSKEY_SPECIAL(0x08)
+/// Delete key
+#define CSKEY_DEL			CSKEY_SPECIAL(0x09)
+/// The "Context menu" key on Windows keyboards
+#define CSKEY_CONTEXT			CSKEY_SPECIAL(0x0a)
+/// The Print Screen key
+#define CSKEY_PRINTSCREEN		CSKEY_SPECIAL(0x0b)
+/// The Pause key
+#define CSKEY_PAUSE			CSKEY_SPECIAL(0x0c)
+/// Function key F1
+#define CSKEY_F1			CSKEY_SPECIAL(0x10)
+/// Function key F2
+#define CSKEY_F2			CSKEY_SPECIAL(0x11)
+/// Function key F3
+#define CSKEY_F3			CSKEY_SPECIAL(0x12)
+/// Function key F4
+#define CSKEY_F4			CSKEY_SPECIAL(0x13)
+/// Function key F5
+#define CSKEY_F5			CSKEY_SPECIAL(0x14)
+/// Function key F6
+#define CSKEY_F6			CSKEY_SPECIAL(0x15)
+/// Function key F7
+#define CSKEY_F7			CSKEY_SPECIAL(0x16)
+/// Function key F8
+#define CSKEY_F8			CSKEY_SPECIAL(0x17)
+/// Function key F9
+#define CSKEY_F9			CSKEY_SPECIAL(0x18)
+/// Function key F10
+#define CSKEY_F10			CSKEY_SPECIAL(0x19)
+/// Function key F11
+#define CSKEY_F11			CSKEY_SPECIAL(0x1a)
+/// Function key F12
+#define CSKEY_F12			CSKEY_SPECIAL(0x1b)
+
+/// The lowest code of a modifier key.
+#define CSKEY_MODIFIER_FIRST		0x2000
+/// The highest code of a modifier key.
+#define CSKEY_MODIFIER_LAST		0x3fff
+/**
+ * \internal How many bits to distinguish between modifier keys of the same 
+ * type?
+ */
+#define CSKEY_MODIFIERTYPE_SHIFT	5
+/// Helper macro to construct a modifiers key code.
+#define CSKEY_MODIFIER(type, num)		\
+  CSKEY_SPECIAL(CSKEY_MODIFIER_FIRST + (type << CSKEY_MODIFIERTYPE_SHIFT) + num)
+/// Helper macro to test whether a key code identifies a modifier.
+#define CSKEY_IS_MODIFIER(rawCode)	\
+  (CSKEY_IS_SPECIAL(rawCode) && 	\
+    ((CSKEY_SPECIAL_NUM(rawCode) >= CSKEY_MODIFIER_FIRST) && \
+     (CSKEY_SPECIAL_NUM(rawCode) <= CSKEY_MODIFIER_LAST)))
+/// Helper macro to determine the modifier type of a key code.
+#define CSKEY_MODIFIER_TYPE(rawCode)	\
+  ((rawCode - CSKEY_MODIFIER_FIRST - CSKEY_SPECIAL_FIRST) >> \
+  CSKEY_MODIFIERTYPE_SHIFT)
+/// Helper macro to determine the modifier number of a key code.
+#define CSKEY_MODIFIER_NUM(rawCode)	\
+  ((rawCode - CSKEY_MODIFIER_FIRST - CSKEY_SPECIAL_FIRST) & \
+  ((1 << CSKEY_MODIFIERTYPE_SHIFT) - 1))  
+
+/// Construct a key code for the Shift modifier key number \a n.
+#define CSKEY_SHIFT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeShift, n)
+/// Lowest code of the Shift modifier keys
+#define CSKEY_SHIFT_FIRST		CSKEY_SHIFT_NUM(0)
+/// Highest code of the Shift modifier keys
+#define CSKEY_SHIFT_LAST		CSKEY_SHIFT_NUM(0x1e)
+
+/// Left Shift
+#define CSKEY_SHIFT_LEFT		CSKEY_SHIFT_NUM(csKeyModifierNumLeft)
+/// Right Shift
+#define CSKEY_SHIFT_RIGHT		CSKEY_SHIFT_NUM(csKeyModifierNumRight)
+/// Undistinguished Shift
+#define CSKEY_SHIFT			CSKEY_SHIFT_NUM(csKeyModifierNumAny)
+
+/// Construct a key code for the Ctrl modifier key number \a n.
+#define CSKEY_CTRL_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeCtrl, n)
+/// Lowest code of the Ctrl modifier keys
+#define CSKEY_CTRL_FIRST		CSKEY_CTRL_NUM(0)
+/// Highest code of the Ctrl modifier keys
+#define CSKEY_CTRL_LAST			CSKEY_CTRL_NUM(0x1e)
+
+/// Left Ctrl
+#define CSKEY_CTRL_LEFT			CSKEY_CTRL_NUM(csKeyModifierNumLeft)
+/// Right Ctrl
+#define CSKEY_CTRL_RIGHT		CSKEY_CTRL_NUM(csKeyModifierNumRight)
+/// Undistinguished Ctrl
+#define CSKEY_CTRL			CSKEY_CTRL_NUM(csKeyModifierNumAny)
+
+/// Construct a key code for the Alt modifier key number \a n.
+#define CSKEY_ALT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeAlt, n)
+/// Lowest code of the Alt modifier keys
+#define CSKEY_ALT_FIRST			CSKEY_ALT_NUM(0)
+/// Highest code of the Alt modifier keys
+#define CSKEY_ALT_LAST			CSKEY_ALT_NUM(0x1e)
+
+/// Left Alt
+#define CSKEY_ALT_LEFT			CSKEY_ALT_NUM(csKeyModifierNumLeft)
+/// Right Alt
+#define CSKEY_ALT_RIGHT			CSKEY_ALT_NUM(csKeyModifierNumRight)
+/// Undistinguished Alt
+#define CSKEY_ALT			CSKEY_ALT_NUM(csKeyModifierNumAny)
+
+/// Bit that is set if a key is from the keypad.
+#define CSKEY_PAD_FLAG			0x4000
+/// Helper macro to construct a keypade key code.
+#define CSKEY_PAD_KEY(code)		CSKEY_SPECIAL(code | CSKEY_PAD_FLAG)
+
+/// Helper macro to test whether a key code identifies a keypad key.
+#define CSKEY_IS_PAD_KEY(rawCode)	((rawCode & CSKEY_PAD_FLAG) != 0)
+/**
+ * Helper macro to convert a 'pad' key code into a 'normal' special key code.
+ */
+#define CSKEY_PAD_TO_NORMAL(rawCode)	(rawCode & (~CSKEY_PAD_FLAG))
+
+/// Keypad 1
+#define CSKEY_PAD1			CSKEY_PAD_KEY('1')
+/// Keypad 2
+#define CSKEY_PAD2			CSKEY_PAD_KEY('2')
+/// Keypad 3
+#define CSKEY_PAD3			CSKEY_PAD_KEY('3')
+/// Keypad 4
+#define CSKEY_PAD4			CSKEY_PAD_KEY('4')
+/// Keypad 5
+#define CSKEY_PAD5			CSKEY_PAD_KEY('5')
+/// Keypad "Center" (5)
+#define CSKEY_CENTER			CSKEY_PAD5
+/// Keypad 6
+#define CSKEY_PAD6			CSKEY_PAD_KEY('6')
+/// Keypad 7
+#define CSKEY_PAD7			CSKEY_PAD_KEY('7')
+/// Keypad 8
+#define CSKEY_PAD8			CSKEY_PAD_KEY('8')
+/// Keypad 9
+#define CSKEY_PAD9			CSKEY_PAD_KEY('9')
+/// Keypad 0
+#define CSKEY_PAD0			CSKEY_PAD_KEY('0')
+/// Keypad Decimal ('.' on English keyboards)
+#define CSKEY_PADDECIMAL		CSKEY_PAD_KEY('.')
+/// Keypad Divide
+#define CSKEY_PADDIV			CSKEY_PAD_KEY('/')
+/// Keypad Multiply
+#define CSKEY_PADMULT			CSKEY_PAD_KEY('*')
+/// Keypad Minus
+#define CSKEY_PADMINUS			CSKEY_PAD_KEY('-')
+/// Keypad Plus
+#define CSKEY_PADPLUS			CSKEY_PAD_KEY('+')
+/// Keypad Enter
+#define CSKEY_PADENTER			CSKEY_PAD_KEY('\n')
+
+/**
+ * NumLock key.
+ * Both a modifier and a keypad key.
+ */
+#define CSKEY_PADNUM			\
+  CSKEY_MODIFIER(csKeyModifierTypeNumLock, csKeyModifierNumAny) | CSKEY_PAD_FLAG
+/// CapsLock key
+#define CSKEY_CAPSLOCK			\
+  CSKEY_MODIFIER(csKeyModifierTypeCapsLock, csKeyModifierNumAny)
+/// ScrollLock key
+#define CSKEY_SCROLLLOCK		\
+  CSKEY_MODIFIER(csKeyModifierTypeScrollLock, csKeyModifierNumAny)
+
+/// Character types
+enum csKeyCharType
+{
+  /// Normal character
+  csKeyCharTypeNormal = 0,
+  /// "Dead" character
+  csKeyCharTypeDead
+};
+
 /** @} */
 
 /** \name Event class masks
@@ -373,9 +586,8 @@ enum
    * help text for all supported command-line switches. Upon reception
    * of such event every plugin should display a short help for any
    * of the command-line switches it supports. The general format is:
-   *<pre>
-   * <2 spaces><switch - 18 positions><space><switch description>{default value}
-   *</pre>
+   * <pre>&lt;2 spaces&gt;&lt;switch - 18 positions&gt;&lt;space&gt;</pre>
+   * <pre>&lt;switch description&gt;{default value}</pre>
    * The help should be displayed to standard output.
    */
   cscmdCommandLineHelp,

@@ -216,37 +216,40 @@ bool csMenuItem::HandleEvent (iEvent &Event)
 
   switch (Event.Type)
   {
-    case csevKeyDown:
-      // Check hot key
-      if ((underline_pos >= 0)
-       && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
-       && ((toupper (Event.Key.Char) == toupper (text [underline_pos]))
-        || (toupper (Event.Key.Code) == toupper (text [underline_pos]))))
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        Press ();
-        return true;
+	// Check hot key
+	if ((underline_pos >= 0)
+	  && ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL) == 0)
+	  && ((toupper (csKeyEventHelper::GetCookedCode (&Event)) == 
+	    toupper (text [underline_pos]))))
+	{
+	  Press ();
+	  return true;
+	}
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_LEFT:
+	    if ((focused)
+	    && (focused->GetState (CSS_VISIBLE))
+	    && (!((csMenu *)parent)->IsMenuBar ()))
+	    {
+	      parent->SendCommand (cscmdMenuSetDropFlag, (void *)false);
+	      return true;
+	    };
+	    return false;
+	  case CSKEY_RIGHT:
+	    if ((focused)
+	    && (!focused->GetState (CSS_VISIBLE))
+	    && (!((csMenu *)parent)->IsMenuBar ()))
+	    {
+	      parent->SendCommand (cscmdMenuSetDropFlag, (void *)true);
+	      return true;
+	    };
+	    return false;
+	} /* endswitch */
       }
-      switch (Event.Key.Code)
-      {
-        case CSKEY_LEFT:
-          if ((focused)
-           && (focused->GetState (CSS_VISIBLE))
-           && (!((csMenu *)parent)->IsMenuBar ()))
-          {
-            parent->SendCommand (cscmdMenuSetDropFlag, (void *)false);
-            return true;
-          };
-          return false;
-        case CSKEY_RIGHT:
-          if ((focused)
-           && (!focused->GetState (CSS_VISIBLE))
-           && (!((csMenu *)parent)->IsMenuBar ()))
-          {
-            parent->SendCommand (cscmdMenuSetDropFlag, (void *)true);
-            return true;
-          };
-          return false;
-      } /* endswitch */
       break;
     case csevMouseDown:
       if (Event.Mouse.Button == 2)
@@ -686,48 +689,51 @@ bool csMenu::HandleEvent (iEvent &Event)
       CurrentHandleEvent (Event);
       return true;
     } /* endif */
-    case csevKeyDown:
+    case csevKeyboard:
     {
-      if (GetState (CSS_FOCUSED) && current
-       && CurrentHandleEvent (Event))
-        return true;
-      switch (Event.Key.Code)
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-        case CSKEY_ESC:
-          if (parent->SendCommand (cscmdMenuSetDropFlag, (void *)false) == 0)
-          {
-            Deactivate (cscmdCancel);
-            return true;
-          }
-          return false;
-        case CSKEY_ENTER:
-          if (current)
-          {
-            current->SendCommand (cscmdActivate);
-            return true;
-          }
-          return false;
-        case CSKEY_LEFT:
-          return ExecuteKey (CSKEY_LEFT);
-        case CSKEY_RIGHT:
-          return ExecuteKey (CSKEY_RIGHT);
-        case CSKEY_UP:
-          return ExecuteKey (CSKEY_UP);
-        case CSKEY_DOWN:
-          if (ExecuteKey (CSKEY_DOWN))
-            return true;
-          else
-          {
-            if (IsMenuBar () && !SubMenuOpened)
-            {
-              SendCommand (cscmdMenuSetDropFlag, (void *)true);
-              return true;
-            } /* endif */
-            return false;
-          } /* endif */
-        default:
-          return !!(ForEach (do_forall, &Event));
-      } /* endswitch */
+	if (GetState (CSS_FOCUSED) && current
+	&& CurrentHandleEvent (Event))
+	  return true;
+	switch (csKeyEventHelper::GetCookedCode (&Event))
+	{
+	  case CSKEY_ESC:
+	    if (parent->SendCommand (cscmdMenuSetDropFlag, (void *)false) == 0)
+	    {
+	      Deactivate (cscmdCancel);
+	      return true;
+	    }
+	    return false;
+	  case CSKEY_ENTER:
+	    if (current)
+	    {
+	      current->SendCommand (cscmdActivate);
+	      return true;
+	    }
+	    return false;
+	  case CSKEY_LEFT:
+	    return ExecuteKey (CSKEY_LEFT);
+	  case CSKEY_RIGHT:
+	    return ExecuteKey (CSKEY_RIGHT);
+	  case CSKEY_UP:
+	    return ExecuteKey (CSKEY_UP);
+	  case CSKEY_DOWN:
+	    if (ExecuteKey (CSKEY_DOWN))
+	      return true;
+	    else
+	    {
+	      if (IsMenuBar () && !SubMenuOpened)
+	      {
+		SendCommand (cscmdMenuSetDropFlag, (void *)true);
+		return true;
+	      } /* endif */
+	      return false;
+	    } /* endif */
+	  default:
+	    return !!(ForEach (do_forall, &Event));
+	} /* endswitch */
+      }
       break;
     }
     case csevCommand:
@@ -787,12 +793,13 @@ bool csMenu::PreHandleEvent (iEvent &Event)
   if (parent->GetState (CSS_FOCUSED)
    && GetState (CSS_VISIBLE)
    && !GetState (CSS_FOCUSED)
-   && (Event.Type == csevKeyDown))
+   && ((Event.Type == csevKeyboard) &&
+     (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)))
   {
     // if we aren't active, and ALT is not pressed,
     // or Ctrl is pressed, skip this event
-    if (((Event.Key.Modifiers & CSMASK_ALT) == 0)
-     || (Event.Key.Modifiers & CSMASK_CTRL))
+    if (((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALT) == 0)
+     || (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL))
       return false;
     // Cycle through all menu items, checking for hotkey
     if (ForEach (do_forall, &Event))

@@ -197,10 +197,9 @@ bool awsLabel::OnMouseEnter ()
   return true;
 }
 
-bool awsLabel::OnKeypress (int key, int cha, int modifiers)
+bool awsLabel::OnKeyboard (const csKeyEventData& eventData)
 {
-  char chr = (char)key;
-  switch(chr)
+  switch(eventData.codeCooked)
   {
     case CSKEY_ENTER:
 		  Broadcast (signalClicked);

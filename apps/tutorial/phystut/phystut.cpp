@@ -143,41 +143,49 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   }
-
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_SPACE)
+  else if ((ev.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
   {
-    if (rand()%2) CreateBox (); else CreateSphere ();
-    return true;
+    if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
+    {
+      if (rand()%2) CreateBox (); else CreateSphere ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
+    {
+      CreateBox ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
+    {
+      CreateSphere ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
+    {
+      CreateJointed ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
+    { // Toggle gravity.
+      dynSys->SetGravity (dynSys->GetGravity () == 0 ?
+       csVector3 (0,-7,0) : csVector3 (0));
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
+    {
+      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+      return true;
+    } 
   }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == 'b')
+  else if ((ev.Type == csevKeyboard) && 
+    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp) &&
+    ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) ||
+    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
   {
-    CreateBox ();
-    return true;
-  }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == 's')
-  {
-    CreateSphere ();
-    return true;
-  }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == 'j')
-  {
-    CreateJointed ();
-    return true;
-  }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == 'g')
-  { // Toggle gravity.
-    dynSys->SetGravity (dynSys->GetGravity () == 0 ?
-     csVector3 (0,-7,0) : csVector3 (0));
-    return true;
-  }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
-  {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
-    return true;
-  } else if(ev.Type == csevKeyUp && (ev.Key.Code == CSKEY_DOWN || ev.Key.Code == CSKEY_UP)) {
-      avatarbody->SetLinearVelocity(csVector3 (0, 0, 0));
-      avatarbody->SetAngularVelocity (csVector3 (0, 0, 0));
+    avatarbody->SetLinearVelocity(csVector3 (0, 0, 0));
+    avatarbody->SetAngularVelocity (csVector3 (0, 0, 0));
   }
 
   return false;

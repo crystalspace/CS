@@ -142,11 +142,8 @@ protected:
   /// Invoked by the event handler when a joystick button up event is received.
   virtual bool OnJoystickUp (iEvent &event);
 
-  /// Invoked by the event handler when a keyboard down event is received.
-  virtual bool OnKeyDown (iEvent &event);
-
-  /// Invoked by the event handler when a keyboard up event is received.
-  virtual bool OnKeyUp (iEvent &event);
+  /// Invoked by the event handler when a keyboard event is received.
+  virtual bool OnKeyboard (iEvent &event);
 
   /// Invoked by the event handler when a mouse move event is received.
   virtual bool OnMouseMove (iEvent &event);
