@@ -73,6 +73,8 @@ The history order is reversed so that new features are at the top.
 	  because they were incorrect.  Instead, fixed the actual problem (a
 	  misplaced `const') which prompted the 1.3 changes.  (And, yes, the
 	  present changes have been tested. :-)
+	- Eric Sunshine eliminated a few instances of NULL which had creeped
+	  back into the project.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

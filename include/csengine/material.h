@@ -123,11 +123,11 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) { return false; }
   /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash) { return NULL; }
+  virtual iShaderVariable* GetVariable(int namehash) { return 0; }
   /// Get all variable names added to this context (used when creating them)
   virtual csBasicVector GetAllVariableNames() const { return csBasicVector (); }
   /// Get the symbol table (used by the implementation to store the variables)
-  virtual csSymbolTable* GetSymbolTable() { return NULL; }
+  virtual csSymbolTable* GetSymbolTable() { return 0; }
 #endif
 
   /// Set effect.

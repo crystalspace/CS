@@ -182,7 +182,7 @@ bool csDefaultsConfig::GetBool (const char *Key, bool Def) const
 
 const char *csDefaultsConfig::GetComment (const char *Key) const
 {
-  return NULL;
+  return 0;
 }
 
 void csDefaultsConfig::SetStr (const char *Key, const char *Val)
@@ -266,7 +266,7 @@ csDefaultsIterator::csDefaultsIterator (csDefaultsConfig* Owner,
   name = [[NSString stringWithCString:Subsection] retain];
 
   // Construct our 'section name'.
-  if (Subsection!=NULL) {
+  if (Subsection!=0) {
 	domain = [[NSString stringWithFormat:@"%@.%@", owner->domain, name] retain];
   } else {
     domain = [owner->domain retain];
