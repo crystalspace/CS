@@ -58,7 +58,7 @@ public:
 
   float animli;
   bool going_right;
-  csProcBump* prBump;
+  csRef<csProcBump> prBump;
 
   bool InitProcDemo();
 

@@ -91,7 +91,6 @@ BumpTest::BumpTest (iObjectRegistry* object_reg)
 
 BumpTest::~BumpTest ()
 {
-  delete prBump;
 }
 
 void BumpTest::Report (int severity, const char* msg, ...)
@@ -121,7 +120,7 @@ bool BumpTest::InitProcDemo ()
   csRef<iImage> map = bptex->GetImageFile();
   engine->Prepare ();
 
-  prBump = new csProcBump (map);
+  prBump.AttachNew (new csProcBump (map));
 
   matBump = prBump->Initialize (object_reg, engine, txtmgr, "bumps");
   prBump->PrepareAnim ();

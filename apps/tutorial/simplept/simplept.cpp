@@ -123,7 +123,7 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
       	dx * genmesh_scale.x - genmesh_scale.x/2,
 	dy * genmesh_scale.y - genmesh_scale.y/2,
 	z);
-      texels[idx].Set (dx, dy);
+      texels[idx].Set (dx, 1.0f - dy);
 
       idx++;
     }

@@ -63,9 +63,9 @@ private:
   Flock *flock;
 
   /// the sky
-  csProcSky *sky;
+  csProcSky* sky;
   /// the six sides (front, back, left, right, up, down)
-  csProcSkyTexture *sky_f, *sky_b, *sky_l, *sky_r, *sky_u, *sky_d;
+  csRef<csProcSkyTexture> sky_f, sky_b, sky_l, sky_r, sky_u, sky_d;
 
   /** set texture space of poly, a size x size texture ,
    * given orig,u,ulen,v,vlen,  so that you get no ugly

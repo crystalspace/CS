@@ -97,12 +97,6 @@ DemoSky::~DemoSky ()
 {
   delete flock;
   delete sky;
-  delete sky_f;
-  delete sky_b;
-  delete sky_l;
-  delete sky_r;
-  delete sky_u;
-  delete sky_d;
 }
 
 void Cleanup ()
@@ -132,7 +126,7 @@ void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3DStatic *poly,
   texv += vvector / float(size);
   texulen += ulen * 2.0f / float(size);
   texvlen += vlen * 2.0f / float(size);
-  poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
+  poly->SetTextureSpace (texorig, texu, texulen, texv, -texvlen);
   skytex->SetTextureSpace(texorig, texu-texorig, texv-texorig);
 }
 
@@ -260,17 +254,17 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 
   sky = new csProcSky();
   sky->SetAnimated(object_reg, false);
-  sky_f = new csProcSkyTexture(sky);
+  sky_f.AttachNew (new csProcSkyTexture(sky));
   iMaterialWrapper* imatf = sky_f->Initialize(object_reg, engine, txtmgr, "sky_f");
-  sky_b = new csProcSkyTexture(sky);
+  sky_b.AttachNew (new csProcSkyTexture(sky));
   iMaterialWrapper* imatb = sky_b->Initialize(object_reg, engine, txtmgr, "sky_b");
-  sky_l = new csProcSkyTexture(sky);
+  sky_l.AttachNew (new csProcSkyTexture(sky));
   iMaterialWrapper* imatl = sky_l->Initialize(object_reg, engine, txtmgr, "sky_l");
-  sky_r = new csProcSkyTexture(sky);
+  sky_r.AttachNew (new csProcSkyTexture(sky));
   iMaterialWrapper* imatr = sky_r->Initialize(object_reg, engine, txtmgr, "sky_r");
-  sky_u = new csProcSkyTexture(sky);
+  sky_u.AttachNew (new csProcSkyTexture(sky));
   iMaterialWrapper* imatu = sky_u->Initialize(object_reg, engine, txtmgr, "sky_u");
-  sky_d = new csProcSkyTexture(sky);
+  sky_d.AttachNew (new csProcSkyTexture(sky));
   iMaterialWrapper* imatd = sky_d->Initialize(object_reg, engine, txtmgr, "sky_d");
 
   room = engine->CreateSector ("room");

@@ -19,6 +19,9 @@ The history order is reversed so that new features are at the top.
 	  a 'nullmesh' internally.
 	- Jorrit fixed a bug in nullmesh, GetRadius(). The center was not
 	  correctly set in case SetBoundingBox() was called.
+	- res updated simplept, demosky and prbump; not only that proctexes
+	  aren't bottom-up any more, but also that they need to be refcounted
+	  now (as additional references are kept outside the application.)
 15-May-2003
 	- res made the following changes to the fire proctex:
 	    - changed the algorithm a bit so it doesn't look tilted any more.
