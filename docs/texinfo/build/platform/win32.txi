@@ -313,7 +313,8 @@ following steps.
 Set the output path to the @file{CS} root directory.  Any Crystal Space
 application must be executed in this directory.  If you want to run it in
 another directory, you must copy the files @file{scf.cfg} and @file{vfs.cfg},
-the data directory and all plugins (@file{.dll}) into this new directory.
+the data directory and all plugins (@file{.dll}) into this new directory, or
+set the CRYSTAL environment variable to your Crystal Space directory.
 
 @item
 Set the include paths.  Simply open one of the application projects coming with
@@ -326,9 +327,10 @@ Add the Crystal Space libraries.  If you are using the Crystal Space workspace,
 simply add dependencies to the Crystal Space projects.  Otherwise you have to
 link to the @file{.lib} files.  To do this, either add these files to the
 project like source files or add them as command line options in @emph{Project
-Settings/C/C++}.  Note that if you add them like source files, you may not
-correctly use the debug version of Crystal Space in debug builds and the
-release version in release builds.
+Settings/C/C++}.  Note that if you add them like source files, you may wish
+to add the release libraries to a @emph{Release} folder and the debug libs to
+a @emph{Debug} folder, and disable each of these
+(@emph{Project Settings/General}) for the opposite type of build.
 
 @item
 Add external libraries (@file{zlib}, @file{libjpeg}, @file{DirectX}, ...).
