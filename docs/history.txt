@@ -17,6 +17,8 @@ Short-term cleanups that need to be done:
 	- Removed support for planed fog. It is obsolete now that we have
 	  vertex fog.
 	- *** Release of 0.14_000 ***
+	- Eric Sunshine fixed a couple of "unused variable" compiler warnings
+	  in polygon.cpp.
 28-Jul-1999
 	- Fixed fog in OpenGL. One-layered fog works now.
 	- Clipping portals are no longer automatic. There is now a CLIP()

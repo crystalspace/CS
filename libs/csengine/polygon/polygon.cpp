@@ -1753,7 +1753,6 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
     csFogInfo* fog_info = rview->fog_info;
     while (fog_info)
     {
-      csVector3 isect;
       float dist1, dist2;
       if (fog_info->has_incoming_plane)
       {
@@ -1827,7 +1826,6 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
     csFogInfo* fog_info = rview->fog_info;
     while (fog_info)
     {
-      csVector3 isect;
       float dist1, dist2;
       if (fog_info->has_incoming_plane)
       {
