@@ -52,6 +52,7 @@ private:
   static bool VostestEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
+  void CheckKeys ();
   void FinishFrame ();
 
 public:

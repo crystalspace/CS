@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-//#include "csutil/sysfunc.h"
 #include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
@@ -80,13 +79,26 @@ Vostest::~Vostest ()
 
 void Vostest::SetupFrame ()
 {
+
+
+  CheckKeys();
+
+
+  // Tell 3D driver we're going to display 3D things.
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+    return;
+
+  // Tell the camera to render into the frame buffer.
+  view->Draw ();
+}
+
+void Vostest::CheckKeys()
+{
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
-
   iCamera* c = view->GetCamera();
-
   if (kbd->GetKeyState (CSKEY_SHIFT)) {
       if (kbd->GetKeyState (CSKEY_RIGHT))
           c->Move (CS_VEC_RIGHT * 4 * speed);
@@ -110,18 +122,11 @@ void Vostest::SetupFrame ()
       if (kbd->GetKeyState (CSKEY_DOWN))
           c->Move (CS_VEC_BACKWARD * 4 * speed);
   }
-
   csMatrix3 rot =  csXRotMatrix3(rotX) * csYRotMatrix3(rotY);
   csOrthoTransform ot(rot, c->GetTransform().GetOrigin());
   c->SetTransform(ot);
-
-
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-    return;
-
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
+  //cout << ".";
+  //fflush(stdout);
 }
 
 void Vostest::FinishFrame ()
@@ -167,12 +172,9 @@ bool Vostest::Initialize ()
                                       CS_REQUEST_ENGINE,
                                       CS_REQUEST_FONTSERVER,
                                       CS_REQUEST_IMAGELOADER,
-                                      CS_REQUEST_LEVELLOADER,
                                       CS_REQUEST_REPORTER,
                                       CS_REQUEST_REPORTERLISTENER,
                                       CS_REQUEST_PLUGIN("crystalspace.network.vos.a3dl", iVosA3DL),
-                    CS_REQUEST_PLUGIN("crystalspace.mesh.crossbuilder", iCrossBuilder),
-                    CS_REQUEST_PLUGIN("crystalspace.modelconverter.multiplexer", iModelConverter),
                                       CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -216,14 +218,6 @@ bool Vostest::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (loader == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.vostest",
-        "No iLoader plugin!");
-    return false;
-  }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (g3d == 0)
@@ -286,29 +280,36 @@ bool Vostest::Initialize ()
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN));
   view->Draw ();
 
-  csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
-  vossector->Load();
-  view->GetCamera()->SetSector(vossector->GetSector());
+  try {
+    csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
+    vossector->Load();
+    view->GetCamera()->SetSector(vossector->GetSector());
 #else
-  csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
-  vossector->Load();
+    csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
+    vossector->Load();
 
-  view = csPtr<iView> (new csView (engine, g3d));
-  view->GetCamera ()->SetSector(vossector->GetSector());
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+    view = csPtr<iView> (new csView (engine, g3d));
+    view->GetCamera ()->SetSector(vossector->GetSector());
+    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+    iGraphics2D* g2d = g3d->GetDriver2D ();
+    view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 #endif
 
-  csRef<iVosApi> vosapi = SCF_QUERY_INTERFACE(vosa3dl, iVosApi);
-  VOS::vRef<VOS::Vobject> vobject = vosapi->GetVobject();
+    csRef<iVosApi> vosapi = SCF_QUERY_INTERFACE(vosa3dl, iVosApi);
+    VOS::vRef<VOS::Vobject> vobject = vosapi->GetVobject();
 
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.application.vostest",
         "Connected to site is %s\n", vobject->getURLstr().c_str());
 
 
-  vossector->IncRef(); // otherwise it gets deleted, which would be bad.
+    vossector->IncRef(); // otherwise it gets deleted, which would be bad.
+  } catch(std::exception& e) {
+    csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.vostest", 
+        "Error loading world %s: %s\n", vosWorldURL, e.what());
+    return false;
+  }
 
   return true;
 }
