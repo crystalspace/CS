@@ -5,6 +5,20 @@ The history order is reversed so that new features are at the top.
 	  vertex compression for a thing (removal of duplicate vertices).
 	  This removal of duplicate vertices is now on by default (used
 	  to be off).
+	- Added iRenderView::TestBSphere() which is a simpler version
+	  of iRenderView::ClipBSphere(). It doesn't initialize the
+	  clip_xxx variables but only tests if the object is (partially)
+	  visible or not.
+	- csThing::DrawTest() now uses the new TestBSphere() function instead
+	  of doing this test on its own. This also fixes a bad bug in this
+	  routine. The old DrawTest() function was actually badly broken.
+	  In some cases it would actually cull away meshes that were visible.
+	  This happened mostly if the following three conditions are true:
+	    - The bounding box of the mesh closely matches the mesh itself
+	      (which is usually the case with room meshes since they are
+	      often square-shaped).
+	    - The bounding box of the mesh is very large.
+	    - Only a small part of the bounding box was visible.
 18-Sep-2001
 	- Changed orientation for default XPLANE so it matches better
 	  with ZPLANE.

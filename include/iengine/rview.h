@@ -178,7 +178,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 2, 1);
+SCF_VERSION (iRenderView, 0, 2, 2);
 
 /**
  * This interface represents all information needed to render
@@ -294,6 +294,13 @@ struct iRenderView : public iBase
   virtual void CalculateFogMesh (const csTransform& tr_o2c,
   	G3DTriangleMesh& mesh) = 0;
 
+  /**
+   * Test if the given bounding sphere (in object space coordinates)
+   * is visibile in this render view. The optional will
+   * transform object to camera space.
+   */
+  virtual bool TestBSphere (const csReversibleTransform& o2c,
+  	const csSphere& sphere) = 0;
   /**
    * Check if the given bounding sphere (in object space coordinates)
    * is visibile in this render view. The given transformation should

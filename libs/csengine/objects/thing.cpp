@@ -1809,6 +1809,23 @@ bool csThing::DrawTest (iRenderView* rview, iMovable* movable)
   cached_movable = movable;
   WorUpdate ();
 
+#if 1
+  csBox3 b;
+  GetBoundingBox (b);
+  csSphere sphere;
+  sphere.SetCenter (b.GetCenter ());
+  sphere.SetRadius (max_obj_radius);
+  if (can_move)
+  {
+    csReversibleTransform tr_o2c = camtrans
+    	* movable->GetFullTransform ().GetInverse ();
+    return rview->TestBSphere (tr_o2c, sphere);
+  }
+  else
+  {
+    return rview->TestBSphere (camtrans, sphere);
+  }
+#else
   csBox3 b;
   GetBoundingBox (b);
   csVector3 center = b.GetCenter();
@@ -1842,6 +1859,7 @@ bool csThing::DrawTest (iRenderView* rview, iMovable* movable)
   if (center.y-maxradius > by) return false;
 
   return true;
+#endif
 }
 
 static int count_cull_node_notvis_behind;

@@ -272,6 +272,13 @@ public:
   virtual void CalculateFogMesh (const csTransform& tr_o2c,
   	G3DTriangleMesh& mesh);
   /**
+   * Test if the given bounding sphere (in object space coordinates)
+   * is visibile in this render view. The transformation will
+   * transform object to camera space.
+   */
+  virtual bool TestBSphere (const csReversibleTransform& o2c,
+  	const csSphere& sphere);
+  /**
    * Check if the given bounding sphere (in object space coordinates)
    * is visibile in this render view. The given transformation should
    * transform object to camera space. If the sphere is visible this

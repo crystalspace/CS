@@ -562,6 +562,67 @@ void csRenderView::TestSphereFrustum (csRenderContextFrustum* frustum,
   }
 }
 
+bool csRenderView::TestBSphere (const csReversibleTransform& o2c,
+	const csSphere& sphere)
+{
+  //------
+  // First transform bounding sphere from object space to camera space
+  // by using the given transform (if needed).
+  //------
+  csSphere tr_sphere = o2c.Other2This (sphere);
+  const csVector3& tr_center = tr_sphere.GetCenter ();
+  float radius = tr_sphere.GetRadius ();
+
+  //------
+  // Test if object is behind the camera plane.
+  //------
+  if (tr_center.z+radius <= 0)
+    return false;
+  
+  //------
+  // Test against far plane if needed.
+  //------
+  csPlane3 far_plane;
+  if (ctxt->icamera->GetFarPlane (far_plane))
+  {
+    // Ok, so this is not really far plane clipping - we just dont draw this
+    // object if the bounding sphere is further away than the D
+    // part of the farplane.
+    if (tr_center.z-radius > far_plane.D ())
+      return false;
+  }
+
+  //------
+  // Check if we're fully inside the bounding sphere.
+  //------
+  bool fully_inside = csSquaredDist::PointPoint (csVector3 (0),
+  	tr_center) <= radius * radius;
+
+  //------
+  // Test if there is a chance we must clip to current portal.
+  //------
+  bool outside, inside;
+  CS_ASSERT (ctxt->iview_frustum != NULL);
+  if (!fully_inside)
+  {
+    TestSphereFrustum (ctxt->iview_frustum, tr_center, radius, inside, outside);
+    if (outside) return false;
+  }
+
+  //------
+  // Test if there is a chance we must clip to current plane.
+  //------
+  if (ctxt->do_clip_plane)
+  {
+    bool mirror = GetCamera ()->IsMirrored ();
+    float dist = ctxt->clip_plane.Classify (tr_center);
+    if (mirror) dist = -dist;
+    if ((-dist) > radius) return false;
+  }
+ 
+  return true;
+}
+
 bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
 	const csSphere& sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane)
@@ -590,7 +651,7 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
     // object if the bounding sphere is further away than the D
     // part of the farplane.
     if (tr_center.z-radius > far_plane.D ())
-      return false;	
+      return false;
   }
 
   //------

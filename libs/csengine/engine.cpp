@@ -629,16 +629,6 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
 {
   csEngine::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-#if defined(JORRIT_DEBUG)
-  printf ("csPolygon3D %ld\n", (long)sizeof (csPolygon3D));
-  printf ("csPolyPlane %ld\n", (long)sizeof (csPolyPlane));
-  printf ("csPolyTxtPlane %ld\n", (long)sizeof (csPolyTxtPlane));
-  printf ("csPolyTexture %ld\n", (long)sizeof (csPolyTexture));
-  printf ("csPolygonSet %ld\n", (long)sizeof (csPolygonSet));
-  printf ("csLightMapped %ld\n", (long)sizeof (csLightMapped));
-  printf ("csGouraudShaded %ld\n", (long)sizeof (csGouraudShaded));
-  printf ("csLightMap %ld\n", (long)sizeof (csLightMap));
-#endif
 
   if (!(G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D)))
   {
