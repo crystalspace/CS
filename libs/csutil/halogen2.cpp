@@ -1,9 +1,11 @@
+
 #include "cssysdef.h"
 #include "qint.h"
 #include "csutil/rng.h"
 
 #include <string.h>
 #include <math.h>
+#include <malloc.h>
 
 /**
  * Idea for this kind of halo has been partially borrowed from GIMP:
