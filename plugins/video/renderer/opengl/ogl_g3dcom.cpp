@@ -4677,7 +4677,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         {
           //set a float
           float var = ci.effect->GetVariableFloat(c->variableID);
-          glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB,
+          glProgramLocalParameter4fARB((GLenum) GL_VERTEX_PROGRAM_ARB,
             c->constantNumber, var, var, var, var);
 
         }
@@ -4685,18 +4685,18 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         {
           //set a vec4
           csEffectVector4 vec = ci.effect->GetVariableVector4(c->variableID);
-          glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB,
+          glProgramLocalParameter4fARB( (GLenum) GL_VERTEX_PROGRAM_ARB,
               c->constantNumber, vec.x, vec.y, vec.z, vec.w);
         }
       }
-      glBindProgramARB(GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
-      glEnable( GL_VERTEX_PROGRAM_ARB );
+      glBindProgramARB((GLenum)GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
+      glEnable( (GLenum)GL_VERTEX_PROGRAM_ARB );
     }
 
     if (pass_data->doblending)
     {
       statecache->Enable_GL_BLEND ();
-      statecache->SetBlendFunc (pass_data->sblend, pass_data->dblend);
+      statecache->SetBlendFunc ((GLenum)pass_data->sblend,(GLenum) pass_data->dblend);
     }
     else
     {
@@ -4736,8 +4736,8 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       if (ARB_multitexture && (ARB_texture_env_combine
           || EXT_texture_env_combine))
       {
-        glActiveTextureARB( GL_TEXTURE0_ARB + l );
-        glClientActiveTextureARB( GL_TEXTURE0_ARB + l );
+        glActiveTextureARB((GLenum) (GL_TEXTURE0_ARB + l) );
+        glClientActiveTextureARB( (GLenum) (GL_TEXTURE0_ARB + l) );
       }
 
       if (layer_data->ccsource == ED_SOURCE_FOG)
@@ -4858,7 +4858,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (pass_data->vertex_program > 0)
-      glDisable (GL_VERTEX_PROGRAM_ARB);
+      glDisable ((GLenum)GL_VERTEX_PROGRAM_ARB);
   }
 
   SetMirrorMode (false);
@@ -4868,8 +4868,8 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   {
     for (l=maxlayers-1 ; l>=0 ; l--)
     {
-      glActiveTextureARB (GL_TEXTURE0_ARB+l);
-      glClientActiveTextureARB (GL_TEXTURE0_ARB+l);
+      glActiveTextureARB ((GLenum) (GL_TEXTURE0_ARB+l));
+      glClientActiveTextureARB ((GLenum) (GL_TEXTURE0_ARB+l));
       if (l>0)
         statecache->Disable_GL_TEXTURE_2D (l);
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -6020,16 +6020,16 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
         //create and load vertex program
 
         glGenProgramsARB(1, &pass_data->vertex_program);
-        glBindProgramARB(GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
+        glBindProgramARB((GLenum) GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
 
         //load it from string
         int i = strlen((const char*)vp);
-        glProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, i, vp);
+        glProgramStringARB((GLenum) GL_VERTEX_PROGRAM_ARB, (GLenum)GL_PROGRAM_FORMAT_ASCII_ARB, i, vp);
 
-        const unsigned char * programErrorString=glGetString(GL_PROGRAM_ERROR_STRING_ARB);
+        const unsigned char * programErrorString=glGetString((GLenum) GL_PROGRAM_ERROR_STRING_ARB);
 
         GLint errorPos;
-	glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
+	glGetIntegerv((GLenum) GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
 
         if(errorPos != -1)
         {
