@@ -25,6 +25,8 @@ chronological order.
 	- Jorrit consequently also removed support for iMaterialHandle
 	  in the shader variables.
 	- Jorrit migrated csMaterial::GetTexture() to old renderer.
+	- Jorrit reverted the change that shader variables don't support
+	  iTextureHandle. Apparently this is needed for fog.
 2-Sep-2003
 	- Philip Wyett re-applied Eric Sunshine's Cygwin __argc/__argv fix in
           win32.cpp, which was overwritten by the old version by another

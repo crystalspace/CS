@@ -27,6 +27,7 @@
 #include "csgeom/vector4.h"
 #include "csgfx/rgbpixel.h"
 
+struct iTextureHandle;
 struct iTextureWrapper;
 
 /**
@@ -55,6 +56,7 @@ private:
 
   int Int;
   csRef<iString> String;
+  csRef<iTextureHandle> TextureHandValue;
   csRef<iTextureWrapper> TextureWrapValue;
   csVector4 VectorValue;
 
@@ -78,6 +80,8 @@ public:
   bool GetValue (iString*& value) const;
   /// Retrieve a color
   bool GetValue (csRGBpixel& value) const;
+  /// Retrieve a texture handle
+  bool GetValue (iTextureHandle*& value) const;
   /// Retrieve a texture wrapper
   bool GetValue (iTextureWrapper*& value) const;
   /// Retireve a csVector2
@@ -95,6 +99,8 @@ public:
   bool SetValue (iString* value);
   /// Store a color
   bool SetValue (const csRGBpixel &value);
+  /// Store a texture handle
+  bool SetValue (iTextureHandle* value);
   /// Store a texture wrapper
   bool SetValue (iTextureWrapper* value);
   /// Store a csVector2

@@ -78,6 +78,12 @@ bool csShaderVariable::GetValue(csRGBpixel& value) const
   return true;
 }
 
+bool csShaderVariable::GetValue(iTextureHandle*& value) const
+{
+  value = TextureHandValue;
+  return true;
+}
+
 bool csShaderVariable::GetValue(iTextureWrapper*& value) const
 {
   value = TextureWrapValue;
@@ -143,10 +149,19 @@ bool csShaderVariable::SetValue(const csRGBpixel &value)
   return true;
 }
 
+bool csShaderVariable::SetValue(iTextureHandle *value)
+{
+  Type = TEXTURE;
+  TextureHandValue = value;
+  return true;
+}
+
 bool csShaderVariable::SetValue(iTextureWrapper *value)
 {
   Type = TEXTURE;
   TextureWrapValue = value;
+  if (value)
+    TextureHandValue = value->GetTextureHandle ();
   return true;
 }
 
