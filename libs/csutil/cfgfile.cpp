@@ -703,10 +703,11 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
     // skip initial whitespace
     while (isspace(*Filedata)) Filedata++;
     // delete whitespace at end of line
-    char* t = s;
-    if (Filedata + 1 != t)
+    if (Filedata != s) {
+      char* t = s;
       while (isspace(*(t-1))) t--;
-        *t = 0;
+      *t = 0;
+    }
 
     // check if this is a comment or a blank line
     if (*Filedata == '\0' || *Filedata == ';')
@@ -714,7 +715,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
     else
     {
       // this is a key. Find equal sign
-      t = strchr(Filedata, '=');
+      char *t = strchr(Filedata, '=');
       // if no equal sign, this is an invalid line
       if (!t)
       {
