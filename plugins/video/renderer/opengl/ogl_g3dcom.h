@@ -360,6 +360,37 @@ private:
     csPlane3* planes, int num_planes,
     csPlane3* diag_planes, int num_diag_planes);
 
+  void ClipTriangleLightmapMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector4* vertices,
+    csVector2* texels,
+    G3DFogInfo* vertex_fog,
+    int* fog_indices,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool transform,
+    bool mirror,
+    bool exact_clipping,
+    bool plane_clipping,
+    bool z_plane_clipping,
+    bool frustum_clipping);
+
+    void ClipTriangleLightmapMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector4* vertices,
+    csVector2* texels,
+    G3DFogInfo* vertex_fog,
+    int* fog_indices,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool exact_clipping,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes,
+    csPlane3* diag_planes, int num_diag_planes);
 
 
 

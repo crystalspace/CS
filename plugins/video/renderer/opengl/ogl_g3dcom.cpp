@@ -104,6 +104,25 @@ CS_IMPLEMENT_STATIC_VAR (Get_clipped_fog, ogl_g3dcom_clipped_fog, ())
 ///Array for clipping polygon meshes with lightmaps
 CS_TYPEDEF_GROWING_ARRAY (ogl_g3dcom_clipped_lightmaps, iPolyTex_p);
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmaps, ogl_g3dcom_clipped_lightmaps, ())
+///Array for clipping
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_vertices, csVector4);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_vertices, ogl_g3dcom_clipped_lightmap_vertices, ())
+/// Array for clipping.
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_triangles, csTriangle);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_triangles, ogl_g3dcom_clipped_lightmap_triangles, ())
+/// Array for clipping.
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_translate, int);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_translate, ogl_g3dcom_clipped_lightmap_translate, ())
+/// Array for clipping.
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_texels, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_texels, ogl_g3dcom_clipped_lightmap_texels, ())
+/// Array for clipping.
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_fog, csColor);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog, ogl_g3dcom_clipped_lightmap_fog, ())
+/// Array for clipping
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_fog_texels, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog_texels, ogl_g3dcom_clipped_lightmap_fog_texels, ())
+
 
 CS_IMPLEMENT_STATIC_VAR (GetStaticClipInfo1, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR (GetStaticClipInfo2, csClipInfo, [100])
@@ -121,6 +140,15 @@ static ogl_g3dcom_clipped_texels *clipped_texels = NULL;
 static ogl_g3dcom_clipped_colors *clipped_colors = NULL;
 static ogl_g3dcom_clipped_fog *clipped_fog = NULL;
 static ogl_g3dcom_clipped_lightmaps *clipped_lightmaps = NULL;
+
+static ogl_g3dcom_clipped_lightmap_vertices *clipped_lightmap_vertices = NULL;
+static ogl_g3dcom_clipped_lightmap_triangles *clipped_lightmap_triangles = NULL;
+static ogl_g3dcom_clipped_lightmap_translate *clipped_lightmap_translate = NULL;
+static ogl_g3dcom_clipped_lightmap_texels *clipped_lightmap_texels = NULL;
+static ogl_g3dcom_clipped_lightmap_fog *clipped_lightmap_fog = NULL;
+static ogl_g3dcom_clipped_lightmap_fog_texels *clipped_lightmap_fog_texels = NULL;
+
+
 
 /*=========================================================================
  Method implementations
@@ -222,6 +250,13 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
     clipped_colors = Get_clipped_colors ();
     clipped_fog = Get_clipped_fog ();
     clipped_lightmaps = Get_clipped_lightmaps ();
+    clipped_lightmap_vertices = Get_clipped_lightmap_vertices();
+    clipped_lightmap_triangles = Get_clipped_lightmap_triangles();
+    clipped_lightmap_translate = Get_clipped_lightmap_translate();
+    clipped_lightmap_texels = Get_clipped_lightmap_texels();
+    clipped_lightmap_fog = Get_clipped_lightmap_fog();
+    clipped_lightmap_fog_texels = Get_clipped_lightmap_fog_texels();
+    
   }
 
   // See note above.
@@ -236,6 +271,12 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   clipped_texels->IncRef ();
   clipped_colors->IncRef ();
   clipped_fog->IncRef ();
+  
+  clipped_lightmap_triangles->IncRef();
+  clipped_lightmap_translate->IncRef();
+  clipped_lightmap_texels->IncRef();
+  clipped_lightmap_fog->IncRef();
+  clipped_lightmap_fog_texels->IncRef();
 
   // Are we going to use the inverted orthographic projection matrix?
   inverted = false;
@@ -269,6 +310,12 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   clipped_texels->DecRef ();
   clipped_colors->DecRef ();
   clipped_fog->DecRef ();
+
+  clipped_lightmap_triangles->DecRef();
+  clipped_lightmap_translate->DecRef();
+  clipped_lightmap_texels->DecRef();
+  clipped_lightmap_fog->DecRef();
+  clipped_lightmap_fog_texels->DecRef();
 }
 
 void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)
@@ -1958,7 +2005,7 @@ int csFogQueue::AddVertices (int num)
   {
     GLfloat* new_ar;
     int old_num = num_vertices-num;
-    max_vertices += 40;
+    max_vertices = num_vertices + 40;
 
     new_ar = new GLfloat [max_vertices*4];
     if (glverts) memcpy (new_ar, glverts, sizeof (GLfloat)*4*old_num);
@@ -2000,7 +2047,7 @@ int csPolyQueue::AddVertices (int num)
   {
     GLfloat* new_ar;
     int old_num = num_vertices-num;
-    max_vertices += 40;
+    max_vertices = num_vertices + 40;
 
     new_ar = new GLfloat [max_vertices*4];
     if (glverts) memcpy (new_ar, glverts, sizeof (GLfloat)*4*old_num);
@@ -2876,7 +2923,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 }
 
 
-// AQUI!!!!
+
 
 void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
     int num_triangles,
@@ -3203,8 +3250,481 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
 }
 
 
-// ACABA !!!
 
+
+static void ResolveVertexLightmap (
+	csClipInfo* ci,
+	int* clipped_translate,
+	csVector2* otexels,
+	G3DFogInfo* ofog,
+	csVector2& texel, csColor& fog, csVector2& fog_texel, int* fog_indices)
+{
+  switch (ci->type)
+  {
+    case CS_CLIPINFO_ORIGINAL:
+      texel = otexels[ci->original.idx];
+      if (ofog)
+      {
+        fog.red = ofog[fog_indices[ci->original.idx]].r;
+        fog.green = ofog[fog_indices[ci->original.idx]].g;
+        fog.blue = ofog[fog_indices[ci->original.idx]].b;
+      }
+        
+
+      break;
+    case CS_CLIPINFO_ONEDGE:
+    {
+      int i1 = ci->onedge.i1;
+      int i2 = ci->onedge.i2;
+      float r = ci->onedge.r;
+      texel = otexels[i1] * (1-r) + otexels[i2] * r;
+      if (ofog)
+      {
+	fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
+	fog_texel.y= 0;
+	
+  fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
+	fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
+	fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
+  
+      }
+      break;
+    }
+    case CS_CLIPINFO_INSIDE:
+    {
+      csVector2 texel1, texel2,fog_texel1,fog_texel2;
+      csColor color1, color2;
+      csColor fog1, fog2;
+      
+      ResolveVertexLightmap (ci->inside.ci1, clipped_translate, otexels,
+		  ofog, texel1, fog1,fog_texel1,fog_indices);
+      ResolveVertexLightmap (ci->inside.ci2, clipped_translate, otexels,
+		  ofog, texel2, fog2,fog_texel2,fog_indices);
+      delete ci->inside.ci1;
+      delete ci->inside.ci2;
+      ci->type = CS_CLIPINFO_ORIGINAL;
+      float r = ci->inside.r;
+      texel = texel1 * (1-r) + texel2 * r;
+      if (ofog)
+      {
+	fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
+	fog_texel.y = 0;
+	fog.red = fog1.red * (1-r) + fog2.red * r;
+	fog.green = fog1.green * (1-r) + fog2.green * r;
+	fog.blue = fog1.blue * (1-r) + fog2.blue * r;
+      }
+      break;
+    }
+  }
+}
+
+
+void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector4* vertices,
+    csVector2* texels,
+    G3DFogInfo* vertex_fog,
+    int* fog_indices,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool transform,
+    bool mirror,
+    bool exact_clipping,
+    bool plane_clipping,
+    bool z_plane_clipping,
+    bool frustum_clipping)
+{
+  // Make sure the frustum is ok.
+
+  if (frustum_clipping)
+    CalculateFrustum ();
+
+  csPlane3 frustum_planes[100];	// @@@ Arbitrary limit
+  csPlane3 diagonal_planes[50];	// @@@ Arbitrary number.
+  int num_frust = 0;
+  int num_diagonal_planes = 0;
+
+  int i, j, j1;
+  if (frustum_clipping)
+  {
+    // Now calculate the frustum as seen in object space for the given
+    // mesh.
+    csPoly3D obj_frustum;
+    int mir_i;
+    num_frust = frustum.GetVertexCount ();
+    for (i = 0 ; i < num_frust ; i++)
+    {
+      if (mirror) mir_i = num_frust-i-1;
+      else mir_i = i;
+      if (transform)
+        obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[mir_i]));
+      else
+        obj_frustum.AddVertex (frustum[mir_i]);
+    }
+    j1 = num_frust-1;
+    for (j = 0 ; j < num_frust ; j++)
+    {
+      frustum_planes[j].Set (csVector3 (0), obj_frustum[j1], obj_frustum[j]);
+      j1 = j;
+    }
+
+    // In addition to the frustum planes itself we also calculate all
+    // diagonal planes which go from one side of the frustum to the other.
+    // These are going to be used to detect the special case of a triangle
+    // that has none of its vertices in the frustum. But this triangle can
+    // still be visible. To detect this we test if there is one of these
+    // extra planes that cuts the triangle in two. Since the number of diagonal
+    // planes is half the number of frustum planes we can save some
+    // calculation here.
+    if (num_frust > 3)
+      // Use (num_frust+1)/2 to make sure that odd frustums get one extra plane.
+      for (j = 0 ; j < (num_frust+1) / 2 ; j++)
+      {
+        j1 = j + (num_frust+1) / 2;
+        j1 = j1 % num_frust;
+        diagonal_planes[num_diagonal_planes++].Set
+      	  (csVector3 (0), obj_frustum[j], obj_frustum[j1]);
+      }
+  }
+
+  // num_planes is the number of planes to test with. If there is no
+  // near clipping plane then this will be equal to num_frust.
+  int num_planes = num_frust;
+  if (plane_clipping)
+  {
+  //@@@ If mirror???
+    if (transform)
+      frustum_planes[num_planes] = o2c.This2OtherRelative (near_plane);
+    else
+      frustum_planes[num_planes] = near_plane;
+    num_planes++;
+  }
+  if (z_plane_clipping)
+  {
+    // @@@ In principle z-plane clipping can be done more efficiently.
+    // Currently we just do it the general way. Have to think about an
+    // easy way to optimize this.
+    if (transform)
+      frustum_planes[num_planes] = o2c.This2OtherRelative (
+      	csPlane3 (0, 0, -1, .001));
+    else
+      frustum_planes[num_planes] = csPlane3 (0, 0, -1, .001);
+    num_planes++;
+  }
+
+  csVector3 frust_origin;
+  if (transform)
+    frust_origin = o2c.This2Other (csVector3 (0));
+  else
+    frust_origin.Set (0, 0, 0);
+
+  ClipTriangleLightmapMesh (num_triangles, num_vertices, triangles, vertices,
+    texels, vertex_fog, fog_indices,
+    num_clipped_triangles, num_clipped_vertices, exact_clipping,
+    frust_origin, frustum_planes, num_planes,
+    diagonal_planes, num_diagonal_planes);
+}
+
+void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector4* vertices,
+    csVector2* texels,
+    G3DFogInfo* vertex_fog,
+    int* fog_indices,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool exact_clipping,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes,
+    csPlane3* diag_planes, int num_diag_planes)
+{
+  int i, j;
+
+  
+  // Make sure our worktables are big enough for the clipped mesh.
+  int num_tri = num_triangles*2+50;
+  if (num_tri > clipped_lightmap_triangles->Limit ())
+  {
+    // Use two times as many triangles. Hopefully this is enough.
+    clipped_lightmap_triangles->SetLimit (num_tri);
+  }
+  if (num_vertices > clipped_lightmap_translate->Limit ())
+    clipped_lightmap_translate->SetLimit (num_vertices);	// Used for original vertices.
+  int num_vts = num_vertices*2+100;
+  if (num_vts > clipped_lightmap_vertices->Limit ())
+  {
+    clipped_lightmap_vertices->SetLimit (num_vts);
+    clipped_lightmap_texels->SetLimit (num_vts);
+    //clipped_colors.SetLimit (num_vts);
+    clipped_lightmap_fog->SetLimit (num_vts);
+    clipped_lightmap_fog_texels->SetLimit(num_vts);
+  }
+
+  num_clipped_triangles = 0;
+  num_clipped_vertices = 0;
+
+  // Check all original vertices and see if they are in frustum.
+  // If yes we set clipped_translate to the new position in the transformed
+  // vertex array. Otherwise we set clipped_translate to -1.
+  
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    csVector3 v;
+    v.x= vertices[i].x;
+    v.y= vertices[i].y;
+    v.z= vertices[i].z;    
+
+    bool inside = true;
+    for (j = 0 ; j < num_planes ; j++)
+    {
+      if (planes[j].Classify (v-frust_origin) >= 0)
+      {
+        
+	inside = false;
+	break;	// Not inside.
+      }
+    }
+    if (inside)
+    {
+      if (exact_clipping)
+      {
+        (*clipped_lightmap_translate)[i] = num_clipped_vertices;
+        (*clipped_lightmap_vertices)[num_clipped_vertices] = vertices[i];
+        (*clipped_lightmap_texels)[num_clipped_vertices] = texels[i];
+
+        if (vertex_fog)
+        {
+          (*clipped_lightmap_fog)[num_clipped_vertices].red = 
+            vertex_fog[fog_indices[i]].r;
+          (*clipped_lightmap_fog)[num_clipped_vertices].green = 
+            vertex_fog[fog_indices[i]].g;
+          (*clipped_lightmap_fog)[num_clipped_vertices].blue = 
+            vertex_fog[fog_indices[i]].b;
+
+          (*clipped_lightmap_fog_texels)[num_clipped_vertices].x = 
+            vertex_fog[fog_indices[i]].intensity;
+          (*clipped_lightmap_fog_texels)[num_clipped_vertices].y = 0.0;
+            
+        }
+        num_clipped_vertices++;
+
+      }
+      else
+        (*clipped_lightmap_translate)[i] = i;
+    }
+    else
+      (*clipped_lightmap_translate)[i] = -1;
+
+    
+  }
+
+  // If we have lazy clipping then the number of vertices remains the same.
+  if (!exact_clipping)
+    num_clipped_vertices = num_vertices;
+
+  // Now clip all triangles.
+  for (i = 0 ; i < num_triangles ; i++)
+  {
+    csTriangle& tri = triangles[i];
+    int cnt = int ((*clipped_lightmap_translate)[tri.a] != -1)
+      	+ int ((*clipped_lightmap_translate)[tri.b] != -1)
+	+ int ((*clipped_lightmap_translate)[tri.c] != -1);
+    if (cnt == 0)
+    {
+      //=====
+      // Here we have a special case where we need to test if the
+      // triangle is cut by the diagonal planes. If yes then we have
+      // to clip anyway.
+      //=====
+      // @@@ WARNING: This test is not 100% correct and it is possible
+      // to reproduce this problem fairly easily. Especially if the
+      // clipper is a triangle in which case this test will not   even
+      // function.
+      for (j = 0 ; j < num_diag_planes ; j++)
+      {
+        csPlane3& pl = diag_planes[j];
+        
+        
+
+        csVector3 v0;
+        v0.x = vertices[tri.a].x - frust_origin.x;
+        v0.y = vertices[tri.a].y - frust_origin.y;
+        v0.z = vertices[tri.a].z - frust_origin.z;
+
+        csVector3 v1;
+        v1.x = vertices[tri.b].x - frust_origin.x;
+        v1.y = vertices[tri.b].y - frust_origin.y;
+        v1.z = vertices[tri.b].z - frust_origin.z;
+
+
+        csVector3 v2;
+        v2.x = vertices[tri.c].x - frust_origin.x;
+        v2.y = vertices[tri.c].y - frust_origin.y;
+        v2.z = vertices[tri.c].z - frust_origin.z;
+        
+	float c0 = pl.Classify (v0);
+	float c1 = pl.Classify (v1);
+	// Set cnt to 1 so that we will clip in the next part.
+	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+	float c2 = pl.Classify (v2);
+	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+      }
+    }
+
+    if (cnt == 0)
+    {
+      //=====
+      // Easiest case: triangle is not visible.
+      //=====
+    }
+    else if (cnt == 3)
+    {
+      //=====
+      // Easy case: the triangle is fully in view.
+      //=====
+      (*clipped_lightmap_triangles)[num_clipped_triangles].a = (*clipped_lightmap_translate)[tri.a];
+      (*clipped_lightmap_triangles)[num_clipped_triangles].b = (*clipped_lightmap_translate)[tri.b];
+      (*clipped_lightmap_triangles)[num_clipped_triangles].c = (*clipped_lightmap_translate)[tri.c];
+      num_clipped_triangles++;
+    }
+    else
+    {
+      //=====
+      // Difficult case: clipping will result in several triangles.
+      //=====
+      if (!exact_clipping)
+      {
+        // If we have lazy clipping then we just add the triangle.
+        (*clipped_lightmap_triangles)[num_clipped_triangles].a = tri.a;
+        (*clipped_lightmap_triangles)[num_clipped_triangles].b = tri.b;
+        (*clipped_lightmap_triangles)[num_clipped_triangles].c = tri.c;
+        num_clipped_triangles++;
+	continue;
+      }
+
+      csVector3 poly[100];	// @@@ Arbitrary limit
+      static csClipInfo clipinfo[100];
+      csVector3 vaux;
+      vaux.x = vertices[tri.a].x - frust_origin.x;
+      vaux.y = vertices[tri.a].y - frust_origin.y;
+      vaux.z = vertices[tri.a].z - frust_origin.z;
+
+      poly[0] = vaux;
+
+
+      vaux.x = vertices[tri.b].x - frust_origin.x;
+      vaux.y = vertices[tri.b].y - frust_origin.y;
+      vaux.z = vertices[tri.b].z - frust_origin.z;
+
+
+      poly[1] = vaux;
+
+      vaux.x = vertices[tri.c].x - frust_origin.x;
+      vaux.y = vertices[tri.c].y - frust_origin.y;
+      vaux.z = vertices[tri.c].z - frust_origin.z;
+
+
+
+      poly[2] = vaux;
+      clipinfo[0].Clear ();
+      clipinfo[1].Clear ();
+      clipinfo[2].Clear ();
+      clipinfo[0].type = CS_CLIPINFO_ORIGINAL; clipinfo[0].original.idx = tri.a;
+      clipinfo[1].type = CS_CLIPINFO_ORIGINAL; clipinfo[1].original.idx = tri.b;
+      clipinfo[2].type = CS_CLIPINFO_ORIGINAL; clipinfo[2].original.idx = tri.c;
+      int num_poly = 3;
+
+      //-----
+      // First we clip the triangle to the given planes.
+      // This will result in a polygon. The clipper keeps information
+      // (in clipinfo) about what happens to all the vertices.
+      //-----
+      for (j = 0 ; j < num_planes ; j++)
+      {
+	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+	if (num_poly <= 0) break;
+      }
+
+      //-----
+      // First add all new vertices and resolve coordinates of texture
+      // mapping and so on using the clipinfo.
+      //-----
+      for (j = 0 ; j < num_poly ; j++)
+      {
+	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+	{
+	  clipinfo[j].original.idx =
+	  	(*clipped_lightmap_translate)[clipinfo[j].original.idx];
+	}
+  else
+	{
+	  ResolveVertexLightmap (&clipinfo[j], clipped_lightmap_translate->GetArray (),
+	  	texels, vertex_fog,
+		clipped_lightmap_texels->GetArray ()[num_clipped_vertices],		
+		clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
+    (*clipped_lightmap_fog_texels)[num_clipped_vertices], 
+    fog_indices);
+
+	  (*clipped_lightmap_vertices)[num_clipped_vertices].x = 
+      poly[j].x+frust_origin.x;
+    (*clipped_lightmap_vertices)[num_clipped_vertices].y = 
+      poly[j].y+frust_origin.y;
+    (*clipped_lightmap_vertices)[num_clipped_vertices].z = 
+      poly[j].z+frust_origin.z;
+    (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
+	  clipinfo[j].original.idx = num_clipped_vertices;
+	  num_clipped_vertices++;
+	}
+      }
+
+      //-----
+      // Triangulate the resulting polygon.
+      //-----
+      for (j = 2 ; j < num_poly ; j++)
+      {
+        (*clipped_lightmap_triangles)[num_clipped_triangles].a = 
+          clipinfo[0].original.idx;
+        (*clipped_lightmap_triangles)[num_clipped_triangles].b = 
+          clipinfo[j-1].original.idx;
+        (*clipped_lightmap_triangles)[num_clipped_triangles].c = 
+          clipinfo[j].original.idx;
+
+        num_clipped_triangles++;
+      }
+    }
+  }
+}
+
+
+
+
+//// End New Clipping func
+
+static void GenerateFogInfo(G3DFogInfo* fog_info, int* indices, int num_verts)
+{
+
+  if (fog_info == NULL){ printf("Retorno sense fer res\n"); return;}
+  int i;
+  if(clipped_lightmap_fog->Limit() < num_verts) 
+    clipped_lightmap_fog->SetLimit(num_verts);
+  if(clipped_lightmap_fog_texels->Limit() < num_verts) 
+    clipped_lightmap_fog_texels->SetLimit(num_verts);
+  
+  for( i = 0; i < num_verts; i++)
+  {
+    (*clipped_lightmap_fog)[i].red = fog_info[indices[i]].r;
+    (*clipped_lightmap_fog)[i].green = fog_info[indices[i]].g;
+    (*clipped_lightmap_fog)[i].blue = fog_info[indices[i]].b;
+
+    (*clipped_lightmap_fog_texels)[i].x = fog_info[indices[i]].intensity;
+    (*clipped_lightmap_fog_texels)[i].y = 0.0;
+  }
+}
 
 void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 {
@@ -3227,7 +3747,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   // For now this will do.
   //@@@
   lightmap_cache->Flush ();
-  //lightmap_cache->FlushIfNeeded ();
+//  lightmap_cache->FlushIfNeeded ();
 
   if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
     FlushDrawFog ();
@@ -3341,10 +3861,11 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         do_z_plane_clipping = false;
       }
     }
+    
   }
 
   int i, k;
-
+  
   //===========
   // Update work tables.
   //===========
@@ -3357,7 +3878,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
   csVector2* work_uv_verts;
   csVector3* work_verts;
-  iPolyTex_p* work_lightmaps;
+//  iPolyTex_p* work_lightmaps;
   csColor* work_colors;
 
   //===========
@@ -3465,19 +3986,21 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
   SetMirrorMode (mesh.do_mirror);
 
-  TrianglesNode *t = polbuf->GetFirst();
+  TrianglesNode *t = polbuf->GetFirst();  
   for (index = 0 ; index < numMaterials ; index++)
   {
     work_verts = polbuf->GetVerticesPerMaterial (t);
     csTriangle *triangles = polbuf->GetTriangles (t);
     int num_triangles = polbuf->GetTriangleCount (t);
     int num_vertices = polbuf->GetVertexCount (t);
+    int mat_index = polbuf->GetMatIndex (t);
     work_uv_verts = polbuf->GetUV (t);
+    int uvCount = polbuf->GetUVCount (t);
     iMaterialHandle* mat_handle = polbuf->GetMaterialPolygon (t);
     G3DFogInfo* work_fog = mesh.vertex_fog;
     work_colors = polbuf->GetColors (t);
-    iPolyTex_p* lightmaps = polbuf->GetLightMaps (t);
-    work_lightmaps = lightmaps;
+    //iPolyTex_p* lightmaps = polbuf->GetLightMaps (t);
+    //work_lightmaps = lightmaps;
 
     //===========
     // Here we perform lazy or software clipping if needed.
@@ -3485,7 +4008,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     if (how_clip == '0' || use_lazy_clipping
   	  || do_plane_clipping || do_z_plane_clipping)
     {
-      ClipTrianglePolygonMesh (
+      ClipTriangleMesh (
 	    num_triangles,
 	    num_vertices,
 	    triangles,
@@ -3493,7 +4016,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 	    work_uv_verts,
 	    work_colors,
 	    NULL,
-	    lightmaps,
+	    //lightmaps,
 	    num_triangles,
 	    num_vertices,
 	    mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE,
@@ -3508,10 +4031,15 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         work_verts = clipped_vertices->GetArray ();
         work_uv_verts = clipped_texels->GetArray ();
         work_colors = clipped_colors->GetArray();
-        work_lightmaps = clipped_lightmaps->GetArray();
+        //work_lightmaps = clipped_lightmaps.GetArray();
       }
       triangles = clipped_triangles->GetArray ();
-      if (num_triangles <= 0) continue;	// Nothing to do!
+      if (num_triangles <= 0) 
+      {
+        t = polbuf->GetNext (t);
+        continue;	// Nothing to do!
+      }
+      
     }
 
     //===========
@@ -3630,12 +4158,12 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     //===========
     // Here we perform multi-texturing.
     //===========
-    if (m_multimat)
+    /*if (m_multimat)
     {
       glShadeModel (GL_FLAT);
       SetClientStates (CS_CLIENTSTATE_VT);
-      if (num_vertices > uv_mul_verts->Limit ())
-        uv_mul_verts->SetLimit (num_vertices);
+      if (num_vertices > uv_mul_verts.Limit ())
+        uv_mul_verts.SetLimit (num_vertices);
 
       int j;
       for (j = 0 ; j < mat->GetTextureLayerCount () ; j++)
@@ -3659,7 +4187,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
           float vscale = layer->vscale;
           float ushift = layer->ushift;
           float vshift = layer->vshift;
-          mul_uv = uv_mul_verts->GetArray ();
+          mul_uv = uv_mul_verts.GetArray ();
 	  for (i = 0 ; i < num_vertices ; i++)
 	  {
 	    mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;
@@ -3688,12 +4216,12 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         glDrawElements (GL_TRIANGLES, num_triangles*3,
       	  GL_UNSIGNED_INT, triangles);
       }
-    }
+    }*/
 
     //===========
     // If there is vertex fog then we apply that last.
     //===========
-    if (mesh.do_fog)
+    /*if (mesh.do_fog)
     {
       // we need to texture and blend, with vertex color
       // interpolation
@@ -3714,128 +4242,140 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         glDisable (GL_TEXTURE_2D);
       if (!m_gouraud)
         glShadeModel (GL_FLAT);
-    }
+    }*/
 
     if (debug_edges)
       DebugDrawElements (G2D,
 	  num_triangles*3, (int*)triangles, (GLfloat*)& work_verts[0],
 		  txtmgr->FindRGB (255, 0, 0), true,
-		  mesh.vertex_mode == G3DPolygonMesh::VM_VIEWSPACE);
-
-    // @@@ Optimization: if the polygon buffer has no lightmaps at all
-    // and no fog is used we don't have to traverse the triangles.
-    if (m_renderstate.lighting || mesh.do_fog)
-    {
-      int tri_idx; // I'm going to traverse all triangles :(
-      csLMCacheData* clm = NULL;
-      csLightMapQueue* lm_queue = NULL;
-      iLightMap * lm = NULL;
-      iPolygonTexture* prevPoly = NULL;
-      float lm_scale_u = 1.0f;
-      float lm_scale_v = 1.0f;
-      float lm_offset_u = 0.0f;
-      float lm_offset_v = 0.0f;
-
-      for (tri_idx = 0 ; tri_idx < num_triangles ; tri_idx++)
-      {
-        const csTriangle& tri = triangles[tri_idx];
-        iPolygonTexture* tex = work_lightmaps[tri_idx];
-        lm = tex->GetLightMap();
-        if (m_renderstate.lighting && lm)
-        {
-          if (prevPoly != tex)
-	  {
-            lightmap_cache->Cache (tex);
-            clm = (csLMCacheData*) lm->GetCacheData();
-            lm_queue = lightmap_cache->GetQueue (clm);
-            lm_scale_u = clm->lm_scale_u;
-            lm_scale_v = clm->lm_scale_v;
-            lm_offset_u = clm->lm_offset_u;
-            lm_offset_v = clm->lm_offset_v;
-            prevPoly = tex;
-          }
-          if (lm_queue)
-          {
-            int lm_idx = lm_queue->AddVertices (3);
-            GLfloat* lm_gl_verts = lm_queue->GetGLVerts (lm_idx);
-	    *lm_gl_verts++ = work_verts[tri.a].x;
-	    *lm_gl_verts++ = work_verts[tri.a].y;
-	    *lm_gl_verts++ = work_verts[tri.a].z;
-	    *lm_gl_verts++ = 1;
-	    *lm_gl_verts++ = work_verts[tri.b].x;
-	    *lm_gl_verts++ = work_verts[tri.b].y;
-	    *lm_gl_verts++ = work_verts[tri.b].z;
-	    *lm_gl_verts++ = 1;
-	    *lm_gl_verts++ = work_verts[tri.c].x;
-	    *lm_gl_verts++ = work_verts[tri.c].y;
-	    *lm_gl_verts++ = work_verts[tri.c].z;
-	    *lm_gl_verts++ = 1;
-
-            GLfloat* lm_gltxt = lm_queue->GetGLTxt (lm_idx);
-            *lm_gltxt++ = (work_uv_verts[tri.a].x - lm_offset_u) * lm_scale_u;
-            *lm_gltxt++ = (work_uv_verts[tri.a].y - lm_offset_v) * lm_scale_v;
-            *lm_gltxt++ = (work_uv_verts[tri.b].x - lm_offset_u) * lm_scale_u;
-            *lm_gltxt++ = (work_uv_verts[tri.b].y - lm_offset_v) * lm_scale_v;
-            *lm_gltxt++ = (work_uv_verts[tri.c].x - lm_offset_u) * lm_scale_u;
-            *lm_gltxt++ = (work_uv_verts[tri.c].y - lm_offset_v) * lm_scale_v;
-
-            lm_queue->AddTriangle (lm_idx, lm_idx + 1, lm_idx + 2);
-          }
-        }
-        if (mesh.do_fog)
-        {
-          fog_queue.z_buf_mode = z_buf_mode;
-          int fog_idx = fog_queue.AddVertices(3);
-
-          GLfloat* fog_glverts = fog_queue.GetGLVerts (fog_idx);
-	  *fog_glverts++ = work_verts[tri.a].x;
-	  *fog_glverts++ = work_verts[tri.a].y;
-	  *fog_glverts++ = work_verts[tri.a].z;
-	  *fog_glverts++ = 1;
-	  *fog_glverts++ = work_verts[tri.b].x;
-	  *fog_glverts++ = work_verts[tri.b].y;
-	  *fog_glverts++ = work_verts[tri.b].z;
-	  *fog_glverts++ = 1;
-	  *fog_glverts++ = work_verts[tri.c].x;
-	  *fog_glverts++ = work_verts[tri.c].y;
-	  *fog_glverts++ = work_verts[tri.c].z;
-	  *fog_glverts++ = 1;
-
-          GLfloat* fog_color = fog_queue.GetFogColor (fog_idx);
-          GLfloat* fog_txt = fog_queue.GetFogTxt (fog_idx);
-          *fog_color++ = mesh.vertex_fog[tri.a].r;
-          *fog_color++ = mesh.vertex_fog[tri.a].g;
-          *fog_color++ = mesh.vertex_fog[tri.a].b;
-
-          *fog_txt++ = mesh.vertex_fog[tri_idx].intensity;
-          *fog_txt++ = 0.0;
-
-          *fog_color++ = mesh.vertex_fog[tri.b].r;
-          *fog_color++ = mesh.vertex_fog[tri.b].g;
-          *fog_color++ = mesh.vertex_fog[tri.b].b;
-
-          *fog_txt++ = mesh.vertex_fog[tri_idx].intensity;
-          *fog_txt++ = 0.0;
-
-          *fog_color++ = mesh.vertex_fog[tri.c].r;
-          *fog_color++ = mesh.vertex_fog[tri.c].g;
-          *fog_color++ = mesh.vertex_fog[tri.c].b;
-
-          *fog_txt++ = mesh.vertex_fog[tri_idx].intensity;
-          *fog_txt++ = 0.0;
-
-          fog_queue.AddTriangle (fog_idx,fog_idx+1,fog_idx+2);
-        }
-      }
-    }
+		  mesh.vertex_mode == G3DPolygonMesh::VM_VIEWSPACE);   
 
     t = polbuf->GetNext (t);
   }
+
+  //OK While loop for drawing geometry is done, let's go for lightmaps
+
+
+
+   // @@@ Optimization: if the polygon buffer has no lightmaps at all
+    // and no fog is used we don't have to traverse the triangles.
+      
+  if (m_renderstate.lighting || mesh.do_fog)
+  {
+    int numSuperLM = polbuf->GetSuperLMCount();
+    //printf("superLMCount = %d\n",numSuperLM);
+    TrianglesSuperLightmapNode* tSL = polbuf->GetFirstTrianglesSLM ();
+    G3DFogInfo* fog_info = mesh.vertex_fog;
+    for(i = 0; i < numSuperLM; i++)
+    {      
+
+      int num_triangles = polbuf->GetTriangleCount (tSL);
+      csTriangle* triangles = polbuf->GetTriangles (tSL);
+      int num_vertices = polbuf->GetVertexCount(tSL);
+      csVector4* work_verts = polbuf->GetVerticesPerSuperLightmap (tSL);
+      csVector2* work_texels = polbuf->GetUV (tSL);
+      int* work_fog_indices = polbuf->GetFogIndices(tSL);
+      
+        
+        
+
+      if(how_clip =='0' || use_lazy_clipping
+         || do_plane_clipping || do_z_plane_clipping)
+      {        
+
+        ClipTriangleLightmapMesh(num_triangles, num_vertices, triangles, 
+          work_verts, work_texels,fog_info,work_fog_indices, num_triangles,
+          num_vertices, mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE,
+          mesh.do_mirror, !use_lazy_clipping,do_plane_clipping, 
+          do_z_plane_clipping, how_clip == '0' || use_lazy_clipping);
+
+
+        if(!use_lazy_clipping)
+        {
+          work_verts = clipped_lightmap_vertices->GetArray ();
+          work_texels = clipped_lightmap_texels->GetArray ();
+        }
+
+        triangles = clipped_lightmap_triangles->GetArray ();
+        if (num_triangles <= 0)
+        {
+          tSL = polbuf->GetNextTrianglesSLM (tSL);
+          continue; //Nothing to do;
+        }
+        csTrianglesPerSuperLightmap* trisSLM = tSL->info;
+        lightmap_cache->Cache(trisSLM);
+        csLightMapQueue* lm_queue = lightmap_cache->GetQueue(trisSLM);
+
+        if(lm_queue)
+        {
+          if(!lm_queue->ownsData)
+          {
+            lm_queue->LoadArrays();
+            lm_queue->ownsData = true;
+          }
+          lm_queue->AddVertices(num_vertices);
+          lm_queue->AddVerticesArray(work_verts,num_vertices);
+          lm_queue->AddTexelsArray(work_texels,num_vertices);
+          lm_queue->AddTrianglesArray(triangles, num_triangles);
+          if (mesh.do_fog)
+          { 
+            csColor* work_fog_info   = clipped_lightmap_fog->GetArray();
+            csVector2* work_fog_texels = clipped_lightmap_fog_texels->GetArray();
+            trisSLM->cacheData->hasFog = true;
+            trisSLM->cacheData->FogHandle = m_fogtexturehandle;
+            lm_queue->AddFogInfoArray(work_fog_info, num_vertices);
+            lm_queue->AddFogTexelsArray(work_fog_texels,num_vertices);
+          }
+          else trisSLM->cacheData->hasFog = false;
+
+        }
+      }
+      else 
+      {
+
+        csTrianglesPerSuperLightmap* trisSLM = tSL->info;
+        lightmap_cache->Cache(trisSLM);
+        csLightMapQueue* lm_queue = lightmap_cache->GetQueue(trisSLM);
+        
+                
+        if(lm_queue)
+        {
+          if(lm_queue->ownsData)
+          {
+            lm_queue->SaveArrays();
+            //lm_queue->DeleteArrays();
+            lm_queue->ownsData = false;
+          }
+          lm_queue->AddVerticesArrayFast(work_verts,num_vertices);
+          lm_queue->AddTexelsArrayFast(work_texels);
+          lm_queue->AddTrianglesArrayFast(triangles, num_triangles);
+          
+          if (mesh.do_fog)
+          { 
+            GenerateFogInfo(fog_info,work_fog_indices,num_vertices);
+            csColor* work_fog_info   = clipped_lightmap_fog->GetArray();
+            csVector2* work_fog_texels = clipped_lightmap_fog_texels->GetArray();
+            trisSLM->cacheData->hasFog = true;
+            trisSLM->cacheData->FogHandle = m_fogtexturehandle;
+            lm_queue->AddFogInfoFast(work_fog_info);
+            lm_queue->AddFogTexelsFast(work_fog_texels);
+          }
+          else trisSLM->cacheData->hasFog = false;
+        }
+
+      }
+      tSL = polbuf->GetNextTrianglesSLM (tSL);
+    }
+
+  }  
+  
+
 
   //@@@
   lightmap_cache->Flush ();
   //lightmap_cache->FlushIfNeeded ();
 
+  
   SetMirrorMode (false);
 
   //===========
@@ -3860,7 +4400,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     cl = clipper;
   else
     cl = NULL;
-  DefaultDrawPolygonMesh (mesh, this, o2c, cl, false lazyclip, aspect,
+  DefaultDrawPolygonMesh (mesh, this, o2c, cl, false /*lazyclip, aspect,
   	asp_center_x, asp_center_y);
   */
 }

@@ -63,9 +63,9 @@ public:
   /// Get the polygon info.
   const csPolArrayPolygon& GetPolygon (int i) const { return polygons[i]; }
   /// Get the number of vertices.
-  int GetVertexCount () const { return num_vertices; }
+  virtual int GetVertexCount () const { return num_vertices; }
   /// Get the vertices array.
-  csVector3* GetVertices () const { return vertices; }
+  virtual csVector3* GetVertices () const { return vertices; }
 
   virtual void AddPolygon (int* verts, int num_verts,
 	const csPlane3& poly_normal,
