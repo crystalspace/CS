@@ -325,7 +325,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   walls_state->DecRef ();
   walls->DecRef ();
 
-  LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif")->DecRef ();
+  LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
   iMaterialWrapper *sg = engine->GetMaterialList ()->FindByName("seagull");
   flock = new Flock(engine, 10, sg, room);
 
@@ -420,7 +420,7 @@ bool DemoSky::HandleEvent (iEvent &Event)
 Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
 {
   printf("Creating flock of %d birds\n", num);
-  mat->IncRef ();
+  //  mat->IncRef ();
   nr = num;
   spr = new iMeshWrapper* [nr];
   speed = new csVector3[nr];
