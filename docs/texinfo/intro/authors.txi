@@ -75,6 +75,11 @@ Michael wrote the documentation for Crystal Space's Phyziks library, of which
 he is the author and principal maintainer.
 
 @item
+Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
+
+Desmond updated map2cs documentation by adding new classnames and keys.
+
+@item
 Seth Galbraith (@email{sgalbrai@@linknet.kitsap.lib.wa.us})
 
 Seth wrote the documentation for the DJGPP port of Crystal Space.  He also
@@ -150,11 +155,6 @@ Siu-Hang (@email{shor@@cse.cuhk.edu.hk})
 
 Siu-Hang wrote one of several tutorials for MazeD, the Crystal Space map
 editor.
-
-@item
-Desmond Fletcher (@email{desmond.fletcher@usm.edu}}
-
-Desmond has updated map2cs documentation adding new classnames and keys.
 @end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
