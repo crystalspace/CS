@@ -106,12 +106,11 @@ static inline char* getcwd( char* p, size_t size )
 
 
 //-----------------------------------------------------------------------------
-// NeXT does not supply getopt_long() (I can't get the GNU version to compile.)
+// Load getopt() definition.
 //-----------------------------------------------------------------------------
 #ifdef SYSDEF_GETOPT
 #undef SYSDEF_GETOPT
-#  define CS_NO_GETOPT_LONG
-#  include <libc.h>
+#  include "support/gnu/getopt.h"
 #endif // SYSDEF_GETOPT
 
 #if defined (__LITTLE_ENDIAN__)
