@@ -117,6 +117,7 @@ int csCoverageMaskTreePersp::TestPoint (const csVector3& point)
   //float iz = 1. / point.z;
   //csVector2 persp (point.x * iz, point.y * iz);
   //return csQuadtree::TestPoint (persp);
+  (void) point;
   return 0;
 }
 
@@ -320,6 +321,7 @@ int csCovcube::TestPoint (const csVector3& point)
   cam.z = point.y;
   return trees[5]->TestPoint (cam);
 #endif
+  (void) point;
   return 0;
 }
 
