@@ -5,7 +5,7 @@ DESCRIPTION.csobject = Crystal Space component object library
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo "  make csobject     Make the $(DESCRIPTION.csobject)"
+LIBHELP += $(NEWLINE)echo $"  make csobject     Make the $(DESCRIPTION.csobject)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
