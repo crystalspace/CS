@@ -265,7 +265,6 @@ public:
 struct csShaderVariableProxy
 {
 public:
-
   csShaderVariableProxy () :
       Name (csInvalidStringID), userData (0), shaderVariable(0), realLocation(0)
   {}
@@ -276,9 +275,9 @@ public:
   {}
         
   csStringID Name;
+  void* userData;
   csShaderVariable *shaderVariable;
   csRef<csShaderVariable>* realLocation;
-  void* userData;
 };
 
 
