@@ -9,7 +9,8 @@ chronological order.
 4-Sep-2004
 	- Mike Handverger updated odedynam including the following changes:
 	  - TriMesh collisions (that collide with everything except planes,
-	     since that is missing in ODE currently)
+	     since that is missing in ODE currently) Partly from code posted
+	     to crystal-main by Marc Rochel.
 	  - Ability to select QuickStep (setting iterations not possible yet)
              QuickStep is a new solver for ODE that is much much faster
 	  - Ability to use AutoDisableBodies. When turned on, ODE will
