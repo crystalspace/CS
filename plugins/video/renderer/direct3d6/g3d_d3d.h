@@ -114,7 +114,7 @@ class csGraphics3DDirect3DDx6 : public IGraphics3D
   int m_nHalfWidth,  m_nHalfHeight;
   
   /// The current read/write settings for the Z-buffer.
-  ZBufMode m_ZBufMode;
+  G3DZBufMode m_ZBufMode;
   
   /// The current drawing mode (2D/3D)
   int m_nDrawMode;
@@ -174,7 +174,7 @@ public:
   STDMETHODIMP FinishDraw ();
   
   /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-  STDMETHODIMP SetZBufMode (ZBufMode mode);
+  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
   
   /// Draw the projected polygon with light and texture.
   STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);

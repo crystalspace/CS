@@ -62,7 +62,7 @@ private:
   bool m_bVRetrace;
 
   /// The current read/write settings for the Z-buffer.
-  ZBufMode m_ZBufMode;
+  G3DZBufMode m_ZBufMode;
 
   /// The current drawing mode (2D/3D)
   int m_nDrawMode;
@@ -99,9 +99,9 @@ private:
   bool rstate_alphablend;
   int rstate_mipmap;
 
-  bool        m_gouraud;
-  DPFXMixMode m_mixmode;
-  float       m_alpha;
+  bool  m_gouraud;
+  UInt  m_mixmode;
+  float m_alpha;
 
   /// use 16 bit texture else 8 bit
   bool use16BitTexture;
@@ -131,7 +131,7 @@ public:
   STDMETHODIMP FinishDraw ();
   
   /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-  STDMETHODIMP SetZBufMode (ZBufMode mode);
+  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
  
   /// Draw the projected polygon with light and texture.
   STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
@@ -142,13 +142,13 @@ public:
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov,  int color);
  
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud);
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
-  STDMETHODIMP FinishPolygonFX();
+  STDMETHODIMP FinishPolygonFX ();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly);
+  STDMETHODIMP DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);

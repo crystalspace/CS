@@ -309,8 +309,7 @@ public:
   static float cfg_lod_detail;
 
 protected:
-  DPFXMixMode MixMode;
-  float       Alpha;
+  UInt MixMode;
 
 private:
   /// Object to world transformation.
@@ -409,6 +408,13 @@ public:
   void ResetVertexColors ();
 
   /**
+   * Clamp all vertice colors to 2.0. This is called inside
+   * csSprite3D::UpdateLighting() so that 3D renderer doesn't have
+   * to deal with brightness lighter than 2.0
+   */
+  void FixVertexColors ();
+
+  /**
    * Light sprite according to the given array of lights (i.e.
    * fill the vertex color array).
    * No shadow calculation will be done. This is assumed to have
@@ -431,7 +437,7 @@ public:
   { force_otherskin = false; }
 
   /// Sets the mode that is used, when drawing that sprite.
-  void SetMixmode(DPFXMixMode m, float a) {MixMode = m; Alpha = a;}
+  void SetMixmode (UInt m) { MixMode = m; }
 
   /**
    * Set the transformation vector to move sprite to some position.

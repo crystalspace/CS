@@ -37,10 +37,28 @@ interface ISystem;
 interface ITextureManager;
 interface ITextureHandle;
 
-#define CS_FOG_FRONT 0
-#define CS_FOG_BACK 1
-#define CS_FOG_VIEW 2
-#define CS_FOG_PLANE 3
+#define CS_FOG_FRONT		0
+#define CS_FOG_BACK		1
+#define CS_FOG_VIEW		2
+#define CS_FOG_PLANE		3
+
+/**
+ * Mix modes for DrawPolygonFX ()
+ * The constants below can be ORed together if they belong to different masks.
+ */ 
+#define CS_FX_MASK_MIXMODE	0xF0000000	// SRC/DST mixing mode mask
+#define CS_FX_COPY		0x00000000	// =SRC
+#define CS_FX_MULTIPLY		0x10000000	// =SRC*DST
+#define CS_FX_MULTIPLY2		0x20000000	// =2*SRC*DST
+#define CS_FX_ADD		0x30000000	// =SRC+DST
+#define CS_FX_ALPHA		0x40000000	// =(1-alpha)*SRC + alpha*DST
+#define CS_FX_TRANSPARENT	0x50000000	// =DST
+#define CS_FX_KEYCOLOR		0x08000000	// color 0 is transparent
+#define CS_FX_GOURAUD		0x04000000	// Gouraud shading
+#define CS_FX_MASK_ALPHA	0x000000FF	// alpha = 0..FF (opaque..transparent)
+
+/// Macro for easier setting of alpha bits into mixmode
+#define CS_FX_SETALPHA(alpha)	(CS_FX_ALPHA | UInt (alpha * CS_FX_MASK_ALPHA))
 
 /// Vertex Structure for use with G3DPolygonDP and G3DPolygonAFP
 class G3DVertex
@@ -196,18 +214,6 @@ struct G3DPolygonAFP
   G3DPolyNormal normal;
 };
 
-typedef enum 
-{
-  FX_Multiply,
-  FX_Multiply2,
-  FX_Add,
-  FX_Copy,
-  FX_Alpha,
-  FX_Transparent
-} DPFXMixMode;
-
-
-
 ///
 class G3DFltLight
 {
@@ -221,15 +227,13 @@ public:
 };
 
 /// Don't test/write, write, test, and write/test, respectively.
-enum ZBufMode
+enum G3DZBufMode
 {
-  ZBuf_None = 0x00,
-  ZBuf_Fill = 0x01,
-  ZBuf_Test = 0x02,
-  ZBuf_Use = 0x03
+  CS_ZBUF_NONE = 0,
+  CS_ZBUF_FILL = 1,
+  CS_ZBUF_TEST = 2,
+  CS_ZBUF_USE  = 3
 };
-
-//enumerations: DAN
 
 ///
 enum G3D_RENDERSTATEOPTION
@@ -374,7 +378,7 @@ public:
   STDMETHOD (Print) (csRect *area) PURE;
 
   /// Set the mode for the Z buffer used for drawing the next polygon.
-  STDMETHOD (SetZBufMode) (ZBufMode mode) PURE;
+  STDMETHOD (SetZBufMode) (G3DZBufMode mode) PURE;
 
   /// Draw the projected polygon with light and texture.
   STDMETHOD (DrawPolygon) (G3DPolygonDP& poly) PURE;
@@ -417,16 +421,10 @@ public:
    * parameters:
    * handle:  The texture handle as returned by ITextureManager.
    * mode:    How shall the new polygon be combined with the current 
-   *          screen content.
-   * alpha:   AlphaValue of the polygon. Ranges from 0.0 to 1.0. 0 means 
-   *          opaque, 1.0 is comletely transparent. Will only cause some 
-   *          effect, if mode is FX_Alpha
-   * gouraud: set to true, if you want to shade the resulting texture by 
-   *          the colorvalues in vertices[i].r, .b, .g, if you set gouraud 
-   *          to true and set all color components to 1.0, you will see no 
-   *          gouraud shading.
+   *          screen content. This is any legal combination of CS_FX_XXX
+   *          flags including alpha value (if CS_FX_ALPHA flag is set)
    */
-  STDMETHOD (StartPolygonFX)  (ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud) PURE;
+  STDMETHOD (StartPolygonFX) (ITextureHandle* handle, UInt mode) PURE;
 
   /**
    * Finish drawing a series of Polygon FX.
@@ -437,7 +435,7 @@ public:
    * Draw a polygon with special effects. This is the most rich and slowest
    * variant of DrawPolygonXxx. (If you use these features) 
    */
-  STDMETHOD (DrawPolygonFX)    (G3DPolygonDPFX& poly) PURE;
+  STDMETHOD (DrawPolygonFX) (G3DPolygonDPFX& poly) PURE;
 
   /// Get the current fog mode (G3D_FOGMETHOD).
   COM_METHOD_DECL GetFogMode (G3D_FOGMETHOD& fogMethod) = 0;

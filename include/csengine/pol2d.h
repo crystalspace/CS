@@ -197,6 +197,6 @@ struct G3DPolygonDPFX;
  * g3d->DrawPolygonFX
  */
 extern void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
-	int num_vertices, csVector2 *orig_triangle, bool gouraud);
+  int num_vertices, csVector2 *orig_triangle, bool gouraud);
 
 #endif /*POL2D_H*/

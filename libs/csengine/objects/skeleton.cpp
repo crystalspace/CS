@@ -59,7 +59,6 @@ void csSkeletonLimbState::AddChild (csSkeletonLimbState* child)
   children = child;
 }
 
-
 void csSkeletonLimb::UpdateState (csSkeletonLimbState* limb)
 {
   limb->vertices = vertices;
@@ -136,9 +135,7 @@ void csSkeletonLimbState::Transform (const csTransform& tr, csFrame* source, csV
   csVector3* src_verts = source->GetVertices ();
   int i;
   for (i = 0 ; i < num_vertices ; i++)
-  {
-    dest[vertices[i]] = tr * src_verts[vertices[i]];
-  }
+    dest [vertices [i]] = tr * src_verts [vertices [i]];
 }
 
 void csSkeletonConnectionState::Transform (const csTransform& tr, csFrame* source, csVector3* dest)
@@ -146,4 +143,3 @@ void csSkeletonConnectionState::Transform (const csTransform& tr, csFrame* sourc
   csTransform tr_new = tr * trans;
   csSkeletonLimbState::Transform (tr_new, source, dest);
 }
-

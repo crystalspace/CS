@@ -277,8 +277,7 @@ csSprite3D::csSprite3D () : csObject ()
   vertex_colors = NULL;
   dynamiclights = NULL;
   skeleton_state = NULL;
-  MixMode = FX_Copy;
-  Alpha   = 0.0f;
+  MixMode = CS_FX_COPY;
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   draw_callback = NULL;
@@ -392,15 +391,22 @@ void csSprite3D::AddVertexColor (int i, const csColor& col)
     for (j = 0 ; j < tpl->GetNumVertices (); j++)
       vertex_colors[j].Set (0, 0, 0);
   }
-  vertex_colors[i].red += col.red;
-  vertex_colors[i].green += col.green;
-  vertex_colors[i].blue += col.blue;
+  vertex_colors [i].red += col.red;
+  vertex_colors [i].green += col.green;
+  vertex_colors [i].blue += col.blue;
 }
 
 void csSprite3D::ResetVertexColors ()
 {
   CHK (delete [] vertex_colors);
   vertex_colors = NULL;
+}
+
+void csSprite3D::FixVertexColors ()
+{
+  if (vertex_colors)
+    for (int i = 0 ; i < tpl->GetNumVertices (); i++)
+      vertex_colors [i].Clamp (2., 2., 2.);
 }
 
 csTriangleMesh csSprite3D::mesh;
@@ -587,7 +593,8 @@ void csSprite3D::Draw (csRenderView& rview)
     poly.txt_handle = tpl->cstxt->GetTextureHandle ();
 
   if (!rview.callback)
-    rview.g3d->StartPolygonFX (poly.txt_handle, MixMode, Alpha, vertex_colors != NULL);
+    rview.g3d->StartPolygonFX (poly.txt_handle, MixMode
+      | (vertex_colors ? CS_FX_GOURAUD : 0));
 
   // Get this field from the current view for conveniance.
   bool mirror = rview.IsMirrored ();
@@ -677,8 +684,7 @@ void csSprite3D::InitSprite ()
 
   m_world2obj = m_obj2world.GetInverse ();
 
-  MixMode = FX_Copy;
-  Alpha   = 0.0f;
+  MixMode = CS_FX_COPY;
 }
 
 bool csSprite3D::NextFrame (long current_time, bool onestep, bool stoptoend)
@@ -781,6 +787,8 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
     this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
 
   ResetVertexColors ();
+
+  // this is so that sprite gets blackened if no light strikes it
   AddVertexColor (0, csColor (0, 0, 0));
 
   for (i = 0 ; i < num_lights ; i++)
@@ -824,6 +832,9 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
       }
     }
   }
+
+  // Clamp all vertice colors to 2.0
+  FixVertexColors ();
 }
 
 void csSprite3D::UnlinkDynamicLight (csLightHitsSprite* lp)

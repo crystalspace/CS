@@ -596,7 +596,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
   // Set default Z-buffer mode.
   m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
   m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE);
-  m_ZBufMode = ZBuf_Fill;
+  m_ZBufMode = CS_ZBUF_FILL;
   
   // save half of the memory for textures,
   // half for lightmaps
@@ -761,19 +761,19 @@ STDMETHODIMP csGraphics3DDirect3DDx5::FinishDraw ()
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::SetZBufMode(ZBufMode mode)
+STDMETHODIMP csGraphics3DDirect3DDx5::SetZBufMode(G3DZBufMode mode)
 {
   if (mode==m_ZBufMode) 
     return S_OK;
   
   m_ZBufMode = mode;
   
-  if (mode == ZBuf_Test)
+  if (mode == CS_ZBUF_TEST)
     VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE), DD_OK );
   else
     VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE), DD_OK );    
   
-  if (mode == ZBuf_Fill)      // write-only
+  if (mode == CS_ZBUF_FILL)      // write-only
     VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS), DD_OK );
   else 
     VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK );
@@ -1133,11 +1133,11 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   return S_OK;
 } 
 
-
-
-STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud)
+STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX (ITextureHandle* handle,
+  UInt mode)
 {
-  m_gouraud = gouraud && rstate_gouraud;
+  float alpha = float (mode & CS_FX_MASK_ALPHA) / 255.;
+  m_gouraud = rstate_gouraud && (mode & CS_FX_GOURAUD != 0);
   m_mixmode = mode;
   m_alpha   = alpha;
 
@@ -1147,54 +1147,48 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPF
 
   HighColorCache_Data* pTexData = txt_mm->get_hicolorcache ();
 
-  bool  bColorKeyed  = txt_mm->get_transparent ();
+  if (txt_mm->get_transparent ())
+    VERIFY_RESULT (m_lpd3dDevice->SetRenderState (D3DRENDERSTATE_COLORKEYENABLE, TRUE), DD_OK);
 
-  if ( bColorKeyed )
-  {
-    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, TRUE), DD_OK);
-  }
-
-  if (mode!=FX_Copy)
-  {
-    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE), DD_OK);
-  }
+  if ((mode & CS_FX_MASK_MODE) != CS_FX_COPY)
+    VERIFY_RESULT (m_lpd3dDevice->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, TRUE), DD_OK);
 
   //Note: In all explanations of Mixing:
   //Color: resulting color
   //SRC:   Color of the texel (content of the texture to be drawn)
   //DEST:  Color of the pixel on screen
   //Alpha: Alpha value of the polygon
-  switch (mode)
+  switch (mode & CS_FX_MASK_MIXMODE)
   {
-    case FX_Multiply:
+    case CS_FX_MULTIPLY:
       //Color = SRC * DEST +   0 * SRC = DEST * SRC
       m_alpha = 0.0f;
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK);
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO), DD_OK);
       break;
-    case FX_Multiply2:
+    case CS_FX_MULTIPLY2:
       //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
       m_alpha = 0.0f;
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK); 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR), DD_OK);
       break;
-    case FX_Add:
+    case CS_FX_ADD:
       //Color = 1 * DEST + 1 * SRC = DEST + SRC
       m_alpha = 0.0f;
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK); 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE), DD_OK);
       break;
-    case FX_Alpha:
+    case CS_FX_ALPHA:
       //Color = Alpha * DEST + (1-Alpha) * SRC 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK); 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA), DD_OK);
       break;
-    case FX_Transparent:
+    case CS_FX_TRANSPARENT:
       //Color = 1 * DEST + 0 * SRC = DEST
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK); 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO), DD_OK);
       break;
-    case FX_Copy:
+    case CS_FX_COPY:
     default:
       //Color = 0 * DEST + 1 * SRC = SRC
       m_alpha = 0.0f;
@@ -1203,14 +1197,15 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPF
       break;
   }
 
-  if (m_alpha == 0.0f && m_mixmode == FX_Alpha)
+  if (m_alpha == 0.0f && (m_mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
   {
-    //workaround for a bug in alpha transparency. It looks like on some cards you may not select
-    //alpha == 0, (opaque) because that will make the result invisible. :-(
+    // workaround for a bug in alpha transparency. It looks like on some cards
+    // you may not select alpha == 0, (opaque) because that will make
+    // the result invisible. :-(
     m_alpha = 0.01f; 
   }
 
-  VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex), DD_OK );
+  VERIFY_RESULT (m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex), DD_OK);
 
   return S_OK;
 }

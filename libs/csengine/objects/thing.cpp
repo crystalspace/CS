@@ -244,7 +244,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
     if (!rview.callback)
-      rview.g3d->StartPolygonFX (poly.txt_handle, FX_Copy, 0.0, gouraud);
+      rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0));
 
     for (j = 0 ; j < tess->GetNumTriangles () ; j++)
     {

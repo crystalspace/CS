@@ -33,15 +33,18 @@ public:
   float blue;
 
 public:
-  ///
+  /// Initialize a color object (contents undefined)
   csColor () { }
-  ///
+  /// Initialize a color object with given R,G,B components
   csColor (float r, float g, float b)
   { red = r; green = g; blue = b; }
-  ///
+  /// Set color to given R,G,B components
   void Set (float r, float g, float b)
   { red = r; green = g; blue = b; }
-  ///
+  /// Clamp color to given R,G,B values
+  void Clamp (float r, float g, float b)
+  { if (red > r) red = r; if (green > g) green = g; if (blue > b) blue = b; }
+  /// Assign one color object to another
   inline void operator= (const csColor &Copy)
   { red = Copy.red; green = Copy.green; blue = Copy.blue; }
 };

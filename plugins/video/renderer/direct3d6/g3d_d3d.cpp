@@ -478,7 +478,7 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(char* Title)
   m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
   m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE);
 
-  m_ZBufMode = ZBuf_Fill;
+  m_ZBufMode = CS_ZBUF_FILL;
   
   // save half of the memory for textures,
   // half for lightmaps
@@ -644,19 +644,19 @@ STDMETHODIMP csGraphics3DDirect3DDx6::FinishDraw ()
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::SetZBufMode(ZBufMode mode)
+STDMETHODIMP csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
 {
   if (mode==m_ZBufMode) 
     return S_OK;
   
   m_ZBufMode = mode;
   
-  if (mode == ZBuf_Test)
+  if (mode == CS_ZBUF_TEST)
     VERIFY( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE) == DD_OK );
   else
     VERIFY( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE) == DD_OK );    
   
-  if (mode == ZBuf_Fill)      // write-only
+  if (mode == CS_ZBUF_FILL)      // write-only
     VERIFY( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS) == DD_OK );
   else 
     VERIFY( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL) == DD_OK );

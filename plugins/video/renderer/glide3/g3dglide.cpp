@@ -632,7 +632,7 @@ STDMETHODIMP csGraphics3DGlide3x::Print(csRect* rect)
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-STDMETHODIMP csGraphics3DGlide3x::SetZBufMode (ZBufMode mode)
+STDMETHODIMP csGraphics3DGlide3x::SetZBufMode (G3DZBufMode mode)
 {
   return E_NOTIMPL;   
 }

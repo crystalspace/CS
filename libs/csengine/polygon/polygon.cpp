@@ -1850,7 +1850,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
       g3dpoly.vertices[2].b = po_colors[2].blue;
     }
     PreparePolygonFX (&g3dpoly, vertices, num_vertices, orig_triangle, po_colors != NULL);
-    rview->g3d->StartPolygonFX (g3dpoly.txt_handle, FX_Copy, 0.0f, po_colors != NULL);
+    rview->g3d->StartPolygonFX (g3dpoly.txt_handle, CS_FX_COPY | (po_colors ? CS_FX_GOURAUD : 0));
     rview->g3d->DrawPolygonFX (g3dpoly);
     rview->g3d->FinishPolygonFX ();
   }

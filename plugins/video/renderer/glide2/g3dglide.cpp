@@ -774,19 +774,19 @@ STDMETHODIMP csGraphics3DGlide2x::Print(csRect* rect)
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-STDMETHODIMP csGraphics3DGlide2x::SetZBufMode (ZBufMode mode)
+STDMETHODIMP csGraphics3DGlide2x::SetZBufMode (G3DZBufMode mode)
 {
   if (mode==m_ZBufMode) 
     return S_OK;
   
   m_ZBufMode = mode;
   
-  if (mode & ZBuf_Test)
+  if (mode & CS_ZBUF_TEST)
     GlideLib_grDepthMask(FXFALSE);
   else
     GlideLib_grDepthMask(FXTRUE);    
   
-  if (mode & ZBuf_Fill)      // write-only
+  if (mode & CS_ZBUF_FILL)      // write-only
     GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);    
   else 
     GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);    
@@ -1125,13 +1125,13 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* /*handle*/, DPFXMixMode mode, 
-                                                 float alpha, bool gouraud)
+STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle * /*handle*/,
+  UInt mode)
 {
   m_mixmode = mode;
-  m_alpha   = alpha;
-  m_gouraud = gouraud && rstate_gouraud;
-  return S_OK; 
+  m_alpha   = float (mode & CS_FX_MASK_ALPHA) / 255.;
+  m_gouraud = rstate_gouraud && (mode & CS_FX_GOURAUD != 0);
+  return S_OK;
 }
 
 STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
@@ -1377,10 +1377,10 @@ STDMETHODIMP csGraphics3DGlide2x::GetRenderState(G3D_RENDERSTATEOPTION op, long&
       retval = 0;
       break;
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      retval = (bool)(m_ZBufMode & ZBuf_Test);
+      retval = (bool)(m_ZBufMode & CS_ZBUF_TEST);
       break;
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      retval = (bool)(m_ZBufMode & ZBuf_Fill);
+      retval = (bool)(m_ZBufMode & CS_ZBUF_FILL);
       break;
     case G3DRENDERSTATE_DITHERENABLE:
       retval = false;
