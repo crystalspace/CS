@@ -1232,7 +1232,16 @@ AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
 	[$cs_cv_libjpeg_lflags $cs_cv_libz_lflags],
 	[$cs_cv_libjpeg_libs $cs_cv_libz_libs])])
 
-
+#-----------------------------------------------------------------------------
+# Check for libmikmod.  In addition to the standard installed locations, we
+# also search CS/libs/libmikmod*.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([mikmod],
+    [AC_LANG_PROGRAM(
+	[#include <mikmod.h>],
+	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
+    [libs/libmikmod*], [],
+    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])])
 
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older

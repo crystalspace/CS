@@ -59,7 +59,7 @@ ifeq ($(MAKESECTION),targets)
 sndmod: $(OUTDIRS) $(SNDMOD)
 
 $(SNDMOD): $(OBJ.SNDMOD) $(LIB.SNDMOD)
-	$(DO.PLUGIN) -lmikmod
+	$(DO.PLUGIN) $(MIKMOD.LFLAGS)
 
 clean: sndmodclean
 sndmodclean:

@@ -127,7 +127,9 @@ PLUGINS.DYNAMIC += font/server/fontplex
 #PLUGINS.DYNAMIC += font/server/freefnt2
 PLUGINS.DYNAMIC += aws
 #PLUGINS.DYNAMIC += sound/loader/ogg
-#PLUGINS.DYNAMIC += sound/loader/mod
+ifeq ($(MIKMOD.AVAILABLE),yes)
+PLUGINS.DYNAMIC += sound/loader/mod
+endif
 #PLUGINS.DYNAMIC += sound/renderer/openal
 #PLUGINS.DYNAMIC += physics/odedynam
 #PLUGINS.DYNAMIC += physics/loader
