@@ -289,7 +289,7 @@ bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
     gettimeofday (&now, &tz);
     to.tv_sec = now.tv_sec + (timeout / 1000);
     to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
-    if (to.tv_nsec > nsec_per_sec) // Catch overflow.
+    if (to.tv_nsec >= nsec_per_sec) // Catch overflow.
     {
       to.tv_sec += to.tv_nsec / nsec_per_sec;
       to.tv_nsec %= nsec_per_sec;
