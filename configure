@@ -6716,15 +6716,7 @@ fi
 
 #------------------------------------------------------------------------------
 # Check if Python SDK is installed and which compiler and linker flags are
-# required to embed Python.  Several techniques are used in an attempt to
-# determine the proper flags.  First, an attempt it made to query Python's
-# "distutils.sysconfig" module.  This should work for Python 2.x.  If that
-# fails, Python's "sys" module is queried to find the path of the Python
-# standard library.  Inside the library's "config" directory is a makefile
-# which can be parsed to glean the necessary flags.  If the Python executable
-# is not available, try locating the Python directories and Makefile manually.
-# As a last resort, if the environment variables PYTHON_INC and PYTHON_LIB are
-# set, then use those values.
+# required to embed Python.
 #------------------------------------------------------------------------------
 for ac_prog in python
 do
@@ -6786,253 +6778,77 @@ if test -z "$with_python"; then
 fi
 
 
-if test "$with_python" != no; then
-  if test -n "$PYTHON"; then
-  echo "$as_me:$LINENO: checking for python distutils module" >&5
-echo $ECHO_N "checking for python distutils module... $ECHO_C" >&6
-if test "${cs_cv_python_distutils+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if { (echo "$as_me:$LINENO: \$PYTHON -c 'import distutils.sysconfig' 1>&2") >&5
-  ($PYTHON -c 'import distutils.sysconfig' 1>&2) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  cs_cv_python_distutils=yes
-else
-  cs_cv_python_distutils=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_python_distutils" >&5
-echo "${ECHO_T}$cs_cv_python_distutils" >&6
-	if test $cs_cv_python_distutils = yes; then
-  cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}PYTHON.DISTUTILS = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.DISTUTILS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-else
-  cs_cv_python_distutils=no
-fi
-
-
-    echo "$as_me:$LINENO: checking for python SDK" >&5
+if test -n "$PYTHON" && test "$with_python" != no; then
+  echo "$as_me:$LINENO: checking for python SDK" >&5
 echo $ECHO_N "checking for python SDK... $ECHO_C" >&6
 if test "${cs_cv_python_sdk+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  cs_cv_python_sdk=no
-	cs_pylib_dir=''
-	cs_python_makefile=''
-
-	if test -n "$PYTHON"; then
-  # Python 2.x?
-	    if test $cs_cv_python_distutils = yes; then
   cs_pyver=`{ (echo "$as_me:$LINENO: \$PYTHON -c 'import sys, string; \\
-		    print string.join(map(str,sys.version_info[:2]),\".\")'") >&5
+	    print string.join(map(str,sys.version_info[:2]),\".\")'") >&5
   ($PYTHON -c 'import sys, string; \
-		    print string.join(map(str,sys.version_info[:2]),".")') 2>&5
+	    print string.join(map(str,sys.version_info[:2]),".")') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
-		cs_cv_pybase="python${cs_pyver}"
-		cs_cv_pybase_cflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-		    'import distutils.sysconfig; \\
-		    print \"-I\"+distutils.sysconfig.get_python_inc()'") >&5
+	cs_cv_pybase="python${cs_pyver}"
+
+	cs_cv_pybase_cflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
+	    'import distutils.sysconfig; \\
+	    print \"-I\" + distutils.sysconfig.get_python_inc()'") >&5
   ($PYTHON -c \
-		    'import distutils.sysconfig; \
-		    print "-I"+distutils.sysconfig.get_python_inc()') 2>&5
+	    'import distutils.sysconfig; \
+	    print "-I" + distutils.sysconfig.get_python_inc()') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
-		# Depending upon platform and installation, link library might
-		# reside in "${prefix}/lib", "get_python_lib()/config", or
-		# "${prefix}/libs" on Windows.
-		cs_cv_pybase_lflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-		    'import sys,distutils.sysconfig; \\
-		    print \"-L\"+distutils.sysconfig.get_python_lib(0,1)+\" \"+ \\
-			\"-L\"+distutils.sysconfig.get_python_lib(0,1)+\"/config\"\\
-			+\" -L\"+sys.prefix+\"/lib\"+\" -L\"+sys.prefix+\"/libs\"'") >&5
+	cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | tr '\\\\' '/' | sed 's/^x//'`
+	cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+
+	# Depending upon platform and installation, link library might reside
+	# in "${prefix}/lib", "get_python_lib()/config", or "${prefix}/libs" on
+	# Windows.
+	cs_cv_pybase_lflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
+	    'import sys,distutils.sysconfig; \\
+	    print \"-L\" + distutils.sysconfig.get_python_lib(0,1) + \\
+		\" -L\" + distutils.sysconfig.get_python_lib(0,1) + \"/config\" + \\
+		\" -L\" + sys.prefix + \"/lib\" + \" -L\" + sys.prefix + \"/libs\"'") >&5
   ($PYTHON -c \
-		    'import sys,distutils.sysconfig; \
-		    print "-L"+distutils.sysconfig.get_python_lib(0,1)+" "+ \
-			"-L"+distutils.sysconfig.get_python_lib(0,1)+"/config"\
-			+" -L"+sys.prefix+"/lib"+" -L"+sys.prefix+"/libs"') 2>&5
+	    'import sys,distutils.sysconfig; \
+	    print "-L" + distutils.sysconfig.get_python_lib(0,1) + \
+		" -L" + distutils.sysconfig.get_python_lib(0,1) + "/config" + \
+		" -L" + sys.prefix + "/lib" + " -L" + sys.prefix + "/libs"') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
-		cs_cv_pybase_libs=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-		    'import distutils.sysconfig ; \\
-		    print (distutils.sysconfig.get_config_var(\"LIBS\") or \"\")+ \\
-			\" \" + (distutils.sysconfig.get_config_var(\"SYSLIBS\") \\
-			or \"\")'") >&5
+	cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | tr '\\\\' '/' | sed 's/^x//'`
+	cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+
+	cs_cv_pybase_libs=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
+	    'import distutils.sysconfig ; \\
+	    print (distutils.sysconfig.get_config_var(\"LIBS\") or \"\") + \" \" + \\
+		  (distutils.sysconfig.get_config_var(\"SYSLIBS\") or \"\")'") >&5
   ($PYTHON -c \
-		    'import distutils.sysconfig ; \
-		    print (distutils.sysconfig.get_config_var("LIBS") or "")+ \
-			" " + (distutils.sysconfig.get_config_var("SYSLIBS") \
-			or "")') 2>&5
+	    'import distutils.sysconfig ; \
+	    print (distutils.sysconfig.get_config_var("LIBS") or "") + " " + \
+		  (distutils.sysconfig.get_config_var("SYSLIBS") or "")') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
-		cs_cv_python_sdk=yes
-fi
+	cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | tr '\\\\' '/' | sed 's/^x//'`
+	cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 
-
-	    # Not Python 2.x; try Python 1.x.
-	    if test $cs_cv_python_sdk != yes; then
-  cs_python_paths=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-'import sys
-for p in sys.path: print p'") >&5
-  ($PYTHON -c \
-'import sys
-for p in sys.path: print p') 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-		if test -n "$cs_python_paths"; then
-  for cs_pypath in $cs_python_paths
-		    do
-			cs_pypath=`echo $cs_pypath | sed 's:/$::'`
-			if test -f $cs_pypath/config/Makefile; then
-  cs_pylib_dir=$cs_pypath
-			    cs_python_makefile=$cs_pypath/config/Makefile
-			    break
-fi
-
-		    done
-fi
-
-fi
-
+	if test -n "$cs_pyver" &&
+	       test -n "$cs_cv_pybase_cflags" &&
+	       test -n "$cs_cv_pybase_lflags"; then
+  cs_cv_python_sdk=yes
 else
-  # Unable to query missing Python executable or query failed, so
-	    # try PYTHON_LIB and well-known locations.
-	    if test -n "$PYTHON_LIB"; then
-  cs_pylib_dir=$PYTHON_LIB
-		if test -f $PYTHON_LIB/config/Makefile; then
-  cs_python_makefile=$PYTHON_LIB/config/Makefile
-fi
-
-else
-  for cs_pypath in /usr/local/python /usr/local /usr
-		do
-		    # If multiple Python subdirectories exists in a given path,
-		    # we choose the last one since it probably has the highest
-		    # version number (that is, do not "break" from the loop).
-		    for cs_pydir in $cs_pypath/lib/python*
-		    do
-			if test -f $cs_pydir/config/Makefile; then
-  cs_pylib_dir=$cs_pydir
-			    cs_python_makefile=$cs_pydir/config/Makefile
-fi
-
-		    done
-		done
-fi
-
-fi
-
-
-	# If compiler and linker flags not yet determined but resource
-	# directory and makefile located, then try extracting information from
-	# Python makefile.
-	if test $cs_cv_python_sdk != yes; then
-  if test -n "$cs_python_makefile"; then
-  cs_pylibs=`{ (echo "$as_me:$LINENO: grep '^LIBS[ 	]*=' \$cs_python_makefile | \\
-			sed 's/LIBS[ 	]*=//'") >&5
-  (grep '^LIBS[ 	]*=' $cs_python_makefile | \
-			sed 's/LIBS[ 	]*=//') 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-		cs_pylibm=`{ (echo "$as_me:$LINENO: grep '^LIBM[ 	]*=' \$cs_python_makefile | \\
-			sed 's/LIBM[ 	]*=//'") >&5
-  (grep '^LIBM[ 	]*=' $cs_python_makefile | \
-			sed 's/LIBM[ 	]*=//') 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-		cs_pylibc=`{ (echo "$as_me:$LINENO: grep '^LIBC[ 	]*=' \$cs_python_makefile | \\
-			sed 's/LIBC[ 	]*=//'") >&5
-  (grep '^LIBC[ 	]*=' $cs_python_makefile | \
-			sed 's/LIBC[ 	]*=//') 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-fi
-
-
-	    # Construct CFLAGS and LFLAGS
-	    if test -n "$cs_pylib_dir"; then
-  cs_cv_pybase=`$as_basename $cs_pylib_dir ||
-$as_expr X/$cs_pylib_dir : '.*/\([^/][^/]*\)/*$' \| \
-	 X$cs_pylib_dir : 'X\(//\)$' \| \
-	 X$cs_pylib_dir : 'X\(/\)$' \| \
-	 .     : '\(.\)' 2>/dev/null ||
-echo X/$cs_pylib_dir |
-    sed '/^.*\/\([^/][^/]*\)\/*$/{ s//\1/; q; }
-  	  /^X\/\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\/\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
-		if test -n "$cs_cv_pybase"; then
-  if test -n "$PYTHON_INC"; then
-  cs_pyinc_dir=$PYTHON_INC
-else
-  cs_pyinc=`(dirname $cs_pylib_dir) 2>/dev/null ||
-$as_expr X$cs_pylib_dir : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$cs_pylib_dir : 'X\(//\)[^/]' \| \
-	 X$cs_pylib_dir : 'X\(//\)$' \| \
-	 X$cs_pylib_dir : 'X\(/\)' \| \
-	 .     : '\(.\)' 2>/dev/null ||
-echo X$cs_pylib_dir |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
-			cs_pyinc=`(dirname $cs_pyinc) 2>/dev/null ||
-$as_expr X$cs_pyinc : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$cs_pyinc : 'X\(//\)[^/]' \| \
-	 X$cs_pyinc : 'X\(//\)$' \| \
-	 X$cs_pyinc : 'X\(/\)' \| \
-	 .     : '\(.\)' 2>/dev/null ||
-echo X$cs_pyinc |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
-			cs_pyinc_dir="$cs_pyinc/include/$cs_cv_pybase"
-fi
-
-
-		    cs_cv_pybase_cflags="-I$cs_pyinc_dir"
-		    cs_cv_pybase_lflags="-L$cs_pylib_dir
-			-L$cs_pylib_dir/config"
-		    cs_cv_pybase_libs="$cs_pylibs $cs_pylibm $cs_pylibc"
-    		    cs_cv_python_sdk=yes
-fi
-
-fi
-
+  cs_cv_python_sdk=no
 fi
 
 fi
 echo "$as_me:$LINENO: result: $cs_cv_python_sdk" >&5
 echo "${ECHO_T}$cs_cv_python_sdk" >&6
-
-    cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | tr '\\\\' '/' | sed 's/^x//'`
-    cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | tr '\\\\' '/' | sed 's/^x//'`
-    cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | tr '\\\\' '/' | sed 's/^x//'`
-    cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 
     # Check if Python SDK is usable.  The most common library name is the
     # basename with a few decorations (for example, libpython2.2.a), however
@@ -7040,17 +6856,15 @@ echo "${ECHO_T}$cs_cv_python_sdk" >&6
     # or python22.lib), so we must check for both variations.  Furthermore,
     # Python on MacOS/X still uses a one-level linker namespace, which means
     # that loadable Python modules do not link against the Python library;
-    # instead, unresolved symbols in the modules are satisfied by the Python
-    # executable when the module is loaded into the executable.  For this
-    # reason, Python on MacOS/X does not even provide a Python link library.
+    # instead, unresolved symbols in the modules are satisfied automatically by
+    # the Python executable when the module is loaded into the executable.  For
+    # this reason, Python on MacOS/X does not even provide a Python link
+    # library.
     if test $cs_cv_python_sdk = yes; then
   cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
 	cs_pytuples="$cs_pytuples `echo @@@-l$cs_cv_pybase | sed 'y% %#%'`"
 	cs_pytuples="$cs_pytuples `echo @@@-l$cs_pywinlib | sed 'y% %#%'`"
-	if test "$cs_host_macosx" = yes; then
-  cs_pytuples="$cs_pytuples `echo @@-bundle -flat_namespace -undefined suppress@ | sed 'y% %#%'`"
-fi
-
+	cs_pytuples="$cs_pytuples `echo @@-bundle -flat_namespace -undefined suppress@ | sed 'y% %#%'`"
 	if test "" != yes; then
   echo "$as_me:$LINENO: checking if python SDK is usable" >&5
 echo $ECHO_N "checking if python SDK is usable... $ECHO_C" >&6

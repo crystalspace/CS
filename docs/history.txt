@@ -38,6 +38,14 @@ chronological order.
 	  for any use of int8, uint8, etc.  after ivaria/ode.h was included
 	  since the compiler still saw ode_int8, ode_uint8, etc. in their
 	  stead.
+	- Eric Sunshine simplified the Python SDK check in configure.ac
+	  considerably by removing support for the obsolete csmingwlibs
+	  package, which involved interrogating the csmingwlibs-specific
+	  environment variables PYTHON_INC and PYTHON_LIB in lieu of querying
+	  distutils.sysconfig (since the Python executable was absent from
+	  csmingwlibs); and by dropping support for Python 1.x, which involved
+	  manually parsing Python's installed makefile.  (The cspython module
+	  dropped Python 1.x support a long time ago.)
 8-Apr-2004
 	- Jorrit committed a patch to map2cs from Aren Blondahl:
 	    - Added Support for "_color" tag in light entities for support

@@ -243,10 +243,6 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
-ifneq ($(PYTHON.DISTUTILS),yes)
-$(PYTHMOD):
-	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
-else
 $(PYTHMOD): $(SRC.PYTHMOD) $(LIB.PYTHMOD)
 	$(PYTHON) $(SRCDIR)/plugins/cscript/cspython/pythmod_setup.py \
 	$(CXX) \
@@ -269,7 +265,6 @@ install_pythmod: $(PYTHMOD)
 	$(CP) $(PYTHMOD) $(INSTALL_SCRIPTS.DIR)/python
 	@echo $"$(INSTALL_SCRIPTS.DIR)/python/$(notdir $(PYTHMOD))$" >> \
 	$(INSTALL_LOG)
-endif
 
 ifneq (,$(CMD.SWIG))
 .PHONY: install_cspace_py
