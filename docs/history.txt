@@ -51,6 +51,14 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a bug he introduced in his last commit with the engine.
 	- Jorrit fixed a bug he introduced in his last commit with the iso
 	  map loader.
+	- res changed the GL renderer to flip procedural textures  vertically, 
+	  so that up/down have the same coordinates as normal textures 
+	  (previously, the texture coordinated had to be flipped manually.)
+	- res fixed the flarge for above change.
+	- res removed the MNG from flarge due to warnings caused on most 
+	  systems.
+	- res changed the software renderer to not flip procedural textures 
+	  any more.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

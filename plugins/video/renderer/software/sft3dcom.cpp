@@ -1325,6 +1325,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csTextureHandleSoftware* tex_mm = (csTextureHandleSoftware *)
 	    render_target->GetPrivateObject ();
+      //tex_mm->DeleteMipmaps ();
       tex_mm->UpdateTexture ();
       csTextureSoftware *tex_0 = (csTextureSoftware*)(tex_mm->get_texture (0));
       int x, y;
@@ -1333,7 +1334,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
       {
 	case 2:
 	  {
-	    for (y = txt_h-1 ; y >= 0 ; y--)
+	    for (y = 0 ; y < txt_h ; y++)
 	    {
               uint16* d = (uint16*)line_table[y];
 	      for (x = 0 ; x < txt_w ; x++)
@@ -1353,7 +1354,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
 	  break;
 	case 4:
 	  {
-	    for (y = txt_h-1 ; y >= 0 ; y--)
+	    for (y = 0 ; y < txt_h ; y++)
 	    {
               uint32* d = (uint32*)line_table[y];
 	      for (x = 0 ; x < txt_w ; x++)

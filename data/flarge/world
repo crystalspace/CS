@@ -119,9 +119,6 @@
         <texture name="flickernote">
             <file>/lib/stdtex/flicker-note1.png</file>
         </texture>
-	<texture name="cube256">
-	    <file>/lib/stdtex/cube256.mng</file>
-	</texture>
 	<texture name="yellowcheckers">
 	    <!-- Our favorite 'not found' texture - 
 	         just yellow & wanted this time :) -->
@@ -271,9 +268,6 @@
         <material name="plasma">
             <texture>plasma</texture>
         </material>
-	<material name="cube256">
-	    <texture>cube256</texture>
-	</material>
 	<material name="yellowcheckers">
 	    <texture>yellowcheckers</texture>
 	</material>
@@ -12347,31 +12341,6 @@
         </meshobj>
     </sector>
     <sector name="street1">
-        <meshobj name="spincube">
-            <plugin>thing</plugin>
-            <ztest />
-            <priority>alpha</priority>
-            <params>
-                <v x="-3.1" y="8" z="0" />
-                <v x="-3.1" y="8" z="-5" />
-                <v x="-3.1" y="3" z="-5" />
-                <v x="-3.1" y="3" z="0" />
-		<material>cube256</material>
-                <p name="eastB">
-                    <v>0</v>
-                    <v>1</v>
-                    <v>2</v>
-                    <v>3</v>
-		    <!--<mixmode><add /></mixmode>
-		    <lighting>no</lighting>-->
-                    <texmap>
-                        <uv idx="0" u="0" v="1" />
-                        <uv idx="1" u="1" v="1" />
-                        <uv idx="2" u="1" v="0" />
-                    </texmap>
-                </p>
-	    </params>
-	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -18618,9 +18587,9 @@
                     <material>fire</material>
                     <lighting>no</lighting>
                     <texmap>
-                        <uv idx="2" u="0.02" v="0.02" />
-                        <uv idx="1" u="0.02" v="0.98" />
-                        <uv idx="0" u="0.98" v="0.98" />
+                        <uv idx="2" u="0.02" v="0.98" />
+                        <uv idx="1" u="0.02" v="0.02" />
+                        <uv idx="0" u="0.98" v="0.02" />
                     </texmap>
                 </p>
                 <p name="west">
