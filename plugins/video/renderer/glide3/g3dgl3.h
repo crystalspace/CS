@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,7 +18,7 @@
 
 // g3d_glide.h
 // Graphics3DGlide Class Declaration
-// Written by Nathaniel
+// Written by xtrochu and Nathaniel
 
 #ifndef G3D_GLIDE_H
 #define G3D_GLIDE_H
@@ -30,38 +30,38 @@
 #include "ihalo.h"
 #include "iplugin.h"
 #include "ipolygon.h"
+#include "icamera.h"
+#include "glcache3.h"
+#include "gltex3.h"
+#include "cs3d/common/dtmesh.h"
+#include "glhalo3.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/polyclip.h"
+#include "cs2d/glide2common/iglide2d.h"
 
-#include "cs3d/glide3/glcache.h"
-
-extern const CLSID CLSID_Glide3xGraphics3D;
-
-class GlideTextureCache;
-class GlideLightmapCache;
-
-typedef struct {
-  float  sow;                   /* s texture ordinate (s over w) */
-  float  tow;                   /* t texture ordinate (t over w) */  
-  float  oow;                   /* 1/w (used mipmapping - really 0xfff/w) */
-}  MyGrTmuVertex;
-
-typedef struct
-{
-  float x, y;         /* X and Y in screen space */
-  float ooz;          /* 65535/Z (used for Z-buffering) */
-  float oow;          /* 1/W (used for W-buffering, texturing) */
-  float r, g, b, a;   /* R, G, B, A [0..255.0] */
-  MyGrTmuVertex  tmuvtx[3]; // tmu unit (max three)
-} MyGrVertex;
+class csGlideTextureCache;
 
 /// the Glide implementation of the Graphics3D class.
-class csGraphics3DGlide3x : public iGraphics3D
+class csGraphics3DGlide3x  : public iGraphics3D
 {
+friend class csGlideHalo;
 private:
   /// the texture cache.
-  GlideTextureCache *m_pTextureCache;
-  /// the lightmap cache.
-  GlideLightmapCache *m_pLightmapCache;
+  csGlideTextureCache *m_pTextureCache, *m_pLightmapCache, *m_pAlphamapCache;
+  /// texturehandler for FX polygon drawing
+  TextureHandler *m_thTex;
+  /// graphics context
+  GrContext_t context;
+  
+  /// vertex array for FX polygon drawing
+  MyGrVertex *m_verts, *m_dpverts;
+  static long m_vertstrulen; // length of our VertexArray structur
+  
+  int m_vertsize, m_dpvertsize;
+  int  poly_alpha;
+  bool poly_fog;
 
+  csTextureManagerGlide* txtmgr; 
   /// Does require multipass rendering for lightmap (if TRUE, then there is only one TMU!)
   bool m_iMultiPass;
 
@@ -75,7 +75,7 @@ private:
   bool m_bVRetrace;
 
   /// The current read/write settings for the Z-buffer.
-  csZBufMode m_ZBufMode;
+  long int m_ZBufMode;
 
   /// The current drawing mode (2D/3D)
   int m_nDrawMode;
@@ -88,9 +88,14 @@ private:
 
   /// the 2d graphics driver.
   iGraphics2D* m_piG2D;
-
+  /// Same seen as glide driver
+  iGraphics2DGlide *m_piGlide2D;
+  
   /// The system driver
   iSystem* m_piSystem;
+
+  /// The world driver
+  //IWorld* m_piWorld;
 
   /// width 'n' height
   int m_nWidth;
@@ -100,23 +105,66 @@ private:
   int m_nFrameWidth;
   int m_nFrameHeight;
 
+  long m_wminmax[2];
+  
+  /**
+   * current render state
+   */
+  struct
+  {
+    bool dither;
+    bool bilinearmap;
+    bool trilinearmap;
+    bool gouraud;
+    bool textured;
+    bool alphablend;
+    bool lighting;
+    int  mipmap;
+  } m_renderstate;
+
+  /**
+   * the effects currently in effect by DrawPolygonFX
+   */
+  struct
+  {
+    bool  gouraud;
+    bool  textured;
+    UInt  mixmode;
+    UInt  alpha;
+  } m_dpfx;
+  
   /// use 16 bit texture else 8 bit
   bool use16BitTexture;
+
+  /// use halo effect
+  bool m_bHaloEffect;
 
   /// Our private config file
   csIniFile *config;
 
+  /// fogtable
+  GrFog_t *fogtable;
+
+  /// State of GlideEngine
+  UByte *state;
+    
+  /// aspect
+  float aspect, inv_aspect;
+  /// object -> camera transformation
+  csTransform o2c;
+  /// current clipper
+  csClipper* clipper;
+
+  void ClearBufferUnderTop();  
 public:
   DECLARE_IBASE;
 
   /// The constructor. Pass all arguments to this.
-  csGraphics3DGlide3x (iBase*);
+  csGraphics3DGlide3x (iBase* iParent);
   /// the destructor.
   virtual ~csGraphics3DGlide3x ();
-
-  ///
+  
   virtual bool Initialize (iSystem *iSys);
-
   /// opens Glide.
   virtual bool Open(const char* Title);
   /// closes Glide.
@@ -134,16 +182,22 @@ public:
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
-  virtual void DrawPolygonDebug(G3DPolygonDP& poly) { }
+  virtual void DrawPolygonDebug(G3DPolygonDP& /*poly*/) { }
 
   /// Draw a Line.
-  virtual void DrawLine (csVector3& v1, csVector3& v2, int color);
+  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
  
-  /// Draw a projected (non-perspective correct) polygon.
-  virtual void DrawPolygonQuick (G3DPolygonDPQ& poly);
+  /// Start a series of DrawPolygonFX
+  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
+
+  /// Finish a series of DrawPolygonFX
+  virtual void FinishPolygonFX ();
+
+  /// Draw a polygon with special effects.
+  virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to Graphics3D to cache it.
-  void CacheTexture (iPolygonTexture *texture);
+  void CacheTexture (iPolygonTexture *piPT);
   
   /// Dump the texture cache.
   virtual void DumpCache ();
@@ -160,16 +214,15 @@ public:
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   
-  /// Get the capabilities of this driver: NOT IMPLEMENTED.
+  /// Get the capabilities of this driver
   virtual csGraphics3DCaps *GetCaps ()
   { return &m_Caps; }
 
   /// Get a render state
-  virtual long GetRenderState (G3D_RENDERSTATEOPTION)
-  { return 0; }
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION);
 
   /// Get a z-buffer point
-  virtual long *GetZBuffAt (int, int)
+  virtual unsigned long *GetZBuffAt (int, int)
   { return NULL; }
 
   /// Get the width
@@ -178,59 +231,61 @@ public:
   virtual int GetHeight () { return m_nHeight; }
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y);
-  /// Set perspective aspect. @@@ NOT YET IMPLEMENTED
-  virtual void SetPerspectiveAspect (float aspect) { }
-  /// Set world to camera transformation. @@@ NOT YET IMPLEMENTED
-  virtual void SetObjectToCamera (csTransform* o2c) { }
-  /// Set optional clipper. @@@ NOT YET IMPLEMENTED
-  virtual void SetClipper (csVector2* vertices, int num_vertices) { }
-  /// Draw a triangle mesh. @@@ NOT YET IMPLEMENTED
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) { }
-
-  /// Get Z-buffer value at given X,Y position
-  virtual float GetZBuffValue (int x, int y)
-  { return 0; }
-
-  /// Create a halo of the specified color and return a handle.
-  virtual iHalo *CreateHalo (float iR, float iG, float iB,
-    unsigned char *iAlpha, int iWidth, int iHeight)
-  { return NULL; }
+  /// Set perspective aspect
+  virtual void SetPerspectiveAspect (float aspect) 
+  {
+    this->aspect = aspect; inv_aspect = 1.0/aspect;	 
+  }
+  /// Set world to camera transformation.
+  virtual void SetObjectToCamera (csTransform* o2c) 
+  { 
+    this->o2c = *o2c;
+  }
+  /// Set optional clipper
+  virtual void SetClipper (csVector2* vertices, int num_vertices);
+  /// Draw a triangle mesh.
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) 
+  { 
+    DefaultDrawTriangleMesh( mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
+  }
 
   /// 
   virtual iGraphics2D *GetDriver2D () 
   { return m_piG2D; }
   
-  /// Set the camera object.
-  virtual void SetCamera (iCamera* pCamera)
-  { m_pCamera = pCamera; }
+  /// Get the ITextureManager.
+  virtual iTextureManager *GetTextureManager ()
+  { return txtmgr; }
 
-  virtual void OpenFogObject (CS_ID id, csFog* fog) { }
-  virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype) { }
-  virtual void CloseFogObject (CS_ID id) { }
+  /// Set the camera object.
+  virtual void SetCamera (iCamera *pCamera)
+  { m_pCamera =  pCamera; }
+
+  virtual void OpenFogObject (CS_ID id, csFog* fog);
+  virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
+  virtual void CloseFogObject (CS_ID id);
+
+  virtual iHalo *CreateHalo(float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight );
+
+  virtual float GetZBuffValue( int x, int y );
+
+  /// Draw a 2D sprite
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th);
 
 private:
   /// board selected
   int board;
-
-  /// Graphic context
-  GrContext_t grcontext;
-
-  // w-buffer hardware limits : wLimits[0] is min, wLimits[1] is max
-  FxU8 wLimits[2];
-
   /// Select the board
-  int SelectBoard();
-
+  // int SelectBoard();
   /// Initialize Instance from Board Config
-  void InitializeBoard();
-
+  void InitializeBoard(const char*);
   /// ptr to Rendering Function
-  void (*RenderPolygon) (MyGrVertex*, int, bool,TextureHandler*,TextureHandler*);
-	
+  void (*RenderPolygon)(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
   /// Rendering Function with MultiPass (One TMU)
-  static void RenderPolygonMultiPass(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*);
+  static void RenderPolygonMultiPass(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
   /// Rendering Function with SinglePass (Two (or more) TMUs)
-  static void RenderPolygonSinglePass(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*);
+  static void RenderPolygonSinglePass(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
 
   /// used to set up polygon geometry before rasterization.
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
