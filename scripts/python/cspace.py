@@ -4985,30 +4985,54 @@ _cspace.iPortalContainer_swigregister(iPortalContainerPtr)
 
 iPortalContainer_scfGetVersion = _cspace.iPortalContainer_scfGetVersion
 
-class iGeneralMeshState(iBase):
+class iGeneralMeshCommonState(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshState, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshCommonState, name, value)
     __swig_getmethods__ = {}
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshCommonState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iGeneralMeshCommonState instance at %s>" % (self.this,)
+    def SetMaterialWrapper(*args): return _cspace.iGeneralMeshCommonState_SetMaterialWrapper(*args)
+    def GetMaterialWrapper(*args): return _cspace.iGeneralMeshCommonState_GetMaterialWrapper(*args)
+    def SetMixMode(*args): return _cspace.iGeneralMeshCommonState_SetMixMode(*args)
+    def GetMixMode(*args): return _cspace.iGeneralMeshCommonState_GetMixMode(*args)
+    def SetLighting(*args): return _cspace.iGeneralMeshCommonState_SetLighting(*args)
+    def IsLighting(*args): return _cspace.iGeneralMeshCommonState_IsLighting(*args)
+    def SetColor(*args): return _cspace.iGeneralMeshCommonState_SetColor(*args)
+    def GetColor(*args): return _cspace.iGeneralMeshCommonState_GetColor(*args)
+    def SetManualColors(*args): return _cspace.iGeneralMeshCommonState_SetManualColors(*args)
+    def IsManualColors(*args): return _cspace.iGeneralMeshCommonState_IsManualColors(*args)
+    def SetShadowCasting(*args): return _cspace.iGeneralMeshCommonState_SetShadowCasting(*args)
+    def IsShadowCasting(*args): return _cspace.iGeneralMeshCommonState_IsShadowCasting(*args)
+    def SetShadowReceiving(*args): return _cspace.iGeneralMeshCommonState_SetShadowReceiving(*args)
+    def IsShadowReceiving(*args): return _cspace.iGeneralMeshCommonState_IsShadowReceiving(*args)
+    def __del__(self, destroy=_cspace.delete_iGeneralMeshCommonState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iGeneralMeshCommonStatePtr(iGeneralMeshCommonState):
+    def __init__(self, this):
+        _swig_setattr(self, iGeneralMeshCommonState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iGeneralMeshCommonState, 'thisown', 0)
+        _swig_setattr(self, iGeneralMeshCommonState,self.__class__,iGeneralMeshCommonState)
+_cspace.iGeneralMeshCommonState_swigregister(iGeneralMeshCommonStatePtr)
+
+class iGeneralMeshState(iGeneralMeshCommonState):
+    __swig_setmethods__ = {}
+    for _s in [iGeneralMeshCommonState]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iGeneralMeshCommonState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C iGeneralMeshState instance at %s>" % (self.this,)
-    def SetMaterialWrapper(*args): return _cspace.iGeneralMeshState_SetMaterialWrapper(*args)
-    def GetMaterialWrapper(*args): return _cspace.iGeneralMeshState_GetMaterialWrapper(*args)
-    def SetMixMode(*args): return _cspace.iGeneralMeshState_SetMixMode(*args)
-    def GetMixMode(*args): return _cspace.iGeneralMeshState_GetMixMode(*args)
-    def SetLighting(*args): return _cspace.iGeneralMeshState_SetLighting(*args)
-    def IsLighting(*args): return _cspace.iGeneralMeshState_IsLighting(*args)
-    def SetColor(*args): return _cspace.iGeneralMeshState_SetColor(*args)
-    def GetColor(*args): return _cspace.iGeneralMeshState_GetColor(*args)
-    def SetManualColors(*args): return _cspace.iGeneralMeshState_SetManualColors(*args)
-    def IsManualColors(*args): return _cspace.iGeneralMeshState_IsManualColors(*args)
-    def SetShadowCasting(*args): return _cspace.iGeneralMeshState_SetShadowCasting(*args)
-    def IsShadowCasting(*args): return _cspace.iGeneralMeshState_IsShadowCasting(*args)
-    def SetShadowReceiving(*args): return _cspace.iGeneralMeshState_SetShadowReceiving(*args)
-    def IsShadowReceiving(*args): return _cspace.iGeneralMeshState_IsShadowReceiving(*args)
+    def SetAnimationControl(*args): return _cspace.iGeneralMeshState_SetAnimationControl(*args)
+    def GetAnimationControl(*args): return _cspace.iGeneralMeshState_GetAnimationControl(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshState):
         try:
             if self.thisown: destroy(self)
@@ -5025,12 +5049,12 @@ _cspace.iGeneralMeshState_swigregister(iGeneralMeshStatePtr)
 
 iGeneralMeshState_scfGetVersion = _cspace.iGeneralMeshState_scfGetVersion
 
-class iGeneralFactoryState(iGeneralMeshState):
+class iGeneralFactoryState(iGeneralMeshCommonState):
     __swig_setmethods__ = {}
-    for _s in [iGeneralMeshState]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    for _s in [iGeneralMeshCommonState]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralFactoryState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iGeneralMeshState]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    for _s in [iGeneralMeshCommonState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGeneralFactoryState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5069,9 +5093,10 @@ class iGeneralFactoryState(iGeneralMeshState):
     def CalculateNormals(*args): return _cspace.iGeneralFactoryState_CalculateNormals(*args)
     def GenerateBox(*args): return _cspace.iGeneralFactoryState_GenerateBox(*args)
     def SetBack2Front(*args): return _cspace.iGeneralFactoryState_SetBack2Front(*args)
+    def IsAutoNormals(*args): return _cspace.iGeneralFactoryState_IsAutoNormals(*args)
     def IsBack2Front(*args): return _cspace.iGeneralFactoryState_IsBack2Front(*args)
-    def SetAnimationControl(*args): return _cspace.iGeneralFactoryState_SetAnimationControl(*args)
-    def GetAnimationControl(*args): return _cspace.iGeneralFactoryState_GetAnimationControl(*args)
+    def SetAnimationControlFactory(*args): return _cspace.iGeneralFactoryState_SetAnimationControlFactory(*args)
+    def GetAnimationControlFactory(*args): return _cspace.iGeneralFactoryState_GetAnimationControlFactory(*args)
     def AddRenderBuffer(*args): return _cspace.iGeneralFactoryState_AddRenderBuffer(*args)
     def SetRenderBufferComponent(*args): return _cspace.iGeneralFactoryState_SetRenderBufferComponent(*args)
     def SetRenderBuffer(*args): return _cspace.iGeneralFactoryState_SetRenderBuffer(*args)
@@ -5106,12 +5131,14 @@ class iGenMeshAnimationControl(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C iGenMeshAnimationControl instance at %s>" % (self.this,)
+    def AnimatesVertices(*args): return _cspace.iGenMeshAnimationControl_AnimatesVertices(*args)
+    def AnimatesTexels(*args): return _cspace.iGenMeshAnimationControl_AnimatesTexels(*args)
+    def AnimatesNormals(*args): return _cspace.iGenMeshAnimationControl_AnimatesNormals(*args)
+    def AnimatesColors(*args): return _cspace.iGenMeshAnimationControl_AnimatesColors(*args)
     def UpdateVertices(*args): return _cspace.iGenMeshAnimationControl_UpdateVertices(*args)
     def UpdateTexels(*args): return _cspace.iGenMeshAnimationControl_UpdateTexels(*args)
     def UpdateNormals(*args): return _cspace.iGenMeshAnimationControl_UpdateNormals(*args)
     def UpdateColors(*args): return _cspace.iGenMeshAnimationControl_UpdateColors(*args)
-    def Load(*args): return _cspace.iGenMeshAnimationControl_Load(*args)
-    def Save(*args): return _cspace.iGenMeshAnimationControl_Save(*args)
     def __del__(self, destroy=_cspace.delete_iGenMeshAnimationControl):
         try:
             if self.thisown: destroy(self)
@@ -5135,6 +5162,8 @@ class iGenMeshAnimationControlFactory(iBase):
     def __repr__(self):
         return "<C iGenMeshAnimationControlFactory instance at %s>" % (self.this,)
     def CreateAnimationControl(*args): return _cspace.iGenMeshAnimationControlFactory_CreateAnimationControl(*args)
+    def Load(*args): return _cspace.iGenMeshAnimationControlFactory_Load(*args)
+    def Save(*args): return _cspace.iGenMeshAnimationControlFactory_Save(*args)
     def __del__(self, destroy=_cspace.delete_iGenMeshAnimationControlFactory):
         try:
             if self.thisown: destroy(self)
@@ -5146,6 +5175,29 @@ class iGenMeshAnimationControlFactoryPtr(iGenMeshAnimationControlFactory):
         if not hasattr(self,"thisown"): _swig_setattr(self, iGenMeshAnimationControlFactory, 'thisown', 0)
         _swig_setattr(self, iGenMeshAnimationControlFactory,self.__class__,iGenMeshAnimationControlFactory)
 _cspace.iGenMeshAnimationControlFactory_swigregister(iGenMeshAnimationControlFactoryPtr)
+
+class iGenMeshAnimationControlType(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControlType, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlType, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iGenMeshAnimationControlType instance at %s>" % (self.this,)
+    def CreateAnimationControlFactory(*args): return _cspace.iGenMeshAnimationControlType_CreateAnimationControlFactory(*args)
+    def __del__(self, destroy=_cspace.delete_iGenMeshAnimationControlType):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iGenMeshAnimationControlTypePtr(iGenMeshAnimationControlType):
+    def __init__(self, this):
+        _swig_setattr(self, iGenMeshAnimationControlType, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iGenMeshAnimationControlType, 'thisown', 0)
+        _swig_setattr(self, iGenMeshAnimationControlType,self.__class__,iGenMeshAnimationControlType)
+_cspace.iGenMeshAnimationControlType_swigregister(iGenMeshAnimationControlTypePtr)
 
 class csSprite2DVertex(_object):
     __swig_setmethods__ = {}
@@ -5545,6 +5597,13 @@ class iSpriteCal3DSocket(iBase):
     def GetSubmeshIndex(*args): return _cspace.iSpriteCal3DSocket_GetSubmeshIndex(*args)
     def SetMeshIndex(*args): return _cspace.iSpriteCal3DSocket_SetMeshIndex(*args)
     def GetMeshIndex(*args): return _cspace.iSpriteCal3DSocket_GetMeshIndex(*args)
+    def SetTransform(*args): return _cspace.iSpriteCal3DSocket_SetTransform(*args)
+    def GetTransform(*args): return _cspace.iSpriteCal3DSocket_GetTransform(*args)
+    def GetSecondaryCount(*args): return _cspace.iSpriteCal3DSocket_GetSecondaryCount(*args)
+    def GetSecondaryMesh(*args): return _cspace.iSpriteCal3DSocket_GetSecondaryMesh(*args)
+    def GetSecondaryTransform(*args): return _cspace.iSpriteCal3DSocket_GetSecondaryTransform(*args)
+    def AttachSecondary(*args): return _cspace.iSpriteCal3DSocket_AttachSecondary(*args)
+    def DetachSecondary(*args): return _cspace.iSpriteCal3DSocket_DetachSecondary(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DSocket):
         try:
             if self.thisown: destroy(self)
@@ -9184,6 +9243,7 @@ class iShaderVariableContext(iBase):
     def AddVariable(*args): return _cspace.iShaderVariableContext_AddVariable(*args)
     def GetVariable(*args): return _cspace.iShaderVariableContext_GetVariable(*args)
     def GetVariableAdd(*args): return _cspace.iShaderVariableContext_GetVariableAdd(*args)
+    def GetShaderVariables(*args): return _cspace.iShaderVariableContext_GetShaderVariables(*args)
     def PushVariables(*args): return _cspace.iShaderVariableContext_PushVariables(*args)
     def PopVariables(*args): return _cspace.iShaderVariableContext_PopVariables(*args)
     def __del__(self, destroy=_cspace.delete_iShaderVariableContext):
@@ -9267,6 +9327,8 @@ class iShader(iShaderVariableContext):
     def __repr__(self):
         return "<C iShader instance at %s>" % (self.this,)
     def QueryObject(*args): return _cspace.iShader_QueryObject(*args)
+    def GetFileName(*args): return _cspace.iShader_GetFileName(*args)
+    def SetFileName(*args): return _cspace.iShader_SetFileName(*args)
     def GetNumberOfPasses(*args): return _cspace.iShader_GetNumberOfPasses(*args)
     def ActivatePass(*args): return _cspace.iShader_ActivatePass(*args)
     def SetupPass(*args): return _cspace.iShader_SetupPass(*args)
@@ -9656,6 +9718,7 @@ class iMaterial(iShaderVariableContext):
         return "<C iMaterial instance at %s>" % (self.this,)
     def SetShader(*args): return _cspace.iMaterial_SetShader(*args)
     def GetShader(*args): return _cspace.iMaterial_GetShader(*args)
+    def GetShaders(*args): return _cspace.iMaterial_GetShaders(*args)
     def GetTexture(*args): return _cspace.iMaterial_GetTexture(*args)
     def GetTextureLayerCount(*args): return _cspace.iMaterial_GetTextureLayerCount(*args)
     def GetTextureLayer(*args): return _cspace.iMaterial_GetTextureLayer(*args)
