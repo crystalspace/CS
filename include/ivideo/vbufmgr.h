@@ -112,7 +112,7 @@ struct iPolygonBuffer : public iBase
   virtual iMaterialHandle* GetMaterial (int idx) const = 0;
 
   /// Gets the numebr of vertices
-  virtual GetVertexCount() const = 0;
+  virtual int GetVertexCount() const = 0;
 
   ///Gets the array of vertices
 
