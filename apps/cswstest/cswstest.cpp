@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "csws/csws.h"
+#include "ifontsrv.h"
 
 class csWsTest : public csApp
 {
@@ -32,12 +33,18 @@ public:
   /// Initialize maze editor
   csWsTest (iSystem *SysDriver);
 
+  /// Initialize maze editor
+  virtual ~csWsTest ();
+
   ///
   virtual bool HandleEvent (iEvent &Event);
 
   virtual bool InitialSetup ();
 
   virtual void StartFrame ();
+
+  iFontServer * pFontServer;
+  int iLucidiaID;
 };
 
 //csWsTest *cswstest_app;                        // The main Windowing System object
@@ -121,6 +128,7 @@ public:
   csThemeTestWindow (csComponent *iParent,char * iTitle,int iWindowStyle);
   ///
   virtual bool HandleEvent (iEvent &Event);
+  void Draw ();
 };
 
 //-----------------------------------------------------------------------------
@@ -137,12 +145,31 @@ static int palette_csWsTest[] =
 csWsTest::csWsTest (iSystem *SysDriver) : csApp (SysDriver)
 {
   SetPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
+  pFontServer = QUERY_PLUGIN(SysDriver,iFontServer);
+  if (pFontServer != NULL)
+  {
+    iLucidiaID = pFontServer->LoadFont("LucidiaTypewriterRegular","/fonts/LucidiaTypewriterRegular.ttf");
+    //    fprintf(stderr,"Font ID = %d\n",iLucidiaID);
+  }
+  else
+  {
+    iLucidiaID=-1;
+    //    fprintf(stderr,"pFontServer == NULL\n");
+  }
+}
+
+csWsTest::~csWsTest ()
+{
+  if (pFontServer != NULL)
+    pFontServer->DecRef();
 }
 
 void csWsTest::StartFrame ()
 {
   // JAS:  Transparency is buggy.  This works around the problem for now.
-  Invalidate();
+  // JAS:  Okay, so I was wrong.  I don't know what the problem with trans is.
+//  Invalidate();
+//  pplDontCacheFrame();
   csApp::StartFrame();
 }
 
@@ -810,4 +837,19 @@ csThemeTestWindow::csThemeTestWindow (csComponent *iParent,char * iTitle,int iWi
   but->SetText ("Select Light Border Color"); but->SetRect (20, 60, 190, 80);
   colordialog  = csColorDialog (this, "Theme Color Dialog",BackgroundColor);
   colordialog->SetPos(240,40);
+}
+
+void csThemeTestWindow::Draw()
+{
+  csWindow::Draw();
+  int d_font = GetFont();
+  int d_fsize = GetFontSize();
+  if ( ((csWsTest *)app)->iLucidiaID != -1)
+    SetFont(((csWsTest *)app)->iLucidiaID,false);
+  SetFontSize(12,false);
+  Text (BorderWidth+8, BorderHeight+100, BorderLightColor,-1, "This is a font 12 test");
+  SetFontSize(8,false);
+  Text (BorderWidth+8, BorderHeight+140, BorderLightColor, -1, "This is a font 8 test");
+  SetFont(d_font,false);
+  SetFontSize(d_fsize,false);
 }

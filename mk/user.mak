@@ -31,6 +31,7 @@ PLUGINS.DYNAMIC += dungeon
 PLUGINS.DYNAMIC += engine
 PLUGINS.DYNAMIC += net/driver/socket net/netman
 #PLUGINS.DYNAMIC += font/server/freefont
+PLUGINS.DYNAMIC += font/manager
 PLUGINS.DYNAMIC += csstdldr
 PLUGINS.DYNAMIC += netspace/nstp netspace/nsmgr
 PLUGINS.DYNAMIC += csauth/simple
