@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+3-Dec-2001
+	- Toni Asco' Gonzalez fixed the 3ds loader so that it now correctly
+	  supports normal and texture mapping information.
 28-Nov-2001
 	- Made the test on bad UV coordinates for a polygon a little
 	  bit more strict so that it rejects more polygons. There were

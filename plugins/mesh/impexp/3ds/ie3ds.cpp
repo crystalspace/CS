@@ -108,7 +108,8 @@ static int DataReadFunc( void *self, Lib3dsByte *buffer, int size )
 }
 
 
-static int DataWriteFunc( void* /*self*/, const Lib3dsByte* /*buffer*/, int /*size*/ )
+static int DataWriteFunc( void* /*self*/, const Lib3dsByte* /*buffer*/,
+	int /*size*/ )
 {
   //  csDataStream *pData = (csDataStream*)self;
 
@@ -150,10 +151,103 @@ const csModelConverterFormat *csModelConverter3ds::GetFormat( int idx ) const
     return NULL;
 }
 
+
+
+static void AddTexels(Lib3dsTexel * pCurTexel, int numTexels,
+	iModelDataVertices * Vertices)
+{
+  csVector2 texel;
+  float tex1, tex2;
+  int i;
+
+  if (!numTexels)
+  { 
+    // This means that the model doesn't contains UV coordinates so
+    // we will use the default ones.
+    Vertices->AddTexel (csVector2 (0, 0));
+    Vertices->AddTexel (csVector2 (1, 0));
+    Vertices->AddTexel (csVector2 (1, 1));
+    return;
+  };
+  for(i = 0; i < numTexels; i++)
+  {
+     tex1 = pCurTexel[0][0];
+     tex2 = pCurTexel[0][1];
+     texel = csVector2(tex1, 1.-tex2);
+     Vertices->AddTexel(texel);
+     pCurTexel++;
+  }
+  return;
+}
+
+
+// Model doesn't have texture info, so we use a default one
+static void AssignDefaultTexels (iModelDataObject *pDataObject,
+	iModelDataVertices* Vertices, Lib3dsFace * pCurFace,
+	int numTriangles)
+{
+  int i,j,index;
+  iModelDataPolygon * pCurPoly;
+  float *normal;
+  for ( i = 0 ; i < numTriangles ; i++ )
+  {
+    // create a new poly for the data object
+    pCurPoly = new csModelDataPolygon ();
+
+    //  add to the mesh object
+    pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
+
+    /***  process the information for each polygon vertex  ***/
+
+    //  get the indices for each vector of the triangle
+    normal = pCurFace->normal;
+    Vertices->AddNormal(csVector3(normal[0],normal[1],normal[2]));
+    for( j = 0 ; j <3 ; j++ )
+    {
+      index = pCurFace->points[j];
+
+      // now add the vertex
+      //pCurPoly->AddVertex( index, 0, 0, j );
+      pCurPoly->AddVertex( index, i , 0, j);
+    }
+    pCurFace++;	      
+  }
+}
+
+// Model has texture info, so we use it
+static void AssignDefinedTexels (iModelDataObject * pDataObject,
+	iModelDataVertices * Vertices, Lib3dsFace * pCurFace,
+	int numTriangles)
+{
+  int i,j,index;
+  iModelDataPolygon * pCurPoly;
+  float *normal;
+	
+  for ( i = 0 ; i < numTriangles ; i++ )
+  {
+    // create a new poly for the data object
+    pCurPoly = new csModelDataPolygon ();
+    //  add to the mesh object
+    pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
+    /***  process the information for each polygon vertex  ***/
+    //  get the indices for each vector of the triangle
+    normal = pCurFace->normal;
+    Vertices->AddNormal(csVector3(normal[0],normal[1],normal[2]));
+    for( j = 0 ; j <3 ; j++ )
+    {
+      index = pCurFace->points[j];
+      // now add the vertex
+      //pCurPoly->AddVertex( index, 0, 0, j );
+      pCurPoly->AddVertex( index, i , 0, index);
+    }
+    pCurFace++;	      
+  }
+}
+
 iModelData *csModelConverter3ds::Load( UByte* buffer, ULong size )
 {
-Lib3dsFile *p3dsFile;
-csModelData *pModelData;
+  Lib3dsFile *p3dsFile;
+  csModelData *pModelData;
 
   /***  send the buffer in to be translated  ***/
   p3dsFile = LoadFileData( buffer, size );
@@ -236,8 +330,8 @@ Lib3dsMaterial *pCurMaterial;
 */
 
   /***  go through all of the mesh objects and convert them  ***/
-iModelDataObject  *pDataObject;
-Lib3dsMesh *pCurMesh;
+  iModelDataObject  *pDataObject;
+  Lib3dsMesh *pCurMesh;
 
   // RDS NOTE: add support for frames
 
@@ -269,18 +363,20 @@ Lib3dsMesh *pCurMesh;
   return SCF_QUERY_INTERFACE( pModelData, iModelData );
 }
 
-iDataBuffer *csModelConverter3ds::Save( iModelData* /*pMdl*/, const char* /*formatName*/ )
+iDataBuffer *csModelConverter3ds::Save( iModelData* /*pMdl*/,
+	const char* /*formatName*/ )
 {
   // not yet supported
 
   return NULL;
 }
 
-bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject, Lib3dsMesh *p3dsMesh )
+bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
+	Lib3dsMesh *p3dsMesh )
 {
 
   /***  Load up vertices and texels  ***/
-int numVertices, i;
+  int numVertices, i;
 
   // create the default vertex set
   iModelDataVertices *Vertices = new csModelDataVertices ();
@@ -290,45 +386,59 @@ int numVertices, i;
   numVertices = p3dsMesh->points;
 
   //  load up the vertices
-Lib3dsPoint *pCurPoint;
-float *xyz;
-csVector3 vertex;
+  Lib3dsPoint *pCurPoint;
+  Lib3dsTexel *pCurTexel;
+  float *xyz;
+  csVector3 vertex;
+
+  int numTexels = p3dsMesh->texels;
 
   pCurPoint = p3dsMesh->pointL;
+  pCurTexel = p3dsMesh->texelL;
 
   // add a dummy normal, white as the default color and three default texels
-  Vertices->AddNormal (csVector3 (0, 0, 0));
+  //Vertices->AddNormal (csVector3 (0, 0, 0));
   Vertices->AddColor (csColor (1, 1, 1));
-  Vertices->AddTexel (csVector2 (0, 0));
-  Vertices->AddTexel (csVector2 (1, 0));
-  Vertices->AddTexel (csVector2 (1, 1));
+    
+  AddTexels(pCurTexel,numTexels,Vertices);
+  
 
   for ( i = 0 ; i < numVertices ; i++ )
   {
-    // index to the position on the list using index (do I have to loop? should I build a list)
+    // Index to the position on the list using index (do I have to
+    // loop? should I build a list)
     xyz = pCurPoint->pos;
     vertex = csVector3( xyz[0], xyz[1], xyz[2] );
-      /// Add a vertex
+
+    /// Add a vertex
     Vertices->AddVertex( vertex );
     pCurPoint++;
   }
-
+ 
+  // It should be possible to add the texels
+ 
   /***  Load up the triangles  ***/
 
-int numTriangles, index, j;
-Lib3dsFace *pCurFace;
-iModelDataPolygon *pCurPoly;
-//csVector3 position;
-//csVector3 normal;
-//csColor color;
-//csVector2 textureUV;
+  int numTriangles;//, index, j;
+  Lib3dsFace *pCurFace;
 
-    //  get the trianlge count and go to the first triangle
-    numTriangles = p3dsMesh->faces;
-    pCurFace = p3dsMesh->faceL;
+  //  get the trianlge count and go to the first triangle
+  numTriangles = p3dsMesh->faces;
+  pCurFace = p3dsMesh->faceL;
 
-    // now copy each triangle over
-    for ( i = 0 ; i < numTriangles ; i++ )
+  // now copy each triangle over
+  /*
+   * These two following functions creates the faces and assigns texels
+   * depending
+   * if the models had UV coordinates or not
+   */
+   if(!numTexels)
+     AssignDefaultTexels(pDataObject,Vertices,pCurFace,numTriangles);
+   else
+     AssignDefinedTexels(pDataObject,Vertices,pCurFace,numTriangles);
+
+// THIS COULD BE DELETED, BUT I DIDN'T.
+  /*  for ( i = 0 ; i < numTriangles ; i++ )
     {
       // create a new poly for the data object
       pCurPoly = new csModelDataPolygon ();
@@ -340,21 +450,23 @@ iModelDataPolygon *pCurPoly;
       /***  process the information for each polygon vertex  ***/
 
       //  get the indices for each vector of the triangle
+	/*  normal = pCurFace->normal;
+	  Vertices->AddNormal(csVector3(normal[0],normal[1],normal[2]));
       for( j = 0 ; j <3 ; j++ )
       {
         index = pCurFace->points[j];
 
         // now add the vertex
-        pCurPoly->AddVertex( index, 0, 0, j );
+        //pCurPoly->AddVertex( index, 0, 0, j );
+		pCurPoly->AddVertex( index, 0 , 0, index);
 
       }
+	  
 
       // set the material
       // pCurPoly->SetMaterial (iModelDataMaterial *m) = 0;
-
-      pCurFace++;
-    
-    }
+      pCurFace++;	      
+    }*/
 
   return true;
 }
@@ -362,10 +474,9 @@ iModelDataPolygon *pCurPoly;
 Lib3dsFile *csModelConverter3ds::LoadFileData( UByte* pBuffer, ULong size )
 {
   // This code is pulled from lib3ds
-
-Lib3dsFile *pFile;
-Lib3dsIo *pLibIO;
-csDataStream *pData;
+  Lib3dsFile *pFile;
+  Lib3dsIo *pLibIO;
+  csDataStream *pData;
 
   pFile = lib3ds_file_new();
   if( !pFile )
