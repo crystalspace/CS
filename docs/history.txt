@@ -47,6 +47,8 @@ chronological order.
 	    - Some small documentation updates.
 	    - Disabled the workaround for glTexSubImage problems with some
 	      ATI drivers. Seems to work now.
+	- Eric Sunshine fixed compilation error on MacOS/X in
+	  csShaderExpression.  MacOS/X does not have strtof().
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:

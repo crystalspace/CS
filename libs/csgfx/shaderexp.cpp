@@ -868,15 +868,17 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
   arg.type = type;
 
   switch (type) {
-  case TYPE_NUMBER:
-    errno = 0;
+  case TYPE_NUMBER: {
+      errno = 0;
 
-    arg.num = strtof(val_str, &tmp);
+      double n = strtod(val_str, &tmp);
+      arg.num = (float)n;
 
-    if (*tmp) {
-      DEBUG_PRINTF("Error parsing float at position %i.\n", tmp - val_str);
+      if (*tmp) {
+        DEBUG_PRINTF("Error parsing float at position %i.\n", tmp - val_str);
 
-      return false;
+        return false;
+      }
     }
 
     if (errno) {
