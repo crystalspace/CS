@@ -210,7 +210,6 @@ csSprite3D* csSpriteTemplate::NewSprite ()
 
 void csSpriteTemplate::GenerateLOD ()
 {
-/*
   int i;
 
   //@@@ turn this into a parameter or member variable?
@@ -249,19 +248,19 @@ void csSpriteTemplate::GenerateLOD ()
     tr.b = translate[tr.b];
     tr.c = translate[tr.c];
   }
-  if (normal_mesh != NULL)
+  if (texel_to_normal != NULL)
   {
     CHK (int* ttn = new int [GetNumTexels()]);
     for (i = 0 ; i < GetNumTexels() ; i++)
-      ttn[i] = texel_to_normal[translate[i]];
+      ttn[translate[i]] = texel_to_normal[i];
     CHK (delete [] texel_to_normal);
     texel_to_normal = ttn;
   }
-  if (vertex_mesh != NULL)
+  if (texel_to_vertex != NULL)
   {
     CHK (int* ttv = new int [GetNumTexels()]);
     for (i = 0 ; i < GetNumTexels() ; i++)
-      ttv[i] = texel_to_vertex[translate[i]];
+      ttv[translate[i]] = texel_to_vertex[i];
     CHK (delete [] texel_to_vertex);
     texel_to_vertex = ttv;
   }
@@ -269,7 +268,6 @@ void csSpriteTemplate::GenerateLOD ()
   CHK (delete [] translate);
   CHK (delete verts);
   CHK (delete new_mesh);
-*/
 }
 
 void csSpriteTemplate::ComputeBoundingBox ()
