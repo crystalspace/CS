@@ -83,6 +83,7 @@ WORLD (
     PLUGIN 'spr3d' ('crystalspace.mesh.loader.sprite.3d')
     PLUGIN 'spr2dFact' ('crystalspace.mesh.loader.factory.sprite.2d')
     PLUGIN 'spr2d' ('crystalspace.mesh.loader.sprite.2d')
+    PLUGIN 'treeFact' ('crystalspace.mesh.loader.factory.genmesh.tree')
     PLUGIN 'meshFact' ('crystalspace.mesh.loader.factory.genmesh')
     PLUGIN 'mesh' ('crystalspace.mesh.loader.genmesh')
     PLUGIN 'metafact' ('crystalspace.mesh.loader.factory.metaball')
@@ -193,6 +194,11 @@ WORLD (
         T (2,7,6)
       )
       AUTONORMALS()
+    )
+  )
+  MESHFACT 'treeFact' (
+    PLUGIN ('treeFact')
+    PARAMS (
     )
   )
 
@@ -2401,6 +2407,14 @@ WORLD (
       MOVE (V (-10,-1,14))
     )
     LIGHT (3.5,2,12.5:5,.7,.7,.8, 0)
+    MESHOBJ 'treeMesh' (
+      PLUGIN ('mesh')
+      PARAMS (
+        FACTORY ('treeFact')
+	MATERIAL ('mosaic')
+      )
+      MOVE (V (-2.5,.3,14))
+    )
     MESHOBJ 'genMesh' (
       PLUGIN ('mesh')
       PARAMS (
