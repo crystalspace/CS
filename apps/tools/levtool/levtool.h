@@ -34,6 +34,22 @@ struct iDocumentNode;
 class csVector3;
 
 /**
+ * A texture plane.
+ */
+class ltPlane
+{
+public:
+  csVector3 orig, first, second;
+  float firstlen, secondlen;
+  char* name;
+
+public:
+  ltPlane () : orig (0), first (0), second (0), firstlen (1), secondlen (1),
+  	name (NULL) { }
+  ~ltPlane () { delete[] name; }
+};
+
+/**
  * A vertex with connectivity information.
  */
 class ltVertex : public csVector3
@@ -203,12 +219,6 @@ public:
   void SplitThingInCenter ();
 
   /**
-   * Warning! Call this function AFTER DuplicateSharedVertices().
-   * This function will make seperate objects of all large polygons.
-   */
-  void SplitThingLargePolygons (float max_area, int minsize);
-
-  /**
    * Warning! Call this function AFTER CreateVertexInfo().
    * This function will split this thing in seperate units.
    * A unit is defined as a group of polygons that is not
@@ -249,9 +259,12 @@ public:
   csRef<iCommandLineParser> cmdline;
   csVector things;
   csVector thing_nodes;
+  csVector planes;
 
   // A vector with all strings that represent 'thing' mesh objects.
   csVector thing_plugins;
+  // A vector with all strings that represent 'plane' addons.
+  csVector plane_plugins;
 
   void ReportError (const char* description, ...);
   void Report (int severity, const char* description, ...);
@@ -263,14 +276,20 @@ public:
 
   /**
    * Analyze the plugins section of the loaded world to see what
-   * plugin strings represent thing mesh objects.
+   * plugin strings represent thing mesh objects. Also find out about
+   * plane objects.
    */
-  void AnalyzePluginSection (iDocument* doc);
+  void AnalyzePluginSection (iDocument* doc, bool meshfacts = false);
 
   /**
    * Test if a mesh object is a thing.
    */
   bool IsMeshAThing (iDocumentNode* meshnode);
+
+  /**
+   * Test if an addon object is a plane.
+   */
+  bool IsAddonAPlane (iDocumentNode* addonnode);
 
   /**
    * Test if a mesh object is movable.
@@ -281,7 +300,14 @@ public:
    * Scan all sectors and find all thing objects and push them
    * on the things vector.
    */
-  void FindAllThings (iDocument* doc);
+  void FindAllThings (iDocument* doc,
+  	bool meshfacts = false, bool movable = false);
+
+  /**
+   * Scan all sectors and find all plane addons and push them
+   * on the planes vector.
+   */
+  void FindAllPlanes (iDocument* doc);
 
   /**
    * Parse one part (or params) node for a thing.
@@ -314,6 +340,16 @@ public:
    * Split a thing and output on the given parent node (a sector node).
    */
   void SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode);
+
+  /**
+   * Clone a document but move all planes in the process.
+   */
+  void CloneAndMovePlanes (iDocumentNode* node, iDocumentNode* newnode);
+
+  /**
+   * Clone a document but move all planes in the process.
+   */
+  void CloneAndMovePlanes (iDocument* doc, iDocument* newdoc);
 
   /**
    * Clone a document but split all things in the process.

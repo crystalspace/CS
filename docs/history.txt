@@ -5,6 +5,11 @@ The history order is reversed so that new features are at the top.
 	- Changed map2cs so it no longer outputs planes using the plane
 	  addon loader. Instead texture mapping is directly specified in
 	  every polygon.
+	- Removed -splitpoly and -analyzep from levtool since those are not
+	  useful.
+	- Added -planes option to levtool to convert a map file that uses
+	  the plane addon so that the planes are integrated with the
+	  polygon itself.
 	- Andrew Craig made some more fixes to make CS compile again under
 	  windows.
 	- Eric Sunshine fixed problem with 10-Mar-2003 patch to bugplug.mak and

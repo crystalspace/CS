@@ -105,10 +105,10 @@
         <fastmesh>10</fastmesh>
     </settings>
     <variables>
-	<variable name="Std Thing Angle" value="0.54321" />
-	<variable name="Std Thing Range" value="50.5" />
-	<variable name="Lightning Restore Color">
-	    <color red="0" green="0" blue="0" />
+        <variable name="Std Thing Angle" value="0.54321" />
+        <variable name="Std Thing Range" value="50.5" />
+        <variable name="Lightning Restore Color">
+            <color red="0" green="0" blue="0" />
         </variable>
     </variables>
     <materials>
@@ -232,7 +232,7 @@
         <priority name="sky">
             <level>1</level>
             <sort>NONE</sort>
-	    <camera />
+            <camera />
         </priority>
         <priority name="wall">
             <level>2</level>
@@ -250,7 +250,6 @@
     <plugins>
         <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
         <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
-        <plugin name="plane">crystalspace.mesh.loader.thing.plane</plugin>
         <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
         <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
         <plugin name="spr2dFact">crystalspace.mesh.loader.factory.sprite.2d</plugin>
@@ -263,77 +262,10 @@
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
         <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     </plugins>
-
     <start>
         <sector>room</sector>
         <position x="0" y="0" z="0" />
     </start>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>largeE</name>
-            <orig x="20" y="17" z="20" />
-            <first x="20" y="17" z="19" />
-            <firstlen>5</firstlen>
-            <second x="20" y="16" z="20" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>largeN</name>
-            <orig x="-20" y="17" z="20" />
-            <first x="-19" y="17" z="20" />
-            <firstlen>5</firstlen>
-            <second x="-20" y="16" z="20" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>largeS</name>
-            <orig x="20" y="17" z="6" />
-            <first x="19" y="17" z="6" />
-            <firstlen>5</firstlen>
-            <second x="20" y="16" z="6" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>largeW</name>
-            <orig x="-20" y="17" z="6" />
-            <first x="-20" y="17" z="7" />
-            <firstlen>5</firstlen>
-            <second x="-20" y="16" z="6" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>largeD</name>
-            <orig x="-20" y="-1" z="20" />
-            <first x="-19" y="-1" z="20" />
-            <firstlen>5</firstlen>
-            <second x="-20" y="-1" z="19" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>corridoruD</name>
-            <orig x="-20" y="8" z="30" />
-            <first x="-19" y="8" z="30" />
-            <firstlen>5</firstlen>
-            <second x="-20" y="8" z="29" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
     <meshfact name="square">
         <plugin>meshFact</plugin>
         <params>
@@ -422,15 +354,15 @@
             <t v1="2" v2="7" v3="6" />
             <autonormals />
         </params>
-	    <hardmove>
-                <matrix>
-                    <scale x="3" y="3" z="3" />
-                </matrix>
-	    </hardmove>
+        <hardmove>
+            <matrix>
+                <scale x="3" y="3" z="3" />
+            </matrix>
+        </hardmove>
     </meshfact>
     <meshfact name="paramsFileTest">
         <plugin>spr3dFact</plugin>
-	<paramsfile>/lib/std/sprite3</paramsfile>
+        <paramsfile>/lib/std/sprite3</paramsfile>
     </meshfact>
     <meshfact name="treeFact">
         <plugin>treeFact</plugin>
@@ -1206,52 +1138,100 @@
             <curvecontrol x="8" y="0" z="-8" u="0.5" v="0.5" />
             <curve name="b1">
                 <material>mosaic</material>
-                <v>0</v> <v>1</v> <v>2</v> <v>8</v>
-                <v>9</v> <v>10</v> <v>16</v> <v>17</v>
+                <v>0</v>
+                <v>1</v>
+                <v>2</v>
+                <v>8</v>
+                <v>9</v>
+                <v>10</v>
+                <v>16</v>
+                <v>17</v>
                 <v>18</v>
-	    </curve>
+            </curve>
             <curve name="b2">
                 <material>mosaic</material>
-                <v>2</v> <v>3</v> <v>4</v> <v>10</v>
-                <v>11</v> <v>12</v> <v>18</v> <v>19</v>
+                <v>2</v>
+                <v>3</v>
+                <v>4</v>
+                <v>10</v>
+                <v>11</v>
+                <v>12</v>
+                <v>18</v>
+                <v>19</v>
                 <v>20</v>
-	    </curve>
+            </curve>
             <curve name="b3">
                 <material>mosaic</material>
-                <v>4</v> <v>5</v> <v>6</v> <v>12</v>
-                <v>13</v> <v>14</v> <v>20</v> <v>21</v>
+                <v>4</v>
+                <v>5</v>
+                <v>6</v>
+                <v>12</v>
+                <v>13</v>
+                <v>14</v>
+                <v>20</v>
+                <v>21</v>
                 <v>22</v>
-	    </curve>
+            </curve>
             <curve name="b4">
                 <material>mosaic</material>
-                <v>6</v> <v>7</v> <v>0</v> <v>14</v>
-                <v>15</v> <v>8</v> <v>22</v> <v>23</v>
+                <v>6</v>
+                <v>7</v>
+                <v>0</v>
+                <v>14</v>
+                <v>15</v>
+                <v>8</v>
+                <v>22</v>
+                <v>23</v>
                 <v>16</v>
-	    </curve>
+            </curve>
             <curve name="b5">
                 <material>mosaic</material>
-                <v>16</v> <v>17</v> <v>18</v> <v>24</v>
-                <v>25</v> <v>26</v> <v>0</v> <v>1</v>
+                <v>16</v>
+                <v>17</v>
+                <v>18</v>
+                <v>24</v>
+                <v>25</v>
+                <v>26</v>
+                <v>0</v>
+                <v>1</v>
                 <v>2</v>
-	    </curve>
+            </curve>
             <curve name="b6">
                 <material>mosaic</material>
-                <v>18</v> <v>19</v> <v>20</v> <v>26</v>
-                <v>27</v> <v>28</v> <v>2</v> <v>3</v>
+                <v>18</v>
+                <v>19</v>
+                <v>20</v>
+                <v>26</v>
+                <v>27</v>
+                <v>28</v>
+                <v>2</v>
+                <v>3</v>
                 <v>4</v>
-	    </curve>
+            </curve>
             <curve name="b7">
                 <material>mosaic</material>
-                <v>20</v> <v>21</v> <v>22</v> <v>28</v>
-                <v>29</v> <v>30</v> <v>4</v> <v>5</v>
+                <v>20</v>
+                <v>21</v>
+                <v>22</v>
+                <v>28</v>
+                <v>29</v>
+                <v>30</v>
+                <v>4</v>
+                <v>5</v>
                 <v>6</v>
-	    </curve>
+            </curve>
             <curve name="b8">
                 <material>mosaic</material>
-                <v>22</v> <v>23</v> <v>16</v> <v>30</v>
-                <v>31</v> <v>24</v> <v>6</v> <v>7</v>
+                <v>22</v>
+                <v>23</v>
+                <v>16</v>
+                <v>30</v>
+                <v>31</v>
+                <v>24</v>
+                <v>6</v>
+                <v>7</v>
                 <v>0</v>
-	    </curve>
+            </curve>
         </params>
     </meshfact>
     <meshfact name="prism4">
@@ -4640,7 +4620,7 @@
         </meshobj>
         <meshobj name="rot_door1">
             <plugin>thing</plugin>
-	    <zuse />
+            <zuse />
             <params>
                 <v x="-2.5" y="0" z="-0.1" />
                 <v x="-2.5" y="0" z="0.1" />
@@ -4718,14 +4698,14 @@
                         </matrix>
                         <v x="-2.5" y="3.4" z="-0.1" />
                     </texmap>
-		    <alpha>75</alpha>
-		    <portal>
-			<sector>large</sector>
-			<mirror />
-			<clip />
-			<float />
-			<zfill />
-		    </portal>
+                    <alpha>75</alpha>
+                    <portal>
+                        <sector>large</sector>
+                        <mirror />
+                        <clip />
+                        <float />
+                        <zfill />
+                    </portal>
                 </p>
                 <p name="west">
                     <v>0</v>
@@ -4878,11 +4858,11 @@
                     <v>2</v>
                     <v>6</v>
                     <lighting>no</lighting>
-		    <texmap>
-		        <uv idx="0" u="0" v="0" />
-		        <uv idx="1" u="1" v="0" />
-		        <uv idx="2" u="1" v="1" />
-		    </texmap>
+                    <texmap>
+                        <uv idx="0" u="0" v="0" />
+                        <uv idx="1" u="1" v="0" />
+                        <uv idx="2" u="1" v="1" />
+                    </texmap>
                 </p>
                 <material>dots</material>
                 <p name="west">
@@ -4891,11 +4871,11 @@
                     <v>3</v>
                     <v>2</v>
                     <lighting>no</lighting>
-		    <texmap>
-		        <uv idx="0" u="0" v="0" />
-		        <uv idx="1" u="1" v="0" />
-		        <uv idx="2" u="1" v="1" />
-		    </texmap>
+                    <texmap>
+                        <uv idx="0" u="0" v="0" />
+                        <uv idx="1" u="1" v="0" />
+                        <uv idx="2" u="1" v="1" />
+                    </texmap>
                 </p>
                 <material>dots</material>
                 <p name="up">
@@ -4904,11 +4884,11 @@
                     <v>6</v>
                     <v>2</v>
                     <lighting>no</lighting>
-		    <texmap>
-		        <uv idx="0" u="0" v="0" />
-		        <uv idx="1" u="1" v="0" />
-		        <uv idx="2" u="1" v="1" />
-		    </texmap>
+                    <texmap>
+                        <uv idx="0" u="0" v="0" />
+                        <uv idx="1" u="1" v="0" />
+                        <uv idx="2" u="1" v="1" />
+                    </texmap>
                 </p>
                 <material>plasma</material>
                 <p name="down">
@@ -5700,7 +5680,7 @@
             <params>
                 <factory>genMeshFact</factory>
                 <material>mosaic</material>
-		<!-- <localshadows /> -->
+                <!-- <localshadows /> -->
             </params>
             <move>
                 <v x="-1.5" y="-.7" z="14" />
@@ -5711,7 +5691,7 @@
             <params>
                 <factory>genMeshFact</factory>
                 <material>mosaic</material>
-		<localshadows />
+                <localshadows />
             </params>
             <move>
                 <v x="-17" y="-.7" z="18" />
@@ -6879,7 +6859,7 @@
             <params>
                 <factory>circle</factory>
                 <moveable />
-		<smooth />
+                <smooth />
             </params>
             <move>
                 <v x="-16" y="1" z="30" />
@@ -6890,7 +6870,7 @@
             <params>
                 <factory>band</factory>
                 <moveable />
-		<smooth />
+                <smooth />
             </params>
             <move>
                 <matrix>
@@ -6904,7 +6884,7 @@
             <params>
                 <factory>band</factory>
                 <moveable />
-		<smooth />
+                <smooth />
             </params>
             <move>
                 <matrix>
@@ -12305,69 +12285,14 @@
                     <v>4</v>
                     <v>0</v>
                     <texmap>
-                    	<uv idx="0" u="1" v="1" />
-                    	<uv idx="1" u="0" v="1" />
-                    	<uv idx="2" u="0" v="0" />
+                        <uv idx="0" u="1" v="1" />
+                        <uv idx="1" u="0" v="1" />
+                        <uv idx="2" u="0" v="0" />
                     </texmap>
                 </p>
             </params>
         </meshobj>
     </sector>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>streetD</name>
-            <orig x="-43" y="-1.3" z="5" />
-            <first x="-42" y="-1.3" z="5" />
-            <firstlen>5</firstlen>
-            <second x="-43" y="-1.3" z="4" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>streetS</name>
-            <orig x="-43" y="12" z="-10" />
-            <first x="-42" y="12" z="-10" />
-            <firstlen>3</firstlen>
-            <second x="-43" y="11" z="-10" />
-            <secondlen>3</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>streetN</name>
-            <orig x="-43" y="12" z="5" />
-            <first x="-42" y="12" z="5" />
-            <firstlen>3</firstlen>
-            <second x="-43" y="11" z="5" />
-            <secondlen>3</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>streetW</name>
-            <orig x="-43" y="12" z="5" />
-            <first x="-43" y="12" z="4" />
-            <firstlen>3</firstlen>
-            <second x="-43" y="11" z="5" />
-            <secondlen>3</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>streetE</name>
-            <orig x="-3" y="12" z="5" />
-            <first x="-3" y="12" z="4" />
-            <firstlen>3</firstlen>
-            <second x="-3" y="11" z="5" />
-            <secondlen>3</secondlen>
-        </params>
-    </addon>
     <sector name="street1">
         <meshobj name="walls">
             <plugin>thing</plugin>
@@ -18613,11 +18538,11 @@
                     <v>0</v>
                     <v>4</v>
                     <material>fire</material>
-		    <lighting>no</lighting>
+                    <lighting>no</lighting>
                     <texmap>
-		        <uv idx="2" u="0.02" v="0.02" />
-		        <uv idx="1" u="0.02" v="0.98" />
-		        <uv idx="0" u="0.98" v="0.98" />
+                        <uv idx="2" u="0.02" v="0.02" />
+                        <uv idx="1" u="0.02" v="0.98" />
+                        <uv idx="0" u="0.98" v="0.98" />
                     </texmap>
                 </p>
                 <p name="west">
@@ -19113,30 +19038,48 @@
                 <v x="-19" y="-14" z="11" />
                 <v x="-19" y="-14" z="16" />
                 <material>asphalt</material>
-		<texlen>2</texlen>
+                <texlen>2</texlen>
                 <p name="north">
-                    <v>3</v> <v>7</v> <v>5</v> <v>1</v>
+                    <v>3</v>
+                    <v>7</v>
+                    <v>5</v>
+                    <v>1</v>
                 </p>
                 <p name="east">
-                    <v>7</v> <v>6</v> <v>4</v> <v>5</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <v>4</v>
+                    <v>5</v>
                     <portal>
                         <sector>kamer2l</sector>
                     </portal>
                 </p>
                 <p name="south">
-                    <v>6</v> <v>2</v> <v>0</v> <v>4</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>0</v>
+                    <v>4</v>
                 </p>
                 <p name="west">
-                    <v>2</v> <v>3</v> <v>1</v> <v>0</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <v>1</v>
+                    <v>0</v>
                     <portal>
                         <sector>kamer2l2</sector>
                     </portal>
                 </p>
                 <p name="up">
-                    <v>2</v> <v>6</v> <v>7</v> <v>3</v>
+                    <v>2</v>
+                    <v>6</v>
+                    <v>7</v>
+                    <v>3</v>
                 </p>
                 <p name="down">
-                    <v>1</v> <v>5</v> <v>4</v> <v>0</v>
+                    <v>1</v>
+                    <v>5</v>
+                    <v>4</v>
+                    <v>0</v>
                 </p>
             </params>
         </meshobj>
@@ -19155,31 +19098,49 @@
                 <v x="-38" y="-14" z="11" />
                 <v x="-38" y="-14" z="16" />
                 <material>asphalt</material>
-		<texlen>2</texlen>
+                <texlen>2</texlen>
                 <p name="north">
-                    <v>3</v> <v>7</v> <v>5</v> <v>1</v>
+                    <v>3</v>
+                    <v>7</v>
+                    <v>5</v>
+                    <v>1</v>
                 </p>
                 <p name="east">
-                    <v>7</v> <v>6</v> <v>4</v> <v>5</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <v>4</v>
+                    <v>5</v>
                     <portal>
                         <sector>kamer2l1</sector>
                     </portal>
                 </p>
                 <p name="south">
-                    <v>6</v> <v>2</v> <v>0</v> <v>4</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>0</v>
+                    <v>4</v>
                 </p>
                 <p name="west">
-                    <v>2</v> <v>3</v> <v>1</v> <v>0</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <v>1</v>
+                    <v>0</v>
                     <portal>
                         <sector>kamer2lhuge</sector>
-			<clip />
+                        <clip />
                     </portal>
                 </p>
                 <p name="up">
-                    <v>2</v> <v>6</v> <v>7</v> <v>3</v>
+                    <v>2</v>
+                    <v>6</v>
+                    <v>7</v>
+                    <v>3</v>
                 </p>
                 <p name="down">
-                    <v>1</v> <v>5</v> <v>4</v> <v>0</v>
+                    <v>1</v>
+                    <v>5</v>
+                    <v>4</v>
+                    <v>0</v>
                 </p>
             </params>
         </meshobj>
@@ -19195,7 +19156,7 @@
                 <numrim>12</numrim>
                 <radius x="100" y="100" z="100" />
                 <shift x="0" y="0" z="0" />
-		<reversed />
+                <reversed />
             </params>
             <move>
                 <v x="-80" y="-16" z="13" />
@@ -19247,9 +19208,9 @@
                     </params>
                     <move>
                         <v x="0" y="4" z="0" />
-			<matrix>
-			    <rotz>3.1415926535</rotz>
-			</matrix>
+                        <matrix>
+                            <rotz>3.1415926535</rotz>
+                        </matrix>
                     </move>
                 </meshobj>
             </meshobj>
@@ -19270,10 +19231,10 @@
                     </params>
                     <move>
                         <v x="0" y="4" z="0" />
-			<matrix>
-			    <roty>1.5707963</roty>
-			    <rotz>3.1415926535</rotz>
-			</matrix>
+                        <matrix>
+                            <roty>1.5707963</roty>
+                            <rotz>3.1415926535</rotz>
+                        </matrix>
                     </move>
                 </meshobj>
             </meshobj>
@@ -19294,10 +19255,10 @@
                     </params>
                     <move>
                         <v x="0" y="4" z="0" />
-			<matrix>
-			    <roty>-1.5707963</roty>
-			    <rotz>3.1415926535</rotz>
-			</matrix>
+                        <matrix>
+                            <roty>-1.5707963</roty>
+                            <rotz>3.1415926535</rotz>
+                        </matrix>
                     </move>
                 </meshobj>
             </meshobj>
@@ -22854,271 +22815,231 @@
         </meshobj>
         <fog red="0.2" green="0.3" blue="0.5" density="0.08" />
     </sector>
-
     <sequences>
         <sequence name="fogloop">
-	    <fadefog sector="kamer2l" red="1" green="1" blue="1" density="0.05"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <fadefog sector="kamer2l" red="1" green="0" blue="0" density="0.02"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <fadefog sector="kamer2l" red="0" green="1" blue="0" density="0.01"
-		duration="1000" />
-	    <delay time="1000" />
-	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <!-- @@@ Circular reference!!! Causes leak -->
-	    <run sequence="fogloop" />
-	</sequence>
-
+            <fadefog sector="kamer2l" red="1" green="1" blue="1" density="0.05" duration="1000" />
+            <delay time="1000" />
+            <fadefog sector="kamer2l" red="1" green="0" blue="0" density="0.02" duration="1000" />
+            <delay time="1000" />
+            <fadefog sector="kamer2l" red="0" green="1" blue="0" density="0.01" duration="1000" />
+            <delay time="1000" />
+            <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02" duration="1000" />
+            <delay time="1000" />
+            <!-- @@@ Circular reference!!! Causes leak -->
+            <run sequence="fogloop" />
+        </sequence>
         <sequence name="fog">
-	    <setfog sector="kamer2l" red="0" green="0" blue="0" density="0" />
-	    <delay time="1000" />
-	    <run sequence="fogloop" />
-	</sequence>
-
-	<sequence name="animlight">
-	    <args>
-	        <arg name="light" />
-	    </args>
-	    <fadelight light_par="light" red="0" green="0" blue="0"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <fadelight light_par="light" red="1" green="1" blue="1"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <fadelight light_par="light" red="1" green="0" blue="0"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <fadelight light_par="light" red="0" green="1" blue="0"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <fadelight light_par="light" red="0" green="0" blue="1"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <enable trigger="animlight" />
-	</sequence>
-
-	<sequence name="anim_sky">
-	    /* Time of day simulation */
-	    <fadeambient sector="street1" red="1" green="1" blue="1"
-	    	duration="1000" />
-	    <delay time="1000" />
-	    <fadeambient sector="street1" red="0" green="0" blue="0"
-	    	duration="1000" />
-	    <delay time="2000" />
-	    /* Time of day simulation */
-	    <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
-	    <delay time="75" />
-	    <setambient sector="street1" red="0" green="0" blue="0" />
-	    <delay time="75" />
-	    <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
-	    <delay time="150" />
-	    <setambient sector="street1" red="0" green="0" blue="0" />
-	    <delay time="3000" />
-	    <enable trigger="anim_sky" />
-	</sequence>
-
-    <sequence name="light_listener_on">
-        <!--
+            <setfog sector="kamer2l" red="0" green="0" blue="0" density="0" />
+            <delay time="1000" />
+            <run sequence="fogloop" />
+        </sequence>
+        <sequence name="animlight">
+            <args>
+                <arg name="light" />
+            </args>
+            <fadelight light_par="light" red="0" green="0" blue="0" duration="1000" />
+            <delay time="1000" />
+            <fadelight light_par="light" red="1" green="1" blue="1" duration="1000" />
+            <delay time="1000" />
+            <fadelight light_par="light" red="1" green="0" blue="0" duration="1000" />
+            <delay time="1000" />
+            <fadelight light_par="light" red="0" green="1" blue="0" duration="1000" />
+            <delay time="1000" />
+            <fadelight light_par="light" red="0" green="0" blue="1" duration="1000" />
+            <delay time="1000" />
+            <enable trigger="animlight" />
+        </sequence>
+        <sequence name="anim_sky">/* Time of day simulation */
+            <fadeambient sector="street1" red="1" green="1" blue="1" duration="1000" />
+            <delay time="1000" />
+            <fadeambient sector="street1" red="0" green="0" blue="0" duration="1000" />
+            <delay time="2000" />/* Time of day simulation */
+            <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
+            <delay time="75" />
+            <setambient sector="street1" red="0" green="0" blue="0" />
+            <delay time="75" />
+            <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
+            <delay time="150" />
+            <setambient sector="street1" red="0" green="0" blue="0" />
+            <delay time="3000" />
+            <enable trigger="anim_sky" />
+        </sequence>
+        <sequence name="light_listener_on">
+            <!--
          *** This light is turned on when the ambient light in 
          *** street gets too dark.
           -->
-        <setambient sector="corridor" red=".5" green=".5" blue=".75" />
-        <enable trigger="light_listener_off" />
-    </sequence>
-
-    <sequence name="light_listener_off">
-        <!--
+            <setambient sector="corridor" red=".5" green=".5" blue=".75" />
+            <enable trigger="light_listener_off" />
+        </sequence>
+        <sequence name="light_listener_off">
+            <!--
          *** This light is turned off when the ambient light in 
          *** street gets bright again.
           -->
-        <setambient sector="corridor" red="0" green="0" blue="0" />
-        <enable trigger="light_listener_on" />
-    </sequence>
-    
-	<sequence name="seq_lightning">
-	    <!-- Sequence fired by application and not by trigger.-->
-	    <setambient sector="large" red="1.0" green="1.0" blue="1.5" />
-	    <delay time="75" />
-	    <fadeambient sector="large" red="0" green="0" blue="0" duration="74" />
-	    <delay time="75" />
-	    <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
-	    <delay time="150" />
-	    <setambient sector="large" color_var="Lightning Restore Color" />
-	    <delay time="3000" />
-	</sequence>
-
-    <sequence name="flicker1">
-        <!-- demo of randomly flickering light -->
-        <delay min="50" max="100" />
-        <setlight light="ganglight1" red=".982" green=".815" blue=".616" />
-        <delay min="100" max="1500" />
-        <setlight light="ganglight1" red=".960" green=".570" blue=".379" />
-        <enable trigger="flicker1" />
-    </sequence>
-    <sequence name="flicker2">
-        <!-- demo of randomly flickering light -->
-        <delay min="50" max="100" />
-        <setlight light="ganglight2" red=".982" green=".815" blue=".616" />
-        <delay min="100" max="1500" />
-        <setlight light="ganglight2" red=".960" green=".570" blue=".379" />
-        <enable trigger="flicker2" />
-    </sequence>
-    <sequence name="flicker3">
-        <!-- demo of randomly flickering light -->
-        <delay min="50" max="100" />
-        <setlight light="ganglight3" red=".982" green=".815" blue=".616" />
-        <delay min="100" max="1500" />
-        <setlight light="ganglight3" red=".960" green=".570" blue=".379" />
-        <enable trigger="flicker3" />
-    </sequence>
-    
-	<sequence name="animhugelight">
-	    <fadelight light="hugeroom_light1" red="0" green="0" blue=".2"
-	    	duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".1" blue="0"
-	    	duration="3000" />
-	    <delay time="3000" />
-	    <fadelight light="hugeroom_light1" red="0" green=".3" blue=".8"
-	        duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".3"
-	        duration="3000" />
-	    <delay time="3000" />
-	    <fadelight light="hugeroom_light1" red="0" green=".2" blue=".3"
-	        duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green="0" blue=".8"
-	        duration="3000" />
-	    <delay time="3000" />
-	    <fadelight light="hugeroom_light1" red="0" green=".4" blue=".7"
-	        duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".4" blue=".3"
-	        duration="3000" />
-	    <delay time="3000" />
-	    <fadelight light="hugeroom_light1" red="0" green=".1" blue=".5"
-	        duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".6"
-	        duration="3000" />
-	    <delay time="3000" />
-	    <enable trigger="animhugelight" />
-	</sequence>
-
-	<sequence name="rot_shapes">
-	    <rotate mesh="cube2" duration="400">
-	        <rotx>1.5</rotx>
+            <setambient sector="corridor" red="0" green="0" blue="0" />
+            <enable trigger="light_listener_on" />
+        </sequence>
+        <sequence name="seq_lightning">
+            <!-- Sequence fired by application and not by trigger.-->
+            <setambient sector="large" red="1.0" green="1.0" blue="1.5" />
+            <delay time="75" />
+            <fadeambient sector="large" red="0" green="0" blue="0" duration="74" />
+            <delay time="75" />
+            <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
+            <delay time="150" />
+            <setambient sector="large" color_var="Lightning Restore Color" />
+            <delay time="3000" />
+        </sequence>
+        <sequence name="flicker1">
+            <!-- demo of randomly flickering light -->
+            <delay min="50" max="100" />
+            <setlight light="ganglight1" red=".982" green=".815" blue=".616" />
+            <delay min="100" max="1500" />
+            <setlight light="ganglight1" red=".960" green=".570" blue=".379" />
+            <enable trigger="flicker1" />
+        </sequence>
+        <sequence name="flicker2">
+            <!-- demo of randomly flickering light -->
+            <delay min="50" max="100" />
+            <setlight light="ganglight2" red=".982" green=".815" blue=".616" />
+            <delay min="100" max="1500" />
+            <setlight light="ganglight2" red=".960" green=".570" blue=".379" />
+            <enable trigger="flicker2" />
+        </sequence>
+        <sequence name="flicker3">
+            <!-- demo of randomly flickering light -->
+            <delay min="50" max="100" />
+            <setlight light="ganglight3" red=".982" green=".815" blue=".616" />
+            <delay min="100" max="1500" />
+            <setlight light="ganglight3" red=".960" green=".570" blue=".379" />
+            <enable trigger="flicker3" />
+        </sequence>
+        <sequence name="animhugelight">
+            <fadelight light="hugeroom_light1" red="0" green="0" blue=".2" duration="3000" />
+            <fadelight light="hugeroom_light2" red="0" green=".1" blue="0" duration="3000" />
+            <delay time="3000" />
+            <fadelight light="hugeroom_light1" red="0" green=".3" blue=".8" duration="3000" />
+            <fadelight light="hugeroom_light2" red="0" green=".2" blue=".3" duration="3000" />
+            <delay time="3000" />
+            <fadelight light="hugeroom_light1" red="0" green=".2" blue=".3" duration="3000" />
+            <fadelight light="hugeroom_light2" red="0" green="0" blue=".8" duration="3000" />
+            <delay time="3000" />
+            <fadelight light="hugeroom_light1" red="0" green=".4" blue=".7" duration="3000" />
+            <fadelight light="hugeroom_light2" red="0" green=".4" blue=".3" duration="3000" />
+            <delay time="3000" />
+            <fadelight light="hugeroom_light1" red="0" green=".1" blue=".5" duration="3000" />
+            <fadelight light="hugeroom_light2" red="0" green=".2" blue=".6" duration="3000" />
+            <delay time="3000" />
+            <enable trigger="animhugelight" />
+        </sequence>
+        <sequence name="rot_shapes">
+            <rotate mesh="cube2" duration="400">
+                <rotx>1.5</rotx>
                 <v x="-16" y="-1" z="36" />
-	    </rotate>
-	    <rotate mesh="cube4" duration="1000">
-	        <roty>.5</roty>
+            </rotate>
+            <rotate mesh="cube4" duration="1000">
+                <roty>.5</roty>
                 <v x="-12" y="-1" z="36" />
-	    </rotate>
-	    <rotate mesh="cube6" duration="1000">
-	        <rotx>1.5</rotx>
+            </rotate>
+            <rotate mesh="cube6" duration="1000">
+                <rotx>1.5</rotx>
                 <v x="-16" y="1" z="36" />
-	    </rotate>
-	    <rotate mesh="circle1" duration="1000">
-	        <rotz>2</rotz>
+            </rotate>
+            <rotate mesh="circle1" duration="1000">
+                <rotz>2</rotz>
                 <v x="-16" y="1" z="30" />
-	    </rotate>
-	    <rotate mesh="band1" duration="1000">
-	        <roty>3</roty>
+            </rotate>
+            <rotate mesh="band1" duration="1000">
+                <roty>3</roty>
                 <v x="-16" y="-2.6" z="25" />
-	    </rotate>
-	    <rotate mesh="band2" duration="1000">
-	        <roty>3</roty>
+            </rotate>
+            <rotate mesh="band2" duration="1000">
+                <roty>3</roty>
                 <v x="-16" y="-1.85" z="25" />
-	    </rotate>
-	    <delay time="400" />
-	    <rotate mesh="cube2" duration="300">
-	        <roty>.5</roty>
+            </rotate>
+            <delay time="400" />
+            <rotate mesh="cube2" duration="300">
+                <roty>.5</roty>
                 <v x="-16" y="-1" z="36" />
-	    </rotate>
-	    <delay time="300" />
-	    <rotate mesh="cube2" duration="300">
-	        <rotz>.5</rotz>
+            </rotate>
+            <delay time="300" />
+            <rotate mesh="cube2" duration="300">
+                <rotz>.5</rotz>
                 <v x="-16" y="-1" z="36" />
-	    </rotate>
-	    <delay time="300" />
-	    <enable trigger="rot_shapes" />
-	</sequence>
-
-	<sequence name="rot_cubard">
-	    <rotate mesh="cubard" duration="1000">
-	        <roty>2</roty>
+            </rotate>
+            <delay time="300" />
+            <enable trigger="rot_shapes" />
+        </sequence>
+        <sequence name="rot_cubard">
+            <rotate mesh="cubard" duration="1000">
+                <roty>2</roty>
                 <v x="4" y="0.3" z="12" />
-	    </rotate>
-	    <rotate mesh="cubard:robotHead:ball1" duration="1000">
-	        <roty>1.5</roty>
+            </rotate>
+            <rotate mesh="cubard:robotHead:ball1" duration="1000">
+                <roty>1.5</roty>
                 <v x="0" y="0.5" z="0" />
-	    </rotate>
-	    <rotate mesh="cubard:robotHead:ball2" duration="1000">
-	        <rotz>2.2</rotz>
+            </rotate>
+            <rotate mesh="cubard:robotHead:ball2" duration="1000">
+                <rotz>2.2</rotz>
                 <v x="0" y="0.5" z="0" />
-	    </rotate>
-	    <rotate mesh="cubard:robotHead:ball3" duration="1000">
-	        <rotx>1</rotx>
+            </rotate>
+            <rotate mesh="cubard:robotHead:ball3" duration="1000">
+                <rotx>1</rotx>
                 <v x="0" y="0.5" z="0" />
-	    </rotate>
-
-	    <rotate mesh="cubard:robotArmRight" duration="500">
-	        <rotz>-1.8</rotz>
+            </rotate>
+            <rotate mesh="cubard:robotArmRight" duration="500">
+                <rotz>-1.8</rotz>
                 <v x="0" y="0.23" z="-0.15" />
-	    </rotate>
-	    <rotate mesh="cubard:robotArmLeft" duration="500">
-	        <rotz>-.4</rotz>
+            </rotate>
+            <rotate mesh="cubard:robotArmLeft" duration="500">
+                <rotz>-.4</rotz>
                 <v x="0" y="0.23" z="0.15" />
-	    </rotate>
-	    <delay time="500" />
-	    <rotate mesh="cubard:robotArmRight" duration="500">
-	        <rotz>1.8</rotz>
+            </rotate>
+            <delay time="500" />
+            <rotate mesh="cubard:robotArmRight" duration="500">
+                <rotz>1.8</rotz>
                 <v x="0" y="0.23" z="-0.15" />
-	    </rotate>
-	    <rotate mesh="cubard:robotArmLeft" duration="500">
-	        <rotz>.4</rotz>
+            </rotate>
+            <rotate mesh="cubard:robotArmLeft" duration="500">
+                <rotz>.4</rotz>
                 <v x="0" y="0.23" z="0.15" />
-	    </rotate>
-	    <delay time="500" />
-	    <enable trigger="rot_cubard" />
-	</sequence>
-
-	<sequence name="rot_transpBall">
-	    <rotate mesh="transpBall" duration="1000">
-	        <roty>3</roty>
+            </rotate>
+            <delay time="500" />
+            <enable trigger="rot_cubard" />
+        </sequence>
+        <sequence name="rot_transpBall">
+            <rotate mesh="transpBall" duration="1000">
+                <roty>3</roty>
                 <v x="15" y="4" z="14" />
-	    </rotate>
-	    <delay time="1000" />
-	    <enable trigger="rot_transpBall" />
-	</sequence>
-
-	<sequence name="rot_s_large1">
-	    <rotate mesh="s_large1" duration="1000">
-	        <rotx>.4</rotx>
-	        <roty>.6</roty>
-	        <rotz>.34</rotz>
+            </rotate>
+            <delay time="1000" />
+            <enable trigger="rot_transpBall" />
+        </sequence>
+        <sequence name="rot_s_large1">
+            <rotate mesh="s_large1" duration="1000">
+                <rotx>.4</rotx>
+                <roty>.6</roty>
+                <rotz>.34</rotz>
                 <v x="15" y="3" z="8" />
-	    </rotate>
-	    <delay time="1000" />
-	    <enable trigger="rot_s_large1" />
-	</sequence>
-
-	<sequence name="rot_cubeHierarchy">
-	    <rotate mesh="cubeHierarchy" duration="1000">
-	        <roty>9</roty>
+            </rotate>
+            <delay time="1000" />
+            <enable trigger="rot_s_large1" />
+        </sequence>
+        <sequence name="rot_cubeHierarchy">
+            <rotate mesh="cubeHierarchy" duration="1000">
+                <roty>9</roty>
                 <v x="-1" y="0.3" z="11" />
-	    </rotate>
-	    <delay time="1000" />
-	    <enable trigger="rot_cubeHierarchy" />
-	</sequence>
-
-	<sequence name="dobox">
-	    <run sequence="movebox" />
-	    <run sequence="openbox" />
-	</sequence>
-
-	<sequence name="movebox">
-	<!-- Disabled because of problems for now:
+            </rotate>
+            <delay time="1000" />
+            <enable trigger="rot_cubeHierarchy" />
+        </sequence>
+        <sequence name="dobox">
+            <run sequence="movebox" />
+            <run sequence="openbox" />
+        </sequence>
+        <sequence name="movebox">
+            <!-- Disabled because of problems for now:
 	    <move mesh="floorplate" duration="10000" x="0" y="-10" z="0" />
 	    <delay time="10000" />
 	    <move mesh="floorplate" duration="10000" x="0" y="10" z="0" />
@@ -23126,101 +23047,98 @@
 	    /* @@@ Circular reference!!! Causes leak */
 	    <run sequence="movebox" />
 	-->
-	</sequence>
-
-	<sequence name="openbox">
-	    <rotate mesh="floorplate" duration="12000">
-	        <roty>1.5707963</roty>
+        </sequence>
+        <sequence name="openbox">
+            <rotate mesh="floorplate" duration="12000">
+                <roty>1.5707963</roty>
                 <v x="-80" y="-16" z="13" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateL" duration="6000">
-	        <rotz>-1.5707963</rotz>
-		<v x="-2" y="0" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateL:triL" duration="6000">
-	        <rotz>-1.5707963</rotz>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateR" duration="6000">
-	        <rotz>1.5707963</rotz>
-		<v x="2" y="0" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateR:triR" duration="6000">
-	        <rotz>1.5707963</rotz>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateU" duration="6000">
-	        <rotx>-1.5707963</rotx>
-		<v x="0" y="0" z="2" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateU:triU" duration="6000">
-	        <rotx>-1.5707963</rotx>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateD" duration="6000">
-	        <rotx>1.5707963</rotx>
-		<v x="0" y="0" z="-2" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateD:triD" duration="6000">
-	        <rotx>1.5707963</rotx>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <delay time="6000" />
-	    <rotate mesh="floorplate:plateL" duration="6000">
-	        <rotz>1.5707963</rotz>
-		<v x="-2" y="0" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateL:triL" duration="6000">
-	        <rotz>1.5707963</rotz>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateR" duration="6000">
-	        <rotz>-1.5707963</rotz>
-		<v x="2" y="0" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateR:triR" duration="6000">
-	        <rotz>-1.5707963</rotz>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateU" duration="6000">
-	        <rotx>1.5707963</rotx>
-		<v x="0" y="0" z="2" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateU:triU" duration="6000">
-	        <rotx>1.5707963</rotx>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateD" duration="6000">
-	        <rotx>-1.5707963</rotx>
-		<v x="0" y="0" z="-2" />
-	    </rotate>
-	    <rotate mesh="floorplate:plateD:triD" duration="6000">
-	        <rotx>-1.5707963</rotx>
-		<v x="0" y="4" z="0" />
-	    </rotate>
-	    <delay time="6000" />
-	    <!-- @@@ Circular reference!!! Causes leak -->
-	    <run sequence="openbox" />
-	</sequence>
-
-	<sequence name="handle1">
-	    <rotate mesh="handle1" duration="500">
-	        <rotx>.4</rotx>
+            </rotate>
+            <rotate mesh="floorplate:plateL" duration="6000">
+                <rotz>-1.5707963</rotz>
+                <v x="-2" y="0" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateL:triL" duration="6000">
+                <rotz>-1.5707963</rotz>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateR" duration="6000">
+                <rotz>1.5707963</rotz>
+                <v x="2" y="0" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateR:triR" duration="6000">
+                <rotz>1.5707963</rotz>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateU" duration="6000">
+                <rotx>-1.5707963</rotx>
+                <v x="0" y="0" z="2" />
+            </rotate>
+            <rotate mesh="floorplate:plateU:triU" duration="6000">
+                <rotx>-1.5707963</rotx>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateD" duration="6000">
+                <rotx>1.5707963</rotx>
+                <v x="0" y="0" z="-2" />
+            </rotate>
+            <rotate mesh="floorplate:plateD:triD" duration="6000">
+                <rotx>1.5707963</rotx>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <delay time="6000" />
+            <rotate mesh="floorplate:plateL" duration="6000">
+                <rotz>1.5707963</rotz>
+                <v x="-2" y="0" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateL:triL" duration="6000">
+                <rotz>1.5707963</rotz>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateR" duration="6000">
+                <rotz>-1.5707963</rotz>
+                <v x="2" y="0" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateR:triR" duration="6000">
+                <rotz>-1.5707963</rotz>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateU" duration="6000">
+                <rotx>1.5707963</rotx>
+                <v x="0" y="0" z="2" />
+            </rotate>
+            <rotate mesh="floorplate:plateU:triU" duration="6000">
+                <rotx>1.5707963</rotx>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <rotate mesh="floorplate:plateD" duration="6000">
+                <rotx>-1.5707963</rotx>
+                <v x="0" y="0" z="-2" />
+            </rotate>
+            <rotate mesh="floorplate:plateD:triD" duration="6000">
+                <rotx>-1.5707963</rotx>
+                <v x="0" y="4" z="0" />
+            </rotate>
+            <delay time="6000" />
+            <!-- @@@ Circular reference!!! Causes leak -->
+            <run sequence="openbox" />
+        </sequence>
+        <sequence name="handle1">
+            <rotate mesh="handle1" duration="500">
+                <rotx>.4</rotx>
                 <v x="-14.7" y="0.8" z="8.8" />
-	    </rotate>
-	    <delay time="500" />
-	    <enable trigger="handle1off" />
-	</sequence>
-	<sequence name="handle1off">
-	    <rotate mesh="handle1" duration="500">
-	        <rotx>-.4</rotx>
+            </rotate>
+            <delay time="500" />
+            <enable trigger="handle1off" />
+        </sequence>
+        <sequence name="handle1off">
+            <rotate mesh="handle1" duration="500">
+                <rotx>-.4</rotx>
                 <v x="-14.7" y="0.8" z="8.8" />
-	    </rotate>
-	    <delay time="500" />
-	    <enable trigger="handle1" />
-	</sequence>
-
-	<!--
+            </rotate>
+            <delay time="500" />
+            <enable trigger="handle1" />
+        </sequence>
+        <!--
 	 *** This sequence is fired when the camera is near the door.
 	 *** It will start the operation of moving the door. First
 	 *** both opendoor triggers are disabled to prevent the other
@@ -23228,145 +23146,125 @@
 	 *** isn't really nice). After opening the door the two triggers
 	 *** are constantly checked in the 'testdoor' sequence.
 	 -->
-	<sequence name="opendoor">
-	    <!-- Disable both triggers because the door is now open -->
-	    <disable trigger="opendoor1" />
-	    <disable trigger="opendoor2" />
-	    <rotate mesh="rot_door1" duration="2000">
-	        <roty>-1.5707963</roty>
+        <sequence name="opendoor">
+            <!-- Disable both triggers because the door is now open -->
+            <disable trigger="opendoor1" />
+            <disable trigger="opendoor2" />
+            <rotate mesh="rot_door1" duration="2000">
+                <roty>-1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
-	    </rotate>
-	    <delay time="2000" />
-	    <check trigger="opendoor1" delay="500" />
-	    <check trigger="opendoor2" delay="500" />
-	    <run sequence="testdoor" />
+            </rotate>
+            <delay time="2000" />
+            <check trigger="opendoor1" delay="500" />
+            <check trigger="opendoor2" delay="500" />
+            <run sequence="testdoor" />
         </sequence>
-	
-	<!--
+        <!--
 	 *** This sequence will first wait one second. Then it will
 	 *** see if both triggers are false. When that's the case the
 	 *** camera has moved away from the door and we can close it.
 	 -->
-	<sequence name="testdoor">
-	    <delay time="1000" />
-	    <test trigger="opendoor1"
-	    	truesequence="testdoor"
-		falsesequence="testdoor2" />
+        <sequence name="testdoor">
+            <delay time="1000" />
+            <test trigger="opendoor1" truesequence="testdoor" falsesequence="testdoor2" />
         </sequence>
-	<sequence name="testdoor2">
-	    <test trigger="opendoor2"
-	    	truesequence="testdoor"
-		falsesequence="reallyclosedoor" />
+        <sequence name="testdoor2">
+            <test trigger="opendoor2" truesequence="testdoor" falsesequence="reallyclosedoor" />
         </sequence>
-
-	<!--
+        <!--
 	 *** Now we can really close the door.
 	 *** First we disable the checks on the triggers.
 	 *** After the door is closed we enable both triggers again
 	 *** so the door can open later.
 	 -->
-	<sequence name="reallyclosedoor">
-	    <!-- Close door again -->
-	    <check trigger="opendoor1" delay="0" />
-	    <check trigger="opendoor2" delay="0" />
-	    <rotate mesh="rot_door1" duration="2000">
-	        <roty>1.5707963</roty>
+        <sequence name="reallyclosedoor">
+            <!-- Close door again -->
+            <check trigger="opendoor1" delay="0" />
+            <check trigger="opendoor2" delay="0" />
+            <rotate mesh="rot_door1" duration="2000">
+                <roty>1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
-	    </rotate>
-	    <delay time="2000" />
-	    <enable trigger="opendoor1" />
-	    <enable trigger="opendoor2" />
+            </rotate>
+            <delay time="2000" />
+            <enable trigger="opendoor1" />
+            <enable trigger="opendoor2" />
         </sequence>
     </sequences>
-
     <triggers>
         <trigger name="setfog">
-	    <sectorvis sector="kamer2l" />
-	    <fire delay="100" sequence="fog" />
-	</trigger>
-
-	<trigger name="animlight">
-	    <sectorvis sector="large" />
-	    <fire sequence="animlight">
-	        <light name="light" light="l1" />
-	    </fire>
-	</trigger>
-
-	<trigger name="anim_sky">
-	    <sectorvis sector="street1" />
-	    <fire sequence="anim_sky" />
-	</trigger>
-
+            <sectorvis sector="kamer2l" />
+            <fire delay="100" sequence="fog" />
+        </trigger>
+        <trigger name="animlight">
+            <sectorvis sector="large" />
+            <fire sequence="animlight">
+                <light name="light" light="l1" />
+            </fire>
+        </trigger>
+        <trigger name="anim_sky">
+            <sectorvis sector="street1" />
+            <fire sequence="anim_sky" />
+        </trigger>
         <!-- These 3 triggers control the flickering lights in the fog hallway-->
         <trigger name="flicker1">
-	    <sectorvis sector="gang3" />
-	    <fire sequence="flicker1" />
-	</trigger>
+            <sectorvis sector="gang3" />
+            <fire sequence="flicker1" />
+        </trigger>
         <trigger name="flicker2">
-	    <sectorvis sector="gang3" />
-	    <fire sequence="flicker2" />
-	</trigger>
+            <sectorvis sector="gang3" />
+            <fire sequence="flicker2" />
+        </trigger>
         <trigger name="flicker3">
-	    <sectorvis sector="gang3" />
-	    <fire sequence="flicker3" />
-	</trigger>
-	
-	<trigger name="light_listener_on">
-	    <lightvalue light="l1" operator="less" red=".1" blue=".1" green=".1" />
-	    <fire sequence="light_listener_on" />
-	</trigger>
-	<trigger name="light_listener_off">
-	    <lightvalue light="l1" operator="greater" red=".1" blue=".1" green=".1" />
-	    <fire sequence="light_listener_off" />
-	    <disable />
-	</trigger>
-
-	<trigger name="rot_shapes">
-	    <sectorvis sector="shapes" />
-	    <fire sequence="rot_shapes" />
-	</trigger>
-
-	<trigger name="rot_cubard">
-	    <sectorvis sector="large" />
-	    <fire sequence="rot_cubard" />
-	</trigger>
-
-	<trigger name="rot_transpBall">
-	    <sectorvis sector="large" />
-	    <fire sequence="rot_transpBall" />
-	</trigger>
-
-	<trigger name="rot_s_large1">
-	    <sectorvis sector="large" />
-	    <fire sequence="rot_s_large1" />
-	</trigger>
-
-	<trigger name="rot_cubeHierarchy">
-	    <sectorvis sector="large" />
-	    <fire sequence="rot_cubeHierarchy" />
-	</trigger>
-
-	<trigger name="animhugelight">
-	    <sectorvis sector="kamer2lhuge" />
-	    <fire sequence="animhugelight" />
-	</trigger>
-
-	<trigger name="openbox">
-	    <sectorvis sector="kamer2lhuge" />
-	    <fire delay="1000" sequence="dobox" />
-	</trigger>
-
-	<trigger name="handle1">
-	    <onclick mesh="handle1" />
-	    <fire sequence="handle1" />
-	</trigger>
-	<trigger name="handle1off">
-	    <onclick mesh="handle1" />
-	    <fire sequence="handle1off" />
-	    <disable />
-	</trigger>
-
-	<!--
+            <sectorvis sector="gang3" />
+            <fire sequence="flicker3" />
+        </trigger>
+        <trigger name="light_listener_on">
+            <lightvalue light="l1" operator="less" red=".1" blue=".1" green=".1" />
+            <fire sequence="light_listener_on" />
+        </trigger>
+        <trigger name="light_listener_off">
+            <lightvalue light="l1" operator="greater" red=".1" blue=".1" green=".1" />
+            <fire sequence="light_listener_off" />
+            <disable />
+        </trigger>
+        <trigger name="rot_shapes">
+            <sectorvis sector="shapes" />
+            <fire sequence="rot_shapes" />
+        </trigger>
+        <trigger name="rot_cubard">
+            <sectorvis sector="large" />
+            <fire sequence="rot_cubard" />
+        </trigger>
+        <trigger name="rot_transpBall">
+            <sectorvis sector="large" />
+            <fire sequence="rot_transpBall" />
+        </trigger>
+        <trigger name="rot_s_large1">
+            <sectorvis sector="large" />
+            <fire sequence="rot_s_large1" />
+        </trigger>
+        <trigger name="rot_cubeHierarchy">
+            <sectorvis sector="large" />
+            <fire sequence="rot_cubeHierarchy" />
+        </trigger>
+        <trigger name="animhugelight">
+            <sectorvis sector="kamer2lhuge" />
+            <fire sequence="animhugelight" />
+        </trigger>
+        <trigger name="openbox">
+            <sectorvis sector="kamer2lhuge" />
+            <fire delay="1000" sequence="dobox" />
+        </trigger>
+        <trigger name="handle1">
+            <onclick mesh="handle1" />
+            <fire sequence="handle1" />
+        </trigger>
+        <trigger name="handle1off">
+            <onclick mesh="handle1" />
+            <fire sequence="handle1off" />
+            <disable />
+        </trigger>
+        <!--
 	 *** opendoor1 and opendoor2 are both responsible for opening
 	 *** the same door. opendoor1 detects coming near the door
 	 *** from within sector 'large' while opendoor2 does the same
@@ -23374,19 +23272,17 @@
 	 *** from within the opendoor sequence so that the door cannot
 	 *** accidently turn 180 degrees by activating both triggers.
 	 -->
-	<trigger name="opendoor1">
-	    <sectorvis sector="large">
-		<sphere x="-3.75" y="0.5" z="20" radius="5" />
-	    </sectorvis>
-	    <fire delay="0" sequence="opendoor" />
-	</trigger>
-	<trigger name="opendoor2">
-	    <sectorvis sector="room3">
-		<sphere x="-3.75" y="0.5" z="20" radius="5" />
-	    </sectorvis>
-	    <fire delay="0" sequence="opendoor" />
-	</trigger>
+        <trigger name="opendoor1">
+            <sectorvis sector="large">
+                <sphere x="-3.75" y="0.5" z="20" radius="5" />
+            </sectorvis>
+            <fire delay="0" sequence="opendoor" />
+        </trigger>
+        <trigger name="opendoor2">
+            <sectorvis sector="room3">
+                <sphere x="-3.75" y="0.5" z="20" radius="5" />
+            </sectorvis>
+            <fire delay="0" sequence="opendoor" />
+        </trigger>
     </triggers>
-
 </world>
-

@@ -45,14 +45,13 @@ CS_IMPLEMENT_APPLICATION
 #define OP_VALIDATE 3
 #define OP_SPLITUNIT 4
 #define OP_SPLITGEOM 5
-#define OP_SPLITPOLY 6
 #define OP_COMPRESS 7
 #define OP_ANALYZE 8
-#define OP_ANALYZEP 9
 #define OP_FLAGCLEAR 10
 #define OP_FLAGGOOD 11
 #define OP_FLAGBAD 12
 #define OP_TRANSLATE 13
+#define OP_PLANES 14
 
 //-----------------------------------------------------------------------------
 
@@ -543,40 +542,6 @@ void ltThing::SplitThingInCenter ()
   }
 }
 
-void ltThing::SplitThingLargePolygons (float max_area, int minsize)
-{
-  max_obj_number = 0;
-  int i, j;
-  for (i = 0 ; i < num_polygons ; i++)
-  {
-    ltPolygon* p = polygons[i];
-    float area = 0.0f;
-    int pi;
-    for (pi = 0 ; pi < p->GetVertexCount ()-2 ; pi++)
-      area += csMath3::Area3 (
-	GetVertex (p->GetVertex (0)),
-	GetVertex (p->GetVertex (pi+1)),
-	GetVertex (p->GetVertex (pi+2)));
-    area = ABS (area);
-    int where = int (50 * (area / max_area));
-    if (where >= minsize)
-    {
-      ++max_obj_number;
-      where = max_obj_number;
-    }
-    else
-    {
-      where = 0;
-    }
-    p->SetObjectNumber (where);
-    for (j = 0 ; j < p->GetVertexCount () ; j++)
-    {
-      ltVertex* vt = vertices[p->GetVertex (j)];
-      vt->SetObjectNumber (where);
-    }
-  }
-}
-
 void ltThing::SplitThingSeperateUnits ()
 {
   max_obj_number = -1;
@@ -696,9 +661,14 @@ bool LevTool::TestValidXML (iDocument* doc)
   return true;
 }
 
-void LevTool::AnalyzePluginSection (iDocument* doc)
+void LevTool::AnalyzePluginSection (iDocument* doc, bool meshfacts)
 {
   thing_plugins.Push (new csString ("crystalspace.mesh.loader.thing"));
+  if (meshfacts)
+    thing_plugins.Push (
+    	new csString ("crystalspace.mesh.loader.factory.thing"));
+  plane_plugins.Push (new csString ("crystalspace.mesh.loader.thing.plane"));
+
   csRef<iDocumentNode> root = doc->GetRoot ();
   csRef<iDocumentNode> worldnode = root->GetNode ("world");
   csRef<iDocumentNode> pluginsnode = worldnode->GetNode ("plugins");
@@ -717,9 +687,43 @@ void LevTool::AnalyzePluginSection (iDocument* doc)
 	{
 	  thing_plugins.Push (new csString (child->GetAttributeValue ("name")));
 	}
+	else if (meshfacts && plugname &&
+		!strcmp (plugname, "crystalspace.mesh.loader.factory.thing"))
+	{
+	  thing_plugins.Push (new csString (child->GetAttributeValue ("name")));
+	}
+	else if (plugname &&
+		!strcmp (plugname, "crystalspace.mesh.loader.thing.plane"))
+	{
+	  plane_plugins.Push (new csString (child->GetAttributeValue ("name")));
+	}
       }
     }
   }
+}
+
+bool LevTool::IsAddonAPlane (iDocumentNode* addonnode)
+{
+  csRef<iDocumentNode> pluginnode = addonnode->GetNode ("plugin");
+  if (!pluginnode)
+  {
+    // Very weird. Should not happen.
+    return false;
+  }
+  const char* plugname = pluginnode->GetContentsValue ();
+  if (!plugname)
+  {
+    // Very weird. Should not happen.
+    return false;
+  }
+  int i;
+  for (i = 0 ; i < plane_plugins.Length () ; i++)
+  {
+    csString* str = (csString*)plane_plugins.Get (i);
+    if (str->Compare (plugname))
+      return true;
+  }
+  return false;
 }
 
 bool LevTool::IsMeshAThing (iDocumentNode* meshnode)
@@ -822,7 +826,63 @@ void LevTool::ParseThing (iDocumentNode* meshnode)
   ParsePart (th, paramsnode, meshnode);
 }
 
-void LevTool::FindAllThings (iDocument* doc)
+void LevTool::FindAllPlanes (iDocument* doc)
+{
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> worldnode = root->GetNode ("world");
+  csRef<iDocumentNodeIterator> it = worldnode->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    if (!strcmp (value, "addon") && IsAddonAPlane (child))
+    {
+      csRef<iDocumentNode> params = child->GetNode ("params");
+      ltPlane* pl = new ltPlane;
+      csRef<iDocumentNode> name = params->GetNode ("name");
+      if (name)
+      {
+        const char* plname = name->GetContentsValue ();
+        pl->name = csStrNew (plname);
+      }
+      csVector3 v;
+      csRef<iDocumentNode> orig = params->GetNode ("orig");
+      if (orig)
+      {
+        v.x = orig->GetAttributeValueAsFloat ("x");
+        v.y = orig->GetAttributeValueAsFloat ("y");
+        v.z = orig->GetAttributeValueAsFloat ("z");
+        pl->orig = v;
+      }
+      csRef<iDocumentNode> first = params->GetNode ("first");
+      if (first)
+      {
+        v.x = first->GetAttributeValueAsFloat ("x");
+        v.y = first->GetAttributeValueAsFloat ("y");
+        v.z = first->GetAttributeValueAsFloat ("z");
+        pl->first = v;
+      }
+      csRef<iDocumentNode> second = params->GetNode ("second");
+      if (second)
+      {
+        v.x = second->GetAttributeValueAsFloat ("x");
+        v.y = second->GetAttributeValueAsFloat ("y");
+        v.z = second->GetAttributeValueAsFloat ("z");
+        pl->second = v;
+      }
+      csRef<iDocumentNode> firstlen = params->GetNode ("firstlen");
+      if (firstlen)
+	pl->firstlen = firstlen->GetContentsValueAsFloat ();
+      csRef<iDocumentNode> secondlen = params->GetNode ("secondlen");
+      if (secondlen)
+	pl->secondlen = secondlen->GetContentsValueAsFloat ();
+      planes.Push (pl);
+    }
+  }
+}
+
+void LevTool::FindAllThings (iDocument* doc, bool meshfacts, bool movable)
 {
   csRef<iDocumentNode> root = doc->GetRoot ();
   csRef<iDocumentNode> worldnode = root->GetNode ("world");
@@ -841,11 +901,15 @@ void LevTool::FindAllThings (iDocument* doc)
         if (child2->GetType () != CS_NODE_ELEMENT) continue;
         const char* value2 = child2->GetValue ();
 	if (!strcmp (value2, "meshobj") && IsMeshAThing (child2)
-		&& !IsMeshMovable (child2))
+		&& (movable || !IsMeshMovable (child2)))
 	{
 	  ParseThing (child2);
 	}
       }
+    }
+    else if (meshfacts && !strcmp (value, "meshfact") && IsMeshAThing (child))
+    {
+      ParseThing (child);
     }
   }
 }
@@ -1126,6 +1190,157 @@ void LevTool::CloneAndSplitDynavis (iDocument* doc, iDocument* newdoc,
   csRef<iDocumentNode> root = doc->GetRoot ();
   csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
   CloneAndSplitDynavis (root, newroot, is_dynavis);
+}
+
+void LevTool::CloneAndMovePlanes (iDocumentNode* node, iDocumentNode* newnode)
+{
+  const char* parentvalue = node->GetValue ();
+
+  bool is_addon = !strcmp (parentvalue, "addon");
+  if (is_addon && IsAddonAPlane (node)) return;	// Discard.
+
+  bool is_meshfact = !strcmp (parentvalue, "meshfact");
+  if (is_meshfact && !IsMeshAThing (node))
+  {
+    CloneNode (node, newnode);
+    return;
+  }
+  bool is_meshobj = !strcmp (parentvalue, "meshobj");
+  if (is_meshobj && !IsMeshAThing (node))
+  {
+    CloneNode (node, newnode);
+    return;
+  }
+
+  bool is_world = !strcmp (parentvalue, "world");
+  bool is_sector = !strcmp (parentvalue, "sector");
+  bool is_plugins = !strcmp (parentvalue, "plugins");
+  bool is_p = !strcmp (parentvalue, "p");
+  bool is_params = !strcmp (parentvalue, "params");
+  bool is_part = !strcmp (parentvalue, "part");
+  bool is_texmap = !strcmp (parentvalue, "texmap");
+  bool is_root = !strcmp (parentvalue, "");
+  if (!is_root && !is_sector && !is_world && !is_meshfact && !is_meshobj
+  	&& !is_p && !is_params && !is_part && !is_texmap && !is_plugins)
+  {
+    CloneNode (node, newnode);
+    return;
+  }
+
+  // First copy the name and attributes.
+  newnode->SetValue (node->GetValue ());
+  csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
+  while (atit->HasNext ())
+  {
+    csRef<iDocumentAttribute> attr = atit->Next ();
+    newnode->SetAttribute (attr->GetName (), attr->GetValue ());
+  }
+
+  if (is_texmap)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      const char* value = child->GetValue ();
+      if (child->GetType () == CS_NODE_ELEMENT && (!strcmp (value, "plane")))
+      {
+        const char* planename = child->GetContentsValue ();
+	int i;
+	for (i = 0 ; i < planes.Length () ; i++)
+	{
+	  ltPlane* pl = (ltPlane*)planes[i];
+	  if (strcmp (pl->name, planename) == 0)
+	  {
+            csRef<iDocumentNode> orig = newnode->CreateNodeBefore (
+      	      child->GetType ());
+	    orig->SetValue ("orig");
+	    orig->SetAttributeAsFloat ("x", pl->orig.x);
+	    orig->SetAttributeAsFloat ("y", pl->orig.y);
+	    orig->SetAttributeAsFloat ("z", pl->orig.z);
+            csRef<iDocumentNode> first = newnode->CreateNodeBefore (
+      	      child->GetType ());
+	    first->SetValue ("first");
+	    first->SetAttributeAsFloat ("x", pl->first.x);
+	    first->SetAttributeAsFloat ("y", pl->first.y);
+	    first->SetAttributeAsFloat ("z", pl->first.z);
+
+            csRef<iDocumentNode> firstlen = newnode->CreateNodeBefore (
+      	      child->GetType ());
+	    firstlen->SetValue ("firstlen");
+	    csRef<iDocumentNode> firstlen_text = firstlen->CreateNodeBefore (
+	      CS_NODE_TEXT);
+	    firstlen_text->SetValueAsFloat (pl->firstlen);
+
+            csRef<iDocumentNode> second = newnode->CreateNodeBefore (
+      	      child->GetType ());
+	    second->SetValue ("second");
+	    second->SetAttributeAsFloat ("x", pl->second.x);
+	    second->SetAttributeAsFloat ("y", pl->second.y);
+	    second->SetAttributeAsFloat ("z", pl->second.z);
+
+            csRef<iDocumentNode> secondlen = newnode->CreateNodeBefore (
+      	      child->GetType ());
+	    secondlen->SetValue ("secondlen");
+	    csRef<iDocumentNode> secondlen_text = secondlen->CreateNodeBefore (
+	      CS_NODE_TEXT);
+	    secondlen_text->SetValueAsFloat (pl->secondlen);
+	    break;
+	  }
+	}
+      }
+      else
+      {
+        csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	  child->GetType ());
+        CloneNode (child, newchild);
+      }
+    }
+  }
+  else if (is_plugins)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      const char* value = child->GetValue ();
+      if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "plugin"))
+      {
+        const char* plugname = child->GetContentsValue ();
+	if (!strcmp (plugname, "crystalspace.mesh.loader.thing.plane"))
+	{
+	  // Drop.
+	  continue;
+	}
+      }
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	  child->GetType ());
+      CloneNode (child, newchild);
+    }
+  }
+  else
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      const char* value = child->GetValue ();
+      if (strcmp (value, "addon") == 0 && IsAddonAPlane (child))
+      {
+        continue;	// Skip.
+      }
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	  child->GetType ());
+      CloneAndMovePlanes (child, newchild);
+    }
+  }
+}
+
+void LevTool::CloneAndMovePlanes (iDocument* doc, iDocument* newdoc)
+{
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
+  CloneAndMovePlanes (root, newroot);
 }
 
 static int cnt;
@@ -1413,9 +1628,19 @@ LevTool::~LevTool ()
     ltThing* th = (ltThing*)things.Get (i);
     delete th;
   }
+  for (i = 0 ; i < planes.Length () ; i++)
+  {
+    ltPlane* pl = (ltPlane*)planes.Get (i);
+    delete pl;
+  }
   for (i = 0 ; i < thing_plugins.Length () ; i++)
   {
     csString* str = (csString*)thing_plugins.Get (i);
+    delete str;
+  }
+  for (i = 0 ; i < plane_plugins.Length () ; i++)
+  {
+    csString* str = (csString*)plane_plugins.Get (i);
     delete str;
   }
 }
@@ -1439,15 +1664,14 @@ void LevTool::Main ()
   if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
   if (cmdline->GetOption ("list")) op = OP_LIST;
   if (cmdline->GetOption ("analyze")) op = OP_ANALYZE;
-  if (cmdline->GetOption ("analyzep")) op = OP_ANALYZEP;
   if (cmdline->GetOption ("validate")) op = OP_VALIDATE;
   if (cmdline->GetOption ("splitunit")) op = OP_SPLITUNIT;
   if (cmdline->GetOption ("splitgeom")) op = OP_SPLITGEOM;
-  if (cmdline->GetOption ("splitpoly")) op = OP_SPLITPOLY;
   if (cmdline->GetOption ("compress")) op = OP_COMPRESS;
   if (cmdline->GetOption ("flagclear")) op = OP_FLAGCLEAR;
   if (cmdline->GetOption ("flaggood")) op = OP_FLAGGOOD;
   if (cmdline->GetOption ("flagbad")) op = OP_FLAGBAD;
+  if (cmdline->GetOption ("planes")) op = OP_PLANES;
   if (cmdline->GetOption ("help")) op = OP_HELP;
 
   if (op == OP_HELP)
@@ -1456,9 +1680,6 @@ void LevTool::Main ()
     printf ("  -list:      List world contents.\n");
     printf ("  -analyze:   Analyze all things and show the distribution of size.\n");
     printf ("              You can use this to decide on the 'minsize' parameter.\n");
-    printf ("  -analyzep:  Analyze all polygons and show the distribution of size.\n");
-    printf ("              You can use this to decide on the 'minsize' parameter\n");
-    printf ("              for -splitpoly.\n");
     printf ("  -validate:  Validate world contents. This will currently check\n");
     printf ("              only for non-coplanar polygons.\n");
     printf ("  -compress : Compress all vertices and remove duplicate and unused vertices.\n");
@@ -1476,24 +1697,20 @@ void LevTool::Main ()
     printf ("              should run levtool with -compress option for efficiency.\n");
     printf ("              -minsize=<percent>: Only split objects larger than the given\n");
     printf ("              percentage. Default 20%%.\n");
-    printf ("  -splitpoly: Split large polygons into seperate objects.\n");
-    printf ("              After doing this you should run levtool with -compress option\n");
-    printf ("              for efficiency.\n");
-    printf ("              -minsize=<percent>: Only split polygons larger than the given\n");
-    printf ("              percentage. Default 20%%.\n");
     printf ("  -flagclear: Clear all goodoccluder/badoccluder flags.\n");
     printf ("  -flaggood:  Add goodoccluder flag for all things that satisfy\n");
     printf ("              conditions defined by the following flags:\n");
-    printf ("              -minsize=<percent>: mimium object size (default 10%%).\n");
-    printf ("              -maxsize=<percent>: maximum object size (default 100%%).\n");
-    printf ("              -minpoly=<number>: minimum number of polygons (default 1).\n");
-    printf ("              -maxpoly=<number>: maximum number of polygons (default 50).\n");
+    printf ("              -minsize=<percent>: min object size (default 10%%).\n");
+    printf ("              -maxsize=<percent>: max object size (default 100%%).\n");
+    printf ("              -minpoly=<number>: min number of polygons (default 1).\n");
+    printf ("              -maxpoly=<number>: max number of polygons (default 50).\n");
     printf ("  -flagbad:   Add badoccluder flag for all things that satisfy\n");
     printf ("              conditions defined by the following flags:\n");
-    printf ("              -minsize=<percent>: mimium object size (default 0%%).\n");
-    printf ("              -maxsize=<percent>: maximum object size (default 3%%).\n");
-    printf ("              -minpoly=<number>: minimum number of polygons (default 6).\n");
-    printf ("              -maxpoly=<number>: maximum number of polygons (default 1000000000).\n");
+    printf ("              -minsize=<percent>: mim object size (default 0%%).\n");
+    printf ("              -maxsize=<percent>: max object size (default 3%%).\n");
+    printf ("              -minpoly=<number>: min number of polygons (default 6).\n");
+    printf ("              -maxpoly=<number>: max number of polygons (default 1000000000).\n");
+    printf ("  -planes:    Move all 'addon' planes to the polygons that use them.\n");
     printf ("  -inds=<plugin>: Documents system plugin for reading world.\n");
     printf ("  -outds=<plugin>: Documents system plugin for writing world.\n");
     exit (0);
@@ -1609,7 +1826,6 @@ void LevTool::Main ()
   {
     case OP_LIST:  
     case OP_ANALYZE: 
-    case OP_ANALYZEP: 
     case OP_VALIDATE: 
       break;
     default:
@@ -1746,67 +1962,19 @@ void LevTool::Main ()
       }
       break;
 
-    case OP_ANALYZEP:
+    case OP_PLANES:
       {
-	AnalyzePluginSection (doc);
-	FindAllThings (doc);
-	csBox3 global_bbox;
-	global_bbox.StartBoundingBox ();
-	int i, j, pi;
-	for (i = 0 ; i < things.Length () ; i++)
+	AnalyzePluginSection (doc, true);
+	FindAllThings (doc, true, true);
+	FindAllPlanes (doc);
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
+	CloneAndMovePlanes (doc, newdoc);
+        error = newdoc->Write (vfs, filename);
+	if (error != NULL)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
-	  th->CreateBoundingBox ();
-	  global_bbox += th->GetBoundingBox ();
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
 	}
-	printf ("Global bounding box: (%g,%g,%g) - (%g,%g,%g)\n",
-		global_bbox.MinX (), global_bbox.MinY (), global_bbox.MinZ (),
-		global_bbox.MaxX (), global_bbox.MaxY (), global_bbox.MaxZ ());
-
-	csVector3 poly[4];
-	poly[0] = global_bbox.Min ();
-	poly[1] = global_bbox.Min (); poly[1].y = global_bbox.MaxY ();
-	poly[2] = global_bbox.Max ();
-	poly[3] = global_bbox.Max (); poly[3].y = global_bbox.MinY ();
-	float max_area = 0.0f;
-	float area = 0.0f;
-	for (pi = 0 ; pi < 4-2 ; pi++)
-	  area += csMath3::Area3 (poly[0], poly[pi+1], poly[pi+2]);
-	csVector3 dim = global_bbox.Max () - global_bbox.Min ();
-	area = ABS (area);
-	max_area = area;
-	max_area = MAX (max_area, dim.x * dim.y);
-	max_area = MAX (max_area, dim.x * dim.z);
-	max_area = MAX (max_area, dim.y * dim.z);
-
-        int counts[51];
-	for (i = 0 ; i <= 50 ; i++)
-	  counts[i] = 0;
-	for (i = 0 ; i < things.Length () ; i++)
-	{
-	  ltThing* th = (ltThing*)things.Get (i);
-	  for (j = 0 ; j < th->GetPolygonCount () ; j++)
-	  {
-	    ltPolygon* p = th->GetPolygon (j);
-	    area = 0.0f;
-	    for (pi = 0 ; pi < p->GetVertexCount ()-2 ; pi++)
-	      area += csMath3::Area3 (
-	      	th->GetVertex (p->GetVertex (0)),
-	      	th->GetVertex (p->GetVertex (pi+1)),
-		th->GetVertex (p->GetVertex (pi+2)));
-	    area = ABS (area);
-	    int where = int (50 * (area / max_area));
-	    counts[where]++;
-	  }
-	}
-	int sum = 0;
-	for (i = 0 ; i <= 50 ; i++)
-	{
-	  sum += counts[i];
-	  printf ("  %3d%% #local=%-5d #<=thissize=%d\n", i*2,
-	  	counts[i], sum);
-	}
-	fflush (stdout);
       }
       break;
 
@@ -1948,56 +2116,6 @@ void LevTool::Main ()
 	  }
 	  else
 	    th->DoNotSplitThingSeperateUnits ();
-        }
-
-	CloneAndSplitDynavis (doc, newdoc, false);
-        error = newdoc->Write (vfs, filename);
-	if (error != NULL)
-	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
-	  return;
-	}
-      }
-      break;
-
-    case OP_SPLITPOLY:
-      {
-	AnalyzePluginSection (doc);
-	FindAllThings (doc);
-	csRef<iDocument> newdoc = newsys->CreateDocument ();
-
-	csBox3 global_bbox;
-	global_bbox.StartBoundingBox ();
-	int i;
-	for (i = 0 ; i < things.Length () ; i++)
-	{
-	  ltThing* th = (ltThing*)things.Get (i);
-	  th->CreateBoundingBox ();
-	  global_bbox += th->GetBoundingBox ();
-	}
-
-	csVector3 poly[4];
-	poly[0] = global_bbox.Min ();
-	poly[1] = global_bbox.Min (); poly[1].y = global_bbox.MaxY ();
-	poly[2] = global_bbox.Max ();
-	poly[3] = global_bbox.Max (); poly[3].y = global_bbox.MinY ();
-	float max_area = 0.0f;
-	float area = 0.0f;
-	int pi;
-	for (pi = 0 ; pi < 4-2 ; pi++)
-	  area += csMath3::Area3 (poly[0], poly[pi+1], poly[pi+2]);
-	csVector3 dim = global_bbox.Max () - global_bbox.Min ();
-	area = ABS (area);
-	max_area = area;
-	max_area = MAX (max_area, dim.x * dim.y);
-	max_area = MAX (max_area, dim.x * dim.z);
-	max_area = MAX (max_area, dim.y * dim.z);
-
-	for (i = 0 ; i < things.Length () ; i++)
-	{
-	  ltThing* th = (ltThing*)things.Get (i);
-	  th->DuplicateSharedVertices ();
-	  th->SplitThingLargePolygons (max_area, minsize);
         }
 
 	CloneAndSplitDynavis (doc, newdoc, false);
