@@ -249,21 +249,21 @@ void csFancyConsole::Draw3D (csRect *oArea)
     v_stretch = ((float)(size.ymax - size.ymin)) / ((float)h);
   }
 
-  poly.vertices [0].u = 0;
-  poly.vertices [0].v = 0;
-  poly.vertices [1].u = u_stretch;
-  poly.vertices [1].v = 0;
-  poly.vertices [2].u = u_stretch;
-  poly.vertices [2].v = v_stretch;
-  poly.vertices [3].u = 0;
-  poly.vertices [3].v = v_stretch;
+  poly.texels [0].x = 0;
+  poly.texels [0].y = 0;
+  poly.texels [1].x = u_stretch;
+  poly.texels [1].y = 0;
+  poly.texels [2].x = u_stretch;
+  poly.texels [2].y = v_stretch;
+  poly.texels [3].x = 0;
+  poly.texels [3].y = v_stretch;
 
   for (i = 0; i < poly.num; i++)
   {
-    poly.vertices [i].r = ((float)deco.bgnd.kr) * (1 / 255.0);
-    poly.vertices [i].g = ((float)deco.bgnd.kg) * (1 / 255.0);
-    poly.vertices [i].b = ((float)deco.bgnd.kb) * (1 / 255.0);
-    poly.vertices [i].z = 1;
+    poly.colors [i].red = ((float)deco.bgnd.kr) * (1 / 255.0);
+    poly.colors [i].green = ((float)deco.bgnd.kg) * (1 / 255.0);
+    poly.colors [i].blue = ((float)deco.bgnd.kb) * (1 / 255.0);
+    poly.z [i] = 1;
   }
 
   poly.mat_handle = deco.bgnd.mat;
@@ -354,14 +354,14 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
 
     poly.num = 4;
     poly.use_fog = false;
-    poly.vertices [0].u = 0;
-    poly.vertices [0].v = 0;
-    poly.vertices [1].u = u_stretch;
-    poly.vertices [1].v = 0;
-    poly.vertices [2].u = u_stretch;
-    poly.vertices [2].v = v_stretch;
-    poly.vertices [3].u = 0;
-    poly.vertices [3].v = v_stretch;
+    poly.texels [0].x = 0;
+    poly.texels [0].y = 0;
+    poly.texels [1].x = u_stretch;
+    poly.texels [1].y = 0;
+    poly.texels [2].x = u_stretch;
+    poly.texels [2].y = v_stretch;
+    poly.texels [3].x = 0;
+    poly.texels [3].y = v_stretch;
 
     poly.vertices [0].x = x;
     poly.vertices [0].y = y;
@@ -376,10 +376,10 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
     {
       poly.vertices [i].x -= border.offx;
       poly.vertices [i].y += border.offy;
-      poly.vertices [i].z = 1;
-      poly.vertices [i].r = 1;
-      poly.vertices [i].g = 1;
-      poly.vertices [i].b = 1;
+      poly.z [i] = 1;
+      poly.colors [i].red = 1;
+      poly.colors [i].green = 1;
+      poly.colors [i].blue = 1;
     }
 
     poly.mat_handle = border.mat;

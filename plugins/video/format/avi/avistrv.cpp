@@ -93,20 +93,20 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   fxmode = CS_FX_COPY;
   polyfx.num = 4;
   polyfx.use_fog = false;
-  polyfx.vertices[0].u = 0;
-  polyfx.vertices[0].v = 0;
-  polyfx.vertices[1].u = 1;
-  polyfx.vertices[1].v = 0;
-  polyfx.vertices[2].u = 1;
-  polyfx.vertices[2].v = 1;
-  polyfx.vertices[3].u = 0;
-  polyfx.vertices[3].v = 1;
+  polyfx.texels[0].x = 0;
+  polyfx.texels[0].y = 0;
+  polyfx.texels[1].x = 1;
+  polyfx.texels[1].y = 0;
+  polyfx.texels[2].x = 1;
+  polyfx.texels[2].y = 1;
+  polyfx.texels[3].x = 0;
+  polyfx.texels[3].y = 1;
   for (i=0; i<4; i++)
   {
-    polyfx.vertices[i].r = 1;
-    polyfx.vertices[i].g = 1;
-    polyfx.vertices[i].b = 1;
-    polyfx.vertices[i].z = 1;
+    polyfx.colors[i].red = 1;
+    polyfx.colors[i].green = 1;
+    polyfx.colors[i].blue = 1;
+    polyfx.z[i] = 1;
   }
 
   pMaterial = NULL;
