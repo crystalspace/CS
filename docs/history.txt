@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+18-Oct-2002
+	- Eric Sunshine eliminated compilation warnings from several modules.
+	- Eric Sunshine fixed a compilation error in cspthrd.cpp for platforms
+	  which do not publish sys_errlist[].
 17-Oct-2002
 	- Removed a few additional procedural texture functions from the
 	  iGraphics3D/iGraphics2D interfaces.

@@ -20,6 +20,11 @@
 #include "cspthrd.h"
 #include <sys/time.h>
 
+// Depending upon the platform, one of these headers declares strerror().
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
+
 #ifdef CS_DEBUG
 #define CS_SHOW_ERROR if (lasterr) printf ("%s\n",lasterr)
 #else
@@ -153,7 +158,7 @@ csPosixSemaphore::csPosixSemaphore (uint32 value)
 {
   int rc = sem_init (&sem, 0, (unsigned int)value);
   if (rc)
-    lasterr = sys_errlist[errno];
+    lasterr = strerror(errno);
   else
     lasterr = NULL;
   CS_SHOW_ERROR;
@@ -174,7 +179,7 @@ bool csPosixSemaphore::LockTry ()
 {
   int rc = sem_trywait (&sem);
   if (rc)
-    lasterr = sys_errlist[errno];
+    lasterr = strerror(errno);
   else
     lasterr = NULL;
   CS_SHOW_ERROR;
@@ -185,7 +190,7 @@ bool csPosixSemaphore::Release ()
 {
   int rc = sem_post (&sem);
   if (rc)
-    lasterr = sys_errlist[errno];
+    lasterr = strerror(errno);
   else
     lasterr = NULL;
   CS_SHOW_ERROR;
@@ -203,7 +208,7 @@ bool csPosixSemaphore::Destroy ()
 {
   int rc = sem_destroy (&sem);
   if (rc)
-    lasterr = sys_errlist[errno];
+    lasterr = strerror(errno);
   else
     lasterr = NULL;
   CS_SHOW_ERROR;
@@ -406,7 +411,7 @@ bool csPosixThread::Wait ()
       break;
     default:
       //      lasterr = "Unknown error while waiting for thread";
-      lasterr = sys_errlist[errno];
+      lasterr = strerror(errno);
       break;
     }
   }
