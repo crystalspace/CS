@@ -1830,14 +1830,18 @@ bool csLoader::LoadRenderPriorities (char* buf)
         long pri;
 	char sorting[100];
 	csScanStr (params, "%d,%s", &pri, sorting);
+	int rendsort = CS_RENDPRI_NONE;
 	if (!strcmp (sorting, "BACK2FRONT"))
 	{
+	  rendsort = CS_RENDPRI_BACK2FRONT;
 	}
 	else if (!strcmp (sorting, "FRONT2BACK"))
 	{
+	  rendsort = CS_RENDPRI_FRONT2BACK;
 	}
 	else if (!strcmp (sorting, "NONE"))
 	{
+	  rendsort = CS_RENDPRI_NONE;
 	}
 	else
 	{
@@ -1847,7 +1851,7 @@ bool csLoader::LoadRenderPriorities (char* buf)
 	    sorting);
 	  return false;
 	}
-	Engine->RegisterRenderPriority (name, pri);
+	Engine->RegisterRenderPriority (name, pri, rendsort);
         break;
       }
     }

@@ -618,7 +618,6 @@ void csSector::Draw (iRenderView* rview)
   if (rview->AddedFogInfo ())
     rview->GetFirstFogInfo ()->has_outgoing_plane = false;
 
-
   // Draw meshes.
   // To correctly support meshes in multiple sectors we only draw a
   // mesh if the mesh is not in the sector we came from. If the
@@ -635,39 +634,40 @@ void csSector::Draw (iRenderView* rview)
   if (meshes.Length () > 0)
   {
     // if we use a culler, visible objects are marked now
-    bool UseCuller = (culler && culler->VisTest (rview));
+    bool use_culler = (culler && culler->VisTest (rview));
 
     // get a pointer to the previous sector
-    iSector *PreviousSector = rview->GetPreviousSector ();
+    iSector *prev_sector = rview->GetPreviousSector ();
 
     // look if meshes from the previous sector should be drawn
-    bool DrawMeshesFromPreviousSector = false;
+    bool draw_prev_sector = false;
   
-    if (PreviousSector) DrawMeshesFromPreviousSector =
-      PreviousSector->HasFog () ||
+    if (prev_sector) draw_prev_sector =
+      prev_sector->HasFog () ||
       rview->GetPortalPolygon ()->IsTransparent () ||
       rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().
         Check (CS_PORTAL_WARP);
 
-    // draw the meshes
+    // Draw the meshes.
     for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
     {
+      RenderQueues.Sort (rview, i);
       csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
       if (!v) continue;
 
       for (j = 0 ; j < v->Length () ; j++)
       {
         iMeshWrapper* sp = v->Get (j);
-        if (!UseCuller || sp->GetPrivateObject ()->IsVisible ())
+        if (!use_culler || sp->GetPrivateObject ()->IsVisible ())
 	{
-          if (!PreviousSector || sp->GetMovable ()->GetSectors ()->
-    	      Find (PreviousSector) == -1)
+          if (!prev_sector || sp->GetMovable ()->GetSectors ()->
+    	      Find (prev_sector) == -1)
 	  {
             // Mesh is not in the previous sector or there is no previous
 	    // sector.
             sp->Draw (rview);
           }
-	  else if (DrawMeshesFromPreviousSector)
+	  else if (draw_prev_sector)
           {
             // @@@ Here we should draw clipped to the portal.
             sp->Draw (rview);

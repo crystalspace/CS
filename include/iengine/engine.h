@@ -127,6 +127,21 @@ struct iRegionList;
 #define CS_ENGINE_CACHE_WRITE 2
 
 /**
+ * Flag for RegisterRenderPriority. Do not sort this priority.
+ */
+#define CS_RENDPRI_NONE 0
+
+/**
+ * Flag for RegisterRenderPriority. Sort this priority back to front.
+ */
+#define CS_RENDPRI_BACK2FRONT 1
+
+/**
+ * Flag for RegisterRenderPriority. Sort this priority front to back.
+ */
+#define CS_RENDPRI_FRONT2BACK 2
+
+/**
  * Flags for the callbacks called via iEngine::DrawFunc().
  * (type iDrawFuncCallback).
  */
@@ -147,7 +162,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 6, 5);
+SCF_VERSION (iEngine, 0, 6, 6);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -230,10 +245,20 @@ struct iEngine : public iBase
   /// Delete everything in the engine.
   virtual void DeleteAll () = 0;
 
-  /// Register a new render priority.
-  virtual void RegisterRenderPriority (const char* name, long priority) = 0;
+  /**
+   * Register a new render priority.
+   * The parameter rendsort is one of the CS_RENDPRI_... flags.
+   * By default this is CS_RENDPRI_NONE which means objects in this render
+   * priority are not sorted.
+   */
+  virtual void RegisterRenderPriority (const char* name, long priority,
+  	int rendsort = CS_RENDPRI_NONE) = 0;
   /// Get a render priority by name.
   virtual long GetRenderPriority (const char* name) const = 0;
+  /// Get the render priority sorting flag.
+  virtual int GetRenderPrioritySorting (const char* name) const = 0;
+  /// Get the render priority sorting flag.
+  virtual int GetRenderPrioritySorting (long priority) const = 0;
   /// Get the render priority for sky objects (attached to 'sky' name).
   virtual long GetSkyRenderPriority () const = 0;
   /// Get the render priority for wall objects (attached to 'wall' name).

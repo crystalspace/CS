@@ -20,21 +20,22 @@
 #define __CS_ENGINE_H__
 
 #include "csutil/scf.h"
-#include "csgeom/math3d.h"
 #include "csutil/nobjvec.h"
+#include "csutil/csobject.h"
+#include "csutil/garray.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
+#include "iutil/config.h"
+#include "csgeom/math3d.h"
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/region.h"
-#include "csutil/csobject.h"
-#include "ivideo/graph3d.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
 #include "iengine/engine.h"
 #include "iengine/collectn.h"
 #include "iengine/campos.h"
-#include "iutil/config.h"
+#include "ivideo/graph3d.h"
 
 class csRegion;
 class csRadiosity;
@@ -327,6 +328,8 @@ public:
 
   /// The list of all named render priorities.
   csVector render_priorities;
+  /// Sorting flags for the render priorities.
+  CS_DECLARE_GROWING_ARRAY (render_priority_sortflags, int);
   /**
    * The engine knows about the following render priorities and keeps
    * them here:
@@ -823,9 +826,14 @@ public:
   void AddToCurrentRegion (csObject* obj);
 
   /// Register a new render priority.
-  virtual void RegisterRenderPriority (const char* name, long priority);
+  virtual void RegisterRenderPriority (const char* name, long priority,
+  	int rendsort = CS_RENDPRI_NONE);
   /// Get a render priority by name.
   virtual long GetRenderPriority (const char* name) const;
+  /// Get the render priority sorting flag.
+  virtual int GetRenderPrioritySorting (const char* name) const;
+  /// Get the render priority sorting flag.
+  virtual int GetRenderPrioritySorting (long priority) const;
   /// Get the render priority for sky objects (attached to 'sky' name).
   virtual long GetSkyRenderPriority () const { return render_priority_sky; }
   /// Get the render priority for wall objects (attached to 'wall' name).

@@ -26,6 +26,18 @@ The history order is reversed so that new features are at the top.
 	  values for alpha for the same polygon (i.e. changing alpha
 	  dynamically) will not work correctly as the new alpha value is
 	  simply or-ed on top of the previous one.
+	- Added CS_RENDPRI_NONE, CS_RENDPRI_BACK2FRONT, and
+	  CS_RENDPRI_FRONT2BACK. Also extended
+	  iEngine::RegisterRenderPriority() with an optional extra parameter
+	  for this new flag (default is CS_RENDPRI_NONE).
+	- Added iEngine::GetRenderPrioritySorting() which returns the value
+	  of this flag for a given render priority.
+	- Extended the parser to support these flags (it already parsed all
+	  of them).
+	- The default 'alpha' render priority is now by default initialized
+	  with the CS_RENDPRI_BACK2FRONT flag.
+	- Extended csSector::Draw() so that it will now sort the objects
+	  in a render priority based on this sorting flag.
 	- Matze added a -L/usr/lib/w32api to fix some issues on cygwin (the
 	  compiler is looking there by default but some external tools like
 	  libtool didn't)

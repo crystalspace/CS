@@ -18,8 +18,13 @@
 
 #include "cssysdef.h"
 #include "csutil/typedvec.h"
+#include "csutil/garray.h"
+#include "csengine/engine.h"
 #include "csengine/rdrprior.h"
 #include "iengine/mesh.h"
+#include "iengine/rview.h"
+#include "iengine/camera.h"
+#include "iengine/engine.h"
 
 csRenderQueueSet::csRenderQueueSet ()
 {
@@ -73,3 +78,57 @@ void csRenderQueueSet::RemoveUnknownPriority (iMeshWrapper *mesh)
     }
   }
 }
+
+struct comp_mesh_comp
+{
+  float z;
+  iMeshWrapper* mesh;
+};
+
+static CS_DECLARE_GROWING_ARRAY (comp_mesh_z, comp_mesh_comp);
+
+static int comp_mesh (const void* el1, const void* el2)
+{
+  comp_mesh_comp* m1 = (comp_mesh_comp*)el1;
+  comp_mesh_comp* m2 = (comp_mesh_comp*)el2;
+  if (m1->z < m2->z) return -1;
+  else if (m1->z > m2->z) return 1;
+  else return 0;
+}
+
+void csRenderQueueSet::Sort (iRenderView* rview, int priority)
+{
+  if (!Queues [priority]) return;
+  int rendsort = csEngine::current_engine->GetRenderPrioritySorting (priority);
+  if (rendsort == CS_RENDPRI_NONE) return;
+  csMeshVectorNodelete* v = Queues [priority];
+  if (v->Length () > comp_mesh_z.Limit ())
+    comp_mesh_z.SetLimit (v->Length ());
+  const csReversibleTransform& camtrans = rview->GetCamera ()->GetTransform ();
+  int i;
+  for (i = 0 ; i < v->Length () ; i++)
+  {
+    iMeshWrapper* mesh = v->Get (i);
+    csVector3 rad, cent;
+    mesh->GetRadius (rad, cent);
+    csReversibleTransform tr_o2c = camtrans * mesh->GetMovable ()
+    	->GetFullTransform ().GetInverse ();
+    csVector3 tr_cent = tr_o2c.Other2This (cent);
+    comp_mesh_z[i].z =
+    	rendsort == CS_RENDPRI_FRONT2BACK
+		? tr_cent.z
+		: -tr_cent.z;
+    comp_mesh_z[i].mesh = mesh;
+  }
+
+  qsort (comp_mesh_z.GetArray (), v->Length (), sizeof (comp_mesh_comp),
+  	comp_mesh);
+
+  for (i = 0 ; i < v->Length () ; i++)
+  {
+    (*v)[i] = comp_mesh_z[i].mesh;
+  }
+
+  return;
+}
+

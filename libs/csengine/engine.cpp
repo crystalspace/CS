@@ -985,18 +985,25 @@ iObject *csEngine::QueryObject ()
   return &scfiObject;
 }
 
-void csEngine::RegisterRenderPriority (const char* name, long priority)
+void csEngine::RegisterRenderPriority (const char* name, long priority,
+	int rendsort)
 {
   int i;
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
+  if (priority+1 >= render_priority_sortflags.Limit ())
+    render_priority_sortflags.SetLimit (priority+2);
   for (i = render_priorities.Length () ; i <= priority ; i++)
+  {
     render_priorities[i] = NULL;
+    render_priority_sortflags[i] = CS_RENDPRI_NONE;
+  }
 
   char* n = (char*)render_priorities[priority];
   delete[] n;
   n = csStrNew (name);
   render_priorities[priority] = n;
+  render_priority_sortflags[priority] = rendsort;
   if (!strcmp (name, "sky")) render_priority_sky = priority;
   else if (!strcmp (name, "wall")) render_priority_wall = priority;
   else if (!strcmp (name, "object")) render_priority_object = priority;
@@ -1014,6 +1021,22 @@ long csEngine::GetRenderPriority (const char* name) const
   return 0;
 }
 
+int csEngine::GetRenderPrioritySorting (const char* name) const
+{
+  int i;
+  for (i = 0 ; i < render_priorities.Length () ; i++)
+  {
+    char* n = (char*)render_priorities[i];
+    if (n && !strcmp (name, n)) return render_priority_sortflags[i];
+  }
+  return CS_RENDPRI_NONE;
+}
+
+int csEngine::GetRenderPrioritySorting (long priority) const
+{
+  return render_priority_sortflags[priority];
+}
+
 void csEngine::ClearRenderPriorities ()
 {
   int i;
@@ -1023,10 +1046,11 @@ void csEngine::ClearRenderPriorities ()
     delete[] n;
   }
   render_priorities.DeleteAll ();
+  render_priority_sortflags.SetLimit (0);
   RegisterRenderPriority ("sky", 2);
   RegisterRenderPriority ("wall", 4);
   RegisterRenderPriority ("object", 6);
-  RegisterRenderPriority ("alpha", 8);
+  RegisterRenderPriority ("alpha", 8, CS_RENDPRI_BACK2FRONT);
 }
 
 void csEngine::ResolveEngineMode ()

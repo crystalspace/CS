@@ -51,6 +51,12 @@ WORLD (
     PLUGIN 'spiral' ('crystalspace.mesh.loader.spiral')
     PLUGIN 'plane' ('crystalspace.mesh.loader.thing.plane')
   )
+  RENDERPRIORITIES (
+    PRIORITY 'sky' (1,NONE)
+    PRIORITY 'wall' (2,NONE)
+    PRIORITY 'object' (3,NONE)
+    PRIORITY 'alpha' (4,BACK2FRONT)
+  )
 
   MESHFACT 'fireFact' (
     PLUGIN ('fireFact')
@@ -152,6 +158,7 @@ WORLD (
     )
     LIGHT (CENTER (0, 0, 0) RADIUS (40) COLOR (1,1,1))
     MESHOBJ 'flame' (
+      PRIORITY (alpha)
       PLUGIN ('fire')
       ZTEST ()
       MOVE (V (-10,0,-10))
@@ -168,6 +175,7 @@ WORLD (
       )
     )
     MESHOBJ 'snowfall' (
+      PRIORITY (alpha)
       PLUGIN ('snow')
       ZTEST ()
       MOVE (V (10,0,10))
@@ -185,6 +193,7 @@ WORLD (
       )
     )
     MESHOBJ 'rainfall' (
+      PRIORITY (alpha)
       PLUGIN ('rain')
       ZTEST ()
       MOVE (V (-10,0,10))
@@ -201,6 +210,7 @@ WORLD (
       )
     )
     MESHOBJ 'fount1' (
+      PRIORITY (alpha)
       PLUGIN (fountain)
       PARAMS (
         FACTORY (fountainFact)
@@ -271,6 +281,7 @@ WORLD (
     )
     LIGHT (CENTER (0, 0, 40) RADIUS (40) COLOR (0,0,1))
     MESHOBJ 'emit1' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (-10,0,50))
@@ -296,6 +307,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit2' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (+10,0,50))
@@ -320,6 +332,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit3' (
+      PRIORITY (alpha)
       KEY ("entity_Rotate", "0,10,0,true")
       PLUGIN ('emit')
       ZTEST ()
@@ -345,6 +358,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit4' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (+15,0,25))
@@ -419,6 +433,7 @@ WORLD (
     )
     LIGHT (CENTER (0, 0, 80) RADIUS (40) COLOR (1,0,1))
     MESHOBJ 'fire' (
+      PRIORITY (alpha)
       PLUGIN ('fire')
       ZTEST ()
       MOVE (V (-10,0,70))
@@ -436,6 +451,7 @@ WORLD (
       )
     )
     MESHOBJ 'spiral' (
+      PRIORITY (alpha)
       PLUGIN ('spiral')
       ZTEST ()
       MOVE (V (+10,0,70))
@@ -451,6 +467,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit5' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (+10,-1,90))
@@ -475,6 +492,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit6' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       KEY ("entity_Rotate", "0,50,0,true")
@@ -549,6 +567,7 @@ WORLD (
     )
     LIGHT (CENTER (-40, 0, 80) RADIUS (40) COLOR (1,1,0))
     MESHOBJ 'emit7' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (-50,-1,70))
@@ -575,6 +594,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit8' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (-30,-1,70))
@@ -603,6 +623,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit9' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (-50,-1,90))
@@ -629,6 +650,7 @@ WORLD (
       )
     )
     MESHOBJ 'emit10' (
+      PRIORITY (alpha)
       PLUGIN ('emit')
       ZTEST ()
       MOVE (V (-30,-1,90))
@@ -704,6 +726,7 @@ WORLD (
     )
     LIGHT (CENTER (40, 0, 0) RADIUS (40) COLOR (1,0,0))
     MESHOBJ 'haze1' (
+      PRIORITY (alpha)
       PLUGIN ('haze')
       ZTEST ()
       MOVE (V (30,1.1,10))
@@ -717,6 +740,7 @@ WORLD (
       )
     )
     MESHOBJ 'haze2' (
+      PRIORITY (alpha)
       PLUGIN ('haze')
       ZTEST ()
       MOVE (V (30,0.1,-10))
@@ -731,6 +755,7 @@ WORLD (
       )
     )
     MESHOBJ 'haze3' (
+      PRIORITY (alpha)
       PLUGIN ('haze')
       ZTEST ()
       MOVE (V (50,0.1,-10))
@@ -744,6 +769,7 @@ WORLD (
       )
     )
     MESHOBJ 'haze4' (
+      PRIORITY (alpha)
       PLUGIN ('haze')
       ZTEST ()
       MOVE (V (50,0.1,+10))
@@ -805,6 +831,7 @@ WORLD (
       LMCACHE (room2_0_walls)
     )
     MESHOBJ 'haze5' (
+      PRIORITY (alpha)
       PLUGIN ('haze')
       ZTEST ()
       MOVE (V (70,0.1,-10))

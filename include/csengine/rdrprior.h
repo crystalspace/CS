@@ -20,6 +20,7 @@
 #define __CSENGINE_RDRPRIOR_H__
 
 struct iMeshWrapper;
+struct iRenderView;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMeshVectorNodelete, iMeshWrapper);
 CS_DECLARE_TYPED_VECTOR (csMeshVectorNodeleteVector, csMeshVectorNodelete);
@@ -29,39 +30,40 @@ CS_DECLARE_TYPED_VECTOR (csMeshVectorNodeleteVector, csMeshVectorNodelete);
  * of mesh wrappers. The rendering queues are sorted by rendering priority.
  * Note that the mesh objects are not reference-counted!
  */
-class csRenderQueueSet {
+class csRenderQueueSet
+{
 private:
   // the list of queues
   csMeshVectorNodeleteVector Queues;
 
 public:
 
-  /// constructor
+  /// Constructor.
   csRenderQueueSet ();
-  /// destructor
+  /// Destructor.
   ~csRenderQueueSet ();
 
-  /// Add a mesh object
+  /// Add a mesh object.
   void Add (iMeshWrapper *mesh);
 
-  /// Remove a mesh object
+  /// Remove a mesh object.
   void Remove (iMeshWrapper *mesh);
 
-  /// Remove a mesh object which is potentially in the wrong queue
+  /// Remove a mesh object which is potentially in the wrong queue.
   void RemoveUnknownPriority (iMeshWrapper *mesh);
 
-  /// Return the number of rendering queues (i.. the maximum priority value)
-  inline int GetQueueCount ();
+  /// Return the number of rendering queues (the maximum priority value).
+  int GetQueueCount () { return Queues.Length (); }
 
-  /// Return a single queue, or NULL if no queue exists for the given priority
-  inline csMeshVectorNodelete *GetQueue (int Priority);
+  /// Return a single queue, or NULL if no queue exists for the given priority.
+  csMeshVectorNodelete *GetQueue (int priority)
+  {
+    return Queues[priority];
+  }
+
+  /// Sort this queue based on the flags for that queue.
+  void Sort (iRenderView* rview, int priority);
 };
 
-// --------------------
-
-inline int csRenderQueueSet::GetQueueCount ()
-  { return Queues.Length (); }
-inline csMeshVectorNodelete *csRenderQueueSet::GetQueue (int p)
-  { return Queues [p]; }
-
 #endif // __CSENGINE_RDRPRIOR_H__
+
