@@ -369,6 +369,8 @@ AS_IF([test -n "$PERL"],
 # set, then use those values.
 #------------------------------------------------------------------------------
 AC_CHECK_PROGS([PYTHON], [python])
+AS_IF([test -n "$PYTHON"], [CS_BUILD_PROPERTY([PYTHON], [$PYTHON])])
+
 AC_CACHE_CHECK([for Python SDK], [cs_cv_python_sdk],
     [cs_cv_python_sdk=no
     cs_python_lib_dir=''

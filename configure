@@ -3775,6 +3775,14 @@ fi
   test -n "$PYTHON" && break
 done
 
+if test -n "$PYTHON"; then
+  cs_makefile_text="${cs_makefile_text}PYTHON = $PYTHON
+"
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON ?= \"$PYTHON\" ;
+"
+fi
+
+
 echo "$as_me:$LINENO: checking for Python SDK" >&5
 echo $ECHO_N "checking for Python SDK... $ECHO_C" >&6
 if test "${cs_cv_python_sdk+set}" = set; then
