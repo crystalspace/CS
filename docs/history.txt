@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine corrected the WinCVS URL in the tutorial based upon
 	  report by <squee@tdzk.net>.
 	- Micah added a little error handling to the picogui server plugin
+	- Philip fixed a couple of typos in the MSVC docs.
 18-Apr-2003
 	- Started a document describing which parts of Crystal Space are
 	  thread-safe and which are not.
