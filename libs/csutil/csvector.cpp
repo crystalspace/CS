@@ -94,15 +94,20 @@ bool csBasicVector::Delete (int n)
     return false;
 }
 
-void csVector::DeleteAll ()
+void csVector::DeleteAll (bool FreeThem)
 {
-  int idx;
-  for (idx = count - 1; idx >= 0; idx--)
-    if (!FreeItem (root [idx]))
-      break;
-  SetLength (idx + 1);
-  while (idx >= 0)
-    Delete (idx--);
+  if (FreeThem)
+  {
+    int idx;
+    for (idx = count - 1; idx >= 0; idx--)
+      if (!FreeItem (root [idx]))
+        break;
+    SetLength (idx + 1);
+    while (idx >= 0)
+      Delete (idx--);
+  }
+  else
+    SetLength (0);
 }
 
 bool csVector::FreeItem (csSome Item)
@@ -111,24 +116,30 @@ bool csVector::FreeItem (csSome Item)
   return true;
 }
 
-bool csVector::Delete (int n)
+bool csVector::Delete (int n, bool FreeIt)
 {
   if (n >= 0 && n < count)
   {
-    if (!FreeItem (root [n]))
-      return false;
+    if (FreeIt)
+    {
+      if (!FreeItem (root [n]))
+        return false;
+    }
     return csBasicVector::Delete(n);
   }
   else
     return false;
 }
 
-bool csVector::Replace (int n, csSome what)
+bool csVector::Replace (int n, csSome what, bool FreePrevious)
 {
   if (n < count)
   {
-    if (!FreeItem (root [n]))
-      return false;
+    if (FreePrevious)
+    {
+      if (!FreeItem (root [n]))
+        return false;
+    }
     root [n] = what;
     return true;
   }

@@ -114,11 +114,11 @@ public:
   void QuickSort (int Mode = 0);
 
   /// Delete element number 'n' from vector
-  bool Delete (int n);
+  bool Delete (int n, bool FreeIt = true);
   /// Replace n-th item with another (free previous value)
-  bool Replace (int n, csSome what);
+  bool Replace (int n, csSome what, bool FreePrevious = true);
   /// Delete all elements
-  void DeleteAll ();
+  void DeleteAll (bool FreeThem = true);
 
   /// Insert element 'Item' so that array remains sorted (assumes its already)
   int InsertSorted (csSome Item, int *oEqual = NULL, int Mode = 0);
