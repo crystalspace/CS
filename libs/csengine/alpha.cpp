@@ -1,0 +1,22 @@
+// alpha.cpp: implementation of the csAlphaHandle class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "sysdef.h"
+#include "csengine/alpha.h"
+#include "csgfxldr/csimage.h"
+#include "csobject/nameobj.h"
+#include "ialphamg.h"
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+csAlphaMapHandle::csAlphaMapHandle(AlphaMapFile *afile)
+{
+
+}
+
+csAlphaMapHandle::~csAlphaMapHandle()
+{
+
+}

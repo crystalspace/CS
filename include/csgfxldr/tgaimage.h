@@ -49,7 +49,7 @@ class TGAImageLoader : public ImageLoader
 protected:
   ///
   virtual ImageFile* LoadImage (UByte* buf, ULong size);
-
+  virtual AlphaMapFile* LoadAlphaMap(UByte *buffer,ULong size);
 public:
   ///
   virtual const char* GetName() const

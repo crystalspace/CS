@@ -50,7 +50,7 @@ class GIFImageLoader : public ImageLoader
 protected:
   ///
   virtual ImageFile* LoadImage (UByte* buf, ULong size);
-
+  virtual AlphaMapFile* LoadAlphaMap(UByte *buf,ULong size);
 public:
   ///
   virtual const char* GetName() const

@@ -52,6 +52,9 @@ DO_JPG=yes
 # If 'yes' include support for WAL graphic files (not required currently).
 DO_WAL=yes
 
+# If 'yes' include support for SGI graphic files (not required currently).
+DO_SGI=yes
+
 # If 'yes' include sound support.
 DO_SOUND=yes
 

@@ -321,14 +321,17 @@ ImageFile* ImageFile::blend (Filter3x3* filt1)
 #if defined (DO_JPG)
   REGISTER_FORMAT (JPG)
 #endif
-#if defined (DO_TGA)
-  REGISTER_FORMAT (TGA)
-#endif
 #if defined (DO_BMP)
   REGISTER_FORMAT (BMP)
 #endif
 #if defined (DO_WAL)
   REGISTER_FORMAT(WAL)
+#endif
+#if defined (DO_SGI)
+  REGISTER_FORMAT(SGI)
+#endif
+#if defined (DO_TGA)
+  REGISTER_FORMAT (TGA)
 #endif
 // Unfortunately, we can't use static variable here since Register()
 // can happened to be called BEFORE loaderlist is initialized... so we
@@ -354,6 +357,18 @@ ImageFile* ImageLoader::load (UByte* buf, ULong size)
     i++; 
   }
   return NULL;
+}
+
+AlphaMapFile* ImageLoader::load_alpha(UByte *buf,ULong size)
+{
+	int i=0;
+	while(i<loaderlist->Length())
+	{
+		ImageLoader* l=(ImageLoader*)(loaderlist->Get(i));
+		AlphaMapFile* alpha=l->LoadAlphaMap(buf,size);
+		if(alpha) return alpha;
+	}
+	return NULL;
 }
 
 //---------------------------------------------------------------------------

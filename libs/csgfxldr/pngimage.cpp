@@ -36,6 +36,11 @@ bool RegisterPNG ()
   return ImageLoader::Register (&loader);
 }
 
+AlphaMapFile* PNGImageLoader::LoadAlphaMap (UByte* buf, ULong size)
+{
+	return NULL;
+}
+
 ImageFile* PNGImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImagePngFile* i = new ImagePngFile(buf, size));

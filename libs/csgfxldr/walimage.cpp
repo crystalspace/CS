@@ -51,6 +51,11 @@ ImageFile* WALImageLoader::LoadImage (UByte* buf, ULong size)
   return i;    
 }
 
+AlphaMapFile *WALImageLoader::LoadAlphaMap(UByte* buf,ULong size)
+{
+	return NULL;
+}
+
 //---------------------------------------------------------------------------
 ImageWALFile::~ImageWALFile ()
 {

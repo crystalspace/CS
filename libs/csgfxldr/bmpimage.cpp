@@ -41,6 +41,11 @@ ImageFile* BMPImageLoader::LoadImage (UByte* buf, ULong size)
   return i;    
 }
 
+AlphaMapFile *BMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
+{
+	return NULL;
+}
+
 //---------------------------------------------------------------------------
 
 // Type ID

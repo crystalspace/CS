@@ -25,6 +25,7 @@
 #include "types.h"
 #include "csgfxldr/rgbpixel.h"
 #include "iimage.h"
+#include "ialphmap.h"
 #include "csobject/csobj.h"
 
 interface ISystem;
@@ -44,6 +45,32 @@ struct Filter5x5;
  * type supported, a subclass should be created for loading that image
  * type.
  */
+
+class AlphaMapFile: public csObject
+{
+private:
+	int width;
+	int height;
+	UByte *alphamap;
+protected:
+	AlphaMapFile();
+	int status;
+	void set_dimensions(int w,int h);
+	UByte *get_buffer(){return alphamap;}
+public:
+	virtual ~AlphaMapFile();
+	int get_width() const{return width;}
+	int get_height() const{return height;}
+	ULong get_size() const{return width*height;}
+	const UByte* get_image() const {return alphamap;}
+	int get_status() const {return status;}
+	virtual const char* get_status_mesg() const;
+
+	DECLARE_INTERFACE_TABLE(AlphaMapFile)
+	DECLARE_IUNKNOWN()
+	DECLARE_COMPOSITE_INTERFACE(AlphaMapFile)
+};
+
 class ImageFile : public csObject
 {
 private:
@@ -146,6 +173,7 @@ protected:
    * returns NULL.
    */
   virtual ImageFile* LoadImage (UByte* buf, ULong size) = 0;
+  virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size) =0;
 
   ///
   virtual ~ImageLoader() {}
@@ -173,6 +201,10 @@ public:
    */
   static ImageFile* load (UByte* buf, ULong size);
 
+  /**
+  * Load an alpha-map from an 8-bit image
+  */
+  static AlphaMapFile *load_alpha(UByte *buf,ULong size);
 private:
   // A list of registered loaders
   static csVector *loaderlist;

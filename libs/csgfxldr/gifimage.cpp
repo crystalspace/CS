@@ -31,6 +31,11 @@ bool RegisterGIF ()
   return ImageLoader::Register (&loader);
 }
 
+AlphaMapFile *GIFImageLoader::LoadAlphaMap(UByte *buf,ULong size)
+{
+	return NULL;
+}
+
 ImageFile* GIFImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageGifFile* i = new ImageGifFile(buf, size));
