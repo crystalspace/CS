@@ -22,10 +22,21 @@ chronological order.
               it's loader, if the odedynam plugin isn't being built.
             - Manually updated cs_pyth.cpp and cspace.py after recent
               changes.
+	- Jorrit added a new csArrayBase<T> class. This class will handle
+	  (when it is fully ready) all common tasks of all array classes
+	  (csArray, csPDelArray, csRefArray, csGrowingArray, csStringArray,
+	  ...). Currently only a few common tasks are handled and only
+	  csArray and csPDelArray inherit from csArrayBase.
+	  Inheritance of csArrayBase is private so that subclasses of
+	  csArray and others cannot get access to the protected members.
+	  In order to let users of csArray and others access the public
+	  members of csArrayBase the C++ 'using' keyword is used to transfer
+	  some of the public members as public members of the array classes.
+	  Work in progress...
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
-	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for Win32/COMP_GCC
-	  platform (Mingw).
+	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for
+	  Win32/COMP_GCC platform (Mingw).
 	- Jorrit removed iAwsParmList->AddBasicVector() and GetBasicVector().
 	  These functions were not used in CS and I thikn they are not safe
 	  (i.e. should use SCF parameter and not csBasicVector). And

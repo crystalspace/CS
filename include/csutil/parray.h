@@ -20,7 +20,7 @@
 #ifndef __CS_PTRARR_H__
 #define __CS_PTRARR_H__
 
-#include "csutil/ref.h"
+#include "csutil/arraybase.h"
 
 /**
  * An array of pointers. No ref counting is done on the elements in this
@@ -30,14 +30,15 @@
  * pointer).
  */
 template <class T>
-class csPDelArray
+class csPDelArray : private csArrayBase<T*>  // Note! Private inheritance here!
 {
-private:
-  int count, limit, threshold;
-  T** root;
-
 public:
-  /// This function prototype is used for csPDelArray::Sort()
+  // We take the following public functions from csArrayBase<T> and
+  // make them public here.
+  using csArrayBase<T*>::Length;
+  using csArrayBase<T*>::Capacity;
+
+  /// This function prototype is used for Sort()
   typedef int ArraySortCompareFunction (void const* item1,
 	void const* item2);
   /// This function prototype is used for csPDelArray::InsertSorted()
@@ -50,14 +51,8 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csPDelArray (int ilimit = 0, int ithreshold = 0)
+  	: csArrayBase<T*> (ilimit, ithreshold)
   {
-    count = 0;
-    limit = (ilimit > 0 ? ilimit : 0);
-    threshold = (ithreshold > 0 ? ithreshold : 16);
-    if (limit != 0)
-      root = (T**)calloc (limit, sizeof(T*));
-    else
-      root = 0;
   }
 
   /**
@@ -65,14 +60,26 @@ public:
    */
   void DeleteAll ()
   {
-    if (root)
+    int i;
+    for (i = 0 ; i < count ; i++)
+      delete root[i];
+    DeleteRoot ();
+  }
+
+  /**
+   * Truncate array to specified number of elements. The new number of
+   * elements cannot exceed the current number of elements. Use SetLength()
+   * for a more general way to enlarge the array.
+   */
+  void Truncate (int n)
+  {
+    CS_ASSERT(n >= 0);
+    CS_ASSERT(n <= count);
+    if (n < count)
     {
-      int i;
-      for (i = 0 ; i < limit ; i++)
+      for (int i = n; i < count; i++)
         delete root[i];
-      free (root);
-      root = 0;
-      limit = count = 0;
+      SetLengthUnsafe(n);
     }
   }
 
@@ -95,54 +102,25 @@ public:
     destination.DeleteAll ();
     destination.root = root;
     destination.count = count;
-    destination.limit = limit;
+    destination.capacity = capacity;
     destination.threshold = threshold;
     root = 0;
-    limit = count = 0;
+    capacity = count = 0;
   }
 
   /// Set vector length to n.
   void SetLength (int n)
   {
-    // Free all items between new count and old count.
-    int i;
-    for (i = n ; i < count ; i++) { delete root[i]; root[i] = 0; }
-
-    int old_count = count;
-    count = n;
-
-    if (n > limit || (limit > threshold && n < limit - threshold))
+    if (n <= count)
     {
-      n = ((n + threshold - 1) / threshold ) * threshold;
-      if (!n)
-      {
-        DeleteAll ();
-      }
-      else if (root == 0)
-      {
-        root = (T**)calloc (n, sizeof(T*));
-      }
-      else
-      {
-        T** newroot = (T**)calloc (n, sizeof(T*));
-	memcpy (newroot, root, old_count * sizeof (T*));
-	free (root);
-	root = newroot;
-      }
-      limit = n;
+      Truncate (n);
     }
-  }
-
-  /// Query vector length.
-  int Length () const
-  {
-    return count;
-  }
-
-  /// Query vector limit.
-  int Limit () const
-  {
-    return limit;
+    else
+    {
+      int old_len = Length ();
+      SetLengthUnsafe (n);
+      memset (root+old_len, 0, (n-old_len)*sizeof (T*));
+    }
   }
 
   /// Get a pointer.

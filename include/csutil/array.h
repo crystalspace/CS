@@ -19,6 +19,8 @@
 #ifndef __CSUTIL_ARRAY_H__
 #define __CSUTIL_ARRAY_H__
 
+#include "csutil/arraybase.h"
+
 // hack: work around problems caused by #defining 'new'
 #ifdef CS_EXTENSIVE_MEMDEBUG
 # undef new
@@ -33,14 +35,9 @@
  * of this class.
  */
 template <class T>
-class csArray
+class csArray : private csArrayBase<T>	// Note! Private inheritance here!
 {
 private:
-  int count;
-  int capacity;
-  int threshold;
-  T* root;
-
   void ConstructElement (int n, T const& src)
   {
     new (static_cast<void*>(root + n)) T(src);
@@ -51,32 +48,13 @@ private:
     (root + n)->T::~T();
   }
  
-  // Adjust internal capacity of this array.
-  void AdjustCapacity (int n)
-  {
-    if (n > capacity || (capacity > threshold && n < capacity - threshold))
-    {
-      n = ((n + threshold - 1) / threshold ) * threshold;
-      if (root == 0)
-        root = (T*)malloc (n * sizeof(T));
-      else
-        root = (T*)realloc (root, n * sizeof(T));
-      capacity = n;
-    }
-  }
-
-  // Set array length.  NOTE: Do not make this public since it does not
-  // properly construct/destroy elements.  To safely truncate the array, use
-  // Truncate().  To safely set the capacity, use SetCapacity().
-  void SetLengthUnsafe (int n)
-  {
-    if (n > capacity)
-      AdjustCapacity (n);
-    count = n;
-  }
-
 public:
-  /// This function prototype is used for csArray::Sort()
+  // We take the following public functions from csArrayBase<T> and
+  // make them public here.
+  using csArrayBase<T>::Length;
+  using csArrayBase<T>::Capacity;
+
+  /// This function prototype is used for Sort()
   typedef int ArraySortCompareFunction (void const* item1,
 	void const* item2);
   /// This function prototype is used for csArray::InsertSorted()
@@ -89,14 +67,8 @@ public:
    * increase storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csArray (int icapacity = 0, int ithreshold = 0)
+  	: csArrayBase<T> (icapacity, ithreshold)
   {
-    count = 0;
-    capacity = (icapacity > 0 ? icapacity : 0);
-    threshold = (ithreshold > 0 ? ithreshold : 16);
-    if (capacity != 0)
-      root = (T*)malloc (capacity * sizeof(T));
-    else
-      root = 0;
   }
 
   /// Copy constructor just copies all data.
@@ -146,13 +118,7 @@ public:
   {
     for (int i = 0; i < count; i++)
       DestroyElement (i);
-    if (root != 0)
-    {
-      free (root);
-      root = 0;
-      capacity = 0;
-      count = 0;
-    }
+    DeleteRoot ();
   }
 
   /**
@@ -207,18 +173,6 @@ public:
   ~csArray ()
   {
     DeleteAll ();
-  }
-
-  /// return the number of elements in the Array
-  int Length () const
-  {
-    return count;
-  }
-
-  /// Query vector capacity.  Note that you should rarely need to do this.
-  int Capacity () const
-  {
-    return capacity;
   }
 
   /**
