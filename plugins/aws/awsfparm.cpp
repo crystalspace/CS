@@ -24,7 +24,9 @@ NameToID(char *name)
 }
 
 
-awsParmList::awsParmList() {}
+awsParmList::awsParmList() {
+  SCF_CONSTRUCT_IBASE (NULL);
+}
 
 awsParmList::~awsParmList() {}
 
