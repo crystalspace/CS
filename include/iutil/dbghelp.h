@@ -19,6 +19,10 @@
 #ifndef __IUTIL_DBGHELP_H__
 #define __IUTIL_DBGHELP_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{ */
 #include "cstypes.h"
 #include "csutil/scf.h"
 
@@ -27,30 +31,29 @@ struct iGraphics3D;
 
 SCF_VERSION (iDebugHelper, 0, 0, 1);
 
+/**\name iDebugHelper implementation support flags
+ * @{ */
 /**
- * iDebugHelper implementation supports UnitTest().
+ * supports UnitTest().
  */
 #define CS_DBGHELP_UNITTEST 1
-
 /**
- * iDebugHelper implementation supports Benchmark().
+ * supports Benchmark().
  */
 #define CS_DBGHELP_BENCHMARK 2
-
 /**
- * iDebugHelper implementation supports non graphical Dump().
+ *  supports non graphical Dump().
  */
 #define CS_DBGHELP_TXTDUMP 4
-
 /**
- * iDebugHelper implementation supports graphical Dump().
+ * supports graphical Dump().
  */
 #define CS_DBGHELP_GFXDUMP 8
-
 /**
- * iDebugHelper implementation supports StateTest().
+ supports StateTest().
  */
 #define CS_DBGHELP_STATETEST 16
+/** @} */
 
 /**
  * Some object that wants to implement unit testing, debugging and/or
@@ -63,11 +66,11 @@ struct iDebugHelper : public iBase
    * unit test implementation supports. This will return a combination of
    * the CS_DBGHELP_... flags:
    * <ul>
-   * <li> CS_DBGHELP_UNITTEST
-   * <li> CS_DBGHELP_BENCHMARK
-   * <li> CS_DBGHELP_TXTDUMP
-   * <li> CS_DBGHELP_GFXDUMP
-   * <li> CS_DBGHELP_STATETEST
+   * <li> #CS_DBGHELP_UNITTEST
+   * <li> #CS_DBGHELP_BENCHMARK
+   * <li> #CS_DBGHELP_TXTDUMP
+   * <li> #CS_DBGHELP_GFXDUMP
+   * <li> #CS_DBGHELP_STATETEST
    * </ul>
    */
   virtual int GetSupportedTests () const = 0;
@@ -111,6 +114,7 @@ struct iDebugHelper : public iBase
    */
   virtual bool DebugCommand (const char* cmd) = 0;
 };
+/** @} */
 
 #endif // __IUTIL_DBGHELP_H__
 

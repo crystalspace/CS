@@ -60,7 +60,7 @@ struct iLoaderContext : public iBase
   virtual csParser* GetParser () = 0;
 };
 
-/** } */
+/** @} */
 
 #endif
 

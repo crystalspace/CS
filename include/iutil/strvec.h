@@ -22,6 +22,11 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ * String Vector interface
+ */
+/**\addtogroup util
+ * @{ */
 SCF_VERSION (iStrVector, 0, 0, 1);
 
 /// This is a SCF-compatible interface for csStrVector.
@@ -57,5 +62,7 @@ struct iStrVector : public iBase
   /// Delete all strings in array
   virtual void DeleteAll () = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_STRVEC_H__

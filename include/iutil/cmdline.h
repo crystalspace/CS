@@ -19,6 +19,10 @@
 #ifndef __IUTIL_CMDLINE_H__
 #define __IUTIL_CMDLINE_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 
 SCF_VERSION (iCommandLineParser, 0, 0, 1);
@@ -48,5 +52,7 @@ struct iCommandLineParser : public iBase
   /// Replace the Nth command-line name with a new value
   virtual bool ReplaceName (const char *iValue, int iIndex = 0) = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_CMDLINE_H__

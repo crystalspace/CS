@@ -21,7 +21,8 @@
 #ifndef __IUTIL_STDINPUT_H__
 #define __IUTIL_STDINPUT_H__
 
-/**\file
+/**\file 
+ * Crystal Space input library.
  * These are the low-level interfaces to generic classes of input devices like
  * keyboard, mouse, and joystick.  System-dependent code should inherit
  * system-specific classes from those defined below, implementing as much

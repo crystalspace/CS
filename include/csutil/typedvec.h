@@ -24,6 +24,7 @@
 #include "csutil/csvector.h"
 
 /**\file
+ * Utility library: type-safe extension of data vectors.
  * This header file contains a set of macros to construct 'typed vectors'.
  * They are the type-safe variant of csVector. You can perform almost any
  * operation as with csVector, but the contained objects are always

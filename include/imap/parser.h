@@ -20,7 +20,8 @@
 #ifndef __IMAP_PARSER_H__
 #define __IMAP_PARSER_H__
 
-/**\file
+/**\file 
+ * Geometry loader interface
  */
 /**\addtogroup loadsave
  * @{ */

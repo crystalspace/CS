@@ -19,6 +19,8 @@
 #ifndef __IUTIL_VIRTCLK_H__
 #define __IUTIL_VIRTCLK_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 
 SCF_VERSION (iVirtualClock, 0, 0, 1);

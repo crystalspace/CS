@@ -20,6 +20,11 @@
 #ifndef __IUTIL_DATABUFF_H__
 #define __IUTIL_DATABUFF_H__
 
+/**\file
+ * Data Buffer interface
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 
 SCF_VERSION (iDataBuffer, 0, 0, 1);
@@ -47,5 +52,6 @@ struct iDataBuffer : public iBase
   inline uint8* GetUint8 ()
   { return (uint8 *)GetData (); }
 };
+/** @} */
 
 #endif // __IUTIL_DATABUFF_H__

@@ -19,6 +19,10 @@
 #ifndef __IUTIL_CFGMGR_H__
 #define __IUTIL_CFGMGR_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 #include "iutil/cfgfile.h"
 
@@ -123,5 +127,6 @@ struct iConfigManager : public iConfigFile
   /// flush all removed config files (only required in optimize mode)
   virtual void FlushRemoved() = 0;
 };
+/** @} */
 
 #endif // __IUTIL_CFGMGR_H__

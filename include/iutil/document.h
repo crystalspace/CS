@@ -20,6 +20,11 @@
 #ifndef __IUTIL_DOCUMENT_H__
 #define __IUTIL_DOCUMENT_H__
 
+/**\file
+ * Document Interface
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
@@ -35,11 +40,17 @@ struct iVFS;
  */
 enum csDocumentNodeType
 {
+  /// Document
   CS_NODE_DOCUMENT = 1,
+  /// Element
   CS_NODE_ELEMENT,
+  /// Comment
   CS_NODE_COMMENT,
+  /// Unknown type
   CS_NODE_UNKNOWN,
+  /// Text
   CS_NODE_TEXT,
+  /// Declaration
   CS_NODE_DECLARATION
 };
 
@@ -118,12 +129,12 @@ struct iDocumentNode : public iBase
    * Get the value of this node.
    * What this is depends on the type of the node:
    * <ul>
-   * <li>CS_NODE_DOCUMENT: filename of the xml file
-   * <li>CS_NODE_ELEMENT: name of the element
-   * <li>CS_NODE_COMMENT: comment text
-   * <li>CS_NODE_UNKNOWN: tag contents
-   * <li>CS_NODE_TEXT: text string
-   * <li>CS_NODE_DECLARATION: undefined
+   * <li>#CS_NODE_DOCUMENT: filename of the xml file
+   * <li>#CS_NODE_ELEMENT: name of the element
+   * <li>#CS_NODE_COMMENT: comment text
+   * <li>#CS_NODE_UNKNOWN: tag contents
+   * <li>#CS_NODE_TEXT: text string
+   * <li>#CS_NODE_DECLARATION: undefined
    * </ul>
    */
   virtual const char* GetValue () = 0;
@@ -131,12 +142,12 @@ struct iDocumentNode : public iBase
    * Set the value of this node.
    * What this is depends on the type of the node:
    * <ul>
-   * <li>CS_NODE_DOCUMENT: filename of the xml file
-   * <li>CS_NODE_ELEMENT: name of the element
-   * <li>CS_NODE_COMMENT: comment text
-   * <li>CS_NODE_UNKNOWN: tag contents
-   * <li>CS_NODE_TEXT: text string
-   * <li>CS_NODE_DECLARATION: undefined
+   * <li>#CS_NODE_DOCUMENT: filename of the xml file
+   * <li>#CS_NODE_ELEMENT: name of the element
+   * <li>#CS_NODE_COMMENT: comment text
+   * <li>#CS_NODE_UNKNOWN: tag contents
+   * <li>#CS_NODE_TEXT: text string
+   * <li>#CS_NODE_DECLARATION: undefined
    * </ul>
    */
   virtual void SetValue (const char* value) = 0;
@@ -301,6 +312,7 @@ struct iDocumentSystem : public iBase
   virtual csRef<iDocument> CreateDocument () = 0;
 };
 
+/** @} */
 
 #endif // __IUTIL_DOCUMENT_H__
 

@@ -19,6 +19,10 @@
 #ifndef __IUTIL_OBJREF_H__
 #define __IUTIL_OBJREF_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 
 struct iReferencedObject;
@@ -51,6 +55,7 @@ struct iReferencedObject : public iBase
   /// Remove a reference.
   virtual void RemoveReference (iReference* ref) = 0;
 };
+/** @} */
 
 #endif
 

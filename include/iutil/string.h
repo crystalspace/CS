@@ -20,6 +20,11 @@
 #ifndef __IUTIL_STRING_H__
 #define __IUTIL_STRING_H__
 
+/**\file
+ * String interface
+ */
+/**\addtogroup util
+ * @{ */
 #include <stdarg.h>
 #include "csutil/scf.h"
 
@@ -125,5 +130,7 @@ struct iString : public iBase
   bool operator == (const iString &iStr) const
   { return Compare (&iStr); }
 };
+
+/** @} */
 
 #endif // __IUTIL_STRING_H__

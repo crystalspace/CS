@@ -20,6 +20,11 @@
 #ifndef __IUTIL_VFS_H__
 #define __IUTIL_VFS_H__
 
+/**\file
+ * Virtual File System SCF interface
+ */
+/**\addtogroup vfs
+ * @{ */
 #include "csutil/scf.h"
 #include "iutil/databuff.h"
 
@@ -32,12 +37,18 @@ struct iStrVector;
  */
 struct csFileTime
 {
-  int sec;		// 0..59
-  int min;		// 0..59
-  int hour;		// 0..23
-  int day;		// 1..31
-  int mon;		// 0..11
-  int year;		// 1900, 2001, ...
+  /// Second, 0..59
+  int sec;
+  /// Minute, 0..59
+  int min;
+  /// Hour, 0..23
+  int hour;
+  /// Day, 1..31
+  int day;
+  /// Month, 0..11
+  int mon;
+  /// Year, 1768, 1900, 2001, ...
+  int year;
 };
 
 /// This macro can be used to assign a "struct tm" to a csFileTime
@@ -56,6 +67,8 @@ struct csFileTime
 /// The maximal "virtual" path+filename length
 #define VFS_MAX_PATH_LEN        256
 
+/**\name File opening flags
+ * @{ */
 /// File open mode mask
 #define VFS_FILE_MODE		0x0000000f
 /// Open file for reading
@@ -64,7 +77,10 @@ struct csFileTime
 #define VFS_FILE_WRITE		0x00000001
 /// Store file uncompressed (no gain possible)
 #define VFS_FILE_UNCOMPRESSED	0x80000000
+/** @} */
 
+/**\name File status codes
+ * @{ */
 /// File status ok
 #define	VFS_STATUS_OK		0
 /// Unclassified error
@@ -77,6 +93,7 @@ struct csFileTime
 #define VFS_STATUS_ACCESSDENIED	4
 /// An error occured during reading or writing data
 #define VFS_STATUS_IOERROR	5
+/** @} */
 
 SCF_VERSION (iFile, 0, 0, 1);
 
@@ -87,7 +104,10 @@ struct iFile : public iBase
   virtual const char *GetName () = 0;
   /// Query file size
   virtual size_t GetSize () = 0;
-  /// Check (and clear) file last error status
+  /**
+   * Check (and clear) file last error status
+   * \sa #VFS_STATUS_ACCESSDENIED
+   */
   virtual int GetStatus () = 0;
 
   /// Replacement for standard fread()
@@ -161,7 +181,11 @@ struct iVFS : public iBase
    * names.
    */
   virtual iStrVector *FindFiles (const char *Path) const = 0;
-  /// Replacement for standard fopen()
+  /**
+   * Replacement for standard fopen().
+   * Mode: combination of VFS_FILE_XXX.
+   * \sa #VFS_FILE_MODE
+   */
   virtual iFile *Open (const char *FileName, int Mode) = 0;
   /**
    * Get an entire file at once. You should DecRef() returned data
@@ -204,6 +228,8 @@ struct iVFS : public iBase
    */
   virtual iDataBuffer *GetRealPath (const char *FileName) = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_VFS_H__
 

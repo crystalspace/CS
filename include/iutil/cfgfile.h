@@ -19,6 +19,10 @@
 #ifndef __IUTIL_CFGFILE_H__
 #define __IUTIL_CFGFILE_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 struct iConfigIterator;
 struct iVFS;
@@ -180,5 +184,6 @@ struct iConfigIterator : public iBase
   /// Get the comment of the given key, or NULL if no comment exists.
   virtual const char *GetComment () const = 0;
 };
+/** @} */
 
 #endif // __IUTIL_CFGFILE_H__

@@ -19,6 +19,10 @@
 #ifndef __IOBJECT_OBJECT_H__
 #define __IOBJECT_OBJECT_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 
 struct iObjectIterator;
@@ -159,5 +163,6 @@ struct iDataObject : public iBase
   /// Return the data buffer
   virtual void* GetData () = 0;
 };
+/** @} */
 
 #endif

@@ -19,20 +19,32 @@
 #ifndef __IUTIL_CONFIG_H__
 #define __IUTIL_CONFIG_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{ */
 #include "csutil/scf.h"
 #include "csutil/util.h"
 
+/// Types that can be contained within a variant.
 enum csVariantType
 {
+  /// long
   CSVAR_LONG,
+  /// bool
   CSVAR_BOOL,
+  /// a command
   CSVAR_CMD,
+  /// float
   CSVAR_FLOAT,
+  /// string
   CSVAR_STRING
 };
 
 /**
  * Variant, means that type of contained data is set at runtime.
+ * Be aware that requesting another type than the containing one
+ * will trigger an assertion!
  */
 struct csVariant
 {
@@ -49,24 +61,28 @@ private:
 public:
   csVariant () { type = CSVAR_LONG; v.s = NULL; }
   ~csVariant () { if (type == CSVAR_STRING) delete[] v.s; }
+  /// Assign a long
   void SetLong (long l)
   {
     if (type == CSVAR_STRING) delete[] v.s;
     type = CSVAR_LONG;
     v.l = l;
   }
+  /// Assign a bool
   void SetBool (bool b)
   {
     if (type == CSVAR_STRING) delete[] v.s;
     type = CSVAR_BOOL;
     v.b = b;
   }
+  /// Assign a float
   void SetFloat (float f)
   {
     if (type == CSVAR_STRING) delete[] v.s;
     type = CSVAR_FLOAT;
     v.f = f;
   }
+  /// Assign a string
   void SetString (const char* s)
   {
     if (type == CSVAR_STRING) delete[] v.s;
@@ -76,27 +92,32 @@ public:
     else
       v.s = NULL;
   }
+  /// Assign a command
   void SetCommand ()
   {
     if (type == CSVAR_STRING) delete[] v.s;
     type = CSVAR_CMD;
   }
 
+  /// Retrieve a long
   long GetLong () const
   {
     CS_ASSERT (type == CSVAR_LONG);
     return v.l;
   }
+  /// Retrieve a bool
   bool GetBool () const
   {
     CS_ASSERT (type == CSVAR_BOOL);
     return v.b;
   }
+  /// Retrieve a float
   float GetFloat () const
   {
     CS_ASSERT (type == CSVAR_FLOAT);
     return v.f;
   }
+  /// Retrieve a string
   const char* GetString () const
   {
     CS_ASSERT (type == CSVAR_STRING);
@@ -108,6 +129,7 @@ public:
 /// Configuration option description.
 struct csOptionDescription
 {
+  /// Description ID.
   int id;
   /// Short name of this option.
   char* name;		
@@ -133,5 +155,6 @@ struct iConfig : public iBase
   /// Get option
   virtual bool GetOption (int id, csVariant* value) = 0;
 };
+/** @} */
 
 #endif // __IUTIL_CONFIG_H__

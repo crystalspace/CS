@@ -20,6 +20,8 @@
 #ifndef __IUTIL_EVENTQ_H__
 #define __IUTIL_EVENTQ_H__
 
+/**\file
+ */
 /**
  * \addtogroup event_handling
  * @{ */

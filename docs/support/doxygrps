@@ -203,3 +203,11 @@
  * \defgroup scf Shared Class Facility (SCF)
  */
 
+/**
+ * \defgroup util Utilities
+ */
+ 
+/**
+ * \defgroup vfs Virtual File System (VFS)
+ */
+
