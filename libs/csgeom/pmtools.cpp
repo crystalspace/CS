@@ -477,7 +477,7 @@ bool csPolygonMeshTools::IsMeshClosed (iPolygonMesh* polyMesh)
 	numIncorrect++;
       }
 
-      adjacency.PutFirst (edge, counter);
+      adjacency.PutUnique (edge, counter);
 
       v1 = v2;
     }

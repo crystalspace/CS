@@ -162,7 +162,13 @@ public:
     Modulo (o.Modulo), InitModulo (o.InitModulo),
     GrowRate (o.GrowRate), MaxSize (o.MaxSize), Size (o.Size) {}
 
-  /// Add an element to the hash table.
+  /**
+   * Add an element to the hash table.
+   * \remarks If `key' is already present, does NOT replace the existing value,
+   *   but merely adds `value' as an additional value of `key'. To retrieve all
+   *   values for a given key, use GetAll(). If you instead want to replace an
+   *   existing value for 'key', use PutUnique().
+   */
   void Put (const K& key, const T &value)
   {
     csArray<Element> &values = 
@@ -190,7 +196,7 @@ public:
   }
 
   /// Add an element to the hash table, overwriting if the key already exists.
-  void PutFirst (const K& key, const T &value)
+  void PutUnique (const K& key, const T &value)
   {
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -209,6 +215,15 @@ public:
     Size++;
     if (values.Length () > Elements.Length () / GrowRate
      && Elements.Length () < MaxSize) Grow ();
+  }
+
+  /**
+   * Add an element to the hash table, overwriting if the key already exists.
+   * \deprecated Use PutUnique() instead.
+   */
+  void PutFirst (const K& key, const T &value)
+  {
+    PutUnique(key, value);
   }
 
   /// Returns whether at least one element matches the given key.

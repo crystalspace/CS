@@ -218,7 +218,7 @@ void csRefTracker::AddAlias (void* obj, void* mapTo)
   csScopedMutexLock lock (mutex);
 
   if (obj == mapTo) return;
-  aliases.PutFirst (obj, mapTo);
+  aliases.PutUnique (obj, mapTo);
 }
 
 void csRefTracker::RemoveAlias (void* obj, void* mapTo)

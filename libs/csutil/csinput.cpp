@@ -468,7 +468,7 @@ void csKeyboardDriver::SetKeyState (utf32_char codeRaw, bool iDown,
         modifiersState.modifiers[modType] = state ? 0 : 1;
       }
 
-      keyStates.PutFirst (codeRaw, iDown);
+      keyStates.PutUnique (codeRaw, iDown);
     }
     else
     {
@@ -483,12 +483,12 @@ void csKeyboardDriver::SetKeyState (utf32_char codeRaw, bool iDown,
 	else
 	  modifiersState.modifiers[modType] &= ~(1 << modNum);
 
-	keyStates.PutFirst (codeRaw, iDown);
+	keyStates.PutUnique (codeRaw, iDown);
       }
     }
   }
   else
-    keyStates.PutFirst (codeRaw, iDown);
+    keyStates.PutUnique (codeRaw, iDown);
 }
 
 bool csKeyboardDriver::GetKeyState (utf32_char codeRaw)

@@ -333,11 +333,11 @@ void csMaterial::SetShader (csStringID type, iShader* shd)
 #ifdef CS_USE_NEW_RENDERER
   if (!shadersCustomized)
   {
-    shaders.PutFirst (engine->default_shadertype, 0);
+    shaders.PutUnique (engine->default_shadertype, 0);
     shadersCustomized = true;
   }
 
-  shaders.PutFirst (type, shd);
+  shaders.PutUnique (type, shd);
 #else
   (void)type;
   (void)shd;

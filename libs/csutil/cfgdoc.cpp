@@ -260,7 +260,7 @@ void csConfigDocument::ParseNode (const char* parent, iDocumentNode* node,
       newInfo.cachedComment = lastComment ? csStrNew (
 	lastComment->GetContentsValue ()) : 0;
       newInfo.originalKey = csStrNew (fullKey);
-      keys.PutFirst ((const char*)downKey, newInfo);
+      keys.PutUnique ((const char*)downKey, newInfo);
       lastComment = 0;
     }
 

@@ -618,14 +618,21 @@ following @samp{iImage} methods have been renamed:
 @code{HasKeycolor()} @result{} @code{HasKeyColor()}
 @end itemize
 
-For consistency with related methods (such as @code{HasPrevious()}) in the same
-template, the following @code{csList<>} methods have been renamed:
+For consistency with related methods (such as @code{HasPrevious()}) in the
+@code{csList<>} template, the following methods have been renamed:
 
 @itemize @bullet
 @item
 @code{FetchPrev()} @result{} @code{FetchPrevious()}
 @item
 @code{HasPrev()} @result{} @code{HasPrevious()}
+@end itemize
+
+For clarification, the following @code{csHash<>} methods have been renamed:
+
+@item @bullet
+@item
+@code{PutFirst()} @result{} @code{PutUnique()}
 @end itemize
 
 @subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size

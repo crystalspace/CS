@@ -18,6 +18,10 @@ chronological order.
 	- Eric Sunshine fixed oversight in 4-Nov-2004 change to jamtemplate
 	  where it neglected to copy config.sub, config.guess, and install-sh
 	  to the synthesized project.
+	- Eric Sunshine renamed csHash<>::PutFirst() to PutUnique(). (The old
+	  name is still recognized, though deprecated.) Also clarified
+	  documentation for Put() to state that it does not replace an existing
+	  key/tuple.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.
