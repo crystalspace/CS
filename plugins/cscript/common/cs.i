@@ -202,7 +202,7 @@ struct iGraphics2D : public iBase
   virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,
      void *buffer, bool alone_hint, csPixelFormat *ipfmt,
      csRGBpixel *palette = NULL, int pal_size = 0) = 0;
-  virtual void AllowCanvasResize (bool iAllow) = 0;
+  virtual void AllowResize (bool iAllow) = 0;
 };
 
 struct iHalo : public iBase
