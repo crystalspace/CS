@@ -39,9 +39,6 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
   pChunk = NULL;
   pAVI = (csAVIFormat*)pBase;
   object_reg = NULL;
-  pG3D = NULL;
-  pG2D = NULL;
-  pCodec = NULL;
 
   pIA = new csImageArea (1,1,1,1);
 }
@@ -80,9 +77,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   nStream = nStreamNumber;
   csAVIStreamVideo::object_reg = object_reg;
-  if (pG3D) pG3D->DecRef ();
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (pG2D) pG2D->DecRef ();
   pG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
 
   pIA->w = 0;
@@ -123,9 +118,6 @@ csAVIStreamVideo::~csAVIStreamVideo ()
   delete pChunk;
   delete pIA->data;
   delete pIA;
-  if (pCodec) pCodec->DecRef ();
-  if (pG2D) pG2D->DecRef ();
-  if (pG3D) pG3D->DecRef ();
 }
 
 void csAVIStreamVideo::GetStreamDescription (csStreamDescription &desc)
@@ -449,7 +441,7 @@ bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
   char cn[128];
   sprintf (cn, "crystalspace.video.codec.avi.%s", strdesc.codec);
   // try open this class
-  pCodec = SCF_CREATE_INSTANCE (cn, iAVICodec);
+  pCodec = csPtr<iAVICodec> (SCF_CREATE_INSTANCE (cn, iAVICodec));
   if (pCodec)
   {
     // codec exists, now try to initialize it
@@ -463,7 +455,6 @@ bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
       		"CODEC class \"%s\" could not be initialized !", cn);
-      pCodec->DecRef ();
       pCodec = NULL;
     }
   }

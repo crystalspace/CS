@@ -91,8 +91,7 @@ SCF_IMPLEMENT_IBASE_END
 // =================================================================
 
 csGraphics3DGLext::csGraphics3DGLext (iBase *parent ) :
-  object_reg (NULL),
-  G2D (NULL)
+  object_reg (NULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
 
@@ -132,11 +131,6 @@ csGraphics3DGLext::~csGraphics3DGLext ( )
 
   if(m_clipper)
     delete m_clipper;
-
-  // G2D - graphics 2D object
-  if( G2D ) {
-    G2D->DecRef();
-  }
 }
 
 
@@ -164,17 +158,16 @@ bool csGraphics3DGLext::Initialize(iObjectRegistry* reg)
 
   config.AddConfig(object_reg, "/config/opengl.cfg");
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-    iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+    iCommandLineParser));
 
   const char *driver = cmdline->GetOption ("canvas");
-  cmdline->DecRef ();
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  plugin_mgr->DecRef ();
   if (!G2D)
     return false;
   if (!object_reg->Register (G2D, "iGraphics2D"))
@@ -542,13 +535,10 @@ void csGraphics3DGLext::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   
   if (rep)
-  {
 	  rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
-	  rep->DecRef ();
-  }
   else
   {
 	  csPrintfV (msg, arg);

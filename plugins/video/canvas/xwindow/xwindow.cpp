@@ -81,19 +81,15 @@ csXWindow::csXWindow (iBase* parent)
   Canvas = NULL;
 
   keyboard_grabbed = 0;
-  xf86vm = NULL;
 }
 
 void csXWindow::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.window.x", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -106,16 +102,11 @@ csXWindow::~csXWindow ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
-  if (xf86vm)
-    xf86vm->DecRef ();
   if (EventOutlet)
     EventOutlet->DecRef ();
   delete [] win_title;
@@ -125,12 +116,11 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
 {
   this->object_reg = object_reg;
   csConfigAccess Config(object_reg, "/config/video.cfg");
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-						   iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+						   iCommandLineParser));
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) do_hwmouse = true;
   if (cmdline->GetOption ("nosysmouse")) do_hwmouse = false;
-  cmdline->DecRef ();
   // Open display
   dpy = XOpenDisplay (NULL);
 
@@ -149,20 +139,17 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Create the event outlet
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
-  }
 
   int opcode, first_event, first_error;
   if (XQueryExtension (dpy, CS_XEXT_XF86VM,
 		       &opcode, &first_event, &first_error))
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (
+    	CS_QUERY_REGISTRY(object_reg, iPluginManager));
     xf86vm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_XF86VM_SCF_ID, iXExtF86VM);
-    plugin_mgr->DecRef ();
   }
   return true;
 }
@@ -349,12 +336,9 @@ bool csXWindow::Open ()
   // Tell event queue to call us on every frame
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
-    q->DecRef ();
-  }
 
   if (xf86vm)
   {

@@ -229,7 +229,6 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
                    csGraphics2DGLCommon (iParent),
                    m_nGraphicsReady (true),
                    m_hWnd (NULL),
-                   m_piWin32Assistant (NULL),
                    m_bPalettized (false),
                    m_bPaletteChanged (false)
 {
@@ -238,8 +237,6 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL (void)
 {
-  if (m_piWin32Assistant)
-    m_piWin32Assistant->DecRef ();
   m_nGraphicsReady = 0;
 }
 
@@ -247,12 +244,9 @@ void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.canvas.openglwin", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -280,11 +274,11 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
     pfmt.PixelBytes = 1;
   }
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (
+  	CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
-  cmdline->DecRef ();
 
   m_nDepthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
   m_nDisplayFrequency = config->GetInt ("Video.DisplayFrequency", 0);
@@ -502,16 +496,19 @@ void csGraphics2DOpenGL::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
-  iWin32Assistant* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  csRef<iWin32Assistant> winhelper (
+  	CS_QUERY_REGISTRY (object_reg, iWin32Assistant));
   CS_ASSERT (winhelper != NULL);
   bool rc;
-  if (!m_bHardwareCursor) {
+  if (!m_bHardwareCursor)
+  {
     winhelper->SetCursor (csmcNone);
     rc = false;
-  } else {
+  }
+  else
+  {
     rc = winhelper->SetCursor (iShape);
   }
-  winhelper->DecRef ();
   return rc;
 }
 

@@ -42,16 +42,16 @@ public:
   iObjectRegistry* object_reg;
 
 private:
-  iPluginManager* plugin_mgr;
+  csRef<iPluginManager> plugin_mgr;
   iSector* room;
-  iView* view;
-  iEngine* engine;
-  iStreamFormat *pVideoFormat;
-  iVideoStream *pVStream;
-  iLoader *LevelLoader;
-  iGraphics3D *myG3D;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iView> view;
+  csRef<iEngine> engine;
+  csRef<iStreamFormat> pVideoFormat;
+  csRef<iVideoStream> pVStream;
+  csRef<iLoader> LevelLoader;
+  csRef<iGraphics3D> myG3D;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
 
   bool InitProcDemo ();
 

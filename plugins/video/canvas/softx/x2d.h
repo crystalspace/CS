@@ -32,7 +32,7 @@
 /// XLIB version.
 class csGraphics2DXLib : public csGraphics2D, public iEventPlug
 {
-  iXWindow *xwin;
+  csRef<iXWindow> xwin;
   /// Shared memory extension (manages the shared memory backbuffer)
   iXExtSHM *xshm;
   /// Used for back buffer when not using shared memory

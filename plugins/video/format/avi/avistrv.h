@@ -44,10 +44,10 @@ class csAVIStreamVideo : public iVideoStream
   csImageArea *pIA;
 
   csRef<iMaterialHandle> pMaterial;
-  iGraphics3D *pG3D;
-  iGraphics2D *pG2D;
+  csRef<iGraphics3D> pG3D;
+  csRef<iGraphics2D> pG2D;
   iObjectRegistry *object_reg;
-  iAVICodec *pCodec;
+  csRef<iAVICodec> pCodec;
   csCodecDescription cdesc;
 
   void yuv_channel_2_rgba_interleave (char *data[3]);

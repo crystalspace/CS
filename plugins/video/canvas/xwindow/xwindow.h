@@ -46,7 +46,7 @@ class csXWindow : public iXWindow, public iEventPlug
   /// The event outlet
   iEventOutlet *EventOutlet;
   /// The XFree86-VidModeExtension
-  iXExtF86VM *xf86vm;
+  csRef<iXExtF86VM> xf86vm;
   /// The Window Title
   char *win_title;
   /// The X-display

@@ -64,12 +64,9 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.canvas.glx2d", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -89,7 +86,8 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 
   csConfigAccess config(object_reg, "/config/opengl.cfg");
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
   {
     dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, iOpenGLDisp);
@@ -122,14 +120,9 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   pfmt.PalEntries = 0;
 
   // Create the event outlet
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
-  }
-
-  plugin_mgr->DecRef ();
 
   return true;
 }
@@ -139,11 +132,6 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   // Destroy your graphic interface
   XFree ((void*)xvis);
   Close ();
-  if (dispdriver)
-    dispdriver->DecRef();
-
-  if (xwin)
-    xwin->DecRef ();
 }
 
 bool csGraphics2DGLX::Open()
@@ -196,9 +184,8 @@ void csGraphics2DGLX::Close(void)
     active_GLContext = NULL;
   }
 
-  if ( dispdriver ){
+  if (dispdriver)
     dispdriver->close();
-  }
 
   if (xwin)
     xwin->Close ();

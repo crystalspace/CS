@@ -72,12 +72,9 @@ void csGraphics2DLineXLib::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.canvas.linex", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -91,7 +88,8 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   xwin = CS_LOAD_PLUGIN (plugin_mgr, XWIN_SCF_ID, iXWindow);
   if (!xwin)
   {
@@ -103,26 +101,18 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   screen_num = xwin->GetScreen ();
 
   // Do a trick: unload the system font server since its useless for us
-  iFontServer *fs = (iFontServer*)(CS_QUERY_REGISTRY (object_reg, iFontServer));
+  csRef<iFontServer> fs (CS_QUERY_REGISTRY (object_reg, iFontServer));
   if (fs)
   {
-    iComponent *fsc = SCF_QUERY_INTERFACE (fs, iComponent);
+    csRef<iComponent> fsc (SCF_QUERY_INTERFACE (fs, iComponent));
     if (fsc)
-    {
       plugin_mgr->UnloadPlugin (fsc);
-      fsc->DecRef ();
-    }
-    fs->DecRef ();
   }
-  // Also DecRef the FontServer since csGraphics2D::Initialize IncRef'ed it
-  if (FontServer)
-    FontServer->DecRef ();
-
   // Load our specific font server instead
   FontServer = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.font.server.linex2d",
     iFontServer);
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
   {
     // Tell event queue to call us on broadcast events
@@ -130,9 +120,7 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
     //q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
   }
-  plugin_mgr->DecRef ();
   return true;
 }
 

@@ -67,32 +67,14 @@ Video *System;
 
 Video::Video ()
 {
-  view = NULL;
-  engine = NULL;
-  pVStream = NULL;
-  pVideoFormat = NULL;
-  LevelLoader = NULL;
-  myG3D = NULL;
-  kbd = NULL;
-  vc = NULL;
-  plugin_mgr = NULL;
 }
 
 Video::~Video ()
 {
-  if (pVStream) pVStream->DecRef ();
   if (pVideoFormat)
   {
     pVideoFormat->Unload ();
-    pVideoFormat->DecRef ();
   }
-  if (vc) vc->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
-  if (view) view->DecRef ();
-  if (LevelLoader) LevelLoader->DecRef();
-  if (myG3D) myG3D->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (engine) engine->DecRef ();
 }
 
 void Video::Report (int severity, const char* msg, ...)
@@ -330,7 +312,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, myG3D);
+  view = csPtr<iView> (new csView (engine, myG3D));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = myG3D->GetDriver2D ();

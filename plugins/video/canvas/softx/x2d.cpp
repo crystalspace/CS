@@ -51,11 +51,10 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (iParent), xwin (NULL), xshm (NULL),  xim (NULL),
+  csGraphics2D (iParent), xshm (NULL),  xim (NULL),
   dpy (NULL), cmap (0), real_Memory (NULL),
   sim_lt8 (NULL), sim_lt16 (NULL)
 {
-  xwin = NULL;
   xshm = NULL;
   EventOutlet = NULL;
 }
@@ -75,20 +74,15 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
 
   if (EventOutlet)
       EventOutlet->DecRef();
-  if (xwin)
-    xwin->DecRef ();
 }
 
 void csGraphics2DXLib::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.canvas.softx", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -102,12 +96,12 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
   xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, iXWindow);
   if (!xwin)
   {
-    plugin_mgr->DecRef ();
     return false;
   }
   dpy = xwin->GetDisplay ();
@@ -116,14 +110,13 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   bool do_shm;
   // Query system settings
   csConfigAccess Config(object_reg, "/config/video.cfg");
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-						   iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+						   iCommandLineParser));
   sim_depth = Config->GetInt ("Video.SimulateDepth", 0);
 
   do_shm = Config->GetBool ("Video.XSHM", true);
   if (cmdline->GetOption ("XSHM")) do_shm = true;
   if (cmdline->GetOption ("noXSHM")) do_shm = false;
-  cmdline->DecRef ();
 
   if (do_shm)
   {
@@ -142,16 +135,14 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     }
   }
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
   {
     // Tell event queue to call us on broadcast messages
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
   }
-  plugin_mgr->DecRef ();
   return true;
 }
 

@@ -86,7 +86,7 @@ bool csGraphics2DGLCommon::Open ()
   const char *renderer = (const char *)glGetString (GL_RENDERER);
   const char *vendor = (const char *)glGetString (GL_VENDOR);
   const char *version = (const char *)glGetString (GL_VERSION);
-  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> reporter (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (renderer || version || vendor)
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -108,7 +108,6 @@ bool csGraphics2DGLCommon::Open ()
 
   glViewport (0, 0, Width, Height);
   Clear (0);
-  if (reporter) reporter->DecRef ();
 
   statecache->InitCache();
 
@@ -486,7 +485,9 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
   if (!strcasecmp (command, "getstatecache"))
   {
     iGLStateCache** cache = va_arg (args, iGLStateCache**);
-    (*cache) = SCF_QUERY_INTERFACE( statecache, iGLStateCache );
+    csRef<iGLStateCache> st (SCF_QUERY_INTERFACE( statecache, iGLStateCache));
+    (*cache) = st;
+    st->IncRef ();	// Avoid smart pointer release.
   }
   return false;
 }

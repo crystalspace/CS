@@ -37,7 +37,7 @@
 /// XLIB version.
 class csGraphics2DGLX : public csGraphics2DGLCommon
 {
-  iXWindow  *xwin;
+  csRef<iXWindow> xwin;
   // The display context
   Display* dpy;
   int screen_num;
@@ -47,7 +47,7 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   GLXContext active_GLContext;
 
   // we are using a specific displaydriver
-  iOpenGLDisp *dispdriver;
+  csRef<iOpenGLDisp> dispdriver;
 
   /**
    * Helper function, attempts to create a visual/context with the

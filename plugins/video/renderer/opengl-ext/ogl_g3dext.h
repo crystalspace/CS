@@ -170,7 +170,7 @@ protected:
     // depending on the Graphics card (atm there's only a standard one)
     iVertexBufferManager *vbufmgr; 
     // The 2D Graphics renderer
-    iGraphics2D *G2D;
+    csRef<iGraphics2D> G2D;
 
     // recalc frustum ?
     bool frustum_valid;

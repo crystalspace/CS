@@ -91,7 +91,7 @@ protected:
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
 
-  iWin32Assistant* m_piWin32Assistant;
+  csRef<iWin32Assistant> m_piWin32Assistant;
 
   bool m_bPalettized;
   bool m_bPaletteChanged;
