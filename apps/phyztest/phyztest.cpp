@@ -677,12 +677,12 @@ void Phyztest::SetupFrame ()
 
   }
   // Add in some help text.
-  WriteShadow (ALIGN_LEFT,10, 100, write_colour,"Press the <DEL> key to start");
+  WriteShadow (ALIGN_LEFT,10, 100, write_colour,"Press the <DELETE> key to start");
   WriteShadow (ALIGN_LEFT,10, 110, write_colour,"the chain object");
   WriteShadow (ALIGN_LEFT,10, 120, write_colour,"Press the <TAB> key to start");
   WriteShadow (ALIGN_LEFT,10, 130, write_colour,"the spring object");
-  WriteShadow (ALIGN_LEFT,10, 140, write_colour,"Press the <ENTER> key to add");
-  WriteShadow (ALIGN_LEFT,10, 150, write_colour,"an impulse to the spring object");
+  //WriteShadow (ALIGN_LEFT,10, 140, write_colour,"Press the <ENTER> key to add");
+  //WriteShadow (ALIGN_LEFT,10, 150, write_colour,"an impulse to the spring object");
 }
 
 void Phyztest::FinishFrame ()
