@@ -3468,8 +3468,8 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-void csLoader::terrain_process (csSector& sector, char* name, char* buf,
-        csTextureHandle* texture)
+void csLoader::terrain_process (csSector& /*sector*/, char* /*name*/, char* buf,
+        csTextureHandle* /*texture*/)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TERRAIN_HEIGHTMAP)
