@@ -26,3 +26,5 @@ include $(TOP)/mk/jam/build.jam ;
 
 # config.h is placed in BUILDTOP directory
 IncludeDir $(BUILDTOP) ;
+IncludeDir $(TOP) ;
+IncludeDir $(TOP)/src ;
