@@ -53,6 +53,12 @@ The history order has been reversed so that new features are at the top.
 	      introduced. Read include/isystem.h for more information about
 	      it.
 	    - And of course lots of changes to the new loader.
+	- Andrew fixed a crash bug on Solaris in his csinput code.
+	- Andrew also changed 'make depend' so that it always regenerates
+	  the dependencies and added 'make dep' which tries to be clever
+	  about this.
+	- Andrew fixed a bug with the 'gamma' setting of the software
+	  renderer.
 	- Made a few fixes to the large batch of changes from Andrew.
 	- Norman Kramer removed several warnings.
 	- Eric Sunshine removed all references to the obsolete csInput library
