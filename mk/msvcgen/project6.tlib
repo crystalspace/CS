@@ -95,8 +95,8 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo [% interpolate('addlib32') %]
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib gdi32.lib advapi32.lib /nologo /subsystem:[% projtypes.${my.doc.projtype.0}.subsystem %] /machine:I386
-# ADD LINK32 shell32.lib user32.lib gdi32.lib advapi32.lib [% compose('libs', [], ' ') %] [% interpolate('delaylibs', ' ') %] /nologo /version:4.0 /subsystem:[% projtypes.${my.doc.projtype.0}.subsystem %] /machine:I386 [% interpolate('linkeropts', ' ') %] [% interpolate('addlink32') %] [% composedirs('libdir', [], '/libpath:') %] [% flags(compose('lflags', [], ' ')) %]
+# ADD BASE LINK32 user32.lib gdi32.lib advapi32.lib /nologo /machine:I386
+# ADD LINK32 shell32.lib user32.lib gdi32.lib advapi32.lib [% compose('libs', [], ' ') %] [% interpolate('delaylibs', ' ') %] /nologo /version:4.0 /machine:I386 [% interpolate('linkeropts', ' ') %] [% interpolate('addlink32') %] [% composedirs('libdir', [], '/libpath:') %] [% flags(compose('lflags', [], ' ')) %]
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 [% interpolate('postbuild') -%]

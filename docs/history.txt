@@ -11,6 +11,16 @@ chronological order.
 	  Marten's new parallax data files.
 	- Eric Sunshine propagated Marten's new parallaxtest VFS mounting in
 	  vfs.cfg to plugins/filesys/vfs/vfs.cfg.template.
+	- Eric Sunshine adjusted the msvcgen templates so that GUI applications
+	  are given subtype "windows" in `release' mode, and subtype "console"
+	  in `debug' mode. This allows stdout/stderr to be captured easily from
+	  debug applications, but avoids the ugly console window popping up
+	  automatically for release applications (when launched from Explorer).
+	- Eric Sunshine fixed problem in msvcgen/custom.cslib where
+	  ExtensiveMemDebug and ExtensiveMemDebug_NR build configurations did
+	  not have the appropriate "debug" tag, thus causing important
+	  debugging configuration to be omitted from the synthesized project
+	  files.
 18-Sep-2004
 	- Eric Sunshine changed the executable subsystem type in the MSVC
 	  project files for GUI applications from "windows" to "console". This

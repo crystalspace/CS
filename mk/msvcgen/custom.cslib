@@ -45,7 +45,7 @@ builds = builds.merge([
     priority => 400
   },
   {
-    tag => 'memdebug',
+    tag => 'debug',
     name => 'ExtensiveMemDebug',
     defines => ['_DEBUG','CS_DEBUG','CS_EXTENSIVE_MEMDEBUG'],
     defineskey => 'definedebug',
@@ -55,7 +55,7 @@ builds = builds.merge([
     priority => 500
   },
   {
-    tag => 'memdebug',
+    tag => 'debug',
     name => 'ExtensiveMemDebug_NR',
     defines => ['_DEBUG','CS_DEBUG','CS_USE_NEW_RENDERER',
 		'CS_EXTENSIVE_MEMDEBUG'],

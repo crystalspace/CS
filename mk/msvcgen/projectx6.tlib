@@ -43,19 +43,14 @@
 [%
 projtypes.appcon.type = 'Console Application';
 projtypes.appcon.typecode = '0x0103';
-projtypes.appcon.subsystem = 'console';
 projtypes.appgui.type = 'Application';
 projtypes.appgui.typecode = '0x0101';
-projtypes.appgui.subsystem = 'console';
 projtypes.group.type = 'Static Library';
 projtypes.group.typecode = '0x0104';
-projtypes.group.subsystem = 'windows';
 projtypes.library.type = 'Static Library';
 projtypes.library.typecode = '0x0104';
-projtypes.library.subsystem = 'windows';
 projtypes.plugin.type = 'Dynamic-Link Library';
 projtypes.plugin.typecode = '0x0102';
-projtypes.plugin.subsystem = 'windows';
 %]
 
 [% MACRO delaylibs_plugin
@@ -89,9 +84,18 @@ GET glue(my.doc.librarydelay,' ','/DELAYLOAD:','.dll') %]
 [% MACRO addlib32_library_release GET addlib32_outfile('') %]
 [% MACRO addlib32_library_debug   GET addlib32_outfile('_d') %]
 
+[% MACRO addlink32_subsystem(subsys) BLOCK -%]
+/subsystem:[% subsys %]
+[%- END %]
 [% MACRO addlink32_outfile BLOCK -%]
 /out:"[% path([my.doc.buildroot.0, my.doc.target.0]) %]"
 [%- END %]
-[% MACRO addlink32_appcon GET addlink32_outfile %]
-[% MACRO addlink32_appgui GET addlink32_outfile %]
-[% MACRO addlink32_plugin GET addlink32_outfile %]
+[% MACRO addlink32_appcon
+GET addlink32_subsystem('console'); GET addlink32_outfile %]
+[% MACRO addlink32_appgui_release
+GET addlink32_subsystem('windows'); GET addlink32_outfile %]
+[% MACRO addlink32_appgui_debug
+GET addlink32_subsystem('console'); GET addlink32_outfile %]
+[% MACRO addlink32_library GET addlink32_subsystem('windows') %]
+[% MACRO addlink32_plugin
+GET addlink32_subsystem('windows'); GET addlink32_outfile %]
