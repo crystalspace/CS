@@ -1375,9 +1375,13 @@ void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
   //shoot_src->CapDelta(suv, srcp_width, srcp_height, cap);
   // get delta in colour
   shoot_src->GetSummedDelta(suv, srcp_width, srcp_height, delta_color);
-  delta_color.red *= src_lumel_color.red;
-  delta_color.green *= src_lumel_color.green;
-  delta_color.blue *= src_lumel_color.blue;
+  csColor colored_delta = delta_color; /// delta * src lumel color
+  colored_delta.red *= src_lumel_color.red;
+  colored_delta.green *= src_lumel_color.green;
+  colored_delta.blue *= src_lumel_color.blue;
+  /// now take a weighted average depending on colour_bleed
+  delta_color += colored_delta; /// for 1.0 + colourbleed of delta
+  delta_color *= 1.0 / (1.0 + colour_bleed);
 }
 
 
