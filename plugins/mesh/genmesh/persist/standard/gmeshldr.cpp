@@ -596,22 +596,6 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     if (!gfact) return false;
     if (!meshfact) return false;
 
-    //Writedown Material tag
-    iMaterialWrapper* mat = gfact->GetMaterialWrapper();
-    if (mat)
-    {
-      const char* matname = mat->QueryObject()->GetName();
-      if (matname && *matname)
-      {
-        csRef<iDocumentNode> matNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = 
-          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        matnameNode->SetValue(matname);
-      }    
-    }    
-
     //Write NumVt Tag
     csRef<iDocumentNode> numvtNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -640,6 +624,19 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       triaNode->SetAttributeAsFloat("v", texel.y);
     }
 
+    //Write Color Tags
+    if (!gfact->IsLighting())
+    {
+      for (i=0; i<gfact->GetVertexCount(); i++)
+      {
+        csRef<iDocumentNode> colorNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        colorNode->SetValue("color");
+        csColor color = gfact->GetColors()[i];
+        synldr->WriteColor(colorNode, &color);
+      }
+    }
+
     //Write Triangle Tags
     for (i=0; i<gfact->GetTriangleCount(); i++)
     {
@@ -651,6 +648,61 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       triaNode->SetAttributeAsInt("v2", tria.b);
       triaNode->SetAttributeAsInt("v3", tria.c);
     }
+
+    //Writedown DefaultColor tag
+    csColor col = gfact->GetColor();
+    if (col.red != 0 || col.green != 0 || col.blue != 0)
+    {
+      csRef<iDocumentNode> colorNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      colorNode->SetValue("defaultcolor");
+      synldr->WriteColor(colorNode, &col);
+    }
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = gfact->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = 
+          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Mixmode tag
+    int mixmode = gfact->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+
+    //Writedown Back2Front tag
+    if (gfact->IsBack2Front())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+        ->SetValue("back2front");
+
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", gfact->IsLighting(), true);
+
+    //Writedown NoShadows tag
+    if (!gfact->IsShadowCasting())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
+
+    //Writedown LocalShadows tag
+    if (gfact->IsShadowReceiving())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+        ->SetValue("localshadows");
+
+    //Writedown ManualColor tag
+    if (gfact->IsManualColors())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+        ->SetValue("manualcolors");
 
     if (gfact->IsAutoNormals()) //TBD: check for autonormals here
     {
@@ -669,58 +721,6 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
         synldr->WriteVector(normalNode, &normal);
       }
     }
-
-    //Writedown DefaultColor tag
-    csColor col = gfact->GetColor();
-    if (col.red != 0 || col.green != 0 || col.blue != 0)
-    {
-      csRef<iDocumentNode> colorNode = 
-        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      colorNode->SetValue("defaultcolor");
-      synldr->WriteColor(colorNode, &col);
-    }
-
-    //Write Color Tags
-    if (!gfact->IsLighting())
-    {
-      for (i=0; i<gfact->GetVertexCount(); i++)
-      {
-        csRef<iDocumentNode> colorNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        colorNode->SetValue("color");
-        csColor color = gfact->GetColors()[i];
-        synldr->WriteColor(colorNode, &color);
-      }
-    }
-
-    //Writedown Lighting tag
-    synldr->WriteBool(paramsNode, "lighting", gfact->IsLighting(), true);
-
-    //Writedown Back2Front tag
-    if (gfact->IsBack2Front())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("back2front");
-
-    //Writedown NoShadows tag
-    if (!gfact->IsShadowCasting())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
-
-    //Writedown LocalShadows tag
-    if (gfact->IsShadowReceiving())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("localshadows");
-
-    //Writedown ManualColor tag
-    if (gfact->IsManualColors())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("manualcolors");
-
-    //Writedown Mixmode tag
-    int mixmode = gfact->GetMixMode();
-    csRef<iDocumentNode> mixmodeNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    mixmodeNode->SetValue("mixmode");
-    synldr->WriteMixmode(mixmodeNode, mixmode, true);
 
     //TBD: Writedown box tag
 

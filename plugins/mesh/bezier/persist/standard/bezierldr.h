@@ -97,6 +97,7 @@ class csBezierSaver : public iSaverPlugin
 private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -109,7 +110,9 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  bool WriteDown (iBase* obj, iDocumentNode* parent);
+  bool WriteObject (iBase* obj, iDocumentNode* parent);
+  bool WriteFactory (iBase* obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {

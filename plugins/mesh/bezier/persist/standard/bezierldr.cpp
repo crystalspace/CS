@@ -411,6 +411,7 @@ bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBezierSaver::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 //TBD
@@ -418,23 +419,130 @@ bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> paramsNode = 
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for bezier mesh");
-  paramsNode=0;
-  
-  return true;
 
-/*
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-  csFindReplace (name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf (buf, "FACTORY ('%s')\n", name);
-  str.Append (buf);
-  file->Write ((const char*)str, str.Length ());
-*/
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if (!mesh) return false;
+
+  csRef<iMeshWrapper> objwrap = 
+    SCF_QUERY_INTERFACE (mesh->GetLogicalParent(), iMeshWrapper);
+
+  if (objwrap) return WriteObject(obj, paramsNode);
+
+  csRef<iMeshFactoryWrapper> factwrap = 
+    SCF_QUERY_INTERFACE (mesh->GetLogicalParent(), iMeshFactoryWrapper);
+
+  if (factwrap) return WriteFactory(obj, paramsNode);
+
+  return false;
 }
 
+bool csBezierSaver::WriteObject (iBase* obj, iDocumentNode* parent)
+{
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iBezierState> state = SCF_QUERY_INTERFACE (obj, iBezierState);
+
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("iSaverPlugin not yet fully supported for bezier mesh");
+
+
+  if (mesh && state)
+  {
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), 
+        iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = 
+          parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = 
+          factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+bool csBezierSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
+{
+  csRef<iBezierFactoryState> fact = 
+    SCF_QUERY_INTERFACE (obj, iBezierFactoryState);
+
+  if (fact)
+  {
+    //Writedown CurveCenter tag
+    csVector3 curvecenter = fact->GetCurvesCenter();
+    csRef<iDocumentNode> curvecenterNode = 
+      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    curvecenterNode->SetValue("curvecenter");
+    synldr->WriteVector(curvecenterNode, &curvecenter);
+
+    //Writedown CurveScale tag
+    float curvescale = fact->GetCurvesScale();
+    csRef<iDocumentNode> curvescaleNode = 
+      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    curvescaleNode->SetValue("curvescale");
+    curvescaleNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+      ->SetValueAsFloat(curvescale);
+
+    //Writedown CurveControl tag
+    for (int i=0; i< fact->GetCurveVertexCount(); i++)
+    {
+      csVector3 cc_v3 = fact->GetCurveVertex(i);
+      csVector2 cc_v2 = fact->GetCurveTexel(i);
+      csRef<iDocumentNode> ccNode = 
+        parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      ccNode->SetValue("curvecontrol");
+      synldr->WriteVector(ccNode, &cc_v3);
+      ccNode->SetAttributeAsFloat("u", cc_v2.x);
+      ccNode->SetAttributeAsFloat("v", cc_v2.y);
+    }
+
+    //Writedown Curve tag
+    for (int i=0; i< fact->GetCurveCount(); i++)
+    {
+      iCurve* curve = fact->GetCurve(i);
+      csVector2 cc_v2 = fact->GetCurveTexel(i);
+      csRef<iDocumentNode> curveNode = 
+        parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      curveNode->SetValue("curve");
+      curveNode->SetAttribute("name", curve->QueryObject()->GetName());
+
+      //Writedown Material tag
+      iMaterialWrapper* mat = curve->GetMaterial();
+      if (mat)
+      {
+        const char* matname = mat->QueryObject()->GetName();
+        if (matname && *matname)
+        {
+          csRef<iDocumentNode> matNode = 
+            curveNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          matNode->SetValue("material");
+          csRef<iDocumentNode> matnameNode = 
+            matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+          matnameNode->SetValue(matname);
+        }
+        for (int i=0; i< curve->GetVertexCount(); i++)
+        {
+          int v = curve->GetVertex(i);
+          csRef<iDocumentNode> vNode = 
+            curveNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          vNode->SetValue("v");
+          vNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(v);
+        }
+      }
+    }
+  }
+
+  return true;
+}

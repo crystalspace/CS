@@ -435,9 +435,10 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       iSpriteFrame* sprite_frame = spritefact->GetFrame(i);
       frameNode->SetAttribute("name", sprite_frame->GetName());
       //Write v Tags
+      csRef<iDocumentNode> vertexNode;
       for (int j=0; j<spritefact->GetVertexCount(); j++)
       {
-        csRef<iDocumentNode> vertexNode = frameNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        vertexNode = frameNode->CreateNodeBefore(CS_NODE_ELEMENT, vertexNode);
         vertexNode->SetValue("v");
         csVector3 vertex = spritefact->GetVertex(i,j);
         csVector2 texel = spritefact->GetTexel(i,j);

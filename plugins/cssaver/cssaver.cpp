@@ -149,12 +149,17 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       if (filename && *filename)
         CreateValueNode(child, "file", filename);
 
-      if (img->HasKeycolor())
+      int r,g,b, r2,g2,b2;
+      texWrap->GetKeyColor(r, g, b);
+      if (r != -1)
       {
-        int r,g,b;
-        img->GetKeycolor(r, g, b);
-        CreateValueNodeAsColor(child, "transparent",
-	  csColor(r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256));
+        if (img->HasKeycolor())
+        {
+          img->GetKeycolor(r2, g2, b2);
+        }
+        if (r != r2 || g != g2 || b != b2)
+          CreateValueNodeAsColor(child, "transparent",
+	    csColor(r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256));
       }
     }
 
@@ -964,10 +969,10 @@ csRef<iString> csSaver::SaveMapFile()
 
   //TBD: this crashes for me, dunno why, have to look at it more closley.
   if (!SaveTextures(parent)) return 0;
-  if (!SaveSettings(parent)) return 0;
+  if (!SaveVariables(parent)) return 0;
   if (!SaveShaders(parent)) return 0;
   if (!SaveMaterials(parent)) return 0;
-  if (!SaveVariables(parent)) return 0;
+  if (!SaveSettings(parent)) return 0;
   if (!SaveRenderPriorities(parent)) return 0;
   if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return 0;
   

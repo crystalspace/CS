@@ -449,8 +449,7 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     numrimValueNode->SetValueAsInt(numrim);
 
     //Writedown Material tag
-    csRef<iMaterialWrapper> mat = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMaterialWrapper);
+    iMaterialWrapper* mat = ball->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
