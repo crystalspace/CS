@@ -179,7 +179,6 @@ public:
   csEmitAge *next;
 };
 
-
 /**
  * A generic emitter particle system.
  * The particles behave in a newtonian manner.

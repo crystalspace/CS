@@ -29,6 +29,7 @@
 #include "qsqrt.h"
 #include "qint.h"
 #include "csgeom/math3d.h"
+#include "csutil/garray.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -69,6 +70,16 @@ SCF_IMPLEMENT_IBASE (csEmitCylinderTangent)
   SCF_IMPLEMENTS_INTERFACE (iEmitCylinderTangent)
   SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
 SCF_IMPLEMENT_IBASE_END
+
+/// helper particle sorting structure
+struct csEmitCompPart {
+  float z;
+  iParticle* part;
+};
+
+/// growing drawing sort array
+CS_TYPEDEF_GROWING_ARRAY (csCompPartArray, struct csEmitCompPart);
+static csCompPartArray cpa;
 
 /// utility function
 static float GetRandomFloat(float min, float max)
@@ -554,11 +565,10 @@ void csEmitMeshObject::SetupObject ()
 
 
 /// particle backtofront sorting
-struct comppart { csVector3 pos; iParticle *part;};
 static int compareparticle(const void* p1, const void* p2)
 {
-  struct comppart *cp1 = (struct comppart*)p1;
-  struct comppart *cp2 = (struct comppart*)p2;
+  struct csEmitCompPart *cp1 = (struct csEmitCompPart*)p1;
+  struct csEmitCompPart *cp2 = (struct csEmitCompPart*)p2;
   /// pos.z is smaller when close to camera.
   /// bigger z's should be drawn first.
   /// thus the bigger z should be considered first.
@@ -566,7 +576,7 @@ static int compareparticle(const void* p1, const void* p2)
   /// if cp1.z == cp2.z --- return 0 (same)
   /// if cp1.z < cp2.z --- return +1 (draw p1 after p2)
   /// this is the sign of cp2.z - cp1.z
-  float val = cp2->pos.z - cp1->pos.z;
+  float val = cp2->z - cp1->z;
   if(val<0) return -1;
   if(val>0) return +1;
   return 0;
@@ -587,18 +597,18 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
   int i;
   csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform()
     * trans.GetInverse(); // object to camera space
-  struct comppart *order = new struct comppart [number];
+  cpa.SetLength(number);
   for (i = 0 ; i < number ; i++)
   {
-    order[i].pos = tr_o2c * part_pos[i];
-    order[i].part = GetParticle(i);
+    cpa[i].z = (tr_o2c * part_pos[i]).z;
+    cpa[i].part = GetParticle(i);
   }
-  qsort(order, number, sizeof( struct comppart ), compareparticle);
+  qsort(cpa.GetArray(), number, sizeof( struct csEmitCompPart ), 
+    compareparticle);
   
   for (i = 0 ; i < number ; i++)
-    order[i].part->Draw (rview, trans, mode);
+    cpa[i].part->Draw (rview, trans, mode);
 
-  delete[] order;
   return true;
 }
 
