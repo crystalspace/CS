@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	  of csSystemDriver (system specific subclasses) contain some
 	  code.
 	- Moved isys/vfs.h and isys/plugin.h to iutil.
+	- Fixed a bug in the curve static lighting which could cause
+	  curved surfaces to be completely unlit if there were polygons
+	  in the level. One polygon was enough to shadow the curve even
+	  if the polygon was nowhere near the curve.
 10-Oct-2001
 	- Slight optimization in csSector::IntersectSegment() where it
 	  would transform back the intersection point even if there

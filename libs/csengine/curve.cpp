@@ -609,17 +609,21 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       if (has_shadows)
       {
         csFrustum* csf = NULL;
+	bool shadowed = false;
 	shadow_it->Reset ();
 	while (shadow_it->HasNext ())
 	{
 	  csf = shadow_it->Next ();
           // is this point in shadow
-          if (csf->Contains(pos - csf->GetOrigin()))
+          if (csf->Contains (pos - csf->GetOrigin()))
+	  {
+	    shadowed = true;
             break;
+	  }
         }
               
         // if it was found in shadow skip it
-        if (csf != NULL)
+        if (shadowed)
           continue;
       }
 
