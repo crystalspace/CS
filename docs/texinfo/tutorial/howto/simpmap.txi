@@ -35,12 +35,24 @@ Here is the map:
         <v x="-10" y="4" z="-10"/> <v x="10" y="4" z="-10"/>
 	<material>wood</material>
         <texlen>4</texlen>
-        <polygon name="up"> <v>6</v> <v>7</v> <v>5</v> <v>4</v> </polygon>
-        <polygon name="down"> <v>3</v> <v>2</v> <v>0</v> <v>1</v> </polygon>
-        <polygon name="back"> <v>7</v> <v>6</v> <v>2</v> <v>3</v> </polygon>
-        <polygon name="front"> <v>4</v> <v>5</v> <v>1</v> <v>0</v> </polygon>
-        <polygon name="left"> <v>6</v> <v>4</v> <v>0</v> <v>2</v> </polygon>
-        <polygon name="right"> <v>5</v> <v>7</v> <v>3</v> <v>1</v> </polygon>
+        <polygon name="up">
+	  <v>6</v> <v>7</v> <v>5</v> <v>4</v>
+	</polygon>
+        <polygon name="down">
+	  <v>3</v> <v>2</v> <v>0</v> <v>1</v>
+	</polygon>
+        <polygon name="back">
+	  <v>7</v> <v>6</v> <v>2</v> <v>3</v>
+	</polygon>
+        <polygon name="front">
+	  <v>4</v> <v>5</v> <v>1</v> <v>0</v>
+	</polygon>
+        <polygon name="left">
+	  <v>6</v> <v>4</v> <v>0</v> <v>2</v>
+	</polygon>
+        <polygon name="right">
+	  <v>5</v> <v>7</v> <v>3</v> <v>1</v>
+	</polygon>
       </params>
     </meshobj>
     <light>

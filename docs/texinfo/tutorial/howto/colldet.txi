@@ -62,8 +62,8 @@ for a mesh:
 @example
 csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  csRef<iPolygonMesh> polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPolygonMesh);
+  csRef<iPolygonMesh> polmesh =
+    SCF_QUERY_INTERFACE(mesh->GetMeshObject(), iPolygonMesh);
   if (polmesh)
   @{
     csRef<iCollider> cd = cd_sys->CreateCollider (polmesh);
@@ -94,11 +94,11 @@ above:
 @example
 bool MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  csRef<iPolygonMesh> polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPolygonMesh);
+  csRef<iPolygonMesh> polmesh =
+    SCF_QUERY_INTERFACE(mesh->GetMeshObject(), iPolygonMesh);
   if (polmesh)
   @{
-    new csColliderWrapper (mesh->QueryObject (), cd_sys, polmesh);
+    new csColliderWrapper(mesh->QueryObject(), cd_sys, polmesh);
     return true;
   @}
   else
@@ -231,4 +231,3 @@ The include files useful for this section are:
 #include "iengine/mesh.h"
 #include "cstool/collider.h"
 @end example
-

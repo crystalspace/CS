@@ -167,7 +167,8 @@ void SetupWorld ()
   @dots{}
   // Make a ball using the ball plug-in.
   csRef<iMeshObject> ballMesh = ball_factory->NewInstance ();
-  csRef<iBallState> ballState = SCF_QUERY_INTERFACE (ballMesh, iBallState);
+  csRef<iBallState> ballState =
+    SCF_QUERY_INTERFACE (ballMesh, iBallState);
   ballState->SetRadius (.5, .5, .5);
   ballState->SetMaterialWrapper (material);
   ballState->SetRimVertices (12);

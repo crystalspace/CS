@@ -7,6 +7,8 @@ The history order is reversed so that new features are at the top.
 	- Steven Geens made milk2spr add normals to the vertices.
 	- Andreas Busch modified the documentation for spr2d/spr3d/cal2cs 
 	  from old syntax to XML.
+	- Eric Sunshine fixed some Texinfo mark-up errors and eliminated a
+	  number of overfull and underfull hbox warnings reported by TeX.
 11-Jan-2002
 	- Fixed a problem in genmesh where
 	  iObjectModel->GetPolygonMeshColldet() was not returning the

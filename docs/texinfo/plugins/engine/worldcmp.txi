@@ -5,7 +5,7 @@
 
 This section describes the objects used to build a world.  This is useful to
 understand the format of the Crystal Space map file
-(@pxref{Map File Format}).  To understand this you should know the basics of
+(@pxref{XML File Format}).  To understand this you should know the basics of
 the @ref{Portal Engine}.  This section describes the components of the world
 independent from the file format, so it is also useful if you want to build a
 world from within your program.

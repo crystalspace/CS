@@ -56,11 +56,11 @@ arrive at some point in the near future.
 is an example of some code that places an object in some sector and position:
 
 @example
-  iMeshWrapper* mesh = @dots{};
-  iMovable* movable = mesh->GetMovable ();
-  movable->SetSector (room);
-  movable->SetPosition (csVector3 (2, 3, 1));
-  movable->UpdateMove ();
+iMeshWrapper* mesh = @dots{};
+iMovable* movable = mesh->GetMovable ();
+movable->SetSector (room);
+movable->SetPosition (csVector3 (2, 3, 1));
+movable->UpdateMove ();
 @end example
 
 One important function is @code{UpdateMove()}. This function MUST
@@ -71,13 +71,13 @@ the object.
 Here is another example where you let the mesh point to some point in space:
 
 @example
-  iMeshWrapper* mesh;
-  iMovable* movable = mesh->GetMovable ();
-  csVector3 pos (1, 1, 0);
-  movable->SetPosition (pos);
-  movable->GetTransform ().LookAt (csVector3 (5, 2, 0)-pos,
-  	csVector3 (0, 1, 0));
-  movable->UpdateMove ();
+iMeshWrapper* mesh;
+iMovable* movable = mesh->GetMovable ();
+csVector3 pos (1, 1, 0);
+movable->SetPosition (pos);
+movable->GetTransform().LookAt(
+  csVector3 (5, 2, 0)-pos, csVector3 (0, 1, 0));
+movable->UpdateMove ();
 @end example
 
 The @code{LookAt()} function is very nice. It takes a position relative
@@ -129,13 +129,13 @@ they are static and is able to optimize on that. In order to make a thing
 movable you need to do the following in code:
 
 @example
-  iMeshWrapper* mesh = @dots{};
-  csRef<iThingState> state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iThingState);
-  if (state)
-  @{
-    state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
-  @}
+iMeshWrapper* mesh = @dots{};
+csRef<iThingState> state =
+  SCF_QUERY_INTERFACE(mesh->GetMeshObject(), iThingState);
+if (state)
+@{
+state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
+@}
 @end example
 
 Warning: do NOT use the @code{CS_THING_MOVE_OFTEN} flag yet as that
@@ -144,16 +144,16 @@ is not implemented at this moment.
 To do this from within a map file you can do the following:
 
 @example
-  <meshobj name="myObject">
-    <plugin>thing</plugin>
-    <params>
-      <moveable />
-      @dots{}
-    </params>
-    <move>
-      @dots{}
-    </move>
-  </meshobj>
+<meshobj name="myObject">
+  <plugin>thing</plugin>
+  <params>
+    <moveable />
+    @dots{}
+  </params>
+  <move>
+    @dots{}
+  </move>
+</meshobj>
 @end example
 
 If you don't make a thing movable you can only move it with
@@ -164,8 +164,7 @@ If you don't make a thing movable you can only move it with
 The include files useful for this section are:
 
 @example
-  #include "csgeom/transfrm.h"
-  #include "iengine/movable.h"
-  #include "iengine/mesh.h"
+#include "csgeom/transfrm.h"
+#include "iengine/movable.h"
+#include "iengine/mesh.h"
 @end example
-

@@ -123,12 +123,14 @@ List of texture mapping UV coordinates for the polygon.
 List of rgb colors for the polygon.
 @item <animate>@dots{}
 Select an uv animation from the list of animations declared in the template
-@itemize
+@itemize @bullet
+@example
 <animate name="animationname">
     <timing>milliseconds</timing>
     <loop>yes/no</loop>
 </animate>
-@itemize
+@end example
+@itemize @bullet
 @item
 timing > 0 : every <timing> milliseconds the next frame will be shown
 @item
