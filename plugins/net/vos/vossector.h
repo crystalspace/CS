@@ -41,6 +41,8 @@ private:
   csVosA3DL* vosa3dl;
   VOS::vRef<A3DL::Sector> sectorvobj;
 
+  csSet <iVosObject3D *> loadedObjects;
+
   bool isLit;
   int waitingForChildren;
 
@@ -58,6 +60,14 @@ public:
   virtual csRef<iSector> GetSector();
 
   virtual VOS::vRef<VOS::Vobject> GetVobject();
+
+  virtual const csSet<iVosObject3D*> &GetObject3Ds();
+
+  void addObject3D (iVosObject3D *obj);
+  void removeObject3D (iVosObject3D *obj);
+
+  //void addLight (iVosLight *light);
+  //void removeLight (iVosLight *light);
 
   friend class LoadSectorTask;
   friend class RelightTask;

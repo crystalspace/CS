@@ -25,6 +25,7 @@
 #include "iengine/mesh.h"
 #include "iengine/sector.h"
 #include "ivaria/dynamics.h"
+#include "csutil/hash.h"
 
 /** @file 
     This defines the plugin interface for the Crystal Space
@@ -45,6 +46,32 @@
     using VOS.
 */
 
+
+SCF_VERSION (iVosObject3D, 0, 1, 1);
+
+/** This interface bridges between a VOS 3D object and the Crystal
+    Space mesh wrapper created for that object.
+    @bug presently this isn't very useful since nothing yet returns this
+    interface.  Obviously that will change as the iVosSector interface
+    is fleshed out (or an alternate interface is introduced instead of this...).
+*/
+struct iVosObject3D : public iBase
+{
+  /** Get the iMeshWrapper for this Object3D. */
+  virtual csRef<iMeshWrapper> GetMeshWrapper() = 0;
+
+  /** Get the iRigidBody collider for this Object3D. This can be used to
+   *  control the forces o the object - useful for avatars
+   *
+   *  This will return no object if there is no iDynamicsSystem registered in
+   *  the object registry
+   */
+  virtual csRef<iRigidBody> GetCollider() = 0;
+};
+
+
+
+
 SCF_VERSION (iVosSector, 0, 1, 1);
 
 /** This interface bridges between a VOS sector and a Crystal Space
@@ -61,7 +88,16 @@ struct iVosSector : public iBase
   /** Get the Crystal Space iSector for this sector.  This will be
       empty until Load() is called. */
   virtual csRef<iSector> GetSector() = 0;
+
+  /** Get the list of object3ds which have been loaded into this sector. This
+   *  list will change in size as objects are loaded and removed - does not 
+   *  represent the list of objects in the A3DL sector
+   */
+  virtual const csSet<iVosObject3D*> &GetObject3Ds() = 0;
 };
+
+
+
 
 SCF_VERSION (iVosA3DL, 0, 1, 1);
 
@@ -89,28 +125,6 @@ struct iVosA3DL : public iBase
       @bug no way (yet) to tell you if the sector doesn't exist
    */
   virtual csRef<iVosSector> GetSector(const char*) = 0;
-};
-
-SCF_VERSION (iVosObject3D, 0, 1, 1);
-
-/** This interface bridges between a VOS 3D object and the Crystal
-    Space mesh wrapper created for that object.
-    @bug presently this isn't very useful since nothing yet returns this
-    interface.  Obviously that will change as the iVosSector interface
-    is fleshed out (or an alternate interface is introduced instead of this...).
-*/
-struct iVosObject3D : public iBase
-{
-  /** Get the iMeshWrapper for this Object3D. */
-  virtual csRef<iMeshWrapper> GetMeshWrapper() = 0;
-
-  /** Get the iRigidBody collider for this Object3D. This can be used to
-   *  control the forces o the object - useful for avatars
-   *
-   *  This will return no object if there is no iDynamicsSystem registered in
-   *  the object registry
-   */
-  virtual csRef<iRigidBody> GetCollider() = 0;
 };
 
 #endif

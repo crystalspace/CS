@@ -120,12 +120,14 @@ void LoadObjectTask::doTask()
   {
     if (toRemove)
     {
+	  sector->removeObject3D (obj3d->GetCSinterface());
       sector->GetSector()->GetMeshes()->Remove (wrapper);
       //wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
 	  //wrapper->GetMovable()->UpdateMove();
     }
     else
     {
+	  sector->addObject3D (obj3d->GetCSinterface());
       if (wrapper->GetMovable()->GetSectors()->Find (sector->GetSector()))
       {
         LOG("LoadObjectTask", 3, "Object already setup and in sector");
@@ -142,11 +144,16 @@ void LoadObjectTask::doTask()
   {
     if (toRemove)
     {
+	  sector->removeObject3D (obj3d->GetCSinterface());
       LOG("LoadObjectTask", 2, "Attempting to remove empty meshwrapper!");
     }
     else
     {
       LOG("LoadObjectTask", 2, "Setting up object3D")
+	  if (obj3d->GetCSinterface() == NULL)
+		LOG("NEIL-LOG", 1, "Uh oh");
+
+	  sector->addObject3D (obj3d->GetCSinterface());
 	  TaskQueue::defaultTQ().addTask(new SetupObjectTask(vosa3dl, obj3d, sector));
     }
   }
@@ -170,6 +177,21 @@ csVosSector::~csVosSector()
 {
   free(url);
   SCF_DESTRUCT_IBASE();
+}
+
+const csSet<iVosObject3D*> &csVosSector::GetObject3Ds()
+{
+  return loadedObjects;
+}
+
+void csVosSector::addObject3D (iVosObject3D *obj)
+{
+  loadedObjects.Add (obj);
+}
+
+void csVosSector::removeObject3D (iVosObject3D *obj)
+{
+  loadedObjects.Delete (obj);
 }
 
 void csVosSector::Load()
