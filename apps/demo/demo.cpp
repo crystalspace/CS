@@ -49,6 +49,7 @@
 #include "imesh/sprite3d.h"
 #include "imesh/ball.h"
 #include "imesh/surf.h"
+#include "imesh/stars.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
 #include "iutil/comp.h"
@@ -518,6 +519,30 @@ void Demo::SetupSector ()
   il->DecRef ();
   room->GetLights ()->Add (light->QueryLight ());
   light->DecRef ();
+
+  //====================================================================
+  iMeshFactoryWrapper *mf = engine->CreateMeshFactory(
+    "crystalspace.mesh.object.stars", "starFact");
+  csVector3 starsmeshposition(0,0,0);
+  iMeshWrapper *starbox = engine->CreateMeshWrapper(mf,
+    "starbox", room, starsmeshposition);
+  //starbox->SetRenderPriority(); for skyboxes...
+  starbox->SetZBufMode(CS_ZBUF_NONE);
+  starbox->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
+  starbox->GetFlags().Set(CS_ENTITY_NOSHADOWS | CS_ENTITY_NOLIGHTING);
+    //CS_ENTITY_CAMERA | CS_ENTITY_NOSHADOWS | 
+    //CS_ENTITY_NOLIGHTING);
+  iStarsState *starstate = SCF_QUERY_INTERFACE( starbox->GetMeshObject(),
+    iStarsState);
+  starstate->SetBox(csBox3(-500, -500, -500, 500, 500, 500));
+  starstate->SetColor(csColor(0.9,0.9,1));
+  starstate->SetDensity(.0001);
+  starstate->SetMaxDistance(100);
+  starstate->SetMaxColor( csColor(0,0,0) );
+  starstate->DecRef();
+  mf->DecRef();
+  starbox->DecRef();
+  
 }
 
 void Demo::SetupObjects ()
