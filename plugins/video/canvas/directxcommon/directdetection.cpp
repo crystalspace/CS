@@ -86,6 +86,8 @@ DirectDetection::~DirectDetection ()
     while (cur)
     {
       DirectDetectionDevice *next = cur->next;
+      if (cur->DeviceName2D) free (cur->DeviceName2D);
+      if (cur->DeviceDescription2D) free (cur->DeviceDescription2D);
       delete cur;
       cur = next;
     }
