@@ -36,7 +36,7 @@ private:
   iAwsPrefManager *awsprefs;
   iAwsCanvas *awsCanvas;
   iSector* room;
-  iView* view;
+  iView* view, *wview;
   iGraphics3D *myG3D;
   iGraphics2D *myG2D;
   iVFS *myVFS;

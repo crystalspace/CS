@@ -98,6 +98,7 @@ awsTest::awsTest()
   loader = NULL;
   aws = NULL;
   view = NULL;
+  wview=NULL;
   message[0] = 0;
 
 #if 0
@@ -130,6 +131,7 @@ awsTest::~awsTest()
 {
   SCF_DEC_REF (vc);
   SCF_DEC_REF (view);
+  SCF_DEC_REF (wawview);
   SCF_DEC_REF (font);
   SCF_DEC_REF (aws);
   SCF_DEC_REF (loader);
@@ -372,6 +374,10 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
 
+  wview = new csView (engine, myG3D);
+  wview->GetCamera ()->SetSector (room);
+  wview->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+   
   txtmgr->SetPalette ();
   col_red = txtmgr->FindRGB (255, 0, 0);
   col_blue = txtmgr->FindRGB (0, 0, 255);
@@ -416,9 +422,13 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   printf("aws-debug: Creating splash window...\n");
   iAwsWindow *test = aws->CreateWindowFrom("Splash");
   iAwsWindow *test2 = aws->CreateWindowFrom("Another");
-
+  iAwsWindow *test3 = aws->CreateWindowFrom("Engine View");
+  
+  test3->SetEngineView(wview);
 
   if (test)  test->Show();
+  if (test3) test3->Show();
+  
   //if (test2) test2->Show();
   s->SetTestWin(test2);
   
@@ -434,8 +444,9 @@ awsTest::SetupFrame()
 {
   static int counter=0;
     
-  iCamera* c = view->GetCamera();
-  
+  iCamera* c = view->GetCamera();   
+  iCamera* c2 = wview->GetCamera();   
+
   counter++;
   
   // First get elapsed time from the system driver.
@@ -447,6 +458,7 @@ awsTest::SetupFrame()
   float speed = (elapsed_time / 1000.0) * (0.03 * 2);
 
   c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+  c2->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   
   // Tell 3D driver we're going to display 3D things.
   if (!myG3D->BeginDraw (
