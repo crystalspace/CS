@@ -335,7 +335,7 @@ void csGraphics3DSoftwareCommon::NewInitialize ()
 {
   config.AddConfig(object_reg, "/config/soft3d.cfg");
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
-  mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
+  mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3f);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
 #ifdef DO_MMX
@@ -1362,7 +1362,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
   render_target = 0;
 }
 
-#define SMALL_D 0.01
+#define SMALL_D 0.01f
 
 /**
  * The engine often generates "empty" polygons, for example
@@ -1373,7 +1373,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
  * for distance is sqrt(dX^2 + dY^2) but to avoid root and multiply
  * DrawPolygon checks abs(dX) + abs(dY). This is enough.
  */
-#define VERTEX_NEAR_THRESHOLD   0.001
+#define VERTEX_NEAR_THRESHOLD   0.001f
 
 /*
  * For the four interpolation modes.
@@ -2022,10 +2022,10 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
 
     // Find the largest texture rectangle that is going to be displayed
-    float u_min = +99999999;
-    float v_min = +99999999;
-    float u_max = -99999999;
-    float v_max = -99999999;
+    float u_min = +99999999.0f;
+    float v_min = +99999999.0f;
+    float u_max = -99999999.0f;
+    float v_max = -99999999.0f;
 
     // Do a quick polygon scan at the edges to find mi/max u and v
     for ( ; ; )

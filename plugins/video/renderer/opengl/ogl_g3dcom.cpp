@@ -862,8 +862,8 @@ bool csGraphics3DOGLCommon::NewOpen ()
 	cfgfkey << OGLCONFIGS_PREFIX << oglconfig << OGLCONFIGS_SUFFIX;
 	csString cfgfile("/config/");
 	cfgfile << config->GetStr(cfgfkey.GetData());
-	config.AddConfig(object_reg, cfgfile.GetData(),
-	  iConfigManager::ConfigPriorityPlugin + 1);
+	config.AddConfig (object_reg, cfgfile.GetData(),
+	  true, iConfigManager::ConfigPriorityPlugin + 1);
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
 	  oglconfig.GetData(), cfgfile.GetData());
       }
@@ -3177,7 +3177,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     }
 
     float sz = poly.z[i];
-    if (ABS (sz) < SMALL_EPSILON) sz = 1. / SMALL_EPSILON;
+    if (ABS (sz) < SMALL_EPSILON) sz = 1.0f / SMALL_EPSILON;
     else sz = 1./sz;
 
     *glverts++ = poly.vertices[i].x * sz;
@@ -3417,9 +3417,9 @@ void csGraphics3DOGLCommon::SetupClippingPlanes (
     // easy way to optimize this.
     if (transform)
       frustum_planes[num_planes] = o2c.This2OtherRelative (
-        csPlane3 (0, 0, -1, .001));
+        csPlane3 (0, 0, -1.0f, 0.001f));
     else
-      frustum_planes[num_planes] = csPlane3 (0, 0, -1, .001);
+      frustum_planes[num_planes] = csPlane3 (0, 0, -1.0f, 0.001f);
     num_planes++;
   }
 

@@ -214,6 +214,7 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
     Scan.tw2 = 0;
     Scan.th2 = 0;
   }
+  
   Scan.min_u = (tmapping->GetIMinU () >> MipMap) << 16;
   Scan.min_v = (tmapping->GetIMinV () >> MipMap) << 16;
 
