@@ -123,7 +123,7 @@
  * NULL is returned. NULL is also returned if the plugin with respective
  * functionality is simply not found. If you need the plugin with given
  * functionality identifier no matter which interface it implements, ask
- * for some basic interface, say iBase or iPlugIn.
+ * for some basic interface, say iBase or iPlugin.
  */
 #define CS_QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
   (Interface *)(Object)->QueryPlugIn (FuncID, #Interface, VERSION_##Interface)
@@ -136,7 +136,7 @@
  * returned if the plugin with respective functionality is simply not
  * found. If you need the plugin with given functionality identifier no
  * matter which interface it implements, ask for some basic interface,
- * say iBase or iPlugIn.
+ * say iBase or iPlugin.
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)			\
   (Interface *)(Object)->QueryPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
@@ -159,7 +159,7 @@
 #define _CS_LOAD_PLUGIN(Object,ClassID,FuncID)				\
   (Object)->LoadPlugIn (ClassID, FuncID, NULL, 0)
 
-struct iPlugIn;
+struct iPlugin;
 struct iVFS;
 struct iEventOutlet;
 struct iEventPlug;
@@ -302,10 +302,10 @@ struct iSystem : public iBase
   /// Find a plugin given his class ID and functionality ID
   virtual iBase *QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list
-  virtual bool UnloadPlugIn (iPlugIn *iObject) = 0;
-  /// Register a object that implements the iPlugIn interface as a plugin
+  virtual bool UnloadPlugIn (iPlugin *iObject) = 0;
+  /// Register a object that implements the iPlugin interface as a plugin
   virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID,
-    iPlugIn *iObject) = 0;
+    iPlugin *iObject) = 0;
   /// Get the number of loaded plugins in the plugin manager.
   virtual int GetPlugInCount () = 0;
   /// Get the specified plugin from the plugin manager.
@@ -349,7 +349,7 @@ struct iSystem : public iBase
   //------------------------------ Event manager -----------------------------//
 
   /// Register the plugin to receive specific events
-  virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask) = 0;
+  virtual bool CallOnEvents (iPlugin *iObject, unsigned int iEventMask) = 0;
   /// Query current state for given key
   virtual bool GetKeyState (int key) = 0;
   /// Query current state for given mouse button (1..CS_MAX_MOUSE_BUTTONS)

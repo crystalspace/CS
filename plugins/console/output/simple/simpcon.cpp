@@ -40,11 +40,11 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csSimpleConsole)
   SCF_IMPLEMENTS_INTERFACE (iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSimpleConsole)
@@ -58,7 +58,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csSimpleConsole::csSimpleConsole (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   LineMessage = NULL;
   Line = NULL;
   LinesChanged = NULL;
@@ -145,7 +145,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   CursorTime = System->GetTime ();
 
   // We want to see broadcast events
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }

@@ -62,38 +62,38 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csBallFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallFactoryLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBallFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallFactorySaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBallLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBallSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallSaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBallFactoryLoader)
@@ -137,7 +137,7 @@ static void ReportError (iReporter* reporter, const char* id,
 csBallFactoryLoader::csBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   reporter = NULL;
 }
 
@@ -180,7 +180,7 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
 csBallFactorySaver::csBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   reporter = NULL;
 }
 
@@ -209,7 +209,7 @@ void csBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csBallLoader::csBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   reporter = NULL;
 }
 
@@ -429,7 +429,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 csBallSaver::csBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   reporter = NULL;
 }
 

@@ -40,13 +40,13 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csIsoEngine)
   SCF_IMPLEMENTS_INTERFACE (iIsoEngine)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csIsoEngine)
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoEngine::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_EXPORT_CLASS_TABLE (iso)
@@ -58,7 +58,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csIsoEngine::csIsoEngine (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   system = NULL;
   g2d = NULL;
   g3d = NULL;
@@ -77,7 +77,7 @@ bool csIsoEngine::Initialize (iSystem* p)
 {
   system = p;
   // Tell system driver that we want to handle broadcast events
-  if (!system->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast))
+  if (!system->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
     return false;
   return true;
 }

@@ -191,12 +191,12 @@ public:
   virtual iSequence* NewSequence ();
   virtual void RunSequence (csTime time, iSequence* sequence);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSequenceManager);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __CS_SEQUENCE_H__

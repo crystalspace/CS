@@ -108,12 +108,12 @@ public:
     return csRAPIDCollider::GetFirstHit ();
   }
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRapidCollideSystem);
     virtual bool Initialize (iSystem*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // _RAPID_H_

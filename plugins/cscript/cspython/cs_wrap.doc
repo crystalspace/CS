@@ -190,7 +190,7 @@ self.blue
 
 self.alpha
 
-1.5.  class iPlugIn
+1.5.  class iPlugin
 -------------------
 
 Initialize(iSys)

@@ -192,12 +192,12 @@ protected:
   virtual void DebugSetBreak (int frame_num)
   { break_frame = frame_num; }
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPerfStats);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __CS_PERFSTAT_H__

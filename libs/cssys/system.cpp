@@ -56,9 +56,9 @@ void default_fatal_exit (int errorcode, bool canreturn)
 
 void (*fatal_exit) (int errorcode, bool canreturn) = default_fatal_exit;
 
-//------------------------------------------------------- csPlugIn class -----//
+//------------------------------------------------------- csPlugin class -----//
 
-csSystemDriver::csPlugIn::csPlugIn (iPlugIn *iObject, const char *iClassID,
+csSystemDriver::csPlugin::csPlugin (iPlugin *iObject, const char *iClassID,
   const char *iFuncID)
 {
   PlugIn = iObject;
@@ -67,7 +67,7 @@ csSystemDriver::csPlugIn::csPlugIn (iPlugIn *iObject, const char *iClassID,
   EventMask = 0;
 }
 
-csSystemDriver::csPlugIn::~csPlugIn ()
+csSystemDriver::csPlugin::~csPlugin ()
 {
   delete [] ClassID;
   delete [] FuncID;
@@ -552,7 +552,7 @@ void csSystemDriver::NextFrame ()
   // See if any plugin wants to be called every frame
   for (i = 0; i < PlugIns.Length (); i++)
   {
-    csPlugIn *plugin = PlugIns.Get (i);
+    csPlugin *plugin = PlugIns.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
       csEvent Event (Time (), csevBroadcast, cscmdPreProcess);
@@ -570,7 +570,7 @@ void csSystemDriver::NextFrame ()
   // If a plugin has set CSMASK_Nothing, it receives cscmdPostProcess events too
   for (i = 0; i < PlugIns.Length (); i++)
   {
-    csPlugIn *plugin = PlugIns.Get (i);
+    csPlugin *plugin = PlugIns.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
       csEvent Event (Time (), csevBroadcast, cscmdPostProcess);
@@ -609,7 +609,7 @@ bool csSystemDriver::HandleEvent (iEvent&Event)
   bool canstop = !(Event.Flags & CSEF_BROADCAST);
   for (int i = 0; i < PlugIns.Length (); i++)
   {
-    csPlugIn *plugin = PlugIns.Get (i);
+    csPlugin *plugin = PlugIns.Get (i);
     if (plugin->EventMask & evmask)
       if (plugin->PlugIn->HandleEvent (Event) && canstop)
         return true;
@@ -715,7 +715,7 @@ void csSystemDriver::Help ()
   csEvent HelpEvent (Time (), csevBroadcast, cscmdCommandLineHelp);
   for (int i = 0; i < PlugIns.Length (); i++)
   {
-    csPlugIn *plugin = PlugIns.Get (i);
+    csPlugin *plugin = PlugIns.Get (i);
     iConfig *Config = SCF_QUERY_INTERFACE (plugin->PlugIn, iConfig);
     if (Config)
     {
@@ -763,7 +763,7 @@ void csSystemDriver::DebugTextOut (bool flush, const char *str)
   }
 }
 
-void csSystemDriver::QueryOptions (iPlugIn *iObject)
+void csSystemDriver::QueryOptions (iPlugin *iObject)
 {
   iConfig *Config = SCF_QUERY_INTERFACE (iObject, iConfig);
   if (Config)
@@ -932,12 +932,12 @@ void csSystemDriver::Printf (int mode, char const* format, ...)
 iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
 {
-  iPlugIn *p = SCF_CREATE_INSTANCE (iClassID, iPlugIn);
+  iPlugin *p = SCF_CREATE_INSTANCE (iClassID, iPlugin);
   if (!p)
     Printf (CS_MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
-    int index = PlugIns.Push (new csPlugIn (p, iClassID, iFuncID));
+    int index = PlugIns.Push (new csPlugin (p, iClassID, iFuncID));
     if (p->Initialize (this))
     {
       iBase *ret;
@@ -959,9 +959,9 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
 }
 
 bool csSystemDriver::RegisterPlugIn (const char *iClassID,
-  const char *iFuncID, iPlugIn *iObject)
+  const char *iFuncID, iPlugin *iObject)
 {
-  int index = PlugIns.Push (new csPlugIn (iObject, iClassID, iFuncID));
+  int index = PlugIns.Push (new csPlugin (iObject, iClassID, iFuncID));
   if (iObject->Initialize (this))
   {
     QueryOptions (iObject);
@@ -983,7 +983,7 @@ int csSystemDriver::GetPlugInCount ()
 
 iBase* csSystemDriver::GetPlugIn (int idx)
 {
-  csPlugIn* pl = PlugIns.Get (idx);
+  csPlugin* pl = PlugIns.Get (idx);
   return pl->PlugIn;
 }
 
@@ -1018,7 +1018,7 @@ iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID,
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   for (i = 0 ; i < PlugIns.Length () ; i++)
   {
-    csPlugIn* pl = PlugIns.Get (i);
+    csPlugin* pl = PlugIns.Get (i);
     if (pl->ClassID && pl->FuncID)
       if (pl->ClassID == iClassID || !strcmp (pl->ClassID, iClassID))
       {
@@ -1031,7 +1031,7 @@ iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID,
   return NULL;
 }
 
-bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
+bool csSystemDriver::UnloadPlugIn (iPlugin *iObject)
 {
   int idx = PlugIns.FindKey (iObject);
   if (idx < 0)
@@ -1049,7 +1049,7 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
     config->DecRef ();
   }
 
-  csPlugIn *p = PlugIns.Get (idx);
+  csPlugin *p = PlugIns.Get (idx);
 
 #define CHECK(Var,Func)						\
   if (!strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
@@ -1089,13 +1089,13 @@ bool csSystemDriver::SaveConfig ()
   return Config->Save ();
 }
 
-bool csSystemDriver::CallOnEvents (iPlugIn *iObject, unsigned int iEventMask)
+bool csSystemDriver::CallOnEvents (iPlugin *iObject, unsigned int iEventMask)
 {
   int idx = PlugIns.FindKey (iObject);
   if (idx < 0)
     return false;
 
-  csPlugIn *plugin = PlugIns.Get (idx);
+  csPlugin *plugin = PlugIns.Get (idx);
   plugin->EventMask = iEventMask;
   return true;
 }

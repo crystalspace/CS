@@ -55,11 +55,11 @@ int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
 
 SCF_IMPLEMENT_IBASE (csDefaultFontServer)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csDefaultFontServer::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csDefaultFontServer)
@@ -72,7 +72,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csDefaultFontServer::csDefaultFontServer (iBase *pParent) : System(0)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csDefaultFontServer::~csDefaultFontServer()

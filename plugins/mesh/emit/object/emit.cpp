@@ -849,11 +849,11 @@ iMeshObject* csEmitMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csEmitMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectType::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csEmitMeshObjectType)
@@ -866,7 +866,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csEmitMeshObjectType::csEmitMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csEmitMeshObjectType::~csEmitMeshObjectType ()

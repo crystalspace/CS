@@ -127,7 +127,7 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   CsPrintf (CS_MSG_INITIALIZATION, "\n");
  
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 

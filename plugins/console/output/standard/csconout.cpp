@@ -36,11 +36,11 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csConsoleOutput)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csConsoleOutput)
@@ -53,7 +53,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csConsoleOutput::csConsoleOutput (iBase *base)
 {
   SCF_CONSTRUCT_IBASE (base);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
   transparent = false;		// Default to no transparency
@@ -106,7 +106,7 @@ bool csConsoleOutput::Initialize (iSystem *system)
   flash_time = System->GetTime ();
 
   // We want to see broadcast events
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 

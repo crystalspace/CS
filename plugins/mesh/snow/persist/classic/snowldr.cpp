@@ -61,38 +61,38 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csSnowFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowFactoryLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSnowFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowFactorySaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSnowLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSnowSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowSaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSnowFactoryLoader)
@@ -115,7 +115,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSnowFactoryLoader::~csSnowFactoryLoader ()
@@ -143,7 +143,7 @@ iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
 csSnowFactorySaver::csSnowFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSnowFactorySaver::~csSnowFactorySaver ()
@@ -180,7 +180,7 @@ void csSnowFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csSnowLoader::csSnowLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSnowLoader::~csSnowLoader ()
@@ -376,7 +376,7 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
 csSnowSaver::csSnowSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSnowSaver::~csSnowSaver ()

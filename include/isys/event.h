@@ -23,7 +23,7 @@
 #include "isys/evdefs.h"
 #include "csutil/scf.h"
 
-struct iPlugIn;
+struct iPlugin;
 
 SCF_VERSION (iEvent, 0, 0, 1);
 
@@ -279,12 +279,12 @@ struct iEventCord
    * significant since returning true from HandleEvent will
    * stop further event processing.
    */
-  virtual int Insert (iPlugIn *plugin, int priority) = 0;
+  virtual int Insert (iPlugin *plugin, int priority) = 0;
 
   /**
    * Remove a plugin from the queue.
    */
-  virtual void Remove (iPlugIn *plugin) = 0;
+  virtual void Remove (iPlugin *plugin) = 0;
 
   /**
    * Returns true if events are passed on to the

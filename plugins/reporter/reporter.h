@@ -65,12 +65,12 @@ public:
   virtual const char* GetMessageId (int idx) const;
   virtual const char* GetMessageDescription (int idx) const;
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE (csReporter);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return true; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __CS_REPORTER_H__

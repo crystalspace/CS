@@ -222,12 +222,12 @@ public:
    */
   virtual iFont *GetFont (int iIndex);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFreeTypeServer);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __CS_FREEFONT_H__

@@ -106,7 +106,7 @@ struct csKeyMap
  * Debugger plugin. Loading this plugin is sufficient to get debugging
  * functionality in your application.
  */
-class csBugPlug : public iPlugIn
+class csBugPlug : public iPlugin
 {
 private:
   iSystem *System;

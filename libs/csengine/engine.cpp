@@ -348,13 +348,13 @@ bool csEngine::do_rad_debug = false;
 
 SCF_IMPLEMENT_IBASE (csEngine)
   SCF_IMPLEMENTS_INTERFACE (iEngine)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::iObjectInterface)
@@ -375,7 +375,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   engine_mode = CS_ENGINE_AUTODETECT;
@@ -469,7 +469,7 @@ bool csEngine::Initialize (iSystem* sys)
     CsPrintf (CS_MSG_WARNING, "No image loader. Loading images will fail.\n");
 
   // Tell system driver that we want to handle broadcast events
-  if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast))
+  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
     return false;
   
   csConfigAccess cfg(System, "/config/engine.cfg");

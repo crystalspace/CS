@@ -40,17 +40,17 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundDriverWaveOut)
   SCF_IMPLEMENTS_INTERFACE(iSoundDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundDriverWaveOut::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 
   System = NULL;
   SoundRender = NULL;
@@ -66,7 +66,7 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 {
   System = iSys;
-  System->CallOnEvents(&scfiPlugIn, csevCommand | csevBroadcast);
+  System->CallOnEvents(&scfiPlugin, csevCommand | csevBroadcast);
   Config.AddConfig(System, "/config/sound.cfg");
   return true;
 }

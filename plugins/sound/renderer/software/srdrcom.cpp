@@ -45,17 +45,17 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundRenderSoftware)
 	SCF_IMPLEMENTS_INTERFACE(iSoundRender)
-	SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+	SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END;
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderSoftware::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
 {
   SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   System = NULL;
   SoundDriver = NULL;
   Listener = NULL;
@@ -70,7 +70,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   System = iSys;
 
   // set event callback
-  System->CallOnEvents(&scfiPlugIn,
+  System->CallOnEvents(&scfiPlugin,
     CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
 
   // read the config file

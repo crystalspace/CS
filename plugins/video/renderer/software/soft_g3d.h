@@ -32,7 +32,7 @@ public:
   csGraphics3DSoftware (iBase*);
   /// Destructor
   virtual ~csGraphics3DSoftware ();
-  /// Initialize iPlugIn.
+  /// Initialize iPlugin.
   virtual bool Initialize (iSystem*);
   /// Open a canvas.
   virtual bool Open (const char *Title);

@@ -58,13 +58,13 @@ public:
  
   void SndDoubleBackProc(SndChannelPtr, SndDoubleBufferPtr);
   
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverMac);
     virtual bool Initialize (iSystem* p)
     { scfParent->m_piSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 
  private:
   SndDoubleBufferHeader	mSoundDBHeader;

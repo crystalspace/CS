@@ -242,12 +242,12 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csStarsMeshObjectType);
     virtual bool Initialize (iSystem*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // _STARS_H_

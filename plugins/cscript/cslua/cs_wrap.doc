@@ -83,7 +83,7 @@ csRGBpixel_blue_get
 csRGBpixel_alpha_set
 csRGBpixel_alpha_get
 
-1.5.  class iPlugIn
+1.5.  class iPlugin
 -------------------
 
 iPlugIn_Initialize

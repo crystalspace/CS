@@ -62,12 +62,12 @@ public:
 
   const char *GetError(HRESULT result);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderEAX);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 
 public:
   LPDIRECTSOUND AudioRenderer;

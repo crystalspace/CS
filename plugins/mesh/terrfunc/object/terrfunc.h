@@ -606,13 +606,13 @@ public:
   /// get supported object features
   virtual uint32 GetFeatures () const;
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncObjectType);
     virtual bool Initialize (iSystem* p)
     { scfParent->pSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 

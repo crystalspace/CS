@@ -37,28 +37,28 @@ class csSoundLoader_IFF : public iSoundLoader
 public:
   SCF_DECLARE_IBASE;
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundLoader_IFF);
     virtual bool Initialize (iSystem*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 
   csSoundLoader_IFF(iBase *p)
   {
     SCF_CONSTRUCT_IBASE(p);
-    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   }
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_IFF)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END;
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoader_IFF::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_IFF);

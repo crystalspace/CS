@@ -161,17 +161,17 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csSequenceManager)
   SCF_IMPLEMENTS_INTERFACE (iSequenceManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSequenceManager::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSequenceManager::csSequenceManager (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   System = NULL;
   main_sequence = new csSequence (this);
   previous_time_valid = false;
@@ -187,7 +187,7 @@ csSequenceManager::~csSequenceManager ()
 bool csSequenceManager::Initialize (iSystem *system)
 {
   System = system;
-  if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing))
+  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
     return false;
   return true;
 }

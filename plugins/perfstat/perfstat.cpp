@@ -40,11 +40,11 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csPerfStats)
   SCF_IMPLEMENTS_INTERFACE (iPerfStats)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csPerfStats::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define SysPrintf System->Printf
@@ -52,7 +52,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csPerfStats::csPerfStats (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   Engine = NULL;
   file_name = NULL;
   statlog_section = NULL;
@@ -80,7 +80,7 @@ csPerfStats::~csPerfStats ()
 bool csPerfStats::Initialize (iSystem *system)
 {
   System = system;
-  if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing))
+  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
     return false;
   sub_section = super_section = NULL;
   // default resolution

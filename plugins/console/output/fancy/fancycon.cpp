@@ -37,11 +37,11 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csFancyConsole)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE(iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csFancyConsole)
@@ -56,7 +56,7 @@ csFancyConsole::csFancyConsole (iBase *p) :
   pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
   SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csFancyConsole::~csFancyConsole ()
@@ -97,7 +97,7 @@ bool csFancyConsole::Initialize (iSystem *system)
   ImageLoader = NULL;
 
   // Tell system driver that we want to handle broadcast events
-  if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast))
+  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
     return false;
 
   int x, y, w, h;

@@ -68,12 +68,12 @@ public:
   csConfigAccess Config;
   csTime LastTime;
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __CS_SNDRDR_H__

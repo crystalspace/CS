@@ -91,23 +91,23 @@ protected:
   /// Are we inbetween StartFrame() and FinishFrame()?
   bool InFrame;
 
-  /// The iPlugIn interface
-  class csAppPlugIn : public iPlugIn
+  /// The iPlugin interface
+  class csAppPlugin : public iPlugin
   {
     SCF_DECLARE_IBASE;
     /// The parent application
     csApp *app;
 
     /// Initialize
-    csAppPlugIn (csApp *iParent);
+    csAppPlugin (csApp *iParent);
 
     /// Initialize the application plugin (called by system driver)
     virtual bool Initialize (iSystem *System);
 
     /// Handle a event and return true if processed; called by system driver
     virtual bool HandleEvent (iEvent &Event);
-  } *scfiPlugIn;
-  friend class csAppPlugIn;
+  } *scfiPlugin;
+  friend class csAppPlugin;
 
   /// A structure for keeping modal information on a stack.
   struct csModalInfo

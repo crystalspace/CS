@@ -57,38 +57,38 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csSurfFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfFactoryLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSurfFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfFactorySaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSurfLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSurfSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfSaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSurfFactoryLoader)
@@ -114,7 +114,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csSurfFactoryLoader::csSurfFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSurfFactoryLoader::~csSurfFactoryLoader ()
@@ -142,7 +142,7 @@ iBase* csSurfFactoryLoader::Parse (const char* /*string*/,
 csSurfFactorySaver::csSurfFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSurfFactorySaver::~csSurfFactorySaver ()
@@ -162,7 +162,7 @@ void csSurfFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csSurfLoader::csSurfLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSurfLoader::~csSurfLoader ()
@@ -332,7 +332,7 @@ iBase* csSurfLoader::Parse (const char* string, iEngine* engine,
 csSurfSaver::csSurfSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csSurfSaver::~csSurfSaver ()

@@ -249,12 +249,12 @@ public:
   virtual void DrawPixmap (iTextureHandle*, int, int, int, int, int, int,
     int, int, uint8);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DNull);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __NULL_G3D_H__

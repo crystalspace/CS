@@ -48,20 +48,20 @@ public:
   virtual iModelData *Load (UByte* Buffer, ULong Size);
   virtual iDataBuffer *Save (iModelData*, const char *Format);
 
-  struct Plugin : public iPlugIn {
+  struct Plugin : public iPlugin {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMultiplexer);
     virtual bool Initialize (iSystem *sys)
     { return scfParent->Initialize (sys); }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 SCF_IMPLEMENT_IBASE (csModelConverterMultiplexer)
   SCF_IMPLEMENTS_INTERFACE (iModelConverter)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterMultiplexer::Plugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer);
@@ -77,7 +77,7 @@ CS_IMPLEMENT_PLUGIN
 csModelConverterMultiplexer::csModelConverterMultiplexer (iBase *p)
 {
   SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
 }
 
 csModelConverterMultiplexer::~csModelConverterMultiplexer ()

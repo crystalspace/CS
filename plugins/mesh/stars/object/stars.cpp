@@ -156,11 +156,11 @@ iMeshObject* csStarsMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csStarsMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csStarsMeshObjectType::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csStarsMeshObjectType)
@@ -173,7 +173,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csStarsMeshObjectType::csStarsMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csStarsMeshObjectType::~csStarsMeshObjectType ()

@@ -361,7 +361,7 @@ bool csGraphics2DSDL::Open(const char *Title)
 
   pfmt.complete ();
   Clear(0);
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
 
   if (!EventOutlet)
     EventOutlet = System->CreateEventOutlet (this);

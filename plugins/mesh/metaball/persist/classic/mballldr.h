@@ -47,12 +47,12 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallFactoryLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 
@@ -76,12 +76,12 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallFactorySaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 
@@ -105,12 +105,12 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 
@@ -134,12 +134,12 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallSaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 

@@ -166,13 +166,13 @@ public:
  
   //////////////////////////////////////
 
-  // Implement iPlugIn interface.
-  struct eiPlugIn : public iPlugIn
+  // Implement iPlugin interface.
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(awsManager);
     virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent(iEvent&)   { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
  
 #endif

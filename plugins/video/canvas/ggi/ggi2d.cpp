@@ -150,7 +150,7 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
   pfmt.complete ();
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 

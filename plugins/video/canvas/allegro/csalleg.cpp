@@ -109,7 +109,7 @@ bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
 
   Font = 0;
   Memory = NULL;
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   EventOutlet = System->CreateEventOutlet (this);
   return true;
 }

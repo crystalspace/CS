@@ -61,38 +61,38 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallFactoryLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallFactorySaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallLoader::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallSaver::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMetaBallFactoryLoader)
@@ -114,7 +114,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csMetaBallFactoryLoader::~csMetaBallFactoryLoader ()
@@ -142,7 +142,7 @@ iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
 csMetaBallFactorySaver::csMetaBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csMetaBallFactorySaver::~csMetaBallFactorySaver ()
@@ -162,7 +162,7 @@ void csMetaBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csMetaBallLoader::csMetaBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csMetaBallLoader::~csMetaBallLoader ()
@@ -356,7 +356,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 csMetaBallSaver::csMetaBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 }
 
 csMetaBallSaver::~csMetaBallSaver ()

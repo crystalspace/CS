@@ -251,13 +251,13 @@ public:
   } scfiConfig;
   friend struct csCubeConfig;
 
-  //------------------- iPlugIn interface implementation -------------------
-  struct eiPlugIn : public iPlugIn
+  //------------------- iPlugin interface implementation -------------------
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeMeshObjectType);
     virtual bool Initialize (iSystem*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // _CUBE_H_

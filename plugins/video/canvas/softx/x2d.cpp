@@ -248,7 +248,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 

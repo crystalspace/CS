@@ -52,12 +52,12 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallFactoryLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 /**
@@ -84,12 +84,12 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallFactorySaver);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 /**
@@ -116,12 +116,12 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 /**
@@ -148,12 +148,12 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallSaver);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // _BALLLDR_H_

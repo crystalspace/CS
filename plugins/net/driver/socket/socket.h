@@ -119,12 +119,12 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSocketDriver);
     virtual bool Initialize (iSystem*);
     virtual bool HandleEvent (iEvent&);
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 

@@ -61,20 +61,20 @@ class csSystemDriver : public iSystem
   /*
    * This is a private structure used to keep the list of plugins.
    */
-  class csPlugIn
+  class csPlugin
   {
   public:
     // The plugin itself
-    iPlugIn *PlugIn;
+    iPlugin *PlugIn;
     // The class ID of the plugin, and their functionality ID
     char *ClassID, *FuncID;
     // The mask of events this plugin wants to see
     unsigned int EventMask;
 
     // Construct the object that represents a plugin
-    csPlugIn (iPlugIn *iObject, const char *iClassID, const char *iFuncID);
+    csPlugin (iPlugin *iObject, const char *iClassID, const char *iFuncID);
     // Free storage
-    virtual ~csPlugIn ();
+    virtual ~csPlugin ();
   };
 
   /*
@@ -89,17 +89,17 @@ class csSystemDriver : public iSystem
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
     {
       if (Mode == 0)
-        return ((csPlugIn *)Item)->PlugIn == Key ? 0 : 1;
+        return ((csPlugin *)Item)->PlugIn == Key ? 0 : 1;
       else
-        return ((csPlugIn *)Item)->FuncID ? strcmp (((csPlugIn *)Item)->FuncID, (char *)Key)
-             : ((csPlugIn *)Item)->FuncID == Key ? 0 : 1;
+        return ((csPlugin *)Item)->FuncID ? strcmp (((csPlugin *)Item)->FuncID, (char *)Key)
+             : ((csPlugin *)Item)->FuncID == Key ? 0 : 1;
     }
     // Overrided Get() to avoid typecasts
-    csPlugIn *Get (int idx)
-    { return (csPlugIn *)csVector::Get (idx); }
+    csPlugin *Get (int idx)
+    { return (csPlugin *)csVector::Get (idx); }
     
     virtual bool FreeItem (csSome Item)
-    { delete (csPlugIn*)Item; return true; }
+    { delete (csPlugin*)Item; return true; }
   };
 
   /*
@@ -199,7 +199,7 @@ class csSystemDriver : public iSystem
   } EventCords;
 
   // Query all options supported by given plugin and place into OptionList
-  void QueryOptions (iPlugIn *iObject);
+  void QueryOptions (iPlugin *iObject);
 
   // Elapsed time between last two frames and absolute time in milliseconds
   csTime ElapsedTime, CurrentTime;
@@ -405,9 +405,9 @@ public:
   /// Find a plugin given his class ID and functionality ID
   virtual iBase *QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion);
   /// Remove a plugin from system driver's plugin list
-  virtual bool UnloadPlugIn (iPlugIn *iObject);
-  /// Register a object that implements the iPlugIn interface as a plugin
-  virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID, iPlugIn *iObject);
+  virtual bool UnloadPlugIn (iPlugin *iObject);
+  /// Register a object that implements the iPlugin interface as a plugin
+  virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID, iPlugin *iObject);
   /// Get the number of loaded plugins in the plugin manager.
   virtual int GetPlugInCount ();
   /// Get the specified plugin from the plugin manager.
@@ -433,7 +433,7 @@ public:
   virtual bool SaveConfig ();
 
   /// Register the plugin to receive specific events
-  virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask);
+  virtual bool CallOnEvents (iPlugin *iObject, unsigned int iEventMask);
   /// Query current state for given key
   virtual bool GetKeyState (int key);
   /// Query current state for given mouse button (0..9)

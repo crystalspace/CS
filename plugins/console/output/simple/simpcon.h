@@ -209,13 +209,13 @@ public:
   virtual bool PerformExtensionV (const char *iCommand, va_list args)
   { (void)iCommand; (void)args; return false; }
 
-  // Implement iPlugIn interface.
-  struct eiPlugIn : public iPlugIn
+  // Implement iPlugin interface.
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSimpleConsole);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 
 private:
   /// Time left until messages will scroll up

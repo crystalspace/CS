@@ -95,7 +95,7 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 

@@ -328,11 +328,11 @@ class csAVIFormat : public iStreamFormat
   virtual bool Load (iFile *pVideoData);
   virtual void Unload ();
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csAVIFormat);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 #endif

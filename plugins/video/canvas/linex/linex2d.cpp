@@ -47,11 +47,11 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_IBASE (csLineX2DFontServer)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csLineX2DFontServer::eiPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 Display *csGraphics2DLineXLib::dpy = NULL;
@@ -169,12 +169,12 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 
   // Do a trick: unload the system font server since its useless for us
-  iPlugIn *fs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iPlugIn);
+  iPlugin *fs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iPlugin);
   if (fs)
   {
     System->UnloadPlugIn (fs);
@@ -895,7 +895,7 @@ int csLineX2DFontServer::csLineX2DFont::GetLength (const char *text, int maxwidt
 csLineX2DFontServer::csLineX2DFontServer (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   font.xfont = NULL;
 }
 

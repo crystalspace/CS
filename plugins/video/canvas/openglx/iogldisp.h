@@ -31,7 +31,7 @@ SCF_VERSION (iOpenGLDisp, 0, 0, 1);
  * This merely breaks down to initialization and shutdown stuff ( like grShutdown for Glide )
  */
  
-struct iOpenGLDisp : public iPlugIn
+struct iOpenGLDisp : public iPlugin
 {
   virtual bool open() = 0;
   virtual bool close() = 0;

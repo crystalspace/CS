@@ -105,13 +105,13 @@ public:
   virtual bool PerformExtension (const char *command, ...);
   virtual bool PerformExtensionV (const char *iCommand, va_list);
 
-  // Implement iPlugIn interface.
-  struct eiPlugIn : public iPlugIn
+  // Implement iPlugin interface.
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFancyConsole);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __FANCYCON_H__

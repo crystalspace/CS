@@ -948,7 +948,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  //--------------------- iPlugIn interface implementation --------------------
+  //--------------------- iPlugin interface implementation --------------------
 
   /**
    * Initialize the engine. This is automatically called by system driver
@@ -960,12 +960,12 @@ public:
   /// We need to handle some events
   virtual bool HandleEvent (iEvent &Event);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csEngine);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 
   //--------------------- iEngine interface implementation --------------------
 

@@ -44,13 +44,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncFactoryLoader);
     virtual bool Initialize (iSystem* p)
     { scfParent->pSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 
@@ -73,13 +73,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncLoader);
     virtual bool Initialize (iSystem* p)
     { scfParent->pSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
   friend struct eiPlugIn;
 };
 

@@ -70,7 +70,7 @@ struct csRGBpixel
 };
 
 //***** Interfaces
-struct iPlugIn:public iBase
+struct iPlugin:public iBase
 {
   bool Initialize(iSystem *iSys);
   bool HandleEvent(iEvent&);

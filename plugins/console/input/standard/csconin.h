@@ -95,13 +95,13 @@ public:
   /// Set the prompt string
   virtual void SetPrompt (const char *iPrompt);
 
-  // Implement iPlugIn interface.
-  struct eiPlugIn : public iPlugIn
+  // Implement iPlugin interface.
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugIn;
+  } scfiPlugin;
 
   // Implement iConsoleWatcher interface.
   struct eiConsoleWatcher : public iConsoleWatcher

@@ -38,7 +38,7 @@ csEventCord::csEventCord (int Category, int Subcategory) : category (Category),
   SpinLock = 0;
 }
 
-int csEventCord::Insert(iPlugIn *plugin, int priority)
+int csEventCord::Insert(iPlugin *plugin, int priority)
 {
   Lock ();
   // Increment the plugin reference count
@@ -86,7 +86,7 @@ int csEventCord::Insert(iPlugIn *plugin, int priority)
   return retval;
 }
 
-void csEventCord::Remove (iPlugIn *plugin)
+void csEventCord::Remove (iPlugin *plugin)
 {
   Lock ();
   PluginData *last = NULL, *curr = plugins;

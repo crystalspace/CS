@@ -61,7 +61,7 @@ bool csGraphics2Dps2::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
   return true;

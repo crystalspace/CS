@@ -64,7 +64,7 @@ bool NeXTDriver2D::Initialize(iSystem* s)
   bool ok = superclass::Initialize(s);
   if (ok)
   {
-    s->CallOnEvents(&scfiPlugIn, CSMASK_Broadcast);
+    s->CallOnEvents(&scfiPlugin, CSMASK_Broadcast);
     controller = NeXTDelegate2D_new(this);
     ok = init_driver(get_desired_depth());
   }

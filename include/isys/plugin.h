@@ -24,7 +24,7 @@
 struct iSystem;
 struct iEvent;
 
-SCF_VERSION (iPlugIn, 0, 0, 1);
+SCF_VERSION (iPlugin, 0, 0, 1);
 
 /**
  * This is the general plug-in interface for CS.
@@ -32,7 +32,7 @@ SCF_VERSION (iPlugIn, 0, 0, 1);
  * During Initialize() call plug-in should do all initialization stuff,
  * such as registering with the system driver and so on.
  */
-struct iPlugIn : public iBase
+struct iPlugin : public iBase
 {
   /// Initialize the plugin, and return success status
   virtual bool Initialize (iSystem *iSys) = 0;

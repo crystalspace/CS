@@ -227,12 +227,12 @@ public:
   bool UpdateAppliedMotion(csAppliedMotion *am, csTime elapsedtime);
   void CompileMotion( csAppliedMotion *motion );
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionManager);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 iSkeletonBone *csFindBone( iSkeletonBone *bone, unsigned int hash );

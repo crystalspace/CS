@@ -466,12 +466,12 @@ public:
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw,
     int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DSoftwareCommon);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __SFT3DCOM_H__

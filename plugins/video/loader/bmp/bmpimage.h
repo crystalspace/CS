@@ -46,12 +46,12 @@ class csBMPImageIO : public iImageIO
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
 
-  struct eiPlugIn : public iPlugIn
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBMPImageIO);
     virtual bool Initialize (iSystem*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 /**

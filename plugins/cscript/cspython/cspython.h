@@ -45,13 +45,13 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  // Implement iPlugIn interface.
-  struct eiPlugIn : public iPlugIn
+  // Implement iPlugin interface.
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPython);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 void InitPytocs();

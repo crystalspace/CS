@@ -242,13 +242,13 @@ public:
   /// Scans the input stream for a match by one of the RegularExpression's returns 0 on failure, otherwise returns the key of the matched RE.
   virtual unsigned int Match();
 
-  // Implement iPlugIn interface.
-  struct eiPlugIn : public iPlugIn
+  // Implement iPlugin interface.
+  struct eiPlugIn : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLexicalAnalyzer);
     virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent(iEvent&) { return false; }
-  } scfiPlugIn;
+  } scfiPlugin;
 };
 
 #endif // __CS_CSLEX_H__

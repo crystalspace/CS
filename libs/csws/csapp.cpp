@@ -40,19 +40,19 @@
 #include "isys/event.h"
 #include "igraphic/imageio.h"
 
-//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
+//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugin //--
 
-SCF_IMPLEMENT_IBASE (csApp::csAppPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE (csApp::csAppPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-csApp::csAppPlugIn::csAppPlugIn (csApp *iParent)
+csApp::csAppPlugin::csAppPlugin (csApp *iParent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   app = iParent;
 }
 
-bool csApp::csAppPlugIn::Initialize (iSystem *System)
+bool csApp::csAppPlugin::Initialize (iSystem *System)
 {
   app->VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   if (!app->VFS) return false;
@@ -64,7 +64,7 @@ bool csApp::csAppPlugIn::Initialize (iSystem *System)
   return System->CallOnEvents (this, unsigned (-1));
 }
 
-bool csApp::csAppPlugIn::HandleEvent (iEvent &Event)
+bool csApp::csAppPlugin::HandleEvent (iEvent &Event)
 {
   // If this is a pre-process or post-process event,
   // do the respective work ...
@@ -91,7 +91,7 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
 {
   Mouse = new csMouse(this);
   hints = new csHintManager(this);
-  scfiPlugIn = new csAppPlugIn(this);
+  scfiPlugin = new csAppPlugin(this);
   
   app = this;			// so that all inserted windows will inherit it
   MouseOwner = NULL;		// no mouse owner
@@ -126,7 +126,7 @@ csApp::~csApp ()
     delete mi;
   }
 
-  System->UnloadPlugIn (scfiPlugIn);
+  System->UnloadPlugIn (scfiPlugin);
 
   // Delete all children prior to shutting down the system
   DeleteAll ();
@@ -149,14 +149,14 @@ csApp::~csApp ()
   // Set app to NULL so that ~csComponent() won't call NotifyDelete()
   app = NULL;
 
-  delete scfiPlugIn;
+  delete scfiPlugin;
   delete hints;
   delete Mouse;
 }
 
 bool csApp::Initialize ()
 {
-  if (!System->RegisterPlugIn ("crystalspace.windowing.system", "CSWS", scfiPlugIn))
+  if (!System->RegisterPlugIn ("crystalspace.windowing.system", "CSWS", scfiPlugin))
     return false;
 
   // Create the graphics pipeline
