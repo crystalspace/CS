@@ -60,9 +60,61 @@ The frame style of the notebook
 The frame style of the notebook
 @end table
 
-@node AWS Notebook Page, , AWS Notebook, AWS Signals and Actions Reference
+@node AWS Notebook Page, AWS Bar Chart, AWS Notebook, AWS Signals and Actions Reference
 @subsubsection Notebook Page
 
 An notebook pages type is ``Notebook Page''.
 
-... more to come after i return from work :)
+@subsubheading Signals
+
+Notebook pages do not send signals.
+
+@subsubheading Attributes
+
+Notebook pages publish the following attributes.
+
+@table @code
+@item Caption
+Guess what, it's the notebook pages caption.
+
+@item Icon
+An optional Icon to show somehow aligned to the caption. How the alignment is done is defined by attribute @samp{IconAlign}.
+
+@item IconAlign
+Defines how the optional icon is aligned with the caption. Possible values are:
+@itemize
+@item nbiaLeft
+@item nbiaRight
+@item nbiaTop
+@item nbiaBottom
+@end itemize
+
+@end table
+
+@subsubheading Skin Attributes
+
+Notebooks support the following skin attributes.
+
+@table @code
+@item Texture
+Texture used to draw the components background.
+
+@item OverlayTextureAlpha
+The default alpha value used when drawing the background texture.
+
+@end table
+
+@subsubheading Properties
+
+Notebook pages publish the following properties.
+
+@table @code
+@item Caption
+The notebook pages caption.
+
+@item Icon
+The icon to show along with the caption in the pages header. This property is read-only.
+
+@item IconAlign
+The alignment of the icon. This property is read-only.
+@end table

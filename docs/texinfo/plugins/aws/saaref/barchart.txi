@@ -1,0 +1,135 @@
+@c -*-texinfo-*-
+@node AWS Bar Chart, , AWS Notebook Page, AWS Signals and Actions Reference
+@subsubsection Bar Chart
+
+A Bar Chart's type is ``Bar Chart''.
+
+@subsubheading Signals
+
+Bar Chart controls send the following signals.
+
+@table @code
+@item signalBarChartClicked
+Currently not implemented.
+
+@item signalTimer
+Currently not implemented
+
+@end table
+
+@subsubheading Attributes
+
+Bar Charts publish the following attributes.
+
+@table @code
+@item Style
+This attribute defines the frame style of the controls outline. Valid values are:
+@itemize
+@item bcfsBump
+@item bcfsSimple
+@item bcfsSunken
+@item bcfsRaised
+@item bcfsFlat
+@item bcfsNone
+@end itemize
+
+@item InnerStyle
+This attribute defines the inner frame's style of the rectangle enclosing the chart itself. Valid values are:
+@itemize
+@item bcfsBump
+@item bcfsSimple
+@item bcfsSunken
+@item bcfsRaised
+@item bcfsFlat
+@item bcfsNone
+@end itemize
+
+@item Options
+Defines the options for drawing the charts bars. Values are:
+@itemize
+@item bcoRolling
+@item bcoRollLeft
+@item bcoRollRight
+@item bcoVertGridLines
+@item bcoHorzGridLines
+@item bcoVerticalChart
+@end itemize
+
+@item MaxItems
+The number of bars that should be placed.
+
+@item UpdateInterval
+Timer interval in milliseconds.
+
+@item Caption
+The caption of the chart.
+
+@item XLegend
+X axis label.
+
+@item YLegend
+Y axis label.
+
+@end table
+
+@subsubheading Skin Attributes
+
+Bar Charts support the following skin attributes.
+
+@table @code
+@item OverlayTextureAlpha
+The alpha value of the overlay texture.
+
+@item Texture
+Used for overlaying the frame area with the global texture.
+
+@item ChartBarColor
+The color used for drawing the bars.
+
+@end table
+
+@subsubheading Properties
+
+Bar Charts publish the following properties.
+
+@table @code
+@item Caption
+The caption of the Bar Chart.
+@end table
+
+@subsubheading Actions
+
+Bar Charts understand the following actions.
+@itemize
+@item @ref{barchartAddItem,,AddItem}
+@end itemize
+
+@anchor{barchartAddItem}
+@table @code
+@item @strong{AddItem}
+Adds a new bar. See below for parameters.
+@end table
+
+@subsubheading Input Parameters
+
+This sections describes the input parameters understood by the bar chart's
+@samp{AddItem} action.
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{value}
+@tab @code{float}
+@tab The value of the bar. This defines how long/tall the bar will be
+
+@item @code{label}
+@tab @code{iString*}
+@tab A label that descrobes the bar.
+@end multitable
+
+@subsubheading Output Parameters
+
+None.
+
