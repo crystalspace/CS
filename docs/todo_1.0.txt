@@ -141,7 +141,7 @@ Bugs to fix:
 	     old culler was removed. Matze: This is probably a duplicate
 	     because this is probably caused because of the wrong bounding
 	     box.
-	     [Bug 747990]
+	     [Bug 725406]
 	[S]  NetTut doesn't parse it's commandline (one always get an error
 	     message no matter what is entered at the command line).
 		Usage:  ./nettut [server/client] [tcp/udp] [hostname*] [port]
