@@ -22,9 +22,11 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
+#include "csgeom/matrix3.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
@@ -63,6 +65,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   object_reg = NULL;
   kdtree = NULL;
   covbuf = NULL;
+  debug_camera = NULL;
 }
 
 csDynaVis::~csDynaVis ()
@@ -101,7 +104,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
     h = 480;
   }
 
-  kdtree = new csKDTree ();
+  kdtree = new csKDTree (NULL);
   covbuf = new csCoverageBuffer (w, h);
 
   return true;
@@ -139,6 +142,8 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
+
+  visobj_vector.Push (visobj_wrap);
 }
 
 void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
@@ -157,7 +162,6 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       return;
     }
   }
-  CS_ASSERT (false);
 }
 
 void csDynaVis::UpdateObjects ()
@@ -269,14 +273,17 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
       objects[i]->timestamp = cur_timestamp;
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
       	objects[i]->GetObject ();
+      visobj_wrap->visobj->MarkVisible ();
     }
   }
 
   return true;
 }
 
-bool csDynaVis::VisTest (iRenderView* irview)
+bool csDynaVis::VisTest (iRenderView* rview)
 {
+  debug_camera = rview->GetOriginalCamera ();
+
   // Initialize the coverage buffer to all empty.
   covbuf->Initialize ();
 
@@ -287,8 +294,8 @@ bool csDynaVis::VisTest (iRenderView* irview)
   // visible that are visible. In the mean time also update the coverage
   // buffer for further culling.
   VisTest_Front2BackData data;
-  data.pos = irview->GetCamera ()->GetTransform ().GetOrigin ();
-  data.rview = irview;
+  data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  data.rview = rview;
   data.dynavis = this;
   kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data);
 
@@ -297,7 +304,7 @@ bool csDynaVis::VisTest (iRenderView* irview)
 
 iString* csDynaVis::Debug_UnitTest ()
 {
-  csKDTree* kdtree = new csKDTree ();
+  csKDTree* kdtree = new csKDTree (NULL);
   iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (kdtree, iDebugHelper);
   if (dbghelp)
   {
@@ -338,22 +345,89 @@ iString* csDynaVis::Debug_Dump ()
   return NULL;
 }
 
+void csDynaVis::Debug_Dump (iGraphics3D* g3d)
+{
+  if (debug_camera)
+  {
+    //iGraphics2D* g2d = g3d->GetDriver2D ();
+    iTextureManager* txtmgr = g3d->GetTextureManager ();
+    int col = txtmgr->FindRGB (255, 0, 0);
+    g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+    csReversibleTransform trans = debug_camera->GetTransform ();
+    trans = csTransform (csYRotMatrix3 (PI/2.0), csVector3 (0)) * trans;
+    float fov = g3d->GetPerspectiveAspect ();
+    int i;
+    for (i = 0 ; i < visobj_vector.Length () ; i++)
+    {
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+    	visobj_vector[i];
+      const csBox3& b = visobj_wrap->child->GetBBox ();
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyz)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_Xyz)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyz)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYz)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyz)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyZ)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_Xyz)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_Xyz)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYz)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYz)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyZ)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+      g3d->DrawLine (
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyZ)),
+      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+    }
+  }
+}
+
 csTicks csDynaVis::Debug_Benchmark (int num_iterations)
 {
-  csKDTree* kdtree = new csKDTree ();
+  csTicks rc = 0;
+
+  csKDTree* kdtree = new csKDTree (NULL);
   iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (kdtree, iDebugHelper);
   if (dbghelp)
   {
-    csTicks rc = dbghelp->Benchmark (num_iterations);
+    csTicks r = dbghelp->Benchmark (num_iterations);
+    printf ("kdtree:   %d ms\n", r);
+    rc += r;
     dbghelp->DecRef ();
-    if (rc)
-    {
-      delete kdtree;
-      return rc;
-    }
   }
   delete kdtree;
 
-  return 0;
+  csCoverageBuffer* covbuf = new csCoverageBuffer (640, 480);
+  dbghelp = SCF_QUERY_INTERFACE (covbuf, iDebugHelper);
+  if (dbghelp)
+  {
+    csTicks r = dbghelp->Benchmark (num_iterations);
+    printf ("covbuf:   %d ms\n", r);
+    rc += r;
+    dbghelp->DecRef ();
+  }
+  delete covbuf;
+
+  return rc;
 }
 

@@ -47,6 +47,7 @@
 #include "imesh/thing/polygon.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
+#include "iengine/viscull.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/camera.h"
@@ -105,6 +106,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   Conout = NULL;
   VFS = NULL;
   mappings = NULL;
+  visculler = NULL;
   process_next_key = false;
   process_next_mouse = false;
   edit_mode = false;
@@ -238,6 +240,58 @@ void csBugPlug::UnleashSpider (int cmd)
   }
 }
 
+void csBugPlug::VisculCmd (const char* cmd)
+{
+  if (!visculler)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Bugplug is currently now tracking a visibility culler!");
+    return;
+  }
+  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (visculler, iDebugHelper);
+  if (!dbghelp)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "This visibility culler does not support iDebugHelper!");
+    return;
+  }
+  if (dbghelp->DebugCommand (cmd))
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Viscul command '%s' performed.", cmd);
+  }
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Viscul command '%s' not supported!", cmd);
+  }
+  dbghelp->DecRef ();
+}
+
+void csBugPlug::VisculView (iCamera* camera)
+{
+  if (visculler)
+  {
+    visculler = NULL;
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Disabled visculler graphical dumping");
+    return;
+  }
+
+  // If we are not tracking a visculler yet we try to find one in current
+  // sector.
+  iSector* sector = camera->GetSector ();
+  visculler = sector->GetVisibilityCuller ();
+  if (!visculler)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Bugplug found no visibility culler in this sector!");
+    return;
+  }
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Bugplug is now tracking a visibility culler");
+}
+
 void csBugPlug::HideSpider (iCamera* camera)
 {
   spider_hunting = false;
@@ -266,7 +320,7 @@ void csBugPlug::HideSpider (iCamera* camera)
 	}
 	break;
       case DEBUGCMD_MOUSE1:
-        MouseButton3 (camera); //@@@ Temporary hack to make bugplug cross platform. MHV.
+        MouseButton3 (camera); //@@@ Temp hack to make bugplug cross platform.
 	break;
       case DEBUGCMD_MOUSE2:
         MouseButton2 (camera);
@@ -274,6 +328,9 @@ void csBugPlug::HideSpider (iCamera* camera)
       case DEBUGCMD_MOUSE3:
         MouseButton3 (camera);
 	break;
+      case DEBUGCMD_VISCULVIEW:
+        VisculView (camera);
+        break;
     }
   }
 }
@@ -523,6 +580,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	  }
 	}
         break;
+      case DEBUGCMD_VISCULCMD:
+        VisculCmd (args);
+        break;
       case DEBUGCMD_ENGINESTATE:
 	{
 	  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (Engine, iDebugHelper);
@@ -737,6 +797,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	    shadow->RemoveFromEngine (Engine);
 	}
         break;
+      case DEBUGCMD_VISCULVIEW:
       case DEBUGCMD_DUMPCAM:
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
@@ -780,6 +841,16 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
   if (!G3D) return false;
+
+  if (visculler)
+  {
+    iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (visculler, iDebugHelper);
+    if (dbghelp)
+    {
+      dbghelp->Dump (G3D);
+      dbghelp->DecRef ();
+    }
+  }
 
   if (edit_mode)
   {
@@ -829,7 +900,8 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       if (spider_timeout < 0)
       {
 	HideSpider (NULL);
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Spider could not catch a camera!");
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Spider could not catch a camera!");
       }
     }
   }
@@ -971,6 +1043,8 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "debuggraph"))	return DEBUGCMD_DEBUGGRAPH;
   if (!strcmp (cmd, "enginecmd"))	return DEBUGCMD_ENGINECMD;
   if (!strcmp (cmd, "enginestate"))	return DEBUGCMD_ENGINESTATE;
+  if (!strcmp (cmd, "visculview"))	return DEBUGCMD_VISCULVIEW;
+  if (!strcmp (cmd, "visculcmd"))	return DEBUGCMD_VISCULCMD;
 
   return DEBUGCMD_UNKNOWN;
 }

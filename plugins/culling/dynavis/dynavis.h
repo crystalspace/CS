@@ -53,6 +53,9 @@ private:
   csCoverageBuffer* covbuf;
   csVector visobj_vector;
 
+  // For Debug_Dump(g3d): keep the last original camera.
+  iCamera* debug_camera;
+
   // Scan all objects, mark them as invisible and check if they
   // have moved since last frame (and update them in the kdtree then).
   void UpdateObjects ();
@@ -75,7 +78,7 @@ public:
   virtual void Setup (const char* name);
   virtual void RegisterVisObject (iVisibilityObject* visobj);
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
-  virtual bool VisTest (iRenderView* irview);
+  virtual bool VisTest (iRenderView* rview);
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL) { return NULL; }
@@ -89,6 +92,7 @@ public:
   iString* Debug_UnitTest ();
   iString* Debug_StateTest ();
   iString* Debug_Dump ();
+  void Debug_Dump (iGraphics3D* g3d);
   csTicks Debug_Benchmark (int num_iterations);
 
   struct eiComponent : public iComponent
@@ -104,7 +108,8 @@ public:
     virtual int GetSupportedTests () const
     {
       return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP |
-      	CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK;
+      	CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK |
+	CS_DBGHELP_GFXDUMP;
     }
     virtual iString* UnitTest ()
     {
@@ -122,8 +127,9 @@ public:
     {
       return scfParent->Debug_Dump ();
     }
-    virtual void Dump (iGraphics3D* /*g3d*/)
+    virtual void Dump (iGraphics3D* g3d)
     {
+      scfParent->Debug_Dump (g3d);
     }
     virtual bool DebugCommand (const char*)
     {

@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+13-May-2002
+	- Fixed a bug in the csCoverageBuffer.
+	- Small optimization to csCoverageBuffer::TestRectangle().
+	- Added notion of parent to csKDTree nodes.
+	- Using that parent I optimized csKDTree so that when moving
+	  an object the object is moved upwards in the tree to the best
+	  fitting node (so that it can later be distributed downwards
+	  again).
+	- Dynavis also supports graphical dump now (using iDebugHelper).
+	- Enhanced Bugplug with two new commands: visculview and visculcmd.
+	  The first command will enable/disable tracking of a visibility
+	  culler in the current sector. With the second command you can
+	  send commands to the specific visibility culler. By default
+	  the 'v' key is assigned to 'visculview'.
+	- Fixed a bug in Dynavis::RegisterVisObject(). It was not correctly
+	  adding the visibility object to its internal list.
+	- Implemented unfinished support for graphical dumping in
+	  Dynavis.
 8-May-2002
 	- Fixed a few bugs in csCoverageBuffer::TestPolygon() and
 	  InsertPolygon(). Added a few additional tests to the unit tester.

@@ -602,7 +602,7 @@ bool csCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 	*scr_buf++ = sb;
 	if (!~sb) pc--;
 	//@@@ Optimize
-	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
+	depth_buf = &depth_buffer[(i<<(w_shift-1)) + (x>>3)];
 	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
 	mod_mask >>= 8;
         depth_buf += width_po2 >> 3;
@@ -660,7 +660,7 @@ bool csCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
         first ^= *buf++;
 	//@@@ Optimize
 	uint32 f = first;	// Only test where our polygon is rendering.
-	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
+	depth_buf = &depth_buffer[(i<<(w_shift-1)) + (x>>3)];
 	if ((f & 0xff) && min_depth <= *depth_buf) return true;
 	f >>= 8;
         depth_buf += width_po2 >> 3;
@@ -688,7 +688,7 @@ bool csCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
       {
 	//@@@ Optimize
 	uint32 f = first;	// Only test where our polygon is rendering.
-	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
+	depth_buf = &depth_buffer[(i<<(w_shift-1)) + (x>>3)];
 	if ((f & 0xff) && min_depth <= *depth_buf) return true;
 	f >>= 8;
         depth_buf += width_po2 >> 3;
@@ -746,14 +746,13 @@ static uint32 keep_masks[33] =
 bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
 {
   csBox2Int bbox;
-  bbox.minx = QRound (rect.MinX ());
-  bbox.miny = QRound (rect.MinY ());
   bbox.maxx = QRound (rect.MaxX ());
-  bbox.maxy = QRound (rect.MaxY ());
-
   if (bbox.maxx < 0) return false;
+  bbox.maxy = QRound (rect.MaxY ());
   if (bbox.maxy < 0) return false;
+  bbox.minx = QRound (rect.MinX ());
   if (bbox.minx >= width) return false;
+  bbox.miny = QRound (rect.MinY ());
   if (bbox.miny >= height) return false;
 
   int i, x;
@@ -772,6 +771,7 @@ bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
   for (i = startrow ; i <= endrow ; i++)
   {
     uint32 first = ~0;
+    bool f1, f2, f3, f4;
     if (i == startrow)
     {
       first &= keep_masks[bbox.miny & 0x1f];
@@ -779,6 +779,21 @@ bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
     if (i == endrow)
     {
       first &= ~keep_masks[(bbox.maxy & 0x1f)+1];
+    }
+    if (i == startrow || i == endrow)
+    {
+      uint32 f = first;
+      f1 = (f & 0xff); f >>= 8;
+      f2 = (f & 0xff); f >>= 8;
+      f3 = (f & 0xff); f >>= 8;
+      f4 = (f & 0xff);
+    }
+    else
+    {
+      f1 = true;
+      f2 = true;
+      f3 = true;
+      f4 = true;
     }
 
     if (!partcols[i])
@@ -788,18 +803,14 @@ bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
       for (x = startcol ; x <= endcol ; x++)
       {
 	//@@@ Optimize
-	uint32 f = first;	// Only test where our rectangle is rendering.
-	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
-	f >>= 8;
+	depth_buf = &depth_buffer[(i<<(w_shift-1)) + (x>>3)];
+	if (f1 && min_depth <= *depth_buf) return true;
         depth_buf += width_po2 >> 3;
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
-	f >>= 8;
+	if (f2 && min_depth <= *depth_buf) return true;
         depth_buf += width_po2 >> 3;
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
-	f >>= 8;
+	if (f3 && min_depth <= *depth_buf) return true;
         depth_buf += width_po2 >> 3;
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	if (f4 && min_depth <= *depth_buf) return true;
       }
       continue;
     }
@@ -816,18 +827,14 @@ bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
       else
       {
 	//@@@ Optimize
-	uint32 f = first;	// Only test where our polygon is rendering.
-	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
-	f >>= 8;
+	depth_buf = &depth_buffer[(i<<(w_shift-1)) + (x>>3)];
+	if (f1 && min_depth <= *depth_buf) return true;
         depth_buf += width_po2 >> 3;
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
-	f >>= 8;
+	if (f2 && min_depth <= *depth_buf) return true;
         depth_buf += width_po2 >> 3;
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
-	f >>= 8;
+	if (f3 && min_depth <= *depth_buf) return true;
         depth_buf += width_po2 >> 3;
-	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	if (f4 && min_depth <= *depth_buf) return true;
       }
       scr_buf++;
     }
@@ -862,7 +869,7 @@ bool csCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
     // the depth buffer.
     //@@@ Optimize
     uint32 f = first;	// Only test where our rectangle is rendering.
-    depth_buf = &depth_buffer[(row<<(w_shift-2)) + (col>>2)];
+    depth_buf = &depth_buffer[(row<<(w_shift-1)) + (col>>3)];
     if ((f & 0xff) && min_depth <= *depth_buf) return true;
     f >>= 8;
     depth_buf += width_po2 >> 3;
@@ -887,7 +894,7 @@ bool csCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
   {
     //@@@ Optimize
     uint32 f = first;	// Only test where our point is rendering.
-    depth_buf = &depth_buffer[(row<<(w_shift-2)) + (col>>2)];
+    depth_buf = &depth_buffer[(row<<(w_shift-1)) + (col>>3)];
     if ((f & 0xff) && min_depth <= *depth_buf) return true;
     f >>= 8;
     depth_buf += width_po2 >> 3;

@@ -125,6 +125,7 @@ class csKDTree : public iBase
 private:
   csKDTree* child1;		// If child1 is not NULL then child2 will
   csKDTree* child2;		// also be not NULL.
+  csKDTree* parent;		// NULL if this is the root.
 
   bool obj_bbox_valid;		// If false obj_bbox is not valid.
   csBox3 obj_bbox;		// Bbox of all objects in this node.
@@ -205,7 +206,7 @@ private:
 
 public:
   /// Create a new empty KD-tree.
-  csKDTree ();
+  csKDTree (csKDTree* parent);
   /// Destroy the KD-tree.
   virtual ~csKDTree ();
 

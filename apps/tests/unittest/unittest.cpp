@@ -28,6 +28,7 @@
 #include "iutil/dbghelp.h"
 #include "iutil/vfs.h"
 #include "cstool/initapp.h"
+#include "csgeom/math3d.h"
 #include "iengine/viscull.h"
 
 //------------------------------------------------- We need the 3D engine -----
@@ -125,19 +126,34 @@ int main (int argc, char* argv[])
     return -1;
   }
 
+  printf ("================================================================\n");
+
   csXORBuffer* buf = new csXORBuffer (640, 480);
   Test (buf, "csXORBuffer");
   //Benchmark (buf, "csXORBuffer", 10000);
   delete buf;
 
+  printf ("================================================================\n");
+
   iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   Test (engine, "Engine");
   if (engine) engine->DecRef ();
 
+  printf ("================================================================\n");
+
+  csGeomDebugHelper* geomdbghelp = new csGeomDebugHelper ();
+  Test (geomdbghelp, "csgeom");
+  delete geomdbghelp;
+
+  printf ("================================================================\n");
+
   iVisibilityCuller* viscull = CS_LOAD_PLUGIN (plugmgr,
   	"crystalspace.culling.dynavis", iVisibilityCuller);
   Test (viscull, "DynaVis");
+  //Benchmark (viscull, "DynaVis", 100);
   if (viscull) viscull->DecRef ();
+
+  printf ("================================================================\n");
 
   plugmgr->DecRef ();
   csInitializer::DestroyApplication (object_reg);

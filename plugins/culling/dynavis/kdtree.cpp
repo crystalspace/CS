@@ -121,13 +121,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 uint32 csKDTree::global_timestamp = 1;
 
-csKDTree::csKDTree ()
+csKDTree::csKDTree (csKDTree* parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
 
   child1 = NULL;
   child2 = NULL;
+  csKDTree::parent = parent;
   objects = NULL;
   num_objects = max_objects = 0;
   disallow_distribute = false;
@@ -429,42 +430,24 @@ void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
     }
   }
 
-  // If there are two or more leafs containing this object we
-  // are going to check if the object will still be in those leafs
-  // after moving.
-  if (object->num_leafs >= 2)
+  // When updating the bounding box of an object we move the object upwards
+  // in the tree until we find a node that completely contains the
+  // new bounding box. For small movements this usually means that the
+  // object will stay in its current node. Note that the case above already
+  // catches that situation but we keep the above case because it is
+  // slightly more efficient even.
+  csKDTree* node = this;
+  if (object->num_leafs > 0)
   {
-    int i;
-    csBox3 bb; bb.StartBoundingBox ();
-    bool valid = true;
-    for (i = 0 ; i < object->num_leafs ; i++)
+    node = object->leafs[0];
+    UnlinkObject (object);
+    object->bbox = new_bbox;
+    while (node->parent && !node->GetNodeBBox ().Contains (new_bbox))
     {
-      const csBox3& nb = object->leafs[i]->GetNodeBBox ();
-      if (!nb.Overlap (new_bbox))
-      {
-        valid = false;
-	break;
-      }
-      bb += nb;
-    }
-    if (valid && bb.Contains (new_bbox))
-    {
-      object->bbox = new_bbox;
-      for (i = 0 ; i < object->num_leafs ; i++)
-      {
-        object->leafs[i]->obj_bbox_valid = false;
-        object->leafs[i]->disallow_distribute = false;
-      }
-      return;
+      node = node->parent;
     }
   }
-
-  // The bad case. In this case we have no choice but to remove the
-  // object and reinsert it in the top level of the tree so that it will
-  // get redistributed later.
-  UnlinkObject (object);
-  object->bbox = new_bbox;
-  AddObject (new_bbox, object);
+  node->AddObject (new_bbox, object);
 }
   
 void csKDTree::Distribute ()
@@ -522,8 +505,8 @@ void csKDTree::Distribute ()
     }
     if (!disallow_distribute)
     {
-      child1 = new csKDTree ();
-      child2 = new csKDTree ();
+      child1 = new csKDTree (this);
+      child2 = new csKDTree (this);
       DistributeLeafObjects ();
       CS_ASSERT (num_objects == 0);
       // Update the bounding box of this node.
@@ -698,6 +681,9 @@ bool csKDTree::Debug_CheckTree (csString& str)
     {
       KDT_ASSERT (GetObjectBBox ().Empty (), "obj_bbox is not empty!");
     }
+
+    KDT_ASSERT (child1->parent == this, "parent check");
+    KDT_ASSERT (child2->parent == this, "parent check");
 
     if (!child1->Debug_CheckTree (str))
       return false;

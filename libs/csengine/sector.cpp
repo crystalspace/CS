@@ -216,7 +216,6 @@ void csSector::UseCuller (const char *meshname)
   culler->Setup (cachename);
 
   // Loop through all meshes and update their bounding box in the
-
   // polygon trees.
   int i;
   for (i = 0; i < meshes.Length (); i++)

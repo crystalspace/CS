@@ -28,6 +28,7 @@
 #include "iutil/plugin.h"
 
 struct iObjectRegistry;
+struct iVisibilityCuller;
 struct iEngine;
 struct iGraphics3D;
 struct iGraphics2D;
@@ -96,6 +97,8 @@ class csShadow;
 #define DEBUGCMD_DEBUGGRAPH	1024	// Do a dump of the debug graph
 #define DEBUGCMD_ENGINECMD	1025	// General engine DebugCommand() (arg)
 #define DEBUGCMD_ENGINESTATE	1026	// Test engine state.
+#define DEBUGCMD_VISCULVIEW	1027	// Call viscull->Dump(g3d)
+#define DEBUGCMD_VISCULCMD	1028	// Call viscull->DebugCommand()
 
 /**
  * For key mappings.
@@ -180,6 +183,14 @@ private:
    * camera != NULL).
    */
   void HideSpider (iCamera* camera);
+
+  /// Current visibility culler we are monitoring.
+  iVisibilityCuller* visculler;
+
+  /// Set viscull view.
+  void VisculView (iCamera* camera);
+  /// Call viscull command.
+  void VisculCmd (const char* cmd);
 
   //------------------------------------------------------------------
 
