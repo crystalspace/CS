@@ -13,6 +13,20 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+7-Oct-1999
+	- Eric Sunshine added apps/support/ezstatic.cpp.  This is a companion
+	  to static.cpp.  It provides COM initialization for applications
+	  which are statically linked against the COM library.  Unlike
+	  static.cpp, ezstatic.cpp does not force references to the various
+	  drivers, and is therefore suitable for command-line applications
+	  which do not wish to unnecessarily link with drivers.
+	- Eric Sunshine fixed map2cs so that it links correctly on platforms
+	  which use static linking (or when "USE_DLL=no" is specified).  The
+	  linking problem appeared quite recently when csutil was modified to
+	  depend upon cscom.
+	- Eric Sunshine considerably simplified the linkage / library
+	  requirements in the vsh makefile.  He also removed an unnecessary
+	  dependency on $(DEP.EXE).
 6-Oct-1999
 	- Eric Sunshine implemented dynamic linking for the MacOS/X Server,
 	  OpenStep, and NextStep ports of Crystal Space.  This was a
@@ -49,10 +63,15 @@ Short-term cleanups that need to be done:
 	  registration instead of deregistration.
 	- Eric Sunshine eliminated a compiler warning in csloader.cpp.
 	- Eric Sunshine fixed some bugs in cygnus.mak.
+	- Thomas Hieber brought the MSVC port up to date with respect to all
+	  of the recent modifications by others (Alex, Andrew, Eric).
+	- Thomas Hieber ported the terrain library to MSVC.
 5-Oct-1999
 	- Received landscape engine code from Alex Pfaffe. It is not
 	  fully integrated yet. I prepared it so that it compiles
 	  ok but that's it.
+	- Andrew Zabolotny checked in another round of improvments to MazeD,
+	  which he is in the process of updating.
 4-Oct-1999
 	- Continued work on quadcube/quadtree lighting. It is almost
 	  working but there are still a few problems here and there.
