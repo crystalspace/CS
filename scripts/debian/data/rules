@@ -59,6 +59,10 @@ clean:
 
 	dh_clean
 
+#DEVBIN=3ds2lev map2cs mdl2spr \
+#	csfedit csfgen cslight picview scfreg viewmesh vsh \
+#	cs-config
+	
 DEVBIN=map2cs mdl2spr scfreg vsh cs-config
 
 install: DH_OPTIONS=
