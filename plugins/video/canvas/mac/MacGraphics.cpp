@@ -935,6 +935,24 @@ void csGraphics2DMac::SetColorPalette( void )
 }
 
 
+void csGraphics2DMac::PauseDisplayContext( void )
+{
+	if ( mDrawSprocketsEnabled ) {
+		if ( mDisplayContext )
+			DSpContext_SetState(mDisplayContext, kDSpContextState_Paused);
+	}
+}
+
+
+void csGraphics2DMac::ActivateDisplayContext( void )
+{
+	if ( mDrawSprocketsEnabled ) {
+		if ( mDisplayContext )
+			DSpContext_SetState(mDisplayContext, kDSpContextState_Active);
+	}
+}
+
+
 void csGraphics2DMac::DisplayErrorDialog( short errorIndex )
 {
 	Str255	theString;

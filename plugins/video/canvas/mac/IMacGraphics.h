@@ -23,6 +23,10 @@ struct iMacGraphics : public iBase
     virtual void WindowChanged( void ) = 0;
     ///
     virtual bool HandleEvent( EventRecord *inEvent ) = 0;
+    ///
+    virtual void PauseDisplayContext( void ) = 0;
+    ///
+    virtual void ActivateDisplayContext( void ) = 0;
 };
 
 #endif /* __IMACGRAPHICS_H__ */

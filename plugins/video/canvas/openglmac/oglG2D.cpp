@@ -484,6 +484,16 @@ bool csGraphics2DOpenGL::HandleEvent( EventRecord *inEvent )
 }
 
 
+void csGraphics2DOpenGL::PauseDisplayContext( void )
+{
+}
+
+
+void csGraphics2DOpenGL::ActivateDisplayContext( void )
+{
+}
+
+
 void csGraphics2DOpenGL::DisplayErrorDialog( short errorIndex )
 {
 	Str255	theString;

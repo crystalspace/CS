@@ -61,6 +61,9 @@ public:
  	virtual void		WindowChanged( void );
 	virtual bool		HandleEvent( EventRecord *inEvent );
 
+ 	virtual void		PauseDisplayContext( void );
+ 	virtual void		ActivateDisplayContext( void );
+
 	DECLARE_IBASE;
 
 protected:

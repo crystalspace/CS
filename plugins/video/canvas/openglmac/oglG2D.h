@@ -61,6 +61,9 @@ public:
 	virtual bool	DoubleBuffer (bool Enable);
 	virtual bool	GetDoubleBufferState ();
 
+    virtual void	PauseDisplayContext( void );
+    virtual void	ActivateDisplayContext( void );
+
 	int mGraphicsReady;
 
 	DECLARE_IBASE;
