@@ -1485,64 +1485,10 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csPoly2DUnbounded ##############
-
-package cspace::csPoly2DUnbounded;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPoly2DUnbounded(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csPoly2DUnbounded($self);
-        delete $OWNER{$self};
-    }
-}
-
-*__copy__ = *cspacec::csPoly2DUnbounded___copy__;
-*MakeEmpty = *cspacec::csPoly2DUnbounded_MakeEmpty;
-*GetVertexCount = *cspacec::csPoly2DUnbounded_GetVertexCount;
-*GetVertices = *cspacec::csPoly2DUnbounded_GetVertices;
-*GetVertex = *cspacec::csPoly2DUnbounded_GetVertex;
-*GetFirst = *cspacec::csPoly2DUnbounded_GetFirst;
-*GetLast = *cspacec::csPoly2DUnbounded_GetLast;
-*In = *cspacec::csPoly2DUnbounded_In;
-*MakeRoom = *cspacec::csPoly2DUnbounded_MakeRoom;
-*SetVertexCount = *cspacec::csPoly2DUnbounded_SetVertexCount;
-*AddVertex = *cspacec::csPoly2DUnbounded_AddVertex;
-*SetVertices = *cspacec::csPoly2DUnbounded_SetVertices;
-*ClipAgainst = *cspacec::csPoly2DUnbounded_ClipAgainst;
-*Intersect = *cspacec::csPoly2DUnbounded_Intersect;
-*ClipPlane = *cspacec::csPoly2DUnbounded_ClipPlane;
-*ExtendConvex = *cspacec::csPoly2DUnbounded_ExtendConvex;
-*GetSignedArea = *cspacec::csPoly2DUnbounded_GetSignedArea;
-*Random = *cspacec::csPoly2DUnbounded_Random;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::csPoly2D ##############
 
 package cspace::csPoly2D;
-@ISA = qw( cspace cspace::csPoly2DUnbounded );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1551,12 +1497,6 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
-*__copy__ = *cspacec::csPoly2D___copy__;
-*MakeEmpty = *cspacec::csPoly2D_MakeEmpty;
-*AddVertex = *cspacec::csPoly2D_AddVertex;
-*UpdateBoundingBox = *cspacec::csPoly2D_UpdateBoundingBox;
-*GetBoundingBox = *cspacec::csPoly2D_GetBoundingBox;
-*ClipAgainst = *cspacec::csPoly2D_ClipAgainst;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -1568,6 +1508,24 @@ sub DESTROY {
     }
 }
 
+*__copy__ = *cspacec::csPoly2D___copy__;
+*MakeEmpty = *cspacec::csPoly2D_MakeEmpty;
+*GetVertexCount = *cspacec::csPoly2D_GetVertexCount;
+*GetVertices = *cspacec::csPoly2D_GetVertices;
+*GetVertex = *cspacec::csPoly2D_GetVertex;
+*GetFirst = *cspacec::csPoly2D_GetFirst;
+*GetLast = *cspacec::csPoly2D_GetLast;
+*In = *cspacec::csPoly2D_In;
+*MakeRoom = *cspacec::csPoly2D_MakeRoom;
+*SetVertexCount = *cspacec::csPoly2D_SetVertexCount;
+*AddVertex = *cspacec::csPoly2D_AddVertex;
+*SetVertices = *cspacec::csPoly2D_SetVertices;
+*ClipAgainst = *cspacec::csPoly2D_ClipAgainst;
+*Intersect = *cspacec::csPoly2D_Intersect;
+*ClipPlane = *cspacec::csPoly2D_ClipPlane;
+*ExtendConvex = *cspacec::csPoly2D_ExtendConvex;
+*GetSignedArea = *cspacec::csPoly2D_GetSignedArea;
+*Random = *cspacec::csPoly2D_Random;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
