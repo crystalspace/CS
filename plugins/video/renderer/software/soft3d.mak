@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/renderer/software;plugins/video/renderer/common
+vpath %.cpp plugins/video/renderer/software plugins/video/renderer/common
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SOFT3D=$(OUTDLL)soft3d$(DLL)
