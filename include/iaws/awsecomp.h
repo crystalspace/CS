@@ -64,6 +64,7 @@ public:
     virtual void Broadcast(unsigned long signal)
     { comp->Broadcast(signal); }
 
+
 public:
     /// Sets the embedded component.  MUST BE CALLED BEFORE ANY OTHER FUNCTION!
     virtual void Initialize(iAwsComponent *component)
@@ -71,6 +72,19 @@ public:
       comp=component; 
       if (comp) comp->IncRef ();
     }
+
+  /** This function takes care of the creation tasks required to prepare this
+    * component for use. If you create a component via the window manager's creation functions
+    * then you should not call this, the window manager has done it for you. If you create
+    * components programatically then you are encouraged to call this func to make setup
+    * easier. For component developers, you should not need to override Create but 
+    * rather do your setup work in Setup. 
+    *
+    * If it returns false then the component was not able to initialize properly and
+    * shouldn't be used.
+    **/
+    virtual bool Create(iAws *m, iAwsComponent *parent, awsComponentNode *settings)
+    { return comp->Create (m, parent, settings);}
 
     /// Sets up component
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings)
@@ -165,6 +179,22 @@ public:
     virtual void Show()
     { comp->Show(); }
 
+    /// Moves a component
+    virtual void Move(int delta_x, int delta_y)
+    { comp->Move (delta_x, delta_y); }
+
+    /// Moves a component to an absolute location
+    virtual void MoveTo(int x, int y)
+    { comp->MoveTo (x, y); }
+
+    /// Resizes a component
+    virtual void Resize(int width, int height)
+    { comp->Resize (width, height); }
+
+    /// Resizes a component to an absolute rect
+    virtual void ResizeTo(csRect newFrame)
+    { comp->ResizeTo (newFrame); }
+
     /// Get's the unique id of this component.
     virtual unsigned long GetID()
     { return comp->GetID(); }
@@ -187,6 +217,11 @@ public:
 
     virtual void UnMaximize()
     { comp->UnMaximize(); }
+
+    /// Resizes all the children of this component using the current layout
+    virtual void LayoutChildren()
+    { comp->LayoutChildren (); }
+
 
 public:
     /// Adds a child
@@ -245,6 +280,22 @@ public:
     /// Set's the component below this one
     virtual void SetComponentBelow(iAwsComponent *comp)
     { comp->SetComponentBelow(comp); }
+
+    /// Moves this component above all its siblings
+    virtual void Raise()
+    { comp->Raise (); }
+
+    /// Moves this component below all its siblings
+    virtual void Lower()
+    { comp->Lower (); }
+
+    /// Sets the value of the redraw tag
+    virtual void SetRedrawTag(unsigned int tag)
+    { comp->SetRedrawTag (tag); }
+
+    /// Gets the value of the redraw tag
+    virtual unsigned int RedrawTag()
+    { return comp->RedrawTag (); }
 
 public:
     /// Triggered when the component needs to draw
@@ -331,6 +382,41 @@ public:
     virtual void OnResized()
     { comp->OnResized ();}
 
+    /// Triggered when a child component has been moved
+    virtual void OnChildMoved()
+    { comp->OnChildMoved(); }
+
+    /// Triggered when the Raise function is called
+    virtual void OnRaise()
+    { comp->OnRaise(); }
+
+    /// Triggered when the Lower function is called
+    virtual void OnLower()
+    { comp->OnLower(); }
+
+    /// Triggered when a child becomes hidden
+    virtual void OnChildHide()
+    { comp->OnChildHide(); }
+
+    /// Triggered when a child becomes shown
+    virtual void OnChildShow()
+    { comp->OnChildShow(); }
+
+    /// Removes a component from the hierarchy
+    virtual void Unlink()
+    { comp->Unlink(); }
+
+    /// Links a component into the hierarchy as a sibling above comp
+    virtual void LinkAbove(iAwsComponent* comp)
+    { comp->LinkAbove (comp); }
+
+    /// Links a component into the hierarchy as a sibling below comp
+    virtual void LinkBelow(iAwsComponent* comp)
+    { comp->LinkBelow(comp); }
+
+    /// Sets the top child
+    virtual void SetTopChild(iAwsComponent* child)
+    { comp->SetTopChild(child); }
 };
 
 /**
