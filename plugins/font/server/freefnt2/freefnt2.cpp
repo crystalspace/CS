@@ -251,7 +251,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
 	  {
 	    Report (CS_REPORTER_SEVERITY_WARNING,
 	      "Fontfile %s doesn't contain charmaps", filename);
-	    return false;
+	    return 0;
 	  }
 
 	  FT_CharMap map = ftFace->charmaps[0];
@@ -264,7 +264,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
 	  if (FreetypeError (FT_Set_Charmap (ftFace, map),
 	    "Could not select charmap '%s' for %s", encName, filename))
 	  {
-	    return false;
+	    return 0;
 	  }
 	  else
 	  {

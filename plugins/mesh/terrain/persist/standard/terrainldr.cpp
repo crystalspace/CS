@@ -147,7 +147,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
 	{
           synldr->ReportError ("crystalspace.terrain.factory.loader",
             child, "Unable to find TerraFormer %s", name);
-          return false;
+          return 0;
 	}
         state->SetTerraFormer (form);
         break;
@@ -159,7 +159,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
 	{
           synldr->ReportError ("crystalspace.terrain.factory.loader",
             child, "Unable to parse sampleregion");
-          return false;
+          return 0;
 	}
         state->SetSamplerRegion (csBox2(box.MinX(), box.MinY(), 
 		                        box.MaxX(), box.MaxY()));

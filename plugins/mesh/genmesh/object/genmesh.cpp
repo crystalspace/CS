@@ -26,7 +26,6 @@
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
-#include "genmesh.h"
 #include "iengine/shadows.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -46,6 +45,7 @@
 #include "iutil/object.h"
 #include "iutil/cmdline.h"
 #include "iutil/strset.h"
+#include "genmesh.h"
 
 #include "qsqrt.h"
 

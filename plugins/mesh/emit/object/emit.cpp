@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
-#include "emit.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/rview.h"
@@ -30,6 +29,7 @@
 #include "qint.h"
 #include "csgeom/math3d.h"
 #include "csutil/garray.h"
+#include "emit.h"
 #include <math.h>
 #include <stdlib.h>
 

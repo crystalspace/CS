@@ -23,7 +23,6 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
 #include "cstool/rbuflock.h"
-#include "partgen.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
@@ -37,6 +36,7 @@
 #include "imesh/sprite2d.h"
 #include "iengine/movable.h"
 #include "ivideo/rendermesh.h"
+#include "partgen.h"
 #include <math.h>
 #include <stdlib.h>
 
