@@ -1724,16 +1724,16 @@ AS_IF([test $cs_cv_header_soundcard_h = yes],
 
 #------------------------------------------------------------------------------
 # Check for BSD-style socket support.  Also test for presence of type
-# socklen_t.  Note that we must not include both <winsock.h> and <sys/socket.h>
-# at the same time on Cygwin even though they both exist since the inclusion of
-# both files generates errors about structures and functions defined
-# differently between <winsock.h> and <sys/socket.h>.  Therefore, if
-# <winsock.h> is present, we include only it, otherwise we include
-# <sys/socket.h>.  A related problem also occurs with the check for presence of
-# <winsock.h> on Cygwin, thus this check is handled specially.  For this check,
-# the "default-includes" normally used by AC_CHECK_HEADER() are suppressed.
-# This prevents complaints about structures and functions in <winsock.h> being
-# defined differently by <sys/types.h> and <unistd.h>
+# socklen_t.  Note that we must not include both <winsock.h> and the Unix
+# socket-related headers at the same time on Cygwin even though they both exist
+# since the inclusion of both results in errors about structures and functions
+# defined differently between <winsock.h> and the other headers.  Therefore, if
+# <winsock.h> is present, we include only it, otherwise we include the Unix
+# socket-related headers.  A related problem also occurs with the check for
+# presence of <winsock.h> on Cygwin, thus this check is handled specially.  For
+# this check, the "default-includes" normally used by AC_CHECK_HEADER() are
+# suppressed.  This prevents complaints about structures and functions in
+# <winsock.h> being defined differently by <sys/types.h> and <unistd.h>
 #------------------------------------------------------------------------------
 m4_define([cs_socket_flags],
     [CS_CREATE_TUPLE() \
@@ -1754,7 +1754,10 @@ AC_CHECK_HEADERS(
 
 CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
     [AC_LANG_PROGRAM(
-	[#if HAVE_SYS_TYPES_H
+	[#if HAVE_WINSOCK_H
+	#include <winsock.h>
+	#else
+	#if HAVE_SYS_TYPES_H
 	#include <sys/types.h>
 	#endif
 	#if HAVE_NETINET_IN_H
@@ -1763,10 +1766,9 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 	#if HAVE_ARPA_INET_H
 	#include <arpa/inet.h>
 	#endif
-	#if HAVE_WINSOCK_H
-	#include <winsock.h>
-	#elif HAVE_SYS_SOCKET_H
+	#if HAVE_SYS_SOCKET_H
 	#include <sys/socket.h>
+	#endif
 	@%:@endif],
 	[struct in_addr a; inet_ntoa(a); socket(0,0,0);])],
 	[cs_socket_flags], [],
@@ -1774,25 +1776,24 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 
 AS_IF([test $cs_cv_sys_socket = yes],
     [AC_CHECK_TYPE([socklen_t], [], [CS_HEADER_PROPERTY([socklen_t],[int])],
-    [#if HAVE_UNISTD_H
-    #include <unistd.h>
-    #endif
-    #if HAVE_SYS_TYPES_H
-    #include <sys/types.h>
-    #endif
-    #if HAVE_SYS_SOCKET_H
-    #include <sys/socket.h>
-    #endif
-    #if HAVE_SYS_IOCTL_H
-    #include <sys/ioctl.h>
-    #endif
-    #if HAVE_NETINET_IN_H
-    #include <netinet/in.h>
-    #endif
-    #if HAVE_NETDB_H
-    #include <netdb.h>
-    #endif
-    ])])
+	[#if HAVE_UNISTD_H
+	#include <unistd.h>
+	#endif
+	#if HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#if HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+	#endif
+	#if HAVE_SYS_IOCTL_H
+	#include <sys/ioctl.h>
+	#endif
+	#if HAVE_NETINET_IN_H
+	#include <netinet/in.h>
+	#endif
+	#if HAVE_NETDB_H
+	#include <netdb.h>
+	@%:@endif])])
 
 
 

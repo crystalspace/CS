@@ -36,10 +36,12 @@ The history order is reversed so that new features are at the top.
 	    - Fixed bug: csGetPluginsPath() was leaking char[1024] buffer.
 	    - Cleaned up implementation files.
 	- Eric Sunshine changed the socket support check in the configure
-	  script so that it no longer includes both <winsock.h> and
-	  <sys/socket.h> at the same time even if both are present.  This works
-	  around a problem with Cygwin where including both files causes the
-	  test to fail because the headers are incompatible with one another.
+	  script so that it no longer includes both <winsock.h> and the Unix
+	  socket-related headers at the same time even if both are present.
+	  This works around a problem with Cygwin where including <winsock.h>
+	  and Unix socket-related headers causes the test to fail because the
+	  same functions and structures are defined differently between
+	  <winsock.h> and the other headers.
 	- Eric Sunshine changed the <winsock.h> check in the configure script
 	  so that it no longer uses AC_CHECK_HEADERS's "default-includes" when
 	  checking for presence of this file.  This works around a problem on
