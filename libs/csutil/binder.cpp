@@ -119,8 +119,6 @@ inline bool csInputBinder::HandleEvent (iEvent &ev)
   switch (ev.Type)
   {
     case csevKeyboard:
-      if (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown)
-	break;
     case csevMouseDown:
     case csevJoystickDown:
     case csevMouseUp:
@@ -128,7 +126,7 @@ inline bool csInputBinder::HandleEvent (iEvent &ev)
     {
       bool up = (ev.Type == csevMouseUp) || (ev.Type == csevJoystickUp) ||
 	((ev.Type == csevKeyboard) && 
-	(csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown));
+	(csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp));
       csEvBind *bind = (csEvBind *) Hash.Get (csHashComputeEvent (&ev));
 
       if (bind && !bind->pos && bind->b)

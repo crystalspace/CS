@@ -9,6 +9,10 @@ chronological order.
 29-Dec-2003
 	- Eric Sunshine changed user.mak so the old OpenGL renderer is not
 	  built when USE_NEW_RENDERER is 'yes'.
+	- Eric Sunshine applied patch from Bjorn Hansen
+	  (holomorph@users.sourceforge.net) for csInputBinder::HandleEvent().
+	  It was completely ignoring key down events and mis-interpreting key
+	  up events as key down events.
 28-Dec-2003
 	- Philip Wyett fixed a few config files so Freetype2 could again be
 	  invoked.
@@ -29,7 +33,7 @@ chronological order.
 	  <midnightcoder@midnightcoder.com> to cs_world.xsd (XML schema) which
 	  fixes a couple typographical errors (rotx,roty,rotx), etc.
 24-Dec-2003
-	- Eric Sunshined fixed linking problem with csjoywin.  It was using
+	- Eric Sunshine fixed linking problem with csjoywin.  It was using
 	  #define INITGUID before #including windows.h, and was also linking
 	  against dbguid.lib.  It needs to do one of these, but not both.
 23-Dec-2003
@@ -68,7 +72,7 @@ chronological order.
 	  fix linking problem on Cygwin (hopefully).
 	- Eric Sunshine fixed bug in cspace.i.  Was using bogus %ignoren rather
 	  than %ignore.
-	- Anders Stenberg made the following changes to NR to 
+	- Anders Stenberg made the following changes to NR to
 	  bring it closer to OR:
 	  - Made or_lighting the default shader, with a renderloop to fit it
 	  - Added a "zmesh" z-mode for renderloop passes, that uses the z-mode
