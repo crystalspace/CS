@@ -322,7 +322,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   light = engine->CreateLight (NULL, csVector3 (0, -4, -3), 10, csColor (0, 1, 0), false);
   room->AddLight (light);
 
-  iMeshWrapper *mw = room->GetMesh (0);
+  iMeshWrapper *mw = room->GetMeshes ()->GetMesh (0);
   iPolygonMesh* mesh = SCF_QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);
   (void)new csColliderWrapper(mw->QueryObject (), cdsys, mesh);
   mesh->DecRef ();
