@@ -30,6 +30,7 @@ int csScanStr (const char* in, const char* format, ...)
   va_start (arg, format);
 
   int num = 0;
+  const char* orig_in=in;
   in += strspn (in, CS_WHITE);
 
   char c[2] = { '\0', '\0' };
@@ -41,6 +42,12 @@ int csScanStr (const char* in, const char* format, ...)
       format++;
       switch (*format)
       {
+        case 'n':
+        {
+          int* a = va_arg (arg, int*);
+          *a=in-orig_in;
+          break;
+	}
         case 'd':
 	{
 	  int* a = va_arg (arg, int*);
@@ -205,6 +212,26 @@ int csScanStr (const char* in, const char* format, ...)
       in += strspn (in, CS_WHITE);
     }
     else if (*in == *format) { format++; in++; }
+    else { num = -1; break; }
+  }
+
+  while (*format)
+  {
+    c[0] = *format;
+    if (c[0] == '%')
+    {
+      format++;
+      switch (*format)
+      {
+        case 'n':
+        {
+          int* a = va_arg (arg, int*);
+          *a=in-orig_in;
+          break;
+	}
+      }
+      if (*format) format++;
+    }
     else { num = -1; break; }
   }
 

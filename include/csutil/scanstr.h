@@ -39,6 +39,10 @@
  *		a pointer to an integer which will contain the
  *		number of elements inserted in the list.
  * <dt>%F<dd>	similarly, a list of floats.
+ * <dt>%n<dd>	This returns the amount of the input string
+ *              thats been consumed, in characters. Does NOT 
+ *              increment the return count and does not read
+ *              from the input string.
  * </dl>
  * <p>Returns the number of successfully scanned arguments or -1 if there
  * was a mismatch.
