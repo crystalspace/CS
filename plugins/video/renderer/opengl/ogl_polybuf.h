@@ -26,6 +26,7 @@
 #include "csutil/refarr.h"
 #include "plugins/video/renderer/common/vbufmgr.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/material.h"
 #include "csutil/cscolor.h"
 #include "csgeom/subrec.h"
 
@@ -56,7 +57,7 @@ public:
   // We're duplicating info, but we need the number of vertices per
   // material, so later we can call ClipTriangleMesh
 
-  CS_DECLARE_GROWING_ARRAY(vertices,csIndexVertex);
+  CS_DECLARE_GROWING_ARRAY(idx_vertices,csIndexVertex);
   CS_DECLARE_GROWING_ARRAY(triangles,csTriangle);
 
   CS_DECLARE_GROWING_ARRAY(texels, csVector2);
@@ -68,10 +69,9 @@ public:
   ~csTrianglesPerMaterial();
 
   void ClearVertexArray();
-  void CopyTrianglesGrowToTriangles();
 
   /// Return the number of triangles
-  int TriangleCount() { return numTriangles;};
+  int TriangleCount () const { return numTriangles; }
 };
 
 
@@ -80,8 +80,8 @@ class TrianglesNode
 public:
   csTrianglesPerMaterial *info;
   TrianglesNode * next;
-  TrianglesNode();
-  ~TrianglesNode();
+  TrianglesNode ();
+  ~TrianglesNode ();
 };
 
 class TrianglesList
@@ -91,13 +91,12 @@ public:
   TrianglesNode* last;
   int numElems;
 
-  TrianglesList();
-  ~TrianglesList();
-  int GetLastMaterial();
-  void Add(TrianglesNode* t);
-  TrianglesNode* GetLast();
+  TrianglesList ();
+  ~TrianglesList ();
+  int GetLastMaterial ();
+  void Add (TrianglesNode* t);
+  TrianglesNode* GetLast ();
 };
-
 
 /**
  * This class stores triangles thatcould share the same superlightmap
@@ -109,7 +108,7 @@ public:
   CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
 
   /// Vertices of those triangles
-  CS_DECLARE_GROWING_ARRAY (vertices, csVector3);
+  CS_DECLARE_GROWING_ARRAY (vec_vertices, csVector3);
 
   /// texels of those triangles
   CS_DECLARE_GROWING_ARRAY (texels, csVector2);
@@ -167,8 +166,8 @@ public:
   TrianglesSuperLightmapNode* prev;
   csTrianglesPerSuperLightmap * info;
 
-  TrianglesSuperLightmapNode();
-  ~TrianglesSuperLightmapNode();
+  TrianglesSuperLightmapNode ();
+  ~TrianglesSuperLightmapNode ();
 };
 
 /**
@@ -186,25 +185,25 @@ public:
   TrianglesSuperLightmapNode* last;
   int numElems;
 
-  TrianglesSuperLightmapList();
-  ~TrianglesSuperLightmapList();
-  void Add(TrianglesSuperLightmapNode* t);
-  TrianglesSuperLightmapNode* GetLast();
+  TrianglesSuperLightmapList ();
+  ~TrianglesSuperLightmapList ();
+  void Add (TrianglesSuperLightmapNode* t);
+  TrianglesSuperLightmapNode* GetLast ();
 
-  //Dirty due dynamic lights, needs recalculating
+  // Dirty due dynamic lights, needs recalculating.
   bool dirty;
 
-  //firstTime says if it's the first time that the superlightmap
-  // is cached
+  // FirstTime says if it's the first time that the superlightmap
+  // is cached.
   bool firstTime;
 
-  //Marks as dirty
-  void MarkLightmapsDirty() {dirty = true;};
+  // Marks as dirty.
+  void MarkLightmapsDirty () { dirty = true; }
 
-  //Clear the dirty state
-  void ClearLightmapsDirty() {dirty = false;};
-  //Gets the dirty state
-  bool GetLightmapsDirtyState(){ return dirty;}
+  // Clear the dirty state.
+  void ClearLightmapsDirty() { dirty = false; }
+  // Gets the dirty state.
+  bool GetLightmapsDirtyState () const { return dirty; }
 };
 
 
@@ -215,18 +214,26 @@ public:
 class csTriangleArrayPolygonBuffer : public csPolygonBuffer
 {
 private:
-  // Add a single vertex to the given tri/mat buffer.
-  // Returns vertex index.
+  /*
+   * Add a single vertex to the given tri/mat buffer.
+   * Returns vertex index.
+   */
   int AddSingleVertex (csTrianglesPerMaterial* pol,
 	int* verts, int i, const csVector2& uv);
-  // Add a single vertex to the given suplm.
-  // Returns vertex index. This version is for when there is
-  // actually no lightmapping needed but the suplm is only
-  // there for fog.
+
+  /*
+   * Add a single vertex to the given suplm.
+   * Returns vertex index. This version is for when there is
+   * actually no lightmapping needed but the suplm is only
+   * there for fog.
+   */
   int AddSingleVertexLM (csTrianglesPerSuperLightmap* triSuperLM,
 	int* verts, int i);
-  // Add a single vertex to the given suplm.
-  // Returns vertex index.
+
+  /*
+   * Add a single vertex to the given suplm.
+   * Returns vertex index.
+   */
   int AddSingleVertexLM (csTrianglesPerSuperLightmap* triSuperLM,
 	int* verts, int i, const csVector2& uvLightmap);
 
@@ -237,10 +244,7 @@ protected:
   // Mesh triangles grouped by material list.
   TrianglesList polygons;
 
-  typedef iMaterialHandle* iMaterialHandleP;
-
-  CS_DECLARE_GROWING_ARRAY (materials, iMaterialHandleP);
-
+  csRefArray<iMaterialHandle> materials;
   CS_DECLARE_GROWING_ARRAY (normals, csVector3);
 
   csVector3 * vertices;
@@ -255,54 +259,15 @@ protected:
 public:
 
   bool HaveUnlitPolys() {return unlitPolysSL != NULL;};
-  /// Gets the triangles for a given node (by material)
-  csTriangle* GetTriangles(TrianglesNode* t);
 
-  /// Gets the triangles for a given node (by super lightmap)
-  csTriangle* GetTriangles(TrianglesSuperLightmapNode* t);
+  TrianglesNode* GetFirst () { return polygons.first; }
+  TrianglesSuperLightmapNode* GetFirstTrianglesSLM () { return superLM.last; }
 
-  /// Gets the triangles count for a given node (by material)
-  int GetTriangleCount(TrianglesNode* t);
-
-  /// Gets the triangles count for a given node (by super lightmap)
-  int GetTriangleCount(TrianglesSuperLightmapNode* t);
-
-
-  /// Gets the  vertices count for a given node (by material)
-  int GetVertexCount(TrianglesNode* t);
-
-  /// Gets the  vertices count for a given node (by super lightmap)
-  int GetVertexCount(TrianglesSuperLightmapNode* t);
-
-  /// Gets the material index for a given node
-  int GetMatIndex(TrianglesNode* t);
-
-
-  /// Gets the UV coordinates for a given node (by material)
-  csVector2* GetUV(TrianglesNode* t);
-
-  /// Gets the UV coordinates for a given node (by super lightmap)
-  csVector2* GetUV(TrianglesSuperLightmapNode* t);
-
-  /// Gets the vertices for a given node (by material)
-  csVector3* GetVerticesPerMaterial(TrianglesNode* t);
-
-  /// Gets the vertices for a given node (by super lightmap)
-  csVector3* GetVerticesPerSuperLightmap(TrianglesSuperLightmapNode* t);
-
-  TrianglesNode* GetFirst();
-  TrianglesNode* GetNext(TrianglesNode* t);
-  TrianglesSuperLightmapNode* GetFirstTrianglesSLM();
-  TrianglesSuperLightmapNode* GetNextTrianglesSLM(TrianglesSuperLightmapNode* t);
-
-  int GetUVCount(TrianglesSuperLightmapNode* t);
-  int GetUVCount(TrianglesNode* t);
+  int GetUVCount (TrianglesSuperLightmapNode* t);
+  int GetUVCount (TrianglesNode* t);
 
   /// Gets the number of materials of the mesh
   virtual int GetMaterialCount() const { return matCount;}
-
-  /// Gets the number of super lightmaps needed for this mesh
-  int GetSuperLMCount();
 
   /// Gets the Lightmap cache data for a given node (by super lightmap)
   csSLMCacheData* GetCacheData(TrianglesSuperLightmapNode* t);
@@ -312,7 +277,7 @@ public:
 
   /// Gets the material handler for a given node (by material)
   iMaterialHandle* GetMaterialPolygon(TrianglesNode* t)
-  { return (materials[GetMatIndex(t)]);}
+  { return (iMaterialHandle*)(materials[t->info->matIndex]);}
 
   /// Constructor
   csTriangleArrayPolygonBuffer (iVertexBufferManager* mgr);
@@ -321,10 +286,9 @@ public:
 
   /// Adds a polygon to the polygon buffer
   virtual void AddPolygon (int* verts, int num_verts,
-  const csPlane3& poly_normal,
-  int mat_index,
-  const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-  iPolygonTexture* poly_texture);
+    const csPlane3& poly_normal, int mat_index,
+    const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+    iPolygonTexture* poly_texture);
 
   /// Adds a material to the polygon buffer
   virtual void AddMaterial (iMaterialHandle* mat_handle);

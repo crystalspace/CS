@@ -2832,13 +2832,13 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
           (*clipped_colors)[num_clipped_vertices] = vertex_colors[i];
         if (vertex_fog)
           (*clipped_fog)[num_clipped_vertices] = vertex_fog[i];
-        if (userarrays) 
+        if (userarrays)
         {
           for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
             if (userarrays[u] != NULL)
             {
               for (int c=0; c<userarraycomponents[u]; c++)
-                (*clipped_user[u])[num_clipped_vertices] = 
+                (*clipped_user[u])[num_clipped_vertices] =
                   (userarrays[u])[i*userarraycomponents[u]+c];
             }
         }
@@ -2961,7 +2961,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 	  for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
 	    clipped_userpointers[u] = clipped_user[u]->GetArray ();
 	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
-	    vertices, texels, vertex_colors, 
+	    vertices, texels, vertex_colors,
 	    userarrays, userarraycomponents, vertex_fog,
 	    num_clipped_vertices,
 	    clipped_texels->GetArray (),
@@ -3020,20 +3020,27 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   else
     trimesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
-  TrianglesNode *t = polbuf->GetFirst();
-  for (i=0 ; i < polbuf->GetMaterialCount () ; i++)
+  // Loop over all sub-meshes. Every sub-mesh represents a different material.
+  TrianglesNode *t = polbuf->GetFirst ();
+  while (t != NULL)
   {
+    csTrianglesPerMaterial* tpm = t->info;
+
+    // Clear the vertex arrays in the polygon buffer since they are only
+    // needed while building the polygon buffer. Not later.
+    tpm->ClearVertexArray ();
+
     trimesh.mat_handle = polbuf->GetMaterialPolygon (t);
-    vbman->LockBuffer (vb, 
-      polbuf->GetVerticesPerMaterial (t),
-      polbuf->GetUV (t),
+    vbman->LockBuffer (vb,
+      tpm->verticesPoints.GetArray (),
+      tpm->texels.GetArray (),
       NULL,
-      polbuf->GetVertexCount (t), 0);
-    trimesh.triangles = polbuf->GetTriangles (t);
-    trimesh.num_triangles = polbuf->GetTriangleCount (t);
+      tpm->numVertices, 0);
+    trimesh.triangles = tpm->triangles.GetArray ();
+    trimesh.num_triangles = tpm->numTriangles;
     DrawTriangleMesh (trimesh);
     vbman->UnlockBuffer (vb);
-    t = polbuf->GetNext (t);
+    t = t->next;
   }
 
   switch (z_buf_mode)
@@ -3052,24 +3059,26 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   TrianglesSuperLightmapNode *sln = polbuf->GetFirstTrianglesSLM ();
   bool dirty = polbuf->superLM.GetLightmapsDirtyState();
   bool modified = false;
-  for (i=0 ; i<polbuf->GetSuperLMCount () ; i++)
+  while (sln != NULL)
   {
-    lightmap_cache->Cache (sln->info, dirty, &modified);
-    if (!sln->info->cacheData->IsUnlit ())
-    {   
-      vbman->LockBuffer (vb, 
-        polbuf->GetVerticesPerSuperLightmap (sln),
-        polbuf->GetUV (sln),
+    csTrianglesPerSuperLightmap* tplm = sln->info;
+
+    lightmap_cache->Cache (tplm, dirty, &modified);
+    if (!tplm->cacheData->IsUnlit ())
+    {
+      vbman->LockBuffer (vb,
+	tplm->vec_vertices.GetArray (),
+	tplm->texels.GetArray (),
         NULL,
-        polbuf->GetVertexCount (sln), 0);
+	tplm->numVertices, 0);
 
-      trimesh.triangles = polbuf->GetTriangles (sln);
-      trimesh.num_triangles = polbuf->GetTriangleCount (sln);
+      trimesh.triangles = tplm->triangles.GetArray ();
+      trimesh.num_triangles = tplm->numTriangles;
 
-      EffectDrawTriangleMesh (trimesh, sln->info->cacheData->Handle);
+      EffectDrawTriangleMesh (trimesh, tplm->cacheData->Handle);
       vbman->UnlockBuffer (vb);
     }
-    sln = polbuf->GetNextTrianglesSLM (sln);
+    sln = sln->prev;
   }
   polbuf->superLM.ClearLightmapsDirty ();
 }
@@ -3832,7 +3841,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     {
       ///@@@HACK.. THESE SHOULD BE CHANEGD
       //set all constants
-      
+
       for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
       {
         csOpenGlVPConstant* c = (csOpenGlVPConstant*)pass_data
@@ -3846,10 +3855,10 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
         }
         else if  (c->efvariableType == CS_EFVARIABLETYPE_VECTOR4)
-        { 
+        {
           //set a vec4
           csEffectVector4 vec = effect->GetVariableVector4(c->variableID);
-          glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB, 
+          glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB,
               c->constantNumber, vec.x, vec.y, vec.z, vec.w);
         }
       }
@@ -3956,12 +3965,12 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       {
         statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
         statecache->EnableState (GL_TEXTURE_2D, l);
-      } 
+      }
       else if (layer_data->inputtex==-2)
       {
         statecache->SetTexture (GL_TEXTURE_2D, lightmap);
         statecache->EnableState (GL_TEXTURE_2D, l);
-      } 
+      }
       else if (layer_data->inputtex==0)
       {
         txt_handle = 0;
@@ -5260,13 +5269,13 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           pass_data->vcsource = ED_SOURCE_MESH;
         else
         {
-          pass_data->vcsource = 
+          pass_data->vcsource =
             ED_SOURCE_USERARRAY((int)pass->GetStateString( pass_state )-1);
         }
       }
       else if ( pass_state == efstrings->nvvertex_program_gl )
       {
-        if( !ARB_vertex_program || !glGenProgramsARB || 
+        if( !ARB_vertex_program || !glGenProgramsARB ||
             !glBindProgramARB || ! glProgramStringARB)
           return false;
 
@@ -5298,7 +5307,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
 
         if(errorPos != -1)
         {
-          Report (CS_REPORTER_SEVERITY_WARNING, 
+          Report (CS_REPORTER_SEVERITY_WARNING,
                   "Vertexprogram error at position %d in effect %s (pass %d)",
                   errorPos, effect->GetName(), p);
           Report (CS_REPORTER_SEVERITY_WARNING,
@@ -5317,10 +5326,10 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           sscanf(constname, "vertex program constant %d", &constnum);
 
           if ( (constnum < 4) ||(constnum > 96) ) return false;
-          
+
           int varnum = effect->GetVariableID(pass->GetStateString(pass_state), false);
           char vartype = effect->GetVariableType(varnum);
-          
+
           if(vartype == 0) return false;
 
           pass_data->vertex_constants.Push(new csOpenGlVPConstant(constnum,  varnum, vartype));
@@ -5533,7 +5542,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
             layer_data->vcord_source = ED_SOURCE_LIGHTMAP;
           else
           {
-            layer_data->vcord_source = 
+            layer_data->vcord_source =
               ED_SOURCE_USERARRAY((int)layer->GetStateFloat( layer_state )-1);
           }
         }

@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+11-Oct-2002
+	- Some more cleanups in the OpenGL renderer.
 10-Oct-2002
 	- Fixed a bug in the OpenGL canvases where a glEnd() was called
 	  (when writing text) without a corresponding glBegin().
