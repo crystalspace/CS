@@ -64,9 +64,11 @@ csHashKey csHashComputeEvent (iEvent* const ev)
   switch (ev->Type)
   {
     case csevKeyboard:
-      utf32_char codeRaw;
-      ev->Find ("keyCodeRaw", codeRaw);
-      return CSMASK_Keyboard | (codeRaw << 8);
+      {
+	utf32_char codeRaw = 0;
+	ev->Retrieve ("keyCodeRaw", codeRaw);
+	return CSMASK_Keyboard | (codeRaw << 8);
+      }
 
     case csevMouseMove:
       return CSMASK_MouseMove

@@ -62,7 +62,9 @@ typedef enum _csEventType
   csevJoystickDown,		
   /// A joystick button has been released
   csevJoystickUp,		
-  /// Somebody(-thing) sent a command. @see csEventCommandData
+  /**
+   * Somebody(-thing) sent a command. @see csEventCommandData
+   */
   csevCommand,			
   /// Somebody(-thing) sent a broadcast command
   csevBroadcast,		
@@ -190,7 +192,9 @@ typedef enum _csKeyModifierType
   /// 'ScrollLock' is toggled
   csKeyModifierTypeScrollLock,
   
-  /// \internal Can be used to get the number of defined modifier types.
+  /**
+   * \internal Can be used to get the number of defined modifier types.
+   */
   csKeyModifierTypeLast
 } csKeyModifierType;
 

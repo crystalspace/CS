@@ -37,7 +37,7 @@ class csFile : public iFile
 {
 protected:
   // Index into parent node RPath
-  int Index;
+  size_t Index;
   // File node
   VfsNode *Node;
   // Filename in VFS
@@ -48,7 +48,7 @@ protected:
   int Error;
 
   // The constructor for csFile
-  csFile (int Mode, VfsNode *ParentNode, int RIndex,
+  csFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   	const char *NameSuffix);
 
 public:

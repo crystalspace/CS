@@ -35,16 +35,6 @@
 #include <string.h>
 #include <assert.h>
 
-// DEPRECATED use "true" instead
-#ifndef TRUE
-  #define TRUE 1
-#endif
-
-// DEPRECATED use "false" instead
-#ifndef FALSE
-  #define FALSE 0
-#endif
-
 #ifndef MIN
   #define MIN(a,b) ((a)<(b)?(a):(b))
 #endif

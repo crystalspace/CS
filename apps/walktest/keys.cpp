@@ -539,10 +539,10 @@ void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
 void WalkTest::eatkeypress (iEvent* Event)
 {
   uint32 key = 0;
-  Event->Find ("keyCodeRaw", key);
+  Event->Retrieve ("keyCodeRaw", key);
 
   uint8 evType = 0;
-  Event->Find ("keyEventType", evType);
+  Event->Retrieve ("keyEventType", evType);
   bool status = (evType == csKeyEventTypeDown);
 
   if (myConsole && myConsole->GetVisible () && status)
@@ -642,7 +642,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
     	iObject);
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
     	psobj ? psobj->GetName () : "<null>",
-	ps->GetFactory ()->GetPolygonName (sel));
+	ps ? ps->GetFactory ()->GetPolygonName (sel) : "<null>");
     //Dumper::dump (sel);
   }
 

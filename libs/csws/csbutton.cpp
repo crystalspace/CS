@@ -203,7 +203,7 @@ bool csButton::HandleEvent (iEvent &Event)
         case cscmdStaticHotKeyEvent:
         {
           iEvent *ev = (iEvent *)Event.Command.Info;
-	  ev->Remove ("keyCodeCooked", 0);
+	  ev->Remove ("keyCodeCooked");
 	  ev->Add ("keyCodeCooked", (uint32)CSKEY_SPACE);
           return csButton::HandleEvent (*ev);
         }

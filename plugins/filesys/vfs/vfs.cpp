@@ -64,7 +64,7 @@ class DiskFile : public csFile
   // Contains the complete file, if GetAllData() was called
   csRef<iDataBuffer> alldata;
   // constructor
-  DiskFile(int Mode, VfsNode* ParentNode, int RIndex,
+  DiskFile(int Mode, VfsNode* ParentNode, size_t RIndex,
   	const char* NameSuffix);
   // set Error according to errno
   void CheckError ();
@@ -125,7 +125,7 @@ private:
   // current data pointer
   size_t fpos;
   // constructor
-  ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
+  ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     const char *NameSuffix, VfsArchive *ParentArchive);
 
 public:
@@ -323,7 +323,7 @@ static VfsArchiveCache *ArchiveCache = 0;
 
 // -------------------------------------------------------------- csFile --- //
 
-csFile::csFile (int Mode, VfsNode *ParentNode, int RIndex,
+csFile::csFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   const char *NameSuffix)
 {
   (void)Mode;
@@ -420,7 +420,7 @@ SCF_IMPLEMENT_IBASE_END
 // disabled for now.
 // #define VFS_DISKFILE_MAPPING
 
-DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
+DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -795,7 +795,7 @@ SCF_IMPLEMENT_IBASE (ArchiveFile)
   SCF_IMPLEMENTS_INTERFACE (iFile)
 SCF_IMPLEMENT_IBASE_END
 
-ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
+ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   const char *NameSuffix, VfsArchive *ParentArchive) :
   csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
@@ -953,10 +953,10 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
 {
   bool rc = false;
   // Split rpath into several, separated by commas
-  int rpl = strlen (RealPath);
+  size_t rpl = strlen (RealPath);
   char *cur, *src;
   char *oldsrc = src = csStrNew (RealPath);
-  for (cur = src; rpl >= 0; cur++, rpl--)
+  for (cur = src, rpl++; rpl-- > 0; cur++)
     if ((rpl == 0) || (*cur == VFS_PATH_DIVIDER))
     {
       *cur = 0;
@@ -1263,9 +1263,9 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
     else
     {
       // rpath is an archive
-      int idx = ArchiveCache->FindKey (rpath);
+      size_t idx = ArchiveCache->FindKey (rpath);
       // archive not in cache?
-      if (idx < 0)
+      if (idx == csArrayItemNotFound)
       {
         if ((Mode & VFS_FILE_MODE) != VFS_FILE_WRITE)
 	{
@@ -1313,9 +1313,9 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
     else
     {
       // rpath is an archive
-      int idx = ArchiveCache->FindKey (rpath);
+      size_t idx = ArchiveCache->FindKey (rpath);
       // archive not in cache?
-      if (idx < 0)
+      if (idx == csArrayItemNotFound)
       {
         // does file rpath exist?
         if (access (rpath, F_OK) != 0)
@@ -1605,7 +1605,7 @@ char *csVFS::_ExpandPath (const char *Path, bool IsDir) const
     }
     else
     {
-      int sl = strlen (tmp);
+      size_t sl = strlen (tmp);
       memcpy (&outname [outp], tmp, sl);
       outp += sl;
       if (IsDir || (inp < namelen))
@@ -1738,16 +1738,16 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
   if (Path != 0)
   {
     csRef<iStringArray> roots = csFindSystemRoots();
-    for (int i = 0, n = roots->Length(); i < n; i++)
+    for (size_t i = 0, n = roots->Length(); i < n; i++)
     {
       char const* t = roots->Get(i);
       csString s(t);
-      int const slen = s.Length();
+      size_t const slen = s.Length();
       char c = '\0';
 
       csString vfs_dir;
       vfs_dir << Path << '/';
-      for (int j = 0; j < slen; j++)
+      for (size_t j = 0; j < slen; j++)
       {
         c = s.GetAt(j);
         if (c == '_' || c == '-' || isalnum(c))
@@ -1785,7 +1785,7 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
     PreparePath (Path, false, node, suffix, sizeof (suffix));
 
     // Now separate the mask from directory suffix
-    int dirlen = strlen (suffix);
+    size_t dirlen = strlen (suffix);
     while (dirlen && suffix [dirlen - 1] != VFS_PATH_SEPARATOR)
       dirlen--;
     strcpy (mask, suffix + dirlen);
@@ -1942,8 +1942,8 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   node->AddRPath (RealPath, this);
   if (node->RPathV.Length () == 0)
   {
-    int idx = NodeList.Find (node);
-    if (idx >= 0)
+    size_t idx = NodeList.Find (node);
+    if (idx != csArrayItemNotFound)
       NodeList.DeleteIndex (idx);
     return false;
   }
@@ -1973,8 +1973,8 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
     csString s("VFS.Mount.");
     s+=node->ConfigKey;
     config.DeleteKey (s);
-    int idx = NodeList.Find (node);
-    if (idx >= 0)
+    size_t idx = NodeList.Find (node);
+    if (idx != csArrayItemNotFound)
       NodeList.DeleteIndex (idx);
   }
 

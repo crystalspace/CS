@@ -95,7 +95,8 @@ public:
     // a function that returns a csPtr and not using the result
     // (or at least not assigning it to a csRef). This is a memory
     // leak and you should fix that.
-    CS_ASSERT (obj == (T*)CS_VOIDED_PTR);
+    CS_ASSERT_MSG ("csPtr<> was not assigned to a csRef<> prior destruction", 
+      obj == (T*)CS_VOIDED_PTR);
   }
 #endif
 
@@ -137,7 +138,8 @@ public:
   {
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    CS_ASSERT (newobj.obj != (T*)CS_VOIDED_PTR);
+    CS_ASSERT_MSG ("csPtr<> was already assigned to a csRef<>",
+      newobj.obj != (T*)CS_VOIDED_PTR);
 #   endif
     // The following line is outside the ifdef to make sure
     // we have binary compatibility.
@@ -193,7 +195,8 @@ public:
     // First assign and then DecRef() of old object!
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    CS_ASSERT (newobj.obj != (T*)CS_VOIDED_PTR);
+    CS_ASSERT_MSG ("csPtr<> was already assigned to a csRef<>",
+      newobj.obj != (T*)CS_VOIDED_PTR);
 #   endif
     // The following line is outside the ifdef to make sure
     // we have binary compatibility.

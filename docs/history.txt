@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Jul-2004
+	- res made the following changes:
+	    - Removed the fake bool stuff. Compilers that are able to deal with
+	      CS' usage of templates are deemed to have a 'bool' type.
+	    - Some doxygen documentation fixes.
+	    - Replaced the CS_ASSERTs with CS_ASSERT_MSGs in csutil/ref.h.
+	    - Removed the flattening from iEvent. Instead, iEvent now offers
+	      an attribute iterator which can be used to serialize an event
+	      "from the outside". Moved flattening code into a separate helper
+	      class, csEventFlattener.
+	    - Removed ability to store multiple event attributes with the same
+	      name.
+	    - Added ability to store iBase data in event attributes.
+	    - Renamed iEvent::Find() to iEvent::Retrieve() due changed return
+	      value (and semantics change caused by that).
+	    - Fixed copy'n'paste error in csendian.h. The int64 variant of
+	      convert_endian() would use little_endian_long() instead of
+	      little_endian_longlong(), causing bogus results.
+	    - Fixed some 64-bit warnings in VFS.
 10-Jul-2004
 	- res fixed the Win32 manifest resource generation code to not emit
 	  non-numerical characters when writing the version number - Windows

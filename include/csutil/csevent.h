@@ -1,6 +1,7 @@
 /*
     Crystal Space 3D engine: Event class interface
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Written by Andrew Zabolotny <bit@eltech.ru>, Jonathan Tarbox, 
+      Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,24 +29,15 @@
 #include "weakref.h"
 #include "cseventq.h"
 
-/// Various datatypes supported by the event system (csEvent).
-enum
-{
-  CS_DATATYPE_INT8 = 0x00,
-  CS_DATATYPE_UINT8,
-  CS_DATATYPE_INT16,
-  CS_DATATYPE_UINT16,
-  CS_DATATYPE_INT32,
-  CS_DATATYPE_UINT32,
-  CS_DATATYPE_INT64,
-  CS_DATATYPE_UINT64,
-  CS_DATATYPE_FLOAT,
-  CS_DATATYPE_DOUBLE,
-  CS_DATATYPE_BOOL,
-  CS_DATATYPE_STRING,
-  CS_DATATYPE_DATABUFFER,
-  CS_DATATYPE_EVENT
-};
+/**\file
+ * iEvent implementation
+ */
+
+class csEventAttributeIterator;
+
+class csEvent;
+
+SCF_VERSION (csEvent, 0, 0, 1);
 
 /**
  * This class represents a system event.<p>
@@ -56,86 +48,119 @@ enum
 class CS_CSUTIL_EXPORT csEvent : public iEvent
 {
 private:
-  typedef struct attribute_tag
+  struct attribute
   {
     union
     {
-      int64 Integer;
-      uint64 Unsigned;
-      double Double;
-      char *String;
-      bool Bool;
-      iEvent *Event;
+      int64 intVal;
+      double doubleVal;
+      char* bufferVal;
+      iBase* ibaseVal;
     };
-    enum Type
-    {
-      tag_int8,
-      tag_uint8,
-      tag_int16,
-      tag_uint16,
-      tag_int32,
-      tag_uint32,
-      tag_int64,
-      tag_uint64,
-      tag_float,
-      tag_double,
-      tag_string,
-      tag_databuffer,
-      tag_bool,
-      tag_event
-    } type;
-    uint32 length;
-    attribute_tag (Type t) { type = t; }
-    ~attribute_tag() 
+    csEventAttributeType type;
+    size_t dataSize;
+    attribute (csEventAttributeType t) { type = t; }
+    ~attribute () 
     { 
-      if ((type == tag_string) || (type == tag_databuffer)) 
-	delete[] String; 
-      else if (type == tag_event)
-	Event->DecRef();
+      if (type == csEventAttrDatabuffer) 
+	delete[] bufferVal; 
+      else if ((type == csEventAttrEvent) || (type == csEventAttriBase))
+	ibaseVal->DecRef();
     }
-  } attribute;
-
+  };
   csHash<attribute*, csStrKey, csConstCharHashKeyHandler> attributes;
+  friend class csEventAttributeIterator;
 
-  uint32 count;
+  size_t count;
 
   bool CheckForLoops(iEvent *current, iEvent *e);
 
-  bool FlattenCrystal(char *buffer);
-  bool FlattenMuscle(char *buffer);
-  bool FlattenXML(char *buffer);
-
-  uint32 FlattenSizeCrystal();
-  uint32 FlattenSizeMuscle();
-  uint32 FlattenSizeXML();
-
-  bool UnflattenCrystal(const char *buffer, uint32 length);
-  bool UnflattenMuscle(const char *buffer, uint32 length);
-  bool UnflattenXML(const char *buffer, uint32 length);
-
-  template<class T, attribute_tag::Type typeID>
-  bool AddInternalInt (const char* name, T value)
+  template <typename T>
+  bool InternalAddInt (const char* name, T value)
   {
-    attribute* object = new attribute (typeID);
-    object->Integer = value;
-    attributes.Put (name, object);
-    count++;
-    return true;
+    if (attributes.In (name)) return false;
+    attribute* object = new attribute (csEventAttrInt);	
+    object->intVal = (int64)value;				
+    attributes.Put (name, object);				
+    count++;							
+    return true;						
   }
 
-  bool SkipToIndex (
-    csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator& iter,
-    int index) const
+  template <typename T>
+  bool InternalAddUInt (const char* name, T value)
   {
-    while (index-- > 0)
+    if (attributes.In (name)) return false;
+    attribute* object = new attribute (csEventAttrUInt);	
+    object->intVal = (int64)value;				
+    attributes.Put (name, object);				
+    count++;							
+    return true;						
+  }
+
+  csEventError InternalReportMismatch (attribute* attr) const
+  {
+    switch (attr->type)
     {
-      if (!iter.HasNext()) return false;
-      iter.Next();
+      case csEventAttrInt:
+	return csEventErrMismatchInt;
+      case csEventAttrUInt:
+	return csEventErrMismatchUInt;
+      case csEventAttrFloat:
+	return csEventErrMismatchFloat;
+      case csEventAttrDatabuffer:
+	return csEventErrMismatchBuffer;
+      case csEventAttrEvent:
+	return csEventErrMismatchEvent;
+      case csEventAttriBase:
+	return csEventErrMismatchIBase;
+      default:
+	break;
     }
-    return iter.HasNext();
+    return csEventErrUhOhUnknown;
   }
 
-  static char const* GetTypeName (attribute::Type t);
+  template <typename T>
+  csEventError InternalRetrieveInt (const char* name, T& value) const
+  {								
+    attribute* object = attributes.Get (name, 0);
+    if (!object) return csEventErrNotFound;
+    if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
+    {									
+      value = (T)object->intVal;
+      const T rangeMin = (T)(1 << (sizeof(T) * 8 - 1));
+      const T rangeMax = ~rangeMin;
+      if ((object->intVal < rangeMin) || (object->intVal > rangeMax))
+	return csEventErrLossy;
+      else
+	return csEventErrNone;
+    }
+    else
+    {
+      return InternalReportMismatch (object);
+    }
+  }
+
+  template <typename T>
+  csEventError InternalRetrieveUint (const char* name, T& value) const
+  {								
+    attribute* object = attributes.Get (name, 0);
+    if (!object) return csEventErrNotFound;
+    if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
+    {									
+      value = (T)object->intVal;
+      const T rangeMax = (T)~0;
+      if ((uint64)object->intVal > rangeMax)
+	return csEventErrLossy;
+      else
+	return csEventErrNone;							
+    }
+    else
+    {
+      return InternalReportMismatch (object);
+    }
+  }
+
+  static char const* GetTypeName (csEventAttributeType t);
 protected:
   virtual csRef<iEvent> CreateEvent();
 
@@ -165,72 +190,88 @@ public:
 
 #define CS_CSEVENT_ADDINT(type)					\
   virtual bool Add (const char* name, type value)		\
-  {								\
-    attribute* object = new attribute (attribute::tag_##type);	\
-    object->Integer = value;					\
-    attributes.Put (name, object);				\
-    count++;							\
-    return true;						\
-  }
-
+  { return InternalAddInt (name, value); }
   CS_CSEVENT_ADDINT(int8)
-  CS_CSEVENT_ADDINT(uint8)
   CS_CSEVENT_ADDINT(int16)
-  CS_CSEVENT_ADDINT(uint16)
-  CS_CSEVENT_ADDINT(uint32)
+  CS_CSEVENT_ADDINT(int32)
   CS_CSEVENT_ADDINT(int64)
-  CS_CSEVENT_ADDINT(uint64)
 #undef CS_CSEVENT_ADDINT
-  virtual bool Add (const char *name, int32 v, bool force_boolean = false);
+#define CS_CSEVENT_ADDUINT(type)				\
+  virtual bool Add (const char* name, type value)		\
+  { return InternalAddUInt (name, value); }
+  CS_CSEVENT_ADDUINT(uint8)
+  CS_CSEVENT_ADDUINT(uint16)
+  CS_CSEVENT_ADDUINT(uint32)
+  CS_CSEVENT_ADDUINT(uint64)
+#undef CS_CSEVENT_ADDUINT
   virtual bool Add (const char *name, float v);
   virtual bool Add (const char *name, double v);
   virtual bool Add (const char *name, const char *v);
-  virtual bool Add (const char *name, const void *v, uint32 size);
-#ifndef CS_USE_FAKE_BOOL_TYPE
-  virtual bool Add (const char *name, bool v, bool force_boolean = true);
-#endif
-  virtual bool Add (const char *name, iEvent *v);
+  virtual bool Add (const char *name, const void *v, size_t size);
+  virtual bool Add (const char *name, bool v);
+  virtual bool Add (const char *name, iEvent* v);
+  virtual bool Add (const char *name, iBase* v);
 
   /// Find a named event for a given type.
 #define CS_CSEVENT_FINDINT(T)						\
-  virtual bool Find (const char* name, T& value, int index) const	\
-  {									\
-    csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator	\
-      iter (attributes.GetIterator (name));				\
-    if (!SkipToIndex (iter, index)) return false;			\
-    attribute* object = iter.Next();					\
-    if (object->type == attribute::tag_##T)				\
-    {									\
-      value = (T)object->Integer;					\
-      return true;							\
-    }									\
-    return false;							\
-  }
+  virtual csEventError Retrieve (const char* name, T& value) const	\
+  { return InternalRetrieveInt (name, value); }
   CS_CSEVENT_FINDINT(int8)
-  CS_CSEVENT_FINDINT(uint8)
   CS_CSEVENT_FINDINT(int16)
-  CS_CSEVENT_FINDINT(uint16)
   CS_CSEVENT_FINDINT(int32)
-  CS_CSEVENT_FINDINT(uint32)
-  CS_CSEVENT_FINDINT(int64)
-  CS_CSEVENT_FINDINT(uint64)
 #undef CS_CSEVENT_FINDINT
-  virtual bool Find (const char *name, float &v, int index = 0) const;
-  virtual bool Find (const char *name, double &v, int index = 0) const;
-  virtual bool Find (const char *name, const char *&v, int index = 0) const;
-  virtual bool Find (const char *name, const void *&v, uint32 &size, 
-    int index = 0) const;
-#ifndef CS_USE_FAKE_BOOL_TYPE
-  virtual bool Find (const char *name, bool &v, int index = 0) const;
-#endif
-  virtual bool Find (const char *name, csRef<iEvent> &v, int index = 0) const;
+  virtual csEventError Retrieve (const char* name, int64& value) const
+  {								
+    attribute* object = attributes.Get (name, 0);
+    if (!object) return csEventErrNotFound;
+    if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
+    {									
+      value = object->intVal;
+      return csEventErrNone;
+    }
+    else
+    {
+      return InternalReportMismatch (object);
+    }
+  }
 
-  virtual bool Remove (const char *name, int index = -1);
+#define CS_CSEVENT_FINDUINT(T)						\
+  virtual csEventError Retrieve (const char* name, T& value) const	\
+  { return InternalRetrieveUint (name, value); }
+  CS_CSEVENT_FINDUINT(uint8)
+  CS_CSEVENT_FINDUINT(uint16)
+  CS_CSEVENT_FINDUINT(uint32)
+#undef CS_CSEVENT_FINDUINT
+  virtual csEventError Retrieve (const char* name, uint64& value) const
+  {								
+    attribute* object = attributes.Get (name, 0);
+    if (!object) return csEventErrNotFound;
+    if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
+    {									
+      value = (uint64)object->intVal;
+      return csEventErrNone;
+    }
+    else
+    {
+      return InternalReportMismatch (object);
+    }
+  }
+
+  virtual csEventError Retrieve (const char *name, float &v) const;
+  virtual csEventError Retrieve (const char *name, double &v) const;
+  virtual csEventError Retrieve (const char *name, const char *&v) const;
+  virtual csEventError Retrieve (const char *name, const void *&v, uint32 &size) const;
+  virtual csEventError Retrieve (const char *name, bool &v) const;
+  virtual csEventError Retrieve (const char *name, csRef<iEvent> &v) const;
+  virtual csEventError Retrieve (const char *name, csRef<iBase> &v) const;
+
+  virtual bool AttributeExists (const char* name);
+  virtual csEventAttributeType GetAttributeType (const char* name);
+
+  virtual bool Remove (const char *name);
   virtual bool RemoveAll ();
 
-  virtual uint32 FlattenSize (int format = CS_CRYSTAL_PROTOCOL);
-  virtual bool Flatten (char *buffer, int format = CS_CRYSTAL_PROTOCOL);
-  virtual bool Unflatten (const char *buffer, uint32 length);
+  virtual csRef<iEventAttributeIterator> GetAttributeIterator();
 
   virtual bool Print (int level = 0);
 
@@ -272,6 +313,44 @@ public:
 
   /// Places the event back into the pool if this is the last reference.
   virtual void DecRef ();
+};
+
+/**
+ * \internal csEvent attribute iterator
+ */
+class csEventAttributeIterator : public iEventAttributeIterator
+{
+  csHash<csEvent::attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator
+    iterator;								 
+  csStrKey currentKey;
+public:
+  SCF_DECLARE_IBASE;
+  
+  csEventAttributeIterator (
+    csHash<csEvent::attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator&
+    iter) : iterator(iter)
+  {
+    SCF_CONSTRUCT_IBASE(0);
+  }
+
+  virtual ~csEventAttributeIterator()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
+
+  virtual bool HasNext()
+  {
+    return iterator.HasNext();
+  }
+  virtual const char* Next()
+  {
+    iterator.Next (currentKey);
+    return currentKey;
+  }
+  virtual void Reset()
+  {
+    iterator.Reset();
+  }
 };
 
 #endif // __CS_CSEVENT_H__

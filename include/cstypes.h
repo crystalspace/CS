@@ -31,20 +31,6 @@
 #include "platform.h"
 #include <float.h>
 
-//-----------------------------------------------------------------------------
-// If your compiler complains about 'true', 'false', and 'bool' it may be an
-// older C++ compiler which doesn't understand these constructs.  In that case,
-// set CS_USE_FAKE_BOOL_TYPE to 'yes' in the makefile, or define the C-macro
-// CS_USE_FAKE_BOOL_TYPE in your project file.
-//-----------------------------------------------------------------------------
-#ifdef CS_USE_FAKE_BOOL_TYPE
-typedef int bool;
-#undef  true
-#define true 1
-#undef  false
-#define false 0
-#endif
-
 /**\name Specific sized types.
  * The following types should be used whenever you need a variable of
  * a specific size (in bits).  If these types are already defined by system
@@ -68,13 +54,21 @@ typedef unsigned int uint32;
 /// signed 32-bit integer (-2 147 483 648..2 147 483 647)
 typedef int int32;
 #ifdef COMP_GCC
-/// unsigned 64 bit integer
+/// unsigned 64-bit integer
 typedef unsigned long long uint64;
-/// signed 64 bit integer
+/// signed 64-bit integer
 typedef long long int64;
-/// specify 64 bit integer constant
+/**\def CONST_INT64
+ * Specify a 64 bit integer constant.
+ * Different compilers differ in 64-bit wide number specification. Use this
+ * macro to automatically use the appropriate way.
+ */
 #define CONST_INT64(x) x ## LL
-/// specify 64 bit unsigned integer constant
+/**\def CONST_UINT64
+ * Specify 64 bit unsigned integer constant.
+ * Different compilers differ in 64-bit wide number specification. Use this
+ * macro to automatically use the appropriate way.
+ */
 #define CONST_UINT64(x) x ## ULL
 #else
 # if defined(COMP_VC) || defined(COMP_BC) || defined(__BORLANDC__)

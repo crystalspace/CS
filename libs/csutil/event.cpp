@@ -24,7 +24,7 @@
 utf32_char csKeyEventHelper::GetRawCode (const iEvent* event)
 {
   uint32 code;
-  if (!event->Find ("keyCodeRaw", code))
+  if (event->Retrieve ("keyCodeRaw", code) != csEventErrNone)
     return 0;
   return code;
 }
@@ -32,7 +32,7 @@ utf32_char csKeyEventHelper::GetRawCode (const iEvent* event)
 utf32_char csKeyEventHelper::GetCookedCode (const iEvent* event)
 {
   uint32 code;
-  if (!event->Find ("keyCodeCooked", code))
+  if (event->Retrieve ("keyCodeCooked", code) != csEventErrNone)
     return 0;
   return code;
 }
@@ -44,14 +44,15 @@ void csKeyEventHelper::GetModifiers (const iEvent* event,
 
   const void* mod;
   uint32 modSize;
-  if (!event->Find ("keyModifiers", mod, modSize)) return;
+  if (event->Retrieve ("keyModifiers", mod, modSize) != csEventErrNone) 
+    return;
   memcpy (&modifiers, mod, MIN (sizeof (modifiers), modSize));
 }
 
 csKeyEventType csKeyEventHelper::GetEventType (const iEvent* event)
 {
   uint8 type;
-  if (!event->Find ("keyEventType", type))
+  if (event->Retrieve ("keyEventType", type) != csEventErrNone)
     return (csKeyEventType)-1;
   return (csKeyEventType)type;
 }
@@ -59,14 +60,14 @@ csKeyEventType csKeyEventHelper::GetEventType (const iEvent* event)
 bool csKeyEventHelper::GetAutoRepeat (const iEvent* event)
 {
   bool autoRep;
-  if (!event->Find ("keyAutoRepeat", autoRep)) return false;
+  if (event->Retrieve ("keyAutoRepeat", autoRep) != csEventErrNone) return false;
   return autoRep;
 }
 				    
 csKeyCharType csKeyEventHelper::GetCharacterType (const iEvent* event)
 {
   uint8 type;
-  if (!event->Find ("keyCharType", type))
+  if (event->Retrieve ("keyCharType", type) != csEventErrNone)
     return (csKeyCharType)-1;
   return (csKeyCharType)type;
 }

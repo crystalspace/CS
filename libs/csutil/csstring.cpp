@@ -466,9 +466,7 @@ csString csString::PadLeft (TYPE v, size_t iNewSize, char iChar) \
   STR_PADLEFT(unsigned long)
   STR_PADLEFT(float)
   STR_PADLEFT(double)
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
   STR_PADLEFT(bool)
-#endif
 #undef STR_PADLEFT
 
 csString& csString::PadRight (size_t iNewSize, char iChar)
@@ -507,9 +505,7 @@ csString csString::PadRight (TYPE v, size_t iNewSize, char iChar) \
   STR_PADRIGHT(unsigned long)
   STR_PADRIGHT(float)
   STR_PADRIGHT(double)
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
   STR_PADRIGHT(bool)
-#endif
 #undef STR_PADRIGHT
 
 csString& csString::PadCenter (size_t iNewSize, char iChar)
@@ -555,7 +551,5 @@ csString csString::PadCenter (TYPE v, size_t iNewSize, char iChar) \
   STR_PADCENTER(unsigned long)
   STR_PADCENTER(float)
   STR_PADCENTER(double)
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
   STR_PADCENTER(bool)
-#endif
 #undef STR_PADCENTER

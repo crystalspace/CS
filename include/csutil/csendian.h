@@ -222,11 +222,11 @@ static inline float short2float (short s)
 
 /// Swap the bytes in a uint64 value.
 static inline uint64 convert_endian (uint64 l)
-{ return little_endian_long (l); }
+{ return little_endian_longlong (l); }
 
 /// Swap the bytes in a int64 value.
 static inline int64 convert_endian (int64 l)
-{ return little_endian_long (l); }
+{ return little_endian_longlong (l); }
 
 /// Swap the bytes in a uint32 value.
 static inline uint32 convert_endian (uint32 l)

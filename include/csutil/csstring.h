@@ -370,10 +370,8 @@ public:
 #undef STR_APPEND
   /** @} */
 
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
   /// Append a boolean (as a number -- 1 or 0) to this string.
   csString& Append (bool b) { return Append (b ? "1" : "0"); }
-#endif
 
   /**
    * Replace contents of this string with the contents of another.
@@ -414,9 +412,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_REPLACE(unsigned long)
   STR_REPLACE(float)
   STR_REPLACE(double)
-#ifndef CS_USE_FAKE_BOOL_TYPE
   STR_REPLACE(bool)
-#endif
 #undef STR_REPLACE
   /** @} */
   
@@ -641,9 +637,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADLEFT(unsigned long)
   STR_PADLEFT(float)
   STR_PADLEFT(double)
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
   STR_PADLEFT(bool)
-#endif
 #undef STR_PADLEFT
   /** @} */
 
@@ -678,9 +672,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADRIGHT(unsigned long)
   STR_PADRIGHT(float)
   STR_PADRIGHT(double)
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
   STR_PADRIGHT(bool)
-#endif
 #undef STR_PADRIGHT
   /** @} */
 
@@ -718,9 +710,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADCENTER(unsigned long)
   STR_PADCENTER(float)
   STR_PADCENTER(double)
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
   STR_PADCENTER(bool)
-#endif
 #undef STR_PADCENTER
   /** @} */
 
@@ -742,9 +732,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
   STR_ASSIGN(unsigned long)
   STR_ASSIGN(float)
   STR_ASSIGN(double)
-#ifndef CS_USE_FAKE_BOOL_TYPE
   STR_ASSIGN(bool)
-#endif
 #undef STR_ASSIGN
   /** @} */
 
@@ -766,9 +754,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
   STR_OP_APPEND(unsigned long)
   STR_OP_APPEND(float)
   STR_OP_APPEND(double)
-#ifndef CS_USE_FAKE_BOOL_TYPE
   STR_OP_APPEND(bool)
-#endif
 #undef STR_OP_APPEND
   /** @} */
 
@@ -862,9 +848,9 @@ inline csString operator + (const csString& iStr1, const char* iStr2)
 /** 
  * Shift operator.  
  * For example: 
- * \example
+ * \code
  * s << "Hi " << name << "; see " << foo;
- * \endexample
+ * \endcode
  */
 STR_SHIFT(const csString&)
 STR_SHIFT(const char*)
@@ -878,9 +864,7 @@ STR_SHIFT(long);
 STR_SHIFT(unsigned long)
 STR_SHIFT(float)
 STR_SHIFT(double)
-#if !defined(CS_USE_FAKE_BOOL_TYPE)
 STR_SHIFT(bool)
-#endif
 #undef STR_SHIFT
 /** @} */
 
