@@ -48,7 +48,6 @@
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/ball.h"
-#include "imesh/surf.h"
 #include "imesh/stars.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
@@ -182,15 +181,6 @@ void Demo::SetupFactories ()
   if (!fact)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not open ball plugin!");
-    exit (0);
-  }
-  fact->DecRef ();
-
-  fact = engine->CreateMeshFactory ("crystalspace.mesh.object.surface",
-  	"surf_factory");
-  if (!fact)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open surface plugin!");
     exit (0);
   }
   fact->DecRef ();

@@ -32,7 +32,7 @@
 #include "igraphic/imageio.h"
 #include "csgeom/box.h"
 #include "imesh/object.h"
-#include "imesh/cube.h"
+#include "imesh/genmesh.h"
 #include "imesh/sprite2d.h"
 #include "imesh/particle.h"
 #include "imesh/partsys.h"
@@ -426,19 +426,23 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
       }
 
   /// create a mesh object
-  const char* classId = "crystalspace.mesh.object.cube";
+  const char* classId = "crystalspace.mesh.object.genmesh";
   iMeshFactoryWrapper* mesh_wrap = engine->CreateMeshFactory (classId,
-  	"cubeFact");
+  	"meshFact");
   iMeshObjectFactory *mesh_fact = mesh_wrap->GetMeshObjectFactory ();
 
-  iCubeFactoryState* cubelook =
-    SCF_QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
+  iGeneralFactoryState* cubelook =
+    SCF_QUERY_INTERFACE(mesh_fact, iGeneralFactoryState);
   cubelook->SetMaterialWrapper(math2);
-  cubelook->SetSize(1,1,1);
-  cubelook->SetMixMode (CS_FX_COPY);
+  cubelook->GenerateBox (csBox3 (-.5,-.5,-.5,.5,.5,.5));
+  cubelook->CalculateNormals ();
   cubelook->DecRef();
 
   iMeshObject *mesh_obj = mesh_fact->NewInstance();
+  iGeneralMeshState* cubestate =
+    SCF_QUERY_INTERFACE (mesh_obj, iGeneralMeshState);
+  cubestate->SetMixMode (CS_FX_COPY);
+  cubestate->DecRef ();
 
   /// add a mesh object sprite
   iIsoMeshSprite *meshspr = engine->CreateMeshSprite();

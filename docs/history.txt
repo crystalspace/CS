@@ -1,5 +1,22 @@
 The history order is reversed so that new features are at the top.
 
+25-Jan-2002
+	- Added a new GenerateBox() to iGeneralFactoryState. With this you
+	  can automatically generate a box for a general mesh.
+	- Extended the standard general mesh loader with a new BOX keyword
+	  (for factories).
+	- Added Get/SetMaterialWrapper() to iGeneralFactoryState. It is now
+	  possible to set a material for the factory. When the mesh object
+	  itself will not have a material it will use the one from the
+	  factory.
+	- Added MATERIAL keyword for the general mesh loader (for factories).
+	- Completely removed the cube mesh object plugin and also its
+	  associated loader. The functionality provided in the cube plugin
+	  can be emulated completely with the genmesh plugin.
+	  Keep in mind to call CalculateNormals() or use AUTONORMALS()
+	  for genmesh so that the normals are calculated automatically.
+	- Completely removed the surface mesh object plugin and also its
+	  associated loader. Use genmesh.
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.

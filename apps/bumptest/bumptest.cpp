@@ -39,7 +39,6 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "imesh/object.h"
-#include "imesh/cube.h"
 #include "imesh/ball.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing/polygon.h"

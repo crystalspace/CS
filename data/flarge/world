@@ -83,8 +83,6 @@ WORLD (
     PLUGIN 'spr3d' ('crystalspace.mesh.loader.sprite.3d')
     PLUGIN 'spr2dFact' ('crystalspace.mesh.loader.factory.sprite.2d')
     PLUGIN 'spr2d' ('crystalspace.mesh.loader.sprite.2d')
-    PLUGIN 'cubeFact' ('crystalspace.mesh.loader.factory.cube')
-    PLUGIN 'cube' ('crystalspace.mesh.loader.cube')
     PLUGIN 'meshFact' ('crystalspace.mesh.loader.factory.genmesh')
     PLUGIN 'mesh' ('crystalspace.mesh.loader.genmesh')
     PLUGIN 'metafact' ('crystalspace.mesh.loader.factory.metaball')
@@ -349,63 +347,65 @@ WORLD (
     PARAMS ()
   )
   MESHFACT 'simpleCubeHierarchy' (
-    PLUGIN ('cubeFact')
-    PARAMS (MATERIAL ('robot') SIZE (.2, .2, .2))
+    PLUGIN ('meshFact')
+    PARAMS (MATERIAL ('robot') BOX (-.1,-.1,-.1,.1,.1,.1) AUTONORMALS())
     MESHFACT 'child1' (
-      PLUGIN ('cubeFact')
-      PARAMS (MATERIAL ('robot') SIZE (.2, .2, .2))
+      PLUGIN ('meshFact')
+      PARAMS (MATERIAL ('robot') BOX (-.1,-.1,-.1,.1,.1,.1) AUTONORMALS())
       MOVE (V (-.3, .4, 0))
     )
     MESHFACT 'child2' (
-      PLUGIN ('cubeFact')
-      PARAMS (MATERIAL ('robot') SIZE (.2, .2, .2))
+      PLUGIN ('meshFact')
+      PARAMS (MATERIAL ('robot') BOX (-.1,-.1,-.1,.1,.1,.1) AUTONORMALS())
       MOVE (V (.3, .4, 0))
     )
   )
   MESHFACT 'robotBody' (
-    PLUGIN ('cubeFact')
+    PLUGIN ('meshFact')
     PARAMS (
       MATERIAL ('robot')
-      SIZE (.2,.5,.2)
+      BOX (-.1,-.25,-.1,.1,.25,.1)
+      AUTONORMALS ()
     )
   )
   MESHFACT 'robotHead' (
-    PLUGIN ('cubeFact')
+    PLUGIN ('meshFact')
     PARAMS (
       MATERIAL ('robot')
-      SIZE (.17,.2,.17)
+      BOX (-.065,-.1,-.065,.065,.1,.065)
+      AUTONORMALS()
     )
   )
   MESHFACT 'robotLeg' (
-    PLUGIN ('cubeFact')
+    PLUGIN ('meshFact')
     PARAMS (
       MATERIAL ('robot')
-      SIZE (.1,.4,.1)
-      SHIFT (0,-.2,0)
+      BOX (-.05,-.4,-.05,.05,0,.05)
+      AUTONORMALS ()
     )
   )
   MESHFACT 'robotArm' (
-    PLUGIN ('cubeFact')
+    PLUGIN ('meshFact')
     PARAMS (
       MATERIAL ('robot')
-      SIZE (.1,.3,.1)
-      SHIFT (0,-.15,0)
+      BOX (-.05,-.3,-.05,.05,0,.05)
+      AUTONORMALS ()
     )
   )
   MESHFACT 'robotHand' (
-    PLUGIN ('cubeFact')
+    PLUGIN ('meshFact')
     PARAMS (
       MATERIAL ('robot')
-      SIZE (.05,.12,.12)
-      SHIFT (0,-.06,0)
+      BOX (-.025,-.12,-.06,.025,0,.06)
+      AUTONORMALS ()
     )
   )
   MESHFACT 'robotFoot' (
-    PLUGIN ('cubeFact')
+    PLUGIN ('meshFact')
     PARAMS (
       MATERIAL ('robot')
-      SIZE (.3,.1,.1)
-      SHIFT (.1,-.05,0)
+      BOX (-.05,-.1,-.05,.25,0,.05)
+      AUTONORMALS ()
     )
   )
   MESHFACT 'spr' (
@@ -2433,11 +2433,11 @@ WORLD (
     )
     MESHOBJ 'cubard' (
       KEY ("entity_Rotate","0,50,0,true")
-      PLUGIN ('cube')
+      PLUGIN ('mesh')
       PARAMS (FACTORY ('robotBody'))
       MOVE (V (4,.3,12))
       MESHOBJ 'robotHead' (
-        PLUGIN ('cube')
+        PLUGIN ('mesh')
         PARAMS (FACTORY ('robotHead'))
         MOVE (V (0,.42,0) MATRIX (ROT_X (0)))
 	MESHOBJ 'ball1' (
@@ -2479,15 +2479,15 @@ WORLD (
       )
       MESHOBJ 'robotArmRight' (
         KEY ("entity_Rotate","0,0,100,true")
-        PLUGIN ('cube')
+        PLUGIN ('mesh')
         PARAMS (FACTORY ('robotArm'))
         MOVE (V (0,.23,-.15) MATRIX (ROT_X (.2)))
         MESHOBJ 'robotArmRight2' (
-          PLUGIN ('cube')
+          PLUGIN ('mesh')
           PARAMS (FACTORY ('robotArm'))
           MOVE (V (0,-.3,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotHandRight' (
-            PLUGIN ('cube')
+            PLUGIN ('mesh')
             PARAMS (FACTORY ('robotHand'))
             MOVE (V (.0,-.29,0) MATRIX (ROT_X (0)))
             MESHOBJ 'something' (
@@ -2522,15 +2522,15 @@ WORLD (
       )
       MESHOBJ 'robotArmLeft' (
         KEY ("entity_Rotate","0,0,10,true")
-        PLUGIN ('cube')
+        PLUGIN ('mesh')
         PARAMS (FACTORY ('robotArm'))
         MOVE (V (0,.23,.15) MATRIX (ROT_X (-.2)))
         MESHOBJ 'robotArmLeft2' (
-          PLUGIN ('cube')
+          PLUGIN ('mesh')
           PARAMS (FACTORY ('robotArm'))
           MOVE (V (0,-.3,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotHandLeft' (
-            PLUGIN ('cube')
+            PLUGIN ('mesh')
             PARAMS (FACTORY ('robotHand'))
             MOVE (V (.0,-.29,0) MATRIX (ROT_X (0)))
             MESHOBJ 'flame' (
@@ -2552,30 +2552,30 @@ WORLD (
 	)
       )
       MESHOBJ 'robotLegRight' (
-        PLUGIN ('cube')
+        PLUGIN ('mesh')
         PARAMS (FACTORY ('robotLeg'))
         MOVE (V (0,-.25,-.05) MATRIX (ROT_X (.2)))
         MESHOBJ 'robotLegRight2' (
-          PLUGIN ('cube')
+          PLUGIN ('mesh')
           PARAMS (FACTORY ('robotLeg'))
           MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotFootRight' (
-            PLUGIN ('cube')
+            PLUGIN ('mesh')
             PARAMS (FACTORY ('robotFoot'))
             MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           )
         )
       )
       MESHOBJ 'robotLegLeft' (
-        PLUGIN ('cube')
+        PLUGIN ('mesh')
         PARAMS (FACTORY ('robotLeg'))
         MOVE (V (0,-.25,.05) MATRIX (ROT_X (-.2)))
         MESHOBJ 'robotLegLeft2' (
-          PLUGIN ('cube')
+          PLUGIN ('mesh')
           PARAMS (FACTORY ('robotLeg'))
           MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotFootLeft' (
-            PLUGIN ('cube')
+            PLUGIN ('mesh')
             PARAMS (FACTORY ('robotFoot'))
             MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           )

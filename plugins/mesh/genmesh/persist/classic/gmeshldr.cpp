@@ -43,6 +43,7 @@
 CS_IMPLEMENT_PLUGIN
 
 CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (BOX)
   CS_TOKEN_DEF (LIGHTING)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (MATERIAL)
@@ -156,9 +157,11 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csGeneralFactoryLoader::Parse (const char* string,
-	iMaterialList*, iMeshFactoryList*, iBase* /* context */)
+	iMaterialList* matlist, iMeshFactoryList*, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (BOX)
     CS_TOKEN_TABLE (NUM)
     CS_TOKEN_TABLE (VERTICES)
     CS_TOKEN_TABLE (COLORS)
@@ -218,6 +221,32 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
     }
     switch (cmd)
     {
+      case CS_TOKEN_MATERIAL:
+	{
+	  char str[255];
+          csScanStr (params, "%s", str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", str);
+            state->DecRef ();
+            fact->DecRef ();
+            return NULL;
+	  }
+	  state->SetMaterialWrapper (mat);
+	}
+	break;
+      case CS_TOKEN_BOX:
+        {
+	  csVector3 miv, mav;
+	  csScanStr (params, "%f,%f,%f,%f,%f,%f",
+	  	&miv.x, &miv.y, &miv.z, &mav.x, &mav.y, &mav.z);
+          csBox3 b (miv, mav);
+	  state->GenerateBox (b);
+	}
+        break;
       case CS_TOKEN_AUTONORMALS:
         auto_normals = true;
 	break;

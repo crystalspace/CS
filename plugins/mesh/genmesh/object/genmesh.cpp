@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
+#include "csgeom/box.h"
 #include "genmesh.h"
 #include "gmtri.h"
 #include "iengine/movable.h"
@@ -264,12 +265,14 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
 bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
-  if (!material)
+  iMaterialWrapper* mater = material;
+  if (!mater) mater = factory->GetMaterialWrapper ();
+  if (!mater)
   {
     printf ("INTERNAL ERROR: mesh used without material!\n");
     return false;
   }
-  iMaterialHandle* mat = material->GetMaterialHandle ();
+  iMaterialHandle* mat = mater->GetMaterialHandle ();
   if (!mat)
   {
     printf ("INTERNAL ERROR: mesh used without valid material handle!\n");
@@ -283,7 +286,7 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
-  material->Visit ();
+  mater->Visit ();
   G3DTriangleMesh& m = factory->GetMesh ();
   iVertexBuffer* vbuf = factory->GetVertexBuffer ();
   iVertexBufferManager* vbufmgr = factory->GetVertexBufferManager ();
@@ -412,6 +415,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   mesh_normals = NULL;
   vbufmgr = NULL;
   vbuf = NULL;
+  material = NULL;
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
@@ -567,6 +571,40 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   delete[] tri_normals;
   delete tri_verts;
   delete tri_mesh;
+}
+
+void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
+{
+  SetVertexCount (8);
+  SetTriangleCount (12);
+  int i;
+  csVector3* v = GetVertices ();
+  csVector2* uv = GetTexels ();
+  for (i = 0 ; i < 8 ; i++)
+  {
+    v[i].Set (box.GetCorner (7-i));
+  }
+  uv[0].Set (0, 0);
+  uv[1].Set (1, 0);
+  uv[2].Set (0, 1);
+  uv[3].Set (1, 1);
+  uv[4].Set (1, 1);
+  uv[5].Set (0, 0);
+  uv[6].Set (0, 0);
+  uv[7].Set (0, 1);
+  csTriangle* triangles = GetTriangles ();
+  triangles[0].a = 0; triangles[0].b = 2; triangles[0].c = 3;
+  triangles[1].a = 0; triangles[1].b = 3; triangles[1].c = 1;
+  triangles[2].a = 1; triangles[2].b = 3; triangles[2].c = 7;
+  triangles[3].a = 1; triangles[3].b = 7; triangles[3].c = 5;
+  triangles[4].a = 7; triangles[4].b = 4; triangles[4].c = 5;
+  triangles[5].a = 7; triangles[5].b = 6; triangles[5].c = 4;
+  triangles[6].a = 6; triangles[6].b = 0; triangles[6].c = 4;
+  triangles[7].a = 6; triangles[7].b = 2; triangles[7].c = 0;
+  triangles[8].a = 6; triangles[8].b = 7; triangles[8].c = 3;
+  triangles[9].a = 6; triangles[9].b = 3; triangles[9].c = 2;
+  triangles[10].a = 0; triangles[10].b = 1; triangles[10].c = 4;
+  triangles[11].a = 1; triangles[11].b = 5; triangles[11].c = 4;
 }
 
 void csGenmeshMeshObjectFactory::Invalidate ()

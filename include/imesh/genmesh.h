@@ -24,6 +24,7 @@
 class csVector3;
 class csVector2;
 class csColor;
+class csBox3;
 struct csTriangle;
 
 struct iMaterialWrapper;
@@ -62,13 +63,18 @@ struct iGeneralMeshState : public iBase
   virtual bool IsManualColors () const = 0;
 };
 
-SCF_VERSION (iGeneralFactoryState, 0, 0, 1);
+SCF_VERSION (iGeneralFactoryState, 0, 0, 2);
 
 /**
  * This interface describes the API for the general mesh factory.
  */
 struct iGeneralFactoryState : public iBase
 {
+  /// Set material of factory.
+  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
+  /// Get material of factory.
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+
   /// Set the number of vertices to use for this mesh.
   virtual void SetVertexCount (int n) = 0;
   /// Get the number of vertices for this mesh.
@@ -124,6 +130,13 @@ struct iGeneralFactoryState : public iBase
    * Automatically calculate normals based on the current mesh.
    */
   virtual void CalculateNormals () = 0;
+
+  /**
+   * Automatically generate a box. This will set the number of vertices
+   * to eight and generate vertices, texels, and triangles. The colors
+   * and normals are not initialized here.
+   */
+  virtual void GenerateBox (const csBox3& box) = 0;
 };
 
 #endif

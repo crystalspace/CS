@@ -8,7 +8,7 @@ This section covers the Crystal Space Mesh Object plug-in system.  This is a
 very general system for defining various kinds of 3D objects and using them in
 the Crystal Space 3D engine.  There are already a number of mesh objects
 predefined in Crystal Space: particle systems like snow and fountain, 2D
-sprites, a cube and a ball, etc.
+sprites, a general mesh and a ball, etc.
 
 In the first section a general overview is given on some of the concepts
 in the mesh object system.
@@ -50,7 +50,6 @@ Crystal Space supports.
 @importss{plugins,meshobj,spr2d.txi}
 @importss{plugins,meshobj,spr3d.txi}
 @importss{plugins,meshobj,ball.txi}
-@importss{plugins,meshobj,cube.txi}
 @importss{plugins,meshobj,emit.txi}
 @importss{plugins,meshobj,partsys.txi}
 @importss{plugins,meshobj,fountain.txi}

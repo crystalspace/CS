@@ -47,7 +47,6 @@
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/ball.h"
-#include "imesh/surf.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
 #include "igraphic/imageio.h"

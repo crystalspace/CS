@@ -177,6 +177,7 @@ private:
   iVertexBuffer* vbuf;
   iVertexBufferManager* vbufmgr;
 
+  iMaterialWrapper* material;
   G3DTriangleMesh top_mesh;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
@@ -218,6 +219,11 @@ public:
   /// Destructor.
   virtual ~csGenmeshMeshObjectFactory ();
 
+  void SetMaterialWrapper (iMaterialWrapper* material)
+  {
+    csGenmeshMeshObjectFactory::material = material;
+  }
+  iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void SetVertexCount (int n);
   int GetVertexCount () const { return num_mesh_vertices; }
   csVector3* GetVertices () { SetupFactory (); return mesh_vertices; }
@@ -229,6 +235,7 @@ public:
   csTriangle* GetTriangles () { SetupFactory (); return top_mesh.triangles; }
   void Invalidate ();
   void CalculateNormals ();
+  void GenerateBox (const csBox3& box);
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
 
@@ -261,6 +268,14 @@ public:
   class GeneralFactoryState : public iGeneralFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    virtual void SetMaterialWrapper (iMaterialWrapper* material)
+    {
+      scfParent->SetMaterialWrapper (material);
+    }
+    virtual iMaterialWrapper* GetMaterialWrapper () const
+    {
+      return scfParent->GetMaterialWrapper ();
+    }
     virtual void SetVertexCount (int n)
     {
       scfParent->SetVertexCount (n);
@@ -304,6 +319,10 @@ public:
     virtual void CalculateNormals ()
     {
       scfParent->CalculateNormals ();
+    }
+    virtual void GenerateBox (const csBox3& box)
+    {
+      scfParent->GenerateBox (box);
     }
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
