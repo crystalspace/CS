@@ -160,7 +160,8 @@ bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 bool csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  return true; // nothing to do
+  //Nothing gets parsed in the loader, so nothing gets saved here!
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -346,19 +347,124 @@ bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
 }
 
 #define MAXLINE	    80
-//TBD
+
 bool csExplosionSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for explosion mesh");
+
+  csRef<iParticleState> partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  csRef<iExplosionState> explosionstate = SCF_QUERY_INTERFACE (obj, iExplosionState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if ( partstate && explosionstate && mesh )
+  {
+    //Writedown Color tag
+    csColor col = partstate->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown Center tag
+    csVector3 center = explosionstate->GetCenter();
+    csRef<iDocumentNode> centerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    centerNode->SetValue("center");
+    synldr->WriteVector(centerNode, &center);
+
+    //Writedown Push tag
+    csVector3 push = explosionstate->GetPush();
+    csRef<iDocumentNode> pushNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    pushNode->SetValue("push");
+    synldr->WriteVector(pushNode, &push);
+
+    //Writedown PartRadius tag
+    float partradius = explosionstate->GetPartRadius();
+    csRef<iDocumentNode> partradiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    partradiusNode->SetValue("partradius");
+    partradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(partradius);
+
+    //Writedown SpreadPos tag
+    float spreadpos = explosionstate->GetSpreadPos();
+    csRef<iDocumentNode> spreadposNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    spreadposNode->SetValue("spreadpos");
+    spreadposNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(spreadpos);
+
+    //Writedown SpreadSpeed tag
+    float spreadspeed = explosionstate->GetSpreadSpeed();
+    csRef<iDocumentNode> spreadspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    spreadspeedNode->SetValue("spreadspeed");
+    spreadspeedNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(spreadspeed);
+
+    //Writedown SpreadAcceleration tag
+    float spreadacceleration = explosionstate->GetSpreadAcceleration();
+    csRef<iDocumentNode> spreadaccelerationNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    spreadaccelerationNode->SetValue("spreadacceleration");
+    spreadaccelerationNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(spreadacceleration);
+
+    //Writedown Fade tag
+    csTicks fade;
+    explosionstate->GetFadeSprites(fade);
+    csRef<iDocumentNode> fadeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    fadeNode->SetValue("fade");
+    fadeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(fade);
+
+    //Writedown NrSides tag
+    int nrsides = explosionstate->GetNrSides();
+    csRef<iDocumentNode> nrsidesNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    nrsidesNode->SetValue("nrsides");
+    nrsidesNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(nrsides);
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = partstate->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }
+    }
+
+    //Writedown Mixmode tag
+    int mixmode = partstate->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+	  
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", explosionstate->GetLighting(), true);
+
+    //Writedown Number tag
+    int number = explosionstate->GetParticleCount();
+    csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numberNode->SetValue("number");
+    numberNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(number);
+  }
+
   paramsNode=0;
-  
+
   return true;
 }
 
 //---------------------------------------------------------------------------
-

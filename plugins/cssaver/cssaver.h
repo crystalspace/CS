@@ -52,8 +52,9 @@ public:
   bool SaveMaterials(iDocumentNode *parent);
   bool SaveCameraPositions(iDocumentNode *parent);
   bool SaveRenderPriorities(iDocumentNode *parent);
+  bool SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent);
   bool SaveSectors(iDocumentNode *parent);
-  bool SaveSectorMeshes(iSector *s, iDocumentNode *parent);
+  bool SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent);
   bool SaveSectorLights(iSector *s, iDocumentNode *parent);
   bool SavePortals(iPortal *portal, iDocumentNode *parent);
 

@@ -161,7 +161,8 @@ bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 bool csFireFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  return true; // nothing to do
+  //Nothing gets parsed in the loader, so nothing gets saved here!
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -351,15 +352,111 @@ bool csFireSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for fire mesh");
+
+  csRef<iParticleState> partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  csRef<iFireState> firestate = SCF_QUERY_INTERFACE (obj, iFireState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if ( partstate && firestate && mesh )
+  {
+    //Writedown Color tag
+    csColor col = partstate->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown DropSize tag
+    float dw, dh;
+    firestate->GetDropSize(dw, dh);
+    csRef<iDocumentNode> dropsizeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    dropsizeNode->SetValue("dropsize");
+    dropsizeNode->SetAttributeAsFloat("w", dw);
+    dropsizeNode->SetAttributeAsFloat("h", dh);
+
+    //Writedown OriginBox tag
+    csRef<iDocumentNode> originboxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    originboxNode->SetValue("originbox");
+    csBox3 originbox = firestate->GetOrigin();
+    synldr->WriteBox(originboxNode, &originbox);
+
+    //Writedown Direction tag
+    csRef<iDocumentNode> directionNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    directionNode->SetValue("direction");
+    csVector3 direction = firestate->GetDirection();
+    synldr->WriteVector(directionNode, &direction);
+
+    //Writedown Swirl tag
+    float swirl = firestate->GetSwirl();
+    csRef<iDocumentNode> swirlNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    swirlNode->SetValue("swirl");
+    swirlNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(swirl);
+
+    //Writedown ColorScale tag
+    float colorscale = firestate->GetColorScale();
+    csRef<iDocumentNode> colorscaleNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorscaleNode->SetValue("colorscale");
+    colorscaleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(colorscale);
+
+    //Writedown TotalTime tag
+    float totaltime = firestate->GetTotalTime();
+    csRef<iDocumentNode> totaltimeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    totaltimeNode->SetValue("totaltime");
+    totaltimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(totaltime);
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = partstate->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }
+    }
+
+    //Writedown Mixmode tag
+    int mixmode = partstate->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+	  
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", firestate->GetLighting(), true);
+
+    //Writedown Number tag
+    int number = firestate->GetParticleCount();
+    csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numberNode->SetValue("number");
+    csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    numberValueNode->SetValueAsInt(number);
+  }
+
   paramsNode=0;
   
   return true;

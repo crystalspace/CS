@@ -340,21 +340,38 @@ bool csNullFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csNullFactorySaver::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
-//TBD
+
 bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for null mesh");
-  paramsNode=0;
-  
+
+  csRef<iNullFactoryState> nullfact = SCF_QUERY_INTERFACE (obj, iNullFactoryState);
+  csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+
+  if ( nullfact && meshfact )
+  {
+    //Writedown Box tag
+    csBox3 box;
+    nullfact->GetBoundingBox(box);
+    synldr->WriteBox(paramsNode, &box);
+
+    //Writedown Radius tag
+    float radius = nullfact->GetRadius();
+    csRef<iDocumentNode> radiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    radiusNode->SetValue("radius");
+    radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
+
+    //TBD: RenderBuffer stuff
+  }
   return true;
 }
 
@@ -463,17 +480,48 @@ bool csNullMeshSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for null mesh");
-  paramsNode=0;
-  
+
+  csRef<iNullMeshState> nullstate = SCF_QUERY_INTERFACE (obj, iNullMeshState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if ( nullstate && mesh )
+  {
+    //Writedown Box tag
+    csBox3 box;
+    nullstate->GetBoundingBox(box);
+    csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    boxNode->SetValue("box");
+    synldr->WriteBox(boxNode, &box);
+
+    //Writedown Radius tag
+    float radius = nullstate->GetRadius();
+    csRef<iDocumentNode> radiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    radiusNode->SetValue("radius");
+    radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+  }
   return true;
 }
 

@@ -162,7 +162,8 @@ bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 bool csFountainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  return true; // nothing to do
+  //Nothing gets parsed in the loader, so nothing gets saved here!
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -354,15 +355,123 @@ bool csFountainSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for fountain mesh");
+
+  csRef<iParticleState> partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  csRef<iFountainState> fountainstate = SCF_QUERY_INTERFACE (obj, iFountainState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if ( partstate && fountainstate && mesh)
+  {
+    //Writedown Color tag
+    csColor col = partstate->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown DropSize tag
+    float dw, dh;
+    fountainstate->GetDropSize(dw, dh);
+    csRef<iDocumentNode> dropsizeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    dropsizeNode->SetValue("dropsize");
+    dropsizeNode->SetAttributeAsFloat("w", dw);
+    dropsizeNode->SetAttributeAsFloat("h", dh);
+
+    //Writedown OriginBox tag
+    csRef<iDocumentNode> originboxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    originboxNode->SetValue("origin");
+    csBox3 originbox = fountainstate->GetOrigin();
+    synldr->WriteBox(originboxNode, &originbox);
+
+    //Writedown Accel tag
+    csVector3 accel = fountainstate->GetAcceleration();
+    csRef<iDocumentNode> accelNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    accelNode->SetValue("accel");
+    synldr->WriteVector(accelNode, &accel);
+
+    //Writedown Speed tag
+    float speed = fountainstate->GetSpeed();
+    csRef<iDocumentNode> speedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    speedNode->SetValue("speed");
+    speedNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(speed);
+
+    //Writedown Opening tag
+    float opening = fountainstate->GetOpening();
+    csRef<iDocumentNode> openingNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    openingNode->SetValue("opening");
+    openingNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(opening);
+
+    //Writedown Azimuth tag
+    float azimuth = fountainstate->GetAzimuth();
+    csRef<iDocumentNode> azimuthNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    azimuthNode->SetValue("azimuth");
+    azimuthNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(azimuth);
+
+    //Writedown Elevation tag
+    float elevation = fountainstate->GetElevation();
+    csRef<iDocumentNode> elevationNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    elevationNode->SetValue("elevation");
+    elevationNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(elevation);
+
+    //Writedown FallTime tag
+    float falltime = fountainstate->GetFallTime();
+    csRef<iDocumentNode> falltimeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    falltimeNode->SetValue("falltime");
+    falltimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(falltime);
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+    
+    //Writedown Material tag
+    iMaterialWrapper* mat = partstate->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }
+    }
+
+    //Writedown Mixmode tag
+    int mixmode = partstate->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+	  
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", fountainstate->GetLighting(), true);
+
+    //Writedown Number tag
+    int number = fountainstate->GetParticleCount();
+    csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numberNode->SetValue("number");
+    csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    numberValueNode->SetValueAsInt(number);
+  }
+
   paramsNode=0;
   
   return true;

@@ -157,7 +157,8 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown(iBase *obj, iDocumentNode* parent);
+  virtual bool WriteEmit(iEmitGen3D* emit, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {

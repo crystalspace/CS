@@ -157,7 +157,8 @@ bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 bool csRainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  return true; // nothing to do
+  //Nothing gets parsed in the loader, so nothing gets saved here!
+  return true;
 }
 //---------------------------------------------------------------------------
 
@@ -332,17 +333,100 @@ bool csRainSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csRainSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for rain mesh");
+
+  csRef<iParticleState> partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  csRef<iRainState> rainstate = SCF_QUERY_INTERFACE (obj, iRainState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if ( partstate && rainstate && mesh )
+  {
+    //Writedown Color tag
+    csColor col = partstate->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown DropSize tag
+    float dw, dh;
+    rainstate->GetDropSize(dw, dh);
+    csRef<iDocumentNode> dropsizeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    dropsizeNode->SetValue("dropsize");
+    dropsizeNode->SetAttributeAsFloat("w", dw);
+    dropsizeNode->SetAttributeAsFloat("h", dh);
+
+    //Writedown Box tag
+    csVector3 minBox, maxBox;
+    rainstate->GetBox(minBox, maxBox);
+    csBox3 box(minBox, maxBox);
+    csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    boxNode->SetValue("box");
+    synldr->WriteBox(boxNode, &box);
+
+    //Writedown FallSpeed tag
+    csVector3 fallspeed = rainstate->GetFallSpeed();
+    csRef<iDocumentNode> fallspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    fallspeedNode->SetValue("fallspeed");
+    synldr->WriteVector(fallspeedNode, &fallspeed);
+
+    //Writedown CollDet tag
+    synldr->WriteBool(paramsNode,"colldet", rainstate->GetCollisionDetection(), true);
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = partstate->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }
+    }
+
+    //Writedown Mixmode tag
+    int mixmode = partstate->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+	  
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", rainstate->GetLighting(), true);
+
+    //Writedown Number tag
+    int number = rainstate->GetParticleCount();
+    csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numberNode->SetValue("number");
+    csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    numberValueNode->SetValueAsInt(number);
+  }
+
   paramsNode=0;
-  
+
   return true;
 }
 

@@ -158,7 +158,8 @@ bool csSpiralFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 bool csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  return true; // nothing to do
+  //Nothing gets parsed in the loader, so nothing gets saved here!
+  return true;
 }
 //---------------------------------------------------------------------------
 csSpiralLoader::csSpiralLoader (iBase* pParent)
@@ -324,17 +325,109 @@ bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csSpiralSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for spiral mesh");
+
+  csRef<iParticleState> partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  csRef<iSpiralState> spiralstate = SCF_QUERY_INTERFACE (obj, iSpiralState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if ( partstate && spiralstate && mesh)
+  {
+    //Writedown Color tag
+    csColor col = partstate->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown Source tag
+    csVector3 source = spiralstate->GetSource();
+    csRef<iDocumentNode> sourceNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    sourceNode->SetValue("source");
+    synldr->WriteVector(sourceNode, &source);
+
+    //Writedown ParticleSize tag
+    float dw, dh;
+    spiralstate->GetParticleSize(dw, dh);
+    csRef<iDocumentNode> particlesizeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    particlesizeNode->SetValue("particlesize");
+    particlesizeNode->SetAttributeAsFloat("w", dw);
+    particlesizeNode->SetAttributeAsFloat("h", dh);
+
+    //Writedown ParticleTime tag
+    int particletime = spiralstate->GetParticleTime();
+    csRef<iDocumentNode> particletimeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    particletimeNode->SetValue("particletime");
+    particletimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(particletime);
+
+    //Writedown RadialSpeed tag
+    float radialspeed = spiralstate->GetRadialSpeed();
+    csRef<iDocumentNode> radialspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    radialspeedNode->SetValue("radialspeed");
+    radialspeedNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radialspeed);
+
+    //Writedown RotationSpeed tag
+    float rotationspeed = spiralstate->GetRotationSpeed();
+    csRef<iDocumentNode> rotationspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    rotationspeedNode->SetValue("rotationspeed");
+    rotationspeedNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(rotationspeed);
+
+    //Writedown ClimbSpeed tag
+    float climbspeed = spiralstate->GetClimbSpeed();
+    csRef<iDocumentNode> climbspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    climbspeedNode->SetValue("climbspeed");
+    climbspeedNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(climbspeed);
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+    
+    //Writedown Material tag
+    iMaterialWrapper* mat = partstate->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }
+    }
+
+    //Writedown Mixmode tag
+    int mixmode = partstate->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+	  
+    //Writedown Number tag
+    int number = spiralstate->GetParticleCount();
+    csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numberNode->SetValue("number");
+    csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    numberValueNode->SetValueAsInt(number);
+  }
+
   paramsNode=0;
   
   return true;
 }
-

@@ -260,14 +260,12 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
 
 bool csTextSyntaxService::WriteBox (iDocumentNode* node, csBox3* v)
 {
-  csRef<iDocumentNode> boxNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  boxNode->SetValue("box");
-  csRef<iDocumentNode> minNode = boxNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> minNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   minNode->SetValue("min");
   minNode->SetAttributeAsFloat("x", v->MinX());
   minNode->SetAttributeAsFloat("y", v->MinY());
   minNode->SetAttributeAsFloat("z", v->MinZ());
-  csRef<iDocumentNode> maxNode = boxNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> maxNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   maxNode->SetValue("max");
   maxNode->SetAttributeAsFloat("x", v->MaxX());
   maxNode->SetAttributeAsFloat("y", v->MaxY());

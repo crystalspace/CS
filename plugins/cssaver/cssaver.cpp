@@ -135,6 +135,10 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       const char* filename=img->GetName();
       if (filename && *filename)
         CreateValueNode(child, "file", filename);
+      else
+      {
+      }
+
 
 #if 0
       //TODO behle not currently read from map, so no point to write back out
@@ -149,7 +153,6 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     }
     else
     {
-      //CS_ASSERT(false);
     }
   }
   return true;
@@ -349,6 +352,47 @@ bool csSaver::SaveCameraPositions(iDocumentNode *parent)
   return true;
 }
 
+bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent)
+{
+  for (int i=0; i<factList->GetCount(); i++)
+  {
+    iMeshFactoryWrapper* meshfactwrap = factList->Get(i);
+    iMeshObjectFactory*  meshfact = meshfactwrap->GetMeshObjectFactory();
+
+    //Create the Tag for the MeshObj
+    csRef<iDocumentNode> factNode = CreateNode(parent, "meshfact");
+
+    //Add the mesh's name to the MeshObj tag
+    const char* name = meshfactwrap->QueryObject()->GetName();
+    if (name && *name) 
+    factNode->SetAttribute("name", name);
+
+    csRef<iFactory> factory = 
+      SCF_QUERY_INTERFACE(meshfact->GetMeshObjectType(), iFactory);
+
+    const char* pluginname = factory->QueryClassID();
+
+    if (!(pluginname && *pluginname)) return false;
+
+    csRef<iDocumentNode> pluginNode = CreateNode(factNode, "plugin");
+
+    //Add the plugin tag
+    char loadername[128] = "";
+    csFindReplace(loadername, pluginname, ".object.", ".loader.factory.", 128);
+
+    pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
+    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+    char savername[128] = "";
+    csFindReplace(savername, pluginname, ".object.", ".saver.factory.", 128);
+
+    //Invoke the iSaverPlugin::WriteDown
+    csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+    if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+    if (saver) saver->WriteDown(meshfactwrap->GetMeshObjectFactory(), factNode);
+ }
+}
+
 bool csSaver::SaveSectors(iDocumentNode *parent)
 {
   iSectorList* sectorList=engine->GetSectors();
@@ -358,15 +402,14 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
     csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
     const char* name = sector->QueryObject()->GetName();
     if (name && *name) sectorNode->SetAttribute("name", name);
-    if(!SaveSectorMeshes(sector, sectorNode)) return false;
+    if(!SaveSectorMeshes(sector->GetMeshes(), sectorNode)) return false;
     if(!SaveSectorLights(sector, sectorNode)) return false;
-	}
-	return true;
+    }
+  return true;
 }
 
-bool csSaver::SaveSectorMeshes(iSector *s, iDocumentNode *parent)
+bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
 {
-  iMeshList* meshList = s->GetMeshes();
   for (int i=0; i<meshList->GetCount(); i++)
   {
     iMeshWrapper* meshwrapper = meshList->Get(i);
@@ -380,7 +423,10 @@ bool csSaver::SaveSectorMeshes(iSector *s, iDocumentNode *parent)
       meshNode->SetValue ("portal");
       for (int i=0; i<portal->GetPortalCount(); i++)
         if (!SavePortals(portal->GetPortal(i), meshNode)) return false;
+
+      continue;
     }
+
     //Add the mesh's name to the MeshObj tag
     const char* name = meshwrapper->QueryObject()->GetName();
     if (name && *name) 
@@ -429,8 +475,12 @@ bool csSaver::SaveSectorMeshes(iSector *s, iDocumentNode *parent)
 
     //TBD: write <priority>
     //TBD: write other tags
+
+    //Save all childmeshes
+    iMeshList* childlist = meshwrapper->GetChildren();
+    if (childlist) SaveSectorMeshes(childlist, meshNode);
   }
-	return true;
+  return true;
 }
 
 bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
@@ -495,8 +545,7 @@ csRef<iString> csSaver::SaveMapFile()
   if (!SaveTextures(parent)) return 0;
   if (!SaveMaterials(parent)) return 0;
   
-  //TBD: Save the Factories
-  //if (!SaveFactories(parent)) return 0;
+  if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return 0;
   
   if (!SaveSectors(parent)) return 0;
 

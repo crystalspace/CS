@@ -11,6 +11,14 @@ chronological order.
 	  normal maximum movement speed with some factor (default 10). That
 	  way you can move very fast on huge levels. Assigned to the ' key
 	  by default. Also swapped assignment of jump and fire (0 and space).
+	- PK did the following:
+	    - Changing csTextSyntaxService::WriteBox
+	    - Extending the csSaver::SaveSectorMeshes to save childmeshes
+	    - Adding csSaver::SaveMeshFactories
+	    - Implementing FactorySaver for nullmesh
+	    - Implementing ObjectSaver for emitmesh, explosionmesh, firemesh
+	      fountainmesh, nullmesh, rainmesh, snowmesh, spiralmesh, starmesh
+	    - Prepare implementation of sprcal3d's FactorySaver
 4-Aug-2004
 	- Peter Amstutz fixed window resizing in the Wx GL canvas.  It works
 	  now.  Also fixed input handling in the canvas (2nd and 3rd mouse

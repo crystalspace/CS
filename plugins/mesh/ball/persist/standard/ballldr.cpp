@@ -187,14 +187,7 @@ bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 bool csBallFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  if (!parent) return false; //you never know...
-  
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for ball mesh");
-  paramsNode=0;
-  
+  //Nothing gets parsed in the loader, so nothing gets saved here!
   return true;
 }
 

@@ -177,17 +177,10 @@ bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
-//TBD
+
 bool csStarFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  if (!parent) return false; //you never know...
-  
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for star mesh");
-  paramsNode=0;
-  
+  //Nothing gets parsed in the loader, so nothing gets saved here!
   return true;
 }
 
@@ -319,17 +312,68 @@ bool csStarSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csStarSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for star mesh");
+
+  csRef<iStarsState> starsstate = SCF_QUERY_INTERFACE (obj, iStarsState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if ( starsstate && mesh )
+  {
+    //Writedown Color tag
+    csColor col = starsstate->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown MaxColor tag
+    csColor maxcol = starsstate->GetMaxColor();
+    csRef<iDocumentNode> maxcolorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    maxcolorNode->SetValue("maxcolor");
+    synldr->WriteColor(maxcolorNode, &maxcol);
+
+    //Writedown Box tag
+    csBox3 box;
+    starsstate->GetBox(box);
+    csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    boxNode->SetValue("box");
+    synldr->WriteBox(boxNode, &box);
+
+    //Writedown Density tag
+    float density = starsstate->GetDensity();
+    csRef<iDocumentNode> densityNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    densityNode->SetValue("density");
+    densityNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(density);
+
+    //Writedown MaxDistance tag
+    float maxdistance = starsstate->GetMaxDistance();
+    csRef<iDocumentNode> maxdistanceNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    maxdistanceNode->SetValue("maxdistance");
+    maxdistanceNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(maxdistance);
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+  }
+
   paramsNode=0;
-  
+
   return true;
 }
-
