@@ -32,6 +32,7 @@ IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
 IMPLEMENT_CSOBJTYPE (csSpiralParticleSystem, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csRainParticleSystem, csParticleSystem)
+IMPLEMENT_CSOBJTYPE (csSnowParticleSystem, csParticleSystem)
 
 
 csParticleSystem :: csParticleSystem(csObject* theParent)
@@ -500,4 +501,80 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
   }
 }
 
+
+//-- csSnowParticleSystem --------------------------------------------------
+
+csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, csTextureHandle* txt, 
+  UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
+  const csVector3& rainbox_min, const csVector3& rainbox_max, 
+  const csVector3& fall_speed, float dwarrel)
+  : csParticleSystem(theParent)
+{
+  part_pos = new csVector3[number];
+  part_speed = new csVector3[number];
+  rain_dir = fall_speed;
+  dwarrel_amount = dwarrel;
+  rainbox.Set(rainbox_min, rainbox_max);
+  /// spread particles evenly through box
+  csVector3 size = rainbox_max - rainbox_min;
+  csVector3 pos;
+  for(int i=0; i<number; i++)
+  {
+    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    GetParticle(i)->SetMixmode(mixmode);
+    pos = GetRandomDirection(size, rainbox.Min()) ;
+    GetParticle(i)->SetPosition(pos);
+    part_pos[i] = pos;
+    part_speed[i] = 0.0;
+  }
+}
+
+csSnowParticleSystem :: ~csSnowParticleSystem()
+{
+  delete[] part_pos;
+  delete[] part_speed;
+}
+
+void csSnowParticleSystem :: Update(time_t elapsed_time)
+{
+  csParticleSystem::Update(elapsed_time);
+  float delta_t = elapsed_time / 1000.0f; // in seconds
+  // move particles;
+  csVector3 move, pos;
+  int i;
+  for(i=0; i<particles.Length(); i++)
+  {
+    move = rain_dir * delta_t;
+    /// dwarrel a bit, for snow drifting in the wind...
+    csVector3 dwarrel = GetRandomDirection() * dwarrel_amount;
+    dwarrel.y = 0.0;
+    part_speed[i] += dwarrel * delta_t;
+    move += part_speed[i] * delta_t;
+    part_pos[i] += move;
+    GetParticle(i)->SetPosition (part_pos[i]); 
+  }
+  // check if particles are out of the box.
+  for(i=0; i<particles.Length(); i++)
+  {
+    if(!rainbox.In(part_pos[i]))
+    {
+      // this particle has left the box.
+      // it will disappear.
+      // To keep the number of particles (and thus the raininess)
+      // constant another particle will appear in sight now.
+      // @@@ rain only appears in box ceiling now, should appear on
+      // opposite side of rain_dir... 
+
+      // @@@ also shifty will not work very nicely with slanted rain.
+      //   but perhaps it won't be too bad...
+      float shifty = rainbox.MinY() - part_pos[i].y;
+      pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
+        0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
+      pos.y = rainbox.MaxY() - shifty;
+      GetParticle(i)->SetPosition(pos);
+      part_pos[i] = pos;
+      part_speed[i] = 0.0;
+    }
+  }
+}
 
