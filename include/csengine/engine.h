@@ -353,6 +353,8 @@ public:
   csRef<iRenderLoop> defaultRenderLoop;
   /// Render loop manager
   csRenderLoopManager* renderLoopManager;
+
+  csPtr<iRenderLoop> CreateDefaultRenderLoop ();
 #endif
 
   /// Option variable: force lightmap recalculation?

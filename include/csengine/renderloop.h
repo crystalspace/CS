@@ -32,44 +32,11 @@
 #include "iutil/strset.h"
 #include "ivideo/render3d.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/rendersteps/irenderstep.h"
 
 class csEngine;
 class csRenderView;
 class csRenderLoop;
-
-class csLightIteratorRenderStep : public iRenderStep
-{
-private:
-  csRenderLoop* rl;
-  csRefArray<iRenderStep> steps;
-public:
-  SCF_DECLARE_IBASE;
-
-  csLightIteratorRenderStep (csRenderLoop* rl);
-
-  virtual void Perform (csRenderView* rview, iSector* sector);
-
-  void AddStep (iRenderStep* step);
-};
-
-
-class csGenericRenderStep : public iRenderStep
-{
-private:
-  csRenderLoop* rl;
-  csStringID shadertype;
-  bool firstpass;
-  csZBufMode zmode;
-public:
-  SCF_DECLARE_IBASE;
-
-  csGenericRenderStep (csRenderLoop* rl, csStringID shadertype, 
-    bool firstpass, csZBufMode zmode);
-
-  inline void RenderMeshes (iRender3D* r3d, iShader* shader, 
-    csRenderMesh** meshes, int num);
-  virtual void Perform (csRenderView* rview, iSector* sector);
-};
 
 class csRenderLoop : public iRenderLoop
 {
