@@ -341,7 +341,8 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
  iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const { return vis_cb; };
  void csStuffObject::NextFrame (unsigned int)
  {
-   UpdateMesh();
+   Integrator->Compute();	 
+   //UpdateMesh();
  };
  bool csStuffObject::WantToDie () const { return false; };
  void csStuffObject::HardTransform (const csReversibleTransform &) {};
