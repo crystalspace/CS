@@ -1300,9 +1300,9 @@ awsListBox::OnResized()
       h = scrollbar->Frame().Width();
 
 
-  scrollbar->Frame().SetPos(Frame().xmax-w, Frame().ymin);
-  scrollbar->Frame().xmax=Frame().xmax;
-  scrollbar->Frame().ymax=Frame().ymax;
+  scrollbar->Frame().SetPos(Frame().xmax-w-1, Frame().ymin+2);
+  scrollbar->Frame().xmax=Frame().xmax-1;
+  scrollbar->Frame().ymax=Frame().ymax-2;
 
   scrollbar->OnResized();
 }
