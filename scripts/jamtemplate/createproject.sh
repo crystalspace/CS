@@ -125,11 +125,6 @@ else
     PERLSUPPORT=false
 fi
 
-echo "TEMPLATEDIR=[$TEMPLATEDIR]"
-echo "SUPPORTDIR=[$SUPPORTDIR]"
-echo "EXTRAM4=[$EXTRAM4]"
-echo "PERLSUPPORT=[$PERLSUPPORT]"
-
 # Part 1: Interactive - Gather information
 cat << __EOF__
 Crystal Space External Project Template Creation
