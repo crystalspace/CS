@@ -182,6 +182,12 @@ public:
    */
   csFrustrum* Intersect (csVector3* poly, int num);
 
+  /**
+   * Check if a point (given relative to the origin of the frustrum)
+   * is inside the frustrum.
+   */
+  bool Contains (csVector3& point);
+
   /// Return true if frustrum is empty.
   bool IsEmpty () const { return !wide && vertices == NULL; }
 
