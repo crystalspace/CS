@@ -103,9 +103,9 @@ enum BlShapeType
 #define MAX_CUBES 30
 
 // Maximum speed (fall down speed).
-#define MAX_FALL_SPEED 16
+#define MAX_FALL_SPEED 16.
 // Maximum speed in game.
-#define MAX_SPEED 8
+#define MAX_SPEED 8.
 // Slowest speed.
 #define MIN_SPEED .2
 

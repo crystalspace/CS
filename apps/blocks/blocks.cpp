@@ -1430,7 +1430,9 @@ void Blocks::UpdateScore ()
 void Blocks::AddScore (int dscore)
 {
   if (screen == SCREEN_GAMEOVER) return;
-  score += dscore;
+  float bonus_fact = (cur_speed - MIN_SPEED) / (MAX_SPEED-MIN_SPEED);
+  bonus_fact = bonus_fact*2+1;
+  score += (int)((float)dscore*bonus_fact);
 }
 
 void Blocks::HandleStartupMovement (time_t elapsed_time)

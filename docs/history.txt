@@ -29,6 +29,10 @@ Short-term cleanups that need to be done:
 	  of the window. In principle the same thing can now be done
 	  for the other 2D/3D combinations too.
 	  The engine will adapt automatically to the new size.
+	- Changed score counting in Blocks (based on a suggestion from
+	  Andrew) so that score increases as speed increases. At lowest
+	  speed the bonus factor is 1 for every score point. At hightest
+	  speed the bonus factor is 3.
 16-Feb-2000
 	- Some fixes to csPhyzik from Michael Ewert.
 	- Seth Galbraith managed to almost fix sprites by disabling LOD
