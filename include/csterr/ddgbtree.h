@@ -89,7 +89,6 @@ public:
 	///	set wedge thickness.
 	inline void	thick(float t )	{_thick = (unsigned short)(4 * t);}
     /// Reset all but queue status.
-#if (defined(OS_SOLARIS))
     inline void reset()
 	{
 		_state.flags.merged = false;
@@ -98,10 +97,8 @@ public:
 		_state.flags.priority = false;
 		_state.flags.dirty = false;
 		_state.flags.vbuffer = false;
-	    _vis.visibility = ddgINIT; }
-#else
-    inline void reset()    { _state.all &= 3; _vis.visibility = ddgINIT; }
-#endif
+	    _vis.visibility = ddgINIT;
+	}
 	/// Set priority delay.
 	inline void setDelay(unsigned char d) { _delay = d; }
 	/// Reset priority delay.
@@ -293,52 +290,31 @@ public:
 	static unsigned int level(ddgTriIndex i)
 	{
 		unsigned int l = 0;
-#if (defined(OS_SOLARIS))
 		while ((i=i/2) > 1) l++;
-#else
-		while ((i=i>>1) > 1) l++;
-#endif
 		return l;
 	}
 	/// If this is odd (right) or even(left) child in the tree.
 	static bool	isRight(ddgTriIndex i)
 	{
-#if (defined(OS_SOLARIS))
 		return ((i%2) == 1);
-#else
-		return ((i&1) == 1);
-#endif
 	}
 	/// If this is odd (right) or even(left) child in the tree.
 	static bool	isLeft(ddgTriIndex i)
 	{
-#if (defined(OS_SOLARIS))
 		return ((i%2) == 0);
-#else
-		return ((i&1) == 0);
-#endif
 	}
 	/// Return the parent of this element.
 	static ddgTriIndex parent(ddgTriIndex i)
 	{
-//		asserts (i < _triNo,"Invalid element number.");
 		if (i == 0)
 			return 0; // Was _triNo
 		if (i == 1) return 0;
-#if (defined(OS_SOLARIS))
 		return i/2;
-#else
-		return i>>1;
-#endif
 	}
 	/// Return the index of the left child.
 	static ddgTriIndex right(ddgTriIndex i)
 	{
-#if (defined(OS_SOLARIS))
 		return i*2;
-#else
-		return i<<1;
-#endif
 	}
 	/// Return the index of the left child.
 	static ddgTriIndex left(ddgTriIndex i)
@@ -359,7 +335,6 @@ public:
 		case eDIAG:
 			return _pNeighbourDiag ? _mesh->stri[i].brother : 0;
 		default:
-			asserts(0,"Invalid edge");
 			return 0;
 		}
 	}
@@ -377,7 +352,6 @@ public:
 		case eDIAG:
 			return _pNeighbourDiag;
 		default:
-			asserts(0,"Invalid edge");
 			return 0;
 		}
 	}
@@ -449,11 +423,5 @@ public:
 	unsigned int index(void) { return _index; }
 
 };
-
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree v );
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree* v );
-
 
 #endif
