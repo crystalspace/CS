@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+7-Sep-2000
+	- Eric Sunshine updated the documentation-related URLs in the User's
+	  Manual Texinfo files.  Also added several new links to resource.txi.
+	- Eric Sunshine fixed a really significant number of Texinfo mark-up
+	  errors in msdos.txi, win32gcc.txi, general.txi, simple2.txi,
+	  worlfmt.txi, phyziks.txi, apimod17.txi.
+	- Eric Sunshine eliminated todo.txi.  Use the To-Do facility on Source
+	  Forge instead.  Also eliminated (the unused) history.txi.
 6-Sep-2000
 	- Patch from Mark Welch to fix a compile error on MSVC.
 	- Small fix to OpenGL canvas from Nicholas Blumire.
