@@ -1,5 +1,8 @@
 BUILDDIR=$(HOME)/debian/crystal
-DATE=$(shell date '+%Y%m%d')
+#DATE=$(shell date '+%Y%m%d')
+VERSION=0.92
+TAG=R0_92_001
+DATE=20020308
 
 default:
 	@echo "=============================================================="
@@ -12,7 +15,7 @@ default:
 	@echo "=============================================================="
 
 # BUILD FROM CVS EXPORT
-fromcvs: start cvsexport debfiles debbuild
+fromcvs: start cvsexportdate debfiles debbuild
 # BUILD FROM LOCAL COPY
 # just binaries
 justbin: start copy debfiles debcopy debclean debconfigure debbinary
@@ -22,13 +25,13 @@ retry: start copy debfiles debcopy debconfigure debbinary
 fromlocal: start copy debfiles debcopy debbuild
 
 start:
-	@echo "Building Crystalspace-$(DATE)"
+	@echo "Building Crystalspace-$(VERSION)-$(DATE)"
 
 # Just to copy from local files
 copy: $(BUILDDIR) $(BUILDDIR)/copy-stamp
 $(BUILDDIR)/copy-stamp:
 	echo "Copying files"
-	cd ../../..; find CS | grep -v CVS | cpio -pdumvB $(BUILDDIR)/crystalspace-$(DATE)
+	cd ../../..; find CS | grep -v CVS | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION)
 	touch $(BUILDDIR)/copy-stamp
 
 # To anonymous login, do it only one time is needed
@@ -38,36 +41,43 @@ cvslogin:
 	cvs -d:pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal login
 
 # If you want to export a special date
-cvsexport: $(BUILDDIR) $(BUILDDIR)/cvsexport-stamp
-$(BUILDDIR)/cvsexport-stamp: 
-	echo "Exporting CVS"
-	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal export -d crystalspace-$(DATE) -D $(DATE) crystal
-	touch $(BUILDDIR)/cvsexport-stamp
+cvsexportdate: $(BUILDDIR) $(BUILDDIR)/cvsexportdate-stamp
+$(BUILDDIR)/cvsexportdate-stamp: 
+	echo "Exporting CVS by date $(DATE)"
+	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal export -d crystalspace-$(VERSION) -D $(DATE) crystal
+	touch $(BUILDDIR)/cvsexportdate-stamp
+
+# If you want to export a special tag (to make e.g. orig file)
+cvsexporttag: $(BUILDDIR) $(BUILDDIR)/cvsexporttag-stamp
+$(BUILDDIR)/cvsexporttag-stamp: 
+	echo "Exporting CVS by tag $(TAG)"
+	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal export -d crystalspace_$(VERSION).orig -r $(TAG) crystal
+	touch $(BUILDDIR)/cvsexporttag-stamp
 
 # Prepare debian files
 debfiles: $(BUILDDIR)/debfile-stamp
 $(BUILDDIR)/debfile-stamp:
 	echo "Moving debian files"
-	mv $(BUILDDIR)/crystalspace-$(DATE)/CS/scripts/debian/files $(BUILDDIR)/crystalspace-$(DATE)/debian
+	mv $(BUILDDIR)/crystalspace-$(VERSION)/CS/scripts/debian/files $(BUILDDIR)/crystalspace-$(VERSION)/debian
 	touch $(BUILDDIR)/debfile-stamp
 
 debcopy:
-	cd files ; find . | cpio -pdumvB $(BUILDDIR)/crystalspace-$(DATE)/debian
+	cd files ; find . | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION)/debian
 
 debclean:
-	cd $(BUILDDIR)/crystalspace-$(DATE); fakeroot debian/rules clean
+	cd $(BUILDDIR)/crystalspace-$(VERSION); fakeroot debian/rules clean
 	
 debconfigure:
-	cd $(BUILDDIR)/crystalspace-$(DATE); fakeroot debian/rules configure
+	cd $(BUILDDIR)/crystalspace-$(VERSION); fakeroot debian/rules configure
 
 debbinary:
-	cd $(BUILDDIR)/crystalspace-$(DATE);dch -v $(DATE)-1 Autobuild ; fakeroot debian/rules binary
+	cd $(BUILDDIR)/crystalspace-$(VERSION);dch -v $(VERSION)-$(DATE) Autobuild ; fakeroot debian/rules binary
 
 debbuild:
-	cd $(BUILDDIR)/crystalspace-$(DATE);dch -v $(DATE)-1 Autobuild ; debuild -us -uc
+	cd $(BUILDDIR)/crystalspace-$(VERSION);dch -v $(VERSION)-$(DATE) Autobuild ; debuild -us -uc
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 clean:
-	rm -f $(BUILDDIR)/copy-stamp $(BUILDDIR)/cvsexport-stamp
+	rm -f $(BUILDDIR)/*-stamp
