@@ -22,6 +22,8 @@ chronological order.
 	  to compile only skinlex and skinpars. All other aws*cpp files were
 	  not compiled. To fix this, replaced FILES with FREEZEFILES for
 	  the awsfreeze rule construction (but not for the main plugin rule).
+	- Eric Sunshine fixed bug in csperl5/Jamfile where it failed to run
+	  Swig to create cswigpl5.inc, upon which the csperl5 plugin depends.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
