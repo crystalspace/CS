@@ -23,6 +23,11 @@ if ! $(MSVCGEN_CONFIG)
 WAVEOUT.LFLAGS = -lwinmm ;
 }
 
+if "$(USE_DLLWRAP)" = "yes"
+{
+PLUGIN.LFLAGS = [ Filter $(PLUGIN.LFLAGS) : -shared ] ;
+}
+
 #----------------------------------------------------------------------------
 # resource handling
 # Unfortunately we can't simply specify resources on the source list, because
