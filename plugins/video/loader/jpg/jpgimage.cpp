@@ -207,8 +207,9 @@ csPtr<iImage> csJPGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   return csPtr<iImage> (i);
 }
 
-void csJPGImageIO::SetDithering (bool)
+void csJPGImageIO::SetDithering (bool enable)
 {
+  ImageJpgFile::dither = enable;
 }
 
 csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
@@ -444,6 +445,8 @@ static void jpeg_memory_src (j_decompress_ptr cinfo, char *inbfr, int len)
 
 /* ==== Constructor ==== */
 
+bool ImageJpgFile::dither = true;
+
 bool ImageJpgFile::Load (uint8* iBuffer, uint32 iSize)
 {
   struct jpeg_decompress_struct cinfo;
@@ -489,9 +492,8 @@ bool ImageJpgFile::Load (uint8* iBuffer, uint32 iSize)
   // We want max quality, doesnt matter too much it can be a bit slow
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
-    extern bool csImage_dither;
     cinfo.two_pass_quantize = TRUE;
-    cinfo.dither_mode = csImage_dither ? JDITHER_FS : JDITHER_NONE;
+    cinfo.dither_mode = dither ? JDITHER_FS : JDITHER_NONE;
     cinfo.quantize_colors = TRUE;
     cinfo.desired_number_of_colors = 256;
   }

@@ -33,7 +33,6 @@ class csJPGImageIO : public iImageIO
  protected:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
-
  public:
   SCF_DECLARE_IBASE;
 
@@ -66,6 +65,7 @@ class csJPGImageIO : public iImageIO
 class ImageJpgFile : public csImageFile
 {
   friend class csJPGImageIO;
+  static bool dither;
 
 private:
   iObjectRegistry* object_reg;
