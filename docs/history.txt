@@ -1,239 +1,355 @@
 The history order is reversed so that new features are at the top.
 
 26-Aug-2001
-	- Michael Voase did the following:
-        mesh/surface: Fixed a small bug,
-	vertex buffer was not being assigned to
-	g3dTriangleMesh.buffers[0]. Fixed a couple
-	of error message typos (said ball instead
-	of surface).
+	- Eric Sunshine made the following changes to the project:
+	    - Removed all event related code and functionality from
+	      csSystemDriver and the cssys library as part of the continuing
+	      effort to eliminate the monolithic system driver concept.  All
+	      event related functionality has been generalized and moved into
+	      the csutil library.
+	    - Rather than the system driver being responsible for event related
+	      activities, an object of type iEventQueue is now available to
+	      clients via the shared object registry (iObjectRegistry) and is
+	      registered with the name "crystalspace.event.queue".
+	    - Added new SCF interface iEventQueue.  All event-related
+	      activities in CS are now performed by interacting with an object
+	      implementing this interface.  Everything related to a particular
+	      event queue is now maintained by that queue rather than being
+	      manually maintained by the system driver.  Examples of ancillary
+	      functions and objects now maintained by the event queue include
+	      event outlets, event cords, and event handlers.  iEventQueue
+	      provides the following main functions (along with some other
+	      minor ones):
+		- Process(); Processes the event queue, dispatching each
+		  contained event to the appropriate event handler.  Also
+		  responsible for sending the cscmdPreProcess and
+		  cscmdPostProcess events to interested listeners.  This method
+		  takes over all the major functionality which used to be
+		  handled by iSystem::NextFrame().  Re-implemented
+		  iSystem::NextFrame() as a very thin cover over this method.
+		- Dispatch(); Actually dispatches each event retrieved from the
+		  queue by Process().  This method takes over all the major
+		  functionality which used to be handled by
+		  iSystem::HandleEvent().
+		- RegisterListener(); Entities interested in listening for
+		  events register with the event queue via this method.  This
+		  replaces the old iSystem::CallOnEvents() method.  Also added
+		  RemoveListener() to provide a way for entities to stop
+		  listening; and ChangeListenerTrigger() to provide a way for
+		  entities to alter the set of event types in which they are
+		  interested.
+		- CreateEventOutlet(); Returns a new event outlet to the
+		  caller.  Replaces iSystem::CreateEventOutlet().
+		- GetEventOutlet(); Returns the shared event outlet for this
+		  particular event queue (for those cases where creating a new
+		  one is overkill).  Replaces iSystem::GetSystemEventOutlet().
+		- GetEventCord(); Returns the event cord for a particular
+		  category and subcategory.  Replaces iSystem::GetEventCord().
+	    - The system driver now registers itself as an event listener with
+	      the shared event queue just like all other modules which are
+	      interested in events.  This allows csSystemDriver to listen for
+	      the cscmdQuit event in order to set its `Shutdown' variable
+	      appropriately.  It also allows the HandleEvent() method in
+	      subclasses of csSystemDriver to function as expected.  Note that
+	      this is a merely a temporary state of affairs, as the system
+	      driver will soon cease to exist.
+	    - Converted all applications, plugin modules, and other support
+	      code to work with the new event system organization.
+	    - Because the generic input drivers, csKeyboardDriver,
+	      csMouseDriver, and csJoystrickDriver, are tied closely to event
+	      outlets, they were also moved from cssys to csutil.
+	    - The generic input drivers, csKeyboardDriver, csMouseDriver, and
+	      csJoystrickDriver, are themselves now responsible for listening
+	      for the cscmdFocusChanged event, rather than relying upon the
+	      system driver to do so on their behalf.
+	    - Added new SCF interfaces: iKeyboardDriver, iMouseDriver,
+	      iJoystickDriver.
+	    - Objects implementing iKeyboardDriver, iMouseDriver, and
+	      iJoystickDriver are now made available via the shared object
+	      registry (iObjectRegistry) under the following names,
+	      respectively:
+		crystalspace.driver.input.generic.keyboard
+		crystalspace.driver.input.generic.mouse
+		crystalspace.driver.input.generic.joystick
+	    - Converted all applications and plugin modules to access the
+	      generic drivers directly from the shared object registry rather
+	      than calling upon iSystem methods to interact with these objects.
+	      Removed all knowledge of these drivers from iSystem and
+	      csSystemDriver.
+	    - Moved the utility functions csParseKeyDef() and csGetKeyDesc() in
+	      cskeys.h and cskeys.cpp from cssys to csutil since they are
+	      totally generic and have no platform-specific bindings.
+	    - Fixed a nasty bug in csEventCord where it failed to unlock itself
+	      in some cases when posting an event.
+	    - Fixed a bad bug in csEventCord where it was leaking all events
+	      posted to it.
+	    - Fixed broken logic in iObjectRegistry::Unregister() where it did
+	      not actually remove the entry for the object, but instead just
+	      left a dangling (and potentially) dead pointer.
+	    - iObjectRegistry implementation now correctly reference counts the
+	      contained objects.  It also now protects itself against
+	      modification during its own destruction, since some of the
+	      objects which it is removing from itself might also get destroyed
+	      and might try modifying the registry.
+	    - Moved mouse driver settings out of system.cfg and into mouse.cfg.
+	      csMouseDriver is now responsible for accessing these settings
+	      itself rather than relying upon the system driver to do so.
+	    - Fixed bug in definition of SCF_IMPLEMENT_IBASE table for
+	      csSystemDriver.  The table neglected to mention that
+	      csSystemDriver implements iObjectRegistry and iPluginManager.
+	      Added mention of iPlugin which csSystemDriver now implements so
+	      that it can listen for events from the event queue.
+	    - Eliminated compilation warnings in aseie.cpp, dxfie.cpp,
+	      hrcie.cpp, ivie.cpp, objie.cpp, povie.cpp, smfie.cpp, stlaie.cpp,
+	      and vlaie.cpp about non-virtual destructor.
+	    - Eliminated compilation warning about unused variable in
+	      md2ie.cpp.  Also fixed a memory leak.
+	    - Eliminated compilation warning about `float' assigned to `int' in
+	      spr2d.cpp.
+	    - Fixed broken header-protection macros in intarray.h.
+	    - Fixed g2dtest so that it once again actually displays a window.
+	      This had been broken for quite some time.
+	    - csSchedule no longer unnecessarily depends upon the system
+	      driver.
+	    - csSchedule no longer publishes its private utility class.
+	    - The cssys library no longer relies upon the csgeom library.
+	    - Eliminated several compilation warnings from AWS.  Worked around
+	      a couple NextStep compiler shortcomings.
+	    - Rewrote csRectRegion in csgeom so that it no longer relies upon
+	      the csutil library.  I think it is best if we keep csgeom free of
+	      any csutil dependencies.
+	    - Fixed csRectRegion so that, at destruction time, it no longer
+	      leaks each of the csRect structures in its `region' list.
+	    - Fixed the comment-style in csrectrg.h so that Doxygen will
+	      produce proper documentation for csRectRegion.
+	    - Repaired some overfull and underfull `hbox' warnings reported by
+	      TeX for tutorial/wincvs/step1.txi.
+	    - Finally, note that I eliminated quite a few unnecessary #include
+	      directives from the event-related headers and from isys/system.h
+	      & cssys/system.h.  Since I am unable to test-compile every single
+	      port of CS and every driver, port maintainers may have to add an
+	      #include statement here and there in platform-specific and/or
+	      driver-specific code.
+	- Michael Voase did the following: mesh/surface: Fixed a small bug,
+	  vertex buffer was not being assigned to g3dTriangleMesh.buffers[0].
+	  Fixed a couple of error message typos (said ball instead of surface).
 24-Aug-2001
 	- Philip Wyett tried to fix the metaballs plugin from crashing.
-	- Fixed metaballs plugin so that it really works again now.
-	  This caused walktest+flarge to crash.
-	- Fixed ptlab and metademo. These apps were not calling
-	  csInitializeApplication so a lot was missing in the object
-	  registry. Some of the changes I did yesterday assumed that
-	  there was an instance of iGraphics3D in the object registry.
-	- Added iPolygonBuffer. This represents an object that holds the
-	  most efficient way to represent a set of polygons for a given
-	  3D renderer. For a software renderer the polygons can just be
-	  stored as such. For a hardware renderer it may be more efficient
-	  to store the polygons as a triangle mesh or a vertex fan/strip.
-	  The vertex buffer manager also serves as the class that implements
-	  polygon buffers. Polygon buffers are supposed to work together
-	  with vertex buffers as the polygons are given as indices in such
-	  a buffer. Implemented a primitive polygon buffer support for all
-	  renderers.
-	  Currently polygon buffers are not used. In the near future
-	  DrawPolygonMesh will use them.
-	- Changed the way that vertex buffers work. In addition to the vertex
+	- Fixed metaballs plugin so that it really works again now.  This
+	  caused walktest+flarge to crash.
+	- Fixed ptlab and metademo.  These apps were not calling
+	  csInitializeApplication so a lot was missing in the object registry.
+	  Some of the changes I did yesterday assumed that there was an
+	  instance of iGraphics3D in the object registry.
+	- Added iPolygonBuffer.  This represents an object that holds the most
+	  efficient way to represent a set of polygons for a given 3D renderer.
+	  For a software renderer the polygons can just be stored as such.  For
+	  a hardware renderer it may be more efficient to store the polygons as
+	  a triangle mesh or a vertex fan/strip.  The vertex buffer manager
+	  also serves as the class that implements polygon buffers.  Polygon
+	  buffers are supposed to work together with vertex buffers as the
+	  polygons are given as indices in such a buffer.  Implemented a
+	  primitive polygon buffer support for all renderers.  Currently
+	  polygon buffers are not used.  In the near future DrawPolygonMesh
+	  will use them.
+	- Changed the way that vertex buffers work.  In addition to the vertex
 	  information that was already present there is now also texel (texture
-	  mapping) and color information. This means the 3D renderer will also
-	  be able to optimize for those. This also means that the vertex_colors
-	  and texels arrays are gone from G3DTriangleMesh.
+	  mapping) and color information.  This means the 3D renderer will also
+	  be able to optimize for those.  This also means that the
+	  vertex_colors and texels arrays are gone from G3DTriangleMesh.
 	- Removed the 'extern "C"' arround the include of Python.h in the
-	  python plugin. This caused problems with MSVC in combination with
-	  Python 2.0. Since the extern "C" doesn't seem to be needed for
-	  Python 1.5 I removed it. One disadvantage of this removal is that
-	  there is now a warning about ignored pragma though.
-	  Note that I could not remove the extern "C" in cs_pyth.cpp since
-	  that file is automatically generated. We have to fix that somehow.
-	- Matze Braun <matze@braunis.de> and Jorrit investigated a bug with
-	  the QInt() function which triggers on gcc 2.96 or higher (gcc 3) if
-	  optimization level -O2 is selected (or higher). After speaking with
+	  python plugin.  This caused problems with MSVC in combination with
+	  Python 2.0.  Since the extern "C" doesn't seem to be needed for
+	  Python 1.5 I removed it.  One disadvantage of this removal is that
+	  there is now a warning about ignored pragma though.  Note that I
+	  could not remove the extern "C" in cs_pyth.cpp since that file is
+	  automatically generated.  We have to fix that somehow.
+	- Matze Braun <matze@braunis.de> and Jorrit investigated a bug with the
+	  QInt() function which triggers on gcc 2.96 or higher (gcc 3) if
+	  optimization level -O2 is selected (or higher).  After speaking with
 	  some people from the gcc community we discovered that this is
-	  actually a bug in gcc and not a bug in the QInt() implementation
-	  that we use. We came up with a work-arround which unfortunatelly
-	  doesn't seem to work for MSVC. So Matze extended the configuration
-	  pass by adding an additional test in bin/comptest.sh which tests
-	  if this bug is present or not. This means that the right version
-	  of QInt() will automatically be selected after you do 'make linux'
-	  (or 'make win32gcc' whatever).
+	  actually a bug in gcc and not a bug in the QInt() implementation that
+	  we use.  We came up with a work-arround which unfortunatelly doesn't
+	  seem to work for MSVC.  So Matze extended the configuration pass by
+	  adding an additional test in bin/comptest.sh which tests if this bug
+	  is present or not.  This means that the right version of QInt() will
+	  automatically be selected after you do 'make linux' (or 'make
+	  win32gcc' whatever).
 23-Aug-2001
 	- Fog should now work for the metaballs plugin.
-	- Started work on vertex buffer support in the 3D renderers. There is
+	- Started work on vertex buffer support in the 3D renderers.  There is
 	  now a new iVertexBufferManager which you can get by calling
-	  iGraphics3D::GetVertexBufferManager(). The vertex buffer manager
-	  manages objects of type iVertexBuffer. The plan is that everything
-	  that wants to use vertex buffers creates one using the
-	  vertex buffer manager. When the vertex buffer is going to be
-	  used it must be locked.
-	- Modified G3DTriangleMesh to use the new vertex buffers. The
+	  iGraphics3D::GetVertexBufferManager().  The vertex buffer manager
+	  manages objects of type iVertexBuffer.  The plan is that everything
+	  that wants to use vertex buffers creates one using the vertex buffer
+	  manager.  When the vertex buffer is going to be used it must be
+	  locked.
+	- Modified G3DTriangleMesh to use the new vertex buffers.  The
 	  'num_vertices' field has gone (since that is now part of the vertex
-	  buffer) and the 'vertices' array is replaced with a 'buffers'
-	  array (DrawTriangleMesh currently supports maximum two such buffers).
+	  buffer) and the 'vertices' array is replaced with a 'buffers' array
+	  (DrawTriangleMesh currently supports maximum two such buffers).
 	- Put a default implementation of vertex buffers in
 	  plugins/video/renderer/common/vbufmgr.*.
 	- Modified all renderers in cvs to support the vertex buffer feature
-	  although the current implementation doesn't do anything special
-	  yet (i.e. it will not perform better than the old system at the
-	  moment).
-	- Modified all mesh object plugins in cvs to support the new
-	  vertex buffer feature. The current implementation in case of
-	  3D sprites is very naive at the moment. It will just use one
-	  vertex buffer which is modified every time. This has to be fixed
-	  later.
+	  although the current implementation doesn't do anything special yet
+	  (i.e.  it will not perform better than the old system at the moment).
+	- Modified all mesh object plugins in cvs to support the new vertex
+	  buffer feature.  The current implementation in case of 3D sprites is
+	  very naive at the moment.  It will just use one vertex buffer which
+	  is modified every time.  This has to be fixed later.
 	- Note that one implication of all this is that
 	  iRenderView::CalculateFogMesh() for G3DTriangleMesh can only operate
 	  on a mesh with locked vertex buffers.
-	- Added CS_ASSERT() at various places to make sure the locked status
-	  of the vertex buffer is as expected.
-	- Christopher Nelson added ability to grab title bar of windows to
-	  move them.
+	- Added CS_ASSERT() at various places to make sure the locked status of
+	  the vertex buffer is as expected.
+	- Christopher Nelson added ability to grab title bar of windows to move
+	  them.
 	- Martin Geisse did the following:
 	    - Added the framework for an MDL converter.
 	    - Fixed a bug in the MD2 converter.
 22-Aug-2001
 	- Norman Kramer made a few comments in polygon.h a bit better.
-	- Norman saved a few cycles in min_z calculation in software
-	  renderer.
+	- Norman saved a few cycles in min_z calculation in software renderer.
 	- Philip Wyett removed ';' at end of 'if()' which was creating a
 	  compiler warning and empty control statement.
-	- Received a patch from Matze Braun <matze@braunis.de> which fixes
-	  the apps crashing when plugins (reporter and standard reporter)
-	  are missing. Added a bool return value to csInitializeApplication
-	  for this purpose.
-	- Added GetTransform() and SetTransform to iMeshFactoryWrapper.
-	  This transform is a transformation relative to the parent of the
-	  factory wrapper. It is only useful when a factory wrapper is part
-	  of a hierarchy.
-	- Removed iMeshFactoryWrapper::GetChildTransform() as the transform
-	  is now part of the iMeshFactoryWrapper itself.
+	- Received a patch from Matze Braun <matze@braunis.de> which fixes the
+	  apps crashing when plugins (reporter and standard reporter) are
+	  missing.  Added a bool return value to csInitializeApplication for
+	  this purpose.
+	- Added GetTransform() and SetTransform to iMeshFactoryWrapper.  This
+	  transform is a transformation relative to the parent of the factory
+	  wrapper.  It is only useful when a factory wrapper is part of a
+	  hierarchy.
+	- Removed iMeshFactoryWrapper::GetChildTransform() as the transform is
+	  now part of the iMeshFactoryWrapper itself.
 	- Generalized csMeshFactoryList (similar to csMeshList) so that
 	  AddMeshFactory and RemoveMeshFactory can now be overriden by
 	  subclasses for additional functionality.
 	- Added csMeshFactoryFactoryList which implements functionality
 	  specific for keeping mesh factories in another mesh factory.
-	- Removed iMeshFactoryWrapper::GetChildCount, GetChild, AddChild,
-	  and RemoveChild. Instead there is now
-	  iMeshFactoryWrapper::GetChildren() which returns iMeshFactoryList.
+	- Removed iMeshFactoryWrapper::GetChildCount, GetChild, AddChild, and
+	  RemoveChild.  Instead there is now iMeshFactoryWrapper::GetChildren()
+	  which returns iMeshFactoryList.
 	- Removed SCF_DEBUG calls in OpenGL renderer. These are not needed.
 	- Removed iEngine::FindMeshWrapper, FindMeshFactory, and FindSector.
 	  Use the FindByName in the respective lists instead (using GetSectors,
-	  GetMeshes, and GetMeshFactories). To search for an object in
-	  a region first get the current region and then call
-	  iRegion::FindBla().
+	  GetMeshes, and GetMeshFactories).  To search for an object in a
+	  region first get the current region and then call iRegion::FindBla().
 21-Aug-2001
 	- Made destructor of new MD2 importer virtual.
 	- Fixed makefile linking for MD2 importer.
 	- Standardized csMeshList so that it can be reused better for other
-	  mesh lists. This means that AddMesh and RemoveMesh are now virtual
-	  functions in csMeshList so that they can be overriden by
-	  subclasses.
-	- csSectorMeshList now inherits from csMeshList making that code
-	  a lot easier.
-	- Added csEngineMeshList (subclass of csMeshList) which is now used
-	  by the engine (instead of csMeshList).
-	- Added csMeshMeshList (subclass of csMeshList) to hold to children
-	  of a mesh wrapper.
-	- Removed iMeshWrapper::GetChildCount, AddChild, RemoveChild,
-	  and GetChild. Instead there is now GetChildren() which returns
-	  an iMeshList.
+	  mesh lists.  This means that AddMesh and RemoveMesh are now virtual
+	  functions in csMeshList so that they can be overriden by subclasses.
+	- csSectorMeshList now inherits from csMeshList making that code a lot
+	  easier.
+	- Added csEngineMeshList (subclass of csMeshList) which is now used by
+	  the engine (instead of csMeshList).
+	- Added csMeshMeshList (subclass of csMeshList) to hold to children of
+	  a mesh wrapper.
+	- Removed iMeshWrapper::GetChildCount, AddChild, RemoveChild, and
+	  GetChild.  Instead there is now GetChildren() which returns an
+	  iMeshList.
 	- Added iMovable::SetParent().
 	- Removed a few warnings regarding not using the plugin manager.
 	- Fixed Blocks after yesterdays changes.
 	- Norman Kramer fixed a few comments in the software renderer.
-	- Philip Wyett fixed a compile problem in the iso engine caused
-	  by the addition of SetParent() to iMovable.
+	- Philip Wyett fixed a compile problem in the iso engine caused by the
+	  addition of SetParent() to iMovable.
 20-Aug-2001
 	- Philip Wyett removed duplicate commented out entry for cslua plugin.
-	  Manually updated MSVC project files with CSLUA. This I do
-	  not out of choice because of SWIG library (or lack of) for VC.
-	  Philip also fixed the LUA plugin so it compiles again for Visual
-	  C++.
+	  Manually updated MSVC project files with CSLUA.  This I do not out of
+	  choice because of SWIG library (or lack of) for VC.  Philip also
+	  fixed the LUA plugin so it compiles again for Visual C++.
 	- Philip fixed a compile error in phyztest.
 	- Philip did a commit of cspace.py which Jorrit forgot to commit
 	  yesterday.
 	- Martin Geisse moved the MD2 importer to its plugin.
 	- Added virtual destructor to csSpriteBuilderFile to remove warning.
 	- Made destructor of csModelConverterSPR private.
-	- Added iThingState::GetPortalPolygon() which returns the polygon
-	  of the portal (given with index). It complements GetPortalCount()
-	  and GetPortal().
+	- Added iThingState::GetPortalPolygon() which returns the polygon of
+	  the portal (given with index).  It complements GetPortalCount() and
+	  GetPortal().
 	- Added iPolygon3D::IntersectSegment, IntersectRay,
-	  IntersectRayNoBackFace, IntersectRayPlane, and PointOnPolygon.
-	  These functions were already in csPolygon3D.
+	  IntersectRayNoBackFace, IntersectRayPlane, and PointOnPolygon.  These
+	  functions were already in csPolygon3D.
 	- Removed the duplicate iMovable::AddSector(), GetSector(int), and
 	  GetSectorCount(). This functionality is present through iSectorList
 	  which you can get with iMovable::GetSectors(). Also actually added
 	  the implementation for iSectorList::AddSector() and RemoveSector().
-	- iMovable::GetSectors() no longer returns a 'const' pointer since
-	  you now have to use that object to actually add sectors.
-	- Completed iMeshWrapper::PlaceMesh(). The function currently has
-	  the following limitations:
+	- iMovable::GetSectors() no longer returns a 'const' pointer since you
+	  now have to use that object to actually add sectors.
+	- Completed iMeshWrapper::PlaceMesh().  The function currently has the
+	  following limitations:
 	    - Does not work correctly if the movable transform is not
 	      orthonormal (i.e. the transform scales the object in some way).
 	      In general this is not recommend either since there are other
 	      parts of CS (like collision detection) that don't work well in
 	      that case.
-	    - PlaceMesh() only goes one level deep. i.e. it only checks
-	      all portals in the current sector and adds the destination
-	      sectors from those portals. It will not recurse into those
-	      sectors to continue the test there. This limitation will only
-	      be a problem if you have portals that are very close to each
-	      other and an object happens to cross them all.
+	    - PlaceMesh() only goes one level deep.  i.e. it only checks all
+	      portals in the current sector and adds the destination sectors
+	      from those portals.  It will not recurse into those sectors to
+	      continue the test there.  This limitation will only be a problem
+	      if you have portals that are very close to each other and an
+	      object happens to cross them all.
 	    - This function ignores children of the mesh object. So only the
 	      bounding sphere of the parent object is considered.
 	    - This function will only test against portals of things that
 	      cannot move (i.e. have flag CS_THING_MOVE_NEVER set).
 	    - This function is not super-efficient as it assumes no previous
-	      knowledge except for one sector. It would be nice to have
-	      extra PlaceMesh() versions that take a displacement vector
-	      and calculate the new set of sectors based on the old one
-	      (assuming this can be done more efficiently).
-	    - For huge sectors containing lots of portals or mesh objects
-	      this function should be optimized. This can probably be done
-	      by keeping an efficient portal representation structure on the
+	      knowledge except for one sector.  It would be nice to have extra
+	      PlaceMesh() versions that take a displacement vector and
+	      calculate the new set of sectors based on the old one (assuming
+	      this can be done more efficiently).
+	    - For huge sectors containing lots of portals or mesh objects this
+	      function should be optimized.  This can probably be done by
+	      keeping an efficient portal representation structure on the
 	      csSector level.
 	  Otherwise it should work just fine but it is untested.
 	- Removed iSector::AddMesh, UnlinkMesh, GetMeshCount, and GetMesh (two
 	  versions). Instead there is now iSector::GetMeshes() which returns
 	  an implementation of iMeshList.
 19-Aug-2001
-	- Added iThingState::GetPortalCount() and GetPortal(int) so you
-	  can query all portals from a thing.
-	- Added iMeshWrapper::PlaceMesh() function which will take position
-	  the mesh in all relevant sectors. To do that it will use the
-	  bounding sphere of the mesh and ONE sector which should already
-	  be initialized in the movable of the mesh BEFORE calling
-	  PlaceMesh(). Note that this routine is not finished yet.
-	  It only goes one level deep so it will fail to correctly
-	  place meshes that cross several consecutive portals. Also it
-	  doesn't take child mesh objects in consideration yet.
-	  NOTE: The function doesn't do anything useful yet! I have to
+	- Added iThingState::GetPortalCount() and GetPortal(int) so you can
+	  query all portals from a thing.
+	- Added iMeshWrapper::PlaceMesh() function which will take position the
+	  mesh in all relevant sectors.  To do that it will use the bounding
+	  sphere of the mesh and ONE sector which should already be initialized
+	  in the movable of the mesh BEFORE calling PlaceMesh().  Note that
+	  this routine is not finished yet.  It only goes one level deep so it
+	  will fail to correctly place meshes that cross several consecutive
+	  portals.  Also it doesn't take child mesh objects in consideration
+	  yet.  NOTE: The function doesn't do anything useful yet!  I have to
 	  continue implementation.
 	- Fixed the crossbld makefile so that it actually links.
 	- Haze Mesh: Implement HitBeamBBox.
 	- Michael Voase did the following:
-	    - Sprite2D: Implement HitBeamBBox and HitBeamOutline. Modified
-	      SetupObject() to always calculate the radius when the object
-	      is setup, reguardless of the lighting setting.
+	    - Sprite2D: Implement HitBeamBBox and HitBeamOutline.  Modified
+	      SetupObject() to always calculate the radius when the object is
+	      setup, reguardless of the lighting setting.
 	    - Introduced a GetObjectBoundingBox method, but it is as yet
-	      invalid. More work to be done here yet. 
+	      invalid. More work to be done here yet.
 	    - Sprite3D: Tidying up HitBeam.
-	- Martin Geisse moved the SPR exporter to its plugin, using a
-	  subclass of csSpriteBuilder.
+	- Martin Geisse moved the SPR exporter to its plugin, using a subclass
+	  of csSpriteBuilder.
 	- Philip Wyett fixed a linking error in spr.mak by adding CSTOOL.
 	- Philip also added EAX plugin entry into SCF for it's imminent
 	  re-insertion back into CS after being updated by Peter Nimmervoll.
-	- Philip reports:
-	  Re-inserted EAX after repair by Peter Nimmervoll - Many thanks.
-	  Added EAX plugin to MSVC port and MSVCGEN process.
+	- Philip reports: Re-inserted EAX after repair by Peter Nimmervoll -
+	  Many thanks.  Added EAX plugin to MSVC port and MSVCGEN process.
 	  Manual update of MSVC project files.
 	  Note:
-	    To build the EAX plugin you will need the EAX 2.0 SDK
-	    available from: "http://www.developer.creative.com" 10Mb
-	    download. Please remember to add the "include" and "lib"
-	    directories to point to the respective files in-order to 
-	    successfully compile.
+	    To build the EAX plugin you will need the EAX 2.0 SDK available
+	    from: "http://www.developer.creative.com" 10Mb download.  Please
+	    remember to add the "include" and "lib" directories to point to the
+	    respective files in-order to successfully compile.
 	- Philip Wyett did some documentation changes:
 	    - Added "isotest" to app overview list.
 	    - Changed round MSVC 5 & 6 in menu of Windows build docs.
-	    - Added a missing ")" and changed link to ssh for win32
-	      from redeye entertainment to my personal webserver.
-	- Philip cleaned up header defines and brought into line with
-	  CS coding style and standards.
+	    - Added a missing ")" and changed link to ssh for win32 from RedEye
+	      entertainment to my personal webserver.
+	- Philip cleaned up header defines and brought into line with CS coding
+	  style and standards.
 	- Philip renamed class: TextureTrans -> class csTextureTrans.
 	- Philiop changed the SCF config line from
 	  "crystalspace.sound.render.eax" to "crystalspace.sound.render.ds3d",
@@ -242,10 +358,10 @@ The history order is reversed so that new features are at the top.
 18-Aug-2001
 	- Martin Geisse made the following changes:
 	    - Registered all converter plugins in scf.cfg.
-	    - Added csString::Detach(). This function empties the string
+	    - Added csString::Detach().  This function empties the string
 	      without deleting the contents (which is faster than copying the
-	      contents and then delete the string). The content buffer is
-	      also returned.
+	      contents and then delete the string).  The content buffer is also
+	      returned.
 	    - Moved the POV converter to its plugin.
 	    - Moved sprite building out of the crossbuilder and into its own
 	      'sprite builder' class. This makes it possible to create a
@@ -256,44 +372,42 @@ The history order is reversed so that new features are at the top.
 	    - Removed the obsolete pobject.h from csutil.
 	- Philip Wyett removed incorrect ".cvsignore" and added new one in
 	  "\lib" directory to ignore the extracted libs from winlibs package.
-	  In addition Philip updated several .cvsignore files. He reports:
-	      This change is in advance of a new winlibs release which
-	      will change the "lib" dir to "libs" and skip the already in
-	      cvs directory "lib" and allow this "cvsingore" to be
-	      correctly applied.
-	      Note: You need to now use winlibs 0.19d.
+	  In addition Philip updated several .cvsignore files.  He reports that
+	  this change is in advance of a new winlibs release which will change
+	  the "lib" dir to "libs" and skip the already in cvs directory "lib"
+	  and allow this "cvsingore" to be correctly applied.  Note: You need
+	  to now use winlibs 0.19d.
 17-Aug-2001
-	- Integrated a few patches from Matze Braun <matze@braunis.de>
-	  to make sure that CS compiles cleanly with gcc3.0. To enable
-	  one patch for timing you have to add -DCOMP_GCC3 to the
-	  commandline for compiling or else you have to edit
-	  libs/cssys/unix/utiming.cpp and make the define there.
-	  This should be done automatically by the makefile (configure
-	  time) but I don't know how to do this.
+	- Integrated a few patches from Matze Braun <matze@braunis.de> to make
+	  sure that CS compiles cleanly with gcc3.0.  To enable one patch for
+	  timing you have to add -DCOMP_GCC3 to the commandline for compiling
+	  or else you have to edit libs/cssys/unix/utiming.cpp and make the
+	  define there.  This should be done automatically by the makefile
+	  (configure time) but I don't know how to do this.
 16-Aug-2001
 	- Martin Geisse updated the list of contributors in the docs.
-	- Martin also added the following files to 'cvsignore':
+	- Martin also added the following files to '.cvsignore':
 	    - In "cs/": *.dll
 	    - In "cs/include/cssys/win32/": freetype.h, fterrid.h, ftnameid.h,
 	      jconfig.h, jerror.h, jinclude.h, jmorecfg.h, jpeglib.h,
 	      lauxlib.h, lua.h, luadebug.h, lualib.h, png.h, pngconf.h,
 	      zconf.h, zlib.h, divx, lib3ds.
 	    - In "cs/libs/cssys/win32": lib
-	- Martin fixed a bug in the engine where it was using typed vectors
-	  the wrong way and added a note to typed vectors to prevent others
-	  from doing the same mistake.
+	- Martin fixed a bug in the engine where it was using typed vectors the
+	  wrong way and added a note to typed vectors to prevent others from
+	  doing the same mistake.
 	- Christopher Nelson did the following:
 	    - Updated AWS interface again for font and event handling.
 	    - Added event handling hook. In your main event handler, you
 	      should now call aws->HandleEvent(Event) to allow the windowing
 	      system to process events.
-	    - Updated window draw code, improved window look.  Windows can
-	      now be resized by grabbing onto the grip.
+	    - Updated window draw code, improved window look.  Windows can now
+	      be resized by grabbing onto the grip.
 	    - Fixed the mark code a little bit to increase efficiency. The
 	      window redraw now checks to see if the window covers the entire
 	      dirty area that is being redrawn. If so, no background erasure
 	      is performed.
-	    - Added font handling abilities to the preference manager. 
+	    - Added font handling abilities to the preference manager.
 	- Eric Sunshine made the following changes to the Texinfo user's
 	  manual:
 	    - Repaired the seriously broken navigational structure which
@@ -314,126 +428,119 @@ The history order is reversed so that new features are at the top.
 15-Aug-2001
 	- Philip Wyett removed the cslua plugin from the MSVC port.
 	- Christopher Nelson added awsdef.zip which is the binary resource
-	  package for aws. Currently it has only three .png bitmaps for
-	  windows. It will eventually serve as the default skin repository
-	  and contain a number of other images.
+	  package for aws.  Currently it has only three .png bitmaps for
+	  windows.  It will eventually serve as the default skin repository and
+	  contain a number of other images.
 14-Aug-2001
-	- Christopher Nelson reports: redrawing code works now, updated some
-	  stuff. Had to had some reset code into the top-level redraw
-	  function. Noticed clunky bug in OpenGL, and odd transparency bug
-	  in software mode when you start in fullscreen mode.
+	- Christopher Nelson reports regarding AWS: redrawing code works now,
+	  updated some stuff.  Had to had some reset code into the top-level
+	  redraw function.  Noticed clunky bug in OpenGL, and odd transparency
+	  bug in software mode when you start in fullscreen mode.
 	- Christopher Nelson made the following changes to AWS:
 	    1. Added a number of new colors to the preference manager:
-                AC_HIGHLIGHT2: a slightly darker highlight
-                AC_SHADOW: a slightly lighter highlight
-                AC_BLACK, AC_WHITE: black and white
-                AC_RED,AC_GREEN,AC_BLUE: colors that are always midpoint red, green, and blue solid colors.
-               Note that these colors are, in the case of HIGHLIGHT and
-	       SHADOW derived BUT NOT SPECIFIED by the user. The constant
-	       colors, Red, Green, Blue, etc are not user definable. They are
-	       intended to be those colors ALWAYS.           
-               I'm contemplating taking the POV-Ray colors definition file
-	       and turning it into a symbolic list of colors that can be
-	       specified via the definitions file so that you don't have to
-	       figure out what RGB colors you want. I'm thinking this might
-	       be nice for non-programmers who don't have a good grasp on
-	       RGB composition.
+		  AC_HIGHLIGHT2: a slightly darker highlight
+		  AC_SHADOW: a slightly lighter highlight
+		  AC_BLACK, AC_WHITE: black and white
+		  AC_RED,AC_GREEN,AC_BLUE: colors that are always midpoint red,
+		     green, and blue solid colors.
+               Note that these colors are, in the case of HIGHLIGHT and SHADOW
+	       derived BUT NOT SPECIFIED by the user.  The constant colors,
+	       Red, Green, Blue, etc are not user definable.  They are intended
+	       to be those colors ALWAYS.  I'm contemplating taking the POV-Ray
+	       colors definition file and turning it into a symbolic list of
+	       colors that can be specified via the definitions file so that
+	       you don't have to figure out what RGB colors you want.  I'm
+	       thinking this might be nice for non-programmers who don't have a
+	       good grasp on RGB composition.
 	    2. Added a bunch of drawing code for windows, and all the
-	       frame_style and frame_options flags.  These still need
-	       to be extended into the constant-ref so that they can be
-	       looked up.  I also need to extend options fields so that
-	       we can make lists of options like:
-		    Window "My Window"
-		    {
-		      ...
-		      FrameOptions: Control, Zoom, Minimize, Beveled
-		    }
-	- Philip Wyett fixed a missing variable "i" in for loop for
-	  awsmgr.cpp.
-	- Fixed a bug in the lighting code which prevented the falling
-	  blocks in Blocks to be lit correctly.
-	- Fixed a bug with the ball mesh not clipping correctly to the
-	  screen boundaries. It appeared that the transformed bounding
-	  box was not calculated correctly.
-	- Fixed a bug with the software renderer where an alpha texture
-	  was used together with a non-COPY mixmode. This caused the
-	  blend tables not to be set up correctly. This bug causes
-	  the partsys level to crash in the room at the far left (software
-	  renderer only).
-	- Fixed a bug with the software renderer where flat rendering
-	  (without texture) would not correctly check which z-buffer
-	  mode (NONE, FILL, TEST, or USE) to use.
-	- Fixed a potential memory overwrite bug in xwindow.cpp. It
-	  was doing:
+	       frame_style and frame_options flags.  These still need to be
+	       extended into the constant-ref so that they can be looked up.  I
+	       also need to extend options fields so that we can make lists of
+	       options like:
+		  Window "My Window"
+		  {
+		    ...
+		    FrameOptions: Control, Zoom, Minimize, Beveled
+		  }
+	- Philip Wyett fixed a missing variable "i" in for loop for awsmgr.cpp.
+	- Fixed a bug in the lighting code which prevented the falling blocks
+	  in Blocks to be lit correctly.
+	- Fixed a bug with the ball mesh not clipping correctly to the screen
+	  boundaries.  It appeared that the transformed bounding box was not
+	  calculated correctly.
+	- Fixed a bug with the software renderer where an alpha texture was
+	  used together with a non-COPY mixmode.  This caused the blend tables
+	  not to be set up correctly.  This bug causes the partsys level to
+	  crash in the room at the far left (software renderer only).
+	- Fixed a bug with the software renderer where flat rendering (without
+	  texture) would not correctly check which z-buffer mode (NONE, FILL,
+	  TEST, or USE) to use.
+	- Fixed a potential memory overwrite bug in xwindow.cpp.  It was doing:
 	    new char [strlen (title+1)];
 	  instead of:
 	    new char [strlen (title)+1];
-	- Fixed the VERY VERY bad bug in the isometric engine which could
-	  cause crashes when using the isometric engine in combination with
-	  the OpenGL renderer. The problem was that the fake iRenderView
-	  which is used by the iso engine didn't correctly implement
-	  the functions CalculateFogPolygon() and CalculateFogMesh(). This
-	  functions are at least supposed to initialize the 'fog' variables
-	  in the polygon/meshes to false. Otherwise the OpenGL renderer
-	  will think fog has to be used. This caused no problem for all iso
-	  stuff itself but it did cause problems for external mesh objects.
-	- Michael H. Voase did the following:
-	  HitBeam updates:
-	    Fleshed out HitBeam interface. HitBeamBBox
-	    now does exactly that and returns the face number
-	    hit. The HitBeamOutline and HitBeamObject methods
-	    now line up with their names. Hitting the outline
-	    of a mesh object will return upon the first hit.
-	    HitBeamObject still returns the nearest hit, which
-	    means that it scans through all triangles looking
-	    for the closest hit. csSector::HitBeam() now uses
-	    the outline for faster processing.
+	- Fixed the VERY VERY bad bug in the isometric engine which could cause
+	  crashes when using the isometric engine in combination with the
+	  OpenGL renderer.  The problem was that the fake iRenderView which is
+	  used by the iso engine didn't correctly implement the functions
+	  CalculateFogPolygon() and CalculateFogMesh().  This functions are at
+	  least supposed to initialize the 'fog' variables in the
+	  polygon/meshes to false.  Otherwise the OpenGL renderer will think
+	  fog has to be used.  This caused no problem for all iso stuff itself
+	  but it did cause problems for external mesh objects.
+	- Michael H.  Voase did the following: HitBeam updates: Fleshed out
+	  HitBeam interface.  HitBeamBBox now does exactly that and returns the
+	  face number hit.  The HitBeamOutline and HitBeamObject methods now
+	  line up with their names.  Hitting the outline of a mesh object will
+	  return upon the first hit.  HitBeamObject still returns the nearest
+	  hit, which means that it scans through all triangles looking for the
+	  closest hit.  csSector::HitBeam() now uses the outline for faster
+	  processing.
 13-Aug-2001
 	- Philip Wyett started the beginings of a optimization schedule.
 	    - Loop optimization.
 	    - Removed over-use and bad use of variables in some code.
-	    - Altered some code code to use bitwise shifting for
-	      "if ( var == 1)" etc. testing. This is an optimization
-	      which eliminates assembler level CMP in speed critical
-	      code. Some may not like this and can be removed if it
-	      makes people un-comfortable.
+	    - Altered some code code to use bitwise shifting for "if (var ==
+	      1)" etc.  testing.  This is an optimization which eliminates
+	      assembler level CMP in speed critical code.  Some may not like
+	      this and can be removed if it makes people un-comfortable.
 	    - Did some altering of code to bring within CS coding style.
-	  Work in progress. The benefits of changes can been seen in
-	  Windows port with faster apps starts (by-product), more efficient
-	  proc textures i.e. animation speed of certain elements improved.
-	  e.g demosky and screen FX (F4 - F6) keys when running walktest.
-	  General FPS is also up a fraction...
-	- Philip Wyett did a pedantic change to PI and PI / 2 :-)
-	  Removed over use of variables in "for" loops within fuctions.
-	  This is well illustrated by the amount of "int i"'s there were
-	  in "protex2d.cpp" :-) Did a little bit of loop optimization.
-	  Bug to be verified: In csvid->opengl, are videos palying upside
-	  down for others are they are for me?
+	  Work in progress.  The benefits of changes can been seen in Windows
+	  port with faster apps starts (by-product), more efficient proc
+	  textures i.e.  animation speed of certain elements improved.  e.g
+	  demosky and screen FX (F4 - F6) keys when running walktest.  General
+	  FPS is also up a fraction...
+	- Philip Wyett did a pedantic change to PI and PI / 2 :-) Removed over
+	  use of variables in "for" loops within fuctions.  This is well
+	  illustrated by the amount of "int i"'s there were in "protex2d.cpp"
+	  :-) Did a little bit of loop optimization.  Bug to be verified: In
+	  csvid->opengl, are videos palying upside down for others are they are
+	  for me?
 	- Christopher Nelson reports:
 	  Finally!  Got all the bugs straightened out.
 	     1. There was a circular dependency which I accidentally
-	        introduced in some test code.  Previously, the palette
-		setup was in the SetDefaultContext code.  It's now inside
-		the SetDefaultSkin code, which makes more sense, since the
-		palette is dependent on the skin anyway.
+	        introduced in some test code.  Previously, the palette setup
+	        was in the SetDefaultContext code.  It's now inside the
+	        SetDefaultSkin code, which makes more sense, since the palette
+	        is dependent on the skin anyway.
 	     2. Some miscellaneous blunders were fixed, and a lot of debug
-	        code was added.  Modules which have a const bool DEBUG_xxx
-		at the top contain debug code which can be activating by
-		setting the DEBUG_xxx switches to true.  All modern compilers
-		can eliminate this dead code in release builds, so it
-		doesn't slow down an optimized system.  This was recommended
-		in last months C/C++ Programmers Journal vs. #ifdef's
-		because it keeps you from maintaining two or three separate
-		programs, as is the case when using #ifdef debugging.
-		I mention it in case anyone wonders why, and the rational in
-		case anyone would like to use this technique as well.
+	        code was added.  Modules which have a const bool DEBUG_xxx at
+	        the top contain debug code which can be activating by setting
+	        the DEBUG_xxx switches to true.  All modern compilers can
+	        eliminate this dead code in release builds, so it doesn't slow
+	        down an optimized system.  This was recommended in last months
+	        C/C++ Programmers Journal vs.  #ifdef's because it keeps you
+	        from maintaining two or three separate programs, as is the case
+	        when using #ifdef debugging.  I mention it in case anyone
+	        wonders why, and the rational in case anyone would like to use
+	        this technique as well.
 	- Brandon Ehle did the following:
 	    - Fixed csLua for recent engine interface changes
 	    - Removed junk from both csPython and csLua
-	    - Changed iScript::Store interface to handle both csPython and csLua
-	      and hopefully and new languages.
-	    - Made both csPython and csLua store their object_reg ptrs
-	      throught Store().
+	    - Changed iScript::Store interface to handle both csPython and
+	      csLua and hopefully and new languages.
+	    - Made both csPython and csLua store their object_reg ptrs throught
+	      Store().
 	    - Fixed cslua.mak for luaswig-1.2.1
 12-Aug-2001
 	- Eric Sunshine converted the Apple/NeXT ports over to the new
@@ -520,117 +627,110 @@ The history order is reversed so that new features are at the top.
 	    - Removed the 'converter test' in the initialization of Walktest.
 	      This test seemed to do nothing, and the old converter is to be
 	      removed anyway.
-	    - Walktest now queries the model converter and the crossbuilder
-	      and uses them in load_meshobj() if the old converter fails.
+	    - Walktest now queries the model converter and the crossbuilder and
+	      uses them in load_meshobj() if the old converter fails.
 10-Aug-2001
 	- Martin Geisse fixed a bug in the sprite crossbuilder.
-	- Martin also changed the way csLoader imports model files: First,
-	  the old converter is used. If that fails, the new one is used.
-	  Also added a test level that imports a model to cs/data/mdltest.
-	- Samuel Humphreys fixed a bug in xextshm.cpp pointed out by
-	  Andrew Topp.
+	- Martin also changed the way csLoader imports model files: First, the
+	  old converter is used.  If that fails, the new one is used.  Also
+	  added a test level that imports a model to cs/data/mdltest.
+	- Samuel Humphreys fixed a bug in xextshm.cpp pointed out by Andrew
+	  Topp.
 9-Aug-2001
 	- Martin Geisse reverted recent changes to csObject because they
 	  contradict with the ideas of reference counting.
 8-Aug-2001
-	- Michael Voase did the following:
-	  csObject: Changed the vector used to CS_TYPED_VECTOR_DECREF()
-	  then changed the delete routines to feed the RefCount of an object
-	  as the FreeIt flag. This staunches cyclic reference runaways and
-	  prevents RefCounts on csObject's from going below zero. Also
-	  removed unecessary while() loop in csObjectIterator::Next(). This
-	  loop was never used. The engine now exit's *slightly* faster.
-	- Samuel Humphreys did several fixes to get -mode working again for
-	  X windows. He broke this yesterday. He additionally fixed a few
-	  other 2D clipping bugs.
-	- Philip Wyett fixed the python plugin through MSVC. Also updated
-	  the python plugin to AllowResize().
-	- Martin Geisse fixed bugs in csModelDataTools, csObject and
-	  the convertor multiplexer. csModelDataTools::Describe() also
-	  prints the RefCount of all objects now. mdltest now uses
-	  the converter multiplexer.
-	- Matthew Tang added a full export plugin for Blender to export
-	  CS world files complete with sectors, things and portals.
-	  There is also a tutorial included. Check it out in
-	  scripts/blender/blend2cs.
+	- Michael Voase did the following: csObject: Changed the vector used to
+	  CS_TYPED_VECTOR_DECREF() then changed the delete routines to feed the
+	  RefCount of an object as the FreeIt flag.  This staunches cyclic
+	  reference runaways and prevents RefCounts on csObject's from going
+	  below zero.  Also removed unecessary while() loop in
+	  csObjectIterator::Next().  This loop was never used.  The engine now
+	  exit's *slightly* faster.
+	- Samuel Humphreys did several fixes to get -mode working again for X
+	  windows.  He broke this yesterday.  He additionally fixed a few other
+	  2D clipping bugs.
+	- Philip Wyett fixed the python plugin through MSVC.  Also updated the
+	  python plugin to AllowResize().
+	- Martin Geisse fixed bugs in csModelDataTools, csObject and the
+	  convertor multiplexer.  csModelDataTools::Describe() also prints the
+	  RefCount of all objects now.  mdltest now uses the converter
+	  multiplexer.
+	- Matthew Tang added a full export plugin for Blender to export CS
+	  world files complete with sectors, things and portals.  There is also
+	  a tutorial included.  Check it out in scripts/blender/blend2cs.
 7-Aug-2001
-	- Removed PerformExtension() in the Windows system driver. Instead
-	  the Windows system driver now creates an object Win32Helper which
-	  implements iWin32Helper. That object contains the function
-	  SetCursor(). The Win32Helper object is registered with the object
-	  registry. The ddraw and ddraw8 canvases now use CS_QUERY_REGISTRY
-	  to query the iWin32Helper and then use SetCursor on that.
-	- Removed PerformExtension() in the DOS system driver. Instead
-	  the DOS system driver now creates an object DosHelper which
-	  implements iDosHelper. That object contains the functions
-	  SetMousePosition() and DoEnablePrintf(). I also modified the raw
-	  and allegro canvases for these modifications. Note that I made all
-	  the modifications but am not able to compile the DOS port. So it may
+	- Removed PerformExtension() in the Windows system driver.  Instead the
+	  Windows system driver now creates an object Win32Helper which
+	  implements iWin32Helper.  That object contains the function
+	  SetCursor().  The Win32Helper object is registered with the object
+	  registry.  The ddraw and ddraw8 canvases now use CS_QUERY_REGISTRY to
+	  query the iWin32Helper and then use SetCursor on that.
+	- Removed PerformExtension() in the DOS system driver.  Instead the DOS
+	  system driver now creates an object DosHelper which implements
+	  iDosHelper.  That object contains the functions SetMousePosition()
+	  and DoEnablePrintf().  I also modified the raw and allegro canvases
+	  for these modifications.  Note that I made all the modifications but
+	  am not able to compile the DOS port.  So it may not work correctly.
+	- Removed PerformExtension() in the BeOS system driver.  Instead the
+	  BeOS system driver now creates an object BeHelper which implements
+	  iBeHelper.  That object contains the functions UserAction(),
+	  SetCursor(), BeginUI(), Quit(), and ContextClose().  I also modified
+	  the BeOS and OpenGL BeOS canvases for this.  Note that I made all the
+	  modifications but am not able to compile the BeOS port.  So it may
 	  not work correctly.
-	- Removed PerformExtension() in the BeOS system driver. Instead
-	  the BeOS system driver now creates an object BeHelper which
-	  implements iBeHelper. That object contains the functions
-	  UserAction(), SetCursor(), BeginUI(), Quit(), and ContextClose().
-	  I also modified the BeOS and OpenGL BeOS canvases for this.
-	  Note that I made all the modifications but am not able to compile
-	  the BeOS port. So it may not work correctly.
-	- Removed PerformExtension() in the OS/2 system driver. Instead
-	  the OS/2 system driver now creates an object Os2Helper which
-	  implements iOs2Helper. That object contains the function
-	  StartGUI(). I also modified the csdive and OpenGL/OS/2 canvases
-	  for these modifications. Note that I made all the modifications but
-	  am not able to compile the OS/2 port. So it may not work correctly.
-	- Did NOT remove PerformExtension() for the NeXT system driver.
-	  The problem is that the code seems slightly complicated and I will
-	  most likely mess it up completely without being able to test it.
-	  So the NeXT port will be broken now.
-	- Removed support for PerformExtension() and PerformExtensionV() in
-	  the system driver (csSystemDriver) and iSystem. All ports (except
+	- Removed PerformExtension() in the OS/2 system driver.  Instead the
+	  OS/2 system driver now creates an object Os2Helper which implements
+	  iOs2Helper.  That object contains the function StartGUI().  I also
+	  modified the csdive and OpenGL/OS/2 canvases for these modifications.
+	  Note that I made all the modifications but am not able to compile the
+	  OS/2 port.  So it may not work correctly.
+	- Did NOT remove PerformExtension() for the NeXT system driver.  The
+	  problem is that the code seems slightly complicated and I will most
+	  likely mess it up completely without being able to test it.  So the
+	  NeXT port will be broken now.
+	- Removed support for PerformExtension() and PerformExtensionV() in the
+	  system driver (csSystemDriver) and iSystem.  All ports (except
 	  NeXTStep) have been fixed for this (I could only test the Windows
-	  port). If your system needs to provide an extension for other system
-	  dependent modules (usually canvases) then you must create an
-	  SCF interface (something like iMyOsHelper) and implemented the
-	  needed additional functionality there. Then the OS specific system
-	  driver can register an instance of this object with the object
-	  registry. To use such an extension from a system dependent canvas
-	  you can then do:
-	  	iMyOsHelper* help = CS_QUERY_REGISTRY (object_reg, iMyOsHelper);
-		CS_ASSERT (help != NULL);
-		help->MySpecialFunction (myspecialargs, ...);
+	  port).  If your system needs to provide an extension for other system
+	  dependent modules (usually canvases) then you must create an SCF
+	  interface (something like iMyOsHelper) and implemented the needed
+	  additional functionality there.  Then the OS specific system driver
+	  can register an instance of this object with the object registry.  To
+	  use such an extension from a system dependent canvas you can then do:
+	    iMyOsHelper* help = CS_QUERY_REGISTRY (object_reg, iMyOsHelper);
+	    CS_ASSERT (help != NULL);
+	    help->MySpecialFunction (myspecialargs, ...);
 	- Michael Voase did the following:
 	  Texture Manager: All drivers
-	  - Continued fortification of texture manager.. It
-	    should now behave like the rest of the engine,
-	    handing over the reference to the texture handle
-	    without needing an IncRef(). This ends the circular
-	    reference contract and resumes normal behaviour.
-	    To release a texture handle, simply DecRef() it,
-	    and the texture manager will do the rest.
+	  - Continued fortification of texture manager..  It should now behave
+	    like the rest of the engine, handing over the reference to the
+	    texture handle without needing an IncRef().  This ends the circular
+	    reference contract and resumes normal behaviour.  To release a
+	    texture handle, simply DecRef() it, and the texture manager will do
+	    the rest.
 	  Texture Manager: soft3d
-	  - Tracked down and fixed the annoying tcache crash
-	    at exit. Under opengl, software texture managers
-	    and caches can be shared between different instances
-	    of the software driver. Soft3dcom now respects the
-	    shared resources and deletes correctly, I have only
-	    the csThing leaks to track down now. Also removed
-	    bug flag in Clear().
+	  - Tracked down and fixed the annoying tcache crash at exit.  Under
+	    opengl, software texture managers and caches can be shared between
+	    different instances of the software driver.  Soft3dcom now respects
+	    the shared resources and deletes correctly, I have only the csThing
+	    leaks to track down now.  Also removed bug flag in Clear().
 	  OpenGL software procedural textures and cswstex:
-	  - Removed now uneeded reference to parent procedural
-	    texture manager. Handles should now clean up with
-	    a DecRef() the same as most other engine objects.
-	    The handle will unregister itself.
+	  - Removed now uneeded reference to parent procedural texture manager.
+	    Handles should now clean up with a DecRef() the same as most other
+	    engine objects.  The handle will unregister itself.
 	- Philip Wyett removed lua from MSVC compilation process.
 	- Philip fixed compile error in csfgen.
 	- Philip updated MingW docs to reflect new version 0.50.
-	- Philip changed compiler switches for build and optimization.
-	  Now uses /G5 (Pentium) over /Gx (Blended 386, 486 etc.)
-	  The Windows maintainer doesn't envisage any developer with
-	  MSVC will be targetting 486 or lower processors. :-)
-	  Added /Ox (Full Optimization) to release builds.
+	- Philip changed compiler switches for build and optimization.  Now
+	  uses /G5 (Pentium) over /Gx (Blended 386, 486 etc.)  The Windows
+	  maintainer doesn't envisage any developer with MSVC will be
+	  targetting 486 or lower processors.  :-) Added /Ox (Full
+	  Optimization) to release builds.
 	- Wyatt Miler fixed a markup error in msvc5.txi.
-	- Martin Geisse continued work on the model importer multiplexer.
-	  It still crashes on loading, so it isn't used yet. Also fixed a
-	  bug in the 3ds importer.
+	- Martin Geisse continued work on the model importer multiplexer.  It
+	  still crashes on loading, so it isn't used yet.  Also fixed a bug in
+	  the 3ds importer.
 	- Martin added a short piece of documentation about the new converter
 	  system.
 	- Samuel Humphreys rewrote the X drivers:
@@ -654,77 +754,74 @@ The history order is reversed so that new features are at the top.
 	    - Various others...
 	- Because iSystem is still needed in some cases (still busy with the
 	  removal of that) there are some cases where you need to have a
-	  pointer to the system. To get that pointer you can now use the
-	  new CS_GET_SYSTEM define like this:
-	  	iSystem* sys = CS_GET_SYSTEM (object_reg);
-	  Note that this define will go away as soon as iSystem is removed.
-	  So it is only a temporary measure. CS_GET_SYSTEM is implemented
-	  by asking the object registry where iSystem is now registered.
-	  The use of iSystem is still required for using everything related
-	  to events (this includes the iEventOutlet pointers and also the
-	  elapsed time (GetElapsedTime()), GetMouseButton(), GetKeyState(),
-	  Sleep(), NextFrame(), ...).
-	- For Python scripts this also means that the 'system' variable is
-	  gone and has been replaced with 'object_reg'.
-	- Since they were not used I removed iSystem::Initialize(),
-	  Loop(), Open(), and Close(). The csSystemDriver versions of these
-	  functions are not removed though. They are still needed at this
-	  moment.
-	- Michael Voase added the following,
+	  pointer to the system.  To get that pointer you can now use the new
+	  CS_GET_SYSTEM define like this:
+	    iSystem* sys = CS_GET_SYSTEM (object_reg);
+	  Note that this define will go away as soon as iSystem is removed.  So
+	  it is only a temporary measure.  CS_GET_SYSTEM is implemented by
+	  asking the object registry where iSystem is now registered.  The use
+	  of iSystem is still required for using everything related to events
+	  (this includes the iEventOutlet pointers and also the elapsed time
+	  (GetElapsedTime()), GetMouseButton(), GetKeyState(), Sleep(),
+	  NextFrame(), ...).
+	- For Python scripts this also means that the 'system' variable is gone
+	  and has been replaced with 'object_reg'.
+	- Since they were not used I removed iSystem::Initialize(), Loop(),
+	  Open(), and Close().  The csSystemDriver versions of these functions
+	  are not removed though.  They are still needed at this moment.
+	- Michael Voase made the following changes:
           Feature update:
 	    - CS/include/csutil/typedvec.h: Added
-	      CS_DECLARE_TYPED_VECTOR_DECREF convenience macro.
+              CS_DECLARE_TYPED_VECTOR_DECREF convenience macro.
           Texture manager cleanup: common
 	    - CS/include/ivideo/texture.h: Added UnregisterTexture() and
-	      UnregisterMaterial() to the scf interface.
+              UnregisterMaterial() to the scf interface.
 	    - CS/libs/csengine/texture.cpp: Texture wrapper now keeps a
-	      reference to the texture handle when registered with a texture
-	      wrapper.
-	    - CS/libs/objects/meshobj.cpp: FreeItem(): Added NULL assignment
-	      to object being free'd to prevent dangling pointers.
-	    - CS/libs/objects/thing.cpp: Added portal polygon delete routine
-	      to thing destructor, in preparation for an audit.
+              reference to the texture handle when registered with a texture
+              wrapper.
+	    - CS/libs/objects/meshobj.cpp: FreeItem(): Added NULL assignment to
+              object being free'd to prevent dangling pointers.
+	    - CS/libs/objects/thing.cpp: Added portal polygon delete routine to
+              thing destructor, in preparation for an audit.
 	    - CS/libs/csws/cswstex.cpp: Changed how csws textures are treated.
 	      The csws textures now use the freshly added UnregisterTexture()
 	      scf interface to unregister textures. Note: Texture Manager now
 	      destructs correctly in csfedit and a couple of other csws apps
 	      (finally ;).
-            - Changed csMatVector and csTexVector to use 
+            - Changed csMatVector and csTexVector to use
               CS_DECLARE_TYPED_VECTOR_DECREF.
             - Added UnregisterTexture() and UnregisterMaterial() to
-              iTextureManager interface. You should now be able to
+              iTextureManager interface.  You should now be able to
               Register/Unregister textures and materials with impunity.
-          Texture Manager All drivers:
-            - Changed procedural texture Prepare() methods to adhere to the
-              scf contract. This includes the opengl software
-              procedural textures, which seemed to have a blatant habit of
-              deleteing every texture handle it touched.... Ouch. The
-              health of the software proctex manager is not good.
-              Although the current round of bugfixes allows it
-              exit cleanly, a corrupted texture cache does not. If
-              one temporarily disables the 'delete tcache' line in 
-              sft3dcom.cpp, Clear(), the engine does exit cleanly. I have
-              not traced this back as yet as the texture cache is another
-              animal altogether.
-            - Modified Unregister[Material|Texture] to check for a
-              zero reference count on incoming handles. This breaks
-              an endless loop issue between csMat/TexVector,
-              the destructor and unregister (it is a circular reference).
+          Texture Manager all drivers:
+            - Changed procedural texture Prepare() methods to adhere to the scf
+              contract.  This includes the opengl software procedural textures,
+              which seemed to have a blatant habit of deleteing every texture
+              handle it touched....  Ouch.  The health of the software proctex
+              manager is not good.  Although the current round of bugfixes
+              allows it exit cleanly, a corrupted texture cache does not.  If
+              one temporarily disables the 'delete tcache' line in
+              sft3dcom.cpp, Clear(), the engine does exit cleanly.  I have not
+              traced this back as yet as the texture cache is another animal
+              altogether.
+            - Modified Unregister[Material|Texture] to check for a zero
+              reference count on incoming handles.  This breaks an endless loop
+              issue between csMat/TexVector, the destructor and unregister (it
+              is a circular reference).
 	- Philip Wyett did some more cleaning and loop optimization etc in
 	  csgeom, csutil, and other libraries.
 5-Aug-2001
-	- Fixed a small bug in haze. Now it shows in OpenGL but not
-	  correctly right yet.
-	- Wouter Wijngaards writes: the haze now adaptively draws polygons to
-	  a certain quality setting. This makes hazes get fuzzy borders and
+	- Fixed a small bug in haze.  Now it shows in OpenGL but not correctly
+	  right yet.
+	- Wouter Wijngaards writes: the haze now adaptively draws polygons to a
+	  certain quality setting.  This makes hazes get fuzzy borders and
 	  retain shape.  Also added two new haze meshes, to a total of four in
-	  the red room of the partsys level. Work in opengl and software.
+	  the red room of the partsys level.  Work in opengl and software.
 	- Wouter also fixed the problem where weird glitches would occur for
 	  hazes when they tried to draw when not onscreen.
 	- Martin Geisse made the following changes:
 	    - Added csIntArray, a growing array of integers (using
-	      CS_TYPEDEF_GROWING_ARRAY), which adds some convenience
-	      functions
+	      CS_TYPEDEF_GROWING_ARRAY), which adds some convenience functions
 	    - Added PushSmart() to csVector which uses Find() to detect if the
 	      object is already in the vector.
 	    - Fixed a bug in growing arrays.
@@ -741,33 +838,32 @@ The history order is reversed so that new features are at the top.
 	      thing from them, then splits by material and builds a sprite
 	      hierarchy.
 	- Philip Wyett changed
-		class csHazeHull : iHazeHull
+	    class csHazeHull : iHazeHull
 	  to
-		class csHazeHull : public iHazeHull
+	    class csHazeHull : public iHazeHull
 	  This fixes C2243 compile error under MSVC. Problem was all a matter
 	  of VC inheriting a private not public. :-/
-	- Philip renamed class Bot ptLabBot.
-	  This fixes class name conflict warning in devapi docs generation
-	  process.
+	- Philip renamed class Bot ptLabBot.  This fixes class name conflict
+	  warning in devapi docs generation process.
 	- Philip did a clean-up and some minor code optimization in memimage.h
 	  and bumpmap.h.
 4-Aug-2001
 	- Wouter Wijngaards did the following:
-	    - Added a loader for the haze mesh object. hazeldr. The loader
+	    - Added a loader for the haze mesh object, hazeldr. The loader
 	      compiles and works. The haze itself seems to compute all right.
 	      The outline looks peachy keen, but nothing gets drawn...
-	    - Later fixed a bug where the triangles would be drawn
-	      backfaced. Still does not show up in OpenGL though.
-	    - Added proper bounding box drawtest visibility testing.
-	      Drawing at an almost 90' angle (with bad vis testing) would give
-	      visual anomalies.
-	    - Added a hazy circular texture to stdtex.zip.
-	      This texture is called hazecirc.zip looks slightly yellow and
-	      has motes of dust in it.
-	    - Added another texture for hazes, this one is a very basic
-	      whitish glow. in stdtex.zip, hazebasic.png
-	    - Added a new Hull prefab to the haze: The Cone - it is really
-	      two y-axis facing circles connected.
+	    - Later fixed a bug where the triangles would be drawn backfaced.
+	      Still does not show up in OpenGL though.
+	    - Added proper bounding box drawtest visibility testing.  Drawing
+	      at an almost 90' angle (with bad vis testing) would give visual
+	      anomalies.
+	    - Added a hazy circular texture to stdtex.zip.  This texture is
+	      called hazecirc.zip looks slightly yellow and has motes of dust
+	      in it.
+	    - Added another texture for hazes, this one is a very basic whitish
+	      glow.  in stdtex.zip, hazebasic.png
+	    - Added a new Hull prefab to the haze: The Cone - it is really two
+	      y-axis facing circles connected.
 	    - Making things neat. Also added two haze meshes to the partsys
 	      level. A 'cubic haze' which looks plainly weird :) and a cone
 	      haze - which looks like a search light of some kind. The
@@ -786,19 +882,16 @@ The history order is reversed so that new features are at the top.
 	  instead.
 	- Removed iSystem::CreateSeperateConfig(). Use a new instance of
 	  csConfigFile instead (like 'new csConfigFile (filename, VFS)').
-	- Removed iSystem::SaveConfig(). Use iConfigManager::Save()
-	  instead.
-	- For all above funtions you can get a pointer to the config
-	  manager by asking the object registry like this:
-	    iConfigManager* cfg = QUERY_REGISTRY (object_reg,
-		iConfigManager);
+	- Removed iSystem::SaveConfig().  Use iConfigManager::Save() instead.
+	- For all above funtions you can get a pointer to the config manager by
+	  asking the object registry like this:
+	    iConfigManager* cfg = QUERY_REGISTRY (object_reg, iConfigManager);
 	- In addition to the above changes also moved the enum values
 	  ConfigPriority??? from iSystem to iConfigManager.
 	- Removed iSystem::GetInstallPath(). Removed
 	  csSystemDriver::InstallPath(). Instead there is now the global
 	  csGetInstallPath() function.
-	- Removed all 'fatal_exit' calls and also removed fatal_exit()
-	  itself.
+	- Removed all 'fatal_exit' calls and also removed fatal_exit() itself.
 	- Dan Bogdanov made the following changes:
 	    - Fixed (a typo) and updated djgpp.mak
 	    - Fixed dosconf.bat to output a more useful config.mak
@@ -809,12 +902,12 @@ The history order is reversed so that new features are at the top.
 	- Martin Geisse made the following changes:
 	    - Added iModelDataAction::GetTotalTime() which returns the length
 	      in time of a complete animation cycle.
-	    - Added merging of different actions. As the resulting action may
-	      be longer than the input actions if they have different length
-	      in time, merging is only done if no input action has to be
-	      repeated more than three times. However, this test is
-	      independent from the merging algorithm itself, so it can easily
-	      be changed to allow higher repetition counts.
+	    - Added merging of different actions.  As the resulting action may
+	      be longer than the input actions if they have different length in
+	      time, merging is only done if no input action has to be repeated
+	      more than three times.  However, this test is independent from
+	      the merging algorithm itself, so it can easily be changed to
+	      allow higher repetition counts.
 	    - Fixed a bug in the sprite factory crossbuilder.
 2-Aug-2001
 	- Eric Sunshine eliminated a compilation warning about unused variable
@@ -864,7 +957,7 @@ The history order is reversed so that new features are at the top.
 	      Right click on "skinlang.flx" and click on "Settings".  You will
 	      now be presented with the "Project Settings" dialog for that
 	      file. Click on the "Custom Build" tab. In the text box "Commands"
-	      enter the following: 
+	      enter the following:
 		    flex.exe -Plex_cpp -L -t ..\..\plugins\aws\skinlang.flx
 		    	> ..\..\plugins\aws\sllex.cpp
 	      Now in the "Outputs" text box enter the following:
@@ -894,7 +987,7 @@ The history order is reversed so that new features are at the top.
 	      conflict detection (objects with unmergeable actions are not
 	      merged) and material conflict detection (objects with different
 	      materials are not merged if the user doesn't want that to
-	      happen) in ::MergeObjects(). 
+	      happen) in ::MergeObjects().
 	    - Fixed a bug in csObject.
 	- Justin Miller started reimplementing csString::Format().
 1-Aug-2001
@@ -903,7 +996,7 @@ The history order is reversed so that new features are at the top.
 	    - The awsTextureManager is now completely functional, if untested,
 	      other than the register/unregister functionality.  Once I
 	      figure out how to unregister a texture from the texture manager,
-	      that will work as well.  
+	      that will work as well.
 	    - I still need to make some updates to the AwsPrefs class so that
 	      it will expose the functionality of the texture manager.
 	      With this update I can now begin to actually test drawing code,
@@ -1394,7 +1487,7 @@ The history order is reversed so that new features are at the top.
 	- Martin also fixed a memory leak in csSectorList.
 	- Michael Voasse did the following:
 	    - terrfunc.cpp: improved current hit beam ready for HitBeam()
-	      rewrite. I have rewritten the while loop to be a for loop. 
+	      rewrite. I have rewritten the while loop to be a for loop.
 	      This has improved performance reasonably. The movement of
 	      the loop through the terrain is now governed by the result
 	      of the csintersect3::BoxSegment() interface. The beam moves
@@ -1406,11 +1499,11 @@ The history order is reversed so that new features are at the top.
 	      point of the beam, then indexes the block array accordingly.
 	      If the beam terminates inside the box, or the beam exits
 	      through the top or the bottom of the box, then the loop exits.
-	      This manner of beam testing scales well and can be adapted 
+	      This manner of beam testing scales well and can be adapted
 	      to a 3 dimensional grid. One small point is the structure
 	      of the loop catches intersections through a given block even
 	      if the beam terminates inside the block. I take this as a
-	      good omen as I didnt expect it. 
+	      good omen as I didnt expect it.
 	      Added into the bundle, terrafunc should be free of all accuracy
 	      bugs. The old increment method has been disposed of safely (and
 	      permanently ;). It was causing blocks to be missed through
@@ -1746,7 +1839,7 @@ The history order is reversed so that new features are at the top.
 	  initialization it finds and loads the default bundled preference
 	  manager.  The user no longer has to do this separately.  You can,
 	  however, replace that preference manager with a totally different
-	  one if you so desire.  
+	  one if you so desire.
 	  A couple of tweaks, also added color definitions for standard UI
 	  items like highlights and shadows.
 	  The preference manager will automatically look those up for you and
@@ -1769,7 +1862,7 @@ The history order is reversed so that new features are at the top.
 	      orientation. Note this does slow down the HitBeam routine
 	      in terrfunc, but at least provides 100% accurate intersections.
 	      I will add a similar step to ball, sprite and metaball. Cube
-	      and surface need no change. 
+	      and surface need no change.
 	    - Reworked how HitBeam uses its increment during box crawl. The
 	      increment is now only added during the Object2Block calc. This
 	      should squash the tiny error that allowed triangles that were
@@ -2075,7 +2168,7 @@ The history order is reversed so that new features are at the top.
 	      in the preferences manager.
 	    - CreateWindowFromDef: This is the high-level key to the whole
 	      definitions architecture.  While the user does have to specify
-	      defintions files to parse, the rest is all automatic.  
+	      defintions files to parse, the rest is all automatic.
 	      When creating a window from a definition template, the user
 	      calls this function, which returns an awsWindow *.  This
 	      function takes care of creating the window to the specifications
@@ -3189,7 +3282,7 @@ The history order is reversed so that new features are at the top.
 	    - Made some minor changes, fixed some silly errors.
 	    - Created the csComponentFactory class.
 	    - Made some mods to the interface and manager to support
-	      component registration.  
+	      component registration.
 	- Norman Kramer removed csBase in favor of iBase (or in many cases it
 	  is just removed).  Did various changes throughout the project for
 	  this.
@@ -3385,13 +3478,13 @@ The history order is reversed so that new features are at the top.
 	      registered in a signal source and mapped to an unsigned long
 	      like ID's.  Then signals themselves can be referenced by index,
 	      much like the colors for csws components.
-		e.g. 
+		e.g.
 		#define PB_MOUSEDOWN 1
 		signals[PB_MOUSEDOWN] = NameToID("pushbutton_mousedown");
 	      The signal itself would still have to be sent using the real
 	      value.  This would mess up switch statements, though, because
 	      you'd never know ahead of time what the values would be.
-	      They wouldn't be.  Hm... const.  
+	      They wouldn't be.  Hm... const.
 	    - Fixed small compile bug introduced by my incorrect handling
 	      of the RCS merge of different versions.
 15-Jun-2001
@@ -3460,7 +3553,7 @@ The history order is reversed so that new features are at the top.
 	      are arranged in a doubly-linked list hierarchy. The top window
 	      is pointed to by the window manager, and the hierachy follows
 	      downwards from there. awsWindow implements Raise() and Lower(),
-	      and implements two new triggers, OnRaise() and OnLower().  
+	      and implements two new triggers, OnRaise() and OnLower().
 	    - Expanded awsComponent. Implemented default Setup() function to
 	      automatically pull the frame and id of a component out of the
 	      component's setup information gleaned from the defintion file.
@@ -3714,7 +3807,7 @@ The history order is reversed so that new features are at the top.
 	      all child objects of another object as children. Using this
 	      method I fixed the bug that allowed static lights to have
 	      only one key-value pair attached to them.
-	- Christopher Nelson made some more progress on the parser. 
+	- Christopher Nelson made some more progress on the parser.
 	  Implemented the very helpful patches sent to me by Eric Sunshine,
 	  so the test harness now functions properly with the plugin.
 	  The parser now recognizes complete skin definitions, and constructs
@@ -4255,7 +4348,7 @@ The history order is reversed so that new features are at the top.
 	  caveat that named tables are still not up. Changed all "char"
 	  references to "unsigned char" in case someone needs the upper 128
 	  characters of the UTF-8 or ASCII table in matching.  This is
-	  primarily for international codepage support. 
+	  primarily for international codepage support.
 	- Christopher Nelson also added final code for named table
 	  recognition in the BuildTableLeaf function. Named tables (character
 	  classes like alpha, alnum, space, upper, lower, print, graph,
@@ -4380,7 +4473,7 @@ The history order is reversed so that new features are at the top.
 	  isometric engine. I've fudged the transformations now, so that the
 	  perspective transformation will be almost like the isometric one,
 	  for small objects (say for animated 3d sprites ;) ). It does not
-	  work yet. The code is commented out in apps/isotest, with a #if. 
+	  work yet. The code is commented out in apps/isotest, with a #if.
 	- Christopher Nelson made some changes to the cslexan parser, added
 	  most of the table support.  Still need to add character classes
 	  (named tables) and finish the table build sequence.
@@ -4392,7 +4485,7 @@ The history order is reversed so that new features are at the top.
 	  yet, but I also wanted to update the repository so that I could
 	  work on it at home too.  I fixed the build problem, so cslexan
 	  should compile normally again.  Sorry for the trouble Philip, and
-	  thanks for letting me know. 
+	  thanks for letting me know.
 	- Philip Wyett added cslexan to build process.
 1-Jun-2001
 	- Martin Geisse changed the way in which csEngine represents a
@@ -4412,7 +4505,7 @@ The history order is reversed so that new features are at the top.
 	  alternates, all wildcards, and have rudimentary support for
 	  tables. Nesting alternates and wildcards is allowed.  Silly
 	  syntax is ignored, and some syntactical errors are recovered from.
-	  Forgetting ')', ']', or specifying an unknown named table are fatal.  
+	  Forgetting ')', ']', or specifying an unknown named table are fatal.
 	- Philip Wyett fixed compiler warning in "Create2DSprites(void)"
 	  caused by:
 	    csEngine* engine = (csEngine*)engine;
