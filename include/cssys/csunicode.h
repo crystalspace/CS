@@ -27,9 +27,7 @@
  * @{ */
 
 #if (CS_WCHAR_T_SIZE == 0) || !defined(CS_WCHAR_T_SIZE)
-// @@@ From Jorrit: commented out following line. Otherwise
-// this doesn't compile on linux.: wchar_t is a builtin type.
-//@@@ typedef uint16 wchar_t;
+typedef uint16 wchar_t;
 #ifdef CS_WCHAR_T_SIZE
   #undef CS_WCHAR_T_SIZE
 #endif
