@@ -44,15 +44,6 @@ Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
 @code{msvc7_libs_0.95dev001.zip}
 @end iftex
 
-@noindent
-@ifnottex
-@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc7/msvc7_libs_0.94f.zip}
-@end ifnottex
-@iftex
-@code{ftp://62.188.48.183/crystal_space/support/win32/msvc7/}@*
-@code{msvc7_libs_0.94f.zip}
-@end iftex
-
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
 root directory.
 
