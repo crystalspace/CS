@@ -59,7 +59,7 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
     int texture_width, texture_height;
     texture_width = txt_unl->get_width ();
     texture_height = txt_unl->get_height ();
-    int active_alpha = txt_mm->get_transparent ();
+    bool active_alpha = txt_mm->get_transparent ();
 
     CHK (GLuint *texturehandle = new GLuint);
     glGenTextures (1,texturehandle);
@@ -85,14 +85,14 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
       dest[1] = G24(*source);
       dest[2] = B24(*source);
       // transparent textures for OpenGL are BROKEN!
-      if (active_alpha != -1 && (*source & 0xffffff) == (unsigned int)active_alpha)
+      if (active_alpha && (*source & 0xffffff) == (unsigned int)active_alpha)
 	dest[3] = 0;
       else
 	dest[3] = 255;
 
       dest+=4; source++;
   }
-/*  if (active_alpha != -1)
+/*  if (active_alpha)
     glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,texture_width,
 		texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
 		tempdata);

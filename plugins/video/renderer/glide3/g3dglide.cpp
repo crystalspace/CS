@@ -800,7 +800,6 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygon& poly)
 
   ITextureMap* piTM;
   IMipMapContainer* piMMC;
-  int poly_transp;
   
   pTex->GetTexture( &piTM );
   ASSERT( piTM );
@@ -808,8 +807,7 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygon& poly)
   piTM->GetParent( &piMMC );
   ASSERT( piMMC );
   
-  piMMC->GetTransparent( poly_transp );
-  is_colorkeyed = (poly_transp != -1);
+  piMMC->GetTransparent (is_colorkeyed);
   
   HighColorCacheAndManage_Data* tcache;
 	HighColorCacheAndManage_Data* lcache;

@@ -55,9 +55,9 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
   csTextureMM* txt_mm = GetcsTextureMMFromITextureHandle (txt_handle);
   csTexture* txt_unl = txt_mm->get_texture (0);
   
-  int active_alpha = txt_mm->get_transparent ();
-
   /*
+  bool is_transparent = txt_mm->get_transparent ();
+
   IMipMapContainer *piMMC = NULL;
   ITextureMap *piTM = NULL;
 

@@ -921,9 +921,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygon& poly)
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
   pTexCache = txt_mm->get_hicolorcache ();
   
-  int tex_transp = txt_mm->get_transparent ();
-
-  bColorKeyed = tex_transp != -1 ? true : false;
+  bColorKeyed = txt_mm->get_transparent ();
  
   // retrieve the lightmap from the cache.
   ILightMap* piLM = NULL;

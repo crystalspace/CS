@@ -1003,8 +1003,6 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
   poly.polygon->GetAlpha( poly_alpha );
   is_transparent = poly_alpha ? true : false;
 
-   int poly_transp = txt_mm->get_transparent ();
-
   //HighColorCacheAndManage_Data* tcache;
   //HighColorCacheAndManage_Data* lcache;
   HighColorCache_Data* tcache;

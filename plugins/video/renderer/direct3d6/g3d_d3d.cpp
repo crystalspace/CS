@@ -835,7 +835,6 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygon& poly)
   
   ITextureMap* piTM;
   IMipMapContainer* piMMC;
-  int poly_transp;
   
   poly.polygon->GetAlpha( poly_alpha );
   bTransparent = poly_alpha>0 ? true : false;
@@ -846,8 +845,7 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygon& poly)
   piTM->GetParent( &piMMC );
   ASSERT( piMMC );
   
-  piMMC->GetTransparent( poly_transp );
-  bColorKeyed = poly_transp != -1 ? true : false;
+  piMMC->GetTransparent (bColorKeyed);
  
   // retrieve the cached texture handle.
   piMMC->GetHighColorCache( &pTexCache ); 
