@@ -317,7 +317,7 @@ public:
   }
 
   ctVector3 operator* ( const ctVector3 &pv ) {
-    ctVector3 rv;
+    ctVector3 rv(0,0,0);
     for( int idx = 0; idx < 3; idx++ )
       rv[idx] = rows[idx]*pv;
     return rv;

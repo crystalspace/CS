@@ -1924,7 +1924,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   long cmd;
   const char *filename = name;
   char *params;
-  csColor transp;
+  csColor transp (0, 0, 0);
   bool do_transp = false;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
