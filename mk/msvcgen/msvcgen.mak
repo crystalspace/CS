@@ -139,6 +139,14 @@
 #	  existing files from the CVS repository and informs the user as to
 #	  exactly which CVS commands must be invoked in order to permanently
 #	  commit the new files to the repository.
+#
+#	The following makefile variables are exported by this makefile:
+#
+#	o DO_MSVCGEN has the value `yes' while the `msvcgen' makefile target is
+#	  running.  In general, this variable can be ignored, but in special
+#	  cases a makefile may check this variable to alter its behavior.  For
+#	  instance, in rare circumstances, a makefile may need to use a
+#	  different $(wildcard) expression during the `msvcgen' process.
 #------------------------------------------------------------------------------
 
 # Target description
@@ -169,7 +177,7 @@ msvcgen:
 	@echo $"  Generating $(DESCRIPTION.$@)$"
 	@echo $(SEPARATOR)
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
-	DO_ASM=no USE_MAKEFILE_CACHE=no \
+	DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
 	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
 
 msvcinst: msvcgen

@@ -26,7 +26,10 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/mp3 plugins/sound/loader/mp3/mpg123 plugins/sound/loader/mp3/mpg123/xfermem
+vpath %.cpp plugins/sound/loader/mp3 plugins/sound/loader/mp3/mpg123
+ifneq ($(OS),WIN32)
+  vpath %.cpp plugins/sound/loader/mp3/mpg123/xfermem
+endif
 
 ifeq ($(USE_PLUGINS),yes)
   MP3 = $(OUTDLL)sndmp3$(DLL)
@@ -39,14 +42,30 @@ else
   TO_INSTALL.STATIC_LIBS += $(MP3)
 endif
 
+MP3_USE_XFERMEM = yes
 ifeq ($(OS),WIN32)
-  INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) $(wildcard plugins/sound/loader/mp3/mpg123/*.h)
-  SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpg123/*.cpp)
+  MP3_USE_XFERMEM = no
+endif
+ifeq ($(DO_MSVCGEN),yes)
+  MP3_USE_XFERMEM = no
+endif
+
+ifeq ($(MP3_USE_XFERMEM),yes)
+  INC.MP3 = $(wildcard \
+    plugins/sound/loader/mp3/*.h \
+    plugins/sound/loader/mp3/mpg123/*.h \
+    plugins/sound/loader/mp3/mpg123/xfermem/*.h)
+  SRC.MP3 = $(wildcard \
+    plugins/sound/loader/mp3/*.cpp \
+    plugins/sound/loader/mp3/mpg123/*.cpp \
+    plugins/sound/loader/mp3/mpg123/xfermem/*.cpp)
 else
-  INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) $(wildcard plugins/sound/loader/mp3/mpg123/*.h) \
-    $(wildcard plugins/sound/loader/mp3/mpg123/xfermem/*.h)
-  SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpg123/*.cpp) \
-    $(wildcard plugins/sound/loader/mp3/mpg123/xfermem/*.cpp)
+  INC.MP3 = $(wildcard \
+    plugins/sound/loader/mp3/*.h \
+    plugins/sound/loader/mp3/mpg123/*.h)
+  SRC.MP3 = $(wildcard \
+    plugins/sound/loader/mp3/*.cpp \
+    plugins/sound/loader/mp3/mpg123/*.cpp)
 endif
 
 OBJ.MP3 = $(addprefix $(OUT),$(notdir $(SRC.MP3:.cpp=$O)))
