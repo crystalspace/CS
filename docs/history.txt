@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+01-Mar-2003
+	- res fixed his latest fix: he changed struct csScanSetup in scan.h
+	  but not scan.ash, causing funky colors and crashes for those using
+	  the asm scanline drawing routines.
 28-Feb-2003
 	- Eric Sunshine instructed Doxygen to ignore include/volatile.h.  Since
 	  its contents are specific to each person's installation, thus it does
