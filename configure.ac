@@ -2349,15 +2349,15 @@ AS_IF([test $enable_old_renderer = yes],
 
 
 #------------------------------------------------------------------------------
-# Determine whether shared libs should be built.
+# Determine whether link libraries should be static or shared.
 #------------------------------------------------------------------------------
-AC_MSG_CHECKING([whether to build shared libs])
-AC_ARG_ENABLE([shared-libs], [AC_HELP_STRING([--enable-shared-libs],
-    [enable build of shared libs (_EXPERIMENTAL_!) (default NO)])],
-    [], [enable_shared_libs=no])
-AC_MSG_RESULT([$enable_shared_libs])
-CS_EMIT_BUILD_PROPERTY([BUILD_SHARED_LIBS], [$enable_shared_libs])
-AS_IF([test $enable_shared_libs = yes], 
+AC_MSG_CHECKING([whether to build shared libraries])
+AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
+    [enable creation of shared libraries (_EXPERIMENTAL_!) (default NO)])],
+    [], [enable_shared=no])
+AC_MSG_RESULT([$enable_shared])
+CS_EMIT_BUILD_PROPERTY([BUILD_SHARED_LIBS], [$enable_shared])
+AS_IF([test $enable_shared = yes], 
   [CS_HEADER_PROPERTY([CS_BUILD_SHARED_LIBS])])
 
 
