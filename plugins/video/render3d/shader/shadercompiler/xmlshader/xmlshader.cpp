@@ -446,8 +446,8 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     }
     if (found)
     {
-      int a = CS_VATTRIB_IS_SPECIFIC (attrib) ? 
-	attrib - CS_VATTRIB_SPECIFIC_FIRST : attrib;
+      //int a = CS_VATTRIB_IS_SPECIFIC (attrib) ? 
+      //attrib - CS_VATTRIB_SPECIFIC_FIRST : attrib;
       csStringID varID = strings->Request (mapping->GetAttributeValue ("name"));
       pass->bufferID[pass->bufferCount] = varID; //MUST HAVE STRINGS
       pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
