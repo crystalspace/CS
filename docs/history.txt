@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 28-Mar-2002
 	- Reverted part of 'res' changes to the lightmap checker because
 	  they cause big problems.
+	- Fixed the software version of DrawPolygonMesh() so it correctly
+	  sets do_fullbright to false before calling DrawPolygon. This
+	  bug would cause the stairs in flarge sometimes to be full
+	  bright.
 27-Mar-2002
 	- Preparation for release 0.94. Updated version numbers.
 	- Norman Kramer reports: awsSource and awsSlot were never

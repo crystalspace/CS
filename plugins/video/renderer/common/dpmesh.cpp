@@ -112,6 +112,7 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   G3DPolygonDP poly;
   poly.mixmode = mesh.mixmode;
   poly.use_fog = mesh.do_fog;
+  poly.do_fullbright = false;
   poly.plane.m_cam2tex = &m_cam2tex;
   poly.plane.v_cam2tex = &v_cam2tex;
 
