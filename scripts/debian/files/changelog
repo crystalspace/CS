@@ -1,10 +1,19 @@
-crystalspace (0.95-20021109) unstable; urgency=low
+crystalspace (0.95-20030115) unstable; urgency=low
 
-  * Integrate NMU changes upstream (Next time please, when you NMU
-    send a patch, thanks)
   * Fresh CVS snapshot
 
  -- Christian Bayle <bayle@debian.org>  Sat,  9 Nov 2002 01:14:09 +0100
+
+crystalspace (0.94-20020502-4) unstable; urgency=low
+
+  * Integrate NMU changes upstream (Next time please, when you NMU
+    send a patch, thanks)
+  * Failed to build from source patch (Closes: bug#174969)
+  * Renaming zoo in cszoo for name conflic with /usr/bin/zoo
+   (Closes: bug#170536)
+  * Added script/cs-config files (Closes: bug#157234)
+
+ -- Christian Bayle <bayle@debian.org>  Sun, 12 Jan 2003 18:43:36 +0100
 
 crystalspace (0.94-20020502-3.1) unstable; urgency=low
 

@@ -4,6 +4,8 @@ cp -r $CURDIR/CS/scripts/lua \
 	$CURDIR/debian/tmp/usr/lib/crystalspace/scripts
 cp -r $CURDIR/CS/scripts/blender \
 	$CURDIR/debian/tmp/usr/lib/crystalspace/scripts
+cp -r $CURDIR/CS/scripts/cs-config \
+	$CURDIR/debian/tmp/usr/lib/crystalspace/scripts
 
 for level in flarge partsys
 do

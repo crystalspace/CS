@@ -226,7 +226,7 @@ do
 			cd $CURDIR
 			export CRYSTAL=$CURDIR/CS
 			case $bin in
-				vsh|zoo)
+				vsh|cszoo)
 					export TYPE="No option"
 					echo "There is no option for this program" > $CURDIR/debian/man/$bin.txt
 					gensgml $CURDIR/debian/man/$bin.txt \

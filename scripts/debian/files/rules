@@ -100,6 +100,10 @@ install: build
 	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/* \
 		$(CURDIR)/debian/tmp/usr/games
 
+	# renaming zoo because of name conflict with /usr/bin/zoo
+	mv $(CURDIR)/debian/tmp/usr/games/zoo \
+		$(CURDIR)/debian/tmp/usr/games/cszoo
+
 	# includes in /usr/include/crystalspace
 	mkdir -p $(CURDIR)/debian/tmp/usr/include
 	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/include \
