@@ -1,6 +1,14 @@
 he history order is reversed so that new features are at the top.
 
 17-Jan-2002
+	- Jorge Acereda made the following changes:
+	    - Added a comment to iGraphics2D::Write() to document the
+	      fact that a negative background color will not draw
+	      background.
+	    - Fixed a bug in the MDL/MD2 converter. Short values where
+	      incorrectly promoted to int when calling convert_endian().
+	    - Changed some type definitions on things intended to be
+              saved to disk to make them 64bit-friendly.
 	- Removed the iCamera::SetUnmirroredCameraPos() function again
 	  (and fixed iso engine for this). This turned out not to be the good
 	  way to solve the bug of mirroring CS_ENTITY_CAMERA objects.
