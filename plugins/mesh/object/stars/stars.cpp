@@ -100,7 +100,7 @@ bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 {
   if (vis_cb) vis_cb (this, rview, vis_cbData);
 
-  iGraphics2D* g2d = rview->GetGraphics2D ();
+  iGraphics2D* g2d; g2d = rview->GetGraphics2D ();
   iCamera* camera = rview->GetCamera ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
   //float fov = camera->GetFOV ();
