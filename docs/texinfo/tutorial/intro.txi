@@ -57,6 +57,13 @@ use the interface like a C++ object.  When you don't need it anymore, don't
 interface to anywhere, call @code{IncRef()} from there, and @code{DecRef()}
 when you don't need the interface there anymore.
 
+Starting with Crystal Space version 0.95 we also have smart pointers.
+A smart pointer is an instance of the class @code{csRef}. This class takes
+care of @code{IncRef()} and @code{DecRef()} for you
+(@pxref{HOWTO Smart Pointers}). It is very important to use smart pointers
+now. They are making life a lot easier and in the future they may become
+required usage (i.e. no longer optional).
+
 As the user you'll only have to include a header that defines the interface,
 but not the implementation.  Despite the obvious advantage of having a very
 clear structure in your code, there is the advantage that linking the
