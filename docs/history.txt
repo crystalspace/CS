@@ -1,6 +1,34 @@
 The history order has been reversed so that new features are at the top.
 
+10-Aug-2000
+	- Michael Dale Long did more fixes on cctest. Can quit and fire
+	  rockets again. Still no console.
+	- Martin Geisse fixed a few compile time errors.
 9-Aug-2000
+	- Mike Bond:
+	    The cd command in bash for RedHat 7.0 outputs directory after
+	    change if CDPATH is set, changed script to ignore this.
+	- Norman Kramer removed cstools.
+	- Norman corrected the path to the opengl 2d driver for windows
+	  and added some comments (win32gcc.mak).
+	- Norman edited glwin32.mak so that either -lGL or the libs in
+	  OPENGL.LIBS.DEFINED are linked. Also added CDS_* defines, they
+	  were undefined when compiling for win32gcc.
+	- Norman reversed the time_t handling for file timestamps. The
+	  cs_time way does not compile on linux and im not sure if its
+	  safe here to cast cs_time to time_t. But since the computed
+	  time_t values are local here and not propagated to the outside
+	  its ok to leave it as time_t.
+	- Andrew Zabolotny writes:
+	    A lot of files have been changed but the change is trivial.
+	    As it turned, there are platforms where "time_t" is signed and
+	    there are platforms where "time_t" is unsigned. This was causing
+	    movement to not work sometimes in walktest, for example. Also
+	    this is a potential source of problems in future.
+	    Because of that, I have added a new type in csdefs.h: cs_time
+	    which is basically an unsigned long. Then I have replaced
+	    time_t everywhere with cs_time. Don't use time_t anymore;
+	    use cs_time instead.
 	- Fixed solaris.mak after Andrew broke it for me.
 	- Fixed bug in csPolygonEdges. The iterator was not correctly
 	  initialized.
