@@ -34,7 +34,7 @@ size_t csMemFile::GetPos() { return cursor; }
 void csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; }
 
 csMemFile::csMemFile() :
-  disposition(DISPOSITION_DELETE), buffer(0), capacity(0), size(0), cursor(0)
+  disposition(DISPOSITION_FREE), buffer(0), capacity(0), size(0), cursor(0)
   { SCF_CONSTRUCT_IBASE(0); }
 
 csMemFile::csMemFile(const char* p, size_t s) :
@@ -83,12 +83,26 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
         capacity = 1024;
       while (capacity < new_cursor)
         capacity <<= 1;
-      char* new_buffer = new char[capacity];
-      if (buffer != 0)
-        memcpy(new_buffer, buffer, size);
-      FreeBuffer();
+
+      // make buffer bigger
+      char * new_buffer;
+      if (disposition == DISPOSITION_FREE)
+      {
+	  new_buffer = (char*) realloc((void*) buffer, capacity);
+	  if (!new_buffer)
+	      return 0;
+      }
+      else
+      {
+	  new_buffer = (char*) malloc(capacity);
+          if (buffer != 0)
+            memcpy(new_buffer, buffer, size);
+	  else
+	    return 0;
+	  FreeBuffer();
+      }  
       buffer = new_buffer;
-      disposition = DISPOSITION_DELETE;
+      disposition = DISPOSITION_FREE;
     }
     memcpy(buffer + cursor, Data, DataSize);
     cursor = new_cursor;
@@ -112,7 +126,7 @@ iDataBuffer *csMemFile::GetAllData()
   // Set disposition to 'DELETE' so that if Write() is called later on,
   // memory allocated for it will be correctly deallocated.  Do not use
   // 'IGNORE' here.
-  disposition = DISPOSITION_DELETE;
+  disposition = DISPOSITION_FREE;
   buffer = NULL;
   capacity = 0;
   size = 0;
