@@ -67,7 +67,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
   * clip the rectangle against children & parents, then clip the poly against
   * all resulting rectangles.
   */
- /* cswsRectVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   int x = csQint (poly.vertices[0].x), y = csQint (poly.vertices[0].y);
   int p;
   csRect *lb = new csRect (x, y, x, y);
