@@ -15,6 +15,9 @@ chronological order.
 	  configuration file specific to CEL; it is no longer tied to CS.)
 	  Also added `jobber.cfg-template', an example configuration file which
 	  projects can copy and modify as needed.
+	- Eric Sunshine performed a bit more re-writing of the "HOWTO Create a
+	  Plugin" section of the manual in order to bring a few portions
+	  up-to-date and to clarify some of the discussion.
 20-Dec-2004
 	- Jorrit added csFastRandFloat() which is a fast random number
 	  generator routine that returns a number between 0 and 1.

@@ -26,7 +26,7 @@ code.
 * HOWTO CS Project:: Creating an External Crystal Space Application
 * HOWTO Creating External MSVC 6 Application:: Creating an External @sc{msvc} 6 Application
 * HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7 Application
-* HOWTO Creating External Application using KDevelop:: Creating an External Application using KDevelop
+* HOWTO Creating External Application Using KDevelop:: Creating an External Application using KDevelop
 * HOWTO Create RPM:: Creating Crystal Space @sc{rpm}'s
 * HOWTO Setting the CRYSTAL environment variable:: Setting the CRYSTAL environment variable
 * HOWTO Create Your Own Plugin:: Create Your Own Plugin
