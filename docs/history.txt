@@ -39,6 +39,12 @@ The history order is reversed so that new features are at the top.
 	  This syntax forces a global search (i.e. ignoring all regions)
 	  for the material 'stone' EVEN if the current loader context
 	  says that only one region should be used.
+	- Brendan Burns <bburns@genet.cs.umass.edu> and Peter Amstutz made
+	  a memory canvas which will render to a memory buffer (and not open
+	  a window). This can be useful in applications that want to save
+	  a rendering to some file without having to open a window. This is
+	  for the software renderer alone. Use the Screenshot() function to
+	  get the image.
 21-Feb-2002
 	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
 	  to add two additional broadcast events:

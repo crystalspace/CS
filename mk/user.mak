@@ -71,6 +71,7 @@ PLUGINS.DYNAMIC += video/renderer/line
 PLUGINS.DYNAMIC += video/renderer/null
 PLUGINS.DYNAMIC += video/renderer/inf
 PLUGINS.DYNAMIC += video/canvas/null2d
+PLUGINS.DYNAMIC += video/canvas/memory
 PLUGINS.DYNAMIC += video/loader/tga
 PLUGINS.DYNAMIC += video/loader/sgi
 PLUGINS.DYNAMIC += video/loader/wal
