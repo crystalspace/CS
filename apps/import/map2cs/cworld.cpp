@@ -817,7 +817,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     CreateNode (poly, "material", pTexture->GetTexturename());
     CreateNode (CreateNode (poly, "texmap"), "plane", 
       pPolygon->GetBaseplane()->GetName());
-    Sky = (stricmp (pTexture->GetTexturename(), "sky") == 0);
+    Sky = (strcasecmp (pTexture->GetTexturename(), "sky") == 0);
   }
 
   

@@ -7,6 +7,8 @@ The history order is reversed so that new features are at the top.
 	- Moved the kdtree code from Dynavis and Frustvis to csgeom. That
 	  way the code can be shared and used for other purposes too.
 	- Removed '.cvsignore' and thus 'lib3ds' dir as it's not needed.
+	- Fixed Map2cs. Please people: don't use stricmp! That's not portable.
+	  Use strcasecmp instead.
 	- Eric Sunshine applied a patch suggested by Ben Thomas
 	  <ben.thomas@wickedstudios.com> to work around a problem where
 	  cssysdef.h including <windef.h> (but not <windows.h>) coupled with
