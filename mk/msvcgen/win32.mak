@@ -59,6 +59,7 @@ DSP.WIN32SYS.NAME = cssys
 DSP.WIN32SYS.TYPE = library
 INC.WIN32SYS = \
   include/cssys/win32/csosdefs.h \
+  include/cssys/win32/shellstuff.h \
   include/cssys/win32/volatile.h \
   include/cssys/win32/win32.h
 SRC.WIN32SYS = \
