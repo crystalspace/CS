@@ -25,7 +25,6 @@
 #include "ivideo/graph3d.h"
 #include <stdarg.h>
 #include <windows.h>
-//#include <penwin.h>
 
 #ifdef DO_DINPUT_KEYBOARD
 #include <dinput.h>
@@ -863,8 +862,8 @@ bool Win32Assistant::SetCursor (int cursor)
   {
     case csmcNone:     CursorID = (char *)-1;   break;
     case csmcArrow:    CursorID = IDC_ARROW;    break;
-    //case csmcCross:    CursorID = IDC_CROSS;	break;
-    //case csmcPen:      CursorID = IDC_PEN;	break;
+    case csmcCross:    CursorID = IDC_CROSS;	break;
+    case csmcPen:      CursorID = 32631;/*IDC_PEN;*/	break;
     case csmcMove:     CursorID = IDC_SIZEALL;  break;
     case csmcSizeNWSE: CursorID = IDC_SIZENWSE; break;
     case csmcSizeNESW: CursorID = IDC_SIZENESW; break;
