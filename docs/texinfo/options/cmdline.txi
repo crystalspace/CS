@@ -31,6 +31,11 @@ Use this option to set the size of the display.
 Use this option to select type of display driver to use.  Other options
 are @code{software}, @code{glide}, @code{direct3d}, etc.
 
+@item -recalc
+Use this option to recalculate all lightmaps after you changed lighting
+or geometry in a level that you're trying. If you don't do this you either
+get the old lightmaps or no lightmaps at all.
+
 @item @emph{FIXME}
 Document the remaining common command line options.
 @end table

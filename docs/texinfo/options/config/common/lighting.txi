@@ -18,6 +18,10 @@ a sort of simulation of radiosity. Note that it greatly increases the time
 needed for precalculated lighting. This option only has effect in
 combination with the @code{-recalc} commandline option.
 
+@item NEWRADIOSITY=<yesno>
+Real radiosity system that operates on the lightmaps. This system is
+currently still experimental.
+
 @item ACCURATE_THINGS=<yesno>
 With this option enabled (default) precalculated lighting is much more
 accurate with regards to shadow calculation of Things. However this is also
