@@ -26,7 +26,8 @@ specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 Keith Fulton (@email{keith@@paqrat.com})
 
 Keith added the ability for rain drops to do collision detection with
-the surrounding.
+the surrounding. He also worked on various other systems in CS like the
+sequence manager. In addition he also fixed various bugs.
 
 @item
 Rene Jager (@email{renej.frog@@yucom.be})
@@ -45,6 +46,11 @@ Andon M. Coleman
 
 Andon patched 3ds2lev so it works correctly for
 non-texture mapped @sc{3ds} objects.
+
+@item
+Charles Al' Quarra (@email{charsquarra@@hotmail.com})
+
+Charles added the OPCODE and cloth plugins to CS.
 
 @item
 Jochen Moench (@email{jochen.moench@@de.thalesgroup.com})
@@ -176,6 +182,7 @@ faster (but he forgot to rename it to @code{find_rgb_slow_somewhat_faster()}.
 Anders Stenberg
 
 Anders added the ODE based dynamics plugin to CS.
+He also worked on the new advanced OpenGL renderer.
 
 @item
 Tor Andersson (@email{d97ta@@efd.lth.se})
@@ -443,6 +450,18 @@ Philipp Spoth (@email{Spoeth@@t-online.de})
 
 Philipp helped with optimizing the texture cache.  Philipp also helped
 optimize a few other routines.
+
+@item
+Philipp Aumayr (@email{phueppl@@gmx.at})
+
+Philipp helped work on the new OpenGL renderer and also participated in the
+design discussions for that.
+
+@item
+Marten Svanfeldt (@email{developer@@svanfeldt.com})
+
+Marten helped work on the new OpenGL renderer. He developed the effect
+system for the old renderer and the shader system for the new one.
 
 @item
 Xavier Hosxe (@email{xhosxe@@cyrano.com})
@@ -990,6 +1009,7 @@ Daniel helped work on the physics engine and collision detection.
 Daniel Duhprey (@email{duhprey@@yahoo.com})
 
 Daniel made the csOBB class in Crystal Space (Oriented Bounding Box).
+He also made the terrbig plugin and helped develop the ODE dynamics library.
 
 @item
 Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
