@@ -837,27 +837,32 @@ STDMETHODIMP csSystemDriver::XSystem::GetSubSystemPtr(void **retval, int iSubSys
   switch(iSubSystemID)
   {
   case G3D_ID:
-	*retval = pThis->piG3D;
-	pThis->piG3D->AddRef();
-
+    *retval = pThis->piG3D;
+    pThis->piG3D->AddRef();
+    break;
   case G2D_ID:
-	*retval = pThis->piG2D;
-	pThis->piG2D->AddRef();
-
+    *retval = pThis->piG2D;
+    pThis->piG2D->AddRef();
+    break;
   case GI_ID:
-	*retval = pThis->piGI;
-	pThis->piGI->AddRef();
-
+    *retval = pThis->piGI;
+    pThis->piGI->AddRef();
+    break;
   case NetDrv_ID:
-	*retval = pThis->piNetDrv;
-	pThis->piNetDrv->AddRef();
-
+    *retval = pThis->piNetDrv;
+    pThis->piNetDrv->AddRef();
+    break;
   case NetMan_ID:
-	*retval = pThis->piNetMan;
-	pThis->piNetMan->AddRef();
-
+    *retval = pThis->piNetMan;
+    pThis->piNetMan->AddRef();
+    break;
+  case SndDrv_ID:
+    *retval = pThis->piSound;
+    pThis->piSound->AddRef();
+    break;
   default:
     *retval = NULL;
+    break;
   }
 
   return S_OK;

@@ -189,7 +189,8 @@ enum SubSystemsIDs
   G2D_ID,
   GI_ID,
   NetDrv_ID,
-  NetMan_ID
+  NetMan_ID,
+  SndDrv_ID
 };
 
 #endif // __DEF_H__
