@@ -1,0 +1,86 @@
+@c -*-texinfo-*-
+@node ApiMods18, Index, FAQ, Top
+@appendix Significant @sc{api} Changes from 0.17 to 0.18
+@cindex @sc{api} Changes
+
+This document provides information to aid developers during the transition
+from version 0.17 of Crystal Space to 0.18. At this moment Crystal Space is
+still beta so we don't have a frozen @sc{api} (@dfn{Application Programmer's
+Interface}).  Even after releasing 1.0 @sc{api} changes will sometimes be
+unavoidable (but we will try to minimize them).  This document should give you
+a head start at trying to convert your application from one version of Crystal
+Space to the next.  Only the major changes are covered here.  If you have
+trouble with something that isn't discussed here you should send mail to the
+the Crystal Space mailing list and ask for help.  @xref{Mailing Lists}.
+
+@heading @sc{api} Changes: Version 0.17 to 0.18
+
+This section documents the major changes between versions 0.17 and 0.18 of of
+Crystal Space.
+
+@subheading Name Change: @code{csWorld} to @code{csEngine}
+@cindex @code{csWorld}
+@cindex @code{csEngine}
+@cindex @code{iWorld}
+@cindex @code{iEngine}
+
+The class @code{csWorld} has been renamed to @code{csEngine}.
+Here is a summary of all the changes which result from this:
+@itemize @bullet
+@item
+@code{iWorld} becomes @code{iEngine}
+@item
+@code{csWorld} becomes @code{csEngine}
+@item
+@code{csWorldConfig} becomes @code{csEngineConfig}
+@item
+@code{csWorldState} becomes @code{csEngineState}
+@item
+@code{csWorldStateVector} becomes @code{csEngineStateVector}
+@item
+@code{iworld.h} becomes @code{iengine.h}
+@item
+@code{world.h} becomes @code{engine.h}
+@end itemize
+
+@subheading Signature Change: @code{NextFrame(elapsed_time/current_time)}
+@cindex @code{NextFrame()} Changes
+@cindex @code{elapsed_time} Changes
+@cindex @code{current_time} Changes
+
+@code{csEngine::AdvanceSpriteFrames()} has been renamed to @code{NextFrame()}.
+In addition @code{UpdateParticleSystems()} has been removed and is now also
+do by @code{csEngine::NextFrame()}.
+
+@subheading Config File Changes
+@cindex config file
+
+The config file format has changed significantly. TODO
+
+@subheading Mesh Object Plugins
+@cindex mesh object plugins
+@cindex csSprite3D
+@cindex csSprite2D
+@cindex particle systems
+
+@subheading @code{csPixmap} Moved and Renamed
+@cindex @code{csPixmap}
+@cindex @code{csSimplePixmap}
+
+@code{csPixmap} has moved to the @code{csfx} library. So you need
+to include the header file from there. Note that @code{csPixmap} is
+now also an abstract class so where you would instantiate @code{csPixmap}
+in the past you now need to instantiate @code{csSimplePixmap} instead.
+In arguments and variables it is recommended you still use @code{csPixmap}
+as it will allow you to use other kinds of pixmaps there.
+
+@subheading General use of SCF Interfaces
+@cindex SCF interfaces
+
+In general it is now a good idea to use SCF interfaces to access
+objects instead of the normal classes wherever possible. This
+applies mostly to the engine (i.e. use the calls in @code{iEngine}
+instead of the ones in @code{csEngine}). Consequently also use
+@code{iMeshWrapper} instead of @code{csMeshWrapper} and @code{iMaterialWrapper}
+instead of @code{csMaterialWrapper} and so on. This will make the transition
+to 1.0 easier when the engine will be fully accessible as a plugin.
