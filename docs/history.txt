@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  i.e. use the iterators. Nothing else works.
 	- Added xmltest application to dump the contents of an XML file.
 	- Fixed an error in mergeres.h by quoting the quotes.
+	- Steven Geens fixed the motion manager plugin. Motions will now
+	  work correctly if no key frame is defined for timeframe 0.
 7-Aug-2002
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"

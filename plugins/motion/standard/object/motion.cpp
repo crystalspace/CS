@@ -138,18 +138,21 @@ void csMotionTemplate::AddFrameBone (int boneid, float frametime, const csVector
 
 //************************************************************ Motion Bone
 
-void csMotionBone::SelectFrameForTime(float time, float *weight, int *curframe, int *nextframe)
+void csMotionBone::SelectFrameForTime(float time,float duration, float *weight, int *curframe, int *nextframe)
 {
   assert(weight);
   assert(curframe);
   assert(nextframe);
-
+  
   int i=0;
-  for(; i<framecount-1; i++) {
-    if(frames[i+1].frametime>time)
+  
+  for(; i<framecount; i++) {
+    if(frames[i].frametime>time)
       break;
   }
-
+  i--;
+  if(i<0) i += framecount;
+  
   //No Lerp needed
   if(frames[i].frametime==time) {
     *weight=1.0f;
@@ -157,21 +160,42 @@ void csMotionBone::SelectFrameForTime(float time, float *weight, int *curframe, 
     *nextframe=-1;
     return;
   }
-
-  //Lerp needed
-  int ni=(i+1<framecount)?i+1:0; //TODO need to support LOOPFLIP()
-  float cur=time-frames[i].frametime;
-  float end=frames[ni].frametime-frames[i].frametime;
-  *weight=cur/end;
+  
+  int ni = 0;
+  float cur = 0; 
+  float end = 0;
+  //Lerp needed 
+  if(i+1<framecount)   //TODO need to support LOOPFLIP()
+  {
+    ni = i+1;
+    cur=time-frames[i].frametime;
+    end=frames[ni].frametime-frames[i].frametime;
+  }
+  else   //TODO need to support LOOPFLIP()
+  {
+    ni = 0;
+    cur=time-frames[i].frametime;
+    if(cur<0) cur += duration;
+    end=frames[ni].frametime-frames[i].frametime + duration;
+  }
+  
+  if(end != 0)
+  {
+    *weight=cur/end;
+  }
+  else
+  {
+    *weight = 1.0f;
+  } 
   *curframe=i;
   *nextframe=ni;
 }
 
-void csMotionBone::Animate(float time, csVector3 &v, csQuaternion &q, bool interpolate)
+void csMotionBone::Animate(float time,float duration, csVector3 &v, csQuaternion &q, bool interpolate)
 {
   float frameweight;
   int curframe, nextframe;
-  SelectFrameForTime(time, &frameweight, &curframe, &nextframe);
+  SelectFrameForTime(time, duration, &frameweight, &curframe, &nextframe);
   if(nextframe>=0 && interpolate) {
     q=frames[curframe].rot.Slerp(frames[nextframe].rot, frameweight);
     v=(1.0f-frameweight)*frames[curframe].pos + frameweight*frames[nextframe].pos;
@@ -321,7 +345,7 @@ void csMotionController::Animate()
 
     csMotionStackItem *si=stack[bone->stacks[0]];
     csMotionBone* motbone=si->motion->bones[bone->boneids[0]];
-    motbone->Animate(si->frametime, v, q, 1); //TODO pass interpolate flag
+    motbone->Animate(si->frametime,si->motion->duration, v, q, 1); //TODO pass interpolate flag
 
 //TODO Enable stack interpolation
     (void) sv; // fix warning
@@ -329,7 +353,7 @@ void csMotionController::Animate()
 /*    for(int j=1; j<bone->nummotions; j++) {
       si=stack[bone->stacks[j]];
       motbone=si->motion->bones[bone->boneids[j]];
-      motbone->Animate(si->frametime, sv, sq, 0); //TODO pass interpolate flag
+      motbone->Animate(si->frametime,si->motion->duration, sv, sq, 0); //TODO pass interpolate flag
       q=
       v=
     }*/

@@ -46,8 +46,8 @@ public:
   unsigned int GetHash() { return hash; }
   char* GetName() { return name; }
 
-  void SelectFrameForTime(float time, float *weight, int *curframe, int *nextframe);
-  void Animate(float time, csVector3 &v, csQuaternion &q, bool interpolate);
+  void SelectFrameForTime(float time,float duration, float *weight, int *curframe, int *nextframe);
+  void Animate(float time,float duration, csVector3 &v, csQuaternion &q, bool interpolate);
 };
 
 CS_DECLARE_TYPED_VECTOR( csMotionBoneVectorBase, csMotionBone );
