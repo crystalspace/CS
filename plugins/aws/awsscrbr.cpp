@@ -45,6 +45,7 @@ awsScrollBar::awsScrollBar () :
 
 awsScrollBar::~awsScrollBar ()
 {
+  if (captured) WindowManager ()->ReleaseMouse ();
   if (dec_slot)
     dec_slot->Disconnect (
         decVal,
@@ -70,9 +71,6 @@ awsScrollBar::~awsScrollBar ()
         sink,
         sink->GetTriggerID ("TickTock"));
 
-  SCF_DEC_REF (incVal);
-  SCF_DEC_REF (decVal);
-  SCF_DEC_REF (knob);
   SCF_DEC_REF (sink);
   SCF_DEC_REF (inc_slot);
   SCF_DEC_REF (dec_slot);
@@ -80,7 +78,6 @@ awsScrollBar::~awsScrollBar ()
   SCF_DEC_REF (tick_slot);
   SCF_DEC_REF (timer);
 
-  if (captured) WindowManager ()->ReleaseMouse ();
 }
 
 char *awsScrollBar::Type ()
@@ -206,7 +203,6 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
       break;
   } // end switch framestyle
 
-  //  DEBUG_BREAK;
   decVal->SetWindow (Window ());
   incVal->SetWindow (Window ());
   knob->SetWindow (Window ());
@@ -228,7 +224,6 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   knob->SetProperty ("TicksPerSecond", (void *) &t);
 
   sink = new awsSink (this);
-
   sink->RegisterTrigger ("DecValue", &DecClicked);
   sink->RegisterTrigger ("IncValue", &IncClicked);
   sink->RegisterTrigger ("TickTock", &TickTock);

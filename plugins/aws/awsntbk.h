@@ -140,7 +140,6 @@ class awsNotebookButtonBar : public awsComponent
       tabEntry *te = (tabEntry*)Item;
       te->slot->Disconnect (te->button, awsCmdButton::signalClicked, 
                            te->sink, te->sink->GetTriggerID ("ActivateTab"));
-      SCF_DEC_REF (te->button);
       SCF_DEC_REF (te->slot);
       SCF_DEC_REF (te->sink);
       delete te;

@@ -232,6 +232,7 @@ void awsSlot::Connect (
     }
   }
 
+  sink->IncRef ();
   stmap.Push (new SignalTriggerMap (signal, sink, trigger, 1));
 }
 

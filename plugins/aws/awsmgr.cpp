@@ -101,6 +101,15 @@ awsManager::~awsManager ()
     delete (awsComponentFactoryMap *)p;
     component_factories.RemoveItem ();
   }
+
+  iAwsWindow *next, *curwin = top;
+  while (curwin)
+  {
+    next = curwin->WindowBelow ();
+    curwin->DecRef ();
+    curwin = next;
+  }
+
 }
 
 bool awsManager::Initialize (iObjectRegistry *object_reg)

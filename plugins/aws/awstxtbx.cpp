@@ -79,7 +79,7 @@ bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
     textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (NULL);
     textbox_sink->RegisterTrigger ("Blink", &BlinkCursor);
   }
-
+  
   blink_timer = new awsTimer (WindowManager ()->GetObjectRegistry (), this);
   blink_timer->SetTimer (350);
   blink_timer->Start ();
@@ -89,7 +89,7 @@ bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
       awsTimer::signalTick,
       textbox_sink,
       textbox_sink->GetTriggerID ("Blink"));
-
+  
   ////////////////
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 

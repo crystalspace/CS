@@ -40,7 +40,6 @@ awsComponent::~awsComponent ()
       item = GetChildAt (i);
 
       awsComponent *cmp = (awsComponent *)item;
-
       cmp->DecRef ();
     }
 

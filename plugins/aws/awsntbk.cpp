@@ -684,11 +684,9 @@ awsNotebookButtonBar::~awsNotebookButtonBar ()
     next_slot->Disconnect (next, awsCmdButton::signalClicked,
                            sink, sink->GetTriggerID ("Next"));
 
-  SCF_DEC_REF (prev);
-  SCF_DEC_REF (next);
+  SCF_DEC_REF (sink);
   SCF_DEC_REF (prev_slot);
   SCF_DEC_REF (next_slot);
-  SCF_DEC_REF (sink);
 }
 
 bool awsNotebookButtonBar::Setup (iAws *_wmgr, awsComponentNode *settings)
