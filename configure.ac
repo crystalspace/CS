@@ -137,7 +137,7 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 #	use for the test.  If LANGUAGE is omitted, C is used.
 #	MAKEFILE-VARIABLE is the name of the variable to insert into the
 #	makefile and Jam text caches if a usable flag is encountered.  If
-#	APPEND is not the empty string, then CACHE-VALUE is appended to the
+#	APPEND is not the empty string, then the flag is appended to the
 #	existing value of the makefile variable.  If the command-line option
 #	was recognized, then ACTION-IF-RECOGNIZED is invoked, otherwise
 #	ACTION-IF-NOT-RECOGNIZED is invoked.
