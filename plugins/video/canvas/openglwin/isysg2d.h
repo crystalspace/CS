@@ -10,7 +10,7 @@ extern const IID IID_IOpenGLGraphicsInfo;
 interface IOpenGLGraphicsInfo : public IUnknown
 {
     ///
-    STDMETHOD(Open)(char* szTitle) = 0;
+    STDMETHOD(Open)(const char* szTitle) = 0;
     ///
     STDMETHOD(Close)() = 0;
     ///

@@ -12,7 +12,7 @@ extern const IID IID_IDDraw3GraphicsInfo;
 interface IDDraw3GraphicsInfo : public IUnknown
 {
     ///
-    STDMETHOD(Open)(char* szTitle) = 0;
+    STDMETHOD(Open)(const char* szTitle) = 0;
     ///
     STDMETHOD(Close)() = 0;
     ///

@@ -10,7 +10,7 @@ interface IXOpenGLGraphicsInfo : public IOpenGLGraphicsInfo
 {
     DECLARE_IUNKNOWN()
     ///
-    STDMETHOD(Open)(char* szTitle);
+    STDMETHOD(Open)(const char* szTitle);
     ///
     STDMETHOD(Close)();
     ///
