@@ -54,6 +54,9 @@ private:
   void GenerateTrunk (csConstructionObject* co,
 	float bot_radius, float top_radius, float height,
 	csConstructionRule* rule);
+  void GenerateBranch (csConstructionObject* co,
+	float bot_radius, float top_radius, float height,
+	csConstructionRule* rule1, csConstructionRule* rule2);
 
 public:
   SCF_DECLARE_IBASE;
