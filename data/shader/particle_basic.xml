@@ -6,7 +6,7 @@
 			<buffer name="vertices" destination="position" />
 			<buffer name="colors" destination="primary color" />
 			<buffer name="texture coordinates" destination="texture coordinate" />
-			<vp plugin="glfixed" file="/shader/vertexlight.fvp"/>
+			<!--<vp plugin="glfixed" file="/shader/vertexlight.fvp"/>-->
 			<texture name="tex diffuse" destination="unit 0" />
 			<fp plugin="glfixed">
 				<fixedfp>

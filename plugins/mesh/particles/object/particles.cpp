@@ -230,26 +230,30 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;
-
   point_sprites = p->g3d->GetCaps ()->SupportsPointSprites;
 
   int i;
 
-  if(point_sprites) {
+  if(point_sprites) 
+  {
     vertex_count = max_particles;
 
     indices = new unsigned int [max_particles];
     index_count = max_particles;
-    for(i=0;i<index_count;i++) {
+    for(i=0;i<index_count;i++) 
+    {
       indices[i] = i;
     }
-  } else {
+  } 
+  else 
+  {
     vertex_count = max_particles * 4;
 
     index_count = max_particles * 6;
     indices = new unsigned int [index_count];
     int j;
-    for(i=0,j=0;i<vertex_count;i+=4,j+=6) {
+    for(i=0,j=0;i<vertex_count;i+=4,j+=6) 
+    {
       // First Triangle
       indices[j] = i;
       indices[j + 1] = i + 1;

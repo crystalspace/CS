@@ -750,7 +750,8 @@ bool csGLGraphics3D::Open ()
     ext->InitGL_ATI_separate_stencil ();
   }
 
-  rendercaps.SupportsPointSprites = ext->CS_GL_ARB_point_parameters;
+  rendercaps.SupportsPointSprites = ext->CS_GL_ARB_point_parameters &&
+    ext->CS_GL_ARB_point_sprite;
 
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
@@ -1548,7 +1549,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
       break;
     case CS_MESHTYPE_POINT_SPRITES:
     {
-      if(!ext->CS_GL_ARB_point_sprite)
+      if(!(ext->CS_GL_ARB_point_sprite && ext->CS_GL_ARB_point_parameters))
       {
         break;
       }

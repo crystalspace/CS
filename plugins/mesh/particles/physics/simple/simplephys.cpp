@@ -98,15 +98,18 @@ void csParticlesPhysicsSimple::RemoveParticles (iParticlesObjectState *particles
 
 bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 {
-  if(event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess) {
+  if(event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess) 
+  {
     csTicks elapsed = vclock->GetElapsedTicks ();
     int updates = (elapsed + leftover_time) / 20;
     leftover_time = (elapsed + leftover_time) - (updates * 20);
     
-    for(int i=0;i<partobjects.Length ();i++) {
-      StepPhysics (elapsed * 0.001f, partobjects[i]->particles,
+    float elapsedSecs = (float)elapsed * 0.001f;
+    for(int i=0; i < partobjects.Length (); i++) 
+    {
+      StepPhysics (elapsedSecs, partobjects[i]->particles,
         partobjects[i]->data);
-      partobjects[i]->particles->Update (elapsed * 0.001f);
+      partobjects[i]->particles->Update (elapsedSecs);
     }
   }
   return false;
@@ -115,7 +118,8 @@ bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
   iParticlesObjectState *particles, csArray<csParticlesData> *data)
 {
-  for(int i=0;i<data->Length ();i++) {
+  for(int i=0;i<data->Length ();i++) 
+  {
     // Setup for this particle
     csParticlesData &part = data->Get (i);
     float force_range = particles->GetForceRange ();
