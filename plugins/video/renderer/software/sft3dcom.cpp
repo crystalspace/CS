@@ -3028,6 +3028,6 @@ void csGraphics3DSoftwareCommon::DrawLine (const csVector3& v1, const csVector3&
 float csGraphics3DSoftwareCommon::GetZBuffValue (int x, int y)
 {
   unsigned long zbf = z_buffer [x + y * width];
-  if (!zbf) return 0;
+  if (!zbf) return 1000000000.;
   return 16777216.0 / float (zbf);
 }

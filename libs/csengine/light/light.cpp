@@ -177,6 +177,35 @@ void csLight::Light::SetSector (iSector* sector)
   scfParent->SetSector (sector->GetPrivateObject ());
 }
 
+iCrossHalo* csLight::Light::CreateCrossHalo (float intensity, float cross)
+{
+  csCrossHalo* halo = new csCrossHalo (intensity, cross);
+  scfParent->SetHalo (halo);
+  iCrossHalo* ihalo = QUERY_INTERFACE (halo, iCrossHalo);
+  ihalo->DecRef ();
+  return ihalo;
+}
+
+iNovaHalo* csLight::Light::CreateNovaHalo (int seed, int num_spokes,
+  	float roundness)
+{
+  csNovaHalo* halo = new csNovaHalo (seed, num_spokes, roundness);
+  scfParent->SetHalo (halo);
+  iNovaHalo* ihalo = QUERY_INTERFACE (halo, iNovaHalo);
+  ihalo->DecRef ();
+  return ihalo;
+}
+
+iFlareHalo* csLight::Light::CreateFlareHalo ()
+{
+  csFlareHalo* halo = new csFlareHalo ();
+  scfParent->SetHalo (halo);
+  iFlareHalo* ihalo = QUERY_INTERFACE (halo, iFlareHalo);
+  ihalo->DecRef ();
+  return ihalo;
+}
+
+
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csStatLight,csLight);

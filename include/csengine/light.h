@@ -245,6 +245,10 @@ public:
     {
       return scfParent->GetBrightnessAtDistance (d);
     }
+    virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
+    virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
+  	float roundness);
+    virtual iFlareHalo* CreateFlareHalo ();
   } scfiLight;
 };
 

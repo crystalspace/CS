@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
@@ -23,22 +23,16 @@
 #include "csgeom/math3d.h"
 #include "csengine/light.h"
 #include "ivideo/halo.h"
+#include "iengine/halo.h"
 
 class csEngine;
 struct iMaterialWrapper;
-
-enum csHaloType
-{
-  cshtCross,
-  cshtNova,
-  cshtFlare
-};
 
 /** 
  * This is the basic class for all types of halos.
  * The csLight class contains a pointer to a object derived from this class.
  */
-class csHalo
+class csHalo : public iBaseHalo
 {
   /// the current intensity of the attached halo; if >0 halo is in halo queue.
   float Intensity;
@@ -56,15 +50,15 @@ public:
   virtual unsigned char *Generate (int Size) = 0;
 
   /// Get halo intensity
-  float GetIntensity ()
-  { return Intensity; }
+  virtual float GetIntensity () { return Intensity; }
   /// Set halo intensity
-  void SetIntensity (float iInt)
-  { Intensity = iInt; }
+  virtual void SetIntensity (float iInt) { Intensity = iInt; }
+
+  DECLARE_IBASE;
 };
 
 /**
- * This is a halo which ressembles a cross.
+ * This is a halo which resembles a cross.
  */
 class csCrossHalo : public csHalo
 {
@@ -79,6 +73,22 @@ public:
 
   /// Generate the alphamap for this halo of size Size x Size
   virtual unsigned char *Generate (int Size);
+
+  //------------------------ iCrossHalo ------------------------------------
+  DECLARE_IBASE_EXT (csHalo);
+  struct CrossHalo : public iCrossHalo
+  {
+    DECLARE_EMBEDDED_IBASE (csCrossHalo);
+    virtual void SetIntensityFactor (float i)
+    { scfParent->IntensityFactor = i; }
+    virtual float GetIntensityFactor ()
+    { return scfParent->IntensityFactor; }
+    virtual void SetCrossFactor (float i)
+    { scfParent->CrossFactor = i; }
+    virtual float GetCrossFactor ()
+    { return scfParent->CrossFactor; }
+  } scfiCrossHalo;
+  friend struct CrossHalo;
 };
 
 /** This halo has a center with a number of spokes */
@@ -97,6 +107,26 @@ public:
 
   /// Generate the alphamap for this halo of size Size x Size
   virtual unsigned char *Generate (int Size);
+
+  //------------------------ iNovaHalo ------------------------------------
+  DECLARE_IBASE_EXT (csHalo);
+  struct NovaHalo : public iNovaHalo
+  {
+    DECLARE_EMBEDDED_IBASE (csNovaHalo);
+    virtual void SetRandomSeed (int s)
+    { scfParent->Seed = s; }
+    virtual int GetRandomSeed ()
+    { return scfParent->Seed; }
+    virtual void SetNumSpokes (int s)
+    { scfParent->NumSpokes = s; }
+    virtual int GetNumSpokes ()
+    { return scfParent->NumSpokes; }
+    virtual void SetRoundnessFactor (float r)
+    { scfParent->Roundness = r; }
+    virtual float GetRoundnessFactor ()
+    { return scfParent->Roundness; }
+  } scfiNovaHalo;
+  friend struct NovaHalo;
 };
 
 
@@ -114,9 +144,12 @@ struct csFlareComponent {
   csFlareComponent *next;
 };
 
-/** This halo is used for (solar)flares */
+/**
+ * This halo is used for (solar)flares
+ */
 class csFlareHalo : public csHalo
 {
+private:
   /// list of the flare components. in drawing order
   csFlareComponent *components;
   /// last flare component to make adding efficient
@@ -141,6 +174,19 @@ public:
    * multiple images.
    */
   virtual unsigned char *Generate (int Size);
+
+  //------------------------ iFlareHalo ------------------------------------
+  DECLARE_IBASE_EXT (csHalo);
+  struct FlareHalo : public iFlareHalo
+  {
+    DECLARE_EMBEDDED_IBASE (csFlareHalo);
+    virtual void AddComponent (float pos, float w, float h, UInt mode, 
+      iMaterialWrapper *image)
+    {
+      scfParent->AddComponent (pos, w, h, mode, image);
+    }
+  } scfiFlareHalo;
+  friend struct FlareHalo;
 };
 
 /**

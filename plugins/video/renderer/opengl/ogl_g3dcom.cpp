@@ -2006,9 +2006,14 @@ float csGraphics3DOGLCommon::GetZBuffValue (int x, int y)
 {
   GLfloat zvalue;
   glReadPixels (x, height - y - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zvalue);
+  if (zvalue < .000001) return 1000000000.;
   // 0.090909=1/11, that is 1 divided by total depth delta set by
   // glOrtho. Where 0.090834 comes from, I don't know
-  return (0.090834 / (zvalue - (0.090909)));
+  //return (0.090834 / (zvalue - (0.090909)));
+  // @@@ Jorrit: I have absolutely no idea what they are trying to do
+  // but changing the above formula to the one below at least appears
+  // to give more accurate results.
+  return (0.090728 / (zvalue - (0.090909)));
 }
 
 void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)

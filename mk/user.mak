@@ -36,6 +36,7 @@ PLUGINS += mesh/object/rain        mesh/loader/rain
 PLUGINS += mesh/object/spiral      mesh/loader/spiral
 PLUGINS += mesh/object/ball        mesh/loader/ball
 PLUGINS += mesh/object/surf        mesh/loader/surf
+PLUGINS += mesh/object/stars
 PLUGINS +=                         mesh/loader/thing
 PLUGINS += terrain/object/ddg      terrain/loader/ddg
 PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc

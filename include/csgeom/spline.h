@@ -30,12 +30,17 @@ private:
   int num_points;
   float* time_points;
   float* points;
+  bool derivatives_valid;
   float* derivative_points;
 
   // The following values are calculated by Calculate() and
   // are used later by GetInterpolatedDimension().
   int idx;
   float A, B, C, D;	// For computation of a spline value.
+
+private:
+  void PrecalculateDerivatives (int dim);
+  void PrecalculateDerivatives ();
 
 public:
   /// Create a cubic spline with d dimensions and p points.
@@ -67,8 +72,7 @@ public:
    * Set the values for some dimension.
    * 'd' should point to an array containing 'num_points' values.
    * These are the values that will be interpolated. The given
-   * array is copied. Note that dimension values should be set only
-   * after the time values are given.
+   * array is copied.
    */
   void SetDimensionValues (int dim, float* d);
 

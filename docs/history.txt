@@ -1,8 +1,40 @@
-The history order has been reversed so that new features are at the top.
+The history order is reversed so that new features are at the top.
 
+23-Apr-2001
+	- Norman Kramer fixed phyztest. Now compiles again, the chain seems
+	  to work, but the spring falls through the sector walls.
+	- Fixed 'walkall' target. Removed obsolete 'imgload' target and
+	  added 'imgplex', 'gifimg', 'jpgimg', 'pngimg', and 'bmpimg'.
 22-Apr-2001
+	- Norman Kramer split the image loader into several plugins
+	  (iImageIO). Also added support for image saving (currently only
+	  implemented by the png plugin).
+	- Norman Kramer fixed several apps so that they use the new png
+	  saver plugin.
+	- Added iBaseHalo, iCrossHalo, iNovaHalo, and iFlareHalo SCF interfaces
+	  to access halo's.
+	- Added CreateCrossHalo(), CreateNovaHalo(), and CreateFlareHalo()
+	  to iLight.
+	- Fixed a bug in software renderer GetZBuffValue(). When the z-buffer
+	  was initializes to 0 it would return 0. But it does return 1/0 so
+	  instead we now let it return a very big value. This fixes halos
+	  for example for apps that initialize the Z-buffer (walktest doesn't).
+	- Did a similar fix to the OpenGL version of GetZBuffValue().
+	- Added 'stars' mesh object plugin. This can be used to simulate
+	  movement in space. At this moment this plugin doesn't work yet.
+	- Philip Wyett did a temporary hack to fix compile errors introduced
+	  by Wouter's changes yesterday. 
+	  x, y and z are not part of csBox3, thus "state->GetOrigin().x",
+	  "state->GetOrigin().y", "state->GetOrigin().z" generates errors.
+	  Changed to "state->GetOrigin().MinX" etc. as a temp fix which still
+	  leaves the 'flame' working when introduced into 'walktest'.
 	- Fixed a small compiler error in the fire loader.
 21-Apr-2001
+	- Changed csCubicSpline so that it is no longer required to first
+	  set the time values and then the dimension values. Precalculation
+	  of derivatives is delayed until later.
+	- With the help of Wouter Wijngaards, fixed csCubicSpline so that
+	  it doesn't oscilate into infinity. But it isn't as smooth anymore.
 	- Wouter Wijngaards did the following for the iso engine:
 	  Added optimization to the iso Engine:
 	    - A complex system of material registration (by the engine object)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
@@ -37,8 +37,13 @@
 
 //--------------------------------------------------------------+ csHalo +---//
 
+IMPLEMENT_IBASE (csHalo)
+  IMPLEMENTS_INTERFACE (iBaseHalo)
+IMPLEMENT_IBASE_END
+
 csHalo::csHalo (csHaloType iType)
 {
+  CONSTRUCT_IBASE (NULL);
   Intensity = 0;
   Type = iType;
 }
@@ -49,9 +54,18 @@ csHalo::~csHalo ()
 
 //---------------------------------------------------------+ csCrossHalo +---//
 
+IMPLEMENT_IBASE_EXT (csCrossHalo)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iCrossHalo)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csCrossHalo::CrossHalo)
+  IMPLEMENTS_INTERFACE (iCrossHalo)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor)
   : csHalo (cshtCross)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiCrossHalo);
   IntensityFactor = intensity_factor;
   CrossFactor = cross_factor;
 }
@@ -63,9 +77,18 @@ uint8 *csCrossHalo::Generate (int Size)
 
 //----------------------------------------------------------+ csNovaHalo +---//
 
+IMPLEMENT_IBASE_EXT (csNovaHalo)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iNovaHalo)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csNovaHalo::NovaHalo)
+  IMPLEMENTS_INTERFACE (iNovaHalo)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness)
   : csHalo (cshtNova)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiNovaHalo);
   Seed = seed;
   NumSpokes = num_spokes;
   Roundness = roundness;
@@ -77,9 +100,19 @@ uint8 *csNovaHalo::Generate (int Size)
 }
 
 //---------------------------------------------------------+ csFlareHalo +---//
+
+IMPLEMENT_IBASE_EXT (csFlareHalo)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iFlareHalo)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csFlareHalo::FlareHalo)
+  IMPLEMENTS_INTERFACE (iFlareHalo)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csFlareHalo::csFlareHalo ()
   : csHalo (cshtFlare)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiFlareHalo);
   components = NULL;
   last = NULL;
 }
