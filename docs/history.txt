@@ -1,6 +1,22 @@
 The history order is reversed so that new features are at the top.
 
 21-Feb-2003
+	- Wyatt Miler suggested a work around for what seems to be a
+	  gcc 3.1 compiler bug which triggers on MacOS/X (PowerPC) in
+	  the tiny XML parser.
+	- Fixed a bug in iEngine->GetNearbyObjects(). This bug could cause
+	  infinite loops in cases where there is a portal from A->B and
+	  then another portal back from B->A which is also visible from
+	  the viewpoint of the center.
+	- Dynavis now only reports about the first six none-closed
+	  objects instead of all.
+	- Thing no longer reports that it is using FASTMESH.
+	- I had to make the epsilon that is used for checking valid uv
+	  coordinates for a polygon a bit bigger. This means that there will
+	  now be more warnings about 'bad UV coordinates for poly ...'.
+	  The reason I had to do this is that with the current epsilon it
+	  was possible that lightmaps were generated that were incompatible
+	  between optimize/debug compiled versions of CS.
 	- Wyatt Miler suggested a work around for what seems to be a gcc 3.1
 	  compiler bug which triggers on MacOS/X (PowerPC) in the tiny XML
 	  parser.
@@ -11,7 +27,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine augmented the configure script so that it uses libm.a
 	  (if available) when testing for GLU, since apparently some GLU tests
 	  (such as RedHat 8.0) fail without it.
-  - Philip Wyett removed ddraw8 canvas from win32gcc build process.
+	- Philip Wyett removed ddraw8 canvas from win32gcc build process.
 20-Feb-2003
 	- Anders Stenberg fixed a bug in shader loader causing fragment
 	  programs not to load.

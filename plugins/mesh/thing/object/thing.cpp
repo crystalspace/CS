@@ -527,7 +527,6 @@ void csThing::Prepare ()
 	GetCurveCount () == 0)
     {
       flags.Set (CS_THING_FASTMESH);
-      printf ("Switch to FASTMESH '%s'!\n", GetName ()); fflush (stdout);
     }
   }
 

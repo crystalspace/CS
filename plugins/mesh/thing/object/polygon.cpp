@@ -1011,10 +1011,10 @@ void csPolygon3D::SetTextureSpace (
   csMatrix2 m (uv2.x - uv1.x, uv3.x - uv1.x, uv2.y - uv1.y, uv3.y - uv1.y);
   float det = m.Determinant ();
 
-  if (ABS (det) < SMALL_EPSILON)
+  if (ABS (det) < 0.0001f)
   {
     thing->thing_type->Warn (
-      "Warning: badly specified UV coordinates for polygon '%s'!",
+      "Warning: bad UV coordinates for poly '%s'!",
       GetName ());
     SetTextureSpace (p1, p2, 1);
     return ;

@@ -152,6 +152,8 @@ void csObjectModelManager::ReleaseObjectModel (csObjectModel* model)
   model->ref_cnt--;
 }
 
+static int show_notclosed = 6;
+
 bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
 	iMeshWrapper* mw)
 {
@@ -188,9 +190,19 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
         if (model->edges[i].poly2 == -1)
 	{
 	  model->use_outline_filler = false;
-	  printf ("WARNING! Object '%s' is not closed!\n", mw != NULL ?
+	  if (show_notclosed > 0)
+	  {
+	    printf ("WARNING! Object '%s' is not closed!\n", mw != NULL ?
 	  	mw->QueryObject ()->GetName () : "<no mesh>");
-	  fflush (stdout);
+	    fflush (stdout);
+	    show_notclosed--;
+	  }
+	  else if (show_notclosed == 0)
+	  {
+	    printf ("...\n");
+	    fflush (stdout);
+	    show_notclosed--;
+	  }
 	  break;
 	}
     }
