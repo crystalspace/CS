@@ -86,6 +86,9 @@ chronological order.
 	  console) plugin. This enables shadowing of the letters. Default
 	  is off, the same behaviour as before. Extensions are:
 	  EnableShadow, DisableShadow, SetShadowColor, GetShadowColor.
+	- Wouter fixed some more SCF_DESTRUCT_IBASE typos in the sndmod
+	  loader, linux joystick and iff loader. Also unbalanced ()'s 
+	  in cssaver.
 
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated some

@@ -317,12 +317,6 @@ class csModLoader : public iSoundLoader
 public:
   SCF_DECLARE_IBASE;
 
-  virtual ~csModLoader ()
-  {
-    if (!csModSoundData::mikmod_init || csModSoundData::mikmod_reinit)
-      MikMod_Exit ();
-  }
-
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModLoader);
@@ -337,6 +331,8 @@ public:
 
   virtual ~csModLoader ()
   {
+    if (!csModSoundData::mikmod_init || csModSoundData::mikmod_reinit)
+      MikMod_Exit ();
     SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
     SCF_DESTRUCT_IBASE();
   }

@@ -253,7 +253,7 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent)
 csRef<iString> csSaver::SaveMapFile()
 {
   csRef<iDocumentSystem> xml =
-    csPtr<iDocumentSystem>(new csTinyDocumentSystem()));
+    csPtr<iDocumentSystem>(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);

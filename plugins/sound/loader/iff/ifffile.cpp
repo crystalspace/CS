@@ -50,7 +50,7 @@ public:
     SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   }
 
-  virtual csSoundLoader_IFF()
+  virtual ~csSoundLoader_IFF()
   {
     SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
     SCF_DESTRUCT_IBASE();
