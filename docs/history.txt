@@ -49,6 +49,11 @@ chronological order.
 	  to include cssysdef.h in header files. Doing so helps to make header
 	  files more self-contained, thus reducing the burden of clients of
 	  those headers.
+	- Eric Sunshine enhanced the Recurse rule (helper.jam) so that it
+	  returns the list of visited files matching the requested type. Also
+	  made it legal to omit the 'rule' argument, which allows Recurse to be
+	  invoked simply to retrieve a list of matching files (without being
+	  forced to apply a rule to each matching file).
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.

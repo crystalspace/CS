@@ -108,7 +108,7 @@ rule Wildcard
   return $(files:BSR=$(sdir)) ;
 }
 
-##  Recurse rule : types [ : prefix ]
+##  Recurse [ rule ] : types [ : prefix ]
 ##    Recursively scan current directory, $(SUBDIR), for files matching 'types'
 ##    and invoke 'rule' for each file which matches one of the 'types'.
 ##    'types' is a list of file extensions (with the leading dot).  'rule' will
@@ -118,29 +118,37 @@ rule Wildcard
 ##    value of the directory containing the file (as if the rule had been
 ##    invoked from within the file's directory).  'prefix' is an optional list
 ##    of path components which will be prepended to rule's second argument.
+##    Returns the list of visited files.  It is legal to omit 'rule', if you
+##    are interested only in obtaining the list of files matching 'types'.
 rule Recurse
 {
   local innerrule = $(1) ;
   local types = $(2) ;
   local prefix = $(3) ;
   local files = [ GLOB $(SUBDIR) : * ] ;
+  local visited ;
   
   local i ;
   for i in $(files)
   {
     if [ IsElem $(i:S) : $(types) ]
     {
-      $(innerrule) $(i:BS) : $(prefix) ;
+      visited += $(i) ;
+      if $(innerrule)
+      {
+        $(innerrule) $(i:BS) : $(prefix) ;
+      }
     }
     else
     {
       if ! [ IsElem $(i:BS) : $(DOT) $(DOTDOT) ]
       {
         local SUBDIR = $(i) ; # Called rules see this new temporary value.
-	Recurse $(innerrule) : $(types) : $(prefix) $(i:BS) ;
+	visited += [ Recurse $(innerrule) : $(types) : $(prefix) $(i:BS) ] ;
       }
     }
   }
+  return $(visited) ;
 }
 
 ##  ResponseFile file : [ items [ : options [ : directory [ : delim ]]]]
