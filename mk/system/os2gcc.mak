@@ -159,7 +159,7 @@ NETSOCK_LIBS=-lsocket
 SYS_SED_DEPEND=-e 's/\.ob*j*\:/$$O:/g'
 
 # Override linker with os2link.cmd
-LINK=@cmd /c bin\\os2link.cmd OUT=$(OUT) DESCRIPTION=[$(DESCRIPTION.$@)]
+LINK=@cmd /c bin\\os2link.cmd OUT=$(OUT) DESCRIPTION="$(DESCRIPTION.$@)"
 LFLAGS.CONSOLE.EXE=CONSOLE
 
 endif # ifeq ($(MAKESECTION),defines)

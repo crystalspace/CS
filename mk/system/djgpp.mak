@@ -3,7 +3,7 @@
 ################################################################################
 
 # Enable for GCC later than 2.7.2 (2.8.0 and up)
-#NO_EXCEPTIONS=-fno-exceptions
+NO_EXCEPTIONS=-fno-exceptions
 
 DRIVERS=cs2d/dosraw cs3d/software csnetdrv/null csnetman/null \
   cssnddrv/null cssndrdr/null
