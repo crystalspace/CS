@@ -163,8 +163,6 @@ void csHazeHull::ComputeEdges()
 
   /// remove temp matrix
   delete[] matrix;
-  
-  //exit(-1);
 }
 
 
@@ -512,9 +510,9 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
-  printf("drawing\n");
+  //printf("drawing\n");
 
-  /// preapre to transform the points
+  /// prepare to transform the points
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
   csVector3 campos = camera->GetTransform().GetOrigin();
@@ -539,7 +537,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   int layer_num = 0;
   int *layer_poly = 0;
   //campos.Set(10,10,10);
-  printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
+  //printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
   csHazeHull::ComputeOutline(hull, campos, layer_num, layer_poly);
   printf("has outline of size %d: ", layer_num);
   if(layer_num <= 0) return false;
@@ -573,13 +571,14 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   for(i=0; i<layer_num; i++)
   {
     int nexti = (i+1)%layer_num;
-    tri_pts[1] = layer_pts[i];
-    tri_pts[2] = layer_pts[nexti];
-    tri_uvs[1] = layer_uvs[i];
-    tri_uvs[2] = layer_uvs[nexti];
-    printf("drawing a polygon\n");
+    tri_pts[2] = layer_pts[i];
+    tri_pts[1] = layer_pts[nexti];
+    tri_uvs[2] = layer_uvs[i];
+    tri_uvs[1] = layer_uvs[nexti];
+    //printf("drawing a polygon\n");
     DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
 
+#if 0
     // debug drawing of the outline 
     iGraphics2D *g2d = g3d->GetDriver2D();
     g2d->DrawLine(scr_orig.x, scr_orig.y, scr_orig.x+1, scr_orig.y+1, -1);
@@ -591,6 +590,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
     float midy = (layer_pts[i].y + layer_pts[nexti].y)*0.5;
     g2d->DrawLine( layer_pts[i].x, layer_pts[i].y, midx, midy, 0);
     g2d->DrawLine( midx, midy, layer_pts[nexti].x, layer_pts[nexti].y, -1);
+#endif
   }
 
   delete[] layer_poly;
