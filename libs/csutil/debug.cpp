@@ -29,24 +29,31 @@
 
 //-----------------------------------------------------------------------------
 
+struct csDGEL;
+
+// A link element (parent->child or child->parent)
+struct csDGELLinkEl
+{
+  csDGEL* link;		// Child or parent linked too.
+  uint32 timestamp;	// Time of creation of link.
+};
+
 struct csDGEL
 {
   void* object;		// Pointer to the object.
-  bool scf;		// If true 'object' is an iBase.
-  bool used;		// If true the object is currently allocated.
   uint32 timestamp;	// Timestamp of last allocation.
+  uint8 scf;		// If true 'object' is an iBase.
+  uint8 used;		// If true the object is currently allocated.
+  uint8 marker;		// To see what we already dumped.
+  uint8 recurse_marker;	// To see what we're dumping in this recursion.
+  uint16 num_parents;
+  uint16 num_children;
+  csDGELLinkEl* parents;
+  csDGELLinkEl* children;
   char* description;
   char* type;
   char* file;
   int linenr;
-  int num_parents;
-  csDGEL** parents;	// Pointer to parents.
-  uint32* p_stamps;	// Pointer to array of timestamps for parent creation.
-  int num_children;
-  csDGEL** children;	// Pointer to children.
-  uint32* c_stamps;	// Pointer to array of timestamps for child creation.
-  bool marker;		// To see what we already dumped.
-  bool recurse_marker;	// To see what we're dumping in this recursion.
 
   csDGEL ()
   {
@@ -59,20 +66,16 @@ struct csDGEL
     file = NULL;
     num_parents = 0;
     parents = NULL;
-    p_stamps = NULL;
     num_children = 0;
     children = NULL;
-    c_stamps = NULL;
   }
   void Clear ()
   {
     delete[] description; description = NULL;
     delete[] type; type = NULL;
-    delete[] file; file = NULL;
     delete[] parents; parents = NULL; num_parents = 0;
-    delete[] p_stamps; p_stamps = NULL;
     delete[] children; children = NULL; num_children = 0;
-    delete[] c_stamps; c_stamps = NULL;
+    file = NULL;
   }
   ~csDGEL ()
   {
@@ -83,37 +86,25 @@ struct csDGEL
   {
     if (!children)
     {
-      CS_ASSERT (c_stamps == NULL);
-      children = new csDGEL*[1];
-      c_stamps = new uint32[1];
+      children = new csDGELLinkEl[1];
     }
     else
     {
-      CS_ASSERT (c_stamps != NULL);
-      csDGEL** new_children = new csDGEL*[num_children+1];
-      uint32* new_c_stamps = new uint32[num_children+1];
-      memcpy (new_children, children, sizeof (csDGEL*)*num_children);
-      memcpy (new_c_stamps, c_stamps, sizeof (uint32)*num_children);
+      csDGELLinkEl* new_children = new csDGELLinkEl[num_children+1];
+      memcpy (new_children, children, sizeof (csDGELLinkEl)*num_children);
       delete[] children; children = new_children;
-      delete[] c_stamps; c_stamps = new_c_stamps;
     }
-    children[num_children] = child;
-    c_stamps[num_children++] = timestamp;
+    children[num_children].link = child;
+    children[num_children++].timestamp = timestamp;
   }
   void RemoveChild (csDGEL* child)
   {
-    if (!children)
-    {
-      CS_ASSERT (c_stamps == NULL);
-      return;
-    }
-    CS_ASSERT (c_stamps != NULL);
+    if (!children) return;
     if (num_children == 1)
     {
-      if (child == children[0])
+      if (child == children[0].link)
       {
         delete[] children; children = NULL;
-	delete[] c_stamps; c_stamps = NULL;
 	num_children = 0;
       }
       return;
@@ -121,11 +112,7 @@ struct csDGEL
     int i, j = 0;
     for (i = 0 ; i < num_children ; i++)
     {
-      if (child != children[i])
-      {
-	children[j] = children[i];
-	c_stamps[j++] = c_stamps[i];
-      }
+      if (child != children[i].link) children[j++] = children[i];
     }
     num_children = j;
   }
@@ -133,37 +120,25 @@ struct csDGEL
   {
     if (!parents)
     {
-      CS_ASSERT (p_stamps == NULL);
-      parents = new csDGEL*[1];
-      p_stamps = new uint32[1];
+      parents = new csDGELLinkEl[1];
     }
     else
     {
-      CS_ASSERT (p_stamps != NULL);
-      csDGEL** new_parents = new csDGEL*[num_parents+1];
-      uint32* new_p_stamps = new uint32[num_parents+1];
-      memcpy (new_parents, parents, sizeof (csDGEL*)*num_parents);
-      memcpy (new_p_stamps, p_stamps, sizeof (uint32)*num_parents);
+      csDGELLinkEl* new_parents = new csDGELLinkEl[num_parents+1];
+      memcpy (new_parents, parents, sizeof (csDGELLinkEl)*num_parents);
       delete[] parents; parents = new_parents;
-      delete[] p_stamps; p_stamps = new_p_stamps;
     }
-    parents[num_parents] = parent;
-    p_stamps[num_parents++] = timestamp;
+    parents[num_parents].link = parent;
+    parents[num_parents++].timestamp = timestamp;
   }
   void RemoveParent (csDGEL* parent)
   {
-    if (!parents)
-    {
-      CS_ASSERT (p_stamps == NULL);
-      return;
-    }
-    CS_ASSERT (p_stamps != NULL);
+    if (!parents) return;
     if (num_parents == 1)
     {
-      if (parent == parents[0])
+      if (parent == parents[0].link)
       {
         delete[] parents; parents = NULL;
-	delete[] p_stamps; p_stamps = NULL;
 	num_parents = 0;
       }
       return;
@@ -171,11 +146,7 @@ struct csDGEL
     int i, j = 0;
     for (i = 0 ; i < num_parents ; i++)
     {
-      if (parent != parents[i])
-      {
-	parents[j] = parents[i];
-	p_stamps[j++] = p_stamps[i];
-      }
+      if (parent != parents[i].link) parents[j++] = parents[i];
     }
     num_parents = j;
   }
@@ -337,7 +308,7 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
   }
   else el->description = NULL;
 
-  el->file = file ? csStrNew (file) : NULL;
+  el->file = file;
   el->linenr = linenr;
 }
 
@@ -643,7 +614,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
         // If we have only one parent and no children we check
 	// if we already visited that parent in this recursion.
 	// In that case we don't print the brackets.
-	if (el->parents[0]->recurse_marker) use_brackets = false;
+	if (el->parents[0].link->recurse_marker) use_brackets = false;
       }
 
       if (use_brackets) printf ("%s{\n", spaces);
@@ -651,11 +622,13 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
       int i;
       for (i = 0 ; i < el->num_parents ; i++)
       {
-        DumpSubTree (indent+2, "P", el->p_stamps[i], el->parents[i]);
+        DumpSubTree (indent+2, "P", el->parents[i].timestamp,
+		el->parents[i].link);
       }
       for (i = 0 ; i < el->num_children ; i++)
       {
-        DumpSubTree (indent+2, "C", el->c_stamps[i], el->children[i]);
+        DumpSubTree (indent+2, "C", el->children[i].timestamp,
+		el->children[i].link);
       }
       el->recurse_marker = false;
       if (use_brackets) printf ("%s}\n", spaces);
@@ -710,17 +683,17 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
     {
       for (i = 0 ; i < lel->num_parents ; i++)
       {
-        if (!lel->parents[i]->marker)
+        if (!lel->parents[i].link->marker)
         {
-          local_els[num++] = lel->parents[i];
-	  lel->parents[i]->marker = true;
+          local_els[num++] = lel->parents[i].link;
+	  lel->parents[i].link->marker = true;
         }
       }	
       for (i = 0 ; i < lel->num_children ; i++)
-        if (!lel->children[i]->marker)
+        if (!lel->children[i].link->marker)
         {
-          local_els[num++] = lel->children[i];
-	  lel->children[i]->marker = true;
+          local_els[num++] = lel->children[i].link;
+	  lel->children[i].link->marker = true;
         }
     }
   }

@@ -87,7 +87,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csPolyTexType::csPolyTexType ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csPolyTexType");
   Alpha = 0;
   MixMode = CS_FX_COPY;

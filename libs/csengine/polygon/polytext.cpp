@@ -49,7 +49,7 @@ SCF_IMPLEMENT_IBASE_END
 csPolyTexture::csPolyTexture ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csPolyTexture");
   lm = NULL;
   cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;

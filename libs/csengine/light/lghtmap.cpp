@@ -32,7 +32,7 @@
 csShadowMap::csShadowMap ()
 {
   Light = NULL;
-  DG_ADD (this, "NONAME");
+  DG_ADD (this, NULL);
   DG_TYPE (this, "csShadowMap");
 }
 
@@ -68,7 +68,7 @@ SCF_IMPLEMENT_IBASE_END
 csLightMap::csLightMap ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csLightMap");
   first_smap = NULL;
   cachedata = NULL;

@@ -107,7 +107,7 @@ void csObject::InitializeObject ()
   static CS_ID id = 0;
   csid = id++;
   ParentObject = NULL;
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csObject");
 }
 

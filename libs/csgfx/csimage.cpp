@@ -142,7 +142,7 @@ SCF_IMPLEMENT_IBASE_END
 csImageFile::csImageFile (int iFormat)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csImageFile");
   Image = NULL;
   Palette = NULL;

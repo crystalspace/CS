@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+27-Nov-2001
+	- Considerably optimized memory usage of graph debugger by
+	  reorganizing the data a little.
 26-Nov-2001
 	- Added documentation for terrain engine.
 	- Extended documentation on the format of the plugin loaders by also
