@@ -4,19 +4,19 @@
 #    CVS Snapshot Generation Script
 #    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
-#    This library is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Library General Public
-#    License as published by the Free Software Foundation; either
-#    version 2 of the License, or (at your option) any later version.
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
 #
-#    This library is distributed in the hope that it will be useful,
+#    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Library General Public License for more details.
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-#    You should have received a copy of the GNU Library General Public
-#    License along with this library; if not, write to the Free
-#    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #==============================================================================
 #------------------------------------------------------------------------------
@@ -34,7 +34,7 @@
 #        3 1 * * * $HOME/bin/snapshot.py
 #
 #    The script makes no attempt to perform any sort of CVS authentication.
-#    Currently, it is the client's responibility to authenticate with the CVS
+#    Currently, it is the client's responsibility to authenticate with the CVS
 #    server if necessary.  For :pserver: access the easiest way to work around
 #    this limitation is to login to the CVS server one time manually using the
 #    appropriate identity (such as "anonymous").  Once logged in successfully,
