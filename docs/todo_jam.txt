@@ -7,6 +7,15 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
+[H] We need a rule for making platform-specific shared libraries which are not
+    CS plugins. This is needed, for instance, by the pythmod, perl5mod, and
+    javamod targets which create pure scripting extension modules (shared
+    libraries). It might be possible to hijack the existing Plugin rule to do
+    this, or it might make more sense to create a distinct rule. Presently,
+    these modules are created with a bunch of custom Jam code which involves
+    a lot of copy/paste, is difficult to maintain, and is fragile because it
+    relies upon internal knowledge of the Plugin rule and the low-level
+    platform-specific SystemFoo rules invoked by the Plugin rule.
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
 [H] msvcgen.jam: Provide rules to copy the generated files back to the source
