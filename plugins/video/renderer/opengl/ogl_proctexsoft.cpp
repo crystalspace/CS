@@ -380,6 +380,8 @@ void csOpenGLProcSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
     poly.mat_handle = (iMaterialHandle*) txts_vector->Get (idx)->soft_txt;
   g3d->DrawPolygonDebug (poly);
   poly.mat_handle = ogl_mat_handle;
+#else
+  (void) poly;
 #endif
 }
 
