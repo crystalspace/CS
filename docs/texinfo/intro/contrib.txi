@@ -22,6 +22,12 @@ project.  Contact him for any general and strategic questions as well as
 specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 3020 Veltem Beisem, @sc{belgium}.
 
+@c *********************************************************************
+@c Contributors have been added to the top of the list, well out of
+@c chronological order. For instance, VFS was patched before andyZ even
+@c wrote it, if the list is to be believed :). 
+@c *********************************************************************
+
 @item
 Keith Fulton (@email{keith@@paqrat.com})
 
