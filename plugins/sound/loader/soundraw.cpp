@@ -50,8 +50,8 @@ iSoundStream *csSoundDataRaw::CreateStream() {
 
 #define REPLACE_DATA(x) {                        \
   unsigned char* const p = (unsigned char*)Data; \
-  delete[] p;                                    \
   Data = x;                                      \
+  delete[] p;                                    \
 }
 
 void *ConvertBuffer8To16Bit(void *buf, unsigned long Num) {
