@@ -195,7 +195,7 @@ clean:
 ifneq (.,$(OUTDLL))
 	-$(RMDIR) $(OUTDLL)
 endif
-	-$(RM) $(wildcard *.txt) precalc.zip
+	-$(RM) $(wildcard *.txt)
 
 cleanlib:
 
