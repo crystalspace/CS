@@ -1544,7 +1544,6 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
   }
 }
 
-#ifdef CS_USE_NEW_RENDERER
 /*
 bool csGenmeshMeshObjectFactory::UpdateRenderBuffers ()
 {
@@ -1690,6 +1689,7 @@ void csGenmeshMeshObjectFactory::AnimControlUpdateColors ()
   }
 }
 
+#ifdef CS_USE_NEW_RENDERER
 void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
