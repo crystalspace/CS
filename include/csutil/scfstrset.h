@@ -38,6 +38,9 @@ public:
   csScfStringSet (uint32 size) : set(size)
   { SCF_CONSTRUCT_IBASE (NULL); }
 
+  /// Destructor.
+  virtual ~csScfStringSet() {}
+
   virtual csStringID Request (const char *s);
 
   virtual const char* Request (csStringID id);

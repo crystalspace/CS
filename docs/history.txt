@@ -7,6 +7,8 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett brought warning level in MSVC 7 project files down
           to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for
           both MSVC 6 and 7.
+	- Eric Sunshine eliminated compilation warning about non-virtual
+	  destructor in csScfStringSet.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
