@@ -98,13 +98,6 @@ private:
   static void* CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** polygon,
   	int num, void* data);
 
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to dump the frustrum (debugging).
-   */
-  static void* DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** polygon,
-  	int num, void* data);
-
 public:
   /**
    * Option variable: render portals?
@@ -247,17 +240,6 @@ public:
   csThing** GetVisibleThings (csLightView& lview, int& num_things);
 
   /**
-   * This is a debugging function that will show the outlines
-   * on all polygons that are hit by a light in this sector.
-   * It will draw perspective correct outlines so it is meant to
-   * be called with a camera transformation.
-   * @@@ THIS IS A DEBUGGING FUNCTION WHICH SHOULD PERHAPS NOT
-   * BE PART OF THE ENGINE!
-   */
-  void DumpFrustrum (csStatLight* l, csVector3* frustrum, int num_frustrum,
-  	csTransform& t);
-
-  /**
    * Cache the lightmaps for all polygons in this sector.
    * The lightmaps will be cached to the current level file
    * (if it is an archive) or else to 'precalc.zip'.
@@ -325,29 +307,6 @@ public:
 
   /// Version of shine_lights() which only affects one thing.
   void ShineLights (csThing* th);
-
-  /**
-   * Follow a beam of light starting in this sector at 'start' and
-   * ending on the given 'poly' at 'end'. Return true if the polygon
-   * is actually reached and also return the squared distance in 'sqdist'
-   * where the beam of light hits with the polygon.
-   */
-  bool HitBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist);
-
-  /**
-   * Follow a beam of light with a given start and end point and return
-   * the first polygon that is hit. Also return the squared distance of the
-   * path that was followed to get at the polygon (this correctly takes care
-   * of mirroring portals and other warping portals).
-   */
-  csPolygon3D* FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist);
-
-private:
-  /**
-   * BSP function used by follow_beam which does the actual work.
-   */
-  static void* BeamPolygons (csPolygonParentInt*, csPolygonInt** polygon,
-  	int num, void* data);
 
   CSOBJTYPE;
 };

@@ -31,7 +31,6 @@
 #include "csengine/world.h"
 #include "csengine/halo.h"
 #include "csengine/stats.h"
-#include "csengine/wirefrm.h"
 #include "csgeom/bsp.h"
 #include "csobject/nameobj.h"
 #include "ihalo.h"
@@ -297,7 +296,12 @@ void csSector::Draw (csRenderView& rview)
   Stats::polygons_considered += num_polygon;
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
-  if (HasFog ())
+
+  if (rview.callback)
+  {
+    rview.callback (&rview, CALLBACK_SECTOR, (void*)this);
+  }
+  else if (HasFog ())
   {
     rview.g3d->OpenFogObject (GetID (), &GetFog ());
     rview.g3d->GetFogMode (fogmethod);
@@ -346,7 +350,7 @@ void csSector::Draw (csRenderView& rview)
       // Z-buffer and put all foggy csThings in the sort_list.
       while (sp)
       {
-        if (!sp->IsMerged ())
+        if (!sp->IsMerged () && sp != static_thing)
           if (sp->GetFog ().enabled) sort_list[sort_idx++] = sp;
           else sp->Draw (rview);
         sp = (csThing*)(sp->GetNext ());
@@ -409,7 +413,7 @@ void csSector::Draw (csRenderView& rview)
 
   // queue all halos in this sector to be drawn.
   IHaloRasterizer* piHR = csWorld::current_world->GetHaloRastizer ();
-  if (piHR)
+  if (!rview.callback && piHR)
   {
     int numlights = lights.Length();
     
@@ -452,7 +456,7 @@ void csSector::Draw (csRenderView& rview)
     }
   }
 
-  if (HasFog ())
+  if (!rview.callback && HasFog ())
   {
     G3DPolygonAFP g3dpoly;
     int i;
@@ -550,67 +554,6 @@ void csSector::Draw (csRenderView& rview)
       CHK (delete [] clipper);
       GetFog().density = real_fog_density;
       rview.g3d->CloseFogObject (GetID ());
-    }
-  }
-
-  //@@@ Map display is application specific!
-  csWireFrame* wf = NULL;
-  if (csWorld::current_world->map_mode != MAP_OFF)
-  {
-    wf = csWorld::current_world->wf->GetWireframe ();
-    int i;
-    for (i = 0 ; i < lights.Length () ; i++)
-    {
-      csWfVertex* vt = wf->AddVertex (((csStatLight*)lights[i])->GetCenter ());
-      vt->SetColor (wf->GetRed ());
-    }
-  }
-
-  long do_edges;
-  rview.g3d->GetRenderState(G3DRENDERSTATE_EDGESENABLE, do_edges);
-
-  if (do_edges)
-  {
-    extern bool do_coord_check;
-//  extern Vector2 coord_check_vector;
-    int i;
-    csVector3 v;
-    float iz;
-    int px, py, r;
-    ITextureManager* txtmgr;
-    rview.g3d->GetTextureManager (&txtmgr);
-    int red, white;
-    txtmgr->FindRGB (255, 255, 255, white);
-    txtmgr->FindRGB (255, 0, 0, red);
-    for (i = 0 ; i < lights.Length () ; i++)
-    {
-      v = rview.Other2This (((csStatLight*)lights[i])->GetCenter ());
-      if (v.z > SMALL_Z)
-      {
-        iz = rview.aspect/v.z;
-        px = QInt (v.x * iz + csWorld::shift_x);
-        py = csWorld::frame_height - 1 - QInt (v.y * iz + csWorld::shift_y);
-        r = QInt (.3 * iz);
-        if (do_coord_check)
-        {
-     // DAN: Commented out this code for now, until we decide
-     // where to put light selection. 10.05.98
-/*        if (ABS (coord_check_vector.x - px) < 5 && ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
-          {
-            rview.g3d->selected_light = lights[i];
-            CsPrintf (MSG_CONSOLE, "Selected light %s/(%f,%f,%f).\n", 
-                      csNameObject::GetName(*this), lights[i]->GetCenter ().x, 
-                      lights[i]->GetCenter ().y, lights[i]->GetCenter ().z);
-            CsPrintf (MSG_DEBUG_0, "Selected light %s/(%f,%f,%f).\n", 
-                      csNameObject::GetName(*this), lights[i]->GetCenter ().x,
-                      lights[i]->GetCenter ().y, lights[i]->GetCenter ().z);
-          }*/
-        }
-        rview.g2d->DrawLine (px-r, py-r, px+r, py+r, white);
-        rview.g2d->DrawLine (px+r, py-r, px-r, py+r, white);
-        rview.g2d->DrawLine (px, py-2, px, py+2, red);
-        rview.g2d->DrawLine (px+2, py, px-2, py, red);
-      }
     }
   }
 
@@ -809,106 +752,6 @@ void csSector::CalculateLighting (csLightView& lview)
   draw_busy--;
 }
 
-#if 0
-struct SectorShineInfo
-{
-  csStatLight* light;
-  csVector3 center;     // The center of the light (possibly warped)
-  bool mirror;          // If everything is mirrored.
-  csVector3* frustrum;  // A (possibly warped) view frustrum for the light.
-  int num_frustrum;
-  // These two are only used for dump_frustrum
-  csTransform *trans;
-  IGraphics3D* g3d;
-};
-#endif
-
-void* csSector::DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** /*polygon*/, 
-                                      int /*num*/, void* /*data*/)
-{
-#if 0
-  csPolygon3D* p;
-  csPortal* po;
-  SectorShineInfo* d = (SectorShineInfo*)data;
-  int i;
-  ITextureManager* txtmgr;
-  d->g3d->GetTextureManager (&txtmgr);
-  int red, white;
-  txtmgr->FindRGB (255, 255, 255, white);
-  txtmgr->FindRGB (255, 0, 0, red);
-
-  for (i = 0 ; i < num ; i++)
-  {
-    p = (csPolygon3D*)polygon[i];
-    csVector3* new_frustrum = NULL;
-    int new_num_frustrum = 0;
-    if (p->ClipFrustrum (d->light->GetCenter (), d->frustrum, d->num_frustrum, false/*@@@unsupported*/,
-        &new_frustrum, &new_num_frustrum))
-    {
-      int j;
-      csVector3 light_cam;
-      csVector3 v0, v1, v2;
-      light_cam = d->trans->Other2This (d->light->GetCenter ());
-
-      for (j = 0 ; j < new_num_frustrum ; j++)
-      {
-        v0 = new_frustrum[j] + d->light->GetCenter ();
-        v1 = d->trans->Other2This (v0);
-        v0 = new_frustrum[(j+1)%new_num_frustrum] + d->light->GetCenter ();
-        v2 = d->trans->Other2This (v0);
-        d->g3d->DrawLine (light_cam, v1, csCamera::aspect, red);
-        d->g3d->DrawLine (light_cam, v2, csCamera::aspect, red);
-        d->g3d->DrawLine (v1, v2, csCamera::aspect, white);
-      }
-
-      po = p->GetPortal ();
-      if (po)
-      {
-        po->dump_frustrum (d->light, new_frustrum, new_num_frustrum, *(d->trans));
-      }
-      if (new_frustrum) CHKB (delete [] new_frustrum);
-    }
-  }
-#endif
-  return NULL;
-}
-
-void csSector::DumpFrustrum (csStatLight* /*l*/, csVector3* /*frustrum*/, int /*num_frustrum*/,
-        csTransform& /*t*/)
-{
-//@@@ Maybe move to application?
-#if 0
-  if (draw_busy) return;
-
-  draw_busy++;
-  csVector3* old = NewTransformation ();
-
-  TranslateVector (l->get_center ());
-
-  SectorShineInfo sh;
-  sh.light = l;
-  sh.frustrum = frustrum;
-  sh.num_frustrum = num_frustrum;
-  sh.trans = &t;
-  sh.g3d = @@@;
-
-  if (bsp)
-    bsp->Back2Front (l->get_center (), &DumpFrustrumPolygons, (void*)&sh);
-  else
-    DumpFrustrumPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&sh);
-
-  csThing* sp = first_thing;
-  while (sp)
-  {
-    sp->dump_frustrum (l, frustrum, num_frustrum, t);
-    sp = (csThing*)(sp->GetNext ());
-  }
-
-  RestoreTransformation (old);
-  draw_busy--;
-#endif
-}
-
 void csSector::InitLightmaps (bool do_cache)
 {
   int i;
@@ -947,145 +790,6 @@ csThing* csSector::GetThing (const char* name)
     s = (csThing*)(s->GetNext ());
   }
   return NULL;
-}
-
-//---------------------------------------------------------------------------
-// Everything needed for the precomputation of the lighting.
-//---------------------------------------------------------------------------
-
-struct BeamInfo
-{
-  csVector3 start;
-  csVector3 end;
-  csPolygon3D* poly;
-  float sqdist;
-};
-
-void* csSector::BeamPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
-{
-  BeamInfo* d = (BeamInfo*)data;
-  int i;
-  void* rc;
-  csPortal* po;
-  csPolygon3D* p;
-
-  for (i = 0 ; i < num ; i++)
-  {
-    p = (csPolygon3D*)polygon[i];
-    if (p->IntersectRay (d->start, d->end))
-    {
-      po = p->GetPortal ();
-      rc = NULL;
-      if (po && p != d->poly)
-        return po->FollowBeam (d->start, d->end, d->poly, &d->sqdist);
-      else
-      {
-        csVector3 isect;
-        p->GetPlane ()->IntersectSegment (d->start, d->end, isect, NULL);
-        d->sqdist = csSquaredDist::PointPoint (isect, d->start);
-        return (void*)p;
-      }
-    }
-  }
-  return NULL;
-}
-
-csPolygon3D* csSector::FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly,
-                                float* sqdist)
-{
-  BeamInfo beam;
-  beam.start = start;
-  beam.end = end;
-  beam.poly = poly;
-
-  beam_busy++;
-  csPolygon3D* p;
-  visited++;
-  if (bsp) p = (csPolygon3D*)bsp->Front2Back (start, &BeamPolygons, (void*)&beam);
-  else p = (csPolygon3D*)BeamPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&beam);
-  if (!p) visited--;
-  beam_busy--;
-
-  // Check all the things.
-  csPolygon3D* p2;
-  float sqdist2;
-  csVector3 isect2;
-  csThing* sp = first_thing;
-  while (sp)
-  {
-    p2 = sp->IntersectSegment (start, end, isect2);
-    if (p2)
-    {
-      sqdist2 = csSquaredDist::PointPoint (isect2, start);
-      if (!p || sqdist2 < beam.sqdist)
-      {
-        p = p2;
-        beam.sqdist = sqdist2;
-      }
-    }
-    sp = (csThing*)(sp->GetNext ());
-  }
-
-  if (sqdist) *sqdist = beam.sqdist;
-  return p;
-}
-
-
-// hit_beam is called by csPolyTexture::shine with 'start' equal to
-// the original world space start of the light and 'end' the corresponding
-// world space coordinate of the end of the light beam. This 'end' point
-// does not necessarily correspond with the point on the polygon.
-
-bool csSector::HitBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist)
-{
-  // First we set visited to 0 in the sector of the polygon we are
-  // looking for. 'follow_beam' will increase visited by 1 for all sectors
-  // that the beam passed to get to the specific polygon.
-  poly->GetSector ()->visited = 0;
-
-  csPolygon3D* p = FollowBeam (start, end, poly, sqdist);
-
-  if (!p) return false;
-
-  if (p->SamePlane (poly))
-  {
-    // If we have the same plane then we have a hit.
-    return true;
-  }
-
-  // exp_sqdist is what we would expect the distance to our polygon
-  // to be if we have a hit.
-  float exp_sqdist = csSquaredDist::PointPoint (start, end);
-  
-  if (!poly->GetSector ()->bsp && poly->GetSector () == p->GetSector () &&
-        (csPolygonSet*)(p->GetParent ()) == (csPolygonSet*)(p->GetSector ()))
-  {
-    // If the polygon that is hit is a member of the same sector as
-    // our sector, and if the sector does NOT use a bsp (it is convex),
-    // and if the polygon that is hit does not belong to a csThing, then
-    // we also consider it a hit. This takes care of misses where the
-    // miss is just on an adjacent polygon.
-    *sqdist = exp_sqdist;
-    return true;
-  }
-
-  if (*sqdist > exp_sqdist && poly->GetSector ()->visited)
-  {
-    // We have missed this polygon and got a hit on some polygon that is
-    // further away than this one. Since the original purpose of
-    // this routine is to aim a beam of light at the polygon, we can't
-    // really miss. So we assume it is a hit (easy, isn't it :-)
-    // To make sure this test really works in all cases we also check
-    // that the portal of our polygon is at least visited by the
-    // beam.
-    *sqdist = exp_sqdist;
-    return true;
-  }
-
-  // The only case that is not fixed is similar to the last case but
-  // for sectors that do use a BSP. Here we can't just use the same test.
-
-  return false;
 }
 
 void csSector::ShineLights ()
