@@ -1031,3 +1031,50 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     delete[] Orig;
   }
 }
+
+void csModelDataTools::BuildVertexArray (
+	iModelDataPolygon* poly,
+	csIntArray* SpriteVertices,
+	csIntArray* SpriteNormals,
+	csIntArray* SpriteColors,
+	csIntArray* SpriteTexels,
+	csIntArray* PolyVertices)
+{
+  // build the vertex array
+  PolyVertices->SetLength (0);
+  int i, j;
+  for (i=0; i<poly->GetVertexCount (); i++)
+  {
+    int SpriteVertexIndex = -1;
+    int PolyVertex = poly->GetVertex (i);
+    int PolyNormal = poly->GetNormal (i);
+    int PolyColor = poly->GetColor (i);
+    int PolyTexel = poly->GetTexel (i);
+
+    for (j=0; j<SpriteVertices->Length (); j++)
+    {
+      int SpriteVertex = SpriteVertices ? SpriteVertices->Get (j) : PolyVertex;
+      int SpriteNormal = SpriteNormals ? SpriteNormals->Get (j) : PolyNormal;
+      int SpriteColor = SpriteColors ? SpriteColors->Get (j) : PolyColor;
+      int SpriteTexel = SpriteTexels ? SpriteTexels->Get (j) : PolyTexel;
+
+      if (SpriteVertex == PolyVertex &&
+	  SpriteNormal == PolyNormal &&
+	  SpriteColor == PolyColor &&
+	  SpriteTexel == PolyTexel)
+      {
+	SpriteVertexIndex = j;
+	break;
+      }
+    }
+    if (SpriteVertexIndex == -1)
+    {
+      SpriteVertexIndex = SpriteVertices->Length ();
+      if (SpriteTexels) SpriteTexels->Push (PolyTexel);
+      if (SpriteNormals) SpriteNormals->Push (PolyNormal);
+      if (SpriteColors) SpriteColors->Push (PolyColor);
+      if (SpriteVertices) SpriteVertices->Push (PolyVertex);
+    }
+    PolyVertices->Push (SpriteVertexIndex);
+  }
+}

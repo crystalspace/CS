@@ -20,9 +20,11 @@
 #define __MDLTOOL_H__
 
 class csString;
+class csIntArray;
 struct iObject;
 struct iModelData;
 struct iModelDataObject;
+struct iModelDataPolygon;
 
 struct csModelDataVertexMap
 {
@@ -83,6 +85,31 @@ struct csModelDataTools
    */
   static void CompressVertices (iModelData *Scene);
 
+  /**
+   * This functions helps to build structures that use a single index per
+   * vertex for position, normal, color and texel instead of one index for
+   * each list. CS's 3d sprites are an example for this. <p>
+   *
+   * The 'poly' parameter is expected to be a valid polygon. The Sprite...
+   * lists should contain the (so far known) mapping of new indices to old
+   * indices. In other words, these lists are adressed with the 'single index'
+   * from the 3d sprite and return the 'multiple indices' used in the model
+   * data components. In the process of converting several polygons with this
+   * function, you should pass the same lists again and again. The lists will
+   * (probably) be empty for the first polygon and be filled a bit more for
+   * each polygon. Finally, after converting all polygons, the lists can be
+   * used to convert the vertex frames. Finally, the 'PolyVertices' parameter
+   * should be an empty list that will be filled with the 'single indices'. <p>
+   *
+   * You can omit those lists you do not need. For example, if you don't care
+   * about vertex colors, pass NULL for 'SpriteColors'. This has the effect that
+   * (obviously) you don't get a list of mapped vertex colors. It also tells
+   * this function that vertices with different colors may be merged.
+   */
+  static void BuildVertexArray (iModelDataPolygon* poly,
+	csIntArray* SpriteVertices, csIntArray* SpriteNormals,
+	csIntArray* SpriteColors, csIntArray* SpriteTexels,
+	csIntArray* PolyVertices);
 };
 
 #endif // __MDLTOOL_H__

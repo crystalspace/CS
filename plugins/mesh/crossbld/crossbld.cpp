@@ -1,10 +1,24 @@
+/*
+    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #include "cssysdef.h"
-#include "csutil/csobject.h"
-#include "csutil/typedvec.h"
-#include "csutil/objiter.h"
-#include "csgeom/transfrm.h"
 #include "isys/plugin.h"
+#include "iutil/object.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdldata.h"
 #include "imesh/thing/thing.h"
@@ -13,12 +27,13 @@
 #include "imesh/object.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
+#include "cstool/sprbuild.h"
+#include "csgeom/transfrm.h"
+#include "csutil/objiter.h"
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
 SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
-SCF_DECLARE_FAST_INTERFACE (iModelDataAction);
-SCF_DECLARE_FAST_INTERFACE (iModelDataVertices);
 SCF_DECLARE_FAST_INTERFACE (iSprite3DFactoryState);
+SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
 
 CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
 
@@ -129,226 +144,11 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
   return true;
 }
 
-CS_DECLARE_TYPED_VECTOR_NODELETE (csModelFrameVector, iModelDataVertices);
-CS_DECLARE_TYPED_VECTOR_NODELETE (csSpriteFrameVector, iSpriteFrame);
-CS_TYPEDEF_GROWING_ARRAY (csIntArray, int);
-
-static void BuildVertexArray (iModelDataPolygon* poly,
-	csIntArray& SpriteVertices,
-	csIntArray& SpriteNormals,
-	csIntArray& SpriteTexels,
-	csIntArray& PolyVertices)
-{
-  // build the vertex array
-  PolyVertices.SetLength (0);
-  int i, j;
-  for (i=0; i<poly->GetVertexCount (); i++)
-  {
-    int SpriteVertexIndex = -1;
-    int PolyVertex = poly->GetVertex (i);
-    int PolyNormal = poly->GetNormal (i);
-    int PolyTexel = poly->GetTexel (i);
-
-    for (j=0; j<SpriteVertices.Length (); j++)
-    {
-      int SpriteVertex = SpriteVertices [j];
-      int SpriteNormal = SpriteNormals [j];
-      int SpriteTexel = SpriteTexels [j];
-
-      if (SpriteVertex == PolyVertex &&
-	  SpriteNormal == PolyNormal &&
-	  SpriteTexel == PolyTexel)
-      {
-	SpriteVertexIndex = j;
-	break;
-      }
-    }
-    if (SpriteVertexIndex == -1)
-    {
-      SpriteVertexIndex = SpriteVertices.Length ();
-      SpriteTexels.Push (PolyTexel);
-      SpriteNormals.Push (PolyNormal);
-      SpriteVertices.Push (PolyVertex);
-    }
-    PolyVertices.Push (SpriteVertexIndex);
-  }
-}
-
 bool csCrossBuilder::BuildSpriteFactory (iModelDataObject *Object,
 	iSprite3DFactoryState *tgt) const
 {
-  int i,j;
-  iObjectIterator *it1;
-  iMaterialWrapper *Material = NULL;
-
-  //--- preparation stage: arrange and validate incoming data locally --------
-
-  // build a list of all frames and merge duplicate frames
-  csModelFrameVector Frames;
-
-  it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
-  {
-    iModelDataAction *ac = SCF_QUERY_INTERFACE_FAST (it1->GetObject (),
-    	iModelDataAction);
-    if (ac)
-    {
-      for (i=0; i<ac->GetFrameCount (); i++)
-      {
-        iModelDataVertices *ver =
-	  SCF_QUERY_INTERFACE_FAST (ac->GetState (i), iModelDataVertices);
-        if (ver)
-	{
-	  if (Frames.Find (ver) == -1)
-	    Frames.Push (ver);
-	  ver->DecRef ();
-	}
-      }
-      ac->DecRef ();
-    }
-    it1->Next ();
-  }
-  it1->DecRef ();
-
-  // we need at least one vertex frame
-  if (Frames.Length () == 0)
-  {
-    iModelDataVertices *BaseVertices = Object->GetDefaultVertices ();
-    if (!BaseVertices) return false;
-    Frames.Push (BaseVertices);
-  }
-
-  //--- building stage -------------------------------------------------------
-
-  /* These lists are filled up with (sprite vertex) to (model data vertex),
-   * (model data normal) and (model data texel) mappings. This means that
-   * they are indexed by the sprite vertex and must be of the same size.
-   */
-  csIntArray SpriteVertices;
-  csIntArray SpriteNormals;
-  csIntArray SpriteTexels;
-
-  // copy polygon data (split polygons into triangles)
-  it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
-  {
-    iModelDataPolygon *poly =
-      SCF_QUERY_INTERFACE_FAST (it1->GetObject (), iModelDataPolygon);
-    if (poly)
-    {
-      // build the vertex array
-      csIntArray PolyVertices;
-      BuildVertexArray (poly,
-	SpriteVertices, SpriteNormals, SpriteTexels, PolyVertices);
-
-      // split the polygon into triangles and copy them
-      for (i=2; i<PolyVertices.Length (); i++)
-        tgt->AddTriangle (PolyVertices[0], PolyVertices[i-1], PolyVertices[i]);
-      
-      // store the material if we don't have any yet
-      if (!Material && poly->GetMaterial ())
-        Material = poly->GetMaterial ()->GetMaterialWrapper ();
-
-      poly->DecRef ();
-    }
-    it1->Next ();
-  }
-  it1->DecRef ();
-
-  // copy the first valid material
-  if (Material) tgt->SetMaterialWrapper (Material);
-
-  /* create all frames in the target factory. This is done separately because
-   * adding the vertices fails if no frames exist.
-   */
-  int NumPreviousFrames = tgt->GetFrameCount ();
-  for (i=0; i<Frames.Length (); i++)
-    tgt->AddFrame ();
-
-  // create room for the vertices in the sprite
-  tgt->AddVertices (SpriteVertices.Length ());
-
-  // create all frames in the target factory
-  bool NeedTiling = false;
-  for (i=0; i<Frames.Length (); i++)
-  {
-    int FrameIndex = NumPreviousFrames + i;
-    iSpriteFrame *SpriteFrame = tgt->GetFrame (FrameIndex);
-    iModelDataVertices *Vertices = Frames.Get (i);
-    SpriteFrame->SetName (Vertices->QueryObject ()->GetName ());
-
-    for (j=0; j<SpriteVertices.Length (); j++)
-    {
-      tgt->SetVertex (FrameIndex, j, Vertices->GetVertex (SpriteVertices [j]));
-      tgt->SetNormal (FrameIndex, j, Vertices->GetNormal (SpriteNormals [j]));
-
-      csVector2 t = Vertices->GetTexel (SpriteTexels [j]);
-      tgt->SetTexel (FrameIndex, j, t);
-      if (t.x < 0 || t.y < 0 || t.x > 1 || t.y > 1)
-        NeedTiling = true;
-    }
-  }
-
-  // enable texture tiling if required
-  if (NeedTiling)
-    tgt->SetMixMode (tgt->GetMixMode () | CS_FX_TILING);
-
-  /* Create all actions in the target factory. We also build a default
-   * action (named 'default') if no action with this name exists. The
-   * default action shows the first frame all the time. 
-   */
-  bool FoundDefault = false;
-
-  it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
-  {
-    iModelDataAction *ac = SCF_QUERY_INTERFACE_FAST (it1->GetObject (), iModelDataAction);
-    if (ac)
-    {
-      iSpriteAction *spract = tgt->AddAction ();
-      const char *name = ac->QueryObject ()->GetName ();
-      if (name)
-      {
-        spract->SetName (name);
-        if (!strcmp (name, "default"))
-	  FoundDefault = true;
-      }
-
-      float LastTime = 0;
-      for (i=0; i<ac->GetFrameCount (); i++)
-      {
-        /* It might seem strange to store the nth frame time value with the
-	 * (n-1)th frame state. This difference is due to the different
-	 * meaning of the time values in the model data structures and
-	 * in 3d sprites.
-	 */
-        int FrameIndex = (i == 0) ? (ac->GetFrameCount ()-1) : (i-1);
-        iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (
-		ac->GetState (FrameIndex), iModelDataVertices);
-	if (ver)
-	{
-	  float ThisTime = ac->GetTime (i);
-	  float Delay = ThisTime - LastTime;
-  	  LastTime = ThisTime;
-
-	  int FrameIndex = Frames.Find (ver);
-	  CS_ASSERT (FrameIndex != -1);
-	  spract->AddFrame (tgt->GetFrame (FrameIndex), int(Delay * 1000));
-	}
-      }
-    }
-    it1->Next ();
-  }
-  it1->DecRef ();
-
-  if (!FoundDefault)
-  {
-    iSpriteAction *spract = tgt->AddAction ();
-    spract->SetName ("default");
-    spract->AddFrame (tgt->GetFrame (0), 1000);
-  }
-
-  return true;
+  csSpriteBuilderMesh SpriteBuilder;
+  return SpriteBuilder.Build (Object, tgt);
 }
 
 iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
