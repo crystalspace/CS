@@ -794,7 +794,7 @@ void csGLTextureHandle::Precache ()
 
 void csGLTextureHandle::SetTextureClass (const char* className)
 {
-  textureClass = txtmgr->GetTextureClassID (className);
+  textureClass = className ? txtmgr->GetTextureClassID (className) : 0;
 }
 
 const char* csGLTextureHandle::GetTextureClass ()

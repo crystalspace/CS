@@ -193,6 +193,42 @@ void csGLGraphics3D::CreateInterleavedRenderBuffers (size_t size,
 
 //-----------------------------------------------------------------
 
+void csGLVBOBufferManager::ParseByteSize (const char* sizeStr, size_t& size)
+{
+  const char* end = sizeStr + strspn (sizeStr, "0123456789"); 	 
+  size_t sizeFactor = 1; 	 
+  if ((*end == 'k') || (*end == 'K')) 	 
+    sizeFactor = 1024; 	 
+  else if ((*end == 'm') || (*end == 'M')) 	 
+    sizeFactor = 1024*1024; 	 
+  else 	 
+  { 	 
+    Report (CS_REPORTER_SEVERITY_WARNING, 	 
+      "Unknown suffix '%s' in maximum buffer size '%s'.", end, sizeStr); 	 
+    sizeFactor = 0; 	 
+  } 	 
+  if (sizeFactor != 0) 	 
+  { 	 
+    if (sscanf (sizeStr, "%d", &size) != 0) 	 
+      size *= sizeFactor; 	 
+    else 	 
+      Report (CS_REPORTER_SEVERITY_WARNING, 	 
+        "Invalid buffer size '%s'.", sizeStr); 	 
+  }
+}
+
+static csString ByteFormat (size_t size)
+{
+  csString str;
+  if (size >= 1024*1024)
+    str.Format ("%d MB", size / (1024*1024));
+  else if (size >= 1024)
+    str.Format ("%d KB", size / (1024));
+  else
+    str.Format ("%d Byte", size);
+  return str;
+}
+
 csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext
                                             , csGLStateCache *state,
                                             iObjectRegistry* p)
@@ -213,12 +249,14 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext
   }
   if (!verbose) bugplug = 0; 
 
-  // get sizes
-  size_t vbSize = config->GetInt ("Video.OpenGL.VBO.VBsize", 8*1024*1024);
-  size_t ibSize = config->GetInt ("Video.OpenGL.VBO.IBsize", 8*1024*1024);
+  size_t vbSize = 8*1024*1024;
+  ParseByteSize (config->GetStr ("Video.OpenGL.VBO.VBsize", "8m"), vbSize);
+  size_t ibSize = 8*1024*1024;
+  ParseByteSize (config->GetStr ("Video.OpenGL.VBO.IBsize", "8m"), ibSize);
 
-  if (verbose) Report (CS_REPORTER_SEVERITY_NOTIFY, "Setting up VBO buffers, VB: %d MB IB: %d MB",
-    vbSize/(1024*1024), ibSize/(1024*1024));
+  if (verbose) Report (CS_REPORTER_SEVERITY_NOTIFY, 
+    "Setting up VBO buffers, VB: %s IB: %s",
+    ByteFormat (vbSize), ByteFormat (ibSize));
 
   vertexBuffer.Setup (GL_ARRAY_BUFFER_ARB, vbSize, ext);
   indexBuffer.Setup (GL_ELEMENT_ARRAY_BUFFER_ARB, ibSize, ext);

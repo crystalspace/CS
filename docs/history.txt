@@ -19,6 +19,10 @@ chronological order.
 	  compressed textures, as opposed to the previous way were the image
 	  was uncompressed and later recompressed by the GL driver.
 	- res added csGetBigEndianLong() and relatives.
+	- res fixed csTextureWrapper to properly propagate the texture class to
+	  the texture handle.
+	- res allowed some slightly friendlier specification of the VBO buffer
+	  sizes.
 26-Jan-2005
 	- Eric Sunshine fixed more boundary-condition bugs in csMouseDriver and
 	  csJoystickDriver.

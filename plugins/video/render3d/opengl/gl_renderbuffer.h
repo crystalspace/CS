@@ -234,7 +234,7 @@ protected:
 };
 
 /**
- * Single slot in a VBO buffer. Holds content of precisly 0 or 1 renderbuffers.
+ * Single slot in a VBO buffer. Holds content of precisely 0 or 1 renderbuffers.
  */
 struct csGLVBOBufferSlot
 {
@@ -456,6 +456,8 @@ protected:
 
   csGLVBOBuffer vertexBuffer; //list of all VBO buffers for VB storage
   csGLVBOBuffer indexBuffer; //list of all VBO buffers for IB storage
+
+  void ParseByteSize (const char* sizeStr, size_t& size);
 
   void Report (int severity, const char* msg, ...)
   {

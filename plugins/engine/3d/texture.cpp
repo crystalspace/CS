@@ -178,7 +178,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   {
     DG_LINK (this, handle);
     SetKeyColor (key_col_r, key_col_g, key_col_b);
-    if (texClass) handle->SetTextureClass (texClass);
+    handle->SetTextureClass (texClass);
   }
   //delete[] texClass; texClass = 0; 
     // @@@SAVE: Maybe needed for saving. But really, clean if not needed!
@@ -191,6 +191,7 @@ void csTextureWrapper::SetTextureClass (const char* className)
 {
   delete[] texClass;
   texClass = csStrNew (className);
+  if (handle) handle->SetTextureClass (texClass);
 }
 
 const char* csTextureWrapper::GetTextureClass ()
