@@ -32,7 +32,6 @@ CSPARSER.LIB = $(OUT)$(LIB_PREFIX)csparser$(LIB_SUFFIX)
 INC.CSPARSER = $(wildcard libs/csparser/*.h include/csparser/*.h)
 SRC.CSPARSER = $(wildcard libs/csparser/*.cpp libs/csparser/impexp/*.cpp)
 OBJ.CSPARSER = $(addprefix $(OUT),$(notdir $(SRC.CSPARSER:.cpp=$O)))
-CFLAGS.CSPARSER = -Ilibs/csterr
 
 TO_INSTALL.STATIC_LIBS += $(CSPARSER.LIB)
 
@@ -52,7 +51,7 @@ csparser: $(OUTDIRS) $(CSPARSER.LIB)
 clean: csparserclean
 
 $(OUT)csloader$O: libs/csparser/csloader.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.CSPARSER)
+	$(DO.COMPILE.CPP)
 
 $(CSPARSER.LIB): $(OBJ.CSPARSER)
 	$(DO.LIBRARY)
@@ -63,7 +62,7 @@ csparserclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)csparser.dep
 $(OUTOS)csparser.dep: $(SRC.CSPARSER)
-	$(DO.DEP1) $(CFLAGS.CSPARSER) $(DO.DEP2)
+	$(DO.DEP)
 else
 -include $(OUTOS)csparser.dep
 endif

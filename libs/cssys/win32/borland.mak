@@ -63,7 +63,7 @@ CFLAGS.@ = -o$@
 LFLAGS.@ = -e$@
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=$(CFLAGS.I)include/cssys/win32 $(CFLAGS.I)libs/csterr
+CFLAGS.INCLUDE=$(CFLAGS.I)include/cssys/win32
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-w-8027 $(CFLAGS.D)WIN32_VOLATILE -q -x- $(CFLAGS.SYSTEM)

@@ -19,6 +19,8 @@ The history order has been reversed so that new features are at the top.
 	  and which is default adds itself to 'softcanvas' target.
 	  'make walkall' then depends on 'softcanvas' target as well.
 	- Fixed a 'delete[]' vs 'delete' bug in md2 loader.
+	- Eric Sunshine removed all remaining `csterr' library references from
+	  the project.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:
