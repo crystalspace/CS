@@ -135,10 +135,10 @@ ifndef DO.DEP
 endif
 
 # Directories for output files
-OUTDIRS=$(OUTBASE) $(OUTOS) $(OUTPROC) $(OUT) $(OUTDLL)
+OUTDIRS = $(OUTBASE) $(OUTOS) $(OUTPROC) $(OUT) $(OUTDLL)
 
 # The following include should make additional defines using above variables
-MAKESECTION=postdefines
+MAKESECTION = postdefines
 include mk/subs.mak
 
 # Now remove duplicate include dirs and duplicate libraries
@@ -202,7 +202,6 @@ MAKESECTION=targets
 include mk/subs.mak
 
 ifdef DO_DEPEND
-# GNU Make considers target makefiles in backward direction,
-# so the following targets will be considered first (and remade)
--include $(OUTOS) $(OUTBASE)
+-include not_exists.mak
+not_exists.mak: $(OUTBASE) $(OUTOS)
 endif

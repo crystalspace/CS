@@ -67,4 +67,3 @@ USE_MESA=1
 # 1.0.3a is the latest pre 1.1.0 egcs which does not have this bug. Versions after 1.1.3
 # may also be safe.
 BUGGY_EGCS_COMPILER=no
-
