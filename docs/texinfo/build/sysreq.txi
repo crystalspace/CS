@@ -46,7 +46,7 @@ of the current dependencies here. @xref{External Libraries}
 @table @emph
 @item The Netwide Assembler
 @sc{nasm} is used by Crystal Space on certain platforms for assembly language
-routines (@url{http://www.web-sites.co.uk/nasm/}).
+routines (@url{http://nasm.2y.net/}).
 
 @item @sc{ascii} Art Library
 aalib is used for 2D rendering in text mode.  Currently a modified version of
