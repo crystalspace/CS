@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 1-Feb-2005
+	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
+	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this
+	  fix can cause an extraordinary number of objects to be returned.
+	  Reverting this fix will cause those functions to work incorrectly
+	  in some weird space warping portal setups though.
 	- res added CAL3D as an external lib to viewmesh (in case Cal3d was
 	  detected). (bug #1113976)
 	- res added CS_HAS_CAL3D to the viewmesh MSVC CFlags.

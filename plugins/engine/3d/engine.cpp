@@ -2602,7 +2602,9 @@ void csEngine::GetNearbyObjectList (iSector* sector,
                     GetNearbyObjectList (portal->GetSector (), pos, radius,
 		    	list, visited_sectors);
 		  }
-		  visited_sectors.Pop ();
+		  // Uncommenting the below causes too many objects to be
+		  // returned in some cases.
+		  //visited_sectors.Pop ();
                 }
               }
             }
@@ -2719,7 +2721,9 @@ void csEngine::GetNearbyMeshList (iSector* sector,
                     GetNearbyMeshList (portal->GetSector (), pos, radius,
 		    	list, visited_sectors);
 		  }
-		  visited_sectors.Pop ();
+		  // Uncommenting the below causes too many objects to be
+		  // returned in some cases.
+		  //visited_sectors.Pop ();
                 }
               }
             }
