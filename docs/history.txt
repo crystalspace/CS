@@ -57,7 +57,7 @@ chronological order.
 	      the "verbatim" option) to invocations of the Description rule
 	      throughout the project.
 	    - Removed the "verbatim" option from the Help rule and changed the
-	      Help rule _always_ treat its argument as verbatim.
+	      Help rule to _always_ treat its argument as verbatim.
 	    - Eliminated the anomaly where Help was hard-coded to prepend
 	      "Build the" to the incoming text.
 	    - Augmented the Application, Library, Plugin, and ShellScript rules
