@@ -16,6 +16,8 @@ done
 cp $CURDIR/CS/data/mdltest/?o* $CURDIR/debian/tmp/usr/lib/crystalspace/data/mdltest
 
 [ ! -f $CURDIR/debian/tmp/usr/lib/crystalspace/data/config/csbumptest.cfg ] && \
+echo "Compensate missing csbumptest.cfg file" && \
 cp $CURDIR/CS/data/config/csbumptest.cfg $CURDIR/debian/tmp/usr/lib/crystalspace/data/config
 [ ! -f $CURDIR/debian/tmp/usr/lib/crystalspace/data/config/csdemo.cfg ] && \
+echo "Compensate missing csdemo.cfg file" && \
 cp $CURDIR/CS/data/config/csdemo.cfg $CURDIR/debian/tmp/usr/lib/crystalspace/data/config
