@@ -244,7 +244,8 @@ DO.SHARED.PLUGIN.CORE = \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
   $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
+    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) --driver-name=$(LINK) \
+    -mwindows
 #DO.SHARED.PLUGIN.CORE = \
 #  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
 #    $(L^) $(LIBS) $(LFLAGS) -mwindows
