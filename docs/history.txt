@@ -52,6 +52,9 @@ chronological order.
 	  on the new staticpos and staticshape flags.
 	- Jorrit added csBlockAllocator::Compact(). This function will remove
 	  all blocks that have no items.
+	- Jorrit renamed 'static_data' to 'static_poly' in the thing mesh
+	  object. This way it is less confusing because csThing also uses
+	  'static_data' to refer to the static thing.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.

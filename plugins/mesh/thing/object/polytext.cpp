@@ -91,13 +91,13 @@ csPolyTexture::~csPolyTexture ()
   delete shadow_bitmap;
   if (polygon && lm)
   {
-    polygon->static_data->thing_static->thing_type->blk_lightmap.Free (lm);
+    polygon->GetParent ()->GetStaticData ()->thing_type->blk_lightmap.Free (lm);
   }
 }
 
 iMaterialHandle *csPolyTexture::GetMaterialHandle ()
 {
-  return polygon->GetStaticData ()->GetMaterialHandle ();
+  return polygon->GetStaticPoly ()->GetMaterialHandle ();
 }
 
 void csPolyTexture::SetLightMap (csLightMap *lightmap)
@@ -227,8 +227,8 @@ static bool CanCastShadow (
    * the two polygons. These are the criteria we now use in this test.
    */
   if (FindSeparatingPlane (
-      shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (),
-      poly, poly->GetStaticData ()->GetVertexCount (),
+      shadow_poly, shadow_poly->GetStaticPoly ()->GetVertexCount (),
+      poly, poly->GetStaticPoly ()->GetVertexCount (),
       lightpos))
     return false;
 
@@ -236,9 +236,9 @@ static bool CanCastShadow (
   // we also try the reverse because that way we might give a good
   // result.
   if (FindSeparatingPlane (
-  poly, poly->GetStaticData ()->GetVertexCount (),
-  shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (),
-  lightpos))
+      poly, poly->GetStaticPoly ()->GetVertexCount (),
+      shadow_poly, shadow_poly->GetStaticPoly ()->GetVertexCount (),
+      lightpos))
     return false;
 
   return true;
@@ -261,7 +261,7 @@ void csPolyTexture::FillLightMap (
   csVector3 &lightpos = light_frustum->GetOrigin ();
   float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->static_data->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = polygon->static_poly->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -477,7 +477,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   float d;
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetStaticData()->GetMaterialHandle();
+  iMaterialHandle* mat_handle = polygon->GetStaticPoly()->GetMaterialHandle();
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
   float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
@@ -774,7 +774,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   CS_ASSERT (shadow_bitmap != 0);
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetStaticData()->GetMaterialHandle();
+  iMaterialHandle* mat_handle = polygon->GetStaticPoly()->GetMaterialHandle();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -1255,10 +1255,10 @@ void csShadowBitmap::UpdateLightMap (
       csVector3 normal = poly->GetPolyPlane().Normal ();
       if (poly->GetParent ()->GetStaticData ()->GetSmoothingFlag())
       {
-	int* vertexs = poly->GetStaticData ()->GetVertexIndices ();
+	int* vertexs = poly->GetStaticPoly ()->GetVertexIndices ();
 	csVector3* normals = poly->GetParent ()->GetStaticData ()
 	  ->GetNormals ();
-	int vCount = poly->GetStaticData ()->GetVertexCount ();
+	int vCount = poly->GetStaticPoly ()->GetVertexCount ();
 
 	csVector3* nearestNormals = new csVector3[vCount];
 	float *distances = new float[vCount];
@@ -1315,7 +1315,7 @@ void csShadowBitmap::UpdateLightMap (
 	  }
 	}
 
-	if (!poly->GetStaticData ()->PointOnPolygon (v))
+	if (!poly->GetStaticPoly ()->PointOnPolygon (v))
 	{
 	  normal = nearestNormals[nearestNormal];
 	}
@@ -1426,9 +1426,9 @@ bool csShadowBitmap::UpdateShadowMap (
       csVector3 normal = poly->GetPolyPlane().Normal ();
       if ( static_data->GetSmoothingFlag() )
       {
-  int* vertexs = poly->GetStaticData ()->GetVertexIndices ();
+  int* vertexs = poly->GetStaticPoly ()->GetVertexIndices ();
   csVector3* normals = static_data->GetNormals ();
-  int vCount = poly->GetStaticData ()->GetVertexCount ();
+  int vCount = poly->GetStaticPoly ()->GetVertexCount ();
   csSegment3* segments = new csSegment3[vCount];
 
   // int nearest;
@@ -1505,7 +1505,7 @@ bool csShadowBitmap::UpdateShadowMap (
       weights[act] = shortestDistance / distances[act];
   }
 
-  if (!poly->GetStaticData ()->PointOnPolygon (v))
+  if (!poly->GetStaticPoly ()->PointOnPolygon (v))
   {
     normal = nearestNormals[nearestNormal];
   }
@@ -1587,13 +1587,13 @@ void csLightingPolyTexQueue::UpdateMaps (
     csVector3 v_world2tex;
     if (mov->IsFullTransformIdentity ())
     {
-      pol->GetStaticData ()->MappingGetTextureSpace (m_world2tex, v_world2tex);
+      pol->GetStaticPoly ()->MappingGetTextureSpace (m_world2tex, v_world2tex);
     }
     else
     {
       csMatrix3 m_obj2tex;
       csVector3 v_obj2tex;
-      pol->GetStaticData ()->MappingGetTextureSpace (m_obj2tex, v_obj2tex);
+      pol->GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex, v_obj2tex);
       pt->ObjectToWorld (
 	m_obj2tex, v_obj2tex,
 	mov->GetFullTransform (),

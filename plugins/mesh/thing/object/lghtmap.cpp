@@ -203,7 +203,7 @@ const char* csLightMap::ReadFromCache (
   strcpy (pswanted.header, LMMAGIC);
   if (poly)
   {
-    csPolygon3DStatic* spoly = poly->GetStaticData ();
+    csPolygon3DStatic* spoly = poly->GetStaticPoly ();
     pswanted.x1 = float2short (spoly->Vobj (0).x);
     pswanted.y1 = float2short (spoly->Vobj (0).y);
     pswanted.z1 = float2short (spoly->Vobj (0).z);
@@ -400,7 +400,7 @@ void csLightMap::Cache (
   strcpy (ps.header, LMMAGIC);
   if (poly)
   {
-    csPolygon3DStatic* spoly = poly->GetStaticData ();
+    csPolygon3DStatic* spoly = poly->GetStaticPoly ();
     ps.x1 = convert_endian (float2short (spoly->Vobj (0).x));
     ps.y1 = convert_endian (float2short (spoly->Vobj (0).y));
     ps.z1 = convert_endian (float2short (spoly->Vobj (0).z));

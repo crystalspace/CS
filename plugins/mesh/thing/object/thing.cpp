@@ -1771,7 +1771,7 @@ void csThing::PreparePolygons ()
   {
     p = static_data->thing_type->blk_polygon3d.Alloc ();
     ps = static_data->static_polygons.Get (i);
-    p->SetStaticData (ps);
+    p->SetStaticPoly (ps);
     p->SetParent (this);
     polygons.Push (p);
     p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
@@ -2032,7 +2032,7 @@ void csThing::PreparePolygonBuffer ()
       verts.DeleteAll ();
 
       csPolygon3D *poly = litPolys[i]->polys[j];
-      csPolygon3DStatic *spoly = poly->GetStaticData ();
+      csPolygon3DStatic *spoly = poly->GetStaticPoly ();
       csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
 
       int v;
@@ -2061,7 +2061,7 @@ void csThing::PreparePolygonBuffer ()
       verts.DeleteAll ();
 
       csPolygon3D *poly = unlitPolys[i]->polys[j];
-      csPolygon3DStatic *spoly = poly->GetStaticData ();
+      csPolygon3DStatic *spoly = poly->GetStaticPoly ();
       csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
 
       int v;
@@ -2500,14 +2500,14 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
     {
       if (ident)
       {
-        poly->GetStaticData ()->MappingGetTextureSpace (m_world2tex,
+        poly->GetStaticPoly ()->MappingGetTextureSpace (m_world2tex,
 		v_world2tex);
       }
       else
       {
 	csMatrix3 m_obj2tex;
 	csVector3 v_obj2tex;
-        poly->GetStaticData ()->MappingGetTextureSpace (m_obj2tex,
+        poly->GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex,
 		v_obj2tex);
         csPolyTexture* lmi = poly->GetPolyTexture ();
         lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
@@ -2828,14 +2828,14 @@ void csThing::UpdateDirtyLMs ()
       csPolyTexture* lmi = poly->GetPolyTexture ();
       if (ident)
       {
-        poly->GetStaticData ()->MappingGetTextureSpace (m_world2tex,
+        poly->GetStaticPoly ()->MappingGetTextureSpace (m_world2tex,
 		v_world2tex);
       }
       else
       {
 	csMatrix3 m_obj2tex;
 	csVector3 v_obj2tex;
-        poly->GetStaticData ()->MappingGetTextureSpace (m_obj2tex,
+        poly->GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex,
 		v_obj2tex);
         csPolyTexture* lmi = poly->GetPolyTexture ();
         lmi->ObjectToWorld (m_obj2tex, v_obj2tex,

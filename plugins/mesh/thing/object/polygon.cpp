@@ -1030,7 +1030,7 @@ csPolygon3D::csPolygon3D ()
 {
   VectorArray = GetStaticVectorArray();
   thing = 0;
-  static_data = 0;
+  static_poly = 0;
 
   txt_info = 0;
   lightpatches = 0;
@@ -1038,7 +1038,7 @@ csPolygon3D::csPolygon3D ()
 
 csPolygon3D::~csPolygon3D ()
 {
-  static_data->thing_static->thing_type->blk_polytex.Free (txt_info);
+  thing->GetStaticData ()->thing_type->blk_polytex.Free (txt_info);
   //delete txt_info;
 
   if (thing)
@@ -1054,9 +1054,9 @@ csPolygon3D::~csPolygon3D ()
   }
 }
 
-void csPolygon3D::SetStaticData (csPolygon3DStatic* static_data)
+void csPolygon3D::SetStaticPoly (csPolygon3DStatic* static_poly)
 {
-  csPolygon3D::static_data = static_data;
+  csPolygon3D::static_poly = static_poly;
 }
 
 void csPolygon3D::SetParent (csThing *thing)
@@ -1066,15 +1066,15 @@ void csPolygon3D::SetParent (csThing *thing)
 
 void csPolygon3D::RefreshFromStaticData ()
 {
-  static_data->thing_static->thing_type->blk_polytex.Free (txt_info);
+  thing->GetStaticData ()->thing_type->blk_polytex.Free (txt_info);
   //delete txt_info;
   txt_info = 0;
-  if (static_data->IsTextureMappingEnabled ())
+  if (static_poly->IsTextureMappingEnabled ())
   {
-    txt_info = static_data->thing_static->thing_type->blk_polytex.Alloc ();
-    txt_info->SetTextureMapping (static_data->GetTextureMapping ());
+    txt_info = static_poly->thing_static->thing_type->blk_polytex.Alloc ();
+    txt_info->SetTextureMapping (static_poly->GetTextureMapping ());
   }
-  plane_wor = static_data->GetObjectPlane ();
+  plane_wor = static_poly->GetObjectPlane ();
 }
 
 void csPolygon3D::WorldToCameraPlane (
@@ -1096,7 +1096,7 @@ void csPolygon3D::ObjectToWorld (
   const csReversibleTransform &t,
   const csVector3 &vwor)
 {
-  t.This2Other (static_data->polygon_data.plane_obj, vwor, plane_wor);
+  t.This2Other (static_poly->polygon_data.plane_obj, vwor, plane_wor);
   // This is not efficient and only needed in those cases where the
   // thing is really scaled. We have to see if this is a problem. Normally
   // it is a good thing to avoid calling csThing::Transform() to often.
@@ -1111,18 +1111,18 @@ void csPolygon3D::Finish ()
 {
   RefreshFromStaticData ();
 
-  if (static_data->IsTextureMappingEnabled ())
+  if (static_poly->IsTextureMappingEnabled ())
   {
     txt_info->SetPolygon (this);
     txt_info->SetLightMap (0);
-    if (static_data->flags.Check (CS_POLY_LIGHTING))
+    if (static_poly->flags.Check (CS_POLY_LIGHTING))
     {
-      csLightMap *lm = static_data->thing_static->thing_type
+      csLightMap *lm = static_poly->thing_static->thing_type
         ->blk_lightmap.Alloc ();
       txt_info->SetLightMap (lm);
 
-      lm->Alloc (static_data->polygon_data.tmapping->w_orig,
-      	static_data->polygon_data.tmapping->h);
+      lm->Alloc (static_poly->polygon_data.tmapping->w_orig,
+      	static_poly->polygon_data.tmapping->h);
 
 #ifndef CS_USE_NEW_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
@@ -1130,8 +1130,8 @@ void csPolygon3D::Finish ()
 	lm->lightcell_size))
       {
         thing_type->Notify ("Renderer can't handle lightmap "
-         "for polygon '%s'", static_data->GetName());
-        static_data->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
+         "for polygon '%s'", static_poly->GetName());
+        static_poly->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
       }
 #endif // CS_USE_NEW_RENDERER
     }
@@ -1200,8 +1200,8 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
     if (txt_info->lm == 0) return 0;
     const char* error = txt_info->lm->ReadFromCache (
           file,
-          static_data->polygon_data.tmapping->w_orig,
-          static_data->polygon_data.tmapping->h,
+          static_poly->polygon_data.tmapping->w_orig,
+          static_poly->polygon_data.tmapping->h,
           this,
     thing->GetStaticData ()->thing_type->engine);
     if (error != 0)
@@ -1320,13 +1320,13 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           // If partial then we first test if the light and shadow
           // frustums are adjacent. If so then we ignore the shadow
           // frustum as well (not relevant).
-          i1 = static_data->GetVertexCount () - 1;
-          for (i = 0; i < static_data->GetVertexCount (); i++)
+          i1 = static_poly->GetVertexCount () - 1;
+          for (i = 0; i < static_poly->GetVertexCount (); i++)
           {
-            j1 = sfp->static_data->GetVertexCount () - 1;
+            j1 = sfp->static_poly->GetVertexCount () - 1;
 
             float a1 = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j1));
-            for (j = 0; j < sfp->static_data->GetVertexCount (); j++)
+            for (j = 0; j < sfp->static_poly->GetVertexCount (); j++)
             {
               float a = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j));
               if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
@@ -1425,7 +1425,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
 
   bool fill_lightmap = true;
 
-  num_vertices = static_data->polygon_data.num_vertices;
+  num_vertices = static_poly->polygon_data.num_vertices;
   if (num_vertices > VectorArray->Length ())
     VectorArray->SetLength (num_vertices);
   poly = VectorArray->GetArray ();

@@ -504,7 +504,7 @@ class csPolygon3D
 
 private:
   /// Pointer to static data.
-  csPolygon3DStatic* static_data;
+  csPolygon3DStatic* static_poly;
 
   /**
    * @@@@@@@@@@@@@ DO WE NEED THIS HERE?
@@ -552,7 +552,7 @@ public:
   /**
    * Set the static data.
    */
-  void SetStaticData (csPolygon3DStatic* static_data);
+  void SetStaticPoly (csPolygon3DStatic* static_poly);
 
   /**
    * After the plane normal and the texture matrices have been set
@@ -580,7 +580,7 @@ public:
    */
   iMaterialWrapper* GetRealMaterial ()
   {
-    return material ? material : static_data->GetMaterialWrapper ();
+    return material ? material : static_poly->GetMaterialWrapper ();
   }
 
   /**
@@ -598,7 +598,7 @@ public:
   /**
    * Get static data.
    */
-  csPolygon3DStatic* GetStaticData () const { return static_data; }
+  csPolygon3DStatic* GetStaticPoly () const { return static_poly; }
 
   /**
    * Return the world-space plane of this polygon.
@@ -635,7 +635,7 @@ public:
   const csVector3& Vwor (int idx) const
   {
     return thing->Vwor (
-    	static_data->polygon_data.vertices[idx]);
+    	static_poly->polygon_data.vertices[idx]);
   }
 
   /**
