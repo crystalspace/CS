@@ -154,8 +154,11 @@ bool csSystemDriver::Initialize (int argc, char *argv[],
   if (!ParseCmdLineDriver (argc, argv))
     return false;
 
-  char *pn = Config->GetStr ("VideoDriver", "DRIVER",
-    override_driver ? override_driver : "crystalspace.graphics3d.software");
+  char* pn;
+  if (override_driver)
+    pn = override_driver;
+  else
+    pn = Config->GetStr ("VideoDriver", "DRIVER", "crystalspace.graphics3d.software");
   if (FAILED (csCLSIDFromProgID (&pn, &clsidRenderSystem)))
   {
     Printf (MSG_FATAL_ERROR, "Bad value '%s' for DRIVER in configuration file\n", pn);
