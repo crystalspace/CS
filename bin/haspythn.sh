@@ -43,5 +43,3 @@ if [ -n "${PYTHON_INC}" -a -n "${PYTHON_LIB}" ]; then
   echo "PYTHON_LIB = ${PYTHON_LIB}"
   echo "PLUGINS.DYNAMIC += cscript/cspython"
 fi
-
-exit 0

@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+4-Nov-2001
+	- Matze Braun cleaned up config scripts for unix and cygwin
 3-Nov-2001
 	- Jorge Acereda changed csLoadLibrary() in unix.cpp to call 
 	  dlopen() always, so that csPrintLibraryError() can get the

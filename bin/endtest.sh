@@ -8,8 +8,6 @@
 # information needed for building Crystal Space.  It is pipied to stdout,
 # and errors are piped to stderr.
 
-CXX=$1
-
 echo "int main() { long x = 0x12; return *(unsigned char *)&x == 0x12; }" > endtest.cpp
 
 ${CXX} -o endtest endtest.cpp 2>/dev/null || echo "endtest.sh: cannot compile testcase" >&2
@@ -22,5 +20,3 @@ if test -f ./endtest; then
 fi
 
 rm -f endtest.cpp endtest
-
-exit 0
