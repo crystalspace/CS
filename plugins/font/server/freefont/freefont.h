@@ -146,7 +146,6 @@ public:
    */
   virtual void GetDimensions (const char *text, int &oW, int &oH);
   virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
-  virtual void GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &);
 
   /**
    * Determine how much characters from this string can be written
