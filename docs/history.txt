@@ -12,6 +12,15 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+6-Jul-99:
+	- Andrew Zabolotny made the movement system from Denis Dmitriev time
+	  dependent (so that movement speed is correct even if frame rate is
+	  different).
+	- Andrew also implemented fog in 8-bit mode and fixed alpha value
+	  for 8-bit.
+	- Andrew fixed SetMousePosition() for OS/2.
+	- Fixed dependency on an csengine include file in OpenGL, Direct3D,
+	  and Glide renderers.
 5-Jul-99:
 	- I completely removed support for the 'map' command from the engine
 	  and moved all of it to WalkTest using the new 'DrawFunc()' system.
@@ -90,6 +99,9 @@ Short-term cleanups that need to be done:
 	  Then I also added a CHECK() function which checked for that value
 	  and was called in EVERY csVector3 function. I did find a few
 	  problems and solved them.
+	- Fixes to software renderer from Andrew Zabolotny to make it more
+	  bullet proof. Yet another fix from DrawPolygon to avoid the problem
+	  with not generating part of the lightmaps for ares of polygons.
 1-Jul-99:
 	- Thomas Hieber enabled snap-to-grid in MazeD and he also increased
 	  the size of the crosses for vertices.
