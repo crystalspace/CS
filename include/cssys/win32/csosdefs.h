@@ -49,6 +49,7 @@
   #pragma warning(disable:4005)   // 'identifier' : macro redefinition
   #pragma warning(disable:4130)   // 'operator' : logical operation on address of string constant
   #pragma warning(disable:4711)   // function 'function' selected for inline expansion
+  #pragma warning(disable:4312)	  // 'variable' : conversion from 'type' to 'type' of greater size
 
   #pragma warning(default:4265)   // class has virtual functions, but destructor is not virtual
 
@@ -60,8 +61,10 @@
   #pragma intrinsic (strcpy, strcmp, strlen, strcat)
   #pragma intrinsic (abs, fabs)
 
-  #ifdef __CRYSTAL_SPACE__
+  #if defined(__CRYSTAL_SPACE__) && !defined(CS_DEBUG)
     #pragma code_seg("CSpace")	  // Just for fun :)
+    // However, doing this in debug builds prevents Edit & Continue from
+    // functioning properly :/
   #endif
 #endif
 
@@ -168,6 +171,29 @@
 #undef min
 #undef max
 #undef DeleteFile
+
+// These don't exist on some older SDKs
+#ifndef _WIN64
+  #ifndef SetWindowLongPtrA
+    #define SetWindowLongPtrA SetWindowLongA
+  #endif
+  #ifndef SetWindowLongPtrW
+    #define SetWindowLongPtrW SetWindowLongW
+  #endif
+  #ifndef SetWindowLongPtr
+    #define SetWindowLongPtr SetWindowLongA
+  #endif
+  
+  #ifndef GetWindowLongPtrA
+    #define GetWindowLongPtrA GetWindowLongA
+  #endif
+  #ifndef GetWindowLongPtrW
+    #define GetWindowLongPtrW GetWindowLongW
+  #endif
+  #ifndef GetWindowLongPtr
+    #define GetWindowLongPtr GetWindowLongA
+  #endif
+#endif
 
 #if defined(_DEBUG) || defined(CS_DEBUG)
   #include <assert.h>
@@ -525,10 +551,16 @@ const char* plugin_compiler() { return CS_COMPILER_NAME; }
 #endif // !CS_STATIC_LINKED
 
 // printf() replacements, to deal with UTF-8 correctly on all Windowses
-//#define		printf		_cs_printf
-//#define		vprintf		_cs_vprintf
+#define		printf		_cs_printf
+#define		vprintf		_cs_vprintf
+#define		vfprintf	_cs_vfprintf
+#define		fprintf		_cs_fprintf
+#define		fputs		_cs_fputs
 
-//extern int _cs_vprintf (const char* format, va_list args);
-//extern int _cs_printf (const char* format, ...);
+extern int _cs_vprintf (const char* format, va_list args);
+extern int _cs_printf (const char* format, ...);
+extern int _cs_fputs (const char* string, FILE* stream);
+extern int _cs_vfprintf (FILE* stream, const char* format, va_list args);
+extern int _cs_fprintf (FILE* stream, const char* format, ...);
 
 #endif // __CS_CSOSDEFS_H__

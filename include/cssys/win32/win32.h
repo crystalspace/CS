@@ -25,7 +25,8 @@
 
 #include "csutil/scf.h"
 
-#define CS_WIN32_WINDOW_CLASS_NAME "CrystalSpaceWin32"
+#define CS_WIN32_WINDOW_CLASS_NAME  "CrystalSpaceWin32"
+#define CS_WIN32_WINDOW_CLASS_NAMEW L"CrystalSpaceWin32"
 
 SCF_VERSION (iWin32Assistant, 0, 0, 4);
 

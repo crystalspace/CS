@@ -62,15 +62,15 @@ private:
   struct Block_O_Mem
   {
     BYTE* data;
-    DWORD size;
+    size_t size;
     Block_O_Mem () : data(0), size(0) { }
     void Clear() { delete[] data; }
-    void SetSize (DWORD sz) { Clear(); size = sz; data = new BYTE[sz]; }
+    void SetSize (size_t sz) { Clear(); size = sz; data = new BYTE[sz]; }
     ~Block_O_Mem() { Clear(); }
   };
   // To shorten calls to RegSetValueEx()
   bool InternalSetValue (const char* Key,
-    DWORD type, const void* data, DWORD datasize);
+    DWORD type, const void* data, size_t datasize);
   // To shorten calls to RegQueryValueEx()
   bool InternalGetValue (const char* Key,
     DWORD& type, Block_O_Mem& data) const;

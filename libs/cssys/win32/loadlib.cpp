@@ -35,6 +35,8 @@
 #include "iutil/document.h"
 #include <windows.h>
 
+#include "cssys/win32/wintools.h"
+
 static csStringArray ErrorMessages;
 
 #define LOADLIBEX_FLAGS		    LOAD_WITH_ALTERED_SEARCH_PATH
@@ -90,16 +92,12 @@ csLibraryHandle csLoadLibrary (const char* iName)
 
   if (handle == 0)
   {
-    char *buf;
-    FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        0, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &buf, 0, 0);
+    char *buf = cswinGetErrorMessage (errorCode);
     csString s;
     s << "LoadLibraryEx(" << dllPath << ") error " << (int)errorCode << ": "
       << buf;
     ErrorMessages.Push (s);
-    LocalFree (buf);
+    delete[] buf;
     return 0;
   }
 
@@ -177,18 +175,13 @@ static void AppendWin32Error (const char* text,
 			      DWORD errorCode,
 			      iStringArray*& strings)
 {
-  char *buf;
-
-  FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-      0, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPTSTR) &buf, 0, 0);
+  char *buf = cswinGetErrorMessage (errorCode);
 
   csString errorMsg;
   errorMsg.Format ("%s: %s [%.8x]", text, buf, 
     (unsigned)errorCode);
   AppendStrVecString (strings, errorMsg);
-  LocalFree (buf);
+  delete[] buf;
 }
 
 static csRef<iString> InternalGetPluginMetadata (const char* fullPath, 

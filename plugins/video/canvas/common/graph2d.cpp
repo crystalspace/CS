@@ -854,6 +854,7 @@ iNativeWindow* csGraphics2D::GetNativeWindow ()
 
 void csGraphics2D::SetTitle (const char* title)
 {
+  if (title == win_title) return;
   delete[] win_title;
   win_title = csStrNew (title);
 }

@@ -18,15 +18,38 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "csutil/util.h"
 #include <windows.h>
+#include <lmcons.h>
+
+#include "cssys/win32/wintools.h"
 
 csString csGetUsername()
 {
   csString username;
-  char buff[512];
-  DWORD sz = sizeof(buff);
-  if (GetUserName(buff, &sz))
-    username = buff;
+  wchar_t* wname = 0;
+  if (cswinIsWinNT ())
+  {
+    WCHAR buff[UNLEN + 1];
+    DWORD sz = sizeof(buff) / sizeof (WCHAR);
+    if (GetUserNameW (buff, &sz))
+    {
+      wname = csStrNewW (buff);
+    }
+  }
+  else
+  {
+    char buff[UNLEN + 1];
+    DWORD sz = sizeof(buff);
+    if (GetUserNameA (buff, &sz))
+    {
+      wname = cswinAnsiToWide (buff);
+    }
+  }
+  char* name = csStrNew (wname);
+  username.Replace (name);
+  delete[] name;
+  delete[] wname;
   username.Trim();
   return username;
 }

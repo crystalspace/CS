@@ -650,9 +650,9 @@ extern void* operator new[] (size_t s, void* filename, int line);
 // this define at the end of the function declaration
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
 #  define CS_GNUC_PRINTF( format_idx, arg_idx)    \
-     __attribute__((format (printf, format_idx, arg_idx)))
+     __attribute__((format (__printf__, format_idx, arg_idx)))
 #  define CS_GNUC_SCANF( format_idx, arg_idx )        \
-     __attribute__((format (scanf, format_idx, arg_idx)))
+     __attribute__((format (__scanf__, format_idx, arg_idx)))
 #else
 #  define CS_GNUC_PRINTF( format_idx, arg_idx )
 #  define CS_GNUC_SCANF( format_idx, arg_idx )

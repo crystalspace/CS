@@ -32,9 +32,7 @@
 #include <stdarg.h>
 #include <windows.h>
 
-#ifdef DO_DINPUT_KEYBOARD
-#include <dinput.h>
-#endif
+#include "cssys/win32/wintools.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -51,359 +49,18 @@
 // Cygwin doesn't understand _argc or _argv, so we define them here.
 // These are borrowed from Mingw32 includes (see stdlib.h)
 // Cygwin Purists, forgive the corruption, Cygwin means Cygnus for Win32.
-extern int CS_WIN32_ARGC;
-extern char** CS_WIN32_ARGV;
+extern int _argc;
+extern char** _argv;
 #endif
 
-void SystemFatalError (char *s)
+void SystemFatalError (const char *s)
 {
   ChangeDisplaySettings (0, 0);  // doesn't hurt
-  fprintf(stderr, "FATAL: %s\n", s);
-  MessageBox(0, s, "Fatal Error", MB_OK | MB_ICONSTOP);
+  fprintf (stderr, "FATAL: %s\n", s);
+  MessageBoxW (0, csCtoW (s), L"Fatal Error", MB_OK | MB_ICONSTOP);
 }
 
 #define MAX_SCANCODE 0x100
-
-#ifdef DO_DINPUT_KEYBOARD
-
-/*
- * This table performs the translation from keycode to Crystal Space key code.
- */
-static unsigned short ScanCodeToChar [MAX_SCANCODE] =
-{
-  0,              CSKEY_ESC,      '1',            '2',
-  '3',            '4',            '5',            '6',		// 00..07
-  '7',            '8',            '9',            '0',
-  '-',            '=',            CSKEY_BACKSPACE,CSKEY_TAB,	// 08..0F
-  'q',            'w',            'e',            'r',
-  't',            'y',            'u',            'i',		// 10..17
-  'o',            'p',            '[',            ']',
-  CSKEY_ENTER,    CSKEY_CTRL,     'a',            's',		// 18..1F
-  'd',            'f',            'g',            'h',
-  'j',            'k',            'l',            ';',		// 20..27
-  39,             '`',            CSKEY_SHIFT,    '\\',
-  'z',            'x',            'c',            'v',		// 28..2F
-  'b',            'n',            'm',            ',',
-  '.',            '/',            CSKEY_SHIFT,    CSKEY_PADMULT,// 30..37
-  CSKEY_ALT,      ' ',            0,              CSKEY_F1,
-  CSKEY_F2,       CSKEY_F3,       CSKEY_F4,       CSKEY_F5,	// 38..3F
-  CSKEY_F6,       CSKEY_F7,       CSKEY_F8,       CSKEY_F9,
-  CSKEY_F10,      0,              0,              CSKEY_HOME,	// 40..47
-  CSKEY_UP,       CSKEY_PGUP,     CSKEY_PADMINUS, CSKEY_LEFT,
-  CSKEY_CENTER,   CSKEY_RIGHT,    CSKEY_PADPLUS,  CSKEY_END,	// 48..4F
-  CSKEY_DOWN,     CSKEY_PGDN,     CSKEY_INS,      CSKEY_DEL,
-  0,              0,              0,              CSKEY_F11,	// 50..57
-  CSKEY_F12,      0,              0,              0,
-  0,              0,              0,              0,		// 58..5F
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// 60..67
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// 68..6F
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// 70..77
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// 78..7F
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// 80..87
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// 88..8F
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// 90..97
-  0,              0,              0,              0,
-  CSKEY_ENTER,    CSKEY_CTRL,     0,              0,		// 98..9F
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// A0..A7
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// A8..AF
-  0,              0,              0,              ',',
-  0,              CSKEY_PADDIV,   0,              0,		// B0..B7
-  CSKEY_ALT,      0,              0,              0,
-  0,              0,              0,              0,		// B8..BF
-  0,              0,              0,              0,
-  0,              0,              0,              CSKEY_HOME,	// C0..C7
-  CSKEY_UP,       CSKEY_PGUP,     0,              CSKEY_LEFT,
-  0,              CSKEY_RIGHT,    0,              CSKEY_END,	// C8..CF
-  CSKEY_DOWN,     CSKEY_PGDN,     CSKEY_INS,      CSKEY_DEL,
-  0,              0,              0,              0,		// D0..D7
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// D8..DF
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// E0..E7
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// E8..EF
-  0,              0,              0,              0,
-  0,              0,              0,              0,		// F0..F7
-  0,              0,              0,              0,
-  0,              0,              0,              0		// F8..FF
-};
-
-// This macro is for COM calls. If it fails, it shows a MessageBox then
-// kills the whole process. It's brutal, but as I use another thread,
-// it's safer this way
-#define CHK_FAILED(x) \
-  { if(FAILED(x)) { MessageBox(0, #x " Failed!", 0,MB_OK|MB_ICONERROR); ::ExitProcess(1); } }
-// This macro is for COM Release calls
-#define CHK_RELEASE(x) \
-  { if((x) != 0) { (x)->Release(); (x)=0; } }
-
-/*
- * The thread entry point. Called by ::Open()
- */
-
-#define AUTOREPEAT_WAITTIME 1000 // 1 seconde
-#define AUTOREPEAT_TIME      100 // 10 keystroke/seconds
-
-DWORD WINAPI s_threadroutine (LPVOID param)
-{
-  iEventOutlet *EventOutlet = (iEventOutlet *)param;
-  HRESULT hr;
-  DWORD dwWait = INFINITE;
-  char *buffer;
-  int i,lastkey = -1;
-#ifndef DI_USEGETDEVICEDATA
-  char *oldbuffer = 0;
-#endif
-  LPDIRECTINPUT lpdi = 0;
-  LPDIRECTINPUTDEVICE lpKbd = 0;
-  //Setup for directinput mouse code
-  LPDIRECTINPUTDEVICE lpMouse = 0;
-
-  HANDLE hEvent [2];
-
-  CHK_FAILED (DirectInputCreate (ModuleHandle, DIRECTINPUT_VERSION, &lpdi, 0));
-  CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, 0));
-  CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard));
-  CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, 0),
-    DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
-
-  //Setup for directinput mouse code
-#if 0
-  CHK_FAILED(lpdi->CreateDevice (GUID_SysMouse, &lpMouse, 0));
-  CHK_FAILED(lpMouse->SetDataFormat(&c_dfDIMouse));
-  CHK_FAILED(lpMouse->SetCooperativeLevel(FindWindow (WINDOWCLASSNAME, 0),
-    DISCL_EXCLUSIVE | DISCL_FOREGROUND));
-  hevtMouse = CreateEvent(0, 0, 0, 0);
-  CHK_FAILED(lpMouse->SetEventNotification(g_hevtMouse));
-  DIPROPDWORD dipdw =
-      {
-          {
-              sizeof(DIPROPDWORD),        // diph.dwSize
-              sizeof(DIPROPHEADER),       // diph.dwHeaderSize
-              0,                          // diph.dwObj
-              DIPH_DEVICE,                // diph.dwHow
-          },
-          DINPUT_BUFFERSIZE,              // dwData
-      };
-  CHK_FAILED(lpMouse->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph));
-#endif
-
-#ifdef DI_USEGETDEVICEDATA
-  {
-    DIPROPDWORD dpd;
-    dpd.diph.dwSize=sizeof(DIPROPDWORD);
-    dpd.diph.dwHeaderSize=sizeof(DIPROPHEADER);
-    dpd.diph.dwObj=0;
-    dpd.diph.dwHow=DIPH_DEVICE;
-    dpd.dwData=10; // The size of the buffer (should be more than sufficient)
-#if DIRECTINPUT_VERSION < 0x0700
-    CHK_FAILED (lpKbd->SetProperty (DIPROP_BUFFERSIZE, &dpd));
-#else
-    //For incomprehensible reason, SetProperty() parameters type has
-    //changed between DX6.1 and DX7 SDK
-    CHK_FAILED (lpKbd->SetProperty (DIPROP_BUFFERSIZE, &dpd.diph));
-#endif
-  }
-#endif
-  hEvent [0] = CreateEvent (0, FALSE, FALSE, 0);
-  if (hEvent [0] == 0)
-  {
-    MessageBox (0, "CreateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
-    ExitProcess (1);
-  }
-  if (!DuplicateHandle (GetCurrentProcess(), GLOBAL_ASSISTANT->GetEventHandle(),
-                        GetCurrentProcess (), &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
-  {
-    MessageBox (0, "DuplicateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
-    ExitProcess (1);
-  }
-
-  hr = lpKbd->SetEventNotification (hEvent [0]);
-  switch (hr)
-  {
-    case DI_OK:
-      break;
-    default:
-      MessageBox (0, "lpKbd->SetEventNotification(hEvent) Failed!", 0,
-        MB_OK|MB_ICONERROR);
-      ExitProcess (1);
-      break;
-  }
-
-  while (1)
-  {
-    hr = lpKbd->Acquire ();
-    if (SUCCEEDED (hr))
-      break;
-    if (WaitForSingleObject (hEvent [1], 0) == WAIT_OBJECT_0 + 1)
-    {
-      CloseHandle (hEvent [0]);
-      CloseHandle (hEvent [1]);
-      CHK_RELEASE (lpKbd);
-      CHK_RELEASE (lpdi);
-#ifndef DI_USEGETDEVICEDATA
-      if (oldbuffer) delete[] oldbuffer;
-#endif
-      return 0;
-    }
-  }
-
-#ifndef DI_USEGETDEVICEDATA
-  oldbuffer = new char [256];
-  hr = lpKbd->GetDeviceState (256, oldbuffer);
-#endif
-  while (1)
-  {
-    switch (WaitForMultipleObjects (2, hEvent, FALSE, dwWait))
-    {
-      case WAIT_OBJECT_0:
-#ifndef DI_USEGETDEVICEDATA
-        buffer = new char [256];
-        do
-        {
-          hr = lpKbd->GetDeviceState (256, buffer);
-          switch (hr)
-          {
-            case DIERR_NOTACQUIRED:
-            case DIERR_INPUTLOST:
-              lpKbd->Acquire ();
-              break;
-            case DI_OK:
-              break;
-            default:
-              MessageBox (0, "lpKbd->GetDeviceState(hEvent) Failed!",
-                0, MB_OK|MB_ICONERROR);
-              ExitProcess (1);
-              break;
-          }
-        } while (hr != DI_OK);
-        for (i = 0; i < 256; i++)
-          if (oldbuffer [i] != buffer [i])
-          {
-            if (buffer [i] & 0X80)
-            {
-              lastkey = i;
-              dwWait = AUTOREPEAT_WAITTIME;
-              EventOutlet->Key (ScanCodeToChar [i], -1, true);
-            }
-            else
-            {
-              lastkey = -1;
-              dwWait = INFINITE;
-              EventOutlet->Key (ScanCodeToChar[i], -1, false);
-            }
-            break;
-          }
-        delete [] oldbuffer;
-        oldbuffer = buffer;
-#else
-        DIDEVICEOBJECTDATA *lpdidod;
-        DWORD dwNb;
-        do
-        {
-          dwNb = INFINITE;
-          hr = lpKbd->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), 0, &dwNb,DIGDD_PEEK);
-          switch(hr)
-          {
-            case DIERR_NOTACQUIRED:
-            case DIERR_INPUTLOST:
-              lpKbd->Acquire ();
-              break;
-            case DI_OK:
-              break;
-            case DI_BUFFEROVERFLOW:
-              hr = DI_OK;
-              break;
-            default:
-              MessageBox(0, "lpKbd->GetDeviceState(hEvent) Failed!",
-                0, MB_OK|MB_ICONERROR);
-              ExitProcess (1);
-              break;
-          }
-        } while (hr != DI_OK);
-        if (!dwNb)
-          continue;
-        lpdidod = new DIDEVICEOBJECTDATA [dwNb];
-        CHK_FAILED (lpKbd->GetDeviceData (sizeof (DIDEVICEOBJECTDATA),
-          lpdidod, &dwNb, 0));
-        for (i = 0; i < dwNb; i++)
-        {
-          if (lpdidod [i].dwData & 0X80)
-          {
-            lastkey = lpdidod [i].dwOfs;
-            dwWait = AUTOREPEAT_WAITTIME:
-            EventOutlet->Key (ScanCodeToChar [lpdidod [i].dwOfs], -1, true);
-          }
-          else
-          {
-            lastkey = -1;
-            dwWait = INFINITE;
-            EventOutlet->Key (ScanCodeToChar [lpdidod [i].dwOfs], -1, false);
-          }
-        }
-        delete[] lpdidod;
-#endif
-        break;
-      case WAIT_TIMEOUT:  // HANDLE key autorepeat
-        buffer = new char [256];
-        do
-        {
-          hr = lpKbd->GetDeviceState (256, buffer);
-          switch (hr)
-          {
-            case DIERR_NOTACQUIRED:
-            case DIERR_INPUTLOST:
-              lpKbd->Acquire ();
-              break;
-            case DI_OK:
-              break;
-            default:
-              MessageBox (0, "lpKbd->GetDeviceState(hEvent) Failed!",
-                0, MB_OK|MB_ICONERROR);
-              ExitProcess (1);
-              break;
-          }
-        } while (hr != DI_OK);
-        // The lastkey is still pressed
-        if ((lastkey >= 0) && (buffer [lastkey] & 0X80))
-        {
-          dwWait = AUTOREPEAT_TIME;
-          EventOutlet->Key (ScanCodeToChar [lastkey], -1, true);
-        }
-        else
-        { // Strange.. we didn't get the message that the key was released !
-          lastkey = -1;
-          dwWait = INFINITE;
-        }
-        delete [] buffer;
-        break;
-      case WAIT_OBJECT_0 + 1:
-        lpKbd->Unacquire ();
-        CloseHandle (hEvent [0]);
-        CloseHandle (hEvent [1]);
-        CHK_RELEASE (lpKbd);
-        CHK_RELEASE (lpdi);
-#ifndef DI_USEGETDEVICEDATA
-        if (oldbuffer)
-          delete [] oldbuffer;
-#endif
-        return 0;
-    }
-  }
-}
-
-#undef CHK_RELEASE
-#undef CHK_FAILED
-#endif // DO_DINPUT_KEYBOARD
 
 class Win32Assistant :
   public iWin32Assistant,
@@ -433,17 +90,18 @@ private:
   /// Hook that will change the OK button text.
   HHOOK msgBoxOkChanger;
 
+  /// Handle to the exception handler DLL.
+  HANDLE exceptHandlerDLL;
+
+  /// The console codepage that was set on program startup. WIll be restored on exit.
+  UINT oldCP;
+
   void SetWinCursor (HCURSOR);
   iEventOutlet* GetEventOutlet();
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
 
-#ifdef DO_DINPUT_KEYBOARD
-  HANDLE m_hEvent;
-  HANDLE m_hThread;
-  friend DWORD WINAPI s_threadroutine(LPVOID param);
-#endif
 public:
   SCF_DECLARE_IBASE;
   Win32Assistant (iObjectRegistry*);
@@ -537,6 +195,18 @@ static inline bool AddToPathEnv (char *dir, char **pathEnv)
 bool csPlatformStartup(iObjectRegistry* r)
 {
   /*
+    Load the exception handler DLL. In case of an OS exception
+    (e.g. Access Violation) this DLL creates a report about
+    where the crash happened. After that, the "Application Error"
+    boy is shown as usual.
+
+    The DLL is contained in the "mingw-utils" package and works
+    for both MinGW and VC compiled binaries.
+   */
+  exceptHandlerDLL = LoadLibraryEx ("exchndl.dll", 0, 
+    LOAD_WITH_ALTERED_SEARCH_PATH);
+
+  /*
     When it isn't already in the PATH environment,
     the CS directory will be put there in front of all
     other paths.
@@ -548,7 +218,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   char* pathEnv = csStrNew (getenv("PATH"));
   bool pathChanged = false;
 
-  csPluginPaths* pluginpaths = csGetPluginPaths (CS_WIN32_ARGV[0]);
+  csPluginPaths* pluginpaths = csGetPluginPaths (__argv[0]);
   for (int i = 0; i < pluginpaths->GetCount(); i++)
   {
     // @@@ deal with path recursion here?
@@ -621,7 +291,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
      the subsystem field in the PE header.
    */
   PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)ModuleHandle;
-  PIMAGE_NT_HEADERS NTheader = (PIMAGE_NT_HEADERS)((int)dosHeader + dosHeader->e_lfanew);
+  PIMAGE_NT_HEADERS NTheader = (PIMAGE_NT_HEADERS)((uint8*)dosHeader + dosHeader->e_lfanew);
   if (NTheader->Signature == 0x00004550) // check for PE sig
   {
     is_console_app = 
@@ -643,15 +313,27 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
     }
   }
 
+  // experimental UC stuff.
+  // Retrieve old codepage.
+  oldCP = GetConsoleOutputCP ();
+  // Try to set console codepage to UTF-8.
+  // @@@ The drawback of UTF8 is that it requires a TrueType console
+  // font to work properly. However, default is "raster font" :/
+  // In this case, text output w/ non-ASCII chars will appear broken, tho
+  // this is really a Windows issue. (see MS KB 99795)
+  // @@@ Maybe a command line param to set a different con cp could be useful.
+  SetConsoleOutputCP (CP_UTF8);
+  //
+
   registry = r;
   registry->IncRef();
 
-  WNDCLASS wc;
-  wc.hCursor        = 0;
+  HICON appIcon;
+
   // try the app icon...
-  wc.hIcon          = LoadIcon (ModuleHandle, MAKEINTRESOURCE(1));
+  appIcon = LoadIcon (ModuleHandle, MAKEINTRESOURCE (1));
   // not? maybe executable.ico?
-  if (!wc.hIcon) 
+  if (!appIcon) 
   {
     char apppath[MAX_PATH];
     GetModuleFileName (0, apppath, sizeof(apppath));
@@ -665,23 +347,55 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
     {
       strcat (apppath, ".ico");
     }
-    wc.hIcon = (HICON)LoadImage (ModuleHandle, apppath, IMAGE_ICON,
+    appIcon = (HICON)LoadImage (ModuleHandle, apppath, IMAGE_ICON,
       0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
   }
   // finally the default one
-  if (!wc.hIcon) wc.hIcon = LoadIcon (0, IDI_APPLICATION);
-  wc.lpszMenuName   = 0;
-  wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
-  wc.hbrBackground  = ::CreateSolidBrush(RGB(0, 0, 0));
-  wc.hInstance      = ModuleHandle;
-  wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-  wc.lpfnWndProc    = WindowProc;
-  wc.cbClsExtra     = 0;
-  wc.cbWndExtra     = 0;
+  if (!appIcon) appIcon = LoadIcon (0, IDI_APPLICATION);
 
   bool bResult = false;
-  if (RegisterClass (&wc))
-    bResult = true;
+  HBRUSH backBrush = ::CreateSolidBrush (RGB (0, 0, 0));
+  if (cswinIsWinNT ())
+  {
+    WNDCLASSEXW wc;
+
+    wc.cbSize	      = sizeof (wc);
+    wc.hCursor        = 0;
+    wc.hIcon          = appIcon;
+    wc.lpszMenuName   = 0;
+    wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAMEW;
+    wc.hbrBackground  = backBrush;
+    wc.hInstance      = ModuleHandle;
+    wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    wc.lpfnWndProc    = WindowProc;
+    wc.cbClsExtra     = 0;
+    wc.cbWndExtra     = 0;
+    wc.hIconSm	      = 0;
+    bResult = RegisterClassExW (&wc) != 0;
+  }
+  else
+  {
+    WNDCLASSEXA wc;
+
+    wc.cbSize	      = sizeof (wc);
+    wc.hCursor        = 0;
+    wc.hIcon          = appIcon;
+    wc.lpszMenuName   = 0;
+    wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
+    wc.hbrBackground  = backBrush;
+    wc.hInstance      = ModuleHandle;
+    wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    wc.lpfnWndProc    = WindowProc;
+    wc.cbClsExtra     = 0;
+    wc.cbWndExtra     = 0;
+    wc.hIconSm	      = 0;
+    bResult = RegisterClassExA (&wc) != 0;
+  }
+
+  if (!bResult)
+  {
+    SystemFatalError ("Failed to register window class!");
+  }
 
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
@@ -693,6 +407,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 Win32Assistant::~Win32Assistant ()
 {
   registry->DecRef();
+  SetConsoleOutputCP (oldCP);
   if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
 }
@@ -746,6 +461,10 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   if (e.Command.Code == cscmdPreProcess)
   {
     MSG msg;
+    /*
+      [res] *W versions of the message queue functions exist,
+      but they don't seem to make a difference.
+     */
     while (PeekMessage (&msg, 0, 0, 0, PM_NOREMOVE))
     {
       if (!GetMessage (&msg, 0, 0, 0))
@@ -761,32 +480,10 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   }
   else if (e.Command.Code == cscmdSystemOpen)
   {
-#   ifdef DO_DINPUT_KEYBOARD
-    DWORD dwThreadId;
-    m_hEvent = CreateEvent (0, FALSE, FALSE, 0);
-    m_hThread =
-      CreateThread (0, 0, s_threadroutine, EventOutlet, 0, &dwThreadId);
-    if (!m_hEvent || !m_hThread)
-    {
-      MessageBox (0, "CreateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
-      ExitProcess (1);
-    }
-#   endif
     return true;
   }
   else if (e.Command.Code == cscmdSystemClose)
   {
-#   ifdef DO_DINPUT_KEYBOARD
-    if (m_hEvent)
-    {
-      SetEvent (m_hEvent);
-      CloseHandle (m_hEvent);
-      m_hEvent = 0;
-      WaitForSingleObject (m_hThread, 1000);
-      CloseHandle (m_hThread);
-      m_hThread = 0;
-    }
-#   endif
   } 
   else if (e.Command.Code == cscmdCommandLineHelp)
   {
@@ -819,8 +516,6 @@ int Win32Assistant::GetCmdShow () const
   return ApplicationShow;
 }
 
-#ifndef DO_DINPUT_KEYBOARD
-
 //----------------------------------------// Windows input translator //------//
 
 /*
@@ -849,7 +544,7 @@ static unsigned char ScanCodeToChar [MAX_SCANCODE] =
 
 static unsigned char LastCharCode [MAX_SCANCODE];
 
-static void WinKeyTrans (WPARAM wParam, bool down, iEventOutlet* outlet)
+static bool WinKeyTrans (WPARAM wParam, bool down, iEventOutlet* outlet)
 {
   int key = 0, chr = 0;
   switch (wParam)
@@ -892,8 +587,9 @@ static void WinKeyTrans (WPARAM wParam, bool down, iEventOutlet* outlet)
 
   if (key)
     outlet->Key (key, chr, down);
+
+  return (key != 0);
 }
-#endif
 
 LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
@@ -912,9 +608,7 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	  GLOBAL_ASSISTANT->ApplicationActive = false; 
 	}
       }
-#ifndef DO_DINPUT_KEYBOARD
       memset (&LastCharCode, 0, sizeof (LastCharCode));
-#endif
       break;
     case WM_ACTIVATE:
       if ((GLOBAL_ASSISTANT != 0))
@@ -939,12 +633,11 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_DESTROY:
       PostQuitMessage (0);
       return 0L;
-#ifndef DO_DINPUT_KEYBOARD
     case WM_SYSCHAR:
     case WM_CHAR:
     {
       if (GLOBAL_ASSISTANT != 0)
-      {
+      {	  
         int scancode = (lParam >> 16) & 0xff;
         int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
         if (key || (wParam >= ' '))
@@ -994,7 +687,6 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       }
       break;
     }
-#endif
     case WM_LBUTTONDOWN:
     case WM_RBUTTONDOWN:
     case WM_MBUTTONDOWN:
@@ -1068,7 +760,14 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       break;
     }
   }
-  return DefWindowProc (hWnd, message, wParam, lParam);
+  if (IsWindowUnicode (hWnd))
+  {
+    return DefWindowProcW (hWnd, message, wParam, lParam);
+  }
+  else
+  {
+    return DefWindowProcA (hWnd, message, wParam, lParam);
+  }
 }
 
 bool Win32Assistant::SetCursor (int cursor)
@@ -1149,7 +848,16 @@ LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
       // The MBs we request always have just ibe button (OK)
       HWND Button = FindWindowEx ((HWND)wParam, 0, "Button", 0);
       if (Button)
-        SetWindowText (Button, GLOBAL_ASSISTANT->msgOkMsg);
+      {
+	if (cswinIsWinNT ())
+	{
+          SetWindowTextW (Button, csCtoW (GLOBAL_ASSISTANT->msgOkMsg));
+	}
+	else
+	{
+          SetWindowTextA (Button, cswinCtoA (GLOBAL_ASSISTANT->msgOkMsg));
+	}
+      }
       LRESULT ret = CallNextHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger,
 	nCode, wParam, lParam);
       // The work is done, remove the hook.
@@ -1190,7 +898,10 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
 
   char buf[4096];
   vsprintf(buf, msg, args);
-  MessageBox (window, buf, title, style);
+
+  // No need to juggle with string conversions here, 
+  // MessageBoxW() also exists on Win9x
+  MessageBoxW (window, csCtoW (buf), csCtoW (title), style);
 
   /*
     Clean up in case it isn't already.

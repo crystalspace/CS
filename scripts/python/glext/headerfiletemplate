@@ -210,7 +210,7 @@ public:
 private:
 %ExtFlagsTested%
 public:
-  csGLExtensionManager (): object_reg(NULL)
+  void Reset ()
   {
     extstrGL = 0;
 #ifdef __WIN32__
@@ -218,6 +218,11 @@ public:
 #endif
 
 %InitFlags%
+  }
+  
+  csGLExtensionManager () : object_reg (0)
+  {
+    Reset ();
   }
   
 %InitExtensions%

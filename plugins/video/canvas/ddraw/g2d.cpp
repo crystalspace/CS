@@ -31,6 +31,8 @@
 #define INITGUID
 #include "video/canvas/directxcommon/directdetection.h"
 
+#include "cssys/win32/wintools.h"
+
 #include "g2d.h"
 
 #ifndef DD_FALSE
@@ -132,15 +134,35 @@ bool csGraphics2DDDraw3::Open ()
   m_rcWindow.bottom = m_rcWindow.top + wheight;
 
   // create the window.
-  m_hWnd = CreateWindow (CS_WIN32_WINDOW_CLASS_NAME, win_title, 0,
-    m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
-    m_rcWindow.bottom - m_rcWindow.top, 0, 0, m_hInstance, 0);
+  if (cswinIsWinNT ())
+  {
+    m_hWnd = CreateWindowW (CS_WIN32_WINDOW_CLASS_NAMEW, 0, 0,
+      m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
+      m_rcWindow.bottom - m_rcWindow.top, 0, 0, m_hInstance, 0);
+  }
+  else
+  {
+    m_hWnd = CreateWindowA (CS_WIN32_WINDOW_CLASS_NAME, 0, 0,
+      m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
+      m_rcWindow.bottom - m_rcWindow.top, 0, 0, m_hInstance, 0);
+  }
   ASSERT (m_hWnd);
 
+  SetTitle (win_title);
+
   // Subclass the window
-  m_OldWndProc = (WNDPROC)GetWindowLong(m_hWnd, GWL_WNDPROC);
-  SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG)WindowProc);
-  SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
+  if (cswinIsWinNT ())
+  {
+    m_OldWndProc = (WNDPROC)GetWindowLongPtrW (m_hWnd, GWL_WNDPROC);
+    SetWindowLongPtrW (m_hWnd, GWL_WNDPROC, (LONG_PTR)WindowProc);
+    SetWindowLongPtrW (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+  }
+  else
+  {
+    m_OldWndProc = (WNDPROC)GetWindowLongA (m_hWnd, GWL_WNDPROC);
+    SetWindowLongPtrA (m_hWnd, GWL_WNDPROC, (LONG_PTR)WindowProc);
+    SetWindowLongPtrA (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+  }
 
   // Get ahold of the main DirectDraw object...
   DDetection.checkDevices2D ();
@@ -321,6 +343,8 @@ void csGraphics2DDDraw3::Refresh (RECT &rect)
   if ((FullScreen && m_bDoubleBuffer)
    || (rect.right <= rect.left) || (rect.bottom <= rect.top))
     return;
+
+  if (!m_lpddsPrimary) return;
 
   bool loop = true;
   while (loop)
@@ -852,7 +876,7 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
 LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
-  csGraphics2DDDraw3 *This = (csGraphics2DDDraw3 *)GetWindowLong (hWnd, GWL_USERDATA);
+  csGraphics2DDDraw3 *This = (csGraphics2DDDraw3 *)GetWindowLongPtr (hWnd, GWL_USERDATA);
   switch (message)
   {
     case WM_PAINT:
@@ -880,14 +904,30 @@ LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
         return TRUE;
       break;
   }
-  return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
+  if (cswinIsWinNT ())
+  {
+    return CallWindowProcW (This->m_OldWndProc, hWnd, message, wParam, lParam);
+  }
+  else
+  {
+    return CallWindowProcA (This->m_OldWndProc, hWnd, message, wParam, lParam);
+  }
 }
 
 void csGraphics2DDDraw3::SetTitle (const char* title)
 {
   csGraphics2D::SetTitle (title);
   if (m_hWnd)
-    SetWindowText (m_hWnd, title);
+  {
+    if (cswinIsWinNT ())
+    {
+      SetWindowTextW (m_hWnd, csCtoW (title));
+    }
+    else
+    {
+      SetWindowTextA (m_hWnd, cswinCtoA (title));
+    }
+  }
 }
 
 void csGraphics2DDDraw3::AlertV (int type, const char* title, 

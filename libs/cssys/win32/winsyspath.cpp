@@ -41,12 +41,12 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
   lpszShortPath = nshort;
 
   const char* nextpos = lpszShortPath;
-  DWORD bufRemain = cchBuffer;
+  size_t bufRemain = cchBuffer;
   *lpszLongPath = 0;
 
 #define BUFCAT(s)				  \
   {						  \
-    int len = strlen (s);			  \
+    size_t len = strlen (s);			  \
     if (bufRemain > 0)				  \
     {						  \
       strncat (lpszLongPath, s, bufRemain);	  \

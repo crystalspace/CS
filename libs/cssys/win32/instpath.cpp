@@ -28,8 +28,9 @@
 
 #include "csutil/util.h"
 
-static inline bool
-GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBufferSize)
+static inline bool GetRegistryInstallPath (const HKEY parentKey, 
+					   char *oInstallPath, 
+					   DWORD iBufferSize)
 {
   char * pValueName = "InstallPath";
   DWORD dwType;

@@ -23,6 +23,18 @@ for each given day, however, are in normal (ascending) chronological order.
 	- Jorrit also fixed the python plugin for all latest changes.
 	- Jorrit renamed FindSortedKey to FindSorted in csStringArray
 	  and iStringArray.
+	- res added some utility functions to convert between UTF encodings.
+	- res changed the Win32 port to assume UTF8 strings for console output
+	  and window titles and such.
+	- res fixed a bug where WGL extensions weren't always initialized properly.
+	- res removed the unused DirectInput keyboard handling code.
+	- res augmented configure to check the sizeof(long). This is used 
+	  to determine whether the platform is a 32 or 64 bit environment.
+	- res added types to cstypes.h which are (un)signed integers with the
+	  same size as a pointer. They are intended in existing cases where 
+	  pointers are casted to ints/longs (it appears that long on 64-bit 
+	  MSVC is still 32 bits large, so it can't be used. Tho I'm not sure.)
+	- res augmented configure to check the sizeof(wchar_t). 
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.

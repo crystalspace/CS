@@ -18,12 +18,15 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/csunicode.h"
 #include "csutil/csstring.h"
+#include "csutil/util.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <stdlib.h>
 #include <windows.h>
 
+#include "cssys/win32/wintools.h"
 
 //
 //To compile this canvas on a plain MSVC6 compiler
@@ -51,22 +54,15 @@
 
 void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
 {
-  LPVOID lpMsgBuf;
   char *szMsg = 0;
-  if (FAILED (hRes))
+  //if (FAILED (hRes))
   {
-    DWORD dwResult;
-    dwResult = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      0, hRes, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, 0);
-
-    if (dwResult != 0)
-    {
-      const char* szStdMessage = "%s\nLast Error: %s [0x%.8x]";
-      szMsg = new char [strlen (szStdMessage) + strlen ((const char*)lpMsgBuf) - 2 + strlen (str) - 2 + 8 - 4 + 1];
-       // in the length formula above the format specifier lengths were subtracted.
-      sprintf (szMsg, szStdMessage, str, lpMsgBuf, hRes);
-      LocalFree (lpMsgBuf);
-    }
+    char* errmsg = cswinGetErrorMessage (hRes);
+    const char* szStdMessage = "%s\nLast Error: %s [0x%.8x]";
+    szMsg = new char [strlen (szStdMessage) + strlen (errmsg) - 2 + strlen (str) - 2 + 8 - 4 + 1];
+      // in the length formula above the format specifier lengths were subtracted.
+    sprintf (szMsg, szStdMessage, str, errmsg, hRes);
+    delete[] errmsg;
   }
 
   csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
@@ -79,7 +75,7 @@ void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
     csPrintf ("\n");
   }
 
-  delete szMsg;
+  delete[] szMsg;
 }
 
 void DirectDetection::SystemFatalError (char *str, HRESULT hRes)
@@ -232,8 +228,16 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
   if (!lpHWDesc->dcmColorModel) return D3DENUMRET_OK;
 
   // Record the D3D driver's information
-  dd3d.DeviceName3D = _strdup (lpDeviceName);
-  dd3d.DeviceDescription3D = _strdup (lpDeviceDescription);
+  wchar_t* buf;
+
+  buf = cswinAnsiToWide (lpDeviceName);
+  dd3d.DeviceName3D = csStrNew (buf);
+  delete[] buf;
+
+  buf = cswinAnsiToWide (lpDeviceDescription);
+  dd3d.DeviceDescription3D = csStrNew (buf);
+  delete[] buf;
+
   if (lpGuid != 0)
   {
     CopyMemory (&dd3d.Guid3D, lpGuid, sizeof (GUID));
@@ -332,8 +336,16 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   }
 
   // some informations about device
-  dd2d.DeviceName2D = _strdup (lpDriverName);
-  dd2d.DeviceDescription2D = _strdup (lpDriverDescription);
+  wchar_t* buf;
+
+  buf = cswinAnsiToWide (lpDriverName);
+  dd2d.DeviceName2D = csStrNew (buf);
+  delete[] buf;
+
+  buf = cswinAnsiToWide (lpDriverDescription);
+  dd2d.DeviceDescription2D = csStrNew (buf);
+  delete[] buf;
+
   if (lpGUID != 0)
   {
     CopyMemory (&dd2d.Guid2D, lpGUID, sizeof (GUID));
@@ -448,6 +460,7 @@ bool DirectDetection::checkDevices2D ()
 
   // Note that you must know which version of the
   // function to retrieve (see the following text).
+  // [res] Sigh. the *W version is "not implemented".
   LPDIRECTDRAWENUMERATEEXA lpDDEnumEx;
 
   lpDDEnumEx = (LPDIRECTDRAWENUMERATEEXA) GetProcAddress (
@@ -459,7 +472,7 @@ bool DirectDetection::checkDevices2D ()
   if (!lpDDEnumEx)
   {
     HRESULT hRes;
-    if (FAILED (hRes = DirectDrawEnumerate (OldCallback, this)))
+    if (FAILED (hRes = DirectDrawEnumerateA (OldCallback, this)))
     {
       //SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
       ReportResult (CS_REPORTER_SEVERITY_WARNING, 

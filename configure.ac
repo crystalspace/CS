@@ -355,7 +355,25 @@ AS_IF([test -n "$PERL"],
 	AS_IF([test -n "$cs_cv_perl_cflags"],
 	    [CS_BUILD_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])])
 	AS_IF([test -n "$cs_cv_perl_lflags"],
-	    [CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])])])
+	    [CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])])
+
+#@@@ The following is intended to check whether the Perl SDK builds correctly.
+# However, I [res] get link errors on cygwin, tho in theory the SDK should be
+# usable.
+#   AS_IF([test -n "$cs_cv_perl_cflags"],
+#	[CS_BUILD_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])])
+#   AS_IF([test -n "$cs_cv_perl_lflags"],
+#	[CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])
+#   CS_CHECK_BUILD([if Perl SDK is usable], [cs_cv_perl],
+#       [AC_LANG_PROGRAM([
+            #include <EXTERN.h>
+	    #include <perl.h>],
+#	    [perl_run (0);])],
+#    	    [],
+#           [], [CS_BUILD_PROPERTY([PERL5.SDK.AVAILABLE], [yes])], [], [],
+#           [$cs_cv_perl_cflags], [$cs_cv_perl_lflags],
+#           [])
+    ])
 
 
 
@@ -1434,6 +1452,25 @@ AS_IF([test $cs_cv_header_stdint_h = yes],
             #include <stdint.h>],
             [(void)INT64_C(0x100000000)])],
         [], [C++], [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for sizeof (long) to determine whether the platform is 32 or 64 bit.
+#------------------------------------------------------------------------------
+AC_CHECK_SIZEOF(long)
+
+AS_IF([test $ac_cv_sizeof_long = 8],
+    [CS_HEADER_PROPERTY([CS_PLATFORM_IS_64BITS])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for sizeof (wchar_t) as they differ among platforms.
+#------------------------------------------------------------------------------
+AC_CHECK_SIZEOF(wchar_t, [], [#include <wchar.h>])
+
+CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])
 
 
 

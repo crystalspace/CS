@@ -24,6 +24,11 @@
 #define CS_SYSDEF_PROVIDE_EXPAND_PATH
 #include "cssysdef.h"
 
+#include "cssys/csunicode.h"
+#include "cssys/csuctransform.h"
+
+static const size_t shortStringChars = 64;
+
 char *csStrNew (const char *s)
 {
   if (s)
@@ -35,6 +40,60 @@ char *csStrNew (const char *s)
   }
   else
     return 0;
+}
+
+char *csStrNew (const wchar_t *s)
+{
+  utf8_char buf[shortStringChars];
+  static const size_t bufChars = sizeof (buf) / sizeof (char);
+  size_t charsNeeded;
+
+  if ((charsNeeded = csUnicodeTransform::WCtoUTF8 (buf, s, bufChars, (size_t)-1)
+    /*csWideToUTF8 (buf, s, bufChars)*/) > bufChars)
+  {
+    utf8_char* newbuf = new utf8_char[charsNeeded];
+    csUnicodeTransform::WCtoUTF8 (newbuf, s, charsNeeded, (size_t)-1);
+    return (char*)newbuf;
+  }
+  else
+  {
+    return csStrNew ((char*)buf);
+  }
+}
+
+wchar_t* csStrNewW (const wchar_t *s)
+{
+  if (s)
+  {
+    size_t sl = wcslen (s) + 1;
+    wchar_t *r = new wchar_t [sl];
+    memcpy (r, s, sl * sizeof (wchar_t));
+    return r;
+  }
+  else
+    return 0;
+}
+
+wchar_t* csStrNewW (const char *s)
+{
+  wchar_t buf[shortStringChars];
+  static const size_t bufChars = sizeof (buf) / sizeof (wchar_t);
+  size_t charsNeeded;
+
+  if ((charsNeeded = csUnicodeTransform::UTF8toWC (buf, (utf8_char*)s, 
+    bufChars, (size_t)-1)
+    /*csUTF8ToWide (buf, s, bufChars)*/) > bufChars)
+  {
+    wchar_t* newbuf = new wchar_t[charsNeeded];
+    csUnicodeTransform::UTF8toWC (newbuf, (utf8_char*)s, charsNeeded, 
+      (size_t)-1);
+    //csUTF8ToWide (newbuf, s, charsNeeded);
+    return newbuf;
+  }
+  else
+  {
+    return csStrNewW (buf);
+  }
 }
 
 #if defined (OS_DOS)

@@ -22,6 +22,8 @@
 #include <windows.h>
 #include <GL/gl.h>
 
+#include "cssys/win32/wintools.h"
+
 #include "csutil/scf.h"
 #include "oglg2d.h"
 #include "iutil/objreg.h"
@@ -103,38 +105,26 @@ CS_IMPLEMENT_PLUGIN
 
 static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
-  LPVOID lpMsgBuf;
+  char* lpMsgBuf;
   char* szMsg;
   char szStdMessage[] = "Last Error: ";
 
-  if (FAILED(hRes))
-  {
-    DWORD dwResult = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER
-    	| FORMAT_MESSAGE_FROM_SYSTEM, 0, hRes,  MAKELANGID(LANG_NEUTRAL,
-      SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, 0 );
+  lpMsgBuf = cswinGetErrorMessage (hRes);
 
-    if (dwResult != 0)
-    {
-      szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str)
-      	+ strlen(szStdMessage) + 1];
-      strcpy( szMsg, str );
-      strcat( szMsg, szStdMessage );
-      strcat( szMsg, (const char*)lpMsgBuf );
+  szMsg = new char[strlen(lpMsgBuf) + strlen(str)
+    + strlen(szStdMessage) + 1];
+  strcpy( szMsg, str );
+  strcat( szMsg, szStdMessage );
+  strcat( szMsg, lpMsgBuf );
 
-      LocalFree( lpMsgBuf );
+  delete[] lpMsgBuf ;
 
-      MessageBox (0, szMsg, "Fatal Error in glwin32.dll", 
-        MB_OK | MB_ICONERROR);
-      delete szMsg;
-
-      exit(1);
-    }
-  }
-
-  MessageBox (0, str, "Fatal Error in glwin32.dll", 
+  MessageBoxW (0, csCtoW (szMsg), L"Fatal Error in glwin32.dll", 
     MB_OK | MB_ICONERROR);
 
-  exit (1);
+  delete[] szMsg;
+
+  exit(1);
 }
 
 /////The 2D Graphics Driver//////////////
@@ -371,7 +361,7 @@ struct DummyWndInfo
 bool csGraphics2DOpenGL::FindMultisampleFormat (int samples, 
 						int& pixelFormat)
 {
-  if (samples == 0) return true;
+  if (samples == 0) return false;
 
   /*
     To use multisampling, a special pixel format has to determined.
@@ -409,7 +399,7 @@ bool csGraphics2DOpenGL::FindMultisampleFormat (int samples,
 
   UnregisterClass (dummyClassName, ModuleHandle);
 
-  return false;
+  return true;
 }
 
 LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
@@ -487,7 +477,12 @@ bool csGraphics2DOpenGL::Open ()
   DWORD style;
 
   int pixelFormat = -1;
-  FindMultisampleFormat (multiSamples, pixelFormat);
+  if (FindMultisampleFormat (multiSamples, pixelFormat))
+  {
+    // Reset all extensions. Needed for proper WGL_ext_str functioning -
+    // the WGL ext string is only valid for one HDC.
+    ext.Reset ();
+  }
 
   // create the window.
   if (FullScreen)
@@ -501,8 +496,16 @@ bool csGraphics2DOpenGL::Open ()
   {
     exStyle = 0;/*WS_EX_TOPMOST;*/
     style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
-    m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style, 0, 0, 
-      Width, Height, 0, 0, m_hInstance, 0);
+    if (cswinIsWinNT ())
+    {
+      m_hWnd = CreateWindowExW (exStyle, CS_WIN32_WINDOW_CLASS_NAMEW, 0, style, 0, 0, 
+	Width, Height, 0, 0, m_hInstance, 0);
+    }
+    else
+    {
+      m_hWnd = CreateWindowExA (exStyle, CS_WIN32_WINDOW_CLASS_NAME, 0, style, 0, 0, 
+	Width, Height, 0, 0, m_hInstance, 0);
+    }
   }
   else
   {
@@ -514,17 +517,36 @@ bool csGraphics2DOpenGL::Open ()
     }
     int wwidth = Width + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
     int wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME) + GetSystemMetrics (SM_CYCAPTION);
-    m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
-      (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2, (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
-      wwidth, wheight, 0, 0, m_hInstance, 0 );
+    if (cswinIsWinNT ())
+    {
+      m_hWnd = CreateWindowExW (exStyle, CS_WIN32_WINDOW_CLASS_NAMEW, 0, style,
+	(GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2, (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
+	wwidth, wheight, 0, 0, m_hInstance, 0 );
+    }
+    else
+    {
+      m_hWnd = CreateWindowExA (exStyle, CS_WIN32_WINDOW_CLASS_NAME, 0, style,
+	(GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2, (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
+	wwidth, wheight, 0, 0, m_hInstance, 0 );
+    }
   }
 
   if (!m_hWnd)
     SystemFatalError ("Cannot create Crystal Space window", GetLastError());
+
+  SetTitle (win_title);
   
   // Subclass the window
-  m_OldWndProc = (WNDPROC)SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG) WindowProc);
-  SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
+  if (cswinIsWinNT ())
+  {
+    m_OldWndProc = (WNDPROC)SetWindowLongPtrW (m_hWnd, GWL_WNDPROC, (LONG_PTR) WindowProc);
+    SetWindowLongPtrW (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+  }
+  else
+  {
+    m_OldWndProc = (WNDPROC)SetWindowLongPtrA (m_hWnd, GWL_WNDPROC, (LONG_PTR) WindowProc);
+    SetWindowLongPtrA (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+  }
 
   hDC = GetDC (m_hWnd);
   CalcPixelFormat (pixelFormat);
@@ -561,7 +583,7 @@ bool csGraphics2DOpenGL::Open ()
     m_bPalettized = false;
   m_bPaletteChanged = false;
 
-  CheckWGLExtensions ();
+  ext.InitWGL_EXT_swap_control (hDC);
 
   if (ext.CS_WGL_EXT_swap_control)
   {
@@ -706,7 +728,16 @@ void csGraphics2DOpenGL::SetTitle (const char* title)
 {
   csGraphics2D::SetTitle (title);
   if (m_hWnd)
-    SetWindowText (m_hWnd, title);
+  {
+    if (cswinIsWinNT ())
+    {
+      SetWindowTextW (m_hWnd, csCtoW (title));
+    }
+    else
+    {
+      SetWindowTextA (m_hWnd, cswinCtoA (title));
+    }
+  }
 }
 
 void csGraphics2DOpenGL::AlertV (int type, const char* title, const char* okMsg,
@@ -765,7 +796,7 @@ void csGraphics2DOpenGL::AllowResize (bool iAllow)
 LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
-  csGraphics2DOpenGL *This = (csGraphics2DOpenGL *)GetWindowLong (hWnd, GWL_USERDATA);
+  csGraphics2DOpenGL *This = (csGraphics2DOpenGL *)GetWindowLongPtr (hWnd, GWL_USERDATA);
   switch (message)
   {
     case WM_ACTIVATE:
@@ -797,7 +828,14 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
       }
       break;
   }
-  return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
+  if (IsWindowUnicode (hWnd))
+  {
+    return CallWindowProcW (This->m_OldWndProc, hWnd, message, wParam, lParam);
+  }
+  else
+  {
+    return CallWindowProcA (This->m_OldWndProc, hWnd, message, wParam, lParam);
+  }
 }
 
 void csGraphics2DOpenGL::Activate (bool activated)
@@ -911,9 +949,4 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
   curdmode.dmDriverExtra = 0;
   EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
   refreshRate = curdmode.dmDisplayFrequency;
-}
-
-void csGraphics2DOpenGL::CheckWGLExtensions ()
-{
-  ext.InitWGL_EXT_swap_control (hDC);
 }

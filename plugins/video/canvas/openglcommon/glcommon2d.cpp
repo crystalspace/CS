@@ -35,7 +35,7 @@ SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
-  csGraphics2D (iParent), FontCache (0)
+  csGraphics2D (iParent), FontCache (0), statecache (0)
 {
   EventOutlet = 0;
   screen_shot = 0;
@@ -53,13 +53,13 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
   // We don't really care about pixel format, except for ScreenShot()
   // and OpenGL software proctexes
 #if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
-    pfmt.RedMask = 0x000000FF;
+    pfmt.RedMask =   0x000000FF;
     pfmt.GreenMask = 0x0000FF00;
-    pfmt.BlueMask = 0x00FF0000;
+    pfmt.BlueMask =  0x00FF0000;
 #else 
-    pfmt.RedMask = 0x00FF0000;
+    pfmt.RedMask =   0x00FF0000;
     pfmt.GreenMask = 0x0000FF00;
-    pfmt.BlueMask = 0x000000FF;
+    pfmt.BlueMask =  0x000000FF;
 #endif
   pfmt.PixelBytes = 4;
   pfmt.PalEntries = 0;

@@ -225,7 +225,7 @@ bool csWin32RegistryConfig::InternalGetValue (const char* Key,
   {
     data.SetSize (datasize);
     err = RegQueryValueEx (hKey,
-      Key, 0, 0, data.data, &data.size);
+      Key, 0, 0, data.data, &datasize);
   }
 
   return (err == ERROR_SUCCESS);
@@ -409,12 +409,12 @@ const char *csWin32RegistryConfig::GetComment (const char *Key) const
 }
 
 bool csWin32RegistryConfig::InternalSetValue (const char* Key,
-    DWORD type, const void* data, DWORD datasize)
+    DWORD type, const void* data, size_t datasize)
 {
   if (!WriteAccess()) return false;
 
   LONG err = RegSetValueEx (hKey,
-    Key, 0, type, (BYTE*)data, datasize);
+    Key, 0, type, (BYTE*)data, (DWORD)datasize);
 
   return (err == ERROR_SUCCESS);
 }

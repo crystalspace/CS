@@ -121,12 +121,6 @@ protected:
   void SwitchDisplayMode (bool userMode);
   /// hardware accelerated?
   bool hardwareAccelerated;
-
-  /**
-   * Call the extension manager's InitializeExtension on all used
-   * WGL exts.
-   */
-  void CheckWGLExtensions ();
 };
 
 #endif // __CS_OGLG2D_H__

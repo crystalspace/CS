@@ -20,6 +20,13 @@
 #include "winthread.h"
 #include <process.h>
 
+#ifndef _UINTPTR_T_DEFINED
+typedef ptr_uint uintptr_t;
+#define _UINTPTR_T_DEFINED
+#endif
+
+#include "cssys/win32/wintools.h"
+
 #ifdef CS_DEBUG
 #define CS_SHOW_ERROR if (lasterr) printf ("%s\n",lasterr)
 #else
@@ -27,11 +34,8 @@
 #endif
 
 #define CS_GET_SYSERROR() \
-if (lasterr){LocalFree (lasterr); lasterr = 0;}\
-FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | \
-    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, \
-    0, (DWORD)GetLastError (), \
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lasterr, 0, 0)
+if (lasterr){delete[] lasterr; lasterr = 0;}\
+  lasterr = cswinGetErrorMessage (::GetLastError ())
 
 #define CS_TEST(x) if(!(x)) {CS_GET_SYSERROR(); CS_SHOW_ERROR;}
 
@@ -231,9 +235,10 @@ csWinThread::~csWinThread ()
 
 bool csWinThread::Start ()
 {
-  thread = (HANDLE)_beginthread (ThreadRun, 0, (void*)this);
-  running = ((unsigned long)thread != (unsigned long)~0);
+  uintptr_t thdl = _beginthread (ThreadRun, 0, (void*)this);
+  running = (thdl != (uintptr_t)-1);
   CS_TEST (running);
+  thread = (HANDLE)thdl;
   return running;
 }
 
