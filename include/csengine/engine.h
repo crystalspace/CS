@@ -26,6 +26,7 @@
 #include "csengine/rview.h"
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"
+#include "csengine/region.h"
 #include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
@@ -323,7 +324,7 @@ public:
   /// A pointer to the current region.
   iRegion* region;
   /// The list of all regions currently loaded.
-  csNamedObjVector regions;
+  csRegionList regions;
 
   /// The list of all named render priorities.
   csVector render_priorities;
@@ -705,6 +706,7 @@ public:
 
   virtual iMaterialList* GetMaterialList () const;
   virtual iTextureList* GetTextureList () const;
+  virtual iRegionList* GetRegions ();
 
   /**
    * Conveniance function to create the thing containing the
@@ -911,9 +913,6 @@ public:
    * region is selected).
    */
   virtual iRegion* GetCurrentRegion () const;
-
-  /// find a region by name
-  virtual iRegion* FindRegion (const char *name) const;
 
   /// Clear the entire engine.
   virtual void DeleteAll ();

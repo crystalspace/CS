@@ -1449,7 +1449,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   iPolygon3D* portalPoly;
   iMeshWrapper* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);
 
-  bool regionExists = (Sys->Engine->FindRegion(lev) != NULL);
+  bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != NULL);
   Sys->Engine->SelectRegion (lev);
   // If the region did not already exist then we load the level in it.
   if (!regionExists)

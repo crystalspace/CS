@@ -1848,17 +1848,13 @@ void csEngine::SelectRegion (const char *iName)
     return;
   }
 
-  csRegion* r = (csRegion*)(regions.FindByName (iName));
-  if (!r)
+  region = regions.FindByName (iName);
+  if (!region)
   {
-    r = new csRegion (this);
+    csRegion *r = new csRegion (this);
     region = &r->scfiRegion;
     r->SetName (iName);
-    regions.Push (r);
-  }
-  else
-  {
-    region = &(r->scfiRegion);
+    regions.Push (region);
   }
 }
 
@@ -1871,12 +1867,6 @@ void csEngine::SelectRegion (iRegion* region)
 iRegion* csEngine::GetCurrentRegion () const
 {
   return region;
-}
-
-iRegion* csEngine::FindRegion (const char *name) const
-{
-  csRegion *r = (csRegion*)regions.FindByName (name);
-  return r ? &r->scfiRegion : NULL;
 }
 
 void csEngine::AddToCurrentRegion (csObject* obj)
@@ -2018,6 +2008,11 @@ iTextureList* csEngine::GetTextureList () const
 iMaterialList* csEngine::GetMaterialList () const
 {
   return &(GetMaterials ()->scfiMaterialList);
+}
+
+iRegionList* csEngine::GetRegions ()
+{
+  return &(regions.scfiRegionList);
 }
 
 iCamera* csEngine::CreateCamera ()

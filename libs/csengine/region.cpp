@@ -355,3 +355,36 @@ bool csRegion::Region::IsInRegion (iObject* iobj)
 {
   return scfParent->IsInRegion (iobj);
 }
+
+// ---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csRegionList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRegionList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRegionList::RegionList)
+  SCF_IMPLEMENTS_INTERFACE (iRegionList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csRegionList::csRegionList () : csRegionListHelper (16, 16)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegionList);
+}
+
+int csRegionList::RegionList::GetCount () const
+  { return scfParent->Length (); }
+iRegion *csRegionList::RegionList::Get (int n) const
+  { return scfParent->Get (n); }
+int csRegionList::RegionList::Add (iRegion *obj)
+  { return scfParent->Push (obj); }
+bool csRegionList::RegionList::Remove (iRegion *obj)
+  { return scfParent->Delete (obj); }
+bool csRegionList::RegionList::Remove (int n)
+  { return scfParent->Delete (n); }
+void csRegionList::RegionList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csRegionList::RegionList::Find (iRegion *obj) const
+  { return scfParent->Find (obj); }
+iRegion *csRegionList::RegionList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }

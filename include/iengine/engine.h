@@ -61,6 +61,7 @@ struct iSectorList;
 struct iMeshList;
 struct iMeshFactoryList;
 struct iProgressMeter;
+struct iRegionList;
 
 /**
  * Flag for GetNearbyLights().
@@ -209,8 +210,6 @@ struct iEngine : public iBase
    * region is selected).
    */
   virtual iRegion* GetCurrentRegion () const = 0;
-  /// Find a region by name
-  virtual iRegion* FindRegion (const char *name) const = 0;
 
   /// Delete everything in the engine.
   virtual void DeleteAll () = 0;
@@ -278,6 +277,8 @@ struct iEngine : public iBase
   virtual iTextureList* GetTextureList () const = 0;
   /// Get the list of all materials.
   virtual iMaterialList* GetMaterialList () const = 0;
+  /// Get the list of all regions
+  virtual iRegionList* GetRegions () = 0;
 
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).

@@ -20,6 +20,7 @@
 #define __CS_REGION_H__
 
 #include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "iengine/region.h"
 
 struct iEngine;
@@ -137,6 +138,33 @@ public:
     virtual bool IsInRegion (iObject* obj);
   } scfiRegion;
   friend struct Region;
+};
+
+
+CS_DECLARE_OBJECT_VECTOR (csRegionListHelper, iRegion);
+
+class csRegionList : public csRegionListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csRegionList ();
+
+  class RegionList : public iRegionList
+  {
+  public:
+    SCF_DECLARE_EMBEDDED_IBASE (csRegionList);
+
+    virtual int GetCount () const;
+    virtual iRegion *Get (int n) const;
+    virtual int Add (iRegion *obj);
+    virtual bool Remove (iRegion *obj);
+    virtual bool Remove (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iRegion *obj) const;
+    virtual iRegion *FindByName (const char *Name) const;
+  } scfiRegionList;
 };
 
 #endif // __CS_REGION_H__
