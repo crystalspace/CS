@@ -26,6 +26,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivideo/effects/efdef.h"
+#include "ivideo/shader/shader.h"
 
 struct iTextureWrapper;
 struct iTextureManager;
@@ -60,6 +61,9 @@ private:
   
   /// The effect associated with this material
   iEffectDefinition* effect;
+
+  /// Shader assoiciated with material
+  csRef<iShader> shader;
 
 public:
   /**
@@ -104,6 +108,14 @@ public:
         float uscale, float vscale, float ushift, float vshift);
 
   //--------------------- iMaterial implementation ---------------------
+
+#ifdef CS_USE_NEW_RENDERER
+  /// Set associated shader
+  virtual void SetShader (iShader* shader);
+  /// Get associated shader
+  virtual iShader* GetShader ();
+
+#endif
 
   /// Set effect.
   virtual void SetEffect (iEffectDefinition *ed);
