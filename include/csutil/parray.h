@@ -97,7 +97,7 @@ public:
   {
     CS_ASSERT (Length () > 0);
     T* ret = GetAndClear (Length () - 1);
-    SetLength (Length () - 1);
+    Truncate (Length () - 1);
     return ret;
   }
 
@@ -115,6 +115,12 @@ public:
       SetLength (n, 0);
       for (int i = old_len ; i < n ; i++) Get(i) = new T (what);
     }
+  }
+
+  /// Call csArray<T*>::SetLength(n).
+  void SetLength (int n)
+  {
+    csArray<T*>::SetLength(n);
   }
 };
 
