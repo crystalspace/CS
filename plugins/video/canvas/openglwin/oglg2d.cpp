@@ -427,8 +427,11 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
     default: return false;
   }
 
-  SetWindowLong(m_hWnd,0,(LONG)hCursor);
-  return true;
+	if (hCursor == NULL) return false;
+
+	if (SetWindowLong(m_hWnd,0,(LONG)hCursor))
+		return true;
+	return false;
 }
 
 bool csGraphics2DOpenGL::SetMousePosition (int x, int y)

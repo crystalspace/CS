@@ -740,8 +740,11 @@ bool csGraphics2DDDraw6::SetMouseCursor (csMouseCursorID iShape)
     default: return false;
   }
 
-  SetWindowLong(m_hWnd,0,(LONG)hCursor);
-  return true;
+	if (hCursor == NULL) return false;
+
+	if (SetWindowLong(m_hWnd,0,(LONG)hCursor))
+		return true;
+	return false;
 }
 
 bool csGraphics2DDDraw6::SetMousePosition (int x, int y)
