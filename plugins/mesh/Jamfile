@@ -15,6 +15,7 @@ SubInclude TOP plugins mesh haze ;
 SubInclude TOP plugins mesh impexp ;
 SubInclude TOP plugins mesh lghtng ;
 SubInclude TOP plugins mesh null ;
+SubInclude TOP plugins mesh particles ;
 SubInclude TOP plugins mesh rain ;
 SubInclude TOP plugins mesh snow ;
 SubInclude TOP plugins mesh spiral ;
@@ -32,5 +33,4 @@ if $(USE_NEW_RENDERER) = "no"
 else
 {
   SubInclude TOP plugins mesh terrain ;
-  SubInclude TOP plugins mesh particles ;
 }
