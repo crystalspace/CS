@@ -222,6 +222,8 @@ CTextureFile* CWad3File::CreateTexture(const char* texturename)
     pTexture->SetTexturename (texturename);
     pTexture->SetFilename    (texfilename);
     pTexture->SetOriginalData(pData, Size);
+    if (*texturename == '{')
+      pTexture->SetKeyColor (0, 0, 1);
 
     miptex_t Info;
     if (GetQtexInfo(texturename, &Info))

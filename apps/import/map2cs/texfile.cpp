@@ -65,6 +65,7 @@ CTextureFile::CTextureFile()
   m_R              = 0.0f;
   m_G              = 0.0f;
   m_B              = 0.0f;
+  m_Stored	   = true;
 }
 
 CTextureFile::~CTextureFile()

@@ -90,6 +90,15 @@ public:
   /// decide, if this texture will be mipmapped
   void SetMipmapped(bool Mipmapped) {m_Mipmapped = Mipmapped;}
 
+  /// set visible flag
+  void SetVisible (bool visible) { m_Visible = visible; }
+
+  /// store this texture in zip?
+  void SetStored (bool stored) { m_Stored = stored; }
+
+  /// return true if this texture will be stored in zip
+  bool IsStored() {return m_Stored;}
+
 protected:
   /**
     * The name of the texture, without filetype extension or references to
@@ -135,6 +144,9 @@ protected:
 
   /// The Keycolor if m_ColorKeyed is true;
   float m_R, m_G, m_B;
+
+  /// store on disk?
+  bool m_Stored;
 };
 
 #endif

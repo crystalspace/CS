@@ -483,7 +483,7 @@ bool CCSSector::WriteCurves(CIWorld* pWorld)
           pWorld->WriteIndent();
           fprintf(fd, "ZUSE()\n");
           pWorld->WriteIndent();
-          fprintf(fd, "PRIORITY('object')\n");
+	  fprintf(fd, "PRIORITY('%s')\n", pEntity->GetValueOfKey("priority", "object"));
 
           CCSWorld::WriteKeys(pWorld, pEntity);
 

@@ -152,6 +152,16 @@ bool CCSWorld::Write(const char* filename, CMapFile* pMap, const char * /*source
 
   WritePlayerStart();
   WriteTextures();
+
+  fprintf(m_fd, 
+    "\tRENDERPRIORITIES (\n"
+    "\t\tPRIORITY 'sky' (1,NONE)\n"
+    "\t\tPRIORITY 'wall' (2,NONE)\n"
+    "\t\tPRIORITY 'object' (3,NONE)\n"
+    "\t\tPRIORITY 'alpha' (4,BACK2FRONT)\n"
+    "\t)\n"
+    "\n");  
+
   WritePlugins();
   WriteSounds();
   WriteSpritesTemplate();
@@ -567,6 +577,8 @@ void CCSWorld::FindAdditionalTextures()
 
 bool CCSWorld::WriteTextures()
 {
+  CMapEntity* pEntity = GetWorldspawn();
+
   FindAdditionalTextures();
 
   WriteIndent();
@@ -581,16 +593,21 @@ bool CCSWorld::WriteTextures()
 
     WriteIndent();
 
+    char replacename[255];
+    const char *newtexfile;
+    sprintf(replacename, "filename_%s", pTexture->GetTexturename());
+    if (newtexfile = pEntity->GetValueOfKey(replacename) )
+      pTexture->SetStored (false);
     fprintf(m_fd, "TEXTURE '%s' (FILE (%s)",
                    pTexture->GetTexturename(),
-                   pTexture->GetFilename());
+		   newtexfile?newtexfile:pTexture->GetFilename());
 
     if (pTexture->IsColorKeyed())
     {
       float r, g, b;
       pTexture->GetKeyColor(r, g, b);
 
-      fprintf(m_fd, " TRANSPARENT (%g %g %g)", r, g, b);
+      fprintf(m_fd, " TRANSPARENT (%g,%g,%g)", r, g, b);
     }
 
     if (!pTexture->IsMipmapped())

@@ -193,7 +193,7 @@ bool CTextureManager::AddAllTexturesToZip(CZipFile* pZipfile)
     //Only add visible textures to the ZIP. This avoids adding textures
     //that shouldn't bee seen in a map. (Like brushes that are used for
     //visblocking and that are using some reserved names.).
-    if (pTexture->IsVisible())
+    if (pTexture->IsVisible() && pTexture->IsStored())
     {
       if (!pTexture->AddToZip(pZipfile))
       {

@@ -42,7 +42,7 @@ CTextureFile* CZipArchive::CreateTexture(const char* texturename)
   char texfilename[256];
   CTextureFile* pTexture = NULL;
 
-  const char* Extensions[] = {"tga", "jpg", "jpeg", "bmp", "wal", "gif"};
+  const char* Extensions[] = {"tga", "jpg", "jpeg", "bmp", "wal", "gif", "png"};
 
   int i;
   for (i=0; i<int(sizeof(Extensions)/sizeof(Extensions[0])); i++)

@@ -65,7 +65,7 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
   if (IsSky())
     fprintf(fd, "PRIORITY('sky')\n");
   else
-    fprintf(fd, "PRIORITY('object')\n");
+    fprintf(fd, "PRIORITY('%s')\n", m_pOriginalEntity->GetValueOfKey("priority", "object"));
 
   //Activate a script
   char scriptname[99] = "none";
