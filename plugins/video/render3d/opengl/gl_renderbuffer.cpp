@@ -70,9 +70,8 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
   if (locked) return (void*)-1;
   
   locked = true; 
-  ext->glBindBufferARB (
-    (type == CS_GLBUF_RENDERLOCK_ARRAY) ? GL_ARRAY_BUFFER_ARB : 
-      GL_ELEMENT_ARRAY_BUFFER_ARB, bufferId);
+  ext->glBindBufferARB (index?GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, 
+    bufferId);
   lastRLock = type;
 
   return 0;

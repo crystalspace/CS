@@ -117,6 +117,7 @@ private:
   csRenderBufferLockType lastLock;
   csGLRenderBufferLockType lastRLock;
   csGLExtensionManager *ext;
+  bool index;
 public:
   csVBORenderBuffer (int size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount, 
@@ -124,6 +125,7 @@ public:
     csGLRenderBuffer (size, type, comptype, compcount)
   {
     csVBORenderBuffer::ext = ext;
+    csVBORenderBuffer::index = index;
     locked = false;
     ext->glGenBuffersARB (1, &bufferId);
     ext->glBindBufferARB (index?
@@ -153,7 +155,8 @@ public:
 	case CS_BUF_LOCK_NORMAL:
 	  RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
 	  lastLock = CS_BUF_LOCK_NORMAL;
-	  return ext->glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+          return ext->glMapBufferARB (index?
+                      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	case CS_BUF_LOCK_NOLOCK:
 	  break;
       }
@@ -166,9 +169,10 @@ public:
   {
     if (lastLock == CS_BUF_LOCK_NORMAL)
     {
-      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
+      ext->glBindBufferARB (index?
+                            GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, bufferId);
       // @@@ Should be real error check.
-      CS_ASSERT(ext->glUnmapBufferARB (GL_ARRAY_BUFFER_ARB));
+      ext->glUnmapBufferARB (index?GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB);
     }
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;
