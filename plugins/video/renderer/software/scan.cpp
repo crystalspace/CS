@@ -27,12 +27,13 @@
 #include "sttest.h"
 
 /// The only instance of this structure lives here
-csScanSetup Scan =
-{
-  16,			// InterpolStep
-  4,			// InterpolShift
-  INTER_MODE_SMART	// InterpolMode
-};
+//csScanSetup Scan =
+//{
+//  16,			// InterpolStep
+//  4,			// InterpolShift
+//  INTER_MODE_SMART	// InterpolMode
+//};
+csScanSetup Scan;
 
 //---------------------- This routine is pixel-depth independent ---
 

@@ -87,6 +87,8 @@ struct iPolygonTexture;
  */
 struct csScanSetup
 {
+  csScanSetup() { InterpolStep = 16; InterpolShift = 4; InterpolMode = INTER_MODE_SMART; }
+
   /// Interpolation step for semi-perspective correct texture mapping
   int InterpolStep;
   /// Interpolation step (shift-value) for semi-perspective correct texture mapping
