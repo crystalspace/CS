@@ -136,10 +136,7 @@ Bugs to fix:
 	     [Bug 430601]
 	[V]  Investigate bugs related to the walktest 'portal' command and
 	     to portals in general.
-	     [Bug 430285]
-	     [Bug 471637]
-	     [Bug 471638]
-	     [Bug 473597]
+	     (For example: [Bug 473597])
 	[V]  Visibility culling does not work correctly on objects that
 	     are scaled using the movable (it works correctly with objects
 	     scaled using HardTransform).
