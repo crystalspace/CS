@@ -1,0 +1,12 @@
+The script in this directory, can create a basic buildsystem (jam based) for
+external CS projects. It sets up jamrules, autoconf macros, a configure script,
+a source directory and a simple main.cpp file.
+
+To run the script change to some directory where you want to have the project
+created and make sure you've setup the CRYSTAL environment variable to point to
+your CS source directory. Then you can invoke the script with your desired
+application name and your email address as argument (the email is used as the
+email of the project author). Example:
+
+  $CRYSTAL/scripts/jamtemplate/createproject.sh testcs me@someisp.com
+  
