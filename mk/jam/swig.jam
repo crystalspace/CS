@@ -129,7 +129,7 @@ if $(CMD.SWIG)
 
     if $(frozentargetdir)
     {
-      local frozen_target = $(target:G=swigfreeze) ;
+      local frozen_target = $(target:G=$(tag)freeze) ;
       MakeLocate $(frozen_target) : $(frozentargetdir) ;
       Depends $(frozen_target) : $(target) ;
       Copy $(frozen_target) : $(target) ;
@@ -137,7 +137,7 @@ if $(CMD.SWIG)
 
       if $(othertargets)
       {
-        local frozen_other = $(othertargets:G=swigfreeze) ;
+        local frozen_other = $(othertargets:G=$(tag)freeze) ;
         MakeLocate $(frozen_other) : $(frozenotherdir) ;
         Depends $(frozen_other) : $(othertargets) ;
         Copy $(frozen_other) : $(othertargets) ;
