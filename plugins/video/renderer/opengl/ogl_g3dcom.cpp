@@ -152,7 +152,7 @@ static DECLARE_GROWING_ARRAY_REF (fog_color_verts, csColor);
 =========================================================================*/
 
 csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
-  G2D (NULL), config (NULL), System (NULL)
+  G2D (NULL), System (NULL)
 {
   ShortcutDrawPolygon = 0;
   ShortcutStartPolygonFX = 0;
@@ -195,9 +195,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 {
-  if (config)
-    config->DecRef();
-
   Close ();
   if (G2D) G2D->DecRef ();
   if (System) System->DecRef ();
@@ -214,9 +211,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 {
   (System = iSys)->IncRef ();
 
-  System->AddConfig (iSystem::ConfigPriorityPlugIn, "/config/opengl.cfg");
-  config = System->GetConfig();
-  config->IncRef();
+  config.AddConfig(System, "/config/opengl.cfg");
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)

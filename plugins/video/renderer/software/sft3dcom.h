@@ -24,6 +24,7 @@
 #include "soft_txt.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
+#include "csutil/cfgacc.h"
 #include "scan.h"
 #include "ihalo.h"
 #include "iplugin.h"
@@ -194,7 +195,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  iConfigFileNew* config;
+  csConfigAccess config;
 
   /// The texture manager.
   csTextureManagerSoftware* texman;

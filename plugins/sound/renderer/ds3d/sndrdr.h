@@ -27,10 +27,10 @@
 #include "isnddata.h"
 #include "isndrdr.h"
 #include "csutil/csvector.h"
+#include "csutil/cfgacc.h"
 
 class csSoundListenerDS3D;
 class csSoundSourceDS3D;
-struct iConfigFileNew;
 
 class csSoundRenderDS3D : public iSoundRender
 {
@@ -69,7 +69,7 @@ public:
   csSoundListenerDS3D *Listener;
   csSoundFormat LoadFormat;
   csVector ActiveSources;
-  iConfigFileNew *Config;
+  csConfigAccess Config;
 };
 
 #endif	//__SOUND_RENDER_DS3D_H__

@@ -22,6 +22,7 @@
 // csGraphics3DLine line rasterizer class.
 
 #include "csutil/scf.h"
+#include "csutil/cfgacc.h"
 #include "csgeom/transfrm.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
@@ -76,7 +77,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  iConfigFileNew* config;
+  csConfigAccess config;
 
   /// The texture manager.
   csTextureManagerLine* texman;

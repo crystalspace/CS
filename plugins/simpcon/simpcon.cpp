@@ -26,6 +26,7 @@
 #include "simpinp.h"
 #include "csutil/util.h"
 #include "csutil/csrect.h"
+#include "csutil/cfgacc.h"
 #include "cssys/csevent.h"
 #include "igraph2d.h"
 #include "itxtmgr.h"
@@ -94,8 +95,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   FrameWidth = G2D->GetWidth ();
   FrameHeight = G2D->GetHeight ();
 
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/simpcon.cfg");
-  iConfigFileNew *Config = System->GetConfig ();
+  csConfigAccess Config(System, "/config/simpcon.cfg");
   console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", false);
   console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", 1);
   const char *buf = Config->GetStr ("SimpleConsole.ConFG", "255,255,255");

@@ -40,14 +40,12 @@ IMPLEMENT_IBASE_END
 csFreeTypeServer::csFreeTypeServer (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
-  ftconfig = NULL;
   VFS = NULL;
 }
 
 csFreeTypeServer::~csFreeTypeServer ()
 {
   if (VFS) VFS->DecRef ();
-  if (ftconfig) ftconfig->DecRef ();
   if (System) System->DecRef ();
 }
 
@@ -63,9 +61,7 @@ bool csFreeTypeServer::Initialize (iSystem *Sys)
   }
 
   VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  System->AddConfig (iSystem::ConfigPriorityPlugIn, "config/freetype.cfg");
-  ftconfig = System->GetConfig();
-  ftconfig->IncRef();
+  ftconfig.AddConfig(System, "config/freetype.cfg");
  
   defaultSize = ftconfig->GetInt ("Freetype.Settings.Size", 10);
   platformID = ftconfig->GetInt ("Freetype.Settings.PlatformID", 3);

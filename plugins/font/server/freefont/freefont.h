@@ -23,6 +23,7 @@
 #include "ifontsrv.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
+#include "csutil/cfgacc.h"
 
 class csFreeTypeServer;
 
@@ -190,7 +191,7 @@ public:
   TT_UShort platformID, encodingID;
   int defaultSize;
   iSystem *System;
-  iConfigFileNew *ftconfig;
+  csConfigAccess ftconfig;
   iVFS *VFS;
   const char *fontset;
 

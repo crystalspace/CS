@@ -26,6 +26,7 @@
 #include <glide.h>
 
 #include "csutil/scf.h"
+#include "csutil/cfgacc.h"
 #include "igraph3d.h"
 #include "ihalo.h"
 #include "iplugin.h"
@@ -150,7 +151,7 @@ private:
   bool m_bHaloEffect;
 
   /// Our private config file
-  iConfigFileNew *config;
+  csConfigAccess config;
 
   /// fogtable
   GrFog_t *fogtable;

@@ -147,7 +147,6 @@ csGraphics3DGlide::csGraphics3DGlide(iBase* iParent) :
     m_pTextureCache(NULL),
     m_pLightmapCache(NULL),
     m_pAlphamapCache(NULL),
-    config(NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -201,8 +200,6 @@ csGraphics3DGlide::~csGraphics3DGlide()
     m_pLightmapCache->DecRef ();
   if (m_pAlphamapCache)
     m_pAlphamapCache->DecRef ();
-  if (config)
-    config->DecRef();
   delete txtmgr;
   if (m_pCamera)
     m_pCamera->DecRef ();
@@ -220,10 +217,7 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
 
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide selected\n");
 
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/glide.cfg");
-  config = m_piSystem->GetConfig ();
-  if (!config) return false;
-  config->IncRef();
+  config.AddConfig(System, "/config/glide.cfg");
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D, NULL, iGraphics2D);
   if (!m_piG2D) return false;

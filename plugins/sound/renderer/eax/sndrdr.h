@@ -27,6 +27,7 @@
 #include "isnddata.h"
 #include "isndrdr.h"
 #include "csutil/csvector.h"
+#include "csutil/cfgacc.h"
 
 class csSoundListenerEAX;
 class csSoundSourceEAX;
@@ -69,7 +70,7 @@ public:
   csSoundListenerEAX *Listener;
   csSoundFormat LoadFormat;
   csVector ActiveSources;
-  iConfigFileNew *Config;
+  csConfigAccess Config;
 };
 
 #endif	//__SOUND_RENDER_EAX_H__

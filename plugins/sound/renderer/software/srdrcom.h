@@ -27,6 +27,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
+#include "csutil/cfgacc.h"
 #include "isndrdr.h"
 
 struct iSoundDriver;
@@ -75,7 +76,7 @@ public:
 	
 private:
   // the config file
-  iConfigFileNew *Config;
+  csConfigAccess Config;
 
   // all active sound sources
   csVector Sources;

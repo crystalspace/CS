@@ -29,6 +29,7 @@
 #include <GL/gl.h>
 
 #include "csutil/scf.h"
+#include "csutil/cfgacc.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "csgeom/transfrm.h"
@@ -214,7 +215,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  iConfigFileNew* config;
+  csConfigAccess config;
 
   /// The System interface. 
   iSystem* System;

@@ -49,20 +49,16 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   MemorySize = 0;
   Memory = NULL;
   WaveOut = NULL;
-  Config = NULL;
 }
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
-  if (Config) Config->DecRef();
 }
 
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 {
   System = iSys;
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/sound.cfg");
-  Config = System->GetConfig();
-  Config->IncRef();
+  Config.AddConfig(System, "/config/sound.cfg");
   return true;
 }
 

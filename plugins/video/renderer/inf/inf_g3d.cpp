@@ -52,7 +52,7 @@ IMPLEMENT_IBASE (csGraphics3DInfinite)
 IMPLEMENT_IBASE_END
 
 csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
-  G2D (NULL), config (NULL)
+  G2D (NULL)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
@@ -92,17 +92,13 @@ csGraphics3DInfinite::~csGraphics3DInfinite ()
   Close ();
   delete texman;
   if (G2D) G2D->DecRef ();
-  if (config)
-    config->DecRef();
 }
 
 bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/inf3d.cfg");
-  config = System->GetConfig();
-  config->IncRef();
+  config.AddConfig(System, "/config/inf3d.cfg");
 
   width = height = -1;
 

@@ -25,10 +25,9 @@
 // csSoundDriverWaveOut class.
 
 #include "csutil/scf.h"
+#include "csutil/cfgacc.h"
 #include "isnddrv.h"
 #include "isystem.h"
-
-struct iConfigFileNew;
 
 class csSoundDriverWaveOut : public iSoundDriver
 {
@@ -58,7 +57,7 @@ protected:
   iSystem *System;
 
   // config file
-  iConfigFileNew *Config;
+  csConfigAccess Config;
 
   // sound renderer
   iSoundRender *SoundRender;

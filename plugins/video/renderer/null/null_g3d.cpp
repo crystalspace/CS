@@ -45,7 +45,7 @@ IMPLEMENT_IBASE (csGraphics3DNull)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END
 
-csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL), config (NULL)
+csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -67,17 +67,13 @@ csGraphics3DNull::~csGraphics3DNull ()
   delete texman;
   if (G2D)
     G2D->DecRef ();
-  if (config)
-    config->DecRef ();
 }
 
 bool csGraphics3DNull::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/null3d.cfg");
-  config = System->GetConfig();
-  config->IncRef();
+  config.AddConfig(System, "/config/null3d.cfg");
 
   width = height = -1;
 

@@ -50,7 +50,6 @@ csSoundRenderEAX::csSoundRenderEAX(iBase *piBase) {
   Listener = NULL;
   AudioRenderer = NULL;
   System = NULL;
-  Config = NULL;
 }
 
 bool csSoundRenderEAX::Initialize(iSystem *iSys) {
@@ -60,17 +59,13 @@ bool csSoundRenderEAX::Initialize(iSystem *iSys) {
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
 
-// use system manager *may not be complete see simpcon for example usage*
-  iSys->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/sound.cfg");
-  Config = iSys->GetConfig ();
+  Config.AddConfig(iSys, "/config/sound.cfg");
 
-//  Config = iSys->CreateConfigNew("/config/sound.cfg"); // compile error
   return true;
 }
 
 csSoundRenderEAX::~csSoundRenderEAX() {
   Close();
-  if (Config) Config->DecRef();
 }
 
 bool csSoundRenderEAX::Open()

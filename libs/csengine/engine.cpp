@@ -53,6 +53,7 @@
 #include "csgeom/polypool.h"
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"
+#include "csutil/cfgacc.h"
 #include "iimage.h"
 #include "ivfs.h"
 #include "ihalo.h"
@@ -689,7 +690,7 @@ bool csEngine::Initialize (iSystem* sys)
   if (!System->CallOnEvents (this, CSMASK_Broadcast))
     return false;
   
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/engine.cfg");
+  csConfigAccess cfg(System, "/config/engine.cfg");
   ReadConfig ();
 
   return true;

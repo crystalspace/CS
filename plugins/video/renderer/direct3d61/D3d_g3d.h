@@ -39,6 +39,7 @@
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "csutil/scf.h"
+#include "csutil/cfgacc.h"
 #include "csgeom/transfrm.h"
 #include "cssys/win32/IDDetect.h"
 #include "igraph3d.h"
@@ -171,7 +172,7 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   bool m_bMipmapping;
 
   /// The private config file
-  iConfigFileNew *config;
+  csConfigAccess config;
 
   csStateCacheDirect3DDx6 m_States;
   csVertexCacheDirect3D m_VertexCache;

@@ -50,7 +50,6 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase) {
   Listener = NULL;
   AudioRenderer = NULL;
   System = NULL;
-  Config = NULL;
 }
 
 bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
@@ -59,15 +58,12 @@ bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/sound.cfg");
-  Config = iSys->GetConfig();
-  Config->IncRef();
+  Config.AddConfig(System, "/config/sound.cfg");
   return true;
 }
 
 csSoundRenderDS3D::~csSoundRenderDS3D() {
   Close();
-  if (Config) Config->DecRef();
 }
 
 bool csSoundRenderDS3D::Open()

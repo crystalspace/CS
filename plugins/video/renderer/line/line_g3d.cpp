@@ -64,7 +64,7 @@ IMPLEMENT_IBASE (csGraphics3DLine)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
-csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL), config (NULL)
+csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
@@ -88,17 +88,13 @@ csGraphics3DLine::~csGraphics3DLine ()
   delete texman;
   if (G2D)
     G2D->DecRef ();
-  if (config)
-    config->DecRef();
 }
 
 bool csGraphics3DLine::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/line3d.cfg");
-  config = System->GetConfig();
-  config->IncRef();
+  config.AddConfig(System, "/config/line3d.cfg");
 
   width = height = -1;
 

@@ -149,7 +149,7 @@ int csGraphics3DSoftwareCommon::filter_bf = 1;
 
 ///---------------------------------------------------------------------------
 csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
-  G2D (NULL), config (NULL)
+  G2D (NULL)
 {
   tcache = NULL;
   texman = NULL;
@@ -194,7 +194,6 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 {
   Close ();
-  if (config) config->DecRef ();
   if (G2D) G2D->DecRef ();
   if (System) System->DecRef ();
   if (partner) partner->DecRef ();
@@ -202,9 +201,7 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/soft3d.cfg");
-  config = System->GetConfig();
-  config->IncRef();
+  config.AddConfig(System, "/config/soft3d.cfg");
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;

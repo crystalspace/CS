@@ -22,6 +22,7 @@
 // csGraphics3DNull line rasterizer class.
 
 #include "csutil/scf.h"
+#include "csutil/cfgacc.h"
 #include "csgeom/transfrm.h"
 #include "null_txt.h"
 #include "iconfig.h"
@@ -76,7 +77,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  iConfigFileNew* config;
+  csConfigAccess config;
 
   /// The texture manager.
   csTextureManagerNull* texman;

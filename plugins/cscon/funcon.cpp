@@ -29,6 +29,7 @@
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "csutil/cfgacc.h"
 #include "funcon.h"
 #include "conbuffr.h"
 #include "icfgnew.h"
@@ -335,8 +336,8 @@ void funConsole::GetPosition (int &x, int &y, int &width, int &height) const
 
 void funConsole::LoadPix ()
 {
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/funcon.cfg");
-  iConfigFileNew *ini = System->GetConfig();
+  csConfigAccess ini(System, "/config/funcon.cfg");
+
   const char* dir = ini->GetStr ("FunCon.General.Zip");
   const char* mountdir = ini->GetStr ("FunCon.General.Mount");
   if (VFS->Mount (mountdir, dir))

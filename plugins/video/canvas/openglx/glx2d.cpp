@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "csutil/csrect.h"
+#include "csutil/cfgacc.h"
 #include "isystem.h"
 #include "itexture.h"
 #include "icfgnew.h"
@@ -51,30 +52,25 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
-  iConfigFileNew *config = pSystem->CreateSeparateConfig ("/config/opengl.cfg" );
+  csConfigAccess config(pSystem, "/config/opengl.cfg");
 
   dispdriver = NULL;
   const char *strDriver;
-  if (config)
+
+  if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
   {
-    if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
+    dispdriver = LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
+    if (!dispdriver)
+      CsPrintf (MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
+    else
     {
-      dispdriver = LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
-      if (!dispdriver)
-        CsPrintf (MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
-      else
+      if (!dispdriver->open ())
       {
-        if (!dispdriver->open ())
-        {
-          printf ("open of displaydriver %s failed!\n", strDriver);
-          return false;
-        }
+        printf ("open of displaydriver %s failed!\n", strDriver);
+        return false;
       }
     }
-    config->DecRef ();
   }
-  else
-    CsPrintf (MSG_FATAL_ERROR, "Could not open opengl.cfg to check if a special MESA displaydriver should be used.\n");
   
   Screen* screen_ptr;
 

@@ -230,8 +230,7 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
   m_piSystem (NULL),
   m_bIsLocked (false),
   m_bVerbose (true),
-  m_bMipmapping (false),
-  config (NULL)
+  m_bMipmapping (false)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -262,8 +261,6 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
 
 csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
 {
-  if (config)
-    config->DecRef ();
   if (m_piG2D)
     m_piG2D->DecRef ();
   if (m_piSystem)
@@ -275,9 +272,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  m_piSystem->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/direct3ddx6.cfg");
-  config = m_piSystem->GetConfig();
-  config->IncRef();
+  config.AddConfig(m_piSystem, "/config/direct3ddx6.cfg");
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx61", NULL, iGraphics2D);
   if (!m_piG2D)

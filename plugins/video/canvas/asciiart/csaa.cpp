@@ -65,10 +65,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/asciiart.cfg");
-  iConfigFileNew *config = System->GetConfig ();
-  if (!config)
-    return false;
+  csConfigAccess config(pSystem, "/config/asciiart.cfg");
 
   // Load settings from config file and setup the aa_defparams structure
   HardwareCursor = System->GetConfig ()->GetBool
