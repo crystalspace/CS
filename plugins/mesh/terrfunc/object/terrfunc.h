@@ -523,7 +523,7 @@ public:
     }
     virtual void SetDirLight (const csVector3& pos, const csColor& col)
     {
-      return scfParent->SetDirLight (pos, col);
+      scfParent->SetDirLight (pos, col);
     }
     virtual csVector3 GetDirLightPosition () const
     {
@@ -535,7 +535,7 @@ public:
     }
     virtual void DisableDirLight ()
     {
-      return scfParent->DisableDirLight ();
+      scfParent->DisableDirLight ();
     }
     virtual bool IsDirLightEnabled () const
     {
@@ -543,7 +543,7 @@ public:
     }
     virtual void SetMaterial (int i, iMaterialWrapper* mat)
     {
-      return scfParent->SetMaterial (i, mat);
+      scfParent->SetMaterial (i, mat);
     }
     virtual int GetMaterialCount () const
     {
