@@ -790,8 +790,11 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
     {
       iTextureWrapper* wrap;
       thispass->textureRef[i]->GetValue(wrap);
-      if (wrap) 
+      if (wrap)
+      {
+        wrap->Visit ();
         last_textures[i] = wrap->GetTextureHandle ();
+      }
       else
         last_textures[i] = 0;
     }
@@ -805,8 +808,10 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
         iTextureWrapper* wrap;
         var->GetValue(wrap);
         if (wrap) 
+        {
+          wrap->Visit ();
           last_textures[i] = wrap->GetTextureHandle ();
-        else 
+        } else 
           var->GetValue(last_textures[i]);
       } else
         last_textures[i] = 0;

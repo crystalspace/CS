@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Mar-2004
+	- Anders Stenberg fixed procedural textures in NR. Visit for
+	  textures wasn't called, and is now called on access in the shader
+	  plugin (XMLShader). Not sure that's the correct place, but it works
+	  for now.
 19-Mar-2004
 	- res fixed compilation of the aseie plugin.
 	- duhprey overrided the correct Write in null2d (from Jorrit)
