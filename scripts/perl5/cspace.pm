@@ -6649,6 +6649,7 @@ package cspace::iSpriteCal3DState;
 *GetAnimCount = *cspacec::iSpriteCal3DState_GetAnimCount;
 *GetAnimName = *cspacec::iSpriteCal3DState_GetAnimName;
 *GetAnimType = *cspacec::iSpriteCal3DState_GetAnimType;
+*FindAnim = *cspacec::iSpriteCal3DState_FindAnim;
 *ClearAllAnims = *cspacec::iSpriteCal3DState_ClearAllAnims;
 *SetAnimCycle = *cspacec::iSpriteCal3DState_SetAnimCycle;
 *AddAnimCycle = *cspacec::iSpriteCal3DState_AddAnimCycle;
