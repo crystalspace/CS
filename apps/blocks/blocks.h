@@ -39,6 +39,7 @@ struct iSector;
 struct iMeshWrapper;
 struct iDynLight;
 struct iView;
+struct iSoundSource;
 
 class KeyMapping
 {
@@ -311,6 +312,7 @@ public:
   iGraphics3D *myG3D;
   iVFS *myVFS;
   iNetworkDriver *myNetDrv;
+  iSoundSource *backsound;
 
   static int white, black, red;
 
