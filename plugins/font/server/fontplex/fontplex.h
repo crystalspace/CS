@@ -28,6 +28,7 @@
 #include "csutil/refarr.h"
 #include "csutil/cfgacc.h"
 #include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 
 class csFontServerMultiplexor;
 class csFontPlexer;
@@ -62,6 +63,8 @@ class csFontPlexer : public iFont
 private:
   friend struct csFontLoadOrderEntry;
 
+  csRef<csFontServerMultiplexor> parent;
+  const char* fontid;
   int size;
   iFont* primaryFont;
 
@@ -70,10 +73,11 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csFontPlexer (iFont* primary, csFontLoaderOrder* order);
+  csFontPlexer (csFontServerMultiplexor* parent, 
+    const char* fontid, iFont* primary, 
+    int size, csFontLoaderOrder* order);
   virtual ~csFontPlexer ();
 
-  virtual void SetSize (int iSize);
   virtual int GetSize ();
   virtual void GetMaxSize (int &oW, int &oH);
   virtual bool GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics);
@@ -129,7 +133,9 @@ private:
     FontServerMapEntry (const FontServerMapEntry& source);
     ~FontServerMapEntry ();
   };
-  csHash<FontServerMapEntry> fontServerMap;
+  csHash<FontServerMapEntry, csStrKey, 
+    csConstCharHashKeyHandler> fontServerMap;
+  csHash<iFont*, const char*, csConstCharHashKeyHandler> loadedFonts;
 
   csFontLoaderOrder fallbackOrder;
 
@@ -137,6 +143,8 @@ private:
     const char* str);
   csPtr<iFontServer> ResolveFontServer (const char* name);
 public:
+  void NotifyDelete (csFontPlexer* font, const char* fontid);
+
   SCF_DECLARE_IBASE;
 
   /// Create the plugin object
@@ -151,19 +159,7 @@ public:
    * Load a font by name.
    * Returns a new iFont object or 0 on failure.
    */
-  virtual csPtr<iFont> LoadFont (const char *filename);
-
-  /**
-   * Get number of loaded fonts.
-   */
-  virtual int GetFontCount ();
-
-  /**
-   * Get Nth loaded font or 0.
-   * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get 0.
-   */
-  virtual iFont *GetFont (int iIndex);
+  virtual csPtr<iFont> LoadFont (const char *filename, int size = 10);
 
   struct eiComponent : public iComponent
   {

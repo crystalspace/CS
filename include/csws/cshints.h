@@ -47,8 +47,7 @@ class csHint : public csComponent
 
 public:
   /// Create a floating hint with an text string
-  csHint (csComponent *iParent, const char *iText, iFont *Font = 0,
-    int iFontSize = -1);
+  csHint (csComponent *iParent, const char *iText, iFont *Font = 0);
   /// Cleanup before destruction
   virtual ~csHint ();
 

@@ -354,8 +354,8 @@ public:
   { return *hints; }
 
   /// Load a font and return its handle or 0
-  csPtr<iFont> LoadFont (const char *iFontName)
-  { return FontServer->LoadFont (iFontName); }
+  csPtr<iFont> LoadFont (const char *iFontName, int fontSize = 10)
+  { return FontServer->LoadFont (iFontName, fontSize); }
 
 /*
  * The following methods are simple redirectors to csGraphicsPipeline
@@ -382,8 +382,8 @@ public:
   { GfxPpl.Pixel (x, y, pplColor (color)); }
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void pplText (int x, int y, int fg, int bg, iFont *Font, int FontSize, const char *s)
-  { GfxPpl.Text (x, y, pplColor (fg), bg != -1 ? pplColor (bg) : bg, Font, FontSize, s); }
+  void pplText (int x, int y, int fg, int bg, iFont *Font, const char *s)
+  { GfxPpl.Text (x, y, pplColor (fg), bg != -1 ? pplColor (bg) : bg, Font, s); }
 
   /// Draw a (scaled) pixmap
   void pplPixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha)

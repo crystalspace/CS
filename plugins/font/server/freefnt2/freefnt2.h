@@ -22,12 +22,29 @@
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/hash.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
+#include "csutil/refcount.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
 
 class csFreeType2Server;
+
+/**
+ * Wrapper so a freetype face can be shared between fonts
+ */
+struct csFt2FaceWrapper : public csRefCount
+{
+  FT_Face face;
+  const char* faceName;
+  csFreeType2Server* owner;
+  csRef<iDataBuffer> data;
+
+  csFt2FaceWrapper (csFreeType2Server* owner, iDataBuffer* data,
+    const char* faceName);
+  virtual ~csFt2FaceWrapper ();
+};
 
 /**
  * A FreeType font object
@@ -36,40 +53,38 @@ class csFreeType2Font : public iFont
 {
 protected:
   FT_Glyph glyph;
-  csRef<iDataBuffer> fontdata;
 
 public:
-  csFreeType2Server* server;
+  csRef<csFreeType2Server> server;
   // font filename (for identification)
-  char *name;
+  const char *name;
+  // The font id, used to identify a face/size pair
+  const char* fontid;
   // Size of this font
   int fontSize;
   // The list of delete callbacks
   csRefArray<iFontDeleteNotify> DeleteCallbacks;
+  /*
+    @@@ Somewhat ugly. The glyph metrics will be stored twice, in the font and
+    the font cache itself.
+   */
+  struct HackAroundHashZeroInitializer : public csGlyphMetrics
+  {
+    HackAroundHashZeroInitializer(int x = 0) { }
+  };
+  csHash<HackAroundHashZeroInitializer, utf32_char> glyphMetrics;
   //
-  FT_Face face;
-  FT_Library instance;
-  FT_UShort pID, eID;
-  FT_CharMap charMap;
-  
+  csRef<csFt2FaceWrapper> face;
+  FT_Size size;
+
   SCF_DECLARE_IBASE;
 
   /// Constructor
-  csFreeType2Font (const char *filename, csFreeType2Server* server);
+  csFreeType2Font (csFreeType2Server* server, const char* fontid, 
+    csFt2FaceWrapper* face, int iSize);
 
   /// Destructor
   virtual ~csFreeType2Font ();
-
-  /// Load the font
-  bool Load (iVFS *pVFS);
-
-  /**
-   * Set the size for this font.
-   * All other methods will change their behaviour as soon as you call
-   * this method; but not all font managers supports rescalable fonts
-   * in which case this method will be unimplemented.
-   */
-  virtual void SetSize (int iSize);
 
   /**
    * Query current font size. If server does not support rescalable
@@ -143,26 +158,15 @@ public:
  */
 class csFreeType2Server : public iFontServer
 {
-  class csFontVector : public csRefArray<csFreeType2Font>
-  {
-  public:
-    static int CompareKey (csFreeType2Font* const& Item1, void* Key)
-    {
-      // compare the font names
-      const char *id1 = Item1->name;
-      const char *id2 = (const char *)Key;
-      return strcmp (id1, id2);
-    }
-  } fonts;
-
 public:
   FT_Library library;
-  int defaultSize;
   iObjectRegistry *object_reg;
   csConfigAccess ftconfig;
   csRef<iVFS> VFS;
   const char *fontset;
   bool freetype_inited;
+  csHash<csFt2FaceWrapper*, const char*> ftfaces;
+  csHash<iFont*, const char*> fonts;
 
   SCF_DECLARE_IBASE;
 
@@ -180,24 +184,16 @@ public:
   bool FreetypeError (int errorCode, const char* message,
     ...);
 
+  /// Unregister a FT face. Called by face's dtor
+  void RemoveFT2Face (csFt2FaceWrapper* face, const char* faceName);
+  /// Unregister a font. Called by font's dtor
+  void RemoveFont (iFont* font, const char* fontId);
+
   /**
    * Load a font by name.
    * Returns a new iFont object or 0 on failure.
    */
-  virtual csPtr<iFont> LoadFont (const char *filename);
-
-  /**
-   * Get number of loaded fonts.
-   */
-  virtual int GetFontCount ()
-  { return fonts.Length(); }
-
-  /**
-   * Get Nth loaded font or 0.
-   * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get 0.
-   */
-  virtual iFont *GetFont (int iIndex);
+  virtual csPtr<iFont> LoadFont (const char *filename, int size = 10);
 
   struct eiComponent : public iComponent
   {

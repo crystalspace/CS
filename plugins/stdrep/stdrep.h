@@ -24,6 +24,7 @@
 #include "iutil/vfs.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/reporter.h"
+#include "ivideo/fontserv.h"
 #include "csutil/csstring.h"
 #include "csutil/refcount.h"
 #include "csutil/refarr.h"
@@ -82,6 +83,7 @@ private:
   csRef<csMutex> mutex;
   csRefArray<csTimedMessage> messages;
   csString lastID;
+  csRef<iFont> fnt;
 
   static csString DefaultDebugFilename();
 

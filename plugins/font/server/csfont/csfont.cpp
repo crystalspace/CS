@@ -94,12 +94,12 @@ csDefaultFontServer::~csDefaultFontServer()
   SCF_DESTRUCT_IBASE();
 }
 
-csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
+csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
 {
   int i;
 
   // First of all, look for an already loaded font
-  for (i = 0; i < fonts.Length (); i++)
+  /*for (i = 0; i < fonts.Length (); i++)
   {
     csDefaultFont *font = fonts.Get (i);
     if (!strcmp (filename, font->Name))
@@ -107,8 +107,14 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
       font->IncRef ();
       return font;
     }
+  }*/
+  if (fonts.In (filename))
+  {
+    const csDefaultFont* font = fonts.Get (filename);
+    return csPtr<iFont> (csRef<iFont> ((iFont*)font));
   }
 
+  csRef<csDefaultFont> newfont;
   // Now check the list of static fonts
   if (filename [0] == '*')
   {
@@ -141,53 +147,52 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
 	csRef<iDataBuffer> db;
 	db.AttachNew (new csDataBuffer ((char*)FontList[i].FontBitmap,
 	  FontList[i].bitmapSize, false));
-        return new csDefaultFont (this,	FontList [i].Name,
+	newfont.AttachNew (new csDefaultFont (this, FontList [i].Name,
           FontList [i].ranges,
 	  FontList [i].Height, FontList [i].Height-FontList [i].Baseline,
 	  FontList [i].Baseline,
-	  gMetrics.GetArray (), db, bMetrics.GetArray ());
+	  gMetrics.GetArray (), db, bMetrics.GetArray ()));
+	break;
       }
     }
   }
   else
   {
     // Otherwise try to load the font as a .csf file
-    csDefaultFont *fontdef = ReadFontFile (filename);
-    if (fontdef)
+    //csDefaultFont *fontdef = ReadFontFile (filename);
+    newfont.AttachNew (ReadFontFile (filename));
+    if (newfont)
     {
-      delete [] fontdef->Name;
-      fontdef->Name = csStrNew (filename);
-      return fontdef;
+      delete [] newfont->Name;
+      newfont->Name = csStrNew (filename);
+      //return fontdef;
     }
   }
 
-  return 0;
-}
-
-iFont *csDefaultFontServer::GetFont (int iIndex)
-{
-  if ((iIndex >= 0) && (iIndex < fonts.Length ()))
+  if (newfont.IsValid())
   {
-    iFont *font = fonts.Get (iIndex);
-    if (font) return font;
+    fonts.Put (filename, newfont);
+    return csPtr<iFont> (csRef<iFont>((csDefaultFont*)newfont));
   }
+
   return 0;
 }
 
 void csDefaultFontServer::NotifyCreate (csDefaultFont *font)
 {
-  fonts.Push (font);
+  //fonts.Push (font);
 }
 
 void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 {
-  int index = fonts.Find (font);
+  fonts.Delete (font->Name, font);
+  /*int index = fonts.Find (font);
   if (index >= 0)
   {
     // Extract the element from the array instead of Delete to avoid
     // the array from deleting it again.
     fonts.Extract (index);
-  }
+  }*/
 }
 
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)

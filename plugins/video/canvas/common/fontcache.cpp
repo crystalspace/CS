@@ -215,6 +215,7 @@ void csFontCache::UncacheFont (iFont* font)
       }
     }
     knownFonts.DeleteIndex (idx);
+    delete knownFont;
   }
 }
 

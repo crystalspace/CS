@@ -125,7 +125,7 @@ private:
   void Pixel (int x, int y, int color);
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void Text (int x, int y, int fg, int bg, iFont *font, int fontsize, const char *s);
+  void Text (int x, int y, int fg, int bg, iFont *font, const char *s);
 
   /// Draw a pixmap
   void Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha);

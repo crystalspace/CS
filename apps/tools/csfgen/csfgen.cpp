@@ -407,24 +407,21 @@ static bool Convert (const char *fontfile)
     return false;
   }
 
-  csRef<iFont> font = fs->LoadFont (fontfile);
+  csRef<iFont> font = fs->LoadFont (fontfile, 
+    (opt.fontsize > 0) ? opt.fontsize : 10);
   if (font == 0)
   {
     printf ("Cannot load font file %s\n", fontfile);
     return false;
   }
 
-  if (opt.fontsize > 0)
   {
-    font->SetSize (opt.fontsize);
     int oldsize = opt.fontsize;
     opt.fontsize = font->GetSize ();
     if (opt.fontsize != oldsize)
       printf ("Could not set font size %d, using size %d\n",
         oldsize, opt.fontsize);
   }
-  else
-    opt.fontsize = font->GetSize ();
 
   // max height of font
   int maxheight, maxwidth;

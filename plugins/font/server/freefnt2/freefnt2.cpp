@@ -39,6 +39,24 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 
+csFt2FaceWrapper::csFt2FaceWrapper (csFreeType2Server* owner,
+				    iDataBuffer* data,
+				    const char* faceName) : face(0)
+{
+  csFt2FaceWrapper::owner = owner;
+  csFt2FaceWrapper::data = data;
+  csFt2FaceWrapper::faceName = faceName;
+}
+
+csFt2FaceWrapper::~csFt2FaceWrapper ()
+{
+  if (face)
+    FT_Done_Face (face);
+  owner->RemoveFT2Face (this, faceName);
+}
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csFreeType2Server)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -140,6 +158,20 @@ bool csFreeType2Server::FreetypeError (int errorCode, const char* message,
   }
 }
 
+void csFreeType2Server::RemoveFT2Face (csFt2FaceWrapper* face, 
+				       const char* faceName)
+{
+  ftfaces.Delete (faceName, face);
+  delete[] faceName;
+}
+
+void csFreeType2Server::RemoveFont (iFont* font, 
+				    const char* fontId)
+{
+  fonts.Delete (fontId, font);
+  delete[] fontId;
+}
+
 bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
 {
   csFreeType2Server::object_reg = object_reg;
@@ -156,14 +188,12 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   ftconfig.AddConfig(object_reg, "config/freetype.cfg");
 
-  defaultSize = ftconfig->GetInt ("Freetype2.Settings.Size", 10);
-
   fontset = ftconfig->GetStr ("Freetype2.Settings.FontSet", 0);
 
   return true;
 }
 
-csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
+csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
 {
   // First of all look for an alias in config file
   if (ftconfig && fontset)
@@ -175,35 +205,99 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
     const char *s = ftconfig->GetStr (Keyname, 0);
     if (s) filename = s;
   }
-
-  // see if we already loaded that font
-  int idx = fonts.FindKey ((void*)filename, fonts.CompareKey);
-  if (idx >= 0)
+  csString fontid;
+  fontid.Format ("%d:%s", size, filename);
+  // see if we already loaded that face/size pair
+  csRef<iFont> font = fonts.Get ((const char*)fontid);
+  if (font)
   {
-    csFreeType2Font *font = fonts.Get (idx);
-    font->IncRef ();
-    return font;
+    return csPtr<iFont> (font);
   }
 
-  // not yet loaded, so do it now
-  csFreeType2Font *font = new csFreeType2Font (filename, this);
-  if (!font->Load (VFS))
+  // see if we already loaded that face
+  csRef<csFt2FaceWrapper> face = ftfaces.Get (filename);
+  if (face == 0)
   {
-    delete font;
-    return 0;
-  }
-  fonts.Push (font);
-  return font;
-}
+    // not yet loaded, so do it now
+    csRef<iFile> file (VFS->Open (filename, VFS_FILE_READ));
+    if (file)
+    {
+      size_t size = file->GetSize ();
+      if (size)
+      {
+	csRef<iDataBuffer> fontdata = file->GetAllData ();
 
-iFont *csFreeType2Server::GetFont (int iIndex)
-{
-  if (iIndex >= 0 && iIndex < fonts.Length ())
-  {
-    csFreeType2Font *font = fonts.Get (iIndex);
-    if (font) return font;
+	// @@@ kludge: don't report error on CSF files(or?)
+	if ((size >= 3) && (strncmp (fontdata->GetData (), "CSF", 3) == 0))
+	{
+	  return 0;
+	}
+	FT_Face ftFace;
+	if (FreetypeError (FT_New_Memory_Face (library, 
+	  (FT_Byte*)fontdata->GetData (), size, 0, &ftFace),
+	  "Font file %s could not be loaded", filename))
+	{
+	  return 0;
+	}
+
+	// we do not change the default values of the new instance
+
+	// Attempt to select an Unicode charmap
+	if (FreetypeError (FT_Select_Charmap (ftFace, FT_ENCODING_UNICODE),
+	  CS_REPORTER_SEVERITY_NOTIFY,
+	  "Could not select an Unicode charmap for %s", filename))
+	{
+	  if (ftFace->num_charmaps == 0)
+	  {
+	    Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Fontfile %s doesn't contain charmaps", filename);
+	    return false;
+	  }
+
+	  FT_CharMap map = ftFace->charmaps[0];
+	  char encName[5];
+	  encName[0] = map->encoding >> 24;
+	  encName[1] = (map->encoding >> 16) & 0xff;
+	  encName[2] = (map->encoding >> 8) & 0xff;
+	  encName[3] = map->encoding & 0xff;
+	  encName[4] = 0;
+	  if (FreetypeError (FT_Set_Charmap (ftFace, map),
+	    "Could not select charmap '%s' for %s", encName, filename))
+	  {
+	    return false;
+	  }
+	  else
+	  {
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "Using charmap '%s' for %s", encName, filename);
+	  }
+	}
+
+	const char* newFilename = csStrNew (filename);
+	face.AttachNew (new csFt2FaceWrapper (this, fontdata, newFilename));
+	face->face = ftFace;
+	ftfaces.Put (newFilename, face);
+      }
+      else
+      {
+	Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Could not determine filesize for fontfile %s!", filename);
+	return 0;
+      }
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	"Could not open fontfile %s!", filename);
+      return 0;
+    }
   }
-  return 0;
+
+  const char* newFontId = csStrNew (fontid);
+  font.AttachNew (new csFreeType2Font (this, newFontId, face, size));
+  fonts.Put (newFontId, font);
+
+  return csPtr<iFont> (font);
 }
 
 //-------------------------------------------// A FreeType font object //----//
@@ -212,15 +306,31 @@ SCF_IMPLEMENT_IBASE (csFreeType2Font)
   SCF_IMPLEMENTS_INTERFACE (iFont)
 SCF_IMPLEMENT_IBASE_END
 
-csFreeType2Font::csFreeType2Font (const char *filename, 
-				  csFreeType2Server* server) : 
+csFreeType2Font::csFreeType2Font (csFreeType2Server* server, 
+				  const char* fontid,
+				  csFt2FaceWrapper* face, 
+				  int iSize) :
   DeleteCallbacks (4, 4)
 {
   SCF_CONSTRUCT_IBASE (0);
-  name = csStrNew (filename);
-  face = 0;
-  fontdata = 0;
+  name = strchr (fontid, ':') + 1;
+  csFreeType2Font::fontid = fontid;
+  csFreeType2Font::face = face;
   csFreeType2Font::server = server;
+  fontSize = iSize;
+
+  FT_New_Size (face->face, &size);
+  FT_Activate_Size (size);
+  if (server->FreetypeError (FT_Set_Char_Size (face->face, 0, 
+    iSize * 64, 96, 96), 
+    "Could not set character dimensions for %s",
+    name))
+  {
+    server->FreetypeError (FT_Set_Pixel_Sizes (face->face, 0, 
+      iSize), 
+      "Could not set character pixel dimensions for %s",
+      name);
+  }
 }
 
 csFreeType2Font::~csFreeType2Font ()
@@ -230,29 +340,11 @@ csFreeType2Font::~csFreeType2Font ()
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
   }
-  if (face)
-  {
-    FT_Done_Face (face);
-  }
-  fontdata = 0;
-  delete [] name;
+  FT_Done_Size (size);
+  server->RemoveFont (this, fontid);
+  face = 0;
+  //delete [] name;
   SCF_DESTRUCT_IBASE();
-}
-
-void csFreeType2Font::SetSize (int iSize)
-{
-  fontSize = iSize;
-
-  if (server->FreetypeError (FT_Set_Char_Size (face, 0, 
-    iSize * 64, 96, 96), 
-    "Could not set character dimensions for %s",
-    name))
-  {
-    server->FreetypeError (FT_Set_Pixel_Sizes (face, 0, 
-      iSize), 
-      "Could not set character pixel dimensions for %s",
-      name);
-  }
 }
 
 int csFreeType2Font::GetSize ()
@@ -262,24 +354,31 @@ int csFreeType2Font::GetSize ()
 
 void csFreeType2Font::GetMaxSize (int &oW, int &oH)
 {
-  int maxrows = (face->size->metrics.height + 63) >> 6;
-  oW = (face->size->metrics.max_advance + 63) >> 6;
+  int maxrows = (size->metrics.height + 63) >> 6;
+  oW = (size->metrics.max_advance + 63) >> 6;
   oH = maxrows;
 }
 
 bool csFreeType2Font::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
+  if (glyphMetrics.In (c))
+  {
+    metrics = glyphMetrics.Get (c);
+    return true;
+  }
+
   FT_UInt ci = (c == CS_FONT_DEFAULT_GLYPH) ? 0 : 
-   FT_Get_Char_Index (face, (FT_ULong)c);
+   FT_Get_Char_Index (face->face, (FT_ULong)c);
   if ((c != CS_FONT_DEFAULT_GLYPH) && (ci == 0)) return 0;
 
-  if (server->FreetypeError (FT_Load_Glyph (face, ci, FT_LOAD_DEFAULT),
+  FT_Activate_Size (size);
+  if (server->FreetypeError (FT_Load_Glyph (face->face, ci, FT_LOAD_DEFAULT),
     "Could not load glyph %d for %s", ci, name))
   {
     return false;
   }
   
-  metrics.advance = face->glyph->advance.x >> 6;
+  metrics.advance = face->face->glyph->advance.x >> 6;
 
   return true;
 }
@@ -287,28 +386,29 @@ bool csFreeType2Font::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
 						    csBitmapMetrics& metrics)
 {
+  FT_Activate_Size (size);
   FT_UInt ci = (c == CS_FONT_DEFAULT_GLYPH) ? 0 : 
-    FT_Get_Char_Index (face, (FT_ULong)c);
+    FT_Get_Char_Index (face->face, (FT_ULong)c);
   if ((c != CS_FONT_DEFAULT_GLYPH) && (ci == 0)) return 0;
 
-  if (server->FreetypeError (FT_Load_Glyph (face, ci, 
+  if (server->FreetypeError (FT_Load_Glyph (face->face, ci, 
     FT_LOAD_RENDER | FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO),
     "Could not load glyph %d for %s", ci, name))
   {
     return 0;
   }
 
-  int stride = (face->glyph->bitmap.width + 7) / 8;
-  int maxrows = (face->size->metrics.height + 63) >> 6;
+  int stride = (face->face->glyph->bitmap.width + 7) / 8;
+  int maxrows = (size->metrics.height + 63) >> 6;
   int bitmapsize = maxrows*stride;
   uint8* bitmap = new uint8 [bitmapsize];
   memset (bitmap, 0, bitmapsize);
 
-  int descend = (-face->size->metrics.descender + 63) >> 6;;
+  int descend = (-size->metrics.descender + 63) >> 6;;
 
-  int startrow = maxrows - (descend + face->glyph->bitmap_top);
+  int startrow = maxrows - (descend + face->face->glyph->bitmap_top);
 
-  int endrow = startrow + face->glyph->bitmap.rows;
+  int endrow = startrow + face->face->glyph->bitmap.rows;
 
   if (startrow < 0) startrow = 0;
   if (endrow > maxrows) endrow = maxrows;
@@ -316,12 +416,13 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
   int n, i;
   for (n = 0, i = startrow; i < endrow; i++, n++)
     memcpy (bitmap + stride*i, 
-            face->glyph->bitmap.buffer + n * face->glyph->bitmap.pitch,
-            MIN(stride, face->glyph->bitmap.pitch));
+            face->face->glyph->bitmap.buffer + 
+	    n * face->face->glyph->bitmap.pitch,
+            MIN(stride, face->face->glyph->bitmap.pitch));
 
-  metrics.width = face->glyph->bitmap.width;
+  metrics.width = face->face->glyph->bitmap.width;
   metrics.height = maxrows;
-  metrics.left = face->glyph->bitmap_left;
+  metrics.left = face->face->glyph->bitmap_left;
   metrics.top = maxrows - descend;
 
   return (csPtr<iDataBuffer> (new csDataBuffer ((char*)bitmap, bitmapsize, 
@@ -331,29 +432,30 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
 csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c, 
 						 csBitmapMetrics& metrics)
 {
+  FT_Activate_Size (size);
   FT_UInt ci = (c == CS_FONT_DEFAULT_GLYPH) ? 0 : 
-    FT_Get_Char_Index (face, (FT_ULong)c);
+    FT_Get_Char_Index (face->face, (FT_ULong)c);
   if ((c != CS_FONT_DEFAULT_GLYPH) && (ci == 0)) return 0;
 
-  if (server->FreetypeError (FT_Load_Glyph (face, ci, 
+  if (server->FreetypeError (FT_Load_Glyph (face->face, ci, 
     FT_LOAD_RENDER | FT_RENDER_MODE_NORMAL),
     "Could not load glyph %d for %s", ci, name))
   {
     return 0;
   }
 
-  int stride = face->glyph->bitmap.width;
-  int maxrows = (face->size->metrics.height + 63) >> 6;
+  int stride = face->face->glyph->bitmap.width;
+  int maxrows = (size->metrics.height + 63) >> 6;
   int bitmapsize = maxrows * stride;
   // malloc at least 1 byte (malloc 0 bytes is undefined).
   uint8* bitmap = (bitmapsize > 0) ? new uint8 [bitmapsize] : new uint8[1];
   memset (bitmap, 0, bitmapsize);
 
-  int descend = (-face->size->metrics.descender + 63) >> 6;
+  int descend = (-size->metrics.descender + 63) >> 6;
 
-  int startrow = maxrows - (descend + face->glyph->bitmap_top);
+  int startrow = maxrows - (descend + face->face->glyph->bitmap_top);
 
-  int endrow = startrow + face->glyph->bitmap.rows;
+  int endrow = startrow + face->face->glyph->bitmap.rows;
 
   if (startrow < 0) startrow = 0;
   if (endrow > maxrows) endrow = maxrows;
@@ -361,12 +463,13 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c,
   int n, i;
   for (n = 0, i = startrow; i < endrow; i++, n++)
     memcpy (bitmap + stride*i, 
-            face->glyph->bitmap.buffer + n * face->glyph->bitmap.pitch,
-            MIN(stride, face->glyph->bitmap.pitch));
+            face->face->glyph->bitmap.buffer + 
+	    n * face->face->glyph->bitmap.pitch,
+            MIN(stride, face->face->glyph->bitmap.pitch));
 
-  metrics.width = face->glyph->bitmap.width;
+  metrics.width = face->face->glyph->bitmap.width;
   metrics.height = maxrows;
-  metrics.left = face->glyph->bitmap_left;
+  metrics.left = face->face->glyph->bitmap_left;
   metrics.top = maxrows - descend;
 
   return (csPtr<iDataBuffer> (new csDataBuffer ((char*)bitmap, bitmapsize, 
@@ -381,17 +484,18 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
     return;
   }
 
+  FT_Activate_Size (size);
   int defW = 0;
-  if (!server->FreetypeError (FT_Load_Glyph (face, 0, 
+  if (!server->FreetypeError (FT_Load_Glyph (face->face, 0, 
     FT_LOAD_DEFAULT),
     "Could not load glyph %d for %s", 0, name))
   {
-    defW = (face->glyph->advance.x >> 6);
+    defW = (face->face->glyph->advance.x >> 6);
   }
 
   oW = 0; 
-  oH = (face->size->metrics.height + 63) >> 6; 
-  desc = (-face->size->metrics.descender + 63) >> 6;
+  oH = (size->metrics.height + 63) >> 6; 
+  desc = (-size->metrics.descender + 63) >> 6;
   int textLen = strlen ((char*)text);
   while (textLen > 0)
   {
@@ -402,13 +506,24 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
     text += skip;
     textLen -= skip;
 
-    FT_UInt ci = FT_Get_Char_Index (face, (FT_ULong)glyph);
+    if (glyphMetrics.In (glyph))
+    {
+      const csGlyphMetrics& metrics = glyphMetrics.Get (glyph);
+      oW += metrics.advance;
+      continue;
+    }
 
-    if (!server->FreetypeError (FT_Load_Glyph (face, ci, 
+    FT_UInt ci = FT_Get_Char_Index (face->face, (FT_ULong)glyph);
+
+    if (!server->FreetypeError (FT_Load_Glyph (face->face, ci, 
       FT_LOAD_DEFAULT),
       "Could not load glyph %d for %s", ci, name))
     {
-      oW += (face->glyph->advance.x >> 6);
+      HackAroundHashZeroInitializer metrics;
+      metrics.advance = (face->face->glyph->advance.x >> 6);
+      glyphMetrics.Put (glyph, metrics);
+
+      oW += metrics.advance;
     }
     else
     {
@@ -429,12 +544,13 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
   if (!text)
     return 0;
 
+  FT_Activate_Size (size);
   int defW = 0;
-  if (!server->FreetypeError (FT_Load_Glyph (face, 0, 
+  if (!server->FreetypeError (FT_Load_Glyph (face->face, 0, 
     FT_LOAD_DEFAULT),
     "Could not load glyph %d for %s", 0, name))
   {
-    defW = (face->glyph->advance.x >> 6);
+    defW = (face->face->glyph->advance.x >> 6);
   }
 
   int count = 0;
@@ -448,14 +564,26 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
     text += skip;
     textLen -= skip;
 
-    FT_UInt ci = FT_Get_Char_Index (face, (FT_ULong)glyph);
-
     int glyphW = defW;
-    if (!server->FreetypeError (FT_Load_Glyph (face, ci, 
-      FT_LOAD_DEFAULT),
-      "Could not load glyph %d for %s", ci, name))
+    if (glyphMetrics.In (glyph))
     {
-      glyphW = face->glyph->advance.x >> 6;
+      const csGlyphMetrics& metrics = glyphMetrics.Get (glyph);
+      glyphW = metrics.advance;
+    }
+    else
+    {
+      FT_UInt ci = FT_Get_Char_Index (face->face, (FT_ULong)glyph);
+
+      if (!server->FreetypeError (FT_Load_Glyph (face->face, ci, 
+	FT_LOAD_DEFAULT),
+	"Could not load glyph %d for %s", ci, name))
+      {
+	HackAroundHashZeroInitializer metrics;
+	metrics.advance = (face->face->glyph->advance.x >> 6);
+	glyphMetrics.Put (glyph, metrics);
+
+	glyphW = metrics.advance;
+      }
     }
     if (maxwidth < glyphW)
       break;
@@ -463,58 +591,6 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
     maxwidth -= glyphW;
   }
   return count;
-}
-
-bool csFreeType2Font::Load (iVFS *pVFS)
-{
-  csRef<iFile> file (pVFS->Open (name, VFS_FILE_READ));
-  if (file)
-  {
-    size_t size = file->GetSize ();
-    if (size)
-    {
-      fontdata = file->GetAllData ();
-
-      // @@@ kludge: don't report error on CSF files(or?)
-      if ((size >= 3) && (strncmp (fontdata->GetData (), "CSF", 3) == 0))
-      {
-	fontdata = 0;
-	return false;
-      }
-      if (server->FreetypeError (FT_New_Memory_Face (server->library, 
-	(FT_Byte*)fontdata->GetData (), size, 0, &face),
-	"Font file %s could not be loaded", name))
-      {
-	fontdata = 0;
-        return false;
-      }
-    }
-    else
-    {
-      server->Report (CS_REPORTER_SEVERITY_WARNING,
-                      "Could not determine filesize for fontfile %s!", name);
-      return false;
-    }
-  }
-  else
-  {
-    server->Report (CS_REPORTER_SEVERITY_WARNING,
-                    "Could not open fontfile %s!", name);
-    return false;
-  }
-
-  // we do not change the default values of the new instance
-
-  // Attempt to select an Unicode charmap
-  if (server->FreetypeError (FT_Select_Charmap (face, FT_ENCODING_UNICODE),
-    "Could not select an Unicode charmap for %s", name))
-  {
-    return false;
-  }
-
-  SetSize (server->defaultSize);
-
-  return true;
 }
 
 void csFreeType2Font::AddDeleteCallback (iFontDeleteNotify* func)
@@ -539,18 +615,18 @@ bool csFreeType2Font::RemoveDeleteCallback (iFontDeleteNotify* func)
 
 int csFreeType2Font::GetAscent ()
 {
-  return (face->size->metrics.ascender + 63) >> 6;
+  return (size->metrics.ascender + 63) >> 6;
 }
 
 int csFreeType2Font::GetDescent ()
 {
-  return -((face->size->metrics.descender + 63) >> 6);
+  return -((size->metrics.descender + 63) >> 6);
 }
 
 bool csFreeType2Font::HasGlyph (utf32_char c)
 {
   if (c == CS_FONT_DEFAULT_GLYPH) return true;
 
-  return (FT_Get_Char_Index (face, (FT_ULong)c) != 0);
+  return (FT_Get_Char_Index (face->face, (FT_ULong)c) != 0);
 }
 

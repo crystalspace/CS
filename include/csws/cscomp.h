@@ -745,11 +745,11 @@ public:
   void SetClipRect ()
   { clip.MakeEmpty (); }
 
-  /// Set font for this component and the size (-1 - leave as-is, 0 - from parent)
-  void SetFont (iFont *iNewFont, int iSize = -1);
+  /// Set font for this component
+  void SetFont (iFont *iNewFont);
 
-  /// Query current text font and his size for this component
-  virtual void GetFont (iFont *&oFont, int &oFontSize);
+  /// Query current text font for this component
+  virtual void GetFont (iFont *&oFont);
 
   /// Draw a box
   void Box (int xmin, int ymin, int xmax, int ymax, int colindx);

@@ -280,96 +280,99 @@ bool csReporterListener::HandleEvent (iEvent& event)
         csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
         csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
-        iFontServer* fntsvr = g2d->GetFontServer ();
-        if (fntsvr)
-        {
-          csRef<iFont> fnt (fntsvr->GetFont (0));
-	  if (fnt)
+	if (!fnt)
+	{
+	  iFontServer* fntsvr = g2d->GetFontServer ();
+	  if (fntsvr)
 	  {
-            g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-	    int sw = g2d->GetWidth ();
-	    int sh = g2d->GetHeight ();
-	    int fw, fh;
-	    fnt->GetMaxSize (fw, fh);
-	    int fg = g2d->FindRGB (0, 0, 0);
-            int bg[2] = {g2d->FindRGB (255, 255, 180),
-                         g2d->FindRGB (int (255*0.9), int (255*0.9),
-			 	int (180*0.9))};
-            int sep = g2d->FindRGB (int (255*0.7), int (255*0.7),
-	    	int (180*0.7));
+	    fnt = fntsvr->LoadFont (CSFONT_LARGE);
+	  }
+	}
+	if (fnt)
+	{
+          g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+	  int sw = g2d->GetWidth ();
+	  int sh = g2d->GetHeight ();
+	  int fw, fh;
+	  fnt->GetMaxSize (fw, fh);
+	  int fg = g2d->FindRGB (0, 0, 0);
+          int bg[2] = {g2d->FindRGB (255, 255, 180),
+                        g2d->FindRGB (int (255*0.9), int (255*0.9),
+			      int (180*0.9))};
+          int sep = g2d->FindRGB (int (255*0.7), int (255*0.7),
+	      int (180*0.7));
 
-	    int max_l = (sh-4-6-4-6) / (fh+6);
-	    if (l > max_l) l = max_l;
-	    //g2d->DrawBox (4, 4, sw-8, 6 + l*(fh+6)-4 + 6, g2d->FindRGB (255, 0, 0));
-            int h = 0;
-            int c = 0;
-	    for (i = 0 ; i < l ; i++)
+	  int max_l = (sh-4-6-4-6) / (fh+6);
+	  if (l > max_l) l = max_l;
+	  //g2d->DrawBox (4, 4, sw-8, 6 + l*(fh+6)-4 + 6, g2d->FindRGB (255, 0, 0));
+          int h = 0;
+          int c = 0;
+	  for (i = 0 ; i < l ; i++)
+	  {
+	    csTimedMessage* tm = messages[i];
+            if (tm->msg[0] != ' ')
+            {
+              c = 1-c;
+              // Assume that the ID fits
+              g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+              g2d->DrawLine (4, 4+h*(fh+6), 4+sw-8-1, 4+h*(fh+6), sep);
+              g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], tm->msg);
+            }
+	    else
 	    {
-	      csTimedMessage* tm = messages[i];
-              if (tm->msg[0] != ' ')
+              csString msg (tm->msg+1);
+              int chars;
+              csString str;
+              str.Format ("  %s", msg.GetData ());
+              while ((chars = fnt->GetLength (str.GetData (), sw-20)) <
+                (int) msg.Length ())
               {
-                c = 1-c;
-                // Assume that the ID fits
+                str.Truncate (chars);
                 g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
-                g2d->DrawLine (4, 4+h*(fh+6), 4+sw-8-1, 4+h*(fh+6), sep);
-                g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], tm->msg);
-              }
-	      else
-	      {
-                csString msg (tm->msg+1);
-                int chars;
-                csString str;
-                str.Format ("  %s", msg.GetData ());
-                while ((chars = fnt->GetLength (str.GetData (), sw-20)) <
-                  (int) msg.Length ())
+                int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
+                if (linebreak>0)
                 {
-                  str.Truncate (chars);
-                  g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
-                  int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
-                  if (linebreak>0)
-                  {
-                    str.Truncate (linebreak);
-                    g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
-                      str.GetData ());
-                    msg = msg.GetData ()+linebreak-1;
-                  }
-		  else
-		  {
-                    g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
-                      str.GetData ());
-                    msg = msg.GetData ()+chars-2;
-                  }
-                  str.Format ("  %s", msg.GetData ());
-                  h++;
-                  l--;
+                  str.Truncate (linebreak);
+                  g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
+                    str.GetData ());
+                  msg = msg.GetData ()+linebreak-1;
+                }
+		else
+		{
+                  g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
+                    str.GetData ());
+                  msg = msg.GetData ()+chars-2;
                 }
                 str.Format ("  %s", msg.GetData ());
-                g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
-                g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], str.GetData ());
+                h++;
+                l--;
               }
-              h++;
-	      // Set the time the first time we could actually display it.
-	      if (tm->time == 0) tm->time = csGetTicks () + 5000;
-	    }
-	    csTicks t = csGetTicks ();
-	    i = 0;
-	    // We only time out the messages we could actually display.
-	    // That way the messages that didn't have a chance to display
-	    // will be displayed later.
-	    while (i < l)
+              str.Format ("  %s", msg.GetData ());
+              g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+              g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], str.GetData ());
+            }
+            h++;
+	    // Set the time the first time we could actually display it.
+	    if (tm->time == 0) tm->time = csGetTicks () + 5000;
+	  }
+	  csTicks t = csGetTicks ();
+	  i = 0;
+	  // We only time out the messages we could actually display.
+	  // That way the messages that didn't have a chance to display
+	  // will be displayed later.
+	  while (i < l)
+	  {
+	    csTimedMessage* tm = messages[i];
+	    if (tm->time != 0 && t > tm->time)
 	    {
-	      csTimedMessage* tm = messages[i];
-	      if (tm->time != 0 && t > tm->time)
-	      {
-	        messages.DeleteIndex (i);
-	        l--;
-	      }
-	      else
-	      {
-	        i++;
-	      }
+	      messages.DeleteIndex (i);
+	      l--;
 	    }
-          }
+	    else
+	    {
+	      i++;
+	    }
+	  }
         }
       }
     }

@@ -2436,9 +2436,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     csRef<iFont> fnt;
     if (fntsvr)
     {
-      fnt = fntsvr->GetFont (0);
-      if (fnt == 0)
-        fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      fnt = fntsvr->LoadFont (CSFONT_COURIER);
     }
 
     g3d->BeginDraw (CSDRAW_2DGRAPHICS);

@@ -8,17 +8,17 @@ Crystal Space.
 
 Crystal Space has a plugin that specifies the font server
 to use.  The font server that almost all applications use
-is the default font server (crystalspace.font.server.default).
+is the font plexer (@samp{crystalspace.font.server.multiplexer}) 
+together with the FreeType2 (@samp{crystalspace.font.server.freetype2})
+and the default font server (@samp{crystalspace.font.server.default}).
 
-The other 2 servers are the freetype2 server and the font
-multiplexor.  The font multiplexor just allows multiple font
-servers to be searched for the specified font.  The freetype2
-font server allows fonts to be created on the fly from fonts
-(like TrueType fonts) located on the user's machine.
-
-This HOWTO document does not address using the freetype2 server with
-the assumption that most programs will not want to depend
-on the font existing on all the potential targeted platforms.
+The font plexer not just searches both the FreeType2 and default font
+server for a font, but also can search multiple fonts for a glyph. This
+is especially important if you plan to internationalize your applications;
+you need to care less whether a font supports the glyphs for a specific
+language or not. (CS comes along with the GNU unifont, which is used as a
+fallback by default. So you have pretty good support for internationalizion
+out-of-the-box.)
 
 @subsubheading Standard Fonts
 
@@ -54,9 +54,8 @@ To use these fonts simply use the LoadFont method and
 pass the font desired.
 
 @example
-Font = G2D->GetFontServer()->LoadFont(CSFONT_LARGE);
+Font = G2D->GetFontServer()->LoadFont (CSFONT_LARGE);
 @end example
-
 
 @subsubheading Loadable Fonts
 
@@ -68,33 +67,21 @@ with different widths and optionally an alpha component
 to provide anti-aliasing.
 
 To specify an alternate font simply use the LoadFont method
-with the file name such as:
+with the file name (and optionally a size) such as:
 
 @example
-Font = G2D->GetFontServer()->LoadFont("/lib/fontshow/lucida36.csf");
+Font = G2D->GetFontServer()->LoadFont ("/fonts/ttf/Vera.ttf", 12);
 @end example
 
 @subsubheading Creating New Loadable Fonts
 
 The easiest way to create a loadable font is to
-use the csfontutil which runs on Windows platforms
-and converts a true type font to the @sc{csf} format.
-
-This program can be downloaded at:
-
-@noindent
-@uref{http://ohrthguy.freeshell.org/tools/csfontutil.htm}
+use the @filename{csfgen} util that comes with CS. It converts 
+a true type font to the @sc{csf} format.
 
 Once the @sc{csf} file is created it can be included
 in the application no matter what platforms are 
 targeted.  The base font does not have to be on
-that system.
-
-@subsubheading Using Anti-Aliased Fonts
-
-When a font is created using the csfontutil program
-it creates it with anti-aliasing information.  This
-information is currently only used by the OpenGL renderer.
-The software and other renderers do not check for 
-the "alpha map" associated with the font and so do
-not blend the edges of the fonts with the background.
+that system.  This is useful if you don't want or can't
+distribute a font with your program and can't rely on
+the presence of it, either. 

@@ -24,11 +24,11 @@
 #include "csws/cswspal.h"
 #include "csutil/util.h"
 
-csHint::csHint (csComponent *iParent, const char *iText, iFont *Font,
-  int FontSize) : csComponent (iParent)
+csHint::csHint (csComponent *iParent, const char *iText, iFont *Font) : 
+  csComponent (iParent)
 {
   SetPalette (CSPAL_HINT);
-  SetFont (Font, FontSize);
+  SetFont (Font);
   if (app)
     app->InsertClipChild (this);
   SetText (iText);
@@ -51,9 +51,7 @@ void csHint::SetText (const char *iText)
 
   // First of all, decide our width and height
   iFont *font;
-  int fontsize;
-  GetFont (font, fontsize);
-  font->SetSize (fontsize);
+  GetFont (font);
 
   int fw, fh;
   font->GetDimensions (iText, fw, fh);
@@ -140,9 +138,7 @@ void csHint::Draw ()
   Box (1, 1, bound.Width () - 1, bound.Height () - 1, CSPAL_HINT_BACKGROUND);
 
   iFont *font;
-  int fontsize;
-  GetFont (font, fontsize);
-  font->SetSize (fontsize);
+  GetFont (font);
 
   int cury = 3;
   char *txt = text;
@@ -271,7 +267,7 @@ void csHintManager::HandleEvent (iEvent &Event)
           {
             // Okay, create the floating hint object
             HintStore *ts = (HintStore *)Get (idx);
-            (void)new csHint (c, ts->text, font, fontsize);
+            (void)new csHint (c, ts->text, font);
           }
         }
       }

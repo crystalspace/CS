@@ -240,11 +240,7 @@ void csBugPlug::SetupPlugin ()
   iFontServer* fntsvr = G2D->GetFontServer ();
   if (fntsvr)
   {
-    fnt = fntsvr->GetFont (0);
-    if (fnt == 0)
-    {
-      fnt = fntsvr->LoadFont (CSFONT_COURIER);
-    }
+    fnt = fntsvr->LoadFont (CSFONT_COURIER);
     CS_ASSERT (fnt != 0);    
   }
 

@@ -67,11 +67,9 @@ iFont* csFontLoadOrderEntry::GetFont (csFontPlexer* parent)
 {
   if (!loaded)
   {
-    font = server->LoadFont (fontName);
-    if (font && (parent->size != 0))
-    {
-      font->SetSize (QRound ((float)parent->size * scale));
-    }
+    font = server->LoadFont (fontName,
+      QRound ((float)parent->size * scale));
+    loaded = true;
   }
   return font;
 }
@@ -154,10 +152,9 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
     if (fs)
     {
       const char* name = mapEnum->GetKey (true);
-      uint32 key = csHashCompute (name);
 
       FontServerMapEntry entry (name, fs);
-      fontServerMap.Put (key, entry);
+      fontServerMap.Put (name, entry);
     }
   }
 
@@ -200,8 +197,24 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename)
+void csFontServerMultiplexor::NotifyDelete (csFontPlexer* font, 
+					    const char* fontid)
 {
+  loadedFonts.Delete (fontid, font);
+  delete[] fontid;
+}
+
+csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename, 
+						int size)
+{
+  csString fontid;
+  fontid.Format ("%d:%s", size, filename);
+  iFont* font = loadedFonts.Get ((const char*)fontid);
+  if (font != 0)
+  {
+    return csPtr<iFont> (csRef<iFont> (font));
+  }
+
   csFontLoaderOrder* order = new csFontLoaderOrder;
 
   csString substKey;
@@ -231,7 +244,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename)
   for (i = 0; i < order->Length (); i++)
   {
     primary = (*order)[i].font = 
-      (*order)[i].server->LoadFont ((*order)[i].fontName);
+      (*order)[i].server->LoadFont ((*order)[i].fontName, size);
     (*order)[i].loaded = true;
     if (primary != 0) break;
   }
@@ -243,29 +256,11 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename)
   }
   else
   {
-    return (new csFontPlexer (primary, order));
+    const char* newFontId = csStrNew (fontid);
+    iFont* newFont = new csFontPlexer (this, newFontId, primary, size, order);
+    loadedFonts.Put (newFontId, newFont);
+    return (newFont);
   }
-}
-
-int csFontServerMultiplexor::GetFontCount ()
-{
-  int i, count = 0;
-  for (i = 0; i < fontservers.Length (); i++)
-    count += fontservers[i]->GetFontCount ();
-  return count;
-}
-
-iFont* csFontServerMultiplexor::GetFont (int iIndex)
-{
-  int i;
-  for (i = 0; i < fontservers.Length (); i++)
-  {
-    int count = fontservers[i]->GetFontCount ();
-    if (iIndex < count)
-      return fontservers[iIndex]->GetFont (iIndex);
-    iIndex -= count;
-  }
-  return 0;
 }
 
 void csFontServerMultiplexor::ParseFontLoaderOrder (
@@ -332,9 +327,9 @@ csPtr<iFontServer> csFontServerMultiplexor::ResolveFontServer (const char* name)
   }
   if (fs == 0)
   {
-    uint32 key = csHashCompute (name);
-    csHash<FontServerMapEntry>::Iterator it = 
-      fontServerMap.GetIterator (key);
+    csHash<FontServerMapEntry, csStrKey, 
+    csConstCharHashKeyHandler>::Iterator it = 
+      fontServerMap.GetIterator (name);
 
     while (it.HasNext ())
     {
@@ -367,14 +362,19 @@ SCF_IMPLEMENT_IBASE (csFontPlexer)
   SCF_IMPLEMENTS_INTERFACE (iFont)
 SCF_IMPLEMENT_IBASE_END
 
-csFontPlexer::csFontPlexer (iFont* primary, csFontLoaderOrder* order)
+csFontPlexer::csFontPlexer (csFontServerMultiplexor* parent,
+			    const char* fontid, iFont* primary, 
+			    int size, csFontLoaderOrder* order)
 {
   SCF_CONSTRUCT_IBASE(0);
 
   csFontPlexer::order = order;
   primaryFont = primary;
-  size = primary->GetSize ();
-  if (size != 0)
+  csFontPlexer::size = size;
+  csFontPlexer::parent = parent;
+  csFontPlexer::fontid = fontid;
+  //size = primary->GetSize ();
+  /*if (size != 0)
   {
     for (int i = 0; i < order->Length (); i++)
     {
@@ -384,11 +384,13 @@ csFontPlexer::csFontPlexer (iFont* primary, csFontLoaderOrder* order)
 	break;
       }
     }
-  }
+  }*/
 }
 
 csFontPlexer::~csFontPlexer ()
 {
+  parent->NotifyDelete (this, fontid);
+
   delete order;
 
   for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
@@ -400,7 +402,7 @@ csFontPlexer::~csFontPlexer ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csFontPlexer::SetSize (int iSize)
+/*void csFontPlexer::SetSize (int iSize)
 {
   size = iSize;
   for (int i = 0; i < order->Length (); i++)
@@ -410,7 +412,7 @@ void csFontPlexer::SetSize (int iSize)
       (*order)[i].font->SetSize (QRound ((float)iSize * (*order)[i].scale));
     }
   }
-}
+}*/
 
 int csFontPlexer::GetSize ()
 {

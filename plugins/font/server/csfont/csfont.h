@@ -24,8 +24,11 @@
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
+#include "csutil/weakref.h"
 #include "iutil/plugin.h"
 #include "iutil/databuff.h"
 
@@ -148,7 +151,7 @@ public:
   int Height;
   csRef<iDataBuffer> bitData;
   csRef<iDataBuffer> alphaData;
-  csDefaultFontServer *Parent;
+  csRef<csDefaultFontServer> Parent;
   csRefArray<iFontDeleteNotify> DeleteCallbacks;
 
   SCF_DECLARE_IBASE;
@@ -244,7 +247,8 @@ private:
   iObjectRegistry* object_reg;
 
   // A list of csDefaultFont pointers.
-  csPDelArray<csDefaultFont> fonts;
+  //csRefArray<csDefaultFont> fonts;
+  csHash<csDefaultFont*, csStrKey, csConstCharHashKeyHandler> fonts;
 
   /// read a font file from vfs
   csDefaultFont *ReadFontFile(const char *file);
@@ -261,20 +265,8 @@ public:
    * Load a font by name.
    * Returns a new iFont object or 0 on failure.
    */
-  virtual csPtr<iFont> LoadFont (const char *filename);
-
-  /**
-   * Get number of loaded fonts.
-   */
-  virtual int GetFontCount ()
-  { return fonts.Length (); }
-
-  /**
-   * Get Nth loaded font or 0.
-   * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get 0.
-   */
-  virtual iFont *GetFont (int iIndex);
+  virtual csPtr<iFont> LoadFont (const char *filename,
+    int size = 10);
 
   /// Called by child fonts to be added to font registry
   void NotifyCreate (csDefaultFont *font);
@@ -291,3 +283,4 @@ public:
 };
 
 #endif // __CS_CSFONT_H__
+

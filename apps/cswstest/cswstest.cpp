@@ -55,7 +55,8 @@ public:
 
   virtual bool Initialize ();
 
-  csRef<iFont> LucidiaFont;
+  csRef<iFont> VeraFont8;
+  csRef<iFont> VeraFont12;
 };
 
 //csWsTest *cswstest_app;                        // The main Windowing System object
@@ -141,10 +142,10 @@ public:
   virtual void Draw ()
   {
     csWindow::Draw();
-    SetFont (((csWsTest *)app)->LucidiaFont, 12);
+    SetFont (((csWsTest *)app)->VeraFont12);
     Text (BorderWidth+8, BorderHeight+100, CSPAL_WINDOW_LIGHT3D, -1,
       "This is a font 12 test");
-    SetFont (((csWsTest *)app)->LucidiaFont, 8);
+    SetFont (((csWsTest *)app)->VeraFont8);
     Text (BorderWidth+8, BorderHeight+140, CSPAL_WINDOW_LIGHT3D, -1,
       "This is a font 8 test");
   }
@@ -178,7 +179,8 @@ bool csWsTest::Initialize ()
   if (!csApp::Initialize ())
     return false;
 
-  LucidiaFont = LoadFont ("*courier");
+  VeraFont8 = LoadFont ("VeraSans", 8);
+  VeraFont12 = LoadFont ("VeraSans", 12);
   DefaultFontSize=14;
   //  LucidiaFont = LoadFont ("/fonts/LucidiaTypewriterRegular.ttf");
   

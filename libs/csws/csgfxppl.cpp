@@ -134,12 +134,11 @@ void csGraphicsPipeline::Pixel (int x, int y, int color)
 }
 
 void csGraphicsPipeline::Text (int x, int y, int fg, int bg, iFont *font,
-  int fontsize, const char *s)
+  const char *s)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
-  font->SetSize (fontsize);
   int fh, fw;
   font->GetDimensions (s, fw, fh);
   INCLUDE_MIN_POINT (x, y);

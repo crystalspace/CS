@@ -102,7 +102,7 @@ struct csGlyphMetrics
   int advance;
 };
 
-SCF_VERSION (iFont, 4, 0, 0);
+SCF_VERSION (iFont, 5, 0, 0);
 
 /**
  * A font object.
@@ -123,14 +123,6 @@ struct iFont : public iBase
    */
   virtual bool RemoveDeleteCallback (iFontDeleteNotify* func) = 0;
   
-  /**
-   * Set the size for this font in Point.
-   * All other methods will change their behaviour as soon as you call
-   * this method; but not all font managers supports rescalable fonts
-   * in which case this method will be unimplemented.
-   */
-  virtual void SetSize (int iSize) = 0;
-
   /**
    * Query current font size in Point. If server does not support rescalable
    * fonts, this method returns 0.
@@ -203,7 +195,7 @@ struct iFont : public iBase
   virtual bool HasGlyph (utf32_char c) = 0; 
 };
 
-SCF_VERSION (iFontServer, 2, 0, 1);
+SCF_VERSION (iFontServer, 3, 0, 0);
 
 /**
  * A font server interface.
@@ -219,21 +211,8 @@ struct iFontServer : public iBase
    * Load a font by name.
    * Returns a new iFont object or 0 on failure.
    */
-  virtual csPtr<iFont> LoadFont (const char *filename) = 0;
-
-  /**
-   * Get number of loaded fonts.
-   */
-  virtual int GetFontCount () = 0;
-
-  /**
-   * Get Nth loaded font or 0.
-   * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get 0.
-   * Note that the returned font is NOT IncRef'd: do it yourself
-   * if you store the pointer for long-term use.
-   */
-  virtual iFont *GetFont (int iIndex) = 0;
+  virtual csPtr<iFont> LoadFont (const char* filename, 
+    int size = 10) = 0;
 };
 
 /** @} */

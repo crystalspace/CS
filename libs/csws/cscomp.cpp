@@ -1623,8 +1623,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
   tb.Move (x - ox, y - oy);
   bool restoreclip = false;
   iFont *font;
-  int fontsize;
-  GetFont (font, fontsize);
+  GetFont (font);
   int i;
   for (i = rect.Length () - 1; i >= 0; i--)
   {
@@ -1633,7 +1632,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
     {
       app->pplSetClipRect (*cur); restoreclip = true;
       app->pplText (x, y, GetColor (fgindx), bgindx >= 0 ? GetColor (bgindx) : -1,
-        font, fontsize, s);
+        font, s);
     } /* endif */
   } /* endfor */
   if (restoreclip)
@@ -2060,32 +2059,27 @@ void csComponent::GetText (char *oText, int iTextSize) const
    *oText = 0;
 }
 
-void csComponent::SetFont (iFont *iNewFont, int iFontSize)
+void csComponent::SetFont (iFont *iNewFont)
 {
   if (Font)
     Font->DecRef ();
   Font = iNewFont;
   if (Font)
     Font->IncRef ();
-  if (iFontSize != -1)
-    FontSize = iFontSize;
 }
 
-void csComponent::GetFont (iFont *&oFont, int &oFontSize)
+void csComponent::GetFont (iFont *&oFont)
 {
-  if (parent && (!Font || !FontSize))
-    parent->GetFont (oFont, oFontSize);
+  if (parent && (!Font))
+    parent->GetFont (oFont);
 
   if (Font) oFont = Font;
-  if (FontSize) oFontSize = FontSize;
 }
 
 int csComponent::GetTextSize (const char *text, int *oHeight)
 {
   iFont *font;
-  int fontsize;
-  GetFont (font, fontsize);
-  font->SetSize (fontsize);
+  GetFont (font);
   int w, h;
   font->GetDimensions (text, w, h);
   if (oHeight) *oHeight = h;
@@ -2095,9 +2089,7 @@ int csComponent::GetTextSize (const char *text, int *oHeight)
 int csComponent::GetTextChars (const char *text, int iWidth)
 {
   iFont *font;
-  int fontsize;
-  GetFont (font, fontsize);
-  font->SetSize (fontsize);
+  GetFont (font);
   return font->GetLength (text, iWidth);
 }
 
