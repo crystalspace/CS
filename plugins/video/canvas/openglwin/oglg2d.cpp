@@ -407,7 +407,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
       int acceleration = dwi->this_->config->GetBool (
 	"Video.OpenGL.FullAcceleration", true) ? WGL_FULL_ACCELERATION_ARB : 
 	WGL_GENERIC_ACCELERATION_ARB;
-      csGLPixelFormatPicker& picker (*dwi->picker);
+      csGLPixelFormatPicker& picker = *dwi->picker;
 
       int pixelFormat = dwi->this_->FindPixelFormatGDI (hDC, picker);
       PIXELFORMATDESCRIPTOR pfd;
