@@ -134,19 +134,6 @@ csSector* csPortalCS::FollowSegment (csReversibleTransform& t,
   return sector ? sector->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
 }
 
-bool csPortalCS::BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly)
-{
-  if (sector->beam_busy >= csSector::cfg_reflections) return false;
-  if (do_warp_space)
-  {
-    csVector3 start2 = warp_wor.Other2This (start);
-    csVector3 end2 = warp_wor.Other2This (end);
-    return sector->BlockingThings (start2, end2, poly);
-  }
-  else
-    return sector->BlockingThings (start, end, poly);
-}
-
 csPolygon3D* csPortalCS::FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist)
 {
   if (sector->beam_busy >= csSector::cfg_reflections) return NULL;
@@ -162,6 +149,8 @@ csPolygon3D* csPortalCS::FollowBeam (csVector3& start, csVector3& end, csPolygon
 
 void csPortalCS::CalculateLighting (csLightView& lview)
 {
+  if (sector->draw_busy > csSector::cfg_reflections) return;
+
   csLightView new_lview = lview;
   if (lview.light_frustrum)
     CHKB (new_lview.light_frustrum = new csFrustrum (*lview.light_frustrum));
@@ -173,6 +162,18 @@ void csPortalCS::CalculateLighting (csLightView& lview)
 
     if (do_mirror) new_lview.mirror = !lview.mirror;
     new_lview.light_frustrum->SetMirrored (new_lview.mirror);
+
+    // Transform all shadow frustrums. First make a copy.
+    new_lview.shadows.Clear ();	// Don't delete elements.
+    csShadowFrustrum* sf, * copy_sf;
+    sf = lview.shadows.GetFirst ();
+    while (sf)
+    {
+      CHK (copy_sf = new csShadowFrustrum (*sf));
+      new_lview.shadows.AddLast (copy_sf);
+      sf = sf->next;
+    }
+    new_lview.shadows.Transform (&warp_wor);
 
     if (cfg_alpha)
     {
@@ -202,6 +203,13 @@ void csPortalCS::CalculateLighting (csLightView& lview)
   }
 
   sector->CalculateLighting (new_lview);
+
+  if (do_warp_space)
+  {
+    // Delete all copied frustrums.
+    new_lview.shadows.DeleteFrustrums ();
+    new_lview.shadows.Clear ();
+  }
 }
 
 void csPortalCS::DumpFrustrum (csStatLight* light, csVector3* frustrum, int num_frustrum,

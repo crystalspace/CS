@@ -28,6 +28,7 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/light/lghtmap.h"
+#include "csengine/dumper.h"
 #include "igraph3d.h"
 #include "itexture.h"
 
@@ -475,8 +476,8 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   int n2[2];
   csVector2 *p2[2];
 
-  p2[0] = new csVector2[n+1];
-  p2[1] = new csVector2[n+1];
+  CHK (p2[0] = new csVector2[n+1]);
+  CHK (p2[1] = new csVector2[n+1]);
 
   n2[0]=n2[1]=0;
 
@@ -579,8 +580,8 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
     poly_fill (n2[1],p2[1],v);
   }
 
-  delete[] p2[0];
-  delete[] p2[1];
+  CHK (delete[] p2[0]);
+  CHK (delete[] p2[1]);
 
   depth--;
 }
@@ -633,7 +634,7 @@ void csPolyTexture::FillLightmap (csLightView& lview)
 
   DB ((MSG_DEBUG_0, "(A,B,C,D)=(%f,%f,%f,%f) txt_(A,B,C,D)=(%f,%f,%f,%f)\n", A, B, C, D, txt_A, txt_B, txt_C, txt_D));
 
-  csVector3 v1, v2, v3;
+  csVector3 v1, v2;
 
   int ru, rv;
   float invww, invhh;
@@ -795,18 +796,29 @@ void csPolyTexture::FillLightmap (csLightView& lview)
             v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
           v2 = vv + m_t2w * v1;
 
-          // Perform the transformation given by m_warp and v_warp.
-          // This is the inverse portal warping transformation required
-          // to transform the end point back to original world space
-          // coordinates.
-          // v3 = ( info[i].m_warp ) * v2 - ( info[i].v_warp );
-          v3 = v2;
-
           // Use the original center of the light here because we need to check
           // for blocking things starting in the original sector before
           // any space warping occured.
+#	  if 1
+	  csShadowFrustrum* shadow_frust;
+	  shadow_frust = lview.shadows.GetFirst ();
+	  bool shadow = false;
+	  //CsPrintf (MSG_DEBUG_0, "-----------------\n");
+	  while (shadow_frust)
+	  {
+	    //Dumper::dump (shadow_frust, "lf");
+	    if (shadow_frust->polygon != polygon)
+	      if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+	      { shadow = true; break; }
+	    shadow_frust = shadow_frust->next;
+	  }
+	  if (!shadow) { rc = false; break; }
+#	  else
           csPolygon3D* p;
-	        csVector3 path_end = lview.beam2source * v3;
+          // Perform the inverse warping transformation required
+          // to transform the end point back to original world space
+          // coordinates.
+	  csVector3 path_end = lview.beam2source * v2;
           rc = light->GetSector ()->BlockingThings (light->GetCenter (),
 	          path_end, &p, light->GetSector () == polygon->GetSector ());
           if (!rc || p == polygon || p->GetParent () == polygon->GetParent ())
@@ -814,6 +826,7 @@ void csPolyTexture::FillLightmap (csLightView& lview)
 	    rc = false;
 	    break;
 	  }
+#	  endif
 
 	  if (!do_accurate_things) break;
 	  rc = true;
@@ -821,7 +834,9 @@ void csPolyTexture::FillLightmap (csLightView& lview)
 
         if (!rc)
         {
-          d = csSquaredDist::PointPoint (light->GetCenter (), v3);
+	  //@@@ I think this is wrong and the next line is right!
+          //d = csSquaredDist::PointPoint (light->GetCenter (), v2);
+          d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
           DB ((MSG_DEBUG_0, "    -> In viewing frustrum (distance %f compared with radius %f)\n", sqrt (d), light->GetRadius ()));
 
 	  if (d >= light->GetSquaredRadius ()) continue;
@@ -832,7 +847,9 @@ void csPolyTexture::FillLightmap (csLightView& lview)
 
 	  l1 = mapR[uv];
 
-	  float cosinus = (v3-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+	  //@@@ I think this is wrong and the next line is right!
+	  //float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+	  float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
 	  cosinus /= d;
 	  cosinus += cosfact;
 	  if (cosinus < 0) cosinus = 0;
@@ -878,8 +895,8 @@ void csPolyTexture::FillLightmap (csLightView& lview)
     }
   }
 
-  if (f_uv) CHKB (delete [] f_uv);
-  CHKB(delete[] rp);
+  CHK (delete [] f_uv);
+  CHK (delete [] rp);
 
   free(__texture);
   free(__mark);
@@ -941,7 +958,7 @@ void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
   float txt_C = A*m_t2w.m13 + B*m_t2w.m23 + C*m_t2w.m33;
   float txt_D = A*pl->v_world2tex.x + B*pl->v_world2tex.y + C*pl->v_world2tex.z + D;
 
-  csVector3 v1, v2, v3;
+  csVector3 v1, v2;
 
   int ru, rv;
   float invww, invhh;
@@ -973,6 +990,7 @@ void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
 
       // T = Mwt * (W - Vwt)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
+      //@@@ This is only right if we don't allow reflections on dynamic lights
       v1 = pl->m_world2tex * (lp->vertices[mi] + light->GetCenter () - pl->v_world2tex);
       f_uv[i].x = (v1.x*ww-Imin_u) / mipmap_size;
       f_uv[i].y = (v1.y*hh-Imin_v) / mipmap_size;
@@ -1107,28 +1125,23 @@ b:      if (scanL2 == MinIndex) goto finish;
           v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
         v2 = vv + m_t2w * v1;
 
-        // Perform the transformation given by m_warp and v_warp.
-        // This is the inverse portal warping transformation required
-        // to transform the end point back to original world space
-        // coordinates.
-        //v3 = ( info[i].m_warp ) * v2 - ( info[i].v_warp );
-        v3 = v2;
-
         // Use the original center of the light here because we need to check
         // for blocking things starting in the original sector before
         // any space warping occured.
         //csPolygon3D* p;
-        //bool rc = light->GetSector ()->BlockingThings (light->GetCenter (), v3, &p,
+        //bool rc = light->GetSector ()->BlockingThings (light->GetCenter (), v2, &p,
       	  //light->GetSector () == polygon->GetSector ());
 
         //if (!rc || p == polygon || p->get_parent () == polygon->get_parent ())
         {
-          d = csSquaredDist::PointPoint (light->GetCenter (), v3);
+	  //@@@ This is only right if we don't allow reflections for dynamic lights
+          d = csSquaredDist::PointPoint (light->GetCenter (), v2);
 
 	  if (d >= light->GetSquaredRadius ()) continue;
 	  d = sqrt (d);
 
-	  float cosinus = (v3-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+	  //@@@ This is only right if we don't allow reflections for dynamic lights
+	  float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
 	  cosinus /= d;
 	  cosinus += cosfact;
 	  if (cosinus < 0) cosinus = 0;
@@ -1175,7 +1188,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 finish:
 
-  if (f_uv) CHKB (delete [] f_uv);
+  CHK (delete [] f_uv);
 }
 
 void csPolyTexture::CreateDirtyMatrix ()
@@ -1185,7 +1198,7 @@ void csPolyTexture::CreateDirtyMatrix ()
   if (!dirty_matrix || dw != dirty_w || dh != dirty_h)
   {
     // Dirty matrix does not exist or the size is not correct
-    if (dirty_matrix) { CHK (delete [] dirty_matrix); }
+    CHK (delete [] dirty_matrix);
     dirty_w = dw;
     dirty_h = dh;
     dirty_size = dw*dh;

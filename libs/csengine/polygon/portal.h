@@ -233,16 +233,6 @@ public:
   virtual csPolygon3D* FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist) = 0;
 
   /**
-   * Follow a beam of light with a given start and end point and return
-   * the first polygon that is hit (in 'poly').
-   * Only Things are considered. It is assumed that
-   * the given start and end are connected through portals.
-   * NOTE@@@! It returns a csPolygon3D which might not be what you want.
-   * This function returns true if something is hit.
-   */
-  virtual bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly) = 0;
-
-  /**
    * Update lighting of all polygons reachable through this portal.
    */
   virtual void CalculateLighting (csLightView& lview) = 0;
@@ -305,11 +295,6 @@ public:
    * Follow a beam of light through this portal.
    */
   virtual csPolygon3D* FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist);
-
-  /**
-   * Follow a beam of light through this portal (for Things).
-   */
-  virtual bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly);
 
   /**
    * Update lighting of all polygons visible through this portal.
