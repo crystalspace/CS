@@ -538,6 +538,98 @@ typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4DVNVPROC) (GLuint index, GLsizei
 typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4FVNVPROC) (GLuint index, GLsizei count, const GLfloat *v);
 typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4SVNVPROC) (GLuint index, GLsizei count, const GLshort *v);
 typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4UBVNVPROC) (GLuint index, GLsizei count, const GLubyte *v);
+// Start of ARB_VERTEX_PROGRAM
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1SARBPROC) (GLuint index, GLshort x);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1DARBPROC) (GLuint index, GLdouble x);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1FARBPROC) (GLuint index, GLfloat x);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2SARBPROC) (GLuint index, GLshort x, GLshort y);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2DARBPROC) (GLuint index, GLdouble x, GLdouble y);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2FARBPROC) (GLuint index, GLfloat x, GLfloat y);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3SARBPROC) (GLuint index, GLshort x, GLshort y, GLshort z);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3DARBPROC) (GLuint index, GLdouble x, GLdouble y, GLdouble z);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3FARBPROC) (GLuint index, GLfloat x, GLfloat y, GLfloat z);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4SARBPROC) (GLuint index, GLshort x, GLshort y, GLshort z, GLshort w);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4DARBPROC) (GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4FARBPROC) (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4NUBARBPROC) (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w);
+
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1SVARBPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1DVARBPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1FVARBPROC) (GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2SVARBPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2DVARBPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2FVARBPROC) (GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3SVARBPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3DVARBPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3FVARBPROC) (GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4SVARBPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4DVARBPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4FVARBPROC) (GLuint index, const GLfloat *v);
+
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4BVARBPROC) (GLuint index, const GLbyte *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4IVARBPROC) (GLuint index, const GLint *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4UBVARBPROC) (GLuint index, const GLubyte *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4USVARBPROC) (GLuint index, const GLushort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4UIVARBPROC) (GLuint index, const GLuint *v);
+
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4NBVARBPROC) (GLuint index, const GLbyte *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4NUBVARBPROC) (GLuint index, const GLubyte *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4NSVARBPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4NUSVARBPROC) (GLuint index, const GLushort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4NIVARBPROC) (GLuint index, const GLint *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4NUIVARBPROC) (GLuint index, const GLuint *v);
+
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBPOINTERARBPROC) (GLuint index, GLint size, GLenum type,
+															   GLboolean normalized, GLsizei stride,
+															   GLvoid* pointer);
+
+typedef void (csAPIENTRY * csPFNGLENABLEVERTEXATTRIBARRAYARBPROC) (GLuint index);
+typedef void (csAPIENTRY * csPFNGLDISALBEVERTEXATTRIBARRAYARBPROC) (GLuint index);
+
+typedef void (csAPIENTRY * csPFNGLPROGRAMSTRINGARBPROC) (GLenum target, GLenum format, GLsizei len,
+														 const GLvoid * string);
+typedef void (csAPIENTRY * csPFNGLBINDPROGRAMARBPROC) (GLenum target, GLuint program);
+typedef void (csAPIENTRY * csPFNGLDELETEPROGRAMSARBPROC) (GLsizei n, const GLuint *programs);
+typedef void (csAPIENTRY * csPFNGLGENPROGRAMSARBPROC) (GLsizei n, GLuint *programs);
+
+typedef void (csAPIENTRY * csPFNGLPROGRAMENVPARAMETER4DARBPROC) (GLenum target, GLuint index,
+																 GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+typedef void (csAPIENTRY * csPFNGLPROGRAMENVPARAMETER4FARBPROC) (GLenum target, GLuint index,
+																 GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (csAPIENTRY * csPFNGLPROGRAMENVPARAMETER4DVARBPROC) (GLenum target, GLuint index,
+																  const GLdouble *params);
+typedef void (csAPIENTRY * csPFNGLPROGRAMENVPARAMETER4FVARBPROC) (GLenum target, GLuint index,
+																  const GLfloat *params);
+
+typedef void (csAPIENTRY * csPFNGLPROGRAMLOCALPARAMETER4DARBPROC) (GLenum target, GLuint index,
+																 GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+typedef void (csAPIENTRY * csPFNGLPROGRAMLOCALPARAMETER4FARBPROC) (GLenum target, GLuint index,
+																 GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (csAPIENTRY * csPFNGLPROGRAMLOCALPARAMETER4DVARBPROC) (GLenum target, GLuint index,
+																  const GLdouble *params);
+typedef void (csAPIENTRY * csPFNGLPROGRAMLOCALPARAMETER4FVARBPROC) (GLenum target, GLuint index,
+																  const GLfloat *params);
+
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMENVPARAMETERDVARBPROC) (GLenum target, GLuint index,
+																	GLdouble *params);
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMENVPARAMETERFVARBPROC) (GLenum target, GLuint index,
+																	GLfloat *params);
+
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMLOCALPARAMETERDVARBPROC) (GLenum target, GLuint index,
+																	GLdouble *params);
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMLOCALPARAMETERFVARBPROC) (GLenum target, GLuint index,
+																	GLfloat *params);
+
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMIVARBPROC) (GLenum target, GLenum pname, GLint *params);
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMSTRINGARBPROC) (GLenum target, GLenum pname, GLvoid *string);
+
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBDVARBPROC) (GLuint index, GLenum pname, GLdouble *params);
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBFVARBPROC) (GLuint index, GLenum pname, GLfloat *params);
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBIVARBPROC) (GLuint index, GLenum pname, GLint *params);
+
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBPOINTERVARBPROC) (GLuint index, GLenum pname, GLvoid **pointer);
+
+typedef GLboolean (csAPIENTRY * csPFNGLISPROGRAMARB) (GLuint program);
 
 #endif
 
@@ -685,6 +777,7 @@ typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4UBVNVPROC) (GLuint index, GLsize
 #define CSGL_SGIS_point_line_texgen
 #define CSGL_SGIS_texture_color_mask
 #define CSGL_NV_vertex_program
+#define CSGL_ARB_vertex_program
 #endif
 
 #define CS_PREP_GL_FUNCTION(fType,fName) \
@@ -1581,6 +1674,74 @@ CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4SVNVPROC, glVertexAttribs4svNV );
 CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4UBVNVPROC, glVertexAttribs4ubvNV );
 #endif
 
+#ifdef CSGL_ARB_vertex_program
+
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1SARBPROC, glVertexAttrib1sARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1DARBPROC, glVertexAttrib1dARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1FARBPROC, glVertexAttrib1fARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2SARBPROC, glVertexAttrib2sARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2DARBPROC, glVertexAttrib2dARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2FARBPROC, glVertexAttrib2fARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3SARBPROC, glVertexAttrib3sARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3DARBPROC, glVertexAttrib3dARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3FARBPROC, glVertexAttrib3fARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4SARBPROC, glVertexAttrib4sARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4DARBPROC, glVertexAttrib4dARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4FARBPROC, glVertexAttrib4fARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4NUBARBPROC, glVertexAttrib4NubARB);
+
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1SVARBPROC, glVertexAttrib1svARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1DVARBPROC, glVertexAttrib1dvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1FVARBPROC, glVertexAttrib1fvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2SVARBPROC, glVertexAttrib2svARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2DVARBPROC, glVertexAttrib2dvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2FVARBPROC, glVertexAttrib2fvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3SVARBPROC, glVertexAttrib3svARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3DVARBPROC, glVertexAttrib3dvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3FVARBPROC, glVertexAttrib3fvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4SVARBPROC, glVertexAttrib4svARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4DVARBPROC, glVertexAttrib4dvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4FVARBPROC, glVertexAttrib4fvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4BVARBPROC, glVertexAttrib4bvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4IVARBPROC, glVertexAttrib4ivARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4UBVARBPROC, glVertexAttrib4ubvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4USVARBPROC, glVertexAttrib4usvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4UIVARBPROC, glVertexAttrib4uivARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4NBVARBPROC, glVertexAttrib4NbvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4NUBVARBPROC, glVertexAttrib4NubvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4NSVARBPROC, glVertexAttrib4NsvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4NUSVARBPROC, glVertexAttrib4NusvARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4NIVARBPROC, glVertexAttrib4NivARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4NUIVARBPROC, glVertexAttrib4NuivARB);
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBPOINTERARBPROC, glVertexAttribPointerARB);
+CS_PREP_GL_FUNCTION( csPFNGLENABLEVERTEXATTRIBARRAYARBPROC, glEnableVertexAttribArrayARB);
+CS_PREP_GL_FUNCTION( csPFNGLDISALBEVERTEXATTRIBARRAYARBPROC, glDisableVertexAttribArrayARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMSTRINGARBPROC, glProgramStringARB);
+CS_PREP_GL_FUNCTION( csPFNGLBINDPROGRAMARBPROC, glBindProgramARB);
+CS_PREP_GL_FUNCTION( csPFNGLDELETEPROGRAMSARBPROC, glDeleteProgramsARB);
+CS_PREP_GL_FUNCTION( csPFNGLGENPROGRAMSARBPROC, glGenProgramsARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMENVPARAMETER4DARBPROC, glProgramEnvParameter4dARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMENVPARAMETER4FARBPROC, glProgramEnvParameter4fARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMENVPARAMETER4DVARBPROC, glProgramEnvParameter4dvARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMENVPARAMETER4FVARBPROC, glProgramEnvParameter4fvARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMLOCALPARAMETER4DARBPROC, glProgramLocalParameter4dARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMLOCALPARAMETER4FARBPROC, glProgramLocalParameter4fARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMLOCALPARAMETER4DVARBPROC, glProgramLocalParameter4dvARB);
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMLOCALPARAMETER4FVARBPROC, glProgramLocalParameter4fvARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMENVPARAMETERDVARBPROC, glGetProgramEnvParameterdvARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMENVPARAMETERFVARBPROC, glGetProgramEnvParameterfvARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMLOCALPARAMETERDVARBPROC, glGetProgramLocalParameterdvARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMLOCALPARAMETERFVARBPROC, glGetProgramLocalParameterfvARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMIVARBPROC, glGetProgramivARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMSTRINGARBPROC, glGetProgramStringARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBDVARBPROC, glGetVertexAttribdvARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBFVARBPROC, glGetVertexAttribfvARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBIVARBPROC, glGetVertexAttribivARB);
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBPOINTERVARBPROC, glGetVertexAttribPointervARB);
+CS_PREP_GL_FUNCTION( csPFNGLISPROGRAMARB, glIsProgramARB);
+#endif
+
+
 #ifdef CSGL_FOR_ALL
 #undef CSGL_VERSION_1_2
 #undef CSGL_ARB_multitexture
@@ -1725,6 +1886,7 @@ CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4UBVNVPROC, glVertexAttribs4ubvNV );
 #undef CSGL_SGIS_point_line_texgen
 #undef CSGL_SGIS_texture_color_mask
 #undef CSGL_NV_vertex_program
+#undef CSGL_ARB_vertex_program
 #endif
 
 #undef CSGL_FOR_ALL
@@ -4745,5 +4907,90 @@ CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4UBVNVPROC, glVertexAttribs4ubvNV );
 #define GL_MAP2_VERTEX_ATTRIB14_4_NV      0x867E
 #define GL_MAP2_VERTEX_ATTRIB15_4_NV      0x867F
 #endif 
+
+#ifndef GL_ARB_vertex_program
+#define GL_ARB_vertex_program 1
+#define GL_VERTEX_PROGRAM_ARB				        	    0x8620
+#define GL_VERTEX_PROGRAM_POINT_SIZE_ARB	       	0x8642
+#define GL_VERTEX_PROGRAM_TWO_SIDE_ARB	    	    0x8643
+#define GL_COLOR_SUM_ARB				        		      0x8458
+#define GL_PROGRAM_FORMAT_ASCII_ARB			        	0x8875
+#define GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB	     	0x8622
+#define GL_VERTEX_ATTRIB_ARRAY_SIZE_ARB		        0x8623
+#define GL_VERTEX_ATTRIB_ARRAY_STRIDE_ARB	        0x8624
+#define GL_VERTEX_ATTRIB_ARRAY_TYPE_ARB           0x8625
+#define GL_VERTEX_ATTRIB_ARRAY_NORMALIZED_ARB     0x886A
+#define GL_CURRENT_VERTEX_ATTRIB_ARB		        	0x8626
+#define GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB        0x8645
+#define GL_PROGRAM_LENGTH_ARB                     0x8627
+#define GL_PROGRAM_FORMAT_ARB                     0x8876
+#define GL_PROGRAM_BINDING_ARB                    0x8677
+#define GL_PROGRAM_INSTRUCTIONS_ARB               0x88A0
+#define GL_MAX_PROGRAM_INSTRUCTIONS_ARB           0x88A1
+#define GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB        0x88A2
+#define GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB    0x88A3
+#define GL_PROGRAM_TEMPORARIES_ARB                0x88A4
+#define GL_MAX_PROGRAM_TEMPORARIES_ARB            0x88A5
+#define GL_PROGRAM_NATIVE_TEMPORARIES_ARB         0x88A6
+#define GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB     0x88A7
+#define GL_PROGRAM_PARAMETERS_ARB                 0x88A8
+#define GL_MAX_PROGRAM_PARAMETERS_ARB             0x88A9
+#define GL_PROGRAM_NATIVE_PARAMETERS_ARB          0x88AA
+#define GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB      0x88AB
+#define GL_PROGRAM_ATTRIBS_ARB                    0x88AC
+#define GL_MAX_PROGRAM_ATTRIBS_ARB                0x88AD
+#define GL_PROGRAM_NATIVE_ATTRIBS_ARB             0x88AE
+#define GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB         0x88AF
+#define GL_PROGRAM_ADDRESS_REGISTERS_ARB          0x88B0
+#define GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB      0x88B1
+#define GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB   0x88B2
+#define GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB  0x88B3
+#define GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB        0x88B4
+#define GL_MAX_PROGRAM_ENV_PARAMETERS_ARB          0x88B5
+#define GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB         0x88B6
+#define GL_PROGRAM_STRING_ARB                      0x8628
+#define GL_PROGRAM_ERROR_POSITION_ARB              0x864B
+#define GL_CURRENT_MATRIX_ARB                      0x8641
+#define GL_TRANSPOSE_CURRENT_MATRIX_ARB            0x88B7
+#define GL_CURRENT_MATRIX_STACK_DEPTH_ARB          0x8640
+#define GL_MAX_VERTEX_ATTRIBS_ARB                  0x8869
+#define GL_MAX_PROGRAM_MATRICES_ARB                0x862F
+#define GL_MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB      0x862E
+#define GL_PROGRAM_ERROR_STRING_ARB                0x8874
+#define GL_MATRIX0_ARB                                  0x88C0
+#define GL_MATRIX1_ARB                                  0x88C1
+#define GL_MATRIX2_ARB                                  0x88C2
+#define GL_MATRIX3_ARB                                  0x88C3
+#define GL_MATRIX4_ARB                                  0x88C4
+#define GL_MATRIX5_ARB                                  0x88C5
+#define GL_MATRIX6_ARB                                  0x88C6
+#define GL_MATRIX7_ARB                                  0x88C7
+#define GL_MATRIX8_ARB                                  0x88C8
+#define GL_MATRIX9_ARB                                  0x88C9
+#define GL_MATRIX10_ARB                                 0x88CA
+#define GL_MATRIX11_ARB                                 0x88CB
+#define GL_MATRIX12_ARB                                 0x88CC
+#define GL_MATRIX13_ARB                                 0x88CD
+#define GL_MATRIX14_ARB                                 0x88CE
+#define GL_MATRIX15_ARB                                 0x88CF
+#define GL_MATRIX16_ARB                                 0x88D0
+#define GL_MATRIX17_ARB                                 0x88D1
+#define GL_MATRIX18_ARB                                 0x88D2
+#define GL_MATRIX19_ARB                                 0x88D3
+#define GL_MATRIX20_ARB                                 0x88D4
+#define GL_MATRIX21_ARB                                 0x88D5
+#define GL_MATRIX22_ARB                                 0x88D6
+#define GL_MATRIX23_ARB                                 0x88D7
+#define GL_MATRIX24_ARB                                 0x88D8
+#define GL_MATRIX25_ARB                                 0x88D9
+#define GL_MATRIX26_ARB                                 0x88DA
+#define GL_MATRIX27_ARB                                 0x88DB
+#define GL_MATRIX28_ARB                                 0x88DC
+#define GL_MATRIX29_ARB                                 0x88DD
+#define GL_MATRIX30_ARB                                 0x88DE
+#define GL_MATRIX31_ARB                                 0x88DF
+
+
+#endif
 
 #endif

@@ -3746,6 +3746,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
   // set up coordinate transform
   GLfloat matrixholder[16];
+  GLfloat my_mvp[16];
 
   //glPushAttrib( GL_ALL_ATTRIB_BITS );
   //glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
@@ -3831,10 +3832,9 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     if (pass_data->vertex_program > 0)
     {
       ///@@@HACK.. THESE SHOULD BE CHANEGD
-      glTrackMatrixNV (GL_VERTEX_PROGRAM_NV, 0, GL_MODELVIEW_PROJECTION_NV,
-        GL_IDENTITY_NV);
       //set all constants
-      for (int i = 0 ; i<pass_data->vertex_constants.Length() ; i++)
+      
+      for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
       {
         csOpenGlVPConstant* c = (csOpenGlVPConstant*)pass_data
 		->vertex_constants[i];
@@ -3842,19 +3842,20 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         {
           //set a float
           float var = effect->GetVariableFloat(c->variableID);
-          glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV,
-	  	c->constantNumber, var, var, var, var);
+          glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB,
+            c->constantNumber, var, var, var, var);
+
         }
         else if  (c->efvariableType == CS_EFVARIABLETYPE_VECTOR4)
         { 
           //set a vec4
           csEffectVector4 vec = effect->GetVariableVector4(c->variableID);
-          glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV,
-	  	c->constantNumber, vec.x, vec.y, vec.z, vec.w );
+          glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB, 
+              c->constantNumber, vec.x, vec.y, vec.z, vec.w);
         }
       }
-      glBindProgramNV( GL_VERTEX_PROGRAM_NV, pass_data->vertex_program );
-      statecache->EnableState( GL_VERTEX_PROGRAM_NV);
+      glBindProgramARB(GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
+      statecache->EnableState( GL_VERTEX_PROGRAM_ARB );
     }
 
     if (pass_data->doblending)
@@ -3923,12 +3924,12 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
           glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
           glEnableClientState (GL_TEXTURE_COORD_ARRAY);
         }
-	else
-	{
-	  /*glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
-	    &((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x);
-	    glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
-	  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	      else
+	      {
+	        /*glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
+	          &((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x);
+	          glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
+	        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         }
       }
       else if (layer_data->vcord_source == ED_SOURCE_MESH)
@@ -4020,8 +4021,10 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (pass_data->vertex_program > 0)
-      statecache->DisableState (GL_VERTEX_PROGRAM_NV);
+      statecache->DisableState (GL_VERTEX_PROGRAM_ARB);
   }
+
+
 
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
   {
@@ -5264,9 +5267,10 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
       }
       else if ( pass_state == efstrings->nvvertex_program_gl )
       {
-        if( (!NV_vertex_program) || !(glBindProgramNV && glGenProgramsNV
-          && glDeleteProgramsNV && glLoadProgramNV))
+        if( !ARB_vertex_program || !glGenProgramsARB || 
+            !glBindProgramARB || ! glProgramStringARB)
           return false;
+
         csStringID vp_s = pass->GetStateString(pass_state);
         unsigned char* vp;
         if(vp_s != csInvalidStringID)
@@ -5280,11 +5284,26 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
         }
         if (!vp) return false;
         //create and load vertex program
-        glGenProgramsNV(1, &pass_data->vertex_program);
-        glLoadProgramNV(GL_VERTEX_PROGRAM_NV, pass_data->vertex_program,
-        strlen((const char*)vp), vp);
-        if(glGetError() != GL_NO_ERROR)
+
+        glGenProgramsARB(1, &pass_data->vertex_program);
+        glBindProgramARB(GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
+
+        //load it from string
+        int i = strlen((const char*)vp);
+        glProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, i, vp);
+
+        const unsigned char * programErrorString=glGetString(GL_PROGRAM_ERROR_STRING_ARB);
+
+        int errorPos;
+	      glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
+
+        if(errorPos != -1)
         {
+          Report (CS_REPORTER_SEVERITY_WARNING, 
+                  "Vertexprogram error at position %d in effect %s (pass %d)",
+                  errorPos, effect->GetName(), p);
+          Report (CS_REPORTER_SEVERITY_WARNING,
+                  "Vertexprogram errorstring: %s", programErrorString);
           return false;
         }
       }

@@ -149,6 +149,32 @@ void csGraphics3DOGLCommon::Init_ARB_texture_env_dot3(iOpenGLInterface*)
 #undef INITMORE_ARB_texture_env_dot3
 
 // -----------------------
+#ifndef INITMORE_ARB_vertex_program
+#define INITMORE_ARB_vertex_program
+#endif
+
+void csGraphics3DOGLCommon::Init_ARB_vertex_program(iOpenGLInterface *G2DGL) 
+{ 
+  #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_vertex_program) 
+  bool &allFound = ARB_vertex_program;	  	  
+  allFound = true;			  
+  #define _CSGLEXT_
+  #define CSGL_ARB_vertex_program
+  #include "csglext.h"
+  #undef CSGL_ARB_vertex_program
+  if (!allFound)
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Could not get all function addresses for %s", "GL_NV_vertex_program");
+  else
+  {
+    INITMORE_ARB_vertex_program
+  }
+  #endif
+}
+
+#undef INITMORE_ARB_vertex_program
+
+// -----------------------
 
 #ifndef INITMORE_EXT_texture_env_combine
 #define INITMORE_EXT_texture_env_combine
