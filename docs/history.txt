@@ -4,6 +4,10 @@ The history order is reversed so that new features are at the top.
 	- Wyatt Miler suggested a work around for what seems to be a
 	  gcc 3.1 compiler bug which triggers on MacOS/X (PowerPC) in
 	  the tiny XML parser.
+	- Fixed a bug in iEngine->GetNearbyObjects(). This bug could cause
+	  infinite loops in cases where there is a portal from A->B and
+	  then another portal back from B->A which is also visible from
+	  the viewpoint of the center.
 20-Feb-2003
 	- Anders Stenberg fixed a bug in shader loader causing fragment
 	  programs not to load.
