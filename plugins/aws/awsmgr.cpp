@@ -239,9 +239,9 @@ awsManager::Print(iGraphics3D *g3d)
   if (updatestore_dirty)
   {
   
-    g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
+    /*g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
   		  0,0,512,480,//g3d->GetWidth(), g3d->GetHeight(),
-		  0,0,512,480,0);
+		  0,0,512,480,0);*/
 
    awsWindow *curwin=top;
    
@@ -257,8 +257,7 @@ awsManager::Print(iGraphics3D *g3d)
    updatestore_dirty=false;
 
   }
-  else
-  {
+  
     int i;
     iGraphics2D *g2d = g3d->GetDriver2D();
 
@@ -286,7 +285,8 @@ awsManager::Print(iGraphics3D *g3d)
       g2d->DrawLine(r.xmax, r.ymin, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
 
     }
-  }
+  
+
 }
 
 void       
@@ -311,8 +311,8 @@ awsManager::Redraw()
    
    /******* The following code is only executed if there is something to redraw *************/
    
-   if (updatestore_dirty && UsingDefaultContext)
-     ptG2D->DrawBox(0,0,512,480,erasefill);
+   //if (updatestore_dirty && UsingDefaultContext)
+     //ptG2D->DrawBox(0,0,512,480,erasefill);
 
 
    awsWindow *curwin=top, *oldwin = 0;
@@ -345,14 +345,14 @@ awsManager::Redraw()
           csRect dr(dirty.RectAt(i));
 
           // Find out if we need to erase.
-          if (!UsingDefaultContext)
+         /* if (!UsingDefaultContext || updatestore_dirty)
           {
             csRect lo(dr);
             lo.Subtract(curwin->Frame());
 
             if (!lo.IsEmpty())            
               ptG2D->DrawBox(dr.xmin-1, dr.ymin-1, dr.xmax+1, dr.ymax+1, erasefill);
-          }
+          }*/
           
           RedrawWindow(curwin, dr);
         }
