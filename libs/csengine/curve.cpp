@@ -98,6 +98,12 @@ csCurveTesselated::~csCurveTesselated ()
 
 void csCurveTesselated::UpdateColors (csLightMap *LightMap)
 {
+  if (!LightMap)
+  {
+    ColorsValid = true;
+    return;
+  }
+  
   csRGBMap &rgbmap = LightMap->GetRealMap ();
   csRGBpixel *map = rgbmap.GetArray ();
   int lm_width = LightMap->GetWidth ();
