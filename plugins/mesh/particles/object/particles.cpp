@@ -48,6 +48,7 @@
 #include "ivaria/reporter.h"
 
 #include "qsqrt.h"
+#include "qint.h"
 
 #include "particles.h"
 #include <limits.h>
@@ -307,10 +308,13 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
     corners[1] = m * csVector3(particle_radius, particle_radius, 0.0f);
     corners[2] = m * csVector3(particle_radius, -particle_radius, 0.0f);
     corners[3] = m * csVector3(-particle_radius, -particle_radius, 0.0f);
-  } else {
-    int fov = cam->GetFOVAngle ();
+  }
+  else
+  {
+    int fov = QInt (cam->GetFOVAngle ());
     int fov_pixels = cam->GetFOV ();
-    if(camera_fov != fov || camera_pixels != fov_pixels) {
+    if(camera_fov != fov || camera_pixels != fov_pixels)
+    {
       camera_fov = fov;
       camera_pixels = fov_pixels;
       float lambda = fov_pixels / ( 2.0f * tanf (fov / 360.0f * PI));
@@ -416,7 +420,8 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     {
       vertex_buffer->SetStride (sizeof(i_vertex));
       color_buffer->SetStride (sizeof(i_vertex));
-      for(int i=0;i<bufsize-4;i+=4)
+      int i;
+      for(i=0;i<bufsize-4;i+=4)
       {
         texcoords[i].x = 0;
         texcoords[i].y = 0;
