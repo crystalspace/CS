@@ -777,16 +777,12 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("addon", XMLTOKEN_ADDON);
   xmltokens.Register ("alwaysanimate", XMLTOKEN_ALWAYSANIMATE);
   xmltokens.Register ("attenuation", XMLTOKEN_ATTENUATION);
-#ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("attenuationvec", XMLTOKEN_ATTENUATIONVECTOR);
-#endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("badoccluder", XMLTOKEN_BADOCCLUDER);
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("camera", XMLTOKEN_CAMERA);
   xmltokens.Register ("center", XMLTOKEN_CENTER);
-#ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("clamp", XMLTOKEN_CLAMP);
-#endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("clearzbuf", XMLTOKEN_CLEARZBUF);
   xmltokens.Register ("clearscreen", XMLTOKEN_CLEARSCREEN);
   xmltokens.Register ("closed", XMLTOKEN_CLOSED);
@@ -805,7 +801,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("farplane", XMLTOKEN_FARPLANE);
   xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("file", XMLTOKEN_FILE);
-#ifdef CS_USE_NEW_RENDERER
   // 3d Texture
   xmltokens.Register ("texture3d", XMLTOKEN_TEXTURE3D);
   // Cubemaps
@@ -818,7 +813,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("bottom", XMLTOKEN_BOTTOM);
 
   xmltokens.Register ("filter", XMLTOKEN_FILTER);
-#endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("fog", XMLTOKEN_FOG);
   xmltokens.Register ("forward", XMLTOKEN_FORWARD);
   xmltokens.Register ("for2d", XMLTOKEN_FOR2D);
@@ -965,12 +959,10 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("arg", XMLTOKEN_ARG);
   xmltokens.Register ("args", XMLTOKEN_ARGS);
 
-#ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("casthwshadow", XMLTOKEN_CAST_HW_SHADOW);
   xmltokens.Register ("shaders", XMLTOKEN_SHADERS);
   xmltokens.Register ("shader", XMLTOKEN_SHADER);
   xmltokens.Register ("renderloop", XMLTOKEN_RENDERLOOP);
-#endif
 
   return true;
 }
@@ -1097,11 +1089,11 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
         case XMLTOKEN_EFFECTS:
           LoadEffectFile(child->GetContentsValue());
           break;
-#ifdef CS_USE_NEW_RENDERER
         case XMLTOKEN_SHADERS:
+#ifdef CS_USE_NEW_RENDERER
           ParseShaderList (child);
-          break;
 #endif //CS_USE_NEW_RENDERER
+          break;
 	default:
 	  SyntaxService->ReportBadToken (child);
 	  return false;

@@ -119,16 +119,18 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
         if (!ParseHeightgen (ldr_context, child))
 	        return false;
         break;
-#ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_CUBEMAP:
+#ifdef CS_USE_NEW_RENDERER
         if (!ParseCubemap (ldr_context, child))
           return false;
+#endif
         break;
       case XMLTOKEN_TEXTURE3D:
+#ifdef CS_USE_NEW_RENDERER
         if (!ParseTexture3D (ldr_context, child))
           return false;
-        break;
 #endif // CS_USE_NEW_RENDERER
+        break;
       default:
         SyntaxService->ReportBadToken (child);
 	      return false;
@@ -262,8 +264,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	if (!SyntaxService->ParseBool (child, always_animate, false))
 	  return 0;
 	break;
-#ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_CLAMP:
+#ifdef CS_USE_NEW_RENDERER
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
@@ -273,8 +275,10 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
           else
             context.SetFlags (context.GetFlags() & ~CS_TEXTURE_CLAMP);
         }
+#endif
         break;
       case XMLTOKEN_FILTER:
+#ifdef CS_USE_NEW_RENDERER
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
@@ -284,8 +288,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
           else
             context.SetFlags (context.GetFlags() | CS_TEXTURE_NOFILTER);
         }
-        break;
 #endif // CS_USE_NEW_RENDERER
+        break;
       default:
         SyntaxService->ReportBadToken (child);
 	return 0;
@@ -593,8 +597,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	}
         break;
 #endif
-#ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_SHADER:
+#ifdef CS_USE_NEW_RENDERER
         {
           csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
           if (!shaderMgr)
@@ -620,8 +624,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  //csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
 	  shaders.Push (shader);
         }
-        break;
 #endif //CS_USE_NEW_RENDERER
+        break;
       default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
