@@ -149,6 +149,14 @@ bool csGraphics2DGLBe::Open(char *Title)
 
 void csGraphics2DGLBe::Close(void)
 {
+	printf("csGraphics2DGLBe::Close(void) entered.\n");//dh
+  // Destroy window and view
+  if (window) {
+    window->Lock();printf("window->Lock() succeeded.\n");
+    window->Close();printf("window->Close() succeeded.\n");
+    window = NULL;
+  }
+  
   // Close your graphic interface
   csGraphics2D::Close ();
 }

@@ -25,6 +25,7 @@
 
 #include "sysdef.h"
 #include "cs2d/openglbe/glbe2d.h"
+#include "isystem.h"
 
 #ifndef CRYST_WINDOW_H
 #include "CrystGLWindow.h"
@@ -159,9 +160,34 @@ CrystGLWindow::~CrystGLWindow()
 
 bool CrystGLWindow::QuitRequested()
 {
+	status_t exit_value;
+	bool sys_shutdown;
+	
+	pi_BeG2D->system->GetShutdown(sys_shutdown);
+	printf ("entering CrystGLWindow::QuitRequested(): Shutdown is %d \n", sys_shutdown);
+	
 	pi_BeG2D->dpy->EnableDirectMode( false );
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(TRUE);
+	
+	// allow quit only when done from application itself
+	// there's a problem in that while in this routine, the window is locked.
+	// the shutdown flag can't work unless LoopThread gets to read it which it can't till this exits.
+	pi_BeG2D->system->GetShutdown(sys_shutdown);
+	
+	printf ("exitting CrystGLWindow::QuitRequested(): Shutdown is %d \n", sys_shutdown);
+	return sys_shutdown;
+	
+/*	
+	// this window is destroyed, prevent the csGraphics2DGLBe::Close() method from trying to close it again!
+	pi_BeG2D->window = NULL;
+	
+	// but don't destroy the window till LoopThread has had a chance to finish!
+	pi_BeG2D->system->Shutdown();
+	Unlock();//dh: will this allow things to finish?
+	wait_for_thread(find_thread("LoopThread"), &exit_value);
+	Lock();//dh: BWindows insist that the window is locked before blowing it away.
+	
+	return(TRUE);*/
 }
 
 void CrystGLWindow::MessageReceived(BMessage *message)
@@ -217,7 +243,7 @@ printf("Entered CrystWindow::DirectConnected \n");
 	if (pi_BeG2D->dpy) {
 		pi_BeG2D->dpy->DirectConnected(info);
 		}
-	pi_BeG2D->dpy->EnableDirectMode( true );
+	pi_BeG2D->dpy->EnableDirectMode( true );// is this necessary
 	
 //	this bit just keeps conventional window behaviour until I've sorted out DirectConnected
 //BDirectWindow::DirectConnected(info);
