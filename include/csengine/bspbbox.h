@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -53,6 +53,8 @@ struct csVisObjInfo
 {
   iVisibilityObject* visobj;
   csPolyTreeBBox* bbox;
+  long last_movablenr;
+  long last_shapenr;
 };
 
 /**

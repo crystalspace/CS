@@ -133,6 +133,12 @@ bool csPoly2D::ClipAgainst (csClipper *view)
   return view->ClipInPlace (vertices, num_vertices, bbox);
 }
 
+bool csPoly2D::ClipAgainst (iClipper2D *view)
+{
+  MakeRoom (num_vertices + view->GetNumVertices () + 1);
+  return view->ClipInPlace (vertices, num_vertices, bbox);
+}
+
 void csPoly2D::Intersect (const csPlane2& plane,
 	csPoly2D& left, csPoly2D& right) const
 {

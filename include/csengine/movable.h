@@ -62,6 +62,9 @@ private:
    */
   csObject* object;
 
+  /// Update number.
+  long updatenr;
+
 public:
   /**
    * Create a default movable.
@@ -208,6 +211,13 @@ public:
    */
   void RemoveListener (iMovableListener* listener);
 
+  /**
+   * A number which indicates if the movable has been updated.
+   * One can use this number to see if the position of the object
+   * has changed since the last time it was checked.
+   */
+  long GetUpdateNumber () { return updatenr; }
+
   DECLARE_IBASE;
 
   //------------------------- iMovable interface -------------------------------
@@ -281,6 +291,10 @@ public:
     virtual void UpdateMove ()
     {
       scfParent->UpdateMove ();
+    }
+    virtual long GetUpdateNumber ()
+    {
+      return scfParent->GetUpdateNumber ();
     }
   } scfiMovable;
   friend struct eiMovable;

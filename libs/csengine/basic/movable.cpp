@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -43,6 +43,7 @@ csMovable::csMovable ()
   CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
   parent = NULL;
   iparent = NULL;
+  updatenr = 0;
 }
 
 csMovable::~csMovable ()
@@ -166,7 +167,6 @@ void csMovable::RemoveListener (iMovableListener* listener)
 
 void csMovable::UpdateMove ()
 {
-//@@@@: the part below is obsolete but still needed. Listener system superceeds it.
   if (object->GetType () >= csThing::Type)
   {
     csThing* th = (csThing*)object;
@@ -182,7 +182,7 @@ void csMovable::UpdateMove ()
     csCollection* col = (csCollection*)object;
     col->UpdateMove ();
   }
-//@@@@
+  updatenr++;
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
   {

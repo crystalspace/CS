@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -59,6 +59,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   MixMode = factory->GetMixMode ();
   initialized = false;
   vis_cb = NULL;
+  shapenr = 0;
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -335,6 +336,7 @@ void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& /*bbox*/, int /*type*/)
 void csSprite2DMeshObject::HardTransform (const csReversibleTransform& t)
 {
   (void)t;
+  //@@@ TODO
 }
 
 void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
@@ -356,6 +358,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
     vertices [i].color.Set (0, 0, 0);
     vertices [i].color_init.Set (0, 0, 0);
   }
+  shapenr++;
 }
 
 void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights,
@@ -404,6 +407,7 @@ void csSprite2DMeshObject::Particle::ScaleBy (float factor)
   csColoredVertices& vertices = scfParent->GetVertices ();
   for (int i = 0; i < vertices.Length (); i++)
     vertices[i].pos *= factor;
+  scfParent->shapenr++;
 }
 
 void csSprite2DMeshObject::Particle::Rotate (float angle)
@@ -411,6 +415,7 @@ void csSprite2DMeshObject::Particle::Rotate (float angle)
   csColoredVertices& vertices = scfParent->GetVertices ();
   for (int i = 0; i < vertices.Length (); i++)
     vertices[i].pos.Rotate (angle);
+  scfParent->shapenr++;
 }
 
 //----------------------------------------------------------------------

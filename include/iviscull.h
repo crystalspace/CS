@@ -51,7 +51,7 @@ struct iVisibilityCuller : public iBase
   virtual bool VisTest (iRenderView* irview) = 0;
 };
 
-SCF_VERSION (iVisibilityObject, 0, 0, 1);
+SCF_VERSION (iVisibilityObject, 0, 0, 2);
 
 /**
  * An object that wants to know if it is visible or not
@@ -61,6 +61,8 @@ struct iVisibilityObject : public iBase
 {
   /// Get the reference to the movable from this object.
   virtual iMovable* GetMovable () = 0;
+  /// Get the shape number of the underlying object.
+  virtual long GetShapeNumber () = 0;
   /// Get the bounding box of the object in object space.
   virtual void GetBoundingBox (csBox3& bbox) = 0;
   /**

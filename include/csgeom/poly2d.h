@@ -24,6 +24,7 @@
 
 class csClipper;
 class Dumper;
+struct iClipper2D;
 
 /**
  * The following class represents a general 2D polygon with
@@ -174,6 +175,16 @@ public:
    * in place of the original 2D polygon.
    */
   bool ClipAgainst (csClipper* view);
+
+  /**
+   * Clipping routines. They return false if the resulting polygon is not
+   * visible for some reason.
+   * Note that these routines must not be called if the polygon is not visible.
+   * These routines will not check that.
+   * Note that these routines will put the resulting clipped 2D polygon
+   * in place of the original 2D polygon.
+   */
+  bool ClipAgainst (iClipper2D* view);
 
   /**
    * Intersect this polygon with a given plane and return the

@@ -38,7 +38,7 @@
 
 class csCamera;
 
-SCF_VERSION (iCamera, 0, 0, 5);
+SCF_VERSION (iCamera, 0, 0, 6);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -142,6 +142,16 @@ struct iCamera : public iBase
 
   /// Return true if space is mirrored.
   virtual bool IsMirrored () = 0;
+  /// Set mirrored state.
+  virtual void SetMirrored (bool m) = 0;
+
+  /**
+   * Get the 3D far plane that should be used to clip all geometry.
+   * If this function returns false then this plane is invalid and should
+   * not be used. Otherwise it must be used to clip the object before
+   * drawing.
+   */
+  virtual bool GetFarPlane (csPlane3& pl) = 0;
 };
 
 #endif

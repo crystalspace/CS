@@ -128,6 +128,7 @@ void csSpiralMeshObject::HardTransform (const csReversibleTransform& t)
 {
   source = t.This2Other (source);
   initialized = false;
+  shapenr++;
 }
 
 //----------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -61,6 +61,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   top_mesh.texels[0][0] = NULL;
   top_mesh.triangles = NULL;
   top_mesh.vertex_fog = NULL;
+  shapenr = 0;
 }
 
 csBallMeshObject::~csBallMeshObject ()
@@ -111,6 +112,7 @@ void csBallMeshObject::SetRadius (float radiusx, float radiusy, float radiusz)
   csBallMeshObject::radiusy = radiusy;
   csBallMeshObject::radiusz = radiusz;
   max_radius.Set (radiusx, radiusy, radiusz);
+  shapenr++;
 }
 
 float csBallMeshObject::GetScreenBoundingBox (iTransformationManager* tranman,
@@ -504,6 +506,7 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
 {
   shift = t.This2Other (shift);
   initialized = false;
+  shapenr++;
 }
 
 //----------------------------------------------------------------------

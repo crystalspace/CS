@@ -1,6 +1,6 @@
 /*
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
     Copyright (C) 2000 by W.C.A. Wijngaards
-    Copyright (C) 2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -79,6 +79,7 @@ protected:
   iMeshObjectFactory* spr_factory;
   /// Previous time.
   cs_time prev_time;
+  long shapenr;
 
   bool initialized;
   /// Set up this object.
@@ -232,6 +233,7 @@ public:
   virtual bool WantToDie () { return to_delete; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
+  virtual long GetShapeNumber () { return shapenr; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

@@ -735,7 +735,7 @@ void csSector::Draw (csRenderView& rview)
   for (i = 0 ; i < skies.Length () ; i++)
   {
     csThing* th = (csThing*)skies[i];
-    th->Draw (rview);
+    th->Draw (&rview.scfiRenderView);
   }
 
   // In some cases this queue will be filled with all visible
@@ -794,7 +794,7 @@ void csSector::Draw (csRenderView& rview)
 
   // If we have a static thing we draw it here.
   if (static_thing)
-    static_thing->Draw (rview);
+    static_thing->Draw (&rview.scfiRenderView);
 
   if (do_things)
   {
@@ -835,7 +835,7 @@ void csSector::Draw (csRenderView& rview)
       csThing* th = thing_queue[i];
       if (th != static_thing)
         if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
-        else th->Draw (rview);
+        else th->Draw (&rview.scfiRenderView);
     }
 
     if (sort_idx)
@@ -847,8 +847,8 @@ void csSector::Draw (csRenderView& rview)
       for (i = 0 ; i < sort_idx ; i++)
       {
         csThing* th = sort_list[i];
-        if (th->GetFog ().enabled) th->DrawFoggy (rview);
-        else th->Draw (rview);
+        if (th->GetFog ().enabled) th->DrawFoggy (&rview.scfiRenderView);
+        else th->Draw (&rview.scfiRenderView);
       }
     }
 

@@ -30,6 +30,7 @@ struct iClipper2D;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iCamera;
+struct iSector;
 struct csFog;
 class csRenderView;
 
@@ -67,7 +68,7 @@ public:
   csFog* fog;
 };
 
-SCF_VERSION (iRenderView, 0, 0, 5);
+SCF_VERSION (iRenderView, 0, 0, 7);
 
 /**
  * This interface represents all information needed to render
@@ -108,6 +109,10 @@ struct iRenderView : public iBase
    */
   virtual csFogInfo* GetFirstFogInfo () = 0;
   /**
+   * Return true if fog info has been added.
+   */
+  virtual bool AddedFogInfo () = 0;
+  /**
    * Get the current camera.
    */
   virtual iCamera* GetCamera () = 0;
@@ -134,6 +139,20 @@ struct iRenderView : public iBase
    */
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
       	bool& do_clip) = 0;
+
+  /**
+   * Get current sector.
+   */
+  virtual iSector* GetThisSector () = 0;
+
+  /**
+   * Get previous sector.
+   */
+  virtual iSector* GetPreviousSector () = 0;
+  /// Set the view frustum at z=1.
+  virtual void SetFrustum (float lx, float rx, float ty, float by) = 0;
+  /// Get the frustum.
+  virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
 };
 
 #endif

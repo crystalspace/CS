@@ -43,7 +43,7 @@ struct iMovableListener : public iBase
   virtual void MovableDestroyed (iMovable* movable, void* userdata) = 0;
 };
 
-SCF_VERSION (iMovable, 0, 0, 7);
+SCF_VERSION (iMovable, 0, 0, 8);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -166,6 +166,13 @@ struct iMovable : public iBase
    * This function is responsible for calling all movement listeners.
    */
   virtual void UpdateMove () = 0;
+
+  /**
+   * A number which indicates if the movable has been updated.
+   * One can use this number to see if the position of the object
+   * has changed since the last time it was checked.
+   */
+  virtual long GetUpdateNumber () = 0;
 };
 
 #endif

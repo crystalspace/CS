@@ -21,6 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csengine/portal.h"
+#include "csengine/rview.h"
 
 class csEngine;
 class Sparse3D;

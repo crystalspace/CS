@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -50,6 +50,7 @@ private:
   csVector3* top_normals;
   bool initialized;
   csBox3 object_bbox;
+  long shapenr;
 
   /**
    * Camera space bounding box is cached here.
@@ -99,6 +100,7 @@ public:
   void SetShift (float shiftx, float shifty, float shiftz)
   {
     initialized = false;
+    shapenr++;
     shift.Set (shiftx, shifty, shiftz);
   }
   void SetRimVertices (int num)
@@ -134,6 +136,7 @@ public:
   virtual bool SupportsHardTransform () { return true; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
+  virtual long GetShapeNumber () { return shapenr; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState

@@ -176,12 +176,25 @@ void csCurve::GetCameraBoundingBox (const csTransform& obj2cam, csBox3& cbox)
   cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (7));
 }
 
+/// Calculate inverse perspective corrected point for this camera.
+static void Perspective (const csVector3& v, csVector2& p,
+	float aspect, float shift_x, float shift_y)
+{
+  float iz = aspect / v.z;
+  p.x = v.x * iz + shift_x;
+  p.y = v.y * iz + shift_y;
+}
+
 float csCurve::GetScreenBoundingBox (const csTransform& obj2cam,
-	const csCamera& camtrans,
+	iCamera* camera,
 	csBox2& boundingBox)
 {
   csVector2   oneCorner;
   csBox3      cbox;
+
+  float aspect = camera->GetFOV ();
+  float shift_x = camera->GetShiftX ();
+  float shift_y = camera->GetShiftY ();
 
   // @@@ Note. The bounding box created by this function greatly
   // exagerates the real bounding box. However, this function
@@ -202,15 +215,15 @@ float csCurve::GetScreenBoundingBox (const csTransform& obj2cam,
   }
   else
   {
-    camtrans.Perspective (cbox.Max (), oneCorner);
+    Perspective (cbox.Max (), oneCorner, aspect, shift_x, shift_y);
     boundingBox.StartBoundingBox (oneCorner);
     csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    camtrans.Perspective (v, oneCorner);
+    Perspective (v, oneCorner, aspect, shift_x, shift_y);
     boundingBox.AddBoundingVertexSmart (oneCorner);
-    camtrans.Perspective (cbox.Min (), oneCorner);
+    Perspective (cbox.Min (), oneCorner, aspect, shift_x, shift_y);
     boundingBox.AddBoundingVertexSmart (oneCorner);
     v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    camtrans.Perspective (v, oneCorner);
+    Perspective (v, oneCorner, aspect, shift_x, shift_y);
     boundingBox.AddBoundingVertexSmart (oneCorner);
   }
 

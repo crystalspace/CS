@@ -33,6 +33,7 @@
 #include "imovable.h"
 #include "ipolmesh.h"
 #include "iviscull.h"
+#include "imeshobj.h"
 
 class csSector;
 class csEngine;
@@ -45,7 +46,9 @@ class csPolygonInt;
 class csPolygonTree;
 class csPolygon2D;
 class csPolygon2DQueue;
+class csVisObjInfo;
 struct iGraphics3D;
+struct iRenderView;
 class Dumper;
 
 /**
@@ -297,13 +300,13 @@ private:
    * lightmapped polygons right now and is far from complete.
    */
   void DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
-	csRenderView* rview, bool use_z_buf);
+	iRenderView* rview, bool use_z_buf);
 
   /**
    * Draw the given array of polygons in the current csPolygonSet.
    */
   static void DrawPolygonArray (csPolygonInt** polygon, int num,
-	csRenderView* rview, bool use_z_buf);
+	iRenderView* rview, bool use_z_buf);
 
   /**
    * Test a number of polygons against the c-buffer and insert them to the
@@ -311,14 +314,14 @@ private:
    * If 'pvs' is true then the PVS is used (polygon->IsVisible()).
    */
   static void* TestQueuePolygonArray (csPolygonInt** polygon, int num,
-	csRenderView* d, csPolygon2DQueue* poly_queue, bool pvs);
+	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs);
 
   /**
    * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
    * and clipped version of the 3D polygon.
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	csRenderView* d, bool use_z_buf);
+	iRenderView* d, bool use_z_buf);
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -330,7 +333,7 @@ private:
   /**
    * Draw a number of polygons from a queue (used with C buffer processing).
    */
-  void DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview);
+  void DrawPolygonsFromQueue (csPolygon2DQueue* queue, iRenderView* rview);
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -340,13 +343,19 @@ private:
   	int num, bool same_plane, void* data);
 
   /**
+   * Check if some object needs updating in the visibility information
+   * (static tree) and do the update in that case.
+   */
+  void CheckVisUpdate (csVisObjInfo* vinf);
+
+  /**
    * Utility function to be called whenever movable changes so the
    * object to world transforms in all the curves have to be updated.
    */
   void UpdateCurveTransform ();
 
   /// Internal draw function.
-  void DrawInt (csRenderView& rview);
+  void DrawInt (iRenderView* rview);
 
   /// Move this thing to the specified sector. Can be called multiple times.
   void MoveToSector (csSector* s);
@@ -622,11 +631,6 @@ public:
    */
   bool VisTest (iRenderView* irview);
 
-  /// The movable has changed.
-  void MovableChanged (iMovable* movable, void* userdata);
-  /// The movable is about to be destroyed.
-  void MovableDestroyed (iMovable* movable, void* userdata);
-
   //----------------------------------------------------------------------
   // Drawing
   //----------------------------------------------------------------------
@@ -634,18 +638,18 @@ public:
   /**
    * Draw this thing given a view and transformation.
    */
-  void Draw (csRenderView& rview);
+  void Draw (iRenderView* rview);
 
   /**
    * Draw all curves in this thing given a view and transformation.
    */
-  void DrawCurves (csRenderView& rview);
+  void DrawCurves (iRenderView* rview);
 
   /**
    * Draw this thing as a fog volume (only when fog is enabled for
    * this thing).
    */
-  void DrawFoggy (csRenderView& rview);
+  void DrawFoggy (iRenderView* rview);
 
   //----------------------------------------------------------------------
   // Lighting
@@ -744,9 +748,9 @@ public:
    * Transform to the given camera if needed. This function works
    * via the transformation manager and will only transform if needed.
    */
-  void UpdateTransformation (const csCamera& c)
+  void UpdateTransformation (const csTransform& c)
   {
-    cam_verts_set.Transform (wor_verts, num_vertices, (const csTransform&)c);
+    cam_verts_set.Transform (wor_verts, num_vertices, c);
     cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
   }
 
@@ -917,11 +921,53 @@ public:
   } scfiVisibilityCuller;
   friend struct VisCull;
 
+  //-------------------- iMeshObject interface implementation ----------
+  struct MeshObject : public iMeshObject
+  {
+    DECLARE_EMBEDDED_IBASE (csThing);
+    virtual iMeshObjectFactory* GetFactory ();
+    virtual bool DrawTest (iRenderView* /*rview*/, iMovable* /*movable*/) { return true; }
+    virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
+      	iMovable* /*movable*/) { }
+    virtual bool Draw (iRenderView* /*rview*/, iMovable* /*movable*/) { return true; }
+    virtual void SetVisibleCallback (csMeshCallback* /*cb*/, void* /*cbData*/) { }
+    virtual csMeshCallback* GetVisibleCallback () { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& /*bbox*/, int /*type = CS_BBOX_NORMAL*/)
+    {
+    }
+    virtual csVector3 GetRadius () { return csVector3 (0); }
+    virtual void NextFrame (cs_time /*current_time*/) { }
+    virtual bool WantToDie () { return false; }
+    virtual void HardTransform (const csReversibleTransform& t)
+    {
+      scfParent->HardTransform (t);
+    }
+    virtual bool SupportsHardTransform () { return true; }
+    virtual bool HitBeamObject (const csVector3& /*start*/, const csVector3& /*end*/,
+  	csVector3& /*isect*/, float* /*pr*/) { return false; }
+    virtual long GetShapeNumber () { return 0; /*@@@*/ }
+  } scfiMeshObject;
+  friend struct MeshObject;
+
+  //-------------------- iMeshObjectFactory interface implementation ---------
+  struct MeshObjectFactory : public iMeshObjectFactory
+  {
+    DECLARE_EMBEDDED_IBASE (csThing);
+    virtual iMeshObject* NewInstance ();
+    virtual void HardTransform (const csReversibleTransform& t)
+    {
+      scfParent->HardTransform (t);
+    }
+    virtual bool SupportsHardTransform () { return true; }
+  } scfiMeshObjectFactory;
+  friend struct MeshObjectFactory;
+
   //-------------------- iVisibilityObject interface implementation ----------
   struct VisObject : public iVisibilityObject
   {
     DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMovable* GetMovable () { return &scfParent->GetMovable ().scfiMovable; }
+    virtual long GetShapeNumber () { return scfParent->scfiMeshObject.GetShapeNumber (); }
     virtual void GetBoundingBox (csBox3& bbox)
     {
       scfParent->GetBoundingBox (bbox);
@@ -931,21 +977,6 @@ public:
     virtual bool IsVisible () { return scfParent->IsVisible (); }
   } scfiVisibilityObject;
   friend struct VisObject;
-
-  //-------------------- iMovableListener interface implementation -----------
-  struct MovListener : public iMovableListener
-  {
-    DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void MovableChanged (iMovable* movable, void* userdata)
-    {
-      scfParent->MovableChanged (movable, userdata);
-    }
-    virtual void MovableDestroyed (iMovable* movable, void* userdata)
-    {
-      scfParent->MovableDestroyed (movable, userdata);
-    }
-  } scfiMovableListener;
-  friend struct MovListener;
 };
 
 #endif // __CS_THING_H__

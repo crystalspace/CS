@@ -386,14 +386,15 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 
 //---------------------------------------------------------------------------
 
-void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
+void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
   csPolyPlane* plane, bool use_z_buf)
 {
   int i;
   bool debug = false;
-  bool mirror = rview->IsMirrored ();
+  iCamera* icam = rview->GetCamera ();
+  bool mirror = icam->IsMirrored ();
 
-  rview->GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
     use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   if (poly->GetTextureType () != POLYTXT_LIGHTMAP)
@@ -442,30 +443,34 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     if (poly->GetMaterialWrapper ())
       poly->GetMaterialWrapper ()->Visit ();
     g3dpolyfx.mat_handle = poly->GetMaterialHandle ();
-    g3dpolyfx.inv_aspect = rview->GetInvFOV ();
+    g3dpolyfx.inv_aspect = icam->GetInvFOV ();
 
     csColor *po_colors = do_light && gs ? gs->GetColors () : NULL;
+
+    float aspect = icam->GetFOV ();
+    float shift_x = icam->GetShiftX ();
+    float shift_y = icam->GetShiftY ();
 
     // Here we have to do a little messy thing because PreparePolygonFX()
     // still requires the original triangle that was valid before clipping.
     csVector2 orig_triangle[3];
     float iz = 1. / unsplit->Vcam (0).z;
     g3dpolyfx.vertices[0].z = iz;
-    iz *= rview->GetFOV ();
-    orig_triangle[0].x = unsplit->Vcam (0).x * iz + rview->GetShiftX ();
-    orig_triangle[0].y = unsplit->Vcam (0).y * iz + rview->GetShiftY ();
+    iz *= aspect;
+    orig_triangle[0].x = unsplit->Vcam (0).x * iz + shift_x;
+    orig_triangle[0].y = unsplit->Vcam (0).y * iz + shift_y;
 
     iz = 1. / unsplit->Vcam (1).z;
     g3dpolyfx.vertices[1].z = iz;
-    iz *= rview->GetFOV ();
-    orig_triangle[1].x = unsplit->Vcam (1).x * iz + rview->GetShiftX ();
-    orig_triangle[1].y = unsplit->Vcam (1).y * iz + rview->GetShiftY ();
+    iz *= aspect;
+    orig_triangle[1].x = unsplit->Vcam (1).x * iz + shift_x;
+    orig_triangle[1].y = unsplit->Vcam (1).y * iz + shift_y;
 
     iz = 1. / unsplit->Vcam (2).z;
     g3dpolyfx.vertices[2].z = iz;
-    iz *= rview->GetFOV ();
-    orig_triangle[2].x = unsplit->Vcam (2).x * iz + rview->GetShiftX ();
-    orig_triangle[2].y = unsplit->Vcam (2).y * iz + rview->GetShiftY ();
+    iz *= aspect;
+    orig_triangle[2].x = unsplit->Vcam (2).x * iz + shift_x;
+    orig_triangle[2].y = unsplit->Vcam (2).y * iz + shift_y;
 
     if (g3dpolyfx.mat_handle->GetTexture () && fs)
     {
@@ -491,11 +496,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     }
     PreparePolygonFX (&g3dpolyfx, vertices, num_vertices,
       orig_triangle, po_colors != NULL);
-    rview->GetG3D ()->StartPolygonFX (g3dpolyfx.mat_handle,
+    rview->GetGraphics3D ()->StartPolygonFX (g3dpolyfx.mat_handle,
       ns->GetMixmode () | (po_colors ? CS_FX_GOURAUD : 0));
     rview->CalculateFogPolygon (g3dpolyfx);
-    rview->GetG3D ()->DrawPolygonFX (g3dpolyfx);
-    rview->GetG3D ()->FinishPolygonFX ();
+    rview->GetGraphics3D ()->DrawPolygonFX (g3dpolyfx);
+    rview->GetGraphics3D ()->FinishPolygonFX ();
   }
   else
   {
@@ -505,7 +510,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     if (poly->GetMaterialWrapper ())
       poly->GetMaterialWrapper ()->Visit ();
     g3dpoly.mat_handle = poly->GetMaterialHandle ();
-    g3dpoly.inv_aspect = rview->GetInvFOV ();
+    g3dpoly.inv_aspect = icam->GetInvFOV ();
 
     // We are going to use DrawPolygon.
     if (mirror)
@@ -546,7 +551,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     csPolyTxtPlane* txt_plane = poly->GetLightMapInfo ()->GetTxtPlane ();
     csMatrix3 m_cam2tex;
     csVector3 v_cam2tex;
-    txt_plane->WorldToCamera (*rview, m_cam2tex, v_cam2tex);
+    txt_plane->WorldToCamera (icam->GetTransform (), m_cam2tex, v_cam2tex);
     g3dpoly.plane.m_cam2tex = &m_cam2tex;
     g3dpoly.plane.v_cam2tex = &v_cam2tex;
 
@@ -558,11 +563,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpoly.normal.D () = Dc;
 
     if (debug)
-      rview->GetG3D ()->DrawPolygonDebug (g3dpoly);
+      rview->GetGraphics3D ()->DrawPolygonDebug (g3dpoly);
     else
     {
       rview->CalculateFogPolygon (g3dpoly);
-      rview->GetG3D ()->DrawPolygon (g3dpoly);
+      rview->GetGraphics3D ()->DrawPolygon (g3dpoly);
     }
     
 #ifdef DO_HW_UVZ
@@ -572,18 +577,19 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
   }
 }
 
-void csPolygon2D::FillZBuf (csRenderView* rview, csPolygon3D* poly,
+void csPolygon2D::FillZBuf (iRenderView* rview, csPolygon3D* poly,
   csPolyPlane* plane)
 {
-  rview->GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
+  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
+  iCamera* icam = rview->GetCamera ();
 
   CS_LOCAL_STATIC(G3DPolygonDP,g3dpoly);
   g3dpoly.num = num_vertices;
-  g3dpoly.inv_aspect = rview->GetInvFOV ();
+  g3dpoly.inv_aspect = icam->GetInvFOV ();
 
   // We are going to use DrawPolygon.
   int i;
-  if (rview->IsMirrored ())
+  if (icam->IsMirrored ())
     for (i = 0 ; i < num_vertices ; i++)
     {
       g3dpoly.vertices[num_vertices-i-1].sx = vertices[i].x;
@@ -596,7 +602,7 @@ void csPolygon2D::FillZBuf (csRenderView* rview, csPolygon3D* poly,
       g3dpoly.vertices[i].sy = vertices[i].y;
     }
 
-  g3dpoly.z_value         = poly->Vcam(0).z;
+  g3dpoly.z_value = poly->Vcam(0).z;
 
   float Ac, Bc, Cc, Dc;
   plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);
@@ -605,7 +611,7 @@ void csPolygon2D::FillZBuf (csRenderView* rview, csPolygon3D* poly,
   g3dpoly.normal.C () = Cc;
   g3dpoly.normal.D () = Dc;
 
-  rview->GetG3D ()->DrawPolygon (g3dpoly);
+  rview->GetGraphics3D ()->DrawPolygon (g3dpoly);
 }
 
 void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,

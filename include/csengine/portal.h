@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,14 +20,16 @@
 #define __CS_PORTAL_H__
 
 #include "csgeom/transfrm.h"
-#include "csengine/rview.h"
 #include "csutil/flags.h"
 #include "iportal.h"
 
+class csObject;
 class csSector;
 class csPolygon2D;
 class csPolygon3D;
 class csStatLight;
+class csFrustumView;
+struct iRenderView;
 struct iTextureHandle;
 
 /**
@@ -150,7 +152,7 @@ public:
    * should be clipped.<br>
    * 'portal_polygon' is the polygon containing this portal. This routine
    * will use the camera space plane of the portal polygon.<br>
-   * 'rview' is the current csRenderView.<p>
+   * 'rview' is the current iRenderView.<p>
    *
    * Return true if succesful, false otherwise.
    * Failure to draw through a portal does not need to
@@ -159,7 +161,7 @@ public:
    * can be drawn through a mirror).
    */
   bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
-  	csRenderView& rview);
+  	iRenderView* rview);
 
   /**
    * Follow a beam through this portal and return the polygon

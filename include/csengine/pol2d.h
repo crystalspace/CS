@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@
 class csPolygon3D;
 class csPolyPlane;
 class csClipper;
-class csRenderView;
+struct iRenderView;
 struct iGraphics2D;
 struct iGraphics3D;
 
@@ -74,14 +74,14 @@ public:
    * space).
    * 'poly' is only used for debugging. The plane and vertices are not used.
    */
-  void DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
+  void DrawFilled (iRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
   	bool use_z_buf = false);
 
   /**
    * Z fill the Z buffer for this polygon.
    * Nothing else is rendered.
    */
-  void FillZBuf (csRenderView* rview, csPolygon3D* poly, csPolyPlane* plane);
+  void FillZBuf (iRenderView* rview, csPolygon3D* poly, csPolyPlane* plane);
 
   /**
    * Add this polygon as a back or front polygon of a fog object.

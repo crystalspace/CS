@@ -71,7 +71,7 @@ struct csVertexStatus
 /// The output vertex is located somewhere inside the original polygon
 #define CS_VERTEX_INSIDE	2
 
-SCF_VERSION (iClipper2D, 0, 0, 1);
+SCF_VERSION (iClipper2D, 0, 0, 2);
 
 /**
  * This interfaces represents a 2D clipper for polygons.
@@ -107,6 +107,9 @@ struct iClipper2D : public iBase
    */
   virtual UByte Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus) = 0;
+
+  /// Wrapper function: clip a polygon in-place.
+  virtual UByte ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox) = 0;
 
   /**
    * Classify some bounding box against this clipper.

@@ -651,6 +651,8 @@ public:
     {
       scfParent->CalculateSectorBBox (bbox, do_things, do_meshes, do_terrain);
     }
+    virtual CS_ID GetID () { return scfParent->GetID (); }
+    virtual bool HasFog () { return scfParent->HasFog (); }
   } scfiSector;
   friend struct eiSector;
 };

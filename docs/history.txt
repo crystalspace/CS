@@ -1,6 +1,35 @@
 The history order has been reversed so that new features are at the top.
 
-21-Fev-2001
+21-Feb-2001
+	- Added iMeshObject::GetShapeNumber(). Using this number one can
+	  check if the object has changed shape enough so that the maximum
+	  bounding box is no longer valid. All mesh object plugins implement
+	  this function now.
+	- Added a similar iMovable/csMovable::GetUpdateNumber() which serves
+	  the same function but is updated when the object moves (i.e.
+	  in movable.UpdateMove()).
+	- Extended iVisibilityObject with GetShapeNumber(). Implementations
+	  should call GetShapeNumber() on the underlying object.
+	- csThing no longer implements iMovableListener. I reimplemented this
+	  using the GetShapeNumber() and GetUpdateNumber() above.
+	- csThing now implements iMeshObject. The implementation is not
+	  yet working though.
+	- csThing now implements iMeshObjectFactory.
+	- Extended iRenderView with AddedFogInfo(), GetThisSector(),
+	  GetPreviousSector(), GetFrustum(), and SetFrustum().
+	- Extended iSector with GetID() and HasFog().
+	- Extended iCamera with GetFarPlane() and SetMirrored().
+	- Added csPoly2D::ClipAgainst() which accepts iClipper2D instead
+	  of csClipper.
+	- Added iClipper2D::ClipInPlace().
+	- Added iEngine::IsPVS().
+	- Fully changed csThing so that it now uses iRenderView instead
+	  of csRenderView. This will help to move to a plugin later.
+	- Added new constructor to csPlaneClip which accepts a csPlane3.
+	- Changed csCurve::GetScreenBoundingBox() to use iCamera instead
+	  of csCamera.
+	- Note that these changes break CAMERA things and reflecting
+	  portals. Not sure why yet.
 	- Eric Sunshine resolved a circular reference problem between the
 	  system driver and the VFS plugin.  The actual problem was that the
 	  VFS plugin was utilizing the new configuration manager module even
@@ -47,6 +76,24 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards applied fix to demosky as suggested by Seth
 	  Galbraith. This fixed the crackes in the skydome. It aligns
 	  perfectly now.
+	- Wouter also did a big speed improvement in procedural sky.
+	  Demosky is friendlier now, displaying a help line, and you can
+	  toggle the sky animation/recalculation. Procedural sky is faster,
+	  since the scaling is now done in advance, perhaps the quality
+	  improved too.
+	- Martin Geisse moved system driver specific configuration to
+	  system.cfg (except the list of plug-in modules); moved simple
+	  console specific configuration to simpcon.cfg.
+	- Martin changed the following in the config system:
+	    - Plugins using a private config file now use the config manager.
+	    - Renamed iSystem::CreateConfig to iSystem::CreateINIConfig.
+	    - Renamed iSystem::CreateConfigNew to
+	      iSystem::CreateSeparateConfig.
+	- Martin also moved engine-specific config keys to
+	  CS/data/config/engine.cfg.
+	- Martin added documentation for the config manager system.
+	- Wouter Wijngaards fixed config call in OpenGL x2d canvas.
+	- Philip Wyett did a small fix to the Map2CS tutorial.
 	- Norman Kramer cleaned up the unresolved instances for meshes,
 	  loaders and factories.
 	- Norman switched the X11 canvases to iConfigManager.

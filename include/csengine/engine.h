@@ -818,7 +818,7 @@ public:
   /**
    * Is PVS enabled?
    */
-  bool IsPVS () { return use_pvs; }
+  virtual bool IsPVS () { return use_pvs; }
 
   /**
    * Use only PVS for culling. This flag only makes sense when

@@ -329,6 +329,10 @@ public:
     {
       return &(scfParent->movable.scfiMovable);
     }
+    virtual long GetShapeNumber ()
+    {
+      return scfParent->mesh->GetShapeNumber ();
+    }
     virtual void GetBoundingBox (csBox3& bbox)
     {
       scfParent->mesh->GetObjectBoundingBox (bbox, CS_BBOX_MAX);

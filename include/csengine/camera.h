@@ -364,6 +364,15 @@ public:
     {
       return scfParent->IsMirrored ();
     }
+    virtual void SetMirrored (bool m)
+    {
+      scfParent->SetMirrored (m);
+    }
+    virtual bool GetFarPlane (csPlane3& pl)
+    {
+      if (scfParent->fp) { pl = *scfParent->fp; return true; }
+      else return false;
+    }
   } scfiCamera;
 
 private:

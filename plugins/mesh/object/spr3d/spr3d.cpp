@@ -506,8 +506,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   // one last loop to fill in all of the merged vertex normals
   for (i = 0; i < GetNumTexels(); i++)
   {
-  	csVector3 &n = GetNormal (frame, i);
-	n = GetNormal (frame, merge [i]);
+    csVector3 &n = GetNormal (frame, i);
+    n = GetNormal (frame, merge [i]);
   }
 
   delete[] tri_normals;
@@ -606,6 +606,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   camera_cookie = 0;
   MixMode = CS_FX_COPY;
   initialized = false;
+  shapenr = 0;
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
     (C) W.C.A. Wijngaards, 2000
 
     This library is free software; you can redistribute it and/or
@@ -65,6 +65,7 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
   if (!type) type = LOAD_PLUGIN (system, "crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
   spr_factory = type->NewFactory ();
   type->DecRef ();
+  shapenr = 0;
 }
 
 csParticleSystem::~csParticleSystem()
@@ -79,6 +80,7 @@ void csParticleSystem::RemoveParticles ()
     if (particles[i])
       GetParticle (i)->DecRef ();
   particles.DeleteAll ();
+  shapenr++;
 }
 
 void csParticleSystem::AppendRectSprite (float width, float height, 
@@ -106,6 +108,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   part->DecRef ();
   state->DecRef ();
   sprmesh->DecRef ();
+  shapenr++;
 }
 
 
@@ -125,6 +128,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   part->DecRef ();
   sprmesh->DecRef (); 
   state->DecRef ();
+  shapenr++;
 }
 
 
@@ -167,6 +171,7 @@ void csParticleSystem::ScaleBy (float factor)
 {
   for (int i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->ScaleBy (factor);
+  shapenr++;
 }
 
 
@@ -174,6 +179,7 @@ void csParticleSystem::Rotate (float angle)
 {
   for (int i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->Rotate (angle);
+  shapenr++;
 }
 
 

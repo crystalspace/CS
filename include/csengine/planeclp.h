@@ -37,6 +37,9 @@ public:
   /// Initialize the plane.
   csPlaneClip (const csVector3& plane_norm, float d = 0) :
     csPlane3(plane_norm, d) { init(100); }
+  /// Initialize the plane.
+  csPlaneClip (const csPlane3& plane) :
+    csPlane3(plane) { init(100); }
 
   /// Initialize the plane
   csPlaneClip (float d = 0) : csPlane3(0, 0, -1, d) { init(100); }

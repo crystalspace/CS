@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csengine/rview.h"
 #include "csengine/engine.h"
+#include "csengine/sector.h"
 #include "csgeom/polyclip.h"
 #include "igraph3d.h"
 #include "iclip2.h"
@@ -525,5 +526,15 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
   }
 
   return true;
+}
+
+iSector* csRenderView::RenderView::GetThisSector ()
+{
+  return &scfParent->GetThisSector ()->scfiSector;
+}
+
+iSector* csRenderView::RenderView::GetPreviousSector ()
+{
+  return &scfParent->GetPreviousSector ()->scfiSector;
 }
 

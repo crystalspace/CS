@@ -20,6 +20,7 @@
 #ifndef __ISECTOR_H__
 #define __ISECTOR_H__
 
+#include "cstypes.h"
 #include "csutil/scf.h"
 
 class csSector;
@@ -27,7 +28,7 @@ struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
 
-SCF_VERSION (iSector, 0, 1, 3);
+SCF_VERSION (iSector, 0, 1, 5);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -43,6 +44,11 @@ struct iSector : public iBase
   virtual csSector *GetPrivateObject () = 0;
   /// Create the static BSP or octree for this sector.
   virtual void CreateBSP () = 0;
+
+  /// Get the ID of this sector.
+  virtual CS_ID GetID () = 0;
+  /// Has this sector fog?
+  virtual bool HasFog () = 0;
 
   /// Find a sky with the given name.
   virtual iThing *GetSkyThing (const char *name) = 0;

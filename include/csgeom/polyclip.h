@@ -48,7 +48,7 @@ public:
   virtual ~csClipper () { }
 
   /// Wrapper function: clip a polygon in-place.
-  UByte ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);
+  virtual UByte ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);
   
   /// most recent Clipresult
   UByte LastClipResult () { return mrClipping; }

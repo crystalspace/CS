@@ -58,7 +58,7 @@ typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 12);
+SCF_VERSION (iMeshObject, 0, 0, 13);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -166,6 +166,14 @@ struct iMeshObject : public iBase
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr) = 0;
+
+  /**
+   * Return a number which will change as soon as the object undergoes
+   * a fundamental change that affects the maximum bounding box. Using
+   * this number you can test if you need to get the bounding box again
+   * and perform calculations on that.
+   */
+  virtual long GetShapeNumber () = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 4);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -47,6 +47,7 @@ private:
   csMeshCallback* vis_cb;
   void* vis_cbData;
   csVector3 radius;
+  long shapenr;
 
   /**
    * Array of 3D vertices.
@@ -113,6 +114,7 @@ public:
   virtual bool SupportsHardTransform () { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
+  virtual long GetShapeNumber () { return shapenr; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState

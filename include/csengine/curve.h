@@ -233,7 +233,7 @@ public:
    * not valid.
    */
   float GetScreenBoundingBox (const csTransform& obj2cam,
-  	const csCamera& camtrans, csBox2& boundingBox);
+  	iCamera* camera, csBox2& boundingBox);
 
   /**
    * Lighting support. If IsLightable returns true, PosInSpace and Normal should

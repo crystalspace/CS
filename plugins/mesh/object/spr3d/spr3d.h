@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -850,6 +850,7 @@ private:
 
   csMeshCallback* vis_cb;
   void* vis_cbData;
+  long shapenr;
 
   /**
    * Camera space bounding box is cached here.
@@ -1089,6 +1090,7 @@ public:
   virtual bool SupportsHardTransform () { return false; }
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
+  virtual long GetShapeNumber () { return shapenr; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh

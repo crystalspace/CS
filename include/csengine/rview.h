@@ -334,6 +334,7 @@ public:
       return scfParent->do_clip_plane;
     }
     virtual csFogInfo* GetFirstFogInfo () { return scfParent->fog_info; }
+    virtual bool AddedFogInfo () { return scfParent->AddedFogInfo (); }
     virtual iCamera* GetCamera () { return scfParent->icamera; }
     virtual void CalculateFogPolygon (G3DPolygonDP& poly)
     {
@@ -351,6 +352,16 @@ public:
 	bool& do_clip)
     {
       return scfParent->ClipBBox (sbox, cbox, do_clip);
+    }
+    virtual iSector* GetThisSector ();
+    virtual iSector* GetPreviousSector ();
+    virtual void SetFrustum (float lx, float rx, float ty, float by)
+    {
+      scfParent->SetFrustum (lx, rx, ty, by);
+    }
+    virtual void GetFrustum (float& lx, float& rx, float& ty, float& by)
+    {
+      scfParent->GetFrustum (lx, rx, ty, by);
     }
   } scfiRenderView;
   friend class RenderView;

@@ -43,7 +43,7 @@ struct iView;
 struct iGraphics3D;
 struct iTransformationManager;
 
-SCF_VERSION (iEngine, 0, 1, 12);
+SCF_VERSION (iEngine, 0, 1, 13);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -72,6 +72,11 @@ struct iEngine : public iPlugIn
    * manager)
    */
   virtual int GetTextureFormat () = 0;
+
+  /**
+   * Return true if engine want to use PVS.
+   */
+  virtual bool IsPVS () = 0;
 
   /**
    * Create or select a new region (name can be NULL for the default main

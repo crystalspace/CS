@@ -54,7 +54,8 @@ IMPLEMENT_IBASE_EXT (csThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityCuller)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMovableListener)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObject)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
@@ -73,8 +74,12 @@ IMPLEMENT_EMBEDDED_IBASE(csThing::VisObject)
   IMPLEMENTS_INTERFACE(iVisibilityObject)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csThing::MovListener)
-  IMPLEMENTS_INTERFACE(iMovableListener)
+IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObject)
+  IMPLEMENTS_INTERFACE(iMeshObject)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObjectFactory)
+  IMPLEMENTS_INTERFACE(iMeshObjectFactory)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
@@ -84,7 +89,8 @@ csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
   CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
-  CONSTRUCT_EMBEDDED_IBASE (scfiMovableListener);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
 
   max_vertices = num_vertices = 0;
 
@@ -137,7 +143,6 @@ csThing::~csThing ()
   {
     csVisObjInfo* vinf = (csVisObjInfo*)visobjects[i];
     delete vinf->bbox;
-    vinf->visobj->GetMovable ()->RemoveListener (&scfiMovableListener);
     vinf->visobj->DecRef ();
     delete vinf;
   }
@@ -489,20 +494,21 @@ csPolygon3D* csThing::IntersectSegment (const csVector3& start,
 }
 
 void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	csRenderView* d, bool use_z_buf)
+	iRenderView* d, bool use_z_buf)
 {
-  if (d->GetCallback ())
-  {
-    d->CallCallback (CALLBACK_POLYGON, (void*)p);
-    d->CallCallback (CALLBACK_POLYGON2D, (void*)poly);
-  }
+  //@@@@@@@@ EDGES if (d->GetCallback ())
+  //{
+    //d->CallCallback (CALLBACK_POLYGON, (void*)p);
+    //d->CallCallback (CALLBACK_POLYGON2D, (void*)poly);
+  //}
+  iCamera* icam = d->GetCamera ();
 
   if (d->AddedFogInfo ())
   {
     // If fog info was added then we are dealing with vertex fog and
     // the current sector has fog. This means we have to complete the
     // fog_info structure with the plane of the current polygon.
-    d->GetFogInfo ()->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
+    d->GetFirstFogInfo ()->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
   }
 
   Stats::polygons_drawn++;
@@ -520,7 +526,7 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // may be rendered again (through mirrors) possibly overwriting the plane.
     csPolyPlane* keep_plane = NULL;
 
-    if (d->GetG3D ()->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
+    if (d->GetGraphics3D ()->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
       filtered = p->IsTransparent ();
               
     if (filtered || is_this_fog || (po && po->flags.Check (CS_PORTAL_ZFILL)))
@@ -531,13 +537,13 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
-    if (po->Draw (poly, p, *d))
+    if (po->Draw (poly, p, d))
     {
-      if (!d->GetCallback ())
+      //@@@@ EDGESif (!d->GetCallback ())
       {
 	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
-	if (is_this_fog) poly->AddFogPolygon (d->GetG3D (), p, keep_plane,
-		d->IsMirrored (), d->GetThisSector ()->GetID (), CS_FOG_BACK);
+	if (is_this_fog) poly->AddFogPolygon (d->GetGraphics3D (), p, keep_plane,
+		icam->IsMirrored (), d->GetThisSector ()->GetID (), CS_FOG_BACK);
 	// Here we z-fill the portal contents to make sure that sprites
 	// that are drawn outside of this portal cannot accidently cross
 	// into the others sector space (we cannot trust the Z-buffer here).
@@ -545,25 +551,27 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	  poly->FillZBuf (d, p, keep_plane);
       }
     }
-    else if (!d->GetCallback ())
+    else //@@@@@@@@ EDGES if (!d->GetCallback ())
       poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
 
     // Cleanup.
     if (keep_plane) keep_plane->DecRef ();
   }
-  else if (!d->GetCallback ())
+  else //@@@@@ EDGES if (!d->GetCallback ())
     poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
 }
 
 void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
-	csRenderView* d, bool use_z_buf)
+	iRenderView* d, bool use_z_buf)
 {
   csPolygon3D* p;
   csVector3* verts;
   int num_verts;
   int i;
-  csPoly2DPool* render_pool = d->GetEngine ()->render_pol2d_pool;
+  csPoly2DPool* render_pool = csEngine::current_engine->render_pol2d_pool;
   csPolygon2D* clip;
+  iCamera* icam = d->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
   
   for (i = 0 ; i < num ; i++)
   {
@@ -571,16 +579,24 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
     p = (csPolygon3D*)polygon[i];
     if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
     p->CamUpdate ();
-    if (p->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () : (csPlane3*)NULL,
-	 	d->GetOrigin (), verts, num_verts)) //@@@Use pool for verts?
+    csPlane3 clip_plane, *pclip_plane;
+    bool do_clip_plane = d->GetClipPlane (clip_plane);
+    if (do_clip_plane) pclip_plane = &clip_plane;
+    else pclip_plane = NULL;
+    if (p->ClipToPlane (pclip_plane,
+	 	camtrans.GetOrigin (), verts, num_verts)) //@@@Use pool for verts?
     {
-      if (!d->UseFarPlane() || d->GetFarPlane()->ClipPolygon (verts, num_verts))
+      csPlaneClip plclip;
+      bool do_plclip;
+      if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
+      else do_plclip = false;
+      if (!do_plclip || plclip.ClipPolygon (verts, num_verts))
       {
         clip = (csPolygon2D*)(render_pool->Alloc ());
-	if (p->DoPerspective (*d, verts, num_verts, clip, NULL, d->IsMirrored ()) &&
-            clip->ClipAgainst (d->GetView ()))
+	if (p->DoPerspective (camtrans, verts, num_verts, clip, NULL, icam->IsMirrored ()) &&
+            clip->ClipAgainst (d->GetClipper ()))
         {
-          p->GetPlane ()->WorldToCamera (*d, verts[0]);
+          p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
           DrawOnePolygon (p, clip, d, use_z_buf);
         }
         render_pool->Free (clip);
@@ -590,17 +606,19 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
 }
 
 void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
-	csRenderView* d, bool use_z_buf)
+	iRenderView* d, bool use_z_buf)
 {
   // @@@ We should include object 2 world transform here too like it
   // happens with sprites.
   int i;
-  csReversibleTransform tr_o2c = (*d);
-  d->GetG3D ()->SetObjectToCamera (&tr_o2c);
-  d->GetG3D ()->SetClipper (d->GetView ()->GetClipPoly (), d->GetView ()->GetNumVertices ());
+  iCamera* icam = d->GetCamera ();
+
+  csReversibleTransform tr_o2c = icam->GetTransform ();
+  d->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
+  d->GetGraphics3D ()->SetClipper (d->GetClipper ()->GetClipPoly (), d->GetClipper ()->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  d->GetG3D ()->SetPerspectiveAspect (d->GetFOV ());
-  d->GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  d->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
+  d->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
     use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   G3DPolygonMesh mesh;
@@ -651,7 +669,7 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
 
   mesh.do_fog = false;
   mesh.do_clip = false;
-  mesh.do_mirror = d->IsMirrored ();
+  mesh.do_mirror = icam->IsMirrored ();
   mesh.vertex_mode = G3DPolygonMesh::VM_WORLDSPACE;
   mesh.vertices = wor_verts;
   mesh.vertex_fog = NULL;
@@ -660,8 +678,8 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // @@@ fog not supported yet.
   // @@@ clipping not supported yet.
 
-  if (!d->GetCallback ())
-    d->GetG3D ()->DrawPolygonMesh (mesh);
+  //@@@@@@ EDGESif (!d->GetCallback ())
+    d->GetGraphics3D ()->DrawPolygonMesh (mesh);
   //else
   // @@@ Provide functionality for visible edges here...
 
@@ -674,19 +692,21 @@ cleanup:
 }
 
 void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
-	csRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
+	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
 {
   csPolygon3D* p;
   csPortal* po;
   csVector3* verts;
   int num_verts;
   int i, j;
-  csCBuffer* c_buffer = d->GetEngine ()->GetCBuffer ();
-  csCoverageMaskTree* covtree = d->GetEngine ()->GetCovtree ();
-  csQuadTree3D* quad3d = d->GetEngine ()->GetQuad3D ();
+  csCBuffer* c_buffer = csEngine::current_engine->GetCBuffer ();
+  csCoverageMaskTree* covtree = csEngine::current_engine->GetCovtree ();
+  csQuadTree3D* quad3d = csEngine::current_engine->GetQuad3D ();
   bool visible;
-  csPoly2DPool* render_pool = d->GetEngine ()->render_pol2d_pool;
+  csPoly2DPool* render_pool = csEngine::current_engine->render_pol2d_pool;
   csPolygon2D* clip;
+  iCamera* icam = d->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
   
   for (i = 0 ; i < num ; i++)
   {
@@ -714,7 +734,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	{
 	  // The bbox of this object has not yet been transformed
 	  // to camera space.
-	  tbb->World2Camera (*d);
+	  tbb->World2Camera (camtrans);
 	}
 
 	// Culling.
@@ -735,14 +755,23 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	}
 	else
 	{
+    	  csPlane3 clip_plane, *pclip_plane;
+    	  bool do_clip_plane = d->GetClipPlane (clip_plane);
+    	  if (do_clip_plane) pclip_plane = &clip_plane;
+    	  else pclip_plane = NULL;
           clip = (csPolygon2D*)(render_pool->Alloc ());
-          if ( bsppol->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () :
-		  (csPlane3*)NULL, d->GetOrigin (), verts, num_verts))
+          if ( bsppol->ClipToPlane (pclip_plane, camtrans.GetOrigin (),
+	  	verts, num_verts))
 	  {
-	    if (!d->UseFarPlane	() || d->GetFarPlane ()->ClipPolygon (verts, num_verts))   
+      	    csPlaneClip plclip;
+      	    bool do_plclip;
+      	    if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
+      	    else do_plclip = false;
+	    if (!do_plclip || plclip.ClipPolygon (verts, num_verts))   
 	    {
-               if (bsppol->DoPerspective (*d, verts, num_verts, clip, d->IsMirrored ()) 
-	          && clip->ClipAgainst (d->GetView ()) )
+               if (bsppol->DoPerspective (camtrans, verts,
+	       		num_verts, clip, icam->IsMirrored ()) 
+	          && clip->ClipAgainst (d->GetClipper ()) )
                {
 	         if (covtree)
 	         {
@@ -785,7 +814,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         // Don't draw this polygon.
       }
-      else if (quad3d && !d->GetEngine ()->IsPVSOnly ())
+      else if (quad3d && !csEngine::current_engine->IsPVSOnly ())
       {
 	csPlane3* wplane = p->GetPolyPlane ();
 	float cl = wplane->Classify (quad3d->GetCenter ());
@@ -804,19 +833,27 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       }
       else
       {
+    	csPlane3 clip_plane, *pclip_plane;
+    	bool do_clip_plane = d->GetClipPlane (clip_plane);
+    	if (do_clip_plane) pclip_plane = &clip_plane;
+    	else pclip_plane = NULL;
+      	csPlaneClip plclip;
+      	bool do_plclip;
+      	if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
+      	else do_plclip = false;
+
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (
-         p->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () : (csPlane3*)NULL,
-                            d->GetOrigin (), verts, num_verts)
-	 && (!d->UseFarPlane () || d->GetFarPlane ()->ClipPolygon (verts, num_verts))		    
-         && p->DoPerspective (*d, verts, num_verts, clip, NULL,
-                              d->IsMirrored ())
-         && clip->ClipAgainst (d->GetView ()))
+         p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
+	 && (!do_plclip || plclip.ClipPolygon (verts, num_verts))		    
+         && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
+                              icam->IsMirrored ())
+         && clip->ClipAgainst (d->GetClipper ()))
         {
           po = p->GetPortal ();
-	  if (d->GetEngine ()->IsPVSOnly ())
+	  if (csEngine::current_engine->IsPVSOnly ())
             visible = true;
-	  if (covtree)
+	  else if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
 		    clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
@@ -830,14 +867,21 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	// If visible and we don't already have a clip (i.e. we did 3D culling)
 	// then we need to make it here. It is still possible that the
 	// polygon will be culled at this stage.
+    	csPlane3 clip_plane, *pclip_plane;
+    	bool do_clip_plane = d->GetClipPlane (clip_plane);
+    	if (do_clip_plane) pclip_plane = &clip_plane;
+    	else pclip_plane = NULL;
+      	csPlaneClip plclip;
+      	bool do_plclip;
+      	if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
+      	else do_plclip = false;
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (!(
-           p->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () : (csPlane3*)NULL,
-                              d->GetOrigin (), verts, num_verts)
-           && (!d->UseFarPlane () || d->GetFarPlane ()->ClipPolygon (verts, num_verts))		    
-           && p->DoPerspective (*d, verts, num_verts, clip, NULL,
-                                d->IsMirrored ())
-           && clip->ClipAgainst (d->GetView ())))
+           p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
+           && (!do_plclip || plclip.ClipPolygon (verts, num_verts))		    
+           && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
+                                icam->IsMirrored ())
+           && clip->ClipAgainst (d->GetClipper ())))
 	{
 	  visible = false;
 	}
@@ -1362,9 +1406,12 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
 /// The list of fog vertices
 static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 
-void csThing::DrawCurves (csRenderView& rview)
+void csThing::DrawCurves (iRenderView* rview)
 {
   bool use_z_buf = !flags.Check (CS_ENTITY_ZFILL);
+
+  iCamera* icam = rview->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
 
   int i;
   int res=1;
@@ -1372,7 +1419,7 @@ void csThing::DrawCurves (csRenderView& rview)
   // Calculate tesselation resolution
   csVector3 wv = curves_center;
   csVector3 world_coord = movable.GetTransform ().This2Other (wv);
-  csVector3 camera_coord = rview.Other2This (world_coord);
+  csVector3 camera_coord = camtrans.Other2This (world_coord);
 
   if (camera_coord.z >= SMALL_Z)
   {
@@ -1383,12 +1430,13 @@ void csThing::DrawCurves (csRenderView& rview)
 
   // Create the combined transform of object to camera by
   // combining object to world and world to camera.
-  csReversibleTransform obj_cam = rview;
+  csReversibleTransform obj_cam = camtrans;
   obj_cam /= movable.GetTransform ();
-  rview.GetG3D ()->SetObjectToCamera (&obj_cam);
-  rview.GetG3D ()->SetClipper (rview.GetView ()->GetClipPoly (), rview.GetView ()->GetNumVertices ());
-  rview.GetG3D ()->SetPerspectiveAspect (rview.GetFOV ());
-  rview.GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
+  rview->GetGraphics3D ()->SetClipper (rview->GetClipper ()->GetClipPoly (),
+  	rview->GetClipper ()->GetNumVertices ());
+  rview->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
+  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   // Base of the mesh.
@@ -1396,7 +1444,7 @@ void csThing::DrawCurves (csRenderView& rview)
   mesh.morph_factor = 0;
   mesh.num_vertices_pool = 1;
   mesh.num_materials = 1;
-  mesh.do_mirror = rview.IsMirrored ();
+  mesh.do_mirror = icam->IsMirrored ();
   mesh.do_morph_texels = false;
   mesh.do_morph_colors = false;
   mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
@@ -1414,14 +1462,15 @@ void csThing::DrawCurves (csRenderView& rview)
     //	3. box is partially visible -> curve is visible and needs to be clipped
     //	   if rview has do_clip_plane set to true.
     csBox2 bbox;
-    if (c->GetScreenBoundingBox (obj_cam, rview, bbox) < 0) continue;	// Not visible.
+    if (c->GetScreenBoundingBox (obj_cam, icam, bbox) < 0) continue;	// Not visible.
     // Test if we need and should clip to the current portal.
     int box_class;
-    box_class = rview.GetView ()->ClassifyBox (bbox);
+    box_class = rview->GetClipper ()->ClassifyBox (bbox);
     if (box_class == -1) continue; // Not visible.
 
     bool do_clip = false;
-    if (rview.HasClipPlane () || rview.HasClipFrustum ())
+    csPlane3 clip_plane;
+    if (rview->GetClipPlane (clip_plane) || rview->IsClipperRequired ())
     {
       if (box_class == 0) do_clip = true;
     }
@@ -1473,25 +1522,25 @@ void csThing::DrawCurves (csRenderView& rview)
       CsPrintf (MSG_STDOUT, "Warning! Curve without material!\n");
       continue;
     }
-    rview.CalculateFogMesh (obj_cam, mesh);
+    rview->CalculateFogMesh (obj_cam, mesh);
 
-    if (rview.GetCallback ())
-      rview.CallCallback (CALLBACK_MESH, (void*)&mesh);
-    else
-      rview.GetG3D ()->DrawTriangleMesh (mesh);
+    //@@@@@ EDGESif (rview.GetCallback ())
+      //rview.CallCallback (CALLBACK_MESH, (void*)&mesh);
+    //else
+      rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
   }
 }
 
-void csThing::Draw (csRenderView& rview)
+void csThing::Draw (iRenderView* rview)
 {
   if (flags.Check (CS_ENTITY_INVISIBLE)) return;
-  if (flags.Check (CS_ENTITY_CAMERA))
-  {
-    csRenderView rview_new = rview;
-    rview_new.SetO2TTranslation (csVector3 (0));
-    DrawInt (rview_new);
-  }
-  else DrawInt (rview);
+  //@@@@@@@@@@@@@@@@@@@@@@@@@@ HOW TO FIX THIS!!!! @@@@@@@@@@@@@@@@@@@@@@@ if (flags.Check (CS_ENTITY_CAMERA))
+  //{
+    //csRenderView rview_new = rview;
+    //rview_new.SetO2TTranslation (csVector3 (0));
+    //DrawInt (rview_new);
+  //}
+  /*else*/ DrawInt (rview);
 }
 
 static int count_cull_node_notvis_behind;
@@ -1508,6 +1557,9 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
 
+  csPlane3 far_plane;
+  bool use_far_plane;
+
   int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
@@ -1515,10 +1567,12 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csCBuffer* c_buffer;
   csQuadTree3D* quad3d;
   csCoverageMaskTree* covtree;
-  csRenderView* rview = (csRenderView*)data;
+  iRenderView* rview = (iRenderView*)data;
   static csPolygon2D persp;
   csVector3 array[7];
-  csEngine* w = rview->GetEngine ();
+  csEngine* w = csEngine::current_engine;
+  iCamera* icam = rview->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
 
   if (w->IsPVS ())
   {
@@ -1531,7 +1585,8 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   covtree = w->GetCovtree ();
   quad3d = w->GetQuad3D ();
   int num_array;
-  otree->GetConvexOutline (onode, pos, array, num_array, rview->UseFarPlane ());
+  use_far_plane = icam->GetFarPlane (far_plane);
+  otree->GetConvexOutline (onode, pos, array, num_array, use_far_plane);
 
   if (num_array)
   {
@@ -1562,7 +1617,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     rview->GetFrustum (lx, rx, ty, by);
     for (i = 0 ; i < nVert; i++)
     {
-      cam[i] = rview->Other2This (array[i]);
+      cam[i] = camtrans.Other2This (array[i]);
       if (cam[i].z < SMALL_EPSILON) num_z_0++;
       if (left && cam[i].x >= cam[i].z * lx) left = false;
       if (right && cam[i].x <= cam[i].z * rx) right = false;
@@ -1578,12 +1633,12 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       return false;
     }
     
-    if (rview->UseFarPlane ())
+    if (use_far_plane)
     {
       if (num_array == 7) // we havent transformed the 7th yet
-       cam[6] = rview->Other2This (array[6]);
+       cam[6] = camtrans.Other2This (array[6]);
       for (i = 0 ; i < num_array ; i++)
-        if (rview->GetFarPlane ()->Classify (cam[i]) > SMALL_EPSILON) 
+        if (far_plane.Classify (cam[i]) > SMALL_EPSILON) 
 	  break;
       if (i == num_array) return false;
     }
@@ -1630,7 +1685,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       }
     }
 
-    if (!persp.ClipAgainst (rview->GetView ())) return false;
+    if (!persp.ClipAgainst (rview->GetClipper ())) return false;
 
     // c-buffer test.
     bool vis;
@@ -1663,7 +1718,7 @@ is_vis:
     indices = onode->GetMiniBspVerts ();
     num_indices = onode->GetMiniBspNumVerts ();
     for (i = 0 ; i < num_indices ; i++)
-      cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
+      cam[indices[i]] = camtrans.Other2This (pset->Vwor (indices[i]));
   }
 
   return true;
@@ -1674,21 +1729,22 @@ csPolygon2DQueue* poly_queue;
 void* csThing::TestQueuePolygons (csThing* /*thing*/,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
-  csRenderView* d = (csRenderView*)data;
+  iRenderView* d = (iRenderView*)data;
   return csThing::TestQueuePolygonArray (polygon, num, d, poly_queue,
     d->GetEngine ()->IsPVS ());
 }
 
 void csThing::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
-  csRenderView* rview)
+  iRenderView* rview)
 {
   csPolygon3D* poly3d;
   csPolygon2D* poly2d;
-  csPoly2DPool* render_pool = rview->GetEngine ()->render_pol2d_pool;
+  csPoly2DPool* render_pool = engine->render_pol2d_pool;
+  const csReversibleTransform& camtrans = rview->GetCamera ()->GetTransform ();
   while (queue->Pop (&poly3d, &poly2d))
   {
     poly3d->CamUpdate ();
-    poly3d->GetPlane ()->WorldToCamera (*rview, poly3d->Vcam (0));
+    poly3d->GetPlane ()->WorldToCamera (camtrans, poly3d->Vcam (0));
     DrawOnePolygon (poly3d, poly2d, rview, false);
     render_pool->Free (poly2d);
   }
@@ -1697,14 +1753,16 @@ void csThing::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
 void* csThing::DrawPolygons (csThing* /*thing*/,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
-  csRenderView* d = (csRenderView*)data;
+  iRenderView* d = (iRenderView*)data;
   csThing::DrawPolygonArray (polygon, num, d, false);
   return NULL;
 }
 
-void csThing::DrawInt (csRenderView& rview)
+void csThing::DrawInt (iRenderView* rview)
 {
   bool use_z_buf = !flags.Check (CS_ENTITY_ZFILL);
+  iCamera* icam = rview->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
 
   draw_busy++;
 
@@ -1712,14 +1770,14 @@ void csThing::DrawInt (csRenderView& rview)
   // to draw it.
   if (static_tree)
   {
-    int engine_mode = rview.GetEngine ()->GetEngineMode ();
+    int engine_mode = engine->GetEngineMode ();
     // If this thing has a static polygon tree (octree) there
     // are three possibilities.
     if (engine_mode == CS_ENGINE_FRONT2BACK)
     {
       csPolygon2DQueue* queue = poly_queue;
       // Render all polygons that are visible back to front.
-      DrawPolygonsFromQueue (queue, &rview);
+      DrawPolygonsFromQueue (queue, rview);
       delete queue;
     }
     else if (engine_mode == CS_ENGINE_BACK2FRONT)
@@ -1728,7 +1786,7 @@ void csThing::DrawInt (csRenderView& rview)
       // Here we don't use the c-buffer or 2D culler but just render back
       // to front.
       //-----
-      static_tree->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
+      static_tree->Back2Front (camtrans.GetOrigin (), &DrawPolygons, (void*)rview);
     }
     else
     {
@@ -1738,15 +1796,15 @@ void csThing::DrawInt (csRenderView& rview)
       csOctree* otree = (csOctree*)static_tree;
       csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons (); 
       DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetNumPolygons (),
-    	  &rview, true);
+    	  rview, true);
     }
   }
   else
   {
     // This thing has no static tree
-    UpdateTransformation (rview);
+    UpdateTransformation (camtrans);
 
-    if (rview.GetCallback ()) rview.CallCallback (CALLBACK_THING, (void*)this);
+    //@@@@@ EDGESif (rview.GetCallback ()) rview.CallCallback (CALLBACK_THING, (void*)this);
     Stats::polygons_considered += polygons.Length ();
 
     DrawCurves (rview);
@@ -1759,7 +1817,7 @@ void csThing::DrawInt (csRenderView& rview)
     {
       csVector3 wv = wor_verts[0];
       csVector3 world_coord = movable.GetTransform ().This2Other (wv);
-      csVector3 camera_coord = rview.Other2This (world_coord);
+      csVector3 camera_coord = camtrans.Other2This (world_coord);
   
       if (camera_coord.z > 0.0001)
       {
@@ -1770,19 +1828,21 @@ void csThing::DrawInt (csRenderView& rview)
     }
 
     if (flags.Check (CS_ENTITY_DETAIL))
-      DrawPolygonArrayDPM (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
+      DrawPolygonArrayDPM (polygons.GetArray (), polygons.Length (), rview, use_z_buf);
     else
-      DrawPolygonArray (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
-    if (rview.GetCallback ()) rview.CallCallback (CALLBACK_THINGEXIT, (void*)this);
+      DrawPolygonArray (polygons.GetArray (), polygons.Length (), rview, use_z_buf);
+    //@@@@@ EDGES if (rview.GetCallback ()) rview.CallCallback (CALLBACK_THINGEXIT, (void*)this);
   }
 
   draw_busy--;
 }
 
-void csThing::DrawFoggy (csRenderView& d)
+void csThing::DrawFoggy (iRenderView* d)
 {
   draw_busy++;
-  UpdateTransformation (d);
+  iCamera* icam = d->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
+  UpdateTransformation (camtrans);
   csPolygon3D* p;
   csVector3* verts;
   int num_verts;
@@ -1793,71 +1853,77 @@ void csThing::DrawFoggy (csRenderView& d)
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
   {
     csVector2 orig_triangle[3];
-    if (!d.GetCallback ()) d.GetG3D ()->OpenFogObject (GetID (), &GetFog ());
+    /*@@@@@ EDGES if (!d.GetCallback ())*/ d->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
     Stats::polygons_considered += polygons.Length ();
 
-    d.SetMirrored (!d.IsMirrored ());
+    icam->SetMirrored (!icam->IsMirrored ());
     for (i = 0 ; i < polygons.Length () ; i++)
     {
       p = GetPolygon3D (i);
       if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
       const csPlane3& wplane = p->GetPlane ()->GetWorldPlane ();
-      bool front = csMath3::Visible (d.GetOrigin (), wplane);
+      bool front = csMath3::Visible (camtrans.GetOrigin (), wplane);
 
+      csPlane3 clip_plane, *pclip_plane;
+      bool do_clip_plane = d->GetClipPlane (clip_plane);
+      if (do_clip_plane) pclip_plane = &clip_plane;
+      else pclip_plane = NULL;
       if (!front &&
-        p->ClipToPlane (d.HasClipPlane () ? &d.GetClipPlane () : (csPlane3*)NULL, d.GetOrigin (),
-              verts, num_verts, false) &&
-        p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ()) &&
-        clip->ClipAgainst (d.GetView ()))
+        p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts, false) &&
+        p->DoPerspective (camtrans, verts, num_verts, clip, orig_triangle, icam->IsMirrored ()) &&
+        clip->ClipAgainst (d->GetClipper ()))
       {
-        p->GetPlane ()->WorldToCamera (d, verts[0]);
-	if (d.GetCallback ())
-	{
-          d.CallCallback (CALLBACK_POLYGON, (void*)p);
-          d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
-	}
+        p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
+	//@@@@ EDGESif (d.GetCallback ())
+	//{
+          //d.CallCallback (CALLBACK_POLYGON, (void*)p);
+          //d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
+	//}
 
         Stats::polygons_drawn++;
 
-	if (!d.GetCallback ())
-          clip->AddFogPolygon (d.GetG3D (), p, p->GetPlane (), d.IsMirrored (),
+	//@@@ EDGESif (!d.GetCallback ())
+          clip->AddFogPolygon (d->GetGraphics3D (), p, p->GetPlane (), icam->IsMirrored (),
 	  	GetID (), CS_FOG_BACK);
       }
       render_pool->Free (clip);
     }
-    d.SetMirrored (!d.IsMirrored ());
+    icam->SetMirrored (!icam->IsMirrored ());
     for (i = 0 ; i < polygons.Length () ; i++)
     {
       p = GetPolygon3D (i);
       if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
       const csPlane3& wplane = p->GetPlane ()->GetWorldPlane ();
-      bool front = csMath3::Visible (d.GetOrigin (), wplane);
+      bool front = csMath3::Visible (camtrans.GetOrigin (), wplane);
 
+      csPlane3 clip_plane, *pclip_plane;
+      bool do_clip_plane = d->GetClipPlane (clip_plane);
+      if (do_clip_plane) pclip_plane = &clip_plane;
+      else pclip_plane = NULL;
       if (front &&
-        p->ClipToPlane (d.HasClipPlane () ? &d.GetClipPlane () : (csPlane3*)NULL,
-		d.GetOrigin (), verts, num_verts, true) &&
-        p->DoPerspective (d, verts, num_verts, clip, orig_triangle,
-		d.IsMirrored ()) &&
-        clip->ClipAgainst (d.GetView ()))
+        p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts, true) &&
+        p->DoPerspective (camtrans, verts, num_verts, clip, orig_triangle,
+		icam->IsMirrored ()) &&
+        clip->ClipAgainst (d->GetClipper ()))
       {
-        p->GetPlane ()->WorldToCamera (d, verts[0]);
-	if (d.GetCallback ())
-	{
-          d.CallCallback (CALLBACK_POLYGON, (void*)p);
-          d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
-	}
+        p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
+	//@@@@@ EDGESif (d.GetCallback ())
+	//{
+          //d.CallCallback (CALLBACK_POLYGON, (void*)p);
+          //d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
+	//}
 
         Stats::polygons_drawn++;
 
-        if (!d.GetCallback ())
-	  clip->AddFogPolygon (d.GetG3D (), p, p->GetPlane (), d.IsMirrored (),
+        //@@@@ EDGESif (!d.GetCallback ())
+	  clip->AddFogPolygon (d->GetGraphics3D (), p, p->GetPlane (), icam->IsMirrored (),
 	  	GetID (), CS_FOG_FRONT);
       }
       render_pool->Free (clip);
     }
-    if (!d.GetCallback ()) d.GetG3D ()->CloseFogObject (GetID ());
+    /*@@@@ EDGES if (!d.GetCallback ())*/ d->GetGraphics3D ()->CloseFogObject (GetID ());
   }
 
   draw_busy--;
@@ -1868,8 +1934,12 @@ void csThing::RegisterVisObject (iVisibilityObject* visobj)
   csVisObjInfo* vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
   vinf->bbox = new csPolyTreeBBox ();
+  // Initialize the movable and shape numbers with a number different
+  // from the one that the objects currently have so that we know
+  // we will add the object to the tree when we first need it.
+  vinf->last_movablenr = visobj->GetMovable ()->GetUpdateNumber ()-1;
+  vinf->last_shapenr = visobj->GetShapeNumber ()-1;
   visobjects.Push (vinf);
-  visobj->GetMovable ()->AddListener (&scfiMovableListener, (void*)vinf);
   visobj->IncRef ();
 }
 
@@ -1887,42 +1957,42 @@ void csThing::UnregisterVisObject (iVisibilityObject* visobj)
   visobjects.Delete (idx);
   delete vinf->bbox;
   delete vinf;
-  visobj->GetMovable()->RemoveListener (&scfiMovableListener);
   visobj->DecRef ();
 }
 
-void csThing::MovableChanged (iMovable* movable, void* userdata)
+void csThing::CheckVisUpdate (csVisObjInfo* vinf)
 {
-  csVisObjInfo* vinf = (csVisObjInfo*)userdata;
   iVisibilityObject* visobj = vinf->visobj;
-  csPolyTreeBBox* bbox = vinf->bbox;
+  iMovable* movable = visobj->GetMovable ();
+  long movablenr = movable->GetUpdateNumber ();
+  long shapenr = visobj->GetShapeNumber ();
+  if (movablenr != vinf->last_movablenr || shapenr != vinf->last_shapenr)
+  {
+    vinf->last_movablenr = movablenr;
+    vinf->last_shapenr = shapenr;
+    csPolyTreeBBox* bbox = vinf->bbox;
 
-  // If object has not been placed in a sector we do nothing here.
-  if (!movable->InSector ()) return;
+    // If object has not been placed in a sector we do nothing here.
+    if (!movable->InSector ()) return;
 
-  csBox3 b;
-  visobj->GetBoundingBox (b);
+    csBox3 b;
+    visobj->GetBoundingBox (b);
 
-  csReversibleTransform trans = movable->GetFullTransform ().GetInverse ();
-  bbox->Update (b, trans, vinf);
+    csReversibleTransform trans = movable->GetFullTransform ().GetInverse ();
+    bbox->Update (b, trans, vinf);
 
-  // Temporarily increase reference to prevent free.
-  bbox->GetBaseStub ()->IncRef ();
-  static_tree->AddObject (bbox);
-  bbox->GetBaseStub ()->DecRef ();
-}
-
-void csThing::MovableDestroyed (iMovable* /*movable*/, void* userdata)
-{
-  csVisObjInfo* vinf = (csVisObjInfo*)userdata;
-  iVisibilityObject* visobj = vinf->visobj;
-  UnregisterVisObject (visobj);
+    // Temporarily increase reference to prevent free.
+    bbox->GetBaseStub ()->IncRef ();
+    static_tree->AddObject (bbox);
+    bbox->GetBaseStub ()->DecRef ();
+  }
 }
 
 bool csThing::VisTest (iRenderView* irview)
 {
   if (!static_tree) return false;
   iEngine* iengine = irview->GetEngine ();
+  iCamera* icam = irview->GetCamera ();
   int engine_mode = iengine->GetEngineMode ();
 
   // If this thing has a static polygon tree (octree) there
@@ -1934,13 +2004,16 @@ bool csThing::VisTest (iRenderView* irview)
     // 2D/3D visibility culler.
     //-----
 
-    csOrthoTransform& camtrans = irview->GetCamera ()->GetTransform ();
+    csOrthoTransform& camtrans = icam->GetTransform ();
     const csVector3& origin = camtrans.GetOrigin ();
 
     int i;
     for (i = 0 ; i < visobjects.Length () ; i++)
     {
       csVisObjInfo* vinf = (csVisObjInfo*)visobjects[i];
+      // First update visibility information if object has moved or
+      // changed shape fundamentally.
+      CheckVisUpdate (vinf);
       iVisibilityObject* vo = vinf->visobj;
       // If the current viewpoint is inside the bounding box of the
       // object then we consider the object visible.
@@ -1979,7 +2052,7 @@ bool csThing::VisTest (iRenderView* irview)
     // on the queue. This traversal will also mark all visible
     // meshes and things. They will be put on a queue later.
     static_tree->Front2Back (origin, &TestQueuePolygons,
-      	irview->GetPrivateObject (), CullOctreeNode, irview->GetPrivateObject ());
+      	irview, CullOctreeNode, irview);
     return true;
   }
   else if (engine_mode == CS_ENGINE_BACK2FRONT)
@@ -1988,7 +2061,7 @@ bool csThing::VisTest (iRenderView* irview)
     // Here we don't use the c-buffer or 2D culler but just render back
     // to front.
     //-----
-    UpdateTransformation (irview->GetPrivateObject ());
+    UpdateTransformation (icam->GetTransform ());
     return false;
   }
   else
@@ -1996,7 +2069,7 @@ bool csThing::VisTest (iRenderView* irview)
     //-----
     // Here we render using the Z-buffer.
     //-----
-    UpdateTransformation (irview->GetPrivateObject ());
+    UpdateTransformation (icam->GetTransform ());
     return false;
   }
 }
@@ -2216,6 +2289,8 @@ void csThing::MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* mat
   }
 }
 
+//---------------------------------------------------------------------------------------------------------
+
 iPolygon3D *csThing::eiThing::GetPolygon (int idx)
 {
   iPolygon3D* ip = QUERY_INTERFACE (scfParent->GetPolygon3D (idx), iPolygon3D);
@@ -2237,6 +2312,23 @@ bool csThing::eiThing::CreateKey (const char *iName, const char *iValue)
 {
   scfParent->ObjAdd (new csKeyValuePair (iName, iValue));
   return true;
+}
+
+//---------------------------------------------------------------------------------------------------------
+
+iMeshObjectFactory* csThing::MeshObject::GetFactory ()
+{
+  if (!scfParent->ParentTemplate) return NULL;
+  return &scfParent->ParentTemplate->scfiMeshObjectFactory;
+}
+
+//---------------------------------------------------------------------------------------------------------
+
+iMeshObject* csThing::MeshObjectFactory::NewInstance ()
+{
+  csThing* thing = new csThing (scfParent->engine);
+  thing->MergeTemplate (scfParent, NULL/*SECTOR@@@*/, NULL, 1, false);
+  return &thing->scfiMeshObject;
 }
 
 //---------------------------------------------------------------------------------------------------------
