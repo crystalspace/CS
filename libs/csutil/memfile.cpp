@@ -91,7 +91,8 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
     cursor = new_cursor;
     if (new_cursor > size)
       size = new_cursor;
-  }
+    return DataSize;
+  } else return 0;
 }
 
 char* csMemFile::GetAllData()
