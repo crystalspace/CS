@@ -67,8 +67,20 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed several compilation problems in MazeD following
 	  Andrew's changes.
 	- Eric Sunshine fixed a long-standing bug in archive.cpp where
-	  csArchive::ArchiveEntry::FreeBuffer() was clobbering the compressed-
-	  size value even though that value may have been used later.
+	  csArchive::ArchiveEntry::FreeBuffer() was clobbering the
+	  uncompressed-size value.  The bad side-effect of this was that if an
+	  attempt was made to re-read the entry's contents later on, the read
+	  operation would mysteriously return zero bytes.  This particular
+	  problem was often triggered during caching of PVS and Octree data
+	  structures.
+	- Eric Sunshine fixed a bug in the Octree caching code where, in one
+	  circumstance, the `write' routine would emit more data than the
+	  `read' routine was expecting; with the result that the data stream
+	  would become unsynchronized.
+	- Eric Sunshine made csPolygonTree's ReadString(), ReadBox3(),
+	  ReadVector3(), ReadPlane3(), ReadLong(), ReadUShort(), ReadByte(),
+	  and ReadBool() methods more robust by checking for VFS read errors
+	  and returning a somewhat sensible values rather than garbage values.
 8-Jan-2001
 	- Wouter Wijngaards fixed procedural sky for OpenGL.
 	- Wouter also optimized it a little to use the new qsqrt().

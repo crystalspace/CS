@@ -167,63 +167,64 @@ void csPolygonTree::WriteBool (iFile* cf, bool b)
 
 void csPolygonTree::ReadString (iFile* cf, char* str, int len)
 {
+  str[0] = '\0';
   cf->Read (str, len);
 }
 
 void csPolygonTree::ReadBox3 (iFile* cf, csBox3& box)
 {
-  float f;
+  float f = 0;
   csVector3 bmin, bmax;
-  cf->Read ((char*)&f, 4); bmin.x = convert_endian (f);
-  cf->Read ((char*)&f, 4); bmin.y = convert_endian (f);
-  cf->Read ((char*)&f, 4); bmin.z = convert_endian (f);
-  cf->Read ((char*)&f, 4); bmax.x = convert_endian (f);
-  cf->Read ((char*)&f, 4); bmax.y = convert_endian (f);
-  cf->Read ((char*)&f, 4); bmax.z = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) bmin.x = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) bmin.y = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) bmin.z = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) bmax.x = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) bmax.y = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) bmax.z = convert_endian (f);
   box.Set (bmin, bmax);
 }
 
 void csPolygonTree::ReadVector3 (iFile* cf, csVector3& v)
 {
-  float f;
-  cf->Read ((char*)&f, 4); v.x = convert_endian (f);
-  cf->Read ((char*)&f, 4); v.y = convert_endian (f);
-  cf->Read ((char*)&f, 4); v.z = convert_endian (f);
+  float f = 0;
+  if (cf->Read ((char*)&f, 4)) v.x = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) v.y = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) v.z = convert_endian (f);
 }
 
 void csPolygonTree::ReadPlane3 (iFile* cf, csPlane3& v)
 {
-  float f;
-  cf->Read ((char*)&f, 4); v.A () = convert_endian (f);
-  cf->Read ((char*)&f, 4); v.B () = convert_endian (f);
-  cf->Read ((char*)&f, 4); v.C () = convert_endian (f);
-  cf->Read ((char*)&f, 4); v.D () = convert_endian (f);
+  float f = 0;
+  if (cf->Read ((char*)&f, 4)) v.A () = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) v.B () = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) v.C () = convert_endian (f);
+  if (cf->Read ((char*)&f, 4)) v.D () = convert_endian (f);
 }
 
 long csPolygonTree::ReadLong (iFile* cf)
 {
-  long l;
+  long l = 0;
   cf->Read ((char*)&l, 4);
   return convert_endian (l);
 }
 
 UShort csPolygonTree::ReadUShort (iFile* cf)
 {
-  UShort l;
+  UShort l = 0;
   cf->Read ((char*)&l, 2);
   return convert_endian (l);
 }
 
 unsigned char csPolygonTree::ReadByte (iFile* cf)
 {
-  unsigned char b;
+  unsigned char b = 0;
   cf->Read ((char*)&b, 1);
   return b;
 }
 
 bool csPolygonTree::ReadBool (iFile* cf)
 {
-  char c;
+  char c = 0;
   cf->Read ((char*)&c, 1);
   return (bool)c;
 }

@@ -837,8 +837,9 @@ void csOctree::Statistics (csOctreeNode* node, int depth,
 void csOctree::Cache (csOctreeNode* node, iFile* cf)
 {
   if (!node) return;
+  long const num = node->unsplit_polygons.GetNumPolygons ();
   // Consistency check
-  WriteLong (cf, node->unsplit_polygons.GetNumPolygons ());
+  WriteLong (cf, num);
   WriteVector3 (cf, node->GetCenter ());
   WriteUShort (cf, node->solid_masks[0]);
   WriteUShort (cf, node->solid_masks[1]);
@@ -848,6 +849,7 @@ void csOctree::Cache (csOctreeNode* node, iFile* cf)
   WriteUShort (cf, node->solid_masks[5]);
   WriteBool (cf, node->leaf);
   WriteBool (cf, node->minibsp != NULL);
+  if (num == 0) return;
   if (node->minibsp)
   {
     node->minibsp->Cache (cf);
