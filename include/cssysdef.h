@@ -155,8 +155,8 @@
        
        if ((pathlen) && (fullname[pathlen-1] != PATH_SEPARATOR))
        {
-	 fullname[pathlen++] = PATH_SEPARATOR;
-	 fullname[pathlen] = 0;
+   fullname[pathlen++] = PATH_SEPARATOR;
+   fullname[pathlen] = 0;
        }
               
        strcat (&fullname [pathlen], de->d_name);
@@ -182,11 +182,11 @@
 #ifdef COMP_GCC
 // In GCC we are able to declare stack vars of dynamic size directly
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
-	    type var [size]
+      type var [size]
 #else
 #  include <malloc.h>
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
-	    type *var = (type *)alloca ((size) * sizeof (type))
+      type *var = (type *)alloca ((size) * sizeof (type))
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_ACCESS
@@ -569,12 +569,12 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  if !defined (DEBUG_BREAK)
 #    if defined (PROC_X86)
 #      if defined (COMP_GCC)
-#        define DEBUG_BREAK	asm ("int $3")
+#        define DEBUG_BREAK asm ("int $3")
 #      else
-#        define DEBUG_BREAK	_asm int 3
+#        define DEBUG_BREAK _asm int 3
 #      endif
 #    else
-#      define DEBUG_BREAK	{ static int x = 0; x /= x; }
+#      define DEBUG_BREAK { static int x = 0; x /= x; }
 #    endif
 #  endif
 #  if !defined (CS_ASSERT)
@@ -582,12 +582,12 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #      define  CS_ASSERT(x) assert(x)
 #    else
 #      include <stdio.h>
-#      define CS_ASSERT(x)						\
-         if (!(x))							\
-         {								\
+#      define CS_ASSERT(x)            \
+         if (!(x))              \
+         {                \
            fprintf (stderr, __FILE__ ":%d: failed assertion '%s'\n",\
-             int(__LINE__), #x );					\
-           DEBUG_BREAK;							\
+             int(__LINE__), #x );         \
+           DEBUG_BREAK;             \
          }
 #    endif
 #  endif
@@ -638,9 +638,9 @@ extern void* operator new[] (size_t s, void* filename, int line);
 // gcc can perform usefull checking for printf/scanf format strings, just add
 // this define at the end of the function declaration
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
-#  define CS_GNUC_PRINTF( format_idx, arg_idx)		\
+#  define CS_GNUC_PRINTF( format_idx, arg_idx)    \
      __attribute__((format (printf, format_idx, arg_idx)))
-#  define CS_GNUC_SCANF( format_idx, arg_idx )				\
+#  define CS_GNUC_SCANF( format_idx, arg_idx )        \
      __attribute__((format (scanf, format_idx, arg_idx)))
 #else
 #  define CS_GNUC_PRINTF( format_idx, arg_idx )
@@ -657,6 +657,50 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #    define CS_STRUCT_ALIGN_4BYTE_END
 #  endif
 #endif
+
+// Macro used to define static implicit pointer conversion function.
+// Only use within a class declaration.
+#ifndef _CS_IMPLICITPTRCAST_NAME
+#  define _CS_IMPLICITPTRCAST_NAME __ImplicitPtrCast
+#endif
+/**
+ * Implements a static member function for a class which can be used to
+ * perform implicit pointer casts.
+ * \param classname Name of the class that the macro is being used in.
+ * \remarks
+ * This macro is intended to support typecasting within macros, allowing the
+ * compiler to provide a more descriptive error message. Use
+ * CS_IMPLEMENT_IMPLICIT_PTR_CAST in the declaration of the class and
+ * CS_IMPLICIT_PTR_CAST in the macro declaration.
+ * \par Example:
+ * \code
+ * struct iObjectRegistry : public iBase
+ * {
+ *   // Allow implicit casts through static function.
+ *   CS_IMPLEMENT_IMPLICIT_PTR_CAST(iObjectRegistry);
+ *   ...
+ * }
+ *
+ * #define CS_QUERY_REGISTRY_TAG(Reg, Tag) \
+ *  csPtr<iBase> (CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag))
+ * \endcode
+ */
+#define CS_IMPLEMENT_IMPLICIT_PTR_CAST(classname) \
+  inline static classname* _CS_IMPLICITPTRCAST_NAME (classname* ptr) \
+  { \
+    return ptr;\
+  }
+
+/**
+ * Perform a compiler implicit cast of a pointer to another pointer type
+ * using a static member function declared with the
+ * \c CS_IMPLEMENT_IMPLICIT_PTR_CAST macro.
+ * \param classname Name of the class to convert to
+ * \param ptr Pointer to be convereted into 
+ * \see CS_IMPLEMENT_IMPLICIT_PTR_CAST
+ */
+#define CS_IMPLICIT_PTR_CAST(classname, ptr) \
+  (classname::_CS_IMPLICITPTRCAST_NAME(ptr))
 
 /// Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
