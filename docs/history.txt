@@ -55,6 +55,12 @@ The history order is reversed so that new features are at the top.
 	  expression to get the max value for the index of the item displayed
 	  in the first row is 'max - amntvis + 1', that is 5, with the previous
 	  code that value was wrongly set to 4.
+	- res slightly changed Win32 csGetPluginMetadata(): a .csplugin file
+	  is looked for when the supplied file name has this extension. 
+	  Retrieving the resource from a .DLL is still tried in all cases.
+	  This should make metadata retrieval a bit faster.
+	- res fixed FR #759764 "Uninitialized members in partgen.cpp":
+	  alphapersecond/alpha_now are now initialized to 0.0f resp. 1.0f.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild

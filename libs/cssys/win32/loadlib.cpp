@@ -198,10 +198,10 @@ static void AppendWin32Error (const char* text,
 }
 
 static csRef<iString> InternalGetPluginMetadata (const char* fullPath, 
-						 csRef<iDocument>& metadata)
+						 csRef<iDocument>& metadata,
+						 bool& metadataValid)
 {
   iString* result = 0;
-  csRef<iDocument> newMetadata = 0;
 
   HMODULE hLibrary = LoadLibraryEx (fullPath, 0, 
     LOADLIBEX_FLAGS | LOAD_LIBRARY_AS_DATAFILE);
@@ -217,7 +217,7 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 	LPVOID resData = LockResource (resDataHandle);
 	if (resData != 0)
 	{
-	  if (!(newMetadata = metadata))
+	  if (!metadata)
 	  {
 	    /*
 	      TinyXML documents hold references to the document system.
@@ -227,18 +227,20 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 	    */
 	    csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
 	      (new csTinyDocumentSystem ());
-	    newMetadata = docsys->CreateDocument();
+	    metadata = docsys->CreateDocument();
 	  }
-	  char const* errmsg = newMetadata->Parse ((char*)resData);
+	  char const* errmsg = metadata->Parse ((char*)resData);
 	  if (errmsg != 0)
 	  {
-	    newMetadata = 0;
-
 	    csString errstr;
 	    errstr.Format ("Error parsing metadata from '%s': %s",
 	      fullPath, errmsg);
 
 	    result = new scfString (errstr);
+	  }
+	  else
+	  {
+	    metadataValid = true;
 	  }
 	}
       }
@@ -253,7 +255,6 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
     or not.
     */
 
-  metadata = newMetadata;
   return csPtr<iString> (result);
 }
 
@@ -274,9 +275,12 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   CS_ALLOC_STACK_ARRAY (char, dllPath, strlen (fullPath) + 5);
   strcpy (dllPath, fullPath);
   char* dot = strrchr (dllPath, '.');
-  if ((!dot) || (strcasecmp (dot, ".dll") != 0))
+
+  bool isCsPlugin = (dot && (strcasecmp (dot, ".csplugin") == 0));
+
+  if ((!dot) || isCsPlugin || (strcasecmp (dot, ".dll") != 0))
   {
-    if (dot && (strcasecmp (dot, ".csplugin") == 0))
+    if (isCsPlugin)
     {
       strcpy (dot, ".dll");
     }
@@ -286,45 +290,61 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
     }
   }
 
+  bool metadataValid = false;
   csRef<iString> result = 
-    InternalGetPluginMetadata (dllPath, metadata);
+    InternalGetPluginMetadata (dllPath, metadata, metadataValid);
 
   /* Check whether a .csplugin file exists as well */
 
-  CS_ALLOC_STACK_ARRAY (char, cspluginPath, strlen (dllPath) + 10);
-  strcpy (cspluginPath, dllPath);
-  dot = strrchr (cspluginPath, '.');
-  strcpy (dot, ".csplugin");
-  csPhysicalFile file (cspluginPath, "rb");
+  /*
+    @@@ This makes the assumption that such might only exists if
+     this function was called with a <blah>.csplugin filename.
+   */
 
-  if (file.GetStatus() == VFS_STATUS_OK)
+  if (isCsPlugin)
   {
-    if (metadata != 0)
-    {
-      csString errstr;
-      errstr.Format ("'%s' contains embedded metadata, "
-	"but external '%s' exists as well. Ignoring the latter.",
-	dllPath, cspluginPath);
+    csPhysicalFile file (fullPath, "rb");
 
-      result.AttachNew (new scfString (errstr));
-    }
-    else
+    if (file.GetStatus() == VFS_STATUS_OK)
     {
-      csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-	(new csTinyDocumentSystem ());
-      metadata = docsys->CreateDocument();
-      char const* errmsg = metadata->Parse (&file);
-
-      if (errmsg != 0)
+      if (metadataValid)
       {
-	metadata = 0;
 	csString errstr;
-	errstr.Format ("Error parsing metadata from '%s': %s",
-	  cspluginPath, errmsg);
+	errstr.Format ("'%s' contains embedded metadata, "
+	  "but external '%s' exists as well. Ignoring the latter.",
+	  dllPath, fullPath);
 
 	result.AttachNew (new scfString (errstr));
       }
+      else
+      {
+	if (metadata == 0)
+	{
+	  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+	    (new csTinyDocumentSystem ());
+	  metadata = docsys->CreateDocument();
+	}
+	char const* errmsg = metadata->Parse (&file);
+
+	if (errmsg != 0)
+	{
+	  csString errstr;
+	  errstr.Format ("Error parsing metadata from '%s': %s",
+	    fullPath, errmsg);
+
+	  result.AttachNew (new scfString (errstr));
+	}
+	else
+	{
+	  metadataValid	= true;
+	}
+      }
     }
+  }
+
+  if (!metadataValid)
+  {
+    metadata = 0;
   }
 
   return (result);

@@ -67,6 +67,8 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   change_color = false;
   change_alpha = false;
   change_rotation = false;
+  alphapersecond = 0.0f;
+  alpha_now = 1.0f;
   // bbox is empty.
   prev_time = 0;
   MixMode = 0;
