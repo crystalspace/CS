@@ -70,7 +70,7 @@ bool csGraphics2DGLCommon::Open(char *Title)
   // load font 'server'
   if (LocalFontServer == NULL)
   {
-       CsPrintf(MSG_INITIALIZATION,"loading fonts...");
+       CsPrintf(MSG_INITIALIZATION,"Loading fonts...");
        LocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
        for (int fontindex=1; 
        		fontindex < 8;
