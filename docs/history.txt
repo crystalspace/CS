@@ -11,9 +11,6 @@ The history order has been reversed so that new features are at the top.
 	  old definition failed to work correctly on MacOS/X Server 1.0
 	  (Rhapsody).
 29-Jan-2001
-	- Martin Geisse did an update to the config system; comments at the
-	  end of a config file are now preserved and can be modified by
-	  the application.
 	- Martin also modified the sound drivers so that they are now opened,
 	  closed, and updated via system events.
 	- Brandon Ehle added documentation for the Skeletal Animation format,
