@@ -93,7 +93,7 @@ csLight* csLightIt::Fetch ()
   }
 
   if (sector_idx >= engine->sectors.Length ()) return NULL;
-  sector = (csSector*)(engine->sectors[sector_idx]);
+  sector = engine->sectors[sector_idx]->GetPrivateObject ();
 
   // Try next light.
   light_idx++;
@@ -112,7 +112,7 @@ csLight* csLightIt::Fetch ()
 
 csSector* csLightIt::GetLastSector ()
 {
-  return (csSector*)(engine->sectors[sector_idx]);
+  return engine->sectors[sector_idx]->GetPrivateObject ();
 }
 
 //---------------------------------------------------------------------------
@@ -372,7 +372,8 @@ SCF_EXPORT_CLASS_TABLE (engine)
       "crystalspace.graphic.image.io.")
 SCF_EXPORT_CLASS_TABLE_END
 
-csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
+csEngine::csEngine (iBase *iParent) : camera_positions (16, 16),
+	sectors (true)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
@@ -565,7 +566,7 @@ void csEngine::Clear ()
 
   for (i = 0 ; i < sectors.Length () ; i++)
   {
-    csSector* sect = (csSector*)sectors[i];
+    csSector* sect = sectors[i]->GetPrivateObject ();
     if (sect) sect->CleanupReferences ();
   }
   sectors.DeleteAll ();
@@ -685,7 +686,7 @@ void csEngine::ResolveEngineMode ()
     int switch_f2b = 0;
     for (int i = 0 ; i < sectors.Length () ; i++)
     {
-      csSector* s = (csSector*)sectors[i];
+      csSector* s = sectors[i]->GetPrivateObject ();
       csMeshWrapper* ss = s->GetCullerMesh ();
       if (ss)
       {
@@ -759,7 +760,7 @@ void csEngine::PrepareTextures ()
   // Then register all materials to the texture manager.
   for (i = 0; i < materials->Length (); i++)
   {
-    csMaterialWrapper *csmh = materials->Get (i);
+    iMaterialWrapper *csmh = materials->Get (i);
     if (!csmh->GetMaterialHandle ())
       csmh->Register (txtmgr);
   }
@@ -1268,7 +1269,7 @@ csStatLight* csEngine::FindCsLight (float x, float y, float z, float dist)
   while (sn > 0)
   {
     sn--;
-    csSector* s = (csSector*)sectors[sn];
+    csSector* s = sectors[sn]->GetPrivateObject ();
     l = s->FindLight (x, y, z, dist);
     if (l) return l;
   }
@@ -1282,7 +1283,7 @@ csStatLight* csEngine::FindCsLight (unsigned long light_id) const
   while (sn > 0)
   {
     sn--;
-    csSector* s = (csSector*)sectors[sn];
+    csSector* s = sectors[sn]->GetPrivateObject ();
     l = s->FindLight (light_id);
     if (l) return l;
   }
@@ -1297,7 +1298,7 @@ csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/) const
   while (sn > 0)
   {
     sn--;
-    csSector* s = (csSector*)sectors[sn];
+    csSector* s = sectors[sn]->GetPrivateObject ();
     l = s->GetLight (name);
     if (l) return l;
   }
@@ -1637,9 +1638,9 @@ bool csEngine::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (meshes, csMeshWrapper)
   DELETE_ALL_OBJECTS (mesh_factories, csMeshFactoryWrapper)
   DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
-  DELETE_ALL_OBJECTS (sectors, csSector)
-  DELETE_ALL_OBJECTS ((*materials), csMaterialWrapper)
 
+  DELETE_ALL_OBJECTS (sectors, iSector)
+  DELETE_ALL_OBJECTS ((*materials), iMaterialWrapper)
   DELETE_ALL_OBJECTS ((*textures), iTextureWrapper)
 
 #undef DELETE_ALL_OBJECTS
@@ -1726,9 +1727,9 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
 iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* texture)
 {
   csMaterial* mat = new csMaterial (texture);
-  csMaterialWrapper* wrapper = materials->NewMaterial (mat);
-  wrapper->SetName (iName);
-  return &wrapper->scfiMaterialWrapper;
+  iMaterialWrapper* wrapper = materials->NewMaterial (mat);
+  wrapper->QueryObject ()->SetName (iName);
+  return wrapper;
 }
 
 iCameraPosition *csEngine::CreateCameraPosition (const char *iName, const char *iSector,
@@ -1754,14 +1755,6 @@ bool csEngine::CreatePlane (const char *iName, const csVector3 &iOrigin,
   ppl->SetTextureSpace (iMatrix, iOrigin);
   planes.Push (ppl);
   return true;
-}
-
-csSector* csEngine::CreateCsSector (const char *iName, bool link)
-{
-  csSector* sector = new csSector (this);
-  sector->SetName (iName);
-  if (link) sectors.Push (sector);
-  return sector;
 }
 
 iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
@@ -1796,15 +1789,14 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (iSector* sector,
 
 iSector* csEngine::CreateSector (const char *iName, bool link)
 {
-  csSector* sector = CreateCsSector (iName, link);
-  iSector *s = SCF_QUERY_INTERFACE (sector, iSector);
-  s->DecRef ();
-  return s;
-}
-
-iSector *csEngine::GetSector (int iIndex) const
-{
-  return &((csSector *)sectors.Get (iIndex))->scfiSector;
+  iSector* sector = &(new csSector (this))->scfiSector;
+  sector->QueryObject ()->SetName (iName);
+  if (link)
+  {
+    sectors.Push (sector);
+    sector->DecRef ();
+  }
+  return sector;
 }
 
 csObject* csEngine::FindObjectInRegion (csRegion* region,
@@ -1837,23 +1829,13 @@ iObject* csEngine::FindObjectInRegion (csRegion* region,
 
 iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
 {
-  csSector* sec;
+  iSector* sec;
   if (regionOnly && region)
-    sec = (csSector*)FindObjectInRegion (region, sectors, iName);
+    sec = SCF_QUERY_INTERFACE_FAST (FindObjectInRegion (region, sectors, iName),
+      iSector);
   else
-    sec = (csSector *)sectors.FindByName (iName);
-  return sec ? &sec->scfiSector : NULL;
-}
-
-void csEngine::DeleteSector (iSector *Sector)
-{
-  int n = sectors.Find (Sector->GetPrivateObject ());
-  if (n >= 0)
-  {
-    csSector* s = (csSector*)sectors[n];
-    s->CleanupReferences ();
-    sectors.Delete (n);
-  }
+    sec = sectors.FindByName (iName);
+  return sec;
 }
 
 iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
@@ -1921,22 +1903,10 @@ iMaterialList* csEngine::GetMaterialList () const
 iMaterialWrapper* csEngine::FindMaterial (const char* iName,
   bool regionOnly) const
 {
-  csMaterialWrapper* wr;
+  iMaterialWrapper* wr;
   if (regionOnly && region)
-    wr = (csMaterialWrapper*)FindObjectInRegion (region, *materials, iName);
-  else
-    wr = materials->FindByName (iName);
-  if (!wr) return NULL;
-  iMaterialWrapper* iwr = &wr->scfiMaterialWrapper;
-  return iwr;
-}
-
-csMaterialWrapper* csEngine::FindCsMaterial (const char* iName,
-  bool regionOnly) const
-{
-  csMaterialWrapper* wr;
-  if (regionOnly && region)
-    wr = (csMaterialWrapper*)FindObjectInRegion (region, *materials, iName);
+    wr = SCF_QUERY_INTERFACE_FAST (FindObjectInRegion (region, *materials, iName),
+      iMaterialWrapper);
   else
     wr = materials->FindByName (iName);
   return wr;
@@ -1952,12 +1922,6 @@ iTextureWrapper* csEngine::FindTexture (const char* iName,
   else
     wr = textures->FindByName (iName);
   return wr;
-}
-
-csTextureWrapper* csEngine::FindCsTexture (const char* iName,
-  bool regionOnly) const
-{
-  return FindTexture (iName, regionOnly)->GetPrivateObject ();
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* iName,

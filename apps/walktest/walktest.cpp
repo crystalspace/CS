@@ -1129,11 +1129,11 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
   Sys->Printf (CS_MSG_INITIALIZATION, "Computing OBBs ...\n");
 
   iPolygonMesh* mesh;
-  int sn = engine->GetSectorCount ();
+  int sn = engine->GetSectors ()->GetSectorCount ();
   while (sn > 0)
   {
     sn--;
-    iSector* sp = engine->GetSector (sn);
+    iSector* sp = engine->GetSectors ()->GetSector (sn);
     if (region && !region->IsInRegion (sp->QueryObject ())) continue;
     // Initialize the things in this sector.
     int i;

@@ -1245,3 +1245,40 @@ void csSector::ReferencedObject::RemoveReference (iReference* ref)
   CS_ASSERT (false);
 }
 
+
+SCF_IMPLEMENT_IBASE (csSectorList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSectorList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSectorList::SectorList)
+  SCF_IMPLEMENTS_INTERFACE (iSectorList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csSectorList::csSectorList (bool cr)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSectorList);
+
+  CleanupReferences = cr;
+}
+
+bool csSectorList::FreeItem (csSome Item)
+{
+  if (CleanupReferences)
+    ((iSector*)Item)->GetPrivateObject ()->CleanupReferences ();
+  return true;
+}
+
+int csSectorList::SectorList::GetSectorCount ()
+  { return scfParent->Length (); }
+iSector *csSectorList::SectorList::GetSector (int idx)
+  { return scfParent->Get (idx); }
+void csSectorList::SectorList::AddSector (iSector *sec)
+  { scfParent->Push (sec); }
+void csSectorList::SectorList::RemoveSector (iSector *sec)
+  {
+    int n = scfParent->Find (sec);
+    if (n >= 0) scfParent->Delete (n); 
+  }
+iSector *csSectorList::SectorList::FindByName (const char *name)
+  { return scfParent->FindByName (name); }

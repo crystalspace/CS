@@ -355,9 +355,9 @@ bool csLoader::LoadMap (char* buf)
   }
  
   int i,j;
-  for (i=0; i<Engine->GetSectorCount(); i++)
+  for (i=0; i<Engine->GetSectors ()->GetSectorCount(); i++)
   {
-    iSector *Sector = Engine->GetSector (i);
+    iSector *Sector = Engine->GetSectors ()->GetSector (i);
     if (ResolveOnlyRegion)
     {
       // This test avoids redoing sectors that are not in this region.

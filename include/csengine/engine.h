@@ -36,8 +36,6 @@ class csRegion;
 class csRadiosity;
 class csSector;
 class csMeshWrapper;
-class csTextureWrapper;
-class csMaterialWrapper;
 class csTextureList;
 class csMaterialList;
 class csPolygon3D;
@@ -82,8 +80,6 @@ SCF_DECLARE_FAST_INTERFACE (csMeshWrapper)
 SCF_DECLARE_FAST_INTERFACE (csMeshFactoryWrapper)
 SCF_DECLARE_FAST_INTERFACE (csCurveTemplate)
 SCF_DECLARE_FAST_INTERFACE (csSector)
-SCF_DECLARE_FAST_INTERFACE (csTextureWrapper)
-SCF_DECLARE_FAST_INTERFACE (csMaterialWrapper)
 SCF_DECLARE_FAST_INTERFACE (csCollider)
 SCF_DECLARE_FAST_INTERFACE (csRadPoly)
 SCF_DECLARE_FAST_INTERFACE (csRadCurve)
@@ -276,10 +272,10 @@ public:
 
   /**
    * List of sectors in the engine. This vector contains
-   * objects of type csSector*. Use CreateCsSector() or CreateSector()
+   * objects of type iSector*. Use CreateSector()
    * to add sectors to the engine.
    */
-  csNamedObjVector sectors;
+  csSectorList sectors;
 
   /**
    * List of planes. This vector contains objects of type
@@ -756,11 +752,6 @@ public:
   virtual iTextureList* GetTextureList () const;
 
   /**
-   * Create a empty sector with given name.
-   */
-  csSector* CreateCsSector (const char *iName, bool link = true);
-
-  /**
    * Conveniance function to create the thing containing the
    * convex outline of a sector. The thing will be empty but
    * it will have CS_ZBUF_FILL set. This version creates a mesh wrapper.
@@ -917,13 +908,6 @@ public:
    */
   void AddToCurrentRegion (csObject* obj);
 
-  /// Find a loaded texture by name.
-  csTextureWrapper* FindCsTexture (const char* iName, bool regionOnly = false)
-    const;
-  /// Find a loaded material by name.
-  csMaterialWrapper* FindCsMaterial (const char* iName,
-  	bool regionOnly = false) const;
-
   /// Register a new render priority.
   virtual void RegisterRenderPriority (const char* name, long priority);
   /// Get a render priority by name.
@@ -1025,16 +1009,12 @@ public:
   /// Create a empty sector with given name.
   virtual iSector *CreateSector (const char *iName, bool link = true);
 
-  /// Query number of sectors in engine
-  virtual int GetSectorCount () const
-  { return sectors.Length (); }
-  /// Get a sector by index
-  virtual iSector *GetSector (int iIndex) const;
   /// Find a sector by name
   virtual iSector *FindSector (const char *iName, bool regionOnly = false)
     const;
-  /// Delete a sector
-  virtual void DeleteSector (iSector *Sector);
+  /// Return the list of sectors
+  virtual iSectorList *GetSectors ()
+    { return &sectors.scfiSectorList; }
 
   /// Find a mesh by name
   virtual iMeshWrapper *FindMeshObject (const char *iName,

@@ -22,7 +22,6 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 
-class csTextureWrapper;
 struct iImage;
 struct iTextureHandle;
 struct iTextureManager;
@@ -41,8 +40,6 @@ SCF_VERSION (iTextureWrapper, 0, 0, 3);
  */
 struct iTextureWrapper : public iBase
 {
-  /// @@@ return the private object
-  virtual csTextureWrapper *GetPrivateObject() = 0;
   /// Get the iObject for this texture
   virtual iObject *QueryObject() = 0;
 

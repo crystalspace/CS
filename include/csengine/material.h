@@ -199,33 +199,25 @@ public:
   friend struct MaterialWrapper;
 };
 
+CS_DECLARE_OBJECT_VECTOR (csMaterialListHelper, iMaterialWrapper);
+
 /**
  * This class is used to hold a list of materials.
  */
-class csMaterialList : public csNamedObjVector
+class csMaterialList : public csMaterialListHelper
 {
 public:
   /// Initialize the array
   csMaterialList ();
-  /// Destroy every material in the list
-  virtual ~csMaterialList ();
 
   /// Create a new material.
-  csMaterialWrapper* NewMaterial (iMaterial* material);
+  iMaterialWrapper* NewMaterial (iMaterial* material);
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed.
    */
-  csMaterialWrapper* NewMaterial (iMaterialHandle *ith);
-
-  /// Return material by index
-  csMaterialWrapper *Get (int idx)
-  { return (csMaterialWrapper *)csNamedObjVector::Get (idx); }
-
-  /// Find a material by name
-  csMaterialWrapper *FindByName (const char* iName)
-  { return (csMaterialWrapper *)csNamedObjVector::FindByName (iName); }
+  iMaterialWrapper* NewMaterial (iMaterialHandle *ith);
 
   SCF_DECLARE_IBASE;
 
@@ -233,32 +225,11 @@ public:
   struct MaterialList : public iMaterialList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMaterialList);
-    virtual iMaterialWrapper* NewMaterial (iMaterial* material)
-    {
-      csMaterialWrapper* mw = scfParent->NewMaterial (material);
-      if (mw) return &(mw->scfiMaterialWrapper);
-      else return NULL;
-    }
-    virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith)
-    {
-      csMaterialWrapper* mw = scfParent->NewMaterial (ith);
-      if (mw) return &(mw->scfiMaterialWrapper);
-      else return NULL;
-    }
-    virtual int GetMaterialCount ()
-    {
-      return scfParent->Length ();
-    }
-    virtual iMaterialWrapper* Get (int idx)
-    {
-      return &(scfParent->Get (idx)->scfiMaterialWrapper);
-    }
-    virtual iMaterialWrapper* FindByName (const char* iName)
-    {
-      csMaterialWrapper* mw = scfParent->FindByName (iName);
-      if (mw) return &(mw->scfiMaterialWrapper);
-      else return NULL;
-    }
+    virtual iMaterialWrapper* NewMaterial (iMaterial* material);
+    virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith);
+    virtual int GetMaterialCount ();
+    virtual iMaterialWrapper* Get (int idx);
+    virtual iMaterialWrapper* FindByName (const char* iName);
   } scfiMaterialList;
 };
 

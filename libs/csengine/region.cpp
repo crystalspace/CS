@@ -143,7 +143,7 @@ void csRegion::Region::DeleteAll ()
       if (!o) continue;
       o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       o->GetPrivateObject ()->CleanupReferences ();
-      int idx = scfParent->engine->sectors.Find (o->GetPrivateObject ());
+      int idx = scfParent->engine->sectors.Find (o);
       if (idx != -1)
         scfParent->engine->sectors.Delete (idx);
       else
@@ -159,8 +159,7 @@ void csRegion::Region::DeleteAll ()
       iMaterialWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
       if (!o) continue;
       o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
-      int idx = scfParent->engine->GetMaterials ()->Find (
-      	o->GetPrivateObject ());
+      int idx = scfParent->engine->GetMaterials ()->Find (o);
       if (idx != -1)
         scfParent->engine->GetMaterials ()->Delete (idx);
       else

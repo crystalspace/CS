@@ -139,14 +139,14 @@ void csShadow::SetShadowMesh (iMeshWrapper* sh)
 bool csShadow::AddToEngine (iEngine* engine)
 {
   if (wrap) { engine->RemoveMesh (wrap); wrap = NULL; }
-  if (engine->GetSectorCount () <= 0) return false;
+  if (engine->GetSectors ()->GetSectorCount () <= 0) return false;
   wrap = engine->CreateMeshObject (this, "_@Shadow@_");
   wrap->SetRenderPriority (engine->GetAlphaRenderPriority ());
   iMovable* movable = wrap->GetMovable ();
   int i;
-  for (i = 0 ; i < engine->GetSectorCount () ; i++)
+  for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
   {
-    iSector* sec = engine->GetSector (i);
+    iSector* sec = engine->GetSectors ()->GetSector (i);
     movable->AddSector (sec);
   }
   movable->UpdateMove ();

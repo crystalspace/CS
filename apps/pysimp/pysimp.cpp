@@ -116,7 +116,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
-  csSector *room = engine->CreateCsSector ("room");
+  csSector *room = engine->CreateSector ("room")->GetPrivateObject ();
 
   // Initialize the python plugin.
   iScript* is = CS_LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
@@ -164,7 +164,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // manually creating a camera and a clipper but it makes things a little
   // easier.
   view = new csView (engine, myG3D);
-  view->GetCamera ()->SetSector(&((csSector*)engine->sectors[0])->scfiSector);
+  view->GetCamera ()->SetSector(engine->sectors[0]);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 2, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 

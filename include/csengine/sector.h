@@ -529,4 +529,29 @@ public:
   friend struct eiSector;
 };
 
+CS_DECLARE_OBJECT_VECTOR (csSectorListHelper, iSector);
+
+class csSectorList : public csSectorListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+  bool CleanupReferences;
+
+  /// constructor
+  csSectorList (bool CleanupReferences);
+
+  /// override FreeItem
+  virtual bool FreeItem (csSome Item);
+
+  class SectorList : public iSectorList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSectorList);
+    virtual int GetSectorCount ();
+    virtual iSector *GetSector (int idx);
+    virtual void AddSector (iSector *sec);
+    virtual void RemoveSector (iSector *sec);
+    virtual iSector *FindByName (const char *name);
+  } scfiSectorList;
+};
+
 #endif // __CS_SECTOR_H__

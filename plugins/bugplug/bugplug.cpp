@@ -554,9 +554,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	{
 	  int enable_disable = -1;
 	  int i, j;
-	  for (i = 0 ; i < Engine->GetSectorCount () ; i++)
+	  for (i = 0 ; i < Engine->GetSectors ()->GetSectorCount () ; i++)
 	  {
-	    iSector* sector = Engine->GetSector (i);
+	    iSector* sector = Engine->GetSectors ()->GetSector (i);
 	    for (j = 0 ; j < sector->GetMeshCount () ; j++)
 	    {
 	      iMeshWrapper* terr = sector->GetMesh (j);
@@ -947,13 +947,13 @@ void csBugPlug::Dump (iEngine* engine)
   System->Printf (CS_MSG_DEBUG_0, "===========================================\n");
   System->Printf (CS_MSG_DEBUG_0,
     "%d sectors, %d mesh factories, %d mesh objects\n",
-    engine->GetSectorCount (),
+    engine->GetSectors ()->GetSectorCount (),
     engine->GetMeshFactoryCount (),
     engine->GetMeshObjectCount ());
   int i;
-  for (i = 0 ; i < engine->GetSectorCount () ; i++)
+  for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
   {
-    iSector* sector = engine->GetSector (i);
+    iSector* sector = engine->GetSectors ()->GetSector (i);
     Dump (sector);
   }
   for (i = 0 ; i < engine->GetMeshFactoryCount () ; i++)

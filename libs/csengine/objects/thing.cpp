@@ -2350,10 +2350,8 @@ void csThing::MergeTemplate (iThingState* tpl,
   {
     iPolygon3D* pt = tpl->GetPolygon (i);
     csPolygon3D* p;
-    csMaterialWrapper* mat = NULL;
-    if (pt->GetMaterial ())
-      mat = pt->GetMaterial ()->GetPrivateObject (); //@@@
-    p = NewPolygon (mat); //@@@
+    iMaterialWrapper* mat = pt->GetMaterial ();
+    p = NewPolygon (mat->GetPrivateObject ()); //@@@
     p->SetName (pt->QueryObject()->GetName ());
     iMaterialWrapper* wrap = pt->GetMaterial ();
     if (!wrap && default_material)

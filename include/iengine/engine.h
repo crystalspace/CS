@@ -54,6 +54,7 @@ struct iCollection;
 struct iDataBuffer;
 struct iCamera;
 struct iRenderView;
+struct iSectorList;
 
 /**
  * Flag for GetNearbyLights().
@@ -128,7 +129,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 1, 32);
+SCF_VERSION (iEngine, 0, 2, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -252,10 +253,9 @@ struct iEngine : public iBase
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
 
-  /// Query number of sectors in engine
-  virtual int GetSectorCount () const = 0;
-  /// Get a sector by index
-  virtual iSector *GetSector (int iIndex) const = 0;
+  /// Get the list of sectors
+  virtual iSectorList *GetSectors () = 0;
+
   /**
    * Find a sector by name. If regionOnly is true then the returned
    * sector will belong to the current region. Note that this is different
@@ -265,8 +265,6 @@ struct iEngine : public iBase
    */
   virtual iSector *FindSector (const char *iName, bool regionOnly = false)
   	const = 0;
-  /// Delete a sector
-  virtual void DeleteSector (iSector *) = 0;
 
   /**
    * Find a mesh object by name. If regionOnly is true then the returned

@@ -211,27 +211,35 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialList::MaterialList)
   SCF_IMPLEMENTS_INTERFACE (iMaterialList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMaterialList::csMaterialList () : csNamedObjVector (16, 16)
+csMaterialList::csMaterialList () : csMaterialListHelper (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
 }
 
-csMaterialList::~csMaterialList ()
+iMaterialWrapper* csMaterialList::NewMaterial (iMaterial* material)
 {
-  DeleteAll ();
-}
-
-csMaterialWrapper* csMaterialList::NewMaterial (iMaterial* material)
-{
-  csMaterialWrapper *tm = new csMaterialWrapper (material);
+  iMaterialWrapper *tm = &(new csMaterialWrapper (material))->scfiMaterialWrapper;
   Push (tm);
+  tm->DecRef ();
   return tm;
 }
 
-csMaterialWrapper* csMaterialList::NewMaterial (iMaterialHandle *ith)
+iMaterialWrapper* csMaterialList::NewMaterial (iMaterialHandle *ith)
 {
-  csMaterialWrapper *tm = new csMaterialWrapper (ith);
+  iMaterialWrapper *tm = &(new csMaterialWrapper (ith))->scfiMaterialWrapper;
   Push (tm);
+  tm->DecRef ();
   return tm;
 }
+
+iMaterialWrapper* csMaterialList::MaterialList::NewMaterial (iMaterial* material)
+  { return scfParent->NewMaterial (material); }
+iMaterialWrapper* csMaterialList::MaterialList::NewMaterial (iMaterialHandle *ith)
+  { return scfParent->NewMaterial (ith); }
+int csMaterialList::MaterialList::GetMaterialCount ()
+  { return scfParent->Length (); }
+iMaterialWrapper* csMaterialList::MaterialList::Get (int idx)
+  { return scfParent->Get (idx); }
+iMaterialWrapper* csMaterialList::MaterialList::FindByName (const char* iName)
+  { return scfParent->FindByName (iName); }
