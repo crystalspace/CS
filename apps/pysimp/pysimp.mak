@@ -1,4 +1,4 @@
-# Plug-in module only valid if module is listed in PLUGINS.
+# Application target only valid if module is listed in PLUGINS.
 ifneq (,$(findstring cspython,$(PLUGINS)))
 
 # Application description
