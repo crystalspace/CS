@@ -748,14 +748,20 @@ public:
     int i;
     printf ("-----------------------------------------------------\n");
     printf ("Module: %s\n", Class);
-    printf (" current      max current#     max# file\n");
+    printf ("     current      max current#     max# file\n");
+    size_t total_current_alloc = 0;
+    int total_current_count = 0;
     for (i = 0 ; i < mti_table_count ; i++)
     {
       MemTrackerInfo* mti = mti_table[i];
-      printf ("%8d %8d %8d %8d %s\n", mti->current_alloc,
+      printf ("    %8d %8d %8d %8d %s\n", mti->current_alloc,
     	  mti->max_alloc, mti->current_count, mti->max_count,
 	  mti->file);
+      total_current_alloc += mti->current_alloc;
+      total_current_count += mti->current_count;
     }
+    printf ("   (%8d)        (%8d)\n", total_current_alloc,
+    	total_current_count);
     fflush (stdout);
   }
 };
