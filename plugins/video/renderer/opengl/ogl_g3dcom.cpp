@@ -3836,7 +3836,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       for (i=0; i<CS_VBUF_TOTAL_USERA; i++)
       {
         work_userarrays[i] = trimesh.buffers[0]->GetUserArray (i);
-        userarraycomponents[i] = trimesh.buffers[0]->GetUserArrayComponentCount (i);
+        userarraycomponents[i] = trimesh.buffers[0]->
+		GetUserArrayComponentCount (i);
       }
       if (ci.how_clip == '0' || ci.use_lazy_clipping
         || ci.do_plane_clipping || ci.do_z_plane_clipping)
@@ -3850,7 +3851,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     }
     trimesh.triangles = t->triangles.GetArray ();
     trimesh.num_triangles = t->triangles.Length ();
-    GLuint lmtex = t->lmh ? ((csGLRendererLightmap*)((iRendererLightmap*)t->lmh))->slm->texHandle : 0;
+    GLuint lmtex = t->lmh ? ((csGLRendererLightmap*)
+    	((iRendererLightmap*)t->lmh))->slm->texHandle : 0;
     bool drawn = EffectDrawTriangleMesh (trimesh, false,
       lmtex);
     something_was_drawn |= drawn;
@@ -3888,13 +3890,13 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     while (t != 0)
     {
       GLuint lmtex = t->lmh ? 
-	((csGLRendererLightmap*)((iRendererLightmap*)t->lmh))->slm->texHandle : 0;
+	((csGLRendererLightmap*)((iRendererLightmap*)t->lmh))->slm->texHandle
+	: 0;
       if (lmtex != 0) 
       {
 	trimesh.triangles = t->triangles.GetArray ();
 	trimesh.num_triangles = t->triangles.Length ();
-	EffectDrawTriangleMesh (trimesh, false, 
-	  lmtex);
+	EffectDrawTriangleMesh (trimesh, false, lmtex);
       }
       t = t->next;
     }
@@ -4773,7 +4775,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
     if (pass_data->vertex_program > 0)
     {
-      ///@@@HACK.. THESE SHOULD BE CHANEGD
+      ///@@@HACK.. THESE SHOULD BE CHANGED
       //set all constants
 
       for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
@@ -4803,7 +4805,8 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     if (pass_data->doblending)
     {
       statecache->Enable_GL_BLEND ();
-      statecache->SetBlendFunc ((GLenum)pass_data->sblend,(GLenum) pass_data->dblend);
+      statecache->SetBlendFunc ((GLenum)pass_data->sblend,
+      	(GLenum) pass_data->dblend);
     }
     else
     {
@@ -4929,6 +4932,11 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
       if (txt_handle)
       {
+        if (txt_handle->GetKeyColor())//&& !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
+        {
+          statecache->Enable_GL_ALPHA_TEST ();
+          statecache->SetAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
+        }
         csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
 		txt_handle->GetPrivateObject ();
         csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
@@ -4976,6 +4984,8 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       }
     }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
+
+    statecache->Disable_GL_ALPHA_TEST ();
 
     for (l=0 ; l<pass->GetLayerCount() ; l++ )
     {

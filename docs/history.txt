@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Oct-2003
+	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
+	  DrawPolygonMesh was used (fastmesh).
 7-Oct-2003
 	- Jorrit changed the main loader for portals:
 	    - New <portals> statement that can group several portals and
