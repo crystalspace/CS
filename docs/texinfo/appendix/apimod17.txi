@@ -321,3 +321,31 @@ move.SetTransform (csMatrix3 ());
 move.UpdateMove ();
 @end example
 
+@heading Some API changes to csCamera
+@index csCamera
+
+The function @code{SetFOV} now needs an extra parameter which is the
+width of the display. This is needed for calculating the angle of the
+FOV. In addition there are now new @code{SetFOVAngle} and @code{GetFOVAngle}
+functions. @code{GetFOVAngle} used to be in @code{csRenderView}.
+
+@heading Some API changes to csWorld
+@cindex csWorld
+
+Here are a few API changes that have happened in csWorld itself.
+
+@itemize @bullet
+@item
+Added csWorld::FindLight(char* name)
+@item
+Removed csWorld::NewSector(). Use world->CreateCsSector(name) instead.
+@item
+Removed csWorld::GetThing(). Use world->things.FindByName() instead.
+@item
+Removed csWorld::GetSpriteTemplate(). Use world->sprite_templates.FindByName() isntead.
+@item
+Removed csWorld::GetThingTemplate(). Use world->thing_templates.FindByName() instead.
+@item
+Added csWorld::UnlinkCollection() and csWorld::RemoveCollection().
+@end itemize
+

@@ -225,9 +225,8 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   for (i = 0 ; i < sp->things.Length () ; i++)
   {
     csThing* tp = (csThing*)(sp->things[i]);
-    // TODO, if and when Things can move, their transform must be passed in.
     Sys->collide_system->ResetCollisionPairs ();
-    if (c->Collide (*tp, cdt)) hit++;
+    if (c->Collide (*tp, cdt, &tp->GetMovable ().GetTransform ())) hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
     for (int j=0 ; j<Sys->collide_system->GetNumCollisionPairs () ; j++)

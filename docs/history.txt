@@ -28,6 +28,9 @@ The history order has been reversed so that new features are at the top.
 	  newer csWorld::CreateSector or csWorld::CreateCsSector.
 	- Things and skies are now also added to the world by the
 	  loader.
+	- Updated apimod17.txi.
+	- Fixed WalkTest so that collision detection with moving things
+	  is now ok.
 30-Aug-2000
      	- Andrew Zabolotny:
 	    - Some fixes to MazeD. Now it works, but is unusabled due to
