@@ -31,7 +31,7 @@
 #include "awsradbt.h"
 #include "awschkbx.h"
 #include "awsgrpfr.h"
-#include "awslistbx.h"
+#include "awslstbx.h"
 #include "awsscrbr.h"
 #include "awsbarct.h"
 #include "awsstbar.h"

@@ -1,6 +1,6 @@
 #include "cssysdef.h"
 #include "awsitmv.h"
-#include "awslistbx.h"
+#include "awslstbx.h"
 
 awsListRowVector::awsListRowVector () :
   sortcol(0)
