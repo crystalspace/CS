@@ -3,6 +3,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.beos = BeOS
+DESCRIPTION.OS.beos = BeOS
 
 # Choose which drivers you want to build/use
 PLUGINS += video/canvas/be video/canvas/openglbe video/renderer/opengl

@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+17-Feb-2001
+	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
+	  lib/cssys/beos/beos.mak.
 16-Feb-2001
 	- Dynamic lights do not traverse through mirroring portals anymore.
 	  This caused a bug because the dynamic lighting routine can't handle
