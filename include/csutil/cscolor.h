@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -52,6 +52,13 @@ public:
     if (red > r) red = r;
     if (green > g) green = g;
     if (blue > b) blue = b;
+  }
+  /// Make sure color components are not negative.
+  void ClampDown ()
+  {
+    if (red < 0) red = 0;
+    if (green < 0) green = 0;
+    if (blue < 0) blue = 0;
   }
   /// Assign one color object to another.
   csColor& operator= (const csColor& c)

@@ -135,10 +135,6 @@ static const double FOG_MAXVALUE = FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE;
 static DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
 /// Static uv array.
 static DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
-/// The perspective corrected vertices.
-//static DECLARE_GROWING_ARRAY_REF (persp, csVector3);
-/// Array which indicates which vertices are visible and which are not.
-//static DECLARE_GROWING_ARRAY_REF (visible, bool);
 /// Array with colors.
 static DECLARE_GROWING_ARRAY_REF (color_verts, csColor);
 /// Array with RGBA colors.
