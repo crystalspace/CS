@@ -37,7 +37,7 @@ fi
 if test -z "$libdir" -a -r "$prefix/Jamfile" \
      -a -r "$prefix/$makeout/libs/csutil/libcsutil.a"; then
     libd=$prefix/$makeout/libs
-    lflags="-L$libd/csutil -L$libd/cstool -L$libd/csgfx -L$libd/csgeom -L$libd/csws -L$libd/csappframe"
+    lflags="-L$libd/csutil -L$libd/cstool -L$libd/csgfx -L$libd/csgeom -L$libd/csws"
 fi
 
 usage()
@@ -282,7 +282,6 @@ fi
 if test -n "$show_libs"; then
     # if users specified no lib, output commonly needed ones
     if test -z "$the_libs"; then
-	addlib "-lcsappframe"
         addlib "-lcsgfx"
         addlib "-lcsgeom"
         addlib "-lcstool"
