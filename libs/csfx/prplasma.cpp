@@ -84,11 +84,13 @@ void csProcPlasma::MakeTable ()
   int i;
   for (i=0 ; i<256 ; i++)
   {
-    /// scale i so that 0-256 is 260 degrees.
+    /// scale i so that 0-256 is 360 degrees.
     /// then convert that to radians.
     double angle = double(i)/256.0*360.0*PI/180.0;
-    /// costable has results from [-1..1] mapped to [0..64].
+    /// costable has results from [-1..1] mapped to [0..63].
     costable[i] = (uint8) ( cos(angle)*32+32 );
+    /// make sure no 64 in table; 4*64 = 256; which will be out of bounds
+    if(costable[i]==64) costable[i]=63;
   }
 }
 
@@ -150,8 +152,6 @@ void csProcPlasma::Animate (cs_time current_time)
       thex %= mat_w;
       they %= mat_h;
 
-      //@@@ Is the following test ok?
-      if (col >= 256) col = 255;
       ptG2D->DrawPixel (thex, they, palette[col*palsize/256] );
 
       curanim[0] += lineincr[0];
