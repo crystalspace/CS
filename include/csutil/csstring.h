@@ -246,7 +246,7 @@ public:
 
   /// Return a const reference to this string in ASCIIZ format
   operator const char * () const
-  { return Data; }
+  { return Data ? Data : ""; }
 
   /// Check if two strings are equal
   bool operator == (const csString &iStr) const
