@@ -18,21 +18,11 @@ Many computer systems come with these libraries pre-installed.
 If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
 
-Windows and @sc{dos} users can download a single package containing all three
-libraries in precompiled form from the following location at the Crystal Space
-site:
+Windows/Visual C++ users can download a single package containing all four
+libraries in precompiled @samp{winlibs15.zip} from the following location:
 
 @noindent
-@uref{ftp://ftp.linuxgames.com/crystal/support/win32/winlibs14.zip}
-
-If you are using the Mingw compiler, then you will need the @sc{dll}'s
-@file{jpeg.dll}, @file{png.dll} and @file{z.dll}, which you can find in the
-following packages:
-
-@noindent
-@uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/libjpeg-win32-bin-6b.zip}@*
-@uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/libpng-win32-bin-1.0.7.zip}@*
-@uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/zlib-win32-bin-1.1.3.zip}@*
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/win32/}
 
 @subheading zlib
 @cindex zlib
