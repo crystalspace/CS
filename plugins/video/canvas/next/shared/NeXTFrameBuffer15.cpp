@@ -31,6 +31,21 @@
 //	conversion is considerably faster, although at a slightly higher cost
 //	in terms of memory.
 //
+//	Note that the 15-to-16 bit lookup table is actually twice the size it
+//	needs to be for safety's sake.  The second half of the table is merely
+//	a verbatim copy of the first half.  The reason for the doubled table
+//	is that there are times when Crystal Space incorrectly places 16-bit
+//	values in its buffer rather than the requested 15-bit color values.
+//	Accessing a 15-bit lookup table with the incorrect 16-bit value can
+//	easily result in a segmentation fault as memory is referenced beyond
+//	the end of the table.  This problem can occur when bugs in the
+//	software renderer cause it to paint polygons with random memory rather
+//	than with the correctly prepared 15-bit textures.  The problem can
+//	also occur when an improperly written program assumes that it can
+//	safely use a hard-coded 16-bit color value in a 15-bit environment.
+//	The doubled table makes the frame-buffer conversion process safer and
+//	more tolerant of bugs elsewhere in Crystal Space.
+//
 //-----------------------------------------------------------------------------
 #include "NeXTFrameBuffer15.h"
 extern "C" {
@@ -109,13 +124,15 @@ NeXTFrameBuffer15::~NeXTFrameBuffer15()
 unsigned short* NeXTFrameBuffer15::build_15_to_12_rgb_table() const
     {
     unsigned int const lim = 1 << 15;
-    unsigned short* table = (unsigned short*)malloc( lim * sizeof(*table) );
+    unsigned int const nbytes = 2 * lim * sizeof(short); // Doubled table.
+    unsigned short* table = (unsigned short*)malloc(nbytes);
     unsigned short* p = table;
     for (unsigned int i = 0; i < lim; i++)
 	*p++ = ENCODE_RED  (DECODE_RED  (i)) |
 	       ENCODE_GREEN(DECODE_GREEN(i)) |
 	       ENCODE_BLUE (DECODE_BLUE (i)) |
 	       ENCODE_ALPHA(0x0f);
+    memcpy( table + lim, table, nbytes / 2 );
     return table;
     }
 
