@@ -20,6 +20,11 @@ Short-term cleanups that need to be done:
 	- Optimized the sprite changes from Seth a bit. Avoided allocation
 	  of arrays every frame. The copy of vertices is still there
 	  however.
+	- Samuel <samuel@metalang.softnet.co.uk> contributed a patch
+	  to the software and X 2D drivers so that they allow resizing
+	  of the window. In principle the same thing can now be done
+	  for the other 2D/3D combinations too.
+	  The engine will adapt automatically to the new size.
 16-Feb-2000
 	- Some fixes to csPhyzik from Michael Ewert.
 	- Seth Galbraith managed to almost fix sprites by disabling LOD

@@ -272,9 +272,11 @@ bool csGraphics2DXLib::Open(const char *Title)
   swa.background_pixel = 0;
   swa.border_pixel = 0;
   swa.colormap = cmap;
+  swa.bit_gravity = CenterGravity;
   window = XCreateWindow (dpy, DefaultRootWindow(dpy), 64, 16,
-    Width, Height, 4, vinfo.depth, InputOutput, visual,
-    CWBackPixel | CWBorderPixel | (cmap ? CWColormap : 0), &swa);
+			  Width, Height, 4, vinfo.depth, InputOutput, visual,
+			  CWBackPixel | CWBorderPixel | CWBitGravity | 
+			  (cmap ? CWColormap : 0), &swa);
   XMapWindow (dpy, window);
   XStoreName (dpy, window, Title);
 
@@ -286,7 +288,8 @@ bool csGraphics2DXLib::Open(const char *Title)
 
   XSetWindowAttributes attr;
   attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-    FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
+    FocusChangeMask | PointerMotionMask | ButtonPressMask | 
+    ButtonReleaseMask | StructureNotifyMask;
   XChangeWindowAttributes (dpy, window, CWEventMask, &attr);
 
   if (cmap)
@@ -329,7 +332,17 @@ bool csGraphics2DXLib::Open(const char *Title)
     if (event.type == Expose)
       break;
   }
+  if (!AllocateMemory ())
+  {
+      CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory!\n");
+      return false;
+  }
+  Clear (0);
+  return true;
+}
 
+bool csGraphics2DXLib::AllocateMemory ()
+{
   // Create backing store
   if (!xim)
   {
@@ -338,8 +351,7 @@ bool csGraphics2DXLib::Open(const char *Title)
     int disp_depth = DefaultDepth(dpy,sc);
     int bitmap_pad = (disp_depth + 7) / 8;
         bitmap_pad = (bitmap_pad==3) ? 32 : bitmap_pad*8;
-    xim = XCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, ZPixmap, 0,
-                       NULL, Width, Height, bitmap_pad, 0);
+
 #   ifdef DO_SHM
     if (do_shm && !XShmQueryExtension (dpy))
     {
@@ -348,10 +360,27 @@ bool csGraphics2DXLib::Open(const char *Title)
     }
     if (do_shm)
     {
+      xim = XShmCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, 
+			    ZPixmap, 0, &shmi, Width, Height);
+      if (!xim)
+      {
+	CsPrintf (MSG_FATAL_ERROR, "XShmCreateImage failed!\n");
+	return false;
+      }
       shm_image = *xim;
       shmi.shmid = shmget (IPC_PRIVATE, xim->bytes_per_line*xim->height,
         IPC_CREAT | 0777);
+      if (shmi.shmid == -1)
+      {
+	CsPrintf (MSG_FATAL_ERROR, "shmget failed!\n");
+	return false;
+      }
       shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
+      if (shmi.shmaddr == (char*) -1)
+      {
+	CsPrintf (MSG_FATAL_ERROR, "shmat failed!\n");
+	return false;
+      }
       shmi.readOnly = FALSE;
       XShmAttach (dpy, &shmi);
 
@@ -367,6 +396,8 @@ bool csGraphics2DXLib::Open(const char *Title)
     else
 #   endif /* DO_SHM */
     {
+      xim = XCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, ZPixmap, 0,
+			 NULL, Width, Height, bitmap_pad, 0);
       CHK(xim->data = new char[xim->bytes_per_line*xim->height]);
       real_Memory = (unsigned char*)(xim->data);
     }
@@ -379,7 +410,6 @@ bool csGraphics2DXLib::Open(const char *Title)
       CHKB (Memory = new unsigned char [Width*Height*pfmt.PixelBytes]);
   }
 
-  Clear (0);
   return true;
 }
 
@@ -993,10 +1023,20 @@ void csGraphics2DXLib::ProcessEvents (void *Param)
   XEvent event;
   int state, key;
   bool down;
+  bool resize = false;
 
   while (XCheckIfEvent (Self->dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
     {
+      case ConfigureNotify:
+	if ((Self->Width  != event.xconfigure.width) ||
+	    (Self->Height != event.xconfigure.height))
+	{
+	  Self->Width = event.xconfigure.width;
+	  Self->Height = event.xconfigure.height;
+	  resize = true;
+	}
+	break;
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == Self->wm_delete_window)
 	{
@@ -1094,14 +1134,58 @@ void csGraphics2DXLib::ProcessEvents (void *Param)
         Self->System->QueueFocusEvent (event.type == FocusIn);
         break;
       case Expose:
-      {
-        csRect rect (event.xexpose.x, event.xexpose.y,
-	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Self->Print (&rect);
-        break;
-      }
+	if (!resize)
+        {
+	  csRect rect (event.xexpose.x, event.xexpose.y,
+		       event.xexpose.x + event.xexpose.width, 
+		       event.xexpose.y + event.xexpose.height);
+	  Self->Print (&rect);
+	}
+	break; 
       default:
         //if (event.type == CompletionType) shm_busy = 0;
         break;
     }
+  if (resize)
+  { 
+    if (!Self->ReallocateMemory ())
+    {
+      Self->CsPrintf (MSG_FATAL_ERROR, 
+		      "Unable to allocate memory on resize!\n");
+      Self->System->StartShutdown();
+    }
+  }
+}
+
+bool csGraphics2DXLib::ReallocateMemory ()
+{
+  XSync (dpy, False);
+  if (do_shm)
+  {
+    XShmDetach (dpy, &shmi);
+    XDestroyImage (xim);
+    shmdt (shmi.shmaddr);
+  }
+  else
+  {
+    XDestroyImage (xim);
+  }
+  xim = NULL;
+  if (!AllocateMemory())
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory!\n");
+    return false;
+  }
+  CHK (delete [] LineAddress);
+  CHK (LineAddress = new int [Height]);
+  if (LineAddress == NULL) return false;
+ 
+  // Initialize scanline address array
+  int i,addr,bpl = Width * pfmt.PixelBytes;
+  for (i = 0, addr = 0; i < Height; i++, addr += bpl)
+    LineAddress[i] = addr;
+ 
+  SetClipRect (0, 0, Width, Height);
+  XSync (dpy, False);
+  return true;
 }

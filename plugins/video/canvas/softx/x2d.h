@@ -55,6 +55,8 @@ class csGraphics2DXLib : public csGraphics2D
   // Window colormap
   Colormap cmap;
 
+  //  bool ReallocatedMemory;
+
   // Use SHM or not?
   bool do_shm;
 #ifdef DO_SHM
@@ -116,6 +118,9 @@ public:
 
   /// Use greyscale palette for simulation of 15/16-bit on an 8-bit display.
   void recompute_grey_palette ();
+
+  bool ReallocateMemory ();
+  bool AllocateMemory ();
 
   /// Extensions for X11 port.
   virtual bool PerformExtension (char* args);

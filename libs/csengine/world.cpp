@@ -216,7 +216,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   covtree_lut = NULL;
   current_camera = NULL;
   current_world = this;
-
+ 
   //@@@
   //CHK (quadcube = new csQuadcube (8));
   if (!covtree_lut)
@@ -267,11 +267,14 @@ printf ("csLightMap %ld\n", (long)sizeof (csLightMap));
   System = sys;
 
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
+  {
+    G3D->DecRef ();
     return false;
+  }
 
   if (!(VFS = QUERY_PLUGIN (sys, iVFS)))
   {
-    G3D->DecRef ();
+    VFS->DecRef ();
     return false;
   }
 
@@ -940,19 +943,36 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   Stats::polygons_rejected = 0;
   Stats::polygons_accepted = 0;
 
+  iGraphics2D *G2D = G3D->GetDriver2D ();
+
+  if ((G2D->GetWidth() != frame_width) || (G2D->GetHeight() != frame_height))
+  {
+    frame_width = G2D->GetWidth ();
+    frame_height = G2D->GetHeight ();
+    if (c_buffer) { EnableCBuffer (false); EnableCBuffer (true); }
+    if (covtree) { EnableCovtree (false); EnableCovtree (true); }
+    if (quadtree) { EnableQuadtree (false); EnableQuadtree (true); }
+  }
+
   current_camera = c;
+
+  // When window is resized need to update the camera. 
+  // This is bad to do it here, but is required for leftx etc below
+  // Need a better way. 
+  c->shift_x = frame_width/2;
+  c->shift_y = frame_height/2;
+
   top_clipper = view;
 
-  iGraphics2D *G2D = G3D->GetDriver2D ();
   csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = NULL;
 
   // Calculate frustrum for screen dimensions (at z=1).
   float leftx = - c->shift_x * c->inv_aspect;
-  float rightx = (G2D->GetWidth () - c->shift_x) * c->inv_aspect;
+  float rightx = (frame_width - c->shift_x) * c->inv_aspect;
   float topy = - c->shift_y * c->inv_aspect;
-  float boty = (G2D->GetHeight () - c->shift_y) * c->inv_aspect;
+  float boty = (frame_height - c->shift_y) * c->inv_aspect;
   rview.SetFrustrum (leftx, rightx, topy, boty);
 
   tr_manager.NewFrame ();
@@ -1027,11 +1047,26 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   rview.callback = callback;
   rview.callback_data = callback_data;
 
+  // Maybe not necessary if DrawFunc is never called before Draw
+  c->shift_x = frame_width/2;
+  c->shift_y = frame_height/2;
+
+  resize = false;
+  if ((G2D->GetWidth() != frame_width) || (G2D->GetHeight() != frame_height))
+  {
+    resize = true;
+    frame_width = G2D->GetWidth ();
+    frame_height = G2D->GetHeight ();
+    if (c_buffer) EnableCBuffer (true);
+    if (covtree) EnableCovtree (true);//hmmmmmmm necessary?
+    if (quadtree) EnableQuadtree (true);      
+  }
+
   // Calculate frustrum for screen dimensions (at z=1).
   float leftx = - c->shift_x * c->inv_aspect;
-  float rightx = (G2D->GetWidth () - c->shift_x) * c->inv_aspect;
+  float rightx = (frame_width - c->shift_x) * c->inv_aspect;
   float topy = - c->shift_y * c->inv_aspect;
-  float boty = (G2D->GetHeight () - c->shift_y) * c->inv_aspect;
+  float boty = (frame_height - c->shift_y) * c->inv_aspect;
   rview.SetFrustrum (leftx, rightx, topy, boty);
 
   tr_manager.NewFrame ();

@@ -24,11 +24,14 @@
 #include "csengine/pol2d.h"
 #include "csengine/camera.h"
 #include "igraph3d.h"
+#include "qint.h"
 
 csView::csView (csWorld *iWorld, iGraphics3D* ig3d)
 {
+  bview = NULL;
   world = iWorld;
   (G3D = ig3d)->IncRef ();
+
   CHK (view = new csPolygon2D ());
   CHK (camera = new csCamera ());
   clipper = NULL;
@@ -37,6 +40,7 @@ csView::csView (csWorld *iWorld, iGraphics3D* ig3d)
 csView::~csView ()
 {
   G3D->DecRef ();
+  CHK (delete bview);
   CHK (delete camera);
   CHK (delete view);
   CHK (delete clipper);
@@ -49,8 +53,11 @@ void csView::ClearView ()
 
 void csView::SetRectangle (int x, int y, int w, int h)
 {
+  orig_width = G3D->GetWidth ();
+  orig_height = G3D->GetHeight();
   CHK (delete view);  view = NULL;
-  bview = csBox (x, y, x+w-1, y+h-1);
+  CHK (delete bview);
+  CHK (bview = new csBox (x, y, x+w-1, y+h-1));
   CHK (delete clipper); clipper = NULL;
 }
 
@@ -64,11 +71,39 @@ void csView::AddViewVertex (int x, int y)
 
 void csView::Draw ()
 {
+  if ((orig_width != G3D->GetWidth ()) || (orig_height != G3D->GetHeight()))
+  {
+    float xscale = ((float)G3D->GetWidth ())  / ((float)orig_width);
+    float yscale = ((float)G3D->GetHeight ()) / ((float)orig_height);
+    orig_width = G3D->GetWidth ();
+    orig_height = G3D->GetHeight ();
+
+    int xmin, ymin, xmax, ymax;
+    if (!bview)
+    {
+      xmin = 0;
+      ymin = 0;
+      xmax = orig_width - 1;
+      ymax = orig_height - 1;
+    }
+    else
+    {
+      xmin = QRound (xscale * bview->MinX());
+      xmax = QRound (xscale * (bview->MaxX() + 1));
+      ymin = QRound (yscale * bview->MinY());
+      ymax = QRound (yscale * (bview->MaxY() + 1));
+      CHK (delete bview);
+    }
+    CHK (bview = new csBox (xmin, ymin, xmax - 1, ymax - 1));
+    CHK (delete clipper);
+    clipper = NULL;
+  }
+
   if (!clipper)
     if (view)
       CHKB (clipper = new csPolygonClipper (view))
     else
-      CHKB (clipper = new csBoxClipper (bview));
+      CHKB (clipper = new csBoxClipper (*bview));
 
   G3D->SetPerspectiveCenter ((int)camera->shift_x, (int)camera->shift_y);
   world->Draw (camera, clipper);

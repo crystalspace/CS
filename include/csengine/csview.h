@@ -43,8 +43,10 @@ private:
   //
   iGraphics3D* G3D;
 
+  int orig_width, orig_height;
+
   // Clipping rectangle.
-  csBox bview;
+  csBox *bview;
   // Clipping region.
   csPolygon2D *view;
 

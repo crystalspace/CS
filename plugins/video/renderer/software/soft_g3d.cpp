@@ -640,6 +640,8 @@ void csGraphics3DSoftware::Close()
 
 void csGraphics3DSoftware::SetDimensions (int nwidth, int nheight)
 {
+  display_width = nwidth;
+  display_height = nheight;
   if (do_smaller_rendering)
   {
     width = nwidth/2;
@@ -682,6 +684,11 @@ void csGraphics3DSoftware::SetClipper (csVector2* vertices, int num_vertices)
 bool csGraphics3DSoftware::BeginDraw (int DrawFlags)
 {
   //ASSERT( G2D );
+
+  if ((G2D->GetWidth() != display_width) || 
+      (G2D->GetHeight() != display_height)) 
+    SetDimensions (G2D->GetWidth(), G2D->GetHeight());
+
 
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
@@ -2655,6 +2662,7 @@ void csGraphics3DSoftware::SysPrintf (int mode, char* szMsg, ...)
 float csGraphics3DSoftware::GetZbuffValue (int x, int y)
 {
   unsigned long zbf = z_buffer [x + y * width];
+  if (!zbf) return 0;
   return 16777216.0 / float (zbf);
 }
 

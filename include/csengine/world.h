@@ -278,6 +278,9 @@ private:
   /// Coverage mask cube used for lighting.
   csCovcube* covcube;
 
+  /// Flag set when window resized.
+  bool resize;
+
   ///
   void ShineLights ();
 

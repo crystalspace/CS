@@ -100,8 +100,13 @@ class csGraphics3DSoftware : public iGraphics3D
   FogBuffer* fog_buffers;
 
   /// Width of display.
-  int width;
+  int display_width;
   /// Height of display.
+  int display_height;
+
+  /// pseudo width of display.
+  int width;
+  /// pseudo height of display.
   int height;
   /// Opt: width divided by 2.
   int width2;
