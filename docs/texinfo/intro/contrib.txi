@@ -83,7 +83,7 @@ Vincent Knecht (@email{vince@@iefr.ath.cx})
 Vincent worked on making RPM's for Crystal Space.
 
 @item
-Aren Blondahl (@email{{rean@@pathcom.ca})
+Aren Blondahl (@email{rean@@pathcom.ca})
 
 Aren applied some patches to map2cs.
 
