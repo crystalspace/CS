@@ -45,6 +45,32 @@ chronological order.
 	  context of csSafeCopyArray.  Solved this by adding a new MemMove()
 	  function to the memory allocator used by csArray.  This fixes
 	  InsertSorted(), Insert(), DeleteRange(), and DeleteIndex().
+	- Eric Sunshine fixed bad side-effect of 29-Jun-2004 change to
+	  flags.jam which fixed problem where LFlags invocations within
+	  Jamfiles for plugin modules were not being respected during creation
+	  a "static" variant. Unfortunately, as a side-effect, this caused an
+	  explosive inclusion of multiple copies of LINKLIBS and PLUGIN.LFLAGS
+	  to be added to the linker flags for the static variant, which
+	  overflowed Jam's command-line length limitation.
+	- Eric Sunshine made the following changes to the Jam build system:
+	    - Added an `options' argument to the ExtraObjects rule (flags.jam),
+	      along with the new option "inheritcflags" which causes the added
+	      object files to inherit compiler flags set on the target's normal
+	      object files (in addition to whatever flags have already been set
+	      manually).
+	    - Augmented LinkStaticPlugins (static.jam) so that it employs the
+	      new "inheritcflags" option for the target's synthesized
+	      _static_init.cpp file.  This fixes a problem with use of static
+	      targets in external projects where _static_init.cpp was compiled
+	      without any special compiler flags, thus it was unable to locate
+	      header files, such as cssysdef.h, scf.h, etc.
+        - Matze fixed a jam install bug for command-line tools on OS/X where
+	  they were not assigned execute permission.
+	- res fixed the Win32 manifest resource generation code to not emit
+	  non-numerical characters when writing the version number - Windows
+	  doesn't like non-numerical characters. Note: Not needed for CS
+	  itself, but external projects may have versions with alphabetical
+	  characters.
 11-Aug-2004
 	- Oktal fixed a problem in the console input plugin where a '%' sign in
 	  the input would cause problems because of iConsoleOutput::PutText's

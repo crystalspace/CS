@@ -105,7 +105,15 @@ actions GenerateWin32ManifestRc
   "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>\r\n",
   "<assembly xmlns=""urn:schemas-microsoft-com:asm.v1"" manifestVersion=""1.0"">\r\n",
   "<assemblyIdentity\r\n",
-  "    version=""$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])""\r\n",
+  "    version=""",
+__EOF__
+
+    # Filter out non-numerical characters from the version number. Windows does
+    # not like them.
+    echo '$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/  "\1",/' >> $(<)
+  
+    cat >> $(<) << __EOF__
+  """\r\n",
   "    processorArchitecture=""X86""\r\n",
   "    name=""$(PRODUCT_NAME)""\r\n",
   "    type=""win32""\r\n",

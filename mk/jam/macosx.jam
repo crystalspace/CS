@@ -93,7 +93,8 @@ rule SystemInstallApplication
 {
     if [ IsElem console : $(3) ]
     {
-        Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) ] ;
+        Depends install_bin : 
+            [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
     }
     else
     {
