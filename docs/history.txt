@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+13-Nov-2001
+	- Small comment fix in vfs.h.
 12-Nov-2001
 	- Fixed a MAJOR bug in the cslua and mp3 makefiles!!! This bug
 	  caused 'make' to show the description of both plugins
