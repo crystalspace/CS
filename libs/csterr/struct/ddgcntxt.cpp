@@ -1,0 +1,252 @@
+/*
+    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+	(Digital Dawn Graphics Inc)
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+#ifdef DDG
+#include "util/ddgpath.h"
+#include "util/ddgclock.h"
+#endif
+#include "struct/ddgcntxt.h"
+
+ddgContext::ddgContext(Mode m, Quality q, ddgControl *ctrl, ddgClock *cl)
+{
+	_mode = m;
+	_quality = q;
+	_clock = cl;
+	_clipbox.set(0,100,0,100,0.6,5100);  // 5 Km visibility.
+	_fov = 90;
+	_tanHalfFOV = 1.0;
+	_dirty = true;
+	_control = ctrl;
+	_aspect = 1.0;
+	_path = NULL;
+	_frame = 0;
+	_record = false;
+	_frustrum = new ddgPlane[6];
+	ddgMemorySet(ddgPlane,6);
+}
+
+ddgContext::~ddgContext(void)
+{
+	delete [] _frustrum;
+	ddgMemoryFree(ddgPlane,6);
+	_frustrum = NULL;
+}
+
+bool ddgContext::update()
+{
+	ddgAssert(_control)
+	_dirty = false;
+#ifdef DDG
+	// Advance time.
+	if (_clock)
+		_clock->update();
+	// If we are playing back from a script load the next frame.
+	if (_path && !_record && _frame < _path->frames())
+	{
+		_path->get(_control->position(), _control->orientation(), _frame);
+		_dirty = true;
+		_frame++;
+	}
+	// Let the controller move the camera.
+	else
+#endif
+	{
+		_dirty = _control->update();
+		_control->clean();
+	}
+	// Calculate a vector in the current direction and an up vector.
+	if (_dirty)
+		_control->orientation()->angletovector(&_forward,&_right,&_up);
+#ifdef DDG
+	// If we are recording add the current position.
+	if (_path && _record)
+	{
+		_path->add(_control->position(), _control->orientation());
+	}
+#endif
+	_tanHalfFOV = tan(ddgAngle::degtorad(_fov/2.0));
+	return _dirty;
+}
+
+
+bool ddgContext::visible ( ddgBBox *bbox )
+{
+	float xmin, xmax, ymin, ymax, zmin, zmax;
+
+	// Get each bounding box corner point in screen coordinates.
+	xmin = ymin = zmin =  MAXFLOAT;
+	xmax = ymax = zmax = -MAXFLOAT;
+
+	float _res[4], _res2[4];
+	for (unsigned int i=0; i<8; i++)
+	{
+        // Convert the world coordinates to screen coordinates.
+        // Note this should be done at the same resolution at
+        // the final rendering or errors will occur along the edges.
+        // Perform matrix multiplication.
+        _res[0] = _mm[0]*bbox->cornerx(i) + _mm[4]*bbox->cornery(i) + _mm[8]*bbox->cornerz(i) + _mm[12];
+        _res[1] = _mm[1]*bbox->cornerx(i) + _mm[5]*bbox->cornery(i) + _mm[9]*bbox->cornerz(i) + _mm[13];
+        _res[2] = _mm[2]*bbox->cornerx(i) + _mm[6]*bbox->cornery(i) + _mm[10]*bbox->cornerz(i) + _mm[14];
+        // Multiply by the projection matrix.
+        _res2[0] = _pm[0] * _res[0] + _pm[4]*_res[1] + _pm[8]*_res[2] + _pm[12];
+        _res2[1] = _pm[1] * _res[0] + _pm[5]*_res[1] + _pm[9]*_res[2] + _pm[13];
+        _res2[2] = _pm[2] * _res[0] + _pm[6]*_res[1] + _pm[10]*_res[2] + _pm[14];
+        // See if z is still useful.
+        if (_res2[2] < _clipbox.cornerz(0) || _res2[2] > _clipbox.cornerz(7))
+            continue;
+        // Perform perspective scaling.
+        _res2[0] = _clipbox.cornerx(0)+(1+(_res2[0]/_res2[2]))*_clipbox.cornerx(7)/2;
+        _res2[1] = _clipbox.cornery(0)+(1+(_res2[1]/_res2[2]))*_clipbox.cornery(7)/2;
+		
+        // Find bounding box.
+        if (xmin > _res2[0]) xmin = _res2[0];
+        if (xmax < _res2[0]) xmax = _res2[0];
+        if (ymin > _res2[1]) ymin = _res2[1];
+        if (ymax < _res2[1]) ymax = _res2[1];
+        if (zmin > _res2[2]) zmin = _res2[2];
+        if (zmax < _res2[2]) zmax = _res2[2];
+	}
+
+    // If the bounding box does not overlap the view volume clip.
+	if (xmax < _clipbox.cornerx(0) || xmin > _clipbox.cornerx(7) ||
+		ymax < _clipbox.cornery(0) || ymin > _clipbox.cornery(7) ||
+		zmax < _clipbox.cornerz(0) || zmin > _clipbox.cornerz(7))
+	{
+        // Indicate that this box is clipped.
+        return false;
+	}
+	return true;
+}
+
+// Convert the world coordinates to camera coordinates.
+// Don't apply perspective scaling.
+// Return true if point is visible from camera.
+void ddgContext::transform( ddgVector3 vin, ddgVector3 *vout )
+{
+    // Convert the world coordinates to camera coordinates.
+    // Perform matrix multiplication.
+    vout->v[0] = _mm[0]*vin[0]+_mm[4]*vin[1]+_mm[8]*vin[2]+_mm[12];
+    vout->v[1] = _mm[1]*vin[0]+_mm[5]*vin[1]+_mm[9]*vin[2]+_mm[13];
+    vout->v[2] = _mm[2]*vin[0]+_mm[6]*vin[1]+_mm[10]*vin[2]+_mm[14];
+}
+
+// Test camera space coordinate agains frustrum.
+bool ddgContext::visible( ddgVector3 vin )
+{
+	// Test against near, and far plane and test viewing
+	// frustrum.
+	vin.v[2] *= -1;
+	if (_tanHalfFOV != 1.0)		// Not 90 degree case
+		vin.multiply(1.0/_tanHalfFOV);
+
+	// Test against near, and far plane and test viewing frustrum.
+	if (vin.v[2] < _clipbox.cornerz(0)
+		|| vin.v[2] > _clipbox.cornerz(7)
+		|| vin.v[2] < fabs(_tanHalfFOV * vin.v[0])
+		|| vin.v[2] < fabs(_tanHalfFOV * vin.v[1])
+		)
+		return false;
+	else
+		return true;
+}
+
+void ddgContext::itransformation( ddgMatrix4 *matinv)
+{
+	//invert matrix
+	matinv->m[0].v[0] = _mm(0,0);
+	matinv->m[1].v[1] = _mm(1,1);
+	matinv->m[2].v[2] = _mm(2,2);
+	matinv->m[0].v[1] = _mm(1,0);
+	matinv->m[0].v[2] = _mm(2,0);
+	matinv->m[1].v[2] = _mm(2,1);
+	matinv->m[1].v[0] = _mm(0,1);
+	matinv->m[2].v[0] = _mm(0,2);
+	matinv->m[2].v[1] = _mm(1,2);
+	matinv->m[3].v[0] = matinv->m[3].v[1] = matinv->m[3].v[2] = 0;
+	matinv->m[0].v[3] = matinv->m[1].v[3] = matinv->m[2].v[3] = 0;
+	matinv->m[3].v[3] = 1;
+
+}
+// Extract 6 clipping planes in world space coordinates from the current view.
+void ddgContext::extractPlanes(ddgPlane planes[6])
+{
+	ddgVector4 tmpVec;
+	ddgMatrix4 comboMat;
+
+	comboMat = _pm * _mm;
+	comboMat.transpose();
+	// Left
+	tmpVec = comboMat.m[3] - comboMat.m[0];
+	planes[0].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	// Right
+	tmpVec = comboMat.m[3] + comboMat.m[0];
+	planes[1].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	// Bottom
+	tmpVec = comboMat.m[3] - comboMat.m[1];
+	planes[2].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	// Top
+	tmpVec = comboMat.m[3] + comboMat.m[1];
+	planes[3].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	// Near
+	tmpVec = comboMat.m[3] - comboMat.m[2];
+	planes[4].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	// Far
+	tmpVec = comboMat.m[3] + comboMat.m[2];
+	planes[5].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+}
+
+//
+// Calculate the approximate screen space distance between to points.
+// Assumes normal is a unit vector.
+// Assumes p1 and p2 have the same normal.
+// Returns   true if estimated screen space distance is larger than tolerance.
+
+bool ddgContext::ssdistance( ddgVector3 *p1, ddgVector3 *p2, ddgVector3 *normal, bool  )
+{
+	float _kk = 1.0;  // scale factor.
+    ddgVector3 v = (*p1) + (*p2);
+    v.divide(2.0);          // Middle point between p1 and p2.
+    ddgVector3 dv(v- *(_control->position()));		// Translate to camera space.
+
+    float ds = dv.sizesq();	// Squared size of middle point.
+    float dd = ds - sq(dv.dot(normal)); // Angular difference.
+    return (dd < (_kk*sq(ds)));
+}
+
+float ddgContext::ssdistance2( ddgVector3 *p, ddgVector3 *d)
+{
+	ddgVector3 csp1, csp2;
+	/*
+	transform( *p, csp1);
+	transform( *p + *d, csp2);
+	// Check for boundary case.
+    if (csp1[2] < clipbox.cornerz(0) || (csp2[2] < clipbox.cornerz(0)))
+		return MAXFLOAT;
+	// Map to screen coords.
+	Vector3 cspp1(csp1), cspp2(csp2);
+	cspp1.divide(cspp1.v[2]); cspp1.v[2] = 0;
+	cspp2.divide(cspp2.v[2]); cspp2.v[2] = 0;
+	Vector3 diff = cspp1 - cspp2;
+	*/
+	transform(*p - *d, &csp1);
+	transform(*p + *d, &csp2);
+	csp1.v[2] = 0; csp2.v[2] = 0;
+	ddgVector3 diff = csp1 - csp2;
+	float l = diff.size();
+	return l;
+}
