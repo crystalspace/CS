@@ -5,7 +5,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated October 13, 2001}
+@emph{Last updated December 11, 2001}
 
 These instructions are for building Crystal Space with MinGW---a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
@@ -19,12 +19,12 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MinGW package @file{cs_mingw_0.90.exe} from the Mingw32 support
+Crystal Space MinGW package @file{cs_mingw_0.92.exe} from the Mingw32 support
 directory at Linux Games.  This package contains all the recent MinGW package
 releases (i.e. all the files necessary to compile Crystal Space successfully).
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.90.exe}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.92.exe}
 
 @item
 @sc{nasm} (Netwide Assembler) for Windows @file{nasm-0.98e-bin-w32.zip}
