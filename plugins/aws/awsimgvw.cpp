@@ -10,10 +10,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsImageView)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsImageView:: signalClicked = 0x1;
 const int awsImageView:: signalMouseDown = 0x2;
 const int awsImageView:: signalMouseUp = 0x3;
@@ -34,7 +30,6 @@ awsImageView::awsImageView () :
   frame_style(0),
   alpha_level(92)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsImageView::~awsImageView ()
@@ -162,15 +157,11 @@ bool awsImageView::OnGainFocus ()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsImageViewFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
 
 awsImageViewFactory::awsImageViewFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Image View");
   RegisterConstant ("ivfsBump", awsImageView::fsBump);
   RegisterConstant ("ivfsSimple", awsImageView::fsSimple);

@@ -11,10 +11,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsBarChart)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsBarChart:: fsBump = 0x0;
 const int awsBarChart:: fsSimple = 0x1;
 const int awsBarChart:: fsRaised = 0x2;
@@ -58,7 +54,6 @@ awsBarChart::awsBarChart () :
   max_items(0),
   bar_color(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsBarChart::~awsBarChart ()
@@ -540,15 +535,10 @@ awsBarChart::Pop(bool normal)
 
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsBarChartFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsBarChartFactory::awsBarChartFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Bar Chart");
   RegisterConstant ("bcsBump", awsBarChart::fsBump);
   RegisterConstant ("bcsSimple", awsBarChart::fsSimple);

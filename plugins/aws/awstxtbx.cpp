@@ -10,10 +10,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsTextBox)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsTextBox:: fsNormal = 0x0;
 const int awsTextBox:: fsBitmap = 0x1;
 const int awsTextBox:: signalChanged = 0x1;
@@ -47,7 +43,6 @@ awsTextBox::awsTextBox () :
   blink_timer(NULL),
   blink(true)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsTextBox::~awsTextBox ()
@@ -493,14 +488,9 @@ bool awsTextBox::OnGainFocus ()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsTextBoxFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsTextBoxFactory::awsTextBoxFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Text Box");
   RegisterConstant ("tbfsNormal", awsTextBox::fsNormal);
   RegisterConstant ("tbfsBitmap", awsTextBox::fsBitmap);

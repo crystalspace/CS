@@ -92,8 +92,6 @@ class awsNotebookButtonFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
-
   /// Calls register to register the component that it builds with the window manager
   awsNotebookButtonFactory (iAws *wmgr);
 
@@ -285,7 +283,6 @@ class awsNotebookPageFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
   awsNotebookPageFactory (iAws *wmgr);
@@ -371,8 +368,6 @@ class awsNotebookFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
-
   /// Calls register to register the component that it builds with the window manager
   awsNotebookFactory (iAws *wmgr);
 

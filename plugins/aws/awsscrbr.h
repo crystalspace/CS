@@ -139,7 +139,6 @@ public:
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();
 public:
-  SCF_DECLARE_IBASE;
 
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
@@ -185,7 +184,6 @@ class awsScrollBarFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
   awsScrollBarFactory (iAws *wmgr);
@@ -216,7 +214,6 @@ protected:
   /**************** signal handlers ************************/
   static void TickTock (void *sk, iAwsSource *);
 public:
-  SCF_DECLARE_IBASE_EXT (awsCmdButton);
 
   awsSliderButton ();
   virtual ~awsSliderButton ();
@@ -247,8 +244,6 @@ class awsSliderButtonFactory :
   public awsCmdButtonFactory
 {
 public:
-  SCF_DECLARE_IBASE_EXT (awsCmdButtonFactory);
-
   // Calls register to register the component that it builds with the window manager
   awsSliderButtonFactory (iAws *wmgr);
 

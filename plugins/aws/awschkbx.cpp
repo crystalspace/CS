@@ -9,10 +9,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsCheckBox)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsCheckBox:: alignLeft = 0x0;
 const int awsCheckBox:: alignRight = 0x1;
 const int awsCheckBox:: alignCenter = 0x2;
@@ -28,7 +24,6 @@ awsCheckBox::awsCheckBox () :
   alignment(0),
   caption(NULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   tex[0] = tex[1] = tex[2] = tex[3] = NULL;
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
@@ -299,14 +294,9 @@ bool awsCheckBox::OnGainFocus ()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsCheckBoxFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsCheckBoxFactory::awsCheckBoxFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Check Box");
 
   RegisterConstant ("cbAlignLeft", awsCheckBox::alignLeft);

@@ -35,7 +35,6 @@ awsNotebook::awsNotebook () :
   bb(NULL),
   alpha_level(92)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
 
@@ -181,15 +180,10 @@ void awsNotebook::AddChild (iAwsComponent *child, bool has_layout)
   bb->Add (child);
 }
 
-SCF_IMPLEMENT_IBASE(awsNotebookFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsNotebookFactory::awsNotebookFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
 
   Register ("Notebook");
   RegisterConstant ("nbTop", awsNotebook::nbTop);
@@ -220,7 +214,6 @@ awsNotebookPage::awsNotebookPage ():
   icon (NULL),
   iconalign(0)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
 
@@ -325,16 +318,10 @@ char *awsNotebookPage::Type ()
   return "Notebook Page";
 }
 
-SCF_IMPLEMENT_IBASE(awsNotebookPageFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsNotebookPageFactory::awsNotebookPageFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-
   Register ("Notebook Page");
 
   RegisterConstant ("nbiaLeft", awsCmdButton::iconLeft);
@@ -365,7 +352,6 @@ awsNotebookButton::awsNotebookButton ():
   icon_align(0),
   alpha_level(92)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
   tex[0]=tex[1]=tex[2]=NULL;
 }
 
@@ -649,14 +635,9 @@ csRect awsNotebookButton::getMinimumSize ()
   return csRect (0, 0, tw + 4, th + 4);
 }
 
-SCF_IMPLEMENT_IBASE(awsNotebookButtonFactory)
-  SCF_IMPLEMENTS_INTERFACE (iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsNotebookButtonFactory::awsNotebookButtonFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Notebook Button");
 
   RegisterConstant ("signalActivateTab", awsNotebookButton::signalActivateTab);
@@ -691,7 +672,6 @@ awsNotebookButtonBar::awsNotebookButtonBar ():
   is_top(true),
   sink(NULL)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiAwsClientRect);
 }
 

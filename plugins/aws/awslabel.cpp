@@ -7,10 +7,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsLabel)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsLabel:: signalClicked = 0x1;
 const int awsLabel:: alignLeft = 0x0;
 const int awsLabel:: alignRight = 0x1;
@@ -224,14 +220,10 @@ bool awsLabel::OnGainFocus ()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsLabelFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
 
 awsLabelFactory::awsLabelFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Label");
   RegisterConstant ("signalLabelClicked", awsLabel::signalClicked);
 

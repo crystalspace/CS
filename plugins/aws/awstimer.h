@@ -49,7 +49,7 @@ protected:
 public:
   static const int signalTick;
 
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(awsSource);
   awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp);
   virtual ~awsTimer ();
 

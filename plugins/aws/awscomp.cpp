@@ -24,6 +24,7 @@ awsComponent::awsComponent () :
   flags(0),
   signalsrc(this)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsComponent::~awsComponent ()
@@ -503,8 +504,14 @@ void awsComponent::OnResized ()
   * don't.  In any case, a factory is remarkably simple to build.  All you need to do is to inherit from
   * awsComponentFactory and call register with the window manager and the named type of the component.  That's it.
   */
+
+SCF_IMPLEMENT_IBASE (awsComponentFactory)
+  SCF_IMPLEMENTS_INTERFACE (iAwsComponentFactory)
+SCF_IMPLEMENT_IBASE_END
+
 awsComponentFactory::awsComponentFactory (iAws *_wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   // This is where you call register, only you must do it in the derived factory.  Like this:
 
   // Register(wmgr, "Radio Button");
@@ -514,6 +521,11 @@ awsComponentFactory::awsComponentFactory (iAws *_wmgr)
 awsComponentFactory::~awsComponentFactory ()
 {
   // Do nothing.
+}
+
+iAwsComponent *awsComponentFactory::Create ()
+{
+  return NULL;
 }
 
 void awsComponentFactory::Register (char *name)

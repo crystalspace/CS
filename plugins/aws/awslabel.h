@@ -74,7 +74,6 @@ public:
 
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
@@ -114,7 +113,6 @@ class awsLabelFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
   awsLabelFactory (iAws *wmgr);

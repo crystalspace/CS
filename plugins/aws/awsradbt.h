@@ -81,7 +81,6 @@ public:
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();
 public:
-  SCF_DECLARE_IBASE;
 
   /// Overridden to listen to GroupOff messages.
   virtual bool HandleEvent (iEvent &Event);
@@ -124,7 +123,6 @@ class awsRadButtonFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
   awsRadButtonFactory (iAws *wmgr);

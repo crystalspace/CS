@@ -79,7 +79,6 @@ public:
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();
 public:
-  SCF_DECLARE_IBASE;
 
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
@@ -119,7 +118,6 @@ class awsImageViewFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
   awsImageViewFactory (iAws *wmgr);

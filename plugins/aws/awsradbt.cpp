@@ -9,10 +9,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsRadButton)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsRadButton:: alignLeft = 0x0;
 const int awsRadButton:: alignRight = 0x1;
 const int awsRadButton:: alignCenter = 0x2;
@@ -28,7 +24,6 @@ awsRadButton::awsRadButton () :
   alignment(0),
   caption(NULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   tex[0] = tex[1] = tex[2] = tex[3] = NULL;
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
@@ -336,15 +331,11 @@ bool awsRadButton::OnGainFocus ()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsRadButtonFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
 
 awsRadButtonFactory::awsRadButtonFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Radio Button");
 
   RegisterConstant ("rbAlignLeft", awsRadButton::alignLeft);

@@ -11,10 +11,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsStatusBar)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsStatusBar:: fsBump = 0x0;
 const int awsStatusBar:: fsSimple = 0x1;
 const int awsStatusBar:: fsRaised = 0x2;
@@ -36,7 +32,6 @@ awsStatusBar::awsStatusBar () :
   bar_color(0),
   status(0.0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsStatusBar::~awsStatusBar ()
@@ -242,15 +237,10 @@ csRect awsStatusBar::getInsets()
 
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsStatusBarFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsStatusBarFactory::awsStatusBarFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Status Bar");
   RegisterConstant ("sbBump", awsStatusBar::fsBump);
   RegisterConstant ("sbSimple", awsStatusBar::fsSimple);

@@ -79,7 +79,6 @@ public:
   virtual csRect getInsets();
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
@@ -119,7 +118,6 @@ class awsGroupFrameFactory :
   public awsComponentFactory
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
   awsGroupFrameFactory (iAws *wmgr);

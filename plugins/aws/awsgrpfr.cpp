@@ -10,10 +10,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsGroupFrame)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsGroupFrame:: fsBump = 0x0;
 const int awsGroupFrame:: fsSimple = 0x1;
 const int awsGroupFrame:: fsRaised = 0x2;
@@ -29,7 +25,6 @@ awsGroupFrame::awsGroupFrame () :
   bkg(NULL),
   caption(NULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsGroupFrame::~awsGroupFrame ()
@@ -213,15 +208,11 @@ csRect awsGroupFrame::getInsets()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsGroupFrameFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
 
 awsGroupFrameFactory::awsGroupFrameFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Group Frame");
   RegisterConstant ("gfsBump", awsGroupFrame::fsBump);
   RegisterConstant ("gfsSimple", awsGroupFrame::fsSimple);

@@ -12,10 +12,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsScrollBar)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsScrollBar:: signalChanged = 0x1;
 const int awsScrollBar:: sboVertical = 0x0;
 const int awsScrollBar:: sboHorizontal = 0x1;
@@ -43,7 +39,6 @@ awsScrollBar::awsScrollBar () :
   value_delta(0.1),
   value_page_delta(0.25)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   SetFlag (AWSF_CMP_ALWAYSERASE);
   captured = false;
 }
@@ -654,15 +649,11 @@ void awsScrollBar::OnResized ()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsScrollBarFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
 
 awsScrollBarFactory::awsScrollBarFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Scroll Bar");
   RegisterConstant ("sboVertical", awsScrollBar::sboVertical);
   RegisterConstant ("sboHorizontal", awsScrollBar::sboHorizontal);
@@ -681,8 +672,6 @@ iAwsComponent *awsScrollBarFactory::Create ()
 }
 
 /************************************* Slider Button ****************/
-SCF_IMPLEMENT_IBASE_EXT(awsSliderButton)
-SCF_IMPLEMENT_IBASE_EXT_END
 
 awsSliderButton::awsSliderButton () :
   timer(NULL),
@@ -691,7 +680,6 @@ awsSliderButton::awsSliderButton () :
   sink(NULL),
   tick_slot(NULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsSliderButton::~awsSliderButton ()
@@ -832,14 +820,11 @@ bool awsSliderButton::OnMouseDoubleClick (int, int, int)
 }
 
 /************************************* Slider Button Factory ****************/
-SCF_IMPLEMENT_IBASE_EXT(awsSliderButtonFactory)
-SCF_IMPLEMENT_IBASE_EXT_END
 
 awsSliderButtonFactory::awsSliderButtonFactory (
   iAws *wmgr) :
     awsCmdButtonFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Slider Button");
 }
 

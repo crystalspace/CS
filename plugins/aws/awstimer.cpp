@@ -22,12 +22,19 @@
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 
+SCF_IMPLEMENT_IBASE_EXT(awsTimer)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (awsTimer::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 const int awsTimer:: signalTick = 0x1;
 
 awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) :
   awsSource(comp)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   this->object_reg = object_reg;
   ehSetup = false;
@@ -118,12 +125,4 @@ bool awsTimer::IsRunning ()
   return !stopped;
 }
 
-SCF_IMPLEMENT_IBASE(awsTimer)
-  SCF_IMPLEMENTS_INTERFACE(iAwsSource)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (awsTimer::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 

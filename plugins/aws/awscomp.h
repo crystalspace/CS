@@ -28,8 +28,6 @@
 
 class awsCanvas;
 
-SCF_VERSION(awsComponent, 0, 0, 1);
-
 /**************************************************************************************************************************
 *   The general idea for a component's initialization stage is like this:                                                 *
 *       1. construction - any internal structures should be created and intialized.                                       *
@@ -264,6 +262,8 @@ class awsComponentFactory :
 {
   iAws *wmgr;
 public:
+  SCF_DECLARE_IBASE;
+
   /// Calls register to register the component that it builds with the window manager
   awsComponentFactory (iAws *_wmgr);
 
@@ -274,7 +274,7 @@ public:
   iAws *WindowManager ()  { return wmgr; }
 
   /// Returns a newly created component of the type this factory handles.
-  virtual iAwsComponent *Create () = 0;
+  virtual iAwsComponent *Create ();
 
   /// Registers this factory with the window manager
   void Register (char *type);

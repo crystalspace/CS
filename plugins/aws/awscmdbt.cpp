@@ -9,10 +9,6 @@
 
 #include <stdio.h>
 
-SCF_IMPLEMENT_IBASE(awsCmdButton)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 const int awsCmdButton:: fsNormal = 0x0;
 const int awsCmdButton:: fsToolbar = 0x1;
 const int awsCmdButton:: fsBitmap = 0x2;
@@ -33,7 +29,6 @@ awsCmdButton::awsCmdButton () :
   icon_align(0),
   caption(NULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   tex[0] = tex[1] = tex[2] = NULL;
 }
 
@@ -689,15 +684,10 @@ bool awsCmdButton::OnGainFocus ()
 }
 
 /************************************* Command Button Factory ****************/
-SCF_IMPLEMENT_IBASE(awsCmdButtonFactory)
-  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
-SCF_IMPLEMENT_IBASE_END
-
 awsCmdButtonFactory::awsCmdButtonFactory (
   iAws *wmgr) :
     awsComponentFactory(wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   Register ("Command Button");
   RegisterConstant ("bfsNormal", awsCmdButton::fsNormal);
   RegisterConstant ("bfsToolbar", awsCmdButton::fsToolbar);
