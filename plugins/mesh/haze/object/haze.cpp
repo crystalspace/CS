@@ -557,8 +557,7 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 
-  csReversibleTransform tr_o2c = camera->GetTransform ()
-        * movable->GetFullTransform ().GetInverse ();
+  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
   float fov = camera->GetFOV ();
   float shiftx = camera->GetShiftX ();
   float shifty = camera->GetShiftY ();
@@ -774,8 +773,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   float shx = camera->GetShiftX ();
   float shy = camera->GetShiftY ();
   /// obj to camera space
-  csReversibleTransform tr_o2c = camera->GetTransform ()
-        * movable->GetFullTransform ().GetInverse ();
+  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
 
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);

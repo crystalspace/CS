@@ -599,8 +599,7 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
   // sort
   int i;
-  csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform()
-    * trans.GetInverse(); // object to camera space
+  csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform() / trans; // object to camera space
   cpa->SetLength(number);
   for (i = 0 ; i < number ; i++)
   {

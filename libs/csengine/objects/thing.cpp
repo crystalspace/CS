@@ -107,6 +107,7 @@ csThing::csThing (iBase *parent) :
   DG_TYPE (this, "csThing");
 
   scfiPolygonMesh.SetThing (this);
+  scfiPolygonMeshLOD.SetThing (this);
 
   last_thing_id++;
   thing_id = last_thing_id;
@@ -929,7 +930,7 @@ void csThing::RemovePolygon (int idx)
 
 iPolygonMesh* csThing::GetWriteObject ()
 {
-  return NULL;
+  return &scfiPolygonMeshLOD;
 }
 
 void csThing::RemovePolygons ()
@@ -1725,8 +1726,7 @@ void csThing::DrawPolygonArrayDPM (
   PreparePolygonBuffer ();
 
   iCamera *icam = rview->GetCamera ();
-  csReversibleTransform tr_o2c = icam->GetTransform () *
-    movable->GetFullTransform ().GetInverse ();
+  csReversibleTransform tr_o2c = icam->GetTransform () / movable->GetFullTransform ();
 
   G3DPolygonMesh mesh;
   csBox2 bbox;
@@ -2305,6 +2305,17 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
 
 //-------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE(csThing::PolyMeshLOD)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
+csThing::PolyMeshLOD::PolyMeshLOD ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
+
+//-------------------------------------------------------------------------
+
 void PolyMeshHelper::Setup ()
 {
   if (polygons || alloc_vertices)
@@ -2698,8 +2709,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   sphere.SetRadius (max_obj_radius);
   if (can_move)
   {
-    csReversibleTransform tr_o2c = camtrans *
-      movable->GetFullTransform ().GetInverse ();
+    csReversibleTransform tr_o2c = camtrans / movable->GetFullTransform ();
     bool rc = rview->TestBSphere (tr_o2c, sphere);
     return rc;
   }

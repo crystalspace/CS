@@ -204,8 +204,7 @@ bool csRapidCollider::Collide (csRapidCollider &otherCollider,
   csVector3 T1 (0, 0, 0);
   if (pTransform1 && pTransform2)
   {
-    csReversibleTransform trans1 = *pTransform1;
-    trans1 *= pTransform2->GetInverse ();
+    csReversibleTransform trans1 = (*pTransform1) / *pTransform2;
     T1 = trans1.GetO2TTranslation ();
     R1 = trans1.GetO2T ();
   }

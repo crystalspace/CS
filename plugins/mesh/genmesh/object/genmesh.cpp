@@ -178,8 +178,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ()
-    	* movable->GetFullTransform ().GetInverse ();
+  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
 
   csVector3 radius;
   csSphere sphere;

@@ -248,8 +248,7 @@ bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
    // Transform the particle's world bounding box (bbox)
    // from world to camera coordinates, including the movable
   csBox3 particle_cbox;
-  csReversibleTransform trans = camera->GetTransform () *
-    	movable->GetFullTransform ().GetInverse ();
+  csReversibleTransform trans = camera->GetTransform () / movable->GetFullTransform ();
   particle_cbox.AddBoundingVertex (trans * bbox.GetCorner (0));
   int i;
   for (i=1; i<BOX_3D_CORNERS; i++)

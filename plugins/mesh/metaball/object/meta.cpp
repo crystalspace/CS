@@ -216,8 +216,7 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 
   iGraphics3D *g3d = rview->GetGraphics3D();
   iCamera *cam = rview->GetCamera();
-  csReversibleTransform tr_o2c = cam->GetTransform() *
-	  movable->GetFullTransform().GetInverse();
+  csReversibleTransform tr_o2c = cam->GetTransform() / movable->GetFullTransform();
   float fov = cam->GetFOV();
   float shftx = cam->GetShiftX();
   float shfty = cam->GetShiftY();

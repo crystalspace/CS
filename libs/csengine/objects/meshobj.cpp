@@ -485,8 +485,7 @@ float csMeshWrapper::GetScreenBoundingBox (
   csBox3 &cbox)
 {
   csVector2 oneCorner;
-  csReversibleTransform tr_o2c = camera->GetTransform () *
-    movable.GetFullTransform ().GetInverse ();
+  csReversibleTransform tr_o2c = camera->GetTransform () / movable.GetFullTransform ();
   GetTransformedBoundingBox (tr_o2c, cbox);
 
   // if the entire bounding box is behind the camera, we're done

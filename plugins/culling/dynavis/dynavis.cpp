@@ -25,6 +25,7 @@
 #include "csutil/scfstr.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
+#include "igeom/polymesh.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -35,8 +36,6 @@
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
-#include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
 #include "dynavis.h"
@@ -323,17 +322,16 @@ end:
   return vis;
 }
 
-void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
-	iMovable* movable, iMeshWrapper* mesh, iThingState* thing)
+void csDynaVis::UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj)
 {
-  // @@@ Temporary routine. We should use another interface instead
-  // of iThingState.
-  const csVector3* verts = thing->GetVertices ();
-  int vertex_count = thing->GetVertexCount ();
-  int poly_count = thing->GetPolygonCount ();
+  iMovable* movable = visobj->GetMovable ();
+  iPolygonMesh* polymesh = visobj->GetWriteObject ();
 
-  csReversibleTransform trans = camera->GetTransform ()
-    	* movable->GetFullTransform ().GetInverse ();
+  const csVector3* verts = polymesh->GetVertices ();
+  int vertex_count = polymesh->GetVertexCount ();
+  int poly_count = polymesh->GetPolygonCount ();
+
+  csReversibleTransform trans = camera->GetTransform () / movable->GetFullTransform ();
   float fov = camera->GetFOV ();
   float sx = camera->GetShiftX ();
   float sy = camera->GetShiftY ();
@@ -353,7 +351,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 
   if (do_state_dump)
   {
-    iObject* iobj = SCF_QUERY_INTERFACE (mesh, iObject);
+    iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
     if (iobj)
     {
       printf ("CovIns of object %s\n", iobj->GetName () ? iobj->GetName () :
@@ -363,12 +361,12 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   }
 
   // Then insert all polygons.
+  csMeshedPolygon* poly = polymesh->GetPolygons ();
   csVector2 verts2d[64];
-  for (i = 0 ; i < poly_count ; i++)
+  for (i = 0 ; i < poly_count ; i++, poly++)
   {
-    iPolygon3D* poly = thing->GetPolygon (i);
-    int num_verts = poly->GetVertexCount ();
-    int* vi = poly->GetVertexIndices ();
+    int num_verts = poly->num_vertices;
+    int* vi = poly->vertices;
     float max_depth = -1.0;
     int j;
     for (j = 0 ; j < num_verts ; j++)
@@ -450,23 +448,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
     // Object is visible. Let it update the coverage buffer if we
     // are using do_cull_coverage.
-    if (do_cull_coverage)
+    if (do_cull_coverage && obj->visobj->GetWriteObject ())
     {
-      // @@@ In future we need to define an interface which specifies
-      // the geometry of the occluder.
-      iMeshWrapper* mesh = SCF_QUERY_INTERFACE (obj->visobj, iMeshWrapper);
-      if (mesh)
-      {
-	iThingState* thing = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-		iThingState);
-	if (thing)
-	{
-	  UpdateCoverageBuffer (data->rview->GetCamera (),
-	  	mesh->GetMovable (), mesh, thing);
-	  thing->DecRef ();
-	}
-        mesh->DecRef ();
-      }
+      UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj);
     }
 
     obj->visobj->MarkVisible ();

@@ -30,7 +30,7 @@
 class csKDTree;
 class csKDTreeChild;
 class csCoverageBuffer;
-struct iThingState;
+struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
 
@@ -105,9 +105,8 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
-  // Given an occluder, update it in the coverage buffer. @@@ iThingState!
-  void UpdateCoverageBuffer (iCamera* camera, iMovable* movable,
-  	iMeshWrapper* mesh, iThingState* thing);
+  // Given an occluder, update it in the coverage buffer.
+  void UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj);
 
 public:
   SCF_DECLARE_IBASE;

@@ -75,8 +75,7 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   G3D->BeginDraw (CSDRAW_2DGRAPHICS);
 
   csTransform tr_w2c = rview->GetCamera ()->GetTransform ();
-  csReversibleTransform tr_o2c = tr_w2c
-    	* shadow_movable->GetFullTransform ().GetInverse ();
+  csReversibleTransform tr_o2c = tr_w2c / shadow_movable->GetFullTransform ();
   float fov = G3D->GetPerspectiveAspect ();
   if (do_bbox)
   {

@@ -1145,6 +1145,15 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
   } scfiPolygonMesh;
 
+  //-------------------- Lower detail iPolygonMesh implementation ---------------
+  struct PolyMeshLOD : public PolyMeshHelper
+  {
+    PolyMeshLOD ();
+    // @@@ Not embedded because we can't have two iPolygonMesh implementations
+    // in csThing.
+    SCF_DECLARE_IBASE;
+  } scfiPolygonMeshLOD;
+
   //-------------------- iVisibilityCuller interface implementation ----------
   struct VisCull : public iVisibilityCuller
   {

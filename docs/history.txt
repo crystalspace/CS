@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+20-May-2002
+	- csThing now implements GetWriteObject(). Currently it will
+	  just return the full detail version of the thing. A lower
+	  detail version is planned.
+	- Dynavis no longer uses iThingState. Instead it uses the
+	  write object which is more general.
+	- Removed the construct trans1 * trans2.GetInverse() with
+	  trans1 / trans2 at various places in the engine and other
+	  plugins. This is a considerable implementation as the
+	  latter is a lot faster.
 19-May-2002
 	- Also added GetWriteObject() function to iMeshObject. The
 	  same function in iVisibilityObject will pass control to the
