@@ -22,7 +22,7 @@
 #include "csutil/cfgfile.h"
 
 /**
- * This is an implementation of iConfigFileNew that stores an ID string
+ * This is an implementation of iConfigFile that stores an ID string
  * at construction, which it then prepends to all config keys on read/write
  * operations.
  */

@@ -2657,7 +2657,7 @@ const char* Blocks::KeyName (const KeyMapping& map)
 
 void Blocks::ReadConfig ()
 {
-  iConfigFileNew *keys = System->GetConfig();
+  iConfigFile *keys = System->GetConfig();
   NamedKey (keys->GetStr ("Blocks.Keys.Up", "up"), key_up);
   NamedKey (keys->GetStr ("Blocks.Keys.Down", "down"), key_down);
   NamedKey (keys->GetStr ("Blocks.Keys.Left", "left"), key_left);
@@ -2702,7 +2702,7 @@ void Blocks::ReadConfig ()
 
 void Blocks::WriteConfig ()
 {
-  iConfigFileNew *keys = System->GetConfig();
+  iConfigFile *keys = System->GetConfig();
   keys->SetStr ("Blocks.Keys.Up", KeyName (key_up));
   keys->SetStr ("Blocks.Keys.Down", KeyName (key_down));
   keys->SetStr ("Blocks.Keys.Left", KeyName (key_left));

@@ -424,7 +424,7 @@ struct iFactory : public iBase
 //----------------------------------------------- Client-side functions -----//
 
 // We'll use iConfigFile to read `scf.cfg'.
-struct iConfigFileNew;
+struct iConfigFile;
 
 /**
  * Handy macro to create an instance of a shared class.
@@ -455,7 +455,7 @@ struct iConfigFileNew;
  * (possibly providing a different iConfig object each time). If you
  * don't specify this parameter, this argument is ignored.
  */
-extern void scfInitialize (iConfigFileNew *iConfig = 0);
+extern void scfInitialize (iConfigFile *iConfig = 0);
 
 /**
  * This function should be called to finish working with SCF.

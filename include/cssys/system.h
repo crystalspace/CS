@@ -396,7 +396,7 @@ protected:
    * CS/data/config/user.cfg. This function is called at least twice, with
    * different ID strings. This *must* be supported!
    */
-  virtual iConfigFileNew *OpenUserConfig(const char *ApplicationID);
+  virtual iConfigFile *OpenUserConfig(const char *ApplicationID);
 
 public:
   DECLARE_IBASE;
@@ -447,15 +447,15 @@ public:
    * The returned config file is the newly loaded file. You must keep the
    * pointer to call RemoveConfig() later.
    */
-  virtual iConfigFileNew *AddConfig(const char *iFileName,
+  virtual iConfigFile *AddConfig(const char *iFileName,
     bool iVFS = true, int Priority = ConfigPriorityPlugIn);
   /// Remove a config file that was added with AddConfig()
-  virtual void RemoveConfig(iConfigFileNew *ConfigFile);
+  virtual void RemoveConfig(iConfigFile *ConfigFile);
   /**
    * Create a new configuration file object which resides on VFS without
    * adding it to the config manager.
    */
-  virtual iConfigFileNew *CreateSeparateConfig (const char *iFileName, bool iVFS = true);
+  virtual iConfigFile *CreateSeparateConfig (const char *iFileName, bool iVFS = true);
   /// Save system configuration file if it was changed
   virtual bool SaveConfig ();
 

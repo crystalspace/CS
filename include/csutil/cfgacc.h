@@ -21,7 +21,7 @@
 
 #include "csutil/csvector.h"
 #include "isystem.h"
-struct iConfigFileNew;
+struct iConfigFile;
 
 /**
  * This is a simple convenience class that can be used to deal with the
@@ -45,9 +45,9 @@ public:
   void AddConfig(iSystem *sys, const char *Filename,
     bool vfs = true, int Priority = iSystem::ConfigPriorityPlugIn);
   /// access to system configuration
-  iConfigFileNew *operator->();
+  iConfigFile *operator->();
   /// access to system configuration
-  operator iConfigFileNew* ();
+  operator iConfigFile* ();
 
 private:
   iSystem *System;

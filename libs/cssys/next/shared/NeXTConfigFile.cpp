@@ -17,19 +17,19 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "NeXTConfigFile.h"
 
 #define NCF_PROTO(RET,FUNC) RET NeXTConfigFile_##FUNC
 
 NCF_PROTO(char const*,lookup)(
     NeXTConfigHandle handle, char const* key, char const* fallback )
-    { return ((iConfigFileNew*)handle)->GetStr( key, fallback ); }
+    { return ((iConfigFile*)handle)->GetStr( key, fallback ); }
 NCF_PROTO(int,exists)( NeXTConfigHandle handle, char const* section )
-    { return ((iConfigFileNew*)handle)->SubsectionExists( section ); }
+    { return ((iConfigFile*)handle)->SubsectionExists( section ); }
 NCF_PROTO(NeXTConfigIterator,new_iterator)( NeXTConfigHandle handle,
     char const* section ) { return (NeXTConfigIterator)
-    ((iConfigFileNew*)handle)->Enumerate( section ); }
+    ((iConfigFile*)handle)->Enumerate( section ); }
 NCF_PROTO(void,dispose_iterator)( NeXTConfigIterator handle )
     { ((iConfigIterator*)handle)->DecRef(); }
 NCF_PROTO(int,iterator_next)( NeXTConfigIterator handle )

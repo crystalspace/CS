@@ -19,12 +19,12 @@
 #ifndef __CS_CFGFILE_H__
 #define __CS_CFGFILE_H__
 
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "csutil/csvector.h"
 class csConfigNode;
 class csConfigIterator;
 
-class csConfigFile : public iConfigFileNew
+class csConfigFile : public iConfigFile
 {
 public:
   DECLARE_IBASE;

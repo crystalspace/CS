@@ -2772,7 +2772,7 @@ bool csLoader::AppendMapFile (csEngine* engine, const char* file,
     return false;
   }
 
-  iConfigFileNew *cfg = new csConfigFile ("map.cfg", System->VFS);
+  iConfigFile *cfg = new csConfigFile ("map.cfg", System->VFS);
   if (cfg)
   {
     csLightMap::SetLightCellSize (cfg->GetInt ("Engine.Lighting.LightmapSize",

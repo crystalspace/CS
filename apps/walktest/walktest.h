@@ -45,7 +45,7 @@ class HugeRoom;
 struct iSoundData;
 struct iCollideSystem;
 struct iPerfStats;
-struct iConfigFileNew;
+struct iConfigFile;
 
 // Several map modes.
 #define MAP_OFF 0

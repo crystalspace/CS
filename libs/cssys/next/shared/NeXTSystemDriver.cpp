@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "cssys/next/NeXTSystemDriver.h"
 #include "NeXTDelegate.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "version.h"
 #include <stdarg.h>
 
@@ -76,7 +76,7 @@ bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
     event_outlet = CreateEventOutlet( &scfiEventPlug );
     if (superclass::Initialize( argc, argv, cfgfile ))
 	{
-	iConfigFileNew* next_config = CreateSeparateConfig("/config/next.cfg");
+	iConfigFile* next_config = CreateSeparateConfig("/config/next.cfg");
 	init_menu( next_config );
 	next_config->DecRef();
 	ok = true;
@@ -89,7 +89,7 @@ bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
 // init_menu
 //	Generate application menu based upon platform configuration.
 //-----------------------------------------------------------------------------
-void NeXTSystemDriver::init_menu( iConfigFileNew* next_config )
+void NeXTSystemDriver::init_menu( iConfigFile* next_config )
     {
     char const* style =
 	next_config->GetStr( "Platform." OS_NEXT_DESCRIPTION ".menu", 0);

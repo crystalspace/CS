@@ -1489,7 +1489,7 @@ void csEngine::NextFrame (cs_time current_time)
 void csEngine::ReadConfig ()
 {
   if (!System) return;
-  iConfigFileNew *Config = System->GetConfig ();
+  iConfigFile *Config = System->GetConfig ();
   csLightMap::SetLightCellSize (Config->GetInt ("Engine.Lighting.LightmapSize", 16));
 
   csLight::ambient_red = Config->GetInt ("Engine.Lighting.Ambient.Red", DEFAULT_LIGHT_LEVEL);

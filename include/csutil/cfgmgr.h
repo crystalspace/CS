@@ -40,36 +40,36 @@ public:
    * with Add(name, vfs), this reference is used instead.
    * </ul>
    */
-  csConfigManager(iConfigFileNew *DynamicDomain, bool Optimize);
+  csConfigManager(iConfigFile *DynamicDomain, bool Optimize);
   /// delete this config manager
   virtual ~csConfigManager();
 
   /// add a configuration domain
-  virtual void AddDomain(iConfigFileNew*, int priority);
+  virtual void AddDomain(iConfigFile*, int priority);
   /// add a configuration domain
-  virtual iConfigFileNew *AddDomain(char const* path, iVFS*, int priority);
+  virtual iConfigFile *AddDomain(char const* path, iVFS*, int priority);
   /// remove a configuration domain
-  virtual void RemoveDomain(iConfigFileNew*);
+  virtual void RemoveDomain(iConfigFile*);
   /// remove a configuration domain
   virtual void RemoveDomain(char const* path, iVFS*);
   /// return a pointer to a single config domain
-  virtual iConfigFileNew* LookupDomain(char const* path, iVFS*) const;
+  virtual iConfigFile* LookupDomain(char const* path, iVFS*) const;
   /// set the priority of a config domain
   virtual void SetDomainPriority(char const* path, iVFS*, int priority);
   /// set the priority of a config domain
-  virtual void SetDomainPriority(iConfigFileNew*, int priority);
+  virtual void SetDomainPriority(iConfigFile*, int priority);
   /// return the priority of a config domain
   virtual int GetDomainPriority(char const* path, iVFS*) const;
   /// return the priority of a config domain
-  virtual int GetDomainPriority(iConfigFileNew*) const;
+  virtual int GetDomainPriority(iConfigFile*) const;
 
   /**
    * Change the dynamic domain. The given config object must already be
    * registered with AddDomain(). Returns false if this is not the case.
    */
-  virtual bool SetDynamicDomain(iConfigFileNew*);
+  virtual bool SetDynamicDomain(iConfigFile*);
   /// return a pointer to the dynamic config domain
-  virtual iConfigFileNew *GetDynamicDomain() const;
+  virtual iConfigFile *GetDynamicDomain() const;
   /// set the priority of the dynamic config domain
   virtual void SetDynamicDomainPriority(int priority);
   /// return the priority of the dynamic config domain
@@ -191,7 +191,7 @@ private:
   // list of all iterators
   csVector Iterators;
 
-  csConfigDomain *FindConfig(iConfigFileNew *cfg) const;
+  csConfigDomain *FindConfig(iConfigFile *cfg) const;
   csConfigDomain *FindConfig(const char *name, iVFS *vfs) const;
   void ClearKeyAboveDynamic(const char *Key);
   void RemoveIterator(csConfigManagerIterator *it);

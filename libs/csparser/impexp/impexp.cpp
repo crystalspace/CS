@@ -40,7 +40,7 @@
 #include "csutil/csstring.h"
 #include "cssys/csendian.h"
 #include "ivfs.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -55,7 +55,7 @@ converter::~converter()
   delete frame_builder;
 }
 
-void converter::ProcessConfig (iConfigFileNew* config)
+void converter::ProcessConfig (iConfigFile* config)
 {
   if ( config->SubsectionExists ("Converter."))
   {

@@ -34,7 +34,7 @@ private:
     NeXTDelegateHandle controller;	// Application & window delegate.
     iEventOutlet* event_outlet;		// Shared event outlet.
 
-    void init_menu( iConfigFileNew* );
+    void init_menu( iConfigFile* );
     void timer_fired();
     bool continue_looping() const { return (!ExitLoop && continue_running()); }
     bool continue_running() const { return !Shutdown; }

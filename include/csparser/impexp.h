@@ -114,7 +114,7 @@ public:
 	  bool create_output_file = true, const char* output_filename = NULL,
           iVFS* vfs = NULL );
 
-        void ProcessConfig( iConfigFileNew* config );
+        void ProcessConfig( iConfigFile* config );
 	void set_reverse_normals( int yesno );
 
 	// set the current 'frame' of animation; the converter

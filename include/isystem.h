@@ -156,7 +156,7 @@ struct iEventOutlet;
 struct iEventPlug;
 struct iEventCord;
 struct iStrVector;
-struct iConfigFileNew;
+struct iConfigFile;
 struct iConfigManager;
 
 SCF_VERSION (iSystem, 4, 0, 1);
@@ -312,15 +312,15 @@ struct iSystem : public iBase
    * The returned config file is the newly loaded file. You must keep the
    * pointer to call RemoveConfig() later.
    */
-  virtual iConfigFileNew *AddConfig(const char *iFileName,
+  virtual iConfigFile *AddConfig(const char *iFileName,
     bool iVFS = true, int Priority = ConfigPriorityPlugIn) = 0;
   /// Remove a config file that was added with AddConfig()
-  virtual void RemoveConfig(iConfigFileNew *ConfigFile) = 0;
+  virtual void RemoveConfig(iConfigFile *ConfigFile) = 0;
   /**
    * Create a new configuration file object which resides on VFS without
    * adding it to the config manager.
    */
-  virtual iConfigFileNew *CreateSeparateConfig (const char *iFileName, bool iVFS = true) = 0;
+  virtual iConfigFile *CreateSeparateConfig (const char *iFileName, bool iVFS = true) = 0;
   /// Save system configuration file if it was changed
   virtual bool SaveConfig () = 0;
 

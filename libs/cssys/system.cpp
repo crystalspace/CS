@@ -386,7 +386,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // can be loaded. At the end, we make the user-and-application-specific
   // config file the dynamic one.
 
-  iConfigFileNew *cfg = new csConfigFile();
+  iConfigFile *cfg = new csConfigFile();
   Config = new csConfigManager(cfg, true);
   Config->SetDomainPriority(cfg, ConfigPriorityApplication);
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
@@ -728,7 +728,7 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
     Config->GetInt ("MouseDriver.DoubleClickDist", 2));
 }
 
-iConfigFileNew *csSystemDriver::OpenUserConfig(const char *ApplicationID)
+iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID)
 {
   // the default implementation does not make a difference between different
   // users. It always uses /config/user.cfg, with the application ID as prefix.
@@ -1132,17 +1132,17 @@ iConfigManager *csSystemDriver::GetConfig ()
   return Config;
 }
 
-iConfigFileNew *csSystemDriver::AddConfig(const char *iFileName, bool iVFS, int Priority)
+iConfigFile *csSystemDriver::AddConfig(const char *iFileName, bool iVFS, int Priority)
 {
   return Config->AddDomain(iFileName, iVFS ? VFS : NULL, Priority);
 }
 
-void csSystemDriver::RemoveConfig(iConfigFileNew *cfg)
+void csSystemDriver::RemoveConfig(iConfigFile *cfg)
 {
   Config->RemoveDomain(cfg);
 }
 
-iConfigFileNew *csSystemDriver::CreateSeparateConfig (const char *iFileName, bool iVFS)
+iConfigFile *csSystemDriver::CreateSeparateConfig (const char *iFileName, bool iVFS)
 {
   return new csConfigFile (iFileName, iVFS ? VFS : NULL);
 }

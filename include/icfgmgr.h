@@ -20,7 +20,7 @@
 #define __ICFGMGR_H__
 
 #include "csutil/scf.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 
 SCF_VERSION(iConfigManager, 0, 0, 1);
 
@@ -58,7 +58,7 @@ SCF_VERSION(iConfigManager, 0, 0, 1);
  *      iterator exists.
  * </ul>
  */
-struct iConfigManager : public iConfigFileNew
+struct iConfigManager : public iConfigFile
 {
   enum
   {
@@ -72,34 +72,34 @@ struct iConfigManager : public iConfigFileNew
   };
 
   /// add a configuration domain
-  virtual void AddDomain(iConfigFileNew*, int priority) = 0;
+  virtual void AddDomain(iConfigFile*, int priority) = 0;
   /**
    * Add a configuration domain. The new config file is also returned. If you
    * want to store the pointer yourself, you must first IncRef it.
    */
-  virtual iConfigFileNew *AddDomain(char const* path, iVFS*, int priority) = 0;
+  virtual iConfigFile *AddDomain(char const* path, iVFS*, int priority) = 0;
   /// remove a configuration domain
-  virtual void RemoveDomain(iConfigFileNew*) = 0;
+  virtual void RemoveDomain(iConfigFile*) = 0;
   /// remove a configuration domain
   virtual void RemoveDomain(char const* path, iVFS*) = 0;
   /// return a pointer to a single config domain
-  virtual iConfigFileNew* LookupDomain(char const* path, iVFS*) const = 0;
+  virtual iConfigFile* LookupDomain(char const* path, iVFS*) const = 0;
   /// set the priority of a config domain
   virtual void SetDomainPriority(char const* path, iVFS*, int priority) = 0;
   /// set the priority of a config domain
-  virtual void SetDomainPriority(iConfigFileNew*, int priority) = 0;
+  virtual void SetDomainPriority(iConfigFile*, int priority) = 0;
   /// return the priority of a config domain
   virtual int GetDomainPriority(char const* path, iVFS*) const = 0;
   /// return the priority of a config domain
-  virtual int GetDomainPriority(iConfigFileNew*) const = 0;
+  virtual int GetDomainPriority(iConfigFile*) const = 0;
 
   /**
    * Change the dynamic domain. The given config object must already be
    * registered with AddDomain(). Returns false if this is not the case.
    */
-  virtual bool SetDynamicDomain(iConfigFileNew*) = 0;
+  virtual bool SetDynamicDomain(iConfigFile*) = 0;
   /// return a pointer to the dynamic config domain
-  virtual iConfigFileNew *GetDynamicDomain() const = 0;
+  virtual iConfigFile *GetDynamicDomain() const = 0;
   /// set the priority of the dynamic config domain
   virtual void SetDynamicDomainPriority(int priority) = 0;
   /// return the priority of the dynamic config domain
