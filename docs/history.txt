@@ -21,7 +21,7 @@ Short-term cleanups that need to be done:
 	  also patched it so that the "-video=" command-line argument works
 	  (though a better solution is needed).
 	- Eric Sunshine fixed the pytest makefile again to remove platform
-	  dependancies (and other buggy stuff).
+	  dependencies (and other buggy stuff).
 	- Eric Sunshine fixed the help message in WalkTest.
 	- Eric Sunshine fixed a potential crasher recently introduced into
 	  cctest.
