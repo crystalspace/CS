@@ -145,7 +145,6 @@ class csLoader
 
   /**
    * Load sounds from a SOUNDS(...) argument.
-   * If 'ar' is given optionally load from that archive as well.
    * This function is normally called automatically by the parser.
    */
   static bool LoadSounds (char* buf);
@@ -167,14 +166,6 @@ class csLoader
   /// World from a memory buffer
   static bool LoadWorld (char* buf);
 
-  /// Load the sprite template from the world file.
-  static bool LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTextureList* textures);
-
-  /**
-   * Load the sprite from the world file.
-   */
-  static bool LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList* textures);
-
   /**
    * Get a sprite template frame from a frame number
    * or an action name and a frame number
@@ -194,6 +185,12 @@ public:
    */
   static csTextureHandle* LoadTexture (csWorld* world, const char* name,
     const char* fname);
+
+  /**
+   * Load a sprite template from a file.
+   */
+  static csSpriteTemplate* LoadSpriteTemplate (csWorld* world, const
+  	char* fname);
 
   /// Load a image and return an iImage object
   static iImage* LoadImage (const char* name)

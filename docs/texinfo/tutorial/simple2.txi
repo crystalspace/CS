@@ -1,0 +1,189 @@
+@c -*-texinfo-*-
+@node Tutorial Simple 2, Simple Tutorial, Tutorial Introduction, Tutorials
+@section Simple Tutorial 2
+@cindex Tutorial, Simple, Sprite, VFS, Texture
+@cindex Simple Tutorial 2
+
+This tutorial continues on the Simple Tutorial (@pxref{Tutorial Simple}).
+In this tutorial we explain a bit about VFS, texture management and
+how you can add a simple sprite to the simple application.
+
+Crystal Space has the concept of sprite templates and sprites. A sprite
+template is like a blue-print for a sprite. It defines how a sprite looks
+and how it animates. Before you can use a sprite you need to have a
+sprite template. Once you have a sprite template you can create multiple
+sprites from this.
+
+In this example we are going to load a sprite template from disk. If you
+have the standard Crystal Space distribution then you have the file
+@file{CS/data/standard.zip}. In that archive file there is a file called
+'sprite1' which contains the definition of our sprite template. Extract
+it (i.e. with something like 'unzip -x standard.zip sprite1') and examine
+it to see how sprite templates are defined.
+
+But how are we actually going to get that file out of that zip archive
+from within the Simple application? This is in fact very easy because
+CS supports the concept of @sc{VFS}. Take a look at the @sc{VFS} documentation
+(@pxref{VFS}) to learn how it works. Suffice it to say here that
+@file{standard.zip} is an archive that is by default mounted onto the
+VFS path @file{/lib/std}. You can see all the mounted @sc{VFS} paths
+in the @file{CS/vfs.cfg} file (and you can add more). So, this means
+that our sprite file can be found at the path @file{/lib/std/sprite1}.
+
+If you look at the @file{sprite1} file you can see that it refers to
+a texture named 'spark'. So we'll have to load that texture as well. This
+can also be found in @file{standard.zip} at the path @file{/lib/std/spark.png}.
+
+@menu
+* Simple Loading Texture:: Loading a Texture
+* Simple Loading Sprite Template:: Loading the Sprite Template
+* Simple Creating Sprite:: Creating the Sprite
+@end menu
+
+@node Simple Loading Texture, Simple Loading Sprite Template, Tutorial Simple 2, Tutorial Simple 2
+@subsection Loading a Texture in Memory
+@cindex Tutorial Simple Loading Texture
+@cindex Simple Loading Texture, Tutorial
+
+To make this example a little more interesting the texture is going
+to be loaded AFTER the other setup of the texture manager has been done.
+This is not really needed but it illustrates how a game might load
+textures dynamically later when the application is already running.
+So first we edit @file{simple.cpp} and add the following in
+@code{Simple::Initialize}} (between @code{txtmgr->SetPalette ()} and
+@code{return true}):
+
+@example
+bool Simple::Initialize(int argc, char const* const argv[],
+  char const* iConfigName)
+@{
+  @dots{}
+  txtmgr->SetPalette ();
+
+  // Load a texture for our sprite.
+  csTextureHandle* txt = csLoader::LoadTexture (world, "spark",
+  	"/lib/std/spark.png");
+  if (txt == NULL)
+  @{
+    Printf (MSG_FATAL_ERROR, "Error loading texture!\n");
+    cleanup ();
+    exit (1);
+  @}
+  txt->Register (txtmgr);
+  txtmgr->PrepareTexture (txt->GetTextureHandle ());
+@}
+@end example
+
+This code first loads a texture in our world with @code{csLoader::LoadTexture}.
+The third argument is the file name for our texture (@sc{VFS} path) and
+the second argument is how that texture should be named in the engine.
+In this case we use 'spark' for that because that's how the @file{sprite1}
+definition wants it.
+
+If this loading succeeds we need to register our texture with the
+texture manager. This is because we didn't put the loading of our texture
+before the @code{world->Prepare()} call (which takes care of this
+registering automatically). The lines @code{txt->Register()} and
+@code{txtmgr->PrepareTexture()} can be used at any time while the
+application is running to dynamically load additional textures. The
+first call to @code{Register()} registers the texture with the texture
+manager so that it is aware of this texture. The second call makes
+sure that the texture can really be used for 3D rendering by mapping
+it to the internal format used by the 3D rasterizer. If you plan to
+dynamically add a lot of textures in one step then you should call
+@code{Register()} once for every texture and then do
+@code{txtmgr->PrepareTextures()} instead. This will be more efficient.
+
+@node Simple Loading Sprite Template, Simple Creating Sprite, Simple Loading Texture, Tutorial Simple 2
+@subsection Loading a Sprite Template in Memory
+@cindex Tutorial Simple Loading Sprite Template
+@cindex Simple Loading Sprite Template, Tutorial
+
+Now that we have our texture we can use it to load the sprite template.
+Edit @file{simple.cpp} and add the following in
+@code{Simple::Initialize}} (before @code{return true} and after
+the code we just added to load the texture):
+
+@example
+bool Simple::Initialize (int argc, const char* const argv[],
+  const char *iConfigName)
+@{
+  @dots{}
+
+  // Load a sprite template from disk.
+  csSpriteTemplate* spritetmpl = csLoader::LoadSpriteTemplate (world,
+  	"/lib/std/sprite1");
+  if (spritetmpl == NULL)
+  @{
+    Printf (MSG_FATAL_ERROR, "Error loading sprite template!\n");
+    cleanup ();
+    exit (1);
+  @}
+
+  return true;
+@}
+@end example
+
+This example uses @code{csLoader::LoadSpriteTemplate()} to load the
+sprite template from the given location. The name of the sprite template
+will be 'box' as that is the name given in the file @file{sprite1} itself.
+
+This is all there is to it. After this call the sprite template is loaded
+in the world and can be used to create sprites. This is what we'll do
+in the next section.
+
+@node Simple Creating Sprite, , Simple Loading Sprite Template, Tutorial Simple 2
+@subsection Creating a Sprite from a Template
+@cindex Tutorial Simple Creating Sprite
+@cindex Simple Creating Sprite, Tutorial
+
+To create a sprite just add the following code in
+@code{Simple::Initialize}} (before @code{return true} and after
+the code we just added to load the sprite template):
+
+@example
+bool Simple::Initialize (int argc, const char* const argv[],
+  const char *iConfigName)
+@{
+  @dots{}
+  // Add the sprite to the world.
+  csSprite3D* sprite = spritetmpl->NewSprite (world);
+  sprite->SetName ("MySprite");
+  world->sprites.Push (sprite);
+  sprite->MoveToSector (room);
+  csMatrix3 m; m.Identity (); m *= 5.;
+  sprite->SetTransform (m);
+  sprite->SetPosition (csVector3 (-3, 5, 3));
+  sprite->SetAction ("default");
+  sprite->InitSprite ();
+
+  return true;
+@}
+@end example
+
+The easiest way to create a sprite is to use @code{spritetmpl->NewSprite()}.
+This is not enough however. First we give the sprite a name. This is not
+required but it is useful in a game context. If you have scripts controlling
+game logic you sometimes might want to refer to objects by their name.
+
+The @code{world->sprites.Push (sprite)} line is important. It registers
+the sprite with the world. If you don't do this then CS will not know
+about this sprite. The @code{sprite->MoveToSector (room)} is equally
+important as it actually places the sprite in a sector (our room).
+@code{MoveToSector()} is a conveniance function to quickly position a
+sprite in some sector. In reality it is possible for a sprite to be
+in multiple sectors at the same time (i.e. when it crosses a portal).
+There is some support for this in CS at the moment but not very much.
+
+The lines @code{SetTransform} and @code{SetPosition} setup a transformation
+matrix and vector to correctly place the sprite in the room. In this
+particular case we use the identity matrix as a transform and scale it
+with five to make the sprite five times bigger. Then we place the
+sprite at position -3,5,3 in world coordinates.
+
+The @code{SetAction} will set the action for the sprite. An action is
+a set of frames and controls animation. In our simple example the sprite
+only has one frame so there is not much animation to see.
+
+This concludes the second Simple tutorial.
+

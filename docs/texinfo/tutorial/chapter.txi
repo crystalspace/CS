@@ -9,12 +9,14 @@ environment.
 
 @menu
 * Tutorial Introduction:: Developing a Crystal Space Application
-* Tutorial Simple:: Simple Tutorial
+* Tutorial Simple:: Simple Tutorial (Starting a World)
+* Tutorial Simple 2:: Simple Tutorial (VFS, Adding a Sprite)
 * map2cs Tutorial:: @code{map2cs} Tutorial
 * Tutorial CrystalClear:: A CrystalClear Tutorial
 @end menu
 
 @imports{tutorial,intro.txi}
 @imports{tutorial,simple.txi}
+@imports{tutorial,simple2.txi}
 @importss{tutorial,map2cs,map2cs.txi}
 @imports{tutorial,csclear.txi}

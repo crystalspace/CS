@@ -1,5 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
+19-Jul-2000
+	- Updated 'simple' tutorial and 'simple' application a little bit.
+	- Extended 'simple' application to load a 'sprite1' template from
+	  standard.zip and show it. Also added a new tutorial 'simple2.txi'
+	  to show how this sprite stuff works.
+	- Removed some non-existing functions from
+	  include/csparser/csloader.h.
+	- Added csLoader::LoadSpriteTemplate() function to load a sprite
+	  template from a file.
+	- Reverted Norman Kramers patch to csFrustum::Classify() because
+	  it seems to be wrong.
+	- Wyatt Miler enabled TGA image format for Mac as some levels now
+	  are using it, and it works.
+	- Wyatt also updated the Macintosh project files.
+	- Wouter Wijngaards disabled some debug prints in csQuadTree3D.
 18-Jul-2000
 	- Did an optimization in csFrustum::Classify() as suggested
 	  by Norman Kramer.
@@ -53,6 +68,19 @@ The history order has been reversed so that new features are at the top.
 	  still doesn't work at the moment.
 	- Removed an assert in map2cs to make converting some badly
 	  formed levels easier :-)
+	- Frank O' Connor updated the VC project files for the removal
+	  of csScript.
+	- Wouter Wijngaards commited code made by Mike Bond
+	  <mbond@cox.rr.com>. It enables fullscreen mode for the line X
+	  2d driver, the opengl X 2d driver, and the software X 2D driver.
+	  I have verified that software mode now runs fullscreen OK
+	  (Xfree86 4.0, 32 bpp, 640x480). Also, the border of funny pixels
+	  at the edge of the screen is not caused by this commit.
+	  Note that the line USE_XFREE86VM = yes should be added to
+	  config.mak before compiling this, if you have XFree86
+	  (most people running linux use XFree86).
+	  Use alt-enter or 'fullscreen' console command to switch between
+	  fullscreen and not.
 17-Jul-2000
 	- Added LGPL notice to a few .inc files.
 	- Change to OpenGL renderer so that lightmaps are only cached

@@ -4856,6 +4856,50 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
 
 //---------------------------------------------------------------------------
 
+csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
+	const char* fname)
+{
+  World = world;
+
+  size_t size;
+  char *buf = System->VFS->ReadFile (fname, size);
+
+  if (!buf || !size)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Could not open sprite template file \"%s\" on VFS!\n", fname);
+    return NULL;
+  }
+
+  TOKEN_TABLE_START (tokens)
+    TOKEN_TABLE (SPRITE)
+  TOKEN_TABLE_END
+
+  char *name, *data;
+
+  if (csGetObject (&buf, tokens, &name, &data))
+  {
+    if (!data)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+
+    csSpriteTemplate* tmpl = new csSpriteTemplate ();
+    tmpl->SetName (name);
+    if (LoadSpriteTemplate (tmpl, data))
+    {
+      World->sprite_templates.Push (tmpl);
+      return tmpl;
+    }
+    else
+    {
+      delete tmpl;
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
 bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 {
   TOKEN_TABLE_START (commands)

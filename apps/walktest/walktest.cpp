@@ -1303,10 +1303,16 @@ void init_sig ()
 int main (int argc, char* argv[])
 {
   //csVector3 rectfr[4];
+  // VS 1
   //rectfr[0].Set(0,1,1);
   //rectfr[1].Set(1,1,1);
   //rectfr[2].Set(1,0,1);
   //rectfr[3].Set(0,0,1);
+  // VS 2
+  //rectfr[0].Set(0.5,-0.5,1);
+  //rectfr[1].Set(1,-0.5,1);
+  //rectfr[2].Set(1,-1,1);
+  //rectfr[3].Set(0.5,-1,1);
   //csVector3 trifr[4];
   //trifr[0].Set(0,0,2);
   //trifr[1].Set(8,8,2);

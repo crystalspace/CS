@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial Simple, map2cs Tutorial, Tutorial Introduction, Tutorials
+@node Tutorial Simple, Simple Tutorial 2, Tutorial Introduction, Tutorials
 @section Simple Tutorial
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
@@ -105,8 +105,6 @@ Simple::~Simple()
 @{
 @}
 
-void debug_dump() @{@}
-
 void cleanup()
 @{
   delete System;
@@ -161,8 +159,6 @@ int main(int argc, char* argv[])
 
   // Create our main class.
   System = new Simple();
-  // Temp hack until we find a better way
-  csWorld::System = System;
 
   // We want at least the minimal set of plugins
   System->RequestPlugin("crystalspace.kernel.vfs:VFS");
@@ -292,7 +288,8 @@ Now add these chunks of code (texture manager, room, lights) to
 @file{simple.cpp}:
 
 @example
-Simple::Simple ()
+bool Simple::Initialize(int argc, char const* const argv[],
+  char const* iConfigName)
 @{
   @dots{}
   // Open the main system. This will open all
@@ -479,7 +476,8 @@ Simple::~Simple()
 At the end of our Initialize() function we add the following:
 
 @example
-void Simple::Initialize()
+bool Simple::Initialize(int argc, char const* const argv[],
+  char const* iConfigName)
 @{
   @dots{}
   Printf(MSG_INITIALIZATION, "Created.\n");
@@ -578,3 +576,7 @@ you can use.  A couple of them are used in this example.
 That's it for now.  In this tutorial you learned how to setup the Crystal
 Space system for use, how to create a simple room with some lights, event
 handling, and how to handle some basic camera operations.
+
+You can now go on to the next tutorial (@pxref{Tutorial Simple 2})) to learn
+how to add a 3D sprite to this world.
+

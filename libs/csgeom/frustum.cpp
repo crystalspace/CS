@@ -400,7 +400,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
       if ((prev_d < 0 && d > 0)
        || (prev_d > 0 && d < 0))
       {
-# if 1
+#if 0
 	// This version is much faster and seems to give the same
 	// results. I keep the old code here for a little while just
 	// to be sure :-)
