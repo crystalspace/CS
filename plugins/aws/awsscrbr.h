@@ -97,7 +97,7 @@ class awsScrollBar :
   /// Amount to move scroll bar when scroll area clicked
   float value_page_delta;
 protected:
-  bool awsScrollBar:: HandleClicking (int btn, int x, int y);
+  bool HandleClicking (int btn, int x, int y);
   bool captured;
 public:
   awsScrollBar ();
