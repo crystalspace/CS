@@ -90,10 +90,8 @@ class G3DFogInfo
 public:
   /// Color.
   float r, g, b;
-  /// Density.
-  float density;
-  /// Thickness at this point.
-  float thickness;
+  /// Intensity (== density * thickness).
+  float intensity;
 };
 
 ///
