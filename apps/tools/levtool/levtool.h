@@ -203,6 +203,12 @@ public:
   void SplitThingInCenter ();
 
   /**
+   * Warning! Call this function AFTER DuplicateSharedVertices().
+   * This function will make seperate objects of all large polygons.
+   */
+  void SplitThingLargePolygons (float max_area, int minsize);
+
+  /**
    * Warning! Call this function AFTER CreateVertexInfo().
    * This function will split this thing in seperate units.
    * A unit is defined as a group of polygons that is not

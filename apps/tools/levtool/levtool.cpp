@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 #include "levtool.h"
+#include "csgeom/math3d.h"
 #include "csgeom/plane3.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
@@ -505,6 +506,40 @@ void ltThing::SplitThingInCenter ()
       if (vt->x < center.x) where |= 1;
       if (vt->y < center.y) where |= 2;
       if (vt->z < center.z) where |= 4;
+    }
+    p->SetObjectNumber (where);
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
+    {
+      ltVertex* vt = vertices[p->GetVertex (j)];
+      vt->SetObjectNumber (where);
+    }
+  }
+}
+
+void ltThing::SplitThingLargePolygons (float max_area, int minsize)
+{
+  max_obj_number = 0;
+  int i, j;
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    ltPolygon* p = polygons[i];
+    float area = 0.0f;
+    int pi;
+    for (pi = 0 ; pi < p->GetVertexCount ()-2 ; pi++)
+      area += csMath3::Area3 (
+	GetVertex (p->GetVertex (0)),
+	GetVertex (p->GetVertex (pi+1)),
+	GetVertex (p->GetVertex (pi+2)));
+    area = ABS (area);
+    int where = int (50 * (area / max_area));
+    if (where >= minsize)
+    {
+      ++max_obj_number;
+      where = max_obj_number;
+    }
+    else
+    {
+      where = 0;
     }
     p->SetObjectNumber (where);
     for (j = 0 ; j < p->GetVertexCount () ; j++)
@@ -1254,12 +1289,14 @@ LevTool::~LevTool ()
 #define OP_VALIDATE 3
 #define OP_SPLITUNIT 4
 #define OP_SPLITGEOM 5
-#define OP_COMPRESS 6
-#define OP_ANALYZE 7
+#define OP_SPLITPOLY 6
+#define OP_COMPRESS 7
+#define OP_ANALYZE 8
+#define OP_ANALYZEP 9
 
 //----------------------------------------------------------------------------
 
-// @@@ TODO: ignore movable things for splitting!
+// @@@ TODO: support hardmove!
 
 void LevTool::Main ()
 {
@@ -1275,6 +1312,9 @@ void LevTool::Main ()
     printf ("  -list:      List world contents.\n");
     printf ("  -analyze:   Analyze all things and show the distribution of size.\n");
     printf ("              You can use this to decide on the 'minsize' parameter.\n");
+    printf ("  -analyzep:  Analyze all polygons and show the distribution of size.\n");
+    printf ("              You can use this to decide on the 'minsize' parameter\n");
+    printf ("              for -splitpoly.\n");
     printf ("  -validate:  Validate world contents. This will currently check\n");
     printf ("              only for non-coplanar polygons.\n");
     printf ("  -compress : Compress all vertices and remove duplicate and unused vertices.\n");
@@ -1292,15 +1332,22 @@ void LevTool::Main ()
     printf ("              should run levtool with -compress option for efficiency.\n");
     printf ("              -minsize=<percent>: Only split objects larger than the given\n");
     printf ("              percentage. Default 20%%.\n");
+    printf ("  -splitpoly: Split large polygons into seperate objects.\n");
+    printf ("              After doing this you should run levtool with -compress option\n");
+    printf ("              for efficiency.\n");
+    printf ("              -minsize=<percent>: Only split polygons larger than the given\n");
+    printf ("              percentage. Default 20%%.\n");
     exit (0);
   }
 
   if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
   if (cmdline->GetOption ("list")) op = OP_LIST;
   if (cmdline->GetOption ("analyze")) op = OP_ANALYZE;
+  if (cmdline->GetOption ("analyzep")) op = OP_ANALYZEP;
   if (cmdline->GetOption ("validate")) op = OP_VALIDATE;
   if (cmdline->GetOption ("splitunit")) op = OP_SPLITUNIT;
   if (cmdline->GetOption ("splitgeom")) op = OP_SPLITGEOM;
+  if (cmdline->GetOption ("splitpoly")) op = OP_SPLITPOLY;
   if (cmdline->GetOption ("compress")) op = OP_COMPRESS;
 
   int minsize = 20;
@@ -1308,7 +1355,7 @@ void LevTool::Main ()
     const char* minsize_arg = cmdline->GetOption ("minsize");
     if (minsize_arg != NULL)
     {
-      sscanf (minsize_arg, "%d", &minsize_arg);
+      sscanf (minsize_arg, "%d", &minsize);
     }
   }
 
@@ -1408,6 +1455,70 @@ void LevTool::Main ()
 	  area = pow (area, 1./3.);
 	  int where = int (50 * (area / global_area));
 	  counts[where]++;
+	}
+	int sum = 0;
+	for (i = 0 ; i <= 50 ; i++)
+	{
+	  sum += counts[i];
+	  printf ("  %3d%% #local=%-5d #<=thissize=%d\n", i*2,
+	  	counts[i], sum);
+	}
+	fflush (stdout);
+      }
+      break;
+
+    case OP_ANALYZEP:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	csBox3 global_bbox;
+	global_bbox.StartBoundingBox ();
+	int i, j, pi;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->CreateBoundingBox ();
+	  global_bbox += th->GetBoundingBox ();
+	}
+	printf ("Global bounding box: (%g,%g,%g) - (%g,%g,%g)\n",
+		global_bbox.MinX (), global_bbox.MinY (), global_bbox.MinZ (),
+		global_bbox.MaxX (), global_bbox.MaxY (), global_bbox.MaxZ ());
+
+	csVector3 poly[4];
+	poly[0] = global_bbox.Min ();
+	poly[1] = global_bbox.Min (); poly[1].y = global_bbox.MaxY ();
+	poly[2] = global_bbox.Max ();
+	poly[3] = global_bbox.Max (); poly[3].y = global_bbox.MinY ();
+	float max_area = 0.0f;
+	float area = 0.0f;
+	for (pi = 0 ; pi < 4-2 ; pi++)
+	  area += csMath3::Area3 (poly[0], poly[pi+1], poly[pi+2]);
+	csVector3 dim = global_bbox.Max () - global_bbox.Min ();
+	area = ABS (area);
+	max_area = area;
+	max_area = MAX (max_area, dim.x * dim.y);
+	max_area = MAX (max_area, dim.x * dim.z);
+	max_area = MAX (max_area, dim.y * dim.z);
+
+        int counts[51];
+	for (i = 0 ; i <= 50 ; i++)
+	  counts[i] = 0;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  for (j = 0 ; j < th->GetPolygonCount () ; j++)
+	  {
+	    ltPolygon* p = th->GetPolygon (j);
+	    area = 0.0f;
+	    for (pi = 0 ; pi < p->GetVertexCount ()-2 ; pi++)
+	      area += csMath3::Area3 (
+	      	th->GetVertex (p->GetVertex (0)),
+	      	th->GetVertex (p->GetVertex (pi+1)),
+		th->GetVertex (p->GetVertex (pi+2)));
+	    area = ABS (area);
+	    int where = int (50 * (area / max_area));
+	    counts[where]++;
+	  }
 	}
 	int sum = 0;
 	for (i = 0 ; i <= 50 ; i++)
@@ -1558,6 +1669,56 @@ void LevTool::Main ()
 	  }
 	  else
 	    th->DoNotSplitThingSeperateUnits ();
+        }
+
+	CloneAndSplitDynavis (doc, newdoc, false);
+        error = newdoc->Write (vfs, filename);
+	if (error != NULL)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+      }
+      break;
+
+    case OP_SPLITPOLY:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	csRef<iDocument> newdoc = xml->CreateDocument ();
+
+	csBox3 global_bbox;
+	global_bbox.StartBoundingBox ();
+	int i;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->CreateBoundingBox ();
+	  global_bbox += th->GetBoundingBox ();
+	}
+
+	csVector3 poly[4];
+	poly[0] = global_bbox.Min ();
+	poly[1] = global_bbox.Min (); poly[1].y = global_bbox.MaxY ();
+	poly[2] = global_bbox.Max ();
+	poly[3] = global_bbox.Max (); poly[3].y = global_bbox.MinY ();
+	float max_area = 0.0f;
+	float area = 0.0f;
+	int pi;
+	for (pi = 0 ; pi < 4-2 ; pi++)
+	  area += csMath3::Area3 (poly[0], poly[pi+1], poly[pi+2]);
+	csVector3 dim = global_bbox.Max () - global_bbox.Min ();
+	area = ABS (area);
+	max_area = area;
+	max_area = MAX (max_area, dim.x * dim.y);
+	max_area = MAX (max_area, dim.x * dim.z);
+	max_area = MAX (max_area, dim.y * dim.z);
+
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->DuplicateSharedVertices ();
+	  th->SplitThingLargePolygons (max_area, minsize);
         }
 
 	CloneAndSplitDynavis (doc, newdoc, false);

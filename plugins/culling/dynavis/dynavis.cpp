@@ -29,6 +29,7 @@
 #include "csgeom/obb.h"
 #include "csgeom/segment.h"
 #include "csgeom/sphere.h"
+#include "csgeom/poly3d.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "csutil/flags.h"
@@ -198,6 +199,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_writequeue = true;
   do_cull_tiled = true;
   do_cull_ignoresmall = false;
+  do_cull_clampoccluder = false;
   do_freeze_vis = false;
 
   cfg_view_mode = VIEWMODE_STATS;
@@ -526,16 +528,26 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
 
   int i;
+
   // First transform all vertices.
-  //@@@ Avoid allocate?
-  csVector2* tr_verts = new csVector2[vertex_count];
-  float* tr_z = new float[vertex_count];
+  //@@@ Memory leak!
+  static csVector2* tr_verts = NULL;
+  static csVector3* tr_cam = NULL;
+  static int max_tr_verts = 0;
+  if (vertex_count > max_tr_verts)
+  {
+    delete[] tr_verts;
+    delete[] tr_cam;
+    max_tr_verts = vertex_count+50;
+    tr_verts = new csVector2[max_tr_verts];
+    tr_cam = new csVector3[max_tr_verts];
+  }
+
   for (i = 0 ; i < vertex_count ; i++)
   {
-    csVector3 camv = trans.Other2This (verts[i]);
-    tr_z[i] = camv.z;
-    if (camv.z > 0.0)
-      Perspective (camv, tr_verts[i], fov, sx, sy);
+    tr_cam[i] = trans.Other2This (verts[i]);
+    if (tr_cam[i].z > 0.1)
+      Perspective (tr_cam[i], tr_verts[i], fov, sx, sy);
   }
 
   if (do_state_dump)
@@ -557,6 +569,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     if (planes[i].Classify (campos_object) >= 0.0)
       continue;
 
+    bool do_clamp = false;
     int num_verts = poly->num_vertices;
     int* vi = poly->vertices;
     float max_depth = -1.0;
@@ -564,11 +577,34 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     for (j = 0 ; j < num_verts ; j++)
     {
       int vertex_idx = vi[j];
-      float tz = tr_z[vertex_idx];
-      if (tz <= 0.0)
+      float tz = tr_cam[vertex_idx].z;
+      if (tz <= 0.1)
       {
-        // @@@ Later we should clamp instead of ignoring this polygon.
 	max_depth = -1.0;
+	if (do_cull_clampoccluder)
+	{
+	  if (i > 0)
+	  {
+	    // If i > 0 we know there was already one vertex which is in front
+	    // of the Z=0.1 plane.
+	    do_clamp = true;
+	  }
+	  else
+	  {
+	    // i == 0 so we still have to test if there are other vertices
+	    // in front of the Z=0.1 plane.
+	    for (++j ; j < num_verts ; j++)	// The start '++j' is not a bug!
+	    {
+	      vertex_idx = vi[j];
+	      tz = tr_cam[vertex_idx].z;
+	      if (tz > 0.1)
+	      {
+	        do_clamp = true;
+		break;
+	      }
+	    }
+	  }
+	}
 	break;
       }
       if (tz > max_depth) max_depth = tz;
@@ -576,6 +612,37 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     }
     if (max_depth > 0.0)
     {
+      if (do_cull_tiled)
+        tcovbuf->InsertPolygon (verts2d, num_verts, max_depth);
+      else
+        covbuf->InsertPolygon (verts2d, num_verts, max_depth);
+      if (do_state_dump)
+      {
+        printf ("  max_depth=%g ", max_depth);
+        for (j = 0 ; j < num_verts ; j++)
+	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
+        printf ("\n");
+      }
+    }
+    else if (do_clamp)
+    {
+      csPoly3D poly;
+      for (j = 0 ; j < num_verts ; j++)
+      {
+	poly.AddVertex (tr_cam[vi[j]]);
+      }
+      csPoly3D front, back;
+      // @@@ Make specific version that doesn't fill 'front' version.
+      poly.SplitWithPlaneZ (front, back, 0.1);
+      max_depth = -1.0;
+      num_verts = back.GetVertexCount ();
+      for (j = 0 ; j < num_verts ; j++)
+      {
+        const csVector3& v = back[j];
+	if (v.z > max_depth) max_depth = v.z;
+        Perspective (v, verts2d[j], fov, sx, sy);
+      }
+
       if (do_cull_tiled)
         tcovbuf->InsertPolygon (verts2d, num_verts, max_depth);
       else
@@ -599,9 +666,6 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
       str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());
   }
-
-  delete[] tr_z;
-  delete[] tr_verts;
 }
 
 void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
@@ -649,7 +713,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     csVector3 v = verts[i] - trans_vec;
     camv.z = trans_mat.m31 * v.x + trans_mat.m32 * v.y + trans_mat.m33 * v.z;
 
-    if (camv.z <= 0.0)
+    if (camv.z <= 0.1)
     {
       // @@@ Later we should clamp instead of ignoring this outline.
       return;
@@ -2149,6 +2213,14 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"BugPlug not found!");
     }
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_clampoccluder"))
+  {
+    do_cull_clampoccluder = !do_cull_clampoccluder;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s clamp occluders to Z=0!",
+	do_cull_clampoccluder ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_ignoresmall"))

@@ -1,5 +1,17 @@
 The history order is reversed so that new features are at the top.
 
+9-Dec-2002
+	- Fixed a bug in Dynavis where it would consider polygons as possible
+	  occluders even if Z very close to 0. This could cause bad overflow.
+8-Dec-2002
+	- Experimental optimation in Dynavis for clamp in polygon mode (not
+	  yet outline mode). Not enabled yet since it isn't working properly
+	  yet.
+7-Dec-2002
+	- Made the following modifications to levtool:
+	    - Added -splitpoly and -analyzep options. With this it is possible
+	      to seperate large polygons in seperate objects.
+  	    - Fixed bug with -minsize. That option was simply ignored.
 6-Dec-2002
 	- Fixed a bug in the engine where children of mesh objects wouldn't
 	  get registered to the visibility culler. This could cause culling
