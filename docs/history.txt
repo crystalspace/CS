@@ -15,6 +15,9 @@ chronological order.
 	  values: now, a handle is requested from a wrapper when it's needed
 	  the first time. Some wrappers don't have a handle yet when the value
 	  is set, but get one later.
+	- Matt Reda changed the MacOS X OpenGL canvas to use a 32 bit depth 
+	  buffer (it was 16) and added 8 bit stencil and alpha buffers when 
+	  compiling for the new renderer
 24-Mar-2004
 	- Jorrit extended the standard output console so that it now also
 	  supports setting of the font through the config file. Added
