@@ -35,7 +35,7 @@ there you can always email the mailing lists. @xref{FAQ}, or
 * Genesis:: Genesis of Crystal Space
 * Authors:: Documentation Authors & Contributors
 * Contributors:: Crystal Space Contributors
-* License:: Gnu Library General Public License
+* License:: GNU Library General Public License
 @end menu
 
 @imports{intro,foreword.txi}
