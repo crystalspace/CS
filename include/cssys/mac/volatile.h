@@ -11,7 +11,7 @@
 #define DO_SOUND		1
 #define DO_GIF			1
 // #define DO_BMP		1
-// #define DO_TGA		1
+#define DO_TGA		    1
 #define DO_PNG			1
 #define DO_JPG			1
 #define DO_AIFF			1
