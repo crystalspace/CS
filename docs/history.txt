@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 10-Nov-2003
+	- Jorrit removed the blend2cs script from CS. It is made obsolete
+	  by the blend2cs project http://projects.blender.org/projects/blend2cs/
 	- Wouter fixed up the terrain texture caching to use the 
 	  CacheManager. Instead of a cachedir, put cache="yes" to
 	  use caching.
