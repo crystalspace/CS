@@ -405,8 +405,28 @@ void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type
   transitions.Push(t);
 }
 
-bool awsManager::PerformTransition(awsWindowTransition *t)
+awsWindowTransition* awsManager::FindTransition(iAwsComponent *win)
 {
+  awsWindowTransition *t;
+  
+  for(int i = 0; i < transitions.Length(); ++i)
+  {
+    t = (awsWindowTransition *)transitions[i];
+
+    if (t->win==win)
+    {
+      return t;
+    }
+  }
+  
+  // if we get here, we didn't find a transition for the window
+  return 0;
+}
+
+bool awsManager::PerformTransition(iAwsComponent *win)
+{
+  awsWindowTransition *t = FindTransition(win);
+
   float dx, dy;
   csRect interp(t->start);
 
@@ -456,14 +476,10 @@ bool awsManager::PerformTransition(awsWindowTransition *t)
     transitions.Delete(t);
     delete t;
 
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
-      "returning false from transition.\n");
-
     return false;
   }
   else
   {
-
     t->morph+=t->morph_step;
     if (t->morph>1.0)
       t->morph=1.0;
@@ -550,27 +566,17 @@ bool awsManager::ComponentIsDirty (iAwsComponent *win)
   return false;
 }
 
-bool awsManager::ComponentIsInTransition(iAwsComponent *win, bool perform_transition)
+bool awsManager::ComponentIsInTransition(iAwsComponent *win)
 {
   int i;
 
   if (win->isHidden ())
     return false;
 
-  for(i = 0; i < transitions.Length(); ++i)
-  {
-    awsWindowTransition *t = (awsWindowTransition *)transitions[i];
-
-    if (t->win==win)
-    {
-      if (perform_transition)
-	return PerformTransition(t);
-      
-      return true;
-    }
-  }
-
-  return false;
+  if (FindTransition(win))
+    return true;
+  else
+    return false;
 }
 
 void awsManager::UpdateStore ()
@@ -690,13 +696,17 @@ void awsManager::Redraw ()
   // check to see if any part of this window needs redrawn, or if the always draw flag is set
   while (curwin)
   {
+    bool transition_performed = false;
+    if (ComponentIsInTransition(curwin))
+    {
+      transition_performed = PerformTransition(curwin);
+    }
     if (
-        (   ComponentIsInTransition(curwin, true) /* MUST COME BEFORE OTHERS! */
+        (   transition_performed               /* MUST COME BEFORE OTHERS! */
          || ComponentIsDirty (curwin) 
          || (flags & AWSF_AlwaysRedrawWindows) 
         )
-
-	&& (!curwin->isHidden ())              /* MUST COME LAST! */
+        && (!curwin->isHidden ())              /* MUST COME LAST! */
        )
     {
       curwin->SetRedrawTag (redraw_tag);

@@ -40,6 +40,31 @@
  * windowing system.  It supports simple skinning via the .skn defintions, and creation of windows from .win definitions.
  *
  */
+
+/**
+ * Defines a transition
+ */
+struct awsWindowTransition
+{
+  /// The rect we start with
+  csRect start;
+
+  /// The rect we end with
+  csRect end;
+
+  /// Where we are
+  float morph;
+
+  /// The size of steps to take
+  float morph_step;
+
+  /// The window we're dealing with
+  iAwsComponent *win;
+
+  /// The type of transition
+  unsigned transition_type;
+};
+
 class awsManager : public iAws
 {
 private:
@@ -129,30 +154,6 @@ private:
   /// Contains the list of factory to ID mappings.
   csArray<awsComponentFactoryMap> component_factories;
 
-  /**
-   * Defines a transition
-   */
-  struct awsWindowTransition
-  {
-    /// The rect we start with
-    csRect start;
-
-    /// The rect we end with
-    csRect end;
-
-    /// Where we are
-    float morph;
-
-    /// The size of steps to take
-    float morph_step;
-
-    /// The window we're dealing with
-    iAwsComponent *win;
-
-    /// The type of transition
-    unsigned transition_type;
-  };
-
   /// Contains the list of windows in transition
   csArray<awsWindowTransition*> transitions;
 
@@ -208,7 +209,7 @@ public:
   virtual bool ComponentIsDirty (iAwsComponent *win);
 
   /// Returns true if window is in transition
-  virtual bool ComponentIsInTransition(iAwsComponent *win, bool perform_transition=false);
+  virtual bool ComponentIsInTransition(iAwsComponent *win);
 
   /// Returns true if the mouse is inside any of the top-level components.
   virtual bool MouseInComponent(int x, int y);
@@ -293,7 +294,10 @@ protected:
   void RegisterCommonComponents ();
 
   /// Performs transitioning on a window.
-  bool PerformTransition(awsWindowTransition *t);
+  bool PerformTransition(iAwsComponent *win);
+
+  /// Finds a transition for the given window.
+  awsWindowTransition*  FindTransition(iAwsComponent *win);
 
 public:
   /// Instantiates a window based on a window definition.

@@ -243,7 +243,7 @@ struct iAwsComponentNode : public iAwsKeyContainer
  * \addtogroup aws
  * @{ */
 
-SCF_VERSION (iAws, 0, 2, 1);
+SCF_VERSION (iAws, 0, 2, 2);
 
 /// Interface for the window manager.
 struct iAws : public iBase
@@ -423,7 +423,9 @@ public:
 
   /// Returns true if all windows are presently hidden
   virtual bool AllWindowsHidden()=0;
-
+  	
+  /// Checks if the specified component is currently going through a transition
+  virtual bool ComponentIsInTransition(iAwsComponent *win)=0;
 };
 
 SCF_VERSION (iAwsPrefManager, 0, 0, 3);
