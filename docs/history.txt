@@ -1,6 +1,14 @@
 The history order is reversed so that new features are at the top.
 
 30-Apr-2001
+	- Brandon Ehle reports:
+	  PS2 Port working, will post external libs soon, hopefully source
+	  code for them will follow, if I find that Sony's OpenGL library
+	  is horrid.
+	  There are also changes to software renderer and iG3D interface
+	  regarding uint32 ULong issues.  You should not assume that
+	  ULong is a 32 bit datatype, but rather a datatype thats big and
+	  goes really fast on the target platform.
 	- Added support for FX mode scanline drawing to DrawPolygon.
 	  So you can now use CS_FX_ADD (for example) with both lighted
 	  and unlighted polygon drawing. Only CS_FX_TRANSPARENT is not
