@@ -37,10 +37,10 @@ class WEXP ddgHeightMap {
 	unsigned short	_cols;
 	/// Allocated size.
 	unsigned short	_rows;
-	/// Height/Width ratio.
-	float _scale;
 	/// Base offset.
 	float _base;
+	/// Height/Width ratio.
+	float _scale;
 public:
 	/**
 	 *  Create an image but don't allocate memory.
