@@ -45,9 +45,9 @@ SCF_VERSION (iSoundRender, 1, 0, 0);
 struct iSoundRender : public iBase
 {
 public:
-  /// Set Volume [0, 1]
+  /// Set Volume (range from 0.0 to 1.0)
   virtual void SetVolume (float vol) = 0;
-  /// Get Volume [0, 1]
+  /// Get Volume (range from 0.0 to 1.0)
   virtual float GetVolume () = 0;
 
   /// Register a sound

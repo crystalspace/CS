@@ -53,9 +53,9 @@ struct iSoundSource : public iBase
   virtual void Play (unsigned long playMethod = 0) = 0;
   /// Stop the sound
   virtual void Stop () = 0;
-  /// Set volume
+  /// Set volume (range from 0.0 to 1.0)
   virtual void SetVolume (float volume) = 0;
-  /// Get volume
+  /// Get volume (range from 0.0 to 1.0)
   virtual float GetVolume () = 0;
   /// Set frequency factor : 1 = normal, >1 faster, 0-1 slower
   virtual void SetFrequencyFactor (float factor) = 0;
