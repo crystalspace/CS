@@ -164,10 +164,10 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
 #define RIGHTSAMP       ((int)(Data[2*i+1]))
 #define READMONO3D      int samp=MONOSAMP;
 #define READSTEREO3D    int samp=(LEFTSAMP+RIGHTSAMP)/2;
-#define WRITEMONO3D     Buffer[i]+=(samp AddModify)*(CalcVolL+CalcVolR)/2;
+#define WRITEMONO3D     Buffer[i]+=(stype)((samp AddModify)*(CalcVolL+CalcVolR)/2);
 #define WRITESTEREO3D   {                   \
-  Buffer[2*i]+=(samp AddModify)*CalcVolL;   \
-  Buffer[2*i+1]=(samp AddModify)*CalcVolR;  \
+  Buffer[2*i]+=(stype)((samp AddModify)*CalcVolL);   \
+  Buffer[2*i+1]=(stype)((samp AddModify)*CalcVolR);  \
 }
 
 #define LOOP        for (unsigned long i=0;i<NumSamples;i++)
@@ -202,25 +202,25 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
         if (SoundRender->isStereo()) {                                      \
           /* stereo -> stereo */                                            \
           LOOP {                                                            \
-            Buffer[2*i]+=CalcVolL*(LEFTSAMP AddModify);                     \
-            Buffer[2*i+1]+=CalcVolL*(RIGHTSAMP AddModify);                  \
+            Buffer[2*i]+= (stype)CalcVolL*(LEFTSAMP AddModify);             \
+            Buffer[2*i+1]+= (stype)CalcVolL*(RIGHTSAMP AddModify);          \
           }                                                                 \
         } else {                                                            \
           /* stereo -> mono */                                              \
           LOOP {                                                            \
-            Buffer[i]+=CalcVolL*((LEFTSAMP + RIGHTSAMP)/2 AddModify);       \
+            Buffer[i]+=(stype)CalcVolL*((LEFTSAMP + RIGHTSAMP)/2 AddModify);       \
           }                                                                 \
         }                                                                   \
       } else {                                                              \
         if (SoundRender->isStereo()) {                                      \
           /* mono -> stereo */                                              \
           LOOP {                                                            \
-            Buffer[2*i]+=CalcVolL*(MONOSAMP AddModify);                     \
-            Buffer[2*i+1]+=CalcVolL*(MONOSAMP AddModify);                   \
+            Buffer[2*i]+=(stype)CalcVolL*(MONOSAMP AddModify);                     \
+            Buffer[2*i+1]+=(stype)CalcVolL*(MONOSAMP AddModify);                   \
           }                                                                 \
         } else {                                                            \
           /* mono -> mono */                                                \
-          LOOP {Buffer[i]+=CalcVolL*(MONOSAMP AddModify);}                  \
+          LOOP {Buffer[i]+=(stype)CalcVolL*(MONOSAMP AddModify);}                  \
         }                                                                   \
       }                                                                     \
     }                                                                       \
@@ -252,4 +252,5 @@ void csSoundSourceSoftware::AddToBuffer(void *Memory, unsigned long MemSize) {
     #undef stype
     #undef AddModify
   }
+  
 }
