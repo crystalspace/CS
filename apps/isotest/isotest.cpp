@@ -43,6 +43,8 @@ IsoTest::IsoTest ()
   world = NULL;
   font = NULL;
   light = NULL;
+  myG2D = NULL;
+  myG3D = NULL;
   lastclick.Set(0,0,0);
   walking = false;
 }
@@ -50,6 +52,8 @@ IsoTest::IsoTest ()
 IsoTest::~IsoTest ()
 {
   if(view) view->DecRef();
+  if (myG2D) myG2D->DecRef ();
+  if (myG3D) myG3D->DecRef ();
   if(world) world->DecRef();
   if(engine) engine->DecRef();
   if(font) font->DecRef();
@@ -86,6 +90,20 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
+  myG3D = QUERY_PLUGIN (this, iGraphics3D);
+  if (!myG3D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    abort ();
+  }
+
+  myG2D = QUERY_PLUGIN (this, iGraphics2D);
+  if (!myG2D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    abort ();
+  }
+
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("IsoTest Crystal Space Application"))
   {
@@ -99,7 +117,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   fsvr->DecRef();
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
@@ -327,14 +345,14 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // scroll view to show player position at center of screen
-  view->SetScroll(startpos, csVector2(G3D->GetWidth()/2, G3D->GetHeight()/2));
+  view->SetScroll(startpos, csVector2(myG3D->GetWidth()/2, myG3D->GetHeight()/2));
 
   return true;
 }
 
 void IsoTest::NextFrame ()
 {
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   SysSystemDriver::NextFrame ();
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
@@ -373,7 +391,7 @@ void IsoTest::NextFrame ()
     int mousex, mousey; 
     GetMousePosition(mousex, mousey);
     // y is up in camera view
-    csVector2 screenpos(mousex, G3D->GetHeight() - mousey);
+    csVector2 screenpos(mousex, myG3D->GetHeight() - mousey);
     view->S2W(screenpos, lastclick);
   }
   if(walking) 
@@ -401,26 +419,26 @@ void IsoTest::NextFrame ()
   }
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
+  if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
     | CSDRAW_CLEARSCREEN ))
     return;
 
   view->Draw ();
   
   // Start drawing 2D graphics.
-  if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   char buf[255];
   sprintf(buf, "FPS: %g    loc(%g,%g,%g)", fps, player->GetPosition().x,
     player->GetPosition().y, player->GetPosition().z);
-  G2D->Write(font, 10, G2D->GetHeight() - 20, txtmgr->FindRGB(255,255,255),
+  myG2D->Write(font, 10, myG2D->GetHeight() - 20, txtmgr->FindRGB(255,255,255),
     -1, buf);
   
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
 
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 bool IsoTest::HandleEvent (iEvent &Event)
@@ -458,7 +476,7 @@ bool IsoTest::HandleEvent (iEvent &Event)
     view->SetAxes( h*settings[setting][0], h*settings[setting][1]*ycorrect, 
       h*settings[setting][2], settings[setting][3], settings[setting][4]);
     view->SetScroll(player->GetPosition(), 
-      csVector2(G3D->GetWidth()/2, G3D->GetHeight()/2));
+      csVector2(myG3D->GetWidth()/2, myG3D->GetHeight()/2));
     return true;
   }
 

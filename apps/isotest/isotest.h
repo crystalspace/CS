@@ -43,6 +43,9 @@ private:
   iIsoWorld *world;
   /// view on the world, the 'camera'
   iIsoView *view;
+  /// G2D and G3D plugin
+  iGraphics2D *myG2D;
+  iGraphics3D *myG3D;
 
   /// the font for text display
   iFont *font;
