@@ -26,6 +26,10 @@ chronological order.
 	  that you can specify a renderloop for a sector in a world file.
 	- Jorrit changed some warnings into notifies and others into errors
 	  in the XML shader compiler plugin.
+	- res updated the iDocument documentation by adding that a 0 iterator
+	  is never returned.
+	- res fixed xmlread to not return a 0 attribute iterator.
+	- res slightly clarified a message in xmlshader.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

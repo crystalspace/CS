@@ -62,7 +62,7 @@ SCF_IMPLEMENT_IBASE_END
 csXmlReadAttributeIterator::csXmlReadAttributeIterator (TrDocumentNode* parent)
 {
   SCF_CONSTRUCT_IBASE (0);
-  csXmlReadAttributeIterator::parent = parent->ToElement ();
+  csXmlReadAttributeIterator::parent = parent ? parent->ToElement () : 0;
   if (csXmlReadAttributeIterator::parent == 0)
   {
     current = -1;
@@ -324,10 +324,9 @@ float csXmlReadNode::GetContentsValueAsFloat ()
 
 csRef<iDocumentAttributeIterator> csXmlReadNode::GetAttributes ()
 {
-  if (use_contents_value) return 0;
   csRef<iDocumentAttributeIterator> it;
   it = csPtr<iDocumentAttributeIterator> (
-  	new csXmlReadAttributeIterator (node));
+    new csXmlReadAttributeIterator (use_contents_value ? 0 : node));
   return it;
 }
 

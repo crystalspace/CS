@@ -218,9 +218,15 @@ struct iDocumentNode : public iBase
 
   //---------------------------------------------------------------------
   
-  /// Get an iterator over all children.
+  /** 
+   * Get an iterator over all children.
+   * \remarks Never returns 0.
+   */
   virtual csRef<iDocumentNodeIterator> GetNodes () = 0;
-  /// Get an iterator over all children of the specified value.
+  /**
+   * Get an iterator over all children of the specified value.
+   * \remarks Never returns 0.
+   */
   virtual csRef<iDocumentNodeIterator> GetNodes (const char* value) = 0;
   /// Get the first node of the given value.
   virtual csRef<iDocumentNode> GetNode (const char* value) = 0;
@@ -261,7 +267,10 @@ struct iDocumentNode : public iBase
 
   //---------------------------------------------------------------------
 
-  /// Get an iterator over all attributes.
+  /**
+   * Get an iterator over all attributes.
+   * \remarks Never returns 0.
+   */
   virtual csRef<iDocumentAttributeIterator> GetAttributes () = 0;
   /// Get an attribute by name.
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name) = 0;

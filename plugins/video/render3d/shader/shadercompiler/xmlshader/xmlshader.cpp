@@ -620,7 +620,7 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
     if (!programFile)
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
-        "Unable to load shader program '%s'",
+        "Unable to load shader program file '%s'",
         node->GetAttributeValue ("file"));
       return 0;
     }
