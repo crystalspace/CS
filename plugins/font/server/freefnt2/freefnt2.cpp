@@ -33,7 +33,10 @@
 #include FT_GLYPH_H
 #include FT_MODULE_H
 #include "freefnt2.h"
+
+#if defined(COMP_VC)
 #include <crtdbg.h>
+#endif
 
 CS_IMPLEMENT_PLUGIN
 
