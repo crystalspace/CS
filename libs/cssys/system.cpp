@@ -666,9 +666,10 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
       char *arg = strchr (opt, '=');
       if (arg)
       {
-        char *newopt = new char [arg - opt + 1];
-        memcpy (newopt, opt, arg - opt);
-        (opt = newopt) [arg - opt] = 0;
+        int n = arg - opt;
+        char *newopt = new char [n + 1];
+        memcpy (newopt, opt, n);
+        (opt = newopt) [n] = 0;
         arg = strnew (arg + 1);
       }
       else
