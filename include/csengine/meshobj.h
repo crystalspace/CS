@@ -35,6 +35,7 @@
 struct iMeshWrapper;
 struct iRenderView;
 struct iMovable;
+struct iSharedVariable;
 class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csLight;
