@@ -196,7 +196,7 @@ bool csGraphics2DGLCommon::Open ()
 	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.canvas.openglcommon",
 	  "Multisample: actually %d samples",
-	  glmultisamp);
+	  (int)glmultisamp);
 
       ext.InitGL_NV_multisample_filter_hint();
       if (ext.CS_GL_NV_multisample_filter_hint)
@@ -789,8 +789,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
       }
       else
       {
-	outfn.Format ("%s%d.png", 
-	  dir, i);
+	outfn.Format ("%s%lu.png", dir, (unsigned long)i);
 	if (!vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
 	{
 	  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
