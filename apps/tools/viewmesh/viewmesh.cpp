@@ -347,11 +347,13 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	      stateslist.Get(ev.Command.Code - VIEWMESH_STATES_SELECT_START) );
 	else
 	{
-          csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+          csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
+		sprite->GetMeshObject(),
                iSpriteCal3DState));
           if (cal3dstate)
           {
-	    cal3dstate->SetAnimCycle(stateslist.Get(ev.Command.Code - VIEWMESH_STATES_SELECT_START),1);
+	    cal3dstate->SetAnimCycle(stateslist.Get(ev.Command.Code
+		  - VIEWMESH_STATES_SELECT_START),1);
 	  }
 	}
 	menu->Hide();
@@ -368,11 +370,13 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	      stateslist.Get(ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START) );
 	else
 	{
-          csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+          csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
+		sprite->GetMeshObject(),
                iSpriteCal3DState));
           if (cal3dstate)
           {
-	    cal3dstate->SetAnimAction(actionlist.Get(ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START),1,1);
+	    cal3dstate->SetAnimAction(actionlist.Get(ev.Command.Code
+		  - VIEWMESH_OVERRIDE_SELECT_START),1,1);
 	  }
 	}
 	menu->Hide();
@@ -385,10 +389,13 @@ bool ViewMesh::HandleEvent (iEvent& ev)
                 iSpriteCal3DState));
         if (cal3dstate)
         {
-	  cal3dstate->AddAnimCycle(stateslist.Get(ev.Command.Code - VIEWMESH_STATES_ADD_START),1,3);
+	  cal3dstate->AddAnimCycle(stateslist.Get(ev.Command.Code
+		- VIEWMESH_STATES_ADD_START),1,3);
 	  activelist.Push(stateslist.Get(ev.Command.Code - VIEWMESH_STATES_ADD_START));
 	  menu->Hide();
-	  (void) new csMenuItem(activemenu,stateslist.Get(ev.Command.Code - VIEWMESH_STATES_ADD_START),VIEWMESH_STATES_CLEAR_START+activelist.Length());
+	  (void) new csMenuItem(activemenu,stateslist.Get(ev.Command.Code
+		- VIEWMESH_STATES_ADD_START),VIEWMESH_STATES_CLEAR_START
+		+ activelist.Length());
 	  return true;
 	}
 	menu->Hide();
@@ -957,7 +964,7 @@ bool ViewMesh::Initialize ()
     printf ("Scaling: %f\n", scale);
   }
   else
-      scale = 1.0F;
+   scale = 1.0F;
 
   // Load specified Libraries
   Printf (CS_REPORTER_SEVERITY_NOTIFY, "Loading libs...");

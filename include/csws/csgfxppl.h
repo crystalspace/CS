@@ -32,6 +32,7 @@
  
 #include "csgeom/csrect.h"
 #include "cstool/cspixmap.h"
+#include "csutil/leakguard.h"
 #include "ivideo/graph2d.h"
 
 class csMouse;
@@ -72,6 +73,9 @@ struct iObjectRegistry;
  */
 class CS_CSWS_EXPORT csGraphicsPipeline
 {
+public:
+  CS_LEAKGUARD_DECLARE (csGraphicsPipeline);
+
 private:
   /// Only csApp can manipulate the graphics pipeline
   friend class csApp;

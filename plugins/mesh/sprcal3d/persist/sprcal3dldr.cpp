@@ -63,39 +63,39 @@ enum
 };
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
-SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DFactoryLoader::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactorySaver)
-SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DFactorySaver::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DLoader)
-SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DLoader::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DSaver)
-SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DSaver::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DFactoryLoader)
@@ -194,7 +194,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       {
           bool rotate = child->GetAttributeValueAsBool("rotate_x_axis");
           bool invert = child->GetAttributeValueAsBool("flip_textures");
-          newspr->SetLoadFlags( rotate?LOADER_ROTATE_X_AXIS:0 | invert?LOADER_INVERT_V_COORD:0 );
+          newspr->SetLoadFlags( rotate?LOADER_ROTATE_X_AXIS:0
+	      | invert?LOADER_INVERT_V_COORD:0 );
           break;
       }
     case XMLTOKEN_PATH:
@@ -276,27 +277,27 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
 	int type;
-    csString ctype = child->GetAttributeValue("type");
-    if (ctype=="idle")
-      type = iSpriteCal3DState::C3D_ANIM_TYPE_IDLE;
-    else if (ctype == "travel")
-      type = iSpriteCal3DState::C3D_ANIM_TYPE_TRAVEL;
-    else if (ctype == "cycle")
-      type = iSpriteCal3DState::C3D_ANIM_TYPE_CYCLE;
-    else if (ctype == "style_cycle")
-      type = iSpriteCal3DState::C3D_ANIM_TYPE_STYLE_CYCLE;
-    else if (ctype == "action")
-      type = iSpriteCal3DState::C3D_ANIM_TYPE_ACTION;
-    else
-      type = iSpriteCal3DState::C3D_ANIM_TYPE_NONE;
+        csString ctype = child->GetAttributeValue("type");
+        if (ctype=="idle")
+          type = iSpriteCal3DState::C3D_ANIM_TYPE_IDLE;
+        else if (ctype == "travel")
+          type = iSpriteCal3DState::C3D_ANIM_TYPE_TRAVEL;
+        else if (ctype == "cycle")
+          type = iSpriteCal3DState::C3D_ANIM_TYPE_CYCLE;
+        else if (ctype == "style_cycle")
+          type = iSpriteCal3DState::C3D_ANIM_TYPE_STYLE_CYCLE;
+        else if (ctype == "action")
+          type = iSpriteCal3DState::C3D_ANIM_TYPE_ACTION;
+        else
+          type = iSpriteCal3DState::C3D_ANIM_TYPE_NONE;
 
-	float base_vel = child->GetAttributeValueAsInt("base_vel");
+        float base_vel = child->GetAttributeValueAsInt("base_vel");
 	float min_vel = child->GetAttributeValueAsFloat("min_vel");
 	float max_vel = child->GetAttributeValueAsFloat("max_vel");
 	int  max_interval = child->GetAttributeValueAsInt("max_random");
 	int  min_interval = child->GetAttributeValueAsInt("min_random");
 	int  idle_pct     = child->GetAttributeValueAsInt("idle_pct");
-    bool lock         = child->GetAttributeValueAsBool("lock");
+        bool lock         = child->GetAttributeValueAsBool("lock");
 	if (file)
 	{
 	  int animID = newspr->LoadCoreAnimation(vfs,file,
@@ -305,17 +306,17 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    base_vel,
 	    min_vel,
 	    max_vel,
-        min_interval,
-        max_interval,
-        idle_pct, lock);
+            min_interval,
+            max_interval,
+            idle_pct, lock);
 
 	  if (animID == -1)
 	  {
-        synldr->ReportError (
+            synldr->ReportError (
   	      "crystalspace.spritecal3dfactoryloader.parse.badfile",
 	      child,"Could not load cal3d anim file <%s>.",file);
 
-        newspr->ReportLastError();
+            newspr->ReportLastError();
 	    return 0;
 	  }
 	}
@@ -348,13 +349,13 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    mat = LoadMaterialTag(newspr,child,ldr_context,def_matl,def_matl);
 	  }
 	  int mesh_index = newspr->LoadCoreMesh(vfs,file,name,attach,mat);
-      if (mesh_index == -1)
+          if (mesh_index == -1)
 	  {
-	  synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
-	    child,"Could not load mesh file <%s>.",file);
-	    newspr->ReportLastError();
-	    return 0;
+	      synldr->ReportError (
+	        "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	        child,"Could not load mesh file <%s>.",file);
+	        newspr->ReportLastError();
+	        return 0;
 	  }
 
           csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
@@ -372,7 +373,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
                 const char *morph_name = childchild->GetAttributeValue("name");
                 if (morph_file)
                 {
-                  int morph_index = newspr->LoadCoreMorphTarget(vfs,mesh_index,morph_file,morph_name);
+                  int morph_index = newspr->LoadCoreMorphTarget(
+		      vfs,mesh_index,morph_file,morph_name);
                   if (morph_index == -1)
                   {
                     newspr->ReportLastError();
@@ -457,11 +459,12 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (fact);
 }
 
-iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(iSpriteCal3DFactoryState *newspr,
-							      iDocumentNode* child,
-							      iLoaderContext* ldr_context,
-							      const char *file, 
-                                  const char* name)
+iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(
+	iSpriteCal3DFactoryState *newspr,
+	iDocumentNode* child,
+	iLoaderContext* ldr_context,
+	const char *file, 
+	const char* name)
 {
   iMaterialWrapper* mat=0;
   if (file)

@@ -64,7 +64,8 @@ private:
    *                       want to attach to.
    * \param fileName The VFS path to the mesh we want to attach.
    */
-  bool AttachMeshToSocket( int socketNumber, char* fileName, float xrot, float yrot, float zrot );
+  bool AttachMeshToSocket (int socketNumber, char* fileName, float xrot,
+      	float yrot, float zrot);
   
   /**
    * Create the window for the rotation of a mesh attached to a slot.
