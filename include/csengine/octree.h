@@ -425,11 +425,13 @@ public:
    * for for this octree node as seen from the given position.
    * The coordinates returned are world space coordinates.
    * Note that you need place for at least six vectors in the array.
+   * If bVisible is set true, the method returns all visible corners.
+   * This could be up to 7 vertices.  
    */
   void GetConvexOutline (csOctreeNode* node, const csVector3& pos,
-  	csVector3* array, int& num_array)
+  	csVector3* array, int& num_array, bool bVisible = false)
   {
-    node->bbox.GetConvexOutline (pos, array, num_array);
+    node->bbox.GetConvexOutline (pos, array, num_array, bVisible);
   }
 
   /**
