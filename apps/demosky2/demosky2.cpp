@@ -319,6 +319,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
 
   ballstate->DecRef();
+  mesh_fact->DecRef();
 
   engine->Prepare ();
 
