@@ -37,6 +37,29 @@ struct iView;
 struct iAwsSource;
 
 
+typedef struct st_EmitterList {
+  csRef<iEmitFixed> point;
+  bool point_used;
+  csRef<iEmitLine> line;
+  bool line_used;
+  csRef<iEmitBox> box;
+  bool box_used;
+  csRef<iEmitCylinder> cylinder;
+  bool cylinder_used;
+  csRef<iEmitCone> cone;
+  bool cone_used;
+  csRef<iEmitSphere> sphere;
+  bool sphere_used;
+  csRef<iEmitSphereTangent> spheretangent;
+  bool spheretangent_used;
+  csRef<iEmitCylinderTangent> cylindertangent;
+  bool cylindertangent_used;
+  csRef<iEmitMix> mix;
+  csRef<iEmitGen3D> current;
+  Emitters current_type;
+} EmitterList;
+
+
 
 class PartEdit
 {
@@ -68,17 +91,25 @@ private:
   void SetupFrame ();
   void FinishFrame ();
 
-  csRef<iEmitGen3D> CreateGen3D(Emitter3DState *emitter_state);
   bool RefreshFileList();
   bool RecreateParticleSystem();
   bool UpdateParticleSystem();
 
   bool recreate_system;
-  EmitterState state_emitter;
+  EmitterState state_emitter,state_emitter_new;
+  bool force_emitter_setup;
   Emitter3DState state_initial_position;
   Emitter3DState state_initial_speed;
   Emitter3DState state_initial_acceleration;
+  FieldState state_field_speed;
+  FieldState state_field_accel;
   AttractorState state_attractor;
+
+  EmitterList startpos,startspeed,startaccel,fieldspeed,fieldaccel,attractor;
+
+  bool InitEmitterList(EmitterList *elist);
+  bool ClearGen3D(EmitterList *elist);
+  bool UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state);
 
   /** Set to true on start.  Set to false when a quit event is received.
    *  When false, normal events are not processed (such as aws events) since the underlying objects

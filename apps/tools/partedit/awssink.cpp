@@ -570,6 +570,254 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetIACYTWeight",&AwsSetIACYTWeight);
 
 
+    // Field Speed Options Callbacks
+    sink->RegisterTrigger("RegisterFieldSpeed",&RegisterFieldSpeed);
+    sink->RegisterTrigger("RegisterFSActive",&RegisterFSActive);
+    sink->RegisterTrigger("RegisterFSFPX",&RegisterFSFPX);
+    sink->RegisterTrigger("RegisterFSFPY",&RegisterFSFPY);
+    sink->RegisterTrigger("RegisterFSFPZ",&RegisterFSFPZ);
+    sink->RegisterTrigger("RegisterFSFWeight",&RegisterFSFWeight);
+    sink->RegisterTrigger("RegisterFSLSX",&RegisterFSLSX);
+    sink->RegisterTrigger("RegisterFSLSY",&RegisterFSLSY);
+    sink->RegisterTrigger("RegisterFSLSZ",&RegisterFSLSZ);
+    sink->RegisterTrigger("RegisterFSLEX",&RegisterFSLEX);
+    sink->RegisterTrigger("RegFSLEY",&RegisterFSLEY);
+    sink->RegisterTrigger("RegFSLEZ",&RegisterFSLEZ);
+    sink->RegisterTrigger("RegisterFSLWeight",&RegisterFSLWeight);
+    sink->RegisterTrigger("RegisterFSBMX",&RegisterFSBMX);
+    sink->RegisterTrigger("RegisterFSBMY",&RegisterFSBMY);
+    sink->RegisterTrigger("RegisterFSBMZ",&RegisterFSBMZ);
+    sink->RegisterTrigger("RegisterFSBXX",&RegisterFSBXX);
+    sink->RegisterTrigger("RegisterFSBXY",&RegisterFSBXY);
+    sink->RegisterTrigger("RegisterFSBXZ",&RegisterFSBXZ);
+    sink->RegisterTrigger("RegisterFSBWeight",&RegisterFSBWeight);
+    sink->RegisterTrigger("RegFSSCX",&RegisterFSSCX);
+    sink->RegisterTrigger("RegisterFSSCY",&RegisterFSSCY);
+    sink->RegisterTrigger("RegisterFSSCZ",&RegisterFSSCZ);
+    sink->RegisterTrigger("RegisterFSSMin",&RegisterFSSMin);
+    sink->RegisterTrigger("RegisterFSSMax",&RegisterFSSMax);
+    sink->RegisterTrigger("RegisterFSSWeight",&RegisterFSSWeight);
+    sink->RegisterTrigger("RegisterFSCNOX",&RegisterFSCNOX);
+    sink->RegisterTrigger("RegisterFSCNOY",&RegisterFSCNOY);
+    sink->RegisterTrigger("RegisterFSCNOZ",&RegisterFSCNOZ);
+    sink->RegisterTrigger("RegisterFSCNElev",&RegisterFSCNElev);
+    sink->RegisterTrigger("RegisterFSCNAzim",&RegisterFSCNAzim);
+    sink->RegisterTrigger("RegisterFSCNAper",&RegisterFSCNAper);
+    sink->RegisterTrigger("RegisterFSCNMin",&RegisterFSCNMin);
+    sink->RegisterTrigger("RegisterFSCNMax",&RegisterFSCNMax);
+    sink->RegisterTrigger("RegisterFSCNWeight",&RegisterFSCNWeight);
+    sink->RegisterTrigger("RegisterFSCYSX",&RegisterFSCYSX);
+    sink->RegisterTrigger("RegisterFSCYSY",&RegisterFSCYSY);
+    sink->RegisterTrigger("RegisterFSCYSZ",&RegisterFSCYSZ);
+    sink->RegisterTrigger("RegisterFSCYEX",&RegisterFSCYEX);
+    sink->RegisterTrigger("RegisterFSCYEY",&RegisterFSCYEY);
+    sink->RegisterTrigger("RegisterFSCYEZ",&RegisterFSCYEZ);
+    sink->RegisterTrigger("RegisterFSCYMin",&RegisterFSCYMin);
+    sink->RegisterTrigger("RegisterFSCYMax",&RegisterFSCYMax);
+    sink->RegisterTrigger("RegisterFSCYWeight",&RegisterFSCYWeight);
+    sink->RegisterTrigger("RegisterFSSTCX",&RegisterFSSTCX);
+    sink->RegisterTrigger("RegisterFSSTCY",&RegisterFSSTCY);
+    sink->RegisterTrigger("RegisterFSSTCZ",&RegisterFSSTCZ);
+    sink->RegisterTrigger("RegisterFSSTMin",&RegisterFSSTMin);
+    sink->RegisterTrigger("RegisterFSSTMax",&RegisterFSSTMax);
+    sink->RegisterTrigger("RegisterFSSTWeight",&RegisterFSSTWeight);
+    sink->RegisterTrigger("RegisterFSCYTSX",&RegisterFSCYTSX);
+    sink->RegisterTrigger("RegisterFSCYTSY",&RegisterFSCYTSY);
+    sink->RegisterTrigger("RegisterFSCYTSZ",&RegisterFSCYTSZ);
+    sink->RegisterTrigger("RegisterFSCYTEX",&RegisterFSCYTEX);
+    sink->RegisterTrigger("RegisterFSCYTEY",&RegisterFSCYTEY);
+    sink->RegisterTrigger("RegisterFSCYTEZ",&RegisterFSCYTEZ);
+    sink->RegisterTrigger("RegisterFSCYTMin",&RegisterFSCYTMin);
+    sink->RegisterTrigger("RegisterFSCYTMax",&RegisterFSCYTMax);
+    sink->RegisterTrigger("RegisterFSCYTWeight",&RegisterFSCYTWeight);
+
+
+
+    sink->RegisterTrigger("SetFSActive",&AwsSetFSActive);
+    sink->RegisterTrigger("SetFSFPositionX",&AwsSetFSFPositionX);
+    sink->RegisterTrigger("SetFSFPositionY",&AwsSetFSFPositionY);
+    sink->RegisterTrigger("SetFSFPositionZ",&AwsSetFSFPositionZ);
+    sink->RegisterTrigger("SetFSFWeight",&AwsSetFSFWeight);
+    sink->RegisterTrigger("SetFSLStartX",&AwsSetFSLStartX);
+    sink->RegisterTrigger("SetFSLStartY",&AwsSetFSLStartY);
+    sink->RegisterTrigger("SetFSLStartZ",&AwsSetFSLStartZ);
+    sink->RegisterTrigger("SetFSLEndX",&AwsSetFSLEndX);
+    sink->RegisterTrigger("SetFSLEndY",&AwsSetFSLEndY);
+    sink->RegisterTrigger("SetFSLEndZ",&AwsSetFSLEndZ);
+    sink->RegisterTrigger("SetFSLWeight",&AwsSetFSLWeight);
+    sink->RegisterTrigger("SetFSBMinX",&AwsSetFSBMinX);
+    sink->RegisterTrigger("SetFSBMinY",&AwsSetFSBMinY);
+    sink->RegisterTrigger("SetFSBMinZ",&AwsSetFSBMinZ);
+    sink->RegisterTrigger("SetFSBMaxX",&AwsSetFSBMaxX);
+    sink->RegisterTrigger("SetFSBMaxY",&AwsSetFSBMaxY);
+    sink->RegisterTrigger("SetFSBMaxZ",&AwsSetFSBMaxZ);
+    sink->RegisterTrigger("SetFSBWeight",&AwsSetFSBWeight);
+    sink->RegisterTrigger("SetFSSCenterX",&AwsSetFSSCenterX);
+    sink->RegisterTrigger("SetFSSCenterY",&AwsSetFSSCenterY);
+    sink->RegisterTrigger("SetFSSCenterZ",&AwsSetFSSCenterZ);
+    sink->RegisterTrigger("SetFSSMin",&AwsSetFSSMin);
+    sink->RegisterTrigger("SetFSSMax",&AwsSetFSSMax);
+    sink->RegisterTrigger("SetFSSWeight",&AwsSetFSSWeight);
+    sink->RegisterTrigger("SetFSCNOriginX",&AwsSetFSCNOriginX);
+    sink->RegisterTrigger("SetFSCNOriginY",&AwsSetFSCNOriginY);
+    sink->RegisterTrigger("SetFSCNOriginZ",&AwsSetFSCNOriginZ);
+    sink->RegisterTrigger("SetFSCNElev",&AwsSetFSCNElev);
+    sink->RegisterTrigger("SetFSCNAzim",&AwsSetFSCNAzim);
+    sink->RegisterTrigger("SetFSCNAper",&AwsSetFSCNAper);
+    sink->RegisterTrigger("SetFSCNMin",&AwsSetFSCNMin);
+    sink->RegisterTrigger("SetFSCNMax",&AwsSetFSCNMax);
+    sink->RegisterTrigger("SetFSCNWeight",&AwsSetFSCNWeight);
+    sink->RegisterTrigger("SetFSCYStartX",&AwsSetFSCYStartX);
+    sink->RegisterTrigger("SetFSCYStartY",&AwsSetFSCYStartY);
+    sink->RegisterTrigger("SetFSCYStartZ",&AwsSetFSCYStartZ);
+    sink->RegisterTrigger("SetFSCYEndX",&AwsSetFSCYEndX);
+    sink->RegisterTrigger("SetFSCYEndY",&AwsSetFSCYEndY);
+    sink->RegisterTrigger("SetFSCYEndZ",&AwsSetFSCYEndZ);
+    sink->RegisterTrigger("SetFSCYMin",&AwsSetFSCYMin);
+    sink->RegisterTrigger("SetFSCYMax",&AwsSetFSCYMax);
+    sink->RegisterTrigger("SetFSCYWeight",&AwsSetFSCYWeight);
+    sink->RegisterTrigger("SetFSSTCenterX",&AwsSetFSSTCenterX);
+    sink->RegisterTrigger("SetFSSTCenterY",&AwsSetFSSTCenterY);
+    sink->RegisterTrigger("SetFSSTCenterZ",&AwsSetFSSTCenterZ);
+    sink->RegisterTrigger("SetFSSTMin",&AwsSetFSSTMin);
+    sink->RegisterTrigger("SetFSSTMax",&AwsSetFSSTMax);
+    sink->RegisterTrigger("SetFSSTWeight",&AwsSetFSSTWeight);
+    sink->RegisterTrigger("SetFSCYTStartX",&AwsSetFSCYTStartX);
+    sink->RegisterTrigger("SetFSCYTStartY",&AwsSetFSCYTStartY);
+    sink->RegisterTrigger("SetFSCYTStartZ",&AwsSetFSCYTStartZ);
+    sink->RegisterTrigger("SetFSCYTEndX",&AwsSetFSCYTEndX);
+    sink->RegisterTrigger("SetFSCYTEndY",&AwsSetFSCYTEndY);
+    sink->RegisterTrigger("SetFSCYTEndZ",&AwsSetFSCYTEndZ);
+    sink->RegisterTrigger("SetFSCYTMin",&AwsSetFSCYTMin);
+    sink->RegisterTrigger("SetFSCYTMax",&AwsSetFSCYTMax);
+    sink->RegisterTrigger("SetFSCYTWeight",&AwsSetFSCYTWeight);
+
+
+
+    // Field Acceleration Options Callbacks
+    sink->RegisterTrigger("RegisterFieldAccel",&RegisterFieldAccel);
+    sink->RegisterTrigger("RegisterFAActive",&RegisterFAActive);
+    sink->RegisterTrigger("RegisterFAFPX",&RegisterFAFPX);
+    sink->RegisterTrigger("RegisterFAFPY",&RegisterFAFPY);
+    sink->RegisterTrigger("RegisterFAFPZ",&RegisterFAFPZ);
+    sink->RegisterTrigger("RegisterFAFWeight",&RegisterFAFWeight);
+    sink->RegisterTrigger("RegisterFALSX",&RegisterFALSX);
+    sink->RegisterTrigger("RegisterFALSY",&RegisterFALSY);
+    sink->RegisterTrigger("RegisterFALSZ",&RegisterFALSZ);
+    sink->RegisterTrigger("RegisterFALEX",&RegisterFALEX);
+    sink->RegisterTrigger("RegFALEY",&RegisterFALEY);
+    sink->RegisterTrigger("RegFALEZ",&RegisterFALEZ);
+    sink->RegisterTrigger("RegisterFALWeight",&RegisterFALWeight);
+    sink->RegisterTrigger("RegisterFABMX",&RegisterFABMX);
+    sink->RegisterTrigger("RegisterFABMY",&RegisterFABMY);
+    sink->RegisterTrigger("RegisterFABMZ",&RegisterFABMZ);
+    sink->RegisterTrigger("RegisterFABXX",&RegisterFABXX);
+    sink->RegisterTrigger("RegisterFABXY",&RegisterFABXY);
+    sink->RegisterTrigger("RegisterFABXZ",&RegisterFABXZ);
+    sink->RegisterTrigger("RegisterFABWeight",&RegisterFABWeight);
+    sink->RegisterTrigger("RegFASCX",&RegisterFASCX);
+    sink->RegisterTrigger("RegisterFASCY",&RegisterFASCY);
+    sink->RegisterTrigger("RegisterFASCZ",&RegisterFASCZ);
+    sink->RegisterTrigger("RegisterFASMin",&RegisterFASMin);
+    sink->RegisterTrigger("RegisterFASMax",&RegisterFASMax);
+    sink->RegisterTrigger("RegisterFASWeight",&RegisterFASWeight);
+    sink->RegisterTrigger("RegisterFACNOX",&RegisterFACNOX);
+    sink->RegisterTrigger("RegisterFACNOY",&RegisterFACNOY);
+    sink->RegisterTrigger("RegisterFACNOZ",&RegisterFACNOZ);
+    sink->RegisterTrigger("RegisterFACNElev",&RegisterFACNElev);
+    sink->RegisterTrigger("RegisterFACNAzim",&RegisterFACNAzim);
+    sink->RegisterTrigger("RegisterFACNAper",&RegisterFACNAper);
+    sink->RegisterTrigger("RegisterFACNMin",&RegisterFACNMin);
+    sink->RegisterTrigger("RegisterFACNMax",&RegisterFACNMax);
+    sink->RegisterTrigger("RegisterFACNWeight",&RegisterFACNWeight);
+    sink->RegisterTrigger("RegisterFACYSX",&RegisterFACYSX);
+    sink->RegisterTrigger("RegisterFACYSY",&RegisterFACYSY);
+    sink->RegisterTrigger("RegisterFACYSZ",&RegisterFACYSZ);
+    sink->RegisterTrigger("RegisterFACYEX",&RegisterFACYEX);
+    sink->RegisterTrigger("RegisterFACYEY",&RegisterFACYEY);
+    sink->RegisterTrigger("RegisterFACYEZ",&RegisterFACYEZ);
+    sink->RegisterTrigger("RegisterFACYMin",&RegisterFACYMin);
+    sink->RegisterTrigger("RegisterFACYMax",&RegisterFACYMax);
+    sink->RegisterTrigger("RegisterFACYWeight",&RegisterFACYWeight);
+    sink->RegisterTrigger("RegisterFASTCX",&RegisterFASTCX);
+    sink->RegisterTrigger("RegisterFASTCY",&RegisterFASTCY);
+    sink->RegisterTrigger("RegisterFASTCZ",&RegisterFASTCZ);
+    sink->RegisterTrigger("RegisterFASTMin",&RegisterFASTMin);
+    sink->RegisterTrigger("RegisterFASTMax",&RegisterFASTMax);
+    sink->RegisterTrigger("RegisterFASTWeight",&RegisterFASTWeight);
+    sink->RegisterTrigger("RegisterFACYTSX",&RegisterFACYTSX);
+    sink->RegisterTrigger("RegisterFACYTSY",&RegisterFACYTSY);
+    sink->RegisterTrigger("RegisterFACYTSZ",&RegisterFACYTSZ);
+    sink->RegisterTrigger("RegisterFACYTEX",&RegisterFACYTEX);
+    sink->RegisterTrigger("RegisterFACYTEY",&RegisterFACYTEY);
+    sink->RegisterTrigger("RegisterFACYTEZ",&RegisterFACYTEZ);
+    sink->RegisterTrigger("RegisterFACYTMin",&RegisterFACYTMin);
+    sink->RegisterTrigger("RegisterFACYTMax",&RegisterFACYTMax);
+    sink->RegisterTrigger("RegisterFACYTWeight",&RegisterFACYTWeight);
+
+
+
+    sink->RegisterTrigger("SetFAActive",&AwsSetFAActive);
+    sink->RegisterTrigger("SetFAFPositionX",&AwsSetFAFPositionX);
+    sink->RegisterTrigger("SetFAFPositionY",&AwsSetFAFPositionY);
+    sink->RegisterTrigger("SetFAFPositionZ",&AwsSetFAFPositionZ);
+    sink->RegisterTrigger("SetFAFWeight",&AwsSetFAFWeight);
+    sink->RegisterTrigger("SetFALStartX",&AwsSetFALStartX);
+    sink->RegisterTrigger("SetFALStartY",&AwsSetFALStartY);
+    sink->RegisterTrigger("SetFALStartZ",&AwsSetFALStartZ);
+    sink->RegisterTrigger("SetFALEndX",&AwsSetFALEndX);
+    sink->RegisterTrigger("SetFALEndY",&AwsSetFALEndY);
+    sink->RegisterTrigger("SetFALEndZ",&AwsSetFALEndZ);
+    sink->RegisterTrigger("SetFALWeight",&AwsSetFALWeight);
+    sink->RegisterTrigger("SetFABMinX",&AwsSetFABMinX);
+    sink->RegisterTrigger("SetFABMinY",&AwsSetFABMinY);
+    sink->RegisterTrigger("SetFABMinZ",&AwsSetFABMinZ);
+    sink->RegisterTrigger("SetFABMaxX",&AwsSetFABMaxX);
+    sink->RegisterTrigger("SetFABMaxY",&AwsSetFABMaxY);
+    sink->RegisterTrigger("SetFABMaxZ",&AwsSetFABMaxZ);
+    sink->RegisterTrigger("SetFABWeight",&AwsSetFABWeight);
+    sink->RegisterTrigger("SetFASCenterX",&AwsSetFASCenterX);
+    sink->RegisterTrigger("SetFASCenterY",&AwsSetFASCenterY);
+    sink->RegisterTrigger("SetFASCenterZ",&AwsSetFASCenterZ);
+    sink->RegisterTrigger("SetFASMin",&AwsSetFASMin);
+    sink->RegisterTrigger("SetFASMax",&AwsSetFASMax);
+    sink->RegisterTrigger("SetFASWeight",&AwsSetFASWeight);
+    sink->RegisterTrigger("SetFACNOriginX",&AwsSetFACNOriginX);
+    sink->RegisterTrigger("SetFACNOriginY",&AwsSetFACNOriginY);
+    sink->RegisterTrigger("SetFACNOriginZ",&AwsSetFACNOriginZ);
+    sink->RegisterTrigger("SetFACNElev",&AwsSetFACNElev);
+    sink->RegisterTrigger("SetFACNAzim",&AwsSetFACNAzim);
+    sink->RegisterTrigger("SetFACNAper",&AwsSetFACNAper);
+    sink->RegisterTrigger("SetFACNMin",&AwsSetFACNMin);
+    sink->RegisterTrigger("SetFACNMax",&AwsSetFACNMax);
+    sink->RegisterTrigger("SetFACNWeight",&AwsSetFACNWeight);
+    sink->RegisterTrigger("SetFACYStartX",&AwsSetFACYStartX);
+    sink->RegisterTrigger("SetFACYStartY",&AwsSetFACYStartY);
+    sink->RegisterTrigger("SetFACYStartZ",&AwsSetFACYStartZ);
+    sink->RegisterTrigger("SetFACYEndX",&AwsSetFACYEndX);
+    sink->RegisterTrigger("SetFACYEndY",&AwsSetFACYEndY);
+    sink->RegisterTrigger("SetFACYEndZ",&AwsSetFACYEndZ);
+    sink->RegisterTrigger("SetFACYMin",&AwsSetFACYMin);
+    sink->RegisterTrigger("SetFACYMax",&AwsSetFACYMax);
+    sink->RegisterTrigger("SetFACYWeight",&AwsSetFACYWeight);
+    sink->RegisterTrigger("SetFASTCenterX",&AwsSetFASTCenterX);
+    sink->RegisterTrigger("SetFASTCenterY",&AwsSetFASTCenterY);
+    sink->RegisterTrigger("SetFASTCenterZ",&AwsSetFASTCenterZ);
+    sink->RegisterTrigger("SetFASTMin",&AwsSetFASTMin);
+    sink->RegisterTrigger("SetFASTMax",&AwsSetFASTMax);
+    sink->RegisterTrigger("SetFASTWeight",&AwsSetFASTWeight);
+    sink->RegisterTrigger("SetFACYTStartX",&AwsSetFACYTStartX);
+    sink->RegisterTrigger("SetFACYTStartY",&AwsSetFACYTStartY);
+    sink->RegisterTrigger("SetFACYTStartZ",&AwsSetFACYTStartZ);
+    sink->RegisterTrigger("SetFACYTEndX",&AwsSetFACYTEndX);
+    sink->RegisterTrigger("SetFACYTEndY",&AwsSetFACYTEndY);
+    sink->RegisterTrigger("SetFACYTEndZ",&AwsSetFACYTEndZ);
+    sink->RegisterTrigger("SetFACYTMin",&AwsSetFACYTMin);
+    sink->RegisterTrigger("SetFACYTMax",&AwsSetFACYTMax);
+    sink->RegisterTrigger("SetFACYTWeight",&AwsSetFACYTWeight);
+
+
+
     // Attractor Options Callbacks
     sink->RegisterTrigger("RegisterAttractor",&RegisterAttractor);
     sink->RegisterTrigger("RegisterATForce",&RegisterATForce);
@@ -882,7 +1130,23 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
         asink->AttractorData.iawscomponent_Attractor->Hide();
       break;
     case SECTION_FIELD_SPEED:
+      if (asink->SectionState[i])
+      {
+        asink->FieldSpeedData.iawscomponent_FieldSpeed->Show();
+        asink->FieldSpeedData.iawscomponent_FieldSpeed->Raise();
+      }
+      else
+        asink->FieldSpeedData.iawscomponent_FieldSpeed->Hide();
+      break;
     case SECTION_FIELD_ACCELERATION:
+      if (asink->SectionState[i])
+      {
+        asink->FieldAccelerationData.iawscomponent_FieldAccel->Show();
+        asink->FieldAccelerationData.iawscomponent_FieldAccel->Raise();
+      }
+      else
+        asink->FieldAccelerationData.iawscomponent_FieldAccel->Hide();
+      break;
     case SECTION_AGING_MOMENTS:
     default:
       printf("Unhandled section state change %d.\n",i);
@@ -2328,6 +2592,728 @@ void awsSink::UpdateInitialAccelerationStateDisplay()
 
 
 
+
+
+
+
+
+
+
+////
+//  Field Speed Display
+////
+IMPLEMENT_REGISTER_FUNCTION(RegisterFieldSpeed,FieldSpeedData.iawscomponent_FieldSpeed)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSActive,FieldSpeedData.iawscomponent_FSActive)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSFPX,FieldSpeedData.iawscomponent_FSFPX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSFPY,FieldSpeedData.iawscomponent_FSFPY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSFPZ,FieldSpeedData.iawscomponent_FSFPZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSFWeight,FieldSpeedData.iawscomponent_FSFWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLSX,FieldSpeedData.iawscomponent_FSLSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLSY,FieldSpeedData.iawscomponent_FSLSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLSZ,FieldSpeedData.iawscomponent_FSLSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLEX,FieldSpeedData.iawscomponent_FSLEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLEY,FieldSpeedData.iawscomponent_FSLEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLEZ,FieldSpeedData.iawscomponent_FSLEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLWeight,FieldSpeedData.iawscomponent_FSLWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSBMX,FieldSpeedData.iawscomponent_FSBMX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSBMY,FieldSpeedData.iawscomponent_FSBMY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSBMZ,FieldSpeedData.iawscomponent_FSBMZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSBXX,FieldSpeedData.iawscomponent_FSBXX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSBXY,FieldSpeedData.iawscomponent_FSBXY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSBXZ,FieldSpeedData.iawscomponent_FSBXZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSBWeight,FieldSpeedData.iawscomponent_FSBWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSCX,FieldSpeedData.iawscomponent_FSSCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSCY,FieldSpeedData.iawscomponent_FSSCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSCZ,FieldSpeedData.iawscomponent_FSSCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSMin,FieldSpeedData.iawscomponent_FSSMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSMax,FieldSpeedData.iawscomponent_FSSMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSWeight,FieldSpeedData.iawscomponent_FSSWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNOX,FieldSpeedData.iawscomponent_FSCNOX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNOY,FieldSpeedData.iawscomponent_FSCNOY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNOZ,FieldSpeedData.iawscomponent_FSCNOZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNElev,FieldSpeedData.iawscomponent_FSCNElevation)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNAzim,FieldSpeedData.iawscomponent_FSCNAzimuth)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNAper,FieldSpeedData.iawscomponent_FSCNAperture)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNMin,FieldSpeedData.iawscomponent_FSCNMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNMax,FieldSpeedData.iawscomponent_FSCNMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCNWeight,FieldSpeedData.iawscomponent_FSCNWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYSX,FieldSpeedData.iawscomponent_FSCYSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYSY,FieldSpeedData.iawscomponent_FSCYSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYSZ,FieldSpeedData.iawscomponent_FSCYSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYEX,FieldSpeedData.iawscomponent_FSCYEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYEY,FieldSpeedData.iawscomponent_FSCYEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYEZ,FieldSpeedData.iawscomponent_FSCYEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYMin,FieldSpeedData.iawscomponent_FSCYMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYMax,FieldSpeedData.iawscomponent_FSCYMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYWeight,FieldSpeedData.iawscomponent_FSCYWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSTCX,FieldSpeedData.iawscomponent_FSSTCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSTCY,FieldSpeedData.iawscomponent_FSSTCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSTCZ,FieldSpeedData.iawscomponent_FSSTCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSTMin,FieldSpeedData.iawscomponent_FSSTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSTMax,FieldSpeedData.iawscomponent_FSSTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSSTWeight,FieldSpeedData.iawscomponent_FSSTWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTSX,FieldSpeedData.iawscomponent_FSCYTSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTSY,FieldSpeedData.iawscomponent_FSCYTSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTSZ,FieldSpeedData.iawscomponent_FSCYTSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTEX,FieldSpeedData.iawscomponent_FSCYTEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTEY,FieldSpeedData.iawscomponent_FSCYTEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTEZ,FieldSpeedData.iawscomponent_FSCYTEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTMin,FieldSpeedData.iawscomponent_FSCYTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTMax,FieldSpeedData.iawscomponent_FSCYTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSCYTWeight,FieldSpeedData.iawscomponent_FSCYTWeight)
+
+
+
+IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetFSActive,
+									 FieldSpeedData.state.active,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+// Fixed Position
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSFPositionX,
+									 FieldSpeedData.state.e3d_state.fixed_position.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSFPositionY,
+									 FieldSpeedData.state.e3d_state.fixed_position.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSFPositionZ,
+									 FieldSpeedData.state.e3d_state.fixed_position.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSFWeight,
+									 FieldSpeedData.state.e3d_state.fixed_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+// Line
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSLStartX,
+									 FieldSpeedData.state.e3d_state.line_start.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSLStartY,
+									 FieldSpeedData.state.e3d_state.line_start.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSLStartZ,
+									 FieldSpeedData.state.e3d_state.line_start.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSLEndX,
+									 FieldSpeedData.state.e3d_state.line_end.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSLEndY,
+									 FieldSpeedData.state.e3d_state.line_end.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSLEndZ,
+									 FieldSpeedData.state.e3d_state.line_end.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSLWeight,
+									 FieldSpeedData.state.e3d_state.line_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+// Box
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSBMinX,
+									 FieldSpeedData.state.e3d_state.box_min.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSBMinY,
+									 FieldSpeedData.state.e3d_state.box_min.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSBMinZ,
+									 FieldSpeedData.state.e3d_state.box_min.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSBMaxX,
+									 FieldSpeedData.state.e3d_state.box_max.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSBMaxY,
+									 FieldSpeedData.state.e3d_state.box_max.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSBMaxZ,
+									 FieldSpeedData.state.e3d_state.box_max.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSBWeight,
+									 FieldSpeedData.state.e3d_state.box_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+// Sphere
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSCenterX,
+									 FieldSpeedData.state.e3d_state.sphere_center.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSCenterY,
+									 FieldSpeedData.state.e3d_state.sphere_center.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSCenterZ,
+									 FieldSpeedData.state.e3d_state.sphere_center.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSMin,
+									 FieldSpeedData.state.e3d_state.sphere_min,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSMax,
+									 FieldSpeedData.state.e3d_state.sphere_max,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSWeight,
+									 FieldSpeedData.state.e3d_state.sphere_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+// Cone
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNOriginX,
+									 FieldSpeedData.state.e3d_state.cone_origin.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNOriginY,
+									 FieldSpeedData.state.e3d_state.cone_origin.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNOriginZ,
+									 FieldSpeedData.state.e3d_state.cone_origin.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNElev,
+									 FieldSpeedData.state.e3d_state.cone_elevation,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNAzim,
+									 FieldSpeedData.state.e3d_state.cone_azimuth,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNAper,
+									 FieldSpeedData.state.e3d_state.cone_aperture,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNMin,
+									 FieldSpeedData.state.e3d_state.cone_min,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNMax,
+									 FieldSpeedData.state.e3d_state.cone_max,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCNWeight,
+									 FieldSpeedData.state.e3d_state.cone_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+// Cylinder
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYStartX,
+									 FieldSpeedData.state.e3d_state.cylinder_start.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYStartY,
+									 FieldSpeedData.state.e3d_state.cylinder_start.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYStartZ,
+									 FieldSpeedData.state.e3d_state.cylinder_start.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYEndX,
+									 FieldSpeedData.state.e3d_state.cylinder_end.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYEndY,
+									 FieldSpeedData.state.e3d_state.cylinder_end.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYEndZ,
+									 FieldSpeedData.state.e3d_state.cylinder_end.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYMin,
+									 FieldSpeedData.state.e3d_state.cylinder_min,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYMax,
+									 FieldSpeedData.state.e3d_state.cylinder_max,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYWeight,
+									 FieldSpeedData.state.e3d_state.cylinder_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+// Sphere Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSTCenterX,
+									 FieldSpeedData.state.e3d_state.spheretangent_center.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSTCenterY,
+									 FieldSpeedData.state.e3d_state.spheretangent_center.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSTCenterZ,
+									 FieldSpeedData.state.e3d_state.spheretangent_center.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSTMin,
+									 FieldSpeedData.state.e3d_state.spheretangent_min,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSTMax,
+									 FieldSpeedData.state.e3d_state.spheretangent_max,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSSTWeight,
+									 FieldSpeedData.state.e3d_state.spheretangent_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+// Cylinder Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTStartX,
+									 FieldSpeedData.state.e3d_state.cylindertangent_start.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTStartY,
+									 FieldSpeedData.state.e3d_state.cylindertangent_start.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTStartZ,
+									 FieldSpeedData.state.e3d_state.cylindertangent_start.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTEndX,
+									 FieldSpeedData.state.e3d_state.cylindertangent_end.x,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTEndY,
+									 FieldSpeedData.state.e3d_state.cylindertangent_end.y,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTEndZ,
+									 FieldSpeedData.state.e3d_state.cylindertangent_end.z,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTMin,
+									 FieldSpeedData.state.e3d_state.cylindertangent_min,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTMax,
+									 FieldSpeedData.state.e3d_state.cylindertangent_max,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTWeight,
+									 FieldSpeedData.state.e3d_state.cylindertangent_weight,FieldSpeedData.settings_changed,
+									 UpdateFieldSpeedStateDisplay)
+
+
+
+
+
+
+bool awsSink::FieldSpeedStateChanged()
+{
+  return FieldSpeedData.settings_changed;
+}
+
+void awsSink::ClearFieldSpeedStateChanged()
+{
+  FieldSpeedData.settings_changed=false;
+}
+
+FieldState *awsSink::GetFieldSpeedState()
+{
+  return &(FieldSpeedData.state);
+}
+
+void awsSink::SetFieldSpeedState(FieldState *source)
+{
+  memcpy(&(FieldSpeedData.state),source,sizeof(FieldState));
+  ClearFieldSpeedStateChanged();
+  UpdateFieldSpeedStateDisplay();
+}
+
+void awsSink::UpdateFieldSpeedStateDisplay()
+{
+  csRef<iString> value;
+  bool bvalue;
+
+  SET_CHECKBOX_BOOL(FieldSpeedData.iawscomponent_FSActive,FieldSpeedData.state.active);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSFPX,FieldSpeedData.state.e3d_state.fixed_position.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSFPY,FieldSpeedData.state.e3d_state.fixed_position.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSFPZ,FieldSpeedData.state.e3d_state.fixed_position.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSFWeight,FieldSpeedData.state.e3d_state.fixed_weight);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSLSX,FieldSpeedData.state.e3d_state.line_start.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSLSY,FieldSpeedData.state.e3d_state.line_start.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSLSZ,FieldSpeedData.state.e3d_state.line_start.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSLEX,FieldSpeedData.state.e3d_state.line_end.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSLEY,FieldSpeedData.state.e3d_state.line_end.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSLEZ,FieldSpeedData.state.e3d_state.line_end.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSLWeight,FieldSpeedData.state.e3d_state.line_weight);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSBMX,FieldSpeedData.state.e3d_state.box_min.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSBMY,FieldSpeedData.state.e3d_state.box_min.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSBMZ,FieldSpeedData.state.e3d_state.box_min.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSBXX,FieldSpeedData.state.e3d_state.box_max.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSBXY,FieldSpeedData.state.e3d_state.box_max.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSBXZ,FieldSpeedData.state.e3d_state.box_max.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSBWeight,FieldSpeedData.state.e3d_state.box_weight);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSCX,FieldSpeedData.state.e3d_state.sphere_center.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSCY,FieldSpeedData.state.e3d_state.sphere_center.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSCZ,FieldSpeedData.state.e3d_state.sphere_center.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSMin,FieldSpeedData.state.e3d_state.sphere_min);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSMax,FieldSpeedData.state.e3d_state.sphere_max);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSWeight,FieldSpeedData.state.e3d_state.sphere_weight);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNOX,FieldSpeedData.state.e3d_state.cone_origin.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNOY,FieldSpeedData.state.e3d_state.cone_origin.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNOZ,FieldSpeedData.state.e3d_state.cone_origin.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNElevation,FieldSpeedData.state.e3d_state.cone_elevation);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNAzimuth,FieldSpeedData.state.e3d_state.cone_azimuth);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNAperture,FieldSpeedData.state.e3d_state.cone_aperture);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNMin,FieldSpeedData.state.e3d_state.cone_min);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNMax,FieldSpeedData.state.e3d_state.cone_max);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCNWeight,FieldSpeedData.state.e3d_state.cone_weight);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYSX,FieldSpeedData.state.e3d_state.cylinder_start.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYSY,FieldSpeedData.state.e3d_state.cylinder_start.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYSZ,FieldSpeedData.state.e3d_state.cylinder_start.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYEX,FieldSpeedData.state.e3d_state.cylinder_end.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYEY,FieldSpeedData.state.e3d_state.cylinder_end.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYEZ,FieldSpeedData.state.e3d_state.cylinder_end.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYMin,FieldSpeedData.state.e3d_state.cylinder_min);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYMax,FieldSpeedData.state.e3d_state.cylinder_max);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYWeight,FieldSpeedData.state.e3d_state.cylinder_weight);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSTCX,FieldSpeedData.state.e3d_state.spheretangent_center.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSTCY,FieldSpeedData.state.e3d_state.spheretangent_center.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSTCZ,FieldSpeedData.state.e3d_state.spheretangent_center.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSTMin,FieldSpeedData.state.e3d_state.spheretangent_min);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSTMax,FieldSpeedData.state.e3d_state.spheretangent_max);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSSTWeight,FieldSpeedData.state.e3d_state.spheretangent_weight);
+
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTSX,FieldSpeedData.state.e3d_state.cylindertangent_start.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTSY,FieldSpeedData.state.e3d_state.cylindertangent_start.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTSZ,FieldSpeedData.state.e3d_state.cylindertangent_start.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTEX,FieldSpeedData.state.e3d_state.cylindertangent_end.x);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTEY,FieldSpeedData.state.e3d_state.cylindertangent_end.y);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTEZ,FieldSpeedData.state.e3d_state.cylindertangent_end.z);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTMin,FieldSpeedData.state.e3d_state.cylindertangent_min);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTMax,FieldSpeedData.state.e3d_state.cylindertangent_max);
+  SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTWeight,FieldSpeedData.state.e3d_state.cylindertangent_weight);
+
+
+}
+
+
+
+
+////
+//  Field Acceleration Display
+////
+IMPLEMENT_REGISTER_FUNCTION(RegisterFieldAccel,FieldAccelerationData.iawscomponent_FieldAccel)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFAActive,FieldAccelerationData.iawscomponent_FAActive)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFAFPX,FieldAccelerationData.iawscomponent_FAFPX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFAFPY,FieldAccelerationData.iawscomponent_FAFPY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFAFPZ,FieldAccelerationData.iawscomponent_FAFPZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFAFWeight,FieldAccelerationData.iawscomponent_FAFWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFALSX,FieldAccelerationData.iawscomponent_FALSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFALSY,FieldAccelerationData.iawscomponent_FALSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFALSZ,FieldAccelerationData.iawscomponent_FALSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFALEX,FieldAccelerationData.iawscomponent_FALEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFALEY,FieldAccelerationData.iawscomponent_FALEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFALEZ,FieldAccelerationData.iawscomponent_FALEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFALWeight,FieldAccelerationData.iawscomponent_FALWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFABMX,FieldAccelerationData.iawscomponent_FABMX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFABMY,FieldAccelerationData.iawscomponent_FABMY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFABMZ,FieldAccelerationData.iawscomponent_FABMZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFABXX,FieldAccelerationData.iawscomponent_FABXX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFABXY,FieldAccelerationData.iawscomponent_FABXY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFABXZ,FieldAccelerationData.iawscomponent_FABXZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFABWeight,FieldAccelerationData.iawscomponent_FABWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASCX,FieldAccelerationData.iawscomponent_FASCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASCY,FieldAccelerationData.iawscomponent_FASCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASCZ,FieldAccelerationData.iawscomponent_FASCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASMin,FieldAccelerationData.iawscomponent_FASMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASMax,FieldAccelerationData.iawscomponent_FASMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASWeight,FieldAccelerationData.iawscomponent_FASWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNOX,FieldAccelerationData.iawscomponent_FACNOX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNOY,FieldAccelerationData.iawscomponent_FACNOY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNOZ,FieldAccelerationData.iawscomponent_FACNOZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNElev,FieldAccelerationData.iawscomponent_FACNElevation)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNAzim,FieldAccelerationData.iawscomponent_FACNAzimuth)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNAper,FieldAccelerationData.iawscomponent_FACNAperture)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNMin,FieldAccelerationData.iawscomponent_FACNMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNMax,FieldAccelerationData.iawscomponent_FACNMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACNWeight,FieldAccelerationData.iawscomponent_FACNWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYSX,FieldAccelerationData.iawscomponent_FACYSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYSY,FieldAccelerationData.iawscomponent_FACYSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYSZ,FieldAccelerationData.iawscomponent_FACYSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYEX,FieldAccelerationData.iawscomponent_FACYEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYEY,FieldAccelerationData.iawscomponent_FACYEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYEZ,FieldAccelerationData.iawscomponent_FACYEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYMin,FieldAccelerationData.iawscomponent_FACYMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYMax,FieldAccelerationData.iawscomponent_FACYMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYWeight,FieldAccelerationData.iawscomponent_FACYWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASTCX,FieldAccelerationData.iawscomponent_FASTCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASTCY,FieldAccelerationData.iawscomponent_FASTCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASTCZ,FieldAccelerationData.iawscomponent_FASTCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASTMin,FieldAccelerationData.iawscomponent_FASTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASTMax,FieldAccelerationData.iawscomponent_FASTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFASTWeight,FieldAccelerationData.iawscomponent_FASTWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTSX,FieldAccelerationData.iawscomponent_FACYTSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTSY,FieldAccelerationData.iawscomponent_FACYTSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTSZ,FieldAccelerationData.iawscomponent_FACYTSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTEX,FieldAccelerationData.iawscomponent_FACYTEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTEY,FieldAccelerationData.iawscomponent_FACYTEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTEZ,FieldAccelerationData.iawscomponent_FACYTEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTMin,FieldAccelerationData.iawscomponent_FACYTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTMax,FieldAccelerationData.iawscomponent_FACYTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFACYTWeight,FieldAccelerationData.iawscomponent_FACYTWeight)
+
+
+
+IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetFAActive,
+									 FieldAccelerationData.state.active,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+// Fixed Position
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFAFPositionX,
+									 FieldAccelerationData.state.e3d_state.fixed_position.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFAFPositionY,
+									 FieldAccelerationData.state.e3d_state.fixed_position.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFAFPositionZ,
+									 FieldAccelerationData.state.e3d_state.fixed_position.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFAFWeight,
+									 FieldAccelerationData.state.e3d_state.fixed_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+// Line
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFALStartX,
+									 FieldAccelerationData.state.e3d_state.line_start.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFALStartY,
+									 FieldAccelerationData.state.e3d_state.line_start.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFALStartZ,
+									 FieldAccelerationData.state.e3d_state.line_start.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFALEndX,
+									 FieldAccelerationData.state.e3d_state.line_end.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFALEndY,
+									 FieldAccelerationData.state.e3d_state.line_end.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFALEndZ,
+									 FieldAccelerationData.state.e3d_state.line_end.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFALWeight,
+									 FieldAccelerationData.state.e3d_state.line_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+
+// Box
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFABMinX,
+									 FieldAccelerationData.state.e3d_state.box_min.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFABMinY,
+									 FieldAccelerationData.state.e3d_state.box_min.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFABMinZ,
+									 FieldAccelerationData.state.e3d_state.box_min.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFABMaxX,
+									 FieldAccelerationData.state.e3d_state.box_max.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFABMaxY,
+									 FieldAccelerationData.state.e3d_state.box_max.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFABMaxZ,
+									 FieldAccelerationData.state.e3d_state.box_max.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFABWeight,
+									 FieldAccelerationData.state.e3d_state.box_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+
+// Sphere
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASCenterX,
+									 FieldAccelerationData.state.e3d_state.sphere_center.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASCenterY,
+									 FieldAccelerationData.state.e3d_state.sphere_center.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASCenterZ,
+									 FieldAccelerationData.state.e3d_state.sphere_center.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASMin,
+									 FieldAccelerationData.state.e3d_state.sphere_min,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASMax,
+									 FieldAccelerationData.state.e3d_state.sphere_max,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASWeight,
+									 FieldAccelerationData.state.e3d_state.sphere_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+
+// Cone
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNOriginX,
+									 FieldAccelerationData.state.e3d_state.cone_origin.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNOriginY,
+									 FieldAccelerationData.state.e3d_state.cone_origin.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNOriginZ,
+									 FieldAccelerationData.state.e3d_state.cone_origin.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNElev,
+									 FieldAccelerationData.state.e3d_state.cone_elevation,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNAzim,
+									 FieldAccelerationData.state.e3d_state.cone_azimuth,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNAper,
+									 FieldAccelerationData.state.e3d_state.cone_aperture,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNMin,
+									 FieldAccelerationData.state.e3d_state.cone_min,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNMax,
+									 FieldAccelerationData.state.e3d_state.cone_max,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACNWeight,
+									 FieldAccelerationData.state.e3d_state.cone_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+
+// Cylinder
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYStartX,
+									 FieldAccelerationData.state.e3d_state.cylinder_start.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYStartY,
+									 FieldAccelerationData.state.e3d_state.cylinder_start.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYStartZ,
+									 FieldAccelerationData.state.e3d_state.cylinder_start.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYEndX,
+									 FieldAccelerationData.state.e3d_state.cylinder_end.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYEndY,
+									 FieldAccelerationData.state.e3d_state.cylinder_end.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYEndZ,
+									 FieldAccelerationData.state.e3d_state.cylinder_end.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYMin,
+									 FieldAccelerationData.state.e3d_state.cylinder_min,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYMax,
+									 FieldAccelerationData.state.e3d_state.cylinder_max,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYWeight,
+									 FieldAccelerationData.state.e3d_state.cylinder_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+
+// Sphere Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASTCenterX,
+									 FieldAccelerationData.state.e3d_state.spheretangent_center.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASTCenterY,
+									 FieldAccelerationData.state.e3d_state.spheretangent_center.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASTCenterZ,
+									 FieldAccelerationData.state.e3d_state.spheretangent_center.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASTMin,
+									 FieldAccelerationData.state.e3d_state.spheretangent_min,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASTMax,
+									 FieldAccelerationData.state.e3d_state.spheretangent_max,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFASTWeight,
+									 FieldAccelerationData.state.e3d_state.spheretangent_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+
+// Cylinder Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTStartX,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_start.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTStartY,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_start.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTStartZ,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_start.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTEndX,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_end.x,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTEndY,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_end.y,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTEndZ,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_end.z,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTMin,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_min,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTMax,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_max,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTWeight,
+									 FieldAccelerationData.state.e3d_state.cylindertangent_weight,FieldAccelerationData.settings_changed,
+									 UpdateFieldAccelStateDisplay)
+
+
+
+
+
+
+bool awsSink::FieldAccelStateChanged()
+{
+  return FieldAccelerationData.settings_changed;
+}
+
+void awsSink::ClearFieldAccelStateChanged()
+{
+  FieldAccelerationData.settings_changed=false;
+}
+
+FieldState *awsSink::GetFieldAccelState()
+{
+  return &(FieldAccelerationData.state);
+}
+
+void awsSink::SetFieldAccelState(FieldState *source)
+{
+  memcpy(&(FieldAccelerationData.state),source,sizeof(FieldState));
+  ClearFieldAccelStateChanged();
+  UpdateFieldAccelStateDisplay();
+}
+
+void awsSink::UpdateFieldAccelStateDisplay()
+{
+  csRef<iString> value;
+  bool bvalue;
+
+  SET_CHECKBOX_BOOL(FieldAccelerationData.iawscomponent_FAActive,FieldAccelerationData.state.active);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FAFPX,FieldAccelerationData.state.e3d_state.fixed_position.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FAFPY,FieldAccelerationData.state.e3d_state.fixed_position.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FAFPZ,FieldAccelerationData.state.e3d_state.fixed_position.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FAFWeight,FieldAccelerationData.state.e3d_state.fixed_weight);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FALSX,FieldAccelerationData.state.e3d_state.line_start.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FALSY,FieldAccelerationData.state.e3d_state.line_start.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FALSZ,FieldAccelerationData.state.e3d_state.line_start.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FALEX,FieldAccelerationData.state.e3d_state.line_end.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FALEY,FieldAccelerationData.state.e3d_state.line_end.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FALEZ,FieldAccelerationData.state.e3d_state.line_end.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FALWeight,FieldAccelerationData.state.e3d_state.line_weight);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FABMX,FieldAccelerationData.state.e3d_state.box_min.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FABMY,FieldAccelerationData.state.e3d_state.box_min.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FABMZ,FieldAccelerationData.state.e3d_state.box_min.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FABXX,FieldAccelerationData.state.e3d_state.box_max.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FABXY,FieldAccelerationData.state.e3d_state.box_max.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FABXZ,FieldAccelerationData.state.e3d_state.box_max.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FABWeight,FieldAccelerationData.state.e3d_state.box_weight);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASCX,FieldAccelerationData.state.e3d_state.sphere_center.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASCY,FieldAccelerationData.state.e3d_state.sphere_center.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASCZ,FieldAccelerationData.state.e3d_state.sphere_center.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASMin,FieldAccelerationData.state.e3d_state.sphere_min);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASMax,FieldAccelerationData.state.e3d_state.sphere_max);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASWeight,FieldAccelerationData.state.e3d_state.sphere_weight);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNOX,FieldAccelerationData.state.e3d_state.cone_origin.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNOY,FieldAccelerationData.state.e3d_state.cone_origin.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNOZ,FieldAccelerationData.state.e3d_state.cone_origin.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNElevation,FieldAccelerationData.state.e3d_state.cone_elevation);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNAzimuth,FieldAccelerationData.state.e3d_state.cone_azimuth);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNAperture,FieldAccelerationData.state.e3d_state.cone_aperture);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNMin,FieldAccelerationData.state.e3d_state.cone_min);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNMax,FieldAccelerationData.state.e3d_state.cone_max);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACNWeight,FieldAccelerationData.state.e3d_state.cone_weight);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYSX,FieldAccelerationData.state.e3d_state.cylinder_start.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYSY,FieldAccelerationData.state.e3d_state.cylinder_start.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYSZ,FieldAccelerationData.state.e3d_state.cylinder_start.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYEX,FieldAccelerationData.state.e3d_state.cylinder_end.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYEY,FieldAccelerationData.state.e3d_state.cylinder_end.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYEZ,FieldAccelerationData.state.e3d_state.cylinder_end.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYMin,FieldAccelerationData.state.e3d_state.cylinder_min);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYMax,FieldAccelerationData.state.e3d_state.cylinder_max);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYWeight,FieldAccelerationData.state.e3d_state.cylinder_weight);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASTCX,FieldAccelerationData.state.e3d_state.spheretangent_center.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASTCY,FieldAccelerationData.state.e3d_state.spheretangent_center.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASTCZ,FieldAccelerationData.state.e3d_state.spheretangent_center.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASTMin,FieldAccelerationData.state.e3d_state.spheretangent_min);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASTMax,FieldAccelerationData.state.e3d_state.spheretangent_max);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FASTWeight,FieldAccelerationData.state.e3d_state.spheretangent_weight);
+
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTSX,FieldAccelerationData.state.e3d_state.cylindertangent_start.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTSY,FieldAccelerationData.state.e3d_state.cylindertangent_start.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTSZ,FieldAccelerationData.state.e3d_state.cylindertangent_start.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTEX,FieldAccelerationData.state.e3d_state.cylindertangent_end.x);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTEY,FieldAccelerationData.state.e3d_state.cylindertangent_end.y);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTEZ,FieldAccelerationData.state.e3d_state.cylindertangent_end.z);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTMin,FieldAccelerationData.state.e3d_state.cylindertangent_min);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTMax,FieldAccelerationData.state.e3d_state.cylindertangent_max);
+  SET_TEXTBOX_FLOAT(FieldAccelerationData.iawscomponent_FACYTWeight,FieldAccelerationData.state.e3d_state.cylindertangent_weight);
+
+
+}
 
 
 
