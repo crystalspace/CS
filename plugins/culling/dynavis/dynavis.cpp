@@ -1150,7 +1150,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
   kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data);
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	new csDynVisObjIt (&vistest_objects));
+  	(iVisibilityObjectIterator*)(new csDynVisObjIt (&vistest_objects)));
   return visit;
 }
 
@@ -1220,7 +1220,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
   kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data);
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	new csDynVisObjIt (&vistest_objects));
+  	(iVisibilityObjectIterator*)(new csDynVisObjIt (&vistest_objects)));
   return visit;
 }
 

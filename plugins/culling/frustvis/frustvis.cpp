@@ -508,7 +508,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
   kdtree->Front2Back (box.GetCenter (), FrustTestBox_Front2Back, (void*)&data);
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	new csFrustVisObjIt (&vistest_objects));
+  	(iVisibilityObjectIterator*)(new csFrustVisObjIt (&vistest_objects)));
   return visit;
 }
 
@@ -578,7 +578,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
   kdtree->Front2Back (data.pos, FrustTestSphere_Front2Back, (void*)&data);
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	new csFrustVisObjIt (&vistest_objects));
+  	(iVisibilityObjectIterator*)(new csFrustVisObjIt (&vistest_objects)));
   return visit;
 }
 
