@@ -440,7 +440,6 @@ bool csGraphics2DOpenGL::RestoreDisplayMode ()
   if (is_open)
   {
     if (FullScreen) SwitchDisplayMode (false);
-    is_open = false;
     return true;
   }
   return false;
@@ -459,8 +458,7 @@ void csGraphics2DOpenGL::Close (void)
   ReleaseDC (m_hWnd, hDC);
 
   RestoreDisplayMode ();
-
-  csGraphics2D::Close ();
+  csGraphics2DGLCommon::Close ();
 }
 
 void csGraphics2DOpenGL::Print (csRect* /*area*/)

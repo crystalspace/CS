@@ -14,6 +14,12 @@ The history order is reversed so that new features are at the top.
 	  failed and that the user should use "-verbose" for more details.  For
 	  debug builds, -verbose is the default.  For optimize builds, it is
 	  not.
+	- Andrew Craig fixed a problem with unreleased references in the
+	  Windows OpenGL canvas. RestoreDisplayMode() set is_open to false
+	  but this prevented the superclass Close() to properly do the
+	  cleanup. In addition fixed the call to the parent Close() so that
+	  it calls csGraphics2DGLCommon::Close() instead of
+	  csGraphics2D::Close().
 	- Eric Sunshine committed an update for win32/loadlib.cpp from John
 	  Harger <john_h@selectpath.com> which implements error reporting.
 	  Previously, win32/loadlib.cpp simply threw away all diagnostic
@@ -2685,7 +2691,7 @@ The history order is reversed so that new features are at the top.
 	- Changed iVFS->Open(), iVFS->ReadFile(), iVFS->ExpandPath(), and
 	  iVFS->GetRealPath() to return csPtr. This means that VFS is now
 	  fully csRef clean.
-	- Did several fixes to the new OPCODE CD plugin from Charles Al-Quarra.
+	- Did several fixes to the new OPCODE CD plugin from Charlls Al-Quarra.
 28-Aug-2002
 	- Added iPolygonMesh implementation for genmesh so it now works
 	  with collision detection.
