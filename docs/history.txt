@@ -33,7 +33,7 @@ chronological order.
 	- res added some docs to csutil/callstack.h.
 	- Eric Sunshine made the following changes to csList<>;
 	    - Fixed strange logic where IsEmpty() was implemented as 'return
-	      (head == 0) || (head == 0)'.
+	      (head == 0) && (head == 0)'.
 	    - Made IsEmpty() const.
 	    - Fixed brokeness of InsertBefore() and InsertAfter().
 	      InsertBefore() was actually inserting the new item _after_ the
