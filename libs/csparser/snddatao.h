@@ -18,30 +18,38 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__CSSOUNDDATAOBJECT_H__)
-#define __CSSOUNDDATAOBJECT_H__
+#ifndef __SNDDATAO_H__
+#define __SNDDATAO_H__
 
 #include "csobject/csobject.h"
+#include "isound/wrapper.h"
 
-struct iSoundHandle;
-
-class csSoundDataObject : public csObject
+class csSoundWrapper : public csObject
 {
 protected:
   ///
-  iSoundHandle* sndbuf;
+  iSoundHandle* SoundHandle;
 
 public:
   ///
-  csSoundDataObject(iSoundHandle* buf);
+  csSoundWrapper(iSoundHandle* buf);
   ///
-  ~csSoundDataObject();
+  ~csSoundWrapper();
   ///
-  iSoundHandle* GetSound() const { return sndbuf; }
+  iSoundHandle* GetSound();
   ///
   static iSoundHandle* GetSound(csObject& csobj, const char* name);
 
   CSOBJTYPE;
+  DECLARE_IBASE;
+
+  struct SoundWrapper : public iSoundWrapper
+  {
+    DECLARE_EMBEDDED_IBASE(csSoundWrapper);
+
+    virtual iSoundHandle *GetSound ();
+    virtual iObject *QueryObject ();
+  } scfiSoundWrapper;
 };
 
-#endif // __CSSOUNDDATAOBJECT_H__
+#endif // __SNDDATAO_H__

@@ -60,8 +60,6 @@
 #include "csengine/halo.h"
 #include "csengine/keyval.h"
 #include "csengine/sector.h"
-#include "csengine/meshobj.h"
-//#include "csengine/terrobj.h"
 #include "cssys/system.h"
 #include "csengine/lghtmap.h"
 
@@ -1074,28 +1072,19 @@ bool csLoader::LoadMap (char* buf)
       fatal_exit (0, false);
     }
   }
-
-  int sn = Engine->GetCsEngine()->sectors.Length ();
-  iRegion* cur_region = NULL;
-  if (ResolveOnlyRegion) cur_region = Engine->GetCurrentRegion ();
-  while (sn > 0)
+ 
+  int i,j;
+  for (i=0; i<Engine->GetSectorCount(); i++)
   {
-    sn--;
-    csSector* s = (csSector*)(Engine->GetCsEngine()->sectors)[sn];
-    if (cur_region && !cur_region->IsInRegion (s))
-      continue;
-    int st = s->GetNumberMeshes ();
-    int j = 0;
-    while (j < st)
+    iSector *Sector = Engine->GetSector (i);
+    for (j=0; j<Sector->GetMeshCount(); j++)
     {
-      csMeshWrapper* ps = s->GetMesh (j);
-      j++;
-      // @@@ UGLY!!!! NEED A MORE GENERAL SOLUTION!
-      iThing* ith = QUERY_INTERFACE (ps->GetMeshObject(), iThing);
-      if (ith)
+      iMeshWrapper *Mesh = Sector->GetMesh(j);
+      iThing *Thing = QUERY_INTERFACE (Mesh->GetMeshObject(), iThing);
+      if (Thing)
       {
-        ResolvePortalSectors (ith);
-	ith->DecRef ();
+        ResolvePortalSectors (Thing);
+	Thing->DecRef ();
       }
     }
   }
@@ -1386,16 +1375,9 @@ bool csLoader::LoadSounds (char* buf)
           System->Printf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
           fatal_exit (0, false);
         }
-        iSoundHandle *snd = csSoundDataObject::GetSound (*Engine->GetCsEngine(), name);
+        iSoundHandle *snd = csSoundWrapper::GetSound (*Engine->GetCsEngine(), name);
         if (!snd)
-        {
-          csSoundDataObject *s = LoadSound(name, filename);
-          if (s)
-          {
-            Engine->GetCsEngine()->ObjAdd(s);
-            Stats->sounds_loaded++;
-          }
-        }
+          LoadSound(name, filename);
       }
       break;
     }
@@ -1757,9 +1739,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         break;
       case CS_TOKEN_MESHOBJ:
         {
-          csMeshWrapper* tmp = new csMeshWrapper (mesh->GetPrivateObject());
-	  iMeshWrapper* sp = &tmp->scfiMeshWrapper;
-          sp->QueryObject ()->SetName (name);
+	  iMeshWrapper* sp = Engine->CreateMeshObject (name);
           LoadMeshObject (sp, params);
           mesh->AddChild (sp);
         }
@@ -2155,7 +2135,7 @@ Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
 
 //---------------------------------------------------------------------------
 
-csMeshWrapper * csLoader::LoadMeshObject (const char* fname)
+iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
 {
   iDataBuffer *databuff = VFS->ReadFile (fname);
 
@@ -2182,11 +2162,10 @@ csMeshWrapper * csLoader::LoadMeshObject (const char* fname)
       fatal_exit (0, false);
     }
 
-    csMeshWrapper* sp = new csMeshWrapper (Engine->GetCsEngine());
-    iMeshWrapper* mesh = &sp->scfiMeshWrapper;
-    mesh->QueryObject ()->SetName (name);
+    
+    iMeshWrapper* mesh = Engine->CreateMeshObject (name);
     LoadMeshObject (mesh, buf);
-    return sp;
+    return mesh;
   }
   databuff->DecRef ();
   return NULL;
@@ -2526,6 +2505,7 @@ iSoundData *csLoader::LoadSoundData(const char* filename) {
   if (!Sound) System->Printf (MSG_WARNING,
     "Cannot create sound data from file \"%s\"!\n", filename);
 
+  Stats->sounds_loaded++;
   return Sound;
 }
 
@@ -2544,16 +2524,16 @@ iSoundHandle *csLoader::LoadSound(const char* filename) {
   return hdl;
 }
 
-csSoundDataObject *csLoader::LoadSound (const char* name, const char* fname) {
+iSoundWrapper *csLoader::LoadSound (const char* name, const char* fname) {
   // load the sound handle
   iSoundHandle *Sound = LoadSound(fname);
   if (!Sound) return NULL;
 
   // build wrapper object
-  csSoundDataObject* sndobj = new csSoundDataObject (Sound);
-  sndobj->SetName (name);
+  iSoundWrapper* Wrapper = &(new csSoundWrapper (Sound))->scfiSoundWrapper;
+  Wrapper->QueryObject ()->SetName (name);
+  Engine->QueryObject ()->ObjAdd(Wrapper->QueryObject ());
 
-  // @@@ add the sound to the engine
-  return sndobj;
+  return Wrapper;
 }
 

@@ -23,27 +23,53 @@
 #include "isound/handle.h"
 #include "csparser/snddatao.h"
 
-IMPLEMENT_CSOBJTYPE (csSoundDataObject,csObject);
+IMPLEMENT_CSOBJTYPE (csSoundWrapper,csObject);
 
-csSoundDataObject::csSoundDataObject (iSoundHandle *buf) : csObject(), sndbuf(buf)
+IMPLEMENT_IBASE (csSoundWrapper);
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);
+IMPLEMENT_IBASE_END;
+
+IMPLEMENT_EMBEDDED_IBASE (csSoundWrapper::SoundWrapper)
+  IMPLEMENTS_INTERFACE (iSoundWrapper)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csSoundWrapper::csSoundWrapper (iSoundHandle *buf) : csObject(), SoundHandle(buf)
 {
-  if (sndbuf) sndbuf->IncRef();
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSoundWrapper);
+
+  if (SoundHandle) SoundHandle->IncRef();
 }
 
-csSoundDataObject::~csSoundDataObject ()
+csSoundWrapper::~csSoundWrapper ()
 {
-  if (sndbuf) sndbuf->DecRef ();
+  if (SoundHandle) SoundHandle->DecRef ();
 }
 
-iSoundHandle* csSoundDataObject::GetSound (csObject& csobj, const char* name)
+iSoundHandle* csSoundWrapper::GetSound ()
+{
+  return SoundHandle;
+}
+
+iSoundHandle* csSoundWrapper::GetSound (csObject& csobj, const char* name)
 {
   if (!name) return NULL;
-  csObjIterator i = csobj.GetIterator (csSoundDataObject::Type);
+  csObjIterator i = csobj.GetIterator (csSoundWrapper::Type);
   while (!i.IsNull ())
   {
     if (strcmp (name, (*i).GetName ()) == 0)
-      return ((csSoundDataObject&)(*i)).GetSound();
+      return ((csSoundWrapper&)(*i)).GetSound();
     ++i;
   }
   return NULL;
+}
+
+iSoundHandle *csSoundWrapper::SoundWrapper::GetSound ()
+{
+  return scfParent->GetSound ();
+}
+
+iObject *csSoundWrapper::SoundWrapper::QueryObject ()
+{
+  return scfParent;
 }

@@ -53,8 +53,6 @@ class csStatLight;
 class csKeyValuePair;
 class csMapNode;
 class csSector;
-class csTerrainFactoryWrapper;
-class csTerrainWrapper;
 
 /**
  * The loader for Crystal Space maps.
@@ -233,14 +231,14 @@ public:
 
   virtual iSoundData *LoadSoundData (const char *fname);
   virtual iSoundHandle *LoadSound (const char *fname);
-  virtual csSoundDataObject *LoadSound (const char *name, const char *fname);
+  virtual iSoundWrapper *LoadSound (const char *name, const char *fname);
 
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
 	bool onlyRegion);
   virtual bool LoadLibraryFile (const char* filename);
 
   virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
-  virtual csMeshWrapper* LoadMeshObject (const char* fname);
+  virtual iMeshWrapper* LoadMeshObject (const char* fname);
 };
 
 #endif // __CS_CSLOADER_H__

@@ -28,9 +28,9 @@ struct iTextureHandle;
 struct iTextureWrapper;
 struct iSoundData;
 struct iSoundHandle;
+struct iMeshWrapper;
 struct iMeshFactoryWrapper;
-class csSoundDataObject;
-class csMeshWrapper;
+struct iSoundWrapper;
 
 /**
  * Bit flags for the loader (used in iLoader::SetMode).
@@ -82,7 +82,7 @@ struct iLoader : public iPlugIn
   /// Load a sound file and register the sound
   virtual iSoundHandle *LoadSound (const char *fname) = 0;
   /// Load a sound file, register the sound and create a wrapper object for it
-  virtual csSoundDataObject *LoadSound (const char *name, const char *fname) = 0;
+  virtual iSoundWrapper *LoadSound (const char *name, const char *fname) = 0;
 
   /**
    * Load a map file. If 'ClearEngine' is true then the current contents
@@ -103,7 +103,7 @@ struct iLoader : public iPlugIn
    * Load a mesh object from a file.
    * The mesh object is not automatically added to the engine and sector.
    */
-  virtual csMeshWrapper* LoadMeshObject (const char* fname) = 0;
+  virtual iMeshWrapper* LoadMeshObject (const char* fname) = 0;
 };
 
 #endif // __IMAP_PARSER_H__

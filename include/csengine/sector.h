@@ -517,6 +517,11 @@ public:
     {
       return scfParent->GetVisibilityCuller ();
     }
+    virtual int GetMeshCount ();
+    virtual iMeshWrapper *GetMesh (int n);
+    virtual void AddMesh (iMeshWrapper *pMesh);
+    virtual int GetTerrainCount ();
+    virtual iTerrainWrapper *GetTerrain (int n);
     virtual void AddTerrain (iTerrainWrapper *pTerrain);
     virtual void AddLight (iStatLight *light);
     virtual iStatLight *FindLight (float x, float y, float z, float dist);

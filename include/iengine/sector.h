@@ -25,6 +25,7 @@
 
 class csSector;
 struct iTerrainWrapper;
+struct iMeshWrapper;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -52,6 +53,16 @@ struct iSector : public iBase
   /// Has this sector fog?
   virtual bool HasFog () = 0;
 
+  /// Return the number of mesh objects in this sector
+  virtual int GetMeshCount () = 0;
+  /// Return a mesh wrapper by index
+  virtual iMeshWrapper *GetMesh (int n) = 0;
+  /// Add a mesh object to this sector.
+  virtual void AddMesh (iMeshWrapper *pMesh) = 0;
+  /// Return the number of terrain objects in this sector
+  virtual int GetTerrainCount () = 0;
+  /// Return a terrain wrapper by index
+  virtual iTerrainWrapper *GetTerrain (int n) = 0;
   /// Add a terrain object to this sector.
   virtual void AddTerrain (iTerrainWrapper *pTerrain) = 0;
 

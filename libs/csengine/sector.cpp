@@ -1190,6 +1190,31 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
 
 //---------------------------------------------------------------------------
 
+int csSector::eiSector::GetMeshCount ()
+{
+  return scfParent->GetNumberMeshes ();
+}
+
+iMeshWrapper *csSector::eiSector::GetMesh (int n)
+{
+  return &scfParent->GetMesh (n)->scfiMeshWrapper;
+}
+
+void csSector::eiSector::AddMesh (iMeshWrapper *pMesh)
+{
+  scfParent->AddMesh (pMesh->GetPrivateObject ());
+}
+
+int csSector::eiSector::GetTerrainCount ()
+{
+  return scfParent->GetNumberTerrains ();
+}
+
+iTerrainWrapper *csSector::eiSector::GetTerrain (int n)
+{
+  return &scfParent->GetTerrain (n)->scfiTerrainWrapper;
+}
+
 void csSector::eiSector::AddTerrain (iTerrainWrapper *pTerrain)
 {
   scfParent->AddTerrain (pTerrain->GetPrivateObject ());
