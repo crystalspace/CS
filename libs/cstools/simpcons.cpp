@@ -1,6 +1,6 @@
 /*
     Simple Console
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,6 +35,10 @@
 #define SIZE_HISTORY	32
 
 #define Gfx2D System->G2D
+
+IMPLEMENT_IBASE(csSimpleConsole)
+  IMPLEMENTS_INTERFACE(iConsole)
+IMPLEMENT_IBASE_END
 
 void GfxWrite (int x, int y, int fg, int bg, char *str, ...)
 {
@@ -210,15 +214,8 @@ void csSimpleConsole::Hide ()
   ConsoleMode = MESSAGE_MODE;
 }
 
-void csSimpleConsole::PutMessage (bool advance, char *str,...)
+void csSimpleConsole::PutMessage (bool advance, const char *str)
 {
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, str);
-  vsprintf (buf, str, arg);
-  va_end (arg);
-
   if (LineMessageNumber >= LineMessageMax)
   {
     for (int i = 1; i < LineMessageMax; i++)
@@ -229,7 +226,7 @@ void csSimpleConsole::PutMessage (bool advance, char *str,...)
     LineMessageNumber--;
   }
 
-  strncpy (LineMessage [LineMessageNumber], buf, SIZE_LINE - 1);
+  strncpy (LineMessage [LineMessageNumber], str, SIZE_LINE - 1);
   LinesChanged [LineMessageNumber] = true;
 
   LineTime = System->Time () + 4000;
@@ -237,21 +234,14 @@ void csSimpleConsole::PutMessage (bool advance, char *str,...)
     LineMessageNumber++;
 }
 
-void csSimpleConsole::PutText (char *str,...)
+void csSimpleConsole::PutText (const char *str)
 {
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, str);
-  vsprintf (buf, str, arg);
-  va_end (arg);
-
-  if(!buf[0])
+  if (str == 0 || *str == 0)
     return;
 
   int len = strlen (Line[LineNumber]);
   char* dst = Line[LineNumber] + len;
-  char const* src = buf;
+  char const* src = str;
   for (char c = *src; c != '\0'; c = *++src)
   {
     if (c == '\b')
@@ -265,7 +255,7 @@ void csSimpleConsole::PutText (char *str,...)
     else if (c == '\n')
     {
       *dst = '\0';
-      PutMessage (true, "%s", Line[LineNumber]);
+      PutMessage (true, Line[LineNumber]);
       if (LineNumber + 1 < LineMax)
         LineNumber++;
       else
@@ -287,17 +277,17 @@ void csSimpleConsole::PutText (char *str,...)
   if (len != 0)
   {
     *dst = '\0';
-    PutMessage (false, "%s", Line[LineNumber]);
+    PutMessage (false, Line[LineNumber]);
   }
 }
 
 void csSimpleConsole::ExecuteCommand (char *command)
 {
-  PutText ("cs# %s\n", command);
+  PutText ("cs# "); PutText (command); PutText ("\n");
   if (command && command[0] != '\0')
   {
     if (command_handler == 0 || !command_handler->PerformLine (command))
-      PutText ("Unknown command: %s\n", command);
+    { PutText ("Unknown command: "); PutText (command); PutText ("\n"); }
 
     if (HistoryCount > HistoryMax - 2)
     {
@@ -470,8 +460,3 @@ void csSimpleConsole::SetupColors (iTextureManager* txtmgr)
   console_fg = txtmgr->FindRGB (console_fg_r, console_fg_g, console_fg_b);
   console_bg = txtmgr->FindRGB (console_bg_r, console_bg_g, console_bg_b);
 }
-
-IMPLEMENT_IBASE(csSimpleConsole)
-  IMPLEMENTS_INTERFACE(iConsole)
-IMPLEMENT_IBASE_END
-

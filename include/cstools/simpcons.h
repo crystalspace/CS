@@ -1,6 +1,6 @@
 /*
     Simple Console
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -107,9 +107,7 @@ public:
   int get_bg () { return console_bg; }
 
   /// Add a text line to message console (overlapped on rendering screen)
-  void PutMessage (bool advance, char *str,...);
-  /// Add a text line to main console window
-  virtual void PutText (char *str, ...);
+  void PutMessage (bool advance, const char *str);
   /// Print (if console is active) and execute a command
   virtual void ExecuteCommand (char *command);
   /// Clear console
@@ -127,7 +125,7 @@ public:
 
   /// iConsole compatibility methods
   virtual bool Initialize(iSystem *system) { return (system->RegisterDriver("iConsole", this)); }
-  virtual void PutText(const char *text) { PutText("%s", text); }
+  virtual void PutText(const char *text);
   virtual void Draw(csRect *rect = NULL) { Print(rect); }
   virtual void SetBufferSize(int lines) { SetMaxLines(lines); }
 private:
