@@ -287,6 +287,7 @@ void csEmitMix::AddEmitter(float weight, iEmitGen3D* emit)
   struct part *np = new struct csEmitMix::part;
   np->next = list;
   np->emit = emit;
+  list = np;
   if(emit) emit->IncRef();
   np->weight = weight;
   nr++;
