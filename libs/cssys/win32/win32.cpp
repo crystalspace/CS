@@ -474,10 +474,16 @@ bool csPlatformShutdown(iObjectRegistry* r)
 }
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
-  EventOutlet (0),
-  console_window (false)
+  console_window (false),
+  EventOutlet (0)
 {
   SCF_CONSTRUCT_IBASE(0);
+
+#if defined(CS_DEBUG)
+  console_window = true;
+#else
+  console_window = false;
+#endif
 
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (r, iCommandLineParser);
   if (cmdline->GetOption ("console")) console_window = true;

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+2-May-2002
+	- Removed a warning in win32.cpp.
+	- Enabled console in debug mode again for Windows. I think that
+	  when you are debugging you certainly want to have that console.
 30-Apr-2002
 	- Added a new iDebugHelper interface in iutil. This interface defines
 	  a consistant interface for debugging CS modules. It has the following
