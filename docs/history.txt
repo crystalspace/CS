@@ -154,6 +154,8 @@ The history order is reversed so that new features are at the top.
 	  work.
 	- res added a remark to iEventQueue::Post() documentation on how
 	  the owner ship of a passed iEvent is treated.
+	- Philip Wyett fixed error accessing private class awscG2D under
+          MSVC 6.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.

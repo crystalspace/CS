@@ -572,7 +572,7 @@ bool awsMultiProctexCanvas::awscG3D::Initialize (iObjectRegistry *r)
 
   width = height = -1;
 
-  G2D = new awsMultiProctexCanvas::awscG2D (awsc, rG3D->GetDriver2D ());
+  G2D = new awscG2D (awsc, rG3D->GetDriver2D ());
   if (!G2D) return false;
   G2D->Initialize (r);
 
