@@ -1,3 +1,12 @@
+crystalspace (0.94-20010412-2) unstable; urgency=low
+
+  * Make compile with -fPIC, this solve compile problems
+  on ia64 (Closes: bug#142633)
+  * Made a change in upstream plugins/net/driver/ensocket/inet.h
+  size_t is now  socklen_t to try to correct autobuilder failure on s390.
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
 crystalspace (0.94-20010412-1) unstable; urgency=low
 
   * Added suggested changes proposed by Gerhard Tonn <GerhardTonn@swol.de>

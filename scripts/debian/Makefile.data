@@ -2,8 +2,8 @@ BUILDDIR=$(HOME)/debian/crystal
 DATE=$(shell date '+%Y%m%d')
 VERSION=0.94
 TAG=R0_94_001
-MINOR=1
-SITE=ftp://sunsite.dk/projects/crystal/cs092/levels
+MINOR=2
+SITE=ftp://sunsite.dk/projects/crystal/cs094/levels
 LEVELS=castle.zip dmburg.zip maze.zip room.zip mazedex.zip newsky.zip sydney.zip demodata.zip 
 
 default: start wget debcopy debbuild

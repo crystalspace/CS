@@ -3,7 +3,6 @@ BUILDDIR=$(HOME)/debian/crystal
 VERSION=0.94
 TAG=R0_94_001
 DATE=20020412
-MINOR=1
 
 default:
 	@echo "=============================================================="
@@ -72,11 +71,9 @@ debconfigure:
 	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE); fakeroot debian/rules configure
 
 debbinary:
-	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE);dch -v $(VERSION).$(DATE)-$(MINOR) "Build from CVS" ; fakeroot debian/rules binary
+	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE); fakeroot debian/rules binary
 
 debbuild:
-	#cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE);dch -v $(VERSION).$(DATE)-$(MINOR) "Build from CVS" ; debuild -us -uc -v$(VERSION)-$(shell expr $(MINOR) - 1)
-	#cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE);dch -v $(VERSION).$(DATE)-$(MINOR) "Build from CVS" ; debuild -v$(VERSION)-$(shell expr $(MINOR) - 1)
 	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE); debuild
 
 $(BUILDDIR):

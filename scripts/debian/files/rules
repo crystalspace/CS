@@ -22,6 +22,10 @@ configure-stamp:
 	# Make it not cpu specific (Intel)
 	# CPU=i386 make linux (this was too intel specific)
 	perl -pi -e "s/CFLAGS.SYSTEM.*mcpu.*\n//" $(CURDIR)/CS/config.mak
+	# Force -fPIC as compiling/linking option
+	perl -pi -e "s/(CC.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
+	perl -pi -e "s/(CXX.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
+	perl -pi -e "s/(LINK.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
 	# Install as much as possible
 	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
 	# Activating scripts
