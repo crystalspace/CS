@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	- The Dynavis ProjectBBox routine is now replaced with the new
 	  ProjectBox() function. We should look in the rest of CS to
 	  see if we can replace it there too...
+	- Added new blender export script (scripts/blender/csexp223.py).
+	  Thanks to Yvon Tanguy <tanguy13@bst.bsf.alcatel.fr>.
 16-May-2002
 	- Added a very efficient AABB/frustum intersection tester which
 	  has an associated clipmask to avoid testing planes that are no
