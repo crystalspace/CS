@@ -114,7 +114,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (iDocumentNode* opnode,
 	parname, seqname);
       return NULL;
     }
-    return par;
+    return csPtr<iParameterESM>(par);
   }
   else
   {
@@ -193,7 +193,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (iDocumentNode* opnode,
       return NULL;
     }
     csRef<iParameterESM> par = eseqmgr->CreateParameterESM (value);
-    return par;
+    return csPtr<iParameterESM>(par);
   }
 }
 
