@@ -1,5 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
+29-Mar-2001
+	- Let csSector::CheckFrustum() work through iVisibilityCuller::
+	  CastShadows(). This is another stip in the rewrite. Moved all
+	  static_thing specific frustum code (i.e. the traversal of the
+	  octree) from csSector to csThing.
 28-Mar-2001
 	- Wouter Wijngaards added GetNumberParticles and GetSource methods
 	  to the spiral particle system SCF interface.

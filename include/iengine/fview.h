@@ -29,6 +29,8 @@ struct iFrustumView;
 struct iShadowBlockList;
 class csFrustum;
 class csFrustumContext;
+class csObject; //@@@@@@
+class csOctreeNode; //@@@@@
 
 /**
  * The structure for registering cleanup actions.  You can register with any
@@ -236,6 +238,22 @@ struct iFrustumView : public iBase
    * up the current frustum context.
    */
   virtual void RestoreFrustumContext (csFrustumContext* original) = 0;
+
+  /// Call the node function. @@@ csOctreeNode!!!!!!!
+  virtual void CallNodeFunction (csOctreeNode* onode) = 0;
+  /// Call the polygon function. @@@ csObject!!!!!
+  virtual void CallPolygonFunction (csObject* poly) = 0;
+  /// Call the curve function. @@@ csObject!!!!!
+  virtual void CallCurveFunction (csObject* curve) = 0;
+
+  /// Get the radius.
+  virtual float GetRadius () = 0;
+  /// Return true if shadowing for things is enabled.
+  virtual bool ThingShadowsEnabled () = 0;
+  /// Check if a mask corresponds with the shadow mask.
+  virtual bool CheckShadowMask (unsigned int mask) = 0;
+  /// Check if a mask corresponds with the process mask.
+  virtual bool CheckProcessMask (unsigned int mask) = 0;
 };
 
 #endif

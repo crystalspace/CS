@@ -679,7 +679,7 @@ public:
   /**
    * Start casting shadows from a given point in space.
    */
-  void CastShadows (const csVector3& pos);
+  void CastShadows (iFrustumView* fview);
 
   //----------------------------------------------------------------------
   // Drawing
@@ -981,9 +981,9 @@ public:
     {
       scfParent->UnregisterShadowReceiver (receiver);
     }
-    virtual void CastShadows (const csVector3& pos)
+    virtual void CastShadows (iFrustumView* fview)
     {
-      scfParent->CastShadows (pos);
+      scfParent->CastShadows (fview);
     }
   } scfiVisibilityCuller;
   friend struct VisCull;

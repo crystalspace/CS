@@ -470,14 +470,14 @@ public:
   /// Set the function that is called for every curve to visit.
   void SetCurveFunction (csFrustumViewFunc* func) { curve_func = func; }
   /// Call the node function.
-  void CallNodeFunction (csOctreeNode* onode)
+  virtual void CallNodeFunction (csOctreeNode* onode)
   {
     if (node_func) node_func (onode, this);
   }
   /// Call the polygon function.
-  void CallPolygonFunction (csObject* poly) { poly_func (poly, this); }
+  virtual void CallPolygonFunction (csObject* poly) { poly_func (poly, this); }
   /// Call the curve function.
-  void CallCurveFunction (csObject* curve) { curve_func (curve, this); }
+  virtual void CallCurveFunction (csObject* curve) { curve_func (curve, this); }
   /// Set the userdata.
   void SetUserData (void* ud) { func_userdata = ud; }
   /// Get the userdata.
@@ -489,13 +489,13 @@ public:
     sq_radius = rad*rad;
   }
   /// Get the radius.
-  float GetRadius () { return radius; }
+  virtual float GetRadius () { return radius; }
   /// Get the squared radius.
   float GetSquaredRadius () { return sq_radius; }
   /// Enable shadowing for things (off by default). @@@SUSPECT!!!
   void EnableThingShadows (bool e) { things_shadow = e; }
   /// Return true if shadowing for things is enabled.
-  bool ThingShadowsEnabled () { return things_shadow; }
+  virtual bool ThingShadowsEnabled () { return things_shadow; }
   /// Set shadow mask.
   void SetShadowMask (unsigned int mask, unsigned int value)
   {
@@ -509,12 +509,12 @@ public:
     process_thing_value = value;
   }
   /// Check if a mask corresponds with the shadow mask.
-  bool CheckShadowMask (unsigned int mask)
+  virtual bool CheckShadowMask (unsigned int mask)
   {
     return ((mask & shadow_thing_mask) == shadow_thing_value);
   }
   /// Check if a mask corresponds with the process mask.
-  bool CheckProcessMask (unsigned int mask)
+  virtual bool CheckProcessMask (unsigned int mask)
   {
     return ((mask & process_thing_mask) == process_thing_value);
   }

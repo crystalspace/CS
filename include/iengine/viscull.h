@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 
 struct iRenderView;
+struct iFrustumView;
 struct iVisibilityObject;
 struct iMovable;
 struct iShadowReceiver;
@@ -62,7 +63,7 @@ struct iVisibilityCuller : public iBase
   /**
    * Start casting shadows from a given point in space.
    */
-  virtual void CastShadows (const csVector3& pos) = 0;
+  virtual void CastShadows (iFrustumView* fview) = 0;
 
   /// Register a shadow receiver.
   virtual void RegisterShadowReceiver (iShadowReceiver* receiver) = 0;

@@ -152,14 +152,6 @@ public:
    */
   int draw_busy;
 
-private:
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to update the lighting for a number of polygons.
-   */
-  static void* CheckFrustumPolygons (csSector*, csPolygonInt** polygon,
-  	int num, void* data);
-
 public:
   /**
    * Construct a sector. This sector will be completely empty.
