@@ -27,7 +27,7 @@
 class csVector2;
 class csVector3;
 class csColor;
-class csTriangle;
+struct csTriangle;
 
 enum EnvMappingModes    {TRUE_ENV_MAP,FAKE_ENV_MAP};
 
