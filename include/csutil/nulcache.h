@@ -22,12 +22,13 @@
 /**\file
  * 'Null' Cache Manager
  */
+#include "csextern.h"
 #include "iutil/cache.h"
 
 /**
  * This is a general cache that doesn't cache anything at all.
  */
-class csNullCacheManager : public iCacheManager
+class CS_CSUTIL_EXPORT csNullCacheManager : public iCacheManager
 {
 public:
   /**

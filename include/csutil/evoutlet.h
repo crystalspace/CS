@@ -20,6 +20,7 @@
 #ifndef __CS_UTIL_EVOUTLET_H__
 #define __CS_UTIL_EVOUTLET_H__
 
+#include "csextern.h"
 #include "csunicode.h"
 #include "iutil/event.h"
 #include "iutil/csinput.h"
@@ -29,7 +30,7 @@ class csEventQueue;
 /**
  * A class which implements the iEventOutlet interface.
  */
-class csEventOutlet : public iEventOutlet
+class CS_CSUTIL_EXPORT csEventOutlet : public iEventOutlet
 {
 private:
   /// The mask of events to allow from this plug

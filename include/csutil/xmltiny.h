@@ -19,6 +19,7 @@
 #ifndef __CS_UTIL_XMLTINY_H__
 #define __CS_UTIL_XMLTINY_H__
 
+#include "csextern.h"
 #include "iutil/document.h"
 
 struct csTinyXmlNode;
@@ -27,7 +28,7 @@ class TiDocumentNode;
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.
  */
-class csTinyDocumentSystem : public iDocumentSystem
+class CS_CSUTIL_EXPORT csTinyDocumentSystem : public iDocumentSystem
 {
 public:
   csTinyDocumentSystem ();

@@ -20,6 +20,8 @@
 #ifndef __CS_GETOPT_H__
 #define __CS_GETOPT_H__
 
+#include "csextern.h"
+
 /**\file
  * Declarations for getopt
  */
@@ -39,7 +41,7 @@
    the argument value is returned here.
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
-extern char *optarg;
+extern CS_CSUTIL_EXPORT char *optarg;
 
 /**
    Index in ARGV of the next element to be scanned.
@@ -53,16 +55,16 @@ extern char *optarg;
 
    Otherwise, `optind' communicates from one call to the next
    how much of ARGV has been scanned so far.  */
-extern int optind;
+extern CS_CSUTIL_EXPORT int optind;
 
 /**
    Callers store zero here to inhibit the error message `getopt' prints
    for unrecognized options.  */
-extern int opterr;
+extern CS_CSUTIL_EXPORT int opterr;
 
 /**
    Set to an option character which was unrecognized.  */
-extern int optopt;
+extern CS_CSUTIL_EXPORT int optopt;
 
 /**
    Describe the long-named options requested by the application.
@@ -86,7 +88,7 @@ extern int optopt;
    value (the equivalent single-letter option character, if there is
    one).  For long options that have a zero `flag' field, `getopt'
    returns the contents of the `val' field.  */
-struct getopt_option
+struct CS_CSUTIL_EXPORT getopt_option
 {
 #if defined (__STDC__) && __STDC__
   const char *name;
@@ -111,10 +113,10 @@ struct getopt_option
 #define required_argument	1
 #define optional_argument	2
 
-extern int getopt (int argc, char *const *argv, const char *shortopts);
-extern int getopt_long (int argc, char *const *argv, const char *shortopts,
+extern CS_CSUTIL_EXPORT int getopt (int argc, char *const *argv, const char *shortopts);
+extern CS_CSUTIL_EXPORT int getopt_long (int argc, char *const *argv, const char *shortopts,
 		        const struct getopt_option *longopts, int *longind);
-extern int getopt_long_only (int argc, char *const *argv,
+extern CS_CSUTIL_EXPORT int getopt_long_only (int argc, char *const *argv,
 			     const char *shortopts,
 		             const struct getopt_option *longopts, int *longind);
 

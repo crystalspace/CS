@@ -19,6 +19,7 @@
 #ifndef __CS_STRHASH_H__
 #define __CS_STRHASH_H__
 
+#include "csextern.h"
 #include "hashmap.h"
 
 /**\file
@@ -40,7 +41,7 @@ class csStringHash;
  * When you have an open iterator you should not alter the
  * string hash that this object iterates over. 
  */
-class csStringHashIterator
+class CS_CSUTIL_EXPORT csStringHashIterator
 {
   friend class csStringHash;
 
@@ -67,7 +68,7 @@ public:
  * The string hash is a hash of strings, all with different content. Each
  * string has an ID number.
  */
-class csStringHash
+class CS_CSUTIL_EXPORT csStringHash
 {
 private:
   friend class csStringHashIterator;

@@ -20,6 +20,8 @@
 #ifndef __CS_REFCOUNT_H__
 #define __CS_REFCOUNT_H__
 
+#include "csextern.h"
+
 /**
  * This is a class which provides basic reference-counting semantics.  It can
  * be used in conjunction with the smart pointer template class csRef (see

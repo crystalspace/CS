@@ -21,6 +21,7 @@
 #ifndef __CS_CSUTIL_EVENT_H__
 #define __CS_CSUTIL_EVENT_H__
 
+#include "csextern.h"
 #include "iutil/event.h"
 
 /**\file
@@ -35,7 +36,7 @@
 /**
  * Helper class to conveniently deal with keyboard events.
  */
-class csKeyEventHelper
+class CS_CSUTIL_EXPORT csKeyEventHelper
 {
 public:
   /// Retrieve the key's raw code.

@@ -19,6 +19,8 @@
 #ifndef __CS_CSBASEEVENTH_H__
 #define __CS_CSBASEEVENTH_H__
 
+#include "csextern.h"
+
 /**\file
  */
 /**
@@ -47,7 +49,7 @@
  * to overload the HandleEvent() method. Always override the specific
  * \c On... trigger function.
  */
-class csBaseEventHandler : public iEventHandler
+class CS_CSUTIL_EXPORT csBaseEventHandler : public iEventHandler
 {
 private:
   csRef<iEventQueue> queue;

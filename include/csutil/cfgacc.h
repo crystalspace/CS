@@ -19,6 +19,7 @@
 #ifndef __CS_CFGACC_H__
 #define __CS_CFGACC_H__
 
+#include "csextern.h"
 #include "array.h"
 #include "iutil/cfgmgr.h"
 
@@ -32,7 +33,7 @@ struct iObjectRegistry;
  * the '->' operator to access the system configuration. Note that you must
  * use the same iObjectRegistry for all config files you add.
  */
-class csConfigAccess
+class CS_CSUTIL_EXPORT csConfigAccess
 {
 public:
   /// constructor

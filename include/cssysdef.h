@@ -72,6 +72,8 @@
  */
 #include "csutil/csosdefs.h"
 
+#include "csextern.h"
+
 /*
  * Default definitions for requested functionality.  Platform-specific
  * configuration files may override these.
@@ -126,9 +128,9 @@
 #  if defined(__NEED_OPENDIR_PROTOTYPE)
      struct DIR;
      struct dirent;
-     extern "C" DIR *opendir (const char *name);
-     extern "C" dirent *readdir (DIR *dirp);
-     extern "C" int closedir (DIR *dirp);
+     extern "C" CS_CSUTIL_EXPORT DIR *opendir (const char *name);
+     extern "C" CS_CSUTIL_EXPORT dirent *readdir (DIR *dirp);
+     extern "C" CS_CSUTIL_EXPORT int closedir (DIR *dirp);
      //extern "C" void seekdir (DIR *dirp, long off);
      //extern "C" long telldir (DIR *dirp);
      //extern "C" void rewinddir (DIR *dirp);

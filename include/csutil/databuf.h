@@ -20,6 +20,7 @@
 #ifndef __CS_DATABUF_H__
 #define __CS_DATABUF_H__
 
+#include "csextern.h"
 #include "iutil/databuff.h"
 
 /**
@@ -28,7 +29,7 @@
  * for use in plugins as a mean to transparently exchange
  * abstract data between plugins.
  */
-class csDataBuffer : public iDataBuffer
+class CS_CSUTIL_EXPORT csDataBuffer : public iDataBuffer
 {
   /// The data buffer
   char *Data;

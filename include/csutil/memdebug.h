@@ -21,11 +21,13 @@
 
 #if defined(CS_MEMORY_TRACKER) || defined(CS_MEMORY_TRACKER_IMPLEMENT)
 
+#include "csextern.h"
+
 /**
  * This structure is used per file to keep track of allocations.
  * ModuleMemTracker maintains an array of them per module.
  */
-struct MemTrackerInfo
+struct CS_CSUTIL_EXPORT MemTrackerInfo
 {
   char* file;
   size_t max_alloc;
@@ -44,9 +46,9 @@ struct MemTrackerInfo
 };
 
 /// 'info' can be filename or some other information to recognize allocation.
-extern MemTrackerInfo* mtiRegisterAlloc (size_t s, void* info);
-extern void mtiRegisterFree (MemTrackerInfo* mti, size_t s);
-extern void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize);
+extern CS_CSUTIL_EXPORT MemTrackerInfo* mtiRegisterAlloc (size_t s, void* info);
+extern CS_CSUTIL_EXPORT void mtiRegisterFree (MemTrackerInfo* mti, size_t s);
+extern CS_CSUTIL_EXPORT void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize);
 
 #endif // CS_MEMORY_TRACKER
 

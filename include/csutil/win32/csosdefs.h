@@ -21,10 +21,11 @@
 #define __CS_CSOSDEFS_H__
 
 #ifdef CS_BUILD_SHARED_LIBS
-  #undef CS_EXPORT_SYM
-  #undef CS_IMPORT_SYM
   #define CS_EXPORT_SYM __declspec(dllexport)
   #define CS_IMPORT_SYM __declspec(dllimport)
+#else
+  #define CS_EXPORT_SYM
+  #define CS_IMPORT_SYM
 #endif // CS_BUILD_SHARED_LIBS
 
 #if defined(COMP_VC)
@@ -36,6 +37,8 @@
   #pragma warning(disable:4146)   // unary minus operator applied to unsigned type, result still unsigned
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
+  #pragma warning(disable:4251)   // class needs to have dll-interface to be used by clients
+  #pragma warning(disable:4275)   // non – DLL-interface used as base for DLL-interface
   #pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  // 'variable' : conversion from 'type' to 'type' of greater size
   #pragma warning(disable:4390)   // Empty control statement
@@ -307,7 +310,11 @@ struct mmioInfo
 
 #ifdef CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
   #define CS_PROVIDES_VFS_VARS 1
-  extern const char* csCheckPlatformVFSVar(const char* VarName);
+#  ifdef CS_CSUTIL_LIB
+  extern CS_EXPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
+#  else
+  extern CS_IMPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
+#  endif // CS_CSUTIL_LIB
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_EXPAND_PATH
@@ -351,9 +358,15 @@ struct mmioInfo
       return !!(de->d_attr & _A_SUBDIR);
     }
 
-    extern "C" DIR *opendir (const char *name);
-    extern "C" dirent *readdir (DIR *dirp);
-    extern "C" int closedir (DIR *dirp);
+#    ifdef CS_CSUTIL_LIB
+    extern "C" CS_EXPORT_SYM DIR *opendir (const char *name);
+    extern "C" CS_EXPORT_SYM dirent *readdir (DIR *dirp);
+    extern "C" CS_EXPORT_SYM int closedir (DIR *dirp);
+#    else
+    extern "C" CS_IMPORT_SYM DIR *opendir (const char *name);
+    extern "C" CS_IMPORT_SYM dirent *readdir (DIR *dirp);
+    extern "C" CS_IMPORT_SYM int closedir (DIR *dirp);
+#    endif // CS_BUILD_SHARED_LIBS
 #  endif // end if !defined(COMP_BC)
 # endif
 #endif

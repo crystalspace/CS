@@ -20,6 +20,7 @@
 #define __CS_UTIL_H__
 
 #include <stdio.h>
+#include "csextern.h"
 #include "csunicode.h"
 
 /**\file
@@ -35,21 +36,21 @@
  * of the strdup() function from string.h (strdup() is not present on some
  * platforms). To free the pointer the caller should call delete[].
  */
-extern char *csStrNew (const char *s);
+extern CS_CSUTIL_EXPORT char *csStrNew (const char *s);
 /**
  * Allocate a new char [] and copy an UTF-8 version of the string into 
  * the newly allocated storage.
  */
-extern char *csStrNew (const wchar_t *s);
+extern CS_CSUTIL_EXPORT char *csStrNew (const wchar_t *s);
 /**
  * Allocate a new widechar [] and the string into the newly allocated storage.
  */
-extern wchar_t* csStrNewW (const wchar_t *s);
+extern CS_CSUTIL_EXPORT wchar_t* csStrNewW (const wchar_t *s);
 /**
  * Allocate a new widechar [] and copy the string converted from UTF-8 into 
  * the newly allocated storage.
  */
-extern wchar_t* csStrNewW (const char *s);
+extern CS_CSUTIL_EXPORT wchar_t* csStrNewW (const char *s);
 
 /**
  * Helper class to convert widechar* to char*(UTF-8) strings for use
@@ -124,13 +125,13 @@ public:
  * The returned filename is always absolute, i.e. it always starts
  * from root. Return a string allocated with csStrNew().
  */
-extern char *csExpandName (const char *iName);
+extern CS_CSUTIL_EXPORT char *csExpandName (const char *iName);
 
 /**
  * Split a pathname into separate path and name. Path delimiters are either
  * '/', PATH_SEPARATOR and, for OS/2, MS-DOS and Win32 targets, ':'.
  */
-extern void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
+extern CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
   char *oName, size_t iNameSize);
 
 /**
@@ -142,16 +143,16 @@ extern void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
  * \remark If you want case-insensitive comparison, upcase (or lowercase,
  *   depends on personal taste) strings first.
  */
-extern bool csGlobMatches (const char *fName, const char *fMask);
+extern CS_CSUTIL_EXPORT bool csGlobMatches (const char *fName, const char *fMask);
 
 /**
  * Finds the smallest number that is a power of two and is larger or
  * equal to n.
  */
-int csFindNearestPowerOf2 (int n);
+CS_CSUTIL_EXPORT int csFindNearestPowerOf2 (int n);
 
 /// returns true if n is a power of two
-bool csIsPowerOf2 (int n);
+CS_CSUTIL_EXPORT bool csIsPowerOf2 (int n);
 
 /// Find the log2 of argument
 static inline int csLog2 (int n)
@@ -167,8 +168,8 @@ static inline int csLog2 (int n)
  * But, do not copy 'search', instead replace that with 'replace' string.
  * max is size of dest.
  */
-void csFindReplace (char *dest, const char *src, const char *search,
-  const char *replace, int max);
+CS_CSUTIL_EXPORT void csFindReplace (char *dest, const char *src,
+  const char *search, const char *replace, int max);
 
 /** @} */
   

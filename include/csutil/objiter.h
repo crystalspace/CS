@@ -23,6 +23,7 @@
 #ifndef __CS_OBJITER_H__
 #define __CS_OBJITER_H__
 
+#include "csextern.h"
 #include "iutil/object.h"
 
 /**
@@ -48,7 +49,7 @@
 /**
  * Helper class for #CS_DECLARE_OBJECT_ITERATOR macro.
  */
-class csTypedObjectIterator
+class CS_CSUTIL_EXPORT csTypedObjectIterator
 {
 protected:
   csRef<iObjectIterator> iter;

@@ -19,6 +19,7 @@
 #ifndef __CSUTIL_BLKALLOC_H__
 #define __CSUTIL_BLKALLOC_H__
 
+#include "csextern.h"
 #include "array.h"
 
 // hack: work around problems caused by #defining 'new'

@@ -20,6 +20,8 @@
 #ifndef __CS_UTIL_LIST_H__
 #define __CS_UTIL_LIST_H__
 
+#include "csextern.h"
+
 /**
  * A lightweight template double-linked list.
  * This is VERY lightweight and not tested very well, as it was writen for
@@ -33,7 +35,7 @@ protected:
    * Template which describs the data stored in the linked list
    * For example a list of ints uses csListElement<int>
    */
-  struct csListElement
+  struct CS_CSUTIL_EXPORT csListElement
   {
     /// Use specified data
     csListElement(const T& d, csListElement* newnext,

@@ -19,9 +19,10 @@
 #ifndef __CS_HASHMAPR_H__
 #define __CS_HASHMAPR_H__
 
+#include "csextern.h"
 #include "hashmap.h"
 
-class csHashIteratorReversible;
+class CS_CSUTIL_EXPORT csHashIteratorReversible;
 
 /// A csHashMap that maintains a reverse hash for indexing key strings by keys.
 class csHashMapReversible : public csHashMap
@@ -65,7 +66,7 @@ public:
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.
-class csGlobalHashIteratorReversible : public csGlobalHashIterator
+class CS_CSUTIL_EXPORT csGlobalHashIteratorReversible : public csGlobalHashIterator
 {
   friend class csHashMapReversible;
 
@@ -88,7 +89,7 @@ public:
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.
-class csHashIteratorReversible : public csHashIterator
+class CS_CSUTIL_EXPORT csHashIteratorReversible : public csHashIterator
 {
   friend class csHashMapReversible;
 

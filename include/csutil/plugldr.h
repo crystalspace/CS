@@ -19,6 +19,7 @@
 #ifndef __CS_PLUGLDR_H__
 #define __CS_PLUGLDR_H__
 
+#include "csextern.h"
 #include "parray.h"
 #include "util.h"
 
@@ -38,7 +39,7 @@ struct csPluginLoadRec
 };
 
 /// \internal Helper class for csPluginLoader.
-class csPluginList : public csPDelArray<csPluginLoadRec>
+class CS_CSUTIL_EXPORT csPluginList : public csPDelArray<csPluginLoadRec>
 {
 public:
   bool Sort (iObjectRegistry* object_reg);
@@ -51,7 +52,7 @@ private:
  * This utility class helps to load plugins based on request,
  * config file, and commandline.
  */
-class csPluginLoader
+class CS_CSUTIL_EXPORT csPluginLoader
 {
   friend class csPluginList;
 

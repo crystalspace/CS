@@ -19,6 +19,7 @@
 #ifndef __CS_PLUGMGR_H__
 #define __CS_PLUGMGR_H__
 
+#include "csextern.h"
 #include "scf.h"
 #include "scopedmutexlock.h"
 #include "parray.h"
@@ -32,7 +33,7 @@ struct iObjectRegistry;
  * This is the standard implementation of the plugin manager.
  * The plugin manager is thread-safe.
  */
-class csPluginManager : public iPluginManager
+class CS_CSUTIL_EXPORT csPluginManager : public iPluginManager
 {
 private:
   /// Mutex to make the plugin manager thread-safe.
@@ -41,7 +42,7 @@ private:
   /**
    * This is a private structure used to keep the list of plugins.
    */
-  class csPlugin
+  class CS_CSUTIL_EXPORT csPlugin
   {
   public:
     /// The plugin itself
@@ -58,7 +59,7 @@ private:
   /**
    * This is a superset of csPDelArray that can find by pointer a plugin.
    */
-  class csPluginsVector : public csPDelArray<csPlugin>
+  class CS_CSUTIL_EXPORT csPluginsVector : public csPDelArray<csPlugin>
   {
   public:
     /// Create the vector
@@ -74,7 +75,7 @@ private:
   /**
    * Class to collect all options for all plug-in modules in the system.
    */
-  class csPluginOption
+  class CS_CSUTIL_EXPORT csPluginOption
   {
   public:
     char *Name;

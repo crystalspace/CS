@@ -26,8 +26,10 @@
 #ifndef __CS_BITARRAY_H__
 #define __CS_BITARRAY_H__
 
+#include "csextern.h"
+
 /// A one-dimensional array of bits, similar to STL bitset.
-class csBitArray
+class CS_CSUTIL_EXPORT csBitArray
 {
 private:
   typedef unsigned long store_type;
@@ -81,7 +83,7 @@ public:
   /**
    * \internal Bit proxy (for csBitArray::operator[])
    */
-  class BitProxy
+  class CS_CSUTIL_EXPORT BitProxy
   {
   private:
     csBitArray &mArray;

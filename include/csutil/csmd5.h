@@ -64,6 +64,7 @@
 #ifndef __CS_CSMD5_H__
 #define __CS_CSMD5_H__
 
+#include "csextern.h"
 #include "csstring.h"
 
 /**
@@ -73,7 +74,7 @@
  * as a more convenient interface which allows one to create a digest in a
  * single step.
  */
-class csMD5
+class CS_CSUTIL_EXPORT csMD5
 {
 public:
   /// 8-bit byte
@@ -82,7 +83,7 @@ public:
   typedef unsigned int md5_word_t;
 
   /// \internal Define the state of the MD5 Algorithm.
-  struct md5_state_t
+  struct CS_CSUTIL_EXPORT md5_state_t
   {
     size_t count[2]; // message length in bits, lsw first
     md5_word_t abcd[4];  // digest buffer
@@ -102,7 +103,7 @@ protected:
 // Our friendly interface.
 public:
   /// An MD5 digest is 16 unsigned characters (not 0-terminated).
-  struct Digest
+  struct CS_CSUTIL_EXPORT Digest
   {
     enum { DigestLen = 16 };
     /// The raw digest data.

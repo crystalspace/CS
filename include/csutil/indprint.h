@@ -20,11 +20,12 @@
 #define __CS_INDPRINT_H__
 
 #include <stdarg.h>
+#include "csextern.h"
 
 /**
  * A debugging class to help print out indented messages.
  */
-class csIndPrint
+class CS_CSUTIL_EXPORT csIndPrint
 {
 private:
   int cur_indent_level;
@@ -60,7 +61,7 @@ public:
  * So you can use it to keep track of indentation without the risk
  * of miscounting Up() and Down() calls.
  */
-class csIndPrintDown
+class CS_CSUTIL_EXPORT csIndPrintDown
 {
 private:
   csIndPrint& indprint;

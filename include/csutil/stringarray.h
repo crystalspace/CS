@@ -21,6 +21,7 @@
 #define __CS_STRINGARRAY_H__
 
 #include <stdarg.h>
+#include "csextern.h"
 #include "util.h"
 #include "array.h"
 

@@ -19,13 +19,15 @@
 #ifndef __CS_DATASTRM_H__
 #define __CS_DATASTRM_H__
 
+#include "csextern.h"
+
 struct iDataBuffer;
 
 /**
  * This class can be used as a wrapper around a data buffer for easy
  * stream-like access.
  */
-class csDataStream
+class CS_CSUTIL_EXPORT csDataStream
 {
 private:
   /// Pointer to data.

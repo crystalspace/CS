@@ -19,6 +19,8 @@
 #ifndef __CS_UTIL_DEBUG_H__
 #define __CS_UTIL_DEBUG_H__
 
+#include "csextern.h"
+
 // Enable the following define to have the DG_... macros.
 //#define CS_USE_GRAPHDEBUG
 
@@ -79,7 +81,7 @@ struct iObjectRegistry;
  * track of allocations in a graph. Later on you can add/remove
  * allocations from that graph.
  */
-class csDebuggingGraph
+class CS_CSUTIL_EXPORT csDebuggingGraph
 {
 public:
   /**

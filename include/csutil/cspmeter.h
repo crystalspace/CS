@@ -20,6 +20,7 @@
 #ifndef __CS_CSPMETER_H__
 #define __CS_CSPMETER_H__
 
+#include "csextern.h"
 #include "ivaria/pmeter.h"
 
 struct iConsoleOutput;
@@ -46,7 +47,7 @@ struct iConsoleOutput;
  * needs a newline printed after 100% has been reached, then it is the
  * client's responsibility to print it.
  */
-class csTextProgressMeter : public iProgressMeter
+class CS_CSUTIL_EXPORT csTextProgressMeter : public iProgressMeter
 {
 private:
   iConsoleOutput* console;

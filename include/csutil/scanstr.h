@@ -19,6 +19,8 @@
 #ifndef __CS_SCANSTR_H__
 #define __CS_SCANSTR_H__
 
+#include "csextern.h"
+
 /**\file
  */
 
@@ -50,6 +52,6 @@
  * <p>Returns the number of successfully scanned arguments or -1 if there
  * was a mismatch.
  */
-int csScanStr (const char* in, const char* format, ...);
+CS_CSUTIL_EXPORT int csScanStr (const char* in, const char* format, ...);
 
 #endif // __CS_SCANSTR_H__

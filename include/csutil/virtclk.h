@@ -19,6 +19,7 @@
 #ifndef __CS_VIRTCLK_H__
 #define __CS_VIRTCLK_H__
 
+#include "csextern.h"
 #include "scf.h"
 #include "iutil/virtclk.h"
 
@@ -27,7 +28,7 @@
  * clock you can easily keep track of elapsed and current time
  * in a virtual setting.
  */
-class csVirtualClock : public iVirtualClock
+class CS_CSUTIL_EXPORT csVirtualClock : public iVirtualClock
 {
 private:
   /// Elapsed time between last two frames and absolute time in milliseconds

@@ -19,12 +19,13 @@
 #ifndef __CS_UTIL_BINTREE_H__
 #define __CS_UTIL_BINTREE_H__
 
+#include "csextern.h"
 #include "blockallocator.h"
 
 /**
  * A generic binary search tree.
  */
-template <class T> class csTree
+template <class T> class CS_CSUTIL_EXPORT csTree
 {
 private:
   struct Element

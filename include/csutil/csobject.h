@@ -20,6 +20,7 @@
 #ifndef __CS_CSOBJECT_H__
 #define __CS_CSOBJECT_H__
 
+#include "csextern.h"
 #include "cstypes.h"
 #include "util.h"
 #include "iutil/object.h"
@@ -32,7 +33,7 @@ typedef csRefArray<iObject> csObjectContainer;
  * children attached to it. You can use SCF_QUERY_INTERFACE to get interfaces
  * from the child objects.
  */
-class csObject : public iObject
+class CS_CSUTIL_EXPORT csObject : public iObject
 {
 protected:
   friend class csObjectIterator;

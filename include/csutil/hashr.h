@@ -21,6 +21,7 @@
  * Reversible hash.
  */
 
+#include "csextern.h"
 #include "hash.h"
  
 /// A csHash<> that maintains a reverse hash for indexing keys by values.

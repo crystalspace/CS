@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include "csextern.h"
 #include "iutil/objreg.h"
 #include "scf.h"
 #include "array.h"
@@ -31,7 +32,7 @@
  * This is an implementation of iObjectRegistry.
  * Thread-safe!
  */
-class csObjectRegistry : public iObjectRegistry
+class CS_CSUTIL_EXPORT csObjectRegistry : public iObjectRegistry
 {
 private:
   csRef<csMutex> mutex;

@@ -20,7 +20,9 @@
 #ifndef __CSUTIL_RADIX_SORT_H__
 #define __CSUTIL_RADIX_SORT_H__
 
-class csRadixSorter
+#include "csextern.h"
+
+class CS_CSUTIL_EXPORT csRadixSorter
 {
 private:
   // Element counter table. This is used to count the

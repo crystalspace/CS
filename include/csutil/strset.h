@@ -19,6 +19,7 @@
 #ifndef __CS_STRSET_H__
 #define __CS_STRSET_H__
 
+#include "csextern.h"
 #include "strhash.h"
 
 /**\file
@@ -31,7 +32,7 @@ class csStringSet;
  * When you have an open iterator you should not alter the
  * string set that this object iterates over. 
  */
-class csStringSetIterator
+class CS_CSUTIL_EXPORT csStringSetIterator
 {
   friend class csStringSet;
 
@@ -59,7 +60,7 @@ public:
  * string, which means to return the ID for the string, adding it to the
  * list if it is not already there.
  */
-class csStringSet
+class CS_CSUTIL_EXPORT csStringSet
 {
   friend class csStringSetIterator;
 

@@ -19,6 +19,7 @@
 #ifndef __CS_UTIL_CFGFILE_H__
 #define __CS_UTIL_CFGFILE_H__
 
+#include "csextern.h"
 #include "iutil/cfgfile.h"
 #include "iutil/vfs.h"
 #include "array.h"
@@ -29,7 +30,7 @@ class csConfigIterator;
 /**
  * Configuration file which implements the iConfigFile SCF interface.
  */
-class csConfigFile : public iConfigFile
+class CS_CSUTIL_EXPORT csConfigFile : public iConfigFile
 {
 public:
   SCF_DECLARE_IBASE;

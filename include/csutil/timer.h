@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include "csextern.h"
 #include "array.h"
 #include "iutil/timer.h"
 
@@ -34,7 +35,7 @@ struct timerevent;
  * This class implements a timer. You can add operations to it and they
  * will be performed at the dedicated time.
  */
-class csEventTimer : public iEventTimer
+class CS_CSUTIL_EXPORT csEventTimer : public iEventTimer
 {
 private:
   iObjectRegistry* object_reg;

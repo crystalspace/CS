@@ -19,6 +19,8 @@
 #ifndef __CS_SCHEDULE_H__
 #define __CS_SCHEDULE_H__
 
+#include "csextern.h"
+
 class csSchedulePart;
 
 /**
@@ -71,7 +73,7 @@ class csSchedulePart;
  * class cannot give callbacks inside a single frame, it will behave as best as
  * possible using callbacks every frame.
  */
-class csSchedule
+class CS_CSUTIL_EXPORT csSchedule
 {
 private:
   /// first part of the scheduled callbacks

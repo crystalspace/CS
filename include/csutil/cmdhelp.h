@@ -19,6 +19,8 @@
 #ifndef __CS_CMDHELP_H__
 #define __CS_CMDHELP_H__
 
+#include "csextern.h"
+
 struct iObjectRegistry;
 struct iCommandLineParser;
 struct iConfig;
@@ -30,7 +32,7 @@ struct iConfig;
  * This class requires the iPluginManager and iCommandLineParser to be
  * in the object registry (or else you give it as a parameter).
  */
-class csCommandLineHelper
+class CS_CSUTIL_EXPORT csCommandLineHelper
 {
 private:
   static void Help (iConfig* config);

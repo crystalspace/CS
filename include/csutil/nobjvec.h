@@ -20,6 +20,7 @@
 #ifndef __CS_NOBJVEC_H__
 #define __CS_NOBJVEC_H__
 
+#include "csextern.h"
 #include "refarr.h"
 #include "iutil/object.h"
 

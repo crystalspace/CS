@@ -23,6 +23,7 @@
 #ifndef __CS_RNG_H__
 #define __CS_RNG_H__
 
+#include "csextern.h"
 #include "cstypes.h"
 
 /**
@@ -35,7 +36,7 @@
  * in a random terrain generator I made after I switched to
  * this RNG.
  */
-class csRandomGen
+class CS_CSUTIL_EXPORT csRandomGen
 {
   int i97, j97;
   float u [98];

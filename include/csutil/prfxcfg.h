@@ -19,6 +19,7 @@
 #ifndef __CS_PRFXCFG_H__
 #define __CS_PRFXCFG_H__
 
+#include "csextern.h"
 #include "cfgfile.h"
 
 /**
@@ -28,7 +29,7 @@
  * returned instead of the real file name. The real name will still be
  * used for loading and saving.
  */
-class csPrefixConfig : public csConfigFile
+class CS_CSUTIL_EXPORT csPrefixConfig : public csConfigFile
 {
 public:
   /// constructor

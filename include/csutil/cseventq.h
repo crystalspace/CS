@@ -25,6 +25,7 @@
  * Event Queue interface
  */
 
+#include "csextern.h"
 #include "csevent.h"
 #include "csevcord.h"
 #include "evoutlet.h"
@@ -47,13 +48,13 @@ struct iObjectRegistry;
  * iEventQueue for a detailed description of each method.  One instance of this
  * class is usually shared via iObjectRegistry.  Event queues are thread-safe.
  */
-class csEventQueue : public iEventQueue
+class CS_CSUTIL_EXPORT csEventQueue : public iEventQueue
 {
   friend class csEventOutlet;
   friend class csPoolEvent;
 
 private:
-  struct Listener
+  struct CS_CSUTIL_EXPORT Listener
   {
     iEventHandler* object;
     unsigned int trigger;

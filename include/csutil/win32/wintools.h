@@ -19,6 +19,7 @@
 #ifndef __CS_CSSYS_WIN32_WINTOOLS_H__
 #define __CS_CSSYS_WIN32_WINTOOLS_H__
 
+#include "csextern.h"
 #include "csutil/csunicode.h"
 #include "csutil/util.h"
 #include <winnls.h> // contains MultiByteToWideChar()/WideCharToMultiByte()
@@ -53,7 +54,7 @@ static inline char* cswinWideToAnsi (const wchar_t* wide,
   return buf;
 }
 
-struct cswinWtoA
+struct CS_CSUTIL_EXPORT cswinWtoA
 {
 private:
   char* s;
@@ -67,7 +68,7 @@ public:
 };
 
 /// Convert UTF-8 to ANSI
-struct cswinCtoA
+struct CS_CSUTIL_EXPORT cswinCtoA
 {
 private:
   char* s;
@@ -82,8 +83,8 @@ public:
   { return s; }
 };
 
-extern char* cswinGetErrorMessage (HRESULT code);
-extern wchar_t* cswinGetErrorMessageW (HRESULT code);
-extern bool cswinIsWinNT ();
+extern CS_CSUTIL_EXPORT char* cswinGetErrorMessage (HRESULT code);
+extern CS_CSUTIL_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
+extern CS_CSUTIL_EXPORT bool cswinIsWinNT ();
 
 #endif

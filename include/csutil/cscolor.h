@@ -19,6 +19,8 @@
 #ifndef __CS_CSCOLOR_H__
 #define __CS_CSCOLOR_H__
 
+#include "csextern.h"
+
 /**
  * A class used to represent a color in RGB space.
  * This class is similar to csRGBpixel and csRGBcolor except that

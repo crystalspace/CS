@@ -19,6 +19,7 @@
 #ifndef __CS_CSSYS_SYSPATH_H__
 #define __CS_CSSYS_SYSPATH_H__
 
+#include "csextern.h"
 #include "array.h"
 #include "csstring.h"
 #include "ref.h"
@@ -42,7 +43,7 @@ class csPluginPaths;
  * For instance in Unix it simply returns '/' but for Windows it may return a
  * list of available drive letters.
  */
-csRef<iStringArray> csFindSystemRoots();
+CS_CSUTIL_EXPORT csRef<iStringArray> csFindSystemRoots();
 
 /**
  * Get the installation path.
@@ -52,13 +53,13 @@ csRef<iStringArray> csFindSystemRoots();
  * need this.  May return the empty string if unable to determine the
  * installation path.
  */
-csString csGetConfigPath ();
+CS_CSUTIL_EXPORT csString csGetConfigPath ();
 
 /** 
  * Get a list of directories where plugins are installed.
  * \remark Caller is responsible to free the list with delete after using it.
  */
-csPluginPaths* csGetPluginPaths (const char* argv0);
+CS_CSUTIL_EXPORT csPluginPaths* csGetPluginPaths (const char* argv0);
 
 /**
  * Expand a native path relative to the current directory.
@@ -66,7 +67,7 @@ csPluginPaths* csGetPluginPaths (const char* argv0);
  * \remark Caller is responsible to free the returend string with delete[] 
  *   after using it.
  */
-char* csExpandPath (const char* path);
+CS_CSUTIL_EXPORT char* csExpandPath (const char* path);
 
 /**
  * Return the absolute path of the executable.
@@ -78,7 +79,7 @@ char* csExpandPath (const char* path);
  *   many platforms, this is the only way to determine the actual location of
  *   the executable.
  */
-csString csGetAppPath (const char* argv0);
+CS_CSUTIL_EXPORT csString csGetAppPath (const char* argv0);
 
 /**
  * Return the directory in which the application executable resides.  For
@@ -94,7 +95,7 @@ csString csGetAppPath (const char* argv0);
  *   many platforms, this is the only way to determine the actual location of
  *   the executable.
  */
-csString csGetAppDir (const char* argv0);
+CS_CSUTIL_EXPORT csString csGetAppDir (const char* argv0);
 
 /**
  * Return the directory in which the application's resources reside.  On
@@ -110,7 +111,7 @@ csString csGetAppDir (const char* argv0);
  *   many platforms, this is the only way to determine the actual location of
  *   the resources.
  */
-csString csGetResourceDir (const char* argv0);
+CS_CSUTIL_EXPORT csString csGetResourceDir (const char* argv0);
 
 /**
  * Check whether two native paths actually point to the same location.
@@ -120,12 +121,12 @@ csString csGetResourceDir (const char* argv0);
  * \remark Expects the paths to be fully qualified. Use csExpandPath() to 
  *   ensure this.
  */
-bool csPathsIdentical (const char* path1, const char* path2);
+CS_CSUTIL_EXPORT bool csPathsIdentical (const char* path1, const char* path2);
 
 /**
  * This structure contains information about a plugin path.
  */
-struct csPluginPath
+struct CS_CSUTIL_EXPORT csPluginPath
 {
   /**
    * The actual path.
@@ -162,7 +163,7 @@ struct csPluginPath
 /**
  * Class to manage a list of plugin paths.
  */
-class csPluginPaths
+class CS_CSUTIL_EXPORT csPluginPaths
 {
   csArray<csPluginPath> paths;
 public:

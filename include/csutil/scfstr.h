@@ -20,11 +20,12 @@
 #ifndef __CS_SCFSTR_H__
 #define __CS_SCFSTR_H__
 
+#include "csextern.h"
 #include "iutil/string.h"
 #include "csstring.h"
 
 /// This is a thin SCF wrapper around csString
-class scfString : public iString
+class CS_CSUTIL_EXPORT scfString : public iString
 {
   csString s;
 

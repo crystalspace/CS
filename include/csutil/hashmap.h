@@ -25,6 +25,7 @@
 #endif
 #endif
 
+#include "csextern.h"
 #include "parray.h"
 #include "array.h"
 
@@ -39,9 +40,9 @@ typedef uint32 csHashKey;
 typedef void* csHashObject;
 
 /// Compute a hash key for a null-terminated string.
-csHashKey csHashCompute(char const*);
+CS_CSUTIL_EXPORT csHashKey csHashCompute(char const*);
 /// Compute a hash key for a string of a given length.
-csHashKey csHashCompute(char const*, int length);
+CS_CSUTIL_EXPORT csHashKey csHashCompute(char const*, int length);
 
 /**
  * An element inside the hashmap (private element).
@@ -65,7 +66,7 @@ typedef csArray<csHashBucket> csHashBucketVector;
  * iterator to delete one element from the map. The iterator
  * will correctly point to the next element then.
  */
-class csGlobalHashIterator
+class CS_CSUTIL_EXPORT csGlobalHashIterator
 {
   friend class csHashMap;
   friend class csGlobalHashIteratorReversible;
@@ -129,7 +130,7 @@ public:
  * iterator to delete one element from the map. The iterator
  * will correctly point to the next element then.
  */
-class csHashIterator
+class CS_CSUTIL_EXPORT csHashIterator
 {
   friend class csHashMap;
   friend class csHashIteratorReversible;
@@ -192,7 +193,7 @@ public:
  * Keys must not be unique. If a key is not unique then you
  * can iterate over all elements with the same key.
  */
-class csHashMap
+class CS_CSUTIL_EXPORT csHashMap
 {
   friend class csHashIterator;
   friend class csGlobalHashIterator;
@@ -284,7 +285,7 @@ public:
  * You can basically use this to test for the occurrence
  * of some object quickly.
  */
-class csHashSet
+class CS_CSUTIL_EXPORT csHashSet
 {
 private:
   csHashMap map;

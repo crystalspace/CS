@@ -20,6 +20,8 @@
 #ifndef __CS_WEAKREF_H__
 #define __CS_WEAKREF_H__
 
+#include "csextern.h"
+
 /**
  * A weak reference. This is a reference to a reference counted object
  * but in itself it doesn't increment the ref counter. As soon as the

@@ -24,6 +24,7 @@
  * iConfigFile implementation for configurations stored in documents.
  */
 
+#include "csextern.h"
 #include "iutil/cfgfile.h"
 #include "iutil/document.h"
 #include "csutil/hash.h"
@@ -34,13 +35,13 @@
  * \todo Write support
  * \todo Enumerators
  */
-class csConfigDocument : public iConfigFile
+class CS_CSUTIL_EXPORT csConfigDocument : public iConfigFile
 {
   char* filename;
   csRef<iDocument> document;
   csRef<iVFS> fileVFS;
 
-  struct KeyInfo
+  struct CS_CSUTIL_EXPORT KeyInfo
   {
     csRef<iDocumentNode> comment;
     csRef<iDocumentNode> node;

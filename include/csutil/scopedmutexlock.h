@@ -19,6 +19,7 @@
 #ifndef __CSUTIL_SCOPEDMUTEX_H__
 #define __CSUTIL_SCOPEDMUTEX_H__
 
+#include "csextern.h"
 #include "thread.h"
 
 /**
@@ -35,7 +36,7 @@
  *      return;
  *  }
  */
-class csScopedMutexLock
+class CS_CSUTIL_EXPORT csScopedMutexLock
 {
 public:
   csScopedMutexLock (csMutex* newmutex)

@@ -22,6 +22,7 @@
 /**\file
  * VFS Cache Manager
  */
+#include "csextern.h"
 #include "iutil/cache.h"
 
 struct iObjectRegistry;
@@ -30,7 +31,7 @@ struct iVFS;
 /**
  * This is a general cache that can cache data on VFS.
  */
-class csVfsCacheManager : public iCacheManager
+class CS_CSUTIL_EXPORT csVfsCacheManager : public iCacheManager
 {
 private:
   iObjectRegistry* object_reg;

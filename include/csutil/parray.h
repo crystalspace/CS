@@ -20,6 +20,7 @@
 #ifndef __CS_PTRARR_H__
 #define __CS_PTRARR_H__
 
+#include "csextern.h"
 #include "array.h"
 
 template <class T>

@@ -20,6 +20,7 @@
 #ifndef __CS_CSPPULSE_H__
 #define __CS_CSPPULSE_H__
 
+#include "csextern.h"
 #include "cstypes.h"
 
 struct iConsoleOutput;
@@ -40,7 +41,7 @@ struct iConsoleOutput;
  * one more backspace.  Reset() erases the pulse and then resets the state.
  * Erase() is called automatically by the destructor.
  */
-class csProgressPulse
+class CS_CSUTIL_EXPORT csProgressPulse
 {
 private:
   iConsoleOutput* console;

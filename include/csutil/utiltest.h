@@ -19,13 +19,14 @@
 #ifndef __CS_CSUTIL_UNITTEST_H__
 #define __CS_CSUTIL_UNITTEST_H__
 
+#include "csextern.h"
 #include "iutil/dbghelp.h"
 
 /**
  * This is a class that does unit testing (and other debug stuff) for some
  * of csutil classes.
  */
-class csUtilDebugHelper : public iDebugHelper
+class CS_CSUTIL_EXPORT csUtilDebugHelper : public iDebugHelper
 {
 public:
   csUtilDebugHelper ();

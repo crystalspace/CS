@@ -19,12 +19,13 @@
 #ifndef __CS_PROCESSORCAP_H__
 #define __CS_PROCESSORCAP_H__
 
+#include "csextern.h"
 
 /**
  * This class is used to identify capabilities in the processor such as 
  * support for MMX and SSE
  */
-class csProcessorCapability
+class CS_CSUTIL_EXPORT csProcessorCapability
 {
 public:
 

@@ -19,6 +19,7 @@
 #ifndef __CS_CFGMGR_H__
 #define __CS_CFGMGR_H__
 
+#include "csextern.h"
 #include "iutil/cfgmgr.h"
 #include "refarr.h"
 #include "array.h"
@@ -28,7 +29,7 @@
  * appear to be a single configuration object.  See the description of the
  * iConfigManager interface for full details.
  */
-class csConfigManager : public iConfigManager
+class CS_CSUTIL_EXPORT csConfigManager : public iConfigManager
 {
 public:
   SCF_DECLARE_IBASE;

@@ -20,11 +20,12 @@
 #ifndef __CS_SCFSTRINGARRAY_H__
 #define __CS_SCFSTRINGARRAY_H__
 
+#include "csextern.h"
 #include "iutil/stringarray.h"
 #include "stringarray.h"
 
 /// This class is a thin wrapper around csStringArray with SCF capability
-class scfStringArray : public iStringArray
+class CS_CSUTIL_EXPORT scfStringArray : public iStringArray
 {
   csStringArray v;
 

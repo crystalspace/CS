@@ -31,6 +31,7 @@
 /**\name Low-level shared library support
  * @{ */
 
+#include "csextern.h"
 #include "syspath.h"
 #include "ref.h"
 #include "refarr.h"
@@ -43,7 +44,7 @@ typedef void* csLibraryHandle;
  * which is used later to query and unload the library.
  * iName is the FULL path to the library.
  */
-csLibraryHandle csLoadLibrary (char const* iName);
+CS_CSUTIL_EXPORT csLibraryHandle csLoadLibrary (char const* iName);
 
 /**
  * Return a pointer to a symbol within given shared library.
@@ -52,20 +53,20 @@ csLibraryHandle csLoadLibrary (char const* iName);
  * If your OS is short on features, you may implement querying of just
  * this symbol.
  */
-void* csGetLibrarySymbol (csLibraryHandle Handle, char const* iName);
+CS_CSUTIL_EXPORT void* csGetLibrarySymbol (csLibraryHandle Handle, char const* iName);
 
 /**
  * Unload a shared library given its handle.
  * The function returns false on error.
  */
-bool csUnloadLibrary (csLibraryHandle Handle);
+CS_CSUTIL_EXPORT bool csUnloadLibrary (csLibraryHandle Handle);
 
 /**
  * Print out the latest dynamic loader error.
  * This is not strictly required (and on some platforms its just a empty
  * routine) but sometimes it helps to find problems.
  */
-void csPrintLibraryError (char const* iModule);
+CS_CSUTIL_EXPORT void csPrintLibraryError (char const* iModule);
 
 /**
  * Control whether dynamic library loading messages are verbose or terse.
@@ -76,12 +77,12 @@ void csPrintLibraryError (char const* iModule);
  * details.  Verbose messages are enabled by default for debug builds; terse
  * messages for optimized builds.
  */
-void csSetLoadLibraryVerbose(bool);
+CS_CSUTIL_EXPORT void csSetLoadLibraryVerbose(bool);
 
 /**
  * Query if failed dynamic library loads generate verbose messages.
  */
-bool csGetLoadLibraryVerbose();
+CS_CSUTIL_EXPORT bool csGetLoadLibraryVerbose();
 
 /**
  * Scan a given directory for plugins and return a list of the plugin
@@ -94,7 +95,7 @@ bool csGetLoadLibraryVerbose();
  * \remark \p plugins can be 0, a string vector will be created in this case.
  * \return If any errors occured, a vector of error descriptions.
  */
-csRef<iStringArray> csScanPluginDir (const char* dir, 
+CS_CSUTIL_EXPORT csRef<iStringArray> csScanPluginDir (const char* dir, 
 				   csRef<iStringArray>& plugins,
 				   bool recursive = true);
 
@@ -103,7 +104,7 @@ csRef<iStringArray> csScanPluginDir (const char* dir,
  * Accepts the same parameters as csScanPluginDir(), with the exception of
  * \p dirs.
  */				
-csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
+CS_CSUTIL_EXPORT csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
 				    csRef<iStringArray>& plugins);
 
 /**
@@ -125,7 +126,7 @@ csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs,
  * specified path does not correspond to a Crystal Space plugin module.  This
  * is a valid condition.
  */
-csRef<iString> csGetPluginMetadata (const char* fullPath, 
+CS_CSUTIL_EXPORT csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata);
 
 /** @} */

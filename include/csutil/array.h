@@ -273,7 +273,7 @@ public:
   }
   
   /// Assignment operator.
-  csArray<T>& operator= (const csArray& other)
+  csArray<T,ElementHandler>& operator= (const csArray& other)
   {
     CopyFrom (other);
     return *this;

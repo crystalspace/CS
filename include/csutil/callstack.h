@@ -20,9 +20,10 @@
 #ifndef __CS_UTIL_CALLSTACK_H__
 #define __CS_UTIL_CALLSTACK_H__
 
+#include "csextern.h"
 #include "csutil/csstring.h"
 
-class csCallStack
+class CS_CSUTIL_EXPORT csCallStack
 {
 protected:
   virtual ~csCallStack() {}
@@ -50,7 +51,7 @@ public:
   }
 };
 
-class csCallStackHelper
+class CS_CSUTIL_EXPORT csCallStackHelper
 {
 public:
   static csCallStack* CreateCallStack (uint skip = 0);

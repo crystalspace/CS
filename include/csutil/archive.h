@@ -21,6 +21,7 @@
 #define __CS_ARCHIVE_H__
 
 #include <stdio.h>
+#include "csextern.h"
 #include "zip.h"
 #include "parray.h"
 #include "stringarray.h"
@@ -47,7 +48,7 @@ struct csFileTime;
  *     stack space when invoked.
  * </ul>
  */
-class csArchive
+class CS_CSUTIL_EXPORT csArchive
 {
 public:
   static char hdr_central[4];
@@ -81,7 +82,7 @@ private:
   friend class ArchiveEntry;
 
   /// A vector of ArchiveEntries
-  class ArchiveEntryVector : public csPDelArray<ArchiveEntry>
+  class CS_CSUTIL_EXPORT ArchiveEntryVector : public csPDelArray<ArchiveEntry>
   {
   public:
     ArchiveEntryVector () : csPDelArray<ArchiveEntry> (256, 256) {}

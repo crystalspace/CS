@@ -20,6 +20,8 @@
 #ifndef __CS_UTIL_REFTRACKERACCESS_H__
 #define __CS_UTIL_REFTRACKERACCESS_H__
 
+#include "csextern.h"
+
 #ifndef CS_REF_TRACKER
   // @@@ HACK: to allow enabled and disabled versions to coexist
   #define csRefTrackerAccess	csRefTrackerAccess_nada
@@ -30,7 +32,7 @@
  * iRefTracker documentation for an explanation of the available 
  * methods.
  */
-class csRefTrackerAccess
+class CS_CSUTIL_EXPORT csRefTrackerAccess
 {
 public:
 #ifndef CS_REF_TRACKER

@@ -20,6 +20,7 @@
 #ifndef __CS_WEAKREFARR_H__
 #define __CS_WEAKREFARR_H__
 
+#include "csextern.h"
 #include "weakref.h"
 #include "array.h"
 

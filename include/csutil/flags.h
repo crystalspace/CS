@@ -19,6 +19,8 @@
 #ifndef __CS_FLAGS_H__
 #define __CS_FLAGS_H__
 
+#include "csextern.h"
+
 /**
  * Set of flags which can be accessed through masks.
  */

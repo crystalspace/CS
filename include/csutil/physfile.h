@@ -19,6 +19,7 @@
 #ifndef __CS_PHYSFILE_H__
 #define __CS_PHYSFILE_H__
 
+#include "csextern.h"
 #include "iutil/vfs.h"
 #include "csstring.h"
 #include <stdio.h>
@@ -27,7 +28,7 @@
  * An implementation of the abstract iFile interface for real files within
  * the physical filesystem.
  */
-class csPhysicalFile : public iFile
+class CS_CSUTIL_EXPORT csPhysicalFile : public iFile
 {
 public:
   /**

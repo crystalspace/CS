@@ -19,12 +19,13 @@
 #ifndef __CS_CSTREENODE_H__
 #define __CS_CSTREENODE_H__
 
+#include "csextern.h"
 #include "array.h"
 
 /**
  * A generic tree class.
  */
-class csTreeNode
+class CS_CSUTIL_EXPORT csTreeNode
 {
 public:
   /// Returns true if this node has no children.

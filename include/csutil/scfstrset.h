@@ -19,6 +19,7 @@
 #ifndef __CS_SCFSTRSET_H__
 #define __CS_SCFSTRSET_H__
 
+#include "csextern.h"
 #include "iutil/strset.h"
 #include "strset.h"
 
@@ -28,7 +29,7 @@
  * string, which means to return the ID for the string, adding it to the
  * list if it is not already there.
  */
-class csScfStringSet : public iStringSet
+class CS_CSUTIL_EXPORT csScfStringSet : public iStringSet
 {
   csStringSet set;
 

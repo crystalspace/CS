@@ -19,6 +19,7 @@
 #ifndef __CS_UTIL_BINDER_H__
 #define __CS_UTIL_BINDER_H__
 
+#include "csextern.h"
 #include "iutil/binder.h"
 #include "iutil/eventh.h"
 #include "hashmap.h"
@@ -33,7 +34,7 @@ csHashKey csHashComputeEvent (iEvent* const);
  * Bind an input event to a pointer to a variable so that that variable will
  * reflect the state of a given key, button or axis.
  */
-class csInputBinder : public iInputBinder
+class CS_CSUTIL_EXPORT csInputBinder : public iInputBinder
 {
 private:
   csHashMap Hash;
@@ -55,7 +56,7 @@ public:
    */
   virtual ~csInputBinder ();
 
-  struct eiEventHandler : public iEventHandler
+  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE (csInputBinder);
     bool HandleEvent (iEvent &ev) { return scfParent->HandleEvent (ev); }
@@ -95,7 +96,7 @@ public:
 /**
  * Represents the position of a mouse or joystick axis, shared between modules.
  */
-class csInputBinderPosition : public iInputBinderPosition
+class CS_CSUTIL_EXPORT csInputBinderPosition : public iInputBinderPosition
 {
 private:
   /// The internally held value of the position.
@@ -127,7 +128,7 @@ public:
  * Represents the up or down state of a keyboard key or a mouse or joystick
  * button, shared between modules.
  */
-class csInputBinderBoolean : public iInputBinderBoolean
+class CS_CSUTIL_EXPORT csInputBinderBoolean : public iInputBinderBoolean
 {
 private:
   /// The internally held state of the button.

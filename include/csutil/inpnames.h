@@ -25,13 +25,14 @@
  * Crystal Space input library
  */
 
+#include "csextern.h"
 #include "iutil/evdefs.h"
 #include "iutil/event.h"
 #include "csstring.h"
 
 struct iEvent;
 
-class csInputDefinition
+class CS_CSUTIL_EXPORT csInputDefinition
 {
 protected:
   uint32 modifiersHonored;
@@ -85,7 +86,7 @@ public:
  * \return CSEVTYPE_Keyboard, CSEVTYPE_Mouse, CSEVTYPE_Joystick or 0 if
  *         the string could not be successfully parsed.
  */
-int csTypeOfInputDef (const char* str);
+CS_CSUTIL_EXPORT int csTypeOfInputDef (const char* str);
 
 /**
  * Convert a free-format string into a set of values that can be compared
@@ -101,7 +102,7 @@ int csTypeOfInputDef (const char* str);
  * \remark The cooked code returned *may* be 0. This is the case if
  *  the non-modifier part is a single letter.
  */
-bool csParseKeyDef (const char* str, utf32_char* rawCode,
+CS_CSUTIL_EXPORT bool csParseKeyDef (const char* str, utf32_char* rawCode,
   utf32_char* cookedCode, csKeyModifiers* modifiers);
 
 /**
@@ -115,7 +116,7 @@ bool csParseKeyDef (const char* str, utf32_char* rawCode,
  *  (e.g. "LAlt" vs just "Alt".)
  * \returns The key string.
  */
-csString csGetKeyDesc (utf32_char code, 
+CS_CSUTIL_EXPORT csString csGetKeyDesc (utf32_char code, 
 			      const csKeyModifiers* modifiers,
 			      bool distinguishModifiers = true);
 
@@ -135,7 +136,7 @@ csString csGetKeyDesc (utf32_char code,
  * \remark For any piece of information in which you are not interested, pass 0
  *  for the address.
  */
-bool csParseMouseDef(const char* str, int* x, int* y, 
+CS_CSUTIL_EXPORT bool csParseMouseDef(const char* str, int* x, int* y, 
                             int* button, csKeyModifiers* modifiers);
 
 /**
@@ -153,7 +154,7 @@ bool csParseMouseDef(const char* str, int* x, int* y,
  *         It will be tested in this order. So setting x and y to nonzero will
  *         result in a MouseX event.
  */
-csString csGetMouseDesc (int x, int y, int button,
+CS_CSUTIL_EXPORT csString csGetMouseDesc (int x, int y, int button,
 			      const csKeyModifiers* modifiers,
 			      bool distinguishModifiers = true);
 
@@ -172,7 +173,7 @@ csString csGetMouseDesc (int x, int y, int button,
  * \remark For any piece of information in which you are not interested, pass 0
  *         for the address.
  */
-bool csParseJoystickDef(const char* str, int* x, int* y,
+CS_CSUTIL_EXPORT bool csParseJoystickDef(const char* str, int* x, int* y,
   int* button, csKeyModifiers* modifiers);
 
 /**
@@ -190,7 +191,7 @@ bool csParseJoystickDef(const char* str, int* x, int* y,
  *         It will be tested in this order. So setting x and y to nonzero will
  *         result in a JoystickX event.
  */
-csString csGetJoystickDesc (int x, int y, int button,
+CS_CSUTIL_EXPORT csString csGetJoystickDesc (int x, int y, int button,
 			      const csKeyModifiers* modifiers,
 			      bool distinguishModifiers = true);
 

@@ -19,6 +19,7 @@
 #ifndef __CS_UTIL_HASH_H__
 #define __CS_UTIL_HASH_H__
 
+#include "csextern.h"
 #include "array.h"
 
 /**
@@ -27,7 +28,7 @@
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-uint32 csHashCompute (char const*);
+CS_CSUTIL_EXPORT uint32 csHashCompute (char const*);
 
 /**
  * Compute a hash key for a string of a given length.
@@ -35,7 +36,7 @@ uint32 csHashCompute (char const*);
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-uint32 csHashCompute (char const*, int length);
+CS_CSUTIL_EXPORT uint32 csHashCompute (char const*, int length);
 
 /**
  * A hash key handler for integral types and types that can be casted to such.

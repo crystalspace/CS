@@ -19,13 +19,14 @@
 #ifndef __CS_CMDLINE_H__
 #define __CS_CMDLINE_H__
 
+#include "csextern.h"
 #include "iutil/cmdline.h"
 #include "parray.h"
 #include "stringarray.h"
 #include "util.h"
 
 /// Representation of a commandline option.
-struct csCommandLineOption
+struct CS_CSUTIL_EXPORT csCommandLineOption
 {
   /// Option name
   char *Name;
@@ -44,7 +45,7 @@ struct csCommandLineOption
 
 
 /// Utility class that makes it easier to parse the command line.
-class csCommandLineParser : public iCommandLineParser
+class CS_CSUTIL_EXPORT csCommandLineParser : public iCommandLineParser
 {
 private:
   /// A vector of command line options

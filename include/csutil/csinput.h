@@ -26,6 +26,7 @@
  * like keyboard, mouse, and joystick.
  */
 
+#include "csextern.h"
 #include "scf.h"
 #include "array.h"
 #include "hash.h"
@@ -40,7 +41,7 @@ struct iObjectRegistry;
 /**
  * Superclass of all the generic input drivers.
  */
-class csInputDriver
+class CS_CSUTIL_EXPORT csInputDriver
 {
 private:
   bool Registered;
@@ -58,7 +59,7 @@ protected:
   void StopListening();
 };
 
-class csKeyComposer : public iKeyComposer
+class CS_CSUTIL_EXPORT csKeyComposer : public iKeyComposer
 {
 protected:
   utf32_char lastDead;
@@ -79,7 +80,8 @@ public:
  * Keyboard driver should generate events and put them into
  * an event queue. Also it tracks the current state of all keys.
  */
-class csKeyboardDriver : public csInputDriver, public iKeyboardDriver
+class CS_CSUTIL_EXPORT csKeyboardDriver : public csInputDriver,
+  public iKeyboardDriver
 {
 protected:
   /// Key state array.
@@ -155,7 +157,7 @@ public:
   virtual void LostFocus() { Reset(); }
 
   /// iEventHandler implementation
-  struct eiEventHandler : public iEventHandler
+  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
     virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
@@ -168,7 +170,7 @@ public:
  * Mouse driver should generate events and put them into the event queue.  Also
  * it is responsible for generating double-click events.
  */
-class csMouseDriver : public csInputDriver, public iMouseDriver
+class CS_CSUTIL_EXPORT csMouseDriver : public csInputDriver, public iMouseDriver
 {
 private:
   // Generic keyboard driver (for checking modifier key states).
@@ -226,7 +228,7 @@ public:
   virtual void LostFocus() { Reset(); }
 
   /// iEventHandler implementation
-  struct eiEventHandler : public iEventHandler
+  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMouseDriver);
     virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
@@ -239,7 +241,8 @@ public:
  * The joystick driver is responsible for tracking current
  * joystick state and also for generating joystick events.
  */
-class csJoystickDriver : public csInputDriver, public iJoystickDriver
+class CS_CSUTIL_EXPORT csJoystickDriver : public csInputDriver,
+  public iJoystickDriver
 {
 private:
   // Generic keyboard driver (for checking modifier key states).
@@ -284,7 +287,7 @@ public:
   virtual void LostFocus() { Reset(); }
 
   /// iEventHandler implementation
-  struct eiEventHandler : public iEventHandler
+  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE (csJoystickDriver);
     virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }

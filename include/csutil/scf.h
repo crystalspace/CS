@@ -20,6 +20,8 @@
 #ifndef __CSSCF_H__
 #define __CSSCF_H__
 
+#include "csextern.h"
+
 /**\file
  * Crystal Space Shared Class Facility (SCF)
  */
@@ -817,13 +819,13 @@ public:
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
  * \remark The path list is ignored for static builds.
  */
-extern void scfInitialize (csPluginPaths* pluginPaths);
+extern CS_CSUTIL_EXPORT void scfInitialize (csPluginPaths* pluginPaths);
 
 /**
  * This function should be called to initialize client SCF library.
  * It uses the default plugin paths provided by csGetPluginPaths().
  */
-extern void scfInitialize (int argc, const char* const argv[]);
+extern CS_CSUTIL_EXPORT void scfInitialize (int argc, const char* const argv[]);
 
 /**
  * This function checks whenever an interface is compatible with given version.
@@ -860,7 +862,7 @@ struct iSCF : public iBase
    * makes no difference since clients access the shared instance uniformly as
    * iSCF::SCF.
    */
-  static iSCF* SCF;
+  static CS_CSUTIL_EXPORT iSCF* SCF;
 
 #ifdef CS_DEBUG
   // This is EXTREMELY dirty but I see no other solution for now.

@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include <ctype.h>
+#include "csextern.h"
 #include "snprintf.h"
 
 /**
@@ -31,7 +32,7 @@
  * const*()' in calls to functions expecting C strings.  The implicit null
  * terminator is not included in the character count returned by Length().
  */
-class csString
+class CS_CSUTIL_EXPORT csString
 {
 protected:
   // Default number of bytes by which allocation should grow.

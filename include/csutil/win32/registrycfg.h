@@ -20,6 +20,7 @@
 #ifndef __CS_CSSYS_WIN32_REGISTRYCFG_H__
 #define __CS_CSSYS_WIN32_REGISTRYCFG_H__
 
+#include "csextern.h"
 #include "iutil/cfgfile.h"
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
@@ -32,7 +33,7 @@ class csWin32RegistryIterator;
 /**
  * An iConfigFile, storing the settings in the Windows registry.
  */
-class csWin32RegistryConfig : public iConfigFile
+class CS_CSUTIL_EXPORT csWin32RegistryConfig : public iConfigFile
 {
 private:
   friend class csWin32RegistryIterator;
@@ -141,7 +142,7 @@ public:
 /**
  * Iterates over a registry key subkeys and values.
  */
-class csWin32RegistryIterator : public iConfigIterator
+class CS_CSUTIL_EXPORT csWin32RegistryIterator : public iConfigIterator
 {
   csRef<csWin32RegistryConfig> owner;
 

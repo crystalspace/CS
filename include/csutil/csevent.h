@@ -20,10 +20,12 @@
 #ifndef __CS_CSEVENT_H__
 #define __CS_CSEVENT_H__
 
+#include "csextern.h"
 #include "iutil/event.h"
 #include "hashmapr.h"
 #include "csendian.h"
 #include "weakref.h"
+#include "cseventq.h"
 
 /// Various datatypes supported by the event system (csEvent).
 enum
@@ -51,7 +53,7 @@ enum
  * this class as much different types of events exists.
  */
 
-class csEvent : public iEvent
+class CS_CSUTIL_EXPORT csEvent : public iEvent
 {
 private:
   csHashMapReversible attributes;
@@ -153,7 +155,7 @@ public:
  * event creation was needed.  Thus, the event pool was born, and
  * there are the events that reside within it.
  */
-class csPoolEvent : public csEvent
+class CS_CSUTIL_EXPORT csPoolEvent : public csEvent
 {
   typedef csEvent superclass;
   friend class csEventQueue;

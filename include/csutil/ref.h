@@ -20,6 +20,8 @@
 #ifndef __CS_REF_H__
 #define __CS_REF_H__
 
+#include "csextern.h"
+
 #define CS_VOIDED_PTR 0xffffffff
 
 template <class T> class csRef;
@@ -70,7 +72,7 @@ template <class T> class csRef;
  * (so no IncRef() happens).
  */
 template <class T>
-class csPtr
+class  csPtr
 {
 private:
   friend class csRef<T>;
@@ -113,7 +115,7 @@ public:
  * placed upon T.
  */
 template <class T>
-class csRef
+class  csRef
 {
 private:
   T* obj;

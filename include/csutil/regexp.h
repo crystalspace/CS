@@ -23,6 +23,7 @@
  * Regular expressions support.
  */
 
+#include "csextern.h"
 #include "csutil/array.h"
 
 /**
@@ -127,7 +128,7 @@ enum csRegExpMatchFlags
 /**
  * Information about (sub)expression matches.
  */
-struct csRegExpMatch
+struct CS_CSUTIL_EXPORT csRegExpMatch
 {
   /// Offset to the match from the beginning of the string to match against.
   size_t startOffset;
@@ -149,7 +150,7 @@ struct csRegExpMatch
  *  previous calls cause a recompilation of the pattern. Thus, to improve 
  *  performance, same \p flags should be used for subsequent calls to Match().
  */
-class csRegExpMatcher
+class CS_CSUTIL_EXPORT csRegExpMatcher
 {
   void* regex;
   char* pattern;

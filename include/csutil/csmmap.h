@@ -20,6 +20,8 @@
 #ifndef __CS_CSSYS_CSMMAP_H__
 #define __CS_CSSYS_CSMMAP_H__
 
+#include "csextern.h"
+
 /**\file
  * Memory mapping interface.
  * BE AWARE that the functions here are very platform-dependent, they
@@ -35,16 +37,16 @@
  * \c filename is a platform-dependent path.
  * Returns true on success, false otherwise.
  */
-extern bool MemoryMapFile(mmioInfo* info, char const* filename);
+extern CS_CSUTIL_EXPORT bool MemoryMapFile(mmioInfo* info, char const* filename);
 /// Unmap a file from a memory area.
-extern void UnMemoryMapFile(mmioInfo* info);
+extern CS_CSUTIL_EXPORT void UnMemoryMapFile(mmioInfo* info);
 /**
  * Memory map in part of a file.
  * Provides more control than the standard MemoryMapFile().
  * The mmioInfo struct is compatible, UnMapMemoryFile() should
  * be used to unmap.
  */
-extern bool MemoryMapWindow(mmioInfo*, char const* filename, unsigned int offset, unsigned int len, bool writable);
+extern CS_CSUTIL_EXPORT bool MemoryMapWindow(mmioInfo*, char const* filename, unsigned int offset, unsigned int len, bool writable);
 /**
  * Memory map in another part of an already mapped file.
  * Provides more control than the standard MemoryMapFile().
@@ -53,7 +55,7 @@ extern bool MemoryMapWindow(mmioInfo*, char const* filename, unsigned int offset
  * This struct will reuse filehandles and any other possible resource
  * from the already mapped file.
  */
-extern bool MemoryMapWindow(mmioInfo*, mmioInfo * original, unsigned int offset, unsigned int len, bool writable);
+extern CS_CSUTIL_EXPORT bool MemoryMapWindow(mmioInfo*, mmioInfo * original, unsigned int offset, unsigned int len, bool writable);
 #endif
 
 #endif // __CS_CSSYS_CSMMAP_H__

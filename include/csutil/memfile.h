@@ -19,13 +19,14 @@
 #ifndef __CS_MEMFILE_H__
 #define __CS_MEMFILE_H__
 
+#include "csextern.h"
 #include "iutil/vfs.h"
 
 /**
  * Essentially a raw memory buffer which implements the abstract iFile
  * interface.
  */
-class csMemFile : public iFile
+class CS_CSUTIL_EXPORT csMemFile : public iFile
 {
 public:
   /// Disposition of memory buffer at destruction time.

@@ -23,6 +23,7 @@
  * Platform-independent Memory-Mapped IO
  */
 
+#include "csextern.h"
 #include "bitarray.h"
 
 struct iVFS;
@@ -68,7 +69,7 @@ const unsigned csmmioDefaultHashSize = 211;//1559;
    does consume about 4k more memory, I think the slight memory usage 
    is worth it, considering the massive speedup.
  */  
-class csMemoryMappedIO
+class CS_CSUTIL_EXPORT csMemoryMappedIO
 {
 private:
   /// Minimum size of a single block 

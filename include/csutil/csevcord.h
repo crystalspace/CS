@@ -20,6 +20,7 @@
 #ifndef __CS_CSEVCORD_H__
 #define __CS_CSEVCORD_H__
 
+#include "csextern.h"
 #include "scf.h"
 #include "iutil/event.h"
 struct iEventHandler;
@@ -28,7 +29,7 @@ class csEventOutlet;
 /**
  * Event cord.
  */
-class csEventCord : public iEventCord
+class CS_CSUTIL_EXPORT csEventCord : public iEventCord
 {
 protected:
   /// Pass events to the system queue?

@@ -20,6 +20,7 @@
 #ifndef __CS_DATAOBJ_H_
 #define __CS_DATAOBJ_H_
 
+#include "csextern.h"
 #include "csobject.h"
 
 /**
@@ -29,7 +30,7 @@
  * implement their own custom csObjects, but this one can be used as a
  * general enough and simple data storage that can be added to any object.
  */
-class csDataObject : public csObject
+class CS_CSUTIL_EXPORT csDataObject : public csObject
 {
 protected:
   /// Pointer to data.
@@ -64,7 +65,7 @@ public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
   /// iDataObject implementation.
-  struct DataObject : public iDataObject
+  struct CS_CSUTIL_EXPORT DataObject : public iDataObject
   {
     SCF_DECLARE_EMBEDDED_IBASE (csDataObject);
 

@@ -24,6 +24,7 @@
  * Additional key handlers for csHash<>
  */
 
+#include "csextern.h"
 #include "hash.h"
 #include "ref.h"
 #include "util.h"
