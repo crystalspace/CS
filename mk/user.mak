@@ -119,7 +119,9 @@ MEM.memdebug=-DMEM_CHECK -DMEM_CHECK_FILL -DMEM_CHECK_EXTENSIVE
 MEM=$(MEM.$(MODE))
 
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
-# variable in environment to point to MesaGL base path
+# variable in environment to point to MesaGL base path. If Mesa is not
+# used then you can use OPENGL_PATH to point to the base of the OpenGL
+# libraries and includes.
 USE_MESA=0
 
 # The tool used to build dependencies. The possible values are:

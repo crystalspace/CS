@@ -32,17 +32,26 @@
  */
 
 // win32 extension detection by Robert Bergkvist
-#ifdef OS_WIN32
+#if defined(OS_WIN32)
 #include "ext_w32.cpp"
-#endif
 
 // Mesa 3.1/Linux extension detection by Gary Haussmann
 // if you get CS to compile and detect extensions on another
 // Mesa platform besides LINUX plz add a test here
-#ifdef MESA
+#elif (MESA_MAJOR_VERSION >= 3) && (MESA_MINOR_VERSION >= 1)
 #include "ext_mesa.cpp"
-#endif
 
+// Default no extensions...
+#else
+#undef USE_EXTENSIONS
+#undef USE_MULTITEXTURE
+void csGraphics3DOGLCommon::DetectExtensions()
+{
+  SysPrintf (MSG_INITIALIZATION, "OpenGL extensions not supported on this platform!\n");
+  return;
+}
+#define _DEFINED_DETECTION_METHOD
+#endif
 
 // default detection function.  Maybe we should make
 // some sort of base/subclass hierarchy for extension

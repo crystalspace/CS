@@ -41,6 +41,10 @@ ifeq ($(USE_MESA),1)
   endif
   LIBS.LOCAL.GL3D+=-lMesaGL
 else
+  ifdef OPENGL_PATH
+    CFLAGS.GL3D+=-I$(OPENGL_PATH)/include
+    LIBS.LOCAL.GL3D+=-L$(OPENGL_PATH)/lib
+  endif
   LIBS.LOCAL.GL3D+=-lGL
 endif
 

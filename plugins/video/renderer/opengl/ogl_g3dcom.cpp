@@ -52,11 +52,11 @@
 // multitexture support - this is independent of the extension detection,
 // but  it may rely on the extension module to supply proper function 
 // prototypes for the ARB_MULTITEXTURE functions
-//#define USE_MULTITEXTURE 1
+#define USE_MULTITEXTURE 1
 
 // Whether or not we should try  and use OpenGL extensions. This should be 
 // removed eventually, when all platforms have been updated.
-//#define USE_EXTENSIONS 1
+#define USE_EXTENSIONS 1
 
 // ---------------------------------------------------------------------------
 
@@ -73,14 +73,17 @@ void csGraphics3DOGLCommon::DetectExtensions ()
 #endif
 
 //@@@ Another experimental optimization:
+// This optimization alone doesn't appear to be enough.
+// We need better state caching. I keep it here to remind
+// us of this.
 static GLuint prev_handle = 0;
 void csglBindTexture (GLenum target, GLuint handle)
 {
-  if (prev_handle != handle)
-  {
-    prev_handle = handle;
+  //if (prev_handle != handle)
+  //{
+    //prev_handle = handle;
     glBindTexture (target, handle);
-  }
+  //}
 }
 
 /*===========================================================================
@@ -710,7 +713,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   csglBindTexture (GL_TEXTURE_2D, texturehandle);
 
-#if 1
+#if 0
+// Temporarily disabled this opt because it is worse. But I don't
+// throw away the code just yet because there may be better
+// alternatives.
   // First copy all data in an array so that we can minimize
   // the amount of code that goes between glBegin/glEnd. This
   // is from an OpenGL high-performance FAQ.

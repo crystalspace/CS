@@ -39,6 +39,10 @@ ifeq ($(USE_MESA),1)
   endif
   LIBS._GLX2D+=-lMesaGL -lMesaGLU
 else
+  ifdef OPENGL_PATH
+    CFLAGS.GLX2D+=-I$(OPENGL_PATH)/include
+    LIBS._GLX2D+=-L$(OPENGL_PATH)/lib
+  endif
   LIBS._GLX2D+=-lGL
 endif
 

@@ -1,6 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
 20-Jun-2000
+	- Wouter Wijngaards added a fountain particle system. Under
+	  construction still...
+	- Enabled extensions in OpenGL renderer.
+	- Disabled the experimental optimization in DrawPolygon for OpenGL.
+	  It had a bad effect on performance.
+	- Provided a default extension detection code for operating systems
+	  other than Windows and Unix (with Mesa). Also made the extension
+	  detection safe so that extensions are not used if you have
+	  Mesa 3.0 or older.
+	- Extend makefies for OpenGL so that OPENGL_PATH is used if
+	  USE_MESA=0 (similar to MESA_PATH).
 	- Eric Sunshine made the following changes to the Blocks game:
 	    - Fixed a nasty memory corruption bug.  HandleLoweringPlanes() was
 	      writing one past the end of the States::filled_planes[] array
