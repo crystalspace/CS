@@ -238,6 +238,7 @@ private:
   csRef<iRenderBuffer> scrapColors;
   csShaderVariableContext scrapContext;
   csRef<csRenderBufferHolder> scrapBufferHolder;
+  csRenderBufferName scrapMapping [CS_VATTRIB_SPECIFIC_LAST+1]; 
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers

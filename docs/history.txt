@@ -7,13 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Jan-2005
-    - acraig extended StandardReporterListener to allow appending to file.
-      Default behaviour is create new file but can now also configure to 
-      append by:
-      1) Reporter.FileAppend = true in a cfg file
-      2) command line option append
-      3) through  a param in SetDebugFile()
-      
+	- acraig extended StandardReporterListener to allow appending to file.
+	  Default behaviour is create new file but can now also configure to 
+	  append by:
+	  1) Reporter.FileAppend = true in a cfg file
+	  2) command line option append
+	  3) through  a param in SetDebugFile()
+	- Marten fixed a bug in csGLRender3D::DrawSimpleMesh he introduced in
+	  his last commit.
 8-Jan-2005
 	- Marten completly rewrote the way renderbuffers are sent from the
 	  mesh into renderer. Also changed the syntax of buffermappings a bit.

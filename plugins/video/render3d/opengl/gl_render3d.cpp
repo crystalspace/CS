@@ -125,12 +125,22 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   stencil_threshold = 500;
   broken_stencil = false;
 
-  int i;
+  unsigned int i;
   for (i=0; i<16; i++)
   {
     texunittarget[i] = 0;
     texunitenabled[i] = false;
   }
+
+  for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST+1; i++)
+  {
+    scrapMapping[i] = CS_BUFFER_NONE;
+  }
+  scrapMapping[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
+  scrapMapping[CS_VATTRIB_TEXCOORD0] = CS_BUFFER_TEXCOORD0;
+  scrapMapping[CS_VATTRIB_COLOR] = CS_BUFFER_COLOR;
+
+
 //  lastUsedShaderpass = 0;
 
   scrapIndicesSize = 0;
@@ -2520,11 +2530,19 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       mesh.shader->ActivatePass (shaderTicket, p);
       mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
     }
+    else
+    {
+      ActivateBuffers (scrapBufferHolder, scrapMapping);
+    }
     DrawMesh (&rmesh, modes, stacks);
     if (mesh.shader != 0)
     {
       mesh.shader->TeardownPass (shaderTicket);
       mesh.shader->DeactivatePass (shaderTicket);
+    }
+    else
+    {
+      DeactivateBuffers (0,0);
     }
   }
 
