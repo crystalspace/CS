@@ -62,7 +62,6 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
   size *= alpha ? 1 : bpp/8;
 
   csGlideCacheData *cached_texture = (csGlideCacheData *)texture->GetCacheData ();
-  
   if (cached_texture)
   {
     // move unit to front (MRU)
@@ -82,8 +81,13 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
   }
   else
   {
+    if ( size > cache_size )
+    {
+      printf( "Knock knock, you try to load a texture of size %d (incl. mipmaps) but your TMU can only handle %ld\n", size, cache_size );
+      exit(1);
+    }
     // unit is not in memory. load it into the cache
-    while((total_size + size >= cache_size)&&(manager->hasFreeSpace(size)))
+    while ((total_size + size >= cache_size) || !manager->hasFreeSpace(size))
     {
       // out of memory. remove units from bottom of list.
       cached_texture = tail;
@@ -166,7 +170,7 @@ void csGlideTextureCache::Add(iPolygonTexture *polytex)
   else
   {
     // unit is not in memory. load it into the cache
-    while(total_size + size >= cache_size)
+    while((total_size + size >= cache_size ) || !manager->hasFreeSpace(size))
     {
       // out of memory. remove units from bottom of list.
       cached_texture = tail;
@@ -383,7 +387,6 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d)
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
   csTextureMM* txt_mm = (csTextureMM*)txt_handle->GetPrivateObject ();
   csTexture* txt_unl = txt_mm->get_texture (0);
-  
   int i;
   int width = txt_unl->get_width ();
   int height = txt_unl->get_height ();
@@ -412,6 +415,7 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d)
     {
       if (lod[i]!=-1)
       {
+      
         csTexture* txt_mip = txt_mm->get_texture (i);
         src = (unsigned char*)txt_mip->get_bitmap();
 

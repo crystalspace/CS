@@ -998,7 +998,6 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   bool lm_exists=false;
   bool is_transparent = false;
   bool is_colorkeyed = false;
-
   // retrieve the texture.
   pTex = poly.poly_texture;
   // cache the tex if neccessary
@@ -1027,6 +1026,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
       thLm = &lcache->texhnd;
     }
   }
+
   // set color and transparency
   UByte a, r, g, b;
   a=r=g=b=255;
@@ -1175,6 +1175,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   
   if ( poly.alpha )
     GlideLib_grDepthMask( FXTRUE );
+
 }
 
 void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
