@@ -68,7 +68,9 @@ clean: memoryclean
 memory: $(OUTDIRS) $(MEMORY)
 
 $(MEMORY): $(OBJ.MEMORY) $(LIB.MEMORY)
-	$(DO.PLUGIN) $(LIB.MEMORY.SYSTEM)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.MEMORY.SYSTEM) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 memoryclean:
 	-$(RMDIR) $(MEMORY) $(OBJ.MEMORY) $(OUTDLL)/$(notdir $(INF.MEMORY)) $(OUTOS)/memory.dep

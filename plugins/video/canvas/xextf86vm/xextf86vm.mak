@@ -66,7 +66,9 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/xextf86vm/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XEXT86VM)
 
 $(XEXT86VM): $(OBJ.XEXT86VM) $(LIB.XEXT86VM)
-	$(DO.PLUGIN) $(LIB.XEXT86VM.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.XEXT86VM.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: xext86vmclean
 xext86vmclean:

@@ -71,7 +71,9 @@ ifeq ($(MAKESECTION),targets)
 ddraw2d: $(OUTDIRS) $(DDRAW2D)
 
 $(DDRAW2D): $(OBJ.DDRAW2D) $(LIB.DDRAW2D)
-	$(DO.PLUGIN) $(LIB.DDRAW2D.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.DDRAW2D.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: ddraw2dclean
 ddraw2dclean:

@@ -64,7 +64,9 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/xextshm/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XEXTSHM)
 
 $(XEXTSHM): $(OBJ.XEXTSHM) $(LIB.XEXTSHM)
-	$(DO.PLUGIN) $(LIB.XEXTSHM.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.XEXTSHM.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: xextshmclean
 xextshmclean:

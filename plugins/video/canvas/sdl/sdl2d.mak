@@ -70,7 +70,9 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/sdl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SDL2D)
 
 $(SDL2D): $(OBJ.SDL2D) $(LIB.SDL2D)
-	$(DO.PLUGIN) $(LIB.SDL2D.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.SDL2D.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: sdl2dclean
 sdl2dclean:

@@ -63,7 +63,9 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/svgalib/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SVGA2D)
 
 $(SVGA2D): $(OBJ.SVGA2D) $(LIB.SVGA2D)
-	$(DO.PLUGIN) $(LIB.SVGA2D.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.SVGA2D.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: svgalib2dclean
 svgalib2dclean:

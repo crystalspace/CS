@@ -111,6 +111,8 @@ chronological order.
 	  to Jamconfig (it was only emitting XFREE86VM.LFLAGS).  This allows
 	  the xextf86vm plugin to build correctly with Jam on platforms where
 	  the X11 headers reside in /usr/X11R6/include.
+	- Eric Sunshine fixed a lot of canvases which were incorrectly using
+	  DO.PLUGIN rather than	DO.PLUGIN.PREAMBLE, CORE, POSTAMBLE.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.

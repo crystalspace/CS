@@ -64,7 +64,9 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/softx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.X2D)
 
 $(X2D): $(OBJ.X2D) $(LIB.X2D)
-	$(DO.PLUGIN) $(LIB.X2D.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.X2D.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: x2dclean
 x2dclean:
