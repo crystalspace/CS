@@ -41,6 +41,10 @@ The history order is reversed so that new features are at the top.
 	- Added csXORBuffer::IsFull() which checks if the entire screen
 	  buffer is full and nothing can be visible now. Always returns
 	  false at the moment.
+	- Implemented csXORBuffer::IsFull(). Also added an optimization
+	  to ignore completely full rows in InsertPolygon() and TestPolygon().
+	  This significantly improves performance of the XOR buffer but
+	  still not as good as the c-buffer.
 17-Apr-2002
 	- Started working on new XOR buffer which *might* (if all goes
 	  well) replace the c-buffer. Nothing functional yet though.

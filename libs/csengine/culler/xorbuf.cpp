@@ -46,6 +46,7 @@ csXORBuffer::csXORBuffer (int w, int h)
 
   buffer = new uint32[bufsize];
   scr_buffer = new uint32[bufsize];
+  partcols = new int[numrows];
 
   debug_mode = false;
 }
@@ -54,6 +55,7 @@ csXORBuffer::~csXORBuffer ()
 {
   delete[] buffer;
   delete[] scr_buffer;
+  delete[] partcols;
 }
 
 void csXORBuffer::InitializePolygonBuffer ()
@@ -64,11 +66,22 @@ void csXORBuffer::InitializePolygonBuffer ()
 void csXORBuffer::Initialize ()
 {
   memset (scr_buffer, 0, bufsize << 2);
+  int i;
+  for (i = 0 ; i < numrows ; i++)
+  {
+    partcols[i] = width;
+  }
 }
 
 bool csXORBuffer::IsFull ()
 {
-  return false;
+  int i;
+  for (i = 0 ; i < numrows ; i++)
+  {
+    if (partcols[i])
+      return false;
+  }
+  return true;
 }
 
 void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
@@ -473,16 +486,25 @@ bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
   else init = 0;
   for (i = 0 ; i < numrows ; i++)
   {
+    int pc = partcols[i];
+    if (!pc) continue;
+
     buf = &buffer[i<<w_shift];
     scr_buf = &scr_buffer[i<<w_shift];
     uint32 first = init;
     for (x = 0 ; x < width ; x++)
     {
       first ^= *buf++;
-      if ((~*scr_buf) & first)
+      uint32 sb = *scr_buf;
+      if ((~sb) & first)
       {
         mod = true;
-	*scr_buf++ |= first;
+	sb |= first;
+	*scr_buf++ = sb;
+	if (!~sb)
+	{
+	  pc--;
+	}
       }
       else
       {
@@ -490,6 +512,7 @@ bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
       }
       // @@@ Optimize to stop when 'first' becomes 0 again after being non-null.
     }
+    partcols[i] = pc;
   }
   return mod;
 }
@@ -507,6 +530,8 @@ bool csXORBuffer::TestPolygon (csVector2* verts, int num_verts)
   uint32* scr_buf;
   for (i = 0 ; i < numrows ; i++)
   {
+    if (!partcols[i])
+      continue;
     buf = &buffer[i<<w_shift];
     scr_buf = &scr_buffer[i<<w_shift];
     uint32 first = 0;

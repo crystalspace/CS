@@ -42,6 +42,7 @@ private:
   uint32* scr_buffer;	// The total screen buffer.
   uint32* buffer;	// The buffer for a single polygon.
   bool debug_mode;
+  int* partcols;	// For every row the number of partial columns.
 
   /**
    * Draw a single debug line (used by DrawPolygonDebug).
