@@ -236,8 +236,10 @@ public:
   void Normalize ();
 
   /// Query if the vector is zero
-  inline bool IsZero () const
-  { return (x == 0) && (y == 0) && (z == 0); }
+  inline bool IsZero (double precision = SMALL_EPSILON) const
+  { return (ABS(x) < precision) && (ABS(y) < precision)
+            && (ABS(z) < precision);
+  }
 };
 
 #endif // __CS_VECTOR3_H__
