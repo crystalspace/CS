@@ -516,27 +516,40 @@ void csShaderPass::Deactivate()
   if(fp) fp->Deactivate(this);
 
   int i;
+  int units[TEXMAX];
+  iTextureHandle* textures[TEXMAX];
+  memset (textures, 0, sizeof (iTextureHandle*)*TEXMAX);
+  int txt_count = 0;
   for (i=TEXMAX-1; i>=0; i--)
   {
     if (texmapping[i] != csInvalidStringID)
     {
-      g3d->DeactivateTexture (i);
+      units[txt_count++] = i;
     }
   }
+  g3d->SetTextureState (units, textures, txt_count);
 
+  csVertexAttrib attribs[STREAMMAX*2];
+  iRenderBuffer* buffers[STREAMMAX*2];
+  memset (buffers, 0, sizeof (iRenderBuffer*)*STREAMMAX*2);
+  int buf_count = 0;
   for (i=0; i<STREAMMAX; i++)
   {
     if (streammapping[i] != csInvalidStringID)
     {
-      g3d->DeactivateBuffer ((csVertexAttrib)i);
-      g3d->DeactivateBuffer ((csVertexAttrib)(i+100));
+      attribs[buf_count++] = (csVertexAttrib)i;
+      attribs[buf_count++] = (csVertexAttrib)(i+100);
     }
   }
+  g3d->SetBufferState (attribs, buffers, buf_count);
 }
 
 void csShaderPass::SetupState (csRenderMesh *mesh)
 {
   int i;
+  csVertexAttrib attribs[STREAMMAX*2];
+  iRenderBuffer* buffers[STREAMMAX*2];
+  int buf_count = 0;
   for (i=0; i<STREAMMAX; i++)
   {
     if (streammapping[i] != csInvalidStringID)
@@ -544,16 +557,24 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
       iRenderBuffer* buf  = 
         mesh->buffersource->GetRenderBuffer (streammapping[i]);
       if (buf)
-        if (g3d->ActivateBuffer ((csVertexAttrib)(i+
-          (streammappinggeneric[i]?0:100)), buf))
-          continue;
+      {
+        attribs[buf_count] = (csVertexAttrib)(i+ (streammappinggeneric[i]?0:100));
+	buffers[buf_count++] = buf;
+        continue;
+      }
     }
-    g3d->DeactivateBuffer ((csVertexAttrib)i);
-    g3d->DeactivateBuffer ((csVertexAttrib)(i+100));
+    attribs[buf_count] = (csVertexAttrib)i;
+    buffers[buf_count++] = 0;
+    attribs[buf_count] = (csVertexAttrib)(i+100);
+    buffers[buf_count++] = 0;
   }
+  g3d->SetBufferState (attribs, buffers, buf_count);
 
   iMaterialHandle* mathandle =
     (mesh->material) ? (mesh->material->GetMaterialHandle()) : 0;
+  int units[TEXMAX];
+  iTextureHandle* textures[TEXMAX];
+  int txt_count = 0;
   for (i=0; i<TEXMAX; i++)
   {
     if (texmapping[i] != csInvalidStringID)
@@ -564,12 +585,17 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
         iTextureHandle* tex;
         var->GetValue (tex);
         if (tex)
-          if (g3d->ActivateTexture (tex, i))
-            continue;
+	{
+	  units[txt_count] = i;
+	  textures[txt_count++] = tex;
+          continue;
+        }
       }
     }
-    g3d->DeactivateTexture (i);
+    units[txt_count] = i;
+    textures[txt_count++] = 0;
   }
+  g3d->SetTextureState (units, textures, txt_count);
 
   g3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
   g3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);

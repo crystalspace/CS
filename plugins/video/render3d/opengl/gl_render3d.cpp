@@ -135,6 +135,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   {
     vertattrib[i] = 0;
     vertattribenabled[i] = false;
+    vertattribenabled100[i] = false;
     texunit[i] = 0;
     texunitenabled[i] = false;
   }
@@ -1073,19 +1074,33 @@ void csGLGraphics3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float 
 bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
 {
   bool bind = true;
-  int att = attrib<100?attrib:attrib-100;
-  if (vertattrib[att] == buffer)
+  int att;
+  if (attrib < 100)
   {
-    if (vertattribenabled[att])
-      return true;
-    //bind = false; //@@@[res]: causes graphical errors in some cases
+    if (vertattrib[attrib] == buffer)
+    {
+      if (vertattribenabled[attrib])
+        return true;
+      //bind = false; //@@@[res]: causes graphical errors in some cases
+    }
+    att = attrib;
+  }
+  else
+  {
+    att = attrib-100;
+    if (vertattrib[att] == buffer)
+    {
+      if (vertattribenabled100[att])
+        return true;
+      //bind = false; //@@@[res]: causes graphical errors in some cases
+    }
   }
   if (bind && vertattrib[att])
   {
     vertattrib[att]->Release ();
     vertattrib[att] = 0;
   }
-  
+
   void* data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data != (void*)-1)
   {
@@ -1132,14 +1147,27 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffe
       }
     }
     vertattrib[att] = buffer;
-    vertattribenabled[att] = true;
+    if (attrib < 100)
+      vertattribenabled[att] = true;
+    else
+      vertattribenabled100[att] = true;
   }
   return true;
 }
 
 void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
 {
-  int att = attrib<100?attrib:attrib-100;
+  int att;
+  if (attrib < 100)
+  {
+    if (vertattribenabled[attrib] == false) return;
+    att = attrib;
+  }
+  else
+  {
+    att = attrib-100;
+    if (vertattribenabled100[att] == false) return;
+  }
   if (ext->glDisableVertexAttribArrayARB && attrib<100) 
   {
     ext->glDisableVertexAttribArrayARB (attrib);
@@ -1147,7 +1175,8 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
 
     ext->glVertexAttribPointerARB(attrib, 1, GL_FLOAT, true, 0, 0);*/
-  } else
+  }
+  else
   {
     switch (attrib)
     {
@@ -1171,7 +1200,24 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
   {
     vertattrib[att]->Release ();
     vertattrib[att] = 0;
-    vertattribenabled[att] = false;
+    if (attrib < 100)
+      vertattribenabled[att] = false;
+    else
+      vertattribenabled100[att] = false;
+  }
+}
+
+void csGLGraphics3D::SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count)
+{
+  int i;
+  for (i = 0 ; i < count ; i++)
+  {
+    csVertexAttrib attrib = attribs[i];
+    iRenderBuffer* buf = buffers[i];
+    if (buf)
+      ActivateBuffer (attrib, buf);
+    else
+      DeactivateBuffer (attrib);
   }
 }
 
@@ -1355,6 +1401,20 @@ void csGLGraphics3D::DeactivateTexture (int unit)
     break;
   }
   texunitenabled[unit] = false;
+}
+
+void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures, int count)
+{
+  int i;
+  for (i = 0 ; i < count ; i++)
+  {
+    int unit = units[i];
+    iTextureHandle* txt = textures[i];
+    if (txt)
+      ActivateTexture (txt, unit);
+    else
+      DeactivateTexture (unit);
+  }
 }
 
 void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)

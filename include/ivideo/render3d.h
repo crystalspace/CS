@@ -233,7 +233,7 @@ class csGraphics3DCaps
 {
 };
 
-SCF_VERSION (iGraphics3D, 0, 0, 1);
+SCF_VERSION (iGraphics3D, 0, 1, 0);
 
 
 /**
@@ -269,18 +269,16 @@ struct iGraphics3D : public iBase
     csRenderBufferType type, csRenderBufferComponentType componentType, 
     int componentCount, bool index) = 0;
 
-  /// Activate a vertex buffer
-  virtual bool ActivateBuffer (csVertexAttrib attrib,
-	iRenderBuffer* buffer) = 0;
+  /**
+   * Activate or deactivate all given buffers depending on the value of 'buffers' for that index.
+   */
+  virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count) = 0;
 
-  /// Deactivate a vertex buffer
-  virtual void DeactivateBuffer (csVertexAttrib attrib) = 0;
-
-  /// Activate a texture
-  virtual bool ActivateTexture (iTextureHandle *txthandle, int unit = 0) = 0;
-
-  /// Deactivate a texture
-  virtual void DeactivateTexture (int unit = 0) = 0;
+  /**
+   * Activate or deactivate all given textures depending on the value of 'textures'
+   * for that unit (i.e. deactivate if 0).
+   */
+  virtual void SetTextureState (int* units, iTextureHandle** textures, int count) = 0;
 
   /// Set dimensions of window
   virtual void SetDimensions (int width, int height) = 0;

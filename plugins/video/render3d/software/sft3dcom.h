@@ -675,32 +675,60 @@ public:
     int componentCount, bool index);
 
   /// Activate a vertex buffer
-  virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
+  bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   {
     activebuffers[attrib] = buffer;
     return true;
   }
 
   /// Deactivate a vertex buffer
-  virtual void DeactivateBuffer (csVertexAttrib attrib)
+  void DeactivateBuffer (csVertexAttrib attrib)
   {
     activebuffers[attrib] = 0;
   }
 
+  virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count)
+  {
+    int i;
+    for (i = 0 ; i < count ; i++)
+    {
+      csVertexAttrib attrib = attribs[i];
+      iRenderBuffer* buf = buffers[i];
+      if (buf)
+        ActivateBuffer (attrib, buf);
+      else
+        DeactivateBuffer (attrib);
+    }
+  }
+
   /// Activate a texture
-  virtual bool ActivateTexture (iTextureHandle *txthandle, int unit = 0)
+  bool ActivateTexture (iTextureHandle *txthandle, int unit = 0)
   {
     return false;
   }
 
   /// Activate a texture (Should probably handled some better way)
-  virtual bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0)
+  bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0)
   {
     return false;
   }
 
+  virtual void SetTextureState (int* units, iTextureHandle** textures, int count)
+  {
+    int i;
+    for (i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      iTextureHandle* txt = textures[i];
+      if (txt)
+        ActivateTexture (txt, unit);
+      else
+        DeactivateTexture (unit);
+    }
+  }
+
   /// Deactivate a texture
-  virtual void DeactivateTexture (int unit = 0)
+  void DeactivateTexture (int unit = 0)
   {
   }
 

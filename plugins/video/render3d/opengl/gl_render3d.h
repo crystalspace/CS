@@ -201,6 +201,7 @@ private:
 
   iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
+  bool vertattribenabled100[16]; // @@@ Hardcoded max number of attributes (for conventional)
   iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
 
@@ -238,19 +239,16 @@ public:
     int componentCount, bool index);
 
   /// Activate a vertex buffer
-  virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
-
-  /// Deactivate a vertex buffer
-  virtual void DeactivateBuffer (csVertexAttrib attrib);
+  bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
+  void DeactivateBuffer (csVertexAttrib attrib);
+  virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count);
 
   /// Activate a texture
-  virtual bool ActivateTexture (iTextureHandle *txthandle, int unit = 0);
-
+  bool ActivateTexture (iTextureHandle *txthandle, int unit = 0);
   /// Activate a texture (Should probably handled some better way)
-  virtual bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0);
-
-  /// Deactivate a texture
-  virtual void DeactivateTexture (int unit = 0);
+  bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0);
+  void DeactivateTexture (int unit = 0);
+  virtual void SetTextureState (int* units, iTextureHandle** textures, int count);
 
   /// Set dimensions of window
   void SetDimensions (int width, int height)

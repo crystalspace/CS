@@ -13,6 +13,25 @@ chronological order.
             - Philip Wyett added CreateThread () and ExitThread () for
               Cygwin port, as it does not have _beginthreadex () or
               _endthreadex ().
+	- Jorrit changed the new renderer iGraphics3D API as follows:
+	  Removed ActivateBuffer, DeactivateBuffer, ActivateTexture, and
+	  DeactivateTexture. Instead there is now SetBufferState() and
+	  SetTextureState(). This has two advantages:
+	    - Avoid the overhead of many virtual function calls when
+	      external modules (shader manager) have to activate and
+	      deactivate buffers and textures.
+	    - Make it possible to do further optimizations in those
+	      routines to avoid the work of deactivating if not needed.
+	- Jorrit implemented the new API in the new renderer software and
+	  OpenGL renderers.
+	- Jorrit fixed a bug in the new renderer in relation to the
+	  activation of vertex buffer. There was only one table used to
+	  indicate if a vertex table was active or not but two tables
+	  are needed to distinguish between conventional and extra
+	  buffers (range 0 to 15 and 100+0 to 100+15).
+	- Jorrit optimized the OpenGL version of SetBufferState() and
+	  SetTextureState() by avoiding the deactivation of the buffers
+	  if this is not needed.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
