@@ -63,6 +63,22 @@ The history order has been reversed so that new features are at the top.
 	- Norman Kramer removed several warnings.
 	- Eric Sunshine removed all references to the obsolete csInput library
 	  from the documentation and from the makefiles ("$(CSINPUT.LIB)").
+	- Eric Sunshine back-ported his nodefix.pl script to earlier versions
+	  of Perl, such as 5.001 which ships with OpenStep.  The shortcomings
+	  in 5.001 which had to be addressed were:
+	    - No 'use vars' pragma; had to use explicit "main::" references.
+	    - No FileHandle class; had to resort to file handles and typeglobs
+	      (ugly!).
+	    - Much less feature-rich Getopt::Long; had to resort to old and
+	      implicit 'opt_' style variables (yuck).
+	    - Can not use 'my' within another statement; use as a stand-alone
+	      statement instead.
+	- Eric Sunshine patched texi2html so that it works with the older Perl
+	  which ships with OpenStep (5.001, in this case).  Perl croaked when
+	  asked to magically create hash and array references out of thin air.
+	  (Newer Perl can do this, but older Perl can not.) He also sent my
+	  patches to the maintainer of texi2html in the hope that he will
+	  incorporate them.
 16-Apr-2000
 	- Eric Sunshine completed Phase Seven of Eric's Big Documentation
 	  Overhaul(tm).
