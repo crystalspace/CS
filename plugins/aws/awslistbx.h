@@ -22,10 +22,7 @@
 
 /// Knows how to draw items that have several properties.
 struct awsListItem
-{
-  /// The key for the item
-  unsigned long key;
-
+{  
   /// An image, if it contains one.
   iTextureHandle *image;
 
@@ -48,10 +45,10 @@ struct awsListItem
   bool expanded;
   
   /// Alignment of text (left or right) and stateful box (if one)
-  unsigned char txt_align;
+  int txt_align;
 
   /// Alignment of image (left or right)
-  unsigned char img_align;
+  int img_align;
  
   /// Draws item
   void DrawItem(iAws *wmgr, csRect frame);
@@ -62,12 +59,12 @@ struct awsListItem
 
 /// Manages a row of items
 struct awsListRow
-{
+{  
   /// Pointer to parent (if it has one)
   awsListRow *parent;
 
   /// Pointer to list of children (if there are some)
-  cListRowVector *children;
+  awsListRowVector *children;
 
   /// Pointer to columns of items in this row
   awsListItem *cols;
@@ -160,7 +157,7 @@ class awsListBox : public awsComponent
    awsListColumn *columns;
 
    /// Row container (grows and shrinks as items are manipulated)
-   csListRowVector rows;
+   awsListRowVector rows;
 
 protected:
    void ClearGroup();
@@ -212,6 +209,9 @@ public:
 
     /// Sets properties
     bool SetProperty(char *name, void *parm);
+
+    /// Executes some actions
+    bool Execute(char *action, awsParmList &parmlist);
 
     /// Returns the named TYPE of the component, like "Radio Button", etc.
     virtual char *Type();

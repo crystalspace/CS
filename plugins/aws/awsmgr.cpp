@@ -19,6 +19,7 @@
 #include "awsradbt.h"
 #include "awschkbx.h"
 #include "awsgrpfr.h"
+#include "awslistbx.h"
 
 
 #include <stdio.h>
@@ -790,6 +791,7 @@ awsManager::RegisterCommonComponents()
   (void)new awsRadButtonFactory(this);
   (void)new awsCheckBoxFactory(this);
   (void)new awsGroupFrameFactory(this);
+  (void)new awsListBoxFactory(this);
 
 
   // Standard sink

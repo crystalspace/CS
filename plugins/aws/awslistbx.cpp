@@ -1,5 +1,6 @@
 #include "cssysdef.h"
 #include "awslistbx.h"
+#include "awsfparm.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -7,6 +8,7 @@
 #include "csutil/csevent.h"
 #include "csutil/snprintf.h"
 #include "iutil/evdefs.h"
+
 
 #include <stdio.h>
 
@@ -126,6 +128,63 @@ awsListBox::SetProperty(char *name, void *parm)
   return false;
 }
 
+bool 
+awsListBox::Execute(char *action, awsParmList &parmlist)
+{
+  if (awsComponent::Execute(action, parmlist)) return true;
+
+  if (strcmp(action, "InsertItem"))
+  {
+    char buf[50];
+    int i;
+    iString *str;
+       
+    // Create a new row and zero it out.
+    awsListRow *row = new awsListRow;
+    memset(row, 0 , sizeof(awsListRow));
+    
+    // Create a new set of columns and zero them out.
+    row->cols = new awsListItem[ncolumns];
+    memset(row, 0, sizeof(awsListItem) * ncolumns);
+    
+    parmlist.GetInt("parent", (int *)&(row->parent));
+
+    /* Fill in the columns by looking for several parameters:
+     *   textX, imageX, txtalignX, imgalignX, statefulX, stateX, groupstateX, 
+     *   selectableX
+     */
+    for(i=0; i<ncolumns; ++i)
+    {
+      cs_snprintf(buf, 50, "text%d", i);
+      if (parmlist.GetString(buf, &(row->cols[i].text)))
+        row->cols[i].text->IncRef();
+
+      cs_snprintf(buf, 50, "image%d", i);
+      if (parmlist.GetString(buf, &str))
+        row->cols[i].image = WindowManager()->GetPrefMgr()->GetTexture(str->GetData(), str->GetData());
+      
+      cs_snprintf(buf, 50, "stateful%d", i);
+      parmlist.GetBool(buf, &(row->cols[i].has_state));
+
+      cs_snprintf(buf, 50, "state%d", i);
+      parmlist.GetBool(buf, &(row->cols[i].state));
+
+      cs_snprintf(buf, 50, "groupstate%d", i);
+      parmlist.GetBool(buf, &(row->cols[i].group_state));
+
+      cs_snprintf(buf, 50, "selectable%d", i);
+      parmlist.GetBool(buf, &(row->cols[i].selectable));
+
+      cs_snprintf(buf, 50, "aligntxt%d", i);
+      parmlist.GetInt(buf, &(row->cols[i].txt_align));
+
+      cs_snprintf(buf, 50, "alignimg%d", i);
+      parmlist.GetInt(buf, &(row->cols[i].txt_align));
+    }
+  }
+  return false;
+}
+
 void 
 awsListBox::ClearGroup()
 {
@@ -179,6 +238,8 @@ awsListBox::OnDraw(csRect clip)
   int  fill = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
   int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
+
+  int i;
     
   
   switch(frame_style)
@@ -262,7 +323,12 @@ awsListBox::OnDraw(csRect clip)
       break;
   }
 
- 
+
+  // Now begin to draw actual list
+  for(i=0; i<rows.Length(); ++i)
+  {
+
+  }
 }
 
 bool 
