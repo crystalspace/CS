@@ -295,7 +295,7 @@ Chris fixed some issues with intersecting triangles, fixed a few bugs
 in @sc{aws}, and a few other issues.
 
 @item
-Christian Bayle (@email{christian.bayle@@rd.francetelecom.com})
+Christian Bayle (@email{bayle@@aist.enst.fr})
 
 Christian Bayle contributed scripts to make a Debian package for Crystal Space.
 
