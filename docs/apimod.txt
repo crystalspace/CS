@@ -13,3 +13,8 @@ Added const csReversibleTransform& csPortal::GetWarp ().
 csBspTree inherits from new class csPolygonTree.
 Added csOctree which also inherits from csPolygonTree.
 
+csPolygonSet::AddVertexSmart() is no longer recommended (too slow). Instead
+use plain AddVertex() and call CompressVertices() afterwards.
+
+New csSector::RemoveThing().
+
