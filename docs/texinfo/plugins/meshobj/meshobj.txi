@@ -29,7 +29,6 @@ Crystal Space supports.
 * MeshObject Spr2D:: Sprite2D Mesh Object
 * MeshObject Spr3D:: Sprite3D Mesh Object
 * MeshObject Ball:: Ball Mesh Object
-* MeshObject Cube:: Cube Mesh Object
 * MeshObject Emit:: Emitter Mesh Object
 * MeshObject PartSys:: Particle Systems in General
 * MeshObject Fountain:: Fountain Mesh Object
