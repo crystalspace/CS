@@ -113,9 +113,9 @@ PLUGINS.DYNAMIC += video/render3d/shadermgr
 PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb
 PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_cg
 PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_fixed
-PLUGINS.DYNAMIC += engine/loader
-PLUGINS.DYNAMIC += engine/stdsteps
-PLUGINS.DYNAMIC += engine/shadow/stencil
+PLUGINS.DYNAMIC += engine/renderloop/loader
+PLUGINS.DYNAMIC += engine/renderloop/stdsteps
+PLUGINS.DYNAMIC += engine/renderloop/shadow/stencil
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
