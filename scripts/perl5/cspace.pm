@@ -4651,6 +4651,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iCameraSectorListener ##############
+
+package cspace::iCameraSectorListener;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*NewSector = *cspacec::iCameraSectorListener_NewSector;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCameraSectorListener($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iCamera ##############
 
 package cspace::iCamera;
@@ -4684,6 +4715,8 @@ package cspace::iCamera;
 *InvPerspective = *cspacec::iCamera_InvPerspective;
 *OnlyPortals = *cspacec::iCamera_OnlyPortals;
 *GetOnlyPortals = *cspacec::iCamera_GetOnlyPortals;
+*AddCameraSectorListener = *cspacec::iCamera_AddCameraSectorListener;
+*RemoveCameraSectorListener = *cspacec::iCamera_RemoveCameraSectorListener;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
