@@ -31,18 +31,31 @@ projects from the Crystal Space build process.
 @subsubheading msvc_libs - Required
 
 Before you attempt to compile Crystal Space, you must download
-and install the ``msvc_libs'' archive.  This archive contains all
-third party header, pre-built library and dll files used by Crystal
+and install the ``msvc_libs'' archive.  This archive contains alot of the
+third party header, pre-built libraries and dll files used by Crystal
 Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll}, etc.
 The latest version of this archive can be downloaded from:
 
+msvc_libs with Python 2.2.3 debug components.
+
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.97dev004.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.97dev005_py223.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc_libs_0.97dev004.zip}
+@code{msvc_libs_0.97dev005_py223.zip}
+@end iftex
+
+msvc_libs with Python 2.3.0 debug components.
+
+@noindent
+@ifnottex
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.97dev005_py230.zip}
+@end ifnottex
+@iftex
+@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
+@code{msvc_libs_0.97dev005_py230.zip}
 @end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
@@ -121,9 +134,10 @@ Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 
-@sc{note}: To have parity with the latest version of msvc_libs and take full
-advantage of the debug elements - you should have Python 2.2.3 installed on
-your system.
+@sc{note}: To have parity with one of the latest versions of msvc_libs and take
+full advantage of the debug elements - you should have Python 2.2.3 or 2.3.0
+installed on your system. Whichever version you decide to use, make sure you
+download the comparable msvc_libs.
 
 @subsubheading Creative EAX 2.0
 

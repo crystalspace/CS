@@ -29,6 +29,7 @@ chronological order.
 	- Jorrit also modified the genmesh mesh so that it only calls
 	  Visit() when needed.
         - Philip Wyett removed the sprcal3d plugin from the default MSVC build.
+        - Philip Wyett updated docs to reflect a new msvc_libs release.
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within
