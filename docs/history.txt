@@ -31,6 +31,10 @@ chronological order.
 	  Initialize() function. Solved this by testing if shaderManager
 	  is not 0 in the RenderMeshes() call and querying it from the
 	  object registry if 0.
+	- Jorrit fixed a bug in the OpenGL renderer which was not clearing
+	  the texture cache when g3d->ClearCache() is called. Unfortunatelly
+	  this doesn't fix engine->ForceRelight() so more debugging is
+	  needed.
 15-Dec-2003
 	- Matze reworked some jam rules so that subdirs are more robust now.
 	  This should also fix some msvcgen problems on jam.
