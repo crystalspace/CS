@@ -277,8 +277,8 @@ Adjust the @code{CC="@dots{}"} directive to reflect the architectures you wish
 to include in the generated libraries.  If you do not wish to generate
 multi-architecture libraries, then omit the @code{CC="@dots{}"} directive
 altogether.  The list of supported architectures varies between MacOS/X,
-MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.  @xref{NeXT
-Architectures}.  Assuming that you unpacked the libraries into the
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
+@xref{NeXT Architectures}.  Assuming that you unpacked the libraries into the
 @file{CS/libs} directory, rather than installing the packages, you might build
 them as follows.
 
