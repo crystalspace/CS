@@ -215,8 +215,6 @@ struct iImage : public iBase
 struct iTextureManager : public iBase
 {
   iTextureHandle *RegisterTexture (iImage *image, int flags);
-  void UnregisterTexture (iTextureHandle *handle);
-  void PrepareTexture (iTextureHandle *handle);
   void PrepareTextures ();
   void FreeImages ();
   void ResetPalette ();

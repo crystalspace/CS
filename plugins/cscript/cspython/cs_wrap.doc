@@ -403,10 +403,6 @@ Crop(x,y,width,height)
 
 RegisterTexture(image,flags)
 
-UnregisterTexture(handle)
-
-PrepareTexture(handle)
-
 PrepareTextures()
 
 FreeImages()

@@ -1,5 +1,81 @@
 The history order has been reversed so that new features are at the top.
 
+19-Dec-2000
+	- Andrew Zabolotny did the following changes:
+	    - Fixed a error in inifile.cpp. The array allocated with
+	      new[] was realloc()'ated. Now it is new/memcpy/delete'd.
+	    - Fixed a minor memory leak in system driver. Event cords
+	      weren't deleted at shutdown.
+	    - Fixed a bad error in inifile.cpp triggered by [Macintosh]
+	      section in vfs.cfg: the loader switches to base64 mode due
+	      to empty assignments like:
+		HOME =
+	      (such lines are used to denote base64 keys) and then
+	      doesn't switch back when it detects invalid base64 symbols.
+	      I changed the ini loader so that it switches to base64 mode
+	      by '==' statement, e.g.:
+		HOME ==
+		ODAwMDAwMDAgd2hpbGUKICAgIHNoYXJlZCBs
+		aWJyYXJpZXMgdXN1YWxseSBoYXZlIGFkZHJl
+		c3NlcyBsaWtlIDB4NHh4eHh4eHgpLgo=
+		===
+		;/HOME
+	      If you want to assign the '=' value to a key, insert a space,
+	      e.g:
+		HOME = =
+	      is interpreted as a normal key, not the head of a base64
+	      stream. csIniFile::Save() inserts spaces automatically, thus
+	      a saved ini file should read perfectly. Also if something other
+	      than newline follows the second equal sign, it is also
+	      interpreted as a normal key.
+	    - Fixed a few memory leaks in MazeD.
+	    - Finished material manager dialog. Now it is functional, use
+	      Ctrl+m to invoke it, model manager has moved to Ctrl+M. Fixed
+	      several bugs that leads to MazeD crashes related to materials.
+	    - Fixed a bad bug in common texture manager object (txtmgr.cpp):
+	      the constructor did no CONSTRUCT_IBASE.
+	    - I have enhanced the memory debugger so that on Linux and OS/2
+	      it is able to debug malloc/realloc/free's as well as new's and
+	      delete's. There is a drawback on Linux though: it will
+	      intercept all malloc/free's from all dynamic libraries (even
+	      from libX11.so) thus you will see a lot of memory leaks
+	      belonging to other libraries (notably libc and libX11). You can
+	      filter them by address (in Linux program address is >
+	      0x80000000 while shared libraries usually have addresses like
+	      0x4xxxxxxx). If you want to debug memory leaks in plug-ins,
+	      build executable in static link mode.
+	    - Fixed a memory leak in csfont plug-in.
+	    - Rearrangement of some aspects of the texture manager to simplify
+	      interface API for textures and materials. Previously you had to
+	      call texture manager's RegisterXXX (where XXX is Texture or
+	      Material) then you had to call PrepareXXX to force texture
+	      manager recompute the internal representation of the
+	      texture/material; when you are done you had to call
+	      UnregisterXXX. Now it works a little different: by calling
+	      RegisterXXX you create a new texture/material handle, and
+	      further you work only with that handle: call handle->Prepare()
+  	      to prepare texture or material for usage; call handle->DecRef()
+	      enough times to destroy the handle (you don't have to call
+	      UnregisterXXX anymore).
+	      I have fixed all the 3D renderers for this, however I'm not
+	      sure about Direct3D and Glide renderers (haven't compiled
+	      them). All others are fully functional.
+	      You can still call PrepareTextures() and PrepareMaterials()
+              on texture manager object to call Prepare on all objects at once.
+	    - Renamed csTextureMMSoftware into csSoftwareTextureHandle and
+	      csTextureMM into csTextureHandle for cleaner names.
+	    - Before closing the system (System::Close) the engine will
+	      free all texture and material handles since after closing
+	      the graphics driver the handles become invalid no matter
+	      whenever we did IncRef or not.
+	    - Implemented alpha textures support for DrawPolygon, DrawPFX
+	      and DrawPixmap in OpenGL renderer.
+	    - Re-worked OpenGL texture cache. Texture unloading happens now
+	      in a centralized routine, which minimizes the effort required
+	      to fix any bugs in it (one of which was causing SIGSEGV on
+	      exit).
+	- Fixed python plugin after Andrew broke it with the changes
+	  above (i.e. remove PrepareTexture() from the cs.i file).
 18-Dec-2000
 	- Rene Dudfield fixed a bug in sprite3d. The rand num generator
 	  was not initialized.
