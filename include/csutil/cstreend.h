@@ -42,7 +42,7 @@ class csTreeNode
 
   virtual ~csTreeNode () 
   { 
-    for(int i=0; i<children.Length (); i++) 
+    for(int i=children.Length ()-1; i>=0; i--) 
       delete (csTreeNode*)children.Get (i); 
     if (parent) 
       parent->RemoveChild (this);
