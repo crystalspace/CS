@@ -76,9 +76,15 @@ csDLListItem * csDLinkList::FindListItem(void *anObj)
 
 void * csDLinkList::SetCurrentItem(void *theObj)
    {
-   currentItem = FindListItem(theObj);
-   return currentItem;
+   csDLListItem *it;
+   if ((it=FindListItem(theObj)))
+   {
+     currentItem = it;
+     return currentItem;
    }
+   else
+     return NULL;
+}
 
 
 bool csDLinkList::AddItem(void *theObj)
