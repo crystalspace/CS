@@ -1,8 +1,8 @@
 # This is a subinclude file used to define the rules needed
-# to build the CoreAudio sound driver for MacOS X
+# to build the CoreAudio sound driver for MacOS/X
 
 # Driver description
-DESCRIPTION.casnddrv = Crystal Space CoreAudio sound driver
+DESCRIPTION.casnddrv = Crystal Space MacOS/X CoreAudio sound driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

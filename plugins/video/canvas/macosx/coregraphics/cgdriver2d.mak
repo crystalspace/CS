@@ -1,10 +1,10 @@
 #==============================================================================
-# This is a MacOS X 2D graphics driver makefile that uses CoreGraphics to
-# do most of it's work
+# This is a MacOS/X 2D graphics driver makefile that uses CoreGraphics to
+# do most of its work
 # Copyright (C) 2001 by Matt Reda <mreda@mac.com>
 #==============================================================================
 
-DESCRIPTION.cgdriver2d = Crystal Space $(NEXT.DESCRIPTION) CoreGraphics 2D driver
+DESCRIPTION.cgdriver2d = Crystal Space MacOS/X CoreGraphics 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -31,18 +31,18 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-NEXT.SOURCE_CG2D_PATHS = plugins/video/canvas/macosx/coregraphics plugins/video/canvas/macosx/common
-NEXT.HEADER_CG2D_PATHS = $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_CG2D_PATHS))
+MACOSX.SOURCE_CG2D_PATHS = plugins/video/canvas/macosx/coregraphics plugins/video/canvas/macosx/common
+MACOSX.HEADER_CG2D_PATHS = $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_CG2D_PATHS))
 
 # Only add header search paths if actually building this plug-in or if
 # USE_PLUGINS=no, in which case this module might be built as the dependency
 # of some other module (rather than being built explicitly by the `cgdriver2d'
 # target).
 ifeq ($(USE_PLUGINS),no)
-  CFLAGS.INCLUDE += $(NEXT.HEADER_CG2D_PATHS)
+  CFLAGS.INCLUDE += $(MACOSX.HEADER_CG2D_PATHS)
 else
 ifeq ($(DO_CGDRIVER2D),yes)
-  CFLAGS.INCLUDE += $(NEXT.HEADER_CG2D_PATHS)
+  CFLAGS.INCLUDE += $(MACOSX.HEADER_CG2D_PATHS)
 endif
 endif
 
@@ -51,8 +51,9 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(NEXT.SOURCE_CG2D_PATHS)
-vpath %.m   $(NEXT.SOURCE_CG2D_PATHS)
+vpath %.cpp $(MACOSX.SOURCE_CG2D_PATHS)
+vpath %.m   $(MACOSX.SOURCE_CG2D_PATHS)
+vpath %.mm  $(MACOSX.SOURCE_CG2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
   CGDRIVER2D = $(OUTDLL)/cgdriver2d$(DLL)
@@ -66,10 +67,10 @@ else
 endif
 
 INC.CGDRIVER2D = $(wildcard $(INC.COMMON.DRV2D) \
-  $(addsuffix /*.h,$(NEXT.SOURCE_CG2D_PATHS)))
+  $(addsuffix /*.h,$(MACOSX.SOURCE_CG2D_PATHS)))
 SRC.CGDRIVER2D = $(wildcard $(SRC.COMMON.DRV2D) \
-  $(addsuffix /*.cpp,$(NEXT.SOURCE_CG2D_PATHS)) \
-  $(addsuffix /*.m,$(NEXT.SOURCE_CG2D_PATHS)))
+  $(addsuffix /*.cpp,$(MACOSX.SOURCE_CG2D_PATHS)) \
+  $(addsuffix /*.m,$(MACOSX.SOURCE_CG2D_PATHS)))
 OBJ.CGDRIVER2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.CGDRIVER2D:.m=$O))))
 DEP.CGDRIVER2D = CSSYS CSUTIL
@@ -93,7 +94,7 @@ cgdriver2dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/cgdriver2d.dep
 $(OUTOS)/cgdriver2d.dep: $(SRC.CGDRIVER2D)
-	$(DO.DEP1) $(NEXT.HEADER_CG2D_PATHS) $(DO.DEP2)
+	$(DO.DEP1) $(MACOSX.HEADER_CG2D_PATHS) $(DO.DEP2)
 else
 -include $(OUTOS)/cgdriver2d.dep
 endif

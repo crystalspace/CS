@@ -32,18 +32,17 @@ SCF_IMPLEMENT_FACTORY(CGDriver2D)
 
 SCF_EXPORT_CLASS_TABLE(cgdriver2d)
     SCF_EXPORT_CLASS_DEP(CGDriver2D, "crystalspace.graphics2d.coregraphics",
-    "Crystal Space 2D Driver for MacOS X (CoreGraphics)", "crystalspace.font.server")
+    "Crystal Space 2D driver for MacOS/X (CoreGraphics)",
+    "crystalspace.font.server")
 SCF_EXPORT_CLASS_TABLE_END
 
 
 
 // Constructor
 // Construct a graphics object for drawing
-CGDriver2D::CGDriver2D(iBase *p)
-    : csGraphics2D(p), OSXDriver2D(this)
+CGDriver2D::CGDriver2D(iBase *p) : csGraphics2D(p), OSXDriver2D(this)
 {
-
-};
+}
 
 
 // Destructor
@@ -51,7 +50,7 @@ CGDriver2D::CGDriver2D(iBase *p)
 CGDriver2D::~CGDriver2D()
 {
     Close();		// Just in case it hasn't been called
-};
+}
 
 
 // Initialize
@@ -65,7 +64,7 @@ bool CGDriver2D::Initialize(iObjectRegistry *reg)
         return false;
 
     return true;
-};
+}
 
 
 // Open
@@ -101,7 +100,7 @@ bool CGDriver2D::Open()
     Print(NULL);
 
     return true;
-};
+}
 
 
 // Close
@@ -119,7 +118,7 @@ void CGDriver2D::Close()
     // Superclasses
     csGraphics2D::Close();
     OSXDriver2D::Close();
-};
+}
 
 
 // SetTitle
@@ -128,7 +127,7 @@ void CGDriver2D::SetTitle(char *title)
 {
     OSXDelegate2D_setTitle(delegate, title);
     csGraphics2D::SetTitle(title);
-};
+}
 
 
 // Print
@@ -136,7 +135,7 @@ void CGDriver2D::SetTitle(char *title)
 void CGDriver2D::Print(csRect *area)
 {
     OSXDelegate2D_blitToWindow(delegate, Memory, Width, Height, Depth);
-};
+}
 
 
 // SetMouseCursor
@@ -144,7 +143,7 @@ void CGDriver2D::Print(csRect *area)
 bool CGDriver2D::SetMouseCursor(csMouseCursorID cursor)
 {
     return OSXDelegate2D_setMouseCursor(delegate, cursor);
-};
+}
 
 
 // AllowResize
@@ -152,7 +151,7 @@ bool CGDriver2D::SetMouseCursor(csMouseCursorID cursor)
 void CGDriver2D::AllowResize (bool allow)
 {
     AllowResizing = allow;
-};
+}
 
 
 // Resize
@@ -170,10 +169,10 @@ bool CGDriver2D::Resize(int w, int h)
         csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
         if (queue.IsValid())
             queue->GetEventOutlet()->Broadcast(cscmdContextResize, (iGraphics2D *) this);
-    };
+    }
 
     return success;
-};
+}
 
 
 
@@ -192,6 +191,5 @@ void CGDriver2D::SetupDrawingFunctions()
         _DrawPixel = DrawPixel16;
         _WriteString = WriteString16;
         _GetPixelAt = GetPixelAt16;
-    };
-};
-
+    }
+}

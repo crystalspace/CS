@@ -131,7 +131,7 @@ void
   fatalerr ("got signal %d\n", sig);
 }
 
-#if defined(USG) || defined(OS_WIN32) || defined(OS_OS2) || defined(OS_NEXT) || defined(OS_BE) || defined (OS_DOS) || defined (OS_SOLARIS)
+#if defined(USG) || defined(OS_WIN32) || defined(OS_MACOSX) || defined (OS_DOS) || defined (OS_SOLARIS)
 #define USGISH
 #endif
 

@@ -36,18 +36,6 @@
 #include "ivideo/graph2d.h"
 
 
-// An ugly hack to avoid "local relocation entries in non-writable section"
-// linkage error on OpenStep/HPPA/Sparc when csEngine library is linked into
-// a plug-in.  @@@FIXME: Work around this in a cleaner way in the future.
-#if !defined(OS_NEXT) || (!defined(PROC_SPARC) && !defined(PROC_HPPA))
-# define CS_LOCAL_STATIC(X, Y) static X Y
-#else
-# define CS_LOCAL_STATIC(X, Y) \
-  static X *Y##__ = 0; \
-  if (Y##__ == 0) Y##__ = new X; \
-  X &Y = *Y##__
-#endif
-
 CS_IMPLEMENT_STATIC_CLASSVAR(csPolygon2DFactory,sharedFactory,SharedFactory,csPolygon2DFactory,())
 
 static void Perspective (const csVector3& v, csVector2& p, int
@@ -480,7 +468,7 @@ void csPolygon2D::DrawFilled (
       }
     }
 
-    CS_LOCAL_STATIC (G3DPolygonDPFX, g3dpolyfx);
+    static G3DPolygonDPFX g3dpolyfx;
 
     csPolyTexType *ns = poly->GetNoTexInfo ();
     csPolyTexFlat *fs = poly->GetFlatInfo ();
@@ -552,7 +540,7 @@ void csPolygon2D::DrawFilled (
   }
   else
   {
-    CS_LOCAL_STATIC (G3DPolygonDP, g3dpoly);
+    static G3DPolygonDP g3dpoly;
 
     g3dpoly.num = num_vertices;
     if (poly->GetMaterialWrapper ()) poly->GetMaterialWrapper ()->Visit ();
@@ -647,7 +635,7 @@ void csPolygon2D::FillZBuf (
 
   iCamera *icam = rview->GetCamera ();
 
-  CS_LOCAL_STATIC (G3DPolygonDP, g3dpoly);
+  static G3DPolygonDP g3dpoly;
   g3dpoly.mixmode = CS_FX_COPY;
   g3dpoly.num = num_vertices;
 
@@ -696,7 +684,7 @@ void csPolygon2D::AddFogPolygon (
 #ifndef CS_USE_NEW_RENDERER
   int i;
 
-  CS_LOCAL_STATIC (G3DPolygonDFP, g3dpoly);
+  static G3DPolygonDFP g3dpoly;
   memset (&g3dpoly, 0, sizeof (g3dpoly));
   g3dpoly.num = num_vertices;
 #if 0

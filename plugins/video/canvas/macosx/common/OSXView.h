@@ -44,5 +44,4 @@
 - (void) otherMouseUp:(NSEvent *) ev;
 - (void) otherMouseDragged:(NSEvent *) ev;
 
-
 @end

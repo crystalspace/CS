@@ -2,7 +2,7 @@
 # to build the NULL 2D driver -- null2d
 
 # Driver description
-DESCRIPTION.null2d = Crystal Space Null 2D driver
+DESCRIPTION.null2d = Crystal Space null 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

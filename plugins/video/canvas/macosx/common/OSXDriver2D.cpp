@@ -40,7 +40,7 @@ OSXDriver2D::OSXDriver2D(csGraphics2D *inCanvas)
     display = kCGDirectMainDisplay;
 
     delegate = OSXDelegate2D_new(this);
-};
+}
 
 
 // Destructor
@@ -58,7 +58,7 @@ OSXDriver2D::~OSXDriver2D()
     Close();					// Just in case it hasn't been called
 
     OSXDelegate2D_delete(delegate);
-};
+}
 
 
 // Initialize
@@ -68,7 +68,7 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
     objectReg = reg;
 
     // Get assistant
-    assistant = CS_QUERY_REGISTRY(reg, iNeXTAssistant);
+    assistant = CS_QUERY_REGISTRY(reg, iOSXAssistant);
 
     // Create event handler
     if (scfiEventHandler == NULL)
@@ -87,7 +87,7 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
     SaveGamma(display, originalGamma);
 
     return true;
-};
+}
 
 
 // Open
@@ -107,7 +107,7 @@ bool OSXDriver2D::Open()
     {
         fprintf(stderr, "Depth %d not supported in CGDriver2D yet", canvas->Depth);
         return false;
-    };
+    }
 
     // Switch to fullscreen mode if necessary
     if (canvas->FullScreen == true)
@@ -121,7 +121,7 @@ bool OSXDriver2D::Open()
         return false;
 
     return true;
-};
+}
 
 
 // Close
@@ -136,8 +136,8 @@ void OSXDriver2D::Close()
     {
         ExitFullscreenMode();
         inFullscreenMode = false;
-    };
-};
+    }
+}
 
 
 // HandleEvent
@@ -154,13 +154,13 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
             bool shouldPause = !assistant->always_runs();
             OSXDelegate2D_focusChanged(delegate, ev.Command.Info, shouldPause);
             handled = true;
-        };
+        }
         if (ev.Command.Code == cscmdCommandLineHelp)
         {
             printf("Options for MacOS X 2D graphics drivers:\n"
                    "  -screen=<num>      Screen number to display on (default=0)\n");
             handled = true;
-        };
+        }
     }
     else if (ev.Type == csevKeyDown)
     {
@@ -169,15 +169,15 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
     }
 
     return handled;
-};
+}
 
 
 // DispatchEvent
 // Dispatch an event to the assistant
-void OSXDriver2D::DispatchEvent(NeXTEvent ev, NeXTView view)
+void OSXDriver2D::DispatchEvent(OSXEvent ev, OSXView view)
 {
     assistant->dispatch_event(ev, view);
-};
+}
 
 
 // HideMouse
@@ -185,7 +185,7 @@ void OSXDriver2D::DispatchEvent(NeXTEvent ev, NeXTView view)
 void OSXDriver2D::HideMouse()
 {
     assistant->hide_mouse_pointer();
-};
+}
 
 
 // ShowMouse
@@ -193,7 +193,7 @@ void OSXDriver2D::HideMouse()
 void OSXDriver2D::ShowMouse()
 {
     assistant->show_mouse_pointer();
-};
+}
 
 
 // Initialize16
@@ -206,7 +206,7 @@ void OSXDriver2D::Initialize16()
     canvas->pfmt.GreenMask = 0x1F << 5;
     canvas->pfmt.BlueMask = 0x1F;
     canvas->pfmt.complete();
-};
+}
 
 
 // Initialize32
@@ -219,7 +219,7 @@ void OSXDriver2D::Initialize32()
     canvas->pfmt.GreenMask = 0x00FF00;
     canvas->pfmt.BlueMask = 0x0000FF;
     canvas->pfmt.complete();
-};
+}
 
 
 // EnterFullscreenMode
@@ -257,10 +257,10 @@ bool OSXDriver2D::EnterFullscreenMode()
     {
         CGDisplayRelease(display);
         return false;
-    };
+    }
 
     return true;
-};
+}
 
 
 // ExitFullscreenMode
@@ -271,7 +271,7 @@ void OSXDriver2D::ExitFullscreenMode()
     CGDisplaySwitchToMode(display, originalMode);
     CGDisplayRelease(display);
     FadeToGammaTable(display, originalGamma);
-};
+}
 
 
 // ToggleFullscreen
@@ -287,7 +287,7 @@ bool OSXDriver2D::ToggleFullscreen()
     {
         ExitFullscreenMode();
         inFullscreenMode = false;
-    };
+    }
 
     // Restore original dimensions - force resize by forcing AllowResize to true
     canvas->FullScreen = !canvas->FullScreen;
@@ -299,7 +299,7 @@ bool OSXDriver2D::ToggleFullscreen()
     {
         inFullscreenMode = EnterFullscreenMode();
         success = inFullscreenMode;
-    };
+    }
 
     if (success == true)
         OSXDelegate2D_openWindow(delegate, canvas->win_title,
@@ -307,7 +307,7 @@ bool OSXDriver2D::ToggleFullscreen()
                                 canvas->FullScreen, display, screen);
 
     return success;
-};
+}
 
 
 // FadeToRGB
@@ -322,10 +322,10 @@ void OSXDriver2D::FadeToRGB(CGDirectDisplayID disp, float r, float g, float b)
         gamma.r[i] = r;
         gamma.g[i] = g;
         gamma.b[i] = b;
-    };
+    }
     
     FadeToGammaTable(disp, gamma);
-};
+}
 
 
 // FadeToGamma
@@ -364,7 +364,7 @@ void OSXDriver2D::FadeToGammaTable(CGDirectDisplayID disp, GammaTable table)
     } while (current_usec < end_usec);
 
     CGSetDisplayTransferByTable(disp, 256, table.r, table.g, table.b);
-};
+}
 
 
 // SaveGamma
@@ -378,7 +378,7 @@ void OSXDriver2D::SaveGamma(CGDirectDisplayID disp, GammaTable &table)
                                         table.b, &sampleCount);
     if (err != kCGErrorSuccess)
         fprintf(stderr, "Error %d reading gamma values\n", err);
-};
+}
 
 
 // ChooseDisplay
@@ -394,7 +394,7 @@ void OSXDriver2D::ChooseDisplay()
     {
         csConfigAccess cfg(objectReg, "/config/video.cfg");
         screen = cfg->GetInt("Video.ScreenNumber", 0);
-    };
+    }
 
     // Get list of displays and get id of display to use if not default
     display = kCGDirectMainDisplay;
@@ -422,20 +422,20 @@ void OSXDriver2D::ChooseDisplay()
                     
         if (display == kCGDirectMainDisplay)
             screen = 0;
-    };
-};
+    }
+}
 
 
 /// C API to driver class
 #define DRV2D_FUNC(ret, func) __private_extern__ "C" ret OSXDriver2D_##func
 
 typedef void *OSXDriver2DHandle;
-typedef void *NeXTEventHandle;
-typedef void *NeXTViewHandle;
+typedef void *OSXEventHandle;
+typedef void *OSXViewHandle;
 
 
 // C API to driver class
-DRV2D_FUNC(void, DispatchEvent)(OSXDriver2DHandle driver, NeXTEventHandle ev, NeXTViewHandle view)
+DRV2D_FUNC(void, DispatchEvent)(OSXDriver2DHandle driver, OSXEventHandle ev, OSXViewHandle view)
 {
     ((OSXDriver2D *) driver)->DispatchEvent(ev, view);
 }
@@ -448,14 +448,11 @@ DRV2D_FUNC(bool, Resize)(OSXDriver2DHandle driver, int w, int h)
 DRV2D_FUNC(void, HideMouse)(OSXDriver2DHandle driver)
 {
     ((OSXDriver2D *) driver)->HideMouse();
-};
+}
 
 DRV2D_FUNC(void, ShowMouse)(OSXDriver2DHandle driver)
 {
     ((OSXDriver2D *) driver)->ShowMouse();
-};
-
+}
 
 #undef DRV2D_FUNC
-
-

@@ -1,11 +1,11 @@
 // casnddrv.h
-// CoreAudio (MacOS X) Sound Driver for Crystal Space
+// CoreAudio (MacOS/X) Sound Driver for Crystal Space
 //
 // Created by mreda on Sun Nov 11 2001.
 // Copyright (c) 2001 Matt Reda. All rights reserved.
 
-#ifndef __CASNDDRV_H
-#define __CASNDDRV_H
+#ifndef __CASNDDRV_H__
+#define __CASNDDRV_H__
 
 #include <CoreAudio/CoreAudio.h>
 
@@ -63,7 +63,7 @@ public:
 
     struct eiComponent : public iComponent
     {
-        SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverCoreAudio);
+	SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverCoreAudio);
         virtual bool Initialize(iObjectRegistry* object_reg)
             { scfParent->reg = object_reg; return true; }
     } scfiComponent;
@@ -83,4 +83,4 @@ protected:
     bool isPlaying;				// Boolean to indicate if playback is going
 };
 
-#endif
+#endif // __CASNDDRV_H__

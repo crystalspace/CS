@@ -31,7 +31,7 @@
 #define MAX_BYTE_VALUE	0xff
 
 // Processor-dependent macros
-#if defined (PROC_X86) && defined (COMP_GCC) && !defined(OS_NEXT)
+#if defined (PROC_X86) && defined (COMP_GCC)
 #  define BIT_SET(bits,index) \
    asm ("bts %1,%0" : : "o" (*bits), "r" (index))
 #  define BIT_RESET(bits,index) \

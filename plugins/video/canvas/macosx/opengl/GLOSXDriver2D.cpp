@@ -29,9 +29,8 @@ SCF_IMPLEMENT_FACTORY(GLOSXDriver2D)
 
 SCF_EXPORT_CLASS_TABLE(glosx2d)
     SCF_EXPORT_CLASS_DEP(GLOSXDriver2D, "crystalspace.graphics2d.glosx",
-    "Crystal Space 2D Driver for MacOS X (OpenGL)", "crystalspace.font.server")
+    "Crystal Space 2D driver for MacOS/X (OpenGL)", "crystalspace.font.server")
 SCF_EXPORT_CLASS_TABLE_END
-
 
 
 // Constructor
@@ -39,14 +38,14 @@ GLOSXDriver2D::GLOSXDriver2D(iBase *p)
     : csGraphics2DGLCommon(p), OSXDriver2D(this)
 {
     context = NULL;
-};
+}
 
 
 // Destructor
 GLOSXDriver2D::~GLOSXDriver2D()
 {
     Close();			// In case it hasn't already been called
-};
+}
 
 
 // Initialize
@@ -67,7 +66,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
     {
         fprintf(stderr, "Failed to create OpenGL context\n");
         return false;
-    };
+    }
 
     // Create the event outlet
     csRef<iEventQueue> queue = CS_QUERY_REGISTRY(reg, iEventQueue);
@@ -75,7 +74,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
         EventOutlet = queue->CreateEventOutlet (this);
 
     return true;
-};
+}
 
 
 
@@ -107,7 +106,7 @@ bool GLOSXDriver2D::Open()
         return false;
 
     return true;
-};
+}
 
 
 // Close
@@ -124,7 +123,7 @@ void GLOSXDriver2D::Close()
     OSXDriver2D::Close();
     CGLClearDrawable(context);
     CGLDestroyContext(context);
-};
+}
 
 
 // SetTitle
@@ -133,7 +132,7 @@ void GLOSXDriver2D::SetTitle(char *title)
 {
     OSXDelegate2D_setTitle(delegate, title);
     csGraphics2DGLCommon::SetTitle(title);
-};
+}
 
 
 // Print
@@ -142,7 +141,7 @@ void GLOSXDriver2D::Print(csRect *area)
 {
     CGLSetCurrentContext(context);
     CGLFlushDrawable(context);
-};
+}
 
 
 // SetMouseCursor
@@ -150,7 +149,7 @@ void GLOSXDriver2D::Print(csRect *area)
 bool GLOSXDriver2D::SetMouseCursor(csMouseCursorID cursor)
 {
     return OSXDelegate2D_setMouseCursor(delegate, cursor);
-};
+}
 
 
 // AllowResize
@@ -158,7 +157,7 @@ bool GLOSXDriver2D::SetMouseCursor(csMouseCursorID cursor)
 void GLOSXDriver2D::AllowResize(bool allow)
 {
     AllowResizing = allow;
-};
+}
 
 
 // Resize
@@ -166,7 +165,7 @@ void GLOSXDriver2D::AllowResize(bool allow)
 bool GLOSXDriver2D::Resize(int w, int h)
 {
     return csGraphics2DGLCommon::Resize(w, h);
-};
+}
 
 
 // ToggleFullscreen
@@ -179,7 +178,7 @@ bool GLOSXDriver2D::ToggleFullscreen()
         OSXDelegate2D_updateOpenGLContext(delegate);
 
     return success;
-};
+}
 
 
 // SetupDrawingFunctions
@@ -197,5 +196,5 @@ void GLOSXDriver2D::SetupDrawingFunctions()
         _DrawPixel = DrawPixel16;
         _WriteString = WriteString16;
         _GetPixelAt = GetPixelAt16;
-    };
-};
+    }
+}

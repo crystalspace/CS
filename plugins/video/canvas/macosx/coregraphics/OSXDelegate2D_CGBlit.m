@@ -67,7 +67,7 @@ static CGColorSpaceRef colorSpace = NULL;
                                 bytesPerRow, colorSpace, kCGImageAlphaNoneSkipFirst, 
                                 prov, NULL, NO, kCGRenderingIntentDefault);
             rect = CGRectMake(0, 0, width, height);
-        };
+        }
         
         CGContextDrawImage([[NSGraphicsContext currentContext] graphicsPort], 
                             rect, image);
@@ -76,10 +76,10 @@ static CGColorSpaceRef colorSpace = NULL;
         [contentView unlockFocus];
 
         return YES;
-    };
+    }
 
     return NO;
-};
+}
 
 
 @end
@@ -95,6 +95,6 @@ typedef void *OSXDelegate2DHandle;
 DEL2D_FUNC(bool, blitToWindow)(OSXDelegate2DHandle delegate, unsigned char *buffer, int width, int height, int depth)
 {
     return [(OSXDelegate2D *) delegate blitToWindow:buffer width:width height:height depth:depth];
-};
+}
 
 #undef DEL2D_FUNC

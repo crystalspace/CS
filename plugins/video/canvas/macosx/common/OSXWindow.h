@@ -10,8 +10,6 @@
 
 
 @interface OSXWindow : NSWindow
-{
-}
 
 // Returns YES to indicate that the window can become key
 // Normal NSWindows cannot become key if they are borderless

@@ -21,8 +21,8 @@
 
 // Include the platform-specific driver classes.
 
-#if defined(OS_NEXT)		/* Must appear before OS_UNIX */
-#  include "cssys/next/NeXTSystemDriver.h"
+#if defined(OS_MACOSX)		/* Must appear before OS_UNIX */
+#  include "cssys/macosx/OSXSystemDriver.h"
 #elif defined(OS_UNIX)
 #  include "cssys/unix/unix.h"
 #elif defined(OS_WIN32)

@@ -10,8 +10,8 @@
 // This code must be callable from the ObjC delegate.  Since that uses the standard C compiler, it doesn't like
 // C++ classes, so we create a C API to some functions of this object
 
-#ifndef __CGDRIVER2D_H
-#define __CGDRIVER2D_H
+#ifndef __CGDRIVER2D_H__
+#define __CGDRIVER2D_H__
 
 
 #include "OSXDriver2D.h"
@@ -19,7 +19,7 @@
 
 #if defined(__cplusplus)
 
-#include "cssys/next/NeXTAssistant.h"
+#include "cssys/macosx/OSXAssistant.h"
 #include "video/canvas/common/graph2d.h"
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -64,6 +64,6 @@ protected:
     virtual void SetupDrawingFunctions();
 };
 
-#endif
+#endif // __cplusplus
 
-#endif
+#endif // __CGDRIVER2D_H__

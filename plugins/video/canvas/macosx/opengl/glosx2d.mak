@@ -1,10 +1,10 @@
 #==============================================================================
-# This is a MacOS X 2D graphics driver makefile that uses openGL to
+# This is a MacOS/X 2D graphics driver makefile that uses openGL to
 # do most of it's work
 # Copyright (C) 2001 by Matt Reda <mreda@mac.com>
 #==============================================================================
 
-DESCRIPTION.glosx2d = Crystal Space $(NEXT.DESCRIPTION) OpenGL 2D driver
+DESCRIPTION.glosx2d = Crystal Space MacOS/X OpenGL 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -31,18 +31,18 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-NEXT.SOURCE_GLOSX2D_PATHS = plugins/video/canvas/macosx/opengl plugins/video/canvas/macosx/common
-NEXT.HEADER_GLOSX2D_PATHS = $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_GLOSX2D_PATHS))
+MACOSX.SOURCE_GLOSX2D_PATHS = plugins/video/canvas/macosx/opengl plugins/video/canvas/macosx/common
+MACOSX.HEADER_GLOSX2D_PATHS = $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_GLOSX2D_PATHS))
 
 # Only add header search paths if actually building this plug-in or if
 # USE_PLUGINS=no, in which case this module might be built as the dependency
 # of some other module (rather than being built explicitly by the `glosx2d'
 # target).
 ifeq ($(USE_PLUGINS),no)
-  CFLAGS.INCLUDE += $(NEXT.HEADER_GLOSX2D_PATHS)
+  CFLAGS.INCLUDE += $(MACOSX.HEADER_GLOSX2D_PATHS)
 else
 ifeq ($(DO_GLOSX2D),yes)
-  CFLAGS.INCLUDE += $(NEXT.HEADER_GLOSX2D_PATHS)
+  CFLAGS.INCLUDE += $(MACOSX.HEADER_GLOSX2D_PATHS)
 endif
 endif
 
@@ -50,9 +50,6 @@ endif # ifeq ($(MAKESECTION),defines)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
-
-#vpath %.cpp $(NEXT.SOURCE_GLOSX2D_PATHS)
-#vpath %.m   $(NEXT.SOURCE_GLOSX2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
   GLOSX2D = $(OUTDLL)/glosx2d$(DLL)
@@ -66,10 +63,10 @@ else
 endif
 
 INC.GLOSX2D = $(wildcard $(INC.COMMON.DRV2D) $(INC.COMMON.DRV2D.OPENGL) \
-  $(addsuffix /*.h,$(NEXT.SOURCE_GLOSX2D_PATHS)))
+  $(addsuffix /*.h,$(MACOSX.SOURCE_GLOSX2D_PATHS)))
 SRC.GLOSX2D = $(wildcard $(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.OPENGL) \
-  $(addsuffix /*.cpp,$(NEXT.SOURCE_GLOSX2D_PATHS)) \
-  $(addsuffix /*.m,$(NEXT.SOURCE_GLOSX2D_PATHS)))
+  $(addsuffix /*.cpp,$(MACOSX.SOURCE_GLOSX2D_PATHS)) \
+  $(addsuffix /*.m,$(MACOSX.SOURCE_GLOSX2D_PATHS)))
 OBJ.GLOSX2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.GLOSX2D:.m=$O))))
 DEP.GLOSX2D = CSSYS CSUTIL
@@ -98,6 +95,9 @@ $(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.cpp
 $(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.m
 	$(DO.COMPILE.C) $(CFLAGS.GLOSX2D)
 
+$(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.mm
+	$(DO.COMPILE.MM) $(CFLAGS.GLOSX2D)
+
 $(GLOSX2D): $(OBJ.GLOSX2D) $(LIB.GLOSX2D)
 	$(DO.PLUGIN.PREAMBLE) $(DO.PLUGIN.CORE) $(LIB.GLOSX2D.OPENGL) $(DO.PLUGIN.POSTAMBLE)
 
@@ -109,7 +109,7 @@ glosx2dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/glosx2d.dep
 $(OUTOS)/glosx2d.dep: $(SRC.GLOSX2D)
-	$(DO.DEP1) $(CFLAGS.GLOSX2D) $(NEXT.HEADER_GLOSX2D_PATHS) $(DO.DEP2)
+	$(DO.DEP1) $(CFLAGS.GLOSX2D) $(MACOSX.HEADER_GLOSX2D_PATHS) $(DO.DEP2)
 else
 -include $(OUTOS)/glosx2d.dep
 endif

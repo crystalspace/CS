@@ -11,15 +11,15 @@
 // compiler, it doesn't like C++ classes, so we create a C API to some functions of
 // this object
 
-#ifndef __OSXDRIVER2D_H
-#define __OSXDRIVER2D_H
+#ifndef __OSXDRIVER2D_H__
+#define __OSXDRIVER2D_H__
 
 #if defined(__cplusplus)
 
 #include "OSXDelegate2D.h"
 
 #include "csgeom/csrect.h"
-#include "cssys/next/NeXTAssistant.h"
+#include "cssys/macosx/OSXAssistant.h"
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "plugins/video/canvas/common/graph2d.h"
@@ -64,7 +64,7 @@ public:
     virtual bool HandleEvent(iEvent &ev);
 
     // Dispatch an event to the assistant
-    inline void DispatchEvent(NeXTEvent ev, NeXTView view);
+    inline void DispatchEvent(OSXEvent ev, OSXView view);
 
     // Show/Hide the mouse
     virtual void HideMouse();
@@ -126,27 +126,26 @@ protected:
     OSXDelegate2D delegate;			// Delegate for ObjC stuff
     csGraphics2D *canvas;			// Canvas (parent class)
 
-    csRef<iNeXTAssistant> assistant;		// Assistant for dispatching events
+    csRef<iOSXAssistant> assistant;		// Assistant for dispatching events
     iObjectRegistry *objectReg;			// Object registry
 };
 
-#else
+#else // __cplusplus
 
 #define DRV2D_FUNC(ret, func) __private_extern__ inline ret OSXDriver2D_##func
 
 typedef void *OSXDriver2D;
-typedef void *NeXTEventHandle;
-typedef void *NeXTViewHandle;
+typedef void *OSXEventHandle;
+typedef void *OSXViewHandle;
 
 // C API to driver class
-DRV2D_FUNC(void, DispatchEvent)(OSXDriver2D driver, NeXTEventHandle ev, NeXTViewHandle view);
+DRV2D_FUNC(void, DispatchEvent)(OSXDriver2D driver, OSXEventHandle ev, OSXViewHandle view);
 DRV2D_FUNC(bool, Resize)(OSXDriver2D driver, int w, int h);
 DRV2D_FUNC(void, HideMouse)(OSXDriver2D driver);
 DRV2D_FUNC(void, ShowMouse)(OSXDriver2D driver);
 
 #undef DRV2D_FUNC
 
+#endif // __cplusplus
 
-#endif
-
-#endif
+#endif // __OSXDRIVER2D_H__

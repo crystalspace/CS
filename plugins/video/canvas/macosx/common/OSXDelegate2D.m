@@ -57,10 +57,10 @@
         trackingMouseTag = 0;
 
         driver = drv;
-    };
+    }
 
     return self;
-};
+}
 
 
 // dealloc
@@ -74,7 +74,7 @@
     [pausedTitle release];
 
     [super dealloc];
-};
+}
 
 
 // openWindow
@@ -101,7 +101,7 @@
         int dispWidth = CGDisplayPixelsWide(display);
         int dispHeight = CGDisplayPixelsHigh(display);
         rect = NSMakeRect((dispWidth - w) / 2, (dispHeight - h) / 2, w - 1, h - 1);
-    };
+    }
 
     // Create window with correct style
     style = [self getWindowStyleForMode:fs];
@@ -133,7 +133,7 @@
     [self startTrackingMouse];
 
     return YES;
-};
+}
 
 
 // setTitle
@@ -142,7 +142,7 @@
 {
     [self configureTitles:newTitle];
     [self adjustTitle];
-};
+}
 
 
 // setMouseCursor
@@ -154,7 +154,7 @@
     {
         [[NSCursor arrowCursor] set];
         hideMouse = NO;
-    };
+    }
 
     if (hideMouse == YES)
         OSXDriver2D_HideMouse(driver);
@@ -162,7 +162,7 @@
         OSXDriver2D_ShowMouse(driver);
 
     return !hideMouse;
-};
+}
 
 
 // startTrackingMouse
@@ -187,8 +187,8 @@
             OSXDriver2D_HideMouse(driver);
 
         trackingMouse = YES;
-    };
-};
+    }
+}
 
 
 // stopTrackingMouse
@@ -204,8 +204,8 @@
         [[window contentView] removeTrackingRect:trackingMouseTag];
 
         trackingMouse = NO;
-    };
-};
+    }
+}
 
 
 // mouseEntered
@@ -218,8 +218,8 @@
 
         if (hideMouse == YES)
             OSXDriver2D_HideMouse(driver);
-    };
-};
+    }
+}
 
 
 
@@ -230,8 +230,8 @@
     if ([ev trackingNumber] == trackingMouseTag)
     {
         [window setAcceptsMouseMovedEvents:NO];
-    };
-};
+    }
+}
 
 
 // closeWindow
@@ -244,8 +244,8 @@
 
         [window release];
         window = nil;
-    };
-};
+    }
+}
 
 
 
@@ -258,7 +258,7 @@
     {
         isPaused = !focused;
         [self adjustTitle];
-    };
+    }
     
     if (focused == NO)
     {
@@ -266,10 +266,9 @@
     }
     else
     {
-        
         [self startTrackingMouse];
     }
-};
+}
 
 
 // dispatchEvent
@@ -277,15 +276,13 @@
 - (void) dispatchEvent:(NSEvent *) ev forView:(NSView *) view
 {
     OSXDriver2D_DispatchEvent(driver, ev, view);
-};
+}
 
 @end
 
 
 
 @implementation OSXDelegate2D (PrivateMethods)
-
-
 
 // getWindowStyleForMode
 // fs windows use a different style than windowed mode - this function returns the correct type
@@ -298,7 +295,7 @@
         winStyle = NSTitledWindowMask | NSResizableWindowMask;
 
     return winStyle;
-};
+}
 
 
 // configureTitles
@@ -309,7 +306,7 @@
     [pausedTitle release];
     title = [[NSString alloc] initWithCString:newTitle];
     pausedTitle = [[title stringByAppendingString:@"  [Paused]"] retain];
-};
+}
 
 
 // adjustTitle
@@ -317,7 +314,7 @@
 - (void) adjustTitle
 {
     [window setTitle:(isPaused == YES) ? pausedTitle : title];
-};
+}
 
 
 // windowDidBecomeKey
@@ -325,7 +322,7 @@
 - (void) windowDidBecomeKey:(NSNotification *) notification
 {
     [self startTrackingMouse];
-};
+}
 
 
 // windowDidResignKey
@@ -333,7 +330,7 @@
 - (void) windowDidResignKey:(NSNotification *) notification
 {
     [self stopTrackingMouse];
-};
+}
 
 
 // windowWillResize
@@ -352,10 +349,10 @@
         NSRect rect = NSMakeRect(0, 0, contentSize.width - 1, contentSize.height - 1);
         newFrameRect = [NSWindow frameRectForContentRect:rect styleMask:style];
         return newFrameRect.size;
-    };
+    }
 
     return [window frame].size;
-};
+}
 
 
 // windowShouldClose
@@ -384,37 +381,36 @@ typedef void *OSXDriver2DHandle;
 DEL2D_FUNC(OSXDelegate2DHandle, new)(OSXDriver2DHandle drv)
 {
     return [[OSXDelegate2D alloc] initWithDriver:drv];
-};
+}
 
 DEL2D_FUNC(void, delete)(OSXDelegate2DHandle delegate)
 {
     [(OSXDelegate2D *) delegate release];
-};
+}
 
 DEL2D_FUNC(bool, openWindow)(OSXDelegate2DHandle delegate, char *title, int w, int h, int d, bool fs, CGDirectDisplayID display, int screen)
 {
     return [(OSXDelegate2D *) delegate openWindow:title width:w height:h depth:d fullscreen:fs onDisplay:display onScreen:screen];
-};
+}
 
 DEL2D_FUNC(void, closeWindow)(OSXDelegate2DHandle delegate)
 {
     [(OSXDelegate2D *) delegate closeWindow];
-};
+}
 
 DEL2D_FUNC(void, setTitle)(OSXDelegate2DHandle delegate, char *title)
 {
     [(OSXDelegate2D *) delegate setTitle:title];
-};
+}
 
 DEL2D_FUNC(BOOL, setMouseCursor)(OSXDelegate2DHandle delegate, csMouseCursorID cursor)
 {
     return [(OSXDelegate2D *) delegate setMouseCursor:cursor];
-};
+}
 
 DEL2D_FUNC(void, focusChanged)(OSXDelegate2DHandle delegate, BOOL focused, BOOL shouldPause)
 {
     [(OSXDelegate2D *) delegate focusChanged:focused shouldPause:shouldPause];
-};
+}
 
 #undef DEL2D_FUNC
-

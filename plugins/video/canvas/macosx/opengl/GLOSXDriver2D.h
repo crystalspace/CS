@@ -7,8 +7,8 @@
 //
 
 
-#ifndef __GLOSXDRIVER2D_H
-#define __GLOSXDRIVER2D_H
+#ifndef __GLOSXDRIVER2D_H__
+#define __GLOSXDRIVER2D_H__
 
 #include "OSXDriver2D.h"
 
@@ -16,7 +16,7 @@
 #if defined(__cplusplus)
 
 
-#include "cssys/next/NeXTAssistant.h"
+#include "cssys/macosx/OSXAssistant.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 
 #include "OSXDelegate2D_OpenGL.h"
@@ -69,8 +69,6 @@ protected:
     CGLContextObj context;
 };
 
+#endif // __cplusplus
 
-#endif
-
-
-#endif
+#endif // __GLOSXDRIVER2D_H__

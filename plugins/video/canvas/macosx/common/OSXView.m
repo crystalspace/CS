@@ -7,9 +7,7 @@
 //
 
 #import "OSXView.h"
-
 #import "OSXDelegate2D.h"
-
 
 
 @implementation OSXView
@@ -26,7 +24,7 @@
     };
     
     return self;
-};
+}
 
 
 // dealloc
@@ -35,7 +33,7 @@
 {
     [delegate release];
     [super dealloc];
-};
+}
 
 // Set the delegate
 - (void) setDelegate:(OSXDelegate2D *) inDelegate
@@ -43,7 +41,7 @@
     [inDelegate retain];
     [delegate release];
     delegate = inDelegate;
-};
+}
 
 
 // acceptsFirstResponder
@@ -51,7 +49,7 @@
 - (BOOL) acceptsFirstResponder
 {
     return YES;
-};
+}
 
 
 // Events
@@ -59,52 +57,52 @@
 - (void) keyDown:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) keyUp:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) flagsChanged:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) mouseMoved:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) mouseDown:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) mouseUp:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) mouseDragged:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) rightMouseDown:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) rightMouseUp:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) rightMouseDragged:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) otherMouseDown:(NSEvent *) ev
 {
@@ -114,12 +112,11 @@
 - (void) otherMouseUp:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
+}
 
 - (void) otherMouseDragged:(NSEvent *) ev
 {
     [delegate dispatchEvent:ev forView:self];
-};
-
+}
 
 @end

@@ -1,5 +1,5 @@
 // casnddrv.cpp
-// CoreAudio (MacOS X) Sound Driver for Crystal Space
+// CoreAudio (MacOS/X) Sound Driver for Crystal Space
 //
 // Created by mreda on Sun Nov 11 2001.
 // Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -15,23 +15,23 @@
 #include "casnddrv.h"
 
 
-
 #define SAMPLES_PER_BUFFER (8 * 1024)
 
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY(csSoundDriverCoreAudio);
+SCF_IMPLEMENT_FACTORY(csSoundDriverCoreAudio)
 
 SCF_EXPORT_CLASS_TABLE(casnddrv)
-	SCF_EXPORT_CLASS (csSoundDriverCoreAudio, "crystalspace.sound.driver.coreaudio",
-                            "Crystal Space CoreAudio Sound driver for MacOS X")
+    SCF_EXPORT_CLASS (csSoundDriverCoreAudio,
+	"crystalspace.sound.driver.coreaudio",
+	"Crystal Space CoreAudio sound driver for MacOS/X")
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundDriverCoreAudio)
     SCF_IMPLEMENTS_INTERFACE(iSoundDriver)
     SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE(csSoundDriverCoreAudio::eiComponent)
     SCF_IMPLEMENTS_INTERFACE(iComponent)
@@ -63,7 +63,7 @@ csSoundDriverCoreAudio::csSoundDriverCoreAudio(iBase *base)
 // Destructor
 csSoundDriverCoreAudio::~csSoundDriverCoreAudio()
 {
-    if (isPlaying == true)
+    if (isPlaying)
         Close();
 }
 
@@ -133,7 +133,7 @@ bool csSoundDriverCoreAudio::Open(iSoundRender *render, int freq, bool bit16, bo
 // Stop playback and clean up
 void csSoundDriverCoreAudio::Close()
 {
-    if (isPlaying == true)
+    if (isPlaying)
     {
         OSStatus status;
         status = AudioDeviceStop(audioDevice, AudioProc);
@@ -216,7 +216,7 @@ void csSoundDriverCoreAudio::CreateSamples(float *buffer)
     float scaleFactor = 1.0f / SHRT_MAX;
     for (int i = 0; i < SAMPLES_PER_BUFFER; i++)
         buffer[i] = memory[i] * scaleFactor;
-};
+}
 
 
 
@@ -232,5 +232,4 @@ static OSStatus AudioProc(AudioDeviceID inDevice, const AudioTimeStamp *inNow, c
     driver->CreateSamples(buffer);
 
     return 0;
-};
-
+}

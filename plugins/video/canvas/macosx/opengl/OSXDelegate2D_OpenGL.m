@@ -24,7 +24,7 @@
 - (CGLContextObj) getCGLContext
 {
     return _contextAuxiliary;
-};
+}
 
 @end
 
@@ -81,13 +81,13 @@ NSOpenGLContext *context;
 
         // Bind context
         [context setView:[window contentView]];
-    };
+    }
 
     // Make the context we created be the current GL context
     [context makeCurrentContext];
 
     return [context getCGLContext];
-};
+}
 
 
 // updateOpenGLContext
@@ -102,7 +102,7 @@ NSOpenGLContext *context;
     [context setView:[window contentView]];
     [context makeCurrentContext];
     [context update];
-};
+}
 
 
 // Need to update the OpenGL context when the window is resized
@@ -111,7 +111,7 @@ NSOpenGLContext *context;
 - (void) windowResized:(NSNotification *) notification
 {
     [[NSOpenGLContext currentContext] update];
-};
+}
 
 
 
@@ -129,12 +129,12 @@ DEL2D_FUNC(CGLContextObj, createOpenGLContext)(OSXDelegate2DHandle delegate, int
                                                 CGDirectDisplayID display)
 {
     return [(OSXDelegate2D *) delegate createOpenGLContext:depth display:display];
-};
+}
 
 DEL2D_FUNC(void, updateOpenGLContext)(OSXDelegate2DHandle delegate)
 {
     [(OSXDelegate2D *) delegate updateOpenGLContext];
-};
+}
 
 
 #undef DEL2D_FUNC
