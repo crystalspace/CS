@@ -1387,7 +1387,7 @@ csMeshWrapper* CreatePortalThing (const char* name, csSector* room,
   return thing;
 }
 
-void OpenPortal (csView* view, char* lev)
+void OpenPortal (iLoaderNew *LevelLoader, csView* view, char* lev)
 {
   csSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));
@@ -1405,7 +1405,7 @@ void OpenPortal (csView* view, char* lev)
     char buf[255];
     sprintf (buf, "/lev/%s", lev);
     Sys->VFS->ChDir (buf);
-    csLoader::AppendMapFile (Sys->engine, "world");
+    LevelLoader->AppendMapFile ("world");
     Sys->engine->GetCurrentRegion ()->Prepare ();
   }
 

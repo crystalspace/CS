@@ -1204,7 +1204,7 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
 void WalkTest::LoadLibraryData(void)
 {
   // Load the "standard" library
-  csLoader::LoadLibraryFile (engine, "/lib/std/library");
+  LevelLoader->LoadLibraryFile ("/lib/std/library");
 }
 
 void WalkTest::Inititalize2DTextures ()
@@ -1457,7 +1457,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     }
 
     // Load the map from the file.
-    if (!csLoader::LoadMapFile (engine, "world"))
+    if (!LevelLoader->LoadMapFile ("world"))
     {
       Printf (MSG_FATAL_ERROR, "Loading of map failed!\n");
       return false;

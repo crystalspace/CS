@@ -1214,8 +1214,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char level[100];
       ScanStr (arg, "%s", level);
-      void OpenPortal (csView* view, char* lev);
-      OpenPortal (Sys->view, level);
+      void OpenPortal (iLoaderNew*, csView* view, char* lev);
+      OpenPortal (Sys->LevelLoader, Sys->view, level);
     }
     else
       Sys->Printf (MSG_CONSOLE, "Expected parameter 'level'!\n");

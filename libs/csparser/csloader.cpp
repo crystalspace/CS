@@ -65,13 +65,6 @@
 
 #include "iterrain/ddg.h"
 
-/// The engine we are currently processing
-static csEngine* Engine;
-/// Loader flags
-static int flags = 0;
-/// If true the we only load in the current region
-bool onlyRegion = false;
-
 //---------------------------------------------------------------------------
 
 class csLoaderStat
@@ -314,17 +307,17 @@ bool csLoader::load_color (char *buf, csRGBcolor &c)
 
 csMaterialWrapper *csLoader::FindMaterial (const char *iName, bool onlyRegion)
 {
-  csMaterialWrapper *mat = Engine->FindCsMaterial (iName, onlyRegion);
+  csMaterialWrapper *mat = Engine->GetCsEngine()->FindCsMaterial (iName, onlyRegion);
   if (mat)
     return mat;
 
-  csTextureWrapper *tex = Engine->FindCsTexture (iName, onlyRegion);
+  csTextureWrapper *tex = Engine->GetCsEngine()->FindCsTexture (iName, onlyRegion);
   if (tex)
   {
     // Add a default material with the same name as the texture
     csMaterial *material = new csMaterial ();
     material->SetTextureWrapper (tex);
-    csMaterialWrapper *mat = Engine->GetMaterials ()->NewMaterial (material);
+    csMaterialWrapper *mat = Engine->GetCsEngine()->GetMaterials ()->NewMaterial (material);
     mat->SetName (iName);
     material->DecRef ();
     return mat;
@@ -351,7 +344,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
   long cmd;
   char* params;
 
-  csCollection* collection = new csCollection (Engine);
+  csCollection* collection = new csCollection (Engine->GetCsEngine());
   collection->SetName (name);
 
   char str[255];
@@ -386,7 +379,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_LIGHT:
         {
           ScanStr (params, "%s", str);
-	  csStatLight* l = Engine->FindLight (str);
+	  csStatLight* l = Engine->GetCsEngine()->FindLight (str);
           if (!l)
             CsPrintf (MSG_WARNING, "Light '%s' not found!\n", str);
 	  else
@@ -409,7 +402,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
         {
           ScanStr (params, "%s", str);
 	  //@@@$$$ TODO: Collection in regions.
-          csCollection* th = (csCollection*)Engine->collections.FindByName (str);
+          csCollection* th = (csCollection*)Engine->GetCsEngine()->collections.FindByName (str);
           if (!th)
           {
             CsPrintf (MSG_FATAL_ERROR, "Collection '%s' not found!\n", str);
@@ -647,8 +640,6 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 
 void csLoader::txt_process (char *name, char* buf)
 {
-  if (!GlobalLoader) return;
-
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (FILTER)
@@ -734,7 +725,7 @@ void csLoader::txt_process (char *name, char* buf)
   // the 3D or 2D driver... if the texture is used for 2D only, it can
   // not have power-of-two dimensions...
 
-  iTextureWrapper *tex = GlobalLoader->LoadTexture (name, filename, flags);
+  iTextureWrapper *tex = LoadTexture (name, filename, flags);
   if (tex && do_transp)
     tex->GetPrivateObject()->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
@@ -764,7 +755,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
       case CS_TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
-        csTextureWrapper *texh = Engine->FindCsTexture (str, onlyRegion);
+        csTextureWrapper *texh = Engine->GetCsEngine()->FindCsTexture (str, onlyRegion);
         if (texh)
           material->SetTextureWrapper (texh);
         else
@@ -798,7 +789,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
     fatal_exit (0, false);
   }
 
-  csMaterialWrapper *mat = Engine->GetMaterials ()->NewMaterial (material);
+  csMaterialWrapper *mat = Engine->GetCsEngine()->GetMaterials ()->NewMaterial (material);
   if (prefix)
   {
     char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
@@ -836,7 +827,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   bool do_culler = false;
   char bspname[100];
 
-  csSector* sector = new csSector (Engine) ;
+  csSector* sector = new csSector (Engine->GetCsEngine()) ;
   sector->SetName (secname);
 
   csLoaderStat::sectors_loaded++;
@@ -864,10 +855,10 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case CS_TOKEN_MESHOBJ:
         {
-          csMeshWrapper* sp = new csMeshWrapper (Engine);
+          csMeshWrapper* sp = new csMeshWrapper (Engine->GetCsEngine());
           sp->SetName (name);
           LoadMeshObject (sp, params, sector);
-          Engine->meshes.Push (sp);
+          Engine->GetCsEngine()->meshes.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
         }
@@ -876,7 +867,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         {
           csTerrainWrapper *pWrapper = new csTerrainWrapper (Engine);
           pWrapper->SetName (name);
-          Engine->terrains.Push (pWrapper);
+          Engine->GetCsEngine()->terrains.Push (pWrapper);
           LoadTerrainObject (pWrapper, params, sector);
         }
         break;
@@ -939,9 +930,9 @@ static void ResolvePortalSectors (csEngine* Engine, bool onlyRegion,
   }
 }
 
-bool csLoader::LoadMap (char* buf, bool onlyRegion)
+bool csLoader::LoadMap (char* buf, bool iOnlyRegion)
 {
-  ::onlyRegion = onlyRegion;
+  onlyRegion = iOnlyRegion;
 
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (WORLD)
@@ -992,7 +983,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
       switch (cmd)
       {
         case CS_TOKEN_RENDERPRIORITIES:
-	  Engine->ClearRenderPriorities ();
+	  Engine->GetCsEngine()->ClearRenderPriorities ();
 	  LoadRenderPriorities (params);
 	  break;
         case CS_TOKEN_ADDON:
@@ -1019,12 +1010,12 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
 	  break;
         case CS_TOKEN_MESHFACT:
           {
-            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->mesh_factories.FindByName (name);
+            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->GetCsEngine()->mesh_factories.FindByName (name);
             if (!t)
             {
               t = new csMeshFactoryWrapper ();
               t->SetName (name);
-              Engine->mesh_factories.Push (t);
+              Engine->GetCsEngine()->mesh_factories.Push (t);
             }
             LoadMeshObjectFactory (t, params);
           }
@@ -1032,12 +1023,12 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
         case CS_TOKEN_TERRAINFACTORY:
           {
             csTerrainFactoryWrapper* pWrapper =(csTerrainFactoryWrapper*)
-	  	Engine->terrain_factories.FindByName( name );
+	  	Engine->GetCsEngine()->terrain_factories.FindByName( name );
             if (!pWrapper)
             {
               pWrapper = new csTerrainFactoryWrapper ();
               pWrapper->SetName( name );
-              Engine->terrain_factories.Push (pWrapper);
+              Engine->GetCsEngine()->terrain_factories.Push (pWrapper);
             }
             LoadTerrainObjectFactory (pWrapper, params);
           }
@@ -1047,17 +1038,17 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
 	    char str[255];
 	    ScanStr (params, "%s", str);
 	    if (*str)
-	      Engine->SelectRegion (str);
+	      Engine->GetCsEngine()->SelectRegion (str);
 	    else
-	      Engine->SelectRegion (NULL);
+	      Engine->GetCsEngine()->SelectRegion (NULL);
 	  }
 	  break;
         case CS_TOKEN_SECTOR:
           if (!Engine->FindSector (name, onlyRegion))
-            Engine->sectors.Push (load_sector (name, params));
+            Engine->GetCsEngine()->sectors.Push (load_sector (name, params));
           break;
         case CS_TOKEN_COLLECTION:
-          Engine->collections.Push (load_collection (name, params));
+          Engine->GetCsEngine()->collections.Push (load_collection (name, params));
           break;
 	case CS_TOKEN_MAT_SET:
           if (!LoadMaterials (params, name))
@@ -1080,19 +1071,19 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
             return false;
           break;
         case CS_TOKEN_LIBRARY:
-          LoadLibraryFile (Engine, name);
+          LoadLibraryFile (name);
           break;
         case CS_TOKEN_START:
         {
           char start_sector [100];
           csVector3 pos (0, 0, 0);
           ScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
-          Engine->camera_positions.Push (new csCameraPosition ("Start",
+          Engine->GetCsEngine()->camera_positions.Push (new csCameraPosition ("Start",
             start_sector, pos, csVector3 (0, 0, 1), csVector3 (0, 1, 0)));
           break;
         }
         case CS_TOKEN_KEY:
-          load_key (params, Engine);
+          load_key (params, Engine->GetCsEngine());
           break;
       }
     }
@@ -1103,13 +1094,13 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     }
   }
 
-  int sn = Engine->sectors.Length ();
+  int sn = Engine->GetCsEngine()->sectors.Length ();
   csRegion* cur_region = NULL;
-  if (onlyRegion) cur_region = Engine->GetCsCurrentRegion ();
+  if (onlyRegion) cur_region = Engine->GetCsEngine()->GetCsCurrentRegion ();
   while (sn > 0)
   {
     sn--;
-    csSector* s = (csSector*)(Engine->sectors)[sn];
+    csSector* s = (csSector*)(Engine->GetCsEngine()->sectors)[sn];
     if (cur_region && !cur_region->IsInRegion (s))
       continue;
     int st = s->GetNumberMeshes ();
@@ -1122,7 +1113,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
       iThing* ith = QUERY_INTERFACE (ps->GetMeshObject (), iThing);
       if (ith)
       {
-        ResolvePortalSectors (Engine, onlyRegion, ith->GetPrivateObject ());
+        ResolvePortalSectors (Engine->GetCsEngine(), onlyRegion, ith->GetPrivateObject ());
 	ith->DecRef ();
       }
     }
@@ -1131,17 +1122,14 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
   return true;
 }
 
-bool csLoader::LoadMapFile (csEngine* engine, const char* file)
+bool csLoader::LoadMapFile (const char* file)
 {
-  engine->StartEngine ();
-  return AppendMapFile (engine, file);
+  Engine->GetCsEngine()->StartEngine ();
+  return AppendMapFile (file);
 }
 
-bool csLoader::AppendMapFile (csEngine* engine, const char* file,
-	bool onlyRegion)
+bool csLoader::AppendMapFile (const char* file, bool onlyRegion)
 {
-  Engine = engine;
-
   csLoaderStat::Init ();
 
   iDataBuffer *buf = System->VFS->ReadFile (file);
@@ -1347,12 +1335,12 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_MESHFACT:
           {
-            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->mesh_factories.FindByName (name);
+            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->GetCsEngine()->mesh_factories.FindByName (name);
             if (!t)
             {
               t = new csMeshFactoryWrapper ();
               t->SetName (name);
-              Engine->mesh_factories.Push (t);
+              Engine->GetCsEngine()->mesh_factories.Push (t);
             }
             LoadMeshObjectFactory (t, params);
           }
@@ -1368,7 +1356,7 @@ bool csLoader::LoadLibrary (char* buf)
   return true;
 }
 
-bool csLoader::LoadLibraryFile (csEngine* engine, const char* fname)
+bool csLoader::LoadLibraryFile (const char* fname)
 {
   iDataBuffer *buf = System->VFS->ReadFile (fname);
 
@@ -1379,7 +1367,6 @@ bool csLoader::LoadLibraryFile (csEngine* engine, const char* fname)
     return false;
   }
 
-  Engine = engine;
   bool retcode = LoadLibrary (**buf);
 
   buf->DecRef ();
@@ -1425,13 +1412,13 @@ bool csLoader::LoadSounds (char* buf)
           CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
           fatal_exit (0, false);
         }
-        iSoundHandle *snd = csSoundDataObject::GetSound (*Engine, name);
+        iSoundHandle *snd = csSoundDataObject::GetSound (*Engine->GetCsEngine(), name);
         if (!snd)
         {
-          csSoundDataObject *s = GlobalLoader->LoadSound(name, filename);
+          csSoundDataObject *s = LoadSound(name, filename);
           if (s)
           {
-            Engine->ObjAdd(s);
+            Engine->GetCsEngine()->ObjAdd(s);
             csLoaderStat::sounds_loaded++;
           }
         }
@@ -1451,7 +1438,6 @@ bool csLoader::LoadSounds (char* buf)
 //---------------------------------------------------------------------------
 
 // @@@ MEMORY LEAK!!! We should unload all the plugins we load here.
-csLoader::csLoadedPluginVector csLoader::loaded_plugins;
 
 iPlugIn* csLoader::csLoadedPluginVector::FindPlugIn (const char* name,
 	const char* classID)
@@ -1479,15 +1465,15 @@ csLoader::LoadedPlugin::~LoadedPlugin ()
 { 
   delete [] short_name; 
   delete [] name; 
-  if (plugin) plugin->DecRef (); 
+  if (plugin) {
+    System->UnloadPlugIn(plugin);
+    plugin->DecRef ();
+  }
 }                                                                                  
 //---------------------------------------------------------------------------
 
-csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
-	const char* fname)
+csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 {
-  Engine = engine;
-
   iDataBuffer *databuff = System->VFS->ReadFile (fname);
 
   if (!databuff || !databuff->GetSize ())
@@ -1517,7 +1503,7 @@ csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
     tmpl->SetName (name);
     if (LoadMeshObjectFactory (tmpl, data))
     {
-      Engine->mesh_factories.Push (tmpl);
+      Engine->GetCsEngine()->mesh_factories.Push (tmpl);
       databuff->DecRef ();
       return tmpl;
     }
@@ -1569,7 +1555,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	}
 	else
 	{
-	  iBase* mof = plug->Parse (params, csEngine::current_iengine,
+	  iBase* mof = plug->Parse (params, Engine,
 	  	&(stemp->scfiMeshFactoryWrapper));
 	  if (!mof)
 	  {
@@ -1841,7 +1827,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (params, csEngine::current_iengine,
+	  iBase* mo = plug->Parse (params, Engine,
 	  	&(mesh->scfiMeshWrapper));
 	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
 	  mesh->SetMeshObject (mo2);
@@ -1873,7 +1859,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
   }
 
   if (!priority[0]) strcpy (priority, "object");
-  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+  mesh->SetRenderPriority (Engine->GetCsEngine()->GetRenderPriority (priority));
 
   return true;
 }
@@ -1920,7 +1906,7 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper,
           // Use the plugin to parse through the parameters the engine is
 	  // passed also a pointer to the factory is returned.
 	  iBase *pBaseFactory = iPlugIn->Parse (params,
-	  	csEngine::current_iengine,
+	  	Engine,
 		&(pWrapper->scfiTerrainFactoryWrapper));
           // If we couldn't get the factory leave.
 	  if (!pBaseFactory)
@@ -2013,7 +1999,7 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper,
           // Use the plugin to parse through the parameters the engine
 	  // is passed also a pointer to the factory is returned.
 	  iBase *iBaseObject = iPlugIn->Parse (params,
-	  	csEngine::current_iengine, &(pWrapper->scfiTerrainWrapper));
+	  	Engine, &(pWrapper->scfiTerrainWrapper));
           // if we couldn't get the factory leave
 	  if (!iBaseObject)
 	  {
@@ -2097,7 +2083,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
 	}
 	else
 	{
-	  plug->Parse (params, csEngine::current_iengine, context);
+	  plug->Parse (params, Engine, context);
 	}
         break;
 
@@ -2168,7 +2154,7 @@ bool csLoader::LoadRenderPriorities (char* buf)
 Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
 	  fatal_exit (0, false);
 	}
-	Engine->RegisterRenderPriority (name, pri);
+	Engine->GetCsEngine()->RegisterRenderPriority (name, pri);
         break;
       }
     }
@@ -2186,10 +2172,8 @@ Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
 
 //---------------------------------------------------------------------------
 
-csMeshWrapper * csLoader::LoadMeshObject (csEngine* engine, const char* fname)
+csMeshWrapper * csLoader::LoadMeshObject (const char* fname)
 {
-  Engine = engine;
-
   iDataBuffer *databuff = System->VFS->ReadFile (fname);
 
   if (!databuff || !databuff->GetSize ())
@@ -2215,7 +2199,7 @@ csMeshWrapper * csLoader::LoadMeshObject (csEngine* engine, const char* fname)
       fatal_exit (0, false);
     }
 
-    csMeshWrapper* sp = new csMeshWrapper (Engine);
+    csMeshWrapper* sp = new csMeshWrapper (Engine->GetCsEngine());
     sp->SetName (name);
     LoadMeshObject (sp, buf, NULL);
     return sp;
@@ -2226,10 +2210,8 @@ csMeshWrapper * csLoader::LoadMeshObject (csEngine* engine, const char* fname)
 
 //---------------------------------------------------------------------------
 
-iMotion* csLoader::LoadMotion (csEngine* engine, const char* fname)
+iMotion* csLoader::LoadMotion (const char* fname)
 {
-  Engine = engine;
-
   iDataBuffer *databuff = System->VFS->ReadFile (fname);
 
   if (!databuff || !databuff->GetSize ())
@@ -2381,8 +2363,6 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
 
 //--- Plugin stuff -----------------------------------------------------------
 
-iLoaderNew *csLoader::GlobalLoader = NULL;
-
 IMPLEMENT_IBASE(csLoader);
   IMPLEMENTS_INTERFACE(iLoaderNew);
   IMPLEMENTS_INTERFACE(iPlugIn);
@@ -2402,24 +2382,23 @@ csLoader::csLoader(iBase *p)
 {
   CONSTRUCT_IBASE(p);
 
-  tmpWrap.VFS = NULL;
-  tmpWrap.ImageLoader = NULL;
-  tmpWrap.SoundLoader = NULL;
-  tmpWrap.Engine = NULL;
+  VFS = NULL;
+  ImageLoader = NULL;
+  SoundLoader = NULL;
+  Engine = NULL;
 
-  GlobalLoader = this;
+  flags = 0;
+  onlyRegion = false;
 }
 
 csLoader::~csLoader()
 {
-  DEC_REF(tmpWrap.VFS);
-  DEC_REF(tmpWrap.ImageLoader);
-  DEC_REF(tmpWrap.SoundLoader);
-  DEC_REF(tmpWrap.Engine);
-  DEC_REF(tmpWrap.G3D);
-  DEC_REF(tmpWrap.SoundRender);
-
-  GlobalLoader = NULL;
+  DEC_REF(VFS);
+  DEC_REF(ImageLoader);
+  DEC_REF(SoundLoader);
+  DEC_REF(Engine);
+  DEC_REF(G3D);
+  DEC_REF(SoundRender);
 }
 
 #define GET_PLUGIN(var, func, intf, msgname)		\
@@ -2428,21 +2407,20 @@ csLoader::~csLoader()
     System->Printf(MSG_INITIALIZATION,			\
       "  Failed to query "msgname" plug-in.\n");	\
 
-
 bool csLoader::Initialize(iSystem *System)
 {
   System->Printf(MSG_INITIALIZATION, "Initializing loader plug-in...\n");
 
   // get the virtual file system plugin
-  GET_PLUGIN(tmpWrap.VFS, CS_FUNCID_VFS, iVFS, "VFS");
-  if (!tmpWrap.VFS) return false;
+  GET_PLUGIN(VFS, CS_FUNCID_VFS, iVFS, "VFS");
+  if (!VFS) return false;
 
   // get all optional plugins
-  GET_PLUGIN(tmpWrap.ImageLoader, CS_FUNCID_IMGLOADER, iImageLoader, "image loader");
-  GET_PLUGIN(tmpWrap.SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader");
-  GET_PLUGIN(tmpWrap.Engine, CS_FUNCID_ENGINE, iEngine, "engine");
-  GET_PLUGIN(tmpWrap.G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");
-  GET_PLUGIN(tmpWrap.SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver");
+  GET_PLUGIN(ImageLoader, CS_FUNCID_IMGLOADER, iImageLoader, "image loader");
+  GET_PLUGIN(SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader");
+  GET_PLUGIN(Engine, CS_FUNCID_ENGINE, iEngine, "engine");
+  GET_PLUGIN(G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");
+  GET_PLUGIN(SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver");
 
   return true;
 }
@@ -2451,18 +2429,18 @@ bool csLoader::Initialize(iSystem *System)
 
 iImage* csLoader::LoadImage (const char* name)
 {
-  if (!tmpWrap.ImageLoader)
+  if (!ImageLoader)
      return NULL;
 
   int Format;
-  if (tmpWrap.Engine) {
-    Format = tmpWrap.Engine->GetTextureFormat ();
-  } else if (tmpWrap.G3D) {
-    Format = tmpWrap.G3D->GetTextureManager()->GetTextureFormat();
+  if (Engine) {
+    Format = Engine->GetTextureFormat ();
+  } else if (G3D) {
+    Format = G3D->GetTextureManager()->GetTextureFormat();
   } else return NULL;
 
   iImage *ifile = NULL;
-  iDataBuffer *buf = tmpWrap.VFS->ReadFile (name);
+  iDataBuffer *buf = VFS->ReadFile (name);
 
   if (!buf || !buf->GetSize ())
   {
@@ -2471,7 +2449,7 @@ iImage* csLoader::LoadImage (const char* name)
     return NULL;
   }
 
-  ifile = tmpWrap.ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
+  ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
   buf->DecRef ();
 
   if (!ifile)
@@ -2480,7 +2458,7 @@ iImage* csLoader::LoadImage (const char* name)
     return NULL;
   }
 
-  iDataBuffer *xname = tmpWrap.VFS->ExpandPath (name);
+  iDataBuffer *xname = VFS->ExpandPath (name);
   ifile->SetName (**xname);
   xname->DecRef ();
 
@@ -2489,14 +2467,14 @@ iImage* csLoader::LoadImage (const char* name)
 
 iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags)
 {
-  if (!tmpWrap.G3D)
+  if (!G3D)
     return NULL;
 
   iImage *Image = LoadImage(fname);
   if (!Image)
     return NULL;
 
-  iTextureHandle *TexHandle = tmpWrap.G3D->GetTextureManager()->
+  iTextureHandle *TexHandle = G3D->GetTextureManager()->
     RegisterTexture (Image, Flags);
   if (!TexHandle)
     System->Printf(MSG_WARNING, "cannot create texture from '%s'.", fname);
@@ -2506,21 +2484,21 @@ iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags)
 
 iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname, int flags)
 {
-  if (!tmpWrap.Engine)
+  if (!Engine)
     return NULL;
   
   iTextureHandle *TexHandle = LoadTexture(fname, flags);
   if (!TexHandle)
     return NULL;
 
-  csTextureWrapper *TexWrapper = tmpWrap.Engine->GetCsEngine()->
+  csTextureWrapper *TexWrapper = Engine->GetCsEngine()->
     GetTextures()->NewTexture(TexHandle);
   TexWrapper->SetName (name);
 
   csMaterial *Material = new csMaterial ();
   Material->SetTextureWrapper (TexWrapper);
 
-  iMaterialWrapper *MatWrapper = tmpWrap.Engine->GetMaterialList()->
+  iMaterialWrapper *MatWrapper = Engine->GetMaterialList()->
     NewMaterial (Material);
   MatWrapper->GetPrivateObject()->SetName (name);
   Material->DecRef ();
@@ -2531,11 +2509,11 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname, int
 //--- Sound Loading ---------------------------------------------------------
 
 iSoundData *csLoader::LoadSoundData(const char* filename) {
-  if (!tmpWrap.VFS || !tmpWrap.SoundLoader)
+  if (!VFS || !SoundLoader)
     return NULL;
 
   // read the file data
-  iDataBuffer *buf = tmpWrap.VFS->ReadFile (filename);
+  iDataBuffer *buf = VFS->ReadFile (filename);
   if (!buf || !buf->GetSize ()) {
     if (buf) buf->DecRef ();
     System->Printf (MSG_WARNING,
@@ -2544,7 +2522,7 @@ iSoundData *csLoader::LoadSoundData(const char* filename) {
   }
 
   // load the sound
-  iSoundData *Sound = tmpWrap.SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ());
+  iSoundData *Sound = SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ());
   buf->DecRef ();
 
   // check for valid sound data
@@ -2555,14 +2533,14 @@ iSoundData *csLoader::LoadSoundData(const char* filename) {
 }
 
 iSoundHandle *csLoader::LoadSound(const char* filename) {
-  if (!tmpWrap.SoundRender)
+  if (!SoundRender)
     return NULL;
 
   iSoundData *Sound = LoadSoundData(filename);
   if (!Sound) return NULL;
 
   /* register the sound */
-  iSoundHandle *hdl = tmpWrap.SoundRender->RegisterSound(Sound);
+  iSoundHandle *hdl = SoundRender->RegisterSound(Sound);
   if (!hdl)
     System->Printf (MSG_WARNING, "Cannot register sound \"%s\"!\n", filename);
 

@@ -29,6 +29,8 @@ struct iTextureWrapper;
 struct iSoundData;
 struct iSoundHandle;
 class csSoundDataObject;
+class csMeshFactoryWrapper;
+class csMeshWrapper;
 
 SCF_VERSION (iLoader, 0, 0, 1);
 
@@ -64,6 +66,9 @@ SCF_VERSION (iLoaderNew, 0, 0, 1);
  */
 struct iLoaderNew : public iPlugIn
 {
+  /// Set loader mode (see CS_LOADER_XXX flags above)
+  virtual void SetMode (int iFlags) = 0;
+
   /// Load an image file
   virtual iImage *LoadImage (const char* Filename) = 0;
   /**
@@ -87,6 +92,27 @@ struct iLoaderNew : public iPlugIn
   virtual iSoundHandle *LoadSound (const char *fname) = 0;
   /// Load a sound file, register the sound and create a wrapper object for it
   virtual csSoundDataObject *LoadSound (const char *name, const char *fname) = 0;
+
+  /// Load map file into engine.
+  virtual bool LoadMapFile (const char* filename) = 0;
+  /**
+   * Merge map file into engine (i.e. don't clear the current engine
+   * contents first). If 'onlyRegion' is true then portals will only
+   * connect to the sectors in the current region, things will only use
+   * thing templates defined in the current region and meshes will
+   * only use mesh factories defined in the current region.
+   */
+  virtual bool AppendMapFile (const char* filename, bool onlyRegion = true) = 0;
+  /// Load library from a VFS file
+  virtual bool LoadLibraryFile (const char* filename) = 0;
+
+  /// Load a Mesh Object Factory from the map file.
+  virtual csMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname) = 0;
+  /**
+   * Load a mesh object from a file.
+   * The mesh object is not automatically added to the engine and sector.
+   */
+  virtual csMeshWrapper* LoadMeshObject (const char* fname) = 0;
 };
 
 #endif // __IMAP_PARSER_H__

@@ -117,160 +117,129 @@ class csLoader : public iLoaderNew
       { Push (new LoadedPlugin (short_name, name, plugin)); }
   };
   
-  static csLoadedPluginVector loaded_plugins;
+  /// List of loaded plugins
+  csLoadedPluginVector loaded_plugins;
+  /// Loader flags
+  int flags;
+  /// If true the we only load in the current region
+  bool onlyRegion;
   
   /// Parse a matrix definition
-  static bool load_matrix (char* buf, csMatrix3 &m);
+  bool load_matrix (char* buf, csMatrix3 &m);
   /// Parse a vector definition
-  static bool load_vector (char* buf, csVector3 &v);
+  bool load_vector (char* buf, csVector3 &v);
   /// Parse a quaternion definition
-  static bool load_quaternion (char* buf, csQuaternion &q);
+  bool load_quaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
-  static bool load_color (char *buf, csRGBcolor &c);
+  bool load_color (char *buf, csRGBcolor &c);
   /// Parse a collection definition and return a new object
-  static csCollection* load_collection (char* name, char* buf);
+  csCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object
-  static csStatLight* load_statlight (char* name, char* buf);
+  csStatLight* load_statlight (char* name, char* buf);
   /// Parse a key definition and return a new object
-  static csKeyValuePair* load_key (char* buf, csObject* pParent);
+  csKeyValuePair* load_key (char* buf, csObject* pParent);
   /// Parse a map node definition and return a new object
-  static csMapNode* load_node (char* name, char* buf, csSector* sec);
+  csMapNode* load_node (char* name, char* buf, csSector* sec);
 
   /// Parse and load a single texture
-  static void txt_process (char *name, char* buf);
+  void txt_process (char *name, char* buf);
   /// Parse and load a single material
-  static void mat_process (char *name, char* buf, const char* prefix = NULL);
+  void mat_process (char *name, char* buf, const char* prefix = NULL);
 
   /// Parse a sector definition and return a new object
-  static csSector* load_sector (char* secname, char* buf);
+  csSector* load_sector (char* secname, char* buf);
 
   /// Load a Mesh Object Factory from the map file.
-  static bool LoadMeshObjectFactory (csMeshFactoryWrapper* meshFact, char* buf);
+  bool LoadMeshObjectFactory (csMeshFactoryWrapper* meshFact, char* buf);
 
   /**
    * Load the mesh object from the map file.
    */
-  static bool LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector);
+  bool LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector);
 
   /// Load a Terrain Object Factory from the map file.
-  static bool LoadTerrainObjectFactory (csTerrainFactoryWrapper* pTerrFact, char* buf);
+  bool LoadTerrainObjectFactory (csTerrainFactoryWrapper* pTerrFact, char* buf);
 
   /**
    * Load the terrain object from the map file.
    */
-  static bool LoadTerrainObject( csTerrainWrapper *pTerrain, char* buf,
+  bool LoadTerrainObject( csTerrainWrapper *pTerrain, char* buf,
   	csSector* pSector );
 
   /**
    * Load a plugin in general.
    */
-  static bool LoadAddOn (char* buf, iBase* context);
+  bool LoadAddOn (char* buf, iBase* context);
 
   /**
    * Load the render priority section.
    */
-  static bool LoadRenderPriorities (char* buf);
+  bool LoadRenderPriorities (char* buf);
 
   /**
    * Load sounds from a SOUNDS(...) argument.
    * This function is normally called automatically by the parser.
    */
-  static bool LoadSounds (char* buf);
+  bool LoadSounds (char* buf);
 
   /**
    * Load all the texture descriptions from the map file
    * (no actual images). 
    */
-  static bool LoadTextures (char* buf);
+  bool LoadTextures (char* buf);
 
   /**
    * Load all the plugin descriptions from the map file
    * (the plugins are not actually loaded yet).
    */
-  static bool LoadPlugins (char* buf);
+  bool LoadPlugins (char* buf);
 
   /**
    * Load all the material descriptions from the map file
    * (no actual images).If a prefix is given, all material names will be
    * prefixed with the corresponding string.
    */
-  static bool LoadMaterials (char* buf, const char* prefix = NULL);
+  bool LoadMaterials (char* buf, const char* prefix = NULL);
 
   /**
    * Loads a skeletal motion from a file
    */
-  static iMotion* LoadMotion (csEngine*, const char* fname);
+  iMotion* LoadMotion (const char* fname);
 
   /**
    * Loads a skeletal motion from an existing stream
    */
-  static bool LoadMotion (iMotion* mot, char* buf);
+  bool LoadMotion (iMotion* mot, char* buf);
 
   /**
    * Load a library into given engine.<p>
    * A library is just a map file that contains just mesh factories,
    * thing templates, sounds and textures.
    */
-  static bool LoadLibrary (char* buf);
+  bool LoadLibrary (char* buf);
 
   /// Load map from a memory buffer
-  static bool LoadMap (char* buf, bool onlyRegion);
+  bool LoadMap (char* buf, bool onlyRegion);
 
   /// Find a material (and create one from texture if possible)
-  static csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
+  csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
 
 public:
-  /// Load map file into engine.
-  static bool LoadMapFile (csEngine*, const char* filename);
-
-  /**
-   * Merge map file into engine (i.e. don't clear the current engine
-   * contents first). If 'onlyRegion' is true then portals will only
-   * connect to the sectors in the current region, things will only use
-   * thing templates defined in the current region and meshes will
-   * only use mesh factories defined in the current region.
-   */
-  static bool AppendMapFile (csEngine*, const char* filename,
-  	bool onlyRegion = true);
-
-  /// Load library from a VFS file
-  static bool LoadLibraryFile (csEngine*, const char* filename);
-
-  /// Load a Mesh Object Factory from the map file.
-  static csMeshFactoryWrapper* LoadMeshObjectFactory (csEngine*, const char* fname);
-
-  /**
-   * Load a mesh object from a file.
-   * The mesh object is not automatically added to the engine and sector.
-   */
-  static csMeshWrapper* LoadMeshObject (csEngine*, const char* fname);
-
-  /// Set loader mode (see CS_LOADER_XXX flags above)
-  static void SetMode (int iFlags);
-
-
   /********** iLoaderNew implementation **********/
-
-  // this is temporarily used by the rest of csLoader
-  static iLoaderNew *GlobalLoader;
-  
   DECLARE_IBASE;
   
-  // temporary wrapper to avoid name collision
-  struct {
-    // virtual file system
-    iVFS *VFS;
-    // image loader
-    iImageLoader *ImageLoader;
-    // sound loader
-    iSoundLoader *SoundLoader;
-    // engine
-    iEngine *Engine;
-    // graphics renderer
-    iGraphics3D *G3D;
-    // sound renderer
-    iSoundRender *SoundRender;
-  } tmpWrap;
+  // virtual file system
+  iVFS *VFS;
+  // image loader
+  iImageLoader *ImageLoader;
+  // sound loader
+  iSoundLoader *SoundLoader;
+  // engine
+  iEngine *Engine;
+  // graphics renderer
+  iGraphics3D *G3D;
+  // sound renderer
+  iSoundRender *SoundRender;
 
   // constructor
   csLoader(iBase *p);
@@ -279,6 +248,8 @@ public:
   // initialize the plug-in
   virtual bool Initialize(iSystem *System);
 
+  virtual void SetMode (int iFlags);
+
   virtual iImage *LoadImage (const char *fname);
   virtual iTextureHandle *LoadTexture (const char *fname, int flags);
   virtual iTextureWrapper *LoadTexture (const char *name, const char *fname, int flags);
@@ -286,6 +257,13 @@ public:
   virtual iSoundData *LoadSoundData (const char *fname);
   virtual iSoundHandle *LoadSound (const char *fname);
   virtual csSoundDataObject *LoadSound (const char *name, const char *fname);
+
+  virtual bool LoadMapFile (const char* filename);
+  virtual bool AppendMapFile (const char* filename, bool onlyRegion = true);
+  virtual bool LoadLibraryFile (const char* filename);
+
+  virtual csMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
+  virtual csMeshWrapper* LoadMeshObject (const char* fname);
 };
 
 #endif // __CS_CSLOADER_H__
