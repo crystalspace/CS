@@ -60,7 +60,7 @@ DEVBIN=3ds2lev map2cs mdl2spr \
 	cs-config
 
 install: DH_OPTIONS=
-install: build ###xpms
+install: build 
 	dh_testdir
 	dh_testroot
 	dh_clean -k
