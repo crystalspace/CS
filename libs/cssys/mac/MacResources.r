@@ -140,10 +140,10 @@ resource 'ALRT' (1028, purgeable) {
 	{332,326,520,658},		/* 332 wide by 188 high */
 	1028,					/* DITL id */
 	{
-		OK, visible, sound1;	/* Stage 4 */
-		OK, visible, sound1;	/* Stage 3 */
-		OK, visible, sound1;	/* Stage 2 */
-		OK, visible, sound1 	/* Stage 1 */
+		OK, visible, silent;	/* Stage 4 */
+		OK, visible, silent;	/* Stage 3 */
+		OK, visible, silent;	/* Stage 2 */
+		OK, visible, silent 	/* Stage 1 */
 	},
 	alertPositionMainScreen
 };
