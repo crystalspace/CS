@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <math.h>
 #include <stdarg.h>
 
@@ -40,9 +41,8 @@ csTexture::~csTexture ()
   DG_REM (this);
 }
 
-//----------------------------------------------------- csTextureHandle -----//
-SCF_IMPLEMENT_IBASE(csTextureHandle)
-  SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
+SCF_IMPLEMENT_IBASE (csTextureHandle)
+  SCF_IMPLEMENTS_INTERFACE (iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
 csTextureHandle::csTextureHandle (
@@ -102,7 +102,7 @@ void csTextureHandle::CreateMipmaps ()
 
   csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
 
-  // Delete existing mipmaps, if any
+  // Delete existing mipmaps, if any.
   int i;
   for (i = 0; i < 4; i++)
   {
@@ -114,21 +114,19 @@ void csTextureHandle::CreateMipmaps ()
   }
 
   // @@@ Jorrit: removed the following IncRef() because I can really
-
   // see no reason for it and it seems to be causing memory leaks.
 #if 0
   // Increment reference counter on image since NewTexture() expects
-
-  // a image with an already incremented reference counter
+  // a image with an already incremented reference counter.
   image->IncRef ();
 #endif
   tex[0] = NewTexture (image);
   DG_LINK (this, tex[0]);
 
-  // 2D textures uses just the top-level mipmap
+  // 2D textures uses just the top-level mipmap.
   if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
-    // Create each new level by creating a level 2 mipmap from previous level
+    // Create each new level by creating a level 2 mipmap from previous level.
     csRef<iImage> i1 = image->MipMap (1, tc);
     csRef<iImage> i2 = i1->MipMap (1, tc);
     csRef<iImage> i3 = i2->MipMap (1, tc);
@@ -149,7 +147,7 @@ void csTextureHandle::SetKeyColor (bool Enable)
   transp = Enable;
 }
 
-// This function must be called BEFORE calling TextureManager::Update().
+/// This function must be called BEFORE calling TextureManager::Update ().
 void csTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
 {
   transp_color.red = red;
@@ -206,9 +204,8 @@ void csTextureHandle::AdjustSizePo2 ()
     image->Rescale (newwidth, newheight);
 }
 
-//----------------------------------------------------- csMaterialHandle -----//
-SCF_IMPLEMENT_IBASE(csMaterialHandle)
-  SCF_IMPLEMENTS_INTERFACE(iMaterialHandle)
+SCF_IMPLEMENT_IBASE (csMaterialHandle)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
 SCF_IMPLEMENT_IBASE_END
 
 csMaterialHandle::csMaterialHandle (
@@ -312,7 +309,6 @@ void csMaterialHandle::Prepare ()
   }
 }
 
-//------------------------------------------------------------ csTexture -----//
 void csTexture::compute_masks ()
 {
   shf_w = csLog2 (w);
@@ -321,16 +317,15 @@ void csTexture::compute_masks ()
   and_h = (1 << shf_h) - 1;
 }
 
-//----------------------------------------------------- csTextureManager -----//
-SCF_IMPLEMENT_IBASE(csTextureManager)
-  SCF_IMPLEMENTS_INTERFACE(iTextureManager)
+SCF_IMPLEMENT_IBASE (csTextureManager)
+  SCF_IMPLEMENTS_INTERFACE (iTextureManager)
 SCF_IMPLEMENT_IBASE_END
 
 csTextureManager::csTextureManager (
   iObjectRegistry *object_reg,
-  iGraphics2D *iG2D) :
-    textures(16, 16),
-    materials(16, 16)
+  iGraphics2D *iG2D)
+: textures(16, 16),
+  materials(16, 16)
 {
   SCF_CONSTRUCT_IBASE (0);
   csTextureManager::object_reg = object_reg;
@@ -342,7 +337,7 @@ csTextureManager::csTextureManager (
 csTextureManager::~csTextureManager ()
 {
   Clear ();
-  SCF_DESTRUCT_IBASE();
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csTextureManager::read_config (iConfigFile*)
