@@ -6,6 +6,23 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Sep-2004
+	- Eric Sunshine fixed bug in msvcgen.jam's LinkWith override where it
+	  did not distinguish between release and debug libraries & linker
+	  flags when applying a project library's external dependencies to a
+	  target which linked against the project library. In practice, this
+	  manifested in CS's release and debug libraries (csutil.lib and
+	  csutil_d.lib, for example) incorrectly appearing together in the same
+	  "AdditionalLibraries" property in the "Debug" configuration within
+	  application and plugin project files of foreign projects.
+	- Eric Sunshine updated the msvcgen templates so that the files listed
+	  as components of projects are now sorted. This will ensure that the
+	  same list of files always generates the same project file regardless
+	  of the order in which the "wildcard" operation returns the files
+	  composing a project. This is an important consideration for
+	  jobber.pl, for instance, which could be fooled into thinking that the
+	  project files were outdated if the wildcard operation returned the
+	  same list of files in different orders on different runs.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:

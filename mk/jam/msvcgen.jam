@@ -850,8 +850,7 @@ rule CompileGroups
 rule LinkWith
 {
   local libs = [ ResolveLibs $(>) ] ;
-  MsvcLFlags $(<) : $($($(>).EXTERNALLIBS).LFLAGS) ;
-  MsvcExternalLibrary $(<) : $($($(>).EXTERNALLIBS).LIBS) ;
+  ExternalLibs $(<) : $($(>).EXTERNALLIBS) ;
   local w ;
   for w in $(MSVC.WORKSPACES)
   {
