@@ -191,6 +191,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
 
   // Are we going to use the inverted orthographic projection matrix?
   inverted = false;
+
 }
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
@@ -906,6 +907,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   GLfloat* p_gltxt, * p_glverts;
   p_gltxt = gltxt;
   p_glverts = glverts;
+
   glBegin (GL_TRIANGLE_FAN);
   for (i = 0 ; i < poly.num ; i++)
   {
@@ -913,6 +915,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glVertex4fv (p_glverts); p_glverts += 4;
   }
   glEnd ();
+
 
   // next draw the lightmap over the texture.  The two are blended
   // together. If a lightmap exists, extract the proper 
@@ -1016,7 +1019,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
       // specify fog vertex alpha value using the fog table and fog
       // distance
-      if (poly.fog_info[i].intensity > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
+      if (poly.fog_info[i].intensity > FOG_MAXVALUE)
 	glTexCoord2f (FOGTABLE_CLAMPVALUE,0.0);
       else
 	glTexCoord2f (poly.fog_info[i].intensity / FOGTABLE_MAXDISTANCE, 0.0);
@@ -1236,7 +1239,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 
       // specify fog vertex transparency
       float I = poly.fog_info[i].intensity;
-      if (I > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
+      if (I > FOG_MAXVALUE)
 	glTexCoord1f (FOGTABLE_CLAMPVALUE);
       else
 	glTexCoord1f (I / FOGTABLE_MAXDISTANCE);
