@@ -48,6 +48,7 @@ enum
   XMLTOKEN_DENSITY,
   XMLTOKEN_FRICTION,
   XMLTOKEN_ELASTICITY,
+  XMLTOKEN_SOFTNESS,
   XMLTOKEN_COLLIDERMESH,
   XMLTOKEN_COLLIDERSPHERE,
   XMLTOKEN_RADIUS,
@@ -108,6 +109,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("density", XMLTOKEN_DENSITY);
   xmltokens.Register ("friction", XMLTOKEN_FRICTION);
   xmltokens.Register ("elasticity", XMLTOKEN_ELASTICITY);
+  xmltokens.Register ("softness", XMLTOKEN_SOFTNESS);
   xmltokens.Register ("collidermesh", XMLTOKEN_COLLIDERMESH);
   xmltokens.Register ("collidersphere", XMLTOKEN_COLLIDERSPHERE);
   xmltokens.Register ("collidercylinder", XMLTOKEN_COLLIDERCYLINDER);
@@ -267,8 +269,8 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
         if (child->GetContentsValue ()) {
           iMeshWrapper *m = engine->FindMeshObject (child->GetContentsValue ());
           if (m) {
+	    body->SetTransform (m->GetMovable()->GetTransform());
             body->AttachMesh (m);
-			body->SetTransform (m->GetMovable()->GetTransform());
           } else {
             synldr->ReportError ("crystalspace.dynamics.loader",
               child, "Unable to find mesh in engine");
@@ -314,26 +316,33 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
     switch (id)
     {
       case XMLTOKEN_COLLIDERMESH:
-        if (child->GetContentsValue ()) {
-          iMeshWrapper *m = engine->FindMeshObject (child->GetContentsValue ());
-          if (m) {
-            if( s > 0)
-              body->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, d, e, s);
-            else  //no softness parameter, so use default
-              body->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, d, e);
-          } else {
-            synldr->ReportError ("crystalspace.dynamics.loader",
-              child, "Unable to find collider mesh in engine");
-            return false;
-          }
+      {
+        if (!child->GetAttributeValue ("mesh")) {
+	  synldr->ReportError ("crystalspace.dynamics.loader",
+	    child, "No mesh specified for collidermesh");
+	  return false;
+        }
+        iMeshWrapper *m = engine->FindMeshObject (child->GetAttributeValue ("mesh"));
+	csOrthoTransform t;
+	ParseTransform (child, t);
+        if (m) {
+          if( s > 0)
+            body->AttachColliderMesh (m, t, f, d, e, s);
+          else  //no softness parameter, so use default
+            body->AttachColliderMesh (m, t, f, d, e);
+        } else {
+          synldr->ReportError ("crystalspace.dynamics.loader",
+            child, "Unable to find collider mesh in engine");
+          return false;
         }
         break;
+      }
       case XMLTOKEN_COLLIDERSPHERE:
       {
         float r = child->GetAttributeValueAsFloat ("radius");
         csOrthoTransform t;
         ParseTransform (child, t);
-        body->AttachColliderSphere (r, t.GetOrigin(), f, d, e);
+        body->AttachColliderSphere (r, t.GetOrigin(), f, d, e, s);
         break;
       }
       case XMLTOKEN_COLLIDERCYLINDER:
@@ -342,7 +351,7 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
         float r = child->GetAttributeValueAsFloat ("radius");
         csOrthoTransform t;
         ParseTransform (child, t);
-        body->AttachColliderCylinder (l, r, t, f, d, e);
+        body->AttachColliderCylinder (l, r, t, f, d, e, s);
         break;
       }
       case XMLTOKEN_COLLIDERBOX:
@@ -355,7 +364,7 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
         }
         csOrthoTransform t;
         ParseTransform (child, t);
-        body->AttachColliderBox (v, t, f, d, e);
+        body->AttachColliderBox (v, t, f, d, e, s);
         break;
       }
       default:
@@ -391,10 +400,11 @@ bool csPhysicsLoader::ParseSystemColliderSphere (iDocumentNode* node, iDynamicSy
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
+  float s = node->GetAttributeValueAsFloat ("softness");
   float r = node->GetAttributeValueAsFloat ("radius");
   csOrthoTransform t;
   ParseTransform (node, t);
-  system->AttachColliderSphere (r, t.GetOrigin(), f, e);
+  system->AttachColliderSphere (r, t.GetOrigin(), f, e, s);
   return true;
 }
   
@@ -403,11 +413,12 @@ bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node, iDynamic
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
+  float s = node->GetAttributeValueAsFloat ("softness");
   float l = node->GetAttributeValueAsFloat ("length");
   float r = node->GetAttributeValueAsFloat ("radius");
   csOrthoTransform t;
   ParseTransform (node, t);
-  system->AttachColliderCylinder (l, r, t, f, e);
+  system->AttachColliderCylinder (l, r, t, f, e, s);
   return true;
 }
 
@@ -415,6 +426,7 @@ bool csPhysicsLoader::ParseSystemColliderBox (iDocumentNode* node, iDynamicSyste
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
+  float s = node->GetAttributeValueAsFloat ("softness");
   csVector3 v;
   if (!synldr->ParseVector (node, v)) {
     synldr->ReportError ("crystalspace.dynamics.loader",
@@ -423,7 +435,7 @@ bool csPhysicsLoader::ParseSystemColliderBox (iDocumentNode* node, iDynamicSyste
   }
   csOrthoTransform t;
   ParseTransform (node, t);
-  system->AttachColliderBox (v, t, f, e);
+  system->AttachColliderBox (v, t, f, e, s);
   return true;
 }
 
