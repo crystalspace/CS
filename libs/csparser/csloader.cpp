@@ -80,11 +80,6 @@ public:
   int terrains_loaded;
   int sounds_loaded;
 
-  csLoaderStats()
-  {
-    Init();
-  }
-
   void Init()
   {
     polygons_loaded = 0;
@@ -96,6 +91,11 @@ public:
     meshes_loaded   = 0;
     terrains_loaded = 0;
     sounds_loaded   = 0;
+  }
+
+  csLoaderStats()
+  {
+    Init();
   }
 };
 

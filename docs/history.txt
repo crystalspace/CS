@@ -13,6 +13,10 @@ The history order has been reversed so that new features are at the top.
 	  so that it is now sane.  (This fix also helps to appease VC++.)
 	- Eric Sunshine eliminated a printf() format conversion warning from
 	  lghtmap.cpp.
+	- Eric Sunshine fixed csLoaderStats so that it compiles on OpenStep.
+	  The OpenStep compiler is buggy and requires that an inline function
+	  calling a second inline functions only do so after the second inline
+	  function has already been seen by the compiler.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.
