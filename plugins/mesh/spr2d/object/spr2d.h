@@ -148,7 +148,7 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent)
-  { rad =  radius; cent.Set(0,0,0); }
+  { rad = radius; cent.Set (0,0,0); }
 
   ///---------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -156,8 +156,13 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
+    iMovable* movable, csVector3 offset);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
-    iMovable* movable);
+    iMovable* movable)
+  {
+    return GetRenderMeshes (n, rview, movable, csVector3 (0.0f));
+  }
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
@@ -275,6 +280,8 @@ public:
     virtual void Rotate (float angle);
     virtual void Draw (iRenderView* rview,
     	const csReversibleTransform& transform, csZBufMode mode);
+    virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
+      iMovable* movable);
     virtual void UpdateLighting (const csArray<iLight*>& lights,
 	const csReversibleTransform& transform);
   } scfiParticle;

@@ -449,7 +449,8 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
 csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n, 
 						      iRenderView* rview, 
-						      iMovable* movable) 
+						      iMovable* movable, 
+						      csVector3 offset) 
 {
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();
@@ -477,11 +478,10 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
     temp /= movable->GetFullTransform ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  csSphere sphere;
   float max_radius = radius.x;
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
+  csSphere sphere (offset, max_radius);
   if (!rview->ClipBSphere (temp, sphere, clip_portal, clip_plane, 
     clip_z_plane))
   {
@@ -490,7 +490,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   }
 
   csReversibleTransform tr_o2c;
-  tr_o2c.SetO2TTranslation (-temp.Other2This (csVector3 (0.0f)));
+  tr_o2c.SetO2TTranslation (-temp.Other2This (offset));
 
   bool meshCreated;
   csRenderMesh*& rm = rmHolder.GetUnusedMesh(meshCreated);
@@ -682,6 +682,13 @@ void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
   cam = rview->GetCamera ()->GetTransform ().Other2This (new_pos);
   if (cam.z < SMALL_Z) return;
   scfParent->Draw (rview, 0, mode);
+}
+    
+csRenderMesh** csSprite2DMeshObject::Particle::GetRenderMeshes (int& n, 
+								iRenderView* rview, 
+								iMovable* movable)
+{
+  return scfParent->GetRenderMeshes (n, rview, movable, part_pos);
 }
 
 void csSprite2DMeshObject::Particle::SetColor (const csColor& col)

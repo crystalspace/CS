@@ -29,6 +29,7 @@ chronological order.
 	- Eric Sunshine performed project-wide spelling corrections:
 	    conveniance --> convenience
 	    conveniant	--> convenient
+	- res ported the csParticleSystem based particle systems to NR.
 24-Mar-2004
 	- Jorrit extended the standard output console so that it now also
 	  supports setting of the font through the config file. Added

@@ -25,6 +25,7 @@
 #include "csgeom/objmodel.h"
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
+#include "cstool/rendermeshholder.h"
 #include "ivideo/graph3d.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
@@ -88,6 +89,8 @@ protected:
   uint32 current_features;
 
   csFlags flags;
+
+  csRenderMeshHolderMultiple rmHolder;
 
   bool initialized;
   /// Set up this object.
@@ -234,7 +237,7 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh** GetRenderMeshes (int& n,iRenderView* rview, 
-    iMovable* movable) { n = 0; return 0; }
+    iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

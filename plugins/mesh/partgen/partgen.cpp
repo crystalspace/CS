@@ -308,6 +308,37 @@ bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
+csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview, 
+						  iMovable* movable)
+{
+  if (!DrawTest (rview, movable))
+  {
+    n = 0;
+    return 0;
+  }
+
+  csDirtyAccessArray<csRenderMesh*>& meshes = rmHolder.GetUnusedMeshes();
+  meshes.Empty();
+
+  for (int i = 0 ; i < particles.Length() ; i++)
+  {
+    int partMeshNum;
+    csRenderMesh** partMeshes = 
+      GetParticle (i)->GetRenderMeshes (partMeshNum, rview, movable);
+
+    if (partMeshes != 0)
+    {
+      while (partMeshNum-- > 0)
+      {
+	meshes.Push (partMeshes[partMeshNum]);
+      }
+    }
+  }
+
+  n = meshes.Length();
+  return meshes.GetArray();
+}
+
 bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
 	csZBufMode mode)
 {

@@ -28,7 +28,7 @@ class csReversibleTransform;
 struct iRenderView;
 struct iLight;
 
-SCF_VERSION (iParticle, 0, 0, 4);
+SCF_VERSION (iParticle, 0, 1, 0);
 
 /**
  * A iParticle can be used in particle Systems.
@@ -73,6 +73,10 @@ struct iParticle : public iBase
    */
   virtual void UpdateLighting (const csArray<iLight*>& lights,
       const csReversibleTransform& transform) = 0;
+
+  /// Get the rendermesh(es) of this particle.
+  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
+    iMovable* movable) = 0;
 };
 
 #endif // __CS_IMESH_PARTICLE_H__
