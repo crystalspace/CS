@@ -16,7 +16,7 @@
 -- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --
 ------------------------------------------------------------
--- Version 05
+-- Version 07
 
 macroScript Export_Sprite_CS
 category:"PlaneShift"
@@ -138,7 +138,7 @@ rollout Test1 "Export Sprite to CS" width:238 height:345
 		
 			-- write header
 			
-		    format "<meshfact>\n" objectname to:outFile
+		    format "<meshfact name=\"%\">\n" objectname to:outFile
 		    format "   <plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n" to:outFile
 		    format "  <params>\n" to:outFile
 		    format "    <material>%</material>\n" materialname to:outFile
@@ -234,8 +234,11 @@ rollout Test1 "Export Sprite to CS" width:238 height:345
 						if (curVert==undefined) then
 							format "\n\nUNDEF: %\n\n" Tface[h]
 						if (debug) then
-							format " face: % curVert %: %\n" i Tface[h] curVert
-	
+							format " Tface[%]: % curVert: %\n" i Tface[h] curVert
+
+						if (debug and vertTInfo[Tface[h]]==undefined) then
+							format "Got one undefined \n"
+
 						-- if the value is different we have a problem on Welded UV
 						if (vertTInfo[Tface[h]]!=undefined and vertTInfo[Tface[h]]!=curVert) then (
 							if (debug) then
@@ -248,12 +251,20 @@ rollout Test1 "Export Sprite to CS" width:238 height:345
 		
 				--for h in vertTInfo do
 				--(
-				--	format "Elem2: % " h
+				--	format "vertTInfo Elem: % " h
 				--)
 	
 				-- cycle on all TVerts of the object
 				for i =1 to (getNumTVerts obj) do
 				(
+					-- skips undefined UV, is that an error?????
+					-- the vert seems not used because is welded to another one
+					if (vertTInfo[i]==undefined) then
+					(
+						format "      <v x=\"0\" y=\"0\" z=\"0\" u=\"0\" v=\"0\" /> ; vert not used \n" to:outFile
+						continue;
+					)
+
 					-- get its 3 vertices as a point3
 					-- export in XZY format
 				    vert=vertTInfo[i]
@@ -263,7 +274,7 @@ rollout Test1 "Export Sprite to CS" width:238 height:345
 		
 					Tvert = getTVert obj i
 		
-					format "      <v x=\"%\" y=\"%\" z=\"%\" u=\"%\" v=\"%\" /> \n" xvert zvert yvert Tvert[1] (1-Tvert[2]) i to:outFile
+					format "      <v x=\"%\" y=\"%\" z=\"%\" u=\"%\" v=\"%\" /> \n" xvert zvert yvert Tvert[1] (1-Tvert[2]) to:outFile
 				)
 
 				-- calculate displacement
@@ -355,7 +366,7 @@ rollout Test1 "Export Sprite to CS" width:238 height:345
 				a = (faceVerts[1]-1) as Integer
 				b = (faceVerts[3]-1) as Integer
 				c = (faceVerts[2]-1) as Integer
-		
+
 				if (flipModel) then
 					format "    <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" a c b to:outFile
 				else
@@ -395,4 +406,3 @@ addRollout Test1 gw
 -- This means that some UV coords are shared on multiple vetexes
 -- Go in the UVUnwrap function and Unweld all the vertexes of the face found
 -------------------
-

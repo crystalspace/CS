@@ -16,7 +16,7 @@
 -- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --
 ------------------------------------------------------------
--- Version 35
+-- Version 39
 
 macroScript Export_Level_CS
 category:"PlaneShift"
@@ -38,8 +38,8 @@ rollout Test1 "Export Level to CS" width:220 height:240
 	checkbox chk2 "Copy textures to dest dir" pos:[3,152] width:210 height:22
 	on Test1 open do
 	(
-	   edt3.text = "D:\\Luca\\temple124"
-	   edtScale.text = "0.01"	
+	   edt3.text = "D:\Luca\PS\gfxpackage3.0\levels\arena\world"
+	   edtScale.text = "1"	
 	)
 	on btn2 pressed do
 	(
@@ -49,10 +49,10 @@ rollout Test1 "Export Level to CS" width:220 height:240
 		-- ////////////////////////
 	
 		-- get filename
-		filename = edt3.text
-		
+		filename = edt3.text 		
 		-- set debug output
 		debug=false
+		debug2=false
 		
 		-- define if export for Dynavis system
 		dynavis=true
@@ -147,9 +147,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 			    mat = m.maps[2]
 				if (mat!=undefined) then
 				(
-
-
-					image = mat.filename
+ 					image = mat.filename
 				) else
 					image="MATERIALNOTDEFINED"
 			)
@@ -234,9 +232,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						append materialsWrittenToWorld image
 					)
 				)
-			)
-
-		  )
+			) 		  )
 	
 	
 		  if (fireNeeded or emitNeeded) then (
@@ -287,7 +283,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 					format "	    <factory>fireFact</factory> \n" to:outFile
 					if (mixmode == undefined) then
 						format "	    <mixmode><add /></mixmode>\n" to:outFile
-					else
+ 					else
 						format "	    <mixmode><% /></mixmode>\n" mixmode to:outFile
 					if (partMaterial == undefined) then
 						format "	    <material>raindrop</material>\n" to:outFile
@@ -488,15 +484,159 @@ rollout Test1 "Export Level to CS" width:220 height:240
 		  )
 		)
 
+
+
+		-- ////////////////////////
+		-- Output a Portal object
+		-- ////////////////////////
+		fn OutputPortal obj debug outFile =
+		(
+			format "    <portal name=\"%\">\n" obj.name to:outFile
+			
+			-- check if poly is valid: for now should be 2 faces MAX!
+			faces = getNumFaces obj
+			if (faces!=2) then (
+				message = "ERROR: Portals with more than 2 triangles are not yet supported!"
+				messageBox message
+				return 1
+			)
+
+			-- checks if model has left-oriented system or not
+			face = getface obj 1
+			v1= getvert obj face[1]
+			v2 = getvert obj face[2]
+			v3 = getvert obj face[3]
+			
+			vect1 = v1-v2
+			vect2 = v3-v2
+			normal1 = cross vect1 vect2
+			facenorm = normal1/(length normal1)
+			maxnorm = getfacenormal obj 1
+			flipModel = false
+
+			dotProd = dot facenorm maxnorm
+			if (dotProd>0) then (
+				flipModel = true
+			)
+
+			-- get faces verts
+		    vertsFace1=getface obj 1
+			vertsFace2=getface obj 2
+
+			-- trasform to array (needed for findItem func)
+			verts1 = #()
+			verts2 = #()
+			for h=1 to 3 do append verts1 vertsFace1[h]
+			for h=1 to 3 do append verts2 vertsFace2[h]
+
+			verts = #()
+			additionalVertex = 0
+			oppositeVertex = 0
+
+			if (debug) then format "Vertex of first face: %\n" verts1
+
+			-- search non-common vertex on face2
+			for h=1 to 3 do
+			(
+ 				if (findItem verts1 verts2[h]==0) then
+					additionalVertex = h
+			)
+			if (debug) then format "Additional vertex: % " verts2[additionalVertex]
+
+			-- search opposite vertex
+			for h=1 to 3 do
+			(
+				if (findItem verts2 verts1[h]==0) then
+					oppositeVertex = h
+			)
+			if (debug) then format "Opposite vertex: % " verts1[oppositeVertex]
+
+			-- list vertexes in right order for resulting polygon
+			commonV = false
+			addedAdd = false
+			addedOpp = false
+			for h=1 to 3 do
+			(
+				 -- check next vertex
+				 if (h!=3 and h!=oppositeVertex) then (
+				    nextV = verts1[h+1]
+					-- first common vertex
+				 	if (nextV != verts1[oppositeVertex]) then (
+						append verts verts1[h]
+						append verts verts2[additionalVertex]
+
+						addedAdd = true
+						continue
+					)
+				 )
+				
+				-- add vertex
+				append verts verts1[h]
+
+				if (h==3 and (not addedAdd) ) then (
+					append verts verts2[additionalVertex]	
+				)
+			)
+
+			-- clock-wise vertexes listing for CS
+			if (not flipModel) then (
+				tmpVert = verts[2]
+				verts[2] = verts[4]
+				verts[4] = tmpVert
+			)
+
+			-- export in XZY format
+			for v in verts do 
+			(
+				currVert = getVert obj v
+				format "      <v x=\"%\" y=\"%\" z=\"%\" /> \n" currVert.x currVert.z currVert.y to:outFile
+			)
+
+			portalname = getUserProp obj "PORTAL"
+			if (portalname==undefined) then
+			(
+				message = "ERROR: PORTAL WITH NO DESTINATION % "
+				messageBox message
+				return 1
+			)
+			format "	  <sector>%</sector>\n" portalname to:outFile
+			format "    </portal>\n" portalname to:outFile
+
+		)
+
+
 		-- ////////////////////////
 		-- Output Faces of a mesh
 		-- ////////////////////////
 		fn OutputMeshFaces obj outFile polyCombine verboseMode debug isportal istrasparent lighting colldet viscull =
 		(
+		   format "OutputMeshFaces for %\n" obj.name
 		   -- list of faces already printed
 		   skiplist = #()
 		   numMat = 0
-	
+
+			-- checks if model has left-oriented system or not
+			face = getface obj 1
+			v1= getvert obj face[1]
+			v2 = getvert obj face[2]
+			v3 = getvert obj face[3]
+			
+			vect1 = v1-v2
+			vect2 = v3-v2
+			normal1 = cross vect1 vect2
+			facenorm = normal1/(length normal1)
+			maxnorm = getfacenormal obj 1
+			flipModel = false
+
+			dotProd = dot facenorm maxnorm
+			if (dotProd>0) then (
+				flipModel = true
+			)
+
+		   if (flipModel) then (
+		    format "\n Object needs flipping: %\n" obj.name
+		   )
+
 		   -- determine number of materials on object
 	 	   if (obj.mat == undefined) then (
 				message = "   OBJECT " +obj.name+ " HAS NO TEXTURE! Aborting export."
@@ -544,9 +684,9 @@ rollout Test1 "Export Level to CS" width:220 height:240
 					else
 						currentMat = obj.mat[matID].name
 				)
-	
+
 				if (debug) then format "Material found: % on face %\n" currentMat i
-		
+
 			   -- output face only if it has current MatID
 			   if (currentMat==matName) then
 			   (
@@ -561,6 +701,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						else (
 						    if ((classOf obj.mat)==Standardmaterial) then
 							(
+							   format "standard material found for %\n" obj.name
 								texturefilename=getMatFilename obj.mat
 								if (texturefilename=="csinvisible.tga") then
 									csinvisibletexture="yes"
@@ -568,6 +709,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 									csinvisibletexture="no"
 						    	format "      <material>%</material>\n" texturefilename to:outFile
 							) else (
+							    format "multi material found for %\n" obj.name
 								texturefilename=getMatFilename obj.mat[matID]
 								if (texturefilename=="csinvisible.tga") then
 									csinvisibletexture="yes"
@@ -621,9 +763,8 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						-- get its 4 vertices
 					    Xverts1=getface obj i
 						Xverts2=getface obj otherface
-		
+
 						-- trasform to array
-	
 						verts1 = #()
 						verts2 = #()
 						for h=1 to 3 do append verts1 Xverts1[h]
@@ -636,12 +777,9 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						if (debug) then format "Vertex of first face: %\n" verts1
 		
 						-- search additional vertex
-	
 						for h=1 to 3 do
 						(
-	
-
-							if (findItem verts1 verts2[h]==0) then
+	 							if (findItem verts1 verts2[h]==0) then
 								additionalVertex = h
 						)
 						if (debug) then format "Additional vertex: % " verts2[additionalVertex]
@@ -669,7 +807,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						-- build poly
 						Tverts = #()
 						commonV = false
-						addedAdd = false
+						addedAdd = false 
 						addedOpp = false
 						for h=1 to 3 do
 						(
@@ -707,12 +845,17 @@ rollout Test1 "Export Level to CS" width:220 height:240
 		
 						-- export in XZY format
 						if (debug) then format "POLY: %" verts
-		 						a = verts[3] as Integer
-						b = verts[2] as Integer
-
-						c = verts[1] as Integer
+		 				a = verts[3] as Integer
+						b = verts[2] as Integer 						c = verts[1] as Integer
 						d = verts[4] as Integer
-		
+
+						if (flipModel) then (
+			 				a = verts[4] as Integer
+							b = verts[1] as Integer
+	 						c = verts[2] as Integer
+							d = verts[3] as Integer
+						)
+
 						if (verboseMode) then
 						(
 						    polyName = obj.name + "_"+ i as String;
@@ -761,7 +904,13 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						format "      <texmap>" to:outFile
 						f = 0
 						outputV = 0
-						for h in #(3,2,1,4) do
+
+						vertOrder = #(3,2,1,4)
+						if (flipModel) then (
+							vertOrder = #(4,1,2,3)
+						)
+
+						for h in vertOrder do
 						(
 							if (verts[h]==verts2[additionalVertex]) then
 							(
@@ -781,16 +930,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 							f=f+1
 						)
 						format "</texmap></p>\n" to:outFile
-	
-						--aTV = Tverts[3]
-						--bTV = Tverts[2]
-						--cTV = Tverts[1]
-						--dTV = Tverts[4]
-						--dTV = getTVert obj textVert2[additionalVertex]
-		
-						--format "      TEXTURE (UV (0,%,%,2,%,%,3,%,%)) )\n" aTV[1] (1-aTV[2]) bTV[1] (1-bTV[2]) cTV[1] (1-cTV[2]) to:outFile
-						--format "      TEXTURE (UV (0,%,%,1,%,%,2,%,%)) )\n" aTV[1] (1-aTV[2]) bTV[1] (1-bTV[2]) cTV[1] (1-cTV[2]) to:outFile
-	
+
 						continue
 		
 				   )
@@ -807,7 +947,13 @@ rollout Test1 "Export Level to CS" width:220 height:240
 					a = verts[1] as Integer
 					b = verts[3] as Integer
 					c = verts[2] as Integer
-	
+
+					if (flipModel) then (
+						a = verts[2] as Integer
+						b = verts[3] as Integer
+						c = verts[1] as Integer
+					)
+
 					if (verboseMode) then
 					(
 					    polyName = obj.name + "_" + i as String;
@@ -846,7 +992,13 @@ rollout Test1 "Export Level to CS" width:220 height:240
 			        TVerts = getTVFace obj i
 					aTV = getTVert obj TVerts[1]
 					bTV = getTVert obj TVerts[3]
-					cTV = getTVert obj TVerts[2] 	
+					cTV = getTVert obj TVerts[2]
+
+					if (flipModel) then (
+						aTV = getTVert obj TVerts[2]
+						bTV = getTVert obj TVerts[3]
+						cTV = getTVert obj TVerts[1]
+					)
 					format "      <texmap><uv idx=\"0\" u=\"%\" v=\"%\" /><uv idx=\"1\" u=\"%\" v=\"%\" /><uv idx=\"2\" u=\"%\" v=\"%\" /></texmap>\n" aTV[1] (1-aTV[2]) bTV[1] (1-bTV[2]) cTV[1] (1-cTV[2]) to:outFile
 					format "      </p>\n" to:outFile
 	
@@ -859,6 +1011,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 		-- ////////////////////////
 		-- Output culleronly polymesh
 		-- ////////////////////////
+
 		fn OutputCullerOnly obj outFile verboseMode debug =
 		(
 			-- cycle on all faces of object
@@ -1044,7 +1197,29 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						close outFile 
 						return 1
 					)
-	
+
+					-- checks if model has left-oriented system or not
+					face = getface obj 1
+					v1= getvert obj face[1]
+					v2 = getvert obj face[2]
+					v3 = getvert obj face[3]
+					
+					vect1 = v1-v2
+					vect2 = v3-v2
+					normal1 = cross vect1 vect2
+					facenorm = normal1/(length normal1)
+					maxnorm = getfacenormal obj 1
+					flipModel = false
+		
+					dotProd = dot facenorm maxnorm
+					if (dotProd>0) then (
+						flipModel = true
+					)
+		
+				   if (flipModel) then (
+				    format "\n GenMesh Factory Object needs flipping: %\n" obj.name
+				   )
+				   
 					vertTInfo = #(getNumTVerts obj)
 					vertTInfo[1] = undefined
 		
@@ -1065,8 +1240,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 	
 							-- if the value is different we have a problem on Welded UV
 							if (vertTInfo[Tface[h]]!=undefined and vertTInfo[Tface[h]]!=curVert) then (
-	
-								message = "PROBLEM on object " + obj.name + ": welded UV on vertex " + (Tface[h] as String)
+								message = "PROBLEM on object " + obj.name + ": UV on vertex " + (Tface[h] as String)
 								messageBox message
 								close outFile
 								return 1
@@ -1081,6 +1255,12 @@ rollout Test1 "Export Level to CS" width:220 height:240
 						-- get its 3 vertices as a point3
 						-- export in XZY format
 					    vert=vertTInfo[i]
+						if (vert==undefined) then (
+							message = "PROBLEM on object " + obj.name + ": UV mapping seems to be messed up. Please UnWrap it then collapse it.";
+							messageBox message
+							close outFile
+							return 1
+						)
 						xvert = (vert.x * xscale) + xrelocate
 						yvert = (vert.y * yscale) + yrelocate
 						zvert = (vert.z * zscale) + zrelocate
@@ -1095,9 +1275,15 @@ rollout Test1 "Export Level to CS" width:220 height:240
 					(
 						faceVerts=getTVface obj i
 						a = (faceVerts[1]-1) as Integer
-						b = (faceVerts[3]-1) as Integer
-						c = (faceVerts[2]-1) as Integer
-	
+
+						if (flipModel) then (
+							b = (faceVerts[2]-1) as Integer
+							c = (faceVerts[3]-1) as Integer
+						) else (
+							b = (faceVerts[3]-1) as Integer
+							c = (faceVerts[2]-1) as Integer
+						)
+
 						format "    <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" a b c to:outFile
 				    )
 					
@@ -1214,6 +1400,12 @@ rollout Test1 "Export Level to CS" width:220 height:240
 				format "Skipping Dummy Object: %\n" obj.name
 				continue
 			)
+
+		    -- skip objects named _n_xxxx
+			if (findString obj.name "_n_" != undefined) then (
+				format "Skipping Unwanted Object: %\n" obj.name
+				continue
+			)
 		
 			-- store lights for later use
 			if ( (classOf obj)==Omnilight) then (
@@ -1302,6 +1494,8 @@ rollout Test1 "Export Level to CS" width:220 height:240
 				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
 					continue;
 	
+				format "    Working on genmesh %\n" obj.name
+	
 				format "    <meshobj name=\"%\">\n" obj.name to:outFile
 				-- check for no shadow setting
 				noshadows = getUserProp obj "NOSHADOWS"
@@ -1310,13 +1504,19 @@ rollout Test1 "Export Level to CS" width:220 height:240
 	
 				format "      <plugin>mesh</plugin>\n" obj.name to:outFile
 				format "      <params><factory>%</factory>\n" toks[3] to:outFile
-				format "      <material>%</material>\n" (getMatFilename obj.mat) to:outFile
+
+				m = obj.mat;
+				if ((classOf m)==Multimaterial) then (
+					matUsed = getFaceMatID obj 1
+					m = obj.mat[matUsed];
+				)
+				format "      <material>%</material>\n" (getMatFilename m) to:outFile
 				-- ALL genmeshes must have this to support light changes.
 				format "      <localshadows /></params>\n" to:outFile
 	
 				-- search factory
 				genFactObj=null
-				format "factoryMeshes: %\n" factoryMeshes.count
+				format "factoryMeshes.count: %\n" factoryMeshes.count
 				for genFact in factoryMeshes do
 				(
 					genFactName = "_g_"+toks[3]+"_0"
@@ -1328,19 +1528,52 @@ rollout Test1 "Export Level to CS" width:220 height:240
 					close outFile
 					return 1
 				)
+
+				-- checks if model has left-oriented system or not
+				face = getface obj 1
+				v1= getvert obj face[1]
+				v2 = getvert obj face[2]
+				v3 = getvert obj face[3]
+				
+				vect1 = v1-v2
+				vect2 = v3-v2
+				normal1 = cross vect1 vect2
+				facenorm = normal1/(length normal1)
+				maxnorm = getfacenormal obj 1
+				flipModel = false
+	
+				dotProd = dot facenorm maxnorm
+				if (dotProd>0) then (
+					flipModel = true
+				)
+	
+			   if (flipModel) then (
+			    format "\n GenMesh Instance Object needs flipping: %\n" obj.name
+			   )
+			   
 				-- calc distance from factory
-				--xMove = ((obj.pos.x-genFactObj.pos.x) * xscale) + xrelocate
-				--yMove = ((obj.pos.y-genFactObj.pos.y) * yscale) + yrelocate
-				--zMove = ((obj.pos.z-genFactObj.pos.z) * zscale) + zrelocate
 				xMove = (obj.pos.x * xscale) + xrelocate
 				yMove = (obj.pos.y * yscale) + yrelocate
 				zMove = (obj.pos.z * zscale) + zrelocate
 	
 				format "      <move><v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
-				rotvalues = quattoeuler obj.rotation order:2
-				rotx = (rotvalues.x * pi)/180
-				roty = (rotvalues.y * pi)/180
-				rotz = (rotvalues.z * pi)/180
+				--if (flipModel) then
+				--	rotvalues = quattoeuler obj.rotation
+				--else
+					rotvalues = quattoeuler obj.rotation order:2
+
+				-- seems that all models have rotation with wrong sign
+				-- all objects must use Pivot Align to Object
+				if (flipModel) then (
+					rotx = ((rotvalues.x) * pi)/180
+					roty = -((rotvalues.y) * pi)/180
+					rotz = ((rotvalues.z) * pi)/180
+				) else (
+					rotx = (rotvalues.x * pi)/180
+					roty = -((rotvalues.y * pi)/180)
+					rotz = (rotvalues.z * pi)/180
+				)
+
 				format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
 				format "      </move>\n"  to:outFile
 				format "    </meshobj>\n" to:outFile
@@ -1365,7 +1598,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 					format "      <noshadows />\n" to:outFile
 	
 				format "      <plugin>thing</plugin>\n" obj.name to:outFile
-				format "      <params><factory>%</factory><moveable />\n" toks[3] to:outFile
+				format "      <params><factory>%</factory>\n" toks[3] to:outFile
 	
 				-- search factory
 				genFactObj=null
@@ -1415,41 +1648,78 @@ rollout Test1 "Export Level to CS" width:220 height:240
 				)
 				-- format "      <material>%</material></params>\n" (getMatFilename obj.mat) to:outFile NO MATERIAL CHANGE FOR NOW
 				format "      </params>\n" to:outFile
+
+				-- checks if model has left-oriented system or not
+				face = getface obj 1
+				v1= getvert obj face[1]
+				v2 = getvert obj face[2]
+				v3 = getvert obj face[3]
+				
+				vect1 = v1-v2
+				vect2 = v3-v2
+				normal1 = cross vect1 vect2
+				facenorm = normal1/(length normal1)
+				maxnorm = getfacenormal obj 1
+				flipModel = false
 	
+				dotProd = dot facenorm maxnorm
+				if (dotProd>0) then (
+					flipModel = true
+				)
+	
+			   if (flipModel) then (
+			    format "\n ThingMesh Instance Object needs flipping: %\n" obj.name
+			   )
+
 				xMove = (obj.pos.x * xscale) + xrelocate
 				yMove = (obj.pos.y * yscale) + yrelocate
 				zMove = (obj.pos.z * zscale) + zrelocate
 	
 				format "      <move><v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
 				rotvalues = quattoeuler obj.rotation order:2
-				rotx = (rotvalues.x * pi)/180
-				roty = (rotvalues.y * pi)/180
-				rotz = (rotvalues.z * pi)/180
+
+				if (flipModel) then (
+					rotx = ((rotvalues.x) * pi)/180
+					roty = -((rotvalues.y) * pi)/180
+					rotz = ((rotvalues.z) * pi)/180
+				) else (
+					rotx = (rotvalues.x * pi)/180
+					roty = -((rotvalues.y * pi)/180)
+					rotz = (rotvalues.z * pi)/180
+				)
+
 				format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
 				format "      </move>\n"  to:outFile
 				format "    </meshobj>\n" to:outFile
 				continue;
 	
 			)
-	
+
+			--
+			-- normal thing objects managed here
+			--
+
 			-- check for culleronly setting
 			culleronly = getUserProp obj "CULLERONLY"
 	
 		    -- output name of object and some info
 			format "\n\nFound Object Name: % Faces: %\n" obj.name obj.numfaces
-		
-		    --format "    ;Object Name: % Faces: %\n" obj.name obj.numfaces to:outFile 
-	
-	
-			if (culleronly=="yes") then (
+
+			isportal=false
+
+		    -- handles portal objects first
+			if (findString obj.name "_p_" !=undefined) then (
+			  isportal=true
+			  OutputPortal obj debug outFile
+			  continue;
+			)
+			else if (culleronly=="yes") then (
 				format "    <polymesh name=\"%\">\n" obj.name to:outFile
 			) else (
 			    format "    <meshobj name=\"%\">\n" obj.name to:outFile
 				format "      <plugin>thing</plugin>\n" to:outFile
 			)
-	
-			isportal=false
-	
+
 			istrasparent=false
 			-- handles transparent objects
 			if (findString obj.name "_t_" !=undefined) then (
@@ -1468,11 +1738,6 @@ rollout Test1 "Export Level to CS" width:220 height:240
 			  format "      <zuse />\n" to:outFile
 	
 			)
-		    -- handles portal objects
-			else if (findString obj.name "_p_" !=undefined) then (
-			  format "      <priority>wall</priority>\n" to:outFile
-			  isportal=true
-			) 
 			else if (culleronly=="yes") then (
 				format "      <mesh>\n" to:outFile
 			)
@@ -1480,8 +1745,8 @@ rollout Test1 "Export Level to CS" width:220 height:240
 			  format "      <priority>object</priority>\n" to:outFile
 			  format "      <zuse />\n" to:outFile
 			)
-	
-			if (culleronly!="yes") then (
+
+			if (culleronly!="yes" and (not isportal)) then (
 			  format "      <params>\n" to:outFile
 			)
 	
@@ -1503,7 +1768,8 @@ rollout Test1 "Export Level to CS" width:220 height:240
 	
 			-- check for viscull setting
 			viscull = getUserProp obj "VISCULL"
-	
+
+
 		   -- output vertexes of the object in XZY format
 		   for v in obj.verts do
 		   (
@@ -1540,9 +1806,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 		  --print (getUserPropBuffer obj) to:outFile -- output buffer as a string literal 
 		  gc()
 		) 
-	
-
-		-- get info on dynamic lights
+	 		-- get info on dynamic lights
 		maxframes = animationrange.end
 	
 		if (animationrange.end != 23f and animationrange.end != 47f) then
@@ -1556,7 +1820,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 		
 		lightColors = #()
 		lightInfo = #()
-		-- if was performing this only if fakelight was checked
+		-- it was performing this only if fakelight was checked
 		-- now we do it always
 		--if (chkLights.checked) then
 		if (true) then
@@ -1622,9 +1886,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 				lcount = lcount + 1
 				continue
 			)
-	
-
-		    --format " ;Light: % \n" ll.name to:outFile
+	 		    --format " ;Light: % \n" ll.name to:outFile
 			format "    <light name=\"%%\">\n" ll.name roomname to:outFile
 	
 			-- check threshold setting to flag light as dynamic
@@ -1645,9 +1907,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 			ylight = (ll.pos.y * yscale) + yrelocate
 			zlight = (ll.pos.z * zscale) + zrelocate
 			llradius = ll.farAttenEnd * xscale
-	
-
-			-- convert lights from 0-255 to 0-1
+	 			-- convert lights from 0-255 to 0-1
 			llred = ((ll.rgb.r)/255) * multiplier
 			llgreen = ((ll.rgb.g)/255) * multiplier
 			llblue = ((ll.rgb.b)/255) * multiplier
@@ -1707,8 +1967,7 @@ rollout Test1 "Export Level to CS" width:220 height:240
 		(
 			-- name sequence with first light
 			seqlightname = (lightsThresholdObjs[lcount][1]).name
-			
-			-- output turn on sequence
+			 			-- output turn on sequence
 			format "    <sequence name=\"light_%%_on\"> \n" seqlightname roomname to:outFile
 			-- for each light in this threshold
 			for ll in lightsThresholdObjs[lcount] do
@@ -1843,5 +2102,3 @@ gw = newRolloutFloater "Export Level" 300 280
 addRollout Test1 gw 
 
 )
-
-

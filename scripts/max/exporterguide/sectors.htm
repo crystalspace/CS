@@ -1,0 +1,101 @@
+<div class="wikitext">
+  <h1>Sectors, an explanation.</h1>
+
+<br/>
+<br/>First, it is important to understand exactly how the engine renders a scene.
+<br/>
+<br/>The CS engine keeps an array of objects, and calls object-&gt;Draw on each one.  That's it.  :-)
+<br/>
+<br/>Actually, the longer version is this:
+
+<br/>
+<br/>- The CS engine keeps an array of objects.
+<br/>- Each frame:
+<br/><ol><li>positions are updated and game logic is run
+</li><li>visibility testing is done to determine what objects can be skipped
+</li><li>The visible objects are all called again to update animation frames or textures, etc.
+</li><li>The renderer cycles through all visible objects and calls object-&gt;Draw() on each one.
+</li></ol>
+  <p><br/>
+    For now we will focus only on the last step though. <br/>
+    <br/>
+    Let's say your level consists of a city full of building objects and an interior 
+    of a tavern and there are 1000 objects altogether in your level. Visibility 
+    culling and rendering has to dig through 1000 objects to decide what to render. 
+    But if you are inside the tavern, probably 950 of those objects representing 
+    the exterior will NEVER be visible. This is where sectors are a big win. <br/>
+    <br/>
+    Sectors are a way of hinting to the engine what is potentially visible and 
+    not. It is a cheap way of doing PVS. So a sector-based 3d engine like CS actually 
+    has a slightly more complex structure than the sequence above. <br/>
+    <br/>
+    - An array of objects is defined as a Sector. <br/>
+    - The Engine keeps an array of Sectors (each with its array of objects). <br/>
+    - Each frame, the engine finds the sector where the camera is located and 
+    does the render loop described above ONLY on the objects in that sector array. 
+    <br/>
+    <br/>
+    Thus if you are indoors in the tavern 'sector', CS is only rendering 50 objects 
+    and not 1000. But if you are outside, it is rendering 950 instead of 1000, 
+    which is not that much of a help. This is why CS (and most other 3d engines) 
+    can render indoor scenes much faster than outdoor scenes. Indoor scenes can 
+    be heavily sectorized. You can imagine if the tavern in our example is 2 stories 
+    tall, we could make indoor rendering even faster by splitting apart the &quot;tavern&quot; 
+    sector into &quot;tavern floor 1&quot; and &quot;tavern floort 2&quot; sectors, 
+    with perhaps 20 objects and 30 objects respectively. This would make rendering 
+    in those areas even faster. The test map with CS called flarge has dozens 
+    of sectors for just this reason. It was made back at a time when gfx cards 
+    were so unpowerful that to maximize speed it was advantageous to split almost 
+    each room up into its own sector. <br/>
+    <br/>
+    But what if you are inside the tavern and look out a window, or look out an 
+    open door? If CS is only considering the &quot;tavern floor 1&quot; sector, 
+    you won't be able to see the outdoors through the window. <br/>
+    <br/>
+    This is where &quot;portals&quot; come in. A portal is a polygon in a sector 
+    that triggers the engine to render another sector besides just the camera 
+    one. So when you model the window of the tavern, you flag the polygon of the 
+    window as a &quot;portal to outdoor sector&quot;. When the renderer renders 
+    the 20 objects in &quot;tavern floor 1&quot; sometimes that window will be 
+    visible, depending on which direction you are pointing, and if the renderer 
+    sees that it is rendering a portal polygon, it adds the sector the portal 
+    points to (&quot;outdoor&quot; in this example) to the queue of sectors to 
+    render, then calls the entire render loop again on each queued sector. This 
+    means in our case it will render the 20 objects, then render the 950 objects. 
+    Thus, if you are indoors and you cannot see the window/portal, it will render 
+    much faster than if you turn just a little bit and can see even a fraction 
+    of the window. When the window shows and activates the portal even a little 
+    bit, the 950 outdoor objects must be considered and not just the 20 &quot;tavern 
+    floor 1&quot; objects. CS handles this fairly efficiently, but it is still 
+    significant overhead. <br/>
+    <br/>
+    In our example, you would also need a portal the other direction too, if you 
+    want people to be able to stand outside the tavern and look in through the 
+    window. Portals are not bi-directional. Looking in a tavern window isn't going 
+    to slow down your render very much though, because it only changes your total 
+    rendered object count from 950 to 970. <br/>
+    <br/>
+    Where handling portals gets complex is that portals can be recursive. Imagine 
+    standing outside the tavern, looking in the window, and seeing all the way 
+    through the tavern to a window on the opposite wall, which shows the outdoors 
+    of the city again. This takes your render count from 950 to 970 to 1920, because 
+    now the outdoor sector is being considered twice. Smart level design can and 
+    should keep these to a minimum. <br/>
+    <br/>
+    Actually this isn't as inefficient as it sounds, because when a sector is 
+    added to the queue of sectors to render, it is visibility clipped to the shape 
+    of the portal before true visibility culling is done. The &quot;cone&quot; 
+    of what you can see through a window is obviously much smaller than the entire 
+    city, and clipping off objects outside the window view is a pretty fast calculation. 
+    This is why small portals like windows are faster than big portals like doors 
+    or walls. <br/>
+    <br/>
+    Hopefully this helps explain why it is good to divide up things into sectors, 
+    but only in certain cases. Please let me know if you have other questions 
+    on this topic.</p>
+  <p><br/>
+  </p>
+</div>
+
+
+<p class="editdate">Created by: <span class='link'></span> last modification: Wednesday 05 of November, 2003 [09:04:09 UTC] by <span class='link'>anonymous</span></p>

@@ -28,6 +28,15 @@ chronological order.
 	    - Removed mention of the obsolete effect system from the
 	      graphics section.
 	    - Replaced 'effects' with 'shaders' in the XML format document.
+	- Luca Pancallo added a new 3DS Max export script (in scripts/max).
+	  The following things were changed:
+	    - Fixes to genmeshes and thingmeshes, added documentation on how
+	      to model those, pivot and rotation issues explained.
+	    - Added support for right-handed and left-handed genmeshes and
+	      sprites.
+	    - Added ability to avoid export of some objects "_n_" prefix.
+	    - Changed documentation to be more readable and complete (a new
+	      guide!).
 	- Eric Sunshine fixed bugs in xmlfmt.txi where it was using incorrect
 	  section nesting directives (@section vs. @subsection, etc.).
 	- Eric Sunshine fixed a lot of Texinfo markup problems in recently

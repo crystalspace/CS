@@ -1,0 +1,48 @@
+<h2>Modeling a level to be exported</h2>
+<p>To be sure that the level you are modeling will be exported correctly, you 
+  must follow these guidelines. The ones marked as &quot;Required&quot; are necessary. 
+  If you don't do that the level will not export.</p>
+<h3>1. Room Properties (Required)</h3>
+<table><tr><td><p>Set the sector name by clicking on File&gt;File Properties. Select the Custom 
+  Tab, enter this data:</p>
+<p>Name: roomname<br>
+  Type: Text<br>
+  Value: &lt;enter the roomname, e.g. laanxinside&gt;</p>
+<p>Click on Add.</p>
+      <h3>2. Starting Position (Required)</h3>
+<p>Every sector in CS has a starting position, this is where the player will appear. 
+  To set that we use the position of a 'Camera' object placed in the Max scene.</p>
+<p>Click on Create-&gt;Cameras, select 'Target', place the camera where you want 
+  the starting position to be. If multiple cameras are present, the exporter uses 
+  the first one.</p>
+
+      <h3>3. Objects</h3>
+      <p>As a general guideline one object in Max is exported as one object in 
+        CS. The type of object exported depends by the name you give to it. If 
+        the name starts with any chars not included in the categories below, the 
+        object is exported as a standard mesh object.<br>
+        <br>
+        _g_ : are exported as genmeshes<br>
+        _f_ : are exported as thingmeshes<br>
+        _p_: are exported as portal objects.<br>
+        _s_ : are exported as static objects<br>
+        _sky_ : is exported as a skybox <br>
+        _n_: are not exported at all </p>
+      <h3>4. Textures</h3>
+      <p>Both Standard Materials and Multi/Sub Materials are supported. The name 
+        of the texture is NOT important, the exporter looks at the actual filename 
+        attached to the material. Features like bump mapping are not supported 
+        for now. Please define all your texture just with the &quot;Diffuse&quot; 
+        option, attaching an image.</p>
+      <p>For trasparent textures see Invisible Faces in the <a href="object.htm">object 
+        section</a>.</p>
+<p> </p></td><td valign=top>
+<img src="pictures/room_properties.jpg" alt="a scene with ambient light">
+<br>Here is the file properties tab of a room with some ambient light
+</td></tr>
+<tr>
+    <td colspan=2 align=right>Next: <a href="object.htm">Object Properties</a></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p></body></html>
