@@ -1,6 +1,6 @@
 /*
     Crystal Space utility library: string class
-    Copyright (C) 1999 by Brandon Ehle (Azverkan)
+    Copyright (C) 1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -164,13 +164,17 @@ public:
   csString (int iLength) : Data (NULL), Size (0), MaxSize (0)
   { SetSize (iLength); }
 
-  /// Copy constructor
+  /// Copy constructor from existing csString.
   csString (const csString &copy) : Data (NULL), Size (0), MaxSize (0)
   { Append (copy); }
 
-  /// Yet another copy constructor
+  /// Copy constructor from ASCIIZ string
   csString (const char *copy) : Data (NULL), Size (0), MaxSize (0)
   { Append (copy); }
+
+  /// Copy constructor from a character
+  csString (char c) : Data (NULL), Size (0), MaxSize (0)
+  { Append (c); }
 
   /// Destroy a csString object
   virtual ~csString ();
