@@ -222,6 +222,10 @@ static inline char* getcwd(char* p, size_t size)
 // on M68K, there are cases (particularly in the software renderer) where the
 // compiler corrupts the emitted code for these functions.  Therefore, disable
 // these optimizations.
+// Note by Matt Reda: I did some rough testing of QInt() and friends on the
+// PowerPC.  It appears to work ok, but is actually slower.  Some simple
+// tests show that QInt() is roughly twice as slow as a cast from double
+// to long
 //-----------------------------------------------------------------------------
 #if !defined(PROC_X86)
 #  define CS_NO_IEEE_OPTIMIZATIONS
@@ -295,10 +299,10 @@ MemoryMapFile(mmioInfo *platform, char *filename)
 
 inline 
 void
-UnMemoryMapFile(mmioInfo *platform, char *filename)
+UnMemoryMapFile(mmioInfo *platform)
 {
-  if (platform->data != -1)
-    munmap(platform->data, file_size);
+  if (platform->data != NULL)
+    munmap(platform->data, platform->file_size);
 
   if (platform->hMappedFile != -1)
     close(platform->hMappedFile);
