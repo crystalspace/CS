@@ -9,7 +9,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed the unit tester in csgeom for the new methods.
 	- Fixed the rapid plugin for the new methods.
 	- Fixed various outdated information throughout the documentation.
-	  Still a lot of work to do however.
+	  Still a lot of work to do however. Some of the modifications
+	  I did:
+	    - Removed all mention of 8-bit display support since CS
+	      no longer supports that.
+	    - Modified all map file examples from old syntax to XML.
+	    - Used csRef where appropriate.
 10-Jan-2002
 	- Made the calling of the movable callbacks safe so that they now
 	  can delete themselves from the movable. This basically amounts
