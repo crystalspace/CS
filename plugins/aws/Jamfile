@@ -16,17 +16,16 @@ if ! [ Property build : projgen ]
     # the source directory.
     local lex = [ DoObjectGrist skinlex.cpp ] ;
     local parse = [ DoObjectGrist skinpars.cpp ] ;
+    local parseh = [ DoObjectGrist skinpars.hpp ] ;
     Depends $(lex) : $(parse) ;
+    Includes $(parse) : $(parseh) ;
 
     # Construct a rule for copying the generated sources from Bison and Flex
     # into the source directories.
-    local freezefiles = skinpars.cpp skinpars.hpp skinlex.cpp ;
-    freezefiles = $(freezefiles:G=awsfreeze) ;
+    local freezefiles = $(lex) $(parse) $(parseh) ;
     for i in $(freezefiles)
     {
-      SEARCH on $(i) = $(LOCATE_TARGET) ;
-      local targetfile = $(i:D=$(SUBDIR)) ;
-      
+      local targetfile = $(i:D=$(SUBDIR):G=awsfreeze) ;
       Copy $(targetfile) : $(i) ;
       Depends $(targetfile) : $(i) ;
       Depends awsfreeze : $(targetfile) ;
@@ -35,6 +34,18 @@ if ! [ Property build : projgen ]
     NotFile awsfreeze ;
     Help awsfreeze :
       "Copy generated Bison/Flex files to source directory" ;
+
+    # When Bison and Flex are installed, then skinpars.cpp and skinlex.cpp
+    # reside in $(LOCATE_TARGET) rather than CS/plugins/aws, so we need to tell
+    # those files that some headers they require reside in CS/plugins/aws.
+    # Also, we ensure that skinlex.cpp searches $(LOCATE_TARGET) first because
+    # it needs to locate the generated skinpars.hpp rather than the
+    # factory-supplied one in CS/plugins/aws.  (In reality, LOCATE_TARGET
+    # should be searched automatically since #include "skinpars.hpp" is used,
+    # and LOCATE_TARGET is the "current directory" in this case, but we do this
+    # for that extra measure of insurance.)
+    C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
+      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
   }
 }
 
@@ -48,17 +59,6 @@ if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
   C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
 }
-
-# If Bison and Flex are installed, then skinpars.cpp and skinlex.cpp reside in
-# $(LOCATE_TARGET) rather than CS/plugins/aws, so we need to tell those files
-# that some headers they require reside in CS/plugins/aws.  Also, we ensure
-# that skinlex.cpp searches $(LOCATE_TARGET) first because it needs to locate
-# the generated skinpars.hpp rather than the factory-supplied one in
-# CS/plugins/aws.  (In reality, LOCATE_TARGET should be searched automatically
-# since #include "skinpars.hpp" is used, and LOCATE_TARGET is the "current
-# directory" in this case, but we do this for that extra measure of insurance.)
-C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
-  [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
 
 if [ Property build : projgen ] = msvc
 {

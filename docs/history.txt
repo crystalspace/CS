@@ -69,6 +69,10 @@ chronological order.
 	      the context of project files and .rc files).
 	- Eric Sunshine fixed bug in Doxygen rule (docs.jam) where it was
 	  invoking MakeLocate on a pseudo-target.
+	- Eric Sunshine fixed bug in aws/Jamfile where the 'awsfreeze' target
+	  was gristing the built source files in such a way that Jam would
+	  complain that it did not know how to create those files if they were
+	  needed.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to
