@@ -25,6 +25,18 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine updated a number of documentation files to reflect
 	  the fact that platform-specific makefiles now reside within the
 	  CS/libs/cssys tree rather than CS/mk/system.
+	- Nearly completed support for DrawTriangleMesh. Sprites now use
+	  it (you can still get the old behaviour back if you change
+	  the right #if 1 to #if 0 :-)
+	- OpenGL and Software now support the generic (unoptimized)
+	  DrawTriangleMesh. All other renderers are currently broken for
+	  sprites since they don't have a working DrawTriangleMesh
+	  implementation (sprites will not show). Check out OpenGL to
+	  see how it must be implemented.
+	- Note: OpenGL sprites using DrawTriangleMesh don't seem to be
+	  textured. I'm not sure why this is yet.
+	- A nice consequence of the new DrawTriangleMesh is that vertex
+	  fog should be a LOT faster.
 15-Feb-2000
 	- Eric Sunshine worked around an OpenStep compiler bug which was
 	  triggeredy by ctLinkList.  The compiler generates unlinkable code

@@ -28,6 +28,7 @@
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/polyclip.h"
 #include "cs3d/opengl/ogl_g3d.h"
 #include "cs3d/opengl/ogl_txtcache.h"
 #include "csutil/inifile.h"
@@ -133,6 +134,7 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (iBase * iParent):G2D (NULL), System (NUL
 
   // default extension state is for all extensions to be OFF
   ARB_multitexture = false;
+  clipper = NULL;
 }
 
 csGraphics3DOpenGL::~csGraphics3DOpenGL ()
@@ -401,10 +403,15 @@ void csGraphics3DOpenGL::SetDimensions (int width, int height)
   csGraphics3DOpenGL::height2 = height / 2;
 }
 
-void csGraphics3DOpenGL::SetPerspectiveCenter (int x, int y)
+void csGraphics3DOpenGL::SetClipper (csVector2* vertices, int num_vertices)
 {
-  width2 = x;
-  height2 = y;
+  CHK (delete clipper);
+  clipper = NULL;
+  if (!vertices) return;
+  // @@@ This could be better! We are using a general polygon clipper
+  // even in cases where a box clipper would be better. We should
+  // have a special SetBoxClipper call in iGraphics3D.
+  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
 }
 
 bool csGraphics3DOpenGL::BeginDraw (int DrawFlags)

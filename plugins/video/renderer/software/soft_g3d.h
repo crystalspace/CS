@@ -317,9 +317,6 @@ public:
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
-  /// Draw a triangle mesh.
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
-
   /// Give a texture to csGraphics3DSoftware to cache it.
   virtual void CacheTexture (iPolygonTexture* texture);
 
@@ -370,14 +367,36 @@ public:
   /// Get drawing buffer height
   virtual int GetHeight ()
   { return height; }
+
   /// Set center of projection.
-  virtual void SetPerspectiveCenter (int x, int y);
+  virtual void SetPerspectiveCenter (int x, int y)
+  {
+    width2 = x;
+    height2 = y;
+  }
   /// Set perspective aspect.
-  virtual void SetPerspectiveAspect (float aspect);
+  virtual void SetPerspectiveAspect (float aspect)
+  {
+    this->aspect = aspect;
+    inv_aspect = 1./aspect;
+  }
   /// Set world to camera transformation.
-  virtual void SetObjectToCamera (csTransform* o2c);
+  virtual void SetObjectToCamera (csTransform* o2c)
+  {
+    this->o2c = *o2c;
+  }
   /// Set optional clipper.
   virtual void SetClipper (csVector2* vertices, int num_vertices);
+
+  /// Draw a triangle mesh.
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
+  {
+    // Call generic version.
+    void DrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
+	csClipper* clipper, float aspect,
+	int width2, int height2);
+    DrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+  }
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()

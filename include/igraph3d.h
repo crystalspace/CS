@@ -377,6 +377,12 @@ struct G3DTriangleMesh
   bool do_clip;
   /// Apply fogging?
   bool do_fog;
+  /// Consider triangle vertices in anti-clockwise order if true.
+  bool do_mirror;
+  /// If morphing is applied then morph texels too if true.
+  bool do_morph_texels;
+  /// If morphing is applied then morph vertex colors too if true.
+  bool do_morph_colors;
 
   /// Type of vertices supplied.
   enum
@@ -385,8 +391,6 @@ struct G3DTriangleMesh
     VM_WORLDSPACE,
     /// Must apply perspective.
     VM_VIEWSPACE,
-    /// Nothing needed.
-    VM_SCREENSPACE
   } vertex_mode;
 
   /// DrawPolygonFX flag.
@@ -397,6 +401,8 @@ struct G3DTriangleMesh
   iTextureHandle* txt_handle[MAX_TEXTURE];
   /// Precalculated vertex color list.
   csColor* vertex_colors[MAX_VERTEXPOOL];
+  /// Information for fogging the vertices.
+  G3DFogInfo* vertex_fog;
 
   // TODO : store information required for lighting calculation
 };

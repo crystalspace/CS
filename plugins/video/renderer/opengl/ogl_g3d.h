@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,12 +30,14 @@
 
 #include "csutil/scf.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
+#include "csgeom/transfrm.h"
 #include "igraph3d.h"
 #include "iplugin.h"
 
 struct iGraphics2D;
 class OpenGLTextureCache;
 class OpenGLLightmapCache;
+class csClipper;
 
 ///
 class csGraphics3DOpenGL : public iGraphics3D
@@ -104,6 +106,15 @@ protected:
   int width2;
   /// Opt: height divided by 2.
   int height2;
+
+  /// Current transformation from world to camera.
+  csTransform o2c;
+  /// Current 2D clipper.
+  csClipper* clipper;
+  /// Current aspect ratio for perspective correction.
+  float aspect;
+  /// Current inverse aspect ratio for perspective correction.
+  float inv_aspect;
 
   /**
    * render-states
@@ -295,15 +306,33 @@ public:
   virtual int GetHeight ()
   { return height; }
   /// Set center of projection.
-  virtual void SetPerspectiveCenter (int x, int y);
-  /// Set perspective aspect. @@@ NOT YET IMPLEMENTED
-  virtual void SetPerspectiveAspect (float aspect) { }
-  /// Set world to camera transformation. @@@ NOT YET IMPLEMENTED
-  virtual void SetObjectToCamera (csTransform* o2c) { }
-  /// Set optional clipper. @@@ NOT YET IMPLEMENTED
-  virtual void SetClipper (csVector2* vertices, int num_vertices) { }
-  /// Draw a triangle mesh. @@@ NOT YET IMPLEMENTED
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) { }
+  virtual void SetPerspectiveCenter (int x, int y)
+  {
+    width2 = x;
+    height2 = y;
+  }
+  /// Set perspective aspect.
+  virtual void SetPerspectiveAspect (float aspect)
+  {
+    this->aspect = aspect;
+    inv_aspect = 1./aspect;
+  }
+  /// Set world to camera transformation.
+  virtual void SetObjectToCamera (csTransform* o2c)
+  {
+    this->o2c = *o2c;
+  }
+  /// Set optional clipper.
+  virtual void SetClipper (csVector2* vertices, int num_vertices);
+  /// Draw a triangle mesh.
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
+  {
+    // Call generic version.
+    void DrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
+	csClipper* clipper, float aspect,
+	int width2, int height2);
+    DrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+  }
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()

@@ -515,6 +515,119 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
   }
 }
 
+// @@@ All messy stuff: this function does not belong here!!!
+// It has nothing to do with polygons. We should have a seperate
+// fog.cpp or something.
+
+// Version of CalculateFogPolygon that works on a triangle mesh.
+// WARNING! Array of fog info in mesh needs to be allocated before
+// calling this function!
+void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
+	G3DTriangleMesh& mesh)
+{
+  if (!rview->fog_info) { mesh.do_fog = false; return; }
+  mesh.do_fog = true;
+
+#ifdef USE_EXP_FOG
+  if (!fog_exp_table)
+    InitializeFogTable ();
+#endif
+
+  float inv_aspect = rview->inv_aspect;
+
+  int i;
+  csVector3* verts = mesh.vertices[0];
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+  {
+    // This is stupid!!! The purpose of DrawTriangleMesh is to be
+    // able to avoid doing camera transformation in the engine at all.
+    // And here we do it again... So this remains here until someone
+    // fixes this calculation to work with object/world space coordinates
+    // (depending on how the mesh is defined). For now this works and
+    // that's most important :-)
+    csVector3 v;
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE)
+      v = verts[i];
+    else
+    {
+      v = (*tr_o2c) * verts[i];
+    }
+
+    // Initialize fog vertex.
+    mesh.vertex_fog[i].r = 0;
+    mesh.vertex_fog[i].g = 0;
+    mesh.vertex_fog[i].b = 0;
+    mesh.vertex_fog[i].intensity = 0;
+
+    // Consider a ray between (0,0,0) and v and calculate the thickness of every
+    // fogged sector in between.
+    csFogInfo* fog_info = rview->fog_info;
+    while (fog_info)
+    {
+      float dist1, dist2;
+      if (fog_info->has_incoming_plane)
+      {
+	const csPlane& pl = fog_info->incoming_plane;
+	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
+	//dist1 = v.Norm () * (-pl.DD / denom);
+        dist1 = v.z * (-pl.DD / denom);
+      }
+      else
+        dist1 = 0;
+      //@@@ assume all FX polygons have no outgoing plane
+      if (!rview->added_fog_info)
+      {
+        const csPlane& pl = fog_info->outgoing_plane;
+        float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
+        //dist2 = v.Norm () * (-pl.DD / denom);
+        dist2 = v.z * (-pl.DD / denom);
+      }
+      else
+        dist2 = v.Norm();
+
+#ifdef USE_EXP_FOG
+      // Implement semi-exponential fog (linearily approximated)
+      UInt table_index = QRound ((100 * ABS (dist2 - dist1)) * fog_info->fog->density);
+      float I2;
+      if (table_index < FOG_EXP_TABLE_SIZE)
+        I2 = fog_exp_table [table_index];
+      else
+        I2 = fog_exp_table[FOG_EXP_TABLE_SIZE-1];
+#else
+      float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
+#endif
+
+      if (mesh.vertex_fog[i].intensity)
+      {
+        // We already have a previous fog level. In this case we do some
+	// mathematical tricks to combine both fog levels. Substitute one
+	// fog expresion in the other. The basic fog expression is:
+	//	C = I*F + (1-I)*P
+	//	with I = intensity
+	//	     F = fog color
+	//	     P = polygon color
+	//	     C = result
+	float I1 = mesh.vertex_fog[i].intensity;
+	mesh.vertex_fog[i].intensity = I1 + I2 - I1*I2;
+	float fact = 1. / (I1 + I2 - I1*I2);
+	mesh.vertex_fog[i].r = (I2*fog_info->fog->red + I1*mesh.vertex_fog[i].r + I1*I2*mesh.vertex_fog[i].r) * fact;
+	mesh.vertex_fog[i].g = (I2*fog_info->fog->green + I1*mesh.vertex_fog[i].g + I1*I2*mesh.vertex_fog[i].g) * fact;
+	mesh.vertex_fog[i].b = (I2*fog_info->fog->blue + I1*mesh.vertex_fog[i].b + I1*I2*mesh.vertex_fog[i].b) * fact;
+      }
+      else
+      {
+        // The first fog level.
+        mesh.vertex_fog[i].intensity = I2;
+        mesh.vertex_fog[i].r = fog_info->fog->red;
+        mesh.vertex_fog[i].g = fog_info->fog->green;
+        mesh.vertex_fog[i].b = fog_info->fog->blue;
+      }
+      fog_info = fog_info->next;
+    }
+  }
+}
+
+
 
 //---------------------------------------------------------------------------
 
