@@ -68,12 +68,14 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
   	[polygon[polygon.GetNumVertices () - 1]];
   sideA = split_plane.Classify (ptA);
+  if (ABS (sideA) < EPSILON) sideA = 0;
   int idx;
 
   for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = split_plane.Classify (ptB);
+    if (ABS (sideB) < EPSILON) sideB = 0;
     if (sideB > 0)
     {
       if (sideA < 0)

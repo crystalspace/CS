@@ -108,7 +108,7 @@ void csSector::AddLight (csStatLight* light)
   light->SetSector (this);
 }
 
-void csSector::UseStaticBSP ()
+void csSector::UseStaticBSP (int mode)
 {
   CHK (delete bsp); bsp = NULL;
   CHK (delete static_bsp); static_bsp = NULL;
@@ -137,7 +137,7 @@ void csSector::UseStaticBSP ()
   first_thing = static_thing;
   static_thing->CreateBoundingBox ();
 
-  CHK (static_bsp = new csBspTree (static_thing));
+  CHK (static_bsp = new csBspTree (static_thing, mode));
 }
 
 csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)

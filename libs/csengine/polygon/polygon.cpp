@@ -356,6 +356,9 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
   light_info.dyn_dirty = true;
+  light_info.flat_color.red = 0;
+  light_info.flat_color.green = 0;
+  light_info.flat_color.blue = 0;
 
   SetTextureType (POLYTXT_LIGHTMAP);
 }
@@ -455,15 +458,32 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   GetParent ()->AddPolygon (np1);
   GetParent ()->AddPolygon (np2);
 
+//bool verbose = strcmp (csNameObject::GetName (*this), "p19") == 0;
+//if (verbose)
+//{
+//printf ("------------\nSplitting p19:%08lx (orig=%08lx)\n", (long)this, (long)orig_poly);
+//printf ("    num_vertices=%d\n", GetVertices ().GetNumVertices ());
+//int j;
+//for (j = 0 ; j < GetVertices ().GetNumVertices () ; j++)
+//printf ("       %d: %f,%f,%f\n", j, Vwor (j).x, Vwor (j).y, Vwor (j).z);
+//printf ("    split_plane=(%f,%f,%f,%f)\n", plane.A (), plane.B (), plane.C (), plane.D ());
+//}
+
   csVector3 ptB;
   float sideA, sideB;
   csVector3 ptA = Vwor (GetVertices ().GetNumVertices () - 1);
   sideA = plane.Classify (ptA);
+  if (ABS (sideA) < EPSILON) sideA = 0;
 
   for (int i = -1 ; ++i < GetVertices ().GetNumVertices () ; )
   {
     ptB = Vwor (i);
     sideB = plane.Classify (ptB);
+    if (ABS (sideB) < EPSILON) sideB = 0;
+//if (verbose)
+//{
+//printf ("    looking at vertex A=%f,%f,%f (%f) and B=%f,%f,%f (%f)\n", ptA.x, ptA.y, ptA.z, sideA, ptB.x, ptB.y, ptB.z, sideB);
+//}
     if (sideB > 0)
     {
       if (sideA < 0)
@@ -474,9 +494,18 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	csVector3 v = ptB; v -= ptA;
 	float sect = - plane.Classify (ptA) / ( plane.Normal () * v ) ;
 	v *= sect; v += ptA;
+//if (verbose)
+//{
+//printf ("        (1) pol1: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
+//printf ("        (2) pol2: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
+//}
 	np1->AddVertex (v);
 	np2->AddVertex (v);
       }
+//if (verbose)
+//{
+//printf ("        (3) pol2: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
+//}
       np2->AddVertex (ptB);
     }
     else if (sideB < 0)
@@ -489,13 +518,27 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	csVector3 v = ptB; v -= ptA;
 	float sect = - plane.Classify (ptA) / ( plane.Normal () * v );
 	v *= sect; v += ptA;
+//if (verbose)
+//{
+//printf ("        (4) pol1: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
+//printf ("        (5) pol2: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
+//}
 	np1->AddVertex (v);
 	np2->AddVertex (v);
       }
+//if (verbose)
+//{
+//printf ("        (6) pol1: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
+//}
       np1->AddVertex (ptB);
     }
     else
     {
+//if (verbose)
+//{
+//printf ("        (7) pol1: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
+//printf ("        (8) pol2: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
+//}
       np1->AddVertex (ptB);
       np2->AddVertex (ptB);
     }
@@ -505,6 +548,16 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 
   np1->Finish ();
   np2->Finish ();
+//if (verbose)
+//{
+//int j;
+//printf ("    split to %08lx (num_vertices=%d)\n", (long)np1, np1->GetVertices ().GetNumVertices ());
+//for (j = 0 ; j < np1->GetVertices ().GetNumVertices () ; j++)
+//printf ("       %d: %f,%f,%f\n", j, np1->Vwor (j).x, np1->Vwor (j).y, np1->Vwor (j).z);
+//printf ("    split to %08lx (num_vertices=%d)\n", (long)np2, np2->GetVertices ().GetNumVertices ());
+//for (j = 0 ; j < np2->GetVertices ().GetNumVertices () ; j++)
+//printf ("       %d: %f,%f,%f\n", j, np2->Vwor (j).x, np2->Vwor (j).y, np2->Vwor (j).z);
+//}
 }
 
 

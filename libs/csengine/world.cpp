@@ -476,6 +476,8 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   Stats::polygons_considered = 0;
   Stats::polygons_drawn = 0;
   Stats::portals_drawn = 0;
+  Stats::polygons_rejected = 0;
+  Stats::polygons_accepted = 0;
 
   IGraphics2D* g2d;
   g3d->Get2dDriver (&g2d);

@@ -494,9 +494,15 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         }
       }
       if (visible)
+      {
         poly_queue->Push (p, clip);
+	Stats::polygons_accepted++;
+      }
       else
+      {
         render_pool->Free (clip);
+        Stats::polygons_rejected++;
+      }
     }
   }
 }

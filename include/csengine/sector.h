@@ -23,6 +23,7 @@
 #include "csengine/polyset.h"
 #include "csengine/rview.h"
 #include "csgeom/math3d.h"
+#include "csgeom/bsp.h"
 
 struct LightInfo;
 class csThing;
@@ -203,8 +204,10 @@ public:
    * This function will only generate BSP trees for the csThings
    * which cannot move. Note that you can no longer remove a csThing
    * from the sector if it has been added to the static BSP tree.
+   * The mode is given to the BSP building routines and can be one of the
+   * BSP_... flags.
    */
-  void UseStaticBSP ();
+  void UseStaticBSP (int mode = BSP_MINIMIZE_SPLITS);
 
   /**
    * Get ambient color valid in this sector.

@@ -22,4 +22,7 @@
 
 int Stats::polygons_considered = 0;
 int Stats::polygons_drawn = 0;
+int Stats::polygons_accepted = 0;
+int Stats::polygons_rejected = 0;
 int Stats::portals_drawn = 0;
+

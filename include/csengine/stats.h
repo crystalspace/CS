@@ -30,6 +30,10 @@ public:
   ///
   static int polygons_considered;
   ///
+  static int polygons_rejected;
+  ///
+  static int polygons_accepted;
+  ///
   static int polygons_drawn;
   ///
   static int portals_drawn;
