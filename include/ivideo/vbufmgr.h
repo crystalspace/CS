@@ -23,11 +23,17 @@
 #include "csutil/scf.h"
 
 class csVector3;
+class csVector2;
+class csColor;
 
-SCF_VERSION (iVertexBuffer, 0, 0, 1);
+SCF_VERSION (iVertexBuffer, 0, 1, 0);
 
 /**
  * This interface represents a black-box vertex buffer.
+ * Using the vertex buffer manager (see below) you can create objects
+ * that implement this interface. These objects are managed by the
+ * respective 3D renderer that provided the vertex buffer manager and
+ * are supposed to store the vertices in the most efficient way possible.
  */
 struct iVertexBuffer : public iBase
 {
@@ -40,12 +46,44 @@ struct iVertexBuffer : public iBase
    */
   virtual csVector3* GetVertices () const = 0;
   /**
+   * Get the current array of texels.
+   */
+  virtual csVector2* GetTexels () const = 0;
+  /**
+   * Get the current array of colors.
+   */
+  virtual csColor* GetColors () const = 0;
+  /**
    * Get the number of vertices.
    */
   virtual int GetVertexCount () const = 0;
 };
 
-SCF_VERSION (iVertexBufferManager, 0, 0, 1);
+SCF_VERSION (iPolygonBuffer, 0, 0, 1);
+
+/**
+ * This interface represents a black-box polygon buffer.
+ * It is used to draw a mesh of polygons. The vertex buffer manager
+ * will create instances of iPolygonBuffer. Internally it will hold
+ * the most efficient representation for the 3D renderer to actually
+ * render the polygons. On hardware this may means that the polygons
+ * are converted to triangle meshes or triangle fans/strips. With the
+ * software renderer it will probably keep the polygons as such.
+ * Polygons in this buffer used indexed coordinates (with indices
+ * that are usually relative to a vertex buffer).
+ */
+struct iPolygonBuffer : public iBase
+{
+  /**
+   * Add a polygon to this buffer. The data pointed to by 'verts'
+   * is copied so it can be discarded after calling AddPolygon.
+   */
+  virtual void AddPolygon (int* verts, int num_verts) = 0;
+  /// Clear all polygons.
+  virtual void ClearPolygons () = 0;
+};
+
+SCF_VERSION (iVertexBufferManager, 0, 0, 2);
 
 /**
  * This interface represents the vertex buffer manager. You can use this
@@ -53,6 +91,8 @@ SCF_VERSION (iVertexBufferManager, 0, 0, 1);
  */
 struct iVertexBufferManager : public iBase
 {
+  //---------- Vertex Buffers -----------------------------------------------
+
   /**
    * Create an empty vertex buffer. The ref count of this vertex buffer
    * will be one. To remove it use DecRef(). The priority number can be
@@ -72,8 +112,8 @@ struct iVertexBufferManager : public iBase
   /**
    * Lock this vertex buffer for use. Only when the vertex buffer is locked
    * are you allowed to make calls to iGraphics3D functions that actually
-   * use the vertex buffer. While the buffer is locked the vertex array
-   * that is given here may not be modified or altered in any way! The
+   * use the vertex buffer. While the buffer is locked the arrays
+   * that are given here may not be modified or altered in any way! The
    * buf_number indicates if the buffer has modified or not. You MUST
    * call UnlockBuffer() when you are ready with the buffer. Deleting a
    * vertex buffer with DecRef() automatically implies an UnlockBuffer().
@@ -83,12 +123,23 @@ struct iVertexBufferManager : public iBase
    * the same time or if memory is low.
    */
   virtual bool LockBuffer (iVertexBuffer* buf,
-  	csVector3* verts, int num_verts, int buf_number) = 0;
+  	csVector3* verts,
+	csVector2* texels,
+	csColor* colors,
+	int num_verts, int buf_number) = 0;
 
   /**
    * Unlock a vertex buffer.
    */
   virtual void UnlockBuffer (iVertexBuffer* buf) = 0;
+
+  //---------- Polygon Buffers -----------------------------------------------
+
+  /**
+   * Create an empty polygon buffer. The ref count of this polygon buffer
+   * will be one. To remove it use DecRef().
+   */
+  virtual iPolygonBuffer* CreatePolygonBuffer () = 0;
 };
 
 #endif // __IVIDEO_VBUFMGR_H__

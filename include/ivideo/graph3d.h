@@ -408,10 +408,7 @@ struct G3DTriangleMesh
    * have the same number of vertices.
    */
   iVertexBuffer* buffers[MAX_VERTEXPOOL];
-  csVector2* texels[MAX_VERTEXPOOL];
   iMaterialHandle* mat_handle;
-  /// Precalculated vertex color list.
-  csColor* vertex_colors[MAX_VERTEXPOOL];
   /// Information for fogging the vertices.
   G3DFogInfo* vertex_fog;
 
