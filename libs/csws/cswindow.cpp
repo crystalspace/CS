@@ -438,7 +438,7 @@ void csWindow::SetMenuBarHeight (int iHeight)
   csComponent::SetRect (bound);
 }
 
-void csWindow::SetText (char *iText)
+void csWindow::SetText (const char *iText)
 {
   csComponent *c = GetChild (CSWID_TITLEBAR);
   if (c)
@@ -456,7 +456,7 @@ void csWindow::GetText (char *oText, int iTextSize)
     *oText = 0;
 }
 
-char *csWindow::GetText ()
+const char *csWindow::GetText ()
 {
   csComponent *c = GetChild (CSWID_TITLEBAR);
   if (c)

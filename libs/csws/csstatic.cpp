@@ -237,7 +237,7 @@ void csStatic::SuggestSize (int &w, int &h)
     h++;
 }
 
-void csStatic::SetText (char *iText)
+void csStatic::SetText (const char *iText)
 {
   if (style == csscsText)
     csComponent::SetText (iText);

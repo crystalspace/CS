@@ -103,7 +103,7 @@ csMenuItem::~csMenuItem ()
   }
 }
 
-void csMenuItem::SetText (char *iText)
+void csMenuItem::SetText (const char *iText)
 {
   if (text)
     CHKB (delete[] text)

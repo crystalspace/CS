@@ -39,12 +39,12 @@ extern void Combinations (int m, int n, bool (*callback) (int *vector, int count
  * Expand a filename if it contains shortcuts ('.', '~', '..' etc)<p>
  * Return a newly-allocated with new [] "char *".
  */
-extern char *expandname (char *iName);
+extern char *expandname (const char *iName);
 /**
  * Split a pathname into separate path and name. Path delimiters are either
  * '/', PATH_SEPARATOR and, for OS/2, MS-DOS and Win32 targets, ':'.
  */
-extern void splitpath (char *iPathName, char *iPath, size_t iPathSize,
+extern void splitpath (const char *iPathName, char *iPath, size_t iPathSize,
   char *iName, size_t iNameSize);
 /**
  * This is a really simple function that does very nice

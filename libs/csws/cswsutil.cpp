@@ -156,7 +156,7 @@ bool csWindowList::do_addtowindowlist (csComponent *child, void *param)
   csWindowList *windowlist = (csWindowList *)param;
   if (windowlist != child)
   {
-    char *title = child->GetText ();
+    const char *title = child->GetText ();
     if (title && title[0])
       CHKB ((void)new csListBoxItem (windowlist->list, title, (int)child,
         child == windowlist->focusedwindow ? cslisEmphasized : cslisNormal));
@@ -454,11 +454,11 @@ public:
   virtual bool HandleEvent (csEvent &Event);
   void Reread ();
   // set file path
-  bool SetPath (char *iPath);
+  bool SetPath (const char *iPath);
   // set file name
-  void SetName (char *iName);
+  void SetName (const char *iName);
   // set path and file name
-  void SetFileName (char *iName);
+  void SetFileName (const char *iName);
   // build path from directory listbox and set it
   bool BuildAndSetPath ();
 };
@@ -584,7 +584,7 @@ bool cspFileDialog::BuildAndSetPath ()
   return SetPath (buff);
 }
 
-bool cspFileDialog::SetPath (char *iPath)
+bool cspFileDialog::SetPath (const char *iPath)
 {
   if (busy || !iPath)
     return false;
@@ -603,14 +603,14 @@ bool cspFileDialog::SetPath (char *iPath)
   return true;
 }
 
-void cspFileDialog::SetName (char *iName)
+void cspFileDialog::SetName (const char *iName)
 {
   csComponent *c = GetChild (CSWID_FILENAME);
   if (c && iName)
     c->SetText (iName);
 }
 
-void cspFileDialog::SetFileName (char *iName)
+void cspFileDialog::SetFileName (const char *iName)
 {
   char path [MAXPATHLEN + 1], name [MAXPATHLEN + 1];
   splitpath (iName, path, sizeof (path), name, sizeof (name));

@@ -108,7 +108,7 @@ static int __getcwd (char drive, char *buffer, int buffersize)
 
 #endif // defined (OS_DOS)
 
-char *expandname (char *iName)
+char *expandname (const char *iName)
 {
   char outname [MAXPATHLEN + 1];
   int inp = 0, outp = 0, namelen = strlen (iName);
@@ -219,8 +219,8 @@ char *expandname (char *iName)
   return ret;
 }
 
-void splitpath (char *iPathName, char *iPath, size_t iPathSize, char *iName,
-  size_t iNameSize)
+void splitpath (const char *iPathName, char *iPath, size_t iPathSize,
+  char *iName, size_t iNameSize)
 {
   size_t sl = strlen (iPathName);
   size_t maxl = sl;
