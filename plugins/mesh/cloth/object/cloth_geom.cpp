@@ -32,7 +32,7 @@ Cloth::AddConstraint(int v0, int v1, Constraint ** edge, int *pos)
     };
     Constraint     *p;
     int             size = Edges->Length();
-    for (uint i = 0; i < size; i++) 
+    for (int i = 0; i < size; i++) 
       {
 	p = (Constraint *) Edges->Get(i);
 	if ((p->v0 == v0) || (p->v0 == v1)) 
@@ -61,7 +61,7 @@ Cloth::AddShearConstraint(int v0, int v1, Constraint ** edge, int *pos)
     };
     Constraint     *p;
     int             size = Shear_Neighbours->Length();
-    for (uint i = 0; i < size; i++) 
+    for (int i = 0; i < size; i++) 
       {
 	p = (Constraint *) Shear_Neighbours->Get(i);
 	if ((p->v0 == v0) || (p->v0 == v1)) 
@@ -87,13 +87,13 @@ Cloth::Cloth(iClothFactoryState * mesh,
     object_bbox = &box;
     gravity = grav;
     //printf(" CREATING the cloth  ... \n");
-    uint            i;
+    int            i;
     vertices = NULL;
     triangles = NULL;
     csVector3      *verts = mesh->GetVertices();
     nverts = mesh->GetVertexCount();
     csTriangle     *tris = mesh->GetTriangles();
-    uint            tri_count = mesh->GetTriangleCount();
+    int            tri_count = mesh->GetTriangleCount();
 
     Edges = new csBasicVector(nverts + 16, 16);
     Shear_Neighbours = new csBasicVector(nverts - 32, 16);
@@ -160,8 +160,8 @@ Cloth::Cloth(iClothFactoryState * mesh,
 	};
 	
     };
-    uint            j = Edges->Length();
-    uint            k;
+    int            j = Edges->Length();
+    int            k;
     Edge2TriangleRef = new int *[j];
     for (i = 0; i < j; i++) 
       {
