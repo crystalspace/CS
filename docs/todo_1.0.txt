@@ -87,8 +87,7 @@ Bugs to fix:
 	     Charles James Leonardo Quarra Cappiello <charsquarra@hotmail.com>
 	     further reports that MatzeB fixed the simplecloth crash at exit,
 	     but the fix is not yet in CVS.
-	[S]  Starting walktest with infinite or null renderer leads to direct
-	     crash
+	[S]  Starting walktest with infinite renderer leads to direct crash
 	[**] simpvs crashes immediately at startup dereferencing a null pointer.
 	     (optimize mode)
 	[S]  tbtut crashes after moving a bit in software mode.  Also, the
