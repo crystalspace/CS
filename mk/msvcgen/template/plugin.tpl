@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib gdi32.lib advapi32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 user32.lib gdi32.lib advapi32.lib ddraw.lib zlib.lib %libs% /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /nodefaultlib:"LIBC" /nodefaultlib:"LIBCD" /nodefaultlib:"LIBCMT" /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\libs" %lflags% /OPT:NOREF
+# ADD LINK32 user32.lib gdi32.lib advapi32.lib ddraw.lib zlib.lib %libs% /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /nodefaultlib:"LIBC" /nodefaultlib:"LIBCD" /nodefaultlib:"LIBCMT" /nodefaultlib:"LIBCMTD" /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\libs" %lflags% /OPT:NOREF
 # Begin Special Build Tool
 TargetPath=.\csrelease\temp\%project%\%target%
 SOURCE="$(InputPath)"
