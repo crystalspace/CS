@@ -312,6 +312,10 @@ bool VideoSystem::FindMode (int Width, int Height, int Depth, int &PaletteSize,
 
   VideoMode = bestmode;
   ScanLinesPerPage = Height;
+
+  // Compute the real bytes per scanline (videoadapter may use more)
+  RealBytesPerScanLine = Width * BytesPerPixel;
+
   return true;
 }
 
@@ -843,6 +847,7 @@ void VideoSystem::Flush (int x, int y, int w, int h)
   {
     // Transform width into bytes
     w *= BytesPerPixel;
+
     // Image Refresh for VESA modes
     bool linetransfer = ((unsigned)w == BytesPerScanLine);
     unsigned char *src, *dest, *last;
@@ -850,8 +855,8 @@ void VideoSystem::Flush (int x, int y, int w, int h)
     unsigned int wg = WindowGranularity * 1024;
     int curx = 0, Bank = 0;
 
-    src = VRAMBuffer + x * BytesPerPixel + y * BytesPerScanLine;
-    last = src + w + h * BytesPerScanLine;
+    src = VRAMBuffer + x * BytesPerPixel + y * RealBytesPerScanLine;
+    last = src + w + (h - 1) * RealBytesPerScanLine;
     dest = VRAM + VideoPage * PageSize + x * BytesPerPixel + y * BytesPerScanLine;
 
     if (IsBanked)
@@ -891,8 +896,9 @@ void VideoSystem::Flush (int x, int y, int w, int h)
       if (!linetransfer)
         if (curx >= w)
         {
-          int delta = BytesPerScanLine - curx;
-          src += delta; dest += delta; curx = 0;
+          src += (RealBytesPerScanLine - curx);
+          dest += (BytesPerScanLine - curx);
+          curx = 0;
         } /* endif */
     } /* endwhile */
 

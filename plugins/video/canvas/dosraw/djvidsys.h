@@ -191,8 +191,10 @@ private:
   bool IsBanked;
   /// How many linearly addressable video pages fits in video RAM?
   int VideoPages;
-  /// Bytes per scan line
-  unsigned int BytesPerScanLine;
+  /// Hardware bytes per scan line (may be more than actually required)
+  unsigned BytesPerScanLine;
+  /// Real number of bytes per scanline (== width * bytes per pixel)
+  unsigned RealBytesPerScanLine;
   /// Bytes per pixel
   unsigned int BytesPerPixel;
   /// VESA SVGA window granularity
