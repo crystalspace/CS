@@ -720,8 +720,7 @@ bool csSystemDriver::UnloadPlugin (iComponent *iObject)
   iConfig *config = SCF_QUERY_INTERFACE (iObject, iConfig);
   if (config)
   {
-	int i;
-    for (i = OptionList.Length () - 1; i >= 0; i--) 
+    for (int i = OptionList.Length () - 1; i >= 0; i--) 
     {
       csPluginOption *pio = (csPluginOption *)OptionList.Get (i);
       if (pio->Config == config)
@@ -729,8 +728,6 @@ bool csSystemDriver::UnloadPlugin (iComponent *iObject)
     }
     config->DecRef ();
   }
-
-  csPlugin *p = Plugins.Get (idx);
 
   object_reg.Unregister ((iBase *)iObject, NULL);
   return Plugins.Delete (idx);
