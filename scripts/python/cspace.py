@@ -487,6 +487,10 @@ class csVector2Ptr(csVector2):
         _swig_setattr(self, csVector2,self.__class__,csVector2)
 _cspace.csVector2_swigregister(csVector2Ptr)
 
+CS_AXIS_NONE = _cspace.CS_AXIS_NONE
+CS_AXIS_X = _cspace.CS_AXIS_X
+CS_AXIS_Y = _cspace.CS_AXIS_Y
+CS_AXIS_Z = _cspace.CS_AXIS_Z
 class csVector3(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3, name, value)
@@ -1548,6 +1552,8 @@ class csPoly3D(_object):
     def ClassifyX(*args): return _cspace.csPoly3D_ClassifyX(*args)
     def ClassifyY(*args): return _cspace.csPoly3D_ClassifyY(*args)
     def ClassifyZ(*args): return _cspace.csPoly3D_ClassifyZ(*args)
+    def ClassifyAxis(*args): return _cspace.csPoly3D_ClassifyAxis(*args)
+    def IsAxisAligned(*args): return _cspace.csPoly3D_IsAxisAligned(*args)
     def CutToPlane(*args): return _cspace.csPoly3D_CutToPlane(*args)
     def SplitWithPlane(*args): return _cspace.csPoly3D_SplitWithPlane(*args)
     def SplitWithPlaneX(*args): return _cspace.csPoly3D_SplitWithPlaneX(*args)
