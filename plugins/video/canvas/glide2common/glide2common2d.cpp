@@ -34,20 +34,22 @@
 #include "isystem.h"
 #include "itexture.h"
 
-IMPLEMENT_IBASE (csGraphics2DGlide2x)
+IMPLEMENT_IBASE (csGraphics2DGlideCommon)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
   IMPLEMENTS_INTERFACE (iGraphics2DGlide)
 IMPLEMENT_IBASE_END
+
+bool csGraphics2DGlideCommon::locked=false;
 
 // csGraphics2DGlideCommon function
 csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
   csGraphics2D ()
 {
   CONSTRUCT_IBASE (iParent);
-  LocalFontServer = NULL;
-  texture_cache = NULL;
-  locked = false;
+//  LocalFontServer = NULL;
+//  texture_cache = NULL;
+  SetVRetrace( false );
 }
 
 bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
@@ -57,7 +59,7 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
 
   // see if we need to go fullscreen or not...
   csIniFile* config = new csIniFile("cryst.cfg");
-  m_DoGlideInWindow = (!config->GetYesNo("VideoDriver","FULL_SCREEN",FALSE));
+  m_DoGlideInWindow = (!config->GetYesNo("VideoDriver","FullScreen",FALSE));
   CHK (delete config);
   
   Depth = 16;
@@ -86,6 +88,9 @@ bool csGraphics2DGlideCommon::Open(const char *Title)
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
+
+  bPalettized = false;
+  bPaletteChanged = false;
 /*
   // load font 'server'
   if (LocalFontServer == NULL)
@@ -152,9 +157,67 @@ void csGraphics2DGlideCommon::DrawLine (int x1, int y1, int x2, int y2, int colo
   grDrawLine(&a,&b);
 }
 
-void csGraphics2DGlideCommon::DrawPixel (csGraphics2D *This, int x, int y, int color)
+//#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
+#define GR_DRAWBUFFER GR_BUFFER_BACKBUFFER
+
+bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
 {
-   // can't do this while framebuffer is locked...
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
+  FxBool bret;
+  lfbInfo.size=sizeof(GrLfbInfo_t);
+  
+  glDrawMode=GR_LFB_WRITE_ONLY;
+
+  if(locked) FinishDraw();
+
+    
+  bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
+                          GR_DRAWBUFFER,
+                          GR_LFBWRITEMODE_565,
+                          GR_ORIGIN_UPPER_LEFT,
+                          FXFALSE,
+                          &lfbInfo);
+  if(bret)
+    {
+      Memory=(unsigned char*)lfbInfo.lfbPtr;
+      if(lfbInfo.origin==GR_ORIGIN_UPPER_LEFT)
+        {
+          for(int i = 0; i < Height; i++)
+            LineAddress [i] = i * lfbInfo.strideInBytes;
+        }
+      else
+        {
+          int omi = Height-1;
+          for(int i = 0; i < Height; i++)
+            LineAddress [i] = (omi--) * lfbInfo.strideInBytes;
+        }
+      locked=true;
+    }
+  return bret;
+
+}
+
+void csGraphics2DGlideCommon::FinishDraw ()
+{
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
+  Memory=NULL;
+  for (int i = 0; i < Height; i++) LineAddress [i] = 0;
+  if (locked) 
+    GlideLib_grLfbUnlock(glDrawMode,GR_DRAWBUFFER);
+  
+  locked = false;
+}
+
+
+void csGraphics2DGlideCommon::DrawPixelGlide ( csGraphics2D *This, int x, int y, int color)
+{
+  // can't do this while framebuffer is locked...
   if (locked) return;
 
   GrVertex p;
@@ -164,18 +227,65 @@ void csGraphics2DGlideCommon::DrawPixel (csGraphics2D *This, int x, int y, int c
   grDrawPoint(&p);
 }
 
-void csGraphics2DGlideCommon::WriteChar (csGraphics2D *This, int x, int y, int fg, int bg, char c)
+void csGraphics2DGlideCommon::WriteCharGlide ( csGraphics2D *This, int x, int y, int fg, int bg, char c)
 {
+  //if (!locked)
+//thisPtr->BeginDraw();
+//  if (locked) thisPtr->FinishDraw();
+//  thisPtr->BeginDraw();
+  This->WriteChar16( This, x,y,fg,bg,c);
+
   // not implemented yet...
 }
 
-void csGraphics2DGlideCommon::DrawSprite (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
+void csGraphics2DGlideCommon::DrawSpriteGlide ( csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
   int sw, int sh, int tx, int ty, int tw, int th)
 {
+ // if (!locked) thisPtr->BeginDraw();
+//  if (locked) thisPtr->FinishDraw();
+  //thisPtr->BeginDraw();
+  This->DrawSprite16( This, hTex,sx,sy,sw,sh,tx,ty,tw,th);
   // not implemented yet...
 }
 
-unsigned char* csGraphics2DGlideCommon::GetPixelAt (csGraphics2D *This, int /*x*/, int /*y*/)
+unsigned char* csGraphics2DGlideCommon::GetPixelAtGlide ( csGraphics2D *This, int x, int y)
 {
-  return NULL;
+  // not implemented yet...
+   //static FxBool bret;
+//   static unsigned char ch;
+   //static GrLfbInfo_t lfbInfo;
+
+/*   if (!locked)
+   {
+     lfbInfo.size=sizeof(GrLfbInfo_t);
+
+
+     bret=GlideLib_grLfbLock(GR_LFB_READ_ONLY|GR_LFB_IDLE,
+                          GR_DRAWBUFFER,
+                          GR_LFBWRITEMODE_565,
+                          GR_ORIGIN_ANY,
+                          FXFALSE,
+                          &lfbInfo);
+     locked=bret;
+   }*/
+
+
+   if (!locked) This->BeginDraw();
+
+   return This->GetPixelAt16( This, x,y);
+/*   if(locked)
+   {
+     //Memory=(unsigned char*)lfbInfo.lfbPtr;
+     return (unsigned char *)thisPtr->Memory+(y*thisPtr->lfbInfo.strideInBytes+x);
+
+     //GlideLib_grLfbUnlock(GR_LFB_READ_ONLY,GR_DRAWBUFFER);
+   }
+
+   else return NULL;*/
+}
+
+void csGraphics2DGlideCommon::Print( csRect* area ){
+
+    // swap the buffers only to show the new frame
+    GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
 }

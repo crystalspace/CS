@@ -50,12 +50,17 @@ class csGraphics2DGlideCommon : public csGraphics2D, public iGraphics2DGlide
 protected:
   /// flag to indicate whether to draw fullscreen or not.
   bool m_DoGlideInWindow;
+  bool m_bVRetrace;
   
   /// palette has been changed
   bool bPaletteChanged;
-  
+  bool bPalettized;
+  int glDrawMode;
+  bool GraphicsReady;
+  GrLfbInfo_t lfbInfo;
+    
   /// flag to prevent 2D drawing
-  bool locked;	
+  static bool locked;	
   /// my own private texture cache--for 2D sprites!
 //  OpenGLTextureCache *texture_cache; //dh: not implemented yet
 
@@ -104,15 +109,17 @@ public:
   //  Glide-specific procedures
   void SetTMUPalette(int tmu);
   /// Draw a line
-  virtual void DrawLine (csGraphics2D *This, int x1, int y1, int x2, int y2, int color);
+  virtual void DrawLine( int x1, int y1, int x2, int y2, int color);
   /// Draw a pixel
-  virtual void DrawPixel (csGraphics2D *This, int x, int y, int color);
+  static void DrawPixelGlide (csGraphics2D *This, int x, int y, int color);
   /// Write a single character
-  virtual void WriteChar (csGraphics2D *This, int x, int y, int fg, int bg, char c);
+  static void WriteCharGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Draw a 2D sprite
-  virtual void DrawSprite (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
+  static void DrawSpriteGlide (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th);
 
+  virtual bool BeginDraw();
+  virtual void FinishDraw();
   /// Figure out GL RGB color from a packed color format
 //  virtual void setGlideColorfromint(int color); //dh: not implemented yet
 
@@ -120,7 +127,11 @@ public:
    * Get address of video RAM at given x,y coordinates.
    * The Glide version of this function just returns NULL.
    */
-  virtual unsigned char* GetPixelAt (int x, int y);
+  static unsigned char* GetPixelAtGlide (csGraphics2D *This,int x, int y);
+
+  virtual void Print( csRect* area );  
+  // iGraphics2DGlide
+  virtual void SetVRetrace( bool wait4vr ){ m_bVRetrace = wait4vr; }
 };
 
 #endif
