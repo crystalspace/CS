@@ -457,15 +457,15 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_ANIMATE:
         {
           bool loop = false;
-	  int type = 0;
+	  int timing = 0;
 	  const char* animname = child->GetAttributeValue ("name");
 	  csRef<iDocumentNode> loopnode = child->GetNode ("loop");
 	  if (loopnode) synldr->ParseBool (loopnode, loop, true);
-	  csRef<iDocumentNode> typenode = child->GetNode ("type");
-	  if (typenode) type = typenode->GetContentsValueAsInt ();
+	  csRef<iDocumentNode> timingnode = child->GetNode ("timing");
+	  if (timingnode) timing = timingnode->GetContentsValueAsInt ();
 	  iSprite2DUVAnimation *ani = spr2dLook->GetUVAnimation (animname);
 	  if (ani)
-	    spr2dLook->SetUVAnimation (animname, type, loop);
+	    spr2dLook->SetUVAnimation (animname, timing, loop);
 	  else
     	  {
 	    synldr->ReportError (
