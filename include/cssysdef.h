@@ -566,10 +566,16 @@ Type &Class::getterFunc ()                                                      
 // Do not enable CS_EXTENSIVE_MEMDEBUG if your platform or your own code
 // defines its own 'new' operator, since this version will interfere with your
 // own.
+// CS_MEMORY_TRACKER is treated like CS_EXTENSIVE_MEMDEBUG here.
 #ifndef CS_DEBUG
 #  undef CS_EXTENSIVE_MEMDEBUG
+#  undef CS_MEMORY_TRACKER
+#else
+#  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
+#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER at the same time!
+#  endif
 #endif
-#ifdef CS_EXTENSIVE_MEMDEBUG
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 extern void* operator new (size_t s, void* filename, int line);
 extern void* operator new[] (size_t s, void* filename, int line);
 #define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)__FILE__, __LINE__)

@@ -143,7 +143,7 @@ void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
 
 bool csUnloadLibrary (csLibraryHandle Handle)
 {
-#if defined(CS_EXTENSIVE_MEMDEBUG) && defined(COMP_VC)
+#if (defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)) && defined(COMP_VC)
   // Why not? - Because the source file information
   // for leaked objects would get lost
   return true;

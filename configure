@@ -900,6 +900,8 @@ Optional Features:
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
                           common memory management mistakes (default NO)
+  --enable-memory-tracker enable the memory tracker which checks memory usage
+                          per source file (default NO)
   --enable-new-renderer   enable use of new renderer (_EXPERIMENTAL_!)
                           (default NO)
   --enable-makefile-cache enable caching of makefile information to speed up
@@ -32660,6 +32662,36 @@ fi
 
 if test $enable_extensive_memory_debugger = yes; then
   cs_header_text="${cs_header_text}#define CS_EXTENSIVE_MEMDEBUG
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine if memory tracker should be enabled.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking whether to use memory tracker" >&5
+echo $ECHO_N "checking whether to use memory tracker... $ECHO_C" >&6
+# Check whether --enable-memory-tracker or --disable-memory-tracker was given.
+if test "${enable_memory_tracker+set}" = set; then
+  enableval="$enable_memory_tracker"
+
+else
+  enable_memory_tracker=no
+fi;
+echo "$as_me:$LINENO: result: $enable_memory_tracker" >&5
+echo "${ECHO_T}$enable_memory_tracker" >&6
+cs_build_prop_val=`echo x$enable_memory_tracker | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}MEMORY_TRACKER = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}MEMORY_TRACKER ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+if test $enable_memory_tracker = yes; then
+  cs_header_text="${cs_header_text}#define CS_MEMORY_TRACKER
 "
 fi
 

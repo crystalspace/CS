@@ -127,7 +127,8 @@ class csShadow;
 #define DEBUGCMD_COUNTERFREEZE	1045	// Freeze all counters.
 #define DEBUGCMD_SHADOWDEBUG	1046	// Toggle shadow debugging
 #define DEBUGCMD_DEBUGCMD   	1047	// Send a debug command to a plugin
-#define DEBUGCMD_UNPREPARE   	1048	// Unprepare all things
+#define DEBUGCMD_MEMORYDUMP   	1048	// Memory dump
+#define DEBUGCMD_UNPREPARE   	1049	// Unprepare all things
 
 /**
  * For key mappings.

@@ -23,6 +23,21 @@ chronological order.
 	  using AddBoundingVertexSmart() instead of AddBoundingVertex().
 	- Jorrit fixed a bug in sprcal3d. It would not set the 'polygon_idx'
 	  to -1 in HitBeamObject().
+	- Jorrit added a new configure --enable-memory-tracker option. With
+	  this option you can compile CS with memory tracking enabled
+	  (CS_MEMORY_TRACKER define). Using memory tracking CS will keep
+	  track of the amount of memory used per source file.
+	- Jorrit implemented a new memory tracker (enabled with the
+	  --enable-memory-tracker configure option) which tracks, per module
+	  and per source file, the number of allocations and how much memory
+	  is being allocated (both maximum and current). There is a new
+	  object in the object registry that is registered at
+	  'crystalspace.utilities.memorytracker' and that implements
+	  iMemoryTracker. This object will keep track of all allocations per
+	  'module' (plugin or app).
+	- Jorrit added a new 'memorydump' command to BugPlug. This command
+	  will try to find the memory tracker and then call Dump() on it.
+	  Assigned to ctrl-m key.
 15-Feb-2004
 	- Norman Kraemer removed inclusion of recently removed av3dtxt.h in AWS
 	  screencanvas header.

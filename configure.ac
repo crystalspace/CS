@@ -2282,6 +2282,23 @@ AS_IF([test $enable_extensive_memory_debugger = yes],
 
 
 #------------------------------------------------------------------------------
+# Determine if memory tracker should be enabled.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to use memory tracker])
+AC_ARG_ENABLE([memory-tracker],
+    [AC_HELP_STRING([--enable-memory-tracker],
+	[enable the memory tracker which checks memory usage per
+	source file (default NO)])],
+    [], [enable_memory_tracker=no])
+AC_MSG_RESULT([$enable_memory_tracker])
+CS_BUILD_PROPERTY([MEMORY_TRACKER],
+    [$enable_memory_tracker])
+AS_IF([test $enable_memory_tracker = yes],
+    [CS_HEADER_PROPERTY([CS_MEMORY_TRACKER])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine whether the new renderer should be activated.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to use new renderer])

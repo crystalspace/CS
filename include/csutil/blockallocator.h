@@ -22,7 +22,7 @@
 #include "array.h"
 
 // hack: work around problems caused by #defining 'new'
-#ifdef CS_EXTENSIVE_MEMDEBUG
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # undef new
 #endif
 #include <new>

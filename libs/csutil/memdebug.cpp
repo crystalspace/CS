@@ -19,7 +19,7 @@
 #include <stdarg.h>
 
 // Include platform.h here. Otherwise we don't get the CS_EXTENSIVE_MEMDEBUG
-// definition.
+// or CS_MEMORY_TRACKER definitions.
 #include "platform.h"
 
 #ifdef CS_EXTENSIVE_MEMDEBUG
@@ -29,8 +29,22 @@
 #  undef CS_EXTENSIVE_MEMDEBUG
 #endif
 
+#ifdef CS_MEMORY_TRACKER
+#  define CS_MEMORY_TRACKER_IMPLEMENT
+#  undef CS_MEMORY_TRACKER
+#endif
+
 // it's important that cssysdef.h is included AFTER the above #ifdef
 #include "cssysdef.h"
+
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+// Select the type of memory debugger to use:
+//#  define MEMDEBUG_EXTENSIVE
+//#  define MEMDEBUG_CHECKALLOC
+//#  define MEMDEBUG_DUMPALLOC
+#else
+#  define MEMDEBUG_MEMORY_TRACKER
+#endif
 
 #if defined(COMP_VC)
 //========================================================================
@@ -65,7 +79,7 @@ void operator delete[] (void* p)
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#elif 0	// COMP_VC
+#elif defined(MEMDEBUG_EXTENSIVE) // COMP_VC
 //========================================================================
 // Extensive memory debugger.
 //========================================================================
@@ -520,7 +534,7 @@ void operator delete[] (void* p)
 #endif
 }
 
-#elif 0	// COMP_VC
+#elif defined(MEMDEBUG_CHECKALLOC)	// COMP_VC
 //========================================================================
 // This alternative branch allows for checking allocated memory amounts.
 //========================================================================
@@ -577,7 +591,7 @@ void operator delete[] (void* p)
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#elif 0	// COMP_VC
+#elif defined(MEMDEBUG_DUMPALLOC)	// COMP_VC
 //========================================================================
 // This alternative branch allows for dumping all memory allocations.
 //========================================================================
@@ -611,6 +625,280 @@ void operator delete[] (void* p)
   if (p) free (p);
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+
+#elif defined(MEMDEBUG_MEMORY_TRACKER)
+
+#undef new
+
+#include "csutil/scf.h"
+#include "csutil/ref.h"
+#include "iutil/objreg.h"
+#include "iutil/memdebug.h"
+
+// This structure is used per file to keep track of allocations.
+// ModuleMemTracker maintains an array of them per module.
+struct MemTrackerInfo
+{
+  char* file;
+  size_t max_alloc;
+  size_t current_alloc;
+  int max_count;
+  int current_count;
+  void Init (char* filename)
+  {
+    file = filename;
+    max_alloc = 0;
+    current_alloc = 0;
+    max_count = 0;
+    current_count = 0;
+  }
+};
+
+// This class is the memory tracker per module or application.
+// MemTrackerRegistry maintains a list of them.
+class MemTrackerModule
+{
+public:
+  char* Class;		// Name of class or 0 for application level.
+  MemTrackerInfo* mti_table[2000];
+  int mti_table_count;
+
+  MemTrackerModule ()
+  {
+    mti_table_count = 0;
+  }
+
+  void InsertBefore (int idx, char* filename)
+  {
+    int tomove = mti_table_count - idx;
+    if (tomove > 0)
+      memmove (mti_table+idx+1, mti_table+idx,
+      	  sizeof (MemTrackerInfo*) * tomove);
+    mti_table_count++;
+    mti_table[idx] = (MemTrackerInfo*)malloc (sizeof (MemTrackerInfo));
+    mti_table[idx]->Init (filename);
+  }
+
+  MemTrackerInfo* FindInsertMtiTableEntry (
+	char* filename, int start, int end)
+  {
+    // Binary search.
+    if (mti_table_count <= 0)
+    {
+      mti_table_count++;
+      mti_table[0] = (MemTrackerInfo*)malloc (sizeof (MemTrackerInfo));
+      mti_table[0]->Init (filename);
+      return mti_table[0];
+    }
+
+    if (start == end)
+    {
+    //@@@@@@@@@@@ IS STRCMP NEEDED?
+      int rc = strcmp (filename, mti_table[start]->file);
+      if (rc == 0) return mti_table[start];
+      if (rc < 0)
+      {
+        InsertBefore (start, filename);
+        return mti_table[start];
+      }
+      else
+      {
+        InsertBefore (start+1, filename);
+        return mti_table[start+1];
+      }
+    }
+    else if (start+1 == end)
+    {
+      int rc1 = strcmp (filename, mti_table[start]->file);
+      if (rc1 == 0) return mti_table[start];
+      if (rc1 < 0)
+      {
+        InsertBefore (start, filename);
+        return mti_table[start];
+      }
+
+      int rc2 = strcmp (filename, mti_table[end]->file);
+      if (rc2 == 0) return mti_table[end];
+      if (rc2 > 0)
+      {
+        InsertBefore (end+1, filename);
+        return mti_table[end+1];
+      }
+      InsertBefore (start+1, filename);
+      return mti_table[start+1];
+    }
+    else
+    {
+      int mid = (start+end)/2;
+      int rc = strcmp (filename, mti_table[mid]->file);
+      if (rc == 0) return mti_table[mid];
+      if (rc < 0) return FindInsertMtiTableEntry (filename, start, mid-1);
+      return FindInsertMtiTableEntry (filename, mid+1, end);
+    }
+  }
+
+  MemTrackerInfo* FindInsertMtiTableEntry (char* filename)
+  {
+    return FindInsertMtiTableEntry (filename, 0, mti_table_count-1);
+  }
+
+  void Dump ()
+  {
+    int i;
+    printf ("-----------------------------------------------------\n");
+    printf ("Module: %s\n", Class);
+    printf ("current  max      current# max#     file\n");
+    for (i = 0 ; i < mti_table_count ; i++)
+    {
+      MemTrackerInfo* mti = mti_table[0];
+      printf ("%8d %8d %8d %8d %s\n", mti->current_alloc,
+    	  mti->max_alloc, mti->current_count, mti->max_count,
+	  mti->file);
+    }
+    fflush (stdout);
+  }
+};
+
+
+// The following machinery is needed to try to keep track of memory
+// allocations in different plugins.
+class MemTrackerRegistry : public iMemoryTracker
+{
+public:
+  MemTrackerModule* modules[500];	// @@@ Hardcoded!
+  int num_modules;
+
+  SCF_DECLARE_IBASE;
+  MemTrackerRegistry ()
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    num_modules = 0;
+  }
+  virtual ~MemTrackerRegistry ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
+
+  MemTrackerModule* NewMemTrackerModule (char* Class)
+  {
+    MemTrackerModule* mod = new MemTrackerModule ();
+    mod->Class = Class;
+    modules[num_modules++] = mod;
+    return mod;
+  }
+
+  virtual void Dump ()
+  {
+    int i;
+    for (i = 0 ; i < num_modules ; i++)
+    {
+      modules[i]->Dump ();
+    }
+  }
+};
+
+SCF_IMPLEMENT_IBASE (MemTrackerRegistry)
+  SCF_IMPLEMENTS_INTERFACE (iMemoryTracker)
+SCF_IMPLEMENT_IBASE_END
+
+static MemTrackerModule* mti_this_module = 0;
+
+void RegisterMemoryTrackerModule (char* Class)
+{
+  if (!iSCF::SCF)
+  {
+    printf ("iSCF::SCF not set yet!\n");
+    return;
+  }
+
+  if (iSCF::SCF->object_reg)
+  {
+    csRef<iMemoryTracker> mtiTR = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    	iSCF::SCF->object_reg, "crystalspace.utilities.memorytracker",
+	iMemoryTracker);
+    if (!mtiTR)
+    {
+      mtiTR = csPtr<iMemoryTracker> ((iMemoryTracker*)new MemTrackerRegistry);
+      iSCF::SCF->object_reg->Register (mtiTR,
+      	"crystalspace.utilities.memorytracker");
+    }
+    mti_this_module = ((MemTrackerRegistry*)(iMemoryTracker*)mtiTR)
+    	->NewMemTrackerModule (Class);
+  }
+  else
+  {
+    printf ("Object Reg not set for %s!!!\n", Class);
+    fflush (stdout);
+  }
+}
+
+MemTrackerInfo* mtiRegisterAlloc (size_t s, void* filename)
+{
+  if (mti_this_module == 0)
+    return 0;	// Don't track this alloc yet.
+
+  MemTrackerInfo* mti = mti_this_module->FindInsertMtiTableEntry (
+  	(char*)filename);
+  mti->current_count++;
+  mti->current_alloc += s;
+  if (mti->current_count > mti->max_count)
+    mti->max_count = mti->current_count;
+  if (mti->current_alloc > mti->max_alloc)
+    mti->max_alloc = mti->current_alloc;
+  return mti;
+}
+
+void mtiRegisterFree (MemTrackerInfo* mti, size_t s)
+{
+  if (mti)
+  {
+    mti->current_count--;
+    mti->current_alloc -= s;
+  }
+}
+
+void* operator new (size_t s, void* filename, int /*line*/)
+{
+  uint32* rc = (uint32*)malloc (s+16);
+  *rc++ = s;
+  *rc++ = 0xbeebbeeb;
+  *rc++ = (uint32)mtiRegisterAlloc (s, filename);
+  *rc++ = 0xdeadbeef;
+  return (void*)rc;
+}
+void* operator new[] (size_t s, void* filename, int /*line*/)
+{
+  uint32* rc = (uint32*)malloc (s+16);
+  *rc++ = s;
+  *rc++ = 0xfeedbeef;
+  *rc++ = (uint32)mtiRegisterAlloc (s, filename);
+  *rc++ = 0xdeadbeef;
+  return (void*)rc;
+}
+void operator delete (void* p)
+{
+  if (p)
+  {
+    uint32* rc = ((uint32*)p)-4;
+    if (rc[3] != 0xdeadbeef) { free (p); return; }
+    size_t s = rc[0];
+    MemTrackerInfo* mti = (MemTrackerInfo*)rc[2];
+    free ((void*)rc);
+    mtiRegisterFree (mti, s);
+  }
+}
+void operator delete[] (void* p)
+{
+  if (p)
+  {
+    uint32* rc = ((uint32*)p)-4;
+    if (rc[3] != 0xdeadbeef) { free (p); return; }
+    size_t s = rc[0];
+    MemTrackerInfo* mti = (MemTrackerInfo*)rc[2];
+    free ((void*)rc);
+    mtiRegisterFree (mti, s);
+  }
+}
 
 #else	// COMP_VC
 //========================================================================

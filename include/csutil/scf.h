@@ -536,12 +536,27 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * iSCF::SCF variable is instead initialized in the Class_scfUnitInitialize()
  * function which is not qualified as `extern "C"'.
  */
+#ifdef CS_MEMORY_TRACKER
+// This special version of SCF_IMPLEMENT_FACTORY_INIT will make sure that
+// the memory tracker for this plugin is implemented.
+#define SCF_IMPLEMENT_FACTORY_INIT(Class)				\
+static inline void Class ## _scfUnitInitialize(iSCF* SCF)		\
+{									\
+  iSCF::SCF = SCF;							\
+  extern void RegisterMemoryTrackerModule (char*);			\
+  RegisterMemoryTrackerModule (#Class);					\
+}									\
+CS_EXPORTED_FUNCTION							\
+void CS_EXPORTED_NAME(Class,_scfInitialize)(iSCF* SCF)			\
+{ Class ## _scfUnitInitialize(SCF); }
+#else
 #define SCF_IMPLEMENT_FACTORY_INIT(Class)				\
 static inline void Class ## _scfUnitInitialize(iSCF* SCF)		\
 { iSCF::SCF = SCF; }							\
 CS_EXPORTED_FUNCTION							\
 void CS_EXPORTED_NAME(Class,_scfInitialize)(iSCF* SCF)			\
 { Class ## _scfUnitInitialize(SCF); }
+#endif
 
 /**
  * The SCF_IMPLEMENT_FACTORY_FINIS macro defines finalization code for a plugin

@@ -45,6 +45,7 @@
 #include "iutil/objreg.h"
 #include "iutil/dbghelp.h"
 #include "iutil/virtclk.h"
+#include "iutil/memdebug.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "ivideo/graph3d.h"
@@ -1218,6 +1219,29 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug %s counting.",
 		counter_freeze ? "disabled" : "enabled");
 	break;
+      case DEBUGCMD_MEMORYDUMP:
+#       ifdef CS_MEMORY_TRACKER
+	  {
+	    csRef<iMemoryTracker> mtr = CS_QUERY_REGISTRY_TAG_INTERFACE (
+	    	object_reg, "crystalspace.utilities.memorytracker",
+		iMemoryTracker);
+	    if (!mtr)
+	    {
+	      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Memory tracker interface is missing!");
+	    }
+	    else
+	    {
+	      mtr->Dump ();
+	      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Memory dump sent to stdout!");
+	    }
+	  }
+#       else
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Memory tracker not enabled at compile time!...");
+#       endif
+        break;
       case DEBUGCMD_UNPREPARE:
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    	"Unprepare all things...");
@@ -1725,6 +1749,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "counterremove"))	return DEBUGCMD_COUNTERREMOVE;
   if (!strcmp (cmd, "shadowdebug"))	return DEBUGCMD_SHADOWDEBUG;
   if (!strcmp (cmd, "debugcmd"))	return DEBUGCMD_DEBUGCMD;
+  if (!strcmp (cmd, "memorydump"))	return DEBUGCMD_MEMORYDUMP;
   if (!strcmp (cmd, "unprepare"))	return DEBUGCMD_UNPREPARE;
 
   return DEBUGCMD_UNKNOWN;

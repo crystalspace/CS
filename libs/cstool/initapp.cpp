@@ -125,6 +125,11 @@ iObjectRegistry* csInitializer::CreateEnvironment (
         reg = r;
       else
         r->DecRef();
+#ifdef CS_MEMORY_TRACKER
+    extern void RegisterMemoryTrackerModule (char* Class);
+    RegisterMemoryTrackerModule ("app");
+#endif
+
     }
   }
   return reg;
