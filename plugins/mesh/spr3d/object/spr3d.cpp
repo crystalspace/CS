@@ -561,12 +561,15 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     if (vt.num_con_triangles)
     {
       csVector3 &n = GetNormal (frame_number, i);
-      n.Set (0,0,0);
-      for (j = 0; j < vt.num_con_triangles; j++)
-        n += tri_normals [vt.con_triangles[j]];
-      float norm = n.Norm ();
-      if (norm)
-        n /= norm;
+      if (n.IsZero())
+      {
+        //n.Set (0,0,0);
+        for (j = 0; j < vt.num_con_triangles; j++)
+          n += tri_normals [vt.con_triangles[j]];
+        float norm = n.Norm ();
+        if (norm)
+          n /= norm;
+      }
     }
     else
     {

@@ -480,7 +480,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
         int anm_idx = fr->GetAnmIndex ();
         int tex_idx = fr->GetTexIndex ();
         int i = 0;
-        float x, y, z, u, v;
+        float x, y, z, u, v, nx, ny, nz;
         while ((cmd = parser->GetObject (&params, tok_frame, &name, &params2)) > 0)
         {
           if (!params2)
@@ -495,7 +495,9 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
           switch (cmd)
           {
             case CS_TOKEN_V:
-            csScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
+	      x = 0; y = 0; z = 0; u = 0; v = 0; nx = 0; ny = 0; nz = 0;
+	      csScanStr (params2, "%f,%f,%f:%f,%f:%f,%f,%f", &x, &y, &z, &u, &v, 
+		&nx, &ny, &nz);
             // check if it's the first frame
             if (spr3dLook->GetFrameCount () == 1)
             {
@@ -514,6 +516,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
             }
             spr3dLook->SetVertex (anm_idx, i, csVector3 (x, y, z));
             spr3dLook->SetTexel  (tex_idx, i, csVector2 (u, v));
+	    spr3dLook->SetNormal (anm_idx, i, csVector3 (nx, ny, nz));
             i++;
             break;
           }
