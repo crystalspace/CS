@@ -25,6 +25,9 @@ OS=WIN32
 # Compiler
 COMP=VC
 
+# Does this OS have native COM support?
+NATIVE_COM=yes
+
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
 #------------------------------------------------------------------ defines ---#
@@ -131,9 +134,6 @@ SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
 # Where to put the dynamic libraries on this system?
 OUTDLL=
-
-# Does this OS have native COM support?
-NATIVE_COM=yes
 
 # The C compiler.
 CC=cl -c

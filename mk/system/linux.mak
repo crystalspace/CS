@@ -110,9 +110,6 @@ SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 # Where to put the dynamic libraries on this system?
 OUTDLL=
 
-# Does this OS have native COM support?
-NATIVE_COM=no
-
 # The C compiler.
 CC=g++ -c
 

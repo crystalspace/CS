@@ -34,7 +34,6 @@ CPUVER=
 # The flag telling the compiler to optimize for FPU or not.
 FPUVER=
 
-
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
 #------------------------------------------------------------------ defines ---#
@@ -116,9 +115,6 @@ SRC.SYS_CSSYS=libs/cssys/amiga/Amiga.cpp libs/cssys/general/printf.cpp \
 # Where to put the dynamic libraries on this system?
 # Not supported yet.
 OUTDLL=
-
-# Does this OS have native COM support?
-NATIVE_COM=no
 
 # The C compiler.
 CC=gcc -c

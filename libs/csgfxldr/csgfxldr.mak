@@ -11,6 +11,22 @@ ifeq ($(MAKESECTION),rootdefines)
 # Library-specific help commands
 LIBHELP += $(NEWLINE)echo $"  make csgfxldr     Make the $(DESCRIPTION.csgfxldr)$"
 
+ifeq ($(DO_GIF),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_GIF$">>$@
+endif
+ifeq ($(DO_BMP),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_BMP$">>$@
+endif
+ifeq ($(DO_TGA),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_TGA$">>$@
+endif
+ifeq ($(DO_PNG),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_PNG$">>$@
+endif
+ifeq ($(DO_JPG),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_JPG$">>$@
+endif
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
@@ -32,26 +48,21 @@ vpath %.cpp libs/csgfxldr
 SRC.CSGFXLDR = libs/csgfxldr/csimage.cpp libs/csgfxldr/iimage.cpp \
   libs/csgfxldr/pcx.cpp
 
-ifeq ($(DO_PNG),yes)
-  SRC.CSGFXLDR+=libs/csgfxldr/pngimage.cpp
-  CFLAGS.GFXLDR+=$(CFLAGS.D)DO_PNG
-  LIBS.EXE+=$(PNG_LIBS)
-endif
 ifeq ($(DO_GIF),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/gifimage.cpp
-  CFLAGS.GFXLDR+=$(CFLAGS.D)DO_GIF
 endif
 ifeq ($(DO_BMP),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/bmpimage.cpp
-  CFLAGS.GFXLDR+=$(CFLAGS.D)DO_BMP
 endif
 ifeq ($(DO_TGA),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/tgaimage.cpp
-  CFLAGS.GFXLDR+=$(CFLAGS.D)DO_TGA
+endif
+ifeq ($(DO_PNG),yes)
+  SRC.CSGFXLDR+=libs/csgfxldr/pngimage.cpp
+  LIBS.EXE+=$(PNG_LIBS)
 endif
 ifeq ($(DO_JPG),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/jpgimage.cpp
-  CFLAGS.GFXLDR+=$(CFLAGS.D)DO_JPG
   LIBS.EXE+=$(JPG_LIBS)
 endif
 
@@ -68,9 +79,6 @@ ifeq ($(MAKESECTION),targets)
 all: $(CSGFXLDR.LIB)
 csgfxldr: $(OUTDIRS) $(CSGFXLDR.LIB)
 clean: csgfxldrclean
-
-$(OUT)csimage$O: csimage.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GFXLDR)
 
 $(CSGFXLDR.LIB): $(OBJ.CSGFXLDR)
 	$(DO.STATIC.LIBRARY)

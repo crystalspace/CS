@@ -7,6 +7,19 @@ ifeq ($(MAKESECTION),rootdefines)
 # Library-specific help commands
 LIBHELP += $(NEWLINE)echo $"  make cssndldr     Make the $(DESCRIPTION.cssndldr)$"
 
+ifeq ($(DO_AIFF),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_AIFF$">>$@
+endif
+ifeq ($(DO_IFF),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_IFF$">>$@
+endif
+ifeq ($(DO_WAV),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_WAV$">>$@
+endif
+ifeq ($(DO_AU),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_AU$">>$@
+endif
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
@@ -30,19 +43,15 @@ SRC.CSSNDLDR = $(wildcard libs/cssndldr/common/*.cpp) \
 
 ifeq ($(DO_AIFF),yes)
   SRC.CSSNDLDR+=libs/cssndldr/aifffile.cpp
-  CFLAGS.SNDLOADER+=$(CFLAGS.D)DO_AIFF
 endif
 ifeq ($(DO_IFF),yes)
   SRC.CSSNDLDR+=libs/cssndldr/ifffile.cpp
-  CFLAGS.SNDLOADER+=$(CFLAGS.D)DO_IFF
 endif
 ifeq ($(DO_WAV),yes)
   SRC.CSSNDLDR+=libs/cssndldr/wavfile.cpp
-  CFLAGS.SNDLOADER+=$(CFLAGS.D)DO_WAV
 endif
 ifeq ($(DO_AU),yes)
   SRC.CSSNDLDR+=libs/cssndldr/aufile.cpp
-  CFLAGS.SNDLOADER+=$(CFLAGS.D)DO_AU
 endif
 
 CSSNDLDR.LIB = $(OUT)$(LIB_PREFIX)cssndldr$(LIB)
@@ -58,9 +67,6 @@ ifeq ($(MAKESECTION),targets)
 all: $(CSSNDLDR.LIB)
 cssndldr: $(OUTDIRS) $(CSSNDLDR.LIB)
 clean: cssndldrclean
-
-$(OUT)sndload$O: sndload.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.SNDLOADER)
 
 $(CSSNDLDR.LIB): $(OBJ.CSSNDLDR)
 	$(DO.STATIC.LIBRARY)

@@ -97,9 +97,6 @@ SRC.SYS_CSSYS=libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
 # Where to put the dynamic libraries on this system?
 OUTDLL=
 
-# Does this OS have native COM support?
-NATIVE_COM=no
-
 # The C compiler.
 CC=gcc -c
 

@@ -29,9 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifeq ($(DO_MMX),yes)
-  CFLAGS.SOFT3D += $(CFLAGS.D)DO_MMX
-endif
+vpath %.cpp libs/cs3d/software
 
 ifeq ($(USE_DLL),yes)
   SOFT3D=$(OUTDLL)softrndr$(DLL)
@@ -70,9 +68,6 @@ $(OUT)scan8a$O: libs/cs3d/software/i386/cs.ash libs/cs3d/software/i386/scan.ash
 $(OUT)scan16a$O: libs/cs3d/software/i386/cs.ash libs/cs3d/software/i386/scan.ash
 $(OUT)scan32a$O: libs/cs3d/software/i386/cs.ash libs/cs3d/software/i386/scan.ash
 $(OUT)cpuid$O: libs/cs3d/software/i386/cs.ash
-
-$(OUT)%$O: libs/cs3d/software/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.SOFT3D)
 
 $(OUT)%$O: libs/cs3d/software/i386/%.asm
 	$(DO.COMPILE.ASM) $(NASMFLAGS.SOFT3D)

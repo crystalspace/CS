@@ -7,6 +7,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 PROC=invalid
 OS=invalid
 COMP=invalid
+NATIVE_COM=invalid
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -34,7 +35,6 @@ LFLAGS.profile=invalid
 LFLAGS.DLL=invalid
 SRC.SYS_EXE=invalid
 OUTDLL=invalid
-NATIVE_COM=invalid
 CC=invalid
 CXX=invalid
 LINK=invalid

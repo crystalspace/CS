@@ -12,6 +12,10 @@ ifeq ($(MAKESECTION),rootdefines)
 # Driver-specific help commands
 DRVHELP += $(NEWLINE)echo $"  make glx2d        Make the $(DESCRIPTION.glx2d)$"
 
+ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_SHM$">>$@
+endif
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
@@ -43,10 +47,6 @@ ifeq ($(USE_MESA),1)
   LIBS._GLX2D+=-lMesaGL -lMesaGLU
 else
   LIBS._GLX2D+=-lGL
-endif
-
-ifeq ($(DO_SHM),yes)
-  CFLAGS.GLX2D+=$(CFLAGS.D)DO_SHM
 endif
 
 # The 2D GLX driver

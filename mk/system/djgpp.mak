@@ -102,9 +102,6 @@ SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp libs/cssys/djgpp/printf.cpp \
 # Where to put the dynamic libraries on this system?
 OUTDLL=
 
-# Does this OS have native COM support?
-NATIVE_COM=no
-
 # The C compiler.
 CC=gcc -c
 

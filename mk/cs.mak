@@ -59,52 +59,17 @@ OUTPROC=$(OUTOS)$(PROC)/
 OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 ############################################
 
-############################################
-# Depending on the type of optimization choosen we disable assembler support.
-ifneq ($(MODE),optimize)
-ifneq ($(USE_NASM),yes)
-  DO_ASM=no
-endif
-endif
-ifeq ($(DO_ASM),no)
-  USE_NASM=no
-endif
-############################################
-
 HEADER=$(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   $(CFLAGS.I)./apps $(CFLAGS.I)./support
 
-CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE)) \
-  $(CFLAGS.D)OS_$(OS) $(CFLAGS.D)PROC_$(PROC) $(CFLAGS.D)COMP_$(COMP) \
-  $(MEM)
+CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE)) $(MEM)
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
 LIBS=$(LIBS.EXE) $(Z_LIBS)
 
 ifeq ($(MAKE_DLL),yes)
   CFLAGS+=$(CFLAGS.DLL)
-endif
-ifeq ($(USE_DLL),no)
-  CFLAGS+=$(CFLAGS.D)CS_STATIC_LINKED
-endif
-ifneq ($(DO_ASM),yes)
-  CFLAGS+=$(CFLAGS.D)NO_ASSEMBLER
-endif
-ifeq ($(BUGGY_EGCS_COMPILER),yes)
-  CFLAGS+=$(CFLAGS.D)BUGGY_EGCS_COMPILER
-endif
-ifeq ($(MODE),debug)
-  CFLAGS+=$(CFLAGS.D)DEBUG
-endif
-ifeq ($(NATIVE_COM),no)
-  CFLAGS+=$(CFLAGS.D)NO_COM_SUPPORT
-endif
-ifeq ($(DO_SOUND),yes)
-  CFLAGS+=$(CFLAGS.D)DO_SOUND
-endif
-ifeq ($(USE_NASM),yes)
-  CFLAGS+=$(CFLAGS.D)DO_NASM
 endif
 
 # Use $(^^) instead of $^ when you need all dependencies except libraries

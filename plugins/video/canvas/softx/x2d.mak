@@ -10,6 +10,10 @@ ifeq ($(MAKESECTION),rootdefines)
 # Driver-specific help commands
 DRVHELP += $(NEWLINE)echo $"  make x2d          Make the $(DESCRIPTION.x2d)$"
 
+ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_SHM$">>$@
+endif
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
@@ -33,10 +37,6 @@ ifeq ($(MAKESECTION),postdefines)
 CFLAGS.X2D+=-I$(X11_PATH)/include
 LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11
  
-ifeq ($(DO_SHM),yes)
-  CFLAGS.X2D += $(CFLAGS.D)DO_SHM
-endif
-
 # The 2D Xlib driver
 ifeq ($(USE_DLL),yes)
   XLIB2D=$(OUTDLL)x2d$(DLL)

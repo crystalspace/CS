@@ -18,6 +18,10 @@ define SYSMODIFIERSHELP
   echo "      Possible values are: $(NEXT.ARCHS)"
 endef
 
+# Add required defines to volatile.h
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>$@
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>$@
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #---------------------------------------------------- rootdefines & defines ---#
@@ -96,9 +100,10 @@ CFLAGS.INCLUDE=$(NEXT.INCLUDE_DIRS) $(addprefix -I,$(NEXT.SOURCE_PATHS)) \
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=$(NEXT.CFLAGS) $(NEXT.ARCH_FLAGS) \
-  $(CFLAGS.D)OS_NEXT_$(NEXT.FLAVOR) \
-  $(CFLAGS.D)OS_NEXT_DESCRIPTION='"$(NEXT.DESCRIPTION)"' \
-  -ObjC++ -fno-common -pipe $(CFLAGS.D)NO_ASSEMBLER 
+  -ObjC++ -fno-common -pipe
+
+# We don't want assembly for now (why? it can be resolved - A.Z.)
+override DO_ASM=no
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-O4
@@ -131,9 +136,6 @@ SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
 
 # Where to put the dynamic libraries on this system?
 OUTDLL=
-
-# Does this OS have native COM support?
-NATIVE_COM=no
 
 # The C compiler.
 CC=cc -c

@@ -26,7 +26,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if !defined(NO_ASSEMBLER)
+#if !defined (NO_ASSEMBLER)
 
 #  if defined(PROC_INTEL)
 #    if defined (DO_NASM)
