@@ -52,6 +52,22 @@ typedef signed long SLong;	// Signed 32 bit value
 typedef unsigned int UInt;	// Unsigned int value (16..32 bit)
 typedef signed int SInt; 	// Signed int value (16..32 bit)
 
-typedef unsigned long CS_ID;    // Used for uniquely generated id numbers 
+typedef unsigned long CS_ID;    // Used for uniquely generated id numbers
+
+//-----------------------------------------------------------------------------
+// The following types should be used whenever you need a variable of
+// a specific size (in bits).
+//-----------------------------------------------------------------------------
+#ifdef __32BIT__
+typedef unsigned char uint8;
+typedef char int8;
+typedef unsigned short uint16;
+typedef short int16;
+typedef unsigned int uint32;
+typedef int int32;
+//#elif defined __64BIT__
+#else
+#  error "Please define one of the __##BIT__ macros!"
+#endif
 
 #endif // __CS_CSTYPES_H__
