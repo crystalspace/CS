@@ -55,6 +55,7 @@ private:
   csPolygonArray polygons;
   
 public:
+  csOctreeVisible() : polygons(8,16), node(NULL) {}
   /// Set octree node.
   void SetOctreeNode (csOctreeNode* onode) { node = onode; }
   /// Get octree node.
