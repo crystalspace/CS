@@ -87,7 +87,7 @@ obsolete.
 
 @uref{http://www.helsinki.fi/~jxsaarin/crystalspace/}
 
-@item Hariharan Bhasker (@email{hbhasker@@in.ibm.com})
+@item Hariharan Bhasker (@email{hbhasker@@yahoo.com})
 
 Hariharan wrote the pathtut tutorial in CS. This tutorial shows how
 to use the @code{csPath} class to smoothly move an object along some
