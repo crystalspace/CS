@@ -123,7 +123,7 @@ G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
   font = NULL;
   pfmt_init = false;
 
-  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
   if (q != 0)
   {
     EventOutlet = q->GetEventOutlet();
