@@ -58,6 +58,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   Description pythmod : "pure Python module" ;
 
+  local desc = [ Description pythmod ] ;
+  Help pythmod : "Build the $(desc)" ;
+
   # Plugin rule above already invokes CompileObject for $(common). We do not
   # invoking it again because we want to avoid compiling the same (large) file
   # twice. Intead, we just get a reference to the object file.
