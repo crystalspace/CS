@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "cssysdef.h"
+#include "util.h"
 #include "isound/loader.h"
 #include "soundraw.h"
 #include "sndload.h"
