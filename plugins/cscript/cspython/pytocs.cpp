@@ -17,13 +17,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+//extern "C" {
+#include <Python.h>
+//}
+
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "cspython.h"
-
-//extern "C" {
-#include "Python.h"
-//}
 
 // The NextStep compiler does not allow C++ expressions in `extern "C"'
 // functions.  This thin cover function works around that limitation.
@@ -63,4 +63,3 @@ void InitPytocs() {
   Py_InitModule("pytocs", PytocsMethods);
   init_cspace();
 }
-

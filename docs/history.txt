@@ -11,6 +11,8 @@ chronological order.
 	  the GetRenderMeshes() of all meshes in the engine. Walktest now
 	  uses this function if you specify '-prepare' option. This speeds up
 	  running through a level.
+        - Philip Wyett eliminated the redefinition of _POSIX_C_SOURCE warning
+          within the CS Python plugin.
 13-Aug-2004
 	- Jorrit added new versions of csPoly3D::ComputeNormal() and
 	  ComputePlane() that accept a csArray<csVector3>.
