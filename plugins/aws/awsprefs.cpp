@@ -290,7 +290,7 @@ bool awsPrefManager::Load (const char *def_file)
   }
 
   printf (
-    "\tload successful (%i windows, %i skins loaded.)\n",
+    "\tload successful (%lu windows, %lu skins loaded.)\n",
     win_defs.Length() - ncw,
     skin_defs.Length() - ncs);
 

@@ -103,9 +103,9 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   * optimally in the future, like with a QuickSort. */
   if (DEBUG_GETTEX)
     printf (
-      "aws-debug: (%s) texture count is: %d\n",
+      "aws-debug: (%s) texture count is: %lu\n",
       __FILE__,
-      textures.Length ());
+      (unsigned long)textures.Length ());
 
   size_t i;
   for (i = 0; i < textures.Length () && txtfound == false; ++i)

@@ -1743,7 +1743,7 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf)
     return "Not enough data";
   }
   bdHeader *head = (bdHeader*)buf->GetData();
-  if (head->magic != BD_HEADER_MAGIC)
+  if (head->magic != (uint32)BD_HEADER_MAGIC)
   {
     return "Not a binary CS document";
   }

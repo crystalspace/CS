@@ -390,7 +390,8 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *paren
     csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
     if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
     if (saver) saver->WriteDown(meshfactwrap->GetMeshObjectFactory(), factNode);
- }
+  }
+  return true;
 }
 
 bool csSaver::SaveSectors(iDocumentNode *parent)
