@@ -22,6 +22,7 @@
 #include "iutil/plugin.h"
 #include "ivaria/collider.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "iengine/engine.h"
 #include "imesh/object.h"
 #include "csgeom/obb.h"
@@ -141,10 +142,10 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
   if (dGeomIsSpace(o1) || dGeomIsSpace (o2)) {
     dSpaceCollide2 (o1, o2, data, &csODEDynamics::NearCallback);
-	if (dGeomIsSpace(o1)) 
-	  dSpaceCollide ((dxSpace*)o1, data, &csODEDynamics::NearCallback);
-	if (dGeomIsSpace(o2)) 
-	  dSpaceCollide ((dxSpace*)o2, data, &csODEDynamics::NearCallback);
+    if (dGeomIsSpace(o1))
+      dSpaceCollide ((dxSpace*)o1, data, &csODEDynamics::NearCallback);
+    if (dGeomIsSpace(o2))
+      dSpaceCollide ((dxSpace*)o2, data, &csODEDynamics::NearCallback);
     return;
   }
 
@@ -282,8 +283,7 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  csRef<iPolygonMesh> p (
-    SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
+  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -393,8 +393,7 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  csRef<iPolygonMesh> p (
-    SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
+  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -494,8 +493,7 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   dReal rad = dGeomSphereGetRadius (sphere);
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  csRef<iPolygonMesh> p (
-    SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
+  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -607,8 +605,7 @@ void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
   csBox3 box;
   csReversibleTransform mesht = GetGeomTransform (g);
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (g);
-  csRef<iPolygonMesh> p (
-    SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
+  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
   csVector3 *vertex_table = p->GetVertices ();
   box.StartBoundingBox ();
   for (int i = 0; i < p->GetVertexCount(); i ++)
@@ -812,8 +809,7 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dGeomTransformSetGeom (id, gid);
 
   csOBB b;
-  csRef<iPolygonMesh> p (
-    SCF_QUERY_INTERFACE (mesh->GetMeshObject(), iPolygonMesh));
+  csRef<iPolygonMesh> p (mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
   b.FindOBB (p->GetVertices(), p->GetVertexCount());
   dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
 
