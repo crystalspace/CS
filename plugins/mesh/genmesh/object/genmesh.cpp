@@ -588,16 +588,39 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
 
   uint bufferMask = CS_BUFFER_ALL_MASK;
 
-  for (size_t i=0;i<factory->GetUserBufferNames().Length();i++)
+  size_t i;
+  iStringSet* strings = factory->GetStrings();
+  const csArray<csStringID>& factoryUBNs = factory->GetUserBufferNames();
+  // Set up factorys user buffers...
+  for (i = 0; i < factoryUBNs.Length(); i++)
   {
-    const csStringID userBuf = factory->GetUserBufferNames().Get(i);
-    const char* bufName = factory->GetStrings()->Request (userBuf);
+    const csStringID userBuf = factoryUBNs.Get(i);
+    const char* bufName = strings->Request (userBuf);
     csRenderBufferName userName = 
-      csRenderBuffer::GetBufferNameFromDescr  (bufName);
+      csRenderBuffer::GetBufferNameFromDescr (bufName);
     if (userName >= CS_BUFFER_POSITION)
     {
       bufferHolder->SetRenderBuffer (userName, 
 	factory->GetUserBuffers().GetRenderBuffer (userBuf));
+      bufferMask &= ~(1 << userName);
+    }
+    else
+    {
+      sv = svcontext->GetVariableAdd (userBuf);
+      sv->SetAccessor (factory->scfiShaderVariableAccessor);
+    }
+  }
+  // Set up meshs user buffers...
+  for (i = 0; i < user_buffer_names.Length(); i++)
+  {
+    const csStringID userBuf = user_buffer_names.Get(i);
+    const char* bufName = strings->Request (userBuf);
+    csRenderBufferName userName = 
+      csRenderBuffer::GetBufferNameFromDescr (bufName);
+    if (userName >= CS_BUFFER_POSITION)
+    {
+      bufferHolder->SetRenderBuffer (userName, 
+	userBuffers.GetRenderBuffer (userBuf));
       bufferMask &= ~(1 << userName);
     }
     else
@@ -1291,23 +1314,23 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBu
 bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
 					   iRenderBuffer* buffer)
 {
-  /*csStringID bufID = strings->Request (name);
+  csStringID bufID = factory->GetStrings()->Request (name);
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
     return true;
-  }*/
+  }
   return false;
 }
 
 bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
 {
-  /*csStringID bufID = strings->Request (name);
+  csStringID bufID = factory->GetStrings()->Request (name);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.DeleteFast (bufID);
     return true;
-  }*/
+  }
   return false;
 }
 

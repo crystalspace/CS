@@ -12,6 +12,7 @@ chronological order.
 	  to the syntax services, and fixed GM factories to support user render
 	  buffers.
 	- res made a small improvement to the csplugincommon/canvas docs.
+	- res made GM mesh objects support user render buffers.
 25-Feb-2005
 	- Jorrit added a new HOWTO that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.

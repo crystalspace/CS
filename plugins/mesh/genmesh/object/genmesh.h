@@ -105,6 +105,9 @@ private:
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
 
+  csUserRenderBufferManager userBuffers;
+  csArray<csStringID> user_buffer_names;
+
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
   csRef<iMaterialWrapper> material;

@@ -661,6 +661,7 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
+  xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
   return true;
 }
 
