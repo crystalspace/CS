@@ -126,13 +126,14 @@ void SinglePolygonTesterAlpha::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
 {
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
+  poly.txt_handle = perftest->GetTexture (0);
 }
 
 void SinglePolygonTesterAlpha::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (NULL, CS_FX_SETALPHA(.5) |CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly.txt_handle, CS_FX_SETALPHA(.5) |CS_FX_GOURAUD);
   g3d->DrawPolygonFX (poly);
   g3d->FinishPolygonFX ();
 }
