@@ -18,8 +18,8 @@ chronological order.
 	- res fixed the GL renderer to properly deal with keycolored procedural
 	  textures.
 	- Eric Sunshine added SCF_DESTRUCT_IBASE() invocations for each of the
-	  corresponding SCF_CONSTRUCT_IBASE() invocations in inline methods in
-	  CS/include.
+	  corresponding SCF_CONSTRUCT_IBASE() invocations in methods in
+	  CS/include and CS/libs.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history
