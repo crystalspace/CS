@@ -1550,6 +1550,7 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	CS_CREATE_TUPLE([],[],[-lopenal32]) \
 	CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
 	CS_CREATE_TUPLE([],[],[-lalut -lopenal32]) \
+	CS_CREATE_TUPLE([],[],[-lALut -lOpenAL32]) \
 	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
 	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound]) \
 	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
@@ -1722,19 +1723,29 @@ AC_DEFUN([CS_CHECK_LIBCG_PREPARE],
 
 CS_CHECK_LIBCG_PREPARE
 
-CS_CHECK_LIB_WITH([Cg],
-    [AC_LANG_PROGRAM(
-	[[#include <Cg/cg.h>]],
-	[CGcontext c = cgCreateContext()])], [], [], [], [],
-    [$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs])
+AC_DEFUN([CS_CHECK_LIBCG],
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
+    CS_CHECK_BUILD([for Cg], [cs_cv_libCg],
+	[AC_LANG_PROGRAM(
+	    [[#include <Cg/cg.h>]],
+	    [CGcontext c = cgCreateContext();])],
+	[CS_CREATE_TUPLE([],[],[-lcg]) \
+	CS_CREATE_TUPLE([],[],[-lCg])], [],
+	[], [], [],
+	[$cs_cv_libm_cflags],
+	[$cs_cv_libm_lflags],
+	[$cs_cv_libm_libs])])
+CS_CHECK_LIBCG
 
 AS_IF([test $cs_cv_libCg = yes],
-    [CS_CHECK_LIB_WITH([CgGL],
+    [CS_CHECK_BUILD([for CgGL], [cs_cv_libCgGL],
 	[AC_LANG_PROGRAM(
 	    [[#include <Cg/cg.h>
 	    #include <Cg/cgGL.h>]],
-	    [CGprogram p; cgGLBindProgram(p)])], [], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [],
+	    [CGprogram p; cgGLBindProgram(p);])],
+	[CS_CREATE_TUPLE([],[],[-lcgGL]) \
+	CS_CREATE_TUPLE([],[],[-lCgGL])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [], [],
 	[$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	[$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
 	[$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs])])
