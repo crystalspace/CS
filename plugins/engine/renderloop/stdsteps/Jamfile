@@ -1,4 +1,4 @@
-SubDir TOP plugins video render3d renderloop stdsteps ;
+SubDir TOP plugins engine renderloop stdsteps ;
 
 Plugin rendstep_std
 	: [ Wildcard *.cpp *.h ]

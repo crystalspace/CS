@@ -1,9 +1,0 @@
-SubDir TOP plugins video render3d renderloop shadow stencil ;
-
-Plugin rendstep_stencil
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith rendstep_stencil : renderstepcommon csgeom cssys csutil ;
-
-Help rendstep_stencil : "Crystal Space standard render loop steps" ;
-

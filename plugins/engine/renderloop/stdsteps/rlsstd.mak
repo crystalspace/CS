@@ -43,13 +43,13 @@ else
   TO_INSTALL.STATIC_LIBS += $(RENDSTEP_STD)
 endif
 
-DIR.RENDSTEP_STD = plugins/video/render3d/renderloop/stdsteps
+DIR.RENDSTEP_STD = plugins/engine/renderloop/stdsteps
 OUT.RENDSTEP_STD = $(OUT)/$(DIR.RENDSTEP_STD)
 INF.RENDSTEP_STD = $(SRCDIR)/$(DIR.RENDSTEP_STD)/rendstep_std.csplugin
 INC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.h \
-  plugins/video/render3d/renderloop/common/*.h))
+  plugins/engine/renderloop/common/*.h))
 SRC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.cpp \
-  plugins/video/render3d/renderloop/common/*.cpp))
+  plugins/engine/renderloop/common/*.cpp))
 OBJ.RENDSTEP_STD = $(addprefix $(OUT.RENDSTEP_STD)/,$(notdir $(SRC.RENDSTEP_STD:.cpp=$O)))
 DEP.RENDSTEP_STD = CSSYS CSUTIL CSGEOM
 

@@ -27,6 +27,9 @@ chronological order.
 	- Jorrit removed lots of #ifdef CS_USE_NEW_RENDERER in the plugins
 	  directory.
 	- Jorrit fixed aws compile with old renderer.
+	- Jorrit moved the entire renderloop stuff from
+	  plugins/video/render3d/renderloop to plugins/engine/renderloop
+	  where it belongs.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:

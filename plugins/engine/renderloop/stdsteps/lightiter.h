@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
-              (C) 2003 by Anders Stenberg
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,77 +17,83 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_FULLSCREENQUAD_H__
-#define __CS_FULLSCREENQUAD_H__
+#ifndef __CS_LIGHTITER_H__
+#define __CS_LIGHTITER_H__
 
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "ivideo/rendersteps/irenderstep.h"
+#include "ivideo/rendersteps/ilightiter.h"
 #include "ivideo/shader/shader.h"
 
 #include "../common/basesteptype.h"
 #include "../common/basesteploader.h"
+#include "../common/parserenderstep.h"
 
-class csFullscreenQuad;
-
-class csFullScreenQuadRSType : public csBaseRenderStepType
+class csLightIterRSType : public csBaseRenderStepType
 {
 public:
-  csFullScreenQuadRSType (iBase* p);
+  csLightIterRSType (iBase* p);
 
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csFullScreenQuadRSLoader : public csBaseRenderStepLoader
+class csLightIterRSLoader : public csBaseRenderStepLoader
 {
+  csRenderStepParser rsp;
+
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "video/render3d/renderloop/stdsteps/fullquad.tok"
+#define CS_TOKEN_ITEM_FILE "engine/renderloop/stdsteps/lightiter.tok"
 #include "cstool/tokenlist.h"
 
 public:
-  csFullScreenQuadRSLoader (iBase* p);
+  csLightIterRSLoader (iBase* p);
+
+  virtual bool Initialize (iObjectRegistry* object_reg);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
     iLoaderContext* ldr_context, 	
     iBase* context);
 };
 
-class csFullScreenQuadRenderStepFactory : public iRenderStepFactory
+class csLightIterRenderStepFactory : public iRenderStepFactory
 {
   csRef<iObjectRegistry> object_reg;
 public:
   SCF_DECLARE_IBASE;
 
-  csFullScreenQuadRenderStepFactory (iObjectRegistry* object_reg);
-  virtual ~csFullScreenQuadRenderStepFactory ();
+  csLightIterRenderStepFactory (iObjectRegistry* object_reg);
+  virtual ~csLightIterRenderStepFactory ();
 
   virtual csPtr<iRenderStep> Create ();
 };
 
-class csFullScreenQuadRenderStep : public iRenderStep
+class csLightIterRenderStep : public iRenderStep, 
+			      public iLightIterRenderStep,
+			      public iRenderStepContainer
 {
 private:
-  csStringID shadertype;
-  csString material;
-  csRef<iEngine> engine;
-  csFullscreenQuad* fullquad;
+  csRefArray<iLightRenderStep> steps;
 
+  csRef<iObjectRegistry> object_reg;
+  csRef<csShaderVariable> shvar_light_0_position;
+  csRef<csShaderVariable> shvar_light_0_diffuse;
+  csRef<csShaderVariable> shvar_light_0_specular;
+  csRef<csShaderVariable> shvar_light_0_attenuation;
+  bool initialized;
 public:
   SCF_DECLARE_IBASE;
 
-  csFullScreenQuadRenderStep (iObjectRegistry* object_reg);
-  virtual ~csFullScreenQuadRenderStep ();
+  csLightIterRenderStep (iObjectRegistry* object_reg);
+  virtual ~csLightIterRenderStep ();
 
+  void InitVariables ();
   virtual void Perform (iRenderView* rview, iSector* sector);
 
-  void SetMaterial (const char* m)
-  { material = m; }
-
-  void SetShaderType (csStringID s)
-  { shadertype = s; }
+  virtual int AddStep (iRenderStep* step);
+  virtual int GetStepCount ();
 };
 
 
-#endif // __CS_FULLSCREENQUAD_H__
+#endif

@@ -1,6 +1,0 @@
-SubDir TOP plugins video render3d renderloop ;
-
-SubInclude TOP plugins video render3d renderloop common ;
-SubInclude TOP plugins video render3d renderloop loader ;
-SubInclude TOP plugins video render3d renderloop stdsteps ;
-SubInclude TOP plugins video render3d renderloop shadow stencil ;

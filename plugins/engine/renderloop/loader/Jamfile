@@ -1,4 +1,4 @@
-SubDir TOP plugins video render3d renderloop loader ;
+SubDir TOP plugins engine renderloop loader ;
 
 Plugin rendloop_loader
 	: [ Wildcard *.cpp *.h ]

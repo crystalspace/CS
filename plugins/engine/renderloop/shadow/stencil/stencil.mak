@@ -40,14 +40,14 @@ else
   TO_INSTALL.STATIC_LIBS += $(RENDSTEP_STENCIL)
 endif
 
-DIR.RENDSTEP_STENCIL = plugins/video/render3d/renderloop
+DIR.RENDSTEP_STENCIL = plugins/engine/renderloop
 INF.RENDSTEP_STENCIL = $(SRCDIR)/$(DIR.RENDSTEP_STENCIL)/shadow/stencil/rendstep_stencil.csplugin
 INC.RENDSTEP_STENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
    $(DIR.RENDSTEP_STENCIL)/shadow/stencil/*.h \
-  plugins/video/render3d/renderloop/common/*.h))
+  plugins/engine/renderloop/common/*.h))
 SRC.RENDSTEP_STENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
    $(DIR.RENDSTEP_STENCIL)/shadow/stencil/*.cpp \
-  plugins/video/render3d/renderloop/common/*.cpp))
+  plugins/engine/renderloop/common/*.cpp))
 OBJ.RENDSTEP_STENCIL = $(addprefix $(OUT)/,$(notdir $(SRC.RENDSTEP_STENCIL:.cpp=$O)))
 DEP.RENDSTEP_STENCIL = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 

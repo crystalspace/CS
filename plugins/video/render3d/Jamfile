@@ -5,4 +5,3 @@ SubInclude TOP plugins video render3d opengl ;
 SubInclude TOP plugins video render3d software ;
 SubInclude TOP plugins video render3d shadermgr ;
 SubInclude TOP plugins video render3d shaderplugins ;
-SubInclude TOP plugins video render3d renderloop ;

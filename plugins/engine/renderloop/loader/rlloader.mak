@@ -43,13 +43,13 @@ else
   TO_INSTALL.STATIC_LIBS += $(RENDLOOP_LOADER)
 endif
 
-DIR.RENDLOOP_LOADER = plugins/video/render3d/renderloop/loader
+DIR.RENDLOOP_LOADER = plugins/engine/renderloop/loader
 OUT.RENDLOOP_LOADER = $(OUT)/$(DIR.RENDLOOP_LOADER)
 INF.RENDLOOP_LOADER = $(SRCDIR)/$(DIR.RENDLOOP_LOADER)/rendloop_loader.csplugin
 INC.RENDLOOP_LOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDLOOP_LOADER)/*.h \
-  plugins/video/render3d/renderloop/common/parserenderstep.h)) 
+  plugins/engine/renderloop/common/parserenderstep.h)) 
 SRC.RENDLOOP_LOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDLOOP_LOADER)/*.cpp \
-  plugins/video/render3d/renderloop/common/parserenderstep.cpp)) 
+  plugins/engine/renderloop/common/parserenderstep.cpp)) 
 OBJ.RENDLOOP_LOADER = $(addprefix $(OUT.RENDLOOP_LOADER)/,$(notdir $(SRC.RENDLOOP_LOADER:.cpp=$O)))
 DEP.RENDLOOP_LOADER = CSSYS CSUTIL
 
