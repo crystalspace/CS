@@ -45,6 +45,7 @@ chronological order.
 	  utilzies this new property to determine if it should perform special
 	  processing for the configure-generated 'include/volatile.h', rather
 	  than performing the check manually.
+	- Jorrit added csddsimg to the walkall target. Walktest now needs it.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

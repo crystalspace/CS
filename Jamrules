@@ -63,6 +63,7 @@ if $(USE_NEW_RENDERER) = "yes"
     csfont
     csgifimg
     csjpgimg
+    csddsimg
     csparser
     cspngimg
     cssynldr
@@ -133,6 +134,7 @@ else
     csfont
     csgifimg
     csjpgimg
+    csddsimg
     csparser
     cspngimg
     cssynldr

@@ -10,6 +10,7 @@ CompileGroups csconin    : walkall ;
 CompileGroups csfont     : walkall ;
 CompileGroups csgifimg   : walkall ;
 CompileGroups csjpgimg   : walkall ;
+CompileGroups csddsimg   : walkall ;
 CompileGroups csparser   : walkall ;
 CompileGroups cspngimg   : walkall ;
 CompileGroups cssynldr   : walkall ; 

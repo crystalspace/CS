@@ -19,7 +19,7 @@ ifeq ($(MAKESECTION),roottargets)
 .PHONY: walktest walktestclean walkall
 
 walkall: walktest engine vfs soft3d softcanvas csfont \
-  csconin simpcon rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg \
+  csconin simpcon rapid meshes cssynldr imgplex csgifimg csjpgimg csddsimg cspngimg \
   csbmpimg reporter stdrep csparser frustvis bugplug sequence engseq xmlread \
   stdpt ptanimimg dynavis gtreeldr
 ifeq ($(GL.AVAILABLE),yes)
