@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+7-Aug-2002
+	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
+	  using " instead of $".  Second, it had an unnecessary dependency upon
+	  $(OUTDIRS).
 6-Aug-2002
 	- Extended iXmlNode with functions to create and move nodes
 	  and attributes. Added iXmlDocument as a representation of a document.
