@@ -5,19 +5,19 @@
 # if yes it just uses that. If not it looke if CRYSTAL var is set, and after
 # that if it tries to find Crystal Space and then it just looks in 
 # /usr/local/crystal. Causes an error if it cant find it or you fed it a bad
-# (optional) path. Remember to do CFLAGS="$CFLAGS $CS_CFLAGS" and so forth for
-# CS_LIBS, CS_CXXFLAGS, and CS_LIBS so you can use the information provided
-# by this script!
+# (optional) path. Remember to do CFLAGS="$CFLAGS $CRYSTAL_CFLAGS" and so
+# forth for CRYSTAL_LIBS, CRYSTAL_CXXFLAGS, and CRYSTAL_LIBS so you can use
+# the information provided by this script!
 
 # Matze Braun <MatzeBraun@gmx.de>
 # Patrick McFarland (Diablo-D3) <unknown@panax.com>
 
-dnl AC_PATH_CS([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, LIBS]]]])
-dnl Test for CS, and define CS_VERSION, CS_LONGVERSION, CS_CFLAGS, 
-dnl CS_CXXFLAGS, and CS_LIBS
+dnl AC_PATH_CRYSTAL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, LIBS]]]])
+dnl Test for CS, and define CRYSTAL_VERSION, CRYSRAL_LONGVERSION, 
+dnl CRYSTAL_CFLAGS, CRYSTAL_CXXFLAGS, and CRYSTAL_LIBS
 dnl
 
-AC_DEFUN(AM_PATH_CS,
+AC_DEFUN(AC_PATH_CRYSTAL,
 [dnl 
 dnl Get the cflags and libraries from the cs-config script
 dnl
@@ -64,11 +64,11 @@ fi
 
 min_cs_version=ifelse([$1], ,0.93,$1)
 AC_MSG_CHECKING(for Crystal Space - version >= $min_cs_version)
-CS_CFLAGS=`$CSCONF $csconf_args --cflags $4`
-CS_CXXFLAGS=`$CSCONF $csconf_args --cxxflags $4`
-CS_LIBS=`$CSCONF $csconf_args --libs $4`
-CS_VERSION=`$CSCONF --version $4`
-CS_LONGVERSION=`$CSCONF --longversion $4`
+CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cflags $4`
+CRYSTAL_CXXFLAGS=`$CSCONF $csconf_args --cxxflags $4`
+CRYSTAL_LIBS=`$CSCONF $csconf_args --libs $4`
+CRYSTAL_VERSION=`$CSCONF --version $4`
+CRYSTAL_LONGVERSION=`$CSCONF --longversion $4`
 
 cs_major_version=`$CSCONF $cs_args --version | \
    sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
@@ -78,8 +78,8 @@ cs_minor_version=`$CSCONF $cs_args --version | \
 if test "x$enable_cstest" = "xyes" ; then
    ac_save_CFLAGS="$CFLAGS"
    ac_save_LIBS="$LIBS"
-   CFLAGS="$CFLAGS $CS_CFLAGS"
-   LIBS="$LIBS $CS_LIBS"
+   CFLAGS="$CFLAGS $CRYSTAL_CFLAGS"
+   LIBS="$LIBS $CRYSTAL_LIBS"
 
 dnl Godamity-damn *nix sh sucks.
 
@@ -149,7 +149,7 @@ int main (int argc, char *argv[])
      fi
 
   if test "x$no_cs" = x ; then
-     AC_MSG_RESULT($CS_LONGVERSION)
+     AC_MSG_RESULT($CRYSTAL_LONGVERSION)
      ifelse([$2], , :, [$2])     
   else
      AC_MSG_RESULT(no)
@@ -157,20 +157,20 @@ int main (int argc, char *argv[])
         :
        else
           echo "*** Could not run Crystal Space test program, checking why..."
-          CFLAGS="$CFLAGS $CS_CFLAGS"
-          LIBS="$LIBS $CS_LIBS"
+          CFLAGS="$CFLAGS $CRYSTAL_CFLAGS"
+          LIBS="$LIBS $CRYSTAL_LIBS"
           CFLAGS="$ac_save_CFLAGS"
           LIBS="$ac_save_LIBS"
        fi
-     CS_CFLAGS=""
-     CS_LIBS=""
+     CRYSTAL_CFLAGS=""
+     CRYSTAL_LIBS=""
      ifelse([$3], , :, [$3])
   fi
-  AC_SUBST(CS_CFLAGS)
-  AC_SUBST(CS_CXXFLAGS)
-  AC_SUBST(CS_LIBS)
-  AC_SUBST(CS_VERSION)
-  AC_SUBST(CS_LONGVERSION)
+  AC_SUBST(CRYSTAL_CFLAGS)
+  AC_SUBST(CRYSTAL_CXXFLAGS)
+  AC_SUBST(CRYSTAL_LIBS)
+  AC_SUBST(CRYSTAL_VERSION)
+  AC_SUBST(CRYSTAL_LONGVERSION)
   rm -f conf.cstest
   # "If sex was gpl, everyone would want to join in" -- Diablo-D3
 ])
