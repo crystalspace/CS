@@ -86,7 +86,7 @@ private:
 
 private:
   ///
-  int GetTextureIdx (char* name);
+  int GetTextureIdx (const char* name);
 
 public:
   /// Add a texture
@@ -111,7 +111,7 @@ public:
   csTextureHandle* GetTextureMM (int idx) { return textures[idx]; }
 
   /// Find a texture given a name.
-  csTextureHandle* GetTextureMM (char* name);
+  csTextureHandle* GetTextureMM (const char* name);
 };
 
 

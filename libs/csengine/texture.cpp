@@ -105,7 +105,7 @@ void csTextureList::AddTexture (csTextureHandle* tm)
   textures [num_textures++] = tm;
 }
 
-int csTextureList::GetTextureIdx (char* name)
+int csTextureList::GetTextureIdx (const char* name)
 {
   int i;
   for (i = 0 ; i < num_textures ; i++)
@@ -113,7 +113,7 @@ int csTextureList::GetTextureIdx (char* name)
   return -1;
 }
 
-csTextureHandle* csTextureList::GetTextureMM (char* name)
+csTextureHandle* csTextureList::GetTextureMM (const char* name)
 {
   int idx = GetTextureIdx (name);
   if (idx == -1) return NULL;

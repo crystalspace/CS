@@ -232,15 +232,14 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config)
   return true;
 }
 
-bool csWorld::Prepare (IGraphics3D* g3d)
+void csWorld::PrepareTextures (IGraphics3D* g3d)
 {
   ITextureManager* txtmgr;
   g3d->GetTextureManager (&txtmgr);
   txtmgr->Initialize ();
 
-  int i;
   // First register all textures to the texture manager.
-  for (i = 0 ; i < textures->GetNumTextures () ; i++)
+  for (int i = 0 ; i < textures->GetNumTextures () ; i++)
   {
     csTextureHandle* th = textures->GetTextureMM (i);
     ITextureHandle* handle;
@@ -251,15 +250,26 @@ bool csWorld::Prepare (IGraphics3D* g3d)
 
   // Prepare all the textures.
   txtmgr->Prepare ();
+}
 
+void csWorld::PrepareSectors()
+{
   // Now precalculate some stuff for all loaded polygons.
-  for (i = 0 ; i < sectors.Length () ; i++)
+  for (int i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* s = (csSector*)sectors[i];
     s->Prepare ();
   }
+}
+
+bool csWorld::Prepare (IGraphics3D* g3d)
+{
+  PrepareTextures(g3d);
+  PrepareSectors();
 
   // The images are no longer needed by the 3D engine.
+  ITextureManager* txtmgr;
+  g3d->GetTextureManager (&txtmgr);
   txtmgr->FreeImages ();
 
   g3d->ClearCache ();

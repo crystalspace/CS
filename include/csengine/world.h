@@ -237,6 +237,19 @@ public:
   bool Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config);
 
   /**
+   * Prepare the textures. It will initialise all loaded textures
+   * for the texture manager. (Normally you shouldn't call this function
+   * directly, because it will be called by Prepare() for you.
+   */
+  void PrepareTextures (IGraphics3D* g3d);
+
+  /**
+   * Prepare all the loaded sectors. (Normally you shouldn't call this 
+   * function directly, because it will be called by Prepare() for you.
+   */
+  void PrepareSectors();
+
+  /**
    * Prepare the world. This function must be called after
    * you loaded/created the world. It will prepare all lightmaps
    * for use and also free all images that were loaded for
