@@ -2379,7 +2379,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   L.fv = R.fv = top;
   int sy = L.fy = R.fy = QRound (poly.vertices [top].sy);
   // The span of Z/U/V/R/G/B for current scanline
-  int span_z, span_u, span_v, span_r, span_g, span_b;
+  int span_z = 0, span_u = 0, span_v = 0, span_r = 0, span_g = 0, span_b = 0;
 
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool do_gouraud = (pqinfo.drawline_gouraud != NULL)
@@ -2525,7 +2525,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     else
       fin_y = R.fy;
 
-    int dszdy, dsudy, dsvdy, dsrdy, dsbdy, dsgdy;
+    int dszdy = 0, dsudy = 0, dsvdy = 0, dsrdy = 0, dsbdy = 0, dsgdy = 0;
     span_z = R.z - L.z;
     dszdy = R.dzdy - L.dzdy;
     if (pqinfo.textured)
@@ -2552,7 +2552,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           float inv_l = 1. / l;
 
           int dzz = QRound (span_z * inv_l);
-          int uu, duu, vv, dvv;
+          int uu = 0, duu = 0, vv = 0, dvv = 0;
           if (pqinfo.textured)
           {
             uu = L.u; duu = QInt (span_u * inv_l);
@@ -2579,7 +2579,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           // R,G,B brightness can underflow due to subpixel correction
           // Underflow will cause visual artifacts while small overflows
           // will be neutralized by our "clamp to 1.0" circuit.
-          int rr, drr, gg, dgg, bb, dbb;
+          int rr = 0, drr = 0, gg = 0, dgg = 0, bb = 0, dbb = 0;
           bool clamp = false;
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
