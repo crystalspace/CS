@@ -20,6 +20,11 @@
 #ifndef __CS_GL_RENDER3D_H__
 #define __CS_GL_RENDER3D_H__
 
+#if defined(CS_OPENGL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#else
+#include <GL/gl.h>
+#endif
 
 #include "csgeom/csrect.h"
 #include "csgeom/poly3d.h"
@@ -45,18 +50,16 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
-
 #include "ivideo/shader/shader.h"
-#include "plugins/video/canvas/openglcommon/glstates.h"
-
 #include "ivaria/bugplug.h"
 
-#include "plugins/video/canvas/openglcommon/glextmanager.h"
-
+#include "plugins/video/canvas/openglcommon/glstates.h"
 
 class csGLTextureHandle;
 class csGLTextureManager;
 class csGLPolygonRenderer;
+  
+class csGLExtensionManager;
 struct iClipper2D;
 struct iObjectRegistry;
 struct iTextureManager;

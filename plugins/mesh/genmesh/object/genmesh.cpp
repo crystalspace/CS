@@ -42,7 +42,7 @@
 #include "iutil/objreg.h"
 #include "iutil/cache.h"
 #include "iutil/object.h"
-#include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "iutil/strset.h"
 #include "genmesh.h"
 
@@ -2217,12 +2217,10 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
 {
   csGenmeshMeshObjectType::object_reg = object_reg;
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-    iCommandLineParser);
-  if (cmdline)
-  {
-    do_verbose = cmdline->GetOption ("verbose") != 0;
-  }
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    do_verbose = verbosemgr->CheckFlag ("genmesh");
 
   return true;
 }

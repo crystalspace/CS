@@ -69,21 +69,21 @@ csVerbosityParser::csVerbosityParser (const char* flags)
 {
   if (flags == 0)
   {
-    all = ForceResult | ForceFalse;
+    defaultGlobalFlag = ForceResult | DefFalse;
   }
   else if (*flags == 0)
   {
-    all = ForceResult | ForceTrue;
+    defaultGlobalFlag = ForceResult | DefTrue;
   }
   else
   {
-    all = 0;
+    defaultGlobalFlag = DefTrue;
     
     CS_ALLOC_STACK_ARRAY (char, msgClassStr, strlen (flags) + 1);
     strcpy (msgClassStr, flags);
     char* msgClass = msgClassStr;
     
-    while ((msgClass != 0) && (*msgClass != 0))
+    while (msgClass != 0)
     {
       char* nextClass = strchr (msgClass, ',');
       if (nextClass != 0)
@@ -91,49 +91,89 @@ csVerbosityParser::csVerbosityParser (const char* flags)
 	*nextClass = 0;
 	nextClass++;
       }
-      size_t vfIndex = verbosityFlags.FindSortedKey (
-	csArrayCmp<VerbosityFlag, const char*> (msgClass, &VfKeyCompare));
-      if (vfIndex == csArrayItemNotFound)
-	vfIndex = verbosityFlags.InsertSorted (VerbosityFlag(), 
-	  &VfCompare);
       
-      VerbosityFlag& vf = verbosityFlags[vfIndex];
-      vf.msgClass = msgClass;
-      char* subclass = strchr (msgClass, ':');
-      if (subclass != 0)
+      // Check for default class verbosity. + = verbose, - = not verbose
+      bool defaultFlag = true;
+      if (msgClass[0] == '+')
       {
-	*subclass = 0;
-	subclass++;
-	
-	while ((subclass != 0) && (*subclass != 0))
-	{
-	  char* nextSubclass = strchr (subclass, ',');
-	  if (nextSubclass != 0)
-	  {
-	    *nextSubclass = 0;
-	    nextSubclass++;
-	  }
-	  
-	  bool subFlag = true;
-	  if (subclass[0] == '+')
-	  {
-	    subFlag = true;
-	    subclass++;
-	  }
-	  else if (subclass[0] == '-')
-	  {
-	    subFlag = false;
-	    subclass++;
-	  }
-	  if (strcmp (subclass, "*") == 0)
-	    vf.defaultFlag = subFlag;
-	  else
-	  {
-	    vf.msgSubclasses.PutUnique (subclass, subFlag);
-	  }
-	  
-	  subclass = nextSubclass;
-	}
+        defaultFlag = true;
+	msgClass++;
+      }
+      else if (msgClass[0] == '-')
+      {
+        defaultFlag = false;
+	msgClass++;
+      }
+      if (*msgClass == 0) break;
+      
+      /* Special class "*": set default global verbosity.
+       * Ie you can turn on everything, or disable everything by default but 
+       * a specific set of classes.
+       */
+      if (strcmp (msgClass, "*") == 0)
+      {
+        defaultGlobalFlag = (defaultGlobalFlag & ~DefMask) 
+          | (defaultFlag ? DefTrue : DefFalse);
+      }
+      else
+      {
+        /* Look for verbosity flag entry. The same class can be specified multiple times.
+         * The last setting overrides all other before. */
+        size_t vfIndex = verbosityFlags.FindSortedKey (
+          csArrayCmp<VerbosityFlag, const char*> (msgClass, &VfKeyCompare));
+        if (vfIndex == csArrayItemNotFound)
+        {
+          VerbosityFlag newVF;
+          newVF.msgClass = msgClass;
+          newVF.defaultFlag = defaultFlag;
+          vfIndex = verbosityFlags.InsertSorted (newVF, &VfCompare);
+        }
+        
+        VerbosityFlag& vf = verbosityFlags[vfIndex];
+        char* subclass = strchr (msgClass, ':');
+        if (subclass != 0)
+        {
+          *subclass = 0;
+          subclass++;
+          
+          while ((subclass != 0) && (*subclass != 0))
+          {
+            char* nextSubclass = strchr (subclass, ',');
+            if (nextSubclass != 0)
+            {
+              *nextSubclass = 0;
+              nextSubclass++;
+            }
+            
+            /* Check for default subclass verbosity.
+             * Again, you can only enable or disable verbosity for speficic 
+             * subclasses. */
+            bool subFlag = vf.defaultFlag;
+            if (subclass[0] == '+')
+            {
+              subFlag = true;
+              subclass++;
+            }
+            else if (subclass[0] == '-')
+            {
+              subFlag = false;
+              subclass++;
+            }
+            if (strcmp (subclass, "*") == 0)
+            {
+              /* Default subclass verbosity. Effectively sets default class verbosity.
+               * I.e. in cases like "+foo:-*" or "-foo:+*" the "*" flag has precedence.
+               * (A subclass specifier should override a class specifier.) */
+              vf.defaultFlag = subFlag;
+            }
+            else
+            {
+              vf.msgSubclasses.PutUnique (subclass, subFlag);
+            }
+            
+            subclass = nextSubclass;
+          }
+        }
       }
       msgClass = nextClass;
     }
@@ -143,7 +183,7 @@ csVerbosityParser::csVerbosityParser (const char* flags)
 bool csVerbosityParser::CheckFlag (const char* msgClass, 
 				    const char* msgSubclass)
 {
-  if (all & ForceResult) return all & ForceTrue;
+  if (defaultGlobalFlag & ForceResult) return defaultGlobalFlag & DefMask;
     
   size_t vfIndex = verbosityFlags.FindSortedKey (
     csArrayCmp<VerbosityFlag, const char*> (msgClass, &VfKeyCompare));
@@ -154,7 +194,7 @@ bool csVerbosityParser::CheckFlag (const char* msgClass,
       msgSubclass, vf.defaultFlag) : vf.defaultFlag;
   }
   
-  return false;
+  return defaultGlobalFlag & DefMask;
 }
 
 SCF_IMPLEMENT_IBASE(csVerbosityManager)

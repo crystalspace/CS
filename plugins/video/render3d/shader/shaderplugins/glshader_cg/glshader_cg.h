@@ -25,10 +25,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "csutil/leakguard.h"
 
-#include "plugins/video/canvas/openglcommon/glextmanager.h"
-
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
+
+class csGLExtensionManager;
 
 class csGLShader_CG : public iShaderProgramPlugin
 {

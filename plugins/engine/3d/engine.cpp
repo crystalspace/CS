@@ -60,7 +60,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/cfgmgr.h"
-#include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "iutil/databuff.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
@@ -904,12 +904,10 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
     Warn ("No 3D driver!");
   }
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-  if (cmdline)
-  {
-    do_verbose = cmdline->GetOption ("verbose") != 0;
-  }
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    do_verbose = verbosemgr->CheckFlag ("engine");
   if (do_verbose)
   {
     bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);

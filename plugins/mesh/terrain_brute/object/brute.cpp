@@ -43,6 +43,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/vfs.h"
 #include "iutil/object.h"
 #include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "iutil/cache.h"
 #include "ivaria/reporter.h"
 #include "brute.h"
@@ -818,9 +819,14 @@ bool csTerrainObject::ReadCDLODFromCache ()
 {
   int i;
 
+  bool verbose = false;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    verbose = verbosemgr->CheckFlag ("bruteblock");
+  
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
   	object_reg, iCommandLineParser);
-  bool verbose = cmdline->GetOption ("verbose") != 0;
   if (cmdline->GetOption ("recalc"))
   {
     static bool reportit = true;

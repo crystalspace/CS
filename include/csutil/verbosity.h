@@ -20,29 +20,54 @@
 #ifndef __CS_CSUTIL_VERBOSITY_H__
 #define __CS_CSUTIL_VERBOSITY_H__
 
+/**\file
+ * Verbosity management helpers
+ */
+
 #include "iutil/verbositymanager.h"
 
 #include "csutil/csstring.h"
 #include "csutil/hashhandlers.h"
 
+/**
+ * Class to parse verbosity flags and allow checking of them.
+ * This class is also internally used by csCheckVerbosity() and
+ * csVerbosityManager.
+ * <p>
+ * The syntax is <tt>[+|-]class{:[+|-]subclass}{,[+|-]class{:[+|-]subclass}}</tt>.
+ * <tt>class</tt> and <tt>subclass</tt> specify the verbosity class and, for 
+ * more fine-grained control, the verbosity subclass names; they match the 
+ * strings passed to CheckFlag() at runtime. The "<tt>+</tt>" and "<tt>-</tt>"
+ * flags specify the actual verbosity; "<tt>+</tt>" enables, "<tt>-</tt>"
+ * disables verbosity for a specific class or subclass. There are the special
+ * class and subclass names "<tt>*</tt>" which control the default verbosity
+ * for all classes or subclasses of a class; they allow to enable or disable 
+ * only specific classes or subclasses, e.g. <tt>--verbose=*,-scf</tt> will
+ * enable verbosity for everything except the SCF diagnostic information.
+ */
 class csVerbosityParser
 {
   struct VerbosityFlag
   {
     csString msgClass;
+    /**
+     * The default verbosity flag. Used when a subclass was requested,
+     * but no specific flag was set for it, or when no subclass is requested.
+     */
     bool defaultFlag;
     csHash<bool, csStrKey, csConstCharHashKeyHandler> msgSubclasses;
     
-    VerbosityFlag() : msgClass ("") {}
+    VerbosityFlag() : defaultFlag(true) {}
   };
   csArray<VerbosityFlag> verbosityFlags;
   enum
   {
     ForceResult = 1,
-    ForceTrue = 2,
-    ForceFalse = 0
+    DefTrue = 2,
+    DefFalse = 0,
+    DefMask = DefTrue
   };
-  uint all;
+  uint defaultGlobalFlag;
 
   static int VfKeyCompare (const VerbosityFlag& vf, const char* const& K);
   static int VfCompare (const VerbosityFlag& vf1, const VerbosityFlag& vf2);
@@ -53,14 +78,27 @@ public:
    *  0 means "always return false", "" means "always return true".
    */
   csVerbosityParser (const char* flags);
-
+  
+  /**
+   * Check for the verbosity of a class and subclass pair.
+   */
   bool CheckFlag (const char* msgClass, const char* msgSubclass = 0);
 };
 
+/**
+ * Parse verbosity for some given command line arguments.
+ * \remarks Should only be used during early initializations when the object 
+ *  registry is not set uo yet; otherwise, the iVerbosityManager object should
+ *  be obtained and used instead.
+ */
 extern CS_CSUTIL_EXPORT bool csCheckVerbosity (int argc,
   const char* const argv[], const char* msgClass,
   const char* msgSubclass = 0);
   
+/**
+ * Default iVerbosityManager implementation. Basically a thin wrapper around 
+ * csVerbosityParser.
+ */
 class csVerbosityManager : public iVerbosityManager
 {
   csVerbosityParser vp;

@@ -35,6 +35,7 @@
 #include "csutil/syspath.h"
 #include "csutil/util.h"
 #include "iutil/objreg.h"
+#include "iutil/verbositymanager.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -1558,11 +1559,14 @@ bool csVFS::Initialize (iObjectRegistry* r)
   object_reg = r;
   basedir = alloc_normalized_path(csGetConfigPath());
 
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    verbose = verbosemgr->CheckFlag ("vfs");
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   if (cmdline)
   {
-    verbose = cmdline->GetOption("verbose") != 0;
     resdir = alloc_normalized_path(cmdline->GetResourceDir());
     appdir = alloc_normalized_path(cmdline->GetAppDir());
   }

@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csver.h"
 #include "csjoylin.h"
-#include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
 #include "csutil/array.h"
@@ -113,9 +113,11 @@ bool csLinuxJoystick::HandleEvent (iEvent &)
 
 bool csLinuxJoystick::Init ()
 {
-  csRef<iCommandLineParser> cmdline (
-    CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
-  bool const verbose = cmdline->GetOption("verbose") != 0;
+  bool verbose = false;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    verbose = verbosemgr->CheckFlag ("joystick");
 
   config.AddConfig (object_reg, CS_LINUX_JOYSTICK_CFG);
   csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));

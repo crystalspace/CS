@@ -30,6 +30,7 @@
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
+#include "iutil/verbositymanager.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
@@ -169,7 +170,13 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
     iCommandLineParser);
   if (cmdline)
   {
-    bool verbose = cmdline->GetOption ("verbose") != 0;
+    silent = cmdline->GetOption ("silent") != 0;
+  }
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+  {
+    bool verbose = verbosemgr->CheckFlag ("stdrep");
     if (verbose)
     {
       dest_stdout[CS_REPORTER_SEVERITY_WARNING] = true;
@@ -179,7 +186,6 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
       dest_stdout[CS_REPORTER_SEVERITY_DEBUG] = true;
       dest_stderr[CS_REPORTER_SEVERITY_DEBUG] = false;
     }
-    silent = cmdline->GetOption ("silent") != 0;
   }
 
   return true;

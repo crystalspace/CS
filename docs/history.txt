@@ -13,6 +13,13 @@ chronological order.
 	  via --verbose.
 	- res changed the Win32 plugin loading error reporting to use 
 	  csPrintfErr().
+	- res added some more documentation to the verbosity stuff.
+	- res changed the shadermgr and xmlshader plugins to check for the
+	  "renderer:shaders" verbosity flag.
+	- res changed direct checks for the "-verbose" command line flag to use
+	  the verbosity manager instead.
+	- res made the Win32 GL driver detector to search harder for a name.
+	- res added verbosity to the Win32 GL driver detector.
 25-Dec-2004
 	- PK fixed a small bug: changed 'i' to 'm' in thing.cpp:1084
 	  for (int m = 0; i < repMaterials.Length(); m++)

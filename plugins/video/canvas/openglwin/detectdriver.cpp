@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
+#include "csutil/sysfunc.h"
 
 #include <windows.h>
 #include "detectdriver.h"
@@ -83,6 +84,8 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
   {
     screenDriverName.Replace ((char*)dm.dmDeviceName);
   }
+  if (verbose)
+    csPrintf ("csDetectDriver: driver name is '%s'\n", screenDriverName.GetData ());
 
   csString glDllName;
   if (!screenDriverName.IsEmpty())
@@ -103,13 +106,33 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
       if ((RegQueryValueExA (key, "Dll", 0, &type, (LPBYTE)dllName, 
 	&dataSize) == ERROR_SUCCESS) && (type == REG_SZ))
       {
-	glDllName.Replace ((char*)dllName);
+	glDllName.Replace ((char*)dllName, dataSize);
       }
       RegCloseKey (key);
+    }
+    else
+    {
+      // Another try: maybe the driver name is in a key under OpenGLdrivers
+      registryKey.Format ("Software\\Microsoft\\%s\\CurrentVersion\\"
+        "OpenGLdrivers", cswinIsWinNT() ? "Windows NT" : "Windows");
+      if (RegOpenKeyExA (HKEY_LOCAL_MACHINE, registryKey.GetData(), 0,
+        KEY_READ, &key) == ERROR_SUCCESS)
+      {
+        char dllName[MAX_PATH];
+        DWORD dataSize = sizeof (dllName);
+        DWORD type;
+        if ((RegQueryValueExA (key, screenDriverName.GetData (), 0, &type, 
+          (LPBYTE)dllName, &dataSize) == ERROR_SUCCESS) && (type == REG_SZ))
+        {
+          glDllName.Replace ((char*)dllName, dataSize);
+        }
+        RegCloseKey (key);
+      }
     }
   }
   if (glDllName.IsEmpty())
   {
+    csPrintf ("csDetectDriver: trying to find *some* driver\n");
     /*
       Could not determine display driver name. Just fetch the first in the
       registry
@@ -143,12 +166,26 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
 	  RegCloseKey (driverKey);
 	}
       }
+      else if (RegEnumValueA (key, 0, subkeyName, &subkeySize, 0, 0, 0, 0) 
+        == ERROR_SUCCESS)
+      {
+        char dllName[MAX_PATH];
+        DWORD dataSize = sizeof (dllName);
+        DWORD type;
+        if ((RegQueryValueExA (key, subkeyName, 0, &type, (LPBYTE)dllName, 
+          &dataSize) == ERROR_SUCCESS) && (type == REG_SZ))
+        {
+          glDllName.Replace ((char*)dllName);
+        }
+      }
       RegCloseKey (key);
     }
   }
   if (!glDllName.IsEmpty())
   {
     DriverDLL = csStrNew (glDllName);
+    if (verbose)
+      csPrintf ("csDetectDriver: found DLL '%s'\n", DriverDLL);
   }
 }
 
@@ -204,7 +241,7 @@ void csDetectDriver::DoDetection (HWND window, HDC dc)
   if (isAccelerated)
   {
     /*
-      Don't even bother if no accelarion (and thus likely no driver)
+      Don't even bother if no acceleration (and thus likely no driver)
       is present
      */
     csString screenDevice;
@@ -228,6 +265,9 @@ void csDetectDriver::DoDetection (HWND window, HDC dc)
       }
     }
 
+    if (verbose)
+      csPrintf ("csDetectDriver: monitor name is '%s'\n", screenDevice.GetData ());
+    
     // Try to determine the driver
     DetermineDriver (screenDevice.GetData ());
 

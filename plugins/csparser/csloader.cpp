@@ -68,7 +68,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
-#include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "imesh/thing.h"
 #include "imesh/nullmesh.h"
 #include "imesh/mdlconv.h"
@@ -984,9 +984,12 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 {
   csLoader::object_reg = object_Reg;
   loaded_plugins.SetObjectRegistry (object_reg);
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-  do_verbose = cmdline->GetOption ("verbose") != 0;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    do_verbose = verbosemgr->CheckFlag ("loader");
+  else
+    do_verbose = false;
 
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));

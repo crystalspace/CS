@@ -21,6 +21,7 @@
 
 class csDetectDriver
 {
+  bool verbose;
   char* DriverDLL;
   char* DriverVersion;
 
@@ -30,6 +31,7 @@ public:
   csDetectDriver();
   ~csDetectDriver();
 
+  void SetVerbose (bool flag) { verbose = flag; }
   void DoDetection (HWND window, HDC dc);
 
   const char* GetDriverDLL() const

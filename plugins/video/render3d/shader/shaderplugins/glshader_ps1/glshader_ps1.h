@@ -22,7 +22,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/comp.h"
 #include "../../common/shaderplugin.h"
 #include "ivideo/shader/shader.h"
-#include "plugins/video/canvas/openglcommon/glextmanager.h"
+
+class csGLExtensionManager;
 
 class csGLShader_PS1 : public iShaderProgramPlugin
 {

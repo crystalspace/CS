@@ -119,6 +119,26 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="cutdownTUs">
+      <Video>
+	<OpenGL>
+	  <Shader>
+	    <Fixed>
+	      <MaxTextureUnits>1</MaxTextureUnits>
+	    </Fixed>
+	  </Shader>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableMT">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_multitexture>no</GL_ARB_multitexture>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -214,6 +234,15 @@
       </conditions>
       <applicable>
 	<usecfg>pixelformatbroken</usecfg>
+      </applicable>
+    </rule>
+    <rule description="Intel: Extreme Buggy Graphics">
+      <conditions>
+	<regexp string="renderer" pattern="^Intel" />
+	<!-- @@@ Check if we really need to be that cruel and shoot down all
+	     Intel gfx hardware. -->
+      </conditions>
+      <applicable>
       </applicable>
     </rule>
     <!--

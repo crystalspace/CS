@@ -21,7 +21,7 @@
 #define __CS_IUTIL_VERBOSITYMANAGER_H__
 
 /**\file
- * Verbosity management helper
+ * Verbosity management interface
  */
 
 #include "csutil/scf.h"
@@ -32,6 +32,9 @@ SCF_VERSION (iVerbosityManager, 0, 0, 1);
  * Helper interface plugins can use to determine whether they should be 
  * "verbose". At startup, the "-verbose" command line flag is parsed, and
  * plugins can subsequently check whether their verbose flag is set.
+ * <p>
+ * See the csVerbosityParser documentation for a description of the "-verbose"
+ * option syntax.
  */
 struct iVerbosityManager : public iBase
 {

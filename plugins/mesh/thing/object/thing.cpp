@@ -58,7 +58,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/cache.h"
-#include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "iutil/strset.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
@@ -2850,12 +2850,10 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 
   lightpatch_pool = new csLightPatchPool ();
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-  if (cmdline)
-  {
-    csThingObjectType::do_verbose = cmdline->GetOption ("verbose") != 0;
-  }
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    csThingObjectType::do_verbose = verbosemgr->CheckFlag ("thing");
 
   csRef<iTextureManager> txtmgr = g->GetTextureManager ();
 
