@@ -817,13 +817,15 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   }
 
   // no env. variable. perhaps current dir?
-  FILE *test = fopen("vfs.cfg", "r");
-  if(test != NULL)
   {
-    // usr current dir
-    fclose(test);
-    strncpy(oInstallPath, "", iBufferSize);
-    goto got_value;
+    FILE *test = fopen("vfs.cfg", "r");
+    if(test != NULL)
+    {
+      // usr current dir
+      fclose(test);
+      strncpy(oInstallPath, "", iBufferSize);
+      goto got_value;
+    }
   }
 
   // nothing helps, use default
