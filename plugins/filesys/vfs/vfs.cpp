@@ -34,7 +34,7 @@
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
 #include "isystem.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 #include "icfgfile.h"
 
 // Characters ignored in VFS paths (except in middle)

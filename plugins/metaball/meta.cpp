@@ -24,7 +24,7 @@
 #include "meta.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csMetaBalls)

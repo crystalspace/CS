@@ -31,6 +31,7 @@
 #include "csutil/util.h"
 #include "csutil/inifile.h"
 #include "csutil/cfgfile.h"
+#include "csutil/cfgmgr.h"
 #include "iplugin.h"
 #include "ivfs.h"
 #include "iconsole.h"
@@ -375,12 +376,13 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // this early is that both the application configuration file and the
   // configuration file for other plugins may (and almost always do) reside on
   // a VFS volume.
-  Config = new csConfigFile;
+  csConfigFile *DynamicConfig = new csConfigFile();
+  Config = new csConfigManager(DynamicConfig);
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
   // Initialize configuration file
   if (iConfigName)
-    if (!Config->Load (iConfigName, VFS))
+    if (!DynamicConfig->Load (iConfigName, VFS))
       Printf (MSG_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
 
@@ -648,7 +650,7 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
   }
 }
 
-void csSystemDriver::SetSystemDefaults (iConfigFileNew *Config)
+void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   // First look in .cfg file
   FrameWidth = Config->GetInt ("Video.ScreenWidth", 640);
@@ -1081,7 +1083,7 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   return PlugIns.Delete (idx);
 }
 
-iConfigFileNew *csSystemDriver::GetConfig ()
+iConfigManager *csSystemDriver::GetConfig ()
 {
   return Config;
 }

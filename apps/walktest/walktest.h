@@ -386,7 +386,7 @@ public:
   virtual bool HandleEvent (iEvent &Event);
 
   /// Override SetSystemDefaults to handle additional configuration defaults.
-  virtual void SetSystemDefaults (iConfigFileNew*);
+  virtual void SetSystemDefaults (iConfigManager*);
   /// Override Help to show additional arguments help
   virtual void Help ();
 

@@ -53,7 +53,7 @@
 #include "csparser/snddatao.h"
 #include "isnddata.h"
 #include "ifontsrv.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 
 #if defined(BLOCKS_NETWORKING)
 #include "inetdrv.h"

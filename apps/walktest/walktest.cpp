@@ -59,7 +59,7 @@
 #include "csfx/cspixmap.h"
 #include "version.h"
 #include "qint.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isnddata.h"
@@ -184,7 +184,7 @@ WalkTest::~WalkTest ()
   if (Engine) Engine->DecRef ();
 }
 
-void WalkTest::SetSystemDefaults (iConfigFileNew *Config)
+void WalkTest::SetSystemDefaults (iConfigManager *Config)
 {
   superclass::SetSystemDefaults (Config);
   do_fps = Config->GetBool ("Walktest.Settings.FPS", true);

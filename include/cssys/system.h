@@ -42,6 +42,7 @@ struct iSoundRender;
 struct iConfig;
 struct iConsole;
 struct iConfigFile;
+struct iConfigManager;
 struct iMotionManager;
 
 /**
@@ -246,8 +247,8 @@ public:
   /// -------------------------- plug-ins --------------------------
   /// The list of all plug-ins
   csPlugInsVector PlugIns;
-  /// The main configuration file
-  iConfigFileNew *Config;
+  /// The configuration manager
+  iConfigManager *Config;
   /// The Virtual File System object
   iVFS *VFS;
   /// 3D Graphics context
@@ -389,7 +390,7 @@ protected:
    * Query default width/height/depth from config file
    * and from command-line parameters.
    */
-  virtual void SetSystemDefaults (iConfigFileNew *config);
+  virtual void SetSystemDefaults (iConfigManager *config);
 
 public:
   DECLARE_IBASE;
@@ -434,7 +435,7 @@ public:
   virtual iBase* GetPlugIn (int idx);
 
   /// Get the system configuration file: this does NOT IncRef the object
-  virtual iConfigFileNew *GetConfig ();
+  virtual iConfigManager *GetConfig ();
   /// Create a new configuration file object which resides on VFS
   virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true);
   /**

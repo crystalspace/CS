@@ -157,6 +157,7 @@ struct iEventCord;
 struct iStrVector;
 struct iConfigFile;
 struct iConfigFileNew;
+struct iConfigManager;
 
 SCF_VERSION (iSystem, 4, 0, 1);
 
@@ -291,7 +292,7 @@ struct iSystem : public iBase
   //----------------------- Configuration file interface ---------------------//
 
   /// Get the system configuration file: this does NOT IncRef the object
-  virtual iConfigFileNew *GetConfig () = 0;
+  virtual iConfigManager *GetConfig () = 0;
   /// Create a new configuration file object which resides on VFS
   virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true) = 0;
   /**

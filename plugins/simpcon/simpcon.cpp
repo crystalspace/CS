@@ -30,7 +30,7 @@
 #include "igraph2d.h"
 #include "itxtmgr.h"
 #include "isystem.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 
 #define SIZE_LINE	256
 

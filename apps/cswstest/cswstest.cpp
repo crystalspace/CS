@@ -22,7 +22,7 @@
 #include "csws/csws.h"
 #include "version.h"
 #include "ifontsrv.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 
 class csWsTest : public csApp
 {

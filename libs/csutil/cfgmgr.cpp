@@ -128,6 +128,7 @@ public:
     // move to next domain (which actually means previous domain!)
     if (CurrentDomain->Prev == NULL) return false;
     CurrentDomain = CurrentDomain->Prev;
+    if (CurrentDomain->Cfg == NULL) return false;
     CurrentIterator = CurrentDomain->Cfg->Enumerate(Subsection);
     return Next();
   }
@@ -169,6 +170,7 @@ csConfigManager::csConfigManager(iConfigFileNew *dyn)
   LastDomain = new csConfigDomain(NULL, PriorityMax);
   LastDomain->InsertAfter(FirstDomain);
   AddDomain(dyn, PriorityMedium);
+  DynamicDomain = FindConfig(dyn);
 }
 
 csConfigManager::~csConfigManager()

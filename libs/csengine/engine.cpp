@@ -60,7 +60,7 @@
 #include "igraph3d.h"
 #include "ievent.h"
 #include "icfgfile.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 #include "itranman.h"
 
 //---------------------------------------------------------------------------

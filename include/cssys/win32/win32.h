@@ -73,7 +73,7 @@ public:
   virtual void Sleep (int SleepTime);
 
   ///
-  virtual void SetSystemDefaults (iConfigFileNew *Config);
+  virtual void SetSystemDefaults (iConfigManager *Config);
 
   ///
   virtual void Help ();
