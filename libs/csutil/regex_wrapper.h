@@ -24,7 +24,8 @@
 #ifdef CS_HAS_REGEX
   #include <regex.h>
 #else
-  #if defined(CS_COMPILER_MSVC) && !defined(__STDC__)
+  #if (defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)) && \
+      !defined(__STDC__)
     #define __STDC__  1
     #define __STDC__DEFINED
   #endif
