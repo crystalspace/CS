@@ -6,10 +6,10 @@
 @emph{Originally written by Dan Ogles @email{dogles@@peachtree.com}.
 Updated by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}; Thomas
 Hieber, @email{thieber@@gmx.net}; Frank O'Connor, @email{frank@@oconnors.org};
-Last updated 09 July 2001 by Philip Wyett.}
+Last updated 18 July 2001 by Philip Wyett.}
 
 The Windows port of Crystal Space is currently maintained by Philip Wyett
-@email{philipwyett@@redeye-entertainment.co.uk}.
+@email{philipwyett@@redeye.go-legend.net}.
 
 @menu
 * Win32 Intro:: Introduction
@@ -43,9 +43,8 @@ mailing list.  To subscribe see the following site and fill in the form:
 @uref{http://lists.sourceforge.net/lists/listinfo/crystal-main}
 
 Alternatively you can email the Win32 port maintainer directly
-at either of these addresses:
+at either of these address:
 
-@email{philipwyett@@redeye-entertainment.co.uk}@*
 @email{philipwyett@@redeye.go-legend.net}.
 
 @node Win32 Required, Win32 MSVC5, Win32 Intro, Win32

@@ -3,7 +3,7 @@
 @subsection Windows - Using Mingw Compiler
 
 @noindent
-@emph{Philip Wyett @email{philipwyett@@redeye-entertainment.co.uk}.}
+@emph{Philip Wyett @email{philipwyett@@redeye.go-legend.net}.}
 @noindent
 @emph{Last updated 26 June 2001}
 
