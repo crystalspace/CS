@@ -3,7 +3,7 @@ The history order is reversed so that new features are at the top.
 10-Feb-2003
   - Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which caused
     perftest to output results twice.
-  - philip Wyett also moved changes by jorrit which remove misleading
+  - Philip Wyett also moved changes by jorrit which remove misleading
     texture not found messages and res's change to add texture which lets
     people know that the outdoor flickering is intentional.
 9-Feb-2003
