@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jul-2004
+	- Jorrit fixed a compile error in the NR GL renderer.
+	- Jorrit fixed a compile error in partgen.
 7-Jul-2004
 	- Jorrit fixed several compile errors for gcc 2.95 as reported by
 	  Darius Dawidowski. Darius also reported a warning in spr2d
