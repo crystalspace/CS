@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	      which required a compiler would fail.
 	    - msys.mak will now utilize CS/libs/zlib, CS/libs/libpng, and
 	      CS/libs/libjpeg, if present.
+	- Eric Sunshine eliminated compilation warnings in ensocket/inet.cpp
+	  and wodrv.cpp.
 24-Jul-2002
 	- Eric Sunshine corrected the formatting of some makefile help
 	  messages.
