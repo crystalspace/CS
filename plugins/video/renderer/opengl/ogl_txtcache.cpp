@@ -281,9 +281,6 @@ OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
     else
       suplm[i] = NULL;
   }
-#if USE_MEMORY_COPY
-  suplm_memory = NULL;
-#endif
   initialized = false;
   OpenGLLightmapCache::g3d = g3d;
   global_timestamp = 0;
@@ -304,10 +301,6 @@ OpenGLLightmapCache::~OpenGLLightmapCache ()
   delete[] suplm[1];
   delete[] suplm[2];
   delete[] suplm[3];
-
-#if USE_MEMORY_COPY
-  delete[] suplm_memory;
-#endif
 
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // Delete the temporary handle
@@ -348,10 +341,6 @@ void OpenGLLightmapCache::Setup ()
     }
     size >>= 1;
   }
-
-#if USE_MEMORY_COPY
-  suplm_memory = new char [super_lm_size*super_lm_size*4];
-#endif
 
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // Initialize the temporary handle
@@ -489,25 +478,6 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
       GLuint SLMHandle = s->cacheData->Handle;
       csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
 
-#if USE_MEMORY_COPY
-      int mem_suplm_size = super_lm_size >> q;
-      for (i = 0; i < numLightmaps; i++)
-      {
-	lmArray[i]->RecalculateDynamicLights();
-	csRGBpixel* lm_data = lmInfo[i];
-	csRect& r = rectangleArray[i];
-	int y;
-	char* ptr = suplm_memory + ((r.xmin + mem_suplm_size * r.ymin) << 2);
-	for (y = r.ymin ; y < r.ymax ; y++)
-	{
-	  memcpy (ptr, lm_data, (r.xmax-r.xmin) << 2);
-	  ptr += mem_suplm_size << 2;
-	  lm_data += r.xmax - r.xmin;
-	}
-      }
-      glTexImage2D (GL_TEXTURE_2D, 0, 3, mem_suplm_size, mem_suplm_size,
-          0, GL_RGBA, GL_UNSIGNED_BYTE, suplm_memory);
-#else
       for (i = 0; i < numLightmaps; i++)
       {
         if (lmArray[i]->RecalculateDynamicLights ())
@@ -518,7 +488,6 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
             r.xmax-r.xmin, r.ymax-r.ymin, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
         }
       }
-#endif
       s->initialized = true;
     }
 
@@ -566,27 +535,6 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   GLuint SLMHandle;
   superLMData->Handle = SLMHandle = suplm[q][index].Handle;
   csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
-#if USE_MEMORY_COPY
-  int mem_suplm_size = super_lm_size >> q;
-  for (i = 0; i < numLightmaps; i++)
-  {
-    if (dirty) lmArray[i]->RecalculateDynamicLights();
-    csRGBpixel* lm_data = lmInfo[i];
-    csRect& r = rectangleArray[i];
-    int y;
-    char* ptr = suplm_memory + ((r.xmin + mem_suplm_size * r.ymin) << 2);
-    for (y = r.ymin ; y < r.ymax ; y++)
-    {
-      memcpy (ptr, lm_data, (r.xmax-r.xmin) << 2);
-      ptr += mem_suplm_size << 2;
-      lm_data += r.xmax - r.xmin;
-    }
-    //glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-      //r.xmax-r.xmin, r.ymax-r.ymin, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
-  }
-  glTexImage2D (GL_TEXTURE_2D, 0, 3, mem_suplm_size, mem_suplm_size,
-          0, GL_RGBA, GL_UNSIGNED_BYTE, suplm_memory);
-#else
   for (i = 0; i < numLightmaps; i++)
   {
     if (dirty) lmArray[i]->RecalculateDynamicLights();
@@ -595,7 +543,6 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
     glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
       r.xmax-r.xmin, r.ymax-r.ymin, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
   }
-#endif
   s->initialized = true;
 }
 

@@ -152,12 +152,6 @@ public:
   void Clear ();
 };
 
-// If USE_MEMORY_COPY is 1 then we will gather all lightmaps in memory
-// before doing glTexImage2D. Otherwise we will use glTexSubImage2D.
-// On Windows and linux enabling this is not a good idea as it makes
-// things slower. However it may help on MacOS/X. We have to experiment.
-#define USE_MEMORY_COPY	0
-
 /**
  * Cache for OpenGL lightmaps. This cache keeps a number of
  * super lightmaps. Every super lightmaps holds a number of lightmaps.
@@ -190,9 +184,6 @@ private:
 
   /// Four queues with super lightmaps.
   csSuperLightMap* suplm[4];
-#if USE_MEMORY_COPY
-  char* suplm_memory;
-#endif
   /// If true then setup is ok.
   bool initialized;
 
