@@ -74,18 +74,18 @@ void csSequence::AddOperation (cs_time time, iSequenceOperation* operation)
   op->operation = operation;
   op->operation->IncRef ();
   // Insert this operation at the right time.
-  csSequenceOp* o = first;
-  if (o)
+  if (first)
   {
+    csSequenceOp* o = first;
     while (o)
     {
       if (time <= o->time)
       {
         op->next = o;
 	op->prev = o->prev;
-	o->prev = op;
 	if (o->prev) o->prev->next = op;
 	else first = op;
+	o->prev = op;
 	break;
       }
       o = o->next;
@@ -202,6 +202,7 @@ bool csSequenceManager::HandleEvent (iEvent &event)
       previous_time_valid = true;
     }
     TimeWarp (current_time-previous_time, false);
+    previous_time = current_time;
   }
   return true;
 }

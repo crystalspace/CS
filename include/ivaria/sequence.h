@@ -69,7 +69,8 @@ SCF_VERSION (iSequence, 0, 0, 1);
 /**
  * A sequence of operations tagged with relative time information.
  * All operations added to this sequence will be executed relative to the
- * time the sequence itself is executed.
+ * time the sequence itself is executed. The execute order of operations
+ * added at the same relative time is undefined.
  */
 struct iSequence : public iBase
 {
