@@ -88,7 +88,8 @@ TEXI2DVI = texi2dvi
 DVIPS = dvips
 PS2PDF = ps2pdf
 MAKEINFO = makeinfo
-DOXYGEN = doxygen
+# TOP=. : Small hack for compatibility w/ files from docs/doxygen
+DOXYGEN = export TOP=.; doxygen
 
 # Root of the entire Crystal Space manual.
 CSMANUAL_DIR  = docs/texinfo
@@ -98,11 +99,11 @@ CSMANUAL_FILE = cs-unix.txi
 TEXI2HTMLINIT = docs/support/texi2html.init
 
 # Doxygen configuration files.
-DOXYGEN_PUBAPI = docs/support/pubapi.dox
-DOXYGEN_DEVAPI = docs/support/devapi.dox
+DOXYGEN_PUBAPI = docs/doxygen/pubapi.dox
+DOXYGEN_DEVAPI = docs/doxygen/devapi.dox
 
 # Copy additional images to doxygen output dir
-OUT.DOXYGEN.IMAGES = $(CP) docs/support/*.jpg 
+OUT.DOXYGEN.IMAGES = $(CP) docs/doxygen/*.jpg 
 
 # Root of the target directory hierarchy.
 OUT.DOC = $(OUTBASE)/docs

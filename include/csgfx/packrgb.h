@@ -61,12 +61,12 @@
  * \param rgb Pointer to packed RGB data returned by csPackRGBcolorToRGB().
  */
 
-/**\fn const csRGBcolor* csUnpackRGBtoRGBcolor (const uint8* pixels, int numPixels)
+/**\fn const csRGBcolor* csUnpackRGBtoRGBcolor (const uint8* rgb, int numPixels)
  * Unpack a RGB byte array into an array of csRGBcolor. 
  * \remarks
  * May return \p pixels.
  * May allocate memory. Free it using csDiscardUnpackedRGBcolor() when finished.
- * \param pixels Source array of RGB data
+ * \param rgb Source array of RGB data
  * \param numPixels Number of pixels in the array
  * \return An array containing the source data in csRGBcolor structs.
  */
@@ -155,12 +155,12 @@ inline void csDiscardUnpackedRGBcolor (const csRGBcolor* pixels)
  * \param rgba Pointer to packed RGB data returned by csPackRGBpixelToRGBA().
  */
 
-/**\fn const csRGBpixel* csUnpackRGBAtoRGBpixel (const uint8* pixels, int numPixels)
+/**\fn const csRGBpixel* csUnpackRGBAtoRGBpixel (const uint8* rgba, int numPixels)
  * Unpack a RGBA byte array into an array of csRGBpixel. 
  * \remarks
  * May return \p pixels.
  * May allocate memory. Free it using csDiscardUnpackedRGBpixel() when finished.
- * \param pixels Source array of RGBA data
+ * \param rgba Source array of RGBA data
  * \param numPixels Number of pixels in the array
  * \return An array containing the source data in csRGBpixel structs.
  */
@@ -170,7 +170,7 @@ inline void csDiscardUnpackedRGBcolor (const csRGBcolor* pixels)
  * \remarks
  * Never returns \p pixels.
  * Allocate memory. Free it using delete[] when finished.
- * \param pixels Source array of RGBA data
+ * \param rgba Source array of RGBA data
  * \param numPixels Number of pixels in the array
  * \return An array containing the source data in csRGBpixel structs.
  */
@@ -289,7 +289,7 @@ inline uint8* csPackRGBpixelToRGB (const csRGBpixel* pixels,
  * is discarded!
  * \remarks
  * Allocates memory. Free it using delete[] when finished.
- * \param pixels Source array of RGBA data
+ * \param rgba Source array of RGBA data
  * \param numPixels Number of pixels in the array
  * \return An array containing the source data in csRGBcolor structs.
  */
