@@ -70,6 +70,9 @@ struct iShaderRenderInterface : iBase
 {
   /// Create a shaderprogram from a string describing it
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type) = 0;
+
+  /// Get a implementationspecific object
+  virtual csSome GetObject(const char* name) = 0;
 };
 
 SCF_VERSION (iShader, 0,0,1);
@@ -206,6 +209,7 @@ struct iShaderProgramPlugin : iBase
 {
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type) = 0  ;
   virtual bool SupportType(const char* type) = 0;
+  virtual void Open() = 0;
 };
 
 #endif //__SHADER_H__
