@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Dec-2004
+	- Eric Sunshine applied a fix to csXWindow::HandleEvent(), loosely
+	  based upon a patch submitted by Seth Yastrov <syastrov@gmail.com>,
+	  which fixes a crash when the Caps Lock, Num Lock, Scroll Lock, Print
+	  Screen, Pause/Break, Windows, or Context Menu keys were pressed.  (It
+	  was accessing out-of-bounds elements of the ScanCodeToChar[] array.)
 26-Dec-2004
 	- res removed some unneeded code from win32.cpp.
 	- res moved some code in heightmapgen into their own methods.

@@ -498,6 +498,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
   }
 
   while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
+  {
     switch (event.type)
     {
       case ConfigureNotify:
@@ -682,9 +683,14 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	      break;
 	    }
           default:            
-	    csKeyRaw = ScanCodeToChar [xKey]; 
-	      // @@@ Remove scancodes, if possible
-	    csKeyCooked = charcount == 1 ? charcode[0] : 0;
+	    {
+	      if (xKey < sizeof(ScanCodeToChar)/sizeof(ScanCodeToChar[0]))
+	      {
+		csKeyRaw = ScanCodeToChar [xKey]; 
+		  // @@@ Remove scancodes, if possible
+		csKeyCooked = charcount == 1 ? charcode[0] : 0;
+	      }
+	    }
 #undef MAP_KEY
         }
         if (csKeyRaw || csKeyCooked)
@@ -755,6 +761,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
       default:
         break;
     }
+  }
 
   if (resize)
     if (Canvas->Resize (wm_width, wm_height))
