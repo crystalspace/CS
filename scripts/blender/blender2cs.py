@@ -34,6 +34,7 @@ def write_factory(filename, factmesh):
         if num < 3:
             continue
         file.write("            POLYGON (\n")
+        if num == 3:
         file.write("                V (%d,%d,%d)\n" % (face.v[0].index, face.v[2].index, face.v[1].index))
         if factmesh.hasFaceUV:
             if len(face.uv) > 0:
@@ -41,12 +42,11 @@ def write_factory(filename, factmesh):
                 file.write("                    UV (0, %3.4f, %3.4f, 1, %3.4f, %3.4f, 2, %3.4f, %3.4f)\n" % (face.uv[0][0], 1.0 - face.uv[0][1], face.uv[2][0], 1.0 - face.uv[2][1], face.uv[1][0], 1.0 - face.uv[1][1]))
                 file.write("                )\n")
         if num == 4:
-            file.write("            )\n            POLYGON (\n")
-            file.write("                V (%d,%d,%d)\n" % (face.v[0].index, face.v[3].index, face.v[2].index))
+            file.write("                V (%d,%d,%d,%d)\n" % (face.v[3].index, face.v[2].index, face.v[1].index, face.v[0].index))
             if factmesh.hasFaceUV:
                 if len(face.uv) > 0:
                     file.write("                TEXTURE (\n")
-                    file.write("                    UV (0, %3.4f, %3.4f, 1, %3.4f, %3.4f, 2, %3.4f, %3.4f)\n" % (face.uv[0][0], 1.0 - face.uv[0][1], face.uv[3][0], 1.0 - face.uv[3][1], face.uv[2][0], 1.0 - face.uv[2][1]))
+                    file.write("                    UV (3, %3.4f, %3.4f, 2, %3.4f, %3.4f, 1, %3.4f, %3.4f, 0, %3.4f, %3.4f)\n" % (face.uv[0][0], 1.0 - face.uv[0][1], face.uv[1][0], 1.0 - face.uv[1][1], face.uv[2][0], 1.0 - face.uv[2][1], face.uv[3][0], 1.0 - face.uv[3][1]))
                     file.write("                )\n")
         file.write("            )\n")
     file.write("        )\n")
