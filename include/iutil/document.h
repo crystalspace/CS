@@ -172,10 +172,10 @@ struct iDocumentNode : public iBase
   
   /// Get an iterator over all children.
   virtual csRef<iDocumentNodeIterator> GetNodes () = 0;
-  /// Get an iterator over all children of the specified type.
-  virtual csRef<iDocumentNodeIterator> GetNodes (const char* type) = 0;
-  /// Get the first node of the given type.
-  virtual csRef<iDocumentNode> GetNode (const char* type) = 0;
+  /// Get an iterator over all children of the specified value.
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value) = 0;
+  /// Get the first node of the given value.
+  virtual csRef<iDocumentNode> GetNode (const char* value) = 0;
 
   /// Remove a child.
   virtual void RemoveNode (const csRef<iDocumentNode>& child) = 0;

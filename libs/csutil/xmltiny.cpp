@@ -255,18 +255,18 @@ csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes ()
   return it;
 }
 
-csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* type)
+csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* value)
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csTinyXmlNodeIterator (
-  	sys, node, type));
+  	sys, node, value));
   return it;
 }
 
-csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* type)
+csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* value)
 {
   csRef<iDocumentNode> child;
-  TiDocumentNode* c = node->FirstChild (type);
+  TiDocumentNode* c = node->FirstChild (value);
   if (!c) return child;
   child = csPtr<iDocumentNode> (sys->Alloc (c));
   return child;

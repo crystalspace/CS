@@ -171,8 +171,8 @@ public:
   virtual csRef<iDocumentNode> GetParent ();
 
   virtual csRef<iDocumentNodeIterator> GetNodes ();
-  virtual csRef<iDocumentNodeIterator> GetNodes (const char* type);
-  virtual csRef<iDocumentNode> GetNode (const char* type);
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value);
+  virtual csRef<iDocumentNode> GetNode (const char* value);
   virtual void RemoveNode (const csRef<iDocumentNode>& child);
   virtual void RemoveNodes ();
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
