@@ -20,7 +20,8 @@
 #define __IHALO_H__
 
 #include "csutil/scf.h"
-#include "csgeom/math2d.h"
+
+class csVector2;
 
 SCF_VERSION (iHalo, 0, 0, 1);
 
