@@ -223,22 +223,30 @@ struct iReporter : public iBase
 class csReporterHelper
 {
 public:
+  static void ReportV(iObjectRegistry* reg, int severity, char const* msgId,
+    char const* description, va_list args)
+  {
+    iReporter* reporter = CS_QUERY_REGISTRY(reg, iReporter);
+    if (reporter)
+    {
+      reporter->ReportV(severity, msgId, description, args);
+      reporter->DecRef ();
+    }
+    else
+    {
+      csPrintfV(description, args);
+      csPrintf("\n");
+    }
+  }
+    
   static void Report(iObjectRegistry* reg, int severity, char const* msgId,
     char const* description, ...)
   {
     va_list arg;
     va_start(arg, description);
-    iReporter* reporter = CS_QUERY_REGISTRY(reg, iReporter);
-    if (reporter)
-    {
-      reporter->ReportV(severity, msgId, description, arg);
-      reporter->DecRef ();
-    }
-    else
-    {
-      csPrintfV(description, arg);
-      csPrintf("\n");
-    }
+
+    ReportV(reg,severity,msgId,description,arg);
+
     va_end (arg);
   }
 };
@@ -248,6 +256,7 @@ public:
  * no reporter is present and use stdout in that case.
  */
 #define csReport csReporterHelper::Report
+#define csReportV csReporterHelper::ReportV
 
 #endif // __IVARIA_REPORTER_H__
 

@@ -352,7 +352,7 @@ void csApp::GetFont (iFont *&oFont, int &oFontSize)
 
 void csApp::PrintfV (int mode, char const* format, va_list args)
 {
-  csReport (object_reg, mode,
+  csReportV (object_reg, mode,
   	"crystalspace.csws", format, args);
 }
 
