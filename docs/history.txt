@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Nov-2003
+	- Jorrit removed obsolete bits64.h from Dynavis.
 16-Nov-2003
 	- Eric Sunshine fixed bug in make and Jam `install' targets where they
 	  neglected to install the generated volatile.h if the build directory
@@ -25,7 +27,7 @@ chronological order.
 	  is bad as well, changed it to allocate at least 1 byte.
 15-Nov-2003
 	- Jorrit fixed various significant bugs in Dynavis related to the
-	  depth buffer. The bug had to do with the fact that a tile is now
+	  depth buffer. The bugs had to do with the fact that a tile is now
 	  64 wide while all coverage buffer routines assumed it was only
 	  32 wide. This caused the depth buffer to be wrongly updated
 	  which in turn could cause culling errors (very rare) but more

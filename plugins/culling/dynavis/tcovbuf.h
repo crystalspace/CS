@@ -22,7 +22,20 @@
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
 #include "iutil/dbghelp.h"
-#include "bits64.h"
+
+//#define SHIFT_TILECOL 5
+//#define SHIFT_TILEROW 6
+
+#define SHIFT_TILECOL 6
+#define SHIFT_TILEROW 5
+
+#define NUM_TILECOL (1<<SHIFT_TILECOL)
+#define NUM_TILEROW (1<<SHIFT_TILEROW)
+#define NUM_DEPTHROW (NUM_TILEROW/8)
+#define NUM_DEPTHCOL (NUM_TILECOL/8)
+#define NUM_DEPTH (NUM_DEPTHROW * NUM_DEPTHCOL)
+
+typedef uint32 csTileCol;
 
 /**
  * A 2D bounding box with integer coordinates.
