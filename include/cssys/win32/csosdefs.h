@@ -40,6 +40,7 @@
   #pragma warning(disable:4611)   // interaction between _setjmp and C++ destructors not portable
   #pragma warning(disable:4710)   // function not inlined
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
+  #pragma warning(disable:4702)   // Unreachable Code
 #endif
 
 #if defined(COMP_WCC) || defined(COMP_BC)
