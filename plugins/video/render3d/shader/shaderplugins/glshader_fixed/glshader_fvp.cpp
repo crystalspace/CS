@@ -79,6 +79,7 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
 
   if (dynamicVars.Length() > 0)
   {
+    dynamicVars.PrepareFill ();
     for(i=0;i<dynamicDomains.Length();i++)
     {
       dynamicDomains[i]->FillVariableList (&dynamicVars);

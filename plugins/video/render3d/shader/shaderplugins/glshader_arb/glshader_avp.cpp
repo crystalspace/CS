@@ -68,8 +68,8 @@ void csShaderGLAVP::Deactivate()
   glDisable (GL_VERTEX_PROGRAM_ARB);
 }
 
-void csShaderGLAVP::SetupState ( csRenderMesh *mesh, 
-                                csArray<iShaderVariableContext*> &dynamicDomains)
+void csShaderGLAVP::SetupState (csRenderMesh *mesh, 
+				csArray<iShaderVariableContext*> &dynamicDomains)
 {
   int i;
   const csGLExtensionManager* ext = shaderPlug->ext;
@@ -92,15 +92,17 @@ void csShaderGLAVP::SetupState ( csRenderMesh *mesh,
 
   if (dynamicVars.Length() > 0)
   {
+    dynamicVars.PrepareFill ();
     for(i=0;i<dynamicDomains.Length();i++)
     {
-      dynamicDomains[i]->FillVariableList(&dynamicVars);
+      dynamicDomains[i]->FillVariableList (&dynamicVars);
     }
   }
 
   for(i = 0; i < dynamicVars.Length(); ++i)
   {
-    csShaderVariable* lvar = dynamicVars.Get(i).shaderVariable;
+    csShaderVariableProxy& proxy = dynamicVars.Get(i);
+    csShaderVariable* lvar = proxy.shaderVariable;
 
     if(lvar)
     {
@@ -108,9 +110,9 @@ void csShaderGLAVP::SetupState ( csRenderMesh *mesh,
       if (lvar->GetValue (v4))
       {
         ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
-          (int)dynamicVars.Get(i).userData, &v4.x);
+          (int)proxy.userData, &v4.x);
       }
-      dynamicVars.Get (i).shaderVariable = 0;
+      proxy.shaderVariable = 0;
     }
   }
 }

@@ -92,9 +92,10 @@ void csShaderGLAFP::SetupState (csRenderMesh *mesh,
 
   if (dynamicVars.Length() > 0)
   {
-    for(i=0;i<dynamicDomains.Length();i++)
+    dynamicVars.PrepareFill ();
+    for(i = 0; i < dynamicDomains.Length (); i++)
     {
-      dynamicDomains[i]->FillVariableList(&dynamicVars);
+      dynamicDomains[i]->FillVariableList (&dynamicVars);
     }
   }
 

@@ -150,6 +150,8 @@ csGenericRenderStep::csGenericRenderStep (
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
+  shaderManager = CS_QUERY_REGISTRY (object_reg,
+    iShaderManager);
 
   shadertype = 0;
   zOffset = false;
@@ -168,17 +170,10 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
 {
   if (num == 0) return;
   csArray<iShaderVariableContext*> dynDomain;
-  
-
-  //iShaderTechnique *tech = shader->GetBestTechnique ();
-
-  //if (tech == 0) return;
 
   int numPasses = shader->GetNumberOfPasses ();
   for (int p=0; p < numPasses; p++)
   {
-    //iShaderPass *pass = tech->GetPass (p);
-    //pass->Activate (0);
     shader->ActivatePass (p);
 
     int j;
@@ -186,25 +181,13 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     {
       dynDomain.Empty ();
       csRenderMesh* mesh = meshes[j];
+      dynDomain.Push (shaderManager);
       dynDomain.Push (mesh->material->GetMaterial ());
 
-      //shader->SelectMaterial (mesh->material->GetMaterial ());
-
-      //pass->SetupState (mesh, dynDomain);
       shader->SetupPass (mesh, dynDomain);
-
-      /*uint mixsave = mesh->mixmode;
-      uint mixmode = pass->GetMixmodeOverride ();
-      if (mixmode != 0)
-        mesh->mixmode = mixmode;*/
-
       g3d->DrawMesh (mesh);
-      //mesh->mixmode = mixsave;
-
-      //pass->ResetState ();
       shader->TeardownPass ();
     }
-    //pass->Deactivate ();
     shader->DeactivatePass ();
   }
 }
@@ -245,8 +228,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
       // @@@ Need error reporter
       if (shader != 0)
       {
-        csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
-        numSSM);
+        RenderMeshes (g3d, shader, sameShaderMeshes, 
+          numSSM);
       }
 
       shader = meshShader;
@@ -260,7 +243,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
     // @@@ Need error reporter
     if (shader != 0)
     {
-      csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
+      RenderMeshes (g3d, shader, sameShaderMeshes, 
         numSSM);
     }
   }

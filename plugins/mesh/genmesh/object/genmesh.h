@@ -87,6 +87,7 @@ private:
   csRef<iGraphics3D> g3d;
 
   csReversibleTransform tr_o2c;
+  uint buffers_version;
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
@@ -439,7 +440,7 @@ private:
   csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
-
+  
   csAnonRenderBufferManager anon_buffers;
   /*csRefArray<iRenderBuffer> anon_buffers;
   csDirtyAccessArray<csStringID> anon_names;
@@ -489,6 +490,7 @@ private:
 public:
   static csStringID vertex_name, texel_name, normal_name, color_name, 
     index_name;
+  uint buffers_version;
 
   iObjectRegistry* object_reg;
   iBase* logparent;

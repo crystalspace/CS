@@ -162,7 +162,7 @@ void csLightIterRenderStep::InitVariables ()
     if (!shvar_light_0_position)
     {
       shvar_light_0_position = new csShaderVariable (posname);
-      shvar_light_0_position->SetType(csShaderVariable::VECTOR4);
+      shvar_light_0_position->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_position);
     }
 
@@ -170,24 +170,24 @@ void csLightIterRenderStep::InitVariables ()
     if (!shvar_light_0_diffuse)
     {
       shvar_light_0_diffuse = new csShaderVariable (difname);
-      shvar_light_0_diffuse->SetType(csShaderVariable::VECTOR4);
-      shadermgr->AddVariable(shvar_light_0_diffuse);
+      shvar_light_0_diffuse->SetType (csShaderVariable::VECTOR4);
+      shadermgr->AddVariable (shvar_light_0_diffuse);
     }
 
     shvar_light_0_specular = shadermgr->GetVariable (spcname);
     if (!shvar_light_0_specular)
     {
       shvar_light_0_specular = new csShaderVariable (spcname);
-      shvar_light_0_specular->SetType(csShaderVariable::VECTOR4);
-      shadermgr->AddVariable(shvar_light_0_specular);
+      shvar_light_0_specular->SetType (csShaderVariable::VECTOR4);
+      shadermgr->AddVariable (shvar_light_0_specular);
     }
 
     shvar_light_0_attenuation = shadermgr->GetVariable (attname);
     if (!shvar_light_0_attenuation)
     {
       shvar_light_0_attenuation = new csShaderVariable (attname);
-      shvar_light_0_attenuation->SetType(csShaderVariable::VECTOR4);
-      shadermgr->AddVariable(shvar_light_0_attenuation);
+      shvar_light_0_attenuation->SetType (csShaderVariable::VECTOR4);
+      shadermgr->AddVariable (shvar_light_0_attenuation);
     }
   }
 }

@@ -251,6 +251,19 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 	pass->alphaMode = am;
       }
     }
+
+    csRef<iDocumentNode> nodeWM = node->GetNode ("writemask");
+    if (nodeWM != 0)
+    {
+      if (nodeWM->GetAttributeValue ("r") != 0)
+	pass->wmRed = strcasecmp (nodeWM->GetAttributeValue ("r"), "true") == 0;
+      if (nodeWM->GetAttributeValue ("g") != 0)
+	pass->wmGreen = strcasecmp (nodeWM->GetAttributeValue ("g"), "true") == 0;
+      if (nodeWM->GetAttributeValue ("b") != 0)
+	pass->wmBlue = strcasecmp (nodeWM->GetAttributeValue ("b"), "true") == 0;
+      if (nodeWM->GetAttributeValue ("a") != 0)
+	pass->wmAlpha = strcasecmp (nodeWM->GetAttributeValue ("a"), "true") == 0;
+    }
   }
   if (pass->alphaMode.autoAlphaMode)
   {
@@ -350,8 +363,8 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       int a = CS_VATTRIB_IS_SPECIFIC (attrib) ? 
 	attrib - CS_VATTRIB_SPECIFIC_FIRST : attrib;
       csStringID varID = strings->Request (mapping->GetAttributeValue ("name"));
-      pass->bufferID[a] = varID; //MUST HAVE STRINGS
-      pass->bufferGeneric[a] = CS_VATTRIB_IS_GENERIC (attrib);
+      pass->bufferID[pass->bufferCount] = varID; //MUST HAVE STRINGS
+      pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
       csShaderVariable *varRef=0;
       //csRef<csShaderVariable>& varRef = pass->bufferRef[a];
@@ -367,7 +380,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 	  0, &pass->bufferRef[pass->bufferCount]));
       }
       else
-	pass->bufferRef[a] = varRef;
+	pass->bufferRef[pass->bufferCount] = varRef;
       pass->vertexattributes[pass->bufferCount] = attrib;
       pass->bufferCount++;
       //pass->bufferCount = MAX (pass->bufferCount, a + 1);
@@ -600,10 +613,13 @@ bool csXMLShader::ActivatePass (unsigned int number)
 
   currentPass = number;
 
-  if(passes[currentPass].vp) passes[currentPass].vp->Activate ();
-  if(passes[currentPass].fp) passes[currentPass].fp->Activate ();
+  shaderPass *thispass = &passes[currentPass];
+  if(thispass->vp) thispass->vp->Activate ();
+  if(thispass->fp) thispass->fp->Activate ();
                            
   g3d->GetWriteMask (orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha);
+  g3d->SetWriteMask (thispass->wmRed, thispass->wmGreen, thispass->wmBlue,
+    thispass->wmAlpha);
 
   return true;
 }
@@ -647,7 +663,7 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   int i;
   for(i=0;i<dynamicDomains.Length();i++)
   {
-    varsFilled += dynamicDomains[i]->FillVariableList(&thispass->dynamicVariables);
+    varsFilled += dynamicDomains[i]->FillVariableList (&thispass->dynamicVariables);
     if (varsFilled>=thispass->dynamicVariables.Length ())
       break;
   }
@@ -683,9 +699,6 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
     thispass->textureCount);
   lastTexturesCount = thispass->textureCount;
 
-  g3d->SetWriteMask (thispass->wmRed, thispass->wmGreen, thispass->wmBlue,
-    thispass->wmAlpha);
-
   // @@@ Is it okay to modify the render mesh here?
   mesh->mixmode = thispass->mixMode;
   if (thispass->alphaMode.autoAlphaMode)
@@ -710,7 +723,10 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
 
 bool csXMLShader::TeardownPass ()
 {
-  if(passes[currentPass].vp) passes[currentPass].vp->ResetState ();
-  if(passes[currentPass].fp) passes[currentPass].fp->ResetState ();
+  shaderPass *thispass = &passes[currentPass];
+
+  if(thispass->vp) thispass->vp->ResetState ();
+  if(thispass->fp) thispass->fp->ResetState ();
+
   return true;
 }

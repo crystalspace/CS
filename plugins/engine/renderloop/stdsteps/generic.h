@@ -80,6 +80,7 @@ private:
   bool zOffset;
   csZBufMode zmode;
   csRef<iStringSet> strings;
+  csRef<iShaderManager> shaderManager;
   iObjectRegistry *objreg;
   // This is a work array we use for getting all meshes.
   csArray<csRenderMesh*> meshes;
@@ -122,7 +123,7 @@ public:
   virtual void SetZBufMode (csZBufMode zmode);
   virtual csZBufMode GetZBufMode ();
 
-  inline static void RenderMeshes (iGraphics3D* g3d, iShader* shader, 
+  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 
     csRenderMesh** meshes, int num);
 };
 

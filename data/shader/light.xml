@@ -2,9 +2,7 @@
   <technique priority="200">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
-      <mixmode>
-        <copy />
-      </mixmode>
+      <mixmode><copy /></mixmode>
       <buffer name="vertices" destination="attribute 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
       <texture destination="unit 0" name="standardtex attenuation" />

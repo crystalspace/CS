@@ -149,6 +149,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 
 #ifdef CS_USE_NEW_RENDERER
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
+  buffers_version = (uint)-1;
 #endif
 }
 
@@ -947,7 +948,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();
   //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-  if (factory->UpdateRenderBuffers ())
+  if ((buffers_version != factory->buffers_version) || 
+    (factory->UpdateRenderBuffers ()))
   {
     csShaderVariable* sv;
     sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
@@ -960,6 +962,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
     sv->SetValue (factory->GetRenderBuffer (factory->normal_name));
     sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
     sv->SetValue (factory->GetRenderBuffer (factory->color_name));
+
+    buffers_version = factory->buffers_version;
   }
 
   // iGraphics3D* g3d = rview->GetGraphics3D ();
@@ -1243,6 +1247,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   mesh_normals_dirty_flag = false;
   mesh_colors_dirty_flag = false;
   mesh_triangle_dirty_flag = false;
+
+  buffers_version = 0;
 #endif
 
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -1415,6 +1421,7 @@ bool csGenmeshMeshObjectFactory::UpdateRenderBuffers ()
     index_buffer->Release ();
     changed = true;
   }
+  if (changed) buffers_version++;
   return changed;
 }
 
