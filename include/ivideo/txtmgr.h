@@ -134,6 +134,13 @@ struct iTextureManager : public iBase
   virtual iTextureHandle *RegisterTexture (iImage *image, int flags) = 0;
 
   /**
+   * Unregister texture. Remember, if you use this, you MUST have 
+   * a reference on the handle. Release your reference after unregistering
+   */
+
+  virtual void UnregisterTexture(iTextureHandle *texhand) = 0;
+
+  /**
    * After all textures have been added, this function does all
    * needed calculations (palette, lookup tables, mipmaps, ...).
    * PrepareTextures () must be able to handle being called twice
@@ -164,6 +171,13 @@ struct iTextureManager : public iBase
    * to quickly make materials based on a single texture.
    */
   virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle) = 0;
+
+  /**
+   * Unregister material. Remember, if you use these, you MUST have 
+   * a reference on the handle. Release your reference after unregistering
+   */
+   
+  virtual void UnregisterMaterial(iMaterialHandle* mathand) = 0;
 
   /**
    * Prepare all materials.

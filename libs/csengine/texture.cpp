@@ -114,9 +114,6 @@ void csTextureWrapper::SetKeyColor (int red, int green, int blue)
 
 void csTextureWrapper::Register (iTextureManager *txtmgr)
 {
-  // smgh 22/07/00
-  //if (handle) handle->DecRef ();
-
   // if we have no image, we cannot register it.
   if (!image)
     return;
@@ -143,7 +140,10 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 
   handle = txtmgr->RegisterTexture (image, flags);
   if (handle)
+  {
     SetKeyColor (key_col_r, key_col_g, key_col_b);
+    handle->IncRef();
+  }
 }
 
 iObject *csTextureWrapper::TextureWrapper::QueryObject()

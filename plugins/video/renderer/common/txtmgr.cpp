@@ -230,9 +230,12 @@ void csMaterialHandle::Prepare ()
 {
   if (material)
   {
-    if (texture) texture->DecRef ();
-    texture = material->GetTexture ();
-    if (texture) texture->IncRef ();
+    if (texture != material->GetTexture())
+    { 
+      SCF_DEC_REF(texture);
+      texture = material->GetTexture ();
+      if (texture) texture->IncRef ();
+    }
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
   }
@@ -326,6 +329,7 @@ iMaterialHandle* csTextureManager::RegisterMaterial (iTextureHandle* txthandle)
 
 void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
+  if (!handle->GetRefCount()) return;
   int idx = materials.Find (handle);
   if (idx >= 0) materials.Delete (idx);
 }
@@ -341,13 +345,3 @@ void csTextureManager::FreeMaterials ()
   for (int i = 0; i < materials.Length (); i++)
     materials.Get (i)->FreeMaterial ();
 }
-
-//----------------------------------------------------------- csMatVector ----//
-
-bool csTextureManager::csMatVector::FreeTypedItem(csMaterialHandle *Item)
-{
-    Item->DecRef();
-    Item = NULL;
-    return true;
-}
-

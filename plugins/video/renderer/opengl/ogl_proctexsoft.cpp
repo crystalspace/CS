@@ -94,11 +94,12 @@ class TxtHandleVector : public csVector
 {
   iSystem *system;
   iPluginManager* plugin_mgr;
-  iTextureManager *soft_man;
+  iTextureManager* soft_man;
+  iTextureManager* ogl_man;
 public:
   // Constructor
-  TxtHandleVector (iSystem *sys, iTextureManager *stm) 
-    : csVector (8, 8), system (sys), soft_man (stm)
+  TxtHandleVector (iSystem *sys, iTextureManager *stm, iTextureManager *otm) 
+    : csVector (8, 8), system (sys), soft_man (stm), ogl_man (otm)
   {
     plugin_mgr = CS_QUERY_REGISTRY (sys->GetObjectRegistry (), iPluginManager);
   }; 
@@ -106,7 +107,14 @@ public:
   virtual ~TxtHandleVector () { DeleteAll (); }
   // Free an item from array
   virtual bool FreeItem (csSome Item)
-  { delete (txt_handles *)Item; return true; }
+  { 
+    soft_man->UnregisterTexture(((txt_handles *)Item)->soft_txt);
+    ((txt_handles *)Item)->soft_txt->DecRef(); 
+    ((txt_handles *)Item)->soft_txt = NULL;
+    ogl_man->UnregisterTexture(((txt_handles *)Item)->ogl_txt);
+    ((txt_handles *)Item)->ogl_txt->DecRef();
+    ((txt_handles *)Item)->ogl_txt = NULL;
+    delete (txt_handles *)Item; return true; }
   // Find a state by referenced OpenGL texture handle
   virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
   { return ((txt_handles *)Item)->ogl_txt == (iTextureHandle *)Key ? 0 : -1; }
@@ -136,7 +144,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   // flags are not set. 
   image->IncRef ();
   iTextureHandle *hstxt = soft_man->RegisterTexture (image, flags);
-
+  hstxt->IncRef ();
   // deal with key colours..
   if (ogl_txt->GetKeyColor ())
   {
@@ -301,6 +309,7 @@ bool csOpenGLProcSoftware::Prepare(
     soft_proc_g3d->DecRef ();
     return false;
   }
+  soft_proc_tex->IncRef();
   // set to correct value.
   g3d = soft_proc_g3d;
 
@@ -309,7 +318,8 @@ bool csOpenGLProcSoftware::Prepare(
   dummy_g2d = (iGraphics2D*) new csOpenGLProcSoftware2D (g3d, main_pfmt);
 
   if (!head_soft_tex)
-    txts_vector = new TxtHandleVector (system, g3d->GetTextureManager ());
+    txts_vector = new TxtHandleVector (system, g3d->GetTextureManager (), 
+      parent_g3d->GetTextureManager ());
   else
     txts_vector = head_soft_tex->txts_vector;
 

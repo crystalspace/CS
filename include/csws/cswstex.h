@@ -47,6 +47,8 @@ class csWSTexture
   bool KeyChanged;
   // texture handle for the 3D/2D driver
   iTextureHandle *Handle;
+  // The texture manager that holds this texture
+  iTextureManager* TexMan;
   // texture name
   char *Name;
   // VFS file name

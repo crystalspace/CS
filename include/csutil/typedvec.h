@@ -76,6 +76,13 @@
   CS_PRIVATE_DECLARE_TYPED_VECTOR_USERDELETE (NAME, TYPE)
 
 /**
+ * 
+ */
+
+#define CS_DECLARE_TYPED_VECTOR_DECREF(NAME, TYPE) \
+ CS_PRIVATE_DECLARE_TYPED_VECTOR_DECREF(NAME, TYPE)
+
+/**
  * Implement Name::FreeTypedItem() for CS_DECLARE_TYPED_VECTOR_USERDELETE to
  * delete the item. This combination can be used instead of
  * CS_DECLARE_TYPED_VECTOR if the contained type is undefined at the time
@@ -316,6 +323,12 @@ public:
     bool FreeTypedItem (TYPE*);						\
   CS_PRIVATE_FINISH_TYPED_VECTOR (TYPE)
 
+#define CS_PRIVATE_DECLARE_TYPED_VECTOR_DECREF(NAME,TYPE)  \
+  CS_PRIVATE_BEGIN_TYPED_VECTOR (NAME,TYPE)                \
+    inline bool FreeTypedItem (TYPE *Item)                 \
+    { Item->DecRef(); Item = NULL; return true; }          \
+  CS_PRIVATE_FINISH_TYPED_VECTOR (TYPE)
+  
 /*
  * This is a special version of typed vectors that contain SCF objects. The
  * vector will correctly IncRef all added objects and DecRef all removed

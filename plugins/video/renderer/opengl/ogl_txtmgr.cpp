@@ -69,6 +69,7 @@ csTextureHandleOpenGL::~csTextureHandleOpenGL ()
   if (G3D->texture_cache)
     G3D->texture_cache->Uncache (this);
   G3D->txtmgr->UnregisterTexture (this);
+  G3D->txtmgr->DecRef();
   G3D->DecRef ();
 }
 
@@ -205,23 +206,6 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
   Clear ();
 }
 
-void csTextureManagerOpenGL::Clear ()
-{
-  int i;
-  for (i=textures.Length ()-1; i >= 0; i--)
-  {
-    csTextureHandleOpenGL* txt = (csTextureHandleOpenGL*)textures.Get (i);
-    UnregisterTexture (txt);
-    txt->DecRef ();
-  }
-
-  for (i=materials.Length ()-1; i >= 0; i--)
-  {
-    csMaterialHandle *mat = materials.Get (i);
-    UnregisterMaterial (mat);
-  }
-}
-
 void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
   const char *proc_texture_type = 
@@ -262,6 +246,7 @@ iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image,
 
 void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 {
+  if (!handle->GetRefCount()) return; // Loop breaker
   int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
 }

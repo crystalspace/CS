@@ -262,6 +262,9 @@ public:
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   ///
   virtual void UnregisterTexture (csTextureHandleLine* handle);
+  ///
+  virtual void UnregisterTexture ( iTextureHandle* handle)
+  { UnregisterTexture((csTextureHandleLine *)handle); }
   /// Clear the palette (including all reserved colors)
   virtual void ResetPalette ();
   /// Reserve a color in palette (if any)

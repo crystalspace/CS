@@ -143,7 +143,10 @@ public:
   void SetPixelFormat (csPixelFormat &PixelFormat);
   /// Called by texture's destructor
   void UnregisterTexture (csTextureHandleOpenGL *handle);
-  virtual void Clear ();
+  /// Called by applications
+  virtual void UnregisterTexture(iTextureHandle* handle)
+  { UnregisterTexture((csTextureHandleOpenGL *)handle); }
+
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
   ///

@@ -1232,9 +1232,10 @@ void csGraphics3DSoftwareCommon::Close ()
     delete fog_buffers;
     fog_buffers = n;
   }
-
+//@@@ Bug: The software texture cache when used with opengl crashes at exit. MHV.
   delete tcache; tcache = NULL;
   if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
+
   texman->Clear();
   texman->DecRef(); texman = NULL;
 

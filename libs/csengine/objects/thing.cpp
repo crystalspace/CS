@@ -153,6 +153,7 @@ csThing::~csThing ()
     vinf->visobj->DecRef ();
     delete vinf;
   }
+  if (portal_polygons.Length()) portal_polygons.DeleteAll();
   CleanupThingEdgeTable ();
 }
 

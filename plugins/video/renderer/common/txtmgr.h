@@ -302,23 +302,14 @@ public:
 class csTextureManager : public iTextureManager
 {
 protected:
-  // Private class used to keep a list of objects derived from csTextureHandle
-  class csTexVector : public csVector
-  {
-  public:
-    // Initialize the array
-    csTexVector (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-    { }
-    // Shortcut to avoid typecasts
-    csTextureHandle *Get (int index)
-    { return (csTextureHandle *)csVector::Get (index); }
-  };
+
+  CS_DECLARE_TYPED_VECTOR_DECREF (csTexVector, csTextureHandle);
 
   /// List of textures.
   csTexVector textures;
 
   // Private class used to keep a list of objects derived from csMaterialHandle
-  CS_DECLARE_TYPED_VECTOR_USERDELETE (csMatVector, csMaterialHandle);
+  CS_DECLARE_TYPED_VECTOR_DECREF (csMatVector, csMaterialHandle);
 
   /// List of materials.
   csMatVector materials;
@@ -349,6 +340,8 @@ public:
    */
   void UnregisterMaterial (csMaterialHandle* handle);
 
+  virtual void  UnregisterMaterial(iMaterialHandle* handle)
+  { UnregisterMaterial((csMaterialHandle *)handle); }
   /// Clear (free) all textures
   virtual void Clear ()
   {

@@ -700,6 +700,7 @@ bool csMeshFactoryList::FreeItem (csSome Item)
 {
   iMeshFactoryWrapper* mesh = (iMeshFactoryWrapper*)Item;
   mesh->DecRef ();
+  Item = NULL;
   return true;
 }
 
