@@ -1,5 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+28-Apr-2000
+	- Paul Garceau modified for COMP_GCC/COMP_VC Win32 implementation:
+	    - Re-enabled "make ddraw".
+	    - Enabled necessary library references for COMP_GCC static
+	      build process.
+	    - Re-defined process to accomodate COMP_BC, COMP_VC & COMP_GCC.
+	    - Modified ddraw.mak to generate ddraw2d.dll for
+	      COMP_VC and COMP_GCC when shared libraries or
+	      "plugins" are being built.
+	- Andrew Zabolotny did a small fix to the unix system
+	  driver with regards to time handling.
+	- Update to VC project files from Frank O'Connor for new
+	  multiprotocol communication manager.
+	- Some other VC project file changes from Frank.
 27-Apr-2000
 	- Frank O'Connor updated VC project files for NetComm and
 	  the scfTutor apps (zoo, dog, worm).
@@ -14,6 +28,16 @@ The history order has been reversed so that new features are at the top.
 	  system created for an explosion. This bug was caused by
 	  a misconception that there are five explosions for a single
 	  missile. This is not true.
+	- Desmond Fletcher added ACTIVATE option to Map2CS for thing
+	  scripts.
+	- Norman Kramer changed ClassID of glide drivers for unix.
+	- Norman also unified unix glide 2D driver. Now both can be build
+	  at same time. See linux.mak file.
+	- Norman also implemented the DoubleBuffer() call in Glide
+	  3D driver.
+	- Brandon Ehle did various fixes for the Borland compile.
+	- Thomas Hieber replaced a fatal_exit() by exit() in csgeom.
+	- Martin Geisse did some updates to dungeon.
 26-Apr-2000
 	- Fixed csMath3::FindObserverSides().
 	- Added csBox2 and csBox3::GetEdge() to iterate over all edges
