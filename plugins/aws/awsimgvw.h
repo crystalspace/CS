@@ -52,7 +52,7 @@ public:
   awsImageView ();
   virtual ~awsImageView ();
 
-  /// Frame styles
+  /// Frame styles.
   static const int fsBump;
   static const int fsSimple;
   static const int fsRaised;
@@ -65,18 +65,18 @@ public:
   static const int frameMask;
   static const int imageMask;
 
-  /// An up and down motion for the button
+  /// An up and down motion for the button.
   static const int signalClicked;
 
-  /// A down motion for the button
+  /// A down motion for the button.
   static const int signalMouseDown;
 
-  /// An up motion for the button
+  /// An up motion for the button.
   static const int signalMouseUp;
 
-  /// A movement of the mouse
+  /// A movement of the mouse.
   static const int signalMouseMoved;
-public:
+
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
@@ -121,7 +121,7 @@ public:
    */
   awsImageViewFactory (iAws *wmgr);
 
-  /// Does nothing
+  /// Does nothing.
   virtual ~awsImageViewFactory ();
 
   /// Returns a newly created component of the type this factory handles.

@@ -159,9 +159,8 @@ private:
   /// Length of rowWeights.
   int rowWeightsLength;
 
-  /// the components that are in this layout
+  /// The components that are in this layout
   awsComponentVector comps;
-
 public:
   /**
    * Constructs a gridbag layout.  Note that columns and rows have a
@@ -181,8 +180,8 @@ public:
   /**
    * Sets the constraints for the specified component in this layout.
    * @param cmp - the component to be modified.
-	 * @param constraints - the constraints to be applied.
-	 */
+   * @param constraints - the constraints to be applied.
+   */
   void setConstraints (
     iAwsComponent *cmp,
     awsGridBagConstraints &constraints);
@@ -297,13 +296,13 @@ protected:
   void AdjustForGravity (awsGridBagConstraints *constraints, csRect r);
 
   /**
-   * Figure out the minimum size of the
-   * master based on the information from GetLayoutInfo()
+   * Figure out the minimum size of the master based on the
+   * information from GetLayoutInfo ().
    */
   csRect GetMinSize (iAwsComponent *parent, GridBagLayoutInfo *info);
 
   /**
-   * Lay out the grid
+   * Layout the grid.
    */
   void ArrangeGrid (iAwsComponent *parent);
 };
