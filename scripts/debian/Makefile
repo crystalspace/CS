@@ -76,7 +76,8 @@ debbinary:
 	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE);dch -v $(VERSION).$(DATE)-$(MINOR) "Daily Build" ; fakeroot debian/rules binary
 
 debbuild:
-	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE);dch -v $(VERSION).$(DATE)-$(MINOR) "Daily Build" ; debuild -us -uc -v$(VERSION)-$(shell expr $(MINOR) - 1)
+	#cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE);dch -v $(VERSION).$(DATE)-$(MINOR) "Daily Build" ; debuild -us -uc -v$(VERSION)-$(shell expr $(MINOR) - 1)
+	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE);dch -v $(VERSION).$(DATE)-$(MINOR) "Daily Build" ; debuild -v$(VERSION)-$(shell expr $(MINOR) - 1)
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
