@@ -46,7 +46,6 @@ MSVC.PLUGINS.REQUIRED =         \
   font/server/freefont          \
   sound/driver/waveoutsd        \
   sound/renderer/ds3d           \
-  sound/renderer/eax            \
   sound/renderer/software       \
   video/canvas/ddraw            \
   video/canvas/ddraw61          \
