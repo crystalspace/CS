@@ -288,7 +288,6 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
   csTextureMM *txt_mm = (csTextureMM *)txt_handle->GetPrivateObject ();
 
   GLuint texturehandle;
-  // bind all 4 mipmap levels if possible
   glGenTextures (1, &texturehandle);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
 
@@ -302,11 +301,14 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
 
   // generate mipmaps
-  // By default, every RGBPixel initializes its alpha component to 255.
-  // Thus, we should just drop to zero alpha for transparent pixels, if any
+  // bind all mipmap levels required.  In OpenGL this means the original mipmap (level 0)
+  // with further levels (1,2,3...) being a reduction of the original mipmap
+  // by a factor of 2 in both directions.  You must keep reducing the mipmap size until
+  // you get down to the 1x1 size mipmap.
   int mipmaplevel = 0;
   RGBPixel *transp = txt_handle->GetTransparent () ? txt_mm->get_transparent () : NULL;
   iImage *previmg = NULL;
+  int twhack = 0, thhack = 0;
   while (true)
   {
     RGBPixel *src;
@@ -328,13 +330,44 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
           (mipmaplevel - 1))->get_image ()->MipMap (1, transp);
       else
       {
-        img = previmg->MipMap (1, transp);
-        previmg->DecRef ();
-        previmg = img;
+        // standard CS imaging will not properly mipmap a 1xN or Nx1 bitmap, so we
+        // have to make a hack to short-circuit such situations with manual shrinkage
+	if ( (previmg->GetWidth() == 1) || (previmg->GetHeight() == 1) )
+	{
+	  img=previmg;
+	  src = (RGBPixel *)previmg->GetImageData();
+	  int totalnewpixels = ( previmg->GetWidth() * previmg->GetHeight() ) / 2;
+	  for (int skippixel = 0; skippixel < totalnewpixels; skippixel ++)
+	    src[skippixel] = src[skippixel*2];
+	  
+	  // as part of the hack we have to manually track the mipmap size, as the
+	  // 'actual' image size is invalid
+	  if ( (twhack == 0) || (thhack = 0) )
+	  {
+	    twhack = previmg->GetWidth();
+	    thhack = previmg->GetHeight();
+	  }
+	  twhack /= 2;
+	  thhack /= 2;
+	  if (twhack < 1) twhack = 1;
+	  if (thhack < 1) thhack = 1;
+	}
+        else
+	{
+          img = previmg->MipMap (1, transp);
+          previmg->DecRef ();
+          previmg = img;
+	}
       }
       tw = img->GetWidth ();
       th = img->GetHeight ();
       src = (RGBPixel *)img->GetImageData ();
+    }
+
+    if (twhack || thhack)
+    {
+      tw = twhack;
+      th = thhack;
     }
 
     if (transp)
@@ -343,7 +376,9 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
       RGBPixel *_src = src;
       while (pixels--)
       {
-        if (transp->eq (*_src))
+         // By default, every RGBPixel initializes its alpha component to 255.
+         // Thus, we should just drop to zero alpha for transparent pixels, if any
+         if (transp->eq (*_src))
           _src->alpha = 0;
         _src++;
       }
@@ -354,8 +389,12 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
       0, GL_RGBA, GL_UNSIGNED_BYTE, src);
 
     // shrink down to the next mipmap level
-    if ((tw <= 2) || (th <= 2)) break;
+    if ((tw <= 1) && (th <= 1)) break;
     mipmaplevel++;
+
+    // if the mipmapping does not properly shrink bitmaps, it will never terminate.
+    // this defensive check will terminate anyways
+//    if (mipmaplevel > 20) break;
   }
   if (previmg) previmg->DecRef ();
 
