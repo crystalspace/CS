@@ -859,7 +859,6 @@ int main (int argc, char* argv[])
   // Some settings.
   Gfx3D->SetRenderState (G3DRENDERSTATE_DEBUGENABLE, (long)false);
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
-  Gfx3D->SetRenderState (G3DRENDERSTATE_EDGESENABLE, (long)false);
 
   // Some commercials...
   Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 0.1.\n");
