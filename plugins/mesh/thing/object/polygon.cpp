@@ -1174,7 +1174,6 @@ void csPolygon3D::InitializeDefault (bool clear)
   {
     if (txt_info->lm == 0) return ;
     txt_info->InitLightMaps ();
-    txt_info->lightmap_up_to_date = false;
     if (clear)
     {
       csColor ambient;
@@ -1204,7 +1203,6 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
     {
       txt_info->InitLightMaps ();
     }
-    txt_info->lightmap_up_to_date = true;
     return error;
   }
 
@@ -1216,7 +1214,6 @@ bool csPolygon3D::WriteToCache (iFile* file)
   if (txt_info)
   {
     if (txt_info->lm == 0) return true;
-    txt_info->lightmap_up_to_date = true;
     if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
       & CS_ENGINE_CACHE_WRITE)
       txt_info->lm->Cache (file, this,
@@ -1532,7 +1529,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   // that are adjacent.
   bool calc_lmap;
   if (txt_info)
-    calc_lmap = txt_info->lm && !txt_info->lightmap_up_to_date;
+    calc_lmap = txt_info->lm != 0;
   else
     calc_lmap = true;
 
@@ -1551,7 +1548,6 @@ void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
 {
   if (txt_info)
   {
-    if (txt_info->lightmap_up_to_date) return ;
     txt_info->FillLightMap (lview, lptq, vis, this,
     	m_world2tex, v_world2tex);
   }

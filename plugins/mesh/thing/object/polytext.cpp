@@ -48,7 +48,6 @@ csPolyTexture::csPolyTexture ()
   shadow_bitmap = 0;
   light_version = 0;
   tmapping = 0;
-  lightmap_up_to_date = false;
 }
 
 void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,

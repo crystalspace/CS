@@ -238,12 +238,6 @@ class csPolyTexture
   friend class csPolygon3D;
 
 private:
-  /**
-   * This bool indicates if the lightmap is up-to-date (read from the
-   * cache). If set to false the polygon still needs to be lit.
-   */
-  bool lightmap_up_to_date;
-
   /// How to map the lightmap on the polygon.
   csPolyTextureMapping* tmapping;
   csRef<iRendererLightmap> rlm;

@@ -58,6 +58,8 @@ chronological order.
 	- Jorrit removed two unnused functions from thing mesh plugin.
 	- Jorrit removed 4 bytes for every polygon (removed a pointer back
 	  to the polygon in csPolyTexture).
+	- Jorrit removed 4 bytes for every polygon (removed lightmap_up_to_date
+	  field which was actually not needed).
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.
