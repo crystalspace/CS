@@ -32,7 +32,7 @@
 #include "iengine/sector.h"
 #include "ivideo/graph3d.h"
 #ifdef CS_USE_NEW_RENDERER
-#include "csutil/bitset.h"
+#include "csutil/array.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "iengine/viscull.h"
@@ -148,7 +148,7 @@ class csRenderMeshList : public iSectorRenderMeshList
   csSector* sector;
   uint32 currentVisNr;
   csTicks currentFrame;
-  csBitSet checkedRPs;
+  csArray<bool> checkedRPs;
   iRenderView* currentView;
   const csReversibleTransform* camtrans;
   // the RP currently sorted - this stored here so the 'uninteresting'

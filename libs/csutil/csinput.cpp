@@ -108,13 +108,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE(csKeyboardDriver::eiEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
-  csInputDriver(r), KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
+  csInputDriver(r)
 {
   SCF_CONSTRUCT_IBASE(0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   Listener = &scfiEventHandler;
   StartListening();
-  KeyState.Reset();
+  KeyState.SetLength (256 + (CSKEY_LAST - CSKEY_FIRST + 1));
+  int i;
+  for (i = 0 ; i < KeyState.Length () ; i++)
+    KeyState[i] = false;
 }
 
 csKeyboardDriver::~csKeyboardDriver ()
@@ -123,7 +126,7 @@ csKeyboardDriver::~csKeyboardDriver ()
 
 void csKeyboardDriver::Reset ()
 {
-  for (size_t i = 0; i < KeyState.GetBitCount (); i++)
+  for (size_t i = 0; i < (size_t)KeyState.Length (); i++)
     if (KeyState [i])
       DoKey (i < 256 ? i : i - 256 + CSKEY_FIRST, 0, false);
 }
@@ -158,9 +161,9 @@ void csKeyboardDriver::SetKeyState (int iKey, bool iDown)
 {
   int idx = (iKey < 256) ? iKey : (256 + iKey - CSKEY_FIRST);
   if (iDown)
-    KeyState.Set (idx);
+    KeyState.Put (idx, true);
   else
-    KeyState.Reset (idx);
+    KeyState.Put (idx, false);
 }
 
 bool csKeyboardDriver::GetKeyState (int iKey)

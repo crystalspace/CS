@@ -428,9 +428,11 @@ void csRenderMeshList::Relink (iMeshWrapper* mw)
 
 void csRenderMeshList::PrepareFrame (iRenderView* rview)
 {
-  checkedRPs.Resize (sector->engine->GetRenderPriorityCount());
-  checkedRPs.Reset ();
-  RPsorting.SetLength (checkedRPs.GetBitCount(), 0);
+  checkedRPs.SetLength (sector->engine->GetRenderPriorityCount());
+  int i;
+  for (i = 0 ; i < checkedRPs.Length () ; i++)
+    checkedRPs[i] = false;
+  RPsorting.SetLength (checkedRPs.Length(), 0);
   currentVisNr = sector->culler->GetCurrentVisibilityNumber();
   // @@@ This won't work as expected when the VC is suspended
   currentFrame = sector->virtual_clock->GetCurrentTicks();
@@ -463,9 +465,10 @@ void csRenderMeshList::Get (int index,
   csRMLitem& item = rendermeshes[index];
 
   long RP = item.mw->GetRenderPriority();
-  if (!checkedRPs.Get (RP))
+  if (RP > checkedRPs.Length ()) checkedRPs.SetLength (RP+1);
+  if (!checkedRPs[RP])
   {
-    checkedRPs.Set (RP);
+    checkedRPs.Put (RP, true);
 
     RPsorting[RP] = sector->engine->GetRenderPrioritySorting (RP);
     // does it need sorting?

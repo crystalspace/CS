@@ -27,7 +27,7 @@
  */
 
 #include "csutil/scf.h"
-#include "csutil/bitset.h"
+#include "csutil/array.h"
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -66,7 +66,7 @@ class csKeyboardDriver : public csInputDriver, public iKeyboardDriver
 {
 protected:
   /// Key state array.
-  csBitSet KeyState;
+  csArray<bool> KeyState;
 
   /**
    * Set key state. For example SetKey (CSKEY_UP, true). Called
