@@ -20,6 +20,7 @@ chronological order.
 	  (applications, plugins, etc.) to appear to be static link libraries.
 	- Eric Sunshine added a number of missing `const' qualifiers to
 	  arguments of video- and graphics-related interfaces.
+	- Norman Kraemer added support for pre 1.0 version of alsa.
 14-Feb-2004
 	- Norman Kraemer added an ALSA sound driver.  It can be used if you
 	  disabled OSS emulation in your ALSA configuration.
