@@ -279,11 +279,11 @@ public:
 
     /// Triggered when a child is added to the parent (triggered on the child)
     virtual void OnAdded()
-    { return comp->OnAdded ();}
+    { comp->OnAdded ();}
 
     /// Triggered when a component is resized by the layout manager.
     virtual void OnResized()
-    { return comp->OnResized ();}
+    { comp->OnResized ();}
 
 };
 
