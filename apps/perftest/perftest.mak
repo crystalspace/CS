@@ -32,7 +32,6 @@ SRC.PERF = $(wildcard apps/perftest/*.cpp) apps/support/static.cpp
 OBJ.PERF = $(addprefix $(OUT),$(notdir $(SRC.PERF:.cpp=$O)))
 DESCRIPTION.$(PERF.EXE) = $(DESCRIPTION.perf)
 TO_INSTALL.EXE+=$(PERF.EXE)
-TO_INSTALL.DATA+=data/perf.zip
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

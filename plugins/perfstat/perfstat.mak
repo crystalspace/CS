@@ -43,7 +43,6 @@ else
   TO_INSTALL.STATIC_LIBS+=$(PERFSTAT)
 endif
 DESCRIPTION.$(PERFSTAT) = $(DESCRIPTION.perfstat)
-TO_INSTALL.DATA += data/perf.zip
 SRC.PERFSTAT = $(wildcard plugins/perfstat/*.cpp)
 OBJ.PERFSTAT = $(addprefix $(OUT),$(notdir $(SRC.PERFSTAT:.cpp=$O)))
 
