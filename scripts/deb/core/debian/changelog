@@ -1,3 +1,13 @@
+crystalspace (0.96-20030912-1) unstable; urgency=low
+
+  * Go to a new cvs snapshot, compatible with VOS packaging
+  * CS is under heavy developpment and it's difficult to get a version 
+  available for all software using it, last release is rather old now
+  I will try to find good snapshot date to get Planeshift work with
+  this CS version.
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 29 Sep 2003 22:39:31 +0200
+
 crystalspace (0.96-20030714-2) unstable; urgency=low
 
   * Stupid error in configure options 

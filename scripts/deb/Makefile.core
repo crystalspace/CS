@@ -35,23 +35,24 @@ $(BUILDDIR)/copy-stamp:
 	touch $(BUILDDIR)/copy-stamp
 
 # To anonymous login, do it only one time is needed
-cvslogin:
+cvslogin: $(BUILDDIR)
 	echo "Login crystalspace CVS archive as anonymous"
 	echo "Password is <Enter>"
-	cvs -d:pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal login
+	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/crystal login
 
 # If you want to export a special date
 cvsexportdate: $(BUILDDIR) $(BUILDDIR)/cvsexportdate-stamp
 $(BUILDDIR)/cvsexportdate-stamp: 
+	mkdir -p $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)
 	echo "Exporting CVS by date $(DATE)"
-	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal export -d crystalspace-$(VERSION).$(DATE) -D $(DATE) crystal
+	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE) && cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/crystal export -D $(DATE) CS
 	touch $(BUILDDIR)/cvsexportdate-stamp
 
 # If you want to export a special tag (to make e.g. orig file)
 cvsexporttag: $(BUILDDIR) $(BUILDDIR)/cvsexporttag-stamp
 $(BUILDDIR)/cvsexporttag-stamp: 
 	echo "Exporting CVS by tag $(TAG)"
-	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal export -d crystalspace_$(VERSION) -r $(TAG) crystal
+	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/crystal export -d crystalspace_$(VERSION)/CS -r $(TAG) CS
 	touch $(BUILDDIR)/cvsexporttag-stamp
 
 # Prepare debian files

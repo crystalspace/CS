@@ -41,6 +41,7 @@ configure-stamp:
 #	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
 	# Temp remove of render3d renderers
 	#perl -pi -e "s/^PLUGINS(.*render3.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	perl -pi -e "s/^PLUGINS(.*glshader_cg$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of cslua
 #	perl -pi -e "s/^PLUGINS(.*cslua.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of openal
