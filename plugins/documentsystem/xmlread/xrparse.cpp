@@ -472,7 +472,8 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
   if ( !p )
   {
     document->SetError( TIXML_ERROR_READING_ELEMENT_VALUE );
-  }  
+  }
+
   return p;
 }
 

@@ -442,30 +442,16 @@ bool csFrustumVis::VisTest (iRenderView* rview)
   FrustTest_Front2BackData data;
 
   // First get the current view frustum from the rview.
-  float lx, rx, ty, by;
-  rview->GetFrustum (lx, rx, ty, by);
-  csVector3 p0 (lx, by, 1);
-  csVector3 p1 (lx, ty, 1);
-  csVector3 p2 (rx, ty, 1);
-  csVector3 p3 (rx, by, 1);
+  csRenderContext* ctxt = rview->GetRenderContext ();
+  csVector3* frust = ctxt->iview_frustum->frustum;
+
   const csReversibleTransform& trans = rview->GetCamera ()->GetTransform ();
-  csVector3 origin = trans.This2Other (csVector3 (0));
-  p0 = trans.This2Other (p0);
-  p1 = trans.This2Other (p1);
-  p2 = trans.This2Other (p2);
-  p3 = trans.This2Other (p3);
-  data.frustum[0].Set (origin, p0, p1);
-  data.frustum[1].Set (origin, p2, p3);
-  data.frustum[2].Set (origin, p1, p2);
-  data.frustum[3].Set (origin, p3, p0);
-  //data.frustum[4].Set (origin, p0, p1);	// @@@ DO z=0 plane too!
-  if (rview->GetCamera ()->IsMirrored ())
-  {
-    data.frustum[0].Invert ();
-    data.frustum[1].Invert ();
-    data.frustum[2].Invert ();
-    data.frustum[3].Invert ();
-  }
+  csVector3 o2tmult = trans.GetO2T () * trans.GetO2TTranslation ();
+  data.frustum[0].Set (trans.GetT2O () * frust[0], - frust[0] * o2tmult);
+  data.frustum[1].Set (trans.GetT2O () * frust[1], - frust[1] * o2tmult);
+  data.frustum[2].Set (trans.GetT2O () * frust[2], - frust[2] * o2tmult);
+  data.frustum[3].Set (trans.GetT2O () * frust[3], - frust[3] * o2tmult);
+  // @@@ DO z=0 plane too!
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.

@@ -976,9 +976,7 @@ bool csRenderView::ClipBSphere (
   // Check if we're fully inside the bounding sphere.
   //------
   bool fully_inside = csSquaredDist::PointPoint (
-        csVector3 (0),
-        tr_center) <= radius *
-    radius;
+        csVector3 (0), tr_center) <= radius * radius;
 
   //------
   // Test if there is a chance we must clip to current portal.
@@ -997,7 +995,8 @@ bool csRenderView::ClipBSphere (
       radius,
       inside,
       outside);
-    if (outside) return false;
+    if (outside)
+      return false;
     if (!inside)
       clip_portal = CS_CLIP_NEEDED;
     else
