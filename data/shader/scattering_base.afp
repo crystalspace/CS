@@ -29,11 +29,11 @@ TEMP heightVal;
 TEX rgb, iTex0, texture[0], 2D;
 TEX normal, iTex0, texture[1], 2D;
 
-# Transform normal to CS space
-SWZ normal, normal, x, z, y, w;
-
 # remove scale and bias from the normal map
 MAD normal, normal, 2.0, -1.0;
+
+# Transform normal to CS space
+SWZ normal, normal, x, z, -y, w;
 
 # normal dot lightdir
 DP3 bump, normal, iLightDir;

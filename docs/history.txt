@@ -14,6 +14,9 @@ chronological order.
 	- Jorrit changed bugplug so it automatically switches the mode to
 	  clearing the screen automatically if edge drawing is selected.
 	  Otherwise the edges are hard to see and cause HOM.
+	- res corrected the normal map swizzling in the 
+	  splatting_scattering_base shader. It didn't flip the (source) Y 
+	  coordinate.
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and
