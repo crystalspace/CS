@@ -731,8 +731,6 @@ void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
 
 bool csGraphics3DOGLCommon::NewOpen ()
 {
-  CommonOpen ();
-
   if (!G2D->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
@@ -807,9 +805,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
 #undef OGLCONFIGS_SUFFIX
 
   G2D->PerformExtension("configureopengl");
-
-  // Initialize the default method calls
-  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
 
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
@@ -913,10 +908,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   // See if we find any OpenGL extensions, and set the corresponding
   // flags.
-  InitGLExtensions ();
-
-  if (ARB_multitexture)
-    DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
+  CommonOpen ();
 
   if (m_renderstate.dither)
     glEnable (GL_DITHER);
@@ -1065,6 +1057,14 @@ void csGraphics3DOGLCommon::CommonOpen ()
   // default lightmap blend style
   m_config_options.m_lightmap_src_blend = GL_DST_COLOR;
   m_config_options.m_lightmap_dst_blend = GL_ZERO;
+  InitGLExtensions ();
+
+  // Initialize the default method calls
+  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
+
+  if (ARB_multitexture)
+    DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
+
 }
 
 void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)

@@ -23,11 +23,12 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "csutil/csvector.h"
 
 class csGraphics3DOGLCommon;
 class csTextureHandleOpenGL;
 class csTextureProcOpenGL;
-class TxtHandleVector;
 struct iSoftProcTexture;
 struct iNativeWindow;
 struct iVertexBufferManager;
@@ -50,6 +51,62 @@ struct iVertexBufferManager;
 
 class csOpenGLProcSoftware : public iGraphics3D
 {
+
+  //----------------------------------------------------------------------------
+  // Keep a private vector of soft textures generated from ogl textures
+  //----------------------------------------------------------------------------
+  struct txt_handles
+  {
+    txt_handles (iTextureHandle *soft, iTextureHandle *ogl)
+    {
+      (soft_txt = soft)->IncRef ();
+      (ogl_txt = ogl)->IncRef ();
+    }
+
+    ~txt_handles ()
+    {
+      SCF_DEC_REF (soft_txt);
+      SCF_DEC_REF (ogl_txt);
+    }
+
+    iTextureHandle *soft_txt;
+    iTextureHandle *ogl_txt;
+  };
+
+  class TxtHandleVector : public csVector
+  {
+    iObjectRegistry *object_reg;
+    iPluginManager* plugin_mgr;
+    iTextureManager* soft_man;
+  public:
+    // Constructor
+    TxtHandleVector (iObjectRegistry *objreg, iTextureManager *stm)
+      : csVector (8, 8), object_reg (objreg), soft_man (stm)
+    {
+      plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
+      soft_man->IncRef ();
+    };
+    // Destructor
+    virtual ~TxtHandleVector ()
+    {
+      DeleteAll ();
+      SCF_DEC_REF (soft_man);
+      SCF_DEC_REF (plugin_mgr);
+    }
+    // Free an item from array
+    virtual bool FreeItem (csSome Item)
+    { delete (txt_handles *)Item; return true; }
+    // Find a state by referenced OpenGL texture handle
+    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+    { return ((txt_handles *)Item)->ogl_txt == (iTextureHandle *)Key ? 0 : -1; }
+    // Get world state according to index
+    inline txt_handles *Get (int n) const
+    { return (txt_handles*)csVector::Get (n); }
+
+    iTextureHandle *RegisterAndPrepare (iTextureHandle *ogltxt);
+    void AddTextureHandles (iTextureHandle *soft, iTextureHandle *ogl);
+  };
+
  protected:
   iObjectRegistry *object_reg;
   char *buffer;

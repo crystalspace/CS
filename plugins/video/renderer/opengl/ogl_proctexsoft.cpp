@@ -49,27 +49,6 @@ SCF_IMPLEMENT_IBASE (csOpenGLProcSoftware2D)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
 SCF_IMPLEMENT_IBASE_END;
 
-//----------------------------------------------------------------------------
-// Keep a private vector of soft textures generated from ogl textures
-//----------------------------------------------------------------------------
-struct txt_handles
-{
-  txt_handles (iTextureHandle *soft, iTextureHandle *ogl)
-  {
-    (soft_txt = soft)->IncRef ();
-    (ogl_txt = ogl)->IncRef ();
-  }
-
-  ~txt_handles ()
-  {
-    SCF_DEC_REF (soft_txt);
-    SCF_DEC_REF (ogl_txt);
-  }
-
-  iTextureHandle *soft_txt;
-  iTextureHandle *ogl_txt;
-};
-
 // A new material that is used to replace textures.
 // @@@ Samuel: Look if this is ok!
 class dummyMaterial : public iMaterialHandle
@@ -97,43 +76,9 @@ dummyMaterial::dummyMaterial ()
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-class TxtHandleVector : public csVector
-{
-  iObjectRegistry *object_reg;
-  iPluginManager* plugin_mgr;
-  iTextureManager* soft_man;
-public:
-  // Constructor
-  TxtHandleVector (iObjectRegistry *objreg, iTextureManager *stm)
-    : csVector (8, 8), object_reg (objreg), soft_man (stm)
-  {
-    plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
-    soft_man->IncRef ();
-  };
-  // Destructor
-  virtual ~TxtHandleVector ()
-  {
-    DeleteAll ();
-    SCF_DEC_REF (soft_man);
-    SCF_DEC_REF (plugin_mgr);
-  }
-  // Free an item from array
-  virtual bool FreeItem (csSome Item)
-  { delete (txt_handles *)Item; return true; }
-  // Find a state by referenced OpenGL texture handle
-  virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-  { return ((txt_handles *)Item)->ogl_txt == (iTextureHandle *)Key ? 0 : -1; }
-  // Get world state according to index
-  inline txt_handles *Get (int n) const
-  { return (txt_handles*)csVector::Get (n); }
-
-  iTextureHandle *RegisterAndPrepare (iTextureHandle *ogltxt);
-  void AddTextureHandles (iTextureHandle *soft, iTextureHandle *ogl);
-};
-
 //----------------------------------------------------------------------------
 
-iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
+iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 {
   csTextureHandleOpenGL *txtmm = (csTextureHandleOpenGL*)ogl_txt->GetPrivateObject();
   iImage *image = txtmm->get_image();
@@ -162,7 +107,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   return hstxt;
 }
 
-void TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
+void csOpenGLProcSoftware::TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
 					 iTextureHandle *ogl)
 {
   Push (new txt_handles (soft, ogl));

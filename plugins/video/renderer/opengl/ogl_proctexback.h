@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2000  by Samuel Humphreys
-    Based on the Glide implementation by Norman Kramer
+    Based on the Glide implementation by Norman Krämer
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -81,6 +81,8 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   virtual void Print (csRect *area);
 
   float GetZBuffValue (int x, int y);
+
+  virtual void ClearCache ();
 };
 
 

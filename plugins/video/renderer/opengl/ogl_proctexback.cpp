@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2000  by Samuel Humphreys
-    Based on the Glide implementation by Norman Kramer
+    Based on the Glide implementation by Norman Krämer
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Software Foundation, Inc.0f, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
 #include "ogl_txtcache.h"
@@ -128,12 +128,14 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     // We set this transform to be the size of the procedural texture and to be
     // inverted so that all the action takes place on the lower left hand
     // corner of the screen and upside down.
-    glOrtho (0., (GLdouble) width, (GLdouble) height, 0., -1.0, 10.0);
+    //glOrtho (0.0f, (GLdouble) width, (GLdouble) height, 0.0f, -1.0f, 10.0f);
+	// @@@ ^^^^ This doesn't seem to work...
+    glOrtho (0.0f, (GLdouble) width, 0.0f, (GLdouble) height, -1.0f, 10.0f);
 
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
-    glColor3f (1., 0., 0.);
-    glClearColor (0., 0., 0., 0.);
+    glColor3f (1.0f, 0.0f, 0.0f);
+    glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
 
     glViewport(0,0,width,height);
 
@@ -147,7 +149,7 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
         ((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
       glShadeModel (GL_FLAT);
       glEnable (GL_TEXTURE_2D);
-      glColor4f (1.,1.,1.,1.);
+      glColor4f (1.0f,1.0f,1.0f,1.0f);
       glBindTexture (GL_TEXTURE_2D, texturehandle);
       do_quad = true;
     }
@@ -176,7 +178,7 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
       glDisable (GL_TEXTURE_2D);
       csGraphics3DOGLCommon::SetupBlend (CS_FX_TRANSPARENT, 0, false);
       glShadeModel (GL_FLAT);
-      glColor4f (0.,0.,0.,0.);
+      glColor4f (0.0f,0.0f,0.0f,0.0f);
     }
     do_quad = true;
   }
@@ -223,7 +225,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
 
   if (tex_data)
   {
-    printf ("cached \n");
+    //printf ("cached \n");
     // Currently Mesa3.x has bugs which affects at least the voodoo2.
     // Copying the framebuffer to make a new texture will work with the voodoo2
     // as of Mesa CVS 6/6/2000. Unfortunately this change has broken the
@@ -287,6 +289,12 @@ float csOpenGLProcBackBuffer::GetZBuffValue (int x, int y)
   // 0.090909=1/11, that is 1 divided by total depth delta set by
   // glOrtho. Where 0.090834 comes from, I don't know
   return (0.090834 / (zvalue - (0.090909)));
+}
+
+void csOpenGLProcBackBuffer::ClearCache ()
+{
+  // since we share everything, the main OpenGL renderer
+  // should clean up
 }
 
 //---------------------------------------------------------------------------

@@ -819,3 +819,24 @@ void csTextureManagerOpenGL::Clear ()
   csTextureManager::Clear ();
 }
 
+void csTextureManagerOpenGL::FreeImages()
+{
+  /*
+     We are pushing all known textures into software proctex renderers before freeing images.
+     This is not optimal, but better than either not freeing the images or having the software 
+     proctexes register NULL images with their renderer.
+   */
+  int i;
+  csOpenGLProcSoftware *softtex;
+
+  for (i = 0 ; i < textures.Length () ; i++)
+  {
+    softtex = head_soft_proc_tex;
+    while (softtex)
+    {
+      softtex->txts_vector->RegisterAndPrepare(textures.Get(i));
+      softtex = softtex->next_soft_tex;
+    }
+    textures.Get (i)->FreeImage ();
+  }
+}

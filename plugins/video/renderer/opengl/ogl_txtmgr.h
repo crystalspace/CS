@@ -206,6 +206,12 @@ class csTextureManagerOpenGL : public csTextureManager
   virtual void PrepareTextures ();
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
+
+  /** 
+   * Free all images associated with textures
+   * (ensures that all software proctexes have the needed textures) 
+   */
+  virtual void FreeImages ();
 };
 
 #define CS_GL_FORMAT_TABLE(var) \
