@@ -6698,9 +6698,31 @@ _cspace.iVirtualClock_swigregister(iVirtualClockPtr)
 
 iVirtualClock_scfGetVersion = _cspace.iVirtualClock_scfGetVersion
 
-CS_CRYSTAL_PROTOCOL = _cspace.CS_CRYSTAL_PROTOCOL
-CS_MUSCLE_PROTOCOL = _cspace.CS_MUSCLE_PROTOCOL
-CS_XML_PROTOCOL = _cspace.CS_XML_PROTOCOL
+class iEventAttributeIterator(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventAttributeIterator, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iEventAttributeIterator, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iEventAttributeIterator instance at %s>" % (self.this,)
+    def HasNext(*args): return _cspace.iEventAttributeIterator_HasNext(*args)
+    def Next(*args): return _cspace.iEventAttributeIterator_Next(*args)
+    def Reset(*args): return _cspace.iEventAttributeIterator_Reset(*args)
+    def __del__(self, destroy=_cspace.delete_iEventAttributeIterator):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iEventAttributeIteratorPtr(iEventAttributeIterator):
+    def __init__(self, this):
+        _swig_setattr(self, iEventAttributeIterator, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iEventAttributeIterator, 'thisown', 0)
+        _swig_setattr(self, iEventAttributeIterator,self.__class__,iEventAttributeIterator)
+_cspace.iEventAttributeIterator_swigregister(iEventAttributeIteratorPtr)
+
 class csKeyEventData(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csKeyEventData, name, value)
@@ -6840,6 +6862,23 @@ class csEventCommandDataPtr(csEventCommandData):
         _swig_setattr(self, csEventCommandData,self.__class__,csEventCommandData)
 _cspace.csEventCommandData_swigregister(csEventCommandDataPtr)
 
+csEventErrNone = _cspace.csEventErrNone
+csEventErrLossy = _cspace.csEventErrLossy
+csEventErrNotFound = _cspace.csEventErrNotFound
+csEventErrMismatchInt = _cspace.csEventErrMismatchInt
+csEventErrMismatchUInt = _cspace.csEventErrMismatchUInt
+csEventErrMismatchFloat = _cspace.csEventErrMismatchFloat
+csEventErrMismatchBuffer = _cspace.csEventErrMismatchBuffer
+csEventErrMismatchEvent = _cspace.csEventErrMismatchEvent
+csEventErrMismatchIBase = _cspace.csEventErrMismatchIBase
+csEventErrUhOhUnknown = _cspace.csEventErrUhOhUnknown
+csEventAttrUnknown = _cspace.csEventAttrUnknown
+csEventAttrInt = _cspace.csEventAttrInt
+csEventAttrUInt = _cspace.csEventAttrUInt
+csEventAttrFloat = _cspace.csEventAttrFloat
+csEventAttrDatabuffer = _cspace.csEventAttrDatabuffer
+csEventAttrEvent = _cspace.csEventAttrEvent
+csEventAttriBase = _cspace.csEventAttriBase
 class iEvent(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6869,27 +6908,16 @@ class iEvent(iBase):
     def AddUInt8(*args): return _cspace.iEvent_AddUInt8(*args)
     def AddInt16(*args): return _cspace.iEvent_AddInt16(*args)
     def AddUInt16(*args): return _cspace.iEvent_AddUInt16(*args)
-    def AddInt32(*args): return _cspace.iEvent_AddInt32(*args)
     def AddUInt32(*args): return _cspace.iEvent_AddUInt32(*args)
     def AddFloat(*args): return _cspace.iEvent_AddFloat(*args)
     def AddDouble(*args): return _cspace.iEvent_AddDouble(*args)
-    def AddBool(*args): return _cspace.iEvent_AddBool(*args)
     def Add(*args): return _cspace.iEvent_Add(*args)
-    def FindInt8(*args): return _cspace.iEvent_FindInt8(*args)
-    def FindUInt8(*args): return _cspace.iEvent_FindUInt8(*args)
-    def FindInt16(*args): return _cspace.iEvent_FindInt16(*args)
-    def FindUInt16(*args): return _cspace.iEvent_FindUInt16(*args)
-    def FindUInt32(*args): return _cspace.iEvent_FindUInt32(*args)
-    def FindFloat(*args): return _cspace.iEvent_FindFloat(*args)
-    def FindDouble(*args): return _cspace.iEvent_FindDouble(*args)
-    def FindBool(*args): return _cspace.iEvent_FindBool(*args)
-    def Find(*args): return _cspace.iEvent_Find(*args)
+    def Retrieve(*args): return _cspace.iEvent_Retrieve(*args)
+    def AttributeExists(*args): return _cspace.iEvent_AttributeExists(*args)
+    def GetAttributeType(*args): return _cspace.iEvent_GetAttributeType(*args)
     def Remove(*args): return _cspace.iEvent_Remove(*args)
     def RemoveAll(*args): return _cspace.iEvent_RemoveAll(*args)
-    def Print(*args): return _cspace.iEvent_Print(*args)
-    def FlattenSize(*args): return _cspace.iEvent_FlattenSize(*args)
-    def Flatten(*args): return _cspace.iEvent_Flatten(*args)
-    def Unflatten(*args): return _cspace.iEvent_Unflatten(*args)
+    def GetAttributeIterator(*args): return _cspace.iEvent_GetAttributeIterator(*args)
     def __del__(self, destroy=_cspace.delete_iEvent):
         try:
             if self.thisown: destroy(self)
