@@ -108,9 +108,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Plug-In Drivers:: Plug-In Modules and Drivers
 * Contributing:: Contributing to Crystal Space
 * FAQ:: Frequently Asked Questions (@sc{faq})
-* Todo:: To-Do List
-* ApiMods17:: Convert From One CS Release to Another
-* History::
+* ApiMods17:: Significant @sc{api} Changes
 * Index::
 @end menu
 @end ifinfo
@@ -137,7 +135,7 @@ For a list of available topics, see the
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
 
-@node Index, , History, Top
+@node Index, , ApiMods17, Top
 @unnumbered Index
 
 @printindex cp

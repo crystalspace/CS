@@ -3,9 +3,6 @@
 @subsection @sc{ms-dos}
 @cindex @sc{ms-dos}
 
-The @sc{djgpp} port of Crystal Space for @sc{ms-dos} is maintained by Seth
-Galbraith, @email{sgalbrai@@krl.org}.
-
 If you want to compile and use Crystal Space for @sc{dos} using the @sc{djgpp}
 compiler (@uref{http://www.delorie.com/djgpp}), you're reading the right
 document.
@@ -26,51 +23,51 @@ should need to compile Crystal Space with @sc{djgpp}:
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/faq210b.zip}
 
 @noindent
-@sc{djgpp} DPMI provider@*
+@sc{djgpp} @sc{dpmi} provider@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2misc/csdpmi3b.zip}
 
 @noindent
-@sc{djgpp} GNU C++ libraries@*
+@sc{djgpp} @sc{gnu} C++ libraries@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/lgp271b.zip}
 
 @noindent
-@sc{djgpp} GNU help system@*
+@sc{djgpp} @sc{gnu} help system@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txi390b.zip}
 
 @noindent
-@sc{djgpp} GNU linker and assembler@*
+@sc{djgpp} @sc{gnu} linker and assembler@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/bnu281b.zip}
 
 @noindent
-@sc{djgpp} GNU C compiler@*
+@sc{djgpp} @sc{gnu} C compiler@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gcc281b.zip}
 
 @noindent
-@sc{djgpp} GNU C++ compiler@*
+@sc{djgpp} @sc{gnu} C++ compiler@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gpp281b.zip}
 
 @noindent
-@sc{djgpp} GNU make utility@*
+@sc{djgpp} @sc{gnu} make utility@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/mak375b.zip}
 
 @noindent
-@sc{djgpp} GNU sed utility@*
+@sc{djgpp} @sc{gnu} sed utility@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/sed302b.zip}
 
 @noindent
-@sc{djgpp} GNU file utilities@*
+@sc{djgpp} @sc{gnu} file utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/fil316b.zip}
 
 @noindent
-@sc{djgpp} GNU text utilities@*
+@sc{djgpp} @sc{gnu} text utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txt122b.zip}
 
 @noindent
-@sc{djgpp} GNU shell utilities@*
+@sc{djgpp} @sc{gnu} shell utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/shl112b.zip}
 
 @noindent
-@sc{djgpp} GNU diff utilities@*
+@sc{djgpp} @sc{gnu} diff utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/dif271b.zip}
 
 @noindent
@@ -84,7 +81,7 @@ Compiled zip, jpeg and png libraries@*
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-dos.zip}
 
 @noindent
-@sc{libdxe} (Dynamic Library Loader) for @sc{DJGPP}@*
+@sc{libdxe} (Dynamic Library Loader) for @sc{djgpp}@*
 @uref{ftp://ftp.linuxgames.com:/crystal/support/dxe2_012.zip}
 
 @subsubheading Installation

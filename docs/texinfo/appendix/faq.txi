@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node FAQ, Todo, Contributing, Top
+@node FAQ, ApiMods17, Contributing, Top
 @appendix Frequently Asked Questions (@sc{faq})
 @cindex Frequently Asked Questions
 @cindex @sc{faq}
@@ -181,10 +181,15 @@ representing a computer keyboard.
 @item
 I'd like to contribute to Crystal Space.  What can I do?
 
-@strong{A}: Have a look at the Crystal Space @emph{To-Do List} (@pxref{Todo})
-and the section on contributing (@pxref{Contributing}).  You can also contact
-the mailing list (@pxref{Mailing Lists}) in order to coordinate your efforts
-with those of other people.
+@strong{A}: Have a look at the section of this manual about contributing
+to the project (@pxref{Contributing}), and take a look at the To-Do and
+Bug lists on the Developer's Project page at SourceForge:
+
+@noindent
+@uref{http://sourceforge.net/projects/crystal/}
+
+@noindent You can also contact the mailing list (@pxref{Mailing Lists}) in
+order to coordinate your efforts with those of other people.
 
 @item
 How does Crystal Space work?

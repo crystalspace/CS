@@ -24,10 +24,13 @@ If all else fails, you can always send your code to Jorrit Tyberghein
 (@email{Jorrit.Tyberghein@@uz.kuleuven.ac.be}) for inclusion in the project.
 
 If you would like to contribute to the project in general by working on
-features which are missing or lacking, you might want to see the future plans
-list, @ref{Todo}.  You can also contact the mailing list and ask if the Todo
-is up-to-date in that point.
+features which are missing or lacking, you might want to see the To-Do
+list at the Developer's Project page at SourceForge:
 
-If you want to help with bug fixing, and you have an idea about a bug send a
-message to the mailing list.  If you have an actual fix for a bug, please send
-it to the developers.
+@noindent
+@uref{http://sourceforge.net/projects/crystal/}
+
+You can also contact the mailing list and ask about unfinished items first
+hand.  If you want to help with bug fixing, and you have an idea about a bug
+send a message to the mailing list.  If you have an actual fix for a bug,
+please send it to the developers.  @xref{Mailing Lists}.

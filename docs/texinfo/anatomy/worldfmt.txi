@@ -206,13 +206,13 @@ Various components:
   <plane-first> | <plane-second-len> |
   <plane-second> | <matrix> | <vector> | <texlen> | <plane> | 
   <plane-uvec> | <plane-vvec> | <uv-shift>
-<polygon-texture> ::= 'TEXTURE' '(' { <polytext-comp> } ')'
+<polygon-texture> ::= 'TEXTURE' '(' @{ <polytext-comp> @} ')'
 
 <beziertext-comp> ::= <plane-orig> | <plane-first-len> | 
   <plane-first> | <plane-second-len> |
   <plane-second> | <matrix> | <vector> | <texlen> | <uv-shift> |
   <plane-uvec> | <plane-vvec>
-<bezier-texture> ::= 'TEXTURE' '(' { <beziertext-comp> } ')'
+<bezier-texture> ::= 'TEXTURE' '(' @{ <beziertext-comp> @} ')'
 
 <portal> ::= 'PORTAL' '(' <sector-name> ')'
 
@@ -223,12 +223,12 @@ Various components:
 <portal-zfill> ::= 'ZFILL' '(' ')'
 <warp-comp> ::= <matrix> | <vector> | <after-vector> | 
   <warp-mirror> | <warp-static> | <portal-clip> | <portal-zfill>
-<warp> ::= 'WARP' '(' { <warp-comp> } ')'
+<warp> ::= 'WARP' '(' @{ <warp-comp> @} ')'
 
 <move-comp> ::= <matrix> | <vector>
-<move2> ::= 'MOVE' '(' { <move-comp> } ')'
+<move2> ::= 'MOVE' '(' @{ <move-comp> @} ')'
 <move> ::= 'MOVE' '(' <matrix> <vector> ')'
-<hardmove> ::= 'HARDMOVE' '(' { <move-comp> } ')'
+<hardmove> ::= 'HARDMOVE' '(' @{ <move-comp> @} ')'
 
 <floor> ::= 'FLOOR' '(' '(' <coordinate> ')' '(' <coodinate> ')'
   '(' <coordinate> ')' '(' <coordinate> ')' ')'
@@ -260,7 +260,7 @@ generate the first circle of vertices using the @code{CIRCLE} macro.
 <skydome-vertices> ::= 'VERTICES' '(' <vertex-index> [ ',' 
   <vertex-index> ] ')'
 <skydome-comp> ::= <skydome-radius> | <skydome-vertices> | <lighting>
-<skydome> ::= 'SKYDOME' '(' { <skydome-comp> } ')'
+<skydome> ::= 'SKYDOME' '(' @{ <skydome-comp> @} ')'
 @end example
 
 @item
@@ -278,7 +278,7 @@ A light:
 <light-halo> ::= 'HALO' '(' ')'
 <light-comp> ::= <light-center> | <light-radius> | <light-dynamic> |
   <light-color> | <light-halo>
-<light-newsyntax> ::= { <light-comp> }
+<light-newsyntax> ::= @{ <light-comp> @}
 
 <light> ::= 'LIGHT' <light-name> '(' <light-oldsyntax> | <light-newsyntax> ')'
 @end example
@@ -287,7 +287,7 @@ A light:
 A bezier curve:
 @example
 <bezier-comp> ::= <texnr> | <material> | <bezier-texture> | <vertices>
-<bezier> ::= 'BEZIER' '(' { <bezier-comp> } ')'
+<bezier> ::= 'BEZIER' '(' @{ <bezier-comp> @} ')'
 @end example
 
 @item
@@ -319,7 +319,7 @@ position from where you want the polygon to be visible.
   <polygon-texture> | <vertices> | <alpha> |
   <fog> | <uv> | <uva> | <colors> | <cosfact> | <gouraud> |
   <flatcol> | <mixmode> | <colldet> | <shading>
-<polygon> ::= 'POLYGON' <polygon-name> '(' { <polygon-comp> } ')'
+<polygon> ::= 'POLYGON' <polygon-name> '(' @{ <polygon-comp> @} ')'
 @end example
 
 @item
@@ -327,7 +327,7 @@ Polygon templates:
 @example
 <polygon-tpl-comp> ::= <texnr> | <material> | <lighting> | <polygon-texture> | <vertices> |
   <gouraud> | <flatcol> | <colldet> | <shading> | <colors>
-<polygon-template> ::= 'POLYGON' <polygon-name> '(' { <polygon-tpl-comp> } ')'
+<polygon-template> ::= 'POLYGON' <polygon-name> '(' @{ <polygon-tpl-comp> @} ')'
 @end example
 
 @item
@@ -341,7 +341,7 @@ A collection object:
 
 <collection-comp> ::= <col-thing> | <col-collection> | <col-light> |
   <col-sector> | <col-sprite>
-<collection> ::= 'COLLECTION' <col-name> '(' { <collection-comp> } ')'
+<collection> ::= 'COLLECTION' <col-name> '(' @{ <collection-comp> @} ')'
 @end example
 
 @item
@@ -359,12 +359,12 @@ A texture and material description:
 
 <texture-desc-comp> ::= <transparent> | <filter> | <mipmap> | <dither> |
   <file> | <procedural> | <tex2d> | <tex3d> | <persistent>
-<texture-desc> ::= 'TEXTURE' <texture-name> '(' { <texture-desc-comp> } ')'
+<texture-desc> ::= 'TEXTURE' <texture-name> '(' @{ <texture-desc-comp> @} ')'
 
 <material-desc-comp> ::= <texture> | 'COLOR' '(' <color> ')' |
 	'DIFFUSE' '(' <number> ')' | 'AMBIENT' '(' <number> ')' |
 	'REFLECTION' '(' <number> ')'
-<material-desc> ::= 'MATERIAL' <material-name> '(' { <material-desc-comp> } ')'
+<material-desc> ::= 'MATERIAL' <material-name> '(' @{ <material-desc-comp> @} ')'
 @end example
 
 @item
@@ -381,14 +381,14 @@ Things and objects:
   <key> | <bsp> | <move2> | <hardmove> |
   <template> | <fog-desc> | <moveable> | <detail> | <convex> | <circle> |
   <bezier> | <tex-select> | <thing-camera>
-<thing> ::= 'THING' <thing-name> '(' { <thing-comp> } ')'
-<sky> ::= 'SKY' <thing-name> '(' { <thing-comp> } ')'
+<thing> ::= 'THING' <thing-name> '(' @{ <thing-comp> @} ')'
+<sky> ::= 'SKY' <thing-name> '(' @{ <thing-comp> @} ')'
 
 <sixface-comp> ::= <move2> | <texture-scale> | <texture> |
   <ceil-texture> | <dim> | <height> | <floor-height> | <floor-ceil> | 
   <floor-texture> | <floor> | <ceiling> |
   <moveable> | <detail> | <fog-desc> | <convex>
-<sixface> ::= 'SIXFACE' <thing-name> '(' { <sixface-comp> } ')'
+<sixface> ::= 'SIXFACE' <thing-name> '(' @{ <sixface-comp> @} ')'
 @end example
 
 @item
@@ -402,12 +402,12 @@ Thing and object templates:
 <thing-tpl-comp> ::= <vertex> | <polygon-template> | <texnr> | <material> | 
   <texlen> | <move> | <fog-desc> | <circle> | <bezier> |
   <curve-center> | <curve-scale> | <curve-control> | <template-file>
-<thing-template> ::= 'THING' <thingtpl-name> '(' { <thing-tpl-comp> } ')'
+<thing-template> ::= 'THING' <thingtpl-name> '(' @{ <thing-tpl-comp> @} ')'
 
 <sixface-tpl-comp> ::= <move> | <texture-scale> | <texture> |
   <ceil-texture> | <dim> | <height> | <floor-height> | 
   <floor-ceil> | <floor-texture> | <floor> | <ceiling> | <fog-desc>
-<sixface-template> ::= 'SIXFACE' <thingtpl-name> '(' { <sixface-tpl-comp> } ')'
+<sixface-template> ::= 'SIXFACE' <thingtpl-name> '(' @{ <sixface-tpl-comp> @} ')'
 @end example
 
 @item
@@ -440,7 +440,7 @@ the sprite template.
 
 <sprite-tpl-comp> ::= <texnr> | <material> | <sprite-frame> | <sprite-action> | 
   <sprite-triangle> | <template-file> | <sprite-skeleton> | <sprite-tween>
-<sprite-template> ::= 'SPRITE' <spritetpl-name> '(' { <sprite-tpl-comp> ... } ')'
+<sprite-template> ::= 'SPRITE' <spritetpl-name> '(' @{ <sprite-tpl-comp> ... @} ')'
 
 <mixmode1> ::= 'COPY ()' | 'MULTIPLY ()' | 'MULTIPLY2 ()' | 'ADD ()' |
   'ALPHA' '(' <number> ')' | 'TRANSPARENT ()' | 'KEYCOLOR ()'
@@ -448,13 +448,13 @@ the sprite template.
 
 <sp-template> ::= 'TEMPLATE' '(' <spritetpl-name> ',' <action-name> ')'
 <sprite-comp> ::= <move2> | <sp-template> | <texnr> | <material> | <mixmode> | <sprite-tween>
-<sprite> ::= 'SPRITE' <sprite-name> '(' { <sprite-comp> } ')'
+<sprite> ::= 'SPRITE' <sprite-name> '(' @{ <sprite-comp> @} ')'
 
 <move2d> ::= 'MOVE' '(' <vector-3d> ')'
 <spr2d-vertices> ::= 'VERTICES' '(' <vector-2d> [ ',' <vector-2d> ] 
 <sprite2d-comp> ::= <move2d> | <texnr> | <material> | <spr2d-vertices> | <uv> |
   <mixmode> | <colors> | <lighting>
-<sprite2d> ::= 'SPRITE2D' <sprite-name> '(' { <sprite2d-comp> } ')'
+<sprite2d> ::= 'SPRITE2D' <sprite-name> '(' @{ <sprite2d-comp> @} ')'
 @end example
 
 @item
@@ -462,7 +462,7 @@ Nodes
 @example
 <position>  ::= 'POSITION' '(' <coordinate> ')' 
 <node-comp> ::= <position> | <key>
-<node> ::= 'NODE' '(' {<node-comp>} ')'
+<node> ::= 'NODE' '(' @{ <node-comp> @} ')'
 @end example
 
 @item
@@ -485,7 +485,7 @@ Particle Systems:
   <fountain-origin> | <fountain-accel> | <fountain-speed> |
   <fountain-falltime> | <fountain-opening> | <fountain-azimuth> |
   <fountain-elevation>
-<fountain> ::= 'FOUNTAIN' <name> '(' { <fountain-comp> } ')'
+<fountain> ::= 'FOUNTAIN' <name> '(' @{ <fountain-comp> @} ')'
 
 <fire-origin> ::= 'ORIGIN' '(' <vector-3d> ')'
 <fire-speed> ::= 'SPEED' '(' <vector-3d> ')'
@@ -496,20 +496,20 @@ Particle Systems:
   <partsys-dropsize> | <partsys-number> |
   <fire-origin> | <fire-speed> | <fire-swirl> |
   <fire-totaltime> | <fire-colorscale>
-<fire> ::= 'FIRE' <name> '(' { <fire-comp> } ')'
+<fire> ::= 'FIRE' <name> '(' @{ <fire-comp> @} ')'
 
 <snow-swirl> ::= 'SWIRL' '(' <number> ')'
 <snow-speed> ::= 'SPEED' '(' <vector-3d> ')'
 <snow-comp> ::= <texture> | <mixmode> | <lighting> |
   <partsys-dropsize> | <partsys-color> | <partsys-number> |
   <partsys-box> | <snow-speed> | <snow-swirl>
-<snow> ::= 'SNOW' <name> '(' { <snow-comp> } ')'
+<snow> ::= 'SNOW' <name> '(' @{ <snow-comp> @} ')'
 
 <rain-speed> ::= 'SPEED' '(' <vector-3d> ')'
 <rain-comp> ::= <texture> | <mixmode> | <lighting> |
   <partsys-dropsize> | <partsys-color> | <partsys-number> |
   <partsys-box> | <rain-speed>
-<rain> ::= 'RAIN' <name> '(' { <rain-comp> } ')'
+<rain> ::= 'RAIN' <name> '(' @{ <rain-comp> @} ')'
 
 <partsys> ::= <fountain> | <snow> | <rain> | <fire>
 @end example
@@ -518,13 +518,13 @@ Particle Systems:
 Sectors and rooms:
 @example
 <tex-comp> ::= <texture> | <plane> | <texlen>
-<tex> ::= 'TEX' '(' { <tex-comp> } ')'
+<tex> ::= 'TEX' '(' @{ <tex-comp> @} ')'
 
 <portal-poly> ::= 'POLYGON' '(' <polygon-name> ')'
 <portal-sector> ::= 'SECTOR' '(' <sector-name> ')'
 <room-portal-comp> ::= <portal-poly> | <portal-sector> | <alpha> | 
   <warp>
-<room-portal> ::= 'PORTAL' '(' { <room-portal-comp> } ')'
+<room-portal> ::= 'PORTAL' '(' @{ <room-portal-comp> @} ')'
 
 <split-direction> ::= 'VER' | 'HOR'
 <split-list> ::= <number-list>
@@ -535,7 +535,7 @@ Sectors and rooms:
   <bsp> | <statbsp> | <thing> | <hardmove> |
   <sixface> | <light> | <sprite> | <fog-desc> | <circle> | <skydome> |
   <key> | <node> | <partsys> | <sky>
-<sector> ::= 'SECTOR' <sector-name> '(' { <sector-comp> } ')'
+<sector> ::= 'SECTOR' <sector-name> '(' @{ <sector-comp> @} ')'
 
 <room-comp> ::= <tex-lighting> | <texture-scale> | <texture> |
   <tex> | <ceil-texture> | <floor-texture> | <light> |
@@ -543,21 +543,21 @@ Sectors and rooms:
   <ceiling> | <sixface> | <thing> | <room-portal> | <split> |
   <partsys> | <sky> |
   <bsp> | <statbsp> | <move> | <sprite> | <fog-desc>
-<room> ::= 'ROOM' <sector-name> '(' { <room-comp> } ')'
+<room> ::= 'ROOM' <sector-name> '(' @{ <room-comp> @} ')'
 @end example
 
 @item
 Descriptions for all textures:
 @example
 <textures-comp> ::= <texture-desc>
-<textures> ::= 'TEXTURES' '(' { <textures-comp> } ')'
+<textures> ::= 'TEXTURES' '(' @{ <textures-comp> @} ')'
 @end example
 
 @item
 Descriptions for all materials:
 @example
 <materials-comp> ::= <material-desc>
-<materials> ::= 'MATERIALS' '(' { <materials-comp> } ')'
+<materials> ::= 'MATERIALS' '(' @{ <materials-comp> @} ')'
 @end example
 
 @item
@@ -581,7 +581,7 @@ Plane description:
   <plane-first> | <plane-second-len> |
   <plane-second> | <matrix> | <vector> |
   <plane-uvec> | <plane-vvec>
-<plane-desc> ::= 'PLANE' <plane-name> '(' { <plane-desc-comp> } ')'
+<plane-desc> ::= 'PLANE' <plane-name> '(' @{ <plane-desc-comp> @} ')'
 @end example
 
 @item
@@ -602,14 +602,15 @@ The World:
 <world-comp> ::= <textures> | <materials> | <library> | <sector> | <room> | 
   <thing-template> | <sixface-template> | <sprite-template> |
   <plane-desc> | <collection> | <start> | <key>
-<world> ::= 'WORLD' '(' { <world-comp> } ')'
+<world> ::= 'WORLD' '(' @{ <world-comp> @} ')'
 @end example
 
 @item
 Description of a Library file (@file{library}):
 @example
 <library-comp> ::= <textures> | <materials> | <thing-template> | <sprite-template>
-<library> ::= 'LIBRARY' '(' { <library-comp> } ')'
+<library> ::= 'LIBRARY' '(' @{ <library-comp> @} ')'
+@end example
 @end itemize
 
 @node WorldFmt Hints, , WorldFmt Syntax, World File Format
@@ -664,7 +665,7 @@ Currently Crystal Space assumes that there is a sector called @samp{room}. It
 will use that as a starting place. It will also always start at location
 (0,0,0).
 
-Note that @code{SECTOR}s must be convex (unless you add a @code{BSP} tree).
+Note that @code{SECTOR}s must be convex (unless you add a @sc{bsp} tree).
 @code{THING}s need not be convex.
 
 Vertices in a @code{THING} are specified in local object space. You can
