@@ -39,9 +39,10 @@
 typedef int socklen_t;
 #endif
 
-#if defined (PROC_INTEL)
+#include <ByteOrder.h>
+#if B_HOST_IS_LENDIAN
 #  define CS_LITTLE_ENDIAN
-#elif defined (PROC_PPC)
+#elif B_HOST_IS_BENDIAN
 #  define CS_BIG_ENDIAN
 #else
 #  error "Please define a suitable CS_XXX_ENDIAN macro in be/csosdefs.h!"
