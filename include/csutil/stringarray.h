@@ -21,10 +21,11 @@
 #define __CS_STRARR_H__
 
 #include "csutil/util.h"
+#include "csutil/parray.h"
 
-typedef int csStringArrayCompareFunction (char const* item1, char const* item2);
-typedef int csStringArrayCompareKeyFunction (char const* item, void* key);
-typedef int csStringArraySortFunction (void const* item1, void const* item2);
+typedef int csStringArrayCompareFunction (char* item1, char* item2);
+typedef int csStringArrayCompareKeyFunction (char* item, void* key);
+typedef int csStringArraySortFunction (const void* item1, const void* item2);
 
 /**
  * An array of strings. This array will properly make copies of the strings
@@ -34,7 +35,7 @@ class csStringArray
 {
 private:
   int count, limit, threshold;
-  char const** root;
+  char** root;
 
 public:
   /**
@@ -47,7 +48,7 @@ public:
     limit = (ilimit > 0 ? ilimit : 0);
     threshold = (ithreshold > 0 ? ithreshold : 16);
     if (limit != 0)
-      root = (char const**)calloc (limit, sizeof(char const*));
+      root = (char**)calloc (limit, sizeof(char*));
     else
       root = 0;
   }
@@ -112,12 +113,12 @@ public:
       }
       else if (root == 0)
       {
-        root = (char const**)calloc (n, sizeof(char const*));
+        root = (char**)calloc (n, sizeof(char*));
       }
       else
       {
-        char const** newroot = (char const**)calloc (n, sizeof(char const*));
-	memcpy (newroot, root, old_count * sizeof (char const*));
+        char** newroot = (char**)calloc (n, sizeof(char*));
+	memcpy (newroot, root, old_count * sizeof (char*));
 	free (root);
 	root = newroot;
       }
@@ -138,21 +139,21 @@ public:
   }
 
   /// Get a string.
-  char const* Get (int n) const
+  char* Get (int n) const
   {
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
   }
 
   /// Get a string.
-  char const* operator [] (int n) const
+  char* operator [] (int n) const
   {
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
   }
 
   /// Make a copy of a string and remember it.
-  void Put (int n, char const* ptr)
+  void Put (int n, char* ptr)
   {
     CS_ASSERT (n >= 0);
     if (n >= count)
@@ -166,7 +167,7 @@ public:
    * This version will compare pointers and does NOT do an actual string
    * compare. Use Find() for that.
    */
-  int FindPointer (char const* which) const
+  int FindPointer (char* which) const
   {
     int i;
     for (i = 0 ; i < Length () ; i++)
@@ -179,7 +180,7 @@ public:
    * Find a element in array and return its index (or -1 if not found).
    * This version will compare strings in a case-sensitive manner.
    */
-  int Find (char const* which) const
+  int Find (char* which) const
   {
     int i;
     for (i = 0 ; i < Length () ; i++)
@@ -193,7 +194,7 @@ public:
   }
 
   /// Push a element on 'top' of vector (makes a copy of the string).
-  int Push (char const* what)
+  int Push (char* what)
   {
     SetLength (count + 1);
     root [count - 1] = csStrNew (what);
@@ -205,51 +206,51 @@ public:
    * (makes a copy of the string).
    * This function does a case-sensitive string compare.
    */
-  int PushSmart (char const* what)
+  int PushSmart (char* what)
   {
     int n = Find (what);
     return (n == -1) ? Push (what) : n;
   }
 
   /**
-   * Pop an element from vector 'top'. Caller is responsible for
+   * Pop an element from vector 'top'. You are responsible for
    * deleting the object later (using delete[]).
    */
-  char const* Pop ()
+  char* Pop ()
   {
-    char const* ret = root [count - 1];
+    char* ret = root [count - 1];
     root [count-1] = 0;
     SetLength (count - 1);
     return ret;
   }
 
   /// Return the top element but don't remove it.
-  char const* Top () const
+  char* Top () const
   {
     return root [count - 1];
   }
 
   /**
    * Get and clear the element 'n' from vector. This spot in the array
-   * will be set to 0. Caller is responsible for deleting the returned
+   * will be set to 0. You are responsible for deleting the returned
    * pointer later (using delete[]).
    */
-  char const* GetAndClear (int n)
+  char* GetAndClear (int n)
   {
     CS_ASSERT (n >= 0 && n < count);
-    char const* ret = root[n];
+    char* ret = root[n];
     root[n] = 0;
     return ret;
   }
 
   /**
    * Extract element number 'n' from vector. The element is deleted
-   * from the array and returned. Caller is responsible for deleting the
+   * from the array and returned. You are responsible for deleting the
    * pointer later (using delete[]).
    */
-  char const* Extract (int n)
+  char* Extract (int n)
   {
-    char const* rc = 0;
+    char* rc = 0;
     if (n >= 0 && n < count)
     {
       rc = root[n]; root[n] = 0;
@@ -257,7 +258,7 @@ public:
       const int nmove = ncount - n;
       if (nmove > 0)
       {
-        memmove (&root [n], &root [n + 1], nmove * sizeof (char const*));
+        memmove (&root [n], &root [n + 1], nmove * sizeof (char*));
 	root[count-1] = 0;	// Clear last element to prevent deletion.
       }
       SetLength (ncount);
@@ -268,7 +269,7 @@ public:
   /// Delete element number 'n' from vector.
   bool Delete (int n)
   {
-    char const* p = Extract (n);
+    char* p = Extract (n);
     if (p)
     {
       delete[] p;
@@ -284,7 +285,7 @@ public:
    * Delete the given element from vector.
    * This function does a case sensitive string compare to find the element.
    */
-  bool Delete (char const* item)
+  bool Delete (char* item)
   {
     int n = Find (item);
     if (n == -1) return false;
@@ -295,7 +296,7 @@ public:
    * Insert element 'Item' before element 'n'. This function makes a
    * copy.
    */
-  bool Insert (int n, char const* item)
+  bool Insert (int n, char* item)
   {
     if (n <= count)
     {
@@ -338,7 +339,7 @@ public:
    * Insert an element at a sorted position.
    * Assumes array is already sorted.
    */
-  int InsertSorted (char const* item, csStringArrayCompareFunction* compare)
+  int InsertSorted (char* item, csStringArrayCompareFunction* compare)
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
@@ -362,24 +363,24 @@ public:
     return m;
   }
 
-  static int CaseSensitiveCompare (char const* item1, char const* item2)
+  static int CaseSensitiveCompare (char* item1, char* item2)
   {
     return strcmp (item1, item2);
   }
 
-  static int CaseInsensitiveCompare (char const* item1, char const* item2)
+  static int CaseInsensitiveCompare (char* item1, char* item2)
   {
     return strcasecmp (item1, item2);
   }
  
-  static int CaseSensitiveCompare (void const* item1, void const* item2)
+  static int CaseSensitiveCompare (const void* item1, const void* item2)
   {
-    return strcmp (*(char const**)item1, *(char const**)item2);
+    return strcmp (*(char**)item1, *(char**)item2);
   }
 
-  static int CaseInsensitiveCompare (void const* item1, void const* item2)
+  static int CaseInsensitiveCompare (const void* item1, const void* item2)
   {
-    return strcasecmp (*(char const**)item1, *(char const**)item2);
+    return strcasecmp (*(char**)item1, *(char**)item2);
   }
  
   /**
@@ -387,7 +388,7 @@ public:
    * Assumes array is already sorted.
    * Sorting assumes case-sensitive string compare.
    */
-  int InsertSorted (char const* item)
+  int InsertSorted (char* item)
   {
     return InsertSorted (item, CaseSensitiveCompare);
   }
@@ -397,7 +398,7 @@ public:
    * Assumes array is already sorted.
    * Sorting assumes case-insensitive string compare.
    */
-  int InsertSortedCase (char const* item)
+  int InsertSortedCase (char* item)
   {
     return InsertSorted (item, CaseInsensitiveCompare);
   }
@@ -428,3 +429,4 @@ public:
 };
 
 #endif // __CS_STRARR_H__
+
