@@ -4745,6 +4745,14 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 	  csRef<iFile> shaderFile = vfs->Open (
 	    fileChild->GetContentsValue (), VFS_FILE_READ);
 
+    if(!shaderFile)
+    {
+      ReportWarning ("csLoader::ParseShaderList", 
+        "Unable to open shader file '%s'!",
+        fileChild->GetContentsValue ());
+      break;
+    }
+
 	  csRef<iDocumentSystem> docsys (
 	    CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
 	  if (docsys == 0)

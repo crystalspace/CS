@@ -596,6 +596,13 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
     csRef<iVFS> VFS = CS_QUERY_REGISTRY(objectreg, iVFS);
     csRef<iFile> programFile = VFS->Open (node->GetAttributeValue ("file"),
       VFS_FILE_READ);
+    if(!programFile)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Unable to load shader program '%s'",
+        node->GetAttributeValue ("file"));
+      return 0;
+    }
     csRef<iDocumentSystem> docsys (
       CS_QUERY_REGISTRY(objectreg, iDocumentSystem));
     if (docsys == 0)
