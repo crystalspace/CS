@@ -143,6 +143,7 @@ csKDTree::csKDTree (csKDTree* parent)
 	KDTREE_MAX, KDTREE_MAX);
 
   userobject = 0;
+  estimate_total_objects = 0;
 }
 
 csKDTree::~csKDTree ()
@@ -179,6 +180,7 @@ void csKDTree::Clear ()
   obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
   SetUserObject (0);
+  estimate_total_objects = 0;
 }
 
 void csKDTree::AddObject (csKDTreeChild* obj)
@@ -195,11 +197,13 @@ void csKDTree::AddObject (csKDTreeChild* obj)
   }
 
   objects[num_objects++] = obj;
+  estimate_total_objects++;
 }
 
 void csKDTree::RemoveObject (int idx)
 {
   CS_ASSERT (idx >= 0 && idx < num_objects);
+  estimate_total_objects--;
   if (num_objects == 1)
   {
     // Easy case.
@@ -506,6 +510,8 @@ void csKDTree::Distribute ()
     // Update the bounding box of this node.
     obj_bbox.StartBoundingBox ();
     obj_bbox_valid = true;
+    estimate_total_objects = child1->GetEstimatedObjectCount ()
+    	+ child2->GetEstimatedObjectCount ();
   }
   else
   {
@@ -555,6 +561,12 @@ void csKDTree::Distribute ()
       child1->node_bbox.SetMax (split_axis, split_location);
       child2->node_bbox = GetNodeBBox ();
       child2->node_bbox.SetMin (split_axis, split_location);
+      estimate_total_objects = child1->GetEstimatedObjectCount ()
+    	+ child2->GetEstimatedObjectCount ();
+    }
+    else
+    {
+      estimate_total_objects = num_objects;
     }
   }
 }
@@ -641,6 +653,7 @@ void csKDTree::FlattenTo (csKDTree* node)
   c2->max_objects = 0;
   delete c1;
   delete c2;
+  estimate_total_objects = num_objects;
 }
 
 void csKDTree::Flatten ()

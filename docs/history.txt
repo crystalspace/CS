@@ -21,6 +21,9 @@ chronological order.
 	  accept a <flipx>yesno</flipx> and/or a <flipy> attribute.
 	  iTerrFuncState::SetHeightMap also has arguments to flipx or flipy.
 	  By default, no flipping occurs, keeping the API compatible.
+	- Jorrit added a function to return an estimate of the amount of
+	  objects that are in a kdtree node and its children. Currently
+	  unused.
 9-Nov-2003
 	- Rhad added functions to handle reversing some operations with
 	  particle emitters.  These take care of some simple situations where

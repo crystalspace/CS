@@ -148,6 +148,9 @@ private:
   int num_objects;
   int max_objects;
 
+  // Estimate of the total number of objects in this tree including children.
+  int estimate_total_objects;
+
   // Disallow Distribute().
   // If this flag is true it means that we cannot find a good split
   // location for the current list of objects. So in that case we don't
@@ -298,6 +301,14 @@ public:
    * Return the number of objects in this node.
    */
   int GetObjectCount () const { return num_objects; }
+
+  /**
+   * Get the estimated total number of objects in this node and
+   * all children. This is only an estimate as it isn't kept up-to-date
+   * constantly but it should give a rough idea about the complexity
+   * of this node.
+   */
+  int GetEstimatedObjectCount () { return estimate_total_objects; }
 
   /**
    * Return the array of objects in this node.
