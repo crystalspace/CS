@@ -1297,7 +1297,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   float sqdistance = path.SquaredNorm ();
   float sqdistance_real = sqdistance;
-  //@@@if (sqdistance < 1.0f) sqdistance = 1.0f;
+  if (sqdistance < 0.01f) sqdistance = 0.01f;
 
   float totalfactor = cossrcangle * cosdestangle * 
     source_patch_area * visibility / (sqdistance_real * sqdistance);
@@ -1323,7 +1323,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
   if(totalfactor > 0.000001) 
-    shoot_dest->AddToDelta(ruv, delta_color * totalfactor * 1.);
+    shoot_dest->AddToDelta(ruv, delta_color * totalfactor);
 
   // specular gloss
   // direction of the 'light' on dest is -path
