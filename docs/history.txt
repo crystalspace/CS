@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  work in progress though but as I have seen the author seems
 	  very fast in his development :-)  The new landscape engine
 	  can be found in plugins/mesh/bcterr.
+	- Fixed a new memory leak in iPluginManager::LoadPlugin() when
+	  it would load the same plugin a second time.
 18-Jul-2002
 	- Steven Geens fixed a bad bug in the RAPID collision detection
 	  plugin. It now seems to work properly in all cases regardless

@@ -1141,31 +1141,6 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
 
     iPolygonMesh* mesh;
-    /*
-    int sn = engine->GetSectors ()->GetCount ();
-    while (sn > 0)
-    {
-      sn--;
-      iSector* sp = engine->GetSectors ()->GetSector (sn);
-      if (region && !region->IsInRegion (sp->QueryObject ())) continue;
-      // Initialize the things in this sector.
-      int i;
-      iMeshList* ml = sp->GetMeshes ();
-      for (i = 0 ; i < ml->GetMeshCount () ; i++)
-      {
-	iMeshWrapper* tp = ml->GetMesh (i);
-	mesh = SCF_QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
-	if (mesh)
-	{
-	  csColliderWrapper *cw = new csColliderWrapper (tp->QueryObject (),
-							 collide_system, mesh);
-	  cw->SetName (tp->QueryObject ()->GetName());
-	  cw->DecRef ();
-	  mesh->DecRef ();
-	}
-      }
-    }
-    */
     // Initialize all mesh objects for collision detection.
     int i;
     iMeshList* meshes = engine->GetMeshes ();

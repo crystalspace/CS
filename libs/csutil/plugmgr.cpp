@@ -178,8 +178,26 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
         (ret = p)->IncRef();
       if (ret)
       {
+        if (!added_here)
+	{
+	  // If we didn't add the plugin (i.e. this is not the first time
+	  // we called LoadPlugin() for this plugin) then we need to
+	  // DecRef() the component to avoid memory leaks.
+	  p->DecRef ();
+	}
+
         QueryOptions (p);
         return ret;
+      }
+      else
+      {
+        if (!added_here)
+	{
+	  // If we didn't add the plugin (i.e. this is not the first time
+	  // we called LoadPlugin() for this plugin) then we need to
+	  // DecRef() the component to avoid memory leaks.
+	  p->DecRef ();
+	}
       }
     }
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
