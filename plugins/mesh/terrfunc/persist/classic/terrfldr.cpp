@@ -49,6 +49,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (LODCOST)
   CS_TOKEN_DEF (QUADDEPTH)
   CS_TOKEN_DEF (VISTEST)
+  CS_TOKEN_DEF (ALLMATERIAL) // For testing purposes. Use after BLOCKS and GRID are set
 CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
@@ -137,6 +138,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
     CS_TOKEN_TABLE (CORRECTSEAMS)
     CS_TOKEN_TABLE (QUADDEPTH)
     CS_TOKEN_TABLE (VISTEST)
+    CS_TOKEN_TABLE (ALLMATERIAL)
   CS_TOKEN_TABLE_END
 
   char *pName;
@@ -178,11 +180,26 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  if (!mat)
 	  {
             // @@@ Error handling!
+            printf("Terrain func loader: Can't find requested material '%s'\n",pStr);
             return NULL;
 	  }
 	  iTerrainState->SetMaterial (i, mat);
 	}
         break;
+	  case CS_TOKEN_ALLMATERIAL:
+	  {
+		int i, j = iTerrainState->GetXResolution();
+		j = j * j;
+		csScanStr( pParams, "%s", pStr);
+		iMaterialWrapper *mat = iEngine->FindMaterial(pStr);
+		if (!mat) 
+		{
+		  printf("Terrain func loader: Cant find requested material '%s'\n",pStr);
+		  return NULL;
+		}
+		for (i = 0; i < j; i++) iTerrainState->SetMaterial(i,mat);
+	  }
+	  break;
       case CS_TOKEN_GROUPMATERIAL:
 	{
 	  int rangeStart, rangeEnd;

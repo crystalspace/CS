@@ -52,10 +52,17 @@ public:
    *      or 0 if point p lies on plane '0-v1-v2'.
    * Plane '0-v1-v2' is the plane passing through points <0,0,0>, v1, and v2.
    */
+//@@@ Warning: This function fails if the three points are co-planar with
+// origin <0,0,0>. Be warned that you should check this before using this
+// function. One method is that since you have a plane that you used to check
+// the vertices, add the normal of the plane to the three vertices. The normal
+// is the only vector that can garuntee that the vertices will be shifted away
+// from origin, and yield a valid result.
+
   static int WhichSide3D (const csVector3& p,
                           const csVector3& v1, const csVector3& v2)
   {
-    // float s = p * (v1%v2); (original expression: expanded to the below:)
+//    float s = p * (v1%v2);  (original expression: expanded to the below:)
     float s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) + 
               p.z*(v1.x*v2.y-v1.y*v2.x);
     if (s < 0) return 1;

@@ -414,9 +414,21 @@ bool csIntersect3::IntersectTriangle (const csVector3& tr1,
   // 'isect' is the intersection of the segment and the
   // plane. Now we have to see if this intersection is
   // in the triangle.
-  if (csMath3::WhichSide3D (isect, tr3, tr1) > 0) return false;
-  if (csMath3::WhichSide3D (isect, tr1, tr2) > 0) return false;
-  if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
+  if (plane.D() > SMALL_EPSILON) // Check if plane is not near origin.
+  {
+	if (csMath3::WhichSide3D (isect, tr3, tr1) > 0) return false;
+	if (csMath3::WhichSide3D (isect, tr1, tr2) > 0) return false;
+	if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
+  } else { // Bug fix for WichSide3D. Slower but valid.
+	csVector3 norm = plane.Normal();
+	csVector3 nsect = isect + norm;
+	csVector3 ntr1 = tr1 + norm;
+	csVector3 ntr2 = tr2 + norm;
+	csVector3 ntr3 = tr3 + norm;
+	if (csMath3::WhichSide3D (nsect, ntr3, ntr1) > 0) return false;
+	if (csMath3::WhichSide3D (nsect, ntr1, ntr2) > 0) return false;
+	if (csMath3::WhichSide3D (nsect, ntr2, ntr3) > 0) return false;
+  }
   return true;
 }
 

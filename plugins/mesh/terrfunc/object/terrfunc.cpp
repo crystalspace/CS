@@ -61,6 +61,7 @@ csTerrBlock::csTerrBlock ()
     dirlight_numbers[i] = -1;
   }
   material = NULL;
+  node = NULL;
 }
 
 csTerrBlock::~csTerrBlock ()
@@ -524,12 +525,12 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
     if (QRound (v[vbl].y) != QRound (v[vtl].y))
       tL = (y - v[vtl].y) / (v[vbl].y - v[vtl].y);
     else
-      tL = (x - v[vtl].x) / (v[vbl].x - v[vtl].x);
+      tL = ((v[vbl].x - v[vtl].x) > SMALL_EPSILON) ? (x - v[vtl].x) / (v[vbl].x - v[vtl].x) : 1000000.;
 //printf ("b\n");
     if (QRound (v[vbr].y) != QRound (v[vtr].y))
       tR = (y - v[vtr].y) / (v[vbr].y - v[vtr].y);
     else
-      tR = (x - v[vtr].x) / (v[vbr].x - v[vtr].x);
+      tR = ((v[vbr].x - v[vtr].x) > SMALL_EPSILON) ? (x - v[vtr].x) / (v[vbr].x - v[vtr].x) : 1000000.;
 
     xL = v[vtl].x + tL * (v[vbl].x - v[vtl].x);
     xR = v[vtr].x + tR * (v[vbr].x - v[vtr].x);
@@ -1302,7 +1303,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   return true;
 }
 
-void csTerrFuncObject::GetObjectBoundingBox (csBox3& bbox, int type)
+void csTerrFuncObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
   bbox = global_bbox;
 }
@@ -1334,10 +1335,10 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
   return 1;
 }
 
-bool csTerrFuncObject::HitBeamObject (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr)
+bool csTerrFuncObject::HitBeamObject (const csVector3& /*start*/,
+	const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
 {
-  // @@@ IMPLEMENT ME!
+//@@@ MHV: Im working on this at the moment. Please check back shortly.
   return false;
 }
 
