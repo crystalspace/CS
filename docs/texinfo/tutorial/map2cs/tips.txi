@@ -28,6 +28,12 @@ detail with brushes.  Often it looks better and is much faster if you paint
 the details on some texture and apply that texture to a plain wall.
 
 @item
+When adding lights to your level be sure to make use of the entity "light"
+rather than "light_spot" and "light_enviroment". If you use the latter 2
+you will experience problems running your level under OpenGL rendering
+under Crystal Space.
+
+@item
 Align your textures properly.  While working with normal brushes make sure,
 that ``texture lock'' is not enabled.  Enable ``texture lock'' only, if you
 are moving objects, that have been thoroughly aligned (usually only some
