@@ -291,7 +291,7 @@ bool R3DTest::Initialize ()
 {
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
-#if CS_USE_NEW_RENDERER
+#ifdef CS_USE_NEW_RENDERER
         CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iRender3D),
 #else
         CS_REQUEST_PLUGIN ("crystalspace.graphics3d.opengl", iGraphics3D),
@@ -343,8 +343,11 @@ bool R3DTest::Initialize ()
     return false;
   }
 
-  //r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#ifdef CS_USE_NEW_RENDERER
+  r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#else
   r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#endif
   if (r3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
