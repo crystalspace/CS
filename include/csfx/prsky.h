@@ -129,6 +129,8 @@ class csProcSky {
   void Initialize();
   /// init an octave with new random/smoothed content
   void InitOctave(uint8 *octs, int nr);
+  /// smooth an octave contents , smoothpower (0=none, 1=medium, 2=much)
+  void SmoothOctave(uint8 *octs, int nr, int smoothpower);
   /// enlarge an octave, size is scaled by 2**factor, values >> rshift;
   void Enlarge(uint8 *dest, uint8 *src, int factor, int rshift);
   /// take weighted average of start&end into dest, pos(0=start) of max(=end).

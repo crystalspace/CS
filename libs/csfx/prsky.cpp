@@ -140,13 +140,10 @@ void csProcSky::Initialize()
   int i;
   for(i=0 ; i< nr_octaves; i++)
   {
-    InitOctave(octaves, i);
     InitOctave(startoctaves, i);
     InitOctave(endoctaves, i);
-  }
-  /// fill enlarged octaves
-  for(i=0 ; i< nr_octaves; i++)
-  {
+    CopyOctave(startoctaves, i, octaves, i);
+    SmoothOctave(octaves, i, 2);
     Enlarge( enlarged[i], octaves + octsize*octsize*i, nr_octaves - i - 1, i);
   }
 }
@@ -154,12 +151,21 @@ void csProcSky::Initialize()
 void csProcSky::InitOctave(uint8 *octs, int nr)
 {
   int sz = octsize*octsize;
-  uint8* myoct = new uint8[sz];
+  uint8* myoct = octs + nr*sz;
   int i;
   for(i=0; i<sz; i++)
-    myoct[i] = (uint8)( rand()&0xFF );
+    *myoct++ = (uint8)( rand()&0xFF );
+}
 
-  int sm = 2;
+
+void csProcSky::SmoothOctave(uint8 *octs, int nr, int smoothpower)
+{
+  int sz = octsize*octsize;
+  uint8* myoct = new uint8 [sz];
+  /// make a backup for perfect smoothing
+  memcpy(myoct, octs+sz*nr, sz);
+  /// smooth
+  int sm = smoothpower;
   for(int y=0; y<octsize; y++)
     for(int x=0; x<octsize; x++)
     {
@@ -237,9 +243,14 @@ void csProcSky::Combine(uint8 *dest, uint8 *start, uint8 *end, int pos,
   uint8 *sp = start + sz * nr;
   uint8 *ep = end + sz * nr;
   int epow = max - pos; // end power, reverse position
+  /// pos = strength of end
+  /// epow = strength of start 
+  /// max = total strength
   for(int i=0; i<sz; i++)
   {
-    *dp++ = (epow*int(*ep++) + pos*int(*sp++))/max;
+    //float res = float(pos) * float(*ep++) + float(epow)*float(*sp++);
+    //*dp++ = int(res / float(max));
+    *dp++ = (pos*int(*ep++) + epow*int(*sp++))/max;
   }
 }
 
@@ -261,13 +272,15 @@ void csProcSky::AnimOctave(int nr, int elapsed)
     }
     else
     {
-      // end becomes start, make new random end point.
+      // end copied to start, make new random end point.
       CopyOctave(endoctaves, nr, startoctaves, nr);
       InitOctave(endoctaves, nr);
     }
   }
   //// start & end are OK, we know the current position < period.
   Combine(octaves, startoctaves, endoctaves, curposition[nr], periods[nr], nr);
+  /// smooth resulting octave
+  SmoothOctave(octaves, nr, 2);
   /// pre-enlarge the octave
   Enlarge(enlarged[nr], octaves + octsize*octsize*nr, nr_octaves - nr - 1, nr);
 }
@@ -391,7 +404,7 @@ uint8 csProcSky::GetCloudVal(int x, int y)
 
     int add = int( enlarged[i][ thesize*(y%thesize)+ x%thesize ]);
     thesize>>=1;
-
+    
     /*
     int add = 0 ;
 
