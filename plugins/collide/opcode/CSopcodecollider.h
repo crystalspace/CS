@@ -1,4 +1,6 @@
 /*
+*      
+*
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -12,7 +14,16 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-------------------------------------------------------------------------
+*           OPCODE collision detection plugin for CrystalSpace
+* 
+*           OPCODE library was written by Pierre Terdiman 
+*                  ported to CS by Charles Quarra
+*
+*
+-------------------------------------------------------------------------
 */
+
 #ifndef __CS_OPCODECOL_H__
 #define __CS_OPCODECOL_H__
 
