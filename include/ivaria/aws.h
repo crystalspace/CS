@@ -21,6 +21,8 @@ struct  iEngine;
 struct  iTextureManager;
 struct  iObjectRegistry;
 struct  iTextureHandle;
+struct  iFontServer;
+struct  iFont;
 
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
        
@@ -53,6 +55,9 @@ public:
 
   /// Mark a region dirty
   virtual void       Mark(csRect &rect)=0;
+
+  /// Dispatches events to the proper components
+  virtual bool HandleEvent(iEvent&)=0;
   
   /// Set the contexts however you want
   virtual void SetContext(iGraphics2D *g2d, iGraphics3D *g3d)=0;
@@ -132,11 +137,20 @@ public:
   /// Gets the value of a color from the global AWS palette.
   virtual int  GetColor(int index)=0;
 
+  /// Gets the current default font
+  virtual iFont *GetDefaultFont()=0;
+
+  /// Gets a font.  If it's not loaded, it will be.  Returns NULL on error.
+  virtual iFont *GetFont(char *filename)=0;
+
   /// Gets a texture from the global AWS cache
   virtual iTextureHandle *GetTexture(char *name, char *filename)=0;
 
   /// Sets the texture manager that the preference manager uses
   virtual void SetTextureManager(iTextureManager *txtmgr)=0;
+
+  /// Sets the font server that the preference manager uses
+  virtual void SetFontServer(iFontServer *fntsvr)=0;
     
   /** Sets up the AWS palette so that the colors are valid reflections of
        user preferences.  Although SetColor can be used, it's recommended 
