@@ -188,13 +188,6 @@ WalkTest::~WalkTest ()
   delete [] auto_script;
   delete infinite_maze;
   delete cslogo;
-  /*
-  if (Engine)
-  {
-    if (plbody) Engine->GetMeshes ()->RemoveMesh (plbody);
-    if (pllegs) Engine->GetMeshes ()->RemoveMesh (pllegs);
-  }
-  */
   delete [] recorded_perf_stats_name;
 
   while (first_map)

@@ -64,7 +64,7 @@ struct iCollideSystem : public iBase
   virtual csPtr<iCollider> CreateSphereCollider (iMeshObject* sphere) = 0;
 
   /// Create an iPrimBoxCollider for the given box geometry
-  virtual csPtr<iCollider>    CreateBoxCollider    (iMeshObject* box) = 0;
+  virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* box) = 0;
   
  
   /**

@@ -24,6 +24,7 @@
 #include "csgeom/frustum.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
+#include "csgeom/polymesh.h"
 #include "ivaria/view.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
@@ -73,118 +74,25 @@ int FindIntersection(csCollisionPair& cd,csVector3 line[2])
 
 void WalkTest::CreateColliders ()
 {
-  iPolygon3DStatic *p;
-  csRef<iPolygonMesh> mesh;
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  csRef<iMeshObjectType> ThingType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType));
-  if (!ThingType)
-    ThingType = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csBox3 body_box (csVector3 (-DX_2, OY, -DZ_2),
+		   csVector3 (DX_2, OY+DY, DZ_2));
+  csPolygonMeshCube* mesh = new csPolygonMeshCube (body_box);
+  body = collide_system->CreateCollider (mesh);
+  float radius = qsqrt (csSquaredDist::PointPoint (body_box.GetCenter (),
+	body_box.Min ()));
+  body_radius.Set (radius);
+  body_center = body_box.GetCenter ();
+  mesh->DecRef ();
 
-  csRef<iMeshObjectFactory> thing_fact = ThingType->NewFactory ();
-  csRef<iMeshObject> mesh_obj = thing_fact->NewInstance ();
-  plbody = Engine->CreateMeshWrapper (mesh_obj, "Player's Body");
-  csRef<iThingState> ws = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
-  csRef<iThingFactoryState> thing_state = ws->GetFactory ();
-
-  thing_state->CreateVertex (csVector3 (-DX_2, OY,    -DZ_2));
-  thing_state->CreateVertex (csVector3 (-DX_2, OY,    DZ_2));
-  thing_state->CreateVertex (csVector3 (-DX_2, OY+DY, DZ_2));
-  thing_state->CreateVertex (csVector3 (-DX_2, OY+DY, -DZ_2));
-  thing_state->CreateVertex (csVector3 (DX_2,  OY,    -DZ_2));
-  thing_state->CreateVertex (csVector3 (DX_2,  OY,    DZ_2));
-  thing_state->CreateVertex (csVector3 (DX_2,  OY+DY, DZ_2));
-  thing_state->CreateVertex (csVector3 (DX_2,  OY+DY, -DZ_2));
-
-  // Left
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (0); p->CreateVertex (1);
-  p->CreateVertex (2); p->CreateVertex (3);
-
-  // Right
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (4); p->CreateVertex (5);
-  p->CreateVertex (6); p->CreateVertex (7);
-
-  // Bottom
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (0); p->CreateVertex (1);
-  p->CreateVertex (5); p->CreateVertex (4);
-
-  // Top
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (3); p->CreateVertex (2);
-  p->CreateVertex (6); p->CreateVertex (7);
-
-  // Front
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (1); p->CreateVertex (5);
-  p->CreateVertex (6); p->CreateVertex (2);
-
-  // Back
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (0); p->CreateVertex (4);
-  p->CreateVertex (7); p->CreateVertex (3);
-
-  mesh = mesh_obj->GetObjectModel()->GetPolygonMeshColldet();
-  body = new csColliderWrapper (plbody->QueryObject (), collide_system, mesh);
-  body->SetName ("player body");
-  plbody->GetRadius (body_radius, body_center);
-
-  thing_fact = ThingType->NewFactory ();
-  mesh_obj = thing_fact->NewInstance ();
-  pllegs = Engine->CreateMeshWrapper (mesh_obj, "Player's Legs");
-  ws = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
-  thing_state = ws->GetFactory ();
-
-  thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     -DZ_2L));
-  thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     DZ_2L));
-  thing_state->CreateVertex (csVector3 (-DX_2L, OYL+DYL, DZ_2L));
-  thing_state->CreateVertex (csVector3 (-DX_2L, OYL+DYL, -DZ_2L));
-  thing_state->CreateVertex (csVector3 (DX_2L,  OYL,     -DZ_2L));
-  thing_state->CreateVertex (csVector3 (DX_2L,  OYL,     DZ_2L));
-  thing_state->CreateVertex (csVector3 (DX_2L,  OYL+DYL, DZ_2L));
-  thing_state->CreateVertex (csVector3 (DX_2L,  OYL+DYL, -DZ_2L));
-
-  // Left
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (0); p->CreateVertex (1);
-  p->CreateVertex (2); p->CreateVertex (3);
-
-  // Right
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (4); p->CreateVertex (5);
-  p->CreateVertex (6); p->CreateVertex (7);
-
-  // Bottom
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (0); p->CreateVertex (1);
-  p->CreateVertex (5); p->CreateVertex (4);
-
-  // Top
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (3); p->CreateVertex (2);
-  p->CreateVertex (6); p->CreateVertex (7);
-
-  // Front
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (1); p->CreateVertex (5);
-  p->CreateVertex (6); p->CreateVertex (2);
-
-  // Back
-  p = thing_state->CreatePolygon ();
-  p->CreateVertex (0); p->CreateVertex (4);
-  p->CreateVertex (7); p->CreateVertex (3);
-
-  mesh = mesh_obj->GetObjectModel()->GetPolygonMeshColldet();
-  legs = new csColliderWrapper (pllegs->QueryObject (), collide_system, mesh);
-  legs->SetName ("player legs");
-  pllegs->GetRadius ( legs_radius, legs_center);
-
-  SCF_DEC_REF (legs);
-  SCF_DEC_REF (body);
+  csBox3 legs_box (csVector3 (-DX_2L, OYL, -DZ_2L),
+		   csVector3 (DX_2L, OYL+DYL, DZ_2L));
+  mesh = new csPolygonMeshCube (legs_box);
+  legs = collide_system->CreateCollider (mesh);
+  radius = qsqrt (csSquaredDist::PointPoint (legs_box.GetCenter (),
+	legs_box.Min ()));
+  legs_radius.Set (radius);
+  legs_center = legs_box.GetCenter ();
+  mesh->DecRef ();
 
   if (!body || !legs)
     do_cd = false;
@@ -210,7 +118,7 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   return c;
 }
 
-int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
+int CollisionDetect (iEngine* Engine, iCollider *c, iSector* sp,
 	csReversibleTransform *cdt)
 {
   int hit = 0;
@@ -225,7 +133,10 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
   {
     iMeshWrapper* mw = objit->Next ();
     Sys->collide_system->ResetCollisionPairs ();
-    if (c->Collide (mw->QueryObject (), cdt, &mw->GetMovable ()->GetTransform ()))
+    csColliderWrapper* other_wrap = csColliderWrapper::GetColliderWrapper (
+	mw->QueryObject ());
+    if (other_wrap && Sys->collide_system->Collide (c, cdt,
+	other_wrap->GetCollider (), &mw->GetMovable ()->GetTransform ()))
       hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();

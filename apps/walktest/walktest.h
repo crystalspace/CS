@@ -159,8 +159,8 @@ public:
   csVector3 angle_velocity;
 
   /// Colliders for "legs" and "body". Intersections are handled differently.
-  csColliderWrapper *legs;
-  csColliderWrapper *body;
+  csRef<iCollider> body;
+  csRef<iCollider> legs;
   csVector3 body_radius, body_center, legs_radius, legs_center;
 
   /// A list with all busy entities.
@@ -354,7 +354,7 @@ public:
   csRef<iCollideSystem> collide_system;
 
   /// Player's body (as a 3D model) and legs
-  csRef<iMeshWrapper> plbody, pllegs;
+  //csRef<iMeshWrapper> plbody, pllegs;
 
   /// The console input plugin
   csRef<iConsoleInput> ConsoleInput;

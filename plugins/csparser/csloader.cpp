@@ -76,6 +76,7 @@
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
 #include "ivaria/reporter.h"
+#include "csgeom/polymesh.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 
@@ -1401,82 +1402,13 @@ SCF_IMPLEMENT_IBASE (PolygonMeshMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
-// Private class implementing iPolygonMesh for one cube.
-class PolygonMeshCube : public iPolygonMesh
-{
-private:
-  csVector3 vertices[8];
-  csMeshedPolygon polygons[6];
-  int vertex_indices[4*6];
-
-public:
-  PolygonMeshCube (const csVector3& bmin, const csVector3& bmax)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    vertices[0].Set (bmin.x, bmin.y, bmin.z);
-    vertices[1].Set (bmax.x, bmin.y, bmin.z);
-    vertices[2].Set (bmin.x, bmin.y, bmax.z);
-    vertices[3].Set (bmax.x, bmin.y, bmax.z);
-    vertices[4].Set (bmin.x, bmax.y, bmin.z);
-    vertices[5].Set (bmax.x, bmax.y, bmin.z);
-    vertices[6].Set (bmin.x, bmax.y, bmax.z);
-    vertices[7].Set (bmax.x, bmax.y, bmax.z);
-    int i;
-    for (i = 0 ; i < 6 ; i++)
-    {
-      polygons[i].num_vertices = 4;
-      polygons[i].vertices = &vertex_indices[i*4];
-    }
-    vertex_indices[0*4+0] = 4;
-    vertex_indices[0*4+1] = 5;
-    vertex_indices[0*4+2] = 1;
-    vertex_indices[0*4+3] = 0;
-    vertex_indices[1*4+0] = 5;
-    vertex_indices[1*4+1] = 7;
-    vertex_indices[1*4+2] = 3;
-    vertex_indices[1*4+3] = 1;
-    vertex_indices[2*4+0] = 7;
-    vertex_indices[2*4+1] = 6;
-    vertex_indices[2*4+2] = 2;
-    vertex_indices[2*4+3] = 3;
-    vertex_indices[3*4+0] = 6;
-    vertex_indices[3*4+1] = 4;
-    vertex_indices[3*4+2] = 0;
-    vertex_indices[3*4+3] = 2;
-    vertex_indices[4*4+0] = 6;
-    vertex_indices[4*4+1] = 7;
-    vertex_indices[4*4+2] = 5;
-    vertex_indices[4*4+3] = 4;
-    vertex_indices[5*4+0] = 0;
-    vertex_indices[5*4+1] = 1;
-    vertex_indices[5*4+2] = 3;
-    vertex_indices[5*4+3] = 2;
-  }
-  virtual ~PolygonMeshCube () { }
-
-  SCF_DECLARE_IBASE;
-
-  virtual int GetVertexCount () { return 8; }
-  virtual csVector3* GetVertices () { return vertices; }
-  virtual int GetPolygonCount () { return 6; }
-  virtual csMeshedPolygon* GetPolygons () { return polygons; }
-  virtual void Cleanup () { }
-  virtual bool IsDeformable () const { return false; }
-  virtual uint32 GetChangeNumber () const { return 0; }
-};
-
-SCF_IMPLEMENT_IBASE (PolygonMeshCube)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
 bool csLoader::ParsePolyMeshChildBox (iDocumentNode* child,
 	csRef<iPolygonMesh>& polymesh)
 {
   csBox3 b;
   if (!SyntaxService->ParseBox (child, b))
     return false;
-  polymesh = csPtr<iPolygonMesh> (
-    new PolygonMeshCube (b.Min (), b.Max ()));
+  polymesh = csPtr<iPolygonMesh> (new csPolygonMeshCube (b));
   return true;
 }
 

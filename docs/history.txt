@@ -3,6 +3,15 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+11-Jul-2003
+	- Jorrit added a conveniance csPolygonMeshCube class which represents
+	  an easy way to make a cube collider.
+	- In addition Jorrit did the following:
+	    - Simplified walktest a bit by using this new csPolygonMeshCube
+	      class. So it no longer has to make dummy cube things for the
+	      actor.
+	    - Also use csPolygonMeshCube in csparser instead of the custom
+	      cube mesh that was implemented there.
 10-Jul-2003
 	- Jorrit added a test in csColliderWrapper::Collide() so that
 	  csColliderWrapper can be used in cases where there is no
