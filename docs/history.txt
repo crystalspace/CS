@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+22-Aug-2000
+	- Got a small patch from Rene Dudfield with new console command
+	  (for WalkTest) 'listactions', and a new sprite name argument
+	  for 'addsprite'.
 21-Aug-2000
 	- Andrew Zabolotny did the following:
 	    - Changed perfstat plugin to compute fps once per 1/2 second

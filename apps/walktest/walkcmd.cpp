@@ -322,6 +322,9 @@ void load_sprite (char *filename, char *templatename, char* txtname)
   Sys->view->GetWorld ()->sprite_templates.Push (result);
 }
 
+
+
+
 csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
 	csVector3 const& pos, float size)
 {
@@ -1246,12 +1249,21 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "addsprite"))
   {
-    char name[100];
+    char tname[100];
+    char sname[100];
     float size;
-    if (arg) ScanStr (arg, "%s,%f", name, &size);
-    else { *name = 0; size = 1; }
-    add_sprite (name, name, Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetOrigin (), size);
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s,%s,%f", tname, sname, &size);
+    if(cnt != 3)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'templatename',");
+      Sys->Printf (MSG_CONSOLE, "'spritename','size'!\n");
+    }
+    else
+    {
+      add_sprite (tname, sname, Sys->view->GetCamera ()->GetSector (),
+    	          Sys->view->GetCamera ()->GetOrigin (), size);
+    }
   }
   else if (!strcasecmp (cmd, "delsprite"))
   {
@@ -1290,8 +1302,16 @@ bool CommandHandler (const char *cmd, const char *arg)
       csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName(name);
       
       if(aspr)
-      {
-        Sys->Printf (MSG_CONSOLE, "Not implemented!  Can't get at the info\n");
+      { 
+	csSpriteTemplate* aspr_tmpl = aspr->GetTemplate();
+	csSpriteAction* aspr_act;
+	int i;
+	
+	for(i = 0; i < (aspr_tmpl->GetNumActions()); i ++)
+	{
+	  aspr_act = aspr_tmpl->GetAction(i);
+	  Sys->Printf (MSG_CONSOLE, "%s\n", aspr_act->GetName());
+	}
       }
       else
       {
@@ -1307,10 +1327,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     char name[100];
     char action[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s %s", name, action);
+    if (arg) cnt = ScanStr (arg, "%s,%s", name, action);
     if(cnt != 2)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename action'!\n");
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename,action'!\n");
       Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
     }
     else
@@ -1324,7 +1344,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         if(!aspr->SetAction(action))
 	{
           Sys->Printf (MSG_CONSOLE,
-		       "Expected parameters 'spritename action'!\n");
+		       "Expected parameters 'spritename,action'!\n");
 	  Sys->Printf (MSG_CONSOLE,
 		 "That sprite does not have that action.\n");
 	}
@@ -1332,7 +1352,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       else
       {
         Sys->Printf (MSG_CONSOLE,
-		     "Expected parameters 'spritename action'!\n");
+		     "Expected parameters 'spritename,action'!\n");
 	Sys->Printf (MSG_CONSOLE,
 		 "That sprite does not exist, use the listsprites command.\n");
       }
