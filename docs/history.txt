@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 24-Aug-2001
 	- Fixed metaballs plugin so that it really works again now.
 	  This caused walktest+flarge to crash.
+	- Fixed ptlab and metademo. These apps were not calling
+	  csInitializeApplication so a lot was missing in the object
+	  registry. Some of the changes I did yesterday assumed that
+	  there was an instance of iGraphics3D in the object registry.
 23-Aug-2001
 	- Fog should now work for the metaballs plugin.
 	- Started work on vertex buffer support in the 3D renderers. There is
