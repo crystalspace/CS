@@ -141,13 +141,11 @@ csTextSyntaxService::csTextSyntaxService (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
   reporter = NULL;
-  loader = NULL;
 }
 
 csTextSyntaxService::~csTextSyntaxService ()
 {
   SCF_DEC_REF (reporter);
-  SCF_DEC_REF (loader);
 }
 
 bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
@@ -160,10 +158,13 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 iMaterialWrapper* csTextSyntaxService::FindMaterial (iEngine* engine,
 	const char* name)
 {
-  if (!loader)
-    loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  iLoader *loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (loader)
-    return loader->FindMaterial (name);
+  {
+    iMaterialWrapper *mat = loader->FindMaterial (name);
+    loader->DecRef ();
+    return mat;
+  }
   else
     return engine->GetMaterialList ()->FindByName (name);
 }

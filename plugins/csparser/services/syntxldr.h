@@ -45,7 +45,6 @@ protected:
   csString text;
   iObjectRegistry* object_reg;
   iReporter* reporter;
-  iLoader* loader;
 
   void OptimizePolygon (iPolygon3D *p);
 
