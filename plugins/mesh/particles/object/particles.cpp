@@ -415,15 +415,15 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
   if (!vertex_buffer || buffer_length != point_data->Length ())
   {
     buffer_length = point_data->Length ();
-    csRefArray<iRenderBuffer> buffers;
+    csRef<iRenderBuffer> buffers[2];
     int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
     pFactory->g3d->CreateInterleavedRenderBuffers (bufsize
       * sizeof(csParticlesData), CS_BUF_DYNAMIC, 2, buffers);
-    vertex_buffer = buffers.Get(0);
+    vertex_buffer = buffers[0];
     vertex_buffer->SetOffset (0);
     vertex_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     vertex_buffer->SetComponentCount (3);
-    color_buffer = buffers.Get (1);
+    color_buffer = buffers[1];
     color_buffer->SetOffset (sizeof(csVector3));
     color_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     color_buffer->SetComponentCount (4);

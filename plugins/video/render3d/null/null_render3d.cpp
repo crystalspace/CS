@@ -499,19 +499,16 @@ csPtr<iRenderBuffer> csNullGraphics3D::CreateIndexRenderBuffer (size_t size,
 }
 
 void csNullGraphics3D::CreateInterleavedRenderBuffers (size_t size, 
-  csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
+  csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers)
 {
-  csRef<iRenderBuffer> buf;
-  buf.AttachNew (new csSysRenderBuffer 
+  buffers[0].AttachNew (new csSysRenderBuffer 
     (new char[size], size, type, CS_BUFCOMP_BYTE, 1));
-  buffers.Push (buf);
   for (int i = 1; i < count; i ++)
   {
     csSysRenderBuffer *interleaved = new csSysRenderBuffer (new char[size],
       size, type, CS_BUFCOMP_BYTE, 1);
     // interleaved->SetInterleaved ();
-    buf.AttachNew (interleaved);
-    buffers.Push (buf);
+    buffers[i].AttachNew (interleaved);
   }
 }
 

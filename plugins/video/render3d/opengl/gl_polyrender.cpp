@@ -128,22 +128,22 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
 #define INTERLEAVE 1
 #if INTERLEAVE
-    csRefArray<iRenderBuffer> buffers;
+    csRef<iRenderBuffer> buffers[3];
     size_t compsize = sizeof (csVector3) + sizeof (csVector2)
     	+ sizeof (csVector3);
     int bufsize = num_verts * compsize;
     parent->CreateInterleavedRenderBuffers (bufsize, CS_BUF_STATIC, 3, buffers);
-    vertex_buffer = buffers.Get (0);
+    vertex_buffer = buffers[0];
     vertex_buffer->SetOffset (0);
     vertex_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     vertex_buffer->SetComponentCount (3);
     vertex_buffer->SetStride (compsize);
-    texel_buffer = buffers.Get (1);
+    texel_buffer = buffers[1];
     texel_buffer->SetOffset (sizeof(csVector3));
     texel_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     texel_buffer->SetComponentCount (2);
     texel_buffer->SetStride (compsize);
-    lmcoords_buffer = buffers.Get (2);
+    lmcoords_buffer = buffers[2];
     lmcoords_buffer->SetOffset (sizeof(csVector3) + sizeof(csVector2));
     lmcoords_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     lmcoords_buffer->SetComponentCount (3);

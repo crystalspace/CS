@@ -43,6 +43,11 @@ chronological order.
 	  be quickly reverted by setting INTERLEAVED to 0 in
 	  plugins/video/render3d/opengl/gl_polyrender.cpp.
 	- Jorrit did a small cleanup to particles mesh.
+	- Jorrit fixed the API of iGraphics3D->CreateInterleavedRenderBuffers.
+	  It would accept a csRefArray and then modify it. This is not legal
+	  in a plugin context. Changed it by accepting a normal array which
+	  should be allocated by the caller. This is also more efficient as
+	  there will be less growing array operations needed.
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections

@@ -93,20 +93,17 @@ csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateIndexRenderBuffer (
 }
 
 void csSoftwareGraphics3DCommon::CreateInterleavedRenderBuffers (size_t size,
-  csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
+  csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers)
 {
   char *mem = new char[size];
-  csRef<iRenderBuffer> buf;
   csSoftRenderBuffer *master = new csSoftRenderBuffer (
     mem, size, type, CS_BUFCOMP_BYTE, 1);
-  buf.AttachNew (master);
-  buffers.Push (buf);
+  buffers[0].AttachNew (master);
 
   for (int i = 0; i < count; i ++) 
   {
     csSoftRenderBuffer *interleaved = new csSoftRenderBuffer (mem,
       size, type, CS_BUFCOMP_BYTE, 1);
-    buf.AttachNew (interleaved);
-    buffers.Push (buf);
+    buffers[i].AttachNew (interleaved);
   }
 }

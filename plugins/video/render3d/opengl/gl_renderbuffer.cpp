@@ -139,22 +139,19 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (size_t size,
 }
 
 void csGLGraphics3D::CreateInterleavedRenderBuffers (size_t size,
-  csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
+  csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers)
 {
-  csRef<iRenderBuffer> buf;
   if (use_hw_render_buffers && size >= vbo_thresshold)
   {
     csVBORenderBuffer* master = new csVBORenderBuffer (size, type,
       CS_BUFCOMP_BYTE, 1, false, ext);
-    buf.AttachNew (master);
-    buffers.Push (buf);
+    buffers[0].AttachNew (master);
     for(int i=1;i<count;i++)
     {
       csVBORenderBuffer *interleaved = new csVBORenderBuffer (
         master);
       interleaved->SetInterleaved ();
-      buf.AttachNew (interleaved);
-      buffers.Push (buf);
+      buffers[i].AttachNew (interleaved);
     }
   }
   else
@@ -163,16 +160,14 @@ void csGLGraphics3D::CreateInterleavedRenderBuffers (size_t size,
     csSysRenderBuffer *master = new csSysRenderBuffer (mem,
       size, type, CS_BUFCOMP_BYTE, 1);
     
-    buf.AttachNew (master);
-    buffers.Push (buf);
+    buffers[0].AttachNew (master);
 
     for(int i=1;i<count;i++) 
     {
       csSysRenderBuffer *interleaved = new csSysRenderBuffer (mem,
         size, type, CS_BUFCOMP_BYTE, 1);
       interleaved->SetInterleaved ();
-      buf.AttachNew (interleaved);
-      buffers.Push (buf);
+      buffers[i].AttachNew (interleaved);
     }
   }
 }

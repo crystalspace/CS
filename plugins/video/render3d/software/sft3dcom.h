@@ -552,7 +552,7 @@ public:
 
   /// Create interleaved renderbuffers
   virtual void CreateInterleavedRenderBuffers (size_t size, 
-    csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers);
+    csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers);
 
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)

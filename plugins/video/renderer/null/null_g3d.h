@@ -273,7 +273,7 @@ public:
     csRenderBufferType, csRenderBufferComponentType, 
     size_t, size_t, bool copy = true) { return 0; }
   virtual void CreateInterleavedRenderBuffers (size_t size, 
-    csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers) { }
+    csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers) { }
   virtual void SetBufferState (csVertexAttrib*,
   	iRenderBuffer**, int count) { }
   virtual void SetTextureState (int*, iTextureHandle**,

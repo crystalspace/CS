@@ -137,7 +137,7 @@ public:
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd, bool copy = true);
   void CreateInterleavedRenderBuffers (size_t size, csRenderBufferType type,
-    int count, csRefArray<iRenderBuffer>& buffers);
+    int count, csRef<iRenderBuffer>* buffers);
   void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, 
     int count);
   void SetTextureState (int* units, iTextureHandle** textures, int count);

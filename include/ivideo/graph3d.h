@@ -1021,11 +1021,13 @@ struct iGraphics3D : public iBase
   /**
    * Create an interleaved renderbuffer (You would use this then set stride to
    * determine offset and stride of the interleaved buffer
-   * \param size Size of the buffer in bytes
-   * \param count Number of renderbuffers you want
+   * \param size size of the buffer in bytes
+   * \param count number of render buffers you want
+   * \param buffers should be an array of render buffer references that can hold
+   * at least 'count' render buffers.
    */
   virtual void CreateInterleavedRenderBuffers (size_t size, 
-    csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers) = 0;
+    csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers) = 0;
 
   /**
    * Activate or deactivate all given buffers depending on the value of
