@@ -731,6 +731,7 @@ The history order is reversed so that new features are at the top.
 	  (almost twice as fast).
 	- Daniel also added light parameter to DrawShadow() for optimization
 	  purposes.
+	- Release of CS 0.96r002.
 3-Feb-2003
 	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
 	  improved portability since not all platforms have fabsf().  (An
