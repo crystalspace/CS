@@ -1879,12 +1879,11 @@ void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
   glEnd ();
 }
 
-iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer (int width, int height,  csPixelFormat *pfmt, void *buffer, RGBPixel */*palette*/, int /*pal_size*/)
+iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer (
+  int width, int height, csPixelFormat *pfmt, void *buffer,
+  RGBPixel* /*palette*/, int /*pal_size*/)
 {
-
   // For now just create a software dynamic texture
-  csDynamicTextureSoft3D *tex3d =  
-       new csDynamicTextureSoft3D (System, G2D);
-
+  csDynamicTextureSoft3D *tex3d = new csDynamicTextureSoft3D (System, G2D);
   return tex3d->CreateOffScreenRenderer (width, height, pfmt, buffer, NULL, 0);
 }
