@@ -31,6 +31,7 @@ CSWS.LIB = $(OUT)$(LIB_PREFIX)csws$(LIB_SUFFIX)
 SRC.CSWS = $(wildcard libs/csws/*.cpp)
 OBJ.CSWS = $(addprefix $(OUT),$(notdir $(SRC.CSWS:.cpp=$O)))
 TO_INSTALL.STATIC_LIBS += $(CSWS.LIB)
+TO_INSTALL.DATA += data/csws.zip
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
