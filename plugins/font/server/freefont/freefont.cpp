@@ -63,30 +63,23 @@ bool csFreeTypeServer::Initialize (iSystem *Sys)
   }
 
   VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  ftconfig = System->CreateConfigNew ("config/freetype.cfg");
-  if (ftconfig)
-  {
-    defaultSize = ftconfig->GetInt ("Freetype.Settings.Size", 10);
-    platformID = ftconfig->GetInt ("Freetype.Settings.PlatformID", 3);
-    encodingID = ftconfig->GetInt ("Freetype.Settings.EncodingID", 1);
+  System->AddConfig (iSystem::ConfigPriorityPlugIn, "config/freetype.cfg");
+  ftconfig = System->GetConfig();
+  ftconfig->IncRef();
+ 
+  defaultSize = ftconfig->GetInt ("Freetype.Settings.Size", 10);
+  platformID = ftconfig->GetInt ("Freetype.Settings.PlatformID", 3);
+  encodingID = ftconfig->GetInt ("Freetype.Settings.EncodingID", 1);
 
-    fontset = ftconfig->GetStr ("Freetype.Settings.FontSet", NULL);
+  fontset = ftconfig->GetStr ("Freetype.Settings.FontSet", NULL);
 
-    csString s;
-    s << fontset << '.';
-    iConfigIterator *fontenum = ftconfig->Enumerate (s);
-    while (fontenum->Next ())
-      if (fontenum->GetKey (true) [0] == '*')
-        LoadFont (fontenum->GetKey (true));
-    fontenum->DecRef ();
-  }
-  else
-  {
-    defaultSize = 10;
-    platformID = 3;
-    encodingID = 1;
-    fontset = NULL;
-  }
+  csString s;
+  s << fontset << '.';
+  iConfigIterator *fontenum = ftconfig->Enumerate (s);
+  while (fontenum->Next ())
+    if (fontenum->GetKey (true) [0] == '*')
+      LoadFont (fontenum->GetKey (true));
+  fontenum->DecRef ();
 
   return true;
 }

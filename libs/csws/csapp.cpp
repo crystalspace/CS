@@ -160,7 +160,7 @@ bool csApp::Initialize (const char *iConfigName)
   WindowListWidth = ScreenWidth / 3;
   WindowListHeight = ScreenWidth / 6;
 
-  Config = System->CreateConfig (iConfigName);
+  Config = System->CreateINIConfig (iConfigName);
   if (!Config)
   {
     printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", iConfigName);

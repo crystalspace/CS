@@ -60,7 +60,9 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 {
   System = iSys;
-  Config = System->CreateConfigNew ("/config/sound.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/sound.cfg");
+  Config = System->GetConfig();
+  Config->IncRef();
   return true;
 }
 

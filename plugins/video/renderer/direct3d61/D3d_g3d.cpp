@@ -275,9 +275,9 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  config = m_piSystem->CreateConfigNew ("/config/direct3ddx6.cfg");
-  if (!config)
-    return false;
+  m_piSystem->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/direct3ddx6.cfg");
+  config = m_piSystem->GetConfig();
+  config->IncRef();
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx61", NULL, iGraphics2D);
   if (!m_piG2D)

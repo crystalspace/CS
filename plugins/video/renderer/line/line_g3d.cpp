@@ -96,7 +96,9 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  config = System->CreateConfigNew ("/config/line3d.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/line3d.cfg");
+  config = System->GetConfig();
+  config->IncRef();
 
   width = height = -1;
 

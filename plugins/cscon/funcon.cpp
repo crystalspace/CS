@@ -335,7 +335,8 @@ void funConsole::GetPosition (int &x, int &y, int &width, int &height) const
 
 void funConsole::LoadPix ()
 {
-  iConfigFileNew *ini = System->CreateConfigNew ("/config/funcon.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/funcon.cfg");
+  iConfigFileNew *ini = System->GetConfig();
   const char* dir = ini->GetStr ("FunCon.General.Zip");
   const char* mountdir = ini->GetStr ("FunCon.General.Mount");
   if (VFS->Mount (mountdir, dir))
@@ -369,8 +370,6 @@ void funConsole::LoadPix ()
   }
   else
     printf ("Couldn't mount %s on %s\n", dir, mountdir);
-
-  ini->DecRef ();
 }
 
 void funConsole::PrepPix (iConfigFileNew *ini, const char *sect,

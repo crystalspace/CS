@@ -201,7 +201,9 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
-  config = System->CreateConfigNew ("/config/soft3d.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/soft3d.cfg");
+  config = System->GetConfig();
+  config->IncRef();
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;

@@ -65,7 +65,9 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   System->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
 
   // read the config file
-  Config = System->CreateConfigNew ("/config/sound.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/sound.cfg");
+  Config = System->GetConfig();
+  Config->IncRef();
 
   // load the sound driver plug-in
 #ifdef SOUND_DRIVER

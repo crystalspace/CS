@@ -1165,9 +1165,9 @@ bool csVFS::Initialize (iSystem *iSys)
   basedir = strnew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
   const char *path = System->GetConfig ()->GetStr ("VFS.Config", vfsconfigpath);
-  config = System->CreateConfigNew (path, false);
-  if (!config)
-    return false;
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, path, false);
+  config = System->GetConfig();
+  config->IncRef();
   bool retval = ReadConfig ();
   return retval;
 }

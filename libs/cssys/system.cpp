@@ -378,6 +378,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // a VFS volume.
   csConfigFile *DynamicConfig = new csConfigFile();
   Config = new csConfigManager(DynamicConfig);
+  Config->SetDynamicDomainPriority(ConfigPriorityApplication);
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
   // Initialize configuration file
@@ -1088,12 +1089,19 @@ iConfigManager *csSystemDriver::GetConfig ()
   return Config;
 }
 
-iConfigFile *csSystemDriver::CreateConfig (const char *iFileName, bool iVFS)
+void csSystemDriver::AddConfig(int Priority, const char *iFileName, bool iVFS)
+{
+  iConfigFileNew *cfg = CreateSeparateConfig(iFileName, iVFS);
+  Config->AddDomain(cfg, Priority);
+  cfg->DecRef();
+}
+
+iConfigFile *csSystemDriver::CreateINIConfig (const char *iFileName, bool iVFS)
 {
   return new csIniFile (iFileName, iVFS ? VFS : NULL);
 }
 
-iConfigFileNew *csSystemDriver::CreateConfigNew (const char *iFileName, bool iVFS)
+iConfigFileNew *csSystemDriver::CreateSeparateConfig (const char *iFileName, bool iVFS)
 {
   return new csConfigFile (iFileName, iVFS ? VFS : NULL);
 }

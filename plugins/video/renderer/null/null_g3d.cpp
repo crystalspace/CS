@@ -75,8 +75,9 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  config = System->CreateConfigNew ("/config/null3d.cfg");
-  if (!config) return false;
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/null3d.cfg");
+  config = System->GetConfig();
+  config->IncRef();
 
   width = height = -1;
 

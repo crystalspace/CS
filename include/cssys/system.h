@@ -436,13 +436,19 @@ public:
 
   /// Get the system configuration file: this does NOT IncRef the object
   virtual iConfigManager *GetConfig ();
-  /// Create a new configuration file object which resides on VFS
-  virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true);
+  /// Add a config file to the global config manager (convenience method)
+  virtual void AddConfig(int Priority, const char *iFileName, bool iVFS = true);
   /**
-   * Create a new configuration file object which resides on VFS. This method
-   * uses a new format for the config files, not the INI format.
+   * Create a new configuration file object which resides on VFS without
+   * adding it to the config manager. NOTE: The config file uses the soon
+   * outdated INI structure.
    */
-  virtual iConfigFileNew *CreateConfigNew (const char *iFileName, bool iVFS = true);
+  virtual iConfigFile *CreateINIConfig (const char *iFileName, bool iVFS = true);
+  /**
+   * Create a new configuration file object which resides on VFS without
+   * adding it to the config manager.
+   */
+  virtual iConfigFileNew *CreateSeparateConfig (const char *iFileName, bool iVFS = true);
   /// Save system configuration file if it was changed
   virtual bool SaveConfig ();
 

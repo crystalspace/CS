@@ -59,7 +59,9 @@ bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
-  Config = iSys->CreateConfigNew("/config/sound.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/sound.cfg");
+  Config = iSys->GetConfig();
+  Config->IncRef();
   return true;
 }
 

@@ -100,9 +100,9 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  config = System->CreateConfigNew ("/config/inf3d.cfg");
-  if (!config)
-    return false;
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/inf3d.cfg");
+  config = System->GetConfig();
+  config->IncRef();
 
   width = height = -1;
 

@@ -20,6 +20,7 @@
 #define __CS_ISYSTEM_H__
 
 #include "csutil/scf.h"
+#include "icfgmgr.h"
 
 /*
  * Several types of messages.
@@ -291,15 +292,29 @@ struct iSystem : public iBase
 
   //----------------------- Configuration file interface ---------------------//
 
+  /// Default priority values (you may use other values if you want)
+  enum
+  {
+    ConfigPriorityPlugIn        = iConfigManager::PriorityVeryLow,
+    ConfigPriorityApplication   = iConfigManager::PriorityLow,
+    ConfigPriorityUser          = iConfigManager::PriorityMedium,
+    ConfigPriorityCmdLine       = iConfigManager::PriorityHigh
+  };
   /// Get the system configuration file: this does NOT IncRef the object
   virtual iConfigManager *GetConfig () = 0;
-  /// Create a new configuration file object which resides on VFS
-  virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true) = 0;
+  /// Add a config file to the global config manager (convenience method)
+  virtual void AddConfig(int Priority, const char *iFileName, bool iVFS = true) = 0;
   /**
-   * Create a new configuration file object which resides on VFS. This method
-   * uses a new format for the config files, not the INI format.
+   * Create a new configuration file object which resides on VFS without
+   * adding it to the config manager. NOTE: The config file uses the soon
+   * outdated INI structure.
    */
-  virtual iConfigFileNew *CreateConfigNew (const char *iFileName, bool iVFS = true) = 0;
+  virtual iConfigFile *CreateINIConfig (const char *iFileName, bool iVFS = true) = 0;
+  /**
+   * Create a new configuration file object which resides on VFS without
+   * adding it to the config manager.
+   */
+  virtual iConfigFileNew *CreateSeparateConfig (const char *iFileName, bool iVFS = true) = 0;
   /// Save system configuration file if it was changed
   virtual bool SaveConfig () = 0;
 

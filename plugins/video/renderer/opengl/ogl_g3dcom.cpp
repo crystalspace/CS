@@ -214,9 +214,9 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 {
   (System = iSys)->IncRef ();
 
-  config = System->CreateConfigNew ("/config/opengl.cfg");
-  if (!config)
-    return false;
+  System->AddConfig (iSystem::ConfigPriorityPlugIn, "/config/opengl.cfg");
+  config = System->GetConfig();
+  config->IncRef();
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
