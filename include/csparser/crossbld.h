@@ -208,7 +208,7 @@ class csCrossBuild_Quake2Importer
   private:
     // VFS to use.  May be the default, or it may have
     // .zip files mounted containing the sprites
-    iVFS &localVFS;
+    iVFS *localVFS;
 
     // find a MD2 geometry file, load and return it, with all standard
     // actions already created
