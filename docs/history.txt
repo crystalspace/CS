@@ -42,6 +42,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine changed the Application rule in application.jam so that
 	  it also ensures that <appname>.txt gets removed at "jam clean" time.
 	  These .txt files are created on Windows when each application runs.
+	- Norman Kraemer added $@ to call of autoconf in script bin/autogen.sh
+	  to transfer optional commandline parameters to autoconf
 3-May-2003
 	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2

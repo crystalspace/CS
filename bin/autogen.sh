@@ -14,5 +14,5 @@ rm -f $MACROFILE
 for i in $MACRODIR/*.m4 ; do
   cat $i >> $MACROFILE
 done
-autoconf
+autoconf $@
 rm -f $MACROFILE
