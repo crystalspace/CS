@@ -12,6 +12,8 @@ chronological order.
 	- res changed the pixel format of the caca canvas to one that doesn't
 	  give color distortions.
 	- Wouter Wijngaards removed a warning in map2cs brush.cpp.
+	- Wouter Wijngaards fixed signed/unsigned warning in
+	  csLoader::CreateSequenceParameters.
 25-Mar-2005
 	- Wouter Wijngaards 
 	  - changed csBitArrayHashKeyHandler::ComputeHash in bitarray.h, 

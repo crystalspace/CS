@@ -219,7 +219,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 {
   error = false;
   csRef<iEngineSequenceParameters> params = sequence->CreateParameterBlock ();
-  int found_params = 0;
+  size_t found_params = 0;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
