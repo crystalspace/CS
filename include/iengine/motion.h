@@ -44,6 +44,12 @@ struct iMotionTemplate : public iBase
 {
   /// Get the name of this motion.
   virtual const char* GetName () = 0;
+  /// Get the duration of this motion.
+  virtual const float GetDuration() = 0;
+  /// Get the number of times to loop the motion
+  virtual const int   GetLoopCount() = 0;
+  /// Returns true if the motion will play backwards after playing forwards
+  virtual const bool  GetLoopFlip() = 0;
   /// Set the length of this motion.
   virtual void SetDuration (float duration) = 0;
   /**

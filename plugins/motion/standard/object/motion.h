@@ -89,6 +89,9 @@ public:
   unsigned int GetHash() { return hash; }
 
   virtual const char* GetName ();
+  virtual const float GetDuration() {return duration;};
+  virtual const int   GetLoopCount() {return loopcount;};
+  virtual const bool  GetLoopFlip() {return loopflip;};
   virtual void SetDuration (float duration);
   virtual void SetLoopCount (int loopcount);
   virtual void SetLoopFlip (bool enable);
