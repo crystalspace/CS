@@ -13,6 +13,7 @@ The history order has been reversed so that new features are at the top.
 	  instantiation, this had the particularly undesirable effect of
 	  creating and destroying VFS's global ArchiveCache twice, thus
 	  resulting in a crash on some platforms.
+	- Eric Sunshine fixed the 'clean' makefile target for Simple.
 31-May-2000
 	- Added a new allegro canvas driver from Burton Radonsxi
 	  <loth@pacificcoast.net>.  This allegro driver is developed on Linux
