@@ -35,6 +35,7 @@
 #include "csutil/scfstrv.h"
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
+#include "csutil/parray.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -177,38 +178,59 @@ public:
   }
 };
 
-class VfsArchiveCache : public csVector
+/// This class is thread-safe because it is global.
+class VfsArchiveCache
 {
+private:
+  csPDelArray<VfsArchive> array;
+
 public:
-  VfsArchiveCache () : csVector (8, 8)
+  VfsArchiveCache () : array (8, 8)
   {
   }
   virtual ~VfsArchiveCache ()
   {
-    DeleteAll ();
+    array.DeleteAll ();
   }
-  int CompareKey (void* Item, const void* Key, int Mode) const
+
+  /// Find a given archive file.
+  int FindKey (const char* Key) const
   {
-    (void)Mode;
-    return strcmp (((VfsArchive *)Item)->GetName (), (char *)Key);
+    int i;
+    for (i = 0; i < array.Length (); i++)
+      if (strcmp (array[i]->GetName (), Key) == 0)
+        return i;
+    return -1;
   }
-  virtual bool FreeItem (void* Item)
-  {
-    delete (VfsArchive *)Item;
-    return true;
-  }
+
   VfsArchive *Get (int iIndex)
   {
-    return (VfsArchive *)csVector::Get (iIndex);
+    return array.Get (iIndex);
   }
+
+  int Length () const
+  {
+    return array.Length ();
+  }
+
+  void Push (VfsArchive* ar)
+  {
+    array.Push (ar);
+  }
+
+  void DeleteAll ()
+  {
+    array.DeleteAll ();
+  }
+
   void CheckUp ()
   {
-	int i;
-    for (i = Length () - 1; i >= 0; i--)
+    int i;
+    for (i = array.Length () - 1; i >= 0; i--)
     {
-      VfsArchive *a = Get (i);
+      VfsArchive *a = array.Get (i);
       if (a->CheckUp ())
-        Delete (i);
+        array.Delete (i);
     }
   }
 };

@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	  object registry iterators.
 	- Added an entry to the faq about lack of hardware stencil causing
 	  possible slow-down if not accelerated.
+	- VfsArchiveCache (in VFS plugin) uses csPDelArray<T> instead
+	  of csVector.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if
