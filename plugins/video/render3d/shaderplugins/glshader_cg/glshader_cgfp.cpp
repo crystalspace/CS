@@ -44,7 +44,7 @@ SCF_IMPLEMENT_IBASE(csShaderGLCGFP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csShaderGLCGFP::Activate(iShaderPass* current, csRenderMesh* mesh)
+void csShaderGLCGFP::Activate(csRenderMesh* mesh)
 {
   int i;
 
@@ -99,9 +99,117 @@ void csShaderGLCGFP::Activate(iShaderPass* current, csRenderMesh* mesh)
   cgGLBindProgram (program);
 }
 
-void csShaderGLCGFP::Deactivate(iShaderPass* current)
+void csShaderGLCGFP::Deactivate()
 {
   cgGLDisableProfile (cgGetProgramProfile (program));
+}
+
+void csShaderGLCGFP::SetupState ( csRenderMesh *mesh, 
+                                csArray<iShaderVariableContext*> &dynamicDomains)
+{
+  int i;
+
+  // set variables
+  for(i = 0; i < variablemap.Length(); ++i)
+  {
+	if (!variablemap[i].parameter)
+      continue;
+    csShaderVariable* lvar = GetVariable(variablemap[i].name);
+
+    if(lvar)
+    {
+      switch(lvar->GetType())
+      {
+        case csShaderVariable::INT:
+          {
+            int intval;
+            if(lvar->GetValue(intval))
+              cgGLSetParameter1f(variablemap[i].parameter, (float)intval);
+          }
+          break;
+        case csShaderVariable::FLOAT:
+          {
+            float fval;
+            if(lvar->GetValue(fval))
+              cgGLSetParameter1f(variablemap[i].parameter, (float)fval);
+          }
+          break;
+        case csShaderVariable::VECTOR3:
+          {
+            csVector3 v3;
+            if(lvar->GetValue(v3))
+              cgGLSetParameter3f(variablemap[i].parameter, v3.x, v3.y, v3.z);
+          }
+          break;
+        case csShaderVariable::VECTOR4:
+          {
+            csVector4 v4;
+            if(lvar->GetValue(v4))
+              cgGLSetParameter4f(variablemap[i].parameter,
+	        v4.x, v4.y, v4.z, v4.w);
+          }
+          break;
+        default:
+	  break;
+      }
+    }
+  }
+
+  if (dynamicVars.Length() > 0)
+  {
+    for(i=0;i<dynamicDomains.Length();i++)
+    {
+      dynamicDomains[i]->FillVariableList(&dynamicVars);
+    }
+  }
+
+  for(i = 0; i < dynamicVars.Length(); ++i)
+  {
+    csShaderVariable* lvar = dynamicVars.Get(i).shaderVariable;
+
+    if(lvar)
+    {
+      switch(lvar->GetType())
+      {
+        case csShaderVariable::INT:
+          {
+            int intval;
+            if(lvar->GetValue(intval))
+              cgGLSetParameter1f(variablemap[i].parameter, (float)intval);
+          }
+          break;
+        case csShaderVariable::FLOAT:
+          {
+            float fval;
+            if(lvar->GetValue(fval))
+              cgGLSetParameter1f(variablemap[i].parameter, (float)fval);
+          }
+          break;
+        case csShaderVariable::VECTOR3:
+          {
+            csVector3 v3;
+            if(lvar->GetValue(v3))
+              cgGLSetParameter3f(variablemap[i].parameter, v3.x, v3.y, v3.z);
+          }
+          break;
+        case csShaderVariable::VECTOR4:
+          {
+            csVector4 v4;
+            if(lvar->GetValue(v4))
+              cgGLSetParameter4f(variablemap[i].parameter,
+	        v4.x, v4.y, v4.z, v4.w);
+          }
+          break;
+        default:
+	  break;
+      }
+      dynamicVars.Get (i).shaderVariable = 0;
+    }
+  }
+}
+
+void csShaderGLCGFP::ResetState()
+{
 }
 
 bool csShaderGLCGFP::LoadProgramStringToGL(const char* programstring)
@@ -240,7 +348,7 @@ bool csShaderGLCGFP::Load(iDocumentNode* program)
 }
 
   
-bool csShaderGLCGFP::Prepare()
+bool csShaderGLCGFP::Prepare(iShaderPass* current)
 {
   if (!LoadProgramStringToGL(programstring))
     return false;
