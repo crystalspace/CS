@@ -30,6 +30,7 @@
 #include "bugplug.h"
 #include "spider.h"
 #include "shadow.h"
+#include "csutil/debug.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iutil/event.h"
@@ -477,6 +478,10 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_STATUS:
         Report (CS_REPORTER_SEVERITY_NOTIFY, "I'm running smoothly, thank you...");
         break;
+      case DEBUGCMD_DEBUGGRAPH:
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Debug graph dumped!");
+	csDebuggingGraph::Dump (object_reg);
+        break;
       case DEBUGCMD_HELP:
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
         break;
@@ -880,6 +885,7 @@ int csBugPlug::GetCommandCode (const char* cmd)
   if (!strcmp (cmd, "terrvis"))		return DEBUGCMD_TERRVIS;
   if (!strcmp (cmd, "meshbbox"))	return DEBUGCMD_MESHBBOX;
   if (!strcmp (cmd, "meshrad"))		return DEBUGCMD_MESHRAD;
+  if (!strcmp (cmd, "debuggraph"))	return DEBUGCMD_DEBUGGRAPH;
 
   return DEBUGCMD_UNKNOWN;
 }

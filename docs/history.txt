@@ -1,5 +1,39 @@
 The history order is reversed so that new features are at the top.
 
+14-Nov-2001
+	- It is very hard to properly debug the huge graph or tree structures
+	  that are used a lot in Crystal Space. Using 'printf' just doesn't
+	  cut it (too much information) and a debugger is hardly better.
+	  That's why a new static class is added (csDebuggingGraph) which
+	  helps with debugging any kind of graph or tree. Using that class
+	  you can build a debug-graph of any kind of pointer with description.
+	  Later you can dump the resulting graph given a good idea on how
+	  everything is linked together. To use it you basically use macros
+	  like this:
+	  	DG_ADD (object_reg, pointer1, "Object 1");
+		DG_ADD (object_reg, pointer2, "Object 2");
+		DG_ADD (object_reg, pointer3, "Object 3");
+		DG_LINK (object_reg, pointer1, pointer2);
+		DG_ADDCHILD (object_reg, pointer2, pointer3);
+		DG_REM (object_reg, pointer2);
+		csDebuggingGraph::Dump (object_reg);
+	  You can issue such commands in the constructors/destructors
+	  of the objects you want to debug.
+	  Note that this tool has two modes. With exact mode (default)
+	  the graph will exactly follow the commands that are issued. This
+	  means that if you remove an object (DG_REM) without removing
+	  links to it (DG_REMCHILD, DG_REMPARENT, ...) then the graph will
+	  be invalid and the Dump will show the invalid links. This is
+	  VERY useful for debugging.
+	  With non-exact mode you can let this graph do the maintenance
+	  of removing dead links on its own. When you remove an object
+	  in this scenario all links (parent or child) to that object will
+	  be removed automatically. This means that the debug graph cannot
+	  get invalid in this scenario (although the real graph you are
+	  debugging can).
+	- Added a new command 'debuggraph' to bugplug. This will call
+	  csDebuggingGraph::Dump() so you can use it to dump the graph
+	  that is in memory. It is assigned to the ctrl-g key.
 13-Nov-2001
 	- Small comment fix in vfs.h.
 	- Fixed a bad bug in csObject destructor. It appears that it could

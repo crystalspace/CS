@@ -93,6 +93,7 @@ class csShadow;
 #define DEBUGCMD_TERRVIS	1021	// Enable/disable terrain visibility
 #define DEBUGCMD_MESHBBOX	1022	// Show BBOX of selected mesh
 #define DEBUGCMD_MESHRAD	1023	// How RADIUS of selected mesh
+#define DEBUGCMD_DEBUGGRAPH	1024	// Do a dump of the debug graph
 
 /**
  * For key mappings.
