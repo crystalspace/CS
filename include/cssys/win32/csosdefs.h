@@ -45,6 +45,12 @@
   #pragma auto_inline (on)
 #endif
 
+#ifdef COMP_VC
+typedef __int64 int64_t;
+#else
+typedef long long int64_t;
+#endif
+
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
 #include <windows.h>

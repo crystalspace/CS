@@ -27,10 +27,6 @@ SCF_IMPLEMENT_IBASE (csOggSoundData)
   SCF_IMPLEMENTS_INTERFACE (iSoundData)
 SCF_IMPLEMENT_IBASE_END
 
-#if defined (COMP_VC)
-typedef __int64 int64_t;
-#endif
-
 static size_t cs_ogg_read (void *ptr, size_t size, size_t nmemb, void *datasource)
 {
   csOggSoundData::datastore *ds = (csOggSoundData::datastore*)datasource;
