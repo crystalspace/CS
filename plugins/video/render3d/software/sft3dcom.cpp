@@ -32,7 +32,6 @@
 #include "soft_txt.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/rendermesh.h"
-#include "imesh/thing/lightmap.h"	//@@@!!!
 #include "sft3dcom.h"
 #include "csutil/garray.h"
 #include "csutil/scfstrset.h"

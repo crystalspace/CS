@@ -737,7 +737,6 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/ball.h"
 %include "imesh/genmesh.h"
 %include "imesh/thing/thing.h"
-%include "imesh/thing/lightmap.h"
 %include "imesh/thing/polygon.h"
 
 %extend iSprite2DState

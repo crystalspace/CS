@@ -31,7 +31,6 @@
 #include "tcache.h"
 #include "soft_txt.h"
 #include "ivideo/graph2d.h"
-#include "imesh/thing/lightmap.h"	//@@@!!!
 #include "sft3dcom.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
