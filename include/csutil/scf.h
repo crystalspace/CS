@@ -31,6 +31,7 @@
 class csPluginPaths;
 
 #include "csutil/ref.h"
+#include "csutil/array.h"
 
 /**
  * Type of registered interface handle used by iBase::QueryInterface().
@@ -120,6 +121,18 @@ struct iBase
   SCF_DECLARE_EMBEDDED_IBASE (iBase)
 
 /**
+ * This macro should be embedded into any SCF-capable class definition
+ * to declare the minimal functionality required by iBase interface.
+ * This is a special version which supports weak references (the
+ * csWeakRef<T> class).
+ */
+#define SCF_DECLARE_IBASE_WEAK(Class)					\
+  csArray<Class**> weak_ref_owners;					\
+  virtual void AddRefOwner (Class** ref_owner);				\
+  virtual void RemoveRefOwner (Class** ref_owner);			\
+  SCF_DECLARE_IBASE
+
+/**
  * SCF_DECLARE_EMBEDDED_IBASE is used to declare the methods of iBase inside
  * an embedded class that is exposed via QueryInterface...
  */
@@ -187,6 +200,46 @@ void Class::DecRef ()							\
 }
 
 /**
+ * The SCF_IMPLEMENT_IBASE_WEAK_DECREF() macro implements the DecRef() method
+ * for a class in a C++ source module.  Typically, this macro is automatically
+ * employed by the SCF_IMPLEMENT_IBASE_WEAK() convenience macro.
+ * <p>
+ * This version clears the pointers for all weak reference owners.
+ */
+#define SCF_IMPLEMENT_IBASE_WEAK_DECREF(Class)				\
+void Class::DecRef ()							\
+{									\
+  if (scfRefCount == 1)							\
+  {									\
+    for (int i = 0 ; i < weak_ref_owners.Length () ; i++)		\
+    {									\
+      Class** p = weak_ref_owners[i];					\
+      *p = 0;								\
+    }									\
+    SCF_TRACE ((" delete (%s *)%p\n", #Class, this));			\
+    if (scfParent)							\
+      scfParent->DecRef ();						\
+    delete this;							\
+    return;								\
+  }									\
+  scfRefCount--;							\
+}
+
+/**
+ * The SCF_IMPLEMENT_IBASE_WEAK_REFOWNER() macro implements the AddRefOwner()
+ * and RemoveRefOwner() for a weak reference.
+ */
+#define SCF_IMPLEMENT_IBASE_WEAK_REFOWNER(Class)			\
+void Class::AddRefOwner (Class** ref_owner)				\
+{									\
+  weak_ref_owners.Push (ref_owner);					\
+}									\
+void Class::RemoveRefOwner (Class** ref_owner)				\
+{									\
+  weak_ref_owners.Delete (ref_owner);					\
+}
+
+/**
  * The SCF_IMPLEMENT_IBASE_GETREFCOUNT() macro implements GetRefCount()
  * for a class in a C++ source module.
  */
@@ -231,10 +284,30 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   SCF_IMPLEMENT_IBASE_QUERY(Class)
 
 /**
+ * The SCF_IMPLEMENT_IBASE_WEAK() macro should be used within the C++ source
+ * module that implements a interface derived from iBase.  Of course, you can
+ * still implement those methods manually, if you desire ...
+ * This version is for use with weak reference counting.
+ */
+#define SCF_IMPLEMENT_IBASE_WEAK(Class)					\
+  SCF_IMPLEMENT_IBASE_INCREF(Class)					\
+  SCF_IMPLEMENT_IBASE_WEAK_DECREF(Class)				\
+  SCF_IMPLEMENT_IBASE_WEAK_REFOWNER(Class)				\
+  SCF_IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
+  SCF_IMPLEMENT_IBASE_QUERY(Class)
+
+/**
  * The SCF_IMPLEMENT_IBASE_END macro is used to finish an SCF_IMPLEMENT_IBASE
  * definition
  */
 #define SCF_IMPLEMENT_IBASE_END						\
+  SCF_IMPLEMENT_IBASE_QUERY_END
+
+/**
+ * The SCF_IMPLEMENT_IBASE_WEAK_END macro is used to finish an
+ * SCF_IMPLEMENT_IBASE_WEAK definition
+ */
+#define SCF_IMPLEMENT_IBASE_WEAK_END					\
   SCF_IMPLEMENT_IBASE_QUERY_END
 
 /**

@@ -21,6 +21,21 @@ chronological order.
 	- Keith updated the example .cal3d file in
 	  /plugins/mesh/sprcal3d/persist.
 	- Jorrit fixed a compile error in thing.cpp for old renderer.
+	- Jorrit added the notion of weak references to CS (experimental
+	  feature, untested). First there is a csWeakRef<T> which takes
+	  an object of type T that implements at least AddRefOwner() and
+	  RemoveRefOwner(). The weak reference doesn't call IncRef() on
+	  the object but it will call AddRefOwner(). As soon as the object
+	  is destroyed the pointer in the weak reference will be set to
+	  0.
+	- Jorrit added several macros in scf.h to assist the creation of
+	  objects that support weak references (all untested). Basically
+	  you can now do in the class definition:
+	      SCF_DECLARE_IBASE_WEAK (csMyClass)
+	  and then in the source file:
+	      SCF_IMPLEMENT_IBASE_WEAK (csMyClass)
+	         SCF_IMPLEMENTS_INTERFACE ...
+	      SCF_IMPLEMENT_IBASE_WEAK_END
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
