@@ -123,7 +123,9 @@ public:
 #define END_EXTENSION_HEADER(ClassName)  \
   DECLARE_IUNKNOWN() \
   DECLARE_INTERFACE_TABLE(cse##ClassName) \
-}; \
+};
+
+#define IMPLEMENT_EXTENSION(ClassName) \
 EXTENSION_FACTORY(ClassName) \
 IMPLEMENT_UNKNOWN_NODELETE(cse##ClassName) \
 BEGIN_INTERFACE_TABLE(cse##ClassName) \
