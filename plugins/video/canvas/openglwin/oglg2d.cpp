@@ -280,19 +280,22 @@ bool csGraphics2DOpenGL::Open(char *Title)
   DWORD style = WS_POPUP;// | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
   if (!FullScreen)
 	  style |= WS_CAPTION;
-  if (FullScreen) {
-        ChangeDisplaySettings(NULL,0);
+  if (FullScreen) 
+  {
+    ChangeDisplaySettings(NULL,0);
 
-        EnumDisplaySettings(NULL, 0, &dmode);
+    EnumDisplaySettings(NULL, 0, &dmode);
 
-        dmode.dmPelsWidth = Width;
-        dmode.dmPelsHeight = Height;
-        dmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+    dmode.dmPelsWidth = Width;
+    dmode.dmPelsHeight = Height;
+    dmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
-        if((ti!= ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) == DISP_CHANGE_SUCCESSFUL) {
-        //The cases below need error handling, as theyare errors. 
-        switch(ti) {
-	case DISP_CHANGE_RESTART:
+    if((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL) 
+    {
+      //The cases below need error handling, as theyare errors. 
+      switch(ti) 
+      {
+        case DISP_CHANGE_RESTART:
         //computer must restart for mode to work.
         break;
         case DISP_CHANGE_BADFLAGS:
@@ -308,6 +311,7 @@ bool csGraphics2DOpenGL::Open(char *Title)
         //Unknown Error
         break;
       }
+    }
   }
 
   int wwidth,wheight;
@@ -315,7 +319,7 @@ bool csGraphics2DOpenGL::Open(char *Title)
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
   m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
-	                      (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
+                          (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                           (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                           wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   if( !m_hWnd )
@@ -364,7 +368,7 @@ void csGraphics2DOpenGL::Close(void)
   }
   ReleaseDC(m_hWnd, hDC);
 
-  if (Fullscreen) ChangeDisplayMode(NULL,0); 
+  if (FullScreen) ChangeDisplaySettings(NULL,0); 
 
   if(!FullScreen)
   {
