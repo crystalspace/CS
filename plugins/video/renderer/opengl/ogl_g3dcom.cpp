@@ -446,6 +446,12 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
+  report_gl_errors = config->GetBool ("Video.OpenGL.ReportGLErrors"
+#ifdef CS_DEBUG
+    , true
+#endif
+    );
+
   csRef<iPluginManager> plugin_mgr (
     CS_QUERY_REGISTRY (object_reg, iPluginManager));
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
@@ -5734,4 +5740,49 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
     pass->SetRendererData( SCF_QUERY_INTERFACE(pass_data, iBase) );
   }
   return true;
+}
+
+bool csGraphics3DOGLCommon::CheckGLError (char* call)
+{
+  GLenum res = glGetError();
+
+  if (res == GL_NO_ERROR)
+  {
+    return true;
+  }
+  else
+  {
+    char msg[64];
+    switch(res)
+    {
+      case GL_INVALID_ENUM:
+        strcpy (msg, "enum argument out of range");
+	break;
+      case GL_INVALID_VALUE:
+        strcpy (msg, "Numeric argument out of range");
+	break;
+      case GL_INVALID_OPERATION:
+	strcpy (msg, "Operation illegal in current state");
+	break;
+      case GL_STACK_OVERFLOW: 
+	strcpy (msg, "Command would cause a stack overflow");
+	break;
+      case GL_STACK_UNDERFLOW:
+	strcpy (msg, "Command would cause a stack undeflow");
+	break;
+      case GL_OUT_OF_MEMORY:
+	strcpy (msg, "Not enough memory left to execute command");
+	break;
+      case GL_TABLE_TOO_LARGE:
+	strcpy (msg, "The specified table is too large");
+	break;
+      default:
+	sprintf (msg, "unknown GL error %x", res);
+	break;
+    }
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "GL reported error for %s: %s", call, msg);
+    
+    return false;
+  }
 }

@@ -407,6 +407,8 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
     }
 
     glDeleteTextures (1, &t);
+
+    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, 1);
   }
   else
   {

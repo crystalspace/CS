@@ -240,6 +240,11 @@ public:
    */
   void SetGlOrtho (bool inverted);
 
+  /**
+   * Calls glGetError(). Returnms true if no error occured,
+   * otherwise false. Also reports the error if enabled by user.
+   */
+  bool CheckGLError (char* call);
 private:
 
   csRef<iEffectServer> effectserver;
@@ -496,6 +501,11 @@ protected:
   // helpers for cam->tex conversion
   float M, N, O;
   float J1, J2, J3, K1, K2, K3;
+
+  /**
+   * if true, CheckGLError() will report errors
+   */
+  bool report_gl_errors;
 
   // declare all the extension function pointers
 # define _CSGLEXT_
