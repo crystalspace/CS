@@ -35,8 +35,13 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csODEDynamics)
   SCF_IMPLEMENTS_INTERFACE (iDynamics)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamics::ODEDynamicState)
+  SCF_IMPLEMENTS_INTERFACE (iODEDynamicState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamics::Component)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
@@ -44,10 +49,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csODEDynamicSystem)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDynamicSystem)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicSystemState);
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamicSystem::DynamicSystem)
   SCF_IMPLEMENTS_INTERFACE (iDynamicSystem)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamicSystem::ODEDynamicSystemState)
+  SCF_IMPLEMENTS_INTERFACE (iODEDynamicSystemState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEBodyGroup)
@@ -83,6 +93,7 @@ csODEDynamics::csODEDynamics (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEDynamicState);
   object_reg = 0;
 
   // Initialize the colliders so that the class isn't overwritten
@@ -96,6 +107,16 @@ csODEDynamics::csODEDynamics (iBase* parent)
   c.aabb_test = 0;
   c.dtor = 0;
   geomclassnum = dCreateGeomClass (&c);
+
+  erp = 0.2;
+  cfm = 1e-5;
+
+  rateenabled = false;
+  steptime = limittime = total_elapsed = 0.0;
+
+  stepfast = false;
+  sfiter = 10;
+  fastobjects = false;
 }
 
 csODEDynamics::~csODEDynamics ()
@@ -111,9 +132,8 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
-  csODEDynamicSystem* system = new csODEDynamicSystem ();
+  csODEDynamicSystem* system = new csODEDynamicSystem (erp, cfm);
   csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
-  systems.Push (isystem);
   isystem->DecRef ();
   return csPtr<iDynamicSystem> (isystem);
 }
@@ -128,12 +148,25 @@ iDynamicSystem *csODEDynamics::FindSystem (const char *name)
   return systems.FindByName (name);
 }
 
-void csODEDynamics::Step (float stepsize)
+void csODEDynamics::Step (float elapsed_time)
 {
-  for (long i=0; i<systems.Length(); i++)
-  {
-    systems.Get (i)->Step (stepsize);
-    dJointGroupEmpty (contactjoints);
+  float stepsize;
+  if (rateenabled) {
+  	stepsize = steptime;
+	if (elapsed_time > limittime) { elapsed_time = limittime; }
+  } else {
+  	stepsize = elapsed_time;
+  }
+  total_elapsed += elapsed_time;
+
+  // TODO handle fractional total_remaining (interpolate render)
+  while (total_elapsed > stepsize) {
+    total_elapsed -= stepsize;
+    for (long i=0; i<systems.Length(); i++)
+    {
+      systems.Get (i)->Step (stepsize);
+      dJointGroupEmpty (contactjoints);
+    }
   }
 }
 
@@ -659,18 +692,70 @@ void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
   aabb[4] = box.MinZ(); aabb[5] = box.MaxZ();
 }
 
-csODEDynamicSystem::csODEDynamicSystem ()
+void csODEDynamics::SetGlobalERP (float erp)
+{
+  csODEDynamics::erp = erp;
+
+  for (int i = 0; i < systems.Length(); i ++) {
+	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+	  iODEDynamicSystemState);
+  	sys->SetERP (erp);
+  }
+}
+
+void csODEDynamics::SetGlobalCFM (float cfm)
+{
+  csODEDynamics::cfm = cfm;
+  for (int i = 0; i < systems.Length(); i ++) {
+	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+	  iODEDynamicSystemState);
+  	sys->SetCFM (cfm);
+  }
+}
+
+void csODEDynamics::EnableStepFast (bool enable)
+{
+  stepfast = enable;
+
+  for (int i = 0; i < systems.Length(); i ++) {
+	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+	  iODEDynamicSystemState);
+  	sys->EnableStepFast (enable);
+  }
+}
+
+void csODEDynamics::SetStepFastIterations (int iter)
+{
+  sfiter = iter;
+
+  for (int i = 0; i < systems.Length(); i ++) {
+	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+	  iODEDynamicSystemState);
+  	sys->SetStepFastIterations (iter);
+  }
+}
+
+csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynamicSystem);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEDynamicSystemState);
 
   //TODO: QUERY for collidesys
 
   worldID = dWorldCreate ();
   spaceID = dHashSpaceCreate (0);
-  dWorldSetCFM (worldID,1e-5);
+  dWorldSetERP (worldID, erp);
+  dWorldSetCFM (worldID, cfm);
   roll_damp = 1.0;
   lin_damp = 1.0;
   move_cb = (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
+
+  rateenabled = false;
+  steptime = limittime = total_elapsed = 0.0;
+
+  stepfast = false;
+  sfiter = 10;
+  fastobjects = false;
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()
@@ -744,17 +829,37 @@ const csVector3 csODEDynamicSystem::GetGravity () const
   return csVector3 (grav[0], grav[1], grav[2]);
 }
 
-void csODEDynamicSystem::Step (float stepsize)
+void csODEDynamicSystem::Step (float elapsed_time)
 {
   dSpaceCollide (spaceID, this, &csODEDynamics::NearCallback);
-  dWorldStep (worldID, stepsize);
+  float stepsize;
+  if (rateenabled) {
+  	stepsize = steptime;
+	if (elapsed_time > limittime) { elapsed_time = limittime; }
+  } else {
+  	stepsize = elapsed_time;
+  }
+  total_elapsed += elapsed_time;
+
+  // TODO handle fractional total_remaining (interpolate render)
+  while (total_elapsed > stepsize) {
+    total_elapsed -= stepsize;
+    if (stepfast) {
+      dWorldStep (worldID, stepsize);
+    } else {
+      dWorldStepFast (worldID, stepsize, sfiter);
+    }
+    for (long i = 0; i < bodies.Length(); i ++) {
+        iRigidBody *b = bodies.Get(i);
+        b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
+        b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
+    }
+  }
 
   for (long i=0; i<bodies.Length(); i++)
   {
     iRigidBody *b = bodies.Get(i);
     b->Update ();
-    b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
-    b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
   }
 }
 
@@ -1013,12 +1118,12 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   mat[0] = b.GetMatrix().m11; mat[1] = b.GetMatrix().m12; mat[2] = b.GetMatrix().m13;
   mat[3] = b.GetMatrix().m21; mat[4] = b.GetMatrix().m22; mat[5] = b.GetMatrix().m23;
   mat[6] = b.GetMatrix().m31; mat[7] = b.GetMatrix().m32; mat[8] = b.GetMatrix().m33;
+  dMassRotate (&m, mat);
 
   mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
   mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
   mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
   dGeomSetRotation (gid, mat);
-  dMassRotate (&m, mat);
 
   dGeomSetPosition (gid,
     trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);

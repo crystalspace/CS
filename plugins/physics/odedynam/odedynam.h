@@ -42,6 +42,7 @@
 #undef ode_int8
 
 #include "ivaria/dynamics.h"
+#include "ivaria/ode.h"
 
 struct iObjectRegistry;
 struct iMeshWrapper;
@@ -108,6 +109,15 @@ private:
   static dJointGroupID contactjoints;
 
   csRefArrayObject<iDynamicSystem> systems;
+  float erp, cfm;
+
+  bool rateenabled;
+  float steptime, limittime;
+  float total_elapsed;
+
+  bool stepfast;
+  int sfiter;
+  bool fastobjects;
 
 public:
   SCF_DECLARE_IBASE;
@@ -135,6 +145,60 @@ public:
   	dContactGeom *contact, int skip);
   static dColliderFn* CollideSelector (int num);
   static void GetAABB (dGeomID g, dReal aabb[6]);
+
+  void SetGlobalERP (float erp);
+  float GlobalERP () { return erp; }
+  void SetGlobalCFM (float cfm);
+  float GlobalCFM () { return cfm; }
+  void EnableStepFast (bool enable);
+  bool StepFastEnabled () { return stepfast; }
+  void SetStepFastIterations (int iter);
+  int StepFastIterations () { return sfiter; }
+  void EnableFrameRate (bool enable) { rateenabled = enable; }
+  bool FrameRateEnabled () { return rateenabled; }
+  void SetFrameRate (float hz) { steptime = 1.0 / hz; }
+  float FrameRate () { return 1.0 / steptime; }
+  void SetFrameLimit (float hz) { limittime = 1.0 / hz; }
+  float FrameLimit () { return 1.0 / limittime; }
+  void EnableFastObjects (bool enable) { fastobjects = enable; }
+  bool FastObjectsEnabled () { return false; }
+
+  struct ODEDynamicState : public iODEDynamicState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csODEDynamics);
+    void SetGlobalERP (float erp)
+    { scfParent->SetGlobalERP (erp); }
+    float GlobalERP ()
+    { return scfParent->GlobalERP (); }
+    void SetGlobalCFM (float cfm) 
+    { scfParent->SetGlobalCFM (cfm); }
+    float GlobalCFM () 
+    { return scfParent->GlobalCFM (); }
+    void EnableStepFast (bool enable)
+    { scfParent->EnableStepFast (enable); }
+    bool StepFastEnabled () 
+    { return scfParent->StepFastEnabled (); }
+    void SetStepFastIterations (int iter)
+    { scfParent->SetStepFastIterations (iter); }
+    int StepFastIterations ()
+    { return scfParent->StepFastIterations (); }
+    void EnableFrameRate (bool enable)
+    { scfParent->EnableFrameRate (enable); }
+    bool FrameRateEnabled ()
+    { return scfParent->FrameRateEnabled (); }
+    void SetFrameRate (float hz)
+    { scfParent->SetFrameRate (hz); }
+    float FrameRate ()
+    { return scfParent->FrameRate (); }
+    void SetFrameLimit (float hz)
+    { scfParent->SetFrameLimit (hz); }
+    float FrameLimit ()
+    { return scfParent->FrameLimit (); }
+    void EnableFastObjects (bool enable)
+    { scfParent->EnableFastObjects (enable); }
+    bool FastObjectsEnabled ()
+    { return scfParent->FastObjectsEnabled (); }
+  } scfiODEDynamicState;
 
   struct Component : public iComponent
   {
@@ -170,6 +234,14 @@ private:
   csRefArray<csODEJoint> joints;
 
   csGeomList geoms;
+
+  bool rateenabled;
+  float steptime, limittime;
+  float total_elapsed;
+
+  bool stepfast;
+  int sfiter;
+  bool fastobjects;
 
 public:
   SCF_DECLARE_IBASE_EXT (csObject);
@@ -226,7 +298,62 @@ public:
   } scfiDynamicSystem;
   friend struct DynamicSystem;
 
-  csODEDynamicSystem ();
+  void SetERP (float erp) { dWorldSetERP (worldID, erp); }
+  float ERP () { return dWorldGetERP (worldID); }
+  void SetCFM (float cfm) { dWorldSetCFM (worldID, cfm); }
+  float CFM () { return dWorldGetCFM (worldID); }
+  void EnableStepFast (bool enable) { stepfast = enable; }
+  bool StepFastEnabled () { return stepfast; }
+  void SetStepFastIterations (int iter) { sfiter = iter; }
+  int StepFastIterations () { return sfiter; }
+  void EnableFrameRate (bool enable) { rateenabled = enable; }
+  bool FrameRateEnabled () { return rateenabled; }
+  void SetFrameRate (float hz) { steptime = 1.0 / hz; }
+  float FrameRate () { return 1.0 / steptime; }
+  void SetFrameLimit (float hz) { limittime = 1.0 / hz; }
+  float FrameLimit () { return 1.0 / limittime; }
+  void EnableFastObjects (bool enable) { fastobjects = enable; }
+  bool FastObjectsEnabled () { return false; }
+
+  struct ODEDynamicSystemState : public iODEDynamicSystemState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csODEDynamicSystem);
+    void SetERP (float erp)
+    { scfParent->SetERP (erp); }
+    float ERP ()
+    { return scfParent->ERP (); }
+    void SetCFM (float cfm) 
+    { scfParent->SetCFM (cfm); }
+    float CFM () 
+    { return scfParent->CFM (); }
+    void EnableStepFast (bool enable)
+    { scfParent->EnableStepFast (enable); }
+    bool StepFastEnabled () 
+    { return scfParent->StepFastEnabled (); }
+    void SetStepFastIterations (int iter)
+    { scfParent->SetStepFastIterations (iter); }
+    int StepFastIterations ()
+    { return scfParent->StepFastIterations (); }
+    void EnableFrameRate (bool enable)
+    { scfParent->EnableFrameRate (enable); }
+    bool FrameRateEnabled ()
+    { return scfParent->FrameRateEnabled (); }
+    void SetFrameRate (float hz)
+    { scfParent->SetFrameRate (hz); }
+    float FrameRate ()
+    { return scfParent->FrameRate (); }
+    void SetFrameLimit (float hz)
+    { scfParent->SetFrameLimit (hz); }
+    float FrameLimit ()
+    { return scfParent->FrameLimit (); }
+    void EnableFastObjects (bool enable)
+    { scfParent->EnableFastObjects (enable); }
+    bool FastObjectsEnabled ()
+    { return scfParent->FastObjectsEnabled (); }
+  } scfiODEDynamicSystemState;
+
+
+  csODEDynamicSystem (float erp, float cfm);
   virtual ~csODEDynamicSystem ();
 
   dWorldID GetWorldID() { return worldID; }
