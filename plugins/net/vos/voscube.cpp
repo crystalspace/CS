@@ -36,21 +36,21 @@ using namespace VOS;
 class ConstructCubeTask : public Task
 {
 public:
-    csRef<iObjectRegistry> object_reg;
-    vRef<csMetaMaterial> metamat;
-    vRef<csMetaCube> cube;
-    std::string name;
-    csRef<iSector> sector;
+  csRef<iObjectRegistry> object_reg;
+  vRef<csMetaMaterial> metamat;
+  vRef<csMetaCube> cube;
+  std::string name;
+  csRef<iSector> sector;
 
-    ConstructCubeTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
-                      csMetaCube* c, std::string n, csRef<iSector> s);
-    virtual ~ConstructCubeTask();
-    virtual void doTask();
+  ConstructCubeTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
+                    csMetaCube* c, std::string n, csRef<iSector> s);
+  virtual ~ConstructCubeTask();
+  virtual void doTask();
 };
 
 ConstructCubeTask::ConstructCubeTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
                                      csMetaCube* c, std::string n, csRef<iSector> s)
-    : object_reg(objreg), metamat(mat), cube(c, true), name(n), sector(s)
+  : object_reg(objreg), metamat(mat), cube(c, true), name(n), sector(s)
 {
 }
 
@@ -60,57 +60,53 @@ ConstructCubeTask::~ConstructCubeTask()
 
 void ConstructCubeTask::doTask()
 {
-    csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-    // should store a single cube factory for everything?  or do we always get
-    // the same one back?
-    //if(! cube_factory) {
-    csRef<iMeshFactoryWrapper> cube_factory = engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh",
-                                                                         "cube_factory");
-    //}
+  // should store a single cube factory for everything?  or do we always get
+  // the same one back?
+  //if(! cube_factory) {
+  csRef<iMeshFactoryWrapper> cube_factory = engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh",
+                                                                       "cube_factory");
+  //}
 
-    csRef<iGeneralFactoryState> cubeLook = SCF_QUERY_INTERFACE(cube_factory->GetMeshObjectFactory(),
-                                                               iGeneralFactoryState);
-    if(cubeLook)
-    {
-        cubeLook->SetMaterialWrapper(metamat->getMaterialWrapper());
-        cubeLook->GenerateBox(csBox3(-.5, -.5, -.5, .5, .5, .5));
+  csRef<iGeneralFactoryState> cubeLook = SCF_QUERY_INTERFACE(cube_factory->GetMeshObjectFactory(),
+                                                             iGeneralFactoryState);
+  if(cubeLook)
+  {
+    cubeLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
+    cubeLook->GenerateBox(csBox3(-.5, -.5, -.5, .5, .5, .5));
 
-        csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (cube_factory, name.c_str(),
-                                                                     sector, csVector3(0, 0, 0));
-        cube->getCSinterface()->SetMeshWrapper(meshwrapper);
-    }
+    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (cube_factory, name.c_str(),
+                                                                 sector, csVector3(0, 0, 0));
+    cube->GetCSinterface()->SetMeshWrapper(meshwrapper);
+  }
 }
 
 /// csMetaCube ///
 
 csMetaCube::csMetaCube(VobjectBase* superobject)
-    : A3DL::Object3D(superobject),
-      csMetaObject3D(superobject),
-      A3DL::Cube(superobject)
+  : A3DL::Object3D(superobject),
+    csMetaObject3D(superobject),
+    A3DL::Cube(superobject)
 {
 }
 
 MetaObject* csMetaCube::new_csMetaCube(VobjectBase* superobject, const std::string& type)
 {
-    return new csMetaCube(superobject);
+  return new csMetaCube(superobject);
 }
 
-void csMetaCube::setup(csVosA3DL* vosa3dl, csVosSector* sect)
+void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
-    vRef<A3DL::Material> m = getMaterial();
-    for(TypeSetIterator ti = m->getTypes(); ti.hasMore(); ti++)
-    {
-        LOG("voscube", 2, "type " << (*ti));
-    }
-    vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
-    LOG("csMetaCube", 2, "getting material " << mat.isValid());
-    mat->setup(vosa3dl);
-    LOG("csMetaCube", 2, "setting up cube");
-    vosa3dl->mainThreadTasks.push(new ConstructCubeTask(vosa3dl->GetObjectRegistry(), mat,
-                                                        this, getURLstr(), sect->GetSector()));
+  vRef<A3DL::Material> m = getMaterial();
+  vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
+  LOG("csMetaCube", 3, "getting material " << mat.isValid());
+  mat->Setup(vosa3dl);
+  LOG("csMetaCube", 3, "setting up cube");
+  vosa3dl->mainThreadTasks.push(new ConstructCubeTask(vosa3dl->GetObjectRegistry(), mat,
+                                                      this, getURLstr(), sect->GetSector()));
 
-    LOG("csMetaCube", 2, "calling csMetaObject3D::setup");
-    csMetaObject3D::setup(vosa3dl, sect);
+  LOG("csMetaCube", 3, "calling csMetaObject3D::setup");
+  csMetaObject3D::Setup(vosa3dl, sect);
 }
 

@@ -108,7 +108,7 @@ csMetaTexture::~csMetaTexture()
 {
 }
 
-void csMetaTexture::setup(csVosA3DL* vosa3dl)
+void csMetaTexture::Setup(csVosA3DL* vosa3dl)
 {
     if(alreadyLoaded) return;
 
@@ -130,7 +130,7 @@ void csMetaTexture::setup(csVosA3DL* vosa3dl)
     }
 
     ConstructTextureTask* ctt = new ConstructTextureTask(vosa3dl->GetObjectRegistry(),
-                                                         imagedata->getURLstr(),
+                                                         getURLstr(),
                                                          cachefilename,
                                                          this);
     imagedata->read(ctt->texturedata);
@@ -187,7 +187,7 @@ void csMetaTexture::notifyPropertyChange(const PropertyEvent& event)
     catch(RemoteError) { }
 }
 
-csRef<iTextureWrapper> csMetaTexture::getTextureWrapper()
+csRef<iTextureWrapper> csMetaTexture::GetTextureWrapper()
 {
     return texturewrapper;
 }

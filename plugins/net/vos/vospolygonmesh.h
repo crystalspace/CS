@@ -20,43 +20,23 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef _CSVOSOBJECT3D_H_
-#define _CSVOSOBJECT3D_H_
 
-#include <vos/metaobjects/a3dl/object3d.hh>
+#ifndef _VOSPOLYGONMESH_H_
+#define _VOSPOLYGONMESH_H_
+
+#include <vos/metaobjects/a3dl/polygonmesh.hh>
 #include "inetwork/vosa3dl.h"
-#include "iengine/mesh.h"
 #include "csvosa3dl.h"
-#include "vossector.h"
+#include "vosobject3d.h"
 
-class csVosObject3D : public iVosObject3D
+class csMetaPolygonMesh : public virtual csMetaObject3D, public virtual A3DL::PolygonMesh
 {
-private:
-  csRef<iMeshWrapper> meshwrapper;
-
 public:
-  SCF_DECLARE_IBASE;
+  csMetaPolygonMesh(VOS::VobjectBase* superobject);
 
-  csVosObject3D();
-  virtual ~csVosObject3D();
-
-  virtual csRef<iMeshWrapper> GetMeshWrapper();
-
-  void SetMeshWrapper(iMeshWrapper* mw);
-};
-
-class csMetaObject3D : public virtual A3DL::Object3D
-{
-protected:
-  csVosObject3D* csvobj3d;
-public:
-  csMetaObject3D(VOS::VobjectBase* superobject);
-  virtual ~csMetaObject3D();
-
-  static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject, const std::string& type);
+  static VOS::MetaObject* new_csMetaPolygonMesh(VOS::VobjectBase* superobject, const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
-  csRef<csVosObject3D> GetCSinterface();
 };
 
 #endif

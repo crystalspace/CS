@@ -24,6 +24,7 @@
 #include "csvosa3dl.h"
 #include "vossector.h"
 #include "vosobject3d.h"
+#include "voslight.h"
 
 #include "vos/metaobjects/a3dl/a3dl.hh"
 
@@ -32,6 +33,54 @@ using namespace VOS;
 SCF_IMPLEMENT_IBASE (csVosSector)
   SCF_IMPLEMENTS_INTERFACE (iVosSector)
 SCF_IMPLEMENT_IBASE_END
+
+class RelightTask : public Task
+{
+public:
+  csVosA3DL* vosa3dl;
+  csRef<csVosSector> sector;
+
+  RelightTask(csVosA3DL* va, csVosSector* vs);
+  virtual ~RelightTask() { }
+  virtual void doTask();
+};
+
+RelightTask::RelightTask(csVosA3DL* va, csVosSector* vs)
+  : vosa3dl(va), sector(vs)
+{
+}
+
+void RelightTask::doTask()
+{
+  csRef<iObjectRegistry> objreg = vosa3dl->GetObjectRegistry();
+  csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
+  engine->ForceRelight();
+}
+
+
+class SetAmbientTask : public Task
+{
+public:
+  csVosA3DL* vosa3dl;
+  csRef<csVosSector> sector;
+
+  SetAmbientTask(csVosA3DL* va, csVosSector* vs);
+  virtual ~SetAmbientTask() { }
+  virtual void doTask();
+};
+
+SetAmbientTask::SetAmbientTask(csVosA3DL* va, csVosSector* vs)
+  : vosa3dl(va), sector(vs)
+{
+}
+
+void SetAmbientTask::doTask()
+{
+  csRef<iObjectRegistry> objreg = vosa3dl->GetObjectRegistry();
+  csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
+  engine->SetAmbientLight(csColor(.2, .2, .2));
+}
+
 
 class LoadSectorTask : public Task
 {
@@ -58,17 +107,48 @@ LoadSectorTask::~LoadSectorTask()
 
 void LoadSectorTask::doTask()
 {
-  vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(Vobject::findObjectFromRoot(url));
+  LOG("csVosSector", 2, "Starting task");
+
+  vRef<Vobject> v = Vobject::findObjectFromRoot(url);
+  vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(v);
+
+  LOG("csVosSector", 2, "did metacast");
   for (ChildListIterator ci = sec->getChildren(); ci.hasMore(); ci++)
   {
+    LOG("csVosSector", 2, "did getchildren");
     vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>((*ci)->getChild());
+    LOG("csVosSector", 2, "did getchild");
     std::cout << "looking at " << (*ci)->getChild()->getURLstr() << " " << obj3d.isValid() << std::endl;
 
     if(obj3d.isValid())
     {
-      obj3d->setup(vosa3dl, (csVosSector*)sector);
+      try
+      {
+        obj3d->Setup(vosa3dl, (csVosSector*)sector);
+      }
+      catch(std::runtime_error& e)
+      {
+        LOG("LoadSectorTask", 2, "Object Setup emitted error: " << e.what());
+      }
+    }
+    else
+    {
+      vRef<csMetaLight> light = meta_cast<csMetaLight>((*ci)->getChild());
+      if(light.isValid())
+      {
+        try
+        {
+          light->Setup(vosa3dl, (csVosSector*)sector);
+        }
+        catch(std::runtime_error& e)
+        {
+          LOG("LoadSectorTask", 2, "Light Setup emitted error: " << e.what());
+        }
+      }
     }
   }
+  exit(0);
+  vosa3dl->mainThreadTasks.push(new RelightTask(vosa3dl, (csVosSector*)sector));
 }
 
 /// csVosSector ///
@@ -91,7 +171,8 @@ csVosSector::~csVosSector()
 
 void csVosSector::Load()
 {
-  TaskQueue::defaultTQ.addTask(new LoadSectorTask(vosa3dl, url, this));
+  LOG("csVosSector", 2, "Pushing task");
+  TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, url, this));
 }
 
 csRef<iSector> csVosSector::GetSector()

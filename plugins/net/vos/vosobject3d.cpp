@@ -67,15 +67,26 @@ public:
   vRef<csMetaObject3D> obj;
   csVector3 pos;
   csMatrix3 ori;
+  csVector3 hardpos;
+  csMatrix3 hardtrans;
 
-  ConstructObject3DTask(csRef<iObjectRegistry> objreg, csMetaObject3D* obj, const csVector3& pos, const csMatrix3& ori);
+  ConstructObject3DTask(csRef<iObjectRegistry> objreg, csMetaObject3D* obj,
+                        const csVector3& pos, const csMatrix3& ori,
+                        const csVector3& posht, const csMatrix3& htrans);
   virtual ~ConstructObject3DTask();
   virtual void doTask();
 };
 
-ConstructObject3DTask::ConstructObject3DTask(csRef<iObjectRegistry> objreg, csMetaObject3D* ob,
-                                             const csVector3& p, const csMatrix3& o)
-  : object_reg(objreg), obj(ob, true), pos(p), ori(o)
+ConstructObject3DTask::ConstructObject3DTask(csRef<iObjectRegistry> objreg,
+                                             csMetaObject3D* ob,
+                                             const csVector3& p,
+                                             const csMatrix3& o,
+                                             const csVector3& hpos,
+                                             const csMatrix3& htrans)
+  : object_reg(objreg), obj(ob, true),
+    pos(p), ori(o),
+    hardpos(hpos),
+    hardtrans(htrans)
 {
 }
 
@@ -85,10 +96,13 @@ ConstructObject3DTask::~ConstructObject3DTask()
 
 void ConstructObject3DTask::doTask()
 {
-  csRef<iMeshWrapper> mw = obj->getCSinterface()->GetMeshWrapper();
-  LOG("vosobject3d", 2, "setting position " << pos.x << " " << pos.y << " " << pos.z);
+  csRef<iMeshWrapper> mw = obj->GetCSinterface()->GetMeshWrapper();
+  LOG("vosobject3d", 2, "setting position of " << obj->getURLstr() << " to " << pos.x << " " << pos.y << " " << pos.z);
   if(mw.IsValid())
   {
+    csReversibleTransform ht(hardtrans, hardpos);
+    mw->GetFactory()->HardTransform(ht);
+
     mw->GetMovable()->SetPosition(pos);
     mw->GetMovable()->SetTransform(ori);
     mw->GetMovable()->UpdateMove();
@@ -114,9 +128,9 @@ MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject, const s
   return new csMetaObject3D(superobject);
 }
 
-void csMetaObject3D::setup(csVosA3DL* vosa3dl, csVosSector* sect)
+void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
-  LOG("csMetaObject3D", 2, "now in csMetaObject3D::setup");
+  LOG("csMetaObject3D", 3, "now in csMetaObject3D::setup");
 
   double x, y, z;
   try
@@ -128,7 +142,7 @@ void csMetaObject3D::setup(csVosA3DL* vosa3dl, csVosSector* sect)
     x = y = z = 0;
   }
 
-  LOG("csMetaObject3D", 2, "got position");
+  LOG("csMetaObject3D", 3, "got position");
 
   double a, b, c, d;
   try
@@ -141,18 +155,57 @@ void csMetaObject3D::setup(csVosA3DL* vosa3dl, csVosSector* sect)
     c = 1;
   }
 
-  LOG("csMetaObject3D", 2, "got orientation ");
+  double xht, yht, zht;
+  try
+  {
+    getPositionHT(xht, yht, zht);
+  }
+  catch(...)
+  {
+    xht = yht = zht = 0;
+  }
+
+  double aht, bht, cht, dht;
+  try
+  {
+    getOrientationHT(aht, bht, cht, dht);
+  }
+  catch(...)
+  {
+    aht = bht = dht = 0;
+    cht = 1;
+  }
+
+  double sxht, syht, szht;
+  try
+  {
+    getScalingHT(sxht, syht, szht);
+  }
+  catch(...)
+  {
+    sxht = syht = szht = 1.0;
+  }
+
+
+  LOG("csMetaObject3D", 3, "got orientation ");
 
   csQuaternion q;
   q.SetWithAxisAngle(csVector3(a, b, c), d);
 
-  LOG("vosobject3d", 2, "setting position " << x << " " << y << " " << z);
+  csQuaternion qht;
+  qht.SetWithAxisAngle(csVector3(aht, bht, cht), dht);
+
+  LOG("vosobject3d", 3, "setting position " << x << " " << y << " " << z);
 
   vosa3dl->mainThreadTasks.push(new ConstructObject3DTask(vosa3dl->GetObjectRegistry(), this,
-                                                          csVector3(x, y, z), csMatrix3(q)));
+                                                          csVector3(x, y, z), csMatrix3(q),
+                                                          csVector3(xht, yht, zht),
+                                                          csMatrix3(qht) * csMatrix3(sxht, 0, 0,
+                                                                                    0, syht, 0,
+                                                                                    0, 0, szht)));
 }
 
-csRef<csVosObject3D> csMetaObject3D::getCSinterface()
+csRef<csVosObject3D> csMetaObject3D::GetCSinterface()
 {
   return csvobj3d;
 }

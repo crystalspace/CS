@@ -44,14 +44,24 @@ protected:
   csRef<iMaterialWrapper> materialwrapper;
   bool alreadyLoaded;
 
+  static csRef<iMaterialWrapper> checkerboard;
+
+  /** Generate the "checkerboard" default pattern (only called once)  */
+  static void CreateCheckerboard();
+
 public:
+  static iObjectRegistry* object_reg;
+
   csMetaMaterial(VOS::VobjectBase* superobject);
   virtual ~csMetaMaterial();
 
-  virtual void setup(csVosA3DL* vosa3dl);
+  virtual void Setup(csVosA3DL* vosa3dl);
 
   /** Return CS iMaterialWrapper interface for this object */
-  csRef<iMaterialWrapper> getMaterialWrapper();
+  csRef<iMaterialWrapper> GetMaterialWrapper();
+
+  /** Get the "checkerboard" default pattern. */
+  static csRef<iMaterialWrapper> GetCheckerboard();
 
   virtual void notifyPropertyChange(const VOS::PropertyEvent& event);
   virtual void notifyChildInserted(VOS::VobjectEvent& event);

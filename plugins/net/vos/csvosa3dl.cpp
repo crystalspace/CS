@@ -28,6 +28,8 @@
 #include "voscube.h"
 #include "vostexture.h"
 #include "vosmaterial.h"
+#include "vospolygonmesh.h"
+#include "voslight.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -65,17 +67,32 @@ csRef<iVosSector> csVosA3DL::GetSector(const char* s)
 
 bool csVosA3DL::Initialize (iObjectRegistry *o)
 {
+  LOG("csVosA3DL", 2, "Initializing");
+
   Site::removeRemoteMetaObjectFactory("a3dl:object3D", &A3DL::Object3D::new_Object3D);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.cube", &A3DL::Cube::new_Cube);
+  Site::removeRemoteMetaObjectFactory("a3dl:object3D.polygonmesh", &A3DL::PolygonMesh::new_PolygonMesh);
   Site::removeRemoteMetaObjectFactory("a3dl:texture", &A3DL::Texture::new_Texture);
   Site::removeRemoteMetaObjectFactory("a3dl:material", &A3DL::Material::new_Material);
+  Site::removeRemoteMetaObjectFactory("a3dl:light", &A3DL::Light::new_Light);
 
-  Site::addRemoteMetaObjectFactory("a3dl:object3D", "a3dl:object3D", &csMetaObject3D::new_csMetaObject3D);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.cube", "a3dl:object3D.cube", &csMetaCube::new_csMetaCube);
-  Site::addRemoteMetaObjectFactory("a3dl:texture", "a3dl:texture", &csMetaTexture::new_csMetaTexture);
-  Site::addRemoteMetaObjectFactory("a3dl:material", "a3dl:material", &csMetaMaterial::new_csMetaMaterial);
+  Site::addRemoteMetaObjectFactory("a3dl:object3D", "a3dl:object3D",
+                                   &csMetaObject3D::new_csMetaObject3D);
+  Site::addRemoteMetaObjectFactory("a3dl:object3D.cube", "a3dl:object3D.cube",
+                                   &csMetaCube::new_csMetaCube);
+  Site::addRemoteMetaObjectFactory("a3dl:object3D.polygonmesh", "a3dl:object3D.polygonmesh",
+                                   &csMetaPolygonMesh::new_csMetaPolygonMesh);
+  Site::addRemoteMetaObjectFactory("a3dl:texture", "a3dl:texture",
+                                   &csMetaTexture::new_csMetaTexture);
+  Site::addRemoteMetaObjectFactory("a3dl:material", "a3dl:material",
+                                   &csMetaMaterial::new_csMetaMaterial);
+  Site::addRemoteMetaObjectFactory("a3dl:light", "a3dl:light",
+                                   &csMetaLight::new_csMetaLight);
 
   objreg = o;
+
+  csMetaMaterial::object_reg = objreg;
+
   eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);
   if (! eventq) return false;
   eventq->RegisterListener (this, CSMASK_FrameProcess);

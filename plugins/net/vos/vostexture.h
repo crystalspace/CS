@@ -50,10 +50,10 @@ public:
   virtual ~csMetaTexture();
 
   /** Fully load this object into Crystal Space */
-  virtual void setup(csVosA3DL* va);
+  virtual void Setup(csVosA3DL* va);
 
   /** Return CS iTextureWrapper interface for this object */
-  csRef<iTextureWrapper> getTextureWrapper();
+  csRef<iTextureWrapper> GetTextureWrapper();
 
   virtual void notifyPropertyChange(const VOS::PropertyEvent& event);
   virtual void notifyChildInserted(VOS::VobjectEvent& event);

@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 
 #include "csgfx/memimage.h"
+#include "csgfx/xorpat.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
@@ -33,6 +34,8 @@
 #include "vostexture.h"
 #include "vosobject3d.h"
 
+csRef<iMaterialWrapper> csMetaMaterial::checkerboard;
+iObjectRegistry* csMetaMaterial::object_reg;
 
 using namespace VOS;
 
@@ -44,6 +47,8 @@ public:
   csTextureLayer* coords;
   vRef<csMetaMaterial> metamaterial;
   csRef<iObjectRegistry> object_reg;
+  bool iscolor;
+  float R, G, B;
 
   ConstructMaterialTask(csRef<iObjectRegistry> objreg, csMetaMaterial* mm);
   virtual ~ConstructMaterialTask();
@@ -68,14 +73,14 @@ void ConstructMaterialTask::doTask()
   csRef<iMaterial> imat;
 
   if(base.isValid()) {
-    csRef<iTextureWrapper> basetw = base->getTextureWrapper();
+    csRef<iTextureWrapper> basetw = base->GetTextureWrapper();
 
     if(layers.size() > 0)
     {
       iTextureWrapper** layertws = (iTextureWrapper**)malloc(layers.size() * sizeof(iTextureWrapper*));
       for(unsigned int i = 0; i < layers.size(); i++)
       {
-        layertws[i] = layers[i]->getTextureWrapper();
+        layertws[i] = layers[i]->GetTextureWrapper();
         layers[i]->release();
       }
 
@@ -88,9 +93,11 @@ void ConstructMaterialTask::doTask()
       imat = engine->CreateBaseMaterial(basetw);
     }
   }
-#if 0
   else
   {
+    if(iscolor) {
+
+      // we tried some alternate ways of doing colors!
     /*
       csRef<iMaterial> color  = engine->CreateBaseMaterial(0);
       int red = strtol(newproperty.substr(1, 2).c_str(), 0, 16);
@@ -119,41 +126,29 @@ void ConstructMaterialTask::doTask()
     */
 
 
+      iTextureWrapper* txtwrap;
+      txtwrap = engine->CreateBlackTexture("", 2, 2, 0, CS_TEXTURE_3D);
 
+      csImageMemory* img = new csImageMemory(1, 1);
+      csRGBpixel px((int)(R*255.0), (int)(G*255.0), (int)(B*255.0));
+      img->Clear(px);
+      txtwrap->SetImageFile(img);
 
-    iTextureWrapper* txtwrap;
-    txtwrap = engine->CreateBlackTexture(getURL().getString().c_str(), 2, 2, 0, CS_TEXTURE_3D);
+      txtwrap->Register(txtmgr);
+      txtwrap->GetTextureHandle()->Prepare ();
 
-    float r, g, b;
-    try
-    {
-      getColor(r, g, b);
+      imat = engine->CreateBaseMaterial(txtwrap);
     }
-    catch(exception& e)
-    {
-      r = g = b = 0;
-    }
-    csImageMemory* img = new csImageMemory(1, 1);
-    csRGBpixel px((int)(r*255.0), (int)(g*255.0), (int)(b*255.0));
-    img->Clear(px);
-    txtwrap->SetImageFile(img);
-
-    txtwrap->Register(txtmgr);
-    txtwrap->GetTextureHandle()->Prepare ();
-
-    imat = engine->CreateBaseMaterial(txtwrap);
   }
-#endif
 
-  csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(imat);
-  if(!material)
-  {
-    return;
+  if(imat.IsValid()) {
+    csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(imat);
+    if(!material) return;
+    material->Register(txtmgr);
+    material->GetMaterialHandle()->Prepare();
+
+    metamaterial->materialwrapper = material;
   }
-  material->Register(txtmgr);
-  material->GetMaterialHandle()->Prepare();
-
-  metamaterial->materialwrapper = material;
 }
 
 
@@ -167,9 +162,33 @@ csMetaMaterial::~csMetaMaterial()
 {
 }
 
-void csMetaMaterial::setup(csVosA3DL* vosa3dl)
+void csMetaMaterial::CreateCheckerboard()
 {
-  LOG("csMetaMaterial", 2, "setting up material");
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+
+  csRef<iImage> im = csCreateXORPatternImage(64, 64, 6);
+  csRef<iTextureManager> txtmgr = g3d->GetTextureManager();
+  csRef<iTextureHandle> th = txtmgr->RegisterTexture (im, CS_TEXTURE_3D);
+  csRef<iTextureWrapper> tw = engine->GetTextureList()->NewTexture(th);
+  tw->SetImageFile(im);
+  csRef<iMaterial> mat = engine->CreateBaseMaterial(tw);
+  checkerboard = engine->GetMaterialList()->NewMaterial(mat);
+  th->Prepare();
+  checkerboard->Register(txtmgr);
+  checkerboard->GetMaterialHandle()->Prepare();
+}
+
+  /** Return CS iMaterialWrapper interface for this object */
+csRef<iMaterialWrapper> csMetaMaterial::GetCheckerboard()
+{
+  if(! checkerboard.IsValid()) CreateCheckerboard();
+  return checkerboard;
+}
+
+void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
+{
+  LOG("csMetaMaterial", 3, "setting up material");
   ConstructMaterialTask* cmt = new ConstructMaterialTask(vosa3dl->GetObjectRegistry(), this);
 
   A3DL::TextureIterator txt = getTextureLayers();
@@ -178,7 +197,7 @@ void csMetaMaterial::setup(csVosA3DL* vosa3dl)
     vRef<csMetaTexture> base = meta_cast<csMetaTexture>(*txt);
     if(base.isValid())
     {
-      base->setup(vosa3dl);
+      base->Setup(vosa3dl);
       cmt->base = base;
     }
 
@@ -191,7 +210,7 @@ void csMetaMaterial::setup(csVosA3DL* vosa3dl)
       {
         vRef<csMetaTexture> mt = meta_cast<csMetaTexture>(*txt);
         if(mt.isValid()) {
-          mt->setup(vosa3dl);
+          mt->Setup(vosa3dl);
           mt->acquire();
           cmt->layers.push_back(&mt);
           try
@@ -243,6 +262,10 @@ void csMetaMaterial::setup(csVosA3DL* vosa3dl)
         }
       }
     }
+    cmt->iscolor = false;
+  } else {
+    getColor(cmt->R, cmt->G, cmt->B);
+    cmt->iscolor = true;
   }
 
   vosa3dl->mainThreadTasks.push(cmt);
@@ -275,8 +298,9 @@ void csMetaMaterial::notifyPropertyChange(const PropertyEvent& event)
   catch(RemoteError) { }
 }
 
-csRef<iMaterialWrapper> csMetaMaterial::getMaterialWrapper()
+csRef<iMaterialWrapper> csMetaMaterial::GetMaterialWrapper()
 {
+  if(! materialwrapper.IsValid()) return GetCheckerboard();
   return materialwrapper;
 }
 

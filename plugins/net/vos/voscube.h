@@ -29,16 +29,14 @@
 #include "csvosa3dl.h"
 #include "vosobject3d.h"
 
-class csMetaCube : public virtual csMetaObject3D, public A3DL::Cube
+class csMetaCube : public virtual csMetaObject3D, public virtual A3DL::Cube
 {
-private:
-  csRef<iMeshFactoryWrapper> cube_factory;
 public:
   csMetaCube(VOS::VobjectBase* superobject);
 
   static VOS::MetaObject* new_csMetaCube(VOS::VobjectBase* superobject, const std::string& type);
 
-  virtual void setup(csVosA3DL* vosa3dl, csVosSector* sect);
+  virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };
 
 #endif
