@@ -4,10 +4,10 @@ skin "Normal Windows"
   WindowMin:		"/aws/minimize.png"
   WindowZoom:		"/aws/zoom.png"
   WindowClose:		"/aws/close.png"
-  HighlightColor: 	200,200,0
-  ShadowColor:    	64,64,0
-  FillColor:      	128,128,0
-  TextDisabledColor:	128,128,128
+  HighlightColor: 	100,180,200
+  ShadowColor:    	30,50,64
+  FillColor:      	100,120,150
+  TextDisabledColor:	128,128,0
   TextForeColor:	0,0,0
   TextBackColor:        255,255,255
   ButtonTextColor:	0,0,192
@@ -27,14 +27,35 @@ window "Splash"
 {
   Frame: (100,200)-(400,300)
   Style: wfsNormal
-
+  Options: wfoBeveledBorder
 }
 
 window "Another"
 {
-  Frame: (200,300)-(500,400)
+  Frame: (200,300)-(500,440)
   Style: wfsNormal
 
+  component "Red" is "Command Button"
+  {
+    Frame: (20, 30) - (120, 50)
+    Style: bfsNormal
+    Caption: "Red"
+  }
+
+  component "Green" is "Command Button"
+  {
+    Frame: (20, 60) - (120, 80)
+    Style: bfsNormal
+    Caption: "Green"
+  }
+
+  component "Blue" is "Command Button"
+  {
+    Frame: (20, 90) - (120, 110)
+    Style: bfsNormal
+    Caption: "Blue"
+  }
+  
 }
 
 window "New User"
@@ -45,6 +66,8 @@ window "New User"
   Back:    "/lib/windows/newuserbck.png"
   Overlayalpha: 192
   Backalpha:    0
+
+  
 
   component "User Name" is "Textbox"
   {
