@@ -115,9 +115,16 @@ static bool firstRun;
 
 bool CrystApp::QuitRequested()
 {
-	status_t exit_value;
+	status_t err_code, exit_value;
+	
+	printf("CrystApp::QuitRequested() entered. \n");
+	
+	// shutdown rendering thread first.
 	driver->Shutdown = true;
-	wait_for_thread(find_thread("LoopThread"), exit_value);//put in because I have moved drawing into that thread.
+	snooze(200000);
+	err_code = wait_for_thread(find_thread("LoopThread"), &exit_value);//put in because I have moved drawing into that thread.
+	
+	printf("LoopThread blown away. err code is %x \n");
 	return(TRUE);
 }
 
@@ -494,7 +501,7 @@ long SysSystemDriver::LoopThread(void *data)
 //	piG2D->GetfConnectionDisabled(&fConnectionDisabled);
 		
 	// loop, frame after frame, until asked to quit.
-	while (!shutdown /* && !(*fConnectionDisabled)*/) {
+	while (!Shutdown /* && !(*fConnectionDisabled)*/) {
 	long render_time;
 	bigtime_t before,after;
 //		printf("LoopThread: loop executing\n");
@@ -525,6 +532,7 @@ long SysSystemDriver::LoopThread(void *data)
 //		}// change to implement BeginDraw/FinishDraw
 //		piG2D->SetFrameBufferLock(false);// change to implement BeginDraw/FinishDraw
 	}	
+	printf("LoopThread: Shutdown detected.\n");//dh
 	return 0;
 }
 
