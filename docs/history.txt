@@ -33,6 +33,10 @@ chronological order.
 	  modes the portal clipper would be disabled AFTER setting up the
 	  clipper. This would cause the stencil clipper to be disabled
 	  again with bad effects.
+	- Jorrit partially reverted Eric's changes to including headers in
+	  the thing mesh plugin because they break compilation. This will
+	  now most likely break compilation on the older compiler but I'm
+	  uncertain how to fix this.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
