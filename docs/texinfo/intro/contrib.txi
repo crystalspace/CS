@@ -48,7 +48,7 @@ first to actually present me with an almost working Windows 95 version with
 source! Nathaniel is also responsible for most of the sound support code in
 Crystal Space.  He made the basic sound system, wrote the Windows drivers and
 wrote support for 3D sound.  Nathaniel created the config utility which allows
-for easier editing of @file{cryst.cfg}.  Currently only for Windows and
+for easier editing of @file{cryst.cfg}; currently only for Windows and
 @sc{dos}.  In addition he also enhanced the (now non-existant) @sc{csar}
 utility.  He also helped develop the Windows/Direct3D and Windows/OpenGL
 versions and is co-author of the Glide port.  His latest work has been some
@@ -165,14 +165,14 @@ memory debugger on Crystal Space and found/fixed many bugs related to that.
 @item
 Anis Ahmad (@email{anis@@cyberus.ca})
 
-Anis updated the makefiles for Watcom C++ for both Crystal Space and csar.  He
-also made the Crystal Space editor for Windows 95 which is unfortunatelly no
-longer supported.
+Anis updated the makefiles for Watcom C++ for both Crystal Space and
+@sc{csar}.  He also made the Crystal Space editor for Windows 95 which is
+unfortunatelly no longer supported.
 
 @item
 Andrew Zabolotny (@email{bit@@eltech.ru})
 
-Andrew ported Crystal Space to @sc{os}/2.  Andrew changed Crystal Space to
+Andrew ported Crystal Space to @sc{os/2}.  Andrew changed Crystal Space to
 read/write @sc{zip} files instead of the @sc{csar} archive format.  He
 enhanced Crystal Space to read @sc{png} files.  He did a @emph{major} rewrite
 of the system dependent stuff and made a lot of support classes for that.
@@ -380,7 +380,7 @@ Seth also contributed a nice missile and he fixed the texture bug in
 Seth also updated the @sc{dos}/@sc{djgpp} documentation and the tutorial.  He
 also wrote the Squawk (@pxref{Squawk}) demo (using the skybox).  Seth also
 fixed the @code{csCamera} and @code{csView} classes so that the @sc{fov} is no
-longer static and it is also possible to recenter each view seperatelly.  Seth
+longer static and it is also possible to recenter each view separatelly.  Seth
 added sprite vertex tweening and new lighting attenuation settings.  He also
 worked on vertex/texel merging in sprites.
 
@@ -401,7 +401,8 @@ Crystal Space.  Crystal Clear serves as a game layer on top of Crystal Space.
 @item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})
 
-Gary wrote the OpenGL port and the importers for 3DS and @file{.md2} models.
+Gary wrote and maintains the Crystal Space OpenGL renderer as well as the
+importers for 3DS and @file{.md2} models.
 
 @item
 Andrew Kenneth Milton (@email{akm@@zeus.theinternet.com.au})
@@ -443,8 +444,9 @@ Norman Kramer (@email{normank@@lycosmail.com})
 
 Norman contributed a few fixes.  In particular he provided a few fixes on the
 sound code.  He also fixed the @sc{bmp} loader so that it is endian correct
-and also added @sc{rle}8 encoding.  Norman also added the @code{csQuaternion}
-class and has been bringing the Glide drivers up to date.
+and added @sc{rle8} encoding.  Norman also added the @code{csQuaternion} class
+and has been bringing the Glide drivers up to date.  Norman contributed a
+FreeType font server plug-in.  Most recently, he added a grid-view to CSWS.
 
 @item
 Nicholas Francis (@email{nicholasfrancis@@iname.com})
@@ -510,9 +512,9 @@ detection system from Alex Pfapf).
 @item
 Thomas Hieber (@email{thieber@@gmx.net})
 
-Thomas is currently the primary maintainer of the Windows port of Crystal
-Space and has also contributed various other things.  He wrote
-@code{DrawPolygonFX()}.  He added the csgame library and the Crystal Shooter
+Thomas was the primary maintainer of the Windows port of Crystal
+Space for some time and has also contributed various other things.  He wrote
+@code{DrawPolygonFX()}.  He added the csGame library and the Crystal Shooter
 application.  He also significantly enhanced the Windows Direct3D port.
 Thomas also wrote @code{map2cs}, a converter which translates Quake maps to
 Crystal Space format.
@@ -557,6 +559,14 @@ FragDance Galore (@email{fragdance@@hotmail.com})
 
 Mr. Galore contributed a @sc{wal}/@sc{sgi} loader and also added initial
 support for alpha maps to the texture loaders.
+
+@item
+Brad Davis (@email{jbdavis@@uswest.net})
+
+Brad used to host and maintain the master @sc{cvs} repository for the project.
+However, the project now resides at SourceForge:
+
+@uref{http://www.sourceforge.net/}
 
 @item
 Brandon Ehle (@email{azverkan@@yahoo.com})
@@ -616,7 +626,8 @@ Samuel did some fixes on the sprites.
 @item
 Michael Day (@email{mikeday@@corplink.com.au})
 
-Michal started work on an @file{autoconf} system for Crystal Space.
+Michal started work on an @file{autoconf} system for Crystal Space but
+abandoned the effort.
 
 @item
 Thomas Skoldenborg (@email{thomas@@dum.chalmers.se})
@@ -627,7 +638,7 @@ anymore.
 @item
 Simon Boily (@email{simonb@@telisphere.com})
 
-Simon did several changes to the Direct3D renderer.  He added multitexture
+Simon made several changes to the Direct3D renderer.  He added multitexture
 support and render state caching.
 
 @item
@@ -636,23 +647,69 @@ Brett Hall (@email{swizin@@rain.org})
 Brett fixed the X-windows 2D drivers so that they properly exit when the
 window is closed by the window manager.
 
+Eric Wigforss (@email{ewigforss@@novametrix.com})
+
+Eric made some Windows-specific fixes to the networking code.
+
 @item
 Martin Geisse (@email{Hellwig.Geisse@@mni.fh-giessen.de})
 
 Martin converted many of the Crystal Space text and LaTeX documents to Texinfo
 format and began construction of Texinfo version of the Crystal Space manual.
+He also contributed a random dungeon generation plug-in module as well as a
+sample program which demonstrates its use.
 
 @item
-Brad Davis (@email{jbdavis@@uswest.net})
+Daniel Fannar Gudbjartsson (@email{dfg@@decode.is})
 
-Brad used to host and maintain the master @sc{cvs} repository for the project.
-However, the project now resides at SourceForge:
+Daniel helped work on the physics engine and collision detection.
 
-@uref{http://www.sourceforge.net/}
+@item
+Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
+
+Desmond helped a bit on @file{map2cs} and updated its documentation.  He also
+pointed out several bugs and errors in Crystal Space.
+
+@item
+Rene Dudfield (@email{illumen@@yahoo.com})
+
+Rene began working on networking capability for the Blocks game.
+
+@item
+Thomas Giesel (@email{skoe@@freenet.de})
+
+Thomas supplied a small patch for BeOS to allow full-screen mode with the
+OpenGL driver.
+
+@item
+Benjamin Sprague (@email{sprague@@core.com})
+
+Benjamin submitted some patches for the terrain engine.
+
+@item
+Wouter C. A. Wijngaards (@email{wouterw@@cs.vu.nl})
+
+Wouter contributed a particle system to Crystal Space based on 2D sprites.  He
+also added a full-fledged radiosity calculator.  Wouter is the author of the
+game @emph{Tunnel Fighter} which is based on the Crystal Space engine.
+
+@item
+Frank O'Connor (@email{frank@@oconnors.org})
+
+Frank is the current maintainer of the Windows port of Crystal Space.  One of
+the first tasks he undertook was a reorganization of the @sc{msvc} project
+files.
+
+@item
+Samuel Humphreys (@email{samuelh@@ntlworld.com})
+
+Samuel added a procedural texture system to Crystal Space.  With this system
+it is possible to render on textures procedurally and use that texture on a
+polygon as usual.
 @end itemize
 
 Many thanks also for the people at @uref{http://www.grimmware.com, GrimmWare}
-for being the first to offer WEB space for Crystal Space.
+for being the first to offer web space for Crystal Space.
 
 Many thanks to Alessandro Russo for convincing his system manager for creating
 a mailing list for Crystal Space.  Thanks to Marco d'Itri (the system manager)

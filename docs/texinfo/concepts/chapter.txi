@@ -24,11 +24,9 @@ Collision Detection
 
 @menu
 * Cameras and Matrices::
-* Portal Engine:: The Portal Engine
+* Portal Engine::
 * Space Warping::
 * Texture Mapping::
-* Texture Cache::
-* Mipmapping::
 * Lighting::
 * Visibility Culling:: Visibility Culling In Detail
 * Rendering Loop::
@@ -40,8 +38,6 @@ Collision Detection
 @imports{concepts,portals.txi}
 @imports{concepts,warping.txi}
 @imports{concepts,texmap.txi}
-@imports{concepts,texcache.txi}
-@imports{concepts,mipmap.txi}
 @imports{concepts,lighting.txi}
 @imports{concepts,viscull.txi}
 @imports{concepts,render.txi}

@@ -1,9 +1,11 @@
 @c -*-texinfo-*-
-@node Coding Style, CVS Guide, Writing Documentation, Contributing
+@node Coding Style, CVS Guide, Portability, Contributing
 @section Coding Style
 
 For consistency and ease of future maintenance, when working on Crystal Space
-source code, please follow these guidelines.
+source code, please follow the following guidelines.  Also be sure to read
+important portability guidelines presented in the @cite{Portability} section.
+@xref{Portability}.
 
 @enumerate
 @item
@@ -39,8 +41,14 @@ tokens.
 Classes should be named in this fashion: @code{csThisIsAClass}. The name
 starts with lower-case @samp{cs} and has every word capitalized.
 
-Methods and functions should be named in this fashion: @code{ThisIsAMethod}.
+Methods and functions should be named in this fashion: @code{ThisIsAMethod()}.
 Each word in the name is capitalized.
+
+@item
+@emph{@sc{scf} Interfaces}
+
+@sc{scf} interfaces always start with a lower @samp{i}, as in
+@code{iThisIsAnInterface}.  @xref{SCF}.
 
 @item
 @emph{Doc++ and Comments}
@@ -54,7 +62,7 @@ then Doc++ will ignore comments for methods within the class itself.
 
 A one line Doc++ comment uses three slashes (@samp{///}) rather than two as is
 typical for normal C++ comments.  Multi-line Doc++ comments are specified with
-@samp{/** ...  */} rather than @samp{/* ...  */}.  Here is an example:
+@samp{/** @dots{} */} rather than @samp{/* @dots{} */}.  Here is an example:
 
 @example
 /**
@@ -69,7 +77,7 @@ private:
   void PrivateFunction();
 
 public:
-  /// This is the constructor. Initializes the blue ball.
+  /// This is the constructor which initializes the blue ball.
   csBlueBall();
 
   /**
@@ -90,7 +98,7 @@ process code or text files.
 @item
 @emph{Multiple-Inclusion Protection for Headers}
 
-Be certain to insert multiple-inclusion protection in all header files. These
+Be certain to insert multiple-inclusion protection in all header files.  These
 controls should take this form:
 
 @example
@@ -101,10 +109,14 @@ controls should take this form:
 @end example
 
 @item
-@emph{@sc{scf} Interfaces}
+@emph{Include @file{cssysdef.h}}
 
-@sc{scf} interfaces always start with a lower @samp{i}, as in
-@code{iThisIsAnInterface}.
+Always include @file{cssysdef.h} in each source file as the very first file
+included.  If you need to use special facilities provided by @file{cssysdef.h}
+then be sure to @code{#define} the appropriate macro before including
+@file{cssysdef.h}.
+
+@emph{Never} include @file{cssysdef.h} in header files.
 
 @item
 @emph{Module and Library Dependencies}
@@ -115,109 +127,4 @@ Absolutely avoid introducing circular dependencies.
 For instance, code in the @code{csGeom} library should never refer to code
 from the @code{csEngine} library.  The other way around is okay, however,
 since @code{csEngine} is at a higher level within the dependency hierarchy.
-
-@item
-@emph{Include @file{cssysdef.h}}
-
-Always include @file{cssysdef.h} in each source file as the very first file
-included.  @emph{Never} include @file{cssysdef.h} in header files.
-
-@item
-@emph{Avoid Global Objects With Constructors in Plug-In Modules}
-
-Avoid placing global objects which require automatic construction in
-dynamically loaded libraries. Some platforms fail to call the object's
-constructor at the time the library is loaded. Therefore it is unsafe to rely
-on such objects.
-
-@item
-@emph{Endian-ness}
-
-Beware of code that is endian specific.  Key off of the @code{CS_BIG_ENDIAN}
-or @code{CS_LITTLE_ENDIAN} macros if necessary.  Avoid unions of bit-sets
-since they can result in endian-related problems. Avoid casting an
-@code{int*} to a @code{short*} or a @code{char*}, or casting a @code{short*}
-to a @code{char*}.
-
-Also reading/writing binary files and sending binary messages over the
-network is endian-prone. The best thing to do here is to use the @code{htons}
-and @code{htonl} macros. They convert the host byte format to the network
-byte format. You can also convert back from the network format to the host
-format with @code{ntohs} and @code{ntohl}.
-
-@item
-@emph{Data Alignment}
-
-Some platforms require data to be aligned in memory. The processor cannot
-access a @code{long} on an odd memory address for instance. The program will
-crash on this instruction. Thus you should make sure to always access
-properly aligned data. The compiler already ensures the proper alignment, but
-you can have problems after pointer arithmatic. This is a problem on the
-Macintosh and NeXT platforms. Together with this problem you are probably
-also having endian problems. Beware of code which tries to access values of
-primitive types at memory locations which are not multiples of the type's
-size.
-
-@item
-@emph{@sc{dos} Filename Restrictions}
-
-Use @sc{dos}-style 8.3 filenames for files which are shared by all platforms
-which run Crystal Space.  This allows the project to support @sc{dos} in
-addition to platforms with less restrictive filenames.  Platform-specific
-files (not intended for @sc{dos}) need not follow this restriction.
-
-@item
-@emph{Filesystem Case Sensitivity}
-
-Some operating systems have case sensitive filenames, whereas others do not.
-Bad things happen if you capitalize a file one way in @code{#include}
-directive and a different way in the actual filename.  This problem many not
-even be apparent on your platform, if you are using a case-insensitive file
-system such as @sc{dos} or Windows.  In general, it is preferable to use
-entirely lower-case filenames for files which are shared between ports.
-
-@strong{Warning}: @file{WinCVS} has been reported to botch capitalization of
-files.  Please be aware of this potential problem.
-
-@item
-@emph{Floating Points}
-
-For some reason comparing floats to 0.0 does not give the same results
-on different platform. Use a @samp{if(floatvalue < EPSILON)} instead where
-@code{EPSILON} is some very small value. It is certain linux and solaris
-platforms differ on this point.
-
-Also @samp{float1 < float2} may give different results on different platforms.
-@samp{float1 < float2+ERSILON} gives more dependable results. Note that these 
-floating point problems are on floats that result from length computation,
-such that seemingly-same floats can be slightly different due to numerical
-accuracy.
-
-@item
-@emph{int i redefined?}
-
-Some compilers do not scope the variable in a for, in a line like
-@samp{for(int i=0; ...)}. They treat the @code{i} as if defined in the outer
-function. Thus when you later on have a second @samp{for(int i...)} line
-those compilers will give an error. Avoid this by only defining variables
-once in a for statement, or else defining the variable at the top of the
-function, changing the for loops to @samp{for(i=0;...)}. The Microsoft Visual
-C++ compiler has this problem.
-
-@item
-@emph{Pathnames}
-
-Pathnames are different on many platforms. Use the VFS which gives a unified
-approach. To seperate folders and files, use @samp{/} in the VFS.
-(Not @samp{\} or @samp{:} ). Also, always use @samp{/} in @code{#include}
-statements, never @samp{\} or @samp{:}. Windows compilers often allow
-@samp{\}, but other platforms never do.
-
-@item
-@emph{Black screen bugs}
-
-Some platforms depend on the correct @code{BeginDraw()} - @code{FinishDraw()}
-calls. Thus every @code{BeginDraw()} must be followed by a @code{FinishDraw()}
-or nothing will be rendered. DirectX needs this, linux does not (currently)
-enforce this.
 @end enumerate

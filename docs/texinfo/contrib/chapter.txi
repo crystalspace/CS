@@ -6,12 +6,14 @@
 
 @menu
 * Writing Documentation::
+* Portability::
 * Coding Style::
 * CVS Guide:: @sc{cvs} Etiquette Guidelines
 * Porting:: Porting to a New Platorm
 @end menu
 
 @imports{contrib,document.txi}
+@imports{contrib,portable.txi}
 @imports{contrib,coding.txi}
 @imports{contrib,cvs.txi}
 @imports{contrib,porting.txi}

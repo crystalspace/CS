@@ -17,7 +17,7 @@ First off, to access the @sc{cvs} repository anonymously, use this
 @end example
 
 The password for the @samp{anonymous} account is the empty string---that is,
-just press the @key{RET} key at the @samp{Password:} prompt.
+just press the @key{RETURN} key at the @samp{Password:} prompt.
 
 For further instructions, please refer to the following document:
 
@@ -40,18 +40,22 @@ location:
 Having a developer account implies you will be able to make changes to the
 code.  You should read the rest of this document before making any changes.
 
-Here are some guidelines you should follow before committing files:
+Below are some guidelines you should follow before committing files.  Also be
+sure to read the important portability guidelines in the @cite{Portability}
+section.  @xref{Portability}.
 
-@itemize @bullet
+@enumerate
 @item
-Always do an @samp{update} before committing new or changed files, and then
-rebuild @emph{everything} from scratch after updating.  @emph{Do not rely on
-dependencies!}
+Always perform an @samp{update} before committing new or changed files, and
+then rebuild @emph{everything} from scratch after updating.  @emph{Do not rely
+on dependencies!}  If there were any conflicts during the update, resolve them.
+If there were any merges, examine them to ensure that the merged code still
+accurately reflects your changes.
 
 @item
 If you worked on the engine internals or on the renderers, run @code{walktest}
 using @file{large.zip} and visit various locations which exercise the engine's
-features, such as the donut in the street and the foggy corridor.
+features, such as the doughnut in the street and the foggy corridor.
 
 @item
 If it works, commit @emph{everything} you have modified, not just parts of
@@ -72,7 +76,7 @@ For large and important modifications, post a description of your changes to
 the main mailing list, @email{crystal-main@@lists.sourceforge.net}.  This is
 especially important if your changes may have affected other ports which must
 be updated by other developers as a consequence.
-@end itemize
+@end enumerate
 
 This might look overdone to some people, but you should remember that we are
 all working together with the same source.  A bug in your code can cripple the
@@ -86,37 +90,3 @@ have to stop and track down your bugs just so they can proceed with their own
 coding.  When you've committed code, please monitor the mailing list regularly
 for any signs that you've caused a problem somewhere.  This is part of the
 responsibility that goes with the ability to commit code.
-
-@subheading Additional Tips
-@cindex Tips, @sc{cvs}
-@cindex @sc{cvs} Tips
-
-When working on Crystal Space, you should keep in mind that it is a
-cross-platform project.  As such, there are certain subtleties that that you
-should be aware of.  Here are some tips to keep in mind:
-
-@itemize @bullet
-@item
-All cross-platform files must be restricted the @sc{dos} 8.3 filename
-convention.  Files which are not needed by @sc{dos} are not subject to this
-restriction.
-
-@item
-Some operating systems have case sensitive filenames, whereas others do not.
-Bad things happen if you capitalize a file one way in @code{#include}
-directive and a different way in the actual filename.  This problem many not
-even be apparent on your platform, if you are using a case-insensitive file
-system such as @sc{dos} or Windows.  In general, it is preferable to use
-entirely lower-case filenames for files which are shared between ports.
-
-@strong{Warning}: @file{WinCVS} has been reported to botch capitalization of
-files.  Please be aware of this potential problem.
-
-@item
-Most platforms have their own makefiles or project files.  If you change one
-makefile and change the code so that it depends on this change, other
-platforms will probably break.  This may be unavoidable to some extent, but
-try to minimize the breakage.  For example, wrap the dependent code in an
-@code{#ifdef} and check for operating systems that @emph{do} support the
-change.  This will allow other systems to still work without your change.
-@end itemize

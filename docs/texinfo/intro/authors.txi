@@ -103,9 +103,9 @@ Crystal Space.
 @item
 Thomas Hieber (@email{thieber@@gmx.net})
 
-Thomas wrote thorough documentation for the very useful map2cs conversion
-tool which he authored.  He also maintains the documentation which details the
-Windows port of Crystal Space.
+Thomas wrote thorough documentation for the very useful map2cs conversion tool
+which he authored.  For a while, he also maintained the documentation which
+details the Windows port of Crystal Space.
 
 @item
 David Huen (@email{smh1008@@cus.cam.ac.uk})
@@ -132,6 +132,12 @@ Jesse McClusky  (@email{Jesse.McClusky@@PSS.Boeing.com})
 
 Jesse wrote documentation explaining how to build Crystal Space on the Amiga
 platform.
+
+@item
+Frank O'Connor (<frank@@oconnors.org>)
+
+Frank is the current maintainer of the Windows port and now maintains the
+instructions for building Crystal Space on Windows.
 
 @item
 Dan Ogles (@email{dogles@@peachtree.com})

@@ -1,5 +1,44 @@
 The history order has been reversed so that new features are at the top.
 
+18-Jun-2000
+	- Eric Sunshine made the following changes to the Crystal Space
+	  documentation:
+	    - Repaired all of the errors and warnings reported by 'makeinfo'
+	      after recent changes to the Texinfo source documents.
+	    - Repaired all of the TeX formatting problems which cropped up
+	      with recent changes to the documentation source files.  Mostly
+	      these problems involved overfull and underfull hboxes.
+	    - Overhauled portals.txi.  Performed a much more thorough Texino
+	      conversion on it.  Replaced the ASCII-art with real images.
+	      This looks much nicer in the printed and HTML output.
+	    - Cleaned up the win32.txi build documentation following some
+	      recent changes to it.  Fixed several mark-up problems and also
+	      re-wrapped source file to 80-column width.  Added a slew of
+	      missing cross references.
+	    - Performed a more thorough Texinfo conversion on memdgb.txi and
+	      also renamed it to memdebug.txi.  Fixed several Texinfo mark-up
+	      problems as well.
+	    - Created a new section (portable.txi) which discusses portability
+	      issues when writing code and creating resources for Crytal
+	      Space.  Most of the content of this section actually comes from
+	      the older coding.txi file which now contains only Coding Style
+	      guidelines instead of a mixture of both.  Also expanded the
+	      portability guidelines and added a lot of missing discussion.
+	      Corrected some mis-information which was recently added to these
+	      discussions.
+	    - Overhauled lighting.txi.  Cleaned up much of the Texinfo mark-up
+	      and also rewrote sections of the document.  Replaced the
+	      ASCII-art with real images.
+	    - Removed the mipmap.txi and texcache.txi files which Martin
+	      recently converted since they were excessively out of date,
+	      meaningless, and confusing to the reader (since they didn't
+	      reflect reality).
+	    - Added missing Texinfo mark-up to viscull.txi.
+	- Eric Sunshine syncrhonized the contributor lists on the Crystal
+	  Space web page and the one in the Crystal Space manual
+	  (intro/contrib.txi).  This involved adding contributors to each
+	  document which appeared in only one or the other document, and in
+	  some cases neither.
 17-Jun-2000
 	- Fundamental change in how the particle systems work.
 	  A particle system now also inherits from csSprite and
@@ -91,17 +130,17 @@ The history order has been reversed so that new features are at the top.
 	  warnings in dungeon plugin and software renderer.
 13-Jun-2000
        - Samuel verbosely has been busy with the now called procedural textures:
-           - Changed names from dynamic textures to the more correct term 
+           - Changed names from dynamic textures to the more correct term
              procedural textures.
-           - The iGraphics3D method CreateOffScreenRenderer is now gone. All 
+           - The iGraphics3D method CreateOffScreenRenderer is now gone. All
              drivers are updated.
-           - The software drivers procedural textures are now more memory 
+           - The software drivers procedural textures are now more memory
              efficient.
            - By default the software procedural textures use the main
 	     renderers texture manager, which makes it more consistent
 	     with the glide and back buffer opengl implementations. Within
 	     this mode the engine can render to the texture.
-           - The CS_TEXTURE_DYNAMIC_SHARE_HINT is now gone. In its place is a 
+           - The CS_TEXTURE_DYNAMIC_SHARE_HINT is now gone. In its place is a
              new hint CS_TEXTURE_PROC_ALONE. When this flag is selected the
              software procedural textures run internally at 8bit, they share
 	     and utilise their own 8bit texture manager. (Before each
@@ -115,10 +154,10 @@ The history order has been reversed so that new features are at the top.
 	     fine grained control of mip-mapping. The software texture
 	     manager now keeps a single linked list of all 8bit canvases
 	     it services.
-           - Rewritten the opengl software procedural texture implementation. 
+           - Rewritten the opengl software procedural texture implementation.
              So that it can be rendered to by the engine.
-           - Added a force32bitsoftware additional flag to opengl.cfg, which 
-             performs better with mesa and 16bit displays with a voodoo2. 
+           - Added a force32bitsoftware additional flag to opengl.cfg, which
+             performs better with mesa and 16bit displays with a voodoo2.
              However, the problem with the transposition of red and
 	     blue returns, this is probably a bug in Mesa3.3beta.
            - This is how it now works: csOpenGLProcSoftware now wraps an
@@ -142,7 +181,7 @@ The history order has been reversed so that new features are at the top.
            - This change has required modifying the software drivers so
 	     that the texture handle is not referred to within the
 	     iPolygonTexture structure.
-           - The CS_TEXTURE_PROC_ALONE_HINT has the effect of disabling the 
+           - The CS_TEXTURE_PROC_ALONE_HINT has the effect of disabling the
              updating of the software texture managers versions of the
 	     procedural textures, which improves performance but disallows
 	     the engine from rendering to any procedural textures. For
@@ -162,11 +201,11 @@ The history order has been reversed so that new features are at the top.
 	     matrix about the lookat vector) within the driver and
 	     inverting all vertices which are in screen co-ordinates.
              I wait for a better suggestion :).
-            - Lastly Ive destroyed the performance of the opengl procedural 
+            - Lastly Ive destroyed the performance of the opengl procedural
              textures, oops, need to investigate this :( Used to get about
 	     70fps with the astext texture alone, this is now down to 10ish
 	     with software textures. This might be Mesa3.3beta.
-            - dtsimple is updated to demonstrate how to do things with the 
+            - dtsimple is updated to demonstrate how to do things with the
               cleaner, more consistent interface.
             - Added new constructor for csImageMemory
             - Fixed typo in memdbg.sh
@@ -346,16 +385,16 @@ The history order has been reversed so that new features are at the top.
 	  finished.
 	- Samuel Humphreys has been busy with the opengl drivers:
             - Rewrote the ogl backbuffer dynamic texture implementation, it now
-              inherits from csGraphics3DOGLCommon and implements a dummy 
-              iGraphics2D which transforms vertex info to lower bottom left 
+              inherits from csGraphics3DOGLCommon and implements a dummy
+              iGraphics2D which transforms vertex info to lower bottom left
               subregion of back buffer, and reports correctly width and height
-              information. This has required splitting the old ogl_g3d.* into 
+              information. This has required splitting the old ogl_g3d.* into
               ogl_g3dcom.* and ogl_g3d.* Also two new private functions are
-              added SharedInitialize and SharedOpen which have the same 
+              added SharedInitialize and SharedOpen which have the same
               functionality as those in the software drivers.
               The engine now renders to backbuffer textures, but they are
 	      still inverted and have corrupt colour information.
-            - Added verbose visual information reporting to glx. Now reports 
+            - Added verbose visual information reporting to glx. Now reports
               about auxiliary buffers and properly fills in pfmt.
             - The ogl texture manager now detects and deals with maximum
 	      texture constraints i.e. my voodoo2's 256x256 :)

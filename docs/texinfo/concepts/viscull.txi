@@ -5,10 +5,10 @@
 @cindex Culling, Visibility
 
 @noindent
-@emph{Written by Jorrit Tyberghein, 
+@emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-@emph{NOTE:} This section describes in detail how visibility culling in
+@emph{Note}: This section describes in detail how visibility culling in
 Crystal Space works or will work in the not-to-distant future.
 Not all that is described in this document is actually implemented. It
 only represents of the ideal implementation which lives in my head right
@@ -23,7 +23,7 @@ system are implemented though.
 * VIS view frustum culling:: View Frustum Culling
 * VIS portal/Sector visibility:: Portal/Sector Visibility
 * VIS in Sector Visibility:: In-Sector Visibility
-* VIS PVS:: Potentially Visible Set (PVS)
+* VIS PVS:: Potentially Visible Set (@sc{pvs})
 @end menu
 
 @node VIS sectors and portals, VIS entities, Visibility Culling, Visibility Culling
@@ -31,7 +31,7 @@ system are implemented though.
 @cindex portals
 @cindex sectors
 
-A sector is the basic building block in CS. A world will be made out
+A sector is the basic building block in Crystal Space. A world will be made out
 of several sectors connected with portals. Normally adjacent sectors
 can be connected with a straight portal but portals can also warp space
 so that you can connect any point in space to any other point in space.
@@ -55,34 +55,43 @@ portal. Discussing both will be the main focus of this document later.
 @node VIS entities, VIS sector structure, VIS sectors and portals, Visibility Culling
 @subsection Entities
 
-But first lets discuss the type of entities that CS supports.
+But first lets discuss the type of entities that Crystal Space supports.
 We already saw sectors above. These are the main containers for all
 the entities below.
 
 @subsubheading Sprites or Models
+@cindex Visibility of Sprites or Models
+@cindex Sprites, Visibility
+@cindex Models Visibility
 
-CS supports both 3D and 2D sprites. A 3D sprite is basicly a
+Crystal Space supports both 3D and 2D sprites. A 3D sprite is basicly a
 set of triangles or a triangle mesh. I will not go into much more
 detail here because this document is related to visibility. A 2D sprite
 is a general polygon which always faces the camera. Both are considered
 detail objects (more on that later).
 
 @subsubheading Things
+@cindex Visibility of Things
+@cindex Things, Visibility
 
 Things are general objects used to enhance geometry. They can move
 and rotate but in general their most important use is to enhance
 geometry of a level (i.e. a painting on the wall, a staircase,
-a chair, ...). Large things can be merged with sector geometry (more
+a chair, etc.). Large things can be merged with sector geometry (more
 on that later). Small and detailed things will be tagged as detail
 objects. Polygons on things can also be portals to other areas.
 
 @subsubheading Curved Surfaces
+@cindex Visibility of Curved Surfaces
+@cindex Curved Surfaces, Visibility
 
 Curved surfaces are technically part of things but for visibility
 they are considered differently. They are always considered as detail
 objects as they represent a rather large triangle mesh.
 
 @subsubheading Terrain Surfaces
+@cindex Visibility of Terrain Surfaces
+@cindex Terrain Surfaces, Visibility
 
 A terrain surface is a large entity that can be in a sector.
 It is not a detail object (obviously). Handling of terrain and visibility
@@ -92,7 +101,7 @@ is not ready yet. We need to do more work on this part.
 @subsection Sector Structure
 
 In this subsection we go deeper into the structure of a sector.
-A sector is always convex. i.e. this means that all the polygons making
+A sector is always convex.  This means that all the polygons making
 up the boundary of a sector must form a convex (and in most cases closed)
 hull.
 
@@ -104,18 +113,19 @@ we add further entities like above (and we can still use the outgoing
 portals). All things which are not marked as
 movable and detail can be added to the octree.
 
-@subsubheading About Octrees and BSP Trees
-@cindex octrees
-@cindex BSP trees
+@subsubheading About Octrees and @sc{bsp} Trees
+@cindex Octrees
+@cindex @sc{bsp} Trees
 
-Note that this is only a very short explanation about BSP trees.
+Note that this is only a very short explanation about @sc{bsp} trees.
 There are much better documents explaining them.
 
-A BSP tree is a way to partition space into convex subspaces. CS uses
-BSP trees mostly to get perfect Z ordering of polygons (i.e. front to
-back or back to front). Why CS needs this will be explained later.
+A @sc{bsp} tree is a way to partition space into convex subspaces.  Crystal
+Space uses @sc{bsp} trees mostly to get perfect Z ordering of polygons (i.e.
+front to back or back to front).  Why Crystal Space needs this will be
+explained later.
 
-To build a BSP tree you take the entire sector (i.e. all polygons
+To build a @sc{bsp} tree you take the entire sector (i.e. all polygons
 from the merged things) and you select one polygon to split all the others.
 This will create two child nodes. All polygons on the same plane as the
 splitter will be added to the current node. All polygons at the left side
@@ -129,38 +139,37 @@ node and the right side to the right node.
 This process continues recursively (i.e. into the left and right children)
 until there are no more polygons left.
 
-This entire process creates a tree (i.e. a BSP tree) that can be used
-for many purposes. i.e. to render from back to front (painters algo)
-using a BSP tree you take the camera view point and then start
+This entire process creates a tree (i.e. a @sc{bsp} tree) that can be used
+for many purposes.  For instance, to render from back to front (painters algo)
+using a @sc{bsp} tree you take the camera view point and then start
 traversing the tree. First you traverse the node that is on the back
 side of the splitter plane as seen from the camera. Then you traverse
 the polygons on the splitter (i.e. in this node) and then the polygons
 on the side in front of the splitter plane. This is also a recursive
 process. To render front to back you simply reverse the process.
 
-An octree is a variant of a BSP tree. Instead of selecting a splitter
-from the given polygons you select three axis aligned splitter planes
-usually centered around the center of the set of input polygons. The planes
-are always axis aligned so you can't do much about that but there is
-some freedom with the choice of the center of those three planes.
-CS currently tries a number of random center points and selects the one
-which causes least number of splits. A better criterion would be to
-select a center which causes the planes to intersect as much solid space
-as possible. This is somewhat harder to implement. The reason why this
-is good has to do with visibility culling and PVS. If a splitter plane
-intersects more solid space than open space the chance is high that
-you will be able to cull nearby octree nodes. More about culling later
-though.
+An octree is a variant of a @sc{bsp} tree.  Instead of selecting a splitter
+from the given polygons you select three axis aligned splitter planes usually
+centered around the center of the set of input polygons.  The planes are
+always axis aligned so you can't do much about that but there is some freedom
+with the choice of the center of those three planes.  Crystal Space currently
+tries a number of random center points and selects the one which causes least
+number of splits.  A better criterion would be to select a center which causes
+the planes to intersect as much solid space as possible.  This is somewhat
+harder to implement.  The reason why this is good has to do with visibility
+culling and @sc{pvs}.  If a splitter plane intersects more solid space than
+open space the chance is high that you will be able to cull nearby octree
+nodes.  More about culling later though.
 
-The advantages of an octree in comparison with a BSP tree is that it
+The advantages of an octree in comparison with a @sc{bsp} tree is that it
 is easier to handle (easier to calculate) and also easier to do culling
 with as all nodes are boxes.
 
-CS uses an octree for structuring polygons. However, at some number
-of polygons (currently set at 150) it will switch to BSP trees.
-So at the end you get a large octree with many mini-BSP trees at the
+Crystal Space uses an octree for structuring polygons. However, at some number
+of polygons (currently set at 150) it will switch to @sc{bsp} trees.
+So at the end you get a large octree with many mini-@sc{bsp} trees at the
 leaves of the octree. This combined structure provides everything that
-CS needs for efficient visibility culling.
+Crystal Space needs for efficient visibility culling.
 
 @node VIS visibility culling, VIS view frustum culling, VIS sector structure, Visibility Culling
 @subsection Visibility Culling
@@ -172,14 +181,18 @@ optimal (or near optimal) visibility.
 When speaking about culling we are mainly speaking about three
 types of geometry:
 
-@table @emph
-@item World Geometry
+@itemize @bullet
+@item
+@emph{World Geometry}
+
 World geometry is the basic geometry that makes up the world.
 Sector walls are part of world geometry. In general world geometry
 are big polygons that define large boundaries in some world or
 level.
 
-@item Detail Objects
+@item
+@emph{Detail Objects}
+
 Detail objects are entities which are too detailed (i.e. too
 many small polygons or triangles) to be included in the processor
 intensive visibility calculations. So we mark them as detail and
@@ -187,7 +200,9 @@ we process them on a higher level for visibility (mostly by treating
 their bounding box instead of the object itself). Curved surfaces,
 sprites, and some things are all detail objects.
 
-@item Culling Objects
+@item
+@emph{Culling Objects}
+
 Culling objects are invisible objects. Their only purpose is to cull
 geometry. So they are in fact the reverse of detail objects. In general
 culling objects should be large and have few polygons. These polygons
@@ -201,17 +216,16 @@ number of other entities (i.e. objects or portals) to be culled.
 A question here is whether or not it is possible (easy) to generate culling
 objects automatically from detail objects. Culling objects will be
 added to the octree if there is one.
-
-@end table
+@end itemize
 
 @node VIS view frustum culling, VIS portal/Sector visibility, VIS visibility culling, Visibility Culling
 @subsection View Frustum Culling
 @cindex View frustum
 
-View frustum culling is the most obvious type of culling. CS does not
-do it right now (see the following section about portal/sector visibility
-for the reason) but there are some areas where we should certainly do
-this. Detail objects are one example.
+View frustum culling is the most obvious type of culling.  Crystal Space does
+not do it right now (see the following section about portal/sector visibility
+for the reason) but there are some areas where we should certainly do this.
+Detail objects are one example.
 
 @node VIS portal/Sector visibility, VIS in Sector Visibility, VIS view frustum culling, Visibility Culling
 @subsection Portal/Sector Visibility
@@ -234,7 +248,7 @@ could this make some sense as overdraw is expensive there. The
 new DrawTriangleMesh and the even newer DrawPolygonMesh (in iGraphics3D
 interface) will be able to handle this. All detail objects will be
 rendered with those. The engine will take care to only enable
-clipping if REALLY needed (i.e. there are some cases where clipping
+clipping if @emph{really} needed (i.e. there are some cases where clipping
 is mandatory: for example, if you have a floating portal you cannot
 rely on correct Z-buffer information. So you need to clip geometry
 to the 2D clipper).
@@ -277,7 +291,7 @@ the portal/sector visibility system is visible.
 If a sector has an octree then the situation is vastly different.
 Here is where the main work of the visibility algorithm happens.
 In-sector visibility is also 2D based (screen coordinates). This is why
-the discussion for detail objects in the previous section (Portal/sector
+the discussion for detail objects in the previous section (Portal/Sector
 Visibility) is relevant here too. In general we will try to avoid to
 do as little culling work as possible while still trying to cull as
 much as possible.
@@ -289,14 +303,13 @@ possible and also potentially cull lots of geometry. Culling objects
 should be found for all large detail objects which can potentially
 cull large numbers of other objects or portals.
 
-The current culler works with the c-buffer. For every scanline we
-have a list of not rendered spans (i.e. the CS c-buffer keeps
-empty spans instead of full spans). Initially we will have a list
-of H spans with H being the number of scanlines on the screen.
-Every span will have a width of W with W being the number of horizontal
-screen pixels. When a polygon is added to the c-buffer it will be
-scan-converted and every scan of the polygon will be inserted at the
-appropriate line of the c-buffer.
+The current culler works with the c-buffer.  For every scanline we have a list
+of not rendered spans (i.e. the Crystal Space c-buffer keeps empty spans
+instead of full spans).  Initially we will have a list of @math{H} spans with
+@math{H} being the number of scanlines on the screen.  Every span will have a
+width of @math{W} with @math{W} being the number of horizontal screen pixels.
+When a polygon is added to the c-buffer it will be scan-converted and every
+scan of the polygon will be inserted at the appropriate line of the c-buffer.
 
 An important issue with the c-buffer is that it doesn't have Z information.
 So adjacent empty or full spans can be merged. This is in contrast
@@ -317,7 +330,7 @@ culled at this stage already. This is called polygon culling. More important
 than polygon culling is node culling. Before traversing into a new
 octree node we take the convex outline of the node box and test if that
 convex outline is visible to the c-buffer. This is the main reason that
-the c-buffer culling is in CS. Culling octree nodes can be a huge
+the c-buffer culling is in Crystal Space. Culling octree nodes can be a huge
 speed benefit as they can often contain thousands of polygons and also
 other child nodes.
 
@@ -332,17 +345,17 @@ world geometry here, not detail objects). And since we do that the test
 to see if the c-buffer was modified (i.e. the polygon is visible) is
 trivial. On the other hand, in order to be able to use this visibility
 test for individual polygons we need strict front to back order. This
-is provided by the BSP trees. Traversing the BSP tree itself involves
+is provided by the @sc{bsp} trees. Traversing the @sc{bsp} tree itself involves
 some overhead. First of all because it does some processing with regards
 to testing on which side of every splitter the camera is and also before
-the BSP tree itself caused polygons to be split so there are actually
+the @sc{bsp} tree itself caused polygons to be split so there are actually
 more polygons to consider. So we could consider rendering and feeding
 the polygons from the octree node in original unsorted order. This way
 we would not be able to use visibility information for the polygons
 themselves but the c-buffer would still be correctly filled. This will
 cause a big number of overdraw so this should only be done on hardware
 that is fast enough. Also this approach may mean that it would be better
-to lower the number of polygons at which the octree reverts to BSP
+to lower the number of polygons at which the octree reverts to @sc{bsp}
 trees (i.e. 150 right now). This means we'll get smaller octree nodes
 and thus reduce overdraw that way. This is an area where some
 experimentation is needed.
@@ -366,8 +379,8 @@ works best. It may be that we will have to make things configurable
 depending on the selected hardware.
 
 @node VIS PVS, , VIS in Sector Visibility, Visibility Culling
-@subsection Potentially Visible Set (PVS)
-@cindex PVS
+@subsection Potentially Visible Set (@sc{pvs})
+@cindex @sc{pvs}, Potentially Visible Set
 @cindex Potentially Visible Set
 
 The c-buffer is a very good way to manage real-time visibility.
@@ -380,17 +393,17 @@ We already presented ways to reduce the overhead by limiting c-buffer
 filling to world geometry and culling objects only. But this may not
 be enough.
 
-So we present another way to reduce this overhead. This is a PVS
+So we present another way to reduce this overhead. This is a @sc{pvs}
 or Potentially Visible Set. Basicly for every octree leaf in the
 octree we keep a set of all other visible nodes and polygons.
 Before testing a polygon or node against the c-buffer we will first
-see if it is in the PVS of the current leaf where the camera is.
+see if it is in the @sc{pvs} of the current leaf where the camera is.
 If it is not then we don't need to continue testing. This means we
 can avoid having to transform, perspective project, and scan convert
-the polygon and then test to the c-buffer. This can be a HUGE benefit.
+the polygon and then test to the c-buffer. This can be a @emph{huge} benefit.
 
-After doing the PVS test we have two choices basicly. We can still
-decide to use the c-buffer to do finer culling tests. The PVS only
+After doing the @sc{pvs} test we have two choices basicly. We can still
+decide to use the c-buffer to do finer culling tests. The @sc{pvs} only
 provides region to region visibility. It is possible that less is
 visible from within some point in some region. Whether or not it
 is really worth it to cull further is again something which we'll
@@ -400,17 +413,17 @@ still be useful to use the c-buffer in order to be able to cull
 complex detail objects.
 
 Static detail objects (detail objects that cannot move) could also
-be included in the PVS easily.
+be included in the @sc{pvs} easily.
 
-@subsubheading Calculating the PVS
+@subsubheading Calculating the @sc{pvs}
 @cindex coverage mask tree
 
-Calculating the PVS is a complex and time consuming task in itself.
+Calculating the @sc{pvs} is a complex and time consuming task in itself.
 Currently this is not yet implemented. The approach that is probably
-going to be used works as follows:
+going to be used works as follows.
 
-We traverse every leaf of the octree (ignore BSP nodes and leaves).
-For every such leaf we want to build the PVS. So we again traverse
+We traverse every leaf of the octree (ignore @sc{bsp} nodes and leaves).
+For every such leaf we want to build the @sc{pvs}. So we again traverse
 the octree for every other node this time. We are going to test visibility
 between the leaf and every other node (called occludee). When we find
 that some occludee is not visible we don't have to continue to the children.
@@ -428,15 +441,13 @@ We will take all the polygons of an occluder and cast shadows from the
 light source on the cube surrounding the leaf. If eventually the
 cube is entirely shadowed by the collected polygons in all potential
 occluders then we say that the occludee is not visible from within the
-leaf. So we don't add it to the PVS.
+leaf. So we don't add it to the @sc{pvs}.
 
 An optimization here is that when an occluder already has a calculated
-PVS then we can see if the occludee is visible for the occluder. If not
+@sc{pvs} then we can see if the occludee is visible for the occluder. If not
 then the occluder can be seen as a solid box from the viewpoint of the
 leaf for the occludee and we can cast a shadow from the entire box at
 once.
 
 This is the basic algorithm. More detail will follow later (about the
-PVS for polygons and so on).
-
-
+@sc{pvs} for polygons and so on).

@@ -1,15 +1,14 @@
 @c -*-texinfo-*-
 @node Win32, NeXT, Unix, Platform Instructions
 @subsection Windows
-@cindex Windows
+@cindex Windows, Building
 
 @emph{Originally written by Dan Ogles, @email{dogles@@peachtree.com}; updated
-by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}; and
-Thomas Hieber, @email{thieber@@gmx.net}. 
-maintained by Frank O''Connor @email{frank@@oconnors.org};
-Last updated 20 January 2000.}
+by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com} and Thomas
+Hieber, @email{thieber@@gmx.net}; currently maintained by Frank O'Connor,
+@email{frank@@oconnors.org}.  Last updated 18 June 2000.}
 
-The Windows port of Crystal Space is maintained by Frank O'Connor,
+The Windows port of Crystal Space is currently maintained by Frank O'Connor,
 @email{frank@@oconnors.org}.  Crystal Space supports a wide variety of Windows
 installations and optional technologies such as DirectInput, DirectX, and
 Direct3D.
@@ -32,7 +31,7 @@ Microsoft Visual C++ 6.0.  If anything doesn't work, see the Win32 @sc{faq},
 Load @file{mk/visualc/csall.dsw}.
 
 @item
-Make ``grpAll Files'' your active project.
+Make ``grpAll'' your active project.
 
 @item
 Select menu @emph{Build/Rebuild All}.
@@ -53,17 +52,17 @@ WORLDFILE = flarge
 
 This will set up CrystalSpace to run in software mode using the world file
 @file{flarge}.  @emph{Make sure that you have downloaded a worldfile from the
-Crystal Space Website before this}.  These files are in @sc{zip} format and
-should be placed in the @file{$/CS/data} directory.  Do not attempt to extract
+Crystal Space web site before this.}  These files are in @sc{zip} format and
+should be placed in the @file{CS/data} directory.  Do not attempt to extract
 this archive---Crystal Space decompresses the @sc{zip} file on the fly.
 
 @item
-Open @emph{Project/Settings}, select WalkTest on the left list.  Select the
-``Debug'' tab in the register, select category ``General'' and enter the
-same directory the @file{exe} sits in as work directory.  If the executable
-would be in @file{E:\cvs\Cs\walktest.exe}, you should select @file{E:\cvs\Cs\}
-as working directory.  Make sure you do these settings for ``Win32 Debug'' and
-``Win32 Release'' (Using the combo box on top of the left list).  Then confirm
+Open @emph{Project/Settings}, select ``WalkTest'' on the left list.  Select
+the ``Debug'' tab in the register, select category ``General'' and enter the
+same directory the @sc{exe} sits in as work directory.  If the executable
+would be in @file{C:\CS\walktest.exe}, you should select @file{C:\CS\} as
+working directory.  Make sure you do these settings for ``Win32 Debug'' and
+``Win32 Release'' (using the combo box on top of the left list).  Then confirm
 the settings by pressing @sc{ok}.  Now select ``WalkTest Files'' in the
 Workspace files tab, click the right mouse button and select ``Set as Active
 Project''.  Now call @emph{Build/Execute walktest.exe}.  Alternatively, you
@@ -75,215 +74,232 @@ can switch to the windows explorer and run @file{walktest}.
 
 The Crystal Space workspace is divided into several projects.  They all exist
 as separate project files (@file{*.dsp}).  All of them are being bound
-together by a workspace @file{csall.dsw}.  This workspace will also ensure 
-correct linking between the various projects, so you need to use a predefined 
-workspace or, if you create your own, you will have to set project 
+together by a workspace @file{csall.dsw}.  This workspace will also ensure
+correct linking between the various projects, so you need to use a predefined
+workspace or, if you create your own, you will have to set project
 dependencies right.
 
-Currently the project files are created by using @sc{ms} Visual C++ 6.0. You can
-use @sc{msvc} 5.0 but need to create your own workspace to hold the project 
-files (@file{*.dsp}).
+Currently the project files are created by using @sc{ms} Visual C++ 6.0.  You
+can use @sc{msvc} 5.0 but need to create your own workspace to hold the
+project files (@file{*.dsp}).
 
-The workspace uses a prefix system for naming the projects and grouping them. 
-There are currently four prefixes in use. The prefix @emph{grp} is used to group 
-the projects into the three main categories: Libraries, Plugins, and Applications. 
-There is also a special group @emph{grpAll} that contains the three major 
-groups @emph{grpLibs, grpApplications, grpPlugins}. These groups hold the following
-respectively: 
+The workspace uses a prefix system for naming the projects and grouping them.
+There are currently four prefixes in use.  The prefix @file{grp} is used to
+group the projects into the three main categories: @emph{libraries},
+@emph{plug-ins}, and @emph{applications}.  There is also a special group
+``grpAll'' that contains the three major groups ``grpLibs'',
+``grpApplications'', and ``grpPlugins'.  These groups are composed of the
+following components.
 
-@enumerate
+@itemize @bullet
 @item
-Projects that output a library (lib) are prefixed with lib. 
+Projects that output a library (@file{.lib}) are prefixed with ``lib''.
 
 @table @code
 @item libCSclear
-More information on the CrystalClear project can be found at the CrystalClear project page. http://crystalclear.sourceforge.net/ 
+More information on the CrystalClear project can be found at the CrystalClear
+project page @uref{http://crystalclear.sourceforge.net/} and elsewhere in
+this manual.  @xref{CrystalClear}.
 
 @item libCSengine
-The core of CrystalSpace 3D engine.
+The core component of the Crystal Space 3D engine.
 
 @item libCSgame
 A library intended to make creation of games simpler by providing a more game
 oriented @sc{api} of the engine.
 
 @item libCSgeom
-This library holds commonly used 2D and 3D geometry classes.
+This library contains commonly used 2D and 3D geometry classes and utility
+functions.
 
 @item libCSgfxldr
-This library contains the graphic loaders and savers for the various formats.
+This library is capable of loading and saving graphic images in various
+formats.
 
 @item libCSobject
-Library that holds csObject implementation.
+Library that implementats @samp{csObject}.
 
 @item libCSparser
 Library contains the components needed to load and parse a map file.
 
 @item libCSphyzik
-The Phyziks library is a dynamics modeling and simulation engine. The core of the engine is a numerical integrator that solves the equations of motion for given bodies. Different types of bodies will have different equations of motion. A simple example would be the equations of motion for the center of mass of a rigid body. 
+The ``Phyziks'' library is a dynamics modeling and simulation engine.  The
+core of the engine is a numerical integrator that solves the equations of
+motion for given bodies.  Different types of bodies will have different
+equations of motion.  A simple example would be the equations of motion for
+the center of mass of a rigid body.  @xref{csPhyziks}.
 
 @item libCSscript
-Library contains the current simple scripting system.
+Library contains a very simple scripting system.
 
 @item libCSsfxldr
-Library is used to load various sound formats.
+Library used to load sounds in various formats.
 
 @item libCSsys
-Library contains the platform specific implementation of the CS Engine.
+Library contains the platform specific portion of the Crystal Space Engine.
 
 @item libCSterr
 Library contains the terrain rendering code.
 
 @item libCStools
-Library holds the original statically linked CS Simple Console. New plugin based consoles now exist.
+Library containing useful application tools such as the statically linked
+@samp{csSimpleConsole} class.  (A newer plug-in based console can be used
+instead.)
 
 @item libCSutil
-Holds the implementation of SCF, and various helper classes.
+Contains the implementation of various utility classes and functions including
+@sc{scf} (@pxref{SCF}) and @sc{vfs} (@pxref{VFS}).
 
 @item libCSws
-The goal of Crystal Space Windowing System (CSWS) is to provide a clean, effective and cross-platform base for creating Crystal Space-related utilites.
+The Crystal Space Windowing System (@sc{csws}) provides a clean, effective and
+cross-platform base for creating Crystal Space-related utilites.  @xref{CSWS}.
+
 @item libCSwin32dll
-Handles the dll entry for win32 dll's.
+Handles the @sc{dll} entry for Windows @sc{dll} modules.
 
 @item libCSwin32exe
-Handles the exe entry for win32 exe's.
-
+Handles the @sc{exe} entry for Windows @sc{exe} files.
 @end table
 
 @item
-Projects that output a plugin (dll) are prefixed with plg. 
+Projects that output a plug-in module (@file{.dll}) are prefixed with ``plg''.
 
 @table @code
 @item plgCrystalClear
-Contains the bulk of the Crystal Clear application framwork.
+Contains the bulk of the Crystal Clear application framework.
 
 @item plgCSfont
-Font plugin that implements the basic CS fonts.
+Font plug-in that implements the basic Crystal Space fonts.
 
 @item plgCSNetMan
+A network manager plug-in.
 
 @item plgDirectDraw3dDX61render
-DX Render plugin designed to work on DX6.1 and later.
+DirectX Renderer plug-in designed to work on DirectX 6.1 and later.
 
 @item plgDirectDraw2D
-Canvas driver (2d) designed to run on any version of DX.
+Canvas driver (2D) designed to run on any version of DirectX.
 
 @item plgDirectDraw2dDX61
-Canvas driver (2d) specifically written for DX6.1 and later.
+Canvas driver (2D) specifically written for DirectX 6.1 and later.
 
 @item plgDungeon
-Random level generator plugin for Crystal Space
-Written by Martin Geisse (@email{mgeisse@gmx.net})
+Random level generator plug-in for Crystal Space written by Martin Geisse
+(@email{mgeisse@@gmx.net}).
 
 @item plgFreeFont
-Font plugin that implements the FreeType system for Crystal Space. Allows the use of TrueType fonts in CrystalSpace. (Fonts not provided)
+Font plug-in that implements the FreeType system for Crystal Space.  Allows
+the use of TrueType fonts in CrystalSpace.  (Fonts not provided.)
 
 @item plgOpenGL2D
-Canvas plugin for OpenGL render to use.
+Canvas plug-in for OpenGL renderer to use.
 
 @item plgOpenGLRender
-OpenGL renderer plugin.
+OpenGL renderer plug-in.
 
 @item plgSoftwareRender
-Software renderer plugin.
+Software renderer plug-in.
 
 @item plgSoundDriverWaveOut
-Sound Driver plugin for wav based sound devices.
+Sound driver plug-in for @sc{wav} based sound devices.
 
 @item plgSoundRenderDS3D
-Sound renderer plugin for the DirectSound 3D API
+Sound renderer plug-in for the DirectSound 3D @sc{api}.
 
 @item plgSoundRenderSoftware
-Software based sound renderer plugin.
+Software based sound renderer plug-in.
 
 @item plgCScon
-Plugin containing Funky Console and a standard console implementation.
+Plug-in containing ``Funky Console'' and a standard console implementation.
 
 @item plgCSSocket
-Basic Socket based network plugin (cross-platform).
+Basic socket-based network plug-in (cross-platform).
 
 @item plgColDetRapid
-Plugin that implements the RAPID system of collision detection.
+Plug-in that implements the @sc{rapid} system of collision detection.
 
 @item plgMetaBalls
-Plugin that encapsulate the MetaBall code. 
+Plug-in that encapsulate the MetaBall code.
 
 @item plgSCFDog
-Example plugin for the SCF Tutorial.
-
-@item plgSCFWorm
-Example plugin for the SCF Tutorial.
-
+@itemx plgSCFWorm
+Example plug-ins for the @sc{scf} Tutorial.  @xref{SCF}.
 @end table
 
 @item
-Projects that output an application (exe) are prefixed with app. 
+Projects that output an application (@file{.exe}) are prefixed with ``app''.
 
 @table @code
 @item appBlocks
-A 3D tetris like game built using CS.
+A 3D tetris like game built using Crystal Space.
 
 @item appCCTest
-A test application for the CrystalClear framework.
+A test application for the Crystal Clear framework.
 
 @item appCSWSTest
-A test application for the CSWS subsystem.
+A test application for the CSWS subsystem.  @xref{CSWS}.
 
 @item appDemoNets
-A test application for the Networking system.
+A test application for the networking system.
 
-@item DTSimple
-A test application for procedural textures (used to be called Dynamic Textures). 
+@item appDTSimple
+A test application for procedural textures.
 
-@item Dungeon
-A test application which uses the Random Dungeon Generator (plgDungeon).
+@item appDungeon
+Application which employs the random dungeon generator (@file{plgDungeon}).
 
-@item Map2cs
-A convertor to convert Quake map files to Crystal Space.  See docs\map2cs for
-details.
+@item appMap2cs
+Utility which converts Quake map files to Crystal Space format.
+@xref{map2cs}.
 
 @item appMazeD
-An editor based on CS and CSWS.
+An editor based on Crystal Space and CSWS.
 
 @item appMDS2SPR
-A MDL to SPR file converter.
+Utility which converts Quake 1 @sc{mdl} and Quake 2 @sc{md2} modesl to Crystal
+Space @sc{spr} format.
 
 @item appMetademo
-A Test app for the MetaBall plugin.
+A test application for the MetaBall plug-in (@file{plgMetaBalls}).
 
 @item appPhyzTest
-A test application for libPhyzik.
+A test application for @file{libPhyzik}.
 
 @item appSCFReg
-A scf application for registering dll's and updating SCF.CFG
+An @sc{scf} application for registering @sc{dll}'s and updating
+@file{scf.cfg}.
 
 @item appSCFZoo
-A simple application for the SCF tutorial.
+A simple application for the @sc{scf} tutorial.  @xref{SCF}.
 
 @item appShooter
-A simple 3d shooter game created in CS.
+A simple 3D shooter game created with Crystal Space and the game library,
+@file{libCSgame}.
 
 @item appSimple
-The simple application used in the main CS tutorial.
+A simple application used as the basis of the ``simple'' Crystal Space
+tutorial.  @xref{Tutorial Simple}.
 
 @item appWalkTest
-The basic CS test application. Contains many bleeding-edge features of the engine (quite messy). 
+The basic Crystal Space test application.  Contains many bleeding-edge
+features of the engine (quite messy).
 
 @item appNetdrvClient
-A test application for the Network subsystem
+A test application for the network subsystem
 
 @item appNetdrvServer
-A test application for the Network subsystem
+A test application for the network subsystem
 
 @item appNSTPc
-The client side of the NSTP implementation.
+The client side of the NetSpace (@sc{nstp}) system.
 
 @item appNSTPs
-The server side of the NSTP implementation.
+The server side of the NetSpace (@sc{nstp} system.
 
 @item appSquawk
-Test application which implemented multiple views.
-
+Test application which implements multiple camera views.
 @end table
+@end itemize
 
 @node Win32 FAQ, , Win32 Workspace, Win32
 @subsubsection Frequently Asked Questions (@sc{faq})
@@ -397,7 +413,7 @@ can't do much for you!
 @item
 Q. @emph{I've got unresolved symbols.}
 
-What kind of symbols?
+A. What kind of symbols?
 
 @itemize @minus
 @item
@@ -494,7 +510,5 @@ solved here!}
 
 A. Try sending a note to the Crystal Space mailing list and asking your
 question there.  @xref{Mailing Lists}.  As a last resort, you might also try
-contacting me, Thomas Hieber at @email{thieber@@gmx.net}.
+contacting Thomas Hieber at @email{thieber@@gmx.net}.
 @end itemize
-
-
