@@ -27,6 +27,7 @@
 #define __CROSSBLD_H__
 
 #include "csutil/impexp.h"
+#include "csutil/vfs.h"
 #include "csengine/cssprite.h"
 #include "csengine/triangle.h"
 #include "csengine/thingtpl.h"
@@ -66,6 +67,32 @@ class csCrossBuild_Factory
  * The sprite template factory makes a whole sprite template by
  * extracting all the frames from a converter and stuffing them
  * into a csSpriteTemplate object.
+ * Typical usage is done by combining this with the 'converter'
+ * class.  Example, assuming the texture exists and is already
+ * loaded:
+ *
+========================================================================
+  // read in the model file
+  CHK (converter * filedata = new converter);
+  if (filedata->ivcon (filename) == ERROR)
+  {
+    Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
+    CHK (delete filedata);
+    return;
+  }
+
+  // convert data from the 'filedata' structure into a CS sprite template
+  csCrossBuild_SpriteTemplateFactory builder;
+  csSpriteTemplate *result = (csSpriteTemplate *)builder.CrossBuild (*filedata);
+  CHK (delete filedata);
+
+  // add this sprite to the world
+  csNameObject::AddName (*result, templatename);
+  result->SetTexture (Sys->view->GetWorld ()->GetTextures (), txtname);
+
+  Sys->view->GetWorld ()->sprite_templates.Push (result);
+==========================================================================
+ *
  */
 class csCrossBuild_SpriteTemplateFactory : public csCrossBuild_Factory
 {
@@ -105,6 +132,7 @@ class csCrossBuild_SpriteTemplateFactory : public csCrossBuild_Factory
      */
     void Build_TriangleMesh(csSpriteTemplate& meshsource, converter& buildsource);
 };
+
 
 /**
  * The thing template factory makes a whole thing template by
@@ -148,6 +176,67 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
      * converter data
      */
     void Build_TriangleMesh(csThingTemplate& meshsource, converter& buildsource);
+};
+
+/**
+ * The quake2 build factory imports a geometry file (assumed to be a 
+ * quake 2 MD2 format file), imports the textures associated with that
+ * file as 'skins', and maps all the frames into Crystal space actions
+ * corresponding to Quake 2 equivalents, i.e., the 'stand###' frames
+ * are mapped to the CS action 'stand' and so on.  Skins are given
+ * names consisting of the sprite name (NOT the file name) plus the
+ * texture filename, separated
+ * by a dash, such as 'bobafett-ROTJ_Fett' which represents the
+ * 'ROTJ_Fett.pcx' skin packed with the 'bobafett' model.
+ * Typical usage, assuming 'bob.zip' is a zip file holdin the
+ * MD2 file and skins:
+=================================================
+ filename = 'bob.zip'
+ csCrossBuild_Quake2Importer importer;
+ csSpriteTemplate *newtemplate = importer.ImportQuake2Pack(filename,'bob',world);
+ newtemplate->SetTexture('bob-gnarlyskin'); // assume 'gnarlyskin' is a skin!
+ csSprite *newsprite = newtemplate->NewSprite();
+=================================================
+ *
+ */
+class csCrossBuild_Quake2Importer
+{
+  private:
+    // VFS to use.  May be the default, or it may have
+    // .zip files mounted containing the sprites
+    csVFS &localVFS;
+
+    // find a MD2 geometry file, load and return it, with all standard
+    // actions already created
+    csSpriteTemplate *Import_Quake2SpriteTemplate(csFile &modelfile) const;
+
+    // find textures in a directory and add to the world.  the texture names
+    // are made by concatinating the modelname passed in and the
+    // texture file name
+    csTextureHandle * Import_Quake2Textures(char *skinpath, char *modelname, csWorld *importdestination) const;
+
+    // given a prefix representing an action name, make a csSpriteAction
+    // by concatinating all the frames that start with that prefix
+    csSpriteAction *  Make_NamedAction(csSpriteTemplate &frameholder, char *prefixstring, int delay) const;
+
+    // build all the standard quake 2 actions, assuming the sprite
+    // has frames with names that start with the proper action names
+    void              Build_Quake2Actions(csSpriteTemplate &frameholder) const;
+
+  public:
+    /// Constructor needs a VFS to map from the WAD, sprite respository,
+    /// or whatever, to files.   If no VFS is supplied it will use
+    /// the system VFS
+    csCrossBuild_Quake2Importer();
+    csCrossBuild_Quake2Importer(csVFS &specialVFS);
+    ~csCrossBuild_Quake2Importer();
+
+    /// import quake 2 data by reading in a specified MD2 file.  Any
+    /// skins are loaded by looking for image files in the directory 
+    /// 'skinpath'.  If 'skinpath' is NULL, looks in the same directory as the
+    /// geometry file.
+    csSpriteTemplate *Import_Quake2File(char *md2filebase, char *skinpath,
+		    char *modelname, csWorld *importdestination) const;
 };
 
 #endif // ifndef __CROSSBLD_H__

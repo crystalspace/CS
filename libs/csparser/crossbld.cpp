@@ -22,46 +22,13 @@
 // can be used in a Crystal Space world.
 
 #include "csparser/crossbld.h"
+#include "csobject/nameobj.h"
+#include "csengine/world.h"
+#include "cssys/common/system.h"
+#include "csutil/csstrvec.h"
+#include "itexture.h"
+#include "itxtmgr.h"
 
-// build action list by concatenating all frames with names
-// that begin with a certain string (the 'prefixstring')
-static csSpriteAction *ivconmake_named_csSpriteAction
-  (csSpriteTemplate &frameholder, char *prefixstring, int delay)
-{
-  csSpriteAction *newaction = frameholder.AddAction();
-
-  newaction->SetName(prefixstring);
-
-  // check all the frame names, do any match?
-  for (int frameindex=0; frameindex < frameholder.GetNumFrames(); frameindex++)
-  {
-    csFrame *curframe = frameholder.GetFrame(frameindex);
-    char *framename = curframe->GetName();
-    if ( strncmp( prefixstring,framename,strlen(prefixstring) ) == 0 )
-    {
-      newaction->AddFrame(curframe,delay);
-    }
-  }
-
-  return newaction;
-}
-
-// build up standard quake2 named actions by glomming together frames that
-// start with that action name
-static void ivconbuild_Quake2Actions (csSpriteTemplate &frameholder)
-{
-  char *actionnames[] = {
-  	"stand", "run", "attack", "pain1", "pain2",
-	"pain3", "jump", "flip",  "salute", "taunt",
-	"wave", "point", "crstand", "crwalk", "crattack",
-	"crpain", "crdeath", "death1", "death2", "death3", NULL };
-
-  for (char **actionname=actionnames; *actionname != NULL; actionname++)
-  {
-    ivconmake_named_csSpriteAction(frameholder,*actionname,100);
-    //printf("add action %s\n",*actionname);
-  }
-}
 //
 // definitions of method for the base csCrossBuild_Factory
 // These are really just placeholders, they shouldn't do much
@@ -130,10 +97,6 @@ void csCrossBuild_SpriteTemplateFactory::CrossBuild (csBase* object,
     defaultaction->AddFrame( newtemplate->GetFrame(0), 1000 );
   }
 
-  // if there exist quake2 actions, add them
-  // --This is a temporary hack.  Model-specific stuff should and
-  // will go into model-specific cross builder classes -GJH
-  ivconbuild_Quake2Actions(*newtemplate);
 }
 
 /// frame build method
@@ -172,6 +135,105 @@ void csCrossBuild_SpriteTemplateFactory::Build_TriangleMesh(csSpriteTemplate& me
     targetmesh->AddTriangle(a,b,c);
   }
 }
+
+
+#if 0
+// build sprite template from a quake-pakked file
+csSpriteTemplate *ivconbuild_Quake2csSpriteTemplate(Archive &pakarchive)
+{
+
+  // read in the model data and, since the converter needs a file to
+  // read from spew into a temporary file
+  size_t modeldatasize;
+  char *modelrawdata = pakarchive.read(modelfilename,&modeldatasize);
+  char *tempfilenamebase = tmpnam(NULL);
+  char tempfilename[2000];
+  sprintf(tempfilename,"%s.md2",tempfilenamebase);
+  FILE *tempfile = fopen(tempfilename,"wb");
+  fwrite(modelrawdata,modeldatasize,1,tempfile);
+  CHK (delete [] modelrawdata);
+
+  return newtemplate;
+}
+
+
+// load textures from a quake-pakked file.  All textures will have
+// their names prefixed by the prefixstring if it is non-NULL
+// returns the 'default' texture for the sprite in this file
+csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,char *prefixstring)
+{
+  // go through and load all .pcx and .bmp files in the archive
+  void *currententry = pakarchive.first_file();
+
+  csTextureHandle *defaulttexture = NULL;
+
+  while (currententry != NULL)
+  {
+    char *filename = pakarchive.get_file_name(currententry);
+
+    // if the file name ends in .pcx, load it
+    char *fileextension = filename + strlen(filename) - 3;
+    if (   (strcmp("pcx",fileextension) == 0) 
+        || (strcmp("PCX",fileextension) == 0) 
+	|| (strcmp("bmp",fileextension) == 0)
+	|| (strcmp("BMP",fileextension) == 0)
+       )
+    {
+      // read from spew into a temporary file
+      size_t skindatasize;
+      char *skinrawdata = pakarchive.read(filename,&skindatasize);
+      char *tempfilename = tmpnam(NULL);
+      FILE *tempfile = fopen(tempfilename,"wb");
+      fwrite(skinrawdata,skindatasize,1,tempfile);
+      CHK (delete [] skinrawdata);
+      fclose(tempfile);
+
+      // convert to a gif which we CAN read
+      char buffer[1024];
+      sprintf(buffer,"convert %s %s.gif",tempfilename,tempfilename);
+      system(buffer);
+
+      // read in the converted skin
+      sprintf(buffer,"%s.gif",tempfilename);
+      tempfile = fopen(buffer,"rb");
+      ImageFile *newskin = ImageLoader::load(tempfile);
+      fclose(tempfile);
+      unlink(buffer);
+      unlink(tempfilename);
+
+      if (!defaulttexture)
+        defaulttexture = world->GetTextures()->NewTexture(newskin);
+/*
+      ITextureManager *txtmgr;
+      System->piG3D->GetTextureManager(&txtmgr);
+      ITextureHandle *th;
+      txtmgr->RegisterTexture(GetIImageFileFromImageFile(defaulttexture->GetImageFile()),&th,
+      			defaulttexture->for_3d,defaulttexture->for_2d);
+      defaulttexture->SetTextureHandle(th);
+      */
+
+      printf("added texture %s...\n",filename);
+
+      if (prefixstring)
+      {
+        CHK (char *prefixedname = new char[strlen(filename)+strlen(prefixstring)+1]);
+        strcpy(prefixedname,prefixstring);
+	strcat(prefixedname,filename);
+	csNameObject::AddName(*defaulttexture,prefixedname);
+	CHK (delete[] prefixedname);
+      }
+	csNameObject::AddName(*defaulttexture,filename);
+
+    }
+
+    currententry = pakarchive.next_file(currententry);
+  }
+
+  return defaulttexture;
+}
+
+
+#endif
 
 //
 // method definitions for csCrossBuild_ThingTemplateFactory
@@ -242,6 +304,205 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& mesh
     ptemp->SetUV (2, buildsource.cor3_uv[0][c], buildsource.cor3_uv[1][c]);
     ptemp->SetGouraud ();
     meshsource.AddPolygon (ptemp);
+  }
+}
+
+csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer()
+      : localVFS (*(System->Vfs) )
+{
+}
+
+
+csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(csVFS &specialVFS)
+      : localVFS (specialVFS)
+{
+}
+
+csCrossBuild_Quake2Importer::~csCrossBuild_Quake2Importer()
+{
+}
+
+csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File(
+			char *md2filebase,
+			char *skinpath,
+			char *modelname,
+			csWorld *importdestination) const
+{
+#if 0
+  csFile *modelfile = localVFS.Open(md2filebase,VFS_FILE_READ);
+
+  csSpriteTemplate *newtemplate = 
+  	Import_Quake2SpriteTemplate(*modelfile);
+
+  delete modelfile;
+
+  // name this texture as appropriate
+  csNameObject::AddName(*newtemplate,modelname);
+
+  /* make this template available for use in the given CS world */
+  importdestination->sprite_templates.Push(newtemplate);
+
+  // arrange to load in any textures accompanying the model as skins
+  char fakeskinpath[300];
+  if (skinpath == NULL)
+  {
+    skinpath = fakeskinpath;
+    strcpy(fakeskinpath,md2filebase);
+    char *lastslash = fakeskinpath;
+    char *walkpath = fakeskinpath;
+    while (*walkpath)
+    {
+      if (*walkpath == '/') lastslash = walkpath;
+      walkpath++;
+    }
+    lastslash = '\0';
+  }
+
+  csTextureHandle *defaultskin = Import_Quake2Textures(skinpath,modelname,importdestination);
+  
+  newtemplate->SetTexture( importdestination->GetTextures(),
+  			   const_cast<char *>( csNameObject::GetName(*defaultskin))
+			   );
+
+  newtemplate->GenerateLOD ();
+  newtemplate->ComputeBoundingBox ();
+
+#endif
+
+  return NULL;
+}
+
+
+csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2SpriteTemplate(
+			csFile &modelfile) const
+{
+#if 0
+  size_t modeldatasize = modelfile.GetSize();
+  char *modelrawdata = new char [modeldatasize];
+  if (modelfile.Read(modelrawdata,modeldatasize) == 0)
+  {
+    return NULL;
+  }
+
+  char *tempfilenamebase = tmpnam(NULL);
+  char tempfilename[2000];
+  sprintf(tempfilename,"%s.md2",tempfilenamebase);
+  FILE *tempfile = fopen(tempfilename,"wb");
+  fwrite(modelrawdata,modeldatasize,1,tempfile);
+  CHK (delete [] modelrawdata);
+
+  converter modeldata;
+  modeldata.ivcon(tempfilename);
+  fclose(tempfile);
+
+  // now we have the data read in, make a sprite template
+  csCrossBuild_SpriteTemplateFactory localfactory;
+  csSpriteTemplate * newtemplate = (csSpriteTemplate *)localfactory.CrossBuild(modeldata);
+
+  return newtemplate;
+#endif
+  return NULL;
+}
+
+csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
+			char *skinpath,
+			char *modelname,
+			csWorld *importdestination) const
+{
+  // go through and load all .pcx and .bmp files in the archive
+  csStrVector *skinlist = localVFS.FindFiles(skinpath);
+  int const skinfilecount = skinlist->Length();
+
+  csTextureHandle *defaulttexture = NULL;
+
+  for (int skinfileindex = 0; skinfileindex < skinfilecount; skinfileindex++)
+  {
+    char *skinfilename = (char *)skinlist->Get(skinfileindex);
+
+    // if the file name ends in .pcx, load it
+    char *fileextension = skinfilename + strlen(skinfilename) - 3;
+    if (   (strcasecmp("gif",fileextension) == 0) 
+	|| (strcasecmp("bmp",fileextension) == 0)
+       )
+    {
+      size_t imagefilesize;
+      char *imagedata = localVFS.ReadFile(skinfilename,imagefilesize);
+
+      ImageFile *newskin = ImageLoader::load((unsigned char *)imagedata,imagefilesize);
+
+      CHK (delete [] imagedata);
+
+      //if (!defaulttexture)
+      defaulttexture = importdestination->GetTextures()->NewTexture(newskin);
+
+      ITextureManager *txtmgr;
+      System->piG3D->GetTextureManager(&txtmgr);
+      ITextureHandle *th;
+      txtmgr->RegisterTexture(GetIImageFileFromImageFile(defaulttexture->GetImageFile()),&th,
+      			defaulttexture->for_3d,defaulttexture->for_2d);
+      defaulttexture->SetTextureHandle(th);
+
+      printf("added texture %s...\n",skinfilename);
+
+      char *prefixstring = modelname;
+      if (prefixstring)
+      {
+        CHK (char *prefixedname = new char[strlen(skinfilename)+strlen(prefixstring)+1]);
+        strcpy(prefixedname,prefixstring);
+	strcat(prefixedname,skinfilename);
+	csNameObject::AddName(*defaulttexture,prefixedname);
+	CHK (delete[] prefixedname);
+      }
+      csNameObject::AddName(*defaulttexture,skinfilename);
+
+    }
+  } /* end for(int skinfileindex...) */
+
+  delete skinlist;
+
+  return defaulttexture;
+}
+
+/// given a prefix representing an action name, make a csSpriteAction
+/// by concatinating all the frames that start with that prefix
+csSpriteAction *  csCrossBuild_Quake2Importer::Make_NamedAction(
+			csSpriteTemplate &frameholder,
+			char *prefixstring,
+			int delay) const
+{
+  csSpriteAction *newaction = frameholder.AddAction();
+
+  newaction->SetName(prefixstring);
+
+  // check all the frame names, do any match?
+  for (int frameindex=0; frameindex < frameholder.GetNumFrames(); frameindex++)
+  {
+    csFrame *curframe = frameholder.GetFrame(frameindex);
+    char *framename = curframe->GetName();
+    if ( strncmp( prefixstring,framename,strlen(prefixstring) ) == 0 )
+    {
+      newaction->AddFrame(curframe,delay);
+    }
+  }
+
+  return newaction;
+}
+
+/// build all the standard quake 2 actions, assuming the sprite
+/// has frames with names that start with the proper action names
+void              csCrossBuild_Quake2Importer::Build_Quake2Actions(
+			csSpriteTemplate &frameholder) const
+{
+  static char *actionnames[] = {
+  	"stand", "run", "attack", "pain1", "pain2",
+	"pain3", "jump", "flip",  "salute", "taunt",
+	"wave", "point", "crstand", "crwalk", "crattack",
+	"crpain", "crdeath", "death1", "death2", "death3", NULL };
+
+  for (char **actionname=actionnames; *actionname != NULL; actionname++)
+  {
+    Make_NamedAction(frameholder,*actionname,100);
+    //printf("add action %s\n",*actionname);
   }
 }
 
