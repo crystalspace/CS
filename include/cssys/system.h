@@ -65,7 +65,7 @@ class csSystemDriver : public iSystem
   {
   public:
     // The plugin itself
-    iPlugin *PlugIn;
+    iPlugin *Plugin;
     // The class ID of the plugin, and their functionality ID
     char *ClassID, *FuncID;
     // The mask of events this plugin wants to see
@@ -89,7 +89,7 @@ class csSystemDriver : public iSystem
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
     {
       if (Mode == 0)
-        return ((csPlugin *)Item)->PlugIn == Key ? 0 : 1;
+        return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
       else
         return ((csPlugin *)Item)->FuncID ? strcmp (((csPlugin *)Item)->FuncID, (char *)Key)
              : ((csPlugin *)Item)->FuncID == Key ? 0 : 1;
@@ -222,7 +222,7 @@ public:
   /// -------------------------- plug-ins --------------------------
 
   /// The list of all plug-ins
-  csPlugInsVector PlugIns;
+  csPlugInsVector Plugins;
 
   /// the width of this frame
   int FrameWidth;

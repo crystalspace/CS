@@ -61,7 +61,7 @@ void (*fatal_exit) (int errorcode, bool canreturn) = default_fatal_exit;
 csSystemDriver::csPlugin::csPlugin (iPlugin *iObject, const char *iClassID,
   const char *iFuncID)
 {
-  PlugIn = iObject;
+  Plugin = iObject;
   ClassID = csStrNew (iClassID);
   FuncID = csStrNew (iFuncID);
   EventMask = 0;
@@ -71,7 +71,7 @@ csSystemDriver::csPlugin::~csPlugin ()
 {
   delete [] ClassID;
   delete [] FuncID;
-  PlugIn->DecRef ();
+  Plugin->DecRef ();
 }
 
 //----------------------- A private class used to keep a list of plugins -----//
@@ -280,7 +280,7 @@ SCF_IMPLEMENT_IBASE (csSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iSystem)
 SCF_IMPLEMENT_IBASE_END
 
-csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
+csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -324,7 +324,7 @@ csSystemDriver::~csSystemDriver ()
   if (VFS) VFS->DecRef ();
 
   // Free all plugins
-  PlugIns.DeleteAll ();
+  Plugins.DeleteAll ();
   // Free the system event outlet
   EventOutlets.DeleteAll ();
 
@@ -550,13 +550,13 @@ void csSystemDriver::NextFrame ()
   CurrentTime = cur_time;
 
   // See if any plugin wants to be called every frame
-  for (i = 0; i < PlugIns.Length (); i++)
+  for (i = 0; i < Plugins.Length (); i++)
   {
-    csPlugin *plugin = PlugIns.Get (i);
+    csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
       csEvent Event (Time (), csevBroadcast, cscmdPreProcess);
-      plugin->PlugIn->HandleEvent (Event);
+      plugin->Plugin->HandleEvent (Event);
     }
   }
 
@@ -568,13 +568,13 @@ void csSystemDriver::NextFrame ()
   }
 
   // If a plugin has set CSMASK_Nothing, it receives cscmdPostProcess events too
-  for (i = 0; i < PlugIns.Length (); i++)
+  for (i = 0; i < Plugins.Length (); i++)
   {
-    csPlugin *plugin = PlugIns.Get (i);
+    csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
       csEvent Event (Time (), csevBroadcast, cscmdPostProcess);
-      plugin->PlugIn->HandleEvent (Event);
+      plugin->Plugin->HandleEvent (Event);
     }
   }
 }
@@ -607,11 +607,11 @@ bool csSystemDriver::HandleEvent (iEvent&Event)
 
   int evmask = 1 << Event.Type;
   bool canstop = !(Event.Flags & CSEF_BROADCAST);
-  for (int i = 0; i < PlugIns.Length (); i++)
+  for (int i = 0; i < Plugins.Length (); i++)
   {
-    csPlugin *plugin = PlugIns.Get (i);
+    csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & evmask)
-      if (plugin->PlugIn->HandleEvent (Event) && canstop)
+      if (plugin->Plugin->HandleEvent (Event) && canstop)
         return true;
   }
 
@@ -713,10 +713,10 @@ void csSystemDriver::Help (iConfig* Config)
 void csSystemDriver::Help ()
 {
   csEvent HelpEvent (Time (), csevBroadcast, cscmdCommandLineHelp);
-  for (int i = 0; i < PlugIns.Length (); i++)
+  for (int i = 0; i < Plugins.Length (); i++)
   {
-    csPlugin *plugin = PlugIns.Get (i);
-    iConfig *Config = SCF_QUERY_INTERFACE (plugin->PlugIn, iConfig);
+    csPlugin *plugin = Plugins.Get (i);
+    iConfig *Config = SCF_QUERY_INTERFACE (plugin->Plugin, iConfig);
     if (Config)
     {
       Printf (CS_MSG_STDOUT, "Options for %s:\n",
@@ -724,7 +724,7 @@ void csSystemDriver::Help ()
       Help (Config);
       Config->DecRef ();
     }
-    plugin->PlugIn->HandleEvent (HelpEvent);
+    plugin->Plugin->HandleEvent (HelpEvent);
   }
 
   Printf (CS_MSG_STDOUT, "General options:\n");
@@ -937,7 +937,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
     Printf (CS_MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
-    int index = PlugIns.Push (new csPlugin (p, iClassID, iFuncID));
+    int index = Plugins.Push (new csPlugin (p, iClassID, iFuncID));
     if (p->Initialize (this))
     {
       iBase *ret;
@@ -953,7 +953,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
       }
     }
     Printf (CS_MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
-    PlugIns.Delete (index);
+    Plugins.Delete (index);
   }
   return NULL;
 }
@@ -961,7 +961,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
 bool csSystemDriver::RegisterPlugIn (const char *iClassID,
   const char *iFuncID, iPlugin *iObject)
 {
-  int index = PlugIns.Push (new csPlugin (iObject, iClassID, iFuncID));
+  int index = Plugins.Push (new csPlugin (iObject, iClassID, iFuncID));
   if (iObject->Initialize (this))
   {
     QueryOptions (iObject);
@@ -971,29 +971,29 @@ bool csSystemDriver::RegisterPlugIn (const char *iClassID,
   else
   {
     Printf (CS_MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
-    PlugIns.Delete (index);
+    Plugins.Delete (index);
     return false;
   }
 }
 
 int csSystemDriver::GetPlugInCount ()
 {
-  return PlugIns.Length ();
+  return Plugins.Length ();
 }
 
 iBase* csSystemDriver::GetPlugIn (int idx)
 {
-  csPlugin* pl = PlugIns.Get (idx);
-  return pl->PlugIn;
+  csPlugin* pl = Plugins.Get (idx);
+  return pl->Plugin;
 }
 
 iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  for (int i = 0; i < PlugIns.Length (); i++)
+  for (int i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret =
-      (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (ifID, iVersion);
+      (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
     if (ret)
       return ret;
   }
@@ -1003,11 +1003,11 @@ iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
 iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
   int iVersion)
 {
-  int idx = PlugIns.FindKey (iFuncID, 1);
+  int idx = Plugins.FindKey (iFuncID, 1);
   if (idx < 0)
     return NULL;
 
-  return (iBase *)PlugIns.Get (idx)->PlugIn->QueryInterface (
+  return (iBase *)Plugins.Get (idx)->Plugin->QueryInterface (
     iSCF::SCF->GetInterfaceID (iInterface), iVersion);
 }
 
@@ -1016,15 +1016,15 @@ iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID,
 {
   int i;
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  for (i = 0 ; i < PlugIns.Length () ; i++)
+  for (i = 0 ; i < Plugins.Length () ; i++)
   {
-    csPlugin* pl = PlugIns.Get (i);
+    csPlugin* pl = Plugins.Get (i);
     if (pl->ClassID && pl->FuncID)
       if (pl->ClassID == iClassID || !strcmp (pl->ClassID, iClassID))
       {
 	if (pl->FuncID == iFuncID || !strcmp (pl->FuncID, iFuncID))
 	{
-	  return (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (ifID, iVersion);
+	  return (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
 	}
       }
   }
@@ -1033,7 +1033,7 @@ iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID,
 
 bool csSystemDriver::UnloadPlugIn (iPlugin *iObject)
 {
-  int idx = PlugIns.FindKey (iObject);
+  int idx = Plugins.FindKey (iObject);
   if (idx < 0)
     return false;
 
@@ -1049,7 +1049,7 @@ bool csSystemDriver::UnloadPlugIn (iPlugin *iObject)
     config->DecRef ();
   }
 
-  csPlugin *p = PlugIns.Get (idx);
+  csPlugin *p = Plugins.Get (idx);
 
 #define CHECK(Var,Func)						\
   if (!strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
@@ -1061,7 +1061,7 @@ bool csSystemDriver::UnloadPlugIn (iPlugin *iObject)
 
 #undef CHECK
 
-  return PlugIns.Delete (idx);
+  return Plugins.Delete (idx);
 }
 
 iConfigManager *csSystemDriver::GetConfig ()
@@ -1091,11 +1091,11 @@ bool csSystemDriver::SaveConfig ()
 
 bool csSystemDriver::CallOnEvents (iPlugin *iObject, unsigned int iEventMask)
 {
-  int idx = PlugIns.FindKey (iObject);
+  int idx = Plugins.FindKey (iObject);
   if (idx < 0)
     return false;
 
-  csPlugin *plugin = PlugIns.Get (idx);
+  csPlugin *plugin = Plugins.Get (idx);
   plugin->EventMask = iEventMask;
   return true;
 }
