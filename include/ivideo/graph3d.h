@@ -724,7 +724,7 @@ struct csSimpleRenderMesh
   /// Number of vertex indices
   uint indexCount;
   /// Vertex indices
-  uint* indices;
+  const uint* indices;
 
   /// Number of vertices
   uint vertexCount;
@@ -733,15 +733,15 @@ struct csSimpleRenderMesh
    * will likely only give useable results if you provide a shader and 
    * shader var context (and transfer vertices and/or texcoords with SVs.)
    */
-  csVector3* vertices;
-  /// Texture coordinates.
-  csVector2* texcoords;
+  const csVector3* vertices;
+  /// (Optional) Texture coordinates.
+  const csVector2* texcoords;
   /**
    * (Optional) Colors. 
    * Leaving this 0 has the same effect as having all vertex colors set to
    * white.
    */
-  csVector4* colors;
+  const csVector4* colors;
   /**
    * (Optional) Handle to the texture to select. 
    * Leaving this 0 has the same effect as using a white texture.

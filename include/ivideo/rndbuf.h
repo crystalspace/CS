@@ -91,7 +91,7 @@ struct iRenderBuffer : public iBase
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() = 0;
 
-  virtual void CopyToBuffer(void *data, int length) = 0;
+  virtual void CopyToBuffer(const void *data, int length) = 0;
 
   /// Sets the number of components per element
   virtual void SetComponentCount (int count) = 0;

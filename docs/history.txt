@@ -13,6 +13,11 @@ chronological order.
 	  csGenmeshMeshObject::PreGetShaderVariableValues.
 	- Rhad altered csGenmeshMeshObject::PreGetShaderVariableValues to use the
 	  existing renderbuffer if the new data set will still fit inside.
+	- res fixed constness support in the GL extension manager.
+	- res changed the simple mesh to use some const members.
+	- res changed iRenderBuffer->CopyToBuffer() to accept const data.
+	- res slightly changed the genmesh color buffer size check to use
+	  '!=' instead of '<'.
 12-Jun-2004
 	- res made all Win32 platforms, not only VC, use CS' own opendir() etc 
 	  functions.

@@ -278,9 +278,9 @@ typedef uint32 GLhandleARB;
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTS) (GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, GLvoid* indices);
-typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3D) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels);
-typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels);
+typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTS) (GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices);
+typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3D) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
+typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
 
 // GL_version_1_3
@@ -676,48 +676,48 @@ typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, 
 typedef GLvoid (csAPIENTRY* csGLACTIVETEXTURE) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVETEXTURE) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1D) (GLenum target, GLdouble s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1DV) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1DV) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1F) (GLenum target, GLfloat s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1FV) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1FV) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1I) (GLenum target, GLint s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1IV) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1IV) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1S) (GLenum target, GLshort s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1SV) (GLenum target, GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1SV) (GLenum target, const GLshort* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2D) (GLenum target, GLdouble s, GLdouble t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2DV) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2DV) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2F) (GLenum target, GLfloat s, GLfloat t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2FV) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2FV) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2I) (GLenum target, GLint s, GLint t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2IV) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2IV) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2S) (GLenum target, GLshort s, GLshort t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2SV) (GLenum target, GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2SV) (GLenum target, const GLshort* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3D) (GLenum target, GLdouble s, GLdouble t, GLdouble r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3DV) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3DV) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3F) (GLenum target, GLfloat s, GLfloat t, GLfloat r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3FV) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3FV) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3I) (GLenum target, GLint s, GLint t, GLint r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3IV) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3IV) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3S) (GLenum target, GLshort s, GLshort t, GLshort r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3SV) (GLenum target, GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3SV) (GLenum target, const GLshort* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4D) (GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4DV) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4DV) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4F) (GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4FV) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4FV) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4I) (GLenum target, GLint s, GLint t, GLint r, GLint q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4IV) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4IV) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4S) (GLenum target, GLshort s, GLshort t, GLshort r, GLshort q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SV) (GLenum target, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXF) (GLfloat* m);
-typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXD) (GLdouble* m);
-typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXF) (GLfloat* m);
-typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXD) (GLdouble* m);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SV) (GLenum target, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXF) (const GLfloat* m);
+typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXD) (const GLdouble* m);
+typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXF) (const GLfloat* m);
+typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXD) (const GLdouble* m);
 typedef GLvoid (csAPIENTRY* csGLSAMPLECOVERAGE) (GLclampf value, GLboolean invert);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE3D) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE2D) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE1D) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE2D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE1D) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE3D) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE2D) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE1D) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE2D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE1D) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint level, GLvoid* img);
 
 // GL_ARB_imaging
@@ -1030,28 +1030,28 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint lev
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLE) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* table);
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLE) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, const GLvoid* table);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, const GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, const GLint* params);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORTABLE) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLE) (GLenum target, GLenum format, GLenum type, GLvoid* table);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLE) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLE) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLE) (GLenum target, GLsizei start, GLint x, GLint y, GLsizei width);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1D) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* image);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* image);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1D) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, const GLvoid* image);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* image);
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERF) (GLenum target, GLenum pname, GLfloat params);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFV) (GLenum target, GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERI) (GLenum target, GLenum pname, GLint params);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERIV) (GLenum target, GLenum pname, const GLint* params);
 typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER1D) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
 typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER2D) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height);
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONFILTER) (GLenum target, GLenum format, GLenum type, GLvoid* image);
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETSEPARABLEFILTER) (GLenum target, GLenum format, GLenum type, GLvoid* row, GLvoid* column, GLvoid* span);
-typedef GLvoid (csAPIENTRY* csGLSEPARABLEFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* row, GLvoid* column);
+typedef GLvoid (csAPIENTRY* csGLSEPARABLEFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* row, const GLvoid* column);
 typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAM) (GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid* values);
 typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
@@ -1210,37 +1210,37 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATION) (GLenum mode);
 typedef GLvoid (csAPIENTRY* csGLACTIVETEXTUREARB) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVETEXTUREARB) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1DARB) (GLenum target, GLdouble s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1DVARB) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1DVARB) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1FARB) (GLenum target, GLfloat s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1FVARB) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1FVARB) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1IARB) (GLenum target, GLint s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1IVARB) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1IVARB) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1SARB) (GLenum target, GLshort s);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1SVARB) (GLenum target, GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1SVARB) (GLenum target, const GLshort* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2DARB) (GLenum target, GLdouble s, GLdouble t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2DVARB) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2DVARB) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2FARB) (GLenum target, GLfloat s, GLfloat t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2FVARB) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2FVARB) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2IARB) (GLenum target, GLint s, GLint t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2IVARB) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2IVARB) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2SARB) (GLenum target, GLshort s, GLshort t);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2SVARB) (GLenum target, GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD2SVARB) (GLenum target, const GLshort* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3DARB) (GLenum target, GLdouble s, GLdouble t, GLdouble r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3DVARB) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3DVARB) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3FARB) (GLenum target, GLfloat s, GLfloat t, GLfloat r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3FVARB) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3FVARB) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3IARB) (GLenum target, GLint s, GLint t, GLint r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3IVARB) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3IVARB) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3SARB) (GLenum target, GLshort s, GLshort t, GLshort r);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3SVARB) (GLenum target, GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD3SVARB) (GLenum target, const GLshort* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4DARB) (GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4DVARB) (GLenum target, GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4DVARB) (GLenum target, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4FARB) (GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4FVARB) (GLenum target, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4FVARB) (GLenum target, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4IARB) (GLenum target, GLint s, GLint t, GLint r, GLint q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4IVARB) (GLenum target, GLint* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4IVARB) (GLenum target, const GLint* v);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SARB) (GLenum target, GLshort s, GLshort t, GLshort r, GLshort q);
-typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SVARB) (GLenum target, GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SVARB) (GLenum target, const GLshort* v);
 
 // GL_ARB_transpose_matrix
 #ifndef GL_TRANSPOSE_MODELVIEW_MATRIX_ARB
@@ -1519,12 +1519,12 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVARB) (GLenum pname, GLfloat* par
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE3DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE2DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE1DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE3DARB) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE2DARB) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE1DARB) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE3DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE2DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE1DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE3DARB) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE2DARB) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE1DARB) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGEARB) (GLenum target, GLint lod, GLvoid* img);
 
 // GL_ARB_texture_env_combine
@@ -2152,44 +2152,44 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4SARB) (GLuint index, GLshort x, GLs
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4FARB) (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4DARB) (GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUBARB) (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SVARB) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FVARB) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DVARB) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2SVARB) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2FVARB) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2DVARB) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3SVARB) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3FVARB) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3DVARB) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4BVARB) (GLuint index, GLbyte* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4SVARB) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4IVARB) (GLuint index, GLint* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UBVARB) (GLuint index, GLubyte* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4USVARB) (GLuint index, GLushort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UIVARB) (GLuint index, GLuint* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4FVARB) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4DVARB) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NBVARB) (GLuint index, GLbyte* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NSVARB) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NIVARB) (GLuint index, GLint* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUBVARB) (GLuint index, GLubyte* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUSVARB) (GLuint index, GLushort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUIVARB) (GLuint index, GLuint* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBPOINTERARB) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SVARB) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FVARB) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DVARB) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2SVARB) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2FVARB) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2DVARB) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3SVARB) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3FVARB) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3DVARB) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4BVARB) (GLuint index, const GLbyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4SVARB) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4IVARB) (GLuint index, const GLint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UBVARB) (GLuint index, const GLubyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4USVARB) (GLuint index, const GLushort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UIVARB) (GLuint index, const GLuint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4FVARB) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4DVARB) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NBVARB) (GLuint index, const GLbyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NSVARB) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NIVARB) (GLuint index, const GLint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUBVARB) (GLuint index, const GLubyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUSVARB) (GLuint index, const GLushort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUIVARB) (GLuint index, const GLuint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBPOINTERARB) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLENABLEVERTEXATTRIBARRAYARB) (GLuint index);
 typedef GLvoid (csAPIENTRY* csGLDISABLEVERTEXATTRIBARRAYARB) (GLuint index);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMSTRINGARB) (GLenum target, GLenum format, GLsizei len, GLvoid* string);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMSTRINGARB) (GLenum target, GLenum format, GLsizei len, const GLvoid* string);
 typedef GLvoid (csAPIENTRY* csGLBINDPROGRAMARB) (GLenum target, GLuint program);
-typedef GLvoid (csAPIENTRY* csGLDELETEPROGRAMSARB) (GLsizei n, GLuint* programs);
+typedef GLvoid (csAPIENTRY* csGLDELETEPROGRAMSARB) (GLsizei n, const GLuint* programs);
 typedef GLvoid (csAPIENTRY* csGLGENPROGRAMSARB) (GLsizei n, GLuint* programs);
 typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETER4DARB) (GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETER4DVARB) (GLenum target, GLuint index, GLdouble* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETER4DVARB) (GLenum target, GLuint index, const GLdouble* params);
 typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETER4FARB) (GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETER4FVARB) (GLenum target, GLuint index, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETER4FVARB) (GLenum target, GLuint index, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETER4DARB) (GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETER4DVARB) (GLenum target, GLuint index, GLdouble* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETER4DVARB) (GLenum target, GLuint index, const GLdouble* params);
 typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETER4FARB) (GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETER4FVARB) (GLenum target, GLuint index, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETER4FVARB) (GLenum target, GLuint index, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMENVPARAMETERDVARB) (GLenum target, GLuint index, GLdouble* params);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMENVPARAMETERFVARB) (GLenum target, GLuint index, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMLOCALPARAMETERDVARB) (GLenum target, GLuint index, GLdouble* params);
@@ -2208,18 +2208,18 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DARB) (GLdouble x, GLdouble y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FARB) (GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IARB) (GLint x, GLint y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2SARB) (GLshort x, GLshort y);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DVARB) (GLdouble* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FVARB) (GLfloat* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IVARB) (GLint* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2SVARB) (GLshort* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DVARB) (const GLdouble* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FVARB) (const GLfloat* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IVARB) (const GLint* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2SVARB) (const GLshort* p);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3DARB) (GLdouble x, GLdouble y, GLdouble z);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FARB) (GLfloat x, GLfloat y, GLfloat z);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IARB) (GLint x, GLint y, GLint z);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SARB) (GLshort x, GLshort y, GLshort z);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3DVARB) (GLdouble* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FVARB) (GLfloat* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IVARB) (GLint* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVARB) (GLshort* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3DVARB) (const GLdouble* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FVARB) (const GLfloat* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IVARB) (const GLint* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVARB) (const GLshort* p);
 
 // GL_EXT_422_pixels
 #ifndef GL_422_EXT
@@ -2345,7 +2345,7 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONEXT) (GLenum mode);
 
 // GL_EXT_color_subtable
 
-typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLEEXT) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLEEXT) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLEEXT) (GLenum target, GLsizei start, GLint x, GLint y, GLsizei width);
 
 // GL_EXT_compiled_vertex_array
@@ -2443,17 +2443,17 @@ typedef GLvoid (csAPIENTRY* csGLUNLOCKARRAYSEXT) ();
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* image);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* image);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, const GLvoid* image);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* image);
 typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER1DEXT) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
 typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER2DEXT) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height);
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONFILTEREXT) (GLenum target, GLenum format, GLenum type, GLvoid* image);
-typedef GLvoid (csAPIENTRY* csGLSEPARABLEFILTER2DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* row, GLvoid* column);
+typedef GLvoid (csAPIENTRY* csGLSEPARABLEFILTER2DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* row, const GLvoid* column);
 typedef GLvoid (csAPIENTRY* csGLGETSEPARABLEFILTEREXT) (GLenum target, GLenum format, GLenum type, GLvoid* row, GLvoid* column, GLvoid* span);
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERIEXT) (GLenum target, GLenum pname, GLint param);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERIVEXT) (GLenum target, GLenum pname, const GLint* params);
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFEXT) (GLenum target, GLenum pname, GLfloat param);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFVEXT) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFVEXT) (GLenum target, GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFVEXT) (GLenum target, GLenum pname, GLfloat* params);
 
@@ -2565,7 +2565,7 @@ typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERFVEXT) (GLenum target, GLenum 
 // GL_EXT_multi_draw_arrays
 
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWARRAYSEXT) (GLenum mode, GLint* first, GLsizei* count, GLsizei primcount);
-typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* count, GLenum type, GLvoid* indices, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* count, GLenum type, const GLvoid* indices, GLsizei primcount);
 
 // GL_EXT_packed_pixels
 #ifndef GL_UNSIGNED_BYTE_3_3_2_EXT
@@ -2700,7 +2700,7 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* cou
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLEEXT) (GLenum target, GLenum internalFormat, GLsizei width, GLenum format, GLenum type, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLEEXT) (GLenum target, GLenum internalFormat, GLsizei width, GLenum format, GLenum type, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEEXT) (GLenum target, GLenum format, GLenum type, GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVEXT) (GLenum target, GLenum pname, GLfloat* params);
@@ -2840,9 +2840,9 @@ typedef GLvoid (csAPIENTRY* csGLACTIVESTENCILFACEEXT) (GLenum face);
 
 // GL_EXT_subtexture
 
-typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE1DEXT) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, GLvoid* pixels);
-typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE2DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* pixels);
-typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels);
+typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE1DEXT) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid* pixels);
+typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE2DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels);
+typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
 
 // GL_EXT_texture3D
 #ifndef GL_PACK_SKIP_IMAGES_EXT
@@ -2882,7 +2882,7 @@ typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3DEXT) (GLenum target, GLint level, G
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels);
+typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
 
 // GL_EXT_texture_compression_s3tc
 #ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
@@ -3053,10 +3053,10 @@ typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLen
 
 
 typedef GLvoid (csAPIENTRY* csGLGENTEXTURESEXT) (GLsizei n, GLuint* textures);
-typedef GLvoid (csAPIENTRY* csGLDELETETEXTURESEXT) (GLsizei n, GLuint* textures);
+typedef GLvoid (csAPIENTRY* csGLDELETETEXTURESEXT) (GLsizei n, const GLuint* textures);
 typedef GLvoid (csAPIENTRY* csGLBINDTEXTUREEXT) (GLenum target, GLuint texture);
-typedef GLvoid (csAPIENTRY* csGLPRIORITIZETEXTURESEXT) (GLsizei n, GLuint* textures, GLclampf* priorities);
-typedef GLboolean (csAPIENTRY* csGLARETEXTURESRESIDENTEXT) (GLsizei n, GLuint* textures, GLboolean* residences);
+typedef GLvoid (csAPIENTRY* csGLPRIORITIZETEXTURESEXT) (GLsizei n, const GLuint* textures, const GLclampf* priorities);
+typedef GLboolean (csAPIENTRY* csGLARETEXTURESRESIDENTEXT) (GLsizei n, const GLuint* textures, GLboolean* residences);
 typedef GLboolean (csAPIENTRY* csGLISTEXTUREEXT) (GLuint texture);
 
 // GL_EXT_vertex_array
@@ -3195,12 +3195,12 @@ typedef GLboolean (csAPIENTRY* csGLISTEXTUREEXT) (GLuint texture);
 
 typedef GLvoid (csAPIENTRY* csGLARRAYELEMENTEXT) (GLint i);
 typedef GLvoid (csAPIENTRY* csGLDRAWARRAYSEXT) (GLenum mode, GLint first, GLsizei count);
-typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, GLvoid* pointer);
-typedef GLvoid (csAPIENTRY* csGLNORMALPOINTEREXT) (GLenum type, GLsizei stride, GLsizei count, GLvoid* pointer);
-typedef GLvoid (csAPIENTRY* csGLCOLORPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, GLvoid* pointer);
-typedef GLvoid (csAPIENTRY* csGLINDEXPOINTEREXT) (GLenum type, GLsizei stride, GLsizei count, GLvoid* pointer);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORDPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, GLvoid* pointer);
-typedef GLvoid (csAPIENTRY* csGLEDGEFLAGPOINTEREXT) (GLsizei stride, GLsizei count, GLboolean* pointer);
+typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLNORMALPOINTEREXT) (GLenum type, GLsizei stride, GLsizei count, const GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLCOLORPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLINDEXPOINTEREXT) (GLenum type, GLsizei stride, GLsizei count, const GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORDPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLEDGEFLAGPOINTEREXT) (GLsizei stride, GLsizei count, const GLboolean* pointer);
 typedef GLvoid (csAPIENTRY* csGLGETPOINTERVEXT) (GLenum pname, GLvoid* params);
 
 // GL_EXT_vertex_shader
@@ -3876,9 +3876,9 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTPOINTEREXT) (GLint size, GLenum type
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLMAPCONTROLPOINTSNV) (GLenum target, GLuint index, GLenum type, GLsizei ustride, GLsizei vstride, GLint uorder, GLint vorder, GLboolean packed, GLvoid* points);
-typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERIVNV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERFVNV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLMAPCONTROLPOINTSNV) (GLenum target, GLuint index, GLenum type, GLsizei ustride, GLsizei vstride, GLint uorder, GLint vorder, GLboolean packed, const GLvoid* points);
+typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERIVNV) (GLenum target, GLenum pname, const GLint* params);
+typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERFVNV) (GLenum target, GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETMAPCONTROLPOINTSNV) (GLenum target, GLuint index, GLenum type, GLsizei ustride, GLsizei vstride, GLboolean packed, GLvoid* points);
 typedef GLvoid (csAPIENTRY* csGLGETMAPPARAMETERIVNV) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETMAPPARAMETERFVNV) (GLenum target, GLenum pname, GLfloat* params);
@@ -3901,7 +3901,7 @@ typedef GLvoid (csAPIENTRY* csGLEVALMAPSNV) (GLenum target, GLenum mode);
 
 
 typedef GLvoid (csAPIENTRY* csGLGENFENCESNV) (GLsizei n, GLuint* fences);
-typedef GLvoid (csAPIENTRY* csGLDELETEFENCESNV) (GLsizei n, GLuint* fences);
+typedef GLvoid (csAPIENTRY* csGLDELETEFENCESNV) (GLsizei n, const GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLSETFENCENV) (GLuint fence, GLenum condition);
 typedef GLboolean (csAPIENTRY* csGLTESTFENCENV) (GLuint fence);
 typedef GLvoid (csAPIENTRY* csGLFINISHFENCENV) (GLuint fence);
@@ -3968,7 +3968,7 @@ typedef GLvoid (csAPIENTRY* csGLGETFENCEIVNV) (GLuint fence, GLenum pname, GLint
 
 
 typedef GLvoid (csAPIENTRY* csGLGENOCCLUSIONQUERIESNV) (GLsizei n, GLuint* ids);
-typedef GLvoid (csAPIENTRY* csGLDELETEOCCLUSIONQUERIESNV) (GLsizei n, GLuint* ids);
+typedef GLvoid (csAPIENTRY* csGLDELETEOCCLUSIONQUERIESNV) (GLsizei n, const GLuint* ids);
 typedef GLboolean (csAPIENTRY* csGLISOCCLUSIONQUERYNV) (GLuint id);
 typedef GLvoid (csAPIENTRY* csGLBEGINOCCLUSIONQUERYNV) (GLuint id);
 typedef GLvoid (csAPIENTRY* csGLENDOCCLUSIONQUERYNV) ();
@@ -4001,7 +4001,7 @@ typedef GLvoid (csAPIENTRY* csGLGETOCCLUSIONQUERYUIVNV) (GLuint id, GLenum pname
 
 
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERINV) (GLenum pname, GLint param);
-typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERIVNV) (GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERIVNV) (GLenum pname, const GLint* params);
 
 // GL_NV_register_combiners
 #ifndef GL_REGISTER_COMBINERS_NV
@@ -4209,8 +4209,8 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERIVNV) (GLenum pname, GLint* params
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERFVNV) (GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERIVNV) (GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERFVNV) (GLenum pname, const GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERIVNV) (GLenum pname, const GLint* params);
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERFNV) (GLenum pname, GLfloat param);
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERINV) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLCOMBINERINPUTNV) (GLenum stage, GLenum portion, GLenum variable, GLenum input, GLenum mapping, GLenum componentUsage);
@@ -4229,7 +4229,7 @@ typedef GLvoid (csAPIENTRY* csGLGETFINALCOMBINERINPUTPARAMETERIVNV) (GLenum vari
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GLenum pname, GLfloat* params);
 
 // GL_NV_texgen_emboss
@@ -5157,10 +5157,10 @@ typedef GLvoid (csAPIENTRY* csWGLFREEMEMORYNV) (GLvoid* pointer);
 
 
 typedef GLvoid (csAPIENTRY* csGLBINDPROGRAMNV) (GLenum target, GLuint id);
-typedef GLvoid (csAPIENTRY* csGLDELETEPROGRAMSNV) (GLsizei n, GLuint* ids);
-typedef GLvoid (csAPIENTRY* csGLEXECUTEPROGRAMNV) (GLenum target, GLuint id, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLDELETEPROGRAMSNV) (GLsizei n, const GLuint* ids);
+typedef GLvoid (csAPIENTRY* csGLEXECUTEPROGRAMNV) (GLenum target, GLuint id, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGENPROGRAMSNV) (GLsizei n, GLuint* ids);
-typedef GLboolean (csAPIENTRY* csGLAREPROGRAMSRESIDENTNV) (GLsizei n, GLuint* ids, GLboolean* residences);
+typedef GLboolean (csAPIENTRY* csGLAREPROGRAMSRESIDENTNV) (GLsizei n, const GLuint* ids, GLboolean* residences);
 typedef GLvoid (csAPIENTRY* csGLREQUESTRESIDENTPROGRAMSNV) (GLsizei n, GLuint* ids);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMPARAMETERFVNV) (GLenum target, GLuint index, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMPARAMETERDVNV) (GLenum target, GLuint index, GLenum pname, GLdouble* params);
@@ -5172,13 +5172,13 @@ typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBFVNV) (GLuint index, GLenum pname
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBIVNV) (GLuint index, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBPOINTERVNV) (GLuint index, GLenum pname, GLvoid* pointer);
 typedef GLboolean (csAPIENTRY* csGLISPROGRAMNV) (GLuint id);
-typedef GLvoid (csAPIENTRY* csGLLOADPROGRAMNV) (GLenum target, GLuint id, GLsizei len, GLubyte* program);
+typedef GLvoid (csAPIENTRY* csGLLOADPROGRAMNV) (GLenum target, GLuint id, GLsizei len, const GLubyte* program);
 typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETER4FNV) (GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETER4FVNV) (GLenum target, GLuint index, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETERS4DVNV) (GLenum target, GLuint index, GLuint num, GLdouble* params);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETERS4FVNV) (GLenum target, GLuint index, GLuint num, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETER4FVNV) (GLenum target, GLuint index, const GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETERS4DVNV) (GLenum target, GLuint index, GLuint num, const GLdouble* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETERS4FVNV) (GLenum target, GLuint index, GLuint num, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLTRACKMATRIXNV) (GLenum target, GLuint address, GLenum matrix, GLenum transform);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBPOINTERNV) (GLuint index, GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBPOINTERNV) (GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SNV) (GLuint index, GLshort x);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FNV) (GLuint index, GLfloat x);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DNV) (GLuint index, GLdouble x);
@@ -5192,32 +5192,32 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4SNV) (GLuint index, GLshort x, GLsh
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4FNV) (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4DNV) (GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UBNV) (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SVNV) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FVNV) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DVNV) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2SVNV) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2FVNV) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2DVNV) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3SVNV) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3FVNV) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3DVNV) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4SVNV) (GLuint index, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4FVNV) (GLuint index, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4DVNV) (GLuint index, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UBVNV) (GLuint index, GLubyte* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS1SVNV) (GLuint index, GLsizei n, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS1FVNV) (GLuint index, GLsizei n, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS1DVNV) (GLuint index, GLsizei n, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS2SVNV) (GLuint index, GLsizei n, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS2FVNV) (GLuint index, GLsizei n, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS2DVNV) (GLuint index, GLsizei n, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS3SVNV) (GLuint index, GLsizei n, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS3FVNV) (GLuint index, GLsizei n, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS3DVNV) (GLuint index, GLsizei n, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4SVNV) (GLuint index, GLsizei n, GLshort* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4FVNV) (GLuint index, GLsizei n, GLfloat* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4DVNV) (GLuint index, GLsizei n, GLdouble* v);
-typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4UBVNV) (GLuint index, GLsizei n, GLubyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SVNV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FVNV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DVNV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2SVNV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2FVNV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2DVNV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3SVNV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3FVNV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3DVNV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4SVNV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4FVNV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4DVNV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UBVNV) (GLuint index, const GLubyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS1SVNV) (GLuint index, GLsizei n, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS1FVNV) (GLuint index, GLsizei n, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS1DVNV) (GLuint index, GLsizei n, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS2SVNV) (GLuint index, GLsizei n, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS2FVNV) (GLuint index, GLsizei n, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS2DVNV) (GLuint index, GLsizei n, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS3SVNV) (GLuint index, GLsizei n, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS3FVNV) (GLuint index, GLsizei n, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS3DVNV) (GLuint index, GLsizei n, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4SVNV) (GLuint index, GLsizei n, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4FVNV) (GLuint index, GLsizei n, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4DVNV) (GLuint index, GLsizei n, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4UBVNV) (GLuint index, GLsizei n, const GLubyte* v);
 
 // GL_NV_vertex_program1_1
 
@@ -5236,7 +5236,7 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4UBVNV) (GLuint index, GLsizei n, G
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERATI) (GLenum type, GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERATI) (GLenum type, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYATI) (GLenum mode, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYATI) (GLenum mode, GLuint start, GLuint end, GLsizei count);
 
@@ -5474,7 +5474,7 @@ typedef GLvoid (csAPIENTRY* csGLCOLORFRAGMENTOP3ATI) (GLenum op, GLuint dst, GLu
 typedef GLvoid (csAPIENTRY* csGLALPHAFRAGMENTOP1ATI) (GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod);
 typedef GLvoid (csAPIENTRY* csGLALPHAFRAGMENTOP2ATI) (GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod);
 typedef GLvoid (csAPIENTRY* csGLALPHAFRAGMENTOP3ATI) (GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod, GLuint arg3, GLuint arg3Rep, GLuint arg3Mod);
-typedef GLvoid (csAPIENTRY* csGLSETFRAGMENTSHADERCONSTANTATI) (GLuint dst, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLSETFRAGMENTSHADERCONSTANTATI) (GLuint dst, const GLfloat* value);
 
 // GL_ATI_pn_triangles
 #ifndef GL_PN_TRIANGLES_ATI
@@ -5562,9 +5562,9 @@ typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESFATI) (GLenum pname, GLfloat param);
 #endif
 
 
-typedef GLuint (csAPIENTRY* csGLNEWOBJECTBUFFERATI) (GLsizei size, GLvoid* pointer, GLenum usage);
+typedef GLuint (csAPIENTRY* csGLNEWOBJECTBUFFERATI) (GLsizei size, const GLvoid* pointer, GLenum usage);
 typedef GLboolean (csAPIENTRY* csGLISOBJECTBUFFERATI) (GLuint buffer);
-typedef GLvoid (csAPIENTRY* csGLUPDATEOBJECTBUFFERATI) (GLuint buffer, GLuint offset, GLsizei size, GLvoid* pointer, GLenum preserve);
+typedef GLvoid (csAPIENTRY* csGLUPDATEOBJECTBUFFERATI) (GLuint buffer, GLuint offset, GLsizei size, const GLvoid* pointer, GLenum preserve);
 typedef GLvoid (csAPIENTRY* csGLGETOBJECTBUFFERFVATI) (GLuint buffer, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETOBJECTBUFFERIVATI) (GLuint buffer, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLFREEOBJECTBUFFERATI) (GLuint buffer);
@@ -5728,7 +5728,7 @@ typedef BOOL (csAPIENTRY* csWGLQUERYFRAMETRACKINGI3D) (DWORD* pFrameCount, DWORD
 // GL_IBM_multimode_draw_arrays
 
 typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWARRAYSIBM) (GLenum* mode, GLint* first, GLsizei* count, GLsizei primcount, GLint modestride);
-typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWELEMENTSIBM) (GLenum* mode, GLsizei* count, GLenum type, GLvoid* indices, GLsizei primcount, GLint modestride);
+typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWELEMENTSIBM) (GLenum* mode, GLsizei* count, GLenum type, const GLvoid* indices, GLsizei primcount, GLint modestride);
 
 // GL_IBM_raster_pos_clip
 #ifndef GL_RASTER_POSITION_UNCLIPPED_IBM
@@ -5810,13 +5810,13 @@ typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWELEMENTSIBM) (GLenum* mode, GLsizei
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
-typedef GLvoid (csAPIENTRY* csGLEDGEFLAGPOINTERLISTIBM) (GLint stride, GLboolean* pointer, GLint ptrstride);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTERLISTIBM) (GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
-typedef GLvoid (csAPIENTRY* csGLNORMALPOINTERLISTIBM) (GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORDPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
-typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
+typedef GLvoid (csAPIENTRY* csGLCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
+typedef GLvoid (csAPIENTRY* csGLEDGEFLAGPOINTERLISTIBM) (GLint stride, const GLboolean* pointer, GLint ptrstride);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTERLISTIBM) (GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
+typedef GLvoid (csAPIENTRY* csGLNORMALPOINTERLISTIBM) (GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORDPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
+typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
 
 // GL_MESA_resize_buffers
 
@@ -5828,26 +5828,26 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DMESA) (GLdouble x, GLdouble y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FMESA) (GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IMESA) (GLint x, GLint y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2SMESA) (GLshort x, GLshort y);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IVMESA) (GLint* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2SVMESA) (GLshort* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FVMESA) (GLfloat* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DVMESA) (GLdouble* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IVMESA) (const GLint* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2SVMESA) (const GLshort* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FVMESA) (const GLfloat* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DVMESA) (const GLdouble* p);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IMESA) (GLint x, GLint y, GLint z);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SMESA) (GLshort x, GLshort y, GLshort z);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FMESA) (GLfloat x, GLfloat y, GLfloat z);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3DMESA) (GLdouble x, GLdouble y, GLdouble z);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IVMESA) (GLint* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVMESA) (GLshort* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FVMESA) (GLfloat* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3DVMESA) (GLdouble* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IVMESA) (const GLint* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVMESA) (const GLshort* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FVMESA) (const GLfloat* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3DVMESA) (const GLdouble* p);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4IMESA) (GLint x, GLint y, GLint z, GLint w);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4SMESA) (GLshort x, GLshort y, GLshort z, GLshort w);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4FMESA) (GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DMESA) (GLdouble x, GLdouble y, GLdouble z, GLdouble w);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4IVMESA) (GLint* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4SVMESA) (GLshort* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4FVMESA) (GLfloat* p);
-typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (GLdouble* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4IVMESA) (const GLint* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4SVMESA) (const GLshort* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4FVMESA) (const GLfloat* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (const GLdouble* p);
 
 // GL_OML_interlace
 #ifndef GL_INTERLACE_OML
@@ -6211,10 +6211,10 @@ typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g,
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLESGI) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* table);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLESGI) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, const GLvoid* table);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORTABLESGI) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIVSGI) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFVSGI) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIVSGI) (GLenum target, GLenum pname, const GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFVSGI) (GLenum target, GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLESGI) (GLenum target, GLenum format, GLenum type, GLvoid* table);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIVSGI) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVSGI) (GLenum target, GLenum pname, GLfloat* params);
@@ -6233,45 +6233,45 @@ typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVSGI) (GLenum target, GLe
 // GL_SUN_vertex
 
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX2FSUN) (GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y);
-typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX2FVSUN) (GLubyte* c, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX2FVSUN) (const GLubyte* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX3FSUN) (GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX3FVSUN) (GLubyte* c, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX3FVSUN) (const GLubyte* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLCOLOR3FVERTEX3FSUN) (GLfloat r, GLfloat g, GLfloat b, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLCOLOR3FVERTEX3FVSUN) (GLfloat* c, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLCOLOR3FVERTEX3FVSUN) (const GLfloat* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLNORMAL3FVERTEX3FSUN) (GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLNORMAL3FVERTEX3FVSUN) (GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLNORMAL3FVERTEX3FVSUN) (const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLCOLOR4FNORMAL3FVERTEX3FSUN) (GLfloat r, GLfloat g, GLfloat b, GLfloat a, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLCOLOR4FNORMAL3FVERTEX3FVSUN) (GLfloat* c, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLCOLOR4FNORMAL3FVERTEX3FVSUN) (const GLfloat* c, const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FVERTEX3FSUN) (GLfloat s, GLfloat t, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FVERTEX3FVSUN) (GLfloat* tc, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FVERTEX3FVSUN) (const GLfloat* tc, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLTEXCOORD4FVERTEX4FSUN) (GLfloat s, GLfloat t, GLfloat p, GLfloat q, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORD4FVERTEX4FVSUN) (GLfloat* tc, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORD4FVERTEX4FVSUN) (const GLfloat* tc, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR4UBVERTEX3FSUN) (GLfloat s, GLfloat t, GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR4UBVERTEX3FVSUN) (GLfloat* tc, GLubyte* c, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR4UBVERTEX3FVSUN) (const GLfloat* tc, const GLubyte* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR3FVERTEX3FSUN) (GLfloat s, GLfloat t, GLfloat r, GLfloat g, GLfloat b, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR3FVERTEX3FVSUN) (GLfloat* tc, GLfloat* c, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR3FVERTEX3FVSUN) (const GLfloat* tc, const GLfloat* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FNORMAL3FVERTEX3FSUN) (GLfloat s, GLfloat t, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FNORMAL3FVERTEX3FVSUN) (GLfloat* tc, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FNORMAL3FVERTEX3FVSUN) (const GLfloat* tc, const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN) (GLfloat s, GLfloat t, GLfloat r, GLfloat g, GLfloat b, GLfloat a, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) (GLfloat* tc, GLfloat* c, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) (const GLfloat* tc, const GLfloat* c, const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FSUN) (GLfloat s, GLfloat t, GLfloat p, GLfloat q, GLfloat r, GLfloat g, GLfloat b, GLfloat a, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-typedef GLvoid (csAPIENTRY* csGLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FVSUN) (GLfloat* tc, GLfloat* c, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FVSUN) (const GLfloat* tc, const GLfloat* c, const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUIVERTEX3FSUN) (GLuint rc, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUIVERTEX3FVSUN) (GLuint* rc, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUIVERTEX3FVSUN) (const GLuint* rc, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR4UBVERTEX3FSUN) (GLuint rc, GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR4UBVERTEX3FVSUN) (GLuint* rc, GLubyte* c, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR4UBVERTEX3FVSUN) (const GLuint* rc, const GLubyte* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR3FVERTEX3FSUN) (GLuint rc, GLfloat r, GLfloat g, GLfloat b, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR3FVERTEX3FVSUN) (GLuint* rc, GLfloat* c, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR3FVERTEX3FVSUN) (const GLuint* rc, const GLfloat* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUINORMAL3FVERTEX3FSUN) (GLuint rc, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUINORMAL3FVERTEX3FVSUN) (GLuint* rc, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUINORMAL3FVERTEX3FVSUN) (const GLuint* rc, const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FSUN) (GLuint rc, GLfloat r, GLfloat g, GLfloat b, GLfloat a, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FVSUN) (GLuint* rc, GLfloat* c, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FVSUN) (const GLuint* rc, const GLfloat* c, const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FVERTEX3FSUN) (GLuint rc, GLfloat s, GLfloat t, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FVERTEX3FVSUN) (GLuint* rc, GLfloat* tc, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FVERTEX3FVSUN) (const GLuint* rc, const GLfloat* tc, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FSUN) (GLuint rc, GLfloat s, GLfloat t, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FVSUN) (GLuint* rc, GLfloat* tc, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FVSUN) (const GLuint* rc, const GLfloat* tc, const GLfloat* n, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN) (GLuint rc, GLfloat s, GLfloat t, GLfloat r, GLfloat g, GLfloat b, GLfloat a, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
-typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) (GLuint* rc, GLfloat* tc, GLfloat* c, GLfloat* n, GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) (const GLuint* rc, const GLfloat* tc, const GLfloat* c, const GLfloat* n, const GLfloat* v);
 
 // GL_ARB_fragment_program
 #ifndef GL_FRAGMENT_PROGRAM_ARB
@@ -6616,11 +6616,11 @@ typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERAPPLE) (GLenum type, GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERAPPLE) (GLenum type, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYAPPLE) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, GLuint start, GLuint end, GLint first, GLsizei count);
-typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTARRAYAPPLE) (GLenum mode, GLint* first, GLsizei* count, GLsizei primcount);
-typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, GLuint start, GLuint end, GLint* first, GLsizei* count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTARRAYAPPLE) (GLenum mode, const GLint* first, const GLsizei* count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, GLuint start, GLuint end, const GLint* first, const GLsizei* count, GLsizei primcount);
 
 // GL_APPLE_fence
 #ifndef GL_DRAW_PIXELS_APPLE
@@ -6633,7 +6633,7 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, G
 
 
 typedef GLvoid (csAPIENTRY* csGLGENFENCESAPPLE) (GLsizei n, GLuint* fences);
-typedef GLvoid (csAPIENTRY* csGLDELETEFENCESAPPLE) (GLsizei n, GLuint* fences);
+typedef GLvoid (csAPIENTRY* csGLDELETEFENCESAPPLE) (GLsizei n, const GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLSETFENCEAPPLE) (GLuint fence);
 typedef GLboolean (csAPIENTRY* csGLISFENCEAPPLE) (GLuint fence);
 typedef GLboolean (csAPIENTRY* csGLTESTFENCEAPPLE) (GLuint fence);
@@ -6648,8 +6648,8 @@ typedef GLvoid (csAPIENTRY* csGLFINISHOBJECTAPPLE) (GLenum object, GLint name);
 
 
 typedef GLvoid (csAPIENTRY* csGLBINDVERTEXARRAYAPPLE) (GLuint array);
-typedef GLvoid (csAPIENTRY* csGLDELETEVERTEXARRAYSAPPLE) (GLsizei n, GLuint* arrays);
-typedef GLvoid (csAPIENTRY* csGLGENVERTEXARRAYSAPPLE) (GLsizei n, GLuint* arrays);
+typedef GLvoid (csAPIENTRY* csGLDELETEVERTEXARRAYSAPPLE) (GLsizei n, const GLuint* arrays);
+typedef GLvoid (csAPIENTRY* csGLGENVERTEXARRAYSAPPLE) (GLsizei n, const GLuint* arrays);
 typedef GLboolean (csAPIENTRY* csGLISVERTEXARRAYAPPLE) (GLuint array);
 
 // GL_APPLE_vertex_array_range
@@ -6885,9 +6885,9 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYPARAMETERIAPPLE) (GLenum pname, GLint
 #endif
 
 
-typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLint* piValues);
-typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLfloat* pfValues);
-typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATARB) (HDC hdc, GLint* piAttribIList, GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
+typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, const GLint* piAttributes, GLint* piValues);
+typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, const GLint* piAttributes, GLfloat* pfValues);
+typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATARB) (HDC hdc, const GLint* piAttribIList, const GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
 
 #endif
 
@@ -6946,7 +6946,7 @@ typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCARB) ();
 #endif
 
 
-typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFERARB) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, GLint* piAttribList);
+typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFERARB) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, const GLint* piAttribList);
 typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCARB) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCARB) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFERARB) (HANDLE hPbuffer);
@@ -7103,7 +7103,7 @@ typedef GLint (csAPIENTRY* csWGLGETSWAPINTERVALEXT) ();
 
 typedef BOOL (csAPIENTRY* csWGLBINDTEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
 typedef BOOL (csAPIENTRY* csWGLRELEASETEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
-typedef BOOL (csAPIENTRY* csWGLSETPBUFFERATTRIBARB) (HANDLE hPbuffer, GLint* piAttribList);
+typedef BOOL (csAPIENTRY* csWGLSETPBUFFERATTRIBARB) (HANDLE hPbuffer, const GLint* piAttribList);
 
 #endif
 
@@ -7161,7 +7161,7 @@ typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCEXT) ();
 #endif
 
 
-typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFEREXT) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, GLint* piAttribList);
+typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFEREXT) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, const GLint* piAttribList);
 typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCEXT) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCEXT) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFEREXT) (HANDLE hPbuffer);
@@ -7354,7 +7354,7 @@ typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFEREXT) (HANDLE hPbuffer, GLint iAttribu
 
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLint* piValues);
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLfloat* pfValues);
-typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATEXT) (HDC hdc, GLint* piAttribIList, GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
+typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATEXT) (HDC hdc, const GLint* piAttribIList, const GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
 
 #endif
 
@@ -7378,7 +7378,7 @@ typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATEXT) (HDC hdc, GLint* piAttribIL
 
 
 typedef BOOL (csAPIENTRY* csWGLGETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
-typedef BOOL (csAPIENTRY* csWGLSETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
+typedef BOOL (csAPIENTRY* csWGLSETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, const GLint* piValue);
 
 #endif
 
@@ -7398,9 +7398,9 @@ typedef BOOL (csAPIENTRY* csWGLSETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAt
 
 
 typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
-typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
+typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, const GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEI3D) (HDC hDC, GLint iEntries, GLushort* puRed, GLushort* puGreen, GLushort* puBlue);
-typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEI3D) (HDC hDC, GLint iEntries, GLushort* puRed, GLushort* puGreen, GLushort* puBlue);
+typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEI3D) (HDC hDC, GLint iEntries, const GLushort* puRed, const GLushort* puGreen, const GLushort* puBlue);
 
 #endif
 
@@ -7516,11 +7516,11 @@ typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXPOINTERARB) (GLint size, GLenum type,
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERNV) (GLenum type, GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERNV) (GLenum type, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYNV) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLuint start, GLuint end, GLint first, GLsizei count);
-typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTARRAYNV) (GLenum mode, GLint* first, GLsizei* count, GLsizei primcount);
-typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLuint start, GLuint end, GLint* first, GLsizei* count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTARRAYNV) (GLenum mode, const GLint* first, const GLsizei* count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLuint start, GLuint end, const GLint* first, const GLsizei* count, GLsizei primcount);
 
 // GL_NV_float_buffer
 #ifndef GL_FLOAT_R_NV
@@ -7647,10 +7647,10 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLui
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4FNV) (GLuint id, GLsizei len, GLubyte* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4DNV) (GLuint id, GLsizei len, GLubyte* name, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
-typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERFVNV) (GLuint id, GLsizei len, GLubyte* name, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERDVNV) (GLuint id, GLsizei len, GLubyte* name, GLdouble* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4FNV) (GLuint id, GLsizei len, const GLubyte* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4DNV) (GLuint id, GLsizei len, const GLubyte* name, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERFVNV) (GLuint id, GLsizei len, const GLubyte* name, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERDVNV) (GLuint id, GLsizei len, const GLubyte* name, GLdouble* params);
 
 // GL_NV_primitive_restart
 #ifndef GL_PRIMITIVE_RESTART_NV
@@ -7795,10 +7795,10 @@ typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTINDEXNV) (GLuint index);
 
 
 typedef GLvoid (csAPIENTRY* csGLBINDBUFFERARB) (GLenum target, GLuint buffer);
-typedef GLvoid (csAPIENTRY* csGLDELETEBUFFERSARB) (GLsizei n, GLuint* buffers);
+typedef GLvoid (csAPIENTRY* csGLDELETEBUFFERSARB) (GLsizei n, const GLuint* buffers);
 typedef GLvoid (csAPIENTRY* csGLGENBUFFERSARB) (GLsizei n, GLuint* buffers);
-typedef GLvoid (csAPIENTRY* csGLBUFFERDATAARB) (GLenum target, GLsizei size, GLvoid* data, GLenum usage);
-typedef GLvoid (csAPIENTRY* csGLBUFFERSUBDATAARB) (GLenum target, GLsizei offset, GLsizei size, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLBUFFERDATAARB) (GLenum target, GLsizei size, const GLvoid* data, GLenum usage);
+typedef GLvoid (csAPIENTRY* csGLBUFFERSUBDATAARB) (GLenum target, GLsizei offset, GLsizei size, const GLvoid* data);
 typedef GLvoid* (csAPIENTRY* csGLMAPBUFFERARB) (GLenum target, GLenum access);
 typedef GLboolean (csAPIENTRY* csGLUNMAPBUFFERARB) (GLenum target);
 typedef GLboolean (csAPIENTRY* csGLISBUFFERARB) (GLuint buffer);
@@ -7954,7 +7954,7 @@ typedef GLvoid (csAPIENTRY* csGLDELETEOBJECTARB) (GLhandleARB obj);
 typedef GLhandleARB (csAPIENTRY* csGLGETHANDLEARB) (GLenum pname);
 typedef GLvoid (csAPIENTRY* csGLDETACHOBJECTARB) (GLhandleARB containerObj, GLhandleARB attachedObj);
 typedef GLhandleARB (csAPIENTRY* csGLCREATESHADEROBJECTARB) (GLenum shaderType);
-typedef GLvoid (csAPIENTRY* csGLSHADERSOURCEARB) (GLhandleARB shaderObj, GLsizei count, GLcharARB** string, GLint* length);
+typedef GLvoid (csAPIENTRY* csGLSHADERSOURCEARB) (GLhandleARB shaderObj, GLsizei count, const GLcharARB** string, const GLint* length);
 typedef GLvoid (csAPIENTRY* csGLCOMPILESHADERARB) (GLhandleARB shaderObj);
 typedef GLhandleARB (csAPIENTRY* csGLCREATEPROGRAMOBJECTARB) ();
 typedef GLvoid (csAPIENTRY* csGLATTACHOBJECTARB) (GLhandleARB containerObj, GLhandleARB Obj);
@@ -7984,7 +7984,7 @@ typedef GLvoid (csAPIENTRY* csGLGETOBJECTPARAMETERFVARB) (GLhandleARB obj, GLenu
 typedef GLvoid (csAPIENTRY* csGLGETOBJECTPARAMETERIVARB) (GLhandleARB obj, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETINFOLOGARB) (GLhandleARB obj, GLsizei maxLength, GLsizei* length, GLcharARB* infoLog);
 typedef GLvoid (csAPIENTRY* csGLGETATTACHEDOBJECTSARB) (GLhandleARB containerObj, GLsizei maxCount, GLsizei* count, GLhandleARB* obj);
-typedef GLint (csAPIENTRY* csGLGETUNIFORMLOCATIONARB) (GLhandleARB programObj, GLcharARB* name);
+typedef GLint (csAPIENTRY* csGLGETUNIFORMLOCATIONARB) (GLhandleARB programObj, const GLcharARB* name);
 typedef GLvoid (csAPIENTRY* csGLGETACTIVEUNIFORMARB) (GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLcharARB* name);
 typedef GLint (csAPIENTRY* csGLGETUNIFORMFVARB) (GLhandleARB programObj, GLint location, GLfloat* params);
 typedef GLint (csAPIENTRY* csGLGETUNIFORMIVARB) (GLhandleARB programObj, GLint location, GLint* params);
@@ -8135,9 +8135,9 @@ typedef GLvoid (csAPIENTRY* csGLGETSHADERSOURCEARB) (GLhandleARB obj, GLsizei ma
 #endif
 
 
-typedef GLvoid (csAPIENTRY* csGLBINDATTRIBLOCATIONARB) (GLhandleARB programObj, GLuint index, GLcharARB* name);
+typedef GLvoid (csAPIENTRY* csGLBINDATTRIBLOCATIONARB) (GLhandleARB programObj, GLuint index, const GLcharARB* name);
 typedef GLvoid (csAPIENTRY* csGLGETACTIVEATTRIBARB) (GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLcharARB* name);
-typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, GLcharARB* name);
+typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, const GLcharARB* name);
 
 
 
@@ -13158,7 +13158,7 @@ public:
     if (init)
     {
       EXTMGR_FUNC_INIT(wglGetExtensionsStringARB, WGLGETEXTENSIONSSTRINGARB);
-      
+
       EXTMGR_REPORT_INIT_RESULT("WGL", WGL_ARB_extensions_string)
       CS_WGL_ARB_extensions_string &= allclear;
     }

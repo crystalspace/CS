@@ -1205,12 +1205,14 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
       if (!do_manual_colors)
       {
         if (!color_buffer || 
-            (color_buffer->GetSize() < (sizeof (csColor) * num_lit_mesh_colors)))
+            (color_buffer->GetSize() != 
+	    (int)(sizeof (csColor) * num_lit_mesh_colors)))
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.
           color_buffer = g3d->CreateRenderBuffer (
-              sizeof (csColor) * num_lit_mesh_colors, CS_BUF_STATIC,
+              sizeof (csColor) * num_lit_mesh_colors, 
+	      do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
               CS_BUFCOMP_FLOAT, 3, false);
         }
         mesh_colors_dirty_flag = false;
@@ -1221,7 +1223,8 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
       else
       {
         if (!color_buffer || 
-            (color_buffer->GetSize() < (sizeof (csColor) * factory->GetVertexCount())))
+            (color_buffer->GetSize() != 
+	    (int)(sizeof (csColor) * factory->GetVertexCount())))
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.

@@ -85,6 +85,10 @@ def getArgument (arg, prevarg):
       values["comma"] = ", ";
     else:
       values["comma"] = "";
+    if (arg.getAttribute ("const") == "true"):
+      values["const"] = "const ";
+    else:
+      values["const"] = "";
     values["type"] = arg.getAttribute("type");
     if (arg.getAttribute ("pointer") == "true"):
       values["pointer"] = "*";

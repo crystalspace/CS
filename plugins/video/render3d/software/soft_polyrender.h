@@ -60,7 +60,7 @@ public:
 
   virtual void* Lock(csRenderBufferLockType lockType) { return 0; }
   virtual void Release() {}
-  virtual void CopyToBuffer(void *data, int length) {}
+  virtual void CopyToBuffer(const void *data, int length) {}
   virtual void SetComponentCount (int count) {}
   virtual int GetComponentCount () const { return 0; }
   virtual void SetComponentType (csRenderBufferComponentType type) {}

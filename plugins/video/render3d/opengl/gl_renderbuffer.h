@@ -119,7 +119,7 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
 
-  virtual void CopyToBuffer(void *data, int length)
+  virtual void CopyToBuffer(const void *data, int length)
   {
     memcpy(buffer, data, length);
   }
@@ -218,7 +218,7 @@ public:
     lastLock = CS_BUF_LOCK_NOLOCK;
   }
 
-  virtual void CopyToBuffer(void *data, int length)
+  virtual void CopyToBuffer(const void *data, int length)
   {
     ext->glBindBufferARB (index?
       GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, bufferId);

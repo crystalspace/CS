@@ -107,7 +107,7 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
 
-  virtual void CopyToBuffer(void *data, int length)
+  virtual void CopyToBuffer(const void *data, int length)
   {
     memcpy(buffer, data, length);
   }
