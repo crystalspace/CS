@@ -9,6 +9,12 @@ The history order is reversed so that new features are at the top.
 	- Reverted Norman's revert on my reversion again :-)
 	- Fixed cspython.mak for swig again.
 	- Fixed python plugin for csPtr usage.
+	- Eric Sunshine fixed the Opcode plugin so that it builds on platforms
+	  where sizeof(bool) != 1.
+	- Eric Sunshine fixed formatting of help message in several new
+	  makefiles.
+	- Eric Sunshine fixed next.mak so that it also runs the support scripts
+	  chkheadr.sh and chktools.sh at configuration time.
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
