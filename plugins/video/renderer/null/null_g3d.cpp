@@ -37,7 +37,7 @@
 static char* get_null_2d_driver ()
 {
   if (getenv ("DISPLAY"))
-    return "crystalspace.graphics2d.linexlib";
+    return "crystalspace.graphics2d.linex2d";
   else
     return SOFTWARE_2D_DRIVER;
 }
