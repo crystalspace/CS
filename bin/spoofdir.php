@@ -321,7 +321,6 @@ function signoff()
 	'Generated ' . pretty_date(time()) . " by <tt>$prog_name</tt> " .
 	"version $prog_version.<br>&nbsp;&nbsp;$copyright</font></td>" .
 	"</tr></table>\n");
-    exit();
 }
 
 //-----------------------------------------------------------------------------
@@ -413,6 +412,7 @@ function close_doc()
 {
     signoff();
     print("</body>\n</html>\n");
+    exit();
 }
 
 //-----------------------------------------------------------------------------
