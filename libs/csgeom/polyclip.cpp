@@ -171,15 +171,6 @@ void csPolygonClipper::Prepare ()
 
 int csPolygonClipper::ClassifyBox (csBox2 &box)
 {
-  //@@ THIS IS WRONG!
-  // NEEDS A RETHINK
-  // Example:
-  //         *----------*
-  //   *-----|-*        | Here all four corners of bounding box are outside
-  //  /      |/         | of the clipping polygon; however the box still
-  // *       |          | intersects it.
-  //  \     /|          |
-  //   *---* *----------*
   if (!ClipBox.Overlap (box)) return -1;
   if (!csClipper::IsInside (box.GetCorner (0))) return 0;
   if (!csClipper::IsInside (box.GetCorner (1))) return 0;
