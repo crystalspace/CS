@@ -155,6 +155,7 @@ STDMETHODIMP csSoundRenderSoftware::CreateSource(ISoundSource ** ppv, csSoundDat
   }
   
   pNew->set3D ();
+  pNew->SetVolume (1.0);
 
   return pNew->CreateSource(ppv);
 }
@@ -179,6 +180,7 @@ STDMETHODIMP csSoundRenderSoftware::CreateSoundBuffer(ISoundBuffer** ppv, csSoun
 
   pNew->setSoundData (snd, false);
   pNew->setPriority (Normal_Priority);
+  pNew->SetVolume (1.0);
 
   addChannel(pNew);
   

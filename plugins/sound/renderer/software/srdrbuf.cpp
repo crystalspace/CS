@@ -67,3 +67,32 @@ STDMETHODIMP csSoundBufferSoftware::Stop()
 {
   return S_OK;
 }
+
+STDMETHODIMP csSoundBufferSoftware::SetVolume(float vol)
+{
+  fVolume = vol;
+
+  setVolume(fVolume);
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferSoftware::GetVolume(float &vol)
+{
+  vol = Channel::Volume;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferSoftware::SetFrequencyFactor(float factor)
+{
+  fFrequencyFactor = factor;
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferSoftware::GetFrequencyFactor(float &factor)
+{
+  factor = fFrequencyFactor;
+  return S_OK;
+}
+
