@@ -192,15 +192,17 @@
       #define calloc(num, size)	_calloc_dbg ((num), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
 
       // heap consistency check is on by default, leave it
-      #define CS_DEBUG_MSVC_INIT_GOOP 
+      #define CS_DEBUG_MSVC_INIT_GOOP \
+        _CrtSetDbgFlag (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF)
       // check for leaks on exit
-      #define CS_DEBUG_MSVC_EXIT_GOOP _CrtDumpMemoryLeaks()
+      #define CS_DEBUG_MSVC_EXIT_GOOP 
     #else
       // turn heap consistency check off
       #define CS_DEBUG_MSVC_INIT_GOOP \
-        _CrtSetDbgFlag (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF )
+        _CrtSetDbgFlag ((_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF) | \
+	  _CRTDBG_LEAK_CHECK_DF)
       // check for leaks on exit
-      #define CS_DEBUG_MSVC_EXIT_GOOP _CrtDumpMemoryLeaks()
+      #define CS_DEBUG_MSVC_EXIT_GOOP 
     #endif
   #endif
 
