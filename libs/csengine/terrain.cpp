@@ -220,6 +220,27 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 
   // Construct some clipping planes.
   context->extractPlanes(context->frustrum());
+
+  // TODO: JORRIT RENDER THE FRUSTRUM.
+  //
+  bool finit = false;
+  ddgVector3 *fc = context->fc;
+  // ntl = near top left, fbr = far bottom right.
+  static csVector3 ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;
+  if (!finit)
+  {
+	finit = true;
+    ntl.Set(fc[0].v[0],fc[0].v[1],fc[0].v[2]);
+    ntr.Set(fc[1].v[0],fc[1].v[1],fc[1].v[2]);
+    nbl.Set(fc[2].v[0],fc[2].v[1],fc[2].v[2]);
+    nbr.Set(fc[3].v[0],fc[3].v[1],fc[3].v[2]);
+    ftl.Set(fc[4].v[0],fc[4].v[1],fc[4].v[2]);
+    ftr.Set(fc[5].v[0],fc[5].v[1],fc[5].v[2]);
+    fbl.Set(fc[6].v[0],fc[6].v[1],fc[6].v[2]);
+    fbr.Set(fc[7].v[0],fc[7].v[1],fc[7].v[2]);
+  }
+  // NOW RENDER THIS USING WHITE LINES and look around to see where it is.
+
   // Optimize the mesh w.r.t. the current viewing location.
   modified = mesh->calculate(context);
 
