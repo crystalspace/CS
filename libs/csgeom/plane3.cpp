@@ -95,13 +95,15 @@ bool csPlane3::ClipPolygon (
 
     if (!z1s && zs)
     {
-      csIntersect3::Plane (pverts[i1], pverts[i], *this, (*verts)[num_verts], r);
+      csIntersect3::Plane (pverts[i1], pverts[i], *this,
+      	(*verts)[num_verts], r);
       num_verts++;
       (*verts)[num_verts++] = pverts[i];
     }
     else if (z1s && !zs)
     {
-      csIntersect3::Plane (pverts[i1], pverts[i], *this, (*verts)[num_verts], r);
+      csIntersect3::Plane (pverts[i1], pverts[i], *this,
+      	(*verts)[num_verts], r);
       num_verts++;
     }
     else if (z1s && zs)

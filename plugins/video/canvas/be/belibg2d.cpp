@@ -200,7 +200,6 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
       break;
     default:
       printf("Unimplemented color depth in Be2D driver (depth=%i)\n", Depth);
-      exit(1);
-      break;
+      return;	// @@@ Return error and use reporter
   }
 }

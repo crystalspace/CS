@@ -137,7 +137,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   if (!dpy)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Cannot open X display");
-    exit (-1);
+    return false;
   }
 
   // Set user locale for national character support

@@ -78,10 +78,12 @@ csQuaternion csQuaternion::Slerp (
   // Calculate dot between quats
   cosom = x * quat2.x + y * quat2.y + z * quat2.z + r * quat2.r;
 
-  // Make sure the two quaternions are not exactly opposite? (within a little slop)
+  // Make sure the two quaternions are not exactly opposite? (within a little
+  // slop).
   if ((1.0f + cosom) > SLERPDELTA)
   {
-    // Are they more than a little bit different?  Avoid a divided by zero and lerp if not
+    // Are they more than a little bit different?  Avoid a divided by zero
+    // and lerp if not.
     if ((1.0f - cosom) > SLERPDELTA)
     {
       // Yes, do a slerp
@@ -105,7 +107,6 @@ csQuaternion csQuaternion::Slerp (
   }
 
   // The quaternions are nearly opposite so to avoid a divided by zero error
-
   // Calculate a perpendicular quaternion and slerp that direction
   scale0 = sin ((1.0f - slerp) * PI);
   scale1 = sin (slerp * PI);

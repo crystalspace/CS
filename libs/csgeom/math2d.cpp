@@ -25,11 +25,8 @@
 //---------------------------------------------------------------------------
 
 // This algorithm assumes that the polygon is convex and that
-
 // the vertices of the polygon are oriented in clockwise ordering.
-
 // If this was not the case then the polygon should not be drawn (culled)
-
 // and this routine would not be called for it.
 int csMath2::InPoly2D (
   const csVector2 &v,
@@ -127,17 +124,11 @@ bool csIntersect2::Segments (
   const csVector2 &b2 = b.End ();
 
   //            (Ya1-Yb1)(Xb2-Xb1)-(Xa1-Xb1)(Yb2-Yb1)
-
   //        r = -------------------------------------  (eqn 1)
-
   //            (Xa2-Xa1)(Yb2-Yb1)-(Ya2-Ya1)(Xb2-Xb1)
-
   //
-
   //            (Ya1-Yb1)(Xa2-Xa1)-(Xa1-Xb1)(Ya2-Ya1)
-
   //        s = -------------------------------------  (eqn 2)
-
   //            (Xa2-Xa1)(Yb2-Yb1)-(Ya2-Ya1)(Xb2-Xb1)
   denom = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
   if (ABS (denom) < EPSILON) return false;
@@ -172,7 +163,8 @@ bool csIntersect2::SegmentLine (
   denom = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
   if (ABS (denom) < EPSILON) return false;
 
-  dist = ((a1.y - b1.y) * (b2.x - b1.x) - (a1.x - b1.x) * (b2.y - b1.y)) / denom;
+  dist = ((a1.y - b1.y) * (b2.x - b1.x) - (a1.x - b1.x) * (b2.y - b1.y))
+  	/ denom;
   if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return false;
 
   isect.x = a1.x + dist * (a2.x - a1.x);

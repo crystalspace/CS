@@ -100,7 +100,7 @@ void csRect::Exclude (int ixmin, int iymin, int ixmax, int iymax)
       else if (xmax <= ixmax)
         xmax = ixmin;
     }
-    else  // xmin >= ixmin
+    else
     {
       if (xmin >= ixmax) return ; // no overlap
       else if (xmax <= ixmax)
@@ -110,7 +110,7 @@ void csRect::Exclude (int ixmin, int iymin, int ixmax, int iymax)
       }
       else
         xmin = ixmax;
-    } /* endif */
+    }
   }
   else if ((xmin >= ixmin) && (xmax <= ixmax))
   {
@@ -120,13 +120,13 @@ void csRect::Exclude (int ixmin, int iymin, int ixmax, int iymax)
       else if (ymax <= iymax)
         ymax = iymin;
     }
-    else  // ymin >= iymin
+    else
     {
       if (ymin >= iymax) return ; // no overlap
       else
         ymin = iymax;
-    } /* endif */
-  }   /* endif */
+    }
+  }
   return ;
 }
 

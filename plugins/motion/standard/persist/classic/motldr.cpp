@@ -273,7 +273,7 @@ iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
     if (!data)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
-      exit (1);
+      return NULL;
     }
 
     if (!motman)
@@ -368,14 +368,17 @@ bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
   long cmd;
   char* params;
 
-  while((cmd = csGetObject (&buf, tok_bone, &name, &params))>0) {
+  while((cmd = csGetObject (&buf, tok_bone, &name, &params))>0)
+  {
     if (!params)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
-      exit (1);
+      return false;
     }
-    switch ( cmd ) {
-      case CS_TOKEN_FRAME: {
+    switch ( cmd )
+    {
+      case CS_TOKEN_FRAME:
+      {
         float frametime;
         csScanStr(name, "%f", &frametime);
         csVector3 v(0,0,0);
@@ -390,7 +393,7 @@ bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
         csGetLastOffender ());
-    exit (1);
+    return false;
   }
   return true;
 }
@@ -418,7 +421,7 @@ bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
     if (!params)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
-      exit (1);
+      return false;
     }
     switch (cmd)
     {
@@ -455,7 +458,7 @@ bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
         csGetLastOffender ());
-    exit (1);
+    return false;
   }
   return true;
 }
@@ -482,7 +485,7 @@ iBase* csMotionLoader::Parse ( const char *string, iLoaderContext*,
 	if (!params)
 	{
 	  printf("Expected parameters instead of '%s'\n", string);
-	  exit (1);
+	  return NULL;
 	}
 	switch (cmd)
 	{
@@ -512,7 +515,7 @@ iBase* csMotionLoader::Parse ( const char *string, iLoaderContext*,
 	  Report(CS_REPORTER_SEVERITY_ERROR,
 		  "Token '%s' not found while parsing the iMotionLoader plugin",
 			csGetLastOffender());
-	  exit (1);
+	  return NULL;
 	}
 	return this;
 }

@@ -142,18 +142,13 @@ void csPoly2D::Intersect (
   float dist;
 
   // The skip variables hold the number of initial skipped vertices.
-
   // Those are vertices that are on the plane so in principle they should
-
   // get added to both polygons. However, we try not to generate degenerate
-
   // polygons (one edge only) so we only add those plane-vertices if
-
   // we know that the polygon has other vertices too.
   int skip_left = 0, skip_right = 0;
 
   // Ignore the specified number of vertices in the beginning (just
-
   // before skip_??? vertices).
   int ignore_left = 0, ignore_right = 0;
 
@@ -169,13 +164,9 @@ void csPoly2D::Intersect (
     if (c > -EPSILON && c < EPSILON)
     {
       // This vertex is on the edge. Add it to both polygons
-
       // unless the polygon has no vertices yet. In that
-
       // case we remember it for later (skip_xxx var) so
-
       // that we can later add them if the polygon ever
-
       // gets vertices.
       if (left.GetVertexCount ())
         left.AddVertex (vertices[i]);
@@ -189,7 +180,6 @@ void csPoly2D::Intersect (
     else if (c <= -EPSILON && c1 < EPSILON)
     {
       // This vertex is on the left and the previous
-
       // vertex is not right (i.e. on the left or on the edge).
       left.AddVertex (vertices[i]);
       if (!skip_right && !right.GetVertexCount ()) ignore_right++;
@@ -197,7 +187,6 @@ void csPoly2D::Intersect (
     else if (c >= EPSILON && c1 > -EPSILON)
     {
       // This vertex is on the right and the previous
-
       // vertex is not left.
       right.AddVertex (vertices[i]);
       if (!skip_left && !left.GetVertexCount ()) ignore_left++;
@@ -219,11 +208,8 @@ void csPoly2D::Intersect (
   }
 
   // If skip_xxx > 0 then there are a number of vertices in
-
   // the beginning that we ignored. These vertices are all on
-
   // 'plane'. We will add them to the corresponding polygon if
-
   // that polygon is not empty.
   i = ignore_left;
   if (left.GetVertexCount ())
@@ -252,18 +238,13 @@ void csPoly2D::ClipPlane (const csPlane2 &plane, csPoly2D &right) const
   float dist;
 
   // The skip variables hold the number of initial skipped vertices.
-
   // Those are vertices that are on the plane so in principle they should
-
   // get added to both polygons. However, we try not to generate degenerate
-
   // polygons (one edge only) so we only add those plane-vertices if
-
   // we know that the polygon has other vertices too.
   int skip_right = 0;
 
   // Ignore the specified number of vertices in the beginning (just
-
   // before skip_right vertices).
   int ignore_right = 0;
 
@@ -275,74 +256,44 @@ void csPoly2D::ClipPlane (const csPlane2 &plane, csPoly2D &right) const
   for (i = 0; i < num_vertices; i++)
   {
     c = plane.Classify (vertices[i]);
-    printf ("    i=%d c=%f\n", i, c);
     if (c > -EPSILON && c < EPSILON)
     {
-      printf ("    b1\n");
-
       // This vertex is on the edge. Add it to both polygons
-
       // unless the polygon has no vertices yet. In that
-
       // case we remember it for later (skip_xxx var) so
-
       // that we can later add them if the polygon ever
-
       // gets vertices.
       if (right.GetVertexCount ())
       {
-        printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
         right.AddVertex (vertices[i]);
       }
       else
       {
         skip_right++;
-        printf ("    skip_right++ = %d\n", skip_right);
       }
     }
     else if (c <= -EPSILON && c1 < EPSILON)
     {
-      printf ("    b2\n");
-
       // This vertex is on the left and the previous
-
       // vertex is not right (i.e. on the left or on the edge).
       if (!skip_right && !right.GetVertexCount ())
       {
         ignore_right++;
-        printf ("    ignore_right++ =%d\n", ignore_right);
       }
     }
     else if (c >= EPSILON && c1 > -EPSILON)
     {
-      printf ("    b3\n");
-
       // This vertex is on the right and the previous
-
       // vertex is not left.
-      printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
       right.AddVertex (vertices[i]);
     }
     else
     {
-      printf ("    b4\n");
-
       // We need to split.
-      printf (
-        "    isect:(%f,%f) and (%f,%f) plane (%f,%f,%f)\n",
-        vertices[i1].x,
-        vertices[i1].y,
-        vertices[i].x,
-        vertices[i].y,
-        plane.A (),
-        plane.B (),
-        plane.C ());
       csIntersect2::Plane (vertices[i1], vertices[i], plane, isect, dist);
-      printf ("    AddVertex isect:(%f,%f)\n", isect.x, isect.y);
       right.AddVertex (isect);
       if (c > 0)
       {
-        printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
         right.AddVertex (vertices[i]);
       }
     }
@@ -352,18 +303,14 @@ void csPoly2D::ClipPlane (const csPlane2 &plane, csPoly2D &right) const
   }
 
   // If skip_xxx > 0 then there are a number of vertices in
-
   // the beginning that we ignored. These vertices are all on
-
   // 'plane'. We will add them to the corresponding polygon if
-
   // that polygon is not empty.
   i = ignore_right;
   if (right.GetVertexCount ())
   {
     while (skip_right > 0)
     {
-      printf ("    AddVertex while:(%f,%f)\n", vertices[i].x, vertices[i].y);
       right.AddVertex (vertices[i]);
       i++;
       skip_right--;
@@ -374,13 +321,9 @@ void csPoly2D::ClipPlane (const csPlane2 &plane, csPoly2D &right) const
 void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
 {
   // Some conventions:
-
   //   i1, i2: edge of this polygon common with 'other'.
-
   //   j1, j2: edge of other polygon common with 'this'.
-
   //   i1 corresponds with j2
-
   //   i2 corresponds with j1
   int i2 = (i1 + 1) % num_vertices;
   int j1, j2;
@@ -397,24 +340,19 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
     }
   }
 
-  if (j2 == -1)
-  {
-    printf ("INTERNAL ERROR: matching vertex not found!\n");
-    exit (0);
-  }
+  CS_ASSERT (j2 != -1);
 
   j1 = (j2 - 1 + other.GetVertexCount ()) % other.GetVertexCount ();
 
   // Double check if i2 and j1 really match.
   if (!((vertices[i2] - other[j1]) < EPSILON))
   {
-    printf ("INTERNAL ERROR: i2 doesn't match j1!\n");
     for (i = 0; i < GetVertexCount (); i++)
       printf ("  orig %d: %f,%f\n", i, (*this)[i].x, (*this)[i].y);
     for (i = 0; i < other.GetVertexCount (); i++)
       printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
     printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
-    exit (0);
+    CS_ASSERT (false);
   }
 
   // Copy this polygon to 'orig' and clear this one.
@@ -424,18 +362,13 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   MakeEmpty ();
 
   // Add the vertex just before i1. We will start our new
-
   // polygon with this one.
   AddVertex (orig[(i1 - 1 + orig_num) % orig_num]);
 
   // Construct two 2D planes for i1-1 to i1 and i2 to i2+1. These
-
   // planes will be used to check what vertices of the other polygon
-
   // we will retain and which we will discard. These two planes in
-
   // effect define the subset of the other polygon that we are
-
   // interested in. This subset we add (union) to this polygon.
   csPlane2 pl1, pl2;
   pl1.Set (orig[(i1 - 1 + orig_num) % orig_num], orig[i1]);
@@ -444,9 +377,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   pl2.Normalize (); //@@@ Needed?
 
   // Start scanning the other polygon starting with j2+1.
-
   // While the vertices of the other polygon are on the left side
-
   // of pl1 we ignore them.
   jp = j2;
   j = (j2 + 1) % other_num;
@@ -465,7 +396,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
       for (i = 0; i < other.GetVertexCount (); i++)
         printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
       printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
-      exit (0);
+      CS_ASSERT (false);
     }
   }
 
@@ -473,9 +404,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   float dist;
 
   // If jp == j2 then we know that the first vertex after i1 is already
-
   // right of pl1 so we consider j2 or i1 the intersection point to
-
   // continue with the rest of the processing below.
   if (jp == j2)
   {
@@ -484,19 +413,14 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   else
   {
     // jp to j is an edge which is intersected by pl1. The intersection
-
     // point is what we need.
     csIntersect2::Plane (other[jp], other[j], pl1, isect, dist);
   }
 
   // If the intersection point is on the left of pl2 then we know
-
   // that the intersection point of the two planes itself will define
-
   // the new extended polygon. In that case we can simply add that
-
   // intersection point to the this polygon and add the rest of the
-
   // vertices as well.
   if (pl2.Classify (isect) > EPSILON)
   {
@@ -518,9 +442,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   AddVertex (isect);
 
   // Now we continue scanning the other polygon starting with the
-
   // vertex j where we ended. We add all vertices that are on the
-
   // right of the second plane.
   while (j != j1)
   {
@@ -533,7 +455,6 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   }
 
   // If j == j1 then all other vertices are right so we must add
-
   // j1 (or i2) itself then continue with the rest of this polygon.
   if (j == j1)
   {
@@ -548,7 +469,6 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   }
 
   // Otherwise the edge jp to j crosses the second plane. In this
-
   // case we intersect again and ignore the rest of 'other'.
   csIntersect2::Plane (other[jp], other[j], pl2, isect, dist);
   AddVertex (isect);

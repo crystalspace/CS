@@ -16,6 +16,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <math.h>
 #include <float.h>
 #include "cssysdef.h"
@@ -82,7 +83,6 @@ bool csMath3::FindIntersection (
       else
       {
         // line is parallel to the plane of
-
         // intersection, so we don't need it ;)
         t1[i] = 15.0;
       }
@@ -100,7 +100,6 @@ bool csMath3::FindIntersection (
       else
       {
         // line is parallel to the plane of
-
         // intersection, so we don't need it ;)
         t2[i] = 15.0;
       }
@@ -219,7 +218,6 @@ int csMath3::OuterPlanes (
   int i, j, k;
 
   // @@@ This is a HIGHLY INEFFICIENT routine.
-
   // However, I haven't yet found something better.
   int num_planes = 0;
   for (i = 0; i < 8; i++)
@@ -227,7 +225,6 @@ int csMath3::OuterPlanes (
     csVector3 v1 = box1.GetCorner (i);
 
     // Try 24 edges instead of 12. The 12 other edges
-
     // are just edges with inverted direction.
     for (j = 0; j < 24; j++)
     {
@@ -251,9 +248,7 @@ int csMath3::OuterPlanes (
       if (equal) continue;
 
       // Count how many vertices of the two boxes are inside or outside
-
       // the plane. We need planes with all vertices either
-
       // on the plane or inside.
       int cnt_out = 0;
       for (k = 0; k < 8; k++)
@@ -276,12 +271,7 @@ int csMath3::OuterPlanes (
       // If no vertices are outside then we have a good plane.
       if (cnt_out == 0)
       {
-        if (num_planes >= 8)
-        {
-          printf ("INTERNAL ERROR! OuterPlanes returns too many planes!\n");
-          exit (0);
-        }
-
+        CS_ASSERT (num_planes < 8);
         planes[num_planes++] = pl;
       }
     }
@@ -506,9 +496,7 @@ bool csIntersect3::IntersectTriangle (
   if (!Plane (seg.Start (), seg.End (), plane, isect, dist)) return false;
 
   // 'isect' is the intersection of the segment and the
-
   // plane. Now we have to see if this intersection is
-
   // in the triangle.
   if (plane.D () > SMALL_EPSILON)   // Check if plane is not near origin.
   {
@@ -517,7 +505,8 @@ bool csIntersect3::IntersectTriangle (
     if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
   }
   else
-  { // Bug fix for WichSide3D. Slower but valid.
+  {
+    // Bug fix for WichSide3D. Slower but valid.
     csVector3 norm = plane.Normal ();
     csVector3 nsect = isect + norm;
     csVector3 ntr1 = tr1 + norm;
@@ -565,9 +554,10 @@ bool csIntersect3::Plane (
   denom = p.norm * vu;
   if (denom == 0)
   {
+    // they are parallel
     isect = v;
     return false;
-  } // they are parallel
+  }
   dist = -(p.norm * u + p.DD) / denom;
   if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return false;
 
@@ -582,19 +572,12 @@ bool csIntersect3::Planes (
   csVector3 &isect)
 {
   //To find the one point that is on all three planes, we need to solve
-
   //the following equation system (we need to find the x, y and z which
-
   //are true for all equations):
-
   // A1*x+B1*y+C1*z+D1=0 //plane1
-
   // A2*x+B2*y+C2*z+D2=0 //plane2
-
   // A3*x+B3*y+C3*z+D3=0 //plane3
-
   //This can be solved according to Cramers rule by looking at the
-
   //determinants of the equation system.
   csMatrix3 mdet (
               p1.A (),

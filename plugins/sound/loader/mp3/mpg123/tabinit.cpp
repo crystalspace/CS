@@ -112,7 +112,7 @@ void make_conv16to8_table(int mode)
     conv16to8_buf = (unsigned char *) malloc(8192);
     if(!conv16to8_buf) {
       fprintf(stderr,"Can't allocate 16 to 8 converter table!\n");
-      exit(1);
+      return;	// @@@ Error return and reporter?
     }
     conv16to8 = conv16to8_buf + 4096;
   }

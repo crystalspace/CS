@@ -123,7 +123,6 @@ void csPoly2DEdges::Intersect (
       if (ONPLANE (c2))
       {
         // Both vertices are on the plane. In this case we ignore the
-
         // edge and set onplane to true.
         onplane = true;
       }

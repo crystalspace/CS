@@ -174,25 +174,18 @@ void csCubicSpline::PrecalculateDerivatives (int dim)
   for (i = 1; i < num_points - 2; i++)
   {
     //float temp =
-
     //(d[i+1]-d[i]) / (time_points[i+1]-time_points[i]) -
-
     //(d[i]-d[i-1]) / (time_points[i]-time_points[i-1]);
-
     //temp -=
-
     //d2[i-1] * (time_points[i]-time_points[i-1])/6.;
-
     //temp -=
-
     //d2[i] * (time_points[i+1]-time_points[i-1])/3.;
-
     //temp /=
-
     //(time_points[i+1]-time_points[i]) / 6.;
 
     //d2[i+1] = temp;
-    d2[i + 1] = (d[i + 2] - d[i + 1]) / (t[i + 2] - t[i + 1]) - (d[i + 1] - d[i]) / (t[i + 1] - t[i]);
+    d2[i + 1] = (d[i + 2] - d[i + 1]) / (t[i + 2] - t[i + 1])
+    	- (d[i + 1] - d[i]) / (t[i + 1] - t[i]);
     d2[i + 1] *= 3.0f / (t[i + 2] - t[i]);
   }
 #endif
@@ -271,7 +264,8 @@ void csBSpline::Calculate (float time)
     if (time >= time_points[idx] && time <= time_points[idx + 1]) break;
   }
 
-  t = 1.0f - (time_points[idx + 1] - time) / (time_points[idx + 1] - time_points[idx]);
+  t = 1.0f - (time_points[idx + 1] - time)
+  	/ (time_points[idx + 1] - time_points[idx]);
 }
 
 float csBSpline::GetInterpolatedDimension (int dim)
@@ -282,7 +276,6 @@ float csBSpline::GetInterpolatedDimension (int dim)
   for (j = -2; j <= 1; j++)
   {
     // @@@ Not very efficient but it will do for now...
-
     // We would need to cache p[-1] and p[-2]
     float pp;
     int id = idx + j + 1;

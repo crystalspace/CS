@@ -389,10 +389,7 @@ csOpenGLProcBackBuffer2D::~csOpenGLProcBackBuffer2D ()
 
 void csOpenGLProcBackBuffer2D::Clear (int color)
 {
-#ifdef CS_DEBUG
-  if (pfmt->PixelBytes == 1)
-    exit (1);
-#endif
+  CS_ASSERT (pfmt->PixelBytes != 1);
   glDisable (GL_TEXTURE_2D);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);

@@ -28,7 +28,7 @@ void synth_ntom_set_step(long m,long n)
 {
   if(n >= 96000 || m >= 96000 || m == 0 || n == 0) {
     fprintf(stderr,"NtoM converter: illegal rates\n");
-    exit(1);
+    return;	// @@@ Error return and reporter?
   }
 
   n *= NTOM_MUL;
@@ -36,7 +36,7 @@ void synth_ntom_set_step(long m,long n)
 
   if(ntom_step > 8*NTOM_MUL) {
     fprintf(stderr,"max. 1:8 conversion allowed!\n");
-    exit(1);
+    return;	// @@@ Error return and reporter?
   }
 
   ntom_val[0] = ntom_val[1] = NTOM_MUL>>1;
