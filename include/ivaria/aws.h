@@ -176,6 +176,9 @@ public:
 
   /// Sets the font server that the preference manager uses
   virtual void SetFontServer(iFontServer *fntsvr)=0;
+  
+  /// Sets the window manager that the preference manager uses
+  virtual void SetWindowMgr(iAws *wmgr)=0;
     
   /** Sets up the AWS palette so that the colors are valid reflections of
        user preferences.  Although SetColor can be used, it's recommended 
