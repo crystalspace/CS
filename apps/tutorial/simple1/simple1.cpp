@@ -28,9 +28,11 @@
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
+#include <imesh/ball.h>
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
+#include "iengine/dynlight.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/texture.h"
@@ -72,22 +74,36 @@ void Simple::SetupFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
+  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
   iCamera* c = view->GetCamera();
   if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
+    c->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed);
   if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
+    c->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed);
   if (kbd->GetKeyState (CSKEY_PGUP))
     c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
   if (kbd->GetKeyState (CSKEY_PGDN))
     c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
   if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
+    c->Move (CS_VEC_FORWARD * 8 * speed);
   if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
+    c->Move (CS_VEC_BACKWARD * 8 * speed);
+  mCamPos = c->GetTransform().GetOrigin();
+  mCamPos.y = 1.8;
+  c->GetTransform ().SetOrigin(mCamPos);
+
+
+
+  csRef<iMeshWrapper> ground = engine->FindMeshObject("floor");
+
+  csVector3 start(mPosX,500.0,mPosZ);
+  csVector3 end(mPosX,-30.0,mPosZ);
+  csVector3 isect;
+  float pr;
+  bool hit = ground->HitBeam(start,end,isect,&pr);
+
+  char buf[255];
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -95,6 +111,26 @@ void Simple::SetupFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+
+  g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+  csRef<iGraphics2D> g2d = g3d->GetDriver2D();
+
+  iFontServer* fntsvr = g2d->GetFontServer ();
+  if (fntsvr)
+  {
+    csRef<iFont> fnt (fntsvr->GetFont (0));
+    if (fnt == NULL)
+    {
+      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+    }
+    int fgcolor = g2d->FindRGB (255, 255, 255);
+    if(hit)
+      sprintf (buf, "pos: %i, %i -- Hit at y=%.2f",int(mPosX),int(mPosZ),isect.y);
+    else
+      sprintf (buf, "pos: %i, %i -- NO Hit",int(mPosX),int(mPosZ));
+    g2d->Write (fnt, 10,420, fgcolor, -1, buf);
+  }
+
 }
 
 void Simple::FinishFrame ()
@@ -119,6 +155,26 @@ bool Simple::HandleEvent (iEvent& ev)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    return true;
+  }
+  else if (ev.Type == csevKeyDown && ev.Key.Code == 'r')
+  {
+    mPosX += 5.0;
+    return true;
+  }
+  else if (ev.Type == csevKeyDown && ev.Key.Code == 'f')
+  {
+    mPosX -= 5.0;
+    return true;
+  }
+  else if (ev.Type == csevKeyDown && ev.Key.Code == 'd')
+  {
+    mPosZ -= 5.0;
+    return true;
+  }
+  else if (ev.Type == csevKeyDown && ev.Key.Code == 'g')
+  {
+    mPosZ += 5.0;
     return true;
   }
 
@@ -220,93 +276,39 @@ bool Simple::Initialize ()
     return false;
   }
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  //load the map
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!vfs)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error loading 'stone4' texture!");
+        "crystalspace.application.simple1",
+        "no iVFS!");
     return false;
   }
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
-  room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  iPolygon3DStatic* p;
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 0, 5));
-  p->CreateVertex (csVector3 (5, 0, 5));
-  p->CreateVertex (csVector3 (5, 0, -5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+  vfs->ChDir ("/this/mytest");
+  // Load the level file which is called 'world'.
+  if (!loader->LoadMapFile("world"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.simple1",
+        "Couldn't load level!");
+    return false;
+  }
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 20, -5));
-  p->CreateVertex (csVector3 (5, 20, -5));
-  p->CreateVertex (csVector3 (5, 20, 5));
-  p->CreateVertex (csVector3 (-5, 20, 5));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+  csRefDynLight = engine->CreateDynLight(csVector3(0,50,0),150,csColor(1.0,1.0,1.0));
+  csRefDynLight->QueryLight()->SetSector(engine->GetSectors()->FindByName("room"));
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 20, 5));
-  p->CreateVertex (csVector3 (5, 20, 5));
-  p->CreateVertex (csVector3 (5, 0, 5));
-  p->CreateVertex (csVector3 (-5, 0, 5));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (5, 20, 5));
-  p->CreateVertex (csVector3 (5, 20, -5));
-  p->CreateVertex (csVector3 (5, 0, -5));
-  p->CreateVertex (csVector3 (5, 0, 5));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 20, -5));
-  p->CreateVertex (csVector3 (-5, 20, 5));
-  p->CreateVertex (csVector3 (-5, 0, 5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (5, 20, -5));
-  p->CreateVertex (csVector3 (-5, 20, -5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
-  p->CreateVertex (csVector3 (5, 0, -5));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  csRef<iStatLight> light;
-  iLightList* ll = room->GetLights ();
-
-  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0), false);
-  ll->Add (light->QueryLight ());
-
-  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1), false);
-  ll->Add (light->QueryLight ());
-
-  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0), false);
-  ll->Add (light->QueryLight ());
+  mCamPos = csVector3(985, 1.8,935);
 
   engine->Prepare ();
 
+  room = engine->GetSectors()->FindByName("room");
+  room->SetDynamicAmbientLight(csColor(0.1,0.1,0.1));
+
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (mCamPos);
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 

@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Aug-2003
+	- Jorrit fixed the x2d plugin so it actually reports an error if the
+	  'xwin' plugin cannot be found.
+	- Jorrit also fixed the reporter so that it will use 'csPrintf'
+	  to report the error if there are no listeners and the severity
+	  is ERROR or BUG. That way error messages sent to the reporter
+	  will not get lost even if the standard reporter listener didn't
+	  have a chance yet to register itself to the reporter.
 27-Aug-2003
 	- Eric Sunshine fixed problem in csHash where non-friend classes
 	  csHash::Iterator and GlobalIterator were accessing protected csHash

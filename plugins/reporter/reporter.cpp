@@ -157,6 +157,12 @@ void csReporter::ReportV (int severity, const char* msgId,
     msg->description = csStrNew (buf);
     csScopedMutexLock lock (mutex);
     messages.Push (msg);
+    if (listeners.Length () == 0 && (severity == CS_REPORTER_SEVERITY_ERROR
+    	|| severity == CS_REPORTER_SEVERITY_BUG))
+    {
+      csPrintfV (description, arg);
+      csPrintf ("\n");
+    }
   }
 }
 

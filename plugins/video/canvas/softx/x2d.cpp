@@ -90,6 +90,8 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, iXWindow);
   if (!xwin)
   {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	      "Couldn't find 'xwin' plugin!");
     return false;
   }
   dpy = xwin->GetDisplay ();
