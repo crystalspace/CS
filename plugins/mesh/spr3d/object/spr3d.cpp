@@ -425,13 +425,16 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
   {
     csBox3 box;
 
-    csVector3 max_sq_radius (0);
-    box.StartBoundingBox (GetVertex (frame, 0));
+    csVector3& v0 = GetVertex (frame, 0);
+    box.StartBoundingBox (v0);
+    csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
+    	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
     for ( vertex = 1 ; vertex < GetVertexCount() ; vertex++ )
     {
       csVector3& v = GetVertex (frame, vertex);
       box.AddBoundingVertexSmart (v);
-      csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+      csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
+      	v.z*v.z + v.z*v.z);
       if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
       if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
       if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
@@ -804,15 +807,18 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
     {
       csVector3* verts = GetVertices (i);
       csBox3 box;
-      csVector3 max_sq_radius (0);
       verts[0] = t.This2Other (verts[0]);
-      box.StartBoundingBox (verts[0]);
+      csVector3& v0 = verts[0];
+      box.StartBoundingBox (v0);
+      csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
+    	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
       for (j = 1 ; j < num ; j++)
       {
         csVector3& v = verts[j];
         v = t.This2Other (v);
         box.AddBoundingVertexSmart (v);
-        csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+	csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
+		v.z*v.z + v.z*v.z);
         if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
         if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
         if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;

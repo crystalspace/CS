@@ -1049,14 +1049,17 @@ void csGenmeshMeshObject::CalculateBBoxRadiusHard ()
   }
 
   csVector3* vt = factory->GetVertices ();
-  hard_bbox->StartBoundingBox (hard_transform->This2Other (vt[0]));
-  csVector3 max_sq_radius (0);
+  csVector3 v0 = hard_transform->This2Other (vt[0]);
+  hard_bbox->StartBoundingBox (v0);
+  csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
+    	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
   int i;
   for (i = 1 ; i < factory->GetVertexCount () ; i++)
   {
     csVector3 v = hard_transform->This2Other (vt[i]);
     hard_bbox->AddBoundingVertexSmart (v);
-    csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+    csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
+    	v.z*v.z + v.z*v.z);
     if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
     if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
     if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
@@ -1324,14 +1327,17 @@ void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
     radius.Set (0, 0, 0);
     return;
   }
-  object_bbox.StartBoundingBox (mesh_vertices[0]);
-  csVector3 max_sq_radius (0);
+  csVector3& v0 = mesh_vertices[0];
+  object_bbox.StartBoundingBox (v0);
+  csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
+    	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
   int i;
   for (i = 1 ; i < num_mesh_vertices ; i++)
   {
     csVector3& v = mesh_vertices[i];
     object_bbox.AddBoundingVertexSmart (v);
-    csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+    csVector3 sq_radius (v.x*v.x + v.x*v.x,
+    	v.y*v.y + v.y*v.y, v.z*v.z + v.z*v.z);
     if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
     if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
     if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
