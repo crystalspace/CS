@@ -346,7 +346,13 @@ void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked,
     SynthesizeCooked (codeRaw, modifiersState, codeCooked);
   }
 
-  SetKeyState (codeRaw, iDown, autoRepeat);
+  /*
+    Set state before the event if the key is released, otherwise
+    after. This is mainly for modifier keys, so if you press Alt
+    you won't get an Alt modifier, neither in the up nor the
+    down event. 
+   */
+  if (!iDown) SetKeyState (codeRaw, iDown, autoRepeat);
 
   // @@@ Pooled events, somehow?
   csRef<iEvent> ev;
@@ -362,6 +368,8 @@ void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked,
   ev->Add ("keyCharType", (uint8)charType);
   ev->Time = csGetTicks ();
   Post (ev);
+
+  if (iDown) SetKeyState (codeRaw, iDown, autoRepeat);
 }
 
 void csKeyboardDriver::SynthesizeCooked (utf32_char codeRaw, 
