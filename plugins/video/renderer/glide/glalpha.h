@@ -121,9 +121,8 @@ public:
   virtual void *GetPrivateObject ()
   { return (csGlideAlphaMap*)this; }
 
-  virtual iGraphics3D* GetDynamicTextureInterface () { return NULL;}
-  virtual void DynamicTextureSyncPalette () {}
-    
+  virtual iGraphics3D* GetProcTextureInterface () { return NULL;}
+  virtual void ProcTextureSync () {}    
   void savemap();
 };
 

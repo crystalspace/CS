@@ -27,8 +27,8 @@
  * To keep the backbuffer intact we save and restore the area.
  */
 
-#ifndef _GLDYNTEX_H_
-#define _GLDYNTEX_H_
+#ifndef _GLPROCTEX_H_
+#define _GLPROCTEX_H_
 
 #include "igraph3d.h"
 
@@ -36,7 +36,7 @@ class csGraphics3DGlide;
 class csTextureMMGlide;
 class csTextureGlide;
 
-class csGlideDynamic : public iGraphics3D
+class csGlideProcedural : public iGraphics3D
 {
  protected:
   csTextureMMGlide *tex;
@@ -48,8 +48,8 @@ class csGlideDynamic : public iGraphics3D
  public:
   DECLARE_IBASE;
 
-  csGlideDynamic (iBase * pParent);
-  virtual ~csGlideDynamic (){}
+  csGlideProcedural (iBase * pParent);
+  virtual ~csGlideProcedural (){}
 
   void SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex);
 

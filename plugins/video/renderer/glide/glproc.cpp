@@ -18,23 +18,23 @@
 
 #include "cssysdef.h"
 #include "gllib.h"
-#include "gldyn.h"
+#include "glproc.h"
 #include "gltex.h"
 #include "g3dgl.h"
 
-IMPLEMENT_IBASE (csGlideDynamic)
+IMPLEMENT_IBASE (csGlideProcedural)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END;
 
 
-csGlideDynamic::csGlideDynamic (iBase * pParent)
+csGlideProcedural::csGlideProcedural (iBase * pParent)
 { 
   CONSTRUCT_IBASE (pParent);
   tex=NULL; 
   g3d=NULL; 
 }
 
-void csGlideDynamic::SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex)
+void csGlideProcedural::SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex)
 { 
   this->g3d = g3d;
   this->tex = tex;
@@ -43,7 +43,7 @@ void csGlideDynamic::SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex)
   tex_0 = (csTextureGlide*) tex->get_texture (0);
 }
 
-bool csGlideDynamic::BeginDraw (int DrawFlags)
+bool csGlideProcedural::BeginDraw (int DrawFlags)
 {
   bool succ = g3d->BeginDraw (DrawFlags);
   if (succ){
@@ -56,7 +56,7 @@ bool csGlideDynamic::BeginDraw (int DrawFlags)
   return succ;
 }
 
-void csGlideDynamic::FinishDraw ()
+void csGlideProcedural::FinishDraw ()
 {
   g3d->FinishDraw ();
   
@@ -79,143 +79,143 @@ void csGlideDynamic::FinishDraw ()
   
 }
 
-void csGlideDynamic::Print (csRect *area)
+void csGlideProcedural::Print (csRect *area)
 {
   (void)area;
 }
 
-void csGlideDynamic::DrawPolygon (G3DPolygonDP& poly)
+void csGlideProcedural::DrawPolygon (G3DPolygonDP& poly)
 { 
   g3d->DrawPolygon (poly); 
 }
 
-void csGlideDynamic::DrawPolygonDebug (G3DPolygonDP& poly)
+void csGlideProcedural::DrawPolygonDebug (G3DPolygonDP& poly)
 { 
   g3d->DrawPolygonDebug (poly); 
 }
 
-void csGlideDynamic::DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color)
+void csGlideProcedural::DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color)
 { 
   g3d->DrawLine (v1, v2, fov, color); 
 }
 
-void csGlideDynamic::StartPolygonFX (iTextureHandle* handle, UInt mode)
+void csGlideProcedural::StartPolygonFX (iTextureHandle* handle, UInt mode)
 { 
   g3d->StartPolygonFX (handle, mode); 
 }
 
-void csGlideDynamic::FinishPolygonFX ()
+void csGlideProcedural::FinishPolygonFX ()
 { 
   g3d->FinishPolygonFX (); 
 }
 
-void csGlideDynamic::DrawPolygonFX (G3DPolygonDPFX& poly)
+void csGlideProcedural::DrawPolygonFX (G3DPolygonDPFX& poly)
 { 
   g3d->DrawPolygonFX (poly); 
 }
 
-void csGlideDynamic::DrawTriangleMesh (G3DTriangleMesh& mesh)
+void csGlideProcedural::DrawTriangleMesh (G3DTriangleMesh& mesh)
 { 
   g3d->DrawTriangleMesh (mesh); 
 }
 
-void csGlideDynamic::DrawPolygonMesh (G3DPolygonMesh& mesh)
+void csGlideProcedural::DrawPolygonMesh (G3DPolygonMesh& mesh)
 { 
   g3d->DrawPolygonMesh (mesh); 
 }
 
-void csGlideDynamic::OpenFogObject (CS_ID id, csFog* fog)
+void csGlideProcedural::OpenFogObject (CS_ID id, csFog* fog)
 { 
   g3d->OpenFogObject (id, fog); 
 }
 
-void csGlideDynamic::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype)
+void csGlideProcedural::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype)
 { 
   g3d->DrawFogPolygon (id, poly, fogtype);
 }
 
-void csGlideDynamic::CloseFogObject (CS_ID id)
+void csGlideProcedural::CloseFogObject (CS_ID id)
 { 
   g3d->CloseFogObject (id); 
 }
 
-bool csGlideDynamic::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
+bool csGlideProcedural::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
 { 
   return g3d->SetRenderState (op, val); 
 }
 
-long csGlideDynamic::GetRenderState (G3D_RENDERSTATEOPTION op)
+long csGlideProcedural::GetRenderState (G3D_RENDERSTATEOPTION op)
 { 
   return g3d->GetRenderState (op); 
 }
 
-csGraphics3DCaps *csGlideDynamic::GetCaps ()
+csGraphics3DCaps *csGlideProcedural::GetCaps ()
 { 
   return g3d->GetCaps (); 
 }
 
-unsigned long *csGlideDynamic::GetZBuffAt (int x, int y)
+unsigned long *csGlideProcedural::GetZBuffAt (int x, int y)
 { 
   return g3d->GetZBuffAt (x, y); 
 }
 
-float csGlideDynamic::GetZBuffValue (int x, int y)
+float csGlideProcedural::GetZBuffValue (int x, int y)
 { 
   return g3d->GetZBuffValue (x, y); 
 }
 
-void csGlideDynamic::DumpCache ()
+void csGlideProcedural::DumpCache ()
 { 
   g3d->DumpCache (); 
 }
 
-void csGlideDynamic::ClearCache ()
+void csGlideProcedural::ClearCache ()
 { 
   g3d->ClearCache (); 
 }
 
-void csGlideDynamic::RemoveFromCache (iPolygonTexture* poly_texture)
+void csGlideProcedural::RemoveFromCache (iPolygonTexture* poly_texture)
 { 
   g3d->RemoveFromCache (poly_texture); 
 }
 
-void csGlideDynamic::SetPerspectiveCenter (int x, int y)
+void csGlideProcedural::SetPerspectiveCenter (int x, int y)
 { 
   g3d->SetPerspectiveCenter (x, y); 
 }
 
-void csGlideDynamic::SetPerspectiveAspect (float aspect)
+void csGlideProcedural::SetPerspectiveAspect (float aspect)
 { 
   g3d->SetPerspectiveAspect (aspect); 
 }
 
-void csGlideDynamic::SetObjectToCamera (csReversibleTransform* o2c)
+void csGlideProcedural::SetObjectToCamera (csReversibleTransform* o2c)
 { 
   g3d->SetObjectToCamera (o2c); 
 }
 
-void csGlideDynamic::SetClipper (csVector2* vertices, int num_vertices)
+void csGlideProcedural::SetClipper (csVector2* vertices, int num_vertices)
 { 
   g3d->SetClipper (vertices, num_vertices);
 }
 
-iGraphics2D *csGlideDynamic::GetDriver2D ()
+iGraphics2D *csGlideProcedural::GetDriver2D ()
 { 
   return g3d->GetDriver2D (); 
 }
 
-iTextureManager *csGlideDynamic::GetTextureManager ()
+iTextureManager *csGlideProcedural::GetTextureManager ()
 { 
   return g3d->GetTextureManager (); 
 }
 
-iHalo *csGlideDynamic::CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, 
+iHalo *csGlideProcedural::CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, 
 				   int iHeight)
 { 
   return g3d->CreateHalo (iR, iG, iB, iAlpha, iWidth, iHeight); 
 }
 
-void csGlideDynamic::DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+void csGlideProcedural::DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
 				 int tx, int ty, int tw, int th)
 { 
   g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th); 

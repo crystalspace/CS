@@ -48,7 +48,7 @@ class csTextureManagerGlide;
 class csGraphics3DGlide  : public iGraphics3D
 {
 friend class csGlideHalo;
-friend class csGlideDynamic;
+friend class csGlideProcedural;
 private:
   /// the texture cache.
   csGlideTextureCache *m_pTextureCache, *m_pLightmapCache, *m_pAlphamapCache;

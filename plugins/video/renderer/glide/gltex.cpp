@@ -24,7 +24,7 @@
 
 #include "gltex.h"
 #include "g3dgl.h"
-#include "gldyn.h"
+#include "glproc.h"
 #include "iimage.h"
 #include "csutil/scanstr.h"
 #include "lightdef.h"
@@ -67,11 +67,11 @@ csTexture *csTextureMMGlide::NewTexture (iImage *Image)
   return new csTextureGlide (this, Image);
 }
 
-iGraphics3D *csTextureMMGlide::GetDynamicTextureInterface()
+iGraphics3D *csTextureMMGlide::GetProcTextureInterface()
 {
-  if ( (flags & CS_TEXTURE_DYNAMIC) && dyn == NULL)
+  if ( (flags & CS_TEXTURE_PROC) && dyn == NULL)
   {
-    dyn = new csGlideDynamic (NULL);
+    dyn = new csGlideProcedural (NULL);
     dyn->SetTarget (g3d, this);
   }
   return dyn;
