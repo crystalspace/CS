@@ -81,6 +81,9 @@ public:
 
   /// Get the value of an integer from a given component node
   virtual bool GetString(awsComponentNode *node, char *name, iString *&val)=0;
+  
+  /// Find window definition and return the component node holding it, Null otherwise
+  virtual awsComponentNode *FindWindowDef(char *name)=0;
 
 };
 
