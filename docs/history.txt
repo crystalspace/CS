@@ -25,6 +25,9 @@ Short-term cleanups that need to be done:
 	  the application to crash during initialization.
 	- Eric Sunshine patched 'makedep' (which Andrew added) so that it
 	  compiles on NextStep.
+	- Eric Sunshine updated many out-of-date documents in the 'docs'
+	  directory.  He also renamed a number of documents in order to
+	  achieve better naming consistency.
 8-Aug-1999
 	- Continued work on new csTransformationManager class. It is now fully
 	  functional and the old NewTransformation()/RestoreTransformation()
