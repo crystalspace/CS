@@ -580,7 +580,7 @@ public:
    * The current flags set with SetLightingCacheMode() control if the
    * lightmaps will be cached or not.
    */
-  virtual void ForceRelight (iStatLight* light, iProgressMeter* meter);
+  virtual void ForceRelight (iStatLight* light);
 
   /**
    * Set the maximum number of polygons to process in

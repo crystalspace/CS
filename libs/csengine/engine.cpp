@@ -1125,7 +1125,7 @@ void csEngine::ForceRelight (iProgressMeter *meter)
   lightcache_mode = old_lightcache_mode;
 }
 
-void csEngine::ForceRelight (iStatLight* light, iProgressMeter *meter)
+void csEngine::ForceRelight (iStatLight* light)
 {
 #ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();

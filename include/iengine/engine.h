@@ -187,7 +187,7 @@ struct iEngine : public iBase
    * The current flags set with SetLightingCacheMode() control if the
    * lightmaps will be cached or not.
    */
-  virtual void ForceRelight (iStatLight* light, iProgressMeter* meter = 0) = 0;
+  virtual void ForceRelight (iStatLight* light) = 0;
 
   /**
    * Prepare the textures. It will initialise all loaded textures
