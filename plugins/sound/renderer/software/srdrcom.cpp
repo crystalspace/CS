@@ -246,13 +246,13 @@ bool csSoundRenderSoftware::HandleEvent (iEvent &e)
     switch (e.Command.Code) {
     case cscmdPreProcess:
       Update();
-      return true;
+      break;
     case cscmdSystemOpen:
       Open();
-      return true;
+      break;
     case cscmdSystemClose:
       Close();
-      return true;
+      break;
     }
   }
   return false;
