@@ -158,7 +158,7 @@ struct iEngine : public iBase
    * <p>
    * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
-   * @param region only relight objects in this region 
+   * \param region only relight objects in this region 
    * (will relight every object in the engine by default)
    * \param meter If supplied, the meter object will be called back
    * periodically to report the progress of engine lighting calculation.

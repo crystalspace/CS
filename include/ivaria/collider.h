@@ -56,15 +56,17 @@ SCF_VERSION (iCollideSystem, 0, 0, 3);
  */
 struct iCollideSystem : public iBase
 {
-  /// Create a iCollider for the given mesh geometry.
+  /**
+   * Create a iCollider for the given mesh geometry.
+   * \param mesh is a structure describing the geometry from which the
+   * collider will be made. You can get such a mesh either by making your
+   * own subclass of iPolygonMesh, by getting a mesh from
+   * iMeshObject->GetObjectModel()->GetPolygonMeshColldet(), or else
+   * by using csPolygonMesh, or csPolygonMeshBox.
+   * \return a reference to a collider that you have to store.
+   */
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
   
-  /// Create a iCollider for the given sphere geometry.
-  virtual csPtr<iCollider> CreateSphereCollider (iMeshObject* sphere) = 0;
-
-  /// Create a iCollider for the given box geometry.
-  virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* box) = 0;
- 
   /**
    * Test collision between two colliders.
    * This is only supported for iCollider objects created by
@@ -73,6 +75,18 @@ struct iCollideSystem : public iBase
    * that you can query with GetCollisionPairs and reset/clear
    * with ResetCollisionPairs (very important! Do not forget this).
    * Every call to Collide will add to that array.
+   *
+   * \param collider1 is the first collider as created by this same
+   * collide system (never pass in a collider created by another
+   * collide system).
+   * \param trans1 is the transform for the object represented by
+   * the first collider. If the collider belongs to a mesh object
+   * then you can get the transform by calling
+   * mesh->GetMovable ()->GetFullTransform().
+   * \param collider2 is the second collider.
+   * \param trans2 is the second transform.
+   * \return true if there are triangles that intersect. The
+   * array with collision pairs will be updated.
    */
   virtual bool Collide (
   	iCollider* collider1, const csReversibleTransform* trans1,
@@ -82,11 +96,14 @@ struct iCollideSystem : public iBase
    * This array will grow with every call to Collide until you clear
    * it using 'ResetCollisionPairs'. Note that the triangles are
    * in object space and not world space!
+   * \return an array of collision pairs for all Collide() calls
+   * that occured between now and the call to ResetCollisionPairs().
    */
   virtual csCollisionPair* GetCollisionPairs () = 0;
 
   /**
    * Get number of collision pairs in array.
+   * \return the number of collision pairs.
    */
   virtual int GetCollisionPairCount () = 0;
 
@@ -101,6 +118,9 @@ struct iCollideSystem : public iBase
    * Indicate if we are interested only in the first hit that is found.
    * This is only valid for CD algorithms that actually allow the
    * detection of multiple CD hit points.
+   * \param o is true if you are only interested in one colliding
+   * triangle per call to Collide. By default this is 'false' unless
+   * the CD system only supports single hits.
    */
   virtual void SetOneHitOnly (bool o) = 0;
 
@@ -109,6 +129,8 @@ struct iCollideSystem : public iBase
    * that is found. For CD systems that support multiple hits this
    * will return the value set by the SetOneHitOnly() function.
    * For CD systems that support one hit only this will always return true.
+   * \return true if there is only one hit recorder for every
+   * call to Collide().
    */
   virtual bool GetOneHitOnly () = 0;
 
@@ -131,6 +153,17 @@ struct iCollideSystem : public iBase
    * with the old position. 'colliders' and 'transforms' should be arrays
    * with 'num_colliders' elements for all the objects that we should
    * test against.
+   * \param collider is the collider of the object that we are going
+   * to move along the path.
+   * \param trans is the transform of that object (see Collide()).
+   * \param newpos is the new position of that object.
+   * \param num_colliders is the number of colliders that we are going
+   * to use to collide with.
+   * \param colliders is an array of colliders. Typically you can obtain
+   * such a list by doing iEngine->GetNearbyMeshes() and then getting
+   * the colliders from all meshes you get (possibly using csColliderWrapper).
+   * \param transforms is an array of transforms that belong with the
+   * array of colliders.
    */
   virtual int CollidePath (
   	iCollider* collider, const csReversibleTransform* trans,

@@ -61,8 +61,6 @@ public:
   bool Initialize (iObjectRegistry* iobject_reg);
 
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
-  virtual csPtr<iCollider> CreateSphereCollider (iMeshObject* sphere);
-  virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* box);
 
   /**
    * Test collision between two colliders.
