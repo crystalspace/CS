@@ -41,6 +41,26 @@ Now just hit the @emph{Ok} buttons until you are back to the @emph{Control Panel
 If you have any commandlines open you will need to close and restart those for the variable to take
 effect, but no reboot should be required.
 
-@subsubheading Linux
+@subsubheading Linux/Unix
+
+There are several way of setting environment variables in unix. We'll only
+describe the popular bash shell here for other shells read the shells manual.
+Setting environment variables in bash works with the @emph{export} command. If
+Crystal Space is installed in @emph{/home/tux/CS} the correct command would
+be:
+
+@example
+export CRYSTAL="/home/tux/CS"
+@end example
+
+If you don't want to type this command each time again then you should insert
+it into one of the script files that are automatically called when the bash is
+started. I recommend using the @emph{.bash_profile} in your home directory, or
+alternatively the @emph{/etc/profile} file if you want to set a @emph{CRYSTAL}
+environment variable for all users. Be sure to read the comments in these
+files, sometimes the configuration tools of linux distributions override them
+when changing settings. In this case the distributions often created other
+files that are called automatically and aren't touched by the configuration
+tools.
 
 @subsubheading Mac OSX
