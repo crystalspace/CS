@@ -137,21 +137,22 @@ void csDefaultButtonSkin::Draw (csComponent &This)
   const char *text = This.GetText ();
   if (text)
   {
-    txtx = (This.bound.Width () - This.TextWidth (text)) / 2;
+    int fh, fw = This.GetTextSize (text, &fh);
+    txtx = (This.bound.Width () - fw) / 2;
     if (img)
       switch (ButtonStyle & CSBS_TEXTPLACEMENT)
       {
         case CSBS_TEXTABOVE:
-          imgy += This.TextHeight () / 2;
-          txty = imgy - This.TextHeight () - 1;
+          imgy += fh / 2;
+          txty = imgy - fh - 1;
           break;
         case CSBS_TEXTBELOW:
-          imgy -= This.TextHeight () / 2;
+          imgy -= fh / 2;
           txty = imgy + img->Height () + 1;
           break;
       } /* endswitch */
     else
-      txty = (This.bound.Height () - This.TextHeight ()) / 2;
+      txty = (This.bound.Height () - fh) / 2;
     if ((ButtonStyle & CSBS_SHIFT) && This.Pressed) { txtx++; txty++; }
   }
 
@@ -192,8 +193,8 @@ void csDefaultButtonSkin::SuggestSize (csButton &This, int &w, int &h)
   const char *text = This.GetText ();
   if (text)
   {
-    int tw = This.TextWidth (text) + 8;
-    int th = This.TextHeight () + 4;
+    int th, tw = This.GetTextSize (text, &th);
+    tw += 8; th += 4;
     if (tw > w) w = tw;
     h += th;
   } /* endif */

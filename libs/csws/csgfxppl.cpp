@@ -26,6 +26,7 @@
 #include "isystem.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
+#include "ifontsrv.h"
 
 #define INCLUDE_MIN_POINT(x, y)						\
 {									\
@@ -47,26 +48,29 @@
   INCLUDE_MAX_POINT (x + 1, y + 1);					\
 }
 
-csGraphicsPipeline::csGraphicsPipeline (iSystem *System)
+csGraphicsPipeline::~csGraphicsPipeline ()
+{
+  Desync ();
+  if (G2D) G2D->DecRef ();
+  if (G3D) G3D->DecRef ();
+}
+
+void csGraphicsPipeline::Initialize (iSystem *System)
 {
   MaxPage = 0;
   DrawMode = 0;
   memset (SyncArea, 0, sizeof (SyncArea));
-  G3D = QUERY_PLUGIN (System, iGraphics3D);
-  G2D = QUERY_PLUGIN (System, iGraphics2D);
+  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  if (G3D)
+    (G2D = G3D->GetDriver2D ())->IncRef ();
+  else
+    G2D = QUERY_PLUGIN_ID (System, CS_FUNCID_CANVAS, iGraphics2D);
   if (G2D)
   {
     FrameWidth = G2D->GetWidth ();
     FrameHeight = G2D->GetHeight ();
   }
   RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-}
-
-csGraphicsPipeline::~csGraphicsPipeline ()
-{
-  Desync ();
-  if (G2D) G2D->DecRef ();
-  if (G3D) G3D->DecRef ();
 }
 
 bool csGraphicsPipeline::ClipLine (float &x1, float &y1, float &x2, float &y2,
@@ -119,19 +123,19 @@ void csGraphicsPipeline::Pixel (int x, int y, int color)
   G2D->DrawPixel (x, y, color);
 }
 
-void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, int fontsize, const char *s)
+void csGraphicsPipeline::Text (int x, int y, int fg, int bg, iFont *font,
+  int fontsize, const char *s)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
-  int tmpx = x + TextWidth (s, font, fontsize);
-  int tmpy = y + TextHeight (font, fontsize);
+  font->SetSize (fontsize);
+  int fh, fw;
+  font->GetDimensions (s, fw, fh);
   INCLUDE_MIN_POINT (x, y);
-  INCLUDE_MAX_POINT (tmpx, tmpy);
+  INCLUDE_MAX_POINT (x + fw, y + fh);
 
-  G2D->SetFontID (font);
-  G2D->SetFontSize (fontsize);
-  G2D->Write (x, y, fg, bg, s);
+  G2D->Write (font, x, y, fg, bg, s);
 }
 
 void csGraphicsPipeline::Pixmap (csPixmap *s2d, int x, int y, int w, int h)
@@ -217,27 +221,18 @@ void csGraphicsPipeline::RestoreClipRect ()
   ClipRect = OrigClip;
 }
 
-int csGraphicsPipeline::TextWidth (const char *text, int Font, int FontSize)
-{
-  G2D->SetFontID (Font);
-  G2D->SetFontSize (FontSize);
-  return text ? G2D->GetTextWidth (Font, text) : 0;
-}
-
-int csGraphicsPipeline::TextHeight (int Font, int FontSize)
-{
-  G2D->SetFontID (Font);
-  G2D->SetFontSize (FontSize);
-  return G2D->GetTextHeight (Font);
-}
-
 void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
 {
   if (!BeginDraw (CSDRAW_3DGRAPHICS))
     return;
 
   for (int i = 0; i < poly.num; i++)
-    INCLUDE_POINT (QRound (poly.vertices [i].sx), QRound (poly.vertices [i].sy));
+  {
+    int x = QInt (poly.vertices [i].sx);
+    int y = FrameHeight - 1 - QInt (poly.vertices [i].sy);
+    INCLUDE_MIN_POINT (x, y);
+    INCLUDE_MAX_POINT (x + 1, y + 1);
+  }
 
   G3D->StartPolygonFX (poly.mat_handle, mode);
   G3D->DrawPolygonFX (poly);
@@ -402,8 +397,6 @@ bool csGraphicsPipeline::BeginDrawImp (int iMode)
   {
     G2D->GetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
     ClipRect = OrigClip;
-    OrigFont = G2D->GetFontID ();
-    OrigFontSize = G2D->GetFontSize ();
     return true;
   }
 
@@ -416,7 +409,5 @@ void csGraphicsPipeline::FinishDrawImp ()
 {
   // Restore clip rectangle, font id and font size
   G2D->SetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
-  G2D->SetFontID (OrigFont);
-  G2D->SetFontSize (OrigFontSize);
   G3D->FinishDraw ();
 }

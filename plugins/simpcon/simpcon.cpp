@@ -74,6 +74,8 @@ csSimpleConsole::~csSimpleConsole ()
   FreeLineMessage ();
   FreeBuffer ();
 
+  if (console_font)
+    console_font->DecRef ();
   if (G3D)
     G3D->DecRef ();
   if (System)
@@ -99,30 +101,32 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   buf = Config->GetStr ("SimpleConsole", "CONBG", "0,0,0");
   sscanf (buf, "%d,%d,%d", &console_bg_r, &console_bg_g, &console_bg_b);
   buf = Config->GetStr ("SimpleConsole", "CONFONT", "auto");
+
+  const char *fontname;
   if (!strcasecmp (buf, "auto"))
   {
     // choose a font that allows at least 80 columns of text
     if (FrameWidth <= 560)
-      console_font = csFontTiny;
+      fontname = CSFONT_SMALL;
     else if (FrameWidth <= 640)
-      console_font = csFontCourier;
+      fontname = CSFONT_COURIER;
     else
-      console_font = csFontPolice;
+      fontname = CSFONT_LARGE;
   }
-  else if (!strcasecmp (buf, "tiny"))
-    console_font = csFontTiny;
-  else if (!strcasecmp (buf, "courier"))
-    console_font = csFontCourier;
-  else if (!strcasecmp (buf, "police"))
-    console_font = csFontPolice;
   else
+    fontname = buf;
+  console_font = G2D->GetFontServer ()->LoadFont (fontname);
+  if (!console_font)
   {
-    System->Printf (MSG_FATAL_ERROR, "Bad value for CONFONT in configuration "
-      "file.\nUse 'auto', 'tiny', 'courier', or 'police'\n");
+    System->Printf (MSG_FATAL_ERROR,
+      "Cannot load font CONFONT=%s defined in configuration file.\n"
+      "Try '*large', '*courier', '*italic' or '*small'\n", buf);
     return false;
   }
 
-  int i = G2D->GetTextHeight (console_font) + 2;
+  int fw, fh;
+  console_font->GetMaxSize (fw, fh);
+  int i = fh + 2;
   LineSize = (FrameWidth / 4) + 1;
   SetBufferSize ((FrameHeight / i) - 2);
   SetLineMessages (Config->GetInt ("SimpleConsole", "LINEMAX", 4));
@@ -320,34 +324,34 @@ void csSimpleConsole::Draw2D (csRect* area)
   int i;
   cs_time CurrentTime = System->GetTime ();
 
-  G2D->SetFontID (console_font);
-
 #define WRITE(x,y,fc,bc,s,changed)				\
   {								\
-    G2D->Write (x, y, fc, bc, s);				\
+    G2D->Write (console_font, x, y, fc, bc, s);			\
     if ((changed) && area)					\
     {								\
-      int tw = G2D->GetTextWidth (console_font, s);		\
-      area->Union (x, y, x + tw, y + th);			\
+      int tw, th;						\
+      console_font->GetDimensions (s, tw, th);			\
+      area->Union (x, y, x + tw, y + th + 2);			\
     }								\
   }
 
 #define WRITE2(x,y,fc,bc,s,changed)				\
   {								\
-    G2D->Write (x + 1, y + 1, bc, -1, s);			\
-    G2D->Write (x, y, fc, -1, s);				\
+    G2D->Write (console_font, x + 1, y + 1, bc, -1, s);		\
+    G2D->Write (console_font, x, y, fc, -1, s);			\
     if ((changed) && area)					\
     {								\
-      int tw = G2D->GetTextWidth (console_font, s);		\
-      area->Union (x, y, x + 1 + tw, y + 1 + th);		\
+      int tw, th;						\
+      console_font->GetDimensions (s, tw, th);			\
+      area->Union (x, y, x + 1 + tw, y + 1 + th + 2);		\
     }								\
   }
 
   if (area && InvalidAll)
     area->Set (0, 0, FrameWidth, FrameHeight);
 
-  // text height
-  int th = G2D->GetTextHeight (console_font);
+  int tw, th;
+  console_font->GetMaxSize (tw, th);
   th += 2;
 
   bool dblbuff = G2D->GetDoubleBufferState ();
@@ -397,7 +401,8 @@ void csSimpleConsole::Draw2D (csRect* area)
       int curx = strlen (tmp);
       if ((CursorPos >= 0) && (CursorPos < curx))
         tmp [CursorPos] = 0;
-      curx = G2D->GetTextWidth (console_font, tmp);
+      int temp_h;
+      console_font->GetDimensions (tmp, curx, temp_h);
       delete [] tmp;
 
       if (console_transparent_bg)
@@ -436,7 +441,7 @@ void csSimpleConsole::GfxWrite (int x, int y, int fg, int bg, char *iText, ...)
   vsprintf (buf, iText, arg);
   va_end (arg);
 
-  G2D->Write (x, y, fg, bg, buf);
+  G2D->Write (console_font, x, y, fg, bg, buf);
 }
 
 void csSimpleConsole::SetVisible (bool iShow)

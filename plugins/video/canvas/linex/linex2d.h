@@ -37,8 +37,6 @@
 /// XLIB version.
 class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
 {
-  // The display context
-  Display* dpy;
   int screen_num;
   int display_width, display_height;
   Window wm_window;
@@ -62,10 +60,6 @@ class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
 
   // Window colormap
   Colormap cmap;
-
-  // The font
-  XFontStruct *xfont;
-  int FontH;
 
   // Hardware mouse cursor or software emulation?
   bool do_hwmouse;
@@ -92,6 +86,9 @@ class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
+  // The display context
+  static Display* dpy;
+
   DECLARE_IBASE;
 
   csGraphics2DLineXLib (iBase *iParent);
@@ -108,10 +105,8 @@ public:
 
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
   virtual void Clear (int color);
-  virtual void Write (int x, int y, int fg, int bg, const char *text);
+  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *text);
   virtual void DrawBox (int x, int y, int w, int h, int color);
-  virtual int GetTextWidth (int Font, const char *text);
-  virtual int GetTextHeight (int Font);
 
   virtual bool PerformExtension (const char* iCommand, ...);
 
@@ -145,6 +140,48 @@ public:
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 150; }
+};
+
+/**
+ * A pretty simple font server that manages one single X11 font :-)
+ */
+class csLineX2DFontServer : public iFontServer
+{
+  // The font object
+  struct csLineX2DFont : public iFont
+  {
+    XFontStruct *xfont;
+    int FontW, FontH;
+    csLineX2DFont ();
+    virtual ~csLineX2DFont ();
+    virtual void SetSize (int iSize) { (void)iSize; }
+    virtual int GetSize () { return 0; }
+    virtual void GetMaxSize (int &oW, int &oH)
+    { oW = FontW; oH = FontH; }
+    virtual bool GetGlyphSize (uint8 c, int &oW, int &oH);
+    virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
+    virtual void GetDimensions (const char *text, int &oW, int &oH);
+    virtual int GetLength (const char *text, int maxwidth);
+    virtual void AddDeleteCallback (DeleteNotify, void *)
+    { }
+    virtual bool RemoveDeleteCallback (DeleteNotify, void *)
+    { return true; }
+    void Load ();
+    DECLARE_IBASE;
+  } font;
+
+public:
+  DECLARE_IBASE;
+
+  csLineX2DFontServer (iBase *iParent);
+  virtual ~csLineX2DFontServer () {}
+  virtual bool Initialize (iSystem *)
+  { return true; }
+  virtual iFont *LoadFont (const char *filename);
+  virtual int GetNumFonts ()
+  { return font.xfont ? 1 : 0; }
+  virtual iFont *GetFont (int iIndex)
+  { (void)iIndex; return font.xfont ? &font : NULL; }
 };
 
 #endif // __LINEX2D_H__

@@ -29,7 +29,7 @@ IMPLEMENT_FACTORY (csEngine)
 
 EXPORT_CLASS_TABLE (enginep)
   EXPORT_CLASS (csEngine, "crystalspace.engine.plugin", 
-		"CrystalSpace Engine Plugin" )
+		"Crystal Space Engine Plugin" )
 EXPORT_CLASS_TABLE_END
 
 csEngine::csEngine (iBase* parent)

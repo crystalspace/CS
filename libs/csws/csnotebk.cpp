@@ -23,6 +23,7 @@
 #include "csws/csapp.h"
 #include "csws/csnotebk.h"
 #include "csws/cswsutil.h"
+#include "csws/csskin.h"
 
 //------------------------------------------------------------------------------
 
@@ -162,7 +163,7 @@ csNotebook::csNotebook (csComponent *iParent, int iStyle) : csComponent (iParent
     for (int i = 0; i < 12; i++)
     {
       int tx,ty,tw,th;
-      ParseConfigBitmap (app, NULL, "Dialog", NotebookButton [i], tx, ty, tw, th);
+      ParseConfigBitmap (app, app->skin->Prefix, "Dialog", NotebookButton [i], tx, ty, tw, th);
       sprites [i] = new csPixmap (tex, tx, ty, tw, th);
     }
   } /* endif */
@@ -369,7 +370,9 @@ void csNotebook::Draw ()
     Rect3D (rect.xmin - 1, yy - 1, rect.xmax + 1, yy + hh,
       CSPAL_NOTEBOOK_DARK3D, CSPAL_NOTEBOOK_LIGHT3D);
     SetClipRect (rect.xmin, yy, rect.xmax, yy + hh - 2);
-    Text (rect.xmin + 4, yy + (hh - TextHeight ()) / 2,
+    int fonth;
+    GetTextSize ("", &fonth);
+    Text (rect.xmin + 4, yy + (hh - fonth) / 2,
       CSPAL_NOTEBOOK_INFO_TEXT, -1, focused->GetText ());
     SetClipRect ();
   }
@@ -539,8 +542,9 @@ void csNotebook::Draw ()
               data->image->Width (), data->image->Height ());
           else
           {
-            int tx = rect.xmin + (w - TextWidth (data->text)) / 2;
-            int ty = rect.ymin + (h - TextHeight ()) / 2;
+            int fh, fw = GetTextSize (data->text, &fh);
+            int tx = rect.xmin + (w - fw) / 2;
+            int ty = rect.ymin + (h - fh) / 2;
             Text (tx, ty, col + CSPAL_NOTEBOOK_UNSEL_TEXT, -1, data->text);
             DrawUnderline (tx, ty, data->text, data->underline_pos,
               col + CSPAL_NOTEBOOK_UNSEL_TEXT);
@@ -845,7 +849,8 @@ int csNotebook::InfoHeight ()
   if (!(style & CSNBS_PAGEINFO))
     return 0;
 
-  int h = TextHeight ();
+  int h;
+  GetTextSize ("", &h);
   if (style & CSNBS_THINTABS)
     h += h / 2;
   else
@@ -880,8 +885,7 @@ bool csNotebook::GetTabSize (int iTab, int &oW, int &oH)
   }
   else
   {
-    oW = TextWidth (data->text);
-    oH = TextHeight ();
+    oW = GetTextSize (data->text, &oH);
 
     if (style & CSNBS_THINTABS)
     {

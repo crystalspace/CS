@@ -54,8 +54,8 @@ static char* get_line_2d_driver ()
 IMPLEMENT_FACTORY (csGraphics3DLine)
 
 EXPORT_CLASS_TABLE (line3d)
-  EXPORT_CLASS (csGraphics3DLine, "crystalspace.graphics3d.line",
-    "Line 3D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics3DLine, "crystalspace.graphics3d.line",
+    "Line 3D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics3DLine)

@@ -51,7 +51,11 @@ struct FogBuffer
   float red, green, blue;
 };
 
-
+/**
+ * The basic software renderer class.
+ * This class is the parent for both "normal" software renderer
+ * as well as for procedural texture class.
+ */
 class csGraphics3DSoftwareCommon : public iGraphics3D
 {
 protected:

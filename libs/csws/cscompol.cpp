@@ -61,11 +61,10 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
 
   lb->xmax++;
   lb->ymax++;
-  lb->Intersect (dirty);
   if (!clip.IsEmpty ())
     lb->Intersect (clip);
   rect.Push (lb);
-  Clip (rect, this);
+  FastClip (rect);
 
   int dx = 0; int dy = 0;
   LocalToGlobal (dx, dy);
@@ -112,21 +111,21 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
         switch (vstats [j].Type)
         {
           case CS_VERTEX_ORIGINAL:
-            vt = vstats  [i].Vertex;
-            poly.vertices [i].z = orig_poly [vt].z;
-            poly.vertices [i].u = orig_poly [vt].u;
-            poly.vertices [i].v = orig_poly [vt].v;
+            vt = vstats  [j].Vertex;
+            poly.vertices [j].z = orig_poly [vt].z;
+            poly.vertices [j].u = orig_poly [vt].u;
+            poly.vertices [j].v = orig_poly [vt].v;
             if (mode & CS_FX_GOURAUD)
             {
-              poly.vertices [i].r = orig_poly [vt].r;
-              poly.vertices [i].g = orig_poly [vt].g;
-              poly.vertices [i].b = orig_poly [vt].b;
+              poly.vertices [j].r = orig_poly [vt].r;
+              poly.vertices [j].g = orig_poly [vt].g;
+              poly.vertices [j].b = orig_poly [vt].b;
             }
             break;
           case CS_VERTEX_ONEDGE:
-            vt = vstats [i].Vertex;
+            vt = vstats [j].Vertex;
             vt2 = vt + 1; if (vt2 >= orig_num_vert) vt2 = 0;
-            t = vstats [i].Pos;
+            t = vstats [j].Pos;
             INTERPOLATE1 (z);
             INTERPOLATE1 (u);
             INTERPOLATE1 (v);
@@ -138,8 +137,8 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
             }
             break;
           case CS_VERTEX_INSIDE:
-            float x = clipped_vert [i].x;
-            float y = clipped_vert [i].y;
+            float x = clipped_vert [j].x;
+            float y = clipped_vert [j].y;
             int edge_from [2], edge_to [2];
             int edge = 0;
             int et, ef;
@@ -192,12 +191,10 @@ void csComponent::ClearZbuffer (int x1, int y1, int x2, int y2)
 {
   csObjVector rect (8, 4);
   csRect *lb = new csRect (x1, y1, x2, y2);
-
-  lb->Intersect (dirty);
   if (!clip.IsEmpty ())
     lb->Intersect (clip);
   rect.Push (lb);
-  Clip (rect, this);
+  FastClip (rect);
 
   for (int i = rect.Length () - 1; i >= 0; i--)
   {

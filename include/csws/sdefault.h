@@ -21,12 +21,14 @@
 #define __SDEFAULT_H__
 
 #include "csskin.h"
+#include "csbackgr.h"
 
 #define SKIN_DECLARE_DEFAULT(var)	\
   SKIN_DECLARE (my##var##Type, csSkin);	\
     SKIN_SLICE (DefaultButton);		\
     SKIN_SLICE (DefaultWindow);		\
     SKIN_SLICE (DefaultDialog);		\
+    SKIN_SLICE (DefaultTitlebar);	\
   SKIN_DECLARE_END var
 
 class csButton;
@@ -50,16 +52,16 @@ public:
  */
 class csDefaultWindowSkin : public csWindowSkin
 {
-  // The material for titlebar buttons
+  // The texture for titlebar buttons
   iTextureHandle *ButtonTex;
-  // The background bitmap
-  iTextureHandle *BackTex;
+  // Window background
+  csBackground Back;
   // The parent skin object
   csSkin *Skin;
 
 public:
   /// Initialize the window skin slice
-  csDefaultWindowSkin () : ButtonTex (NULL), BackTex (NULL) {}
+  csDefaultWindowSkin () : ButtonTex (NULL), Skin (NULL) {}
 
   /// Query the required resources from application
   virtual void Initialize (csApp *iApp, csSkin *Parent);
@@ -91,15 +93,12 @@ protected:
  */
 class csDefaultDialogSkin : public csDialogSkin
 {
-  // The material for background
-  iTextureHandle *BackTex;
+  // The background
+  csBackground Back;
 
 public:
-
-  csDefaultDialogSkin () : BackTex (NULL) {}
-
   /// Query the required resources from application
-  void Initialize (csApp *iApp, csSkin *Parent);
+  virtual void Initialize (csApp *iApp, csSkin *Parent);
 
   /// Free the resources allocated in Initialize()
   virtual void Deinitialize ();
@@ -109,6 +108,29 @@ public:
 
   /// Set dialog border width and height depending on frame style
   virtual void SetBorderSize (csDialog &This);
+};
+
+/**
+ * This is the default skin for window titlebars.
+ */
+class csDefaultTitlebarSkin : public csTitlebarSkin
+{
+  // The active window titlebar background
+  csBackground ABack;
+  // The inactive window titlebar background
+  csBackground IBack;
+  /// Whenever to enable titlebar hashing
+  bool Hash;
+
+public:
+  /// Query the required resources from application
+  void Initialize (csApp *iApp, csSkin *Parent);
+
+  /// Free the resources allocated in Initialize()
+  virtual void Deinitialize ();
+
+  /// Draw the component we are responsible for
+  virtual void Draw (csComponent &iComp);
 };
 
 #endif // __SDEFAULT_H__

@@ -17,28 +17,39 @@
 */
 
 #include "cssysdef.h"
-#include "csws/csslider.h"
+#include "csws/cssplit.h"
 #include "csws/cscomp.h"
 #include "csws/csapp.h"
 
-csSlider::csSlider (csComponent *pParent) : csComponent (pParent)
+csSplitter::csSplitter (csComponent *pParent) : csComponent (pParent)
 {
-  SetPalette (CSPAL_SLIDER);
-  SetState (CSS_SELECTABLE, true);
-  SetState (CSS_TOPSELECT, true);
+  SetPalette (CSPAL_SPLITTER);
+  state |= CSS_SELECTABLE | CSS_TOPSELECT;
   isSliding = false;
-  mx = my = 0;
 }
 
-void csSlider::Draw ()
+void csSplitter::Draw ()
 {
-  if (isSliding)
-    Box (0, 0, bound.Width (), bound.Height (), CSPAL_SLIDER_ACTIVE_FILL);
+  int idx = isSliding ? 3 : 0;
+  int dx = 0, dy = 0;
+  int w = bound.Width (), h = bound.Height ();
+  if (isHorizontal)
+  {
+    Line (0, 0, 0, h, idx + CSPAL_SPLITTER_ILIGHT3D);
+    Line (w - 1, 0, w - 1, h - 1, idx + CSPAL_SPLITTER_IDARK3D);
+    dx = 1;
+  }
   else
-    Box (0, 0, bound.Width (), bound.Height (), CSPAL_SLIDER_FILL);
+  {
+    Line (0, 0, w, 0, idx + CSPAL_SPLITTER_ILIGHT3D);
+    Line (0, h - 1, w, h - 1, idx + CSPAL_SPLITTER_IDARK3D);
+    dy = 1;
+  }
+  Box (dx, dy, bound.Width () - dx, bound.Height () - dy,
+    idx + CSPAL_SPLITTER_IBACKGROUND);
 }
 
-bool csSlider::HandleEvent (iEvent &Event)
+bool csSplitter::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -50,6 +61,8 @@ bool csSlider::HandleEvent (iEvent &Event)
         app->CaptureMouse (this);
         isSliding = true;
         Select ();
+        // Save the position of the mouse relative to our top-left corner
+        mousex = mdx = Event.Mouse.x; mousey = mdy = Event.Mouse.y;
         Invalidate ();
         return true;
       }
@@ -59,25 +72,23 @@ bool csSlider::HandleEvent (iEvent &Event)
       {
         app->CaptureMouse (NULL);
         isSliding = false;
-        mx = Event.Mouse.x;
-        my = Event.Mouse.y;
-        parent->SendCommand (cscmdSliderPosSet, (void*)this);
+        parent->SendCommand (cscmdSplitterPosSet, (void *)this);
         Invalidate ();
         return true;
       }
       break;
     case csevMouseMove:
+      SetMouse (isHorizontal ? csmcSizeEW : csmcSizeNS);
       if (isSliding)
       {
-        mx = Event.Mouse.x;
-        my = Event.Mouse.y;
+        mousex = Event.Mouse.x;
+	mousey = Event.Mouse.y;
         if (isHorizontal)
-          SetPos (bound.xmin + mx, bound.ymin);
+          SetPos (bound.xmin + mousex - mdx, bound.ymin);
         else
-          SetPos (bound.xmin, bound.ymin + my);
+          SetPos (bound.xmin, bound.ymin + mousey - mdy);
         if (parent)
-          parent->SendCommand (cscmdSliderPosChanged, (void*)this);
-        Invalidate ();
+          parent->SendCommand (cscmdSplitterPosChanged, (void *)this);
         return true;
       }
       break;
@@ -85,7 +96,7 @@ bool csSlider::HandleEvent (iEvent &Event)
   return csComponent::HandleEvent (Event);
 }
 
-bool csSlider::SetRect (int xmin, int ymin, int xmax, int ymax)
+bool csSplitter::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
   if (csComponent::SetRect (xmin, ymin, xmax, ymax))
   {
@@ -93,4 +104,10 @@ bool csSlider::SetRect (int xmin, int ymin, int xmax, int ymax)
     return true;
   }
   return false;
+}
+
+void csSplitter::GetPos (int &x, int &y)
+{
+  x = bound.xmin + (isHorizontal ? bound.Width () / 2 : mousex);
+  y = bound.ymin + (isHorizontal ? mousey : bound.Height () / 2);
 }

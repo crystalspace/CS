@@ -55,8 +55,6 @@ public:
   /// The font server
   iFontServer *FontServer;
   
-  /// Current font number
-  int Font;
   /// The width, height and depth of visual
   int Width, Height, Depth;
   /// True if visual is full-screen
@@ -127,15 +125,11 @@ public:
   /// (*) Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b);
   /// Write a text string into the back buffer
-  virtual void Write (int x, int y, int fg, int bg, const char *text)
-  { _WriteString (this, x, y, fg, bg, text); }
+  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *text)
+  { _WriteString (this, font, x, y, fg, bg, text); }
   /// Write a single character
-  void (*_WriteString) (csGraphics2D *This, int x, int y, int fg, int bg,
-    const char *text);
-  /// Get the width of a string if it would be drawn with given font
-  virtual int GetTextWidth (int Font, const char *text);
-  /// Get the height of given font
-  virtual int GetTextHeight (int Font);
+  void (*_WriteString) (csGraphics2D *This, iFont *font, int x, int y,
+    int fg, int bg, const char *text);
   /// (*) Get address of video RAM at given x,y coordinates
   unsigned char* (*_GetPixelAt) (csGraphics2D *This, int x, int y);
   /// Same but exposed through iGraphics2D interface
@@ -187,6 +181,10 @@ public:
   /// Set mouse cursor position; return success status
   virtual bool SetMousePosition (int x, int y);
 
+  /// Gets the font server
+  virtual iFontServer *GetFontServer ()
+  { return FontServer; }
+
   /**
    * Set mouse cursor to one of predefined shape classes
    * (see csmcXXX enum above). If a specific mouse cursor shape
@@ -197,26 +195,6 @@ public:
    * iShape argument.
    */
   virtual bool SetMouseCursor (csMouseCursorID iShape);
-
-  /// Gets the ID of current font.
-  virtual int GetFontID ()
-  { return Font; }
-  /// Sets the type of the font.
-  virtual void SetFontID (int FontID)
-  { Font = FontID; }
-
-  /// Load font with name from given file, returns fontid or -1
-  virtual int LoadFont(const char *Name, const char *File);
-
-  /// Gets the font size.
-  virtual int GetFontSize ();
-  
-  /// Sets the font size.
-  virtual bool SetFontSize (int FontSize);
-
-  /// Gets the font server
-  virtual iFontServer *GetFontServer ()
-  { return FontServer; }
 
   /// Return the width of the framebuffer.
   virtual int GetWidth ()
@@ -262,24 +240,24 @@ protected:
   /// Draw a pixel in 8-bit modes
   static void DrawPixel8 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 8-bit modes
-  static void WriteString8 (csGraphics2D *This, int x, int y, int fg, int bg,
-    const char *text);
+  static void WriteString8 (csGraphics2D *This, iFont *font, int x, int y,
+    int fg, int bg, const char *text);
   /// Return address of a 8-bit pixel
   static unsigned char *GetPixelAt8 (csGraphics2D *This, int x, int y);
 
   /// Draw a pixel in 16-bit modes
   static void DrawPixel16 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 16-bit modes
-  static void WriteString16 (csGraphics2D *This, int x, int y, int fg, int bg,
-    const char *text);
+  static void WriteString16 (csGraphics2D *This, iFont *font, int x, int y,
+    int fg, int bg, const char *text);
   /// Return address of a 16-bit pixel
   static unsigned char *GetPixelAt16 (csGraphics2D *This, int x, int y);
 
   /// Draw a pixel in 32-bit modes
   static void DrawPixel32 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 32-bit modes
-  static void WriteString32 (csGraphics2D *This, int x, int y, int fg, int bg,
-    const char *text);
+  static void WriteString32 (csGraphics2D *This, iFont *font, int x, int y,
+    int fg, int bg, const char *text);
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
 };

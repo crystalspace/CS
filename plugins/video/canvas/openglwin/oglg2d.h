@@ -50,9 +50,6 @@ public:
   
   virtual bool SetMouseCursor (csMouseCursorID iShape);
   virtual bool SetMousePosition (int x, int y);
-  virtual int GetPage ();
-  virtual bool DoubleBuffer (bool Enable);
-  virtual bool GetDoubleBufferState ();
 
   int m_nGraphicsReady;
 
@@ -74,8 +71,6 @@ protected:
 
   bool m_bPalettized;
   bool m_bPaletteChanged;
-  int m_nActivePage;
-  bool m_bDisableDoubleBuffer;
   
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();

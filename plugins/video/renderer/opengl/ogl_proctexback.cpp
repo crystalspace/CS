@@ -61,7 +61,7 @@ void csOpenGLProcBackBuffer::Close ()
 }
 
 void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d, 
-		  csTextureMMOpenGL *tex_mm, csPixelFormat *ipfmt, bool bpersistent)
+  csTextureMMOpenGL *tex_mm, csPixelFormat *ipfmt, bool bpersistent)
 { 
   memcpy (&pfmt, ipfmt, sizeof(csPixelFormat));
   persistent = bpersistent;
@@ -298,7 +298,6 @@ csOpenGLProcBackBuffer2D::csOpenGLProcBackBuffer2D
   height = iheight; 
   pfmt = ipfmt;
   frame_height = g2d->GetHeight (); 
-  font = g2d->GetFontID ();
   g2d->IncRef (); 
 }
 
@@ -326,12 +325,6 @@ void csOpenGLProcBackBuffer2D::Clear (int color)
   glVertex2i (width, height);
   glVertex2i (0, height);
   glEnd ();
-}
-
-void csOpenGLProcBackBuffer2D::SetFontID (int FontID)
-{
-  font = FontID;
-  g2d->SetFontID (FontID); 
 }
 
 void csOpenGLProcBackBuffer2D::DrawLine (float x1, float y1, 
@@ -362,18 +355,10 @@ csImageArea *csOpenGLProcBackBuffer2D::SaveArea (int x, int y, int w, int h)
   return g2d->SaveArea (x, frame_height - height + y, w, h); 
 }
 
-void csOpenGLProcBackBuffer2D::Write (int x, int y, int fg, int bg, 
-					 const char *str)
+void csOpenGLProcBackBuffer2D::Write (iFont *font, int x, int y, int fg, int bg,
+  const char *str)
 { 
-  g2d->Write (x, frame_height - height + y, fg, bg, str); 
-}
-//g2d->GetTextHeight (font)
-void csOpenGLProcBackBuffer2D::WriteChar (int x, int y, int fg, int bg, char c)
-{
-  char text[2];
-  text[0] = c;
-  text[1] = 0;
-  Write (x, y, fg, bg, text);
+  g2d->Write (font, x, frame_height - height + y, fg, bg, str); 
 }
 
 int csOpenGLProcBackBuffer2D::GetWidth ()

@@ -48,8 +48,8 @@ static unsigned short ScanCodeToChar [128] =
 IMPLEMENT_FACTORY (csGraphics2DAlleg)
 
 EXPORT_CLASS_TABLE (alleg2d)
-  EXPORT_CLASS (csGraphics2DAlleg, "crystalspace.graphics2d.allegro",
-    "Allegro 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DAlleg, "crystalspace.graphics2d.allegro",
+    "Allegro 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DAlleg)

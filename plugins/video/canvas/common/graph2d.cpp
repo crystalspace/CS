@@ -49,13 +49,9 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   // Get the system parameters
   System->GetSettings (Width, Height, Depth, FullScreen);
 
-  // Get the font server
-  const char *p = pSystem->GetConfig ()->GetStr (
-    "VideoDriver", CS_FUNCID_FONT, "crystalspace.font.server.csfont");
-  FontServer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontServer);
-  Font = 0;
+  // Get the font server: A missing font server is NOT an error
   if (!FontServer)
-    return false;
+    FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
 
   Palette = new csRGBpixel [256];
   pfmt.PalEntries = 256;
@@ -521,36 +517,6 @@ bool csGraphics2D::PerformExtension (const char* iCommand, ...)
 {
   (void)iCommand;
   return false;
-}
-
-int csGraphics2D::GetTextWidth (int Font, const char *text)
-{
-  int w = 0, h = 0;
-  FontServer->GetTextDimensions (Font, text, w, h);
-  return w;
-}
-
-int csGraphics2D::GetTextHeight (int Font)
-{
-  return FontServer->GetMaximumHeight (Font);
-}
-
-int csGraphics2D::LoadFont(const char *Name, const char *File)
-{
-  /// default implementation that calls fontserver to do the work
-  return FontServer->LoadFont(Name, File);
-}
-
-int csGraphics2D::GetFontSize ()
-{
-  long s;
-  return FontServer->GetFontProperty (Font, CS_FONTSIZE, s) ? s : -1;
-}
-  
-bool csGraphics2D::SetFontSize (int FontSize)
-{
-  long s = FontSize;
-  return FontServer->SetFontProperty (Font, CS_FONTSIZE, s, false);
 }
 
 void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)

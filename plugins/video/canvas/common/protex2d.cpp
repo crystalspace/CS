@@ -141,8 +141,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   }
 
   // Get the font server, as we've bypassed csGraphics2D::Initialize
-  FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONT, iFontServer);
-  Font = 0;
+  FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
 
   return (iGraphics2D*)this;
 }

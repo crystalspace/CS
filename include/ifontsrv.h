@@ -16,68 +16,136 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IFNTRNDR_H__
-#define __IFNTRNDR_H__
+#ifndef __IFONTSRV_H__
+#define __IFONTSRV_H__
 
 #include "csutil/scf.h"
 #include "iplugin.h"
 
-enum CS_FONTPROPERTY
-{
-  CS_FONTSIZE
-};
+/**
+ * Some alias names for basic fonts.
+ * Any font server should provide these fonts, since most
+ * programs expect they to be available. Other fonts may or
+ * may be not available but these should be always available.
+ * Default font names always start with "*" to avoid confusion
+ * with real file names.
+ */
 
-SCF_VERSION (iFontServer, 1, 0, 0);
+/// Thick and relatively large font
+#define CSFONT_LARGE		"*large"
+/// Thick italic relatively large font
+#define CSFONT_ITALIC		"*italic"
+/// Thin courier-like relatively large font
+#define CSFONT_COURIER		"*courier"
+/// Very small font (smallest font that is still readable)
+#define CSFONT_SMALL		"*small"
+
+SCF_VERSION (iFont, 1, 0, 0);
 
 /**
- * A font server interface.  Serves up fonts.
+ * A font object.
+ * Objects of this class are used by canvas driver to paint glyphs.
+ */
+struct iFont : public iBase
+{
+  /**
+   * Set the size for this font.
+   * All other methods will change their behaviour as soon as you call
+   * this method; but not all font managers supports rescalable fonts
+   * in which case this method will be unimplemented.
+   */
+  virtual void SetSize (int iSize) = 0;
+
+  /**
+   * Query current font size. If server does not support rescalable
+   * fonts, this method returns 0.
+   */
+  virtual int GetSize () = 0;
+
+  /**
+   * Return the maximum width and height of a single glyph.
+   * Return -1 if it could not be determined.
+   */
+  virtual void GetMaxSize (int &oW, int &oH) = 0;
+
+  /**
+   * Return character size in pixels.
+   * Returns false if values could not be determined.
+   */
+  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH) = 0;
+
+  /**
+   * Return a pointer to a bitmap containing a rendered character.
+   * Returns NULL if error occured. The oW and oH parameters are
+   * filled with bitmap width and height.
+   */
+  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH) = 0;
+
+  /**
+   * Return the width and height of text written with this font.
+   */
+  virtual void GetDimensions (const char *text, int &oW, int &oH) = 0;
+
+  /**
+   * Determine how much characters from this string can be written
+   * without exceeding given width (in pixels)
+   */
+  virtual int GetLength (const char *text, int maxwidth) = 0;
+
+  /**
+   * You can insert any number of callback routines into the font
+   * so that when the font will be destroyed all of them will be
+   * called in turn. This can be used by canvas driver, for example,
+   * if the canvas driver does some kind of caching for fonts,
+   * e.g. OpenGL driver pre-caches the font on a texture, it needs
+   * some mechanism to be notified when the font is destroyed to free
+   * the cache texture associated with the font.
+   */
+  typedef void (*DeleteNotify) (iFont *, void *);
+
+  /**
+   * Add a font delete notification callback routine.
+   * This routine will be called from font destructor,
+   * with the font instance being passed as argument.
+   * Another parameter is provided to supply additional data.
+   */
+  virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
+
+  /**
+   * Remove a font delete notification callback.
+   */
+  virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
+};
+
+SCF_VERSION (iFontServer, 2, 0, 0);
+
+/**
+ * A font server interface.
+ * Font server can load fonts and create iFont objects.
+ * In fact user does not care whenever fonts are built-in
+ * the font server or are on disk; thus some font servers
+ * may contain the fonts hardcoded; in this case the
+ * font path is really a identifier.
  */
 struct iFontServer : public iPlugIn
 {
   /**
    * Load a font by name.
-   * Returns a font id by which the font can be referenced further.
-   * RETURN:
-   * -1 ... loading failed
-   * >=0 ... the font id
+   * Returns a new iFont object or NULL on failure.
    */
-  virtual int LoadFont (const char* name, const char* filename) = 0;
+  virtual iFont *LoadFont (const char *filename) = 0;
 
   /**
-   * Set font property.<p>
-   * Return true if chage was successful.  If not, the server returns false,
-   * decides whats the next best possible thing to this property, returns this
-   * new value in 'property' and if wanted also applies this next best thing.
+   * Get number of loaded fonts.
    */
-  virtual bool SetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property, bool autoApply) = 0;
-
-  /// Get a font property. Returns true if the property could be retrieved.
-  virtual bool GetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property) = 0;
+  virtual int GetNumFonts () = 0;
 
   /**
-   * Return a pointer to a bitmap containing a rendered character (by current
-   * font).  NULL if error occured.
+   * Get Nth loaded font or NULL.
+   * You can query all loaded fonts with this method, by looping
+   * through all indices starting from 0 until you get NULL.
    */
-  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c,
-    int &oW, int &oH) = 0;
-
-  /// Return character size in pixels. Returns false if values could not be determined.
-  virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH) = 0;
-
-  /**
-   * Return the maximum height of the glyphs.  Return -1 if it could not be
-   * determined.
-   */
-  virtual int GetMaximumHeight (int fontId) = 0;
-
-  /// Return minimal bounding box of text.
-  virtual void GetTextDimensions (int fontId, const char* text,
-    int& width, int& height) = 0;
-
-  /// Return number of fonts served.
-  virtual int GetFontCount () = 0;
+  virtual iFont *GetFont (int iIndex) = 0;
 };
 
-#endif // __IFNTRNDR_H__
+#endif // __IFONTSRV_H__

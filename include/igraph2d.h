@@ -28,19 +28,8 @@
 
 class csRect;
 struct iImage;
-
-enum FontType
-{
-  csFontParent = -1,
-  csFontPolice,
-  csFontPoliceFixed,
-  csFontItalic,
-  csFontItalicFixed,
-  csFontCourier,
-  csFontCourierFixed,
-  csFontTiny,
-  csFontTinyFixed
-};
+struct iFontServer;
+struct iFont;
 
 /**
  * Standard mouse cursor IDs
@@ -139,7 +128,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 1, 0, 0);
+SCF_VERSION (iGraphics2D, 2, 0, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -258,28 +247,11 @@ struct iGraphics2D : public iPlugIn
   virtual void FreeArea (csImageArea *Area) = 0;
 
   /// Write a text string into the back buffer
-  virtual void Write (int x, int y, int fg, int bg, const char *str) = 0;
+  virtual void Write (iFont *font, int x, int y, int fg, int bg,
+    const char *str) = 0;
 
-  /// Gets the ID of current font.
-  virtual int GetFontID () = 0;
-
-  /// Sets the type of the font.
-  virtual void SetFontID (int FontID) = 0;
-
-  /// Load font with name from given file, returns fontid or -1
-  virtual int LoadFont(const char *Name, const char *File) = 0;
-
-  /// Set font size, return true on success
-  virtual bool SetFontSize (int FontSize) = 0;
-
-  /// Set currents font size, -1 if not detectable
-  virtual int GetFontSize () = 0;
-
-  /// Get the width of a string if it would be drawn with given font
-  virtual int GetTextWidth (int FontID, const char *text) = 0;
-
-  /// Get the height of given font
-  virtual int GetTextHeight (int FontID) = 0;
+  /// Get the active font server (does not do IncRef())
+  virtual iFontServer *GetFontServer () = 0;
 
   /// Set mouse position (relative to top-left of CS window).
   virtual bool SetMousePosition (int x, int y) = 0;

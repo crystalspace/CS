@@ -112,8 +112,8 @@ DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdPrimarySurfDesc = { 0 };
 IMPLEMENT_FACTORY (csGraphics3DDirect3DDx6)
 
 EXPORT_CLASS_TABLE (d3ddx61)
-  EXPORT_CLASS (csGraphics3DDirect3DDx6, "crystalspace.graphics3d.direct3d.dx61",
-    "Direct3D DX6.1 3D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics3DDirect3DDx6, "crystalspace.graphics3d.direct3d.dx61",
+    "Direct3D DX6.1 3D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics3DDirect3DDx6)

@@ -18,22 +18,93 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSFONT_H__
-#define __CS_CSFONT_H__
+#ifndef __CSFONT_H__
+#define __CSFONT_H__
 
 #include "ifontsrv.h"
 #include "csutil/csvector.h"
 
 struct iSystem;
+class csDefaultFontServer;
 
-struct csFontDef
+/**
+ * Bitmap font
+ */
+class csDefaultFont : public iFont
 {
-  char *Name;
+public:
+  const char *Name;
   int Width;
+  int MaxWidth;
   int Height;
   int BytesPerChar;
-  unsigned char *FontBitmap;
-  unsigned char *IndividualWidth;
+  uint8 *FontBitmap;
+  uint8 *IndividualWidth;
+  csDefaultFontServer *Parent;
+  csVector DeleteCallbacks;
+
+  DECLARE_IBASE;
+
+  /// Create the font object
+  csDefaultFont (csDefaultFontServer *parent, const char *name, int width,
+    int height, int bytesperchar, uint8 *bitmap, uint8 *individualwidth);
+
+  /// Destroy the font object
+  virtual ~csDefaultFont ();
+
+  /**
+   * Set the size for this font.
+   * All other methods will change their behaviour as soon as you call
+   * this method; but not all font managers supports rescalable fonts
+   * in which case this method will be unimplemented.
+   */
+  virtual void SetSize (int iSize);
+
+  /**
+   * Query current font size. If server does not support rescalable
+   * fonts, this method returns 0.
+   */
+  virtual int GetSize ();
+
+  /**
+   * Return the maximum width and height of a single glyph.
+   * Return -1 if it could not be determined.
+   */
+  virtual void GetMaxSize (int &oW, int &oH);
+
+  /**
+   * Return character size in pixels.
+   * Returns false if values could not be determined.
+   */
+  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH);
+
+  /**
+   * Return a pointer to a bitmap containing a rendered character.
+   * Returns NULL if error occured. The oW and oH parameters are
+   * filled with bitmap width and height.
+   */
+  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
+
+  /**
+   * Return the width and height of text written with this font.
+   */
+  virtual void GetDimensions (const char *text, int &oW, int &oH);
+
+  /**
+   * Determine how much characters from this string can be written
+   * without exceeding given width (in pixels)
+   */
+  virtual int GetLength (const char *text, int maxwidth);
+
+  /**
+   * Add a call-on-font-delete callback routine.
+   */
+  virtual void AddDeleteCallback (DeleteNotify func, void *databag);
+
+  /**
+   * Remove a font delete notification callback.
+   */
+  virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag);
 };
 
 /**
@@ -44,14 +115,8 @@ class csDefaultFontServer : public iFontServer
 private:
   iSystem *System;
 
-  // A list of csFontDef pointers.
-  csBasicVector fonts;
-
-  // Read a .fnt file from VFS.  Return a csFontDef if ok, or NULL on error.
-  csFontDef* ReadFntFile(const char *file);
-
-  // Get the fontDef for a certain font ID
-  csFontDef *GetFontDef(int id) {return (csFontDef*)fonts[id];}
+  // A list of csDefaultFont pointers.
+  DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;
 
 public:
   DECLARE_IBASE;
@@ -66,50 +131,28 @@ public:
 
   /**
    * Load a font by name.
-   * Returns a font id by which the font can be referenced further.
-   * RETURN:
-   * -1 ... loading failed
-   * >=0 ... the font id
+   * Returns a new iFont object or NULL on failure.
    */
-  virtual int LoadFont (const char* name, const char* filename);
+  virtual iFont *LoadFont (const char *filename);
 
   /**
-   * Set font property.
-   * Return true if chage was successfull.  If not, the server returns false,
-   * decides whats the next best possible thing to this propertym, returns
-   * this new value in invalue and if wanted also applies this next best
-   * thing.
+   * Get number of loaded fonts.
    */
-  virtual bool SetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property, bool autoApply );
-
-  /// Get a font property. Returns true if the property could be retrieved.
-  virtual bool GetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property);
+  virtual int GetNumFonts ()
+  { return fonts.Length (); }
 
   /**
-   * Return a pointer to a bitmap containing a rendered character (by current
-   * font).  NULL if error occured.
+   * Get Nth loaded font or NULL.
+   * You can query all loaded fonts with this method, by looping
+   * through all indices starting from 0 until you get NULL.
    */
-  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c,
-    int &oW, int &oH);
+  virtual iFont *GetFont (int iIndex);
 
-  /**
-   * Return character size in pixels.  Returns false if values could not be
-   * determined.
-   */
-  virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH);
+  /// Called by child fonts to be added to font registry
+  void NotifyCreate (csDefaultFont *font);
 
-  /// Get maximal font height
-  virtual int GetMaximumHeight (int fontId);
-
-  /// Return minimal boundings of text.
-  virtual void GetTextDimensions (int fontId, const char* text,
-    int& width, int& height);
-
-  /// Return font count.
-  virtual int GetFontCount ()
-  { return fonts.Length(); }
+  /// This function is called by iFont objects when they are destroyed
+  void NotifyDelete (csDefaultFont *font);
 };
 
-#endif // __CS_CSFONT_H__
+#endif // __CSFONT_H__

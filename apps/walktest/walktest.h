@@ -31,6 +31,7 @@
 #include "iconsole.h"
 #include "iconinp.h"
 #include "ivfs.h"
+#include "ifontsrv.h"
 
 class Polygon3D;
 class WalkTest;
@@ -300,6 +301,9 @@ public:
   iConsoleInput *ConsoleInput;
   /// Is the console smaller than the screen?
   bool SmallConsole;
+
+  /// The font we'll use for writing
+  iFont *Font;
 
 public:
   ///

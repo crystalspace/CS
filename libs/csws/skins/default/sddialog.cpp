@@ -25,29 +25,13 @@
 
 void csDefaultDialogSkin::Initialize (csApp *iApp, csSkin *Parent)
 {
-  (void)Parent;
-  if (BackTex)
-  {
-    BackTex->DecRef ();
-    BackTex = NULL;
-  }
-
-  const char *tex = iApp->Config->GetStr ("Dialog", "Background", NULL);
-  if (tex)
-  {
-    BackTex = iApp->GetTexture (tex);
-    if (BackTex)
-      BackTex->IncRef ();
-  }
+  (void)iApp;
+  Parent->Load (Back, "Dialog", "Background");
 }
 
 void csDefaultDialogSkin::Deinitialize ()
 {
-  if (BackTex)
-  {
-    BackTex->DecRef ();
-    BackTex = NULL;
-  }
+  Back.Free ();
 }
 
 void csDefaultDialogSkin::Draw (csComponent &This)
@@ -82,23 +66,25 @@ void csDefaultDialogSkin::Draw (csComponent &This)
   } /* endswitch */
   int bw, bh;
   This.GetBorderSize (bw, bh);
-  if (This.GetState (CSS_TRANSPARENT) || BackTex)
+  if (Back.GetType () == csbgNone)
   {
-    int orgx = 0, orgy = 0;
-    // If dialog has title, suppose it is the top-level window
-    // thus we'll align the texture with the dialog; otherwise
-    // we'll align the texture to parent's top-left corner.
-    if (!This.GetText ())
-    {
-      orgx = -This.bound.xmin;
-      orgy = -This.bound.ymin;
-    }
-    This.Texture (BackTex, bw, bh, This.bound.Width () - 2 * bw,
-      This.bound.Height () - 2 * bh, orgx, orgy, This.GetAlpha ());
+    Back.SetColor (CSPAL_DIALOG_BACKGROUND);
+    Back.SetType (csbgNone);
+//  This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,
+//    CSPAL_DIALOG_BACKGROUND);
   }
-  else
-    This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,
-      CSPAL_DIALOG_BACKGROUND);
+
+  int orgx = 0, orgy = 0;
+  // If dialog has title, suppose it is the top-level window
+  // thus we'll align the texture with the dialog; otherwise
+  // we'll align the texture to parent's top-left corner.
+  if (!This.GetText ())
+  {
+    orgx = -This.bound.xmin;
+    orgy = -This.bound.ymin;
+  }
+  Back.Draw (This, bw, bh, This.bound.Width () - 2 * bw,
+    This.bound.Height () - 2 * bh, orgx, orgy, This.GetAlpha ());
 #undef This
 }
 

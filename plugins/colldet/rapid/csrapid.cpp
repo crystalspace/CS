@@ -50,8 +50,8 @@ IMPLEMENT_IBASE_END
 IMPLEMENT_FACTORY (csRapidCollideSystem)
 
 EXPORT_CLASS_TABLE (rapid)
-  EXPORT_CLASS (csRapidCollideSystem, "crystalspace.colldet.rapid", 
-		"CrystalSpace RAPID CD System" )
+  EXPORT_CLASS (csRapidCollideSystem, "crystalspace.colldet.rapid",
+    "Crystal Space RAPID CD System")
 EXPORT_CLASS_TABLE_END
 
 csRapidCollideSystem::csRapidCollideSystem (iBase *pParent)

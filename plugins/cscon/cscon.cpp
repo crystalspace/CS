@@ -25,6 +25,7 @@
 #include "igraph3d.h"
 #include "isystem.h"
 #include "itxtmgr.h"
+#include "ifontsrv.h"
 #include "cssys/csevent.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
@@ -71,6 +72,8 @@ csConsole::csConsole (iBase *base)
 
 csConsole::~csConsole ()
 {
+  if (font)
+    font->DecRef ();
   if (System)
     System->DecRef ();
   if (G2D)
@@ -80,7 +83,7 @@ csConsole::~csConsole ()
   delete buffer;
 }
 
-bool csConsole::Initialize(iSystem *system)
+bool csConsole::Initialize (iSystem *system)
 {
   (System = system)->IncRef ();
   G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
@@ -91,9 +94,11 @@ bool csConsole::Initialize(iSystem *system)
   // Initialize the display rectangle to the entire display
   size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);
   invalid.Set (size); // Invalidate the entire console
-  font = G2D->GetFontID ();
+  font = G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+  int fw, fh;
+  font->GetMaxSize (fw, fh);
   // Create the backbuffer (4096 lines max)
-  buffer = new csConsoleBuffer (4096, (size.Height() / (G2D->GetTextHeight (font) + 2)));
+  buffer = new csConsoleBuffer (4096, (size.Height() / (fh + 2)));
   // Initialize flash_time for flashing cursors
   flash_time = System->GetTime ();
 
@@ -239,7 +244,7 @@ void csConsole::Draw2D (csRect *area)
 {
   if (!visible) return;
 
-  int i, height, oldfont;
+  int i, height, fh;
   csRect line, oldrgn;
   const csString *text;
   bool dirty;
@@ -250,12 +255,9 @@ void csConsole::Draw2D (csRect *area)
   G2D->GetClipRect (oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
   G2D->SetClipRect (invalid.xmin, invalid.ymin, invalid.xmax, invalid.ymax);
 
-  // Save the old font and set it to the requested font
-  oldfont = G2D->GetFontID ();
-  G2D->SetFontID (font);
-
   // Calculate the height of the text
-  height = G2D->GetTextHeight (font) + 2;
+  font->GetMaxSize (i, height);
+  height += 2;
 
   // Draw the background
   if (!transparent)
@@ -284,7 +286,7 @@ void csConsole::Draw2D (csRect *area)
       area->Union (line);
 
     // Write the line
-    G2D->Write (1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData ());
+    G2D->Write (font, 1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData ());
   }
 
   // Test for a change in the flash state
@@ -322,12 +324,14 @@ void csConsole::Draw2D (csRect *area)
       csString curText (*text);
       curText.SetCapacity (cx);
       curText.SetAt (cx, '\0');
-      cx_pix = G2D->GetTextWidth (font, curText.GetData ());
+      font->GetDimensions (curText.GetData (), cx_pix, fh);
     }
     cy_pix = (cy * height) + size.ymin;
     cx_pix += size.xmin;
 
-    line.Set (cx_pix, cy_pix, cx_pix + G2D->GetTextWidth(font, "_"), cy_pix + height);
+    int cursor_w;
+    font->GetDimensions ("_", cursor_w, fh);
+    line.Set (cx_pix, cy_pix, cx_pix + cursor_w, cy_pix + height);
 
     // Draw the appropriate cursor
     switch (cursor)
@@ -350,9 +354,6 @@ void csConsole::Draw2D (csRect *area)
 
   // No more invalid area
   invalid.MakeEmpty ();
-
-  // Restore the original font
-  G2D->SetFontID (oldfont);
 }
 
 void csConsole::CacheColors ()
@@ -389,7 +390,9 @@ void csConsole::SetPosition(int x, int y, int width, int height)
     size.ymax = G2D->GetHeight () - 1;
   
   // Calculate the number of lines on the console
-  buffer->SetPageSize (size.Height () / (G2D->GetTextHeight (font) + 2));
+  int fw, fh;
+  font->GetMaxSize (fw, fh);
+  buffer->SetPageSize (size.Height () / (fh + 2));
 
   // Invalidate the entire new area of the console
   invalid.Set (size); 
@@ -405,8 +408,12 @@ void csConsole::SetPosition(int x, int y, int width, int height)
     csString curText (*text);
     curText.SetCapacity (cx);
     curText.SetAt (cx, '\0');
-    while (cx && G2D->GetTextWidth (font, curText.GetData ()) > size.Width ())
+    while (cx)
     {
+      int fw, fh;
+      font->GetDimensions (curText.GetData (), fw, fh);
+      if (fw <= size.Width ())
+        break;
       curText.SetCapacity (--cx);
       curText.SetAt (cx, '\0');
     }
@@ -422,17 +429,18 @@ void csConsole::Invalidate (csRect &area)
     invalid.Union (console);
 }
 
-int csConsole::GetFontID () const
+void csConsole::SetFont (iFont *Font)
 {
-  return font;
-}
-
-void csConsole::SetFontID (int FontID)
-{
-  font = FontID;
+  if (font)
+    font->DecRef ();
+  font = Font;
+  if (font)
+    font->IncRef ();
 
   // Calculate the number of lines on the console with the new font
-  buffer->SetPageSize (size.Height () / (G2D->GetTextHeight (font) + 2));
+  int fw, fh;
+  font->GetMaxSize (fw, fh);
+  buffer->SetPageSize (size.Height () / (fh + 2));
 }
 
 int csConsole::GetTopLine () const

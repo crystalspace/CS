@@ -21,6 +21,7 @@
 #include "cssys/sysdriv.h"
 #include "csws/csws.h"
 #include "ifontsrv.h"
+#include "icfgfile.h"
 
 class csWsTest : public csApp
 {
@@ -42,8 +43,7 @@ public:
 
   virtual bool Initialize (const char *iConfigName);
 
-  iFontServer * pFontServer;
-  int iLucidiaID;
+  iFont *LucidiaFont;
 };
 
 //csWsTest *cswstest_app;                        // The main Windowing System object
@@ -52,15 +52,15 @@ public:
 class csGridHeaderCell : public csGridCell
 {
 public:
-  csGridHeaderCell (){};
-  void Draw (){
+  virtual void Draw ()
+  {
     // Draw the column number in the cell canvas
-    //    printf("ping\n");
-    csGridCell::Draw();
+    csGridCell::Draw ();
     char tt[20];
-    sprintf( tt, "%d", col);
-    int tx = (bound.Width () - TextWidth (tt)) /2;
-    int ty = (bound.Height () - TextHeight ()) /2;
+    sprintf (tt, "%d", col);
+    int fh, fw = GetTextSize (tt, &fh);
+    int tx = (bound.Width () - fw) /2;
+    int ty = (bound.Height () - fh) /2;
     Text (tx, ty, CSPAL_GRIDCELL_DATA_FG, CSPAL_GRIDCELL_DATA_BG, tt );
   }
 };
@@ -145,29 +145,21 @@ csWsTest::csWsTest (iSystem *System, csSkin &Skin) : csApp (System, Skin)
 {
   int pal = csRegisterPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
   SetPalette (pal);
-  pFontServer = QUERY_PLUGIN (System, iFontServer);
-  if (pFontServer != NULL)
-  {
-    iLucidiaID = pFontServer->LoadFont("LucidiaTypewriterRegular","/fonts/LucidiaTypewriterRegular.ttf");
-    //    fprintf(stderr,"Font ID = %d\n",iLucidiaID);
-  }
-  else
-  {
-    iLucidiaID=-1;
-    //    fprintf(stderr,"pFontServer == NULL\n");
-  }
+  LucidiaFont = NULL;
 }
 
 csWsTest::~csWsTest ()
 {
-  if (pFontServer != NULL)
-    pFontServer->DecRef();
+  if (LucidiaFont)
+    LucidiaFont->DecRef ();
 }
 
 bool csWsTest::Initialize (const char *iConfigName)
 {
   if (!csApp::Initialize (iConfigName))
     return false;
+
+  LucidiaFont = LoadFont ("/fonts/LucidiaTypewriterRegular.ttf");
 
   // CSWS apps are a lot more performant with a single-buffered canvas
   GetG2D ()->DoubleBuffer (false);
@@ -178,16 +170,16 @@ bool csWsTest::Initialize (const char *iConfigName)
 #if 0
   //@@ A small group of controls for fine-level debugging
   {
-    csWindow *window = new csWindow (this, "-- Drag me --", CSWS_TITLEBAR);
+    csWindow *window = new csWindow (this, "-- Drag me --", 0/*CSWS_TITLEBAR*/);
     window->SetAlpha (160);
     window->SetRect (100, 100, 300, 140);
 
     csButton *but = new csButton (window, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThickRect);
     but->SetText ("-* test *-"); but->SetRect (40, 30, 140, 60);
 
-    window = new csWindow (this, "-- help me --", CSWS_TITLEBAR);
-//  window->SetState (CSS_TOPSELECT, false);
-    window->SetAlpha (160);
+    window = new csWindow (this, "-- help me --", 0/*CSWS_TITLEBAR*/);
+    window->SetState (CSS_TOPSELECT, false);
+//  window->SetAlpha (160);
     window->SetRect (200, 200, 500, 400);
 
     but = new csButton (this, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThickRect);
@@ -206,7 +198,6 @@ bool csWsTest::Initialize (const char *iConfigName)
   csMenu *menu = (csMenu *)window->GetChild (CSWID_MENUBAR);
   if (menu)
   {
-    menu->SetFont (csFontCourier);
     csMenu *submenu;
 
     submenu = new csMenu (NULL);
@@ -276,11 +267,16 @@ bool csWsTest::Initialize (const char *iConfigName)
   csDialog *toolbar = (csDialog *)window->GetChild (CSWID_TOOLBAR);
   if (toolbar)
   {
-    csNewToolbarButton (toolbar, cscmdNothing, "hello");
-    csNewToolbarButton (toolbar, cscmdNothing, "hello again");
-    csNewToolbarButton (toolbar, cscmdNothing, "test");
-    csNewToolbarButton (toolbar, cscmdNothing, "another test");
-    csNewToolbarButton (toolbar, cscmdNothing, "yet another test");
+    HintAdd ("This is the hello button",
+      csNewToolbarButton (toolbar, cscmdNothing, "hello"));
+    HintAdd ("This is the hello again button",
+      csNewToolbarButton (toolbar, cscmdNothing, "hello again"));
+    HintAdd ("This is a test button on the toolbar with an associated hint",
+      csNewToolbarButton (toolbar, cscmdNothing, "test"));
+    HintAdd ("This is the another test button",
+      csNewToolbarButton (toolbar, cscmdNothing, "another test"));
+    HintAdd ("This is the yet another test button",
+      csNewToolbarButton (toolbar, cscmdNothing, "yet another test"));
   }
   window->SetRect (80, 60, 520, 380);
 
@@ -290,10 +286,14 @@ bool csWsTest::Initialize (const char *iConfigName)
     csButton *but = new csButton (client, cscmdQuit);
     but->SetText ("~Quit!"); but->SetRect (20, 20, 90, 40);
     but->SetState (CSS_GROUP, true);
+    HintAdd ("Press this button to quit program", but);
     csStatic *stat = new csStatic (client, but, "Test ~Label", csscsFrameLabel);
     stat->SetRect (10, 10, 420, 110);
     but = new csButton (client, cscmdNothing, CSBS_DEFAULTVALUE | CSBS_DEFAULT);
     but->SetText ("~Another button"); but->SetRect (50, 80, 180, 100);
+
+    csSplitter *splitter = new csSplitter (client);
+    splitter->SetRect (200, 20, 400, 40);
 
     but = new csButton (client, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThinRect);
     but->SetText ("hmm~..."); but->SetRect (20, 130, 100, 144);
@@ -304,6 +304,7 @@ bool csWsTest::Initialize (const char *iConfigName)
     but->SetText ("~whoops!"); but->SetRect (120, 130, 200, 144);
     but = new csButton (client, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThinRect);
     but->SetText ("~crash!"); but->SetRect (220, 130, 300, 144);
+    HintAdd ("Relax, this button won't crash your HD", but);
 
     csInputLine *il = new csInputLine (client, 40, csifsThinRect);
     il->SetRect (100, 200, 300, 216);
@@ -311,18 +312,16 @@ bool csWsTest::Initialize (const char *iConfigName)
     il = new csInputLine (client, 10, csifsThickRect);
     il->SetRect (100, 220, 300, 236);
     il->SetText ("another input line");
-    il->SetFont (csFontCourier); il->SetSelection (0, 999);
+    il->SetSelection (0, 999);
 
     csListBox *lb = new csListBox (client, CSLBS_HSCROLL | CSLBS_VSCROLL, cslfsThinRect);
     lb->SetRect (320, 120, 410, 250);
-    lb->SetFont (csFontCourier);
     for (int i = 1; i < 100; i++)
     {
       char tmp[20];
       sprintf (tmp, "item %d - dummy", i);
       (void)new csListBoxItem (lb, tmp, i);
     }
-
   }
 
   window = new csWindow (this, "SetState (CSS_TOPSELECT, false)",
@@ -333,7 +332,7 @@ bool csWsTest::Initialize (const char *iConfigName)
   {
     csButton *but = new csButton (this, 9999);
     but->SetText ("File dialog"); but->SetRect (10, 10, 100, 30);
-    but->SetFont (csFontTiny);
+    HintAdd ("Press this button for a test file dialog", but);
 
     but = new csButton (this, 9998);
     but->SetText ("Color dialog"); but->SetRect (210, 10, 360, 30);
@@ -379,7 +378,6 @@ void csWsTest::TreeDialog ()
 
   csTreeCtrl *tc = new csTreeCtrl (window, CSTS_HSCROLL | CSTS_VSCROLL | CSTS_MULTIPLESEL, cstfsThinRect);
   //  tc->SetRect (320, 20, 410, 110);
-  tc->SetFont (csFontCourier);
   csTreeItem *ti;
   csComponent *p = tc;
   ti = new csTreeItem (p, "CrystalSpace Platforms");
@@ -430,9 +428,8 @@ void csWsTest::TreeDialog ()
 
 void csWsTest::GridDialog ()
 {
-  csComponent *window = new csWindow (this, "Grid test",
-    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
-    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+  csComponent *window = new csWindow (this, "Grid test", CSWS_BUTSYSMENU |
+    CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE | CSWS_BUTMAXIMIZE);
   window->SetSize (400, 300);
   window->Center ();
 
@@ -440,13 +437,13 @@ void csWsTest::GridDialog ()
   csGridCell *gc = new csGridCell;
   gc->SetRect (0, 0, 50, 30);
 
-  csGrid *grid = new csGrid (window, 20000, 20000, CSGVS_DEFAULTVALUE|CSGS_VSPLIT|CSGS_HSPLIT, gc);
+  csGrid *grid = new csGrid (window, 1000, 1000, gc);
 
   // create a subregion that looks different
   gc = new csGridCell;
   gc->SetColor (CSPAL_GRIDCELL_BACKGROUND, cs_Color_Brown_L);
   gc->SetRect (0, 0, 50, 30);
-  gc->right.style = gc->left.style = GCBS_NONE;
+  gc->right.style = gc->left.style = gcbsNone;
   csRect rc (3, 3, 10, 6);
   grid->CreateRegion (rc, gc);
 
@@ -489,8 +486,9 @@ void csWsTest::GridDialog ()
   but->SetText ("blah");
   grid->CreateRegion (rc, gc);
 
-  Execute (window);
-  delete window;
+  window->Select ();
+//Execute (window);
+//delete window;
 }
 
 void CreateButton (csComponent *parent, int id, const char *text, int xpos, int ypos)
@@ -579,7 +577,7 @@ void csWsTest::ThemeDialog ()
   window->SetSize (400, 300);
   window->Center ();
   window->Select ();
-  window->SetAlpha (uint8 (0.2 * 255));
+  window->SetAlpha (uint8 (0.5 * 255));
 }
 
 void csWsTest::NotebookDialog ()
@@ -854,7 +852,6 @@ drawline:
 csThemeTestWindow::csThemeTestWindow (csComponent *iParent, char * iTitle,
   int iWindowStyle) : csWindow (iParent, iTitle, iWindowStyle)
 {
-  SetState (CSS_TRANSPARENT, true);
 #if 0
   csButton *but = new csButton (this, 0x8f000000);
   but->SetText ("Select Background Color"); but->SetRect (20, 20, 190, 40);
@@ -870,18 +867,12 @@ csThemeTestWindow::csThemeTestWindow (csComponent *iParent, char * iTitle,
 void csThemeTestWindow::Draw()
 {
   csWindow::Draw();
-  int d_font = GetFont();
-  int d_fsize = GetFontSize();
-  if ( ((csWsTest *)app)->iLucidiaID != -1)
-    SetFont(((csWsTest *)app)->iLucidiaID,false);
-  SetFontSize(12, false);
+  SetFont (((csWsTest *)app)->LucidiaFont, 12);
   Text (BorderWidth+8, BorderHeight+100, CSPAL_WINDOW_LIGHT3D, -1,
     "This is a font 12 test");
-  SetFontSize(8, false);
+  SetFont (((csWsTest *)app)->LucidiaFont, 8);
   Text (BorderWidth+8, BorderHeight+140, CSPAL_WINDOW_LIGHT3D, -1,
     "This is a font 8 test");
-  SetFont(d_font,false);
-  SetFontSize(d_fsize,false);
 }
 
 bool csThemeTestWindow::HandleEvent (iEvent &Event)
@@ -942,6 +933,11 @@ int main (int argc, char* argv[])
 
   if (!System.Open ("Crystal Space Windowing System testbed"))
     return -1;
+
+  // Look for skin variant from config file
+  DefaultSkin.Prefix = System.GetOptionCL ("skin");
+  if (!DefaultSkin.Prefix)
+    DefaultSkin.Prefix = System.GetConfig ()->GetStr ("CSWS", "Skin.Variant", NULL);
 
   // Create our application object
   csWsTest app (&System, DefaultSkin);

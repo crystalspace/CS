@@ -36,8 +36,8 @@
 IMPLEMENT_FACTORY (csGraphics3DNull)
 
 EXPORT_CLASS_TABLE (null3d)
-  EXPORT_CLASS (csGraphics3DNull, "crystalspace.graphics3d.null3d",
-    "NULL 3D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics3DNull, "crystalspace.graphics3d.null3d",
+    "NULL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics3DNull)
@@ -185,14 +185,6 @@ bool csGraphics3DNull::BeginDraw (int DrawFlags)
 
   if (DrawFlags & CSDRAW_CLEARSCREEN)
     G2D->Clear (0);
-
-  if (DrawFlags & CSDRAW_3DGRAPHICS)
-  {
-    G2D->Clear (0);
-  }
-  else if (DrawMode & CSDRAW_3DGRAPHICS)
-  {
-  }
 
   DrawMode = DrawFlags;
 

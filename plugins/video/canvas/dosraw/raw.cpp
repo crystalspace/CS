@@ -34,8 +34,8 @@ static VideoSystem VS;
 IMPLEMENT_FACTORY (csGraphics2DDOSRAW)
 
 EXPORT_CLASS_TABLE (dosraw)
-  EXPORT_CLASS (csGraphics2DDOSRAW, "crystalspace.graphics2d.dosraw",
-    "DOS/DJGPP 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DDOSRAW, "crystalspace.graphics2d.dosraw",
+    "DOS/DJGPP 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DDOSRAW)

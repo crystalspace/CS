@@ -30,8 +30,8 @@ IMPLEMENT_FACTORY (csGraphics3DSoftware)
 IMPLEMENT_FACTORY (csSoftProcTexture3D)
 
 EXPORT_CLASS_TABLE (soft3d)
-  EXPORT_CLASS (csGraphics3DSoftware, "crystalspace.graphics3d.software",
-    "Software 3D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics3DSoftware, "crystalspace.graphics3d.software",
+    "Software 3D graphics driver for Crystal Space", "crystalspace.font.server.")
   EXPORT_CLASS (csSoftProcTexture3D, 
     "crystalspace.graphics3d.software.offscreen",
     "Software 3D off screen driver")

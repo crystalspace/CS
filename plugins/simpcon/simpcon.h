@@ -24,6 +24,7 @@
 #include "iconsole.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
+#include "ifontsrv.h"
 #include "csutil/csbase.h"
 #include "csutil/scf.h"
 
@@ -56,8 +57,8 @@ class csSimpleConsole : public iConsole
   bool console_transparent_bg;
   /// Console mode
   int ConsoleMode;
-  /// Select font (-1 = automatic, else one of cs_Font_...)
-  int console_font;
+  /// Select font
+  iFont *console_font;
   /// The width and height of graphics canvas
   int FrameWidth, FrameHeight;
   /// The system driver
@@ -141,12 +142,16 @@ public:
   /// Set transparency
   virtual void SetTransparency (bool iTransp);
 
-  /// Gets the ID of current font.
-  virtual int GetFontID () const
+  /// Gets the current font.
+  virtual iFont *GetFont () const
   { return console_font; }
   /// Sets the type of the font.
-  virtual void SetFontID (int FontID)
-  { console_font = FontID; }
+  virtual void SetFont (iFont *Font)
+  {
+    if (console_font) console_font->DecRef ();
+    console_font = Font;
+    if (console_font) console_font->IncRef ();
+  }
 
   /// Get the current top line being displayed
   virtual int GetTopLine () const

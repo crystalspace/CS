@@ -24,148 +24,201 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 
+class csFreeTypeServer;
+
+/**
+ * A FreeType font object
+ */
+class csFreeTypeFont : public iFont
+{
+  // A single glyph bitmap
+  struct GlyphBitmap
+  {
+    // The width and height of the glyph bitmap (in pixels)
+    int w, h;
+    // The bitmap itself (or NULL if the glyph has not been rendered yet)
+    uint8 *bitmap;
+
+    // Destructor
+    ~GlyphBitmap ()
+    { delete [] bitmap; }
+  };
+
+  // A set of glyphs with same point size
+  struct GlyphSet
+  {
+    int size;
+    int maxW, maxH;
+    GlyphBitmap glyphs [256];
+  };
+
+  // An array with (numerous) sets of glyphs of different sizes
+  class csFontDefVector : public csVector
+  {
+  public:
+    virtual ~csFontDefVector ()
+    { DeleteAll (); }
+    virtual bool FreeItem (csSome Item)
+    { delete (GlyphSet *)Item; return true; }
+    GlyphSet *Get (int n)
+    { return (GlyphSet *)csVector::Get (n); }
+    virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    {
+      int id1 = ((GlyphSet*)Item1)->size, id2 = ((GlyphSet*)Item2)->size;
+      return id1 - id2;
+    }
+    virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    { int id1 = ((GlyphSet*)Item1)->size; return id1 - (int)Key; }
+  } cache;
+
+  GlyphSet *FindGlyphSet (int size)
+  {
+    int idx = cache.FindKey ((csConstSome)size);
+    return (idx == -1 ? NULL : cache.Get (idx));
+  }
+
+  bool CreateGlyphBitmaps (int size);
+
+public:
+  // font filename (for identification)
+  char *name;
+  // current glyph set
+  GlyphSet *current;
+  // The list of delete callbacks
+  csVector DeleteCallbacks;
+  //
+  TT_Face face;
+  TT_Instance instance;
+  TT_Face_Properties prop;
+  TT_UShort pID, eID;
+  TT_CharMap charMap;
+
+  DECLARE_IBASE;
+
+  /// Constructor
+  csFreeTypeFont (const char *filename);
+
+  /// Destructor
+  virtual ~csFreeTypeFont ();
+
+  /// Load the font
+  bool Load (csFreeTypeServer *server);
+
+  /**
+   * Set the size for this font.
+   * All other methods will change their behaviour as soon as you call
+   * this method; but not all font managers supports rescalable fonts
+   * in which case this method will be unimplemented.
+   */
+  virtual void SetSize (int iSize);
+
+  /**
+   * Query current font size. If server does not support rescalable
+   * fonts, this method returns 0.
+   */
+  virtual int GetSize ();
+
+  /**
+   * Return the maximum width and height of a single glyph.
+   * Return -1 if it could not be determined.
+   */
+  virtual void GetMaxSize (int &oW, int &oH);
+
+  /**
+   * Return character size in pixels.
+   * Returns false if values could not be determined.
+   */
+  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH);
+
+  /**
+   * Return a pointer to a bitmap containing a rendered character.
+   * Returns NULL if error occured. The oW and oH parameters are
+   * filled with bitmap width and height.
+   */
+  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
+
+  /**
+   * Return the width and height of text written with this font.
+   */
+  virtual void GetDimensions (const char *text, int &oW, int &oH);
+
+  /**
+   * Determine how much characters from this string can be written
+   * without exceeding given width (in pixels)
+   */
+  virtual int GetLength (const char *text, int maxwidth);
+
+  /**
+   * Add a call-on-font-delete callback routine.
+   */
+  virtual void AddDeleteCallback (DeleteNotify func, void *databag);
+
+  /**
+   * Remove a font delete notification callback.
+   */
+  virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag);
+};
+
 /**
  * FreeType font server.
  */
 class csFreeTypeServer : public iFontServer
 {
-  struct CharDef
-  {
-    int Width; // in pixel
-    int Height; // in pixel
-    unsigned char *Bitmap;
-  };
-
-  struct FTDef
-  {
-    CharDef outlines[256];
-    int size;
-  };
-
-  class csFontDefVector : public csVector
-  {
-  public:
-    FTDef* Get (int n) { return (FTDef*)csVector::Get (n); }
-    virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-      { int id1 = ((FTDef*)Item1)->size, id2 = ((FTDef*)Item2)->size;
-      return id1 - id2; }
-
-    virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-      { int id1 = ((FTDef*)Item1)->size, id2 = (int)Key; return id1 - id2; }
-  };
-
-  class FT
-  {
-  public:
-    FT (const char *name, int fontId)
-      { this->name = strnew (name); this->fontId = fontId; }
-    ~FT ()
-      {
-	for(int i=0; i<cache.Length(); i++)
-	{
-	  for(int j=0; j<256; j++) delete [] cache.Get(i)->outlines[j].Bitmap;
-	  delete cache.Get (i);
-	}
-	TT_Close_Face (face);
-      }
-
-    FTDef* GetFontDef (int size)
-      { int i=cache.FindKey ((csConstSome)size);
-      return (i==-1?NULL:cache.Get (i));}
-    int GetFontIdx (int size) { return cache.FindKey ((csConstSome)size); }
-
-    char *name;
-    int fontId;
-    int current;
-    TT_Face face;
-    TT_Instance instance;
-    TT_Face_Properties prop;
-    TT_UShort pID, eID;
-    TT_CharMap charMap;
-    csFontDefVector cache;
-  };
-
   class csFontVector : public csVector
   {
   public:
-    FT* Get (int n) { return (FT*)csVector::Get (n); }
+    void Put (csFreeTypeFont *Font)
+    { Font->IncRef (); csVector::Push (Font); }
+    virtual bool FreeItem (csSome Item)
+    { ((csFreeTypeFont *)Item)->DecRef (); return true; }
+    csFreeTypeFont *Get (int n)
+    { return (csFreeTypeFont *)csVector::Get (n); }
     virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-    { int id1 = ((FT*)Item1)->fontId, id2 = ((FT*)Item2)->fontId;
-    return id1 - id2; }
-
-    virtual int CompareKey (csSome Item1, csConstSome Key, int Mode) const
+    { return strcmp (((csFreeTypeFont *)Item1)->name,
+                     ((csFreeTypeFont *)Item2)->name); }
+    virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
     {
-      // compare the font ids
-      if (Mode==0)
-      { int id1 = ((FT*)Item1)->fontId, id2 = (int)Key; return id1 - id2; }
       // compare the font names
-      else{ char *id1 = ((FT*)Item1)->name; const char *id2 = (const char*)Key;
-      return strcmp (id1,id2); }
+      const char *id1 = ((csFreeTypeFont *)Item1)->name;
+      const char *id2 = (const char *)Key;
+      return strcmp (id1, id2);
     }
-  };
+  } fonts;
 
-protected:
-  csFontVector fonts;
+public:
   TT_Engine engine;
   TT_UShort platformID, encodingID;
   int defaultSize;
-  bool bInit;
+  iSystem *System;
+  iConfigFile *ftini;
+  iVFS *VFS;
+  const char *fontset;
 
-  iSystem *pSystem;
-
-  bool CreateGlyphBitmaps (FT *font, int size);
-
-public:
   DECLARE_IBASE;
 
-  csFreeTypeServer (iBase *pParent);
+  csFreeTypeServer (iBase *iParent);
   virtual ~csFreeTypeServer ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem *Sys);
 
   /**
    * Load a font by name.
-   * Returns a font id by which the font can be referenced further.
-   * RETURN:
-   * -1 ... loading failed
-   * >=0 ... the font id
+   * Returns a new iFont object or NULL on failure.
    */
-  virtual int LoadFont (const char* name, const char* filename);
+  virtual iFont *LoadFont (const char *filename);
 
   /**
-   * Set font property.
-   * Return true if chage was successfull.  If not, the server returns false,
-   * decides whats the next best possible thing to this propertym, returns
-   * this new value in invalue and if wanted also applies this next best
-   * thing.
+   * Get number of loaded fonts.
    */
-  virtual bool SetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property, bool autoApply );
-
-  /// Get a font property. Returns true if the property could be retrieved.
-  virtual bool GetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property);
+  virtual int GetNumFonts ()
+  { return fonts.Length(); }
 
   /**
-   * Return a pointer to a bitmap containing a rendered character (by current
-   * font).  NULL if error occured.
+   * Get Nth loaded font or NULL.
+   * You can query all loaded fonts with this method, by looping
+   * through all indices starting from 0 until you get NULL.
    */
-  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c, int &oW, int &oH);
-
-  /// Return character size in pixels. Returns false if values could not be determined.
-  virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH);
-  /*
-   * Return maximum height of a char.  Returns false if values could not be
-   * determined.
-   */
-  virtual int GetMaximumHeight (int fontId);
-
-  /// Return minimal boundings of text.
-  virtual void GetTextDimensions (int fontId, const char* text,
-    int& width, int& height);
-
-  /// Return font count.
-  virtual int GetFontCount (){ return fonts.Length(); }
+  virtual iFont *GetFont (int iIndex);
 };
 
 #endif // __CS_FREEFONT_H__

@@ -64,6 +64,7 @@ class StringTester : public Tester2D
 {
   char *line;
   int length, text_height, rows;
+  iFont *font;
   
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);

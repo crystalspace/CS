@@ -107,8 +107,10 @@ void csInputLine::Draw ()
 
   csComponent::Draw ();
 
+  int fonth;
+  GetTextSize ("", &fonth);
   textx = dx;
-  texty = dy + (clip.Height () - TextHeight ()) / 2;
+  texty = dy + (clip.Height () - fonth) / 2;
 
   int sels = selstart, sele = selend;
   if (sels > sele)
@@ -139,11 +141,11 @@ void csInputLine::Draw ()
     int cx = GetCharX (cursorpos);
     if (cx < clip.xmax)
       if (app->InsertMode || (cursorpos == (int)strlen (text)))
-        cursorrect.Set (cx - 1, texty - 1, cx + 1, texty + TextHeight () + 1);
+        cursorrect.Set (cx - 1, texty - 1, cx + 1, texty + fonth + 1);
       else
       {
         int cex = GetCharX (cursorpos + 1);
-        cursorrect.Set (cx, texty - 1, cex, texty + TextHeight () + 1);
+        cursorrect.Set (cx, texty - 1, cex, texty + fonth + 1);
       }
   } /* endif */
 
@@ -171,12 +173,12 @@ void csInputLine::Draw ()
     char tmp = text [sc];
     text [sc] = 0;
     Text (cx, texty, CSPAL_INPUTLINE_TEXT, -1, &text [firstchar]);
-    cx += TextWidth (&text [firstchar]);
+    cx += GetTextSize (&text [firstchar]);
     text [sc] = tmp;
     tmp = text [sele];
     text [sele] = 0;
     Text (cx, texty, CSPAL_INPUTLINE_SELTEXT, -1, &text [sc]);
-    cx += TextWidth (&text [sc]);
+    cx += GetTextSize (&text [sc]);
     text [sele] = tmp;
     if (sele < (int)strlen (text))
       Text (cx, texty, CSPAL_INPUTLINE_TEXT, -1, &text [sele]);
@@ -395,7 +397,7 @@ int csInputLine::GetCharX (int iNum)
     iNum = firstchar;
   char tmp = text [iNum];
   text [iNum] = 0;
-  int x = TextWidth (&text [firstchar]);
+  int x = GetTextSize (&text [firstchar]);
   text [iNum] = tmp;
   if (iNum == maxlen)
     x++;
@@ -428,7 +430,8 @@ void csInputLine::SetCursorPos (int NewPos, bool ExtendSel)
     {
       if (NewPos < firstchar)
         firstchar = NewPos;
-    } else
+    }
+    else
     {
       int curx = GetCharX (NewPos + 1);
       int delta = curx - (bound.Width () - textx);
@@ -437,7 +440,7 @@ void csInputLine::SetCursorPos (int NewPos, bool ExtendSel)
         char tmp[2];
         tmp[1] = 0;
         tmp[0] = text [firstchar];
-        delta -= TextWidth (tmp);
+        delta -= GetTextSize (tmp);
         firstchar++;
       } /* endwhile */
     } /* endif */
@@ -451,10 +454,7 @@ void csInputLine::SetCursorPos (int NewPos, bool ExtendSel)
 void csInputLine::SuggestSize (int &w, int &h)
 {
   if (text)
-  {
-    w = TextWidth (&text [0]);
-    h = TextHeight ();
-  }
+    w = GetTextSize (text, &h);
   else
     w = h = 0;
   

@@ -114,6 +114,8 @@ public:
   void EnterFullScreen ();
   void LeaveFullScreen ();
 
+  virtual void AllowCanvasResize (bool iAllow);
+
 #ifdef XFREE86VM
   void InitVidModes ();
 #endif

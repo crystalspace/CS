@@ -27,10 +27,13 @@
 #include "icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)
+IMPLEMENT_FACTORY (csLineX2DFontServer)
 
 EXPORT_CLASS_TABLE (linex2d)
-  EXPORT_CLASS (csGraphics2DLineXLib, "crystalspace.graphics2d.linex2d",
-    "X-Windows 2D graphics driver (line3d) for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DLineXLib, "crystalspace.graphics2d.linex2d",
+    "X-Windows 2D graphics driver for Crystal Space", "crystalspace.font.server.")
+  EXPORT_CLASS (csLineX2DFontServer, "crystalspace.font.server.linex2d",
+    "Private X-Windows font server for LineX2D canvas")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DLineXLib)
@@ -39,8 +42,10 @@ IMPLEMENT_IBASE (csGraphics2DLineXLib)
   IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
+Display *csGraphics2DLineXLib::dpy = NULL;
+
 csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
-  csGraphics2D (), dpy (NULL), cmap (0), currently_full_screen (false)
+  csGraphics2D (), cmap (0), currently_full_screen (false)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -48,7 +53,6 @@ csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   leader_window = window = 0;
   EventOutlet = NULL;
-  xfont = NULL;
 }
 
 bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
@@ -162,6 +166,21 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   InitVidModes();
 #endif
 
+  // Do a trick: unload the system font server since its useless for us
+  iPlugIn *fs = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iPlugIn);
+  if (fs)
+  {
+    System->UnloadPlugIn (fs);
+    fs->DecRef ();
+  }
+  // Also DecRef the FontServer since csGraphics2D::Initialize IncRef'ed it
+  if (FontServer)
+    FontServer->DecRef ();
+
+  // Load our specific font server instead
+  FontServer = LOAD_PLUGIN (System, "crystalspace.font.server.linex2d",
+    CS_FUNCID_FONTSERVER, iFontServer);
+
   return true;
 }
 
@@ -181,15 +200,6 @@ bool csGraphics2DLineXLib::Open(const char *Title)
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
-
-  // Load font or substitute
-  xfont = XLoadQueryFont (dpy, "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*");
-  if (!xfont)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: Cannot query font helvetica, size 14\n");
-    return false;
-  }
-  FontH = xfont->ascent + xfont->descent;
 
   // Create window
   XSetWindowAttributes swa;
@@ -324,8 +334,6 @@ bool csGraphics2DLineXLib::AllocateMemory ()
   if (!Memory)
     return false;
 
-  XSetFont (dpy, gc_back, xfont->fid);
-
   return true;
 }
 
@@ -379,11 +387,6 @@ void csGraphics2DLineXLib::Close ()
   {
     XDestroyWindow (dpy, leader_window);
     leader_window = 0;
-  }
-  if (xfont)
-  {
-    XFreeFont (dpy, xfont);
-    xfont = NULL;
   }
   csGraphics2D::Close ();
 }
@@ -497,23 +500,18 @@ void csGraphics2DLineXLib::DrawLine (float x1, float y1, float x2, float y2, int
   nr_segments++;
 }
 
-void csGraphics2DLineXLib::Write (int x, int y, int fg, int bg, const char *text)
+void csGraphics2DLineXLib::Write (iFont *font, int x, int y, int fg, int bg,
+  const char *text)
 {
+  int FontW, FontH;
+  XFontStruct *xfont = (XFontStruct *)font->GetGlyphBitmap (' ', FontW, FontH);
+  XSetFont (dpy, gc_back, xfont->fid);
+
   if (bg >= 0)
     DrawBox (x, y, XTextWidth (xfont, text, strlen (text)), FontH, bg);
   XSetForeground (dpy, gc_back, fg);
-  XSetBackground (dpy, gc_back, fg); // fg is not an error
+  XSetBackground (dpy, gc_back, fg); // `fg' rather than `bg' here is not an error
   XDrawString (dpy, back, gc_back, x, y + xfont->ascent, text, strlen (text));
-}
-
-int csGraphics2DLineXLib::GetTextWidth (int /*Font*/, const char *text)
-{
-  return XTextWidth (xfont, text, strlen (text));
-}
-
-int csGraphics2DLineXLib::GetTextHeight (int /*Font*/)
-{
-  return FontH;
 }
 
 void csGraphics2DLineXLib::Clear (int color)
@@ -757,8 +755,6 @@ bool csGraphics2DLineXLib::HandleEvent (iEvent &Event)
           case XK_End:        key = CSKEY_END; break;
           case XK_Escape:     key = CSKEY_ESC; break;
           case XK_Tab:        key = CSKEY_TAB; break;
-	  case XK_KP_Enter:
-          case XK_Return:     key = CSKEY_ENTER; break;
           case XK_F1:         key = CSKEY_F1; break;
           case XK_F2:         key = CSKEY_F2; break;
           case XK_F3:         key = CSKEY_F3; break;
@@ -771,9 +767,16 @@ bool csGraphics2DLineXLib::HandleEvent (iEvent &Event)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
+	  case XK_KP_Enter:
+          case XK_Return:     if (down && event.xkey.state & Mod1Mask)
+                                PerformExtension ("fullscreen"), key = 0;
+                              else
+                                key = CSKEY_ENTER;
+                              break;
           default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
-	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
+        if (key)
+          EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
         break;
       case FocusIn:
       case FocusOut:
@@ -1041,4 +1044,86 @@ void csGraphics2DLineXLib::LeaveFullScreen()
     XSync (dpy, False);
   }
 #endif // XFREE86VM
+}
+
+//--------------------------------------------- The dummy font server --------//
+
+IMPLEMENT_IBASE (csLineX2DFontServer::csLineX2DFont)
+  IMPLEMENTS_INTERFACE (iFont)
+IMPLEMENT_IBASE_END
+
+csLineX2DFontServer::csLineX2DFont::csLineX2DFont ()
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
+csLineX2DFontServer::csLineX2DFont::~csLineX2DFont ()
+{
+  if (xfont)
+    XFreeFont (csGraphics2DLineXLib::dpy, xfont);
+}
+
+void csLineX2DFontServer::csLineX2DFont::Load ()
+{
+  xfont = XLoadQueryFont (csGraphics2DLineXLib::dpy,
+    "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*");
+  if (!xfont) return;
+  FontW = xfont->max_bounds.width;
+  FontH = xfont->ascent + xfont->descent;
+}
+
+bool csLineX2DFontServer::csLineX2DFont::GetGlyphSize (uint8 c, int &oW, int &oH)
+{
+  XCharStruct *cs = &xfont->per_char [c - xfont->min_char_or_byte2];
+  oW = cs->width;
+  oH = cs->ascent + cs->descent;
+  return true;
+}
+
+uint8 *csLineX2DFontServer::csLineX2DFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
+{
+  (void)c;
+  oW = FontW; oH = FontH;
+  return (uint8 *)xfont;
+}
+
+void csLineX2DFontServer::csLineX2DFont::GetDimensions (const char *text, int &oW, int &oH)
+{
+  oW = XTextWidth (xfont, text, strlen (text));
+  oH = FontH;
+}
+
+int csLineX2DFontServer::csLineX2DFont::GetLength (const char *text, int maxwidth)
+{
+  int i;
+  for (i = 0; text [i]; i++)
+    if (XTextWidth (xfont, text, i + 1) > maxwidth)
+      return i;
+  return i;
+}
+
+//----------
+
+IMPLEMENT_IBASE (csLineX2DFontServer)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iFontServer)
+IMPLEMENT_IBASE_END
+
+csLineX2DFontServer::csLineX2DFontServer (iBase *iParent)
+{
+  CONSTRUCT_IBASE (iParent);
+  font.xfont = NULL;
+}
+
+iFont *csLineX2DFontServer::LoadFont (const char *filename)
+{
+  (void)filename;
+  if (!font.xfont)
+    font.Load ();
+  if (font.xfont)
+  {
+    font.IncRef ();
+    return &font;
+  }
+  return NULL;
 }

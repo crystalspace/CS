@@ -2246,7 +2246,7 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
       case CS_FX_ALPHA:
       {
         int alpha = mode & CS_FX_MASK_ALPHA;
-        if (alpha < 32)
+        if (alpha < 12)
           mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
         else if (alpha < 96)
           Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA25];
@@ -2286,9 +2286,9 @@ zfill_only:
   // 32bpp modes/textured where we use (#-2).16 format).
   int shift_amount =
     ((pfmt.PixelBytes == 4) && (Scan.BlendTable || pqinfo.textured)) ? 6 : 8;
-  pqinfo.redFact   = (pfmt.RedMask >> pfmt.RedShift)     << shift_amount;
-  pqinfo.greenFact = (pfmt.GreenMask >> pfmt.GreenShift) << shift_amount;
-  pqinfo.blueFact  = (pfmt.BlueMask >> pfmt.BlueShift)   << shift_amount;
+  pqinfo.redFact   = (((pfmt.RedMask >> pfmt.RedShift) + 1)     << shift_amount) - 1;
+  pqinfo.greenFact = (((pfmt.GreenMask >> pfmt.GreenShift) + 1) << shift_amount) - 1;
+  pqinfo.blueFact  = (((pfmt.BlueMask >> pfmt.BlueShift) + 1)   << shift_amount) - 1;
 
   pqinfo.max_r = (1 << (pfmt.RedBits   + shift_amount + 8)) - 1;
   pqinfo.max_g = (1 << (pfmt.GreenBits + shift_amount + 8)) - 1;
@@ -2304,30 +2304,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
     return;
 
-  //-----
-  // Calculate constant du,dv,dz.
-  //
-  //          (At-Ct)*(By-Cy) - (Bt-Ct)*(Ay-Cy)
-  //  dt/dx = ---------------------------------
-  //          (Ax-Cx)*(By-Cy) - (Bx-Cx)*(Ay-Cy)
-  //-----
-
-  int last;
-  float dd = 0;
-  for (last = 2; last < poly.num; last++)
-  {
-    dd = (poly.vertices [0].sx - poly.vertices [last].sx) *
-         (poly.vertices [1].sy - poly.vertices [last].sy) -
-         (poly.vertices [1].sx - poly.vertices [last].sx) *
-         (poly.vertices [0].sy - poly.vertices [last].sy);
-    if (dd < 0)
-      break;
-  }
-
-  // Rejection of back-faced polygons
-  if ((last == poly.num) || (dd == 0))
-    return;
-
+  // Determine the R/G/B of the polygon's flat color
   if (pqinfo.textured)
     Scan.FlatRGB.Set (255, 255, 255);
   else
@@ -2337,6 +2314,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     else
       Scan.FlatRGB.Set (poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
   }
+
+  // Get the same value as a pixel-format-encoded value
   if (pfmt.PixelBytes >= 2)
     Scan.FlatColor = texman->encode_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
       Scan.FlatRGB.blue);
@@ -2380,56 +2359,34 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
       ((top_y - EPSILON) > height))
     return;
 
-  float inv_dd = 1 / dd;
-  int dz = QInt24 (((iz [0] - iz [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                  - (iz [1] - iz [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-  int du = 0, dv = 0;
-  if (pqinfo.textured)
-  {
-    du = QInt16 (((uu [0] - uu [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (uu [1] - uu [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-    dv = QInt16 (((vv [0] - vv [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (vv [1] - vv [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-  }
-  long dr = 0, dg = 0, db = 0;
-  if (pqinfo.mixmode & CS_FX_GOURAUD)
-  {
-    dr = QRound (((rr [0] - rr [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (rr [1] - rr [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-    dg = QRound (((gg [0] - gg [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (gg [1] - gg [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-    db = QRound (((bb [0] - bb [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (bb [1] - bb [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-  }
-
   //-----
   // Scan from top to bottom.
-  // scanL1-scanL2 is the left segment to scan.
-  // scanR1-scanR2 is the right segment to scan.
+  // The following structure contains all the data for one side
+  // of the scanline conversion. 'L' is responsible for the left
+  // side, 'R' for the right side respectively.
   //-----
-  int scanL1, scanL2 = top;
-  int scanR1, scanR2 = top;
-
-  int xL = 0, xR = 0, dxdyL = 0, dxdyR = 0;
-  int uL = 0, vL = 0, zL = 0, rL = 0, gL = 0, bL = 0;
-  int dudyL = 0, dvdyL = 0, dzdyL = 0, drdyL = 0, dgdyL = 0, dbdyL = 0;
-
-  int sy, fyL, fyR;
-  sy = fyL = fyR = QRound (poly.vertices [top].sy);
+  struct
+  {
+    // Start and final vertex number
+    char sv, fv;
+    // The X coordinates and its per-scanline delta; also the final Y coordinate
+    int x, dxdy, fy;
+    // The `U/V/Z' texture coordinates and their per-scanline delta
+    int u, dudy, v, dvdy, z, dzdy;
+    // The `R/G/B' colors and their per-scanline delta
+    int r, drdy, g, dgdy, b, dbdy;
+  } L,R;
+  L.fv = R.fv = top;
+  int sy = L.fy = R.fy = QRound (poly.vertices [top].sy);
+  // The span of Z/U/V/R/G/B for current scanline
+  int span_z, span_u, span_v, span_r, span_g, span_b;
 
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool do_gouraud = (pqinfo.drawline_gouraud != NULL)
-    && ((pqinfo.mixmode & CS_FX_GOURAUD)
-     || (pqinfo.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY);
-  if (do_gouraud && !(pqinfo.mixmode & CS_FX_GOURAUD))
-  {
-    rL = pqinfo.redFact   << 8;
-    gL = pqinfo.greenFact << 8;
-    bL = pqinfo.blueFact  << 8;
-  } /* endif */
+    && (pqinfo.mixmode & CS_FX_GOURAUD);
 
   //-----
-  // The loop.
+  // Main scanline loop.
   //-----
   for ( ; ; )
   {
@@ -2440,85 +2397,120 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     do
     {
       leave = true;
-      if (sy <= fyR)
+      if (sy <= R.fy)
       {
         // Check first if polygon has been finished
-        if (scanR2 == bot)
+        if (R.fv == bot)
           return;
-        scanR1 = scanR2;
-	if (++scanR2 >= poly.num)
-	  scanR2 = 0;
+        R.sv = R.fv;
+	if (++R.fv >= poly.num)
+	  R.fv = 0;
 
         leave = false;
-	fyR = QRound (poly.vertices [scanR2].sy);
-	if (sy <= fyR)
+	R.fy = QRound (poly.vertices [R.fv].sy);
+	if (sy <= R.fy)
 	  continue;
 
-        float dyR = poly.vertices [scanR1].sy - poly.vertices [scanR2].sy;
+        float dyR = poly.vertices [R.sv].sy - poly.vertices [R.fv].sy;
         if (dyR)
         {
-          xR = QInt16 (poly.vertices [scanR1].sx);
-          dxdyR = QInt16 ((poly.vertices [scanR2].sx - poly.vertices [scanR1].sx) / dyR);
-          // horizontal pixel correction
-          xR += QRound (dxdyR * (poly.vertices [scanR1].sy -
-            ((float)QRound (poly.vertices [scanR1].sy) - 0.5)));
-        } /* endif */
-      } /* endif */
-      if (sy <= fyL)
-      {
-        if (scanL2 == bot)
-          return;
-        scanL1 = scanL2;
-	if (--scanL2 < 0)
-	  scanL2 = poly.num - 1;
-
-        leave = false;
-	fyL = QRound (poly.vertices [scanL2].sy);
-	if (sy <= fyL)
-	  continue;
-
-        float dyL = poly.vertices [scanL1].sy - poly.vertices [scanL2].sy;
-        if (dyL)
-        {
-          float inv_dyL = 1/dyL;
-          dxdyL = QInt16 ((poly.vertices [scanL2].sx - poly.vertices [scanL1].sx) * inv_dyL);
+          float inv_dyR = 1 / dyR;
+          R.x = QInt16 (poly.vertices [R.sv].sx);
+          R.dxdy = QInt16 (
+            (poly.vertices [R.fv].sx - poly.vertices [R.sv].sx) * inv_dyR);
+          R.dzdy = QInt24 ((iz [R.fv] - iz [R.sv]) * inv_dyR);
           if (pqinfo.textured)
           {
-            dudyL = QInt16 ((uu[scanL2] - uu[scanL1]) * inv_dyL);
-            dvdyL = QInt16 ((vv[scanL2] - vv[scanL1]) * inv_dyL);
+            R.dudy = QInt16 ((uu [R.fv] - uu [R.sv]) * inv_dyR);
+            R.dvdy = QInt16 ((vv [R.fv] - vv [R.sv]) * inv_dyR);
           }
-          dzdyL = QInt24 ((iz[scanL2] - iz[scanL1]) * inv_dyL);
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            drdyL = QRound ((rr [scanL2] - rr [scanL1]) * inv_dyL);
-            dgdyL = QRound ((gg [scanL2] - gg [scanL1]) * inv_dyL);
-            dbdyL = QRound ((bb [scanL2] - bb [scanL1]) * inv_dyL);
+            R.drdy = QRound ((rr [R.fv] - rr [R.sv]) * inv_dyR);
+            R.dgdy = QRound ((gg [R.fv] - gg [R.sv]) * inv_dyR);
+            R.dbdy = QRound ((bb [R.fv] - bb [R.sv]) * inv_dyR);
           }
-          xL = QInt16 (poly.vertices [scanL1].sx);
 
           // horizontal pixel correction
-          float deltaY = poly.vertices [scanL1].sy - (float (sy) - 0.5);
-          float deltaX = (dxdyL / 65536.) * deltaY;
-          xL += QInt16 (deltaX);
+          float deltaX = (R.dxdy * 1/65536.) *
+            (poly.vertices [R.sv].sy - (float (sy) - 0.5));
+          R.x += QInt16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
-          if (poly.vertices [scanL2].sx != poly.vertices [scanL1].sx)
-            Factor = deltaX / (poly.vertices [scanL2].sx - poly.vertices [scanL1].sx);
+          if (poly.vertices [R.fv].sx != poly.vertices [R.sv].sx)
+            Factor = deltaX / (poly.vertices [R.fv].sx - poly.vertices [R.sv].sx);
           else
             Factor = 0;
-
           if (pqinfo.textured)
           {
-            uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
-            vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
+            R.u = QInt16 (uu [R.sv] + (uu [R.fv] - uu [R.sv]) * Factor);
+            R.v = QInt16 (vv [R.sv] + (vv [R.fv] - vv [R.sv]) * Factor);
           }
-          zL = QInt24 (iz [scanL1] + (iz [scanL2] - iz [scanL1]) * Factor);
+          R.z = QInt24 (iz [R.sv] + (iz [R.fv] - iz [R.sv]) * Factor);
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            rL = QRound (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
-            gL = QRound (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
-            bL = QRound (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
+            R.r = QRound (rr [R.sv] + (rr [R.fv] - rr [R.sv]) * Factor);
+            R.g = QRound (gg [R.sv] + (gg [R.fv] - gg [R.sv]) * Factor);
+            R.b = QRound (bb [R.sv] + (bb [R.fv] - bb [R.sv]) * Factor);
+          }
+        } /* endif */
+      } /* endif */
+      if (sy <= L.fy)
+      {
+        if (L.fv == bot)
+          return;
+        L.sv = L.fv;
+	if (--L.fv < 0)
+	  L.fv = poly.num - 1;
+
+        leave = false;
+	L.fy = QRound (poly.vertices [L.fv].sy);
+	if (sy <= L.fy)
+	  continue;
+
+        float dyL = poly.vertices [L.sv].sy - poly.vertices [L.fv].sy;
+        if (dyL)
+        {
+          float inv_dyL = 1 / dyL;
+          L.x = QInt16 (poly.vertices [L.sv].sx);
+          L.dxdy = QInt16 (
+            (poly.vertices [L.fv].sx - poly.vertices [L.sv].sx) * inv_dyL);
+          L.dzdy = QInt24 ((iz [L.fv] - iz [L.sv]) * inv_dyL);
+          if (pqinfo.textured)
+          {
+            L.dudy = QInt16 ((uu [L.fv] - uu [L.sv]) * inv_dyL);
+            L.dvdy = QInt16 ((vv [L.fv] - vv [L.sv]) * inv_dyL);
+          }
+          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          {
+            L.drdy = QRound ((rr [L.fv] - rr [L.sv]) * inv_dyL);
+            L.dgdy = QRound ((gg [L.fv] - gg [L.sv]) * inv_dyL);
+            L.dbdy = QRound ((bb [L.fv] - bb [L.sv]) * inv_dyL);
+          }
+
+          // horizontal pixel correction
+          float deltaX = (L.dxdy * 1/65536.) *
+            (poly.vertices [L.sv].sy - (float (sy) - 0.5));
+          L.x += QInt16 (deltaX);
+
+          // apply sub-pixel accuracy factor
+          float Factor;
+          if (poly.vertices [L.fv].sx != poly.vertices [L.sv].sx)
+            Factor = deltaX / (poly.vertices [L.fv].sx - poly.vertices [L.sv].sx);
+          else
+            Factor = 0;
+          if (pqinfo.textured)
+          {
+            L.u = QInt16 (uu [L.sv] + (uu [L.fv] - uu [L.sv]) * Factor);
+            L.v = QInt16 (vv [L.sv] + (vv [L.fv] - vv [L.sv]) * Factor);
+          }
+          L.z = QInt24 (iz [L.sv] + (iz [L.fv] - iz [L.sv]) * Factor);
+          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          {
+            L.r = QRound (rr [L.sv] + (rr [L.fv] - rr [L.sv]) * Factor);
+            L.g = QRound (gg [L.sv] + (gg [L.fv] - gg [L.sv]) * Factor);
+            L.b = QRound (bb [L.sv] + (bb [L.fv] - bb [L.sv]) * Factor);
           }
         } /* endif */
       } /* endif */
@@ -2528,10 +2520,20 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     // Now draw a trapezoid.
     //-----
     int fin_y;
-    if (fyL > fyR)
-      fin_y = fyL;
+    if (L.fy > R.fy)
+      fin_y = L.fy;
     else
-      fin_y = fyR;
+      fin_y = R.fy;
+
+    int dszdy, dsudy, dsvdy, dsrdy, dsbdy, dsgdy;
+    span_z = R.z - L.z;
+    dszdy = R.dzdy - L.dzdy;
+    if (pqinfo.textured)
+      span_u = R.u - L.u, span_v = R.v - L.v,
+      dsudy = R.dudy - L.dudy, dsvdy = R.dvdy - L.dvdy;
+    if (pqinfo.mixmode & CS_FX_GOURAUD)
+      span_r = R.r - L.r, span_g = R.g - L.g, span_b = R.b - L.b,
+      dsrdy = R.drdy - L.drdy, dsgdy = R.dgdy - L.dgdy, dsbdy = R.dbdy - L.dbdy;
 
     int screenY = height - sy;
     while (sy > fin_y)
@@ -2541,56 +2543,62 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
         //-----
         // Draw one scanline.
         //-----
-        int xl = round16 (xL);
-        int xr = round16 (xR);
+        int xl = round16 (L.x);
+        int xr = round16 (R.x);
 
         if (xr > xl)
         {
           int l = xr - xl;
+          float inv_l = 1. / l;
 
-          int uu = uL, vv = vL;
-          int duu = du, dvv = dv;
-
+          int dzz = QRound (span_z * inv_l);
+          int uu, duu, vv, dvv;
           if (pqinfo.textured)
           {
+            uu = L.u; duu = QInt (span_u * inv_l);
+            vv = L.v; dvv = QInt (span_v * inv_l);
+
             // Check for texture overflows
             if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
             if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
 
-            int tmpu = uu + du * l;
-            int tmpv = vv + dv * l;
+            int tmpu = uu + span_u;
             if (tmpu < 0 || tmpu > pqinfo.twfp)
             {
               if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
-              duu = (tmpu - uu) / l;
+              duu = QInt ((tmpu - uu) * inv_l);
             }
+            int tmpv = vv + span_v;
             if (tmpv < 0 || tmpv > pqinfo.thfp)
             {
               if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
-              dvv = (tmpv - vv) / l;
+              dvv = QInt ((tmpv - vv) * inv_l);
             }
           }
 
-          // R,G,B brightness can underflow due to pixel subcorrection
+          // R,G,B brightness can underflow due to subpixel correction
           // Underflow will cause visual artifacts while small overflows
           // will be neutralized by our "clamp to 1.0" circuit.
-          int rr = rL, gg = gL, bb = bL;
-          int drr = dr; int dgg = dg; int dbb = db;
+          int rr, drr, gg, dgg, bb, dbb;
           bool clamp = false;
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
+            rr = L.r, drr = QInt (span_r * inv_l);
+            gg = L.g, dgg = QInt (span_g * inv_l);
+            bb = L.b, dbb = QInt (span_b * inv_l);
+
             if (rr < 0) rr = 0;
             if (gg < 0) gg = 0;
             if (bb < 0) bb = 0;
 
-            int tmp = rr + drr * l;
-            if (tmp < 0) drr = - (rr / l);
+            int tmp = rr + span_r;
+            if (tmp < 0) drr = - QInt (rr * inv_l);
             clamp |= (rr > pqinfo.max_r) || (tmp > pqinfo.max_r);
-            tmp = gg + dgg * l;
-            if (tmp < 0) dgg = - (gg / l);
+            tmp = gg + span_g;
+            if (tmp < 0) dgg = - QInt (gg * inv_l);
             clamp |= (gg > pqinfo.max_g) || (tmp > pqinfo.max_g);
-            tmp = bb + dbb * l;
-            if (tmp < 0) dbb = - (bb / l);
+            tmp = bb + span_b;
+            if (tmp < 0) dbb = - QInt (bb * inv_l);
             clamp |= (bb > pqinfo.max_b) || (tmp > pqinfo.max_b);
           }
 
@@ -2599,18 +2607,21 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 
           if (do_gouraud)
             pqinfo.drawline_gouraud (dest, l, zbuff, uu, duu, vv, dvv,
-              zL, dz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg, dbb, clamp);
+              L.z, dzz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg, dbb, clamp);
           else
             pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
-              zL, dz, pqinfo.bm, pqinfo.shf_w);
+              L.z, dzz, pqinfo.bm, pqinfo.shf_w);
         }
       }
 
-      xL += dxdyL; xR += dxdyR; zL += dzdyL;
+      L.x += L.dxdy; R.x += R.dxdy;
+      L.z += L.dzdy; span_z += dszdy;
       if (pqinfo.textured)
-        uL += dudyL, vL += dvdyL;
+        L.u += L.dudy, L.v += L.dvdy,
+        span_u += dsudy, span_v += dsvdy;
       if (pqinfo.mixmode & CS_FX_GOURAUD)
-        rL += drdyL, gL += dgdyL, bL += dbdyL;
+        L.r += L.drdy, L.g += L.dgdy, L.b += L.dbdy,
+        span_r += dsrdy, span_g += dsgdy, span_b += dsbdy;
 
       sy--;
       screenY++;

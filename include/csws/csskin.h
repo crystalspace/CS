@@ -29,6 +29,7 @@ class csComponent;
 class csButton;
 class csWindow;
 class csDialog;
+class csBackground;
 
 /**
  * This class defines the interface for a container of skins.
@@ -58,6 +59,9 @@ class csDialog;
  */
 class csSkin : public csVector
 {
+  /// The application
+  csApp *app;
+
 public:
   /// This is the prefix for section names in CSWS' configuration file
   const char *Prefix;
@@ -89,6 +93,17 @@ public:
 
   /// Free any resources allocated by the skin slices
   virtual void Deinitialize ();
+
+  /// Utility function: get a skin-specific string from csws config file
+  const char *GetConfigStr (const char *iSection, const char *iKey, const char *iDefault);
+  /// Same but get a boolean value
+  bool GetConfigYesNo (const char *iSection, const char *iKey, bool iDefault);
+
+  /// Utility function: read background from given section with given key prefix
+  void Load (csBackground &oBack, const char *iSection, const char *iPrefix);
+
+private:
+  bool ReadGradient (const char *iText, csRGBcolor *color, int iNum);
 };
 
 /**
@@ -222,6 +237,19 @@ public:
 
   /// Set dialog border width and height depending on frame style
   virtual void SetBorderSize (csDialog &This) = 0;
+};
+
+/**
+ * This class defines the interface for a window titlebar skin slice.
+ * Every skin slice that is meant for title bars should inherit
+ * from this interface.
+ */
+class csTitlebarSkin : public csSkinSlice
+{
+public:
+  /// Get the identifier of the component this skin slice is for
+  virtual const char *GetName ()
+  { return "Titlebar"; }
 };
 
 /**

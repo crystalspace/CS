@@ -57,13 +57,13 @@
 IMPLEMENT_FACTORY (csGraphics2DSDL)
 
 EXPORT_CLASS_TABLE (sdl2d)
-    EXPORT_CLASS (csGraphics2DSDL, "crystalspace.graphics2d.sdl2d",
-    "SDL 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DSDL, "crystalspace.graphics2d.sdl2d",
+    "SDL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DSDL)
-    IMPLEMENTS_INTERFACE (iPlugIn)
-    IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
 #if SHADE_BUF

@@ -43,18 +43,7 @@ void csDefaultWindowSkin::Initialize (csApp *iApp, csSkin *Parent)
     fatal_exit (0, false);
   }
 
-  if (BackTex)
-  {
-    BackTex->DecRef ();
-    BackTex = NULL;
-  }
-  const char *tex = iApp->Config->GetStr ("Dialog", "Background", NULL);
-  if (tex)
-  {
-    BackTex = iApp->GetTexture (tex);
-    if (BackTex)
-      BackTex->IncRef ();
-  }
+  Parent->Load (Back, "Window", "Background");
 }
 
 void csDefaultWindowSkin::Deinitialize ()
@@ -64,11 +53,7 @@ void csDefaultWindowSkin::Deinitialize ()
     ButtonTex->DecRef ();
     ButtonTex = NULL;
   }
-  if (BackTex)
-  {
-    BackTex->DecRef ();
-    BackTex = NULL;
-  }
+  Back.Free ();
 }
 
 csButton *csDefaultWindowSkin::CreateButton (csWindow &This, int ButtonID)
@@ -285,20 +270,22 @@ void csDefaultWindowSkin::Draw (csComponent &This)
     }
   } /* endswitch */
 
-  if (This.GetState (CSS_TRANSPARENT))
+  if (Back.GetType () == csbgNone)
   {
-    int x1 = This.bound.Width ()  - wbw, x2 = This.bound.Width ()  - bw;
-    int y1 = This.bound.Height () - wbh, y2 = This.bound.Height () - bh;
-    This.Box (bw, bh, wbw, y2, CSPAL_WINDOW_BORDER);
-    This.Box (x1, bh, x2, y2, CSPAL_WINDOW_BORDER);
-    This.Box (wbw, bh, x1, wbh, CSPAL_WINDOW_BORDER);
-    This.Box (wbw, y1, x1, y2, CSPAL_WINDOW_BORDER);
-    This.Texture (BackTex, wbw, wbh, This.bound.Width () - 2 * wbw,
-      This.bound.Height () - 2 * wbh, 0, 0, This.GetAlpha ());
+    Back.SetColor (CSPAL_WINDOW_BORDER);
+    Back.SetType (csbgNone);
+//  This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,
+//    CSPAL_WINDOW_BORDER);
   }
-  else
-    This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,
-      CSPAL_WINDOW_BORDER);
+
+  int x1 = This.bound.Width ()  - wbw, x2 = This.bound.Width ()  - bw;
+  int y1 = This.bound.Height () - wbh, y2 = This.bound.Height () - bh;
+  This.Box (bw, bh, wbw, y2, CSPAL_WINDOW_BORDER);
+  This.Box (x1, bh, x2, y2, CSPAL_WINDOW_BORDER);
+  This.Box (wbw, bh, x1, wbh, CSPAL_WINDOW_BORDER);
+  This.Box (wbw, y1, x1, y2, CSPAL_WINDOW_BORDER);
+  Back.Draw (This, wbw, wbh, This.bound.Width () - 2 * wbw,
+    This.bound.Height () - 2 * wbh, 0, 0, This.GetAlpha ());
 
   if (This.GetWindowStyle () & CSWS_CLIENTBORDER)
   {

@@ -27,8 +27,8 @@
 IMPLEMENT_FACTORY (csGraphics2DBeLib)
 
 EXPORT_CLASS_TABLE (be2d)
-  EXPORT_CLASS (csGraphics2DBeLib, "crystalspace.graphics2d.be",
-    "Crystal Space 2D driver for BeOS")
+  EXPORT_CLASS_DEP (csGraphics2DBeLib, "crystalspace.graphics2d.be",
+    "Crystal Space 2D driver for BeOS", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DBeLib)

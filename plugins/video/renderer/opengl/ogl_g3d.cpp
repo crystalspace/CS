@@ -53,14 +53,14 @@
 =========================================================================*/
 
 IMPLEMENT_FACTORY (csGraphics3DOpenGL)
-EXPORT_CLASS_TABLE (gl3d)
-EXPORT_CLASS (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
-	      "OpenGL 3D graphics driver for Crystal Space")
+  EXPORT_CLASS_TABLE (gl3d)
+  EXPORT_CLASS_DEP (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
+    "OpenGL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics3DOpenGL)
-IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END
 
 /*=========================================================================

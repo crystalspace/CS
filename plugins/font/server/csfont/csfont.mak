@@ -1,4 +1,4 @@
-DESCRIPTION.csfont = Crystal Space default font server
+DESCRIPTION.csfont = Default Crystal Space font server
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -30,7 +30,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   DEP.CSFONT=$(LIB.CSFONT)
   TO_INSTALL.DYNAMIC_LIBS += $(CSFONT)
 else
-  CSFONT=$(OUT)$(LIB_PREFIX)csfnt$(LIB)
+  CSFONT=$(OUT)$(LIB_PREFIX)csfont$(LIB)
   DEP.EXE+=$(CSFONT)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSFONT
   TO_INSTALL.STATIC_LIBS += $(CSFONT)

@@ -101,7 +101,6 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   iGraphics2D *g2d;
   int frame_height, width, height;
   csPixelFormat *pfmt;
-  int font;
 
  public:
   DECLARE_IBASE;
@@ -183,22 +182,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual void SetRGB (int i, int r, int g, int b)
   { g2d->SetRGB (i, r, g, b); }
   ///
-  virtual void Write (int x, int y, int fg, int bg, const char *str)
-;
-  virtual void WriteChar (int x, int y, int fg, int bg, char c);
-  virtual int GetFontID ()
-  { return g2d->GetFontID (); }
-
-  virtual void SetFontID (int FontID);
-
-  virtual int LoadFont (const char *name, const char *file)
-  { return g2d->LoadFont(name, file); }
-
-  virtual bool SetFontSize (int FontSize)
-  { return g2d->SetFontSize (FontSize); }
-
-  virtual int GetFontSize ()
-  { return g2d->GetFontSize (); }
+  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *str);
 
   virtual bool PerformExtension (const char *args)
   { return g2d->PerformExtension (args); }
@@ -223,11 +207,6 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual csRGBpixel *GetPalette ()
   { return g2d->GetPalette (); }
 
-  virtual int GetTextWidth (int FontID, const char *text)
-  { return g2d->GetTextWidth (FontID, text); }
-
-  virtual int GetTextHeight (int FontID)
-  { return g2d->GetTextHeight (FontID); }
   ///
   virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
@@ -244,7 +223,11 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   { return false; }
 
   virtual void AllowCanvasResize (bool /*iAllow*/)
-  {}
+  { }
+
+  /// Get the active font server (does not do IncRef())
+  virtual iFontServer *GetFontServer ()
+  { return g2d->GetFontServer (); }
 };
 
 

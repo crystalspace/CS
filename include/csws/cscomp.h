@@ -26,6 +26,7 @@
 #include "csengine/cspixmap.h"
 #include "cswspal.h"
 #include "igraph2d.h"
+#include "ifontsrv.h"
 
 class csApp;
 class csSkin;
@@ -219,7 +220,16 @@ enum
    * OUT: nothing
    * </pre>
    */
-  cscmdSkinChanged
+  cscmdSkinChanged,
+  /**
+   * CSWS private command sent when a component is moved;
+   * in this case we have to move all children who's clip
+   * parent is not equal to their parent in a special way.
+   * <pre>
+   * IN:  (int *)deltaxy [2]
+   * </pre>
+   */
+  cscmdMoveClipChildren
 };
 
 /**
@@ -286,8 +296,8 @@ protected:
   csComponent *clipparent;
   /// Most components contain a text string. Unify the interface.
   char *text;
-  /// Current font index
-  int Font;
+  /// Current font (or NULL if should use parent font)
+  iFont *Font;
   /// Current font size
   int FontSize;
   /// An array of 'clip children', i.e. components which are clipped inside our bounds
@@ -509,11 +519,14 @@ public:
   /// Same, but with coordinates instead of rectangle
   void Invalidate (int xmin, int ymin, int xmax, int ymax,
     bool IncludeChildren = false, csComponent *below = NULL)
-  { csRect inv (xmin, ymin, xmax, ymax); Invalidate (inv, IncludeChildren, below); }
+  {
+    csRect inv (xmin, ymin, xmax, ymax);
+    Invalidate (inv, IncludeChildren, below);
+  }
 
-  /// Same, but invalidates entire component
+  /// Same, but invalidates entire component (and possibly all children)
   void Invalidate (bool IncludeChildren = false, csComponent *below = NULL)
-  { Invalidate (0, 0, bound.Width (), bound.Height (), IncludeChildren, below); }
+  { Invalidate (-99999, -99999, +99999, +99999, IncludeChildren, below); }
 
   /// Set/clear given component state flags
   virtual void SetState (int mask, bool enable);
@@ -548,6 +561,19 @@ public:
    * When this function returns, the object is already destroyed.
    */
   virtual void Close ();
+
+  /**
+   * Get the (possibly child) component that is topmost at given x,y
+   * location. This is useful, for example, to get the component under
+   * mouse cursor. You can provide a test function that will be called
+   * for "transparent" childs; if the child has the CSS_TRANSPARENT
+   * flag set, this routine will be called to determine whenever we
+   * should go further below this child. If the routine is NULL, it
+   * will stop at the first transparent child. If the routine returns
+   * true, GetChildAt() will return given child component.
+   */
+  csComponent *GetChildAt (int x, int y,
+    bool (*func) (csComponent *, void *) = NULL, void *data = NULL);
 
   /**
    * Set mouse cursor to one of sizing cursors depending on drag mode
@@ -627,18 +653,12 @@ public:
   void SetClipRect ()
   { clip.MakeEmpty (); }
 
-  /// Query current text font for this component
-  int GetFont ();
+  /// Set font for this component and the size (-1 - leave as-is, 0 - from parent)
+  void SetFont (iFont *iNewFont, int iSize = -1);
 
-  /// Set text font for this component and possibly its children
-  void SetFont (int iFont, bool IncludeChildren = false);
+  /// Query current text font and his size for this component
+  virtual void GetFont (iFont *&oFont, int &oFontSize);
 
-  /// Query current fontsize for this component
-  int GetFontSize ();
-  
-  /// Set text font size for this component and possibly its children
-  void SetFontSize (int iSize, bool IncludeChildren = false);
-  
   /// Draw a box
   void Box (int xmin, int ymin, int xmax, int ymax, int colindx);
 
@@ -662,10 +682,10 @@ public:
   void Texture (iTextureHandle *tex, int x, int y, int w, int h,
     int orgx, int orgy, uint8 Alpha = 0);
 
-  /// Return the width of given text using currently selected font
-  int TextWidth (const char *text);
-  /// Return the height of currently selected font
-  int TextHeight ();
+  /// Return the width of given text using current font (and possibly height)
+  int GetTextSize (const char *text, int *oHeight = NULL);
+  /// Return how many letters from given string fits in this number of pixels
+  int GetTextChars (const char *text, int iWidth);
 
   /// Draw a 3D-looking thin rectangle
   void Rect3D (int xmin, int ymin, int xmax, int ymax, int darkindx, int lightindx);

@@ -71,6 +71,8 @@ void csStatic::Draw ()
   int disabled = link ? linkdisabled : false;
   int textcolor = disabled ? CSPAL_STATIC_DTEXT :
     linkactive ? CSPAL_STATIC_ATEXT : CSPAL_STATIC_ITEXT;
+  int fonth;
+  GetTextSize ("", &fonth);
   switch (style)
   {
     case csscsEmpty:
@@ -80,10 +82,10 @@ void csStatic::Draw ()
       break;
     case csscsFrameLabel:
     {
-      int txtx = TextWidth ("///");
-      int fryt = (TextHeight () - 1) / 2;
+      int txtx = GetTextSize ("///");
+      int fryt = (fonth - 1) / 2;
       int fryb = bound.Height () - fryt;
-      int txtw = TextWidth (text);
+      int txtw = GetTextSize (text);
 
       Line (0, fryt, txtx, fryt, CSPAL_STATIC_DARK3D);
       Line (txtx + txtw, fryt, bound.Width (), fryt, CSPAL_STATIC_DARK3D);
@@ -120,22 +122,22 @@ void csStatic::Draw ()
     switch (TextAlignment & CSSTA_HALIGNMASK)
     {
       case CSSTA_LEFT:    x = 0; break;
-      case CSSTA_RIGHT:   x = bound.Width () - TextWidth (text); break;
-      case CSSTA_HCENTER: x = (bound.Width () - TextWidth (text)) / 2; break;
+      case CSSTA_RIGHT:   x = bound.Width () - GetTextSize (text); break;
+      case CSSTA_HCENTER: x = (bound.Width () - GetTextSize (text)) / 2; break;
       default:            return;
     } /* endswitch */
     switch (TextAlignment & CSSTA_VALIGNMASK)
     {
       case CSSTA_TOP:     y = 0; break;
-      case CSSTA_BOTTOM:  y = bound.Height () - TextHeight (); break;
-      case CSSTA_VCENTER: y = (bound.Height () - TextHeight ()) / 2; break;
+      case CSSTA_BOTTOM:  y = bound.Height () - fonth; break;
+      case CSSTA_VCENTER: y = (bound.Height () - fonth) / 2; break;
       default:            return;
     } /* endswitch */
     if (!(TextAlignment & CSSTA_WRAPMASK))
       Text (x, y, textcolor, -1, text);
     else
     {
-      int lines_avail = bound.Height () / TextHeight ();
+      int lines_avail = bound.Height () / fonth;
       // remember where the lines start
       char **starts = new char * [strlen (text)];
       // count the lines
@@ -155,7 +157,7 @@ void csStatic::Draw ()
         {
           s [0] = *t;
           len = 0;
-          while ((len += TextWidth (s)) <= bound.Width () && *++t)
+          while ((len += GetTextSize (s)) <= bound.Width () && *++t)
             s [0] = *t;
           if (*t)
           { 
@@ -198,10 +200,10 @@ void csStatic::Draw ()
         switch (TextAlignment & CSSTA_HALIGNMASK)
         {
           case CSSTA_LEFT:    x = 0; break;
-          case CSSTA_RIGHT:   x = bound.Width () - TextWidth (t); break;
-          case CSSTA_HCENTER: x = (bound.Width () - TextWidth (t)) / 2; break;
+          case CSSTA_RIGHT:   x = bound.Width () - GetTextSize (t); break;
+          case CSSTA_HCENTER: x = (bound.Width () - GetTextSize (t)) / 2; break;
         } /* endswitch */
-        y = i * TextHeight ();
+        y = i * fonth;
         Text (x, y, textcolor, -1, t);
       }
       
@@ -249,8 +251,8 @@ bool csStatic::HandleEvent (iEvent &Event)
         // for frames, check if mouse is within label text
         if (style == csscsFrameLabel)
         {
-          int xmin = TextWidth ("///");
-          csRect r (xmin, 0, xmin + TextWidth (text), TextHeight ());
+          int fh, xmin = GetTextSize ("///", &fh);
+          csRect r (xmin, 0, xmin + GetTextSize (text), fh);
           if (!r.Contains (Event.Mouse.x, Event.Mouse.y))
             break;
         }
@@ -319,10 +321,7 @@ void csStatic::SuggestSize (int &w, int &h)
     case csscsFrameLabel:
     case csscsText:
       if (text)
-      {
-        w = TextWidth (text);
-        h = TextHeight ();
-      } /* endif */
+        w = GetTextSize (text, &h);
       break;
     case csscsBitmap:
       if (Bitmap)

@@ -33,8 +33,8 @@
 IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
 EXPORT_CLASS_TABLE (Driver2DGL)
-  EXPORT_CLASS (csGraphics2DOpenGL, OPENGL_2D_DRIVER,
-    "Crystal Space OpenGL 2D driver for Macintosh")
+  EXPORT_CLASS_DEP (csGraphics2DOpenGL, OPENGL_2D_DRIVER,
+    "Crystal Space OpenGL 2D driver for Macintosh", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DOpenGL)

@@ -21,8 +21,8 @@
 #include "igraph3d.h"
 #include "igraph2d.h"
 #include "itxtmgr.h"
+#include "ifontsrv.h"
 #include "apps/perftest/ptests2d.h"
-
 
 void Tester2D::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
 {
@@ -84,10 +84,11 @@ Tester* PixelTester::NextTester ()
 void StringTester::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
 {
   Tester2D::Setup (g3d, NULL);
-  G2D->SetFontID (csFontTiny);
+  font = G2D->GetFontServer ()->LoadFont (CSFONT_SMALL);
   char tl [] = "aA1! bB2 cC3 dD4$ 5%eE fF^6 gG&7hH8*iI9(j0)Jk[K1lL]}mM@n2No+O5p> Qq<r;RSs Tt =Uu|uv;Vwxyz WXYZ Crystal Space, the open sourced graphics engine.";
   int tl_len = strlen (tl);
-  int line_length = G2D->GetTextWidth (csFontTiny, tl);
+  int line_length;
+  font->GetDimensions (tl, line_length, text_height);
   float ave_char_w = ((float)line_length)/tl_len;
 
   if (line_length > max_w)
@@ -97,7 +98,7 @@ void StringTester::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
     length = tl_len - sub_len + 1;
     line = new char[length];
     strncpy (line, tl, length);
-    line_length = G2D->GetTextWidth (csFontTiny, line);
+    font->GetDimensions (line, line_length, text_height);
     line [length-1] = 0;
   }
   else
@@ -114,11 +115,10 @@ void StringTester::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
       buf_len -= tl_len;
     }
     strncpy (buf, tl, buf_len);
-    line_length = G2D->GetTextWidth (csFontTiny, line);
+    font->GetDimensions (line, line_length, text_height);
     line [length-1] = 0;
   }
 
-  text_height = G2D->GetTextHeight (csFontTiny);
   rows = (max_h - 10)/text_height;
 }
 
@@ -128,13 +128,14 @@ void StringTester::Draw (iGraphics3D* /*g3d*/)
   int height = 10 + text_height;
   while (height < max_h)
   {
-    G2D->Write (10, height, colour[0], -1, line);
+    G2D->Write (font, 10, height, colour[0], -1, line);
     height += text_height +1;
   }
 }
 
 Tester* StringTester::NextTester ()
 {
+  font->DecRef ();
   delete [] line;
   return NULL;
 }

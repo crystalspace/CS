@@ -59,12 +59,12 @@
 IMPLEMENT_FACTORY (csGraphics2DMac)
 
 EXPORT_CLASS_TABLE (Driver2D)
-	EXPORT_CLASS (csGraphics2DMac, SOFTWARE_2D_DRIVER,
-		"Crystal Space 2D driver for Macintosh")
+    EXPORT_CLASS_DEP (csGraphics2DMac, SOFTWARE_2D_DRIVER,
+        "Crystal Space 2D driver for Macintosh", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE(csGraphics2DMac)
-	IMPLEMENTS_INTERFACE (iPlugIn)
+    IMPLEMENTS_INTERFACE (iPlugIn)
     IMPLEMENTS_INTERFACE(iGraphics2D)
     IMPLEMENTS_INTERFACE(iMacGraphics)
 IMPLEMENT_IBASE_END

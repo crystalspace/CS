@@ -154,6 +154,9 @@ public:
   inline bool Equal (int ixmin, int iymin, int ixmax, int iymax) const
   { return (xmin == ixmin) && (ymin == iymin) &&
            (xmax == ixmax) && (ymax == iymax); }
+  /// Same but compare with another csRect
+  inline bool Equal (csRect &other) const
+  { return Equal (other.xmin, other.ymin, other.xmax, other.ymax); }
 
   /// Normalize a rectangle such that xmin <= xmax and ymin <= ymax.
   inline void Normalize ()

@@ -30,8 +30,8 @@
 IMPLEMENT_FACTORY (csGraphics2DGGI)
 
 EXPORT_CLASS_TABLE (ggi2d)
-  EXPORT_CLASS (csGraphics2DGGI, "crystalspace.graphics2d.ggi",
-    "GGI 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DGGI, "crystalspace.graphics2d.ggi",
+    "GGI 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DGGI)

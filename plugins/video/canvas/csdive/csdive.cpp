@@ -47,8 +47,8 @@ inline void memsetd (void *dest, unsigned int value, size_t count)
 IMPLEMENT_FACTORY (csGraphics2DOS2DIVE)
 
 EXPORT_CLASS_TABLE (csdive)
-  EXPORT_CLASS (csGraphics2DOS2DIVE, "crystalspace.graphics2d.dive",
-    "OS/2 DIVE 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DOS2DIVE, "crystalspace.graphics2d.dive",
+    "OS/2 DIVE 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DOS2DIVE)

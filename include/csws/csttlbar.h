@@ -33,11 +33,12 @@ public:
   /// Create title bar object
   csTitleBar (csComponent *iParent, char *iTitle);
 
-  /// Draw the title bar
-  virtual void Draw ();
-
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);
+
+  /// Get the name of the skip slice for this component
+  virtual char *GetSkinName ()
+  { return "Titlebar"; }
 };
 
 #endif // __CSTTLBAR_H__

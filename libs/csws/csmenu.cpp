@@ -67,7 +67,6 @@ csMenuItem::csMenuItem (csComponent *iParent, const char *iText,
   CommandCode = cscmdNothing;
   Insert (iSubMenu);
   parent->GetClipParent ()->InsertClipChild (iSubMenu);
-  iSubMenu->MenuStyle &= ~CSMS_HIDEINACTIVE;
   iSubMenu->Hide ();
   state |= CSS_SELECTABLE;
 }
@@ -145,10 +144,11 @@ void csMenuItem::SuggestSize (int &w, int &h)
 
   if (text && parent)
   {
-    w += TextWidth (text);
-    h += TextHeight ();
+    int fh, fw = GetTextSize (text, &fh);
+    w += fw;
+    h += fh;
     if (info)
-      w += MENUITEM_TABSPACE + TextWidth (info);
+      w += MENUITEM_TABSPACE + GetTextSize (info);
   } /* endif */
 
   // Leave a bit of space at left, right, top and bottom
@@ -344,7 +344,7 @@ void csMenuItem::Draw ()
     Text (MENUITEM_XSPACE, MENUITEM_YSPACE, txtcol, -1, text);
     DrawUnderline (MENUITEM_XSPACE, MENUITEM_YSPACE, text, underline_pos, txtcol);
     if (info)
-      Text (bound.Width () - MENUITEM_XSPACE - TextWidth (info), MENUITEM_YSPACE,
+      Text (bound.Width () - MENUITEM_XSPACE - GetTextSize (info), MENUITEM_YSPACE,
         txtcol, -1, info);
   } /* endif */
 

@@ -27,8 +27,8 @@
 IMPLEMENT_FACTORY (csGraphics2DBeGlide)
 
 EXPORT_CLASS_TABLE (glidebe2d)
-  EXPORT_CLASS (csGraphics2DBeGlide, "crystalspace.graphics2d.glide.be.2",
-    "Crystal Space Glide2 2D driver for BeOS")
+  EXPORT_CLASS_DEP (csGraphics2DBeGlide, "crystalspace.graphics2d.glide.be.2",
+    "Crystal Space Glide2 2D driver for BeOS", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DBeGlide)

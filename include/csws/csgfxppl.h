@@ -61,7 +61,7 @@ struct iSystem;
  * have access to its internals, all graphics pipeline management is done
  * through main application object.
  */
-class csGraphicsPipeline : public csBase
+class csGraphicsPipeline
 {
 private:
   /// Only csApp can manipulate the graphics pipeline
@@ -85,8 +85,6 @@ private:
   csRect ClipRect;
   /// The original clipping rectangle (set by user manually)
   csRect OrigClip;
-  /// The original font set by user (before drawing with CSWS)
-  int OrigFont, OrigFontSize;
 
   // Frame width and height
   int FrameWidth, FrameHeight;
@@ -100,8 +98,8 @@ private:
   bool DontCacheFrame;
   
   /// Initialize pipeline
-  csGraphicsPipeline (iSystem *System);
-  /// Deinitialize pipeline
+  void Initialize (iSystem *System);
+  /// Finish graphics pipeline
   virtual ~csGraphicsPipeline ();
 
   /// Synchronise image on this page with previous pages
@@ -120,7 +118,7 @@ private:
   void Pixel (int x, int y, int color);
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void Text (int x, int y, int fg, int bg, int font, int fontsize, const char *s);
+  void Text (int x, int y, int fg, int bg, iFont *font, int fontsize, const char *s);
 
   /// Draw a pixmap
   void Pixmap (csPixmap *s2d, int x, int y, int w, int h);
@@ -162,12 +160,6 @@ private:
 
   /// Change system mouse cursor and return success status
   bool SwitchMouseCursor (csMouseCursorID Shape);
-
-  /// Return the width of given text using selected font and size
-  int TextWidth (const char *text, int Font, int FontSize);
-
-  /// Return the height of selected font and size
-  int TextHeight (int Font, int FontSize);
 
   /// Clear Z-buffer (takes effect before next 3D draw operation)
   void ClearZbuffer ()

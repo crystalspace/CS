@@ -27,8 +27,8 @@
 IMPLEMENT_FACTORY (csGraphics2DMGL)
 
 EXPORT_CLASS_TABLE (mgl2d)
-  EXPORT_CLASS (csGraphics2DMGL, "crystalspace.graphics2d.mgl",
-    "SciTech MGL 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DMGL, "crystalspace.graphics2d.mgl",
+    "SciTech MGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DMGL)

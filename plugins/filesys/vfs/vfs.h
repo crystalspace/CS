@@ -195,6 +195,14 @@ public:
   /// Query file size (without opening it)
   virtual bool GetFileSize (const char *FileName, size_t &oSize);
 
+  /**
+   * Query real-world path from given VFS path.
+   * This will work only for files that are stored on real filesystem,
+   * not in archive files. You should expect this function to return
+   * NULL in this case.
+   */
+  virtual iDataBuffer *GetRealPath (const char *FileName);
+
 private:
   /// Same as ExpandPath() but with less overhead
   char *_ExpandPath (const char *Path, bool IsDir = false) const;

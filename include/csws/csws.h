@@ -47,7 +47,7 @@
  *        |--[ csListBox ]		// list box control
  *        |--[ csNotebook ]		// notebook control
  *        |--[ csGrid ]			// grid control
- *        |--[ csSlider ]		// slider control
+ *        |--[ csSplitter ]		// splitter control
  *        |--[ csTreeCtrl ]		// tree control
  *        +--[ csLayout ]		// layout control
  *        |    |--[ csLayout2 ]	        // layout control 2
@@ -130,7 +130,7 @@ struct iEvent;
 #include "cstree.h"			// Tree control class
 #include "csnotebk.h"			// Notebook class
 #include "csgrid.h"			// Grid class
-#include "csslider.h"			// Slider class
+#include "cssplit.h"			// Splitter class
 #include "csdialog.h"			// User dialogs
 #include "cswindow.h"			// Window class
 #include "cswstex.h"			// Windowing System textures
@@ -144,6 +144,7 @@ struct iEvent;
 #include "csflwlay.h"                   // flow layout
 #include "csgrdlay.h"                   // grid layout
 #include "csbaglay.h"                   // gridbag layout
+#include "csstddlg.h"			// Default dialogs (file, color, ...)
 // Include all known skins here
 #include "sdefault.h"
 

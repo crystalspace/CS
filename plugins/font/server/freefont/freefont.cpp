@@ -23,385 +23,394 @@
 #include "csutil/csstrvec.h"
 #include "freefont.h"
 
-IMPLEMENT_IBASE (csFreeTypeServer)
-  IMPLEMENTS_INTERFACE (iFontServer)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
-
 IMPLEMENT_FACTORY (csFreeTypeServer)
 
 EXPORT_CLASS_TABLE (freefont)
   EXPORT_CLASS (csFreeTypeServer, "crystalspace.font.server.freetype", 
-		"CrystalSpace FreeType font server" )
+    "Crystal Space FreeType font server" )
 EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csFreeTypeServer)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iFontServer)
+IMPLEMENT_IBASE_END
 
 csFreeTypeServer::csFreeTypeServer (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
-  bInit = false;
+  ftini = NULL;
+  VFS = NULL;
 }
 
 csFreeTypeServer::~csFreeTypeServer ()
 {
-  // drop all fonts
-  int i;
-  for (i = 0; i < fonts.Length (); i++)
-    delete fonts.Get (i);
-  if (pSystem) pSystem->DecRef ();
+  if (VFS) VFS->DecRef ();
+  if (ftini) ftini->DecRef ();
+  if (System) System->DecRef ();
 }
 
-bool csFreeTypeServer::Initialize (iSystem *pSystem)
+bool csFreeTypeServer::Initialize (iSystem *Sys)
 {
-  if (bInit)
-    return true;
+  (System = Sys)->IncRef ();
 
-  bool succ;
-  this->pSystem = pSystem;
-  pSystem->IncRef ();
-
-  succ = TT_Init_FreeType (&engine) == 0;
-  if (!succ)
-    pSystem->Printf (MSG_FATAL_ERROR, "Could not create a TrueType engine instance !\n");
-  else
+  if (TT_Init_FreeType (&engine))
   {
-    iVFS *v= QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
-    csIniFile *ftini = new csIniFile ( "config/freetype.cfg", v);
+    System->Printf (MSG_FATAL_ERROR, "Could not create a TrueType engine instance !\n");
+    return false;
+  }
+
+  VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  ftini = System->CreateConfig ("config/freetype.cfg");
+  if (ftini)
+  {
     defaultSize = ftini->GetInt ("Default", "size", 10);
     platformID = ftini->GetInt ("Default", "platformid", 3);
     encodingID = ftini->GetInt ("Default", "encodingid", 1);
 
-    iConfigDataIterator *pFonts;
-    const char *p = ftini->GetStr ("Default", "preload");
-	int i=0;
-    pFonts = ftini->EnumData (p);
+    fontset = ftini->GetStr ("Default", "fontset", NULL);
 
-    while (pFonts->Next ())
-    {
-      pSystem->Printf (MSG_INITIALIZATION, "Load font %s\n",pFonts->GetKey ());
-      LoadFont (pFonts->GetKey (), (const char*)pFonts->GetData ());
-	  i++;
-    }
-    succ = (i == 0 || fonts.Length () > 0 );
-    v->DecRef ();
-	pFonts->DecRef ();
-    delete ftini;
-  }
-
-  return (bInit = succ);
-}
-
-int csFreeTypeServer::LoadFont (const char* name, const char* filename)
-{
-  // first see if we already loaded that font
-  int key = fonts.FindKey (name, 1);
-  int fontid = -1;
-
-  if (key == -1)
-  {
-    // not yet loaded, so do it now
-    FT *font = new FT (name, -1);
-    font->current = 0;
-    int error = TT_Open_Face (engine, filename, &font->face);
-    if (error)
-      pSystem->Printf (MSG_WARNING, "Font %s could not be loaded from file %s!\n", name, filename);
-    else
-    {
-      error = TT_Get_Face_Properties (font->face, &font->prop);
-      if (error)
-      {
-	pSystem->Printf(MSG_WARNING, "Get_Face_Properties: error %d.\n", error );
-	delete font;
-	return -1;
-      }
-      error = TT_New_Instance (font->face, &font->instance);
-      if (error)
-	pSystem->Printf(MSG_WARNING, "Could not create an instance of Font %s."
-			" The font is probably broken!\n", name, filename);
-      else
-      {
-	// we do not change the default values of the new instance ( 96 dpi, 10 pt. size, no trafo flags )
-	
-	// next we scan the charmap table if there is an encoding that matches the requested platform and
-	// encoding ids
-	TT_UShort i = 0;
-	font->pID = platformID - 1;
-	font->eID = encodingID - 1;
-	while (i < font->prop.num_CharMaps
-            && platformID != font->pID
-            && encodingID != font->eID)
-        {
-	  error = TT_Get_CharMap_ID (font->face, i++, &font->pID, &font->eID);
-	  if (error) pSystem->Printf (MSG_WARNING, "Get_CharMap_ID: error %d.\n", error);
-	}
-
-	i--;
-
-	if (platformID != font->pID || encodingID != font->eID)
-        {
-	  // encoding scheme not found
-	  pSystem->Printf(MSG_INITIALIZATION, "Font %s does not contain encoding %d for platform %d.\n",
-            name, encodingID, platformID );
-	  
-	  error = TT_Get_CharMap_ID (font->face, 0, &font->pID, &font->eID);
-	  if (error) pSystem->Printf (MSG_WARNING, "Get_CahrMap_ID: error %d.\n", error );
-	  pSystem->Printf (MSG_INITIALIZATION, "Will instead use encoding %d for platform %d.\n", 
-            font->eID, font->pID);
-	  i = 0;
-	}
-	
-	// ok. now lets retrieve a handle the the charmap
-	error = TT_Get_CharMap (font->face, i, &font->charMap);
-	if (error) pSystem->Printf(MSG_WARNING, "Get_CharMap: error %d.\n", error );
-	
-	// now we create the bitmap of all glyphs in the face
-	if (CreateGlyphBitmaps (font, defaultSize))
-        {
-	  fontid = font->fontId = fonts.Length ();
-	  fonts.Push (font);
-	}
-      }
-    }
+    iConfigDataIterator *fontenum = ftini->EnumData (fontset);
+    while (fontenum->Next ())
+      if (fontenum->GetKey () [0] == '*')
+        LoadFont (fontenum->GetKey ());
+    fontenum->DecRef ();
   }
   else
-    fontid = fonts.Get (key)->fontId;
-  
-  return fontid;
+  {
+    defaultSize = 10;
+    platformID = 3;
+    encodingID = 1;
+    fontset = NULL;
+  }
+
+  return true;
 }
 
-bool csFreeTypeServer::CreateGlyphBitmaps (FT *font, int size)
+iFont *csFreeTypeServer::LoadFont (const char *filename)
 {
-  bool succ;
-  FTDef *fontdef = font->GetFontDef (size);
-  succ = fontdef != NULL;
-  if (!succ)
+  // First of all look for an alias in config file
+  if (ftini && fontset)
   {
-    int error = TT_Set_Instance_CharSize (font->instance, size * 64);
-    if (error)
+    const char *s = ftini->GetStr (fontset, filename, NULL);
+    if (s) filename = s;
+  }
+  // Okay, now convert the VFS path into a real path
+  iDataBuffer *db = VFS->GetRealPath (filename);
+  if (db) filename = (const char *)db->GetData ();
+
+  // see if we already loaded that font
+  int idx = fonts.FindKey (filename);
+  if (idx >= 0)
+  {
+    if (db) db->DecRef ();
+    csFreeTypeFont *font = fonts.Get (idx);
+    font->IncRef ();
+    return font;
+  }
+
+  // not yet loaded, so do it now
+  csFreeTypeFont *font = new csFreeTypeFont (filename);
+  if (db) db->DecRef ();
+  if (!font->Load (this))
+  {
+    delete font;
+    return NULL;
+  }
+  fonts.Put (font);
+  return font;
+}
+
+iFont *csFreeTypeServer::GetFont (int iIndex)
+{
+  if (iIndex >= 0 && iIndex < fonts.Length ())
+  {
+    csFreeTypeFont *font = fonts.Get (iIndex);
+    if (font) { font->IncRef (); return font; }
+  }
+  return NULL;
+}
+
+//--------------------------------------------// A FreeType font object //----//
+
+IMPLEMENT_IBASE (csFreeTypeFont)
+  IMPLEMENTS_INTERFACE (iFont)
+IMPLEMENT_IBASE_END
+
+csFreeTypeFont::csFreeTypeFont (const char *filename) : DeleteCallbacks (4, 4)
+{
+  CONSTRUCT_IBASE (NULL);
+  name = strnew (filename);
+  face.z = NULL;
+  current = NULL;
+}
+
+csFreeTypeFont::~csFreeTypeFont ()
+{
+  for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
+    ((DeleteNotify)DeleteCallbacks.Get (i)) (this, DeleteCallbacks.Get (i + 1));
+  if (face.z)
+    TT_Close_Face (face);
+}
+
+void csFreeTypeFont::SetSize (int iSize)
+{
+  CreateGlyphBitmaps (iSize);
+  current = FindGlyphSet (iSize);
+}
+
+int csFreeTypeFont::GetSize ()
+{
+  return current ? current->size : 0;
+}
+
+void csFreeTypeFont::GetMaxSize (int &oW, int &oH)
+{
+  if (current)
+  {
+    oW = current->maxW;
+    oH = current->maxH;
+  }
+  else
+    oW = oH = 0;
+}
+
+bool csFreeTypeFont::GetGlyphSize (uint8 c, int &oW, int &oH)
+{
+  if (!current) return false;
+  oW = current->glyphs [c].w;
+  oH = current->glyphs [c].h;
+  return true;
+}
+
+uint8 *csFreeTypeFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
+{
+  if (!current) return NULL;
+  oW = current->glyphs [c].w;
+  oH = current->glyphs [c].h;
+  return current->glyphs [c].bitmap;
+}
+
+void csFreeTypeFont::GetDimensions (const char *text, int &oW, int &oH)
+{
+  if (!text || !current)
+  {
+    oW = oH = 0;
+    return;
+  }
+
+  oW = 0; oH = current->maxH;
+  while (*text)
+  {
+    oW += current->glyphs [*(const uint8 *)text].w;
+    text++;
+  }
+}
+
+int csFreeTypeFont::GetLength (const char *text, int maxwidth)
+{
+  if (!text || !current)
+    return 0;
+
+  int count = 0, w = 0;
+  while (*text)
+  {
+    w += current->glyphs [*(const uint8 *)text].w;
+    if (w > maxwidth)
+      break;
+    text++; count++;
+  }
+  return count;
+}
+
+bool csFreeTypeFont::Load (csFreeTypeServer *server)
+{
+  if (TT_Open_Face (server->engine, name, &face))
+  {
+    server->System->Printf (MSG_WARNING, "Font file %s could not be loaded!\n", name);
+    return false;
+  }
+
+  int error;
+  if ((error = TT_Get_Face_Properties (face, &prop)))
+  {
+    server->System->Printf(MSG_WARNING, "Get_Face_Properties: error %d.\n", error);
+    return false;
+  }
+
+  if ((error = TT_New_Instance (face, &instance)))
+  {
+    server->System->Printf(MSG_WARNING, "Could not create an instance of Font %s."
+      " The font is probably broken!\n", name);
+    return false;
+  }
+
+  // we do not change the default values of the new instance
+  // ( 96 dpi, 10 pt. size, no trafo flags )
+
+  // next we scan the charmap table if there is an encoding
+  // that matches the requested platform and encoding ids
+  TT_UShort i = 0;
+  while (i < prop.num_CharMaps)
+  {
+    if ((error = TT_Get_CharMap_ID (face, i, &pID, &eID)))
+      server->System->Printf (MSG_WARNING, "Get_CharMap_ID: error %d.\n", error);
+    if (server->platformID == pID && server->encodingID == eID)
+      break;
+    i++;
+  }
+
+  if (server->platformID != pID || server->encodingID != eID)
+  {
+    // encoding scheme not found
+    server->System->Printf(MSG_INITIALIZATION,
+      "Font %s does not contain encoding %d for platform %d.\n",
+      name, server->encodingID, server->platformID);
+
+    if ((error = TT_Get_CharMap_ID (face, 0, &pID, &eID)))
     {
-      pSystem->Printf(MSG_WARNING, "Set_Instance_CharSize: error %d.\n", error );
+      server->System->Printf (MSG_WARNING, "Get_CahrMap_ID: error %d.\n", error);
       return false;
     }
-    // first get the instance metrics
-    TT_Instance_Metrics im;
-    error = TT_Get_Instance_Metrics (font->instance, &im);
-    if (error)
-    {
-      pSystem->Printf (MSG_WARNING, "Get_Instance_Metrics: error %d.\n", error);
-      return false;
-    }
-    // does not exist, so we create it now
-    TT_UShort iso_char;
-    fontdef = new FTDef;
-    fontdef->size = size;
-    memset (fontdef->outlines, 0, 256*sizeof (CharDef) );
-    
-    // compute the maximum height a glyph from this font would have including linegap
-    int maxY;
-    int maxDesc;
-    int lineGap;
-    if (font->prop.os2->version == 0xffff)
-    {
-      maxDesc = -ABS (font->prop.horizontal->Descender);
-      lineGap = font->prop.horizontal->Line_Gap;
-      maxY= font->prop.horizontal->Ascender - maxDesc + lineGap;
-    }
-    else
-    {
-      lineGap = font->prop.os2->sTypoLineGap;
-      /// @@@ EVIL: i found that some fonts incorrectly define descends as positive 
-      /// numbers while they should be negative - so i force the numbers being negative
-      maxDesc = -ABS (font->prop.os2->sTypoDescender);
-      maxY = font->prop.os2->sTypoAscender - maxDesc + lineGap;
-    }
+    server->System->Printf (MSG_INITIALIZATION, "Will instead use encoding %d"
+      " for platform %d.\n", eID, pID);
+    i = 0;
+  }
 
-    lineGap = (lineGap * im.y_scale) / 0x10000;
-    maxDesc = (maxDesc * im.y_scale) / 0x10000;
-    maxY    = (maxY * im.y_scale) / 0x10000;
-
-    lineGap = lineGap / 64;
-    maxY    = (maxY + 32) / 64;
-
-    //    printf("* gap=%d desc=%d maxY=%d\n", lineGap, maxDesc/64, maxY);
-
-    for (iso_char = 0; iso_char < 256; iso_char++)
-    {
-      TT_Glyph glyph;
-      int error = TT_New_Glyph (font->face, &glyph);
-      if (error)
-      {
-	pSystem->Printf (MSG_WARNING, "Could not create glyph in font %s, error %d.\n", error, font->name);
-	continue;
-      }
-      TT_UShort glyphindex = TT_Char_Index (font->charMap, iso_char);
-      error = TT_Load_Glyph (font->instance, glyph, glyphindex, TTLOAD_DEFAULT);
-      if (!error)
-      {
-	// now we are going to render the glyphs outline into a bitmap
-	TT_Raster_Map bitmap;
-	TT_Big_Glyph_Metrics m;
-	CharDef *cd = &fontdef->outlines [iso_char];
+  // ok. now lets retrieve a handle the the charmap
+  if ((error = TT_Get_CharMap (face, i, &charMap)))
+  {
+    server->System->Printf (MSG_WARNING, "Get_CharMap: error %d.\n", error);
+    return false;
+  }
 	
-	// compute the extend
-	error = TT_Get_Glyph_Big_Metrics (glyph, &m);
-	if (error)
-          pSystem->Printf(MSG_WARNING, "Get_Glyph_Metrics: error %d.\n", error);
-	// grid fit ( numbers are 26.6 fixed point )
-	/*
-	m.bbox.xMin &= -64;
-	m.bbox.yMin &= -64;
-	m.bbox.xMax = (m.bbox.xMax+63) & -64;
-	m.bbox.yMax = (m.bbox.yMax+63) & -64;
-	*/
-	// prepare the bitmap
-	bitmap.rows  = maxY;
-	//	bitmap.width = (m.bbox.xMax - m.bbox.xMin)/64;
-	bitmap.width = MAX( m.horiAdvance, (m.horiBearingX + m.bbox.xMax - m.bbox.xMin)) / 64;
-	bitmap.cols  = (bitmap.width+7)/8;
-	bitmap.flow  = TT_Flow_Down;
-	bitmap.size  = bitmap.rows * bitmap.cols;
-
-	cd->Width = bitmap.width;
-	cd->Height = bitmap.rows;
-	cd->Bitmap = new unsigned char[bitmap.size];
-	
-	if (cd->Bitmap == NULL)
-	  pSystem->Printf (MSG_WARNING, "Could not allocate memory to render character %c (dec:%d)"
-			   " in font %s.\n", (char)iso_char, iso_char, font->name);
-	else
-        {
-	  bitmap.bitmap = cd->Bitmap;
-	  // zero out memory
-	  memset (bitmap.bitmap, 0, bitmap.size);
-	  // and finally render it into bitmap
-	  error = TT_Get_Glyph_Bitmap ( glyph, &bitmap, 0/*-m.bbox.xMin*/, -maxDesc);
-	  if (error) pSystem->Printf(MSG_WARNING, "Get_Outline_Bitmap: error %d.\n", error );
-	}
-	
-      }
-      else
-	pSystem->Printf (MSG_WARNING, "Could not load glyph for character %c (dec:%d) in"
-			 " font %s, error %d.\n", (char)iso_char, iso_char, font->name, error );
-      error = TT_Done_Glyph (glyph);
-      if (error) pSystem->Printf(MSG_WARNING, "Done_Glyph_: error %d.\n", error );
-    }
-    // our fontdescriptor is now filled
-    succ = true;
-    font->cache.Push (fontdef);
-  }
-  return succ;
+  // now we create the bitmap of all glyphs in the face
+  return CreateGlyphBitmaps (server->defaultSize);
 }
 
-bool csFreeTypeServer::SetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-  long &property, bool autoApply)
+bool csFreeTypeFont::CreateGlyphBitmaps (int size)
 {
-  (void)autoApply;
-  bool succ = false;
-  if (fontId >= 0 && fontId < fonts.Length ())
-  {
-    FT *font = fonts.Get (fontId);
-    if (propertyId == CS_FONTSIZE)
-    {
-      FTDef *fontdef = font->GetFontDef (property);
-      succ = (fontdef != NULL);
-      if (!succ)
-      {
-	// the size does not yet exist, so we create it
-	succ = CreateGlyphBitmaps (font, property);
-      }
-      if (succ)
-        font->current = MAX (0, font->GetFontIdx (property));
-    }
-    else
-      pSystem->Printf (MSG_WARNING, "Unknown fontproperty %d requested.\n", (long)propertyId);
-  }
-  else
-    pSystem->Printf (MSG_WARNING, "Unknown fontid %d requested, currently %d fonts are known.\n",
-      fontId, fonts.Length() );
-  return succ;
-}
-
-bool csFreeTypeServer::GetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property)
-{
-  bool succ = false;
-  if (fontId >= 0 && fontId < fonts.Length ())
-  {
-    FT *font = fonts.Get (fontId);
-    if (propertyId == CS_FONTSIZE)
-    {
-      succ = true;
-      property = font->cache.Get (font->current)->size;
-    }
-    else
-      pSystem->Printf (MSG_WARNING, "Unknown fontproperty %d requested.\n", (long)propertyId);
-  }
-  else
-    pSystem->Printf (MSG_WARNING, "Unknown fontid %d requested, currently %d fonts are known.\n",
-      fontId, fonts.Length() );  
-  return succ;
-}
-
-unsigned char* csFreeTypeServer::GetGlyphBitmap (int fontId, unsigned char c,
-  int &oW, int &oH)
-{
-  unsigned char *bm = NULL;
-  if (fontId >= 0 && fontId < fonts.Length ())
-  {
-    FT *font = fonts.Get (fontId);
-    FTDef *fontdef = font->cache.Get (font->current);
-    bm = fontdef->outlines [c].Bitmap;
-    oW = fontdef->outlines [c].Width;
-    oH = fontdef->outlines [c].Height;
-  }
-  else
-    pSystem->Printf (MSG_WARNING, "Unknown fontid %d requested, currently %d fonts are known.\n",
-      fontId, fonts.Length ());
-  return bm;
-}
-
-bool csFreeTypeServer::GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH)
-{
-  if (fontId >= 0 && fontId < fonts.Length ())
-  {
-    FT *font = fonts.Get (fontId);
-    FTDef *fontdef = font->cache.Get (font->current);
-    oW = fontdef->outlines [c].Width;
-    oH = fontdef->outlines [c].Height;
+  if (FindGlyphSet (size))
     return true;
-  }
-  pSystem->Printf (MSG_WARNING, "Unknown fontid %d requested, currently %d fonts are known.\n",
-    fontId, fonts.Length ());
-  return false;
-}
 
-int csFreeTypeServer::GetMaximumHeight (int fontId)
-{
-  // all chars have same height (?) so return any
-  if (fontId >= 0 && fontId < fonts.Length ())
-  {
-    FT *font = fonts.Get (fontId);
-    return font->cache.Get (font->current)->outlines ['T'].Height;
-  }
-  pSystem->Printf (MSG_WARNING, "Unknown fontid %d requested, currently %d fonts are known.\n",
-    fontId, fonts.Length ());
-  return 0;
-}
+  if (TT_Set_Instance_CharSize (instance, size * 64))
+    return false;
 
-void csFreeTypeServer::GetTextDimensions (int fontId, const char* text, int& width, int& height)
-{
-  width = height = 0;
-  if (fontId >= 0 && fontId < fonts.Length ())
+  // first get the instance metrics
+  TT_Instance_Metrics im;
+  if (TT_Get_Instance_Metrics (instance, &im))
+    return false;
+
+  // compute the maximum height a glyph from this font would have
+  // including linegap
+  int maxY;
+  int maxDesc;
+  int lineGap;
+  if (prop.os2->version == 0xffff)
   {
-    const char *p=text;
-    FT *font = fonts.Get (fontId);
-    FTDef *fontdef = font->cache.Get (font->current);
-    while (*p)
-    {
-      width += fontdef->outlines [*p].Width;
-      height = MAX (height, fontdef->outlines [*p].Height);
-      p++;
-    }
+    maxDesc = -ABS (prop.horizontal->Descender);
+    lineGap = prop.horizontal->Line_Gap;
+    maxY= prop.horizontal->Ascender - maxDesc + lineGap;
   }
   else
-    pSystem->Printf (MSG_WARNING, "Unknown fontid %d requested, currently %d fonts are known.\n",
-		     fontId, fonts.Length() );
+  {
+    lineGap = prop.os2->sTypoLineGap;
+    /// @@@ EVIL: i found that some fonts incorrectly define descends
+    // as positive numbers while they should be negative - so i force
+    // the numbers being negative
+    maxDesc = -ABS (prop.os2->sTypoDescender);
+    maxY = prop.os2->sTypoAscender - maxDesc + lineGap;
+  }
+
+  lineGap = (lineGap * im.y_scale) / 0x10000;
+  maxDesc = (maxDesc * im.y_scale) / 0x10000;
+  maxY    = (maxY * im.y_scale) / 0x10000;
+
+  lineGap = lineGap / 64;
+  maxY    = (maxY + 32) / 64;
+
+  // Create the glyphset
+  GlyphSet *glyphset;
+  glyphset = new GlyphSet;
+  glyphset->size = size;
+  glyphset->maxW = glyphset->maxH = 0;
+  memset (glyphset->glyphs, 0, sizeof (glyphset->glyphs));
+  cache.Push (glyphset);
+
+  for (TT_UShort iso_char = 0; iso_char < 256; iso_char++)
+  {
+    TT_Glyph glyph;
+    if ((TT_New_Glyph (face, &glyph)))
+      // The font does not contain required character, continue quietly
+      continue;
+
+    TT_UShort glyphindex = TT_Char_Index (charMap, iso_char);
+    if (TT_Load_Glyph (instance, glyph, glyphindex, TTLOAD_DEFAULT))
+      continue;
+
+    // now we are going to render the glyphs outline into a bitmap
+    TT_Raster_Map bitmap;
+    TT_Big_Glyph_Metrics m;
+    GlyphBitmap *glyphbitmap = &glyphset->glyphs [iso_char];
+
+    // compute the extend
+    if (TT_Get_Glyph_Big_Metrics (glyph, &m))
+      continue;
+
+    // grid fit ( numbers are 26.6 fixed point )
+    /*
+    m.bbox.xMin &= -64;
+    m.bbox.yMin &= -64;
+    m.bbox.xMax = (m.bbox.xMax+63) & -64;
+    m.bbox.yMax = (m.bbox.yMax+63) & -64;
+    */
+    // prepare the bitmap
+    bitmap.rows  = maxY;
+    // bitmap.width = (m.bbox.xMax - m.bbox.xMin)/64;
+    bitmap.width = MAX (m.horiAdvance,
+      (m.horiBearingX + m.bbox.xMax - m.bbox.xMin)) / 64;
+    bitmap.cols  = (bitmap.width + 7) / 8;
+    bitmap.flow  = TT_Flow_Down;
+    bitmap.size  = bitmap.rows * bitmap.cols;
+
+    glyphbitmap->w = bitmap.width;
+    glyphbitmap->h = bitmap.rows;
+    glyphbitmap->bitmap = new uint8 [bitmap.size];
+
+    if (!glyphbitmap->bitmap)
+      continue;
+
+    if (glyphset->maxW < glyphbitmap->w)
+      glyphset->maxW = glyphbitmap->w;
+    if (glyphset->maxH < glyphbitmap->h)
+      glyphset->maxH = glyphbitmap->h;
+
+    bitmap.bitmap = glyphbitmap->bitmap;
+    // zero out memory
+    memset (bitmap.bitmap, 0, bitmap.size);
+    // and finally render it into bitmap
+    TT_Get_Glyph_Bitmap (glyph, &bitmap, 0/*-m.bbox.xMin*/, -maxDesc);
+    TT_Done_Glyph (glyph);
+  }
+
+  current = glyphset;
+  return true;
+}
+
+void csFreeTypeFont::AddDeleteCallback (DeleteNotify func, void *databag)
+{
+  DeleteCallbacks.Push ((void *)func);
+  DeleteCallbacks.Push (databag);
+}
+
+bool csFreeTypeFont::RemoveDeleteCallback (DeleteNotify func, void *databag)
+{
+  for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
+    if ((DeleteCallbacks.Get (i) == (void *)func)
+     && (DeleteCallbacks.Get (i + 1) == databag))
+    {
+      DeleteCallbacks.Delete (i);
+      DeleteCallbacks.Delete (i);
+      return true;
+    }
+  return false;
 }

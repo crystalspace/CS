@@ -31,8 +31,8 @@ BITMAP *_cs_alleg2d;
 IMPLEMENT_FACTORY (csGraphics2DDOSAlleg)
 
 EXPORT_CLASS_TABLE (allegro)
-  EXPORT_CLASS (csGraphics2DDOSAlleg, "crystalspace.graphics2d.allegro",
-    "DOS/DJGPP Allegro 2D graphics driver for Crystal Space")
+  EXPORT_CLASSP_DEP (csGraphics2DDOSAlleg, "crystalspace.graphics2d.allegro",
+    "DOS/DJGPP Allegro 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DDOSAlleg)

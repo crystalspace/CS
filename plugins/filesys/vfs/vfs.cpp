@@ -234,8 +234,6 @@ public:
   bool AddRPath (const char *RealPath, const csVFS *Parent);
   // Remove a real-world path
   bool RemoveRPath (const char *RealPath);
-  // Get value of a variable
-  const char *GetValue (const csVFS *Parent, const char *VarName);
   // Find all files in a subpath
   void FindFiles (const char *Suffix, const char *Mask, iStrVector *FileList);
   // Find a file and return the appropiate csFile object
@@ -251,6 +249,10 @@ public:
   // Get file size
   bool GetFileSize (const char *Suffix, size_t &oSize);
 private:
+  // Get value of a variable
+  const char *GetValue (const csVFS *Parent, const char *VarName);
+  // Copy a string from src to dst and expand all variables
+  int Expand (const csVFS *Parent, char *dst, char *src, int size);
   // Find a file either on disk or in archive - in this node only
   bool FindFile (const char *Suffix, char *RealPath, csArchive *&) const;
 };
@@ -658,47 +660,7 @@ bool VfsNode::AddRPath (const char *RealPath, const csVFS *Parent)
 
       // Now parse and expand this path
       char rpath [MAXPATHLEN + 1];
-      char *dst = rpath;
-      while (*src && ((dst - rpath) < MAXPATHLEN))
-      {
-        // Is this a variable reference?
-        if (*src == '$')
-        {
-          // Parse the name of variable
-          src++;
-          char *var = src;
-          char one_letter_varname [2];
-          if (*src == '(')
-          {
-            // Parse until the end of variable, skipping pairs of '(' and ')'
-            int level = 1;
-            src++; var++;
-            while (level && *src)
-            {
-              if (*src == '(')
-                level++;
-              else if (*src == ')')
-                level--;
-              else
-                src++;
-            } /* endwhile */
-            *src++ = 0;
-          }
-          else
-          {
-            var = one_letter_varname;
-            var [0] = *src++;
-            var [1] = 0;
-          }
-
-          strcpy (dst, GetValue (Parent, var));
-          dst += strlen (dst);
-        } /* endif */
-        else
-          *dst++ = *src++;
-      } /* endif */
-      *dst = 0;
-
+      Expand (Parent, rpath, src, MAXPATHLEN);
       RPathV.Push (strnew (rpath));
       src = cur + 1;
     } /* endif */
@@ -726,6 +688,67 @@ bool VfsNode::RemoveRPath (const char *RealPath)
     } /* endif */
 
   return false;
+}
+
+int VfsNode::Expand (const csVFS *Parent, char *dst, char *src, int size)
+{
+  char *org = dst;
+  while (*src && ((dst - org) < size))
+  {
+    // Is this a variable reference?
+    if (*src == '$')
+    {
+      // Parse the name of variable
+      src++;
+      char *var = src;
+      char one_letter_varname [2];
+      if (*src == '(')
+      {
+        // Parse until the end of variable, skipping pairs of '(' and ')'
+        int level = 1;
+        src++; var++;
+        while (level && *src)
+        {
+          if (*src == '(')
+            level++;
+          else if (*src == ')')
+            level--;
+          else
+            src++;
+        } /* endwhile */
+        // Replace closing parenthesis with \0
+        *src++ = 0;
+      }
+      else
+      {
+        var = one_letter_varname;
+        var [0] = *src++;
+        var [1] = 0;
+      }
+
+      char *alternative = strchr (var, ':');
+      if (alternative)
+        *alternative++ = 0;
+      else
+        alternative = strchr (var, 0);
+
+      const char *value = GetValue (Parent, var);
+      if (!value)
+      {
+        if (*alternative)
+          dst += Expand (Parent, dst, alternative, size - (dst - org));
+      }
+      else
+      {
+        strcpy (dst, value);
+        dst = strchr (dst, 0);
+      }
+    } /* endif */
+    else
+      *dst++ = *src++;
+  } /* endif */
+  *dst = 0;
+  return dst - org;
 }
 
 const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
@@ -762,7 +785,7 @@ const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
   if (strcmp (VarName, "@") == 0) // Installation directory?
     return Parent->basedir;
 
-  return "";
+  return NULL;
 }
 
 void VfsNode::FindFiles (const char *Suffix, const char *Mask,
@@ -1620,4 +1643,28 @@ bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
 
   ArchiveCache->CheckUp ();
   return success;
+}
+
+iDataBuffer *csVFS::GetRealPath (const char *FileName)
+{
+  if (!FileName)
+    return NULL;
+
+  VfsNode *node;
+  char suffix [VFS_MAX_PATH_LEN + 1];
+  PreparePath (FileName, false, node, suffix, sizeof (suffix));
+  if (!node) return NULL;
+
+  char path [MAXPATHLEN + 1];
+  for (int i = 0; i < node->RPathV.Length (); i++)
+  {
+    const char *rpath = node->RPathV.Get (i);
+    strcat (strcpy (path, rpath), suffix);
+    if (!access (path, F_OK))
+      goto done;
+  }
+
+  strcat (strcpy (path, node->RPathV.Get (0)), suffix);
+done:
+  return new csDataBuffer (strnew (path), strlen (path) + 1);
 }

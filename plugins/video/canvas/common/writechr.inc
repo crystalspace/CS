@@ -28,9 +28,12 @@
     WR_PIXTYPE - The type of a pixel (UByte, UShort, ULong)
 */
 
-void csGraphics2D::WR_NAME (csGraphics2D *This, int x, int y, int fg, int bg,
-  const char *text)
+void csGraphics2D::WR_NAME (csGraphics2D *This, iFont *font, int x, int y,
+  int fg, int bg, const char *text)
 {
+  if (!font)
+    return;
+
   unsigned char c;
   int charW, charH;
 
@@ -39,8 +42,9 @@ void csGraphics2D::WR_NAME (csGraphics2D *This, int x, int y, int fg, int bg,
     if (x > This->ClipX2)
       return;
 
-    register unsigned char *CharImage = This->FontServer->GetGlyphBitmap (
-      This->Font, c, charW, charH);
+    register unsigned char *CharImage = font->GetGlyphBitmap (c, charW, charH);
+    if (!CharImage)
+      continue;
 
     // If character is completely outside the clipping rectangle, continue
     if ((x + charW <= This->ClipX1) || (x >= This->ClipX2)

@@ -35,8 +35,8 @@
 IMPLEMENT_FACTORY (csGraphics2DAA)
 
 EXPORT_CLASS_TABLE (asciiart)
-  EXPORT_CLASS (csGraphics2DAA, "crystalspace.graphics2d.asciiart",
-    "Ascii Art 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DAA, "crystalspace.graphics2d.asciiart",
+    "Ascii Art 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DAA)

@@ -88,7 +88,7 @@
 /// Sound renderer
 #define CS_FUNCID_SOUND		"SoundRender"
 /// Font server
-#define CS_FUNCID_FONT		"FontServer"
+#define CS_FUNCID_FONTSERVER	"FontServer"
 /// Network driver
 #define CS_FUNCID_NETDRV	"NetDriver"
 /// Network manager
@@ -136,6 +136,13 @@
  */
 #define LOAD_PLUGIN(Object,ClassID,FuncID,Interface)			\
   (Interface *)(Object)->LoadPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
+
+/**
+ * Same as LOAD_PLUGIN but don't bother asking for a interface.
+ * This is useful for unconditionally loading plugins.
+ */
+#define _LOAD_PLUGIN(Object,ClassID,FuncID)				\
+  (Object)->LoadPlugIn (ClassID, FuncID, NULL, 0)
 
 struct iPlugIn;
 struct iVFS;

@@ -787,5 +787,5 @@ bool csIniFile::GetYesNo (const char *iSection, const char *iKey,
   const char *s = GetStr (iSection, iKey, NULL);
   if (!s)
     return def;
-  return !strcasecmp(s,"yes") || !strcasecmp(s,"true") || !strcasecmp(s,"on");
+  return !strcasecmp (s,"yes") || !strcasecmp (s,"true") || !strcasecmp (s,"on");
 }

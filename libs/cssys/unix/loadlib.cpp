@@ -51,7 +51,7 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
 
 csLibraryHandle csLoadLibrary (const char* iName)
 {
-  csLibraryHandle Handle = dlopen (iName, DLOPEN_MODE);
+  csLibraryHandle Handle = access (iName, F_OK) ? NULL : dlopen (iName, DLOPEN_MODE);
   return Handle;
 }
 

@@ -29,8 +29,8 @@
 IMPLEMENT_FACTORY (csGraphics2DXLib)
 
 EXPORT_CLASS_TABLE (x2d)
-  EXPORT_CLASS (csGraphics2DXLib, "crystalspace.graphics2d.x2d",
-    "X-Windows 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DXLib, "crystalspace.graphics2d.x2d",
+    "X-Windows 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DXLib)
@@ -342,7 +342,6 @@ bool csGraphics2DXLib::Open(const char *Title)
   wm_hints.window_group = leader_window;
   wm_hints.initial_state = NormalState;
   XSetWMHints (dpy, wm_window, &wm_hints);
-//    XSetWMHints (dpy, window, &wm_hints);
 
   Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
   XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32,
@@ -414,9 +413,8 @@ bool csGraphics2DXLib::Open(const char *Title)
   }
   Clear (0);
 
-  if (FullScreen) {
-    EnterFullScreen();
-  }
+  if (FullScreen)
+    EnterFullScreen ();
 
   return true;
 }
@@ -1278,8 +1276,6 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
           case XK_End:        key = CSKEY_END; break;
           case XK_Escape:     key = CSKEY_ESC; break;
           case XK_Tab:        key = CSKEY_TAB; break;
-	  case XK_KP_Enter:
-          case XK_Return:     key = CSKEY_ENTER; break;
           case XK_F1:         key = CSKEY_F1; break;
           case XK_F2:         key = CSKEY_F2; break;
           case XK_F3:         key = CSKEY_F3; break;
@@ -1292,9 +1288,16 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
+	  case XK_KP_Enter:
+          case XK_Return:     if (down && event.xkey.state & Mod1Mask)
+                                PerformExtension ("fullscreen"), key = 0;
+                              else
+                                key = CSKEY_ENTER;
+                              break;
           default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
-	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
+        if (key)
+          EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
         break;
       case FocusIn:
       case FocusOut:

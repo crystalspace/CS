@@ -31,11 +31,10 @@ IMPLEMENT_IBASE_END
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   csGraphics2D (),
-  LocalFontServer (NULL)
+  FontCache (NULL)
 {
   CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
-  is_double_buffered = true;
 }
 
 bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
@@ -73,6 +72,10 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 
 bool csGraphics2DGLCommon::Open (const char *Title)
 {
+  // initialize font cache object
+  if (!FontCache)
+    FontCache = new GLFontCache (FontServer);
+
   if (!csGraphics2D::Open (Title))
     return false;
 
@@ -94,24 +97,14 @@ bool csGraphics2DGLCommon::Open (const char *Title)
   glViewport (0, 0, Width, Height);
   Clear (0);
 
-  // load font 'server'
-  if (LocalFontServer == NULL)
-  {
-    int nFonts = FontServer->GetFontCount ();
-    LocalFontServer = new csGraphics2DOpenGLFontServer (FontServer);
-    for (int fontindex = 0; fontindex < nFonts; fontindex++)
-      LocalFontServer->AddFont (fontindex);
-    LocalFontServer->SetClipRect (0, 0, Width, Height);
-  }
-
   return true;
 }
 
-void csGraphics2DGLCommon::Close(void)
+void csGraphics2DGLCommon::Close ()
 {
+  delete FontCache;
+  FontCache = NULL;
   csGraphics2D::Close ();
-  delete LocalFontServer;
-  LocalFontServer = NULL;
 }
 
 bool csGraphics2DGLCommon::BeginDraw ()
@@ -137,8 +130,7 @@ bool csGraphics2DGLCommon::BeginDraw ()
 void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
   csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
-  if (LocalFontServer)
-    LocalFontServer->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
+  FontCache->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
@@ -258,31 +250,26 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
     setGLColorfromint(color);
 
     glBegin (GL_POINTS);
-    glVertex2i (x, Height - y - 1);
+    glVertex2i (x, Height - y);
     glEnd ();
   }    
 }
 
-void csGraphics2DGLCommon::Write (int x, int y, int fg, int bg, const char *text)
+void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg, const char *text)
 {
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
 
   if (bg >= 0)
-    DrawBox (x, y, GetTextWidth (Font, text), GetTextHeight (Font), bg);
+  {
+    int fw, fh;
+    font->GetDimensions (text, fw, fh);
+    DrawBox (x, y, fw, fh, bg);
+  }
 
   setGLColorfromint (fg);
-  LocalFontServer->Write (x, Height - 1 - y, text, Font);
-}
-
-int csGraphics2DGLCommon::LoadFont(const char *Name, const char *File)
-{
-  int fontid = FontServer->LoadFont(Name, File);
-  if(fontid == -1) return -1;
-  /// also prepare font for rendering in an opengl friendly manner
-  LocalFontServer->AddFont(fontid);
-  return fontid;
+  FontCache->Write (font, x, Height - y, text);
 }
 
 // This variable is usually NULL except when doing a screen shot:
@@ -292,7 +279,7 @@ static UByte *screen_shot = NULL;
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
   return screen_shot ?
-    (screen_shot + pfmt.PixelBytes * ((Height - 1 - y) * Width + x)) : NULL;
+    (screen_shot + pfmt.PixelBytes * ((Height - y) * Width + x)) : NULL;
 }
 
 csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)

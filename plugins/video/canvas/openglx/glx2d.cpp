@@ -30,8 +30,8 @@
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 
 EXPORT_CLASS_TABLE (glx2d)
-  EXPORT_CLASS (csGraphics2DGLX, "crystalspace.graphics2d.glx",
-    "GL/X OpenGL 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DGLX, "crystalspace.graphics2d.glx",
+    "GL/X OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 #define DEF_OGLDISP "crystalspace.graphics2d.glx.disp.empty"
@@ -40,6 +40,9 @@ EXPORT_CLASS_TABLE_END
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
   csGraphics2DGLCommon (iParent), cmap (0), currently_full_screen(false)
 {
+  EmptyMouseCursor = 0;
+  memset (&MouseCursor, 0, sizeof (MouseCursor));
+  leader_window = window = 0;
 }
 
 bool csGraphics2DGLX::Initialize (iSystem *pSystem)
@@ -48,7 +51,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     return false;
 
   iConfigFile *config = pSystem->CreateConfig ("/config/opengl.cfg" );
-  
+
   dispdriver = NULL;
   const char *strDriver;
   if (config)
@@ -176,18 +179,14 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
     }
 
     // try to get visual with a depth buffer
-    int depthbuffer_attributes[] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None };
-    if (!glXChooseVisual(dpy,screen_num,depthbuffer_attributes) )
-    {
+    int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
+    if (!glXChooseVisual (dpy,screen_num,depthbuffer_attributes))
       CsPrintf(MSG_FATAL_ERROR,"Graphics display does not support a depth buffer\n");
-    }
-    if (is_double_buffered)
-    {
-      // try to get a visual with double buffering
-      int doublebuffer_attributes[] = {GLX_RGBA, GLX_DOUBLEBUFFER, None };
-      if (!glXChooseVisual(dpy,screen_num,doublebuffer_attributes) )
+
+    // try to get a visual with double buffering
+    int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
+    if (!glXChooseVisual (dpy,screen_num,doublebuffer_attributes))
 	CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
-    }
 
     return false;
   }
@@ -227,12 +226,9 @@ bool csGraphics2DGLX::Open(const char *Title)
     GLX_RED_SIZE, 4,
     GLX_BLUE_SIZE, 4,
     GLX_GREEN_SIZE, 4,
-    None,
+    GLX_DOUBLEBUFFER,
     None
   };
-
-  if (is_double_buffered)
-    desired_attributes [9] = GLX_DOUBLEBUFFER;
 
   if (!CreateContext (desired_attributes))
     return false;
@@ -251,9 +247,9 @@ bool csGraphics2DGLX::Open(const char *Title)
 	    active_GLVisual->visualid, Depth, 
 	    visual_class_name (active_GLVisual->c_class));
 
-  int ctype, frame_buffer_depth, double_buffer, size_depth_buffer, level;
+  int ctype, frame_buffer_depth, size_depth_buffer, level;
   glXGetConfig(dpy, active_GLVisual, GLX_RGBA, &ctype);
-  glXGetConfig(dpy, active_GLVisual, GLX_DOUBLEBUFFER, &double_buffer);
+//glXGetConfig(dpy, active_GLVisual, GLX_DOUBLEBUFFER, &double_buffer);
   glXGetConfig(dpy, active_GLVisual, GLX_BUFFER_SIZE, &frame_buffer_depth);
   glXGetConfig(dpy, active_GLVisual, GLX_DEPTH_SIZE, &size_depth_buffer);
   glXGetConfig(dpy, active_GLVisual, GLX_LEVEL, &level);
@@ -291,8 +287,7 @@ bool csGraphics2DGLX::Open(const char *Title)
 		pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
     }
   } 
-  CsPrintf (MSG_INITIALIZATION, "level %d, %s\n",
-	    level, double_buffer ? "double buffered," : "single buffered,");
+  CsPrintf (MSG_INITIALIZATION, "level %d, double buffered\n", level);
   CsPrintf (MSG_INITIALIZATION, "Depth buffer: %dbit\n", size_depth_buffer);
 
   pfmt.complete ();
@@ -340,13 +335,8 @@ bool csGraphics2DGLX::Open(const char *Title)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
   XSetWMProtocols (dpy, wm_window, &wm_delete_window, 1);
 
-  // Now communicate fully to the window manager our wishes using the non-mapped
-  // leader_window to form a window_group
-  XSizeHints normal_hints;
-  normal_hints.flags = PSize;
-  normal_hints.width = Width;
-  normal_hints.height = Height;
-  XSetWMNormalHints (dpy, window, &normal_hints);
+  // Allow window resizes
+  AllowCanvasResize (true);
 
   XWMHints wm_hints;
   wm_hints.flags = InputHint | StateHint | WindowGroupHint;
@@ -400,6 +390,11 @@ bool csGraphics2DGLX::Open(const char *Title)
       break;
   }
 
+  // Now disable window resizes.
+  // Note that if we do this before expose event, with some window managers
+  // (e.g. Window Maker) it will be unable to resize the window.
+  AllowCanvasResize (false);
+
   // this makes the context we created in Initialize() the current
   // context, so that all subsequent OpenGL calls will set state and
   // draw stuff on this context.  You could of couse make
@@ -419,7 +414,7 @@ bool csGraphics2DGLX::Open(const char *Title)
 
 void csGraphics2DGLX::Close(void)
 {
-  LeaveFullScreen();
+  LeaveFullScreen ();
 
   if (EmptyMouseCursor)
   {
@@ -427,13 +422,13 @@ void csGraphics2DGLX::Close(void)
     EmptyMouseCursor = 0;
     XFreePixmap (dpy, EmptyPixmap);
     EmptyPixmap = 0;
-  XSync (dpy, False);
+    XSync (dpy, False);
   }
   for (int i = sizeof (MouseCursor) / sizeof (Cursor) - 1; i >= 0; i--)
   {
     if (MouseCursor [i])
       XFreeCursor (dpy, MouseCursor [i]);
-  XSync (dpy, False);
+    XSync (dpy, False);
     MouseCursor [i] = None;
   }
   if ( dispdriver ){
@@ -529,10 +524,57 @@ bool csGraphics2DGLX::HandleEvent (iEvent &/*Event*/)
   int charcount;
   char charcode [8];
   bool down;
+  bool resize = false;
+  bool parent_resize = false;
+  int newWidth = 0;
+  int newHeight = 0;
 
   while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
     {
+      case ConfigureNotify:
+	if (event.xconfigure.window == wm_window)
+ 	{
+	  if (wm_width  != event.xconfigure.width ||
+	      wm_height != event.xconfigure.height)
+	  {
+	    wm_width  = event.xconfigure.width;
+	    wm_height = event.xconfigure.height;
+
+	    if (!currently_full_screen)
+	    {
+	      newWidth  = wm_width;
+	      newHeight = wm_height;
+	      parent_resize = true;
+	    }
+	  }
+	}
+#ifdef XFREE86VM
+	else if (event.xconfigure.window == fs_window)
+	{
+	  if (fs_width  != event.xconfigure.width ||
+	      fs_height != event.xconfigure.height)
+	  {
+	    fs_width  = event.xconfigure.width;
+	    fs_height = event.xconfigure.height;
+
+	    if (currently_full_screen)
+	    {
+	      newWidth  = fs_width;
+	      newHeight = fs_height;
+	      parent_resize = true;
+	    }
+	  }
+	}
+#endif
+	else if ((Width  != event.xconfigure.width) ||
+		 (Height != event.xconfigure.height))
+	{
+	  Width = event.xconfigure.width;
+	  Height = event.xconfigure.height;
+	  resize = true;
+	}
+	break;
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
@@ -606,8 +648,6 @@ bool csGraphics2DGLX::HandleEvent (iEvent &/*Event*/)
           case XK_End:        key = CSKEY_END; break;
           case XK_Escape:     key = CSKEY_ESC; break;
           case XK_Tab:        key = CSKEY_TAB; break;
-	  case XK_KP_Enter:
-          case XK_Return:     key = CSKEY_ENTER; break;
           case XK_F1:         key = CSKEY_F1; break;
           case XK_F2:         key = CSKEY_F2; break;
           case XK_F3:         key = CSKEY_F3; break;
@@ -620,26 +660,42 @@ bool csGraphics2DGLX::HandleEvent (iEvent &/*Event*/)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
+	  case XK_KP_Enter:
+          case XK_Return:     if (down && event.xkey.state & Mod1Mask)
+                                PerformExtension ("fullscreen"), key = 0;
+                              else
+                                key = CSKEY_ENTER;
+                              break;
           default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
-	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
+        if (key)
+          EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
         break;
       case FocusIn:
       case FocusOut:
         EventOutlet->Broadcast (cscmdFocusChanged, (void *)(event.type == FocusIn));
         break;
       case Expose:
-      {
-        csRect rect (event.xexpose.x, event.xexpose.y,
-                     event.xexpose.x + event.xexpose.width,
-                     event.xexpose.y + event.xexpose.height);
-        Print (&rect);
-	break;
-      }
+	if (!resize && !parent_resize)
+        {
+          csRect rect (event.xexpose.x, event.xexpose.y,
+                       event.xexpose.x + event.xexpose.width,
+                       event.xexpose.y + event.xexpose.height);
+          Print (&rect);
+          break;
+        }
       default:
         break;
     }
 
+  if (parent_resize)
+    XResizeWindow (dpy, window, newWidth, newHeight);
+
+  if (resize)
+  {
+    SetClipRect (0, 0, Width, Height);
+    EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
+  }
   return false;
 }
 
@@ -854,4 +910,29 @@ void csGraphics2DGLX::LeaveFullScreen()
     XSync (dpy, True);
   }
 #endif // XFREE86VM
+}
+
+void csGraphics2DGLX::AllowCanvasResize (bool iAllow)
+{
+  XSizeHints normal_hints;
+  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
+  normal_hints.width = Width;
+  normal_hints.height = Height;
+  normal_hints.width_inc = 2;
+  normal_hints.height_inc = 2;
+  if (iAllow)
+  {
+    normal_hints.min_width = 32;
+    normal_hints.min_height = 32;
+    normal_hints.max_width = display_width;
+    normal_hints.max_height = display_height;
+  }
+  else
+  {
+    normal_hints.min_width =
+    normal_hints.max_width = Width;
+    normal_hints.min_height =
+    normal_hints.max_height = Height;
+  }
+  XSetWMNormalHints (dpy, wm_window, &normal_hints);
 }

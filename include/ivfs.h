@@ -108,7 +108,7 @@ struct iFile : public iBase
 };
 
 
-SCF_VERSION (iVFS, 0, 0, 3);
+SCF_VERSION (iVFS, 0, 0, 4);
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -195,6 +195,14 @@ struct iVFS : public iPlugIn
 
   /// Query file size (without opening it)
   virtual bool GetFileSize (const char *FileName, size_t &oSize) = 0;
+
+  /**
+   * Query real-world path from given VFS path.
+   * This will work only for files that are stored on real filesystem,
+   * not in archive files. You should expect this function to return
+   * NULL in this case.
+   */
+  virtual iDataBuffer *GetRealPath (const char *FileName) = 0;
 };
 
 #endif // __IVFS_H__

@@ -24,6 +24,7 @@
 
 class csRect;
 struct iTextureManager;
+struct iFont;
 
 /// These constants are for use with the ScrollTo() member function below
 enum
@@ -90,10 +91,10 @@ struct iConsole : public iPlugIn
   /// Set transparency
   virtual void SetTransparency (bool iTransp) = 0;
 
-  /// Gets the ID of current font.
-  virtual int GetFontID () const = 0;
+  /// Gets the current font.
+  virtual iFont *GetFont () const = 0;
   /// Sets the type of the font.
-  virtual void SetFontID (int FontID) = 0;
+  virtual void SetFont (iFont *Font) = 0;
 
   /// Get the current top line being displayed
   virtual int GetTopLine () const = 0;

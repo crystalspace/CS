@@ -23,6 +23,9 @@
 #include "csws/cscomp.h"
 #include "csws/csapp.h"
 #include "csws/csskin.h"
+#include "csws/csbackgr.h"
+#include "csutil/scanstr.h"
+#include "icfgfile.h"
 
 //--//--//--//--//--//--//--//--//--//--//--// The skin repository class -//--//
 
@@ -54,6 +57,7 @@ void csSkin::Apply (csComponent *iComp)
 
 void csSkin::Initialize (csApp *iApp)
 {
+  app = iApp;
   for (int i = 0; i < count; i++)
     Get (i)->Initialize (iApp, this);
 }
@@ -62,6 +66,104 @@ void csSkin::Deinitialize ()
 {
   for (int i = 0; i < count; i++)
     Get (i)->Deinitialize ();
+  app = NULL;
+}
+
+const char *csSkin::GetConfigStr (const char *iSection, const char *iKey,
+  const char *iDefault)
+{
+  if (Prefix)
+  {
+    char temp [100];
+    strcat (strcat (strcpy (temp, Prefix), "::"), iSection);
+    if (app->Config->KeyExists (temp, iKey))
+      return app->Config->GetStr (temp, iKey, iDefault);
+  }
+  return app->Config->GetStr (iSection, iKey, iDefault);
+}
+
+bool csSkin::GetConfigYesNo (const char *iSection, const char *iKey,
+  bool iDefault)
+{
+  if (Prefix)
+  {
+    char temp [100];
+    strcat (strcat (strcpy (temp, Prefix), "::"), iSection);
+    if (app->Config->KeyExists (temp, iKey))
+      return app->Config->GetYesNo (temp, iKey, iDefault);
+  }
+  return app->Config->GetYesNo (iSection, iKey, iDefault);
+}
+
+bool csSkin::ReadGradient (const char *iText, csRGBcolor *color, int iNum)
+{
+  if (!iText)
+    return false;
+
+  int idx = 0;
+  while (idx < iNum)
+  {
+    char temp [100];
+    const char *end = strchr (iText, ':');
+    if (!end)
+      end = strchr (iText, 0);
+    memcpy (temp, iText, end - iText);
+    temp [end - iText] = 0;
+    iText = end + 1;
+    int r, g, b;
+    if (ScanStr (temp, "%d,%d,%d", &r, &g, &b) != 3)
+      return false;
+    color [idx++].Set (r, g, b);
+  }
+  return true;
+}
+
+void csSkin::Load (csBackground &oBack, const char *iSection, const char *iPrefix)
+{
+  oBack.Free ();
+
+  csRGBcolor colors [4];
+  char temp [100];
+  size_t sl = strlen (iPrefix);
+  memcpy (temp, iPrefix, sl);
+  strcpy (temp + sl, ".Texture");
+  const char *name = GetConfigStr (iSection, temp, NULL);
+  if (name)
+    oBack.SetTexture (app->GetTexture (name));
+
+  strcpy (temp + sl, ".Color");
+  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 1))
+  {
+    oBack.SetColor (0, colors [0]);
+    oBack.SetColor (1, colors [0]);
+    oBack.SetColor (2, colors [0]);
+    oBack.SetColor (3, colors [0]);
+    oBack.SetColor (app->FindColor (colors [0].red, colors [0].green, colors [0].blue));
+  }
+  strcpy (temp + sl, ".HGradient");
+  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 2))
+  {
+    oBack.SetColor (0, colors [0]);
+    oBack.SetColor (1, colors [1]);
+    oBack.SetColor (2, colors [1]);
+    oBack.SetColor (3, colors [0]);
+  }
+  strcpy (temp + sl, ".VGradient");
+  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 2))
+  {
+    oBack.SetColor (0, colors [0]);
+    oBack.SetColor (1, colors [0]);
+    oBack.SetColor (2, colors [1]);
+    oBack.SetColor (3, colors [1]);
+  }
+  strcpy (temp + sl, ".Gradient");
+  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 4))
+  {
+    oBack.SetColor (0, colors [0]);
+    oBack.SetColor (1, colors [1]);
+    oBack.SetColor (2, colors [2]);
+    oBack.SetColor (3, colors [3]);
+  }
 }
 
 //--//--//--//--//--//--//--//--//- Basic functionality for skin slices --//--//

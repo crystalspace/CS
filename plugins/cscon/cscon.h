@@ -86,9 +86,10 @@ public:
   { transparent = iTransp; }
 
   /// Gets the ID of current font.
-  virtual int GetFontID () const;
+  virtual iFont *GetFont () const
+  { return font; }
   /// Sets the type of the font.
-  virtual void SetFontID (int FontID);
+  virtual void SetFont (iFont *Font);
 
   /// Get the current top line being displayed
   virtual int GetTopLine () const;
@@ -161,7 +162,8 @@ protected:
   iGraphics3D *G3D;
   iSystem *System;
   csRect size, invalid;
-  int font, cursor, cx, cy;
+  int cursor, cx, cy;
+  iFont *font;
   cs_time flash_time, flash_interval;
   bool cursor_visible;
   bool clear_input;

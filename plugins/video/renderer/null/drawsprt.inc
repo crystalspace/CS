@@ -32,8 +32,8 @@
 #if defined (DP_PIXFORM_INDEX8)
 #  define ALPHA_MIX(dst,src)						     \
   {									     \
-    uint s = PrivateCMap [src], d = GlobalCMap [dst];			     \
-    dst = inv_cmap [							     \
+    uint s = PrivateCMap [src], d = GlobalCMap [dst];        		     \
+    dst = inv_cmap [                                                         \
           (((((s & 0x7c1f) * srcf) + ((d & 0x7c1f) * dstf)) >> 5) & 0x7c1f)  \
         | (((((s & 0x03e0) * srcf) + ((d & 0x03e0) * dstf)) >> 5) & 0x03e0)];\
   }
@@ -184,6 +184,7 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
           for (int w = sw; w; w--)
           {
             ALPHA_MIX (*VRAM, data [tx >> 16]);
+            VRAM++;
             tx += dx;
           } /* endfor */
       } /* endfor */

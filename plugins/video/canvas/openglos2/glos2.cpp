@@ -40,8 +40,8 @@
 IMPLEMENT_FACTORY (csGraphics2DOS2GL)
 
 EXPORT_CLASS_TABLE (glos2)
-  EXPORT_CLASS (csGraphics2DOS2GL, "crystalspace.graphics2d.glos2",
-    "OS/2 OpenGL 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DOS2GL, "crystalspace.graphics2d.glos2",
+    "OS/2 OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 csGraphics2DOS2GL::csGraphics2DOS2GL (iBase *iParent) :

@@ -306,7 +306,7 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   NetProtocol = NULL;
   CmdManager = NULL;
   Sound = NULL;
-	MotionMan = NULL;
+  MotionMan = NULL;
 
   Console = NULL;
 
@@ -341,7 +341,7 @@ csSystemDriver::~csSystemDriver ()
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
   if (Config) Config->DecRef ();
-	if (MotionMan) MotionMan->DecRef();
+  if (MotionMan) MotionMan->DecRef();
 
   // Free all plugins
   PlugIns.DeleteAll ();
@@ -1068,20 +1068,19 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   if (idx < 0)
     return false;
 
-#define CHECK(Var,Interface)						\
-  {									\
-    iBase *itf = QUERY_INTERFACE (iObject, Interface);			\
-    if (itf) { if (itf == Var) { Var = NULL; itf->DecRef (); } itf->DecRef (); }\
-  }
+  csPlugIn *p = PlugIns.Get (idx);
 
-  CHECK (VFS, iVFS)
-  CHECK (G3D, iGraphics3D)
-  CHECK (G2D, iGraphics2D)
-  CHECK (Sound, iSoundRender)
-  CHECK (NetDrv, iNetworkDriver)
-  CHECK (NetMan, iNetworkManager)
-  CHECK (Auth, iAuth)    
-  CHECK (Console, iConsole)
+#define CHECK(Var,Func)						\
+  if (!strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
+
+  CHECK (VFS, CS_FUNCID_VFS)
+  CHECK (G3D, CS_FUNCID_VIDEO)
+  CHECK (G2D, CS_FUNCID_CANVAS)
+  CHECK (Sound, CS_FUNCID_SOUND)
+  CHECK (NetDrv, CS_FUNCID_NETDRV)
+  CHECK (NetMan, CS_FUNCID_NETMAN)
+  CHECK (Auth, CS_FUNCID_AUTH)
+  CHECK (Console, CS_FUNCID_CONSOLE)
 
 #undef CHECK
 

@@ -170,6 +170,7 @@ WalkTest::~WalkTest ()
 {
   if (ConsoleInput) ConsoleInput->DecRef ();
   if (collide_system) collide_system->DecRef ();
+  if (Font) Font->DecRef ();
   delete wf;
   delete [] auto_script;
   delete view;
@@ -553,7 +554,7 @@ void WalkTest::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
   vsprintf (buf, str, arg);
   va_end (arg);
 
-  G2D->Write (x, y, fg, bg, buf);
+  G2D->Write (Font, x, y, fg, bg, buf);
 }
 
 void WalkTest::DrawFrameConsole ()
@@ -587,9 +588,8 @@ void WalkTest::DrawFrameConsole ()
 	view->GetCamera ()->GetW2CTranslation ().y,
         view->GetCamera ()->GetW2CTranslation ().z,
 	view->GetCamera ()->GetSector()->GetName ());
-      Gfx2D->Write(FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
-      Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, fgcolor_stats,
-      	-1, buffer);
+      GfxWrite (FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
+      GfxWrite (FRAME_WIDTH-24*8, FRAME_HEIGHT-10, fgcolor_stats, -1, buffer);
     }
   }
 }
@@ -1168,6 +1168,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     Printf (MSG_FATAL_ERROR, "Error opening system!\n");
     return false;
   }
+
+  // Find the font we'll use
+  Font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Open the startup console
   start_console ();

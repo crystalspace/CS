@@ -90,8 +90,9 @@ void csTreeItem::SuggestSize (int &w, int &h)
 
   if (text && parent)
   {
-    w += TextWidth (text);
-    h += TextHeight ();
+    int fh, fw = GetTextSize (text, &fh);
+    w += fw;
+    h += fh;
   } /* endif */
 
   if (h < minh)
@@ -231,8 +232,9 @@ void csTreeItem::Draw ()
   } /* endif */
   if (text)
   {
-    Text (x, vOffset + (bound.Height () - TextHeight () + 1) / 2, color, -1, text);
-    x += TextWidth (text);
+    int fh, fw = GetTextSize (text, &fh);
+    Text (x, vOffset + (bound.Height () - fh + 1) / 2, color, -1, text);
+    x += fw;
   } /* endif */
 
   csComponent::Draw ();

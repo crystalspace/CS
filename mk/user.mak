@@ -115,20 +115,6 @@ DO_MMX=yes
 # Be warned, they are large (> 20MB)!
 DO_COREDUMP=no
 
-# Uncomment the following line(s) if you want to enable the memory debugger
-# that is built in.  This is only recommended for debugging purposes as it
-# makes Crystal Space a lot slower.  If you want more extensive memory
-# checking then you should also enable MEM_CHECK_EXTENSIVE.  In this mode CS
-# also keeps all allocated memory even after it has been freed and fills it
-# with some special value.  That way you can detect if memory is still being
-# used after it has been freed.  Define MEM_CHECK_FILL symbol so that newly
-# allocated memory will be filled with garbage to detect memory areas that are
-# used uninitialized (since most OSes fills allocated memory with zeros).
-
-MEM.memdebug=-DMEM_CHECK -DMEM_CHECK_FILL -DMEM_CHECK_EXTENSIVE
-
-MEM=$(MEM.$(MODE))
-
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
 # variable in environment to point to MesaGL base path. If Mesa is not
 # used then you can use OPENGL_PATH to point to the base of the OpenGL

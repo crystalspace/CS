@@ -1,8 +1,6 @@
 /*
-    Copyright (C) 2000 by Jerry A. Segler, Jr.
-    Based on csFont
-    Copyright (C) 2000 by Norman Kramer
-    original unplugged code and fonts by Andrew Zabolotny
+    Copyright (C) 2000 by Jerry A. Segler, Jr. Based on csFont
+    Major improvements by Andrew Zabolotny, <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,134 +23,69 @@
 #include "csutil/csvector.h"
 #include "fontplex.h"
 
-IMPLEMENT_IBASE (csDefaultFontManager)
+IMPLEMENT_IBASE (csFontServerMultiplexor)
   IMPLEMENTS_INTERFACE (iFontServer)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csDefaultFontManager)
+IMPLEMENT_FACTORY (csFontServerMultiplexor)
 
 EXPORT_CLASS_TABLE (fontplex)
-  EXPORT_CLASS (csDefaultFontManager, "crystalspace.font.manager", 
-		"Crystal Space font server multiplexor" )
+  EXPORT_CLASS_DEP (csFontServerMultiplexor, "crystalspace.font.server.multiplexor", 
+    "Crystal Space font server multiplexor", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
-csDefaultFontManager::csDefaultFontManager (iBase *pParent)
+csFontServerMultiplexor::csFontServerMultiplexor (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
 }
 
-bool csDefaultFontManager::Initialize (iSystem* SysDriver)
+csFontServerMultiplexor::~csFontServerMultiplexor ()
 {
-  FontList = new csVectorFonts();
-  FontServers = (iFontServer **) malloc(sizeof(iFontServer *) * 10);
-  FontServerCount=0;
+}
 
-  FontServers[FontServerCount] = LOAD_PLUGIN(SysDriver,"crystalspace.font.server.csfont","csfont",iFontServer);
-  if (FontServers[FontServerCount] != NULL) FontServerCount++;
-
-  FontServers[FontServerCount] = LOAD_PLUGIN(SysDriver,"crystalspace.font.server.freetype","freefont",iFontServer);
-  if (FontServers[FontServerCount] != NULL) FontServerCount++;
-
-  for(int i=0;i<FontServerCount;i++)
+bool csFontServerMultiplexor::Initialize (iSystem *System)
+{
+  // Query the auxiliary font servers in turn
+  char funcid [20];
+  for (int idx = 1; ; idx++)
   {
-    iFontServer * pServer = FontServers[i];
-    int j = pServer->GetFontCount();
-    for(int k=0;k<j;k++)
-    {
-      csManagedFontDef * font = new csManagedFontDef();
-      font->pFontServer = pServer;
-      font->FontID=k;
-      FontList->Push(font);
-    }
+    sprintf (funcid, "FontServer.%d", idx);
+    iFontServer *fs = QUERY_PLUGIN_ID (System, funcid, iFontServer);
+    if (!fs) break;
+    fontservers.Push (fs);
   }
-
+  if (!fontservers.Length ())
+    System->Printf (MSG_WARNING, "Font server multiplexor: WARNING, no slave font servers found!\n");
   return true;
 }
 
-csDefaultFontManager::~csDefaultFontManager()
+iFont *csFontServerMultiplexor::LoadFont (const char *filename)
 {
-  for(int i=0;i<FontServerCount;i++)
+  for (int i = 0; i < fontservers.Length (); i++)
   {
-    iFontServer * pServer = FontServers[i];
-    pServer->DecRef();
+    iFont *font = fontservers.Get (i)->LoadFont (filename);
+    if (font) return font;
   }
-  delete FontList;
-}
-
-int csDefaultFontManager::LoadFont (const char* name, const char* filename)
-{
-  for(int i=0;i<FontServerCount;i++)
-  {
-    iFontServer * pServer = FontServers[i];
-    int FontID = pServer->LoadFont(name,filename);
-    if (FontID != -1)
-    {
-      csManagedFontDef * font = new csManagedFontDef();
-      font->pFontServer = pServer;
-      font->FontID = FontID;
-      int fontI = FontList->Find(font);
-      if (fontI != -1)
-      {
-        delete font;
-        return fontI;
-      }
-      else
-      {
-        return FontList->Push(font);
-      }
-    }
-  }
-  return -1;
-}
-
-bool csDefaultFontManager::SetFontProperty (int fontId,
-  CS_FONTPROPERTY propertyId, long& property, bool autoApply)
-{
-  csManagedFontDef * font = (csManagedFontDef *) FontList->Get(fontId);
-  if (font != NULL)
-    return font->pFontServer->SetFontProperty(font->FontID,propertyId,property,autoApply);
-  return false;
-}
-
-bool csDefaultFontManager::GetFontProperty (int fontId,
-  CS_FONTPROPERTY propertyId, long& property)
-{
-  csManagedFontDef * font = (csManagedFontDef *) FontList->Get(fontId);
-  if (font != NULL)
-    return font->pFontServer->GetFontProperty(font->FontID,propertyId,property);
-  return false;
-}
-
-unsigned char *csDefaultFontManager::GetGlyphBitmap (int fontId, unsigned char c,
-  int &oW, int &oH)
-{ 
-  csManagedFontDef * font = (csManagedFontDef *) FontList->Get(fontId);
-  if (font != NULL)
-    return font->pFontServer->GetGlyphBitmap(font->FontID,c,oW,oH);
   return NULL;
 }
 
-bool csDefaultFontManager::GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH)
+int csFontServerMultiplexor::GetNumFonts ()
 {
-  csManagedFontDef * font = (csManagedFontDef *) FontList->Get(fontId);
-  if (font != NULL)
-    return font->pFontServer->GetGlyphSize(font->FontID,c,oW,oH);
-  return false;
+  int count = 0;
+  for (int i = 0; i < fontservers.Length (); i++)
+    count += fontservers.Get (i)->GetNumFonts ();
+  return count;
 }
 
-int csDefaultFontManager::GetMaximumHeight (int fontId)
+iFont *csFontServerMultiplexor::GetFont (int iIndex)
 {
-  csManagedFontDef * font = (csManagedFontDef *) FontList->Get(fontId);
-  if (font != NULL)
-    return font->pFontServer->GetMaximumHeight(font->FontID);
-  return -1;
-}
-
-void csDefaultFontManager::GetTextDimensions (int fontId, const char* text,
-  int& width, int& height)
-{
-  csManagedFontDef * font = (csManagedFontDef *) FontList->Get(fontId);
-  if (font != NULL)
-    font->pFontServer->GetTextDimensions(font->FontID,text,width,height);
+  for (int i = 0; i < fontservers.Length (); i++)
+  {
+    int count = fontservers.Get (i)->GetNumFonts ();
+    if (iIndex < count)
+      return fontservers.Get (iIndex)->GetFont (iIndex);
+    iIndex -= count;
+  }
+  return NULL;
 }

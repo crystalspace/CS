@@ -41,8 +41,8 @@ DirectDetectionDevice *DirectDevice;
 IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
 EXPORT_CLASS_TABLE (csddraw)
-  EXPORT_CLASS (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
-    "Crystal Space 2D DirectDraw driver")
+  EXPORT_CLASS_DEP (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
+    "Crystal Space 2D DirectDraw driver", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DDDraw3)

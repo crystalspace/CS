@@ -24,35 +24,51 @@
 enum
 {
   /**
-   * Sent to parent whenever the slider is moved.
+   * Sent to parent whenever the splitter is moved.
+   * <pre>
+   * IN: (csSplitter *)splitter
+   * </pre>
    */
-  cscmdSliderPosChanged = 0x00000d00,
+  cscmdSplitterPosChanged = 0x00000d00,
   /**
-   *
+   * Send to parent component when the splitter has finished
+   * its motion (e.g. the user releases the mouse button).
+   * <pre>
+   * IN: (csSplitter *)splitter
+   * </pre>
    */
-  cscmdSliderPosSet
+  cscmdSplitterPosSet
 };
 
 /**
- * This is a slider control that draws vertical and/or horizontal lines
- * in its parent canvas. Look at csGrid to see it in action.
+ * This is a splitter control that draws vertical and/or horizontal lines
+ * in its parent canvas. It is used to split some view into parts dynamically.
+ * Look at csGrid to see it in action.
  */
-class csSlider : public csComponent
+class csSplitter : public csComponent
 {
 protected:
+  /// True if it is currently sliding
   bool isSliding;
+  /// True if the splitter is horizontal
   bool isHorizontal;
-  int mx, my; // last mouse position
+  /// Mouse delta x and y (when user grabbed the splitter)
+  int mdx, mdy;
+  /// Current mouse position within slider
+  int mousex, mousey;
 
 public:
-  csButton *handle;
+  /// Create the splitter object
+  csSplitter (csComponent *pParent);
 
-  csSlider (csComponent *pParent);
-
+  /// Draw the splitter
   virtual void Draw ();
+  /// Handle events
   virtual bool HandleEvent (iEvent &Event);
+  /// Set splitter size/position
   bool SetRect (int xmin, int ymin, int xmax, int ymax);
-  void GetLastMousePos (int &x, int &y){ x = mx; y = my; }
+  /// Get the position of the splitter
+  void GetPos (int &x, int &y);
 };
 
 #endif // __CSSLIDER_H__

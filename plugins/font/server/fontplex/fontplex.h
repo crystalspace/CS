@@ -23,103 +23,66 @@
 #define __FONTPLEX_H__
 
 #include "ifontsrv.h"
-
-struct csManagedFontDef
-{
-  iFontServer * pFontServer;
-  int FontID;
-};
-
-class csVectorFonts : public csVector
-{
-public:
-  csVectorFonts () : csVector (16, 16) {}
-  virtual ~csVectorFonts () { DeleteAll (); }
-  virtual bool FreeItem (csSome Item)
-  { delete (csManagedFontDef *)Item; return true; }
-  virtual int CompareKey (csSome Item, csConstSome Key, int) const
-  { 
-    if ( ((csManagedFontDef *)Item)->pFontServer < ((csManagedFontDef *)Key)->pFontServer ) return -1;
-    if ( ((csManagedFontDef *)Item)->pFontServer > ((csManagedFontDef *)Key)->pFontServer ) return 1;
-    if ( ((csManagedFontDef *)Item)->FontID < ((csManagedFontDef *)Key)->FontID ) return -1;
-    if ( ((csManagedFontDef *)Item)->FontID > ((csManagedFontDef *)Key)->FontID ) return 1;
-    return 0;
-  }
-  virtual int Compare (csSome Item, csConstSome Key, int) const
-  { 
-    if ( ((csManagedFontDef *)Item)->pFontServer < ((csManagedFontDef *)Key)->pFontServer ) return -1;
-    if ( ((csManagedFontDef *)Item)->pFontServer > ((csManagedFontDef *)Key)->pFontServer ) return 1;
-    if ( ((csManagedFontDef *)Item)->FontID < ((csManagedFontDef *)Key)->FontID ) return -1;
-    if ( ((csManagedFontDef *)Item)->FontID > ((csManagedFontDef *)Key)->FontID ) return 1;
-    return 0;
-  }
-};
+#include "csutil/csvector.h"
 
 /**
- * Default font server.
+ * Font server multiplexor plug-in.
+ * This plug-in takes all the other font servers and hides them behind
+ * itself. Then when the application requests some font, all servers are
+ * queried in turn; the first one that is able to load the specified font
+ * wins. To use the plug-in you should assign the "FontServer" functionality
+ * identifier to this server, and "FontServer.1", "FontServer.2" and so on
+ * to auxiliary font servers. Example extract from config file:
+ * <code>
+ * [PlugIns]
+ * ...
+ * FontServer = crystalspace.font.server.multiplexor
+ * FontServer.1 = crystalspace.font.server.default
+ * FontServer.2 = crystalspace.font.server.freetype
+ * ...
+ * </code>
  */
-class csDefaultFontManager : public iFontServer
+class csFontServerMultiplexor : public iFontServer
 {
-  // The list of registered fonts
-  csVectorFonts * FontList;
-
-  iFontServer ** FontServers;
-  // Number of font servers
-  int FontServerCount;
+  class csFontServerVector : public csVector
+  {
+  public:
+    virtual ~csFontServerVector ()
+    { DeleteAll (); }
+    virtual bool FreeItem (csSome Item)
+    { ((iFontServer *)Item)->DecRef (); return true; }
+    iFontServer *Get (int idx)
+    { return (iFontServer *)csVector::Get (idx); }
+  } fontservers;
 
 public:
   DECLARE_IBASE;
 
   /// Create the plugin object
-  csDefaultFontManager (iBase *pParent);
+  csFontServerMultiplexor (iBase *pParent);
+  /// Destructor: nothing to do
+  virtual ~csFontServerMultiplexor ();
 
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
   /**
    * Load a font by name.
-   * Returns a font id by which the font can be referenced further.
-   * RETURN:
-   * -1 ... loading failed
-   * >=0 ... the font id
+   * Returns a new iFont object or NULL on failure.
    */
-  virtual int LoadFont (const char* name, const char* filename);
+  virtual iFont *LoadFont (const char *filename);
 
   /**
-   * Set font property.
-   * Return true if chage was successfull.  If not, the server returns false,
-   * decides whats the next best possible thing to this propertym, returns
-   * this new value in invalue and if wanted also applies this next best
-   * thing.
+   * Get number of loaded fonts.
    */
-  virtual bool SetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property, bool autoApply );
-
-  /// Get a font property. Returns true if the property could be retrieved.
-  virtual bool GetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
-    long& property);
+  virtual int GetNumFonts ();
 
   /**
-   * Return a pointer to a bitmap containing a rendered character (by current
-   * font).  NULL if error occured.
+   * Get Nth loaded font or NULL.
+   * You can query all loaded fonts with this method, by looping
+   * through all indices starting from 0 until you get NULL.
    */
-  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c, int &oW, int &oH);
-
-  /// Return character size in pixels. Returns false if values could not be determined.
-  virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH);
-
-  /// Get maximal font height
-  virtual int GetMaximumHeight (int fontId);
-
-  /// Return minimal boundings of text.
-  virtual void GetTextDimensions (int fontId, const char* text,
-    int& width, int& height);
-
-  /// Return font count.
-  virtual int GetFontCount ()
-  { return FontList->Length(); }
-
-  virtual ~csDefaultFontManager();
+  virtual iFont *GetFont (int iIndex);
 };
 
 #endif // __FONTPLEX_H__

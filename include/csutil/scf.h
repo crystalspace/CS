@@ -26,8 +26,33 @@
 
 */
 
+/**
+ * Macro for typing debug strings: Add #define SCF_DEBUG at the top
+ * of modules you want to track miscelaneous SCF activity and recompile.
+ */
+#ifdef SCF_DEBUG
+#  define SCF_TRACE(x)							\
+   {									\
+     printf ("SCF [%s:%d]:\n", __FILE__, __LINE__);			\
+     printf x; SCF_PRINT_CALL_ADDRESS					\
+   }
+#else
+#  define SCF_TRACE(x)
+#endif
+
+/**
+ * Macro for getting the address we were called from (stack backtracing).
+ * This works ONLY For GCC >= 2.8.0
+ */
+#if (__GNUC__ >= 2) && (__GNUC_MINOR__ >= 8)
+#  define SCF_PRINT_CALL_ADDRESS					\
+   printf ("  Called from address %p\n", __builtin_return_address (0));
+#else
+#  define SCF_PRINT_CALL_ADDRESS
+#endif
+
 /// Use this macro to construct interface version numbers.
-#define SCF_CONSTRUCT_VERSION(Major,Minor,Micro) \
+#define SCF_CONSTRUCT_VERSION(Major,Minor,Micro)			\
   ((Major << 24) | (Minor << 16) | Micro)
 
 /**
@@ -42,7 +67,7 @@
  * };
  * </pre>
  */
-#define SCF_VERSION(Name,Major,Minor,Micro) \
+#define SCF_VERSION(Name,Major,Minor,Micro)				\
   const int VERSION_##Name = SCF_CONSTRUCT_VERSION (Major, Minor, Micro)
 
 SCF_VERSION (iBase, 0, 0, 1);
@@ -117,6 +142,7 @@ public:									\
 #define IMPLEMENT_IBASE(Class)						\
 void Class::IncRef ()							\
 {									\
+  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
   if (scfParent)							\
     scfParent->IncRef ();						\
   scfRefCount++;							\
@@ -127,10 +153,17 @@ void Class::DecRef ()							\
   if (scfParent)							\
     scfParent->DecRef ();						\
   if (scfRefCount <= 0)							\
+  {									\
+    SCF_TRACE (("  delete (%s *)%p\n", #Class, this));			\
     delete this;							\
+  }									\
+  else									\
+    SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));\
 }									\
 void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
-{
+{									\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%s, %08X)\n",		\
+    #Class, this, iInterfaceID, iVersion));				\
 
 /**
  * IMPLEMENT_EMBEDDED_IBASE should be used to implement embedded
@@ -141,6 +174,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
 #define IMPLEMENT_EMBEDDED_IBASE(Class)					\
 void Class::IncRef ()							\
 {									\
+  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
   if (scfParent)							\
     scfParent->IncRef ();						\
   scfRefCount++;							\
@@ -150,9 +184,12 @@ void Class::DecRef ()							\
   scfRefCount--;							\
   if (scfParent)							\
     scfParent->DecRef ();						\
+  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));	\
 }									\
 void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
-{
+{									\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%s, %08X)\n",		\
+    #Class, this, iInterfaceID, iVersion));				\
 
 /**
  * This macro is used to finish a IMPLEMENT_IBASE definition
@@ -243,6 +280,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
 void *Create_##Class (iBase *iParent)					\
 {									\
   void *ret = new Class (iParent);					\
+  SCF_TRACE (("  %p = new %s ()\n", ret, #Class));			\
   return ret;								\
 }
 

@@ -87,7 +87,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
 }
 
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
-  csObject (), handle (NULL)
+  csObject (), iMaterialWrapper (), handle (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   (material = th.material)->IncRef ();

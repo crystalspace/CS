@@ -100,14 +100,13 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 /// GridView palette index
 #define CSPAL_GRIDVIEW  		13
 /// Slider palette index
-#define CSPAL_SLIDER		        14
+#define CSPAL_SPLITTER		        14
 /// Tree control item palette index
 #define CSPAL_TREEITEM		        15
 /// Tree control palette index
 #define CSPAL_TREECTRL		        16
-
-/// The last palette index, user palettes should go at CSPAL_LAST + 1, + 2, ...
-#define CSPAL_LAST			16
+/// Hine component palette index
+#define CSPAL_HINT			17
 
 /**
  * csApp class color palette indices.<p>
@@ -329,17 +328,17 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 /// Selected tree item background
 #define CSPAL_TREEITEM_SELECTION	1
 /// Thin rectangle around selected item
-#define CSPAL_TREEITEM_SELRECT	2
+#define CSPAL_TREEITEM_SELRECT		2
 /// Disabled text
 #define CSPAL_TREEITEM_DTEXT		3
 /// Unselected normal text
-#define CSPAL_TREEITEM_UNTEXT	4
+#define CSPAL_TREEITEM_UNTEXT		4
 /// Selected normal text
-#define CSPAL_TREEITEM_SNTEXT	5
+#define CSPAL_TREEITEM_SNTEXT		5
 /// Unselected emphasized text
-#define CSPAL_TREEITEM_UETEXT	6
+#define CSPAL_TREEITEM_UETEXT		6
 /// Selected emphasized text
-#define CSPAL_TREEITEM_SETEXT	7
+#define CSPAL_TREEITEM_SETEXT		7
 
 /**
  * csScrollBar class color palette indices.<p>
@@ -406,15 +405,34 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
  */
 #define CSPAL_GRIDVIEW_BACKGROUND	0
 /// 3D border dark
-#define CSPAL_GRIDVIEW_DARK3D	1
+#define CSPAL_GRIDVIEW_DARK3D		1
 /// 3D border light
-#define CSPAL_GRIDVIEW_LIGHT3D	2
+#define CSPAL_GRIDVIEW_LIGHT3D		2
 
 /**
- * csSlider class color palete indices.<p>
+ * csSplitter class color palete indices.<p>
  */
-#define CSPAL_SLIDER_BACKGROUND	0
-#define CSPAL_SLIDER_FILL	CSPAL_SLIDER_BACKGROUND
-#define CSPAL_SLIDER_ACTIVE_FILL	1
+/// Splitter inactive background
+#define CSPAL_SPLITTER_IBACKGROUND	0
+/// Splitter inactive light 3D color
+#define CSPAL_SPLITTER_ILIGHT3D		1
+/// Splitter inactive dark 3D color
+#define CSPAL_SPLITTER_IDARK3D		2
+/// Splitter active background
+#define CSPAL_SPLITTER_ABACKGROUND	3
+/// Splitter active light 3D color
+#define CSPAL_SPLITTER_ALIGHT3D		4
+/// Splitter active dark 3D color
+#define CSPAL_SPLITTER_ADARK3D		5
+
+/**
+ * csTip class color palete indices.<p>
+ */
+/// Background tip color
+#define CSPAL_HINT_BACKGROUND		0
+/// Tip text color
+#define CSPAL_HINT_TEXT			1
+/// Tip border
+#define CSPAL_HINT_BORDER        	2
 
 #endif // __CSWSPAL_H__

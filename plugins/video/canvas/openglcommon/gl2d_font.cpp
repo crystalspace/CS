@@ -33,34 +33,41 @@
 
 struct GLGlyph
 {
-  GLuint hTexture; // the texture where we find this character in
-  float x, y, width, texwidth; // location and size of the character
+  // the texture where we find this character in
+  GLuint hTexture;
+  // Glyph width - in pixels
+  int width;
+  // Glyph width - relative to texture width
+  float texwidth;
+  // location of the character
+  float x, y;
 };
 
-class GLFontInfo
+struct GLGlyphSet : public GLProtoGlyphSet
 {
-  friend class csGraphics2DOpenGLFontServer;
-  public:
+  // The height of every glyph - in 0..1 range (e.g. height / texture height)
+  float texheight;
+  // The glyphs
+  GLGlyph glyphs [256];
 
-    GLFontInfo (){}
-    ~GLFontInfo ();
-
-    GLGlyph glyphs[256];
-    float height, texheight;
-    bool one_texture;
+  // Constructor
+  GLGlyphSet (iFont *Font);
+  // The destructor
+  ~GLGlyphSet ();
 };
 
-/* MACOS driver do not currently support GL_ALPHA textures needed for
- * shaped text, so for that platform we have a hack that gives blocky
- * text.  This is superior to the other option which is NO text. -GJH 05-20-2000
- */
+GLGlyphSet::GLGlyphSet (iFont *Font)
+{
+  font = Font;
+  size = Font->GetSize ();
+}
 
-GLFontInfo::~GLFontInfo ()
+GLGlyphSet::~GLGlyphSet ()
 {
   GLuint hTex = glyphs [0].hTexture + 1;
   for (int i = 0; i < 256; i++)
   {
-    if (hTex != glyphs[i].hTexture)
+    if (hTex != glyphs [i].hTexture)
     {
       hTex = glyphs [i].hTexture;
       glDeleteTextures (1, &glyphs [i].hTexture);
@@ -68,49 +75,68 @@ GLFontInfo::~GLFontInfo ()
   }
 }
 
+//-----------------------------------------------------// GLGlyphVector //----//
 
-//--------------------------------------------------------------------------------
-//----------------------------------------------csGraphics2DOpenGLFontServer------
-//--------------------------------------------------------------------------------
+GLFontCache::GLGlyphVector::~GLGlyphVector ()
+{
+  DeleteAll ();
+}
 
-/* The constructor initializes it member variables and constructs the
- * first font, if one was passed into the constructor
- */
-csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer (iFontServer *pFS)
-  : FontCache (8, 8), FontServer (pFS)
+bool GLFontCache::GLGlyphVector::FreeItem (csSome Item)
+{
+  delete (GLGlyphSet *)Item;
+  return true;
+}
+
+//-------------------------------------------------------// GLFontCache //----//
+
+GLFontCache::GLFontCache (iFontServer *fs) : FontCache (8, 8)
+{
+  int i = 0;
+  iFont *font;
+  while ((font = fs->GetFont (i++)))
+    CacheFont (font);
+}
+
+GLFontCache::~GLFontCache ()
 {
 }
 
-csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer ()
+static void FontDeleteNotify (iFont *font, void *glyphset)
 {
-  // kill all the font data we have accumulated
-  for (int index = 0; index < FontCache.Length (); index++)
-    delete FontCache.Get (index);
+  GLFontCache *This = (GLFontCache *)glyphset;
+  This->CacheFree (font);
 }
 
-void csGraphics2DOpenGLFontServer::AddFont (int fontId)
+GLGlyphSet *GLFontCache::CacheFont (iFont *font)
 {
-  GLFontInfo *font = new GLFontInfo ();
-  FontCache.Push (font);
+  // See if we have any instances of this font in the cache
+  int i;
+  for (i = FontCache.Length () - 1; i >= 0; i--)
+    if (FontCache.Get (i)->font == font)
+      break;
+  if (i < 0)
+    // Tell the font to notify us when it is freed
+    font->AddDeleteCallback (FontDeleteNotify, this);
+
+  GLGlyphSet *gs = new GLGlyphSet (font);
+  FontCache.Push (gs);
 
   unsigned c;
-  float x, y;
-  int width, height;
-  int rows=1;
 
-  x = y = 256.0;
-
-  int maxheight;
-  font->height = maxheight = FontServer->GetMaximumHeight (fontId);
+  int maxwidth, maxheight;
+  font->GetMaxSize (maxwidth, maxheight);
   const int basetexturewidth = 256;
 
   // figure out how many charcter rows we need
   int texwidth = 0;
+  int rows = 1;
   for (c = 0; c < 256; c++)
   {
-    FontServer->GetGlyphSize (fontId, c, width, height);
+    int width, height;
+    font->GetGlyphSize (c, width, height);
     texwidth += width;
-    if (texwidth > 256)
+    if (texwidth > basetexturewidth)
     {
       rows++;
       texwidth = width;
@@ -118,57 +144,46 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   }
 
   int basetextureheight = FindNearestPowerOf2 (MIN (maxheight * rows, 256));
-  font->texheight = ((float)maxheight) / basetextureheight;
+  gs->texheight = float (maxheight) / basetextureheight;
 
-  int nTextures = 1 + rows / (256 / maxheight);
-  if (nTextures > 1)
-    font->one_texture = false;
-  else
-    font->one_texture = true;
+  int nTextures = (rows * maxheight + 255) / 256;
+  uint8 *fontbitmapdata, *characterbitmapbase;
 
-  int nCurrentTex = 0;
-  unsigned int basepixelsize = 1;
-  unsigned char *fontbitmapdata, *characterbitmapbase;
-  bool GlyphBitsNotByteAligned;
-  fontbitmapdata = new unsigned char [basetexturewidth * basetextureheight * basepixelsize];
-  memset (fontbitmapdata, 0, basetexturewidth * basetextureheight * basepixelsize);
+  const int fontbitmapsize = basetexturewidth * basetextureheight;
+  fontbitmapdata = new uint8 [fontbitmapsize];
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   // make new texture handles
   GLuint *nTexNames = new GLuint [nTextures];
   glGenTextures (nTextures, nTexNames);
 
+  int nCurrentTex = 0;
+  int x = 256, y = 256;
   for (c = 0; c < 256; c++)
   {
-    unsigned char *fontsourcebits = FontServer->GetGlyphBitmap (
-      fontId, c, width, height);
-    GlyphBitsNotByteAligned = width & 7;
+    int width, height;
+    uint8 *fontsourcebits = font->GetGlyphBitmap (c, width, height);
+    bool GlyphBitsNotByteAligned = width & 7;
 
     // calculate the start of this character
-    if (x + width > 256)
+    if (x + width > basetexturewidth)
     {
       x = 0;
       y += maxheight;
-      if (y + maxheight > 256)
+      if (y + maxheight > basetextureheight)
       {
         y = 0;
-	// if this is not the first handle we create, we hand over the data
-	// to opengl
-	if (c)
-	{
-#ifdef OS_MACOS
+        // if this is not the first handle we create, we hand over the data
+        // to opengl
+        if (c)
+        {
           glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
-			GL_LUMINANCE /* bytes-per-pixel */,
-                        basetexturewidth, basetextureheight, 0 /*border*/,
-                        GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
-#else
-          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
-			GL_ALPHA /* bytes-per-pixel */,
+                        GL_ALPHA /* bytes-per-pixel */,
                         basetexturewidth, basetextureheight, 0 /*border*/,
                         GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
-#endif
-	  nCurrentTex++;
+          nCurrentTex++;
         }
         // set up the texture info
+        memset (fontbitmapdata, 0, fontbitmapsize);
         glBindTexture (GL_TEXTURE_2D, nTexNames [nCurrentTex]);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -177,19 +192,18 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
       }
     }
 
-    characterbitmapbase = fontbitmapdata + ((int)y) * basetexturewidth *
-      basepixelsize + ((int)x) * basepixelsize;
+    characterbitmapbase = fontbitmapdata + y * basetexturewidth + x;
 
     // Construct a buffer of data for OpenGL. We must do some transformation
     // of the Crystal Space data:
-    // -use unsigned bytes instead of bits (GL_BITMAP not supported? GJH)
-    // -width and maxheight must be a power of 2
-    // -characters are laid out in a grid format, going across and
-    //  then down
+    // - use unsigned bytes instead of bits (GL_BITMAP not supported? GJH)
+    // - width and maxheight must be a power of 2
+    // - characters are laid out in a grid format, going across and
+    //   then down
 
     // grab bits from the source, and stuff them into the font bitmap
     // one at a time
-    unsigned char currentsourcebyte = *fontsourcebits;
+    uint8 currentsourcebyte = *fontsourcebits;
     for (int pixely = 0; pixely < maxheight; pixely++)
     {
       for (int pixelx = 0; pixelx < width; pixelx++)
@@ -204,35 +218,41 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
       if (GlyphBitsNotByteAligned)
         currentsourcebyte = *++fontsourcebits;
       // advance base bitmap pointer to the next row
-      if (pixely + 1 != maxheight)
-        characterbitmapbase += (basetexturewidth - width) *basepixelsize;
+      characterbitmapbase += basetexturewidth - width;
     }
-    font->glyphs [c].width = width;
-    font->glyphs [c].texwidth = ((float)width) / basetexturewidth ;
-    font->glyphs [c].x = x / basetexturewidth;
-    font->glyphs [c].y = y / basetextureheight;
-    font->glyphs [c].hTexture = nTexNames [nCurrentTex];
+    GLGlyph &glyph = gs->glyphs [c];
+    glyph.width = width;
+    glyph.texwidth = ((float)width) / basetexturewidth;
+    glyph.x = float (x) / basetexturewidth;
+    glyph.y = float (y) / basetextureheight;
+    glyph.hTexture = nTexNames [nCurrentTex];
 
     x += width;
   }
 
-#ifdef OS_MACOS
-  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
-		GL_LUMINANCE /* bytes-per-pixel */,
-                basetexturewidth, basetextureheight, 0 /*border*/,
-                GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
-#else
-  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
-		GL_ALPHA /* bytes-per-pixel */,
-                basetexturewidth, basetextureheight, 0 /*border*/,
-                GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
-#endif
+  if (x || y)
+    glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
+                  GL_ALPHA /* bytes-per-pixel */,
+                  basetexturewidth, basetextureheight, 0 /*border*/,
+                  GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
 
   delete [] nTexNames;
   delete [] fontbitmapdata;
+  return gs;
 }
 
-bool csGraphics2DOpenGLFontServer::ClipRect (float x, float y,
+void GLFontCache::CacheFree (iFont *font)
+{
+  for (int i = FontCache.Length () - 1; i >= 0; i--)
+  {
+    GLGlyphSet *gs = FontCache.Get (i);
+    if (gs->font == font)
+      FontCache.Delete (i);
+  }
+  font->RemoveDeleteCallback (FontDeleteNotify, this);
+}
+
+bool GLFontCache::ClipRect (float x, float y,
   float &x1, float &y1, float &x2, float &y2,
   float &tx1, float &ty1, float &tx2, float &ty2)
 {
@@ -261,61 +281,59 @@ bool csGraphics2DOpenGLFontServer::ClipRect (float x, float y,
 }
 
 // Rasterize string
-void csGraphics2DOpenGLFontServer::Write (int x, int y, const char *text, int Font)
+void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 {
   if (!text || !*text) return;
 
-  y = y - QInt (FontCache.Get (Font)->height) + 1;
+  int idx = FontCache.FindKey (font);
+  GLGlyphSet *gs = idx >= 0 ? FontCache.Get (idx) : CacheFont (font);
+  if (!gs) return;
+
+  int maxwidth, maxheight;
+  font->GetMaxSize (maxwidth, maxheight);
+
+  y = y - maxheight;
   if (y >= ClipY2) return;
 
-  GLGlyph *glyphs = FontCache.Get (Font)->glyphs;
-  GLuint hLastTexture = 0;
-  GLuint hTexture     = glyphs[*text].hTexture;
+  GLGlyph *glyphs = gs->glyphs;
+  GLuint hLastTexture = glyphs [*text].hTexture - 1;
 
-  glPushMatrix();
+  glPushMatrix ();
   glTranslatef (x, y, 0);
 
-  glEnable(GL_TEXTURE_2D);
-  glShadeModel(GL_FLAT);
+  glEnable (GL_TEXTURE_2D);
+  glShadeModel (GL_FLAT);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  // bind the texture containing this font
-  glBindTexture(GL_TEXTURE_2D, hTexture);
-
-#ifndef OS_MACOS
-  glEnable(GL_ALPHA_TEST);
-  glAlphaFunc (GL_EQUAL,1.0);
-#endif
+  glEnable (GL_ALPHA_TEST);
+  glAlphaFunc (GL_EQUAL, 1.0);
 
   glBegin (GL_QUADS);
 
   float tx1, tx2, ty1, ty2, x1, x2, y1, y2, x_right;
-  float maxheight = FontCache.Get (Font)->height;
-  float texheight = FontCache.Get (Font)->texheight;
-  bool bOneTexture = FontCache.Get (Font)->one_texture;
+  float texheight = gs->texheight;
 
   x1 = 0.0;
 
   for (; *text; ++text)
   {
-    x_right = x2 = x1 + glyphs[*text].width;
+    GLGlyph &glyph = glyphs [*text];
 
-    if (!bOneTexture)
+    x_right = x2 = x1 + glyph.width;
+
+    GLuint hTexture = glyph.hTexture;
+    if (hTexture != hLastTexture)
     {
-      hTexture = glyphs[*text].hTexture;
-      if (hTexture != hLastTexture)
-      {
-        hLastTexture = hTexture;
-        glBindTexture(GL_TEXTURE_2D, hTexture);
-      }
+      hLastTexture = hTexture;
+      glBindTexture (GL_TEXTURE_2D, hTexture);
     }
     // the texture coordinates must point to the correct character
     // the texture is a strip a wide as a single character and
     // as tall as 256 characters.  We must select a single
     // character from it
-    tx1 = glyphs[*text].x;
-    tx2 = tx1 + glyphs[*text].texwidth;
-    ty1 = glyphs[*text].y;
+    tx1 = glyph.x;
+    tx2 = tx1 + glyph.texwidth;
+    ty1 = glyph.y;
     ty2 = ty1 + texheight;
     y1 = 0.0;
     y2 = maxheight;
@@ -333,9 +351,7 @@ void csGraphics2DOpenGLFontServer::Write (int x, int y, const char *text, int Fo
 
   glEnd ();
 
-#ifndef OS_MACOS
-  glDisable(GL_ALPHA_TEST);
-#endif
+  glDisable (GL_ALPHA_TEST);
   glPopMatrix ();
 }
 

@@ -66,7 +66,7 @@ OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   $(CFLAGS.I)./plugins $(CFLAGS.I)./apps $(CFLAGS.I)./support
   
-CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE)) $(MEM)
+CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE))
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
 LIBS.EXE+=$(Z_LIBS)
 LIBS=$(LIBS.EXE)
@@ -142,7 +142,7 @@ dep: mkdep
       else
         MAKEDEP := makedep
       endif
-      DO.DEP1 = $(MAKEDEP) $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
+      DO.DEP1 = $(MAKEDEP) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
       DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\) -r -c -f $@
       DO.DEP = $(DO.DEP1) $(DO.DEP2)
     else

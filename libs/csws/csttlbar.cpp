@@ -29,39 +29,7 @@ csTitleBar::csTitleBar (csComponent *iParent, char *iText)
   text = new char [strlen (iText) + 1];
   strcpy (text, iText);
   SetPalette (CSPAL_TITLEBAR);
-}
-
-void csTitleBar::Draw ()
-{
-  int indx = parent->GetState (CSS_FOCUSED) ? CSPAL_TITLEBAR_ABACKGROUND :
-    CSPAL_TITLEBAR_PBACKGROUND;
-
-  // Draw the 3D frame around titlebar
-  Rect3D (0, 0, bound.Width (), bound.Height (), CSPAL_TITLEBAR_LIGHT3D,
-    CSPAL_TITLEBAR_DARK3D);
-
-  // Draw title bar background
-  Box (1, 1, bound.Width () - 1, bound.Height () - 1, indx);
-
-  // Draw title bar text
-  int tw = TextWidth (text);
-  int th = TextHeight ();
-  int tx = (bound.Width () - tw) / 2;
-  int ty = (bound.Height () - th) / 2;
-  Text (tx, ty, indx + 1, -1, text);
-
-  // Hash title bar (a-la Macintosh)
-  int bdy = bound.Height () / 4;
-  if ((bdy > 2) && (tx > 8 + bound.Height ()))
-    for (int by = 1 + bdy / 2; by < bound.Height () - 2; by += 4)
-    {
-      Line (8, by, tx - 7, by, indx + 2);
-      Line (8, by + 1, tx - 7, by + 1, indx + 3);
-      Line (tx + tw + 7, by, bound.Width () - 8, by, indx + 2);
-      Line (tx + tw + 7, by + 1, bound.Width () - 8, by + 1, indx + 3);
-    }
-
-  csComponent::Draw ();
+  ApplySkin (GetSkin ());
 }
 
 bool csTitleBar::HandleEvent (iEvent &Event)

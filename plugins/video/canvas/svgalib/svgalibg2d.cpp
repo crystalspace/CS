@@ -47,8 +47,8 @@ static unsigned short ScanCodeToChar[128] =
 IMPLEMENT_FACTORY (csGraphics2DSVGALib)
 
 EXPORT_CLASS_TABLE (svga2d)
-  EXPORT_CLASS (csGraphics2DSVGALib, "crystalspace.graphics2d.svgalib",
-    "SVGALib 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DSVGALib, "crystalspace.graphics2d.svgalib",
+    "SVGALib 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DSVGALib)

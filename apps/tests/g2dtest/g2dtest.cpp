@@ -29,6 +29,7 @@
 
 #include "ivfs.h"
 #include "igraph2d.h"
+#include "ifontsrv.h"
 
 #define APP_TITLE	"Graphics canvas plugin test"
 
@@ -66,14 +67,19 @@ class G2DTestSystemDriver : public SysSystemDriver
   int lastkey, lastkey2, lastkey3, lastkey4;
   // Switch backbuffer while waiting for a key
   bool SwitchBB;
+  // Current font
+  iFont *font;
 
 public:
   G2DTestSystemDriver ();
+  virtual ~G2DTestSystemDriver ();
   virtual bool CheckDrivers () { return true; }
   virtual void NextFrame ();
   virtual bool HandleEvent (iEvent &Event);
 
 private:
+  void SetFont (const char *fontID);
+
   void EnterState (appState newstate, int arg = 0);
   void LeaveState ();
 
@@ -100,8 +106,15 @@ G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
   state_sptr = 0;
   EnterState (stStartup);
   SwitchBB = false;
+  font = NULL;
 
   RequestPlugin ("crystalspace.kernel.vfs:VFS");
+}
+
+G2DTestSystemDriver::~G2DTestSystemDriver ()
+{
+  if (font)
+    font->DecRef ();
 }
 
 void G2DTestSystemDriver::EnterState (appState newstate, int arg)
@@ -273,30 +286,32 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdSystemOpen:
-        {
-          // Create a uniform palette: r(3)g(3)b(2)
-          int r,g,b;
-          for (r = 0; r < 8; r++)
-            for (g = 0; g < 8; g++)
-              for (b = 0; b < 4; b++)
-                G2D->SetRGB (r * 32 + g * 4 + b, r * 32, g * 32, b * 64);
+          if (G2D)
+          {
+            // Create a uniform palette: r(3)g(3)b(2)
+            int r,g,b;
+            for (r = 0; r < 8; r++)
+              for (g = 0; g < 8; g++)
+                for (b = 0; b < 4; b++)
+                  G2D->SetRGB (r * 32 + g * 4 + b, r * 32, g * 32, b * 64);
 
-          pfmt = *G2D->GetPixelFormat ();
-          white = MakeColor (255, 255, 255);
-          yellow = MakeColor (255, 255, 0);
-          green = MakeColor (0, 255, 0);
-          red = MakeColor (255, 0, 0);
-          blue = MakeColor (0, 0, 255);
-          gray = MakeColor (128, 128, 128);
-          dsteel = MakeColor (80, 100, 112);
-          black = 0;
-          break;
-        }
+            pfmt = *G2D->GetPixelFormat ();
+            white = MakeColor (255, 255, 255);
+            yellow = MakeColor (255, 255, 0);
+            green = MakeColor (0, 255, 0);
+            red = MakeColor (255, 0, 0);
+            blue = MakeColor (0, 0, 255);
+            gray = MakeColor (128, 128, 128);
+            dsteel = MakeColor (80, 100, 112);
+            black = 0;
+            break;
+          }
         case cscmdContextResize:
-        {
-          ResizeContext ();
-          break;
-        }
+          if (G2D)
+          {
+            ResizeContext ();
+            break;
+          }
       }
       break;
     case csevKeyDown:
@@ -334,6 +349,13 @@ int G2DTestSystemDriver::MakeColor (int r, int g, int b)
   return ((r >> 5) << 5) | ((g >> 5) << 2) | (b >> 6);
 }
 
+void G2DTestSystemDriver::SetFont (const char *iFontID)
+{
+  if (font) font->DecRef ();
+  iFontServer *fs = G2D->GetFontServer ();
+  font = fs->LoadFont (iFontID);
+}
+
 void G2DTestSystemDriver::WriteCentered (int mode, int dy, int fg, int bg,
   char *format, ...)
 {
@@ -344,8 +366,10 @@ void G2DTestSystemDriver::WriteCentered (int mode, int dy, int fg, int bg,
   vsprintf (text, format, arg);
   va_end (arg);
 
-  int fontid = G2D->GetFontID ();
-  int x = (G2D->GetWidth () - G2D->GetTextWidth (fontid, text)) / 2;
+  int fw, fh;
+  font->GetDimensions (text, fw, fh);
+
+  int x = (G2D->GetWidth () - fw) / 2;
   int y = 0;
 
   switch (mode)
@@ -357,30 +381,30 @@ void G2DTestSystemDriver::WriteCentered (int mode, int dy, int fg, int bg,
       y = dy;
       break;
     case 2: // from bottom
-      y = dy + (G2D->GetHeight () - 1 - G2D->GetTextHeight (fontid));
+      y = dy + (G2D->GetHeight () - 1 - fh);
       break;
   }
 
-  G2D->Write (x, y, fg, bg, text);
+  G2D->Write (font, x, y, fg, bg, text);
 }
 
 void G2DTestSystemDriver::DrawStartupScreen ()
 {
   G2D->DrawBox (20, 20, G2D->GetWidth () - 40, G2D->GetHeight () - 40, blue);
 
-  G2D->SetFontID (csFontItalic);
+  SetFont (CSFONT_ITALIC);
   WriteCentered (0, -20, white, -1, "WELCOME");
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,   0, white, -1, "to graphics canvas plugin");
   WriteCentered (0, +20, white, -1, "test application");
 
-  G2D->SetFontID (csFontCourier);
+  SetFont (CSFONT_COURIER);
   WriteCentered (2, 0, green, -1, "please wait five seconds");
 }
 
 void G2DTestSystemDriver::DrawContextInfoScreen ()
 {
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
 
   WriteCentered (0,-16*3, white, -1, "Some information about graphics context");
   WriteCentered (0,-16*2, gray,  -1, "Screen size: %d x %d", G2D->GetWidth (), G2D->GetHeight ());
@@ -403,13 +427,13 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
   G2D->GetClipRect (MinX, MinY, MaxX, MaxY);
   WriteCentered (0, 16*2, gray,  -1, "Current clipping rectangle: %d,%d - %d,%d", MinX, MinY, MaxX, MaxY);
 
-  G2D->SetFontID (csFontCourier);
+  SetFont (CSFONT_COURIER);
   WriteCentered (2, 0, green, -1, "press any key to continue");
 }
 
 void G2DTestSystemDriver::DrawWindowScreen ()
 {
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*4, white, -1, "If you're running in windowed mode, you should");
   WriteCentered (0,-16*3, white, -1, "see a black window with white and green letters.");
   WriteCentered (0,-16*2, white, -1, "The window's title should read:");
@@ -422,7 +446,7 @@ void G2DTestSystemDriver::DrawWindowScreen ()
   WriteCentered (0, 16*3, white, -1, "rescale along width window (e.g. the resolution");
   WriteCentered (0, 16*4, white, -1, "should remain constant).");
 
-  G2D->SetFontID (csFontCourier);
+  SetFont (CSFONT_COURIER);
   WriteCentered (2, 0, green, -1, "press any key to continue");
 }
 
@@ -432,14 +456,14 @@ void G2DTestSystemDriver::DrawWindowResizeScreen ()
 
   G2D->AllowCanvasResize (true);
   G2D->DrawBox (0, G2D->GetHeight () / 2 + 16, G2D->GetWidth (), 16 * 4, blue);
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
 
   WriteCentered (0, 16*1, white, -1, "Now resizing should be enabled. Try to resize the");
   WriteCentered (0, 16*2, white, -1, "window: you should be either unable to do it (if");
   WriteCentered (0, 16*3, white, -1, "canvas driver does not support resize) or see");
   WriteCentered (0, 16*4, white, -1, "the current window size in top-right corner.");
 
-  G2D->SetFontID (csFontCourier);
+  SetFont (CSFONT_COURIER);
   WriteCentered (2, 0, green, -1, "press any key to continue");
 }
 
@@ -453,9 +477,11 @@ void G2DTestSystemDriver::ResizeContext ()
 
   char text [50];
   sprintf (text, "Canvas [%d x %d]", G2D->GetWidth (), G2D->GetHeight ());
-  G2D->SetFontID (csFontPolice);
-  int x = G2D->GetWidth () - G2D->GetTextWidth (G2D->GetFontID (), text);
-  G2D->Write (x, 0, red, -1, text);
+  SetFont (CSFONT_LARGE);
+  int fw, fh;
+  font->GetDimensions (text, fw, fh);
+  int x = G2D->GetWidth () - fw;
+  G2D->Write (font, x, 0, red, -1, text);
 
   G2D->FinishDraw ();
   G2D->Print (NULL);
@@ -463,9 +489,9 @@ void G2DTestSystemDriver::ResizeContext ()
 
 void G2DTestSystemDriver::DrawBackBufferText ()
 {
-  G2D->SetFontID (csFontItalic);
+  SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*5, white, -1, "DOUBLE BACK BUFFER TEST");
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*3, gray,  -1, "Now graphics canvas is in double-backbuffer mode");
   WriteCentered (0,-16*2, gray,  -1, "You should see how background quickly switches");
   WriteCentered (0,-16*1, gray,  -1, "between yellow and red colors.");
@@ -501,9 +527,9 @@ void G2DTestSystemDriver::DrawBackBufferOFF ()
 
   G2D->Clear (black);
 
-  G2D->SetFontID (csFontItalic);
+  SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*3, white, -1, "SINGLE BACK BUFFER TEST");
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*1, gray,  -1, "Now graphics canvas is in single-backbuffer mode");
   WriteCentered (0, 16*0, gray,  -1, "You should not see any flickering now; if this text");
   WriteCentered (0, 16*1, gray,  -1, "flickers, this means that current canvas plugin has");
@@ -530,9 +556,9 @@ void G2DTestSystemDriver::DrawLineTest ()
 
 #else
 
-  G2D->SetFontID (csFontItalic);
+  SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*5, white, -1, "LINE DRAWING TEST");
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*3, gray,  -1, "At the top of the screen you should see a sinusoid,");
   WriteCentered (0,-16*2, gray,  -1, "each point on sinusoid should be connected with the");
   WriteCentered (0,-16*1, gray,  -1, "top-left corner of the canvas.");
@@ -582,7 +608,7 @@ void G2DTestSystemDriver::DrawLineTest ()
 
 void G2DTestSystemDriver::DrawLinePerf ()
 {
-  G2D->SetFontID (csFontItalic);
+  SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*4, white, -1, "LINE SLOPE AND PERFORMANCE TEST");
 
   int w2 = G2D->GetWidth () / 2;
@@ -602,7 +628,7 @@ void G2DTestSystemDriver::DrawLinePerf ()
   int sh = sy;
   G2D->DrawBox (sx, sy + 16, sw, sh - 16, dsteel);
 
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*2, gray,  -1, "Above this text you should see a uniformly hashed circle,");
   WriteCentered (0,-16*1, gray,  -1, "while below you should see some random lines, and the");
   WriteCentered (0, 16*0, gray,  -1, "measured line drawing performance in pixels per second.");
@@ -643,27 +669,28 @@ void G2DTestSystemDriver::DrawTextTest ()
     G2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
   }
 
-  G2D->SetFontID (csFontItalic);
+  SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*7, white, -1, "TEXT DRAWING TEST");
 
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*5,   blue,    -1, "This is blue text with transparent background");
   WriteCentered (0,-16*4,  green,  blue, "This is green text on blue background");
   WriteCentered (0,-16*3, yellow,  gray, "Yellow text on gray background");
   WriteCentered (0,-16*2,    red, black, "Red text on black background");
   WriteCentered (0,-16*1,  black, white, "Black text on white background");
 
-  G2D->SetFontID (csFontCourier);
+  SetFont (CSFONT_COURIER);
   int sx = 0, sy = h / 2 + 48, sw = w, sh = h / 2 - 48;
   G2D->DrawBox (sx, sy, sw, sh, dsteel);
   const char *text = "Crystal Space rulez";
-  int tw = G2D->GetTextWidth (G2D->GetFontID (), text);
+  int tw, th;
+  font->GetDimensions (text, tw, th);
   int cc = strlen (text);
 
   // Test text drawing performance for 1/4 seconds
   int colors [4] = { red, green, blue, yellow };
   sx += 20; sw -= 40 + tw;
-  sy += 10; sh -= 20 + G2D->GetTextHeight (G2D->GetFontID ());
+  sy += 10; sh -= 20 + th;
   csRandomGen rng (Time ());
   cs_time start_time = Time (), delta_time;
   int char_count = 0;
@@ -673,14 +700,14 @@ void G2DTestSystemDriver::DrawTextTest ()
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
-      G2D->Write (x, y, colors [rng.Get (4)], black, text);
+      G2D->Write (font, x, y, colors [rng.Get (4)], black, text);
       char_count += cc;
     }
     G2D->PerformExtension ("flush");
     delta_time = Time () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
 }
 
@@ -695,24 +722,25 @@ void G2DTestSystemDriver::DrawTextTest2 ()
     G2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
   }
 
-  G2D->SetFontID (csFontItalic);
+  SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*4, white, -1, "TEXT DRAWING TEST");
 
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*2,   gray, black, "This is a benchmark of text drawing");
   WriteCentered (0,-16*1,   gray, black, "with transparent background");
 
-  G2D->SetFontID (csFontCourier);
+  SetFont (CSFONT_COURIER);
   int sx = 0, sy = h / 2 + 48, sw = w, sh = h / 2 - 48;
   G2D->DrawBox (sx, sy, sw, sh, dsteel);
   const char *text = "Crystal Space rulez";
-  int tw = G2D->GetTextWidth (G2D->GetFontID (), text);
+  int tw,th;
+  font->GetDimensions (text, tw, th);
   int cc = strlen (text);
 
   // Test text drawing performance for 1/4 seconds
   int colors [4] = { red, green, blue, yellow };
   sx += 20; sw -= 40 + tw;
-  sy += 10; sh -= 20 + G2D->GetTextHeight (G2D->GetFontID ());
+  sy += 10; sh -= 20 + th;
   csRandomGen rng (Time ());
   cs_time start_time = Time (), delta_time;
   int char_count = 0;
@@ -722,20 +750,23 @@ void G2DTestSystemDriver::DrawTextTest2 ()
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
-      G2D->Write (x, y, colors [rng.Get (4)], -1, text);
+      G2D->Write (font, x, y, colors [rng.Get (4)], -1, text);
       char_count += cc;
     }
     G2D->PerformExtension ("flush");
     delta_time = Time () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
-  G2D->SetFontID (csFontPolice);
+  SetFont (CSFONT_LARGE);
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
 }
 
 int main (int argc, char **argv)
 {
   G2DTestSystemDriver System;
+
+  // Request the font server
+  System.RequestPlugin ("crystalspace.font.server.default:" CS_FUNCID_FONTSERVER);
 
   if (!System.Initialize (argc, argv, NULL))
   {
@@ -757,6 +788,12 @@ int main (int argc, char **argv)
       canvas = tmp;
     }
     System.G2D = LOAD_PLUGIN (&System, canvas, CS_FUNCID_CANVAS, iGraphics2D);
+  }
+
+  if (!System.G2D)
+  {
+    System.Printf (MSG_FATAL_ERROR, "Unable to load canvas driver!\n");
+    return -1;
   }
 
   if (!System.Open (APP_TITLE))

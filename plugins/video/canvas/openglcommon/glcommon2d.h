@@ -24,8 +24,9 @@
 #include "gl2d_font.h"
 #include "ievent.h"
 
-class OpenGLTextureCache;
 #define CsPrintf System->Printf
+class OpenGLTextureCache;
+class GLFontCache;
 
 /**
  * Basic OpenGL version of the 2D driver class
@@ -41,7 +42,7 @@ class OpenGLTextureCache;
 class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 {
   /// hold the CS fonts in an OpenGL-friendly format
-  csGraphics2DOpenGLFontServer *LocalFontServer;
+  GLFontCache *FontCache;
 
   /// Decompose a color ID into r,g,b components
   void DecomposeColor (int iColor, GLubyte &oR, GLubyte &oG, GLubyte &oB);
@@ -56,32 +57,28 @@ public:
 
   DECLARE_IBASE;
 
-  bool is_double_buffered;
-
   /// Constructor does little, most initialization stuff happens in Initialize()
   csGraphics2DGLCommon (iBase *iParent);
 
-  /// Destructor deletes LocalFontServer
+  /// Clear font cache etc
   virtual ~csGraphics2DGLCommon ();
 
-  /* You must supply all the functions not supplied here, such
-   * as SetMouseCursor etc.
-   * Note also that even though Initialize, Open, and Close are supplied here, 
-   * you must still override these functions for your own
-   * subclass to make system-specific calls for creating and showing
-   * windows, etc. */
+  /*
+   * You must supply all the functions not supplied here, such as
+   * SetMouseCursor etc. Note also that even though Initialize, Open,
+   * and Close are supplied here, you must still override these functions
+   * for your own subclass to make system-specific calls for creating and
+   * showing windows, etc.
+   */
 
   /// Initialize the plugin
   virtual bool Initialize (iSystem *pSystem);
 
-  /** initialize fonts, texture cache, prints renderer name and version.
-   *  you should still print out the 2D driver type (X, Win, etc.) in your
-   *  subclass code.  Note that the Open() method makes some OpenGL calls,
-   *  so your GL context should already be created and bound before
-   *  you call csGraphics2DGLCommon::Open()!  This means you
-   *  may or may not be calling this method at the beginning of your own
-   *  class Open(), since the GL context may not have been bound yet...
-   * check the GLX class for an example */
+  /**
+   * Initialize font cache, texture cache, prints renderer name and version.
+   * you should still print out the 2D driver type (X, Win, etc.) in your
+   * subclass code.
+   */
   virtual bool Open (const char *Title);
 
   virtual void Close ();
@@ -93,10 +90,16 @@ public:
   virtual bool BeginDraw ();
 
   virtual void SetClipRect (int xmin, int ymin, int xmax, int ymax);
-  // the remaining functions here do not need to be overridden when
-  // inheriting from this class
 
+  /*
+   * the remaining functions here do not need to be overridden when
+   * inheriting from this class
+   */
+
+  /// Clear the screen with color
   virtual void Clear (int color);
+
+  /// Set a palette entry
   virtual void SetRGB (int i, int r, int g, int b);
 
   /// Draw a line
@@ -105,19 +108,15 @@ public:
   virtual void DrawBox (int x, int y, int w, int h, int color);
   /// Draw a pixel
   virtual void DrawPixel (int x, int y, int color);
-
-  /// Write a text string into the back buffer
-  virtual void Write (int x, int y, int fg, int bg, const char *text);
-
-  /// Load a font
-  virtual int LoadFont(const char *Name, const char *File);
+  /// Write a text string
+  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *text);
 
   /**
    * Get address of video RAM at given x,y coordinates.
    * The OpenGL version of this function just returns NULL
    * if not doing a screenshot.
    */
-  virtual unsigned char* GetPixelAt (int x, int y);
+  virtual unsigned char *GetPixelAt (int x, int y);
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot ();
@@ -132,11 +131,13 @@ public:
   virtual void RestoreArea (csImageArea *Area, bool Free = true);
 
   /// Get the double buffer state
-  virtual bool GetDoubleBufferState () { return is_double_buffered; }
+  virtual bool GetDoubleBufferState ()
+  { return false; }
   /// Enable or disable double buffering; returns success status
-  virtual bool DoubleBuffer (bool Enable) 
-  { is_double_buffered = Enable; return true; }
+  virtual bool DoubleBuffer (bool Enable)
+  { return !Enable; }
 
+  /// Perform extension commands
   virtual bool PerformExtension (const char* iCommand, ...);
 
   //------------------------- iEventPlug interface ---------------------------//

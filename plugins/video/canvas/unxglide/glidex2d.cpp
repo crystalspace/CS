@@ -32,8 +32,8 @@
 IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
 EXPORT_CLASS_TABLE (glidx2d3)
-  EXPORT_CLASS (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.3",
-    "Glide V3/X 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.3",
+    "Glide V3/X 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 #else
@@ -41,8 +41,8 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
 EXPORT_CLASS_TABLE (glidx2d2)
-  EXPORT_CLASS (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.2",
-    "Glide V2/X 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.2",
+    "Glide V2/X 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 #endif

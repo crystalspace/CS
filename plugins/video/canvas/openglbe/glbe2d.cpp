@@ -26,8 +26,8 @@
 IMPLEMENT_FACTORY (csGraphics2DGLBe)
 
 EXPORT_CLASS_TABLE (glbe2d)
-  EXPORT_CLASS (csGraphics2DGLBe, "crystalspace.graphics2d.glbe",
-    "Crystal Space 2D driver for OpenGL using GL on BeOS")
+  EXPORT_CLASS_DEP (csGraphics2DGLBe, "crystalspace.graphics2d.glbe",
+    "Crystal Space 2D driver for OpenGL using GL on BeOS", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 csGraphics2DGLBe::csGraphics2DGLBe(iBase* p) :

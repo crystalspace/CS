@@ -82,8 +82,8 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
 EXPORT_CLASS_TABLE (glwin32)
-  EXPORT_CLASS (csGraphics2DOpenGL, "crystalspace.graphics2d.glwin32",
-    "Win32 OpenGL 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DOpenGL, "crystalspace.graphics2d.glwin32",
+    "Win32 OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
@@ -175,10 +175,8 @@ void CreateIdentityPalette(csRGBpixel *p)
 csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) : 
                    csGraphics2DGLCommon (iParent),
                    m_hWnd(NULL),
-                   m_bDisableDoubleBuffer(false),
                    m_bPaletteChanged(false),
                    m_bPalettized(false),
-                   m_nActivePage(0),
                    m_nGraphicsReady(true),
                    m_piWin32System(NULL)
 {
@@ -304,7 +302,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
 		wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   if( !m_hWnd )
-    sys_fatalerror("Cannot create CrystalSpace window", GetLastError());
+    sys_fatalerror("Cannot create Crystal Space window", GetLastError());
 
   ShowWindow( m_hWnd, m_nCmdShow );
   UpdateWindow( m_hWnd );
@@ -354,33 +352,10 @@ void csGraphics2DOpenGL::Close(void)
   csGraphics2D::Close ();
 }
 
-int csGraphics2DOpenGL::GetPage ()
-{
-  return m_nActivePage;
-}
-
-bool csGraphics2DOpenGL::DoubleBuffer (bool Enable)
-{
-  if (Enable)
-    m_bDisableDoubleBuffer = false;
-  else
-    m_bDisableDoubleBuffer = true;
-  return true;
-}
-
-bool csGraphics2DOpenGL::GetDoubleBufferState ()
-{
-  return m_bDisableDoubleBuffer;
-}
-
 void csGraphics2DOpenGL::Print (csRect* /*area*/)
 {
   SwapBuffers(hDC);
   glFlush();
-  if (m_nActivePage == 0)
-    m_nActivePage = 1;
-  else
-    m_nActivePage = 0;
 }
 
 HRESULT csGraphics2DOpenGL::SetColorPalette()

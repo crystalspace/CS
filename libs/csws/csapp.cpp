@@ -26,7 +26,6 @@
 #include "csutil/scanstr.h"
 #include "cssys/cseventq.h"
 #include "csws/cslistbx.h"
-#include "csws/csmouse.h"
 #include "csws/csmenu.h"
 #include "csws/cswindow.h"
 #include "csws/csdialog.h"
@@ -86,7 +85,7 @@ bool csApp::csAppPlugIn::HandleEvent (iEvent &Event)
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
 csApp::csApp (iSystem *System, csSkin &Skin)
-  : csComponent (NULL), scfiPlugIn (this)
+  : csComponent (NULL), Mouse (this), hints (this), scfiPlugIn (this)
 {
   app = this;			// so that all inserted windows will inherit it
   MouseOwner = NULL;		// no mouse owner
@@ -96,9 +95,8 @@ csApp::csApp (iSystem *System, csSkin &Skin)
   LoopLevel = 0;
   BackgroundStyle = csabsSolid;
   InsertMode = true;
-  SetFontSize (12);
-  GfxPpl = NULL;
   VFS = NULL;
+  DefaultFont = NULL;
   InFrame = false;
   (csApp::System = System)->IncRef ();
 
@@ -108,7 +106,6 @@ csApp::csApp (iSystem *System, csSkin &Skin)
   SetPalette (CSPAL_APP);
   state |= CSS_VISIBLE | CSS_SELECTABLE | CSS_FOCUSED;
 
-  Mouse = new csMouse (this);
   skin = &Skin;
 }
 
@@ -123,26 +120,32 @@ csApp::~csApp ()
   if (skin)
     skin->Deinitialize ();
 
-  delete Mouse;
-  delete GfxPpl;
-  if (VFS) VFS->DecRef ();
-  if (Config) Config->DecRef ();
+  if (VFS)
+    VFS->DecRef ();
+  if (Config)
+    Config->DecRef ();
+  if (DefaultFont)
+    DefaultFont->DecRef ();
+  if (FontServer)
+    FontServer->DecRef ();
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
   System->DecRef ();
+  // Set app to NULL so that ~csComponent() won't call NotifyDelete()
+  app = NULL;
 }
 
 bool csApp::Initialize (const char *iConfigName)
 {
-  if (!System->RegisterPlugIn ("crystalspace.windowing.application", "CSWS", &scfiPlugIn))
+  if (!System->RegisterPlugIn ("crystalspace.windowing.system", "CSWS", &scfiPlugIn))
     return false;
 
   // Create the graphics pipeline
-  GfxPpl = new csGraphicsPipeline (System);
+  GfxPpl.Initialize (System);
 
-  ScreenWidth = GfxPpl->G2D->GetWidth ();
-  ScreenHeight = GfxPpl->G2D->GetHeight ();
+  ScreenWidth = GfxPpl.G2D->GetWidth ();
+  ScreenHeight = GfxPpl.G2D->GetHeight ();
   bound.Set (0, 0, ScreenWidth, ScreenHeight);
   dirty.Set (bound);
   WindowListWidth = ScreenWidth / 3;
@@ -154,6 +157,10 @@ bool csApp::Initialize (const char *iConfigName)
     printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", iConfigName);
     fatal_exit (0, true);			// cfg file not found
   }
+
+  FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+  DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
+  DefaultFontSize = 8;
 
   // Now initialize all skin slices
   InitializeSkin ();
@@ -250,9 +257,9 @@ void csApp::InitializeSkin ()
     di = Config->EnumData ("MouseCursor");
   if (di)
   {
-    Mouse->ClearPointers ();
+    Mouse.ClearPointers ();
     while (di->Next ())
-      Mouse->NewPointer (di->GetKey (), (char *)di->GetData ());
+      Mouse.NewPointer (di->GetKey (), (char *)di->GetData ());
     di->DecRef ();
   }
 
@@ -261,6 +268,12 @@ void csApp::InitializeSkin ()
     PrepareTextures ();
 
   skin->Initialize (this);
+}
+
+void csApp::GetFont (iFont *&oFont, int &oFontSize)
+{
+  oFont = DefaultFont;
+  oFontSize = DefaultFontSize;
 }
 
 void csApp::printf (int mode, char* str, ...)
@@ -352,7 +365,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   }
   delete [] filename;
 
-  iTextureManager *txtmgr = GfxPpl->G3D->GetTextureManager ();
+  iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
   iImage *image = csImageLoader::Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
     txtmgr->GetTextureFormat ());
   fbuffer->DecRef ();
@@ -368,7 +381,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
 
 void csApp::PrepareTextures ()
 {
-  iTextureManager *txtmgr = GfxPpl->G3D->GetTextureManager ();
+  iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
 
   // Clear all textures from texture manager
   txtmgr->ResetPalette ();
@@ -391,18 +404,18 @@ void csApp::PrepareTextures ()
   // Look in palette for colors we need for windowing system
   SetupPalette ();
   // Finally, set up mouse pointer images
-  Mouse->Setup ();
+  Mouse.Setup ();
   // Invalidate entire screen
   Invalidate (true);
 }
 
 void csApp::SetupPalette ()
 {
-  csPixelFormat *pfmt = GfxPpl->G2D->GetPixelFormat ();
+  csPixelFormat *pfmt = GfxPpl.G2D->GetPixelFormat ();
   PhysColorShift = ((pfmt->RedShift >= 24) || (pfmt->GreenShift >= 24)
     || (pfmt->BlueShift >= 24)) ? 8 : 0;
 
-  iTextureManager* txtmgr = GfxPpl->G3D->GetTextureManager ();
+  iTextureManager* txtmgr = GfxPpl.G3D->GetTextureManager ();
   Pal [cs_Color_Black]   = txtmgr->FindRGB (  0,   0,   0);
   Pal [cs_Color_White]   = txtmgr->FindRGB (255, 255, 255);
   Pal [cs_Color_Gray_D]  = txtmgr->FindRGB (128, 128, 128);
@@ -428,7 +441,7 @@ void csApp::SetupPalette ()
 int csApp::FindColor (int r, int g, int b)
 {
   int color;
-  iTextureManager *txtmgr = GfxPpl->G3D->GetTextureManager ();
+  iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
   color = txtmgr->FindRGB (r, g, b);
   return (color >> PhysColorShift) | 0x80000000;
 }
@@ -447,7 +460,7 @@ void csApp::StartFrame ()
   cs_time elapsed_time;
   System->GetElapsedTime (elapsed_time, CurrentTime);
 
-  GfxPpl->StartFrame (Mouse);
+  GfxPpl.StartFrame (&Mouse);
 }
 
 void csApp::FinishFrame ()
@@ -461,15 +474,17 @@ void csApp::FinishFrame ()
   // Redraw all changed windows
   if (GetState (CSS_DIRTY))
   {
-    // Check windows from bottom-up for propagated changes
-    csRect r (dirty);
-    CheckDirtyBU (r);
-    // Now propagate dirty areas through transparent windows top-down
-    r.MakeEmpty ();
-    CheckDirtyTD (r);
-    // Check from bottom-up once again in the case we need it after top-down
-    r.Set (dirty);
-    CheckDirtyBU (r);
+    // Check dirty areas until everybody is happy
+    do
+    {
+      app->SetState (CSS_RESTART_DIRTY_CHECK, false);
+      // Check windows from bottom-up for propagated changes
+      csRect r (dirty);
+      CheckDirtyBU (r);
+      // Now propagate dirty areas through transparent windows top-down
+      r.MakeEmpty ();
+      CheckDirtyTD (r);
+    } while (app->GetState (CSS_RESTART_DIRTY_CHECK));
 
     do_idle = false;
     Redraw ();
@@ -479,12 +494,12 @@ void csApp::FinishFrame ()
   if (OldMouseCursorID != MouseCursorID)
   {
     do_idle = false;
-    Mouse->SetCursor (MouseCursorID);
+    Mouse.SetCursor (MouseCursorID);
     OldMouseCursorID = MouseCursorID;
   }
 
   // Flush application graphics operations
-  GfxPpl->FinishFrame (Mouse);
+  GfxPpl.FinishFrame (&Mouse);
 
   if (do_idle)
     Idle ();
@@ -540,7 +555,9 @@ bool csApp::HandleEvent (iEvent &Event)
 {
   // Mouse should always receive events
   // to reflect current mouse position
-  Mouse->HandleEvent (Event);
+  Mouse.HandleEvent (Event);
+  // Same about hint manager
+  hints.HandleEvent (Event);
 
   if ((Event.Type == csevKeyDown)
    && (Event.Key.Code == CSKEY_INS))
@@ -598,7 +615,7 @@ void csApp::WindowList ()
 {
   csWindowList *wl = new csWindowList (this);
   int x, y;
-  GetMouse ()->GetPosition (x, y);
+  GetMouse ().GetPosition (x, y);
   int w = WindowListWidth;
   int h = WindowListHeight;
   csRect rect (x - w/2, y - h/2, x + w/2, y + h/2);
@@ -642,6 +659,18 @@ void csApp::Delete (csComponent *comp)
 {
   csComponent::Delete (comp);
   WindowListChanged = true;
+}
+
+void csApp::NotifyDelete (csComponent *comp)
+{
+  if (MouseOwner == comp)
+    CaptureMouse (NULL);
+  if (KeyboardOwner == comp)
+    CaptureKeyboard (NULL);
+  if (FocusOwner == comp)
+    CaptureFocus (NULL);
+
+  hints.Remove (comp);
 }
 
 int csApp::Execute (csComponent *comp)
