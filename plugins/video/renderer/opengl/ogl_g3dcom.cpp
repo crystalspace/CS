@@ -698,6 +698,47 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
   glBindTexture (GL_TEXTURE_2D, texturehandle);
+
+#if 1
+  // First copy all data in an array so that we can minimize
+  // the amount of code that goes between glBegin/glEnd. This
+  // is from an OpenGL high-performance FAQ.
+  // @@@ HARDCODED LIMIT OF 64 VERTICES!
+  float ar_u[64], ar_v[64];
+  float ar_x[64], ar_y[64], ar_w[64];
+  for (i = 0; i < poly.num; i++)
+  {
+    sx = poly.vertices[i].sx - width2;
+    sy = poly.vertices[i].sy - height2;
+    one_over_sz = M * sx + N * sy + O;
+    sz = 1.0 / one_over_sz;
+    u_over_sz = (J1 * sx + J2 * sy + J3);
+    v_over_sz = (K1 * sx + K2 * sy + K3);
+    // we must communicate the perspective correction (1/z) for
+    // textures by using homogenous coordinates in either texture 
+    // space or in object (vertex) space.  We do it in texture 
+    // space.
+    // glTexCoord4f(u_over_sz,v_over_sz,one_over_sz,one_over_sz);
+    // glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy,
+    // -one_over_sz);
+
+    // modified to use homogenous object space coordinates instead
+    // of homogenous texture space coordinates
+    ar_u[i] = u_over_sz * sz;
+    ar_v[i] = v_over_sz * sz;
+    ar_x[i] = poly.vertices[i].sx * sz;
+    ar_y[i] = poly.vertices[i].sy * sz;
+    ar_w[i] = sz;
+  }
+
+  glBegin (GL_TRIANGLE_FAN);
+  for (i = 0; i < poly.num; i++)
+  {
+    glTexCoord2f (ar_u[i], ar_v[i]);
+    glVertex4f (ar_x[i], ar_y[i], -1, ar_w[i]);
+  }
+  glEnd ();
+#else
   glBegin (GL_TRIANGLE_FAN);
   for (i = 0; i < poly.num; i++)
   {
@@ -721,6 +762,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1, sz);
   }
   glEnd ();
+#endif
 
   // next draw the lightmap over the texture.  The two are blended
   // together. If a lightmap exists, extract the proper 
