@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #==============================================================================
 #
-#    Automated Texinfo to HTML Conversion and CVS Update Script
+#    Automated Documentation Generation and CVS Update Script
 #    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,8 @@
 #
 #        - Repairs broken @node directives and @menu blocks.
 #        - Converts Texinfo documentation to HTML format.
+#        - Builds the public API reference.
+#        - Builds the developer's API reference.
 #        - Commits all changes to the CVS repository.
 #        - Makes the generated HTML available online for browsing.
 #        - Makes archives of the generated HTML availble for download.
@@ -76,7 +78,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'docproc.pl';
-my $PROG_VERSION = '1.6';
+my $PROG_VERSION = '1.7';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -91,21 +93,14 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        repository in order to perform the conversion process.  This list
 #        should include the documentation directories as well as those
 #        containing tools and supporting files used in the conversion process.
-#    FAKE_DIRS - A list of directories to be created (empty) after files have
-#        been extracted from the repository.  This is a list of directories
-#        which must exist (though empty) for the conversion process to
-#        succeed.  In particular, the makefile configuration step expects
-#        CS/include to exists since it places volatile.h there.
-#    OLD_HTML_DIR - Relative path to existing HTML directory hierarchy within
-#        the CVS repository.
-#    NEW_HTML_DIR - Relative path to newly generated HTML directory hierarchy.
+#    OLD_DOC_DIR - Relative path to existing documentation directory hierarchy
+#        within the CVS repository.
+#    NEW_DOC_DIR - Relative path to generated documented directory hierarchy.
 #    TEXINFO_DIR - Relative path to Texinfo source directory hierarchy.
-#    BROWSEABLE_DIR - Directory into which generated HTML should be copied for
-#        browsing via a web browser.
+#    BROWSEABLE_DIR - Directory into which generated documentation should be
+#        copied for online browsing.
 #    PACKAGE_DIR - Directory into which archives of generated documentation
 #        are placed to make them available for download in package form.
-#    PACKAGE_BASE - Base name of the packaged archives.  An appropriate file
-#        extention will be appended for each generated archive.
 #    OWNER_GROUP - Group to which to assign all directories which will exist
 #        after script's termination (such as the "browseable" directory).  May
 #        be 'undef' if no special group should be assigned.
@@ -113,39 +108,85 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        configuration step.  The rules for building the documentation do not
 #        actually care about the platform, but the makefile architecture
 #        expects the makefiles to have been configured before a makefile
-#        target can be invoked.
-#    LOG_MESSAGE_HTML = Log message for CVS transactions for HTML conversion.
-#    LOG_MESSAGE_REPAIR = Log message for CVS transactions for repaired
-#        document files.
+#        target can be invoked.  For instance, if this script runs on Linux,
+#        then this value should be "linux".  
+#    LOG_MESSAGE_REPAIR - CVS log message for repaired Texinfo files.
+#    LOG_MESSAGE_HTML - CVS log message for for Texinfo to HTML conversion.
+#    LOG_MESSAGE_API - CVS log message for for generated API documentation.
+#    TARGETS - A list of documentation target records.  Each target is used to
+#        generate a particular documentation set.  Each target record is a
+#        dictionary which contains the following keys.  The key "name" is the
+#        human-readable name for this document set and is used in status
+#        messages.  The key "dir" is the name of the directory containing the
+#        document set within both OLD_DOC_DIR and NEW_DOC_DIR.  The key "make"
+#        is the Makefile target to invoke in order to generate the particular
+#        document set.  The key "exportto" is the directory name within
+#        BROWSEABLE_DIR and PACKAGE_DIR into which the directory set is
+#        published.  The key "exportas" is the base package name used when
+#        generating downloadable packages via ARCHIVERS (below).  When
+#        published, the base package name is combined with the archiver's file
+#        extension and placed within the appropriate subdirectory of
+#        PACKAGE_DIR.  The key "commit" is a boolean flag controlling whether
+#        or not the generated files for this target should be committed to
+#        CVS.  The key "log" is the log message to use for CVS transactions
+#        involving this target.
 #    ARCHIVERS - A list of archiver records.  Each arechiver is used to
-#        generate a package archive given an input directory.  Each archiver
-#        record contains the following keys.  The key "name" specifies the
-#        archiver's printable name.  The key "ext" is the file extension for
-#        the generated archive file.  The key "cmd" is the actual command
-#        template which describes how to generate the given archive.  It may
-#        contain the meta-token ~S and ~D.  The name of the source directory
-#        is interpolated into the command in place of ~S, and the destination
-#        package name is interpolated in place of ~D.
+#        generate a package from an input directory.  Each archiver record is
+#        a dictionary which contains the following keys.  The key "name"
+#        specifies the archiver's printable name.  The key "ext" is the file
+#        extension for the generated archive file.  The key "cmd" is the
+#        actual command template which describes how to generate the given
+#        archive.  The template may contain the meta-token ~S and ~D.  The
+#        name of the source directory is interpolated into the command in
+#        place of ~S, and the destination package name is interpolated in
+#        place of ~D.
 #------------------------------------------------------------------------------
 
+# For write-access, SourceForge requires SSH access.
 $ENV{'CVS_RSH'} = 'ssh';
+
+# Use local copy of Doxygen since it is not installed on SourceForge.
+my $LOCAL_PATH = '/home/groups/crystal/bin';
+$ENV{'PATH'} = "$LOCAL_PATH:$ENV{'PATH'}";
+
 my $PROJECT_ROOT = 'CS';
 my $CVSUSER = 'sunshine';
 my $CVSROOT = "$CVSUSER\@cvs1:/cvsroot/crystal";
-my $CVS_SOURCES = "$PROJECT_ROOT/bin $PROJECT_ROOT/docs $PROJECT_ROOT/mk " .
-    "$PROJECT_ROOT/Makefile $PROJECT_ROOT/libs/cssys/unix";
-my $FAKE_DIRS = "$PROJECT_ROOT/include";
-my $OLD_HTML_DIR = 'docs/html';
-my $NEW_HTML_DIR = 'out/docs/html';
+my $CVS_SOURCES = $PROJECT_ROOT;
+my $OLD_DOC_DIR = 'docs';
+my $NEW_DOC_DIR = 'out/docs';
 my $TEXINFO_DIR = 'docs/texinfo';
 my $PUBLIC_DOC_DIR = '/home/groups/ftp/pub/crystal/docs';
-my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online/manual";
-my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download/manual";
-my $PACKAGE_BASE = 'csmanual-html';
+my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online";
+my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
 my $OWNER_GROUP = 'crystal';
 my $PLATFORM = 'linux';
-my $LOG_MESSAGE_HTML = 'Automated Texinfo to HTML conversion.';
 my $LOG_MESSAGE_REPAIR = 'Automated Texinfo @node and @menu repair.';
+my $LOG_MESSAGE_HTML = 'Automated Texinfo to HTML conversion.';
+my $LOG_MESSAGE_API = 'Automated API reference generation.';
+
+my @TARGETS =
+    ({ 'name'     => 'User\'s Manual',
+       'dir'      => 'html',
+       'make'     => 'htmldoc',
+       'exportto' => 'manual',
+       'exportas' => 'csmanual-html',
+       'commit'   => 1,
+       'log'      => $LOG_MESSAGE_HTML },
+     { 'name'     => 'Public API Reference',
+       'dir'      => 'pubapi',
+       'make'     => 'pubapi',
+       'exportto' => 'pubapi',
+       'exportas' => 'cspubapi-html',
+       'commit'   => 1,
+       'log'      => $LOG_MESSAGE_API },
+     { 'name'     => 'Developer\'s API Reference',
+       'dir'      => 'devapi',
+       'make'     => 'devapi',
+       'exportto' => 'devapi',
+       'exportas' => 'csdevapi-html',
+       'commit'   => 0,
+       'log'      => $LOG_MESSAGE_API });
 
 my @ARCHIVERS =
     ({ 'name' => 'gzip',
@@ -258,7 +299,8 @@ sub rename_file {
 }
 
 #------------------------------------------------------------------------------
-# Generate a temporary name in a directory.  (Perl tmpnam() only knows '/tmp'.)
+# Generate a temporary name in a directory.  Perl tmpnam() only works with
+# '/tmp', so must do this manually, instead.
 #------------------------------------------------------------------------------
 sub temporary_name {
     my ($dir, $prefix, $suffix) = @_;
@@ -301,8 +343,8 @@ sub scandir {
 # when the "-P" switch is used with the CVS "update" command.
 #------------------------------------------------------------------------------
 sub cvs_remove {
-    my $file = shift;
-    my $dst = "$OLD_HTML_DIR/$file";
+    my $dst = shift;
+    my $file = basename($dst);
     if (-d $dst) {
 	print "Pruning directory: $file\n";
     }
@@ -319,13 +361,12 @@ sub cvs_remove {
 # a binary file (such as an image) to the repository.
 #------------------------------------------------------------------------------
 sub cvs_add {
-    my $file = shift;
-    my $src = "$NEW_HTML_DIR/$file";
-    my $dst = "$OLD_HTML_DIR/$file";
+    my ($src, $dst) = @_;
+    my $file = basename($dst);
     if (-d $src) {
 	print "Adding directory: $file\n";
 	create_directory($dst);
-	run_command("cvs -Q add -m \"$LOG_MESSAGE_HTML\" $dst") unless $DEBUG;
+	run_command("cvs -Q add $dst") unless $DEBUG;
     }
     else {
 	my $isbin = -B $src;
@@ -343,9 +384,7 @@ sub cvs_add {
 # actually been modified.
 #------------------------------------------------------------------------------
 sub cvs_examine {
-    my $file = shift;
-    my $src = "$NEW_HTML_DIR/$file";
-    my $dst = "$OLD_HTML_DIR/$file";
+    my ($src, $dst) = @_;
     if (!-d $src) {
 	remove_file($dst);
 	copy_file($src, $dst);
@@ -364,58 +403,56 @@ sub cvs_checkout {
 # Print a summary list of files which were modified, added, or removed.
 #------------------------------------------------------------------------------
 sub cvs_update {
-    print "Modification summary:\n" .
-	run_command("cvs -q update $TEXINFO_DIR $OLD_HTML_DIR");
+    my $message = "Modification summary:";
+    my $line = '-' x length($message);
+    my $dirs = $TEXINFO_DIR;
+    foreach my $target (@TARGETS) {
+	if ($target->{'commit'}) {
+	    $dirs .= " $OLD_DOC_DIR/$target->{'dir'}";
+	}
+    }
+    print "$line\n$message\n" . run_command("cvs -q update $dirs") . "$line\n";
 }
 
 #------------------------------------------------------------------------------
 # Commit files to the CVS repository.  The 'cvs' command is smart enough to
 # only commit files which have actually changed.
 #------------------------------------------------------------------------------
-sub cvs_commit_files {
-    my ($files, $message) = @_;
-    run_command("cvs -Q commit -m \"$message\" $files") unless $DEBUG;
+sub cvs_commit_dir {
+    my ($dir, $message) = @_;
+    run_command("cvs -Q commit -m \"$message\" $dir") unless $DEBUG;
 }
 
 #------------------------------------------------------------------------------
 # Commit repaired and converted files to the CVS repository.
 #------------------------------------------------------------------------------
 sub cvs_commit {
-    print "Committing changes.\n";
-    cvs_commit_files($TEXINFO_DIR,  $LOG_MESSAGE_REPAIR);
-    cvs_commit_files($OLD_HTML_DIR, $LOG_MESSAGE_HTML  );
-}
-
-#------------------------------------------------------------------------------
-# Extract the appropriate files from the CVS repository.  The curent technique
-# of using the makefile to convert documentation also requires some directories
-# to exist even though they are not needed by the actual documentation
-# conversion step, so fake them up.  In particular, the makefile configuration
-# step expects the CS/include directory to exist so that it can create
-# CS/include/volatile.h.
-#------------------------------------------------------------------------------
-sub extract_docs {
-    my $dir;
-    cvs_checkout();
-    foreach $dir ($FAKE_DIRS) {
-	print "Faking directory: $dir\n";
-	create_directory($dir);
+    print "Committing Texinfo.\n";
+    cvs_commit_dir($TEXINFO_DIR, $LOG_MESSAGE_REPAIR);
+    foreach my $target (@TARGETS) {
+	if ($target->{'commit'}) {
+	    print "Committing $target->{'name'}.\n";
+	    cvs_commit_dir("$OLD_DOC_DIR/$target->{'dir'}", $target->{'log'});
+	}
     }
 }
 
 #------------------------------------------------------------------------------
-# Perform the Texinfo repair and HTML conversion.  This is accomplished by
-# invoking the appropriate makefile targets.  Note that the documentation
-# related targets only work if the makefile system has been configured for a
-# particular platform, thus that step must be perform first.
+# Perform the Texinfo repair and HTML conversion, then build public and
+# developer's API reference manuals.  This is accomplished by invoking the
+# appropriate makefile targets.  Note that the documentation related targets
+# only work if the makefile system has been configured for a particular
+# platform, thus that step must be performed first.
 #------------------------------------------------------------------------------
 sub build_docs {
     print "Configuring documentation.\n";
     run_command("$MAKE $PLATFORM");
-    print "Repairing documentation.\n";
+    print "Repairing Texinfo files.\n";
     run_command("$MAKE repairdoc");
-    print "Building HTML documentation.\n";
-    run_command("$MAKE htmldoc");
+    foreach my $target (@TARGETS) {
+	print "Building $target->{'name'}.\n";
+	run_command("$MAKE $target->{'make'}");
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -425,57 +462,72 @@ sub build_docs {
 # removing entries as necessary.
 #------------------------------------------------------------------------------
 sub apply_diffs {
-    print "Scanning directories.\n";
-    my @oldfiles = scandir($OLD_HTML_DIR);
-    my @newfiles = scandir($NEW_HTML_DIR);
-
-    print "Comparing directories.\n";
-    my $oldfile = shift @oldfiles;
-    my $newfile = shift @newfiles;
-
-    while (defined($oldfile) || defined($newfile)) {
-	if (!defined($newfile) || defined($oldfile) && $oldfile lt $newfile) {
-	    cvs_remove($oldfile);
-	    $oldfile = shift @oldfiles;
-	}
-	elsif (!defined($oldfile) || $oldfile gt $newfile) {
-	    cvs_add($newfile);
-	    $newfile = shift @newfiles;
-	}
-	else { # Filenames are identical.
-	    cvs_examine($newfile);
-	    $oldfile = shift @oldfiles;
-	    $newfile = shift @newfiles;
+    foreach my $target (@TARGETS) {
+	if ($target->{'commit'}) {
+	    print "Applying changes to $target->{'name'}.\n";
+	    my $olddir = "$OLD_DOC_DIR/$target->{'dir'}";
+	    my $newdir = "$NEW_DOC_DIR/$target->{'dir'}";
+	
+	    print "Scanning directories.\n";
+	    my @oldfiles = scandir($olddir);
+	    my @newfiles = scandir($newdir);
+	
+	    print "Comparing directories.\n";
+	    my $oldfile = shift @oldfiles;
+	    my $newfile = shift @newfiles;
+	
+	    while (defined($oldfile) || defined($newfile)) {
+		if (!defined($newfile) ||
+		    (defined($oldfile) && $oldfile lt $newfile)) {
+		    cvs_remove("$olddir/$oldfile");
+		    $oldfile = shift @oldfiles;
+		}
+		elsif (!defined($oldfile) || $oldfile gt $newfile) {
+		    cvs_add("$newdir/$newfile", "$olddir/$newfile");
+		    $newfile = shift @newfiles;
+		}
+		else { # Filenames are identical.
+		    cvs_examine("$newdir/$newfile", "$olddir/$newfile");
+		    $oldfile = shift @oldfiles;
+		    $newfile = shift @newfiles;
+		}
+	    }
 	}
     }
 }
 
 #------------------------------------------------------------------------------
 # Publish a browseable copy of the generated documentation.  Also, copy
-# index.html to index.html so that the manual displays automatically if a
-# client browses the directory.  (The alternative would be to add a
-# "DirectoryIndex index.htm" directive to Apache's .htaccess file, SourceForge
-# disallows this.) 
+# index.htm to index.html (if present) so that the manual displays
+# automatically when a client browses the directory.  (If SourceForge's Apache
+# configuration file contained a "DirectoryIndex index.htm" directive, then it
+# would not be necessary to copy index.htm to index.html.)
 #------------------------------------------------------------------------------
 sub publish_browseable {
-    print("Publishing browseable.\n"), return if $DEBUG;
-    print "Preparing browseable.\n";
-    my $parent = dirname($BROWSEABLE_DIR);
-    create_directory_deep($parent, $OWNER_GROUP);
+    create_directory_deep($BROWSEABLE_DIR, $OWNER_GROUP);
+    foreach my $target (@TARGETS) {
+	my $name = $target->{'name'};
+	print "Publishing $name.\n";
+	next if $DEBUG;
+    
+	my $src = "$NEW_DOC_DIR/$target->{'dir'}";
+	my $dst = "$BROWSEABLE_DIR/$target->{'exportto'}";
+	my $new_dir = temporary_name($BROWSEABLE_DIR, 'new');
+	my $old_dir = temporary_name($BROWSEABLE_DIR, 'old');
 
-    my $new_dir = temporary_name($parent, 'new');
-    my $old_dir = temporary_name($parent, 'old');
-    run_command("cp -r \"$NEW_HTML_DIR\" \"$new_dir\"");
-    change_group_deep($OWNER_GROUP, "$new_dir");
-    copy_file("$new_dir/index.htm", "$new_dir/index.html")
-	if -e "$new_dir/index.htm";
-
-    print "Publishing browseable.\n";
-    rename_file($BROWSEABLE_DIR, $old_dir) if -e $BROWSEABLE_DIR;
-    rename_file($new_dir, $BROWSEABLE_DIR);
-
-    print "Cleaning browseable.\n";
-    rmtree($old_dir);
+	print "Preparing.\n";
+	run_command("cp -r \"$src\" \"$new_dir\"");
+	change_group_deep($OWNER_GROUP, "$new_dir");
+	copy_file("$new_dir/index.htm", "$new_dir/index.html")
+	    if -e "$new_dir/index.htm";
+    
+	print "Installing.\n";
+	rename_file($dst, $old_dir) if -e $dst;
+	rename_file($new_dir, $dst);
+    
+	print "Cleaning.\n";
+	rmtree($old_dir);
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -492,14 +544,14 @@ sub interpolate {
 # Publish an archive of the generated documentation.
 #------------------------------------------------------------------------------
 sub publish_package {
-    my ($archiver, $dir) = @_;
+    my ($archiver, $src, $dst, $base) = @_;
     print "Packaging: $archiver->{'name'}\n";
     return if $DEBUG;
     my $ext = $archiver->{'ext'};
-    my $tmp_pkg = temporary_name($PACKAGE_DIR, 'pkg', ".$ext");
-    my $package = "$PACKAGE_DIR/$PACKAGE_BASE.$ext";
+    my $tmp_pkg = temporary_name($dst, 'pkg', ".$ext");
+    my $package = "$dst/$base.$ext";
     my $cmd = $archiver->{'cmd'};
-    interpolate($cmd, '~S', $dir);
+    interpolate($cmd, '~S', $src);
     interpolate($cmd, '~D', $tmp_pkg);
     run_command($cmd);
     rename_file($tmp_pkg, $package);
@@ -512,22 +564,27 @@ sub publish_package {
 # a directory hierarchy identical to the one in the project itself (ie.
 # CS/docs/html).  Unfortunately, CVS directories are present within this tree,
 # and it would be preferable not to include them in the archive.  To work
-# around this problem, this function archives the newly generated directory
-# (out/docs/html) instead.  A small amount of sleight-of-hand is used to make
-# the directory appear as though it resides directly in the project root.
-# (Specifically, it is temporarily renamed from out/docs/html to CS/docs/html.)
+# around this problem, this function archives files from the newly generated
+# directory (out/docs) instead.  A small amount of sleight-of-hand is used to
+# make the directory appear as though it resides directly in the project root.
+# (Specifically, it is temporarily renamed from out/docs to CS/docs.)
 #------------------------------------------------------------------------------
 sub publish_packages {
-    my $fake_root = "$PROJECT_ROOT/$OLD_HTML_DIR";
-    create_directory_deep($PACKAGE_DIR, $OWNER_GROUP);
+    my $fake_root = "$PROJECT_ROOT/$OLD_DOC_DIR";
     create_directory_deep(dirname($fake_root));
-    rename_file($NEW_HTML_DIR, $fake_root); # Sleight-of-hand (magic).
-    foreach my $archiver (@ARCHIVERS) {
-	publish_package($archiver, $fake_root);
+    rename_file($NEW_DOC_DIR, $fake_root); # Sleight-of-hand (magic).
+    foreach my $target (@TARGETS) {
+	print "Packaging $target->{'name'}.\n";
+	my $base = $target->{'exportas'};
+	my $src = "$fake_root/$target->{'dir'}";
+	my $dst = "$PACKAGE_DIR/$target->{'exportto'}";
+	create_directory_deep($dst, $OWNER_GROUP);
+	foreach my $archiver (@ARCHIVERS) {
+	    publish_package($archiver, $src, $dst, $base);
+	}
     }
-    rename_file($fake_root, $NEW_HTML_DIR); # Unmagic.
-    rmtree($PROJECT_ROOT);
-
+    rename_file($fake_root, $NEW_DOC_DIR); # Unmagic.
+    rmtree($PROJECT_ROOT); # Remove fake project root.
 }
 
 #------------------------------------------------------------------------------
@@ -563,7 +620,7 @@ sub time_now {
 sub process_docs {
     print 'BEGIN: ' . time_now() . "\n";
     create_transient($CONV_DIR);
-    extract_docs();
+    cvs_checkout();
     change_directory($PROJECT_ROOT);
     build_docs();
     apply_diffs();
@@ -592,16 +649,26 @@ sub print_usage {
 $PROG_NAME version $PROG_VERSION
 $COPYRIGHT
 
-Repairs out-of-date and broken \@node directives and \@menu blocks, then
-converts Texinfo documentation to HTML and updates the CVS repository with
-the results.
-
 Usage: $PROG_NAME [options]
 
 Options:
     -h --help   Print this usage message.
-    -d --debug  Process the documentation but do not modify the CVS
-                repository.
+    -d --debug  Process the documentation but do not actually modify
+                the CVS repository or export any files.
+
+This program performs a series of documentation-related tasks.  It should be
+run on a periodic basis, typically by some automated means.  The tasks which
+it performs are:
+
+    o Repairs out-of-date and broken \@node directives and \@menu blocks
+      in the Texinfo source files.
+    o Converts User's Manual Texinfo source files to HTML format.
+    o Generates Public API Reference in HTML format.
+    o Generates Developer's API Reference in HTML format.
+    o Commits all changed Texinfo and HTML files to the CVS repository.
+    o Publishes all HTML files for online browsing.
+    o Creates and publishes packages from HTML files for download.
+
 EOT
 }
 
