@@ -29,7 +29,7 @@
 	struct OPCODE_API BVTCache : Pair
 	{
 		//! Constructor
-		inline_				BVTCache()
+		BVTCache()
 							{
 								ResetCache();
 								ResetCountDown();
@@ -49,7 +49,7 @@
 #endif // __MESHMERIZER_H__
 							}
 
-		inline_		void	ResetCountDown()
+		void	ResetCountDown()
 							{
 #ifdef __MESHMERIZER_H__		// Collision hulls only supported within ICE !
 								CountDown		= 50;
@@ -113,7 +113,7 @@
 		 *	\see		SetFullBoxBoxTest(bool flag)
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				void			SetFullPrimBoxTest(bool flag)			{ mFullPrimBoxTest		= flag;					}
+		void			SetFullPrimBoxTest(bool flag)			{ mFullPrimBoxTest		= flag;					}
 
 		// Stats
 
