@@ -36,7 +36,13 @@ Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
 @file{msvc7_libs_0.92b.zip} can be downloaded from:
 
 @noindent
+@ifnottex
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.92b.zip}
+@end ifnottex
+@iftex
+@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
+@code{msvc7_libs_0.92b.zip}
+@end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
 root directory.
@@ -232,11 +238,14 @@ produce @file{.exe} files.
 
 @emph{TODO}
 
-@item
+@quotation
 Q. @emph{I have a problem that you haven't solved here!}
 
 A. Try sending a note to the Crystal Space mailing list and asking your
 question there.  @xref{Mailing Lists}.  Be sure to include any pertinent
 information, such as the operating system you are using, the compiler, which
 version of Crystal Space, and any special configuration information.
-@end itemize
+@end quotation
+
+
+

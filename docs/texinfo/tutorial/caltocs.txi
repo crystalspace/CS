@@ -31,8 +31,9 @@ knowledge of 3D Studio MAX and Crystal Space.
 
 @itemize @bullet
 @item 
-Goto @uref{http://sourceforge.net/projects/cal3d} and download the latest 
-@file{cal3d_exporter_binaries} package.
+Download the latest @file{cal3d_exporter_binaries} package from:
+
+@uref{http://sourceforge.net/projects/cal3d}
 
 @item 
 Copy the @file{cal3d.dll} from the package into your @file{3dsmax\} directory.
@@ -44,7 +45,7 @@ version number as your copy of 3D Studio MAX.
 @quotation
 @strong{Note:} If no version of the @file{cal3d_max_exporter.dle} exists for 
 your 3D Studio MAX, you will need a programmer to compile one for you.
-@xref{Compile Cal3D Exporter}
+@xref{Compile Cal3D Exporter}.
 @end quotation
 
 @end itemize
@@ -54,8 +55,9 @@ your 3D Studio MAX, you will need a programmer to compile one for you.
 
 @itemize @bullet
 @item 
-Goto @uref{http://sourceforge.net/projects/cal3d} and download the latest 
-@file{cal3d} package and @file{cal3d_exporter} package.
+Download the latest @file{cal3d} package and @file{cal3d_exporter} package from:
+
+@uref{http://sourceforge.net/projects/cal3d}
 
 @item 
 Compile these two packages on Windows with Microsoft Visual C++ 6.0 or better.
@@ -63,13 +65,13 @@ Compile these two packages on Windows with Microsoft Visual C++ 6.0 or better.
 @strong{Note:} You will have to install the 3D Studio MAX SDK and the 
 Character Studio SDK.
 
-@strong{Note:} You will need to goto @option{Tools/Options/Directories} in the 
+@strong{Note:} You will need to go to @option{Tools/Options/Directories} in the 
 Microsoft Visual C++ IDE to fix header file and linker library errors.
 @end quotation
 
 @item 
-Drop the resulting @file{cal3d.dll} into your @file{3dsmax\} directory and 
-@file{cal3d_max_exporter.dle} into your @file{3dsmax\plugins\} directory.
+Drop the resulting @file{cal3d.dll} into your @file{3dsmax\} directory and
+drop the resulting @file{cal3d_max_exporter.dle} into your @file{3dsmax\plugins\} directory.
 
 @end itemize
 
@@ -83,7 +85,7 @@ Drop the resulting @file{cal3d.dll} into your @file{3dsmax\} directory and
 You will want to put your character in the base pose.  With normal bones, 
 this is usually just the unanimated state.  With Character Studio Bipeds, 
 you will want to select the Biped object and under the Motion tab enable 
-Figure mode.  Now goto @option{File/Export@dots{}} and select the 
+Figure mode.  Now go to @option{File/Export@dots{}} and select the 
 @option{Save As Type@dots{}} as @option{Cal3D Skeleton File (*.CSF)} and 
 enter your filename.  On the next page it will ask what bones you want to 
 export, usually you just make sure that all bones are checked and hit Finish.
@@ -92,7 +94,7 @@ export, usually you just make sure that all bones are checked and hit Finish.
 @emph{Export the mesh}
 
 With the character still in the base pose (or Figure mode).  Select the 
-objects you want to export in 3D Studio MAX.  Now goto 
+objects you want to export in 3D Studio MAX.  Now go to 
 @option{File/Export@dots{}} and select the @option{Save As Type@dots{}} as 
 @option{Cal3D Mesh File (*.CMF)} and enter 
 your filename.  On the next page you will hit browse and select the skeleton 
@@ -105,7 +107,7 @@ the default values.
 @emph{Export the animations}
 
 You will now want to disable Figure mode in character studio, and make sure 
-your object animates when you push play in 3D Studio MAX.  Now goto 
+your object animates when you push play in 3D Studio MAX.  Now go to 
 @option{File/Export@dots{}} and select the @option{Save As Type@dots{}} as 
 @option{Cal3D Animation File (*.CAF)} and enter your filename.  On the next 
 page you will hit browse and select the skeleton file we exported the first 
@@ -120,7 +122,7 @@ the timeframe variables on the this page, now push Finish.
 @item 
 @emph{Export the material}
 
-Now goto @option{File/Export@dots{}} and select the 
+Now go to @option{File/Export@dots{}} and select the 
 @option{Save As Type@dots{}} as @option{Cal3D Material File (*.CRF)} and 
 enter your filename.  On the next page you need to select which material you 
 want your character to have and push Next.  Verify that the textures are 
@@ -153,8 +155,8 @@ in the text file that specifies which parts of your character to load.
 @dfn{animation} specifies what animations to allow the model to use.
 
 @example
-skeleton=@emph{(your skeleton file .csf}
-mesh=@emph{(your mesh file .cmf}
+skeleton=@emph{(your skeleton file .csf)}
+mesh=@emph{(your mesh file .cmf)}
 material=@emph{(your material file .crf)}
 animation=@emph{(your animation file .caf)}
 @end example
@@ -178,8 +180,9 @@ times if you want multiple animations or meshes to be in the final sprite.
 
 @itemize @bullet
 @item 
-Goto @uref{http://sourceforge.net/projects/cal3d} and download the latest 
-@file{cal3d_miniviewer} package.
+Download the latest @file{cal3d_miniviewer} package from:
+
+@uref{http://sourceforge.net/projects/cal3d}
 
 @item 
 You can compile this package on Windows or Linux.
@@ -201,13 +204,15 @@ and play with the number until you fit the model on the screen.
 
 @itemize @bullet
 @item 
-Goto @uref{http://sourceforge.net/projects/cal3d} and download the latest 
-@file{cal3d} package if you haven't already done so.
+Download the latest @file{cal3d} package if you haven't already done so from:
 
-@itemize @dash
+@uref{http://sourceforge.net/projects/cal3d}
+
+
+@itemize
 @item
 @strong{GCC:} Configure the @file{cal3d} package and run a 
-@command{make install}.  Goto your CS directory and type 
+@command{make install}.  Go to your CS directory and type 
 @command{make @var{platform}} where @var{platform} is @samp{linux}, 
 @samp{cygwin},  etc@dots{}.  CS should now have found Cal3D and recorded the 
 line  @samp{HAS_CAL3D = yes}.  Lastly run @command{make cal3dtocs} to create 
@@ -264,7 +269,7 @@ Compile the Motion Manager (@var{motman} plugin) and Motion Loader
 @item
 Edit the mapfile of the map that you wish to place your characters in.  You 
 will want to add a line to load the library file containing your sprite to the 
-@sc{WORLD} section of the mapfile with the @sc{LIBRARY} command.
+@sc{world} section of the mapfile with the @sc{library} command.
 
 Sample File:
 @example
@@ -303,15 +308,15 @@ Run @command{walktest} and you should see your model in the mapfile.
 outside the room or way too big or way too small.  
 
 @strong{Note:} Try playing with the @var{geomscale} setting in your model 
-config file, and the xyz coordinates in the @sc{MOVE} macro in your mapfile.  
-@xref{Create Sprite Library}
+config file, and the xyz coordinates in the @sc{move} macro in your mapfile. 
+@xref{Create Sprite Library}.
 
 @strong{Note:} @command{viewmesh} is a useful tool for tracking down problems 
-with your sprite.  @xref{View Library in Viewmesh}
+with your sprite. @xref{View Library in Viewmesh}.
 @end quotation
 
 @item
-Lastly, we are going to animate your sprite with the @sc{APPLY_MOTION} line.
+Lastly, we are going to animate your sprite with the @sc{apply_motion} line.
 
 Sample File:
 @example

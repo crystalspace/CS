@@ -30,7 +30,13 @@ contains all headers, pre-built library files, and dynamic link libraries in
 pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
+@ifnottex
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.92b.zip}
+@end ifnottex
+@iftex
+@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
+@code{msvc7_libs_0.92b.zip}
+@end iftex
 
 @subheading zlib
 @cindex zlib
