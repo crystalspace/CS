@@ -23,6 +23,7 @@
 #include "cs3d/common/txtmgr.h"
 #include "cs3d/common/inv_cmap.h"
 #include "csgfxldr/boxfilt.h"
+#include "csutil/util.h"
 #include "iimage.h"
 #include "isystem.h"
 #include "lightdef.h"
@@ -43,8 +44,20 @@ csTextureMM::csTextureMM (iImageFile* image)
   usage = NULL;
   istransp = false;
 
-  ifile = image;
-  ifile->IncRef ();
+  if (IsPowerOf2(image->GetWidth()) && 
+      IsPowerOf2(image->GetHeight()))
+  {
+    ifile = image;
+    ifile->IncRef ();
+  }
+  else
+  {
+    //The images size is not a power of two. CS can only handle sizes, that
+    //are a power of two, so we resize the texture now. We choose the next
+    //size, that is a power of two and smaller that the current size.
+    ifile = image->Resize(FindNearestPowerOf2(image->GetWidth())/2,
+                          FindNearestPowerOf2(image->GetHeight())/2);
+  }
 }
 
 csTextureMM::~csTextureMM ()
