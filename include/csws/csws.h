@@ -46,10 +46,10 @@
  *        |--[ csScrollBar ]		// scroll bar control
  *        |--[ csInputLine ]		// input line control
  *        |    +--[ csSpinBox ]		// spin box control
- *        +--[ csListBox ]		// list box control
- *        +--[ csNotebook ]		// notebook control
- *        +--[ csGrid ]			// grid control
- *        +--[ csSlider ]		// slider control
+ *        |--[ csListBox ]		// list box control
+ *        |--[ csNotebook ]		// notebook control
+ *        |--[ csGrid ]			// grid control
+ *        |--[ csSlider ]		// slider control
  *        +--[ csTreeCtrl ]		// tree control
  * </pre>
  */
