@@ -189,7 +189,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
   }
 #ifdef CS_DEBUG
   else {
-    piSystem->Print(MSG_WARNING, "csConsoleInput:  Received an unknown event!\n");
+    piSystem->Printf(MSG_WARNING, "csConsoleInput:  Received an unknown event!\n");
   }
 #endif // CS_DEBUG
   
