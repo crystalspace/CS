@@ -13,7 +13,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: sprcal3dldr sprcal3dldrclean
-all plugins: sprcal3dldr
+all plugins meshes: sprcal3dldr
 
 sprcal3dldr:
 	$(MAKE_TARGET) MAKE_DLL=yes
