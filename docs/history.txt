@@ -49,6 +49,46 @@ Short-term cleanups that need to be done:
 		    $(DO.DEP) $(CFLAGS.SOMETHING)
 	- Michael Dale Long fixed the 'make depend' target of the
 	  cctest app.
+	- Eric Sunshine fixed a warning about a floating backslash within
+	  a // comment in ddgvec.cpp.
+	- Eric Sunshine completed Phase One of Eric's Big Documentation
+	  Overhaul.
+	    - Cleaned up and rewrote a lot of the filler material in the
+	      Crystal Space manual and updated and corrected much of the
+	      existing information.  Also composed new filler material which
+	      was sorely lacking and which is needed to bind chapters and
+	      sections together.
+	    - Cleaned up a lot of the Texinfo mark-up (though a tremendous
+	      amount of mark-up repair is still required).
+	    - Major overhaul of the logical organization of the Crystal Space
+	      manual.  The organization now attempts to take user perspective
+	      into account and is especially concerned with the first-time
+	      user.
+	    - Major overhaul of the physical organization of the Texinfo
+	      source files which comprise the manual.
+	    - Moved the newly reorganized Texinfo source hierarchy from
+	      CS/txidocs to CS/docs/texinfo.  This will be its final resting
+	      place.
+	    - Created the CS/docs/html directory and populated it with the
+	      HTML conversion of the Texinfo manual.  In a later phase of this
+	      overhaul, docs/html/ will be updated automatically as the
+	      Texinfo master files are modified, so consider this directory
+	      read-only.  It was manually populated in this instance because I
+	      wanted to give people convenient access to the new documentation
+	      even in the absence of automated conversion.
+	    - Created a README.htm file within CS/docs which acts as a cover
+	      page and gateway to the remainder of the documentation hierarchy.
+	    - Created the CS/docs/incoming directory which is intended as a
+	      temporary holding area for documents pending conversion to
+	      Texinfo.
+	    - Relocated all non-Texinfo documents (plain text and LaTex) to
+	      CS/docs/incoming pending their conversion to Texinfo.
+	    - Eliminated the now obsolete CS/newdoc and CS/txidocs directories.
+	      CS/docs is now the one and only documentation directory within
+	      the CS package.  Hopefully this should eliminate confusion which
+	      resulted from the other two directories (and particularly from
+	      newdoc), in the past.
+	    - Too many other changes to remember. :-)
 16-Mar-2000
 	- Michael Dale Long did some changes to Crystal Clear:
 	    - Rewrote ccActor class to make it less prone to errors of
@@ -81,8 +121,8 @@ Short-term cleanups that need to be done:
 	    - Added "show console" menu item to MazeD.
 	    - Added per-texture MIPMAP(yes|no) and DITHER(yes|no) option.o
 	      I.e. you can write in world file:
-		TEXTURE 'red ball' (FILE (/lib/tex/redball.gif)o
-		MIPMAP(no) DITHER(yes))
+		TEXTURE 'red ball' (FILE (/lib/tex/redball.gif)
+		    MIPMAP(no) DITHER(yes))
 	      Dithering is now by default off in soft3d.cfg.
 	    - Fixed the bug with close things disappearing when texelflt
 	      is on. Removed "texfilt" command, use "bilinear" and
