@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine renamed cswigpl5.c to cswigpl5.cpp in repository since
 	  this is the filename which the makefile expects (and to ensure that
 	  it gets compiled as C++, rather than C).
+	- Eric Sunshine renamed vd.m4 to progver.m4 since it provides the
+	  AC_CHECK_PROG_VERSION() (not some macro named VD).
 29-Apr-2003
 	- Matze fixed bad filepermission for jam install
 	- Matze moved crystal.m4 around to mk/autoconf and merged to make and
