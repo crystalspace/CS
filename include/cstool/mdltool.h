@@ -19,6 +19,11 @@
 #ifndef __MDLTOOL_H__
 #define __MDLTOOL_H__
 
+class csString;
+struct iObject;
+struct iModelData;
+struct iModelDataObject;
+
 struct csModelDataVertexMap
 {
   int VertexCount, NormalCount, ColorCount, TexelCount;
@@ -40,7 +45,7 @@ struct csModelDataTools
    * the given mapping table.
    */
   static void CopyVerticesMapped (iModelDataObject *dest,
-    iModelDataObject *src, csModelDataVertexMap *map);
+    iModelDataObject *src, const csModelDataVertexMap *map);
 
   /**
    * Merge all contained mesh objects in a scene into a single one. If
@@ -54,6 +59,11 @@ struct csModelDataTools
    * objects with only a single material.
    */
   static void SplitObjectsByMaterial (iModelData *Scene);
+
+  /**
+   * Print a description of an object into a string.
+   */
+  static void Describe (iObject *obj, csString &s);
 };
 
 #endif // __MDLTOOL_H__

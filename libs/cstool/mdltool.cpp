@@ -21,6 +21,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/objiter.h"
 #include "csutil/garray.h"
+#include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "cstool/mdldata.h"
 #include "cstool/mdltool.h"
@@ -35,6 +36,7 @@ SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
 SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
 SCF_DECLARE_FAST_INTERFACE (iModelDataVertices);
 SCF_DECLARE_FAST_INTERFACE (iModelDataAction);
+SCF_DECLARE_FAST_INTERFACE (iModelData);
 
 CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
@@ -154,6 +156,34 @@ static iModelDataVertices *BuildMappedVertexFrame (iModelDataVertices *Orig,
   return ver;
 }
 
+/*
+ * CheckMaterialConflict (one object): Returns true if the given
+ * object uses more than one material, false otherwise.
+ */
+static bool CheckMaterialConflict (iModelDataObject *obj1)
+{
+  iModelDataMaterial *mat = NULL;
+
+  csModelDataPolygonIterator it = (obj1->QueryObject ());
+  while (!it.IsFinished ())
+  {
+    iModelDataMaterial *mat2 = it.Get ()->GetMaterial ();
+
+    if (mat2)
+    {
+      if (!mat) mat = mat2;
+      else {
+        if (mat != mat2)
+          return true; 
+      }
+    }
+
+    it.Next ();
+  }
+
+  return false;
+}
+
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
@@ -258,46 +288,48 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
   SCF_DEC_REF (DefaultVertices);
 }
 
-/*
-void csModelDataObject::CopyVerticesMapped (iModelDataObject *Other,
-  const csModelDataVertexMap *Map)
+void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
+  iModelDataObject *src, const csModelDataVertexMap *Map)
 {
   iModelDataVertices *ver =
-    BuildMappedVertexFrame (Other->GetDefaultVertices (), Map);
-  SetDefaultVertices (ver);
+    BuildMappedVertexFrame (src->GetDefaultVertices (), Map);
+  dest->SetDefaultVertices (ver);
   ver->DecRef ();
 
-  csModelDataActionIterator it (Other->QueryObject ());
+  csModelDataActionIterator it (src->QueryObject ());
   while (!it.IsFinished ())
   {
     iModelDataAction *OldAction = it.Get ();
-    iModelDataAction *NewAction = CS_GET_NAMED_CHILD_OBJECT (&scfiObject,
+    iModelDataAction *NewAction = CS_GET_NAMED_CHILD_OBJECT (dest->QueryObject (),
       iModelDataAction, OldAction->QueryObject ()->GetName ());
-    if (!NewAction) NewAction = new csModelDataAction ();
-    else NewAction->DeleteAllFrames ();
+    if (!NewAction) {
+      NewAction = new csModelDataAction ();
+      dest->QueryObject ()->ObjAdd (NewAction->QueryObject ());
+      NewAction->QueryObject ()->SetName (OldAction->QueryObject ()->GetName ());
+    } else {
+      while (NewAction->GetFrameCount () > 0)
+        NewAction->DeleteFrame (0);
+    }
 
     for (int i=0; i<OldAction->GetFrameCount (); i++)
     {
-      iModelDataVertices *oldver = SCF_QUERY_INTERFACE_FAST (OldAction.GetState (i),
+      iModelDataVertices *oldver = SCF_QUERY_INTERFACE_FAST (OldAction->GetState (i),
         iModelDataVertices);
       if (oldver)
       {
         ver = BuildMappedVertexFrame (oldver, Map);
-	NewAction->AddFrame (OldAction->GetTime (i), ver);
+	NewAction->AddFrame (OldAction->GetTime (i), ver->QueryObject ());
         oldver->DecRef ();
 	ver->DecRef ();
       }
     }
+    NewAction->DecRef ();
     it.Next ();
   }
 }
-*/
 
 static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
 {
-/*
-  @@@ untested, thus disabled.
-
   csModelDataActionIterator it (obj1->QueryObject ());
   while (!it.IsFinished ())
   {
@@ -313,15 +345,12 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
     }
     it.Next ();
   }
-*/
+
   return false;
 }
 
 static bool CheckMaterialConflict (iModelDataObject *obj1, iModelDataObject *obj2)
 {
-/*
-  @@@ untested, thus disabled.
-
   csModelDataMaterialVector mat1, mat2;
 
   {
@@ -346,31 +375,13 @@ static bool CheckMaterialConflict (iModelDataObject *obj1, iModelDataObject *obj
 
   for (int i=0; i<mat1.Length (); i++)
   {
-    if (mat2.Find (mat1.Get (i)) != -1)
-      return true;
+    for (int j=0; j<mat2.Length (); j++)
+    {
+      if (mat1.Get (i) != mat2.Get (j))
+        return true;
+    }
   }
-*/
-  return false;
-}
 
-static bool CheckMaterialConflict (iModelDataObject *obj1)
-{
-/*
-  iModelDataMaterial *mat = NULL;
-
-  csModelDataPolygonIterator it = (obj1->QueryObject ());
-  while (!it.IsFinished ())
-  {
-    iModelDataMaterial *mat2 = it.Get ()->GetMaterial ();
-
-    if (mat2)
-      if (!mat) mat = mat2;
-    else if (mat != mat2)
-      return true;
-
-    it.Next ();
-  }
-*/
   return false;
 }
 
@@ -408,27 +419,25 @@ void csModelDataTools::MergeObjects (iModelData *Scene, bool MultiTexture)
   }
 }
 
-/*
-void csModelData::SplitObjectsByMaterial (iModelData *Scene)
+void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 {
   csModelDataObjectVector OldObjects, NewObjects;
 
-  ExtractObject (Scene, OldObjects);
+  ExtractObjects (Scene, OldObjects);
 
   while (OldObjects.Length () > 0)
   {
     iModelDataObject *obj = OldObjects.Pop ();
 
     if (!CheckMaterialConflict (obj)) {
-      scfiObject.ObjAdd (obj->QueryObject ());
+      Scene->QueryObject ()->ObjAdd (obj->QueryObject ());
     } else {
       csModelDataPolygonVector Polygons;
       csModelDataMaterialVector Materials;
       csIntArray PolygonToNewObject;
       csModelDataObjectVector NewObjects;
-      csIntArrayArray VertexMap;
 
-      // build the Polygons, Materials and PolygonToMaterial lists
+      // build the Polygons, Materials and PolygonToNewObject lists
       csModelDataPolygonIterator it (obj->QueryObject ());
       while (!it.IsFinished ())
       {
@@ -443,7 +452,7 @@ void csModelData::SplitObjectsByMaterial (iModelData *Scene)
 
 	  iModelDataObject *obj = new csModelDataObject ();
 	  NewObjects.Push (obj);
-	  scfiObject.ObjAdd (obj->QueryObject ());
+	  Scene->QueryObject ()->ObjAdd (obj->QueryObject ());
 	  obj->DecRef ();
         } else {
           PolygonToNewObject.Push (n);
@@ -454,41 +463,170 @@ void csModelData::SplitObjectsByMaterial (iModelData *Scene)
 
       // build the vertex mapping table and move the polygons
       int i;
-      VertexMap.SetLength (Materials.Length ());
+      csIntArray *VertexMap = new csIntArray [Materials.Length ()];
+      csIntArray *NormalMap = new csIntArray [Materials.Length ()];
+      csIntArray *ColorMap = new csIntArray [Materials.Length ()];
+      csIntArray *TexelMap = new csIntArray [Materials.Length ()];
       for (i=0; i<Polygons.Length (); i++)
       {
         iModelDataPolygon *Polygon = Polygons.Get (i);
         int NewObjIndex = PolygonToNewObject.Get (i);
 	csIntArray *VertexIndexTable = &(VertexMap [NewObjIndex]);
+	csIntArray *NormalIndexTable = &(NormalMap [NewObjIndex]);
+	csIntArray *ColorIndexTable = &(ColorMap [NewObjIndex]);
+	csIntArray *TexelIndexTable = &(TexelMap [NewObjIndex]);
 	iModelDataObject *Object = NewObjects.Get (NewObjIndex);
 
         Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
-	scfiObject.ObjRemove (Polygon->QueryObject ());
+	Scene->QueryObject ()->ObjRemove (Polygon->QueryObject ());
 
 	for (int j=0; j<Polygon->GetVertexCount (); j++)
 	{
-	  int n = -1;
-          for (int k=0; k<VertexIndexTable->Length (); k++)
-            if (VertexIndexTable->Get (i) == Polygon->GetVertex (j))
-	      { n = i; break; }
-	  if (n != -1) {
-	    Polygon->SetVertex (j, n);
-	  } else {
-	    VertexIndexTable->Push (Polygon->GetVertex (j));
-	    Polygon->SetVertex (j, VertexIndexTable->Length () - 1);
-	  }
+
+#define CS_MDLTOOL_HELPER(obj)						\
+  n = -1;								\
+  for (k=0; k<obj##IndexTable->Length (); k++)				\
+    if (obj##IndexTable->Get (k) == Polygon->Get##obj (j))		\
+      { n = k; break; }							\
+  if (n != -1) {							\
+    Polygon->Set##obj (j, n);						\
+  } else {								\
+    obj##IndexTable->Push (Polygon->Get##obj (j));			\
+    Polygon->Set##obj (j, obj##IndexTable->Length () - 1);		\
+  }
+        
+          int n, k;
+          CS_MDLTOOL_HELPER (Vertex);
+          CS_MDLTOOL_HELPER (Normal);
+          CS_MDLTOOL_HELPER (Color);
+          CS_MDLTOOL_HELPER (Texel);
+
 	}
       }
+
+#undef CS_MDLTOOL_HELPER
 
       // copy the vertices themselves
       for (i=0; i<NewObjects.Length (); i++)
       {
-        NewObjects.Get (i)->CopyVerticesMapped (obj, VertexMap.Length (),
-	  VertexMap[i].GetArray ());
+        csModelDataVertexMap Map;
+	Map.VertexCount = VertexMap [i].Length ();
+	Map.NormalCount = NormalMap [i].Length ();
+	Map.ColorCount = ColorMap [i].Length ();
+	Map.TexelCount = TexelMap [i].Length ();
+	Map.Vertices = VertexMap [i].GetArray ();
+	Map.Normals = NormalMap [i].GetArray ();
+	Map.Colors = ColorMap [i].GetArray ();
+	Map.Texels = TexelMap [i].GetArray ();
+        CopyVerticesMapped (NewObjects.Get (i), obj, &Map);
       }
+
+      delete [] VertexMap;
+      delete [] NormalMap;
+      delete [] ColorMap;
+      delete [] TexelMap;
     }
     obj->DecRef ();
   }
 }
-*/
 
+// ---------------------------------------------------------------------------
+// Debug output functions
+// ---------------------------------------------------------------------------
+
+#define CS_MDLTOOL_TRY_BEGIN(obj,t)				\
+  {								\
+    t *Object = SCF_QUERY_INTERFACE_FAST (obj, t);		\
+    if (Object) {						\
+      typestring = #t;
+
+#define CS_MDLTOOL_TRY_END					\
+    }								\
+  }
+
+void csModelDataTools::Describe (iObject *obj, csString &out)
+{
+  static int Indent = 0;
+  static char *Indention = NULL;
+  if (!Indention) {
+    Indention = new char [2000];
+    memset (Indention, ' ', 2000);
+    Indention[0] = 0;
+  }
+
+  Indention [Indent] = ' ';
+  Indent += 2;
+  Indention [Indent] = 0;
+
+  csString typestring, contents;
+
+  CS_MDLTOOL_TRY_BEGIN (obj, iModelData)
+  CS_MDLTOOL_TRY_END
+
+  CS_MDLTOOL_TRY_BEGIN (obj, iModelDataObject)
+    contents << Indention << "DefaultVertices :\n";
+    Describe (Object->GetDefaultVertices ()->QueryObject (), contents);
+  CS_MDLTOOL_TRY_END
+
+  CS_MDLTOOL_TRY_BEGIN (obj, iModelDataPolygon)
+    for (int i=0; i<Object->GetVertexCount (); i++)
+    {
+      contents << Indention << "Vertex <v" <<
+        Object->GetVertex (i) << ",n" <<
+        Object->GetNormal (i) << ",t" <<
+        Object->GetTexel (i) << ",c" <<
+        Object->GetColor (i) << ">\n";
+    }
+  CS_MDLTOOL_TRY_END
+
+  CS_MDLTOOL_TRY_BEGIN (obj, iModelDataAction)
+    for (int i=0; i<Object->GetFrameCount (); i++)
+    {
+      contents << Indention << "Frame <" << Object->GetTime (i) <<
+        "> :\n";
+      Describe (Object->GetState (i), contents);
+    }
+  CS_MDLTOOL_TRY_END
+
+  CS_MDLTOOL_TRY_BEGIN (obj, iModelDataVertices)
+    int i;
+    for (i=0; i<Object->GetVertexCount (); i++)
+    { csVector3 v = Object->GetVertex (i); contents << Indention <<
+      "Vertex <" << v.x << ',' << v.y << ',' << v.z << ">\n"; }
+    for (i=0; i<Object->GetNormalCount (); i++)
+    { csVector3 v = Object->GetNormal (i); contents << Indention <<
+      "Normal <" << v.x << ',' << v.y << ',' << v.z << ">\n"; }
+    for (i=0; i<Object->GetTexelCount (); i++)
+    { csVector2 v = Object->GetTexel (i); contents << Indention <<
+      "Texel <" << v.x << ',' << v.y << ">\n"; }
+    for (i=0; i<Object->GetColorCount (); i++)
+    { csColor v = Object->GetColor (i); contents << Indention <<
+      "Color <" << v.red << ',' << v.green << ',' << v.blue << ">\n"; }
+  CS_MDLTOOL_TRY_END
+
+  CS_MDLTOOL_TRY_BEGIN (obj, iModelDataTexture)
+  CS_MDLTOOL_TRY_END
+
+  CS_MDLTOOL_TRY_BEGIN (obj, iModelDataMaterial)
+  CS_MDLTOOL_TRY_END
+
+  iObjectIterator *it = obj->GetIterator ();
+  while (!it->IsFinished ())
+  {
+    Describe (it->GetObject (), contents);
+    it->Next ();
+  }
+
+  it->DecRef ();
+  Indent -= 2;
+  Indention [Indent] = 0;
+
+  csString s;
+  s << Indention << "object '" << obj->GetName () << "' [" << typestring << "] (\n";
+  s << contents;
+  s << Indention << ") \n";
+  out << s;
+}
+
+#undef CS_MDLTOOL_TRY_BEGIN
+#undef CS_MDLTOOL_TRY_END

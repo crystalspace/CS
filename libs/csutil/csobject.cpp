@@ -236,8 +236,11 @@ void* csObject::GetChild (int InterfaceID, int Version,
 
   for (int i = 0; i < Children->Length (); i++)
   {
-    if (Name && strcmp(Children->Get (i)->GetName (), Name))
-      continue;
+    if (Name) {
+      const char *OtherName = Children->Get (i)->GetName ();
+      if (!OtherName) continue;
+      if (strcmp(OtherName, Name)) continue;
+    }
 
     void *obj = Children->Get (i)->QueryInterface (InterfaceID, Version);
     if (obj) return obj;
