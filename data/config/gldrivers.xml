@@ -245,6 +245,14 @@
 	<usecfg>pixelformatbroken</usecfg>
       </applicable>
     </rule>
+    <rule description="Intel: Texture Compression">
+      <conditions>
+	<regexp string="renderer" pattern="^Intel" />
+      </conditions>
+      <applicable>
+	<usecfg>texturecompression</usecfg>
+      </applicable>
+    </rule>
     <rule description="Intel: Extreme Buggy Graphics">
       <conditions>
 	<regexp string="renderer" pattern="^Intel" />
@@ -252,6 +260,7 @@
 	     Intel gfx hardware. -->
       </conditions>
       <applicable>
+	<usecfg>disableMTtext</usecfg>
       </applicable>
     </rule>
     <!--
