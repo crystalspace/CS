@@ -26,10 +26,16 @@
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 
+static bool verbose_errors = true;
+
+void csSetLoadLibraryVerbose(bool b) { verbose_errors = b; }
+bool csGetLoadLibraryVerbose() { return verbose_errors; }
+
+
 CS_IMPLEMENT_STATIC_VAR (GetLibPath, csStrVector, (4, 4))
 bool findlib_search_nodir = true;
 
-void csAddLibraryPath (const char *iPath)
+void csAddLibraryPath (char const* iPath)
 {
   GetLibPath ()->Push (csStrNew (iPath));
 }
@@ -37,26 +43,26 @@ void csAddLibraryPath (const char *iPath)
 const int CALLBACK_STOP = 0;
 const int CALLBACK_CONTINUE = 1;
 
-class iCallback
+class iLoadLibCallback
 {
 public:
-  virtual int File (const char *file, bool search_nodir) = 0;
+  virtual int File (char const* file, bool search_nodir) = 0;
 };
 
-class callbackLoadLibrary : public iCallback
+class csLoadLibLoader : public iLoadLibCallback
 {
 public:
-  callbackLoadLibrary ()
+  csLoadLibLoader ()
   {
-    _handle = 0;
-    _file_found = false;
+    handle = 0;
+    file_found = false;
   }
 
-  virtual int File (const char *file, bool search_nodir)
+  virtual int File (char const* file, bool search_nodir)
   {
     int status;
-    _handle = csLoadLibrary (file);
-    if (!_handle)
+    handle = csLoadLibrary (file);
+    if (!handle)
     {
       if (search_nodir)
       {
@@ -64,7 +70,7 @@ public:
 	// because the file does not exist or because loading
 	// an existing file triggers errors (undefined symbols).
 	// The only course of action is to keep trying.
-	// _file_found is not set to true because we don't know
+	// file_found is not set to true because we don't know
 	// for sure.
 	status = CALLBACK_CONTINUE;
       }
@@ -78,7 +84,7 @@ public:
 	struct stat st;
 	if (stat (file, &st) == 0)
 	{
-	  _file_found = true;
+	  file_found = true;
 	  status = CALLBACK_STOP;
 	}
 	else
@@ -89,27 +95,27 @@ public:
     }
     else
     {
-      // This is only for consistency purpose since _file_found is only
+      // This is only for consistency purpose since file_found is only
       // supposed to be used for error checking, not when loading
       // succeeds.
-      _file_found = true;
+      file_found = true;
       status = CALLBACK_STOP;
     }
     return status;
   }
 
   // The dynamic library handle or 0 if failed to load
-  csLibraryHandle _handle;
+  csLibraryHandle handle;
   // Set to true if we know for sure that a file exists but cannot be loaded
   // When implicitly searching in LD_LIBRARY_PATH or equivalent, we cannot
-  // figure out if the file exists or not, therefore _file_found is false.
-  bool _file_found;
+  // figure out if the file exists or not, therefore file_found is false.
+  bool file_found;
 };
 
-class callbackPrint : public iCallback
+class csLoadLibPrintErr : public iLoadLibCallback
 {
 public:
-  virtual int File (const char *file, bool search_nodir)
+  virtual int File (char const* file, bool search_nodir)
   {
     if (search_nodir)
     {
@@ -119,24 +125,21 @@ public:
       // It may be a simple "file not found" but in the case where it is
       // "failed to resolve symbol XXX" it is a precious bit of
       // information that we need to display.
-      fprintf (stderr, "\tloading '%s' from LD_LIBRARY_PATH or equivalent gives:\n", file);
       csLoadLibrary (file);
       csPrintLibraryError (file);
     }
     else
     {
-      fprintf (stderr, "\t%s: file not found\n", file);
+      fprintf (stderr, "%s: File not found\n", file);
     }
     return CALLBACK_CONTINUE;
   }
 };
 
-static void csFindLoadLibraryHelper (const char *iPrefix, const char *iName,
-  const char *iSuffix, iCallback& callback)
+static void csFindLoadLibraryHelper (char const* iPrefix, char const* iName,
+  char const* iSuffix, iLoadLibCallback& callback)
 {
-  int i, j;
-
-  for (i = findlib_search_nodir ? -1 : 0; i < GetLibPath ()->Length (); i++)
+  for (int i = findlib_search_nodir?-1:0, n = GetLibPath()->Length(); i<n; i++)
   {
     char lib [CS_MAXPATHLEN + 1];
 
@@ -146,8 +149,8 @@ static void csFindLoadLibraryHelper (const char *iPrefix, const char *iName,
     else
       lib [0] = 0;
 
-    size_t sl = strlen (lib);
-    for (j = 0 ; j < 2 ; j++)
+    size_t const sl = strlen (lib);
+    for (int j = 0 ; j < 2 ; j++)
     {
       if (j)
 	 strcpy (lib + sl, iPrefix);
@@ -162,35 +165,35 @@ static void csFindLoadLibraryHelper (const char *iPrefix, const char *iName,
 	 break;
     }
   }
-
 }
 
-csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
-  const char *iSuffix)
+csLibraryHandle csFindLoadLibrary (char const* iPrefix, char const* iName,
+  char const* iSuffix)
 {
-  callbackLoadLibrary loader;
-
+  csLoadLibLoader loader;
   csFindLoadLibraryHelper(iPrefix, iName, iSuffix, loader);
 
-  if (!loader._handle)
+  if (!loader.handle)
   {
-    if (loader._file_found)
+    if (!csGetLoadLibraryVerbose())
     {
-      csPrintLibraryError (iName);
+      fprintf(stderr,
+        "Warning: Failed to load `%s'; use -verbose for details.\n", iName);
     }
     else
     {
-#ifdef CS_DEBUG
-      callbackPrint printer;
-      fprintf (stderr, "WARNING: %s, failed to load, because:\n", iName);
-      csFindLoadLibraryHelper (iPrefix, iName, iSuffix, printer);
-#else
-      fprintf (stderr, "Warning: %s failed to load (perhaps application doesn't need it?).\n", iName);
-#endif
+      fprintf(stderr, "Warning: Failed to load `%s'; reason:\n", iName);
+      if (loader.file_found)
+      {
+        csPrintLibraryError (iName);
+      }
+      else
+      {
+        csLoadLibPrintErr printer;
+        csFindLoadLibraryHelper (iPrefix, iName, iSuffix, printer);
+      }
     }
   }
 
-  return loader._handle;
+  return loader.handle;
 }
-
-

@@ -62,6 +62,12 @@
 #include "ivaria/conout.h"
 #include "ivaria/perfstat.h"
 
+#ifdef CS_DEBUG
+#define CS_LOAD_LIB_VERBOSE true
+#else
+#define CS_LOAD_LIB_VERBOSE false
+#endif
+
 static SysSystemDriver* global_sys = NULL;
 static bool config_done = false;
 static bool sys_init_done = false;
@@ -221,9 +227,24 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
   return Config;
 }
 
-bool csInitializer::SetupConfigManager (
-  iObjectRegistry* r, const char* configName, const char *AppID)
+static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)
 {
+  csRef<iCommandLineParser> cmdline(CS_QUERY_REGISTRY(r, iCommandLineParser));
+  if (cmdline.IsValid())
+  {
+    bool verbose = CS_LOAD_LIB_VERBOSE;
+    char const* const s = cmdline->GetOption("verbose");
+    if (s != 0)
+      verbose = true;
+    csSetLoadLibraryVerbose(verbose);
+  }
+}
+
+bool csInitializer::SetupConfigManager (
+  iObjectRegistry* r, char const* configName, char const* AppID)
+{
+  SetupPluginLoadErrVerbosity(r);
+
   if (config_done) return true;
 
   // @@@ This is ugly.  We need a better, more generalized way of doing this.
@@ -234,7 +255,7 @@ bool csInitializer::SetupConfigManager (
   // configuration file for other plugins may (and almost always do) reside on
   // a VFS volume.
 
-  // we first create an empty application config file, so we can create the
+  // We first create an empty application config file, so we can create the
   // config manager at all. Then we load the VFS. After that, all config files
   // can be loaded. At the end, we make the user-and-application-specific
   // config file the dynamic one.
@@ -263,18 +284,18 @@ bool csInitializer::SetupConfigManager (
     if (!cfg->Load (configName, VFS))
       return false;
 
-  // look if the user-specific config domain should be used
+  // Check if the user-specific config domain should be used.
   {
     csConfigAccess cfgacc (r, "/config/system.cfg");
     if (cfgacc->GetBool ("System.UserConfig", true))
     {
-      // open the user-specific, application-neutral config domain
+      // Open the user-specific, application-neutral config domain.
       cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
       	"User.Global");
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal);
       cfg->DecRef ();
 
-      // open the user-and-application-specific config domain
+      // Open the user-and-application-specific config domain.
       cfg = new csPrefixConfig ("/config/user.cfg", VFS,
       	cfgacc->GetStr ("System.ApplicationID", AppID),
         "User.Application");
@@ -290,7 +311,8 @@ bool csInitializer::SetupConfigManager (
 
 bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
 {
-  if (!config_done) SetupConfigManager (r, NULL);
+  SetupConfigManager (r, NULL);
+  SetupPluginLoadErrVerbosity(r);
 
   csPluginLoader* plugldr = new csPluginLoader (r);
 
@@ -366,7 +388,8 @@ bool csInitializer::SetupEventHandler (
 
 bool csInitializer::OpenApplication (iObjectRegistry* r)
 {
-  if (!config_done) SetupConfigManager (r, NULL);
+  SetupConfigManager (r, NULL);
+
   // @@@ Temporary.
   if (!sys_init_done)
   {
@@ -422,10 +445,10 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   r->Clear ();
   r->DecRef ();
 
-  // destruct all static variables that had been created during runtime
+  // Destroy all static variables created by CS_IMPLEMENT_STATIC_VAR() or one
+  // of its cousins.
   CS_DECLARE_STATIC_VARIABLE_CLEANUP
   CS_STATIC_VARIABLE_CLEANUP
 
   iSCF::SCF->Finish();
 }
-

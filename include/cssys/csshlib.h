@@ -20,14 +20,14 @@
 #ifndef __CS_CSSHLIB_H__
 #define __CS_CSSHLIB_H__
 
-typedef void *csLibraryHandle;
+typedef void* csLibraryHandle;
 
 /**
  * Load a shared library and return a library handle,
  * which is used later to query and unload the library.
  * iName is the FULL path to the library.
  */
-extern csLibraryHandle csLoadLibrary (const char* iName);
+csLibraryHandle csLoadLibrary (char const* iName);
 
 /**
  * Return a pointer to a symbol within given shared library.
@@ -36,27 +36,27 @@ extern csLibraryHandle csLoadLibrary (const char* iName);
  * If your OS is short on features, you may implement querying of just
  * this symbol.
  */
-extern void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName);
+void* csGetLibrarySymbol (csLibraryHandle Handle, char const* iName);
 
 /**
  * Unload a shared library given its handle.
  * The function returns false on error.
  */
-extern bool csUnloadLibrary (csLibraryHandle Handle);
+bool csUnloadLibrary (csLibraryHandle Handle);
 
 /**
  * Add one element to shared library search path;
  * the path should end in '/' or whatever the path separator is,
  * that is, it should be immediately prependable to shared library name.
  */
-extern void csAddLibraryPath (const char *iPath);
+void csAddLibraryPath (char const* iPath);
 
 /**
  * Find a shared library in library search path and load it.
  * Same as csLoadLibrary except that you give just the name of the
  * module, without any prefix/suffix.
  */
-extern csLibraryHandle csFindLoadLibrary (const char *iModule);
+csLibraryHandle csFindLoadLibrary (char const* iModule);
 
 /**
  * Same but you give the possible suffix and prefix. This is usually called
@@ -66,14 +66,30 @@ extern csLibraryHandle csFindLoadLibrary (const char *iModule);
  * Same about iSuffix - it can be something like ".dll" or ".so", but
  * not NULL (because all OSes use some suffix for shared libs).
  */
-extern csLibraryHandle csFindLoadLibrary (const char *iPrefix,
-  const char *iName, const char *iSuffix);
+csLibraryHandle csFindLoadLibrary (char const* iPrefix,
+  char const* iName, char const* iSuffix);
 
 /**
  * Print out the latest dynamic loader error.
  * This is not strictly required (and on some platforms its just a empty
  * routine) but sometimes it helps to find problems.
  */
-extern void csPrintLibraryError (const char *iModule);
+void csPrintLibraryError (char const* iModule);
+
+/**
+ * Control whether dynamic library loading messages are verbose or terse.
+ * When verbose, and a library fails to load, csPrintLibraryError() is invoked
+ * to emit detailed diagnostic information regarding the failure.  If terse,
+ * then a simple message is emitted stating that the library failed to load
+ * and instructing the user to use the -verbose command-line option for more
+ * details.  Verbose messages are enabled by default for debug builds; terse
+ * messages for optimized builds.
+ */
+void csSetLoadLibraryVerbose(bool);
+
+/**
+ * Query if failed dynamic library loads generate verbose messages.
+ */
+bool csGetLoadLibraryVerbose();
 
 #endif // __CS_CSSHLIB_H__

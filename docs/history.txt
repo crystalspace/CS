@@ -1,5 +1,17 @@
 The history order is reversed so that new features are at the top.
 
+20-Jan-2003
+	- Eric Sunshine reverted the recent change to the general
+	  csFindLoadLibrary() which caused it to throw away potentially useful
+	  diagnostic information when a plugin failed to load.  Unconditionally
+	  throwing away this information was unacceptable.  Instead, the
+	  verbosity of error messages from the plugin loader is now controlled
+	  by the new command-line option "-verbose".  When -verbose is used,
+	  error messages present detailed information about the load failure.
+	  When not used, a simple message is printed saying that the load
+	  failed and that the user should use "-verbose" for more details.  For
+	  debug builds, -verbose is the default.  For optimize builds, it is
+	  not.
 19-Jan-2003
 	- Fixed a problem where RemoveObject() would not properly remove
 	  objects from the sectors so memory leaks would occur.
