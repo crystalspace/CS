@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make tutphys     Make the $(DESCRIPTION.tutphys)$"
+  $(NEWLINE)echo $"  make tutphys      Make the $(DESCRIPTION.tutphys)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

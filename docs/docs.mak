@@ -38,7 +38,7 @@ DESCRIPTION.psdoc = user manual as PostScript
 DESCRIPTION.pdfdoc = user manual as PDF
 DESCRIPTION.infodoc = user manual as Info
 DESCRIPTION.repairdoc = Texinfo @node and @menu directives
-DESCRIPTION.chmsupp = HTML Help support files (projects, TOCs, index files)
+DESCRIPTION.chmsupp = MS HTML Help support files (projects, TOCs, index)
 # For 'cleandoc' target
 DESCRIPTION.doc = generated documentation
 
