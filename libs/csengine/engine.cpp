@@ -1714,6 +1714,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
+  top_clipper = view;
   defaultRenderLoop->Draw (c, view);
 }
 

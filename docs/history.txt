@@ -14,6 +14,14 @@ chronological order.
 	  compatible with old renderer.
 	- Jorrit completely merged render3d.h with graph3d.h so that only
 	  graph3d.h remains.
+	- Peter Amstutz added more comments to the AttachCollider*
+	  methods in varia/dynamics.h and changed the default
+	  softness from .316 to .01
+	- Duhprey fixed the default to stepfast and coding style in
+	  odedynam.
+	- Jorrit fixed a bug in the new renderer where it would fail to
+	  set the top_clipper in StartDraw(). In fact new renderer fails to
+	  do anything in StartDraw().
 	- Peter Amstutz added more comments to the AttachCollider* methods in
 	  varia/dynamics.h and changed the default softness from .316 to .01
 	- Duhprey fixed the default to stepfast and coding style in odedynam.
