@@ -1420,7 +1420,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
     float area = (b.MaxX () - b.MinX ()) *
 		     (b.MaxY () - b.MinY ()) *
 		     (b.MaxZ () - b.MinZ ());
-    area = pow (area, 1./3.);
+    area = pow (area, 1.0f/3.0f);
     int where = int (100 * (area / global_area));
     if (where < minsize || where > maxsize)
       return;
@@ -1954,7 +1954,7 @@ void LevTool::Main ()
 	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
 		     (global_bbox.MaxY () - global_bbox.MinY ()) *
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
-	global_area = pow (global_area, 1./3.);
+	global_area = pow (global_area, 1.0f/3.0f);
         int counts[51];
 	for (i = 0 ; i <= 50 ; i++)
 	  counts[i] = 0;
@@ -1965,7 +1965,7 @@ void LevTool::Main ()
 	  float area = (b.MaxX () - b.MinX ()) *
 		     (b.MaxY () - b.MinY ()) *
 		     (b.MaxZ () - b.MinZ ());
-	  area = pow (area, 1./3.);
+	  area = pow (area, 1.0f/3.0f);
 	  int where = int (50 * (area / global_area));
 	  counts[where]++;
 	}
@@ -2070,7 +2070,7 @@ void LevTool::Main ()
 	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
 		     (global_bbox.MaxY () - global_bbox.MinY ()) *
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
-	global_area = pow (global_area, 1./3.);
+	global_area = pow (global_area, 1.0f/3.0f);
 
 	for (i = 0 ; i < things.Length () ; i++)
 	{
@@ -2079,7 +2079,7 @@ void LevTool::Main ()
 	  float area = (b.MaxX () - b.MinX ()) *
 		     (b.MaxY () - b.MinY ()) *
 		     (b.MaxZ () - b.MinZ ());
-	  area = pow (area, 1./3.);
+	  area = pow (area, 1.0f/3.0f);
 	  int where = int (100 * (area / global_area));
 	  if (where >= minsize)
 	    th->SplitThingSeperateUnits ();
@@ -2116,7 +2116,7 @@ void LevTool::Main ()
 	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
 		     (global_bbox.MaxY () - global_bbox.MinY ()) *
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
-	global_area = pow (global_area, 1./3.);
+	global_area = pow (global_area, 1.0f/3.0f);
 
 	for (i = 0 ; i < things.Length () ; i++)
 	{
@@ -2125,7 +2125,7 @@ void LevTool::Main ()
 	  float area = (b.MaxX () - b.MinX ()) *
 		     (b.MaxY () - b.MinY ()) *
 		     (b.MaxZ () - b.MinZ ());
-	  area = pow (area, 1./3.);
+	  area = pow (area, 1.0f/3.0f);
 	  int where = int (100 * (area / global_area));
 	  if (where >= minsize)
 	  {
@@ -2167,7 +2167,7 @@ void LevTool::Main ()
 	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
 		     (global_bbox.MaxY () - global_bbox.MinY ()) *
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
-	global_area = pow (global_area, 1./3.);
+	global_area = pow (global_area, 1.0f/3.0f);
 
 	cnt = 0;
 	CloneAndChangeFlags (doc, newdoc, op, minsize, maxsize,

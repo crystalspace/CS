@@ -744,7 +744,7 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
     csVector2& uv = tx[i];
     // This is a bit like 3D texture mapping.
     uv.x = fmod (10.*fabs (v.x+v.z), 1.)/2.;
-    uv.y = fmod (fabs (v.y), 1.);
+    uv.y = fmod (fabs (v.y), 1.0f);
     if (int (v.y) & 1) uv.y = 1-uv.y;
   }
   state->SetTriangleCount (construction->GetTriangleCount ());

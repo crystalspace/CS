@@ -921,7 +921,7 @@ void csEmitMeshObject::ReplaceAge(int time, const csColor& color, float alpha,
   csEmitAge *p = aging;
   while(p && (p->time != time))
   {
-    if(fabs(p->time-time) < SMALL_EPSILON)
+    if(fabs((float)p->time-time) < SMALL_EPSILON)
       break;  /// almost the same, assume the diff is due to float inaccuracy
     p=p->next;
   }

@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 5-May-2003
+	- Marten Svanfeldt fixed a few compilation errors in MSVC 7.1
 	- Eric Sunshine changed jobber.pl and snapshot.py to once again use
 	  /home/groups/c/cr/crystal as a working area rather than /tmp.  It
 	  seems that the snapshot script runs out of disk space when using
