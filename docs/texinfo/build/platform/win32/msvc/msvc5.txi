@@ -199,6 +199,15 @@ below.
 Now just follow the @emph{Compiling Crystal Space} instructions to again re-build AWS
 with your modifications included.
 
+@subsubheading Creative EAX 2.0
+
+In order to build the CS EAX 2.0 enviromental audio plugin (@emph{plgsndrdreax}), requires
+you have the EAX 2.0 SDK on your system. The SDK can be obtained from the following website.
+
+@uref{http://developer.creative.com/LEFTMENU/DC_LM_Downloads.asp}
+
+After installtion you will need to point MSVC to the SDK's include and lib paths.
+
 @subsubheading Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
