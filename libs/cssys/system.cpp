@@ -1065,11 +1065,11 @@ iBase* csSystemDriver::GetPlugIn (int idx)
 
 iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
 {
+  scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   for (int i = 0; i < PlugIns.Length (); i++)
   {
     iBase *ret =
-      (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (
-        iSCF::SCF->GetInterfaceID (iInterface), iVersion);
+      (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (ifID, iVersion);
     if (ret)
       return ret;
   }
