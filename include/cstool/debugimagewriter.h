@@ -38,11 +38,13 @@ class CS_CSTOOL_EXPORT csDebugImageWriter
 {
   static void Report (int severity, const char* msg, ...)
   {
+#ifdef CS_DEBUG
     va_list arg;
     va_start (arg, msg);
     csReportV (iSCF::SCF->object_reg, severity, "crystalspace.debugimagewriter",
       msg, arg);
     va_end (arg);
+#endif
   }
 public:
   /**

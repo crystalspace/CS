@@ -16,6 +16,9 @@ chronological order.
 	  additional data maps. Currently unused and untested.
 	- Jorrit added bruteblock, simpleformer, and simpleformerldr to
 	  the walktest_static target.
+	- Jorrit fixed a bug in debugimagewriter.h. It was using
+	  iSCF::SCF->object_reg but that field is only present in debug
+	  mode.
 7-Oct-2004
 	- Jorrit added a new 'proto' mesh. This is a basic mesh that can
 	  be used to start creating a new mesh. It supports the following
