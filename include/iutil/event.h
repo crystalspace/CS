@@ -98,7 +98,7 @@ SCF_VERSION (iEvent, 0, 1, 1);
 /**
  * Structure that collects the data a keyboard event carries.
  * The event it self doesn't transfer the data in this structure; it is merely 
- * ment to pass around keyboard event data in a compact way within client code
+ * meant to pass around keyboard event data in a compact way within client code
  * without having to pass around the event itself. 
  * @sa csKeyEventHelper
  */
