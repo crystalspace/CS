@@ -7,8 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 22-Nov-2004
-	- Eric Sunshine added blurb about newly supported Java bindings to
-	  apimod100.txi.
+	- Eric Sunshine added blurb to apimod100.txi regarding newly supported
+	  Java bindings.
 21-Nov-2004
 	- res fixed a problem in the NR software renderer were wrong renderer
 	  lightmaps were selected for polygons, causing problems from visual 
