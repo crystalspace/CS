@@ -1,6 +1,39 @@
 The history order has been reversed so that new features are at the top.
 
+5-May-2000
+	- Andrew Zabolotny removed some relatively expensive unneeded
+	  code from lighting routines which should make lighting (both
+	  static and dynamic) work faster :-)
+	- Andrew split FillLightMap routine into two: GetCoverageMatrix
+	  and FillLightMap. The first one can be used to get the coverage
+	  matrix for any frustum projected on the polygon lightmap.
+	  Wouter is going to use it for radiosity.
+	- Frank O'Connor fixed post-build copy macro for VC project files.
+	- Frank also fixed bug where DirectDraw 2d plugin was exporting
+	  a class name that did not synch with SCF.CFG or the MSVC output
+	  name. The (default) directdraw 2d class is now named csddraw. The
+	  ddraw.mak and static.cpp have been updated as well.
+	- Fixed bug in csIntersect2::Planes(). It always returned false
+	  even if there was an intersection.
+	- Paul Garceau modified mingw.mak to accomodate static lib builds
+	  for COMP_GCC. Added libdinput.a link reference.
+	- Fixed a fix by Eric to radiosity (suggested by Wouter Wijngaards).
+	- Fixed memory leak in new lighting code from Andrew.
 4-May-2000
+	- Chris Bruner did some various cleanups in some files.
+	- Borland Ehle did an attempt to unify makefile for all Win32
+	  compilers.
+	- Frank O'Connor did a big win32 project overhaul to standardize
+	  (re-standardize) the settings, defines, paths whic the projects
+	  use. Defined debug/ and release/ directories, added a macro for
+	  copying output to root directory. Prevents clutter from debug
+	  info, browse files, ilk's and other files that MSVC makes.
+	- Martin Geisse did some update and clean-up work for dungeon
+	  plugin.
+	- Andrew Zabolotny fixed another lighting bug. Now every light
+	  frustum has a unique numeric ID which can be used to uniquely
+	  identify that frustum. This is used to avoid duplicate lighting
+	  of same shared lightmap by same light.
 	- Eric Sunshine fixed a slew of compilation problems throughout the
 	  project.
 	- Eric Sunshine fixed a bug in the Dungeon plugin in which virtual
@@ -26,6 +59,8 @@ The history order has been reversed so that new features are at the top.
 	      wasn't taking endianess into account.  I also moved this
 	      function to cctest (which is the only place it was used) since
 	      it is inappropriate for a general MD5 class, IMHO.
+	- Robert Bate made some more InputSprocket changes.
+	- Robert also updated the Mac project files.
 3-May-2000
 	- Fixed bug in Blocks which caused the menu not to work
 	  properly (left/right arrows were gone).
@@ -77,8 +112,17 @@ The history order has been reversed so that new features are at the top.
 	  are left after his changes.
 	- Andrew Zabolotny fixed the second of the many lighting bugs that
 	  are left after his changes.
+	- Andrew Zabolotny fixed the third of the many lighting bugs that
+	  are left after his changes. It is a theoretical bug though,
+	  nobody has seen it in action yet :-)
 	- Fixed a memory leak in csClipper. The destructor was not virtual.
 	- Some further fixes on PVS.
+	- Frank O'Connor did some various bug fixes.
+	- Wouter Wijngaards did various changes to radiosity:
+	    - Fixed ambient, use standard ambient values again.
+	    - Slightly faster.
+	    - Can do specular gloss.
+	    - Options configurable in config.
 2-May-2000
 	- Added csPoly3D::ProjectAxisPlane() which is similar to
 	  ProjectXPlane() but for a general axis aligned plane.
