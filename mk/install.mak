@@ -9,7 +9,9 @@
 # TO_INSTALL.CONFIG: files will be put in data/config/
 # TO_INSTALL.STATIC_LIBS:  files will be put in lib/
 # TO_INSTALL.DYNAMIC_LIBS: files could be put in lib/, but could also end up in
-#    a platform specific location (e.g.  System folder).
+#    a platform specific location (e.g. System folder).
+# TO_INSTALL.SCRIPTS: files will be placed under appropriately named
+#    subdirectories of scripts/
 #
 # Always copied:
 # INSTALL_INCLUDE.FILES: does not exist, the entire include/ hierarchy is
@@ -17,8 +19,6 @@
 # INSTALL_DOCS.FILES: also does not exist, the docs/html dir is copied (all
 #    html) to docs/html, as well as all subdirs (8 deep) with gif, jpg, png,
 #    css; also docs/README.html is copied.
-# INSTALL_SCRIPTS.FILES: does not exist.  scripts/python and scripts/perl5 are
-#    copied.
 #==============================================================================
 
 #------------------------------------------------------------- all defines ---#
@@ -45,14 +45,20 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: install uninstall
+.PHONY: install_config install_data install_plugin install_lib \
+  install_bin install_include install_root install_doc install_script
 
-install:
+define INSTALL_COMPONENT
 	@echo $(SEPARATOR)
-	@echo $"  Installing Crystal Space SDK$"
+	@echo $"  Installing Crystal Space SDK (component: $@)$"
 	@echo $"  INSTALL_DIR=$(INSTALL_DIR)$"
 	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak install_all \
-	DO_INSTALL=yes
+	+@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak $@ DO_INSTALL=yes
+endef
+
+install install_config install_data install_plugin install_lib \
+  install_bin install_include install_root install_doc install_script:
+	$(INSTALL_COMPONENT)
 
 uninstall: uninstexe
 	uninst $(INSTALL_DIR)/install.log
@@ -68,26 +74,32 @@ ifeq ($(MAKESECTION),postdefines)
 
 ifeq ($(DO_INSTALL),yes)
 
+INSTALL_INCLUDE.DIR = $(INSTALL_DIR)/include
+INSTALL_DOCS.DIR = $(INSTALL_DIR)/docs
+INSTALL_SCRIPTS.DIR = $(INSTALL_DIR)/scripts
+INSTALL_DATA.DIR = $(INSTALL_DIR)/data
+INSTALL_CONFIG.DIR = $(INSTALL_DATA.DIR)/config
+INSTALL_EXE.DIR = $(INSTALL_DIR)/bin
+INSTALL_LIB.DIR = $(INSTALL_DIR)/lib
+ifneq (.,$(OUTDLL))
+  INSTALL_DLL.DIR = $(INSTALL_DIR)/$(OUTDLL)
+else
+  INSTALL_DLL.DIR = $(INSTALL_LIB.DIR)
+endif
+
+
 INSTALL_LOG = $(INSTALL_DIR)/install.log
 
 INSTALL_DEPTH=* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/* */*/*/*/*/*/* \
   */*/*/*/*/*/*/*
 
-# For the 'include/' hierarchy, only the header files detected here
-# will be copied
+# For the 'include/' hierarchy, only the header files and Swig input files
+# detected here will be copied.
 INSTALL_INCLUDE.FILES = $(wildcard $(addprefix $(SRCDIR)/include/,\
   $(foreach s,.h .i,$(addsuffix $s,$(INSTALL_DEPTH)))))
 
-# Given all installable files in 'include/', take their directory parts, sort
-# those, and remove trailing '/', then add the INSTALL_DIR prefix.  This gives
-# us a list of directories into which headers must be installed.
-INSTALL_INCLUDE.DIR = $(addprefix $(INSTALL_DIR)/,$(patsubst %/,%,$(sort \
-  $(dir $(subst $(SRCDIR)/,,$(INSTALL_INCLUDE.FILES))))))
-INSTALL_INCLUDE.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/,%,$(sort $(subst $(SRCDIR)/,,$(INSTALL_INCLUDE.FILES)))))
-
-# Install docs/html into INSTALL_DIR/docs/html, copy docs/README.html &
-# docs/history.{txt|old}.
+# Install docs/html into INSTALL_DIR/docs/html; copy docs/README.html and
+# docs/history.* into INSTALL_DIR/docs.
 INSTALL_DOCS.FILES = \
   $(SRCDIR)/docs/README.html \
   $(SRCDIR)/docs/history.txt \
@@ -98,83 +110,96 @@ INSTALL_DOCS.FILES = \
       $(addsuffix .gif,$(INSTALL_DEPTH)) \
       $(addsuffix .png,$(INSTALL_DEPTH)) \
       $(addsuffix .css,$(INSTALL_DEPTH))))
-INSTALL_DOCS.DIR = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/,%,$(sort $(dir $(subst $(SRCDIR)/,,$(INSTALL_DOCS.FILES))))))
-INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
-  $(sort $(subst $(SRCDIR)/,,$(INSTALL_DOCS.FILES))))
 
-# Files to install for scripts.
-INSTALL_SCRIPTS.FILES = \
-  $(wildcard $(addprefix $(SRCDIR)/scripts/,python/*.py perl5/*.pm))
-INSTALL_SCRIPTS.DIR = $(addprefix $(INSTALL_DIR)/,$(patsubst %/,%,$(sort \
-  $(dir $(subst $(SRCDIR)/,,$(INSTALL_SCRIPTS.FILES))))))
-INSTALL_SCRIPTS.DESTFILES = $(addprefix $(INSTALL_DIR)/,$(sort \
-  $(subst $(SRCDIR)/,,$(INSTALL_SCRIPTS.FILES))))
+# Macro to copy a potentially deeply nested file from the source tree to the
+# installation directory while preserving the nesting.  Creates the destination
+# directory if needed.  The file to be copied must be stored in a variable
+# named F.  Also takes care of recording the installation in $(INSTALL_LOG).
+# IMPLEMENTATION NOTE: The empty line in this macro is important since it
+# results in inclusion of a newline.  This is desirable because we expect this
+# macro to be invoked from $(foreach) for a set of files, and we want the
+# expansion to be a series of copy commands, one per line.
+define INSTALL.DEEP_COPY
+  @test -r $(INSTALL.DEEP_DIR) || { $(MKDIRS) $(INSTALL.DEEP_DIR); \
+    echo $"$(INSTALL.DEEP_DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
+  $(CP) $(F) $(INSTALL_DIR)/$(subst $(SRCDIR)/,,$(F))
+  @echo $"$(INSTALL_DIR)/$(subst $(SRCDIR)/,,$(F))$" >> $(INSTALL_LOG)
 
-# Static library and plugin directories.
-INSTALL_LIB.DIR = $(INSTALL_DIR)/lib
-ifneq (.,$(OUTDLL))
-  INSTALL_DLL.DIR = $(INSTALL_DIR)/$(OUTDLL)
-else
-  INSTALL_DLL.DIR = $(INSTALL_LIB.DIR)
-endif
+endef
+INSTALL.DEEP_DIR = \
+  $(patsubst %/,%,$(dir $(INSTALL_DIR)/$(subst $(SRCDIR)/,,$(F))))
 
-# Data directories.
-INSTALL_DATA.DIR = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/,%,$(sort $(dir $(subst $(SRCDIR)/,,$(TO_INSTALL.DATA))))))
-
-# Command to copy a plugin module to the installation directory.  The plugin to
-# be copied must be stored in a variable named F.  This default implementation
-# copies the named file to the installation directory for plugins along with a
-# second file of the same name but with extension .csplugin.  This is suitable
+# Macro to copy a plugin module to the installation directory.  Creates the
+# destination directory if needed.  The plugin to be copied must be stored in a
+# variable named F.  This default implementation copies the named file to the
+# installation directory for plugins along with a second file of the same name
+# but with extension .csplugin, if the .csplugin file exists.  This is suitable
 # for platforms where a plugin's meta information resides in a separate file
-# alongside the plugin itself.  Other platforms may have to override this
+# alongside the plugin itself, or when it is embedded directly into the plugin
+# file.  Other platforms with different requirements may have to override this
 # command with a more suitable one.  For instance, on MacOS/X, meta information
 # might be bundled inside the plugin's "wrapper", rather than living alongside
 # the plugin.  It is also the responsibility of this command to make an
 # appropriate entry (or multiple entries) in the install log, $(INSTALL_LOG),
-# for each installed plugin.  Assumes that the target directory tree already
-# exists.  The empty line in this macro is important since it results in
-# inclusion of a newline.  This is desirable because we expect this macro to be
-# invoked from $(foreach) for a set of files, and we want the expansion to be a
-# series of copy commands, one per line.  IMPLEMENTATION NOTE: We conditionally
-# copy the .csplugin file only if it is present.  This is a convenience for
-# platforms which merge the metainformation directory into the plugin itself.
-# This allows those platforms to use this default intallation macro, instead of
-# a customized one.
+# for each installed plugin.  This macro assumes that the target directory tree
+# already exists.  IMPLEMENTATION NOTE: The empty line in this macro is
+# important since it results in inclusion of a newline.  This is desirable
+# because we expect this macro to be invoked from $(foreach) for a set of
+# files, and we want the expansion to be a series of copy commands, one per
+# line.
 ifeq (,$(strip $(INSTALL.DO_PLUGIN)))
 define INSTALL.DO_PLUGIN
-  $(CP) $(F) $(INSTALL_DLL.DIR)
-  @echo $(addprefix $(INSTALL_DLL.DIR)/,$(notdir $(F))) >> $(INSTALL_LOG)
-  if test -f $(patsubst %$(DLL),%.csplugin,$(F)); then \
-  $(CP) $(patsubst %$(DLL),%.csplugin,$(F)) $(INSTALL_DLL.DIR); \
-  echo $(addprefix $(INSTALL_DLL.DIR)/, \
-    $(notdir $(patsubst %$(DLL),%.csplugin,$(F)))) >> $(INSTALL_LOG); \
+  @test -r $(INSTALL_DLL.DIR) || { $(MKDIRS) $(INSTALL_DLL.DIR); \
+    echo $"$(INSTALL_DLL.DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
+  $(CP) $(F) $(INSTALL_DLL.DIR)/$(notdir $(F))
+  @echo $"$(INSTALL_DLL.DIR)/$(notdir $(F))$" >> $(INSTALL_LOG)
+  if test -f $(INSTALL.CSPLUGIN); then \
+  $(CP) $(INSTALL.CSPLUGIN) $(INSTALL_DLL.DIR)/$(INSTALL.CSPLUGIN.BASE); \
+  echo $"$(INSTALL_DLL.DIR)/$(INSTALL.CSPLUGIN.BASE)$" >> $(INSTALL_LOG); \
   fi
 
 endef
+INSTALL.CSPLUGIN = $(patsubst %$(DLL),%.csplugin,$(F))
+INSTALL.CSPLUGIN.BASE = $(notdir $(INSTALL.CSPLUGIN))
 endif
 
-# Command to copy a potentially deeply nested file to the installation
-# directory even while preserving the nesting.  The file to be copied must be
-# stored in a variable named F.  Assumes that the target directory tree
-# already exists.  The empty line in this macro is important since it results
-# in inclusion of a newline.  This is desirable because we expect this macro
-# to be invoked from $(foreach) for a set of files, and we want the expansion
-# to be a series of copy commands, one per line.
-define INSTALL.DEEP_COPY
-  $(CP) $(F) $(INSTALL_DIR)/$(subst $(SRCDIR)/,,$(F))
+# Macro to copy a library to the installation directory.  Creates the
+# destination directory if needed.  The library to be copied must be stored in
+# a variable named F.  Also takes care of recording the installation in
+# $(INSTALL_LOG) and running $(RANLIB) on the installed library.
+define INSTALL.DO_LIBRARY
+  @test -r $(INSTALL_LIB.DIR) || { $(MKDIRS) $(INSTALL_LIB.DIR); \
+    echo $"$(INSTALL_LIB.DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
+  $(CP) $(F) $(INSTALL_LIB.DIR)/$(notdir $(F))
+  @echo $"$(INSTALL_LIB.DIR)/$(notdir $(F))$" >> $(INSTALL_LOG)
+  $(RANLIB) $(INSTALL_LIB.DIR)/$(notdir $(F))
+
+endef
+ifeq (,$(RANLIB))
+RANLIB = @:$(SPACE)
+endif
+
+# Macro to copy a resource to the root installation directory.  Creates the
+# destination directory if needed.  The resource to be copied must be stored in
+# a variable named F.  Also takes care of recording the installation in
+# $(INSTALL_LOG).
+define INSTALL.DO_ROOT
+  @test -r $(INSTALL_DIR) || { $(MKDIRS) $(INSTALL_DIR); \
+    echo $"$(INSTALL_DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
+  $(CP) $(F) $(INSTALL_DIR)/$(notdir $(F))
+  @echo $"$(INSTALL_DIR)/$(notdir $(F))$" >> $(INSTALL_LOG)
 
 endef
 
-# Command to run "ranlib" on an installed static library archive.  The archive
-# to be processed must be stored in a variable named F.  The empty line in this
-# macro is important since it results in inclusion of a newline.  This is
-# desirable because we expect this macro to be invoked from $(foreach) for a
-# set of archives, and we want the expansion to be a series of "ranlib"
-# commands, one per line.
-define INSTALL.RANLIB
-  $(RANLIB) $(F)
+# Macro to copy an executable file to the installation directory.  Creates the
+# destination directory if needed.  The executable to be copied must be stored
+# in a variable named F.  Also takes care of recording the installation in
+# $(INSTALL_LOG). Uses recursive copy (-r) to handle MacOS/X .app wrappers.
+define INSTALL.DO_EXE
+  @test -r $(INSTALL_EXE.DIR) || { $(MKDIRS) $(INSTALL_EXE.DIR); \
+    echo $"$(INSTALL_EXE.DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
+  $(CP) -r $(F) $(INSTALL_EXE.DIR)/$(notdir $(F))
+  @echo $"$(INSTALL_DIR)/bin/$(notdir $(F))$" >> $(INSTALL_LOG)
 
 endef
 
@@ -191,136 +216,79 @@ ifeq ($(MAKESECTION),targets)
 
 ifeq ($(DO_INSTALL),yes)
 
-.PHONY: install_config install_data install_dynamiclibs install_staticlibs \
-  install_exe install_include install_root install_logfile install_docs \
-  install_scripts install_all
-
-# Rules for creating installation directories.
-$(INSTALL_DIR) $(INSTALL_DIR)/bin $(INSTALL_LIB.DIR) $(INSTALL_INCLUDE.DIR) \
-$(INSTALL_DATA.DIR) $(INSTALL_DIR)/data/config:
-	$(MKDIRS)
-
-ifneq (.,$(OUTDLL))
-$(INSTALL_DLL.DIR):
-	$(MKDIRS)
-endif
+.PHONY: install_config install_data install_plugin install_lib \
+  install_bin install_include install_root install_logfile install_doc \
+  install_script install_all
 
 # Install log, itself, should also be deleted.
 install_logfile:
-	@echo $(INSTALL_LOG) >> $(INSTALL_LOG)
+	@echo $"$(INSTALL_LOG)$" >> $(INSTALL_LOG)
 
 # Install configuration files.
-install_config: $(TO_INSTALL.CONFIG) $(INSTALL_DIR)/data/config
+install_config: $(TO_INSTALL.CONFIG)
 	$(foreach F,$(TO_INSTALL.CONFIG),$(INSTALL.DEEP_COPY))
-	@echo $(addprefix $(INSTALL_DIR)/data/config/, \
-	  $(notdir $(TO_INSTALL.CONFIG))) >> $(INSTALL_LOG)
 
 # Install data files.
-install_data: $(INSTALL_DATA.DIR)
+install_data: $(TO_INSTALL.DATA)
 	$(foreach F,$(TO_INSTALL.DATA),$(INSTALL.DEEP_COPY))
-	@echo $(addprefix $(INSTALL_DIR)/data/, \
-	  $(notdir $(TO_INSTALL.DATA))) >> $(INSTALL_LOG)
 
 # Install dynamic libraries (plug-in modules).
+# ***NOTE***
+# Do not make the `install_plugin' target depend upon TO_INSTALL.DYNAMIC_LIBS.
+# The current makefile mechanism is wholely incapable of correctly building out
+# of date or missing plugin modules once the `install' target has been invoked,
+# therefore the `install_plugin' target must not depend upon any plugin
+# modules.  The technical reason for the inability to regenerate plugin modules
+# at this late stage is that such modules must be built with the MAKE_DLL
+# makefile variable set to `yes', yet by the time `install_plugin' is running,
+# it is too late to set the MAKE_DLL variable.  Furthermore, this variable must
+# only be set for plugin modules.  It can not be set for static libraries.
+# Therefore, trying to use a blanket approach of globally enabling MAKE_DLL
+# during the installation process will not succeed.
 ifeq ($(USE_PLUGINS),yes)
-install_dynamiclibs: $(INSTALL_DLL.DIR)
+install_plugin:
 	$(foreach F,$(TO_INSTALL.DYNAMIC_LIBS),$(INSTALL.DO_PLUGIN))
 endif
 
 # Install static libraries.
-install_staticlibs: $(INSTALL_LIB.DIR)
-	$(CP) $(TO_INSTALL.STATIC_LIBS) $(INSTALL_LIB.DIR)
-ifneq (,$(RANLIB))
-	$(foreach F,$(addprefix $(INSTALL_LIB.DIR)/,\
-	$(notdir $(TO_INSTALL.STATIC_LIBS))),$(INSTALL.RANLIB))
-endif
-	@echo $(addprefix $(INSTALL_LIB.DIR)/, \
-	  $(notdir $(TO_INSTALL.STATIC_LIBS))) >> $(INSTALL_LOG)
+install_lib: $(TO_INSTALL.STATIC_LIBS)
+	$(foreach F,$(TO_INSTALL.STATIC_LIBS),$(INSTALL.DO_LIBRARY))
 
 # Install executables.
-install_exe: $(INSTALL_DIR)/bin
-	$(CP) -r $(TO_INSTALL.EXE) $(INSTALL_DIR)/bin
-	@echo $(addprefix $(INSTALL_DIR)/bin/, \
-	  $(notdir $(TO_INSTALL.EXE))) >> $(INSTALL_LOG)
+install_bin: $(TO_INSTALL.EXE)
+	$(foreach F,$(TO_INSTALL.EXE),$(INSTALL.DO_EXE))
 
 # Install top-level files.
-install_root: $(INSTALL_DIR)
-	$(CP) $(TO_INSTALL.ROOT) $(INSTALL_DIR)
-	@echo $(addprefix $(INSTALL_DIR)/, \
-	  $(notdir $(TO_INSTALL.ROOT))) >> $(INSTALL_LOG)
+install_root: $(TO_INSTALL.ROOT)
+	$(foreach F,$(TO_INSTALL.ROOT),$(INSTALL.DO_ROOT))
 
 # Install headers.
-$(INSTALL_INCLUDE.DESTFILES): $(INSTALL_DIR)/% : $(SRCDIR)/%
-	$(CP) $< $@
-	@echo $@ >> $(INSTALL_LOG)
+install_include:
+	$(foreach F,$(INSTALL_INCLUDE.FILES),$(INSTALL.DEEP_COPY))
 
 # If the build directory differs from the source directory, we must take
 # special care to install the generated $(builddir)/include/volatile.h.
 ifneq ($(SRCDIR),.)
-INSTALL_INCLUDE.EXTRA_RULES += install_volatile
+.PHONY: install_volatile
+install_include: install_volatile
 install_volatile:
+	@test -r $(INSTALL_DIR)/include || \
+	{ $(MKDIRS) $(INSTALL_DIR)/include; \
+	echo $"$(INSTALL_DIR)/include/deleteme.dir$" >> $(INSTALL_LOG); }
 	$(CP) include/volatile.h $(INSTALL_DIR)/include/volatile.h
-	@echo $(INSTALL_DIR)/include/volatile.h >> $(INSTALL_LOG)
+	@echo $"$(INSTALL_DIR)/include/volatile.h$" >> $(INSTALL_LOG)
 endif
 
-install_include: $(INSTALL_DIR)/include $(INSTALL_INCLUDE.DIR) \
-  $(INSTALL_INCLUDE.DESTFILES) $(INSTALL_INCLUDE.EXTRA_RULES)
-
 # Install documentation.
-$(INSTALL_DOCS.DIR): 
-	$(MKDIRS)
-	@echo $@/deleteme.dir >> $(INSTALL_LOG)
-
-$(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : $(SRCDIR)/docs/%
-	$(CP) $< $@
-	@echo $@ >> $(INSTALL_LOG)
-
-install_docs: $(INSTALL_DIR)/docs $(INSTALL_DOCS.DIR) \
-  $(INSTALL_DOCS.DESTFILES)
+install_doc:
+	$(foreach F,$(INSTALL_DOCS.FILES),$(INSTALL.DEEP_COPY))
 
 # Install Scripts
-$(INSTALL_DIR)/scripts $(INSTALL_SCRIPTS.DIR): 
-	$(MKDIRS)
-	@echo $@/deleteme.dir >> $(INSTALL_LOG)
+install_script: $(TO_INSTALL.SCRIPTS)
+	$(foreach F,$(TO_INSTALL.SCRIPTS),$(INSTALL.DEEP_COPY))
 
-$(INSTALL_SCRIPTS.DESTFILES): $(INSTALL_DIR)/scripts/% : $(SRCDIR)/scripts/%
-	$(CP) $< $@
-	@echo $@ >> $(INSTALL_LOG)
-
-install_scripts: $(INSTALL_DIR)/scripts $(INSTALL_SCRIPTS.DIR) \
-  $(INSTALL_SCRIPTS.DESTFILES)
-
-# The Big Kafoozy!
-# ***NOTE***
-# Do not make the `install_all' target depend upon TO_INSTALL.DYNAMIC_LIBS.
-# The current makefile mechanism is incapable of correctly building out of date
-# or missing plugin modules once the `install' target has been invoked,
-# therefore the `install_all' target must not depend upon any plugin modules.
-# The technical reason for the inability to regenerate plugin modules at this
-# late stage is that such modules must be built with the MAKE_DLL makefile
-# variable set to `yes', yet by the time `install_all' is running, it is too
-# late to set the MAKE_DLL variable.  Furthermore, this variable must only be
-# set for plugin modules.  It can not be set for static libraries.  Therefore,
-# trying to use a blanket approach of globally enabling MAKE_DLL during the
-# installation process will not succeed.
-install_all: \
-  $(OUTDIRS) \
-  $(TO_INSTALL.ROOT) \
-  $(TO_INSTALL.CONFIG) \
-  $(TO_INSTALL.DATA) \
-  $(TO_INSTALL.EXE) \
-  $(TO_INSTALL.STATIC_LIBS) \
-  $(INSTALL_DIR) \
-  install_data \
-  install_config \
-  install_dynamiclibs \
-  install_staticlibs \
-  install_exe \
-  install_include \
-  install_docs \
-  install_scripts \
-  install_root \
-  install_logfile
+.PHONY: install_build_lightmaps
+install_build_lightmaps:
 	@echo $"$"
 	@echo $"Creating Lightmaps...$"
 	@echo $"---------------------$"
@@ -344,6 +312,19 @@ install_all: \
 	@echo $"Now set up the following definition in your environment to$"
 	@echo $"let Crystal Space programs know where their resources are.$"
 	@echo $"CRYSTAL=$(INSTALL_DIR)$"
+
+# The Big Kafoozy!
+install_all: \
+  install_data \
+  install_config \
+  install_plugin \
+  install_lib \
+  install_bin \
+  install_include \
+  install_doc \
+  install_script \
+  install_root \
+  install_logfile
 
 endif # ifeq ($(DO_INSTALL),yes)
 

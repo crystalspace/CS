@@ -18,7 +18,7 @@ PLUGINHELP += \
 ifneq (,$(CMD.SWIG))
 PSEUDOHELP += \
   $(NEWLINE)echo $"  make swigpythgen  Make the $(DESCRIPTION.swigpythgen)$" \
-  $(NEWLINE)echo $"  make swigpythinst Install $(DESCRIPTION.swigpythinst)$"
+  $(NEWLINE)echo $"  make swigpythinst Freeze the $(DESCRIPTION.swigpythinst)$"
 endif
 ifneq ($(MAKE_PYTHON_MODULE),no)
 PLUGINHELP += \
@@ -40,7 +40,7 @@ all plugins: cspython
 endif
 
 cspython:
-	$(MAKE_TARGET) MAKE_DLL=yes CSPYTHON_MSVC_EXCLUDE=no
+	$(MAKE_TARGET) MAKE_DLL=yes
 cspythonclean:
 	$(MAKE_CLEAN)
 ifneq ($(MAKE_PYTHON_MODULE),no)
@@ -53,7 +53,7 @@ ifneq (,$(CMD.SWIG))
 swigpythgen:
 	$(MAKE_TARGET)
 swigpythinst:
-	$(MAKE_TARGET)
+	$(MAKE_TARGET) 
 endif
 swigpythclean:
 	$(MAKE_CLEAN)
@@ -89,10 +89,6 @@ PYTHMOD = $(PYTHMOD.INSTALLDIR)/_cspace$(DLL)
 LIB.PYTHMOD = $(LIB.CSPYTHON)
 LIB.PYTHMOD.LOCAL = $(LIB.CSPYTHON.LOCAL)
 
-ifneq ($(MAKE_PYTHON_MODULE),no)
-TO_INSTALL.DYNAMIC_LIBS += $(PYTHMOD)
-endif
-
 TO_INSTALL.EXE += python.cex
 
 SWIG.CSPYTHON.OUTDIR = $(OUTDERIVED)/python
@@ -125,6 +121,13 @@ OBJ.PYTHMOD = $(addprefix $(OUT)/, $(notdir $(SRC.PYTHMOD:.cpp=$O)))
 DEP.PYTHMOD = $(DEP.CSPYTHON)
 
 OUTDIRS += $(SWIG.CSPYTHON.OUTDIR) $(PYTHMOD.BUILDBASE) $(PYTHMOD.INSTALLDIR)
+
+ifeq (,$(CMD.SWIG))
+TO_INSTALL.SCRIPTS += $(wildcard $(SRCDIR)/scripts/python/*.py)
+else
+TO_INSTALL.SCRIPTS += $(filter-out $(SWIG.CSPYTHON.PY.CVS), \
+  $(wildcard $(SRCDIR)/scripts/python/*.py))
+endif
 
 MSVC.DSP += CSPYTHON
 DSP.CSPYTHON.NAME = cspython
@@ -240,7 +243,10 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
-ifeq ($(PYTHON.DISTUTILS),yes)
+ifneq ($(PYTHON.DISTUTILS),yes)
+$(PYTHMOD):
+	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
+else
 $(PYTHMOD): $(SRC.PYTHMOD) $(LIB.PYTHMOD)
 	$(PYTHON) $(SRCDIR)/plugins/cscript/cspython/pythmod_setup.py \
 	$(CXX) \
@@ -254,9 +260,26 @@ $(PYTHMOD): $(SRC.PYTHMOD) $(LIB.PYTHMOD)
 	$(PYTHMOD.LFLAGS.PLATFORM) -- \
 	build -q --build-base=$(PYTHMOD.BUILDBASE) \
 	install -q --install-lib=$(PYTHMOD.INSTALLDIR)
-else
-$(PYTHMOD):
-	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
+
+.PHONY: install_pythmod
+install_script: install_pythmod
+install_pythmod: $(PYTHMOD)
+	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/python
+	@echo $"$(INSTALL_SCRIPTS.DIR)/python/deleteme.dir$" >> $(INSTALL_LOG)
+	$(CP) $(PYTHMOD) $(INSTALL_SCRIPTS.DIR)/python
+	@echo $"$(INSTALL_SCRIPTS.DIR)/python/$(notdir $(PYTHMOD))$" >> \
+	$(INSTALL_LOG)
+endif
+
+ifneq (,$(CMD.SWIG))
+.PHONY: install_cspace_py
+install_script: install_cspace_py
+install_cspace_py: $(SWIG.CSPYTHON.PY)
+	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/python
+	@echo $"$(INSTALL_SCRIPTS.DIR)/python/deleteme.dir$" >> $(INSTALL_LOG)
+	$(CP) $(SWIG.CSPYTHON.PY) $(INSTALL_SCRIPTS.DIR)/python
+	@echo $"$(INSTALL_SCRIPTS.DIR)/python/$(notdir $(SWIG.CSPYTHON.PY))$" \
+	>> $(INSTALL_LOG)
 endif
 
 pythmodclean:

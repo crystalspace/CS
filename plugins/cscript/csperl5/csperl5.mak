@@ -13,7 +13,7 @@ ifneq (,$(CMD.SWIG))
 PSEUDOHELP += \
   $(NEWLINE)echo $"  make swigperl5gen Make the $(DESCRIPTION.swigperl5gen)$" \
   $(NEWLINE)echo $"  make swigperl5inst$" \
-  $(NEWLINE)echo $"                    Install $(DESCRIPTION.swigperl5inst)$"
+  $(NEWLINE)echo $"                    Freeze $(DESCRIPTION.swigperl5inst)$"
 endif
 
 endif
@@ -90,6 +90,13 @@ PERL5.CFLAGS += $(CXXFLAGS.WARNING.NO_UNUSED)
 
 OUTDIRS += $(CSPERL5.DERIVED) $(SWIG.PERL5.INSTALLDIR)
 
+ifeq (,$(CMD.SWIG))
+TO_INSTALL.SCRIPTS += $(wildcard $(SWIG.PERL5.DIR)/*.pm)
+else
+TO_INSTALL.SCRIPTS += \
+  $(filter-out $(SWIG.PERL5.PM),$(wildcard $(SWIG.PERL5.DIR)/*.pm))
+endif
+
 #MSVC.DSP += MSCSPERL5
 #DSP.MSCSPERL5.NAME = csperl5
 #DSP.MSCSPERL5.TYPE = plugin
@@ -125,7 +132,7 @@ ifeq ($(MAKESECTION), targets)
 csperl5: $(OUTDIRS) $(SWIG.PERL5.INSTALLPM) $(CSPERL5) $(SWIG.PERL5.DLL) \
   $(CEX.CSPERL5)
 
-$(CSPERL5): $(OBJ.CSPERL5) $(LIB.CSPERL5) $(PERLXSI.O) $(SWIG.PERL5.DLL)
+$(CSPERL5): $(OBJ.CSPERL5) $(LIB.CSPERL5) $(PERLXSI.O)
 	$(DO.PLUGIN.PREAMBLE) \
 	$(DO.PLUGIN.CORE) $(PERL5.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
@@ -179,6 +186,26 @@ $(SWIG.PERL5.C): $(SWIG.PERL5.C.IN)
 $(SWIG.PERL5.PM): $(SWIG.PERL5.PM.IN)
 	-$(RM) $@
 	$(CP) $(SWIG.PERL5.PM.IN) $@
+endif
+
+.PHONY: install_perlmod
+install_script: install_perlmod
+install_perlmod: $(SWIG.PERL5.DLL)
+	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/perl5
+	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/deleteme.dir$" >> $(INSTALL_LOG)
+	$(CP) $(SWIG.PERL5.DLL) $(INSTALL_SCRIPTS.DIR)/perl5
+	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/$(notdir $(SWIG.PERL5.DLL))$" >> \
+	$(INSTALL_LOG)
+
+ifneq (,$(CMD.SWIG))
+.PHONY: install_cspace_pm
+install_script: install_cspace_pm
+install_cspace_pm: $(SWIG.PERL5.PM.IN)
+	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/perl5
+	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/deleteme.dir$" >> $(INSTALL_LOG)
+	$(CP) $(SWIG.PERL5.PM.IN) $(INSTALL_SCRIPTS.DIR)/perl5
+	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/$(notdir $(SWIG.PERL5.PM.IN))$" \
+	>> $(INSTALL_LOG)
 endif
 
 $(SWIG.PERL5.O): $(SWIG.PERL5.CPP)

@@ -18,7 +18,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 all apps: perl5test
 
-perl5test: csperl5
+perl5test:
 	$(MAKE_APP)
 perl5testclean:
 	$(MAKE_CLEAN)

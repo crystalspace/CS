@@ -24,7 +24,7 @@ chronological order.
 	      that up in the future**) the value of the key is loaded as a
 	      pk3 file (will add support for other archive types later).
 	      This will essentially exclude the need for the .cfg (for now
-	      at least) I will be adding more options in the future.
+	      at least). I will be adding more options in the future.
 	- Jorrit added the following persons to the contributors document:
 	    - Aren Blondahl
 	    - Frank Richter
@@ -42,6 +42,51 @@ chronological order.
 	    - Andreas Busch
 	    - Andrew Topp
 	  Also updated a few other entries.
+	- Eric Sunshine made the following changes to the 'make install'
+	  machinery:
+	    - Published the component sub-install targets to give the user
+	      finer control at install time.  For instance, to install plugins,
+	      "make install_plugin".  The sub-install target names match the
+	      Jam sub-install names as closely as possible.  The available
+	      installation targets are:
+		install
+		install_bin
+		install_config
+		install_data
+		install_doc
+		install_include
+		install_lib
+		install_plugin
+		install_root
+		install_script
+		uninstall
+	    - Fixed bugs: At install time, with Swig present, cspython.mak and
+	      csperl5.mak would attempt to copy Swig-generated files from the
+	      build directory back into source tree even though this was not
+	      requested (and might fail if source tree is read-only).
+	    - Fixed bugs: With Swig present, cspython.mak and csperl5.mak
+	      incorrectly installed the Swig-generated files from source tree,
+	      rather than the ones from the build tree. (The ones from the
+	      build tree will be newer if Swig is installed.)
+	    - Fixed bug: cspython.mak attempted to install _cspace.so as if it
+	      was as CS plugin rather than a Python extension module.  This
+	      failed on MacOS/X because CS plugins have a .csbundle extension,
+	      whereas Python modules have a .so extension, and it was looking
+	      for the non-existent _cspace.csplugin.
+	    - Changed cspython.mak and csperl5.mak so that they now install the
+	      pure Python (_cspace.so) and pure Perl (cspace.so) extensions in
+	      scripts/python and scripts/perl5, respectively, rather than
+	      installing them alongside the CS plugins.  This change allows
+	      Python users to set their PYTHONPATH environment variable to
+	      simply point at scripts/python and have Python find both
+	      cspace.py and _cspace.so.  Ditto for Perl's PERL5LIBS variable.
+	    - cspython.mak and csperl5.mak are now responsible for requesting
+	      installation of their related scripting files from scripts/python
+	      and scripts/perl5, respectively.  install.mak no longer has any
+	      hard-coded knowledge about these directories.
+	    - Simplified and clarified the implementation of install.mak to
+	      some extent by introducing re-usable macros which do much of the
+	      difficult or dirty work.
 7-Apr-2004
 	- res added a small helper class to create minidumps on Win32.
 	- res augmented the Win32 assistant to allow user-defined exception
