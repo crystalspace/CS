@@ -25,9 +25,6 @@
 #define NORMAL_LIGHT_LEVEL 128
 
 /// Max number of polygons that can be lit by one light. (bad practice !!!@@@)
-#define MAX_NUM_POLYGON 600
-
-/// Dynamic lights can light maximum 200 polygons (@@@ Remove this arbitrary limit!)
-#define MAX_DYN_POLYGON 200
+#define MAX_NUM_LIGHTMAP 2000
 
 #endif // __LIGHTDEF_H__
