@@ -766,13 +766,32 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
 
 //======== CastShadows =====================================================
 
+struct ShadObj
+{
+  float sqdist;
+  iShadowCaster* caster;
+  iShadowReceiver* receiver;
+  iMovable* movable;
+};
+
 struct CastShadows_Front2BackData
 {
   uint32 current_visnr;
   iFrustumView* fview;
   csPlane3 planes[32];
   uint32 planes_mask;
+  ShadObj* shadobjs;
+  int num_shadobjs;
 };
+
+static int compare_shadobj (const void* el1, const void* el2)
+{
+  ShadObj* m1 = (ShadObj*)el1;
+  ShadObj* m2 = (ShadObj*)el2;
+  if (m1->sqdist < m2->sqdist) return -1;
+  if (m1->sqdist > m2->sqdist) return 1;
+  return 0;
+}
 
 static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
 	uint32 cur_timestamp)
@@ -800,50 +819,8 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
   iFrustumView* fview = data->fview;
   const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
     ->GetOrigin ();
-  iShadowBlockList *shadows = fview->GetFrustumContext ()->GetShadows ();
 
   int i;
-  // The first time through the loop we just append shadows.
-  // We also don't mark the timestamp yet so that we can easily
-  // go a second time through the loop.
-  for (i = 0 ; i < num_objects ; i++)
-  {
-    if (objects[i]->timestamp != cur_timestamp)
-    {
-      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      	objects[i]->GetObject ();
-
-      // Test the bounding box of the object with the frustum.
-      bool vis = false;
-      if (data->planes_mask)
-      {
-        const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
-	uint32 out_mask;
-	if (csIntersect3::BoxFrustum (obj_bbox, data->planes, data->planes_mask,
-		out_mask))
-	{
-	  vis = true;
-	}
-      }
-      else
-      {
-        vis = true;
-      }
-      // If visible we mark as visible and add shadows if possible.
-      if (vis)
-      {
-	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
-        if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
-            fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
-        {
-          visobj_wrap->caster->AppendShadows (
-	  	visobj_wrap->visobj->GetMovable (), shadows, center);
-	}
-      }
-    }
-  }
-  // Here we go a second time through the loop. Here we will
-  // actually send shadows to the receivers.
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -851,17 +828,28 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
       objects[i]->timestamp = cur_timestamp;
       csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	objects[i]->GetObject ();
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      csBox3 b (obj_bbox.Min ()-center, obj_bbox.Max ()-center);
 
-      // If visible we mark as visible and add shadows if possible.
-      if (visobj_wrap->visobj->GetVisibilityNumber () == data->current_visnr)
+      if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
+            fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
       {
-        if (visobj_wrap->receiver
-		&& fview->CheckProcessMask (
-			visobj_wrap->mesh->GetFlags ().Get ()))
-        {
-          visobj_wrap->receiver->CastShadows (
-	  	visobj_wrap->visobj->GetMovable (), fview);
-	}
+        data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginDist ();
+	data->shadobjs[data->num_shadobjs].caster = visobj_wrap->caster;
+	data->shadobjs[data->num_shadobjs].receiver = NULL;
+	data->shadobjs[data->num_shadobjs].movable =
+		visobj_wrap->visobj->GetMovable ();
+	data->num_shadobjs++;
+      }
+      if (visobj_wrap->receiver
+	&& fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
+      {
+        data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
+	data->shadobjs[data->num_shadobjs].receiver = visobj_wrap->receiver;
+	data->shadobjs[data->num_shadobjs].caster = NULL;
+	data->shadobjs[data->num_shadobjs].movable =
+		visobj_wrap->visobj->GetMovable ();
+	data->num_shadobjs++;
       }
     }
   }
@@ -869,6 +857,8 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
   return true;
 }
 
+
+// @@@ USE RADIUS!!!
 void csFrustumVis::CastShadows (iFrustumView* fview)
 {
   current_visnr++;
@@ -879,12 +869,30 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
   const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
     ->GetOrigin ();
 
+  //======================================
+  // First we find all relevant objects. For all these objects we add
+  // both the shadow-caster as the receiver to the array (as two different
+  // entries). The caster is added with the distance from the light position
+  // to the nearest point on the bounding box while the receiver is added
+  // with the distance from the light position to the farthest point on
+  // the bounding box. Later on we can then traverse the resulting list
+  // so that all relevant shadow casters are added before the receivers
+  // are processed.
+  //======================================
+
+  data.shadobjs = new ShadObj [visobj_vector.Length () * 2];
+  data.num_shadobjs = 0;
+
   // First check if we need to do frustum clipping.
   csFrustum* lf = fview->GetFrustumContext ()->GetLightFrustum ();
   data.planes_mask = 0;
+  int i;
   bool infinite = lf->IsInfinite ();
   if (!infinite)
   {
+    // In this case we have a frustum and we traverse the kd-tree to
+    // find all relevant objects.
+    
     // @@@ What if the frustum is bigger???
     CS_ASSERT (lf->GetVertexCount () <= 31);
     if (lf->GetVertexCount () > 31)
@@ -893,7 +901,6 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
       fflush (stdout);
       return;
     }
-    int i;
     int i1 = lf->GetVertexCount () - 1;
     for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
     {
@@ -909,13 +916,58 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
       data.planes_mask = (data.planes_mask<<1)|1;
       data.planes[i] = *(lf->GetBackPlane ());
     }
+
+    kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
   }
+  else
+  {
+    // The frustum is infinite so we can just add all objects
+    // (@@@ CHECK RADIUS IN FUTURE?)
+    for (i = 0 ; i < visobj_vector.Length () ; i++)
+    {
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+    	visobj_vector[i];
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      csBox3 b (obj_bbox.Min ()-center, obj_bbox.Max ()-center);
+      if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
+            fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
+      {
+        data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginDist ();
+	data.shadobjs[data.num_shadobjs].caster = visobj_wrap->caster;
+	data.shadobjs[data.num_shadobjs].receiver = NULL;
+	data.shadobjs[data.num_shadobjs].movable =
+		visobj_wrap->visobj->GetMovable ();
+	data.num_shadobjs++;
+      }
+      if (visobj_wrap->receiver
+	&& fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
+      {
+        data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
+	data.shadobjs[data.num_shadobjs].receiver = visobj_wrap->receiver;
+	data.shadobjs[data.num_shadobjs].caster = NULL;
+	data.shadobjs[data.num_shadobjs].movable =
+		visobj_wrap->visobj->GetMovable ();
+	data.num_shadobjs++;
+      }
+    }
+  }
+
+  // Now sort the list of shadow objects on radius.
+  qsort (data.shadobjs, data.num_shadobjs, sizeof (ShadObj), compare_shadobj);
 
   // Mark a new region so that we can restore the shadows later.
   iShadowBlockList *shadows = fview->GetFrustumContext ()->GetShadows ();
   uint32 prev_region = shadows->MarkNewRegion ();
 
-  kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
+  // Now scan all objects and cast and receive shadows as appropriate. 
+  ShadObj* so = data.shadobjs;
+  for (i = 0 ; i < data.num_shadobjs ; i++)
+  {
+    if (so->caster) so->caster->AppendShadows (so->movable, shadows, center);
+    if (so->receiver) so->receiver->CastShadows (so->movable, fview);
+    so++;
+  }
+  delete[] data.shadobjs;
 
   // Restore the shadow list in 'fview' and then delete
   // all the shadow frustums that were added in this recursion

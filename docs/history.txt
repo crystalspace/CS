@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+21-Nov-2002
+	- Fixed CastShadows() implementation in Dynavis and Frustvis
+	  so that it shadow casting is now correct (I hope).
 20-Nov-2002
 	- Fixed csVfsCacheManager so it no longer tries to use 'scope' if
 	  that is NULL. This has an effect on 'precalc_info' which will now
