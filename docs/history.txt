@@ -8,6 +8,12 @@ The history order is reversed so that new features are at the top.
 	- Implemented the missing feature for locating a mesh that is a child
 	  of a hierarchical mesh parent (using the ':' notation). This worked
 	  in the default case but not within regions.
+	- Fixed autonormals in genmesh so it now ignores duplicate vertices
+	  caused by vertices which have same coordinates but different
+	  uv mapping. Before calculating normals it will first compress
+	  the vertices (but ignoring uv mapping).
+	- Added the ability to disable shadow casting for genmeshes.
+	  New 'noshadows' keyword. New SetShadowCasting() function.
 28-Nov-2002
 	- Eric Sunshine disabled the "experimental" render3d project by default
 	  for MSVC users since its many compilation problems were causing

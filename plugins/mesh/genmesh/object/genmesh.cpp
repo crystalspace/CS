@@ -88,6 +88,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   color.blue = 0;
   current_lod = 1;
   current_features = 0;
+  do_shadows = true;
 }
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
@@ -99,6 +100,7 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 void csGenmeshMeshObject::AppendShadows (iMovable* movable,
 	iShadowBlockList* shadows, const csVector3& origin)
 {
+  if (!do_shadows) return;
   int tri_num = factory->GetTriangleCount ();
   csVector3* vt = factory->GetVertices ();
   int vt_num = factory->GetVertexCount ();
@@ -619,17 +621,155 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
   top_mesh.triangles = new csTriangle [top_mesh.num_triangles];
 }
 
+struct CompressVertex
+{
+  int orig_idx;
+  float x, y, z;
+  int new_idx;
+};
+
+static int compare_vt (const void *p1, const void *p2)
+{
+  CompressVertex *sp1 = (CompressVertex *)p1;
+  CompressVertex *sp2 = (CompressVertex *)p2;
+  if (sp1->x < sp2->x)
+    return -1;
+  else if (sp1->x > sp2->x)
+    return 1;
+  if (sp1->y < sp2->y)
+    return -1;
+  else if (sp1->y > sp2->y)
+    return 1;
+  if (sp1->z < sp2->z)
+    return -1;
+  else if (sp1->z > sp2->z)
+    return 1;
+  return 0;
+}
+
+static int compare_vt_orig (const void *p1, const void *p2)
+{
+  CompressVertex *sp1 = (CompressVertex *)p1;
+  CompressVertex *sp2 = (CompressVertex *)p2;
+  if (sp1->orig_idx < sp2->orig_idx)
+    return -1;
+  else if (sp1->orig_idx > sp2->orig_idx)
+    return 1;
+  return 0;
+}
+
+bool csGenmeshMeshObjectFactory::CompressVertices (
+	csVector3* orig_verts, int orig_num_vts,
+	csVector3*& new_verts, int& new_num_vts,
+	csTriangle* orig_tris, int num_tris,
+	csTriangle*& new_tris,
+	int*& mapping)
+{
+  new_num_vts = orig_num_vts;
+  new_tris = orig_tris;
+  new_verts = orig_verts;
+  mapping = NULL;
+  if (orig_num_vts <= 0) return false;
+
+  // Copy all the vertices.
+  CompressVertex *vt = new CompressVertex[orig_num_vts];
+  int i, j;
+  for (i = 0; i < orig_num_vts; i++)
+  {
+    vt[i].orig_idx = i;
+    vt[i].x = (float)ceil (orig_verts[i].x * 1000000);
+    vt[i].y = (float)ceil (orig_verts[i].y * 1000000);
+    vt[i].z = (float)ceil (orig_verts[i].z * 1000000);
+  }
+
+  // First sort so that all (nearly) equal vertices are together.
+  qsort (vt, orig_num_vts, sizeof (CompressVertex), compare_vt);
+
+  // Count unique values and tag all doubles with the index of the unique one.
+  // new_idx in the vt table will be the index inside vt to the unique vector.
+  new_num_vts = 1;
+  int last_unique = 0;
+  vt[0].new_idx = last_unique;
+  for (i = 1 ; i < orig_num_vts ; i++)
+  {
+    if (
+      vt[i].x != vt[last_unique].x ||
+      vt[i].y != vt[last_unique].y ||
+      vt[i].z != vt[last_unique].z)
+    {
+      last_unique = i;
+      new_num_vts++;
+    }
+
+    vt[i].new_idx = last_unique;
+  }
+
+  // If count_unique == num_vertices then there is nothing to do.
+  if (new_num_vts == orig_num_vts)
+  {
+    delete[] vt;
+    return false;
+  }
+
+  // Now allocate and fill new vertex tables.
+  // After this new_idx in the vt table will be the new index
+  // of the vector.
+  new_verts = new csVector3[new_num_vts];
+  new_verts[0] = orig_verts[vt[0].orig_idx];
+
+  vt[0].new_idx = 0;
+  j = 1;
+  for (i = 1 ; i < orig_num_vts ; i++)
+  {
+    if (vt[i].new_idx == i)
+    {
+      new_verts[j] = orig_verts[vt[i].orig_idx];
+      vt[i].new_idx = j;
+      j++;
+    }
+    else
+      vt[i].new_idx = j - 1;
+  }
+
+  // Now we sort the table back on orig_idx so that we have
+  // a mapping from the original indices to the new one (new_idx).
+  qsort (vt, orig_num_vts, sizeof (CompressVertex), compare_vt_orig);
+
+  // Now we can remap the vertices in all triangles.
+  new_tris = new csTriangle[num_tris];
+  for (i = 0 ; i < num_tris ; i++)
+  {
+    new_tris[i].a = vt[orig_tris[i].a].new_idx;
+    new_tris[i].b = vt[orig_tris[i].b].new_idx;
+    new_tris[i].c = vt[orig_tris[i].c].new_idx;
+  }
+  mapping = new int[orig_num_vts];
+  for (i = 0 ; i < orig_num_vts ; i++)
+    mapping[i] = vt[i].new_idx;
+
+  delete[] vt;
+  return true;
+}
+
 void csGenmeshMeshObjectFactory::CalculateNormals ()
 {
   int i, j;
 
-  csTriangle * tris = top_mesh.triangles;
   int num_triangles = top_mesh.num_triangles;
+  csTriangle* tris;
+  csVector3* new_verts;
+  int new_num_verts;
+  int* mapping;
+
+  bool compressed = CompressVertices (mesh_vertices, num_mesh_vertices,
+      new_verts, new_num_verts,
+      top_mesh.triangles, num_triangles, tris,
+      mapping);
 
   csTriangleMesh* tri_mesh = new csTriangleMesh ();
   tri_mesh->SetTriangles (tris, num_triangles);
   csGenTriangleVertices* tri_verts = new csGenTriangleVertices (tri_mesh,
-  	mesh_vertices, num_mesh_vertices);
+  	new_verts, new_num_verts);
 
   csVector3 * tri_normals = new csVector3[num_triangles];
 
@@ -637,21 +777,25 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   // Get the cross-product of 2 edges of the triangle and normalize it.
   for (i = 0; i < num_triangles; i++)
   {
-    csVector3 ab = mesh_vertices [tris[i].b] - mesh_vertices [tris[i].a];
-    csVector3 bc = mesh_vertices [tris[i].c] - mesh_vertices [tris[i].b];
+    csVector3 ab = new_verts [tris[i].b] - new_verts [tris[i].a];
+    csVector3 bc = new_verts [tris[i].c] - new_verts [tris[i].b];
     tri_normals [i] = ab % bc;
     float norm = tri_normals[i].Norm ();
     if (norm)
       tri_normals[i] /= norm;
   }
 
+  csVector3* new_normals = mesh_normals;
+  if (compressed)
+    new_normals = new csVector3[new_num_verts];
+
   // Calculate vertex normals, by averaging connected triangle normals.
-  for (i = 0 ; i < num_mesh_vertices ; i++)
+  for (i = 0 ; i < new_num_verts ; i++)
   {
     csTriangleVertex &vt = tri_verts->GetVertex (i);
     if (vt.num_con_triangles)
     {
-      csVector3 &n = mesh_normals[i];
+      csVector3 &n = new_normals[i];
       n.Set (0,0,0);
       for (j = 0; j < vt.num_con_triangles; j++)
         n += tri_normals [vt.con_triangles[j]];
@@ -663,13 +807,27 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
     {
       // If there are no connecting triangles then we just
       // initialize the normal to a default value.
-      mesh_normals[i].Set (1, 0, 0);
+      new_normals[i].Set (1, 0, 0);
     }
   }
 
   delete[] tri_normals;
   delete tri_verts;
   delete tri_mesh;
+
+  if (compressed)
+  {
+    // Translate the mapped normal table back to the original table.
+    for (i = 0 ; i < num_mesh_vertices ; i++)
+    {
+      mesh_normals[i] = new_normals[mapping[i]];
+    }
+
+    delete[] new_normals;
+    delete[] new_verts;
+    delete[] tris;
+    delete[] mapping;
+  }
 }
 
 void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)

@@ -29,7 +29,7 @@ struct csTriangle;
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iGeneralMeshState, 0, 0, 1);
+SCF_VERSION (iGeneralMeshState, 0, 0, 2);
 
 /**
  * This interface describes the API for the general mesh object.
@@ -61,6 +61,13 @@ struct iGeneralMeshState : public iBase
   virtual void SetManualColors (bool m) = 0;
   /// Are manual colors enabled?
   virtual bool IsManualColors () const = 0;
+  /**
+   * Set shadowing. By default genmesh objects will cast shadows
+   * (during the static lighting phase). You can disable this here.
+   */
+  virtual void SetShadowCasting (bool m) = 0;
+  /// Is shadow casting enabled?
+  virtual bool IsShadowCasting () const = 0;
 };
 
 SCF_VERSION (iGeneralFactoryState, 0, 0, 2);

@@ -57,6 +57,7 @@ private:
   csColor color;
   float current_lod;
   uint32 current_features;
+  bool do_shadows;
 
   csColor* lit_mesh_colors;
 
@@ -224,6 +225,14 @@ public:
     {
       return scfParent->IsManualColors ();
     }
+    virtual void SetShadowCasting (bool m)
+    {
+      scfParent->do_shadows = m;
+    }
+    virtual bool IsShadowCasting () const
+    {
+      return scfParent->do_shadows;
+    }
   } scfiGeneralMeshState;
   friend class GeneralMeshState;
 
@@ -273,6 +282,16 @@ private:
 
   /// Retrieve a vertexbuffer from the manager if not done already.
   void SetupVertexBuffer ();
+
+  /**
+   * Compress vertices. This is for CalculateNormals().
+   */
+  bool CompressVertices (
+	csVector3* orig_verts, int orig_num_vts,
+	csVector3*& new_verts, int& new_num_vts,
+	csTriangle* orig_tris, int num_tris,
+	csTriangle*& new_tris,
+	int*& mapping);
 
   /**
    * Setup this factory. This function will check if setup is needed.

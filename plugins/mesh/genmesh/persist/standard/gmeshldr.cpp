@@ -56,7 +56,8 @@ enum
   XMLTOKEN_T,
   XMLTOKEN_N,
   XMLTOKEN_COLORS,
-  XMLTOKEN_AUTONORMALS
+  XMLTOKEN_AUTONORMALS,
+  XMLTOKEN_NOSHADOWS
 };
 
 SCF_IMPLEMENT_IBASE (csGeneralFactoryLoader)
@@ -351,6 +352,7 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   return true;
 }
 
@@ -375,6 +377,11 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  if (!synldr->ParseBool (child, r, true))
 	    return NULL;
 	  meshstate->SetManualColors (r);
+	}
+	break;
+      case XMLTOKEN_NOSHADOWS:
+	{
+	  meshstate->SetShadowCasting (false);
 	}
 	break;
       case XMLTOKEN_LIGHTING:
