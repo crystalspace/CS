@@ -763,7 +763,7 @@ iVFS* vfs = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS);
 
 The @sc{ddg} landscape engine which used to be featured in Crystal Space has
 been removed and was replaced with a simpler landscape engine, but one which is
-better integrated with the project.
+better integrated with the project. It is now also a mesh object.
 
 @subheading @sc{csws} Modal Session Paradigm Shift
 @cindex @sc{csws}
