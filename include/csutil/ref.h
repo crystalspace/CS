@@ -105,7 +105,7 @@ public:
   {
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    newobj.assigned = true;
+    ((csPtr<T>)newobj).assigned = true;
 #   endif
   }
 
@@ -148,7 +148,7 @@ public:
     // First assign and then DecRef() of old object!
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    newobj.assigned = true;
+    ((csPtr<T>)newobj).assigned = true;
 #   endif
     if (oldobj)
       oldobj->DecRef ();
