@@ -93,6 +93,7 @@ PLUGINS.DYNAMIC += aws
 #PLUGINS.DYNAMIC += sound/loader/ogg
 #PLUGINS.DYNAMIC += sound/loader/mp3
 #PLUGINS.DYNAMIC += sound/loader/mod
+#PLUGINS.DYNAMIC += physics/odedynam
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
