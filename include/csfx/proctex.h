@@ -64,7 +64,7 @@ protected:
   cs_time last_cur_time;
 
 private:
-  static void ProcCallback (csTextureWrapper* txt, void* data);
+  static void ProcCallback (iTextureWrapper* txt, void* data);
 
 public:
   csProcTexture ();

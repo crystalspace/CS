@@ -32,9 +32,6 @@ struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
 
-/// A callback function for when a csTextureWrapper is used.
-typedef void (csTextureCallback) (csTextureWrapper* wrap, void* data);
-
 /**
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
@@ -114,7 +111,7 @@ public:
    * before using the texture. It is responsible for calling the use
    * callback if there is one.
    */
-  void Visit () { if (use_callback) use_callback (this, use_data); }
+  void Visit () { if (use_callback) use_callback (&scfiTextureWrapper, use_data); }
 
   CSOBJTYPE;
   DECLARE_IBASE;
@@ -125,6 +122,13 @@ public:
     DECLARE_EMBEDDED_IBASE (csTextureWrapper);
 
     virtual csTextureWrapper *GetPrivateObject() const;
+    virtual iTextureHandle *GetTextureHandle() const;
+    virtual void SetKeyColor (int red, int green, int blue);
+    virtual void GetKeyColor (int &red, int &green, int &blue) const;
+    virtual void Register (iTextureManager *txtmng);
+    virtual void SetUseCallback (csTextureCallback* callback, void* data);
+    virtual csTextureCallback* GetUseCallback () const;
+    virtual void* GetUseData () const;
   } scfiTextureWrapper;
 };
 

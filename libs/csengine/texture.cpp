@@ -147,6 +147,40 @@ csTextureWrapper *csTextureWrapper::TextureWrapper::GetPrivateObject() const
   return scfParent;
 }
 
+iTextureHandle *csTextureWrapper::TextureWrapper::GetTextureHandle() const
+{
+  return scfParent->GetTextureHandle();
+}
+
+void csTextureWrapper::TextureWrapper::SetKeyColor (int red, int green, int blue)
+{
+  scfParent->SetKeyColor (red, green, blue);
+}
+
+void csTextureWrapper::TextureWrapper::GetKeyColor (int &red, int &green, int &blue) const
+{
+  scfParent->GetKeyColor (red, green, blue);
+}
+
+void csTextureWrapper::TextureWrapper::Register (iTextureManager *txtmng)
+{
+  scfParent->Register(txtmng);
+}
+
+void csTextureWrapper::TextureWrapper::SetUseCallback (csTextureCallback* callback, void* data)
+{
+  scfParent->SetUseCallback (callback, data);
+}
+
+csTextureCallback* csTextureWrapper::TextureWrapper::GetUseCallback () const
+{
+  return scfParent->GetUseCallback();
+}
+
+void* csTextureWrapper::TextureWrapper::GetUseData () const
+{
+  return scfParent->GetUseData();
+}
 
 //------------------------------------------------------- csTextureList -----//
 

@@ -23,8 +23,14 @@
 #include "cstypes.h"
 
 class csTextureWrapper;
+struct iTextureHandle;
+struct iTextureManager;
+struct iTextureWrapper;
 
-SCF_VERSION (iTextureWrapper, 0, 0, 2);
+/// A callback function for when a csTextureWrapper is used.
+typedef void (csTextureCallback) (iTextureWrapper* wrap, void* data);
+
+SCF_VERSION (iTextureWrapper, 0, 0, 3);
 
 /**
  * This class represents a texture wrapper which holds
@@ -35,6 +41,33 @@ struct iTextureWrapper : public iBase
 {
   /// @@@temporary: return the private csTextureWrapper object
   virtual csTextureWrapper *GetPrivateObject() const = 0;
+
+  /// Get the texture handle
+  virtual iTextureHandle *GetTextureHandle() const = 0;
+
+  /// Set the transparent color.
+  virtual void SetKeyColor (int red, int green, int blue) = 0;
+  /// Query the transparent color.
+  virtual void GetKeyColor (int &red, int &green, int &blue) const = 0;
+
+  /// Register the texture with the texture manager
+  virtual void Register (iTextureManager *txtmng) = 0;
+
+  /**
+   * Set a callback which is called just before the texture is used.
+   * This is mainly useful for procedural textures which can then
+   * choose to update their image.
+   */
+  virtual void SetUseCallback (csTextureCallback* callback, void* data) = 0;
+  /**
+   * Get the use callback. If there are multiple use callbacks you can
+   * use this function to chain.
+   */
+  virtual csTextureCallback* GetUseCallback () const = 0;
+  /**
+   * Get the data for the use callback.
+   */
+  virtual void* GetUseData () const = 0;
 };
 
 #endif // __IENGINE_TEXTURE_H__
