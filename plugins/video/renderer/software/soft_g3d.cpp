@@ -145,9 +145,6 @@ char* get_software_2d_driver ()
 csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 {
   CONSTRUCT_IBASE (iParent);
-#ifdef REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
-  CONSTRUCT_EMBEDDED_IBASE (scfiHaloRasterizer);
-#endif // REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 
   config = new csIniFile ("soft3d.cfg");
