@@ -133,7 +133,7 @@ bool csSoundRenderOpenAL::Open()
   /* This is the amount of audio (in seconds) that is sent ahead to the underlying layer for streaming audio
   *  Don't set this extremely tiny or you will cause increased CPU usage.
   */
-  BufferLengthSeconds=config->GetFloat("Sound.OpenAL.StreamingBufferLength",0.2);
+  BufferLengthSeconds=config->GetFloat("Sound.OpenAL.StreamingBufferLength",1.0);
 
   /* If true, a background thread is created for streaming updates.  If false updates are triggered by
   *  events through the main cs loop.  

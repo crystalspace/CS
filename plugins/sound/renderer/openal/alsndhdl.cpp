@@ -142,9 +142,9 @@ void csSoundHandleOpenAL::UpdateCount(long NumSamples)
         length1=buffer_length-buffer_writecursor;
         length2=(buffer_writecursor+readlength) % buffer_length;
       }
-      if (length1) CopyMemory((unsigned char *)local_buffer+position1,buf,length1);
+      if (length1) memcpy((unsigned char *)local_buffer+position1,buf,length1);
       // Position 2 is always 0, even if valid since it will be at the start of the buffer
-      if (length2) CopyMemory(local_buffer,(unsigned char *)buf+length1,length2);
+      if (length2) memcpy(local_buffer,(unsigned char *)buf+length1,length2);
     }
 
 
@@ -171,7 +171,8 @@ void csSoundHandleOpenAL::UpdateCount(long NumSamples)
         }
       }
     }
-    Data->ResetStreamed(); // Reset the data stream to the begining and pull more data out for looping
+    else
+      Data->ResetStreamed(); // Reset the data stream to the begining and pull more data out for looping
   }
 
   mutex_WriteCursor->Release();

@@ -232,7 +232,7 @@ void csSoundSourceOpenAL::Play(unsigned long PlayMethod)
   SoundRender->mutex_OpenAL->LockWait();
 
   // We never loop on streaming sources, and only loop statics 
-  if (SoundHandle->Data->IsStatic() && PlayMethod & SOUND_LOOP)
+  if (SoundHandle->Data->IsStatic() && (PlayMethod & SOUND_LOOP))
   {
     alSourcei (source, AL_LOOPING, AL_TRUE);
   }

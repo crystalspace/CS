@@ -145,7 +145,7 @@ private:
   /** Stores the buffer length (in seconds) for streaming audio buffers. 
    *
    *  Read from the config file option "Sound.OpenAL.StreamingBufferLength"
-   *  Default: 0.2 seconds (0.2)
+   *  Default: 1.0 seconds (1.0)
    */
   float BufferLengthSeconds;
 

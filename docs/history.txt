@@ -4,6 +4,9 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 7-Apr-2003
+        - Rhad changed MSVC specific CopyMemory to memcpy() in OpenAL
+          sound renderer.  Increased default sound buffer to 1.0 seconds
+          due to oddities observed with short buffer durations.
         - Boyan added key/value pair to iSoundWrapper.
 	- Reverted endian changes from res because they break compile
 	  with MSYS.
