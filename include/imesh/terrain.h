@@ -31,7 +31,7 @@ struct iImage;
 struct iMovable;
 class csTransform;
 
-SCF_VERSION (iTerrainObjectState, 0, 0, 2);
+SCF_VERSION (iTerrainObjectState, 0, 0, 3);
 
 /**
  * This will override the settings for material in the parent
@@ -93,6 +93,15 @@ struct iTerrainObjectState : public iBase
    * Retrieve whether static lighting is enabled.
    */
   virtual bool GetStaticLighting () = 0;
+
+  /**
+   * Enable or disable shadow casting by this terrain mesh.
+   */
+  virtual void SetCastShadows (bool enable) = 0;
+  /**
+   * Retrieve whether shadow casting is enabled.
+   */
+  virtual bool GetCastShadows () = 0;
 };
 
 SCF_VERSION (iTerrainFactoryState, 0, 0, 1);

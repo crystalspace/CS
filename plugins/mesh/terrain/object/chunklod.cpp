@@ -1609,8 +1609,8 @@ void csChunkLodTerrainObject::AppendShadows (iMovable* movable,
       
       const csVector3& v1 = worldVertices[pos];
       const csVector3& v2 = worldVertices[pos + 1];
-      const csVector3& v3 = worldVertices[pos + w];
-      const csVector3& v4 = worldVertices[pos + w + 1];
+      const csVector3& v3 = worldVertices[pos + w + 1];
+      const csVector3& v4 = worldVertices[pos + w];
 
       csVector3 middle ((v1 + v2 + v3 + v4) * 0.25f);
       AppendShadowTri (v1, v2, middle, list, origin);

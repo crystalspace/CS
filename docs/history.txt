@@ -51,6 +51,8 @@ chronological order.
 	- res fixed an issue with proctex flippedness in NR.
 	- res augmented chunklod to also cast shadows. Activated with 
 	  <castshadows> mesh object parameter.
+	- res fixed some coordinate swappage in chunklod, causing it to cast 
+	  wrong shadows.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render

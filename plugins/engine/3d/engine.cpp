@@ -1569,7 +1569,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     {
       if (do_verbose)
       {
-        printf ("Doing light %d\n", lit_cnt);
+	csPrintf ("Doing light %d\n", lit_cnt);
 	fflush (stdout);
       }
       lit_cnt++;
