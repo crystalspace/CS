@@ -33,7 +33,7 @@ echo				>> cs-config
 echo "makevars()"		>> cs-config
 echo "{"			>> cs-config
 echo "	cat <<EOF"		>> cs-config
-cat out/csconfig.tmp		>> cs-config
+cat out/csconfig.tmp | sed -e 's/cs-config/\\\$@/g' >> cs-config
 echo "EOF"			>> cs-config
 echo "}"			>> cs-config
 echo				>> cs-config
