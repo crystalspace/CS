@@ -43,6 +43,8 @@ chronological order.
 	  casting the offset in the array to integer
 	  will do exactly nothing) and there is no other sensible default
 	  sorting that can be used for csArray in general.
+	- Jorrit also removed DefaultSortCompare() for csPDelArray. Doesn't
+	  make sense to sort pointers.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for
