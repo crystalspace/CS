@@ -1,0 +1,3 @@
+InterfaceName=Arts::csSoundModule,Arts::csSoundSource,Arts::cs3DEffect,Arts::SynthModule,Arts::Object
+Library=libcsarts.la
+Buildable=true

@@ -1,0 +1,46 @@
+#include <artsflow.idl>
+
+module Arts {
+
+  /// this is where the soundbits come from
+  interface csSoundSource : SynthModule {
+    attribute sequence<float> Data;
+    out audio stream left, right;
+    default left, right;
+    void Play (long playtype);
+  };
+
+  /// modifying sound to give 3d environmental impression
+  enum Sound3DType { SOUND3D_DISABLE, SOUND3D_RELATIVE, SOUND3D_ABSOLUTE };
+  interface cs3DEffect : StereoEffect {
+    void SetHeadSize (float headSize);
+    void SetOrientation (float upX, float upY, float upZ, float frontX, float frontY, float frontZ);
+    void SetListenerPosition (float posX, float posY, float posZ);
+    void SetSoundPosition (float posX, float posY, float posZ);
+    void SetDistanceFactor (float fact);
+    void Set3DType (Sound3DType mode);
+    void SetVelocity (float x, float y, float z);
+    void SetRollOffFactor (float factor);
+    void SetDopplerFactor (float factor);
+
+  };
+
+  /// this is the main module through which CS communicates, it is responsible for connecting
+  /// submodules, starting, stoping, etc.
+  interface csSoundModule : SynthModule {
+    void SetData (sequence<float> Data);
+    void SetHeadSize (float headSize);
+    void SetOrientation (float upX, float upY, float upZ, float frontX, float frontY, float frontZ);
+    void SetListenerPosition (float posX, float posY, float posZ);
+    void SetSoundPosition (float posX, float posY, float posZ);
+    void SetDistanceFactor (float fact);
+    void Set3DType (Sound3DType mode);
+    void SetVelocity (float x, float y, float z);
+    void SetRollOffFactor (float factor);
+    void SetDopplerFactor (float factor);
+    void SetVolume (float vol);
+    void SetFrequencyFactor (float freq);
+    void Play (long playType);
+    void Stop ();
+  };
+};
