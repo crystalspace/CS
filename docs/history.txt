@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+14-Dec-2001
+	- Reverted a patch from 'res' on the OpenGL windows canvas
+	  related to the calculation of 'wwidth' and 'wheight'. This
+	  patch caused OpenGL to stop working correctly for me (ATI card).
+	  Don't know the reason though.
 13-Dec-2001
 	- Applied a patch from Peter Amstutz <tetron@student.umass.edu>
 	  which allows csMovable to operate nicely even if there is no
