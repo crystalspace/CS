@@ -243,16 +243,16 @@ void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
     (info->destructed && (info->refCount <= 1));
   if (!okay)
   {
-    csPrintf ("object %p (%s), refcount %d, %s\n",
-      (void*)obj, 
+    csPrintf ("object %.8x (%s), refcount %d, %s\n",
+      (uint32)((void*)obj), // @@@ Fix for pointer
       info->descr ? info->descr : "<unknown>",
       info->refCount,
       info->destructed ? "destructed" : "not destructed");
     for (size_t i = 0; i < info->actions.Length(); i++)
     {
-      csPrintf ("%s by %p from %d\n",
+      csPrintf ("%s by %.8x from %d\n",
 	(info->actions[i].type == Increased) ? "Increase" : "Decrease",
-	(void*)info->actions[i].tag, 
+	(uint32)((void*)info->actions[i].tag), // @@@ Fix for pointer
 	info->actions[i].refCount);
       if (info->actions[i].stack != 0)
 	info->actions[i].stack->Print ();

@@ -19,11 +19,102 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
+#include "csutil/sysfunc.h"
 #include "csutil/csstring.h"
 #include "callstack.h"
 #include "csutil/win32/callstack.h"
+#include "csutil/win32/wintools.h"
 
 #include <tlhelp32.h>
+
+static void PrintError (const char* format, ...)
+{
+  csPrintfErr ("wincallstack: ");
+  va_list args;
+  va_start (args, format);
+  csPrintfErrV (format, args);
+  va_end (args);
+  csPrintfErr ("\n");
+}
+
+static void RescanModules ();
+
+class SymInitializer
+{
+  bool inited;
+  HANDLE hProc;
+public:
+  SymInitializer ()
+  {
+    inited = false;
+    hProc = INVALID_HANDLE_VALUE;
+  }
+  ~SymInitializer ()
+  {
+    if (inited)
+    {
+      DbgHelp::SymCleanup (GetSymProcessHandle ());
+      DbgHelp::DecRef();
+    }
+    if (hProc != INVALID_HANDLE_VALUE)
+      CloseHandle (hProc);
+  }
+  void Init ()
+  {
+    if (inited) return;
+    inited = true;
+
+    DbgHelp::IncRef();
+    if (!DbgHelp::SymInitialize (GetSymProcessHandle (), 0, true))
+      PrintError ("SymInitialize : %s", 
+      cswinGetErrorMessage (GetLastError ()));
+    DbgHelp::SymSetOptions (SYMOPT_DEFERRED_LOADS |
+      SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
+  }
+  HANDLE GetSymProcessHandle ()
+  {
+    if (hProc == INVALID_HANDLE_VALUE)
+    {
+      if (!DuplicateHandle (GetCurrentProcess (), 
+	GetCurrentProcess (), GetCurrentProcess (), &hProc,
+	0, false, DUPLICATE_SAME_ACCESS))
+	hProc = GetCurrentProcess ();
+    }
+    return hProc;
+  }
+};
+
+static SymInitializer symInit;
+
+static void RescanModules ()
+{
+  /*
+   If "deferred symbol loads" are enabled, for some reason the first 
+   attempt to get symbol info after a rescan fails. So turn it off.
+   */
+  DbgHelp::SymSetOptions (SYMOPT_FAIL_CRITICAL_ERRORS |
+    SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
+
+  HANDLE hSnap = CreateToolhelp32Snapshot (TH32CS_SNAPMODULE,
+    GetCurrentProcessId ());
+  MODULEENTRY32 me;
+  memset (&me, 0, sizeof (me));
+  me.dwSize = sizeof (me);
+  bool res = Module32First (hSnap, &me);
+  while (res)
+  {
+    if (DbgHelp::SymLoadModule64 (symInit.GetSymProcessHandle (), 0, me.szExePath,
+      /*me.szExePath*/0, (LONG_PTR)me.modBaseAddr, 0) == 0)
+    {
+      DWORD err = GetLastError ();
+      if (err != ERROR_SUCCESS)
+	PrintError ("SymLoadModule64 %s: %s", me.szModule, 
+	  cswinGetErrorMessage (err));
+    }
+    res = Module32Next (hSnap, &me);
+  }
+  CloseHandle (hSnap);
+}
 
 struct SymCallbackInfo
 {
@@ -43,7 +134,7 @@ BOOL cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo, ULONG SymbolSize,
     uint32 data = *((uint32*)(info->paramOffset + pSymInfo->Address));
     StackEntry::Param& param =
       info->params->GetExtend(info->params->Length ());
-    param.name = strings.Request (pSymInfo->Name);//csStrNew (pSymInfo->Name);
+    param.name = strings.Request (pSymInfo->Name);
     param.value = data;
   }
 
@@ -72,13 +163,23 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
   stackFrame.Virtual = frame.Virtual;
 
   entry.hasParams = false;
-  if (DbgHelp::SymSetContext (GetCurrentProcess (), &stackFrame, 0))
+  bool result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+    &stackFrame, 0);
+  if (!result)
+  {
+    // Bit hackish: if SymSetContext() failed, scan the loaded DLLs
+    // and try to load their debug info.
+    RescanModules ();
+    result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+      &stackFrame, 0);
+  }
+  if (result)
   {
     str.Clear ();
     SymCallbackInfo callbackInfo;
     callbackInfo.params = &entry.params;
     callbackInfo.paramOffset = (uint8*)(LONG_PTR)(frame.AddrStack.Offset - 8);
-    if (DbgHelp::SymEnumSymbols (GetCurrentProcess (), 
+    if (DbgHelp::SymEnumSymbols (symInit.GetSymProcessHandle (), 
       0
       /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
       "*", &EnumSymCallback, &callbackInfo))
@@ -86,35 +187,17 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
       entry.hasParams = true;
     }
   }
+  else
+  {
+    DWORD err = GetLastError ();
+    if (err != ERROR_SUCCESS)
+      PrintError ("SymSetContext: %s", cswinGetErrorMessage (err));
+  }
 }
 
 size_t cswinCallStack::GetEntryCount ()
 {
   return entries.Length();
-}
-
-static void RescanModules ()
-{
-  /*
-   If "deferred symbol loads" are enabled, for some reason the first 
-   attempt to get symbol info after a rescan fails. So turn it off.
-   */
-  DbgHelp::SymSetOptions (SYMOPT_FAIL_CRITICAL_ERRORS |
-    SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
-
-  HANDLE hSnap = CreateToolhelp32Snapshot (TH32CS_SNAPMODULE,
-    GetCurrentProcessId ());
-  MODULEENTRY32 me;
-  memset (&me, 0, sizeof (me));
-  me.dwSize = sizeof (me);
-  bool res = Module32First (hSnap, &me);
-  while (res)
-  {
-    DbgHelp::SymLoadModule64 (GetCurrentProcess (), 0, me.szModule,
-      me.szExePath, (LONG_PTR)me.modBaseAddr, 0);
-    res = Module32Next (hSnap, &me);
-  }
-  CloseHandle (hSnap);
 }
 
 bool cswinCallStack::GetFunctionName (size_t num, csString& str)
@@ -130,20 +213,20 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
   symbolInfo->SizeOfStruct = sizeof (SYMBOL_INFO);
   symbolInfo->MaxNameLen = MaxSymbolLen;
   uint64 displace;
-  if (!DbgHelp::SymFromAddr (GetCurrentProcess (), entries[num].instrPtr,
+  if (!DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (), entries[num].instrPtr,
     &displace, symbolInfo))
   {
     // Bit hackish: if SymFromAddr() failed, scan the loaded DLLs
     // and try to load their debug info.
     RescanModules ();
-    DbgHelp::SymFromAddr (GetCurrentProcess (), entries[num].instrPtr,
+    DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (), entries[num].instrPtr,
       &displace, symbolInfo);
   }
 
   IMAGEHLP_MODULE64 module;
   memset (&module, 0, sizeof (IMAGEHLP_MODULE64));
   module.SizeOfStruct = sizeof (IMAGEHLP_MODULE64);
-  DbgHelp::SymGetModuleInfo64 (GetCurrentProcess (), entries[num].instrPtr,
+  DbgHelp::SymGetModuleInfo64 (symInit.GetSymProcessHandle (), entries[num].instrPtr,
     &module);
 
   if (symbolInfo->Name[0] != 0)
@@ -169,7 +252,7 @@ bool cswinCallStack::GetLineNumber (size_t num, csString& str)
   memset (&line, 0, sizeof (IMAGEHLP_LINE64));
   line.SizeOfStruct = sizeof (IMAGEHLP_LINE64);
   DWORD displacement;
-  if (DbgHelp::SymGetLineFromAddr64 (GetCurrentProcess (), 
+  if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
     entries[num].instrPtr, &displacement, &line))
   {
     str.Format ("%s:%u", line.FileName, (uint)line.LineNumber);
@@ -196,48 +279,145 @@ bool cswinCallStack::GetParameters (size_t num, csString& str)
   return true;
 }
 
-class SymInitializer
+class CurrentThreadContextHelper
 {
-  bool inited;
-public:
-  SymInitializer ()
-  {
-    inited = false;
-  }
-  ~SymInitializer ()
-  {
-    if (inited)
-    {
-      DbgHelp::SymCleanup (GetCurrentProcess ());
-      DbgHelp::DecRef();
-    }
-  }
-  void Init ()
-  {
-    if (inited) return;
-    inited = true;
+  HANDLE mutex;
 
-    DbgHelp::IncRef();
-    DbgHelp::SymInitialize (GetCurrentProcess (), 0, true);
-    DbgHelp::SymSetOptions (SYMOPT_DEFERRED_LOADS |
-      SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
-  }
+  struct ContextThreadParams
+  {
+    HANDLE evStartWork;
+    HANDLE evFinishedWork;
+
+    HANDLE CallingThread;
+    CONTEXT* context;
+  } params;
+  HANDLE hThread;
+  HANDLE evStartWork;
+  HANDLE evFinishedWork;
+
+  static DWORD WINAPI ContextThread (LPVOID lpParameter);
+public:
+  CurrentThreadContextHelper ();
+  ~CurrentThreadContextHelper ();
+
+  bool GetCurrentThreadContext (CONTEXT* context);
 };
 
-static SymInitializer symInit;
+CurrentThreadContextHelper::CurrentThreadContextHelper ()
+{
+  mutex = CreateMutex (0, false, 0);
+  hThread = evStartWork = evFinishedWork = 0;
+}
+
+CurrentThreadContextHelper::~CurrentThreadContextHelper ()
+{
+  if (hThread != 0)
+  {
+    params.context = 0;
+    SetEvent (evStartWork);
+    WaitForSingleObject (hThread, INFINITE);
+
+    hThread = 0;
+  }
+  if (evStartWork != 0)
+    CloseHandle (evStartWork);
+  if (evFinishedWork != 0)
+    CloseHandle (evFinishedWork);
+}
+
+DWORD CurrentThreadContextHelper::ContextThread (LPVOID lpParameter)
+{
+  ContextThreadParams& params = *((ContextThreadParams*)lpParameter);
+
+  while (true)
+  {
+    WaitForSingleObject (params.evStartWork, INFINITE);
+
+    if (params.context == 0)
+      return 0;
+
+    SuspendThread (params.CallingThread);
+    GetThreadContext (params.CallingThread, params.context);
+    ResumeThread (params.CallingThread);
+
+    SetEvent (params.evFinishedWork);
+  }
+}
+
+bool CurrentThreadContextHelper::GetCurrentThreadContext (CONTEXT* context)
+{
+  WaitForSingleObject (mutex, INFINITE);
+
+  /* GetThreadContext() doesn't work reliably for the current thread, so do it
+   * from another thread while the real current one is suspended. */
+  if (hThread == 0)
+  {
+    evStartWork = CreateEvent (0, false, false, 0);
+    if (evStartWork == 0)
+    {
+      ReleaseMutex (mutex);
+      return false;
+    }
+    evFinishedWork = CreateEvent (0, false, false, 0);
+    if (evFinishedWork == 0)
+    {
+      ReleaseMutex (mutex);
+      return false;
+    }
+
+    params.evStartWork = evStartWork;
+    params.evFinishedWork = evFinishedWork;
+
+    DWORD ThreadID;
+    hThread = CreateThread (0, 0, ContextThread, &params, 
+      0, &ThreadID);
+    if (hThread == 0)
+    {
+      ReleaseMutex (mutex);
+      return false;
+    }
+  }
+
+  HANDLE ThisThread;
+  if (!DuplicateHandle (GetCurrentProcess (), 
+    GetCurrentThread (), GetCurrentProcess (), &ThisThread,
+    0, false, DUPLICATE_SAME_ACCESS))
+  {
+    ReleaseMutex (mutex);
+    return false;
+  }
+
+  params.CallingThread = ThisThread;
+  params.context = context;
+
+  if (!SetEvent (evStartWork))
+  {
+    ReleaseMutex (mutex);
+    return false;
+  }
+  WaitForSingleObject (evFinishedWork, INFINITE);
+
+  CloseHandle (ThisThread);
+
+  ReleaseMutex (mutex);
+  return true;
+}
+
+static CurrentThreadContextHelper contextHelper;
 
 csCallStack* csCallStackHelper::CreateCallStack (int skip)
 {
-  HANDLE hProc = GetCurrentProcess ();
+  HANDLE hProc = symInit.GetSymProcessHandle ();
   HANDLE hThread = GetCurrentThread ();
 
   CONTEXT context;
   memset (&context, 0, sizeof (context));
   context.ContextFlags = CONTEXT_FULL;
-  GetThreadContext (hThread, &context);
+  if (!contextHelper.GetCurrentThreadContext (&context))
+    return 0;
 
   return cswinCallStackHelper::CreateCallStack (hProc, hThread, context, 
-    skip);
+    skip + 1); // Always skip one more to hide GetCurrentThreadContext()
 }
 
 csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
@@ -251,10 +431,16 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
 
   STACKFRAME64 frame;
   memset (&frame, 0, sizeof (frame));
+#ifdef CS_PROCESSOR_X86
   frame.AddrPC.Offset = context.Eip;
   frame.AddrPC.Mode = AddrModeFlat;
+  frame.AddrStack.Offset = context.Esp;
+  frame.AddrStack.Mode = AddrModeFlat;
   frame.AddrFrame.Offset = context.Ebp;
   frame.AddrFrame.Mode = AddrModeFlat;
+#else
+  #error Don't know how to stack walk for your platform.
+#endif
 
   int count = 0;
   cswinCallStack* stack = new cswinCallStack;
@@ -266,6 +452,6 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
     // Always skip the first entry (this func)
     if (count > (skip + 1)) stack->AddFrame (frame);
   }
-  
+
   return stack;
 }

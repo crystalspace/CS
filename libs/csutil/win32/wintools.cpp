@@ -85,11 +85,23 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
     ret = csStrNewW (msg);
   }
 
+  wchar_t* retEnd = ret + wcslen (ret);
+  while (retEnd > ret)
+  {
+    retEnd--;
+    if ((*retEnd != '\n') && (*retEnd != '\r'))
+      break;
+    *retEnd = 0;
+  }
+
   return ret;
 }
 
 char* cswinGetErrorMessage (HRESULT code)
 {
-  return csStrNew (cswinGetErrorMessageW (code));
+  wchar_t* retW = cswinGetErrorMessageW (code);
+  char* ret = csStrNew (retW);
+  delete[] retW;
+  return ret;
 }
 

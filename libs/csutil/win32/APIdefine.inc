@@ -21,7 +21,7 @@
 
 cswinCacheDLL* CS_API_NAME::dll = 0;
 bool CS_API_NAME::dllLoaded = false;
-int CS_API_NAME::refCount = false;
+int CS_API_NAME::refCount = 0;
 #define FUNC_GROUP_BEGIN(name)	    \
   bool CS_API_NAME::name ## _avail = false;
 #define FUNC_GROUP_END
@@ -43,6 +43,11 @@ void CS_API_NAME::DecRef()
     dll = 0;
     dllLoaded = false;
   }
+}
+
+int CS_API_NAME::GetRefCount ()
+{
+  return refCount;
 }
 
 bool CS_API_NAME::Available ()

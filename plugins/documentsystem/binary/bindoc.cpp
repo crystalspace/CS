@@ -139,7 +139,7 @@ const char* csBdAttr::GetNameStr (csBinaryDocument* doc) const
 
 const char* csBdAttr::GetValueStr (csBinaryDocument* doc) const
 {
-  if (flags & BD_ATTR_MODIFIED)
+  if (GetRealFlags() & BD_ATTR_MODIFIED)
   {
     return vstr;
   }

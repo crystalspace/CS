@@ -35,8 +35,9 @@ private:
 public:
   // A refcount mechanism is used to determine when to unload
   // the DLL.
-  static void IncRef();
-  static void DecRef();
+  static void IncRef ();
+  static void DecRef ();
+  static int GetRefCount ();
 
   #define FUNC_GROUP_BEGIN(name)	    \
     private: static bool name ## _avail;    \

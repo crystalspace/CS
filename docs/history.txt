@@ -14,12 +14,17 @@ chronological order.
 	- Rhad changed the Windows waveout sound driver to properly handle
 	  threading issues, buffer sounds better, manage memory better, and
 	  not blow up randomly.
-		- Fixes "waveOutUnprepareHeader: 0000000b An invalid 
-                         parameter was passed"
-		- Should reduce/fix sound studdering during moderate system 
-                  load.
-		- The software renderer needs certain changes to be made to
-		  thread safety to go along with this.
+	    - Fixes "waveOutUnprepareHeader: 0000000b An invalid 
+		     parameter was passed"
+	    - Should reduce/fix sound studdering during moderate system load.
+	    - The software renderer needs certain changes to be made to thread 
+	      safety to go along with this.
+	- res fixed a bug in bindoc where a struct member was accessed directly
+	  instead of through a method, causing bogus values to be used 
+	  sometimes (and subsequent crashes).
+	- res fixed a leak in cswinGetErrorMessage().
+	- res added some error reporting to the Win32 callstack code and other 
+	  various improvements.
 27-Sep-2004
 	- dfryer changed "unsigned int" to size_t in
 	  csXMLShaderTech::ActivatePass().  Prototype used size_t; size_t is
@@ -54,6 +59,8 @@ chronological order.
 	  of 'extern') over to the GL extension manager templates.
 	- res fixed a leak in VFS.
 	- res fixed a signed vs unsigned warning in dynavis.
+	- res fixed bug 1004889 (GL font cache: glTexSubImage2D() called with 
+	  0 length).
 24-Sep-2004
 	- Jorrit moved csProcAnimated to cstool so that it is easier to
 	  use animated textures from code.
