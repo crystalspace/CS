@@ -41,6 +41,8 @@ chronological order.
 	  simply didn't work with NR.
 	- Neil Mosafi added forward declare for iGraphics3D to 
 	  ivideo/custcursor.h
+	- Eric Sunshine augmented scripts/python/Jamfile so that it also cleans
+	  up the evil .pyc and .pyo files which are excreted by Python.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render
