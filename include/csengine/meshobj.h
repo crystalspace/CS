@@ -434,6 +434,10 @@ public:
     virtual iMeshWrapper* GetChild (int idx) const;
     virtual void GetRadius (csVector3& rad, csVector3 &cent) const 
 	  { scfParent->GetRadius (rad,cent); }
+    virtual void Draw (iRenderView* rview)
+    {
+      scfParent->Draw (rview);
+    }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

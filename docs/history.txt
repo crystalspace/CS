@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+20-Jul-2001
+	- Added iMeshWrapper::Draw() so that it is now possible to draw
+	  mesh wrappers on your own. This can be useful if you want to display
+	  an object in a CSWS window for example. Normally applications
+	  will rarely use this function.
 19-Jul-2001
 	- Added iMeshList and iMeshFactoryList. Added iEngine::GetMeshes()
 	  and GetMeshFactories() and removed several mesh/mesh factory

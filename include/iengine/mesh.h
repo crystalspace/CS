@@ -110,7 +110,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 0, 15);
+SCF_VERSION (iMeshWrapper, 0, 0, 16);
 
 /**
  * This interface corresponds to the object in the engine
@@ -291,7 +291,15 @@ struct iMeshWrapper : public iBase
    */
   virtual iBase* GetParentContainer () = 0;
   /// Get the radius of this mesh (ignoring children).
-  virtual void GetRadius ( csVector3& rad, csVector3& cent) const = 0;
+  virtual void GetRadius (csVector3& rad, csVector3& cent) const = 0;
+
+  /**
+   * Draw this mesh. This is a function that you normally don't have
+   * to call on your own as the engine does this for you. However it can
+   * be useful to have this function in some special cases where you
+   * want to render mesh objects in a CSWS window or something like that.
+   */
+  virtual void Draw (iRenderView* rview) = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 6);
