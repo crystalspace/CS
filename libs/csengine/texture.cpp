@@ -33,6 +33,8 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
 {
   (image = Image)->IncRef ();
   key_col_r = -1;
+  if(image->HasKeycolor ())
+    image->GetKeycolor( key_col_r, key_col_g, key_col_b );
 }
 
 csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :

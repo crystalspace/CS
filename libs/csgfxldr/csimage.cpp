@@ -427,6 +427,18 @@ void csImageFile::CheckAlpha ()
   }
 }
 
+bool csImageFile::HasKeycolor ()
+{
+  return has_keycolour;
+}
+
+void csImageFile::GetKeycolor (int &r, int &g, int &b) 
+{
+  r = keycolour_r;
+  g = keycolour_g;
+  b = keycolour_b;
+}
+
 void csImageFile::convert_rgba (csRGBpixel *iImage)
 {
   int pixels = Width * Height;

@@ -119,6 +119,13 @@ struct iImage : public iBase
 
   /// Check if all alpha values are "non-transparent" and if so, discard alpha
   virtual void CheckAlpha () = 0;
+
+  /// check if image has a keycolour stored with it
+  virtual bool HasKeycolor () = 0;
+  
+  /// get the keycolour stored with the image.
+  virtual void GetKeycolor (int &r, int &g, int &b) = 0;
+
 };
 
 #endif // __IIMAGE_H__

@@ -160,6 +160,10 @@ public:
   virtual iImage *Crop (int x, int y, int width, int height);
   /// Check if all alpha values are "non-transparent" and if so, discard alpha
   virtual void CheckAlpha ();
+  /// check if image has a keycolour stored with it
+  virtual bool HasKeycolor ();
+  /// get the keycolour stored with the image.
+  virtual void GetKeycolor (int &r, int &g, int &b);
 };
 
 /**
