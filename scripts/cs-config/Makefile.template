@@ -92,7 +92,8 @@ $(PLUGIN): $(PLUGIN.OBJS)
 	$(DO.PLUGIN) $(PLUGIN.LINKFLAGS) 
 
 clean:
-	$(RM) $(OBJS) $(PLUGIN.OBJS) *.def
+	$(RM) $(EXECUTABLE) $(OBJS) $(PLUGIN.OBJS) $(CSCONFIG.MAK) \
+	makefile.dep *.def
 
 #------
 # Create dependencies

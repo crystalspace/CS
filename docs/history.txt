@@ -14,6 +14,10 @@ The history order is reversed so that new features are at the top.
 	  it is impossible to make csArray<int> instances (since you then
 	  get a conflict with the two Delete() functions).
 	- Eric Sunshine fixed a silly synatx error in csutil/array.h.
+	- Eric Sunshine fixed CS/scripts/cs-config/Makefile.template so that
+	  the `clean' target now deletes the generated executable,
+	  makefile.dep, and csconfig.mak.  David Calkins <dcalk@verizon.net>
+	  reported this shortcoming.
 8-Feb-2003
 	- Reverted the changes of res for packed rgb struct since they
 	  don't appear to work on linux (png image loader crashes).
