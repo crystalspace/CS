@@ -22,13 +22,36 @@
 #include <stdarg.h>
 #include "igeom/polymesh.h"
 #include "csgeom/vector3.h"
+#include "csgeom/box.h"
 #include "csutil/csvector.h"
 
 struct iVFS;
 struct iCommandLineParser;
 struct iObjectRegistry;
+struct iFile;
 class csParser;
 class csVector3;
+
+/**
+ * A vertex with connectivity information.
+ */
+class ltVertex : public csVector3
+{
+private:
+  int* polygons;
+  int num_polygons;
+  int max_polygons;
+
+public:
+  ltVertex ();
+  ltVertex (const ltVertex& vt);
+  ~ltVertex ();
+
+  void AddPolygon (int idx);
+  int GetPolygonCount () const { return num_polygons; }
+  int GetPolygon (int idx) const { return polygons[idx]; }
+  int* GetPolygonIndices () const { return polygons; }
+};
 
 /**
  * A polygon.
@@ -49,6 +72,9 @@ public:
   void AddVertex (int idx);
   int GetVertexCount () const { return num_vertices; }
   int GetVertex (int idx) const { return vertices[idx]; }
+  int* GetVertexIndices () const { return vertices; }
+
+  void RemoveDuplicateVertices ();
 
   void SetName (const char* name);
   const char* GetName () const { return name; }
@@ -62,7 +88,7 @@ class ltThing
 private:
   char* name;
 
-  csVector3* vertices;
+  ltVertex** vertices;
   int num_vertices;
   int max_vertices;
 
@@ -70,14 +96,15 @@ private:
   int num_polygons;
   int max_polygons;
 
+  csBox3 bbox;
+
 public:
   ltThing ();
   ~ltThing ();
 
   void AddVertex (const csVector3& vt);
-  //@@@void CompressVertices ();
   int GetVertexCount () const { return num_vertices; }
-  const csVector3& GetVertex (int idx) const { return vertices[idx]; }
+  const csVector3& GetVertex (int idx) const { return *vertices[idx]; }
 
   ltPolygon* AddPolygon ();
   int GetPolygonCount () const { return num_polygons; }
@@ -85,6 +112,34 @@ public:
 
   void SetName (const char* name);
   const char* GetName () const { return name; }
+
+  /**
+   * Warning! Only call this function BEFORE CreateVertexInfo()!
+   * This function will remove all vertices that are duplicates (i.e.
+   * close in space).
+   */
+  void CompressVertices ();
+  /**
+   * Warning! Only call this function BEFORE CreateVertexInfo()!
+   * This function will remove all vertices that are not used by
+   * polygons.
+   */
+  void RemoveUnusedVertices ();
+  /**
+   * Warning! Only call this function BEFORE CreateVertexInfo()!
+   * This function will remove all duplicate vertices in polygons.
+   */
+  void RemoveDuplicateVertices ();
+
+  void CreateBoundingBox ();
+
+  /**
+   * Warning! Don't call this function BEFORE CompressVertices(),
+   * RemoveUnusedVertices(), or RemoveDuplicateVertices().
+   * This function will update all vertices so that they contain
+   * a table of all polygon indices that use these vertices.
+   */
+  void CreateVertexInfo ();
 };
 
 /**
@@ -100,10 +155,14 @@ public:
 
   void ReportError (const char* description, ...);
 
-  void ParseWorld (csParser* parser, char* buf);
-  void ParseSector (csParser* parser, char* buf);
-  void ParseMeshObj (csParser* parser, const char* thname, char* buf);
-  void ParseThingParams (csParser* parser, const char* thname, char* buf);
+  void ParseWorld (csParser* parser, iFile* fout, char* buf);
+  void ParseSector (csParser* parser, iFile* fout, char* buf);
+  void ParseMeshObj (csParser* parser, iFile* fout,
+  	const char* thname, char* buf);
+  void ParseThingParams (csParser* parser, iFile* fout,
+  	const char* thname, char* buf);
+  void ParsePolygonParams (csParser* parser, iFile* fout,
+  	ltPolygon* polygon, char* buf);
 
 public:
   LevTool ();

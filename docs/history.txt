@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+10-Jul-2002
+	- Further work on levtool.
 9-Jul-2002
 	- DynaVis now correctly does frustum culling in mirrored sectors.
 	  Apparently the fix that I did yesterday for FrustVis has the
@@ -14,7 +16,7 @@ The history order is reversed so that new features are at the top.
 	  tokens that are not equal. So this could avoid a lot of compares.
 	- Started work on a new 'levtool' application. One of the main
 	  purposes of this application will be a tool to convert an old-style
-	  octree using level to Dynavis. But more features will also be
+	  octree level to Dynavis. But more features will also be
 	  added like world file validation and things like that. At this
 	  moment this tool doesn't do much.
 8-Jul-2002
