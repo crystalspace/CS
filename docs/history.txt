@@ -44,6 +44,8 @@ chronological order.
 	    - Re-organized sections a bit so that sections logically related to
 	      one another are now physically grouped, thus achieving a somewhat
 	      less fragmented feel.
+	- Eric Sunshine brought vfs.txi in the user manual up to date.  Also
+	  added mention of new $@, $*, and $^ pseudo-variables.
 12-Oct-2003
 	- Eric Sunshine clarified documentation for csGetResourceDir(),
 	  iCommandLineParser::GetResourceDir(), and

@@ -54,27 +54,30 @@ should follow this list of guidelines:
 @item
 Choose filenames that are well suited for all operating systems you are
 targeting.  As of today @sc{dos} has the most restricted rules for naming
-files (@sc{ascii7} characters except ``?*+'' and space, and with only one
-dot per filename).
+files (@sc{ascii7} characters except @samp{?}, @samp{*}, @samp{+}, and space,
+and with only one dot per filename).
 The part of @sc{vfs} that is located in archives support virtually any
-filenames, so if you're sure that you will never have to place some file on a
+filenames, so if you are sure that you will never have to place some file on a
 ``real'' filesystem, you can give it any name you desire.
 
 @item
-Different platforms use different filename comparison criteria.  On Unix
-filenames are case-sensitive, while on Windows, @sc{dos}, and Macintosh (HFS)
-they are case-insensitive.  To avoid problems always refer to files by their
-exact names.  For example, if you have a file on @sc{vfs} called
-@file{GaMe.DaT} you should open it exactly as @file{GaMe.DaT} and not as
-@file{game.dat} or @file{GAME.DAT}.  On @sc{dos}, the file will appear to be
-entirely upper-case @file{GAME.DAT}, but you should still use the correct name,
-@file{GaMe.DaT}, when opening it.
+Different platforms use different filename comparison criteria.  On Unix and
+MacOS/X @sc{ufs} filesystems, filenames are case-sensitive, while on Windows,
+@sc{dos}, and Macintosh @sc{hfs} filesystems, they are case-insensitive.  To
+avoid problems always refer to files by their exact names.  For example, if you
+have a file on @sc{vfs} called @file{GaMe.DaT} you should open it exactly as
+@file{GaMe.DaT} and not as @file{game.dat} or @file{GAME.DAT}.  On @sc{dos},
+the file will appear to be entirely upper-case @file{GAME.DAT}, but you should
+still use the correct name, @file{GaMe.DaT}, when opening it.
 
 @item
-Keep in mind that Unix @emph{can} delete currently opened files while Windows,
-@sc{dos}, and possibly others can not.  So you should avoid deleting open
-files.  (@emph{Technical Note}: Actually this should work for files which are
-located in archives but is not advisable to do so---and has not been tested.)
+Keep in mind that Unix @emph{can} delete files which are actively open, whereas
+Windows, @sc{dos}, and possibly other platforms can not.  Therefore, you should
+avoid deleting open files.  (@emph{Technical Note}: Actually, this should work
+for files which are located in archives but is not advisable to do so, because
+in general, program code will not know if a file resides within an archive or
+within the physical filesystem.  Furthermore, deleting open files from an
+archive not been tested.
 @end itemize
 
 @node VFS Configuration File, , VFS Details, VFS
@@ -82,23 +85,24 @@ located in archives but is not advisable to do so---and has not been tested.)
 @cindex @sc{vfs} Configuration File
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
 
-The main @samp{VFS.Mount.} section describes the layout of the ``virtual''
-file system. Imagine a clean disk drive onto which you start to create
-directories by making links to existing ``real'' directories and archive
-(@file{.zip}) files.  An archive is treated exactly like a subdirectory; you
-even can link one ``virtual directory'' to several ``real'' paths and
-archives; however if you write files they will be written to the first
-directory or archive in list.
+Keys in the @file{vfs.cfg} configuration file with names starting with
+@samp{VFS.Mount.} describe the layout of the @dfn{virtual} file system.
+Imagine a clean disk drive onto which you start to create directories by making
+links to existing @dfn{real} directories and archive (@file{.zip}) files.  An
+archive is treated exactly like a subdirectory; you even can link one ``virtual
+directory'' to several ``real'' paths and archives; however if you write files
+they will be written to the first directory or archive in list.
 
-This section contains a list of virtual-to-real path mappings. The local name
-of the keys in the @samp{VFS.Mount.} section define the virtual directory,
-and the values define the real paths, which can represent a list of
-@dfn{physical} directories and @sc{zip} archives.  The path lists should be
-separated by commas (,), so commas cannot be used in directory names. This
-should not be much of a restriction, but if it is for a particular
-application, change @samp{VFS_PATH_DIVIDER} macro in @file{vfs.cpp}.
+These keys present a list of virtual-to-real path mappings.  The local name of
+a key with the @samp{VFS.Mount.} prefix define the virtual directory, and the
+values define the real paths, which can represent a list of @dfn{physical}
+directories and @sc{zip} archives.  The physical directory path lists should be
+separated by commas (,), therefore commas cannot be used in directory names.
+This should not be much of a restriction, but if it is a problem for a
+particular platform, you may want to take the drastic action of changing
+@samp{VFS_PATH_DIVIDER} macro in @file{vfs.cpp}.
 
-The @code{VFS.Mount.} section usually makes heavy use of variable data since
+The @samp{VFS.Mount.} values typically makes heavy use of variables since
 most operating systems have different pathname semantics and syntax.  The
 ``common denominator'' that @sc{vfs} emulates is a Unix-like filesystem.  To
 include the value of a variable in a @sc{vfs} path use the
@@ -126,11 +130,31 @@ not set, use the contents of @samp{$HOMEDIR}; if it is also not set, use
 @samp{$HOMEPATH}; and if none are set, use the literal string @samp{/home} as
 the resulting value.
 
-The @sc{vfs} class defines a variable called @samp{/} that contains the path
-delimiter for the current operating system (i.e. @samp{/} for Unix, @samp{\}
-for Windows/@sc{dos}, and @samp{:} for Macintosh).  You reference this
-variable by writing @samp{$/} rather than using the ``real-world'' delimiters
-@samp{/}, @samp{\}, or @samp{:}.
+@sc{vfs} defines a pseudo-variable named @samp{/} that contains the path
+delimiter for the current operating system (i.e.  @file{/} for Unix and
+MacOS/X, and @file{\} for Windows/@sc{dos}).  You reference this variable by
+writing @samp{$/} rather than using the ``real-world'' delimiters @samp{/},
+or @samp{\}.
+
+Here is the complete list of pseudo-variables understood by @sc{vfs}:
+
+@table @code
+@item $/
+Platform-specific path delimiter; @file{/} on Unix and MacOS/X; @file{\} on
+Windows.
+
+@item $@@
+Crystal Space installation directory.
+
+@item $*
+Application resource directory; typically the directory in which the
+application executable resides but, on MacOS/X, it is the @file{Resources}
+directory within the Cocoa application wrapper for @sc{gui} programs.
+
+@item $^
+Directory where application executable resides, or the directory where Cocoa
+application wrapper resides on MacOS/X.
+@end table
 
 The following is an example @sc{vfs} configuration file.
 
@@ -148,37 +172,43 @@ libraries or plug-in modules you use may require a mapping that is not listed
 here. This example is only intended to understand the concept:
 
 @example
+;;; Virtual File System mount table
+;;;
+;;; $/ -- path delimiter (i.e. "/" on Unix; "\" on Windows)
+;;; $@@ -- installation directory of Crystal Space
+;;; $* -- application resource directory
+;;; $^ -- directory in which application resides
+;;; The expansions of $@, $*, and $^ always have a trailing
+;;; path delimiter.
+;
 ; The following variables should be defined either in
 ; the environment or in system-dependent sections:
 ;
-; $. - The current directory.
-; $@@ - The directory into which CS has been installed. This is
-;      detected by iSystem::GetInstallPath().
-; $/ - The native path separator character; this value is
-;      supplied by the VFS manager, so you do not need to define
-;      it here; you can do so, however, if you really want to.
 ; $CD - The path to CD-ROM.
 ; $HOME - user's home directory
-
+;
 ; A common error is to omit the last $/ from directories.
 ; This is an error since VFS will treat any path not ending
 ; in $/ as an archive file name and not as a physical
 ; directory.
 
+; Mount points. (These are split over multiple lines in order to
+; fit correctly on a printed page in the documentation.  In real
+; life, the values would appear immediately after the `=' signs!)
 VFS.Mount.~ = $(HOME)$/
 VFS.Mount.map1 =
-  $.$/patches$/map1$/, $.$/cache$/map1.zip, $(CD)$/data$/map1.zip
+  $*$/patch$/map1$/, $*$/cache$/map1.zip, $(CD)$/data$/map1.zip
 VFS.Mount.map2 =
-  $.$/patches$/map2$/, $.$/cache$/map2.zip, $(CD)$/data$/map2.zip
+  $*$/patch$/map2$/, $*$/cache$/map2.zip, $(CD)$/data$/map2.zip
 VFS.Mount.map3 =
-  $.$/patches$/map3$/, $.$/cache$/map3.zip, $(CD)$/data$/map3.zip
+  $*$/patch$/map3$/, $*$/cache$/map3.zip, $(CD)$/data$/map3.zip
 
 ; Platform aliases.  Aliases are always read first; VFS
 ; entries specific to each platform override those defined
 ; in the platform alias section.  For example, if your
-; current platform is Solaris, VFS will look for the value
+; current platform is MacOS/X, VFS will look for the value
 ; of a variable first in the environment, then in
-; VFS.Solaris., and finally in VFS.Unix. (as specified in
+; VFS.MacOS/X., and finally in VFS.Unix. (as specified in
 ; section below).
 
 ; Unix-style filesystems
