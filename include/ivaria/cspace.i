@@ -570,6 +570,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "iutil/string.h"
 #endif // CS_MINI_SWIG
 
+%ignore csStringBase;
+%ignore csStringFast;
 %ignore csString::csString (size_t);
 %ignore csString::csString (char);
 %ignore csString::csString (unsigned char);
@@ -589,6 +591,8 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csString::Insert;
 %ignore csString::Overwrite;
 %ignore csString::Append;
+%ignore csString::AppendFmt;
+%ignore csString::AppendFmtV;
 %ignore csString::Slice;
 %ignore csString::SubString;
 %ignore csString::FindFirst;
