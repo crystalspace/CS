@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "csutil/csvector.h"
 #include "sndload.h"
+#include "soundraw.h"
 
 // Amiga 8svx/iff file format loader
 //  support 8 bits PCM
@@ -33,14 +34,10 @@
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-const char *csSoundLoader_IFF::GetDesc() const {
-  return "Amiga svx/iff sound format";
-}
-
-iSoundData* csSoundLoader_IFF::Load(UByte* buf, ULong size,
-        const csSoundFormat *fmt) const {
+iSoundData *csSoundLoader_IFF::Load(UByte* buf, ULong size,
+        const csSoundFormat *RequestFormat) const {
   unsigned long index=0;
-  csSoundDataWave *sb= NULL;
+  csSoundDataRaw *sb= NULL;
   char *data=NULL;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
@@ -136,9 +133,12 @@ iSoundData* csSoundLoader_IFF::Load(UByte* buf, ULong size,
 
   if(data==NULL) goto exit_read;
 
-  sb = new csSoundDataWave(NULL);
-  sb->Initialize(freq, 8, 1, samples_size, (unsigned char*)data);
-  sb->Prepare(fmt);
+  csSoundFormat Format;
+  Format.Freq=freq;
+  Format.Bits=8;
+  Format.Channels=1;
+  sb = new csSoundDataRaw(NULL, data, samples_size, Format);
+  sb->Convert(RequestFormat);
 
   goto exit_ok;
 exit_read:

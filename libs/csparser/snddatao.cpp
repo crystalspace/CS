@@ -32,6 +32,7 @@ csSoundDataObject::~csSoundDataObject ()
 
 iSoundData* csSoundDataObject::GetSound (csObject& csobj, const char* name)
 {
+  if (!name) return NULL;
   csObjIterator i = csobj.GetIterator (csSoundDataObject::Type);
   while (!i.IsNull ())
   {

@@ -19,30 +19,29 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/scf.h"
-#include "srdrsrc.h"
-#include "srdrcom.h"
 #include "isystem.h"
 #include "isndlstn.h"
 #include "isnddata.h"
+#include "srdrsrc.h"
+#include "srdrcom.h"
 
 IMPLEMENT_IBASE(csSoundSourceSoftware)
   IMPLEMENTS_INTERFACE(iSoundSource)
 IMPLEMENT_IBASE_END;
 
-csSoundSourceSoftware::csSoundSourceSoftware(iBase *piBase, bool snd3d,
-    csSoundRenderSoftware *srdr, iSoundData *sndData)
-{
-  CONSTRUCT_IBASE(piBase);
+csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
+    iSoundStream *Stream, bool is3d) {
+  CONSTRUCT_IBASE(srdr);
 
-  SoundRender=srdr;
-  FrequencyFactor=1;
-  Volume=1.0;
-  Sound3d=snd3d;
-  Position=csVector3(0,0,0);
-  Velocity=csVector3(0,0,0);
-  Active=false;
-  SoundStream=sndData->CreateStream();
+  SoundRender = srdr;
+  FrequencyFactor = 1;
+  Volume = 1.0;
+  Sound3d = is3d;
+  Position = csVector3(0,0,0);
+  Velocity = csVector3(0,0,0);
+  Active = false;
+  SoundStream = Stream;
+  SoundStream->IncRef();
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
@@ -56,7 +55,7 @@ void csSoundSourceSoftware::Play(unsigned long pMethod)
   PlayMethod=pMethod;
   if (!Active) SoundRender->AddSource(this);
   Active=true;
-  if (PlayMethod & SOUND_RESTART) SoundStream->Reset();
+  if (PlayMethod & SOUND_RESTART) SoundStream->Restart();
 }
 
 void csSoundSourceSoftware::Stop() {
@@ -158,30 +157,30 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
 }
 
 /* helper macros */
-#define READMONOSAMP        ((int)(Data[i])-NullSample)
-#define READLEFTSAMP        ((int)(Data[2*i])-NullSample)
-#define READRIGHTSAMP       ((int)(Data[2*i+1])-NullSample)
+#define READMONOSAMP        ((int)(RawData[i])-NullSample)
+#define READLEFTSAMP        ((int)(RawData[2*i])-NullSample)
+#define READRIGHTSAMP       ((int)(RawData[2*i+1])-NullSample)
 
 #define WRITEMONOSAMP(x)    Buffer[i]+=(x)*(CalcVolL+CalcVolR)/2+NullSample;
 #define WRITELEFTSAMP(x)    Buffer[2*i]+=(x)*CalcVolL+NullSample;
 #define WRITERIGHTSAMP(x)   Buffer[2*i+1]+=(x)*CalcVolR+NullSample;
 
-#define READMONO3D      int samp=READMONOSAMP;
-#define READSTEREO3D    int samp=(READLEFTSAMP+READRIGHTSAMP)/2;
+#define READMONO3D          int samp=READMONOSAMP;
+#define READSTEREO3D        int samp=(READLEFTSAMP+READRIGHTSAMP)/2;
 
-#define WRITEMONO3D     WRITEMONOSAMP(samp);
-#define WRITESTEREO3D   {WRITELEFTSAMP(samp); WRITERIGHTSAMP(samp);}
+#define WRITEMONO3D         WRITEMONOSAMP(samp);
+#define WRITESTEREO3D       {WRITELEFTSAMP(samp); WRITERIGHTSAMP(samp);}
 
-#define LOOP        for (unsigned long i=0;i<NumSamples;i++)
+#define LOOP                for (unsigned long i=0;i<NumSamples;i++)
 
 #define ADDTOBUFFER_BITS {                                                  \
   stype *Buffer=(stype*)Memory;                                             \
-  unsigned long RemainingSamples=MemSize/(sizeof(stype));                   \
+  long RemainingSamples=MemSize/(sizeof(stype));                            \
   if (SoundRender->isStereo()) RemainingSamples/=2;                         \
                                                                             \
   while (1) {                                                               \
-    unsigned long NumSamples=RemainingSamples;                              \
-    stype *Data=(stype*)(SoundStream->Read(NumSamples));                    \
+    long NumSamples = RemainingSamples;                                     \
+    stype *RawData = (stype*)SoundStream->Read(NumSamples);                 \
     if (Is3d()) {                                                           \
       /* handle 3d sound using the above macros */                          \
       if (Format->Channels==2) {                                            \
@@ -228,20 +227,20 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
         }                                                                   \
       }                                                                     \
     }                                                                       \
-    SoundStream->DiscardBuffer(Data);                                       \
+    SoundStream->DiscardBuffer(RawData);                                    \
     RemainingSamples-=NumSamples;                                           \
     if (RemainingSamples==0) break;                                         \
     else {                                                                  \
-      if (PlayMethod & SOUND_LOOP) SoundStream->Reset();                    \
+      if (PlayMethod & SOUND_LOOP) SoundStream->Restart();                  \
       else {Active=false;return;}                                           \
     }                                                                       \
   }                                                                         \
 }
 
-void csSoundSourceSoftware::AddToBuffer(void *Memory, unsigned long MemSize) {
+void csSoundSourceSoftware::AddToBuffer(void *Memory, long MemSize) {
   if (!Active) return;
 
-  const csSoundFormat *Format=SoundStream->GetSoundData()->GetFormat();
+  const csSoundFormat *Format = SoundStream->GetFormat();
 
   if (SoundRender->is16Bits()) {
     #define stype short

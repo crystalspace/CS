@@ -1,7 +1,7 @@
 /*
-	Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
-	Copyright (C) 1998, 1999 by Jorrit Tyberghein
-	Written by Nathaniel 'NooTe' Saint Martin
+    Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
+    Copyright (C) 1998, 1999 by Jorrit Tyberghein
+    Written by Nathaniel 'NooTe' Saint Martin
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -43,14 +43,15 @@ public:
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
 
-  virtual void PlayEphemeral (iSoundData *snd, bool Loop=false);
+  virtual void PlaySound (iSoundData *snd);
+  virtual void PlaySound (iSoundStream *snd);
   virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d);
+  virtual iSoundSource *CreateSource (iSoundStream *snd, bool Is3d);
+
   virtual iSoundListener *GetListener ();
   virtual const csSoundFormat *GetLoadFormat();
   virtual void Update();
   virtual void MixingFunction ();
-  virtual void PlayMusic(iSoundData *snd);
-  virtual void StopMusic();
 
   void SetDirty();
 

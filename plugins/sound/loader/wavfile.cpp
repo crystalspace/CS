@@ -25,6 +25,7 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "sndload.h"
+#include "soundraw.h"
 
 // Microsoft Wav file loader
 //  support 8 and 16 bits PCM (RIFF)
@@ -54,15 +55,11 @@ struct _WAVhdr
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-const char *csSoundLoader_WAV::GetDesc() const {
-  return "Microsoft WAV sound format";
-}
-
 iSoundData *csSoundLoader_WAV::Load(UByte* buf, ULong size,
-        const csSoundFormat *fmt) const {
+        const csSoundFormat *RequestFormat) const {
   int index=0;
 
-  csSoundDataWave *sb= NULL;
+  csSoundDataRaw *sb= NULL;
   char *data=NULL;
   UByte *ptr;
   UByte *ptr_end;
@@ -124,13 +121,14 @@ iSoundData *csSoundLoader_WAV::Load(UByte* buf, ULong size,
   }
 #endif // CS_BIG_ENDIAN
 
-  sb=new csSoundDataWave(NULL);
-  sb->Initialize(wavhdr.samples_per_sec,
-    wavhdr.bits_per_sample,
-    wavhdr.channel,
-    (wavhdr.bits_per_sample==16)?(wavchk.len/2)-1:wavchk.len-1,
-    (unsigned char*)data);
-  sb->Prepare(fmt);
+
+  csSoundFormat Format;
+  Format.Freq=wavhdr.samples_per_sec;
+  Format.Bits=wavhdr.bits_per_sample;
+  Format.Channels=wavhdr.channel;
+  sb=new csSoundDataRaw(NULL, data,
+    (wavhdr.bits_per_sample==16)?(wavchk.len/2)-1:wavchk.len-1, Format);
+  sb->Convert(RequestFormat);
 
   goto exit_ok;
 exit_read:

@@ -49,6 +49,8 @@ struct
   { THREAD_PRIORITY_HIGHEST, "highest"}
 };
 
+static bool are_you_playing = false;
+
 IMPLEMENT_FACTORY (csSoundDriverWaveOut)
 
 EXPORT_CLASS_TABLE (sndwaveout)
@@ -78,9 +80,7 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
-  m_piSystem->Printf (MSG_CONSOLE, "\nSoundDriver Destructor !!!!\n");
-  if (Config)
-    Config->DecRef();
+  if (Config) Config->DecRef();
 }
 
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
@@ -91,10 +91,7 @@ bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 
 bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver waveOut selected\n");
-
-  m_piSystem->Printf (MSG_INITIALIZATION,
-    "trying to init sound driver to freq=%d, bit16=%d, stereo=%d\n",frequency,bit16,stereo);
+  m_piSystem->Printf (MSG_INITIALIZATION, "Wave-Out Sound Driver selected\n");
 
   if (!render) return false;
   m_piSoundRender = render;
@@ -143,7 +140,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   // Open the playback device
   if(threading)
   {
-    m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver use thread method\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "  uses thread method\n");
     hThread = CreateThread(NULL, 0, &waveOutThreadProc, this, 0, &dwThread);
     if(hThread)
     {
@@ -151,7 +148,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
         if(stricmp(ThreadPriority[p].name, thread_func) == 0)
         {
           if(SetThreadPriority(hThread, ThreadPriority[p].priority)!=0)
-            m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver thread set to %s priority\n", ThreadPriority[p].name);
+            m_piSystem->Printf (MSG_INITIALIZATION, "  thread set to %s priority\n", ThreadPriority[p].name);
           break;
         }
       res = waveOutOpen(&hwo, WAVE_MAPPER, &format, (LONG)dwThread, 0L, CALLBACK_THREAD);
@@ -161,7 +158,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   }
   else
   {
-    m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver use function callback method\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "  uses function callback method\n");
     res=waveOutOpen(&hwo, WAVE_MAPPER, &format, (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
   }
   if(res!=MMSYSERR_NOERROR)
@@ -204,7 +201,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   SetVolume((float)old_v2/(float)65535.0);
 	
   SoundProc(NULL);
-  m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver initialized to %d Hz %d bits %s\n",
+  m_piSystem->Printf (MSG_INITIALIZATION, "  playing %d Hz, %d bits, %s\n",
     m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
   return S_OK;
 }
@@ -218,6 +215,9 @@ void csSoundDriverWaveOut::Close()
     waveOutClose(hwo);
     hwo=NULL;
   }
+
+  // wait for SoundProc() to exit
+  while (are_you_playing);
 
   if( m_piSoundRender ) 
   {
@@ -284,8 +284,6 @@ int csSoundDriverWaveOut::GetFrequency()
 {
   return m_nFrequency;
 }
-
-static bool are_you_playing = false;
 
 DWORD WINAPI csSoundDriverWaveOut::waveOutThreadProc( LPVOID dwParam)
 {

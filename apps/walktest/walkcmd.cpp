@@ -1577,7 +1577,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       iSoundData *sb =
         csSoundDataObject::GetSound(*(Sys->view->GetWorld()), arg);
       if (sb)
-        Sys->Sound->PlayEphemeral(sb);
+        Sys->Sound->PlaySound(sb);
       else
         Sys->Printf (MSG_CONSOLE, "Sound '%s' not found!\n", arg);
     }

@@ -28,18 +28,14 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "isndrdr.h"
-#include "iplugin.h"
-#include "isnddata.h"
-#include "ivfs.h"
 
 struct iSoundDriver;
-struct iSoundData;
-struct iSoundLoader;
 class csSoundListenerSoftware;
 class csSoundSourceSoftware;
 
 class csSoundRenderSoftware : public iSoundRender
 {
+friend class csSoundSourceSoftware;
 public:
   DECLARE_IBASE;
   csSoundRenderSoftware(iBase *piBase);
@@ -53,14 +49,14 @@ public:
   virtual void Close ();
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
-  virtual void PlayEphemeral (iSoundData *snd, bool Loop);
+  virtual void PlaySound(iSoundData *Data, bool Loop);
+  virtual void PlaySound(iSoundStream *Sound, bool Loop);
+  virtual iSoundSource *CreateSource(iSoundData *Sound, bool is3d);
+  virtual iSoundSource *CreateSource(iSoundStream *Sound, bool is3d);
   virtual iSoundListener *GetListener ();
-  virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d);
+  virtual const csSoundFormat *GetLoadFormat();
   virtual void MixingFunction ();
   virtual void Update();
-  virtual const csSoundFormat *GetLoadFormat();
-  virtual void PlayMusic(iSoundData *snd);
-  virtual void StopMusic();
 
   // add a sound source
   void AddSource(csSoundSourceSoftware *src);
@@ -94,15 +90,12 @@ private:
   // the global listener object
   csSoundListenerSoftware *Listener;
 
-  // the vfs
-  iVFS *VFS;
+  // is the mixing function acitvated?
+  bool ActivateMixing;
 
-  // format for loading sounds
+  // the format used to load sounds
   csSoundFormat LoadFormat;
-
-  // the sound source for music
-  iSoundSource *MusicSource;
 };
 
-#endif	//__NETWORK_DRIVER_SOFTWARE_H__
+#endif
 

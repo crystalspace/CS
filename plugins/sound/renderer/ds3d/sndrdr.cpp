@@ -1,22 +1,23 @@
 /*
-  Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
-  Copyright (C) 1998, 1999 by Jorrit Tyberghein
-  Written by Nathaniel 'NooTe' Saint Martin
+    Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
+    Copyright (C) 1998, 1999 by Jorrit Tyberghein
+    Written by Nathaniel 'NooTe' Saint Martin
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "cssysdef.h"
 #include <stdio.h>
 #include <initguid.h>
@@ -27,6 +28,7 @@
 #include "sndrdr.h"
 #include "sndlstn.h"
 #include "sndsrc.h"
+#include "../common/convmeth.h"
 
 IMPLEMENT_FACTORY(csSoundRenderDS3D);
 
@@ -49,18 +51,15 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase) {
 
 bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
   System = iSys;
-
-  LoadFormat.Freq = -1;
   LoadFormat.Bits = -1;
+  LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
-
   return true;
 }
 
 csSoundRenderDS3D::~csSoundRenderDS3D() {
   Close();
 }
-
 
 bool csSoundRenderDS3D::Open()
 {
@@ -115,13 +114,9 @@ float csSoundRenderDS3D::GetVolume()
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
-void csSoundRenderDS3D::PlayEphemeral(iSoundData* snd, bool loop)
-{
-  iSoundSource *Sound = CreateSource(snd, false);
-  if (Sound) Sound->Play(loop?SOUND_LOOP:0);
-}
+IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderDS3D);
 
-iSoundSource *csSoundRenderDS3D::CreateSource(iSoundData *snd, bool is3d) {
+iSoundSource *csSoundRenderDS3D::CreateSource(iSoundStream *snd, bool is3d) {
   if (!snd) return NULL;
   csSoundSourceDS3D *src = new csSoundSourceDS3D(this);
   if (!src->Initialize(this, snd, is3d)) {
@@ -134,24 +129,16 @@ iSoundListener *csSoundRenderDS3D::GetListener() {
   return Listener;
 }
 
-const csSoundFormat *csSoundRenderDS3D::GetLoadFormat() {
-  return &LoadFormat;
-}
-
 void csSoundRenderDS3D::Update() {
   Listener->Prepare();
+}
+
+const csSoundFormat *csSoundRenderDS3D::GetLoadFormat() {
+  return &LoadFormat;
 }
 
 void csSoundRenderDS3D::MixingFunction() {}
 
 void csSoundRenderDS3D::SetDirty() {
   Listener->Dirty = true;
-}
-
-void csSoundRenderDS3D::PlayMusic(iSoundData * /*snd*/) {
-  // @@@
-}
-
-void csSoundRenderDS3D::StopMusic() {
-  // @@@
 }

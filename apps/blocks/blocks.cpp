@@ -2114,7 +2114,7 @@ void Blocks::InitWorld ()
   // Load the blocks.zip library where sound refs are stored
   csLoader::LoadLibraryFile (world, "/data/blocks/Library");
   iSoundData* w = csSoundDataObject::GetSound(*world, "background.wav");
-  if (w && Sound) Sound->PlayEphemeral (w, true);
+  if (w && Sound) Sound->PlaySound (w, true);
 #endif
 }
 

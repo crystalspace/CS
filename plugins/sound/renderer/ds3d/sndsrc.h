@@ -18,7 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__CSSOUNDSOURCEDS3D_H__)
+#ifndef __CSSOUNDSOURCEDS3D_H__
 #define __CSSOUNDSOURCEDS3D_H__
 
 #include "isndsrc.h"
@@ -31,7 +31,7 @@ public:
 
   csSoundSourceDS3D(iBase *scfParent);
   virtual ~csSoundSourceDS3D();
-  bool Initialize(csSoundRenderDS3D *srdr, iSoundData *data, bool is3d);
+  bool Initialize(csSoundRenderDS3D *srdr, iSoundStream *data, bool is3d);
 
   virtual void Play (unsigned long playMethod = 0);
   virtual void Stop ();
@@ -62,4 +62,4 @@ private:
   unsigned long BaseFrequency;
 };
 
-#endif // __CSSOUNDSOURCEDS3D_H__
+#endif

@@ -1370,7 +1370,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // Load a few sounds.
 #ifdef DO_SOUND
   //csSoundData* w = csSoundDataObject::GetSound(*world, "tada.wav");
-  //if (w && Sound) Sound->PlayEphemeral (w);
+  //if (w && Sound) Sound->PlaySound (w);
 
   wMissile_boom = csSoundDataObject::GetSound(*world, "boom.wav");
   wMissile_whoosh = csSoundDataObject::GetSound(*world, "whoosh.wav");
@@ -1392,7 +1392,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       }
       else
       {
-        Sound->PlayEphemeral (wSoundData, true);
+        Sound->PlaySound (wSoundData, true);
         ///++sobj;
       }
     }

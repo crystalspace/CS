@@ -50,10 +50,13 @@ csSoundSourceDS3D::~csSoundSourceDS3D() {
   if (Renderer) Renderer->DecRef();
 }
 
-bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr, iSoundData *Data,
-        bool is3d) {
+bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
+        iSoundStream *Data, bool is3d) {
   srdr->IncRef();
   Renderer = srdr;
+
+  // if number of samples is unknown this should be a streamed sound
+  if (Data->GetNumSamples()==-1) return false;
 
   unsigned long BufferBytes = Data->GetNumSamples() *
     Data->GetFormat()->Channels * Data->GetFormat()->Bits/8;
@@ -86,12 +89,11 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr, iSoundData *Data,
     return false;
   }
 
-  iSoundStream *Stream = Data->CreateStream();
-  unsigned long NumSamples = Data->GetNumSamples();
-  void *WaveBuffer = Stream->Read(NumSamples);
-  CopyMemory(pbWrite1, WaveBuffer, BufferBytes);
-  Stream->DiscardBuffer(WaveBuffer);
-  Stream->DecRef();
+  // this can possibly be optimized without CopyMemory()
+  long num = Data->GetNumSamples();
+  void *d = Data->Read(num);
+  CopyMemory(pbWrite1, d, BufferBytes);
+  Data->DiscardBuffer(d);
     
   if (Buffer2D->Unlock(pbWrite1, BufferBytes, pbWrite2, 0) != DS_OK) {
     if (pbWrite1) Buffer2D->Unlock(pbWrite1, BufferBytes, pbWrite2, 0);
@@ -153,6 +155,7 @@ void csSoundSourceDS3D::Play(unsigned long PlayMethod)
   Buffer2D->Stop();
   if (PlayMethod & SOUND_RESTART) Buffer2D->SetCurrentPosition(0);
   Buffer2D->Play(0, 0, (PlayMethod & SOUND_LOOP) ? DSBPLAY_LOOPING : 0);
+  IncRef(); // @@@
 }
 
 void csSoundSourceDS3D::Stop()

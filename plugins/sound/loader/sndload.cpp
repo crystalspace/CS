@@ -17,35 +17,46 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/csvector.h"
 #include "isndldr.h"
 #include "isystem.h"
-#include "csutil/csvector.h"
-#include "sndload.h"
 #include "ivfs.h"
+#include "isnddata.h"
+
+#include "sndload.h"
 
 class csSoundLoader : public iSoundLoader {
 private:
-  csVector FormatLoaders;
+  csVector SoundDataLoaders;
+  iVFS *VFS;
 
 public:
   DECLARE_IBASE;
 
-  /// constructor
+  // constructor
   csSoundLoader(iBase *iParent);
 
-  /// destructor
+  // destructor
   virtual ~csSoundLoader();
 
-  /// Initialize the Sound Loader.
+  // Initialize the Sound Loader.
   virtual bool Initialize (iSystem *sys);
 
-  /// Load a sound from the VFS.
-  virtual iSoundData *LoadSound(UByte *Buffer, ULong Size,
-    const csSoundFormat *Format, bool Streamed);
+  // Load a sound file from the VFS.
+  virtual iSoundData *LoadSound(void *Data, unsigned long Size,
+    const csSoundFormat *fmt);
 
-  /// register a sound loader
-  void RegisterFormatLoader(csSoundFormatLoader *Loader);
+  // register a sound data loader
+  inline void RegisterSoundDataLoader(csSoundDataLoader *Loader)
+    {SoundDataLoaders.Push(Loader);}
 };
+
+IMPLEMENT_FACTORY(csSoundLoader);
+
+EXPORT_CLASS_TABLE (sndload)
+EXPORT_CLASS (csSoundLoader, "crystalspace.sound.loader",
+    "Sound Loader plug-in")
+EXPORT_CLASS_TABLE_END;
 
 IMPLEMENT_IBASE(csSoundLoader)
   IMPLEMENTS_INTERFACE(iSoundLoader)
@@ -57,55 +68,49 @@ csSoundLoader::csSoundLoader(iBase *iParent) {
 }
 
 csSoundLoader::~csSoundLoader() {
-  for (long i=0;i<FormatLoaders.Length();i++) {
-    csSoundFormatLoader *ldr=(csSoundFormatLoader*)(FormatLoaders.Get(i));
+  for (long i=0;i<SoundDataLoaders.Length();i++) {
+    csSoundDataLoader *ldr=(csSoundDataLoader*)(SoundDataLoaders.Get(i));
     delete ldr;
   }
+  VFS->DecRef();
 }
 
 bool csSoundLoader::Initialize(iSystem *sys) {
-  (void)sys;
+
+  VFS = QUERY_PLUGIN(sys, iVFS);
+  if (!VFS) {
+    sys->Printf(MSG_INITIALIZATION,
+      "cannot initialize sound loader : no VFS plugin\n");
+    return false;
+  }
+
 #ifdef DO_AIFF
-  RegisterFormatLoader(new csSoundLoader_AIFF());
+  RegisterSoundDataLoader(new csSoundLoader_AIFF());
 #endif
 
 #ifdef DO_AU
-  RegisterFormatLoader(new csSoundLoader_AU());
+  RegisterSoundDataLoader(new csSoundLoader_AU());
 #endif
 
 #ifdef DO_IFF
-  RegisterFormatLoader(new csSoundLoader_IFF());
+  RegisterSoundDataLoader(new csSoundLoader_IFF());
 #endif
 
 #ifdef DO_WAV
-  RegisterFormatLoader(new csSoundLoader_WAV());
+  RegisterSoundDataLoader(new csSoundLoader_WAV());
 #endif
 
   return true;
 }
 
-iSoundData *csSoundLoader::LoadSound(UByte *Buffer, ULong Size,
-    const csSoundFormat *Format, bool Streamed) {
-  iSoundData *SoundData;
-
-  if (!Buffer || Size<1) return NULL;
-
-  for (long i=0;i<FormatLoaders.Length();i++) {
-    csSoundFormatLoader *Ldr=(csSoundFormatLoader*)(FormatLoaders.Get(i));
-    SoundData=Ldr->Load(Buffer, Size, Format);
-    if (SoundData) {
-      if (!Streamed) {
-        iSoundData *Unstreamed = SoundData->Decode();
-        SoundData->DecRef();
-        return Unstreamed;
-      } else return SoundData;
-    }
+iSoundData *csSoundLoader::LoadSound(void *Data, unsigned long Size,
+        const csSoundFormat *fmt) {
+  for (long i=0;i<SoundDataLoaders.Length();i++) {
+    csSoundDataLoader *Ldr=(csSoundDataLoader*)(SoundDataLoaders.Get(i));
+    iSoundData *snd=Ldr->Load((unsigned char *)Data, Size, fmt);
+    if (snd) return snd;
   }
   return NULL;
-}
-
-void csSoundLoader::RegisterFormatLoader(csSoundFormatLoader *Loader) {
-  FormatLoaders.Push(Loader);
 }
 
 // i have stolen this from Olivier Langlois (olanglois@sympatico.ca) ;-)
@@ -122,11 +127,4 @@ short int csSndFunc::ulaw2linear(unsigned char ulawbyte)
   if (sign != 0) sample = -sample;
   return(sample);
 }
-
-IMPLEMENT_FACTORY(csSoundLoader);
-
-EXPORT_CLASS_TABLE (sndload)
-EXPORT_CLASS (csSoundLoader, "crystalspace.sound.loader",
-    "Sound Loader plug-in")
-EXPORT_CLASS_TABLE_END;
 

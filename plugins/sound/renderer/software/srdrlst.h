@@ -18,7 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__CSSOUNDLISTENERSOFTWARE_H__)
+#ifndef __CSSOUNDLISTENERSOFTWARE_H__
 #define __CSSOUNDLISTENERSOFTWARE_H__
 
 #include "isndlstn.h"
@@ -67,4 +67,4 @@ public:
 	SoundEnvironment Environment;
 };
 
-#endif // __CSSOUNDLISTENERSOFTWARE_H__
+#endif

@@ -19,9 +19,7 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/scf.h"
 #include "srdrlst.h"
-#include "isystem.h"
 
 IMPLEMENT_FACTORY (csSoundListenerSoftware);
 

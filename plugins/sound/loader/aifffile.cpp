@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "csutil/csvector.h"
 #include "sndload.h"
+#include "soundraw.h"
 
 // MacIntosh AIFF file format loader
 
@@ -42,14 +43,10 @@
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-const char *csSoundLoader_AIFF::GetDesc() const {
-  return "MacIntosh AIFF sound format";
-}
-
 iSoundData *csSoundLoader_AIFF::Load(UByte* buf, ULong size,
-        const csSoundFormat *fmt) const {
+        const csSoundFormat *RequestFormat) const {
   unsigned long index=0;
-  csSoundDataWave *sb= NULL;
+  csSoundDataRaw *sb= NULL;
   char *data=NULL;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
@@ -168,13 +165,13 @@ iSoundData *csSoundLoader_AIFF::Load(UByte* buf, ULong size,
 
   if(data==NULL) goto exit_read;
 
-  sb=new csSoundDataWave(NULL);
-  sb->Initialize((flag2==HZ11025)?11025:(flag2==HZ22050)?22050:/*(flag2==HZ44100)*/44100,
-    (flag==BIT16)?16:8,
-    nchannels,
-    (flag==BIT16)?samples_size/2:samples_size,
-    (unsigned char*)data);
-  sb->Prepare(fmt);
+  csSoundFormat Format;
+  Format.Freq=(flag2==HZ11025)?11025:(flag2==HZ22050)?22050:44100;
+  Format.Bits=(flag==BIT16)?16:8;
+  Format.Channels=nchannels;
+  sb=new csSoundDataRaw(NULL, data,
+    (flag==BIT16)?samples_size/2:samples_size, Format);
+  sb->Convert(RequestFormat);
 
   goto exit_ok;
 exit_read:

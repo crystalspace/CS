@@ -22,15 +22,15 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "isystem.h"
+#include "icfgfile.h"
+#include "isnddrv.h"
+#include "isnddata.h"
+
 #include "srdrcom.h"
 #include "srdrlst.h"
 #include "srdrsrc.h"
-#include "isystem.h"
-#include "isnddrv.h"
-#include "isndldr.h"
-#include "isnddata.h"
-#include "icfgfile.h"
+#include "../common/convmeth.h"
 
 IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
@@ -52,35 +52,34 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
   Listener = NULL;
   memory = NULL;
   memorysize = 0;
-  VFS = NULL;
-  MusicSource = NULL;
+  ActivateMixing = false;
 }
 
 bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 {
   // copy the system pointer
-  if (!iSys) return false;
   System = iSys;
 
-  // get the VFS interface
-  VFS=QUERY_PLUGIN(System, iVFS);
-  if (!VFS) return false;
-
   // read the config file
-  Config = System->CreateConfig ("config/sound.cfg");
+  Config = System->CreateConfig ("/config/sound.cfg");
+  if (!Config) {
+    System->Printf(MSG_INITIALIZATION, "csSoundRenderSoftware::Initialize(): "
+      "cannot open config file: /config/sound.cfg\n");
+    return false;
+  }
 
   // load the sound driver plug-in
-  char *drv;
 #ifdef SOUND_DRIVER
-  drv = SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
+  char *drv = SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
 #else
-  drv = "crystalspace.sound.driver.null";
+  char *drv = "crystalspace.sound.driver.null";
 #endif
 
   SoundDriver = LOAD_PLUGIN (System, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
-    System->Printf(MSG_FATAL_ERROR, "Error! Cant find sound driver %s.\n", drv);
-    exit(0);
+    System->Printf(MSG_INITIALIZATION, "csSoundRenderSoftware::Initialize(): "
+      "cannot load sound driver: %s\n", drv);
+    return false;
   }
 
   return true;
@@ -88,30 +87,75 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 
 csSoundRenderSoftware::~csSoundRenderSoftware()
 {
-  StopMusic();
   Close();
   if (SoundDriver) SoundDriver->DecRef();
+  if (Config) Config->DecRef();
+}
 
-  while (Sources.Length()>0) {
-    iSoundSource *src=(iSoundSource*)(Sources.Get(0));
-    src->DecRef();
+bool csSoundRenderSoftware::Open()
+{
+  System->Printf (MSG_INITIALIZATION, "Software Sound Renderer selected\n");
+
+  SoundDriver->Open(this,
+    Config->GetInt("SoundRender.Software", "FREQUENCY", 22050),
+    Config->GetYesNo("SoundRender.Software", "16BITS", true),
+    Config->GetYesNo("SoundRender.Software", "STEREO", true));
+
+  float v=Config->GetFloat("SoundRender","VOLUME",-1);
+  if (v>1) v=1;
+  if (v>=0) SetVolume(v);
+
+  Listener = new csSoundListenerSoftware (NULL);
+  ActivateMixing = true;
+  LoadFormat.Freq = getFrequency();
+  LoadFormat.Bits = is16Bits() ? 16 : 8;
+  LoadFormat.Channels = -1;
+
+  return true;
+}
+
+void csSoundRenderSoftware::Close()
+{
+  ActivateMixing = false;
+  if (SoundDriver) {
+    iSoundDriver *d = SoundDriver;
+    SoundDriver = NULL;
+    d->Close();
   }
 
-  if (Config)
-    Config->DecRef();
+  if (Listener) {
+    Listener->DecRef();
+    Listener = NULL;
+  }
 
-  VFS->DecRef();
+  for (long i=0;i<Sources.Length();i++) {
+    csSoundSourceSoftware *src=(csSoundSourceSoftware*)Sources.Get(i);
+    src->DecRef();
+  }
+  Sources.DeleteAll();
+}
+
+IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderSoftware);
+
+iSoundSource *csSoundRenderSoftware::CreateSource(iSoundStream *Str, bool is3d) {
+  if (!Str) return NULL;
+  // check for correct input format
+  const csSoundFormat *fmt = Str->GetFormat();
+  if (fmt->Bits != (is16Bits()?16:8)) {
+    System->Printf(MSG_WARNING, "incorrect input format for sound renderer (bits)\n");
+    return NULL;
+  }
+  if (fmt->Freq != getFrequency()) {
+    System->Printf(MSG_WARNING, "incorrect input format for sound renderer (frequency)\n");
+    return NULL;
+  }
+
+  return new csSoundSourceSoftware(this, Str, is3d);
 }
 
 iSoundListener *csSoundRenderSoftware::GetListener()
 {
   return Listener;
-}
-
-iSoundSource *csSoundRenderSoftware::CreateSource(iSoundData *snd, bool Is3d)
-{
-  if (!snd) return NULL;
-  return new csSoundSourceSoftware(snd, Is3d, this, snd);
 }
 
 bool csSoundRenderSoftware::is16Bits()
@@ -129,37 +173,6 @@ int csSoundRenderSoftware::getFrequency()
   return SoundDriver->GetFrequency();
 }
 
-bool csSoundRenderSoftware::Open()
-{
-  System->Printf (MSG_INITIALIZATION, "SoundRender Software selected\n");
-
-  SoundDriver->Open(this,
-    Config->GetInt("SoundRender.Software", "FREQUENCY", 22050),
-    Config->GetYesNo("SoundRender.Software", "16BITS", true),
-    Config->GetYesNo("SoundRender.Software", "STEREO", true));
-
-  float v=Config->GetFloat("SoundSystem","VOLUME",-1);
-  if (v>1) v=1;
-  if (v>=0) SetVolume(v);
-
-  LoadFormat.Freq = getFrequency();
-  LoadFormat.Bits = is16Bits()?16:8;
-  LoadFormat.Channels = -1;
-
-  Listener = new csSoundListenerSoftware (NULL);
-
-  return true;
-}
-
-void csSoundRenderSoftware::Close()
-{
-  if (Listener) {
-    Listener->DecRef();
-    Listener = NULL;
-  }
-  SoundDriver->Close();
-}
-
 void csSoundRenderSoftware::SetVolume(float vol)
 {
   SoundDriver->SetVolume(vol);
@@ -168,14 +181,6 @@ void csSoundRenderSoftware::SetVolume(float vol)
 float csSoundRenderSoftware::GetVolume()
 {
   return SoundDriver->GetVolume();
-}
-
-void csSoundRenderSoftware::PlayEphemeral(iSoundData *snd, bool Loop)
-{
-  iSoundSource *src=CreateSource(snd,false);
-  if (!src) return;
-  src->Play(Loop ? SOUND_LOOP : 0);
-  src->DecRef();
 }
 
 void csSoundRenderSoftware::AddSource(csSoundSourceSoftware *src) {
@@ -191,8 +196,15 @@ void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src) {
   }
 }
 
+const csSoundFormat *csSoundRenderSoftware::GetLoadFormat() {
+  return &LoadFormat;
+}
+
 void csSoundRenderSoftware::MixingFunction()
 {
+  // look if this function is activated
+  if (!ActivateMixing) return;
+
   // test if we have a sound driver
   if(!SoundDriver) return;
 	
@@ -227,30 +239,6 @@ void csSoundRenderSoftware::MixingFunction()
 
 void csSoundRenderSoftware::Update()
 {
-  // Is current sound driver work in a background thread ?
-  bool res = SoundDriver->IsBackground();
-	
-  if(!res) // No !
-  {
-    // update sound data
-    MixingFunction();
-  }
-}
-
-const csSoundFormat *csSoundRenderSoftware::GetLoadFormat() {
-  return &LoadFormat;
-}
-
-void csSoundRenderSoftware::PlayMusic(iSoundData *snd) {
-  StopMusic();
-  MusicSource = CreateSource(snd, false);
-  MusicSource->Play();
-}
-
-void csSoundRenderSoftware::StopMusic() {
-  if (MusicSource) {
-    MusicSource->Stop();
-    MusicSource->DecRef();
-    MusicSource = NULL;
-  }
+  // update sound if the sound driver doesn't do it
+  if(!SoundDriver->IsBackground()) MixingFunction();
 }
