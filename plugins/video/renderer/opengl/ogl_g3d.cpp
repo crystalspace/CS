@@ -81,6 +81,11 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (ISystem* piSystem)
     m_piG2D (NULL), txtmgr(NULL), texture_cache(NULL), lightmap_cache(NULL),
     m_piSystem(piSystem)
 {
+  ShortcutDrawPolygon = 0;
+  ShortcutStartPolygonFX = 0;
+  ShortcutDrawPolygonFX = 0;
+  ShortcutFinishPolygonFX = 0;
+
   HRESULT hRes;
   CLSID clsid2dDriver;
   char *sz2DDriver = OPENGL_2D_DRIVER;
