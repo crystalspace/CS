@@ -504,10 +504,10 @@ static void get_pixel (UByte*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
       Blu = *iBuffer++;
       Grn = *iBuffer++;
       Red = *iBuffer++;
-      Alpha = 0;
+      Alpha = 0xff;
       if (Size == 32)
         if (alpha)
-          Alpha = *iBuffer++;	/* Read alpha byte & throw away. */
+          Alpha = *iBuffer++;	/* Read alpha byte */
         else
           iBuffer++;
       l = 0;
@@ -522,6 +522,6 @@ PixEncode:
     *dest = ColorMap [l];
   else
   {
-    dest->red = Red; dest->green = Grn; dest->blue = Blu;
+    dest->red = Red; dest->green = Grn; dest->blue = Blu; dest->alpha = Alpha;
   }
 }

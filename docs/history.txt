@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed a problem that precalc_info is written even if caching
 	  of lightmap data is disabled. Thanks to res <reque@gmx.ch> for
 	  spotting this.
+	- res <reque@gmx.ch> added alpha support for TGA images.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
