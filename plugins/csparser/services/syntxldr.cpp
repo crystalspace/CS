@@ -1087,6 +1087,7 @@ bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalu
 
 bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
 {
+#if 0
   node->SetAttribute ("name", keyvalue->GetKey ());
   csArray<const char*> vnames = keyvalue->GetValueNames ();
   csArray<const char*>::Iterator it = vnames.GetIterator ();
@@ -1095,6 +1096,7 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
     const char* name = it.Next ();
     node->SetAttribute (name, keyvalue->GetValue (name));
   }
+#endif
   return true;
 }
 

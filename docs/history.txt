@@ -10,6 +10,10 @@ chronological order.
 	- Jorrit removed the GetValueNames() from iKeyValuePair again as it
 	  is illegal to return a csArray directly in an SCF interface (due
 	  to inter-plugin memory management issues).
+	- Jorrit temporarily disabled WriteKey() in syntax services since
+	  it used the above GetValueNames(). It will have to be rewritten
+	  once we have another way to iterate over all values in a key value
+	  pair.
 02-Dec-2004
 	- Eric Sunshine fixed the various extension checks in glextmanager.h so
 	  that they won't crash if glGetString(GL_EXTENSIONS) and/or

@@ -649,6 +649,30 @@ void csFoliageMeshObjectFactory::ClearGeneratedFoliage ()
 void csFoliageMeshObjectFactory::GenerateFoliage ()
 {
   ClearGeneratedFoliage ();
+<<<<<<< foliage.cpp
+  genfoliage = new csArray<csGeneratedFoliage> [genfoliage_res*genfoliage_res];
+  float dx = (samplerRegion.MaxX ()-samplerRegion.MinX ())
+    / float (genfoliage_res);
+  float dy = (samplerRegion.MaxY ()-samplerRegion.MinY ())
+    / float (genfoliage_res);
+  int x, y;
+  int idx;
+
+  // Sample a region...
+  csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
+      samplerRegion, genfoliage_res);
+
+  for (y = 0 ; y < genfoliage_res ; y++)
+  {
+    for (x = 0 ; x < genfoliage_res ; x++)
+    {
+      genfoliage[idx].Push ();
+      @@@@@@@@@@@
+      genfoliage[idx].ShrinkBestFit ();
+      idx++;
+    }
+  }
+=======
   genfoliage = new csArray<csGeneratedFoliage> [genfoliage_res*genfoliage_res];
   /*
   float dx = (samplerRegion.MaxX ()-samplerRegion.MinX ())
@@ -676,6 +700,7 @@ void csFoliageMeshObjectFactory::GenerateFoliage ()
       idx++;
     }
   }
+>>>>>>> 1.7
 }
 
 void csFoliageMeshObjectFactory::CalculateBBoxRadius ()
