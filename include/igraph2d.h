@@ -201,7 +201,11 @@ struct iGraphics2D : public iPlugIn
   /// This routine should be called when you finished drawing.
   virtual void FinishDraw () = 0;
 
-  /// Flip video pages (or dump backbuffer into framebuffer).
+  /**
+   * Flip video pages (or dump backbuffer into framebuffer). The area
+   * parameter is only a hint to the canvas driver. Changes outside the
+   * rectangle may or may not be printed as well.
+   */
   virtual void Print (csRect *pArea) = 0;
 
   /// Clear backbuffer.

@@ -522,7 +522,11 @@ struct iGraphics3D : public iPlugIn
   /// End the frame and do a page swap.
   virtual void FinishDraw () = 0;
 
-  /// Print the image in backbuffer
+  /**
+   * Print the image in backbuffer. The area parameter is only a hint to the
+   * renderer. Changes outside the rectangle may or may not be printed as
+   * well.
+   */
   virtual void Print (csRect *area) = 0;
 
   /// Set a renderstate value.
