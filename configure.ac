@@ -1432,6 +1432,19 @@ AS_IF([test $cs_cv_libgl = yes],
 
 
 #------------------------------------------------------------------------------
+# Check for DirectDraw.
+#------------------------------------------------------------------------------
+
+CS_CHECK_BUILD([for DirectDraw], [cs_cv_ddraw],
+    [AC_LANG_PROGRAM([
+    #include <ddraw.h>
+    ],
+    [DirectDrawCreate(NULL, NULL, NULL);])],
+    [CS_CREATE_TUPLE([],[],[-lddraw])], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_ddraw], [DDRAW])], [], [])
+
+
+#------------------------------------------------------------------------------
 # Check for zlib.  In addition to the standard installed locations, we also
 # search CS/libs/zlib*.
 #------------------------------------------------------------------------------

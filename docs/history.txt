@@ -7,6 +7,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the thing plugin. If the dynavis culler was
 	  already mentioned before all other objects in the sector then
 	  this could cause crashes.
+	- res added a check for DirectDraw to the configure process.
+	- res added the missing Jamfile for directxcommon.
 14-Apr-2003
 	- Philip Wyett removed makedep entry under apps/tools for Jam. This
 	  is no longer needed after recent changes.
