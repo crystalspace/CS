@@ -70,7 +70,9 @@ sndmodclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndmod.dep
 $(OUTOS)/sndmod.dep: $(SRC.SNDMOD)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(MIKMOD.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/sndmod.dep
 endif

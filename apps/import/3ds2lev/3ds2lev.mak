@@ -64,7 +64,9 @@ ifdef DO_DEPEND
 3ds2levdep: $(OUTOS)/3ds2lev.dep
 #dep: $(OUTOS)/3ds2lev.dep
 $(OUTOS)/3ds2lev.dep: $(SRC.3DS2LEV)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(3DS.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/3ds2lev.dep
 endif

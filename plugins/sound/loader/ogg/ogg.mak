@@ -71,7 +71,9 @@ sndoggclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndogg.dep
 $(OUTOS)/sndogg.dep: $(SRC.SNDOGG)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(VORBISFILE.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/sndogg.dep
 endif
