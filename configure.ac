@@ -92,7 +92,9 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 	[SWIGBIN], [CMD.SWIG],
 	[NASM.BIN], [CMD.NASM],
 	[CFLAGS.SYSTEM], [COMPILER.CFLAGS],
+	[CFLAGS.SYSTEM.MANDATORY], [COMPILER.CFLAGS.MANDATORY],
 	[CXXFLAGS.SYSTEM], [COMPILER.C++FLAGS],
+	[CXXFLAGS.SYSTEM.MANDATORY], [COMPILER.C++FLAGS.MANDATORY],
 	[MACOSX.LFLAGS.CONFIG], [COMPILER.LFLAGS],
 	[CFLAGS.optimize], [COMPILER.CFLAGS.optimize],
 	[CFLAGS.debug], [COMPILER.CFLAGS.debug],
@@ -708,7 +710,8 @@ CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
 # Check if the linker recognizes "-force_cpusubtype_ALL".  This is required on
 # MacOS/X since the Crystal Space's PowerPC implementation of qsqrt() uses the
 # `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL flag
-# is present.
+# is present.  This flag is marked "mandatory" because it is required even for
+# external projects if they use qsqrt().
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_FORCE_CPUSUBTYPE_ALL],
     [CS_CHECK_BUILD_FLAGS([if -force_cpusubtype_ALL is needed],
@@ -717,7 +720,7 @@ AC_DEFUN([CS_CHECK_FORCE_CPUSUBTYPE_ALL],
     
 CS_CHECK_FORCE_CPUSUBTYPE_ALL
 AS_IF([test $cs_cv_prog_cxx_force_cpusubtype_all != no],
-    [CS_BUILD_PROPERTY([CFLAGS.SYSTEM],
+    [CS_BUILD_PROPERTY([CFLAGS.SYSTEM.MANDATORY],
 	[$cs_cv_prog_cxx_force_cpusubtype_all], [+])])
 
 
@@ -736,7 +739,7 @@ AC_DEFUN([CS_CHECK_NO_COMMON],
 	    CS_EMIT_BUILD_FLAGS([if -fno-common is needed],
 		[cs_cv_prog_cxx_no_common],
 		[CS_CREATE_TUPLE([], [-fno-common])], [C++],
-		[CFLAGS.SYSTEM], [+])
+		[CFLAGS.SYSTEM.MANDATORY], [+])
 	    ;;
     esac])
 
@@ -758,7 +761,8 @@ AC_DEFUN([CS_CHECK_VTABLE_THUNKS],
 	    CS_CHECK_BUILD_FLAGS([if -fvtable-thunks is needed],
 		[cs_cv_prog_cxx_vtable_thunks],
 		[CS_CREATE_TUPLE([-fvtable-thunks -Werror])], [C++],
-		[CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM], [-fvtable-thunks], [+])])
+		[CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM.MANDATORY],
+		    [-fvtable-thunks], [+])])
 	    ;;
     esac])
 
@@ -2220,6 +2224,10 @@ CS_HEADER_APPEND(
 # Boilerplate: config.mak
 #------------------------------------------------------------------------------
 CS_EMIT_PACKAGEINFO([make])
+CS_MAKEFILE_PROPERTY(
+    [CFLAGS.SYSTEM], [AS_ESCAPE([$(CFLAGS.SYSTEM.MANDATORY)])], [+])
+CS_MAKEFILE_PROPERTY(
+    [CXXFLAGS.SYSTEM], [AS_ESCAPE([$(CXXFLAGS.SYSTEM.MANDATORY)])], [+])
 CS_MAKEFILE_PROPERTY([SRCDIR], [$srcdir])
 
 # Hack: The makefile system presently assumes that CFLAGS.SYSTEM should be
@@ -2232,8 +2240,12 @@ CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [AS_ESCAPE([$(CXXFLAGS.SYSTEM)])], [+])
 #------------------------------------------------------------------------------
 # Boilerplate: Jamconfig
 #------------------------------------------------------------------------------
-CS_EMIT_PACKAGEINFO([jam])
+CS_JAMCONFIG_PROPERTY(
+    [COMPILER.CFLAGS], [AS_ESCAPE([$(COMPILER.CFLAGS.MANDATORY)])], [+])
+CS_JAMCONFIG_PROPERTY(
+    [COMPILER.C++FLAGS], [AS_ESCAPE([$(COMPILER.C++FLAGS.MANDATORY)])], [+])
 CS_JAMCONFIG_PROPERTY([JAMCONFIG_READ], [yes])
+CS_EMIT_PACKAGEINFO([jam])
 
 
 

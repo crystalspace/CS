@@ -7,25 +7,34 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Dec-2003
-	- res enabled enabled VC the warning 'class has virtual functions, but 
-	  destructor is not virtual'. It was enabled in the past, but somehow
+	- res enabled VC the warning "class has virtual functions, but
+	  destructor is not virtual". It was enabled in the past, but somehow
 	  got lost on the way.
+	- Eric Sunshine changed configure.ac so that a few (very few) detected
+          compiler flags are now deemed "mandatory".  Mandatory flags are
+          required even for external projects which utilize Crystal Space.  For
+          example, an external project on MacOS/X must use the
+          -force_cpusubtype_ALL flag if the project calls qsqrt().  cs-config's
+          --cflags and --cxxflags options now emit only mandatory flags, rather
+          than emitting all of the compiler flags with which Crystal Space
+          itself was built.  This prevents cs-config from polluting external
+          project builds with flags (such as -fno-exceptions) which are mere
+          preferences of the Crystal Space developers.
 1-Dec-2003
 	- Jorrit fixed a serious bug in csString::FormatV. A comment in that
 	  routine incorrectly stated the following:
-		// Some vsnprintf()s return -1 on failure, others return
-		// desired capacity.
+	    // Some vsnprintf()s return -1 on failure, others return
+	    // desired capacity.
 	  However, on MSYS neither happens. Instead the size of the input
 	  buffer is returned in case of failure.
-        - John Harger changed iRenderBuffer to use a "CopyToBuffer"
-          method as an alternative (and preferred) method to copy data
-          to a buffer, rather than Locking the buffer. This should be
-          especially beneficial to sprite3d's, where it updates the
-          buffer quite frequently, when VBO is enabled because you
-          cannot render from a locked VBO buffer.
-	- res augmented the documentation of csInitializer::DestroyApplication()
-	  with the information that it unloads all plugins (and what this can
-	  cause.)
+        - John Harger changed iRenderBuffer to use a "CopyToBuffer" method as
+          an alternative (and preferred) method to copy data to a buffer,
+          rather than Locking the buffer.  This should be especially beneficial
+          to sprite3d's, where it updates the buffer quite frequently, when VBO
+          is enabled because you cannot render from a locked VBO buffer.
+	- res augmented csInitializer::DestroyApplication() documentation with
+          the information that it unloads all plugins (and what this can
+          cause.)
 	- res changed csSimplePixmap to store the texture handle in a csRef<>.
 30-Nov-2003
 	- Eric Sunshine clarified and corrected comments in crystal.m4.  Also
@@ -128,7 +137,7 @@ chronological order.
 	  compiler also seems to have trouble parsing normal, valid C++ in a
 	  number of cases.  Issues reported by Randall Foreman
 	  <rrforeman@comcast.net>.
-	- Luca fixed a compilation error in cssys/win32.cpp: the error was 
+	- Luca fixed a compilation error in cssys/win32.cpp: the error was
 	  a bad casting.
 24-Nov-2003
 	- Eric Sunshine performed minor clean up of the new cslibs test in
@@ -153,7 +162,7 @@ chronological order.
           jam file.
 22-Nov-2003
 	- res made the following changes to configure:
-	    - Now checks for a 'cslibs-config' script, which provide 
+	    - Now checks for a 'cslibs-config' script, which provide
 	      additional CFLAGS and LDFLAGS. This script will be included in
 	      the upcoming unified Win32 libs package.
 	    - Some library checks now utilize the new aliases feature for the
@@ -304,8 +313,8 @@ chronological order.
 	- res fixed misinterpretion of the 'flags' TGA header field.
 	- res removed some leftover comments from
 	  plugins/video/render3d/opengl/gl_txtmgr.cpp.
-	- res fixed some visual glitches with 2D graphics on NR GL by adding 
-	  some code to choose the default texture unit and turning off alpha 
+	- res fixed some visual glitches with 2D graphics on NR GL by adding
+	  some code to choose the default texture unit and turning off alpha
 	  test when entering 2D mode.
 	- Eric Sunshine continued working around SourceForge CVS server
 	  brokenness with regards to jobber.pl.  Specifically, the SourceForge

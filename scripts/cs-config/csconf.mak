@@ -91,8 +91,8 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@echo $"  libdir="$${prefix}/lib"$"		>> cs-config
 	@echo $"fi$"					>> cs-config
 	@echo $"syslibs="$(LIBS.EXE) $(LIBS.EXE.PLATFORM) $(LFLAGS.GENERAL)"$" >> cs-config
-	@echo $"common_cflags="$(CFLAGS)"$"		>> cs-config
-	@echo $"common_cxxflags="$(CFLAGS)"$"		>> cs-config
+	@echo $"common_cflags="$(CFLAGS.SYSTEM.MANDATORY)"$" >> cs-config
+	@echo $"common_cxxflags="$(CFLAGS.SYSTEM.MANDATORY)"$" >> cs-config
 	@echo $"$"					>> cs-config
 	@echo $"makevars()$"				>> cs-config
 	@echo $"{$"					>> cs-config

@@ -6879,7 +6879,8 @@ fi
 # Check if the linker recognizes "-force_cpusubtype_ALL".  This is required on
 # MacOS/X since the Crystal Space's PowerPC implementation of qsqrt() uses the
 # `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL flag
-# is present.
+# is present.  This flag is marked "mandatory" because it is required even for
+# external projects if they use qsqrt().
 #------------------------------------------------------------------------------
 
 
@@ -7027,9 +7028,9 @@ fi
 if test $cs_cv_prog_cxx_force_cpusubtype_all != no; then
   cs_build_prop_val=`echo x$cs_cv_prog_cxx_force_cpusubtype_all | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM.MANDATORY += $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -7188,9 +7189,9 @@ echo "${ECHO_T}$cs_cv_prog_cxx_no_common" >&6
     if test "$cs_cv_prog_cxx_no_common" != no; then
   cs_build_prop_val=`echo x$cs_cv_prog_cxx_no_common | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM.MANDATORY += $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -7354,9 +7355,9 @@ echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks" >&6
     if test "$cs_cv_prog_cxx_vtable_thunks" != no; then
   cs_build_prop_val=`echo x-fvtable-thunks | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM += $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM.MANDATORY += $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.MANDATORY += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -28625,6 +28626,10 @@ cs_makefile_text="${cs_makefile_text}PACKAGE.NAME = $PACKAGE_NAME
 
     cs_makefile_text="${cs_makefile_text}PACKAGE.VERSION.LIST = 0 97
 "
+cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += \$(CFLAGS.SYSTEM.MANDATORY)
+"
+cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM += \$(CXXFLAGS.SYSTEM.MANDATORY)
+"
 cs_makefile_text="${cs_makefile_text}SRCDIR = $srcdir
 "
 
@@ -28639,6 +28644,12 @@ cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += \$(CXXFLAGS.SYSTEM)
 #------------------------------------------------------------------------------
 # Boilerplate: Jamconfig
 #------------------------------------------------------------------------------
+cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"\$(COMPILER.CFLAGS.MANDATORY)\" ;
+"
+cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"\$(COMPILER.C++FLAGS.MANDATORY)\" ;
+"
+cs_jamconfig_text="${cs_jamconfig_text}JAMCONFIG_READ ?= \"yes\" ;
+"
 cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.NAME ?= \"$PACKAGE_NAME\" ;
 "
     cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.VERSION ?= \"$PACKAGE_VERSION\" ;
@@ -28655,8 +28666,6 @@ cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.NAME ?= \"$PACKAGE_NAME\" ;
 "
 
     cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.VERSION.LIST ?= 0 97 ;
-"
-cs_jamconfig_text="${cs_jamconfig_text}JAMCONFIG_READ ?= \"yes\" ;
 "
 
 

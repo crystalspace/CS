@@ -22,8 +22,8 @@ else
   includedir="$(INSTALLDIR.INCLUDE)"
 fi
 syslibs=" $(LINKLIBS) "
-common_cflags=" $(COMPILER.CFLAGS) "
-common_cxxflags=" $(COMPILER.CFLAGS) $(COMPILER.C++FLAGS) "
+common_cflags=" $(COMPILER.CFLAGS.MANDATORY) "
+common_cxxflags=" $(COMPILER.CFLAGS.MANDATORY) $(COMPILER.C++FLAGS.MANDATORY) "
 
 makevars()
 {
