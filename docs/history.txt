@@ -12,9 +12,9 @@ chronological order.
 	  a data/config/standardcon.cfg file. Currently the only setting
 	  that the standard output console supports is StandardConsole.ConFont
 	  which can have the following values:
-	  	- auto: select font based on size of display, similar like
-		  what simple output console does.
-		- select the specified font.
+	    - auto: select font based on size of display, similar like what
+	      simple output console does.
+	    - select the specified font.
 	- res updated spr2d to work with NR.
 	- res made some changes to how the render mesh holders work internally.
 	- res added some documentation to csRenderMesh, csAlphaMode, the
@@ -28,6 +28,9 @@ chronological order.
 	- Eric Sunshine fixed run-time syntax error in Java header directory
 	  check in configure.ac.  Problem was introduced on 22-Mar-2004 when
 	  Java check was augmented for MacOS/X.
+	- Eric Sunshine fixed csconout.mak so that it installs the new
+	  standardcon.cfg configuration file.  Also upgraded the makefile to
+	  the new style which does not directly pollute $(OUT).
 23-Mar-2004
 	- Anders Stenberg brought stencil shadows back to life in NR.
 	  They should get along well with stencil clipping.
@@ -89,7 +92,7 @@ chronological order.
 	- Jorrit fixed the NR glrender3d target. You can't declare variables
 	  without a type like this:
 	    static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
-	    GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
+	      GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
 	- Jorrit fixed a harmless initialization error in Frustvis and
 	  Dynavis.
 	- Jorrit fixed a bug with NR and handling of visibility culling and
@@ -544,27 +547,26 @@ chronological order.
 	  the source of a csRenderMesh.
 	- Jorrit again fixed a few errors throughout the Crystal Space
 	  project as reported by valgrind.
-	      - engine: portal containers didn't initialize the material
-	        field. Although this material field is strictly not needed
-		it was used by the csRenderMeshList to sort two portals
-		relative to each other.
-	      - NR OpenGL renderer: in the csVBORenderBuffer implementation
-	        there was a potentially serious lack of initialization
-		with the 'lastLock' field.
-	      - Thing mesh: the useLightmap field was not initialized.
+	    - engine: portal containers didn't initialize the material field.
+	      Although this material field is strictly not needed it was used
+	      by the csRenderMeshList to sort two portals relative to each
+	      other.
+	    - NR OpenGL renderer: in the csVBORenderBuffer implementation there
+	      was a potentially serious lack of initialization with the
+	      'lastLock' field.
+	    - Thing mesh: the useLightmap field was not initialized.
 6-Mar-2004
 	- Anders Stenberg finally found and fixed a clipper problem in NR, 
 	  which actually turned out to be more than a clipper problem.
 	- Jorrit fixed a few errors throughout the Crystal Space project
 	  as reported by valgrind. Please people! Remember to initialize
 	  your variables!!!
-	      - engine: current_visnr was not initialized in csSector.
-	      - engine: with NR enabled the fog structure was not
-	        initialized (but it was used in csPortalContainer).
-	      - spr3d: single_step field was not initialized to false.
-	      - spr3d: frame_increment field was not initialized to 1.
-	      - explosion mesh: lighted_particles was not initialized to
-	        false.
+	    - engine: current_visnr was not initialized in csSector.
+	    - engine: with NR enabled the fog structure was not initialized
+	      (but it was used in csPortalContainer).
+	    - spr3d: single_step field was not initialized to false.
+	    - spr3d: frame_increment field was not initialized to 1.
+	    - explosion mesh: lighted_particles was not initialized to false.
 5-Mar-2004
 	- Jorrit changed 'userobject' in csKDTree to a csRef<iBase>.
 	- Eric Sunshine increased robustness of CS_STATIC_VARIABLE_CLEANUP by
