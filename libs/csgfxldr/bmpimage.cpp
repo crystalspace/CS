@@ -136,16 +136,25 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
   UByte *iPtr = iBuffer + *BFOFFBITS(iBuffer);
 
   // The last scanline in BMP corresponds to the top line in the image
-  int buffer_y = Width * (Height - 1);
-  bool blip = false;
+  int  buffer_y = Width * (Height - 1);
+  bool blip     = false;
 
   if ((*BITCOUNT(iBuffer)) == _256Color && (*BICLRUSED(iBuffer)))
   {
-    UByte *buffer = new UByte [bmp_size];
+    UByte    *buffer  = new UByte [bmp_size];
     RGBPixel *palette = new RGBPixel [256];
 
     // Get the palette first: suppose sizeof (RGBPixel) == sizeof (ULong)
-    memcpy (palette, BIPALETTE (iBuffer), 256 * sizeof (RGBPixel));
+    for (int color = 0; color < 256; color++)
+    {  
+      //We can't just copy the BMP palette to the palette structure, because
+      //in a Bitmap file, colors are not in RGB order!
+      palette[color].red   = *(BIPALETTE(iBuffer) + 4*color + 2);
+      palette[color].green = *(BIPALETTE(iBuffer) + 4*color + 1);
+      palette[color].blue  = *(BIPALETTE(iBuffer) + 4*color + 0);
+      palette[color].alpha = 0;
+    }
+    //memcpy (palette, BIPALETTE (iBuffer), 256 * sizeof (RGBPixel));
 
     if ((*BICOMP(iBuffer)) == BI_RGB)
     {
