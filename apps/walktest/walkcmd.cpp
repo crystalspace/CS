@@ -1758,7 +1758,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  {
 	    if (System->MotionMan)
 	    {
-	      if (!System->MotionMan->ApplyMotion(sb, motion))
+	      if (!System->MotionMan->ApplyMotion(sb, motion, 0))
 	        Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
 	    }
 	    else

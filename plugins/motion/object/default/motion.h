@@ -28,22 +28,54 @@ struct csMotionFrame
 {
   cs_time keyframe;
 
-  int size;
-  int *links;
-  unsigned int *affectors;
+  int *qlinks;
+  int numqlinks;
+  unsigned int *qaffector;
+
+  int *mlinks;
+  int nummlinks;
+  unsigned int *maffector;
+
+  int *vlinks;
+  int numvlinks;
+  unsigned int *vaffector;
 };
+
+struct csAppliedFrame
+{
+  cs_time keyframe;
+
+  csQuaternion **qlinks;
+  int numqlinks;
+  iSkeletonBone **qaffector;
+
+  csMatrix3 **mlinks;
+  int nummlinks;
+  iSkeletonBone **maffector;
+
+  csVector3 **vlinks;
+  int numvlinks;
+  iSkeletonBone **vaffector;
+};
+
+DECLARE_TYPED_VECTOR( csAppliedFrameVector, csAppliedFrame );
 
 ///
 class csMotion:public iMotion
 {
 public:
   char* name;
-  char matrixmode;
 
   unsigned int hash;
 
-  void* transforms;
-  int numtransforms;
+  csQuaternion* transquat;
+  int numtransquat;
+  
+  csMatrix3* transmat;
+  int numtransmat;
+  
+  csVector3* translate;
+  int numtranslate;
 
   csMotionFrame* frames;
   int numframes;
@@ -63,9 +95,15 @@ public:
   ///
   virtual bool AddAnim (const csMatrix3 &mat);
   ///
-  virtual int AddFrame (int framenumber);
+  virtual bool AddAnim (const csVector3 &vec);
+  
+  virtual int AddFrame (int frametime);
   ///
-  virtual void AddFrameLink (int frameindex, const char* affector, int link);
+  virtual void AddFrameQLink (int frameindex, const char* affector, int link);
+
+  virtual void AddFrameMLink (int frameindex, const char* affector, int link);
+
+  virtual void AddFrameVLink (int frameindex, const char* affector, int link);
   ///
   unsigned int GetHash() { return hash; }
 };
@@ -87,11 +125,13 @@ public:
 
 struct csAppliedMotion
 {
-  iSkeletonBone* skel;
+  char *name;
+  iSkeletonBone *skel;
   csMotion* curmotion;
   cs_time curtime;
-  csMotionFrame* curframe;
-  csMotionFrame* nextframe;
+  int numframes;
+  int curframe;
+  csAppliedFrameVector frames;
 };
 
 DECLARE_TYPED_VECTOR(csAppliedMotionVector,csAppliedMotion); 
@@ -121,18 +161,23 @@ public:
   ///
   virtual iMotion* AddMotion (const char* name);
   ///
-  virtual bool ApplyMotion(iSkeletonBone *skel, const char* motion);
+  virtual bool ApplyMotion(iSkeletonBone *skel, const char* motion, int time);
   ///
   virtual void UpdateAll();
 
+  virtual void UpdateAll(int time);
   ///
   csMotion* FindClassByName (const char* name);
 
-  void UpdateTransform(csAppliedMotion *am, iSkeletonBone *bone, int link, int link2);
-  bool UpdateBone(csAppliedMotion *am, iSkeletonBone *bone, unsigned int hash);
-  void UpdateAppliedBones(csAppliedMotion *am, iSkeletonBone *bone);
+  void UpdateTransform(iSkeletonBone *bone, csQuaternion *quat);
+  void UpdateTransform(iSkeletonBone *bone, csMatrix3 *mat);
+  void UpdateTransform(iSkeletonBone *bone, csVector3 *vec);
+  void UpdateAppliedFrame(csAppliedFrame *fr);
   bool UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime);
+  void CompileMotion( csAppliedMotion *motion );
 };
+
+iSkeletonBone *FindBone( iSkeletonBone *bone, unsigned int hash );
 
 #endif
 

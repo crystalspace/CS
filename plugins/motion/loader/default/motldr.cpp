@@ -37,7 +37,9 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF(EULER)
   CS_TOKEN_DEF(FILE)
   CS_TOKEN_DEF(FRAME)
-  CS_TOKEN_DEF(LINK)
+  CS_TOKEN_DEF(QLINK)
+  CS_TOKEN_DEF(MLINK)
+  CS_TOKEN_DEF(VLINK)
   CS_TOKEN_DEF(IDENTITY)
   CS_TOKEN_DEF(MATRIX)
   CS_TOKEN_DEF(MOTION)
@@ -50,6 +52,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF(SCALE_Y)
   CS_TOKEN_DEF(SCALE_Z)
   CS_TOKEN_DEF(SCALE)
+  CS_TOKEN_DEF(V)
 CS_TOKEN_DEF_END
 
 
@@ -275,10 +278,13 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
     CS_TOKEN_TABLE (EULER)
     CS_TOKEN_TABLE (Q)
     CS_TOKEN_TABLE (MATRIX)
+	CS_TOKEN_TABLE (V)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_frame)
-    CS_TOKEN_TABLE (LINK)
+    CS_TOKEN_TABLE (QLINK)
+    CS_TOKEN_TABLE (MLINK)
+    CS_TOKEN_TABLE (VLINK)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -323,6 +329,13 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 	        mot->AddAnim(mat);
 	      }
 	      break;
+		case CS_TOKEN_V:
+		  {
+			csVector3 vec;
+			load_vector(params2, vec);
+			mot->AddAnim(vec);
+		  }
+		  break;
 	    default:
 	      sys->Printf (MSG_FATAL_ERROR, "Expected MATRIX or Q instead of '%s'!\n", buf);
 	      fatal_exit (0, false);
@@ -331,22 +344,37 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
         break;
       case CS_TOKEN_FRAME:
 	{
-	  int framenumber;
-	  ScanStr(name, "%d", &framenumber);
-	  int index=mot->AddFrame(framenumber);
+	  int frametime,link;
+	  ScanStr(name, "%d", &frametime);
+	  int index=mot->AddFrame(frametime);
 	  while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0)
 	  {
-	    if(cmd!=CS_TOKEN_LINK)
-	    {
-	      sys->Printf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
-	      fatal_exit (0, false);
-	    }
-	    int link;
-	    ScanStr(params2, "%d", &link);
-	    mot->AddFrameLink(index, name, link);
+		switch (cmd)
+		{
+		  case CS_TOKEN_QLINK:
+			{
+	  		  ScanStr(params2, "%d", &link);
+	  		  mot->AddFrameQLink(index, name, link);
+			}
+			break;
+		  case CS_TOKEN_MLINK:
+			{
+			  ScanStr( params2, "%d", &link);
+			  mot->AddFrameMLink(index, name, link);
+			}
+			break;
+		  case CS_TOKEN_VLINK:
+			{
+			  ScanStr( params2, "%d", &link);
+			  mot->AddFrameVLink(index, name, link);
+			}
+			break;
+		  default:
+	    	sys->Printf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
+	    	fatal_exit (0, false);
+		}
 	  }
-        }
-	break;
+    }
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)

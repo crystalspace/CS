@@ -22,10 +22,12 @@
 #include "csutil/scf.h"
 #include "isys/plugin.h"
 #include "iengine/skelbone.h"
+
 class csMatrix3;
 class csQuaternion;
+class csVector3;
 
-SCF_VERSION (iMotion, 0, 0, 1);
+SCF_VERSION (iMotion, 0, 0, 2);
 
 /**
  * A motion.
@@ -41,12 +43,19 @@ struct iMotion : public iBase
   ///
   virtual bool AddAnim (const csMatrix3 &mat) = 0;
   ///
+  virtual bool AddAnim (const csVector3 &vec) = 0;
+  ///
   virtual int AddFrame (int framenumber) = 0;
   ///
-  virtual void AddFrameLink (int frameindex, const char* affector, int link)=0;
+  virtual void AddFrameQLink ( int frameindex, const char* affector, int link) = 0;
+  ///
+  virtual void AddFrameMLink ( int frameindex, const char* affector, int link) = 0;
+  ///
+  virtual void AddFrameVLink ( int frameindex, const char* affector, int link) = 0;
+  
 };
 
-SCF_VERSION (iMotionManager, 0, 0, 1);
+SCF_VERSION (iMotionManager, 0, 0, 2);
 
 /**
  * The motion manager.
@@ -60,9 +69,11 @@ struct iMotionManager : public iPlugIn
   ///
   virtual iMotion* AddMotion (const char* name) = 0;
   ///
-  virtual bool ApplyMotion (iSkeletonBone *skel, const char* motion) = 0;
+  virtual bool ApplyMotion (iSkeletonBone *skel, const char* motion, int time) = 0;
   ///
   virtual void UpdateAll () = 0;
+  
+  virtual void UpdateAll ( int time ) = 0;
 };
 
 #endif
