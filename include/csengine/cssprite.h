@@ -174,14 +174,13 @@ private:
   csTriangleMesh* vertex_mesh;
   /// The vertices
   DECLARE_TYPED_VECTOR (csVerticesVector,csPoly3D) vertices;
+  /// Array that maps Texels to Normals
+  int* texel_to_normal;
 
   /// The normal mesh is used for smooth shading control.
   csTriangleMesh* normal_mesh;
   /// The normals
   DECLARE_TYPED_VECTOR (csNormalsVector,csPoly3D) normals;
-
-  /// Array that maps Texels to Normals
-  int* texel_to_normal;
   /// Array that maps Texels to Vertices
   int* texel_to_vertex;
 
@@ -240,21 +239,42 @@ public:
 
   /// Query the number of texels.
   int GetNumTexels () { return texels.Get(0)->GetNumVertices (); }
-  ///
+  /// Get a texel.
   csVector2& GetTexel (int frame, int vertex)
     { return (*texels.Get(frame)) [vertex]; }
+  /// Get array of texels.
+  csVector2* GetTexels (int frame)
+    { return (*texels.Get(frame)).GetVertices (); }
 
   /// Query the number of vertices.
   int GetNumVertices () { return vertices.Get (0)->GetNumVertices (); }
-  ///
-  csVector3& GetVertex (int frame, int vertex)
+  /// Get a vertex in compressed mode.
+  csVector3& GetCompressedVertex (int frame, int vertex)
     { return (*vertices.Get(frame)) [texel_to_vertex [vertex]]; }
+  /// Get a vertex in uncompressed mode.
+  csVector3& GetVertex (int frame, int vertex)
+    { return (*vertices.Get(frame)) [vertex]; }
+  /// Get vertex array (only valid in uncompressed mode).
+  csVector3* GetVertices (int frame)
+    { return (*vertices.Get(frame)).GetVertices (); }
+  /// Return true if vertices are compressed.
+  bool VerticesAreCompressed ()
+    { return texel_to_vertex ? true : false; }
 
   /// Query the number of normals.
   int GetNumNormals () { return normals.Get (0)->GetNumVertices (); }
-  ///
-  csVector3& GetNormal (int frame, int vertex)
+  /// Get a normal in compressed mode.
+  csVector3& GetCompressedNormal (int frame, int vertex)
     { return (*normals.Get(frame)) [texel_to_normal [vertex]]; }
+  /// Get a normal in uncompressed mode.
+  csVector3& GetNormal (int frame, int vertex)
+    { return (*normals.Get(frame)) [vertex]; }
+  /// Get normal array (only valid in uncompressed mode).
+  csVector3* GetNormals (int frame)
+    { return (*normals.Get(frame)).GetVertices (); }
+  /// Return true if normals are compressed.
+  bool NormalsAreCompressed ()
+    { return texel_to_normal ? true : false; }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes

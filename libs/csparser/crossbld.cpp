@@ -110,16 +110,33 @@ void csCrossBuild_SpriteTemplateFactory::Build_Frame
   if (framesource.GetNumFrames() == 1)
     framesource.AddVertices(buildsource.num_cor3);
 
-  for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
+  if (framesource.VerticesAreCompressed ())
   {
-    // standard 3D coords seem to swap y and z axis compared to CS
-    framesource.GetVertex(anm_idx, coordindex) = csVector3 (
-      buildsource.cor3[0][coordindex]/20.0,
-      buildsource.cor3[2][coordindex]/20.0,
-      buildsource.cor3[1][coordindex]/20.0);
-    framesource.GetTexel(tex_idx, coordindex) = csVector2 (
-      buildsource.cor3_uv[0][coordindex],
-      buildsource.cor3_uv[1][coordindex]);
+    for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
+    {
+      // standard 3D coords seem to swap y and z axis compared to CS
+      framesource.GetCompressedVertex(anm_idx, coordindex) = csVector3 (
+        buildsource.cor3[0][coordindex]/20.0,
+        buildsource.cor3[2][coordindex]/20.0,
+        buildsource.cor3[1][coordindex]/20.0);
+      framesource.GetTexel(tex_idx, coordindex) = csVector2 (
+        buildsource.cor3_uv[0][coordindex],
+        buildsource.cor3_uv[1][coordindex]);
+    }
+  }
+  else
+  {
+    for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
+    {
+      // standard 3D coords seem to swap y and z axis compared to CS
+      framesource.GetVertex(anm_idx, coordindex) = csVector3 (
+        buildsource.cor3[0][coordindex]/20.0,
+        buildsource.cor3[2][coordindex]/20.0,
+        buildsource.cor3[1][coordindex]/20.0);
+      framesource.GetTexel(tex_idx, coordindex) = csVector2 (
+        buildsource.cor3_uv[0][coordindex],
+        buildsource.cor3_uv[1][coordindex]);
+    }
   }
 }
 

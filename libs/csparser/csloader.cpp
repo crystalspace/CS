@@ -97,7 +97,7 @@ int csLoaderStat::things_loaded   = 0;
 int csLoaderStat::lights_loaded   = 0;
 int csLoaderStat::curves_loaded   = 0;
 int csLoaderStat::sprites_loaded  = 0;
-int csLoaderStat::sounds_loaded	  = 0;
+int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
 TOKEN_DEF_START
@@ -4178,7 +4178,7 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
       csLoaderStat::portals_loaded);
     CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d sprites, \n", csLoaderStat::sectors_loaded,
       csLoaderStat::things_loaded, csLoaderStat::sprites_loaded);
-    CsPrintf (MSG_INITIALIZATION, "  %d curves, %d lights. %d sounds\n", csLoaderStat::curves_loaded,
+    CsPrintf (MSG_INITIALIZATION, "  %d curves, %d lights, %d sounds.\n", csLoaderStat::curves_loaded,
       csLoaderStat::lights_loaded, csLoaderStat::sounds_loaded);
   } /* endif */
 
@@ -4377,9 +4377,9 @@ bool csLoader::LoadSounds (char* buf)
           {
             csSoundDataObject *s = load_sound (name, filename);
             if (s)
-	    {									
-              World->ObjAdd(s);
-              csLoaderStat::sounds_loaded++;    
+	    {
+	      World->ObjAdd(s);
+	      csLoaderStat::sounds_loaded++;
 	    }
           }
         }
@@ -4598,7 +4598,10 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                     fr->GetName ());
                   fatal_exit (0, false);
                 }
-                stemp->GetVertex (anm_idx, i) = csVector3 (x, y, z);
+                if (stemp->VerticesAreCompressed ())
+                  stemp->GetCompressedVertex (anm_idx, i) = csVector3 (x, y, z);
+                else
+                  stemp->GetVertex (anm_idx, i) = csVector3 (x, y, z);
                 stemp->GetTexel  (tex_idx, i) = csVector2 (u, v);
                 i++;
                 break;

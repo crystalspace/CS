@@ -133,35 +133,39 @@ void csSpriteTemplate::AddVertices (int num)
 {
   int frame, vertex;
 
-  CHK (int* ttn = new int [GetNumTexels() + num]);
-  if (texel_to_normal != NULL)
-  {
-    for (vertex = 0; vertex < GetNumTexels(); vertex++)
-      ttn [vertex] = texel_to_normal [vertex];
-    CHK (delete[] texel_to_normal);
-  }
-  texel_to_normal = ttn;
-
-  CHK (int* ttv = new int [GetNumTexels() + num]);
-  if (texel_to_vertex != NULL)
-  {
-    for (vertex = 0; vertex < GetNumTexels(); vertex++)
-      ttv [vertex] = texel_to_vertex [vertex];
-    CHK (delete[] texel_to_vertex);
-  }
-  texel_to_vertex = ttv;
-
-  for (vertex = 0; vertex < num; vertex++)
-  {
-    texel_to_normal [GetNumTexels() + vertex] = GetNumNormals  () + vertex;
-    texel_to_vertex [GetNumTexels() + vertex] = GetNumVertices () + vertex;
-  }
-
   for (frame = 0; frame < frames.Length(); frame++)
   {
     normals.Get (frame)->SetNumVertices (GetNumNormals () + num);
     texels.Get (frame)->SetNumVertices (GetNumTexels () + num);
     vertices.Get (frame)->SetNumVertices (GetNumVertices () + num);
+  }
+
+  // if a texel_to_normal array is in use,
+  // add the vertex to that array
+
+  if (NormalsAreCompressed ())
+  {
+    CHK (int* ttn = new int [GetNumTexels() + num]);
+    for (vertex = 0; vertex < GetNumTexels(); vertex++)
+      ttn [vertex] = texel_to_normal [vertex];
+    CHK (delete[] texel_to_normal);
+    texel_to_normal = ttn;
+    for (vertex = 0; vertex < num; vertex++)
+      texel_to_normal [GetNumTexels() + vertex] = GetNumNormals  () + vertex;
+  }
+
+  // if a texel_to_vertex array is in use,
+  // add the vertex to that array
+
+  if (VerticesAreCompressed ())
+  {
+    CHK (int* ttv = new int [GetNumTexels() + num]);
+    for (vertex = 0; vertex < GetNumTexels(); vertex++)
+      ttv [vertex] = texel_to_vertex [vertex];
+    CHK (delete[] texel_to_vertex);
+    texel_to_vertex = ttv;
+    for (vertex = 0; vertex < num; vertex++)
+      texel_to_vertex [GetNumTexels() + vertex] = GetNumVertices () + vertex;
   }
 }
 
@@ -169,11 +173,11 @@ void csSpriteTemplate::AddTriangle (int a, int b, int c)
 {
   texel_mesh->AddTriangle (a, b, c);
 
-  if (normal_mesh)
+  if (NormalsAreCompressed ())
     normal_mesh->AddTriangle
       (texel_to_normal[a], texel_to_normal[b], texel_to_normal[c]);
 
-  if (vertex_mesh)
+  if (VerticesAreCompressed ())
     vertex_mesh->AddTriangle
       (texel_to_vertex[a], texel_to_vertex[b], texel_to_vertex[c]);
 }
@@ -196,14 +200,27 @@ csSprite3D* csSpriteTemplate::NewSprite ()
 
 void csSpriteTemplate::GenerateLOD ()
 {
+// @@@ TEMPORARILY DISABLED LOD BECAUSE IT IS BROKEN RIGHT NOW.
+// WE NEED TO SEE WHAT IS WRONG IN THIS ROUTINE.
+return;
   int i;
 
   //@@@ turn this into a parameter or member variable?
   int lod_base_frame = 0;
 
   CHK (csVector3* v = new csVector3[GetNumTexels()]);
-  for (i = 0; i < GetNumTexels(); i++)
-    v[i] = GetVertex (lod_base_frame, i);
+
+  if (VerticesAreCompressed ())
+  {
+    for (i = 0; i < GetNumTexels(); i++)
+      v[i] = GetCompressedVertex (lod_base_frame, i);
+  }
+  else
+  {
+    for (i = 0; i < GetNumTexels(); i++)
+      v[i] = GetVertex (lod_base_frame, i);
+  }
+
   CHK (csTriangleVertices* verts = new csTriangleVertices (texel_mesh, v, GetNumTexels()));
   CHK (delete [] v);
 
@@ -236,7 +253,7 @@ void csSpriteTemplate::GenerateLOD ()
     tr.c = translate[tr.c];
   }
 
-  if (texel_to_normal != NULL)
+  if (NormalsAreCompressed ())
   {
     CHK (int* ttn = new int [GetNumTexels()]);
     for (i = 0 ; i < GetNumTexels() ; i++)
@@ -244,7 +261,8 @@ void csSpriteTemplate::GenerateLOD ()
     CHK (delete [] texel_to_normal);
     texel_to_normal = ttn;
   }
-  if (texel_to_vertex != NULL)
+
+  if (VerticesAreCompressed ())
   {
     CHK (int* ttv = new int [GetNumTexels()]);
     for (i = 0 ; i < GetNumTexels() ; i++)
@@ -261,13 +279,25 @@ void csSpriteTemplate::GenerateLOD ()
 void csSpriteTemplate::ComputeBoundingBox ()
 {
   int frame, vertex;
+
   for ( frame = 0 ; frame < GetNumFrames () ; frame++ )
   {
     csBox3 box;
     GetFrame(frame)->GetBoundingBox (box);
-    box.StartBoundingBox (GetVertex (frame, 0));
-    for ( vertex = 1 ; vertex < GetNumVertices() ; vertex++ )
-      box.AddBoundingVertexSmart (GetVertex (frame, vertex));
+
+    if (VerticesAreCompressed ())
+    {
+      box.StartBoundingBox (GetCompressedVertex (frame, 0));
+      for ( vertex = 1 ; vertex < GetNumTexels() ; vertex++ )
+        box.AddBoundingVertexSmart (GetCompressedVertex (frame, vertex));
+    }
+    else
+    {
+      box.StartBoundingBox (GetVertex (frame, 0));
+      for ( vertex = 1 ; vertex < GetNumTexels() ; vertex++ )
+        box.AddBoundingVertexSmart (GetVertex (frame, vertex));
+    }
+
     GetFrame(frame)->SetBoundingBox (box);
   }
   if (skeleton)
@@ -364,20 +394,42 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
 
   // calculate vertex normals, by averaging connected triangle normals
   int frame_number = frame->GetAnmIndex();
-  for (i = 0; i < GetNumTexels(); i++)
+
+  if (NormalsAreCompressed ())
   {
-    csTriangleVertex &vt = tri_verts->GetVertex (i);
-    if (vt.num_con_triangles)
+    for (i = 0; i < GetNumTexels(); i++)
     {
-      csVector3 &n = GetNormal (frame_number, i);
-      n = csVector3 (0,0,0);
-      for (j = 0; j < vt.num_con_triangles; j++)
-        n += tri_normals [vt.con_triangles[j]];
-      float norm = n.Norm ();
-      if (norm)
-        n /= norm;
+      csTriangleVertex &vt = tri_verts->GetVertex (i);
+      if (vt.num_con_triangles)
+      {
+        csVector3 &n = GetCompressedNormal (frame_number, i);
+        n = csVector3 (0,0,0);
+        for (j = 0; j < vt.num_con_triangles; j++)
+          n += tri_normals [vt.con_triangles[j]];
+        float norm = n.Norm ();
+        if (norm)
+          n /= norm;
+      }
     }
   }
+  else
+  {
+    for (i = 0; i < GetNumTexels(); i++)
+    {
+      csTriangleVertex &vt = tri_verts->GetVertex (i);
+      if (vt.num_con_triangles)
+      {
+        csVector3 &n = GetNormal (frame_number, i);
+        n = csVector3 (0,0,0);
+        for (j = 0; j < vt.num_con_triangles; j++)
+          n += tri_normals [vt.con_triangles[j]];
+        float norm = n.Norm ();
+        if (norm)
+          n /= norm;
+      }
+    }
+  }
+
   CHK (delete[] tri_normals);
 }
 
@@ -461,7 +513,8 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
   int * ttv = new int [GetNumTexels()];
   for (int i = 0; i < GetNumTexels(); i++)
     ttv[i] = old_vertices[texel_to_vertex[i]];
-  CHK (delete [] texel_to_vertex);
+  if (texel_to_vertex)
+    CHK (delete [] texel_to_vertex);
   texel_to_vertex = ttv;
 
 #endif
@@ -543,7 +596,8 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
   int * ttn = new int [GetNumTexels()];
   for (int i = 0; i < GetNumTexels(); i++)
     ttn[i] = old_vertices[texel_to_normal[i]];
-  CHK (delete [] texel_to_normal);
+  if (texel_to_normal)
+    CHK (delete [] texel_to_normal);
   texel_to_normal = ttn;
 
 #endif
@@ -1278,17 +1332,32 @@ void csSprite3D::Draw (csRenderView& rview)
   if (!skeleton_state && tween_ratio) do_tween = true;
 
   // @@@ Can't this copy be avoided?
+
   int cf_idx = cframe->GetAnmIndex();
-  for (i = 0 ; i < tpl->GetNumTexels () ; i++)
+
+  csVector3* real_obj_verts;
+  csVector3* real_tween_verts;
+
+  if (tpl->VerticesAreCompressed ())
   {
-    obj_verts[i] = tpl->GetVertex (cf_idx, i);
-  }
-  if (do_tween)
-  {
-    int nf_idx = next_frame->GetAnmIndex();
     for (i = 0 ; i < tpl->GetNumTexels () ; i++)
+      obj_verts[i] = tpl->GetCompressedVertex (cf_idx, i);
+    real_obj_verts = obj_verts.GetArray ();
+    if (do_tween)
     {
-      tween_verts[i] = tpl->GetVertex (nf_idx, i);
+      int nf_idx = next_frame->GetAnmIndex();
+      for (i = 0 ; i < tpl->GetNumTexels () ; i++)
+        tween_verts[i] = tpl->GetCompressedVertex (nf_idx, i);
+      real_tween_verts = tween_verts.GetArray ();
+    }
+  }
+  else
+  {
+    real_obj_verts = tpl->GetVertices (cf_idx);
+    if (do_tween)
+    {
+      int nf_idx = next_frame->GetAnmIndex();
+      real_tween_verts = tpl->GetVertices (nf_idx);
     }
   }
 
@@ -1298,12 +1367,12 @@ void csSprite3D::Draw (csRenderView& rview)
   csVector3* verts;
   if (skeleton_state)
   {
-    skeleton_state->Transform (tr_o2c, obj_verts.GetArray (), tr_verts.GetArray ());
+    skeleton_state->Transform (tr_o2c, real_obj_verts, tr_verts.GetArray ());
     verts = tr_verts.GetArray ();
   }
   else
   {
-    verts = obj_verts.GetArray ();
+    verts = real_obj_verts;
   }
 
   // Calculate the right LOD level for this sprite.
@@ -1331,22 +1400,31 @@ void csSprite3D::Draw (csRenderView& rview)
     emerge_from = tpl->GetEmergeFrom ();
   }
 
+  csVector2* real_uv_verts;
   // Do vertex morphing if needed.
-  for (i = 0 ; i < num_verts ; i++)
+  if (cfg_lod_detail < 0 || cfg_lod_detail == 1)
   {
-    csVector2 uv;
-    if (cfg_lod_detail < 0 || cfg_lod_detail == 1 || i < num_verts-1)
+    real_uv_verts = tpl->GetTexels (cf_idx);
+  }
+  else
+  {
+    for (i = 0 ; i < num_verts ; i++)
     {
-      uv = tpl->GetTexel (cf_idx, i);
-    }
-    else
-    {
-      // Morph between the last vertex and the one we morphed from.
-      uv = (1-fnum) * tpl->GetTexel (cf_idx, emerge_from[i])
-        + fnum * tpl->GetTexel (cf_idx, i);
-    }
+      csVector2 uv;
+      if (i < num_verts-1)
+      {
+        uv = tpl->GetTexel (cf_idx, i);
+      }
+      else
+      {
+        // Morph between the last vertex and the one we morphed from.
+        uv = (1-fnum) * tpl->GetTexel (cf_idx, emerge_from[i])
+          + fnum * tpl->GetTexel (cf_idx, i);
+      }
 
-    uv_verts[i] = uv;
+      uv_verts[i] = uv;
+    }
+    real_uv_verts = uv_verts.GetArray ();
   }
 
   // Setup the structure for DrawTriangleMesh.
@@ -1357,14 +1435,14 @@ void csSprite3D::Draw (csRenderView& rview)
     mesh.txt_handle[0] = tpl->cstxt->GetTextureHandle ();
   mesh.num_vertices = num_verts;
   mesh.vertices[0] = verts;
-  mesh.texels[0][0] = uv_verts.GetArray ();
+  mesh.texels[0][0] = real_uv_verts;
   mesh.vertex_colors[0] = vertex_colors;
   if (do_tween)
   {
     mesh.morph_factor = tween_ratio;
     mesh.num_vertices_pool = 2;
-    mesh.vertices[1] = tween_verts.GetArray ();
-    mesh.texels[1][0] = uv_verts.GetArray ();
+    mesh.vertices[1] = real_tween_verts;
+    mesh.texels[1][0] = real_uv_verts;
     mesh.vertex_colors[1] = vertex_colors;
   }
   else
@@ -1471,8 +1549,17 @@ csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
 {
   UpdateWorkTables (tpl->GetNumTexels ());
   int fr_idx = fr->GetAnmIndex();
-  for (int i = 0; i < tpl->GetNumTexels (); i++)
-    obj_verts[i] = tpl->GetVertex(fr_idx, i);
+
+  if (tpl->VerticesAreCompressed ())
+  {
+    for (int i = 0; i < tpl->GetNumTexels (); i++)
+      obj_verts[i] = tpl->GetCompressedVertex(fr_idx, i);
+  }
+  else
+  {
+    for (int i = 0; i < tpl->GetNumTexels (); i++)
+      obj_verts[i] = tpl->GetVertex(fr_idx, i);
+  }
 
   if (skeleton_state)
   {
@@ -1507,9 +1594,18 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
     int nf_idx = next_frame->GetAnmIndex();
     float remainder = 1 - tween_ratio;
 
-    for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-      obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
-        + remainder * tpl->GetVertex (nf_idx, i);
+    if (tpl->VerticesAreCompressed ())
+    {
+      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
+        obj_verts[i] = tween_ratio * tpl->GetCompressedVertex (tf_idx, i)
+          + remainder * tpl->GetCompressedVertex (nf_idx, i);
+    }
+    else
+    {
+      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
+        obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
+          + remainder * tpl->GetVertex (nf_idx, i);
+    }
 
     work_obj_verts = obj_verts.GetArray ();
   }
@@ -1566,26 +1662,53 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
     float obj_dist = FastSqrt (obj_sq_dist);
     float wor_dist = FastSqrt (wor_sq_dist);
 
-    for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+    if (tpl->NormalsAreCompressed ())
     {
-      csVector3& obj_vertex = object_vertices[j];
-
-      float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON)
-        cosinus = 1;
-      else
-        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
-
-      if (cosinus > 0)
+      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
       {
-        color = light_color;
-        if (obj_sq_dist >= SMALL_EPSILON)
-          cosinus /= obj_dist;
-        if (cosinus < 1)
-          color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
-        AddVertexColor (j, color);
+        csVector3& obj_vertex = object_vertices[j];
+
+        float cosinus;
+        if (obj_sq_dist < SMALL_EPSILON)
+          cosinus = 1;
+        else
+          cosinus = (obj_light_pos - obj_vertex) * tpl->GetCompressedNormal (tf_idx, j);
+
+        if (cosinus > 0)
+        {
+          color = light_color;
+          if (obj_sq_dist >= SMALL_EPSILON)
+            cosinus /= obj_dist;
+          if (cosinus < 1)
+            color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
+          AddVertexColor (j, color);
+        }
       }
     }
+    else
+    {
+      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+      {
+        csVector3& obj_vertex = object_vertices[j];
+
+        float cosinus;
+        if (obj_sq_dist < SMALL_EPSILON)
+          cosinus = 1;
+        else
+          cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
+
+        if (cosinus > 0)
+        {
+          color = light_color;
+          if (obj_sq_dist >= SMALL_EPSILON)
+            cosinus /= obj_dist;
+          if (cosinus < 1)
+            color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
+          AddVertexColor (j, color);
+        }
+      }
+    }
+
   }
 
   // Clamp all vertice colors to 2.0
@@ -1608,34 +1731,69 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     csVector3 obj_light_pos = m_world2obj * (wor_light_pos - v_obj2world);
 
-    for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+    if (tpl->NormalsAreCompressed ())
     {
-      csVector3& obj_vertex = object_vertices[j];
-      csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
-
-      // @@@ We have the distance in object space. Can't we use
-      // that to calculate the distance in world space as well?
-      // These calculations aren't optimal. I have the feeling they
-      // can be optimized somewhat.
-      float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
-      float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
-
-      float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON)
-        cosinus = 1;
-      else
-        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
-
-      if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
+      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
       {
-        color = light_color;
-        if (obj_sq_dist >= SMALL_EPSILON)
-          cosinus /= FastSqrt (obj_sq_dist);
-        if (cosinus < 1)
-          color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
-        AddVertexColor (j, color);
+        csVector3& obj_vertex = object_vertices[j];
+        csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
+
+        // @@@ We have the distance in object space. Can't we use
+        // that to calculate the distance in world space as well?
+        // These calculations aren't optimal. I have the feeling they
+        // can be optimized somewhat.
+        float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
+        float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
+
+        float cosinus;
+        if (obj_sq_dist < SMALL_EPSILON)
+          cosinus = 1;
+        else
+          cosinus = (obj_light_pos - obj_vertex) * tpl->GetCompressedNormal (tf_idx, j);
+
+        if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
+        {
+          color = light_color;
+          if (obj_sq_dist >= SMALL_EPSILON)
+            cosinus /= FastSqrt (obj_sq_dist);
+          if (cosinus < 1)
+            color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+          AddVertexColor (j, color);
+        }
       }
     }
+    else
+    {
+      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+      {
+        csVector3& obj_vertex = object_vertices[j];
+        csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
+
+        // @@@ We have the distance in object space. Can't we use
+        // that to calculate the distance in world space as well?
+        // These calculations aren't optimal. I have the feeling they
+        // can be optimized somewhat.
+        float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
+        float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
+
+        float cosinus;
+        if (obj_sq_dist < SMALL_EPSILON)
+          cosinus = 1;
+        else
+          cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
+
+        if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
+        {
+          color = light_color;
+          if (obj_sq_dist >= SMALL_EPSILON)
+            cosinus /= FastSqrt (obj_sq_dist);
+          if (cosinus < 1)
+            color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+          AddVertexColor (j, color);
+        }
+      }
+    }
+
   }
 
   // Clamp all vertice colors to 2.0

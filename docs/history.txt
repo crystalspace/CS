@@ -6,6 +6,10 @@ The history order has been reversed so that new features are at the top.
 	- Frank also modified zoo.cpp so that it compiles on Win32.
 	- Fixed a small compile error in libs/cssys/unix/unix.h which
 	  prevent compilation on Unix.
+	- Did some significant improvements on sprite performance
+	  (thanks to Seth Galbraith for starting this). Unfortunatelly
+	  I had to break LOD for this (temporarily). Luckily LOD is not
+	  used by the engine right now.
 26-Apr-2000
 	- Fixed csMath3::FindObserverSides().
 	- Added csBox2 and csBox3::GetEdge() to iterate over all edges
