@@ -278,7 +278,8 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   DetectExtensions ();
 #endif
 
-  // csPixelFormat pfmt = *G2D->GetPixelFormat ();
+  // now that we know what pixelformat we use, clue the texture manager in
+  txtmgr->pfmt = *G2D->GetPixelFormat ();
 
   if (m_renderstate.dither)
     glEnable (GL_DITHER);
