@@ -64,8 +64,8 @@ class csNetworkSocket2 : public iNetworkSocket2
   int sin_size;
   int addr_len;
 #else
-  size_t sin_size;
-  size_t addr_len;
+  socklen_t sin_size;
+  socklen_t addr_len;
 #endif
   
   virtual int SELECT( int fds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds );
