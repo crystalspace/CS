@@ -1117,7 +1117,10 @@ void WalkTest::Create2DSprites(void)
 bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
+  {
+    Printf (MSG_FATAL_ERROR, "Failed to initialize SysSystemDriver!\n");
     return false;
+  }
 
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", VERSION, RELEASE_DATE);
@@ -1184,7 +1187,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // performance statistics module, also takes care of fps
   perf_stats = QUERY_PLUGIN (this, iPerfStats);
   if (!perf_stats)
+  {
+    Printf (MSG_FATAL_ERROR, "No iPerfStats plugin!\n");
     return false;
+  }
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
