@@ -178,7 +178,6 @@
 #include "ivaria/mapnode.h"
 #include "ivaria/perfstat.h"
 #include "ivaria/pmeter.h"
-#include "ivaria/polymesh.h"
 #include "ivaria/reporter.h"
 #include "ivaria/script.h"
 #include "ivaria/sequence.h"
