@@ -65,3 +65,10 @@ cindex @code{SCF_DECLARE_FAST_INTERFACE}
 Fast interfaces are now default. Just use the
 normal query versions instead of the ones above.
 
+@subheading @code{make} Targets 
+Some targets for the @code{make} process(all apps, some plugins) have changed. 
+In general, the name of a target is now equal to the name of the resulting 
+binary (without suffix). E.g. @code{walktest} is now built with @code{make 
+walktest} instead of @code{malk walk}. However, the 'mass' targets have been
+unchanged. To build @code{walktest} and all required plugins, the target is
+still @code{walkall}.
