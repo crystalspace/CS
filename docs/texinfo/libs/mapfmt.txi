@@ -262,7 +262,7 @@ points forward.
 @production{key,
     @token{KEY} @LP{} @nonterm{keyname} @COMMA{} @nonterm{keyvalue} @RP{}}
 
-@subsubheading Lighting
+@subsubheading Lighting Primitives
 @production{tex-lighting,
     @token{TEXTURE_LIGHTING} @LP{} @nonterm{yes-no} @RP{}}@*
 @production{lighting, @token{LIGHTING} @LP{} @nonterm{yes-no} @RP{}}
