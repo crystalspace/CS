@@ -490,7 +490,7 @@ void csImageFile::convert_rgba (csRGBpixel *iImage)
         int maxcolors = 256;
 	csColorQuantizer quant;
         quant.DoRGB (iImage, pixels, Width, (uint8 *&)Image, Palette,
-          maxcolors, csImage_dither);
+          maxcolors, true/*csImage_dither*/);
       }
       delete [] iImage;
       break;
