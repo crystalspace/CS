@@ -93,8 +93,8 @@ public:
   bool EnumSections (const char *SectionPath, bool (*iterator)
     (csSome Parm, char *Name), csSome Parm) const;
 
-	/// Enumerate sections, but doesn't use crappy iterator
-	bool EnumSections(csSTRList* List); 
+  /// Enumerate sections, but doesn't use crappy iterator
+  bool EnumSections(csSTRList*); 
 
   /// Enumerate data entries: call iterator for each data entry
   bool EnumData (const char *SectionPath, bool (*iterator)
