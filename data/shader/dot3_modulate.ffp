@@ -14,9 +14,9 @@
 		<colorsource num="1" source="texture" modifier="color"/>
 		<coloroperation operation="modulate"/>
 	</layer>
-	<!--<layer>
+	<layer>
 		<colorsource num="0" source="previous layer" modifier="color"/>
 		<colorsource num="1" source="primary color" modifier="color"/>
 		<coloroperation operation="modulate"/>
-	</layer>-->
+	</layer>
 </fixedfp>

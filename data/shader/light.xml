@@ -10,6 +10,7 @@
       <texturemapping unit="0" name="standardtex normalization map" />
       <texturemapping unit="1" name="standardtex normalization map" />
       <texturemapping unit="2" name="tex diffuse" />
+      <texturemapping unit="3" name="tex diffuse" />
 			<fp type="gl_fixed_fp" file="/shader/dot3_modulate.ffp"/>
 		</pass>
 	</technique>
