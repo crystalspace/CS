@@ -47,18 +47,18 @@
 #define MIPMAP_DIVIDER	(MIPMAP_STEP * MIPMAP_STEP)
 
 #if defined (MIPMAP_PALETTED) || defined (MIPMAP_ALPHA)
-#  define MIPMAP_PIXTYPE	UByte
+#  define MIPMAP_PIXTYPE	uint8
 #else
 #  define MIPMAP_PIXTYPE	uint32
 #endif
 
 static void MIPMAP_NAME (unsigned w, unsigned h
 #if defined (MIPMAP_ALPHA)
-  , UByte *src, UByte *dst
+  , uint8 *src, uint8 *dst
 #elif defined (MIPMAP_PALETTED)
-  , UByte *src, csRGBpixel *dst, csRGBpixel *pal
+  , uint8 *src, csRGBpixel *dst, csRGBpixel *pal
 #  ifdef MIPMAP_TRANSPARENT
-  , UByte transp
+  , uint8 transp
 #  endif
 #else
   , csRGBpixel *src, csRGBpixel *dst
@@ -77,7 +77,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
 #  if defined (MIPMAP_TRANSPARENT) && (MIPMAP_LEVEL == 0)
 #    define ACCUMULATE_PIXEL(p, m)					\
      {									\
-       UByte pix = p;							\
+       uint8 pix = p;							\
        if (pix == transp) { *dst++ = pal [src2 [1]]; FINALLY; continue; }\
        uint32 rgb = *(uint32 *)&pal [pix];				\
        rb += (rgb & 0x00ff00ff) * m;					\
@@ -86,7 +86,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
 #  elif defined (MIPMAP_TRANSPARENT)
 #    define ACCUMULATE_PIXEL(p, m)					\
      {									\
-       UByte pix = p;							\
+       uint8 pix = p;							\
        uint32 rgb = *(uint32 *)&pal [pix];				\
        if (pix == transp) { *(uint32 *)dst++ = rgb; FINALLY; continue; }	\
        rb += (rgb & 0x00ff00ff) * m;					\

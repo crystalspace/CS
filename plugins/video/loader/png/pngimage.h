@@ -41,7 +41,7 @@ class csPNGImageIO : public iImageIO
   virtual ~csPNGImageIO (){}
 
   virtual const csVector& GetDescription ();
-  virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
+  virtual iImage *Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
@@ -64,7 +64,7 @@ private:
   /// Initialize the image object
   ImagePngFile (int iFormat) : csImageFile (iFormat) { };
   /// Try to read the PNG file from the buffer and return success status
-  bool Load (UByte* iBuffer, ULong iSize);
+  bool Load (uint8* iBuffer, uint32 iSize);
 };
 
 #endif // PNGIMAGE_H

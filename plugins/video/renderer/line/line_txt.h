@@ -42,9 +42,9 @@ class csTextureManagerLine;
 struct csAlphaTables
 {
   /// Alpha table for 50%
-  UByte alpha_map50 [256*256];
+  uint8 alpha_map50 [256*256];
   /// Alpha table for 25% and 75%
-  UByte alpha_map25 [256*256];
+  uint8 alpha_map25 [256*256];
 };
 
 /// The prefered distances to use for the color matching.
@@ -152,7 +152,7 @@ class csTextureLine : public csTexture
 {
 public:
   /// The bitmap
-  UByte *bitmap;
+  uint8 *bitmap;
   /// The image (temporary storage)
   iImage *image;
 
@@ -206,10 +206,10 @@ public:
   csAlphaTables *alpha_tables;
 
   /// The multiplication tables used for lightmapping
-  UByte *lightmap_tables [3];
+  uint8 *lightmap_tables [3];
 
   /// The inverse colormap (for 8-bit modes)
-  UByte *inv_cmap;
+  uint8 *inv_cmap;
 
   ///
   csTextureManagerLine (iObjectRegistry *object_reg,
@@ -221,7 +221,7 @@ public:
   void SetPixelFormat (csPixelFormat &PixelFormat);
 
   /// Encode RGB values to a 16-bit word (for 16-bit mode).
-  ULong encode_rgb (int r, int g, int b);
+  uint32 encode_rgb (int r, int g, int b);
 
   /**
    * Create the inverse colormap. The forward colormap

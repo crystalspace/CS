@@ -62,10 +62,10 @@ public:
 
   virtual bool ParseMatrix (char *buffer, csMatrix3 &m);
   virtual bool ParseVector (char *buffer, csVector3 &v);
-  virtual bool ParseMixmode (char *buffer, UInt &mixmode);
+  virtual bool ParseMixmode (char *buffer, uint &mixmode);
   virtual bool ParseShading (char *buf, int &shading);
   virtual bool ParseTexture (
-  	char *buf, const csVector3* vref, UInt &texspec, 
+  	char *buf, const csVector3* vref, uint &texspec, 
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
 	csMatrix3 &tx_m, csVector3 &tx_v,
 	csVector2 &uv_shift,
@@ -101,7 +101,7 @@ public:
   	const char *vname, bool b, int indent, bool newline=true);
 
   virtual const char* MixmodeToText (
-  	UInt mixmode, int indent, bool newline = true);
+  	uint mixmode, int indent, bool newline = true);
 
  private:
   /// make it plugable

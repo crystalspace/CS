@@ -378,7 +378,7 @@ iBase* csBallLoader::Parse (const char* string, iMaterialList* matlist,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-	UInt mm;
+	uint mm;
 	if (!synldr->ParseMixmode (params, mm))
 	{
 	  ReportError (reporter, "crystalspace.ballloader.parse.mixmode",

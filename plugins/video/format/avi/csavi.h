@@ -60,10 +60,10 @@ class csAVIFormat : public iStreamFormat
 
     struct indexentry
     {
-      ULong id;
-      ULong flags;
-      ULong offset;
-      ULong length;
+      uint32 id;
+      uint32 flags;
+      uint32 offset;
+      uint32 length;
       void Endian ()
       {
 		id = little_endian_long (id);
@@ -76,9 +76,9 @@ class csAVIFormat : public iStreamFormat
     class StreamIdx : public csVector
     {
     public:
-      ULong id;
+      uint32 id;
     public:
-      StreamIdx (ULong id) : csVector (8,8) {this->id = id;}
+      StreamIdx (uint32 id) : csVector (8,8) {this->id = id;}
       virtual ~StreamIdx (){}
       virtual indexentry *Get (int idx)const {return (indexentry*)csVector::Get(idx); }
     };
@@ -96,7 +96,7 @@ class csAVIFormat : public iStreamFormat
       virtual int CompareKey (csSome Item1, csConstSome Item2, int) const
       { 
 	StreamIdx *i1 = (StreamIdx*)Item1;
-	ULong id = (ULong)Item2;
+	uint32 id = (uint32)Item2;
         return (i1->id < id ? -1 : i1->id > id ? 1 : 0);
       }
       virtual StreamIdx *Get (int idx)const {return (StreamIdx*)csVector::Get(idx); }
@@ -107,9 +107,9 @@ class csAVIFormat : public iStreamFormat
     char *start;
   public:
     ChunkList (char *start) {this->start = start;}
-    void LoadList (UByte *data, ULong length);
-    bool HasChunk (ULong id, ULong idx);
-    bool GetPos (ULong id, ULong idx, char *&pos, ULong &size);
+    void LoadList (uint8 *data, uint32 length);
+    bool HasChunk (uint32 id, uint32 idx);
+    bool GetPos (uint32 id, uint32 idx, char *&pos, uint32 &size);
   };
 
   friend class streamiterator;
@@ -119,10 +119,10 @@ class csAVIFormat : public iStreamFormat
   struct AVIDataChunk
   {
     char id[5];
-    SLong currentframe;
+    int32 currentframe;
     char *currentframepos;
     void *data;
-    ULong length; // in byte
+    uint32 length; // in byte
   };
 
   // this is used to read in the id and length of an AVI fileheader, 
@@ -130,7 +130,7 @@ class csAVIFormat : public iStreamFormat
   struct hcl
   {
     char id[4];
-    ULong size;
+    uint32 size;
     void Endian (){ size = little_endian_long (size); }
     bool Is (const char *theID, const char* theType, const char* p)
       {return !strncmp (id, theID, 4) && !strncmp (p, theType, 4);}
@@ -168,17 +168,17 @@ class csAVIFormat : public iStreamFormat
       WASCAPTUREFILE = 0x00010000,
       COPYRIGHTED    = 0x00020000
     };
-    ULong msecperframe; // milliseconds per frame
-    ULong maxbytespersec; // max. transfer rate in bytes/sec
-    ULong padsize;
-    ULong flags;
-    ULong framecount;
-    ULong initialframecount;
-    ULong streamcount;
-    ULong suggestedbuffersize;
-    ULong width;
-    ULong height;
-    ULong reserved[4];
+    uint32 msecperframe; // milliseconds per frame
+    uint32 maxbytespersec; // max. transfer rate in bytes/sec
+    uint32 padsize;
+    uint32 flags;
+    uint32 framecount;
+    uint32 initialframecount;
+    uint32 streamcount;
+    uint32 suggestedbuffersize;
+    uint32 width;
+    uint32 height;
+    uint32 reserved[4];
     void Endian ()
     { 
       msecperframe = little_endian_long (msecperframe); 
@@ -197,18 +197,18 @@ class csAVIFormat : public iStreamFormat
   {
     char type[4];
     char handler[4];
-    ULong flags;
-    UShort priority;
-    UShort language;
-    ULong initialframecount;
-    ULong scale;
-    ULong rate;
-    ULong start;
-    ULong length;
-    ULong suggestedbuffersize;
-    ULong quality;
-    ULong samplesize;
-    SLong left, top, right, bottom;
+    uint32 flags;
+    uint16 priority;
+    uint16 language;
+    uint32 initialframecount;
+    uint32 scale;
+    uint32 rate;
+    uint32 start;
+    uint32 length;
+    uint32 suggestedbuffersize;
+    uint32 quality;
+    uint32 samplesize;
+    int32 left, top, right, bottom;
     void Endian ()
     {
       flags = little_endian_long (flags);
@@ -231,17 +231,17 @@ class csAVIFormat : public iStreamFormat
 
   struct VideoStreamFormat
   {
-    ULong size;
-    ULong width;
-    ULong height;
-    UShort planes;
-    UShort bitcount;
-    ULong compression;
-    ULong sizeimage;
-    ULong xpelspermeter;
-    ULong ypelspermeter;
-    ULong colorsused;
-    ULong colorsimportant;
+    uint32 size;
+    uint32 width;
+    uint32 height;
+    uint16 planes;
+    uint16 bitcount;
+    uint32 compression;
+    uint32 sizeimage;
+    uint32 xpelspermeter;
+    uint32 ypelspermeter;
+    uint32 colorsused;
+    uint32 colorsimportant;
     void Endian ()
     {
       size = little_endian_long (size);
@@ -260,13 +260,13 @@ class csAVIFormat : public iStreamFormat
 
   struct AudioStreamFormat
   {
-    UShort formattag;
-    UShort channels;
-    ULong samplespersecond;
-    ULong avgbytespersecond;
-    UShort blockalign;
-    UShort bitspersample;
-    UShort extra;
+    uint16 formattag;
+    uint16 channels;
+    uint32 samplespersecond;
+    uint32 avgbytespersecond;
+    uint16 blockalign;
+    uint16 bitspersample;
+    uint16 extra;
     void Endian ()
     {
       formattag = little_endian_short (formattag);
@@ -285,8 +285,8 @@ class csAVIFormat : public iStreamFormat
   iFile *pFile;
 
   char *pData, *p;
-  UShort nAudio, nVideo; // streamcounter
-  ULong maxframe; // max. frame visited to date
+  uint16 nAudio, nVideo; // streamcounter
+  uint32 maxframe; // max. frame visited to date
   char *maxframepos;
   char *pmovi; // right before movi LIST
   char *moviendpos; // right behind last LIST within movi LIST
@@ -309,10 +309,10 @@ class csAVIFormat : public iStreamFormat
 
   bool InitVideoData ();
   bool ValidateStreams ();
-  ULong CreateStream (StreamHeader *streamheader);
-  bool HasChunk (ULong id, ULong frameindex);
-  bool GetChunk (ULong frameindex, AVIDataChunk *pChunk);
-  UShort stream_number (const char c1, const char c2);
+  uint32 CreateStream (StreamHeader *streamheader);
+  bool HasChunk (uint32 id, uint32 frameindex);
+  bool GetChunk (uint32 frameindex, AVIDataChunk *pChunk);
+  uint16 stream_number (const char c1, const char c2);
 
  public:
   SCF_DECLARE_IBASE;

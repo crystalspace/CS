@@ -23,11 +23,11 @@
    for clipiing against a square rectangle (box).
 */
 
-  UByte ClipCount = 0;
+  uint8 ClipCount = 0;
 
 #ifdef BOXCLIP_HAVEBOX
   // Decide against which edges we have to clip
-  UByte ClipEdges = 0;
+  uint8 ClipEdges = 0;
   // Do we need to clip against left x line?
   if (BoundingBox.MinX () < region.MinX ())
     ClipEdges |= 1, ClipCount++;

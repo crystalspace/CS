@@ -59,7 +59,7 @@ const csVector& csGIFImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csGIFImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+iImage *csGIFImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageGifFile* i = new ImageGifFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -105,19 +105,19 @@ iDataBuffer *csGIFImageIO::Save (iImage *, const char *)
 class GIFStream
 {
 private:
-  UByte *buf, *ptr, *bmark;
+  uint8 *buf, *ptr, *bmark;
   long size, remaining;
-  UByte bitoffs;
+  uint8 bitoffs;
   bool EOFcode;
 
 public:
-  GIFStream(UByte* b, long fsize, int offs=0) :
+  GIFStream(uint8* b, long fsize, int offs=0) :
    buf(b), ptr(b+offs), bmark(NULL), size(fsize), remaining(fsize-offs), 
    bitoffs(0), EOFcode( fsize <= offs ) {}
   
-  UByte operator* () const
+  uint8 operator* () const
   { if (EOFcode) return 0;  else return *ptr; }
-  UByte operator[] (int i) const
+  uint8 operator[] (int i) const
   { if (i >= remaining) return 0;  else return ptr[i]; }
   GIFStream& operator++ () 
   { ptr++;  remaining--;  EOFcode = remaining<=0;  return *this; }
@@ -127,9 +127,9 @@ public:
   { ptr += i;  remaining -= i;  EOFcode = remaining<=0;  return *this; }
   bool isEOF() const { return EOFcode; }
 
-  UByte nextbyte() { return *(*this)++; }
+  uint8 nextbyte() { return *(*this)++; }
   int nextword() { int r = nextbyte();  return ( nextbyte() << 8 ) + r; }
-  int nextcode(UByte codesize);
+  int nextcode(uint8 codesize);
 private:
   int getunblock();
 };
@@ -151,7 +151,7 @@ int GIFStream::getunblock()
   return r;
 }
 
-int GIFStream::nextcode(UByte codesize)
+int GIFStream::nextcode(uint8 codesize)
 {
   int code = getunblock();
   code = (code >> bitoffs) & ( (1<<codesize) - 1 );
@@ -166,7 +166,7 @@ int GIFStream::nextcode(UByte codesize)
 class GIFOutput
 {
 private:
-  UByte *img;
+  uint8 *img;
   int w, h, x, y;
   bool interlaced;
   int pass;  
@@ -176,10 +176,10 @@ public:
   GIFOutput (int width, int height, bool ilace = false) : w (width), h (height),
     x (0), y (0), interlaced (ilace), pass (0)
   {
-    img = new UByte [width * height];
+    img = new uint8 [width * height];
   }
 
-  UByte& operator* () const 
+  uint8& operator* () const 
   { return *(img + y * w + x); }
 
   GIFOutput& operator++ ()
@@ -204,7 +204,7 @@ public:
     return *this;
   }
 
-  UByte *get_image () { return img; }
+  uint8 *get_image () { return img; }
 };
 
 //---------------------------------------------------------------------------
@@ -243,14 +243,14 @@ public:
 
 //---------------------------------------------------------------------------
 
-int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
+int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
   int* Suffix, int* OutCode)
 {
   GIFStream gptr (iBuffer,iSize);
   GIFPalette palette;
-  UByte ch;
+  uint8 ch;
   int is_transparent = 0;
-  UByte transp_index = 0;
+  uint8 transp_index = 0;
 
   if (strncmp( (char*)iBuffer, "GIF87a", 6) && strncmp( (char*)iBuffer, "GIF89a", 6)) 
     return GIF_BadFormat;
@@ -271,7 +271,7 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
   if (has_cmap) palette.Load (gptr, cmap_size);
 
   // look for image separator
-  for (UByte i = gptr.nextbyte() ; i != IMAGESEP ; i = gptr.nextbyte())
+  for (uint8 i = gptr.nextbyte() ; i != IMAGESEP ; i = gptr.nextbyte())
   {
     if (i != START_EXTENSION)
       return GIF_BadFormat;
@@ -435,7 +435,7 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
   return 0;
 }
 
-bool ImageGifFile::Load (UByte* iBuffer, ULong iSize)
+bool ImageGifFile::Load (uint8* iBuffer, uint32 iSize)
 {
   int* Prefix  = new int [4096]; // Hash table used by decompressor.
   int* Suffix  = new int [4096]; // Hash table used by decompressor.

@@ -162,7 +162,7 @@ static int blueloop (int);
  */
 
 void csInverseColormap (int colors, csRGBpixel *colormap,
-  int rbits, int gbits, int bbits, UByte *&rgbmap, ULong *dist_buf)
+  int rbits, int gbits, int bbits, uint8 *&rgbmap, uint32 *dist_buf)
 {
   int rnbits = 8 - rbits;
   int gnbits = 8 - gbits;
@@ -186,13 +186,13 @@ void csInverseColormap (int colors, csRGBpixel *colormap,
   if (!dist_buf)
   {
     free_dist_buf = true;
-    dist_buf = new ULong [rcolormax * gcolormax * bcolormax];
+    dist_buf = new uint32 [rcolormax * gcolormax * bcolormax];
   }
   maxfill (dist_buf, rcolormax, gcolormax, bcolormax);
 
   // Allocate inverse colormap if not already done
   if (!rgbmap)
-    rgbmap = new UByte [rcolormax * gcolormax * bcolormax];
+    rgbmap = new uint8 [rcolormax * gcolormax * bcolormax];
 
   for (cindex = 0; cindex < colors; cindex++)
   {

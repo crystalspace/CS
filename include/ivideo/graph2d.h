@@ -43,7 +43,7 @@ struct csPixelFormat
    * only).  Currently only masks for 16-bit/15-bit colors are supported.
    * Ignore the Mask and Shift fields of this structure if PalEntries != 0.
    */
-  ULong RedMask, GreenMask, BlueMask;
+  uint32 RedMask, GreenMask, BlueMask;
   /**
    * The shifts to extract the color information from a pixel (truecolor mode
    * only).
@@ -205,7 +205,7 @@ struct iGraphics2D : public iBase
   virtual unsigned char *GetPixelAt (int x, int y) = 0;
 
   /// Query pixel R,G,B at given screen location
-  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB) = 0;
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB) = 0;
 
   /**
    * Save a subarea of screen and return a handle to saved buffer.

@@ -129,7 +129,7 @@ csFlareHalo::~csFlareHalo()
   }
 }
 
-void csFlareHalo::AddComponent(float pos, float w, float h, UInt mode, 
+void csFlareHalo::AddComponent(float pos, float w, float h, uint mode, 
   iMaterialWrapper *image)
 {
   csFlareComponent *comp = new csFlareComponent;
@@ -467,12 +467,12 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   csVector2 clipped_poly2d[MAX_OUTPUT_VERTICES];
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
 
-  UByte clip_result = engine.top_clipper->Clip (HaloPoly, 4, clipped_poly2d, 
+  uint8 clip_result = engine.top_clipper->Clip (HaloPoly, 4, clipped_poly2d, 
     num_clipped_verts, clipped_vtstats);
   if (clip_result == CS_CLIP_OUTSIDE) return; // nothing to do
 
   // draw the halo
-  UInt mode = comp->mixmode;
+  uint mode = comp->mixmode;
   if(flare->GetIntensity() < 1.0)
     return; // many drivers do not support combinations of weird modes
     //mode |= CS_FX_SETALPHA(1.0 - flare->GetIntensity());

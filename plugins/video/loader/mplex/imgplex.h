@@ -47,7 +47,7 @@ class csMultiplexImageIO : public iImageIO
 
   virtual bool Initialize (iObjectRegistry*);
   virtual const csVector& GetDescription ();
-  virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
+  virtual iImage *Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);

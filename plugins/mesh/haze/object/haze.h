@@ -202,7 +202,7 @@ private:
   csHazeMeshObjectFactory* factory;
 
   iMaterialWrapper* material;
-  UInt MixMode;
+  uint MixMode;
   bool initialized;
   iMeshObjectDrawCallback* vis_cb;
   csVector3 radius;
@@ -341,8 +341,8 @@ public:
       scfParent->material = material;
     }
     virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
-    virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () const { return scfParent->MixMode; }
+    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
+    virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
     virtual const csVector3& GetOrigin() const {return scfParent->origin;}
     virtual void SetDirectional(const csVector3& pos) 
@@ -376,7 +376,7 @@ class csHazeMeshObjectFactory : public iMeshObjectFactory
 {
 private:
   iMaterialWrapper* material;
-  UInt MixMode;
+  uint MixMode;
   /// haze state info
   csVector3 origin, directional;
   /// vector of csHazeLayer
@@ -393,7 +393,7 @@ public:
   /// Get the material for this 2D sprite.
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
-  UInt GetMixMode () const { return MixMode; }
+  uint GetMixMode () const { return MixMode; }
   /// Get the layers vector
   csHazeLayerVector* GetLayers() {return &layers;}
   /// get the origin
@@ -419,8 +419,8 @@ public:
       scfParent->material = material;
     }
     virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
-    virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () const { return scfParent->MixMode; }
+    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
+    virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
     virtual const csVector3& GetOrigin() const {return scfParent->origin;}
     virtual void SetDirectional(const csVector3& pos) 

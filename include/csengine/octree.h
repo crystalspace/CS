@@ -62,7 +62,7 @@ private:
    * Six masks representing solid space on the boundaries
    * of this node. Use the BOX_SIDE_xxx flags to fetch them.
    */
-  UShort solid_masks[6];
+  uint16 solid_masks[6];
 
   /**
    * If true then this is a leaf.
@@ -142,7 +142,7 @@ public:
    * Get one of the masks representing solid space on the boundaries
    * of this node. Use the BOX_SIDE_xxx flags to fetch them.
    */
-  UShort GetSolidMask (int idx) { return solid_masks[idx]; }
+  uint16 GetSolidMask (int idx) { return solid_masks[idx]; }
 
   /**
    * Get the list of all unsplit polygons in this node.

@@ -72,7 +72,7 @@ class csTextureInfinite : public csTexture
 {
 public:
   /// The bitmap
-  UByte *bitmap;
+  uint8 *bitmap;
   /// The image (temporary storage)
   iImage *image;
 
@@ -114,7 +114,7 @@ public:
   void SetPixelFormat (csPixelFormat &PixelFormat) { pfmt = PixelFormat; }
 
   /// Encode RGB values to a 16-bit word (for 16-bit mode).
-  ULong encode_rgb (int r, int g, int b);
+  uint32 encode_rgb (int r, int g, int b);
 
   /**
    * Return the index for some color. This works in 8-bit

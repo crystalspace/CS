@@ -388,7 +388,7 @@ void csCurve::CalculateLightingStatic (csFrustumView* lview, bool vis)
   bool dyn = light->IsDynamic ();
 
   csShadowMap* smap;
-  UByte *ShadowMap = 0;
+  uint8 *ShadowMap = 0;
   csRGBpixel *Lightmap = 0;
 
   /* initialize color to something to avoid compiler warnings */

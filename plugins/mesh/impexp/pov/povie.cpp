@@ -43,7 +43,7 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( UByte* Buffer, ULong size );
+  virtual iModelData *Load( uint8* Buffer, uint32 size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
   struct Component : public iComponent
@@ -122,7 +122,7 @@ static void WriteVertex (csString &out, iModelDataVertices *Vertices,
   out << s;
 }
 
-iModelData *csModelConverterPOV::Load (UByte * /*Buffer*/, ULong /*Size*/)
+iModelData *csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 {
   return NULL;
 }

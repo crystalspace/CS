@@ -182,7 +182,7 @@ bool csLoader::ParseColor (char *buf, csRGBcolor &c)
   return true;
 }
 
-UInt csLoader::ParseMixmode (char* buf)
+uint csLoader::ParseMixmode (char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -199,7 +199,7 @@ UInt csLoader::ParseMixmode (char* buf)
   long cmd;
   char* params;
 
-  UInt Mixmode = 0;
+  uint Mixmode = 0;
 
   while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
   {

@@ -76,7 +76,7 @@
 #define SCANLOOP \
   do									\
   {									\
-    UByte texel = srcTex [((uu >> 16) & ander_w) +			\
+    uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
       ((vv >> shifter_h) & ander_h)];					\
     DO_BLEND(texel);							\
     _dest++;								\
@@ -96,7 +96,7 @@
 #define SCANLOOP \
   do									\
   {									\
-    UByte texel = srcTex [((uu >> 16) & ander_w) +			\
+    uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
       ((vv >> shifter_h) & ander_h)];					\
     DO_BLEND(texel);							\
     _dest++;								\
@@ -126,7 +126,7 @@
     if (izz >= *z_buffer)						\
     {									\
       *z_buffer = izz;							\
-      UByte texel = srcTex [((uu >> 16) & ander_w) +			\
+      uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
         ((vv >> shifter_h) & ander_h)];					\
       DO_BLEND(texel);							\
     }									\
@@ -151,7 +151,7 @@
   {									\
     if (izz >= *z_buffer)						\
     {									\
-      UByte texel = srcTex [((uu >> 16) & ander_w) +			\
+      uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
         ((vv >> shifter_h) & ander_h)];					\
       DO_BLEND(texel);							\
     }									\
@@ -176,7 +176,7 @@
   do									\
   {									\
     PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-    UByte texel = SCR_COLORMAP (pix);					\
+    uint8 texel = SCR_COLORMAP (pix);					\
     DO_BLEND(texel);							\
     _dest++;								\
     uu += duu;								\
@@ -197,7 +197,7 @@
   do									\
   {									\
     PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-    UByte texel = SCR_COLORMAP (pix);					\
+    uint8 texel = SCR_COLORMAP (pix);					\
     DO_BLEND(texel);							\
     _dest++;								\
     uu += duu;								\
@@ -228,7 +228,7 @@
     {									\
       *z_buffer = izz;							\
       PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-      UByte texel = SCR_COLORMAP (pix);					\
+      uint8 texel = SCR_COLORMAP (pix);					\
       DO_BLEND(texel);							\
     }									\
     _dest++;								\
@@ -254,7 +254,7 @@
     if (izz >= *z_buffer)						\
     {									\
       PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-      UByte texel = SCR_COLORMAP (pix);					\
+      uint8 texel = SCR_COLORMAP (pix);					\
       DO_BLEND(texel);							\
     }									\
     _dest++;								\

@@ -105,7 +105,7 @@ struct iImage : public iBase
    * If image has no alpha map, or the image is in RGBA format,
    * this function will return NULL.
    */
-  virtual UByte *GetAlpha () = 0;
+  virtual uint8 *GetAlpha () = 0;
   /**
    * Convert the image to another format.
    * This method will allocate a respective color component if

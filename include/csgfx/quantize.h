@@ -47,7 +47,7 @@
  * </dl>
  */
 extern void csQuantizeRGB (csRGBpixel *image, int pixels, int pixperline,
-  UByte *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither);
+  uint8 *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither);
 
 /**
  * The following routines can be used to split the quantization process
@@ -120,9 +120,9 @@ extern void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors,
   csRGBpixel *transp = NULL);
 /// Remap a image to the palette computed by csQuantizePalette()
 extern void csQuantizeRemap (csRGBpixel *image, int pixels,
-  UByte *&outimage, csRGBpixel *transp = NULL);
+  uint8 *&outimage, csRGBpixel *transp = NULL);
 /// Same but apply Floyd-Steinberg dithering for nicer (but slower) results
 extern void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
-  csRGBpixel *palette, int colors, UByte *&outimage, csRGBpixel *transp = NULL);
+  csRGBpixel *palette, int colors, uint8 *&outimage, csRGBpixel *transp = NULL);
 
 #endif // __CS_QUANTIZE_H__

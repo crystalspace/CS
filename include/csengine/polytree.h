@@ -138,7 +138,7 @@ protected:
   void WriteVector3 (iFile* cf, const csVector3& v);
   void WritePlane3 (iFile* cf, const csPlane3& v);
   void WriteLong (iFile* cf, long l);
-  void WriteUShort (iFile* cf, UShort l);
+  void WriteUShort (iFile* cf, uint16 l);
   void WriteByte (iFile* cf, unsigned char b);
   void WriteBool (iFile* cf, bool b);
 
@@ -148,7 +148,7 @@ protected:
   void ReadVector3 (iFile* cf, csVector3& v);
   void ReadPlane3 (iFile* cf, csPlane3& v);
   long ReadLong (iFile* cf);
-  UShort ReadUShort (iFile* cf);
+  uint16 ReadUShort (iFile* cf);
   unsigned char ReadByte (iFile* cf);
   bool ReadBool (iFile* cf);
 

@@ -41,7 +41,7 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( UByte* Buffer, ULong size );
+  virtual iModelData *Load( uint8* Buffer, uint32 size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
   struct Component : public iComponent
@@ -102,7 +102,7 @@ const csModelConverterFormat *csModelConverterSPR::GetFormat (int idx) const
   return (idx == 0) ? &FormatInfo : NULL;
 }
 
-iModelData *csModelConverterSPR::Load (UByte * /*Buffer*/, ULong /*Size*/)
+iModelData *csModelConverterSPR::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 {
   return NULL;
 }

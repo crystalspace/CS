@@ -223,7 +223,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iMaterialList* matlist,
 	break;
       case CS_TOKEN_MIXMODE:
 	{
-	  UInt mixmode;
+	  uint mixmode;
 	  if (!synldr->ParseMixmode (params, mixmode))
 	  {
 	    cubeLook->DecRef ();

@@ -286,9 +286,9 @@ private:
   float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
 
   ///
-  UShort shf_u;
+  uint16 shf_u;
   ///
-  UShort and_u;
+  uint16 and_u;
 
   /*
    * New texture data with lighting added. This is an untiled texture

@@ -267,9 +267,9 @@ void Class::IncRef ()							\
 #define SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)			\
 void Class::DecRef ()							\
 {									\
+  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this,                \
+	      scfParent->GetRefCount ()-1));				\
   scfParent->DecRef ();							\
-  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, 		\
-    scfParent->GetRefCount ()));						\
 }
 
 /**

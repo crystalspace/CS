@@ -176,7 +176,7 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
   dest->ds = ds;
 }
 
-iImage *csJPGImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+iImage *csJPGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageJpgFile* i = new ImageJpgFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -363,7 +363,7 @@ static void jpeg_memory_src (j_decompress_ptr cinfo, char *inbfr, int len)
 
 /* ==== Constructor ==== */
 
-bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
+bool ImageJpgFile::Load (uint8* iBuffer, uint32 iSize)
 {
   struct jpeg_decompress_struct cinfo;
   struct my_error_mgr jerr;
@@ -435,7 +435,7 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
 
   int pixelcount = Width * Height;
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
-    Image = new UByte [pixelcount];
+    Image = new uint8 [pixelcount];
   else
     Image = new csRGBpixel [pixelcount];
 
@@ -466,7 +466,7 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
 	// Safety.
 	if (bufp + row_stride > pixelcount) break;
         /* paletted image */
-        memcpy (((UByte *)Image) + bufp, buffer [0], row_stride);
+        memcpy (((uint8 *)Image) + bufp, buffer [0], row_stride);
       }
       else
       {

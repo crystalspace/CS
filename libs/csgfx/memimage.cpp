@@ -53,8 +53,8 @@ csImageMemory::~csImageMemory ()
 
 void csImageMemory::Clear (const csRGBpixel &colour)
 {
-  ULong *src = (ULong*) &colour;
-  ULong *dst = (ULong*)Image;
+  uint32 *src = (uint32*) &colour;
+  uint32 *dst = (uint32*)Image;
 
   int i;
   for (i = 0; i < Width*Height; i++, dst++)

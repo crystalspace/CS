@@ -189,7 +189,7 @@ struct csScanSetup
   unsigned char *BlendTable;
 
   /// The inverse colormap (extracted from texture manager)
-  UByte *inv_cmap;
+  uint8 *inv_cmap;
 
   /// This is the global palette -> uint16 conversion table (for 8-bit modes)
   uint16 *GlobalCMap;

@@ -104,7 +104,7 @@ const csVector& csPNGImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csPNGImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+iImage *csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImagePngFile* i = new ImagePngFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -228,7 +228,7 @@ error2:
    * use the first method if you aren't handling interlacing yourself.
    */
   png_bytep *row_pointers = new png_bytep [height];
-  UByte *ImageData = (UByte *)Image->GetImageData ();
+  uint8 *ImageData = (uint8 *)Image->GetImageData ();
   int i;
   for (i = 0; i < height; i++)
     row_pointers [i] = ImageData + i * rowlen;
@@ -265,7 +265,7 @@ iDataBuffer *csPNGImageIO::Save (iImage *Image, const char *mime)
 struct ImagePngRawData
 {
   // The buffer to "read" from
-  UByte *r_data;
+  uint8 *r_data;
   // The buffer size
   size_t r_size;
 };
@@ -284,7 +284,7 @@ void ImagePngRead (png_structp png, png_bytep data, png_size_t size)
   } /* endif */
 }
 
-bool ImagePngFile::Load (UByte *iBuffer, ULong iSize)
+bool ImagePngFile::Load (uint8 *iBuffer, uint32 iSize)
 {
   size_t rowbytes, exp_rowbytes;
   png_infop info;
@@ -399,9 +399,9 @@ nomem2:
   if (ImageType == imgRGB)
     NewImage = new csRGBpixel [Width * Height];
   else if (ImageType == imgPALALPHA)
-    NewImage = new UByte [Width * Height * 2];
+    NewImage = new uint8 [Width * Height * 2];
   else
-    NewImage = new UByte [Width * Height];
+    NewImage = new uint8 [Width * Height];
   if (!NewImage)
     goto nomem2;
 
@@ -432,7 +432,7 @@ nomem2:
         palette [i].red = palette [i].green = palette [i].blue =
           (i * 255) / entries;
     }
-    convert_pal8 ((UByte *)NewImage, palette, colors);
+    convert_pal8 ((uint8 *)NewImage, palette, colors);
   }
   else // grayscale + alpha
   {
@@ -444,15 +444,15 @@ nomem2:
         (i * 255) / entries;
 
     int pixels = Width * Height;
-    UByte *image = new UByte [pixels];
-    Alpha = new UByte [pixels];
-    UByte *src = (UByte *)NewImage;
+    uint8 *image = new uint8 [pixels];
+    Alpha = new uint8 [pixels];
+    uint8 *src = (uint8 *)NewImage;
     for (i = 0; i < pixels; i++)
     {
       image [i] = *src++;
       Alpha [i] = *src++;
     }
-    delete [] (UByte *)NewImage;
+    delete [] (uint8 *)NewImage;
     convert_pal8 (image, palette);
   }
 

@@ -38,13 +38,13 @@ struct iTextureHandle : public iBase
   virtual void SetKeyColor (bool Enable) = 0;
 
   /// Set the key color.
-  virtual void SetKeyColor (UByte red, UByte green, UByte blue) = 0;
+  virtual void SetKeyColor (uint8 red, uint8 green, uint8 blue) = 0;
 
   /// Get the key color status (false if disabled, true if enabled).
   virtual bool GetKeyColor () = 0;
 
   /// Get the key color
-  virtual void GetKeyColor (UByte &red, UByte &green, UByte &blue) = 0;
+  virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) = 0;
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
@@ -68,7 +68,7 @@ struct iTextureHandle : public iBase
   virtual void GetOriginalDimensions (int& mw, int& mh) = 0;
 
   /// Get the mean color.
-  virtual void GetMeanColor (UByte &red, UByte &green, UByte &blue) = 0;
+  virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) = 0;
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData () = 0;

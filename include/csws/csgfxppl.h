@@ -149,14 +149,14 @@ private:
   void RestoreClipRect();
 
   /// Draw a 3D polygon using DrawPolygonFX
-  void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
+  void Polygon3D (G3DPolygonDPFX &poly, uint mode);
 
   /// Clip a line against a rectangle and return true if its clipped out
   bool ClipLine (float &x1, float &y1, float &x2, float &y2,
     int ClipX1, int ClipY1, int ClipX2, int ClipY2);
 
   /// Get R,G,B at given screen location
-  void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
+  void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
   /// Change system mouse cursor and return success status
   bool SwitchMouseCursor (csMouseCursorID Shape);

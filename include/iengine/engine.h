@@ -483,7 +483,7 @@ struct iEngine : public iBase
    * array.
    */
   virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
-  	ULong flags, iLight** lights, int max_num_lights) = 0;
+  	uint32 flags, iLight** lights, int max_num_lights) = 0;
 
   /**
    * This routine returns an iterator to iterate over

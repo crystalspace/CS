@@ -29,13 +29,13 @@ class csAVIStreamAudio : public iAudioStream
   csAVIFormat *pAVI;
   bool bTimeSynced;
   csAVIFormat::AVIDataChunk *pChunk;
-  UShort nStream;
+  uint16 nStream;
   csAudioStreamDescription strdesc;
 
   iObjectRegistry *object_reg;
   iAVICodec *pCodec;
 
-  bool LoadCodec (UByte *pInitData, ULong nInitDataLen, UByte *pFormatEx, ULong nFormatEx);
+  bool LoadCodec (uint8 *pInitData, uint32 nInitDataLen, uint8 *pFormatEx, uint32 nFormatEx);
 
  public:
   SCF_DECLARE_IBASE;
@@ -44,17 +44,17 @@ class csAVIStreamAudio : public iAudioStream
   bool Initialize (const csAVIFormat::AVIHeader *ph, 
 		   const csAVIFormat::StreamHeader *psh, 
 		   const csAVIFormat::AudioStreamFormat *pf, 
-		   UShort nStreamNumber,
-		   UByte *pInitData, ULong nInitDataLen,
+		   uint16 nStreamNumber,
+		   uint8 *pInitData, uint32 nInitDataLen,
 		   char *pName,
-		   UByte *pFormatEx, ULong nFormatEx, 
+		   uint8 *pFormatEx, uint32 nFormatEx, 
 		   iObjectRegistry *object_reg);
   virtual ~csAVIStreamAudio ();
 
   // iStream
   virtual void GetStreamDescription (csStreamDescription &desc);
-  virtual bool GotoFrame (ULong frameindex);
-  virtual bool GotoTime (ULong timeindex);
+  virtual bool GotoFrame (uint32 frameindex);
+  virtual bool GotoTime (uint32 timeindex);
   virtual bool SetPlayMethod (bool bTimeSynced);
   virtual void NextFrame ();
   // iAudioStream

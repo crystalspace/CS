@@ -58,16 +58,16 @@ void csfxInterference(iGraphics2D *g2d, iTextureManager *txtmgr,
 
 void csfxFadeToColor(iGraphics3D *g3d, float fadevalue, const csColor& color)
 {
-  UByte red = int(255*color.red);
-  UByte green = int(255*color.green);
-  UByte blue = int(255*color.blue);
+  uint8 red = int(255*color.red);
+  uint8 green = int(255*color.green);
+  uint8 blue = int(255*color.blue);
   float fade = 1.0 - fadevalue;
   csfxScreenDPFX(g3d, NULL, CS_FX_SETALPHA(fade), red, green, blue);
 }
 
 void csfxFadeOut(iGraphics3D *g3d, float fadevalue)
 {
-  UByte multval = 255 - int(255.*fadevalue);
+  uint8 multval = 255 - int(255.*fadevalue);
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, multval, multval);
 }
 
@@ -79,31 +79,31 @@ void csfxFadeTo(iGraphics3D *g3d, iMaterialHandle *mat, float fadevalue)
 
 void csfxGreenScreen(iGraphics3D *g3d, float fadevalue)
 {
-  UByte multval = 255 - int(255.*fadevalue);
+  uint8 multval = 255 - int(255.*fadevalue);
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, 255, multval);
 }
 
 void csfxRedScreen(iGraphics3D *g3d, float fadevalue)
 {
-  UByte multval = 255 - int(255.*fadevalue);
+  uint8 multval = 255 - int(255.*fadevalue);
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, 255, multval, multval);
 }
 
 void csfxBlueScreen(iGraphics3D *g3d, float fadevalue)
 {
-  UByte multval = 255 - int(255.*fadevalue);
+  uint8 multval = 255 - int(255.*fadevalue);
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, multval, 255);
 }
 
 
 void csfxWhiteOut(iGraphics3D *g3d, float fadevalue)
 {
-  UByte multval = int(255.*fadevalue);
+  uint8 multval = int(255.*fadevalue);
   csfxScreenDPFX(g3d, NULL, CS_FX_ADD, multval, multval, multval);
 }
 
 void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
-  const csColor& bottomcolor, UInt mixmode)
+  const csColor& bottomcolor, uint mixmode)
 {
   G3DPolygonDPFX dpfx;
   dpfx.num = 4;
@@ -153,8 +153,8 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
 }
 
 
-void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, UInt mixmode,
-  UByte r, UByte g, UByte b)
+void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
+  uint8 r, uint8 g, uint8 b)
 {
   G3DPolygonDPFX dpfx;
   dpfx.num = 4;

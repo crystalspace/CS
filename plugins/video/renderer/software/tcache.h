@@ -58,13 +58,13 @@ public:
    * The lighted texture data. The beginning of this array
    * holds the lightmap used to generate this lighted texture.
    */
-  UByte *data;
+  uint8 *data;
 
   /**
    * bitmap points to the real data inside 'data' (thus skipping the
    * H_MARGIN pixel border at the top of the texture map).
    */
-  UByte *bitmap;
+  uint8 *bitmap;
 
   /// The original polygon texture
   iPolygonTexture *source;
@@ -94,11 +94,11 @@ public:
   }
 
   /// Get the pointer to the bitmap
-  UByte *get_bitmap ()
+  uint8 *get_bitmap ()
   { return bitmap; }
 
   /// Get the pointer to lightmap
-  UByte *get_lightmap ()
+  uint8 *get_lightmap ()
   { return data; }
 };
 

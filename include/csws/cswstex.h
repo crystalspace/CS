@@ -40,7 +40,7 @@ class csWSTexture
   // Will be this texture used for 3D and/or for 2D operations?
   int Flags;
   // Red,Green and Blue components of key color
-  UByte tr, tg, tb;
+  uint8 tr, tg, tb;
   // texture has key color?
   bool HasKey;
   // Has transparent color changed?

@@ -308,7 +308,7 @@ static bool load_vector (char* buf, csVector3 &v)
   return true;
 }
 
-static UInt ParseMixmode (iReporter* reporter, char* buf)
+static uint ParseMixmode (iReporter* reporter, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -325,7 +325,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
   long cmd;
   char* params;
 
-  UInt Mixmode = 0;
+  uint Mixmode = 0;
 
   while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
   {
@@ -492,7 +492,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
 }
 
 iBase* csSprite3DFactoryLoader::Parse (const char* string,
-	iMaterialList* matlist, iMeshFactoryList* factlist,
+	iMaterialList* matlist, iMeshFactoryList* /*factlist*/,
 	iBase* context)
 {
   // @@@ Implement MIXMODE
@@ -772,7 +772,7 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, UInt mixmode)
+static void WriteMixmode(iStrVector *str, uint mixmode)
 {
   str->Push(csStrNew("  MIXMODE ("));
   if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
@@ -1022,8 +1022,8 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  UInt mm = ParseMixmode (reporter, params);
-	  if (mm == (UInt)~0)
+	  uint mm = ParseMixmode (reporter, params);
+	  if (mm == (uint)~0)
 	  {
 	    if (spr3dLook) spr3dLook->DecRef ();
 	    mesh->DecRef ();

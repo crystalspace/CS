@@ -61,7 +61,7 @@ struct iImageIO : public iBase
    * are optional: if the image does not contain alpha mask, the GetFormat()
    * method of the image will return a value without that bit set.
    */
-  virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat) = 0;
+  virtual iImage *Load (uint8* iBuffer, uint32 iSize, int iFormat) = 0;
 
   /**
    * Set global image dithering option.<p>

@@ -174,7 +174,7 @@ bool csSnowFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, UInt mixmode)
+static void WriteMixmode(iStrVector *str, uint mixmode)
 {
   str->Push(csStrNew("  MIXMODE ("));
   if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
@@ -218,7 +218,7 @@ bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static UInt ParseMixmode (char* buf)
+static uint ParseMixmode (char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -235,7 +235,7 @@ static UInt ParseMixmode (char* buf)
   long cmd;
   char* params;
 
-  UInt Mixmode = 0;
+  uint Mixmode = 0;
 
   while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
   {

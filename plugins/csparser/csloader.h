@@ -160,7 +160,7 @@ private:
   /// -----------------------------------------------------------------------
 
   /// parse a texture mixing mode specification
-  UInt ParseMixmode (char* buf);
+  uint ParseMixmode (char* buf);
 
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (char* buf);

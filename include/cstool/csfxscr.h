@@ -101,15 +101,15 @@ void csfxWhiteOut(iGraphics3D *g3d, float fadevalue);
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
 void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
-  const csColor& bottomcolor, UInt mixmode = CS_FX_COPY);
+  const csColor& bottomcolor, uint mixmode = CS_FX_COPY);
 
  
 /**
  * Do a fullscreen drawpolygonFX draw, used by some other routines.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
 */
-void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, UInt mixmode,
-  UByte r, UByte g, UByte b);
+void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
+  uint8 r, uint8 g, uint8 b);
 
 #endif // __CS_FXSCR_H__
 

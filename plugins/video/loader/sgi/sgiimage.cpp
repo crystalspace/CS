@@ -60,7 +60,7 @@ const csVector& csSGIImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csSGIImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+iImage *csSGIImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageSGIFile* i = new ImageSGIFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -91,48 +91,48 @@ iDataBuffer *csSGIImageIO::Save (iImage *, const char *)
 
 static struct SGIHeader
 {
-  UShort Magic;		// Magic id
-  UByte Packed;		// Using rle or straight format
-  UByte Bpc;		// Bytes per channel
-  UShort Dimension;	// 1=one scanline per channel
+  uint16 Magic;		// Magic id
+  uint8 Packed;		// Using rle or straight format
+  uint8 Bpc;		// Bytes per channel
+  uint16 Dimension;	// 1=one scanline per channel
 			// 2=many lines per channel
 			// 3=entire picture for each channel
-  UShort Width;		// Width
-  UShort Height;	// Height
-  UShort Channels;	// Depth (bytes per pixel)
-  ULong Pixmin;		// Seems unused
-  ULong Pixmax;		// Seems unused
-  ULong Dummy;		// Max value for R/G/B components?
-  UByte Imagename[80];	// if someone would bother to fill it...
-  ULong Colormap;	// who knows... maybe support for paletted images?
+  uint16 Width;		// Width
+  uint16 Height;	// Height
+  uint16 Channels;	// Depth (bytes per pixel)
+  uint32 Pixmin;		// Seems unused
+  uint32 Pixmax;		// Seems unused
+  uint32 Dummy;		// Max value for R/G/B components?
+  uint8 Imagename[80];	// if someone would bother to fill it...
+  uint32 Colormap;	// who knows... maybe support for paletted images?
 } header;
 
 //---------------------------------------------------------------------------
 
-bool ImageSGIFile::Load (UByte* iBuffer, ULong iSize)
+bool ImageSGIFile::Load (uint8* iBuffer, uint32 iSize)
 {
   (void)iSize;
 
-  UInt planes = readHeader (iBuffer);
+  uint planes = readHeader (iBuffer);
   if (planes !=3 && planes != 4)
     return false;
 
   set_dimensions (header.Width, header.Height);
   csRGBpixel *buffer = new csRGBpixel [Width * Height];
 
-  UByte *line = new UByte [Width];
+  uint8 *line = new uint8 [Width];
 
-  ULong *starttable = NULL;
-  ULong *lengthtable = NULL;
+  uint32 *starttable = NULL;
+  uint32 *lengthtable = NULL;
 
   // Indicates if it's rle encoded or not
   if (header.Packed)
   {
-    starttable = new ULong [Height * header.Channels];
-    lengthtable = new ULong [Height * header.Channels];
+    starttable = new uint32 [Height * header.Channels];
+    lengthtable = new uint32 [Height * header.Channels];
 
     loadSGITables (iBuffer + 512, starttable, Height * header.Channels);
-    loadSGITables (iBuffer + 512 + (sizeof (ULong) * Height * header.Channels),
+    loadSGITables (iBuffer + 512 + (sizeof (uint32) * Height * header.Channels),
       lengthtable, Height * header.Channels);
   }
   else
@@ -201,17 +201,17 @@ bool ImageSGIFile::Load (UByte* iBuffer, ULong iSize)
   return true;
 }
 
-static inline ULong getLong (UByte *p)
+static inline uint32 getLong (uint8 *p)
 {
   return ((*(p)<<24)|(*(p+1)<<16)|(*(p+2)<<8)|(*(p+3)));
 }
 
-static inline UShort getShort (UByte *p)
+static inline uint16 getShort (uint8 *p)
 {
   return (((*p)<<8)|(*(p+1)));
 }
 
-void ImageSGIFile::loadSGITables(UByte *in,ULong *out,int size)
+void ImageSGIFile::loadSGITables(uint8 *in,uint32 *out,int size)
 {
   int i;
   for (i = 0; i < size; i++)
@@ -221,10 +221,10 @@ void ImageSGIFile::loadSGITables(UByte *in,ULong *out,int size)
   }
 }
 
-int ImageSGIFile::decode_rle (UByte *src, ULong length, UByte *dst)
+int ImageSGIFile::decode_rle (uint8 *src, uint32 length, uint8 *dst)
 {
   int size = 0;
-  UByte count = 0;
+  uint8 count = 0;
 
   while (length-- && (count = *src++))
   {
@@ -251,9 +251,9 @@ int ImageSGIFile::decode_rle (UByte *src, ULong length, UByte *dst)
   return size;
 }
 
-UInt ImageSGIFile::readHeader (UByte *iBuffer)
+uint ImageSGIFile::readHeader (uint8 *iBuffer)
 {
-  UByte *tmpPtr = iBuffer;
+  uint8 *tmpPtr = iBuffer;
 
   // This could propably be done better
   header.Magic = getShort (tmpPtr); tmpPtr += 2;

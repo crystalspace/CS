@@ -160,9 +160,9 @@ struct _WAVchk
   unsigned long len; // length of chunk after this 8 bytes of header
 } wavchk;
 
-iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
+iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 {
-  UByte* buf = (UByte*) databuf;
+  uint8* buf = (uint8*) databuf;
   csSoundFormat format;
   char* data = NULL;
 

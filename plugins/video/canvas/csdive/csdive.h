@@ -26,8 +26,8 @@ struct iKeyboardDriver;
 
 // avoid including os2.h
 class diveWindow;
-typedef ULong HWND;
-typedef ULong ULONG;
+typedef uint32 HWND;
+typedef uint32 ULONG;
 
 /**
  * This is the SysGraphics2D class for OS/2. It implements drawing
@@ -45,9 +45,9 @@ typedef ULong ULONG;
 class csGraphics2DOS2DIVE : public csGraphics2D, public iEventPlug
 {
   /// Pixel format (one of FOURCC_XXX)
-  UInt PixelFormat;
+  uint PixelFormat;
   /// The width for which LineAddress has been computed last time
-  UInt LineAddressFrameW;
+  uint LineAddressFrameW;
   /// The DIVE window object
   diveWindow *dW;
   /// The handle of window where DIVE context is located

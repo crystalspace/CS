@@ -192,7 +192,7 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   Scan.PaletteTable = texture->GetPaletteToGlobal ();
   Scan.PrivateCMap = texture->GetPaletteToGlobal8 ();
 
-  UByte r, g, b;
+  uint8 r, g, b;
   texture->GetMeanColor (r, g, b);
   Scan.FlatColor = g3d->texman->FindRGB (r, g, b);
 

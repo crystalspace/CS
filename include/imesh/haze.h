@@ -126,9 +126,9 @@ struct iHazeFactoryState : public iBase
   /// Get material of sprite.
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
-  virtual void SetMixMode (UInt mode) = 0;
+  virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () const = 0;
+  virtual uint GetMixMode () const = 0;
 
   /// Set the point of origin, the center of the texture.
   virtual void SetOrigin(const csVector3& pos) = 0;

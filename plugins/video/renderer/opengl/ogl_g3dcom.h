@@ -74,7 +74,7 @@ class csPolyQueue
 {
 public:
   iMaterialHandle* mat_handle;
-  UInt mixmode;
+  uint mixmode;
   csZBufMode z_buf_mode;
   float flat_color_r;
   float flat_color_g;
@@ -247,13 +247,13 @@ public:
   /**
    * Setup and remember blend mode for subsequent polygon drawing.
    */
-  static float SetupBlend (UInt mode, float m_alpha, bool txt_alpha);
+  static float SetupBlend (uint mode, float m_alpha, bool txt_alpha);
 
   /**
    * Setup and remember client states.
    * Use a combination of CS_CLIENTSTATE_...
    */
-  static void SetClientStates (UInt client_states);
+  static void SetClientStates (uint client_states);
 
   /**
    * Set mirror mode for the rasterizer. Then polygons have

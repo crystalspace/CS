@@ -30,16 +30,16 @@ class csRLECodec : public iAVICodec
   csRGBpixel *pixel;
   int w,h;
   bool bOK;
-  void (*decode)(UByte *dst, UByte *src, ULong inlen, csRGBcolor *pMap, int w, int h);
+  void (*decode)(uint8 *dst, uint8 *src, uint32 inlen, csRGBcolor *pMap, int w, int h);
 
  public:
   SCF_DECLARE_IBASE;
   csRLECodec (iBase *pParent);
   virtual ~csRLECodec ();
 
-  virtual bool Initialize (csStreamDescription *desc, UByte *, ULong, UByte *, ULong);
+  virtual bool Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *, uint32);
   virtual void GetCodecDescription (csCodecDescription &desc);
-  virtual bool Decode (char *indata, ULong inlength, void *&outdata);
-  virtual bool Encode (void *indata, char *outdata, ULong &outlength);
+  virtual bool Decode (char *indata, uint32 inlength, void *&outdata);
+  virtual bool Encode (void *indata, char *outdata, uint32 &outlength);
 };
 #endif

@@ -79,7 +79,7 @@ class csMetaBall : public iMeshObject
   long shape_num;
   long cur_camera_num;
   long cur_movable_num;
-  UInt MixMode;
+  uint MixMode;
   csVector3 rad;
   float current_lod;
   uint32 current_features;
@@ -168,8 +168,8 @@ public:
 
   virtual void GetRadius(csVector3& radius, csVector3& cent) 
 	{ radius =  rad; cent = object_bbox.GetCenter(); }
-  virtual UInt GetMixMode() { return MixMode; }
-  virtual void SetMixMode(UInt mode) { MixMode = mode; }
+  virtual uint GetMixMode() { return MixMode; }
+  virtual void SetMixMode(uint mode) { MixMode = mode; }
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
   virtual iMaterialWrapper *GetMaterial() { return th; }
@@ -197,9 +197,9 @@ public:
       { scfParent->SetMaterial(mat); }
     virtual int ReportTriangleCount()
       { return scfParent->ReportTriangleCount(); }
-    virtual UInt GetMixMode ()
+    virtual uint GetMixMode ()
       { return scfParent->GetMixMode(); }
-    virtual void SetMixMode( UInt mode )
+    virtual void SetMixMode( uint mode )
       { scfParent->SetMixMode( mode ); }
     virtual bool IsLighting()
       { return scfParent->IsLighting(); }

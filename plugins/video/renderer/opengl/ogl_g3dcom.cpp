@@ -1381,7 +1381,7 @@ void csGraphics3DOGLCommon::DebugDrawElements (iGraphics2D* g2d,
   glPopAttrib ();
 }
 
-static float GetAlpha (UInt mode, float m_alpha, bool txt_alpha)
+static float GetAlpha (uint mode, float m_alpha, bool txt_alpha)
 {
   switch (mode & CS_FX_MASK_MIXMODE)
   {
@@ -1417,10 +1417,10 @@ static float GetAlpha (UInt mode, float m_alpha, bool txt_alpha)
 }
 
 
-static UInt prev_mode = 0xffffffff; //@@@ Move to class (static).
+static uint prev_mode = 0xffffffff; //@@@ Move to class (static).
 static bool prev_txt_alpha = false;
 
-float csGraphics3DOGLCommon::SetupBlend (UInt mode,
+float csGraphics3DOGLCommon::SetupBlend (uint mode,
 	float m_alpha, bool txt_alpha)
 {
   if (prev_mode == mode && prev_txt_alpha == txt_alpha)
@@ -1495,9 +1495,9 @@ float csGraphics3DOGLCommon::SetupBlend (UInt mode,
   return m_alpha;
 }
 
-UInt prev_ct = 0;	// @@@ Move to class (static).
+uint prev_ct = 0;	// @@@ Move to class (static).
 
-void csGraphics3DOGLCommon::SetClientStates (UInt ct)
+void csGraphics3DOGLCommon::SetClientStates (uint ct)
 {
   if (prev_ct == ct) return;
 
@@ -3039,7 +3039,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Setup states
   //===========
-  UInt m_mixmode = mesh.mixmode;
+  uint m_mixmode = mesh.mixmode;
   float m_alpha = 1.0f - BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
   bool m_gouraud = m_renderstate.lighting && m_renderstate.gouraud &&
   	((m_mixmode & CS_FX_GOURAUD) != 0);

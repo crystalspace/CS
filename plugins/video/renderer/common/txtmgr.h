@@ -119,7 +119,7 @@ public:
   virtual void SetKeyColor (bool Enable);
 
   /// Set the transparent color.
-  virtual void SetKeyColor (UByte red, UByte green, UByte blue);
+  virtual void SetKeyColor (uint8 red, uint8 green, uint8 blue);
 
   /**
    * Get the transparent status (false if no transparency, true if
@@ -128,7 +128,7 @@ public:
   virtual bool GetKeyColor ();
 
   /// Get the transparent color
-  virtual void GetKeyColor (UByte &r, UByte &g, UByte &b);
+  virtual void GetKeyColor (uint8 &r, uint8 &g, uint8 &b);
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
@@ -142,7 +142,7 @@ public:
   }
 
   /// Get the mean color.
-  virtual void GetMeanColor (UByte &r, UByte &g, UByte &b);
+  virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b);
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData ()

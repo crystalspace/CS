@@ -53,9 +53,9 @@ struct iBallState : public iBase
   /// Get material of ball.
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
-  virtual void SetMixMode (UInt mode) = 0;
+  virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () const = 0;
+  virtual uint GetMixMode () const = 0;
   /// Set reversed mode (i.e. sphere visible from inside out).
   virtual void SetReversed (bool r) = 0;
   /// Get reversed mode.

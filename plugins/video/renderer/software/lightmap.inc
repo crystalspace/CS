@@ -70,7 +70,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   csTextureSoftware *tx = (csTextureSoftware *)texmm->get_texture (mipmap);
   csRGBpixel *tx_palette = texmm->GetColorMap ();
-  UByte *tx_bitmap = tx->get_bitmap ();
+  uint8 *tx_bitmap = tx->get_bitmap ();
 
   int pt_min_u = pt->GetIMinU () >> mipmap;
   int pt_min_v = pt->GetIMinV () >> mipmap;
@@ -86,7 +86,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   int lm_size = lm->GetSize ();
 
   void *dst = ct->get_bitmap ();
-  ULong *old_lm = (ULong *)ct->get_lightmap ();
+  uint32 *old_lm = (uint32 *)ct->get_lightmap ();
 
   int tx_shfw = tx->get_w_shift ();
   int tx_andw = tx->get_w_mask ();
@@ -109,9 +109,9 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 */
 
   // Get the multiplication tables for red, green and blue
-  UByte *lt_R = texman->lightmap_tables [0];
-  UByte *lt_G = texman->lightmap_tables [1];
-  UByte *lt_B = texman->lightmap_tables [2];
+  uint8 *lt_R = texman->lightmap_tables [0];
+  uint8 *lt_G = texman->lightmap_tables [1];
+  uint8 *lt_B = texman->lightmap_tables [2];
 
   int min_lu = QRound (floor (u_min)) >> pt_cell_shift;
   int max_lu = (QRound (ceil (u_max)) + pt_cell_size - 1) >> pt_cell_shift;
@@ -146,7 +146,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
     {
       if (src >= src_end) return;
 #define GET(map, col, col_long)                 \
-      UByte col##00, col##10, col##01, col##11; \
+      uint8 col##00, col##10, col##01, col##11; \
       col##00 = map [src].col_long;             \
       col##10 = map [src + 1].col_long;         \
       col##01 = map [src + lm_w].col_long;      \
@@ -159,12 +159,12 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
       // this is somewhat tricky but in practice it works well
 #if 0
-      ULong cellid = ((r00 + g00 + b00)      ) ^
+      uint32 cellid = ((r00 + g00 + b00)      ) ^
                      ((r01 + g01 + b01) << 8 ) ^
                      ((r10 + g10 + b10) << 16) ^
                      ((r11 + g11 + b11) << 24);
 #else
-      ULong cellid =
+      uint32 cellid =
         ((r00 + hash_table [r01] + hash_table [r10 + 64] + hash_table [r11 + 128])      ) +
         ((g00 + hash_table [g01] + hash_table [g10 + 64] + hash_table [g11 + 128]) << 11) +
         ((b00 + hash_table [b01] + hash_table [b10 + 64] + hash_table [b11 + 128]) << 22);

@@ -162,7 +162,7 @@ void *csOggSoundData::ReadStreamed(long &NumSamples)
 
     if (buffersize > len)
     {
-      buf = (UByte*) realloc (buf, buffersize);
+      buf = (uint8*) realloc (buf, buffersize);
       len = buffersize;
     }
 

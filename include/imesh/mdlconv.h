@@ -48,7 +48,7 @@ struct iModelConverter : public iBase
   virtual const csModelConverterFormat *GetFormat (int idx) const = 0;
 
   /// Read a model file
-  virtual iModelData* Load (UByte* Buffer, ULong Size) = 0;
+  virtual iModelData* Load (uint8* Buffer, uint32 Size) = 0;
 
   /// Write data to a file
   virtual iDataBuffer* Save (iModelData*, const char *Format) = 0;

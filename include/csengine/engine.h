@@ -759,7 +759,7 @@ public:
    * array.
    */
   virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
-  	ULong flags, iLight** lights, int max_num_lights);
+  	uint32 flags, iLight** lights, int max_num_lights);
 
   /**
    * This routine returns an iterator to iterate over

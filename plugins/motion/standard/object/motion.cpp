@@ -324,6 +324,8 @@ void csMotionController::Animate()
     motbone->Animate(si->frametime, v, q, 1); //TODO pass interpolate flag
 
 //TODO Enable stack interpolation    
+    (void) sv; // fix warning
+    (void) sq;
 /*    for(int j=1; j<bone->nummotions; j++) {
       si=stack[bone->stacks[j]];
       motbone=si->motion->bones[bone->boneids[j]];

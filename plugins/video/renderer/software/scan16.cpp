@@ -24,7 +24,7 @@
 #include "sttest.h"
 
 #define SCAN16
-#define COLORMAP	((UShort *)Scan.PaletteTable)
+#define COLORMAP	((uint16 *)Scan.PaletteTable)
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
@@ -626,7 +626,7 @@
 #define SCANLOOP \
     do									\
     {									\
-      UShort tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
       *_dest++ = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
       uu += duu;							\
       vv += dvv;							\
@@ -645,7 +645,7 @@
 #define SCANLOOP \
     do									\
     {									\
-      UShort tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
       int tr = *_dest & 0x7c00;						\
       int tg = *_dest & 0x03e0;						\
       int tb = *_dest & 0x001f;						\
@@ -670,7 +670,7 @@
 #define SCANLOOP \
     do									\
     {									\
-      UShort tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
       int tr = *_dest & 0xf800;						\
       int tg = *_dest & 0x07e0;						\
       int tb = *_dest & 0x001f;						\
@@ -695,11 +695,11 @@ void csScan_16_555_scan_fog (int xx, unsigned char* d,
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
-  UShort *_dest = (UShort *)d;
-  UShort *_destend = _dest + xx;
+  uint16 *_dest = (uint16 *)d;
+  uint16 *_destend = _dest + xx;
   uint32 izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
+  uint16 fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   uint32 fog_dens = Scan.FogDensity;
 
   do
@@ -750,11 +750,11 @@ void csScan_16_565_scan_fog (int xx, unsigned char* d,
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
-  UShort *_dest = (UShort *)d;
-  UShort *_destend = _dest + xx;
+  uint16 *_dest = (uint16 *)d;
+  uint16 *_destend = _dest + xx;
   uint32 izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
+  uint16 fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   uint32 fog_dens = Scan.FogDensity;
 
   do
@@ -805,9 +805,9 @@ void csScan_16_555_scan_fog_view (int xx, unsigned char* d,
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx;
-  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
+  uint16* _dest = (uint16*)d;
+  uint16* _destend = _dest + xx;
+  uint16 fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   uint32 fog_dens = Scan.FogDensity;
 
   do
@@ -844,9 +844,9 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx;
-  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
+  uint16* _dest = (uint16*)d;
+  uint16* _destend = _dest + xx;
+  uint16 fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   uint32 fog_dens = Scan.FogDensity;
 
   do

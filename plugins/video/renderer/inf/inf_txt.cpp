@@ -103,7 +103,7 @@ csTextureManagerInfinite::csTextureManagerInfinite (iObjectRegistry *object_reg,
   G2D = iG2D;
 }
 
-ULong csTextureManagerInfinite::encode_rgb (int r, int g, int b)
+uint32 csTextureManagerInfinite::encode_rgb (int r, int g, int b)
 {
   return
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |

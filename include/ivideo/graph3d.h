@@ -147,12 +147,12 @@ struct G3DPolygonDPFX
   /// The material handle as returned by iTextureManager.
   iMaterialHandle *mat_handle;
   /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
-  UInt mixmode;
+  uint mixmode;
 
   /// Use this color for drawing (if txt_handle == NULL) instead of a material.
-  UByte flat_color_r;
-  UByte flat_color_g;
-  UByte flat_color_b;
+  uint8 flat_color_r;
+  uint8 flat_color_g;
+  uint8 flat_color_b;
 
   // A dummy constructor to appease NextStep compiler which otherwise
   // complains that it is unable to create this object.  This happens when
@@ -190,7 +190,7 @@ struct G3DPolygonDP : public G3DPolygonDFP
   iPolygonTexture* poly_texture;
 
   /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
-  UInt mixmode;
+  uint mixmode;
 
   /// Z value (in camera space) of vertex[0].
   float z_value;
@@ -398,7 +398,7 @@ struct G3DTriangleMesh
   } vertex_mode;
 
   /// DrawPolygonFX flag.
-  UInt mixmode;
+  uint mixmode;
   float morph_factor;
   /**
    * Vertex buffers. Note that all vertex buffers used here MUST
@@ -431,7 +431,7 @@ struct G3DPolygonMesh
   bool do_fog;
 
   /// Mixmode.
-  UInt mixmode;
+  uint mixmode;
 
   /// Clip to portal? One of CS_CLIP_???.
   int clip_portal;

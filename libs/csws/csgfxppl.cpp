@@ -91,7 +91,7 @@ bool csGraphicsPipeline::ClipLine (float &x1, float &y1, float &x2, float &y2,
   return G2D->ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2);
 }
 
-void csGraphicsPipeline::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+void csGraphicsPipeline::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
   {
@@ -234,7 +234,7 @@ void csGraphicsPipeline::RestoreClipRect ()
   ClipRect = OrigClip;
 }
 
-void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
+void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, uint mode)
 {
   if (!BeginDraw (CSDRAW_3DGRAPHICS))
     return;

@@ -64,7 +64,7 @@ public:
   virtual csRGBpixel *GetPalette ()
   { return Palette; }
   /// Get alpha map for 8-bit paletted image.
-  virtual UByte *GetAlpha ()
+  virtual uint8 *GetAlpha ()
   { return NULL; }
   /// Change image format
   virtual void SetFormat (int /*iFormat*/)

@@ -14,6 +14,12 @@ The history order is reversed so that new features are at the top.
 	  canvases, renderers, ...).
 	- Removed the reference to the plugin manager from the OpenGL and
 	  perfstats plugins. This is also a circular reference.
+	- fixed SCF_DEBUG to work correctly with embeded interfaces
+	- fixed some compiler warnings
+	- fixed definition of int32 and uint32 should be long not int
+	- removed the type UByte,SByte, UShort,SShort, ULong,SLong, UInt, 
+	  SInt, uchar, ushort and ulong and substituted code with the
+	  corresponding intxx types.
 25-Dec-2001
 	- Matze had nothing to do and fixed hundreds of compiler warnings
 	  in aws.

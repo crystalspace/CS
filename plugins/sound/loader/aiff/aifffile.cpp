@@ -85,7 +85,7 @@ SCF_EXPORT_CLASS_TABLE_END
 iSoundData*
 csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const
 {
-  UByte *buf = (UByte*) databuf;
+  uint8 *buf = (uint8*) databuf;
   unsigned long index=0;
   csSoundDataRaw *sb= NULL;
   char *data=NULL;
@@ -163,7 +163,7 @@ csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const
       if(flag==BIT8)
       {
         int i=0;
-        if((ULong)chunk_size>size)
+        if((uint32)chunk_size>size)
           goto exit_read;
 
         data = new char[chunk_size];
@@ -182,7 +182,7 @@ csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const
       else if(flag==BIT16)
       {
         int i=0;
-        if((ULong)chunk_size>size)
+        if((uint32)chunk_size>size)
           goto exit_read;
 
         data= new char[chunk_size];

@@ -149,7 +149,7 @@ void csTextureHandle::SetKeyColor (bool Enable)
 }
 
 // This function must be called BEFORE calling TextureManager::Update().
-void csTextureHandle::SetKeyColor (UByte red, UByte green, UByte blue)
+void csTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
 {
   transp_color.red = red;
   transp_color.green = green;
@@ -158,7 +158,7 @@ void csTextureHandle::SetKeyColor (UByte red, UByte green, UByte blue)
 }
 
 /// Get the transparent color
-void csTextureHandle::GetKeyColor (UByte &r, UByte &g, UByte &b)
+void csTextureHandle::GetKeyColor (uint8 &r, uint8 &g, uint8 &b)
 {
   r = transp_color.red;
   g = transp_color.green;
@@ -170,7 +170,7 @@ bool csTextureHandle::GetKeyColor ()
   return transp;
 }
 
-void csTextureHandle::GetMeanColor (UByte &r, UByte &g, UByte &b)
+void csTextureHandle::GetMeanColor (uint8 &r, uint8 &g, uint8 &b)
 { 
   r = mean_color.red;
   g = mean_color.green;

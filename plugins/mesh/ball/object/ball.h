@@ -47,7 +47,7 @@ private:
   csVector3 max_radius;
   csVector3 shift;
   iMaterialWrapper* material;
-  UInt MixMode;
+  uint MixMode;
   iMeshObjectDrawCallback* vis_cb;
   bool reversed;
   bool toponly;
@@ -129,7 +129,7 @@ public:
   /// Get the material for this ball.
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
-  UInt GetMixMode () const { return MixMode; }
+  uint GetMixMode () const { return MixMode; }
   void SetRadius (float radiusx, float radiusy, float radiusz);
   void GetRadius (float& radx, float& rady, float& radz) const
   { radx=radiusx; rady=radiusy; radz=radiusz; }
@@ -268,8 +268,8 @@ public:
     }
     virtual iMaterialWrapper* GetMaterialWrapper () const
     { return scfParent->material; }
-    virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () const { return scfParent->MixMode; }
+    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
+    virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetReversed (bool r) { scfParent->SetReversed (r); }
     virtual bool IsReversed () const { return scfParent->IsReversed (); }
     virtual void SetTopOnly (bool t) { scfParent->SetTopOnly (t); }

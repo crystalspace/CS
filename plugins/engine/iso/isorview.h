@@ -86,7 +86,7 @@ public:
   virtual float GetMinZ() const {return minz;}
   virtual void SetMinZ(float val) {minz = val;}
   virtual void AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx, 
-    UInt mixmode);
+    uint mixmode);
 };
 
 /** keeps render info

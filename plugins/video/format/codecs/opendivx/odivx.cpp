@@ -50,7 +50,7 @@ csOpenDivX::~csOpenDivX ()
   delete [] vdata;
 }
 
-bool csOpenDivX::Initialize (csStreamDescription *desc, UByte *, ULong, UByte *, ULong)
+bool csOpenDivX::Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *, uint32)
 {
   csVideoStreamDescription *vd = (csVideoStreamDescription *)desc;
   w = vd->width;
@@ -86,7 +86,7 @@ void csOpenDivX::GetCodecDescription (csCodecDescription &desc)
   desc.encodeinput = CS_CODECFORMAT_YUV_CHANNEL;
 }
 
-bool csOpenDivX::Decode (char *indata, ULong inlength, void *&outdata)
+bool csOpenDivX::Decode (char *indata, uint32 inlength, void *&outdata)
 {
   if (bOK)
   {
@@ -102,7 +102,7 @@ bool csOpenDivX::Decode (char *indata, ULong inlength, void *&outdata)
   return false;
 }
 
-bool csOpenDivX::Encode (void *indata, char *outdata, ULong &outlength)
+bool csOpenDivX::Encode (void *indata, char *outdata, uint32 &outlength)
 {
   (void)indata;
   (void)outdata;

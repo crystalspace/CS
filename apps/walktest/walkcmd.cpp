@@ -729,8 +729,8 @@ char* LookForTextureFileName(const char* value)
 
 
 void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
-					   iGraphics3D* MyG3D, iLoader* loader,
-					   iObjectRegistry* objReg)
+					   iGraphics3D* /*MyG3D*/, iLoader* loader,
+					   iObjectRegistry* /*objReg*/)
 {
   iMaterialList* matList = Engine->GetMaterialList();
   //used to check if a material is already registered

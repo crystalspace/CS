@@ -94,7 +94,7 @@ struct iFlareHalo : public iBase
    * give position, size, image and mixmode.
    * The component is added at the end of the list - to be displayed last.
    */
-  virtual void AddComponent (float pos, float w, float h, UInt mode, 
+  virtual void AddComponent (float pos, float w, float h, uint mode, 
     iMaterialWrapper *image) = 0;
 };
 

@@ -233,7 +233,7 @@ unsigned char* awsMultiProctexCanvas::awscG2D::GetPixelAt (int x, int y)
   return NULL;
 }
 
-void awsMultiProctexCanvas::awscG2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+void awsMultiProctexCanvas::awscG2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
 {
   oR = oG = oB = 0;
   int i,count=awsc->GetFlatCanvasCount();

@@ -95,7 +95,7 @@ public:
   void SetTextureWrapper (iTextureWrapper *tex);
 
   /// Add a texture layer (currently only one supported).
-  void AddTextureLayer (iTextureWrapper* txtwrap, UInt mode,
+  void AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
       	float uscale, float vscale, float ushift, float vshift);
 
   //--------------------- iMaterial implementation ---------------------

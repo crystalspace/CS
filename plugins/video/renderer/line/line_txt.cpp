@@ -202,24 +202,24 @@ void csTextureHandleLine::remap_texture (csTextureManager *texman)
   switch (texman->pfmt.PixelBytes)
   {
     case 1:
-      delete [] (UByte *)pal2glob;
-      pal2glob = new UByte [palette_size];
+      delete [] (uint8 *)pal2glob;
+      pal2glob = new uint8 [palette_size];
       for (i = 0; i < palette_size; i++)
-        ((UByte *)pal2glob) [i] = txm->cmap.find_rgb (palette [i].red,
+        ((uint8 *)pal2glob) [i] = txm->cmap.find_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
     case 2:
-      delete [] (UShort *)pal2glob;
-      pal2glob = new UShort [palette_size];
+      delete [] (uint16 *)pal2glob;
+      pal2glob = new uint16 [palette_size];
       for (i = 0; i < palette_size; i++)
-        ((UShort *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
+        ((uint16 *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
     case 4:
-      delete [] (ULong *)pal2glob;
-      pal2glob = new ULong [palette_size];
+      delete [] (uint32 *)pal2glob;
+      pal2glob = new uint32 [palette_size];
       for (i = 0; i < palette_size; i++)
-        ((ULong *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
+        ((uint32 *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
   }
@@ -233,11 +233,11 @@ void csTextureHandleLine::Prepare ()
 
 //----------------------------------------------- csTextureManagerLine ---//
 
-static UByte *GenLightmapTable (int bits)
+static uint8 *GenLightmapTable (int bits)
 {
-  UByte *table = new UByte [64 * 256];
-  UByte *dst = table;
-  UByte maxv = (1 << bits) - 1;
+  uint8 *table = new uint8 [64 * 256];
+  uint8 *dst = table;
+  uint8 maxv = (1 << bits) - 1;
   int rshf = (13 - bits);
   int i, j, x;
   for (i = 0; i < 64; i++)
@@ -306,7 +306,7 @@ void csTextureManagerLine::Clear ()
   delete alpha_tables; alpha_tables = NULL;
 }
 
-ULong csTextureManagerLine::encode_rgb (int r, int g, int b)
+uint32 csTextureManagerLine::encode_rgb (int r, int g, int b)
 {
   return
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
@@ -359,8 +359,8 @@ void csTextureManagerLine::create_alpha_tables ()
   if (!alpha_tables)
     alpha_tables = new csAlphaTables ();
 
-  UByte *map50 = alpha_tables->alpha_map50;
-  UByte *map25 = alpha_tables->alpha_map25;
+  uint8 *map50 = alpha_tables->alpha_map50;
+  uint8 *map25 = alpha_tables->alpha_map25;
 
   int i, j, r, g, b;
   for (i = 0 ; i < 256 ; i++)

@@ -380,7 +380,7 @@ struct iIsoRenderView : public iBase
   virtual void SetMinZ(float val) = 0;
   /// add a component to draw between MAIN and FG passes, give materialindex.
   virtual void AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx, 
-    UInt mixmode) = 0;
+    uint mixmode) = 0;
 };
 
 SCF_VERSION (iIsoSprite, 0, 0, 1);
@@ -425,9 +425,9 @@ struct iIsoSprite : public iBase
   /// Get the materialwrapper
   virtual iMaterialWrapper* GetMaterialWrapper() const = 0;
   /// Set the mixmode
-  virtual void SetMixMode (UInt mode) = 0;
+  virtual void SetMixMode (uint mode) = 0;
   /// Get the mixmode
-  virtual UInt GetMixMode () const = 0;
+  virtual uint GetMixMode () const = 0;
 
   /// Draw using given renderview
   virtual void Draw(iIsoRenderView *rview) = 0;

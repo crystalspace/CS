@@ -29,11 +29,11 @@ struct iAVICodec : public iBase
   /**
    * Send either video or audio stream description as input. The codec will cast it.
    */
-  virtual bool Initialize (csStreamDescription *desc, UByte *pInitData, ULong nInitDataLen,
-			   UByte *pFormatEx, ULong nFormatEx )=0;
+  virtual bool Initialize (csStreamDescription *desc, uint8 *pInitData, uint32 nInitDataLen,
+			   uint8 *pFormatEx, uint32 nFormatEx )=0;
   virtual void GetCodecDescription (csCodecDescription &desc) = 0;
-  virtual bool Decode (char *indata, ULong inlength, void *&outdata) = 0;
-  virtual bool Encode (void *indata, char *outdata, ULong &outlength) = 0;
+  virtual bool Decode (char *indata, uint32 inlength, void *&outdata) = 0;
+  virtual bool Encode (void *indata, char *outdata, uint32 &outlength) = 0;
 };
 
 #endif

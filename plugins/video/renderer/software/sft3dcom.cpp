@@ -1313,7 +1313,7 @@ void csGraphics3DSoftwareCommon::SetDimensions (int nwidth, int nheight)
   smaller_buffer = NULL;
   if (do_smaller_rendering)
   {
-    smaller_buffer = new UByte [(width*height) * pfmt.PixelBytes];
+    smaller_buffer = new uint8 [(width*height) * pfmt.PixelBytes];
   }
 
   delete [] z_buffer;
@@ -1321,7 +1321,7 @@ void csGraphics3DSoftwareCommon::SetDimensions (int nwidth, int nheight)
   z_buf_size = sizeof (uint32)*width*height;
 
   delete [] line_table;
-  line_table = new UByte* [height+1];
+  line_table = new uint8* [height+1];
 }
 
 void csGraphics3DSoftwareCommon::SetClipper (iClipper2D* clip, int cliptype)
@@ -1378,9 +1378,9 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
           if (pfmt.GreenBits == 5)
             for (y = 0 ; y < height ; y++)
             {
-              UShort* src = (UShort*)line_table[y];
-              UShort* dst1 = (UShort*)G2D->GetPixelAt (0, y+y);
-              UShort* dst2 = (UShort*)G2D->GetPixelAt (0, y+y+1);
+              uint16* src = (uint16*)line_table[y];
+              uint16* dst1 = (uint16*)G2D->GetPixelAt (0, y+y);
+              uint16* dst2 = (uint16*)G2D->GetPixelAt (0, y+y+1);
               for (x = 0 ; x < width ; x++)
               {
                 dst1[x+x] = src[x];
@@ -1392,9 +1392,9 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
           else
             for (y = 0 ; y < height ; y++)
             {
-              UShort* src = (UShort*)line_table[y];
-              UShort* dst1 = (UShort*)G2D->GetPixelAt (0, y+y);
-              UShort* dst2 = (UShort*)G2D->GetPixelAt (0, y+y+1);
+              uint16* src = (uint16*)line_table[y];
+              uint16* dst1 = (uint16*)G2D->GetPixelAt (0, y+y);
+              uint16* dst2 = (uint16*)G2D->GetPixelAt (0, y+y+1);
               for (x = 0 ; x < width ; x++)
               {
                 dst1[x+x] = src[x];
@@ -1407,9 +1407,9 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
         case 4:
           for (y = 0 ; y < height ; y++)
           {
-            ULong* src = (ULong*)line_table[y];
-            ULong* dst1 = (ULong*)G2D->GetPixelAt (0, y+y);
-            ULong* dst2 = (ULong*)G2D->GetPixelAt (0, y+y+1);
+            uint32* src = (uint32*)line_table[y];
+            uint32* dst1 = (uint32*)G2D->GetPixelAt (0, y+y);
+            uint32* dst2 = (uint32*)G2D->GetPixelAt (0, y+y+1);
             for (x = 0 ; x < width ; x++)
             {
               dst1[x+x] = src[x];
@@ -2229,7 +2229,7 @@ texr_done:
     else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
     else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
     dscan = ScanProc [scan_index];
-    UInt mode = poly.mixmode;
+    uint mode = poly.mixmode;
     Scan.PaletteTable = tex_mm->GetPaletteToGlobal ();
     Scan.TexturePalette = tex_mm->GetColorMap ();
     Scan.PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
@@ -2555,11 +2555,11 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
         // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
         // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
         // different pixel encodings such as RGB, BGR, RBG and so on...
-        ULong r = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 16) ? Scan.FogR :
+        uint32 r = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 16) ? Scan.FogR :
           (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 16) ? Scan.FogG : Scan.FogB;
-        ULong g = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 8) ? Scan.FogR :
+        uint32 g = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 8) ? Scan.FogR :
           (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 8) ? Scan.FogG : Scan.FogB;
-        ULong b = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 0) ? Scan.FogR :
+        uint32 b = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 0) ? Scan.FogR :
           (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 0) ? Scan.FogG : Scan.FogB;
         Scan.FogR = R8G8B8_PIXEL_PREPROC(r);
         Scan.FogG = R8G8B8_PIXEL_PREPROC(g);
@@ -2737,7 +2737,7 @@ static struct
   bool keycolor;
   bool textured;
   bool tiling;
-  UInt mixmode;
+  uint mixmode;
   csDrawPIScanline *drawline;
   csDrawPIScanlineGouraud *drawline_gouraud;
 } pqinfo;
@@ -2745,7 +2745,7 @@ static struct
 #define EPS   0.0001
 
 void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
-  UInt mode, bool use_fog)
+  uint mode, bool use_fog)
 {
   if (!dpfx_valid ||
   	use_fog != dpfx_use_fog ||

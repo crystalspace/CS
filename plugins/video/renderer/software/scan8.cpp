@@ -24,7 +24,7 @@
 #include "sttest.h"
 
 #define SCAN8
-#define COLORMAP	((UByte *)Scan.PaletteTable)
+#define COLORMAP	((uint8 *)Scan.PaletteTable)
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 

@@ -136,7 +136,7 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     {
       csVector2 clipped_poly[100];
       int clipped_num;
-      UByte clip_result = clipper->Clip (poly.vertices, poly.num,
+      uint8 clip_result = clipper->Clip (poly.vertices, poly.num,
       	clipped_poly, clipped_num);
       if (clip_result == CS_CLIP_OUTSIDE) continue;
       if (clip_result != CS_CLIP_INSIDE)

@@ -68,7 +68,7 @@ struct csStreamDescription
   /**
    * Type of stream ala video, audio, text or whatever.
    */
-  UShort type;
+  uint16 type;
   /**
    * Codec id.
    */
@@ -87,11 +87,11 @@ struct csVideoStreamDescription : public csStreamDescription
   /**
    * Colordepth in bits or -1 if not available.
    */
-  SByte colordepth;
+  int8 colordepth;
   /**
    * Framecount or -1 if not available.
    */
-  SLong framecount;
+  int32 framecount;
   /**
    * Resolution or -1 if not available.
    */
@@ -103,7 +103,7 @@ struct csVideoStreamDescription : public csStreamDescription
   /**
    * duration in milliseconds or -1 if not available.
    */
-  SLong duration;
+  int32 duration;
 };
 
 /**
@@ -111,14 +111,14 @@ struct csVideoStreamDescription : public csStreamDescription
  */
 struct csAudioStreamDescription : public csStreamDescription
 {
-  UShort formattag;
-  UShort channels;
-  ULong samplespersecond;
-  UShort bitspersample;
+  uint16 formattag;
+  uint16 channels;
+  uint32 samplespersecond;
+  uint16 bitspersample;
   /**
    * duration in milliseconds or -1 if not available.
    */
-  ULong duration;
+  uint32 duration;
 };
 
 SCF_VERSION (iStreamIterator, 0, 0, 1);
@@ -182,11 +182,11 @@ struct iStream : public iBase
    * necessarily mean a video frame.  It is the datachunk a stream is separated
    * into by the underlying protocol/format like RIFF for instance.
    */
-  virtual bool GotoFrame (ULong frameindex) = 0;
+  virtual bool GotoFrame (uint32 frameindex) = 0;
   /**
    * Next frame to be examined is the frame at timeindex.
    */
-  virtual bool GotoTime (ULong timeindex) = 0;
+  virtual bool GotoTime (uint32 timeindex) = 0;
   /**
    * When NextFrame is called either the next frame is read based on frameindex
    * or the next frame at timeindex (bTimeSynced = true).
@@ -218,7 +218,7 @@ struct iVideoStream : public iStream
    * Set the blendingmode that is used to combine this frame with the data in
    * the framebuffer Use the usual CS_FX_* values.  The default is CS_FX_COPY.
    */
-  virtual bool SetFXMode (UInt mode) = 0;
+  virtual bool SetFXMode (uint mode) = 0;
   /**
    * Call this if you want to use the frames as textures on your own polygons.
    */
@@ -277,11 +277,11 @@ struct csCodecDescription
   /**
    * output data format
    */
-  UShort decodeoutput;
+  uint16 decodeoutput;
   /**
    * input data format
    */
-  UShort encodeinput;
+  uint16 encodeinput;
 };
 
 #endif // __IVIDEO_CODEC_H__

@@ -1024,7 +1024,7 @@ void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   }
 
   int num_clipped_verts;
-  UByte clip_result = rview->GetClipper ()->Clip (poly2d, num,
+  uint8 clip_result = rview->GetClipper ()->Clip (poly2d, num,
     clipped_poly2d, num_clipped_verts, clipped_vtstats);
   if (clip_result == CS_CLIP_OUTSIDE) return;
   g3dpolyfx.num = num_clipped_verts;

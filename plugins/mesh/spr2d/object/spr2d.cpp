@@ -341,7 +341,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   }
 
   int num_clipped_verts;
-  UByte clip_result = rview->GetClipper ()->Clip (poly2d, vertices.Length (),
+  uint8 clip_result = rview->GetClipper ()->Clip (poly2d, vertices.Length (),
     clipped_poly2d, num_clipped_verts, clipped_vtstats);
   if (clip_result == CS_CLIP_OUTSIDE) return false;
   g3dpolyfx.num = num_clipped_verts;

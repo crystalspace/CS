@@ -45,7 +45,7 @@ private:
   csVector3 topleft;
   float xscale, yscale;
   iMaterialWrapper* material;
-  UInt MixMode;
+  uint MixMode;
   iMeshObjectDrawCallback* vis_cb;
   bool do_lighting;
   csColor color;
@@ -128,8 +128,8 @@ public:
     csSurfMeshObject::material = material;
   }
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
-  void SetMixMode (UInt mode) { MixMode = mode; }
-  UInt GetMixMode () const { return MixMode; }
+  void SetMixMode (uint mode) { MixMode = mode; }
+  uint GetMixMode () const { return MixMode; }
   void SetTopLeftCorner (const csVector3& tl)
   {
     initialized = false;
@@ -239,11 +239,11 @@ public:
     {
       return scfParent->GetMaterialWrapper ();
     }
-    virtual void SetMixMode (UInt mode)
+    virtual void SetMixMode (uint mode)
     {
       scfParent->SetMixMode (mode);
     }
-    virtual UInt GetMixMode () const
+    virtual uint GetMixMode () const
     {
       return scfParent->GetMixMode ();
     }

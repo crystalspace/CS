@@ -292,7 +292,7 @@ void csGraphics2DLineXLib::Close ()
 
 struct palent
 {
-  UShort idx;
+  uint16 idx;
   unsigned char r, g, b;
   int cnt;
 };

@@ -66,8 +66,8 @@ public:
   virtual void MovePosition(const csVector3& delta);
   virtual void SetMaterialWrapper(iMaterialWrapper *material);
   virtual iMaterialWrapper* GetMaterialWrapper() const;
-  virtual void SetMixMode(UInt mode);
-  virtual UInt GetMixMode() const;
+  virtual void SetMixMode(uint mode);
+  virtual uint GetMixMode() const;
   virtual void Draw(iIsoRenderView *rview);
   virtual void SetGrid(iIsoGrid *grid);
   virtual void SetAllColors(const csColor& color);

@@ -53,7 +53,7 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   csPixelFormat real_pfmt;	// Contains the real pfmt is simulating stuff
   unsigned char* real_Memory;	// Real memory to the display
   unsigned char* sim_lt8;	// 8-bit lookup table (with 16-bit index) for simulated depth
-  UShort* sim_lt16;		// 16-bit lookup table (with 8-bit index) for simulated depth
+  uint16* sim_lt16;		// 16-bit lookup table (with 8-bit index) for simulated depth
 
   bool CreateVisuals ();
   bool AllocateMemory ();

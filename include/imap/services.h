@@ -56,7 +56,7 @@ struct iSyntaxService : public iBase
   /**
    * Parse a MIXMODE description. Returns true if successful.
    */
-  virtual bool ParseMixmode (char *buffer, UInt &mixmode) = 0;
+  virtual bool ParseMixmode (char *buffer, uint &mixmode) = 0;
 
   /**
    * Parse a SHADING description. Returns true if successful.
@@ -84,7 +84,7 @@ struct iSyntaxService : public iBase
    *     This is used to make errormessages more verbose.
    * </ul>
    */
-  virtual bool ParseTexture (char *buf, const csVector3* vref, UInt &texspec, 
+  virtual bool ParseTexture (char *buf, const csVector3* vref, uint &texspec, 
 			     csVector3 &tx_orig, csVector3 &tx1,
 			     csVector3 &tx2, csVector3 &len,
 			     csMatrix3 &tx_m, csVector3 &tx_v,
@@ -155,7 +155,7 @@ struct iSyntaxService : public iBase
    * <li>newline: signals whether to append a newline to the result.
    * </ul>
    */
-  virtual const char* MixmodeToText (UInt mixmode, int indent,
+  virtual const char* MixmodeToText (uint mixmode, int indent,
   	bool newline=true) = 0;
 };
 

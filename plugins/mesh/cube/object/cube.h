@@ -156,7 +156,7 @@ private:
   float sizex, sizey, sizez;
   csVector3 shift;
   iMaterialWrapper* material;
-  UInt MixMode;
+  uint MixMode;
 
 public:
   iObjectRegistry* object_reg;
@@ -185,7 +185,7 @@ public:
   /// Get the material for this cube.
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
-  UInt GetMixMode () const { return MixMode; }
+  uint GetMixMode () const { return MixMode; }
 
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
@@ -222,8 +222,8 @@ public:
     }
     virtual iMaterialWrapper* GetMaterialWrapper () const
     { return scfParent->material; }
-    virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () const { return scfParent->MixMode; }
+    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
+    virtual uint GetMixMode () const { return scfParent->MixMode; }
   } scfiCubeFactoryState;
   friend class CubeFactoryState;
 };
@@ -237,7 +237,7 @@ class csCubeMeshObjectType : public iMeshObjectType
 private:
   float default_sizex, default_sizey, default_sizez;
   csVector3 default_shift;
-  UInt default_MixMode;
+  uint default_MixMode;
 
 public:
   iObjectRegistry* object_reg;

@@ -80,14 +80,14 @@
 #  define B_BIT		8
 #endif
 
-// The mask for extracting just R/G/B from an ULong or csRGBpixel
+// The mask for extracting just R/G/B from an uint32 or csRGBpixel
 #ifdef CS_BIG_ENDIAN
 #  define RGB_MASK 0xffffff00
 #else
 #  define RGB_MASK 0x00ffffff
 #endif
 
-// Compute masks for effectively separating R,G and B components from a ULong.
+// Compute masks for effectively separating R,G and B components from a uint32.
 // For a little-endian machine they are respectively
 // 0x000000f8, 0x0000fc00 and 0x00f80000
 // For a big-endian machine they are respectively
@@ -95,7 +95,7 @@
 #define R_MASK		((HIST_R_MAX - 1) << (R_BIT + 8 - HIST_R_BITS))
 #define G_MASK		((HIST_G_MAX - 1) << (G_BIT + 8 - HIST_G_BITS))
 #define B_MASK		((HIST_B_MAX - 1) << (B_BIT + 8 - HIST_B_BITS))
-// The following macro extract the respective color components from a ULong
+// The following macro extract the respective color components from a uint32
 // and transform them into a index in the histogram.
 #define INDEX_R(l)	((l & R_MASK) >> (R_BIT + 8 - HIST_R_BITS))
 #define INDEX_G(l)	((l & G_MASK) >> (G_BIT + 8 - HIST_G_BITS - HIST_R_BITS))
@@ -104,7 +104,7 @@
 #define INDEX(r,g,b)	(r + (g << HIST_R_BITS) + (b << (HIST_R_BITS + HIST_G_BITS)))
 
 // The storage for color usage histogram
-static UShort *hist = NULL;
+static uint16 *hist = NULL;
 // Total number of colors that were used to create the histogram
 static unsigned hist_pixels;
 
@@ -120,11 +120,11 @@ static unsigned hist_pixels;
 struct csColorBox
 {
   // The minimal and maximal R
-  UByte Rm,Rx;
+  uint8 Rm,Rx;
   // The minimal and maximal G
-  UByte Gm,Gx;
+  uint8 Gm,Gx;
   // The minimal and maximal B
-  UByte Bm,Bx;
+  uint8 Bm,Bx;
   // Color box volume
   unsigned Volume;
   // Number of pixels in this box
@@ -136,7 +136,7 @@ struct csColorBox
   static inline unsigned Sqr (int x)
   { return x * x; }
   // Set box to given bounds
-  void Set (UByte rm, UByte rx, UByte gm, UByte gx, UByte bm, UByte bx)
+  void Set (uint8 rm, uint8 rx, uint8 gm, uint8 gx, uint8 bm, uint8 bx)
   { Rm = rm; Rx = rx; Gm = gm; Gx = gx; Bm = bm; Bx = bx; }
   // Compute the volume of box
   void ComputeVolume ()
@@ -159,7 +159,7 @@ struct csColorBox
 	  int g;
       for (g = Gm; g <= Gx; g++)
       {
-        UShort *hp = &hist [INDEX (Rm, g, b)];
+        uint16 *hp = &hist [INDEX (Rm, g, b)];
 		int r;
         for (r = Rx - Rm; r >= 0; r--, hp++)
 		{
@@ -176,14 +176,14 @@ struct csColorBox
   // Move Rm up until we find pixels that contain this value
   bool ShrinkRm ()
   {
-    UByte iRm = Rm;
+    uint8 iRm = Rm;
 	int g;
     for (; Rm <= Rx; Rm++)
 	{
-	  UByte b;
+	  uint8 b;
       for (b = Bm; b <= Bx; b++)
       {
-        UShort *hp = &hist [INDEX (Rm, Gm, b)];
+        uint16 *hp = &hist [INDEX (Rm, Gm, b)];
         for (g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rm != iRm);
       }
@@ -194,12 +194,12 @@ struct csColorBox
   // Move Rx down until we find pixels that contain this value
   bool ShrinkRx ()
   {
-    UByte iRx = Rx;
+    uint8 iRx = Rx;
 	int g;
     for (; Rx >= Rm; Rx--)
-      for (UByte b = Bm; b <= Bx; b++)
+      for (uint8 b = Bm; b <= Bx; b++)
       {
-        UShort *hp = &hist [INDEX (Rx, Gm, b)];
+        uint16 *hp = &hist [INDEX (Rx, Gm, b)];
         for (g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rx != iRx);
       }
@@ -209,15 +209,15 @@ struct csColorBox
   // Move Gm up until we find pixels that contain this value
   bool ShrinkGm ()
   {
-    UByte iGm = Gm;
+    uint8 iGm = Gm;
 	int r;
 
     for (; Gm <= Gx; Gm++)
 	{
-	  UByte b;
+	  uint8 b;
       for (b = Bm; b <= Bx; b++)
       {
-        UShort *hp = &hist [INDEX (Rm, Gm, b)];
+        uint16 *hp = &hist [INDEX (Rm, Gm, b)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gm != iGm);
       }
@@ -228,14 +228,14 @@ struct csColorBox
   // Move Gx down until we find pixels that contain this value
   bool ShrinkGx ()
   {
-    UByte iGx = Gx;
+    uint8 iGx = Gx;
 	int r;
     for (; Gx >= Gm; Gx--)
 	{
-	  UByte b;
+	  uint8 b;
       for (b = Bm; b <= Bx; b++)
       {
-        UShort *hp = &hist [INDEX (Rm, Gx, b)];
+        uint16 *hp = &hist [INDEX (Rm, Gx, b)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gx != iGx);
       }
@@ -246,14 +246,14 @@ struct csColorBox
   // Move Bm up until we find pixels that contain this value
   bool ShrinkBm ()
   {
-    UByte iBm = Bm;
+    uint8 iBm = Bm;
 	int r;
     for (; Bm <= Bx; Bm++)
 	{
-	  UByte g;
+	  uint8 g;
       for (g = Gm; g <= Gx; g++)
       {
-        UShort *hp = &hist [INDEX (Rm, g, Bm)];
+        uint16 *hp = &hist [INDEX (Rm, g, Bm)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bm != iBm);
       }
@@ -264,14 +264,14 @@ struct csColorBox
   // Move Bx down until we find pixels that contain this value
   bool ShrinkBx ()
   {
-    UByte iBx = Bx;
+    uint8 iBx = Bx;
 	int r;
     for (; Bx >= Bm; Bx--)
 	{
-	  UByte g;
+	  uint8 g;
       for (g = Gm; g <= Gx; g++)
       {
-        UShort *hp = &hist [INDEX (Rm, g, Bx)];
+        uint16 *hp = &hist [INDEX (Rm, g, Bx)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bx != iBx);
       }
@@ -300,7 +300,7 @@ struct csColorBox
     for (b = Bm; b <= Bx; b++)
       for (g = Gm; g <= Gx; g++)
       {
-        UShort *hp = &hist [INDEX (Rm, g, b)];
+        uint16 *hp = &hist [INDEX (Rm, g, b)];
         for (r = Rm; r <= Rx; r++, hp++)
           if (*hp)
           {
@@ -323,7 +323,7 @@ struct csColorBox
     color.green = ((gs + count / 2) << (8 - HIST_G_BITS)) / count;
     color.blue  = ((bs + count / 2) << (8 - HIST_B_BITS)) / count;
   }
-  void FillInverseCMap (UByte *icmap, UByte index)
+  void FillInverseCMap (uint8 *icmap, uint8 index)
   {
     int Rcount = Rx - Rm + 1;
 	int b;
@@ -341,12 +341,12 @@ static csColorBox *box = NULL;
 // Number of valid color boxes
 static int boxcount;
 // The storage for color indices
-static UByte *color_index = NULL;
+static uint8 *color_index = NULL;
 
 static int compare_boxes (const void *i1, const void *i2)
 {
-  int count1 = box [*(UByte *)i1].PixelCount;
-  int count2 = box [*(UByte *)i2].PixelCount;
+  int count1 = box [*(uint8 *)i1].PixelCount;
+  int count2 = box [*(uint8 *)i2].PixelCount;
   return (count1 > count2) ? -1 : (count1 == count2) ? 0 : +1;
 }
 
@@ -369,8 +369,8 @@ void csQuantizeBegin ()
   csQuantizeEnd ();
 
   // First, allocate the histogram
-  hist = new UShort [HIST_R_MAX * HIST_G_MAX * HIST_B_MAX];
-  memset (hist, 0, HIST_R_MAX * HIST_G_MAX * HIST_B_MAX * sizeof (UShort));
+  hist = new uint16 [HIST_R_MAX * HIST_G_MAX * HIST_B_MAX];
+  memset (hist, 0, HIST_R_MAX * HIST_G_MAX * HIST_B_MAX * sizeof (uint16));
 
   hist_pixels = 0;
   qState = qsCount;
@@ -392,16 +392,16 @@ void csQuantizeCount (csRGBpixel *image, int pixels, csRGBpixel *transp)
   hist_pixels += pixels;
 
   // Now, count all colors in image
-  ULong *src = (ULong *)image;
+  uint32 *src = (uint32 *)image;
   if (transp)
   {
-    ULong tc = (*(ULong *)transp) & RGB_MASK;
+    uint32 tc = (*(uint32 *)transp) & RGB_MASK;
     while (pixels--)
     {
-      ULong pix = *src++;
+      uint32 pix = *src++;
       if (tc != (pix & RGB_MASK))
       {
-        UShort &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+        uint16 &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
         // do not permit overflow here; stick to MAX_USHORT
         if (!++pa) --pa;
       }
@@ -410,8 +410,8 @@ void csQuantizeCount (csRGBpixel *image, int pixels, csRGBpixel *transp)
   else
     while (pixels--)
     {
-      ULong pix = *src++;
-      UShort &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+      uint32 pix = *src++;
+      uint16 &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
       // do not permit overflow here; stick to MAX_USHORT
       if (!++pa) --pa;
     }
@@ -434,11 +434,11 @@ void csQuantizeBias (csRGBpixel *colors, int count, int weight)
     return;
 
   // Now, count all colors in image
-  ULong *src = (ULong *)colors;
+  uint32 *src = (uint32 *)colors;
   while (count--)
   {
-    ULong pix = *src++;
-    UShort &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+    uint32 pix = *src++;
+    uint16 &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
     // do not permit overflow here; stick to MAX_USHORT
     if (unsigned (pa) + delta > 0xffff) pa = 0xffff; else pa += delta;
   }
@@ -587,11 +587,11 @@ void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors, csRGBpixel *tra
 
   // Assign successive palette indices to all boxes
   int count, delta = transp ? 1 : 0;
-  color_index = new UByte [boxcount + delta];
+  color_index = new uint8 [boxcount + delta];
   for (count = 0; count < boxcount; count++)
     color_index [count] = count;
   // Sort palette indices by usage (a side bonus to quantization)
-  qsort (color_index, boxcount, sizeof (UByte), compare_boxes);
+  qsort (color_index, boxcount, sizeof (uint8), compare_boxes);
 
   // Allocate the palette, if not already allocated
   if (!outpalette)
@@ -618,7 +618,7 @@ void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors, csRGBpixel *tra
 }
 
 void csQuantizeRemap (csRGBpixel *image, int pixels,
-  UByte *&outimage, csRGBpixel *transp)
+  uint8 *&outimage, csRGBpixel *transp)
 {
   // Sanity check
   if (qState != qsCount && qState != qsRemap)
@@ -630,7 +630,7 @@ void csQuantizeRemap (csRGBpixel *image, int pixels,
   // will need just a byte per element, so we'll assign the address of
   // histogram memory block to a pointer of suitable type, and the second
   // half of histogram storage remains unused.
-  UByte *icmap = (UByte *)hist;
+  uint8 *icmap = (uint8 *)hist;
 
   int delta = transp ? 1 : 0;
   if (qState == qsCount)
@@ -642,18 +642,18 @@ void csQuantizeRemap (csRGBpixel *image, int pixels,
   }
 
   // Allocate the picture and the palette
-  if (!outimage) outimage = new UByte [pixels];
+  if (!outimage) outimage = new uint8 [pixels];
 
-  ULong *src = (ULong *)image;
-  UByte *dst = outimage;
+  uint32 *src = (uint32 *)image;
+  uint8 *dst = outimage;
   count = pixels;
 
   if (transp)
   {
-    ULong tc = (*(ULong *)transp) & RGB_MASK;
+    uint32 tc = (*(uint32 *)transp) & RGB_MASK;
     while (count--)
     {
-      ULong pix = *src++;
+      uint32 pix = *src++;
       if (tc == (pix & RGB_MASK))
         *dst++ = 0;
       else
@@ -663,13 +663,13 @@ void csQuantizeRemap (csRGBpixel *image, int pixels,
   else
     while (count--)
     {
-      ULong pix = *src++;
+      uint32 pix = *src++;
       *dst++ = icmap [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
     }
 }
 
 void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
-  csRGBpixel *palette, int colors, UByte *&outimage, csRGBpixel *transp)
+  csRGBpixel *palette, int colors, uint8 *&outimage, csRGBpixel *transp)
 {
   // Sanity check
   if (qState != qsCount && qState != qsRemap)
@@ -681,7 +681,7 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
   // will need just a byte per element, so we'll assign the address of
   // histogram memory block to a pointer of suitable type, and the second
   // half of histogram storage remains unused.
-  UByte *icmap = (UByte *)hist;
+  uint8 *icmap = (uint8 *)hist;
 
   int delta = transp ? 1 : 0;
   if (qState == qsCount)
@@ -700,10 +700,10 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
   }
 
   // Allocate the picture and the palette
-  if (!outimage) outimage = new UByte [pixels];
+  if (!outimage) outimage = new uint8 [pixels];
 
   csRGBpixel *src = image;
-  UByte *dst = outimage;
+  uint8 *dst = outimage;
   count = pixels;
 
   int *fserr = (int *)alloca (2 * 3 * (pixperline + 2) * sizeof (int));
@@ -722,7 +722,7 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
     // Even lines are traversed left to right, odd lines backwards.
 
     csRGBpixel *cursrc;
-    UByte *curdst;
+    uint8 *curdst;
     int *curerr, *nexterr;
     int dir;
 
@@ -781,7 +781,7 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
       int b = srcpix.blue  + ((err10b + curerr [2]) / 16);
       if (b < 0) b = 0; if (b > 255) b = 255;
 
-      UByte pix = icmap [((r >> (8 - HIST_R_BITS)) << (HIST_G_BITS + HIST_B_BITS)) |
+      uint8 pix = icmap [((r >> (8 - HIST_R_BITS)) << (HIST_G_BITS + HIST_B_BITS)) |
                          ((g >> (8 - HIST_G_BITS)) << HIST_B_BITS) |
                          ((b >> (8 - HIST_B_BITS)))];
       *curdst = pix;
@@ -819,7 +819,7 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
 }
 
 void csQuantizeRGB (csRGBpixel *image, int pixels, int pixperline,
-  UByte *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither)
+  uint8 *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither)
 {
   csQuantizeBegin ();
 

@@ -180,7 +180,7 @@ bool csAVIFormat::InitVideoData ()
 	aviheader.Endian ();
 	p += AVI_EVEN(avichunk.size);
 	// now read all streamlists
-	for (ULong nStream=0; nStream < aviheader.streamcount; nStream++)
+	for (uint32 nStream=0; nStream < aviheader.streamcount; nStream++)
 	{
 	  memcpy (&strl, p, len_hcl);
 	  strl.Endian ();
@@ -201,7 +201,7 @@ bool csAVIFormat::InitVideoData ()
 		memcpy (&streamheader, p, sizeof (StreamHeader));
 		streamheader.Endian ();
 		p += AVI_EVEN(strh.size);
-		ULong nread = CreateStream (&streamheader);
+		uint32 nread = CreateStream (&streamheader);
 		if (nread == 0)
 		{
 		  // error ! we skip the remainder of the stream LIST
@@ -259,7 +259,7 @@ bool csAVIFormat::InitVideoData ()
 	    if (movi.Is (CHUNK_IDX1))
 	    {
 	      pChunkList = new ChunkList (startframepos - len_id);
-	      pChunkList->LoadList ((UByte*)(moviendpos + len_hcl), movi.size);
+	      pChunkList->LoadList ((uint8*)(moviendpos + len_hcl), movi.size);
 	    }
 	  }
 	}
@@ -312,14 +312,14 @@ bool csAVIFormat::ValidateStreams ()
   return nAudio >= 0 && nVideo == 1;
 }
 
-ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
+uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
 {
-  ULong n=0;
-  UByte *pCID=NULL;
+  uint32 n=0;
+  uint8 *pCID=NULL;
   char *pName = NULL;
-  ULong nCIDLen = 0;
-  UByte *pFormatEx;
-  ULong nFormatEx;
+  uint32 nCIDLen = 0;
+  uint8 *pFormatEx;
+  uint32 nFormatEx;
 
   if (!strncmp (streamheader->type, "auds", 4))
   {
@@ -334,7 +334,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       memcpy (&audsf, p, sizeof (AudioStreamFormat));
       audsf.Endian ();
       p += AVI_EVEN(strh.size);
-      pFormatEx = (UByte*)p;
+      pFormatEx = (uint8*)p;
       nFormatEx = sizeof (audsf) + sizeof (audsf.extra);
       n = AVI_EVEN(strh.size) + len_hcl;
       // optionally follows a "strd" chunk containing codec specific data which is handed
@@ -344,7 +344,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       if (strh.Is (CHUNK_STRD))
       {
 	p += len_hcl;
-	pCID = (UByte*)p;
+	pCID = (uint8*)p;
 	nCIDLen = strh.size;
 	p += AVI_EVEN(strh.size);
 	n += AVI_EVEN(strh.size) + len_hcl;
@@ -381,7 +381,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       p += len_hcl;
       memcpy (&vidsf, p, sizeof (VideoStreamFormat));
       vidsf.Endian ();
-      pFormatEx = (UByte*)p;
+      pFormatEx = (uint8*)p;
       nFormatEx = sizeof(vidsf) + vidsf.size;
       p += AVI_EVEN(strh.size);
       n = AVI_EVEN(strh.size) + len_hcl;
@@ -392,7 +392,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       if (strh.Is (CHUNK_STRD))
       {
 	p += len_hcl;
-	pCID = (UByte*)p;
+	pCID = (uint8*)p;
 	nCIDLen = strh.size;
 	p += AVI_EVEN(strh.size);
 	n += AVI_EVEN(strh.size) + len_hcl;
@@ -438,7 +438,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
   return n;
 }
 
-bool csAVIFormat::HasChunk (ULong id, ULong frameindex)
+bool csAVIFormat::HasChunk (uint32 id, uint32 frameindex)
 {
   bool bSucc = false;
   if (pChunkList)
@@ -475,18 +475,18 @@ bool csAVIFormat::HasChunk (ULong id, ULong frameindex)
   return bSucc;
 }
  
-bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
+bool csAVIFormat::GetChunk (uint32 frameindex, AVIDataChunk *pChunk)
 {
   char *pp = NULL;
-  ULong maxsize=0, n=0;
+  uint32 maxsize=0, n=0;
 
-  if (HasChunk (*(ULong*)pChunk->id, frameindex))
+  if (HasChunk (*(uint32*)pChunk->id, frameindex))
   {
     if (!pChunk->currentframepos)
       pChunk->currentframepos = startframepos;
     if (pChunkList)
     {
-      bool succ = pChunkList->GetPos (*(ULong*)pChunk->id, frameindex, 
+      bool succ = pChunkList->GetPos (*(uint32*)pChunk->id, frameindex, 
 				      pp, pChunk->length);
       pChunk->data = (csSome)(pp + len_hcl);
       pChunk->currentframe = frameindex;
@@ -494,9 +494,9 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
     }
     else
     {  // no index list
-      ULong startfrom = (frameindex < (ULong)pChunk->currentframe ? 0 
+      uint32 startfrom = (frameindex < (uint32)pChunk->currentframe ? 0 
 			 : frameindex <= maxframe ? pChunk->currentframe : maxframe);
-      pp = (frameindex < (ULong)pChunk->currentframe ? startframepos
+      pp = (frameindex < (uint32)pChunk->currentframe ? startframepos
 	    : frameindex <= maxframe ? pChunk->currentframepos : maxframepos);
     
       if (!no_recl)
@@ -555,11 +555,11 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
   return false;
 }
 
-UShort csAVIFormat::stream_number (const char c1, const char c2)
+uint16 csAVIFormat::stream_number (const char c1, const char c2)
 {
 #define AVI_DECODE_HEX(c) ((c)<='9'?(c)-'0':((c)<='F'?(c)-'A'+10:(c)-'a'+10))
 
-  UShort num = AVI_DECODE_HEX(c1);
+  uint16 num = AVI_DECODE_HEX(c1);
   num <<=4;
   num += AVI_DECODE_HEX(c2);
 
@@ -614,9 +614,9 @@ iStream* csAVIFormat::streamiterator::GetNext ()
 }
 
 
-void csAVIFormat::ChunkList::LoadList (UByte *data, ULong length)
+void csAVIFormat::ChunkList::LoadList (uint8 *data, uint32 length)
 {
-  ULong i, nEntries = length / sizeof(indexentry);
+  uint32 i, nEntries = length / sizeof(indexentry);
   indexentry *ie = (indexentry*)data;
   int idx;
 
@@ -631,13 +631,13 @@ void csAVIFormat::ChunkList::LoadList (UByte *data, ULong length)
   }
 }
 
-bool csAVIFormat::ChunkList::HasChunk (ULong id, ULong idx)
+bool csAVIFormat::ChunkList::HasChunk (uint32 id, uint32 idx)
 {
   int i = streamlist.FindKey ((csSome)id);
-  return (i == -1 ? false : idx < (ULong)streamlist.Get (i)->Length ());
+  return (i == -1 ? false : idx < (uint32)streamlist.Get (i)->Length ());
 }
 
-bool csAVIFormat::ChunkList::GetPos (ULong id, ULong idx, char *&pos, ULong &size)
+bool csAVIFormat::ChunkList::GetPos (uint32 id, uint32 idx, char *&pos, uint32 &size)
 {
   int i = streamlist.FindKey ((csSome)id);
   if (i != -1)

@@ -76,7 +76,7 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( UByte* Buffer, ULong size );
+  virtual iModelData *Load( uint8* Buffer, uint32 size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
   struct Component : public iComponent
@@ -490,7 +490,7 @@ bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv, csDataStream &i
   return false;
 }
 
-iModelData *csModelConverterASE::Load (UByte *Buffer, ULong Size)
+iModelData *csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
 {
   csDataStream in (Buffer, Size, false);
   interp = &csASEInterpreter_MAIN;

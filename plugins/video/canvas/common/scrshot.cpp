@@ -36,13 +36,13 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
   {
     Format = CS_IMGFMT_PALETTED8;
     Palette = G2D->GetPalette ();
-    Data = new UByte [Width * Height];
-    UByte *dst = (UByte *)Data;
+    Data = new uint8 [Width * Height];
+    uint8 *dst = (uint8 *)Data;
     for (x = 0; x < Height; x++)
     {
-      UByte *src = (UByte *)G2D->GetPixelAt (0, x);
+      uint8 *src = (uint8 *)G2D->GetPixelAt (0, x);
       if (!src) continue;
-      memcpy (dst, src, Width * sizeof (UByte));
+      memcpy (dst, src, Width * sizeof (uint8));
       dst += Width;
     }
   }
@@ -61,11 +61,11 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
       {
         case 2:
         {
-          UShort *src = (UShort *)G2D->GetPixelAt (0, x);
+          uint16 *src = (uint16 *)G2D->GetPixelAt (0, x);
           if (!src) continue;
           for (y = Width; y; y--)
           {
-            UShort pix = *src++;
+            uint16 pix = *src++;
             dst->red   = ((pix & pfmt->RedMask)   >> pfmt->RedShift)   << rs;
             dst->green = ((pix & pfmt->GreenMask) >> pfmt->GreenShift) << gs;
             dst->blue  = ((pix & pfmt->BlueMask)  >> pfmt->BlueShift)  << bs;
@@ -75,11 +75,11 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
         }
         case 4:
         {
-          ULong *src = (ULong *)G2D->GetPixelAt (0, x);
+          uint32 *src = (uint32 *)G2D->GetPixelAt (0, x);
           if (!src) continue;
           for (y = Width; y; y--)
           {
-            ULong pix = *src++;
+            uint32 pix = *src++;
             dst->red   = ((pix & pfmt->RedMask)   >> pfmt->RedShift)   << rs;
             dst->green = ((pix & pfmt->GreenMask) >> pfmt->GreenShift) << gs;
             dst->blue  = ((pix & pfmt->BlueMask)  >> pfmt->BlueShift)  << bs;
@@ -94,7 +94,7 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
 csScreenShot::~csScreenShot ()
 {
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
-    delete [] (UByte *)Data;
+    delete [] (uint8 *)Data;
   else
     delete [] (csRGBpixel *)Data;
 }

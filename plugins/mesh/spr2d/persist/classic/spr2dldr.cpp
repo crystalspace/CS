@@ -159,7 +159,7 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static UInt ParseMixmode (iReporter* reporter, char* buf)
+static uint ParseMixmode (iReporter* reporter, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -176,7 +176,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
   long cmd;
   char* params;
 
-  UInt Mixmode = 0;
+  uint Mixmode = 0;
 
   while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
   {
@@ -263,7 +263,7 @@ static void ParseAnim (iReporter* reporter, iSprite2DFactoryState* spr2dLook,
 }
 
 iBase* csSprite2DFactoryLoader::Parse (const char* string,
-	iMaterialList* matlist, iMeshFactoryList* factlist,
+	iMaterialList* matlist, iMeshFactoryList* /*factlist*/,
 	iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -336,8 +336,8 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  UInt mm = ParseMixmode (reporter, params);
-	  if (mm == (UInt)~0)
+	  uint mm = ParseMixmode (reporter, params);
+	  if (mm == (uint)~0)
 	  {
 	    spr2dLook->DecRef ();
 	    fact->DecRef ();
@@ -383,7 +383,7 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, UInt mixmode)
+static void WriteMixmode(iStrVector *str, uint mixmode)
 {
   str->Push(csStrNew("  MIXMODE ("));
   if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
@@ -515,8 +515,8 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  UInt mm = ParseMixmode (reporter, params);
-	  if (mm == (UInt)~0)
+	  uint mm = ParseMixmode (reporter, params);
+	  if (mm == (uint)~0)
 	  {
 	    if (spr2dLook) spr2dLook->DecRef ();
 	    mesh->DecRef ();

@@ -290,7 +290,7 @@ void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
 
 // This variable is usually NULL except when doing a screen shot:
 // in this case it is a temporarily allocated buffer for glReadPixels ()
-static UByte *screen_shot = NULL;
+static uint8 *screen_shot = NULL;
 
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
@@ -412,7 +412,7 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
 
   // Need to resolve pixel alignment issues
   int screen_width = Width * pfmt.PixelBytes;
-  screen_shot = new UByte [screen_width * Height];
+  screen_shot = new uint8 [screen_width * Height];
   if (!screen_shot) return NULL;
 
   // glPixelStore ()?
@@ -440,7 +440,7 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
   // colors.
   if (pfmt.PixelBytes == 4)
   {
-    ulong* s = (ulong*)screen_shot;
+    uint32* s = (uint32*)screen_shot;
     int i;
     for (i = 0 ; i < Width*Height ; i++)
     {

@@ -83,7 +83,7 @@ class csTextureNull : public csTexture
 {
 public:
   /// The bitmap
-  UByte *bitmap;
+  uint8 *bitmap;
   /// The alpha map (NULL if no alphamap)
   uint8 *alphamap;
   /// The image (temporary storage)
@@ -103,7 +103,7 @@ public:
   virtual ~csTextureNull ()
   { delete [] bitmap; delete [] alphamap; if (image) image->DecRef (); }
   /// Return a pointer to texture data
-  UByte *get_bitmap ()
+  uint8 *get_bitmap ()
   { return bitmap; }
   /// Return a pointer to alpha map data
   uint8 *get_alphamap ()
@@ -227,7 +227,7 @@ public:
   void SetPixelFormat (csPixelFormat &PixelFormat);
 
   /// Encode RGB values to a 16-bit word (for 16-bit mode).
-  ULong encode_rgb (int r, int g, int b);
+  uint32 encode_rgb (int r, int g, int b);
 
   /**
    * Create the inverse colormap. The forward colormap

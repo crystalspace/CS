@@ -35,7 +35,7 @@ private:
 //  bool LoadMaterialData( iMaterial *pCSMaterial, Lib3dsMaterial *p3dsMaterial );
   bool LoadMeshObjectData( iModelDataObject *pData, Lib3dsMesh *p3dsMesh );
 
-  Lib3dsFile * LoadFileData( UByte* Buffer, ULong size );
+  Lib3dsFile * LoadFileData( uint8* Buffer, uint32 size );
 
 public:
   SCF_DECLARE_IBASE;
@@ -49,7 +49,7 @@ public:
   bool Initialize( iObjectRegistry *object_reg );
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( UByte* Buffer, ULong size );
+  virtual iModelData *Load( uint8* Buffer, uint32 size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
   struct eiComponent : public iComponent

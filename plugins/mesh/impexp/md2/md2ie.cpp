@@ -84,7 +84,7 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( UByte* Buffer, ULong size );
+  virtual iModelData *Load( uint8* Buffer, uint32 size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
   struct Component : public iComponent
@@ -211,7 +211,7 @@ static void ReadMD2Header (csMD2Header *hdr, csDataStream *in)
 
 #undef CS_MD2_READ
 
-iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
+iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 {
   // prepare input buffer
   csDataStream in (Buffer, Size, false);

@@ -36,10 +36,10 @@ CS_IMPLEMENT_PLUGIN
 #define BI_BITFIELDS  3  // Bitfields
 #endif
 
-#define BICOMP(x)    *(ULong*)((x)+16)
-#define BITCOUNT(x)  *(UShort*)((x) + 14)
-#define BICLRUSED(x) *(ULong*)((x) + 32)
-#define BIPALETTE(x) (UByte*)((x)+40)
+#define BICOMP(x)    *(uint32*)((x)+16)
+#define BITCOUNT(x)  *(uint16*)((x) + 14)
+#define BICLRUSED(x) *(uint32*)((x) + 32)
+#define BIPALETTE(x) (uint8*)((x)+40)
 
 SCF_IMPLEMENT_IBASE (csRLECodec)
   SCF_IMPLEMENTS_INTERFACE (iAVICodec)
@@ -63,11 +63,11 @@ csRLECodec::~csRLECodec ()
   delete [] pixel;
 }
 
-static void decode_idx (UByte *dst, UByte *src, ULong, csRGBcolor *pMap, 
+static void decode_idx (uint8 *dst, uint8 *src, uint32, csRGBcolor *pMap, 
 			int w, int h)
 {
   int i,j;
-  UByte *ps;
+  uint8 *ps;
   src = src + (h-1)*w;
 
   for (i=0; i<h; i++)
@@ -82,11 +82,11 @@ static void decode_idx (UByte *dst, UByte *src, ULong, csRGBcolor *pMap,
   }
 }
 
-static void decode_rgb24 (UByte *dst, UByte *src, ULong, csRGBcolor *, 
+static void decode_rgb24 (uint8 *dst, uint8 *src, uint32, csRGBcolor *, 
 			  int w, int h)
 {
   int i,j;
-  UByte *ps;
+  uint8 *ps;
   int stride = w*3;
 
   src = src + (h-1)*stride;
@@ -105,14 +105,14 @@ static void decode_rgb24 (UByte *dst, UByte *src, ULong, csRGBcolor *,
   }
 }
 
-static void decode_rle8 (UByte *dst, UByte *src, ULong inlen, csRGBcolor *pMap, 
+static void decode_rle8 (uint8 *dst, uint8 *src, uint32 inlen, csRGBcolor *pMap, 
 			 int w, int h)
 {
   // Decompress pixel data
-  UByte rl, rl1, i;			// runlength
-  UByte clridx, clridx1;		// colorindex
+  uint8 rl, rl1, i;			// runlength
+  uint8 clridx, clridx1;		// colorindex
   int buffer_x = 0;
-  UByte *ps, *end, *buffer_y;
+  uint8 *ps, *end, *buffer_y;
   ps = src;
   end = ps + inlen;
   int dststride = w*4;
@@ -168,8 +168,8 @@ static void decode_rle8 (UByte *dst, UByte *src, ULong inlen, csRGBcolor *pMap,
   }
 }
 
-bool csRLECodec::Initialize (csStreamDescription *desc, UByte *, ULong, 
-			     UByte *pFormatEx, ULong nFormatEx)
+bool csRLECodec::Initialize (csStreamDescription *desc, uint8 *, uint32, 
+			     uint8 *pFormatEx, uint32 nFormatEx)
 {
   csVideoStreamDescription *vd = (csVideoStreamDescription *)desc;
   w = vd->width;
@@ -183,7 +183,7 @@ bool csRLECodec::Initialize (csStreamDescription *desc, UByte *, ULong,
     if (nFormatEx != 0)
     {
       int i, nMaxColor = 256; //MIN (256, (nFormatEx-40) / 4);
-      UByte *pPal = BIPALETTE(pFormatEx);
+      uint8 *pPal = BIPALETTE(pFormatEx);
       memset (cmap, 0, 256 * sizeof(csRGBcolor));
       // read colormap
       for (i=0; i < nMaxColor; i++)
@@ -225,18 +225,18 @@ void csRLECodec::GetCodecDescription (csCodecDescription &desc)
   desc.encodeinput = CS_CODECFORMAT_RGBA_INTERLEAVED;
 }
 
-bool csRLECodec::Decode (char *indata, ULong inlength, void *&outdata)
+bool csRLECodec::Decode (char *indata, uint32 inlength, void *&outdata)
 {
   if (bOK)
   {
-    decode ((UByte*)pixel, (UByte*)indata, inlength, &cmap[0], w, h);
+    decode ((uint8*)pixel, (uint8*)indata, inlength, &cmap[0], w, h);
     outdata = (void*)pixel;
     return true;
   }
   return false;
 }
 
-bool csRLECodec::Encode (void *, char *, ULong &)
+bool csRLECodec::Encode (void *, char *, uint32 &)
 {
   return false;
 }

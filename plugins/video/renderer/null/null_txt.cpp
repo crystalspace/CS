@@ -135,7 +135,7 @@ csTextureHandleNull::~csTextureHandleNull ()
 {
   texman->UnregisterTexture (this);
   texman->DecRef ();
-  delete [] (UByte *)pal2glob;
+  delete [] (uint8 *)pal2glob;
   delete [] pal2glob8;
 }
 
@@ -225,30 +225,30 @@ void csTextureHandleNull::remap_texture (csTextureManager *texman)
   switch (texman->pfmt.PixelBytes)
   {
     case 1:
-      delete [] (UByte *)pal2glob;
-      pal2glob = new UByte [palette_size];
+      delete [] (uint8 *)pal2glob;
+      pal2glob = new uint8 [palette_size];
       delete [] pal2glob8;
       pal2glob8 = new uint16 [palette_size];
       for (i = 0; i < palette_size; i++)
       {
-        ((UByte *)pal2glob) [i] = txm->cmap.find_rgb (palette [i].red,
+        ((uint8 *)pal2glob) [i] = txm->cmap.find_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
         pal2glob8 [i] = txm->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       }
       break;
     case 2:
-      delete [] (UShort *)pal2glob;
-      pal2glob = new UShort [palette_size];
+      delete [] (uint16 *)pal2glob;
+      pal2glob = new uint16 [palette_size];
       for (i = 0; i < palette_size; i++)
-        ((UShort *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
+        ((uint16 *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
     case 4:
-      delete [] (ULong *)pal2glob;
-      pal2glob = new ULong [palette_size];
+      delete [] (uint32 *)pal2glob;
+      pal2glob = new uint32 [palette_size];
       for (i = 0; i < palette_size; i++)
-        ((ULong *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
+        ((uint32 *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
   }
@@ -301,7 +301,7 @@ void csTextureManagerNull::Clear ()
   csTextureManager::Clear ();
 }
 
-ULong csTextureManagerNull::encode_rgb (int r, int g, int b)
+uint32 csTextureManagerNull::encode_rgb (int r, int g, int b)
 {
   return
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
@@ -338,7 +338,7 @@ void csTextureManagerNull::create_inv_cmap ()
   // Greg Ewing, 12 Oct 1998
   delete inv_cmap;
   inv_cmap = NULL; // let the routine allocate the array itself
-  UByte* im;
+  uint8* im;
   csInverseColormap (256, &cmap [0], RGB2PAL_BITS_R, RGB2PAL_BITS_G,
     RGB2PAL_BITS_B, im);
   inv_cmap = im;

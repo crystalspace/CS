@@ -210,7 +210,7 @@ static void DrawTriangle (
   csVector2 triangle[3];
   csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARCODED!
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
-  UByte clip_result;
+  uint8 clip_result;
 
   //-----
   // Do backface culling. Note that this depends on the

@@ -481,12 +481,12 @@ iMaterialWrapper* csIsoMeshSprite::GetMaterialWrapper() const
   return NULL;
 }
 
-void csIsoMeshSprite::SetMixMode(UInt /*mode*/)
+void csIsoMeshSprite::SetMixMode(uint /*mode*/)
 {
   // nothing
 }
 
-UInt csIsoMeshSprite::GetMixMode() const
+uint csIsoMeshSprite::GetMixMode() const
 {
   /// CS_FX_COPY -> rendered in main pass,
   /// CS_FX_ADD -> in alpha pass

@@ -87,9 +87,9 @@ bool csGraphics2DDOSRAW::Initialize (iObjectRegistry *object_reg)
     exit (-1);
   }
 
-  pfmt.RedMask = (ULong)rm;
-  pfmt.GreenMask = (ULong)gm;
-  pfmt.BlueMask = (ULong)bm;
+  pfmt.RedMask = (uint32)rm;
+  pfmt.GreenMask = (uint32)gm;
+  pfmt.BlueMask = (uint32)bm;
   pfmt.PixelBytes = (Depth + 7) / 8;
   pfmt.complete ();
   return true;

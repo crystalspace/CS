@@ -64,7 +64,7 @@ private:
   csSprite2DMeshObjectFactory* factory;
 
   iMaterialWrapper* material;
-  UInt MixMode;
+  uint MixMode;
   bool initialized;
   iMeshObjectDrawCallback* vis_cb;
   csVector3 radius;
@@ -165,8 +165,8 @@ public:
       scfParent->material = material;
     }
     virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
-    virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () const { return scfParent->MixMode; }
+    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
+    virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual csColoredVertices& GetVertices ()
     {
       return scfParent->GetVertices ();
@@ -202,7 +202,7 @@ public:
     virtual void SetColor (const csColor& col);
     virtual void AddColor (const csColor& col);
     virtual void ScaleBy (float factor);
-    virtual void SetMixMode (UInt mode)
+    virtual void SetMixMode (uint mode)
     {
       scfParent->MixMode = mode;
     }
@@ -240,7 +240,7 @@ protected:
 private:
   iMaterialWrapper* material;
   iBase* logparent;
-  UInt MixMode;
+  uint MixMode;
   /**
    * If false then we don't do lighting but instead use
    * the given colors.
@@ -259,7 +259,7 @@ public:
   /// Get the material for this 2D sprite.
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
-  UInt GetMixMode () const { return MixMode; }
+  uint GetMixMode () const { return MixMode; }
   
   int GetUVAnimationCount () const {return vAnims.Length ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
@@ -307,8 +307,8 @@ public:
       scfParent->material = material;
     }
     virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
-    virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () const { return scfParent->MixMode; }
+    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
+    virtual uint GetMixMode () const { return scfParent->MixMode; }
 
     virtual int GetUVAnimationCount () const {return scfParent->GetUVAnimationCount();}
     virtual iSprite2DUVAnimation *CreateUVAnimation ()

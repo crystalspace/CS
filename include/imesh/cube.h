@@ -54,9 +54,9 @@ struct iCubeFactoryState : public iBase
   /// Get material of cube.
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
-  virtual void SetMixMode (UInt mode) = 0;
+  virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () const = 0;
+  virtual uint GetMixMode () const = 0;
 };
 
 #endif

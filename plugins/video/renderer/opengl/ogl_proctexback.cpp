@@ -261,10 +261,10 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
 		    buffer);
 
       csRGBpixel *dst = tex_0->get_image_data();
-      UShort bb = 8 - pfmt.BlueBits;
-      UShort gb = 8 - pfmt.GreenBits;
-      UShort rb = 8 - pfmt.RedBits;
-      UShort *src = (UShort*) buffer;
+      uint16 bb = 8 - pfmt.BlueBits;
+      uint16 gb = 8 - pfmt.GreenBits;
+      uint16 rb = 8 - pfmt.RedBits;
+      uint16 *src = (uint16*) buffer;
 	  int i;
       for (i = 0; i < width*height; i++, src++, dst++)
       {

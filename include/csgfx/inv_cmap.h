@@ -53,7 +53,7 @@
  * 			rgbmap[(r<<(gbits+bbits)) + (g<<bbits) + b]
  * 			is the colormap entry that is closest to the
  * 			(quantized) color (r,g,b). If NULL, it will be
- *                      allocated with "new UByte * []"
+ *                      allocated with "new uint8* []"
  * Assumptions:
  * 	Quantization is performed by right shift (low order bits are
  * 	truncated).  Thus, the distance to a quantized color is
@@ -84,7 +84,7 @@
  * If someone can find out why it happens, he is free to do it -- A.Z.
  */
 extern void csInverseColormap (int colors, csRGBpixel *colormap,
-  int rbits, int gbits, int bbits, UByte *&rgbmap,
-  ULong *dist_buf = NULL);
+  int rbits, int gbits, int bbits, uint8 *&rgbmap,
+  uint32 *dist_buf = NULL);
 
 #endif // __INV_CMAP_H__

@@ -107,7 +107,7 @@ const csVector& csMultiplexImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csMultiplexImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+iImage *csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   int i;
   for (i=0; i<list.Length(); i++)

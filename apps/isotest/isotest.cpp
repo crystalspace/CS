@@ -117,7 +117,7 @@ void Cleanup ()
 
 /// call during 2d phase
 static void DebugZBufShow(iGraphics3D *g3d, iGraphics2D *g2d, 
-  iTextureManager *txtmgr)
+  iTextureManager* /*txtmgr*/)
 {
   int w = g3d->GetWidth();
   int h = g3d->GetHeight();

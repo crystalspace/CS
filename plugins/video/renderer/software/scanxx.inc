@@ -332,7 +332,7 @@ void SCAN_NAME (SCAN_BPP, scan_flat_ztest) (int xx, unsigned char* d,
 #define SCANLOOP \
   do									\
   {									\
-    UByte c = srcTex [((uu >> 16) & ander_w) +				\
+    uint8 c = srcTex [((uu >> 16) & ander_w) +				\
       ((vv >> shifter_h) & ander_h)];					\
     if (c)								\
     {									\
@@ -356,7 +356,7 @@ void SCAN_NAME (SCAN_BPP, scan_flat_ztest) (int xx, unsigned char* d,
 #define SCANLOOP \
   do									\
   {									\
-    UByte c = srcTex [((uu >> 16) & ander_w) +				\
+    uint8 c = srcTex [((uu >> 16) & ander_w) +				\
       ((vv >> shifter_h) & ander_h)];					\
     if (c)								\
     {									\
@@ -384,7 +384,7 @@ void SCAN_NAME (SCAN_BPP, scan_flat_ztest) (int xx, unsigned char* d,
   {									\
     if (izz >= *z_buffer)						\
     {									\
-      UByte c = srcTex [((uu >> 16) & ander_w) +			\
+      uint8 c = srcTex [((uu >> 16) & ander_w) +			\
         ((vv >> shifter_h) & ander_h)];					\
       if (!c) goto transp_pixel;					\
       *z_buffer = izz;							\
@@ -412,7 +412,7 @@ transp_pixel:								\
   {									\
     if (izz >= *z_buffer)						\
     {									\
-      UByte c = srcTex [((uu >> 16) & ander_w) +			\
+      uint8 c = srcTex [((uu >> 16) & ander_w) +			\
         ((vv >> shifter_h) & ander_h)];					\
       if (!c) goto transp_pixel;					\
       *_dest = COLORMAP [c];						\

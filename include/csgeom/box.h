@@ -481,7 +481,7 @@ public:
    * Given a face index (BOX_SIDE_???) return the four edges oriented
    * clockwise around this face (BOX_EDGE_???).
    */
-  UByte* GetFaceEdges (int face) const
+  uint8* GetFaceEdges (int face) const
   {
     return faces[face];
   }

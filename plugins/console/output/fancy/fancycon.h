@@ -34,7 +34,7 @@ struct ConDecoBorder
 {
   iMaterialHandle *mat;
   bool do_keycolor;
-  UByte kr, kg, kb;
+  uint8 kr, kg, kb;
   bool do_stretch;
   int offx, offy;
   bool do_alpha;

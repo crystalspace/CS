@@ -59,7 +59,7 @@ private:
   {
     if (handle && handle->GetKeyColor ())
     {
-      UByte r, g, b;
+      uint8 r, g, b;
       handle->GetKeyColor (r, g, b);
       SetKeyColor ((int)r, (int)g, (int)b);
     }

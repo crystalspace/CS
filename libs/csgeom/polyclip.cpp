@@ -37,11 +37,11 @@ csClipper::csClipper ()
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-UByte csClipper::ClipInPlace (csVector2 *InPolygon, int &InOutCount,
+uint8 csClipper::ClipInPlace (csVector2 *InPolygon, int &InOutCount,
   csBox2 &BoundingBox)
 {
   csVector2 TempPoly [MAX_OUTPUT_VERTICES];
-  UByte rc = Clip (InPolygon, InOutCount, TempPoly, InOutCount, BoundingBox);
+  uint8 rc = Clip (InPolygon, InOutCount, TempPoly, InOutCount, BoundingBox);
   if (rc != CS_CLIP_OUTSIDE)
     memcpy (InPolygon, TempPoly, InOutCount * sizeof (csVector2));
   return rc;
@@ -61,7 +61,7 @@ int csBoxClipper::ClassifyBox (const csBox2 &box)
   return 0;
 }
 
-UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
+uint8 csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount)
 {
 #include "boxclip.inc"
@@ -69,7 +69,7 @@ UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
   return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
 }
 
-UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
+uint8 csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus)
 {
 #define OUTPUT_VERTEX_STATUS
@@ -79,7 +79,7 @@ UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
   return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
 }
 
-UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
+uint8 csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox)
 {
   if (!region.Overlap (BoundingBox))
@@ -204,7 +204,7 @@ bool csPolygonClipper::IsInside (const csVector2& v)
   return true;
 }
 
-UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
+uint8 csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount)
 {
 #include "polyclip.inc"
@@ -213,13 +213,13 @@ UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
   return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
 }
 
-UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
+uint8 csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox)
 {
   if (!ClipBox.Overlap (BoundingBox))
     return false;
 
-  UByte rc = Clip (InPolygon, InCount, OutPolygon, OutCount);
+  uint8 rc = Clip (InPolygon, InCount, OutPolygon, OutCount);
   if (rc != CS_CLIP_OUTSIDE)
   {
     BoundingBox.StartBoundingBox (OutPolygon [0]);
@@ -230,7 +230,7 @@ UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
   return rc;
 }
 
-UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
+uint8 csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus)
 {
 #define OUTPUT_VERTEX_STATUS

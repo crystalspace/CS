@@ -25,7 +25,7 @@
     Before including this file you should define the following macros:
 
     WR_NAME - The name of routine (WriteString8 etc).
-    WR_PIXTYPE - The type of a pixel (UByte, UShort, ULong)
+    WR_PIXTYPE - The type of a pixel (uint8, uint16, uint32)
 */
 
 void csGraphics2D::WR_NAME (csGraphics2D *This, iFont *font, int x, int y,
@@ -35,7 +35,7 @@ void csGraphics2D::WR_NAME (csGraphics2D *This, iFont *font, int x, int y,
     return;
 
   int charW, charH;
-  for (uchar c = *text; (c = *text); ++text, x += charW)
+  for (uint8 c = *text; (c = *text); ++text, x += charW)
   {
     if (x > This->ClipX2)
       return;

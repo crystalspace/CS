@@ -139,7 +139,7 @@ struct csFlareComponent {
   /// visual image of component
   iMaterialWrapper *image;
   /// mixmode for drawing
-  UInt mixmode;
+  uint mixmode;
   /// next component to draw
   csFlareComponent *next;
 };
@@ -164,7 +164,7 @@ public:
    * give position, size, image and mixmode.
    * The component is added at the end of the list - to be displayed last.
    */
-  void AddComponent(float pos, float w, float h, UInt mode, 
+  void AddComponent(float pos, float w, float h, uint mode, 
     iMaterialWrapper *image);
   /// Get the list of component
   csFlareComponent *GetComponents() const {return components;}
@@ -180,7 +180,7 @@ public:
   struct FlareHalo : public iFlareHalo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csFlareHalo);
-    virtual void AddComponent (float pos, float w, float h, UInt mode, 
+    virtual void AddComponent (float pos, float w, float h, uint mode, 
       iMaterialWrapper *image)
     {
       scfParent->AddComponent (pos, w, h, mode, image);

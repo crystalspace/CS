@@ -207,7 +207,7 @@ static bool display_picture (iImage *ifile)
   static char imgchr [] = " .,;+*oO";
   ifile->Rescale (opt.displayW, opt.displayH);
   csRGBpixel *rgb = ifile->GetPalette ();
-  UByte *idx = (UByte *)ifile->GetImageData ();
+  uint8 *idx = (uint8 *)ifile->GetImageData ();
   int y, x;
   for (y = 0; y < opt.displayH; y++)
   {
@@ -363,7 +363,7 @@ static bool process_file (const char *fname)
   if (opt.verbose)
     printf ("Reading %ld bytes from file\n", (long)fsize);
 
-  UByte *buffer = new UByte [fsize];
+  uint8 *buffer = new uint8 [fsize];
   if (fread (buffer, 1, fsize, f) < fsize)
   {
     printf ("%s: unexpected EOF while reading file %s\n", programname, fname);

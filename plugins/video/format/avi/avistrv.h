@@ -33,12 +33,12 @@ class csAVIStreamVideo : public iVideoStream
 {
  protected:
   csRect rc;
-  UInt fxmode;
+  uint fxmode;
   bool bTimeSynced;
   G3DPolygonDPFX polyfx;
   csImageMemory memimage;
   csAVIFormat::AVIDataChunk *pChunk;
-  UShort nStream;
+  uint16 nStream;
   csVideoStreamDescription strdesc;
   csAVIFormat *pAVI;
   csImageArea *pIA;
@@ -55,7 +55,7 @@ class csAVIStreamVideo : public iVideoStream
   void rgba_channel_2_rgba_interleave (char *data[4]);
   void rgba_interleave (char *data);
 
-  bool LoadCodec (UByte *pInitData, ULong nInitDataLen, UByte *pFormatEx, ULong nFormatEx);
+  bool LoadCodec (uint8 *pInitData, uint32 nInitDataLen, uint8 *pFormatEx, uint32 nFormatEx);
   void makeMaterial ();
   bool NextFrameGetData ();
   void PrepImageArea ();
@@ -67,23 +67,23 @@ class csAVIStreamVideo : public iVideoStream
   bool Initialize (const csAVIFormat::AVIHeader *ph, 
 		   const csAVIFormat::StreamHeader *psh, 
 		   const csAVIFormat::VideoStreamFormat *pf, 
-		   UShort nStreamNumber,
-		   UByte *pInitData, ULong nInitDataLen,
+		   uint16 nStreamNumber,
+		   uint8 *pInitData, uint32 nInitDataLen,
 		   char *pName, 
-		   UByte *pFormatEx, ULong nFormatEx, 
+		   uint8 *pFormatEx, uint32 nFormatEx, 
 		   iObjectRegistry *object_reg);
   virtual ~csAVIStreamVideo ();
 
   // iStream
   virtual void GetStreamDescription (csStreamDescription &desc);
-  virtual bool GotoFrame (ULong frameindex);
-  virtual bool GotoTime (ULong timeindex);
+  virtual bool GotoFrame (uint32 frameindex);
+  virtual bool GotoTime (uint32 timeindex);
   virtual bool SetPlayMethod (bool bTimeSynced);
   virtual void NextFrame ();
   // iVideoStream
   virtual void GetStreamDescription (csVideoStreamDescription &desc);
   virtual bool SetRect (int x, int y, int w, int h);
-  virtual bool SetFXMode (UInt mode);
+  virtual bool SetFXMode (uint mode);
   virtual iMaterialHandle* NextFrameGetMaterial ();
 };
 

@@ -27,9 +27,9 @@ struct iKeyboardDriver;
 
 // avoid including os2.h
 class glWindow;
-typedef ULong HWND;
-typedef ULong ULONG;
-typedef ULong HPAL;
+typedef uint32 HWND;
+typedef uint32 ULONG;
+typedef uint32 HPAL;
 
 /**
  * This is the OS/2 OpenGL 2D driver. I did not had any chance to test
@@ -43,9 +43,9 @@ typedef ULong HPAL;
 class csGraphics2DOS2GL : public csGraphics2DGLCommon
 {
   /// Pixel format (a combination of GLCF_XXX)
-  UInt PixelFormat;
+  uint PixelFormat;
   /// The width for which LineAddress has been computed last time
-  UInt LineAddressFrameW;
+  uint LineAddressFrameW;
   /// The OpenGL window object
   glWindow *glW;
   /// The handle of window where OpenGL context is located

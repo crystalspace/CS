@@ -44,11 +44,11 @@ struct swap_4
 #else
 
 /// Convert a long from big-endian to machine format
-static inline ULong big_endian_long (ULong l)
+static inline uint32 big_endian_long (uint32 l)
 { return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
 
 /// Convert a short from big-endian to machine format
-static inline UShort big_endian_short (UShort s)
+static inline uint16 big_endian_short (uint16 s)
 { return (s >> 8) | (s << 8); }
 
 /// Convert a big-endian floating-point number to machine format
@@ -71,11 +71,11 @@ static inline float big_endian_float (float f)
 #else
 
 /// Convert a long from little-endian to machine format
-static inline ULong little_endian_long (ULong l)
+static inline uint32 little_endian_long (uint32 l)
 { return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
 
 /// Convert a short from little-endian to machine format
-static inline UShort little_endian_short (UShort s)
+static inline uint16 little_endian_short (uint16 s)
 { return (s >> 8) | (s << 8); }
 
 /// Convert a little-endian floating-point number to machine format
@@ -154,12 +154,12 @@ static inline float short2float (short s)
   return ldexp (mant, exp);
 }
 
-/// Swap the bytes in a ULong value.
-static inline ULong convert_endian (ULong l)
+/// Swap the bytes in a uint32 value.
+static inline uint32 convert_endian (uint32 l)
 { return little_endian_long (l); }
 
 /// Swap the bytes in a long value.
-static inline long convert_endian (long l)
+static inline int32 convert_endian (int32 l)
 { return little_endian_long (l); }
 
 /// Swap the bytes in a int value.
@@ -167,7 +167,7 @@ static inline int convert_endian (int i)
 { return little_endian_long (i); }
 
 /// Swap the bytes in a short value.
-static inline UShort convert_endian (UShort s)
+static inline uint16 convert_endian (uint16 s)
 { return little_endian_short (s); }
 
 /// Swap the bytes in a float value.
@@ -175,54 +175,54 @@ static inline float convert_endian (float f)
 { return little_endian_float (f); }
 
 /// Read a little-endian short from address
-inline UShort get_le_short (void *buff)
+inline uint16 get_le_short (void *buff)
 {
 #ifdef PROC_NEEDS_STRICT_ALIGNMENT
-  UShort s; memcpy (&s, buff, sizeof (s));
+  uint16 s; memcpy (&s, buff, sizeof (s));
   return little_endian_short (s);
 #else
-  return little_endian_short (*(UShort *)buff);
+  return little_endian_short (*(uint16 *)buff);
 #endif
 }
 
 /// Read a little-endian long from address
-inline ULong get_le_long (void *buff)
+inline uint32 get_le_long (void *buff)
 {
 #ifdef PROC_NEEDS_STRICT_ALIGNMENT
-  ULong l; memcpy (&l, buff, sizeof (l));
+  uint32 l; memcpy (&l, buff, sizeof (l));
   return little_endian_long (l);
 #else
-  return little_endian_long (*(ULong *)buff);
+  return little_endian_long (*(uint32 *)buff);
 #endif
 }
 
 /// Read a little-endian 32-bit float from address
 inline float get_le_float32 (void *buff)
-{ ULong l = get_le_long (buff); return long2float (l); }
+{ uint32 l = get_le_long (buff); return long2float (l); }
 
 /// Read a little-endian 16-bit float from address
 inline float get_le_float16 (void *buff)
-{ UShort s = get_le_short (buff); return short2float (s); }
+{ uint16 s = get_le_short (buff); return short2float (s); }
 
 /// Set a little-endian short on a address
-inline void set_le_short (void *buff, UShort s)
+inline void set_le_short (void *buff, uint16 s)
 {
 #ifdef PROC_NEEDS_STRICT_ALIGNMENT
   s = little_endian_short (s);
   memcpy (buff, &s, sizeof (s));
 #else
-  *((UShort *)buff) = little_endian_short (s);
+  *((uint16 *)buff) = little_endian_short (s);
 #endif
 }
 
 /// Set a little-endian long on a address
-inline void set_le_long (void *buff, ULong l)
+inline void set_le_long (void *buff, uint32 l)
 {
 #ifdef PROC_NEEDS_STRICT_ALIGNMENT
   l = little_endian_long (l);
   memcpy (buff, &l, sizeof (l));
 #else
-  *((ULong *)buff) = little_endian_long (l);
+  *((uint32 *)buff) = little_endian_long (l);
 #endif
 }
 

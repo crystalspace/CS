@@ -39,10 +39,10 @@ csAVIStreamAudio::csAVIStreamAudio (iBase *pBase)
 bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph, 
 				   const csAVIFormat::StreamHeader *psh, 
 				   const csAVIFormat::AudioStreamFormat *pf, 
-				   UShort nStreamNumber,
-				   UByte *pInitData, ULong nInitDataLen,
+				   uint16 nStreamNumber,
+				   uint8 *pInitData, uint32 nInitDataLen,
 				   char *pName, 
-				   UByte *pFormatEx, ULong nFormatEx, 
+				   uint8 *pFormatEx, uint32 nFormatEx, 
 				   iObjectRegistry *object_reg)
 {
 
@@ -88,12 +88,12 @@ void csAVIStreamAudio::GetStreamDescription (csStreamDescription &desc)
   memcpy (&desc, (csStreamDescription*)&strdesc, sizeof (csStreamDescription));
 }
 
-bool csAVIStreamAudio::GotoFrame (ULong frameindex)
+bool csAVIStreamAudio::GotoFrame (uint32 frameindex)
 {
   return pAVI->GetChunk (frameindex, pChunk);
 }
 
-bool csAVIStreamAudio::GotoTime (ULong timeindex)
+bool csAVIStreamAudio::GotoTime (uint32 timeindex)
 {
   (void)timeindex;
   // not yet implemented
@@ -125,8 +125,8 @@ void csAVIStreamAudio::NextFrame ()
   */
 }
 
-bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen, 
-				  UByte *pFormatEx, ULong nFormatEx)
+bool csAVIStreamAudio::LoadCodec (uint8 *pInitData, uint32 nInitDataLen, 
+				  uint8 *pFormatEx, uint32 nFormatEx)
 {
   // based on the codec id we try to load the apropriate codec
 

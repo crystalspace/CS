@@ -77,8 +77,8 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
   int bw = txt_unl->get_width ();
   int bh = txt_unl->get_height ();
 
-  UByte *bitmap = txt_unl->get_bitmap ();
-  UByte *alpha_map = txt_unl->get_alphamap ();
+  uint8 *bitmap = txt_unl->get_bitmap ();
+  uint8 *alpha_map = txt_unl->get_alphamap ();
   DP_PIXTYPE *palette = (DP_PIXTYPE *)tex_mm->GetPaletteToGlobal ();
 #ifdef DP_PIXFORM_INDEX8
   uint16 *PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
@@ -141,13 +141,13 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
       for (ty = (ty << 16) & bhm; sh > 0; sh--, ty = (ty + dy) & bhm, sy++)
       {
         DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
-        UByte *data = bitmap + (ty >> 16) * bw;
-        UByte *alpha = alpha_map + (ty >> 16) * bw;
+        uint8 *data = bitmap + (ty >> 16) * bw;
+        uint8 *alpha = alpha_map + (ty >> 16) * bw;
         int _tx = tx;
         if (transp)
           for (int w = sw; w; w--)
           {
-            UByte pixel = data [(_tx & bwm) >> 16];
+            uint8 pixel = data [(_tx & bwm) >> 16];
             if (pixel)
 	    {
 	      register uint8
@@ -181,13 +181,13 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
       for (; sh > 0; sh--, ty += dy, sy++)
       {
         DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
-        UByte *data = bitmap + (ty >> 16) * bw;
-        UByte *alpha = alpha_map + (ty >> 16) * bw;
+        uint8 *data = bitmap + (ty >> 16) * bw;
+        uint8 *alpha = alpha_map + (ty >> 16) * bw;
         int tx = 0;
         if (transp)
           for (int w = sw; w; w--)
           {
-            UByte pixel = data [tx >> 16];
+            uint8 pixel = data [tx >> 16];
             if (pixel)
 	    {
 	      register uint8
@@ -232,12 +232,12 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
       for (ty = (ty << 16) & bhm; sh > 0; sh--, ty = (ty + dy) & bhm, sy++)
       {
         DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
-        UByte *data = bitmap + (ty >> 16) * bw;
+        uint8 *data = bitmap + (ty >> 16) * bw;
         int _tx = tx;
         if (transp)
           for (int w = sw; w; w--)
           {
-            UByte pixel = data [(_tx & bwm) >> 16];
+            uint8 pixel = data [(_tx & bwm) >> 16];
             if (pixel)
               ALPHA_MIX (*VRAM, pixel);
             VRAM++;
@@ -257,12 +257,12 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
       for (; sh > 0; sh--, ty += dy, sy++)
       {
         DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
-        UByte *data = bitmap + (ty >> 16) * bw;
+        uint8 *data = bitmap + (ty >> 16) * bw;
         int tx = 0;
         if (transp)
           for (int w = sw; w; w--)
           {
-            UByte pixel = data [tx >> 16];
+            uint8 pixel = data [tx >> 16];
             if (pixel)
               ALPHA_MIX (*VRAM, pixel);
             VRAM++;
@@ -285,12 +285,12 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
     for (ty = (ty << 16) & bhm; sh > 0; sh--, ty = (ty + dy) & bhm, sy++)
     {
       DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
-      UByte *data = bitmap + (ty >> 16) * bw;
+      uint8 *data = bitmap + (ty >> 16) * bw;
       int _tx = tx;
       if (transp)
         for (int w = sw; w; w--)
         {
-          UByte pixel = data [(_tx & bwm) >> 16];
+          uint8 pixel = data [(_tx & bwm) >> 16];
           if (pixel)
             *VRAM = palette [pixel];
           VRAM++;
@@ -308,11 +308,11 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
     for (; sh > 0; sh--, ty += dy, sy++)
     {
       DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
-      UByte *data = bitmap + (ty >> 16) * bw;
+      uint8 *data = bitmap + (ty >> 16) * bw;
       if (transp)
         for (int w = sw; w; w--)
         {
-          UByte pixel = *data;
+          uint8 pixel = *data;
           if (pixel)
             *VRAM = palette [pixel];
           VRAM++;
@@ -326,12 +326,12 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
     for (; sh > 0; sh--, ty += dy, sy++)
     {
       DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
-      UByte *data = bitmap + (ty >> 16) * bw;
+      uint8 *data = bitmap + (ty >> 16) * bw;
       int tx = 0;
       if (transp)
         for (int w = sw; w; w--)
         {
-          UByte pixel = data [tx >> 16];
+          uint8 pixel = data [tx >> 16];
           if (pixel)
             *VRAM = palette [pixel];
           VRAM++;

@@ -477,9 +477,9 @@ public:
    */
   void MergeNormals ();
 
-  void SetMixMode (UInt mode)
+  void SetMixMode (uint mode)
   { MixMode = mode; }
-  UInt GetMixMode () const
+  uint GetMixMode () const
   { return MixMode; }
 
   /// For LOD.
@@ -691,9 +691,9 @@ public:
     {
       scfParent->MergeNormals ();
     }
-    virtual void SetMixMode (UInt mode)
+    virtual void SetMixMode (uint mode)
     { scfParent->SetMixMode (mode); }
-    virtual UInt GetMixMode () const
+    virtual uint GetMixMode () const
     { return scfParent->GetMixMode (); }
   } scfiSprite3DFactoryState;
 
@@ -945,7 +945,7 @@ private:
   static csTriangleMesh2 mesh;
 
   /// Mixmode for the triangles/polygons of the sprite.
-  UInt MixMode;
+  uint MixMode;
 
   /**
    * Array of colors for the vertices. If not set then this
@@ -1089,10 +1089,10 @@ public:
   iMaterialWrapper* GetMaterial () const { return cstxt; }
 
   /// Sets the mode that is used, when drawing that sprite.
-  void SetMixMode (UInt m) { MixMode = m; }
+  void SetMixMode (uint m) { MixMode = m; }
 
   /// Gets the mode that is used, when drawing that sprite.
-  UInt GetMixMode () const { return MixMode; }
+  uint GetMixMode () const { return MixMode; }
 
   /// Enable or disable tweening frames (default false).
   void EnableTweening (bool en) { do_tweening = en; }
@@ -1330,11 +1330,11 @@ public:
     {
       return scfParent->GetMaterial ();
     }
-    virtual void SetMixMode (UInt mode)
+    virtual void SetMixMode (uint mode)
     {
       scfParent->SetMixMode (mode);
     }
-    virtual UInt GetMixMode () const
+    virtual uint GetMixMode () const
     {
       return scfParent->GetMixMode ();
     }

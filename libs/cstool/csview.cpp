@@ -200,7 +200,7 @@ void csView::RestrictClipperToScreen ()
     int InCount = PolyView->GetVertexCount (), OutCount;
     csBoxClipper bc (0., 0., (float)G3D->GetWidth (), (float)G3D->GetHeight());
     csVector2 *TempPoly = new csVector2[InCount + 5];
-    UByte rc = bc.Clip (PolyView->GetVertices (), InCount , TempPoly, OutCount);
+    uint8 rc = bc.Clip (PolyView->GetVertices (), InCount , TempPoly, OutCount);
     if (rc != CS_CLIP_OUTSIDE)
     {
       PolyView->MakeRoom (OutCount);

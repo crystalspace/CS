@@ -34,7 +34,7 @@ void SkinImage::SetName (const char*) {}
 const char *SkinImage::GetName () { return NULL; }
 int SkinImage::GetFormat () { return CS_IMGFMT_PALETTED8; }
 csRGBpixel *SkinImage::GetPalette () { return Palette; }
-UByte *SkinImage::GetAlpha () { return NULL; }
+uint8 *SkinImage::GetAlpha () { return NULL; }
 void SkinImage::CheckAlpha () { }
 void SkinImage::SetFormat (int) {}
 iImage *SkinImage::Clone () { return NULL; }

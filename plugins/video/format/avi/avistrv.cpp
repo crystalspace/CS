@@ -50,10 +50,10 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
 bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph, 
 				   const csAVIFormat::StreamHeader *psh, 
 				   const csAVIFormat::VideoStreamFormat *pf, 
-				   UShort nStreamNumber, 
-				   UByte *pInitData, ULong nInitDataLen,
+				   uint16 nStreamNumber, 
+				   uint8 *pInitData, uint32 nInitDataLen,
 				   char *pName,
-				   UByte *pFormatEx, ULong nFormatEx, 
+				   uint8 *pFormatEx, uint32 nFormatEx, 
 				   iObjectRegistry *object_reg)
 {
   strdesc.type = CS_STREAMTYPE_VIDEO;
@@ -136,12 +136,12 @@ void csAVIStreamVideo::GetStreamDescription (csStreamDescription &desc)
   memcpy (&desc, (csStreamDescription*)&strdesc, sizeof (csStreamDescription));
 }
 
-bool csAVIStreamVideo::GotoFrame (ULong frameindex)
+bool csAVIStreamVideo::GotoFrame (uint32 frameindex)
 {
   return pAVI->GetChunk (frameindex, pChunk);
 }
 
-bool csAVIStreamVideo::GotoTime (ULong timeindex)
+bool csAVIStreamVideo::GotoTime (uint32 timeindex)
 {
   (void)timeindex;
   // not yet implemented
@@ -177,7 +177,7 @@ bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
   return true;
 }
 
-bool csAVIStreamVideo::SetFXMode (UInt mode)
+bool csAVIStreamVideo::SetFXMode (uint mode)
 {
   fxmode = mode;
   return true;
@@ -445,8 +445,8 @@ void csAVIStreamVideo::makeMaterial ()
   pMaterial->Prepare ();
 }
 
-bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen, 
-				  UByte *pFormatEx, ULong nFormatEx)
+bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen, 
+				  uint8 *pFormatEx, uint32 nFormatEx)
 {
   // based on the codec id we try to load the apropriate codec
  

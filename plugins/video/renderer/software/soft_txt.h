@@ -46,9 +46,9 @@ class csSoftProcTexture3D;
 struct csAlphaTables
 {
   /// Alpha table for 50%
-  UByte alpha_map50 [256*256];
+  uint8 alpha_map50 [256*256];
   /// Alpha table for 25% and 75%
-  UByte alpha_map25 [256*256];
+  uint8 alpha_map25 [256*256];
 };
 
 /// The prefered distances to use for the color matching.
@@ -175,7 +175,7 @@ protected:
   uint16 *pal2glob8;
 
   /// The private palette for this texture (compressed a little)
-  UByte *orig_palette;
+  uint8 *orig_palette;
 
   /// The private palette (with gamma applied)
   csRGBpixel palette [256];
@@ -224,7 +224,7 @@ public:
   uint16 *GetPaletteToGlobal8 () { return pal2glob8; }
 
   /// Apply gamma correction to private palette
-  void ApplyGamma (UByte *GammaTable);
+  void ApplyGamma (uint8 *GammaTable);
 
   /**
    * Query if the texture has an alpha channel.<p>
@@ -304,10 +304,10 @@ public:
   csAlphaTables *alpha_tables;
 
   /// The multiplication tables used for lightmapping
-  UByte *lightmap_tables [3];
+  uint8 *lightmap_tables [3];
 
   /// The translation table for applying gamma
-  UByte GammaTable [256];
+  uint8 GammaTable [256];
 
   /// Texture gamma
   float Gamma;
@@ -323,7 +323,7 @@ public:
   void SetPixelFormat (csPixelFormat &PixelFormat);
 
   /// Encode RGB values to a 16-bit word (for 16-bit mode).
-  ULong encode_rgb (int r, int g, int b);
+  uint32 encode_rgb (int r, int g, int b);
 
   /**
    * Create the inverse colormap. The forward colormap

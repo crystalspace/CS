@@ -308,13 +308,13 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
           break;
         case 2:
         {
-          UShort *dest = (UShort *)GetPixelAt (fx1, fy1);
+          uint16 *dest = (uint16 *)GetPixelAt (fx1, fy1);
           while (count--) *dest++ = color;
           break;
         }
         case 4:
         {
-          ULong *dest = (ULong *)GetPixelAt (fx1, fy1);
+          uint32 *dest = (uint32 *)GetPixelAt (fx1, fy1);
           while (count--) *dest++ = color;
           break;
         }
@@ -420,7 +420,7 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
     case 2:
       while (h)
       {
-        register UShort *dest = (UShort *)GetPixelAt (x, y);
+        register uint16 *dest = (uint16 *)GetPixelAt (x, y);
         register int count = w;
         while (count--) *dest++ = color;
         y++; h--;
@@ -429,7 +429,7 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
     case 4:
       while (h)
       {
-        register ULong *dest = (ULong *)GetPixelAt (x, y);
+        register uint32 *dest = (uint32 *)GetPixelAt (x, y);
         register int count = w;
         while (count--) *dest++ = color;
         y++; h--;
@@ -439,15 +439,15 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
 }
 
 #define WR_NAME WriteString8
-#define WR_PIXTYPE UByte
+#define WR_PIXTYPE uint8
 #include "writechr.inc"
 
 #define WR_NAME WriteString16
-#define WR_PIXTYPE UShort
+#define WR_PIXTYPE uint16
 #include "writechr.inc"
 
 #define WR_NAME WriteString32
-#define WR_PIXTYPE ULong
+#define WR_PIXTYPE uint32
 #include "writechr.inc"
 
 void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
@@ -629,32 +629,32 @@ bool csGraphics2D::PerformExtension (char const* command, ...)
   return rc;
 }
 
-void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
 {
   oR = oG = oB = 0;
 
   if (x < 0 || y < 0 || x >= Width || y >= Height)
     return;
 
-  UByte *vram = GetPixelAt (x, y);
+  uint8 *vram = GetPixelAt (x, y);
   if (!vram)
     return;
 
   if (pfmt.PalEntries)
   {
-    UByte pix = *vram;
+    uint8 pix = *vram;
     oR = Palette [pix].red;
     oG = Palette [pix].green;
     oB = Palette [pix].blue;
   }
   else
   {
-    ULong pix = 0;
+    uint32 pix = 0;
     switch (pfmt.PixelBytes)
     {
       case 1: pix = *vram; break;
-      case 2: pix = *(UShort *)vram; break;
-      case 4: pix = *(ULong *)vram; break;
+      case 2: pix = *(uint16 *)vram; break;
+      case 4: pix = *(uint32 *)vram; break;
     }
     oR = ((pix & pfmt.RedMask)   >> pfmt.RedShift)   << (8 - pfmt.RedBits);
     oG = ((pix & pfmt.GreenMask) >> pfmt.GreenShift) << (8 - pfmt.GreenBits);

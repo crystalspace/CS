@@ -420,13 +420,13 @@ public:
   { return GfxPpl.SwitchMouseCursor (Shape); }
 
   /// Get R,G,B at given screen location
-  void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+  void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
   { GfxPpl.GetPixel (x, y, oR, oG, oB); }
 
   //--- 3D drawing ---//
 
   /// Draw a 3D polygon
-  void pplPolygon3D (G3DPolygonDPFX &poly, UInt mode)
+  void pplPolygon3D (G3DPolygonDPFX &poly, uint mode)
   { GfxPpl.Polygon3D (poly, mode); }
 
   /// Clear the Z-buffer in the given area

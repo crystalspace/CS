@@ -36,7 +36,7 @@ protected:
   static csPoly2DPool polypool;
 
   /// Result of most recent clipping
-  UByte mrClipping;
+  uint8 mrClipping;
   
 public:
   /// Constructor.
@@ -46,10 +46,10 @@ public:
   virtual ~csClipper () { }
 
   /// Wrapper function: clip a polygon in-place.
-  virtual UByte ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);
+  virtual uint8 ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);
   
   /// most recent Clipresult
-  UByte LastClipResult () { return mrClipping; }
+  uint8 LastClipResult () { return mrClipping; }
 
   SCF_DECLARE_IBASE;
 };
@@ -83,15 +83,15 @@ public:
   { InitClipBox (); }
 
   /// Simple clipping
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount);
 
   /// Clip and compute the bounding box
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox);
 
   /// Clip and return additional information about each vertex
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.
@@ -147,15 +147,15 @@ public:
   virtual ~csPolygonClipper ();
 
   /// Simple clipping
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount);
 
   /// Clip and compute the bounding box
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox);
 
   /// Clip and return additional information about each vertex
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.

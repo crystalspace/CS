@@ -73,8 +73,8 @@ SCF_EXPORT_CLASS_TABLE_END;
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_IFF::LoadSound(void *databuf, ULong size) const {
-  UByte *buf = (UByte*) databuf;
+iSoundData *csSoundLoader_IFF::LoadSound(void *databuf, uint32 size) const {
+  uint8 *buf = (uint8*) databuf;
   unsigned long index=0;
   csSoundDataRaw *sb= NULL;
   char *data=NULL;

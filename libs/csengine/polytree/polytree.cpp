@@ -149,7 +149,7 @@ void csPolygonTree::WriteLong (iFile* cf, long l)
   l = convert_endian (l); cf->Write ((char*)&l, 4);
 }
 
-void csPolygonTree::WriteUShort (iFile* cf, UShort l)
+void csPolygonTree::WriteUShort (iFile* cf, uint16 l)
 {
   l = convert_endian (l); cf->Write ((char*)&l, 2);
 }
@@ -208,9 +208,9 @@ long csPolygonTree::ReadLong (iFile* cf)
   return convert_endian (l);
 }
 
-UShort csPolygonTree::ReadUShort (iFile* cf)
+uint16 csPolygonTree::ReadUShort (iFile* cf)
 {
-  UShort l = 0;
+  uint16 l = 0;
   cf->Read ((char*)&l, 2);
   return convert_endian (l);
 }

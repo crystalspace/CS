@@ -265,7 +265,7 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
     long buffersize = NumSamples * (fmt.Bits >> 3) * fmt.Channels;
     if (buffersize > len)
     {
-      buf = (UByte*) realloc (buf, buffersize);
+      buf = (uint8*) realloc (buf, buffersize);
       len = buffersize;
     }
 

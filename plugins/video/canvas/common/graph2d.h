@@ -225,7 +225,7 @@ public:
   { return pfmt.PalEntries ? Palette : 0; }
 
   /// Query pixel R,G,B at given screen location
-  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
   /**
    * Perform a system specific extension. Return false if extension

@@ -44,10 +44,10 @@ SCF_VERSION (iEvent, 0, 0, 1);
  */
 struct iEvent : public iBase
 {
-  uchar Type;			// Event type (one of csevXXX)
-  uchar Category;		// Event cathegory (unused by CSWS)
-  uchar SubCategory;		// Even finer granularity
-  uchar Flags;			// Miscelaneous event flags
+  uint8 Type;			// Event type (one of csevXXX)
+  uint8 Category;		// Event cathegory (unused by CSWS)
+  uint8 SubCategory;		// Even finer granularity
+  uint8 Flags;			// Miscelaneous event flags
   csTicks Time;			// Time when the event occured
   union
   {

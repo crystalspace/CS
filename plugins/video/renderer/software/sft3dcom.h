@@ -77,7 +77,7 @@ protected:
    * (by BeginDraw()) because double buffering or other stuff can change
    * the addresses.
    */
-  UByte** line_table;
+  uint8** line_table;
 
   /// If true then really rendering with a smaller size inside a larger window.
   bool do_smaller_rendering;
@@ -103,11 +103,11 @@ protected:
   bool dpfx_valid;
   bool dpfx_use_fog;
   iMaterialHandle* dpfx_mat_handle;
-  UInt dpfx_mixmode;
+  uint dpfx_mixmode;
   csZBufMode dpfx_z_buf_mode;
 
   /// Alpha mask used for 16-bit mode.
-  UShort alpha_mask;
+  uint16 alpha_mask;
 
   /// Fog buffers.
   FogBuffer* fog_buffers;
@@ -202,7 +202,7 @@ protected:
   unsigned char *BuildIndexedFogTable ();
 
   /// Start a series of DrawPolygonFX
-  void RealStartPolygonFX (iMaterialHandle* handle, UInt mode,
+  void RealStartPolygonFX (iMaterialHandle* handle, uint mode,
   	bool use_fog);
 
 public:

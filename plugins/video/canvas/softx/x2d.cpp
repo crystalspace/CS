@@ -361,7 +361,7 @@ bool csGraphics2DXLib::CreateVisuals ()
 
 struct palent
 {
-  UShort idx;
+  uint16 idx;
   unsigned char r, g, b;
   int cnt;
 };
@@ -479,7 +479,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   // Count how many times each color appears.
   if (sim_depth == 15 || sim_depth == 16)
   {
-    UShort* m = (UShort*)Memory;
+    uint16* m = (uint16*)Memory;
     i = Width*Height;
     while (i > 0)
     {
@@ -489,12 +489,12 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   }
   else if (sim_depth == 32)
   {
-    ULong* m = (ULong*)Memory;
+    uint32* m = (uint32*)Memory;
     i = Width*Height;
     while (i > 0)
     {
-      ULong col = *m++;
-      UShort scol =
+      uint32 col = *m++;
+      uint16 scol =
       	(((col & pfmt.RedMask) >> (pfmt.RedShift+3)) << 11) |
       	(((col & pfmt.GreenMask) >> (pfmt.GreenShift+2)) << 5) |
       	(((col & pfmt.BlueMask) >> (pfmt.BlueShift+3)));
@@ -694,55 +694,55 @@ void csGraphics2DXLib::Print (csRect *area)
   {
     if (sim_depth == 16 && real_pfmt.PixelBytes == 4)
     {
-      UShort* src = (UShort*)Memory;
-      ULong* dst = (ULong*)real_Memory;
+      uint16* src = (uint16*)Memory;
+      uint32* dst = (uint32*)real_Memory;
       int i = Width * Height;
       while (i > 0)
       {
-        UShort rgb = *src++;
+        uint16 rgb = *src++;
         *dst++ = (((rgb>>11)&31)<<(real_pfmt.RedShift+3)) | (((rgb>>5)&63)<<(real_pfmt.GreenShift+2)) | (((rgb>>0)&31)<<(real_pfmt.BlueShift+3));
         i--;
       }
     }
     else if (sim_depth == 15 && real_pfmt.PixelBytes == 4)
     {
-      UShort* src = (UShort*)Memory;
-      ULong* dst = (ULong*)real_Memory;
+      uint16* src = (uint16*)Memory;
+      uint32* dst = (uint32*)real_Memory;
       int i = Width * Height;
       while (i > 0)
       {
-        UShort rgb = *src++;
+        uint16 rgb = *src++;
         *dst++ = (((rgb>>10)&31)<<(real_pfmt.RedShift+3)) | (((rgb>>5)&31)<<(real_pfmt.GreenShift+3)) | (((rgb>>0)&31)<<(real_pfmt.BlueShift+3));
         i--;
       }
     }
     else if (sim_depth == 16 && real_pfmt.PixelBytes == 2)
     {
-      UShort* src = (UShort*)Memory;
-      UShort* dst = (UShort*)real_Memory;
+      uint16* src = (uint16*)Memory;
+      uint16* dst = (uint16*)real_Memory;
       int i = Width * Height;
       while (i > 0)
       {
-        UShort rgb = *src++;
+        uint16 rgb = *src++;
         *dst++ = (((rgb>>11)&31)<<10) | (((rgb>>6)&31)<<5) | (((rgb>>0)&31)<<0);
         i--;
       }
     }
     else if (sim_depth == 15 && real_pfmt.PixelBytes == 2)
     {
-      UShort* src = (UShort*)Memory;
-      UShort* dst = (UShort*)real_Memory;
+      uint16* src = (uint16*)Memory;
+      uint16* dst = (uint16*)real_Memory;
       int i = Width * Height;
       while (i > 0)
       {
-        UShort rgb = *src++;
+        uint16 rgb = *src++;
         *dst++ = (((rgb>>10)&31)<<11) | (((rgb>>5)&31)<<(5+1)) | (((rgb>>0)&31)<<0);
         i--;
       }
     }
     else if (sim_depth == 15 || sim_depth == 16)
     {
-      UShort* src = (UShort*)Memory;
+      uint16* src = (uint16*)Memory;
       unsigned char* dst = real_Memory;
       int i = Width * Height;
       while (i > 0)
@@ -753,13 +753,13 @@ void csGraphics2DXLib::Print (csRect *area)
     }
     else if (sim_depth == 32 && real_pfmt.PixelBytes == 1)
     {
-      ULong* src = (ULong*)Memory;
+      uint32* src = (uint32*)Memory;
       unsigned char* dst = real_Memory;
       int i = Width*Height;
       while (i > 0)
       {
-        ULong col = *src++;
-        UShort scol =
+        uint32 col = *src++;
+        uint16 scol =
       	  (((col & pfmt.RedMask) >> (pfmt.RedShift+3)) << 11) |
       	  (((col & pfmt.GreenMask) >> (pfmt.GreenShift+2)) << 5) |
       	  (((col & pfmt.BlueMask) >> (pfmt.BlueShift+3)));
@@ -769,13 +769,13 @@ void csGraphics2DXLib::Print (csRect *area)
     }
     else if (sim_depth == 32 && real_pfmt.PixelBytes == 2)
     {
-      ULong* src = (ULong*)Memory;
-      UShort* dst = (UShort*)real_Memory;
+      uint32* src = (uint32*)Memory;
+      uint16* dst = (uint16*)real_Memory;
       int i = Width*Height;
       while (i > 0)
       {
-        ULong col = *src++;
-        UShort scol =
+        uint32 col = *src++;
+        uint16 scol =
       	  (((col & pfmt.RedMask) >> (pfmt.RedShift+(8-real_pfmt.RedBits))) << real_pfmt.RedShift) |
       	  (((col & pfmt.GreenMask) >> (pfmt.GreenShift+(8-real_pfmt.GreenBits))) << real_pfmt.GreenShift) |
       	  (((col & pfmt.BlueMask) >> (pfmt.BlueShift+(8-real_pfmt.BlueBits))) << real_pfmt.BlueShift);
@@ -794,7 +794,7 @@ void csGraphics2DXLib::Print (csRect *area)
       // from 8-bit to 16-bit and we change 16-bit to 32-bit on the fly.
       if (!sim_lt16)
       {
-        sim_lt16 = new UShort [256];
+        sim_lt16 = new uint16 [256];
 	int i, r, g, b;
 	for (i = 0 ; i < 256 ; i++)
 	{
@@ -816,7 +816,7 @@ void csGraphics2DXLib::Print (csRect *area)
       if (real_pfmt.PixelBytes == 2)
       {
         unsigned char* src = Memory;
-        UShort* dst = (UShort*)real_Memory;
+        uint16* dst = (uint16*)real_Memory;
         int i = Width*Height;
         while (i > 0)
         {
@@ -827,11 +827,11 @@ void csGraphics2DXLib::Print (csRect *area)
       else if (real_pfmt.PixelBytes == 4)
       {
         unsigned char* src = Memory;
-        ULong* dst = (ULong*)real_Memory;
+        uint32* dst = (uint32*)real_Memory;
         int i = Width*Height;
         while (i > 0)
         {
-          UShort rgb = sim_lt16[*src++];
+          uint16 rgb = sim_lt16[*src++];
           *dst++ = (((rgb>>11)&31)<<(real_pfmt.RedShift+3)) | (((rgb>>5)&63)<<(real_pfmt.GreenShift+2)) | (((rgb>>0)&31)<<(real_pfmt.BlueShift+3));
           i--;
         }

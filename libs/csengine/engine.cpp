@@ -335,7 +335,7 @@ public:
   virtual iObject* GetObject () const;
   virtual bool IsFinished () const;
   virtual iObject* GetParentObj () const { return NULL; }
-  virtual bool FindName (const char* name) { return false; }
+  virtual bool FindName (const char* name) { (void) name; return false; }
 };
 
 //---------------------------------------------------------------------------
@@ -1622,6 +1622,9 @@ iStatLight* csEngine::FindLight (unsigned long light_id) const
 
 iStatLight* csEngine::FindLight (const char* name, bool regionOnly) const
 {
+  // XXX: Need to implement region?
+  (void) regionOnly;
+    
   // @@@### regionOnly
   for (int i=0; i<sectors.Length (); i++)
   {
@@ -1784,7 +1787,7 @@ static int compare_light (const void* p1, const void* p2)
 }
 
 int csEngine::GetNearbyLights (iSector* sector, const csVector3& pos,
-	ULong flags, iLight** lights, int max_num_lights)
+	uint32 flags, iLight** lights, int max_num_lights)
 {
   int i;
   float sqdist;

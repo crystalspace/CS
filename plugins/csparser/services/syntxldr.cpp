@@ -293,7 +293,7 @@ bool csTextSyntaxService::ParseVector (char *buf, csVector3 &v)
   return true;
 }
 
-bool csTextSyntaxService::ParseMixmode (char *buf, UInt &mixmode)
+bool csTextSyntaxService::ParseMixmode (char *buf, uint &mixmode)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -389,7 +389,7 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
 }
 
 bool csTextSyntaxService::ParseTexture (
-	char *buf, const csVector3* vref, UInt &texspec, 
+	char *buf, const csVector3* vref, uint &texspec, 
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
 	csMatrix3 &tx_m, csVector3 &tx_v,
 	csVector2 &uv_shift,
@@ -666,7 +666,7 @@ bool csTextSyntaxService::ParsePoly3d (
   iThingEnvironment* te =
     SCF_QUERY_INTERFACE (thing_type, iThingEnvironment);
 
-  UInt texspec = 0;
+  uint texspec = 0;
   int tx_uv_i1 = 0;
   int tx_uv_i2 = 0;
   int tx_uv_i3 = 0;
@@ -759,7 +759,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	  if (ParseWarp (params, flags, do_mirror, m_w, v_w_before, v_w_after))
 	  {
 	    for (int i = 0; i < flags.Length (); i++)
-	      poly3d->GetPortal ()->GetFlags ().Set ((UInt)flags.Get (i));
+	      poly3d->GetPortal ()->GetFlags ().Set ((uint)flags.Get (i));
 
 	    if (do_mirror)
 	    {
@@ -884,7 +884,7 @@ bool csTextSyntaxService::ParsePoly3d (
         break;
       case CS_TOKEN_MIXMODE:
         {
-          UInt mixmode;
+          uint mixmode;
 	  if (ParseMixmode (params, mixmode))
 	  {
 	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
@@ -1198,7 +1198,7 @@ const char* csTextSyntaxService::BoolToText (
 }
 
 const char* csTextSyntaxService::MixmodeToText (
-	UInt mixmode, int indent, bool newline)
+	uint mixmode, int indent, bool newline)
 {
   csString ind = csString::PadLeft (' ', indent);
   

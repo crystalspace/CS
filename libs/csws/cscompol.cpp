@@ -47,7 +47,7 @@
   poly.vertices [j].component = v1 + t * (v2 - v1); \
 }
 
-void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
+void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
 {
  /* Do clipping as follows: create a minimal rectangle which fits the polygon,
   * clip the rectangle against children & parents, then clip the poly against

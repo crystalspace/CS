@@ -71,7 +71,7 @@ void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
   texture = tex;
 }
 
-void csMaterial::AddTextureLayer (iTextureWrapper* txtwrap, UInt mode,
+void csMaterial::AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
       	float uscale, float vscale, float ushift, float vshift)
 {
   if (num_texture_layers >= 4) return;

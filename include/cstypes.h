@@ -41,20 +41,6 @@ typedef int bool;
 #endif
 
 //-----------------------------------------------------------------------------
-// Make sure the following six types are correct for your system.
-//-----------------------------------------------------------------------------
-typedef unsigned char UByte;	// Unsigned 8 bit value
-typedef signed char SByte;	// Signed 8 bit value
-typedef unsigned short UShort;	// Unsigned 16 bit value
-typedef signed short SShort;	// Signed 16 bit value
-typedef unsigned long ULong;	// Unsigned 32 bit value
-typedef signed long SLong;	// Signed 32 bit value
-typedef unsigned int UInt;	// Unsigned int value (16..32 bit)
-typedef signed int SInt; 	// Signed int value (16..32 bit)
-
-typedef unsigned long CS_ID;    // Used for uniquely generated id numbers
-
-//-----------------------------------------------------------------------------
 // The following types should be used whenever you need a variable of
 // a specific size (in bits).  If these types are already defined by system
 // headers for a particular platform, then define CS_BUILTIN_SIZED_TYPES to
@@ -65,17 +51,16 @@ typedef unsigned char uint8;
 typedef char int8;
 typedef unsigned short uint16;
 typedef short int16;
-typedef unsigned int uint32;
-typedef int int32;
+typedef unsigned long uint32;
+typedef long int32;
 #endif
+
+typedef uint32 CS_ID;		// Used for uniquely generated id numbers
 
 //------------------------------
 // Shortcuts for normal C types
 //------------------------------
-typedef unsigned char uchar;
-typedef unsigned short ushort;
 typedef unsigned int uint;
-typedef unsigned long ulong;
 
 // Time in milli (1/1000) seconds
 typedef unsigned int csTicks;

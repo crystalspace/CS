@@ -326,7 +326,7 @@ void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
     return;
   int i, color;
 
-  UByte flat_r, flat_g, flat_b;
+  uint8 flat_r, flat_g, flat_b;
   poly.mat_handle->GetTexture ()->GetMeanColor (flat_r, flat_g, flat_b);
 
   if (flat_r < 50 && flat_g < 50 && flat_b < 50)
@@ -351,7 +351,7 @@ void csGraphics3DLine::DrawPolygonFX (G3DPolygonDPFX& poly)
     return;
   int i, color;
 
-  UByte flat_r, flat_g, flat_b;
+  uint8 flat_r, flat_g, flat_b;
   if (poly.mat_handle)
     poly.mat_handle->GetTexture ()->GetMeanColor (flat_r, flat_g, flat_b);
   else

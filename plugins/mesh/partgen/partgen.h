@@ -59,7 +59,7 @@ protected:
   /// Material for all particles.
   iMaterialWrapper* mat;
   /// MixMode for all particles.
-  UInt MixMode;
+  uint MixMode;
   /// Color change
   bool change_color; csColor colorpersecond;
   /// Size change
@@ -274,12 +274,12 @@ public:
     {
       return scfParent->mat;
     }
-    virtual void SetMixMode (UInt mode)
+    virtual void SetMixMode (uint mode)
     {
       scfParent->MixMode = mode;
       scfParent->SetupMixMode ();
     }
-    virtual UInt GetMixMode () const { return scfParent->MixMode; }
+    virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetColor (const csColor& color)
     {
       scfParent->color = color;

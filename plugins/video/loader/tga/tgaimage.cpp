@@ -101,9 +101,9 @@ static int mapped, rlencoded;
 static csRGBpixel ColorMap[MAXCOLORS];
 static int RLE_count = 0, RLE_flag = 0;
 
-static void readtga (UByte*& ptr, struct TGAheader* tgaP);
-static void get_map_entry (UByte*& ptr, csRGBpixel* Value, int Size, bool alpha);
-static void get_pixel (UByte*& ptr, csRGBpixel* dest, int Size, bool alpha);
+static void readtga (uint8*& ptr, struct TGAheader* tgaP);
+static void get_map_entry (uint8*& ptr, csRGBpixel* Value, int Size, bool alpha);
+static void get_pixel (uint8*& ptr, csRGBpixel* dest, int Size, bool alpha);
 
 
 static iImageIO::FileFormatDescription formatlist[6] = 
@@ -133,7 +133,7 @@ const csVector& csTGAImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csTGAImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+iImage *csTGAImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageTgaFile* i = new ImageTgaFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -247,7 +247,7 @@ iDataBuffer *csTGAImageIO::Save (iImage *Image, const char *mime)
 
 //---------------------------------------------------------------------------
 
-bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
+bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
 {
   (void)iSize;
   struct TGAheader tga_head;
@@ -380,7 +380,7 @@ bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
 }
 
 
-static void readtga (UByte*& iBuffer, TGAheader* tgaP)
+static void readtga (uint8*& iBuffer, TGAheader* tgaP)
 {
   unsigned char flags;
 
@@ -411,7 +411,7 @@ static void readtga (UByte*& iBuffer, TGAheader* tgaP)
     iBuffer += tgaP->IDLength;
 }
 
-static void get_map_entry (UByte*& iBuffer, csRGBpixel* Value, int Size, bool alpha)
+static void get_map_entry (uint8*& iBuffer, csRGBpixel* Value, int Size, bool alpha)
 {
   unsigned char j, k;
 
@@ -448,7 +448,7 @@ static void get_map_entry (UByte*& iBuffer, csRGBpixel* Value, int Size, bool al
   }
 }
 
-static void get_pixel (UByte*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
+static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
 {
   static int Red, Grn, Blu, Alpha;
   static unsigned int l;

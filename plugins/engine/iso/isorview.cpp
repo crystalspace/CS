@@ -77,7 +77,7 @@ void csIsoRenderView::DrawBuckets()
 }
 
 void csIsoRenderView::AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx,  
-  UInt mixmode) 
+  uint mixmode) 
 {
   CS_ASSERT (materialindex >= 0);
   if(materialindex>=maxbuckets) 

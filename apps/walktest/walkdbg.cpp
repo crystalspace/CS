@@ -476,7 +476,7 @@ void CreateSolidThings (csEngine* engine, csSector* room,
   const csBox3& bbox = node->GetBox ();
   for (side = 0 ; side < 6 ; side++)
   {
-    UShort mask = node->GetSolidMask (side);
+    uint16 mask = node->GetSolidMask (side);
     if (mask)
     {
       csBox2 box = bbox.GetSide (side);

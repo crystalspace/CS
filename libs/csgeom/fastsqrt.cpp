@@ -25,14 +25,14 @@
 union FastSqrtUnion
 {
   float d;
-  ULong i;
+  uint32 i;
 };
 
-static ULong fast_sqrt_table[0x10000];  // declare table of square roots 
+static uint32 fast_sqrt_table[0x10000];  // declare table of square roots 
 
 void BuildSqrtTable ()
 {
-  ULong i;
+  uint32 i;
   FastSqrtUnion s;
 
   for (i = 0; i <= 0x7FFF; i++)

@@ -23,7 +23,7 @@ class csSGIImageIO : public iImageIO
   virtual ~csSGIImageIO () {}
 
   virtual const csVector& GetDescription ();
-  virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
+  virtual iImage *Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
@@ -39,17 +39,17 @@ class ImageSGIFile : public csImageFile
 {
   friend class csSGIImageIO;
   // Read SGI header and get the number of planes (only 3 or 4 is supported)
-  UInt readHeader(UByte *buf);
+  uint readHeader(uint8 *buf);
   // Read table with offsets
-  void loadSGITables(UByte *in,ULong *out,int size);
+  void loadSGITables(uint8 *in,uint32 *out,int size);
   // Decode an RLE encoded line
-  int decode_rle (UByte *src, ULong length, UByte *dst);
+  int decode_rle (uint8 *src, uint32 length, uint8 *dst);
 
 private:
   /// Initialize the image object
   ImageSGIFile (int iFormat) : csImageFile (iFormat) { };
   /// Try to read the SGI file from the buffer and return success status
-  bool Load (UByte* iBuffer, ULong iSize);
+  bool Load (uint8* iBuffer, uint32 iSize);
 };
 
 #endif

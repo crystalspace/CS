@@ -41,7 +41,7 @@ public:
   virtual const char *GetName ();
   virtual int GetFormat ();
   virtual csRGBpixel *GetPalette ();
-  virtual UByte *GetAlpha ();
+  virtual uint8 *GetAlpha ();
   virtual void CheckAlpha ();
   virtual void SetFormat (int iFormat);
   virtual iImage *Clone ();

@@ -109,14 +109,14 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
       image_buffer = (csRGBpixel*) buffer;
 
-      UShort *dst = (UShort*)Memory;
-      UShort bb = 8 - pfmt.BlueBits;
-      UShort gb = 8 - pfmt.GreenBits;
-      UShort rb = 8 - pfmt.RedBits;
+      uint16 *dst = (uint16*)Memory;
+      uint16 bb = 8 - pfmt.BlueBits;
+      uint16 gb = 8 - pfmt.GreenBits;
+      uint16 rb = 8 - pfmt.RedBits;
       for (i = 0; i < width*height; i++, dst++)
-	*dst = ((((UShort)image_buffer[i].blue >> bb) << pfmt.BlueShift) +
-		(((UShort)image_buffer[i].green >> gb) << pfmt.GreenShift) +
-		(((UShort)image_buffer[i].red >> rb) << pfmt.RedShift));
+	*dst = ((((uint16)image_buffer[i].blue >> bb) << pfmt.BlueShift) +
+		(((uint16)image_buffer[i].green >> gb) << pfmt.GreenShift) +
+		(((uint16)image_buffer[i].red >> rb) << pfmt.RedShift));
     } 
     else
     {
@@ -129,7 +129,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       destroy_memory = true;
       Memory = new unsigned char[width*height*4];
       image_buffer = (csRGBpixel*) buffer;
-      ULong *dst = (ULong*) Memory;
+      uint32 *dst = (uint32*) Memory;
       for (i = 0; i < width*height; i++, dst++)
 	*dst = (image_buffer[i].red << pfmt.RedShift) +
 	  (image_buffer[i].green << pfmt.GreenShift) +
@@ -168,7 +168,7 @@ void csProcTextureSoft2D::Print (csRect *area)
       // As we are in 16bit mode we unpack the 16 bit frame buffer into 
       // the 32 bit image_buffer as this is the format required by the 
       // quantization routines in the texture manager.
-      UShort *src = (UShort*) Memory;
+      uint16 *src = (uint16*) Memory;
 
       int rb = 8 - pfmt.RedBits;
       int gb = 8 - pfmt.GreenBits;
@@ -204,7 +204,7 @@ void csProcTextureSoft2D::Print (csRect *area)
     }
     else  // 32bit: byte shuffle 
     {
-      ULong *src = (ULong *)Memory;
+      uint32 *src = (uint32 *)Memory;
       if (area)
       {
 	int stride = area->xmin + Width - area->xmax;

@@ -282,9 +282,9 @@ struct iSprite3DFactoryState : public iBase
   virtual void MergeNormals () = 0;
 
   /// Set default mix mode for new sprites.
-  virtual void SetMixMode (UInt mode) = 0;
+  virtual void SetMixMode (uint mode) = 0;
   /// Get default mix mode for new sprites.
-  virtual UInt GetMixMode () const = 0;
+  virtual uint GetMixMode () const = 0;
 };
 
 SCF_VERSION (iSprite3DState, 0, 0, 5);
@@ -299,9 +299,9 @@ struct iSprite3DState : public iBase
   /// Get material of sprite.
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
-  virtual void SetMixMode (UInt mode) = 0;
+  virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () const = 0;
+  virtual uint GetMixMode () const = 0;
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
   /// Get lighting.

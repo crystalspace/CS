@@ -98,7 +98,7 @@ private:
     virtual int GetWidth () { return Width; }
     virtual int GetHeight () { return Height; }
     virtual csRGBpixel *GetPalette () { return NULL; }
-    virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
+    virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
     virtual bool PerformExtension (char const* command, ...) 
 	{ (void) command; return false; };

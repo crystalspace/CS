@@ -182,15 +182,15 @@ public:
   inline csBitSet &operator |= (csBitSet &bs)
   {
     unsigned sz = MIN (byte_count, bs.byte_count);
-    ULong *ldst = (ULong *)bits;
-    ULong *lsrc = (ULong *)bs.bits;
-    while (sz >= sizeof (ULong))
+    uint32 *ldst = (uint32 *)bits;
+    uint32 *lsrc = (uint32 *)bs.bits;
+    while (sz >= sizeof (uint32))
     {
       *ldst++ |= *lsrc++;
-      sz -= sizeof (ULong);
+      sz -= sizeof (uint32);
     }
-    UByte *bdst = (UByte *)ldst;
-    UByte *bsrc = (UByte *)lsrc;
+    uint8 *bdst = (uint8 *)ldst;
+    uint8 *bsrc = (uint8 *)lsrc;
     while (sz--)
       *bdst++ |= *bsrc++;
     return *this;
@@ -200,15 +200,15 @@ public:
   inline csBitSet &operator &= (csBitSet &bs)
   {
     unsigned sz = MIN (byte_count, bs.byte_count);
-    ULong *ldst = (ULong *)bits;
-    ULong *lsrc = (ULong *)bs.bits;
-    while (sz >= sizeof (ULong))
+    uint32 *ldst = (uint32 *)bits;
+    uint32 *lsrc = (uint32 *)bs.bits;
+    while (sz >= sizeof (uint32))
     {
       *ldst++ &= *lsrc++;
-      sz -= sizeof (ULong);
+      sz -= sizeof (uint32);
     }
-    UByte *bdst = (UByte *)ldst;
-    UByte *bsrc = (UByte *)lsrc;
+    uint8 *bdst = (uint8 *)ldst;
+    uint8 *bsrc = (uint8 *)lsrc;
     while (sz--)
       *bdst++ &= *bsrc++;
     return *this;

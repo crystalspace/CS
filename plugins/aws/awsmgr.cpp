@@ -813,7 +813,7 @@ awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
       if (mouse_in != cmp)
       {
         // Create a new event for MouseExit and MouseEnter
-        uchar et = Event.Type;
+        uint8 et = Event.Type;
 
         if (mouse_in)
         {
@@ -833,7 +833,7 @@ awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
         if (keyb_focus != cmp)
         {
           // Create a new event for MouseExit and MouseEnter
-          uchar et = Event.Type;
+          uint8 et = Event.Type;
 
           if (keyb_focus)
           {

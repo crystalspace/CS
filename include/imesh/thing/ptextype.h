@@ -69,9 +69,9 @@ SCF_VERSION (iPolyTexType, 0, 0, 2);
 struct iPolyTexType : public iBase
 {
   /// Sets the mode that is used for DrawPolygon.
-  virtual void SetMixMode (UInt m) = 0;
+  virtual void SetMixMode (uint m) = 0;
   /// Gets the mode that is used for DrawPolygon.
-  virtual UInt GetMixMode () = 0;
+  virtual uint GetMixMode () = 0;
 };
 
 SCF_VERSION (iPolyTexFlat, 0, 0, 1);

@@ -51,10 +51,10 @@ char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 
 //-- Endianess handling -----------------------------------------------------
 
-#define BUFF_GET_SHORT(ofs)     get_le_short ((UByte *)&buff[ofs])
-#define BUFF_GET_LONG(ofs)      get_le_long  ((UByte *)&buff[ofs])
-#define BUFF_SET_SHORT(ofs,val) set_le_short ((UByte *)&buff[ofs], val)
-#define BUFF_SET_LONG(ofs,val)  set_le_long  ((UByte *)&buff[ofs], val)
+#define BUFF_GET_SHORT(ofs)     get_le_short ((uint8 *)&buff[ofs])
+#define BUFF_GET_LONG(ofs)      get_le_long  ((uint8 *)&buff[ofs])
+#define BUFF_SET_SHORT(ofs,val) set_le_short ((uint8 *)&buff[ofs], val)
+#define BUFF_SET_LONG(ofs,val)  set_le_long  ((uint8 *)&buff[ofs], val)
 
 //-- Archive class implementation -------------------------------------------
 
@@ -111,7 +111,7 @@ void csArchive::ReadZipDirectory (FILE *infile)
   /* after which follows a two-byte END_CENTRAL_SIG */
   while (cur_offs > min_offs)
   {
-    UInt search_pos;
+    uint search_pos;
 
     if (cur_offs >= sizeof (buff) - step)
       cur_offs -= sizeof (buff) - step;
@@ -129,7 +129,7 @@ void csArchive::ReadZipDirectory (FILE *infile)
             (memcmp (search_ptr, hdr_endcentral, sizeof (hdr_endcentral)) == 0))
         {
           /* Central directory structure found */
-          central_directory_offset = cur_offs + (ULong) search_ptr - (ULong)buff;
+          central_directory_offset = cur_offs + (uint32) search_ptr - (uint32)buff;
           LoadECDR (ecdr, &search_ptr[sizeof (hdr_endcentral)]);
           if (fseek (infile, central_directory_offset + sizeof (hdr_endcentral) + ZIP_END_CENTRAL_DIR_RECORD_SIZE, SEEK_SET)
            || !ReadArchiveComment (infile, ecdr.zipfile_comment_length)
@@ -259,7 +259,7 @@ void csArchive::Dir () const
   {
     ArchiveEntry *e = dir.Get (fn);
     printf ("%6ld|%6ld|%6ld|%08x|%s\n", e->info.csize, e->info.ucsize,
-      e->info.relative_offset_local_header, (UInt)e->info.crc32, e->filename);
+      e->info.relative_offset_local_header, (uint)e->info.crc32, e->filename);
   }
 }
 

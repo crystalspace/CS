@@ -43,7 +43,7 @@ protected:
   /// The image palette or NULL
   csRGBpixel *Palette;
   /// The alpha map
-  UByte *Alpha;
+  uint8 *Alpha;
   /// Image file name
   char *fName;
   /// Image format (see CS_IMGFMT_XXX above)
@@ -84,19 +84,19 @@ protected:
   /**
    * Used to convert an 8-bit indexed image into requested format.
    * Pass a pointer to color indices and a pointer to palette, and you're done.
-   * NOTE: the pointer should be allocated with new UByte [] and you should
+   * NOTE: the pointer should be allocated with new uint8 [] and you should
    * not free it after calling this function: the function will free
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format). Same about palette.
    */
-  void convert_pal8 (UByte *iImage, csRGBpixel *iPalette, int nPalColors = 256);
+  void convert_pal8 (uint8 *iImage, csRGBpixel *iPalette, int nPalColors = 256);
 
   /**
    * Same as above but accepts an array of csRGBcolor's as palette.
    * The csRGBcolor array is never freed, so its your responsability
    * if you did it.
    */
-  void convert_pal8 (UByte *iImage, csRGBcolor *iPalette, int nPalColors = 256);
+  void convert_pal8 (uint8 *iImage, csRGBcolor *iPalette, int nPalColors = 256);
 
   /**
    * Free all image data: pixels and palette. Takes care of image data format.
@@ -151,7 +151,7 @@ public:
   /// Get image palette (or NULL if no palette)
   virtual csRGBpixel *GetPalette ();
   /// Get alpha map for image
-  virtual UByte *GetAlpha ();
+  virtual uint8 *GetAlpha ();
   /// Convert the image to another format
   virtual void SetFormat (int iFormat);
   /// Create yet another image and copy this one into the new image.

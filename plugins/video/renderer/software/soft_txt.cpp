@@ -147,7 +147,7 @@ csTextureHandleSoftware::~csTextureHandleSoftware ()
 {
   texman->UnregisterTexture (this);
   texman->DecRef ();
-  delete [] (UByte *)pal2glob;
+  delete [] (uint8 *)pal2glob;
   delete [] pal2glob8;
   delete [] orig_palette;
 }
@@ -160,12 +160,12 @@ csTexture *csTextureHandleSoftware::NewTexture (iImage *Image)
     return new csTextureSoftware (this, Image);
 }
 
-void csTextureHandleSoftware::ApplyGamma (UByte *GammaTable)
+void csTextureHandleSoftware::ApplyGamma (uint8 *GammaTable)
 {
   if (!orig_palette)
     return;
 
-  UByte *src = orig_palette;
+  uint8 *src = orig_palette;
   csRGBpixel *dst = palette;
   int i;
   for (i = palette_size; i > 0; i--)
@@ -209,7 +209,7 @@ void csTextureHandleSoftware::ComputeMeanColor ()
     {
       csTextureSoftware *t = (csTextureSoftware *)tex [i];
       if (!t->image) break;
-      UByte* bmap = t->bitmap; // Temp assignment to pacify BeOS compiler.
+      uint8* bmap = t->bitmap; // Temp assignment to pacify BeOS compiler.
       if (texman->dither_textures || (flags & CS_TEXTURE_DITHER))
         csQuantizeRemapDither ((csRGBpixel *)t->image->GetImageData (),
           t->get_size (), t->get_width (), pal, palette_size, bmap, tc);
@@ -269,8 +269,8 @@ void csTextureHandleSoftware::SetupFromPalette ()
   // Now allocate the orig palette and compress the texture palette there
   src = palette;
   delete [] orig_palette;
-  orig_palette = new UByte [palette_size * 3];
-  UByte *dst = orig_palette;
+  orig_palette = new uint8 [palette_size * 3];
+  uint8 *dst = orig_palette;
   for (i = palette_size; i > 0; i--)
   {
     *dst++ = src->red;
@@ -283,7 +283,7 @@ void csTextureHandleSoftware::SetupFromPalette ()
 void csTextureHandleSoftware::GetOriginalColormap (csRGBpixel *oPalette, int &oCount)
 {
   oCount = palette_size;
-  UByte *src = orig_palette;
+  uint8 *src = orig_palette;
   csRGBpixel *dst = oPalette;
   int i;
   for (i = palette_size; i > 0; i--)
@@ -303,31 +303,31 @@ void csTextureHandleSoftware::remap_texture ()
   switch (texman->pfmt.PixelBytes)
   {
     case 1:
-      delete [] (UByte *)pal2glob;
-      pal2glob = new UByte [palette_size * sizeof (UByte)];
+      delete [] (uint8 *)pal2glob;
+      pal2glob = new uint8 [palette_size * sizeof (uint8)];
       delete [] pal2glob8;
       pal2glob8 = new uint16 [palette_size];
       for (i = 0; i < palette_size; i++)
       {
-        ((UByte *)pal2glob) [i] = texman->cmap.find_rgb (palette [i].red,
+        ((uint8 *)pal2glob) [i] = texman->cmap.find_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
         pal2glob8 [i] = texman->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       }
       break;
     case 2:
-      delete [] (UShort *)pal2glob;
-      pal2glob = new UByte [palette_size * sizeof (UShort)];
+      delete [] (uint16 *)pal2glob;
+      pal2glob = new uint8 [palette_size * sizeof (uint16)];
       for (i = 0; i < palette_size; i++)
-        ((UShort *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
+        ((uint16 *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
     case 4:
-      delete [] (ULong *)pal2glob;
-      pal2glob = new UByte [palette_size * sizeof (ULong)];
+      delete [] (uint32 *)pal2glob;
+      pal2glob = new uint8 [palette_size * sizeof (uint32)];
       for (i = 0; i < palette_size; i++)
       {
-        ((ULong *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
+        ((uint32 *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       }
       break;
@@ -425,11 +425,11 @@ void csTextureHandleSoftware::Prepare ()
 
 //----------------------------------------------- csTextureManagerSoftware ---//
 
-static UByte *GenLightmapTable (int bits)
+static uint8 *GenLightmapTable (int bits)
 {
-  UByte *table = new UByte [64 * 256];
-  UByte *dst = table;
-  UByte maxv = (1 << bits) - 1;
+  uint8 *table = new uint8 [64 * 256];
+  uint8 *dst = table;
+  uint8 maxv = (1 << bits) - 1;
   int rshf = (13 - bits);
   int i, j;
   for (i = 0; i < 64; i++)
@@ -535,7 +535,7 @@ void csTextureManagerSoftware::Clear ()
   delete alpha_tables; alpha_tables = NULL;
 }
 
-ULong csTextureManagerSoftware::encode_rgb (int r, int g, int b)
+uint32 csTextureManagerSoftware::encode_rgb (int r, int g, int b)
 {
   return
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
@@ -600,8 +600,8 @@ void csTextureManagerSoftware::create_alpha_tables ()
   if (!alpha_tables)
     alpha_tables = new csAlphaTables ();
 
-  UByte *map50 = alpha_tables->alpha_map50;
-  UByte *map25 = alpha_tables->alpha_map25;
+  uint8 *map50 = alpha_tables->alpha_map50;
+  uint8 *map25 = alpha_tables->alpha_map25;
 
   int i, j;
   for (i = 0 ; i < 256 ; i++)

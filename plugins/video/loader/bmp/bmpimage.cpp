@@ -63,21 +63,21 @@ static iImageIO::FileFormatDescription formatlist[] =
 // access it as the given type.
 //-----------------------------------------------------------------------------
 
-static inline UShort us_endian (const UByte* ptr)
+static inline uint16 us_endian (const uint8* ptr)
 {
-  UShort n;
+  uint16 n;
   memcpy(&n, ptr, sizeof(n));
   return convert_endian(n);
 }
 
-static inline ULong ul_endian (const UByte* ptr)
+static inline uint32 ul_endian (const uint8* ptr)
 {
-  ULong n;
+  uint32 n;
   memcpy(&n, ptr, sizeof(n));
   return convert_endian(n);
 }
 
-static inline long l_endian (const UByte* ptr)
+static inline long l_endian (const uint8* ptr)
 {
   long n;
   memcpy(&n, ptr, sizeof(n));
@@ -128,24 +128,24 @@ static inline long l_endian (const UByte* ptr)
 
 struct bmpHeader
 {
-  UShort pad;
-  UByte bfTypeLo;
-  UByte bfTypeHi;
-  ULong bfSize;
-  UShort bfRes1;
-  UShort bfRes2;
-  ULong bfOffBits;
-  ULong biSize;
-  ULong biWidth;
-  ULong biHeight;
-  UShort biPlanes;
-  UShort biBitCount;
-  ULong biCompression;
-  ULong biSizeImage;
-  ULong biXPelsPerMeter;
-  ULong biYPelsPerMeter;
-  ULong biClrUsed;
-  ULong biClrImportant;
+  uint16 pad;
+  uint8 bfTypeLo;
+  uint8 bfTypeHi;
+  uint32 bfSize;
+  uint16 bfRes1;
+  uint16 bfRes2;
+  uint32 bfOffBits;
+  uint32 biSize;
+  uint32 biWidth;
+  uint32 biHeight;
+  uint16 biPlanes;
+  uint16 biBitCount;
+  uint32 biCompression;
+  uint32 biSizeImage;
+  uint32 biXPelsPerMeter;
+  uint32 biYPelsPerMeter;
+  uint32 biClrUsed;
+  uint32 biClrImportant;
 };
 
 //---------------------------------------------------------------------------
@@ -165,7 +165,7 @@ const csVector& csBMPImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csBMPImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+iImage *csBMPImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageBMPFile* i = new ImageBMPFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
@@ -273,19 +273,19 @@ iDataBuffer *csBMPImageIO::Save (iImage *Image, const char *mime)
   return NULL;
 }
 
-bool ImageBMPFile::Load (UByte* iBuffer, ULong iSize)
+bool ImageBMPFile::Load (uint8* iBuffer, uint32 iSize)
 {
   if ((memcmp (iBuffer, BM, 2) == 0) && BISIZE(iBuffer) == WinHSize)
     return LoadWindowsBitmap (iBuffer, iSize);
   return false;
 }
 
-bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
+bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
 {
   set_dimensions (BIWIDTH(iBuffer), BIHEIGHT(iBuffer));
   const int bmp_size = Width * Height;
 
-  UByte *iPtr = iBuffer + BFOFFBITS(iBuffer);
+  uint8 *iPtr = iBuffer + BFOFFBITS(iBuffer);
 
   // No alpha for BMP.
   Format &= ~CS_IMGFMT_ALPHA;
@@ -296,10 +296,10 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
 
   if (BITCOUNT(iBuffer) == _256Color && BICLRUSED(iBuffer))
   {
-    UByte    *buffer  = new UByte [bmp_size];
+    uint8    *buffer  = new uint8 [bmp_size];
     csRGBpixel *palette = new csRGBpixel [256];
     csRGBpixel *pwork   = palette;
-    UByte    *inpal   = BIPALETTE(iBuffer);
+    uint8    *inpal   = BIPALETTE(iBuffer);
 	int scanlinewidth = 4 * ((Width+3) / 4);
 	int color;
     for (color = 0; color < 256; color++, pwork++)
@@ -324,8 +324,8 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
     else if (BICOMP(iBuffer) == BI_RLE8)
     {
       // Decompress pixel data
-      UByte rl, rl1, i;			// runlength
-      UByte clridx, clridx1;		// colorindex
+      uint8 rl, rl1, i;			// runlength
+      uint8 clridx, clridx1;		// colorindex
       int buffer_x = 0;
       while (iPtr < iBuffer + iSize && buffer_y >= 0)
       {

@@ -238,7 +238,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
     {
       unsigned int rs = R8G8B8_SHIFT_ADJUST(pfmt.RedShift);
       unsigned int gs = R8G8B8_SHIFT_ADJUST(pfmt.GreenShift);
-      ULong r = Scan.FogR, g = Scan.FogG, b = Scan.FogB;
+      uint32 r = Scan.FogR, g = Scan.FogG, b = Scan.FogB;
       Scan.FogR = (rs == 16) ? r : (gs == 16) ? g : b;
       Scan.FogG = (rs ==  8) ? r : (gs ==  8) ? g : b;
       Scan.FogB = (rs ==  0) ? r : (gs ==  0) ? g : b;

@@ -96,7 +96,7 @@ protected:
    * approximate it (and some values like 25/50/75 are optimized for speed).
    * Note that alpha is in range 0..255, 0 for 0% and 255 for 100%.
    */
-  ushort Alpha;
+  uint16 Alpha;
 
   /**
    * MixMode to use for drawing this polygon (plus alpha value
@@ -120,10 +120,10 @@ public:
   void SetAlpha (int a) { Alpha = a; }
 
   /// Sets the mode that is used for DrawPolygonFX.
-  virtual void SetMixMode (UInt m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
+  virtual void SetMixMode (uint m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
 
   /// Gets the mode that is used for DrawPolygonFX.
-  virtual UInt GetMixMode () { return (MixMode | Alpha); }
+  virtual uint GetMixMode () { return (MixMode | Alpha); }
 
   SCF_DECLARE_IBASE;
 };
@@ -532,7 +532,7 @@ private:
    * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
    * this object is visible.
    */
-  ULong pvs_vis_nr;
+  uint32 pvs_vis_nr;
 
   /**
    * Return twice the signed area of the polygon in world space coordinates

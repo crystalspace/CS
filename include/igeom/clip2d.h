@@ -83,7 +83,7 @@ struct iClipper2D : public iBase
    * to contain space at least for MAX_OUTPUT_VERTICES elements.
    * Returns one of CS_CLIP_XXX values defined above.
    */
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount) = 0;
 
   /**
@@ -94,7 +94,7 @@ struct iClipper2D : public iBase
    * minimal rectangle that contains the output polygon.
    * Returns one of CS_CLIP_XXX values defined above.
    */
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox) = 0;
 
   /**
@@ -105,11 +105,11 @@ struct iClipper2D : public iBase
    * arrays are expected to have enough storage for at least
    * MAX_OUTPUT_VERTICES elements.
    */
-  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+  virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus) = 0;
 
   /// Wrapper function: clip a polygon in-place.
-  virtual UByte ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox) = 0;
+  virtual uint8 ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox) = 0;
 
   /**
    * Classify some bounding box against this clipper.

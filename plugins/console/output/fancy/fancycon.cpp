@@ -515,7 +515,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
     {
       iTextureManager *tm = G3D->GetTextureManager ();
       iImage *image =
-        ImageLoader->Load ((UByte *)data, len, tm->GetTextureFormat ());
+        ImageLoader->Load ((uint8 *)data, len, tm->GetTextureFormat ());
       if (image)
       {
 	iTextureHandle* txt =
