@@ -2,6 +2,7 @@ The history order is reversed so that new features are at the top.
 
 2-Jan-2001
 	- Fixed software renderer after 'res' broke it.
+	- Fixed csparser after 'res' broke it.
 1-Jan-2001
 	- Fixed bug [497461] from sf.net. This bug prevented joystick
 	  button handling to work properly. Reported by J.F. Miller.

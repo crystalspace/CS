@@ -80,8 +80,9 @@ iImage* csLoader::LoadImage (const char* name, int Format)
       //return NULL;
     }
   }
-  if (!ifile) {
-    ifile = csCreateXORPatternImage(32, 32, 5);
+  if (!ifile)
+  {
+    //ifile = csCreateXORPatternImage(32, 32, 5);
   } 
   
   iDataBuffer *xname = VFS->ExpandPath (name);
