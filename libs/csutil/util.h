@@ -25,7 +25,7 @@
 long RndNum(long minRange, long maxRange);
 
 /// Allocate a new char [] and copy the string into newly allocated storage
-extern char *strnew (char *s);
+extern char *strnew (const char *s);
 
 /**
  * Compute all combinations of m by n. Calls the callback function with

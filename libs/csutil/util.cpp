@@ -38,7 +38,7 @@ long RndNum(long minRange, long maxRange)
   return minRange + (long (rand ()) % range);
 }
 
-char *strnew (char *s)
+char *strnew (const char *s)
 {
   if (s)
   {
