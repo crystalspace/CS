@@ -1285,12 +1285,12 @@ csLoader::~csLoader()
   var = CS_QUERY_PLUGIN_ID(System, func, intf);	\
   if (var)					\
     System->Printf(CS_MSG_INITIALIZATION,	\
-      "  "msgname" available to the loader.\n");
+      " "msgname);
 
 bool csLoader::Initialize(iSystem *iSys)
 {
   System = iSys;
-  System->Printf(CS_MSG_INITIALIZATION, "Initializing loader plug-in...\n");
+  System->Printf(CS_MSG_INITIALIZATION, "Initializing loader plug-in\n ");
   loaded_plugins.System = System;
 
   // get the virtual file system plugin
@@ -1302,13 +1302,14 @@ bool csLoader::Initialize(iSystem *iSys)
   }
 
   // get all optional plugins
-  GET_PLUGIN (Reporter, CS_FUNCID_REPORTER, iReporter, "error reporter");
-  GET_PLUGIN (ImageLoader, CS_FUNCID_IMGLOADER, iImageIO, "image loader");
-  GET_PLUGIN (SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader");
+  GET_PLUGIN (Reporter, CS_FUNCID_REPORTER, iReporter, "reporter");
+  GET_PLUGIN (ImageLoader, CS_FUNCID_IMGLOADER, iImageIO, "image-loader");
+  GET_PLUGIN (SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound-loader");
   GET_PLUGIN (Engine, CS_FUNCID_ENGINE, iEngine, "engine");
-  GET_PLUGIN (G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");
-  GET_PLUGIN (SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver");
-  GET_PLUGIN (MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion manager");
+  GET_PLUGIN (G3D, CS_FUNCID_VIDEO, iGraphics3D, "video-driver");
+  GET_PLUGIN (SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound-driver");
+  GET_PLUGIN (MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion-manager");
+  System->Printf(CS_MSG_INITIALIZATION, "\n");
   return true;
 }
 
