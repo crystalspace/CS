@@ -3,7 +3,7 @@
 @subsection Windows - Using Mingw Compiler
 
 @noindent
-@emph{Updated by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}.}
+@emph{Last updated, 24 March, 2001  by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}.}
 
 These instructions are for building Crystal Space with Mingw - a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
@@ -70,7 +70,10 @@ commands:
 
 @example
 make win32gcc MODE=debug
-make -k clean depend all
+
+make depend
+
+make all
 @end example
 
 Note that making the @samp{depend} target is not absolutely required.  If
@@ -78,8 +81,24 @@ doing so presents problems, then you can safely omit it:
 
 @example
 make win32gcc MODE=debug
-make -k clean all
+
+make all
 @end example
+
+@subsubheading Additional command line compile parameters
+
+Adding @samp{clean} to the compile command line e.g.:
+
+make clean all
+
+Will instruct and perform a cleanout of all object files, link libraries etc. from
+the @samp{out\WIN32\INTEL\debug} directory.
+
+Adding @samp{-k} to the compile command line e.g.:
+
+make -k all
+
+Will instruct the compiler to ignore errors and continue compiling regardless.
 
 @subsubheading Customizing
 
