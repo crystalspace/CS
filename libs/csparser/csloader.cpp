@@ -154,10 +154,10 @@ csPolyPlane* CSLoader::load_polyplane (char* buf, char* name)
   csNameObject::AddName(*ppl, name); 
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig, tx1, tx2;
+  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = 0, tx2_len = 0;
   csMatrix3 tx_matrix;
-  csVector3 tx_vector;
+  csVector3 tx_vector (0, 0, 0);
 
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
@@ -1064,11 +1064,11 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   poly3d->SetParent (parent);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig, tx1, tx2;
+  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
-  csVector3 tx_vector;
+  csVector3 tx_vector (0, 0, 0);
   char plane_name[30];
   plane_name[0] = 0;
   bool uv_shift_given = false;
@@ -1139,8 +1139,8 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         if (poly3d->GetPortal ())
         {
           csMatrix3 m_w; m_w.Identity ();
-          csVector3 v_w_before;
-          csVector3 v_w_after;
+          csVector3 v_w_before (0, 0, 0);
+          csVector3 v_w_after (0, 0, 0);
           bool do_static = false;
           while ((cmd = csGetObject (&params, pCommands, &name, &params2)) > 0)
           {
@@ -1308,7 +1308,7 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
     // T = Mot * (O - Vot) + Vuv                ; Add shift Vuv to final texture map
     // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
     // T = Mot * (O - Vot + Mot-1 * Vuv)
-    csVector3 shift; shift.x = u_shift; shift.y = v_shift; shift.z = 0;
+    csVector3 shift (u_shift, v_shift, 0);
     tx_vector -= tx_matrix.GetInverse () * shift;
     poly3d->SetTextureSpace (tx_matrix, tx_vector);
   }
@@ -1356,11 +1356,11 @@ csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 //TODO??  poly3d->SetParent (parent);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig, tx1, tx2;
+  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
-  csVector3 tx_vector;
+  csVector3 tx_vector (0, 0, 0);
   char plane_name[30];
   plane_name[0] = 0;
   bool uv_shift_given = false;
@@ -1597,11 +1597,11 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
   else ptemplate->SetTexture (default_texture);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig, tx1, tx2;
+  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
-  csVector3 tx_vector;
+  csVector3 tx_vector (0, 0, 0);
 
   bool uv_shift_given = false;
   float u_shift = 0, v_shift = 0;
@@ -1738,7 +1738,7 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
     // T = Mot * (O - Vot) + Vuv                ; Add shift Vuv to final texture map
     // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
     // T = Mot * (O - Vot + Mot-1 * Vuv)
-    csVector3 shift; shift.x = u_shift; shift.y = v_shift; shift.z = 0;
+    csVector3 shift (u_shift, v_shift, 0);
     tx_vector -= tx_matrix.GetInverse () * shift;
   }
   ptemplate->SetTextureSpace (tx_matrix, tx_vector);
@@ -1782,11 +1782,11 @@ csCurveTemplate* CSLoader::load_beziertemplate (char* ptname, char* buf,
   else ptemplate->SetTextureHandle (default_texture);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig, tx1, tx2;
+  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
-  csVector3 tx_vector;
+  csVector3 tx_vector (0, 0, 0);
 
   bool uv_shift_given = false;
   float u_shift = 0, v_shift = 0;
@@ -1916,7 +1916,7 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
   float default_texlen = 1.;
 
   csMatrix3 m_move;
-  csVector3 v_move;
+  csVector3 v_move (0, 0, 0);
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -2061,15 +2061,14 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
   csTextureHandle* texture = NULL;
   float tscale = 1;
 
-  csVector3 v0, v1, v2, v3, v4, v5, v6, v7;
-  v0.x = -1; v0.y =  1; v0.z =  1;
-  v1.x =  1; v1.y =  1; v1.z =  1;
-  v2.x = -1; v2.y = -1; v2.z =  1;
-  v3.x =  1; v3.y = -1; v3.z =  1;
-  v4.x = -1; v4.y =  1; v4.z = -1;
-  v5.x =  1; v5.y =  1; v5.z = -1;
-  v6.x = -1; v6.y = -1; v6.z = -1;
-  v7.x =  1; v7.y = -1; v7.z = -1;
+  csVector3 v0 (-1,  1,  1);
+  csVector3 v1 ( 1,  1,  1);
+  csVector3 v2 (-1, -1,  1);
+  csVector3 v3 ( 1, -1,  1);
+  csVector3 v4 (-1,  1, -1);
+  csVector3 v5 ( 1,  1, -1);
+  csVector3 v6 (-1, -1, -1);
+  csVector3 v7 ( 1, -1, -1);
   float r;
 
   char str[255];
@@ -2077,7 +2076,7 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
   char* params;
 
   csMatrix3 m_move;
-  csVector3 v_move;
+  csVector3 v_move (0, 0, 0);
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -2262,7 +2261,7 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
     p->AddVertex (todo[done].v2);
     p->AddVertex (todo[done].v1);
     csMatrix3 m_tx;
-    csVector3 v_tx;
+    csVector3 v_tx (0, 0, 0);
     float A, B, C;
     p->PlaneNormal (&A, &B, &C);
     TextureTrans::compute_texture_space (m_tx, v_tx,
@@ -2512,15 +2511,14 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
   int num_light = 0;
   DLight dlights[MAX_ROOM_LIGHT];
 
-  csVector3 v0, v1, v2, v3, v4, v5, v6, v7;
-  v0.x = -1; v0.y =  1; v0.z =  1;
-  v1.x =  1; v1.y =  1; v1.z =  1;
-  v2.x = -1; v2.y = -1; v2.z =  1;
-  v3.x =  1; v3.y = -1; v3.z =  1;
-  v4.x = -1; v4.y =  1; v4.z = -1;
-  v5.x =  1; v5.y =  1; v5.z = -1;
-  v6.x = -1; v6.y = -1; v6.z = -1;
-  v7.x =  1; v7.y = -1; v7.z = -1;
+  csVector3 v0 (-1,  1,  1);
+  csVector3 v1 ( 1,  1,  1);
+  csVector3 v2 (-1, -1,  1);
+  csVector3 v3 ( 1, -1,  1);
+  csVector3 v4 (-1,  1, -1);
+  csVector3 v5 ( 1,  1, -1);
+  csVector3 v6 (-1, -1, -1);
+  csVector3 v7 ( 1, -1, -1);
   float r;
 
   char str[255];
@@ -3110,7 +3108,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
   }
 
   csMatrix3 t_m;
-  csVector3 t_v;
+  csVector3 t_v (0, 0, 0);
 
   // If radius is negative we have an up-side-down skydome.
   float vert_radius = radius;

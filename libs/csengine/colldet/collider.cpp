@@ -34,7 +34,7 @@ static int currHit;
 
 ///
 csMatrix3 csCollider::mR;
-csVector3 csCollider::mT;
+csVector3 csCollider::mT (0, 0, 0);
 ///
 int csCollider::trianglesTested = 0;
 int csCollider::boxesTested = 0;
@@ -167,7 +167,7 @@ int csCollider::CollidePair (csCollider *p1, csCollider *p2, csTransform *t1, cs
   BBox *b2 = p2->_rm->b;
 
   csMatrix3 tR1, tR2, R, R1, R2;
-  csVector3 tT1, tT2, T, T1, T2;
+  csVector3 tT1, tT2, T, T1 (0, 0, 0), T2 (0, 0, 0);
   if (t1)
     {
     T1 = t1->GetO2TTranslation ();
@@ -840,7 +840,7 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
 	}
 
       csMatrix3 cR;
-      csVector3 cT;
+      csVector3 cT (0, 0, 0);
 
       // Currently, the transform from model 2 to model 1 space is
       // given by [B T], where y = [B T].x = B.x + T.
