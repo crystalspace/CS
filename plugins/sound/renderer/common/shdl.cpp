@@ -25,12 +25,11 @@ SCF_IMPLEMENT_IBASE(csSoundHandle);
   SCF_IMPLEMENTS_INTERFACE(iSoundHandle);
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundHandle::csSoundHandle(iSoundData *s)
+csSoundHandle::csSoundHandle(csRef<iSoundData> s)
 {
   SCF_CONSTRUCT_IBASE(NULL);
 
   Data = s;
-  Data->IncRef();
   Registered = false;
   ActiveStream = false;
   LoopStream = false;
@@ -46,7 +45,6 @@ void csSoundHandle::ReleaseSoundData()
 {
   if (Data)
   {
-    Data->DecRef();
     Data = NULL;
   }
 }

@@ -26,11 +26,11 @@ class csSoundRenderDS3D;
 class csSoundHandleDS3D : public csSoundHandle
 {
 public:
-  csSoundRenderDS3D *SoundRender;
+  csRef<csSoundRenderDS3D> SoundRender;
   long NumSamples;
 
   // constructor
-  csSoundHandleDS3D(csSoundRenderDS3D *srdr, iSoundData *snd);
+  csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSoundData> snd);
   // destructor
   ~csSoundHandleDS3D();
 

@@ -35,6 +35,8 @@ The history order is reversed so that new features are at the top.
 	  corrected coordinates don't get as big.
 	- Dynamic ambient wasn't working correctly for objects using
 	  DrawPolygonMesh (fastmesh objects).
+	- res updated the DirectSound renderer to use smart pointers and fixed
+	  a DecRef() on a smart pointer there.
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.

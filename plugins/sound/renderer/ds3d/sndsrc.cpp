@@ -52,8 +52,8 @@ csSoundSourceDS3D::~csSoundSourceDS3D() {
     Buffer2D->Stop();
     Buffer2D->Release();
   }
-  if (Renderer) Renderer->DecRef();
-  if (SoundHandle) SoundHandle->DecRef();
+  if (Renderer) Renderer = NULL;
+  if (SoundHandle) SoundHandle = NULL;
 }
 
 void csSoundSourceDS3D::Report (int severity, const char* msg, ...)
@@ -72,13 +72,11 @@ void csSoundSourceDS3D::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
-        csSoundHandleDS3D *shdl, int mode3d, long NumSamples) {
+bool csSoundSourceDS3D::Initialize(csRef<csSoundRenderDS3D> srdr,
+        csRef<csSoundHandleDS3D> shdl, int mode3d, long NumSamples) {
   HRESULT r;
 
-  srdr->IncRef();
   Renderer = srdr;
-  shdl->IncRef();
   SoundHandle = shdl;
 
   Static = SoundHandle->Data->IsStatic();

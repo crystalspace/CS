@@ -23,18 +23,17 @@
 
 #define REFRESH_RATE    10
 
-csSoundHandleDS3D::csSoundHandleDS3D(csSoundRenderDS3D *srdr, iSoundData *snd)
+csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSoundData> snd)
         : csSoundHandle(snd)
 {
   SoundRender = srdr;
-  SoundRender->IncRef();
   Registered = true;
   NumSamples = Data->IsStatic() ? Data->GetStaticSampleCount() :
     (Data->GetFormat()->Freq/REFRESH_RATE);
 }
 
 csSoundHandleDS3D::~csSoundHandleDS3D() {
-  SoundRender->DecRef();
+  SoundRender = NULL;
 }
 
 void csSoundHandleDS3D::Unregister() {

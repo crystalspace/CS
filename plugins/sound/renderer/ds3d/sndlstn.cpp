@@ -40,7 +40,7 @@ csSoundListenerDS3D::csSoundListenerDS3D(iBase *piBase) {
 }
 
 csSoundListenerDS3D::~csSoundListenerDS3D() {
-  if (Renderer) Renderer->DecRef();
+  if (Renderer) Renderer = NULL;
   if (Listener) Listener->Release();
   if (PrimaryBuffer) {
     PrimaryBuffer->Stop();
@@ -48,8 +48,7 @@ csSoundListenerDS3D::~csSoundListenerDS3D() {
   }
 }
 
-bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
-  srdr->IncRef();
+bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr) {
   Renderer = srdr;
 
   DSBUFFERDESC dsbd;
