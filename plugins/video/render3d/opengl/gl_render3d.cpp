@@ -158,7 +158,7 @@ csGLRender3D::~csGLRender3D()
 ////////////////////////////////////////////////////////////////////
 
 
-void csGLRender3D::Report (int severity, const char* msg, ...)
+void csGLRender3D::Report (int severity, const char* msg, ...) const
 {
   va_list arg;
   va_start (arg, msg);
@@ -173,7 +173,7 @@ void csGLRender3D::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-int csGLRender3D::GetMaxTextureSize ()
+int csGLRender3D::GetMaxTextureSize () const
 {
   GLint max;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max);
@@ -246,7 +246,7 @@ void csGLRender3D::SetZMode (csZBufMode mode)
   }
 }
 
-csZBufMode csGLRender3D::GetZModePass2 (csZBufMode mode)
+csZBufMode csGLRender3D::GetZModePass2 (csZBufMode mode) const
 {
   switch (mode)
   {
@@ -1703,7 +1703,7 @@ bool csGLRender3D::SetRenderState (R3D_RENDERSTATEOPTION op, long val)
   return false;
 }
 
-long csGLRender3D::GetRenderState (R3D_RENDERSTATEOPTION op)
+long csGLRender3D::GetRenderState (R3D_RENDERSTATEOPTION op) const
 {
   return 0;
 }

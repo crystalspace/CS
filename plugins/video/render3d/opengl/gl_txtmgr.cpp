@@ -149,7 +149,7 @@ void csGLTextureHandle::FreeImage ()
   images = 0;
 }
 
-int csGLTextureHandle::GetFlags ()
+int csGLTextureHandle::GetFlags () const
 {
   return flags;
 }
@@ -169,7 +169,7 @@ void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   texupdate_needed = true;
 }
 
-bool csGLTextureHandle::GetKeyColor ()
+bool csGLTextureHandle::GetKeyColor () const
 {
   return(transp_color.alpha == 1);
 }
@@ -360,14 +360,14 @@ bool csGLTextureHandle::FindFormatType ()
   return true;
 }
 
-void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue)
+void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const
 {
   red = transp_color.red;
   green = transp_color.green;
   blue = transp_color.blue;
 }
 
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh) const
 {
   if(cachedata)
   {
@@ -390,7 +390,7 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
   return true; 
 }
 
-void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
+void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh) const
 {
   if(images.IsValid() && (*images)[0].IsValid())
   {
@@ -399,7 +399,7 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
   }
 }
 
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md) const
 {
   if(cachedata)
   {
@@ -421,7 +421,7 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &
   return true; 
 }
 
-void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
+void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md) const
 {
   if(images.IsValid() && (*images)[0].IsValid())
   {
@@ -436,7 +436,7 @@ void csGLTextureHandle::SetTextureTarget(int target)
   this->target = target;
 }
 
-void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)
+void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const
 {
   red = green = blue = 0;
 }
@@ -456,7 +456,7 @@ void *csGLTextureHandle::GetPrivateObject ()
   return (csGLTextureHandle *)this;
 }
 
-bool csGLTextureHandle::GetAlphaMap ()
+bool csGLTextureHandle::GetAlphaMap () const
 {
   return has_alpha;
 }
@@ -1064,7 +1064,7 @@ void csGLTextureManager::SetVerbose (bool vb)
   verbose = vb;
 }
 
-int csGLTextureManager::GetTextureFormat ()
+int csGLTextureManager::GetTextureFormat () const
 {
   return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }

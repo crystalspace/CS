@@ -116,10 +116,18 @@ public:
 
 #ifdef CS_USE_NEW_RENDERER
   /// Associate a shader with a shader type
-  virtual void SetShader (csStringID type, iShader* shader);
+  virtual void SetShader (csStringID type, iShaderWrapper* shader);
   /// Get shader associated with a shader type
-  virtual iShader* GetShader (csStringID type);
+  virtual iShaderWrapper* GetShader (csStringID type);
 
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) { return false; }
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash) { return NULL; }
+  /// Get all variable names added to this context (used when creating them)
+  virtual csBasicVector GetAllVariableNames() const { return csBasicVector (); }
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() { return NULL; }
 #endif
 
   /// Set effect.

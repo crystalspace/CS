@@ -175,7 +175,7 @@ private:
 	
   void Report (int severity, const char* msg, ...);
 
-  int GetMaxTextureSize ();
+  int GetMaxTextureSize () const;
 
   void SetGlOrtho (bool inverted);
 
@@ -271,15 +271,15 @@ public:
     { viewwidth = width; viewheight = height; }
   
   /// Get width of window
-  int GetWidth () 
+  int GetWidth () const
     { return viewwidth; }
   
   /// Get height of window
-  int GetHeight () 
+  int GetHeight () const
     { return viewheight; }
 
   /// Capabilities of the driver
-  csRender3dCaps* GetCaps() 
+  const csRender3dCaps* GetCaps() const
     { return &rendercaps; }
 
   /// Set center of projection.
@@ -291,7 +291,7 @@ public:
   }
   
   /// Get center of projection.
-  virtual void GetPerspectiveCenter (int& x, int& y)
+  virtual void GetPerspectiveCenter (int& x, int& y) const
   {
     x = asp_center_x;
     y = asp_center_y;
@@ -305,7 +305,7 @@ public:
   }
 
   /// Get perspective aspect.
-  virtual float GetPerspectiveAspect ()
+  virtual float GetPerspectiveAspect () const
   {
     return aspect;
   }
@@ -354,7 +354,7 @@ public:
     glColorMask (red, green, blue, alpha); 
   }
 
-  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha)
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) const
   {
     red = color_red_enabled;
     green = color_green_enabled;
@@ -381,7 +381,7 @@ public:
     { return clipper; }
 
   /// Return type of clipper.
-  int GetClipType ()
+  int GetClipType () const
     { return cliptype; }
 
   /// Set near clip plane.
@@ -396,15 +396,15 @@ public:
     { do_near_plane = false; }
 
   /// Get near clip plane.
-  virtual const csPlane3& GetNearPlane () 
+  virtual const csPlane3& GetNearPlane () const
     { return near_plane; }
 
   /// Return true if we have near plane.
-  virtual bool HasNearPlane () 
+  virtual bool HasNearPlane () const
     { return do_near_plane; }
 
   /// Get maximum number of simultaneous vertex lights supported
-  virtual int GetMaxLights ()
+  virtual int GetMaxLights () const
     { return GL_MAX_LIGHTS; }
 
   /// Sets a parameter for light i
@@ -427,7 +427,7 @@ public:
     { statecache->Disable_GL_LIGHTING (); }
 
   virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val);
-  virtual long GetRenderState (R3D_RENDERSTATEOPTION op);
+  virtual long GetRenderState (R3D_RENDERSTATEOPTION op) const;
 
   ////////////////////////////////////////////////////////////////////
   //                         iShaderRenderInterface

@@ -178,6 +178,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csRenderMeshList(csSector* sector);
+  virtual ~csRenderMeshList ();
 
   virtual int GetCount ();
   virtual void Get (int index, 

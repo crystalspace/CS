@@ -335,24 +335,24 @@ struct iRender3D : public iBase
   /// Set dimensions of window
   virtual void SetDimensions (int width, int height) = 0;
   /// Get width of window
-  virtual int GetWidth () = 0;
+  virtual int GetWidth () const = 0;
   /// Get height of window
-  virtual int GetHeight () = 0;
+  virtual int GetHeight () const = 0;
 
   /// Capabilities of the driver
-  virtual csRender3dCaps* GetCaps () = 0;
+  virtual const csRender3dCaps* GetCaps () const = 0;
 
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y) = 0;
   
   /// Get center of projection.
-  virtual void GetPerspectiveCenter (int& x, int& y) = 0;
+  virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
   
   /// Set perspective aspect.
   virtual void SetPerspectiveAspect (float aspect) = 0;
 
   /// Get perspective aspect.
-  virtual float GetPerspectiveAspect () = 0;
+  virtual float GetPerspectiveAspect () const = 0;
 
   /// Set world to view transform
   virtual void SetObjectToCamera (csReversibleTransform* wvmatrix) = 0;
@@ -393,7 +393,7 @@ struct iRender3D : public iBase
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha) = 0;
 
   /// Get the masking of color and/or alpha values to framebuffer
-  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) = 0;
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) const = 0;
 
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode) = 0;
@@ -426,7 +426,7 @@ struct iRender3D : public iBase
   /**
    * Return type of clipper.
    */
-  virtual int GetClipType () = 0;
+  virtual int GetClipType () const = 0;
 
   /// Set near clip plane.
   virtual void SetNearPlane (const csPlane3& pl) = 0;
@@ -435,13 +435,13 @@ struct iRender3D : public iBase
   virtual void ResetNearPlane () = 0;
 
   /// Get near clip plane.
-  virtual const csPlane3& GetNearPlane () = 0;
+  virtual const csPlane3& GetNearPlane () const = 0;
 
   /// Return true if we have near plane.
-  virtual bool HasNearPlane () = 0;
+  virtual bool HasNearPlane () const = 0;
 
   /// Get maximum number of simultaneous HW lights supported
-  virtual int GetMaxLights () = 0;
+  virtual int GetMaxLights () const = 0;
 
   /// Sets a parameter for light i
   virtual void SetLightParameter (int i, int param, csVector3 value) = 0;
@@ -462,7 +462,7 @@ struct iRender3D : public iBase
   virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val) = 0;
 
   /// Get a renderstate value.
-  virtual long GetRenderState (R3D_RENDERSTATEOPTION op) = 0;
+  virtual long GetRenderState (R3D_RENDERSTATEOPTION op) const = 0;
 };
 
 /** @} */

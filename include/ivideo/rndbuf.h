@@ -96,22 +96,22 @@ struct iRenderBuffer : public iBase
   virtual void Release() = 0;
 
   /// Gets the number of components per element
-  virtual int GetComponentCount () = 0;
+  virtual int GetComponentCount () const = 0;
 
   /// Gets the component type
-  virtual csRenderBufferComponentType GetComponentType () = 0;
+  virtual csRenderBufferComponentType GetComponentType () const = 0;
 
   /// Returns wheter the buffer is discarded or not
-  virtual bool IsDiscarded() = 0;
+  virtual bool IsDiscarded() const = 0;
 
   /// Set if buffer can be discarded or not
   virtual void CanDiscard(bool value) = 0;
 
   /// Get type of buffer (where it's located)
-  virtual csRenderBufferType GetBufferType() = 0;
+  virtual csRenderBufferType GetBufferType() const = 0;
 
   /// Get the size of the buffer (in bytes)
-  virtual int GetSize() = 0;
+  virtual int GetSize() const = 0;
 
 };
 

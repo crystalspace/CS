@@ -46,7 +46,7 @@ private:
   csRef<iVirtualClock> vc;
 
   csHashMap* variables;
-  csRefArray<iShader> shaders;
+  csRefArray<iShaderWrapper> shaders;
 
   int seqnumber;
 
@@ -69,17 +69,21 @@ public:
   /// Get a shader by name
   virtual iShader* GetShader(const char* name) ;
   /// Returns all shaders that have been created
-  virtual const csRefArray<iShader> &GetShaders () { return shaders; }
+  virtual const csRefArray<iShaderWrapper> &GetShaders () { return shaders; }
+  /// Create a wrapper for a shader
+  virtual csPtr<iShaderWrapper> CreateWrapper(iShader *);
 
   /// Create variable
-  virtual csPtr<iShaderVariable> CreateVariable(const char* name) ;
+  virtual csPtr<iShaderVariable> const CreateVariable(const char* name) ;
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) ;
   /// Get variable
   virtual iShaderVariable* GetVariable(int namehash)
   { return privateGetVariable (namehash); }
   /// Get all variable stringnames in this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames(); 
+  virtual csBasicVector GetAllVariableNames() const; 
+
+  virtual csSymbolTable* GetSymbolTable();
 
   /// Private variable to get the variable without virtual call
   inline iShaderVariable* privateGetVariable (int namehash);
@@ -155,7 +159,7 @@ public:
   //====================== iShader =====================//
   
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
-  virtual bool IsValid();
+  virtual bool IsValid() const;
 
   /// Set this shader's name
   virtual void SetName( const char* name ) 
@@ -170,7 +174,7 @@ public:
   /// Create a new technique
   virtual csPtr<iShaderTechnique> CreateTechnique();
   /// Get number of techniques
-  virtual int GetTechniqueCount() { return techniques->Length(); }
+  virtual int GetTechniqueCount() const { return techniques->Length(); }
   /// Retrieve a technique
   virtual iShaderTechnique* GetTechnique( int technique );
   /// Retrieve the best technique in this shader
@@ -182,7 +186,9 @@ public:
   virtual iShaderVariable* GetVariable(int namehash)
   { return privateGetVariable (namehash); }
   /// Get all variable stringnames in this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames(); 
+  virtual csBasicVector GetAllVariableNames() const; 
+
+  virtual csSymbolTable* GetSymbolTable();
 
   /// Private variable to get the variable without virtual call
   inline iShaderVariable* privateGetVariable (int namehash);
@@ -229,7 +235,7 @@ public:
   /* Get technique priority. If there are several valid techniques
    * use the one with highest priority
    */
-  virtual int GetPriority() {return priority;}
+  virtual int GetPriority() const {return priority;}
 
   /// Set technique priority.
   virtual void SetPriority(int priority) {this->priority = priority;}
@@ -237,12 +243,21 @@ public:
   /// Create a pass
   virtual csPtr<iShaderPass> CreatePass();
   /// Get number of passes
-  virtual int GetPassCount() {return passes->Length(); }
+  virtual int GetPassCount() const {return passes->Length(); }
   /// Retrieve a pass
   virtual iShaderPass* GetPass( int pass );
 
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable);
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash);
+  /// Get all variable stringnames in this context (used when creatingthem)
+  virtual csBasicVector GetAllVariableNames() const; 
+
+  virtual csSymbolTable* GetSymbolTable();
+
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
-  virtual bool IsValid(); 
+  virtual bool IsValid() const; 
 
   /// Loads a shader from buffer
   virtual bool Load(iDataBuffer* program);
@@ -323,19 +338,19 @@ public:
   /// Add a stream mapping
   virtual void AddStreamMapping (csStringID name, csVertexAttrib attribute);
   /// Get stream mapping for a certain attribute
-  virtual csStringID GetStreamMapping (csVertexAttrib attribute);
+  virtual csStringID GetStreamMapping (csVertexAttrib attribute) const;
 
   /// Add a texture mapping by name
   virtual void AddTextureMapping (const char* name, int unit);
   /// Add a texture mapping by material layer
   virtual void AddTextureMapping (int layer, int unit);
   /// Get texture mapping for a certain unit as a layer index
-  virtual int GetTextureMappingAsLayer (int unit);
+  virtual int GetTextureMappingAsLayer (int unit) const;
   /// Get texture mapping for a certain unit as a texture name
   virtual iTextureHandle* GetTextureMappingAsDirect (int unit);
 
   /// Get mixmode override
-  virtual uint GetMixmodeOverride ()
+  virtual uint GetMixmodeOverride () const
   { return mixmode; }
 
   /// Get vertex-program
@@ -351,7 +366,7 @@ public:
   virtual void SetFragmentProgram(iShaderProgram* program) { fp = program; }
 
   /// Check if valid
-  virtual bool IsValid()
+  virtual bool IsValid() const
   {
     bool valid = true;
     if(vp) valid = vp->IsValid();
@@ -377,7 +392,9 @@ public:
   virtual iShaderVariable* GetVariable(int namehash) 
   { return privateGetVariable (namehash); }
   /// Get all variable stringnames in this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames() {return csBasicVector();}
+  virtual csBasicVector GetAllVariableNames() const {return csBasicVector();}
+
+  virtual csSymbolTable* GetSymbolTable();
 
   /// Private variable to get the variable without virtual call
   inline iShaderVariable* privateGetVariable (int namehash);
@@ -392,47 +409,56 @@ public:
   virtual bool Prepare();
 };
 
-class csShaderVariable : public iShaderVariable
+class csShaderVariable : iShaderVariable
 {
 private:
-  csString name;
-  int namehash;
-  VariableType type;
+  char *Name;
+  int NameHash;
 
-  int intval;
-  float floatval;
-  csRef<iString> istring;
-  csVector3 v3;
-  csVector4 v4;
+  VariableType Type;
+
+  int Int;
+  float Float;
+  csRef<iString> String;
+  csVector3 Vector3;
+  csVector4 Vector4;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderVariable()
-  {
-    type = INT;
-    intval = 0;
-    namehash = -1;
-  }
-  virtual ~csShaderVariable() { }
+  csShaderVariable (iBase *);
+  virtual ~csShaderVariable ();
 
-  virtual VariableType GetType() { return type; }
-  virtual void SetType(VariableType newtype) { type = newtype; }
+  virtual VariableType GetType() const { return Type; }
+  virtual void SetType(VariableType t) { Type = t; }
 
-  virtual int GetHash () {return namehash; }
+  virtual int GetHash() const { return NameHash; }
 
-  virtual void SetName(const char* name) { csShaderVariable::name = csString(name); namehash = csHashCompute(name); }
-  virtual const char* GetName() { return name; }
-  virtual bool GetValue(int& value) { if(type==INT) {value = intval; return true;} return false; }
-  virtual bool GetValue(float& value) { if(type==VECTOR1) {value = floatval; return true;} return false; }
-  virtual bool GetValue(iString* value) { if(type==STRING) {value = istring; return true;} return false; }
-  virtual bool GetValue(csVector3& value) { if(type==VECTOR3) {value = v3; return true;} return false; }
-  virtual bool GetValue(csVector4& value) { if(type==VECTOR4) {value = v4; return true;} return false; }
-  virtual bool SetValue(int value) { type=INT; intval = value; return true; }
-  virtual bool SetValue(float value) { type=VECTOR1; floatval = value; return true; }
-  virtual bool SetValue(iString* value) { type=STRING; istring = value; return true; }
-  virtual bool SetValue(csVector3 value) { type=VECTOR3; v3 = value; return true; }
-  virtual bool SetValue(csVector4 value) { type=VECTOR4; v4 = value; return true; }
+  virtual void SetName(const char* n)
+    { if (Name) free (Name); Name = strdup (n); }
+  virtual const char* GetName() const { return Name; }
+
+  virtual bool GetValue(int& value) const
+    { CS_ASSERT(Type == INT); value = Int; return true; }
+  virtual bool GetValue(float& value) const
+    { CS_ASSERT(Type == FLOAT); value = Float; return true; }
+  virtual bool GetValue(iString* value) const
+    { CS_ASSERT(Type == STRING); value = String; return true; }
+  virtual bool GetValue(csVector3& value) const
+    { CS_ASSERT(Type == VECTOR3); value = Vector3; return true; }
+  virtual bool GetValue(csVector4& value) const
+    { CS_ASSERT(Type == VECTOR4); value = Vector4; return true; }
+
+  virtual bool SetValue(int value)
+    { Type = INT; Int = value; return true; }
+  virtual bool SetValue(float value)
+    { Type = FLOAT; Float = value; return true; }
+  virtual bool SetValue(iString* value)
+    { Type = STRING; String = value; return true; }
+  virtual bool SetValue(const csVector3 &value)
+    { Type = VECTOR3; Vector3 = value; return true; }
+  virtual bool SetValue(const csVector4 &value)
+    { Type = VECTOR4; Vector4 = value; return true; }
 };
 
 #endif //__SHADERMGR_H__

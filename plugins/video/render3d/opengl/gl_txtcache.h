@@ -94,7 +94,7 @@ public:
   ///
   void SetBilinearMapping (bool m) { rstate_bilinearmap = m; }
   ///
-  bool GetBilinearMapping () { return rstate_bilinearmap; }
+  bool GetBilinearMapping () const { return rstate_bilinearmap; }
 
 protected:
 

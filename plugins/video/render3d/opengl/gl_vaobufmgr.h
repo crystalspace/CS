@@ -119,21 +119,22 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() ;
 
-  virtual bool IsDiscarded() { return discarded; }
+  virtual bool IsDiscarded() const { return discarded; }
 
   virtual void CanDiscard(bool value) {}
 
   /// Get type of buffer (where it's located)
-  virtual csRenderBufferType GetBufferType() { return type; }
+  virtual csRenderBufferType GetBufferType() const { return type; }
 
   /// Get the size of the buffer (in bytes)
-  virtual int GetSize() { return size; }
+  virtual int GetSize() const { return size; }
 
   /// Gets the number of components per element
-  virtual int GetComponentCount () { return compcount; }
+  virtual int GetComponentCount () const { return compcount; }
 
   /// Gets the component type
-  virtual csRenderBufferComponentType GetComponentType () { return comptype; }
+  virtual csRenderBufferComponentType GetComponentType () const
+    { return comptype; }
 };
 
 

@@ -28,6 +28,7 @@
  
 #include "csutil/scf.h"
 #include "csutil/strset.h"
+#include "csutil/csvector.h"
 
 /// Default material `diffuse' parameter
 #define CS_DEFMAT_DIFFUSE 0.7f
@@ -41,6 +42,9 @@ struct iTextureHandle;
 struct csRGBpixel;
 struct csRGBcolor;
 struct iShader;
+struct iShaderWrapper;
+struct iShaderVariable;
+class csSymbolTable;
 
 /**
  * This structure represents an extra texture
@@ -73,13 +77,21 @@ struct iMaterial : public iBase
   /**
    * Associate a shader with a shader type
    */
-  virtual void SetShader (csStringID type, iShader* shader) = 0;
+  virtual void SetShader (csStringID type, iShaderWrapper* shader) = 0;
 
   /**
    * Get shader associated with a shader type
    */
-  virtual iShader* GetShader (csStringID type) = 0;
+  virtual iShaderWrapper* GetShader (csStringID type) = 0;
 
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
+  /// Get all variable names added to this context (used when creating them)
+  virtual csBasicVector GetAllVariableNames() const = 0; 
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() = 0;
 #endif
 
   /**

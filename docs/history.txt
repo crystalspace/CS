@@ -10,6 +10,9 @@ The history order is reversed so that new features are at the top.
 	  and DecRefIfPooled(). It is indicative of inflexible procedural
 	  design if you find yourself using conditional statements to
 	  destinguish between objects of different types.
+	- Oktal added the shader variable system to the new renderer, and
+	  fixed const-correctness throughout the renderer.
+	  Note I can't test this since I don't have GL.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the

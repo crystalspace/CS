@@ -53,13 +53,13 @@ public:
   GLint size;
   int w, h, d, components;
    ///
-  int get_width () { return w; }
+  int get_width () const { return w; }
   ///
-  int get_height () { return h; }
+  int get_height () const { return h; }
 
-  int get_depth () { return d; }
+  int get_depth () const { return d; }
 
-  int get_components () { return components; } 
+  int get_components () const { return components; } 
 
   uint8 *&get_image_data ()
   { return image_data; }
@@ -127,9 +127,9 @@ public:
 
   virtual ~csGLTextureHandle () { }
 
-  GLenum SourceType (){return sourceType;}
-  GLenum SourceFormat (){return sourceFormat;}
-  GLenum TargetFormat (){return targetFormat;}
+  GLenum SourceType () const { return sourceType; }
+  GLenum SourceFormat () const { return sourceFormat; }
+  GLenum TargetFormat () const { return targetFormat; }
 
   void Clear();
 
@@ -141,7 +141,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Retrieve the flags set for this texture
-  virtual int GetFlags ();
+  virtual int GetFlags () const;
 
   /// Enable key color
   virtual void SetKeyColor (bool Enable);
@@ -150,7 +150,7 @@ public:
   virtual void SetKeyColor (uint8 red, uint8 green, uint8 blue);
 
   /// Get the key color status (false if disabled, true if enabled).
-  virtual bool GetKeyColor ();
+  virtual bool GetKeyColor () const;
 
   /// Get the key color
   virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue);
@@ -239,7 +239,7 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap ();
+  virtual bool GetAlphaMap () const;
 
   /**
    * Merge this texture into current palette, compute mipmaps and so on.
@@ -301,11 +301,11 @@ public:
   iMaterial* GetMaterial () { return material; }
 
   /// Get the number of texture layers.
-  int GetTextureLayerCount () { return num_texture_layers; }
+  int GetTextureLayerCount () const { return num_texture_layers; }
   /// Get a texture layer.
   csTextureLayer* GetTextureLayer (int idx) { return &texture_layers[idx]; }
   /// Returns true if texture layer needs translation.
-  bool TextureLayerTranslated (int idx)
+  bool TextureLayerTranslated (int idx) const
   { return texture_layer_translate[idx]; }
 
   //--------------------- iMaterialHandle implementation ----------------------

@@ -116,15 +116,15 @@ iEffectDefinition *csMaterial::GetEffect ()
 }
 
 #ifdef CS_USE_NEW_RENDERER
-void csMaterial::SetShader (csStringID type, iShader* shd)
+void csMaterial::SetShader (csStringID type, iShaderWrapper* shd)
 {
   shd->IncRef ();
   shaders->Put (type, shd);
 }
 
-iShader* csMaterial::GetShader(csStringID type)
+iShaderWrapper* csMaterial::GetShader(csStringID type)
 {
-  return (iShader*)shaders->Get (type);
+  return (iShaderWrapper *) shaders->Get (type);
 }
 
 #endif
