@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 
-csLibraryHandle csLoadLibrary (const char* szLibName)
+csLibraryHandle csLoadLibrary (const char* installpath, const char* szLibName)
 {
   return LoadLibrary (szLibName);
 }
