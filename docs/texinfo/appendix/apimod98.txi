@@ -168,6 +168,44 @@ Several methods in @samp{iPortal} have changed slightly. For example,
 In the map loader the syntax for specifying warp vectors for portals has changed
 from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
 
+Portals in thing have been removed completely! Instead there is now a seperate
+portal container object which belongs in the engine (otherwise it is just
+a mesh like any other mesh). To create a portal you can use the conveniance
+functions @code{iEngine->CreatePortal()} and
+@code{iEngine->CreatePortalContainer()}. Here is an example of old code
+and how to change it to new code:
+
+@example
+  @dots{} create thing in sourceSector @dots{}
+  iPolygon3DStatic* p = state->CreatePolygon ();
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  iPortal* portal = p->CreatePortal (destSector);
+@end example
+
+New code:
+
+@example
+  csPoly3D poly;
+  poly.AddVertex (csVector3 (@dots{}));
+  poly.AddVertex (csVector3 (@dots{}));
+  poly.AddVertex (csVector3 (@dots{}));
+  poly.AddVertex (csVector3 (@dots{}));
+  iPortal* portal;
+  csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
+  	"my_portal", sourceSector, csVector3 (0, 0, 0),
+	destSector, poly.GetVertices (), poly.GetVertexCount (),
+	portal);
+@end example
+
+In map files the old way to create portals in a polygon is still supported.
+Internally it will also create a portal container (as a child mesh of
+the thing it is in). The new way to create portals is by using the new
+@samp{portals} and @samp{portal} keywords in sectors or as children of
+other meshes.
+
 @subheading Datatype Changes
 
 The @samp{csSome}, @samp{csConstSome} and @samp{uint} types have been removed.

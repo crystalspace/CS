@@ -29,6 +29,7 @@ chronological order.
 	- Jorrit added iMeshWrapper->GetPortalContainer() as an easy and
 	  efficient way to get to the portal container of a mesh.
 	- Jorrit removed iMeshObject->GetPortalCount() and GetPortal().
+	- Jorrit changed api documentation to reflect new portal changes.
 6-Oct-2003
         - Philip Wyett added 'waterdemo' to CS root .cvsignore file.
 	- Jorrit fixed waterdemo so it no longer uses '/this/data'. It is
