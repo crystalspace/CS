@@ -1100,13 +1100,11 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
     {
       csScan_CalcBlendTables (Scan.BlendingTable, o_rbits = pfmt.RedBits, 
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
-	printf("Calc main blend tables \n");
     }
     else 
     {
       csScan_CalcBlendTables (Scan.BlendingTableProc, o_rbits = pfmt.RedBits, 
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
-	printf("Calc proc blend tables \n");
     }
 }
 
