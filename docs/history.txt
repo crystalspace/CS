@@ -1,5 +1,36 @@
 The history order has been reversed so that new features are at the top.
 
+4-Sep-2000
+	- Brandon Ehle did some maintenance to the python scripting stuff.
+	  Need to wait for next SWIG release for everything to fall in place.
+	- Added more information to the object list of levtool app.
+	- Added a detail window to show the individual polygons and curves
+	  of a thing or sector.
+	- 'Levtool' recalculated lighting every time a new level was
+	  loaded. No longer...
+	- Eric Sunshine did several changes to the cvs snapshot utilities:
+	    - Major overhaul.  (Also renamed from cvssnap.php to spoofdir.php.)
+	    - Now very general in nature, highly configurable, and generates
+	      much more aesthetically pleasing directory listings.
+	    - Now capable of providing virtual HTTP access to any directory
+	      within or outside of the web space.  No longer tied to _only_
+	      spoofing 'cvs-snapshots' directory from FTP space into HTTP
+	      space.
+	    - Directory listings can now be annotated.  The annotation is
+	      displayed along with the directory listing and can be used to
+	      describe the directory contents in human-readable terms.  See
+		http://crystal.sourceforge.net/cvs-snapshots/
+	      and
+		http://crystal.sourceforge.net/docs/
+	      and any of their subdirectories for an example of how this
+	      works and how useful it can be.
+	    - Overhauled index.php at http://crystal.sourceforge.net/.
+	      Added many missing links; particularly for documentation.
+	    - Eliminated old dirlist.php which vended the docs/download
+	      directory. spoofdir.php now handles this functionality plus
+	      much more.
+	    - Eliminated build_fake and cousins since spoofdir.php can now
+	      handle this functionality as well.
 2-Sep-2000
 	- Fixed bug in csWorld::Clear() where that function would forget
 	  to clear the texture cache in G3D. This could result in crashes

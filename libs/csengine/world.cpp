@@ -809,6 +809,7 @@ void csWorld::EnableLightingCache (bool en)
 {
   do_lighting_cache = en;
   if (!do_lighting_cache) do_force_relight = true;
+  else do_force_relight = false;
 }
 
 void csWorld::SetCuller (int culler)
