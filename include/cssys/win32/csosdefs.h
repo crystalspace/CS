@@ -253,13 +253,13 @@ inline bool MemoryMapFile(mmioInfo* info, char const* filename)
 inline void UnMemoryMapFile(mmioInfo* info)
 {
   if (info->data != NULL)
-    UnmapViewOfFile(platform->data);
+    UnmapViewOfFile(info->data);
 
   if (info->hMappedFile != INVALID_HANDLE_VALUE)
-    CloseHandle(platform->hMappedFile);
+    CloseHandle(info->hMappedFile);
 
   if (info->hFileMapping != INVALID_HANDLE_VALUE)
-    CloseHandle(platform->hFileMapping);
+    CloseHandle(info->hFileMapping);
 }
 
 #endif
