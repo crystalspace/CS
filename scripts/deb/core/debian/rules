@@ -34,6 +34,7 @@ endif
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
 	CONFFLAG = --without-lib3ds --without-libode
 endif
+NEWRENDERER = --enable-new-renderer
 
 configure: configure-stamp
 configure-stamp:
@@ -66,7 +67,7 @@ endif
 	# Don't support until this is dynamic lib
 	# --enable-meta-info-embedding was by default before (enbed .csplugin info)
 	perl -pi -e "s:\[crystal\]:\[crystalspace\]:" $(CURDIR)/CS/configure.ac
-	cd CS; ./bin/autogen.sh ; cs_cv_prog_cxx_local_include=no ./configure --prefix=/usr --sysconfdir=/etc --enable-cpu-specific-optimizations=no $(CONFFLAG)
+	cd CS; ./bin/autogen.sh ; cs_cv_prog_cxx_local_include=no ./configure --prefix=/usr --sysconfdir=/etc --enable-cpu-specific-optimizations=no $(NEWRENDERER) $(CONFFLAG)
 
 	# Install as much as possible
 #	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
