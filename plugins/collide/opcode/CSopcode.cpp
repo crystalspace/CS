@@ -116,9 +116,6 @@ bool csOPCODECollideSystem::Collide (
   col1 = (csOPCODECollider*) collider1;
   col2 = (csOPCODECollider*) collider2;
  
-  //TreeCollider.SetCallback0 (_opcodeCallback , udword(col1));
-  //TreeCollider.SetCallback1 (_opcodeCallback , udword(col2));
-
   ColCache.Model0 = col1->m_pCollisionModel;
   ColCache.Model1 = col2->m_pCollisionModel;
   

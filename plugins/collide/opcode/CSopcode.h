@@ -39,20 +39,19 @@
 
 struct iObjectRegistry;
 
+/**
+ * Opcode implementation of the collision detection system.
+ */
 class csOPCODECollideSystem : public iCollideSystem
 {
 public:
-	Opcode::AABBTreeCollider TreeCollider;
-  //  CollisionFaces CollideFaces;
-  //  csDLinkList CacheList;
-	Opcode::BVTCache ColCache;
-	csOPCODECollider* col1;
-	csReversibleTransform T1;
-	csOPCODECollider* col2;
-	csReversibleTransform T2;
+  Opcode::AABBTreeCollider TreeCollider;
+  Opcode::BVTCache ColCache;
+  csOPCODECollider* col1;
+  csReversibleTransform T1;
+  csOPCODECollider* col2;
+  csReversibleTransform T2;
 
-  //Opcode::MeshInterface mesh0;
-  //Opcode::MeshInterface mesh1;
 
   csCollisionPair *pairs;
   int N_pairs;

@@ -46,11 +46,11 @@ struct csCollisionPair;
 struct iPolygonMesh;
 class PathPolygonMesh;
 
-/// Low level collision detection using the RAPID algorithm.
+/// Low level collision detection using Opcode library.
 class csOPCODECollider : public iCollider
 {
-/// The internal model object.
 public:
+  /// The internal model object.
   Opcode::Model* m_pCollisionModel;
   IceMaths::Matrix4x4 transform;
   unsigned int* indexholder;
@@ -64,14 +64,6 @@ private:
   static void MeshCallback (udword triangle_index, 
     Opcode::VertexPointers& triangle, void* user_data);
 public:
-  /**
-   * Global variables
-   * Matrix, and Vector used for collision testing.
-   */
-
-  // CS_DECLARE_STATIC_CLASSVAR (mR, GetMR, csMatrix3)
-  // CS_DECLARE_STATIC_CLASSVAR (mT, GetMT, csVector3)
-
   /// Create a collider based on geometry.
   csOPCODECollider (iPolygonMesh* mesh);
 

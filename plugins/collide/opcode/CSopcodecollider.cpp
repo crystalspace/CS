@@ -33,30 +33,12 @@
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
 #include "CSopcodecollider.h"
-//#include "prapid.h"
 #include "igeom/polymesh.h"
 #include "ivaria/collider.h"
 
 #include "OPC_TreeBuilders.h"
 
 using namespace Opcode;
-
-//#define CD_MAX_COLLISION    1000
-
-// This array contains the colliding pairs
-
-//typedef csDirtyAccessArray<csCollisionPair> prapid_CD_contact;
-//CS_IMPLEMENT_STATIC_VAR (GetCD_contact, prapid_CD_contact,())
-
-//static prapid_CD_contact *CD_contact = 0;
-
-//static int hits = 0;
-// Array of hits.
-//static csRapidCollider* hitv[CD_MAX_COLLISION][2];
-//static int currHit;
-
-//CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mR, GetMR, csMatrix3,())
-//CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mT, GetMT, csVector3, (0))
 
 SCF_IMPLEMENT_IBASE (csOPCODECollider)
   SCF_IMPLEMENTS_INTERFACE (iCollider)
@@ -137,11 +119,6 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
 
     // Mesh data
     OPCC.mIMesh = &opcMeshInt;
-    //OPCC.NbTris = tri_count;
-    //OPCC.NbVerts = vertcount;
-    //OPCC.Tris = indexholder;
-    //OPCC.Verts = vertholder;
-    //OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
     OPCC.mSettings.mRules = SPLIT_SPLATTER_POINTS | SPLIT_GEOM_CENTER;
     OPCC.mNoLeaf = true;
     OPCC.mQuantized = true;
