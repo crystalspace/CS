@@ -428,13 +428,10 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
           return index_outside;
       }
       break;
-    case 0xb:	// Top, left, and right side.
-    case 0xe:	// Top, left, and bottom side.
-    case 0xd:	// Top, right, and bottom side.
-    case 0x7:	// Bottom, left, and right side.
-#     if 0
+    case 0xf:	// All sides.
+#     if 1
       CsPrintf (MSG_INTERNAL_ERROR,
-      	"ERROR: Three intersections in csCovMaskLUT::GetIndex()!\n");
+      	"ERROR: Four intersections in csCovMaskLUT::GetIndex()!\n");
       printf ("  start=(%f,%f) stop=(%f,%f)\n", start.x, start.y, stop.x, stop.y);
       printf ("  edge.dxdy=%f dydx=%f hor=%d ver=%d\n", edge.dxdy, edge.dydx,
       	edge.horizontal, edge.vertical);
@@ -445,10 +442,8 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
       	mask, x_top, x_bot, y_left, y_right);
 #     endif
       break;
-    case 0xf:	// All sides.
-      //CsPrintf (MSG_INTERNAL_ERROR,
-      	//"ERROR: Four intersections in csCovMaskLUT::GetIndex()!\n");
-      break;
+    case 0xb:	// Top, left, and right side.
+    case 0x7:	// Bottom, left, and right side.
     case 0x3:	// Left and right side.
       if (sta.x < sto.x)
       {
@@ -461,6 +456,8 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
         to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
       }
       break;
+    case 0xe:	// Top, left, and bottom side.
+    case 0xd:	// Top, right, and bottom side.
     case 0xc:	// Top and bottom side.
       if (sta.y > sto.y)
       {
