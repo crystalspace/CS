@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GARRAY_H__
-#define __GARRAY_H__
+#ifndef __CS_GARRAY_H__
+#define __CS_GARRAY_H__
 
 /**
  * This is a macro that will declare a growable array variable that is able to 
@@ -55,7 +55,7 @@
     { limit = length = RefCount = 0; root = NULL; }			\
     ~Name ()								\
     { SetLimit (0); }							\
-    int Limit ()							\
+    int Limit () const							\
     { return limit; }							\
     void SetLimit (int iLimit)						\
     {									\
@@ -65,7 +65,7 @@
       else								\
       { if (root) { free (root); root = NULL; } }			\
     }									\
-    int Length ()							\
+    int Length () const							\
     { return length; }							\
     void SetLength (int iLength, int iGrowStep = 8)			\
     {									\
@@ -82,14 +82,21 @@
     }									\
     Type &operator [] (int n)						\
     { return root [n]; }						\
+    const Type &operator [] (int n) const				\
+    { return root [n]; }						\
     Type &Get (int n)							\
     { return root [n]; }						\
+    const Type &Get (int n) const					\
+    { return root [n]; }						\
     void Delete (int n)							\
-    { memmove (&root [n], &root [n + 1], (limit - n - 1) * sizeof (Type)); }\
+    { memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (Type)); }\
     Type *GetArray ()							\
     { return root; }							\
-    void Push (Type &val, int iGrowStep = 8)				\
-    { SetLength (length + 1, iGrowStep); root [length - 1] = val; }	\
+    void Push (const Type &val, int iGrowStep = 8)			\
+    {									\
+      SetLength (length + 1, iGrowStep);				\
+      memcpy (root + length - 1, &val, sizeof (Type));			\
+    }									\
   }
 
 /**
@@ -105,4 +112,4 @@
 #define DECLARE_GROWING_ARRAY(Name, Type)				\
   TYPEDEF_GROWING_ARRAY(__##Name,Type) Name
 
-#endif // __GARRAY_H__
+#endif // __CS_GARRAY_H__
