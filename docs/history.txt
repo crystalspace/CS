@@ -1,5 +1,38 @@
 The history order is reversed so that new features are at the top.
 
+26-Sep-2001
+	- Added the following new initialization functions to initapp (cstool
+	  library):
+	    - csInitializeApplication() which creates and returns an
+	      object registry. Should be called first.
+	    - csInitializeQueryPlugins() which requests a few standard
+	      plugins (3D, engine, ...) and also makes sure the commandline
+	      and config file are queried for other plugins.
+	    - csInitializeStartApp() which initializes all loaded plugins.
+	    - csInitializeReporter() which optionally creates a reporter
+	      and reporter listener.
+	    - csInitializeRegistry() which will update the registry with
+	      a few common objects (like 3D, engine, ...).
+	    - csInitializeOpenApp() which will open the application.
+	    - csInitializeEventHandler() which initializes the event handler
+	      so that the application knows when to draw a new frame
+	      and also gets other events (keyboard, ...).
+	    - csStartMainLoop() to start the main event loop for the
+	      application.
+	    - csDestroyApp() to destroy the application.
+	  The purpose of these functions is to provide a new way to
+	  initialize the application. Keep in mind that the system driver
+	  will be removed in the future. Using the functions above you can
+	  now make an application that doesn't have to inherit from
+	  SysSystemDriver. At this moment the old way to create an
+	  application still works (inheriting from SysSystemDriver) and
+	  the old csInitializeApplication() is also still there. I will
+	  not remove the old system until I got enough feedback from the
+	  new system to see if it is indeed the appropriate way to do this.
+	- Modified the first simple tutorial to use the new initialization
+	  technique. Simple1 no longer inherits from SysSystemDriver.
+	- Shawn Carroll found a bug in the OpenGL texture cache where
+	  'if (thhack = 0)' should be 'if (thhack == 0)'.
 25-Sep-2001
 	- Fixed a bug in csTransform::Other2This and This2Other for
 	  csSphere. The radius was not always calculated correctly.

@@ -50,8 +50,8 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-// The global system driver
-Simple *System;
+// The global pointer to simple
+Simple *simple;
 
 Simple::Simple ()
 {
@@ -74,23 +74,72 @@ Simple::~Simple ()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
+  delete simple;
+  csDestroyApp ();
+}
+
+bool SimpleEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdPostProcess)
+  {
+    simple->NextFrame ();
+    return true;
+  }
+  else
+  {
+    return simple->HandleEvent (ev);
+  }
 }
 
 bool Simple::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
-
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  if (!csInitializeApplication (object_reg))
+  object_reg = csInitializeApplication ();
+  if (!object_reg)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.simple1",
-	"couldn't init app! (plugins missing?)");
     return false;
   }
+
+  if (!csInitializeQueryPlugins (object_reg, iConfigName, argc, argv))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+	"Can't initialize plugins!");
+    return false;
+  }
+
+  if (!csInitializeStartApp (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+	"Can't start application!");
+    return false;
+  }
+
+  if (!csInitializeReporter (object_reg, true))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+	"Can't initialize reporter!");
+    return false;
+  }
+
+  if (!csInitializeRegistry (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+	"Can't initialize registry!");
+    return false;
+  }
+
+  if (!csInitializeEventHandler (object_reg, SimpleEventHandler))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+	"Can't initialize event handler!");
+    return false;
+  }
+
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -134,7 +183,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ())
+  if (!csInitializeOpenApp (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -264,12 +313,9 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
 bool Simple::HandleEvent (iEvent& Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -279,10 +325,10 @@ bool Simple::HandleEvent (iEvent& Event)
 
 void Simple::NextFrame ()
 {
-  superclass::NextFrame ();
   // First get elapsed time from the system driver.
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);
+  sys->GetElapsedTime (elapsed_time, current_time);
   
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
@@ -323,30 +369,16 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class.
-  System = new Simple ();
+  simple = new Simple ();
 
-  // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  //@@@ WHY IS THE FONTSERVER NEEDED FOR OPENGL AND NOT FOR SOFTWARE???
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
-
-  // Initialize the main system. This will load all needed plug-ins
-  // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!simple->Initialize (argc, argv, NULL))
   {
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error initializing system!");
     Cleanup ();
     exit (1);
   }
 
   // Main loop.
-  System->Loop ();
+  csStartMainLoop (simple->object_reg);
 
   // Cleanup.
   Cleanup ();

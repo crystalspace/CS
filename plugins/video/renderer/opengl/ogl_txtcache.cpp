@@ -238,7 +238,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
 	    // As part of the hack we have to manually track the mipmap size,
 	    // as the  'actual' image size is invalid.
-	    if ( (twhack == 0) || (thhack = 0) )
+	    if ( (twhack == 0) || (thhack == 0) )
 	    {
 	      twhack = previmg->GetWidth();
 	      thhack = previmg->GetHeight();
