@@ -1,6 +1,8 @@
 The history order is reversed so that new features are at the top.
 
 7-Mar-2002
+	- Matt Reda fixed an endian-related bug in the OpenGL screenshot
+	  code
 	- Fixed another occurance of an initializer in a cpp file.
 	  This is not legal.
 	- The cache manager is no longer registered with the object
