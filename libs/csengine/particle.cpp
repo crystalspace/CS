@@ -35,6 +35,7 @@ IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csRainParticleSystem, csParticleSystem)
 IMPLEMENT_CSOBJTYPE (csSnowParticleSystem, csParticleSystem)
 IMPLEMENT_CSOBJTYPE (csFountainParticleSystem, csParticleSystem)
+IMPLEMENT_CSOBJTYPE (csFireParticleSystem, csParticleSystem)
 
 
 csParticleSystem :: csParticleSystem(csObject* theParent)
@@ -685,3 +686,120 @@ void csFountainParticleSystem :: Update(time_t elapsed_time)
   }
   time_left = todo_time;
 }
+
+
+
+//-- csFireParticleSystem --------------------------------------------------
+
+csFireParticleSystem :: csFireParticleSystem(csObject* theParent, 
+  int number, csTextureHandle* txt, UInt mixmode, 
+  bool lighted_particles, float drop_width, float drop_height,
+  float total_time, const csVector3& dir, const csVector3& origin,
+  float swirl, float color_scale
+  )
+  : csParticleSystem(theParent)
+{
+  part_pos = new csVector3[number];
+  part_speed = new csVector3[number];
+  part_age = new float[number];
+  direction = dir;
+  csFireParticleSystem::total_time = total_time;
+  csFireParticleSystem::origin = origin;
+  csFireParticleSystem::swirl = swirl;
+  csFireParticleSystem::color_scale = color_scale;
+  amt = number;
+  // create particles
+  for(int i=0; i<number; i++)
+  {
+    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    GetParticle(i)->SetMixmode(mixmode);
+    RestartParticle(i, (total_time / float(number)) * float(number-i));
+  }
+  time_left = 0.0;
+  next_oldest = 0;
+}
+
+csFireParticleSystem :: ~csFireParticleSystem()
+{
+  delete[] part_pos;
+  delete[] part_speed;
+  delete[] part_age;
+}
+
+
+void csFireParticleSystem :: RestartParticle(int index, float pre_move)
+{
+  part_pos[index] = origin;
+  part_speed[index] = direction;
+  part_age[index] = 0.0;
+  GetParticle(index)->SetPosition(part_pos[index]);
+
+  MoveAndAge(index, pre_move);
+}
+
+
+void csFireParticleSystem :: MoveAndAge(int i, float delta_t)
+{
+  csVector3 accel = GetRandomDirection() * swirl;
+  part_speed[i] += accel * delta_t;
+  part_pos[i] += part_speed[i] * delta_t;
+  GetParticle(i)->SetPosition (part_pos[i]); 
+  part_age[i] += delta_t;
+
+  // set the colour based on the age of the particle
+  //   white->yellow->red->gray->black
+  // col_age: 1.0 means total_time;
+  const float col_age[] = {0., 0.05, 0.2, 0.5, 1.0};
+  const csColor cols[] = {
+    csColor(1.,1.,1.),
+    csColor(1.,1.,0.),
+    csColor(1.,0.,0.),
+    csColor(0.6,0.6,0.6),
+    csColor(0.1,0.1,0.1)
+  };
+  const int nr_colors = 5;
+  csColor col;
+  col = cols[nr_colors-1];
+  float age = part_age[i] / total_time;
+  for(int k=1; k<nr_colors; k++)
+  {
+    if(age >= col_age[k-1] && age < col_age[k])
+    {
+      /// colouring fraction
+      float fr = (age - col_age[k-1]) / (col_age[k] - col_age[k-1]);
+      col = cols[k-1] * (1.0-fr) + cols[k] * fr;
+    }
+  }
+  GetParticle(i)->SetColor(col * color_scale);
+}
+
+
+int csFireParticleSystem :: FindOldest()
+{
+  int ret = next_oldest;
+  next_oldest = (next_oldest + 1 ) % amt;
+  return ret;
+}
+
+void csFireParticleSystem :: Update(time_t elapsed_time)
+{
+  csParticleSystem::Update(elapsed_time);
+  float delta_t = elapsed_time / 1000.0f; // in seconds
+  // move particles;
+  int i;
+  for(i=0; i<particles.Length(); i++)
+  {
+    MoveAndAge(i, delta_t);
+  }
+
+  /// restart a number of particles
+  float intersperse = total_time / (float)amt;
+  float todo_time = delta_t + time_left;
+  while(todo_time > intersperse)
+  {
+    RestartParticle(FindOldest(), todo_time);
+    todo_time -= intersperse;
+  }
+  time_left = todo_time;
+}
+

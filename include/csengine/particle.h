@@ -421,6 +421,7 @@ public:
   CSOBJTYPE;
 };
 
+
 /**
  * A Fountain particle system. Each x msec n particles shoot out of a spout, 
  * falling down after that. Thus some particles may not reach the floor if
@@ -477,5 +478,54 @@ public:
   CSOBJTYPE;
 };
 
+/**
+ * A Fire particle system. Each x msec n particles shoot out of the fire, 
+ */
+class csFireParticleSystem : public csParticleSystem {
+protected:
+  int amt;
+  csVector3 direction;
+  csVector3 origin;
+  float swirl;
+  float color_scale;
+  csVector3* part_pos;
+  csVector3* part_speed;
+  float *part_age;
+  float total_time;
+  float time_left; // from previous update
+  int next_oldest;
+
+  int FindOldest();
+  void RestartParticle(int index, float pre_move);
+  void MoveAndAge(int index, float delta_t);
+
+public:
+  /** creates a fire particle system given parameters.
+    * number : number of raindrops visible at one time
+    * txt: texture of raindrops. mixmode = mixmode used.
+    * lighted: the particles will be lighted if true.
+    * drop_width, drop_height: size of rectangular particles.
+    * total_time is the seconds a particle gets to burn.
+    * dir is direction of fire.
+    * origin is the starting point of the flame
+    * swirl is the amount of swirling of particles.
+    * color_scale scales the colour the particles are set to.
+    */
+  csFireParticleSystem(csObject* theParent, int number, 
+    csTextureHandle* txt, UInt mixmode,
+    bool lighted_particles, float drop_width, float drop_height, 
+    float total_time, const csVector3& dir, const csVector3& origin,
+    float swirl, float color_scale
+    );
+  /// 
+  virtual ~csFireParticleSystem();
+
+  /**
+   * Update
+   */
+  virtual void Update (time_t elapsed_time);
+
+  CSOBJTYPE;
+};
 #endif //CSPARTIC_H
 
