@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit fixed another initialization error with current_visnr in
 	  csSector. Please people! Don't forget to initialize variables
 	  in the constructor!
+	- res reverted an accidential commit of msvcgen.mak and committed the
+	  originally intended win32.mak.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate

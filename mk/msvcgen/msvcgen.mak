@@ -298,9 +298,6 @@ MSVC.EXT.FRAGMENT = frag
 MSVC.EXT.RESOURCES = rc
 MSVC.WORKSPACE = csall.$(MSVC.EXT.WORKSPACE)
 
-MSVC.BASEADDR = $(SRCDIR)/libs/cssys/win32/baseaddr.sh
-MSVC.BASEFILE = $(MSVC.OUT.FRAGMENT)/bases.txt
-
 # Prefixes for particular project types.  For instance, the name "csgeom"
 # which is of type "library" is transformed into a project name "libcsgeom".
 MSVC.PREFIX.appgui  = app
@@ -334,13 +331,6 @@ MSVC.MERGERC.appcon  = $(MSVC.MERGERC.COMMAND)
 MSVC.MERGERC.plugin  = $(MSVC.MERGERCMETA.COMMAND)
 MSVC.MERGERC.library =
 MSVC.MERGERC.group   =
-
-MSVC.BASEADDRESS.DIRECTIVE.appgui  = 
-MSVC.BASEADDRESS.DIRECTIVE.appcon  = 
-MSVC.BASEADDRESS.DIRECTIVE.plugin  = --base=`$(MSVC.BASEADDR) \
-  $(MSVC.BASEFILE) $* 1342177280 2097152`
-MSVC.BASEADDRESS.DIRECTIVE.library = 
-MSVC.BASEADDRESS.DIRECTIVE.group   = 
 
 # Name of project.rc file for types which require version information.
 MSVC.VERSIONRC.CVS.appgui  = $(MSVC.VERSIONRC.CVS.NAME)
@@ -405,9 +395,6 @@ MSVC.CONTENTS = $(subst $(SRCDIR)/,, \
 # Macro to compose the optional --meta-file option from INF.PROJECT.
 MSVC.METAFILE.DIRECTIVE = \
   $(subst $(SRCDIR)/,,$(foreach m,$(INF.$*),--meta-file=$m))
-
-# Macro to a DLL base address
-MSVC.BASEADDRESS.DIRECTIVE = $(MSVC.BASEADDRESS.DIRECTIVE.$(DSP.$*.TYPE))
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -518,7 +505,6 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 	--project-name=$(MSVC.PROJECT) \
 	--output=$(MSVC.OUTPUT) \
 	--fragment=$(MSVC.FRAGMENT) \
-	$(MSVC.BASEADDRESS.DIRECTIVE) \
 	$(MSVC.METAFILE.DIRECTIVE) \
 	$(MSVC.DEPEND.DIRECTIVES) \
 	$(MSVC.LIBRARY.DIRECTIVES) \
