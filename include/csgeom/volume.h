@@ -87,6 +87,15 @@ public:
   bool Intersects (csVolume& target);
 
   /**
+   * Tests the orientation of this volume with respect
+   * to the given plane. If the plane cuts right through
+   * the volume then it returns 0. If the volume is completely
+   * to the positive side of the plane then it returns > 0.
+   * Otherwise it returns < 0.
+   */
+  int ClassifyToPlane (const csPlane& cutter);
+
+  /**
    * Cut this volume by a plane and retain everything on the
    * positive side of it.
    */

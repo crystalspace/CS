@@ -19,10 +19,6 @@
 #include "sysdef.h"
 #include "csgeom/volume.h"
 
-  csPlane* planes;
-  int num_planes;
-  int max_planes;
-
 void csVolume::Clear ()
 {
   CHK (delete [] planes);
@@ -90,7 +86,13 @@ bool csVolume::Intersects (csVolume& target)
   return false;
 }
 
-void CutByPlane (const csPlane& cutter)
+int csVolume::ClassifyToPlane (const csPlane& cutter)
+{
+  (void)cutter;
+  return 0;
+}
+
+void csVolume::CutByPlane (const csPlane& cutter)
 {
   (void)cutter;
 }
