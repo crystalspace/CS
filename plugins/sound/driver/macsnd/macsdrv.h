@@ -28,6 +28,7 @@
 
 #include "csutil/scf.h"
 #include "isnddrv.h"
+#include "isystem.h"
 
 class csSoundDriverMac : public iSoundDriver
 {
@@ -44,24 +45,24 @@ public:
   DECLARE_IBASE;
   csSoundDriverMac(iBase *piBase);
   virtual ~csSoundDriverMac();
-  bool Initialize(iSystem *iSys);
+  virtual bool Initialize(iSystem *iSys);
   
-  bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
-  void Close();
+  virtual bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
+  virtual void Close();
 	
-  void LockMemory(void **mem, int *memsize);
-  void UnlockMemory();
-  bool IsBackground();
-  bool Is16Bits();
-  bool IsStereo();
-  int GetFrequency();
-  bool IsHandleVoidSound();
+  virtual void LockMemory(void **mem, int *memsize);
+  virtual void UnlockMemory();
+  virtual bool IsBackground();
+  virtual bool Is16Bits();
+  virtual bool IsStereo();
+  virtual int  GetFrequency();
+  virtual bool IsHandleVoidSound();
  
   void SndDoubleBackProc( SndChannelPtr channel, SndDoubleBufferPtr doubleBuffer );
   
  private:
   SndDoubleBufferHeader	mSoundDBHeader;
-  SndDoubleBuffer			mSoundDoubleBuffer;
+  SndDoubleBuffer		mSoundDoubleBuffer;
   SndChannelPtr			mSoundChannel;
   
   long	mFramesPerBuffer;
