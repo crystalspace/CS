@@ -16,7 +16,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 all apps: tbconvert
 tbconvert:
-	$(MAKE_TARGET)
+	$(MAKE_APP)
 tbconvertclean:
 	$(MAKE_CLEAN)
 
