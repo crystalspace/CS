@@ -10,6 +10,7 @@ The history order has been reversed so that new features are at the top.
 	- Removed a lot of the obsolete tokens in csparser.
 	- Fixed a bug in csThing::MergeTemplate(). The function did not
 	  correctly copy the flags from the template to the thing.
+	- Fixed a bug in simple.
 	- Eric Sunshine fixed a couple of problems in
 	  ddgTriangle3::intersectPointTriangle() which were reported by
 	  Jonathon Doran <jon.doran@nsc.com>:
