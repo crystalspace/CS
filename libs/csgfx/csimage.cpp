@@ -241,7 +241,7 @@ csPtr<iImage> csImageFile::MipMap (int steps, csRGBpixel *transp)
     return Clone ();
   }
 
-  csRef<csImageFile> nimg = NULL;
+  csRef<csImageFile> nimg;
 
   if (steps == 0)
   {
@@ -327,7 +327,6 @@ csPtr<iImage> csImageFile::MipMap (int steps, csRGBpixel *transp)
     }
   }
 
-  nimg->IncRef ();
   return csPtr<iImage> (nimg);
 }
 
@@ -385,7 +384,6 @@ csPtr<iImage> csImageFile::Sharpen (csRGBpixel *transp, int strength)
   resimg->set_dimensions (Width, Height);
   resimg->convert_rgba (result);
 
-  resimg->IncRef ();
   return csPtr<iImage> (resimg);
 }
 
@@ -632,7 +630,6 @@ csPtr<iImage> csImageFile::Clone ()
     }
   }
 
-  nimg->IncRef ();
   return csPtr<iImage> (nimg);
 }
 
@@ -682,7 +679,6 @@ csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height )
     }
   }
 
-  nimg->IncRef ();
   return csPtr<iImage> (nimg);
 }
 
