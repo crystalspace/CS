@@ -49,9 +49,13 @@
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/event.h"
+#include "ivideo/fontserv.h"
+#include "ivaria/collider.h"
+#include "iutil/plugin.h"
 
 #include "imesh/ball.h"
 #include "ivaria/dynamics.h"
+#include "ivaria/ode.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -63,6 +67,9 @@ Simple *simple;
 Simple::Simple (iObjectRegistry* object_reg)
 {
   Simple::object_reg = object_reg;
+  objcnt=0;
+  solver=0;
+  disable=false;
 }
 
 Simple::~Simple ()
@@ -100,7 +107,8 @@ void Simple::SetupFrame ()
   const float maxStep = 0.01f;
   float ta = 0;
   float tb = speed;
-  while (ta < speed)
+  int maxSteps=4;
+  while (ta < speed && maxSteps)
   {
     if (tb - ta > maxStep)
       tb = ta + maxStep;
@@ -111,7 +119,10 @@ void Simple::SetupFrame ()
 
     view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
     //avatarbody->SetTransform(view->GetCamera()->GetTransform());
+
+    maxSteps--;
   }
+//  dyn->Step(maxStep);
 
   view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
   //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
@@ -122,6 +133,15 @@ void Simple::SetupFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+
+  // Write FPS and other info..
+  if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if( speed != 0.0f) WriteShadow( 0,10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",1.0f/speed);
+  WriteShadow( 0,10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",objcnt);
+  if(solver==0) WriteShadow( 0,10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
+  else if(solver==1) WriteShadow( 0,10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
+  else if(solver==2) WriteShadow( 0,10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
+  if(disable) WriteShadow( 0,10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
 }
 
 void Simple::FinishFrame ()
@@ -160,6 +180,11 @@ bool Simple::HandleEvent (iEvent& ev)
       CreateSphere ();
       return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
+    {
+      CreateMesh ();
+      return true;
+    }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
     {
       CreateJointed ();
@@ -169,6 +194,35 @@ bool Simple::HandleEvent (iEvent& ev)
     { // Toggle gravity.
       dynSys->SetGravity (dynSys->GetGravity () == 0 ?
        csVector3 (0,-7,0) : csVector3 (0));
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
+    { // Toggle autodisable.
+      dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
+      //dynSys->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
+      disable=dynSys->AutoDisableEnabled ();
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
+    { // Toggle stepfast.
+      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
+      osys->EnableStepFast (0);
+      solver=0;
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
+    { // Toggle stepfast.
+      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
+      osys->EnableStepFast (1);
+      solver=1;
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
+    { // Toggle quickstep.
+      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
+      //iODEDynamicSystemState osys=(iODEDynamicSystemState*)dynSys->QueryObject();
+      osys->EnableQuickStep (1);
+      solver=2;
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
@@ -268,6 +322,15 @@ bool Simple::Initialize ()
     return false;
   }
 
+  g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  if (g2d == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.phystut",
+        "No iGraphics2D plugin!");
+    return false;
+  }
+
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (kbd == 0)
   {
@@ -294,6 +357,27 @@ bool Simple::Initialize ()
     return false;
   }
 
+  csRef<iFontServer> fs = g3d->GetDriver2D()->GetFontServer ();
+  if (fs)
+    courierFont = fs->LoadFont (CSFONT_COURIER);
+  else
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.phystut",
+        "Error getting FontServer!");
+    return false;
+  };
+
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.opcode" , iCollideSystem);
+  if (!cdsys)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.phystut",
+        "Error getting Collision Detection System!");
+    return false;
+  };
+  
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
@@ -369,6 +453,15 @@ bool Simple::Initialize ()
   csReversibleTransform t = csReversibleTransform (m, csVector3 (0));
   boxFact->HardTransform (t);
 
+  // Load the mesh factory.
+  meshFact = loader->LoadMeshObjectFactory ("/varia/physmesh");
+  if (meshFact == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.phystut",
+        "Error loading mesh object factory!");
+    return false;
+  }
 
   // Create the ball mesh factory.
   ballFact = engine->CreateMeshFactory("crystalspace.mesh.object.ball",
@@ -413,14 +506,15 @@ bool Simple::Initialize ()
   const csVector3 tvv (0);
   csOrthoTransform tt (tmm, tvv);
   csVector3 size (0.4f, 0.8f, 0.4f); // This should be the same size as the mesh.
-  avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
-  //avatarbody->AttachColliderSphere (1.5, csVector3 (0), 10, 1, .8);
+//  avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
+  avatarbody->AttachColliderSphere (1.5, csVector3 (0), 10, 1, 0.8f);
 
   return true;
 }
 
 iRigidBody* Simple::CreateBox (void)
 {
+  objcnt++;
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
@@ -447,8 +541,38 @@ iRigidBody* Simple::CreateBox (void)
   return rb;
 }
 
+iRigidBody* Simple::CreateMesh (void)
+{
+  objcnt++;
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the mesh.
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (meshFact, "mesh", room));
+
+  // Create a body and attach the mesh.
+  csRef<iRigidBody> rb = dynSys->CreateBody ();
+  rb->SetProperties (1, csVector3 (0), csMatrix3 ());
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
+  rb->AttachMesh (mesh);
+
+  // Create and attach a trimesh collider.
+  const csMatrix3 tm;
+  const csVector3 tv (0);
+  csOrthoTransform t (tm, tv);
+
+  rb->AttachColliderMesh (mesh, t, 10, 1, 0.8f);
+     
+  // Fling the body.
+  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  return rb;
+}
+
 iRigidBody* Simple::CreateSphere (void)
 {
+  objcnt++;
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
@@ -485,6 +609,7 @@ iRigidBody* Simple::CreateSphere (void)
 
 iJoint* Simple::CreateJointed (void)
 {
+  objcnt++;
   // Create and position objects.
   iRigidBody* rb1 = CreateBox();
   rb1->SetPosition (rb1->GetPosition () +
@@ -522,17 +647,83 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
 
+  csOrthoTransform t;
+#if 0
+  // trying to make the sector walls into a mesh collider doesn't seem to work..
+  dynSys->AttachColliderMesh (walls, t,10,0);
+#endif
+#if 0
   for(int i = 0; i < walls_state->GetPolygonCount(); i++)
   {
+      // mesh -> plan doesn't work yet, so we will use boxes for each wall for now
       rb->AttachColliderPlane(walls_state->GetPolygonObjectPlane(i), 10, 0, 0);
   }
+#endif
+#if 1
+  csVector3 size (10.0f, 10.0f, 10.0f); // This should be the same size as the mesh.
+  t.SetOrigin(csVector3(10.0f,0.0f,0.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
+  t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
+  t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
+  t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
+  t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
+  t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
+  dynSys->AttachColliderBox (size, t, 10, 0);
 
+#endif
   return rb;
 }
 
 void Simple::Start ()
 {
   csDefaultRunLoop (object_reg);
+}
+
+void Simple::WriteShadow (int align,int x,int y,int fg,char *str,...) {
+  char buf[256];
+
+  va_list arg;
+  va_start (arg, str);
+  vsprintf (buf, str, arg);
+  va_end (arg);
+
+  Write (align, x+1, y-1, 0, -1, buf);
+  Write (align, x, y, fg, -1, buf);
+}
+
+void Simple::Write(int align,int x,int y,int fg,int bg,char *str,...) {
+  va_list arg;
+  char b[256], *buf = b;
+
+  va_start (arg,str);
+  int l = vsprintf (buf, str, arg);
+  va_end (arg);
+
+  if (align != 0)
+  {
+    int rb = 0;
+    if (align == 1)
+    {
+      int where;
+      sscanf (buf, "%d%n", &rb,&where);
+      buf += where + 1;
+      l -= where + 1;
+    }
+
+    int w, h;
+    courierFont->GetDimensions (buf, w, h);
+
+    switch(align) {
+      case 2:  x -= w; break;
+      case 1: x = (x + rb - w) / 2; break;
+    }
+  }
+
+  g2d->Write (courierFont, x, y, fg, bg, buf);
 }
 
 /*---------------------------------------------------------------------*
@@ -550,3 +741,4 @@ int main (int argc, char* argv[])
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }
+

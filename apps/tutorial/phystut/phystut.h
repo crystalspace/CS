@@ -38,6 +38,7 @@ struct iDynamicSystem;
 struct iRigidBody;
 struct iJoint;
 struct iMeshFactoryWrapper;
+struct iCollideSystem;
 
 class Simple
 {
@@ -46,23 +47,33 @@ private:
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;
+  csRef<iGraphics2D> g2d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
   csRef<iView> view;
+  csRef<iCollideSystem> cdsys; 
   iSector* room;
+  int objcnt;
+  int solver;
+  bool disable;
 
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
   csRef<iMeshFactoryWrapper> boxFact;
+  csRef<iMeshFactoryWrapper> meshFact;
   csRef<iMeshFactoryWrapper> ballFact;
+  csRef<iFont> courierFont;
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
-
+  void WriteShadow (int align,int x,int y,int fg,char *str,...);
+  void Write(int align,int x,int y,int fg,int bg,char *str,...);
+  
   iRigidBody* CreateBox (void);
   iRigidBody* CreateSphere (void);
+  iRigidBody* CreateMesh (void);
   iJoint* CreateJointed (void);
   iRigidBody* CreateWalls (const csVector3& radius);
   csRef<iMeshWrapper> walls;
