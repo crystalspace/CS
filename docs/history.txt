@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Jan-2005
+	- Eric Sunshine fixed more boundary-condition bugs in csMouseDriver and
+	  csJoystickDriver.
 25-Jan-2005
 	- Jorrit fixed a bug that could come up in case you are relighting
 	  several maps at the same time and a certain polygon was affected
@@ -39,8 +42,8 @@ chronological order.
 	- Eric Sunshine augmented the joystick drivers so that they support and
 	  scan for up to sixteen joysticks.
 	- res changed some always-true checks in csArray<>::DeleteRange().
-	  When one of the boundary index is invalid (csArrayItemNotFound value),
-	  nothing is deleted.
+	  When one of the boundary index is invalid (csArrayItemNotFound
+	  value), nothing is deleted.
 	- res applied a patch from Seth Yastrov <syastrov@gmail.com> to 
 	  improve GLX support in the wxgl canvas, after removing some code that
 	  created another GLX context (which should be done by the wxgl 

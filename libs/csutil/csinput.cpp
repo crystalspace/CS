@@ -627,7 +627,7 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
   if (x != LastX || y != LastY)
     DoMotion (x, y);
 
-  if (button <= 0 || button >= CS_MAX_MOUSE_BUTTONS)
+  if (button <= 0 || button > CS_MAX_MOUSE_BUTTONS)
     return;
 
   iKeyboardDriver* k = GetKeyboardDriver();
@@ -737,7 +737,7 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 void csJoystickDriver::DoButton (int number, int button, bool down,
   int x, int y)
 {
-  if (number <= 0 || number >= CS_MAX_JOYSTICK_COUNT)
+  if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
     return;
 
   if (x != LastX [number - 1] || y != LastY [number - 1])
@@ -761,7 +761,7 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
 
 void csJoystickDriver::DoMotion (int number, int x, int y)
 {
-  if (number <= 0 || number >= CS_MAX_JOYSTICK_COUNT)
+  if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
     return;
 
   if (x != LastX [number - 1] || y != LastY [number - 1])
