@@ -35,6 +35,15 @@ Bugs to fix:
 	     Solution: try to find a spot that doesn't work right and
 	     remember with 'C'. Later on you can go back to that position
 	     with 'c' (after including debug info).
+	     Here's a cam file for it:
+	     --snip--
+419.985 37.1595 375.409
+-.94714 0 -.320818
+0 1 0
+.320818 0 -.94714
+"room"
+0
+	     --snap--
 	[V]  Fix radiosity so that it works again. Radiosity is currently
 	     disabled because several things had been rewritten and the
 	     radiosity code was left behind.
