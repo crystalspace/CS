@@ -11520,7 +11520,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in Xxf86vm
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -11563,8 +11565,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "Xxf86vm"; then
-  cs_check_lib_libs="-lXxf86vm"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -11583,8 +11585,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "Xxf86vm"; then
-  cs_check_lib_libs="-lXxf86vm"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -11602,8 +11604,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "Xxf86vm"; then
-  cs_check_lib_libs="-lXxf86vm"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -11612,6 +11614,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libXxf86vm" >&5
@@ -11909,6 +11912,7 @@ fi
 else
   cs_cv_libXxf86vm=no
 fi
+
 
     cs_cv_with_libXxf86vm="$with_libXxf86vm"
 
@@ -14229,7 +14233,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in z
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -14272,8 +14278,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "z"; then
-  cs_check_lib_libs="-lz"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -14292,8 +14298,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "z"; then
-  cs_check_lib_libs="-lz"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -14311,8 +14317,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "z"; then
-  cs_check_lib_libs="-lz"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -14321,6 +14327,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libz" >&5
@@ -14611,6 +14618,7 @@ else
   cs_cv_libz=no
 fi
 
+
     cs_cv_with_libz="$with_libz"
 
     if test "$cs_cv_libz" = yes; then
@@ -14742,7 +14750,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in png
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -14785,8 +14795,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "png"; then
-  cs_check_lib_libs="-lpng"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -14805,8 +14815,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "png"; then
-  cs_check_lib_libs="-lpng"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -14824,8 +14834,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "png"; then
-  cs_check_lib_libs="-lpng"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -14834,6 +14844,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libpng" >&5
@@ -15124,6 +15135,7 @@ else
   cs_cv_libpng=no
 fi
 
+
     cs_cv_with_libpng="$with_libpng"
 
     if test "$cs_cv_libpng" = yes; then
@@ -15196,7 +15208,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in jpeg
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -15239,8 +15253,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "jpeg"; then
-  cs_check_lib_libs="-ljpeg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -15259,8 +15273,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "jpeg"; then
-  cs_check_lib_libs="-ljpeg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -15278,8 +15292,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "jpeg"; then
-  cs_check_lib_libs="-ljpeg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -15288,6 +15302,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libjpeg" >&5
@@ -15582,6 +15597,7 @@ else
   cs_cv_libjpeg=no
 fi
 
+
     cs_cv_with_libjpeg="$with_libjpeg"
 
     if test "$cs_cv_libjpeg" = yes; then
@@ -15653,7 +15669,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in mng
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -15696,8 +15714,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "mng"; then
-  cs_check_lib_libs="-lmng"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -15716,8 +15734,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "mng"; then
-  cs_check_lib_libs="-lmng"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -15735,8 +15753,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "mng"; then
-  cs_check_lib_libs="-lmng"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -15745,6 +15763,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libmng" >&5
@@ -16035,6 +16054,7 @@ else
   cs_cv_libmng=no
 fi
 
+
     cs_cv_with_libmng="$with_libmng"
 
     if test "$cs_cv_libmng" = yes; then
@@ -16107,7 +16127,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in mikmod
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -16150,8 +16172,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "mikmod"; then
-  cs_check_lib_libs="-lmikmod"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -16170,8 +16192,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "mikmod"; then
-  cs_check_lib_libs="-lmikmod"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -16189,8 +16211,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "mikmod"; then
-  cs_check_lib_libs="-lmikmod"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -16199,6 +16221,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libmikmod" >&5
@@ -16489,6 +16512,7 @@ else
   cs_cv_libmikmod=no
 fi
 
+
     cs_cv_with_libmikmod="$with_libmikmod"
 
     if test "$cs_cv_libmikmod" = yes; then
@@ -16560,7 +16584,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in ogg
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -16603,8 +16629,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "ogg"; then
-  cs_check_lib_libs="-logg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -16623,8 +16649,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "ogg"; then
-  cs_check_lib_libs="-logg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -16642,8 +16668,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "ogg"; then
-  cs_check_lib_libs="-logg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -16652,6 +16678,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libogg" >&5
@@ -16942,6 +16969,7 @@ else
   cs_cv_libogg=no
 fi
 
+
     cs_cv_with_libogg="$with_libogg"
 
     if test "$cs_cv_libogg" = yes; then
@@ -17007,7 +17035,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in vorbis
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -17050,8 +17080,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vorbis"; then
-  cs_check_lib_libs="-lvorbis"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17070,8 +17100,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vorbis"; then
-  cs_check_lib_libs="-lvorbis"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17089,8 +17119,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vorbis"; then
-  cs_check_lib_libs="-lvorbis"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17099,6 +17129,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libvorbis" >&5
@@ -17389,6 +17420,7 @@ else
   cs_cv_libvorbis=no
 fi
 
+
     cs_cv_with_libvorbis="$with_libvorbis"
 
     if test "$cs_cv_libvorbis" = yes; then
@@ -17456,7 +17488,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in vorbisfile
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -17499,8 +17533,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vorbisfile"; then
-  cs_check_lib_libs="-lvorbisfile"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17519,8 +17553,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vorbisfile"; then
-  cs_check_lib_libs="-lvorbisfile"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17538,8 +17572,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vorbisfile"; then
-  cs_check_lib_libs="-lvorbisfile"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17548,6 +17582,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libvorbisfile" >&5
@@ -17842,6 +17877,7 @@ else
   cs_cv_libvorbisfile=no
 fi
 
+
     cs_cv_with_libvorbisfile="$with_libvorbisfile"
 
     if test "$cs_cv_libvorbisfile" = yes; then
@@ -17915,7 +17951,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in pgserver
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -17958,8 +17996,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "pgserver"; then
-  cs_check_lib_libs="-lpgserver"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17978,8 +18016,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "pgserver"; then
-  cs_check_lib_libs="-lpgserver"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -17997,8 +18035,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "pgserver"; then
-  cs_check_lib_libs="-lpgserver"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -18007,6 +18045,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libpgserver" >&5
@@ -18297,6 +18336,7 @@ else
   cs_cv_libpgserver=no
 fi
 
+
     cs_cv_with_libpgserver="$with_libpgserver"
 
     if test "$cs_cv_libpgserver" = yes; then
@@ -18371,7 +18411,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in 3ds
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -18414,8 +18456,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "3ds"; then
-  cs_check_lib_libs="-l3ds"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -18434,8 +18476,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "3ds"; then
-  cs_check_lib_libs="-l3ds"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -18453,8 +18495,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "3ds"; then
-  cs_check_lib_libs="-l3ds"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -18463,6 +18505,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for lib3ds" >&5
@@ -18752,6 +18795,7 @@ fi
 else
   cs_cv_lib3ds=no
 fi
+
 
     cs_cv_with_lib3ds="$with_lib3ds"
 
@@ -19113,7 +19157,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in ode
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -19156,8 +19202,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "ode"; then
-  cs_check_lib_libs="-lode"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -19176,8 +19222,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "ode"; then
-  cs_check_lib_libs="-lode"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -19195,8 +19241,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "ode"; then
-  cs_check_lib_libs="-lode"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -19205,6 +19251,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libode" >&5
@@ -19494,6 +19541,7 @@ fi
 else
   cs_cv_libode=no
 fi
+
 
     cs_cv_with_libode="$with_libode"
 
@@ -20622,7 +20670,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in vga
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -20665,8 +20715,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vga"; then
-  cs_check_lib_libs="-lvga"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -20685,8 +20735,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vga"; then
-  cs_check_lib_libs="-lvga"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -20704,8 +20754,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "vga"; then
-  cs_check_lib_libs="-lvga"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -20714,6 +20764,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libvga" >&5
@@ -21004,6 +21055,7 @@ else
   cs_cv_libvga=no
 fi
 
+
     cs_cv_with_libvga="$with_libvga"
 
     if test "$cs_cv_libvga" = yes; then
@@ -21075,7 +21127,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in cal3d
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -21118,8 +21172,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "cal3d"; then
-  cs_check_lib_libs="-lcal3d"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -21138,8 +21192,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "cal3d"; then
-  cs_check_lib_libs="-lcal3d"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -21157,8 +21211,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "cal3d"; then
-  cs_check_lib_libs="-lcal3d"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -21167,6 +21221,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libcal3d" >&5
@@ -21456,6 +21511,7 @@ fi
 else
   cs_cv_libcal3d=no
 fi
+
 
     cs_cv_with_libcal3d="$with_libcal3d"
 
@@ -22282,7 +22338,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in Cg
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -22325,8 +22383,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "Cg"; then
-  cs_check_lib_libs="-lCg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -22345,8 +22403,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "Cg"; then
-  cs_check_lib_libs="-lCg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -22364,8 +22422,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "Cg"; then
-  cs_check_lib_libs="-lCg"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -22374,6 +22432,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libCg" >&5
@@ -22664,6 +22723,7 @@ else
   cs_cv_libCg=no
 fi
 
+
     cs_cv_with_libCg="$with_libCg"
 
     if test "$cs_cv_libCg" = yes; then
@@ -22703,7 +22763,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in CgGL
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -22746,8 +22808,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "CgGL"; then
-  cs_check_lib_libs="-lCgGL"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -22766,8 +22828,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "CgGL"; then
-  cs_check_lib_libs="-lCgGL"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -22785,8 +22847,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "CgGL"; then
-  cs_check_lib_libs="-lCgGL"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -22795,6 +22857,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libCgGL" >&5
@@ -23086,6 +23149,7 @@ fi
 else
   cs_cv_libCgGL=no
 fi
+
 
     cs_cv_with_libCgGL="$with_libCgGL"
 
@@ -27389,7 +27453,9 @@ fi
 
 
 	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
+	for cs_check_lib_alias in bfd
+	do
+	    for cs_lib_item in $cs_check_lib_paths
     do
 	case $cs_lib_item in
 	    *\|*)
@@ -27432,8 +27498,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bfd"; then
-  cs_check_lib_libs="-lbfd"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -27452,8 +27518,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bfd"; then
-  cs_check_lib_libs="-lbfd"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -27471,8 +27537,8 @@ else
   cs_check_lib_lflag=''
 fi
 
-    if test -n "bfd"; then
-  cs_check_lib_libs="-lbfd"
+    if test -n "$cs_check_lib_alias"; then
+  cs_check_lib_libs="-l$cs_check_lib_alias"
 else
   cs_check_lib_libs=''
 fi
@@ -27481,6 +27547,7 @@ fi
 		;;
 	esac
     done
+	done
 
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libbfd" >&5
@@ -27770,6 +27837,7 @@ fi
 else
   cs_cv_libbfd=no
 fi
+
 
     cs_cv_with_libbfd="$with_libbfd"
 
