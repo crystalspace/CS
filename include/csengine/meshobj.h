@@ -42,6 +42,7 @@ struct iSharedVariable;
 class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csLight;
+class csStaticLODMesh;
 
 /**
  * General list of meshes. This class implements iMeshList.
@@ -194,6 +195,12 @@ protected:
    * Position in the world.
    */
   csMovable movable;
+
+  /**
+   * Optional LOD control that will turn a hierarchical mesh in a
+   * mesh that supports static LOD.
+   */
+  csRef<csStaticLODMesh> static_lod;
 
   /**
    * The renderer will render all objects in a sector based on this
@@ -370,6 +377,13 @@ public:
    * Optionally update lighting if needed (DeferUpdateLighting()).
    */
   void Draw (iRenderView* rview);
+
+  // Static LOD methods.
+  iLODControl* CreateStaticLOD ();
+  void DestroyStaticLOD ();
+  iLODControl* GetStaticLOD ();
+  void RemoveMeshFromStaticLOD (iMeshWrapper* mesh);
+  void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh);
 
 #ifdef CS_USE_NEW_RENDERER
   /**
@@ -689,31 +703,51 @@ public:
     {
       scfParent->Draw (rview);
     }
+    virtual iLODControl* CreateStaticLOD ()
+    {
+      return scfParent->CreateStaticLOD ();
+    }
+    virtual void DestroyStaticLOD ()
+    {
+      scfParent->DestroyStaticLOD ();
+    }
+    virtual iLODControl* GetStaticLOD ()
+    {
+      return scfParent->GetStaticLOD ();
+    }
+    virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh)
+    {
+      scfParent->RemoveMeshFromStaticLOD (mesh);
+    }
+    virtual void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
+    {
+      scfParent->AddMeshToStaticLOD (lod, mesh);
+    }
 #ifdef CS_USE_NEW_RENDERER
     virtual csRenderMesh** GetRenderMeshes (int& num) 
-	{
-	  return scfParent->GetRenderMeshes (num);
-	}
-	virtual void DrawShadow (iRenderView* rview, iLight* light)
-	{
-	  scfParent->DrawShadow (rview, light);
-	}
-	virtual void DrawLight (iRenderView* rview, iLight* light)
-	{
-	  scfParent->DrawLight (rview, light);
-	}
-        virtual void CastHardwareShadow (bool castShadow) 
-        {
-          scfParent->CastHardwareShadow (castShadow);
-        }
-        virtual void SetDrawAfterShadow (bool drawAfter)
-        {
-          scfParent->SetDrawAfterShadow (drawAfter);
-        }
-        virtual bool GetDrawAfterShadow ()
-        {
-          return scfParent->GetDrawAfterShadow ();
-        }
+    {
+      return scfParent->GetRenderMeshes (num);
+    }
+    virtual void DrawShadow (iRenderView* rview, iLight* light)
+    {
+      scfParent->DrawShadow (rview, light);
+    }
+    virtual void DrawLight (iRenderView* rview, iLight* light)
+    {
+      scfParent->DrawLight (rview, light);
+    }
+    virtual void CastHardwareShadow (bool castShadow) 
+    {
+      scfParent->CastHardwareShadow (castShadow);
+    }
+    virtual void SetDrawAfterShadow (bool drawAfter)
+    {
+      scfParent->SetDrawAfterShadow (drawAfter);
+    }
+    virtual bool GetDrawAfterShadow ()
+    {
+      return scfParent->GetDrawAfterShadow ();
+    }
 #endif
   } scfiMeshWrapper;
   friend struct MeshWrapper;

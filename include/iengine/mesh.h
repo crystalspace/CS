@@ -37,11 +37,10 @@ struct iMeshObjectFactory;
 struct iMeshWrapper;
 struct iMeshList;
 struct iMeshFactoryList;
-class csMeshWrapper;
-class csMeshFactoryWrapper;
 struct iMeshFactoryWrapper;
 struct iRenderView;
 struct iMovable;
+struct iLODControl;
 struct iLight;
 struct iLightingInfo;
 struct iShadowReceiver;
@@ -102,6 +101,11 @@ class csFlags;
 #define CS_ENTITY_NOLIGHTING 32
 /** @} */
 
+/**
+ * A mesh supports 10 static lod levels.
+ */
+#define CS_STATIC_LOD_LEVELS 10
+
 SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
 
 /**
@@ -122,7 +126,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 5, 0);
+SCF_VERSION (iMeshWrapper, 0, 6, 0);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -403,6 +407,27 @@ struct iMeshWrapper : public iBase
    * want to render mesh objects in a CSWS window or something like that.
    */
   virtual void Draw (iRenderView* rview) = 0;
+
+  /**
+   * Create a LOD control for this mesh wrapper. This is relevant
+   * only if the mesh is a hierarchical mesh. The LOD control will be
+   * used to select which children are visible and which are not.
+   * Use this to create static lod.
+   */
+  virtual iLODControl* CreateStaticLOD () = 0;
+
+  /**
+   * Destroy the LOD control for this mesh. After this call the hierarchical
+   * mesh will act as usual.
+   */
+  virtual void DestroyStaticLOD () = 0;
+
+  /**
+   * Get the LOD control for this mesh. This will return 0 if this is a normal
+   * (hierarchical) mesh. Otherwise it will return an object with which you
+   * can control the static LOD of this object.
+   */
+  virtual iLODControl* GetStaticLOD () = 0;
 
 #ifdef CS_USE_NEW_RENDERER
   /**

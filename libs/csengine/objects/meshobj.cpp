@@ -21,6 +21,7 @@
 #include "igeom/objmodel.h"
 #include "csengine/sector.h"
 #include "csengine/meshobj.h"
+#include "csengine/meshlod.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
 #include "iengine/portal.h"
@@ -299,6 +300,44 @@ bool csMeshWrapper::GetDrawAfterShadow ()
   return draw_after_fancy_stuff;
 }
 #endif // CS_USE_NEW_RENDERER
+
+//----- Static LOD ----------------------------------------------------------
+
+iLODControl* csMeshWrapper::CreateStaticLOD ()
+{
+  static_lod = csPtr<csStaticLODMesh> (new csStaticLODMesh ());
+  return static_lod;
+}
+
+void csMeshWrapper::DestroyStaticLOD ()
+{
+  static_lod = 0;
+}
+
+iLODControl* csMeshWrapper::GetStaticLOD ()
+{
+  return (iLODControl*)static_lod;
+}
+
+void csMeshWrapper::RemoveMeshFromStaticLOD (iMeshWrapper* mesh)
+{
+  if (!static_lod) return;	// No static lod, nothing to do here.
+  int lod;
+  for (lod = 0 ; lod < CS_STATIC_LOD_LEVELS ; lod++)
+  {
+    csArray<iMeshWrapper*>& meshes_for_lod = static_lod->GetMeshesForLOD (lod);
+    meshes_for_lod.Delete (mesh);
+  }
+}
+
+void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
+{
+  if (!static_lod) return;	// No static lod, nothing to do here.
+  csArray<iMeshWrapper*>& meshes_for_lod = static_lod->GetMeshesForLOD (lod);
+  meshes_for_lod.Push (mesh);
+}
+
+//---------------------------------------------------------------------------
 
 void csMeshWrapper::DrawInt (iRenderView *rview)
 {
@@ -896,6 +935,7 @@ void csMeshMeshList::FreeItem (iMeshWrapper* item)
 
   item->SetParentContainer (0);
   item->GetMovable ()->SetParent (0);
+  mesh->RemoveMeshFromStaticLOD (item);
   csMeshList::FreeItem (item);
 }
 
