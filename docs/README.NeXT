@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/09/13
+    1999/09/29
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -217,10 +217,9 @@ AppKit's Application class.  The files comprising this module are:
     NeXTMenu.cfg            An INI-style configuration file which defines a
                             menu layout appropriate to the platform.
 
-    NeXTfopen.cpp           Platform-specific implementations of
-    NeXTprintf.cpp          csSystemDriver::fopen(), csSystemDriver::printf(),
-    NeXTTime.cpp            and csSystemDriver::Time() which work on MacOS/X
-                            Server, OpenStep, and NextStep.
+    NeXTprintf.cpp          Platform-specific implementations of
+    NeXTTime.cpp            csSystemDriver::printf, and csSystemDriver::Time
+                            which work on MacOS/X Server, OpenStep, & NextStep.
 
     malloc.h                A header which works around Crystal Space's misuse
                             of the deprecated <malloc.h> header.
