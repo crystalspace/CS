@@ -1,8 +1,23 @@
 The history order has been reversed so that new features are at the top.
 
+29-Jan-2001
+	- Philip Wyett added a divide by zero check in csSprite3D.
+	  This fixes ptlab on Windows.
 28-Jan-2001
 	- Eric Sunshine fixed a crasher in PTLab where it was trying to
 	  access a texture (cslogo.gif) which it had never loaded.
+	- Philip Wyett removed the reference to the non-existant texture
+	  archive at http://server.empathy.com/crystal.
+	- Norman Kramer fixed Save & RestoreArea in iGraphics2D to be
+	  good with PixelBytes == 2.
+	- Norman also did some fixes on the OpenGL texture cache:
+	    - Texture size on caching is now only calculated when needed.
+	    - Keycolor setting is now remembered so that it is not processed
+	      again when texture handle is created again.
+27-Jan-2001
+	- Martin Geisse moved the main system/application config files to the
+	  new config system.
+	- Martin Geisse fixed a bug in the sound loader.
 26-Jan-2001
 	- Norman Kramer did further work on the video plugins.
 	  With exception of yuv2rgb conversion AVI is working.
@@ -13,6 +28,22 @@ The history order has been reversed so that new features are at the top.
 	      void* to some other type.
 	    - GetYesNo() now also recognizes "1" as true in addition to "yes",
 	      "true", and "on".
+	- Wouter Wijngaards fixed several bugs in radiosity:
+	    - Normals when really close up for both lumels. Taking only one
+	      normal value would give bad results. This the code now averages
+	      for the corners of all lumels.
+	    - Set source_patch_size in the config to 1 (did not debug that
+	      yet). Vectors a,b when a*b is taken (to get cosinus), lengths
+	      must be one. a*b/length(a)/length(b) is only a valid approx
+	      when both a and b are pretty large. Close to zero this fails.
+	    - When lumels overlap in space (i.e. two polygons with the same
+	      texture seamlessly aligning) the distance would become almost
+	      zero. Added a test, and at such a moment a derivative of
+	      radiosity is applied (the diffuse*area*visibility/PI is taken,
+	      no angles/distances are used). This seems to remove all
+	      glitches from the radtest level.
+	    - To avoid light explosion with radiosity we do a Normalize()
+	      for each step now.
 25-Jan-2001
 	- Wouter Wijngaards fixed mazed compilation, by adding csutil
 	  library after the cssys for linking.
