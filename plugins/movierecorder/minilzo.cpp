@@ -28,6 +28,7 @@
    http://wildsau.idv.uni-linz.ac.at/mfx/lzo.html
  */
 
+#include "cssysdef.h"
 /*
  * NOTE:
  *   the full LZO package can be found at
