@@ -43,6 +43,13 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine added "const" here and there through the source tree.
 	- Eric Sunshine updated some documentation.
 	- Eric Sunshine fixed some compilation warnings in MazeD.
+	- Seth Galbraith imported Squawk version 17 which includes many
+	  improvements and changes.
+	- Eric Sunshine fixed a compilation error in Squawk 17.
+	- Eric Sunshine fixed a crasher in Squawk 17 caused by an unhandled
+	  boundary condition.
+	- Eric Sunshine fixed the new command-line -cfg option in Squawk 17
+	  so that it actually works.
 28-Sep-1999
 	- Csparser detects duplicate vertex indices in polygons and ignores
 	  them (while given a warning at the same time).
