@@ -62,7 +62,6 @@ ctReferenceFrame *rf = new ctReferenceFrame();
 
 }
 
-
 // w is actually a secondary value that is calculated from L
 // so need to calc L to set w
 void ctRigidBody::set_angular_v( const ctVector3 &pw )
@@ -70,7 +69,7 @@ void ctRigidBody::set_angular_v( const ctVector3 &pw )
 //  ctMatrix3 I_world = get_I_world();
   const ctMatrix3 &R = RF.get_R();
   ctMatrix3 I_world;
-  R.similarity_transform( I_world, I_inv );
+  R.similarity_transform( I_world, I );
 
   // angular speed = 
   // inverse of inertia tensor in world coords * angular momentum
@@ -84,6 +83,30 @@ void ctRigidBody::set_angular_v( const ctVector3 &pw )
 void ctRigidBody::set_v( const ctVector3 &pv )
 { 
   v = pv; 
+  P = v*m;
+}
+
+// w is actually a secondary value that is calculated from L
+// so need to calc L to set w
+void ctRigidBody::add_angular_v( const ctVector3 &pw )
+{
+//  ctMatrix3 I_world = get_I_world();
+  const ctMatrix3 &R = RF.get_R();
+  ctMatrix3 I_world;
+  R.similarity_transform( I_world, I );
+
+  // angular speed = 
+  // inverse of inertia tensor in world coords * angular momentum
+  w += pw;
+
+  // from w = I_inv_world*L
+  L = I_world * w;
+}
+
+// v is a secondary value that is calculated from momentum
+void ctRigidBody::add_v( const ctVector3 &pv )
+{ 
+  v += pv; 
   P = v*m;
 }
 

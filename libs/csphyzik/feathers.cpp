@@ -240,7 +240,7 @@ ctArticulatedBody *ab_f;
 ctFeatherstoneAlgorithm *out_link_solver;
 ctFeatherstoneAlgorithm *svr_f;
 //ctMatrix3 Mwork;
-ctVector3 vwork(0);
+ctVector3 vwork;
 ctSpatialVector svwork;
 //ctSpatialMatrix sMwork;
 //ctSpatialVector ZaIac;
@@ -367,7 +367,7 @@ void ctFeatherstoneAlgorithm::test_impulse_response()
     if( inboard_link != NULL ){
       in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
 	    ctSpatialMatrix fXg;
-      ctVector3 vwork(0);
+      ctVector3 vwork;
       s = ab.inboard_joint->get_spatial_joint_axis();
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
       ab.T_fg.put_transpose( Mwork );
@@ -439,8 +439,8 @@ void ctFeatherstoneAlgorithm::propagate_impulse()
     inboard_link = ab.inboard_joint->inboard;
     if( inboard_link != NULL ){
       in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
-	    ctSpatialMatrix fXg;
-      ctVector3 vwork(0);
+	  ctSpatialMatrix fXg;
+      ctVector3 vwork;
       ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis();
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
       ab.T_fg.put_transpose( Mwork );
@@ -465,9 +465,10 @@ void ctFeatherstoneAlgorithm::propagate_impulse()
     dv.zero();
   }else{
     Ia.solve( dv, Ja*(-1.0) );
-    //!me gains energy..... something is wrong.  otherwise looks good
-    ab.handle->set_v( ctVector3( dv[3], dv[4], dv[5] ) ); 
-    ab.handle->set_angular_v( ctVector3( dv[0], dv[1], dv[2] ) ); 
+    //!me 27May2000 added this_to_world rb transform... is that right?  Or should I use spatial trasform..
+	//!me tests look totally correct...
+	ab.handle->add_v( ab.handle->get_this_to_world()*ctVector3( dv[3], dv[4], dv[5] ) ); 
+    ab.handle->add_angular_v( ab.handle->get_this_to_world()*ctVector3( dv[0], dv[1], dv[2] ) ); 
   }
   ctArticulatedBody *out_link = ab.outboard_links.get_first();
   ctFeatherstoneAlgorithm *out_link_solver;
@@ -535,6 +536,7 @@ void ctFeatherstoneAlgorithm::get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_i
   // based on how this articulated body responds to a test impulse...
   // Mirtich uses 3 orthogonal test impulses... but he is doing some kind of 
   // continuous "collision integration".  I think I can get away with just one test
+  //!me I'll may have to do some special magic for friction...
   ctVector3 test_j = impulse_vector;
   test_j.Normalize();
   ctMatrix3 iR = ab.handle->get_world_to_this();
@@ -546,11 +548,24 @@ void ctFeatherstoneAlgorithm::get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_i
   Ja = j_coll*(-1.0);
   test_impulse_response();
 
-  ctVector3 dv_world = iR.get_transpose()*dv.get_b();
+  ctMatrix3 iRt = iR.get_transpose();
+
+  ir = iRt*ir;
+  ctVector3 dv_world = iRt*dv.get_b();
   *pm = 1.0/(dv_world*impulse_vector);
-  ctVector3 dw_world = iR.get_transpose()*dv.get_a();
+  ctVector3 dw_world = iRt*dv.get_a();
   ctVector3 r_x_i = -ir%impulse_vector;
-  // obtained by solving dw = Ia^-1(r x J)  for Ia^-1
-  *pI_inv = ctMatrix3(dw_world*r_x_i/(r_x_i*r_x_i));
+
+  // discontinuity if ir and impulse are same direction.... I think I_inv is really ignored 
+  // by collision response code in that case so safe to do this...
+  //!me todo: work through equations and confirm above statement
+  if( r_x_i*r_x_i < MIN_REAL ){
+    pI_inv->identity();
+  }else{
+    // obtained by solving dw = Ia^-1(r x J)  for Ia^-1
+	//!me this sucker comes away looking just like unmodified I... wierd, everything seems to work out
+    //!me in the end however, tests look totaly accurate. 
+    *pI_inv = ctMatrix3(dw_world*r_x_i/(r_x_i*r_x_i));
+  }
 
 }

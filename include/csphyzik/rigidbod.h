@@ -79,7 +79,7 @@ public:
   ctMatrix3 get_I_world(){ 
     const ctMatrix3 &R = RF.get_R();
     ctMatrix3 I_world;
-    R.similarity_transform( I_world, I_inv );
+    R.similarity_transform( I_world, I );
     return I_world;
   }
 
@@ -104,16 +104,19 @@ public:
   }
  
 
-	ctVector3 get_angular_P(){ return L; }
+  ctVector3 get_angular_P(){ return L; }
 	
 	// ODE interface
-	virtual int get_state_size(){ return RBSTATESIZE; }
-	virtual int set_state( real *state_array ); 
-	virtual int get_state( const real *state_array );  
-	virtual int set_delta_state( real *state_array ); 
-	virtual void set_angular_v( const ctVector3 &pw );
+  virtual int get_state_size(){ return RBSTATESIZE; }
+  virtual int set_state( real *state_array ); 
+  virtual int get_state( const real *state_array );  
+  virtual int set_delta_state( real *state_array ); 
+
+  virtual void set_angular_v( const ctVector3 &pw );
   virtual void set_v( const ctVector3 &pv );
-	virtual void set_m( real pm );
+  virtual void add_angular_v( const ctVector3 &pw );
+  virtual void add_v( const ctVector3 &pv );
+  virtual void set_m( real pm );
   
   // impulse_point is vector from center of body to point of collision in 
   // world coordinates.  impulse_vector is in world coords
