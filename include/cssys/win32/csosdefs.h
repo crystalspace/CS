@@ -166,6 +166,42 @@
   #include <io.h>
 #endif
 
+#ifdef SYSDEF_TEMP
+#  include <process.h>
+#  define TEMP_FILE "%x.cs", _getpid()
+#  define TEMP_DIR win32_tempdir()
+   // This is the function called by TEMP_DIR macro
+   static inline char *win32_tempdir()
+   {
+     char *tmp;
+     if ((tmp = getenv ("TMP")) != NULL)
+       return tmp;
+     if ((tmp = getenv ("TEMP")) != NULL)
+       return tmp;
+     return "";
+   }
+#endif // SYSDEF_TEMP
+
+// The Microsoft Visual C compiler miserably crashes on boxclip.inc
+// because of memcpy(). This is a replacement for memcpy() which is
+// supposed to fix the problem.
+#ifdef COMP_MSVC___DISABLED_UNTIL_ITS_TESTED
+#  define memcpy better_memcpy
+static inline void better_memcpy (void *dst, void *src, size_t size)
+{
+  _asm		mov	esi,src
+  _asm		mov	edi,dst
+  _asm		mov	ecx,size
+  _asm		mov	al,cl
+  _asm		shr	ecx,2
+  _asm		cld
+  _asm		rep	movsd
+  _asm		mov	cl,al
+  _asm		and	cl,3
+  _asm		rep	movsb
+}
+#endif
+
 #if defined (PROC_INTEL)
 #  define CS_LITTLE_ENDIAN
 #else
