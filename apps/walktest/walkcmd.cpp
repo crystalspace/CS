@@ -1152,7 +1152,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Visibility:");
     CONPRI("  emode pvs freezepvs pvsonly");
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum");
-    CONPRI("  db_curleaf");
+    CONPRI("  db_curleaf, farplane");
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights picklight droplight");
     CONPRI("  clrlights setlight");
@@ -2551,6 +2551,30 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->view = Sys->views[Sys->split];
         Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Switching to view %d", Sys->split);
     }
+  }
+  else if (!strcasecmp(cmd, "farplane"))
+  {
+    if (!arg)
+    {
+	Sys->Report(CS_REPORTER_SEVERITY_WARNING, "Please specify the"
+		"distance of the farplane or 0 to disable it.");
+	return true;
+    }
+    float distance;
+    csScanStr (arg, "%f", &distance);
+    // disable farplane
+    if (distance==0)
+    {
+	Sys->view->GetCamera()->SetFarPlane(NULL);
+	// we can't disable zclear now... because we can't say for sure that
+	// the level didn't need it
+	Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "farplane disabled");
+	return true;
+    }
+    csPlane3 farplane(0,0,1,distance);
+    Sys->view->GetCamera()->SetFarPlane(&farplane);
+    // turn on zclear to be sure
+    Sys->Engine->SetClearZBuf(true);
   }
   else
     return false;
