@@ -89,7 +89,7 @@ public:
   ///
   static csImageFile* load_image(const char* name);
   ///
-  static void txt_process (char *name, char* buf, csTextureList* textures, csWorld *world);
+  static void txt_process (char *name, char* buf, csTextureList* textures, csWorld *world, const char* prefix=NULL);
   ///
   static csPolygonTemplate* load_ptemplate (char* ptname, char* buf,
         csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
@@ -138,7 +138,7 @@ public:
    * Load all the texture descriptions from the world
    * file (no actual images).
    */
-  static bool LoadTextures (csTextureList* textures, char* buf, csWorld* world);
+  static bool LoadTextures (csTextureList* textures, char* buf, csWorld* world, const char* prefix=NULL);
 
   /**
    * Load a texture and add it to the world.

@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csengine/polyset.h"
 #include "csengine/rview.h"
+#include "csengine/texture.h"
 
 class csSector;
 class csStatLight;
@@ -221,6 +222,14 @@ public:
   void MergeTemplate (csThingTemplate* tpl, csTextureHandle* default_texture = NULL,
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
+
+  /// Add polygons and vertices from the specified template. Replace the textures if they 
+  ///match one in the txtList
+  void MergeTemplate (csThingTemplate* tpl, csTextureList* txtList, const char* prefix, 
+	csTextureHandle* default_texture = NULL,
+  	float default_texlen = 1, CLights* default_lightx = NULL,
+	csVector3* shift = NULL, csMatrix3* transform = NULL);
+
 
   /// Set parent template
   void SetTemplate (csThingTemplate *t)

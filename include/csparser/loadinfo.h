@@ -34,10 +34,19 @@ public:
   csWorld* w;
   csTextureList* textures;
   bool use_bsp;
+  bool use_tex_set;
+  char* tex_set_name;
+  
   ///
   PSLoadInfo(csWorld* world, csTextureList* t) : default_texture(NULL), 
    default_texlen(1), default_lightx(NULL), w(world), textures(t),
-   use_bsp(false) {}
+   use_bsp(false), use_tex_set(false), tex_set_name(NULL) {}
+
+  void SetTextureSet( const char* name ){
+    if ( tex_set_name ) delete [] tex_set_name;
+    tex_set_name = new char[ strlen( name ) +1 ];
+    strcpy( tex_set_name, name );
+  }   
 };
 
 #endif

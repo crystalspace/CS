@@ -87,7 +87,7 @@ private:
   int num_textures;
   ///
   int max_textures;
-
+  
 private:
   ///
   int GetTextureIdx (const char* name);
@@ -116,6 +116,7 @@ public:
 
   /// Find a texture given a name.
   csTextureHandle* GetTextureMM (const char* name);
+  
 };
 
 

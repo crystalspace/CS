@@ -186,6 +186,8 @@ TOKEN_DEF_START
   TOKEN_DEF (TEXTURE_LIGHTING)
   TOKEN_DEF (TEXTURE_MIPMAP)
   TOKEN_DEF (TEXTURE_SCALE)
+  TOKEN_DEF (TEX_SET)
+  TOKEN_DEF (TEX_SET_SELECT)
   TOKEN_DEF (THING)
   TOKEN_DEF (TRANSFORM)
   TOKEN_DEF (TRANSPARENT)
@@ -767,6 +769,11 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
     case TOKEN_TEXLEN:
       ScanStr (params, "%f", &info.default_texlen);
       break;
+    case TOKEN_TEX_SET_SELECT:
+      ScanStr(params, "%s", str);
+      info.SetTextureSet( str );
+      info.use_tex_set=true;
+      break;
     case TOKEN_LIGHTX:
       ScanStr (params, "%s", str);
       info.default_lightx = CLights::FindByName (str);
@@ -1134,6 +1141,7 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
     TOKEN_TABLE (CIRCLE)
     TOKEN_TABLE (POLYGON)
     TOKEN_TABLE (BEZIER)
+    TOKEN_TABLE (TEX_SET_SELECT)
     TOKEN_TABLE (TEXNR)
     TOKEN_TABLE (TEXLEN)
     TOKEN_TABLE (TRIGGER)
@@ -1213,8 +1221,11 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n", str);
             fatal_exit (0, false);
           }
-          thing->MergeTemplate (t, info.default_texture, info.default_texlen,
-            info.default_lightx);
+	  if ( info.use_tex_set ){
+              thing->MergeTemplate (t, w->GetTextures(), info.tex_set_name, info.default_texture, info.default_texlen, info.default_lightx);
+	      info.use_tex_set = false;
+	  }else
+             thing->MergeTemplate (t, info.default_texture, info.default_texlen,  info.default_lightx);
           csLoaderStat::polygons_loaded += t->GetNumPolygon ();
         }
         break;
@@ -1804,7 +1815,7 @@ csImageFile* csLoader::load_image (const char* name)
   return ifile;
 }
 
-void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWorld* /*world*/)
+void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWorld* /*world*/, const char* prefix)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TRANSPARENT)
@@ -1851,7 +1862,14 @@ void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWo
   // not have power-of-two dimensions...
 
   csTextureHandle *tex = textures->NewTexture (image);
-  tex->SetName (name);
+  if ( prefix ){
+    char *prefixedname = new char[ strlen( name ) + strlen( prefix ) + 2 ];
+    strcpy( prefixedname, prefix );
+    strcat( prefixedname, "_" );
+    strcat( prefixedname, name );
+    tex->SetName( prefixedname );
+  }else
+    tex->SetName (name);
   // dereference image pointer since tex already incremented it
   image->DecRef ();
 
@@ -3712,6 +3730,7 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
     TOKEN_TABLE (COLLECTION)
     TOKEN_TABLE (SCRIPT)
     TOKEN_TABLE (TEXTURES)
+    TOKEN_TABLE (TEX_SET)
     TOKEN_TABLE (LIGHTX)
     TOKEN_TABLE (THING)
     TOKEN_TABLE (SIXFACE)
@@ -3775,6 +3794,9 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
           break;
         case TOKEN_SCRIPT:
           csScriptList::NewScript (layer, name, params);
+          break;
+	case TOKEN_TEX_SET:
+          if (!LoadTextures ( world->GetTextures (), params, world, name)) return false;
           break;
         case TOKEN_TEXTURES:
           {
@@ -3893,7 +3915,7 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world)
+bool csLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world, const char* prefix)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (MAX_TEXTURES)
@@ -3917,7 +3939,7 @@ bool csLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world)
         // ignored for backward compatibility
         break;
       case TOKEN_TEXTURE:
-        txt_process (name, params, textures, world);
+        txt_process (name, params, textures, world, prefix);
         break;
     }
   }
