@@ -265,7 +265,7 @@ bool csCursor::Setup (iGraphics3D *ig3d, bool forceEmulation)
 // Switches to named cursor
 bool csCursor::SwitchCursor (const char *name)
 {
-  if (!strcmp (current, name))
+  if (!strcmp (current.GetDataSafe(), name))
     return true;
 
   // Get CursorInfo and return false if we can't get it
