@@ -66,6 +66,7 @@
 #include "iengine/fview.h"
 #include "qsqrt.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/polyrender.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 #include "igraphic/imageio.h"
@@ -128,13 +129,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-csStringID csThingStatic::vertex_name = csInvalidStringID;
+/*csStringID csThingStatic::vertex_name = csInvalidStringID;
 csStringID csThingStatic::texel_name = csInvalidStringID;
 csStringID csThingStatic::normal_name = csInvalidStringID;
 csStringID csThingStatic::color_name = csInvalidStringID;
 csStringID csThingStatic::index_name = csInvalidStringID;
 csStringID csThingStatic::tangent_name = csInvalidStringID;
-csStringID csThingStatic::binormal_name = csInvalidStringID;
+csStringID csThingStatic::binormal_name = csInvalidStringID;*/
 #endif
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
@@ -171,7 +172,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 #ifdef CS_USE_NEW_RENDERER
   r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);
 
-  if ((vertex_name == csInvalidStringID) ||
+/*  if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
     (normal_name == csInvalidStringID) ||
     (color_name == csInvalidStringID) ||
@@ -190,7 +191,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
     index_name = strings->Request ("indices");
     tangent_name = strings->Request ("tangents");
     binormal_name = strings->Request ("binormals");
-  }
+  }*/
 #endif
 }
 
@@ -1043,7 +1044,7 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
 #ifdef CS_USE_NEW_RENDERER
 iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
 {
-  if (name == vertex_name)
+/*  if (name == vertex_name)
   {
     return vertex_buffer;
   } 
@@ -1071,7 +1072,7 @@ iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
   {
     return binormal_buffer;
   }
-  else
+  else*/
   {
     return 0;
   }
@@ -1081,7 +1082,9 @@ void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
 	const csArray<RepMaterial>& repMaterials)
 {
-  int num_verts = 0, num_indices = 0, max_vc = 0;
+  polyRenderers.DeleteAll ();
+
+/*  int num_verts = 0, num_indices = 0, max_vc = 0;
   int i;
 
   for (i = 0; i < static_polygons.Length(); i++)
@@ -1091,11 +1094,7 @@ void csThingStatic::FillRenderMeshes (
     int pvc = poly->GetVertexCount ();
 
     num_verts += pvc;
-#ifdef POLY_RENDERMESH
-    num_indices += pvc;
-#else
     num_indices += (pvc - 2) * 3;
-#endif
     max_vc = MAX (max_vc, pvc);
   }
 
@@ -1129,39 +1128,36 @@ void csThingStatic::FillRenderMeshes (
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
   csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-#ifdef POLY_RENDERMESH
-  polyVertNum.SetLength (static_polygons.Length());
-  int polyCounter = 0;
-#endif
-
   CS_ALLOC_STACK_ARRAY (int, pvIndices, max_vc);
 
-  int vindex = 0, iindex = 0;
+  int vindex = 0, iindex = 0;*/
 
-  for (i = 0; i < litPolys.Length (); i++)
+  for (int i = 0; i < litPolys.Length (); i++)
   {
     const csStaticPolyGroup& pg = *(litPolys[i]);
     csRenderMesh* rm = new csRenderMesh;
+
+    csRef<iPolygonRenderer> polyRenderer = r3d->CreatePolygonRenderer ();
+    polyRenderers.Push (polyRenderer);
 
     rm->buffersource = this;
     rm->z_buf_mode = CS_ZBUF_USE;
     rm->mixmode = CS_FX_COPY; 
     rm->material = pg.material;
-#ifdef POLY_RENDERMESH
+    //rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->meshtype = CS_MESHTYPE_POLYGON;
-    rm->polyNumVerts = polyVertNum.GetArray () + polyCounter;
-    rm->polyTexMaps = polyTexMaps.GetArray () + polyCounter;
-#else
-    rm->meshtype = CS_MESHTYPE_TRIANGLES;
-#endif
 
-    rm->indexstart = iindex;
+    //rm->indexstart = iindex;
 
     int j;
     for (j = 0; j< pg.polys.Length(); j++)
     {
       csPolygon3DStatic* static_data = static_polygons[pg.polys[j]];
+      csRef<iPolygon3DStatic> iStatic = 
+        SCF_QUERY_INTERFACE(static_polygons[pg.polys[j]], iPolygon3DStatic);
+      polyRenderer->AddPolygon (iStatic);
 
+#if 0
       int* poly_indices = static_data->GetVertexIndices ();
 
       csVector3 polynormal;
@@ -1224,16 +1220,6 @@ void csThingStatic::FillRenderMeshes (
 	pvIndices[j] = vindex++;
       }
 
-#ifdef POLY_RENDERMESH
-      for (j = 0; j < vc; j++)
-      {
-	*indices++ = pvIndices[j];
-	iindex++;
-      }
-      polyVertNum[polyCounter] = vc;
-      polyTexMaps[polyCounter] = static_data->GetTextureMapping ();
-      polyCounter++;
-#else
       // Triangulate poly.
       for (j = 2; j < vc; j++)
       {
@@ -1246,17 +1232,19 @@ void csThingStatic::FillRenderMeshes (
       }
 #endif
     }
-    rm->indexend = iindex;
+    //rm->indexend = iindex;
+    rm->buffersource = polyRenderer->GetBufferSource (rm->indexstart,
+      rm->indexend);
 
     rmeshes.Push (rm);
   }
 
-  index_buffer->Release ();
+/*  index_buffer->Release ();
   texel_buffer->Release ();
   normal_buffer->Release ();
   vertex_buffer->Release ();
   tangent_buffer->Release ();
-  binormal_buffer->Release ();
+  binormal_buffer->Release ();*/
 }
 #endif // CS_USE_NEW_RENDERER
 
@@ -2366,8 +2354,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   for (i = 0; i < renderMeshes.Length(); i++)
   {
     csRenderMesh* rm = renderMeshes[i];
-    rm->transform = &tr_o2c;
-    //rm->object2camera = tr_o2c;
+    rm->object2camera = tr_o2c;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;

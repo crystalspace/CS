@@ -252,7 +252,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         mesh.buffersource = fullquad;
         csReversibleTransform trans = csReversibleTransform (
 		csMatrix3(), csVector3 (0, 0, -2.0f));
-        mesh.transform = &trans;
+        mesh.object2camera = trans;
         mesh.meshtype = CS_MESHTYPE_QUADS;
         mesh.z_buf_mode = CS_ZBUF_NONE;
         mesh.material = mat;

@@ -840,6 +840,8 @@ public:
   virtual void EnableZOffset () { }
   virtual void DisableZOffset () { }
   virtual void SetShadowState (int) { }
+  virtual csPtr<iPolygonRenderer> CreatePolygonRenderer () { return 0; }
+  virtual void SetWorldToCamera (csReversibleTransform* wvmatrix) {}
   //========================================================================
 
 #if 0

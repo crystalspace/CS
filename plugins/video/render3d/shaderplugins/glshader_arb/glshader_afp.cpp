@@ -40,13 +40,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
-#include "glshader_avp.h"
+#include "glshader_afp.h"
 
-SCF_IMPLEMENT_IBASE(csShaderGLAVP)
+SCF_IMPLEMENT_IBASE(csShaderGLAFP)
 SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csShaderGLAVP::Report (int severity, const char* msg, ...)
+void csShaderGLAFP::Report (int severity, const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
@@ -55,19 +55,19 @@ void csShaderGLAVP::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
-void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
+void csShaderGLAFP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
   //enable it
-  glEnable(GL_VERTEX_PROGRAM_ARB);
-  ext->glBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_num);
+  glEnable(GL_FRAGMENT_PROGRAM_ARB);
+  ext->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_num);
 }
 
-void csShaderGLAVP::Deactivate(iShaderPass* current)
+void csShaderGLAFP::Deactivate(iShaderPass* current)
 {
-  glDisable (GL_VERTEX_PROGRAM_ARB);
+  glDisable (GL_FRAGMENT_PROGRAM_ARB);
 }
 
-void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
+void csShaderGLAFP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 {
   int i;
 
@@ -81,41 +81,40 @@ void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
       csVector4 v4;
       if (lvar->GetValue (v4))
       {
-        ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
+        ext->glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 
 	  variablemap[i].registernum, &v4.x);
       }
     }
   }
 }
 
-void csShaderGLAVP::ResetState ()
+void csShaderGLAFP::ResetState ()
 {
 }
 
-bool csShaderGLAVP::LoadProgramStringToGL (const char* programstring)
+bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
 {
-  if(!ext)
-    return false;
-
-  if(!ext->CS_GL_ARB_vertex_program)
-    return false;
-
   if(!programstring)
     return false;
-
   //step to first !!
-  int stringlen = strlen(programstring);
+  int stringlen = strlen (programstring);
   int i=0;
-  while (*programstring != '!' && i<stringlen)
+  while (*programstring != '!' && (i < stringlen))
   {
     ++programstring;
     ++i;
   }
 
+  if(!ext)
+    return false;
+
+  if(!ext->CS_GL_ARB_fragment_program)
+    return false;
+
   ext->glGenProgramsARB(1, &program_num);
-  ext->glBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_num);
+  ext->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_num);
   
-  ext->glProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, 
+  ext->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, 
     strlen(programstring), (void*) programstring);
 
   const GLubyte * programErrorString = glGetString(GL_PROGRAM_ERROR_STRING_ARB);
@@ -142,7 +141,7 @@ bool csShaderGLAVP::LoadProgramStringToGL (const char* programstring)
       *(end-1) = 0;
 
     Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Couldn't load vertex program \"%s\"", description);
+      "Couldn't load fragment program \"%s\"", description);
     Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
     Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
       programErrorString);
@@ -153,7 +152,7 @@ bool csShaderGLAVP::LoadProgramStringToGL (const char* programstring)
     if ((programErrorString != 0) && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Warning for vertex program \"%s\": '%s'", description, 
+	"Warning for fragment program \"%s\": '%s'", description, 
 	programErrorString);
     }
   }
@@ -161,9 +160,9 @@ bool csShaderGLAVP::LoadProgramStringToGL (const char* programstring)
   return true;
 }
 
-void csShaderGLAVP::BuildTokenHash()
+void csShaderGLAFP::BuildTokenHash()
 {
-  xmltokens.Register ("arbvp", XMLTOKEN_ARBVP);
+  xmltokens.Register ("arbfp", XMLTOKEN_ARBFP);
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
   xmltokens.Register ("variablemap", XMLTOKEN_VARIABLEMAP);
   xmltokens.Register ("program", XMLTOKEN_PROGRAM);
@@ -177,7 +176,7 @@ void csShaderGLAVP::BuildTokenHash()
   xmltokens.Register ("vector3", csShaderVariable::VECTOR3);
 }
 
-bool csShaderGLAVP::Load(iDataBuffer* program)
+bool csShaderGLAFP::Load(iDataBuffer* program)
 {
   csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
@@ -192,7 +191,7 @@ bool csShaderGLAVP::Load(iDataBuffer* program)
   return Load(doc->GetRoot());
 }
 
-bool csShaderGLAVP::Load (iDocumentNode* program)
+bool csShaderGLAFP::Load(iDocumentNode* program)
 {
   if(!program)
     return false;
@@ -204,7 +203,7 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
 	object_reg, "crystalspace.renderer.stringset", iStringSet);
 
-  csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
+  csRef<iDocumentNode> variablesnode = program->GetNode("arbfp");
   if (variablesnode)
   {
     csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();
@@ -279,12 +278,12 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
 }
 
   
-bool csShaderGLAVP::Prepare ()
+bool csShaderGLAFP::Prepare()
 {
   return LoadProgramStringToGL(programstring);
 }
 
-csPtr<iString> csShaderGLAVP::GetProgramID ()
+csPtr<iString> csShaderGLAFP::GetProgramID()
 {
   csMD5::Digest digest = csMD5::Encode (programstring);
   scfString* str = new scfString();

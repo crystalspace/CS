@@ -697,7 +697,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   else 
   {
     int len = meshes.Length();
-    meshes.GetExtend(len).transform = &tr_o2c;
+    meshes.GetExtend(len).object2camera = tr_o2c;
     meshes[len].clip_portal = clip_portal;
     meshes[len].clip_plane = clip_plane;
     meshes[len].clip_z_plane = clip_z_plane;
@@ -714,7 +714,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     for (int i = 0; i < palette.Length(); i ++)
     {
       int len = palette_meshes[i].Length();
-      palette_meshes[i].GetExtend(len).transform = &tr_o2c;
+      palette_meshes[i].GetExtend(len).object2camera = tr_o2c;
       palette_meshes[i][len].clip_portal = clip_portal;
       palette_meshes[i][len].clip_plane = clip_plane;
       palette_meshes[i][len].clip_z_plane = clip_z_plane;

@@ -234,6 +234,9 @@ bool csGLTextureHandle::FindFormatType ()
 
   formatidx = i;
 
+  sourceType = GL_UNSIGNED_BYTE;
+  targetFormat = csGLTextureManager::glformats[formatidx].targetFormat;
+
   // do we force it to some specific targetFormat ?
   if (csGLTextureManager::glformats[i].forcedFormat != 0)
   {
@@ -244,9 +247,6 @@ bool csGLTextureHandle::FindFormatType ()
     if (csGLTextureManager::glformats[i].targetFormat != targetFormat)
       formatidx = i;
   }
-
-  sourceType = GL_UNSIGNED_BYTE;
-  targetFormat = csGLTextureManager::glformats[formatidx].targetFormat;
 
   if (csGLTextureManager::glformats[formatidx].sourceFormat == GL_RGB
       || csGLTextureManager::glformats[formatidx].sourceFormat == GL_RGBA)

@@ -730,6 +730,15 @@ public:
     {
       return scfParent->PointOnPolygon (v);
     }
+
+    virtual csPolyLightMapMapping* GetLightMapMapping () const 
+    { 
+      return scfParent->GetLightMapMapping ();
+    }
+    csPolyTextureMapping* GetTextureMapping () const 
+    { 
+      return scfParent->GetTextureMapping (); 
+    }
   } scfiPolygon3DStatic;
   friend struct eiPolygon3DStatic;
 };

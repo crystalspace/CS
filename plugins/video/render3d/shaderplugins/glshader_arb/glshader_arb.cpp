@@ -36,6 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "video/canvas/openglcommon/glextmanager.h"
 
 #include "glshader_avp.h"
+#include "glshader_afp.h"
 
 #include "glshader_arb.h"
 
@@ -76,6 +77,8 @@ bool csGLShader_ARB::SupportType(const char* type)
     return false;
   else if( strcasecmp(type, "gl_arb_vp") == 0)
     return true;
+  else if( strcasecmp(type, "gl_arb_fp") == 0)
+    return true;
   return false;
 }
 
@@ -83,6 +86,8 @@ csPtr<iShaderProgram> csGLShader_ARB::CreateProgram(const char* type)
 {
   if (strcasecmp(type, "gl_arb_vp") == 0)
     return csPtr<iShaderProgram> (new csShaderGLAVP(object_reg, ext));
+  if (strcasecmp(type, "gl_arb_fp") == 0)
+    return csPtr<iShaderProgram> (new csShaderGLAFP(object_reg, ext));
   else
     return 0;
 }
@@ -104,15 +109,25 @@ void csGLShader_ARB::Open()
     return;
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
-  ext->InitGL_ARB_vertex_program ();
+  if (ext)
+  {
+    ext->InitGL_ARB_vertex_program ();
+    ext->InitGL_ARB_fragment_program ();
+  }
 }
 
 csPtr<iString> csGLShader_ARB::GetProgramID(const char* programstring)
 {
-  csMD5::Digest d = csMD5::Encode(programstring);
+  csMD5::Digest digest = csMD5::Encode (programstring);
   scfString* str = new scfString();
-  str->Append((char const*)&d.data, sizeof(d.data));
-  return csPtr<iString>(str);
+  str->Format (
+    "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+    digest.data[0], digest.data[1], digest.data[2], digest.data[3],
+    digest.data[4], digest.data[5], digest.data[6], digest.data[7],
+    digest.data[8], digest.data[9], digest.data[10], digest.data[11],
+    digest.data[12], digest.data[13], digest.data[14], digest.data[15]);
+
+  return csPtr<iString> (str);
 }
 
 ////////////////////////////////////////////////////////////////////

@@ -291,7 +291,6 @@ void csGLShaderFFP::Activate(iShaderPass* current, csRenderMesh* mesh)
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
     ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
 
-
     if(ext->CS_GL_ARB_texture_env_combine || 
       ext->CS_GL_EXT_texture_env_combine)
     {

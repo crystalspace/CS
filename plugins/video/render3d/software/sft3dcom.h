@@ -49,22 +49,6 @@ struct iConfigFile;
   float red, green, blue;
 };*/
 
-/// Extra information for vertex fogging.
-class G3DFogInfo
-{
-public:
-  /// Color.
-  float r, g, b;
-  /**
-  * Intensity (== density * thickness).
-  * The second intensity value is always 0 and is put there
-  * to make it easier for 3D implementations to just use the
-  * two values below as a coordinate in a texture of 64*1.
-  */
-  float intensity;
-  float intensity2;
-};
-
 /// Information about a texture plane.
 class G3DTexturePlane
 {
@@ -75,20 +59,8 @@ public:
   csVector3* v_cam2tex;
 };
 
-/// Structure containing all info needed by DrawFogPolygon (DFP)
-struct G3DPolygonDFP
-{
-  /// Current number of vertices.
-  int num;
-  /// Vertices that form the polygon.
-  csVector2 vertices[100];
-
-  /// The plane equation in camera space of this polygon.
-  csPlane3 normal;
-};
-
 /// Structure containing all info needed by DrawPolygon (DP)
-struct G3DPolygonDPF : public G3DPolygonDFP
+/*struct G3DPolygonDPF : public G3DPolygonDFP
 {
   /// Extra optional fog information.
   G3DFogInfo fog_info[100];
@@ -112,10 +84,10 @@ struct G3DPolygonDPF : public G3DPolygonDFP
 
   /// Z value (in camera space) of vertex[0].
   float z_value;
-};
+};*/
 
 /// Structure containing all info needed by DrawPolygonFX (DPFX)
-struct G3DPolygonDPFX
+/*struct G3DPolygonDPFX
 {
   /// Current number of vertices.
   int num;
@@ -147,7 +119,7 @@ struct G3DPolygonDPFX
   // complains that it is unable to create this object.  This happens when
   // a subcomponent such as csVector2 has a constructor.
   G3DPolygonDPFX() {}
-};
+};*/
 
 /**
 * Structure containing all info needed by DrawTriangeMesh.
@@ -160,7 +132,7 @@ struct G3DPolygonDPFX
 * </ul>
 * To disable the use of one of the components, set it to 0.
 */
-struct G3DTriangleMesh
+/*struct G3DTriangleMesh
 {
   enum
   {
@@ -214,13 +186,13 @@ struct G3DTriangleMesh
   * Vertex buffers. Note that all vertex buffers used here MUST
   * have the same number of vertices.
   */
-  iVertexBuffer* buffers[MAX_VERTEXPOOL];
+/*  iVertexBuffer* buffers[MAX_VERTEXPOOL];
   iMaterialHandle* mat_handle;
   /// Information for fogging the vertices.
   G3DFogInfo* vertex_fog;
 
   // TODO : store information required for lighting calculation
-};
+};*/
 
 
 
@@ -316,8 +288,9 @@ protected:
   /// True if 3D rendering should use MMX if available.
   bool do_mmx;
 #endif
-  /// Current transformation from world to camera.
+  /// Current transformation from object to camera.
   csReversibleTransform o2c;
+  csReversibleTransform w2c;
 
   /// Current 2D clipper.
   iClipper2D* clipper;
@@ -379,7 +352,8 @@ protected:
   csRef<iStringSet> strings;
   csRef<iShaderManager> shadermgr;
 
-  iRenderBuffer* activebuffers[16];
+  iRenderBuffer* activebuffers[CS_VATTRIB_SPECIFIC_LAST - 
+    CS_VATTRIB_SPECIFIC_FIRST + 1];
 
 public:
   SCF_DECLARE_IBASE;
@@ -443,6 +417,8 @@ public:
    */
   virtual bool Initialize (iObjectRegistry*);
 
+  iStringSet* GetStrings () const { return strings; }
+
   /**
    * Open or close our interface.
    */
@@ -478,7 +454,7 @@ public:
   /// End the frame and do a page swap.
   virtual void FinishDraw ();
   /// Draw the projected polygon with light and texture.
-  //virtual void DrawPolygon (G3DPolygonDP& poly);
+  virtual void DrawPolygon (G3DPolygonDP& poly);
 
   /**
    * Draw the projected polygon with light and texture.  Debugging version.
@@ -552,7 +528,7 @@ public:
   virtual void ClearCache ();
 
   /// Remove texture from cache.
-  virtual void RemoveFromCache (iPolygonTexture* poly_texture);
+  virtual void RemoveFromCache (iRendererLightmap* rlm);
 
   /// Get drawing buffer width
   virtual int GetWidth ()
@@ -584,12 +560,16 @@ public:
   {
     return aspect;
   }
-  /// Set world to camera transformation.
+  /// Set object to camera transformation.
   virtual void SetObjectToCamera (csReversibleTransform* o2c)
   {
     this->o2c = *o2c;
   }
-  /// Get world to camera transformation.
+  virtual void SetWorldToCamera (csReversibleTransform* w2c)
+  {
+    this->w2c = *w2c;
+  }
+  /// Get object to camera transformation.
   virtual const csReversibleTransform& GetObjectToCamera ()
   {
     return o2c;
@@ -677,14 +657,16 @@ public:
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   {
-    activebuffers[attrib] = buffer;
+    if (!CS_VATTRIB_IS_SPECIFIC(attrib)) return false;
+    activebuffers[attrib - CS_VATTRIB_SPECIFIC_FIRST] = buffer;
     return true;
   }
 
   /// Deactivate a vertex buffer
   void DeactivateBuffer (csVertexAttrib attrib)
   {
-    activebuffers[attrib] = 0;
+    if (!CS_VATTRIB_IS_SPECIFIC(attrib)) return;
+    activebuffers[attrib - CS_VATTRIB_SPECIFIC_FIRST] = 0;
   }
 
   virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count)
@@ -738,7 +720,7 @@ public:
 
   /// Get height of window
   int GetHeight () const
-  { return display_width; }
+  { return display_height; }
 
   /// Capabilities of the driver
   const csGraphics3DCaps* GetCaps() const
@@ -759,10 +741,10 @@ public:
   {
   }
 
-  csReversibleTransform& GetObjectToCamera ()
+/*  csReversibleTransform& GetWorldToCamera ()
   {
-    return o2c;
-  }
+    return w2c;
+  }*/
 
   /// Set the masking of color and/or alpha values to framebuffer
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha)
@@ -775,6 +757,7 @@ public:
 
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (csRenderMesh* mymesh);
+  void DrawPolysMesh (csRenderMesh* mesh);
 
   /// Controls shadow drawing
   virtual void SetShadowState (int state)
@@ -822,17 +805,16 @@ public:
     return 0;
   }
 
+  virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
+
   //=========================================================================
   // Below this line are all functions that are not yet implemented by
   // the new renderer or are not going to be implemented ever. In the
   // last case they will be removed as soon as we permanently switch
   // to the new renderer. @@@NR@@@
   //=========================================================================
-  virtual uint32 *GetZBuffAt (int, int) { return 0; }
-  virtual float GetZBuffValue (int, int) { return 0; }
-  virtual void DrawPolygon (G3DPolygonDP&) { CS_ASSERT (false); }
+  //virtual void DrawPolygon (G3DPolygonDP&) { CS_ASSERT (false); }
   virtual void DrawPolygonDebug (G3DPolygonDP&) { CS_ASSERT (false); }
-  virtual void DrawPolygonFX (G3DPolygonDPFX&) { CS_ASSERT (false); }
   virtual void DrawTriangleMesh (G3DTriangleMesh&) { CS_ASSERT (false); }
   virtual void DrawPolygonMesh (G3DPolygonMesh&) { CS_ASSERT (false); }
   virtual void OpenFogObject (CS_ID, csFog*) { CS_ASSERT (false); }
@@ -842,9 +824,6 @@ public:
   virtual void ClosePortal () { CS_ASSERT (false); }
   virtual iHalo *CreateHalo (float, float, float,
     unsigned char *, int, int) { return 0; }
-  virtual void DumpCache () { }
-  virtual void ClearCache () { }
-  virtual void RemoveFromCache (iRendererLightmap*) { }
   virtual iVertexBufferManager* GetVertexBufferManager () { return 0; }
   virtual bool IsLightmapOK (int, int, int) { return true; }
   //=========================================================================

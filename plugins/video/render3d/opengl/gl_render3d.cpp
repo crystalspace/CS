@@ -55,6 +55,7 @@
 #include "gl_renderbuffer.h"
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
+#include "gl_polyrender.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
@@ -665,7 +666,8 @@ bool csGLGraphics3D::Open ()
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
   	object_reg, iCommandLineParser);
 
-  config.AddConfig(object_reg, "/config/r3dopengl.cfg");
+  config.AddConfig (object_reg, "/config/r3dopengl.cfg",
+    true, iConfigManager::ConfigPriorityPlugin);
 
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
     -0.5);
@@ -693,16 +695,13 @@ bool csGLGraphics3D::Open ()
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
-  ext->InitGL_ARB_texture_env_combine ();
-  ext->InitGL_EXT_texture_env_combine ();
-  ext->InitGL_ARB_texture_env_dot3 ();
-  ext->InitGL_EXT_texture_env_dot3 ();
   ext->InitGL_EXT_texture_compression_s3tc ();
   ext->InitGL_ARB_vertex_buffer_object ();
-  ext->InitGL_ARB_vertex_program ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
   ext->InitGL_EXT_texture_lod_bias ();
+  ext->InitGL_EXT_stencil_wrap ();
+  ext->InitGL_EXT_stencil_two_side ();
   /*
     Check whether to init NVidia-only exts.
     Note: NV extensions supported by multiple vendors
@@ -719,7 +718,7 @@ bool csGLGraphics3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseATIExt", true))
   {
-    //no special ati extensions atm
+    ext->InitGL_ATI_separate_stencil ();
   }
 
   // check for support of VBO
@@ -862,22 +861,21 @@ bool csGLGraphics3D::Open ()
   shadermgr->AddVariable(normvar);
 
 
-  #define CS_ATTTABLE_SIZE 128
+  #define CS_ATTTABLE_SIZE	  128
+  #define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
 
-  unsigned char *attenuationdata = 
-    new unsigned char[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE * 4];
-  unsigned char* data = attenuationdata;
-  for (int y=0; y<CS_ATTTABLE_SIZE; y++)
+  csRGBpixel *attenuationdata = 
+    new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE * 4];
+  csRGBpixel* data = attenuationdata;
+  for (int y=0; y < CS_ATTTABLE_SIZE; y++)
   {
-    for (int x=0; x<CS_ATTTABLE_SIZE; x++)
+    for (int x=0; x < CS_ATTTABLE_SIZE; x++)
     {
-      float yv = 3.0*(y-CS_ATTTABLE_SIZE/2+0.5)/(float)(CS_ATTTABLE_SIZE/2);
-      float xv = 3.0*(x-CS_ATTTABLE_SIZE/2+0.5)/(float)(CS_ATTTABLE_SIZE/2);
-      float i = exp(-0.7*(xv*xv+yv*yv));
-      *data++ = i>1?255:i*255;
-      *data++ = i>1?255:i*255;
-      *data++ = i>1?255:i*255;
-      *data++ = i>1?255:i*255;
+      float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+      float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+      float i = exp (-0.7 * (xv*xv + yv*yv));
+      unsigned char v = i>1.0f ? 255 : QInt (i*255.99f);
+      (data++)->Set (v, v, v, v);
     }
   }
 
@@ -1553,8 +1551,8 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);*/
 
-  //SetObjectToCamera (&mymesh->object2camera);
-  SetObjectToCamera (mymesh->transform);
+  SetObjectToCamera (&mymesh->object2camera);
+  //SetObjectToCamera (mymesh->transform);
 
   GLenum primitivetype;
   switch (mymesh->meshtype)
@@ -1565,7 +1563,6 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     case CS_MESHTYPE_TRIANGLESTRIP:
       primitivetype = GL_TRIANGLE_STRIP;
       break;
-    //case CS_MESHTYPE_POLYGON:
     case CS_MESHTYPE_TRIANGLEFAN:
       primitivetype = GL_TRIANGLE_FAN;
       break;
@@ -1578,6 +1575,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     case CS_MESHTYPE_LINESTRIP:
       primitivetype = GL_LINE_STRIP;
       break;
+    case CS_MESHTYPE_POLYGON:
     case CS_MESHTYPE_TRIANGLES:
     default:
       primitivetype = GL_TRIANGLES;
@@ -1865,6 +1863,11 @@ bool csGLGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
 long csGLGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
 {
   return 0;
+}
+
+csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
+{
+  return csPtr<iPolygonRenderer> (new csGLPolygonRenderer (this));
 }
 
 ////////////////////////////////////////////////////////////////////

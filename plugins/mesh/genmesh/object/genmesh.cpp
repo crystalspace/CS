@@ -489,7 +489,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   m.clip_z_plane = clip_z_plane;
   m.do_mirror = camera->IsMirrored ();
 #else
-  mesh.transform = &tr_o2c;
+  mesh.object2camera = tr_o2c;
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
   mesh.clip_z_plane = clip_z_plane;
@@ -738,7 +738,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   // iGraphics3D* g3d = rview->GetGraphics3D ();
 
   if (material_needs_visit) mater->Visit ();
-  mesh.transform = &tr_o2c;
+  //mesh.transform = &tr_o2c;
+  //mesh.object2world = movable->GetFullTransform ();
 
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;// mode;

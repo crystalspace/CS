@@ -27,6 +27,7 @@ class csGLShader_FIXED : public iShaderProgramPlugin
 public:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
+  csConfigAccess config;
 
   bool enable;
   int texUnits;

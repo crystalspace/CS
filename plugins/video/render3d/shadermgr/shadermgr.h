@@ -112,6 +112,9 @@ public:
   csShaderManager(iBase* parent);
   virtual ~csShaderManager();
 
+  void Open ();
+  void Close ();
+
   //==================== iShaderManager ================//
 
   /// Create a empty shader

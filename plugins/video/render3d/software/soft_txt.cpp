@@ -608,7 +608,18 @@ void csSoftwareTextureManager::UnregisterTexture (
 		csSoftwareTextureHandle* handle)
 {
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.Delete (idx);
+  if (idx >= 0) textures.DeleteIndex (idx);
 }
 
+csPtr<iSuperLightmap> csSoftwareTextureManager::CreateSuperLightmap (
+  int width, int height)
+{
+  return csPtr<iSuperLightmap> (new csSoftSuperLightmap (width, height));
+}
+
+void csSoftwareTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
+{
+  w = h = 2048;
+  aspect = 32768;
+}
 

@@ -19,6 +19,7 @@
 
 
 #include "cssysdef.h"
+#include <limits.h>
 #include "cstypes.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
@@ -131,7 +132,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
   if (q)
     q->RegisterListener (scfiEventHandler,
-	CSMASK_Broadcast | CSMASK_FrameProcess);
+	CSMASK_Broadcast);
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
 	iPluginManager);
@@ -151,6 +152,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
       {
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Loaded plugin %s", classname);
         pluginlist.Push (plugin);
+	// @@@ Really, shouldn't that be called in Open()?
         plugin->Open ();
       }
     }
@@ -163,6 +165,14 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   return true;
 }
 
+void csShaderManager::Open ()
+{
+}
+
+void csShaderManager::Close ()
+{
+}
+
 bool csShaderManager::HandleEvent(iEvent& event)
 {
   if (event.Type == csevBroadcast)
@@ -170,8 +180,18 @@ bool csShaderManager::HandleEvent(iEvent& event)
     switch(event.Command.Code)
     {
       case cscmdPreProcess:
-//      UpdateStandardVariables();
-      return false;
+  //      UpdateStandardVariables();
+	return false;
+      case cscmdSystemOpen:
+	{
+	  Open ();
+	  return true;
+	}
+      case cscmdSystemClose:
+	{
+	  Close ();
+	  return true;
+	}
     }
   }
   return false;
@@ -331,7 +351,7 @@ iShaderTechnique* csShader::GetTechnique(int technique)
 iShaderTechnique* csShader::GetBestTechnique()
 {
   int i;
-  int maxpriority = 0;
+  int maxpriority = INT_MIN;
   iShaderTechnique* tech = 0;
 
   for (i = 0; i < techniques->Length(); ++i)

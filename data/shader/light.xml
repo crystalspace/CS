@@ -170,7 +170,7 @@
 
     <technique priority="0">
         <pass>
-            <mixmode><add/></mixmode>
+            <mixmode><copy/></mixmode><!-- for now -->
             <streammapping stream="vertices" destination="position" />
             <streammapping stream="normals" destination="normal" />
             <streammapping stream="texture coordinates" destination="texture coordinate" />

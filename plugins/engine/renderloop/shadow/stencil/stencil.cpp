@@ -537,8 +537,8 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   	edge_start);
 
   csRenderMesh rmesh;
-  //rmesh.object2camera = tr_o2c;
-  rmesh.transform = &tr_o2c;
+  rmesh.object2camera = tr_o2c;
+  //rmesh.transform = &tr_o2c;
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   rmesh.mixmode = pass->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;

@@ -202,8 +202,6 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
   iLightList* lights = sector->GetLights();
   int nlights = lights->GetCount();
 
-  //g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
-
   while (nlights-- > 0)
   {
     iLight* light = lights->Get (nlights);
@@ -233,9 +231,6 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
       }
     }
   }
-
-  //g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
-
 }
 
 int csLightIterRenderStep::AddStep (iRenderStep* step)

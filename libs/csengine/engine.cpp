@@ -1733,6 +1733,9 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
   top_clipper = view;
+  csReversibleTransform camTransR = 
+    c->GetTransform();
+  G3D->SetWorldToCamera (&camTransR);
   current_framenumber++;
   defaultRenderLoop->Draw (c, view);
 }

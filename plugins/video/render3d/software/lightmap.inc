@@ -60,8 +60,7 @@
 
 #include "pixtype.inc"
 
-void LM_NAME (/*iPolygonTexture *pt, */
-	      csPolyLightMapMapping* mapping,
+void LM_NAME (csPolyLightMapMapping* mapping,
 	      csPolyTextureMapping* tmapping,
 	      csSoftRendererLightmap* rlm, 
 	      SoftwareCachedTexture *ct,

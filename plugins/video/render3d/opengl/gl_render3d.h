@@ -207,6 +207,8 @@ public:
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 
+  iStringSet* GetStrings () { return strings; }
+
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D
   ////////////////////////////////////////////////////////////////////
@@ -292,9 +294,10 @@ public:
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode);
 
-  /// Set world to view transform
-  void SetObjectToCamera (csReversibleTransform* wvmatrix);
-  const csReversibleTransform& GetObjectToCamera ();
+  /// Set object to view transform
+  virtual void SetObjectToCamera (csReversibleTransform* wvmatrix);
+  virtual const csReversibleTransform& GetObjectToCamera ();
+  virtual void SetWorldToCamera (csReversibleTransform* wvmatrix) {}
 
   /// Set the current render target (0 for screen).
   virtual void SetRenderTarget (iTextureHandle* handle,
@@ -389,6 +392,8 @@ public:
 
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
+
+  virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
 
   //=========================================================================
   // Below this line are all functions that are not yet implemented by

@@ -45,6 +45,7 @@
 #include "ivaria/reporter.h"
 
 #include "renderbuffer.h"
+#include "soft_polyrender.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -288,8 +289,7 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
 
   object_reg = 0;
 
-  for (int i=0; i<16; ++i)
-    activebuffers[i] = 0;
+  memset (activebuffers, 0, sizeof (activebuffers));
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
@@ -1545,11 +1545,11 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
   iPolygonTexture *tex = 0;
   iLightMap *lm = 0;
-  if (do_lighting)
+/*  if (do_lighting)
   {
     tex = poly.poly_texture;
     lm = tex->GetLightMap ();
-  }
+  }*/
 
   csRGBpixel color;
   iTextureHandle *txt_handle = poly.mat_handle->GetTexture ();
@@ -1710,7 +1710,6 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     } /* endwhile */
   } /* endfor */
 }
-#if 0
 
 void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 {
@@ -1844,36 +1843,38 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   // the position in camera space coordinates. It would be better (more
   // suitable for the following calculations) if it would be written
   // as T = M*C - V.
-  P1 = poly.plane.m_cam2tex->m11;
-  P2 = poly.plane.m_cam2tex->m12;
-  P3 = poly.plane.m_cam2tex->m13;
-  P4 = - (P1 * poly.plane.v_cam2tex->x
-        + P2 * poly.plane.v_cam2tex->y
-        + P3 * poly.plane.v_cam2tex->z);
-  Q1 = poly.plane.m_cam2tex->m21;
-  Q2 = poly.plane.m_cam2tex->m22;
-  Q3 = poly.plane.m_cam2tex->m23;
-  Q4 = - (Q1 * poly.plane.v_cam2tex->x
-        + Q2 * poly.plane.v_cam2tex->y
-        + Q3 * poly.plane.v_cam2tex->z);
+  P1 = poly.cam2tex.m_cam2tex->m11;
+  P2 = poly.cam2tex.m_cam2tex->m12;
+  P3 = poly.cam2tex.m_cam2tex->m13;
+  P4 = - (P1 * poly.cam2tex.v_cam2tex->x
+        + P2 * poly.cam2tex.v_cam2tex->y
+        + P3 * poly.cam2tex.v_cam2tex->z);
+  Q1 = poly.cam2tex.m_cam2tex->m21;
+  Q2 = poly.cam2tex.m_cam2tex->m22;
+  Q3 = poly.cam2tex.m_cam2tex->m23;
+  Q4 = - (Q1 * poly.cam2tex.v_cam2tex->x
+        + Q2 * poly.cam2tex.v_cam2tex->y
+        + Q3 * poly.cam2tex.v_cam2tex->z);
 
-  iPolygonTexture *tex = poly.poly_texture;
-  const csLightMapMapping& mapping = tex->GetMapping ();
+  //iPolygonTexture *tex = poly.poly_texture;
+  csPolyLightMapMapping* mapping = poly.lmap; //tex->GetMapping ();
   csSoftwareTextureHandle *tex_mm =
     (csSoftwareTextureHandle *)poly.mat_handle->GetTexture ()
     	->GetPrivateObject ();
+  csPolyTextureMapping* tmapping = poly.texmap; 
+  csSoftRendererLightmap* srlm = (csSoftRendererLightmap*)poly.rlm;
 
   float fdu, fdv;
-  if (tex)
+//  if (tex)
   {
-    fdu = mapping.GetFDU ();
-    fdv = mapping.GetFDV ();
+    fdu = tmapping->GetFDU ();
+    fdv = tmapping->GetFDV ();
   }
-  else
+/*  else
   {
     fdu = 0;
     fdv = 0;
-  }
+  }*/
 
   // Now we're in the right shape to determine the mipmap level.
   // We'll use the following formula to determine the required level of
@@ -1971,7 +1972,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // If mipmap is too small or not available, use the mipmap level
   // that is still visible or available ...
-  int shf_u = mapping.GetShiftU () - mipmap;
+  int shf_u = tmapping->GetShiftU () - mipmap;
   if (shf_u < 0) mipmap += shf_u;
   if (mipmap < 0) mipmap = 0;
   while (mipmap && !tex_mm->get_texture (mipmap))
@@ -1985,17 +1986,17 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   }
 
   // Now get the unlighted texture corresponding to mipmap level we choosen
-  csSoftwareTexture *txt_unl = (csSoftwareTexture *)tex_mm->get_texture (
+  csSoftwareTexture *txt_unl = (csSoftwareTexture*)tex_mm->get_texture (
   	mipmap);
 
   // Check if polygon has a lightmap (i.e. if it is lighted)
-  bool has_lightmap = tex->GetLightMap () && do_lighting && !poly.do_fullbright;
+  bool has_lightmap = srlm && !poly.do_fullbright && do_lighting && mapping;
   if (has_lightmap)
   {
     // If there is a lightmap we check if the size of the lighted
     // texture would not exceed MAX_LIGHTMAP_SIZE pixels. In that case we
     // revert to unlighted texture mapping.
-    long size = mapping.GetWidth () * mapping.GetHeight ();
+    long size = mapping->GetWidth () * mapping->GetHeight ();
     if (size > MAX_LIGHTMAP_SIZE) has_lightmap = false;
   }
 
@@ -2157,9 +2158,10 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 #undef CHECK
     }
 texr_done:
-    tcache->fill_texture (mipmap, tex, tex_mm, u_min, v_min, u_max, v_max);
+    tcache->fill_texture (mipmap, mapping, tmapping, srlm, 
+      /*tex, */tex_mm, u_min, v_min, u_max, v_max);
   }
-  csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
+  csScan_InitDraw (mipmap, this, tmapping, mapping, srlm, tex_mm, txt_unl);
 
   // Select the right scanline drawing function.
   bool tex_keycolor = tex_mm->GetKeyColor ();
@@ -2249,8 +2251,8 @@ texr_done:
   if (do_alpha) 
   {
     // cached texture has different coords than original tex.
-    Scan.amap_uofs = mapping.GetIMinU() >> mipmap; 
-    Scan.amap_vofs = mapping.GetIMinV() >> mipmap; 
+    Scan.amap_uofs = tmapping->GetIMinU() >> mipmap; 
+    Scan.amap_vofs = tmapping->GetIMinV() >> mipmap; 
   }
 
   for ( ; ; )
@@ -2367,6 +2369,8 @@ texr_done:
 finish:
   ;
 }
+
+#if 0
 
 void csSoftwareGraphics3DCommon::DrawPolygonDebug (G3DPolygonDP& poly)
 {
@@ -3319,14 +3323,17 @@ void csSoftwareGraphics3DCommon::ClearCache()
   if (tcache) tcache->Clear ();
 }
 
-void csSoftwareGraphics3DCommon::RemoveFromCache (iPolygonTexture* poly_texture)
+void csSoftwareGraphics3DCommon::RemoveFromCache (
+	      iRendererLightmap* rlm)
 {
   if (tcache)
   {
-    tcache->uncache_texture (0, poly_texture);
-    tcache->uncache_texture (1, poly_texture);
-    tcache->uncache_texture (2, poly_texture);
-    tcache->uncache_texture (3, poly_texture);
+    csSoftRendererLightmap* srlm = 
+      (csSoftRendererLightmap*)rlm;
+    tcache->uncache_texture (0, srlm);
+    tcache->uncache_texture (1, srlm);
+    tcache->uncache_texture (2, srlm);
+    tcache->uncache_texture (3, srlm);
   }
 }
 
@@ -3734,9 +3741,462 @@ static void DrawTriangle (
   g3d->DrawPolygonFX (poly);
 }
 
+static void DoAddPerspective (csPoly2D& dest, const csVector3& v, 
+			      float aspect, float shift_x, float shift_y)
+{
+  float iz = aspect / v.z;
+  csVector2 p;
+  p.x = v.x * iz + shift_x;
+  p.y = v.y * iz + shift_y;
+  //dest.Push (p);
+  dest.AddVertex (p);
+  dest.GetBoundingBox ().AddBoundingVertex (p);
+}
+
+static bool DoPolyPerspective (csVector3* verts, int num_verts, 
+			       csPoly2D& dest, /*bool mirror,*/
+			       float aspect, float shift_x, float shift_y,
+			       const csPlane3& plane_cam)
+{
+  bool mirror = false;
+
+  csVector3 *ind, *end = verts + num_verts;
+
+  if (num_verts == 0) return false;
+  dest.MakeEmpty ();
+
+  // Classify all points as NORMAL (z>=SMALL_Z), NEAR (0<=z<SMALL_Z), or
+  // BEHIND (z<0).  Use several processing algorithms: trivially accept if all
+  // points are NORMAL, mixed process if some points are NORMAL and some
+  // are not, special process if there are no NORMAL points, but some are
+  // NEAR.  Assume that the polygon has already been culled if all points
+  // are BEHIND.
+  // Handle the trivial acceptance case:
+  ind = verts;
+  while (ind < end)
+  {
+    if (ind->z >= SMALL_Z)
+      DoAddPerspective (dest, *ind, aspect, shift_x, shift_y);
+    else
+      break;
+    ind++;
+  }
+
+  // Check if special or mixed processing is required
+  if (ind == end) return true;
+
+  // If we are processing a triangle (uv_coords != 0) then
+  // we stop here because the triangle is only visible if all
+  // vertices are visible (this is not exactly true but it is
+  // easier this way! @@@ CHANGE IN FUTURE).
+
+  csVector3 *exit = 0, *exitn = 0, *reenter = 0, *reentern = 0;
+  csVector2 *evert = 0;
+
+  if (ind == verts)
+  {
+    while (ind < end)
+    {
+      if (ind->z >= SMALL_Z)
+      {
+        reentern = ind;
+        reenter = ind - 1;
+        break;
+      }
+
+      ind++;
+    }
+  }
+  else
+  {
+    exit = ind;
+    exitn = ind - 1;
+    evert = dest.GetLast ();
+  }
+
+  // Check if mixed processing is required
+  if (exit || reenter)
+  {
+    bool needfinish = false;
+
+    if (exit)
+    {
+      // we know where the polygon is no longer NORMAL, now we need to
+
+      // to find out on which edge it becomes NORMAL again.
+      while (ind < end)
+      {
+        if (ind->z >= SMALL_Z)
+        {
+          reentern = ind;
+          reenter = ind - 1;
+          break;
+        }
+
+        ind++;
+      }
+
+      if (ind == end)
+      {
+        reentern = verts;
+        reenter = ind - 1;
+      }
+      else
+        needfinish = true;
+    } /* if (exit) */
+    else
+    {
+      // we know where the polygon becomes NORMAL, now we need to
+      // to find out on which edge it ceases to be NORMAL.
+      while (ind < end)
+      {
+        if (ind->z >= SMALL_Z)
+          DoAddPerspective (dest, *ind, aspect, shift_x, shift_y);
+        else
+        {
+          exit = ind;
+          exitn = ind - 1;
+          break;
+        }
+
+        ind++;
+      }
+
+      if (ind == end)
+      {
+        exit = verts;
+        exitn = ind - 1;
+      }
+
+      evert = dest.GetLast ();
+    }
+
+    // Add the NEAR points appropriately.
+#define MAX_VALUE 1000000.
+    // First, for the exit point.
+    float ex, ey, epointx, epointy;
+    ex = exitn->z * exit->x - exitn->x * exit->z;
+    ey = exitn->z * exit->y - exitn->y * exit->z;
+    if (ABS (ex) < SMALL_EPSILON && ABS (ey) < SMALL_EPSILON)
+    {
+      // Uncommon special case:  polygon passes through origin.
+      //plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed???
+      ex = plane_cam.A ();
+      ey = plane_cam.B ();
+      if (ABS (ex) < SMALL_EPSILON && ABS (ey) < SMALL_EPSILON)
+      {
+        // Downright rare case:  polygon near parallel with viewscreen.
+        ex = exit->x - exitn->x;
+        ey = exit->y - exitn->y;
+      }
+    }
+
+    if (ABS (ex) > ABS (ey))
+    {
+      if (ex > 0)
+        epointx = MAX_VALUE;
+      else
+        epointx = -MAX_VALUE;
+      epointy = (epointx - evert->x) * ey / ex + evert->y;
+    }
+    else
+    {
+      if (ey > 0)
+        epointy = MAX_VALUE;
+      else
+        epointy = -MAX_VALUE;
+      epointx = (epointy - evert->y) * ex / ey + evert->x;
+    }
+
+    // Next, for the reentry point.
+    float rx, ry, rpointx, rpointy;
+
+    // Perspective correct the point.
+    float iz = aspect / reentern->z;
+    csVector2 rvert;
+    rvert.x = reentern->x * iz + shift_x;
+    rvert.y = reentern->y * iz + shift_y;
+
+    if (reenter == exit && reenter->z > -SMALL_EPSILON)
+    {
+      rx = ex;
+      ry = ey;
+    }
+    else
+    {
+      rx = reentern->z * reenter->x - reentern->x * reenter->z;
+      ry = reentern->z * reenter->y - reentern->y * reenter->z;
+    }
+
+    if (ABS (rx) < SMALL_EPSILON && ABS (ry) < SMALL_EPSILON)
+    {
+      // Uncommon special case:  polygon passes through origin.
+      //plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed?
+      rx = plane_cam.A ();
+      ry = plane_cam.B ();
+      if (ABS (rx) < SMALL_EPSILON && ABS (ry) < SMALL_EPSILON)
+      {
+        // Downright rare case:  polygon near parallel with viewscreen.
+        rx = reenter->x - reentern->x;
+        ry = reenter->y - reentern->y;
+      }
+    }
+
+    if (ABS (rx) > ABS (ry))
+    {
+      if (rx > 0)
+        rpointx = MAX_VALUE;
+      else
+        rpointx = -MAX_VALUE;
+      rpointy = (rpointx - rvert.x) * ry / rx + rvert.y;
+    }
+    else
+    {
+      if (ry > 0)
+        rpointy = MAX_VALUE;
+      else
+        rpointy = -MAX_VALUE;
+      rpointx = (rpointy - rvert.y) * rx / ry + rvert.x;
+    }
+
+#define QUADRANT(x, y)  ((y < x ? 1 : 0) ^ (x < -y ? 3 : 0))
+#define MQUADRANT(x, y) ((y < x ? 3 : 0) ^ (x < -y ? 1 : 0))
+    dest.AddVertex (epointx, epointy);
+#if EXPERIMENTAL_BUG_FIX
+    if (mirror)
+    {
+      int quad = MQUADRANT (epointx, epointy);
+      int rquad = MQUADRANT (rpointx, rpointy);
+      if (
+        (quad == 0 && -epointx == epointy) ||
+        (quad == 1 && epointx == epointy))
+        quad++;
+      if (
+        (rquad == 0 && -rpointx == rpointy) ||
+        (rquad == 1 && rpointx == rpointy))
+        rquad++;
+      while (quad != rquad)
+      {
+        epointx = float((quad & 2) ? MAX_VALUE : -MAX_VALUE);
+        epointy = float((quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE);
+        dest.AddVertex (epointx, epointy);
+        quad = (quad + 1) & 3;
+      }
+    }
+    else
+    {
+      int quad = QUADRANT (epointx, epointy);
+      int rquad = QUADRANT (rpointx, rpointy);
+      if (
+        (quad == 0 && epointx == epointy) ||
+        (quad == 1 && -epointx == epointy))
+        quad++;
+      if (
+        (rquad == 0 && rpointx == rpointy) ||
+        (rquad == 1 && -rpointx == rpointy))
+        rquad++;
+      while (quad != rquad)
+      {
+        epointx = float((quad & 2) ? -MAX_VALUE : MAX_VALUE);
+        epointy = float((quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE);
+        dest.AddVertex (epointx, epointy);
+        quad = (quad + 1) & 3;
+      }
+    }
+#endif
+    dest.AddVertex (rpointx, rpointy);
+
+    // Add the rest of the vertices, which are all NORMAL points.
+    if (needfinish)
+      while (ind < end) DoAddPerspective (dest, *ind++,
+        aspect, shift_x, shift_y);
+  } /* if (exit || reenter) */
+
+  // Do special processing (all points are NEAR or BEHIND)
+  else
+  {
+    if (mirror)
+    {
+      csVector3 *ind2 = end - 1;
+      for (ind = verts; ind < end; ind2 = ind, ind++)
+        if (
+          (
+            ind->x -
+            ind2->x
+          ) *
+              (ind2->y) -
+              (ind->y - ind2->y) *
+              (ind2->x) > -SMALL_EPSILON)
+          return false;
+      dest.AddVertex (MAX_VALUE, -MAX_VALUE);
+      dest.AddVertex (MAX_VALUE, MAX_VALUE);
+      dest.AddVertex (-MAX_VALUE, MAX_VALUE);
+      dest.AddVertex (-MAX_VALUE, -MAX_VALUE);
+    }
+    else
+    {
+      csVector3 *ind2 = end - 1;
+      for (ind = verts; ind < end; ind2 = ind, ind++)
+        if (
+          (
+            ind->x -
+            ind2->x
+          ) *
+              (ind2->y) -
+              (ind->y - ind2->y) *
+              (ind2->x) < SMALL_EPSILON)
+          return false;
+      dest.AddVertex (-MAX_VALUE, -MAX_VALUE);
+      dest.AddVertex (-MAX_VALUE, MAX_VALUE);
+      dest.AddVertex (MAX_VALUE, MAX_VALUE);
+      dest.AddVertex (MAX_VALUE, -MAX_VALUE);
+    }
+  }
+
+  return true;
+
+}
+
+void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
+{
+  iRenderBufferSource* source = mesh->buffersource;
+
+  csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)source;
+
+  int i;
+/*  iRenderBuffer* indexbuf = source->GetRenderBuffer (
+    strings->Request ("indices"));
+  if (!indexbuf)
+    return;
+
+  const int numBuffers = sizeof (activebuffers) / sizeof (iRenderBuffer*);
+  void* locks[numBuffers];
+  for (i=0; i<numBuffers; ++i)
+  {
+    if (activebuffers[i] != 0)
+      locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_NORMAL);
+    else
+      locks[i] = 0;
+  }
+
+  uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
+  csVector3* f1 = (csVector3*)locks[CS_VATTRIB_POSITION - 
+    CS_VATTRIB_SPECIFIC_FIRST];
+
+  // Transform
+  csDirtyAccessArray<csVector3> camVerts;
+  for (i = 0; i < (mesh->indexend - mesh->indexstart); i++)
+  {
+    camVerts.Push (o2c.Other2This (f1[i]));
+  }*/
+
+  /*
+    - perspective
+    - clip
+   */
+
+  G3DPolygonDP poly;
+  poly.use_fog = false;
+  poly.rlm = 0;
+  poly.lmap = 0;
+  poly.do_fullbright = false;
+  poly.mixmode = mesh->mixmode;
+
+  for (i = 0; i < polyRender->polys.Length (); i++)
+  {
+    const csReversibleTransform& object2camera = mesh->object2camera;
+    iPolygon3DStatic* spoly = polyRender->polys[i];
+
+    int numVerts = spoly->GetVertexCount ();
+    CS_ALLOC_STACK_ARRAY(csVector3, camVerts, numVerts);
+
+    int v;
+    int cnt_vis = 0;
+    for (v = 0; v < numVerts; v++)
+    {
+      camVerts[v] = object2camera.Other2This (spoly->GetVertex (v));
+      if (camVerts[v].z >= 0)
+      {
+	cnt_vis++;
+      }
+    }
+    if (cnt_vis == 0) continue;
+
+    const csPlane3 &wplane = spoly->GetObjectPlane ();
+    float cl = wplane.Classify (w2c.GetOrigin ());
+    if (cl > EPSILON) continue;
+
+    /* @@@ Portal clipping here? */
+
+    csPlane3 plane_cam;
+    w2c.Other2This (wplane, camVerts[0], plane_cam);
+
+    /* do perspective */
+    csPoly2D p2d;
+    DoPolyPerspective (camVerts, numVerts, p2d, 
+      aspect, width2, height2,
+      plane_cam);
+
+    if (p2d.ClipAgainst (clipper))
+    {
+      poly.num = p2d.GetVertexCount ();
+      memcpy (poly.vertices, p2d.GetVertices (), sizeof (csVector2) * poly.num);
+      poly.z_value = camVerts[0].z;
+      poly.normal = plane_cam;
+      poly.mat_handle = spoly->GetMaterialHandle ();
+
+      csMatrix3 m_o2t;
+      csVector3 v_o2t;
+      spoly->GetTextureSpace (m_o2t, v_o2t);
+      //csReversibleTransform obj2tex (m_o2t, v_o2t);
+
+      csReversibleTransform obj2world; // @@@ 
+
+      csMatrix3 m_world2tex = m_o2t;
+      m_world2tex *= obj2world.GetO2T ();
+      csVector3 v_world2tex = obj2world.This2Other (v_o2t);
+
+      poly.cam2tex.m_cam2tex = &m_world2tex;
+      *poly.cam2tex.m_cam2tex *= w2c.GetT2O ();
+
+      csVector3 v = w2c.Other2This (v_world2tex);
+      poly.cam2tex.v_cam2tex = &v;
+
+      //csReversibleTransform cam2tex (obj2tex / object2camera.GetInverse ());
+
+      //poly.cam2tex.m_cam2tex = (csMatrix3*)&cam2tex.GetO2T ();
+      //poly.cam2tex.v_cam2tex = (csVector3*)&cam2tex.GetOrigin ();
+      poly.texmap = spoly->GetTextureMapping ();
+      poly.lmap = 0;
+
+      DrawPolygon (poly);
+    }
+  }
+
+/*  int indexPos = mesh->indexstart;
+  int polyIdx = 0;
+  while (indexPos < mesh->indexend)
+  {
+    int numVerts = mesh->polyNumVerts[polyIdx];
+    poly.num = numVerts;
+    poly.mat_handle = mesh->material->GetMaterialHandle ();
+    poly.texmap = mesh->polyTexMaps[polyIdx];
+
+    indexPos += numVerts;
+    polyIdx++;
+  }*/
+
+  //indexbuf->Release ();
+}
 
 void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
 {
+  if (mesh->meshtype == CS_MESHTYPE_POLYGON)
+  {
+    DrawPolysMesh (mesh);
+    return;
+  }
+
   int i;
 
   if (!z_verts)
@@ -3759,11 +4219,12 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
   //do_lighting = false;
   bool lazyclip = false;
 
-  SetObjectToCamera (mesh->transform);
+  //SetObjectToCamera (&mesh->object2camera);
   z_buf_mode = CS_ZBUF_USE;
 
-  void* locks[16];
-  for (i=0; i<16; ++i)
+  const int numBuffers = sizeof (activebuffers) / sizeof (iRenderBuffer*);
+  void* locks[numBuffers];
+  for (i=0; i<numBuffers; ++i)
   {
     if (activebuffers[i] != 0)
       locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_NORMAL);
@@ -3792,32 +4253,36 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
   }
 
   // Update work tables.
-  if (num_vertices > tr_verts->Limit ())
+  if (num_vertices > tr_verts->Capacity ())
   {
-    tr_verts->SetLimit (num_vertices);
-    z_verts->SetLimit (num_vertices);
-    uv_verts->SetLimit (num_vertices);
-    persp->SetLimit (num_vertices);
-    color_verts->SetLimit (num_vertices);
+    tr_verts->SetCapacity (num_vertices);
+    z_verts->SetCapacity (num_vertices);
+    uv_verts->SetCapacity (num_vertices);
+    persp->SetCapacity (num_vertices);
+    color_verts->SetCapacity (num_vertices);
   }
 
   // Do vertex tweening and/or transformation to camera space
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
-  csVector3* f1 = (csVector3*)locks[CS_VATTRIB_POSITION];
-  csVector2* uv1 = (csVector2*)locks[CS_VATTRIB_TEXCOORD];
+  csVector3* f1 = (csVector3*)locks[CS_VATTRIB_POSITION - 
+    CS_VATTRIB_SPECIFIC_FIRST];
+  csVector2* uv1 = (csVector2*)locks[CS_VATTRIB_TEXCOORD - 
+    CS_VATTRIB_SPECIFIC_FIRST];
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_col;
   csColor* col1 = 0;
   
   //if (mesh.use_vertex_color)
-    col1 = (csColor*)locks[CS_VATTRIB_COLOR];
+    col1 = (csColor*)locks[CS_VATTRIB_COLOR - 
+    CS_VATTRIB_SPECIFIC_FIRST];
 
   //if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
   {
+    tr_verts->SetLength (num_vertices);
     for (i = 0 ; i < num_vertices ; i++)
-      (*tr_verts)[i] = o2c * f1[i];
+      (*tr_verts)[i] = mesh->object2camera * f1[i];
     work_verts = tr_verts->GetArray ();
   }
   /*else
@@ -3828,6 +4293,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
   // Perspective project.
   for (i = 0 ; i < num_vertices ; i++)
   {
+    z_verts->SetLength (num_vertices);
+    persp->SetLength (num_vertices);
     if (work_verts[i].z >= SMALL_Z)
     {
       (*z_verts)[i] = 1. / work_verts[i].z;
@@ -4058,9 +4525,14 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
   }
 
   indexbuf->Release ();
-  for (i=0; i<16; ++i)
+  for (i=0; i<numBuffers; ++i)
   {
     if (activebuffers[i] != 0)
       activebuffers[i]->Release ();
   }
+}
+
+csPtr<iPolygonRenderer> csSoftwareGraphics3DCommon::CreatePolygonRenderer ()
+{
+  return csPtr<iPolygonRenderer> (new csSoftPolygonRenderer (this));
 }

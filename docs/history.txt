@@ -15,6 +15,23 @@ chronological order.
 	     camera->GetSector ()->HitBeamPortals (
 	     	camera->GetTransform ().GetOrigin (), v, isect, pidx)
 	- Duhprey added a new terrain plugin and demo for the NR
+	- res made the following changes:
+	    - Fixed walktest for recent iCamera->GetHit() removal.
+	    - Added Jamfiles for duhprey's CLOD plugin.
+	    - Added a patch from John Harger <john_h@selectpath.com> which
+	      enhances the glshader_arb plugin with fragment program support.
+	    - Added "polygon buffers" to the NR. You can compare it to the
+	      polygon buffers of the OR; you feed in some polygons, and get out
+	      a render buffer source you have specify in the csRenderMesh
+	      structure. The 'mesh type' has to be 'POLYGON'.
+	    - In the csRenderMesh structure, the 'transform' member was 
+	      renamed to the more speaking 'object2camera'.
+	    - Brought the NR SW renderer up-to-date.
+	    - Added polygon drawing to NR SW. Still veeery crude.
+	    - Some GL extensions are now inited in the plugins which actually
+	      use them.
+	    - Fixed the problem that the shader manager only accepted 
+	      technique priorities > 0.
 24-Sep-2003
 	- Jorrit finished implemented basic drawing of portals in
 	  csPortalContainer. Still some optimizations and testing to do.

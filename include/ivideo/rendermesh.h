@@ -30,6 +30,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/strset.h"
 #include "ivideo/graph3d.h"
+#include "csgeom/transfrm.h"
 
 class csVector3;
 class csVector2;
@@ -48,7 +49,8 @@ enum csRenderMeshType
   CS_MESHTYPE_TRIANGLEFAN,
   CS_MESHTYPE_POINTS,
   CS_MESHTYPE_LINES,
-  CS_MESHTYPE_LINESTRIP
+  CS_MESHTYPE_LINESTRIP,
+  CS_MESHTYPE_POLYGON,
 };
 
 /// Document me! @@@
@@ -110,8 +112,11 @@ public:
   //iMaterialHandle* mathandle;
   iMaterialWrapper* material;
 
-  /// Transform to use for this mesh
-  csReversibleTransform *transform;
+  /// Transform to use for this mesh (object->camera)
+  csReversibleTransform object2camera;
+
+  int* polyNumVerts;
+  csPolyTextureMapping** polyTexMaps;
 };
 
 /** @} */

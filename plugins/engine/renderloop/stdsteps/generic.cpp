@@ -161,9 +161,9 @@ csGenericRenderStep::~csGenericRenderStep ()
 }
 
 void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
-                                         iShaderWrapper* shader, 
-                                         csRenderMesh** meshes, 
-                                         int num)
+                                        iShaderWrapper* shader, 
+                                        csRenderMesh** meshes, 
+                                        int num)
 {
   if (num == 0) return;
 

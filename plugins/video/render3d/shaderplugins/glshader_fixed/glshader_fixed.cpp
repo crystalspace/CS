@@ -61,6 +61,7 @@ csGLShader_FIXED::csGLShader_FIXED(iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
   enable = false;
+  texUnits = 0;
 }
 
 csGLShader_FIXED::~csGLShader_FIXED()
@@ -84,7 +85,7 @@ bool csGLShader_FIXED::SupportType(const char* type)
 {
   if (!enable)
     return false;
-  if( strcasecmp(type, "gl_fixed_fp") == 0)
+  if ((strcasecmp(type, "gl_fixed_fp") == 0) && ext->CS_GL_ARB_multitexture)
     return true;
   else if( strcasecmp(type, "gl_fixed_vp") == 0)
     return true;
@@ -108,37 +109,60 @@ void csGLShader_FIXED::Open()
   if(!object_reg)
     return;
 
+  config.AddConfig (object_reg, "/config/glshader_fixed.cfg");
+
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg, iGraphics3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
   	iShaderRenderInterface);
-
-  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
     f->QueryClassID ()) == 0)
     enable = true;
 
-  glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+  ext = 0;
+  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
 
-#ifdef FUNNY_TEXTURE_UNIT_COUNT
-  const char* descr = 0;
-  if (texUnits <= 0)
-    descr = "unbelievable";
-  else if (texUnits <= 2)
-    descr = "puny";
-  else if (texUnits <= 4)
-    descr = "moderate";
-  else if (texUnits <= 6)
-    descr = "acceptable";
-  else if (texUnits <= 8)
-    descr = "whopping";
-  else 
-    descr = "unseen before";
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Texture units: %s %d", descr, texUnits);
-#else
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Texture units: %d", texUnits);
-#endif
+  if (!(enable && ext)) return;
+
+  if (ext->CS_GL_ARB_multitexture)
+  {
+    ext->InitGL_ARB_texture_env_combine ();
+    if (!ext->CS_GL_ARB_texture_env_combine)
+      ext->InitGL_EXT_texture_env_combine ();
+    ext->InitGL_ARB_texture_env_dot3 ();
+    if (!ext->CS_GL_ARB_texture_env_dot3)
+      ext->InitGL_EXT_texture_env_dot3 ();
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+
+  #ifdef FUNNY_TEXTURE_UNIT_COUNT
+    const char* descr = 0;
+    if (texUnits < 2)
+      descr = "unbelievable";
+    else if (texUnits == 2)
+      descr = "puny";
+    else if (texUnits <= 4)
+      descr = "moderate";
+    else if (texUnits <= 6)
+      descr = "acceptable";
+    else if (texUnits <= 8)
+      descr = "whopping";
+    else 
+      descr = "unseen before";
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Multitexture units: %s %d", descr, texUnits);
+  #else
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Multitexture units: %d", texUnits);
+  #endif
+
+    int useTextureUnits = 
+      config->GetInt ("Video.OpenGL.Shader.Fixed.MaxTextureUnits", texUnits);
+    if (useTextureUnits < texUnits)
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	"Configured to use %d texture units", useTextureUnits);
+      texUnits = useTextureUnits;
+    }
+  }
 }
 
 csPtr<iString> csGLShader_FIXED::GetProgramID(const char* programstring)

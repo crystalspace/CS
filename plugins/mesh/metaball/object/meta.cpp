@@ -457,14 +457,16 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false)
     return false;
 
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetObjectToCamera( &tr_o2c );
+#endif
  
   mesh.material = th;
   mesh.indexstart = 0;
   mesh.indexend = num_mesh_triangles * 3;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   mesh.buffersource = &scfiRenderBufferSource;
-  mesh.transform = &tr_o2c;
+  mesh.object2camera = tr_o2c;
 
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;

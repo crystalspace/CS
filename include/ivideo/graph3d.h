@@ -62,6 +62,7 @@ struct csPolyLightMapMapping;
 struct iRenderBuffer;
 struct iRenderBufferManager;
 struct iLightingManager;
+struct iPolygonRenderer;
 
 
 /**\name iGraphics3D::BeginDraw() flags
@@ -922,6 +923,13 @@ struct iGraphics3D : public iBase
    */
   virtual bool IsLightmapOK (int lmw, int lmh, 
     int lightCellSize) = 0;
+    
+  virtual csPtr<iPolygonRenderer> CreatePolygonRenderer () = 0;
+
+  /*
+    @@@ Needed for SW poly drawing ATM.
+   */
+  virtual void SetWorldToCamera (csReversibleTransform* w2c) = 0;
 };
 
 /** @} */

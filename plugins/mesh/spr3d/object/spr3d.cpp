@@ -1555,6 +1555,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
+#ifdef CS_USE_NEW_RENDERER
+  rendermesh.object2camera = tr_o2c;
+#endif
 
 #if 1
   csVector3 radius;
@@ -1861,11 +1864,11 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
 {
 #ifdef CS_USE_NEW_RENDERER
   n = 1;
-  if (skeleton_state) {
+  if (skeleton_state) 
+  {
     /* set to identify for software skeleton */
-    tr_o2c = csReversibleTransform ();
+    rendermesh.object2camera = csReversibleTransform ();
   }
-  rendermesh.transform = &tr_o2c;
   rendermesh.z_buf_mode = CS_ZBUF_TEST;
   rendermesh.mixmode = CS_FX_COPY;
   rendermesh.indexstart = 0;

@@ -163,8 +163,6 @@ private:
   }
 };
 
-//#define POLY_RENDERMESH
-
 /**
  * The static data for a thing.
  */
@@ -282,17 +280,15 @@ public:
 #ifdef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> r3d;
 
-  csRef<iRenderBuffer> vertex_buffer;
+  csRefArray<iPolygonRenderer> polyRenderers;
+
+/*  csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
   csRef<iRenderBuffer> tangent_buffer;
   csRef<iRenderBuffer> binormal_buffer;
-#ifdef POLY_RENDERMESH
-  csDirtyAccessArray<int> polyVertNum;
-  csDirtyAccessArray<csPolyTextureMapping*> polyTexMaps;
-#endif
 
   static csStringID vertex_name;
   static csStringID texel_name;
@@ -300,7 +296,7 @@ public:
   static csStringID color_name;
   static csStringID index_name;
   static csStringID tangent_name;
-  static csStringID binormal_name;
+  static csStringID binormal_name;*/
 #endif
 
 

@@ -23,11 +23,6 @@
 #include "soft_g3d.h"
 #include "soft_txt.h"
 #include "ivaria/reporter.h"
-// @@@ The following include needs a cleanup. It is not very good that
-// the 3D rendering is accessing something private from the thing mesh
-// object. Instead a lightmap should be something that is defined in
-// a 3D renderer/csengine aspecific format.
-#include "imesh/thing/lightmap.h"
 
 static int hash_table [384];
 
@@ -48,7 +43,7 @@ static int hash_table [384];
 //------------------------------------------------- csSoftwareTextureCache ---//
 
 //  static void (*create_lighted_texture) (iPolygonTexture *pt,
-//    SoftwareCachedTexture *ct, csSoftwareTextureManager *texman,
+//    SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
 //    float u_min, float v_min, float u_max, float v_max);
 
 static void compute_hash_table ()
@@ -102,10 +97,14 @@ void csSoftwareTextureCache::Clear ()
   total_textures = 0;
 }
 
-void csSoftwareTextureCache::uncache_texture (int MipMap, iPolygonTexture* pt)
+void csSoftwareTextureCache::uncache_texture (int MipMap, 
+	      csSoftRendererLightmap* rlm
+/*iPolygonTexture* pt*/)
 {
   SoftwareCachedTexture* cached_texture;
-  cached_texture = (SoftwareCachedTexture*)pt->GetCacheData (MipMap);
+  cached_texture = (SoftwareCachedTexture*)
+    rlm->cacheData[MipMap];
+    //pt->GetCacheData (MipMap);
   if (!cached_texture) return;
 
   if (cached_texture->next)
@@ -130,7 +129,7 @@ void csSoftwareTextureCache::uncache_texture (int MipMap, iTextureHandle *itexh)
   {
     next_cached_texture = cached_texture->next;
     if ((cached_texture->mipmap == MipMap) &&
-	(cached_texture->source->GetMaterialHandle ()->GetTexture () == itexh))
+      (cached_texture->sourceTexH /*source->GetMaterialHandle ()->GetTexture ()*/ == itexh))
     {
       if (cached_texture->next)
 	cached_texture->next->prev = cached_texture->prev;
@@ -149,14 +148,18 @@ void csSoftwareTextureCache::uncache_texture (int MipMap, iTextureHandle *itexh)
   }
 }
 
-SoftwareCachedTexture *csSoftwareTextureCache::cache_texture
-  (int MipMap, iPolygonTexture* pt)
+SoftwareCachedTexture *csSoftwareTextureCache::cache_texture (
+  int MipMap, csPolyLightMapMapping* mapping, csPolyTextureMapping* tmapping,
+  csSoftRendererLightmap* rlm, iTextureHandle* itexh/*iPolygonTexture* pt*/)
 {
-  SoftwareCachedTexture *cached_texture =
-    (SoftwareCachedTexture *)pt->GetCacheData (MipMap);
+//  SoftwareCachedTexture *cached_texture =
+//    (SoftwareCachedTexture *)pt->GetCacheData (MipMap);
+  SoftwareCachedTexture *cached_texture = (SoftwareCachedTexture*)
+    rlm->cacheData[MipMap];
+    //pt->GetCacheData (MipMap);
 
   csSoftwareTextureHandle* txt = (csSoftwareTextureHandle*)(
-  	pt->GetMaterialHandle ()->GetTexture ());
+  	/*pt->GetMaterialHandle ()->GetTexture ()*/itexh);
 
   // If texture is already in cache we first check if the
   // unlit texture itself has changed (proc texture). If so
@@ -164,7 +167,7 @@ SoftwareCachedTexture *csSoftwareTextureCache::cache_texture
   if (cached_texture  && cached_texture->last_texture_number
   	!= txt->GetUpdateNumber ())
   {
-    uncache_texture (MipMap, pt);
+    uncache_texture (MipMap, rlm/*pt*/);
     cached_texture = 0;
   }
 
@@ -196,10 +199,11 @@ SoftwareCachedTexture *csSoftwareTextureCache::cache_texture
   else
   {
     // Texture is not in the cache.
-    int lightmap_size = pt->GetLightMap ()->GetSize () * sizeof (uint32);
-    const csLightMapMapping& mapping = pt->GetMapping ();
-    int bitmap_w = (mapping.GetWidth () >> MipMap);
-    int bitmap_h = ((mapping.GetHeight () + (1 << MipMap) - 1) >> MipMap);
+    int lightmap_size = /*pt->GetLightMap ()->GetSize ()*/
+      rlm->rect.Width () * rlm->rect.Height () * sizeof (uint32);
+    //const csPolyLightMapMapping& mapping = *(srlm->GetMapping ()); //pt->GetMapping ();
+    int bitmap_w = (mapping->GetWidth () >> MipMap);
+    int bitmap_h = ((mapping->GetHeight () + (1 << MipMap) - 1) >> MipMap);
     int bitmap_size = lightmap_size + bytes_per_texel * bitmap_w
     	* (H_MARGIN * 2 + bitmap_h);
 
@@ -262,7 +266,7 @@ SoftwareCachedTexture *csSoftwareTextureCache::cache_texture
       delete cached_texture;
     }
 
-    cached_texture = new SoftwareCachedTexture (MipMap, pt);
+    cached_texture = new SoftwareCachedTexture (MipMap, rlm, itexh /*pt*/);
     cached_texture->frameno = frameno;
     cached_texture->last_texture_number = txt->GetUpdateNumber ();
 
@@ -285,19 +289,21 @@ SoftwareCachedTexture *csSoftwareTextureCache::cache_texture
   return cached_texture;
 }
 
-void csSoftwareTextureCache::fill_texture (int MipMap, iPolygonTexture* pt,
-    csSoftwareTextureHandle *tex_mm, float u_min, float v_min, float u_max,
-    float v_max)
+void csSoftwareTextureCache::fill_texture (int MipMap, /*iPolygonTexture* pt,*/
+					   csPolyLightMapMapping* mapping,
+					   csPolyTextureMapping* tmapping,
+					   csSoftRendererLightmap* rlm,
+                                           csSoftwareTextureHandle *tex_mm, 
+					   float u_min, float v_min, 
+					   float u_max, float v_max)
 {
-  // Recalculate the lightmaps
-  //@@@ This is now done by csThing! pt->RecalculateDynamicLights ();
-
   // Now cache the texture
-  SoftwareCachedTexture *cached_texture = cache_texture (MipMap, pt);
+  SoftwareCachedTexture *cached_texture = cache_texture (MipMap, mapping, 
+    tmapping, rlm, tex_mm);
 
   // Compute the rectangle on the lighted texture, if it is dirty
-  (this->*create_lighted_texture) (pt, cached_texture, tex_mm,
-  	texman, u_min, v_min, u_max, v_max);
+  (this->*create_lighted_texture) (/*pt, */mapping, tmapping, rlm, 
+    cached_texture, tex_mm, texman, u_min, v_min, u_max, v_max);
 }
 
 void csSoftwareTextureCache::dump (csSoftwareGraphics3DCommon *iG3D)

@@ -211,7 +211,7 @@ class csSoftSuperLightmap;
 class csSoftRendererLightmap : public iRendererLightmap
 {
   friend class csSoftSuperLightmap;
-  friend class csTextureCacheSoftware;
+  friend class csSoftwareTextureCache;
 
   csRect rect;
   float u1, v1, u2, v2;
@@ -320,9 +320,10 @@ public:
     return 0;
   }
 
-
   virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
     int height);
+
+  virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 };
 
 #endif // __CS_SOFT_TXT_H__

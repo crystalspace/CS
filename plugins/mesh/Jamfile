@@ -31,4 +31,7 @@ if $(USE_NEW_RENDERER) = "no"
   SubInclude TOP plugins mesh terrbig ;
   SubInclude TOP plugins mesh terrfunc ;
 }
-
+else
+{
+  SubInclude TOP plugins mesh terrain ;
+}

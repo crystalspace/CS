@@ -679,7 +679,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
   // iGraphics3D* g3d = rview->GetGraphics3D ();
 
   mater->Visit ();
-  mesh.transform = &tr_o2c;
+  //mesh.transform = &tr_o2c;
 
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;// mode;
@@ -752,7 +752,7 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     return false;
 
 #ifdef CS_USE_NEW_RENDERER
-  mesh.transform = &tr_o2c;
+  mesh.object2camera = tr_o2c;
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
   mesh.clip_z_plane = clip_z_plane;

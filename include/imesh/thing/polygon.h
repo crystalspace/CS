@@ -38,6 +38,8 @@ struct iThingState;
 struct iThingFactoryState;
 struct iPolyTexType;
 struct iRendererLightmap;
+struct csPolyLightMapMapping;
+struct csPolyTextureMapping;
 
 class csReversibleTransform;
 class csPlane3;
@@ -256,6 +258,9 @@ struct iPolygon3DStatic : public iBase
    * Test happens in object space.
    */
   virtual bool PointOnPolygon (const csVector3& v) = 0;
+
+  virtual csPolyLightMapMapping* GetLightMapMapping () const = 0;
+  virtual csPolyTextureMapping* GetTextureMapping () const = 0;
 };
 
 SCF_VERSION (iPolygon3D, 0, 3, 1);

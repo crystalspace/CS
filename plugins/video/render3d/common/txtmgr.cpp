@@ -23,6 +23,7 @@
 #include "txtmgr.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
+#include "iutil/objreg.h"
 #include "qint.h"
 #include "igraphic/image.h"
 #include "ivideo/material.h"
@@ -231,6 +232,7 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
   SCF_CONSTRUCT_IBASE (0);
   DG_ADDI (this, 0);
   DG_TYPE (this, "csMaterialHandle");
+  texman = parent;
   material = m;
   if (material != 0)
   {
@@ -241,7 +243,6 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
       DG_LINK (this, texture);
     }
   }
-  texman = parent;
 }
 
 csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
@@ -326,7 +327,10 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 
   pfmt = *iG2D->GetPixelFormat ();
 
-  nameDiffuseTexture = 0; // @@@ !!!
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
+  CS_ASSERT(strings != 0);
+  nameDiffuseTexture = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 }
 
 csTextureManager::~csTextureManager()
