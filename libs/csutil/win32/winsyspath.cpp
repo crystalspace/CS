@@ -102,6 +102,10 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
 #undef BUFCAT
 }
 
+// Can't put this inside the function because Cygwin would segfault
+// on the destructor for some unknown reason.
+static cswinCacheDLL hKernel32 ("kernel32.dll");
+
 char* csExpandPath (const char* path)
 {
   if (path == 0 || *path == '\0')
@@ -119,7 +123,6 @@ char* csExpandPath (const char* path)
   DWORD result = 0;
   PFNGETLONGPATHNAMEA GetLongPathNameFunc = 0;
   // unfortunately, GetLongPathName() is only supported on Win98+/W2k+
-  static cswinCacheDLL hKernel32 ("kernel32.dll");
   if (hKernel32 != 0)
   {
     GetLongPathNameFunc = 

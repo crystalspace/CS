@@ -31,6 +31,9 @@ chronological order.
 	  that caused it to bark if no suffix is present at all.
 	- res changed the generic csPrintf() to better deal with surrogates.
 	- res made a couple of small doxygen changes/improvements.
+	- res applied a patch from Michael D. Adams 
+	  <mdmkolbe@users.sourceforge.net> to fix a crash on exit in Cygwin
+	  (patch #1154478).
 1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 
