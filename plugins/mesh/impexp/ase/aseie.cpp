@@ -350,7 +350,7 @@ bool csASEInterpreter_MESH_VERTEX_LIST (csModelConverterASE *conv, csDataStream 
   if (CS_ASE_CHECK_TOKEN ("*MESH_VERTEX"))
   {
     // @@@ nbase?
-    int n = in.ReadTextInt ();
+    int n = in.ReadTextInt (); (void)n;
     float x = in.ReadTextFloat ();
     float y = in.ReadTextFloat ();
     float z = in.ReadTextFloat ();
@@ -451,7 +451,7 @@ bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv, csDataStream &i
   if (CS_ASE_CHECK_TOKEN ("*MESH_VERTCOL"))
   {
     // @@@ nbase?
-    int n = in.ReadTextInt ();
+    int n = in.ReadTextInt (); (void)n;
     float r = in.ReadTextFloat ();
     float g = in.ReadTextFloat ();
     float b = in.ReadTextFloat ();
@@ -478,7 +478,7 @@ bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv, csDataStream &i
   if (CS_ASE_CHECK_TOKEN ("*MESH_TVERT"))
   {
     // @@@ nbase?
-    int n = in.ReadTextInt ();
+    int n = in.ReadTextInt (); (void)n;
     float u = in.ReadTextFloat ();
     float v = in.ReadTextFloat ();
     conv->Vertices->AddTexel (csVector2 (u, v));
