@@ -20,6 +20,10 @@ The history order is reversed so that new features are at the top.
 	  with 'xxx' a sector that was previously defined you will just
 	  add objects to that sector without affecting the previous contents.
 	- Changed an snprintf to sprintf in caltocs.
+	- Added a new MilkShape to CS/3D sprite convertor to CS. This convertor
+	  is actually able to convert skeletal information! It has not been
+	  tested a lot though. Thanks to Steven Geens <old_belge@hotmail.com>
+	  for making this.
 15-Jul-2002
 	- Fixed a compiler error in spr3d by rearranging the code a little
 	  bit.

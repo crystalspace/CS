@@ -88,6 +88,12 @@ obsolete.
 @uref{http://www.helsinki.fi/~jxsaarin/crystalspace/}
 
 @item
+Steven Geens (@email{old_belge@@hotmail.com})
+
+Steven made a MilkShape to CS sprite convertor which also supports
+skeletal animation.
+
+@item
 Steve Israelson (@email{pfhorte@@rogers.wave.ca})
 
 Steve made the pre-Carbon Macintosh port of Crystal Space.  He also did some
