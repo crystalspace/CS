@@ -49,7 +49,6 @@ public:
   csRefArray (int ilimit = 0, int ithreshold = 0)
   	: csArrayBase<csRef<T> > (ilimit, ithreshold)
   {
-    // memset on capacity???
   }
 
   /// Copy constructor.
