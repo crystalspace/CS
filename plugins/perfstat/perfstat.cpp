@@ -100,7 +100,7 @@ bool csPerfStats::Initialize (iObjectRegistry *object_reg)
 {
   csPerfStats::object_reg = object_reg;
   if (!scfiEventHandler)
-    scfiEventHandler = EventHandler (this);
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
   {
