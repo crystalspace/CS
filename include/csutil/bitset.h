@@ -56,42 +56,48 @@
  */
 class csBitSet
 {
-  unsigned size;
+  unsigned bit_count;
+  unsigned byte_count;
   unsigned char *bits;
 public:
   /// Create bit set of given size
-  csBitSet (unsigned iSize)
+  csBitSet (unsigned iBitCount) : bit_count(iBitCount)
   {
-    size = (iSize + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
-    bits = (unsigned char *)malloc (size);
+    byte_count = (iBitCount + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
+    bits = (unsigned char *)malloc (byte_count);
   }
 
   /// Destroy the bit array
   ~csBitSet ()
   { free (bits); }
 
-  /// Query bit set size
-  unsigned GetSize ()
-  { return size; }
+  /// Query number of bytes used to represent bit set
+  unsigned GetByteCount () const
+  { return byte_count; }
+
+  /// Query number of bits represented by bit set
+  unsigned GetBitCount () const
+  { return bit_count; }
 
   /// Resize the array
-  void Resize (unsigned iSize)
+  void Resize (unsigned iBitCount)
   {
-    size = (iSize + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
-    bits = (unsigned char *)realloc (bits, size);
+    bit_count = iBitCount;
+    byte_count = (iBitCount + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
+    bits = (unsigned char *)realloc (bits, byte_count);
   }
 
   /// Get a pointer to entire array for custom manipulations
-  unsigned char *GetBits ()
+  unsigned char *GetBits () const
   { return bits; }
 
   /// Clear the entire array
   inline void Reset ()
-  { memset (bits, 0, size); }
+  { memset (bits, 0, byte_count); }
 
   /// Set all the bits to one
   inline void Set ()
-  { memset (bits, MAX_BYTE_VALUE, size); }
+  { memset (bits, MAX_BYTE_VALUE, byte_count); }
 
   /// Set a bit in the array
   inline void Set (unsigned index)
@@ -139,13 +145,13 @@ public:
   }
 
   /// Get the value of a bit in the array
-  inline bool Get (unsigned index)
+  inline bool Get (unsigned index) const
   { IMPLEMENT_BIT_GET }
 
   /// OR two bit sets together
   inline csBitSet &operator |= (csBitSet &bs)
   {
-    unsigned sz = MIN (size, bs.size);
+    unsigned sz = MIN (byte_count, bs.byte_count);
     ULong *ldst = (ULong *)bits;
     ULong *lsrc = (ULong *)bs.bits;
     while (sz >= sizeof (ULong))
@@ -163,7 +169,7 @@ public:
   /// AND two bit sets together
   inline csBitSet &operator &= (csBitSet &bs)
   {
-    unsigned sz = MIN (size, bs.size);
+    unsigned sz = MIN (byte_count, bs.byte_count);
     ULong *ldst = (ULong *)bits;
     ULong *lsrc = (ULong *)bs.bits;
     while (sz >= sizeof (ULong))
@@ -176,6 +182,20 @@ public:
     while (sz--)
       *bdst++ &= *bsrc++;
     return *this;
+  }
+
+  /**
+   * Dump an ASCII representation of the bit set to a string.  Caller is
+   * responsible for destroying the returned string with delete[].
+   */
+  char *Description() const
+  { 
+    char *s = new char [bit_count + 1];
+    char *p = s;
+    for (unsigned i = 0; i < bit_count; i++)
+      *p++ = Get(i) ? '1' : '0';
+    *p = '\0';
+    return s;
   }
 };
 
