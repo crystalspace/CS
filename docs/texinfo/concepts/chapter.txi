@@ -39,4 +39,5 @@ Miscallenous notes requiring classification.  (Jorrit's @dfn{brain dump}.)
 @end itemize
 
 @imports{concepts,viscull.txi}
+@imports{concepts,3dsprite.txi}
 

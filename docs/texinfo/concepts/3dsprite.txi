@@ -1,0 +1,156 @@
+@c -*-texinfo-*-
+@node 3D Sprites
+@section 3D Sprites
+@cindex 3D Sprites
+
+"3D Sprites" are triangle-based models which can be animated by a skeleton
+or pre-calculated vertex animations.  This type of model is well suited for
+detailed models which are not easily represented as heightmapped terrain or
+smooth curves.
+
+@itemize @bullet
+
+@item @ref{Example 1}
+
+@item @ref{Example 2}
+
+@item @ref{Example 3}
+
+@item @ref{Example 4}
+
+@end itemize
+
+
+@node Example 1
+@subsection A Simple 3D Sprite
+
+Let us consider a simple 3D sprite:  a 24 sided prism meant to look like a
+cylinder.  Each side is made from two triangles, and the ends are made
+from 24 polygons (you could make the ends from 23 polygons, but that's not
+how artists do things :-)
+
+@ifnottex
+@pictures{concepts,cylinder}
+@end ifnottex
+
+This sprite has 96 triangles.  If we treat each triangle as a seperate
+object, it has 288 vertices.  Think about that.  Every frame each of those
+288 vertices has to be transformed from local coordinates screen space.
+
+Each vertex is also consuming some memory.  If each vertex only has
+three 32 bit float coordinates, then the sprite uses 3456 bytes of memory,
+but in practise each vertex also has texture alignment, color, and
+surface normal data, and if the sprite has precalculated animation, that
+data is multiplied by the number of frames.
+
+However, the 3D Sprite structure is compressed so that triangles can share
+vertices.  Instead of 288 vertices, the cylinder sprite has 48 vertices
+shared by the 96 triangles.  Each triangle is simply three indices to
+to the vertex list.
+
+@itemize @bullet
+
+@item Vertices
+
+@itemize @bullet
+
+@item 3D Coordinates (X, Y, Z)
+
+@item Texture Coordinates (U, V)
+
+@item Color (R, G, B)
+
+@item Surface Normal (X, Y, Z)
+
+@end itemize
+
+@item Triangles
+
+@itemize @bullet
+
+@item First Vertex Index
+
+@item Second Vertex Index
+
+@item Third Vertex Index
+
+@end itemize
+
+@end itemize
+
+
+@node Example 2
+@subsection Texturing
+
+Our next challenge is texturing the sprite .  To apply a two dimensional
+texture to the 3D sprite we need to flatten it.  If we have 288 seperate
+vertices (@xref{Example 1}), we can flatten the sprite any way we want,
+but when the triangles are sharing vertices we cannot seperate them.
+
+The simplest solution to this problem is to duplicate some vertices and
+split up enough triangle edges to flatten the cylinder the way we want it,
+but leave the rest of the the triangles connected, sharing vertices.
+We probably want to texture the sides as a single rectangular area and
+each end as a rough circle.  Seperating the ends doubles the number of
+vertices. Cutting one edge of the sides so it can be unwrapped adds
+two more vertices.
+
+@ifnottex
+@pictures{concepts,skin}
+@end ifnottex
+
+Fortunately we still have only 98 vertices instead of 288, but can we do
+better than that?  We should not have to duplicate the 3D coordinates just
+because we need more texture coordinates.  We will address this issue
+(@xref{Example 4}), but first we have to deal with some shading problems
+(@xref{Example 3}.)
+
+
+@node Example 3
+@subsection Shading Problems
+
+Seperating the ends of the cylinder sprite for texturing (@xref{Example 2})
+has a fortunate side effect.  It seperates the surface normals of the
+vertices as well as the texture coordinates.
+
+Surface normals are used for shading the sprite. Light colors each vertex
+based on the average normal of all of the triangles that share that vertex.
+When all of the vertices in our sprite are shared, all of the edges look
+smooth - even the edges between the sides and the ends of the cylinder.
+With the ends seperated, that edge is now sharply defined.
+
+@ifnottex
+@pictures{concepts,unseamly}
+@end ifnottex
+
+Unfortunately, we have also split one edge of the cylinder's sides, which
+creates a sharply defined edge where we don't want it.  We could reconnect
+the shared vertices along that edge, but then we would have to texture the
+sides differently. We don't want to texture the sides as a loop that that
+overlaps itself because then part of the surface is textured with a mirror
+image of the texture on another part. We don't want to texture the sides
+as a non-overlapping loop because that is less intuitive and wastes space.
+
+We are stuck with an unwanted edge or a difficult texturing job until we
+can find a way to connect vertex normals without connecting skin vertices
+(@xref{Example 4}.)
+
+
+@node Example 4
+@subsection A Solution
+
+@c--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+
+
+Blah blah blah.
+
+@ifnottex
+@pictures{concepts,split}
+@end ifnottex
+
+
+@node optimizations
+@subsection Optimizations
+
+@c--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+
+
+Blah blah blah.
