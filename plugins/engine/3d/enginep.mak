@@ -40,14 +40,11 @@ endif
 INC.ENGINE = $(wildcard plugins/engine/3d/*.h)
 SRC.ENGINE = $(wildcard plugins/engine/3d/*.cpp)
 OBJ.ENGINE = $(addprefix $(OUT),$(notdir $(SRC.ENGINE:.cpp=$O)))
-# @@@ Should also include "CSENGINE" but see *Mingw* note below.
-DEP.ENGINE = CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+DEP.ENGINE = CSENGINE CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += ENGINE
 DSP.ENGINE.NAME = engine
 DSP.ENGINE.TYPE = plugin
-# @@@ Should be no need to set this variable at all but see *Mingw* note below.
-DSP.ENGINE.RESOURCES = $(INC.CSENGINE) $(SRC.CSENGINE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -56,16 +53,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: engine engineclean
 engine: $(OUTDIRS) $(ENGINE)
 
-# @@@ *Mingw* Dependency should really be "$(OBJ.ENGINE) $(LIB.ENGINE)"; should
-# not include $(OBJ.CSENGINE).  Unfortunately, there is a bug in `dllwrap',
-# which is employed by Mingw, where it fails to emit symbols into the output
-# DLL which are exported from csengine.lib.  Even though the symbols, such as
-# engine_scfInitialize(), are properly exported with __declspec(dllexport) in
-# csengine.lib, dllwrap fails to emit them into the generated DLL.  To work
-# around this problem, instead of linking with CSENGINE.LIB as expected, we
-# link individually with the object files from OBJ.CSENGINE.  The real solution
-# to this problem, however, is to figure out why dllwrap is misbehaving.
-$(ENGINE): $(OBJ.ENGINE) $(OBJ.CSENGINE) $(LIB.ENGINE)
+$(ENGINE): $(OBJ.ENGINE) $(LIB.ENGINE)
 	$(DO.PLUGIN)
 
 clean: engineclean
