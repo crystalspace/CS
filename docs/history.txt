@@ -45,6 +45,7 @@ chronological order.
 	  retrieved from a library.
         - Andreas Busch renamed CS_ZBUF_SPECIAL to CS_ZBUF_INVERT in python
 	  and perl5 modules to match latest renderer changes.
+	- res fixed the missing arguments to the SCF "symbol not found" errors.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done
