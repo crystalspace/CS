@@ -69,6 +69,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   VFS = NULL;
   mappings = NULL;
   process_next_key = false;
+  process_next_mouse = false;
   edit_mode = false;
   edit_string[0] = 0;
   initialized = false;
@@ -98,7 +99,8 @@ csBugPlug::~csBugPlug ()
 bool csBugPlug::Initialize (iSystem *system)
 {
   System = system;
-  if (!System->CallOnEvents (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown))
+  if (!System->CallOnEvents (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
+  	CSMASK_MouseUp|CSMASK_MouseDown))
     return false;
 
   return true;
@@ -148,9 +150,71 @@ void csBugPlug::SetupPlugin ()
 
   System->Printf (MSG_CONSOLE, "BugPlug loaded...\n");
 
-  //---------------------------------------------------------------------
   do_clear = false;
-  //---------------------------------------------------------------------
+}
+
+void csBugPlug::UnleashSpider (int cmd)
+{
+  if (Engine)
+  {
+    spider->ClearCamera ();
+    if (spider->WeaveWeb (Engine))
+    {
+      spider_command = cmd;
+      spider_hunting = true;
+      spider_timeout = 20;
+    }
+    else
+    {
+      System->Printf (MSG_CONSOLE,
+	"Spider could not weave its web (No sectors)!\n");
+    }
+  }
+  else
+  {
+    System->Printf (MSG_CONSOLE,
+      "Spider could not weave its web (No engine)!\n");
+  }
+}
+
+void csBugPlug::HideSpider (iCamera* camera)
+{
+  spider_hunting = false;
+  spider->UnweaveWeb (Engine);
+  if (camera)
+  {
+    char buf[80];
+    System->Printf (MSG_CONSOLE, "Spider catched a camera!\n");
+    switch (spider_command)
+    {
+      case DEBUGCMD_DUMPCAM:
+	Dump (camera);
+	break;
+      case DEBUGCMD_FOV:
+	{
+          int fov = camera->GetFOV ();
+	  sprintf (buf, "%d", fov);
+	  EnterEditMode (spider_command, "Enter new fov value:", buf);
+	}
+	break;
+      case DEBUGCMD_FOVANGLE:
+	{
+          float fov = camera->GetFOVAngle ();
+	  sprintf (buf, "%g", fov);
+	  EnterEditMode (spider_command, "Enter new fov angle:", buf);
+	}
+	break;
+      case DEBUGCMD_MOUSE1:
+        MouseButton1 (camera);
+	break;
+      case DEBUGCMD_MOUSE2:
+        MouseButton2 (camera);
+	break;
+      case DEBUGCMD_MOUSE3:
+        MouseButton3 (camera);
+	break;
+    }
+  }
 }
 
 void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
@@ -170,11 +234,60 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
   }
 }
 
+void csBugPlug::MouseButton1 (iCamera*)
+{
+}
+
+void csBugPlug::MouseButton2 (iCamera*)
+{
+}
+
+void csBugPlug::MouseButton3 (iCamera* camera)
+{
+  csVector3 v;
+  csVector2 p (mouse_x, mouse_y);
+
+  camera->InvPerspective (p, 1, v);
+  csVector3 vw = camera->GetTransform ().This2Other (v);
+
+  iSector* sector = camera->GetSector ();
+  //csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
+  //csVector3 isect;
+  //iPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
+
+  vw = isect;
+  v = camera->GetTransform ().Other2This (vw);
+  System->Printf (MSG_CONSOLE,
+    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
+    v.x, v.y, v.z, vw.x, vw.y, vw.z);
+  System->Printf (MSG_DEBUG_0,
+    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
+    v.x, v.y, v.z, vw.x, vw.y, vw.z);
+}
+
+bool csBugPlug::EatMouse (iEvent& event)
+{
+  SetupPlugin ();
+  if (!process_next_mouse) return false;
+
+  bool down = (event.Type == csevMouseDown);
+  int button = event.Mouse.Button;
+
+  if (down)
+  {
+    mouse_x = event.Mouse.x;
+    mouse_y = event.Mouse.y;
+    UnleashSpider (DEBUGCMD_MOUSE1+button-1);
+    process_next_mouse = false;
+  }
+  return true;
+}
+
 bool csBugPlug::EatKey (iEvent& event)
 {
   SetupPlugin ();
   int key = event.Key.Code;
-  int down = (event.Type == csevKeyDown);
+  bool down = (event.Type == csevKeyDown);
   bool shift = (event.Key.Modifiers & CSMASK_SHIFT) != 0;
   bool alt = (event.Key.Modifiers & CSMASK_ALT) != 0;
   bool ctrl = (event.Key.Modifiers & CSMASK_CTRL) != 0;
@@ -252,6 +365,15 @@ bool csBugPlug::EatKey (iEvent& event)
       if (process_next_key)
       {
         System->Printf (MSG_CONSOLE, "Press debug key...\n");
+      }
+      return true;
+    }
+    if (cmd == DEBUGCMD_MOUSEENTER)
+    {
+      process_next_mouse = !process_next_mouse;
+      if (process_next_mouse)
+      {
+        System->Printf (MSG_CONSOLE, "Click on screen...\n");
       }
       return true;
     }
@@ -377,13 +499,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
         // Set spider on a hunt.
-	if (Engine)
-	{
-	  spider_command = cmd;
-	  spider_hunting = true;
-	  spider->ClearCamera ();
-          spider->WeaveWeb (Engine);
-	}
+	UnleashSpider (cmd);
         break;
     }
     process_next_key = false;
@@ -406,7 +522,6 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
 bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
-  char buf[80];
   if (edit_mode)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
@@ -449,28 +564,15 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     iCamera* camera = spider->GetCamera ();
     if (camera)
     {
-      spider_hunting = false;
-      spider->UnweaveWeb (Engine);
-      System->Printf (MSG_CONSOLE, "Spider catched a camera!\n");
-      switch (spider_command)
+      HideSpider (camera);
+    }
+    else
+    {
+      spider_timeout--;
+      if (spider_timeout < 0)
       {
-        case DEBUGCMD_DUMPCAM:
-	  Dump (camera);
-	  break;
-        case DEBUGCMD_FOV:
-	  {
-            int fov = camera->GetFOV ();
-	    sprintf (buf, "%d", fov);
-	    EnterEditMode (spider_command, "Enter new fov value:", buf);
-	  }
-	  break;
-        case DEBUGCMD_FOVANGLE:
-	  {
-            float fov = camera->GetFOVAngle ();
-	    sprintf (buf, "%g", fov);
-	    EnterEditMode (spider_command, "Enter new fov angle:", buf);
-	  }
-	  break;
+	HideSpider (NULL);
+        System->Printf (MSG_CONSOLE, "Spider could not catch a camera!\n");
       }
     }
   }
@@ -569,6 +671,7 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
 int csBugPlug::GetCommandCode (const char* cmd)
 {
   if (!strcmp (cmd, "debugenter"))	return DEBUGCMD_DEBUGENTER;
+  if (!strcmp (cmd, "mouseenter"))	return DEBUGCMD_MOUSEENTER;
   if (!strcmp (cmd, "quit"))		return DEBUGCMD_QUIT;
   if (!strcmp (cmd, "status"))		return DEBUGCMD_STATUS;
   if (!strcmp (cmd, "help"))		return DEBUGCMD_HELP;
@@ -887,6 +990,14 @@ bool csBugPlug::HandleEvent (iEvent& event)
   else if (event.Type == csevKeyUp)
   {
     return EatKey (event);
+  }
+  else if (event.Type == csevMouseDown)
+  {
+    return EatMouse (event);
+  }
+  else if (event.Type == csevMouseUp)
+  {
+    return EatMouse (event);
   }
   else if (event.Type == csevBroadcast)
   {

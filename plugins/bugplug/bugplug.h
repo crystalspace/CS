@@ -54,9 +54,13 @@ class csSpider;
 
 // Commands controlling the plugin itself.
 #define DEBUGCMD_DEBUGENTER	0	// Next key will be ours
-#define DEBUGCMD_QUIT		1	// Unload
-#define DEBUGCMD_STATUS		2	// Request status
-#define DEBUGCMD_HELP  		3	// Show help
+#define DEBUGCMD_MOUSEENTER	1	// Next mouse click will be ours
+#define DEBUGCMD_QUIT		2	// Unload
+#define DEBUGCMD_STATUS		3	// Request status
+#define DEBUGCMD_HELP  		4	// Show help
+#define DEBUGCMD_MOUSE1 	5	// Mouse button 1
+#define DEBUGCMD_MOUSE2 	6	// Mouse button 2
+#define DEBUGCMD_MOUSE3 	7	// Mouse button 3
 
 // Commands for debugging.
 #define DEBUGCMD_DUMPENG	1000	// Dump structure of world
@@ -136,14 +140,31 @@ private:
   csSpider* spider;
   /// If true then spider is hunting.
   bool spider_hunting;
+  /**
+   * Timeout. Every frame this value is decreased.
+   * If it reaches 0 and no camera has been found we stop hunting.
+   */
+  int spider_timeout;
   /// Command to execute when spider found a camera.
   int spider_command;
+  /// Mouse x and y for the command (if a selection command).
+  int mouse_x, mouse_y;
+  /// Send the Spider on a hunt.
+  void UnleashSpider (int cmd);
+  /**
+   * The Spider has done its job. Send him back to his hiding place.
+   * Also perform the Spider command on the camera we found (only if
+   * camera != NULL).
+   */
+  void HideSpider (iCamera* camera);
 
   //------------------------------------------------------------------
 
   csKeyMap* mappings;
   /// If true we will eat next key and process it.
   bool process_next_key;
+  /// If true we will eat next mouse click and process it.
+  bool process_next_mouse;
 
   /// If true we are in edit mode.
   bool edit_mode;
@@ -158,10 +179,19 @@ private:
 
   /// Eat a key and process it.
   bool EatKey (iEvent& event);
+  /// Eat a mouse click and process it.
+  bool EatMouse (iEvent& event);
   /// Start of frame.
   bool HandleStartFrame (iEvent& event);
   /// End of frame.
   bool HandleEndFrame (iEvent& event);
+
+  /// Execute mouse button one.
+  void MouseButton1 (iCamera* camera);
+  /// Execute mouse button two.
+  void MouseButton2 (iCamera* camera);
+  /// Execute mouse button three.
+  void MouseButton3 (iCamera* camera);
 
   /// Given a command string, return a command code.
   int GetCommandCode (const char* cmd);

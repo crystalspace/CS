@@ -62,8 +62,11 @@ public:
   /// Clear the camera so that Spider can catch a new one.
   void ClearCamera () { camera = NULL; }
 
-  /// Weave the web: i.e. distribute Spider over all engine sectors.
-  void WeaveWeb (iEngine* engine);
+  /**
+   * Weave the web: i.e. distribute Spider over all engine sectors.
+   * Will return false if this could not be done (i.e. no sectors)
+   */
+  bool WeaveWeb (iEngine* engine);
 
   /// Unweave the web.
   void UnweaveWeb (iEngine* engine);

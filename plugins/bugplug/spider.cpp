@@ -50,9 +50,10 @@ bool csSpider::DrawTest (iRenderView* rview, iMovable*)
   return false;
 }
 
-void csSpider::WeaveWeb (iEngine* engine)
+bool csSpider::WeaveWeb (iEngine* engine)
 {
-  if (wrap) wrap->DecRef ();
+  if (wrap) { wrap->DecRef (); wrap = NULL; }
+  if (engine->GetSectorCount () <= 0) return false;
   wrap = engine->CreateMeshObject (this, "_@Spider@_");
   iMovable* movable = wrap->GetMovable ();
   int i;
@@ -62,6 +63,7 @@ void csSpider::WeaveWeb (iEngine* engine)
     movable->AddSector (sec);
   }
   movable->UpdateMove ();
+  return true;
 }
 
 void csSpider::UnweaveWeb (iEngine* engine)

@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+13-Jun-2001
+	- Increased robustness of the Spider in BugPlug a little. If there
+	  are no sectors it will not start hunting. There is also a timeout
+	  of 20 frames. If the camera has not been found in that time then
+	  the hunt will be canceled.
+	- Added the ability to do mouse selection in BugPlug.
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
 	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug
