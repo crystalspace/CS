@@ -657,6 +657,7 @@ csEngine::csEngine (iBase *iParent) :
   object_reg = NULL;
   textures = NULL;
   materials = NULL;
+  shared_variables = NULL;
   c_buffer = NULL;
   cbufcube = NULL;
   region = NULL;
@@ -683,6 +684,7 @@ csEngine::csEngine (iBase *iParent) :
 
   textures = new csTextureList ();
   materials = new csMaterialList ();
+  shared_variables = new csSharedVariableList();
 
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
   lightpatch_pool = new csLightPatchPool ();
@@ -2428,6 +2430,12 @@ iMaterialList *csEngine::GetMaterialList () const
 {
   return &(GetMaterials ()->scfiMaterialList);
 }
+
+iSharedVariableList *csEngine::GetVariableList () const
+{
+  return &(GetVariables()->scfiSharedVariableList);
+}
+
 
 iRegionList *csEngine::GetRegions ()
 {

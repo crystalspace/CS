@@ -35,6 +35,7 @@
 SCF_IMPLEMENT_IBASE_EXT(csMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iImposter)
   SCF_IMPLEMENTS_INTERFACE(csMeshWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
 
@@ -46,6 +47,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::VisObject)
   SCF_IMPLEMENTS_INTERFACE(iVisibilityObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshImposter)
+  SCF_IMPLEMENTS_INTERFACE(iImposter)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csMeshWrapper::csMeshWrapper (
   iMeshWrapper *theParent,
   iMeshObject *mesh) :
@@ -53,6 +58,7 @@ csMeshWrapper::csMeshWrapper (
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiImposter);
   DG_TYPE (this, "csMeshWrapper");
 
   movable.scfParent = this;
@@ -71,6 +77,7 @@ csMeshWrapper::csMeshWrapper (
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
+  imposter_active = false;
 }
 
 csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
@@ -78,6 +85,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiImposter);
   DG_TYPE (this, "csMeshWrapper");
 
   movable.scfParent = this;

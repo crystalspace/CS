@@ -32,6 +32,7 @@
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/region.h"
+#include "csengine/sharevar.h"
 #include "iengine/engine.h"
 #include "iengine/collectn.h"
 #include "iengine/campos.h"
@@ -353,6 +354,8 @@ private:
   csMaterialList* materials;
   /// Linked list of dynamic lights.
   csDynLight* first_dyn_lights;
+  /// The list of all shared variables in the engine.
+  csSharedVariableList* shared_variables;
   /// List of halos (csHaloInformation).
   csHaloArray halos;
   /// Debugging: maximum number of polygons to process in one frame.
@@ -809,12 +812,18 @@ public:
   csMaterialList* GetMaterials () const { return materials; }
 
   /**
+   * Return the object managing all shared variables.
+   */
+  csSharedVariableList* GetVariables () const { return shared_variables; }
+
+  /**
    * Create a base material.
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt);
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers);
 
+  virtual iSharedVariableList* GetVariableList () const;
   virtual iMaterialList* GetMaterialList () const;
   virtual iTextureList* GetTextureList () const;
   virtual iRegionList* GetRegions ();

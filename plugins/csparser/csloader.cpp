@@ -55,6 +55,8 @@
 #include "iengine/statlght.h"
 #include "iengine/mesh.h"
 #include "iengine/lod.h"
+#include "iengine/imposter.h"
+#include "iengine/sharevar.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "igraphic/imageio.h"
@@ -724,6 +726,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("up", XMLTOKEN_UP);
   xmltokens.Register ("v", XMLTOKEN_V);
   xmltokens.Register ("world", XMLTOKEN_WORLD);
+  xmltokens.Register ("imposter", XMLTOKEN_IMPOSTER);
   xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
   xmltokens.Register ("znone", XMLTOKEN_ZNONE);
   xmltokens.Register ("zuse", XMLTOKEN_ZUSE);
@@ -770,6 +773,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("vertexcolor", XMLTOKEN_VERTEXCOLOR);
   xmltokens.Register ("vertexprogram", XMLTOKEN_VERTEXPROGRAM);
   xmltokens.Register ("vertexprogramconstant", XMLTOKEN_VERTEXPROGRAMCONST);
+
+  xmltokens.Register ("variables", XMLTOKEN_VARIABLELIST);
 
   xmltokens.Register ("run", XMLTOKEN_RUN);
   xmltokens.Register ("sequence", XMLTOKEN_SEQUENCE);
@@ -891,6 +896,10 @@ bool csLoader::LoadMap (iDocumentNode* node)
           if (!ParseMaterialList (child))
             return false;
           break;
+	case  XMLTOKEN_VARIABLELIST:
+	  if (!ParseVariableList (child))
+	    return false;
+	  break;
         case XMLTOKEN_SOUNDS:
           if (!LoadSounds (child))
             return false;
@@ -992,6 +1001,10 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
           if (!ParseMaterialList (child))
             return false;
           break;
+	case  XMLTOKEN_VARIABLELIST:
+	  if (!ParseVariableList (child))
+	    return false;
+	  break;
         case XMLTOKEN_SOUNDS:
           if (!LoadSounds (child))
             return false;
@@ -1557,6 +1570,16 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	}
         mesh->GetFlags().Set (CS_ENTITY_DETAIL);
         break;
+      case XMLTOKEN_IMPOSTER:
+        if (!mesh)
+	{
+	  SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+	ParseImposterSettings(mesh,child);
+        break;
       case XMLTOKEN_ZFILL:
         if (!mesh)
 	{
@@ -1826,6 +1849,9 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
         if (!priority) priority = "alpha";
         mesh->SetZBufMode (CS_ZBUF_TEST);
         break;
+      case XMLTOKEN_IMPOSTER:
+	ParseImposterSettings(mesh,child);
+        break;
       case XMLTOKEN_CAMERA:
         if (!priority) priority = "sky";
         mesh->GetFlags().Set (CS_ENTITY_CAMERA);
@@ -2069,6 +2095,48 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
   mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
 
   return true;
+}
+
+void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
+{
+  csRef<iImposter> imposter (SCF_QUERY_INTERFACE (
+                                mesh,
+	                        iImposter));
+  if (!imposter)
+  {
+    SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshobject",
+	    node, "This mesh doesn't implement impostering!");
+    return;
+  }
+  const char *s = node->GetAttributeValue ("active");
+  if (s && !strcmp (s,"no"))
+      imposter->SetImposterActive (false);
+  else
+      imposter->SetImposterActive (true);
+
+  s = node->GetAttributeValue ("range");
+  iSharedVariable *var = Engine->GetVariableList()->FindByName (s);
+  if (!var)
+  {
+    SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshobject",
+	    node, "Specified imposter range variable (%s) doesn't exist!",s);
+    return;
+  }
+  imposter->SetMinDistance (var);
+
+  s = node->GetAttributeValue ("tolerance");
+  iSharedVariable* var2 = Engine->GetVariableList ()->FindByName (s);
+  if (!var2)
+  {
+    SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshobject",
+	    node, "Specified imposter rotation tolerance variable doesn't exist!");
+    return;
+  }
+  imposter->SetRotationTolerance (var2);
+  ReportWarning("crystalspace.maploader.parse.meshobject",node,"Set mesh %s to imposter active=%s, range=%f, tolerance=%f",mesh->QueryObject()->GetName(),var->Get(),var2->Get() );
 }
 
 bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
@@ -3052,6 +3120,49 @@ iEngineSequenceManager* csLoader::GetEngineSequenceManager ()
     }
   }
   return eseqmgr;
+}
+
+bool csLoader::ParseVariableList (iDocumentNode* node)
+{
+  if (!Engine) return false;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_VARIABLE:
+	ParseSharedVariable (child);
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+	return false;
+    }
+  }
+
+  return true;
+}
+
+void csLoader::ParseSharedVariable (iDocumentNode* node)
+{
+  iSharedVariable *v = Engine->GetVariableList()->New();
+
+  v->Set(node->GetAttributeValueAsFloat ("value"));
+  v->SetName(node->GetAttributeValue ("name"));
+
+  if (v->GetName())
+  {
+//  ReportWarning("csLoader::ParseSharedVariable",node,"Adding value of %s=%f.",v->GetName(),v->Get());
+    Engine->GetVariableList()->Add(v);
+  }
+  else
+  {
+    ReportWarning("csLoader::ParseSharedVariable",node,"Variable tag does not have name attribute.");
+  }
 }
 
 //========================================================================

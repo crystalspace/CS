@@ -158,6 +158,7 @@ enum
   XMLTOKEN_UP,
   XMLTOKEN_V,
   XMLTOKEN_WORLD,
+  XMLTOKEN_IMPOSTER,
   XMLTOKEN_ZFILL,
   XMLTOKEN_ZNONE,
   XMLTOKEN_ZUSE,
@@ -228,9 +229,12 @@ enum
   XMLTOKEN_FIRE,
   XMLTOKEN_SECTORVIS,
   XMLTOKEN_ONCLICK,
+  XMLTOKEN_ONCLICK,
   XMLTOKEN_POLYGON,
   XMLTOKEN_ARG,
   XMLTOKEN_ARGS
+  // For variable lists
+   XMLTOKEN_VARIABLELIST
 };
 
 class StdLoaderContext;
@@ -343,6 +347,13 @@ private:
    * given, all material names will be prefixed with the corresponding string.
    */
   bool ParseMaterialList (iDocumentNode* node, const char* prefix = NULL);
+  /// Parse a list of shared variables and add them each to the engine
+  bool ParseVariableList (iDocumentNode* node);
+  /// Process the attributes of one shared variable
+  void ParseSharedVariable (iDocumentNode* node);
+  /// Process the attributes of an <imposter> tag in a mesh specification.
+  void ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
+
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iDocumentNode* node);
   /// Parse a proc texture definition and add the texture to the engine

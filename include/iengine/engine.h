@@ -74,6 +74,7 @@ struct iProgressMeter;
 struct iRegionList;
 struct iLoaderContext;
 struct iCacheManager;
+struct iSharedVariableList;
 
 /** \name GetNearbyLights() flags
  * @{ */
@@ -355,6 +356,8 @@ struct iEngine : public iBase
   virtual iTextureList* GetTextureList () const = 0;
   /// Get the list of all materials.
   virtual iMaterialList* GetMaterialList () const = 0;
+  /// Get the list of all shared variables.
+  virtual iSharedVariableList* GetVariableList () const = 0;
   /// Get the list of all regions
   virtual iRegionList* GetRegions () = 0;
 
