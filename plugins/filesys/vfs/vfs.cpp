@@ -32,7 +32,9 @@
 #include "csutil/util.h"
 #include "csutil/scfstrv.h"
 #include "csutil/databuf.h"
+#include "csutil/csstring.h"
 #include "isystem.h"
+#include "icfgnew.h"
 #include "icfgfile.h"
 
 // Characters ignored in VFS paths (except in middle)
@@ -757,18 +759,24 @@ const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
   if (value)
     return value;
 
-  iConfigFile *Config = Parent->config;
+  iConfigFileNew *Config = Parent->config;
 
   // Now look in "VFS.Solaris" section, for example
-  value = Config->GetStr ("VFS." CS_PLATFORM_NAME, VarName, NULL);
+  csString Keyname("VFS." CS_PLATFORM_NAME ".");
+  Keyname += VarName;
+  value = Config->GetStr (Keyname, NULL);
   if (value)
     return value;
 
   // Now look in "VFS.Alias" section for alias section name
-  const char *alias = Config->GetStr ("VFS.Alias", CS_PLATFORM_NAME, NULL);
+  const char *alias = Config->GetStr ("VFS.Alias." CS_PLATFORM_NAME, NULL);
   // If there is one, look into that section too
-  if (alias)
-    value = Config->GetStr (alias, VarName, NULL);
+  if (alias) {
+    Keyname = alias;
+    Keyname += '.';
+    Keyname += VarName;
+    value = Config->GetStr (Keyname, NULL);
+  }
   if (value)
     return value;
 
@@ -1159,7 +1167,7 @@ bool csVFS::Initialize (iSystem *iSys)
   strcat (vfsconfigpath, "vfs.cfg");
   const char *path = System->GetConfig ()->GetStr ("VFS.Options", 
     "Config", vfsconfigpath);
-  config = System->CreateConfig (path, false);
+  config = System->CreateConfigNew (path, false);
   if (!config)
     return false;
   bool retval = ReadConfig ();
@@ -1168,9 +1176,9 @@ bool csVFS::Initialize (iSystem *iSys)
 
 bool csVFS::ReadConfig ()
 {
-  iConfigDataIterator *iterator = config->EnumData ("VFS");
+  iConfigIterator *iterator = config->Enumerate ("VFS.Mount.");
   while (iterator->Next ())
-    AddLink (iterator->GetKey (), (const char *)iterator->GetData ());
+    AddLink (iterator->GetKey (true), iterator->GetStr ());
   iterator->DecRef ();
   NodeList.QuickSort (0);
   return true;
@@ -1557,7 +1565,9 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 
   if (node->RPathV.Length () == 0)
   {
-    config->DeleteKey ("VFS", node->ConfigKey);
+    csString s("VFS.Mount.");
+    s+=node->ConfigKey;
+    config->DeleteKey (s);
     int idx = NodeList.Find (node);
     if (idx >= 0)
       NodeList.Delete (idx);
@@ -1593,7 +1603,9 @@ bool csVFS::SaveMounts (const char *FileName)
         tmp [sl + rpl] = 0;
       sl += rpl + 1;
     }
-    config->SetStr ("VFS", node->ConfigKey, tmp);
+    csString s("VFS.Mount.");
+    s+=node->ConfigKey;
+    config->SetStr (s, tmp);
     delete [] tmp;
   }
   return config->Save (FileName);
