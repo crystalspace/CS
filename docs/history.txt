@@ -3,7 +3,11 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
-02-Jul-2003
+3-Jul-2003
+	- Jorrit removed obsolete bindings for radiosity commands for Walktest
+	  and added 'r' key to record movements on/off and 'shift-r' to play
+	  the recording.
+2-Jul-2003
 	- Eric Sunshine fixed some spelling errors in the user manual pointed
 	  out by Vincent Knecht <vince@iefr.ath.cx>: existance -> existence
 	- Eric Sunshine applied a patch to snapshot.py from Just van Rossum
@@ -27,7 +31,7 @@ The history order is reversed so that new features are at the top.
 	  Marten <martin@cyber-dog.freeserve.co.uk>. The old
 	  documentation remains in CVS until some parts are
 	  transplanted.
-01-Jul-2003
+1-Jul-2003
 	- HangDude made the following changes:
 	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).
 	   - Added LGPL notice.
