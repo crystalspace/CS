@@ -585,10 +585,7 @@ int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   /* If V0 V1 V2 describes a degenerate triangle, then N1 will be 0,0,0
    *  We do not detect collisions on degenerate triangles.
    */
-  if (ABS (N1[0]) < SMALL_EPSILON
-  	&& ABS (N1[1]) < SMALL_EPSILON
-	&& ABS (N1[2]) < SMALL_EPSILON)
-      return 0;
+  if (N1 < SMALL_EPSILON) return 0;
 
   d1 = -N1 * V0;
   /* plane equation 1: N1.X+d1=0 */
@@ -619,10 +616,7 @@ int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   /* If U0 U1 U2 describes a degenerate triangle, then N2 will be 0,0,0
    *  We do not detect collisions on degenerate triangles.
    */
-  if (ABS (N2[0]) < SMALL_EPSILON
-  	&& ABS (N2[1]) < SMALL_EPSILON
-	&& ABS (N2[2]) < SMALL_EPSILON)
-      return 0;
+  if (N2 < SMALL_EPSILON) return 0;
 
   d2 = -N2 * U0;
   /* plane equation 2: N2.X+d2=0 */
