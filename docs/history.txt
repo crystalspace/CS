@@ -3,6 +3,8 @@ The history order is reversed so that new features are at the top.
 18-Mar-2003
 	- Added two entries to the faq about scaled objects.
 	- Some Doxygen improvements on iMovable and iMeshWrapper.
+	- MatzeB fixed ossdrv makefile, so that the target has the same name
+	  as the plugin.
 17-Mar-2003
 	- Fixed scale issue with dynamic ambient. Dynamic ambient brightness
 	  was divided by 1.5 but that's not needed.

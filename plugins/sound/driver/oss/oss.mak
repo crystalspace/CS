@@ -2,26 +2,26 @@
 # to build the OpenSoundSystem driver -- ossdrv
 
 # Driver description
-DESCRIPTION.oss = Crystal Space OSS sound driver
+DESCRIPTION.ossdrv = Crystal Space OSS sound driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make oss          Make the $(DESCRIPTION.oss)$"
+  $(NEWLINE)echo $"  make ossdrv       Make the $(DESCRIPTION.ossdrv)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: oss ossclean
-all plugins drivers snddrivers: oss
+.PHONY: ossdrv ossdrvclean
+all plugins drivers snddrivers: ossdrv
 
-oss:
+ossdrv:
 	$(MAKE_TARGET) MAKE_DLL=yes
-ossclean:
+ossdrvclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -52,15 +52,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: oss ossclean
+.PHONY: ossdrv ossdrvclean
 
-oss: $(OUTDIRS) $(SNDOSS)
+ossdrv: $(OUTDIRS) $(SNDOSS)
 
 $(SNDOSS): $(OBJ.SNDOSS) $(LIB.SNDOSS)
 	$(DO.PLUGIN)
 
 clean: ossclean
-ossclean:
+ossdrvclean:
 	$(RM) $(SNDOSS) $(OBJ.SNDOSS)
 
 ifdef DO_DEPEND
