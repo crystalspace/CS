@@ -34,12 +34,12 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
 
   // Because the we know the parameters with which this function will be 
   // called, some safety checks can be omitted.
-  if (lpszShortPath == lpszLongPath)
-  {
-    CS_ALLOC_STACK_ARRAY (char, nshort, strlen (lpszShortPath) + 1);
-    strcpy (nshort, lpszShortPath);
-    lpszShortPath = nshort;
-  }
+  
+  // In case ShortPath == LongPath
+  CS_ALLOC_STACK_ARRAY (char, nshort, strlen (lpszShortPath) + 1);
+  strcpy (nshort, lpszShortPath);
+  lpszShortPath = nshort;
+
   const char* nextpos = lpszShortPath;
   DWORD bufRemain = cchBuffer;
   *lpszLongPath = 0;

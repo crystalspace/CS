@@ -17,6 +17,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine performed project-wide spelling corrections:
 	    conveniance --> convenience
 	    conveniant  --> convenient
+	- res fixed a bug in the GetLongPathName() replacement for Win9x/NT:
+	  an array was allocated on the stack at runtime, but was almost
+	  immediately overwritten, causing the function to not work at all.
+	  The issue was unnoticed as the behaviour didn't occur with MSVC.
 10-Jul-2003
 	- Jorrit added a test in csColliderWrapper::Collide() so that
 	  csColliderWrapper can be used in cases where there is no
