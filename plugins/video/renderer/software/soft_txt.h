@@ -221,9 +221,6 @@ public:
   csSoftRendererLightmap ();
   virtual ~csSoftRendererLightmap ();
 
-  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2);
-    
   virtual void GetSLMCoords (int& left, int& top, 
     int& width, int& height);
     
@@ -252,6 +249,8 @@ public:
     int width, int height);
 
   virtual csPtr<iImage> Dump ();
+  
+  virtual iTextureHandle* GetTexture ();
 };
 
 /**
@@ -310,6 +309,10 @@ public:
     int height);
 
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
+
+  virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
+    int lm_x1, int lm_y1, int lm_x2, int lm_y2,
+    float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
 
 #endif // __CS_SOFT_TXT_H__

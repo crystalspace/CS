@@ -33,6 +33,7 @@
 #include "csutil/garray.h"
 #include "csutil/blockallocator.h"
 #include "csutil/parray.h"
+#include "csgfx/shadervar.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -44,6 +45,7 @@
 #include "iutil/comp.h"
 #include "iutil/config.h"
 #include "iutil/dbghelp.h"
+#include "ivideo/shader/shader.h"
 #include "lghtmap.h"
 
 #include "csgeom/subrec2.h"
@@ -313,6 +315,7 @@ public:
   static csStringID index_name;
   static csStringID tangent_name;
   static csStringID binormal_name;*/
+  static csStringID texLightmapName;
 #endif
 
 public:
@@ -691,6 +694,7 @@ private:
   void ClearLMs ();
   void UpdateDirtyLMs ();
 
+  //csShaderVariableContextHelper svContextHelper;
 private:
   /**
    * Prepare the polygon buffer for use by DrawPolygonMesh.

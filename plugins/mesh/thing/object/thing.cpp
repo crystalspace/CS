@@ -103,7 +103,10 @@ public:
     csPolygonHandle::obj = obj;
     csPolygonHandle::index = index;
   }
-  virtual ~csPolygonHandle () { }
+  virtual ~csPolygonHandle () 
+  { 
+    SCF_DESTRUCT_IBASE ();
+  }
 
   SCF_DECLARE_IBASE;
 
@@ -166,6 +169,38 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 int csThing:: last_thing_id = 0;
 
+class csShaderVariableContext : public iShaderVariableContext
+{
+  csShaderVariableContextHelper svContextHelper;
+public:
+  SCF_DECLARE_IBASE;
+
+  csShaderVariableContext ()
+  {
+    SCF_CONSTRUCT_IBASE(0);
+  }
+  virtual ~csShaderVariableContext ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
+
+  virtual void AddVariable (csShaderVariable *variable)
+    { svContextHelper.AddVariable (variable); }
+
+  virtual csShaderVariable* GetVariable (csStringID name) const
+    { return svContextHelper.GetVariable (name); }
+
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+    { return GetVariable (name); }
+  
+    virtual void FillVariableList (csShaderVariableList *list) const
+    { svContextHelper.FillVariableList (list); }
+};
+
+SCF_IMPLEMENT_IBASE(csShaderVariableContext)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
+SCF_IMPLEMENT_IBASE_END
+
 //----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csThingStatic)
@@ -189,6 +224,7 @@ csStringID csThingStatic::color_name = csInvalidStringID;
 csStringID csThingStatic::index_name = csInvalidStringID;
 csStringID csThingStatic::tangent_name = csInvalidStringID;
 csStringID csThingStatic::binormal_name = csInvalidStringID;*/
+csStringID csThingStatic::texLightmapName = csInvalidStringID;
 #endif
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
@@ -246,6 +282,14 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
     tangent_name = strings->Request ("tangents");
     binormal_name = strings->Request ("binormals");
   }*/
+  if ((texLightmapName == csInvalidStringID))
+  {
+    csRef<iStringSet> strings = 
+      CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
+        "crystalspace.renderer.stringset", iStringSet);
+
+    texLightmapName = strings->Request ("tex lightmap");
+  }
 #endif
 }
 
@@ -255,6 +299,9 @@ csThingStatic::~csThingStatic ()
   delete[] obj_normals;
 
   UnprepareLMLayout ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csThingStatic::Prepare ()
@@ -474,6 +521,7 @@ void csThingStatic::DistributePolyLMs (
     csPolyTextureMapping* lm = sp->GetTextureMapping ();
     if ((lm == 0) || (!sp->flags.Check (CS_POLY_LIGHTING)))
     {
+      sp->polygon_data.useLightmap = false;
       rejectedPolys->polys.Push (polyIdx);
       continue;
     }
@@ -486,6 +534,7 @@ void csThingStatic::DistributePolyLMs (
     if ((lmw > thing_type->maxLightmapW) || 
       (lmh > thing_type->maxLightmapH)) 
     {
+      sp->polygon_data.useLightmap = false;
       rejectedPolys->polys.Push (polyIdx);
     }
     else
@@ -634,6 +683,23 @@ void csThingStatic::DistributePolyLMs (
   }
   delete curOutputPolys;
 
+  for (i = 0; i < litPolys.Length(); i++)
+  {
+    StaticSuperLM* slm = litPolys[i]->staticSLM;
+    for (int j = 0; j < litPolys[i]->polys.Length(); j++)
+    {
+      csPolygon3DStatic* sp = static_polygons[litPolys[i]->polys[j]];
+      const csRect& r = litPolys[i]->lmRects[j];
+
+      sp->polygon_data.useLightmap = true;
+      thing_type->G3D->GetTextureManager ()->GetLightmapRendererCoords (
+	slm->width, slm->height, 
+	r.xmin, r.ymin, r.xmax, r.ymax,
+	sp->polygon_data.tmapping->lmu1, sp->polygon_data.tmapping->lmv1,
+	sp->polygon_data.tmapping->lmu2, sp->polygon_data.tmapping->lmv2);
+      //sp->polygon_data.lmu1
+    }
+  }
 }
 
 void csThingStatic::UnprepareLMLayout ()
@@ -1132,6 +1198,8 @@ void csThingStatic::FillRenderMeshes (
     rm->material = pg.material;
     //rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->meshtype = CS_MESHTYPE_POLYGON;
+    rm->dynDomain = new csShaderVariableContext ();
+    rm->dynDomain->AddVariable (new csShaderVariable (texLightmapName));
 
     //rm->indexstart = iindex;
 
@@ -1719,6 +1787,14 @@ csThing::~csThing ()
 #ifdef CS_USE_NEW_RENDERER
   ClearRenderMeshes ();
 #endif
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiThingState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 char* csThing::GenerateCacheName ()
@@ -2387,7 +2463,10 @@ struct PolyMeshTimerEvent : public iTimerEvent
     SCF_CONSTRUCT_IBASE (0);
     PolyMeshTimerEvent::pmh = pmh;
   }
-  virtual ~PolyMeshTimerEvent () { }
+  virtual ~PolyMeshTimerEvent () 
+  { 
+    SCF_DESTRUCT_IBASE ();
+  }
   SCF_DECLARE_IBASE;
   virtual bool Perform (iTimerEvent*)
   {
@@ -2553,6 +2632,9 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();  
+
+    rm->dynDomain->GetVariable (static_data->texLightmapName)->SetValue (
+      i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
   }
 
   UpdateDirtyLMs (); // @@@ Here?
@@ -2783,13 +2865,21 @@ void csThing::Merge (csThing *other)
 
 void csThing::PrepareRenderMeshes ()
 {
-  static_data->FillRenderMeshes (renderMeshes, replace_materials, mixmode);
   int i;
+  for (i = 0; i < renderMeshes.Length () ; i++)
+  {
+    if (renderMeshes[i]->dynDomain != 0)
+      renderMeshes[i]->dynDomain->DecRef ();
+    delete renderMeshes[i];
+  }
+  renderMeshes.DeleteAll ();
+  static_data->FillRenderMeshes (renderMeshes, replace_materials, mixmode);
   materials_to_visit.DeleteAll ();
   for (i = 0 ; i < renderMeshes.Length () ; i++)
   {
     if (renderMeshes[i]->material->IsVisitRequired ())
       materials_to_visit.Push (renderMeshes[i]->material);
+    //renderMeshes[i]->dynDomain = 
   }
 }
 
@@ -3058,6 +3148,12 @@ csThingObjectType::~csThingObjectType ()
   delete blk_polidx6;
   delete blk_polidx20;
   delete blk_polidx60;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry *object_reg)

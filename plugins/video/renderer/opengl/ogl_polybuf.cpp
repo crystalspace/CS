@@ -76,65 +76,13 @@ void csTrianglesPerMaterial::ClearVertexArray ()
 
 //--------------------------------------------------------------------------
 
-/*csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap (int size,
-	int queue_num)
-{
-  region = new csSubRectangles (csRect (0, 0, size, size));
-
-  csTrianglesPerSuperLightmap::queue_num = queue_num;
-  cacheData = 0;
-  isUnlit = false;
-  initialized = false;
-  prev = 0;
-  cost = -1;
-}
-
-csTrianglesPerSuperLightmap::~csTrianglesPerSuperLightmap ()
-{
-  if (cacheData) cacheData->Clear();
-  delete region;
-}
-
-int csTrianglesPerSuperLightmap::CalculateCost ()
-{
-  if (cost != -1) return cost;
-  cost = rectangles.Length ();
-  return cost;
-}  */
-
-//--------------------------------------------------------------------------
-
-/*TrianglesSuperLightmapList::TrianglesSuperLightmapList ()
-{
-  first = 0;
-  last = 0;
-  dirty = true;
-}
-
-TrianglesSuperLightmapList::~TrianglesSuperLightmapList ()
-{
-  while (last)
-  {
-    csTrianglesPerSuperLightmap* aux = last->prev;
-    delete last;
-    last = aux;
-  }
-}
-
-void TrianglesSuperLightmapList::Add (csTrianglesPerSuperLightmap* t)
-{
-  if (first == 0) first = t;
-  t->prev = last;
-  last = t;
-}*/
-
-//--------------------------------------------------------------------------
-
 csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (
-  iVertexBufferManager* mgr) : csPolygonBuffer (mgr)
+  iVertexBufferManager* mgr, csGraphics3DOGLCommon* G3D) : 
+  csPolygonBuffer (mgr)
 {
   matCount = 0;
   vertices = 0;
+  csTriangleArrayPolygonBuffer::G3D = G3D;
 }
 
 csTriangleArrayPolygonBuffer::~csTriangleArrayPolygonBuffer ()
@@ -218,7 +166,7 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
    * the face normal, just add it to the vertex normal and normalize
    */
 
-  iSuperLightmap* slm = 0;
+  csGLSuperLightmap* slm = 0;
   if (lm)
     slm = ((csGLRendererLightmap*)lm)->slm;
 
@@ -254,10 +202,12 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
     };
 
     csPolyLMCoords lmc;
-    lm->GetRendererCoords (lmc.u1, lmc.v1,
-      lmc.u2, lmc.v2);
-
-
+    int lm_left, lm_top, lm_w, lm_h;
+    lm->GetSLMCoords (lm_left, lm_top, lm_w, lm_h);
+    G3D->txtmgr->GetLightmapRendererCoords (slm->w, slm->h,
+      lm_left, lm_top, lm_left + lm_w, lm_top + lm_h,  
+      lmc.u1, lmc.v1, lmc.u2, lmc.v2);
+    
     float lm_low_u = 0.0f, lm_low_v = 0.0f;
     float lm_high_u = 1.0f, lm_high_v = 1.0f;
     if (tmapping)
@@ -337,7 +287,8 @@ csTriangleArrayVertexBufferManager::~csTriangleArrayVertexBufferManager()
 
 iPolygonBuffer* csTriangleArrayVertexBufferManager::CreatePolygonBuffer ()
 {
-  csTriangleArrayPolygonBuffer* buf = new csTriangleArrayPolygonBuffer (this);
+  csTriangleArrayPolygonBuffer* buf = new csTriangleArrayPolygonBuffer (this,
+    g3d);
   return buf;
 }
 

@@ -91,6 +91,7 @@ protected:
   TrianglesList polygons;
 
   csRefArray<iMaterialHandle> materials;
+  csRef<csGraphics3DOGLCommon> G3D;
 
   /**
    * Vertices per triangle (every vertex is duplicated here for every
@@ -120,7 +121,8 @@ public:
   { return (iMaterialHandle*)(materials[t->matIndex]);}
 
   /// Constructor
-  csTriangleArrayPolygonBuffer (iVertexBufferManager* mgr);
+  csTriangleArrayPolygonBuffer (iVertexBufferManager* mgr,
+    csGraphics3DOGLCommon* G3D);
   /// Destructor
   virtual ~csTriangleArrayPolygonBuffer ();
 

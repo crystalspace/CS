@@ -176,10 +176,6 @@ public:
   csGLRendererLightmap ();
   virtual ~csGLRendererLightmap ();
 
-  /// Return the LM texture coords.
-  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2);
-    
   /// Return the LM texture coords, in pixels.
   virtual void GetSLMCoords (int& left, int& top, 
     int& width, int& height);
@@ -236,6 +232,8 @@ public:
 
   /// Dump the contents onto an image.
   virtual csPtr<iImage> Dump ();
+  
+  virtual iTextureHandle* GetTexture ();
 };
 
 /**
@@ -310,6 +308,10 @@ public:
 
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
+
+  virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
+    int lm_x1, int lm_y1, int lm_x2, int lm_y2,
+    float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
 
 #define CS_GL_FORMAT_TABLE(var) \

@@ -2541,8 +2541,12 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     };
 
     csPolyLMCoords lmc;
-    poly.rlm->GetRendererCoords (lmc.u1, lmc.v1,
-      lmc.u2, lmc.v2);
+    csGLSuperLightmap* slm = ((csGLRendererLightmap*)poly.rlm)->slm;
+    int lm_left, lm_top, lm_w, lm_h;
+    poly.rlm->GetSLMCoords (lm_left, lm_top, lm_w, lm_h);
+    txtmgr->GetLightmapRendererCoords (slm->w, slm->h,
+      lm_left, lm_top, lm_left + lm_w, lm_top + lm_h,  
+      lmc.u1, lmc.v1, lmc.u2, lmc.v2);
 
     float lm_low_u = 0.0f, lm_low_v = 0.0f;
     float lm_high_u = 1.0f, lm_high_v = 1.0f;
@@ -3000,8 +3004,12 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
   };
 
   csPolyLMCoords lmc;
-  poly.rlm->GetRendererCoords (lmc.u1, lmc.v1,
-    lmc.u2, lmc.v2);
+  csGLSuperLightmap* slm = ((csGLRendererLightmap*)poly.rlm)->slm;
+  int lm_left, lm_top, lm_w, lm_h;
+  poly.rlm->GetSLMCoords (lm_left, lm_top, lm_w, lm_h);
+  txtmgr->GetLightmapRendererCoords (slm->w, slm->h,
+    lm_left, lm_top, lm_left + lm_w, lm_top + lm_h,  
+    lmc.u1, lmc.v1, lmc.u2, lmc.v2);
 
   float lm_low_u = 0.0f, lm_low_v = 0.0f;
   float lm_high_u = 1.0f, lm_high_v = 1.0f;

@@ -56,6 +56,7 @@ csVertexBuffer::csVertexBuffer (iVertexBufferManager* mgr) : verts (0)
 csVertexBuffer::~csVertexBuffer ()
 {
   ((csVertexBufferManager*)mgr)->RemoveVBuf (this);
+  SCF_DESTRUCT_IBASE();
 }
 
 //--------------------------------------------- csVertexBufferManager -----//
@@ -82,6 +83,8 @@ csVertexBufferManager::~csVertexBufferManager()
   /// available
   for (int i=0; i < vClients.Length (); i++)
     vClients[i]->ManagerClosing ();
+    
+  SCF_DESTRUCT_IBASE();
 }
 
 void csVertexBufferManager::RemoveVBuf (iVertexBuffer* buf)

@@ -38,6 +38,7 @@ class csGLPolygonRenderer : public iPolygonRenderer,
   csRef<iRenderBuffer> index_buffer;
   csRef<iRenderBuffer> tangent_buffer;
   csRef<iRenderBuffer> binormal_buffer;
+  csRef<iRenderBuffer> lmcoords_buffer;
   uint rbIndexStart, rbIndexEnd;
 
   static csStringID vertex_name;
@@ -47,6 +48,7 @@ class csGLPolygonRenderer : public iPolygonRenderer,
   static csStringID index_name;
   static csStringID tangent_name;
   static csStringID binormal_name;
+  static csStringID lmcoords_name;
 
   void PrepareBuffers (uint& indexStart, uint& indexEnd);
 public:

@@ -43,6 +43,7 @@
 
 class csGLTextureHandle;
 class csGLTextureManager;
+class csGLTextureCache;
 
 class csGLTexture
 {
@@ -77,7 +78,7 @@ class csGLTextureHandle : public iTextureHandle
 {
 private:
   /// texturemanager handle
-  csGLTextureManager *txtmgr;
+  csRef<csGLTextureManager> txtmgr;
 
   
   GLenum sourceFormat, targetFormat;
@@ -106,12 +107,13 @@ private:
 
   csGLTexture* NewTexture (iImage *Image, bool ismipmap);
 
+  GLuint Handle;
 public:
   int bpp;
   int formatidx;
   int orig_width, orig_height;
   csArray<csGLTexture*> vTex;
-  csGLGraphics3D *G3D;
+  csRef<csGLGraphics3D> G3D;
   long size;
   int flags;
   int target;
@@ -122,6 +124,8 @@ public:
 
   csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLGraphics3D *iG3D);
+
+  csGLTextureHandle (int target, GLuint Handle, csGLGraphics3D *iG3D);
 
   virtual ~csGLTextureHandle ();
 
@@ -254,6 +258,8 @@ public:
   virtual iGraphics2D* GetCanvas ();
 
   void UpdateTexture ();
+
+  GLuint GetHandle ();
 };
 
 /*
@@ -326,15 +332,13 @@ class csGLSuperLightmap;
 /**
  * A single lightmap on a super lightmap.
  */
-class csGLRendererLightmap : iRendererLightmap
+class csGLRendererLightmap : public iRendererLightmap
 {
   friend class csGLSuperLightmap;
   friend class csGLGraphics3D;
 
   /// Texture coordinates (in pixels)
   csRect rect;
-  /// Texture coordinates ([0;1])
-  float u1, v1, u2, v2;
   /// The SLM this lightmap is a part of.
   csRef<csGLSuperLightmap> slm;
   /// Raw lightmap data.
@@ -350,10 +354,6 @@ public:
   csGLRendererLightmap ();
   virtual ~csGLRendererLightmap ();
 
-  /// Return the LM texture coords.
-  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2);
-    
   /// Return the LM texture coords, in pixels.
   virtual void GetSLMCoords (int& left, int& top, 
     int& width, int& height);
@@ -380,6 +380,8 @@ class csGLSuperLightmap : public iSuperLightmap
 
   /// Allocator for lightmaps on this SLM.
   csBlockAllocator<csGLRendererLightmap> RLMs;
+
+  csRef<iTextureHandle> th;
 
   /// Actually create the GL texture.
   void CreateTexture ();
@@ -410,6 +412,8 @@ public:
 
   /// Dump the contents onto an image.
   virtual csPtr<iImage> Dump ();
+
+  virtual iTextureHandle* GetTexture ();
 };
 
 /*
@@ -430,8 +434,6 @@ class csGLTextureManager : public iTextureManager
     int texelbytes;
   };
 
-  csRef<csGLGraphics3D> G3D;
-
   typedef csRefArray<csGLTextureHandle> csTexVector;
   /// List of textures.
   csTexVector textures;
@@ -448,6 +450,9 @@ class csGLTextureManager : public iTextureManager
 
   iObjectRegistry *object_reg;
 public:
+  csGLTextureCache* txtcache;
+  csRef<csGLGraphics3D> G3D;
+
   /// All SLMs currently in use.
   csArray<csGLSuperLightmap*> superLMs;
 
@@ -467,7 +472,7 @@ public:
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
-        csGLGraphics3D *G3D);
+        csGLGraphics3D *G3D, csGLTextureCache* txtcache);
 
   virtual ~csGLTextureManager () { }
 
@@ -598,6 +603,10 @@ public:
 
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
+
+  virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
+    int lm_x1, int lm_y1, int lm_x2, int lm_y2,
+    float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
 
 #define CS_GL_FORMAT_TABLE(var) \

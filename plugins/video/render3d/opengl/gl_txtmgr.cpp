@@ -99,13 +99,14 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
-  (G3D = iG3D)->IncRef();
-  (txtmgr = G3D->txtmgr)->IncRef();
+  G3D = iG3D;
+  txtmgr = G3D->txtmgr;
   has_alpha = false;
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
   size = 0;
   was_render_target = false;
+  Handle = 0;
 
   images = new csImageVector();
   image->IncRef();
@@ -134,13 +135,14 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
-  (G3D = iG3D)->IncRef();
-  (txtmgr = G3D->txtmgr)->IncRef();
+  G3D = iG3D;
+  txtmgr = G3D->txtmgr;
   has_alpha = false;
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
   size = 0;
   was_render_target = false;
+  Handle = 0;
 
   images = image;
   int i=0;
@@ -161,6 +163,17 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
   cachedata = 0;
 
   prepared = false;
+}
+
+csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
+				      csGLGraphics3D *iG3D)
+{
+  SCF_CONSTRUCT_IBASE(0);
+  G3D = iG3D;
+  txtmgr = G3D->txtmgr;
+  this->target = target;
+  csGLTextureHandle::Handle = Handle;
+  has_alpha = false;
 }
 
 csGLTextureHandle::~csGLTextureHandle()
@@ -793,6 +806,21 @@ void csGLTextureHandle::UpdateTexture ()
     G3D->txtcache->Uncache (this);
 }
 
+GLuint csGLTextureHandle::GetHandle ()
+{
+  if (Handle)
+  {
+    return Handle;
+  }
+  else
+  {
+    txtmgr->txtcache->Cache (this);
+    csTxtCacheData *cachedata =
+      (csTxtCacheData *)GetCacheData ();
+    return cachedata->Handle;
+  }
+}
+
 /*
  *New iMaterialHandle Implementation
  *done by Phil Aumayr (phil@rarebyte.com)
@@ -942,11 +970,14 @@ SCF_IMPLEMENT_IBASE_END
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
-        csGLGraphics3D *iG3D) : textures (16, 16), materials (16, 16)
+        csGLGraphics3D *iG3D, csGLTextureCache* txtcache) : 
+  textures (16, 16), materials (16, 16)
 {
   SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
   verbose = false;
+
+  csGLTextureManager::txtcache = txtcache;
 
   nameDiffuseTexture = iG3D->strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
@@ -1214,6 +1245,22 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
     }
   }
 }
+  
+void csGLTextureManager::GetLightmapRendererCoords (int slmWidth, int slmHeight,
+						    int lm_x1, int lm_y1, 
+						    int lm_x2, int lm_y2,
+						    float& lm_u1, float& lm_v1, 
+						    float &lm_u2, float& lm_v2)
+{
+  float islmW = 1.0f / (float)slmWidth;
+  float islmH = 1.0f / (float)slmHeight;
+  // Those offsets seem to result in a look similar to the software
+  // renderer... but not perfect yet.
+  lm_u1 = ((float)lm_x1 + 0.5f) * islmW;
+  lm_v1 = ((float)lm_y1 + 0.5f) * islmH;
+  lm_u2 = ((float)lm_x2 - 1.0f) * islmW;
+  lm_v2 = ((float)lm_y2 - 1.0f) * islmH;
+}
 
 //---------------------------------------------------------------------------
 
@@ -1272,19 +1319,10 @@ csGLRendererLightmap::~csGLRendererLightmap ()
 #endif
 }
 
-void csGLRendererLightmap::GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2)
-{
-  lm_u1 = u1;
-  lm_v1 = v1;
-  lm_u2 = u2;
-  lm_v2 = v2;
-}
-    
 void csGLRendererLightmap::GetSLMCoords (int& left, int& top, 
     int& width, int& height)
 {
-  left = rect.xmin; top  = rect.xmin;
+  left = rect.xmin; top  = rect.ymin;
   width = rect.Width (); height = rect.Height ();
 }
     
@@ -1375,6 +1413,9 @@ csGLSuperLightmap::~csGLSuperLightmap ()
 
 void csGLSuperLightmap::CreateTexture ()
 {
+  /*
+    @@@ Or hm... go through the texture cache?...
+   */
   if (texHandle == (GLuint)~0)
   {
     glGenTextures (1, &texHandle);
@@ -1434,6 +1475,7 @@ void csGLSuperLightmap::DeleteTexture ()
 
     glDeleteTextures (1, &texHandle);
     texHandle = (GLuint)~0;
+    th = 0;
   }
 }
 
@@ -1460,15 +1502,6 @@ csPtr<iRendererLightmap> csGLSuperLightmap::RegisterLightmap (int left, int top,
   rlm->slm = this;
   rlm->rect.Set (left, top, left + width, top + height);
 
-  float islmW = 1.0f / (float)w;
-  float islmH = 1.0f / (float)h;
-  // Those offsets seem to result in a look similar to the software
-  // renderer... but not perfect yet.
-  rlm->u1 = ((float)left + 0.5f) * islmW;
-  rlm->v1 = ((float)top  + 0.5f) * islmH;
-  rlm->u2 = ((float)(left + width) - 1.0f) * islmW;
-  rlm->v2 = ((float)(top  + height) - 1.0f) * islmH;
-
   numRLMs++;
 
   return csPtr<iRendererLightmap> (rlm);
@@ -1494,4 +1527,15 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
 
   return csPtr<iImage> (lmimg);
+}
+
+iTextureHandle* csGLSuperLightmap::GetTexture ()
+{
+  if (th == 0)
+  {
+    CreateTexture ();
+    th.AttachNew (new csGLTextureHandle (iTextureHandle::CS_TEX_IMG_2D, 
+      texHandle, txtmgr->G3D));
+  }
+  return th;
 }

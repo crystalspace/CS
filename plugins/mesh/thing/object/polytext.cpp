@@ -1561,6 +1561,7 @@ csLightingPolyTexQueue::csLightingPolyTexQueue (
 
 csLightingPolyTexQueue::~csLightingPolyTexQueue ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture *pt)

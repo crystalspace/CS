@@ -52,6 +52,8 @@ struct csPolygonRenderData
    * Double pointer to the array of vertices in object space.
    */
   csVector3** p_obj_verts;
+  /// Poly uses lightmap
+  bool useLightmap;
 };
 
 

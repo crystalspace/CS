@@ -930,11 +930,27 @@ void csTextureManagerOpenGL::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
   }
 }
 
+void csTextureManagerOpenGL::GetLightmapRendererCoords (
+  int slmWidth, int slmHeight, int lm_x1, int lm_y1, int lm_x2, int lm_y2,
+  float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
+{
+  float islmW = 1.0f / (float)slmWidth;
+  float islmH = 1.0f / (float)slmHeight;
+  // Those offsets seem to result in a look similar to the software
+  // renderer... but not perfect yet.
+  lm_u1 = ((float)lm_x1 + 0.5f) * islmW;
+  lm_v1 = ((float)lm_y1  + 0.5f) * islmH;
+  lm_u2 = ((float)lm_x2 - 1.0f) * islmW;
+  lm_v2 = ((float)lm_y2 - 1.0f) * islmH;
+}
+
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE_INCREF(csGLRendererLightmap)					
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLRendererLightmap)				
 SCF_IMPLEMENT_IBASE_REFOWNER(csGLRendererLightmap)				
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLRendererLightmap)				
 SCF_IMPLEMENT_IBASE_QUERY(csGLRendererLightmap)
   SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
 SCF_IMPLEMENT_IBASE_END
@@ -985,21 +1001,13 @@ csGLRendererLightmap::~csGLRendererLightmap ()
     delete[] pat;
   }
 #endif
+  SCF_DESTRUCT_IBASE();
 }
 
-void csGLRendererLightmap::GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2)
-{
-  lm_u1 = u1;
-  lm_v1 = v1;
-  lm_u2 = u2;
-  lm_v2 = v2;
-}
-    
 void csGLRendererLightmap::GetSLMCoords (int& left, int& top, 
     int& width, int& height)
 {
-  left = rect.xmin; top  = rect.xmin;
+  left = rect.xmin; top  = rect.ymin;
   width = rect.Width (); height = rect.Height ();
 }
     
@@ -1056,6 +1064,7 @@ void csGLRendererLightmap::GetMeanColor (float& r, float& g, float& b)
 SCF_IMPLEMENT_IBASE_INCREF(csGLSuperLightmap)					
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLSuperLightmap)				
 SCF_IMPLEMENT_IBASE_REFOWNER(csGLSuperLightmap)				
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLSuperLightmap)				
 SCF_IMPLEMENT_IBASE_QUERY(csGLSuperLightmap)
   SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
 SCF_IMPLEMENT_IBASE_END
@@ -1086,6 +1095,8 @@ csGLSuperLightmap::csGLSuperLightmap (csTextureManagerOpenGL* txtmgr,
 csGLSuperLightmap::~csGLSuperLightmap ()
 {
   DeleteTexture ();
+  
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGLSuperLightmap::CreateTexture ()
@@ -1175,15 +1186,6 @@ csPtr<iRendererLightmap> csGLSuperLightmap::RegisterLightmap (int left, int top,
   rlm->slm = this;
   rlm->rect.Set (left, top, left + width, top + height);
 
-  float islmW = 1.0f / (float)w;
-  float islmH = 1.0f / (float)h;
-  // Those offsets seem to result in a look similar to the software
-  // renderer... but not perfect yet.
-  rlm->u1 = ((float)left + 0.5f) * islmW;
-  rlm->v1 = ((float)top  + 0.5f) * islmH;
-  rlm->u2 = ((float)(left + width) - 1.0f) * islmW;
-  rlm->v2 = ((float)(top  + height) - 1.0f) * islmH;
-
   numRLMs++;
 
   return csPtr<iRendererLightmap> (rlm);
@@ -1209,4 +1211,9 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
 
   return csPtr<iImage> (lmimg);
+}
+
+iTextureHandle* csGLSuperLightmap::GetTexture ()
+{
+  return 0;
 }

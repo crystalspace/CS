@@ -504,6 +504,7 @@ void csShaderPass::Deactivate()
 void csShaderPass::SetupState (csRenderMesh *mesh, 
                                csArray<iShaderVariableContext*> &dynamicDomains)
 {
+  if (mesh->dynDomain) dynamicDomains.Insert(0, mesh->dynDomain);
   dynamicDomains.Insert(0, (iShaderVariableContext*)parent->GetParent ()->GetParent ());
   int i;
   for (i=0; i<buffercount; i++)
@@ -518,6 +519,8 @@ void csShaderPass::SetupState (csRenderMesh *mesh,
     csShaderVariable* var = texmappingRef[units[i]];
     if (var)
       var->GetValue (textures[i]);
+    else
+      textures[i] = 0;
   }
 
   if (dynamicVars.Length() > 0)
@@ -676,25 +679,21 @@ bool csShaderPass::Load (iDocumentNode* node)
               attribute = CS_VATTRIB_TEXCOORD;
               found = true;
             }
-            else if (strcmp (dest, "texture coordinate 0") == 0)
+            else //if (strcmp (dest, "texture coordinate 0") == 0)
             {
-              attribute = CS_VATTRIB_TEXCOORD0;
-              found = true;
-            }
-            else if (strcmp (dest, "texture coordinate 1") == 0)
-            {
-              attribute = CS_VATTRIB_TEXCOORD1;
-              found = true;
-            }
-            else if (strcmp (dest, "texture coordinate 2") == 0)
-            {
-              attribute = CS_VATTRIB_TEXCOORD2;
-              found = true;
-            }
-            else if (strcmp (dest, "texture coordinate 3") == 0)
-            {
-              attribute = CS_VATTRIB_TEXCOORD3;
-              found = true;
+	      static const char mapName[] = "texture coordinate %d";
+	      char buf[sizeof (mapName)];
+	      
+	      for (int u = 0; u < 8; u++)
+	      {
+	        sprintf (buf, mapName, u);
+		if (strcmp (dest, buf) == 0)
+		{
+		  attribute = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + u);
+		  found = true;
+		  break;
+		}
+	      }
             }
           }
           if (found)

@@ -98,6 +98,11 @@ struct csPolyTextureMapping
 
   /// Get original width.
   int GetOriginalWidth () const { return w_orig; }
+
+  /**
+   * Coordinates of the lightmap on the super lightmap, in renderer coords.
+   */
+  float lmu1, lmv1, lmu2, lmv2;
 };
 
 #endif // __CS_THING_POLYGON_H__

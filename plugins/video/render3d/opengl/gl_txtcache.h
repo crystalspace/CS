@@ -46,7 +46,7 @@ struct csTxtCacheData
 
 SCF_VERSION ( iGLTextureCache, 0,0,1)
 /**
- * Simle interface just to be able to marshal across plugin-border
+ * Simple interface just to be able to marshal across plugin-border
  */
 struct iGLTextureCache : iBase
 {

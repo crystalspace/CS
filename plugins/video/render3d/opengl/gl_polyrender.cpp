@@ -39,6 +39,7 @@ csStringID csGLPolygonRenderer::color_name    = csInvalidStringID;
 csStringID csGLPolygonRenderer::index_name    = csInvalidStringID;
 csStringID csGLPolygonRenderer::tangent_name  = csInvalidStringID;
 csStringID csGLPolygonRenderer::binormal_name = csInvalidStringID;
+csStringID csGLPolygonRenderer::lmcoords_name = csInvalidStringID;
 
 csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
 {
@@ -61,7 +62,8 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     (color_name     == csInvalidStringID) ||
     (index_name     == csInvalidStringID) ||
     (tangent_name   == csInvalidStringID) ||
-    (binormal_name  == csInvalidStringID))
+    (binormal_name  == csInvalidStringID) ||
+    (lmcoords_name  == csInvalidStringID))
   {
     iStringSet* strings = parent->GetStrings ();
 
@@ -72,6 +74,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     index_name    = strings->Request ("indices");
     tangent_name  = strings->Request ("tangents");
     binormal_name = strings->Request ("binormals");
+    lmcoords_name = strings->Request ("lightmap coordinates");
   }
 
   if (renderBufferNum != polysNum)
@@ -114,6 +117,10 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
     csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
+    lmcoords_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector2), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2, false);
+    csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
     int vindex = 0, iindex = 0;
     indexStart = rbIndexStart = iindex;
 
@@ -150,6 +157,41 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
         CS_ASSERT (false);	// @@@ NEED TO SUPPORT FLAT SHADING!!!
       }
       csTransform object2texture (t_m, t_v);
+
+      csTransform tex2lm;
+      if (static_data->useLightmap)
+      {
+	struct csPolyLMCoords
+	{
+	  float u1, v1, u2, v2;
+	};
+
+	csPolyLMCoords lmc;
+	/*lm->GetRendererCoords (lmc.u1, lmc.v1,
+	  lmc.u2, lmc.v2);*/
+	lmc.u1 = static_data->tmapping->lmu1;
+	lmc.v1 = static_data->tmapping->lmv1;
+	lmc.u2 = static_data->tmapping->lmu2;
+	lmc.v2 = static_data->tmapping->lmv2;
+
+	float lm_low_u = 0.0f, lm_low_v = 0.0f;
+	float lm_high_u = 1.0f, lm_high_v = 1.0f;
+	if (static_data->tmapping)
+	  static_data->tmapping->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+
+	float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
+	float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
+
+	tex2lm.SetO2T (
+	  csMatrix3 (lm_scale_u, 0, 0,
+		      0, lm_scale_v, 0,
+		      0, 0, 1));
+	tex2lm.SetO2TTranslation (
+	  csVector3 (
+	  (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0,
+	  (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0,
+	  0));
+      }
 
       /*
         Calculate the 'tangent' vector of this poly, needed for dot3.
@@ -191,6 +233,8 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 	  *normals++ = polynormal;
 	csVector3 t = object2texture.Other2This (vertex);
 	*texels++ = csVector2 (t.x, t.y);
+	csVector3 l = tex2lm.Other2This (t);
+	*lmcoords++ = csVector2 (l.x, l.y);
         *tangents++ = tangent;
         *binormals++ = binormal;
 
@@ -225,6 +269,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   vertex_buffer->Release ();
   tangent_buffer->Release ();
   binormal_buffer->Release ();
+  lmcoords_buffer->Release ();
 }
 
 iRenderBufferSource* csGLPolygonRenderer::GetBufferSource (uint& indexStart, 
@@ -257,6 +302,10 @@ iRenderBuffer* csGLPolygonRenderer::GetRenderBuffer (csStringID name)
   else if (name == texel_name)
   {
     return texel_buffer;
+  }
+  else if (name == lmcoords_name)
+  {
+    return lmcoords_buffer;
   }
   else if (name == normal_name)
   {

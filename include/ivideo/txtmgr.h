@@ -91,14 +91,6 @@ SCF_VERSION (iRendererLightmap, 1, 0, 0);
 struct iRendererLightmap : public iBase
 {
   /**
-   * Retrieve the coordinates of this lightmap in the superlightmap, in a 
-   * system the renderer uses internally. Calculate lightmap U/Vs within this
-   * bounds when they are intended to be passed to the renderer.
-   */
-  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2) = 0;
-    
-  /**
    * Retrieve the coordinates of this lightmap in the superlightmap, in the
    * 'absolute' system used by iSuperLightmap::RegisterLightmap().
    */
@@ -124,6 +116,8 @@ struct iSuperLightmap : public iBase
     
   /// Retrieve an image of the whole SLM (for debugging purposes)
   virtual csPtr<iImage> Dump () = 0;
+
+  virtual iTextureHandle* GetTexture () = 0;
 };
 
 SCF_VERSION (iTextureManager, 2, 3, 0);
@@ -249,6 +243,15 @@ struct iTextureManager : public iBase
    * Request maximum texture dimensions.
    */
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect) = 0;
+
+  /**
+   * Retrieve the coordinates of a lightmap in the its superlightmap, in a 
+   * system the renderer uses internally. Calculate lightmap U/Vs within this
+   * bounds when they are intended to be passed to the renderer.
+   */
+  virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
+    int lm_x1, int lm_y1, int lm_x2, int lm_y2,
+    float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2) = 0;
 };
 
 /** @} */

@@ -84,6 +84,7 @@ csTextureHandle::~csTextureHandle ()
   }
   DG_REM (this);
   FreeImage ();
+  SCF_DESTRUCT_IBASE();
 }
 
 void csTextureHandle::FreeImage ()
@@ -335,6 +336,7 @@ csTextureManager::~csTextureManager()
 {
   Clear ();
   //printf("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
+  SCF_DESTRUCT_IBASE();
 }
 
 void csTextureManager::read_config (iConfigFile* /*config*/)

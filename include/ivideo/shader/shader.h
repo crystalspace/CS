@@ -50,7 +50,7 @@ SCF_VERSION (iShaderVariableContext, 0,1,0);
  * This is a baseclass for all interfaces which provides shadervariables
  * both dynamically and static
  */
-struct iShaderVariableContext : iBase
+struct iShaderVariableContext : public iBase
 {
   /// Add a variable to this context
   virtual void AddVariable (csShaderVariable *variable) = 0;
@@ -70,7 +70,7 @@ SCF_VERSION (iShaderManager, 0, 1, 0);
 /**
  * A manager for all shaders. Will only be one at a given time
  */
-struct iShaderManager : iShaderVariableContext
+struct iShaderManager : public iShaderVariableContext
 {
   /// Create an empty shader
   virtual csPtr<iShader> CreateShader() = 0;
@@ -92,7 +92,7 @@ struct iShaderManager : iShaderVariableContext
 SCF_VERSION (iShaderRenderInterface, 0,0,1);
 
 /// Document me!@@@
-struct iShaderRenderInterface : iBase
+struct iShaderRenderInterface : public iBase
 {
   /// Get a implementationspecific object
   virtual void* GetPrivateObject(const char* name) = 0;
@@ -103,7 +103,7 @@ SCF_VERSION (iShader, 0,0,1);
 /**
  * Specific shader. Can/will be either render-specific or general
  */
-struct iShader : iShaderVariableContext
+struct iShader : public iShaderVariableContext
 {
   /// Set this shader's name
   virtual void SetName(const char* name) = 0;
@@ -144,7 +144,7 @@ SCF_VERSION (iShaderTechnique, 0,0,1);
 /**
  * One specific technique used by shader.
  */
-struct iShaderTechnique : iShaderVariableContext
+struct iShaderTechnique : public iShaderVariableContext
 {
   /**
    * Get technique priority. If there are several valid techniques
@@ -180,7 +180,7 @@ SCF_VERSION (iShaderPass, 0,0,1);
 /**
  * Description of a single pass in  a shader
  */
-struct iShaderPass : iShaderVariableContext
+struct iShaderPass : public iShaderVariableContext
 {
   /// Add a stream mapping
   virtual void AddStreamMapping (csStringID name, csVertexAttrib attribute) = 0;
@@ -239,7 +239,7 @@ SCF_VERSION (iShaderProgram, 0,0,2);
  * A shader-program is either a vertexprogram, fragmentprogram or any
  * other type of "program" utilizied by shader.
  */
-struct iShaderProgram : iShaderVariableContext
+struct iShaderProgram : public iShaderVariableContext
 {
   /// Sets this program to be the one used when rendering
   virtual void Activate(csRenderMesh* mesh) = 0;
@@ -273,7 +273,7 @@ struct iShaderProgram : iShaderVariableContext
 SCF_VERSION(iShaderProgramPlugin, 0,0,1);
 
 /// Document me!@@@
-struct iShaderProgramPlugin : iBase
+struct iShaderProgramPlugin : public iBase
 {
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;
   virtual bool SupportType(const char* type) = 0;

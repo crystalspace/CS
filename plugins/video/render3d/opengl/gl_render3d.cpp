@@ -733,9 +733,9 @@ bool csGLGraphics3D::Open ()
   }
 
   txtcache = csPtr<csGLTextureCache> (new csGLTextureCache (
-  	1024*1024*32, this));
+  	1024*1024*64, this));
   txtmgr.AttachNew (new csGLTextureManager (
-  	object_reg, GetDriver2D (), config, this));
+  	object_reg, GetDriver2D (), config, this, txtcache));
 
   glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
@@ -1223,7 +1223,7 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
   	CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data != (void*)-1)
   {
-    if (ext->glEnableVertexAttribArrayARB && attrib<100)
+    if (ext->glEnableVertexAttribArrayARB && attrib < CS_VATTRIB_SPECIFIC_FIRST)
     {
       ext->glEnableVertexAttribArrayARB (att);
       if (bind)
@@ -1256,17 +1256,26 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
             ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
           glEnableClientState (GL_COLOR_ARRAY);
 	  break;
-        case CS_VATTRIB_TEXCOORD:
-          glTexCoordPointer (buffer->GetComponentCount (), 
-            ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
-          glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-	  break;
         default:
+	  if ((attrib >= CS_VATTRIB_TEXCOORD0) && 
+	    (attrib <= CS_VATTRIB_TEXCOORD7))
+	  {
+	    int unit = attrib - CS_VATTRIB_TEXCOORD0;
+	    if (ext->CS_GL_ARB_multitexture)
+	    {
+	      ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	      ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	    }
+	    else if (unit != 0) return false;
+	    glTexCoordPointer (buffer->GetComponentCount (), 
+	      ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+	    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+	  }
 	  break;
       }
     }
     vertattrib[att] = buffer;
-    if (attrib < 100)
+    if (attrib < CS_VATTRIB_SPECIFIC_FIRST)
       vertattribenabled[att] = true;
     else
       vertattribenabled100[att] = true;
@@ -1277,14 +1286,14 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
 void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
 {
   int att;
-  if (attrib < 100)
+  if (attrib < CS_VATTRIB_SPECIFIC_FIRST)
   {
     if (vertattribenabled[attrib] == false) return;
     att = attrib;
   }
   else
   {
-    att = attrib-100;
+    att = attrib - CS_VATTRIB_SPECIFIC_FIRST;
     if (vertattribenabled100[att] == false) return;
   }
   if (ext->glDisableVertexAttribArrayARB && attrib<100) 
@@ -1308,18 +1317,27 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
       case CS_VATTRIB_PRIMARY_COLOR:
         glDisableClientState (GL_COLOR_ARRAY);
         break;
-      case CS_VATTRIB_TEXCOORD:
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-        break;
       default:
-        break;
+	if ((attrib >= CS_VATTRIB_TEXCOORD0) && 
+	  (attrib <= CS_VATTRIB_TEXCOORD7))
+	{
+	  int unit = attrib - CS_VATTRIB_TEXCOORD0;
+	  if (ext->CS_GL_ARB_multitexture)
+	  {
+	    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	  }
+	  else if (unit != 0) break;
+	  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	}
+	break;
     }
   }
   if (vertattrib[att])
   {
     vertattrib[att]->Release ();
     vertattrib[att] = 0;
-    if (attrib < 100)
+    if (attrib < CS_VATTRIB_SPECIFIC_FIRST)
       vertattribenabled[att] = false;
     else
       vertattribenabled100[att] = false;
@@ -1363,25 +1381,23 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   }
   else if (unit != 0) return false;
 
-  txtcache->Cache (txthandle);
   csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
     txthandle->GetPrivateObject ();
-  csTxtCacheData *cachedata =
-    (csTxtCacheData *)gltxthandle->GetCacheData ();
+  GLuint texHandle = gltxthandle->GetHandle ();
 
   switch (gltxthandle->target)
   {
     case iTextureHandle::CS_TEX_IMG_1D:
       statecache->Enable_GL_TEXTURE_1D (unit);
       if (bind)
-        statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle, unit);
+        statecache->SetTexture (GL_TEXTURE_1D, texHandle, unit);
       texunit[unit] = txthandle;
       texunitenabled[unit] = true;
       break;
     case iTextureHandle::CS_TEX_IMG_2D:
       statecache->Enable_GL_TEXTURE_2D (unit);
       if (bind)
-        statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle, unit);
+        statecache->SetTexture (GL_TEXTURE_2D, texHandle, unit);
       if (ext->CS_GL_EXT_texture_lod_bias)
       {
         glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
@@ -1393,14 +1409,14 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
     case iTextureHandle::CS_TEX_IMG_3D:
       statecache->Enable_GL_TEXTURE_3D (unit);
       if (bind)
-        statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
+        statecache->SetTexture (GL_TEXTURE_3D, texHandle, unit);
       texunit[unit] = txthandle;
       texunitenabled[unit] = true;
       break;
     case iTextureHandle::CS_TEX_IMG_CUBEMAP:
       statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
       if (bind)
-        statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle, unit);
+        statecache->SetTexture (GL_TEXTURE_CUBE_MAP, texHandle, unit);
       texunit[unit] = txthandle;
       texunitenabled[unit] = true;
       break;
@@ -1812,7 +1828,7 @@ void csGLGraphics3D::SetShadowState (int state)
       statecache->Enable_GL_STENCIL_TEST ();
       statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       //statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-      glPolygonOffset (-0.1, -4); 
+      glPolygonOffset (-0.1f, -4.0f); 
       statecache->Enable_GL_POLYGON_OFFSET_FILL ();
       break;
     case CS_SHADOW_VOLUME_PASS1:

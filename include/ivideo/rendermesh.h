@@ -39,6 +39,7 @@ class csReversibleTransform;
 struct iTextureHandle;
 struct iMaterialWrapper;
 struct iRenderBufferSource;
+struct iShaderVariableContext;
 
 /// Type of mesh
 enum csRenderMeshType
@@ -66,6 +67,7 @@ public:
     clip_z_plane = 0;
     do_mirror = false;
     indexstart = indexend = 0;
+    dynDomain = 0;
   }
 
   virtual ~csRenderMesh () {}
@@ -114,6 +116,8 @@ public:
 
   /// Transform to use for this mesh (object->camera)
   csReversibleTransform object2camera;
+
+  iShaderVariableContext* dynDomain;
 
   int* polyNumVerts;
   csPolyTextureMapping** polyTexMaps;

@@ -286,6 +286,7 @@ public:
   }
   virtual ~csOFSCbSoftware ()
   {
+    SCF_DESTRUCT_IBASE();
   }
   SCF_DECLARE_IBASE;
   virtual void FinishDraw (iGraphics2D*)
@@ -377,6 +378,7 @@ void csTextureHandleSoftware::DeleteMipmaps ()
 SCF_IMPLEMENT_IBASE_INCREF(csSoftRendererLightmap)					
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csSoftRendererLightmap)				
 SCF_IMPLEMENT_IBASE_REFOWNER(csSoftRendererLightmap)				
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csSoftRendererLightmap)				
 SCF_IMPLEMENT_IBASE_QUERY(csSoftRendererLightmap)
   SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
 SCF_IMPLEMENT_IBASE_END
@@ -405,17 +407,9 @@ csSoftRendererLightmap::csSoftRendererLightmap ()
 
 csSoftRendererLightmap::~csSoftRendererLightmap ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
-void csSoftRendererLightmap::GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2)
-{
-  lm_u1 = u1;
-  lm_v1 = v1;
-  lm_u2 = u2;
-  lm_v2 = v2;
-}
-    
 void csSoftRendererLightmap::GetSLMCoords (int& left, int& top, 
     int& width, int& height)
 {
@@ -456,6 +450,7 @@ csSoftSuperLightmap::csSoftSuperLightmap (int width, int height) : RLMs(32)
 
 csSoftSuperLightmap::~csSoftSuperLightmap ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoftSuperLightmap::FreeRLM (csSoftRendererLightmap* rlm)
@@ -476,15 +471,15 @@ csPtr<iRendererLightmap> csSoftSuperLightmap::RegisterLightmap (int left, int to
   rlm->slm = this;
   rlm->rect.Set (left, top, left + width, top + height);
 
-  rlm->u1 = left;
-  rlm->v1 = top;
-  rlm->u2 = left + width;
-  rlm->v2 = top  + height;
-
   return csPtr<iRendererLightmap> (rlm);
 }
 
 csPtr<iImage> csSoftSuperLightmap::Dump ()
+{
+  return 0;
+}
+
+iTextureHandle* csSoftSuperLightmap::GetTexture ()
 {
   return 0;
 }
@@ -635,4 +630,14 @@ void csTextureManagerSoftware::GetMaxTextureSize (int& w, int& h, int& aspect)
 {
   w = h = 2048;
   aspect = 32768;
+}
+
+void csTextureManagerSoftware::GetLightmapRendererCoords (
+  int slmWidth, int slmHeight, int lm_x1, int lm_y1, int lm_x2, int lm_y2,
+  float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
+{
+  lm_u1 = lm_x1;
+  lm_v1 = lm_y1;
+  lm_u2 = lm_x2 + 1;
+  lm_v2 = lm_y2 + 1;
 }
