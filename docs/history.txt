@@ -4,6 +4,11 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 5-Apr-2003
+        - Rhad improved the OpenAL sound renderer.
+          Major overhaul of implementation.
+          A background thread is now used to support streaming audio 
+          data. 
+          Read the source if interested, too many changes to list here.
 	- Rhad fixed some issues with oggdata.cpp.
           Initialize() member function now handles channels and frequency
           requests of default (-1).

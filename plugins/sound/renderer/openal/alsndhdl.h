@@ -19,24 +19,41 @@
 #ifndef __CS_SNDHDLOPENAL_H__
 #define __CS_SNDHDLOPENAL_H__
 
+#include "cssys/thread.h"
 #include "../common/shdl.h"
 
 class csSoundRenderOpenAL;
 class csSoundHandleOpenAL : public csSoundHandle
 {
-  csSoundRenderOpenAL *parent;
-  ALuint buffer;
+  csRef<csSoundRenderOpenAL> SoundRender;
+ 
 
 public:
   // constructor
-  csSoundHandleOpenAL(csSoundRenderOpenAL *srdr, iSoundData *snd);
+  csSoundHandleOpenAL(csSoundRenderOpenAL *srdr, iSoundData *snd,float BufferLengthSeconds,bool LocalBuffer);
   // destructor
   ~csSoundHandleOpenAL();
+
+  void Update_Time(csTicks ElapsedTime); 
+  void UpdateCount(long NumSamples);
+
+  /// Implimented to perform local buffer fills if needed
+  virtual void StartStream(bool Loop);
+  /// Returns the play cursor position in the virtual sound buffer
+  long GetPlayCursorPosition();
 
   csPtr<iSoundSource> CreateSource(int m);
   void vUpdate (void *buf, long samples);
 
-  ALuint GetID () { return buffer; }
+  void *local_buffer;
+  long buffer_length;
+  long NumSamples;
+  long buffer_writecursor;
+
+  /// The writecursor needs to be read by new sources to syncronize to the current position and updated by the background thread.
+  csRef<csMutex> mutex_WriteCursor;
+
+  
 };
 
 #endif // __CS_SNDHDLOPENAL_H__

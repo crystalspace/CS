@@ -42,7 +42,7 @@ public:
   void Prepare();
 
 private:
-  csSoundRenderOpenAL* parent;
+  csRef<csSoundRenderOpenAL> SoundRender;
   ALfloat position[3];
   ALfloat velocity[3];
   ALfloat orientation[6];
