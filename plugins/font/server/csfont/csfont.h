@@ -104,46 +104,17 @@ public:
     csBitmapMetrics bMetrics;
     csBitmapMetrics aMetrics;
 
-    Glyph () { bitmapSize = alphaSize = (size_t)~0; }  
+    Glyph () 
+    { 
+      memset (this, 0, sizeof (*this));
+      bitmapSize = alphaSize = (size_t)~0; 
+    }  
   };
 
   /**
-   * Array of a number of glyphs.
-   * To quickly access a specific glyph, basically a two-dimensional
-   * array is used. This is the "second" dimension, a "plane". A plane
-   * always contains #GLYPH_INDEX_LOWER_COUNT number of glyphs.
+   * Hash of a number of glyphs.
    */
-  struct PlaneGlyphs
-  {
-    /// Pointer to glyph information
-    Glyph entries[GLYPH_INDEX_LOWER_COUNT];
-  };
-
-  class PlaneGlyphElementHandler : public csArrayElementHandler<PlaneGlyphs*>
-  {
-  public:
-    static void Construct (PlaneGlyphs** address, PlaneGlyphs* const& src)
-    {
-      *address = 0;
-    }
-
-    static void Destroy (PlaneGlyphs** address)
-    {
-    }
-
-    static void InitRegion (PlaneGlyphs** address, int count)
-    {
-      memset (address, 0, count * sizeof (PlaneGlyphs*));
-    }
-  };
-
-  /**
-   * Array of a number of glyphs.
-   * This is the "first" dimension of the glyphs array, and consists of
-   * a variable number of "planes". If a plane doesn't contain a glyph,
-   * it doesn't take up memory.
-   */
-  csArray<PlaneGlyphs*, PlaneGlyphElementHandler> Glyphs;
+  csHash<Glyph, utf32_char> glyphs;
 
   char *Name;
   int Ascent, Descent;

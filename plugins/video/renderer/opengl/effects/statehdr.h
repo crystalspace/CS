@@ -20,6 +20,7 @@
 #ifndef __CS_STATEHANDLER_H__
 #define __CS_STATEHANDLER_H__
 
+#include "csutil/hashmap.h"
 #include "csutil/strset.h"
 #include "../ieffects/efvector4.h"
 

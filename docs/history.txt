@@ -31,6 +31,12 @@ chronological order.
 	  lightmap. Instead, the final LM is computed into a buffer whose
 	  contents are then sent to the renderer. The renderer now has to keep 
 	  a copy if it needs one.
+	- res fixed the DDS loader to properly clear the CS_IMGFMT_ALPHA flag
+	  if no alpha is present.
+	- res changed the default font server to store glyphs in a hash 
+	  instead of an array of arrays.
+	- res added ShrinkToFit() calls for some arrays in dsplex and fixed
+	  function shaders.
 12-Nov-2004
 	- Eric Sunshine fixed pthread check in checkpthread.m4 so that it works
 	  correctly with pre-C99 compilers. Previously, it was mixing variable

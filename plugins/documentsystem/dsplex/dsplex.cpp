@@ -258,7 +258,7 @@ SCF_IMPLEMENT_IBASE(csMplexDocumentSystem)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-csMplexDocumentSystem::csMplexDocumentSystem(iBase* parent)
+csMplexDocumentSystem::csMplexDocumentSystem(iBase* parent) : autolist (0, 1)
 {
   SCF_CONSTRUCT_IBASE(parent);
 }
@@ -299,6 +299,7 @@ bool csMplexDocumentSystem::Initialize (iObjectRegistry* object_reg)
 	orderedlist.Push (ds);
       }
     }
+    orderedlist.ShrinkBestFit();
 
     csRef<iBase> b (CS_QUERY_REGISTRY_TAG (object_reg, 
       "iDocumentSystem.Default"));

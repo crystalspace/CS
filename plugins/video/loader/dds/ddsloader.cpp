@@ -117,6 +117,10 @@ bool csDDSImageFile::Load (dds::Loader* loader)
   if (!img)
     return false;
   convert_rgba (img);
+  if (loader->GetFormat() == dds::FORMAT_RGB)
+    Format &= ~CS_IMGFMT_ALPHA;
+  else
+    CheckAlpha();
 
   mipmapcount = loader->GetMipmapCount () - 1;
   for (int i=0;i<mipmapcount;i++)

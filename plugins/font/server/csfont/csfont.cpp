@@ -496,7 +496,7 @@ SCF_IMPLEMENT_IBASE (csDefaultFont)
 SCF_IMPLEMENT_IBASE_END
 
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name, 
-			      CharRange* glyphs, int height, 
+			      CharRange* glyphRanges, int height, 
 			      int ascent, int descent,
 			      csGlyphMetrics* gMetrics,
 			      iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
@@ -518,10 +518,10 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   int n = 0;
   size_t bOffs = 0, aOffs = 0;
   MaxWidth = 0;
-  while (glyphs[n].charCount > 0)
+  while (glyphRanges[n].charCount > 0)
   {
-    int numGlyphs = glyphs[n].charCount;
-    utf32_char glyph = glyphs[n].startChar;
+    int numGlyphs = glyphRanges[n].charCount;
+    utf32_char glyph = glyphRanges[n].startChar;
     while (numGlyphs > 0)
     {
       int w = bMetrics[i].width + abs (bMetrics[i].left);
@@ -537,19 +537,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 	aSize = aMetrics[i].width * aMetrics[i].height;
       }
 
-      size_t gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
-	gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
-
-      if (Glyphs.Length () <= gidx1)
-      {
-	Glyphs.SetLength (gidx1 + 1);
-      }
-      PlaneGlyphs*& pg = Glyphs[gidx1];
-      if (pg == 0)
-      {
-	pg = new PlaneGlyphs;
-      }
-      Glyph& glyphData = pg->entries[gidx2];
+      Glyph glyphData;
 
       glyphData.bitmapOffs = bOffs;
       glyphData.bitmapSize = bSize;
@@ -564,6 +552,8 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
       }
 
       memcpy (&glyphData.gMetrics, &(gMetrics[i]), sizeof (csGlyphMetrics));
+
+      glyphs.Put (glyph, glyphData);
 
       glyph++;
       numGlyphs--;
@@ -583,11 +573,6 @@ csDefaultFont::~csDefaultFont ()
 
   Parent->NotifyDelete (this);
   delete [] Name;
-
-  for (size_t j = 0; j < Glyphs.Length(); j++)
-  {
-    delete Glyphs[j];
-  }
 
   SCF_DESTRUCT_IBASE();
 }
@@ -610,27 +595,17 @@ void csDefaultFont::GetMaxSize (int &oW, int &oH)
 
 bool csDefaultFont::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
-  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
-    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
-
-  if (Glyphs.Length () <= gidx1)
-  {
+  Glyph* glyphData = glyphs.GetElementPointer (c);
+  if (glyphData == 0) 
     return false;
-  }
-  PlaneGlyphs*& pg = Glyphs[gidx1];
-  if (pg == 0)
-  {
-    return false;
-  }
-  Glyph& glyphData = pg->entries[gidx2];
 
-  if ((glyphData.bitmapSize == (size_t)~0) && 
-      (glyphData.alphaSize == (size_t)~0))
+  if ((glyphData->bitmapSize == (size_t)~0) && 
+      (glyphData->alphaSize == (size_t)~0))
   {
     return false;
   }
 
-  metrics = glyphData.gMetrics;
+  metrics = glyphData->gMetrics;
 
   return true;
 }
@@ -640,27 +615,17 @@ csPtr<iDataBuffer> csDefaultFont::GetGlyphBitmap (utf32_char c,
 {
   if (bitData == 0) return 0;
 
-  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
-    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
-
-  if (Glyphs.Length () <= gidx1)
-  {
+  Glyph* glyphData = glyphs.GetElementPointer (c);
+  if (glyphData == 0) 
     return 0;
-  }
-  PlaneGlyphs*& pg = Glyphs[gidx1];
-  if (pg == 0)
-  {
-    return 0;
-  }
-  Glyph& glyphData = pg->entries[gidx2];
 
-  if (glyphData.bitmapSize == (size_t)~0) return 0;
+  if (glyphData->bitmapSize == (size_t)~0) return 0;
 
-  metrics = glyphData.bMetrics;
+  metrics = glyphData->bMetrics;
 
   csParasiticDataBuffer* db = 
-    new csParasiticDataBuffer (bitData, glyphData.bitmapOffs, 
-    glyphData.bitmapSize);
+    new csParasiticDataBuffer (bitData, glyphData->bitmapOffs, 
+    glyphData->bitmapSize);
 
   return csPtr<iDataBuffer> (db);
 }
@@ -670,27 +635,17 @@ csPtr<iDataBuffer> csDefaultFont::GetGlyphAlphaBitmap (utf32_char c,
 {
   if (alphaData == 0) return 0;
 
-  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
-    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
-
-  if (Glyphs.Length () <= gidx1)
-  {
+  Glyph* glyphData = glyphs.GetElementPointer (c);
+  if (glyphData == 0) 
     return 0;
-  }
-  PlaneGlyphs*& pg = Glyphs[gidx1];
-  if (pg == 0)
-  {
-    return 0;
-  }
-  Glyph& glyphData = pg->entries[gidx2];
 
-  if (glyphData.alphaSize == (size_t)~0) return 0;
+  if (glyphData->alphaSize == (size_t)~0) return 0;
 
-  metrics = glyphData.aMetrics;
+  metrics = glyphData->aMetrics;
 
   csParasiticDataBuffer* db = 
-    new csParasiticDataBuffer (alphaData, glyphData.alphaOffs, 
-    glyphData.alphaSize);
+    new csParasiticDataBuffer (alphaData, glyphData->alphaOffs, 
+    glyphData->alphaSize);
 
   return csPtr<iDataBuffer> (db);
 }
@@ -709,18 +664,9 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH,
   desc = GetDescent ();
 
   int defW = 0;
-  if (Glyphs.Length () > (CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT))
-  {
-    PlaneGlyphs* pg = Glyphs[(CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT)];
-    if (pg != 0)
-    {
-      Glyph& glyphData = 
-	pg->entries[(CS_FONT_DEFAULT_GLYPH & GLYPH_INDEX_LOWER_MASK)];
-      if ((glyphData.bitmapSize != (size_t)~0) || 
-	(glyphData.alphaSize != (size_t)~0))
-	defW = glyphData.gMetrics.advance;
-    }
-  }
+  Glyph* glyphData = glyphs.GetElementPointer (CS_FONT_DEFAULT_GLYPH);
+  if (glyphData != 0)
+    defW = glyphData->gMetrics.advance;
 
   int textLen = strlen ((char*)text);
   while (textLen > 0)
@@ -733,25 +679,16 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH,
     text += skip;
     textLen -= skip;
 
-    size_t gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
-      gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
-
-    if (Glyphs.Length () <= gidx1)
+    glyphData = glyphs.GetElementPointer (glyph);
+    if (glyphData == 0)
     {
       oW += defW;
       continue;
     }
-    PlaneGlyphs* pg = Glyphs[gidx1];
-    if (pg == 0)
-    {
-      oW += defW;
-      continue;
-    }
-    Glyph& glyphData = pg->entries[gidx2];
 
-    if ((glyphData.bitmapSize != (size_t)~0) || 
-      (glyphData.alphaSize != (size_t)~0))
-      oW += glyphData.gMetrics.advance;
+    if ((glyphData->bitmapSize != (size_t)~0) || 
+      (glyphData->alphaSize != (size_t)~0))
+      oW += glyphData->gMetrics.advance;
     else
       oW += defW;
   }
@@ -760,18 +697,9 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH,
 int csDefaultFont::GetLength (const char *text, int maxwidth)
 {
   int defW = 0;
-  if (Glyphs.Length () > (CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT))
-  {
-    PlaneGlyphs* pg = Glyphs[(CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT)];
-    if (pg != 0)
-    {
-      Glyph& glyphData = 
-	pg->entries[(CS_FONT_DEFAULT_GLYPH & GLYPH_INDEX_LOWER_MASK)];
-      if ((glyphData.bitmapSize != (size_t)~0) || 
-	(glyphData.alphaSize != (size_t)~0))
-	defW = glyphData.gMetrics.advance;
-    }
-  }
+  Glyph* glyphData = glyphs.GetElementPointer (CS_FONT_DEFAULT_GLYPH);
+  if (glyphData != 0)
+    defW = glyphData->gMetrics.advance;
 
   int n = 0;
   int textLen = strlen ((char*)text);
@@ -787,17 +715,10 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
 
     int charW = defW;
 
-    size_t gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
-      gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
-
-    if (Glyphs.Length () > gidx1)
+    glyphData = glyphs.GetElementPointer (glyph);
+    if (glyphData != 0)
     {
-      PlaneGlyphs*& pg = Glyphs[gidx1];
-      if (pg != 0)
-      {
-	Glyph& glyphData = pg->entries[gidx2];
-	charW = glyphData.gMetrics.advance;
-      }
+      charW = glyphData->gMetrics.advance;
     }
 
     if (maxwidth < charW)
@@ -843,20 +764,9 @@ int csDefaultFont::GetDescent ()
 
 bool csDefaultFont::HasGlyph (utf32_char c)
 {
-  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
-    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
+  Glyph* glyphData = glyphs.GetElementPointer (c);
 
-  if (Glyphs.Length () <= gidx1)
-  {
-    return false;
-  }
-  PlaneGlyphs*& pg = Glyphs[gidx1];
-  if (pg == 0)
-  {
-    return false;
-  }
-  Glyph& glyphData = pg->entries[gidx2];
-
-  return ((glyphData.bitmapSize != (size_t)~0) || 
-    (glyphData.alphaSize != (size_t)~0));
+  return ((glyphData != 0) 
+    && ((glyphData->bitmapSize != (size_t)~0) 
+    || (glyphData->alphaSize != (size_t)~0)));
 }

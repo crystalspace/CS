@@ -151,12 +151,14 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
 	    }
 	  }
       }
-    } 
+    }
+    texlayers.ShrinkBestFit();
   }
   else
   {
     synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.fp",
       node, "<fixedfp> node missing");
+    return false;
   }
   return true;
 }

@@ -147,6 +147,7 @@ public:
   // delete[] later
   csRGBpixel* LoadMipmap (int n);
 
+  int GetFormat () const { return format; }
 private:
   bool ReadHeader ();
   
