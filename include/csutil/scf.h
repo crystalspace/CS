@@ -20,6 +20,8 @@
 #ifndef __CSSCF_H__
 #define __CSSCF_H__
 
+class csVector;
+
 /*
     PLEASE USE 8-SPACE TAB WIDTH WHEN EDITING THIS FILE!
 */
@@ -626,6 +628,15 @@ struct iSCF : public iBase
    * because this will do a forced free of all loaded shared libraries).
    */
   virtual void Finish () = 0;
+
+  /**
+   * Retrieve a list of classnames that start with a specific string.
+   * So for instance QueryClassList ("crystalspace.sound.loader") will retrieve
+   * all the sound loader plugins like aiff, iff, wav, etc.
+   * The returning csVector is a vector of (const char*).
+   * If substring equals NULL a list of all classes will be returned.
+   */
+  virtual void QueryClassList (const char *substring, csVector &vList) = 0;
 };
 
 //-------------------------------------------- System-dependent defines -----//
