@@ -92,9 +92,10 @@ the @sc{sdl2d} canvas @ref{Common Command Line Options}
 @subsubheading Python
 
 Crystal Space contains support for Python scripting and thus has projects
-within it requires that Python be installed on your system.  If you wish to
-compile with Python support you must install Python 2.2 or later, which can be
-obtained from:
+within it requires that Python be installed on your system. Make sure you add the
+Python @emph{include} and @emph{libs} directories too @sc{smvc} so that the compiler
+can see those files. If you wish to compile with Python support you must install
+Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 

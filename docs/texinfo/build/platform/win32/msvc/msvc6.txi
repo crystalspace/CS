@@ -98,7 +98,7 @@ can be used as an alternative to the default Direct Draw canvas for use with
 the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
 have the supported 1.2.3 development runtime for your version of @sc{msvc} be
 it 5 or 6.  Please remeber to add the @file{include} and @file{lib} directories
-to the global MSVC options, so @sc{msvc} can see them.
+to the global @sc{msvc} options, so @sc{msvc} can see them.
 
 @uref{http://www.libsdl.org}
 
@@ -111,9 +111,10 @@ the @sc{sdl2d} canvas @ref{Common Command Line Options}
 @subsubheading Python
 
 Crystal Space contains support for Python scripting and thus has projects
-within it requires that Python be installed on your system.  If you wish to
-compile with Python support you must install Python 1.5.2 or later, which can be
-obtained from:
+within it requires that Python be installed on your system. Make sure you add the
+Python @emph{include} and @emph{libs} directories too @sc{smvc} so that the compiler
+can see those files. If you wish to compile with Python support you must install
+Python 1.5.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 
