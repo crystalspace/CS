@@ -383,8 +383,8 @@ void csGraphics3DSoftware::ScanSetup ()
         csScan_16_draw_pi_scanline_tex_zuse;
 
       ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_draw_pi_scanline_flat_gouraud_zfil_565 :
-        csScan_16_draw_pi_scanline_flat_gouraud_zfil_555;
+        csScan_16_draw_pi_scanline_flat_gouraud_zfil_555 :
+        csScan_16_draw_pi_scanline_flat_gouraud_zfil_565;
       ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = (pfmt.GreenBits == 5) ?
         csScan_16_draw_pi_scanline_flat_gouraud_zuse_555 :
         csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
@@ -2196,7 +2196,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   } /* endif */
 
   if (pqinfo.textured)
-    max_r >>= 8; max_g >>= 8; max_b >>= 8;
+    max_r >>= 8, max_g >>= 8, max_b >>= 8;
 
   //-----
   // The loop.
