@@ -1420,18 +1420,6 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
       meshes[i][j].do_mirror = camera->IsMirrored ();
     }
   }
-#else
-  SetupRenderMeshes ();
-
-  for (int m = 0; m < allRenderMeshes.Length(); m++)
-  {
-    allRenderMeshes[m]->clip_portal = clip_portal;
-    allRenderMeshes[m]->clip_plane = clip_plane;
-    allRenderMeshes[m]->clip_z_plane = clip_z_plane;
-    allRenderMeshes[m]->do_mirror = camera->IsMirrored ();
-    allRenderMeshes[m]->object2camera = tr_o2c;
-  }
-  currentMovable = movable;
 #endif
 
 // This is now done at rendertime each frame.
@@ -1445,14 +1433,81 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n)
+csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n, 
+							 iRenderView* rview,
+							 iMovable* movable)
 {
 #ifndef CS_USE_NEW_RENDERER
   n = 0;
   return 0;
 #else
-  n = allRenderMeshes.Length();
-  return allRenderMeshes.GetArray();
+  SetupObject ();
+
+  iGraphics3D* g3d = rview->GetGraphics3D ();
+  iCamera* camera = rview->GetCamera ();
+
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  csReversibleTransform tr_o2c;
+  tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+
+  //  float scale = factory->GetRenderScale();
+  //  csMatrix3 scale_mat(scale,0,0,0,scale,0,0,0,scale);
+
+  //  tr_o2c *= scale_mat;
+
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+    clip_z_plane) == false)
+  {
+    n = 0;
+    return 0;
+  }
+
+  SetupRenderMeshes ();
+  csDirtyAccessArray<csRenderMesh*>& meshes = rmHolder.GetUnusedMeshes ();
+
+  for (int m = 0; m < allRenderMeshes.Length(); m++)
+  {
+    csRenderMesh* rm;
+    if (m >= meshes.Length())
+    {
+      rm = new csRenderMesh (*allRenderMeshes[m]);
+      meshes.Push (rm);
+    }
+    else
+    {
+      rm = meshes[m];
+      *rm = *allRenderMeshes[m];
+    }
+
+    rm->clip_portal = clip_portal;
+    rm->clip_plane = clip_plane;
+    rm->clip_z_plane = clip_z_plane;
+    rm->do_mirror = camera->IsMirrored ();
+    rm->object2camera = tr_o2c;
+  }
+  currentMovable = movable;
+  // @@@ One movable for all meshes... not good.
+
+  n = meshes.Length();
+  return meshes.GetArray();
+
+  /*n = allRenderMeshes.Length();
+  return allRenderMeshes.GetArray();*/
 #endif
 }
 

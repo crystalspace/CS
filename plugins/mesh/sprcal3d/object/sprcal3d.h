@@ -32,6 +32,7 @@
 #include "csgeom/box.h"
 #include "csgeom/objmodel.h"
 #include "csgfx/shadervarcontext.h"
+#include "cstool/rendermeshholder.h"
 #include "imesh/spritecal3d.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
@@ -546,6 +547,7 @@ private:
   csRef<iStringSet> strings;
   csDirtyAccessArray<csRenderMesh*> allRenderMeshes;
   csArray<csArray<csRenderMesh> > renderMeshes;
+  csRenderMeshHolderMultiple rmHolder;
   csRef<iGraphics3D> G3D;
   iMovable* currentMovable;
 #endif
@@ -680,7 +682,8 @@ public:
   }
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual csRenderMesh **GetRenderMeshes (int &n);
+  virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview,
+    iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

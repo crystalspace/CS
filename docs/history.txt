@@ -49,6 +49,7 @@ chronological order.
 	- res changed the glrender3d to also call G2D->BeginDraw()/FinishDraw()
 	  before beginning/finishing 3d graphics.
 	- res moved the NV/ATI fragment shader setup to the ps1 plugin.
+	- res updated sprcal3d after Marten's recent changes.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader
