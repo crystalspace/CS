@@ -1,5 +1,104 @@
 The history order has been reversed so that new features are at the top.
 
+21-Aug-2000
+	- Andrew Zabolotny did the following:
+	    - Changed perfstat plugin to compute fps once per 1/2 second
+	      rather than once per 10 frames. This will compute more accurate
+	      values in high-fps environments and also makes fps numbers
+	      more steady. Also iPerfStat::SetResolution sets the interval
+	      in msecs rather than in frames.
+	    - Changed FPS display in walktest to display just two numbers
+	      after dot. I don't think you really care whenever you have
+	      20.111 or 20.112 fps :)
+	    - Created the iEvent interface. It is really a very special
+	      interface since its the first time (as far as I know) an SCF
+	      interface with member variables is used. However, this is
+	      supposed to work on all platforms. Be warned though.
+	    - csEvent is now just a particular implementation of iEvent.
+	      You can create your own objects implementing iEvent interface.
+	      PLEASE always use QueryInterface (or rather QUERY_INTERFACE
+	      macro) to get access to extended fields; NEVER do direct
+	      typecasts.
+	    - Added a new halo generation routine - csutil/halogen2.cpp. It
+	      is not used anywhere yet though. The algorithm has been
+	      borrowed from GIMP (`SuperNova' plugin).
+	    - Started to work on MazeD material support. Not finished
+	      though (even not compilable).
+	    - Improved material support. The MATERIALS() statement in
+	      world file now looks like this:
+		MATERIALS (
+		  MATERIAL 'material name' (
+		    TEXTURE ('texture name')
+		    COLOR (float, float, float)		; R,G,B = 0..1
+		    DIFFUSE (float)			; 0..1
+		    AMBIENT (float)			; 0..1
+		    REFLECTION (float)			; 0..1
+		  )
+		  ...
+		)
+	      I have added the GetFlatColor() method to iMaterial and
+	      iMaterialHandle. For now the flat_color_X members in
+	      iGraphics3D polygon structures are still present; however I
+	      hope one day they will be gone and a material handle will
+	      be always present, since materials also support flat color.
+	      For now only software renderer supports materials with flat
+	      colors; I hope with time other renderers will be also
+	      updated for this.
+	    - Renamed RGBcolor -> csRGBcolor and RGBpixel -> csRGBpixel.
+	      In general, we should think where to put all
+	      library-independent header files such as rgbpixel.h and
+	      cspixmap.h. I would say they could live in main include
+	      directory since those classes are absolutely independent
+	      and completely inline.
+	    - Changed the way engine defines and uses texturing. There are
+	      four polygon texturing types now: POLYTXT_NONE (no texturing,o
+	      useful when using materials without textures -- it defines no
+	      texturing parameters at all thus saves memory), POLYTXT_FLAT
+	      (flat-shading, only the angle between light and polygon
+	      normal is considered if CS_POLY_LIGHTING flag is set, and
+	      entire polygon is painted with one lighting value; every
+	      vertex has an U/V pair associated), POLYTXT_GOURAUD (every
+	      polygon vertex has a color and those colors are interpolated
+	      across scanlines) and finally POLYTXT_LIGHTMAP (a polygon
+	      which has an associated lightmap and a texture plane). Now
+	      it is possible to define and use objects which have flat-color
+	      but still receive light with Gouraud as well as without
+	      Gouraud interpolation; in general this open a whole new area
+	      for experimenting.
+	    - New keyword in world file inside the POLYGON () context:
+		TEXTURING (NONE | FLAT | GOURAUD | LIGHTMAP)
+	      This defines one of the texturing modes above.
+	    - MIXMODE() keyword is applicable to all texturing types
+	      except LIGHTMAP. Alpha transparency for such polygons can be
+	      defined in two ways:
+		POLYGON (... ALPHA (50) MIXMODE (MULTIPLY2))
+	      or
+		POLYGON (... MIXMODE (MULTIPLY2 ALPHA (0.5)))
+	      To be honest, I don't like having two different ways to
+	      specify alpha. I don't like the different scale either
+	      (0..1 and 0..100).  Polygon always keeps alpha as a value
+	      0..255 (and iGraphics3D always receives alpha in this
+	      range, the old 0..100 scale is gone).
+	      In general, I would say that giving colors and alpha as
+	      floating-point value looks like a bad idea. I would store both
+	      them as 0..255 value, or as a floating-point 0..1 value.
+	      Maybe it makes sense to change this in the new loader?
+	    - DECLARE_GROWING_ARRAY does not have a reference counter
+	      anymore. If you need a reference counter, use
+	      DECLARE_GROWING_ARRAY_REF. This gives slight less memory
+	      usage in some places. I have changed thing and polygon
+	      template objects to use growing arrays for vertices. This
+	      does not change memory footprint and gives better readable
+	      code (and maybe a little less binary size).
+	    - Simplified polygon template class a lot by moving most state
+	      variable into a csFlags variable. Added support for COLORS()
+	      keyword in polygon templates. GOURAUD keyword is now obsolete
+	      in both normal polygons and polygon templates; use
+	      TEXTURING (GOURAUD) instead. This gains us a little memory.
+	    - In addition to TEXNR() everywhere it appears MATTERIAL is
+	      accepted as a synonym; one day TEXNR should die.
+	- Norman Kramer updated the win32gcc.txi documentation to make it
+	  a little clearer.
 20-Aug-2000
 	- Norman Kramer updated the install documentation for the win32gcc
 	  target.
