@@ -880,6 +880,9 @@ provides a means to query static information about @sc{scf} interfaces, such
 as an interface's current version number.  Presently, this class allows access
 to the following static information:
 
+The macros @code{SCF_SET_REF()}, @code{SCF_INC_REF()}, and @code{SCF_DEC_REF()}
+have been removed. Instead you should use @code{csRef<>}.
+
 @itemize @bullet
 @item
 @code{GetVersion()}---Retrieves the interface's current version number.
