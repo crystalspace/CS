@@ -15,6 +15,8 @@ chronological order.
           changes as it is correct already. 'perl5tst' is now 'perl5test' and
           'netmntst' is now 'netmantest'. Also made these changes in CS/ root
           .cvsignore and also added 'partedit' and 'uninst'.
+        - Philip Wyett removed 'testapp', which jorrit added by accident in a
+          large recent commit.
 8-Aug-2003
         - Philip Wyett changed instances of NULL for 0 in sprcal3d plugins.
             - Added 3ds2lev and makedep to CS/ root .cvsignore.

@@ -17,4 +17,3 @@ SubInclude TOP apps tools ;
 SubInclude TOP apps tutorial ;
 SubInclude TOP apps video ;
 SubInclude TOP apps walktest ;
-SubInclude TOP apps testapp ;
