@@ -36,7 +36,7 @@ rule GristInstall
   for i in $(<)
   {
     if $(i:G) { files += $(i) ; }
-    else { files += $(i:G=$(>)) ; }
+    else { files += $(i:G=$(SUBDIR)) ; }
   }
   return $(files) ;
 }
@@ -46,7 +46,7 @@ rule GristInstall
 ##    relative to the includedir can be specified.
 rule InstallHeader
 {
-    local files = [ GristInstall $(<) : installheader ] ;
+    local files = [ GristInstall $(<) ] ;
     SEARCH on $(files) = $(SUBDIR) ;
     Depends install_include : [ DoInstall $(files) : $(includedir) $(2) ] ;
 }
@@ -55,7 +55,7 @@ rule InstallHeader
 ##    Installs data files
 rule InstallData
 {
-    local files = [ GristInstall $(<) : installdata ] ;
+    local files = [ GristInstall $(<) ] ;
     SEARCH on $(files) = $(SUBDIR) ;
     Depends install_data : [ DoInstall $(files) : $(appdatadir) $(2) ] ;
 }
@@ -64,7 +64,7 @@ rule InstallData
 ##    Installs configuration files
 rule InstallConfig
 {
-    local files = [ GristInstall $(<) : installconfig ] ;
+    local files = [ GristInstall $(<) ] ;
     SEARCH on $(files) = $(SUBDIR) ;
     Depends install_config : [ DoInstall $(files) : $(appconfdir) $(2) ] ;
 }
@@ -73,7 +73,7 @@ rule InstallConfig
 ##    Installs documentation files
 rule InstallDoc
 {
-    local files = [ GristInstall $(<) : installdoc ] ;
+    local files = [ GristInstall $(<) ] ;
     SEARCH on $(files) = $(SUBDIR) ;
     Depends install_doc : [ DoInstall $(files) : $(appdocdir) $(2) ] ;
 }
@@ -82,7 +82,7 @@ rule InstallDoc
 ##    Installs Unix manual files
 rule InstallMan
 {
-    local files = [ GristInstall $(<) : installman ] ;
+    local files = [ GristInstall $(<) ] ;
     SEARCH on $(files) = $(SUBDIR) ;
 
     local i ;

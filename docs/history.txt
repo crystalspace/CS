@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Apr-2004
+	- Eric Sunshine changed the Install* rules in install.jam so that they
+	  grist the source files with $(SUBDIR). This fixes a bug where
+	  like-named resources would be installed at the wrong location. For
+	  instance, win32/csosdefs.h was being installed as csutil/csosdefs.h,
+	  macosx/csosdef.h, unix/csosdefs.h, and win32/csosdefs.h.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.
