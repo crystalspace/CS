@@ -67,10 +67,10 @@ class csInputBinder : public iEventHandler
 
     /**
      * Bind one or two variables to an event.
-     *  Bind one or two 'int's to a csev*Move type event.
-     *   You can bind the two axes simultaneously or separately.
-     *   If yvar is NULL and the event is a y-axis type, xvar is used as yvar.
-     *  Or bind a button status '(int)bool' to a csev*Up/Down type event.
+     * Bind one or two 'int's to a csev*Move type event.
+     * You can bind the two axes simultaneously or separately.
+     * If yvar is NULL and the event is a y-axis type, xvar is used as yvar.
+     * Or bind a button status '(int)bool' to a csev*Up/Down type event.
      * Will modify the existing binding if any.
      * It is recommended that you use this in conjuction with csParseKeyDef
      * The axis (either x, y or both) is given by whether ev.*.x is greater
