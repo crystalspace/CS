@@ -107,6 +107,30 @@ HCURSOR csWin32CustomCursors::GetMouseCursor (iImage* image,
   return cursor.cursor;
 }
 
+static HBITMAP CreateCursorBitmapXP (HDC hDC, const BITMAPINFO* bitmapInfo,
+                                      DWORD dibFlags, const void* data)
+{
+  return CreateDIBitmap (hDC, &bitmapInfo->bmiHeader, dibFlags, data, 
+    bitmapInfo, DIB_RGB_COLORS);
+}
+
+static HBITMAP CreateCursorBitmapOther (HDC hDC, const BITMAPINFO* bitmapInfo,
+                                         DWORD dibFlags, const void* data)
+{
+  HDC memDC = CreateCompatibleDC (hDC);
+  HBITMAP bm = CreateCompatibleBitmap (hDC, bitmapInfo->bmiHeader.biWidth,
+    -bitmapInfo->bmiHeader.biHeight);
+  
+  SetDIBits (memDC, bm, 0, -bitmapInfo->bmiHeader.biHeight, data, bitmapInfo,
+    DIB_RGB_COLORS);
+  DeleteDC (memDC);
+  
+  return bm;
+}
+
+typedef HBITMAP (*CreateCursorBitmapFN)(HDC hDC, const BITMAPINFO* bitmapInfo,
+  DWORD dibFlags, const void* data);
+
 csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   iImage* image, const csRGBcolor* keycolor,  int hotspot_x, int hotspot_y)
 {
@@ -121,14 +145,23 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   bool doPaletted = (ver == cswinWinNT) 
     || (((image->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
     && !doAlpha);
+  CreateCursorBitmapFN CreateCursorBitmap = 
+    (ver >= cswinWinXP) ? &CreateCursorBitmapXP : &CreateCursorBitmapOther;
 
   const int imgW = image->GetWidth();
   const int imgH = image->GetHeight();
+  
+  if ((ver == cswinWin9x) 
+    && ((imgW != GetSystemMetrics (SM_CXCURSOR)) 
+      || (imgH != GetSystemMetrics (SM_CYCURSOR))))
+    // @@@ Support smaller cursors.
+    return CachedCursor ();
 
   uint8* pixels = 0;
   csRGBpixel* palette = 0;
   uint8* pixelsRGB = 0;
-  uint8* maskRGB = 0;
+  csRef<iImage> imageRGB;
+  csRGBpixel transp;
   if (doPaletted)
   {
     if (!csCursorConverter::ConvertTo8bpp (image, pixels, palette, keycolor))
@@ -136,11 +169,10 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   }
   else
   {
-    csRef<iImage> myImage = image->Clone();
-    csRGBpixel transp;
+    imageRGB = image->Clone();
     if (!doAlpha)
     {
-      myImage->SetFormat (CS_IMGFMT_TRUECOLOR 
+      imageRGB->SetFormat (CS_IMGFMT_TRUECOLOR 
 	| (image->GetFormat () & ~CS_IMGFMT_MASK));
 
       if (keycolor)
@@ -149,21 +181,18 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
       {
 	transp.Set (255, 0, 255);
 	if (image->GetFormat () & CS_IMGFMT_ALPHA)
-	  csCursorConverter::StripAlphaFromRGBA (myImage, transp);
+	  csCursorConverter::StripAlphaFromRGBA (imageRGB, transp);
       }
     }
     else
-      myImage->SetFormat (CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+      imageRGB->SetFormat (CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
 
     int scanlineSize = doAlpha ? imgW * 4 : ((imgW * 3) + 3) & ~3;
-    csRGBpixel* imageData = (csRGBpixel*)myImage->GetImageData();
+    csRGBpixel* imageData = (csRGBpixel*)imageRGB->GetImageData();
     pixelsRGB = new uint8[scanlineSize * imgH];
-    if (!doAlpha)
-      maskRGB = new uint8[scanlineSize * imgH];
     for (int y = 0; y < imgH; y++)
     {
       uint8* pixPtr = pixelsRGB + (y * scanlineSize);
-      uint8* maskPtr = maskRGB + (y * scanlineSize);
 
       for (int x = 0; x < imgW; x++)
       {
@@ -181,18 +210,12 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
 	    *pixPtr++ = 0;
 	    *pixPtr++ = 0;
 	    *pixPtr++ = 0;
-	    *maskPtr++ = 255;
-	    *maskPtr++ = 255;
-	    *maskPtr++ = 255;
 	  }
 	  else
 	  {
 	    *pixPtr++ = imageData->blue;
 	    *pixPtr++ = imageData->green;
 	    *pixPtr++ = imageData->red;
-	    *maskPtr++ = 0;
-	    *maskPtr++ = 0;
-	    *maskPtr++ = 0;
 	  }
 	}
 	imageData++;
@@ -237,29 +260,75 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
     }
   }
 
-  HDC hClientDC		    = GetDC (0);
+  HDC hClientDC	= GetDC (0);
 
-  HBITMAP XORbitmap = CreateDIBitmap (hClientDC, &bmpInfoMem->bmiHeader, CBM_INIT, 
-    doPaletted ? pixels : pixelsRGB, bmpInfoMem, DIB_RGB_COLORS);
+  HBITMAP XORbitmap = CreateCursorBitmap (hClientDC, bmpInfoMem, CBM_INIT, 
+    doPaletted ? pixels : pixelsRGB);
 
-  if (doPaletted)
+  HBITMAP ANDbitmap;
+  if (!doAlpha)
   {
-    for(i = 1; i < 256; i++)
+    // Create the monochrome AND mask
+    int destScanlineSize = (((imgW + 7) / 8) + 1) & ~1;
+    if (doPaletted)
     {
-      bmpInfoMem->bmiColors[i].rgbRed = 0;
-      bmpInfoMem->bmiColors[i].rgbGreen = 0;
-      bmpInfoMem->bmiColors[i].rgbBlue = 0;
+      int srcScanlineSize = (imgW + 1) & ~1;
+      CS_ALLOC_STACK_ARRAY(uint8, destLine, destScanlineSize + 1);
+      
+      for (int y = 0; y < imgH; y++)
+      {
+        uint8* dest = destLine;
+        memset (dest, 0, destScanlineSize);
+        uint8* src = pixels + y * srcScanlineSize;
+        
+        for (int x = 0; x < imgW; x++)
+        {
+          if (*src++ == 0)
+            *dest |= 1;
+          
+          if (((x + 1) % 8) == 0)
+            dest++;
+          else
+            *dest <<= 1;
+        }
+        *dest <<= 7 - (imgW % 8);
+        memcpy (pixels + y * destScanlineSize, destLine, destScanlineSize);
+      }
+      ANDbitmap = CreateBitmap (imgW, imgH, 1, 1, pixels);
     }
-    bmpInfoMem->bmiColors[0].rgbRed = 255;
-    bmpInfoMem->bmiColors[0].rgbGreen = 255;
-    bmpInfoMem->bmiColors[0].rgbBlue = 255;
+    else
+    {
+      csRGBpixel* imageData = (csRGBpixel*)imageRGB->GetImageData();
+      pixels = new uint8[imgH * destScanlineSize];
+      memset (pixels, 0, imgH * destScanlineSize);
+      
+      for (int y = 0; y < imgH; y++)
+      {
+        uint8* dest = pixels + y * destScanlineSize;
+        
+        for (int x = 0; x < imgW; x++)
+        {
+          if ((imageData++)->eq (transp))
+            *dest |= 1;
+          
+          if (((x + 1) % 8) == 0)
+            dest++;
+          else
+            *dest <<= 1;
+        }
+        *dest <<= 7 - (imgW % 8);
+      }
+      ANDbitmap = CreateBitmap (imgW, imgH, 1, 1, pixels);
+      delete[] pixels;
+    }
   }
-
-  HBITMAP ANDbitmap = CreateDIBitmap (hClientDC, &bmpInfoMem->bmiHeader, 
-    doAlpha ? 0 : CBM_INIT, /* Apparently, for alpha cursors, the AND mask 
-			       contents don't matter, but you need _some_
-			       bitmap */
-    doPaletted ? pixels : maskRGB, bmpInfoMem, DIB_RGB_COLORS);
+  else
+  {
+    ANDbitmap = CreateBitmap (imgW, imgH, 1, 1, 0);
+      /* Apparently, for alpha cursors, the AND mask 
+         contents don't matter, but you need _some_
+         bitmap */
+  }
 
   ICONINFO iconInfo;
   iconInfo.fIcon          = false;
@@ -277,7 +346,6 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   delete[] pixels;
   delete[] palette;
   delete[] pixelsRGB;
-  delete[] maskRGB;
 
   return CachedCursor (hCursor, true);
 }

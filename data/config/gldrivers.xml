@@ -266,9 +266,10 @@
     </rule>
     <rule description="Intel: Extreme Buggy Graphics">
       <conditions>
-	<regexp string="renderer" pattern="^Intel" />
+	<regexp string="vendor" pattern="^Intel" />
 	<!-- @@@ Check if we really need to be that cruel and shoot down all
 	     Intel gfx hardware. -->
+	<regexp string="platform" pattern="Win32" />
       </conditions>
       <applicable>
 	<usecfg>nolinearfog</usecfg>

@@ -200,10 +200,18 @@ bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels,
       sizeof (csRGBpixel) * 256);
     myImage->ApplyKeyColor ();
   }
+#ifdef DEBUG_WRITE_IMAGES
+  csDebugImageWriter::DebugImageWrite (myImage, "cursor-%s-8bpp.png",
+    image->GetName ());
+#endif
 
   if (myImage->GetFormat () & CS_IMGFMT_ALPHA)
   {
     StripAlphaFromPal8 (myImage);
+#ifdef DEBUG_WRITE_IMAGES
+    csDebugImageWriter::DebugImageWrite (myImage, "cursor-%s-stripped.png",
+      image->GetName ());
+#endif
   }
 
   pixels = new uint8[imgW * imgH];

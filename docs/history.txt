@@ -20,6 +20,8 @@ chronological order.
 	  compile group.
 	- res made some changes to GL text drawing, hopefully improving 
 	  compatibility.
+	- res made some changes to Win32 custom cursor handling, hopefully 
+	  improving compatibility.
 26-Dec-2004
 	- res removed some unneeded code from win32.cpp.
 	- res moved some code in heightmapgen into their own methods.
