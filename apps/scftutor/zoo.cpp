@@ -70,8 +70,13 @@ void Clone (iBase *iObject)
   newobj->DecRef ();
 }
 
-int main(int,char **)
+//Changing this causes a link2001 error for win32.
+//int main(int,char **)
+int main(int argc, char *argv[])
 {
+  //hack to hide warning.
+  argc;
+  argv;
 #if 0
   // This method requires you register dlls with scfreg (or manually) in scf.cfg
   csIniFile config ("scf.cfg");
