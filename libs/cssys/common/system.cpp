@@ -107,6 +107,8 @@ csSystemDriver::csSystemDriver()
 csSystemDriver::~csSystemDriver ()
 {
   Close ();
+
+  System = NULL;
   
   CHK (delete Mouse);
   CHK (delete Keyboard);
@@ -121,7 +123,6 @@ csSystemDriver::~csSystemDriver ()
 
   csCoUninitialize();
 
-  System = NULL;
   CHK (delete com_options);
 }
 
