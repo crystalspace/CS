@@ -7885,6 +7885,7 @@ WORLD (
       VERTICES (7,6,4,5)
       MATERIAL ('plasma')
       MIXMODE (ADD ())
+      LIGHTING (no)
       PORTAL ('corridor')
       ; matrix y rotation a is (cos(a),0,-sin(a),0,1,0,sin(a),0,cos(a))
       WARP (W(+25.6, -22.0, -12.6) MATRIX(1,0,0, 0,1,0, 0,0,1))
