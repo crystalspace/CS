@@ -1,0 +1,37 @@
+@c -*-texinfo-*-
+@node Visibility Culling
+@section Visibility Culling In Detail
+@cindex Visibility Culling
+@cindex Culling, Visibility
+@cindex octrees
+@cindex BSP trees
+@cindex portals
+@cindex c-buffer
+
+@emph{NOTE:} This section describes in detail how visibility culling in
+Crystal Space works or will work in the not-to-distant future.
+Not all that is described in this document is actually implemented. It
+only represents of the ideal implementation which lives in my head right
+now and which I'm planning to implement in the near future. Parts of the
+system are implemented though.
+
+@node sectors and portals
+@subsection Sectors and Portals
+
+A sector is the basic building block in CS. A world will be made out
+of several sectors connected with portals. Normally adjacent sectors
+can be connected with a straight portal but portals can also warp space
+so that you can connect any point in space to any other point in space.
+This effect can be used to create mirrors for example.
+
+This effect of portals makes them very powerful. It also means that
+you can have overlapping sectors and in general other weird portal
+constructs.
+
+Important for this discussion is that the visibility problem is
+mostly solved within one sector. Between the sectors visibility can
+easily be solved using the portal outline. When drawing through a
+portal everything that is behind that portal will be clipped to the
+portal polygon. This clipping currently happens in 2D which means
+that the geometry behind needs to be transformed to 2D (screen space).
+

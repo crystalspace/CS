@@ -39,6 +39,7 @@ Short-term cleanups that need to be done:
 	  (CompressShadowFrustrums).
 	- Eric Sunshine fixed several compilation warnings and errors
 	  throughout the project.
+	- Started document on visibility (not finished right now).
 27-Mar-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to line
 	  renderer.
