@@ -160,7 +160,7 @@ public:
     if (culling) return 2;
     else return 0;
   }
-  virtual csTriange* GetTriangles ()
+  virtual csTriangle* GetTriangles ()
   {
     if (culling)
     {
