@@ -11,11 +11,11 @@ The history order is reversed so that new features are at the top.
 	      installed, and always attempted to re-create the Swig-generated
 	      files when the cspython or pythmod modules were built.
 	    - Fixed cspythonclean and pythmodclean targets.  They were not
-	      removing all of the transient, generated files.  (In fact,
-	      "make pythmod ; make pythmodclean; make pythmod" would not rebuild
-	      the pythmod module at all for the second invocation.)
-	    - Fixed problem with non-standard use of $(MKDIR) which caused mkdir
-	      to attempt to create the pythmod transient directory twice.
+	      removing all of the transient, generated files.  (In fact, "make
+	      pythmod ; make pythmodclean; make pythmod" would not rebuild the
+	      pythmod module at all for the second invocation.)
+	    - Fixed problem with non-standard use of $(MKDIR) which caused
+	      mkdir to attempt to create the pythmod transient directory twice.
 	      The second attempt would fail.
 	    - It is once again possible to build pythmod when building the
 	      project in an external directory (outside of the source tree).
@@ -45,21 +45,23 @@ The history order is reversed so that new features are at the top.
 	      function, which only worked by chance before 5.8.
 	- res made the following changes to the script-generated extension 
 	  manager (from scripts/python):
-	    - extension to be used now must be explicitly requested via 
-	      Init<ext> () (e.g. InitGL_ARB_multitexture ())
-	    - only check once for every extension
-	    - emit names of functions not found
-	    - use of extensions can be enabled/disabled via config.
+	    - Extension to be used now must be explicitly requested via 
+	      Init<ext>() (e.g. InitGL_ARB_multitexture())
+	    - Only check once for every extension
+	    - Emit names of functions not found
+	    - Use of extensions can be enabled/disabled via config.
 	- res changed the OpenGL canvases to use the extension manager (to ease
 	  use of OpenGL extensions)
-	- duhprey (and also Dentoid) did the following (new renderer only):
-	    - changed sector so the engine is now responsible for coordinating draw
-	      by setting the shader and then drawing all objects which use that
-	      shader.
-	    - instead of drawing the objects now prepare the csRenderMesh for
+	- Duhprey (and also Dentoid) did the following (new renderer only):
+	    - Changed sector so the engine is now responsible for coordinating
+	      draw by setting the shader and then drawing all objects which use
+	      that shader.
+	    - Instead of drawing the objects now prepare the csRenderMesh for
 	      the engine
 	    - The renderer now expects the shader to be set before any calls to
-	      draw 
+	      draw
+	- Eric Sunshine fixed problems where csArray<T>::Pop() and Top() were
+	  accessing the non-existent `Length' instance variable.
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an
@@ -99,7 +101,7 @@ The history order is reversed so that new features are at the top.
 	      CS/mk/cache.mak prints the value of this variable as part of
 	      $(SYSMODIFIER).
 	- Matze did the following changes to the jam rules:
-	    - added the possibilities to use custom header scan patterns.
+	    - Added the possibilities to use custom header scan patterns.
 	      Added custom headerscanpatterns to the nasm and swig rules.
 	    - Improved the swig rules.
 	    - Cleaned the bison and flex rules a bit.

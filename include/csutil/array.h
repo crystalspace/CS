@@ -298,7 +298,7 @@ public:
   /// Pop an element from tail end of array.
   T Pop ()
   {
-    CS_ASSERT (length > 0);
+    CS_ASSERT (count > 0);
     T ret(root [count - 1]);
     DestroyElement (count - 1);
     SetLengthUnsafe (count - 1);
@@ -308,7 +308,7 @@ public:
   /// Return the top element but do not remove it.
   T const& Top () const
   {
-    CS_ASSERT (length > 0);
+    CS_ASSERT (count > 0);
     return root [count - 1];
   }
 
