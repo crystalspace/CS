@@ -2,29 +2,45 @@ SubDir TOP plugins aws ;
 
 FILES = [ Wildcard *.cpp *.h ] ;
 
-if $(CMD.BISON) && $(CMD.FLEX)
+if ! $(MSVCGEN_CONFIG) # Ugly, but we must take msvcgen.jam into account.
 {
-  FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp ] 
-	  skinlex.ll skinpars.yy ;
-  BisonFlags skinpars.yy : "-p aws" ;
+  if $(CMD.BISON) && $(CMD.FLEX)
+  {
+    FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp ] 
+	skinlex.ll skinpars.yy ;
+    BisonFlags skinpars.yy : "-p aws" ;
+
+    # skinlex.cpp includes the generated skinpars.hpp, so we must ensure that
+    # skinpars.hpp is generated before skinlex.cpp, since we do not want
+    # skinlex.cpp accidentally including the factory-supplied skinpars.hpp from
+    # the source directory.
+    local lex = [ DoObjectGrist skinlex.cpp ] ;
+    local parse = [ DoObjectGrist skinpars.cpp ] ;
+    Depends $(lex) : $(parse) ;
+
+    # Construct a rule for copying the generated sources from Bison and Flex
+    # into the source directories.
+    FILES = skinpars.cpp skinpars.hpp skinlex.cpp ;
+    FILES = $(FILES:G=awsfreeze) ;
+    for i in $(FILES)
+    {
+      SEARCH on $(i) = $(LOCATE_TARGET) ;
+      local targetfile = $(i:D=$(SUBDIR)) ;
+      
+      Copy $(targetfile) : $(i) ;
+      Depends $(targetfile) : $(i) ;
+      Depends awsfreeze : $(targetfile) ;
+    }
+
+    NotFile awsfreeze ;
+    Help awsfreeze : "Copy generated Bison/Flex files to source directory" :
+      verbatim ;
+  }
 }
 
 Help aws : "Alternate Windowing System plug-in" ;
-
-Plugin aws :
-	$(FILES)
-;
-
-if $(CMD.BISON) && $(CMD.FLEX)
-{
-  # skinlex.cpp includes the generated skinpars.hpp, so we must ensure that
-  # skinpars.hpp is generated before skinlex.cpp, since we do not want
-  # skinlex.cpp accidentally including the factory-supplied skinpars.hpp from
-  # the source directory.
-  local lex = [ DoObjectGrist skinlex.cpp ] ;
-  local parse = [ DoObjectGrist skinpars.cpp ] ;
-  Depends $(lex) : $(parse) ;
-}
+Plugin aws : $(FILES) ;
+LinkWith aws : cstool csgfx csgeom csutil ;
 
 if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
 {
@@ -43,26 +59,3 @@ if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
 # directory" in this case, but we do this for that extra measure of insurance.)
 C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
   [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
-
-LinkWith aws : cstool csgfx csgeom csutil ;
-
-if $(CMD.BISON) && $(CMD.FLEX)
-{
-  # Construct a rule for copying the generated sources from Bison and Flex into
-  # the source directories.
-  FILES = skinpars.cpp skinpars.hpp skinlex.cpp ;
-  FILES = $(FILES:G=awsfreeze) ;
-  for i in $(FILES)
-  {
-    SEARCH on $(i) = $(LOCATE_TARGET) ;
-    local targetfile = $(i:D=$(SUBDIR)) ;
-    
-    Copy $(targetfile) : $(i) ;
-    Depends $(targetfile) : $(i) ;
-    Depends awsfreeze : $(targetfile) ;
-  }
-
-  NotFile awsfreeze ;
-  Help awsfreeze : "Copy generated Bison/Flex files to source directory" :
-    verbatim ;
-}
