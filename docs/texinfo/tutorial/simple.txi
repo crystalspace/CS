@@ -305,8 +305,7 @@ Simple::Simple ()
   txtmgr->SetVerbose(true);
 
   // Initialize the texture manager
-  txtmgr->Initialize();
-  txtmgr->SetPalette();
+  txtmgr->ResetPalette();
   @dots{}
   // Create the world.
   Printf(MSG_INITIALIZATION, "Creating world...\n");
