@@ -135,6 +135,8 @@ public:
   {
     if (accessor) accessor->PreGetValue (this);
     value = TextureHandValue;
+    if (!value && TextureWrapValue)
+      value = TextureHandValue = TextureWrapValue->GetTextureHandle ();
     return true;
   }
 
@@ -222,8 +224,6 @@ public:
   {
     Type = TEXTURE;
     TextureWrapValue = value;
-    if (value)
-      TextureHandValue = value->GetTextureHandle ();
     return true;
   }
 

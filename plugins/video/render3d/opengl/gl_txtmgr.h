@@ -146,6 +146,8 @@ public:
     const csRGBpixel* transp_color, csRGBpixel& mean_color);
   void CheckAlpha (int w, int h, csRGBpixel *src, 
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
+  csRef<iImageVector>& GetImages () { return images; }
+  void Unprepare () { prepared = false; }
 
   SCF_DECLARE_IBASE;
 

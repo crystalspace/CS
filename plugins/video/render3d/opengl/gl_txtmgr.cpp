@@ -542,47 +542,44 @@ void csGLTextureHandle::CreateMipMaps()
   // Create each new level by creating a level 2 mipmap from previous level
   // we do this down to 1x1 as opengl defines it
 
-  iImageVector* prevImages = images;
+  //iImageVector* prevImages = images;
   csRef<iImageVector> thisImages =
       csPtr<iImageVector> (new csImageVector()); 
+  for (i=0; i < images->Length(); i++)
+  {
+    thisImages->AddImage (images->GetImage (i));
+  }
   csArray<int> nMipmaps;
 
-  int w = prevImages->GetImage (0)->GetWidth ();
-  int h = prevImages->GetImage (0)->GetHeight ();
+  int w = thisImages->GetImage (0)->GetWidth ();
+  int h = thisImages->GetImage (0)->GetHeight ();
   int nTex = 0;
 
-  for (i=0; i < prevImages->Length(); i++)
+  for (i=0; i < thisImages->Length(); i++)
   {
-    nMipmaps.Push (prevImages->GetImage (i)->HasMipmaps());
+    nMipmaps.Push (thisImages->GetImage (i)->HasMipmaps());
   }
   
   while (w != 1 || h != 1)
   {
     nTex++;
-    for (i=0; i<prevImages->Length();i++)
+    for (i=0; i<thisImages->Length();i++)
     {
       csRef<iImage> cimg;
       if (nMipmaps[i] != 0)
       {
-	cimg = prevImages->GetImage (i)->MipMap (nTex, tc);
+	cimg = images->GetImage (i)->MipMap (nTex, tc);
 	nMipmaps[i]--;
       }
       else
       {
-        cimg = prevImages->GetImage (i)->MipMap (1, tc);
+        cimg = thisImages->GetImage (i)->MipMap (1, tc);
       }
       if (txtmgr->sharpen_mipmaps)
       {
 	cimg = cimg->Sharpen (tc, txtmgr->sharpen_mipmaps);
       }
-      if (i >= thisImages->Length ())
-      {
-        thisImages->AddImage (cimg);
-      }
-      else
-      {
-	thisImages->SetImage (i, cimg);
-      }
+      thisImages->SetImage (i, cimg);
     }
 
     csGLTexture* ntex = NewTexture (thisImages->GetImage (0), true);
@@ -593,10 +590,6 @@ void csGLTextureHandle::CreateMipMaps()
     transform (thisImages, ntex);
     w = thisImages->GetImage (0)->GetWidth ();
     h = thisImages->GetImage (0)->GetHeight ();
-    for (i=0; i < thisImages->Length(); i++)
-    {
-      prevImages->SetImage (i, thisImages->GetImage (i));
-    }
   }
 }
 

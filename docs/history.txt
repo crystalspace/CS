@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Mar-2004
+	- res ported code to properly handle keycolored procedural textures
+	  over from the OR.
+	- res changed the NR glrender3d texture manager so that the images of
+	  a texture aren't replaced with the lowest mipmap(s).
+	- res slightly changed the behaviour for retrieving shader var texture
+	  values: now, a handle is requested from a wrapper when it's needed
+	  the first time. Some wrappers don't have a handle yet when the value
+	  is set, but get one later.
 24-Mar-2004
 	- Jorrit extended the standard output console so that it now also
 	  supports setting of the font through the config file. Added
