@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 3-Sep-2003
+	- Peter Amstutz changed nullmesh to properly initialize it's
+	  bounding box to a legal (albeit extremely small) value.
 	- Jorrit changed the engine to create the stringset object in the
 	  object registry when this is not already done by the new renderer.
 	  This is also done with old renderer.
