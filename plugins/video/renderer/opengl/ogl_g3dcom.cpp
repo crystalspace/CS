@@ -3213,7 +3213,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       // color will be used in all cases. We only do this if the
       // flat color from the material is different from white though.
       mesh.mat_handle->GetFlatColor (color);
-      if (color.red < 255 || color.green < 255 | color.blue < 255)
+      if (color.red < 255 || color.green < 255 || color.blue < 255)
         do_multiply_color = true;
     }
     flat_r = BYTE_TO_FLOAT (color.red);
