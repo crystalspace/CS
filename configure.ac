@@ -1866,8 +1866,12 @@ CS_SYS_PLUGIN_MAIN
 #------------------------------------------------------------------------------
 # Check for sizeof(long) to determine whether the platform is 32 or 64 bit.
 #------------------------------------------------------------------------------
-AC_CHECK_SIZEOF([long])
-AS_IF([test $ac_cv_sizeof_long = 8], [cs_long_bits=64], [cs_long_bits=32])
+AC_DEFUN([CS_CHECK_LONG_BITS],
+    [AC_CHECK_SIZEOF([long])
+    AS_IF([test $ac_cv_sizeof_long = 8],
+	[cs_long_bits=64], [cs_long_bits=32])])
+
+CS_CHECK_LONG_BITS
 CS_HEADER_PROPERTY([CS_PROCESSOR_SIZE], [$cs_long_bits])
 CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [$cs_long_bits])
 
@@ -2147,8 +2151,9 @@ AC_DEFUN([CS_CHECK_QSQRT],
     AC_REQUIRE([AC_PROG_CXX])
     AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
     AC_REQUIRE([CS_CHECK_FORCE_CPUSUBTYPE_ALL])
-    AS_IF([test $ac_compiler_gnu = yes],
-	[AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
+    AC_REQUIRE([CS_CHECK_LONG_BITS])
+    AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
+	[AS_IF([test $cs_long_bits = 32 && test $ac_compiler_gnu = yes],
 	    [cs_qsqrt_cflags="$cs_optimize_flags"
 	    AS_IF([test $cs_cv_prog_cxx_fpic != no],
 		[cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"])
@@ -2164,8 +2169,8 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		[CS_CREATE_TUPLE([$cs_qsqrt_cflags -I$srcdir/include])], [C++],
 		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no],
 		[$cs_cv_prog_cxx_enable_warnings \
-		$cs_cv_prog_cxx_enable_errors])])],
-	[cs_cv_cxx_qsqrt_ok=no])])
+		$cs_cv_prog_cxx_enable_errors])],
+	    [cs_cv_cxx_qsqrt_ok=no])])])
 
 CS_CHECK_QSQRT
 AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
@@ -2179,23 +2184,26 @@ AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
 # -----------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_QINT],
     [AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
+    AC_REQUIRE([CS_CHECK_LONG_BITS])
     AC_CACHE_CHECK([if csQint() functions correctly], [cs_cv_cxx_qint_ok],
-	[AC_LANG_PUSH([C++])
-	cs_cflags_save="$CXXFLAGS"
-	CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
-	AC_RUN_IFELSE(
-	    [AC_LANG_PROGRAM(
-		[static inline long double2int(double val) {
-		    long* l;
-		    val += 68719476736.0;
-		    l = (long*)((char*)&val + 2);
-		    return *l; }],
-		[exit(double2int(255.99) != 255);])],
-	    [cs_cv_cxx_qint_ok=yes],
-	    [cs_cv_cxx_qint_ok=no],
-	    [cs_cv_cxx_qint_ok=no])
-	CXXFLAGS="$cs_cflags_save"
-	AC_LANG_POP([C++])])])
+	[AS_IF([test $cs_long_bits = 32],
+	    [AC_LANG_PUSH([C++])
+	    cs_cflags_save="$CXXFLAGS"
+	    CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
+	    AC_RUN_IFELSE(
+		[AC_LANG_PROGRAM(
+		    [static inline long double2int(double val) {
+			long* l;
+			val += 68719476736.0;
+			l = (long*)((char*)&val + 2);
+			return *l; }],
+		    [exit(double2int(255.99) != 255);])],
+		[cs_cv_cxx_qint_ok=yes],
+		[cs_cv_cxx_qint_ok=no],
+		[cs_cv_cxx_qint_ok=no])
+	    CXXFLAGS="$cs_cflags_save"
+	    AC_LANG_POP([C++])],
+	    [cs_cv_cxx_qint_ok=no])])])
 
 CS_CHECK_QINT
 AS_IF([test $cs_cv_cxx_qint_ok = no],

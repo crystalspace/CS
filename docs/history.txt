@@ -16,6 +16,10 @@ chronological order.
 	  but differently sized. However, for csArray<>s etc. VC uses the same 
 	  code - which can't end well. Renamed the gmeshskelanim 'ac_*' structs
 	  to 'sac_*'.
+	- Eric Sunshine augmented csQsqrt() and csQint() checks in configure.ac
+	  in order to detect problems specific to 64-bit platforms. (For
+	  instance, on Intel 64-bit, csQint() gives incorrect results for
+	  negative numbers.)
 20-Feb-2005
 	- res made the following changes:
 	    - Added a flag that is set via a variable indicating whether the
