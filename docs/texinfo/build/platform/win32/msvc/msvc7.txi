@@ -248,14 +248,28 @@ produce @file{.exe} files.
 
 @emph{TODO}
 
-@quotation
+@subsubheading Compilation
+
+@itemize @bullet
+@item 
+Q. @emph{I get "Errors in post link" and later "file not found" errors.}
+
+A. Some problems with non-latin directory names have been reported (e.g.
+Hebrew). If your CS directory is under such a directory, try to move it to
+a directory which name has only Latin characters in it.
+@end itemize
+
+@subsubheading Miscellaneous
+
+@itemize @bullet
+@item
 Q. @emph{I have a problem that you haven't solved here!}
 
 A. Try sending a note to the Crystal Space mailing list and asking your
 question there.  @xref{Mailing Lists}.  Be sure to include any pertinent
 information, such as the operating system you are using, the compiler, which
 version of Crystal Space, and any special configuration information.
-@end quotation
+@end itemize
 
 
 

@@ -19,7 +19,7 @@
 *****************************************************************************/
 
 /**\file 
- * Advanced Windowing Systen
+ * Advanced Windowing System
  */
 
 #include "csutil/scf.h"

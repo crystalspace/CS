@@ -334,13 +334,20 @@ not use project dependencies.
 @subsubheading Frequently Asked Questions (@sc{faq})
 @anchor{MSVC6 FAQ}
 
-This is the list of frequently asked questions for the Win32 port of Crsytal
+This is the list of frequently asked questions for the Win32 port of Crystal
 Space.  Please consult this list if you are having difficulty building or using
 the project.
 
 @subsubheading Compilation
 
 @itemize @bullet
+@item 
+Q. @emph{I get "Errors in post link" and later "file not found" errors.}
+
+A. Some problems with non-latin directory names have been reported (e.g.
+Hebrew). If your CS directory is under such a directory, try to move it to
+a directory which name has only Latin characters in it.
+
 @item
 Q. @emph{I get errors like the following:}
 

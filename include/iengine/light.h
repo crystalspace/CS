@@ -23,7 +23,7 @@
 /**\file
  */
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_light
  * @{ */
  
 #include "csutil/scf.h"
@@ -47,7 +47,7 @@ struct iFlareHalo;
  */
 #define CS_LIGHT_THINGSHADOWS	0x00000001
 
-/** \internal
+/** 
  * If this flag is set, the halo for this light is active and is in the
  * engine's queue of active halos. When halo become inactive, this flag
  * is reset.
@@ -76,7 +76,7 @@ struct iFlareHalo;
 #define CS_ATTN_LINEAR    1
 /// inverse attenuation: light * (radius / distance)
 #define CS_ATTN_INVERSE   2
-/// realistic attenuation = light * (radius^2 / distance^2)
+/// realistic attenuation: light * (radius^2 / distance^2)
 #define CS_ATTN_REALISTIC 3
 /** @} */
 

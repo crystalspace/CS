@@ -161,6 +161,10 @@
  * \defgroup engine3d Crystal Space 3D Engine
  * @{ */
 
+	/**
+	 * \defgroup engine3d_light Lighting
+	 */
+ 
 /** @} */
  
 /**
