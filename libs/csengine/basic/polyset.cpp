@@ -207,7 +207,7 @@ csPolygon3D* csPolygonSet::GetPolygon (char* name)
   for (i = 0 ; i < num_polygon ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)polygons[i];
-    char* n = csNameObject::GetName (*p);
+    char* n = (char*)csNameObject::GetName (*p);
     if (n && !strcmp (n, name)) return p;
   }
   return NULL;
