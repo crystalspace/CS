@@ -205,8 +205,12 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # If SHELL is the Windows COMMAND or CMD, then we need "bash" for scripts.
+# Also, multiple commands are separated with "&" vs ";" w/ bash.
 ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
   RUN_SCRIPT = bash
+  COMMAND_DELIM = &
+else
+  COMMAND_DELIM = ;
 endif
 
 # How to make shared libs for cs-config
@@ -220,13 +224,23 @@ PLUGIN.POSTFLAGS=-mwindows -mconsole
 # uncomment the following to enable workaround for dllwrap bug
 DLLWRAPWRAP = $(RUN_SCRIPT) libs/cssys/win32/dllwrapwrap.sh
 
+COMPILE_RES = $(RUN_SCRIPT) libs/cssys/win32/compres.sh
+MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
+
 DO.SHARED.PLUGIN.CORE = \
-  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+  $(MAKEVERSIONINFO) $(OUT)$(@:$(DLL)=-version.rc) "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
+  $(COMPILE_RES) $(MODE) $(OUT)$(@:$(DLL)=-rsrc.o) $($@.WINRSRC) $(OUT)$(@:$(DLL)=-version.rc) $(COMMAND_DELIM) \
+  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(OUT)$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
 # and the console will not start minimized if a shortcut says it should
 DO.SHARED.PLUGIN.CORE += -mconsole
+
+DO.LINK.EXE = \
+	$(MAKEVERSIONINFO) $(OUT)$(@:$(EXE)=-version.rc) "$*" $(COMMAND_DELIM) \
+	$(COMPILE_RES) $(MODE) $(OUT)$(@:$(EXE)=-rsrc.o) $($@.WINRSRC) $(OUT)$(@:$(EXE)=-version.rc) $(COMMAND_DELIM) \
+	$(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) $(OUT)$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -49,7 +49,7 @@ MSVC.DSP += WALKTEST
 DSP.WALKTEST.NAME = walktest
 DSP.WALKTEST.TYPE = appcon
 
-WALKTEST.WINRSRC = libs/cssys/win32/rsrc/cs1.rc
+$(WALKTEST.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

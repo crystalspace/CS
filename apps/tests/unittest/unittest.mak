@@ -41,7 +41,7 @@ MSVC.DSP += UNITTEST
 DSP.UNITTEST.NAME = unittest
 DSP.UNITTEST.TYPE = appcon
 
-#WINRSRC.UNITTEST = libs/cssys/win32/rsrc/cs1.rc
+#$(UNITTEST.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

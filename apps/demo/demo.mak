@@ -41,7 +41,7 @@ MSVC.DSP += DEMO
 DSP.DEMO.NAME = csdemo
 DSP.DEMO.TYPE = appcon
 
-DEMO.WINRSRC = libs/cssys/win32/rsrc/cs1.rc
+$(DEMO.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

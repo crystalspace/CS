@@ -41,7 +41,7 @@ MSVC.DSP += CSLIGHT
 DSP.CSLIGHT.NAME = cslight
 DSP.CSLIGHT.TYPE = appcon
 
-CSLIGHT.WINRSRC = apps/tools/cslight/cslight.rc
+$(CSLIGHT.EXE).WINRSRC = apps/tools/cslight/cslight.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

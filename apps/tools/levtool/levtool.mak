@@ -40,7 +40,7 @@ MSVC.DSP += LEVTOOL
 DSP.LEVTOOL.NAME = levtool
 DSP.LEVTOOL.TYPE = appcon
 
-#WINRSRC.LEVTOOL = libs/cssys/win32/rsrc/cs1.rc
+#$(LEVTOOL.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
