@@ -49,6 +49,8 @@ chronological order.
 	  visibility culling will happen. Similarly the shadow manager should
 	  ONLY use the shadow polygon mesh. If that is not present no
 	  shadow casting should happen either.
+	- Jorrit removed the usage of the collision detection mesh in case
+	  there is no shadow mesh (from the stencil shadower).
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

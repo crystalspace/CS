@@ -247,8 +247,10 @@ void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHashMap& edge_stack)
 
 void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 {
-  if (csStencilShadowCacheEntry::model != model) {
-    printf ("New model %8.8x, old model %8.8x\n", model, csStencilShadowCacheEntry::model);
+  if (csStencilShadowCacheEntry::model != model)
+  {
+    //printf ("New model %8.8x, old model %8.8x\n", model,
+      //csStencilShadowCacheEntry::model);
     csStencilShadowCacheEntry::model = model;	
   }
 
@@ -257,9 +259,8 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   csRef<iPolygonMesh> mesh = model->GetPolygonMeshShadows ();
   if (!mesh)
   {
-    mesh = model->GetPolygonMeshColldet (); //@@@ CHECK IF WE WANT TO DO THIS
-    if (!mesh)
-      return; 
+    // No shadow casting for this object.
+    return; 
   }
 
   csVector3 *verts = mesh->GetVertices ();
@@ -357,7 +358,8 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     csVector3 normal = ab % bc;
     normal.Normalize();
 
-    for (int j = 2; j < poly->num_vertices; j ++) {
+    for (int j = 2; j < poly->num_vertices; j ++)
+    {
       v[ind] = verts[poly->vertices[0]];
       n[ind++] = normal;
       v[ind] = verts[poly->vertices[j-1]];
@@ -372,15 +374,12 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
 iRenderBuffer *csStencilShadowCacheEntry::GetRenderBuffer (csStringID name)
 {
-  if (name == shadow_vertex_name) {
+  if (name == shadow_vertex_name)
     return shadow_vertex_buffer;
-  }
-  if (name == shadow_normal_name) {
+  if (name == shadow_normal_name)
     return shadow_normal_buffer;
-  }
-  if (name == shadow_index_name) {
+  if (name == shadow_index_name)
     return active_index_buffer;
-  }
   return 0;
 }
 
@@ -419,7 +418,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
   if (!shadow) 
   {
     printf ("Unable to create new shader\n");
-	return false;
+    return false;
   }
 
   csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
@@ -476,10 +475,12 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
     shadowcache.Put ((csHashKey)mesh, shadowCacheEntry);
   }
 
-  csVector3 meshlightpos = light->GetCenter () * mesh->GetMovable()->GetFullTransform ();
+  csVector3 meshlightpos = light->GetCenter ()
+  	* mesh->GetMovable()->GetFullTransform ();
   int index_range, edge_start;
 
-  shadowCacheEntry->SetActiveLight (light, meshlightpos, index_range, edge_start);
+  shadowCacheEntry->SetActiveLight (light, meshlightpos, index_range,
+  	edge_start);
 
   csRenderMesh rmesh;
   rmesh.transform = &tr_o2c;
@@ -529,7 +530,8 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector)
   return;
 }
 
-void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* light)
+void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
+	iLight* light)
 {
   //int i;
   //test if light is in front of or behind camera
@@ -629,11 +631,14 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* 
         csVector3 radWorld = sp->GetMovable ()->GetTransform ().This2Other (rad);
         maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
   
-        if (!lightBehindCamera) {
+        if (!lightBehindCamera)
+	{
           // light is in front of camera
           //test if mesh is behind camera
           v = pos - camPos;
-        } else {
+        }
+	else
+	{
           v = pos - lightPos;
         }
         if (!(camPlaneZ*v < -maxRadius))
@@ -803,3 +808,4 @@ csPtr<iBase> csStencilShadowLoader::Parse (iDocumentNode* node,
 
   return csPtr<iBase> ((iRenderStep*)step);
 }
+
