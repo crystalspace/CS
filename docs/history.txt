@@ -33,6 +33,12 @@ The history order has been reversed so that new features are at the top.
 	      non-whitespace delimiters, such as "%f,%f,%f".)
 	    - Is now much more tolerant of Macintosh and Windows/DOS line
 	      terminators (CR and CRLF).
+	- Eric Sunshine made the following changes to WalkTest's 'coord' file
+	  handling:
+	    - WalkTest now saves and loads 'coord' files via VFS rather than
+	      via a physical filesystem.
+	    - The format of the 'coord' file has changed slightly.  The stored
+	      sector name is now quoted (with double-quotes) rather than bare.
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.
