@@ -4094,23 +4094,23 @@ static void *SwigiSectorListToiBase(void *ptr) {
     return (void *) dest;
 }
 
-#define iSectorList_GetSectorCount(_swigobj)  (_swigobj->GetSectorCount())
+#define iSectorList_GetCount(_swigobj)  (_swigobj->GetCount())
 static int
-wrap_iSectorList_GetSectorCount(lua_State *L)
+wrap_iSectorList_GetCount(lua_State *L)
 {
     int  _result;
     iSectorList * _arg0;
 
 {_arg0 = (iSectorList *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
-    _result = (int )iSectorList_GetSectorCount(_arg0);
+    _result = (int )iSectorList_GetCount(_arg0);
 {lua_pushnumber(L, (double)_result);}
 	return 1;
 }
 
-#define iSectorList_GetSector(_swigobj,_swigarg0)  (_swigobj->GetSector(_swigarg0))
+#define iSectorList_Get(_swigobj,_swigarg0)  (_swigobj->Get(_swigarg0))
 static int
-wrap_iSectorList_GetSector(lua_State *L)
+wrap_iSectorList_Get(lua_State *L)
 {
     iSector * _result;
     iSectorList * _arg0;
@@ -4119,14 +4119,14 @@ wrap_iSectorList_GetSector(lua_State *L)
 {_arg0 = (iSectorList *)LS_luaL_check_userdata(L, 1);}
 {_arg1 = ( int )luaL_check_long(L, 2);}
 	lua_settop(L, 0);
-    _result = (iSector *)iSectorList_GetSector(_arg0,_arg1);
+    _result = (iSector *)iSectorList_Get(_arg0,_arg1);
 {LS_luaL_pushuserpointer(L, _result, iSector_tag);}
 	return 1;
 }
 
-#define iSectorList_AddSector(_swigobj,_swigarg0)  (_swigobj->AddSector(_swigarg0))
+#define iSectorList_Add(_swigobj,_swigarg0)  (_swigobj->Add(_swigarg0))
 static int
-wrap_iSectorList_AddSector(lua_State *L)
+wrap_iSectorList_Add(lua_State *L)
 {
     iSectorList * _arg0;
     iSector * _arg1;
@@ -4134,13 +4134,13 @@ wrap_iSectorList_AddSector(lua_State *L)
 {_arg0 = (iSectorList *)LS_luaL_check_userdata(L, 1);}
 {_arg1 = (iSector *)LS_luaL_check_userdata(L, 2);}
 	lua_settop(L, 0);
-    iSectorList_AddSector(_arg0,_arg1);
+    iSectorList_Add(_arg0,_arg1);
 	return 0;
 }
 
-#define iSectorList_RemoveSector(_swigobj,_swigarg0)  (_swigobj->RemoveSector(_swigarg0))
+#define iSectorList_Remove(_swigobj,_swigarg0)  (_swigobj->Remove(_swigarg0))
 static int
-wrap_iSectorList_RemoveSector(lua_State *L)
+wrap_iSectorList_Remove(lua_State *L)
 {
     iSectorList * _arg0;
     iSector * _arg1;
@@ -4148,7 +4148,7 @@ wrap_iSectorList_RemoveSector(lua_State *L)
 {_arg0 = (iSectorList *)LS_luaL_check_userdata(L, 1);}
 {_arg1 = (iSector *)LS_luaL_check_userdata(L, 2);}
 	lua_settop(L, 0);
-    iSectorList_RemoveSector(_arg0,_arg1);
+    iSectorList_Remove(_arg0,_arg1);
 	return 0;
 }
 
@@ -4795,10 +4795,10 @@ cspace_initialize(lua_State *L)
 	lua_pushnumber(L, iCameraPosition_tag);
 	lua_setglobal(L, "iCameraPosition_tag");
 
-	lua_register(L, "iSectorList_GetSectorCount", wrap_iSectorList_GetSectorCount);
-	lua_register(L, "iSectorList_GetSector", wrap_iSectorList_GetSector);
-	lua_register(L, "iSectorList_AddSector", wrap_iSectorList_AddSector);
-	lua_register(L, "iSectorList_RemoveSector", wrap_iSectorList_RemoveSector);
+	lua_register(L, "iSectorList_GetCount", wrap_iSectorList_GetCount);
+	lua_register(L, "iSectorList_Get", wrap_iSectorList_Get);
+	lua_register(L, "iSectorList_Add", wrap_iSectorList_Add);
+	lua_register(L, "iSectorList_Remove", wrap_iSectorList_Remove);
 	lua_register(L, "iSectorList_FindByName", wrap_iSectorList_FindByName);
 	lua_register(L, "iSectorList_DecRef", wrap_iBase_DecRef);
 	iSectorList_tag = lua_newtag(L);
