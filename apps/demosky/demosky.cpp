@@ -93,6 +93,7 @@ DemoSky::DemoSky ()
 
 DemoSky::~DemoSky ()
 {
+  delete flock;
   if (view) view->DecRef ();;
   if(font) font->DecRef ();
   if (LevelLoader) LevelLoader->DecRef ();
@@ -109,7 +110,6 @@ DemoSky::~DemoSky ()
   delete sky_u;
   delete sky_d;
 
-//  delete flock;
 }
 
 void Cleanup ()
@@ -235,9 +235,6 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   // Create our world.
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
-  //LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
-  //csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
-
   sky = new csProcSky();
   sky->SetAnimated(false);
   sky_f = new csProcSkyTexture(sky);
@@ -266,8 +263,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (size, -simi, size));
   p->CreateVertex (csVector3 (size, -simi, -size));
   p->CreateVertex (csVector3 (-size, -simi, -size));
-  //sky_d->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
-  SetTexSpace (sky_d, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+
+  SetTexSpace (sky_d, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -276,8 +274,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (size, simi, -size));
   p->CreateVertex (csVector3 (size, simi, size));
   p->CreateVertex (csVector3 (-size, simi, size));
-  //sky_u->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
-  SetTexSpace (sky_u, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+
+  SetTexSpace (sky_u, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -286,8 +285,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (size, size, simi));
   p->CreateVertex (csVector3 (size, -size, simi));
   p->CreateVertex (csVector3 (-size, -size, simi));
-  //sky_f->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
-  SetTexSpace (sky_f, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+
+  SetTexSpace (sky_f, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -296,8 +296,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (simi, size, -size));
   p->CreateVertex (csVector3 (simi, -size, -size));
   p->CreateVertex (csVector3 (simi, -size, size));
-  //sky_r->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
-  SetTexSpace (sky_r, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+
+  SetTexSpace (sky_r, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -306,8 +307,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-simi, size, size));
   p->CreateVertex (csVector3 (-simi, -size, size));
   p->CreateVertex (csVector3 (-simi, -size, -size));
-  //sky_l->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
-  SetTexSpace (sky_l, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+
+  SetTexSpace (sky_l, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -316,16 +318,16 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-size, size, -simi));
   p->CreateVertex (csVector3 (-size, -size, -simi));
   p->CreateVertex (csVector3 (size, -size, -simi));
-  //sky_b->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
-  SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+
+  SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
   walls_state->DecRef ();
   walls->DecRef ();
 
-  LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
+  LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif")->DecRef ();
   iMaterialWrapper *sg = engine->GetMaterialList ()->FindByName("seagull");
-  flock = new Flock(engine, 10, SCF_QUERY_INTERFACE(sg, iMaterialWrapper), 
-    SCF_QUERY_INTERFACE(room, iSector));
+  flock = new Flock(engine, 10, sg, room);
 
   engine->Prepare ();
 
@@ -418,6 +420,7 @@ bool DemoSky::HandleEvent (iEvent &Event)
 Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
 {
   printf("Creating flock of %d birds\n", num);
+  mat->IncRef ();
   nr = num;
   spr = new iMeshWrapper* [nr];
   speed = new csVector3[nr];
@@ -458,7 +461,7 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     sprstate->GetVertices()[1].color_init.Set(1.0,1.0,1.0);
     sprstate->GetVertices()[2].color_init.Set(1.0,1.0,1.0);
     sprstate->GetVertices()[3].color_init.Set(1.0,1.0,1.0);
-    //sprstate->CreateRegularVertices(4, true);
+
     float sz = 1.0;
     sprstate->GetVertices()[0].pos.Set(-sz, sz);
     sprstate->GetVertices()[0].u = 0.2;
@@ -475,7 +478,8 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     sprstate->DecRef();
 
   }
-//  state->DecRef();
+  state->DecRef();
+  fact->DecRef ();
 }
 
 
