@@ -18,17 +18,14 @@
 
 */
 
-#ifndef FORCE_H
-#define FORCE_H
+#ifndef __CT_FORCE_H__
+#define __CT_FORCE_H__
 
 #include "csphyzik/phyztype.h"
 #include "csphyzik/math3d.h"
-#include "csphyzik/linklist.h"
 
 class ctReferenceFrame;
 class ctDynamicEntity;
-class ctPhysicalEntity;
-
 
 // parent class for all forces
 class ctForce
@@ -54,22 +51,6 @@ public:
 	ctVector3 origin;
 	ctReferenceFrame &RF;
 	
-};
-
-
-// parent class for all N-body forces 
-class ctNBodyForce : public ctForce
-{
-public:
-	ctNBodyForce();
-	ctNBodyForce( ctReferenceFrame &rf );
-	virtual ~ctNBodyForce();
-
-	// add another body that this force works on
-	virtual void add_body( ctPhysicalEntity *bod ){ body_vector.add_link( bod ); }
-
-	ctLinkList<ctPhysicalEntity> body_vector;  
-
 };
 
 #endif

@@ -35,6 +35,15 @@ class ctSolver;
 // parent class of all physical bodies ( or even some non-physical ones... )
 class ctEntity
 {
+protected:
+  int state_offset;
+
+  // object responsible for calculating the change in state wrt time 
+  // uses forces list and current state to do this.
+  ctSolver *solver;
+
+  ctLinkList<ctForce> forces;   // list of all forces affecting this object
+
  public:
 /*
 **      Constructors/destructors/statics
@@ -94,15 +103,6 @@ class ctEntity
 
   // flags
   unsigned long flags;
-
-protected:
-  int state_offset;
-
-  // object responsible for calculating the change in state wrt time 
-  // uses forces list and current state to do this.
-  ctSolver *solver;
-
-  ctLinkList<ctForce> forces;   // list of all forces affecting this object
 };
 
 #endif

@@ -18,54 +18,26 @@
 
 */
 
-#include "sysdef.h"
+#ifndef __CT_BODYFORCE_H__
+#define __CT_BODYFORCE_H__
+
 #include "csphyzik/force.h"
-#include "csphyzik/phyzent.h"
-#include "csphyzik/bodyforce.h"
-#include "csphyzik/refframe.h"
+#include "csphyzik/linklist.h"
 
-ctForce::ctForce() :
-  direction(0), origin(0), RF( ctReferenceFrame::universe() )
+class ctPhysicalEntity;
+
+// parent class for all N-body forces 
+class ctNBodyForce : public ctForce
 {
-	RF.add_ref( RF );
-	magnitude = 1.0;
-}
+public:
+	ctLinkList<ctPhysicalEntity> body_vector;  
 
-ctForce::ctForce( ctReferenceFrame &ref ) :
-  direction(0), origin(0), RF( ref )
-{
-	RF.add_ref( RF );
-}
+	ctNBodyForce();
+	ctNBodyForce( ctReferenceFrame &rf );
+	virtual ~ctNBodyForce();
 
-ctForce::~ctForce()
-{
-	RF.remove_ref( RF );
-}
+	// add another body that this force works on
+	virtual void add_body( ctPhysicalEntity *bod ){ body_vector.add_link( bod ); }
+};
 
-
-ctNBodyForce::ctNBodyForce()
-{
-
-}
-
-ctNBodyForce::ctNBodyForce( ctReferenceFrame &ref ) : ctForce( ref )
-{
-}
-
-ctNBodyForce::~ctNBodyForce()
-{
-ctPhysicalEntity *pe;
-	
-	pe = body_vector.get_first();
-	while( pe ){
-		body_vector.delete_link( pe );
-		pe = body_vector.get_next();
-	}
-
-/*	for( int i = 0; i < body_vector.get_size(); i++ ){
-		pe = body_vector[i];
-		if( pe ){
-			pe->remove_force( this );
-		}
-	}*/
-}
+#endif

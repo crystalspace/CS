@@ -22,10 +22,10 @@
 #define ctPhysicalEntity_H
 
 #include "csphyzik/phyztype.h"
-#include "csphyzik/force.h"
 #include "csphyzik/linklist.h"
 #include "csphyzik/refframe.h"
 #include "csphyzik/entity.h"
+class ctForce;
 
 #define DEFAULT_ENTITY_MASS 10.0
 

@@ -21,7 +21,8 @@
 #ifndef CT_THEFORCES_H
 #define CT_THEFORCES_H
 
-#include "csphyzik/force.h"
+#include "csphyzik/phyzent.h"
+#include "csphyzik/bodyforce.h"
 
 class ctDynamicEntity;
 
@@ -69,6 +70,10 @@ public:
 // spring attached to two bodies or inertial reference frame.
 class ctSpringF : public ctNBodyForce
 {
+protected:
+	ctLinkList<ctVector3> attachment_point_vector;
+	real rest_length;
+	
 public:
 	ctSpringF( ctPhysicalEntity *b1, ctVector3 p1, ctPhysicalEntity *b2, ctVector3 p2 )
 	{
@@ -90,11 +95,6 @@ public:
 
 	//!me expand to include 3+ bodies on one spring
 	virtual void add_body( ctPhysicalEntity *bod ){ if( body_vector.get_size() < 2 ) body_vector.add_link( bod ); }
-
-protected:
-	ctLinkList<ctVector3> attachment_point_vector;
-	real rest_length;
-	
 };
 
 
