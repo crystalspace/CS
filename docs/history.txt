@@ -17,6 +17,9 @@ chronological order.
 	- Jorrit fixed the handling of CS_ENTITY_CAMERA objects in the new
 	  renderer. This fixes stuff like skyboxes (like the one used in the
 	  csdemo space demo).
+	- Jorrit fixed a few broken CS_ASSERT's in glrender3d.
+	- Jorrit attempted to fix the stencil clipper in combination with
+	  stencil shadows but failed so far (NR OpenGL renderer).
 3-Mar-2004
 	- Eric Sunshine added REGEX.AVAILABLE=no to msvcgen/required.mak to
 	  ensure that generic/regex.c gets included in csutil project file.

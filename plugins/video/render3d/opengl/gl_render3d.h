@@ -124,8 +124,14 @@ private:
   bool do_near_plane;
   csPlane3 near_plane;
 
+  bool shadow_stencil_enabled;
+  bool clipping_stencil_enabled;
+  void EnableStencilShadow ();
+  void DisableStencilShadow ();
+  void EnableStencilClipping ();
+  void DisableStencilClipping ();
+
   int stencilclipnum;
-  bool stencil_enabled;		// Stencil clipper is enabled.
   bool stencil_initialized;	// Stencil clipper is initialized from 'clipper'
   bool clip_planes_enabled;	// glClipPlane is enabled.
   csRef<iClipper2D> clipper;	// Current clipper from engine.

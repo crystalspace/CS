@@ -105,7 +105,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   viewheight = 100;
 
   stencilclipnum = 0;
-  stencil_enabled = false;
   clip_planes_enabled = false;
 
   render_target = 0;
@@ -132,6 +131,9 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
 
   scrapIndicesSize = 0;
   scrapVerticesSize = 0;
+
+  shadow_stencil_enabled = false;
+  clipping_stencil_enabled = false;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -164,6 +166,32 @@ void csGLGraphics3D::Report (int severity, const char* msg, ...)
     csPrintf ("\n");
   }
   va_end (arg);
+}
+
+void csGLGraphics3D::EnableStencilShadow ()
+{
+  shadow_stencil_enabled = true;
+  statecache->Enable_GL_STENCIL_TEST ();
+}
+
+void csGLGraphics3D::DisableStencilShadow ()
+{
+  shadow_stencil_enabled = false;
+  if (clipping_stencil_enabled) return;
+  statecache->Disable_GL_STENCIL_TEST ();
+}
+
+void csGLGraphics3D::EnableStencilClipping ()
+{
+  clipping_stencil_enabled = true;
+  statecache->Enable_GL_STENCIL_TEST ();
+}
+
+void csGLGraphics3D::DisableStencilClipping ()
+{
+  clipping_stencil_enabled = false;
+  if (shadow_stencil_enabled) return;
+  statecache->Disable_GL_STENCIL_TEST ();
 }
 
 void csGLGraphics3D::SetGlOrtho (bool inverted)
@@ -352,7 +380,7 @@ void csGLGraphics3D::SetupStencil ()
 {
   if (stencil_initialized)
     return;
-  
+
   stencil_initialized = true;
 
   if (clipper)
@@ -364,8 +392,8 @@ void csGLGraphics3D::SetupStencil ()
     glPushMatrix ();
     glLoadIdentity ();
     // First set up the stencil area.
-    statecache->Enable_GL_STENCIL_TEST ();
-    
+    EnableStencilClipping ();
+
     //stencilclipnum++;
     //if (stencilclipnum>255)
     {
@@ -378,13 +406,14 @@ void csGLGraphics3D::SetupStencil ()
     csVector2* v = clipper->GetClipPoly ();
     glColor4f (1, 0, 0, 0);
     statecache->SetShadeModel (GL_FLAT);
+
     bool oldz = statecache->IsEnabled_GL_DEPTH_TEST ();
     if (oldz) statecache->Disable_GL_DEPTH_TEST ();
-
     bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
     if (tex2d) statecache->Disable_GL_TEXTURE_2D ();
+
     if (color_red_enabled || color_green_enabled || color_blue_enabled ||
-      alpha_enabled)
+        alpha_enabled)
       glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
     statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
@@ -406,11 +435,9 @@ void csGLGraphics3D::SetupStencil ()
     glEnd ();
 
     if (color_red_enabled || color_green_enabled || color_blue_enabled ||
-      alpha_enabled)
+        alpha_enabled)
       glColorMask (color_red_enabled, color_green_enabled, color_blue_enabled,
         alpha_enabled);
-
-    //statecache->Disable_GL_STENCIL_TEST ();
 
     glPopMatrix ();
     glMatrixMode (GL_PROJECTION);
@@ -488,7 +515,6 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   cache_clip_plane = clip_plane;
   cache_clip_z_plane = clip_z_plane;
 
-  stencil_enabled = false;
   clip_planes_enabled = false;
 
   //===========
@@ -535,9 +561,12 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   if (clip_with_stencil)
   {
     SetupStencil ();
-    stencil_enabled = true;
     // Use the stencil area.
-    statecache->Enable_GL_STENCIL_TEST ();
+    EnableStencilClipping ();
+  }
+  else
+  {
+    DisableStencilClipping ();
   }
 
   int planes = SetupClipPlanes (clip_with_planes, do_plane_clipping,
@@ -1509,8 +1538,8 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
 
   SetObjectToCameraInternal (mymesh->object2camera);
   
-  CS_ASSERT (!(string_indices<(csStringID)stacks.Length ()
-      && stacks[string_indices].Length () > 0));
+  CS_ASSERT (string_indices<(csStringID)stacks.Length ()
+      && stacks[string_indices].Length () > 0);
   csShaderVariable* indexBufSV = stacks[string_indices].Top ();
   iRenderBuffer* iIndexbuf = 0;
   indexBufSV->GetValue (iIndexbuf);
@@ -1539,13 +1568,13 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
         break;
       }
       float radius, scale;
-      CS_ASSERT (!(string_point_radius<(csStringID)stacks.Length ()
-          && stacks[string_point_radius].Length () > 0));
+      CS_ASSERT (string_point_radius<(csStringID)stacks.Length ()
+          && stacks[string_point_radius].Length () > 0);
       csShaderVariable* radiusSV = stacks[string_point_radius].Top ();
       radiusSV->GetValue (radius);
 
-      CS_ASSERT (!(string_point_scale < (csStringID)stacks.Length ()
-          && stacks[string_point_scale].Length () > 0));
+      CS_ASSERT (string_point_scale < (csStringID)stacks.Length ()
+          && stacks[string_point_scale].Length () > 0);
       csShaderVariable* scaleSV = stacks[string_point_scale].Top ();
       scaleSV->GetValue (scale);
 
@@ -1599,7 +1628,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
       statecache->SetStencilFunc (GL_EQUAL, 0, 127);
       break;
     default:
-      if (stencil_enabled)
+      if (clipping_stencil_enabled)
       {
         statecache->SetStencilFunc (GL_EQUAL, 0, 255);
         statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
@@ -1790,7 +1819,7 @@ void csGLGraphics3D::SetShadowState (int state)
       stencil_initialized = false;
       glClearStencil (0);
       glClear (GL_STENCIL_BUFFER_BIT);
-      statecache->Enable_GL_STENCIL_TEST ();
+      EnableStencilShadow ();
       statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       //statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
       // @@@ Jorrit: to avoid flickering I had to increase the
@@ -1817,7 +1846,7 @@ void csGLGraphics3D::SetShadowState (int state)
       break;
     case CS_SHADOW_VOLUME_FINISH:
       current_shadow_state = 0;
-      statecache->Disable_GL_STENCIL_TEST ();
+      DisableStencilShadow ();
       break;
   }
 }
@@ -1831,10 +1860,9 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   csGLGraphics3D::cliptype = cliptype;
   stencil_initialized = false;
   frustum_valid = false;
-  stencil_enabled = false;
   for (int i = 0; i<6; i++)
     glDisable ((GLenum)(GL_CLIP_PLANE0+i));
-  statecache->Disable_GL_STENCIL_TEST ();
+  DisableStencilClipping ();
   cache_clip_portal = -1;
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
