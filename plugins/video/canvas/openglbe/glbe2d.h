@@ -17,15 +17,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLBE2D_H__
-#define __GLBE2D_H__
+#ifndef __CS_GLBE2D_H__
+#define __CS_GLBE2D_H__
 
 #include <GL/gl.h>
 #include "GraphicsDefs.h"
 #include "Rect.h"
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "cssys/be/beitf.h"
+#include "cssys/be/icsbe.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 
 class CrystGLView;
@@ -34,28 +34,25 @@ class CrystGLWindow;
 /// Be 2D OpenGL Driver
 class csGraphics2DGLBe : public csGraphics2DGLCommon
 {
-  friend CrystGLWindow;	// FIXME: Currently needs access to 'dpy'.
+  typedef csGraphics2DGLCommon superclass;
 protected:
-  iSystem* cs_system;
   iBeLibSystemDriver* be_system;
-  CrystGLView* dpy;
+  CrystGLView* view;
   CrystGLWindow* window;
   color_space curr_color_space;
   BRect screen_frame;
   
 public:
-  csGraphics2DGLBe (iSystem*);
+  csGraphics2DGLBe (iBase*);
   virtual ~csGraphics2DGLBe();
   
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*);
   virtual bool Open (const char* title);
   virtual void Close ();
-  
   virtual bool BeginDraw ();
   virtual void Print (csRect* area = NULL);
   virtual void FinishDraw ();
-
-  virtual void ApplyDepthInfo(color_space this_color_space);
+  virtual void ApplyDepthInfo (color_space);
 };
 
-#endif // __BELIB2D_H__
+#endif // __CS_GLBE2D_H__

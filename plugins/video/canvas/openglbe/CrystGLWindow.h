@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CRYST_GL_WINDOW_H
-#define CRYST_GL_WINDOW_H
+#ifndef __CS_CRYSTGLWINDOW_H__
+#define __CS_CRYSTGLWINDOW_H__
 
 #include <Application.h>
 #include <Window.h>
@@ -28,53 +28,39 @@
 #include <DirectWindow.h>
 #include <GLView.h>
 class iSystem;
-class csGraphics2DGLBe;
 class iBeLibSystemDriver;
 
-class CrystGLView : public BGLView {
-
+class CrystGLView : public BGLView
+{
 public:
-		CrystGLView(BRect frame, iBeLibSystemDriver*); 
-virtual	~CrystGLView();
-virtual	void AttachedToWindow();
+  CrystGLView(BRect frame, iBeLibSystemDriver*); 
+  virtual ~CrystGLView();
+  virtual void AttachedToWindow();
 
-virtual	void KeyDown(char const* bytes, int32 numBytes);
-virtual	void KeyUp(char const* bytes, int32 numBytes);
-virtual	void MouseDown(BPoint);
-virtual	void MouseUp(BPoint);
-virtual	void MouseMoved(BPoint, uint32 transit, BMessage const*);
+  virtual void KeyDown(char const* bytes, int32 numBytes);
+  virtual void KeyUp(char const* bytes, int32 numBytes);
+  virtual void MouseDown(BPoint);
+  virtual void MouseUp(BPoint);
+  virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
 
 protected:
-	iBeLibSystemDriver* be_system;
-	void ProcessUserEvent() const;
+  iBeLibSystemDriver* be_system;
+  void ProcessUserEvent() const;
 };
 
-class CrystGLWindow : public BDirectWindow { // BGLScreen { //BWindow { // BWindowScreen {
-
+class CrystGLWindow : public BDirectWindow
+{
 public:
-		CrystGLWindow(BRect, const char*, CrystGLView*,
-			csGraphics2DGLBe*, iSystem*, iBeLibSystemDriver*); 
-virtual	~CrystGLWindow();
-
-virtual	bool QuitRequested();
-virtual	void MessageReceived(BMessage*);
-
-virtual void DirectConnected(direct_buffer_info*);
+  CrystGLWindow(BRect, const char*, CrystGLView*, iSystem*,
+    iBeLibSystemDriver*); 
+  virtual ~CrystGLWindow();
+  virtual bool QuitRequested();
+  virtual void MessageReceived(BMessage*);
 
 protected:
-		CrystGLView* view;
-		iSystem* cs_system;
-		iBeLibSystemDriver* be_system;
-		// Stuff to implement BDirectWindow
-		// FIXME: Why keep pi_BeG2D when piG2D is around?
-//		IBeLibGraphicsInfo* piG2D;  // New pointer to 2D driver info method interface.
-		csGraphics2DGLBe* pi_BeG2D ;// Local copy of this pointer to csGraphics2DBeLib.
-
-		 BLocker* locker;
-		 bool fDirty;
-		 bool fConnected;
-		 bool fConnectionDisabled;
-		 bool fDrawingThreadSuspended;
+  CrystGLView* view;
+  iSystem* cs_system;
+  iBeLibSystemDriver* be_system;
 };
 
-#endif // CRYST_GL_WINDOW_H
+#endif // __CS_CRYSTGLWINDOW_H__

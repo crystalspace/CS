@@ -18,15 +18,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BELIBG2D_H
-#define BELIBG2D_H
+#ifndef __CS_BELIBG2D_H__
+#define __CS_BELIBG2D_H__
 
 #include "GraphicsDefs.h"
 #include "Rect.h"
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "cs2d/be/besysg2d.h"
-#include "cssys/be/beitf.h"
+#include "cssys/be/icsbe.h"
 
 class CrystView;
 class CrystWindow;
@@ -34,51 +33,27 @@ class CrystWindow;
 /// Be 2D Graphics Driver
 class csGraphics2DBeLib : public csGraphics2D
 {
+  typedef csGraphics2D superclass;
 protected:
-  iSystem* cs_system;
   iBeLibSystemDriver* be_system;
-  CrystView* dpy;
+  CrystView* view;
   CrystWindow* window;
+  BBitmap* bitmap;
   color_space curr_color_space;
   BRect screen_frame;
   
-  // double buffer implementation
-#define BUFFER_COUNT 2
-  BBitmap* cryst_bitmap[BUFFER_COUNT];
-  int curr_page;
-  bool double_buffered;
-  
-  // stuff to implement BDirectWindow  
-#if 0
-protected:
-  BLocker* locker;
-  bool fDirty;
-  bool fConnected;
-  bool fConnectionDisabled;
-  bool fDrawingThreadSuspended;
-#endif		
-
 public:
   DECLARE_IBASE;
 
-  csGraphics2DBeLib(iSystem*);
-  virtual ~csGraphics2DBeLib();
+  csGraphics2DBeLib (iBase*);
+  virtual ~csGraphics2DBeLib ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*);
   virtual bool Open (const char* title);
   virtual void Close ();
-
-  virtual bool BeginDraw ();
   virtual void Print (csRect* area = NULL);
-  virtual void FinishDraw ();
-
-  virtual bool DoubleBuffer (bool Enable);
-  virtual bool DoubleBuffer ();
-  virtual int  GetPage ();
   virtual bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*);
-  virtual void ApplyDepthInfo(color_space);
-
-  bool DirectConnect (direct_buffer_info *info);
+  virtual void ApplyDepthInfo (color_space);
 };
 
-#endif //BELibG2D_H
+#endif // __CS_BELIBG2D_H__

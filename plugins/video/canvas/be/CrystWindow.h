@@ -18,54 +18,45 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CRYST_WINDOW_H
-#define CRYST_WINDOW_H
+#ifndef __CS_CRYSTWINDOW_H__
+#define __CS_CRYSTWINDOW_H__
 
 #include <Application.h>
 #include <Window.h>
 #include <View.h>
 #include <Bitmap.h>
 #include <DirectWindow.h>
-
 class iSystem;
-class csGraphics2DBeLib;
 class iBeLibSystemDriver;
 
 class CrystView : public BView
 {
 public:
-	CrystView(BRect frame, iBeLibSystemDriver*); 
-	virtual	~CrystView();
+  CrystView(BRect, iBeLibSystemDriver*); 
+  virtual ~CrystView();
 
-	virtual void KeyDown(char const* bytes, int32 numBytes);
-	virtual void KeyUp(char const* bytes, int32 numBytes);
-	virtual void MouseDown(BPoint);
-	virtual void MouseUp(BPoint);
-	virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
+  virtual void KeyDown(char const* bytes, int32 numBytes);
+  virtual void KeyUp(char const* bytes, int32 numBytes);
+  virtual void MouseDown(BPoint);
+  virtual void MouseUp(BPoint);
+  virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
 
 protected:
-	iBeLibSystemDriver* be_system;
-	void ProcessUserEvent() const;
+  iBeLibSystemDriver* be_system;
+  void ProcessUserEvent() const;
 };
 
 class CrystWindow : public BDirectWindow
 {
-
 public:
-	CrystWindow (BRect, const char*, CrystView*,
-		csGraphics2DBeLib*, iSystem*, iBeLibSystemDriver*);
-	virtual	~CrystWindow();
-
-	virtual	bool QuitRequested();
-	virtual	void MessageReceived(BMessage*);
-
-	virtual bool DirectConnected(direct_buffer_info*);
+  CrystWindow (BRect, const char*, CrystView*, iSystem*, iBeLibSystemDriver*);
+  virtual ~CrystWindow();
+  virtual bool QuitRequested();
 
 protected:
-	CrystView* view;
-	iSystem* cs_system;
-	iBeLibSystemDriver* be_system;
-	csGraphics2DBeLib* pG2D;
+  CrystView* view;
+  iSystem* cs_system;
+  iBeLibSystemDriver* be_system;
 };
 
-#endif CRYST_WINDOW_H
+#endif __CS_CRYSTWINDOW_H__

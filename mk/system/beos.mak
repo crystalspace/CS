@@ -30,7 +30,7 @@ COMP=GCC
 EXE=
 
 # Typical extension for dynamic libraries on this system.
-DLL=.so
+DLL=.plugin
 
 # Typical extension for static libraries
 LIB=.a

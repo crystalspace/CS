@@ -18,10 +18,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IBEOS_H__
-#define __IBEOS_H__
+#ifndef __CS_ICSBE_H__
+#define __CS_ICSBE_H__
 
 #include "csutil/scf.h"
+#include "igraph2d.h"
 
 class BMessage;
 class iTextureHandle;
@@ -29,7 +30,7 @@ class iTextureHandle;
 SCF_INTERFACE (iBeLibSystemDriver, 0, 0, 1) : public iBase
 {
   virtual void ProcessUserEvent (BMessage*) = 0;
-  virtual void SetMouseCursor (int shape, iTextureHandle*) = 0;
+  virtual bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*) = 0;
 };
 
-#endif // __IBEOS_H__
+#endif // __CS_ICSBE_H__

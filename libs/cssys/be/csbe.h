@@ -18,15 +18,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSBE_H
-#define CSBE_H
+#ifndef __CS_CSBE_H__
+#define __CS_CSBE_H__
 
 #include "csutil/scf.h"
 #include "def.h"
 #include "csinput/csinput.h"
 #include "cssys/system.h"
-#include "cssys/be/beitf.h"
-#include "igraph2d.h"
+#include "cssys/be/icsbe.h"
 class CrystApp;
 
 class SysKeyboardDriver : public csKeyboardDriver {};
@@ -49,7 +48,7 @@ public:
 
   /// Implementation of iBeLibSystemDriver
   void ProcessUserEvent (BMessage*);
-  void SetMouseCursor (int shape, iTextureHandle*);
+  bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*);
 };
 
-#endif // CSBE_H
+#endif // __CS_CSBE_H__

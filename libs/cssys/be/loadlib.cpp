@@ -17,23 +17,27 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssys/csshlib.h"
 #include <kernel/image.h>
+#include <sys/param.h>
+#include "sysdef.h"
+#include "cssys/csshlib.h"
+#include "csutil/csstring.h"
 
-csLibraryHandle csLoadLibrary (const char* iName)
+csLibraryHandle csLoadLibrary (const char* name)
 {
-  char name [260];
-  strcat (strcpy (name, iName), ".so");
-  return (csLibraryHandle)load_add_on (name);
+  csString s(name);
+  s += ".plugin";
+  return (csLibraryHandle)load_add_on (s);
 }
 
-void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
+void *csGetLibrarySymbol (csLibraryHandle h, const char* name)
 {
-  void *func;
-  return (get_image_symbol (Handle, iName, B_SYMBOL_TYPE_TEXT, &func) == B_OK) ? func : NULL;
+  void* sym;
+  return (get_image_symbol ((image_id)h, name, B_SYMBOL_TYPE_TEXT, &sym) ==
+    B_OK) ? sym : 0;
 }
 
-bool csUnloadLibrary (csLibraryHandle Handle)
+bool csUnloadLibrary (csLibraryHandle h)
 {
-  return (unload_add_on (Handle) == B_OK);
+  return (unload_add_on ((image_id)h) == B_OK);
 }

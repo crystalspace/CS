@@ -23,49 +23,50 @@
 #include "csutil/scf.h"
 #include "cs2d/openglbe/glbe2d.h"
 #include "cs2d/openglbe/CrystGLWindow.h"
-#include "cssys/be/beitf.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLBe)
 
 EXPORT_CLASS_TABLE (glbe2d)
   EXPORT_CLASS (csGraphics2DGLBe, "crystalspace.graphics2d.glbe",
-    "BeOS OpenGL 2D graphics driver for Crystal Space")
+    "Crystal Space 2D driver for OpenGL using GL on BeOS")
 EXPORT_CLASS_TABLE_END
 
-csGraphics2DGLBe::csGraphics2DGLBe(iBase *iParent) :
-  csGraphics2DGLCommon (iParent)
+csGraphics2DGLBe::csGraphics2DGLBe(iBase* p) :
+  superclass(p), be_system(0), view(0), window(0)
 {
 }
 
 csGraphics2DGLBe::~csGraphics2DGLBe ()
 {
-  Close ();
-  be_system->DecRef();
+  Close();
+  if (be_system != 0)
+    be_system->DecRef();
 }
 
-bool csGraphics2DGLBe::Initialize (iSystem *pSystem)
+bool csGraphics2DGLBe::Initialize (iSystem* p)
 {
-  if (!csGraphics2DGLCommon::Initialize (pSystem))
-    return false;
-
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space BeOS OpenGL version.\n");
-
-  be_system = QUERY_INTERFACE (System, iBeLibSystemDriver);
-  if (!be_system)
+  bool ok = csGraphics2DGLCommon::Initialize(p);
+  if (ok)
   {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not "
-      "implement the iBeLibSystemDriver interface\n");
-    return false;
+    CsPrintf (MSG_INITIALIZATION, "Crystal Space BeOS OpenGL version.\n");
+    be_system = QUERY_INTERFACE (System, iBeLibSystemDriver);
+    if (be_system != 0)
+    {
+      // Get current screen information.
+      BScreen screen(B_MAIN_SCREEN_ID);
+      screen_frame = screen.Frame();
+      curr_color_space = screen.ColorSpace();
+      ApplyDepthInfo(curr_color_space);
+    }
+    else
+    {
+      CsPrintf (MSG_FATAL_ERROR, "FATAL: System driver does not "
+        "implement the iBeLibSystemDriver interface\n");
+      ok = false;
+    }
   }
-
-  // Get current screen information.
-  BScreen screen(B_MAIN_SCREEN_ID);
-  screen_frame = screen.Frame();
-  curr_color_space = screen.ColorSpace();
-  ApplyDepthInfo(curr_color_space);
-
-  return true;
+  return ok;
 }
 
 bool csGraphics2DGLBe::Open(const char* title)
@@ -77,29 +78,24 @@ bool csGraphics2DGLBe::Open(const char* title)
   int const vh = Height - 1;
   BRect win_rect(INSET, INSET, vw + INSET, vh + INSET);
 
-  if (vw <= sw && vh <= sh) {
+  if (vw <= sw && vh <= sh)
+  {
     float const x = floor((sw - vw) / 2); // Center window horizontally.
     float const y = floor((sh - vh) / 4); // A pleasing vertical position.
     win_rect.Set(x, y, x + vw, y + vh);
   }
 
-  dpy = CHK(new CrystGLView(BRect(0, 0, vw, vh), be_system));
-  window = CHK(new CrystGLWindow(win_rect, title, dpy, this, system, be_system));
+  view = CHK(new CrystGLView(BRect(0, 0, vw, vh), be_system));
+  window = CHK(new CrystGLWindow(win_rect, title, view, System, be_system));
 	
   window->Show();
-  if (window->Lock()) {
-    dpy->MakeFocus();
+  if (window->Lock())
+  {
+    view->MakeFocus();
     window->Unlock();
   }
 
-  // FIXME: The application crashes unless the superclass Open() is called
-  // after the earlier initialization.  Normally this call would appear at the
-  // top of this method.
-  if (!csGraphics2DGLCommon::Open (title))
-    return false;
-
-  Clear(0);
-  return true;
+  return superclass::Open (title);
 }
 
 void csGraphics2DGLBe::Close()
@@ -107,112 +103,90 @@ void csGraphics2DGLBe::Close()
   window->Lock();
   window->Quit();
   window = NULL;
-  csGraphics2DGLCommon::Close();
+  superclass::Close();
 }
 
 bool csGraphics2DGLBe::BeginDraw ()
 {
-  csGraphics2D::BeginDraw ();
-  if (FrameBufferLocked != 1)
-    return true;
-
-#if 0
-  // if fConnectionDisabled, then I will suspend the drawing thread and await shutdown.
-  // fConnectionDisabled is set true by the csGraphics2DBeLib destructor.
-  // If true, then the Window is being destroyed so this thread should go as well!
-  // The application object may try to kill it too but it doesn't matter: you can only die once!
-  if (window->fConnectionDisabled) kill_thread(find_thread(NULL));
-
-  // lock 2D driver object
-  window->locker->Lock();
-
-  // this implements the fConnected feature with suspend_thread
-  // it is only feasible because this is the only place that suspends that thread.
-  // if you put in suspension elsewhere, use a proper semaphore
-  if (!window->fConnected)	{
-    window->fDrawingThreadSuspended = true;
-    window->locker->Unlock();
-    suspend_thread(find_thread(NULL));	
-  } //uncomment for conventional DirectConnected
-#endif
-  dpy->LockGL();
+  superclass::BeginDraw ();
+  if (FrameBufferLocked == 1)
+    view->LockGL();
   return true;
 }
 
 void csGraphics2DGLBe::FinishDraw ()
 {
-  csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
-//window->locker->Unlock();// uncomment for conventional DirectConnected.
-  dpy->UnlockGL();
+  superclass::FinishDraw ();
+  if (FrameBufferLocked == 0)
+    view->UnlockGL();
 }
 
-void csGraphics2DGLBe::Print (csRect *area)
+void csGraphics2DGLBe::Print (csRect*)
 {
-  if(dpy) {
-    dpy->LockGL();
-    dpy->SwapBuffers();
-    dpy->UnlockGL();
+  if(view != 0)
+  {
+    view->LockGL();
+    view->SwapBuffers();
+    view->UnlockGL();
     glFinish();
   }
 }
 
-void csGraphics2DGLBe::ApplyDepthInfo(color_space this_color_space)
+void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
 {
   unsigned long RedMask, GreenMask, BlueMask;
-  
-  switch (this_color_space) {
-  	case B_RGB15: 
-		Depth	  = 15;
-  		RedMask   = 0x1f << 10;
-  		GreenMask = 0x1f << 5;
-  		BlueMask  = 0x1f;
+  switch (cs)
+  {
+    case B_RGB15: 
+      Depth	= 15;
+      RedMask   = 0x1f << 10;
+      GreenMask = 0x1f << 5;
+      BlueMask  = 0x1f;
 
-  		pfmt.PixelBytes = 2;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
-  		pfmt.PalEntries = 0;
+      pfmt.PixelBytes = 2;
+      pfmt.PalEntries = 0;
+      pfmt.RedMask    = RedMask;
+      pfmt.GreenMask  = GreenMask;
+      pfmt.BlueMask   = BlueMask;
+      pfmt.PalEntries = 0;
+
+      complete_pixel_format();
+      break;
+    case B_RGB16:
+      Depth	= 16;
+      RedMask   = 0x1f << 11;
+      GreenMask = 0x3f << 5;
+      BlueMask  = 0x1f;
+
+      pfmt.PixelBytes = 2;
+      pfmt.PalEntries = 0;
+      pfmt.RedMask    = RedMask;
+      pfmt.GreenMask  = GreenMask;
+      pfmt.BlueMask   = BlueMask;
+      pfmt.PalEntries = 0;
   		
-  		complete_pixel_format();
-  		break;
-  	case B_RGB16:
-  		Depth	  = 16;
-  		RedMask   = 0x1f << 11;
-  		GreenMask = 0x3f << 5;
-  		BlueMask  = 0x1f;
+      complete_pixel_format();
+      break;
+    case B_RGB32:
+    case B_RGBA32:
+      Depth	= 32;
+      RedMask   = 0xff << 16;
+      GreenMask = 0xff << 8;
+      BlueMask  = 0xff;
 
-  		pfmt.PixelBytes = 2;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
-  		pfmt.PalEntries = 0;
-  		  		
-  		complete_pixel_format();
-  		break;
-  	case B_RGB32:
-  	case B_RGBA32:
-		Depth	  = 32;
-  		RedMask   = 0xff << 16;
-  		GreenMask = 0xff << 8;
-  		BlueMask  = 0xff;
+      pfmt.PixelBytes = 4;
+      pfmt.PalEntries = 0;
+      pfmt.RedMask    = RedMask;
+      pfmt.GreenMask  = GreenMask;
+      pfmt.BlueMask   = BlueMask;
+      pfmt.PalEntries = 0;
 
-  		pfmt.PixelBytes = 4;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
-  		pfmt.PalEntries = 0;
-  		
-  		complete_pixel_format();
-  		break;
-  	default:
-	  	printf("Unimplemented color depth in Be 2D OpenGL driver, depth = %i\n", Depth);
-	  	exit(1);
-  		break;
+      complete_pixel_format();
+      break;
+    default:
+      printf("Unimplemented color depth in Be 2D OpenGL driver (depth=%i)\n",
+        Depth);
+      exit(1);
+      break;
   }
 }
