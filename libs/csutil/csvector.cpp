@@ -105,7 +105,9 @@ bool csVector::Insert (int n, csSome Item)
   if (n <= count)
   {
     SetLength (count + 1); // Increments 'count' as a side-effect.
-    memmove (&root [n + 1], &root [n], (count - n - 1) * sizeof (csSome));
+    const int nmove = (count - n - 1);
+    if (nmove > 0)
+      memmove (&root [n + 1], &root [n], nmove * sizeof (csSome));
     root [n] = Item;
     return true;
   }
