@@ -364,7 +364,7 @@ void csSprite3D::Draw (csRenderView& rview)
   int* emerge_from;
   int num_verts;
   float fnum;
-  if (cfg_lod_detail < 0)
+  if (cfg_lod_detail < 0 || cfg_lod_detail == 1)
   {
     m = tpl->GetBaseMesh ();
     num_verts = tpl->num_vertices;
@@ -376,8 +376,8 @@ void csSprite3D::Draw (csRenderView& rview)
     // level. The integer part will be the number of vertices.
     // The fractional part will determine how much to morph
     // between the new vertex and the previous last vertex.
-    fnum = cfg_lod_detail*(float)tpl->num_vertices;
-    num_verts = (int)(cfg_lod_detail*tpl->num_vertices);
+    fnum = cfg_lod_detail*(float)(tpl->num_vertices+1);
+    num_verts = (int)fnum;
     fnum -= num_verts;	// fnum is now the fractional part.
     GenerateSpriteLOD (num_verts);
     emerge_from = tpl->GetEmergeFrom ();
@@ -389,7 +389,7 @@ void csSprite3D::Draw (csRenderView& rview)
   {
     csVector3 v;
     csVector2 uv;
-    if (cfg_lod_detail < 0 || i < num_verts-1)
+    if (cfg_lod_detail < 0 || cfg_lod_detail == 1 || i < num_verts-1)
     {
       v = cframe->GetVertex (i);
       uv = cframe->GetTexel (i);
@@ -499,11 +499,20 @@ void csSprite3D::Draw (csRenderView& rview)
         {
           vtl = vbl;
           vbl = (vbl + 1) % 3;
-        } else if (y > triangle [vbr].y)
+        }
+	else if (y > triangle [vbr].y)
         {
           vtr = vbr;
           vbr = (vbr + 3 - 1) % 3;
-        } /* endif */
+        }
+        else
+        {
+          // The last two vertices of the triangle have the same height.
+	  // @@@ I think we should interpolate by 'x' here but this fix at
+	  // least eliminates most errors.
+          vtl = vbl;
+          vbl = (vbl + 1) % 3;
+        }
 
         // Now interpolate Z,U,V by Y
         float tL = triangle [vbl].y - triangle [vtl].y;
