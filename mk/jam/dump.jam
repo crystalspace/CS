@@ -35,10 +35,10 @@
 #    - All single-word arguments to NotFile composed of ._- and alphanumerics.
 #
 #    - Targets defined by the Application rule.  Unlike other rules (Plugin,
-#      Library, etc.) which compose a pseudo-target top-level target using
-#      NotFile (which is thus caught by the case), on Unix, the Application
-#      rule does not invoke NotFile since the top-level target has the same
-#      name as the generated executable.
+#      Library, etc.) which compose a top-level pseudo-target using NotFile
+#      (which is thus caught by the above case), on Unix, the Application rule
+#      does not invoke NotFile since the top-level target has the same name as
+#      the generated executable.
 #
 #    - Targets defined by the ShellScript rule, since the emitted shell scripts
 #      have the same name as the top-level target.
