@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+3-Mar-2000
+	- Thomas Giesel <skoe@freenet.de> supplied a patch to enable true
+	  full-screen support by the BeOS OpenGL driver.
 2-Mar-2000
 	- Norman Kramer completely rewrote the glide texture cache
 	  handling. It now holds alphamaps too. On single TMU systems the

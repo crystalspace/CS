@@ -56,6 +56,7 @@ public:
   virtual ~CrystGLWindow();
   virtual bool QuitRequested();
   virtual void MessageReceived(BMessage*);
+  virtual void DirectConnected(direct_buffer_info*);
 
 protected:
   CrystGLView* view;

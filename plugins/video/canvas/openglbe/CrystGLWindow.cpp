@@ -84,6 +84,7 @@ CrystGLWindow::CrystGLWindow(BRect frame, const char* name, CrystGLView *v,
 {
   be_system->IncRef();
   view->SetViewColor(0, 0, 0);
+
   AddChild(view);
   AddShortcut('f', B_COMMAND_KEY, new BMessage('full'));
   SetSizeLimits(40.0, 2000.0, 40.0, 2000.0);
@@ -94,6 +95,15 @@ CrystGLWindow::~CrystGLWindow()
   Hide();
   Flush();
   be_system->DecRef();
+}
+
+void CrystGLWindow::DirectConnected(direct_buffer_info* info)
+{
+  if (view)
+  {
+    view->DirectConnected(info);
+    view->EnableDirectMode(true);
+  }
 }
 
 bool CrystGLWindow::QuitRequested()
