@@ -6,7 +6,7 @@
   rem *** configuration we are expecting.
 
   echo extern "C" void* opendir(char const*);>conftest.cpp
-  echo int main () { opendir(""); }>>conftest.cpp
+  echo int main () { opendir(""); return 0; }>>conftest.cpp
   echo %%xdefine TEST>conftest.asm
 
   echo ###------------------------------------------------------------
@@ -20,27 +20,7 @@
   goto nothing
 
 :mingw32
-  rem *** As of gcc 3.x, -fvtable-thunks is deprecated and produces a harmless
-  rem *** warning message, however it is still required for pre-gcc 3.x
-  rem *** configurations, thus we must add it to CFLAGS.SYSTEM.
-
   echo ### - Crystal Space MinGW32 Package 0.90 or later
-  echo CC = gcc -c>>config.tmp
-  echo CXX = g++ -c>>config.tmp
-  echo LINK = g++>>config.tmp
-  echo # Remove the following line if compiler complains>>config.tmp
-  echo # about -fvtable-thunks option.>>config.tmp
-  echo CFLAGS.SYSTEM += -fvtable-thunks>>config.tmp
-
-  echo ### Checking if -lmingwex is needed for linking...
-  gcc conftest.cpp -lmingwex -o conftest.exe
-  if not exist conftest.exe goto nomingwex
-
-  del conftest.exe >nul
-  echo $$$ Yes, setting MINGW_LIBS to "-lmingwex"
-  echo MINGW_LIBS = -lmingwex>>config.tmp
-
-:nomingwex
   goto nothing
 
 :msvc
@@ -59,7 +39,27 @@
   echo.
   pause >nul
 
-  echo ### Testing whenever you have (the right version of) NASM installed ...
+if not /%1/ == /mingw32/ goto nomingwex
+  echo CC = gcc -c>>config.tmp
+  echo CXX = g++ -c>>config.tmp
+  echo LINK = g++>>config.tmp
+
+  rem *** As of gcc 3.x, -fvtable-thunks is deprecated and produces a harmless
+  rem *** warning message, however it is still required for pre-gcc 3.x
+  rem *** configurations, thus we must add it to CFLAGS.SYSTEM.
+  echo # Remove the following line if compiler complains>>config.tmp
+  echo # about -fvtable-thunks option.>>config.tmp
+  echo CFLAGS.SYSTEM += -fvtable-thunks>>config.tmp
+
+  echo ### Checking if -lmingwex is needed for linking...
+  gcc conftest.cpp -lmingwex -o conftest.exe >nul
+  if not exist conftest.exe goto nomingwex
+  del conftest.exe >nul
+  echo $$$ Yes, setting MINGW_LIBS to "-lmingwex"
+  echo MINGW_LIBS = -lmingwex>>config.tmp
+
+:nomingwex
+  echo ### Testing whether you have (the right version of) NASM installed ...
   nasm -f win32 conftest.asm -o conftest.o
   if not exist conftest.o goto nonasm
 
@@ -69,7 +69,7 @@
 
 :nonasm
 
-  echo ### Checking whenever you have makedep already built and installed ...
+  echo ### Checking whether you have makedep already built and installed ...
   makedep conftest.cpp -fconftest.o -c
   if not exist conftest.o goto nomakedep
 

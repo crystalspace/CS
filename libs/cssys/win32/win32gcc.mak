@@ -36,7 +36,7 @@ COMP=GCC
 
 # Command to update a target
 ifeq (,$(MSYSTEM))
-UPD=libs\cssys\win32\winupd.bat $@ DEST
+UPD=libs/cssys/win32/winupd.bat $@ DEST
 endif
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -274,7 +274,7 @@ ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 ifneq (,$(MSYSTEM))
 SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/win32conf.sh $(INSTALL_DIR)>>config.tmp
 else
-SYSCONFIG=libs\cssys\win32\winconf.bat mingw32
+SYSCONFIG=libs/cssys/win32/winconf.bat mingw32
 endif
 
 endif # ifeq ($(ROOTCONFIG),config)
