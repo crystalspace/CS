@@ -4,7 +4,6 @@
 #include "igeom/polymesh.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "csgeom/tesselat.h"
 #include "imesh/object.h"
 #include "imesh/clothmesh.h"
 #include "iutil/eventh.h"

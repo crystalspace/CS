@@ -204,7 +204,9 @@ struct iDocumentNode : public iBase
 
   /**
    * Get the value of a node.  Scans all child nodes and looks for a node of
-   * type 'text', and returns the text of that node.
+   * type 'text', and returns the text of that node. WARNING! Make a copy
+   * of this text if you intend to use it later. The document parsing system
+   * does not guarantee anything about the lifetime of the returned string.
    */
   virtual const char* GetContentsValue () = 0;
   /**

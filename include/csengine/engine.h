@@ -515,6 +515,11 @@ public:
   void Warn (const char* description, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
+   * Report an error.
+   */
+  void Error (const char* description, ...) CS_GNUC_PRINTF (2, 3);
+
+  /**
    * Report a bug.
    */
   void ReportBug (const char* description, ...) CS_GNUC_PRINTF (2, 3);

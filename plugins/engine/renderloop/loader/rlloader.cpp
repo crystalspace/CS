@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 
+#include "csutil/util.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iengine/engine.h"
@@ -109,7 +110,7 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
 
   csRef<iRenderLoop> loop = loopmgr->Create ();
 
-  const char* loopName = 0;
+  char* loopName = 0;
 
   if (node)
   {
@@ -123,20 +124,20 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
       {
 	case XMLTOKEN_NAME:
 	  {
-	    loopName = child->GetContentsValue ();
+	    loopName = csStrNew (child->GetContentsValue ());
 	  }
 	  break;
 	case XMLTOKEN_STEPS:
 	  {
 	    if (!ParseRenderSteps (loop, child))
 	    {
-	      return 0;
+	      goto error;
 	    }
 	  }
 	  break;
 	default:
 	  if (synldr) synldr->ReportBadToken (child);
-	  return 0;
+	  goto error;
       }
     }
   }
@@ -183,7 +184,12 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
     }
   }
 
+  delete[] loopName;
   return csPtr<iBase> (loop);
+
+error:
+  delete[] loopName;
+  return 0;
 }
 
 

@@ -580,7 +580,7 @@ private:
    */
   bool HandleMeshParameter (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
-	csStringID id, bool& handled, const char*& priority,
+	csStringID id, bool& handled, char*& priority,
 	bool do_portal_container);
   /**
    * Load the mesh object from the map file.

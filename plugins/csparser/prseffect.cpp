@@ -205,19 +205,24 @@ bool csLoader::ParseEffectPass(iDocumentNode* node, iEffectPass* pass)
     switch(id)
     {
     case XMLTOKEN_BLENDING:
-      pass->SetStateString(ef_strings->blending, effect_server->RequestString(child->GetContentsValue()));
+      pass->SetStateString(ef_strings->blending,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_SHADING:
-      pass->SetStateString(ef_strings->shade_mode, effect_server->RequestString(child->GetContentsValue()));
+      pass->SetStateString(ef_strings->shade_mode,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_SOURCEBLEND:
-      pass->SetStateString(ef_strings->source_blend_mode, effect_server->RequestString(child->GetContentsValue()));
+      pass->SetStateString(ef_strings->source_blend_mode,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;  
     case XMLTOKEN_DESTINATIONBLEND:
-      pass->SetStateString(ef_strings->destination_blend_mode, effect_server->RequestString(child->GetContentsValue()));
+      pass->SetStateString(ef_strings->destination_blend_mode,
+        effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_VERTEXCOLOR:
-      pass->SetStateString(ef_strings->vertex_color_source, effect_server->RequestString(child->GetContentsValue()));
+      pass->SetStateString(ef_strings->vertex_color_source,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_VERTEXPROGRAM: 
       {
@@ -228,7 +233,8 @@ bool csLoader::ParseEffectPass(iDocumentNode* node, iEffectPass* pass)
           break;
         }
 
-        pass->SetStateString(ef_strings->nvvertex_program_gl, effect_server->RequestString( (char*)db->GetData()));
+        pass->SetStateString(ef_strings->nvvertex_program_gl,
+		effect_server->RequestString( (char*)db->GetData()));
       }
       break;
     case XMLTOKEN_VERTEXPROGRAMCONST:
@@ -237,7 +243,8 @@ bool csLoader::ParseEffectPass(iDocumentNode* node, iEffectPass* pass)
         char* mybuff = new char[30];
 
         sprintf(mybuff, "vertex program constant %d", num);
-        pass->SetStateString(effect_server->RequestString(mybuff), effect_server->RequestString(child->GetContentsValue()));
+        pass->SetStateString(effect_server->RequestString(mybuff),
+		effect_server->RequestString(child->GetContentsValue()));
 
         delete []mybuff;
       }
@@ -281,61 +288,79 @@ bool csLoader::ParseEffectLayer(iDocumentNode* node, iEffectLayer* layer)
         if(strcasecmp(child->GetContentsValue(), "fog")==0)
           layer->SetStateString(ef_strings->texture_source, ef_strings->fog);
         else
-          layer->SetStateFloat(ef_strings->texture_source, child->GetContentsValueAsFloat());
+          layer->SetStateFloat(ef_strings->texture_source,
+	  	child->GetContentsValueAsFloat());
       }
       break;
     case XMLTOKEN_TEXTURECOORDSOURCE:
       {
         if(strcasecmp(child->GetContentsValue(), "fog")==0)
-          layer->SetStateString(ef_strings->texture_coordinate_source, ef_strings->fog);
+          layer->SetStateString(ef_strings->texture_coordinate_source,
+	  	ef_strings->fog);
         else if(strcasecmp(child->GetContentsValue(), "mesh")==0)
-          layer->SetStateString(ef_strings->texture_coordinate_source, ef_strings->mesh);
+          layer->SetStateString(ef_strings->texture_coordinate_source,
+	  	ef_strings->mesh);
         else
-          layer->SetStateFloat(ef_strings->texture_coordinate_source, child->GetContentsValueAsFloat());
+          layer->SetStateFloat(ef_strings->texture_coordinate_source,
+	  	child->GetContentsValueAsFloat());
       }
       break;
       //ALOT OF REPEATING STUFF (ALMOST IDENTICAL)
     case XMLTOKEN_COLORSOURCE1:
-      layer->SetStateString(ef_strings->color_source_1, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->color_source_1,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_COLORSOURCE2:
-      layer->SetStateString(ef_strings->color_source_2, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->color_source_2,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_COLORSOURCE3:
-      layer->SetStateString(ef_strings->color_source_3, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->color_source_3,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_COLORMODIFIER1:
-      layer->SetStateString(ef_strings->color_source_modifier_1, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->color_source_modifier_1,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_COLORMODIFIER2:
-      layer->SetStateString(ef_strings->color_source_modifier_2, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->color_source_modifier_2,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_COLORMODIFIER3:
-      layer->SetStateString(ef_strings->color_source_modifier_3, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->color_source_modifier_3,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_ALPHASOURCE1:
-      layer->SetStateString(ef_strings->alpha_source_1, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->alpha_source_1,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_ALPHASOURCE2:
-      layer->SetStateString(ef_strings->alpha_source_2, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->alpha_source_2,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_ALPHASOURCE3:
-      layer->SetStateString(ef_strings->alpha_source_3, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->alpha_source_3,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_ALPHAMODIFIER1:
-      layer->SetStateString(ef_strings->alpha_source_modifier_1, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->alpha_source_modifier_1,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_ALPHAMODIFIER2:
-      layer->SetStateString(ef_strings->alpha_source_modifier_2, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->alpha_source_modifier_2,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_ALPHAMODIFIER3:
-      layer->SetStateString(ef_strings->alpha_source_modifier_3, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->alpha_source_modifier_3,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_COLOROPERATION:
-      layer->SetStateString(ef_strings->color_operation, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->color_operation,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     case XMLTOKEN_ALPHAOPERATION:
-      layer->SetStateString(ef_strings->alpha_operation, effect_server->RequestString(child->GetContentsValue()));
+      layer->SetStateString(ef_strings->alpha_operation,
+      	effect_server->RequestString(child->GetContentsValue()));
       break;
     default:
       SyntaxService->ReportBadToken(child);

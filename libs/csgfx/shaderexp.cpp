@@ -1093,33 +1093,42 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node) {
   cons * cptr = head;
   csStringID tok = xmltokens.Request(node->GetValue());
 
-  if (tok == OP_XML_ATOM) {
+  if (tok == OP_XML_ATOM)
+  {
     const char * type = node->GetAttributeValue("type"), 
                * val  = node->GetContentsValue();
     
     if (!parse_xml_atom(cptr->car, 
 		    xmltypes.Request(type), 
 		    type,
-		    val)) {
+		    val))
+    {
       return false;
     }
 
     cptr->cdr = NULL;
-  } else if (tok == OP_XML_SEXP) {
+  }
+  else if (tok == OP_XML_SEXP)
+  {
     DEBUG_PRINTF("S-expressions not ready yet.\n");
 
     return false;
-  } else if (tok <= OP_INVALID || tok >= OP_LIMIT) {
+  }
+  else if (tok <= OP_INVALID || tok >= OP_LIMIT)
+  {
     DEBUG_PRINTF("Invalid XML token: %s.\n", node->GetValue());
 
     return false;
-  } else {
+  }
+  else
+  {
 
     cptr->car.type = TYPE_OPER;
     cptr->car.oper = tok;
     cptr->cdr = NULL;
     
-    while (iter->HasNext()) {
+    while (iter->HasNext())
+    {
       cptr->cdr = new cons;
       cptr->cdr->cdr_rev = cptr;
       cptr = cptr->cdr;
@@ -1127,14 +1136,17 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node) {
       csRef<iDocumentNode> next_node (iter->Next());
       csStringID sub_tok = xmltokens.Request(next_node->GetValue());
       
-      if (sub_tok != OP_XML_ATOM) {
+      if (sub_tok != OP_XML_ATOM)
+      {
 	cptr->car.type = TYPE_CONS;
 	cptr->car.cell = new cons;
 	
 	if (!parse_xml(cptr->car.cell, next_node)) 
 	  return false;
 	
-      } else {
+      }
+      else
+      {
 	if (!parse_xml(cptr, next_node))
 	  return false;
       }
@@ -1158,21 +1170,25 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
   
   arg.type = type;
 
-  switch (type) {
-  case TYPE_NUMBER: {
+  switch (type)
+  {
+    case TYPE_NUMBER:
+    {
       errno = 0;
 
       double n = strtod(val_str, &tmp);
       arg.num = (float)n;
 
-      if (*tmp) {
+      if (*tmp)
+      {
         DEBUG_PRINTF("Error parsing float at position %i.\n", tmp - val_str);
 
         return false;
       }
     }
 
-    if (errno) {
+    if (errno)
+    {
 #ifdef CS_DEBUG
       perror("Error parsing float");
 #endif
@@ -1181,10 +1197,12 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     }
     break;
 
-  case TYPE_VECTOR2: {
+  case TYPE_VECTOR2:
+  {
     float v1, v2;
 
-    if (sscanf(val_str, "%f,%f", &v1, &v2) < 2) {
+    if (sscanf(val_str, "%f,%f", &v1, &v2) < 2)
+    {
       DEBUG_PRINTF("Couldn't parse vector2: %s.\n", val_str);
 
       return false;
@@ -1194,7 +1212,8 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
 
   } break;
 
-  case TYPE_VECTOR3: {
+  case TYPE_VECTOR3:
+  {
     float v1, v2, v3;
 
     if (sscanf(val_str, "%f,%f,%f", &v1, &v2, &v3) < 3) {
@@ -1207,7 +1226,8 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
 
   } break;
 
-  case TYPE_VECTOR4: {
+  case TYPE_VECTOR4:
+  {
     float v1, v2, v3, v4;
 
     if (sscanf(val_str, "%f,%f,%f,%f", &v1, &v2, &v3, &v4) < 4) {
@@ -1248,7 +1268,8 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
   if (op == OP_PS_MAKE_VECTOR)
     return compile_make_vector(cptr, acc_top, this_acc);
 
-  if (!cptr) { /* zero arg func */
+  if (!cptr)
+  { /* zero arg func */
     oper tmp;
 
     tmp.opcode = op;
@@ -1263,7 +1284,8 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
     return true;
   }
 
-  while (cptr) {
+  while (cptr)
+  {
     oper tmp;
 
     CS_ASSERT((cptr->car.type > TYPE_INVALID && cptr->car.type < TYPE_LIMIT) || cptr->car.type == TYPE_CONS);
@@ -1271,7 +1293,8 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
     tmp.opcode = op;
     tmp.acc = this_acc;
 
-    if (cptr->car.type == TYPE_CONS) {
+    if (cptr->car.type == TYPE_CONS)
+    {
       if (!compile_cons(cptr->car.cell, acc_top)) 
 	return false;
 
@@ -1282,14 +1305,18 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
 	tmp.arg2.acc = this_acc + 1;
 
 	acc_top--;
-      } else if (!cptr->cdr) {
+      }
+      else if (!cptr->cdr)
+      {
 	CS_ASSERT(acc_top > this_acc);
 	
 	tmp.arg1.type = TYPE_ACCUM;
 	tmp.arg1.acc = acc_top - 1;
 
 	tmp.arg2.type = TYPE_INVALID;
-      } else {
+      }
+      else
+      {
 	/* don't want to emit any code yet, there is no 
 	   useful second argument */
 
@@ -1297,23 +1324,33 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
 	continue;
       }
 
-    } else if (acc_top > this_acc) { 
+    }
+    else if (acc_top > this_acc)
+    {
       tmp.arg1.type = TYPE_ACCUM;
       tmp.arg1.acc = this_acc;
       tmp.arg2 = cptr->car;
-    } else {
-      if (cptr->cdr) {
-	if (cptr->cdr->car.type != TYPE_CONS) {
+    }
+    else
+    {
+      if (cptr->cdr)
+      {
+	if (cptr->cdr->car.type != TYPE_CONS)
+	{
 	  tmp.arg1 = cptr->car;
 	  tmp.arg2 = cptr->cdr->car;
 	  
 	  cptr = cptr->cdr;
-	} else {
+	}
+	else
+	{
 	  tmp.opcode = OP_INT_LOAD;
 	  tmp.arg1 = cptr->car;
 	  tmp.arg2.type = TYPE_INVALID;
 	}
-      } else {
+      }
+      else
+      {
 	tmp.arg1 = cptr->car;
 	tmp.arg2.type = TYPE_INVALID;
       }
@@ -1328,38 +1365,46 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
   return true;
 }
 
-bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, int this_acc) {
+bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, int this_acc)
+{
   oper tmp;
   
   tmp.opcode = OP_INT_SELT12;
   tmp.acc = this_acc;
   
-  if (cptr->car.type == TYPE_CONS) {
+  if (cptr->car.type == TYPE_CONS)
+  {
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
     
     tmp.arg1.type = TYPE_ACCUM;
     tmp.arg1.acc = --acc_top;
-  } else {
+  }
+  else
+  {
     tmp.arg1 = cptr->car;
   }
   
   cptr = cptr->cdr;
   
-  if (cptr->car.type == TYPE_CONS) {
+  if (cptr->car.type == TYPE_CONS)
+  {
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
     
     tmp.arg2.type = TYPE_ACCUM;
     tmp.arg2.acc = --acc_top;
-  } else {
+  }
+  else
+  {
     tmp.arg2 = cptr->car;
   }
   
   opcodes.Push(tmp);
   
   cptr = cptr->cdr;
-  if (!cptr) {
+  if (!cptr)
+  {
     acc_top++;
     return true;
   }
@@ -1367,18 +1412,22 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
   tmp.opcode = OP_INT_SELT34;
   tmp.acc = this_acc;
   
-  if (cptr->car.type == TYPE_CONS) {
+  if (cptr->car.type == TYPE_CONS)
+  {
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
     
     tmp.arg1.type = TYPE_ACCUM;
     tmp.arg1.acc = --acc_top;
-  } else {
+  }
+  else
+  {
     tmp.arg1 = cptr->car;
   }
   
   cptr = cptr->cdr;
-  if (!cptr) {
+  if (!cptr)
+  {
     acc_top++;
     
     tmp.arg2.type = TYPE_INVALID;
@@ -1387,13 +1436,16 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
     return true;
   }
   
-  if (cptr->car.type == TYPE_CONS) {
+  if (cptr->car.type == TYPE_CONS)
+  {
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
     
     tmp.arg2.type = TYPE_ACCUM;
     tmp.arg2.acc = --acc_top;
-  } else {
+  }
+  else
+  {
     tmp.arg2 = cptr->car;
   }
   
@@ -1403,7 +1455,8 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
   return true;
 }
 
-void csShaderExpression::destruct_cons(cons * cell) const {
+void csShaderExpression::destruct_cons(cons * cell) const
+{
   if (!cell)
     return;
   
@@ -1415,13 +1468,16 @@ void csShaderExpression::destruct_cons(cons * cell) const {
   delete cell;
 }
 
-void csShaderExpression::print_cons(const cons * head) const {
+void csShaderExpression::print_cons(const cons * head) const
+{
   const cons * cell = head;
 
   printf("(");
 
-  while (cell) {
-    switch (cell->car.type) {
+  while (cell)
+  {
+    switch (cell->car.type)
+    {
     case TYPE_CONS:
       printf(" ");
       print_cons(cell->car.cell);
@@ -1461,16 +1517,20 @@ void csShaderExpression::print_cons(const cons * head) const {
   printf(")");
 }
 
-void csShaderExpression::print_ops(const oper_array & ops) const {
+void csShaderExpression::print_ops(const oper_array & ops) const
+{
   oper_array::Iterator iter = ops.GetIterator();
 
-  while (iter.HasNext()) {
+  while (iter.HasNext())
+  {
     const oper & op = iter.Next();
 
     printf(" %s", mnemonics.Request(op.opcode));
 
-    if (op.arg1.type != TYPE_INVALID) {
-      switch (op.arg1.type) {
+    if (op.arg1.type != TYPE_INVALID)
+    {
+      switch (op.arg1.type)
+      {
       case TYPE_NUMBER:
 	printf(" %f", op.arg1.num);
 	break;
@@ -1501,8 +1561,10 @@ void csShaderExpression::print_ops(const oper_array & ops) const {
       
     }
 
-    if (op.arg2.type != TYPE_INVALID) {
-      switch (op.arg2.type) {
+    if (op.arg2.type != TYPE_INVALID)
+    {
+      switch (op.arg2.type)
+      {
       case TYPE_NUMBER:
 	printf(",%f", op.arg2.num);
 	break;

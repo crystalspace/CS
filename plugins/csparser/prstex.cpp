@@ -143,6 +143,9 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (t) return t;
   }
 
+  csRef<iTextureWrapper> tex;
+  csRef<iLoaderPlugin> plugin;
+
   char filename[256] = "";
   csColor transp (0, 0, 0);
   bool do_transp = false;
@@ -150,7 +153,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   bool always_animate = false;
   TextureLoaderContext context;
   csRef<iDocumentNode> ParamsNode;
-  const char* type = 0;
+  char* type = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -165,7 +168,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool for2d;
 	  if (!SyntaxService->ParseBool (child, for2d, true))
-	    return 0;
+	    goto error;
           if (for2d)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_2D);
           else
@@ -176,7 +179,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool for3d;
 	  if (!SyntaxService->ParseBool (child, for3d, true))
-	    return 0;
+	    goto error;
           if (for3d)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_3D);
           else
@@ -186,7 +189,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       case XMLTOKEN_TRANSPARENT:
         do_transp = true;
 	if (!SyntaxService->ParseColor (child, transp))
-	  return 0;
+	  goto error;
         break;
       case XMLTOKEN_FILE:
 	{
@@ -196,7 +199,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.texture",
 	      child, "Expected VFS filename for 'file'!");
-	    return 0;
+	    goto error;
 	  }
           strcpy (filename, fname);
 	}
@@ -205,7 +208,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool mm;
 	  if (!SyntaxService->ParseBool (child, mm, true))
-	    return 0;
+	    goto error;
           if (mm)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_NOMIPMAPS);
           else
@@ -216,7 +219,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool di;
 	  if (!SyntaxService->ParseBool (child, di, true))
-	    return 0;
+	    goto error;
           if (di)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_DITHER);
           else
@@ -226,21 +229,21 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       case XMLTOKEN_KEEPIMAGE:
         {
 	  if (!SyntaxService->ParseBool (child, keep_image, true))
-	    return 0;
+	    goto error;
 	}
 	break;
       case XMLTOKEN_PARAMS:
 	ParamsNode = child;
 	break;
       case XMLTOKEN_TYPE:
-	type = child->GetContentsValue ();
-	  if (!type)
-	  {
-	    SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      child, "Expected plugin ID for <type>!");
-	    return 0;
-	  }
+	type = csStrNew (child->GetContentsValue ());
+	if (!type)
+	{
+	  SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.texture",
+	    child, "Expected plugin ID for <type>!");
+	  goto error;
+	}
 	break;
       case XMLTOKEN_SIZE:
 	{
@@ -255,13 +258,13 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	break;
       case XMLTOKEN_ALWAYSANIMATE:
 	if (!SyntaxService->ParseBool (child, always_animate, false))
-	  return 0;
+	  goto error;
 	break;
       case XMLTOKEN_CLAMP:
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
-            return 0;
+            goto error;
           if (c)
             context.SetFlags (context.GetFlags() | CS_TEXTURE_CLAMP);
           else
@@ -272,7 +275,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
-            return 0;
+            goto error;
           if (c)
             context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NOFILTER);
           else
@@ -281,7 +284,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
         break;
       default:
         SyntaxService->ReportBadToken (child);
-	return 0;
+	goto error;
     }
   }
 
@@ -291,10 +294,10 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     strcpy (filename, txtname);
   }
 
-  csRef<iLoaderPlugin> plugin;
-
-  iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
-  int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
+  iTextureManager* tm;
+  tm = G3D ? G3D->GetTextureManager() : 0;
+  int Format;
+  Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
   if (filename && (filename[0] != 0))
   {
     csRef<iImage> image = LoadImage (filename, Format);
@@ -306,7 +309,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	(SCF_QUERY_INTERFACE (image, iAnimatedImage));
       if (anim && anim->IsAnimated())
       {
-	type = PLUGIN_TEXTURELOADER_ANIMIMG;
+	type = csStrNew (PLUGIN_TEXTURELOADER_ANIMIMG);
       }
       else
       {
@@ -321,11 +324,10 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       }
     }
   }
-  csRef<iTextureWrapper> tex;
   
   static bool deprecated_warned = false;
 
-  iLoaderPlugin* Plug = 0;
+  iLoaderPlugin* Plug; Plug = 0;
   iBinaryLoaderPlugin* Binplug;
   if (type && !plugin)
   {
@@ -349,11 +351,12 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	  deprecated_warned = true;
 	}
 
-	CS_ALLOC_STACK_ARRAY (char, newtype,
+	char* newtype = new char[
 		strlen (PLUGIN_LEGACY_TEXTYPE_PREFIX) +
-		strlen (type) + 1);
+		strlen (type) + 1];
 	strcpy (newtype, PLUGIN_LEGACY_TEXTYPE_PREFIX);
 	strcat (newtype, type);
+	delete[] type;
 	type = newtype;
 
 	loaded_plugins.FindPlugin (type, Plug, Binplug);
@@ -418,7 +421,13 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
   }
   AddToRegion (ldr_context, tex->QueryObject ());
+
+  delete[] type;
   return tex;
+
+error:
+  delete[] type;
+  return 0;
 }
 
 iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
@@ -737,10 +746,13 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
   int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
-  
+ 
+  csRef<iTextureHandle> itex;
+  csRef<iTextureWrapper> itexwrap;
+
   csRef<iImage> north, south, east, west, top, bottom;
   const char* texname = node->GetAttributeValue ("name");
-  const char *fname;
+  char *fname= 0;
 
   while (it->HasNext ())
   {
@@ -750,83 +762,83 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-    case XMLTOKEN_NORTH:
-      fname = child->GetContentsValue ();
-	    if (!fname)
-	    {
-	      SyntaxService->ReportError (
+      case XMLTOKEN_NORTH:
+        fname = csStrNew (child->GetContentsValue ());
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
 	       "crystalspace.maploader.parse.texture",
 	       child, "Expected VFS filename for 'file'!");
-	      return 0;
-	    }
+	  goto error;
+	}
       
-      north = LoadImage(fname, Format);
-      break;
+        north = LoadImage(fname, Format);
+        break;
     
-    case XMLTOKEN_SOUTH:
-      fname = child->GetContentsValue ();
-	    if (!fname)
-	    {
-	      SyntaxService->ReportError (
+      case XMLTOKEN_SOUTH:
+        fname = csStrNew (child->GetContentsValue ());
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
 	       "crystalspace.maploader.parse.texture",
 	       child, "Expected VFS filename for 'file'!");
-	      return 0;
-	    }
+	  goto error;
+	}
       
-      south = LoadImage(fname, Format);
-      break;
+        south = LoadImage(fname, Format);
+        break;
     
-    case XMLTOKEN_EAST:
-      fname = child->GetContentsValue ();
-	    if (!fname)
-	    {
-	      SyntaxService->ReportError (
+      case XMLTOKEN_EAST:
+        fname = csStrNew (child->GetContentsValue ());
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
 	       "crystalspace.maploader.parse.texture",
 	       child, "Expected VFS filename for 'file'!");
-	      return 0;
-	    }
+	  goto error;
+	}
       
-      east = LoadImage(fname, Format);
-      break;
+        east = LoadImage(fname, Format);
+        break;
     
-    case XMLTOKEN_WEST:
-      fname = child->GetContentsValue ();
-	    if (!fname)
-	    {
-	      SyntaxService->ReportError (
+      case XMLTOKEN_WEST:
+        fname = csStrNew (child->GetContentsValue ());
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
 	       "crystalspace.maploader.parse.texture",
 	       child, "Expected VFS filename for 'file'!");
-	      return 0;
-	    }
+	  goto error;
+	}
       
-      west = LoadImage(fname, Format);
-      break;
+        west = LoadImage(fname, Format);
+        break;
     
-    case XMLTOKEN_TOP:
-      fname = child->GetContentsValue ();
-	    if (!fname)
-	    {
-	      SyntaxService->ReportError (
+      case XMLTOKEN_TOP:
+        fname = csStrNew (child->GetContentsValue ());
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
 	       "crystalspace.maploader.parse.texture",
 	       child, "Expected VFS filename for 'file'!");
-	      return 0;
-	    }
+	  goto error;
+	}
       
-      top = LoadImage(fname, Format);
-      break;
+        top = LoadImage(fname, Format);
+        break;
     
-    case XMLTOKEN_BOTTOM:
-      fname = child->GetContentsValue ();
-	    if (!fname)
-	    {
-	      SyntaxService->ReportError (
+      case XMLTOKEN_BOTTOM:
+        fname = csStrNew (child->GetContentsValue ());
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
 	       "crystalspace.maploader.parse.texture",
 	       child, "Expected VFS filename for 'file'!");
-	      return 0;
-	    }
+	  goto error;
+	}
       
-      bottom = LoadImage(fname, Format);
-      break;
+        bottom = LoadImage(fname, Format);
+        break;
     }
   }
 
@@ -837,12 +849,18 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
   cubetextures->AddImage (top);
   cubetextures->AddImage (bottom);
 
-  csRef<iTextureHandle> itex (tm->RegisterTexture(cubetextures,0, iTextureHandle::CS_TEX_IMG_CUBEMAP));
+  itex = tm->RegisterTexture(cubetextures,0,
+  	iTextureHandle::CS_TEX_IMG_CUBEMAP);
 
-  csRef<iTextureWrapper> itexwrap = Engine->GetTextureList()->NewTexture(itex);
+  itexwrap = Engine->GetTextureList()->NewTexture(itex);
   itexwrap->QueryObject()->SetName(texname);
 
+  delete[] fname;
   return itexwrap;
+
+error:
+  delete[] fname;
+  return 0;
 }
 
 iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
@@ -858,7 +876,6 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
   csRef<iImage> image;
 
   const char* texname = node->GetAttributeValue ("name");
-  const char *fname;
 
   int imagecount = 0;
   while (it->HasNext ())
@@ -869,24 +886,26 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-    case XMLTOKEN_LAYER:
-      fname = child->GetContentsValue ();
-	    if (!fname)
-	    {
-	      SyntaxService->ReportError (
+      case XMLTOKEN_LAYER:
+      {
+        const char* fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
 	       "crystalspace.maploader.parse.texture",
 	       child, "Expected VFS filename for 'file'!");
-	      return 0;
-	    }
-      image = LoadImage(fname, Format);
-      imagevec->AddImage(image);
-      imagecount++;
-
-      break;
+	  return 0;
+	}
+        image = LoadImage(fname, Format);
+        imagevec->AddImage(image);
+        imagecount++;
+        break;
+      }
     }
   }
   
-  csRef<iTextureHandle> itex (tm->RegisterTexture(imagevec,0, iTextureHandle::CS_TEX_IMG_3D));
+  csRef<iTextureHandle> itex (tm->RegisterTexture(imagevec,0,
+  	iTextureHandle::CS_TEX_IMG_3D));
 
   csRef<iTextureWrapper> itexwrap = Engine->GetTextureList()->NewTexture(itex);
   itexwrap->QueryObject()->SetName(texname);

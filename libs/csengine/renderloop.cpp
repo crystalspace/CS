@@ -194,7 +194,7 @@ bool csRenderLoopManager::Unregister (iRenderLoop* loop)
   if ((key = loops.GetKey (loop)) == 0) return false;
   //loop->DecRef();
   loops.Delete (key, loop);
-  return false;
+  return true;
 }
 
 csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
@@ -209,7 +209,7 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
 
   if (rlLoader == 0)
   {
-    engine->Warn ("Error loading '%s': could not retrieve render loop loader",
+    engine->Error ("Error loading '%s': could not retrieve render loop loader",
       fileName);
     return 0;
   }
@@ -217,7 +217,7 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
   csRef<iFile> file = engine->VFS->Open (fileName, VFS_FILE_READ);
   if (file == 0)
   {
-    engine->Warn ("Error loading '%s': could open file on VFS", fileName);
+    engine->Error ("Error loading '%s': could open file on VFS", fileName);
     return 0;
   }
 
@@ -228,19 +228,24 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
 
   const char* error = doc->Parse (file);
   if (error != 0)
-  { 
-    engine->Warn ("Error parsing '%s': %s", fileName, error);
+  {
+    engine->Error ("Error parsing '%s': %s", fileName, error);
     return 0;
   }
 
   csRef<iDocumentNode> rlNode = doc->GetRoot ()->GetNode ("params");
   if (rlNode == 0)
   {
-    engine->Warn ("Error loading '%s': no <params> node", fileName);
+    engine->Error ("Error loading '%s': no <params> node", fileName);
     return 0;
   }
 
   csRef<iBase> b = rlLoader->Parse (rlNode, 0, 0);
+  if (!b)
+  {
+    // Error already reported.
+    return 0;
+  }
   csRef<iRenderLoop> rl = SCF_QUERY_INTERFACE (b, iRenderLoop);
   if (rl == 0)
   {

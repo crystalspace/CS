@@ -176,8 +176,7 @@ bool csShaderGLCGFP::Load(iDocumentNode* program)
         case XMLTOKEN_PROGRAM:
           {
             //save for later loading
-            programstring = new char[strlen(child->GetContentsValue())+1];
-            strcpy(programstring, child->GetContentsValue());
+            programstring = csStrNew (child->GetContentsValue());
           }
           break;
         case XMLTOKEN_DECLARE:

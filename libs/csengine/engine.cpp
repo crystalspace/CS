@@ -103,6 +103,30 @@ void csEngine::Report (const char *description, ...)
   va_end (arg);
 }
 
+void csEngine::Error (const char *description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (!Reporter) Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (
+        CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.engine.warning",
+        description,
+        arg);
+  }
+  else
+  {
+    csPrintfV (description, arg);
+    csPrintf ("\n");
+  }
+
+  va_end (arg);
+}
+
 void csEngine::Warn (const char *description, ...)
 {
   va_list arg;
@@ -816,22 +840,22 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
 #if defined(CS_USE_NEW_RENDERER)
   // Set up the RL manager.
   renderLoopManager = new csRenderLoopManager (this);
-  // Create the default, hardwired RL.
-  defaultRenderLoop = CreateDefaultRenderLoop ();
-  // Register it.
-  renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
-    defaultRenderLoop);
 
   // Now, try to load the user-specified default render loop.
-  const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default",
-    0);
-
-  if (configLoop)
+  const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
+  if (!configLoop)
   {
-    csRef<iRenderLoop> newDefault = renderLoopManager->Load (configLoop);
-    if (newDefault != 0)
-      defaultRenderLoop = newDefault;
+    defaultRenderLoop = CreateDefaultRenderLoop ();
   }
+  else
+  {
+    defaultRenderLoop = renderLoopManager->Load (configLoop);
+    if (!defaultRenderLoop)
+      return false;
+  }
+
+  // Register it.
+  renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, defaultRenderLoop);
 #endif
 
   return true;

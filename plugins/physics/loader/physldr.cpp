@@ -266,12 +266,16 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
         body->MakeStatic ();
         break;
       case XMLTOKEN_MESH:
-        if (child->GetContentsValue ()) {
+        if (child->GetContentsValue ())
+	{
           iMeshWrapper *m = engine->FindMeshObject (child->GetContentsValue ());
-          if (m) {
+          if (m)
+	  {
 	    body->SetTransform (m->GetMovable()->GetTransform());
             body->AttachMesh (m);
-          } else {
+          }
+	  else
+	  {
             synldr->ReportError ("crystalspace.dynamics.loader",
               child, "Unable to find mesh in engine");
             return false;
@@ -284,7 +288,8 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
           child, "Currently unable to parse a bone, sorry.");
         break;
       case XMLTOKEN_COLLIDER:
-        if (!ParseCollider (child, body)) {
+        if (!ParseCollider (child, body))
+	{
           synldr->ReportError ("crystalspace.dynamics.loader",
             child, "Currently unable to parse a bone, sorry.");
           return false;
@@ -317,7 +322,8 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
     {
       case XMLTOKEN_COLLIDERMESH:
       {
-        if (!child->GetAttributeValue ("mesh")) {
+        if (!child->GetAttributeValue ("mesh"))
+	{
 	  synldr->ReportError ("crystalspace.dynamics.loader",
 	    child, "No mesh specified for collidermesh");
 	  return false;
@@ -325,12 +331,15 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
         iMeshWrapper *m = engine->FindMeshObject (child->GetAttributeValue ("mesh"));
 	csOrthoTransform t;
 	ParseTransform (child, t);
-        if (m) {
+        if (m)
+	{
           if( s > 0)
             body->AttachColliderMesh (m, t, f, d, e, s);
           else  //no softness parameter, so use default
             body->AttachColliderMesh (m, t, f, d, e);
-        } else {
+        }
+	else
+	{
           synldr->ReportError ("crystalspace.dynamics.loader",
             child, "Unable to find collider mesh in engine");
           return false;
@@ -383,12 +392,15 @@ bool csPhysicsLoader::ParseSystemColliderMesh (
   float s = node->GetAttributeValueAsFloat ("softness");
   if (!node->GetContentsValue ()) { return false; }
   iMeshWrapper *m = engine->FindMeshObject (node->GetContentsValue ());
-  if (m) {
+  if (m)
+  {
     if( s > 0)
       system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e, s);
     else  //no softness parameter, so use default
       system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e);
-  } else {
+  }
+  else
+  {
     synldr->ReportError ("crystalspace.dynamics.loader",
       node, "Unable to find collider mesh in engine");
     return false;
@@ -487,23 +499,34 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
     switch (id)
     {
       case XMLTOKEN_BODY:
-        if (body1 == 0) {
-          if (child->GetContentsValue ()) {
+        if (body1 == 0)
+	{
+          if (child->GetContentsValue ())
+	  {
             body1 = system->FindBody (child->GetContentsValue());
-          } else {
+          }
+	  else
+	  {
             synldr->ReportError ("crystalspace.dynamics.loader",
               child, "Body should have a name");
             return false;
           }
-        } else if (body2 == 0) {
-          if (child->GetContentsValue ()) {
+        }
+	else if (body2 == 0)
+	{
+          if (child->GetContentsValue ())
+	  {
             body2 = system->FindBody (child->GetContentsValue());
-          } else {
+          }
+	  else
+	  {
             synldr->ReportError ("crystalspace.dynamics.loader",
               child, "Body should have a name");
             return false;
           }
-        } else {
+        }
+	else
+	{
           synldr->ReportError ("crystalspace.dynamics.loader",
             child, "Too many bodies attached to joint");
           return false;
