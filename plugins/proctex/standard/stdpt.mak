@@ -29,7 +29,7 @@ ifeq ($(USE_PLUGINS),yes)
   LIB.STDPT= $(foreach d,$(DEP.STDPT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(STDPT)
 else
-  STDPT = $(OUT)/$(LIBPREFIX)stdpt$(LIB)
+  STDPT = $(OUT)/$(LIB_PREFIX)stdpt$(LIB)
   DEP.EXE += $(STDPT)
   SCF.STATIC += stdpt
   TO_INSTALL.STATIC_LIBS += $(STDPT)
