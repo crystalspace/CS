@@ -77,6 +77,8 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_CAMMODE3 77713
 #define VIEWMESH_COMMAND_MOVEANIMFASTER 77714
 #define VIEWMESH_COMMAND_MOVEANIMSLOWER 77715
+#define VIEWMESH_COMMAND_REVERSEACTION  77716
+#define VIEWMESH_COMMAND_FORWARDACTION  77717
 
 //-----------------------------------------------------------------------------
 
@@ -202,6 +204,24 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  menu->Hide();
 	  return true;
 
+	case VIEWMESH_COMMAND_REVERSEACTION:
+	{
+	  csRef<iSprite3DState> spstate (
+	      SCF_QUERY_INTERFACE(sprite->GetMeshObject(),iSprite3DState));
+	  if (spstate)
+	      spstate->SetReverseAction(true);
+	  menu->Hide();
+	  return true;
+	}
+	case VIEWMESH_COMMAND_FORWARDACTION:
+	{
+	  csRef<iSprite3DState> spstate (
+	      SCF_QUERY_INTERFACE(sprite->GetMeshObject(),iSprite3DState));
+	  if (spstate)
+	      spstate->SetReverseAction(false);
+	  menu->Hide();
+	  return true;
+	}
 	case VIEWMESH_COMMAND_CAMMODE1:
 	  cammode = movenormal;
 	  menu->Hide();
@@ -366,8 +386,14 @@ void ViewMesh::ConstructMenu()
   (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
   (void)new csMenuItem(menu,"Save Mesh (Binary)", VIEWMESH_COMMAND_SAVEMESH);
   (void)new csMenuItem(menu,"Load TextureLib", VIEWMESH_COMMAND_LOADLIB);
-  (void)new csMenuItem(menu,"Move Sprite Faster", VIEWMESH_COMMAND_MOVEANIMFASTER);
-  (void)new csMenuItem(menu,"Move Sprite Slower", VIEWMESH_COMMAND_MOVEANIMSLOWER);
+
+  // AnimMenu
+  csMenu *animmenu = new csMenu(NULL);
+  (void)new csMenuItem(animmenu,"Move Sprite Faster", VIEWMESH_COMMAND_MOVEANIMFASTER);
+  (void)new csMenuItem(animmenu,"Move Sprite Slower", VIEWMESH_COMMAND_MOVEANIMSLOWER);
+  (void)new csMenuItem(animmenu,"Reverse Action",     VIEWMESH_COMMAND_REVERSEACTION);
+  (void)new csMenuItem(animmenu,"Forward Action",     VIEWMESH_COMMAND_FORWARDACTION);
+  (void)new csMenuItem(menu, "Action Effects",animmenu);
 
   // StateMenu
   csMenu *statesmenu = new csMenu(NULL);
