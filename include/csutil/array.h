@@ -565,6 +565,14 @@ public:
   class Iterator
   {
   public:
+    /** Copy constructor. */
+    Iterator(Iterator const& r) :
+      currentelem(r.currentelem), array(r.array) {}
+
+    /** Assignment operator. */
+    Iterator& operator=(Iterator const& r)
+    { currentelem = r.currentelem; array = r.array; return *this; }
+
     /** Returns true if the next Next() call will return an element */
     bool HasNext()
     { return currentelem < array.Length(); }

@@ -19,6 +19,12 @@ chronological order.
 	  (30,000 warnings, according to one report).
 	- Eric Sunshine fixed ambiguous overload compilation error in
 	  cfgmgr.cpp reported by some versions of gcc.
+	- Eric Sunshine added copy constructor and assignment operator to
+	  csArray<>::Iterator in order to make it legal to utilize the iterator
+	  returned by csArray<>::GetIterator().  This change should eliminate a
+	  lot of MSVC compilation warnings when building PlaneShift, the
+	  project files of which use a higher warning level than the CS project
+	  files.
 28-Oct-2003
 	- Jorrit did various optimizations to the tiled coverage buffer
 	  in Dynavis. Added several new special cases to Flush() and
