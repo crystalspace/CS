@@ -387,6 +387,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
   iConfigFile *cfg = new csConfigFile();
   Config = new csConfigManager(cfg, true);
+  cfg->DecRef ();
   Config->SetDomainPriority(cfg, ConfigPriorityApplication);
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
