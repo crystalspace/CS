@@ -84,9 +84,23 @@ machine for instance it can be favourable to use the @emph{Unix} option. We leav
 @picturessss{build,platform,win32,cygwin,cygshot4}
 @end ifnotinfo
 
+After deciding on a root install location and other options, click on the @emph{Next}
+button to continue.
+
+The next dialog you will see is the @emph{Select Local Package Directory} dialog - See
+screenshot below. This directory is corresponds to the location where you placed
+the Cygwin @emph{setup.exe}.
+
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot5}
 @end ifnotinfo
+
+If they correspond click on the @emph{Next} button to continue.
+
+The next dialog you will see is the @emph{Select Your Internet Connection} dialog - See
+screenshot below. This is just so you can specify the type of connection you have. Most
+of the time it will be a @emph{Direct Connection} you have. However, if you access the
+internet via proxy server, please select that option and enter the necessary information.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot6}
