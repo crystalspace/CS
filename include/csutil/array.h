@@ -352,7 +352,7 @@ protected:
   }
 
 private:
-  /// Copy from one array to this.
+  /// Copy from one array to this one, properly constructing the copied items.
   void CopyFrom (const csArray& source)
   {
     if (&source != this)
@@ -365,6 +365,7 @@ private:
     }
   }
 
+  /// Set the capacity of the array precisely to `n' elements.
   void InternalSetCapacity (size_t n)
   {
     if (root == 0)
@@ -384,7 +385,10 @@ private:
     capacity = n;
   }
 
-  // Adjust internal capacity of this array.
+  /**
+   * Adjust capacity of this array to `n' elements rounded up to a multiple of
+   * `threshold'.
+   */
   void AdjustCapacity (size_t n)
   {
     if (n > capacity || (capacity > threshold && n < capacity - threshold))
@@ -393,9 +397,11 @@ private:
     }
   }
 
-  // Set array length.  NOTE: Do not make this public since it does not
-  // properly construct/destroy elements.  To safely truncate the array, use
-  // Truncate().  To safely set the capacity, use SetCapacity().
+  /**
+   * Set array length.  NOTE: Do not make this public since it does not
+   * properly construct/destroy elements.  To safely truncate the array, use
+   * Truncate().  To safely set the capacity, use SetCapacity().
+   */
   void SetLengthUnsafe (size_t n)
   {
     if (n > capacity)
@@ -445,6 +451,7 @@ public:
     }
   }
 
+  /// Destructor.
   ~csArray ()
   {
     DeleteAll ();
