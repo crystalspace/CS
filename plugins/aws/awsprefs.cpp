@@ -1,33 +1,32 @@
 #include "cssysdef.h"
+#include "isys/plugin.h"
 #include "iutil/string.h"
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
+#include "ivaria/iawsprefs.h"
 #include "awsprefs.h"
 
-awsKey *
-awsKeyContainer::Find(iString *name)
+
+
+////////////////////////////////////////////////////////
+
+IMPLEMENT_IBASE (awsPrefManager)
+  IMPLEMENTS_INTERFACE (iAwsPrefs)
+IMPLEMENT_IBASE_END
+
+
+awsPrefManager::awsPrefManager(iBase *iParent)
 {
-   void *p = children.GetFirstItem();
-
-   while(p) 
-   {
-     awsKey *key = static_cast<awsKey *>(p);
-
-     if (key) 
-     {
-       if (key->Name() == name)
-       {
-          return key;
-       }
-     }
-
-     p = children.GetNextItem();
-
-   } // end while traversing the children
-
-  return NULL;
+  CONSTRUCT_IBASE (iParent);
 }
 
+awsPrefManager::~awsPrefManager()
+{
 
+}
 
+void 
+awsPrefManager::Load(char *def_file)
+{
 
+}

@@ -1,7 +1,8 @@
 typedef union {
   char   *str;     /* For returning titles and handles to items. */
-  int     val;   /* For returning numbers                      */
-  csRect *rect;  /* For returning rectangular regions          */
+  int     val;     /* For returning numbers                      */
+  csRect *rect;    /* For returning rectangular regions          */
+  awsKey *key;     /* For returning keys to various definition items */
 } YYSTYPE;
 #define	TOKEN_NUM	257
 #define	TOKEN_STR	258

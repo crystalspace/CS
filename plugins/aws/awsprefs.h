@@ -162,13 +162,17 @@ public:
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
 
-class awsPrefManager
+class awsPrefManager : public iAwsPrefs
 {
    
 
 public:
+    DECLARE_IBASE;
 
+    awsPrefManager(iBase *iParent);
+    virtual ~awsPrefManager();
 
+    virtual void Load(char *def_file);
 
 };
  

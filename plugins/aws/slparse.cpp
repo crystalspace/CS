@@ -20,26 +20,34 @@
 #define	TOKEN_FROM	263
 #define	NEG	264
 
-#line 5 "skinlang.bsn"
+//#line 5 "skinlang.bsn"
 
 
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
+#include "csutil/scfstr.h"
+#include "csutil/csdllist.h"
+#include "ivaria/iawsprefs.h"
+#include "awsprefs.h"
 
 #include <stdio.h>
 
 
-#line 15 "skinlang.bsn"
+#line 18 "skinlang.bsn"
 typedef union {
   char   *str;     /* For returning titles and handles to items. */
-  int     val;   /* For returning numbers                      */
-  csRect *rect;  /* For returning rectangular regions          */
+  int     val;     /* For returning numbers                      */
+  csRect *rect;    /* For returning rectangular regions          */
+  awsKey *key;     /* For returning keys to various definition items */
 } YYSTYPE;
-#line 21 "skinlang.bsn"
+#line 25 "skinlang.bsn"
 
 
 extern int awslex(YYSTYPE *awslval);
 extern int awserror(char *s);
+
+/// This is locally global variable that holds  
+static awsKeyContainer kcont;
 
 #include <stdio.h>
 
@@ -110,9 +118,9 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    48,    49,    52,    53,    54,    55,    62,    63,    64,    68,
-    69,    72,    81,    84,    85,    88,    95,    96,    97,    98,
-    99,   100,   101
+    56,    57,    60,    61,    62,    63,    70,    71,    72,    76,
+    77,    80,    89,    92,    93,    96,   103,   104,   105,   106,
+   107,   108,   109
 };
 #endif
 
@@ -736,59 +744,75 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 53 "skinlang.bsn"
+#line 61 "skinlang.bsn"
 { ;
     break;}
 case 5:
-#line 54 "skinlang.bsn"
+#line 62 "skinlang.bsn"
 { ;
     break;}
 case 6:
-#line 55 "skinlang.bsn"
+#line 63 "skinlang.bsn"
 { yyerrok;      ;
     break;}
 case 7:
-#line 62 "skinlang.bsn"
+#line 70 "skinlang.bsn"
 {               ;
     break;}
 case 8:
-#line 63 "skinlang.bsn"
+#line 71 "skinlang.bsn"
 {               ;
     break;}
 case 9:
-#line 64 "skinlang.bsn"
+#line 72 "skinlang.bsn"
 {               ;
     break;}
+case 10:
+#line 76 "skinlang.bsn"
+{ kcont.Add(yyvsp[0].key); ;
+    break;}
+case 11:
+#line 77 "skinlang.bsn"
+{ kcont.Add(yyvsp[0].key); ;
+    break;}
 case 13:
-#line 81 "skinlang.bsn"
-{                      ;
+#line 89 "skinlang.bsn"
+{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str));   ;
+    break;}
+case 14:
+#line 92 "skinlang.bsn"
+{ kcont.Add(yyvsp[0].key); ;
+    break;}
+case 15:
+#line 93 "skinlang.bsn"
+{ kcont.Add(yyvsp[0].key); ;
     break;}
 case 17:
-#line 95 "skinlang.bsn"
+#line 103 "skinlang.bsn"
 { yyval.val = yyvsp[0].val;      ;
     break;}
 case 18:
-#line 96 "skinlang.bsn"
+#line 104 "skinlang.bsn"
 { yyval.val = yyvsp[-2].val + yyvsp[0].val; ;
     break;}
 case 19:
-#line 97 "skinlang.bsn"
+#line 105 "skinlang.bsn"
 { yyval.val = yyvsp[-2].val - yyvsp[0].val; ;
     break;}
 case 20:
-#line 98 "skinlang.bsn"
+#line 106 "skinlang.bsn"
 { yyval.val = yyvsp[-2].val * yyvsp[0].val; ;
     break;}
 case 21:
-#line 99 "skinlang.bsn"
+#line 107 "skinlang.bsn"
 { yyval.val = yyvsp[-2].val / yyvsp[0].val; ;
     break;}
 case 22:
-#line 100 "skinlang.bsn"
+#line 108 "skinlang.bsn"
 { yyval.val = -yyvsp[0].val;     ;
     break;}
 case 23:
-#line 101 "skinlang.bsn"
+#line 109 "skinlang.bsn"
 { yyval.val = yyvsp[-1].val;      ;
     break;}
 }
@@ -1013,7 +1037,7 @@ yyerrhandle:
     }
   return 1;
 }
-#line 106 "skinlang.bsn"
+#line 114 "skinlang.bsn"
 
 
 int 

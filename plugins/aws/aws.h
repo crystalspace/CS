@@ -26,7 +26,6 @@ windowing system.  It supports simple skinning via the .skn defintions, and crea
 
  ****/
  
- 
 
 class awsComponent
 {
@@ -35,6 +34,29 @@ class awsComponent
 public:
 
 
+
+};
+
+class awsManager : public iAws
+{
+
+public:
+    DECLARE_IBASE;
+
+    awsManager(iBase *p);
+    virtual ~awsManager();
+    
+    bool Initialize(iSystem *sys);
+
+    virtual void Load(char *defs_file);
+
+  // Implement iPlugIn interface.
+  struct eiPlugIn : public iPlugIn
+  {
+    DECLARE_EMBEDDED_IBASE(awsManager);
+    virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent(iEvent&) { return false; }
+  } scfiPlugIn;
 
 };
  

@@ -6,6 +6,9 @@
 
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
+#include "csutil/scfstr.h"
+#include "csutil/csdllist.h"
+#include "awsprefs.h"
 
 #include <stdio.h>
 
@@ -16,12 +19,16 @@
   char   *str;     /* For returning titles and handles to items. */
   int     val;     /* For returning numbers                      */
   csRect *rect;    /* For returning rectangular regions          */
+  awsKey *key;     /* For returning keys to various definition items */
 }
 
 %{
 
 extern int awslex(YYSTYPE *awslval);
 extern int awserror(char *s);
+
+/// This is locally global variable that holds  
+static awsKeyContainer kcont;
 
 %}
 
@@ -34,7 +41,8 @@ extern int awserror(char *s);
 %token        TOKEN_FROM
 
 %type  <val>  exp
-/*%type  <rect> rectdef*/
+%type  <key>  skin_item window_item
+ 
 
 %right '='
 %left '-' '+'
@@ -65,8 +73,8 @@ window_item:    TOKEN_ATTR ':' TOKEN_STR                                        
 ;
 
 
-window_item_list:  window_item
-              | window_item_list window_item
+window_item_list:  window_item                                                  { kcont.Add($1); }
+              | window_item_list window_item                                    { kcont.Add($2); }
 ;
 
 window:        TOKEN_WINDOW TOKEN_STR TOKEN_FROM TOKEN_STR '{' window_item_list '}'
@@ -78,11 +86,11 @@ window:        TOKEN_WINDOW TOKEN_STR TOKEN_FROM TOKEN_STR '{' window_item_list 
   Definitions for parsing a skin def
  *************************************/
 
-skin_item:       TOKEN_ATTR ':' TOKEN_STR             {                      }
+skin_item:       TOKEN_ATTR ':' TOKEN_STR             { $$ = new awsStringKey(new scfString($1), new scfString($3));   }
 ;
 
-skin_item_list:  skin_item                
-               | skin_item_list skin_item 
+skin_item_list:  skin_item                            { kcont.Add($1); }
+               | skin_item_list skin_item             { kcont.Add($2); }
 ;
 
 skin:            TOKEN_SKIN TOKEN_FOR TOKEN_STR '{' skin_item_list '}'   
