@@ -412,6 +412,8 @@ class csString(_object):
     def GetDataSafe(*args): return _cspace.csString_GetDataSafe(*args)
     def Length(*args): return _cspace.csString_Length(*args)
     def IsEmpty(*args): return _cspace.csString_IsEmpty(*args)
+    def FindStr(*args): return _cspace.csString_FindStr(*args)
+    def FindReplace(*args): return _cspace.csString_FindReplace(*args)
     def StartsWith(*args): return _cspace.csString_StartsWith(*args)
     def __init__(self, *args):
         _swig_setattr(self, csString, 'this', _cspace.new_csString(*args))
@@ -4117,6 +4119,8 @@ class iEngine(iBase):
     def GetCurrentDefaultRenderloop(*args): return _cspace.iEngine_GetCurrentDefaultRenderloop(*args)
     def SetCurrentDefaultRenderloop(*args): return _cspace.iEngine_SetCurrentDefaultRenderloop(*args)
     def GetCurrentFrameNumber(*args): return _cspace.iEngine_GetCurrentFrameNumber(*args)
+    def SetSaveableFlag(*args): return _cspace.iEngine_SetSaveableFlag(*args)
+    def GetSaveableFlag(*args): return _cspace.iEngine_GetSaveableFlag(*args)
     def __del__(self, destroy=_cspace.delete_iEngine):
         try:
             if self.thisown: destroy(self)
@@ -9205,7 +9209,6 @@ class iTextureHandle(iBase):
     CS_TEXTURE_CUBE_NEG_Z = _cspace.iTextureHandle_CS_TEXTURE_CUBE_NEG_Z
     def GetRendererDimensions(*args): return _cspace.iTextureHandle_GetRendererDimensions(*args)
     def GetOriginalDimensions(*args): return _cspace.iTextureHandle_GetOriginalDimensions(*args)
-    def SetTextureTarget(*args): return _cspace.iTextureHandle_SetTextureTarget(*args)
     def GetTextureTarget(*args): return _cspace.iTextureHandle_GetTextureTarget(*args)
     def Blit(*args): return _cspace.iTextureHandle_Blit(*args)
     def GetImageName(*args): return _cspace.iTextureHandle_GetImageName(*args)
