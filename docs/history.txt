@@ -22,6 +22,13 @@ chronological order.
 	    - WriteString() now wraps WriteStringBaseline() on all canvas.
 	    - The surrogate check macros in cssys/csunicode.h didn't honor 
 	      that characters can get wider than 16 bits.
+	- Jorrit added the following commands to walktest console:
+	    - varlist: list all variables currently defined in the engine and
+	      their values.
+	    - var: show one variable value.
+	    - setvar: set a floating point value to a variable.
+	    - setvarc: set a color value to a variable.
+	    - setvarv: set a vector value to a variable.
 	- res fixed the missing SetLimit() compile error in 
 	  apps/demosky/demosky.cpp.
 	- res added dummies for the new LOD functions to 

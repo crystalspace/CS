@@ -1059,6 +1059,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  coordsave coordload bind p_alpha s_fog");
     CONPRI("  snd_play snd_volume record play clrrec saverec");
     CONPRI("  loadrec action plugins conflist confset do_logo");
+    CONPRI("  varlist var setvar setvarv setvarc");
 
 #   undef CONPRI
   }
@@ -1085,6 +1086,148 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"%d: %s", i, fact->QueryDescription ());
       i++;
+    }
+  }
+  else if (!strcasecmp (cmd, "setvarc"))
+  {
+    if (!arg)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"Please give a name of a variable and a color.");
+      return false;
+    }
+    char name[256];
+    csColor c;
+    csScanStr (arg, "%s,%f,%f,%f", name, &c.red, &c.green, &c.blue);
+
+    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariable* v = vl->FindByName (name);
+    if (!v)
+    {
+      csRef<iSharedVariable> nv = vl->New ();
+      v = nv;
+      v->SetName (name);
+      vl->Add (nv);
+    }
+    v->SetColor (c);
+  }
+  else if (!strcasecmp (cmd, "setvarv"))
+  {
+    if (!arg)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"Please give a name of a variable and a vector.");
+      return false;
+    }
+    char name[256];
+    csVector3 w;
+    csScanStr (arg, "%s,%f,%f,%f", name, &w.x, &w.y, &w.z);
+
+    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariable* v = vl->FindByName (name);
+    if (!v)
+    {
+      csRef<iSharedVariable> nv = vl->New ();
+      v = nv;
+      v->SetName (name);
+      vl->Add (nv);
+    }
+    v->SetVector (w);
+  }
+  else if (!strcasecmp (cmd, "setvar"))
+  {
+    if (!arg)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"Please give a name of a variable and a value.");
+      return false;
+    }
+    char name[256];
+    float value;
+    csScanStr (arg, "%s,%f", name, &value);
+
+    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariable* v = vl->FindByName (name);
+    if (!v)
+    {
+      csRef<iSharedVariable> nv = vl->New ();
+      v = nv;
+      v->SetName (name);
+      vl->Add (nv);
+    }
+    v->Set (value);
+  }
+  else if (!strcasecmp (cmd, "var"))
+  {
+    if (!arg)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"Please give a name of a variable to show.");
+      return false;
+    }
+    char name[256];
+    csScanStr (arg, "%s", name);
+
+    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariable* v = vl->FindByName (name);
+    if (!v)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"Couldn't find variable '%s'!", name);
+      return false;
+    }
+    int t = v->GetType ();
+    switch (t)
+    {
+      case iSharedVariable::SV_FLOAT:
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
+	  	v->GetName (), v->Get ());
+	break;
+      case iSharedVariable::SV_COLOR:
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
+	  	v->GetName (), v->GetColor ().red, v->GetColor ().green,
+		v->GetColor ().blue);
+	break;
+      case iSharedVariable::SV_VECTOR:
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
+	  	v->GetName (), v->GetVector ().x, v->GetVector ().y,
+		v->GetVector ().z);
+        break;
+      default:
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
+	  	v->GetName ());
+        break;
+    }
+  }
+  else if (!strcasecmp (cmd, "varlist"))
+  {
+    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    int i;
+    for (i = 0 ; i < vl->GetCount () ; i++)
+    {
+      iSharedVariable* v = vl->Get (i);
+      int t = v->GetType ();
+      switch (t)
+      {
+        case iSharedVariable::SV_FLOAT:
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
+	  	v->GetName (), v->Get ());
+	  break;
+        case iSharedVariable::SV_COLOR:
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
+	  	v->GetName (), v->GetColor ().red, v->GetColor ().green,
+		v->GetColor ().blue);
+	  break;
+        case iSharedVariable::SV_VECTOR:
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
+	  	v->GetName (), v->GetVector ().x, v->GetVector ().y,
+		v->GetVector ().z);
+          break;
+        default:
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
+	  	v->GetName ());
+          break;
+      }
     }
   }
   else if (!strcasecmp (cmd, "conflist"))
@@ -1281,9 +1424,9 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  return true;
 	}
 	else
-    {
+	{
 	  strcpy(name, option);
-    }
+	}
 	char buf[255];
 	sprintf (buf, "/this/%s.rps", name);
 	Sys->recorded_perf_stats->SetOutputFile (buf, summary);
