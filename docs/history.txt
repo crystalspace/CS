@@ -69,6 +69,9 @@ chronological order.
 	      It is correct when just culling against a rview. Functions to
 	      cull properly against lightvolumes and portals is still work 
 	      in progress.
+	- Marten Svanfeldt changed GL_CLAMP into GL_CLAMP_TO_EDGE in glrender3ds
+	  texturecache. They should be identical, but ATI does not work as
+	  expected when using GL_CLAMP.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:
