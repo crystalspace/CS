@@ -43,7 +43,7 @@ private:
   // functions which might want to partake of this unsafe behavior are those
   // which return the excess strings to the caller with the expectation that
   // the caller will be responsible for freeing them with delete[].
-  void SetLength (int n, bool dealloc = true)
+  void SetLength (int n, bool dealloc)
   {
     // Free all items between new count and old count.
     int i;
@@ -139,7 +139,7 @@ public:
   /// Set vector length to n.
   void SetLength (int n)
   {
-    SetLength(n);
+    SetLength(n, true);
   }
 
   /// Query vector length.
@@ -173,7 +173,7 @@ public:
   {
     CS_ASSERT (n >= 0);
     if (n >= count)
-      SetLength (n + 1);
+      SetLength (n + 1, true);
     delete root[n];
     root[n] = csStrNew (ptr);
   }
@@ -212,7 +212,7 @@ public:
   /// Push a element on 'top' of vector (makes a copy of the string).
   int Push (char const* what)
   {
-    SetLength (count + 1);
+    SetLength (count + 1, true);
     root [count - 1] = csStrNew (what);
     return (count - 1);
   }
@@ -316,7 +316,7 @@ public:
   {
     if (n <= count)
     {
-      SetLength (count + 1); // Increments 'count' as a side-effect.
+      SetLength (count + 1, true); // Increments 'count' as a side-effect.
       const int nmove = (count - n - 1);
       if (nmove > 0)
       {
