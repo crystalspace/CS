@@ -1,10 +1,30 @@
 The history order is reversed so that new features are at the top.
 
+11-Feb-2003
+	- Fixed lightning command in walktest to also work if there is no
+	  light called 'l1'.
+	- Fixed lightning sequence in flarge a bit.
+	- Added iSequenceManager->GetDeltaTime(). This time should be added
+	  to GetMainTime() if you want to know the current main time when
+	  NOT in an operation callback! If you are in an operation callback
+	  then you should use the delta time that is given to you as a
+	  parameter instead.
+	- The sequence manager now fires in the 'final' stage
+	  (cscmdFinalProcess) instead of cscmdPostProcess. The engine
+	  sequence manager now fires in the cscmdPostProcess stage instead
+	  of cscmdPreProcess. This is to ensure that the following order
+	  of execution is guaranteed for every frame:
+	  	1. Frame is rendered.
+		2. Engine sequence manager fires and performs remaining
+		   timed operations.
+		3. Sequence manager fires and performs operations.
+	  We REALLY need a better event priority system so that we don't
+	  have to depend on those ugly 'pre', 'final', and 'post' things.
 10-Feb-2003
 	- Marten Svanfeldt fixed various bugs in TextureManager
 	- Philipp Aumayr added new TextureManager for Render3D with support
-	  for 1D, 3D and CubeMap Textures. iTextureManager and iTexture interface
-	  was extended to do so (#ifdef CS_USE_NEW_RENDERER)
+	  for 1D, 3D and CubeMap Textures. iTextureManager and iTexture
+	  interface was extended to do so (#ifdef CS_USE_NEW_RENDERER).
 	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
 	  caused perftest to output results twice.
 	- Philip Wyett moved the flicker-note texture into 'stdtex.zip',

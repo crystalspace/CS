@@ -1122,12 +1122,13 @@ void show_lightning ()
     // This finds the light L1 (the colored light over the stairs) and
     // makes the lightning restore this color back after it runs.
     iStatLight *light = Sys->view->GetEngine ()->FindLight("l1");
-    iSharedVariable *var = Sys->view->GetEngine ()->GetVariableList()->FindByName("Lightning Restore Color");
+    iSharedVariable *var = Sys->view->GetEngine ()->GetVariableList()
+    	->FindByName("Lightning Restore Color");
     if (light && var)
     {
       var->SetColor (light->GetPrivateObject ()->GetColor ());
-      seqmgr->RunSequenceByName ("seq_lightning", 0);
     }
+    seqmgr->RunSequenceByName ("seq_lightning", 0);
   }
   else
   {

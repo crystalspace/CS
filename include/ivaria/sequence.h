@@ -129,7 +129,7 @@ struct iSequence : public iBase
   virtual bool IsEmpty () = 0;
 };
 
-SCF_VERSION (iSequenceManager, 0, 0, 3);
+SCF_VERSION (iSequenceManager, 0, 1, 0);
 
 /**
  * The sequence manager. The sequence manager is a plugin that will perform
@@ -190,8 +190,19 @@ struct iSequenceManager : public iBase
    * Get the current time for the sequence manager. This is not
    * directly related to the real current time.
    * Suspending the sequence manager will also freeze this time.
+   * Note that the sequence manager updates the main time AFTER
+   * rendering frames. So if you want to get the real main time
+   * you should add the delta returned by GetDeltaTime() too. However
+   * from within operation callbacks you should just use GetMainTime()
+   * in combination with the supplied delta.
    */
-  virtual csTicks GetMainTime () = 0;
+  virtual csTicks GetMainTime () const = 0;
+
+  /**
+   * Get the delta time to add to the main time to get the real main time.
+   * Do not use GetDeltaTime() from within the operation callback.
+   */
+  virtual csTicks GetDeltaTime () const = 0;
 
   /**
    * Create a new empty sequence. This sequence is not attached to the

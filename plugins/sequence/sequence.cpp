@@ -219,8 +219,10 @@ bool csSequenceManager::Initialize (iObjectRegistry *r)
 
 bool csSequenceManager::HandleEvent (iEvent &event)
 {
+  // Sequence manager must be final because engine sequence manager
+  // must come first. @@@ HACKY
   if (event.Type != csevBroadcast
-   || event.Command.Code != cscmdPostProcess)
+   || event.Command.Code != cscmdFinalProcess)
     return false;
 
   if (!suspended)
@@ -235,6 +237,15 @@ bool csSequenceManager::HandleEvent (iEvent &event)
     previous_time = current_time;
   }
   return true;
+}
+
+csTicks csSequenceManager::GetDeltaTime () const
+{
+  if (suspended) return 0;
+  if (!previous_time_valid)
+    return 0;
+  else
+    return csGetTicks () - previous_time;
 }
 
 void csSequenceManager::Clear ()
@@ -266,8 +277,7 @@ void csSequenceManager::TimeWarp (csTicks time, bool skip)
   {
     // Because an operation can itself modify the main sequence
     // queue we take care to first unlink this sequence operation
-    // before performing it. Because DeleteFirstSequence() does a
-    // DecRef() we first IncRef() it.
+    // before performing it.
     csRef<iSequenceOperation> op = seqOp->operation;
     csRef<iBase> params = seqOp->params;
     csTicks opt = seqOp->time;
