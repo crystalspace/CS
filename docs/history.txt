@@ -1,6 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+8-Dec-2000
+	- Samuel Humphreys did the following changes to phyztest:
+	    - First stage of reformatting csphyziks to be more consistent
+	      with itself and the Crystal Space style.
+	    - Fixed the dissappearing block in phyztest..thx to Michaels
+	      guidance.
+	    - Added reportage of the main variables associated with the
+	      block object.
+	    - Changed the room to be a cube of 10 units each side centred
+	      on the origin.
 7-Dec-2000
+	- Wouter Wijngaards made the fire polygon unlit in ptlab. This
+	  looks better.
 	- Eric Sunshine made the following changes:
 	    - Renamed the following classes and SCF interfaces.  Fixed all
 	      source files, header files, and documentation to reflect these
@@ -118,6 +130,10 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated several compilation warnings from
 	  crysball.cpp.
 	- Eric Sunshine added missing RequestPlugin(FontServer) to simplep.cpp.
+	- Samuel Humphreys added a fire procedural texture to ptlab. The fire
+	  algorithm was contributed by Wouter Wijngaards.
+	- Martin Geisse fixed a bug which caused the sound modules to ignore
+	  some config settings.
 5-Dec-2000
 	- Wouter Wijngaards created csBox3::SquaredOriginDist which returns
 	  a float with the squared distance of the box to (0,0,0). It
