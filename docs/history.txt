@@ -15,6 +15,19 @@ chronological order.
 	  referencing that location, so SCF would not find those installed
 	  plugins.
 	- res fixed csdemo after the csSpline constness changes.
+	- Jorrit added a new 'csbench' application. The purpose of this
+	  application is to collect benchmark and usability statistics about
+	  the NR OpenGL renderer. To do that it will create a simple room with
+	  a high poly object and then it will render that room for five seconds
+	  with various settings for the NR GL renderer. For every run it
+	  will print out the performance and also make a screenshot. All
+	  this information is collected in 'csbench_report.zip'.
+	  This application is not finished yet. The basic framework is there
+	  and it currently also does two tests already but more tests will
+	  follow.
+	- Jorrit added a new iGraphics3D->SetOption() so that you can set
+	  renderer specific options from within the application. Implemented
+	  the "StencilThreshold" option for the NR GL renderer.
 17-Jun-2004
 	- Jorrit changed g3d->ClosePortal() to also have a new use_zfill_portal
 	  flag. When this flag is set the renderer will zfill the portal area.

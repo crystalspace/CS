@@ -709,6 +709,11 @@ public:
     return 0;
   }
 
+  virtual bool SetOption (const char*, const char*)
+  {
+    return false;
+  }
+
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
 
   virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool);

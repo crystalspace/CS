@@ -2289,6 +2289,16 @@ long csGLGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
   }
 }
 
+bool csGLGraphics3D::SetOption (const char* name, const char* value)
+{
+  if (!strcmp (name, "StencilThreshold"))
+  {
+    sscanf (value, "%d", &stencil_threshold);
+    return true;
+  }
+  return false;
+}
+
 csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
 {
   return csPtr<iPolygonRenderer> (new csGLPolygonRenderer (this));

@@ -3295,6 +3295,11 @@ long csGraphics3DSoftwareCommon::GetRenderState(G3D_RENDERSTATEOPTION op) const
   }
 }
 
+bool csGraphics3DSoftwareCommon::SetOption (const char*, const char*)
+{
+  return false;
+}
+
 void csGraphics3DSoftwareCommon::ClearCache()
 {
   if (tcache) tcache->Clear ();

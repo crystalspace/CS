@@ -5638,6 +5638,11 @@ long csGraphics3DOGLCommon::GetRenderState (G3D_RENDERSTATEOPTION op) const
   }
 }
 
+bool csGraphics3DOGLCommon::SetOption (const char*, const char*)
+{
+  return false;
+}
+
 void csGraphics3DOGLCommon::ClearCache ()
 {
   // We will clear lightmap cache since when unloading a world lightmaps

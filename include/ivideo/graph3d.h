@@ -963,6 +963,12 @@ struct iGraphics3D : public iBase
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const = 0;
 
   /**
+   * Set a renderer specific option. Returns false if renderer doesn't
+   * support that option.
+   */
+  virtual bool SetOption (const char*, const char*) = 0;
+
+  /**
    * Create a renderbuffer.
    * \param size Size of the buffer in bytes.
    * \param type Type of buffer; CS_BUF_DYNAMIC or CS_BUF_STATIC

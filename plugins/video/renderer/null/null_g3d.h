@@ -150,6 +150,8 @@ public:
   /// Get a renderstate value.
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
 
+  virtual bool SetOption (const char*, const char*);
+
   /**
    * Get the current driver's capabilities. Each driver implements their
    * own function.

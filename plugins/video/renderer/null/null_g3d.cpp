@@ -274,6 +274,11 @@ long csGraphics3DNull::GetRenderState (G3D_RENDERSTATEOPTION op) const
   }
 }
 
+bool csGraphics3DNull::SetOption (const char*, const char*)
+{
+  return false;
+}
+
 void csGraphics3DNull::DrawLine (const csVector3&, const csVector3&,
   float /*fov*/, int /*color*/)
 {

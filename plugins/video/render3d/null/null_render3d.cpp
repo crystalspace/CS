@@ -463,9 +463,15 @@ bool csNullGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
 {
   return false;
 }
+
 long csNullGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
 {
   return 0;
+}
+
+bool csNullGraphics3D::SetOption (const char*, const char*)
+{
+  return false;
 }
 
 csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (int size,

@@ -465,6 +465,7 @@ public:
 
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
+  virtual bool SetOption (const char*, const char*);
 
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh, 

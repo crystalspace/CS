@@ -8,3 +8,4 @@ SubInclude TOP apps tests lghtngtest ;
 SubInclude TOP apps tests perl5tst ;
 SubInclude TOP apps tests unittest ;
 SubInclude TOP apps tests vostest ;
+SubInclude TOP apps tests csbench ;

@@ -109,6 +109,7 @@ public:
   bool HasNearPlane () const;
   bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   long GetRenderState (G3D_RENDERSTATEOPTION op) const;
+  bool SetOption (const char*, const char*);
   csPtr<iRenderBuffer> CreateRenderBuffer (int size,
     csRenderBufferType type, csRenderBufferComponentType componentType,
     int componentCount, bool index);
