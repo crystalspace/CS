@@ -61,8 +61,11 @@ void Clone (iBase *iObject)
   iName *name = QUERY_INTERFACE (newobj, iName);
   if (name)
   {
-    printf ("Name of the object is [%s], setting name to [Clone]\n",
-      name->GetName ());
+    if (!name->GetName())
+      printf ("Object is unnamed; renaming to \"Clone\"\n");
+    else
+      printf ("Object's name is \"%s\"; renaming to \"Clone\"\n",
+        name->GetName ());
     name->SetName ("Clone");
     name->DecRef ();
   }
