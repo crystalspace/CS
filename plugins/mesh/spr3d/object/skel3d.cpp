@@ -219,6 +219,7 @@ csSkelLimbState::~csSkelLimbState ()
     delete children;
     children = n;
   }
+  delete[] name;
 }
 
 void csSkelLimbState::Transform (const csTransform& tr, csVector3* source,
