@@ -27,7 +27,7 @@ LIBRARY.CFLAGS += $(COMPILER.CFLAGS.PIC) ;
 
 # The BFD tag name under which to embed meta-information into a plugin module.
 # This much match the name expected by csGetPluginMetadata() (bfdplugins.cpp).
-SECTION_TAG_NAME ?= .$(PACKAGE_NAME) ;
+SECTION_TAG_NAME ?= .crystalspace ;
 
 #----------------------------------------------------------------------------
 # platform specific rules
