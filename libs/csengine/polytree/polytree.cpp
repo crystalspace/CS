@@ -320,15 +320,24 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
 	    // We can not see the polygon from 'pos'. So we could be in solid
 	    // space.
 	    data->cnt_solid++;
-	    if (data->cnt_solid >= data->wanted_solid) return (void*)1;
+	    if (data->cnt_solid >= data->wanted_solid)
+	    {
+	      delete [] sorted_polygons;
+	      return (void*)1;
+	    }
 	  }
 	  // We tested all points.
-	  if (data->num_polygon_was_hit >= 6) return (void*)1;
+	  if (data->num_polygon_was_hit >= 6)
+	  {
+	    delete [] sorted_polygons;
+	    return (void*)1;
+	  }
 	  // Otherwise don't test any other polygons from this node.
 	  break;
         }
       }
     }
+  delete [] sorted_polygons;
   return NULL;
 }
 

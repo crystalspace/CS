@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 26-Jun-2000
+	- Fixed memory leak while building BSP/octree.
 	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp
 	  and cswstest.cpp.
 	- Eric Sunshine fixed several broken comments in sft3dcom.h.
