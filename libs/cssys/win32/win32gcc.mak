@@ -16,6 +16,7 @@ PLUGINS+=net/driver/ensocket
 #PLUGINS.DYNAMIC += font/server/freefnt2
 #PLUGINS+=video/format/avi
 #PLUGINS+=video/format/codecs/opendivx
+#PLUGINS+=physics/odedynam
 
 # if u have the following line uncommented make sure one
 # LIBS.OPENGL.SYSTEM is set below or you have a custom
