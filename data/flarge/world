@@ -18742,7 +18742,7 @@
 		    <colldet>no</colldet>
                     <portal>
                         <sector>corridor</sector>
-                        <w x="59.1" y="-21.7" z="2.3" />
+                        <ww x="59.1" y="-21.7" z="2.3" />
                         <matrix>
                             <m11>0</m11>
                             <m12>0</m12>
@@ -22832,7 +22832,7 @@
                     <lighting>no</lighting>
                     <portal>
                         <sector>wavySector</sector>
-                        <w x="11" y="0" z="0" />
+                        <ww x="11" y="0" z="0" />
                         <maxvisit>15</maxvisit>
                     </portal>
                 </p>
@@ -22844,7 +22844,7 @@
                     <lighting>no</lighting>
                     <portal>
                         <sector>wavySector</sector>
-                        <w x="0" y="0" z="-11" />
+                        <ww x="0" y="0" z="-11" />
                         <maxvisit>15</maxvisit>
                     </portal>
                 </p>
@@ -22856,7 +22856,7 @@
                     <lighting>no</lighting>
                     <portal>
                         <sector>wavySector</sector>
-                        <w x="-11" y="0" z="0" />
+                        <ww x="-11" y="0" z="0" />
                         <maxvisit>15</maxvisit>
                     </portal>
                 </p>
@@ -22882,7 +22882,7 @@
                     <lighting>no</lighting>
                     <portal>
                         <sector>wavySector</sector>
-                        <w x="0" y="0" z="11" />
+                        <ww x="0" y="0" z="11" />
                         <maxvisit>15</maxvisit>
                     </portal>
                 </p>

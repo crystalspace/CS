@@ -66,11 +66,11 @@ public:
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v);
   virtual bool ParseColor (iDocumentNode* node, csColor &c);
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode);
-  virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
-		  	   uint32 &flags, bool &mirror,
-  			   bool& warp, int& msv,
-			   csMatrix3 &m, csVector3 &before,
-			   csVector3 &after, iString* destSector);
+  virtual bool HandlePortalParameter (
+	iDocumentNode* child, iLoaderContext* ldr_context,
+	uint32 &flags, bool &mirror, bool &warp, int& msv,
+	csMatrix3 &m, csVector3 &before, csVector3 &after,
+	iString* destSector, bool& handled);
   virtual bool ParseGradient (iDocumentNode* node,
 			      csGradient& gradient);
   virtual bool ParseShaderParam (iDocumentNode* node,

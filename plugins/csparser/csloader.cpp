@@ -25,6 +25,7 @@
 #include "csutil/xmltiny.h"
 #include "csutil/cfgfile.h"
 #include "csutil/scanstr.h"
+#include "csutil/scfstr.h"
 #include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
 #include "cstool/sndwrap.h"
@@ -78,6 +79,7 @@
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
 #include "ivaria/reporter.h"
+#include "csgeom/poly3d.h"
 #include "csgeom/polymesh.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
@@ -3950,51 +3952,81 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
 // @@@ Need to use syntax services::ParsePortal()!
   const char* name = node->GetAttributeValue ("name");
   iSector* destSector = 0;
-  csDirtyAccessArray<csVector3> poly;
+  csPoly3D poly;
+
+  csMatrix3 m_w; m_w.Identity ();
+  csVector3 v_w_before (0, 0, 0);
+  csVector3 v_w_after (0, 0, 0);
+  uint32 flags = 0;
+  bool do_warp = false;
+  bool do_mirror = false;
+  int msv = -1;
+  scfString destSectorName;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  csRef<csMissingSectorCallback> missing_cb;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
+    bool handled;
+    if (!SyntaxService->HandlePortalParameter (child, ldr_context,
+        flags, do_mirror, do_warp, msv, m_w, v_w_before, v_w_after,
+	&destSectorName, handled))
     {
-      case XMLTOKEN_SECTOR:
-	destSector = ldr_context->FindSector (child->GetContentsValue ());
-	if (!destSector)
-	{
-	  missing_cb = csPtr<csMissingSectorCallback> (
-	  	new csMissingSectorCallback (ldr_context,
-			child->GetContentsValue ()));
-	}
-        break;
-      case XMLTOKEN_V:
-        {
-          csVector3 vec;
-          if (!SyntaxService->ParseVector (child, vec))
-	    return false;
-	  poly.Push (vec);
-	}
-        break;
-      default:
-	SyntaxService->ReportBadToken (child);
-	return false;
+      return false;
+    }
+    if (!handled)
+    {
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+        case XMLTOKEN_V:
+          {
+            csVector3 vec;
+            if (!SyntaxService->ParseVector (child, vec))
+	      return false;
+	    poly.AddVertex (vec);
+	  }
+          break;
+        default:
+	  SyntaxService->ReportBadToken (child);
+	  return false;
+      }
     }
   }
 
   iPortal* portal;
+  destSector = ldr_context->FindSector (destSectorName.GetData ());
   csRef<iMeshWrapper> mesh = Engine->CreatePortal (
   	name,
   	sourceSector, csVector3 (0), destSector,
-  	poly.GetArray (), poly.Length (), portal);
+  	poly.GetVertices (), poly.GetVertexCount (), portal);
   if (!destSector)
   {
     // Create a callback to find the sector at runtime when the
     // portal is first used.
+    csMissingSectorCallback* missing_cb = new csMissingSectorCallback (
+	    	ldr_context, destSectorName.GetData ());
     portal->SetMissingSectorCallback (missing_cb);
+    missing_cb->DecRef ();
   }
+
+  portal->GetFlags ().Set (flags);
+  if (do_mirror)
+  {
+    csPlane3 p = poly.ComputePlane ();
+    portal->SetWarp (csTransform::GetReflect (p));
+  }
+  else if (do_warp)
+  {
+    portal->SetWarp (m_w, v_w_before, v_w_after);
+  }
+  if (msv != -1)
+  {
+    portal->SetMaximumSectorVisit (msv);
+  }
+
   return true;
 }
 

@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Oct-2003
+	- Jorrit changed syntax services->ParsePortal() into
+	  HandlePortalParameter(). This is a more general function which can
+	  parse portal parameters but doesn't return an error if it
+	  doesn't recognize the token. That way the standard loader will be
+	  able to use this and also add additional tokens to parse.
+	- Jorrit changed the warp vector notation for portals in the loader from
+	  'v' to 'wv' and 'w' to 'ww' to avoid collision with using 'v'
+	  for specifying the vertices of a portal.
+	- Jorrit changed the main loader so that it also calls syntax services
+	  HandlePortalParameter(). This means that you can now specify all
+	  portal stuff in the <portal> statement.
 2-Oct-2003
 	- Jorrit extended the two versions of iEngine->CreatePortal() with
 	  a 'name' parameter. That name will be used for the portal container

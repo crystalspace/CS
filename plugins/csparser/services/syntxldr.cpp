@@ -109,10 +109,10 @@ enum
   XMLTOKEN_INTEGER,
   XMLTOKEN_MAXVISIT,
   XMLTOKEN_MIXMODE,
-  XMLTOKEN_V,
+  XMLTOKEN_WV,
   XMLTOKEN_MATRIX,
   XMLTOKEN_VISCULL,
-  XMLTOKEN_W,
+  XMLTOKEN_WW,
   XMLTOKEN_MIRROR,
   XMLTOKEN_STATIC,
   XMLTOKEN_STRING,
@@ -182,10 +182,10 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
   xmltokens.Register ("maxvisit", XMLTOKEN_MAXVISIT);
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
-  xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("wv", XMLTOKEN_WV);
   xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
   xmltokens.Register ("viscull", XMLTOKEN_VISCULL);
-  xmltokens.Register ("w", XMLTOKEN_W);
+  xmltokens.Register ("ww", XMLTOKEN_WW);
   xmltokens.Register ("mirror", XMLTOKEN_MIRROR);
   xmltokens.Register ("static", XMLTOKEN_STATIC);
   xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
@@ -387,79 +387,67 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
 #undef MIXMODE_EXCLUSIVE
 }
 
-bool csTextSyntaxService::ParsePortal (
-	iDocumentNode* node, iLoaderContext* ldr_context,
+bool csTextSyntaxService::HandlePortalParameter (
+	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector)
+	iString* destSector, bool& handled)
 {
-  destSector->Clear ();
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
+  handled = true;
+  const char* value = child->GetValue ();
+  csStringID id = xmltokens.Request (value);
+  switch (id)
   {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_MAXVISIT:
-	msv = child->GetContentsValueAsInt ();
-	break;
-      case XMLTOKEN_MATRIX:
-	ParseMatrix (child, m);
-	mirror = false;
-	warp = true;
-        break;
-      case XMLTOKEN_V:
-        ParseVector (child, before);
-        after = before;
-        mirror = false;
-        warp = true;
-        break;
-      case XMLTOKEN_W:
-        ParseVector (child, after);
-        mirror = false;
-        warp = true;
-        break;
-      case XMLTOKEN_MIRROR:
-	if (!ParseBool (child, mirror, true))
-	  return false;
-        break;
-      case XMLTOKEN_CLIPSTRADDLING:
-        flags |= CS_PORTAL_CLIPSTRADDLING;
-        break;
-      case XMLTOKEN_COLLDET:
-        flags |= CS_PORTAL_COLLDET;
-        break;
-      case XMLTOKEN_VISCULL:
-        flags |= CS_PORTAL_VISCULL;
-        break;
-      case XMLTOKEN_STATIC:
-        flags |= CS_PORTAL_STATICDEST;
-        break;
-      case XMLTOKEN_FLOAT:
-        flags |= CS_PORTAL_FLOAT;
-        break;
-      case XMLTOKEN_ZFILL:
-        flags |= CS_PORTAL_ZFILL;
-        break;
-      case XMLTOKEN_CLIP:
-        flags |= CS_PORTAL_CLIPDEST;
-        break;
-      case XMLTOKEN_SECTOR:
-	destSector->Append (child->GetContentsValue ());
-	break;
-      default:
-	ReportBadToken (child);
+    case XMLTOKEN_MAXVISIT:
+      msv = child->GetContentsValueAsInt ();
+      break;
+    case XMLTOKEN_MATRIX:
+      ParseMatrix (child, m);
+      mirror = false;
+      warp = true;
+      break;
+    case XMLTOKEN_WV:
+      ParseVector (child, before);
+      after = before;
+      mirror = false;
+      warp = true;
+      break;
+    case XMLTOKEN_WW:
+      ParseVector (child, after);
+      mirror = false;
+      warp = true;
+      break;
+    case XMLTOKEN_MIRROR:
+      if (!ParseBool (child, mirror, true))
         return false;
-    }
-  }
-  if (destSector->Length () == 0)
-  {
-    ReportError ("crystalspace.syntax.portal", node,
-      "Missing sector in portal!");
-    return false;
+      break;
+    case XMLTOKEN_CLIPSTRADDLING:
+      flags |= CS_PORTAL_CLIPSTRADDLING;
+      break;
+    case XMLTOKEN_COLLDET:
+      flags |= CS_PORTAL_COLLDET;
+      break;
+    case XMLTOKEN_VISCULL:
+      flags |= CS_PORTAL_VISCULL;
+      break;
+    case XMLTOKEN_STATIC:
+      flags |= CS_PORTAL_STATICDEST;
+      break;
+    case XMLTOKEN_FLOAT:
+      flags |= CS_PORTAL_FLOAT;
+      break;
+    case XMLTOKEN_ZFILL:
+      flags |= CS_PORTAL_ZFILL;
+      break;
+    case XMLTOKEN_CLIP:
+      flags |= CS_PORTAL_CLIPDEST;
+      break;
+    case XMLTOKEN_SECTOR:
+      destSector->Append (child->GetContentsValue ());
+      break;
+    default:
+      handled = false;
+      return true;
   }
 
   return true;

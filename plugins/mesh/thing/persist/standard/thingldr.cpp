@@ -389,6 +389,42 @@ SCF_IMPLEMENT_IBASE (MissingSectorCallback)
   SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
 SCF_IMPLEMENT_IBASE_END
 
+bool csThingLoader::ParsePortal (
+	iDocumentNode* node, iLoaderContext* ldr_context,
+	uint32 &flags, bool &mirror, bool &warp, int& msv,
+	csMatrix3 &m, csVector3 &before, csVector3 &after,
+	iString* destSector)
+{
+  destSector->Clear ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    //const char* value = child->GetValue ();
+    //csStringID id = xmltokens.Request (value);
+    bool handled;
+    if (!synldr->HandlePortalParameter (child, ldr_context,
+        flags, mirror, warp, msv, m, before, after, destSector, handled))
+    {
+      return false;
+    }
+    if (!handled)
+    {
+      synldr->ReportBadToken (child);
+      return false;
+    }
+  }
+  if (destSector->Length () == 0)
+  {
+    synldr->ReportError ("crystalspace.syntax.portal", node,
+      "Missing sector in portal!");
+    return false;
+  }
+
+  return true;
+}
+
 bool csThingLoader::ParsePoly3d (
         iDocumentNode* node,
 	iLoaderContext* ldr_context,
@@ -713,7 +749,7 @@ bool csThingLoader::ParsePoly3d (
     int msv = -1;
     scfString destSectorName;
 
-    if (synldr->ParsePortal (portal_node, ldr_context,
+    if (ParsePortal (portal_node, ldr_context,
 	      flags, do_mirror, do_warp, msv,
 	      m_w, v_w_before, v_w_after, &destSectorName))
     {

@@ -104,15 +104,16 @@ struct iSyntaxService : public iBase
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode) = 0;
 
   /**
-   * Parses a portal definition specification.
+   * Handles a common portal parameter.
    * flags: contains all flags found in the description.
+   * Returns false on failure. Returns false in 'handled' if it couldn't
+   * understand the token.
    */
-  virtual bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
-		  	   uint32 &flags, bool &mirror,
-  			   bool& warp, int& msv,
-			   csMatrix3 &m, csVector3 &before,
-			   csVector3 &after, iString* destSector) = 0;
-
+  virtual bool HandlePortalParameter (
+	iDocumentNode* child, iLoaderContext* ldr_context,
+	uint32 &flags, bool &mirror, bool &warp, int& msv,
+	csMatrix3 &m, csVector3 &before, csVector3 &after,
+	iString* destSector, bool& handled) = 0;
 
   /**
    * Parse a color gradient.
