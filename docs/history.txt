@@ -1,6 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
+16-Nov-2000
+	- Martin Geisse did some updates to documentation.
+	- Thomas Hieber provided the base implementation of gamecore
+	  iEntity and iEntityComponentIterator is now done.
 15-Nov-2000
+	- Martin Geisse added streamed sound sources to ds3d module.
+	  Output is still distorted but you can at least hear what it
+	  should be like.
+	- Seth Galbraith updated Squawk so that you can now controll the
+	  views simultaneously. Also added simplified keyboard controls
+	  and todo list.
+	- Thomas Hieber had another idea on how to make iEntity _really_
+	  generic. I really think you can't make this class any simpler now.
+	  I guess I should be able now to provide a simple and efficient
+	  implementation for iEntity soon.
 	- Andrew Zabolotny did the following:
 	    - Fixed a bug in DrawPolygonFX introduced by my last changes,
 	      caused by an minor `optimization' I've added near the end
