@@ -75,7 +75,7 @@ public:
    * Construct a smart pointer from a raw object reference. Calls IncRef()
    * on the object.
    */
-  explicit csRef (T* newobj) : obj (newobj)
+  csRef (T* newobj) : obj (newobj)
   {
     if (obj)
       obj->IncRef ();
