@@ -364,7 +364,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csEngine)
 
 SCF_EXPORT_CLASS_TABLE (engine)
-  SCF_EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.core",
+  SCF_EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.3d",
     "Crystal Space 3D Engine",
       "crystalspace.kernel., "
       "crystalspace.graphics3d., "

@@ -22,6 +22,9 @@ The history order is reversed so that new features are at the top.
 	  accessed via the --detailed-help option.
 	- Eric Sunshine eliminated a float-to-int compilation warning from
 	  isotest.cpp.
+	- Eric Sunshine changed the SCF name for the 3D engine from
+	  crystalspace.engine.core to crystalspace.engine.3d in order to
+	  complement the existing crystalspace.engine.iso SCF class name.
 26-Jun-2001
 	- Philip updated the win32gcc.txi doc to add explanation about
 	  PYTHONPATH environment variable.

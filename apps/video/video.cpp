@@ -374,7 +374,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
   System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.core:Engine");
+  System->RequestPlugin ("crystalspace.engine.3d:Engine");
   System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
 

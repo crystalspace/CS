@@ -674,7 +674,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
   System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.core:Engine");
+  System->RequestPlugin ("crystalspace.engine.3d:Engine");
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

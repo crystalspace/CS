@@ -236,7 +236,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin (
     "crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin (
-    "crystalspace.engine.core:Engine");
+    "crystalspace.engine.3d:Engine");
   System->RequestPlugin (
     "crystalspace.level.loader:LevelLoader");
 

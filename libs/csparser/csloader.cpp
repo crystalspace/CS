@@ -1907,7 +1907,7 @@ SCF_EXPORT_CLASS_TABLE (lvlload)
     "Level and library file loader", "crystalspace.kernel., "
     "crystalspace.sound.loader., crystalspace.image.loader, "
     "crystalspace.mesh.loader., crystalspace.terrain.loader., "
-    "crystalspace.engine.core, crystalspace.graphics3d., "
+    "crystalspace.engine.3d, crystalspace.graphics3d., "
     "crystalspace.sound.render., crystalspace.motion.manager.")
 SCF_EXPORT_CLASS_TABLE_END
 

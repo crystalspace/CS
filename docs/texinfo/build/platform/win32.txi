@@ -449,7 +449,7 @@ Q. @emph{I get the following (or similar) errors:}
 WARNING: could not load plugin
   `crystalspace.graphics3d.software'
 WARNING: failed to initialize plugin
-  `crystalspace.engine.core'
+  `crystalspace.engine.3d'
 FATAL: No iGraphics3D plug-in loaded!
 FATAL: No iGraphics2D plug-in loaded!
 Error initializing system!

@@ -166,7 +166,7 @@ Using the engine as a plugin means in the first loading the engine plugin
 instead of linking to the @file{csengine} library.  You can do this with:
 
 @example
-System->RequestPlugin ("crystalspace.engine.core:Engine");
+System->RequestPlugin ("crystalspace.engine.3d:Engine");
 System->Initialize (argc, argv, NULL);
 @dots{}
 iEngine* engine = CS_QUERY_PLUGIN (System, iEngine);
@@ -747,6 +747,11 @@ bool MyApp::HandleEvent (iEvent &Event)
 @cindex @code{csMeshWrapper}
 @cindex @code{csEngine::NextFrame()}
 @cindex @code{iEngine::NextFrame()}
+
+The @sc{scf} name of the 3D engine changed from:@*
+@code{crystalspace.engine.core}@*
+To:
+@code{crystalspace.engine.3d}
 
 @code{csEngine::NextFrame()} and @code{iEngine::NextFrame()} are removed.
 This is now done automatically in @code{csEngine::Draw()}.

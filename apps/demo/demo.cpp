@@ -744,7 +744,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   // Load the engine plugin.
   engine =
-    CS_LOAD_PLUGIN (this, "crystalspace.engine.core", CS_FUNCID_ENGINE, iEngine);
+    CS_LOAD_PLUGIN (this, "crystalspace.engine.3d", CS_FUNCID_ENGINE, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No engine!\n");
