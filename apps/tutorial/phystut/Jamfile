@@ -1,5 +1,8 @@
 SubDir TOP apps tutorial phystut ;
 
-Description phystut : "physics tutorial" ;
-Application phystut : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith phystut : csgeom csgfx cstool csutil ;
+if $(ODE.AVAILABLE) = "yes"
+{
+  Description phystut : "physics tutorial" ;
+  Application phystut : [ Wildcard *.cpp *.h ] : noinstall ;
+  LinkWith phystut : csgeom csgfx cstool csutil ;
+}

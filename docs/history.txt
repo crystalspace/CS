@@ -11,6 +11,10 @@ chronological order.
 	  configure.ac so that it demands version 0.5. Also added a check to
 	  see if ODE was built with OPCODE support since OPCODE support is
 	  required by Mike Handverger's latest changes.
+	- Wouter Wijngaards changed the Jamfile for the phystut tutorial
+	  application. It failed to examine if ODE.AVAILABLE was set,
+	  resulting in trying to compile phystut in the absence of ode,
+	  even though ivaria/ode.h includes ode/ode.h.
 4-Sep-2004
 	- Mike Handverger updated odedynam including the following changes:
 	    - TriMesh collisions (that collide with everything except planes,
