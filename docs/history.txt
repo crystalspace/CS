@@ -70,6 +70,10 @@ chronological order.
 	  shader program <variablemap> parser.
 	- res changed the fixed and PS1 shader plugins to use the new shader
 	  plugin base class.
+	- Jorrit fixed a problem with the new autoresolve and the old
+	  style portal specification using the <portal> keyword in a
+	  thing mesh. In this particular case it wouldn't actually work
+	  and it would also use an uninitialized variable.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

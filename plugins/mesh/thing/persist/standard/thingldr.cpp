@@ -394,7 +394,6 @@ bool csThingLoader::ParsePortal (
     //const char* value = child->GetValue ();
     //csStringID id = xmltokens.Request (value);
     bool handled;
-    bool autoresolve;
     if (!synldr->HandlePortalParameter (child, ldr_context,
         flags, mirror, warp, msv, m, before, after, destSector, handled,
 	autoresolve))
@@ -747,7 +746,7 @@ bool csThingLoader::ParsePoly3d (
     int msv = -1;
     scfString destSectorName;
 
-    bool autoresolve;
+    bool autoresolve = false;
     if (ParsePortal (portal_node, ldr_context,
 	      flags, do_mirror, do_warp, msv,
 	      m_w, v_w_before, v_w_after, &destSectorName, autoresolve))

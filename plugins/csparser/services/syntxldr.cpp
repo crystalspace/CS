@@ -287,7 +287,6 @@ bool csTextSyntaxService::HandlePortalParameter (
 	iString* destSector, bool& handled, bool& autoresolve)
 {
   handled = true;
-  autoresolve = false;
   const char* value = child->GetValue ();
   csStringID id = xmltokens.Request (value);
   switch (id)
