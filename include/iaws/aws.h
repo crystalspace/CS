@@ -43,6 +43,7 @@ class  awsComponentFactory;
 struct  iGraphics2D;
 struct  iGraphics3D;
 struct  iEngine;
+struct  iView;
 struct  iTextureManager;
 struct  iObjectRegistry;
 struct  iTextureHandle;
@@ -494,6 +495,12 @@ struct iAwsWindow : public iAwsComponent
 
   /// Event triggered when a window is about to be lowered
   virtual void OnLower()=0;
+
+  /// Sets the engine view for this window 
+  virtual void SetEngineView(iView *_view)=0;
+
+  /// Gets the engine view for this window
+  virtual iView *GetEngineView()=0;
 };
 
 
