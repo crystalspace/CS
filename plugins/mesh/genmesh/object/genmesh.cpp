@@ -997,11 +997,11 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
   lighting_movable = movable;
 
-  if (factory->light_mgr)
+  if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
   {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
-      ->GetRelevantLights (logparent, -1, false);
-    UpdateLighting (relevant_lights, movable);
+    // Remember relevant lights for later.
+    relevant_lights = factory->light_mgr->GetRelevantLights (
+    	logparent, -1, false);
   }
 
   iMaterialWrapper* mater = material;
@@ -1192,7 +1192,14 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
 {
   if (var->Name == csGenmeshMeshObjectFactory::color_name)
   {
-    UpdateLighting2 (lighting_movable);
+    if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
+    {
+      UpdateLighting (relevant_lights, lighting_movable);
+    }
+    else
+    {
+      UpdateLighting2 (lighting_movable);
+    }
     if (mesh_colors_dirty_flag)
     {
       color_buffer = g3d->CreateRenderBuffer (

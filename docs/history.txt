@@ -19,6 +19,10 @@ chronological order.
 	- Jorrit added views to the new isotest. You can switch with tab.
 	- Peter Amstutz fixed an mistake in an entry in the driver database
 	  "Rage128" -> "Rage 128"
+	- Jorrit optimized genmesh so that with NR the lighting update
+	  routine is only called if the shaders actually need color
+	  information. That speeds up levels that use stencil shadows or
+	  other shaders that don't require software vertex lighting.
 3-Jun-2004
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
 	  clients to create msvcgen %foo%-style template variables on-the-fly.

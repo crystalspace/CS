@@ -125,6 +125,10 @@ private:
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
   csSet<iLight*> affecting_lights;
+  // In case we are not using the iLightingInfo system then we
+  // GetRenderMeshes() will updated the following array:
+  csArray<iLight*> relevant_lights;
+
   // If the following flag is dirty then some of the affecting lights
   // has changed and we need to recalculate.
   bool lighting_dirty;
