@@ -8,8 +8,8 @@ DESCRIPTION.OS.win32gcc = Win32
 PLUGINS += sound/renderer/software
 PLUGINS += video/canvas/ddraw
 PLUGINS += video/canvas/ddraw8
-#PLUGINS.DYNAMIC +=video/format/avi
-#PLUGINS.DYNAMIC +=video/format/codecs/opendivx
+#PLUGINS +=video/format/avi
+#PLUGINS +=video/format/codecs/opendivx
 
 ifeq ($(GL.AVAILABLE),yes)
 PLUGINS += video/canvas/openglwin
