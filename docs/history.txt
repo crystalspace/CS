@@ -16,9 +16,23 @@ Short-term cleanups that need to be done:
 5-Aug-1999
 	- Eric Sunshine fixed a compilation warning in djvidsys.cpp where
 	  XModeCount was declared without a type.  It is now declared as int.
+	- Michael Dale Long did some fixes on ISystem::GetSubSystemPtr().
+	- Small change to 2D OpenGL X driver to show 'XSHM' if it is used.
+	- Improved the c-buffer implementation to use one global unused
+	  list instead of an unused list for every scanline.
+	- Continued work on the c-buffer stuff. Note that it is still not
+	  enabled and the current queue stuff that I added is already obsolete
+	  before being used even once :-)  I'm going to implement it in a much
+	  better and more general (and less error prone) method using the object
+	  pool design pattern.
+	- The CACHE option for the software renderer was mistakenly
+	  put in the Hardware config section. Moved to the TextureManager
+	  section where it belongs.
 	- Eric Sunshine generalized the MacOS/X Server, OpenStep, and NextStep
 	  makefiles slightly.
 4-Aug-1999
+	- Implemented dynamic lighting for gouraud shaded polygons (NOT sprites
+	  and curves, that's another matter).
 	- Eric Sunshine committed Seth Galbraith's latest version of Squawk
 	  to the CVS repository.  He also made the following modifications:
 	    - Fixed a problem with the handling of the texture manager.  The
@@ -33,7 +47,30 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed oodles of new compilation warnings and a few
 	  compilation errors in MazeD.  Also fixed a link error caused by a
 	  second definition of csTextureMM::fIgnoreLoadingErrors which
-	  incorrectly materialized in me_world.cpp for an unknown reason.
+	  incorrectly appeared in me_world.cpp for some unknown reason.
+	- Robert Bate fixed compile errors for CodeWarrior (Macintosh).
+	- Changed glOrtho again. This fixes the problem of the walls
+	  disappearing when you come to close. Unfortunatelly this means
+	  that Z buffer is now not accurate anymore :-( We need to find
+	  a better solution for this.
+	- Jorrit forgot to change the second CalculateFogPolygon() routine
+	  so that it also uses Z for distance calculation and not sqrt.
+	- Jorrit found an extra pass for the OpenGL renderer which
+	  improves quality for SRC*DST mode on the RIVA 128. It almost
+	  looks like 2*SRC*DST.
+	- Andrew Zabolotny did a cleanup in all 3D drivers:
+	    - Made a seperate config file for software renderer
+	      (softrndr.cfg) and moved every related configuration
+	      parameter from cryst.cfg (etc) to it.
+	    - Removed all methods from IGraphics3D interface that are
+	      useful only for software renderer, removed them as well
+	      from all other renderers.
+	    - Fox for 32-bit modes different from RGBA (unlighted textures).
+	      Not tested though.
+	- Thomas Hieber made MazeD, software renderer, and some other
+	  stuff compilable again on MSVC. He also fixed the VC project
+	  files.
+	- Robert Bate fixed software renderer with regards to DO_MMX.
 3-Aug-1999
 	- Added 'FILE' keyword in SPRITE template loader so that you can load
 	  3DS and MD2 files from within a world file (and every other format
@@ -54,25 +91,34 @@ Short-term cleanups that need to be done:
 	- Michael Dale Long added Initialize() code to GGI 2D driver
 	  so that the GGI port works again.
 	- Added update to MazeD from Or Siu-Hang with the following changes:
-	    - All things in the world all displayed.  Previously only one
+	    - All things in the world all displayed. Previously only one
 	      thing was displayed.
-	    - The save path was incorrect.  The map was saved into cryst
-	      directory no matter the path that the user selected.
-	    - Some hand-edited map features (like 'start' and 'thing') were
-	      lost when MazeD loaded and then saved the level.  This is now
-	      fixed.  There are still a few features not supported though.
-	    - Portal Expression Generation: select it in edit/select menu,
-	      drag accross the portal position and MazeD will gnerate a portal
-	      expression for the two sectors involved.
-	    - Polygon Mirror Expression.  You can now change the attributes of
-	      a selected polygon by changing the texture, name, and even the
-	      mirror effect of a particular polygon (edit/select/polygon).
+	    - The save path was incorrect. The map was saved into
+	      cryst directory no matter the path that the user
+	      selected.
+	    - Some hand-edited map features (like 'start' and
+	      'thing') were lost when MazeD loaded and then saved
+	      the level. This is now fixed. There are still a
+	      few features not supported though.
+	    - Portal Expression Generation: select it in edit/select
+	      menu, drag accross the portal position and MazeD
+	      will gnerate a portal expression for the two sectors involved.
+	    - Polygon Mirror Expression. You can now change the
+	      attributes of a selected polygon by changing the
+	      texture, name, and even the mirror effect of a
+	      particular polygon (edit/select/polygon).
+	- Fixed long standing bug with csPolyPlane::ObjectToWorld(). This
+	  function did not bother to normalize the resulting world plane.
+	  Most of the time this does not give problem except when scaling
+	  things or polygons. Then this could affect lighting and other
+	  parts of the engine. Unfortunatelly this extra normalization
+	  is not efficient.
 	- Eric Sunshine fixed a problem in 3ds.cpp where the compiler
 	  correctly warned that "num_cor3_prev" might have been used
 	  uninitialized.
 2-Aug-1999
-	- Added 'maxpol' debugging functionality to OpenGL renderer (just like
-	  software renderer).
+	- Added 'maxpol' debugging functionality to OpenGL renderer (just
+	  like software renderer).
 	- Experimenting with OpenGL renderer. Fixed a bug already (lightmap
 	  scaling).
 	- Implemented a c-buffer class (csCBuffer). Project file maintainers
@@ -80,19 +126,19 @@ Short-term cleanups that need to be done:
 	- Andrew Zabolotny fixed a bug in the makefile system which caused
 	  some changes in user.mak not to be reflected in volatile.h.
 	- Andrew did many small changes required to build Win32 version from
-	  command line using GNU Make and VC++.  He removed DllMain() from
+	  command line using GNU Make and VC++. He removed DllMain() from
 	  several 3D and 2D drivers and moved it to a seperate file
-	  libs/cssys/win32/dllentry.cpp.  Moved ModuleHandle to csCOM library.
+	  libs/cssys/win32/dllentry.cpp. Moved ModuleHandle to csCOM library.
 	  Fixed complete_pixel_format() to work around a bug in VC 5.
 1-Aug-1999
-	- Jorrit managed to get hardware accelerated OpenGL in Linux (for my
+	- I managed to get hardware accelerated OpenGL in Linux (for my
 	  RIVA 128)!
-	- Changed glOrtho() settings in OpenGL renderer so that it works
-	  better on my RIVA 128 card (problems with Z buffering otherwise).
+	- Changed glOrtho() settings in OpenGL renderer so that it works better
+	  on my RIVA 128 card (problems with Z buffering otherwise).
 	- For OpenGL/DrawPolygon() the Z buffer test is disabled when blending
-	  a lightmap if Zbuf mode is equal to fill.  This gives a noticable
+	  a lightmap if Zbuf mode is equal to fill. This gives a noticable
 	  performance increase (about 5%).
-	- Use Z instead of sqrt for vertex fog distance calculation.  This is
+	- Use Z instead of sqrt for vertex fog distance calculation. This is
 	  not as accurate but a lot faster.
 31-Jul-1999
 	- Michael Dale Long made a small fix in unixconf.sh for IRIX.
