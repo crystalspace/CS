@@ -571,7 +571,7 @@ private:
   void UpdateLightingSubmesh (iLight* lights, iMovable* movable, 
     CalRenderer *pCalRenderer, int mesh, int submesh);
   void UpdateLighting (iMovable* movable, CalRenderer *pCalRenderer);
-  void UpdateLighting (const csArray<iLight>& lights,
+  void UpdateLighting (const csArray<iLight*>& lights,
       iMovable* movable);
 
 public:

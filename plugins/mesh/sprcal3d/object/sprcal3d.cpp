@@ -852,7 +852,7 @@ void csSpriteCal3DMeshObject::LightDisconnect (iLight* light)
   lighting_dirty = true;
 }
 
-void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight>& lights,
+void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 					      iMovable* movable)
 {
   CalRenderer *pCalRenderer;
