@@ -339,3 +339,32 @@ use @code{iAWS::SetupCanvas} instead.
 This means that functions like @code{iVFS::MountRoot()} and
 @code{iVFS::FindFiles()} now return an @code{iStringArray}.
 
+@subheading iEventQueue clients now responsible for their own references
+@cindex @code{csEventQueue}
+@cindex @code{iEventQueue}
+@cindex @code{csEvent}
+@cindex @code{iEvent}
+@cindex @code{csPoolEvent}
+@cindex @code{csEventOutlet}
+@cindex @code{iEventOutlet}
+@cindex @code{csEventCord}
+@cindex @code{iEventCord}
+
+Clients passing a @code{csEvent} instance @code{iEventQueue::Post()} or
+@code{iEventOutlet::Post()} must now @code{DecRef()} the @code{csEvent} after
+the call, since the @code{iEventQueue} will @code{IncRef()} it during the call
+and then @code{DecRef()} it when it's been handled.
+
+This means that if you are calling @code{Post()} like this:
+@example
+  iEvent *e = new csEvent (foo, bar);
+  eventq->Post(e);
+@end example
+You must now call it like this:
+@example
+  csRef<iEvent> *e = csPtr<iEvent> (new csEvent (foo, bar));
+  eventq->Post(e);
+@end example
+
+Events created with @code{iEventQueue::CreateEvent()} or
+@code{iEventOutlet::CreateEvent()} are unaffected by this change.

@@ -75,11 +75,7 @@ void csEventOutlet::Post (iEvent *Event)
     // If the cord does not handle the event, then place it in the queue.
     if (!cord || !cord->Post (Event))
       Queue->Post (Event);
-    else
-      Event->DecRefUnlessPooled();
   }
-  else
-    Event->DecRefUnlessPooled();
 }
 
 void csEventOutlet::Key (int iKey, int iChar, bool iDown)
@@ -125,7 +121,8 @@ void csEventOutlet::Joystick (int iNumber, int iButton,
 
 void csEventOutlet::Broadcast (int iCode, void *iInfo)
 {
-  Queue->Post (new csEvent (csGetTicks (), csevBroadcast, iCode, iInfo));
+  Queue->Post (csRef<iEvent> (csPtr<iEvent>
+    (new csEvent (csGetTicks (), csevBroadcast, iCode, iInfo))));
 }
 
 void csEventOutlet::ImmediateBroadcast (int iCode, void *iInfo)

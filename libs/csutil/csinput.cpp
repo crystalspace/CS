@@ -85,8 +85,6 @@ void csInputDriver::Post(iEvent* e)
   csRef<iEventQueue> q (GetEventQueue());
   if (q != 0)
     q->Post(e);
-  else
-    e->DecRef();
 }
 
 bool csInputDriver::HandleEvent(iEvent& e)

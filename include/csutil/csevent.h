@@ -141,9 +141,6 @@ public:
 
   virtual bool Print (int level = 0);
 
-  virtual void IncRefIfPooled ();
-  virtual void DecRefUnlessPooled ();
-
   SCF_DECLARE_IBASE;
 };
 
@@ -176,9 +173,6 @@ private:
 public:
   /// The constructor, this should only be called from within the csEventQueue
   csPoolEvent (csEventQueue *q);
-
-  virtual void IncRefIfPooled ();
-  virtual void DecRefUnlessPooled ();
 
   /// The DecRef() that places the event back into the pool at a ref count of 1
   void DecRef ();

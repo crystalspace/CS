@@ -1456,15 +1456,6 @@ bool csEvent::UnflattenXML(const char *buffer, uint32 length)
   return false;
 }
 
-void csEvent::DecRefUnlessPooled()
-{
-  DecRef();
-}
-
-void csEvent::IncRefIfPooled()
-{
-}
-
 csPoolEvent::csPoolEvent(csEventQueue *q) 
 {
     pool = q;
@@ -1479,6 +1470,7 @@ void csPoolEvent::DecRef()
     // while this should never happen, this will prevent a seg fault if some 
     // donut-head decides to create one of these improperly.
     if (!pool) return;
+
     next = pool->EventPool;
     pool->EventPool = this;
     RemoveAll();
@@ -1494,13 +1486,4 @@ void csPoolEvent::DecRef()
   {
     scfRefCount--;
   }
-}
-
-void csPoolEvent::DecRefUnlessPooled()
-{
-}
-
-void csPoolEvent::IncRefIfPooled()
-{
-  IncRef();
 }

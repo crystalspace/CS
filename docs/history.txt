@@ -22,6 +22,10 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced VfsVector in csVFS with a csPDelArray<VfsNode>.
 	    - Replaced ArchiveEntryVector in csArchive with a
 	      csPDelArray<ArchiveEntry>.
+	- Oktal changed iEventQueue::Post() and iEventOutlet::Post() so they
+	  always IncRef() the iEvent they are passed. This means that after
+	  calling Post(), the iEvent's reference count will be 2, so the
+	  caller must DecRef() the iEvent (give up their reference).
 30-Jul-2003
 	- Anders Stenberg brought the variable system for the new renderer
 	  back up and running, now using Oktal's symbol table which should

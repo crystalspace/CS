@@ -203,9 +203,6 @@ struct iEvent : public iBase
   virtual uint32 FlattenSize(int format = CS_CRYSTAL_PROTOCOL) = 0;
   virtual bool Flatten(char *buffer, int format = CS_CRYSTAL_PROTOCOL) = 0;
   virtual bool Unflatten(const char *buffer, uint32 length) = 0;
-
-  virtual void IncRefIfPooled() = 0;
-  virtual void DecRefUnlessPooled() = 0;
 };
 
 /** \page EventFlow Overall structure of the basic event flow in Crystal Space
