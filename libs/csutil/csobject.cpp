@@ -201,7 +201,8 @@ void csObject::ObjRemoveAll ()
   if (!Children)
     return;
 
-  for (int i=0; i < Children->Length (); i++)
+  int i;
+  for (i=0; i < Children->Length (); i++)
   {
     iObject* child = Children->Get (i);
     child->SetObjectParent (NULL);
@@ -232,7 +233,8 @@ void* csObject::GetChild (int InterfaceID, int Version,
     return obj ? obj->QueryInterface (InterfaceID, Version) : NULL;
   }
 
-  for (int i = 0; i < Children->Length (); i++)
+  int i;
+  for (i = 0; i < Children->Length (); i++)
   {
     if (Name) {
       const char *OtherName = Children->Get (i)->GetName ();

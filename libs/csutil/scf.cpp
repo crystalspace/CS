@@ -482,7 +482,8 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 
 void csSCF::UnloadUnusedModules ()
 {
-  for (int i = ClassRegistry->Length () - 1; i >= 0; i--)
+  int i;
+  for (i = ClassRegistry->Length () - 1; i >= 0; i--)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (i);
     cf->TryUnload ();

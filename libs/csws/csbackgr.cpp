@@ -66,7 +66,8 @@ void csBackground::Draw (csComponent &This, int x, int y, int w, int h,
       poly.use_fog = false;
       poly.num = 4;
       poly.mat_handle = NULL;
-      for (int i = 0; i < 4; i++)
+	  int i;
+      for (i = 0; i < 4; i++)
       {
         poly.vertices [i].sx = (i == 0 || i == 3) ? x : x + w;
         poly.vertices [i].sy = (i == 0 || i == 1) ? y : y + h;

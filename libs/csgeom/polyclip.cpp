@@ -196,7 +196,8 @@ bool csPolygonClipper::IsInside (const csVector2& v)
   if (!ClipBox.In (v.x, v.y))
     return false;
   // Detailed test
-  for (int vert = 0; vert < ClipPolyVertices; vert++)
+  int vert;
+  for (vert = 0; vert < ClipPolyVertices; vert++)
     if ((v.x - ClipPoly [vert].x) * ClipData [vert].y -
         (v.y - ClipPoly [vert].y) * ClipData [vert].x < 0)
       return false;

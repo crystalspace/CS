@@ -84,8 +84,10 @@ csDefaultFontServer::~csDefaultFontServer()
 
 iFont *csDefaultFontServer::LoadFont (const char *filename)
 {
+  int i;
+
   // First of all, look for an already loaded font
-  for (int i = 0; i < fonts.Length (); i++)
+  for (i = 0; i < fonts.Length (); i++)
   {
     csDefaultFont *font = fonts.Get (i);
     if (!strcmp (filename, font->Name))
@@ -98,7 +100,7 @@ iFont *csDefaultFontServer::LoadFont (const char *filename)
   // Now check the list of static fonts
   if (filename [0] == '*')
   {
-    for (int i = 0; i < FontListCount; i++)
+    for (i = 0; i < FontListCount; i++)
       if (!strcmp (filename, FontList [i].Name))
         return new csDefaultFont (this, FontList [i].Name,
           FontList [i].First, FontList [i].Glyphs,
@@ -237,8 +239,8 @@ error:
   memcpy (fontdef.IndividualWidth, binary, fontdef.Glyphs);
 
   // Compute the font size
-  int fontsize = 0;
-  for (int c = 0; c < fontdef.Glyphs; c++)
+  int c, fontsize = 0;
+  for (c = 0; c < fontdef.Glyphs; c++)
     fontsize += ((fontdef.IndividualWidth [c] + 7) / 8) * fontdef.Height;
 
   // allocate memory and copy the font
@@ -274,11 +276,12 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   Height = height;
   FontBitmap = bitmap;
   IndividualWidth = individualwidth;
+  int i;
 
   if (IndividualWidth)
   {
     MaxWidth = 0;
-    for (int i = 0; i < Glyphs; i++)
+    for (i = 0; i < Glyphs; i++)
       if (MaxWidth < IndividualWidth [i])
         MaxWidth = IndividualWidth [i];
   }
@@ -287,7 +290,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 
   uint8 *cur = bitmap;
   GlyphBitmap = new uint8 * [Glyphs];
-  for (int i = 0; i < Glyphs; i++)
+  for (i = 0; i < Glyphs; i++)
   {
     GlyphBitmap [i] = cur;
     cur += ((IndividualWidth [i] + 7) / 8) * Height;
@@ -296,7 +299,8 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 
 csDefaultFont::~csDefaultFont ()
 {
-  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
     iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
     delnot->BeforeDelete (this);
@@ -366,12 +370,15 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH)
   if (!IndividualWidth)
     oW = n * Width;
   else
-    for (int i = 0; i < n; i++)
+  {
+	int i;
+    for (i = 0; i < n; i++)
     {
       int chr = (*(uint8 *)text++) - First;
       if ((chr >= 0) && (chr < Glyphs))
         oW += IndividualWidth [chr];
     }
+  }
 }
 
 int csDefaultFont::GetLength (const char *text, int maxwidth)
@@ -403,7 +410,8 @@ void csDefaultFont::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
     iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
     if (delnot == func)

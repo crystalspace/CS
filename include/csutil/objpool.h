@@ -58,7 +58,8 @@ public:
   }
   ~csObjectPool ()
   {
-    for (int i=0; i<Num; i++)
+	int i;
+    for (i=0; i<Num; i++)
       FreeItem (Objects[Num]);
     delete[] Objects;
   }

@@ -96,7 +96,7 @@ csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 
 bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
-  int i;
+  int i, j;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // @@@ collect converter plugins
@@ -116,7 +116,7 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
   for (i=0; i<Converters.Length (); i++)
   {
     iModelConverter *mconv = Converters.Get(i);
-    for (int j=0; j<mconv->GetFormatCount (); j++)
+    for (j=0; j<mconv->GetFormatCount (); j++)
       Formats.Push (mconv->GetFormat (j));
   }
 
@@ -135,7 +135,8 @@ const csModelConverterFormat *csModelConverterMultiplexer::GetFormat (int idx) c
 
 iModelData *csModelConverterMultiplexer::Load (UByte* Buffer, ULong Size)
 {
-  for (int i=0; i<Converters.Length (); i++)
+  int i;
+  for (i=0; i<Converters.Length (); i++)
   {
     iModelData *mdl = Converters.Get(i)->Load (Buffer, Size);
     if (mdl) return mdl;
@@ -145,7 +146,8 @@ iModelData *csModelConverterMultiplexer::Load (UByte* Buffer, ULong Size)
 
 iDataBuffer *csModelConverterMultiplexer::Save (iModelData *mdl, const char *Format)
 {
-  for (int i=0; i<Converters.Length (); i++)
+  int i;
+  for (i=0; i<Converters.Length (); i++)
   {
     iDataBuffer *dbuf = Converters.Get(i)->Save (mdl, Format);
     if (dbuf) return dbuf;

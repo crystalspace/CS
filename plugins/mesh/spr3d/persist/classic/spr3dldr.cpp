@@ -435,9 +435,9 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
 	break;
       case CS_TOKEN_VERTICES:
         {
-          int list[1000], num;	//@@@ HARDCODED!!!
+          int i, list[1000], num;	//@@@ HARDCODED!!!
           csScanStr (params, "%D", list, &num);
-          for (int i = 0 ; i < num ; i++) limb->AddVertex (list[i]);
+          for (i = 0 ; i < num ; i++) limb->AddVertex (list[i]);
         }
         break;
     }

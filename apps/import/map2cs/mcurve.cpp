@@ -73,11 +73,13 @@ bool CMapCurve::Read(CMapParser* pParser, CMapFile* pMap)
   if (!pParser->ExpectToken(")"))     return false;
 
   if (!pParser->ExpectToken("("))     return false;
-  for (int y=0; y<m_Rows; y++)
+
+  int y, x;
+  for (y=0; y<m_Rows; y++)
   {
     if (!pParser->ExpectToken("("))     return false;
 
-    for (int x=0; x<m_Cols; x++)
+    for (x=0; x<m_Cols; x++)
     {
       if (!pParser->ExpectToken("(")) return false;
       double x,y,z,u,v;
@@ -125,10 +127,10 @@ bool CMapCurve::Write(CCSWorld* pWorld)
 
   if (pTexture->IsVisible())
   {
-    int y;
+    int y, x;
     for (y=0; y<(pCurve->GetNumRows()-1)/2; y++)
     {
-      for (int x=0; x<(pCurve->GetNumCols()-1)/2; x++)
+      for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
         fprintf(fd, "    ADDON (PLUGIN ('bezier') PARAMS (NAME ('bezier_%s_%d_%d') MATERIAL ('%s') ",
                     (const char*) m_Name, y, x, pTexture->GetTexturename());
@@ -182,7 +184,7 @@ bool CMapCurve::Write(CCSWorld* pWorld)
 
     for (y=0; y<(pCurve->GetNumRows()-1)/2; y++)
     {
-      for (int x=0; x<(pCurve->GetNumCols()-1)/2; x++)
+      for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
         fprintf(fd, "      CURVE 'bez_%s_%d_%d' ('bezier_%s_%d_%d')\n",
                     (const char*) m_Name, y, x, (const char*) m_Name, y, x);

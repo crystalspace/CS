@@ -181,7 +181,8 @@ void csSimpleConsole::FreeBuffer ()
 {
   if (Line)
   {
-    for (int i = 0; i < LineMax; i++)
+	int i;
+    for (i = 0; i < LineMax; i++)
       delete [] Line [i];
     delete [] Line;
   }
@@ -195,7 +196,8 @@ void csSimpleConsole::SetBufferSize (int iCount)
   if (LineMax <= 0)
     LineMax = 1;
   Line = new char * [LineMax];
-  for (int i = 0; i < LineMax; i++)
+  int i;
+  for (i = 0; i < LineMax; i++)
   {
     Line [i] = new char [SIZE_LINE];
     Line [i][0] = '\0';
@@ -216,7 +218,8 @@ void csSimpleConsole::SetLineMessages (int iCount)
   // Allocate new messages.
   LineMessage = new char * [LineMessageMax];
   LinesChanged = new bool [LineMessageMax];
-  for (int i = 0; i < LineMessageMax; i++)
+  int i;
+  for (i = 0; i < LineMessageMax; i++)
   {
     LineMessage [i] = new char [SIZE_LINE];
     LineMessage [i][0] = '\0';
@@ -229,7 +232,8 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
 {
   if (LineMessageNumber >= LineMessageMax)
   {
-    for (int i = 1; i < LineMessageMax; i++)
+	int i;
+    for (i = 1; i < LineMessageMax; i++)
     {
       strcpy (LineMessage [i - 1], LineMessage [i]);
       LinesChanged [i - 1] = true;
@@ -292,7 +296,8 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
       }
       else
       {
-        for (int i = 1; i < LineMax; i++)
+		int i;
+        for (i = 1; i < LineMax; i++)
           strcpy (Line[i - 1], Line[i]);
       }
       dst = Line[LineNumber];
@@ -333,7 +338,8 @@ void csSimpleConsole::Clear (bool)
   Line [LineNumber][0] = '\0';
   ClearInput = false;
 
-  for (int i = 0; i < LineMessageMax; i++)
+  int i;
+  for (i = 0; i < LineMessageMax; i++)
   {
     LineMessage [i][0] = '\0';
     LinesChanged [i] = true;

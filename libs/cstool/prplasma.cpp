@@ -73,8 +73,11 @@ bool csProcPlasma::PrepareAnim ()
   offsetincr[1] = -3;
 
   if (mat_w<256)
-    for (int i=0 ; i<4 ; i++)
+  {
+    int i;
+    for (i=0 ; i<4 ; i++)
       lineincr[i] = lineincr[i]*256/mat_w;
+  }
   return true;
 }
 

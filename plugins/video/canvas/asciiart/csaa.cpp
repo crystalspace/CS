@@ -80,7 +80,8 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   aa_defparams.height =
   aa_defparams.recheight = config->GetInt ("Video.ASCII.Console.Height", 25);
   const char *font = config->GetStr ("Video.ASCII.Console.Font", "vga16");
-  for (int i = 0; aa_fonts [i]; i++)
+  int i;
+  for (i = 0; aa_fonts [i]; i++)
     if ((strcasecmp (font, aa_fonts [i]->name) == 0)
      || (strcasecmp (font, aa_fonts [i]->shortname) == 0))
       aa_defparams.font = aa_fonts [i];
@@ -213,7 +214,8 @@ void csGraphics2DAA::Print (csRect *area)
         if (oldmousebut != b)
         {
           static int but [3] = { 1, 3, 2 };
-          for (int i = 0; i <= 2; i++)
+		  int i;
+          for (i = 0; i <= 2; i++)
             if ((oldmousebut ^ b) & (1 << i))
               EventOutlet->Mouse (but [i], (b & (1 << i)) != 0, x, y);
           oldmousebut = b;

@@ -160,7 +160,8 @@ csNotebook::csNotebook (csComponent *iParent, int iStyle) : csComponent (iParent
   {
     // Load images
     iTextureHandle *tex = app->GetTexture (NOTEBOOK_TEXTURE_NAME);
-    for (int i = 0; i < 12; i++)
+	int i;
+    for (i = 0; i < 12; i++)
     {
       int tx,ty,tw,th;
       ParseConfigBitmap (app, app->skin->Prefix, "Dialog", NotebookButton [i], tx, ty, tw, th);
@@ -292,11 +293,11 @@ void csNotebook::Draw ()
     pages.Get (delta)->zorder = -1;
 
   // Draw the tabs in two passes: first unselected and then selected
-  int zorder = 0;
-  for (int selected = 0; selected < 2; selected++)
+  int zorder = 0, tab, selected;
+  for (selected = 0; selected < 2; selected++)
   {
     int pos = (((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ? tabx : taby) + lastpos;
-    for (int tab = lasttab; tab >= firsttab; tab--)
+    for (tab = lasttab; tab >= firsttab; tab--)
       if (IS_PRIMARY_PAGE (tab))
       {
         int w, h;
@@ -595,8 +596,8 @@ bool csNotebook::HandleEvent (iEvent &Event)
       if (Event.Mouse.Button == 1)
       {
         // Find the "topmost" tab under the mouse
-        int zmax = -1, pageno = -1;
-        for (int i = pages.Length () - 1; i >= 0; i--)
+        int zmax = -1, pageno = -1, i;
+        for (i = pages.Length () - 1; i >= 0; i--)
           if (InsideTab (i, Event.Mouse.x, Event.Mouse.y))
           {
             cspPageData *data = pages.Get (i);
@@ -631,12 +632,15 @@ bool csNotebook::HandleEvent (iEvent &Event)
           if ((app->KeyboardOwner == NULL)
            && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
            && (Event.Key.Modifiers & CSMASK_FIRST))
-          for (int i = 0; i < pages.Length (); i++)
+		  {
+		  int i;
+          for (i = 0; i < pages.Length (); i++)
             if (pages.Get (i)->IsHotKey (Event.Key.Char))
             {
               SelectTab (i);
               return true;
             }
+		  }
           break;
       }
       break;
@@ -695,7 +699,8 @@ bool csNotebook::HandleEvent (iEvent &Event)
 
 int csNotebook::FindPage (csComponent *iComponent)
 {
-  for (int idx = 0; idx < pages.Length (); idx++)
+  int idx;
+  for (idx = 0; idx < pages.Length (); idx++)
     if (pages.Get (idx)->page == iComponent)
       return idx;
   return -1;
@@ -815,7 +820,8 @@ void csNotebook::GetClientRect (csRect &oRect)
 {
   struct { int w, h; } maxsize;
   maxsize.w = maxsize.h = 0;
-  for (int i = 0; i < pages.Length (); i++)
+  int i;
+  for (i = 0; i < pages.Length (); i++)
   {
     cspPageData *data = pages.Get (i);
     if ((data->flags & NOTEBOOK_PAGE_PIXMAP)

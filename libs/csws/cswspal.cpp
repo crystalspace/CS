@@ -296,7 +296,8 @@ static void csSavePalette ()
   if (savedPalette)
     return;
   savedPalette = new int * [cswsPaletteSize];
-  for (int i = 0; i < cswsPaletteSize; i++)
+  int i;
+  for (i = 0; i < cswsPaletteSize; i++)
   {
     savedPalette [i] = new int [cswsPalette [i].Size];
     memcpy (savedPalette [i], cswsPalette [i].Palette,
@@ -308,7 +309,8 @@ static void csFreePalette ()
 {
   if (!savedPalette)
     return;
-  for (int i = 0; i < cswsPaletteSize; i++)
+  int i;
+  for (i = 0; i < cswsPaletteSize; i++)
     delete [] savedPalette [i];
   delete [] savedPalette;
   savedPalette = NULL;
@@ -318,7 +320,8 @@ static void csRestorePalette ()
 {
   if (!savedPalette)
     return;
-  for (int i = 0; i < cswsPaletteSize; i++)
+  int i;
+  for (i = 0; i < cswsPaletteSize; i++)
     memcpy (cswsPalette [i].Palette, savedPalette [i],
       cswsPalette [i].Size * sizeof (int));
 }
@@ -345,10 +348,11 @@ void csSetColorScheme (csApp *iApp, csColorScheme &Scheme)
     float sch_contrast = -Scheme.Contrast / 100.;
     float sch_blend = Scheme.Blend / 100.;
 
-    for (int i = 0; i < cswsPaletteSize; i++)
+	int i, j;
+    for (i = 0; i < cswsPaletteSize; i++)
     {
       int *pal = savedPalette [i];
-      for (int j = 0; j < cswsPalette [i].Size; j++)
+      for (j = 0; j < cswsPalette [i].Size; j++)
       {
         float r, g, b;
         csGetRGB (pal [j], iApp, r, g, b);

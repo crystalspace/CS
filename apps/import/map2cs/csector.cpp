@@ -188,7 +188,8 @@ bool CCSSector::Write(CIWorld* pIWorld)
 
 bool CCSSector::WriteWorldspawn(CIWorld* pWorld)
 {
-  for (int i=0; i<m_Things.Length(); i++)
+  int i;
+  for (i=0; i<m_Things.Length(); i++)
   {
     if (strcasecmp(m_Things[i]->GetClassname(), "worldspawn")==0) 
     {
@@ -203,7 +204,8 @@ bool CCSSector::WriteWorldspawn(CIWorld* pWorld)
 
 bool CCSSector::WriteThings(CIWorld* pWorld)
 {
-  for (int i=0; i<m_Things.Length(); i++)
+  int i;
+  for (i=0; i<m_Things.Length(); i++)
   {
     if (strcasecmp(m_Things[i]->GetClassname(), "worldspawn")!=0) 
     {
@@ -351,7 +353,8 @@ bool CCSSector::WriteNodes(CIWorld* pWorld)
   double ScaleFactor = pWorld->GetScalefactor();
 
   //iterate all nodes
-  for (int i=0; i<m_Nodes.Length(); i++)
+  int i;
+  for (i=0; i<m_Nodes.Length(); i++)
   {
     CMapEntity* pEntity = m_Nodes[i];
     CdVector3 Origin(0,0,0);
@@ -384,13 +387,14 @@ bool CCSSector::WriteCurves(CIWorld* pWorld)
   assert(pMap);
   assert(fd);
 
-  for (int i=0; i<pMap->GetNumEntities(); i++)
+  int i, curve;
+  for (i=0; i<pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = pMap->GetEntity(i);
     int const ncurves = pEntity->GetCurveCount();
     if (ncurves>0)
     {
-      for (int curve=0; curve<ncurves; curve++)
+      for (curve=0; curve<ncurves; curve++)
       {
         CMapCurve*    pCurve   = pEntity->GetCurve(curve);
         CTextureFile* pTexture = pCurve->GetTexture();
@@ -693,7 +697,8 @@ bool CCSSector::WriteFog(CIWorld* pWorld)
   double b=255.0;
 
   //iterate all entities, brushes, polygons and vertices:
-  for (int i=0; i<pMap->GetNumEntities(); i++)
+  int i;
+  for (i=0; i<pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = pMap->GetEntity(i);
     assert(pEntity);

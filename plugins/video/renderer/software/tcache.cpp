@@ -58,7 +58,8 @@ static int hash_table [384];
 
 static void compute_hash_table ()
 {
-  for (int i = 0; i < 384; i++)
+  int i;
+  for (i = 0; i < 384; i++)
     hash_table [i] = i + 64;
 }
 

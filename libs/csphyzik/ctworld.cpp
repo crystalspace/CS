@@ -139,7 +139,8 @@ errorcode ctWorld::do_time_step ( real t0, real t1 )
   load_state ( y0 );
   
   // save this state for posible rewinding
-  for ( int i = 0; i < arr_size; i++ )
+  int i;
+  for (i = 0; i < arr_size; i++ )
     y_save[i] = y0[i];
  
   y_save_size = arr_size;

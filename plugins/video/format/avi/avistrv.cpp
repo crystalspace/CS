@@ -210,8 +210,9 @@ void csAVIStreamVideo::PrepImageArea ()
   char *p = pIA->data;
   iTextureManager *pTexMgr = pG3D->GetTextureManager();
 
-  for (int row=0; row<rc.Height (); row++)
-    for (int col=0; col<rc.Width (); col++)
+  int row, col;
+  for (row=0; row<rc.Height (); row++)
+    for (col=0; col<rc.Width (); col++)
     {
       int color = pTexMgr->FindRGB (pixel->red, pixel->green, pixel->blue);
       memcpy (p, ((char*)&color), nPB);
@@ -307,13 +308,14 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   int ls = 0;
   float y,u,v, uf1 = 0, uf2 = 0, vf1 = 0, vf2 = 0;
   int sr=0, sc; // source row and col
+  int row, col;
 
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int row=0; row < th; row++)
+  for (row=0; row < th; row++)
   {
     xtic = 0;
     sc = 0;
-    for (int col=0; col < tw; col++)
+    for (col=0; col < tw; col++)
     {
       if (uvidx != (sc>>1)) // this YUV is a 1:4:4 scheme
       {
@@ -364,14 +366,15 @@ void csAVIStreamVideo::rgba_interleave (char *data)
   int ytic=th, xtic;
   int ls = 0;
   int sr=0, sc; // source row and col
+  int row, col;
 
   csRGBpixel *src = (csRGBpixel*)data;
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int row=0; row < th; row++)
+  for (row=0; row < th; row++)
   {
     xtic = 0;
     sc = 0;
-    for (int col=0; col < tw; col++)
+    for (col=0; col < tw; col++)
     {
       memcpy (&pixel[tidx], &src[idx], sizeof (csRGBpixel));
       while (xtic < sw)
@@ -396,12 +399,13 @@ void csAVIStreamVideo::rgba_interleave (char *data)
 
 void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
 {
+  int idx, x, y;
   char *rdata = data[0];
   char *gdata = data[1];
   char *bdata = data[2];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < memimage.GetHeight (); y++)
-    for (int x=0; x < memimage.GetWidth (); x++)
+  for (idx=0, y=0; y < memimage.GetHeight (); y++)
+    for (x=0; x < memimage.GetWidth (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];
@@ -412,13 +416,14 @@ void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
 
 void csAVIStreamVideo::rgba_channel_2_rgba_interleave (char *data[4])
 {
+  int idx, x, y;
   char *rdata = data[0];
   char *gdata = data[1];
   char *bdata = data[2];
   char *adata = data[3];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < memimage.GetHeight (); y++)
-    for (int x=0; x < memimage.GetWidth (); x++)
+  for (idx=0, y=0; y < memimage.GetHeight (); y++)
+    for (x=0; x < memimage.GetWidth (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];

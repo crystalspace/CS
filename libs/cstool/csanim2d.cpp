@@ -25,7 +25,8 @@ csAnimationTemplate::csAnimationTemplate() {
 }
 
 csAnimationTemplate::~csAnimationTemplate() {
-  for (int i=0;i<Frames.Length();i++) {
+  int i;
+  for (i=0;i<Frames.Length();i++) {
     csPixmap *p = GetFrame(i);
     delete p;
   }

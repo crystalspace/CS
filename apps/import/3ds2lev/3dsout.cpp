@@ -96,7 +96,8 @@ void OutpVertsCS (FILE * o, H3dsMapVert * vrtmap, int verts,char * name)
   {
     fprintf (o, "FRAME '%s' (\n", "f1");
   }
-  for (int n=0; n<verts; n++)
+  int n;
+  for (n=0; n<verts; n++)
   {
     H3dsMapVert * vm = &vrtmap[n];
     if (flags & FLAG_SPRITE)
@@ -133,12 +134,13 @@ void OutpObjectsCS (FILE * o, H3dsScene * scene, H3dsMapVert* vrtmap,
     fprintf (o, "  ; '%s'\n", name);
   }
 
-  for (int n=0; n<scene->meshobjs; n++)
+  int i, n;
+  for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
     fprintf (o, "; %s ", mo->name);
     fprintf (o, ": %6d faces - %d + 256 * %d \n", (int)mo->faces, 0, 0);
-    for (int i=0; i<mo->faces; i++)
+    for (i=0; i<mo->faces; i++)
     {
       H3dsFace * fa = &mo->facelist[i];
       if (flags & FLAG_SPRITE)

@@ -63,7 +63,8 @@ csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
 
 void csCommandLineParser::Initialize (int argc, const char* const argv[])
 {
-  for (int i = 1; i < argc; i++)
+  int i;
+  for (i = 1; i < argc; i++)
   {
     char *opt = (char *)argv [i];
     if (*opt == '-')

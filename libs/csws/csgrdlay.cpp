@@ -85,8 +85,9 @@ void csGridLayout::LayoutContainer ()
 
   i = 0;
 
-  for (int row = 0; row != nRows; ++row, y += (rowHeight + ((row == 0) ? 0 : mVgap)))
-    for (int col = 0; col != nCols; ++col)
+  int row, col;
+  for (row = 0; row != nRows; ++row, y += (rowHeight + ((row == 0) ? 0 : mVgap)))
+    for (col = 0; col != nCols; ++col)
     {
       if ( i < cnt )
       {

@@ -42,7 +42,8 @@ extern WalkTest* Sys;
 
 void DrawZbuffer ()
 {
-  for (int y = 0; y < FRAME_HEIGHT; y++)
+  int y, x;
+  for (y = 0; y < FRAME_HEIGHT; y++)
   {
     int gi_pixelbytes = Gfx2D->GetPixelBytes ();
 
@@ -52,19 +53,19 @@ void DrawZbuffer ()
       if (gi_pixelbytes == 4)
       {
         uint32 *dest = (uint32 *)Gfx2D->GetPixelAt (0, y);
-        for (int x = 0; x < FRAME_WIDTH; x++)
+        for (x = 0; x < FRAME_WIDTH; x++)
           *dest++ = *zbuf++ >> 10;
       }
       else if (gi_pixelbytes == 2)
       {
         uint16 *dest = (uint16 *)Gfx2D->GetPixelAt(0, y);
-        for (int x = 0; x < FRAME_WIDTH; x++)
+        for (x = 0; x < FRAME_WIDTH; x++)
           *dest++ = (unsigned short)(*zbuf++ >> 13);
       }
       else
       {
         unsigned char *dest = Gfx2D->GetPixelAt (0, y);
-        for (int x = 0; x < FRAME_WIDTH; x++)
+        for (x = 0; x < FRAME_WIDTH; x++)
           *dest++ = (unsigned char)(*zbuf++ >> 16);
       }
   }
@@ -76,8 +77,9 @@ void DrawPalette ()
     return;
   int pw = Gfx2D->GetWidth () / 16;
   int ph = Gfx2D->GetHeight () / 16;
-  for (int i = 0; i < 16; i++)
-    for (int j = 0; j < 16; j++)
+  int i, j;
+  for (i = 0; i < 16; i++)
+    for (j = 0; j < 16; j++)
       Gfx2D->DrawBox (i * pw, j * ph, pw, ph, j * 16 + i);
 }
 

@@ -105,7 +105,8 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   int const nmatches = list->Length();
   if (nmatches != 0)
   {
-    for (int i = 0; i < nmatches; i++)
+	int i;
+    for (i = 0; i < nmatches; i++)
     {
       char const* classname = list->Get(i);
       if (strcasecmp (classname, MY_CLASSNAME))

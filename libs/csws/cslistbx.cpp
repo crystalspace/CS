@@ -483,15 +483,21 @@ bool csListBox::HandleEvent (iEvent &Event)
           return true;
         case CSKEY_PGUP:
           if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            for (int i = 0; i < vertcount; i++)
+		  {
+			int i;
+            for (i = 0; i < vertcount; i++)
               SendCommand (cscmdListBoxTrack, (void *)focused->prev);
+		  }
           else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
             SendCommand (cscmdListBoxTrack, (void *)NextChild (first));
           return true;
         case CSKEY_PGDN:
           if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-            for (int i = 0; i < vertcount; i++)
+		  {
+			int i;
+            for (i = 0; i < vertcount; i++)
               SendCommand (cscmdListBoxTrack, (void *)focused->next);
+		  }
           else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
             SendCommand (cscmdListBoxTrack, (void *)PrevChild (first));
           return true;

@@ -641,7 +641,8 @@ HRESULT csGraphics2DDDraw8::InitSurfaces ()
 
   m_lpddsBack->GetSurfaceDesc (&ddsd);
 
-  for (int i = 0; i < Height; i++)
+  int i;
+  for (i = 0; i < Height; i++)
     LineAddress [i] = i * ddsd.lPitch;
 
   m_bPalettized = (Depth == 8);
@@ -655,12 +656,13 @@ HRESULT csGraphics2DDDraw8::ChangeCoopLevel ()
   HRESULT hRet;
 
   char *oldBuffer = NULL;
+  int i;
 
   if (BeginDraw ())
   {
     size_t BytesPerLine = Width * ((Depth + 7) / 8);
     oldBuffer = new char [Height * BytesPerLine];
-    for (int i = 0; i < Height; i++)
+    for (i = 0; i < Height; i++)
       memcpy (oldBuffer + i * BytesPerLine, Memory + LineAddress [i], BytesPerLine);
     FinishDraw ();
   }
@@ -678,12 +680,12 @@ HRESULT csGraphics2DDDraw8::ChangeCoopLevel ()
 
   hRet = InitSurfaces ();
 
-  for (int times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
+  int times;
+  for (times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
     if (BeginDraw ())
     {
       size_t BytesPerLine = Width * ((Depth + 7) / 8);
 
-			int i;
       for (i = 0; i < Height; i++)
         memcpy (Memory + LineAddress [i], oldBuffer + i * BytesPerLine, BytesPerLine);
       FinishDraw ();

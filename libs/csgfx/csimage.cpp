@@ -245,12 +245,13 @@ void csImageFile::Rescale (int newwidth, int newheight)
   {							\
     pt *dst = new pt [newwidth * newheight];		\
     pt *newfield = dst;					\
-    y = 0;						\
-    for (int ny = newheight; ny; ny--)			\
+    y = 0;	\
+	int ny, nx;  \
+    for (ny = newheight; ny; ny--)			\
     {							\
       pt *src = ((pt *)field) + (y >> 16) * Width;	\
       y += dy; x = 0;					\
-      for (int nx = newwidth; nx; nx--)			\
+      for (nx = newwidth; nx; nx--)			\
       {							\
         *dst++ = src [x >> 16];				\
         x += dx;					\
@@ -455,7 +456,8 @@ void csImageFile::convert_rgba (csRGBpixel *iImage)
       {
         if (!Alpha)
           Alpha = new UByte [pixels];
-        for (int i = 0; i < pixels; i++)
+		int i;
+        for (i = 0; i < pixels; i++)
           Alpha [i] = iImage [i].alpha;
       }
       if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
@@ -530,7 +532,8 @@ void csImageFile::convert_pal8 (UByte *iImage, csRGBpixel *iPalette,
 void csImageFile::convert_pal8 (UByte *iImage, csRGBcolor *iPalette, int nPalColors)
 {
   csRGBpixel *newpal = new csRGBpixel [256];
-  for (int i = 0; i < nPalColors; i++) // Default csRGBpixel constructor ensures
+  int i;
+  for (i = 0; i < nPalColors; i++) // Default csRGBpixel constructor ensures
     newpal [i] = iPalette [i];         // palette past nPalColors is sane.
   convert_pal8 (iImage, newpal);
 }

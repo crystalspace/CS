@@ -71,7 +71,7 @@ int converter::obj_read ( FILE *filein ) {
     John Burkardt
 */
   int   count;
-  int   i;
+  int   i, j;
   int   ivert;
   char *next;
   char *next2;
@@ -512,7 +512,7 @@ int converter::obj_read ( FILE *filein ) {
 */
   for (i=0; i < num_face; i++)
   {
-    for (int j=0; j < face_order[i]; j++)
+    for (j=0; j < face_order[i]; j++)
     {
       int vidx = face[j][i];
       int vtidx = face_texnode[j][i];

@@ -870,7 +870,8 @@ void move_ghost (iMeshWrapper* spr)
     hits += CollisionDetect (col, n[num_sectors], &test);
 
   // Change our velocity according to the collisions.
-  for (int j=0 ; j<hits ; j++)
+  int j;
+  for (j=0 ; j<hits ; j++)
   {
     csCollisionPair& cd = our_cd_contact[j];
     csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
@@ -1202,7 +1203,8 @@ void light_statics ()
 {
   iEngine* e = Sys->view->GetEngine ();
   iMeshList* meshes = e->GetMeshes ();
-  for (int i = 0 ; i < meshes->GetMeshCount () ; i++)
+  int i;
+  for (i = 0 ; i < meshes->GetMeshCount () ; i++)
   {
     iMeshWrapper* sp = meshes->GetMesh (i);
     iSprite3DState* state = SCF_QUERY_INTERFACE (sp->GetMeshObject (),

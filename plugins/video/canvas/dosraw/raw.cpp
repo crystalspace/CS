@@ -215,7 +215,8 @@ void csGraphics2DDOSRAW::Print (csRect *area)
   if (PaletteChanged && pfmt.PalEntries)
   {
     outportb (0x3c8, 0);
-    for (int i = 0; i <= 255; i++)
+	int i;
+    for (i = 0; i <= 255; i++)
     {
       outportb (0x3c9, Palette[i].red >> 2);
       outportb (0x3c9, Palette[i].green >> 2);

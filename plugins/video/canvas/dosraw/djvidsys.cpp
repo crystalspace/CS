@@ -140,7 +140,8 @@ static void SetXmode (int XMode)
   outportw (0x3D4, (int (XModeTable [XMode].CRTCReg [0x11]) << 8) | 0x0011);
 
   // Set up CRTC registers
-  for (int r = 0; r < 0x19; r++)
+  int r;
+  for (r = 0; r < 0x19; r++)
     outportw (0x3D4, (int (XModeTable [XMode].CRTCReg [r]) << 8) | r);
 
   // Lock CRT registers
@@ -218,7 +219,8 @@ VideoSystem::VideoSystem ()
     {
       // build a dummy videomode list
       VESAModes = new unsigned short [0x40 + 1];
-      for (int i = 0; i < 0x40; i++)
+	  int i;
+      for (i = 0; i < 0x40; i++)
         VESAModes [i] = 0x100 + i;
       VESAModes [0x40] = 0xffff;
     }
@@ -787,6 +789,7 @@ void VideoSystem::Flush (int x, int y, int w, int h)
     x &= ~3;
     if (VRAMSelector)
       _farsetsel (VRAMSelector);
+	int page, _h;
     // Copy backbuffer in X-mode
     if ((VideoPages > 1) && UseDoubleBuffering)
     {
@@ -798,7 +801,7 @@ void VideoSystem::Flush (int x, int y, int w, int h)
       unsigned char *dest = VRAM + (x >> 2) + y * BytesPerScanLine + vpoffset;
       unsigned int length = linetransfer ? h * BytesPerScanLine : w / 4;
 
-      for (int page = 0; page < 4; page++)
+      for (page = 0; page < 4; page++)
       {
         outportw (0x3C4, (0x0100 << page) | 0x0002);
         if (linetransfer)
@@ -811,14 +814,14 @@ void VideoSystem::Flush (int x, int y, int w, int h)
           unsigned char *_src = src + page;
           unsigned char *_dest = dest;
           if (VRAMSelector)
-            for (int _h = h; _h; _h--)
+            for (_h = h; _h; _h--)
             {
               XFmove (_src, _dest, length);
               _src += BytesPerScanLine * 4;
               _dest += BytesPerScanLine;
             } /* endfor */
           else
-            for (int _h = h; _h; _h--)
+            for (_h = h; _h; _h--)
             {
               Xmove (_src, _dest, length);
               _src += BytesPerScanLine * 4;
@@ -837,9 +840,9 @@ void VideoSystem::Flush (int x, int y, int w, int h)
       unsigned char *dest = VRAM + (x >> 2) + y * BytesPerScanLine;
       unsigned int length = w / 4;
       // We have only one page; refresh visible page from VRAMBuffer
-      for (int _h = h; _h; _h--)
+      for (_h = h; _h; _h--)
       {
-        for (int page = 0; page < 4; page++)
+        for (page = 0; page < 4; page++)
         {
           outportw (0x3C4, (0x0100 << page) | 0x0002);
           if (VRAMSelector)
@@ -1031,7 +1034,8 @@ void VideoSystem::VESAFillModeBlock (VESAModeInfoBlock &mb)
   {
     mb.XResolution = mb.YResolution = mb.BitsPerPixel = mb.MemoryModel = 0;
     mb.VideoPages = 1;
-    for (int mode = 0; VesaModeDesc [mode].Mode; mode++)
+	int mode;
+    for (mode = 0; VesaModeDesc [mode].Mode; mode++)
       if (mode == VesaModeDesc [mode].Mode)
       {
         mb.XResolution = VesaModeDesc [mode].Width;

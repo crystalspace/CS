@@ -47,7 +47,8 @@ csCollection::~csCollection ()
 
 iObject* csCollection::FindObject (char* name)
 {
-  for (int i = 0 ; i < objects.Length() ; i++)
+  int i;
+  for (i = 0 ; i < objects.Length() ; i++)
   {
     iObject* obj = (iObject*)(objects[i]);
     if (!strcmp ( obj->GetName (), name)) return obj;

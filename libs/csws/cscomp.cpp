@@ -590,7 +590,8 @@ AbortDrag:
     if (CS_IS_MOUSE_EVENT (Event))
     {
       // Pass mouse events to 'clip children'
-      for (int i = clipchildren.Length () - 1; i >= 0; i--)
+	  int i;
+      for (i = clipchildren.Length () - 1; i >= 0; i--)
       {
         csComponent *child = (csComponent *)clipchildren.Get (i);
         // If child is not visible, skip it
@@ -940,7 +941,8 @@ void csComponent::CheckDirtyTD (csRect &ioR)
     // should mark as dirty the respective area on their neightbours.
 
     // "Clip children" are always topmost, so start from them
-    for (int i = clipchildren.Length () - 1; i >= 0; i--)
+	int i;
+    for (i = clipchildren.Length () - 1; i >= 0; i--)
       ((csComponent *)clipchildren.Get (i))->CheckDirtyTD (r);
 
     // Loop through all "direct" children top-down
@@ -1024,7 +1026,8 @@ void csComponent::CheckDirtyBU (csRect &ioR)
   }
 
   // Continue with "clip children" bottom-up
-  for (int i = 0; i < clipchildren.Length (); i++)
+  int i;
+  for (i = 0; i < clipchildren.Length (); i++)
     ((csComponent *)clipchildren.Get (i))->CheckDirtyBU (r);
 
   // Add the dirty rectangle into output rectangle
@@ -1158,7 +1161,8 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
       } while (cur != focused);
 
       // Now invalidate all clip children that intersects these two areas
-      for (int i = clipchildren.Length () - 1; i >= 0; i--)
+	  int i;
+      for (i = clipchildren.Length () - 1; i >= 0; i--)
       {
         csComponent *cur = (csComponent *)clipchildren.Get (i);
         int dX = 0, dY = 0;
@@ -1313,7 +1317,8 @@ void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
       dX = child->bound.xmin;
       dY = child->bound.ymin;
     }
-    for (int i = (int)rect.Length () - 1; i >= 0; i--)
+	int i;
+    for (i = (int)rect.Length () - 1; i >= 0; i--)
       ((csRect *)rect[i])->Move (-dX, -dY);
 
     child->Clip (rect, child, true);
@@ -1337,7 +1342,8 @@ void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
   childbound.Intersect (relbound);
 
   // Now clip all the rectangles against this child's bound
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
     if (childbound.Intersects (*cur))
@@ -1404,7 +1410,8 @@ void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
 
   // Clip rectangles against 'clip children' bounds.
   // (see the remark at definition of csComponent::parentclip)
-  for (int c = clipchildren.Length () - 1; c >= 0; c--)
+  int c;
+  for (c = clipchildren.Length () - 1; c >= 0; c--)
   {
     csComponent *nb = (csComponent *)clipchildren.Get (c);
     if (nb == last)
@@ -1440,14 +1447,15 @@ void csComponent::FastClip (cswsRectVector &rect)
   int dX = 0, dY = 0;
   LocalToGlobal (dX, dY);
   // Clip all the rectangles in "rect" against all the rectangles in "visregion"
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i, j;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *r = (csRect *)rect.Get (i);
     // Transform rectangle to global coordinates
     csRect cr (*r);
     cr.Move (dX, dY);
     bool used = false;
-    for (int j = visregion.Length () - 1; j >= 0; j--)
+    for (j = visregion.Length () - 1; j >= 0; j--)
     {
       csRect vis (*(csRect *)visregion.Get (j));
       vis.Intersect (cr);
@@ -1516,7 +1524,8 @@ void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
     bb->Intersect (clip);
   rect.Push (bb);
   FastClip (rect);
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplBox (cur->xmin, cur->ymin, cur->xmax, cur->ymax,
@@ -1551,7 +1560,8 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   x2 += dx; y2 += dy;
 
   int color = GetColor (colindx);
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
     float xx1 = x1, xx2 = x2, yy1 = y1, yy2 = y2;
@@ -1578,7 +1588,8 @@ void csComponent::Pixel (int x, int y, int colindx)
   LocalToGlobal (x, y);
 
   int color = GetColor (colindx);
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplPixel (cur->xmin, cur->ymin, color);
@@ -1609,7 +1620,8 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
   iFont *font;
   int fontsize;
   GetFont (font, fontsize);
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
     if (cur->Intersects (tb))
@@ -1641,7 +1653,8 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha
 
   LocalToGlobal (x, y);
   bool restoreclip = false;
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplSetClipRect (*cur); restoreclip = true;
@@ -1668,7 +1681,8 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h,
   rect.Push (sb);
   FastClip (rect);
 
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect [i];
     app->pplTiledPixmap (s2d, cur->xmin, cur->ymin, cur->Width (), cur->Height (),
@@ -1690,7 +1704,8 @@ void csComponent::Texture (iTextureHandle *tex, int x, int y, int w, int h,
   FastClip (rect);
 
   LocalToGlobal (orgx, orgy);
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect [i];
     app->pplTexture (tex, cur->xmin, cur->ymin, cur->Width (), cur->Height (),
@@ -1905,7 +1920,8 @@ csComponent *csComponent::GetChildAt (int x, int y,
   bool (*func) (csComponent *, void *), void *data)
 {
   // Check clip children first
-  for (int i = clipchildren.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = clipchildren.Length () - 1; i >= 0; i--)
   {
     csComponent *child = (csComponent *)clipchildren.Get (i);
     if (child->GetState (CSS_VISIBLE))

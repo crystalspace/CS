@@ -215,7 +215,8 @@ int main (int argc, char *argv[])
   // print the entire command line if required
   if (opt.verbose)
   {
-    for (int i = 0; i < new_argc; i++)
+	int i;
+    for (i = 0; i < new_argc; i++)
       printf ("%s%s", i ? " " : "", new_argv [i]);
     printf ("\n");
   }

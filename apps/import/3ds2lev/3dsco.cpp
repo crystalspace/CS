@@ -33,12 +33,13 @@ void FindCentrePoints (H3dsScene * scene)
 {
   float32 xmino= 1e30, ymino= 1e30, zmino= 1e30;
   float32 xmaxo=-1e30, ymaxo=-1e30, zmaxo=-1e30;
-  for (int n=0; n<scene->meshobjs; n++)
+  int n, v;
+  for (n=0; n<scene->meshobjs; n++)
   {
     float32 xmin= 1e30, ymin= 1e30, zmin= 1e30;
     float32 xmax=-1e30, ymax=-1e30, zmax=-1e30;
     H3dsMeshObj * mo = &scene->meshobjlist[n];
-    for (int v=0; v<mo->verts; v++)
+    for (v=0; v<mo->verts; v++)
     {
       H3dsVert * vrt=&mo->vertlist[v];
       if (vrt->x > xmax) xmax=vrt->x;
@@ -69,13 +70,14 @@ void Move (H3dsScene * scene, float32 x, float32 y, float32 z)
   scene->centre.x+=x;
   scene->centre.y+=y;
   scene->centre.z+=z;
-  for (int n=0; n<scene->meshobjs; n++)
+  int n, v;
+  for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
     mo->centre.x+=x;
     mo->centre.y+=y;
     mo->centre.z+=z;
-    for (int v=0; v<mo->verts; v++)
+    for (v=0; v<mo->verts; v++)
     {
       H3dsVert * vrt=&mo->vertlist[v];
       vrt->x+=x;
@@ -90,13 +92,14 @@ void Scale (H3dsScene * scene, float32 x, float32 y, float32 z)
   scene->centre.x*=x;
   scene->centre.y*=y;
   scene->centre.z*=z;
-  for (int n=0; n<scene->meshobjs; n++)
+  int n, v;
+  for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
     mo->centre.x*=x;
     mo->centre.y*=y;
     mo->centre.z*=z;
-    for (int v=0; v<mo->verts; v++)
+    for (v=0; v<mo->verts; v++)
     {
       H3dsVert * vrt=&mo->vertlist[v];
       vrt->x*=x;
@@ -123,11 +126,12 @@ void ConvertXYZ (float& x, float& y, float& z)
 void ConvertXYZ (H3dsScene * scene)
 {
   ConvertXYZ (scene->centre.x, scene->centre.y, scene->centre.z);
-  for (int n=0; n<scene->meshobjs; n++)
+  int n, v;
+  for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
     ConvertXYZ (mo->centre.x, mo->centre.y, mo->centre.z);
-    for (int v=0; v<mo->verts; v++)
+    for (v=0; v<mo->verts; v++)
     {
       H3dsVert * vrt=&mo->vertlist[v];
       ConvertXYZ (vrt->x, vrt->y, vrt->z);
@@ -137,10 +141,11 @@ void ConvertXYZ (H3dsScene * scene)
 
 void ConvertFloatsToInts (H3dsScene * scene)
 {
-  for (int n=0; n<scene->meshobjs; n++)
+  int n, v;
+  for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
-    for (int v=0; v<mo->verts; v++)
+    for (v=0; v<mo->verts; v++)
     {
       H3dsVert * vrt = &mo->vertlist[v];
       vrt->ix = roundFloat(vrt->x);
@@ -173,10 +178,11 @@ void FindExchange (H3dsScene * scene, int find, int exchange)
 {
   // Find all references to the 'find' vertice and replace
   // them with references to the 'exchange' vertice
-  for (int o=0; o<scene->meshobjs; o++)
+  int o, f;
+  for (o=0; o<scene->meshobjs; o++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[o];
-    for (int f=0; f<mo->faces; f++)
+    for (f=0; f<mo->faces; f++)
     {
       H3dsFace * fa = &mo->facelist[f];
       if(fa->p0 == find) fa->p0 = exchange;
@@ -188,8 +194,8 @@ void FindExchange (H3dsScene * scene, int find, int exchange)
 
 int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
 {
-  int vrttop=0, dot=0;
-  for (int currvtx=0; currvtx<verts; currvtx++)
+  int vrttop=0, dot=0, currvtx, runvtx;
+  for (currvtx=0; currvtx<verts; currvtx++)
   {
     // Only process those vertices that has not been
     // processed already.
@@ -197,7 +203,7 @@ int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
     {
       // OK, we have a vertex, currvtx. Try to find all other
       // vertices that have the same x,y,z values.
-      for (int runvtx=currvtx+1; runvtx<verts; runvtx++)
+      for (runvtx=currvtx+1; runvtx<verts; runvtx++)
       {
         // Skip all vertices that has been processed already.
         // We already know that they don't have the same values.
@@ -240,11 +246,11 @@ int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
 
 void AdjustFaceIndexes (H3dsScene * scene)
 {
-  int m=0;
-  for (int n=0; n<scene->meshobjs; n++)
+  int m=0, f, n;
+  for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
-    for (int f=0; f<mo->faces; f++)
+    for (f=0; f<mo->faces; f++)
     {
       H3dsFace * fa = &mo->facelist[f];
       fa->p0 += m;
@@ -257,19 +263,19 @@ void AdjustFaceIndexes (H3dsScene * scene)
 
 void CollectVertsAndMaps (H3dsScene * scene, H3dsMapVert * vrtmap)
 {
-  int vn=0, mn;
-  for (int n=0; n<scene->meshobjs; n++)
+  int vn=0, mn, v, n, m, mmn;
+  for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
     mn=vn;
-    for (int v=0; v<mo->verts; v++)
+    for (v=0; v<mo->verts; v++)
     {
       vrtmap[vn].ix=mo->vertlist[v].ix;
       vrtmap[vn].iy=mo->vertlist[v].iy;
       vrtmap[vn].iz=mo->vertlist[v].iz;
       vn++;
     }
-    for (int m=0; m<mo->maps; m++)
+    for (m=0; m<mo->maps; m++)
     {
       vrtmap[mn].iu=mo->maplist[m].u;
       vrtmap[mn].iv=
@@ -281,7 +287,7 @@ void CollectVertsAndMaps (H3dsScene * scene, H3dsMapVert * vrtmap)
       if (flags & FLAG_VERBOSE)
         fprintf(stderr, "%-14s missing mapping, set to zero...\n",
             mo->name);
-      for (int mmn=mn; mmn<vn; mmn++)
+      for (mmn=mn; mmn<vn; mmn++)
       {
         vrtmap[mmn].iu=0;
         vrtmap[mmn].iv=0;

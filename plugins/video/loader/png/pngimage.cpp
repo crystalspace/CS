@@ -190,7 +190,8 @@ error2:
   {
     csRGBpixel *pal = Image->GetPalette ();
     png_colorp palette = (png_colorp)malloc (256 * sizeof (png_color));
-    for (int i = 0; i < 256; i++)
+	int i;
+    for (i = 0; i < 256; i++)
     {
       palette [i].red   = pal [i].red;
       palette [i].green = pal [i].green;
@@ -226,7 +227,8 @@ error2:
    */
   png_bytep *row_pointers = new png_bytep [height];
   UByte *ImageData = (UByte *)Image->GetImageData ();
-  for (int i = 0; i < height; i++)
+  int i;
+  for (i = 0; i < height; i++)
     row_pointers [i] = ImageData + i * rowlen;
 
   /* One of the following output methods is REQUIRED */
@@ -427,7 +429,8 @@ nomem2:
       palette = graypal;
       int entries = (1 << bit_depth) - 1;
       colors = entries + 1;
-      for (int i = 0; i <= entries; i++)
+	  int i;
+      for (i = 0; i <= entries; i++)
         palette [i].red = palette [i].green = palette [i].blue =
           (i * 255) / entries;
     }

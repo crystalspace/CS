@@ -93,10 +93,10 @@ int csColorMapLine::alloc_rgb (int r, int g, int b, int dist)
 {
   CLIP_RGB;
 
-  int d, i = find_rgb (r, g, b, &d);
+  int d, j, i = find_rgb (r, g, b, &d);
   if (i == -1 || d > dist)
   {
-    for (int j = 0; j < 256; j++)
+    for (j = 0; j < 256; j++)
       if (!alloc [j])
       {
         alloc[j] = true;
@@ -113,8 +113,8 @@ int csColorMapLine::alloc_rgb (int r, int g, int b, int dist)
 
 int csColorMapLine::FreeEntries ()
 {
-  int colors = 0;
-  for (int i = 0; i < 256; i++)
+  int i, colors = 0;
+  for (i = 0; i < 256; i++)
     if (!alloc [i])
       colors++;
   return colors;
@@ -237,10 +237,11 @@ static UByte *GenLightmapTable (int bits)
   UByte *dst = table;
   UByte maxv = (1 << bits) - 1;
   int rshf = (13 - bits);
-  for (int i = 0; i < 64; i++)
-    for (int j = 0; j < 256; j++)
+  int i, j, x;
+  for (i = 0; i < 64; i++)
+    for (j = 0; j < 256; j++)
     {
-      int x = (i * j) >> rshf;
+      x = (i * j) >> rshf;
       *dst++ = (x > maxv) ? maxv : x;
     }
   return table;
@@ -359,10 +360,10 @@ void csTextureManagerLine::create_alpha_tables ()
   UByte *map50 = alpha_tables->alpha_map50;
   UByte *map25 = alpha_tables->alpha_map25;
 
-  for (int i = 0 ; i < 256 ; i++)
-    for (int j = 0 ; j < 256 ; j++)
+  int i, j, r, g, b;
+  for (i = 0 ; i < 256 ; i++)
+    for (j = 0 ; j < 256 ; j++)
     {
-      int r, g, b;
       r = (cmap [i].red   + cmap [j].red  ) / 2;
       g = (cmap [i].green + cmap [j].green) / 2;
       b = (cmap [i].blue  + cmap [j].blue ) / 2;
@@ -377,22 +378,25 @@ void csTextureManagerLine::create_alpha_tables ()
 
 void csTextureManagerLine::compute_palette ()
 {
+  int i;
+
   if (truecolor) return;
 
   // Allocate first 6*6*4=144 colors in a uniformly-distributed fashion
   // since we'll get lighted/dimmed/colored textures more often
   // than original pixel values, thus we should be prepared for this.
-  for (int _r = 0; _r < 6; _r++)
-    for (int _g = 0; _g < 6; _g++)
-      for (int _b = 0; _b < 4; _b++)
+  int _r, _g, _b;
+  for (_r = 0; _r < 6; _r++)
+    for (_g = 0; _g < 6; _g++)
+      for (_b = 0; _b < 4; _b++)
         cmap.alloc_rgb (20 + _r * 42, 20 + _g * 42, 30 + _b * 50, prefered_dist);
 
   // Compute a common color histogram for all textures
   csQuantizeBegin ();
 
-  for (int t = textures.Length () - 1; t >= 0; t--)
+  for (i = textures.Length () - 1; i >= 0; i--)
   {
-    csTextureHandleLine *txt = (csTextureHandleLine *)textures [t];
+    csTextureHandleLine *txt = (csTextureHandleLine *)textures [i];
     csRGBpixel *colormap = txt->GetColorMap ();
     int colormapsize = txt->GetColorMapSize ();
     if (txt->GetKeyColor ())
@@ -402,26 +406,26 @@ void csTextureManagerLine::compute_palette ()
 
   // Introduce the uniform colormap bias into the histogram
   csRGBpixel new_cmap [256];
-  int ci, colors = 0;
-  for (ci = 0; ci < 256; ci++)
-    if (!locked [ci] && cmap.alloc [ci])
-      new_cmap [colors++] = cmap [ci];
+  int colors = 0;
+  for (i = 0; i < 256; i++)
+    if (!locked [i] && cmap.alloc [i])
+      new_cmap [colors++] = cmap [i];
 
   csQuantizeBias (new_cmap, colors, uniform_bias);
 
   // Now compute the actual colormap
   colors = 0;
-  for (ci = 0; ci < 256; ci++)
-    if (!locked [ci]) colors++;
+  for (i = 0; i < 256; i++)
+    if (!locked [i]) colors++;
   csRGBpixel *cmap_p = new_cmap;
   csQuantizePalette (cmap_p, colors);
 
   // Finally, put the computed colors back into the colormap
   int outci = 0;
-  for (ci = 0; ci < colors; ci++)
+  for (i = 0; i < colors; i++)
   {
     while (locked [outci]) outci++;
-    cmap [outci++] = new_cmap [ci];
+    cmap [outci++] = new_cmap [i];
   }
 
   csQuantizeEnd ();
@@ -498,7 +502,8 @@ void csTextureManagerLine::SetPalette ()
   if (!truecolor && !palette_ok)
     compute_palette ();
 
-  for (int i = 0; i < 256; i++)
+  int i;
+  for (i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 
   iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@

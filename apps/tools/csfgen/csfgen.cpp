@@ -91,7 +91,8 @@ static int display_help ()
 
 static bool Display (iFontServer *fs, iFont *font)
 {
-  for (int c = opt.first; c < lastglyph; c++)
+  int c, l, i;
+  for (c = opt.first; c < lastglyph; c++)
   {
     int w, h;
     uint8 *bitmap = font->GetGlyphBitmap (c, w, h);
@@ -99,10 +100,10 @@ static bool Display (iFontServer *fs, iFont *font)
       continue;
 
     printf ("---- Character:%d\n", c);
-    for (int l = 0; l < h; l++)
+    for (l = 0; l < h; l++)
     {
       uint8 *line = bitmap + l * ((w + 7) / 8);
-      for (int i = 0; i < w; i++)
+      for (i = 0; i < w; i++)
         printf ("%s", (line [i / 8] & (0x80 >> (i & 7))) ? "@" : ".");
       printf ("\n");
     }

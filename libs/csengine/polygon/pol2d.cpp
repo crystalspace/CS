@@ -244,7 +244,8 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
   // first we copy the first three texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
   G3DTexturedVertex inpoly[3];
-  for (int i = 0; i < 3; i++)
+  int i;
+  for (i = 0; i < 3; i++)
     inpoly [i] = g3dpoly->vertices [i];
 
   // Now we have to find the u,v coordinates for every

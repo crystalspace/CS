@@ -60,7 +60,8 @@ GLGlyphSet::GLGlyphSet (iFont *Font)
 
 GLGlyphSet::~GLGlyphSet ()
 {
-  for (int c = 0; c < 256; c++)
+  int c;
+  for (c = 0; c < 256; c++)
     delete [] glyph [c];
   delete [] glyph;
 }
@@ -69,7 +70,8 @@ void GLGlyphSet::Load ()
 {
   glyph = new uint8 * [256];
   maxheight = 0;
-  for (int c = 0; c < 256; c++)
+  int c, line;
+  for (c = 0; c < 256; c++)
   {
     int width, height;
     // points to location of the font source data
@@ -85,7 +87,7 @@ void GLGlyphSet::Load ()
 
     // Now we'll have to reverse character lines from bottom up
     uint8 *data = new unsigned char [bytes * height];
-    for (int line = 0; line < height; line++)
+    for (line = 0; line < height; line++)
       memcpy (data + bytes * (height - 1 - line), bmp + bytes * line, bytes);
     glyph [c] = data;
   }
@@ -139,7 +141,8 @@ GLFontCache::~GLFontCache ()
 {
   // Remove deletion callbacks to avoid being deleted later -
   // when the font cache object will be already deleted
-  for (int i = 0; i < FontCache.Length (); i++)
+  int i;
+  for (i = 0; i < FontCache.Length (); i++)
     FontCache.Get (i)->font->RemoveDeleteCallback (delete_callback);
   delete_callback->DecRef ();
 }
@@ -162,7 +165,8 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
 
 void GLFontCache::CacheFree (iFont *font)
 {
-  for (int i = FontCache.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = FontCache.Length () - 1; i >= 0; i--)
   {
     GLGlyphSet *gs = FontCache.Get (i);
     if (gs->font == font)

@@ -259,7 +259,8 @@ static void cmd_ls (char *args)
   if (fl)
   {
     bool nl = false;
-    for (int i = 0; i < fl->Length (); i++)
+	int i;
+    for (i = 0; i < fl->Length (); i++)
     {
       char *fname = (char *)fl->Get (i);
       if (fullpath)
@@ -311,7 +312,8 @@ static void cmd_cp (char *args)
     return;
 
   iStrVector *fl = VFS->FindFiles (src);
-  for (int i = 0; i < fl->Length (); i++)
+  int i;
+  for (i = 0; i < fl->Length (); i++)
   {
     char destname [VFS_MAX_PATH_LEN + 1];
     src = (char *)fl->Get (i);
@@ -498,7 +500,8 @@ static bool execute (char *command)
   skipspc (args);
   command [cp] = 0;
 
-  for (int i = 0; cmdlist [i].command; i++)
+  int i;
+  for (i = 0; cmdlist [i].command; i++)
     if (strcmp (cmdlist [i].command, command) == 0)
     {
       cmdlist [i].handler (args);

@@ -270,7 +270,8 @@ bool gdDiveInitialize ()
   if (!QueryDIVE ())
     return false;
   PMtid = _beginthread (PMthread, NULL, 0x8000, NULL);
-  for (int i = 0; i < 100; i++)
+  int i;
+  for (i = 0; i < 100; i++)
   {
     DosSleep (30);
     if (PMmng)

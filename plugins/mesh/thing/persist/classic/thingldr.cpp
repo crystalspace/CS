@@ -1043,7 +1043,9 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	  	&x, &y, &z, &rx, &ry, &rz, &num);
           if (num < 0) { num = -num; dir = -1; }
           else dir = 1;
-          for (int i = 0 ; i < num ; i++)
+		  {
+		  int i;
+          for (i = 0 ; i < num ; i++)
           {
             float rad;
             if (dir == 1) rad = 2.*M_PI*(num-i-1)/(float)num;
@@ -1060,6 +1062,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	    { cz = z; cx = x+cc*rx; cy = y+ss*ry; }
             thing_state->CreateVertex (csVector3 (cx, cy, cz));
           }
+		  }
         }
         break;
       case CS_TOKEN_FOG:

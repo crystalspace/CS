@@ -246,7 +246,8 @@ void csGraphics2DAlleg::Print (csRect *area)
   {
     RGB rgb;
 
-    for (int i = 0; i <= 255; i++)
+	int i;
+    for (i = 0; i <= 255; i++)
     {
       rgb.r = Palette[i].red >> 2;
       rgb.g = Palette[i].green >> 2;

@@ -42,9 +42,10 @@ void States::InitStates ()
 
 void States::Init_game_cube()
 {
-  for (int k = 0; k < ZONE_SAFETY + ZONE_HEIGHT + ZONE_SAFETY; k++)
-    for (int j = 0; j < ZONE_SAFETY + zone_dim + ZONE_SAFETY; j++)
-      for (int i = 0; i < ZONE_SAFETY + zone_dim + ZONE_SAFETY; i++)
+  int k, j, i;
+  for (k = 0; k < ZONE_SAFETY + ZONE_HEIGHT + ZONE_SAFETY; k++)
+    for (j = 0; j < ZONE_SAFETY + zone_dim + ZONE_SAFETY; j++)
+      for (i = 0; i < ZONE_SAFETY + zone_dim + ZONE_SAFETY; i++)
         game_cube[i][j][k] =
 	  i < ZONE_SAFETY || j < ZONE_SAFETY || k < ZONE_SAFETY ||
 	  i >= ZONE_SAFETY + zone_dim || j >= ZONE_SAFETY + zone_dim ||
@@ -60,19 +61,20 @@ void States::AddScore (int dscore)
 
 void States::UpdateScore ()
 {
-  int increase = 0;
-  for (int i = 0; i < ZONE_HEIGHT; i++)
+  int i, increase = 0;
+  for (i = 0; i < ZONE_HEIGHT; i++)
     if (filled_planes[i]) increase++;
   AddScore (zone_dim * zone_dim * 10 * increase * increase);
 }
 
 void States::checkForPlane ()
 {
-  for (int z = 0; z < ZONE_HEIGHT; z++)
+  int z, x, y;
+  for (z = 0; z < ZONE_HEIGHT; z++)
   {
     bool plane_hit = true;
-    for (int x = 0; plane_hit && x < zone_dim; x++)
-      for (int y = 0; y < zone_dim; y++)
+    for (x = 0; plane_hit && x < zone_dim; x++)
+      for (y = 0; y < zone_dim; y++)
 	if (!get_cube (x, y, z))
 	  { plane_hit = false; break; }
     filled_planes[z] = plane_hit;
@@ -89,16 +91,18 @@ void States::checkForPlane ()
 
 void States::removePlane (int z)
 {
-  for (int x = 0; x < zone_dim; x++)
-    for (int y = 0; y < zone_dim; y++)
+  int x, y;
+  for (x = 0; x < zone_dim; x++)
+    for (y = 0; y < zone_dim; y++)
       set_cube (x, y, z, false);
 }
 
 bool States::CheckEmptyPlayArea ()
 {
-  for (int z = 0; z < ZONE_HEIGHT; z++)
-    for (int x = 0; x < zone_dim; x++)
-      for (int y = 0; y < zone_dim; y++)
+  int z, x, y;
+  for (z = 0; z < ZONE_HEIGHT; z++)
+    for (x = 0; x < zone_dim; x++)
+      for (y = 0; y < zone_dim; y++)
         if (get_cube (x, y, z))
 	  return false;
   return true;
@@ -129,10 +133,10 @@ void States::EncodeStates ()
 //  csBitSet tempBitSet(ST_NUM_BITS);
   tempBitSet->Reset();
 
-  int pos = 0;
-  for (int l = 0; l < ZONE_HEIGHT; l++)
-    for (int k = 0; k < ZONE_DIM; k++)
-      for (int j = 0; j < ZONE_DIM; j++, pos++)
+  int pos = 0, l, k, j;
+  for (l = 0; l < ZONE_HEIGHT; l++)
+    for (k = 0; k < ZONE_DIM; k++)
+      for (j = 0; j < ZONE_DIM; j++, pos++)
 	if (get_cube(j, k, l))
           tempBitSet->Set(pos);
   memcpy(encodedData + i, tempBitSet->GetBits(), tempBitSet->GetByteCount());  
@@ -186,10 +190,10 @@ bool States::DecodeStates ()
   memcpy(tempBitSet.GetBits(), encodedData + i, tempBitSet.GetByteCount());
   // i here is just after the ",".
 
-  int pos = 0;
-  for (int l = 0; l < ZONE_HEIGHT; l++)
-    for (int k = 0; k < ZONE_DIM; k++)
-      for (int j = 0; j < ZONE_DIM; j++, pos++)
+  int pos = 0, l, k, j;
+  for (l = 0; l < ZONE_HEIGHT; l++)
+    for (k = 0; k < ZONE_DIM; k++)
+      for (j = 0; j < ZONE_DIM; j++, pos++)
         set_cube(j, k, l, tempBitSet.Get(pos));
   return true;
 }
@@ -201,9 +205,10 @@ bool States::PrintData (const char* fileName) const
   printf("\n--------------------------------------------------\n");
   printf("%f,%f,%d,%d,%d,%d,%d,%d\n",
     speed, cur_speed, score, cube_x, cube_y, cube_z, zone_dim, new_zone_dim);
-  for (int k = 0; k < ZONE_SAFETY + ZONE_HEIGHT + ZONE_SAFETY ; k++)
-    for (int j = 0; j < ZONE_SAFETY + ZONE_DIM + ZONE_SAFETY ; j++)
-      for (int i = 0; i < ZONE_SAFETY + ZONE_DIM + ZONE_SAFETY ; i++)
+  int k, j, i;
+  for (k = 0; k < ZONE_SAFETY + ZONE_HEIGHT + ZONE_SAFETY ; k++)
+    for (j = 0; j < ZONE_SAFETY + ZONE_DIM + ZONE_SAFETY ; j++)
+      for (i = 0; i < ZONE_SAFETY + ZONE_DIM + ZONE_SAFETY ; i++)
         putchar(game_cube[i][j][k] ? '1' : '0');
   putchar('\n');
 

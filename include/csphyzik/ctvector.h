@@ -60,7 +60,8 @@ public:
 
   void set ( int pnum, real *pele )
   {
-    for( int idx = 0; idx < pnum; idx++ )
+	int idx;
+    for(idx = 0; idx < pnum; idx++ )
     {
       elements[idx] = *pele;
       pele++;
@@ -69,7 +70,8 @@ public:
 
   void set ( real *pele )
   {
-    for ( int idx = 0; idx < 3; idx++ )
+	int idx;
+    for (idx = 0; idx < 3; idx++)
     {
       elements[idx] = *pele;
       pele++;
@@ -85,16 +87,17 @@ public:
   ctVectorTranspose3 operator* ( const real pk ) 
   { 
     ctVectorTranspose3 scaled;
-    for( int idx = 0; idx < 3; idx++ ) 
+	int idx;
+    for(idx = 0; idx < 3; idx++ ) 
       scaled.elements[idx] = elements[idx] * pk;  
     return scaled;
   }
   
   void operator*= (const real p) 
-  { for (int idx=0; idx<3; ++idx) elements[idx] *= p; }
+  { int idx; for (idx=0; idx<3; ++idx) elements[idx] *= p; }
 
   void operator/= (const real p) 
-  { for (int idx=0; idx<3; ++idx) elements[idx] /= p; }
+  { int idx; for (idx=0; idx<3; ++idx) elements[idx] /= p; }
 
   real operator* ( const ctVector3 &bs );
 

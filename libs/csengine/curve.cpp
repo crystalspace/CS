@@ -303,15 +303,15 @@ void csCurve::SetObject2World (const csReversibleTransform *o2w)
   int lm_height = LightMap->GetHeight ();
 
   // current index into buffers
-  int uv;
+  int uv, ui, vi;
   
   // if there was already an object to world transform specified
   if (O2W && uv2World) 
   {
     // untransform our buffers
-    for(int ui=0; ui < lm_width; ui++)
+    for(ui=0; ui < lm_width; ui++)
     {
-      for(int vi=0; vi < lm_height; vi++)
+      for(vi=0; vi < lm_height; vi++)
       {
         uv = vi*lm_width + ui;
 
@@ -327,9 +327,9 @@ void csCurve::SetObject2World (const csReversibleTransform *o2w)
   if (uv2World)
   {
     // transform our uv2World buffer
-    for (int ui=0; ui < lm_width; ui++)
+    for (ui=0; ui < lm_width; ui++)
     {
-      for (int vi=0; vi < lm_height; vi++)
+      for (vi=0; vi < lm_height; vi++)
       {
         uv = vi*lm_width + ui;
         uv2World[uv] = O2W->Other2This(uv2World[uv]);
@@ -554,7 +554,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
                                  csCoverageMatrix &cm) const
 {
   csVector3 pos;
-  int uv;
+  int uv, ui, vi;
 
   csFrustumContext* ctxt = lview.GetFrustumContext ();
   iShadowIterator* shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
@@ -567,9 +567,9 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
   cm.height = lm_height;
   cm.width = lm_width;
 
-  for (int ui = 0 ; ui < lm_width; ui++)
+  for (ui = 0 ; ui < lm_width; ui++)
   {
-    for (int vi = 0 ; vi < lm_height; vi++)
+    for (vi = 0 ; vi < lm_height; vi++)
     {
       uv = vi*lm_width + ui;
       pos = uv2World[uv];
@@ -615,7 +615,8 @@ float csCurve::GetArea()
   csTriangle t;
 
   // loop through all of our triangles and sum thier areas
-  for(int i=0; i<ct->GetTriangleCount(); i++)
+  int i;
+  for(i=0; i<ct->GetTriangleCount(); i++)
   {
     t = ct->GetTriangle(i);
     area += ABS(csMath3::Area3 (vertex[t.a], vertex[t.b], vertex[t.c]) );
@@ -637,14 +638,14 @@ void csCurve::CalcUVBuffers()
 
   // our texture space coordinates
   float u,v;
-  int uv;
+  int uv, ui, vi;
 
   // now loop over every texel in the LightMap
-  for (int ui = 0 ; ui < lm_width; ui++)
+  for (ui = 0 ; ui < lm_width; ui++)
   {
     // calculate the real u coordinate in texture space
     u = ((float)ui + 0.5F)/(float)lm_width; // offset 0.5 for texel center
-    for (int vi = 0 ; vi < lm_height; vi++)
+    for (vi = 0 ; vi < lm_height; vi++)
     {
       uv = vi*lm_width + ui;
 
@@ -745,7 +746,8 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 void csCurve::HardTransform (const csReversibleTransform& /*trans*/)
 {
   /// @@@ where must the transformation be used???
-  for (int i = 0 ; i < GetParentTemplate ()->GetVertexCount () ; i++)
+  int i;
+  for (i = 0 ; i < GetParentTemplate ()->GetVertexCount () ; i++)
     SetControlPoint (i, GetParentTemplate ()->GetVertex (i));
   if (uv2World) CalcUVBuffers ();
 }

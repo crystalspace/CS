@@ -48,7 +48,8 @@ float FastPow2(float x, const int y)
 // computes x ** (2 ** y), using only y multiplies.
 {
   float res = x;
-  for(int i=1; i<y; i++)
+  int i;
+  for(i=1; i<y; i++)
     res *= res;
   return res;
 }
@@ -97,8 +98,9 @@ void csRadElement::ComputePriority()
 
 bool csRadElement::DeltaIsZero(int suv, int w, int h)
 {
-  for(int y=0; y<h; y++, suv += width - w)
-    for(int x=0; x<w; x++, suv ++)
+  int y, x;
+  for(y=0; y<h; y++, suv += width - w)
+    for(x=0; x<w; x++, suv ++)
       if(!DeltaIsZero(suv)) return false;
   return true;
 }
@@ -111,8 +113,9 @@ void csRadElement::GetTextureColour(int suv, int w, int h, csColor &avg,
   avg.green = 0.0f;
   avg.blue = 0.0f;
   csRGBpixel* m = texturemap->GetArray ();
-  for(int y=0; y<h; y++, suv += width - w)
-    for(int x=0; x<w; x++, suv ++)
+  int y, x;
+  for(y=0; y<h; y++, suv += width - w)
+    for(x=0; x<w; x++, suv ++)
     {
       avg.red += m[suv].red;
       avg.green += m[suv].green;
@@ -123,8 +126,9 @@ void csRadElement::GetTextureColour(int suv, int w, int h, csColor &avg,
 
 void csRadElement::CapDelta(int suv, int w, int h, float max)
 {
-  for(int y=0; y<h; y++, suv += width - w)
-    for(int x=0; x<w; x++, suv ++)
+  int y, x;
+  for(y=0; y<h; y++, suv += width - w)
+    for(x=0; x<w; x++, suv ++)
     {
       if(deltamap->GetRed()[suv] > max)
         deltamap->GetRed()[suv] = max;

@@ -47,7 +47,8 @@ iSector *csMovableSectorList::FindByName (const char *name) const
 {
   if (!name) return NULL;
 
-  for (int i=0; i<Length (); i++)
+  int i;
+  for (i=0; i<Length (); i++)
   {
     iSector *sec = Get(i);
     if (sec->QueryObject ()->GetName ())

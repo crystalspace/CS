@@ -66,7 +66,8 @@ void csFountainMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     // create particles
-    for (int i=0 ; i<number ; i++)
+	int i;
+    for (i=0 ; i<number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
       GetParticle(i)->SetMixMode(MixMode);

@@ -177,13 +177,14 @@ struct csColorBox
   bool ShrinkRm ()
   {
     UByte iRm = Rm;
+	int g;
     for (; Rm <= Rx; Rm++)
 	{
 	  UByte b;
       for (b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rm, Gm, b)];
-        for (int g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
+        for (g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rm != iRm);
       }
 	}
@@ -194,11 +195,11 @@ struct csColorBox
   bool ShrinkRx ()
   {
     UByte iRx = Rx;
+	int g;
     for (; Rx >= Rm; Rx--)
       for (UByte b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rx, Gm, b)];
-		int g;
         for (g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rx != iRx);
       }
@@ -209,6 +210,7 @@ struct csColorBox
   bool ShrinkGm ()
   {
     UByte iGm = Gm;
+	int r;
 
     for (; Gm <= Gx; Gm++)
 	{
@@ -216,7 +218,6 @@ struct csColorBox
       for (b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rm, Gm, b)];
-		int r;
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gm != iGm);
       }
@@ -228,13 +229,14 @@ struct csColorBox
   bool ShrinkGx ()
   {
     UByte iGx = Gx;
+	int r;
     for (; Gx >= Gm; Gx--)
 	{
 	  UByte b;
       for (b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rm, Gx, b)];
-        for (int r = Rx - Rm; r >= 0; r--, hp++)
+        for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gx != iGx);
       }
 	}
@@ -245,13 +247,14 @@ struct csColorBox
   bool ShrinkBm ()
   {
     UByte iBm = Bm;
+	int r;
     for (; Bm <= Bx; Bm++)
 	{
 	  UByte g;
       for (g = Gm; g <= Gx; g++)
       {
         UShort *hp = &hist [INDEX (Rm, g, Bm)];
-        for (int r = Rx - Rm; r >= 0; r--, hp++)
+        for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bm != iBm);
       }
 	}
@@ -262,13 +265,14 @@ struct csColorBox
   bool ShrinkBx ()
   {
     UByte iBx = Bx;
+	int r;
     for (; Bx >= Bm; Bx--)
 	{
 	  UByte g;
       for (g = Gm; g <= Gx; g++)
       {
         UShort *hp = &hist [INDEX (Rm, g, Bx)];
-        for (int r = Rx - Rm; r >= 0; r--, hp++)
+        for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bx != iBx);
       }
 	}
@@ -292,12 +296,11 @@ struct csColorBox
   {
     unsigned rs = 0, gs = 0, bs = 0;
     unsigned count = 0;
-	int b;
+	int b, g, r;
     for (b = Bm; b <= Bx; b++)
-      for (int g = Gm; g <= Gx; g++)
+      for (g = Gm; g <= Gx; g++)
       {
         UShort *hp = &hist [INDEX (Rm, g, b)];
-		int r;
         for (r = Rm; r <= Rx; r++, hp++)
           if (*hp)
           {

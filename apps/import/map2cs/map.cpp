@@ -127,8 +127,8 @@ CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
 CMapTexturedPlane* CMapFile::AddPlane(CMapTexturedPlane* pNewPlane)
 {
   //first we look in m_Planes to check, if a similar plane is already stored.
-  int NumPlanes = m_Planes.Length();
-  for (int i=0; i<NumPlanes; i++)
+  int i, NumPlanes = m_Planes.Length();
+  for (i=0; i<NumPlanes; i++)
   {
     CMapTexturedPlane* pPlane = m_Planes[i];
     assert(pPlane);
@@ -160,7 +160,8 @@ CMapTexturedPlane* CMapFile::AddPlane(CMapTexturedPlane* pNewPlane)
 
 void CMapFile::CreatePolygons()
 {
-  for (int i=0; i<m_Entities.Length(); i++)
+  int i;
+  for (i=0; i<m_Entities.Length(); i++)
   {
     m_Entities[i]->CreatePolygons();
   }
@@ -173,7 +174,8 @@ void CMapFile::GetMapSize(CdVector3& Min, CdVector3& Max)
   Max = CdVector3(0,0,0);
 
   //iterate all entities, brushes, polygons and vertices:
-  for (int i=0; i<GetNumEntities(); i++)
+  int i;
+  for (i=0; i<GetNumEntities(); i++)
   {
     CMapEntity* pEntity = GetEntity(i);
 
@@ -206,13 +208,14 @@ void CMapFile::GetMapSize(CdVector3& Min, CdVector3& Max)
       }
     }
 
-    for (int j=0; j<pEntity->GetNumBrushes(); j++)
+	int j, k, l;
+    for (j=0; j<pEntity->GetNumBrushes(); j++)
     {
       CMapBrush* pBrush = pEntity->GetBrush(j);
-      for (int k=0; k<pBrush->GetPolygonCount(); k++)
+      for (k=0; k<pBrush->GetPolygonCount(); k++)
       {
         CMapPolygon* pPolygon = pBrush->GetPolygon(k);
-        for (int l=0; l<pPolygon->GetVertexCount(); l++)
+        for (l=0; l<pPolygon->GetVertexCount(); l++)
         {
           CdVector3 v = pPolygon->GetVertex(l);
           if (!inited)

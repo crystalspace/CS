@@ -365,8 +365,9 @@ void PixmapTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
 void PixmapTester::Draw (iGraphics3D* g3d)
 {
   draw++;
-  for (int i = 0; i < 10; ++i)
-    for (int j = 0; j < 10; ++j)
+  int i, j;
+  for (i = 0; i < 10; ++i)
+    for (j = 0; j < 10; ++j)
       g3d->DrawPixmap (texture,
 		       i*inc_w+5, j*inc_h+10, inc_w-5, inc_h-5,
 		       0, 0, tex_w, tex_h);
@@ -385,7 +386,8 @@ void MultiTexturePixmapTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   draw = 0;
   inc_w = g3d->GetWidth ()/10;
   inc_h = g3d->GetHeight ()/10;
-  for (int i = 0; i < 4; i++)
+  int i;
+  for (i = 0; i < 4; i++)
   {
     tex[i].texture = perftest->GetMaterial (i)->GetTexture ();
     tex[i].texture->GetMipMapDimensions (0, tex[i].tex_w, tex[i].tex_h);
@@ -395,8 +397,9 @@ void MultiTexturePixmapTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
 void MultiTexturePixmapTester::Draw (iGraphics3D* g3d)
 {
   draw++;
-  for (int i = 0; i < 10; ++i)
-    for (int j = 0; j < 10; ++j)
+  int i, j;
+  for (i = 0; i < 10; ++i)
+    for (j = 0; j < 10; ++j)
       g3d->DrawPixmap (tex[j&3].texture,
 		       i*inc_w+5, j*inc_h+10, inc_w-5, inc_h-10,
 		       0, 0, tex[j&3].tex_w, tex[j&3].tex_h);

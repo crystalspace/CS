@@ -206,10 +206,11 @@ iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
   memcpy (p, CSTGA_ID, hdr.IDLength);
   p += hdr.IDLength;
 
+  int i, x, y;
   if (palette)
   {
     csRGBpixel *pal = Image->GetPalette ();
-    for (int i= 0; i < 256; i++)
+    for (i= 0; i < 256; i++)
     {
       csRGBcolor color = pal[i];
       memcpy (p, &color, sizeof (csRGBcolor));
@@ -217,15 +218,15 @@ iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     }
 
     unsigned char *data = (unsigned char *)Image->GetImageData ();
-    for (int y=h-1; y >= 0; y--)
-      for (int x=0; x < w; x++)
+    for (y=h-1; y >= 0; y--)
+      for (x=0; x < w; x++)
 	*p++ = data[y*w+x];
   }
   else
   {
     csRGBpixel *pixel = (csRGBpixel *)Image->GetImageData ();
-    for (int y=h-1; y >= 0; y--)
-      for (int x=0; x < w; x++)
+    for (y=h-1; y >= 0; y--)
+      for (x=0; x < w; x++)
       {
 	unsigned char *c = (unsigned char *)&pixel[y*w+x];
 	*p++ = *(c+2);

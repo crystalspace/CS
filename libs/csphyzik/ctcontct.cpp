@@ -372,7 +372,8 @@ void ctContactSolver::compute_contact_force_b ( ctContact contacts[], int nconta
   ctVector3 a_ext_part, a_vel_part,
             b_ext_part, b_vel_part;
 
-  for ( int i = 0; i < ncontacts; i++ )
+  int i;
+  for (i = 0; i < ncontacts; i++)
   {
     ctContact *c = &contacts[i];
     ctRigidBody *A = c->body_a;

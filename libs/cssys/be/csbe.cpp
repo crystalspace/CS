@@ -54,7 +54,8 @@ SysSystemDriver::SysSystemDriver() :
   shift_down(false), alt_down(false), ctrl_down(false),
   real_mouse(true), mouse_moved(false), mouse_point(0,0)
 {
-  for (int i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
+  int i;
+  for (i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
     button_state[i] = false;
   BeHelper* behelper = new BeHelper (this);
   scfiObjectRegistry.Register (behelper, "SystemHelper");

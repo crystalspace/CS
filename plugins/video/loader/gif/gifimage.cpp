@@ -223,7 +223,8 @@ public:
   {
     pal_size = (size < 0) ? 0 : (size > 256) ? 256 : size;
     bitmask = pal_size - 1;
-    for (int i = 0; i < pal_size; i++)
+	int i;
+    for (i = 0; i < pal_size; i++)
     {
       palette[i].red = gptr.nextbyte ();
       palette[i].green = gptr.nextbyte ();
@@ -401,7 +402,8 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
       // Now we put the data out to the image buffer.
       // It's been stacked LIFO, so deal with it that way...
 
-      for (int j = OutCount - 1; j >= 0; j--)
+	  int j;
+      for (j = OutCount - 1; j >= 0; j--)
       {
         *optr = OutCode [j];
         ++optr;

@@ -107,11 +107,10 @@ void OpenGLTextureCache::Cache (iTextureHandle *txt_handle)
   }
   else
   {
-    int size = 0;
+    int size = 0, c, width, height;
 
-    for (int c = 0; c < 4; c++)
+    for (c = 0; c < 4; c++)
     {
-      int width, height;
       if (txt_handle->GetMipMapDimensions (c, width, height))
         size += width * height;
     }
@@ -233,7 +232,8 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	    img = previmg;
 	    src = (csRGBpixel *)previmg->GetImageData();
 	    int totalnewpixels = (previmg->GetWidth() * previmg->GetHeight())/2;
-	    for (int skippixel = 0; skippixel < totalnewpixels; skippixel ++)
+		int skippixel;
+	    for (skippixel = 0; skippixel < totalnewpixels; skippixel ++)
 	      src[skippixel] = src[skippixel*2];
 
 	    // As part of the hack we have to manually track the mipmap size,

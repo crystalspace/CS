@@ -126,7 +126,7 @@ void Md2::Clear()
 bool Md2::ReadMDLFile(const char* mdlfile)
 {
   FILE *f;
-  int i;
+  int i, j;
 
   clearError();
 
@@ -267,7 +267,7 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   short* pt = triangles;
   for (i = 0; i < nbtriangles; i++)
   {
-    for (int j = 0; j < 3; j++, pt++)
+    for (j = 0; j < 3; j++, pt++)
     {
       short xyzindex = qtriangles[i].xyz[j];
       short texindex = qtriangles[i].vertice[j];

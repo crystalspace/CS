@@ -46,7 +46,8 @@ SkinImage::SkinImage(void* Data, const void* Pal, int w, int h) :
   SCF_CONSTRUCT_IBASE(NULL);
   const unsigned char* src = (const unsigned char*)Pal;
   csRGBpixel* dst = Palette;
-  for (int i = 256; i-- > 0; dst++)
+  int i;
+  for (i = 256; i-- > 0; dst++)
   {
     dst->red   = *src++;
     dst->green = *src++;

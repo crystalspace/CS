@@ -160,7 +160,8 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
+  int i;
+  for (i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = split_plane.Classify (ptB);
@@ -233,7 +234,8 @@ void csBspPolygon::SplitWithPlaneX (csPolygonInt** poly1, csPolygonInt** poly2,
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
+  int i;
+  for (i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = ptB.x - x;
@@ -306,7 +308,8 @@ void csBspPolygon::SplitWithPlaneY (csPolygonInt** poly1, csPolygonInt** poly2,
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
+  int i;
+  for (i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = ptB.y - y;
@@ -379,7 +382,8 @@ void csBspPolygon::SplitWithPlaneZ (csPolygonInt** poly1, csPolygonInt** poly2,
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
+  int i;
+  for (i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = ptB.z - z;

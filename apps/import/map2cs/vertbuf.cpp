@@ -49,7 +49,8 @@ void CVertexBuffer::AddVertices(CMapPolygon* pPoly)
 {
   //Add all vertices of this polygon
   int  NumPolyVertices = pPoly->GetVertexCount();
-  for (int i=0; i<NumPolyVertices; i++)
+  int i;
+  for (i=0; i<NumPolyVertices; i++)
   {
     AddVertex(pPoly->GetVertex(i));
   }
@@ -59,7 +60,8 @@ void CVertexBuffer::AddVertices(CMapPolygonSet* pPolySet)
 {
   //Add all vertices of all polygons
   int  NumPolygons = pPolySet->GetPolygonCount();
-  for (int i=0; i<NumPolygons ; i++)
+  int i;
+  for (i=0; i<NumPolygons ; i++)
   {
     AddVertices(pPolySet->GetPolygon(i));
   }
@@ -67,7 +69,8 @@ void CVertexBuffer::AddVertices(CMapPolygonSet* pPolySet)
 
 void CVertexBuffer::AddVertices(CMapPolygonSetVector* pPolySetVector)
 {
-  for (int i=0; i<pPolySetVector->Length(); i++)
+  int i;
+  for (i=0; i<pPolySetVector->Length(); i++)
   {
     AddVertices(pPolySetVector->Get(i));
   }
@@ -75,7 +78,8 @@ void CVertexBuffer::AddVertices(CMapPolygonSetVector* pPolySetVector)
 
 void CVertexBuffer::AddVertices(CIPortalVector* pPortalVector)
 {
-  for (int i=0; i<pPortalVector->Length(); i++)
+  int i;
+  for (i=0; i<pPortalVector->Length(); i++)
   {
     AddVertices(pPortalVector->Get(i));
   }
@@ -84,7 +88,8 @@ void CVertexBuffer::AddVertices(CIPortalVector* pPortalVector)
 int CVertexBuffer::GetIndex(CdVector3 Vertex) const
 {
   //search for the vertex in the buffer
-  for (int i=0; i<m_Vertices.Length(); i++)
+  int i;
+  for (i=0; i<m_Vertices.Length(); i++)
   {
     if (Vertex == (*m_Vertices[i]))
     {
@@ -106,7 +111,8 @@ bool CVertexBuffer::WriteCS(CIWorld* pWorld)
 
   double ScaleFactor = pWorld->GetScalefactor();
 
-  for (int i=0; i<m_Vertices.Length(); i++)
+  int i;
+  for (i=0; i<m_Vertices.Length(); i++)
   {
     pWorld->WriteIndent();
     fprintf(fd, "VERTEX (%g,%g,%g)", 

@@ -130,11 +130,14 @@ static bool SavePNM (const char *fname, void *image, int w, int h, bool rgb)
   sprintf (header, "P%c\n%d %d\n%d\n", rgb ? '6' : '5', w, h, 255);
   fwrite (header, 1, strlen (header), f);
   if (rgb)
-    for (int i = w * h; i > 0; i--)
+  {
+	int i;
+    for (i = w * h; i > 0; i--)
     {
       fwrite (image, 1, 3, f);
       image = ((csRGBpixel *)image) + 1;
     }
+  }
   else
     fwrite (image, 1, w * h, f);
   fclose (f);
@@ -172,9 +175,10 @@ static bool display_picture (iImage *ifile)
   ifile->Rescale (opt.displayW, opt.displayH);
   csRGBpixel *rgb = ifile->GetPalette ();
   UByte *idx = (UByte *)ifile->GetImageData ();
-  for (int y = 0; y < opt.displayH; y++)
+  int y, x;
+  for (y = 0; y < opt.displayH; y++)
   {
-    for (int x = 0; x < opt.displayW; x++)
+    for (x = 0; x < opt.displayW; x++)
     {
       csRGBpixel &src = rgb [*idx++];
       int gray = int (sqrt (src.red * src.red + src.green * src.green +
@@ -211,7 +215,8 @@ static bool output_heightmap (const char *fname, iImage *ifile)
   int height [257], tc = 0;
   csRGBpixel *pal = ifile->GetPalette ();
   height [256] = transpcolor.Intensity ();
-  for (int i = 0; i < 256; i++)
+  int i;
+  for (i = 0; i < 256; i++)
     if (opt.transp && transpcolor.eq (pal [i]))
       height [tc = i] = -1;
     else

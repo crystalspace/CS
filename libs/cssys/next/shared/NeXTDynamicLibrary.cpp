@@ -128,7 +128,8 @@ bool csUnloadLibrary(csLibraryHandle handle)
   if (NeXTUnloadLibrary(handle))
   {
     NeXTPluginArray& loaded_plugins = get_loaded_plugins();
-    for (int i = loaded_plugins.Length() - 1; i >= 0; i--)
+	int i;
+    for (i = loaded_plugins.Length() - 1; i >= 0; i--)
       if (((NeXTPluginEntry const*)loaded_plugins[i])->handle == handle)
         { loaded_plugins.Delete(i); break; }
   }

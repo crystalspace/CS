@@ -112,8 +112,9 @@ void csProcWater::MakePalette (int max)
 void csProcWater::MakePuddle (int sx, int sy, int rad, int val)
 {
   int sqrad = rad *rad;
-  for (int y=-rad ; y<=rad ; y++)
-    for (int x=-rad ; x<=rad ; x++)
+  int y, x;
+  for (y=-rad ; y<=rad ; y++)
+    for (x=-rad ; x<=rad ; x++)
     {
       int d = x*x + y*y;
       if (d < sqrad)

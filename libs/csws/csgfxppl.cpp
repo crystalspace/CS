@@ -235,7 +235,8 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   if (!BeginDraw (CSDRAW_3DGRAPHICS))
     return;
 
-  for (int i = 0; i < poly.num; i++)
+  int i;
+  for (i = 0; i < poly.num; i++)
   {
     int x = QInt (poly.vertices [i].sx);
     int y = FrameHeight - 1 - QInt (poly.vertices [i].sy);

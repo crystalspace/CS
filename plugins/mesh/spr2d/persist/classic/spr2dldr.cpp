@@ -529,7 +529,8 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
           csScanStr (params, "%F", list, &num);
 	  num /= 2;
 	  verts->SetLength (num);
-          for (int i = 0 ; i < num ; i++)
+	  int i;
+      for (i = 0 ; i < num ; i++)
 	  {
 	    (*verts)[i].pos.x = list[i*2+0];
 	    (*verts)[i].pos.y = list[i*2+1];
@@ -545,7 +546,8 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
           csScanStr (params, "%F", list, &num);
 	  num /= 2;
 	  verts->SetLength (num);
-          for (int i = 0 ; i < num ; i++)
+	  int i;
+      for (i = 0 ; i < num ; i++)
 	  {
 	    (*verts)[i].u = list[i*2+0];
 	    (*verts)[i].v = list[i*2+1];
@@ -566,7 +568,8 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
           csScanStr (params, "%F", list, &num);
 	  num /= 3;
 	  verts->SetLength (num);
-          for (int i = 0 ; i < num ; i++)
+	  int i;
+      for (i = 0 ; i < num ; i++)
 	  {
 	    (*verts)[i].color_init.red = list[i*3+0];
 	    (*verts)[i].color_init.green = list[i*3+1];

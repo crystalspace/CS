@@ -52,7 +52,8 @@ bool CScriptParser::Open(const char* filename)
 
   m_CurrentLine = 1;
   m_Eof = false;
-  for (int i=0;i<ReadAhead;i++)
+  int i;
+  for (i=0;i<ReadAhead;i++)
   {
     GetNextChar(); //Ensure m_NextChars is inited;
   }

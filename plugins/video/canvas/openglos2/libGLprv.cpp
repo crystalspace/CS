@@ -191,7 +191,8 @@ bool gdGLInitialize ()
   if (PMtid)
     return TRUE;
   PMtid = _beginthread (PMthread, NULL, 0x40000, NULL);
-  for (int i = 0; i < 100; i++)
+  int i;
+  for (i = 0; i < 100; i++)
   {
     DosSleep (30);
     if (PMmng)

@@ -269,7 +269,8 @@ bool CWad3File::Open(const char *filename)
   Read(m_Lumpinfo, m_Numlumps*sizeof(S_Lumpinfo));
 
   // Convert pos and size to proper endian format.
-  for (int i=0 ; i<m_Numlumps ; i++)
+  int i;
+  for (i=0 ; i<m_Numlumps ; i++)
   {
     m_Lumpinfo[i].filepos = LittleEndian(m_Lumpinfo[i].filepos);
     m_Lumpinfo[i].size    = LittleEndian(m_Lumpinfo[i].size);
@@ -282,7 +283,8 @@ bool CWad3File::GetQtexInfo(const char* Texture, miptex_t* pInfo, int* LumpNr)
 {
   if (!m_Filehandle) return false;
 
-  for (int i = 0; i < m_Numlumps; i++) 
+  int i, level;
+  for (i = 0; i < m_Numlumps; i++) 
   {
     if (strcasecmp( m_Lumpinfo[i].name, Texture) == 0)
     {
@@ -297,7 +299,7 @@ bool CWad3File::GetQtexInfo(const char* Texture, miptex_t* pInfo, int* LumpNr)
       pInfo->width   = LittleEndian(pInfo->width);
       pInfo->height  = LittleEndian(pInfo->height);
 
-      for (int level = 0; level<MIPLEVELS; level++)
+      for (level = 0; level<MIPLEVELS; level++)
       { 
         pInfo->offsets[level] = LittleEndian(pInfo->offsets[level]);
       }

@@ -45,7 +45,8 @@ void _chdrive (char drive)
 static inline char *djgpp_getcwd (char *buf, size_t size)
 {
   char *out = getcwd (buf, size);
-  for (int i = 0; out [i]; i++)
+  int i;
+  for (i = 0; out [i]; i++)
     if (out [i] == '/') out [i] = '\\';
   return out;
 }

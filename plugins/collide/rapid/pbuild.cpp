@@ -219,7 +219,8 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
   csVector3 c = m_Rotation.GetTranspose () * Triangles [TriangleIndices[0]].p1;
   csVector3 minval = c, maxval = c;
 
-  for (int i=0 ; i<NumTriangles ; i++)
+  int i;
+  for (i=0 ; i<NumTriangles ; i++)
   {
     int CurrentTriangleIndex = TriangleIndices[i];
     csCdTriangle *ptr = &Triangles[CurrentTriangleIndex];

@@ -53,7 +53,8 @@ csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 
 csMultiplexImageIO::~csMultiplexImageIO ()
 {
-  for (int i=0; i < list.Length (); i++)
+  int i;
+  for (i=0; i < list.Length (); i++)
     ((iImageIO*)list.Get (i))->DecRef ();
 }
 
@@ -73,7 +74,8 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
     int const nmatches = classlist->Length();
     if (nmatches != 0)
     {
-      for (int i = 0; i < nmatches; i++)
+	  int i;
+      for (i = 0; i < nmatches; i++)
       {
 	char const* classname = classlist->Get(i);
         if (strcasecmp (classname, MY_CLASSNAME))

@@ -73,7 +73,8 @@ csConverter_MD2FrameManipulator::~csConverter_MD2FrameManipulator()
 {
   if (m_frame_array)
   {
-    for (int frameindex=0; frameindex < m_total_frame_count; frameindex++)
+	int frameindex;
+    for (frameindex=0; frameindex < m_total_frame_count; frameindex++)
     {
       if (m_frame_array[frameindex].vertexcoords)
         delete [] m_frame_array[frameindex].vertexcoords;
@@ -103,7 +104,8 @@ int csConverter_MD2FrameManipulator::SetFrame(int framenumber)
 
   // copy over the vertex location data--all other data remains unchanged
   float *md2vertexwalk = setframeto->vertexcoords;
-  for (int coordindex=0; coordindex < m_data_target->num_cor3; coordindex++)
+  int coordindex;
+  for (coordindex=0; coordindex < m_data_target->num_cor3; coordindex++)
   {
     m_data_target->cor3[0][coordindex] = *md2vertexwalk++;
     m_data_target->cor3[1][coordindex] = *md2vertexwalk++;
@@ -204,6 +206,7 @@ int converter::md2_read ( FILE *filein ) {
     John Burkardt
 */
   unsigned char readbuffer[MAX_DATAELEMENT_SIZE];
+  int vertexindex;
 
   // Read in header and check for a correct file.  The
   // header consists of two longs, containing
@@ -266,7 +269,8 @@ int converter::md2_read ( FILE *filein ) {
   // read in texmap (skin) names - skin names are 64 bytes long
   memset(texmap_name,0,sizeof(char)*81*MAX_TEXMAP);
   fseek(filein, skinoffset,SEEK_SET);
-  for (int skinindex = 0; skinindex < num_texmap; skinindex++)
+  int skinindex;
+  for (skinindex = 0; skinindex < num_texmap; skinindex++)
   {
     fread(texmap_name[skinindex],SIZEOF_MD2SKINNAME,1,filein);
   }
@@ -279,7 +283,8 @@ int converter::md2_read ( FILE *filein ) {
   // are the static texture map (uv) locations for each vertex!
   fseek(filein, texcoordoffset,SEEK_SET);
   float *packed_uv_coords = new float[num_uv*2];
-  for (int texcoordindex = 0; texcoordindex < num_uv; texcoordindex++)
+  int texcoordindex;
+  for (texcoordindex = 0; texcoordindex < num_uv; texcoordindex++)
   {
     fread(readbuffer,SIZEOF_MD2SHORT,2,filein);
     packed_uv_coords[texcoordindex*2] = get_le_short(readbuffer)/(float)skinwidth;
@@ -298,10 +303,11 @@ int converter::md2_read ( FILE *filein ) {
   // 'modelvertices' handles
   // all the bookkeeping, allocating new vertices as it needs to
   fseek(filein,triangleoffset,SEEK_SET);
-  for (int triangleindex = 0; triangleindex < num_face; triangleindex++)
+  int triangleindex, partindex;
+  for (triangleindex = 0; triangleindex < num_face; triangleindex++)
   {
     fread(readbuffer,SIZEOF_MD2SHORT,6,filein);
-    for (int partindex = 0; partindex<3; partindex++)
+    for (partindex = 0; partindex<3; partindex++)
     {
       short xyzindex = get_le_short(readbuffer + partindex * SIZEOF_MD2SHORT);
       short texindex = get_le_short(readbuffer + (partindex+3) * SIZEOF_MD2SHORT);
@@ -317,7 +323,7 @@ int converter::md2_read ( FILE *filein ) {
 
   // pull vertex data of these remapped vertices out of
   // modelvertices, and build a texture coordinate table
-  for (int vertexindex=0; vertexindex<num_cor3; vertexindex++)
+  for (vertexindex=0; vertexindex<num_cor3; vertexindex++)
   {
       short xyz_index, tex_index;
       modelvertices.get_md2vertexmap(vertexindex,xyz_index,tex_index);
@@ -333,7 +339,8 @@ int converter::md2_read ( FILE *filein ) {
   md2framedata *file_framedata = new md2framedata[num_object];
   float scale[3],translate[3];
 
-  for (int frameindex = 0; frameindex < num_object; frameindex++)
+  int frameindex;
+  for (frameindex = 0; frameindex < num_object; frameindex++)
   {
     // read in scale and translate info
     fread(scale,SIZEOF_MD2FLOAT,3,filein);
@@ -358,7 +365,7 @@ int converter::md2_read ( FILE *filein ) {
     // remapping built earlier
     fread(readbuffer,1,4*num_xyz,filein);
 
-    for (int vertexindex = 0; vertexindex < num_cor3; vertexindex++)
+    for (vertexindex = 0; vertexindex < num_cor3; vertexindex++)
     {
       short xyz_index, texindex;
       modelvertices.get_md2vertexmap(vertexindex,xyz_index,texindex);
@@ -467,7 +474,8 @@ int converter::mdl_read ( FILE *filein ) {
   // frame coordinate value read in later.
   float scale[3], translate[3];
   float *floatvals = (float *)readbuffer;
-  for (int transformindex = 0; transformindex < 3; transformindex++)
+  int transformindex;
+  for (transformindex = 0; transformindex < 3; transformindex++)
   {
     scale[transformindex] = convert_endian(floatvals[transformindex]);
     translate[transformindex] = convert_endian(floatvals[3 + transformindex]);
@@ -476,7 +484,8 @@ int converter::mdl_read ( FILE *filein ) {
   // skip over all skin data.  Skins are read in separately; this module
   // is for reading in geometry
   unsigned char *skinholder = new unsigned char[skinwidth*skinheight];
-  for (int skinindex = 0; skinindex < num_texmap; skinindex++)
+  int skinindex, multiskinindex;
+  for (skinindex = 0; skinindex < num_texmap; skinindex++)
   {
     fread(readbuffer,SIZEOF_MD2LONG,1,filein);
     int group = get_le_long(readbuffer);
@@ -489,7 +498,7 @@ int converter::mdl_read ( FILE *filein ) {
       fread(readbuffer,SIZEOF_MD2LONG,1,filein);
       int multiskincount = get_le_long(readbuffer);
       fread(readbuffer,SIZEOF_MD2FLOAT,multiskincount,filein);
-      for (int multiskinindex = 0; multiskinindex < multiskincount; multiskinindex++)
+      for (multiskinindex = 0; multiskinindex < multiskincount; multiskinindex++)
       {
         fread(skinholder,skinwidth*skinheight,sizeof(unsigned char),filein);
       }
@@ -529,12 +538,13 @@ int converter::mdl_read ( FILE *filein ) {
   // for faces on opposite sides of the seam.  These are marked as
   // 'front' and 'back' vertices
   md2vertexset vertexlist;
-  for (int faceindex = 0; faceindex < num_face; faceindex++)
+  int faceindex, partindex;
+  for (faceindex = 0; faceindex < num_face; faceindex++)
   {
     fread(readbuffer, SIZEOF_MD2LONG, 4, filein);
     int frontpoly = get_le_long(readbuffer);
     face_order[faceindex] = 3;
-    for (int partindex = 0; partindex < 3; partindex++)
+    for (partindex = 0; partindex < 3; partindex++)
     {
       int cornerindex = 
       	get_le_long(readbuffer + (1+partindex) * SIZEOF_MD2LONG);
@@ -573,6 +583,7 @@ int converter::mdl_read ( FILE *filein ) {
 
   int framecount = 0;
   int framesetindex;
+  int subframeindex;
   for (framesetindex = 0; framesetindex < framesetcount; framesetindex++)
   {
     fread(readbuffer, SIZEOF_MD2LONG, 1, filein);
@@ -595,7 +606,7 @@ int converter::mdl_read ( FILE *filein ) {
     file_framesetdata[framesetindex] = file_framedata;
     framesetsizes[framesetindex] = framesetsize;
 
-    for (int subframeindex = 0; subframeindex < framesetsize; subframeindex++)
+    for (subframeindex = 0; subframeindex < framesetsize; subframeindex++)
     {
       // skip min/max info
       fread(readbuffer, SIZEOF_MD2LONG, 2, filein);
@@ -637,7 +648,7 @@ int converter::mdl_read ( FILE *filein ) {
   md2framedata *curframe = file_framedata;
   for (framesetindex = 0; framesetindex < framesetcount; framesetindex++)
   {
-    for (int subframeindex = 0; subframeindex < framesetsizes[framesetindex]; subframeindex++)
+    for (subframeindex = 0; subframeindex < framesetsizes[framesetindex]; subframeindex++)
     {
       curframe->vertexcoords = file_framesetdata[framesetindex][subframeindex].vertexcoords;
       strcpy (curframe->name, file_framesetdata[framesetindex][subframeindex].name);

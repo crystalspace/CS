@@ -443,7 +443,8 @@ void csApp::PrepareTextures ()
         txtmgr->ReserveColor (r * 32, g * 32, b * 64);
 
   // Register all CSWS textures to the texture manager
-  for (int i = 0; i < Textures.Length (); i++)
+  int i;
+  for (i = 0; i < Textures.Length (); i++)
     Textures.Get (i)->Register (txtmgr);
 
   // Prepare all the textures.

@@ -160,7 +160,8 @@ real csRigidSpaceTimeObj::collision_check()
       this_contact = &(contact_heap [contact_heap_index]);
       this_contact->next = NULL;
       
-      for ( int acol = 0; acol < cdsys->GetCollisionPairCount (); acol++ )
+	  int acol;
+      for (acol = 0; acol < cdsys->GetCollisionPairCount (); acol++)
       {
         space_time_continuum[i]->cd_contact[acol] = CD_contact[acol];
 
@@ -188,7 +189,8 @@ real csRigidSpaceTimeObj::collision_check()
 
         // check each point of this triangle to see which penetrated the most
   
-        for ( int j = 0; j < 3 ; j++ )
+		int j;
+        for (j = 0; j < 3 ; j++)
 	{
           if ( j == 0 )
             trime = tfm.This2Other ( cd.a1 );
@@ -243,7 +245,8 @@ void csRigidSpaceTimeObj::collision_response()
 {
   csRigidSpaceTimeObj *sto;
 
-  for ( int i = 0; i < continuum_end; i++ )
+  int i;
+  for (i = 0; i < continuum_end; i++)
   {
     sto = space_time_continuum[i];
     if ( sto->num_collisions > 0 && sto->contact != NULL )

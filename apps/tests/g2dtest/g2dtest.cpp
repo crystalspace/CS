@@ -579,7 +579,8 @@ void G2DTestSystemDriver::DrawLineTest ()
   WriteCentered (0,-16*1, gray,  -1, "top-left corner of the canvas.");
 
   float py = -1;
-  for (int a = 0; a <= myG2D->GetWidth (); a += 8)
+  int a;
+  for (a = 0; a <= myG2D->GetWidth (); a += 8)
   {
     float angle = float (a) / 30;
     float y = int (80 + sin (angle) * 60);
@@ -628,7 +629,8 @@ void G2DTestSystemDriver::DrawLinePerf ()
 
   int w2 = myG2D->GetWidth () / 2;
   int colors [4] = { red, green, blue, yellow };
-  for (int a = 0; a < 360; a += 5)
+  int a;
+  for (a = 0; a < 360; a += 5)
   {
     float angle = (a * 2 * PI) / 360.0;
     float x = w2 + 80 * cos (angle);
@@ -656,7 +658,7 @@ void G2DTestSystemDriver::DrawLinePerf ()
   float pix_count = 0;
   do
   {
-    for (int i = 0; i < 5000; i++)
+    for (a = 0; a < 5000; a++)
     {
       float x1 = sx + rng.Get () * sw;
       float y1 = sy + rng.Get () * sh;
@@ -678,10 +680,11 @@ void G2DTestSystemDriver::DrawTextTest ()
   // Draw a grid of lines so that transparent text background will be visible
   int w = myG2D->GetWidth ();
   int h = myG2D->GetHeight ();
-  for (int x = 0; x < w; x += 4)
+  int i;
+  for (i = 0; i < w; i += 4)
   {
-    myG2D->DrawLine (x, 0, x + 50, h, dsteel);
-    myG2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
+    myG2D->DrawLine (i, 0, i + 50, h, dsteel);
+    myG2D->DrawLine (w - i, 0, w - i - 50, h, dsteel);
   }
 
   SetFont (CSFONT_ITALIC);
@@ -711,7 +714,7 @@ void G2DTestSystemDriver::DrawTextTest ()
   int char_count = 0;
   do
   {
-    for (int i = 0; i < 2000; i++)
+    for (i = 0; i < 2000; i++)
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
@@ -731,7 +734,8 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   // Draw a grid of lines so that transparent text background will be visible
   int w = myG2D->GetWidth ();
   int h = myG2D->GetHeight ();
-  for (int x = 0; x < w; x += 4)
+  int x;
+  for (x = 0; x < w; x += 4)
   {
     myG2D->DrawLine (x, 0, x + 50, h, dsteel);
     myG2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
@@ -761,7 +765,8 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   int char_count = 0;
   do
   {
-    for (int i = 0; i < 2000; i++)
+	int i;
+    for (i = 0; i < 2000; i++)
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;

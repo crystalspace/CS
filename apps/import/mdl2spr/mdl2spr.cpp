@@ -118,7 +118,8 @@ int main(int argc,char *argv[])
     fatal_usage();
   else
   {
-    for (int i = 1; i < argc - 2; i++)
+	int i;
+    for (i = 1; i < argc - 2; i++)
     {
       if (argv[i][0] != '-' && argv[i][0] != '/')
       {

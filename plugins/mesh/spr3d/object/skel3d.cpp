@@ -90,7 +90,8 @@ void csSkelLimb::RemapVertices (int* mapping)
 {
   if (num_vertices)
   {
-    for (int i = 0 ; i < num_vertices ; i++)
+	int i;
+    for (i = 0 ; i < num_vertices ; i++)
       vertices[i] = mapping[vertices[i]];
   }
 
@@ -108,7 +109,8 @@ void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
   {
     csVector3 max_sq_radius (0);
     box.StartBoundingBox ((*source)[vertices[0]]);
-    for (int i = 1 ; i < num_vertices ; i++)
+	int i;
+    for (i = 1 ; i < num_vertices ; i++)
     {
       const csVector3& v = (*source)[vertices[i]];
       box.AddBoundingVertexSmart (v);
@@ -230,7 +232,8 @@ void csSkelLimbState::Transform (const csTransform& tr, csVector3* source,
     c = c->GetNext ();
   }
 
-  for (int i = 0 ; i < num_vertices ; i++)
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
     dest [vertices [i]] = tr * source[vertices [i]];
 }
 

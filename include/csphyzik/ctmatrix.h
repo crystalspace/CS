@@ -52,12 +52,13 @@ protected:
 public:
   ctMatrixN ( long pdim, real scl = 1.0 )
   {
+	int i, j;
     dimen = pdim;
     rows = new real *[pdim];
-    for( int i = 0; i < pdim; i++ )
+    for(i = 0; i < pdim; i++ )
     {
       rows[i] = new real[pdim];
-      for( int j = 0; j < pdim; j++ )
+      for(j = 0; j < pdim; j++ )
         rows[i][j] = 0.0;
       rows[i][i] = scl;
     }
@@ -107,9 +108,10 @@ public:
 
   void identity ()
   { 
-    for( int i = 0; i < dimen; i++ )
+	int i, j;
+    for(i = 0; i < dimen; i++ )
     {
-      for( int j = 0; j < dimen; j++ )
+      for(j = 0; j < dimen; j++ )
         rows[i][j] = 0.0;
       rows[i][i] = 1.0;
     }
@@ -124,8 +126,9 @@ public:
   ctMatrixN get_transpose () const 
   {
     ctMatrixN Mret;
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         Mret[idx][idy] = rows[idy][idx];
     return Mret;
   }
@@ -135,10 +138,11 @@ public:
   // better be same size vector....
   void mult_v ( real *pdest, const real *pv )
   {
-    for( int idx = 0; idx < dimen; idx++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
     {
       pdest[idx] = 0;
-      for( int idy = 0; idy < dimen; idy++ )
+      for(idy = 0; idy < dimen; idy++)
         pdest[idx] += rows[idx][idy]*pv[idy];
     }
   }
@@ -146,11 +150,12 @@ public:
   ctMatrixN operator* ( const ctMatrixN &MM ) const 
   {
     ctMatrixN Mret;
-    for( int idr = 0; idr < dimen; idr++ )
-      for( int idc = 0; idc < dimen; idc++ )
+	int idr, idc, adder;
+    for(idr = 0; idr < dimen; idr++)
+      for(idc = 0; idc < dimen; idc++)
       {
         Mret[idr][idc] = 0.0;
-        for( int adder = 0; adder < dimen; adder++ )
+        for(adder = 0; adder < dimen; adder++)
           Mret[idr][idc] += rows[idr][adder]*(MM[adder][idc]);
       }
 
@@ -160,31 +165,35 @@ public:
   ctMatrixN operator* ( const real pk ) const 
   {
     ctMatrixN Mret;
-    for( int idr = 0; idr < dimen; idr++ )
-      for( int idc = 0; idc < dimen; idc++ )
+	int idr, idc;
+    for(idr = 0; idr < dimen; idr++)
+      for(idc = 0; idc < dimen; idc++)
         Mret[idr][idc] = rows[idr][idc]*pk;
     return Mret;
   }
 
   void operator*= ( const real pm )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
 	rows[idx][idy] *= pm;
   }
 
   // addition
   void add ( const ctMatrixN &pm )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         rows[idx][idy] += pm.rows[idx][idy];
   }
 
   void add2 ( const ctMatrixN &pm1, const ctMatrixN &pm2 )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
   }
 
@@ -197,8 +206,9 @@ public:
 
   void operator+=( const ctMatrixN &pm )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         rows[idx][idy] += pm.rows[idx][idy];
   }
 
@@ -206,8 +216,9 @@ public:
   {
     ctMatrixN Mret;
 
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         Mret.rows[idx][idy] = rows[idx][idy] + pm.rows[idx][idy];
 
     return Mret;
@@ -216,29 +227,33 @@ public:
   // subtraction
   void subtract ( const ctMatrixN &pm )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         rows[idx][idy] -= pm.rows[idx][idy];
   }
 
   void subtract2 ( const ctMatrixN &pm1, const ctMatrixN &pm2 )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
   }
 
   void subtract3 ( ctMatrixN &pmdest, const ctMatrixN &pm1, const ctMatrixN &pm2 )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         pmdest.rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
   }
 
   void operator-= ( const ctMatrixN &pm )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         rows[idx][idy] -= pm.rows[idx][idy];
   }
 
@@ -246,8 +261,9 @@ public:
   {
     ctMatrixN Mret;
 
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++)
+      for(idy = 0; idy < dimen; idy++)
         Mret.rows[idx][idy] = rows[idx][idy] - pm.rows[idx][idy];
 
     return Mret;
@@ -276,9 +292,10 @@ public:
 
   void debug_print()
   {
-    for( int i = 0; i < dimen; i++ )
+	int i, j;
+    for(i = 0; i < dimen; i++)
     {
-      for( int j = 0; j < dimen; j++ )
+      for(j = 0; j < dimen; j++)
       {
         logf( "%f :: ", rows[i][j] ); 
       }
@@ -360,27 +377,30 @@ public:
   ctMatrix3 get_transpose () const 
   {
     ctMatrix3 Mret;
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         Mret[idx][idy] = (*this)[idy][idx];
     return Mret;
   }
 
   void put_transpose( ctMatrix3 &Mret ) const 
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         Mret[idx][idy] = (*this)[idy][idx];
   }
 
   /// I think that's what this is called... M * A * M_transpose
   void similarity_transform( ctMatrix3 &Mret, const ctMatrix3 &pA ) const 
   {
-    for ( int idr = 0; idr < 3; idr++ )
-      for ( int idc = 0; idc < 3; idc++ )
+	int idr, idc, adder;
+    for (idr = 0; idr < 3; idr++)
+      for (idc = 0; idc < 3; idc++)
       {
         Mret[idr][idc] = 0.0;
-        for ( int adder = 0; adder < 3; adder++ )
+        for (adder = 0; adder < 3; adder++)
           Mret[idr][idc] += ( rows[idr][0]*pA[0][adder] + 
                               rows[idr][1]*pA[1][adder] + 
                               rows[idr][2]*pA[2][adder] ) *
@@ -392,10 +412,11 @@ public:
 
   void mult_v ( ctVector3 &pdest, const ctVector3 &pv )
   {
-    for ( int idx = 0; idx < 3; idx++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
     {
       pdest[idx] = 0;
-      for ( int idy = 0; idy < 3; idy++ )
+      for (idy = 0; idy < 3; idy++)
         pdest[idx] += rows[idx][idy]*pv[idy];
     }
   }
@@ -423,11 +444,12 @@ public:
   ctMatrix3 operator* ( const ctMatrix3 &MM ) const 
   {
     ctMatrix3 Mret;
-    for ( int idr = 0; idr < 3; idr++ )
-      for ( int idc = 0; idc < 3; idc++ )
+	int idr, idc, adder;
+    for (idr = 0; idr < 3; idr++)
+      for (idc = 0; idc < 3; idc++ )
       {
         Mret[idr][idc] = 0.0;
-        for ( int adder = 0; adder < 3; adder++ )
+        for (adder = 0; adder < 3; adder++)
           Mret[idr][idc] += (*this)[idr][adder]*MM[adder][idc];
       }
 
@@ -437,8 +459,9 @@ public:
   ctMatrix3 operator* ( const real pk ) const 
   {
     ctMatrix3 Mret;
-    for ( int idr = 0; idr < 3; idr++ )
-      for ( int idc = 0; idc < 3; idc++ )
+	int idr, idc;
+    for (idr = 0; idr < 3; idr++)
+      for ( idc = 0; idc < 3; idc++)
         Mret[idr][idc] = (*this)[idr][idc]*pk;
 
     return Mret;
@@ -446,37 +469,42 @@ public:
 
   void operator*= ( const real pm )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
 	rows[idx][idy] *= pm;
   }
 
   // addition
   void add ( const ctMatrix3 &pm )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         (*this)[idx][idy] += pm[idx][idy];
   }
 
   void add2 ( const ctMatrix3 &pm1, const ctMatrix3 &pm2 )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         (*this)[idx][idy] = pm1[idx][idy] + pm2[idx][idy];
   }
 
   void add3 ( ctMatrix3 &pmdest, const ctMatrix3 &pm1, const ctMatrix3 &pm2 )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         pmdest[idx][idy] = pm1[idx][idy] + pm2[idx][idy];
   }
 
   void operator+= ( const ctMatrix3 &pm )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         (*this)[idx][idy] += pm[idx][idy];
   }
 
@@ -484,8 +512,9 @@ public:
   {
     ctMatrix3 Mret;
 
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         Mret[idx][idy] = (*this)[idx][idy] + pm[idx][idy];
 
     return Mret;
@@ -494,29 +523,33 @@ public:
   // subtraction
   void subtract ( const ctMatrix3 &pm )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++ )
+      for (idy = 0; idy < 3; idy++ )
         (*this)[idx][idy] -= pm[idx][idy];
   }
 
   void subtract2 ( const ctMatrix3 &pm1, const ctMatrix3 &pm2 )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         (*this)[idx][idy] = pm1[idx][idy] - pm2[idx][idy];
   }
 
   void subtract3 ( ctMatrix3 &pmdest, const ctMatrix3 &pm1, const ctMatrix3 &pm2 )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         pmdest[idx][idy] = pm1[idx][idy] - pm2[idx][idy];
   }
 
   void operator-=( const ctMatrix3 &pm )
   {
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         (*this)[idx][idy] -= pm[idx][idy];
   }
 
@@ -524,8 +557,9 @@ public:
   {
     ctMatrix3 Mret;
 
-    for ( int idx = 0; idx < 3; idx++ )
-      for ( int idy = 0; idy < 3; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 3; idx++)
+      for (idy = 0; idy < 3; idy++)
         Mret[idx][idy] = (*this)[idx][idy] - pm[idx][idy];
 
     return Mret;
@@ -539,7 +573,7 @@ public:
     real **A;
     real *b;
     real *x;
-    int idx;
+    int idx, idy;
     
     b = (real *)malloc( sizeof( real )*3 );
     A = (real **)malloc( sizeof( real * )*3 );
@@ -547,11 +581,11 @@ public:
     x = (real *)malloc( sizeof( real )*3 );
     x[0] = px[0]; x[1] = px[1]; x[2] = px[2];
 
-    for( idx = 0; idx < 3; idx++ )
+    for(idx = 0; idx < 3; idx++)
     {
       b[idx] = pb[idx];
       A[idx] = (real *)malloc( sizeof( real )*3 );
-      for( int idy = 0; idy < 3; idy++ )
+      for(idy = 0; idy < 3; idy++)
         A[idx][idy] = (*this)[idx][idy];
     }
 
@@ -579,9 +613,10 @@ public:
 
   void debug_print ()
   {
-    for ( int i = 0; i < dimen; i++ )
+	int i, j;
+    for (i = 0; i < dimen; i++)
     {
-      for ( int j = 0; j < dimen; j++ )
+      for (j = 0; j < dimen; j++)
         DEBUGLOGF( "%f :: ", rows[i][j] ); 
       DEBUGLOG( "\n" );
     }

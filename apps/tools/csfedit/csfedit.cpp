@@ -843,12 +843,12 @@ csEditChar::csEditChar()
 csEditChar::csEditChar(int w, int h, uint8 *bitmap)
 {
   view = NULL;
-  int i;
+  int l, i;
   width=w; height=h;
   pixels = new uint8[width*height];
   for(i=0; i<width*height; i++) pixels[i] = 0;
 
-  for (int l = 0; l < h; l++)
+  for (l = 0; l < h; l++)
   {
     uint8 *line = bitmap + l * ((w + 7) / 8);
     for (i = 0; i < w; i++)
@@ -1073,8 +1073,8 @@ error:
 
   // Compute the font size
   int fontsize = 0;
-  for (int c = 0; c < numchars; c++)
-    fontsize += ((IndividualWidth [c] + 7) / 8) * fontheight;
+  for (i = 0; i < numchars; i++)
+    fontsize += ((IndividualWidth [i] + 7) / 8) * fontheight;
 
   // allocate memory and copy the font
   uint8* FontBitmap = new uint8 [fontsize];

@@ -66,7 +66,8 @@ csMouse::csMouse (csApp *iApp)
 
 csMouse::~csMouse ()
 {
-  for (int i = 0; i < MAX_SYNC_PAGES; i++)
+  int i;
+  for (i = 0; i < MAX_SYNC_PAGES; i++)
     if (Under [i])
       app->pplFreeArea (Under [i]);
 }
@@ -172,7 +173,8 @@ bool csMouse::SetCursor (csMouseCursorID ID)
     ((VirtualX != MouseX) || (VirtualY != MouseY));
 
   ActiveCursor = NULL;
-  for (int i = 0; i < Pointers.Length (); i++)
+  int i;
+  for (i = 0; i < Pointers.Length (); i++)
     if (Pointers.Get (i)->id == ID)
     {
       ActiveCursor = Pointers.Get (i);

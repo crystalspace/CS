@@ -256,7 +256,8 @@ iPerfStats *csPerfStats::StartNewSubsection (const char *name)
 
   int ind = sub_section->indent = indent+2;
   sub_section->margin = new char[ind+1];
-  for (int i=0; i < ind; i++)
+  int i;
+  for (i=0; i < ind; i++)
      sub_section->margin[i] = ' ';
   sub_section->margin[ind] = 0;
 

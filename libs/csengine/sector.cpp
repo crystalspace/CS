@@ -1010,7 +1010,8 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
 
 void csSector::ShineLights (csProgressPulse* pulse)
 {
-  for (int i = 0 ; i < lights.Length () ; i++)
+  int i;
+  for (i = 0 ; i < lights.Length () ; i++)
   {
     if (pulse != 0)
       pulse->Step();
@@ -1020,7 +1021,8 @@ void csSector::ShineLights (csProgressPulse* pulse)
 
 void csSector::ShineLights (iMeshWrapper* mesh, csProgressPulse* pulse)
 {
-  for (int i = 0 ; i < lights.Length () ; i++)
+  int i;
+  for (i = 0 ; i < lights.Length () ; i++)
   {
     if (pulse != 0)
       pulse->Step();

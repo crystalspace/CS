@@ -227,7 +227,8 @@ void csPoly3D::SplitWithPlane (csPoly3D& poly1, csPoly3D& poly2,
   sideA = split_plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
-  for (int i = -1 ; ++i < num_vertices ; )
+  int i;
+  for (i = -1 ; ++i < num_vertices ; )
   {
     ptB = vertices[i];
     sideB = split_plane.Classify (ptB);

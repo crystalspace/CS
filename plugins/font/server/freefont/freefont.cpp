@@ -168,7 +168,8 @@ csFreeTypeFont::csFreeTypeFont (const char *filename) : DeleteCallbacks (4, 4)
 
 csFreeTypeFont::~csFreeTypeFont ()
 {
-  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
     iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
     delnot->BeforeDelete (this);
@@ -426,7 +427,8 @@ void csFreeTypeFont::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csFreeTypeFont::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
     iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
     if (delnot == func)

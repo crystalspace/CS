@@ -30,7 +30,8 @@
 void CMapBrushBoundingBox::Extend(CMapPolygon* pPoly)
 {
   assert(pPoly);
-  for (int i=0; i<pPoly->GetVertexCount(); i++)
+  int i;
+  for (i=0; i<pPoly->GetVertexCount(); i++)
   {
     CdVector3 v = pPoly->GetVertex(i);
     if (!m_Defined)
@@ -80,7 +81,8 @@ CMapBrush::CMapBrush(CMapEntity* pEntity)
 
 CMapBrush::~CMapBrush()
 {
-  for (int i=0; i<m_Polygons.Length(); i++)
+  int i;
+  for (i=0; i<m_Polygons.Length(); i++)
   {
     delete m_Polygons[i];
   }
@@ -225,7 +227,8 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
         {
           //Looks like a Quake3 Arena Map. I don't know the meaning of these numbers,
           //but there are always three of them
-          for (int i=0; i<3; i++)
+		  int i;
+          for (i=0; i<3; i++)
           {
             char         cDummy;
             unsigned int val;
@@ -285,7 +288,8 @@ void CMapBrush::CreatePolygons()
 {
   CMapPolygon* pPoly = new CMapPolygon;
   int NumPlanes = m_Planes.Length();
-  for (int i = 0; i<NumPlanes; i++)
+  int i;
+  for (i = 0; i<NumPlanes; i++)
   {
     pPoly->SetErrorInfo(m_Line, i);
     pPoly->Create(m_Planes[i], m_Planes, this);
@@ -302,8 +306,8 @@ void CMapBrush::CreatePolygons()
 
 bool CMapBrush::IsInside(CdVector3& v)
 {
-  int NumPlanes = m_Planes.Length();
-  for (int k=0; k<NumPlanes; k++)
+  int k, NumPlanes = m_Planes.Length();
+  for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = m_Planes[k];
     
@@ -326,8 +330,8 @@ void CMapBrush::IntersectWithPlane(CMapTexturedPlane* pIntersectplane,
 
 bool CMapBrush::IsVisible()
 {
-  int NumPlanes = m_Planes.Length();
-  for (int k=0; k<NumPlanes; k++)
+  int k, NumPlanes = m_Planes.Length();
+  for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = m_Planes[k];
     if (pPlane->GetTexture()->IsVisible()) return true;

@@ -363,7 +363,8 @@ csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
 
 csSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n)
 {
-  for (int i = GetFrameCount () - 1; i >= 0; i--)
+  int i;
+  for (i = GetFrameCount () - 1; i >= 0; i--)
     if (strcmp (GetFrame (i)->GetName (), n) == 0)
       return GetFrame (i);
 
@@ -557,7 +558,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
 csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
 {
-  for (int i = GetActionCount () - 1; i >= 0; i--)
+  int i;
+  for (i = GetActionCount () - 1; i >= 0; i--)
     if (strcmp (GetAction (i)->GetName (), n) == 0)
       return GetAction (i);
 
@@ -700,8 +702,11 @@ void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
 void csSprite3DMeshObject::ResetVertexColors ()
 {
   if (vertex_colors)
-    for (int i = 0 ; i < factory->GetVertexCount (); i++)
+  {
+	int i;
+    for (i = 0 ; i < factory->GetVertexCount (); i++)
       vertex_colors [i] = base_color;
+  }
   //delete [] vertex_colors;
   //vertex_colors = NULL;
 }
@@ -709,8 +714,11 @@ void csSprite3DMeshObject::ResetVertexColors ()
 void csSprite3DMeshObject::FixVertexColors ()
 {
   if (vertex_colors)
-    for (int i = 0 ; i < factory->GetVertexCount (); i++)
+  {
+	int i;
+    for (i = 0 ; i < factory->GetVertexCount (); i++)
       vertex_colors [i].Clamp (2., 2., 2.);
+  }
 }
 
 csTriangleMesh2 csSprite3DMeshObject::mesh;
@@ -1219,7 +1227,8 @@ csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
   UpdateWorkTables (factory->GetVertexCount ());
   int fr_idx = fr->GetAnmIndex();
 
-  for (int i = 0; i < factory->GetVertexCount (); i++)
+  int i;
+  for (i = 0; i < factory->GetVertexCount (); i++)
     obj_verts[i] = factory->GetVertex(fr_idx, i);
 
   if (skeleton_state)
@@ -1253,7 +1262,8 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   {
     int num_texels = factory->GetVertexCount();
     // Reseting all of the vertex_colors to the base color.
-    for (int i = 0 ; i < num_texels; i++)
+	int i;
+    for (i = 0 ; i < num_texels; i++)
       vertex_colors [i] = base_color;
   }
   
@@ -1286,7 +1296,8 @@ void csSprite3DMeshObject::UpdateLightingRandom ()
   int num_texels = GetVertexToLightCount();
   float r,g,b;
 
-  for (int i = 0; i < num_texels; i++)
+  int i;
+  for (i = 0; i < num_texels; i++)
   {
     // By seeding the rng with the current time each time, we get a slower
     //  cycling of colors.

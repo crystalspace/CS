@@ -65,7 +65,8 @@ GLGlyphSet::GLGlyphSet (iFont *Font)
 GLGlyphSet::~GLGlyphSet ()
 {
   GLuint hTex = glyphs [0].hTexture + 1;
-  for (int i = 0; i < 256; i++)
+  int i;
+  for (i = 0; i < 256; i++)
   {
     if (hTex != glyphs [i].hTexture)
     {
@@ -124,7 +125,8 @@ GLFontCache::~GLFontCache ()
 {
   // Remove deletion callbacks to avoid being deleted later -
   // when the font cache object will be already deleted
-  for (int i = 0; i < FontCache.Length (); i++)
+  int i;
+  for (i = 0; i < FontCache.Length (); i++)
     FontCache.Get (i)->font->RemoveDeleteCallback (delete_callback);
   delete_callback->DecRef ();
 }
@@ -225,9 +227,10 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
     // grab bits from the source, and stuff them into the font bitmap
     // one at a time
     uint8 currentsourcebyte = *fontsourcebits;
-    for (int pixely = 0; pixely < maxheight; pixely++)
+	int pixelx, pixely;
+    for (pixely = 0; pixely < maxheight; pixely++)
     {
-      for (int pixelx = 0; pixelx < width; pixelx++)
+      for (pixelx = 0; pixelx < width; pixelx++)
       {
         // strip a bit off and dump it into the base bitmap
         *characterbitmapbase++ = (currentsourcebyte & 128) ? 255 : 0;
@@ -265,7 +268,8 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
 void GLFontCache::CacheFree (iFont *font)
 {
   font->RemoveDeleteCallback (delete_callback);
-  for (int i = FontCache.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = FontCache.Length () - 1; i >= 0; i--)
   {
     GLGlyphSet *gs = FontCache.Get (i);
     if (gs->font == font)

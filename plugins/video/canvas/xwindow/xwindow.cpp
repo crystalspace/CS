@@ -368,7 +368,8 @@ void csXWindow::Close ()
     XFreePixmap (dpy, EmptyPixmap);
     EmptyPixmap = 0;
   }
-  for (int i = sizeof (MouseCursor) / sizeof (Cursor) - 1; i >= 0; i--)
+  int i;
+  for (i = sizeof (MouseCursor) / sizeof (Cursor) - 1; i >= 0; i--)
   {
     if (MouseCursor [i])
       XFreeCursor (dpy, MouseCursor [i]);

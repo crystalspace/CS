@@ -140,11 +140,12 @@ int csGridBagLayout::CalcPrefSize (CellInfo* cells, int xCnt, int yCnt, int _arr
 {
   int prefered = 0;
 
-  for (int x = 0; x != xCnt; ++x)
+  int x, y;
+  for (x = 0; x != xCnt; ++x)
   {
     int maxColSize = 0;
 
-    for (int y = 0; y != yCnt; ++y)
+    for (y = 0; y != yCnt; ++y)
       if (CELL_AT(x,y).prefSize > maxColSize)
 	maxColSize = CELL_AT(x,y).prefSize;
 		
@@ -314,7 +315,8 @@ void csGridBagLayout::CleanupConstraints ()
 
 void csGridBagLayout::InitializeCellArray (CellInfo* cells, int size)
 {
-  for (int i = 0; i != size; ++i)
+  int i;
+  for (i = 0; i != size; ++i)
   {
     memset (cells + i, 0, sizeof (CellInfo));
     cells [i].weight = 0; // floats cannot be zero'ed with memset(..)
@@ -480,8 +482,9 @@ void csGridBagLayout::CreateMatrix ()
 
     CellHolder* pHolder = NULL;
 
-    for (int xofs = 0; xofs != width; ++xofs)
-      for (int yofs = 0; yofs != height; ++yofs)
+	int xofs, yofs, x, y;
+    for (xofs = 0; xofs != width; ++xofs)
+      for (yofs = 0; yofs != height; ++yofs)
       {
         pHolder = new CellHolder ();
         pHolder->constr = &c;
@@ -504,12 +507,12 @@ void csGridBagLayout::CreateMatrix ()
 
     if (c.gridwidth == csGridBagConstraint::REMAINDER)
       // mark all possible reminding cells in the row as used
-      for (int x = nextX + width; x < MAX_GRID_WIDTH; ++x)
+      for (x = nextX + width; x < MAX_GRID_WIDTH; ++x)
         usedCellsHash.Put (GetCellCode (x, nextY), (csHashObject)pHolder);
 
     if (c.gridheight == csGridBagConstraint::REMAINDER)
       // mark all possible eminding cells in the column as used
-      for (int y = nextY+height; y < MAX_GRID_HEIGHT; ++y)
+      for (y = nextY+height; y < MAX_GRID_HEIGHT; ++y)
         usedCellsHash.Put (GetCellCode (nextX, y), (csHashObject)pHolder);
     // adjust estimated dimensions of the matrix (grid)
 
@@ -616,8 +619,9 @@ bool csGridBagLayout::HasCashedInfo ()
 
 void csGridBagLayout::SetComponentLocations ()
 {
-  for (int y = 0; y != mRowCount; ++y)
-    for (int x = 0; x != mColCount; ++x)
+  int x, y;
+  for (y = 0; y != mRowCount; ++y)
+    for (x = 0; x != mColCount; ++x)
     {
       CellInfo& hCell = mpHorizCellInfos [y * mColCount + x]; // note the trick...
       CellInfo& vCell = mpVertCellInfos  [x * mRowCount + y]; // -/-

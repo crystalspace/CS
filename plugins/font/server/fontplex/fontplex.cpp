@@ -61,7 +61,8 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Query the auxiliary font servers in turn
   char funcid [20];
-  for (int idx = 1; ; idx++)
+  int idx;
+  for (idx = 1; ; idx++)
   {
     sprintf (funcid, "FontServer.%d", idx);
     iFontServer *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFontServer);
@@ -79,7 +80,8 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
 
 iFont *csFontServerMultiplexor::LoadFont (const char *filename)
 {
-  for (int i = 0; i < fontservers.Length (); i++)
+  int i;
+  for (i = 0; i < fontservers.Length (); i++)
   {
     iFont *font = fontservers.Get (i)->LoadFont (filename);
     if (font) return font;
@@ -89,15 +91,16 @@ iFont *csFontServerMultiplexor::LoadFont (const char *filename)
 
 int csFontServerMultiplexor::GetFontCount ()
 {
-  int count = 0;
-  for (int i = 0; i < fontservers.Length (); i++)
+  int i, count = 0;
+  for (i = 0; i < fontservers.Length (); i++)
     count += fontservers.Get (i)->GetFontCount ();
   return count;
 }
 
 iFont *csFontServerMultiplexor::GetFont (int iIndex)
 {
-  for (int i = 0; i < fontservers.Length (); i++)
+  int i;
+  for (i = 0; i < fontservers.Length (); i++)
   {
     int count = fontservers.Get (i)->GetFontCount ();
     if (iIndex < count)

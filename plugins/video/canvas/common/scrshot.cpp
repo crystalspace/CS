@@ -30,6 +30,7 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
   Width = G2D->GetWidth ();
   Height = G2D->GetHeight ();
   csPixelFormat *pfmt = G2D->GetPixelFormat ();
+  int x;
 
   if (pfmt->PalEntries)
   {
@@ -37,9 +38,9 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
     Palette = G2D->GetPalette ();
     Data = new UByte [Width * Height];
     UByte *dst = (UByte *)Data;
-    for (int y = 0; y < Height; y++)
+    for (x = 0; x < Height; x++)
     {
-      UByte *src = (UByte *)G2D->GetPixelAt (0, y);
+      UByte *src = (UByte *)G2D->GetPixelAt (0, x);
       if (!src) continue;
       memcpy (dst, src, Width * sizeof (UByte));
       dst += Width;
@@ -54,14 +55,15 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
     int rs = 8 - pfmt->RedBits;
     int gs = 8 - pfmt->GreenBits;
     int bs = 8 - pfmt->BlueBits;
-    for (int y = 0; y < Height; y++)
+	int y;
+    for (x = 0; x < Height; x++)
       switch (pfmt->PixelBytes)
       {
         case 2:
         {
-          UShort *src = (UShort *)G2D->GetPixelAt (0, y);
+          UShort *src = (UShort *)G2D->GetPixelAt (0, x);
           if (!src) continue;
-          for (int x = Width; x; x--)
+          for (y = Width; y; y--)
           {
             UShort pix = *src++;
             dst->red   = ((pix & pfmt->RedMask)   >> pfmt->RedShift)   << rs;
@@ -73,9 +75,9 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
         }
         case 4:
         {
-          ULong *src = (ULong *)G2D->GetPixelAt (0, y);
+          ULong *src = (ULong *)G2D->GetPixelAt (0, x);
           if (!src) continue;
-          for (int x = Width; x; x--)
+          for (y = Width; y; y--)
           {
             ULong pix = *src++;
             dst->red   = ((pix & pfmt->RedMask)   >> pfmt->RedShift)   << rs;

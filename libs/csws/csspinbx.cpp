@@ -53,7 +53,8 @@ csSpinBox::csSpinBox (csComponent *iParent, csInputLineFrameStyle iFrameStyle)
   if (app)
   {
     // If  images are not loaded, load them
-    for (int i = 0; i < 3; i++)
+	int i;
+    for (i = 0; i < 3; i++)
       if (!sprspin [i])
         sprspin [i] = new csSimplePixmap (app->GetTexture (
           SPINBOX_TEXTURE_NAME), i * 16, 0, 16, 16);
@@ -66,7 +67,8 @@ csSpinBox::~csSpinBox ()
     delete [] NumLimits.ValueFormat;
   if (--spinboxref == 0)
   {
-    for (int i = 0; i < 3; i++)
+	int i;
+    for (i = 0; i < 3; i++)
     {
       delete sprspin [i];
       sprspin [i] = NULL;

@@ -251,7 +251,8 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
       UShort gb = 8 - pfmt.GreenBits;
       UShort rb = 8 - pfmt.RedBits;
       UShort *src = (UShort*) buffer;
-      for (int i = 0; i < width*height; i++, src++, dst++)
+	  int i;
+      for (i = 0; i < width*height; i++, src++, dst++)
       {
 	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
 	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;

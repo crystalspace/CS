@@ -88,7 +88,8 @@ csParticleSystem::~csParticleSystem()
 
 void csParticleSystem::RemoveParticles ()
 {
-  for (int i=0 ; i < particles.Length () ; i++)
+  int i;
+  for (i=0 ; i < particles.Length () ; i++)
     if (particles[i])
       GetParticle (i)->DecRef ();
   particles.DeleteAll ();
@@ -146,7 +147,8 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
 
 void csParticleSystem::SetupMixMode ()
 {
-  for (int i = 0 ; i < particles.Length () ; i++)
+  int i;
+  for (i = 0 ; i < particles.Length () ; i++)
     GetParticle (i)->SetMixMode (MixMode);
 }
 
@@ -181,7 +183,8 @@ void csParticleSystem::AddColor (const csColor& col)
 
 void csParticleSystem::ScaleBy (float factor)
 {
-  for (int i = 0 ; i<particles.Length () ; i++)
+  int i;
+  for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->ScaleBy (factor);
   shapenr++;
 }
@@ -189,7 +192,8 @@ void csParticleSystem::ScaleBy (float factor)
 
 void csParticleSystem::Rotate (float angle)
 {
-  for (int i = 0 ; i<particles.Length () ; i++)
+  int i;
+  for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->Rotate (angle);
   shapenr++;
 }
@@ -289,7 +293,8 @@ bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
 {
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
   csReversibleTransform trans = movable->GetFullTransform ();
-  for (int i = 0 ; i < particles.Length() ; i++)
+  int i;
+  for (i = 0 ; i < particles.Length() ; i++)
     GetParticle (i)->Draw (rview, trans, mode);
   return true;
 }
@@ -299,7 +304,8 @@ void csParticleSystem::UpdateLighting (iLight** lights, int num_lights,
 {
   SetupObject ();
   csReversibleTransform trans = movable->GetFullTransform ();
-  for (int i = 0 ; i < particles.Length () ; i++)
+  int i;
+  for (i = 0 ; i < particles.Length () ; i++)
     GetParticle (i)->UpdateLighting (lights, num_lights, trans);
 }
 
@@ -368,7 +374,8 @@ void csNewtonianParticleSystem::Update (csTicks elapsed_time)
   csParticleSystem::Update (elapsed_time);
   // time passed; together with CS 1 unit = 1 meter makes units right.
   float delta_t = elapsed_time / 1000.0f; // in seconds
-  for (int i=0 ; i < particles.Length () ; i++)
+  int i;
+  for (i=0 ; i < particles.Length () ; i++)
   {
     // notice that the ordering of the lines (1) and (2) makes the
     // resulting newpos = a*dt^2 + v*dt + oldposition (i.e. paraboloid).

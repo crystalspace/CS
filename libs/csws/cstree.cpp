@@ -536,7 +536,8 @@ csTreeBox::csTreeBox (csComponent *iParent, int iStyle,
     static char *pixnam [8] =
     { "TBCN", "TBCP", "TBON", "TBOP", "TBSCN", "TBSCP", "TBSON", "TBSOP" };
     iTextureHandle *tex = app->GetTexture (TREEBOX_TEXTURE_NAME);
-    for (int i = 0; i < 8; i++)
+	int i;
+    for (i = 0; i < 8; i++)
     {
       int tx,ty,tw,th;
       ParseConfigBitmap (app, app->skin->Prefix, "Dialog", pixnam [i], tx, ty, tw, th);
@@ -550,8 +551,11 @@ csTreeBox::~csTreeBox ()
 {
   treeref--;
   if (!treeref)
-    for (int i = 0; i < 8; i++)
+  {
+	int i;
+    for (i = 0; i < 8; i++)
       delete treepix [i];
+  }
 }
 
 static bool do_hide_buttons (csTreeItem *iItem, void *iParam)

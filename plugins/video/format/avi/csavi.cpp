@@ -278,7 +278,8 @@ bool csAVIFormat::InitVideoData ()
 
 void csAVIFormat::Unload ()
 {
-  for (int i=0; i < vStream.Length (); i++)
+  int i;
+  for (i=0; i < vStream.Length (); i++)
     ((iStream*)vStream.Get (i))->DecRef ();
   vStream.DeleteAll ();
 

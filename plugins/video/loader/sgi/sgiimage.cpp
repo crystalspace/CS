@@ -213,7 +213,8 @@ static inline UShort getShort (UByte *p)
 
 void ImageSGIFile::loadSGITables(UByte *in,ULong *out,int size)
 {
-  for (int i = 0; i < size; i++)
+  int i;
+  for (i = 0; i < size; i++)
   {
     out [i] = getLong (in);
     in += 4;

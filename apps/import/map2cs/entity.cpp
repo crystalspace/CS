@@ -120,8 +120,8 @@ void CMapEntity::AddKeyValuePair(const char* Key, const char* Value)
 
 const char* CMapEntity::GetValueOfKey(const char* key, const char* defaultvalue)
 {
-  int NumKeys = m_Keymap.Length();
-  for (int i=0; i<NumKeys; i++)
+  int i, NumKeys = m_Keymap.Length();
+  for (i=0; i<NumKeys; i++)
   {
     if (strcmp(key, m_Keymap[i]->GetKey())==0)
     {
@@ -220,7 +220,8 @@ bool CMapEntity::GetOrigin(CdVector3& v)
 
 void CMapEntity::CreatePolygons()
 {
-  for (int i=0; i<m_Brushes.Length(); i++)
+  int i;
+  for (i=0; i<m_Brushes.Length(); i++)
   {
     m_Brushes[i]->CreatePolygons();
   }

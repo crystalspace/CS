@@ -849,7 +849,7 @@ void mdbFinish ()
     output ("+--------+- Top ten memory allocations ---------------------------------------\n");
     output ("|  size  |location where block was allocated\n");
     output ("+--------+--------------------------------------------------------------------\n");
-    for (int i = 0; i < 10; i++)
+    for (i = 0; i < 10; i++)
     {
       if (mdbStat.topten [i].alloc_addr)
         output ("|%8lu|%s\n", mdbStat.topten [i].size,

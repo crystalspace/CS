@@ -66,7 +66,8 @@ void InitializeSprite (iMeshWrapper *SpriteWrapper)
   sprState->SetAction ("action");
   sprState->DecRef ();
 
-  for (int i=0; i<SpriteWrapper->GetChildCount (); i++)
+  int i;
+  for (i=0; i<SpriteWrapper->GetChildCount (); i++)
     InitializeSprite (SpriteWrapper->GetChild (i));
 }
 

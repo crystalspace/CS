@@ -45,16 +45,16 @@ CCSWorld::~CCSWorld()
 
 void CCSWorld::FindSectors()
 {
-  int SectorCounter = 0;
+  int i, j, SectorCounter = 0;
 
   //iterate all entities and brushes
-  for (int i=0; i<m_pMap->GetNumEntities(); i++)
+  for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = m_pMap->GetEntity(i);
     if (strcmp(pEntity->GetClassname(), "cs_sector")==0)
     {
       //This entity is a sector!
-      for (int j=0; j<pEntity->GetNumBrushes(); j++)
+      for (j=0; j<pEntity->GetNumBrushes(); j++)
       {
         SectorCounter++;
         CMapBrush* pBrush  = pEntity->GetBrush(j);
@@ -118,7 +118,8 @@ void CCSWorld::GenerateDefaultsector()
   //Create the Brush for that sector;
   CMapBrush* pBrush = new CMapBrush(NULL);
 
-  for (int i=0; i<6; i++)
+  int i;
+  for (i=0; i<6; i++)
   {
     //For every side of the default sector create a flatshaded
     //plane in black color.
@@ -192,8 +193,8 @@ bool CCSWorld::Write(const char* filename, CMapFile* pMap, const char * /*source
 
 CMapEntity* CCSWorld::GetWorldspawn()
 {
-  int NumEntities = GetNumEntities();
-  for (int i=0; i<NumEntities; i++)
+  int i, NumEntities = GetNumEntities();
+  for (i=0; i<NumEntities; i++)
   {
     CMapEntity* pEntity = GetEntity(i);
     assert(pEntity);
@@ -229,7 +230,8 @@ void CCSWorld::AllocateSkytextures()
     static const char ext[] = "frblud";
     const char* basename    = pEntity->GetValueOfKey("skybox", "sky");
     
-    for (int i=0; i<6; i++)
+	int i;
+    for (i=0; i<6; i++)
     {
       char name[255];
       sprintf(name, "%s_%c", basename, ext[i]);
@@ -637,7 +639,8 @@ bool CCSWorld::WritePlayerStart()
 
 bool CCSWorld::WritePlanes()
 {
-  for (int i=0; i<m_pMap->GetPlaneCount(); i++)
+  int i;
+  for (i=0; i<m_pMap->GetPlaneCount(); i++)
   {
     CMapTexturedPlane* pPlane = m_pMap->GetPlane(i);
 
@@ -673,7 +676,8 @@ bool CCSWorld::WritePlanes()
 
 bool CCSWorld::WriteSectors()
 {
-  for (int i=0; i<m_Sectors.Length(); i++)
+  int i;
+  for (i=0; i<m_Sectors.Length(); i++)
   {
     if (!m_Sectors[i]->Write(this)) return false;
   }
@@ -705,10 +709,11 @@ bool CCSWorld::WriteVector(const CdVector3& v)
 
 bool CCSWorld::WriteCurvetemplates()
 {
-  for (int i=0; i<m_pMap->GetNumEntities(); i++)
+  int i, c;
+  for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = m_pMap->GetEntity(i);
-    for (int c=0; c<pEntity->GetCurveCount(); c++)
+    for (c=0; c<pEntity->GetCurveCount(); c++)
     {
       CMapCurve*    pCurve   = pEntity->GetCurve(c);
       CTextureFile* pTexture = pCurve->GetTexture();
@@ -726,7 +731,8 @@ bool CCSWorld::WriteKeys(CIWorld* pWorld, CMapEntity* pEntity)
 {
   if (pEntity)
   {
-    for (int i=0; i<pEntity->GetNumberOfKeyValuePairs(); i++)
+	int i;
+    for (i=0; i<pEntity->GetNumberOfKeyValuePairs(); i++)
     {
       CMapKeyValuePair* pKV = pEntity->GetKeyValuePair(i);
       pWorld->WriteIndent();
@@ -744,6 +750,7 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
 {
   const CMapTexturedPlane* pPlane   = pPolygon->GetBaseplane();
   CMapEntity*              pEntity  = pPolygon->GetEntity();
+  int l;
 
   WriteIndent();
   fprintf(m_fd, "POLYGON '' ( VERTICES (");
@@ -753,7 +760,7 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
     //Because for a sector we draw the _inside_ of the brush, we spit out the
     //vertices in reverse order, so they will have proper orientation for 
     //backface culling in the engine.
-    for (int l=pPolygon->GetVertexCount()-1; l>=0; l--)
+    for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
     {
       fprintf(m_fd, "%d%s", Vb.GetIndex(pPolygon->GetVertex(l)), 
                           ((l==0) ? "" : ","));
@@ -762,7 +769,7 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
   else
   {
     //regular vertex order
-    for (int l=0; l<pPolygon->GetVertexCount(); l++)
+    for (l=0; l<pPolygon->GetVertexCount(); l++)
     {
       fprintf(m_fd, "%s%d", ((l==0) ? "" : ","),
                           Vb.GetIndex(pPolygon->GetVertex(l)));

@@ -1035,10 +1035,11 @@ void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
   float light_g = lightcolor.green * NORMAL_LIGHT_LEVEL;
   float light_b = lightcolor.blue * NORMAL_LIGHT_LEVEL;
   bool ful_lit = IsFullyLit ();
-  for (int i = 0 ; i < lm_h ; i++)
+  int i, j;
+  for (i = 0 ; i < lm_h ; i++)
   {
     int uv = i * lm_w;
-    for (int j = 0 ; j < lm_w ; j++, uv++)
+    for (j = 0 ; j < lm_w ; j++, uv++)
     {
 //@@@
 //if (i == j) lightmap[uv].red = 255;
@@ -1098,10 +1099,11 @@ void csShadowBitmap::UpdateShadowMap (unsigned char* shadowmap,
 {
   if (IsFullyShadowed () || IsFullyLit ()) return;
   bool ful_lit = IsFullyLit ();
-  for (int i = 0 ; i < lm_h ; i++)
+  int i, j;
+  for (i = 0 ; i < lm_h ; i++)
   {
     int uv = i * lm_w;
-    for (int j = 0 ; j < lm_w ; j++, uv++)
+    for (j = 0 ; j < lm_w ; j++, uv++)
     {
       float lightness;
       if (ful_lit)

@@ -55,7 +55,8 @@ CMapPolygonSet& CMapPolygonSet::operator=(const CMapPolygonSet& Other)
 
 void CMapPolygonSet::AddPolygons(const CMapPolygonSet& Other)
 {
-  for (int i=0; i<Other.m_Polygon.Length(); i++)
+  int i;
+  for (i=0; i<Other.m_Polygon.Length(); i++)
   {
     m_Polygon.Push(new CMapPolygon(*Other.m_Polygon.Get(i)));
   }
@@ -63,7 +64,8 @@ void CMapPolygonSet::AddPolygons(const CMapPolygonSet& Other)
 
 void CMapPolygonSet::FlipSide()
 {
-  for (int i=0; i<m_Polygon.Length(); i++)
+  int i;
+  for (i=0; i<m_Polygon.Length(); i++)
   {
     m_Polygon[i]->FlipSide();
   }
@@ -72,9 +74,10 @@ void CMapPolygonSet::FlipSide()
 void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optimise)
 {
   CMapPolygonVector NewPoly;
+  int i, j, k;
 
   //We handle every pair of convex Polygon and Other convex Polygon
-  for (int i=0; i<m_Polygon.Length(); i++)
+  for (i=0; i<m_Polygon.Length(); i++)
   {
     if (optimise)
     {
@@ -90,13 +93,13 @@ void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optim
     }
 
     //We need to split the polygon into smaller parts.
-    for (int j=0; j<Other.m_Polygon.Length(); j++)
+    for (j=0; j<Other.m_Polygon.Length(); j++)
     {
       CMapPolygon  Poly(*(m_Polygon[i]));
       CMapPolygon* pClipPoly = Other.m_Polygon[j];
 
       //We clip them against each other, to get the common parts
-      for (int k=0; k<pClipPoly->GetVertexCount(); k++)
+      for (k=0; k<pClipPoly->GetVertexCount(); k++)
       {
         Poly.Split(pClipPoly->GetPlane(k), &Poly);
         if (Poly.IsEmpty()) break;
@@ -113,7 +116,8 @@ void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optim
   //As a last step, we clear the current list of polygons and replace
   //it by a new list.
   DELETE_VECTOR_MEMBERS(m_Polygon);
-  for (int p=0; p<NewPoly.Length(); p++)
+  int p;
+  for (p=0; p<NewPoly.Length(); p++)
   {
     m_Polygon.Push(NewPoly.Get(p));
   }
@@ -121,7 +125,8 @@ void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optim
 
 void CMapPolygonSet::RemoveCommonParts(const CMapPolygonSet& Other, bool optimise)
 {
-  for (int i=0; i<Other.m_Polygon.Length(); i++)
+  int i;
+  for (i=0; i<Other.m_Polygon.Length(); i++)
   {
     if (optimise)
     {
@@ -148,11 +153,12 @@ void CMapPolygonSet::RemovePolygon(const CMapPolygon& Other)
 {
   CMapPolygonVector NewPoly;
 
-  for (int i=0; i<m_Polygon.Length(); i++)
+  int i, k;
+  for (i=0; i<m_Polygon.Length(); i++)
   {
     CMapPolygon Poly(*(m_Polygon[i]));
 
-    for (int k=0; k<Other.GetVertexCount(); k++)
+    for (k=0; k<Other.GetVertexCount(); k++)
     {
       //Get the area outside of this plane
       CMapPolygon Outside; 
@@ -175,7 +181,8 @@ void CMapPolygonSet::RemovePolygon(const CMapPolygon& Other)
   //As a last step, we clear the current list of polygons and replace
   //it by a new list.
   DELETE_VECTOR_MEMBERS(m_Polygon);
-  for (int p=0; p<NewPoly.Length(); p++)
+  int p;
+  for (p=0; p<NewPoly.Length(); p++)
   {
     m_Polygon.Push(NewPoly.Get(p));
   }

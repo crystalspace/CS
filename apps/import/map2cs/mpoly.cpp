@@ -39,7 +39,8 @@ CMapPolygon::CMapPolygon(const CMapPolygon& poly)
   m_pBrush          = poly.m_pBrush;
   m_BrushLineNumber = poly.m_BrushLineNumber;
   m_PlaneNumber     = poly.m_PlaneNumber;
-  for (int i=0; i<poly.m_Planes.Length(); i++)
+  int i;
+  for (i=0; i<poly.m_Planes.Length(); i++)
   {
     m_Planes.Push(poly.m_Planes[i]); //only stored by reference
   }
@@ -146,9 +147,9 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
  
     //Check all planes, if they will form a new legal vertex
     //with the baseplane and plane1 (the last found plane)
-    for (int i=0; i<NumPlanes; i++)
+    for (p=0; p<NumPlanes; p++)
     {
-      pPlane2 = redplanes[i];
+      pPlane2 = redplanes[p];
       
       //Only after three planes have been inserted, we can check if
       //m_Planes[0] will close the polygon. 
@@ -262,7 +263,8 @@ double CMapPolygon::GetArea()
   CdVector3 Normal = m_pBaseplane->GetNormal().Unit();
   CdVector3 Sum(0,0,0);
 
-  for (int i=0; i<(m_Vertices.Length()-1); i++)
+  int i;
+  for (i=0; i<(m_Vertices.Length()-1); i++)
   {
     Sum += (*(m_Vertices[i])) % (*(m_Vertices[i+1]));
   }  
@@ -286,7 +288,8 @@ void CMapPolygon::Split(CMapTexturedPlane* pSplitplane,
   CMapTexturedPlaneVector NewPlanes;
 
   int NumPlanes = m_Planes.Length();
-  for (int i=0; i<NumPlanes; i++)
+  int i;
+  for (i=0; i<NumPlanes; i++)
   {
     //Use all current planes
     NewPlanes.Push(m_Planes[i]);
@@ -349,10 +352,11 @@ void CMapPolygon::GetStartplanes(const CMapTexturedPlaneVector& planes,
   int NumPlanes = planes.Length();
   
   //Try the follwing for all possible pairs of planes.
-  for (int i=0; i<NumPlanes; i++)
+  int i, j;
+  for (i=0; i<NumPlanes; i++)
   {
     pPlane1 = planes[i];
-    for (int j=i+1; j<NumPlanes; j++)
+    for (j=i+1; j<NumPlanes; j++)
     {
       pPlane2 = planes[j];
       if (CdIntersect3::Planes(*m_pBaseplane, *pPlane1, *pPlane2, point))
@@ -399,7 +403,8 @@ int  CMapPolygon::GetNumberOfValidVertices(CMapTexturedPlane*             pPlane
   int NumPlanes = planes.Length();
   
   //Try the follwing for all planes.
-  for (int i=0; i<NumPlanes; i++)
+  int i;
+  for (i=0; i<NumPlanes; i++)
   {
     CMapTexturedPlane* pOtherPlane = planes[i];
     if (pOtherPlane == pPlane || pOtherPlane == m_pBaseplane) continue;
@@ -450,8 +455,8 @@ bool CMapPolygon::CheckIfInside(const CdVector3&               point,
   //All thre planes create at least a single point. Now we need to
   //determine, if that point is inside or outside the given polygons
 
-  int NumPlanes = planes.Length();
-  for (int k=0; k<NumPlanes; k++)
+  int k, NumPlanes = planes.Length();
+  for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = planes[k];
     
@@ -479,9 +484,10 @@ void CMapPolygon::SetErrorInfo(int BrushLineNumber, int PlaneNumber)
 void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
                                const CMapTexturedPlaneVector& planes)
 {
-  for (int j=0; j<m_Planes.Length(); j++)
+  int j, i, y, c, x;
+  for (j=0; j<m_Planes.Length(); j++)
   {
-    for (int i=0; i<planes.Length(); i++)
+    for (i=0; i<planes.Length(); i++)
     {
       if (m_Planes[j] == planes[i])
       {
@@ -491,11 +497,11 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
   }
   printf("\n");
 
-  for (int y=0; y<planes.Length(); y++)
+  for (y=0; y<planes.Length(); y++)
   {
-    for (int c=0; c<3; c++)
+    for (c=0; c<3; c++)
     {
-      for (int x=0; x<planes.Length(); x++)
+      for (x=0; x<planes.Length(); x++)
       {
         CdVector3 point;
         if (x==y)

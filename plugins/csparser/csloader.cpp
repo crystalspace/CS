@@ -204,7 +204,8 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
 
 bool csLoader::ResolvePortalSectors (iThingState *th)
 {
-  for (int i=0;  i < th->GetPolygonCount ();  i++)
+  int i;
+  for (i=0;  i < th->GetPolygonCount ();  i++)
   {
     iPolygon3D* p = th->GetPolygon (i);
     if (p && p->GetPortal ())
@@ -835,7 +836,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    Model->DecRef ();
 
 	    stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
-	    for (int i=0; i<stemp2->GetChildCount (); i++)
+		int i;
+	    for (i=0; i<stemp2->GetChildCount (); i++)
 	      stemp->AddChild (stemp2->GetChild (i), csReversibleTransform ());
 	  } else {
   	    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,

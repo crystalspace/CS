@@ -273,7 +273,8 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
     }
     
     int buttons = mouse_getbutton ();
-    for (int button = 0; button < 3; button++)
+	int button;
+    for (button = 0; button < 3; button++)
     {
       bool down = (buttons & mouse_button_mask [button]) != 0;
       if (down != mouse_button [button])

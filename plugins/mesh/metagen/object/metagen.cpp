@@ -124,7 +124,8 @@ bool csMetaGen::InitArcSineTable(void)
 
 void csMetaGen::FillArcSineTable()
 {
-  for (int i = -asin_table_res, j = 0; i <= asin_table_res; i++, j++)
+  int i, j;
+  for (i = -asin_table_res, j = 0; i <= asin_table_res; i++, j++)
   {
     float c = 1.0 * i / asin_table_res;
     switch(env_mapping)
@@ -199,7 +200,8 @@ void csMetaGen::CreateLighting( iLight **, int, iMovable * )
   //TODO: The lighting code is incomplete...
 #if 0
       csVector3 n(0, 0, 0);
-      for(int k = 0; k < num_meta_balls; k++)
+	  int k;
+      for(k = 0; k < num_meta_balls; k++)
       {
         csVector3 rv(mesh.vertices[0][m].x - meta_balls[k].center.x,
           mesh.vertices[0][m].y - meta_balls[k].center.y,
@@ -238,7 +240,8 @@ void csMetaGen::CreateBoundingBoxLinear( int bone )
   y = _2coordY(bones[bone]->start_slice + bones[bone]->num_slices);
   finish.y = y;
 
-  for ( int i = 0; i < current_vertices; i++)
+  int i;
+  for (i = 0; i < current_vertices; i++)
   {
 	if ( vrt[i].z < zmin ) zmin = vrt[i].z;
 	  else

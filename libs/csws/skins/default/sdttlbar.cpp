@@ -66,12 +66,15 @@ void csDefaultTitlebarSkin::Draw (csComponent &iComp)
   {
     int bdy = This.bound.Height () / 4;
     if ((bdy > 2) && (tx > 8 + This.bound.Height ()))
-      for (int by = 1 + bdy / 2; by < This.bound.Height () - 2; by += 4)
+	{
+	  int by;
+      for (by = 1 + bdy / 2; by < This.bound.Height () - 2; by += 4)
       {
         This.Line (8, by, tx - 7, by, indx + 2);
         This.Line (8, by + 1, tx - 7, by + 1, indx + 3);
         This.Line (tx + tw + 7, by, This.bound.Width () - 8, by, indx + 2);
         This.Line (tx + tw + 7, by + 1, This.bound.Width () - 8, by + 1, indx + 3);
       }
+	}
   }
 }

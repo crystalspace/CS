@@ -150,9 +150,8 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   iSector *room = engine->CreateSector ("room");
 
-  int testpython=0;
-  int testlua=0;
-  for (int i=1; i<argc; i++)
+  int testpython=0, testlua=0, i;
+  for (i=1; i<argc; i++)
   {
     if (!strcasecmp(argv[i], "-python"))
     {

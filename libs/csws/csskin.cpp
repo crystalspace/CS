@@ -58,13 +58,15 @@ void csSkin::Apply (csComponent *iComp)
 void csSkin::Initialize (csApp *iApp)
 {
   app = iApp;
-  for (int i = 0; i < count; i++)
+  int i;
+  for (i = 0; i < count; i++)
     Get (i)->Initialize (iApp, this);
 }
 
 void csSkin::Deinitialize ()
 {
-  for (int i = 0; i < count; i++)
+  int i;
+  for (i = 0; i < count; i++)
     Get (i)->Deinitialize ();
   app = NULL;
 }

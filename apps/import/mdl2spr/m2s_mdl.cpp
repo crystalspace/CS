@@ -73,7 +73,7 @@ void Mdl::Clear()
 bool Mdl::ReadMDLFile(const char* mdlfile)
 {
   FILE *f;
-  int i, ii;
+  int i, j, ii;
 
   clearError();
 
@@ -170,7 +170,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
 
       // read all texture of group
       skins[i].texs = new unsigned char *[skins[i].nbtexs];
-      for (int j = 0; j < skins[i].nbtexs; j++)
+      for (j = 0; j < skins[i].nbtexs; j++)
       {
         skins[i].texs[j] = new unsigned char [skinheight * skinwidth];
         if (fread(skins[i].texs[j], skinheight * skinwidth, 1, f) != 1)
@@ -272,7 +272,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
         framesets[i].delay[ii] = convert_endian (framesets[i].delay[ii]);
 
       // read all frames in frameset
-      for (int j = 0; j < framesets[i].nbframes; j++)
+      for (j = 0; j < framesets[i].nbframes; j++)
       {
         // read min bound
         if (fread(&framesets[i].frames[j].min, sizeof(trivertx_t), 1, f) != 1)
@@ -397,10 +397,11 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	    float yscale = (float)skinheight / (float)spr.skinheight;
 	    float xscale = (float)skinwidth / (float)spr.skinwidth;
 	    y = 0.5;
-	    for (int row = 0; row < spr.skinheight; row++, y += yscale)
+		int row, col;
+	    for (row = 0; row < spr.skinheight; row++, y += yscale)
 	    {
 	      x = 0.5;
-	      for (int col = 0; col < spr.skinwidth; col++, x += xscale)
+	      for (col = 0; col < spr.skinwidth; col++, x += xscale)
 		spr.skins[i].texs[j][col + row * spr.skinwidth] =
 		  skins[i].texs[j][((int)x) + ((int)y) * skinwidth];
 	    }

@@ -52,11 +52,12 @@ void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
     if (Font_Offsets!=NULL)
     {
     	GLuint *newoffsets = new GLuint[Font_Count+1];
-	for (int index=0; index < Font_Count; index++)
-		newoffsets[index] = Font_Offsets[index];
+		int index;
+		for (index=0; index < Font_Count; index++)
+		  newoffsets[index] = Font_Offsets[index];
 	
         delete[] Font_Offsets;
-	Font_Offsets = newoffsets;
+		Font_Offsets = newoffsets;
     }
     else
     	Font_Offsets = new GLuint[1];
@@ -74,7 +75,8 @@ void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
 
     // new shove all the raster data at openGL...
     unsigned char *flipbuffer = NULL;
-    for (int characterindex=0; characterindex<256; characterindex++)
+	int characterindex;
+    for (characterindex=0; characterindex<256; characterindex++)
     {
       int charwidth = pFontServer->GetCharWidth (iFont, characterindex);
       int BytesPerRow = (charwidth+7)/8;
@@ -87,9 +89,10 @@ void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
       // copy into the flip buffer -- see flipbuffer declaration for
       // the reason behind this code!
 
-      for (int row=0; row < Rows; row++)
+	  int row, col;
+      for (row=0; row < Rows; row++)
       {
-        for (int col=0; col < BytesPerRow; col++)
+        for (col=0; col < BytesPerRow; col++)
           flipbuffer[row*BytesPerRow+col] = 255;
 //			basebuffer[(Rows-row-1)*BytesPerRow+col];
       }

@@ -1400,7 +1400,8 @@ void csThing::UpdateCurveTransform (const csReversibleTransform& movtrans)
   if (GetCurveCount () == 0) return;
   // since obj has changed (possibly) we need to tell all of our curves
   csReversibleTransform o2w = movtrans.GetInverse();
-  for (int i = 0 ; i < GetCurveCount () ; i++)
+  int i;
+  for (i = 0 ; i < GetCurveCount () ; i++)
   {
     csCurve* c = curves.Get (i);
     c->SetObject2World (&o2w);
@@ -1413,7 +1414,8 @@ void csThing::UpdateCurveTransform ()
   curves_transf_ok = true;
   if (GetCurveCount () == 0) return;
   csReversibleTransform o2w;	// Identity transform.
-  for (int i = 0 ; i < GetCurveCount () ; i++)
+  int i;
+  for (i = 0 ; i < GetCurveCount () ; i++)
   {
     csCurve* c = curves.Get (i);
     c->SetObject2World (&o2w);

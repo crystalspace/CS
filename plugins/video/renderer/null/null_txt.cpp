@@ -93,10 +93,10 @@ int csColorMapNull::alloc_rgb (int r, int g, int b, int dist)
 {
   CLIP_RGB;
 
-  int d, i = find_rgb (r, g, b, &d);
+  int d, j, i = find_rgb (r, g, b, &d);
   if (i == -1 || d > dist)
   {
-    for (int j = 0; j < 256; j++)
+    for (j = 0; j < 256; j++)
       if (!alloc [j])
       {
         alloc[j] = true;
@@ -113,8 +113,8 @@ int csColorMapNull::alloc_rgb (int r, int g, int b, int dist)
 
 int csColorMapNull::FreeEntries ()
 {
-  int colors = 0;
-  for (int i = 0; i < 256; i++)
+  int i, colors = 0;
+  for (i = 0; i < 256; i++)
     if (!alloc [i])
       colors++;
   return colors;
@@ -346,28 +346,32 @@ void csTextureManagerNull::create_inv_cmap ()
     cmap.find_rgb (cmap [0].red, cmap [0].green, cmap [0].blue);
 
   // Now we'll encode the palette into 16-bit values
-  for (int i = 0; i < 256; i++)
+  int i;
+  for (i = 0; i < 256; i++)
     GlobalCMap [i] = encode_rgb (cmap [i].red, cmap [i].green, cmap [i].blue);
 }
 
 void csTextureManagerNull::compute_palette ()
 {
+  int i;
+
   if (truecolor) return;
 
   // Allocate first 6*6*4=144 colors in a uniformly-distributed fashion
   // since we'll get lighted/dimmed/colored textures more often
   // than original pixel values, thus we should be prepared for this.
-  for (int _r = 0; _r < 6; _r++)
-    for (int _g = 0; _g < 6; _g++)
-      for (int _b = 0; _b < 4; _b++)
+  int _r, _g, _b;
+  for (_r = 0; _r < 6; _r++)
+    for (_g = 0; _g < 6; _g++)
+      for (_b = 0; _b < 4; _b++)
         cmap.alloc_rgb (20 + _r * 42, 20 + _g * 42, 30 + _b * 50, prefered_dist);
 
   // Compute a common color histogram for all textures
   csQuantizeBegin ();
 
-  for (int t = textures.Length () - 1; t >= 0; t--)
+  for (i = textures.Length () - 1; i >= 0; i--)
   {
-    csTextureHandleNull *txt = (csTextureHandleNull *)textures [t];
+    csTextureHandleNull *txt = (csTextureHandleNull *)textures [i];
     csRGBpixel *colormap = txt->GetColorMap ();
     int colormapsize = txt->GetColorMapSize ();
     if (txt->GetAlphaMap ())
@@ -377,26 +381,26 @@ void csTextureManagerNull::compute_palette ()
 
   // Introduce the uniform colormap bias into the histogram
   csRGBpixel new_cmap [256];
-  int ci, colors = 0;
-  for (ci = 0; ci < 256; ci++)
-    if (!locked [ci] && cmap.alloc [ci])
-      new_cmap [colors++] = cmap [ci];
+  int colors = 0;
+  for (i = 0; i < 256; i++)
+    if (!locked [i] && cmap.alloc [i])
+      new_cmap [colors++] = cmap [i];
 
   csQuantizeBias (new_cmap, colors, uniform_bias);
 
   // Now compute the actual colormap
   colors = 0;
-  for (ci = 0; ci < 256; ci++)
-    if (!locked [ci]) colors++;
+  for (i = 0; i < 256; i++)
+    if (!locked [i]) colors++;
   csRGBpixel *cmap_p = new_cmap;
   csQuantizePalette (cmap_p, colors);
 
   // Finally, put the computed colors back into the colormap
   int outci = 0;
-  for (ci = 0; ci < colors; ci++)
+  for (i = 0; i < colors; i++)
   {
     while (locked [outci]) outci++;
-    cmap [outci++] = new_cmap [ci];
+    cmap [outci++] = new_cmap [i];
   }
 
   csQuantizeEnd ();
@@ -470,7 +474,8 @@ void csTextureManagerNull::SetPalette ()
   if (!truecolor && !palette_ok)
     compute_palette ();
 
-  for (int i = 0; i < 256; i++)
+  int i;
+  for (i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 
   iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@

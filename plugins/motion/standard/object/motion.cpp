@@ -132,7 +132,8 @@ iSkeletonBone *csFindBone ( iSkeletonBone *bone, unsigned int hash )
 
 int csFindFrameSet ( csMotion *mot, unsigned int hash )
 {
-  for (int i = 0; i < mot->framesets.Length(); i++ )
+  int i;
+  for (i = 0; i < mot->framesets.Length(); i++ )
 	if ( mot->framesets[i]->name == hash ) return i;
   
   return -1;
@@ -314,9 +315,9 @@ void csMotionManager::RecompileMotion( int idx, bool cached )
 {
   csAppliedMotion *am = (cached) ? cache[idx] : skels[idx];
 
-  int len;
+  int len, i;
   if ((len = am->frames.Length()))
-	for ( int i = 0; i < len ; i++ )
+	for (i = 0; i < len ; i++)
 	{
 	  csAppliedFrame *f = am->frames[i];
 	  if ( f->numqlinks ) { free ( f->qlinks ); free( f->qaffector ); }
@@ -354,10 +355,10 @@ int csMotionManager::RestoreMotion( int idx )
 void csMotionManager::DeleteAppliedMotion( int idx, bool cached )
 {
   csAppliedMotion *mot = (cached) ? cache[idx] : skels[idx];
-  int len;
+  int len, i;
   if ((len = mot->frames.Length()))
   {
-	for ( int i = 0; i < len; i++ )
+	for (i = 0; i < len; i++)
 	{
 	  csAppliedFrame *f = mot->frames[i];
 	  if ( f->numqlinks ) { free ( f->qlinks ); free( f->qaffector ); }

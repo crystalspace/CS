@@ -402,7 +402,8 @@ bool csGraphics3DSoftwareCommon::Open ()
   SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
   z_buf_mode = CS_ZBUF_NONE;
 
-  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+  int i;
+  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     fog_tables [i].table = NULL;
 
   return true;
@@ -1222,7 +1223,8 @@ void csGraphics3DSoftwareCommon::Close ()
   if ((width == height) && (width == -1))
     return;
 
-  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+  int i;
+  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     if (fog_tables [i].table)
       delete [] fog_tables [i].table;
 
@@ -3180,7 +3182,7 @@ unsigned char *csGraphics3DSoftwareCommon::BuildIndexedFogTable ()
   usage++;
 
   // first look if a fog table with given R,G,B has already been built
-  int i;
+  int i, j;
   for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     if (fog_tables [i].table
      && (fog_tables [i].r == Scan.FogR)
@@ -3218,7 +3220,7 @@ unsigned char *csGraphics3DSoftwareCommon::BuildIndexedFogTable ()
     int r = texman->cmap [i].red;
     int g = texman->cmap [i].green;
     int b = texman->cmap [i].blue;
-    for (int j = 1; j <= 32; j++)
+    for (j = 1; j <= 32; j++)
       dest [(j - 1) * 256 + i] = texman->find_rgb (
         Scan.FogR + (int (j * (r - Scan.FogR)) >> 5),
         Scan.FogG + (int (j * (g - Scan.FogG)) >> 5),

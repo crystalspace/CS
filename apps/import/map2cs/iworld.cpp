@@ -58,16 +58,16 @@ CIWorld::~CIWorld()
 
 void CIWorld::FindSectors()
 {
-  int SectorCounter = 0;
+  int i, j, SectorCounter = 0;
 
   //iterate all entities and brushes
-  for (int i=0; i<m_pMap->GetNumEntities(); i++)
+  for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = m_pMap->GetEntity(i);
     if (strcmp(pEntity->GetClassname(), "cs_sector")==0)
     {
       //This entity is a sector!
-      for (int j=0; j<pEntity->GetNumBrushes(); j++)
+      for (j=0; j<pEntity->GetNumBrushes(); j++)
       {
         SectorCounter++;
         CMapBrush* pBrush  = pEntity->GetBrush(j);
@@ -132,7 +132,8 @@ void CIWorld::GenerateDefaultsector()
   //Create the Brush for that sector;
   CMapBrush* pBrush = new CMapBrush(NULL);
 
-  for (int i=0; i<6; i++)
+  int i;
+  for (i=0; i<6; i++)
   {
     //For every side of the default sector create a flatshaded
     //plane in black color.
@@ -152,12 +153,13 @@ void CIWorld::GenerateDefaultsector()
 
 void CIWorld::FindPortals()
 {
-  for (int i=0; i<m_Sectors.Length(); i++)
+  int i, j;
+  for (i=0; i<m_Sectors.Length(); i++)
   {
     CISector* pSector1 = m_Sectors[i];
     assert(pSector1);
 
-    for (int j=0; j<m_Sectors.Length(); j++)
+    for (j=0; j<m_Sectors.Length(); j++)
     {
       if (j==i) continue;
 
@@ -172,7 +174,8 @@ void CIWorld::FindPortals()
 
 void CIWorld::InsertThings()
 {
-  for (int i=0; i<m_Sectors.Length(); i++)
+  int i;
+  for (i=0; i<m_Sectors.Length(); i++)
   {
     CISector* pSector = m_Sectors[i];
     assert(pSector);
@@ -183,7 +186,8 @@ void CIWorld::InsertThings()
 
 CISector* CIWorld::FindSectorForPoint(CdVector3& v)
 {
-  for (int i=0; i<m_Sectors.Length(); i++)
+  int i;
+  for (i=0; i<m_Sectors.Length(); i++)
   {
     CISector* pSector = m_Sectors[i];
     assert(pSector);
@@ -315,7 +319,8 @@ void CIWorld::Unindent()
 
 bool CIWorld::WriteIndent()
 {
-  for (int i=0; i<m_Indent; i++)
+  int i;
+  for (i=0; i<m_Indent; i++)
   {
     fprintf(m_fd, "\t");
   }

@@ -754,12 +754,12 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
 
 csGrid::~csGrid ()
 {
-  int i;
+  int i, j;
   
   for (i = 0; i < grid->rows.Length (); i++)
   {
     csSparseGrid::csGridRow *r = (csSparseGrid::csGridRow*)grid->rows.Get(i)->data;
-    for (int j = 0; j < r->Length (); j++)
+    for (j = 0; j < r->Length (); j++)
     {
       csString *str = (csString*)r->Get (j)->data;
       if (str) delete str;

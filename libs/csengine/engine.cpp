@@ -763,7 +763,8 @@ void csEngine::ResolveEngineMode ()
     // sector (only switch based on the position of the camera, not switch
     // based on the sector we are currently rendering).
     int switch_f2b = 0;
-    for (int i = 0 ; i < sectors.Length () ; i++)
+	int i;
+    for (i = 0 ; i < sectors.Length () ; i++)
     {
       csSector* s = sectors[i]->GetPrivateObject ();
       csMeshWrapper* ss = s->GetCullerMesh ();
@@ -1198,7 +1199,8 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   csTicks Elapsed, Current;
   iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
   sys->GetElapsedTime (Elapsed, Current);
-  for (int halo = halos.Length () - 1; halo >= 0; halo--)
+  int halo;
+  for (halo = halos.Length () - 1; halo >= 0; halo--)
     if (!halos.Get (halo)->Process (Elapsed, *this))
       halos.Delete (halo);
 
@@ -1748,7 +1750,8 @@ iSector* csEngine::CreateSector (const char *iName, bool link)
 csObject* csEngine::FindObjectInRegion (csRegion* region,
 	const csNamedObjVector& vector, const char* name) const
 {
-  for (int i = vector.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = vector.Length () - 1; i >= 0; i--)
   {
     csObject* o = (csObject *)vector[i];
     if (!region->IsInRegion (o)) continue;
@@ -1762,7 +1765,8 @@ csObject* csEngine::FindObjectInRegion (csRegion* region,
 iObject* csEngine::FindObjectInRegion (csRegion* region,
 	const csNamedObjectVector& vector, const char* name) const
 {
-  for (int i = vector.Length () - 1; i >= 0; i--)
+  int i;
+  for (i = vector.Length () - 1; i >= 0; i--)
   {
     iObject* o = vector.Get (i);
     if (!region->IsInRegion (o)) continue;
@@ -2198,7 +2202,8 @@ void csEngine::csEngineStateVector::Close (iGraphics2D *g2d)
   // It is impossible to tell which is which so destroy them all, and rely on
   // regeneration the next time the context is set to the surviving G3Ds associated
   // with this G2D
-  for (int i = 0; i < Length (); i++)
+  int i;
+  for (i = 0; i < Length (); i++)
     if (((csEngineState*)root [i])->G2D == g2d)
     {
       //Delete (i);
@@ -2211,7 +2216,8 @@ void csEngine::csEngineStateVector::Resize (iGraphics2D *g2d)
   // With the glide back buffer implementation of procedural textures
   // circumstances are that many G3D can be associated with one G2D, so
   // we test for width and height also.
-  for (int i = 0; i < Length (); i++)
+  int i;
+  for (i = 0; i < Length (); i++)
   {
     csEngineState *state = (csEngineState*)root [i];
     if (state->G2D == g2d)

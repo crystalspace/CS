@@ -294,7 +294,8 @@ public:
   inline void moments(int *t, int n)
   {
     clear ();
-    for (int i = 0; i < n; i++)
+	int i;
+    for (i = 0; i < n; i++)
       moment (Moment::stack [t [i]]);
   }
 };

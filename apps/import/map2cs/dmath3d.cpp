@@ -263,7 +263,8 @@ double CdSquaredDist::PointPoly (const CdVector3& p, CdVector3 *V, int n,
 {
   CdVector3 W, L;
   bool lflag = true, lflag0 = true;
-  for (int i=0; i<n-1; i++)
+  int i;
+  for (i=0; i<n-1; i++)
   {
     W = V[i] - p;
     if (i==0)

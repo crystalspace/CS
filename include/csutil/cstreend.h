@@ -41,8 +41,9 @@ class csTreeNode
   { parent=theParent; if (parent) parent->children.Push (this); }
 
   virtual ~csTreeNode () 
-  { 
-    for(int i=children.Length ()-1; i>=0; i--) 
+  {
+	int i;
+    for(i=children.Length ()-1; i>=0; i--) 
       delete (csTreeNode*)children.Get (i); 
     if (parent) 
       parent->RemoveChild (this);
@@ -94,8 +95,11 @@ class csTreeNode
       if (TreeFunc (node, param, stopOnSuccess))
         foundNode = node;
       if (!node->IsLeaf () && (SelBranch==NULL || SelBranch (node)))
-      for (int i=0; i < node->children.Length (); i++ ) 
-        fifo.Push (node->children.Get (i));
+	  {
+		int i;
+        for (i=0; i < node->children.Length (); i++ ) 
+          fifo.Push (node->children.Get (i));
+	  }
     }
     fifo.DeleteAll ();
     return foundNode;

@@ -149,7 +149,8 @@ void csTextureHandleOpenGL::ComputeMeanColor ()
 {
   // Compute the mean color from the smallest mipmap available
   csTextureOpenGL *tex = NULL;
-  for (int i = 3; i >= 0; i--)
+  int i;
+  for (i = 3; i >= 0; i--)
   {
     tex = (csTextureOpenGL *)get_texture (i);
     if (tex) break;
@@ -229,7 +230,8 @@ void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat &PixelFormat)
 void csTextureManagerOpenGL::PrepareTextures ()
 {
   // Create mipmaps for all textures
-  for (int i = 0; i < textures.Length (); i++)
+  int i;
+  for (i = 0; i < textures.Length (); i++)
     textures.Get (i)->Prepare ();
 }
 

@@ -56,7 +56,9 @@ csMaterial::~csMaterial ()
 {
   if (texture)
     texture->DecRef ();
-  for (int i=0; i<num_texture_layers; i++)
+
+  int i;
+  for (i=0; i<num_texture_layers; i++)
     if (texture_layer_wrappers[i])
       texture_layer_wrappers[i]->DecRef ();
 }

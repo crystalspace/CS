@@ -35,8 +35,9 @@ public:
   ctSpatialMatrix6 ()
   {
     dimen = 6;
-    for( int idx = 0; idx < 6; idx++ )
-      for( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < 6; idx++)
+      for(idy = 0; idy < 6; idy++)
         rows[idx][idy] = ( idx == idy ) ? 1.0 : 0.0;
   }
 
@@ -68,9 +69,10 @@ public:
   }
 
   void identity ()
-  { 
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+  {
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
       {
         if( idx == idy )
           rows[idx][idy] = 1.0;
@@ -82,8 +84,9 @@ public:
   ctSpatialMatrix6 get_transpose () const 
   {
     ctSpatialMatrix6 Mret;
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         Mret[idx][idy] = rows[idy][idx];
     return Mret;
   }
@@ -92,10 +95,11 @@ public:
 
   void mult_v ( ctSpatialVector6 &pdest, const ctSpatialVector6 &pv )
   {
-    for( int idx = 0; idx < 6; idx++ )
+	int idx, idy;
+    for(idx = 0; idx < 6; idx++)
     {
       pdest[idx] = 0;
-      for( int idy = 0; idy < 6; idy++ )
+      for(idy = 0; idy < 6; idy++)
         pdest[idx] += rows[idx][idy]*pv[idy];
     }
   }
@@ -104,8 +108,8 @@ public:
   {
     ctSpatialVector6 rv (0,0,0,0,0,0);
     int idx, idx2;
-    for ( idx = 0; idx < 6; idx++ )
-      for( idx2 = 0; idx2 < 6; idx2++ )
+    for (idx = 0; idx < 6; idx++)
+      for(idx2 = 0; idx2 < 6; idx2++)
         rv[idx] += rows[idx][idx2]*pv[idx2];
 
     return rv;
@@ -124,11 +128,12 @@ public:
   ctSpatialMatrix6 operator* ( const ctSpatialMatrix6 &MM ) const 
   {
     ctSpatialMatrix6 Mret;
-    for( int idr = 0; idr < 6; idr++ )
-      for( int idc = 0; idc < 6; idc++ )
+	int idr, idc, adder;
+    for(idr = 0; idr < 6; idr++)
+      for(idc = 0; idc < 6; idc++)
       {
         Mret[idr][idc] = 0.0;
-        for( int adder = 0; adder < 6; adder++ )
+        for(adder = 0; adder < 6; adder++)
           Mret[idr][idc] += rows[idr][adder]*MM[adder][idc];
       }
 
@@ -137,11 +142,12 @@ public:
 
   void mult_M( ctSpatialMatrix6 &Mret, const ctSpatialMatrix6 &MM ) const 
   {
-    for ( int idr = 0; idr < 6; idr++ )
-      for ( int idc = 0; idc < 6; idc++ )
+	int idr, idc, adder;
+    for (idr = 0; idr < 6; idr++)
+      for (idc = 0; idc < 6; idc++)
       {
         Mret[idr][idc] = 0.0;
-        for( int adder = 0; adder < 6; adder++ )
+        for(adder = 0; adder < 6; adder++)
           Mret[idr][idc] += rows[idr][adder]*MM[adder][idc];
       }
   }
@@ -149,11 +155,12 @@ public:
   void operator*=( const ctSpatialMatrix6 &MM )
   {
     ctSpatialMatrix6 Mret;
-    for ( int idr = 0; idr < 6; idr++ )
-      for ( int idc = 0; idc < 6; idc++ )
+	int idr, idc, adder;
+    for (idr = 0; idr < 6; idr++)
+      for (idc = 0; idc < 6; idc++)
       {
         Mret[idr][idc] = 0.0;
-        for ( int adder = 0; adder < 6; adder++ )
+        for (adder = 0; adder < 6; adder++)
           Mret[idr][idc] += rows[idr][adder]*MM[adder][idc];
       }
     *this = Mret;
@@ -162,54 +169,61 @@ public:
   ctSpatialMatrix6 operator* ( const real pk ) const 
   {
     ctSpatialMatrix6 Mret;
-    for ( int idr = 0; idr < 6; idr++ )
-      for ( int idc = 0; idc < 6; idc++ )
+	int idr, idc;
+    for (idr = 0; idr < 6; idr++)
+      for (idc = 0; idc < 6; idc++)
         Mret[idr][idc] = rows[idr][idc]*pk;
     return Mret;
   }
 
   void operator*= ( const real pm )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
 	rows[idx][idy] *= pm;
   }
 
   // addition
   void add ( const ctSpatialMatrix6 &pm )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         rows[idx][idy] += pm.rows[idx][idy];
   }
 
   void add2 ( const ctSpatialMatrix6 &pm1, const ctSpatialMatrix6 &pm2 )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
   }
 
   void add3 ( ctSpatialMatrix6 &pmdest, 
 	      const ctSpatialMatrix6 &pm1, const ctSpatialMatrix6 &pm2 )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         pmdest.rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
   }
 
   void operator+= ( const ctSpatialMatrix6 &pm )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         rows[idx][idy] += pm.rows[idx][idy];
   }
 
   ctSpatialMatrix6 operator+ ( const ctSpatialMatrix6 &pm )
   {
     ctSpatialMatrix6 Mret;
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         Mret.rows[idx][idy] = rows[idx][idy] + pm.rows[idx][idy];
 
     return Mret;
@@ -218,38 +232,43 @@ public:
   // subtraction
   void subtract ( const ctSpatialMatrix6 &pm )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         rows[idx][idy] -= pm.rows[idx][idy];
   }
 
   void subtract2 ( const ctSpatialMatrix6 &pm1, const ctSpatialMatrix6 &pm2 )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
   }
 
   void subtract3 ( ctSpatialMatrix6 &pmdest,
 		  const ctSpatialMatrix6 &pm1, const ctSpatialMatrix6 &pm2 )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         pmdest.rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
   }
 
   void operator-= ( const ctSpatialMatrix6 &pm )
   {
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         rows[idx][idy] -= pm.rows[idx][idy];
   }
 
   ctSpatialMatrix6 operator- ( ctSpatialMatrix6 &pm )
   {
     ctSpatialMatrix6 Mret;
-    for ( int idx = 0; idx < 6; idx++ )
-      for ( int idy = 0; idy < 6; idy++ )
+	int idx, idy;
+    for (idx = 0; idx < 6; idx++)
+      for (idy = 0; idy < 6; idy++)
         Mret.rows[idx][idy] = rows[idx][idy] - pm.rows[idx][idy];
     return Mret;
   }
@@ -263,17 +282,17 @@ public:
     real **A;
     real *b;
     real *x;
-    int idx;
+    int idx, idy;
     
     b = (real *)malloc ( sizeof( real )*6 );
     A = (real **)malloc ( sizeof( real * )*6 );
     x = px.get_elements();
 
-    for( idx = 0; idx < 6; idx++ )
+    for(idx = 0; idx < 6; idx++)
     {
       b[idx] = pb[idx];
       A[idx] = (real *)malloc( sizeof( real )*6 );
-      for( int idy = 0; idy < 6; idy++ )
+      for(idy = 0; idy < 6; idy++)
         A[idx][idy] = rows[idx][idy];
     }
 
@@ -286,9 +305,10 @@ public:
 
   void debug_print ()
   {
-    for( int i = 0; i < dimen; i++ )
+	int i, j;
+    for(i = 0; i < dimen; i++)
     {
-      for( int j = 0; j < dimen; j++ )
+      for(j = 0; j < dimen; j++)
       {
 //        Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
 //      Debug::logf( CT_DEBUG_LEVEL, "\n" );
@@ -305,8 +325,9 @@ inline ctSpatialMatrix6 ctSpatialVector6::operator*
    ( const ctVectorTranspose6 &pv )
 { 
   ctSpatialMatrix6 Mret;
-  for( int idr = 0; idr < 6; idr++ )
-    for( int idc = 0; idc < 6; idc++ )
+  int idr, idc;
+  for(idr = 0; idr < 6; idr++)
+    for(idc = 0; idc < 6; idc++)
       Mret[idr][idc] = elements[idr]*pv[idc];
   return Mret;
 }
@@ -326,10 +347,11 @@ inline void ctSpatialMatrix::form_spatial_transformation
   rows[5][0]/*M21.m31*/ =  pr[1]*pR[0][0] - pr[0] * pR[1][0];
   rows[5][1]/*M21.m32*/ =  pr[1]*pR[0][1] - pr[0] * pR[1][1];
   rows[5][2]/*M21.m33*/ =  pr[1]*pR[0][2] - pr[0] * pR[1][2];
-	
-  for ( int idr = 0; idr < 3; idr++ )
+
+  int idr, idc;
+  for (idr = 0; idr < 3; idr++)
   {
-    for( int idc = 0; idc < 3; idc++ )
+    for(idc = 0; idc < 3; idc++)
     {
       rows[idr][idc] = pR[idr][idc];
       rows[idr+3][idc+3] = pR[idr][idc];
@@ -346,9 +368,11 @@ inline void ctSpatialMatrix::form_spatial_I( const ctMatrix3 &pI, real pmass )
 	M21 = pI;
 	M22 *= 0;
 */
-  for ( int idr = 0; idr < 3; idr++ )
+
+  int idr, idc;
+  for (idr = 0; idr < 3; idr++)
   {
-    for ( int idc = 0; idc < 3; idc++ )
+    for (idc = 0; idc < 3; idc++)
     {
       rows[idr][idc] = 0;
       rows[idr][idc+3] = ( idc == idr ) ? pmass : 0.0;

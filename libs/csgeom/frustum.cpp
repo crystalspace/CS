@@ -707,7 +707,8 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
   bool all_inside = true;
 
   // Loop through all planes that makes the frustum
-  for (int fv = 0, fvp = num_frust - 1; fv < num_frust; fvp = fv++)
+  int fv, fvp, pv, pvp;
+  for (fv = 0, fvp = num_frust - 1; fv < num_frust; fvp = fv++)
   {
     // Find the equation of the Nth plane
     // Since the origin of frustum is at (0,0,0) the plane equation
@@ -717,7 +718,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
     csVector3 fn = v1 % v2;
 
     float prev_d = fn * poly [num_poly - 1];
-    for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+    for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
     {
       // The distance from plane to polygon vertex
       float d = fn * poly [pv];
@@ -765,7 +766,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
   // enough to check just the first vertex of frustum is outside polygon
   // frustum: this lets us make the right decision.
 
-  for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+  for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
   {
     csVector3 pn = poly [pvp] % poly [pv];
     if (pn * frustum [0] >= 0)
@@ -786,14 +787,15 @@ int csFrustum::BatchClassify (csVector3* frustum, csVector3* frustumNormals, int
   bool all_inside = true;
 
   // Loop through all planes that makes the frustum
-  for (int fv = 0, fvp = num_frust - 1; fv < num_frust; fvp = fv++)
+  int fv, fvp, pv, pvp;
+  for (fv = 0, fvp = num_frust - 1; fv < num_frust; fvp = fv++)
   {
     csVector3 &v1 = frustum [fvp];
     csVector3 &v2 = frustum [fv];
     csVector3 &fn = frustumNormals[fvp];
 
     float prev_d = fn * poly [num_poly - 1];
-    for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+    for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
     {
       // The distance from plane to polygon vertex
       float d = fn * poly [pv];
@@ -836,7 +838,7 @@ int csFrustum::BatchClassify (csVector3* frustum, csVector3* frustumNormals, int
   // enough to check just the first vertex of frustum is outside polygon
   // frustum: this lets us make the right decision.
 
-  for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+  for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
   {
     csVector3 pn = poly [pvp] % poly [pv];
     if (pn * frustum [0] >= 0)

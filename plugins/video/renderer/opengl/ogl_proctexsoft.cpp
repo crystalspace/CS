@@ -449,13 +449,16 @@ void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
   G3DPolygonMesh cmesh;
   memcpy (&cmesh, &mesh, sizeof(G3DPolygonMesh));
   dummyMaterial* dmat = NULL;
+  int idx;
+
   if (!mesh.master_mat_handle)
   {
     dmat = new dummyMaterial[mesh.num_polygons];
-    for (int i = 0; i < mesh.num_polygons; i++)
+	int i;
+    for (i = 0; i < mesh.num_polygons; i++)
     {
       cmesh.mat_handle[i] = &dmat[i];
-      int idx = txts_vector->FindKey ((void*)mesh.mat_handle[i]->GetTexture ());
+      idx = txts_vector->FindKey ((void*)mesh.mat_handle[i]->GetTexture ());
       if (idx == -1)
 	dmat[i].handle = txts_vector->RegisterAndPrepare(mesh.mat_handle[i]->GetTexture ());
       else
@@ -465,7 +468,7 @@ void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
   else
   {
     dmat = new dummyMaterial[1];
-    int idx = txts_vector->FindKey ((void*)mesh.master_mat_handle->GetTexture ());
+    idx = txts_vector->FindKey ((void*)mesh.master_mat_handle->GetTexture ());
     cmesh.master_mat_handle = &dmat[0];
     if (idx == -1)
       dmat[0].handle = txts_vector->RegisterAndPrepare(mesh.master_mat_handle->GetTexture ());

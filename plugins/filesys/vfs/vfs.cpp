@@ -199,7 +199,8 @@ public:
   }
   void CheckUp ()
   {
-    for (int i = Length () - 1; i >= 0; i--)
+	int i;
+    for (i = Length () - 1; i >= 0; i--)
     {
       VfsArchive *a = Get (i);
       if (a->CheckUp ())
@@ -324,11 +325,13 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   memcpy (fName + rpl, NameSuffix, nsl + 1);
 
   // Convert all VFS_PATH_SEPARATOR's in filename into PATH_SEPARATOR's
-  for (size_t n = 0; n < nsl; n++)
+  size_t n;
+  for (n = 0; n < nsl; n++)
     if (fName [rpl + n] == VFS_PATH_SEPARATOR)
       fName [rpl + n] = PATH_SEPARATOR;
 
-  for (int t = 1; t <= 2; t++)
+  int t;
+  for (t = 1; t <= 2; t++)
   {
 #ifdef VFS_DEBUG
     printf ("VFS: Trying to open disk file \"%s\"\n", fName);
@@ -682,7 +685,8 @@ bool VfsNode::RemoveRPath (const char *RealPath)
     return true;
   } /* endif */
 
-  for (int i = 0; i < RPathV.Length (); i++)
+  int i;
+  for (i = 0; i < RPathV.Length (); i++)
     if (strcmp ((char *)RPathV.Get (i), RealPath) == 0)
     {
       RPathV.Delete (i);
@@ -800,7 +804,8 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
   iStrVector *FileList)
 {
   // Look through all RPathV's for file or directory
-  for (int i = 0; i < RPathV.Length (); i++)
+  int i;
+  for (i = 0; i < RPathV.Length (); i++)
   {
     char *rpath = (char *)RPathV [i];
     size_t rpl = strlen (rpath);
@@ -908,7 +913,8 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
   csFile *f = NULL;
 
   // Look through all RPathV's for file or directory
-  for (int i = 0; i < RPathV.Length (); i++)
+  int i;
+  for (i = 0; i < RPathV.Length (); i++)
   {
     char *rpath = (char *)RPathV [i];
     if (rpath [strlen (rpath) - 1] == PATH_SEPARATOR)
@@ -958,7 +964,8 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
   csArchive *&Archive) const
 {
   // Look through all RPathV's for file or directory
-  for (int i = 0; i < RPathV.Length (); i++)
+  int i;
+  for (i = 0; i < RPathV.Length (); i++)
   {
     char *rpath = (char *)RPathV [i];
     if (rpath [strlen (rpath) - 1] == PATH_SEPARATOR)
@@ -1271,9 +1278,9 @@ iDataBuffer *csVFS::ExpandPath (const char *Path, bool IsDir) const
 VfsNode *csVFS::GetNode (const char *Path, char *NodePrefix,
   size_t NodePrefixSize) const
 {
-  int best_i = -1;
+  int i, best_i = -1;
   size_t best_l = 0, path_l = strlen (Path);
-  for (int i = 0; i < NodeList.Length (); i++)
+  for (i = 0; i < NodeList.Length (); i++)
   {
     VfsNode *node = (VfsNode *)NodeList [i];
     size_t vpath_l = strlen (node->VPath);
@@ -1397,7 +1404,8 @@ iStrVector *csVFS::FindFiles (const char *Path) const
   // first add all nodes that are located one level deeper
   // these are "directories" and will have a slash appended
   size_t sl = strlen (XPath);
-  for (int i = 0; i < NodeList.Length (); i++)
+  int i;
+  for (i = 0; i < NodeList.Length (); i++)
   {
     VfsNode *node = (VfsNode *)NodeList [i];
     if ((memcmp (node->VPath, XPath, sl) == 0)
@@ -1577,7 +1585,8 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 
 bool csVFS::SaveMounts (const char *FileName)
 {
-  for (int i = 0; i < NodeList.Length (); i++)
+  int i;
+  for (i = 0; i < NodeList.Length (); i++)
   {
     VfsNode *node = (VfsNode *)NodeList.Get (i);
     int j;
@@ -1666,7 +1675,8 @@ iDataBuffer *csVFS::GetRealPath (const char *FileName)
   if (!node) return NULL;
 
   char path [MAXPATHLEN + 1];
-  for (int i = 0; i < node->RPathV.Length (); i++)
+  int i;
+  for (i = 0; i < node->RPathV.Length (); i++)
   {
     const char *rpath = node->RPathV.Get (i);
     strcat (strcpy (path, rpath), suffix);

@@ -158,7 +158,8 @@ void csCrystalBall::csTriNode::Transform (const csMatrix3 &m, csVector &indexVec
       {
 	// add all polygon indices
 	int to = from+len;
-	for (int i=from; i < to; i++)
+	int i;
+	for (i=from; i < to; i++)
 	  indexVector.Push ((csSome)((csCrystalBallVec*)vP->Get (i))->GetIndex ());
       }
     }
@@ -167,8 +168,8 @@ void csCrystalBall::csTriNode::Transform (const csMatrix3 &m, csVector &indexVec
   {
     const csVector3 *p[4] = {&v1, &v2, &v3, &v1};
     csVector3 td = m* (*(csCrystalBallVec*)vTP->Get (divider));
-
-    for (int i=0; i < 3; i++)
+	int i;
+    for (i=0; i < 3; i++)
     {
       const csVector3 &n1 = *p[i];
       const csVector3 &n2 = *p[i+1];
@@ -179,7 +180,8 @@ void csCrystalBall::csTriNode::Transform (const csMatrix3 &m, csVector &indexVec
 	// all in same half of sphere, sp add them all
 	csTriNode *tri = (csTriNode*)children.Get (i);
 	int to = tri->from+tri->len;
-	for (int j=tri->from; j < to; j++)
+	int j;
+	for (j=tri->from; j < to; j++)
 	  indexVector.Push ((csSome)((csCrystalBallVec*)vP->Get (j))->GetIndex ());
       }
       else
@@ -307,7 +309,8 @@ void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
 void csCrystalBall::Build (iPolygonMesh *polyset)
 {
   // just cycle through all polygons and add them
-  for (int i=0; i<polyset->GetPolygonCount (); i++)
+  int i;
+  for (i=0; i<polyset->GetPolygonCount (); i++)
     InsertPolygon (polyset, i);
 }
 

@@ -61,7 +61,8 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
 
 csTextureHandle::~csTextureHandle ()
 {
-  for (int i = 0; i < 4; i++)
+  int i;
+  for (i = 0; i < 4; i++)
     delete tex [i];
   FreeImage ();
 }
@@ -80,7 +81,8 @@ void csTextureHandle::CreateMipmaps ()
   csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
 
   // Delete existing mipmaps, if any
-  for (int i = 0; i < 4; i++)
+  int i;
+  for (i = 0; i < 4; i++)
     delete tex [i];
 
   // Increment reference counter on image since NewTexture() expects
@@ -280,7 +282,8 @@ void csTextureManager::read_config (iConfigFile* /*config*/)
 
 void csTextureManager::FreeImages ()
 {
-  for (int i = 0 ; i < textures.Length () ; i++)
+  int i;
+  for (i = 0 ; i < textures.Length () ; i++)
     textures.Get (i)->FreeImage ();
 }
 
@@ -336,12 +339,14 @@ void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 
 void csTextureManager::PrepareMaterials ()
 {
-  for (int i = 0; i < materials.Length (); i++)
+  int i;
+  for (i = 0; i < materials.Length (); i++)
     materials.Get (i)->Prepare ();
 }
 
 void csTextureManager::FreeMaterials ()
 {
-  for (int i = 0; i < materials.Length (); i++)
+  int i;
+  for (i = 0; i < materials.Length (); i++)
     materials.Get (i)->FreeMaterial ();
 }

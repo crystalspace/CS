@@ -206,7 +206,7 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
 int CollisionDetect (csColliderWrapper *c, iSector* sp, csTransform *cdt)
 {
   int hit = 0;
-  int i;
+  int i, j;
 
   // Check collision with this sector.
   Sys->collide_system->ResetCollisionPairs ();
@@ -227,7 +227,7 @@ int CollisionDetect (csColliderWrapper *c, iSector* sp, csTransform *cdt)
     if (c->Collide (tp->QueryObject (), cdt, &tp->GetMovable ()->GetTransform ())) hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
-    for (int j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
+    for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
       our_cd_contact[num_our_cd++] = CD_contact[j];
 
     if (Sys->collide_system->GetOneHitOnly () && hit)
@@ -283,6 +283,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
   // the loop.
   if (hits) new_pos = test.GetOrigin ();
 
+  int j;
+
   if (hits == 0)
   {
     Sys->collide_system->ResetCollisionPairs ();
@@ -291,7 +293,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
       hits += CollisionDetect (Sys->body, n[num_sectors], &test);
 
 //printf ("body: hits=%d num_our_cd=%d\n", hits, num_our_cd);
-    for (int j=0 ; j<num_our_cd ; j++)
+    for (j=0 ; j<num_our_cd ; j++)
     {
       csCollisionPair& cd = our_cd_contact[j];
       csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
@@ -325,7 +327,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     {
       float max_y=-1e10;
       
-      for (int j=0 ; j<num_our_cd ; j++)
+      for (j=0 ; j<num_our_cd ; j++)
       {
 	csCollisionPair cd = our_cd_contact[j];
         csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();

@@ -83,7 +83,8 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   {
     // Allocate our copy of the scanline which is power-of-two
     Alpha = new uint8 [Width * Height];
-    for (int i = 0; i < iHeight; i++)
+	int i;
+    for (i = 0; i < iHeight; i++)
     {
       // Copy a scanline from the supplied alphamap
       memcpy (Alpha + (i * Width), iAlpha + (i * iWidth), iWidth);

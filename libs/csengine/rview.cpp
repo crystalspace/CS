@@ -109,7 +109,8 @@ static float *fog_exp_table = NULL;
 static void InitializeFogTable ()
 {
   fog_exp_table = new float [FOG_EXP_TABLE_SIZE];
-  for (int i = 0; i < FOG_EXP_TABLE_SIZE; i++)
+  int i;
+  for (i = 0; i < FOG_EXP_TABLE_SIZE; i++)
     fog_exp_table [i] = 1 - exp (-float (i) / 256.);
 }
 #endif

@@ -103,7 +103,7 @@ void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
 
   CD_contact.IncRef ();
 
-  int i;
+  int i, v;
   int tri_count = 0;
   // first, count the number of triangles polyset contains
   csVector3* vertices = mesh->GetVertices ();
@@ -125,7 +125,7 @@ void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
       csMeshedPolygon& p = polygons[i];
       int* vidx = p.vertices;
       // Collision detection only works with triangles.
-      for (int v = 2; v < p.num_vertices; v++)
+      for (v = 2; v < p.num_vertices; v++)
       {
         m_pCollisionModel->AddTriangle (vertices [vidx[v - 1]],
                                         vertices [vidx[v]], 

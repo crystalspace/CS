@@ -1309,7 +1309,8 @@ void csGraphics3DOGLCommon::SetupStencil ()
     glDisable (GL_TEXTURE_2D);
     SetupBlend (CS_FX_TRANSPARENT, 0, false);
     glBegin (GL_TRIANGLE_FAN);
-    for (int i = 0 ; i < nv ; i++)
+	int i;
+    for (i = 0 ; i < nv ; i++)
       glVertex2f (v[i].x, v[i].y);
     glEnd ();
     glDisable (GL_STENCIL_TEST);

@@ -496,7 +496,8 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   sideA = plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
-  for (int i = -1 ; ++i < GetVertices ().GetVertexCount () ; )
+  int i;
+  for (i = -1 ; ++i < GetVertices ().GetVertexCount () ; )
   {
     ptB = Vobj (i);
     sideB = plane.Classify (ptB);
@@ -831,7 +832,8 @@ float csPolygon3D::GetArea()
 {
   float area = 0.0;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  for (int i = 0 ; i<vertices.GetVertexCount()-2 ; i++)
+  int i;
+  for (i = 0 ; i<vertices.GetVertexCount()-2 ; i++)
     area += ABS(csMath3::Area3 (Vobj(0), Vobj(i+1), Vobj(i+2)));
   return area / 2.0;
 }

@@ -232,7 +232,8 @@ static void ReadVertList (dword, H3dsMeshObj * meshobj)
   meshobj->verts=nv;
   int k=nv;
   meshobj->vertlist=(H3dsVert *) getmem(sizeof(H3dsVert)*k);
-  for (int n=0; n<k; n++)
+  int n;
+  for (n=0; n<k; n++)
   {
     dread (&meshobj->vertlist[n], sizeof(float32)*3);
     meshobj->vertlist[n].x = convert_endian2 (meshobj->vertlist[n].x);
@@ -249,7 +250,8 @@ static void ReadFaceList (dword, H3dsMeshObj * meshobj)
   meshobj->faces=nv;
   int k=nv;
   meshobj->facelist=(H3dsFace *) getmem(sizeof(H3dsFace)*k);
-  for (int n=0; n<k; n++)
+  int n;
+  for (n=0; n<k; n++)
   {
     dread (&meshobj->facelist[n], sizeof(word)*4);
     meshobj->facelist[n].p0 = convert_endian2 (meshobj->facelist[n].p0);
@@ -267,7 +269,8 @@ static void ReadMapList (dword, H3dsMeshObj * meshobj)
   meshobj->maps=nv;
   int k=nv;
   meshobj->maplist=(H3dsMap *) getmem(sizeof(H3dsMap)*k);
-  for (int n=0; n<k; n++)
+  int n;
+  for (n=0; n<k; n++)
   {
     dread (&meshobj->maplist[n], sizeof(float32)*2);
     meshobj->maplist[n].u = convert_endian2 (meshobj->maplist[n].u);
@@ -466,7 +469,8 @@ void HFree3dsScene (H3dsScene * scene)
   {
     if (scene->meshobjlist)
     {
-      for (int n=scene->meshobjs-1; n>=0; n--)
+	  int n;
+      for (n=scene->meshobjs-1; n>=0; n--)
       {
         H3dsMeshObj * mobj = &scene->meshobjlist[n];
         if(mobj->maplist)  free(mobj->maplist);

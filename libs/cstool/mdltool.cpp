@@ -132,7 +132,8 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
   iModelDataVertices *In2, bool Swap)
 {
   iModelDataAction *Out = new csModelDataAction ();
-  for (int i=0; i<In1->GetFrameCount (); i++)
+  int i;
+  for (i=0; i<In1->GetFrameCount (); i++)
   {
     iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (In1->GetState (i),
       iModelDataVertices);
@@ -371,6 +372,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
   int NormalOffset = DefaultVertices ? DefaultVertices->GetNormalCount () : 0;
   int TexelOffset = DefaultVertices ? DefaultVertices->GetTexelCount () : 0;
   int ColorOffset = DefaultVertices ? DefaultVertices->GetColorCount () : 0;
+  int i;
 
   // copy the default vertices
   iModelDataVertices *ver = new csModelDataVertices (DefaultVertices, src->GetDefaultVertices ());
@@ -385,7 +387,6 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     iModelDataPolygon *NewPoly = new csModelDataPolygon ();
     dest->QueryObject ()->ObjAdd (NewPoly->QueryObject ());
 
-    int i;
     for (i=0; i<poly->GetVertexCount (); i++)
     {
       NewPoly->AddVertex (
@@ -430,7 +431,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
   }
 
   // merge the actions
-  for (int i=0; i<ActionMap1.Length (); i++)
+  for (i=0; i<ActionMap1.Length (); i++)
   {
     iModelDataAction *Action1 = ActionMap1.Get (i),
                      *Action2 = ActionMap2.Get (i),
@@ -488,7 +489,8 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
         NewAction->DeleteFrame (0);
     }
 
-    for (int i=0; i<OldAction->GetFrameCount (); i++)
+	int i;
+    for (i=0; i<OldAction->GetFrameCount (); i++)
     {
       iModelDataVertices *oldver = SCF_QUERY_INTERFACE_FAST (OldAction->GetState (i),
         iModelDataVertices);
@@ -552,9 +554,10 @@ static bool CheckMaterialConflict (iModelDataObject *obj1, iModelDataObject *obj
     }
   }
 
-  for (int i=0; i<mat1.Length (); i++)
+  int i, j;
+  for (i=0; i<mat1.Length (); i++)
   {
-    for (int j=0; j<mat2.Length (); j++)
+    for (j=0; j<mat2.Length (); j++)
     {
       if (mat1.Get (i) != mat2.Get (j))
         return true;
@@ -659,7 +662,8 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
         Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
 	Scene->QueryObject ()->ObjRemove (Polygon->QueryObject ());
 
-	for (int j=0; j<Polygon->GetVertexCount (); j++)
+	int j;
+	for (j=0; j<Polygon->GetVertexCount (); j++)
 	{
 
 #define CS_MDLTOOL_HELPER(obj)						\
@@ -725,6 +729,7 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
 {
   static int Indent = 0;
   static char *Indention = NULL;
+  int i;
   if (!Indention) {
     Indention = new char [2000];
     memset (Indention, ' ', 2000);
@@ -746,7 +751,7 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
   CS_MDLTOOL_TRY_END
 
   CS_MDLTOOL_TRY_BEGIN (obj, iModelDataPolygon)
-    for (int i=0; i<Object->GetVertexCount (); i++)
+    for (i=0; i<Object->GetVertexCount (); i++)
     {
       contents << Indention << "Vertex <v" <<
         Object->GetVertex (i) << ",n" <<
@@ -757,7 +762,7 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
   CS_MDLTOOL_TRY_END
 
   CS_MDLTOOL_TRY_BEGIN (obj, iModelDataAction)
-    for (int i=0; i<Object->GetFrameCount (); i++)
+    for (i=0; i<Object->GetFrameCount (); i++)
     {
       contents << Indention << "Frame <" << Object->GetTime (i) <<
         "> :\n";

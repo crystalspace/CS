@@ -233,10 +233,11 @@ iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
 
   p += sizeof (bmpHeader)-2;
 
+  int x, y, i;
   if (palette)
   {
     csRGBpixel *pal = Image->GetPalette ();
-    for (int i= 0; i < 256; i++)
+    for (i= 0; i < 256; i++)
     {
       *p++ = pal[i].blue;
       *p++ = pal[i].green;
@@ -245,15 +246,15 @@ iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     }
 
     unsigned char *data = (unsigned char *)Image->GetImageData ();
-    for (int y=h-1; y >= 0; y--)
-      for (int x=0; x < w; x++)
+    for (y=h-1; y >= 0; y--)
+      for (x=0; x < w; x++)
 	*p++ = data[y*w+x];
   }
   else
   {
     csRGBpixel *pixel = (csRGBpixel *)Image->GetImageData ();
-    for (int y=h-1; y >= 0; y--)
-      for (int x=0; x < w; x++)
+    for (y=h-1; y >= 0; y--)
+      for (x=0; x < w; x++)
       {
 	unsigned char *c = (unsigned char *)&pixel[y*w+x];
 	*p++ = *(c+2);
@@ -300,7 +301,8 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
     csRGBpixel *pwork   = palette;
     UByte    *inpal   = BIPALETTE(iBuffer);
 	int scanlinewidth = 4 * ((Width+3) / 4);
-    for (int color = 0; color < 256; color++, pwork++)
+	int color;
+    for (color = 0; color < 256; color++, pwork++)
     {  
       // Whacky BMP palette is in BGR order.
       pwork->blue  = *inpal++;
@@ -380,10 +382,12 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
   {
     csRGBpixel *buffer = new csRGBpixel [bmp_size];
 
+	int x;
+
     while (iPtr < iBuffer + iSize && buffer_y >= 0)
     {
       csRGBpixel *d = buffer + buffer_y;
-      for (int x = Width; x; x--)
+      for (x = Width; x; x--)
       {
         d->blue    = *iPtr++;
         d->green   = *iPtr++;

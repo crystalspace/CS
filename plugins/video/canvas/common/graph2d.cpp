@@ -109,7 +109,8 @@ bool csGraphics2D::Initialize (iObjectRegistry* object_reg)
   _WriteString = WriteString8;
   _GetPixelAt = GetPixelAt8;
   // Mark all slots in palette as free
-  for (int i = 0; i < 256; i++)
+  int i;
+  for (i = 0; i < 256; i++)
   {
     PaletteAlloc [i] = false;
     Palette [i].red = 0;
@@ -310,7 +311,8 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
 
 #define H_LINE(pixtype)						\
   {								\
-    for (int x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)	\
+    int x, y;  \
+    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)	\
     {								\
       pixtype *p = (pixtype *)(Memory +				\
         (x * sizeof (pixtype) + LineAddress [y >> 16]));	\
@@ -343,7 +345,8 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
 
 #define V_LINE(pixtype)						\
   {								\
-    for (int x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)	\
+    int x, y; \
+    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)	\
     {								\
       pixtype *p = (pixtype *)(Memory +				\
         ((x >> 16) * sizeof (pixtype) + LineAddress [y]));	\

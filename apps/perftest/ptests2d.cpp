@@ -47,8 +47,8 @@ void Tester2D::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
 void LineTester2D::Draw (iGraphics3D* /*g3d*/)
 {
   draw++;
-  int j = 0;
-  for (int i = 10; i < max_w; i++)
+  int i, j = 0;
+  for (i = 10; i < max_w; i++)
   {
     int k = ++j&7;
     G2D->DrawLine (i, 10, i, inc_h, colour [k]);
@@ -69,8 +69,9 @@ Tester* LineTester2D::NextTester ()
 void PixelTester::Draw (iGraphics3D* /*g3d*/)
 {
   draw++;
-  for (int i = 10; i < max_w; i++)
-    for (int j = 10; j < max_h; j++)
+  int i, j;
+  for (i = 10; i < max_w; i++)
+    for (j = 10; j < max_h; j++)
       G2D->DrawPixel (i, j, colour[(i+j)&7]);
 }
 

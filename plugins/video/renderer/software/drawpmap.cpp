@@ -44,11 +44,11 @@ void csGraphics3DSoftwareCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  if (pfmt.PixelBytes == 1)
+  if ((1 << pfmt.PixelBytes) & (1 << 1)) // PixelBytes == 1
     DrawPixmap8 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
-  else if (pfmt.PixelBytes == 2)
+  else if ((1 << pfmt.PixelBytes) & (1 << 2)) // PixelBytes == 2
   {
-    if (pfmt.GreenBits == 5)
+    if ((1 << pfmt.GreenBits) & (1 << 5)) // GreenBits == 5
       DrawPixmap16_555 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
     else
       DrawPixmap16_565 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);

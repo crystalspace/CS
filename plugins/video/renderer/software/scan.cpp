@@ -170,7 +170,8 @@ void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
 
 void csScan_Finalize ()
 {
-  for (int i = 0; i < NUMBLENDINGTABLES; i++)
+  int i;
+  for (i = 0; i < NUMBLENDINGTABLES; i++)
   {
     delete [] Scan.BlendingTable [i];
     delete [] Scan.BlendingTableProc [i];

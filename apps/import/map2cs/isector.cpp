@@ -45,7 +45,8 @@ CISector::CISector(CMapBrush* pBrush)
   m_IsDefaultsector = (pBrush->GetEntity() == NULL);
   
   // Create wall polygon sets for all sides of the brush
-  for (int i=0; i<pBrush->GetPolygonCount(); i++)
+  int i;
+  for (i=0; i<pBrush->GetPolygonCount(); i++)
   {
     CMapPolygon* pPolygon = pBrush->GetPolygon(i);
     m_Walls.Push(new CMapPolygonSet(*pPolygon));
@@ -77,17 +78,18 @@ bool CISector::IsInside(CdVector3& v)
 void CISector::CreatePortal(CISector* pOtherSector)
 {
   assert(pOtherSector != this);
+  int i, j;
 
   //Check all pairs of this sectors walls and the other sectors walls. We are using
   //the original brush for this operation, to avoid having portals that are already
   //split. That would be the worst case scenario, because that would mean, the engine
   //must draw the sector multiple times, and this would be a major performance loss!
-  for (int i=0; i<m_pOriginalBrush->GetPolygonCount(); i++)
+  for (i=0; i<m_pOriginalBrush->GetPolygonCount(); i++)
   {
     CMapPolygonSet*    pOwnWall  = new CMapPolygonSet(*m_pOriginalBrush->GetPolygon(i));
     CMapTexturedPlane* pOwnPlane = pOwnWall->GetBaseplane();
 
-    for (int j=0; j<pOtherSector->m_Walls.Length(); j++)
+    for (j=0; j<pOtherSector->m_Walls.Length(); j++)
     {
       CMapPolygonSet*    pOtherWall  = new CMapPolygonSet(*pOtherSector->m_pOriginalBrush->GetPolygon(j));
       CMapTexturedPlane* pOtherPlane = pOtherWall->GetBaseplane()->GetMirror();
@@ -133,7 +135,8 @@ CMapPolygonSet* CISector::GetCorrespondingWall(CMapTexturedPlane* pPlane,
 {
   if (!pPlane) return NULL;
 
-  for (int i=0; i<m_Walls.Length(); i++)
+  int i;
+  for (i=0; i<m_Walls.Length(); i++)
   {
     CMapPolygonSet*    pOwnWall  = m_Walls[i];
     CMapTexturedPlane* pOwnPlane = pOwnWall->GetBaseplane();
@@ -203,7 +206,7 @@ void CISector::InsertThings(CIWorld* pWorld)
 {
   assert(pWorld);
 
-  int i, j, k;
+  int i, j, k, p, r;
 
   int BrushesProcessed = 0;
   int BrushesToProcess = pWorld->GetMap()->GetNumBrushes() - pWorld->GetNumSectors();
@@ -240,7 +243,7 @@ void CISector::InsertThings(CIWorld* pWorld)
             CMapPolygon        Polygon    = *pBrush->GetPolygon(k);
             CMapTexturedPlane* pPolyPlane = Polygon.GetBaseplane();
 
-            for (int p=0; p<m_pOriginalBrush->GetPolygonCount(); p++)
+            for (p=0; p<m_pOriginalBrush->GetPolygonCount(); p++)
             {
               CMapTexturedPlane* pPlane = m_pOriginalBrush->GetPolygon(p)->GetBaseplane();
 
@@ -275,7 +278,7 @@ void CISector::InsertThings(CIWorld* pWorld)
                 //To do so, we intersect the baseplane of the polygon with every
                 //other brush of the same entity. If the baseplane intersects,
                 //we remove the common area, because that area is inside the brush.
-                for (int r=0; r<pEntity->GetNumBrushes(); r++)
+                for (r=0; r<pEntity->GetNumBrushes(); r++)
                 {
                   if (r==j) continue;
 

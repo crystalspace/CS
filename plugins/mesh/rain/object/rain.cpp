@@ -58,7 +58,8 @@ void csRainMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     csVector3 pos;
-    for (int i=0 ; i < number ; i++)
+	int i;
+    for (i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
       GetParticle (i)->SetMixMode (MixMode);

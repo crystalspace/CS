@@ -58,7 +58,8 @@ void CTextureManager::LoadTextureArchives(CMapFile* pMap)
     "Map2CS.TextureSettings.pk%d",
     "Map2CS.TextureSettings.zip%d"};
 
-  for (int type=0; type<MaxType; type++)
+  int type;
+  for (type=0; type<MaxType; type++)
   {
     int nr = 1;
     do 
@@ -168,7 +169,8 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
 bool CTextureManager::AddAllTexturesToZip(CZipFile* pZipfile)
 {
   bool ok = true;
-  for (int i=0; i<m_StoredTextures.Length(); i++)
+  int i;
+  for (i=0; i<m_StoredTextures.Length(); i++)
   {
     CTextureFile* pTexture = m_StoredTextures[i];
     assert(pTexture);
@@ -189,7 +191,8 @@ bool CTextureManager::AddAllTexturesToZip(CZipFile* pZipfile)
 
 void CTextureManager::CleanupTexturename(char* Name)
 {
-  for (int i=0; i<int(sizeof(Q3Extensions)/sizeof(Q3Extensions[0])); i++)
+  int i;
+  for (i=0; i<int(sizeof(Q3Extensions)/sizeof(Q3Extensions[0])); i++)
   {
     int ExtensionLen = strlen(Q3Extensions[i]);
     int NameLen      = strlen(Name);

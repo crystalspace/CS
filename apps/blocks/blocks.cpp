@@ -723,7 +723,8 @@ void Blocks::ChangeThingMaterial (iMeshWrapper* thing,
 {
   iThingState* thing_state = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
-  for (int i = 0 ; i < thing_state->GetPolygonCount () ; i++)
+  int i;
+  for (i = 0 ; i < thing_state->GetPolygonCount () ; i++)
   {
     iPolygon3D* p = thing_state->GetPolygon (i);
     p->SetMaterial (mat);
@@ -1515,7 +1516,8 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
   else if (new_shift_rot.z > .25) new_shift_rot.z = .5;
   else new_shift_rot.z = 0;
 
-  for (int i = 0 ; i < num_cubes ; i++)
+  int i;
+  for (i = 0 ; i < num_cubes ; i++)
   {
     csVector3 v;
     v.x = cube_info[i].dx;
@@ -1550,7 +1552,8 @@ iMaterialWrapper* Blocks::GetMaterialForHeight (int z)
 
 void Blocks::freeze_shape ()
 {
-  for (int i = 0 ; i < num_cubes ; i++)
+  int i;
+  for (i = 0 ; i < num_cubes ; i++)
   {
     int x = player1->cube_x+(int)cube_info[i].dx;
     int y = player1->cube_y+(int)cube_info[i].dy;
@@ -1583,7 +1586,8 @@ void Blocks::freeze_shape ()
 void Blocks::dump_shape ()
 {
   Report (CS_REPORTER_SEVERITY_DEBUG,"Dump shape:");
-  for (int i = 0 ; i < num_cubes ; i++)
+  int i;
+  for (i = 0 ; i < num_cubes ; i++)
   {
     int x = (int)cube_info[i].dx;
     int y = (int)cube_info[i].dy;
@@ -1595,7 +1599,8 @@ void Blocks::dump_shape ()
 
 bool Blocks::check_new_shape_location (int dx, int dy, int dz)
 {
-  for (int i = 0 ; i < num_cubes ; i++)
+  int i;
+  for (i = 0 ; i < num_cubes ; i++)
   {
     int x = player1->cube_x+(int)cube_info[i].dx + dx;
     int y = player1->cube_y+(int)cube_info[i].dy + dy;
@@ -1621,7 +1626,8 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
 
   new_shift_rot *= 10.;
 
-  for (int i = 0 ; i < num_cubes ; i++)
+  int i;
+  for (i = 0 ; i < num_cubes ; i++)
   {
     csVector3 v;
 
@@ -1883,7 +1889,8 @@ void Blocks::DrawMenu (int menu)
 void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
   int new_menu)
 {
-  for (int i = 0 ; i < num_menus ; i++)
+  int i;
+  for (i = 0 ; i < num_menus ; i++)
   {
     int old_curi = (i-old_menu+num_menus)%num_menus;
     int new_curi = (i-new_menu+num_menus)%num_menus;
@@ -2043,7 +2050,8 @@ iMeshWrapper* Blocks::CreateMenuArrow (bool left)
 void Blocks::InitMenu ()
 {
   num_menus = 0;
-  for (int i = 0 ; i < MENU_TOTAL ; i++)
+  int i;
+  for (i = 0 ; i < MENU_TOTAL ; i++)
   {
     src_menus[i]->GetMovable ()->ClearSectors ();
     src_menus[i]->GetMovable ()->UpdateMove ();
@@ -2193,7 +2201,8 @@ void Blocks::InitGameRoom ()
   Sys->add_pillar (-1, player1->zone_dim);
   Sys->add_pillar (player1->zone_dim, player1->zone_dim);
 
-  for (int i = 0 ; i < player1->zone_dim-1 ; i++)
+  int i;
+  for (i = 0 ; i < player1->zone_dim-1 ; i++)
   {
     Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
     Sys->add_vrast ((player1->zone_dim)-1, i, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
@@ -2370,11 +2379,12 @@ void Blocks::StartNewGame ()
 
 void Blocks::removePlanesVisual (States* player)
 {
-  for (int z = 0; z < ZONE_HEIGHT; z++)
+  int x, y, z;
+  for (z = 0; z < ZONE_HEIGHT; z++)
   {
     if (player->filled_planes[z])
-      for (int x = 0; x < player->zone_dim; x++)
-        for (int y = 0; y < player->zone_dim; y++)
+      for (x = 0; x < player->zone_dim; x++)
+        for (y = 0; y < player->zone_dim; y++)
         { // Physically remove it.
           char temp[20];
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
@@ -2390,7 +2400,8 @@ void Blocks::HandleTransition (csTicks elapsed_time)
   if (screen == SCREEN_GAMEOVER) return;
   player1->transition = false;
 
-  for (int i=0 ; i<ZONE_HEIGHT ; i++)
+  int i;
+  for (i=0 ; i<ZONE_HEIGHT ; i++)
   {
     if (player1->filled_planes[i])
     {

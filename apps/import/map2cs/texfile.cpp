@@ -119,7 +119,8 @@ void CTextureFile::SetTexturename(const char* name)
   m_Texturename = name;
 
   m_Visible = true;
-  for (int i=0; i<int(sizeof(InvisibleTextures)/sizeof(InvisibleTextures[0])); i++)
+  int i;
+  for (i=0; i<int(sizeof(InvisibleTextures)/sizeof(InvisibleTextures[0])); i++)
   {
     if (strcmp(m_Texturename, InvisibleTextures[i])==0)
     {

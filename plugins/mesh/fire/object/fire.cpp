@@ -99,7 +99,8 @@ void csFireMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     // create particles
-    for (int i=0 ; i < number ; i++)
+	int i;
+    for (i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
       GetParticle (i)->SetMixMode (MixMode);
@@ -173,12 +174,13 @@ void csFireMeshObject::MoveAndAge (int i, float delta_t)
   part_pos[i] += part_speed[i] * delta_t;
   GetParticle (i)->SetPosition (part_pos[i]); 
   part_age[i] += delta_t;
+  int k;
 
   if (!precalc_valid)
   {
     precalc_valid = true;
     ColorInfo const* prev_info = GetColorInfo(0);
-    for (int k = 1 ; k < MAX_COLORS ; k++)
+    for (k = 1 ; k < MAX_COLORS ; k++)
     {
       ColorInfo const* info = GetColorInfo(k);
       precalc_add[k] = color_scale * (prev_info->c
@@ -190,7 +192,6 @@ void csFireMeshObject::MoveAndAge (int i, float delta_t)
   }
 
   float age = part_age[i] * inv_total_time;
-  int k;
   if (age < COL_AGE1)	   k = 1;
   else if (age < COL_AGE2) k = 2;
   else if (age < COL_AGE3) k = 3;

@@ -72,7 +72,8 @@ void csDefaultButtonSkin::Draw (csComponent &This)
         // Fill the button background
         int dx = aw - 1;
         rvy = This.bound.Height () - 1;
-        for (int i = 3; i < aw; i++, dx--)
+		int i;
+        for (i = 3; i < aw; i++, dx--)
         {
           This.Line (dx, i, This.bound.Width () - 3, i, CSPAL_BUTTON_BACKGROUND);
           This.Line (3, rvy - i, This.bound.Width () - dx, rvy - i, CSPAL_BUTTON_BACKGROUND);

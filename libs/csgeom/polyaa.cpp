@@ -80,10 +80,9 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
       DrawBox (Grid.xmin, Grid.ymin, width, height, Arg);
     else
 	{
-	  int i;
+	  int i, j;
       for (i = 0 ; i < height; i++)
 	  {
-		int j;
         for (j = 0 ; j < width; j++)
           PutPixel (Grid.xmin + j, Grid.ymin + i, 1.0, Arg);
 	  }
@@ -106,7 +105,8 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
     int sub_x = Grid.xmin + width / 2;
     int where_are_we = iVertices [0].x > sub_x;
     p2 [where_are_we] [n2 [where_are_we]++] = iVertices [0];
-    for (int v = 1, prev = 0; v <= iVertexCount; v++)
+	int v, prev;
+    for (v = 1, prev = 0; v <= iVertexCount; v++)
     {
       // Check whenever current vertex is on left or right side of divider
       int cur = (v == iVertexCount) ? 0 : v;
@@ -151,7 +151,8 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
     int sub_y = Grid.ymin + height / 2;
     int where_are_we = iVertices [0].y > sub_y;
     p2 [where_are_we] [n2 [where_are_we]++] = iVertices [0];
-    for (int v = 1, prev = 0; v <= iVertexCount; v++)
+	int v, prev;
+    for (v = 1, prev = 0; v <= iVertexCount; v++)
     {
       // Check whenever current vertex is on top or down side of divider
       int cur = (v == iVertexCount) ? 0 : v;

@@ -66,10 +66,11 @@ const char* CIThing::GetClassname()
 
 bool CIThing::ContainsVisiblePolygons()
 {
-  for (int i=0; i<m_Polygon.Length(); i++)
+  int i, j;
+  for (i=0; i<m_Polygon.Length(); i++)
   {
     CMapPolygonSet* pPolySet = m_Polygon[i];
-    for (int j=0; j<pPolySet->GetPolygonCount(); j++)
+    for (j=0; j<pPolySet->GetPolygonCount(); j++)
     {
       CMapPolygon*             pPolygon = pPolySet->GetPolygon(j);
       const CMapTexturedPlane* pPlane   = pPolygon->GetBaseplane();

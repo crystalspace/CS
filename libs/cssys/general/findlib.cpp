@@ -35,7 +35,8 @@ void csAddLibraryPath (const char *iPath)
 csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
   const char *iSuffix)
 {
-  for (int i = findlib_search_nodir ? -1 : 0; i < LibPath.Length (); i++)
+  int i, j;
+  for (i = findlib_search_nodir ? -1 : 0; i < LibPath.Length (); i++)
   {
     char lib [MAXPATHLEN + 1];
 
@@ -46,7 +47,7 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
       lib [0] = 0;
 
     size_t sl = strlen (lib);
-    for (int j = 0; j < 2; j++)
+    for (j = 0; j < 2; j++)
     {
       if (j)
         strcpy (lib + sl, iPrefix);

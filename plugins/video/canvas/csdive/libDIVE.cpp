@@ -169,7 +169,8 @@ diveWindow::diveWindow (long Width, long Height, FOURCC Format, long nBuff)
   hFocus = NULL;
   ScreenW = WinQuerySysValue (HWND_DESKTOP, SV_CXSCREEN);
   ScreenH = WinQuerySysValue (HWND_DESKTOP, SV_CYSCREEN);
-  for (int i = 0; i < DIVE_MAXBUFFERS; i++)
+  int i;
+  for (i = 0; i < DIVE_MAXBUFFERS; i++)
     hBuffer[i] = NULLHANDLE;
   DirtyRect.xLeft = 1;
   DirtyRect.xRight = -1;
@@ -205,7 +206,8 @@ diveWindow::~diveWindow ()
 {
   Unbind (false);
   DosCloseEventSem (sRedrawComplete);   // Destroy redraw semaphore
-  for (int i = 0; i <= nBuffers; i++)   // Free image buffers
+  int i;
+  for (i = 0; i <= nBuffers; i++)   // Free image buffers
     DiveFreeImageBuffer (hDive, hBuffer[i]);
   DiveClose (hDive);
   ResetPhysCLUT ();
@@ -380,7 +382,8 @@ bool diveWindow::SetupBlitter ()
     // Now goes the tricky part: scan all rectangles returned by
     // GpiQueryRegionRects and intersect them with DirtyRect. This way,
     // we'll get updated only the part of screen that has been changed.
-    for (int i = rgnCtl.crcReturned - 1; i >= 0; i--)
+	int i;
+    for (i = rgnCtl.crcReturned - 1; i >= 0; i--)
     {
       if (DirtyRect.xLeft > rctls[i].xLeft)
         rctls[i].xLeft = DirtyRect.xLeft;
@@ -475,7 +478,8 @@ bool diveWindow::SetPhysCLUT ()
     ULONG *CurCol = tmpCLUT;
     int Count = 0;
 
-    for (int i = 0; i < MAX_PHYS_COLORS; i++)
+	int i;
+    for (i = 0; i < MAX_PHYS_COLORS; i++)
       if (CLUT[i] != 0xffffffff)
       {
         *CurCol++ = CLUT[i];

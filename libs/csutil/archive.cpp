@@ -253,7 +253,8 @@ void csArchive::Dir () const
   printf (" Comp |Uncomp| File |CheckSum| File\n");
   printf (" size | size |offset| (CRC32)| name\n");
   printf ("------+------+------+--------+------\n");
-  for (int fn = 0; fn < dir.Length (); fn++)
+  int fn;
+  for (fn = 0; fn < dir.Length (); fn++)
   {
     ArchiveEntry *e = dir.Get (fn);
     printf ("%6ld|%6ld|%6ld|%08x|%s\n", e->info.csize, e->info.ucsize,

@@ -99,7 +99,8 @@ float csMetaBall::map (float x)
 
 void csMetaBall::InitTables(void)
 {
-  for (int i = -MAP_RESOLUTION, j = 0; i <= MAP_RESOLUTION; i++, j++)
+  int i, j;
+  for (i = -MAP_RESOLUTION, j = 0; i <= MAP_RESOLUTION; i++, j++)
   {
     float c = 1.0 * i / MAP_RESOLUTION;
     switch(env_mapping)
@@ -126,7 +127,8 @@ bool csMetaBall::Initialize ()
     mesh.vertices[0] = new csVector3[max_vertices];
     mesh.texels[0] = new csVector2[max_vertices];
     mesh.vertex_colors[0] = new csColor[max_vertices];
-    for (int i = 0; i < max_vertices; i++)
+	int i;
+    for (i = 0; i < max_vertices; i++)
     {
       mesh.vertices[0][i].Set(0,0,0);
       mesh.texels[0][i].Set(0,0);
@@ -212,7 +214,8 @@ void csMetaBall::UpdateLighting( iLight **, int, iMovable * )
   //TODO: The lighting code is incomplete...
 #if 0
       csVector3 n(0, 0, 0);
-      for(int k = 0; k < num_meta_balls; k++)
+	  int k;
+      for(k = 0; k < num_meta_balls; k++)
       {
         csVector3 rv(mesh.vertices[0][m].x - meta_balls[k].center.x,
           mesh.vertices[0][m].y - meta_balls[k].center.y,
@@ -251,7 +254,8 @@ void csMetaBall::CreateBoundingBox()
 
   int maxxi = 0, maxyi = 0, maxzi = 0, minxi = 0, minyi = 0, minzi = 0;
 
-  for ( int i = 0; i < mesh.num_vertices; i++ )
+  int i;
+  for (i = 0; i < mesh.num_vertices; i++)
   {
 	if ( mesh.vertices[0][i].x < minx ) {minx = mesh.vertices[0][i].x; minxi = i; }
 	else
@@ -398,6 +402,7 @@ void csMetaBall::NextFrame(csTicks)
 // The next routine sets up the triangles and the texturing for
 // the mesh...
   int num = 0, trigs = int( vertices_tesselated / 3);
+  int k;
   for (i = 0; i < trigs; i++, num += 3)
   {
 	// Fill our mesh buffer with the created triangles
@@ -405,11 +410,11 @@ void csMetaBall::NextFrame(csTicks)
 	mesh.triangles[i].b = num + 1;
 	mesh.triangles[i].c = num;
 
-	for ( j = 0; j < 3; j++ )
+	for (j = 0; j < 3; j++)
 	{
 	  m = num + j;
       csVector3 n(0, 0, 0);
-      for(int k = 0; k < num_meta_balls; k++)
+      for(k = 0; k < num_meta_balls; k++)
       {
       	csVector3 rv(mesh.vertices[0][m].x - meta_balls[k].center.x,
           mesh.vertices[0][m].y - meta_balls[k].center.y,
@@ -450,13 +455,14 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   mesh.use_vertex_color = true;
 
 #if 0
+  int i;
   printf("Dumping Triangles: %d Vertices: %d\n", mesh.num_triangles, mesh.num_vertices );
-  for (int i = 0; i < mesh.num_vertices; i++ )
+  for (i = 0; i < mesh.num_vertices; i++)
   {
 	csVector3 v = mesh.vertices[0][i];
 	printf("V(%f,%f,%f) ; %d\n", v.x,v.y,v.z, i);
   }
-  for ( int i = 0; i < mesh.num_triangles; i++ )
+  for (i = 0; i < mesh.num_triangles; i++)
   {
 	csTriangle tr = mesh.triangles[i];
 	printf("TRIANGLE(%d,%d,%d) ; %d\n",tr.a,tr.b,tr.c,i);

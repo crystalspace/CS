@@ -81,7 +81,8 @@ void csSprite2DMeshObject::SetupObject ()
       // If there is no lighting then we need to copy the color_init
       // array to color.
       float max_sq_dist = 0;
-      for (int i = 0 ; i < vertices.Length () ; i++)
+	  int i;
+      for (i = 0 ; i < vertices.Length () ; i++)
       {
         csSprite2DVertex& v = vertices[i];
         v.color = vertices[i].color_init;
@@ -369,7 +370,8 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   double angle = 0.0;
   vertices.SetLimit (n);
   vertices.SetLength (n);
-  for (int i = 0; i < vertices.Length (); i++, angle += angle_inc)
+  int i;
+  for (i = 0; i < vertices.Length (); i++, angle += angle_inc)
   {
     vertices [i].pos.y = cos (angle);
     vertices [i].pos.x = sin (angle);
@@ -435,7 +437,8 @@ void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
 void csSprite2DMeshObject::Particle::ScaleBy (float factor)
 {
   csColoredVertices& vertices = scfParent->GetVertices ();
-  for (int i = 0; i < vertices.Length (); i++)
+  int i;
+  for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos *= factor;
   scfParent->shapenr++;
 }
@@ -443,7 +446,8 @@ void csSprite2DMeshObject::Particle::ScaleBy (float factor)
 void csSprite2DMeshObject::Particle::Rotate (float angle)
 {
   csColoredVertices& vertices = scfParent->GetVertices ();
-  for (int i = 0; i < vertices.Length (); i++)
+  int i;
+  for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos.Rotate (angle);
   scfParent->shapenr++;
 }

@@ -185,6 +185,8 @@ bool csGraphics2DOS2DIVE::Open ()
   if (!csGraphics2D::Open ())
     return false;
 
+  int i;
+
   // Set up FGVideoMode
   // Check first all available 16-bit modes for 'native' flag
   // if so, use it. Otherwise choose R5G6B5 format.
@@ -192,7 +194,7 @@ bool csGraphics2DOS2DIVE::Open ()
   switch (Depth)
   {
     case 32:
-      for (int i = 0; i < (int)vmCount; i++)
+      for (i = 0; i < (int)vmCount; i++)
         if (vmList[i].PixelFormat == FOURCC_RGB4
          || vmList[i].PixelFormat == FOURCC_BGR4)
         {
@@ -208,7 +210,7 @@ bool csGraphics2DOS2DIVE::Open ()
       if (PixelFormat != FOURCC_LUT8)
         break;
     case 16:
-      for (int i = 0; i < (int)vmCount; i++)
+      for (i = 0; i < (int)vmCount; i++)
       {
         if (vmList[i].PixelFormat == FOURCC_R565
          || vmList[i].PixelFormat == FOURCC_R664
@@ -229,7 +231,7 @@ bool csGraphics2DOS2DIVE::Open ()
       if (PixelFormat != FOURCC_LUT8)
         break;
     case 15:
-      for (int i = 0; i < (int)vmCount; i++)
+      for (i = 0; i < (int)vmCount; i++)
         if (vmList[i].PixelFormat == FOURCC_R555)
         {
           PixelFormat = vmList[i].PixelFormat;

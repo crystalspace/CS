@@ -139,7 +139,8 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   // don't know why, but the previous implementation did this:
   def.alpha = 128;
 
-  for (int i=0; i<lm_size; i++)
+  int i;
+  for (i=0; i<lm_size; i++)
     map[i] = def;
 }
 

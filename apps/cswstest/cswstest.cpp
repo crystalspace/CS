@@ -383,7 +383,8 @@ void csWsTest::MiscDialog ()
 
     csListBox *lb = new csListBox (client, CSLBS_HSCROLL | CSLBS_VSCROLL, cslfsThinRect);
     lb->SetRect (320, 120, 410, 250);
-    for (int i = 1; i < 100; i++)
+	int i;
+    for (i = 1; i < 100; i++)
     {
       char tmp[20];
       sprintf (tmp, "item %d - dummy", i);
@@ -687,14 +688,16 @@ void csWsTest::LayoutDialog ()
   // a flow layout in the center of the borderlayout
   border->c = *blc[0];
   csFlowLayout *flow = new csFlowLayout (border);
-  for (int k=0; k<10; k++)
+  int k;
+  for (k=0; k<10; k++)
   {
     char tt[20];
     sprintf (tt, "t %d", k);
     CreateButton (flow, 7200+k, tt, k*20, 20);
   }
 
-  for (int j=1; j < 5; j++)
+  int j;
+  for (j=1; j < 5; j++)
   {
     border->c = *blc[j];
     csButton *b= new csButton (border, 7100+j);

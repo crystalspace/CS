@@ -157,7 +157,8 @@ CMapTexturedPlane::CMapTexturedPlane(CMapTexturedPlane* pPlane, bool mirrored)
   m_pTexture  = pPlane->m_pTexture;
 
   //texture coordinates stay the same
-  for (int i=0; i<3; i++)
+  int i;
+  for (i=0; i<3; i++)
   {
     m_tx[i] = pPlane->m_tx[i];
   }
@@ -267,7 +268,8 @@ void CMapTexturedPlane::CalcTextureAxis(CdVector3& no,
   int   bestaxis = 0;
   
   //Search for the best axis by comparing all normals
-  for (int i=0 ; i<6 ; i++)
+  int i;
+  for (i=0 ; i<6 ; i++)
   {
     double dot = Normal() * CdVector3(baseaxis[i*3].x, 
                                      baseaxis[i*3].y,

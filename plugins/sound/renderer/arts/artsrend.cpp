@@ -103,7 +103,8 @@ void csArtsRenderer::SetVolume (float vol)
     // servers effect stack.  The upside would be easier handling here, the
     // downside is we would modify the volume of other sounds too, like the
     // napstered mp3 playing in the background.
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetVolume (vol);
   }
   volume = vol;
@@ -160,7 +161,8 @@ void csArtsRenderer::SetDirection(const csVector3 &Front, const csVector3 &Top)
 {
   if (bInit)
   {
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetDirection (Front, Top);
 
   }
@@ -172,7 +174,8 @@ void csArtsRenderer::SetPosition (const csVector3 &pos)
 {
   if (bInit)
   {
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetPosition (pos);
 
   }
@@ -183,7 +186,8 @@ void csArtsRenderer::SetVelocity (const csVector3 &v)
 {
   if (bInit)
   {
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetVelocity (v);
 
   }
@@ -194,7 +198,8 @@ void csArtsRenderer::SetDistanceFactor (float factor)
 {
   if (bInit)
   {
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetDistanceFactor (factor);
   }
   distanceFactor = factor;
@@ -204,7 +209,8 @@ void csArtsRenderer::SetRollOffFactor (float factor)
 {
   if (bInit)
   {
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetRollOffFactor (factor);
   }
   rolloffFactor = factor;
@@ -214,7 +220,8 @@ void csArtsRenderer::SetDopplerFactor (float factor)
 {
   if (bInit)
   {
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetDopplerFactor (factor);
   }
   dopplerFactor = factor;
@@ -224,7 +231,8 @@ void csArtsRenderer::SetHeadSize (float size)
 {
   if (bInit)
   {
-    for (int i=0; i<vObject.Length (); i++)
+	int i;
+    for (i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetHeadSize (size);
   }
   headSize = size;

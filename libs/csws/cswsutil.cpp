@@ -226,8 +226,9 @@ static bool doRectUnion (int *vector, int count, void *arg)
 void RectUnion (cswsRectVector &rect, csRect &result)
 {
   // Sort rectangles by area so that we can compute much less variants
-  for (int i = 0; i < rect.Length (); i++)
-    for (int j = rect.Length () - 1; j > i; j--)
+  int i, j;
+  for (i = 0; i < rect.Length (); i++)
+    for (j = rect.Length () - 1; j > i; j--)
       if (((csRect *)rect [i])->Area () < ((csRect *)rect [j])->Area ())
       {
         csRect *tmp = (csRect *)rect [i];

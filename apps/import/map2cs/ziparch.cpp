@@ -44,7 +44,8 @@ CTextureFile* CZipArchive::CreateTexture(const char* texturename)
 
   const char* Extensions[] = {"tga", "jpg", "jpeg", "bmp", "wal", "gif"};
 
-  for (int i=0; i<int(sizeof(Extensions)/sizeof(Extensions[0])); i++)
+  int i;
+  for (i=0; i<int(sizeof(Extensions)/sizeof(Extensions[0])); i++)
   {
     sprintf (texfilename, "%s.%s", texturename, Extensions[i]);
     pTexture = ExtractTexture(texturename, texfilename);
