@@ -31,34 +31,39 @@
 	if you wish them to be deleted as well.)
 */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 
 // global information
-int nr_files = 0;
-struct file_info {
+static int nr_files = 0;
+static struct file_info
+{
   char *name;
   int deleted;
   struct file_info* next;
 } *files = 0;
 
-int nr_dirs = 0;
-struct file_info *dirs = 0;
+static int nr_dirs = 0;
+static struct file_info *dirs = 0;
 
 
-// a strdup (for portability to e.g. NeXT)
-char *mystrdup(char *orig)
+// not all platforms provide strdup(), so roll our own.
+static char *mystrdup(char const *orig)
 {
-  int len = strlen(orig);
+  int len = orig != 0 ? strlen(orig) : 0;
   char *dest = (char*)malloc(len+1);
-  memcpy(dest, orig, len+1); // also copy terminating 0
+  if (orig != 0)
+    memcpy(dest, orig, len);
+  dest[len] = '\0';
   return dest;
 }
 
+
 // extract the notdir part of a pathname, returns a ptr in the same string
-char *notdir(char *str)
+static char const *notdir(char const *str)
 {
   int len = strlen(str);
   int i= len-1;
@@ -69,17 +74,14 @@ char *notdir(char *str)
 
 
 // get directory part of a pathname (assumes absolute pathnames)
-void getdirpart(char *dest, char *src)
+static void getdirpart(char *dest, char const *src)
 {
-  char *cp = src;
+  char const *cp = src;
   int i=0;
-  //int len = strlen(src);
-  char *ndir = notdir(src);
+  char const *ndir = notdir(src);
 
   while(cp < ndir)
-  {
     dest[i++] = *(cp++);
-  }
   dest[i] = 0;
   // remove trailing / \ or :
   if(i>0) dest[i-1] = 0;
@@ -87,9 +89,9 @@ void getdirpart(char *dest, char *src)
 
 
 // returns true if a file name exists in the list
-int file_exists(struct file_info *start, char *checkname)
+static int file_exists(struct file_info const *start, char const *checkname)
 {
-  struct file_info* fp= start;
+  struct file_info const* fp= start;
   while(fp)
   {
     if(strcmp(fp->name, checkname)==0)
@@ -101,15 +103,16 @@ int file_exists(struct file_info *start, char *checkname)
 
 
 // read all files from install.log, removing duplicates
-void readallfiles(FILE *in)
+static void readallfiles(FILE *in)
 {
   nr_files = 0;
   files = 0;
-  char buf[500];
+  char buf[2048];
   struct file_info *newfile = 0;
 
-  while( fscanf(in, " %499s", buf) == 1)
+  while( fscanf(in, " %2047s", buf) == 1)
   {
+    buf[sizeof(buf)-1] = '\0';
     // duplicate ?
     if(file_exists(files, buf)) continue;
     // add
@@ -125,13 +128,13 @@ void readallfiles(FILE *in)
 
 
 // get dirs from file list
-void getdirs(void)
+static void getdirs()
 {
   nr_dirs = 0;
   dirs = 0;
   struct file_info *fp = files;
   struct file_info *newdir=0;
-  char buf[500];
+  char buf[2048];
 
   while(fp)
   {
@@ -159,7 +162,7 @@ void getdirs(void)
 
 
 /// delete all files.
-void delete_files()
+static void delete_files()
 {
   struct file_info *fp = files;
 
@@ -175,7 +178,7 @@ void delete_files()
 
 
 /// returns true if a dir could be deleted
-int try_delete_dirs()
+static int try_delete_dirs()
 {
   struct file_info *dp = dirs;
   int succeed = 0;
@@ -187,7 +190,7 @@ int try_delete_dirs()
     ///        use   int remove(char*) from stdio.
     /// both return -1 on failure, 0 on success.
     /// (and for both the directory must be empty on Linux)
-    if( remove(dp->name) == 0 )
+    if(remove(dp->name) == 0)
     {
       dp->deleted = 1;
       succeed = 1;
@@ -200,7 +203,7 @@ int try_delete_dirs()
 
 
 /// delete only empty directories, but try deleting subdirs first.
-void delete_dirs()
+static void delete_dirs()
 {
   /// try deleting all dirs until no dir can be deleted any more...
   while(try_delete_dirs())
@@ -209,7 +212,7 @@ void delete_dirs()
 
 
 /// clean up memory
-void destruct()
+static void destruct()
 {
   struct file_info *fp = files;
   struct file_info *nextfp;
@@ -256,8 +259,9 @@ void destruct()
 
 int main(int argc, char *argv[])
 {
-  char *install_log;
+  char const *install_log;
   char *notdir_inst;
+  char *p;
   FILE *in;
 
   if( argc < 1 || argc > 2 )
@@ -266,17 +270,21 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  // default to current dir. (i.e. double click ?!)
+  // default to current dir.
   if(argc == 2)
     install_log = argv[1];
   else install_log = "install.log";
   /// get the notdir part.
-  notdir_inst = notdir(install_log);
+  notdir_inst = mystrdup(notdir(install_log));
+  for (p = notdir_inst; *p != '\0'; p++) // be Windows-friendly
+    *p = tolower(*p);
   if(strcmp(notdir_inst, "install.log") != 0)
   {
+    free(notdir_inst);
     printf("This program will only uninstall from a file 'install.log'.\n");
     exit(1);
   }
+  free(notdir_inst);
 
   /// read all from install.log
   in=fopen(install_log, "r");
@@ -300,4 +308,3 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-
