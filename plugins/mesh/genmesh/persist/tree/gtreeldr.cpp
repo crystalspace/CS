@@ -199,11 +199,11 @@ csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
   delete co_shrinktrunk;
   delete co_tip;
   delete co_branch;
+  delete co_smallbranch;
 }
 
-void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionObject* co,
-	float bot_radius, float top_radius, float height,
-	csConstructionRule* rule)
+void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionGeometry* co,
+	float bot_radius, float top_radius, float height)
 {
   int j;
   csVector3 vertices[200];
@@ -252,13 +252,12 @@ void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionObject* co,
   vtidx[j++] = 9;
   vtidx[j++] = 10;
   vtidx[j++] = 11;
-  csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform, rule);
+  csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform);
   co->AddConnector (ocon);
 }
 
-void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionObject* co,
-	float bot_radius, float top_radius, float height,
-	csConstructionRule* rule1, csConstructionRule* rule2)
+void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
+	float bot_radius, float top_radius, float height)
 {
   int j;
   csVector3 vertices[200];
@@ -352,7 +351,7 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionObject* co,
   vtidx[j++] = 9;
   vtidx[j++] = 10;
   vtidx[j++] = 11;
-  csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform, rule1);
+  csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform);
   co->AddConnector (ocon);
 
   m.Set (.5, 0, 0, 0, .5, 0, 0, 0, .5);
@@ -368,7 +367,123 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionObject* co,
   vtidx[j++] = 21;
   vtidx[j++] = 22;
   vtidx[j++] = 23;
-  ocon = new csOutputConnector (j, vtidx, transform, rule2);
+  ocon = new csOutputConnector (j, vtidx, transform);
+  co->AddConnector (ocon);
+}
+
+void csGeneralTreeFactoryLoader::GenerateSmallBranch (
+	csConstructionGeometry* co,
+	float bot_radius, float top_radius, float height)
+{
+  int j;
+  csVector3 vertices[200];
+  csTriangle tri[200];
+  csReversibleTransform transform;
+  csMatrix3 m;
+  csVector3 v;
+  int vtidx[100];
+
+  j = 0;
+  vertices[j++].Set (-.1*bot_radius, 0, 0*bot_radius);
+  vertices[j++].Set (-.03*bot_radius, 0, .07*bot_radius);
+  vertices[j++].Set (.03*bot_radius, 0, .07*bot_radius);
+  vertices[j++].Set (.1*bot_radius, 0, 0*bot_radius);
+  vertices[j++].Set (.03*bot_radius, 0, -.07*bot_radius);
+  vertices[j++].Set (-.03*bot_radius, 0, -.07*bot_radius);
+  vertices[j++].Set (-.1*top_radius, height, 0*top_radius);
+  vertices[j++].Set (-.03*top_radius, height, .07*top_radius);
+  vertices[j++].Set (.03*top_radius, height, .07*top_radius);
+  vertices[j++].Set (.1*top_radius, height, 0*top_radius);
+  vertices[j++].Set (.03*top_radius, height, -.07*top_radius);
+  vertices[j++].Set (-.03*top_radius, height, -.07*top_radius);
+
+  // Vertices for the connection to the side branch.
+  vertices[j++].Set (-.1, height*.4, 0);
+  vertices[j++].Set (-.085, height*.48, .015);
+  vertices[j++].Set (-.085, height*.52, .015);
+  vertices[j++].Set (-.1, height*.6, 0);
+  vertices[j++].Set (-.085, height*.52, -.015);
+  vertices[j++].Set (-.085, height*.48, -.015);
+
+  // Vertices for the top of the side branch.
+  vertices[j++].Set (-.19, height*.52, 0);
+  vertices[j++].Set (-.175, height*.535, .015);
+  vertices[j++].Set (-.155, height*.555, .015);
+  vertices[j++].Set (-.14, height*.57, 0);
+  vertices[j++].Set (-.155, height*.555, -.015);
+  vertices[j++].Set (-.175, height*.535, -.015);
+
+  co->SetVertices (j, 6, vertices);
+  j = 0;
+  //tri[j].a = 0; tri[j].b = 1; tri[j].c = 7; j++;
+  //tri[j].a = 7; tri[j].b = 6; tri[j].c = 0; j++;
+  tri[j].a = 1; tri[j].b = 2; tri[j].c = 8; j++;
+  tri[j].a = 8; tri[j].b = 7; tri[j].c = 1; j++;
+  tri[j].a = 2; tri[j].b = 3; tri[j].c = 9; j++;
+  tri[j].a = 9; tri[j].b = 8; tri[j].c = 2; j++;
+  tri[j].a = 3; tri[j].b = 4; tri[j].c = 10; j++;
+  tri[j].a = 10; tri[j].b = 9; tri[j].c = 3; j++;
+  tri[j].a = 4; tri[j].b = 5; tri[j].c = 11; j++;
+  tri[j].a = 11; tri[j].b = 10; tri[j].c = 4; j++;
+  //tri[j].a = 5; tri[j].b = 0; tri[j].c = 6; j++;
+  //tri[j].a = 6; tri[j].b = 11; tri[j].c = 5; j++;
+
+  // Triangles for the connection of the main branch to side branch.
+  tri[j].a = 14; tri[j].b = 7; tri[j].c = 6; j++;
+  tri[j].a = 15; tri[j].b = 14; tri[j].c = 6; j++;
+  tri[j].a = 1; tri[j].b = 7; tri[j].c = 14; j++;
+  tri[j].a = 13; tri[j].b = 1; tri[j].c = 14; j++;
+  tri[j].a = 12; tri[j].b = 1; tri[j].c = 13; j++;
+  tri[j].a = 0; tri[j].b = 1; tri[j].c = 12; j++;
+  tri[j].a = 5; tri[j].b = 0; tri[j].c = 12; j++;
+  tri[j].a = 5; tri[j].b = 12; tri[j].c = 17; j++;
+  tri[j].a = 5; tri[j].b = 17; tri[j].c = 16; j++;
+  tri[j].a = 5; tri[j].b = 16; tri[j].c = 11; j++;
+  tri[j].a = 16; tri[j].b = 15; tri[j].c = 6; j++;
+  tri[j].a = 16; tri[j].b = 6; tri[j].c = 11; j++;
+
+  // Side branch triangles.
+  tri[j].a = 12; tri[j].b = 18; tri[j].c = 23; j++;
+  tri[j].a = 12; tri[j].b = 23; tri[j].c = 17; j++;
+  tri[j].a = 17; tri[j].b = 23; tri[j].c = 22; j++;
+  tri[j].a = 17; tri[j].b = 22; tri[j].c = 16; j++;
+  tri[j].a = 16; tri[j].b = 22; tri[j].c = 21; j++;
+  tri[j].a = 16; tri[j].b = 21; tri[j].c = 15; j++;
+  tri[j].a = 15; tri[j].b = 21; tri[j].c = 20; j++;
+  tri[j].a = 15; tri[j].b = 20; tri[j].c = 14; j++;
+  tri[j].a = 14; tri[j].b = 20; tri[j].c = 19; j++;
+  tri[j].a = 14; tri[j].b = 19; tri[j].c = 13; j++;
+  tri[j].a = 13; tri[j].b = 19; tri[j].c = 18; j++;
+  tri[j].a = 13; tri[j].b = 18; tri[j].c = 12; j++;
+  co->SetTriangles (j, tri);
+
+  transform.SetO2TTranslation (csVector3 (0, -height, 0));
+  m.Identity ();
+  transform.SetO2T (m);
+  j = 0;
+  vtidx[j++] = 6;
+  vtidx[j++] = 7;
+  vtidx[j++] = 8;
+  vtidx[j++] = 9;
+  vtidx[j++] = 10;
+  vtidx[j++] = 11;
+  csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform);
+  co->AddConnector (ocon);
+
+  m.Set (.3, 0, 0, 0, .3, 0, 0, 0, .3);
+  m *= csZRotMatrix3 (.7);
+  v = m.GetInverse () * csVector3 (.165, -.545*height, 0);
+  transform.SetO2TTranslation (v);
+  transform.SetO2T (m);
+
+  j = 0;
+  vtidx[j++] = 18;
+  vtidx[j++] = 19;
+  vtidx[j++] = 20;
+  vtidx[j++] = 21;
+  vtidx[j++] = 22;
+  vtidx[j++] = 23;
+  ocon = new csOutputConnector (j, vtidx, transform);
   co->AddConnector (ocon);
 }
 
@@ -382,22 +497,29 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csTriangle tri[100];
   int j;
 
-  co_straighttrunk = new csConstructionObject ();
-  co_shrinktrunk = new csConstructionObject ();
-  co_tip = new csConstructionObject ();
-  co_branch = new csConstructionObject ();
+  cg_straighttrunk = new csConstructionGeometry ();
+  cg_shrinktrunk = new csConstructionGeometry ();
+  cg_tip = new csConstructionGeometry ();
+  cg_branch = new csConstructionGeometry ();
+  cg_smallbranch = new csConstructionGeometry ();
+
+  co_straighttrunk = new csConstructionObject (cg_straighttrunk);
+  co_shrinktrunk = new csConstructionObject (cg_shrinktrunk);
+  co_tip = new csConstructionObject (cg_tip);
+  co_branch = new csConstructionObject (cg_branch);
+  co_smallbranch = new csConstructionObject (cg_smallbranch);
 
   //---------
   // A straight trunk.
   //---------
-  GenerateTrunk (co_straighttrunk, 1, 1, .5, 
-    new csStraightRule (co_branch));
+  GenerateTrunk (cg_straighttrunk, 1, 1, .5);
+  co_straighttrunk->AddRule (new csStraightRule (co_branch));
 
   //---------
   // A trunk that shrinks at the top.
   //---------
-  GenerateTrunk (co_shrinktrunk, 1, .8, .5, 
-    new csStraightRule (co_branch));
+  GenerateTrunk (cg_shrinktrunk, 1, .8, .5);
+  co_shrinktrunk->AddRule (new csStraightRule (co_branch));
 
   //---------
   // A tip with no output connectors.
@@ -410,7 +532,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   vertices[j++].Set (.03, 0, -.07);
   vertices[j++].Set (-.03, 0, -.07);
   vertices[j++].Set (0, .5, 0);
-  co_tip->SetVertices (j, 6, vertices);
+  cg_tip->SetVertices (j, 6, vertices);
   j = 0;
   tri[j].a = 0; tri[j].b = 1; tri[j].c = 6; j++;
   tri[j].a = 1; tri[j].b = 2; tri[j].c = 6; j++;
@@ -418,14 +540,19 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   tri[j].a = 3; tri[j].b = 4; tri[j].c = 6; j++;
   tri[j].a = 4; tri[j].b = 5; tri[j].c = 6; j++;
   tri[j].a = 5; tri[j].b = 0; tri[j].c = 6; j++;
-  co_tip->SetTriangles (j, tri);
+  cg_tip->SetTriangles (j, tri);
 
   //---------
   // A branch.
   //---------
-  GenerateBranch (co_branch, 1, 1, .5,
-    new csRandomRule (co_branch, co_shrinktrunk, co_tip),
-    new csRandomRule (co_branch, co_shrinktrunk, co_tip));
+  GenerateBranch (cg_branch, 1, 1, .5);
+  co_branch->AddRule (new csRandomRule (co_branch, co_shrinktrunk, co_tip));
+  co_branch->AddRule (new csRandomRule (co_branch, co_shrinktrunk, co_tip));
+  GenerateSmallBranch (cg_smallbranch, 1, 1, .3);
+  co_smallbranch->AddRule (new csRandomRule (co_branch,
+  	co_shrinktrunk, co_tip));
+  co_smallbranch->AddRule (new csRandomRule (co_branch,
+  	co_shrinktrunk, co_tip));
 
   return true;
 }
@@ -517,7 +644,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
 
 //----------------------------------------------------------------------------
 
-csConstructionObject::csConstructionObject ()
+csConstructionGeometry::csConstructionGeometry ()
 {
   num_input_points = 0;
   num_vertices = 0;
@@ -526,12 +653,6 @@ csConstructionObject::csConstructionObject ()
   triangles = NULL;
   num_output_connectors = 0;
   output_connectors = NULL;
-}
-
-csConstructionObject::~csConstructionObject ()
-{
-  delete[] vertices;
-  delete[] triangles;
   int i;
   for (i = 0 ; i < num_output_connectors ; i++)
   {
@@ -540,7 +661,13 @@ csConstructionObject::~csConstructionObject ()
   delete[] output_connectors;
 }
 
-void csConstructionObject::SetVertices (
+csConstructionGeometry::~csConstructionGeometry ()
+{
+  delete[] vertices;
+  delete[] triangles;
+}
+
+void csConstructionGeometry::SetVertices (
   int inum_vertices, int inum_input_points, csVector3* ivertices)
 {
   delete[] vertices;
@@ -550,7 +677,7 @@ void csConstructionObject::SetVertices (
   memcpy (vertices, ivertices, num_vertices * sizeof (csVector3));
 }
 
-void csConstructionObject::SetTriangles (
+void csConstructionGeometry::SetTriangles (
   int inum_triangles, csTriangle* itriangles)
 {
   delete[] triangles;
@@ -559,7 +686,7 @@ void csConstructionObject::SetTriangles (
   memcpy (triangles, itriangles, num_triangles * sizeof (csTriangle));
 }
 
-void csConstructionObject::AddConnector (csOutputConnector* con)
+void csConstructionGeometry::AddConnector (csOutputConnector* con)
 {
   if (num_output_connectors == 0)
   {
@@ -582,14 +709,48 @@ void csConstructionObject::AddConnector (csOutputConnector* con)
 
 //----------------------------------------------------------------------------
 
+csConstructionObject::csConstructionObject (csConstructionGeometry* igeometry)
+{
+  geometry = igeometry;
+  num_rules = 0;
+  rules = NULL;
+}
+
+csConstructionObject::~csConstructionObject ()
+{
+  int i;
+  for (i = 0 ; i < num_rules ; i++)
+  {
+    csConstructionRule* rule = rules[i];
+    delete rule;
+  }
+  delete[] rules;
+}
+
+void csConstructionObject::AddRule (csConstructionRule* rule)
+{
+  csConstructionRule** new_rules = new csConstructionRule*[num_rules+1];
+  if (rules)
+  {
+    memcpy (new_rules, rules, sizeof (csConstructionRule*)*num_rules);
+    delete[] rules;
+  }
+  rules = new_rules;
+  rules[num_rules++] = rule;
+}
+
+//----------------------------------------------------------------------------
+
 int csConstruction::AddVertex (const csVector3& v)
 {
   if (num_vertices >= max_vertices)
   {
     csVector3* new_vertices = new csVector3 [max_vertices+40];
     if (num_vertices > 0)
+    {
       memcpy (new_vertices, vertices, num_vertices * sizeof (csVector3));
-    delete[] vertices;
+      delete[] vertices;
+    }
     vertices = new_vertices;
     max_vertices += 40;
   }
@@ -603,8 +764,10 @@ csTriangle& csConstruction::AddTriangle ()
   {
     csTriangle* new_triangles = new csTriangle [max_triangles+30];
     if (num_triangles > 0)
+    {
       memcpy (new_triangles, triangles, num_triangles * sizeof (csTriangle));
-    delete[] triangles;
+      delete[] triangles;
+    }
     triangles = new_triangles;
     max_triangles += 30;
   }
@@ -641,15 +804,16 @@ bool csConstruction::AddConstructionObject (int depth,
   	csConstructionObject* con)
 {
   int i;
+  csConstructionGeometry* geom = con->GetGeometry ();
 
-  if (con->GetInputPointCount () != num_connection_points)
+  if (geom->GetInputPointCount () != num_connection_points)
     return false;
 
   int offset = num_vertices-num_connection_points;
 
   // Map point on construction object to output point here.
-  int* mapping = new int[con->GetVertexCount ()];
-  for (i = 0 ; i < con->GetVertexCount () ; i++)
+  int* mapping = new int[geom->GetVertexCount ()];
+  for (i = 0 ; i < geom->GetVertexCount () ; i++)
   {
     if (i < num_connection_points)
       mapping[i] = connection_points[
@@ -673,15 +837,15 @@ bool csConstruction::AddConstructionObject (int depth,
   }
 
   // Add all vertices except for the initial connection points.
-  for (i = num_connection_points ; i < con->GetVertexCount () ; i++)
+  for (i = num_connection_points ; i < geom->GetVertexCount () ; i++)
   {
-    AddVertex (new_g2o->Other2This (con->GetVertices ()[i]));
+    AddVertex (new_g2o->Other2This (geom->GetVertices ()[i]));
   }
 
   // Add all triangles.
-  for (i = 0 ; i < con->GetTriangleCount () ; i++)
+  for (i = 0 ; i < geom->GetTriangleCount () ; i++)
   {
-    const csTriangle& ot = con->GetTriangles ()[i];
+    const csTriangle& ot = geom->GetTriangles ()[i];
     csTriangle& nt = AddTriangle ();
     nt.a = mapping[ot.a];
     nt.b = mapping[ot.b];
@@ -689,10 +853,10 @@ bool csConstruction::AddConstructionObject (int depth,
   }
 
   // Check all output connectors and apply the rules.
-  for (i = 0 ; i < con->GetOutputConnectorCount () ; i++)
+  for (i = 0 ; i < geom->GetOutputConnectorCount () ; i++)
   {
-    csOutputConnector* ocon = con->GetOutputConnector (i);
-    csConstructionRule* rule = ocon->GetRule ();
+    csOutputConnector* ocon = geom->GetOutputConnector (i);
+    csConstructionRule* rule = con->GetRule (i);
     csConstructionObject* new_con = rule->GetConstructionObject (depth);
     int* new_points = new int[ocon->GetPointCount ()];
     int j;

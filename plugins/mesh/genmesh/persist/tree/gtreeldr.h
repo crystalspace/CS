@@ -33,6 +33,7 @@ struct iSyntaxService;
 struct csTriangle;
 class csVector3;
 
+class csConstructionGeometry;
 class csConstructionObject;
 class csConstructionRule;
 
@@ -46,17 +47,24 @@ private:
   iObjectRegistry* object_reg;
   iReporter* reporter;
 
+  csConstructionGeometry* cg_straighttrunk;
+  csConstructionGeometry* cg_shrinktrunk;
+  csConstructionGeometry* cg_tip;
+  csConstructionGeometry* cg_branch;
+  csConstructionGeometry* cg_smallbranch;
+
   csConstructionObject* co_straighttrunk;
   csConstructionObject* co_shrinktrunk;
   csConstructionObject* co_tip;
   csConstructionObject* co_branch;
+  csConstructionObject* co_smallbranch;
 
-  void GenerateTrunk (csConstructionObject* co,
-	float bot_radius, float top_radius, float height,
-	csConstructionRule* rule);
-  void GenerateBranch (csConstructionObject* co,
-	float bot_radius, float top_radius, float height,
-	csConstructionRule* rule1, csConstructionRule* rule2);
+  void GenerateTrunk (csConstructionGeometry* co,
+	float bot_radius, float top_radius, float height);
+  void GenerateBranch (csConstructionGeometry* co,
+	float bot_radius, float top_radius, float height);
+  void GenerateSmallBranch (csConstructionGeometry* co,
+	float bot_radius, float top_radius, float height);
 
 public:
   SCF_DECLARE_IBASE;
@@ -118,42 +126,29 @@ private:
   // the input ground space).
   csReversibleTransform transform;
 
-  // A rule for this output connector.
-  // This class will take ownership of the rule and delete it when
-  // the construction object is deleted.
-  csConstructionRule* rule;
-
 public:
   csOutputConnector (int num_points, int* vtidx,
-  	const csReversibleTransform& transform, csConstructionRule* rule)
+  	const csReversibleTransform& transform)
   {
     csOutputConnector::num_points = num_points;
     csOutputConnector::vtidx = new int [num_points];
     memcpy (csOutputConnector::vtidx, vtidx, num_points*sizeof (int));
     csOutputConnector::transform = transform;
-    csOutputConnector::rule = rule;
   }
   ~csOutputConnector ()
   {
     delete[] vtidx;
-    delete rule;
   }
 
   int GetPointCount () const { return num_points; }
   int* GetPoints () const { return vtidx; }
   const csReversibleTransform& GetTransform () const { return transform; }
-  csConstructionRule* GetRule () const { return rule; }
 };
 
 /**
- * A construction object. This object has one input connector with which
- * it can be connected to the output of a previous construction object, and
- * zero or more output connectors on which other objects can be placed.
- * The input connector will be fitted on a previous output connector
- * by placing it on the current ground-plane. An output connector will
- * result in a new ground-plane (by transformation).
+ * The geometry for a construction object.
  */
-class csConstructionObject
+class csConstructionGeometry
 {
 private:
   int num_input_points;
@@ -165,8 +160,8 @@ private:
   csOutputConnector** output_connectors;
 
 public:
-  csConstructionObject ();
-  ~csConstructionObject ();
+  csConstructionGeometry ();
+  ~csConstructionGeometry ();
 
   /**
    * Set vertex array. These vertices are given relative to the input
@@ -181,12 +176,6 @@ public:
   void SetTriangles (int num_triangles, csTriangle* triangles);
 
   /**
-   * Add an output connector. This class will take ownership of the
-   * connector.
-   */
-  void AddConnector (csOutputConnector* con);
-
-  /**
    * Get the number of input points. The first vertices of this
    * object correspond with these input points.
    */
@@ -196,23 +185,7 @@ public:
   }
 
   /**
-   * Get the number of output connectors.
-   */
-  int GetOutputConnectorCount () const
-  {
-    return num_output_connectors;
-  }
-
-  /**
-   * Get the description for one output connector.
-   */
-  csOutputConnector* GetOutputConnector (int i) const
-  {
-    return output_connectors[i];
-  }
-
-  /**
-   * Get the number of vertices in this construction object (including
+   * Get the number of vertices in this construction geometry (including
    * the input points at the beginning and output points somewhere in
    * the object).
    */
@@ -244,6 +217,69 @@ public:
   {
     return triangles;
   }
+
+  /**
+   * Add an output connector. This class will take ownership of the
+   * connector.
+   */
+  void AddConnector (csOutputConnector* con);
+
+  /**
+   * Get the number of output connectors.
+   */
+  int GetOutputConnectorCount () const
+  {
+    return num_output_connectors;
+  }
+
+  /**
+   * Get the description for one output connector.
+   */
+  csOutputConnector* GetOutputConnector (int i) const
+  {
+    return output_connectors[i];
+  }
+};
+
+/**
+ * A construction object. This object has one input connector with which
+ * it can be connected to the output of a previous construction object, and
+ * zero or more output connectors on which other objects can be placed.
+ * The input connector will be fitted on a previous output connector
+ * by placing it on the current ground-plane. An output connector will
+ * result in a new ground-plane (by transformation).
+ */
+class csConstructionObject
+{
+private:
+  csConstructionGeometry* geometry;
+  int num_rules;
+  csConstructionRule** rules;
+
+public:
+  csConstructionObject (csConstructionGeometry* geometry);
+  ~csConstructionObject ();
+
+  /**
+   * Get the construction geometry.
+   */
+  csConstructionGeometry* GetGeometry () { return geometry; }
+
+  /**
+   * Add a rule. This class will take ownership of the rule and
+   * delete it at destruction time.
+   */
+  void AddRule (csConstructionRule* rule);
+
+  /**
+   * Get the number of rules.
+   */
+  int GetRuleCount () const { return num_rules; }
+
+  /**
+   * Get a rule.
+   */
+  csConstructionRule* GetRule (int idx) const { return rules[idx]; }
 };
 
 /**

@@ -1,8 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 28-Jan-2002
+	- Seperated geometry and rule in the tree generator. This will make
+	  it easier to setup better rules.
 	- Matze changed annotation to include a link to the page in the e-mail
-	  and mangles e-mail adress
+	  and mangles e-mail adress.
 26-Jan-2002
 	- Matze fixed skybox generation in map2cs
 	- Added missing initialization of do_manual_colors to genmesh
