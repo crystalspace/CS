@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in iObjectRegistry::Register() where it would accidently
 	  increase the ref count on the object with a given tag if that tag
 	  was already defined.
+	- Matrices and Vectors now parse nicely with the new XML parser.
+	  The syntax loader unit test now succeeds.
 	- Eric Sunshine fixed the cslexan makefile, which was recently broken,
 	  so that it once again produces a plugin.
 8-Aug-2002

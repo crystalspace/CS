@@ -1594,16 +1594,18 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   xml.Take (new csTinyXmlSystem ());
   csRef<iXmlDocument> doc = xml->CreateDocument ();
   const char* error = doc->ParseXML ("\
-    <v x=1 y=2 z=3>\
-    <matrix>\
-      <scale>3</scale>\
-    </matrix>\
+    <root>\
+      <v x=1 y=2 z=3/>\
+      <matrix>\
+        <scale>3</scale>\
+	<m13>1.5</m13>\
+      </matrix>\
+    </root>\
   ");
   SYN_ASSERT (error == NULL, error);
 
-  csRef<iXmlNodeIterator> it = doc->GetRoot ()->GetNodes ("v");
-  SYN_ASSERT (it != NULL, "it");
-  csRef<iXmlNode> vector_node = it->Next ();
+  csRef<iXmlNode> root = doc->GetRoot ()->GetNode ("root");
+  csRef<iXmlNode> vector_node = root->GetNode ("v");
   SYN_ASSERT (vector_node != NULL, "vector_node");
 
   csVector3 v;
@@ -1612,17 +1614,14 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (v.y == 2, "y");
   SYN_ASSERT (v.z == 3, "z");
 
-  //it = doc->GetRoot ()->GetNodes ("matrix");
-  //SYN_ASSERT (it != NULL, "it");
-  //csRef<iXmlNode> matrix_node = it->Next ();
-  csRef<iXmlNode> matrix_node = doc->GetRoot ()->GetNode ("matrix");
+  csRef<iXmlNode> matrix_node = root->GetNode ("matrix");
   SYN_ASSERT (matrix_node != NULL, "matrix_node");
 
   csMatrix3 m;
   ParseMatrix (matrix_node, m);
   SYN_ASSERT (m.m11 == 3, "m");
   SYN_ASSERT (m.m12 == 0, "m");
-  SYN_ASSERT (m.m13 == 0, "m");
+  SYN_ASSERT (m.m13 == 1.5, "m");
   SYN_ASSERT (m.m21 == 0, "m");
   SYN_ASSERT (m.m22 == 3, "m");
   SYN_ASSERT (m.m23 == 0, "m");

@@ -153,6 +153,7 @@ csTinyXmlNode::~csTinyXmlNode ()
 csRef<iXmlNode> csTinyXmlNode::GetParent ()
 {
   csRef<iXmlNode> child;
+  if (!node->Parent ()) return child;
   child.Take (new csTinyXmlNode (node->Parent ()));
   return child;
 }
@@ -197,7 +198,9 @@ csRef<iXmlNodeIterator> csTinyXmlNode::GetNodes (const char* type)
 csRef<iXmlNode> csTinyXmlNode::GetNode (const char* type)
 {
   csRef<iXmlNode> child;
-  child.Take (new csTinyXmlNode (node->FirstChild (type)));
+  TiXmlNode* c = node->FirstChild (type);
+  if (!c) return child;
+  child.Take (new csTinyXmlNode (c));
   return child;
 }
 
