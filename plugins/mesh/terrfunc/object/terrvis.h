@@ -97,7 +97,7 @@ public:
   void InitHorizon(float *horizon, int horsize);
 
   /// Return true if this node is a leaf.
-  bool IsLeaf () { return children[0] == NULL; }
+  bool IsLeaf () { return children[0] == 0; }
 
   /// Get a child.
   csTerrainQuad* GetChild (int idx)

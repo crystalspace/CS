@@ -30,8 +30,8 @@ const int awsPanel::fsToolbar = awsPanel::fsFlat;
 awsPanel::awsPanel() :
   style(fsFlat),
   todraw_dirty(false),
-  bkg(NULL),
-  ovl(NULL),
+  bkg(0),
+  ovl(0),
   bkg_alpha(128),
   ovl_alpha(0)
 { }
@@ -53,7 +53,7 @@ bool awsPanel::Setup(iAws *_wmgr, iAwsComponentNode *settings)
 	bkg = pm->GetTexture ("Texture");
 
 
-    iString *tn1 = NULL, *tn2 = NULL;
+    iString *tn1 = 0, *tn2 = 0;
 
     pm->GetString (settings, "BitmapBackground", tn1);
     pm->GetString (settings, "BitmapOverlay", tn2);

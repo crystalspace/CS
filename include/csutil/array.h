@@ -115,7 +115,7 @@ public:
     destination.count = count;
     destination.capacity = capacity;
     destination.threshold = threshold;
-    root = NULL;
+    root = 0;
     capacity = count = 0;
   }
 

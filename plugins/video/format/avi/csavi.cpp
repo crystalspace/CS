@@ -98,15 +98,15 @@ bool csAVIFormat::Initialize (iObjectRegistry *object_reg)
   datalen = 0;
 
   csAVIFormat::object_reg = object_reg;
-  pFile = NULL;
-  pData = NULL;
-  pChunkList = NULL;
+  pFile = 0;
+  pData = 0;
+  pChunkList = 0;
 
   maxframe = 0; // max. frame visited to date
-  maxframepos = NULL;
-  pmovi = NULL; // right before movi LIST
-  moviendpos = NULL; // right behind last LIST within movi LIST
-  startframepos = NULL; // right before 1st LIST within movi LIST
+  maxframepos = 0;
+  pmovi = 0; // right before movi LIST
+  moviendpos = 0; // right behind last LIST within movi LIST
+  startframepos = 0; // right before 1st LIST within movi LIST
   no_recl = false;
 
   return true;
@@ -126,9 +126,9 @@ bool csAVIFormat::Load (iFile *pVideoData)
       delete [] pData;
     if (pChunkList)
       delete pChunkList;
-    pChunkList = NULL;
-    pData = NULL;
-    pFile = NULL;
+    pChunkList = 0;
+    pData = 0;
+    pFile = 0;
   }
 
   (pFile = pVideoData)->IncRef ();
@@ -287,8 +287,8 @@ void csAVIFormat::Unload ()
     ((iStream*)vStream.Get (i))->DecRef ();
   vStream.DeleteAll ();
 
-  pAudio = NULL;
-  pVideo = NULL;
+  pAudio = 0;
+  pVideo = 0;
   nAudio = 0;
   nVideo = 0;
 }
@@ -315,8 +315,8 @@ bool csAVIFormat::ValidateStreams ()
 uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
 {
   uint32 n=0;
-  uint8 *pCID=NULL;
-  char *pName = NULL;
+  uint8 *pCID=0;
+  char *pName = 0;
   uint32 nCIDLen = 0;
   uint8 *pFormatEx;
   uint32 nFormatEx;
@@ -477,7 +477,7 @@ bool csAVIFormat::HasChunk (uint32 id, uint32 frameindex)
 
 bool csAVIFormat::GetChunk (uint32 frameindex, AVIDataChunk *pChunk)
 {
-  char *pp = NULL;
+  char *pp = 0;
   uint32 maxsize=0, n=0;
 
   if (HasChunk (*(uint32*)pChunk->id, frameindex))
@@ -610,7 +610,7 @@ iStream* csAVIFormat::streamiterator::GetNext ()
 {
   if (HasNext ())
     return (iStream*)pAVI->vStream.Get (pos++);
-   return NULL;
+   return 0;
 }
 
 

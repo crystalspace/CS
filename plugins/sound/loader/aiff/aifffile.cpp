@@ -87,8 +87,8 @@ csSoundLoader_AIFF::LoadSound(void* databuf, uint32 size)
 {
   uint8 *buf = (uint8*) databuf;
   unsigned long index=0;
-  csSoundDataRaw *sb= NULL;
-  char *data=NULL;
+  csSoundDataRaw *sb= 0;
+  char *data=0;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
   unsigned long flag = 0, flag2 = 0, nchannels = 0, length_form,
@@ -167,7 +167,7 @@ csSoundLoader_AIFF::LoadSound(void* databuf, uint32 size)
           goto exit_read;
 
         data = new char[chunk_size];
-        if(data==NULL) goto exit_read;
+        if(data==0) goto exit_read;
         char *ptr=(char *)data;
 
         while(i<chunk_size)
@@ -186,7 +186,7 @@ csSoundLoader_AIFF::LoadSound(void* databuf, uint32 size)
           goto exit_read;
 
         data= new char[chunk_size];
-        if(data==NULL) goto exit_read;
+        if(data==0) goto exit_read;
         unsigned short *ptr=(unsigned short *)data;
 
         int nbs = chunk_size/2;
@@ -206,13 +206,13 @@ csSoundLoader_AIFF::LoadSound(void* databuf, uint32 size)
     }
   }
 
-  if(data==NULL) goto exit_read;
+  if(data==0) goto exit_read;
 
   csSoundFormat Format;
   Format.Freq=(flag2==HZ11025)?11025:(flag2==HZ22050)?22050:44100;
   Format.Bits=(flag==BIT16)?16:8;
   Format.Channels=nchannels;
-  sb=new csSoundDataRaw(NULL, data,
+  sb=new csSoundDataRaw(0, data,
     (flag==BIT16)?samples_size/2:samples_size, Format);
 
   goto exit_ok;

@@ -113,13 +113,13 @@ void Md2::Clear()
 {
   nbskins = 0;
   skinheight = skinwidth = 0;
-  skins = NULL;
+  skins = 0;
   nbframes = 0;
-  frames = NULL;
+  frames = 0;
   nbtriangles = 0;
-  triangles = NULL;
+  triangles = 0;
   nbvertices = 0;
-  vertices = NULL;
+  vertices = 0;
   skinheight = skinwidth = 0;
 }
 
@@ -130,10 +130,10 @@ bool Md2::ReadMDLFile(const char* mdlfile)
 
   clearError();
 
-  if (mdlfile == NULL || strlen(mdlfile) == 0)
-    return setError("MD2 filename is NULL");
+  if (mdlfile == 0 || strlen(mdlfile) == 0)
+    return setError("MD2 filename is 0");
 
-  if ((f = fopen(mdlfile, "rb")) == NULL)
+  if ((f = fopen(mdlfile, "rb")) == 0)
     return setError("Cannot find mdl file");
 
   // read mdl header
@@ -288,9 +288,9 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   char *spritefilename;
   int i = 0, j = 0, k = 0;
 
-  if (spritename == NULL || strlen(spritename) == 0)
+  if (spritename == 0 || strlen(spritename) == 0)
   {
-    fprintf(stderr, "Unable to save: NULL sprite name\n");
+    fprintf(stderr, "Unable to save: 0 sprite name\n");
     return false;
   }
 
@@ -308,7 +308,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
       "Warning: no skin named in this model: using `%s' by default\n",
       skinname);
 
-  if ((f = fopen(spritefilename, "w")) == NULL)
+  if ((f = fopen(spritefilename, "w")) == 0)
   {
     fprintf(stderr, "Cannot open sprite file %s for writing\n", spritename);
     return false;

@@ -29,7 +29,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csSystemDriver::csSystemDriver (iObjectRegistry* object_reg)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   csSystemDriver::object_reg = object_reg;
 }

@@ -81,7 +81,7 @@ public:
   /**
    * Traverse the tree and call user supplied function for every node.
    */
-  void Traverse (csRegionTreeFunc userFunc, void* databag = NULL);
+  void Traverse (csRegionTreeFunc userFunc, void* databag = 0);
 
 };
 
@@ -165,7 +165,7 @@ public:
   /// Get the data at given row/column
   void* GetAt (int row, int col)
   {
-    void* result = NULL;
+    void* result = 0;
     int idx1 = rows.FindSortedKey ((const void*)row);
     if (idx1 != -1)
     {

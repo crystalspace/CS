@@ -30,7 +30,7 @@ public:
 
   csMovableListener (csObjectWatcher* watcher)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csMovableListener::watcher = watcher;
   }
   virtual ~csMovableListener () { }
@@ -39,12 +39,12 @@ public:
 
   virtual void MovableChanged (iMovable* movable)
   {
-    watcher->ReportOperation (CS_WATCH_MOVABLE_CHANGED, movable, NULL);
+    watcher->ReportOperation (CS_WATCH_MOVABLE_CHANGED, movable, 0);
   }
 
   virtual void MovableDestroyed (iMovable* movable)
   {
-    watcher->ReportOperation (CS_WATCH_MOVABLE_DESTROY, movable, NULL);
+    watcher->ReportOperation (CS_WATCH_MOVABLE_DESTROY, movable, 0);
     watcher->RemoveMovable (movable);
   }
 };
@@ -60,7 +60,7 @@ public:
 
   csLightCallback (csObjectWatcher* watcher)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csLightCallback::watcher = watcher;
   }
   virtual ~csLightCallback () { }
@@ -69,27 +69,27 @@ public:
 
   virtual void OnColorChange (iLight* light, const csColor& newcolor)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_COLOR, NULL, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_COLOR, 0, light);
   }
 
   virtual void OnPositionChange (iLight* light, const csVector3& newpos)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_MOVE, NULL, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_MOVE, 0, light);
   }
 
   virtual void OnSectorChange (iLight* light, iSector* newsector)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_SECTOR, NULL, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_SECTOR, 0, light);
   }
 
   virtual void OnRadiusChange (iLight* light, float newradius)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_RADIUS, NULL, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_RADIUS, 0, light);
   }
 
   virtual void OnDestroy (iLight* light)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_DESTROY, NULL, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_DESTROY, 0, light);
     watcher->RemoveLight (light);
   }
 };
@@ -106,11 +106,11 @@ SCF_IMPLEMENT_IBASE_END
 
 csObjectWatcher::csObjectWatcher ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   updatenr = 0;
   last_op = CS_WATCH_NONE;
-  last_light = NULL;
-  last_movable = NULL;
+  last_light = 0;
+  last_movable = 0;
   light_callback = new csLightCallback (this);
   movable_listener = new csMovableListener (this);
 }

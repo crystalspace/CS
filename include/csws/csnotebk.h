@@ -69,21 +69,21 @@ enum
   /**
    * Sent to parent component to notify that the notebook is going
    * to leave a page. The parent can abort this process by returning
-   * NULL in Event.Command.Info field.
+   * 0 in Event.Command.Info field.
    * <pre>
    * IN:  (csComponent *)page
-   * OUT: unchanged or NULL
+   * OUT: unchanged or 0
    * </pre>
    */
   cscmdNotebookLeavePage = 0x00000c00,
   /**
    * Notify parent window that a page is going to be selected.
-   * The parent can abort this process by returning NULL in the
+   * The parent can abort this process by returning 0 in the
    * Event.Command.Info field or set the address of another component
    * to be selected instead.
    * <pre>
    * IN:  (csComponent *)page
-   * OUT: (csComponent *)page_to_select or NULL
+   * OUT: (csComponent *)page_to_select or 0
    * </pre>
    */
   cscmdNotebookSelectPage,
@@ -195,14 +195,14 @@ public:
 
   /// Add a primary tab: page info can differ from page title
   bool AddPrimaryTab (csComponent *iComponent, const char *iText,
-    const char *iInfo = NULL, csComponent *iBefore = NULL);
+    const char *iInfo = 0, csComponent *iBefore = 0);
   /// Add a secondary tab (no page title)
   bool AddSecondaryTab (csComponent *iComponent, const char *iInfo,
-    csComponent *iBefore = NULL);
+    csComponent *iBefore = 0);
   /// Same but use a pixmap as tab label rather than a text string
   bool AddPrimaryTab (csComponent *iComponent, csPixmap *iPixmap,
-    bool iDeletePixmap = true, const char *iInfo = NULL,
-    csComponent *iBefore = NULL);
+    bool iDeletePixmap = true, const char *iInfo = 0,
+    csComponent *iBefore = 0);
 
   /// Delete a tab and associated component by index
   bool DeleteTab (int iIndex);

@@ -189,21 +189,21 @@ csGeneralTreeFactoryLoader::csGeneralTreeFactoryLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
-  co_tree = NULL;
-  co_branch1 = NULL;
-  co_branch2 = NULL;
-  co_top = NULL;
-  co_sidebranch = NULL;
-  co_twig = NULL;
-  co_twigside1 = NULL;
-  co_twigside2 = NULL;
+  co_tree = 0;
+  co_branch1 = 0;
+  co_branch2 = 0;
+  co_top = 0;
+  co_sidebranch = 0;
+  co_twig = 0;
+  co_twigside1 = 0;
+  co_twigside2 = 0;
 
-  cg_straighttrunk = NULL;
-  cg_shrinktrunk = NULL;
-  cg_tip = NULL;
-  cg_debug4 = NULL;
-  cg_branch = NULL;
-  cg_smallbranch = NULL;
+  cg_straighttrunk = 0;
+  cg_shrinktrunk = 0;
+  cg_tip = 0;
+  cg_debug4 = 0;
+  cg_branch = 0;
+  cg_smallbranch = 0;
 }
 
 csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
@@ -608,7 +608,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 #if 0
   co_tree = new csConstructionObject (cg_debug4);
-  co_tree->AddRule (new csDepthRule (co_tree, NULL, 3));
+  co_tree->AddRule (new csDepthRule (co_tree, 0, 3));
 #elif 1
   co_tree = new csConstructionObject (cg_straighttrunk);
   co_branch1 = new csConstructionObject (cg_branch);
@@ -617,7 +617,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   co_tree->AddRule (new csStraightRule (co_branch1));
   co_branch1->AddRule (new csStraightRule (co_sidebranch));
   co_branch1->AddRule (new csStraightRule (co_sidebranch));
-  co_sidebranch->AddRule (new csDepthRule (co_sidebranch, NULL, 4));
+  co_sidebranch->AddRule (new csDepthRule (co_sidebranch, 0, 4));
 #else
   co_tree = new csConstructionObject (cg_straighttrunk);
   co_branch1 = new csConstructionObject (cg_branch);
@@ -664,7 +664,7 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
     ReportError (reporter,
 		"crystalspace.gentreefactoryloader.setup.objecttype",
 		"Could not load the general mesh object plugin!");
-    return NULL;
+    return 0;
   }
 
   csRef<iMeshObjectFactory> fact;
@@ -688,7 +688,7 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
         ReportError (reporter,
 		"crystalspace.gentreefactoryloader.parse.badformat",
 		"Unexpected token '%s' while parsing 'gentree'!");
-        return NULL;
+        return 0;
     }
   }
 
@@ -762,11 +762,11 @@ csConstructionGeometry::csConstructionGeometry ()
 {
   num_input_points = 0;
   num_vertices = 0;
-  vertices = NULL;
+  vertices = 0;
   num_triangles = 0;
-  triangles = NULL;
+  triangles = 0;
   num_output_connectors = 0;
-  output_connectors = NULL;
+  output_connectors = 0;
 }
 
 csConstructionGeometry::~csConstructionGeometry ()
@@ -827,7 +827,7 @@ csConstructionObject::csConstructionObject (csConstructionGeometry* igeometry)
 {
   geometry = igeometry;
   num_rules = 0;
-  rules = NULL;
+  rules = 0;
 }
 
 csConstructionObject::~csConstructionObject ()
@@ -892,9 +892,9 @@ csTriangle& csConstruction::AddTriangle ()
 csConstruction::csConstruction ()
 {
   num_vertices = max_vertices = 0;
-  vertices = NULL;
+  vertices = 0;
   num_triangles = max_triangles = 0;
-  triangles = NULL;
+  triangles = 0;
 }
 
 csConstruction::~csConstruction ()

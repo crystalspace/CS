@@ -44,7 +44,7 @@ public:
   csMotionFrame *frames;
   int framecount;
 
-  csMotionBone():name(NULL), hash(0), frames(NULL), framecount(0) {}
+  csMotionBone():name(0), hash(0), frames(0), framecount(0) {}
 
   unsigned int GetHash() { return hash; }
   char* GetName() { return name; }

@@ -364,7 +364,7 @@ public:
   bool MakeDynamic (void);
 
   void SetGroup (iBodyGroup *group);
-  void UnsetGroup () { collision_group = NULL; }
+  void UnsetGroup () { collision_group = 0; }
   csRef<iBodyGroup> GetGroup (void) { return collision_group; }
 
   bool AttachColliderMesh (iMeshWrapper* mesh,

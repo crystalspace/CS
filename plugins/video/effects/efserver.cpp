@@ -97,10 +97,10 @@ iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
 	iEffectDefinition* effect )
 {
   if( !effect )
-    return NULL;
+    return 0;
 
   float maxquality = -1;
-  csRef<iEffectTechnique> tech = NULL;
+  csRef<iEffectTechnique> tech = 0;
   for( int i=0; i<effect->GetTechniqueCount(); i++ )
     if( (effect->GetTechnique(i)->GetValidation() == CS_TECHNIQUE_PASSED) && 
         (effect->GetTechnique(i)->GetQuality()>maxquality) )
@@ -119,7 +119,7 @@ iEffectDefinition* csEffectServer::GetEffect(const char* name)
       //is this, return it
       return effects.Get (i);
   }
-  return NULL;
+  return 0;
 }
 
 csStringID csEffectServer::RequestString( const char *s )

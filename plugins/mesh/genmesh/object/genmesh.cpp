@@ -114,7 +114,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 #ifdef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStreamSource);
 #endif
@@ -125,14 +125,14 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   csGenmeshMeshObject::factory = factory;
-  logparent = NULL;
+  logparent = 0;
   initialized = false;
   cur_cameranr = -1;
   cur_movablenr = -1;
-  material = NULL;
+  material = 0;
   MixMode = 0;
-  vis_cb = NULL;
-  lit_mesh_colors = NULL;
+  vis_cb = 0;
+  lit_mesh_colors = 0;
   num_lit_mesh_colors = 0;
   do_lighting = true;
   do_manual_colors = false;
@@ -145,8 +145,8 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   do_shadow_rec = false;
   lighting_dirty = true;
   shadow_caps = false;
-  hard_transform = NULL;
-  hard_bbox = NULL;
+  hard_transform = 0;
+  hard_bbox = 0;
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
@@ -156,7 +156,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
-  shadow_index_buffer = NULL;
+  shadow_index_buffer = 0;
   shadow_index_name = strings->Request ("indices");
 #endif
 }
@@ -294,7 +294,7 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
   delete[] cachename;
 
   bool rc = false;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("genmesh_lm", NULL, ~0);
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("genmesh_lm", 0, ~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
@@ -320,7 +320,7 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
   }
 
 stop:
-  cache_mgr->SetCurrentScope (NULL);
+  cache_mgr->SetCurrentScope (0);
   return rc;
 }
 
@@ -350,13 +350,13 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
   char cont = 0;
   mf.Write ((char*)&cont, 1);
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    	"genmesh_lm", NULL, ~0))
+    	"genmesh_lm", 0, ~0))
     goto stop;
 
   rc = true;
 
 stop:
-  cache_mgr->SetCurrentScope (NULL);
+  cache_mgr->SetCurrentScope (0);
   return rc;
 }
 
@@ -393,7 +393,7 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   int i;
   if (movable->IsFullTransformIdentity ())
   {
-    vt_array_to_delete = NULL;
+    vt_array_to_delete = 0;
     vt_world = vt;
   }
   else
@@ -419,7 +419,7 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
 
     pl.DD += origin * pl.norm;
     pl.Invert ();
-    frust = list->AddShadow (origin, NULL, 3, pl);
+    frust = list->AddShadow (origin, 0, 3, pl);
     frust->GetVertex (0).Set (vt_world[tri->a] - origin);
     frust->GetVertex (1).Set (vt_world[tri->b] - origin);
     frust->GetVertex (2).Set (vt_world[tri->c] - origin);
@@ -434,7 +434,7 @@ void csGenmeshMeshObject::SetupObject ()
   {
     initialized = true;
     delete[] lit_mesh_colors;
-    lit_mesh_colors = NULL;
+    lit_mesh_colors = 0;
     if (!do_manual_colors)
     {
       num_lit_mesh_colors = factory->GetVertexCount ();
@@ -512,7 +512,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   //csFrustumContext* ctxt = fview->GetFrustumContext ();
   iBase* b = (iBase *)fview->GetUserdata ();
   iLightingProcessInfo* lpi = (iLightingProcessInfo*)b;
-  CS_ASSERT (lpi != NULL);
+  CS_ASSERT (lpi != 0);
 
   iLight* li = lpi->GetLight ();
   bool dyn = lpi->IsDynamic ();
@@ -832,7 +832,7 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   csVector3 lightpos = light->GetCenter () * movable->GetFullTransform ();
   const char* lightID = light->GetLightID ();
   
-  csGenmeshShadowCacheEntry* shadowCacheEntry = NULL;
+  csGenmeshShadowCacheEntry* shadowCacheEntry = 0;
 
   //check if this light exists in cache, and if it is ok
   for (i = 0; i < shadowCache.Length (); i++)
@@ -1223,7 +1223,7 @@ void csGenmeshMeshObject::HardTransform (const csReversibleTransform& t)
   }
   // Force recomputation of bbox.
   delete hard_bbox;
-  hard_bbox = NULL;
+  hard_bbox = 0;
 }
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()
@@ -1297,42 +1297,42 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   scfiPolygonMesh.SetFactory (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (NULL);
-  scfiObjectModel.SetPolygonMeshShadows (NULL);
+  scfiObjectModel.SetPolygonMeshViscull (0);
+  scfiObjectModel.SetPolygonMeshShadows (0);
 
-  logparent = NULL;
+  logparent = 0;
   initialized = false;
   object_bbox_valid = false;
-  mesh_tri_normals = NULL;
+  mesh_tri_normals = 0;
 #ifndef CS_USE_NEW_RENDERER
   top_mesh.num_triangles = 0;
-  top_mesh.triangles = NULL;
-  top_mesh.vertex_fog = NULL;
+  top_mesh.triangles = 0;
+  top_mesh.vertex_fog = 0;
 #else
   num_mesh_triangles = 0;
-  mesh_triangles = NULL;
-  edge_indices = NULL;
-  edge_normals = NULL;
-  edge_midpts = NULL;
+  mesh_triangles = 0;
+  edge_indices = 0;
+  edge_normals = 0;
+  edge_midpts = 0;
 #endif
   num_mesh_vertices = 0;
-  mesh_vertices = NULL;
-  mesh_texels = NULL;
-  mesh_colors = NULL;
-  mesh_normals = NULL;
+  mesh_vertices = 0;
+  mesh_texels = 0;
+  mesh_colors = 0;
+  mesh_normals = 0;
 #ifndef CS_USE_NEW_RENDERER
-  vbufmgr = NULL;
+  vbufmgr = 0;
 #endif
-  material = NULL;
-  polygons = NULL;
+  material = 0;
+  polygons = 0;
 #ifdef CS_USE_NEW_RENDERER
-  vertex_buffer = NULL;
-  shadow_vertex_buffer = NULL;
-  normal_buffer = NULL;
-  trinormal_buffer = NULL;
-  texel_buffer = NULL;
-  color_buffer = NULL;
-  index_buffer = NULL;
+  vertex_buffer = 0;
+  shadow_vertex_buffer = 0;
+  normal_buffer = 0;
+  trinormal_buffer = 0;
+  texel_buffer = 0;
+  color_buffer = 0;
+  index_buffer = 0;
 
   anon_buffers.SetLength (0);
   anon_names.SetLength (0);
@@ -1496,7 +1496,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       vertex_buffer->CanDiscard(false);
       return vertex_buffer;
     }
-    return NULL;
+    return 0;
   }
   if (name == shadow_vertex_name)
   {
@@ -1525,7 +1525,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       shadow_vertex_buffer->CanDiscard(false);
       return shadow_vertex_buffer;
     }
-    return NULL;
+    return 0;
   }
   if (name == texel_name)
   {
@@ -1547,7 +1547,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       texel_buffer->CanDiscard(false);
       return texel_buffer;
     }
-    return NULL;
+    return 0;
   }
   if (name == normal_name)
   {
@@ -1569,7 +1569,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       normal_buffer->CanDiscard(false);
       return normal_buffer;
     }
-    return NULL;
+    return 0;
   }
   if (name == trinormal_name) 
   {
@@ -1612,7 +1612,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       trinormal_buffer->CanDiscard(false);
       return trinormal_buffer;
     }
-    return NULL;
+    return 0;
   }
   if (name == color_name)
   {
@@ -1634,7 +1634,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       color_buffer->CanDiscard(false);
       return color_buffer;
     }
-    return NULL;
+    return 0;
   }
   if (name == index_name)
   {
@@ -1905,7 +1905,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       index_buffer->CanDiscard(false); 
       return index_buffer;
     }
-    return NULL;
+    return 0;
   }
   for (int i = 0; i < anon_names.Length(); i ++)
   {
@@ -1915,7 +1915,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       return anon_buffers[i];
     }
   }
-  return NULL;
+  return 0;
 }
 
 #endif
@@ -2005,7 +2005,7 @@ bool csGenmeshMeshObjectFactory::CompressVertices (
   new_num_vts = orig_num_vts;
   new_tris = orig_tris;
   new_verts = orig_verts;
-  mapping = NULL;
+  mapping = 0;
   if (orig_num_vts <= 0) return false;
 
   // Copy all the vertices.
@@ -2347,7 +2347,7 @@ void csGenmeshMeshObjectFactory::Invalidate ()
 {
   object_bbox_valid = false;
   delete[] polygons;
-  polygons = NULL;
+  polygons = 0;
 
 #ifdef CS_USE_NEW_RENDERER
   mesh_vertices_dirty_flag = true;
@@ -2409,8 +2409,8 @@ void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf = NULL;
-    scfParent->vbufmgr = NULL;
+    scfParent->vbuf = 0;
+    scfParent->vbufmgr = 0;
   }
 }
 #endif
@@ -2486,7 +2486,7 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
   	iCommandLineParser);
   if (cmdline)
   {
-    do_verbose = cmdline->GetOption ("verbose") != NULL;
+    do_verbose = cmdline->GetOption ("verbose") != 0;
   }
 
   return true;

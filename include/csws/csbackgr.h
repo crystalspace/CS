@@ -55,7 +55,7 @@ class csBackground
 {
   /// Background type
   csBackgroundType type;
-  /// The background texture (if not NULL)
+  /// The background texture (if not 0)
   iTextureHandle *tex;
   /// Gradient colors (for all four corners)
   csRGBcolor colors [4];
@@ -71,7 +71,7 @@ public:
 
   /// Free the background
   void Free ()
-  { SetTexture (NULL); }
+  { SetTexture (0); }
 
   /// Set background texture
   void SetTexture (iTextureHandle *iTex);

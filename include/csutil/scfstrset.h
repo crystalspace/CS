@@ -32,11 +32,11 @@ public:
 
   /// Create an empty scfStringSet object
   csScfStringSet ()
-  { SCF_CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (0); }
 
   /// Create an scfStringSet object and set the size of the hash
   csScfStringSet (uint32 size) : set(size)
-  { SCF_CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (0); }
 
   /// Destructor.
   virtual ~csScfStringSet() {}

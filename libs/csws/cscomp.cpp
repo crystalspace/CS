@@ -38,21 +38,21 @@
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
 
 CS_IMPLEMENT_STATIC_VAR (GetDragBoundRect, csRect, ())
-csRect *csComponent::dragBound = NULL;
+csRect *csComponent::dragBound = 0;
 // The visible region cache
 CS_IMPLEMENT_STATIC_VAR (GetVisRegion, cswsRectVector, (8, 8))
-cswsRectVector *csComponent::visregion = NULL;
+cswsRectVector *csComponent::visregion = 0;
 
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
-  palette (NULL), originalpalette (NULL), DragStyle (CS_DRAG_MOVEABLE),
-  clipparent (NULL), text (NULL), Font (NULL), FontSize (0),
-  focused (NULL), top (NULL), next (NULL), prev (NULL), parent (NULL),
-  app (NULL), skinslice (NULL), skindata (NULL), id (0)
+  palette (0), originalpalette (0), DragStyle (CS_DRAG_MOVEABLE),
+  clipparent (0), text (0), Font (0), FontSize (0),
+  focused (0), top (0), next (0), prev (0), parent (0),
+  app (0), skinslice (0), skindata (0), id (0)
 {
   dragBound = GetDragBoundRect ();
   visregion = GetVisRegion ();
 
-  SetPalette (NULL, 0);
+  SetPalette (0, 0);
   if (iParent)
     iParent->Insert (this);
   // The skin slice is set as soon as PreHandleEvent() is called
@@ -74,7 +74,7 @@ csComponent::~csComponent ()
 
   delete [] text;
   DeleteAll ();
-  SetPalette (NULL, 0);
+  SetPalette (0, 0);
 
   // Tell skin slice to free its private data (if any)
   // We'll reset the VISIBLE bit to avoid extra work in Reset()
@@ -85,12 +85,12 @@ csComponent::~csComponent ()
 
 char *csComponent::GetSkinName ()
 {
-  return NULL;
+  return 0;
 }
 
 csSkin *csComponent::GetSkin ()
 {
-  return parent ? parent->GetSkin () : (csSkin*)NULL;
+  return parent ? parent->GetSkin () : (csSkin*)0;
 }
 
 bool csComponent::ApplySkin (csSkin *Skin)
@@ -121,8 +121,8 @@ static bool do_delete (csComponent *child, void *param)
 void csComponent::DeleteAll ()
 {
   ForEach (do_delete);
-  focused = NULL;
-  top = NULL;
+  focused = 0;
+  top = 0;
 }
 
 void csComponent::SetPalette (int *iPalette, int iPaletteSize)
@@ -226,17 +226,17 @@ void csComponent::Delete (csComponent *comp)
         cur->Hide ();
         if (cur == focused)
         {
-          focused = (cur->next == focused) ? (csComponent *)NULL : NextChild (focused);
+          focused = (cur->next == focused) ? (csComponent *)0 : NextChild (focused);
           if (cur == focused) // Whoa, delo pahnet kerosinom
             focused = cur->next;
           else if (focused && GetState (CSS_FOCUSED))
             focused->SetState (CSS_FOCUSED, true);
         } /* endif */
         if (cur == top)
-          top = top->next == top ? (csComponent*)NULL : top->next;
+          top = top->next == top ? (csComponent*)0 : top->next;
         cur->prev->next = cur->next;
         cur->next->prev = cur->prev;
-        cur->next = cur->prev = cur->clipparent = cur->parent = NULL;
+        cur->next = cur->prev = cur->clipparent = cur->parent = 0;
         return;
       } /* endif */
     } while ((cur = cur->next) != focused); /* enddo */
@@ -247,10 +247,10 @@ csComponent *csComponent::ForEach (bool (*func) (csComponent *child, void *param
   void *param, bool Zorder)
 {
   if (!func)
-    return NULL;
+    return 0;
 
   csComponent *cur = Zorder ? top : focused;
-  csComponent *last = NULL;
+  csComponent *last = 0;
   if (cur)
     last = Zorder ? cur->next : cur->prev;
   while (cur)
@@ -262,7 +262,7 @@ csComponent *csComponent::ForEach (bool (*func) (csComponent *child, void *param
       break;
     cur = next;
   } /* endwhile */
-  return NULL;
+  return 0;
 }
 
 static bool find_child_by_id (csComponent *child, void *find_id)
@@ -333,7 +333,7 @@ bool csComponent::SetZorder (csComponent *comp, csComponent *below)
    * operation will rise their Z-order should be invalidated (only
    * the rectangle which intersects the bound of moving window).
    */
-  csComponent *last = comp->prev == top ? (csComponent*)NULL : comp->prev;
+  csComponent *last = comp->prev == top ? (csComponent*)0 : comp->prev;
 
   // Remove component from parent's child list
   comp->prev->next = comp->next;
@@ -543,12 +543,12 @@ bool csComponent::HandleEvent (iEvent &Event)
         if (Event.Key.Code != CSKEY_ESC)
           break;
         if (app->MouseOwner != this)
-          return (ForEach (do_handle_event, &Event, true) != NULL);
+          return (ForEach (do_handle_event, &Event, true) != 0);
 AbortDrag:
         SetRect (dragBound->xmin, dragBound->ymin, dragBound->xmax, dragBound->ymax);
         dragMode = 0;
         if (app->MouseOwner == this)
-          app->CaptureMouse (NULL);
+          app->CaptureMouse (0);
         return true;
       case csevMouseDown:
         if (Event.Mouse.Button == 2)
@@ -559,7 +559,7 @@ AbortDrag:
         // we'll abort on first mouse up message
         dragMode = 0;
         if (app->MouseOwner == this)
-          app->CaptureMouse (NULL);
+          app->CaptureMouse (0);
         return true;
       case csevMouseMove:
         if (app->MouseOwner == this)
@@ -628,7 +628,7 @@ AbortDrag:
       // For mouse events, proceed from Z-order top child,
       // for all other events proceed from focused child
       if (!ret)
-        ret = (ForEach (do_handle_event, &Event, CS_IS_MOUSE_EVENT (Event)) != NULL);
+        ret = (ForEach (do_handle_event, &Event, CS_IS_MOUSE_EVENT (Event)) != 0);
   } /* endif */
 
   if (ret)
@@ -786,7 +786,7 @@ static bool do_find_default (csComponent *child, void *param)
 {
   (void)param;
   if (child->GetState (CSS_SELECTABLE))
-    return (child->SendCommand (cscmdAreYouDefault, NULL) == child);
+    return (child->SendCommand (cscmdAreYouDefault, 0) == child);
   else
     return false;
 }
@@ -803,7 +803,7 @@ csComponent *csComponent::GetDefault ()
              (CSS_FOCUSED | CSS_SELECTABLE)))
       return focused;
   } /* endif */
-  return NULL;
+  return 0;
 }
 
 csComponent *csComponent::NextChild (csComponent *start, bool disabled)
@@ -1962,7 +1962,7 @@ csComponent *csComponent::GetChildAt (int x, int y,
    || func (this, data))
     return this;
 
-  return NULL;
+  return 0;
 }
 
 void csComponent::PrepareLabel (const char *iLabel, char * &oLabel,
@@ -1972,7 +1972,7 @@ void csComponent::PrepareLabel (const char *iLabel, char * &oLabel,
     delete[] oLabel;
 
   oUnderlinePos = -1;
-  oLabel = NULL;
+  oLabel = 0;
 
   if (iLabel)
   {

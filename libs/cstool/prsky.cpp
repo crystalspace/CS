@@ -32,7 +32,7 @@ csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
   sky = par;
   mat_w = 256;
   mat_h = 256;
-  isect = NULL;
+  isect = 0;
   forcerender = false;
   next = sky->GetFirstSky();
   sky->SetFirstSky(this);
@@ -78,7 +78,7 @@ void csProcSkyTexture::Animate (csTicks current_time)
 
 csProcSky::csProcSky()
 {
-  firstsky = NULL;
+  firstsky = 0;
   int i;
   radius = 20000000.0f; /// 20 000 km
   center.Set(0.0f, -radius + 100000.0f, 0.0f); // sky is 100 km high

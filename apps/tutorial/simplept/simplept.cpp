@@ -400,7 +400,7 @@ bool Simple::Initialize ()
   CreatePolygon (walls_state, 7, 6, 5, 4, tm);
 
   csRef<iStatLight> light;
-  light = engine->CreateLight (NULL, csVector3 (0, 0, 0), 20,
+  light = engine->CreateLight (0, csVector3 (0, 0, 0), 20,
   	csColor (1, 1, 1), false);
   room->GetLights ()->Add (light->QueryLight ());
 
@@ -469,7 +469,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 void Simple::Start ()
@@ -482,7 +482,7 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
 

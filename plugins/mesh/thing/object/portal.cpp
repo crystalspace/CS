@@ -41,11 +41,11 @@ csPortal::csPortal (csPolygon3DStatic* parent)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
   DG_TYPE (this, "csPortal");
-  filter_texture = NULL;
+  filter_texture = 0;
   filter_r = 1;
   filter_g = 1;
   filter_b = 1;
-  sector = NULL;
+  sector = 0;
   max_sector_visit = 5;
   csPortal::parent = parent;
 }
@@ -53,8 +53,8 @@ csPortal::csPortal (csPolygon3DStatic* parent)
 csPortal::~csPortal ()
 {
   // Before destruction the destination of the portal needs to be
-  // set to NULL.
-  CS_ASSERT (sector == NULL);
+  // set to 0.
+  CS_ASSERT (sector == 0);
   if (filter_texture) filter_texture->DecRef ();
   int i;
   for (i = 0 ; i < sector_cb_vector.Length () ; i++)
@@ -71,7 +71,7 @@ csPortal::~csPortal ()
 
 csPortal* csPortal::Clone ()
 {
-  csPortal* clone = new csPortal (NULL);
+  csPortal* clone = new csPortal (0);
   clone->SetSector (sector);
   clone->flags.SetAll (flags.Get ());
   clone->warp_obj = warp_obj;
@@ -90,7 +90,7 @@ csPortal* csPortal::Clone ()
 
 iReferencedObject *csPortal::GetReferencedObject () const
 {
-  if (!sector) return NULL;
+  if (!sector) return 0;
   csRef<iReferencedObject> ref = SCF_QUERY_INTERFACE (sector,
     iReferencedObject);
   return ref; // DecRef is ok.
@@ -98,14 +98,14 @@ iReferencedObject *csPortal::GetReferencedObject () const
 
 void csPortal::SetReferencedObject (iReferencedObject *b)
 {
-  if (b == NULL)
+  if (b == 0)
   {
-    SetSector (NULL);
+    SetSector (0);
   }
   else
   {
     csRef<iSector> s (SCF_QUERY_INTERFACE (b, iSector));
-    CS_ASSERT (s != NULL);
+    CS_ASSERT (s != 0);
     SetSector (s);
   }
 }
@@ -125,7 +125,7 @@ void csPortal::SetSector (iSector *s)
       csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
           sector,
           iReferencedObject));
-      CS_ASSERT (refobj != NULL);
+      CS_ASSERT (refobj != 0);
       refobj->RemoveReference (&scfiPortal);
     }
 
@@ -136,7 +136,7 @@ void csPortal::SetSector (iSector *s)
       csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
           sector,
           iReferencedObject));
-      CS_ASSERT (refobj != NULL);
+      CS_ASSERT (refobj != 0);
       refobj->AddReference (&scfiPortal);
     }
   }
@@ -271,7 +271,7 @@ void csPortal::SetFilter (float r, float g, float b)
   if (filter_texture)
   {
     filter_texture->DecRef ();
-    filter_texture = NULL;
+    filter_texture = 0;
   }
 }
 
@@ -399,9 +399,9 @@ iPolygon3D *csPortal::HitBeam (
   const csVector3 &end,
   csVector3 &isect)
 {
-  if (!CompleteSector (NULL)) return NULL;
+  if (!CompleteSector (0)) return 0;
   if (sector->GetRecLevel () >= max_sector_visit)
-    return NULL;
+    return 0;
   if (flags.Check (CS_PORTAL_WARP))
   {
     csReversibleTransform warp_wor;
@@ -430,9 +430,9 @@ iMeshWrapper *csPortal::HitBeam (
   csVector3 &isect,
   iPolygon3D **polygonPtr)
 {
-  if (!CompleteSector (NULL)) return NULL;
+  if (!CompleteSector (0)) return 0;
   if (sector->GetRecLevel () >= max_sector_visit)
-    return NULL;
+    return 0;
   if (flags.Check (CS_PORTAL_WARP))
   {
     csVector3 new_start = warp_wor.Other2This (start);

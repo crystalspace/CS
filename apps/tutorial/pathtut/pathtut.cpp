@@ -66,7 +66,7 @@ PathTut *pathtut;
 PathTut::PathTut (iObjectRegistry* object_reg)
 {
   PathTut::object_reg = object_reg;
-  m_Path = NULL;
+  m_Path = 0;
 }
 
 PathTut::~PathTut ()
@@ -109,7 +109,7 @@ void PathTut::SetupFrame ()
 void PathTut::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 bool PathTut::HandleEvent (iEvent& ev)
@@ -302,15 +302,15 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
@@ -327,7 +327,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",
   	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
-  if (txt == NULL)
+  if (txt == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.PathTut",
@@ -338,7 +338,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   // Load a sprite template from disk.
   csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
   	"/lib/std/sprite1"));
-  if (imeshfact == NULL)
+  if (imeshfact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.PathTut",

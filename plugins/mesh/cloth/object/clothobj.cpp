@@ -89,17 +89,17 @@ void csStuffObject::SetupVertexBuffer ()
 bool csStuffObject::Initialize(iObjectRegistry *iO_R)
 {
   printf("initializtion \n");
-  if (iO_R==NULL) { 	printf(" NO OBJECT_REG! \n"); return false; };
+  if (iO_R==0) { 	printf(" NO OBJECT_REG! \n"); return false; };
   Obj_Reg=iO_R;
   shift.Set(0,0,0);
   max_radius.Set(5.0,5.0,0.0);
-  vis_cb=NULL;
-  vertices=NULL;
-  material=NULL;
-  texels=NULL;
-  colors=NULL;
-  mesh.triangles=NULL;
-  mesh.vertex_fog=NULL;
+  vis_cb=0;
+  vertices=0;
+  material=0;
+  texels=0;
+  colors=0;
+  mesh.triangles=0;
+  mesh.vertex_fog=0;
   setup=false;
   return true;
 };
@@ -155,7 +155,7 @@ csStuffObject::csStuffObject(iMeshObjectFactory *fact)
 {
   printf("creator \n");
   factory = fact;
-  vbufmgr=NULL;
+  vbufmgr=0;
   
   SCF_CONSTRUCT_IBASE(fact);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiVertexBufferManagerClient);
@@ -223,7 +223,7 @@ bool csStuffObject::Draw(iRenderView *rview, iMovable*, csZBufMode zbufmode)
     printf ("INTERNAL ERROR: cloth used without material!\n");
     iTextureWrapper* txt = loader->LoadTexture ("spark",    
   	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
-    if (txt == NULL)
+    if (txt == 0)
     {
       printf( " no texture for u!! \n" );
       return false;
@@ -333,9 +333,9 @@ void csStuffObject::SetLogicalParent (iBase *)
 {}
    
 iBase *csStuffObject::GetLogicalParent () const 
-{ return NULL; }
+{ return 0; }
  
-// iObjectModel *csStuffObject::GetObjectModel () { return NULL; };
+// iObjectModel *csStuffObject::GetObjectModel () { return 0; };
 
 //-----------Vertex Buffer Manager Client embedded implementation
 void csStuffObject::eiVertexBufferManagerClient::ManagerClosing() 
@@ -356,12 +356,12 @@ StuffFactory::StuffFactory(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE( parent )
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiClothFactoryState)	
-  object_reg       = NULL;
-  material         = NULL;		
-  factory_vertices = NULL; 
-  factory_texels   = NULL;
-  factory_colors   = NULL;
-  factory_triangles= NULL;
+  object_reg       = 0;
+  material         = 0;		
+  factory_vertices = 0; 
+  factory_texels   = 0;
+  factory_colors   = 0;
+  factory_triangles= 0;
 }
 
 StuffFactory::~StuffFactory() 
@@ -382,7 +382,7 @@ csPtr<iMeshObject> StuffFactory::NewInstance()
 {
   csStuffObject *obj = new csStuffObject((iMeshObjectFactory*) this);
   bool initOk = obj->Initialize(object_reg);
-  if (!initOk) { delete(obj);  return NULL;  };
+  if (!initOk) { delete(obj);  return 0;  };
   csRef<iMeshObject> itface (SCF_QUERY_INTERFACE ( obj, iMeshObject ));
   obj->DecRef ();
   return csPtr<iMeshObject> (itface);
@@ -398,7 +398,7 @@ void StuffFactory::SetLogicalParent(iBase *)
 {}
   
 iBase *StuffFactory::GetLogicalParent ()const 
-{ return NULL; }
+{ return 0; }
   
 //----------------------------------------------------------------------
 

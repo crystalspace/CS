@@ -211,7 +211,7 @@ struct iRigidBody : public iBase
   /// Set the physic properties
   virtual void SetProperties (float mass, const csVector3& center,
   	const csMatrix3& inertia) = 0;
-  /// Get the physic properties. NULL parameters are ignored
+  /// Get the physic properties. 0 parameters are ignored
   virtual void GetProperties (float* mass, csVector3* center,
     csMatrix3* inertia) = 0;
   /// Set total mass to targetmass, and adjust properties
@@ -277,12 +277,12 @@ struct iRigidBody : public iBase
 
   /**
    * Set a callback to be executed when this body moves.
-   * If NULL, no callback is executed.
+   * If 0, no callback is executed.
    */
   virtual void SetMoveCallback (iDynamicsMoveCallback* cb) = 0;
   /**
    * Set a callback to be executed when this body collides with another
-   * If NULL, no callback is executed.
+   * If 0, no callback is executed.
    */
   virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb) = 0;
 

@@ -115,7 +115,7 @@ bool csShaderGLCGVP::LoadProgramStringToGL(const char* programstring)
 
   program = cgCreateProgram (context, CG_SOURCE,
     programstring, cgGLGetLatestProfile (CG_GL_VERTEX),
-    "main", NULL);
+    "main", 0);
 
   if (!program)
     return false;
@@ -139,7 +139,7 @@ bool csShaderGLCGVP::Load(iDataBuffer* program)
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (program);
-  if (error != NULL)
+  if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glcg",
       "XML error '%s'!", error);
@@ -221,7 +221,7 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
           map->cgvarname = new char[strlen(cgvarname)+1];
           memset(map->cgvarname, 0, strlen(cgvarname)+1); 
           memcpy(map->cgvarname, cgvarname, strlen(cgvarname));
-          map->parameter = NULL;
+          map->parameter = 0;
           
           map->namehash = csHashCompute(varname);
           //save it for later
@@ -252,10 +252,10 @@ bool csShaderGLCGVP::Prepare()
       char msg[500];
       sprintf (msg, "Variablemap warning: Variable '%s' not found in CG program.", e->cgvarname);
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glcg",
-        msg, NULL);
+        msg, 0);
     }
     if (!cgIsParameterReferenced (e->parameter))
-      e->parameter = NULL;
+      e->parameter = 0;
   }
 
   CGparameter param = cgGetFirstLeafParameter (program, CG_SOURCE);
@@ -375,7 +375,7 @@ iShaderVariable* csShaderGLCGVP::GetVariable(int namehash)
     return (iShaderVariable*)c.Next();
   }
 
-  return NULL;
+  return 0;
 }
 
 csPtr<iString> csShaderGLCGVP::GetProgramID()

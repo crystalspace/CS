@@ -82,8 +82,8 @@ public:
    * not false is returned.
    */
   bool Collide (csOPCODECollider &pOtherCollider,
-    const csReversibleTransform *pThisTransform = NULL,
-    const csReversibleTransform *pOtherTransform = NULL);
+    const csReversibleTransform *pThisTransform = 0,
+    const csReversibleTransform *pOtherTransform = 0);
 
   /// Test collision with an array of colliders.
   bool CollideArray (

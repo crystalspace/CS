@@ -25,7 +25,7 @@
 
 //---------------------------------------------------------------------------
 CS_IMPLEMENT_STATIC_VAR (GetPolyPool, csPoly2DPool, (csPoly2DFactory::SharedFactory()))
-csPoly2DPool *csClipper::polypool = NULL;
+csPoly2DPool *csClipper::polypool = 0;
 
 SCF_IMPLEMENT_IBASE(csClipper)
   SCF_IMPLEMENTS_INTERFACE(iClipper2D)
@@ -33,7 +33,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csClipper::csClipper ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   polypool = GetPolyPool ();
 }
 
@@ -139,7 +139,7 @@ csPolygonClipper::csPolygonClipper (
   }
   else
   {
-    ClipPoly2D = NULL;
+    ClipPoly2D = 0;
     ClipPoly = Clipper->GetVertices ();
     ClipData = new csVector2[ClipPolyVertices];
   }
@@ -172,7 +172,7 @@ csPolygonClipper::csPolygonClipper (
   }
   else
   {
-    ClipPoly2D = NULL;
+    ClipPoly2D = 0;
     ClipPoly = Clipper;
     ClipData = new csVector2[ClipPolyVertices];
   }

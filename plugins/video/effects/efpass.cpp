@@ -32,7 +32,7 @@
 
 csEffectPass::csEffectPass()
 {
-  SCF_CONSTRUCT_IBASE( NULL );
+  SCF_CONSTRUCT_IBASE( 0 );
 }
 
 csEffectPass::~csEffectPass ()

@@ -62,7 +62,7 @@ csPtr<iTextureWrapper> csPtFireFactory::Generate ()
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -155,19 +155,19 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
 	  break;
 	case XMLTOKEN_PALETTE:
 	  {
-	    if (!synldr) return NULL;
+	    if (!synldr) return 0;
 
 	    csGradient grad;
 	    if (!synldr->ParseGradient (child, grad))
 	    {
-	      return NULL;
+	      return 0;
 	    }
 	    fire->SetPalette (grad);
 	  }
 	  break;
 	default:
 	  if (synldr) synldr->ReportBadToken (child);
-	  return NULL;
+	  return 0;
       };
     }
   }

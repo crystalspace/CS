@@ -169,9 +169,9 @@ public:
   virtual bool SetColor (const csColor& col) { color = col; return true; }
   virtual bool GetColor (csColor& col) const { col = color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iStarsState implementation ----------------
   class StarsState : public iStarsState
@@ -250,7 +250,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 };
 
 /**

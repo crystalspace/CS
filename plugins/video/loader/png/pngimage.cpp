@@ -59,7 +59,7 @@ struct datastore{
   long pos;
   long length;
 
-  datastore () { data = NULL; pos = 0; length = 0; }
+  datastore () { data = 0; pos = 0; length = 0; }
   ~datastore () { free (data); }
 };
 
@@ -113,7 +113,7 @@ csPtr<iImage> csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return 0;
   }
   return csPtr<iImage> (i);
 }
@@ -158,7 +158,7 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   const char* extraoptions)
 {
   if (!Image)
-    return NULL;
+    return 0;
 
   int compress = 6;
   volatile bool interlace = false;
@@ -210,21 +210,21 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 
   datastore ds;
 
-  png_structp png = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+  png_structp png = png_create_write_struct (PNG_LIBPNG_VER_STRING, 0, 0, 0);
 
   if (!png)
   {
 error1:
-    return NULL;
+    return 0;
   }
 
   png_set_compression_level (png, compress);
 
   /* Allocate/initialize the image information data. */
   png_infop info = png_create_info_struct (png);
-  if (info == NULL)
+  if (info == 0)
   {
-    png_destroy_write_struct (&png, (png_infopp)NULL);
+    png_destroy_write_struct (&png, (png_infopp)0);
 error2:
     goto error1;
   }
@@ -275,7 +275,7 @@ error2:
     interlace?PNG_INTERLACE_ADAM7:PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, 
     PNG_FILTER_TYPE_BASE);
 
-  png_colorp palette = NULL;
+  png_colorp palette = 0;
   /* set the palette if there is one. */
   if (colortype & PNG_COLOR_MASK_PALETTE)
   {
@@ -312,7 +312,7 @@ error2:
       png_bytep trans = new png_byte[key_index + 1];
       memset (trans, 0xff, key_index);
       trans[key_index] = 0;
-      png_set_tRNS (png, info, trans, key_index+1, NULL);
+      png_set_tRNS (png, info, trans, key_index+1, 0);
       delete[] trans;
     }
   }
@@ -328,7 +328,7 @@ error2:
       trans.red = big_endian_short (key_r << 8);
       trans.green = big_endian_short (key_g << 8);
       trans.blue = big_endian_short (key_b << 8);
-      png_set_tRNS (png, info, NULL, 0, &trans);
+      png_set_tRNS (png, info, 0, 0, &trans);
     }
   }
 
@@ -397,9 +397,9 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
   if (!strcasecmp (mime, PNG_MIME))
-    return Save (Image, (iImageIO::FileFormatDescription *)NULL,
+    return Save (Image, (iImageIO::FileFormatDescription *)0,
       extraoptions);
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -435,7 +435,7 @@ bool ImagePngFile::Load (uint8 *iBuffer, uint32 iSize)
     return false;
 
   png_structp png =
-    png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    png_create_read_struct (PNG_LIBPNG_VER_STRING, 0, 0, 0);
 
   if (!png)
   {
@@ -447,7 +447,7 @@ nomem:
   if (!info)
   {
 nomem2:
-    png_destroy_read_struct (&png, (png_infopp) NULL, (png_infopp) NULL);
+    png_destroy_read_struct (&png, (png_infopp) 0, (png_infopp) 0);
     goto nomem;
   }
 
@@ -465,7 +465,7 @@ nomem2:
   int bit_depth, color_type;
 
   png_get_IHDR (png, info, &Width, &Height, &bit_depth, &color_type,
-    NULL, NULL, NULL);
+    0, 0, 0);
 
   if (bit_depth > 8)
   {
@@ -496,7 +496,7 @@ nomem2:
 	if (png_get_valid (png, info, PNG_INFO_tRNS))
 	{
 	  png_color_16p trans_values;
-	  png_get_tRNS (png, info, NULL, NULL, &trans_values);
+	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  has_keycolour = true;
 	  keycolour_r = convert_endian (trans_values->gray) & 0xff;
 	  keycolour_g = convert_endian (trans_values->gray) & 0xff;
@@ -514,7 +514,7 @@ nomem2:
 	  // tRNS chunk. Every palette entry gets its own alpha value.
 	  png_bytep trans;
 	  int num_trans;
-	  png_get_tRNS (png, info, &trans, &num_trans, NULL);
+	  png_get_tRNS (png, info, &trans, &num_trans, 0);
 	  
 	  // see if there is a single entry w/ alpha==0 and all other 255.
 	  // if yes use keycolor transparency.
@@ -551,7 +551,7 @@ nomem2:
         if (png_get_valid (png, info, PNG_INFO_tRNS))
 	{
 	  png_color_16p trans_values;
-	  png_get_tRNS (png, info, NULL, NULL, &trans_values);
+	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  has_keycolour = true;
 	  keycolour_r = convert_endian (trans_values->red) & 0xff;
 	  keycolour_g = convert_endian (trans_values->green) & 0xff;
@@ -588,7 +588,7 @@ nomem2:
     goto nomem2;
   }
 
-  uint8 *NewImage = NULL;
+  uint8 *NewImage = 0;
   if (ImageType == imgRGB)
     NewImage = new uint8 [Width * Height * 4];
   else if (ImageType == imgGrayAlpha)
@@ -605,7 +605,7 @@ nomem2:
   png_read_image (png, row_pointers);
 
   // read rest of file, and get additional chunks in info_ptr
-  png_read_end (png, (png_infop)NULL);
+  png_read_end (png, (png_infop)0);
 
   if (ImageType == imgRGB)
   {
@@ -617,7 +617,7 @@ nomem2:
   else if (ImageType == imgPAL)
   {
     png_color graypal [256];
-    png_color *png_palette = NULL;
+    png_color *png_palette = 0;
     csRGBcolor *palette;
     int colors, i;
     if (!png_get_PLTE (png, info, &png_palette, &colors))
@@ -671,7 +671,7 @@ nomem2:
   }
 
   // clean up after the read, and free any memory allocated
-  png_destroy_read_struct (&png, &info, (png_infopp) NULL);
+  png_destroy_read_struct (&png, &info, (png_infopp) 0);
 
   // Free the row pointers array that is not needed anymore
   delete [] row_pointers;

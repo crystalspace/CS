@@ -161,7 +161,7 @@ public:
   virtual iGraphics3D* GetGraphics3D () {return isorview->GetG3D();}
   virtual void SetFrustum (float, float, float, float) {}
   virtual void GetFrustum (float&, float&, float&, float&) {}
-  virtual csRenderContextFrustum* GetTopFrustum () { return NULL; }
+  virtual csRenderContextFrustum* GetTopFrustum () { return 0; }
   virtual iClipper2D* GetClipper () {return isorview->GetClipper();}
   virtual void SetClipper (iClipper2D*) {}
   virtual bool IsClipperRequired () {return false;}
@@ -327,7 +327,7 @@ public:
   {
     (void)key;
   }
-  virtual iCamera* GetOriginalCamera () const { return NULL; }
+  virtual iCamera* GetOriginalCamera () const { return 0; }
 };
 
 SCF_IMPLEMENT_IBASE (csIsoFakeRenderView)
@@ -349,9 +349,9 @@ csIsoMeshSprite::csIsoMeshSprite (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   position.Set(0,0,0);
   transform.Identity();
-  grid = NULL;
-  gridcall = NULL;
-  mesh = NULL;
+  grid = 0;
+  gridcall = 0;
+  mesh = 0;
   zbufmode = CS_ZBUF_USE;
 }
 
@@ -421,7 +421,7 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
   {
     //printf("mesh draw()\n");
     /// UpdateLighting ....
-    iLight **lights = NULL;
+    iLight **lights = 0;
     int numlights = 0;
     grid->GetFakeLights(position, lights, numlights);
     mesh->UpdateLighting(lights, numlights, movable);
@@ -473,7 +473,7 @@ void csIsoMeshSprite::SetMaterialWrapper(iMaterialWrapper * /*material*/)
 
 iMaterialWrapper* csIsoMeshSprite::GetMaterialWrapper() const
 {
-  return NULL;
+  return 0;
 }
 
 void csIsoMeshSprite::SetMixMode(uint /*mode*/)
@@ -554,7 +554,7 @@ csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper (iMeshObjectFactory* meshFact)
 csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
-  csIsoMeshFactoryWrapper::meshFact = NULL;
+  csIsoMeshFactoryWrapper::meshFact = 0;
 }
 
 csIsoMeshFactoryWrapper::~csIsoMeshFactoryWrapper ()
@@ -590,7 +590,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csIsoMeshFactoryList::csIsoMeshFactoryList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
 }
 

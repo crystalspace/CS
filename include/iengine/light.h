@@ -86,7 +86,7 @@ SCF_VERSION (iLightCallback, 0, 2, 0);
 /**
  * Set a callback which is called when this light color is changed.
  * The given context will be either an instance of iRenderView, iFrustumView,
- * or else NULL.
+ * or else 0.
  */
 struct iLightCallback : public iBase
 {
@@ -404,7 +404,7 @@ struct iLightIterator : public iBase
   /// Restart iterator.
   virtual void Restart () = 0;
 
-  /// Get light from iterator. Return NULL at end.
+  /// Get light from iterator. Return 0 at end.
   virtual iLight* Fetch () = 0;
 
   /// Get the sector for the last fetched light.

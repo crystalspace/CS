@@ -56,7 +56,7 @@
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-char *optarg = NULL;
+char *optarg = 0;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -218,7 +218,7 @@ exchange (char **argv)
       /* We must extend the array.  The user plays games with us and
 	 presents new arguments.  */
       char *new_str = malloc (top + 1);
-      if (new_str == NULL)
+      if (new_str == 0)
 	nonoption_flags_len = nonoption_flags_max_len = 0;
       else
 	{
@@ -286,7 +286,7 @@ static const char *_getopt_initialize (int /*argc*/, char* const* /*argv*/,
 
   first_nonopt = last_nonopt = optind;
 
-  nextchar = NULL;
+  nextchar = 0;
 
   posixly_correct = getenv ("POSIXLY_CORRECT");
 
@@ -302,18 +302,18 @@ static const char *_getopt_initialize (int /*argc*/, char* const* /*argv*/,
       ordering = REQUIRE_ORDER;
       ++optstring;
     }
-  else if (posixly_correct != NULL)
+  else if (posixly_correct != 0)
     ordering = REQUIRE_ORDER;
   else
     ordering = PERMUTE;
 
 #ifdef _LIBC
-  if (posixly_correct == NULL
+  if (posixly_correct == 0
       && argc == original_argc && argv == original_argv)
     {
       if (nonoption_flags_max_len == 0)
 	{
-	  if (__getopt_nonoption_flags == NULL
+	  if (__getopt_nonoption_flags == 0
 	      || __getopt_nonoption_flags[0] == '\0')
 	    nonoption_flags_max_len = -1;
 	  else
@@ -324,7 +324,7 @@ static const char *_getopt_initialize (int /*argc*/, char* const* /*argv*/,
 		nonoption_flags_max_len = argc;
 	      __getopt_nonoption_flags =
 		(char *) malloc (nonoption_flags_max_len);
-	      if (__getopt_nonoption_flags == NULL)
+	      if (__getopt_nonoption_flags == 0)
 		nonoption_flags_max_len = -1;
 	      else
 		{
@@ -403,7 +403,7 @@ int
 _getopt_internal (int argc, char *const *argv, const char *optstring,
      const struct option *longopts, int *longind, int long_only)
 {
-  optarg = NULL;
+  optarg = 0;
 
   if (optind == 0 || !__getopt_initialized)
     {
@@ -425,7 +425,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 #define NONOPTION_P (argv[optind][0] != '-' || argv[optind][1] == '\0')
 #endif
 
-  if (nextchar == NULL || *nextchar == '\0')
+  if (nextchar == 0 || *nextchar == '\0')
     {
       /* Advance to the next ARGV-element.  */
 
@@ -499,7 +499,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 	 Skip the initial punctuation.  */
 
       nextchar = (argv[optind] + 1
-		  + (longopts != NULL && argv[optind][1] == '-'));
+		  + (longopts != 0 && argv[optind][1] == '-'));
     }
 
   /* Decode the current option-ARGV-element.  */
@@ -517,13 +517,13 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 
      This distinction seems to be the most useful approach.  */
 
-  if (longopts != NULL
+  if (longopts != 0
       && (argv[optind][1] == '-'
 	  || (long_only && (argv[optind][2] || !my_index (optstring, argv[optind][1])))))
     {
       char *nameend;
       const struct option *p;
-      const struct option *pfound = NULL;
+      const struct option *pfound = 0;
       int exact = 0;
       int ambig = 0;
       int indfound = -1;
@@ -546,7 +546,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 		exact = 1;
 		break;
 	      }
-	    else if (pfound == NULL)
+	    else if (pfound == 0)
 	      {
 		/* First nonexact match found.  */
 		pfound = p;
@@ -568,7 +568,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 	  return '?';
 	}
 
-      if (pfound != NULL)
+      if (pfound != 0)
 	{
 	  option_index = indfound;
 	  optind++;
@@ -615,7 +615,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 		}
 	    }
 	  nextchar += strlen (nextchar);
-	  if (longind != NULL)
+	  if (longind != 0)
 	    *longind = option_index;
 	  if (pfound->flag)
 	    {
@@ -630,7 +630,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 	 option, then it's an error.
 	 Otherwise interpret it as a short option.  */
       if (!long_only || argv[optind][1] == '-'
-	  || my_index (optstring, *nextchar) == NULL)
+	  || my_index (optstring, *nextchar) == 0)
 	{
 	  if (opterr)
 	    {
@@ -660,7 +660,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
     if (*nextchar == '\0')
       ++optind;
 
-    if (temp == NULL || c == ':')
+    if (temp == 0 || c == ':')
       {
 	if (opterr)
 	  {
@@ -680,7 +680,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
       {
 	char *nameend;
 	const struct option *p;
-	const struct option *pfound = NULL;
+	const struct option *pfound = 0;
 	int exact = 0;
 	int ambig = 0;
 	int indfound = 0;
@@ -733,7 +733,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 		  exact = 1;
 		  break;
 		}
-	      else if (pfound == NULL)
+	      else if (pfound == 0)
 		{
 		  /* First nonexact match found.  */
 		  pfound = p;
@@ -752,7 +752,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 	    optind++;
 	    return '?';
 	  }
-	if (pfound != NULL)
+	if (pfound != 0)
 	  {
 	    option_index = indfound;
 	    if (*nameend)
@@ -787,7 +787,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 		  }
 	      }
 	    nextchar += strlen (nextchar);
-	    if (longind != NULL)
+	    if (longind != 0)
 	      *longind = option_index;
 	    if (pfound->flag)
 	      {
@@ -796,7 +796,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 	      }
 	    return pfound->val;
 	  }
-	  nextchar = NULL;
+	  nextchar = 0;
 	  return 'W';	/* Let the application handle it.   */
       }
     if (temp[1] == ':')
@@ -810,8 +810,8 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 		optind++;
 	      }
 	    else
-	      optarg = NULL;
-	    nextchar = NULL;
+	      optarg = 0;
+	    nextchar = 0;
 	  }
 	else
 	  {
@@ -842,7 +842,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 	      /* We already incremented `optind' once;
 		 increment it again when taking next ARGV-elt as argument.  */
 	      optarg = argv[optind++];
-	    nextchar = NULL;
+	    nextchar = 0;
 	  }
       }
     return c;

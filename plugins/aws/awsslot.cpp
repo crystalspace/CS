@@ -12,7 +12,7 @@ static unsigned long NameToId (const char *n)
   if (n)
   {
     unsigned long id = aws_adler32 (
-        aws_adler32 (0, NULL, 0),
+        aws_adler32 (0, 0, 0),
         (unsigned char *)n,
         strlen (n));
 
@@ -79,7 +79,7 @@ iAwsSink *awsSinkManager::FindSink (const char *_name)
       return sm->sink;
   }
 
-  return NULL;
+  return 0;
 }
 
 iAwsSink *awsSinkManager::CreateSink (void *parm)
@@ -96,7 +96,7 @@ iAwsSlot *awsSinkManager::CreateSlot ()
 awsSink::awsSink (void *p) :
 parm(p), sink_err(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 awsSink::~awsSink ()
@@ -147,7 +147,7 @@ void awsSink::RegisterTrigger (const char *name,
 awsSource::awsSource (iAwsComponent *_owner) :
   owner(_owner)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 awsSource::~awsSource ()
@@ -213,7 +213,7 @@ void awsSource::Broadcast (unsigned long signal)
 ///////////////////////////////////// Slots ////////////////////////////////////////////////////////
 awsSlot::awsSlot ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 awsSlot::~awsSlot ()

@@ -12,7 +12,7 @@ void awsActionDispatcher::Register (const char *name,
   awsActionMap *map = new awsActionMap ();
 
   map->name = aws_adler32 (
-      aws_adler32 (0, NULL, 0),
+      aws_adler32 (0, 0, 0),
       (unsigned char *)name,
       strlen (name));
   map->Action = Action;
@@ -26,7 +26,7 @@ void awsActionDispatcher::Execute (
   iAwsParmList* parmlist)
 {
   unsigned long name = aws_adler32 (
-      aws_adler32 (0, NULL, 0),
+      aws_adler32 (0, 0, 0),
       (unsigned char *)action,
       strlen (action));
 

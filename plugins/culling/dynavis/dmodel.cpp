@@ -33,9 +33,9 @@
 
 csDynavisObjectModel::csDynavisObjectModel ()
 {
-  planes = NULL;
+  planes = 0;
   num_planes = -1;
-  edges = NULL;
+  edges = 0;
   num_edges = -1;
   dirty_obb = true;
   has_obb = false;
@@ -192,7 +192,7 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
 	  model->use_outline_filler = false;
 	  if (show_notclosed > 0)
 	  {
-	    printf ("WARNING! Object '%s' is not closed!\n", mw != NULL ?
+	    printf ("WARNING! Object '%s' is not closed!\n", mw != 0 ?
 	  	mw->QueryObject ()->GetName () : "<no mesh>");
 	    fflush (stdout);
 	    show_notclosed--;

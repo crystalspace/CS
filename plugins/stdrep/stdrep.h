@@ -43,7 +43,7 @@ public:
   char* msg;
   csTicks time;
 
-  csTimedMessage () : msg (NULL) { }
+  csTimedMessage () : msg (0) { }
   csTimedMessage (const char* m)
   {
     msg = csStrNew (m);
@@ -133,7 +133,7 @@ public:
   public:
     EventHandler (csReporterListener* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual ~EventHandler () { }

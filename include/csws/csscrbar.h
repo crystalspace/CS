@@ -62,7 +62,7 @@ enum
    * Set scroll bar range, value etc.
    * <pre>
    * IN:  (csScrollBarStatus *)status
-   * OUT: NULL if successful
+   * OUT: 0 if successful
    * </pre>
    */
   cscmdScrollBarSet = 0x00000600,
@@ -70,7 +70,7 @@ enum
    * Query scroll bar status
    * <pre>
    * IN:  (csScrollBarStatus *)status
-   * OUT: NULL if successful
+   * OUT: 0 if successful
    * </pre>
    */
   cscmdScrollBarGetStatus,

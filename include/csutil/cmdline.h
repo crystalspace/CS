@@ -55,14 +55,14 @@ private:
   /// The list of raw filenames on the command line (i.e. without any switches)
   csStrVector Names;
 
-  /// Find Nth command-line option and return a pointer to the object (or NULL)
+  /// Find Nth command-line option and return a pointer to the object (or 0)
   csCommandLineOption *FindOption (const char *iName, int iIndex) const;
 
 public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
-  csCommandLineParser (iBase *Parent = NULL);
+  csCommandLineParser (iBase *Parent = 0);
   /// Construct with a given command line.
   csCommandLineParser (int argc, const char* const argv[]);
   /// Destructor.

@@ -35,14 +35,14 @@ SCF_EXPORT_CLASS_TABLE_END
 csOpenDivX::csOpenDivX (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  ydata = udata = vdata = NULL;
+  ydata = udata = vdata = 0;
 }
 
 csOpenDivX::~csOpenDivX ()
 {
   if (bOK)
     // stop current processing
-    decore ( (unsigned long)this, DEC_OPT_RELEASE, NULL, NULL);
+    decore ( (unsigned long)this, DEC_OPT_RELEASE, 0, 0);
 
   delete [] ydata;
   delete [] udata;
@@ -67,12 +67,12 @@ bool csOpenDivX::Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *
   dec_param.x_dim = w;
   dec_param.y_dim = h;
   dec_param.color_depth = 32;
-  succ = (decore ((unsigned long)this, DEC_OPT_INIT, &dec_param, NULL) == DEC_OK);
+  succ = (decore ((unsigned long)this, DEC_OPT_INIT, &dec_param, 0) == DEC_OK);
 
   if (succ)
   {
     dec_set.postproc_level = 0; // no pp
-    bOK = (decore ((unsigned long)this, DEC_OPT_SETPP, &dec_set, NULL) == DEC_OK);
+    bOK = (decore ((unsigned long)this, DEC_OPT_SETPP, &dec_set, 0) == DEC_OK);
   }
   return bOK;
 }
@@ -93,7 +93,7 @@ bool csOpenDivX::Decode (char *indata, uint32 inlength, void *&outdata)
     dec_frame.bitstream = indata;
     dec_frame.bmp = yuvdata;
     dec_frame.render_flag = 1;
-    decore ((unsigned long)this, 0, &dec_frame, NULL);
+    decore ((unsigned long)this, 0, &dec_frame, 0);
     outdata = yuvdata;
 
     return true;

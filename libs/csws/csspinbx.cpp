@@ -32,7 +32,7 @@
 // The pause between first click and autorepeat
 #define AUTO_SPIN_STARTINTERVAL		500
 
-static csPixmap *sprspin [3] = { NULL, NULL, NULL };
+static csPixmap *sprspin [3] = { 0, 0, 0 };
 static int spinboxref = 0;
 
 inline int sqr(int x)
@@ -45,7 +45,7 @@ csSpinBox::csSpinBox (csComponent *iParent, csInputLineFrameStyle iFrameStyle)
 {
   SpinState = 0;
   Value = NumLimits.MinValue = NumLimits.MaxValue = 0;
-  NumLimits.ValueFormat = NULL;
+  NumLimits.ValueFormat = 0;
   SpinTimer = new csTimer (this, AUTO_SPIN_INTERVAL);
   SpinTimer->Stop ();
 
@@ -71,7 +71,7 @@ csSpinBox::~csSpinBox ()
     for (i = 0; i < 3; i++)
     {
       delete sprspin [i];
-      sprspin [i] = NULL;
+      sprspin [i] = 0;
     } /* endfor */
   }
 }
@@ -223,7 +223,7 @@ bool csSpinBox::HandleEvent (iEvent &Event)
         case CSKEY_DOWN:
           if (app->KeyboardOwner == this)
           {
-            app->CaptureKeyboard (NULL);
+            app->CaptureKeyboard (0);
             SpinState = 0;
             Invalidate ();
           } /* endif */

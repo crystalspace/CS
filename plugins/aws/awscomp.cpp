@@ -17,17 +17,17 @@
 //#define AWS_COMP_DEBUG
 
 awsComponent::awsComponent () :
-  wmgr(NULL),
-  parent(NULL),
-  top_child(NULL),
-  below(NULL),
-  above(NULL),
+  wmgr(0),
+  parent(0),
+  top_child(0),
+  below(0),
+  above(0),
   is_zoomed(false),
   flags(0),
   signalsrc(this),
 	focusable(false)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 awsComponent::~awsComponent ()
@@ -126,7 +126,7 @@ void awsComponent::SetID (unsigned long _id)
 
 bool awsComponent::HasChildren ()
 {
-  return top_child != NULL;
+  return top_child != 0;
 }
 
 iAws *awsComponent::WindowManager ()
@@ -170,7 +170,7 @@ bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent,
     return false;
 
   // if we are a top-level component link in to the top-level list
-  if(Parent() == NULL)
+  if(Parent() == 0)
   {
     // Link into the current hierarchy, at the top.
     if (wmgr->GetTopComponent ())
@@ -226,7 +226,7 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
     // Children are automatically filled in by the windowmanager.
 
     // Do layout check
-    iString *ln = NULL;
+    iString *ln = 0;
 
     pm->GetString (settings, "Layout", ln);
 
@@ -460,7 +460,7 @@ iAwsComponent *awsComponent::FindChild(const char* name)
 
 iAwsComponent *awsComponent::DoFindChild(unsigned id)
 {
-  if (!HasChildren ()) return NULL;
+  if (!HasChildren ()) return 0;
   iAwsComponent* result;
 
   for (iAwsComponent *child = GetTopChild(); child ; child = child->ComponentBelow())
@@ -470,18 +470,18 @@ iAwsComponent *awsComponent::DoFindChild(unsigned id)
       return child;
 
     // otherwise, check this child
-    if ((result = child->DoFindChild(id))!=NULL)
+    if ((result = child->DoFindChild(id))!=0)
       return result;
   }
 
-  return NULL;
+  return 0;
 }
 
 iAwsComponent *awsComponent::ChildAt(int x, int y)
 {
-  // if the point is not inside the client area then return NULL
+  // if the point is not inside the client area then return 0
   if(!Frame().Contains(x,y))
-    return NULL;
+    return 0;
 
   for(iAwsComponent* cmp = GetTopChild(); cmp; cmp = cmp->ComponentBelow())
   {
@@ -495,7 +495,7 @@ iAwsComponent *awsComponent::ChildAt(int x, int y)
       return cmp;
   }
   
-  return NULL;
+  return 0;
 }
 
 void awsComponent::Hide ()
@@ -696,7 +696,7 @@ void awsComponent::Unlink()
     ComponentAbove()->SetComponentBelow(ComponentBelow());
   if(ComponentBelow())
     ComponentBelow()->SetComponentAbove(ComponentAbove());
-  above = below = NULL;
+  above = below = 0;
 
   CS_ASSERT(LinkedListCheck());
 }
@@ -738,7 +738,7 @@ iAwsComponent *awsComponent::TabNext(iAwsComponent *child)
 	int n = TabOrder.Find(child);
 
 	if(n == -1)
-		return NULL;
+		return 0;
 	else 
 	if(n == TabOrder.Length() -1)
 		return ((iAwsComponent *)TabOrder[0]);
@@ -751,7 +751,7 @@ iAwsComponent *awsComponent::TabPrev(iAwsComponent *child)
 	int n = TabOrder.Find(child);
 
 	if(n == -1)
-		return NULL;
+		return 0;
 	else 
 	if(n == 0)
 		return ((iAwsComponent *)TabOrder[TabOrder.Length() -1]);
@@ -768,7 +768,7 @@ iAwsComponent *awsComponent::GetTabComponent(int index)
 {
 	if(index < TabOrder.Length())
 		return ((iAwsComponent *)TabOrder[index]);	
-	else return NULL;
+	else return 0;
 }
 
 void awsComponent::SetAbove(iAwsComponent* comp)
@@ -1049,7 +1049,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsComponentFactory::awsComponentFactory (iAws *_wmgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   // This is where you call register, only you must do it in the derived factory.  Like this:
 
   wmgr = _wmgr;

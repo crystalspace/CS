@@ -39,7 +39,7 @@ struct iReference : public iBase
   /// Get the referenced object.
   virtual iReferencedObject* GetReferencedObject () const = 0;
 
-  /// Set the referenced object. Can be NULL to clear the reference.
+  /// Set the referenced object. Can be 0 to clear the reference.
   virtual void SetReferencedObject (iReferencedObject*) = 0;
 };
 

@@ -143,7 +143,7 @@ public:
   void DeleteAll (bool FreeThem = true);
 
   /// Insert element 'Item' so that array remains sorted (assumes its already)
-  int InsertSorted (void* Item, int *oEqual = NULL, int Mode = 0);
+  int InsertSorted (void* Item, int *oEqual = 0, int Mode = 0);
   /// Virtual function which frees a vector element; returns success status
   virtual bool FreeItem (void* Item);
   /// Compare two array elements in given Mode
@@ -207,7 +207,7 @@ inline int csBasicVector::PushSmart (void* what)
 inline void* csBasicVector::Pop ()
 {
   if (count<=0)
-    return NULL;
+    return 0;
 
   void* ret = root [count - 1];
   SetLength (count - 1);

@@ -51,9 +51,9 @@ private:
 
   // Last operation.
   int last_op;
-  // Last light (or NULL if last operation has nothing to do with lights).
+  // Last light (or 0 if last operation has nothing to do with lights).
   iLight* last_light;
-  // Last movable (or NULL if last operation has nothing to do with movables).
+  // Last movable (or 0 if last operation has nothing to do with movables).
   iMovable* last_movable;
 
 public:

@@ -55,11 +55,11 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  virtual bool BeginDraw () { return (Memory != NULL); }
+  virtual bool BeginDraw () { return (Memory != 0); }
   virtual bool DoubleBuffer (bool /*Enable*/) { return true; }
   virtual bool GetDoubleBufferState () { return true; }
 
-  virtual void Print (csRect *area = NULL);
+  virtual void Print (csRect *area = 0);
   virtual void SetRGB (int i, int r, int g, int b);
 
   /// Called on every frame by system driver

@@ -90,7 +90,7 @@ extern csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
   int iButtonStyle = CSBS_SHIFT | CSBS_TEXTBELOW);
 /// The short way to add a icon button to a toolbar
 extern csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
-  csPixmap *bmpup = NULL, csPixmap *bmpdn = NULL,
+  csPixmap *bmpup = 0, csPixmap *bmpdn = 0,
   csButtonFrameStyle iFrameStyle = csbfsThinRect,
   int iButtonStyle = CSBS_SHIFT, bool iDeletePixmaps = true);
 /// Create and return a new bitmap (2D sprite)

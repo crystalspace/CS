@@ -43,9 +43,9 @@ SCF_EXPORT_CLASS_TABLE(cspython)
     "Crystal Space Script Python")
 SCF_EXPORT_CLASS_TABLE_END
 
-csPython* csPython::shared_instance = NULL;
+csPython* csPython::shared_instance = 0;
 
-csPython::csPython(iBase *iParent) :object_reg(NULL),
+csPython::csPython(iBase *iParent) :object_reg(0),
 	Mode(CS_REPORTER_SEVERITY_NOTIFY)
 {
   SCF_CONSTRUCT_IBASE(iParent);
@@ -57,7 +57,7 @@ csPython::~csPython()
 {
   Mode=CS_REPORTER_SEVERITY_BUG;
   Py_Finalize();
-  object_reg=NULL;
+  object_reg=0;
 }
 
 extern "C" {

@@ -45,7 +45,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csBinaryDocAttributeIterator::csBinaryDocAttributeIterator ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 void csBinaryDocAttributeIterator::SetTo (csBdNode* node,
@@ -53,7 +53,7 @@ void csBinaryDocAttributeIterator::SetTo (csBdNode* node,
 {
   if (!(node->flags & BD_NODE_HAS_ATTR))
   {
-    iteratedNode = NULL;
+    iteratedNode = 0;
   }
   else
   {
@@ -88,7 +88,7 @@ csBdAttr::csBdAttr (const char* name)
 {
   flags = BD_ATTR_MODIFIED;
   value = 0;
-  vstr = NULL;
+  vstr = 0;
   nstr = csStrNew (name);
 }
 
@@ -167,10 +167,10 @@ SCF_IMPLEMENT_IBASE_END
 
 csBinaryDocAttribute::csBinaryDocAttribute ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
-  vstr = NULL;
-  vsptr = NULL;
+  vstr = 0;
+  vsptr = 0;
 };
 
 csBinaryDocAttribute::~csBinaryDocAttribute ()
@@ -231,7 +231,7 @@ const char* csBinaryDocAttribute::GetValue ()
 	return vstr;
       }
     default:
-      return NULL;
+      return 0;
   }
 }
 
@@ -327,8 +327,8 @@ void csBinaryDocAttribute::SetValue (const char* val)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
   {
-    delete[] attrPtr->vstr; attrPtr->vstr = NULL;
-    delete[] vstr; vstr = NULL;
+    delete[] attrPtr->vstr; attrPtr->vstr = 0;
+    delete[] vstr; vstr = 0;
     int v;
     float f;
     if (checkInt (val, v))
@@ -356,8 +356,8 @@ void csBinaryDocAttribute::SetValueAsInt (int v)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
   {
-    delete[] attrPtr->vstr; attrPtr->vstr = NULL;
-    delete[] vstr; vstr = NULL;
+    delete[] attrPtr->vstr; attrPtr->vstr = 0;
+    delete[] vstr; vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_INT;
     attrPtr->value = little_endian_long (v);
@@ -368,8 +368,8 @@ void csBinaryDocAttribute::SetValueAsFloat (float f)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
   {
-    delete[] attrPtr->vstr;	attrPtr->vstr = NULL;
-    delete[] vstr; vstr = NULL;
+    delete[] attrPtr->vstr;	attrPtr->vstr = 0;
+    delete[] vstr; vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
     attrPtr->value = little_endian_long (float2long (f));
@@ -422,9 +422,9 @@ SCF_IMPLEMENT_IBASE_END
 
 csBinaryDocNodeIterator::csBinaryDocNodeIterator ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
-  value = NULL;
+  value = 0;
 }
 
 void csBinaryDocNodeIterator::SetTo (csBdNode* node,
@@ -440,11 +440,11 @@ void csBinaryDocNodeIterator::SetTo (csBdNode* node,
   }
   else
   {
-    value = NULL;
+    value = 0;
   }
   if (!(node->flags & BD_NODE_HAS_CHILDREN))
   {
-    iteratedNode = NULL;
+    iteratedNode = 0;
   }
   else
   {
@@ -501,7 +501,7 @@ csBdNode::csBdNode (uint32 newType)
 {
   flags = newType | BD_NODE_MODIFIED;
   value = 0;
-  vstr = NULL;
+  vstr = 0;
 
   attrs = new csPDelArray<csBdAttr>;
   nodes = new csPDelArray<csBdNode>;
@@ -527,7 +527,7 @@ bdNodeChildTab* csBdNode::GetChildTab ()
       (little_endian_long (offsets[offsetnum]));
   }
   else
-    return NULL;
+    return 0;
 }
 
 bdNodeAttrTab* csBdNode::GetAttrTab ()
@@ -539,7 +539,7 @@ bdNodeAttrTab* csBdNode::GetAttrTab ()
       (little_endian_long (offsets[0]));
   }
   else
-    return NULL;
+    return 0;
 }
 
 const char* csBdNode::GetValueStr (csBinaryDocument* doc)
@@ -725,10 +725,10 @@ SCF_IMPLEMENT_IBASE_END
 
 csBinaryDocNode::csBinaryDocNode ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
-  vstr = NULL;
-  vsptr = NULL;
+  vstr = 0;
+  vsptr = 0;
 }
 
 csBinaryDocNode::~csBinaryDocNode ()
@@ -811,7 +811,7 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
 	return vstr;
       }
     default:
-      return NULL;
+      return 0;
   }
 }
 
@@ -968,8 +968,8 @@ void csBinaryDocNode::SetValue (const char* value)
 {
   if (nodeData->flags & BD_NODE_MODIFIED)
   {
-    delete[] vstr; vstr = NULL;
-    delete[] nodeData->vstr; nodeData->vstr = NULL;
+    delete[] vstr; vstr = 0;
+    delete[] nodeData->vstr; nodeData->vstr = 0;
     int v;
     float f;
     if (checkInt (value, v))
@@ -997,7 +997,7 @@ void csBinaryDocNode::SetValueAsInt (int value)
 {
   if (nodeData->flags & BD_NODE_MODIFIED)
   {
-    delete[] vstr; vstr = NULL;
+    delete[] vstr; vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) |
       BD_VALUE_TYPE_INT;
     nodeData->value = little_endian_long (value);
@@ -1008,7 +1008,7 @@ void csBinaryDocNode::SetValueAsFloat (float value)
 {
   if (nodeData->flags & BD_NODE_MODIFIED)
   {
-    delete[] vstr; vstr = NULL;
+    delete[] vstr; vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) |
       BD_VALUE_TYPE_FLOAT;
     nodeData->value = little_endian_long (float2long (value));
@@ -1050,7 +1050,7 @@ csRef<iDocumentNode> csBinaryDocNode::GetNode (const char* value)
       }
     }
   }
-  return NULL;
+  return 0;
 }
 
 void csBinaryDocNode::RemoveNode (const csRef<iDocumentNode>& child)
@@ -1096,7 +1096,7 @@ csRef<iDocumentNode> csBinaryDocNode::CreateNodeBefore (csDocumentNodeType type,
 	break;
 
       default:
-	return NULL;
+	return 0;
     }
 
     csBdNode* newData = new csBdNode (newType);
@@ -1119,7 +1119,7 @@ csRef<iDocumentNode> csBinaryDocNode::CreateNodeBefore (csDocumentNodeType type,
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -1138,7 +1138,7 @@ const char* csBinaryDocNode::GetContentsValue ()
       }
     }
   }
-  return NULL;
+  return 0;
 }
 
 int csBinaryDocNode::GetContentsValueAsInt ()
@@ -1220,7 +1220,7 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
     }
     else
     {
-      return NULL;
+      return 0;
     }
   }
   else
@@ -1231,7 +1231,7 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
     return csPtr<iDocumentAttribute> (attr);
   }
 
-  return NULL;
+  return 0;
 }
 
 const char* csBinaryDocNode::GetAttributeValue (const char* name)
@@ -1243,7 +1243,7 @@ const char* csBinaryDocNode::GetAttributeValue (const char* name)
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -1432,11 +1432,11 @@ SCF_IMPLEMENT_IBASE_END
 
 csBinaryDocument::csBinaryDocument ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  nodePool = NULL;
-  attrPool = NULL;
-  root = NULL;
-  outStrHash = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  nodePool = 0;
+  attrPool = 0;
+  root = 0;
+  outStrHash = 0;
 }
 
 csBinaryDocument::~csBinaryDocument ()
@@ -1528,7 +1528,7 @@ csBinaryDocNode* csBinaryDocument::GetRootNode ()
 {
   csBinaryDocNode* rootNode;
   rootNode = GetPoolNode();
-  rootNode->SetTo (root, NULL);
+  rootNode->SetTo (root, 0);
   return rootNode;
 }
 
@@ -1536,7 +1536,7 @@ uint32 csBinaryDocument::GetOutStringID (const char* str)
 {
   CS_ASSERT (outStrStorage);
   CS_ASSERT (outStrHash);
-  if (str == NULL) return BD_OFFSET_INVALID;
+  if (str == 0) return BD_OFFSET_INVALID;
   uint32 val;
   val = outStrHash->Request (str);
   if (val == csInvalidStringID)
@@ -1551,16 +1551,16 @@ uint32 csBinaryDocument::GetOutStringID (const char* str)
 
 const char* csBinaryDocument::GetInIDString (uint32 ID)
 {
-  if (ID == BD_OFFSET_INVALID) return NULL;
+  if (ID == BD_OFFSET_INVALID) return 0;
   return (char*)(dataStart + inStrTabOfs + 
     ID);
 }
 
 void csBinaryDocument::Clear ()
 {
-  data = NULL; 
-  dataStart = NULL;
-  delete root; root = NULL;
+  data = 0; 
+  dataStart = 0;
+  delete root; root = 0;
 }
 
 csRef<iDocumentNode> csBinaryDocument::CreateRoot ()
@@ -1605,7 +1605,7 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf)
   }
   
   Clear();
-  root = NULL;
+  root = 0;
   data = buf;
   dataStart = data->GetUint8();
 
@@ -1613,7 +1613,7 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf)
 
   root = (csBdNode*)((uint8*)bdDoc + bdDoc->ofsRoot);
 
-  return NULL;
+  return 0;
 }
 
 const char* csBinaryDocument::Parse (iString* str)
@@ -1672,7 +1672,7 @@ const char* csBinaryDocument::Write (csMemFile& out)
     doc.ofsRoot = BD_OFFSET_INVALID;
   }
   delete outStrHash; 
-  outStrHash = NULL;
+  outStrHash = 0;
 
   doc.ofsRoot = out.GetPos();
   {
@@ -1694,7 +1694,7 @@ const char* csBinaryDocument::Write (csMemFile& out)
   out.Write ((char*)&head, sizeof (head));
   out.Write ((char*)&doc, sizeof (doc));
 
-  return NULL;
+  return 0;
 }
 
 const char* csBinaryDocument::Write (iFile* file)

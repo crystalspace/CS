@@ -104,7 +104,7 @@ int csModelConverterPOV::GetFormatCount ()
 
 const csModelConverterFormat *csModelConverterPOV::GetFormat (int idx)
 {
-  return (idx == 0) ? &FormatInfo : NULL;
+  return (idx == 0) ? &FormatInfo : 0;
 }
 
 static void WriteVertex (csString &out, iModelDataVertices *Vertices,
@@ -121,7 +121,7 @@ static void WriteVertex (csString &out, iModelDataVertices *Vertices,
 
 csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 {
-  return NULL;
+  return 0;
 }
 
 /*
@@ -192,7 +192,7 @@ csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/
 csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "pov"))
-    return NULL;
+    return 0;
 
   csString out;
   out << "// This file was created by csModelConverterPOV from Crystal Space.\n";

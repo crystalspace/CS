@@ -65,13 +65,13 @@ protected:
   unsigned char *bits;
 public:
   /// Create an empty bit set
-  csBitSet () : bit_count (0), byte_count (0), bits (NULL)
+  csBitSet () : bit_count (0), byte_count (0), bits (0)
   {
   }
 
   /// Create bit set of given size
   csBitSet (unsigned iBitCount) :
-    bit_count (iBitCount), byte_count (0), bits (NULL)
+    bit_count (iBitCount), byte_count (0), bits (0)
   {
     if (iBitCount > 0)
     {
@@ -112,7 +112,7 @@ public:
     else if (bits)
     {
       free (bits);
-      bits = NULL;
+      bits = 0;
     }
   }
 

@@ -22,7 +22,7 @@
 
 csConsoleBuffer::csConsoleBuffer (int length, int size)
 {
-  buffer = NULL;
+  buffer = 0;
   SetLength (length);
   SetPageSize (size);
   empty = new csString ("");
@@ -45,8 +45,8 @@ csConsoleBuffer::~csConsoleBuffer ()
 
 void csConsoleBuffer::NewLine (bool snap)
 {
-  // Assign the empty display string to avoid NULL pointer ugliness
-  if (buffer[current_line] == NULL)
+  // Assign the empty display string to avoid 0 pointer ugliness
+  if (buffer[current_line] == 0)
     buffer [current_line] = empty;
 
   // Increment current line and account for going past the end of the buffer
@@ -58,7 +58,7 @@ void csConsoleBuffer::NewLine (bool snap)
       delete buffer [0];
     // Shift all the lines up by one
     memmove (buffer, &buffer + 1, (len - 1) * sizeof (csString *));
-    buffer [len - 1] = NULL;
+    buffer [len - 1] = 0;
     current_line = len - 1;
 
     // Invalidate all the lines now visible to scroll properly
@@ -69,7 +69,7 @@ void csConsoleBuffer::NewLine (bool snap)
   // Clear the new current line and mark it dirty
   if (buffer [current_line] != empty)
     delete buffer [current_line];
-  buffer [current_line] = NULL;
+  buffer [current_line] = 0;
   dirty [current_line] = true;
 
   if (snap
@@ -87,7 +87,7 @@ void csConsoleBuffer::NewLine (bool snap)
 
 csString *csConsoleBuffer::WriteLine ()
 {
-  if (buffer [current_line] == NULL
+  if (buffer [current_line] == 0
    || buffer [current_line] == empty)
     buffer [current_line] = new csString ();
   dirty [current_line] = true;
@@ -99,7 +99,7 @@ const csString *csConsoleBuffer::GetLine (int line, bool *dirty_line)
   if (line > display_bottom)
   {
     if (dirty_line) *dirty_line = false;
-    return NULL;
+    return 0;
   }
   int pos = display_top + line;
   if (dirty_line)
@@ -135,7 +135,7 @@ void csConsoleBuffer::Clear ()
     {
       if (buffer [i] != empty)
 	delete buffer [i];
-      buffer [i] = NULL;
+      buffer [i] = 0;
       dirty [i] = true;
     }
 
@@ -204,6 +204,6 @@ void csConsoleBuffer::DeleteLine(int line)
     pos = line;
   if (buffer [pos] != empty)
     delete buffer [pos];
-  buffer [pos] = NULL;
+  buffer [pos] = 0;
   dirty [pos] = true;
 }

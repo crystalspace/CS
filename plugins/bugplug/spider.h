@@ -62,7 +62,7 @@ public:
   iCamera* GetCamera () { return camera; }
 
   /// Clear the camera so that Spider can catch a new one.
-  void ClearCamera () { camera = NULL; }
+  void ClearCamera () { camera = 0; }
 
   /**
    * Weave the web: i.e. distribute Spider over all engine sectors.
@@ -87,7 +87,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory () const { return NULL; }
+  virtual iMeshObjectFactory* GetFactory () const { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight**, int, iMovable*) { }
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode) { return false; }
@@ -101,7 +101,7 @@ public:
 
 #endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
-  virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return NULL; }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
@@ -118,15 +118,15 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpider);
     virtual long GetShapeNumber () const { return 1; }
-    virtual iPolygonMesh* GetPolygonMeshBase () { return NULL; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
+    virtual iPolygonMesh* GetPolygonMeshBase () { return 0; }
+    virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
     virtual void SetPolygonMeshColldet (iPolygonMesh*) { }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
+    virtual iPolygonMesh* GetPolygonMeshViscull () { return 0; }
     virtual void SetPolygonMeshViscull (iPolygonMesh*) { }
-    virtual iPolygonMesh* GetPolygonMeshShadows () { return NULL; }
+    virtual iPolygonMesh* GetPolygonMeshShadows () { return 0; }
     virtual void SetPolygonMeshShadows (iPolygonMesh*) { }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
+    { return 0; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -148,9 +148,9 @@ public:
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 };
 
 #endif // __CS_SPIDER_H__

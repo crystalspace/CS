@@ -71,13 +71,13 @@ public:
    * Display the console and return the dirty rectangle.
    * The graphics driver should be in 2D draw mode.
    */
-  virtual void Draw2D (csRect *oRect = NULL);
+  virtual void Draw2D (csRect *oRect = 0);
 
   /**
    * Update the 3D part of the console on the window.
    * The graphics driver should be in 3D draw mode.
    */
-  virtual void Draw3D (csRect *oRect = NULL)
+  virtual void Draw3D (csRect *oRect = 0)
   {(void) oRect;}
 
   /**
@@ -174,7 +174,7 @@ public:
   public:
     EventHandler (csConsoleOutput* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;

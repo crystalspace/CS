@@ -39,7 +39,7 @@ public:
   DirectDetection2D()
   {
     Mipmap = false; Texture = false; Can3D = false; Windowed = false;
-    IsPrimary2D = true; DeviceName2D = NULL; DeviceDescription2D = NULL;
+    IsPrimary2D = true; DeviceName2D = 0; DeviceDescription2D = 0;
     ZeroMemory(&Guid2D, sizeof(GUID));
   }
   virtual ~DirectDetection2D() 
@@ -67,7 +67,7 @@ public:
     Perspective = false; HighColor = false; ZBuffer = false;
     ZeroMemory(&Desc3D, sizeof(D3DDEVICEDESC));
     ZeroMemory(&Guid3D, sizeof(GUID));
-    DeviceName3D = NULL; DeviceDescription3D = NULL;
+    DeviceName3D = 0; DeviceDescription3D = 0;
     IsPrimary3D = true;
 
     memcpy((DirectDetection2D *)this, dd2d, sizeof(DirectDetection2D));
@@ -78,7 +78,7 @@ public:
     Perspective = false; HighColor = false; ZBuffer = false;
     ZeroMemory(&Desc3D, sizeof(D3DDEVICEDESC));
     ZeroMemory(&Guid3D, sizeof(GUID));
-    DeviceName3D = NULL; DeviceDescription3D = NULL;
+    DeviceName3D = 0; DeviceDescription3D = 0;
     IsPrimary3D = true;
   }
   virtual ~DirectDetection3D() {}
@@ -102,7 +102,7 @@ public:
 class DirectDetectionDevice : public DirectDetection3D, public IDirectDetectionInternal
 {
 public:
-  DirectDetectionDevice():DirectDetection3D() {next = NULL; Only2D = true;}
+  DirectDetectionDevice():DirectDetection3D() {next = 0; Only2D = true;}
   virtual ~DirectDetectionDevice() {}
 
   bool Only2D; // Is only a 2d device ?

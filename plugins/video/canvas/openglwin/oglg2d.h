@@ -53,7 +53,7 @@ public:
 
   virtual bool Initialize(iObjectRegistry *object_reg);
 
-  virtual void Print (csRect *area = NULL);
+  virtual void Print (csRect *area = 0);
 
   virtual void SetRGB(int i, int r, int g, int b);
 
@@ -76,7 +76,7 @@ public:
 
   /**
    * Get address of video RAM at given x,y coordinates.
-   * The OpenGL version of this function just returns NULL.
+   * The OpenGL version of this function just returns 0.
    */
   static unsigned char* GetPixelAtGL (int x, int y);
 

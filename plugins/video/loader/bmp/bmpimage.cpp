@@ -173,7 +173,7 @@ csPtr<iImage> csBMPImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return 0;
   }
   return csPtr<iImage> (i);
 }
@@ -185,10 +185,10 @@ void csBMPImageIO::SetDithering (bool)
 csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
   const char* extraoptions)
 {
-  extraoptions = NULL;
+  extraoptions = 0;
 
   if (!Image || !Image->GetImageData ())
-    return NULL;
+    return 0;
 
   // check if we have a format we support saving
   int format = Image->GetFormat ();
@@ -202,7 +202,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     break;
   default:
       // unknown format
-      return NULL;
+      return 0;
   } /* endswitch */
 
   // alpha channel?
@@ -211,7 +211,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   int bytesPerPixel = palette?1:(hasAlpha?4:3);
 
   if (palette && !Image->GetPalette ())
-    return NULL;
+    return 0;
 
   // calc size
   int w = Image->GetWidth ();
@@ -289,9 +289,9 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
   if (!strcasecmp (mime, BMP_MIME))
-    return Save (Image, (iImageIO::FileFormatDescription *)NULL,
+    return Save (Image, (iImageIO::FileFormatDescription *)0,
       extraoptions);
-  return NULL;
+  return 0;
 }
 
 bool ImageBMPFile::Load (uint8* iBuffer, uint32 iSize)

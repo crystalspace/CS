@@ -62,13 +62,13 @@ struct iObjectRegistry : public iBase
    * best to have different tags so they can be distinguished.
    * This function will increase the ref count of the given object.
    * <p>
-   * Note that a given tag (if non-NULL) may only be registered once.
+   * Note that a given tag (if non-0) may only be registered once.
    * This function will return false otherwise.
    * <p>
    * This function will also fail if this object registry is being
    * cleared.
    */
-  virtual bool Register (iBase*, char const* tag = NULL) = 0;
+  virtual bool Register (iBase*, char const* tag = 0) = 0;
 
   /**
    * Unregister an object with this registry. If 'tag' is not given
@@ -77,7 +77,7 @@ struct iObjectRegistry : public iBase
    * the object that has that tag will be unregistered.
    * This function will decrease the ref count of the given object.
    */
-  virtual void Unregister (iBase*, char const* tag = NULL) = 0;
+  virtual void Unregister (iBase*, char const* tag = 0) = 0;
 
   /**
    * Get the registered object corresponding with the given tag.
@@ -127,7 +127,7 @@ struct iObjectRegistryIterator : public iBase
   virtual bool Restart () = 0;
 
   /**
-   * Get the current element. Return NULL if none (end of list).
+   * Get the current element. Return 0 if none (end of list).
    */
   virtual iBase* GetCurrent () = 0;
 

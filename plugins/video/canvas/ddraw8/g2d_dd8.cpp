@@ -49,14 +49,14 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DDDraw8::csGraphics2DDDraw8 (iBase *iParent) :
   csGraphics2D (iParent),
-  m_lpDD7 (NULL),
-  m_lpddsPrimary (NULL),
-  m_lpddsBack (NULL),
-  m_lpddsBackLeft (NULL),
-  m_lpddClipper (NULL),
-  m_lpddPal (NULL),
-  m_hWnd (NULL),
-  m_hWndPalette (NULL),
+  m_lpDD7 (0),
+  m_lpddsPrimary (0),
+  m_lpddsBack (0),
+  m_lpddsBackLeft (0),
+  m_lpddClipper (0),
+  m_lpddPal (0),
+  m_hWnd (0),
+  m_hWndPalette (0),
   m_bUses3D (false),
   m_bPalettized (false),
   m_bPaletteChanged (false),
@@ -65,8 +65,8 @@ csGraphics2DDDraw8::csGraphics2DDDraw8 (iBase *iParent) :
   m_bDoubleBuffer (false),
   m_bAllowWindowed (false)
 {
-  m_hInstance = GetModuleHandle (NULL);
-  D3DCallback = NULL;
+  m_hInstance = GetModuleHandle (0);
+  D3DCallback = 0;
 }
 
 csGraphics2DDDraw8::~csGraphics2DDDraw8 ()
@@ -121,7 +121,7 @@ bool csGraphics2DDDraw8::Open ()
   // Create the window.
   m_hWnd = CreateWindow (CS_WIN32_WINDOW_CLASS_NAME, win_title, 0,
     m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
-    m_rcWindow.bottom - m_rcWindow.top, NULL, NULL, m_hInstance, NULL);
+    m_rcWindow.bottom - m_rcWindow.top, 0, 0, m_hInstance, 0);
   ASSERT (m_hWnd);
 
   // Subclass the window
@@ -148,13 +148,13 @@ bool csGraphics2DDDraw8::Open ()
     DirectDevice = DDetection.findBestDevice3D (FullScreen);
   }
 
-  if (DirectDevice == NULL)
+  if (DirectDevice == 0)
   {
     InitFail (DD_FALSE, "Error creating DirectDevice\n");
     return false;
   }
 
-  LPGUID pGuid = NULL;
+  LPGUID pGuid = 0;
   if (!DirectDevice->IsPrimary2D)
     pGuid = &DirectDevice->Guid2D;
 
@@ -164,7 +164,7 @@ bool csGraphics2DDDraw8::Open ()
   // Create a DD object for either the primary device or the secondary.
   HRESULT ddrval;
   LPDIRECTDRAW lpDD;
-  if ((ddrval = DirectDrawCreate (pGuid, &lpDD, NULL)) != DD_OK)
+  if ((ddrval = DirectDrawCreate (pGuid, &lpDD, 0)) != DD_OK)
   {
     InitFail (ddrval, "DirectDrawCreate FAILED (Code: %08lx)\n");
     return false;
@@ -179,8 +179,8 @@ bool csGraphics2DDDraw8::Open ()
   // We don't need the raw DirectDraw object anymore ...
   lpDD->Release ();
 
-  Memory = NULL;
-  m_hWndPalette = NULL;
+  Memory = 0;
+  m_hWndPalette = 0;
 
   if (InitSurfaces () != DD_OK)
     return false;
@@ -199,19 +199,19 @@ void csGraphics2DDDraw8::Close ()
     if (m_lpddPal)
     {
       m_lpddPal->Release ();
-      m_lpddPal = NULL;
+      m_lpddPal = 0;
     }
     m_lpDD7->Release ();
-    m_lpDD7 = NULL;
+    m_lpDD7 = 0;
   }
 
   if (!FullScreen)
   {
     // restore the original system palette.
-    HDC dc = GetDC (NULL);
+    HDC dc = GetDC (0);
     SetSystemPaletteUse (dc, SYSPAL_STATIC);
     PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-    ReleaseDC (NULL, dc);
+    ReleaseDC (0, dc);
   }
 
   csGraphics2D::Close ();
@@ -249,11 +249,11 @@ bool csGraphics2DDDraw8::BeginDraw ()
 
   DDSURFACEDESC2 ddsd;
   ddsd.dwSize = sizeof (ddsd);
-  ddsd.lpSurface = NULL;
+  ddsd.lpSurface = 0;
 
   HRESULT ret = DDERR_WASSTILLDRAWING;
   while (ret == DDERR_WASSTILLDRAWING)
-    ret = m_lpddsBack->Lock (NULL, &ddsd, DDLOCK_SURFACEMEMORYPTR, NULL);
+    ret = m_lpddsBack->Lock (0, &ddsd, DDLOCK_SURFACEMEMORYPTR, 0);
 
   if (ret != DD_OK)
   {
@@ -264,7 +264,7 @@ bool csGraphics2DDDraw8::BeginDraw ()
   Memory = (unsigned char *)ddsd.lpSurface;
   m_bLocked = true;
 
-  return (Memory != NULL);
+  return (Memory != 0);
 }
 
 void csGraphics2DDDraw8::FinishDraw ()
@@ -275,9 +275,9 @@ void csGraphics2DDDraw8::FinishDraw ()
 
   if (m_bLocked)
   {
-    m_lpddsBack->Unlock (NULL);
+    m_lpddsBack->Unlock (0);
     m_bLocked = false;
-    Memory = NULL;
+    Memory = 0;
   }
 }
 
@@ -290,7 +290,7 @@ void csGraphics2DDDraw8::Print (csRect* area)
 
     if (FullScreen && m_bDoubleBuffer)
     {
-      ddrval = m_lpddsPrimary->Flip (NULL, 0);
+      ddrval = m_lpddsPrimary->Flip (0, 0);
       m_nActivePage ^= 1;
     }
     else
@@ -323,7 +323,7 @@ void csGraphics2DDDraw8::Print (csRect* area)
       }
 
       ddrval = m_lpddsPrimary->Blt (&rcScreen, m_lpddsBack,
-        area ? &rcSource : NULL, DDBLT_WAIT, NULL);
+        area ? &rcSource : 0, DDBLT_WAIT, 0);
 
       if (m_bPalettized)
         SelectPalette (hdc, oldPal, FALSE);
@@ -382,7 +382,7 @@ void csGraphics2DDDraw8::Refresh (RECT &rect)
     }
 
     ddrval = m_lpddsPrimary->Blt (&rcScreen, m_lpddsBack,
-      &rcSource, DDBLT_WAIT, NULL);
+      &rcSource, DDBLT_WAIT, 0);
 
     if (m_bPalettized)
       SelectPalette (hdc, oldPal, FALSE);
@@ -418,16 +418,16 @@ void csGraphics2DDDraw8::SetColorPalette ()
     if (m_lpddPal)
     {
       m_lpddPal->Release ();
-      m_lpddPal = NULL;
+      m_lpddPal = 0;
     }
 
-    ret = m_lpDD7->CreatePalette (DDPCAPS_8BIT, (PALETTEENTRY *)Palette, &m_lpddPal, NULL);
+    ret = m_lpDD7->CreatePalette (DDPCAPS_8BIT, (PALETTEENTRY *)Palette, &m_lpddPal, 0);
     if (ret == DD_OK) m_lpddsPrimary->SetPalette (m_lpddPal);
 
     if (!FullScreen)
     {
       HPALETTE oldPal;
-      HDC dc = GetDC(NULL);
+      HDC dc = GetDC(0);
 
       SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
       PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
@@ -439,7 +439,7 @@ void csGraphics2DDDraw8::SetColorPalette ()
 
       RealizePalette (dc);
       SelectPalette (dc, oldPal, FALSE);
-      ReleaseDC (NULL, dc);
+      ReleaseDC (0, dc);
     }
   }
 }
@@ -454,7 +454,7 @@ bool csGraphics2DDDraw8::SetMouseCursor (csMouseCursorID iShape)
 {
   csRef<iWin32Assistant> winhelper =
       CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
-  CS_ASSERT (winhelper != NULL);
+  CS_ASSERT (winhelper != 0);
   bool rc = winhelper->SetCursor (iShape);
   return rc;
 }
@@ -499,17 +499,17 @@ HRESULT csGraphics2DDDraw8::ReleaseAllObjects ()
     if (m_lpddsBack)
     {
       m_lpddsBack->Release ();
-      m_lpddsBack = NULL;
+      m_lpddsBack = 0;
     }
     if (m_lpddsPrimary)
     {
       m_lpddsPrimary->Release ();
-      m_lpddsPrimary = NULL;
+      m_lpddsPrimary = 0;
     }
     if (m_lpddClipper)
     {
       m_lpddClipper->Release ();
-      m_lpddClipper = NULL;
+      m_lpddClipper = 0;
     }
     m_lpDD7->SetCooperativeLevel (m_hWnd, DDSCL_NORMAL);
   }
@@ -549,7 +549,7 @@ HRESULT csGraphics2DDDraw8::InitSurfaces ()
     ddsd.dwSize = sizeof (ddsd);
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-    if ((ddrval = m_lpDD7->CreateSurface (&ddsd, &m_lpddsPrimary, NULL)) != DD_OK)
+    if ((ddrval = m_lpDD7->CreateSurface (&ddsd, &m_lpddsPrimary, 0)) != DD_OK)
       return InitFail (ddrval, "Cannot create primary surface for DirectDraw (Code: %08lx)\n");
 
     // Create the backbuffer. In fullscreen mode by default we don't
@@ -564,7 +564,7 @@ HRESULT csGraphics2DDDraw8::InitSurfaces ()
     else
       ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
 
-    if ((ddrval = m_lpDD7->CreateSurface (&ddsd, &m_lpddsBack, NULL)) != DD_OK)
+    if ((ddrval = m_lpDD7->CreateSurface (&ddsd, &m_lpddsBack, 0)) != DD_OK)
     {
       InitFail (ddrval, "CreateSurface for backbuffer FAILED (Code: %08lx)\n");
       return false;
@@ -573,7 +573,7 @@ HRESULT csGraphics2DDDraw8::InitSurfaces ()
     if (!FullScreen)
     {
       // Create a clipper object since this is for a Windowed render
-      if ((ddrval = DirectDrawCreateClipper (0, &m_lpddClipper, NULL)) != DD_OK)
+      if ((ddrval = DirectDrawCreateClipper (0, &m_lpddClipper, 0)) != DD_OK)
         return InitFail (ddrval, "CreateClipper FAILED (Code: %08lx)\n");
 
       // Associate the clipper with the window
@@ -594,7 +594,7 @@ HRESULT csGraphics2DDDraw8::InitSurfaces ()
     if (!DirectDevice->Only2D)
       ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
 
-    ddrval = m_lpDD7->CreateSurface (&ddsd, &m_lpddsPrimary, NULL);
+    ddrval = m_lpDD7->CreateSurface (&ddsd, &m_lpddsPrimary, 0);
     if (ddrval != DD_OK)
       return InitFail (ddrval, "Cannot create primary surface for DirectDraw (Code: %08lx)\n");
 
@@ -659,7 +659,7 @@ HRESULT csGraphics2DDDraw8::ChangeCoopLevel ()
 {
   HRESULT hRet;
 
-  char *oldBuffer = NULL;
+  char *oldBuffer = 0;
   int i;
 
   if (BeginDraw ())
@@ -693,7 +693,7 @@ HRESULT csGraphics2DDDraw8::ChangeCoopLevel ()
       for (i = 0; i < Height; i++)
         memcpy (Memory + LineAddress [i], oldBuffer + i * BytesPerLine, BytesPerLine);
       FinishDraw ();
-      Print (NULL);
+      Print (0);
     }
   delete [] oldBuffer;
 
@@ -734,7 +734,7 @@ void csGraphics2DDDraw8::ClearSystemPalette ()
     Palette.palPalEntry [i].peFlags = PC_NOCOLLAPSE;
   }
 
-  hdc = GetDC (NULL);
+  hdc = GetDC (0);
 
   BlackPal = CreatePalette (&Palette);
 
@@ -743,7 +743,7 @@ void csGraphics2DDDraw8::ClearSystemPalette ()
   SelectPalette (hdc, OldPal, FALSE);
   DeleteObject (BlackPal);
 
-  ReleaseDC (NULL, hdc);
+  ReleaseDC (0, hdc);
 }
 
 bool csGraphics2DDDraw8::CreateIdentityPalette (csRGBpixel *p)

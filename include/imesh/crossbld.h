@@ -42,7 +42,7 @@ struct iCrossBuilder : public iBase
    * stored as material wrappers, otherwise the default material will be used.
    */
   virtual bool BuildThing (iModelDataObject *Data, iThingFactoryState *tgt,
-	iMaterialWrapper *DefaultMaterial = NULL) const = 0;
+	iMaterialWrapper *DefaultMaterial = 0) const = 0;
 
   /// Build a sprite factory from a model file
   virtual bool BuildSpriteFactory (iModelDataObject *Data,

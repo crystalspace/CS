@@ -177,7 +177,7 @@ csHintManager::csHintManager (csApp *iApp) : csVector (16, 16)
   app = iApp;
   check = false;
   timeout = CSHINT_DEFAULT_TIMEOUT;
-  font = NULL;
+  font = 0;
   fontsize = 0;
 }
 

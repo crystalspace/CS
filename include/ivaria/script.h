@@ -240,7 +240,7 @@ struct iScript : public iBase
 
   /**
    * Create an object in the script.
-   * Returns NULL if the constructor fails.
+   * Returns 0 if the constructor fails.
    * CtorFormat is a printf-style format string for the arguments.
    */
   virtual csPtr<iScriptObject> NewObject (const char *type,

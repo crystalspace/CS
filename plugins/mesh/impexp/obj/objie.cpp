@@ -105,7 +105,7 @@ int csModelConverterOBJ::GetFormatCount ()
 
 const csModelConverterFormat *csModelConverterOBJ::GetFormat (int idx)
 {
-  return (idx == 0) ? &FormatInfo : NULL;
+  return (idx == 0) ? &FormatInfo : 0;
 }
 
 csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
@@ -495,7 +495,7 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
       Object->DecRef ();
       Vertices->DecRef ();
       Scene->DecRef ();
-      return NULL;
+      return 0;
     }
   }
 
@@ -513,12 +513,12 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
 csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "obj"))
-    return NULL;
+    return 0;
 
   // only the first object is saved
   csRef<iModelDataObject> obj (
   	CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject));
-  if (!obj) return NULL;
+  if (!obj) return 0;
   iModelDataVertices *ver = obj->GetDefaultVertices ();
   int i;
 

@@ -93,7 +93,7 @@ struct iConsoleOutput : public iBase
    * Only call this function from the same thread that maintains
    * the graphics subsystem!
    */
-  virtual void Draw2D (csRect *oRect = NULL) = 0;
+  virtual void Draw2D (csRect *oRect = 0) = 0;
 
   /**
    * Update the 3D part of the console on the window.
@@ -101,7 +101,7 @@ struct iConsoleOutput : public iBase
    * Only call this function from the same thread that maintains
    * the graphics subsystem!
    */
-  virtual void Draw3D (csRect *oRect = NULL) = 0;
+  virtual void Draw3D (csRect *oRect = 0) = 0;
 
   /**
    * Clear console. If wipe = false, it just moves the top line to the

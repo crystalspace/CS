@@ -36,7 +36,7 @@ struct csReporterMessage
   char* id;
   char* description;
 
-  csReporterMessage () : id (NULL), description (NULL) { }
+  csReporterMessage () : id (0), description (0) { }
   ~csReporterMessage ();
 };
 

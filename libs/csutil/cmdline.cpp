@@ -31,7 +31,7 @@ csCommandLineParser::csCommandLineParser (iBase *Parent) : Names (16, 16)
 csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
   Names (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Initialize (argc, argv);
 }
 
@@ -85,13 +85,13 @@ csCommandLineParser::FindOption (const char *name, int iIndex) const
     {
       idx++;
       if (idx >= Options.Length ())
-        return NULL;
+        return 0;
       if (!strcmp (Options.Get (idx)->Name,  name))
         iIndex--;
     }
     return Options.Get (idx);
   }
-  return NULL;
+  return 0;
 }
 
 bool csCommandLineParser::ReplaceOption (
@@ -122,14 +122,14 @@ bool csCommandLineParser::ReplaceName (const char *iValue, int iIndex)
 const char *csCommandLineParser::GetOption(const char *iName, int iIndex) const
 {
   csCommandLineOption *clo = FindOption (iName, iIndex);
-  return clo ? (clo->Value ? clo->Value : "") : NULL;
+  return clo ? (clo->Value ? clo->Value : "") : 0;
 }
 
 const char *csCommandLineParser::GetName (int iIndex) const
 {
   if ((iIndex >= 0) && (iIndex < Names.Length ()))
     return (const char *)Names.Get (iIndex);
-  return NULL;
+  return 0;
 }
 
 void csCommandLineParser::AddOption (const char *iName, const char *iValue)

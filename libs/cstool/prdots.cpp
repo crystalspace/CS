@@ -30,7 +30,7 @@
 csProcDots::csProcDots () : csProcTexture()
 {
   palsize = 0;
-  palette = NULL;
+  palette = 0;
   mat_w = 16;
   mat_h = 16;
   elapsed = 0;
@@ -78,7 +78,7 @@ void csProcDots::Animate (csTicks current_time)
   elapsed = elapsed % 1000;
   g3d->SetRenderTarget (tex->GetTextureHandle (), true);
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  g3d->SetClipper (NULL, 0);
+  g3d->SetClipper (0, 0);
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   switch (state)
   {
@@ -107,7 +107,7 @@ void csProcDots::Animate (csTicks current_time)
 #elif 0
   g3d->SetRenderTarget (tex->GetTextureHandle ());
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  g3d->SetClipper (NULL, 0);
+  g3d->SetClipper (0, 0);
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   int i, j;
   int offs = 0;

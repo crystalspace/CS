@@ -642,7 +642,7 @@ char *cpp_argv[ARGUMENTS] = {
 		__mib[0] = CTL_KERN;					\
 		__mib[1] = KERN_OSRELDATE;				\
 		__len = sizeof(__osrel);				\
-		sysctl(__mib, 2, &__osrel, &__len, NULL, 0);		\
+		sysctl(__mib, 2, &__osrel, &__len, 0, 0);		\
 		if (__osrel < 210000) {					\
 			if (__osrel < 199607)				\
 				buf[0] = '0';				\
@@ -689,7 +689,7 @@ char *cpp_argv[ARGUMENTS] = {
 # define DEFAULT_OS_NAME_FROB(buf, size)				\
     do {								\
 	char *__sp;							\
-	if ((__sp = strchr((buf), ' ')) != NULL)			\
+	if ((__sp = strchr((buf), ' ')) != 0)			\
 		*__sp = '/';						\
     } while (0)
 #else
@@ -956,7 +956,7 @@ struct symtab	predefs[] = {
 #endif
 #endif
 	/* add any additional symbols before this line */
-	{NULL, NULL}
+	{0, 0}
 };
 
 #endif /* MAKEDEPEND */

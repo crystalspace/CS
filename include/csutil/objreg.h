@@ -53,12 +53,12 @@ public:
   /**
    * Register an object with this registry. 
    */
-  virtual bool Register (iBase* obj, char const* tag = NULL);
+  virtual bool Register (iBase* obj, char const* tag = 0);
 
   /**
    * Unregister an object with this registry. 
    */
-  virtual void Unregister (iBase* obj, char const* tag = NULL);
+  virtual void Unregister (iBase* obj, char const* tag = 0);
   
   /**
    * Get the registered object corresponding with the given tag.

@@ -42,12 +42,12 @@
  */
 class csHint : public csComponent
 {
-  /// Old mouse owner (before the hint has popped up). Usually NULL.
+  /// Old mouse owner (before the hint has popped up). Usually 0.
   csComponent *oldmo;
 
 public:
   /// Create a floating hint with an text string
-  csHint (csComponent *iParent, const char *iText, iFont *Font = NULL,
+  csHint (csComponent *iParent, const char *iText, iFont *Font = 0,
     int iFontSize = -1);
   /// Cleanup before destruction
   virtual ~csHint ();

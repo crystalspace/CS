@@ -69,10 +69,10 @@ csGraphics2D::csGraphics2D (iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
-  scfiEventHandler = NULL;
-  Memory = NULL;
-  LineAddress = NULL;
-  Palette = NULL;
+  scfiEventHandler = 0;
+  Memory = 0;
+  LineAddress = 0;
+  Palette = 0;
   Width = 640;
   Height = 480;
   Depth = 16;
@@ -80,7 +80,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   FullScreen = false;
   is_open = false;
   win_title = csStrNew ("Crystal Space Application");
-  object_reg = NULL;
+  object_reg = 0;
   AllowResizing = false;
   refreshRate = 0;
   vsync = false;
@@ -88,7 +88,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
 {
-  CS_ASSERT (r != NULL);
+  CS_ASSERT (r != 0);
   object_reg = r;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Get the system parameters
@@ -147,7 +147,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     int depth, void* memory, iOffscreenCanvasCallback* ofscb)
 {
-  CS_ASSERT (r != NULL);
+  CS_ASSERT (r != 0);
   object_reg = r;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Get the system parameters
@@ -181,7 +181,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     Palette [i].blue = 0;
   }
 
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 
   csGraphics2D::ofscb = ofscb;
 
@@ -236,7 +236,7 @@ bool csGraphics2D::Open ()
 
   // Allocate buffer for address of each scan line to avoid multuplication
   LineAddress = new int [Height];
-  if (LineAddress == NULL) return false;
+  if (LineAddress == 0) return false;
 
   // Initialize scanline address array
   int i,addr,bpl = Width * pfmt.PixelBytes;
@@ -253,7 +253,7 @@ void csGraphics2D::Close ()
   if (!is_open) return;
   is_open = false;
   delete [] LineAddress;
-  LineAddress = NULL;
+  LineAddress = 0;
 }
 
 bool csGraphics2D::BeginDraw ()
@@ -701,17 +701,17 @@ csImageArea *csGraphics2D::SaveArea (int x, int y, int w, int h)
   if (y + h > Height)
     h = Height - y;
   if ((w <= 0) || (h <= 0))
-    return NULL;
+    return 0;
 
   csImageArea *Area = new csImageArea (x, y, w, h);
   if (!Area)
-    return NULL;
+    return 0;
   w *= pfmt.PixelBytes;
   char *dest = Area->data = new char [w * h];
   if (!dest)
   {
     delete Area;
-    return NULL;
+    return 0;
   }
   for (; h > 0; y++, h--)
   {
@@ -878,11 +878,11 @@ bool csGraphics2D::Resize (int w, int h)
     Height = h;
 
     delete [] LineAddress;
-    LineAddress = NULL;
+    LineAddress = 0;
 
     // Allocate buffer for address of each scan line to avoid multuplication
     LineAddress = new int [Height];
-    CS_ASSERT (LineAddress != NULL);
+    CS_ASSERT (LineAddress != 0);
 
     // Initialize scanline address array
     int i,addr,bpl = Width * pfmt.PixelBytes;
@@ -968,7 +968,7 @@ csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
     void* memory, int width, int height, int depth,
     iOffscreenCanvasCallback* ofscb)
 {
-  csGraphics2D* g2d = new csGraphics2D (NULL);
+  csGraphics2D* g2d = new csGraphics2D (0);
   if (g2d->Initialize (object_reg, width, height, depth, memory,
     ofscb) && g2d->Open ())
   {
@@ -977,7 +977,7 @@ csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
   else
   {
     delete g2d;
-    return NULL;
+    return 0;
   }
 }
 

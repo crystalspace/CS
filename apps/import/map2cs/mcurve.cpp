@@ -39,7 +39,7 @@ CMapCurve::CMapCurve()
   m_Line = 0;
   m_Rows = 0;
   m_Cols = 0;
-  m_pTexture = NULL;
+  m_pTexture = 0;
 }
 
 CMapCurve::~CMapCurve()

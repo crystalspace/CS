@@ -35,9 +35,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMovableSectorList::csMovableSectorList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSectorList);
-  movable = NULL;
+  movable = 0;
 }
 
 csMovableSectorList::~csMovableSectorList ()
@@ -48,10 +48,10 @@ csMovableSectorList::~csMovableSectorList ()
 bool csMovableSectorList::PrepareItem (iSector* sector)
 {
   // Check for a valid item.
-  if (sector == NULL) return false;
+  if (sector == 0) return false;
 
   // if the movable has a parent, no sectors can be added.
-  CS_ASSERT (movable != NULL);
+  CS_ASSERT (movable != 0);
   if (movable->GetParent ()) return false;
 
   csMeshWrapper *mw = movable->GetMeshWrapper ();
@@ -112,10 +112,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMovable::csMovable ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
-  parent = NULL;
-  object = NULL;
+  parent = 0;
+  object = 0;
   updatenr = 0;
   sectors.SetMovable (this);
   is_identity = true;
@@ -163,7 +163,7 @@ void csMovable::SetSector (iSector *sector)
 
 void csMovable::ClearSectors ()
 {
-  if (parent == NULL)
+  if (parent == 0)
   {
     if (object) object->RemoveFromSectors ();
     sectors.DeleteAll ();
@@ -202,7 +202,7 @@ void csMovable::UpdateMove ()
 
 csReversibleTransform csMovable::GetFullTransform () const
 {
-  if (parent == NULL)
+  if (parent == 0)
     return GetTransform ();
   else if (is_identity)
     return parent->GetFullTransform ();

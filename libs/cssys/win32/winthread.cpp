@@ -27,11 +27,11 @@
 #endif
 
 #define CS_GET_SYSERROR() \
-if (lasterr){LocalFree (lasterr); lasterr = NULL;}\
+if (lasterr){LocalFree (lasterr); lasterr = 0;}\
 FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | \
     FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, \
-    NULL, (DWORD)GetLastError (), \
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lasterr, 0, NULL)
+    0, (DWORD)GetLastError (), \
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lasterr, 0, 0)
 
 #define CS_TEST(x) if(!(x)) {CS_GET_SYSERROR(); CS_SHOW_ERROR;}
 
@@ -43,9 +43,9 @@ csRef<csMutex> csMutex::Create (bool )
 
 csWinMutex::csWinMutex ()
 {
-  lasterr = NULL;
-  mutex = CreateMutex (NULL, false, NULL);
-  CS_TEST (mutex != NULL);
+  lasterr = 0;
+  mutex = CreateMutex (0, false, 0);
+  CS_TEST (mutex != 0);
 }
 
 csWinMutex::~csWinMutex ()
@@ -56,7 +56,7 @@ csWinMutex::~csWinMutex ()
 #else
   Destroy ();
 #endif
-  if (lasterr) {LocalFree (lasterr); lasterr = NULL;}
+  if (lasterr) {LocalFree (lasterr); lasterr = 0;}
 }
 
 bool csWinMutex::Destroy ()
@@ -100,12 +100,12 @@ csRef<csSemaphore> csSemaphore::Create (uint32 value)
 
 csWinSemaphore::csWinSemaphore (uint32 v)
 {
-  lasterr = NULL;
+  lasterr = 0;
   value = v;
-  sem = CreateSemaphore (NULL, (LONG)value, (LONG)value, NULL);
-  if (sem == NULL)
+  sem = CreateSemaphore (0, (LONG)value, (LONG)value, 0);
+  if (sem == 0)
     value = 0;
-  CS_TEST (sem != NULL);
+  CS_TEST (sem != 0);
 }
 
 csWinSemaphore::~csWinSemaphore ()
@@ -165,9 +165,9 @@ csRef<csCondition> csCondition::Create (uint32 conditionAttributes)
 
 csWinCondition::csWinCondition (uint32 /*conditionAttributes*/)
 {
-  lasterr = NULL;
-  cond = CreateEvent (NULL, false, false, NULL); // auto-reset
-  CS_TEST (cond != NULL);
+  lasterr = 0;
+  cond = CreateEvent (0, false, false, 0); // auto-reset
+  CS_TEST (cond != 0);
 }
 
 csWinCondition::~csWinCondition ()
@@ -220,7 +220,7 @@ csWinThread::csWinThread (csRunnable* r, uint32 /*options*/)
 {
   runnable = r;
   running = false;
-  lasterr = NULL;
+  lasterr = 0;
 }
 
 csWinThread::~csWinThread ()

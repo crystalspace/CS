@@ -65,7 +65,7 @@ csConsoleOutput::csConsoleOutput (iBase *base)
 {
   SCF_CONSTRUCT_IBASE (base);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
   transparent = false;		// Default to no transparency
@@ -79,9 +79,9 @@ csConsoleOutput::csConsoleOutput (iBase *base)
   auto_update = true;
   system_ready = false;
   visible = true;
-  Client = NULL;
+  Client = 0;
   // clear font for closedown
-  object_reg = NULL;
+  object_reg = 0;
   mutex = csMutex::Create (true);
 }
 
@@ -169,7 +169,7 @@ void csConsoleOutput::PutTextV (const char *text2, va_list args)
   csScopedMutexLock lock (mutex);
 
   int i;
-  csString *curline = NULL;
+  csString *curline = 0;
 
   char text[4096];
   vsprintf (text, text2, args);
@@ -199,7 +199,7 @@ void csConsoleOutput::PutTextV (const char *text2, va_list args)
         else
           ++cy < buffer->GetPageSize () ? cy : cy--;
         // Make sure we don't change the X position below
-        curline = NULL;
+        curline = 0;
         break;
       case '\b':
         if (cx > 0)
@@ -208,7 +208,7 @@ void csConsoleOutput::PutTextV (const char *text2, va_list args)
           {
             cx = 0;
             buffer->DeleteLine (cy);
-            curline = NULL;
+            curline = 0;
           }
           else
           {
@@ -315,8 +315,8 @@ void csConsoleOutput::Draw2D (csRect *area)
     // Retrieve the line from the buffer and it's dirty flag
     text = buffer->GetLine (i, &dirty);
 
-    // A NULL line indicates it's the last printed line on the page
-    if (text == NULL)
+    // A 0 line indicates it's the last printed line on the page
+    if (text == 0)
       break;
 
     // Calculate the rectangle of this line
@@ -353,7 +353,7 @@ void csConsoleOutput::Draw2D (csRect *area)
     // Get the line of text that the cursor is on
     text = buffer->GetLine (cy);
 
-    if (text == NULL)
+    if (text == 0)
     {
 #ifdef CS_DEBUG
       if (cx != 0)

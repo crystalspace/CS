@@ -87,7 +87,7 @@ csMotionLoader::csMotionLoader(iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  object_reg=NULL;
+  object_reg=0;
 }
 
 csMotionLoader::~csMotionLoader()
@@ -314,13 +314,13 @@ csPtr<iBase> csMotionLoader::Parse (iDocumentNode* node,
 	  {
 	    m = motman->AddMotion (motname);
 	    if (!LoadMotion (child, m))
-	      return NULL;
+	      return 0;
 	  }
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
   this->IncRef (); // the returned pointer wil be DecRef()ed.

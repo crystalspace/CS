@@ -100,7 +100,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename)
     if (font)
       return csPtr<iFont> (font);
   }
-  return NULL;
+  return 0;
 }
 
 int csFontServerMultiplexor::GetFontCount ()
@@ -121,5 +121,5 @@ iFont *csFontServerMultiplexor::GetFont (int iIndex)
       return fontservers.Get (iIndex)->GetFont (iIndex);
     iIndex -= count;
   }
-  return NULL;
+  return 0;
 }

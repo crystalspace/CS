@@ -337,13 +337,13 @@ public:
 
   /**
    * Add a new node related to this. Adds a child past the LastChild.
-   * Returns a pointer to the new object or NULL if an error occured.
+   * Returns a pointer to the new object or 0 if an error occured.
    */
   TiDocumentNode* InsertEndChild( const TiDocumentNode& addThis );
 
   /**
    * Add a new node related to this. Adds a child before the specified child.
-   * Returns a pointer to the new object or NULL if an error occured.
+   * Returns a pointer to the new object or 0 if an error occured.
    */
   TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis,
     const TiDocumentNode& addThis );
@@ -378,7 +378,7 @@ class TiDocumentAttribute
 
 public:
   /// Construct an empty attribute.
-  TiDocumentAttribute() { name = NULL; value = NULL; }
+  TiDocumentAttribute() { name = 0; value = 0; }
   ~TiDocumentAttribute () { delete[] value; }
 
   const char* Name()  const { return name; }
@@ -549,7 +549,7 @@ class TiXmlComment : public TiDocumentNode
 {
 public:
   /// Constructs an empty comment.
-  TiXmlComment() { value = NULL; type = COMMENT; }
+  TiXmlComment() { value = 0; type = COMMENT; }
   virtual ~TiXmlComment() { delete[] value; }
 
   // [internal use] Creates a new Element and returs it.
@@ -563,7 +563,7 @@ public:
     if (_value)
       value = csStrNew (_value);
     else
-      value = NULL;
+      value = 0;
   }
 
 protected:
@@ -587,7 +587,7 @@ public:
   /// Constructor.
   TiXmlText ()
   {
-    value = NULL;
+    value = 0;
     type = TEXT;
   }
   virtual ~TiXmlText()

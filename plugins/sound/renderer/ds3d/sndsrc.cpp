@@ -41,10 +41,10 @@ csSoundSourceDS3D::csSoundSourceDS3D(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
 
-  Buffer3D = NULL;
-  Buffer2D = NULL;
-  Renderer = NULL;
-  SoundHandle = NULL;
+  Buffer3D = 0;
+  Buffer2D = 0;
+  Renderer = 0;
+  SoundHandle = 0;
   WriteCursor = -1;
 }
 
@@ -55,8 +55,8 @@ csSoundSourceDS3D::~csSoundSourceDS3D()
     Buffer2D->Stop();
     Buffer2D->Release();
   }
-  Renderer = NULL;
-  SoundHandle = NULL;
+  Renderer = 0;
+  SoundHandle = 0;
 }
 
 void csSoundSourceDS3D::Report (int severity, const char* msg, ...)
@@ -114,7 +114,7 @@ bool csSoundSourceDS3D::Initialize(csRef<csSoundRenderDS3D> srdr,
   if (!Renderer->AudioRenderer)
     return false;
 
-  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL);
+  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, 0);
   if (r != DS_OK) {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "cannot create secondary sound buffer "
@@ -306,7 +306,7 @@ bool csSoundSourceDS3D::IsPlaying()
 
 void csSoundSourceDS3D::Write(void *Data, unsigned long NumBytes) 
 {
-  void *Pointer1 = NULL, *Pointer2 = NULL;
+  void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
 
   if (!Renderer->AudioRenderer || !Buffer2D) 
@@ -332,7 +332,7 @@ void csSoundSourceDS3D::Write(void *Data, unsigned long NumBytes)
 
 void csSoundSourceDS3D::WriteMute(unsigned long NumBytes) 
 {
-  void *Pointer1 = NULL, *Pointer2 = NULL;
+  void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
 
   if (!Renderer->AudioRenderer || !Buffer2D) 
@@ -368,7 +368,7 @@ void csSoundSourceDS3D::WriteMute(unsigned long NumBytes)
 
 void csSoundSourceDS3D::FillBufferWithSilence()
 {
-  void *Pointer1 = NULL, *Pointer2 = NULL;
+  void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
 
   if (!Renderer->AudioRenderer || !Buffer2D) 
@@ -408,7 +408,7 @@ void csSoundSourceDS3D::NotifyStreamEnd()
 void csSoundSourceDS3D::WatchBufferEnd()
 {
   int32 bytes;
-  void *Pointer1 = NULL, *Pointer2 = NULL;
+  void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
   long old_cursor=WriteCursor;
 
@@ -479,7 +479,7 @@ int32 csSoundSourceDS3D::GetFreeBufferSpace()
   *   This is why we don't use the write cursor from Direct Sound, it's useless for what we do.
   */
 
-  if (DS_OK!=Buffer2D->GetCurrentPosition(&playcursor,NULL))
+  if (DS_OK!=Buffer2D->GetCurrentPosition(&playcursor,0))
     return 0;
   if (WriteCursor==-1)
   {

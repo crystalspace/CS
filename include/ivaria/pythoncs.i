@@ -60,7 +60,7 @@
 		if (!PyArg_ParseTuple(args, "OOi", &reg_obj, &func_obj, &mask))
 		{
 			PyErr_SetString(PyExc_TypeError, "Wrong arguments!");
-			return NULL;
+			return 0;
 		}
 		iObjectRegistry * reg = 0;
 		swig_type_info * ti = SWIG_TypeQuery("iObjectRegistry *");
@@ -68,17 +68,17 @@
 			== -1)
 		{
 			PyErr_SetString(PyExc_TypeError, "Not a iObjectRegistry object!");
-			return NULL;
+			return 0;
 		}
 		if (!reg)
 		{
 			PyErr_SetString(PyExc_TypeError, "Nil iObjectRegistry!");
-			return NULL;
+			return 0;
 		}
 		if (!func_obj || !PyCallable_Check(func_obj))
 		{
 			PyErr_SetString(PyExc_TypeError, "Need a callable object!");
-			return NULL;
+			return 0;
 		}
 		_py_csInitializer_EventHandler = func_obj;
 		Py_XINCREF(_py_csInitializer_EventHandler);

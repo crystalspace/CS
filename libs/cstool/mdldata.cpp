@@ -76,9 +76,9 @@ CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataTexture);
 
 csModelDataTexture::csModelDataTexture ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  FileName = NULL;
+  FileName = 0;
 }
 
 csModelDataTexture::~csModelDataTexture ()
@@ -137,10 +137,10 @@ CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataMaterial);
 
 csModelDataMaterial::csModelDataMaterial ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  BaseMaterial = NULL;
-  MaterialWrapper = NULL;
+  BaseMaterial = 0;
+  MaterialWrapper = 0;
 }
 
 csModelDataMaterial::~csModelDataMaterial ()
@@ -186,14 +186,14 @@ CS_IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
 
 csModelDataVertices::csModelDataVertices ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelDataVertices::csModelDataVertices (const iModelDataVertices *orig,
   const iModelDataVertices *orig2)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   CopyFrom (orig);
   CopyFrom (orig2);
@@ -278,7 +278,7 @@ CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataAction);
 
 csModelDataAction::csModelDataAction ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
@@ -350,9 +350,9 @@ CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataPolygon);
 
 csModelDataPolygon::csModelDataPolygon ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  Material = NULL;
+  Material = 0;
 }
 
 csModelDataPolygon::~csModelDataPolygon ()
@@ -412,9 +412,9 @@ CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataObject,
 
 csModelDataObject::csModelDataObject ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  DefaultVertices = NULL;
+  DefaultVertices = 0;
 }
 
 csModelDataObject::~csModelDataObject ()
@@ -438,7 +438,7 @@ CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, RightVector)
 
 csModelDataCamera::csModelDataCamera ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
@@ -498,7 +498,7 @@ CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csVector3 &, Position);
 
 csModelDataLight::csModelDataLight ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
@@ -522,7 +522,7 @@ CS_IMPLEMENT_OBJECT_INTERFACE (csModelData);
 
 csModelData::csModelData ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 

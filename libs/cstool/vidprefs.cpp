@@ -41,7 +41,7 @@
 
 csVideoPreferences::csVideoPreferences ()
 {
-  object_reg = NULL;
+  object_reg = 0;
 }
 
 csVideoPreferences::~csVideoPreferences ()
@@ -284,7 +284,7 @@ bool csVideoPreferences::HandleEvent (iEvent& ev)
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
     g3d->FinishDraw ();
-    g3d->Print (NULL);
+    g3d->Print (0);
     return false;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdSystemClose)

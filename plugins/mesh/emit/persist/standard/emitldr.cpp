@@ -237,8 +237,8 @@ bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
 iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 			      iEmitFactoryState *fstate, float* weight)
 {
-  iEmitGen3D* result = NULL;
-  iEmitMix *emix = NULL;
+  iEmitGen3D* result = 0;
+  iEmitMix *emix = 0;
   csVector3 a;
   float p,q,r,s,t;
   if (weight) *weight = 1.;
@@ -253,11 +253,11 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_WEIGHT:
-	if (weight == NULL)
+	if (weight == 0)
 	{
 	  synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "'weight' cannot be given in this context!");
-	  return NULL;
+	  return 0;
 	}
 	*weight = child->GetContentsValueAsFloat ();
 	break;
@@ -278,7 +278,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		  child, "Error parsing box for 'emitbox'!");
-	    return NULL;
+	    return 0;
 	  }
 	  iEmitBox *ebox = fstate->CreateBox ();
 	  ebox->SetContent (box.Min (), box.Max ());
@@ -330,7 +330,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		  child, "Error parsing box for 'emitline'!");
-	    return NULL;
+	    return 0;
 	  }
 	  iEmitLine *eline = fstate->CreateLine ();
 	  eline->SetContent (box.Min (), box.Max ());
@@ -344,7 +344,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		  child, "Error parsing box for 'emitcylinder'!");
-	    return NULL;
+	    return 0;
 	  }
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
@@ -360,7 +360,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		  child, "Error parsing box for 'emitcylindertangent'!");
-	    return NULL;
+	    return 0;
 	  }
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
@@ -376,7 +376,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "'min' is missing in 'emitspheretangent'!");
-	    return NULL;
+	    return 0;
 	  }
 	  a.x = minnode->GetAttributeValueAsFloat ("x");
 	  a.y = minnode->GetAttributeValueAsFloat ("y");
@@ -390,7 +390,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
   return result;
@@ -422,7 +422,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Cannot find factory '%s' for emit!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -439,7 +439,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Cannot find material '%s' for emit!", matname);
-            return NULL;
+            return 0;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -458,7 +458,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  bool light = false;
 	  if (!synldr->ParseBool (child, light, true))
-	    return NULL;
+	    return 0;
 	  emitstate->SetLighting (light);
 	}
 	break;
@@ -492,7 +492,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'alpha' in 'aging'!");
-            return NULL;
+            return 0;
 	  }
 	  alpha = alphanode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> swirlnode = child->GetNode ("swirl");
@@ -500,7 +500,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'swirl' in 'aging'!");
-            return NULL;
+            return 0;
 	  }
 	  swirl = swirlnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
@@ -508,7 +508,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'scale' in 'aging'!");
-            return NULL;
+            return 0;
 	  }
 	  scale = scalenode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> rotspeednode = child->GetNode ("rotspeed");
@@ -516,7 +516,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'rotspeed' in 'aging'!");
-            return NULL;
+            return 0;
 	  }
 	  rotspeed = rotspeednode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> timenode = child->GetNode ("time");
@@ -524,33 +524,33 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'time' in 'aging'!");
-            return NULL;
+            return 0;
 	  }
 	  time = timenode->GetContentsValueAsInt ();
 	  csRef<iDocumentNode> colornode = child->GetNode ("color");
 	  if (colornode)
 	    if (!synldr->ParseColor (colornode, col))
-	      return NULL;
+	      return 0;
 	  emitstate->AddAge (time, col, alpha, swirl, rotspeed, scale);
 	}
 	break;
       case XMLTOKEN_STARTPOS:
 	{
-	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartPosEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case XMLTOKEN_STARTSPEED:
 	{
-	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartSpeedEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case XMLTOKEN_STARTACCEL:
 	{
-	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartAccelEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
@@ -560,21 +560,21 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_ATTRACTOR:
 	{
-	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetAttractorEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case XMLTOKEN_FIELDSPEED:
 	{
-	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetFieldSpeedEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case XMLTOKEN_FIELDACCEL:
 	{
-	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetFieldAccelEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
@@ -583,13 +583,13 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if(!synldr->ParseBox(child, box))
-	    return NULL;
+	    return 0;
 	  emitstate->SetContainerBox(true, box.Min(), box.Max());
 	}
 	break;
       default:
 	synldr->ReportBadToken (child);
-        return NULL;
+        return 0;
     }
   }
 

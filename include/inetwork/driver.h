@@ -123,8 +123,8 @@ struct iNetworkListener : public iNetworkEndPoint
    * Accepts a connection request.  If the listener is in blocking mode, then
    * the function does not return until a connection has been established or
    * an error has occurred.  If in non-blocking mode, then it returns
-   * immediately.  The return value is either an accepted connection or NULL.
-   * If the connection is non-blocking, NULL is returned, and GetLastError()
+   * immediately.  The return value is either an accepted connection or 0.
+   * If the connection is non-blocking, 0 is returned, and GetLastError()
    * returns CS_NET_ERR_NO_ERROR then no connection was pending.  Otherwise
    * an error occurred, and GetLastError() returns the appropriate error code.
    */
@@ -147,7 +147,7 @@ struct iNetworkDriver : public iBase
    * "Device:PhoneNumber"; etc. The 'reliable' flag is deprecated.
    * The 'blocking' flag determines whether operations on the connection
    * return immediately in all cases or wait until the operation can be
-   * completed successfully. Returns the new connection object or NULL
+   * completed successfully. Returns the new connection object or 0
    * if the connection failed.
    */
   virtual csPtr<iNetworkConnection> NewConnection(const char* target,

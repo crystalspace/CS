@@ -363,7 +363,7 @@ Nag to Jorrit about this feature if you want it.");
 	{
 	  const char* matname = child->GetContentsValue ();
           info.default_material = ldr_context->FindMaterial (matname);
-          if (info.default_material == NULL)
+          if (info.default_material == 0)
           {
 	    synldr->ReportError (
 	        "crystalspace.thingloader.parse.material",
@@ -409,7 +409,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.thingloader.setup.objecttype",
 		node, "Could not load the thing mesh object plugin!");
-    return NULL;
+    return 0;
   }
   csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (info.type,
   	iThingEnvironment);
@@ -418,7 +418,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
   	engine, 0, true))
   {
-    info.obj = NULL;
+    info.obj = 0;
   }
   else
   {
@@ -432,7 +432,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 	synldr->ReportError (
 	        "crystalspace.thingloader.parse.material",
                 node, "Couldn't find material named '%s'!", rm.oldmat);
-	return NULL;
+	return 0;
       }
       iMaterialWrapper* new_mat = ldr_context->FindMaterial (rm.newmat);
       if (!new_mat)
@@ -440,7 +440,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 	synldr->ReportError (
 	        "crystalspace.thingloader.parse.material",
                 node, "Couldn't find material named '%s'!", rm.newmat);
-	return NULL;
+	return 0;
       }
       info.thing_state->ReplaceMaterial (old_mat, new_mat);
     }
@@ -470,7 +470,7 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.thingloader.setup.objecttype",
 		node, "Could not load the thing mesh object plugin!");
-    return NULL;
+    return 0;
   }
   csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (info.type,
   	iThingEnvironment);
@@ -483,7 +483,7 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
   	engine, 0, true))
   {
-    fact = NULL;
+    fact = 0;
   }
   return csPtr<iBase> (fact);
 }

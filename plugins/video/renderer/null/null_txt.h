@@ -37,7 +37,7 @@ class csTextureNull : public csTexture
 public:
   /// The bitmap
   uint8 *bitmap;
-  /// The alpha map (NULL if no alphamap)
+  /// The alpha map (0 if no alphamap)
   uint8 *alphamap;
   /// The image (temporary storage)
   iImage *image;
@@ -45,8 +45,8 @@ public:
   /// Create a csTexture object
   csTextureNull (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
   {
-    bitmap = NULL;
-    alphamap = NULL;
+    bitmap = 0;
+    alphamap = 0;
     image = Image;
     image->IncRef();
     w = Image->GetWidth ();

@@ -119,9 +119,9 @@ csFireMeshObject::csFireMeshObject (iObjectRegistry* object_reg,
   iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
-  part_pos = NULL;
-  part_speed = NULL;
-  part_age = NULL;
+  part_pos = 0;
+  part_speed = 0;
+  part_age = 0;
   direction.Set (0, 1, 0);
   origin.Set (0,0,0, 0,0,0);
   total_time = 1;
@@ -130,7 +130,7 @@ csFireMeshObject::csFireMeshObject (iObjectRegistry* object_reg,
   color_scale = 1;
   number = 40;
   delete_light = false;
-  light_engine = NULL;
+  light_engine = 0;
   precalc_valid = false;
   SetupColors ();
 }
@@ -266,7 +266,7 @@ SCF_IMPLEMENT_IBASE_END
 csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (b);
-  logparent = NULL;
+  logparent = 0;
   object_reg = s;
 }
 

@@ -71,7 +71,7 @@ public:
   virtual bool AtEOF () = 0;
   /// Query current file pointer
   virtual size_t GetPos () = 0;
-  /// Get entire file data at once, if possible, or NULL
+  /// Get entire file data at once, if possible, or 0
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
   /// Set new file pointer
   virtual bool SetPos (size_t newpos) = 0;
@@ -191,7 +191,7 @@ public:
 
   /// Mount an VFS path on a "real-world-filesystem" path
   virtual bool Mount (const char *VirtualPath, const char *RealPath);
-  /// Unmount an VFS path; if RealPath is NULL, entire VirtualPath is unmounted
+  /// Unmount an VFS path; if RealPath is 0, entire VirtualPath is unmounted
   virtual bool Unmount (const char *VirtualPath, const char *RealPath);
   
   /// Mount the root directory or directories 
@@ -215,7 +215,7 @@ public:
    * Query real-world path from given VFS path.
    * This will work only for files that are stored on real filesystem,
    * not in archive files. You should expect this function to return
-   * NULL in this case.
+   * 0 in this case.
    */
   virtual csPtr<iDataBuffer> GetRealPath (const char *FileName);
 

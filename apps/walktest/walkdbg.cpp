@@ -137,7 +137,7 @@ void select_object (iRenderView* rview, int type, void* entity)
 	  csLight* light = sector->GetLight (i);
 	  if (check_light)
 	  {
-            if (Sys->selected_light == light) Sys->selected_light = NULL;
+            if (Sys->selected_light == light) Sys->selected_light = 0;
 	    else Sys->selected_light = light;
 	    //check_light = false;
 	  }
@@ -169,7 +169,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   csVector2 persp;
   poly.num = 4;
   poly.use_fog = false;
-  poly.mat_handle = NULL;
+  poly.mat_handle = 0;
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
@@ -245,7 +245,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   poly.colors[3].red = c4.red;
   poly.colors[3].green = c4.green;
   poly.colors[3].blue = c4.blue;
-  poly.mat_handle = NULL;
+  poly.mat_handle = 0;
   poly.mixmode = CS_FX_ADD|CS_FX_GOURAUD;
   if (do3d)
   {

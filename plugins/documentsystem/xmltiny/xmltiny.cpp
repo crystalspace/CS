@@ -54,7 +54,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csTinyDocWrapper::csTinyDocWrapper (csRef<iDocument> doc)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   tinydoc = doc;
 }
@@ -138,7 +138,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csTinyXMLPlugin (iBase* parent = NULL);
+  csTinyXMLPlugin (iBase* parent = 0);
   virtual ~csTinyXMLPlugin ();
 
   virtual bool Initialize (iObjectRegistry* objreg);

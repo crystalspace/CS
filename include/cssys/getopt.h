@@ -76,7 +76,7 @@ extern int optopt;
    optional_argument 	(or 2) if the option takes an optional argument.
    </pre>
 
-   If the field `flag' is not NULL, it points to a variable that is set
+   If the field `flag' is not 0, it points to a variable that is set
    to the value given in the field `val' when the option is found, but
    left unchanged if the option is not found.
 

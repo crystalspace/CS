@@ -77,7 +77,7 @@ public:
   const char *Prefix;
 
   /// Create the skin repository object
-  csSkin () : csVector (16, 16), Prefix (NULL) {}
+  csSkin () : csVector (16, 16), Prefix (0) {}
 
   /// Destroy all skins in this repository
   virtual ~csSkin ();
@@ -182,7 +182,7 @@ public:
    * component size etc. This is usually called by skin slices
    * inside Apply() method before applying any changes
    * to the component. If the component has the `skinslice'
-   * non-NULL, the Initialize() method calls this method of
+   * non-0, the Initialize() method calls this method of
    * the old skin slice so that it will restore the component
    * to the initial state.
    */

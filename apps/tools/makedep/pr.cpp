@@ -48,7 +48,7 @@ void add_include (struct filepointer *filep, struct inclist *file,
 
   /* First decide what the pathname of this include file really is. */
   newfile = inc_path (file->i_file, include, dot);
-  if (newfile == NULL)
+  if (newfile == 0)
   {
     if (failOK || (!opt_sysincludes && !dot))
       return;
@@ -113,10 +113,10 @@ void pr (struct inclist *ip, char *file, char *base)
   fwrite (buf, len, 1, stdout);
 
   /* If opt_verbose is set, then print out what this file includes. */
-  if (!opt_verbose || ip->i_list == NULL || ip->i_flags & NOTIFIED)
+  if (!opt_verbose || ip->i_list == 0 || ip->i_flags & NOTIFIED)
     return;
   ip->i_flags |= NOTIFIED;
-  lastfile = NULL;
+  lastfile = 0;
   printf ("\n# %s includes:", ip->i_file);
   for (i = 0; i < ip->i_listlen; i++)
     printf ("\n#\t%s", ip->i_list[i]->i_incstring);

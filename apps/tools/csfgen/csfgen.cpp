@@ -68,7 +68,7 @@ static struct
   -1,
   0,
   256,
-  NULL,
+  0,
   true
 };
 
@@ -132,7 +132,7 @@ static bool Convert (const char *fontfile)
   }
 
   csRef<iFont> font = fs->LoadFont (fontfile);
-  if (font == NULL)
+  if (font == 0)
   {
     printf ("Cannot load font file %s\n", fontfile);
     return false;
@@ -165,7 +165,7 @@ static bool Convert (const char *fontfile)
 
   char fontname [CS_MAXPATHLEN + 1];
   char outfile [CS_MAXPATHLEN + 1];
-  csSplitPath (fontfile, NULL, 0, fontname, sizeof (fontname));
+  csSplitPath (fontfile, 0, 0, fontname, sizeof (fontname));
   if (fontname [0] == '*')
     strcpy (fontname, fontname + 1);
   char *dot = strchr (fontname, '.');
@@ -297,7 +297,7 @@ int main (int argc, char* argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "f:g:s:o:tdhvVa", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "f:g:s:o:tdhvVa", long_options, 0)) != EOF)
     switch (c)
     {
       case '?':

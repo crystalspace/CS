@@ -32,4 +32,4 @@
 // are really only needed by the application, thus by defining this variable
 // here, we avoid having to link plugin modules with other unnecessary goop.
 
-iSCF *iSCF::SCF = NULL;
+iSCF *iSCF::SCF = 0;

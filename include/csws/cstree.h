@@ -40,7 +40,7 @@ enum
   /**
    * Check if a component is indeed a tree item.
    * <pre>
-   * IN:  NULL (nothing)
+   * IN:  0 (nothing)
    * OUT: CS_TREEITEM_MAGIC if it is a tree item.
    * </pre>
    */
@@ -97,7 +97,7 @@ enum
    * child tree item, return its parent; otherwise if his previous neightbour
    * is closed, return it; otherwise return the last child tree item from the
    * "last->opened ? last->last : last" chain.
-   * If there is no previous item (top of the tree), it returns NULL.
+   * If there is no previous item (top of the tree), it returns 0.
    * <pre>
    * OUT: (csTreeItem *)PrevItem
    * </pre>
@@ -109,7 +109,7 @@ enum
    * return its first child item; otherwise if it is the last item
    * in the subtree, return the item following its parent; otherwise
    * return the next item in the branch.
-   * If there is no next item (bottom of the tree), it returns NULL.
+   * If there is no next item (bottom of the tree), it returns 0.
    * <pre>
    * OUT: (csTreeItem *)NextItem
    * </pre>
@@ -156,7 +156,7 @@ enum
    * Select first item that exactly matches the text.
    * <pre>
    * IN: (char *)text
-   * OUT: (csTreeItem *)item (or NULL if not found)
+   * OUT: (csTreeItem *)item (or 0 if not found)
    * </pre>
    */
   cscmdTreeSelectItem,
@@ -301,7 +301,7 @@ public:
   void SuggestTotalSize (int &w, int &h, int &totw, int &toth);
 
   /// Set tree item image (possibly for open state too)
-  void SetBitmap (csPixmap *iBitmap, csPixmap *iBitmapOpen = NULL,
+  void SetBitmap (csPixmap *iBitmap, csPixmap *iBitmapOpen = 0,
     bool iDelete = true);
 
   /// Set horizontal offset of child items
@@ -318,7 +318,7 @@ public:
    * so that only visible branches will be handled.
    */
   csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, void *param),
-    void *param = NULL, bool iOnlyOpen = false);
+    void *param = 0, bool iOnlyOpen = false);
 
   /// Force a reset of button size & position
   void ResetButton ()
@@ -504,7 +504,7 @@ public:
    * Function returns the first child on which func returnes 'true'
    */
   csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, void *param),
-    void *param = NULL, bool iOnlyOpen = false);
+    void *param = 0, bool iOnlyOpen = false);
 
   /// Override SetState method to toggle scrollbars together with CSS_SELECTED
   virtual void SetState (int mask, bool enable);

@@ -83,13 +83,13 @@ public:
   /// Simple constructor creates new key with name "n" (iString version)
   awsKey (iString *n)
   { 
-    SCF_CONSTRUCT_IBASE(NULL);
+    SCF_CONSTRUCT_IBASE(0);
     ComputeKeyID (n->GetData (), n->Length());
   }
   /// Simple constructor creates new key with name "n" (const char* version)
   awsKey (const char* n)
   {
-    SCF_CONSTRUCT_IBASE(NULL);
+    SCF_CONSTRUCT_IBASE(0);
     ComputeKeyID (n, strlen(n));
   }
 
@@ -737,11 +737,11 @@ public:
   /// Gets the current default font
   virtual iFont *GetDefaultFont ();
 
-  /// Gets a font.  If it's not loaded, it will be.  Returns NULL on error.
+  /// Gets a font.  If it's not loaded, it will be.  Returns 0 on error.
   virtual iFont *GetFont (const char *filename);
 
   /// Gets a texture from the global AWS cache
-  virtual iTextureHandle *GetTexture (const char *name, const char *filename = NULL);
+  virtual iTextureHandle *GetTexture (const char *name, const char *filename = 0);
 
   /// Gets a texture from the global AWS cache, if its loaded for the first time then
   /// the keycolor (key_r,key_g,key_b) is set

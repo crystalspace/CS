@@ -120,8 +120,8 @@ public:
     * while a console application will just do a printf.
     */
   virtual void ReportError(const char* message,
-                           const char* info1=NULL,
-                           const char* info2=NULL);
+                           const char* info1=0,
+                           const char* info2=0);
 
 
   /**

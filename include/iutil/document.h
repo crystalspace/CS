@@ -195,12 +195,12 @@ struct iDocumentNode : public iBase
 
   /**
    * Create a new node of the given type before the given node.
-   * If the given node is NULL then it will be added at the end.
-   * Returns the new node or NULL if the given type is not valid
+   * If the given node is 0 then it will be added at the end.
+   * Returns the new node or 0 if the given type is not valid
    * (CS_NODE_DOCUMENT is not allowed here for example).
    */
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
-  	iDocumentNode* before = NULL) = 0;
+  	iDocumentNode* before = 0) = 0;
 
   /**
    * Get the value of a node.  Scans all child nodes and looks for a node of
@@ -267,7 +267,7 @@ struct iDocument : public iBase
   /**
    * Parse document file from an iFile.
    * This will clear the previous root node if any.
-   * Returns NULL if all is ok. Otherwise it will return an error
+   * Returns 0 if all is ok. Otherwise it will return an error
    * string.
    */
   virtual const char* Parse (iFile* file) = 0;
@@ -275,7 +275,7 @@ struct iDocument : public iBase
   /**
    * Parse document file from an iDataBuffer.
    * This will clear the previous root node if any.
-   * Returns NULL if all is ok. Otherwise it will return an error
+   * Returns 0 if all is ok. Otherwise it will return an error
    * string.
    */
   virtual const char* Parse (iDataBuffer* buf) = 0;
@@ -283,7 +283,7 @@ struct iDocument : public iBase
   /**
    * Parse document file from an iString.
    * This will clear the previous root node if any.
-   * Returns NULL if all is ok. Otherwise it will return an error
+   * Returns 0 if all is ok. Otherwise it will return an error
    * string.
    */
   virtual const char* Parse (iString* str) = 0;
@@ -291,28 +291,28 @@ struct iDocument : public iBase
   /**
    * Parse document file from a null-terminated C-string.
    * This will clear the previous root node if any.
-   * Returns NULL if all is ok. Otherwise it will return an error
+   * Returns 0 if all is ok. Otherwise it will return an error
    * string.
    */
   virtual const char* Parse (const char* buf) = 0;
 
   /**
    * Write out document file to an iFile.
-   * This will return NULL if all is ok. Otherwise it will return an
+   * This will return 0 if all is ok. Otherwise it will return an
    * error string.
    */
   virtual const char* Write (iFile* file) = 0;
 
   /**
    * Write out document file to an iString.
-   * This will return NULL if all is ok. Otherwise it will return an
+   * This will return 0 if all is ok. Otherwise it will return an
    * error string.
    */
   virtual const char* Write (iString* str) = 0;
 
   /**
    * Write out document file to a VFS file.
-   * This will return NULL if all is ok. Otherwise it will return an
+   * This will return 0 if all is ok. Otherwise it will return an
    * error string.
    */
   virtual const char* Write (iVFS* vfs, const char* filename) = 0;

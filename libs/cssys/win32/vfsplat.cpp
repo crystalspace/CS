@@ -60,6 +60,6 @@ csCheckPlatformVFSVar(const char* VarName)
     return szMyDocs;
   }
 
-  return NULL;
+  return 0;
 }
 

@@ -144,7 +144,7 @@ public:
     if (culling)
       return square_verts;
     else
-      return NULL;
+      return 0;
   }
   virtual int GetPolygonCount ()
   {
@@ -158,7 +158,7 @@ public:
     if (culling)
       return culling_mesh;
     else
-      return NULL;
+      return 0;
   }
   virtual void Cleanup () 
   {
@@ -431,14 +431,14 @@ public:
     }
     virtual iPolygonMesh* GetPolygonMeshShadows ()
     {
-      return NULL;
+      return 0;
     }
     virtual void SetPolygonMeshShadows (iPolygonMesh*)
     {
       // @@@ TODO: implement me!
     }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float /*detail*/)
-    { return NULL; }
+    { return 0; }
     virtual void GetObjectBoundingBox (csBox3& bbox,
 				       int /*type*/ = CS_BBOX_NORMAL)
     {
@@ -463,9 +463,9 @@ public:
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iTerrFuncState implementation ----------------
   // only here for walktest use
@@ -541,11 +541,11 @@ public:
     }
     virtual iTerrainHeightFunction* GetHeightFunction () const
     {
-      return NULL;
+      return 0;
     }
     virtual iTerrainNormalFunction* GetNormalFunction () const
     {
-      return NULL;
+      return 0;
     }
     virtual void SetLODDistance (int /*lod*/, float /*dist*/)
     {
@@ -716,7 +716,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csPtr<iMeshObject> NewInstance ();
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
@@ -794,7 +794,7 @@ public:
     }
     virtual csVector2* GetLODUV (int lod_level)
     {
-      if ((lod_level >= scfParent->LOD_Levels) || (lod_level < 0) ) return NULL;
+      if ((lod_level >= scfParent->LOD_Levels) || (lod_level < 0) ) return 0;
       return &scfParent->LOD_UV[lod_level];
     }
     virtual void SetDefaultMaterial (iMaterialWrapper* mat)

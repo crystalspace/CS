@@ -51,7 +51,7 @@ private:
 
 public:
   /// Create an empty pool.
-  csPoly2DPool (csPoly2DFactory* fact) : alloced (NULL), freed (NULL),
+  csPoly2DPool (csPoly2DFactory* fact) : alloced (0), freed (0),
   	factory (fact) { }
 
   /// Destroy pool and all objects in the pool.

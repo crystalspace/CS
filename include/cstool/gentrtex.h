@@ -193,7 +193,7 @@ private:
   iGenerateImageFunction* heightfunc;
 
 public:
-  csGenerateImageValueFunc () : heightfunc (NULL) { }
+  csGenerateImageValueFunc () : heightfunc (0) { }
   virtual ~csGenerateImageValueFunc ()
   {
     if (heightfunc) heightfunc->DecRef ();

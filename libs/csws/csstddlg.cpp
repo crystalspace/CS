@@ -46,7 +46,7 @@ struct MessageBoxData : public iMessageBoxData
   int id;
   iBase* userdata;
   SCF_DECLARE_IBASE;
-  MessageBoxData () { SCF_CONSTRUCT_IBASE (NULL); }
+  MessageBoxData () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~MessageBoxData () { if (userdata) userdata->DecRef (); }
   virtual int GetPressedButton () { return id; }
   virtual iBase* GetUserData () { return userdata; }
@@ -91,8 +91,8 @@ void csMessageBox (csComponent *iParent, const char *iTitle,
     cswfs3D);
   csDialog *Dialog = new csDialog (MsgBox);
 
-  csPixmap *img = NULL;
-  csStatic *bmp = NULL;
+  csPixmap *img = 0;
+  csStatic *bmp = 0;
 
   va_list arg;
   va_start (arg, iFlags);
@@ -147,7 +147,7 @@ void csMessageBox (csComponent *iParent, const char *iTitle,
       strncpy (line, MsgStart, count);
       line [count] = 0;
 
-      L [L_count] = new csStatic (Dialog, NULL, line, csscsText);
+      L [L_count] = new csStatic (Dialog, 0, line, csscsText);
 
       int w,h;
       L [L_count]->SuggestSize (w, h);
@@ -277,13 +277,13 @@ public:
 
 #define CSFDI_PATHCOMPONENT 0x9999
 static int fdref = 0;
-static csPixmap *fdspr[2] = { NULL, NULL };
+static csPixmap *fdspr[2] = { 0, 0 };
 
 cspFileDialog::cspFileDialog (csComponent *iParent)
   : csDialog (iParent)
 {
-  path = NULL;
-  vfs = NULL;
+  path = 0;
+  vfs = 0;
   busy = false;
   fdref++;
   if (app)
@@ -302,8 +302,8 @@ cspFileDialog::~cspFileDialog ()
 {
   if (--fdref == 0)
   {
-    delete fdspr [0]; fdspr [0] = NULL;
-    delete fdspr [1]; fdspr [1] = NULL;
+    delete fdspr [0]; fdspr [0] = 0;
+    delete fdspr [1]; fdspr [1] = 0;
   }
   if (path)
     delete [] path;
@@ -380,7 +380,7 @@ static bool is_checked (csComponent *child, void *param)
 bool cspFileDialog::BuildAndSetPath ()
 {
   csListBox *dp = (csListBox *)GetChild (CSWID_DIRLIST);
-  csComponent *cur = dp->ForEachItem (is_checked, NULL, true);
+  csComponent *cur = dp->ForEachItem (is_checked, 0, true);
   char buff [CS_MAXPATHLEN + 1];
 
   if (cur->id != CSFDI_PATHCOMPONENT)
@@ -461,7 +461,7 @@ void cspFileDialog::Reread ()
   csListBox *fp = (csListBox *)GetChild (CSWID_FILELIST);
   dp->SendCommand (cscmdListBoxClear);
   fp->SendCommand (cscmdListBoxClear);
-  csComponent *activate = NULL;
+  csComponent *activate = 0;
 
   // Clear "file name" field
   SetName ("");
@@ -513,12 +513,12 @@ void cspFileDialog::Reread ()
 
     if (!(dh = opendir (path)))
     {
-      csMessageBox (app, "Error", "Invalid directory", NULL);
+      csMessageBox (app, "Error", "Invalid directory", 0);
       app->Printf (CS_REPORTER_SEVERITY_NOTIFY, "Invalid directory path\n");
     }
     else
     {
-      while ((de = readdir (dh)) != NULL)
+      while ((de = readdir (dh)) != 0)
       {
 	const char* const name = de->d_name;
 	if (strcmp (name, ".") != 0 && strcmp (name, "..") != 0)
@@ -906,7 +906,7 @@ csWindow *csColorDialog (csComponent *iParent, const char *iTitle,
     sbs.pagestep = 10;							\
     sb->SendCommand (cscmdScrollBarSet, &sbs);				\
 									\
-    st = new csStatic (d, NULL, "@@@");					\
+    st = new csStatic (d, 0, "@@@");					\
     st->SetPos (sb->bound.xmax + 4,					\
      sby + (sb->bound.Height () - st->bound.Height ()) / 2);		\
     st->id = wid##_NUM;							\

@@ -35,7 +35,7 @@
 
 CIWorld::CIWorld()
 {
-  m_pMap   = NULL;
+  m_pMap   = 0;
   m_ScaleFactor = 1.0/40.0;
 }
 
@@ -123,7 +123,7 @@ void CIWorld::GenerateDefaultsector()
 
 
   //Create the Brush for that sector;
-  CMapBrush* pBrush = new CMapBrush(NULL);
+  CMapBrush* pBrush = new CMapBrush(0);
 
   int i;
   for (i=0; i<6; i++)
@@ -191,7 +191,7 @@ CISector* CIWorld::FindSectorForPoint(CdVector3& v)
     }
   }
 
-  return NULL;
+  return 0;
 }
 
 

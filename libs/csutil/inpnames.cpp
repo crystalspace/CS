@@ -74,7 +74,7 @@ static struct csKeyCodeDef
   { "PAD-",	CSKEY_PADMINUS	},
   { "PAD*",	CSKEY_PADMULT	},
   { "PAD/",	CSKEY_PADDIV	},
-  { NULL,	0		}
+  { 0,	0		}
 };
 
 static struct csKeyMaskDef
@@ -86,7 +86,7 @@ static struct csKeyMaskDef
   { "Ctrl+",	CSMASK_CTRL	},
   { "Alt+",	CSMASK_ALT	},
   { "Shift+",	CSMASK_SHIFT	},
-  { NULL,	0		}
+  { 0,	0		}
 };
 
 bool csParseInputDef (const char *name, iEvent* ev, bool use_shift)
@@ -224,7 +224,7 @@ bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift)
     }
   }
 
-  const char *key = NULL;
+  const char *key = 0;
   switch (ev->Type)
   {
     case csevKeyUp:

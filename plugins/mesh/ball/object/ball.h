@@ -268,7 +268,7 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState
@@ -360,7 +360,7 @@ public:
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () 
-    { SCF_CONSTRUCT_IBASE (NULL); }
+    { SCF_CONSTRUCT_IBASE (0); }
     virtual ~PolyMesh () { }
   } scfiPolygonMesh;
   friend struct PolyMesh;
@@ -390,7 +390,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 };
 
 /**

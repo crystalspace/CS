@@ -280,31 +280,31 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
 
   /// Create an empty csString object
-  csString () : Data (NULL), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
+  csString () : Data (0), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
     GrowExponentially (false) {}
 
   /// Create an csString object and reserve space for iLength characters
-  csString (size_t iLength) : Data (NULL), Size (0), MaxSize (0),
+  csString (size_t iLength) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { SetCapacity (iLength); }
 
   /// Copy constructor from existing csString.
-  csString (const csString& copy) : Data (NULL), Size (0), MaxSize (0),
+  csString (const csString& copy) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (copy); }
 
   /// Copy constructor from ASCIIZ string
-  csString (const char* copy) : Data (NULL), Size (0), MaxSize (0),
+  csString (const char* copy) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (copy); }
 
   /// Copy constructor from a character
-  csString (char c) : Data (NULL), Size (0), MaxSize (0),
+  csString (char c) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (c); }
 
   /// Copy constructor from a character (unsigned)
-  csString (unsigned char c) : Data(NULL), Size (0), MaxSize (0),
+  csString (unsigned char c) : Data(0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append ((char) c); }
 
@@ -511,7 +511,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
    * Detach the low-level null-terminated string buffer from the csString
    * object.  The caller of this function becomes the owner of the returned
    * string buffer and is responsible for destroying it via `delete[]' when
-   * no longer needed.  The returned value may be NULL if no buffer had been
+   * no longer needed.  The returned value may be 0 if no buffer had been
    * allocated for this string.
    */
   char* Detach ()

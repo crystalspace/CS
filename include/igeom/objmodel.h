@@ -90,14 +90,14 @@ struct iObjectModel : public iBase
 
   /**
    * Get a polygon mesh representing the basic geometry of the object.
-   * Can return NULL if this object model doesn't support that.
+   * Can return 0 if this object model doesn't support that.
    */
   virtual iPolygonMesh* GetPolygonMeshBase () = 0;
 
   /**
    * Get a polygon mesh representing the geometry of the object.
    * This mesh is useful for collision detection.
-   * Can return NULL if this object model doesn't support that.
+   * Can return 0 if this object model doesn't support that.
    */
   virtual iPolygonMesh* GetPolygonMeshColldet () = 0;
 
@@ -119,7 +119,7 @@ struct iObjectModel : public iBase
    * mesh in red and this one in blue you should not see any blue anywhere.
    * This kind of lower detail version can be used for occlusion writing
    * in a visibility culling system.
-   * Can return NULL if this object model doesn't support that. In that
+   * Can return 0 if this object model doesn't support that. In that
    * case the object will not be used for visibility culling.
    */
   virtual iPolygonMesh* GetPolygonMeshViscull () = 0;
@@ -140,7 +140,7 @@ struct iObjectModel : public iBase
    * shadow manager). This polygon mesh is guaranteed to be smaller or equal
    * to the real object. In other words: if you would render the original
    * mesh in red and this one in blue you should not see any blue anywhere.
-   * Can return NULL if this object model doesn't support that. In that
+   * Can return 0 if this object model doesn't support that. In that
    * case the object will not be used for shadow casting.
    */
   virtual iPolygonMesh* GetPolygonMeshShadows () = 0;
@@ -162,7 +162,7 @@ struct iObjectModel : public iBase
    * The floating point input number is 0 for minimum detail and
    * 1 for highest detail. This function may return the same polygon
    * mesh as GetPolygonMeshColldet() (but with ref count incremented by one).
-   * Can return NULL if this object model doesn't support that.
+   * Can return 0 if this object model doesn't support that.
    */
   virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail) = 0;
 

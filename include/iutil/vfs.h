@@ -129,7 +129,7 @@ struct iFile : public iBase
    *  to the buffer (e.g. for use with string functions.)
    * \remarks Null-termination might have a performance penalty (dependent on
    *  where the file is stored.) Use only when needed.
-   * \return The complete data contained in the file, or NULL if this doesn't 
+   * \return The complete data contained in the file, or 0 if this doesn't 
    *  support this function (e.g. write-opened VFS files.) Don't modify the 
    *  contained data!
    */
@@ -231,7 +231,7 @@ struct iVFS : public iBase
 
   /// Mount an VFS path on a "real-world-filesystem" path
   virtual bool Mount (const char *VirtualPath, const char *RealPath) = 0;
-  /// Unmount an VFS path; if RealPath is NULL, entire VirtualPath is unmounted
+  /// Unmount an VFS path; if RealPath is 0, entire VirtualPath is unmounted
   virtual bool Unmount (const char *VirtualPath, const char *RealPath) = 0;
   /**
    * Mount the root directory or directories beneath the given virtual path.
@@ -254,7 +254,7 @@ struct iVFS : public iBase
    * Query real-world path from given VFS path.
    * This will work only for files that are stored on real filesystem,
    * not in archive files. You should expect this function to return
-   * NULL in this case.
+   * 0 in this case.
    */
   virtual csPtr<iDataBuffer> GetRealPath (const char *FileName) = 0;
 };

@@ -69,7 +69,7 @@ bool csSplitter::HandleEvent (iEvent &Event)
     case csevMouseUp:
       if (isSliding && Event.Mouse.Button == 1)
       {
-        app->CaptureMouse (NULL);
+        app->CaptureMouse (0);
         isSliding = false;
         parent->SendCommand (cscmdSplitterPosSet, (void *)this);
         Invalidate ();

@@ -71,15 +71,15 @@ csTerrBlock::csTerrBlock ()
   for (i = 0 ; i < LOD_LEVELS ; i++)
   {
     memset (&mesh[i], 0, sizeof (G3DTriangleMesh));
-    normals[i] = NULL;
+    normals[i] = 0;
     dirlight_numbers[i] = -1;
-    mesh_vertices[i] = NULL;
-    mesh_texels[i] = NULL;
-    mesh_colors[i] = NULL;
+    mesh_vertices[i] = 0;
+    mesh_texels[i] = 0;
+    mesh_colors[i] = 0;
   }
-  material = NULL;
-  node = NULL;
-  quaddiv = NULL;
+  material = 0;
+  node = 0;
+  quaddiv = 0;
   quaddiv_visible = false;
   qd_portal = false;
   qd_plane = false;
@@ -98,7 +98,7 @@ csTerrBlock::~csTerrBlock ()
     delete[] mesh[i].triangles;
     delete[] normals[i];
   }
-  delete quaddiv; quaddiv = NULL;
+  delete quaddiv; quaddiv = 0;
 }
 
 /// static texture computing helpder
@@ -283,7 +283,7 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
   csReversibleTransform& camtrans = pCamera->GetTransform ();
 
   struct terrdata m; // my data
-  m.mesh.vertex_fog = NULL;
+  m.mesh.vertex_fog = 0;
   m.mesh.morph_factor = 0;
   m.mesh.num_vertices_pool = 1;
   m.mesh.use_vertex_color = true;
@@ -294,10 +294,10 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
   m.mesh.mixmode = CS_FX_GOURAUD;
   /// can use vbuf[0]
   m.mesh.buffers[0] = vbuf[0];
-  m.mesh.buffers[1] = NULL;
+  m.mesh.buffers[1] = 0;
 
   m.mesh.num_triangles = 0;
-  m.mesh.triangles = NULL;
+  m.mesh.triangles = 0;
   m.mesh.do_mirror = pCamera->IsMirrored();
   m.mesh.clip_portal = clip_portal;
   m.mesh.clip_plane = clip_plane;
@@ -345,7 +345,7 @@ struct QuadDivHeightFunc : public iTerrainHeightFunction
   float sch, offh;
 
   SCF_DECLARE_IBASE;
-  QuadDivHeightFunc () { SCF_CONSTRUCT_IBASE (NULL); hf=NULL;
+  QuadDivHeightFunc () { SCF_CONSTRUCT_IBASE (0); hf=0;
     scx=scy=sch=1.0; offx=offy=offh=0.0f;}
   virtual ~QuadDivHeightFunc () {}
   /// get height using world space in world space answers
@@ -379,7 +379,7 @@ struct QuadDivNormalFunc : public iTerrainNormalFunction
   float inv_totx, inv_toty;
 
   SCF_DECLARE_IBASE;
-  QuadDivNormalFunc () { SCF_CONSTRUCT_IBASE (NULL); nf=NULL; hf=NULL;}
+  QuadDivNormalFunc () { SCF_CONSTRUCT_IBASE (0); nf=0; hf=0;}
   virtual ~QuadDivNormalFunc () {}
   /// get Normal using world space in world space answers
   virtual csVector3 GetNormal (float x, float y)
@@ -423,7 +423,7 @@ SCF_IMPLEMENT_IBASE_END
 struct DefaultFunction : public iTerrainHeightFunction
 {
   SCF_DECLARE_IBASE;
-  DefaultFunction () { SCF_CONSTRUCT_IBASE (NULL); }
+  DefaultFunction () { SCF_CONSTRUCT_IBASE (0); }
   virtual float GetHeight (float x, float y)
   {
     return 8. * (sin (x*40.)+cos (y*40.));
@@ -443,7 +443,7 @@ struct HeightMapData : public iTerrainHeightFunction
   float hscale, hshift;
   SCF_DECLARE_IBASE;
 
-  HeightMapData () : im (NULL) { SCF_CONSTRUCT_IBASE (NULL); }
+  HeightMapData () : im (0) { SCF_CONSTRUCT_IBASE (0); }
   virtual ~HeightMapData ()
   {
     if (im) im->DecRef ();
@@ -503,13 +503,13 @@ void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
 csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
 	iMeshObjectFactory *pFactory)
 {
-  SCF_CONSTRUCT_IBASE (NULL)
+  SCF_CONSTRUCT_IBASE (0)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csTerrFuncObject::object_reg = object_reg;
   csTerrFuncObject::pFactory = pFactory;
-  logparent = NULL;
+  logparent = 0;
   initialized = false;
   blockxy = 4;
   gridx = 8; gridy = 8;
@@ -521,7 +521,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
 
   topleft.Set (0, 0, 0);
   scale.Set (1, 1, 1);
-  blocks = NULL;
+  blocks = 0;
   do_dirlight = false;
   do_vis_test = true;
   dirlight_number = 0;
@@ -529,7 +529,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   base_color.green = 0;
   base_color.blue = 0;
   height_func = new DefaultFunction ();
-  normal_func = NULL;
+  normal_func = 0;
   lod_sqdist[0] = 100*100;
   lod_sqdist[1] = 400*400;
   lod_sqdist[2] = 800*800;
@@ -538,14 +538,14 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   max_cost[2] = .2;
   CorrectSeams (0, 0);
   quad_depth = 6;
-  quadtree = NULL;
-  vis_cb = NULL;
+  quadtree = 0;
+  vis_cb = 0;
   current_lod = 1;
   current_features = 0;
-  vbufmgr = NULL;
+  vbufmgr = 0;
   quaddiv_enabled = false;
-  quad_height = NULL;
-  quad_normal = NULL;
+  quad_height = 0;
+  quad_normal = 0;
   qd_framenum = 1;
 }
 
@@ -659,9 +659,9 @@ public:
     // Vertex to collapse to with minimal cost.
     int to_vertex;
 
-    csTriangleVertex () : deleted (false), con_triangles (NULL),
+    csTriangleVertex () : deleted (false), con_triangles (0),
                           num_con_triangles (0), max_con_triangles (0),
-                          con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
+                          con_vertices (0), num_con_vertices (0), max_con_vertices (0) { }
     ~csTriangleVertex () { delete [] con_triangles; delete [] con_vertices; }
     void AddTriangle (int idx);
     void AddVertex (int idx);
@@ -1305,13 +1305,13 @@ void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh,
 	csColor*& mesh_colors)
 {
   delete[] mesh_colors;
-  mesh_colors = NULL;
+  mesh_colors = 0;
   delete[] mesh_vertices;
-  mesh_vertices = NULL;
+  mesh_vertices = 0;
   delete[] mesh_texels;
-  mesh_texels = NULL;
+  mesh_texels = 0;
   delete[] mesh.vertex_fog;
-  mesh.vertex_fog = NULL;
+  mesh.vertex_fog = 0;
   mesh.morph_factor = 0;
   mesh.num_vertices_pool = 1;
   mesh.use_vertex_color = true;
@@ -1800,7 +1800,7 @@ void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
       csTerrBlock& block = blocks[blidx];
       if (do_vis_test)
       {
-        CS_ASSERT (block.node != NULL);
+        CS_ASSERT (block.node != 0);
         if (!block.node->IsVisible ()) continue;
       }
       int clip_portal, clip_plane, clip_z_plane;
@@ -1826,7 +1826,7 @@ void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
       if(block.quaddiv_visible)
       {
         //if((bx!=0&&bx!=1) || by!=0) continue; // one block only
-        SetupVertexBuffer (block.vbuf[0], NULL);
+        SetupVertexBuffer (block.vbuf[0], 0);
         block.Draw(rview, block.qd_portal, block.qd_plane, block.qd_z_plane,
           correct_du, correct_su, correct_dv, correct_sv, this, qd_framenum);
 	block.quaddiv_visible = false;
@@ -1868,7 +1868,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       csTerrBlock& block = blocks[blidx];
       if (do_vis_test)
       {
-        CS_ASSERT (block.node != NULL);
+        CS_ASSERT (block.node != 0);
         if (!block.node->IsVisible ()) continue;
       }
       int clip_portal, clip_plane, clip_z_plane;
@@ -1890,10 +1890,10 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	m->clip_portal = clip_portal;
 	m->clip_plane = clip_plane;
 	m->clip_z_plane = clip_z_plane;
-	SetupVertexBuffer (block.vbuf[lod], NULL);
+	SetupVertexBuffer (block.vbuf[lod], 0);
 	CS_ASSERT (block.vbuf[lod]);
 	CS_ASSERT (!block.vbuf[lod]->IsLocked ());
-	CS_ASSERT (block.mesh_vertices[lod] != NULL);
+	CS_ASSERT (block.mesh_vertices[lod] != 0);
 	vbufmgr->LockBuffer (block.vbuf[lod],
 		block.mesh_vertices[lod],
 		block.mesh_texels[lod],
@@ -1955,7 +1955,7 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
 // the other variant.
 
   csSegment3 seg (start, end);
-  csIntersect3::BoxSegment (global_bbox, seg, isect, NULL);
+  csIntersect3::BoxSegment (global_bbox, seg, isect, 0);
   csVector3 v, *vrt;
   csTriangle *tr;
   csBox3 tbox;
@@ -1975,7 +1975,7 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
   {
     rev.SetEnd(isect);
     tbox = blocks[index].bbox;
-    if (csIntersect3::BoxSegment (tbox, seg, isect, NULL) > -1)
+    if (csIntersect3::BoxSegment (tbox, seg, isect, 0) > -1)
     {
       max = blocks[index].mesh[0].num_triangles;
       vrt = blocks[index].mesh_vertices[0];
@@ -1996,7 +1996,7 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
     tbox.AddBoundingVertex(v.x, max_y, v.z);
     tbox.AddBoundingVertex(v.x, min_y, v.z);
 
-    switch (csIntersect3::BoxSegment (tbox, rev, isect, NULL))
+    switch (csIntersect3::BoxSegment (tbox, rev, isect, 0))
     {
       case CS_BOX_SIDE_x: x--; break;
       case CS_BOX_SIDE_X: x++; break;
@@ -2040,7 +2040,7 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
   {
     rev.SetEnd(st);
     tbox = blocks[index].bbox;
-    if (csIntersect3::BoxSegment (tbox, seg, st, NULL) > -1)
+    if (csIntersect3::BoxSegment (tbox, seg, st, 0) > -1)
     {
       max = blocks[index].mesh[0].num_triangles;
       vrt = blocks[index].mesh_vertices[0];
@@ -2066,7 +2066,7 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
     tbox.AddBoundingVertex(v.x, max_y, v.z);
     tbox.AddBoundingVertex(v.x, min_y, v.z);
 
-    switch (csIntersect3::BoxSegment (tbox, rev, st, NULL))
+    switch (csIntersect3::BoxSegment (tbox, rev, st, 0))
     {
       case CS_BOX_SIDE_x: x--; break;
       case CS_BOX_SIDE_X: x++; break;
@@ -2091,10 +2091,10 @@ void csTerrFuncObject::eiVertexBufferManagerClient::ManagerClosing ()
       csTerrBlock& block = scfParent->blocks[i];
       for (int lod = 0; lod < 4; lod++)
       {
-	block.vbuf[lod] = NULL;
+	block.vbuf[lod] = 0;
       }
     }
-    scfParent->vbufmgr = NULL;
+    scfParent->vbufmgr = 0;
   }
 }
 
@@ -2108,9 +2108,9 @@ SCF_IMPLEMENT_IBASE_END
 
 csTerrFuncObjectFactory::csTerrFuncObjectFactory (iObjectRegistry* object_reg)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csTerrFuncObjectFactory::object_reg = object_reg;
-  logparent = NULL;
+  logparent = 0;
 }
 
 csTerrFuncObjectFactory::~csTerrFuncObjectFactory ()

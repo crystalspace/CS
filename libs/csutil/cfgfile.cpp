@@ -30,11 +30,11 @@
 class csConfigNode
 {
 public:
-  // create a new config node. Set name to NULL to create the initial node.
+  // create a new config node. Set name to 0 to create the initial node.
   csConfigNode(const char *Name);
   // delete this node
   ~csConfigNode();
-  // delete all nodes will non-NULL name
+  // delete all nodes will non-0 name
   void DeleteDataNodes();
   // insert this node after the given node
   void InsertAfter(csConfigNode *Where);
@@ -71,9 +71,9 @@ private:
 
 csConfigNode::csConfigNode(const char *Keyname)
 {
-  Prev = Next = NULL;
+  Prev = Next = 0;
   Name = csStrNew(Keyname);
-  Data = Comment = NULL;
+  Data = Comment = 0;
 }
 
 csConfigNode::~csConfigNode()
@@ -118,7 +118,7 @@ void csConfigNode::Remove()
 {
   if (Next) Next->Prev = Prev;
   if (Prev) Prev->Next = Next;
-  Prev = Next = NULL;
+  Prev = Next = 0;
 }
 
 void csConfigNode::SetStr(const char *s)
@@ -215,7 +215,7 @@ public:
   virtual const char *GetStr() const;
   /// Get a boolean value from the configuration.
   virtual bool GetBool() const;
-  /// Get the comment of the given key, or NULL if no comment exists.
+  /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment() const;
 
 private:
@@ -245,7 +245,7 @@ SCF_IMPLEMENT_IBASE_END;
 
 csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
   Config = c;
   Node = Config->FirstNode;
   Subsection = csStrNew(sub);
@@ -279,14 +279,14 @@ bool csConfigIterator::DoPrev()
 {
   if (!Node->GetPrev()) return false;
   Node = Node->GetPrev();
-  return (Node->GetName() != NULL);
+  return (Node->GetName() != 0);
 }
 
 bool csConfigIterator::DoNext()
 {
   if (!Node->GetNext()) return false;
   Node = Node->GetNext();
-  return (Node->GetName() != NULL);
+  return (Node->GetName() != 0);
 }
 
 bool csConfigIterator::CheckSubsection(const char *Key) const
@@ -355,14 +355,14 @@ SCF_IMPLEMENT_IBASE_END;
 
 void csConfigFile::InitializeObject ()
 {
-  FirstNode = new csConfigNode(NULL);
-  LastNode = new csConfigNode(NULL);
+  FirstNode = new csConfigNode(0);
+  LastNode = new csConfigNode(0);
   LastNode->InsertAfter(FirstNode);
 
   Iterators = new csVector();
-  Filename = NULL;
+  Filename = 0;
   Dirty = false;
-  EOFComment = NULL;
+  EOFComment = 0;
 }
 
 csConfigFile::csConfigFile(iBase *pBase)
@@ -373,7 +373,7 @@ csConfigFile::csConfigFile(iBase *pBase)
 
 csConfigFile::csConfigFile(const char *file, iVFS *vfs)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
   InitializeObject ();
   if (file)
     Load(file, vfs);
@@ -465,7 +465,7 @@ void WriteComment(csString &Filedata, const char *s)
 {
   if (s != 0)
   {
-    for (const char* b = strchr(s,'\n'); b != NULL; b = strchr(s,'\n'))
+    for (const char* b = strchr(s,'\n'); b != 0; b = strchr(s,'\n'))
     {
       if (*s != '\n' && *s != ';') // Prepend comment character if absent.
         Filedata << "; ";
@@ -490,10 +490,10 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
   csString Filedata;
   csConfigNode *n;
 
-  for (n = FirstNode; n != NULL; n = n->GetNext())
+  for (n = FirstNode; n != 0; n = n->GetNext())
   {
     // don't write first and last nodes
-    if (n->GetName() == NULL) continue;
+    if (n->GetName() == 0) continue;
 
     // write comment
     WriteComment(Filedata, n->GetComment());
@@ -531,7 +531,7 @@ void csConfigFile::Clear()
   if (EOFComment)
   {
     delete[] EOFComment;
-    EOFComment = NULL;
+    EOFComment = 0;
   }
   Dirty = true;
 }
@@ -580,7 +580,7 @@ bool csConfigFile::GetBool(const char *Key, bool Def) const
 const char *csConfigFile::GetComment(const char *Key) const
 {
   csConfigNode *Node = FindNode(Key);
-  return Node ? Node->GetComment() : NULL;
+  return Node ? Node->GetComment() : 0;
 }
 
 void csConfigFile::SetStr (const char *Key, const char *Val)
@@ -774,7 +774,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
 
 csConfigNode *csConfigFile::FindNode(const char *Name, bool isSubsection) const
 {
-  if (!Name) return NULL;
+  if (!Name) return 0;
 
   csConfigNode *n = FirstNode;
   const int sz = (isSubsection ? strlen(Name) : 0);
@@ -786,12 +786,12 @@ csConfigNode *csConfigFile::FindNode(const char *Name, bool isSubsection) const
       return n;
     n = n->GetNext();
   }
-  return NULL;
+  return 0;
 }
 
 csConfigNode *csConfigFile::CreateNode(const char *Name)
 {
-  if (!Name) return NULL;
+  if (!Name) return 0;
 
   csConfigNode *n = new csConfigNode(Name);
   n->InsertAfter(LastNode->GetPrev());
@@ -809,7 +809,7 @@ void csConfigFile::RemoveIterator(csConfigIterator *it) const
 void csConfigFile::SetEOFComment(const char *text)
 {
   if (EOFComment) delete[] EOFComment;
-  EOFComment = (text ? csStrNew(text) : NULL);
+  EOFComment = (text ? csStrNew(text) : 0);
   Dirty = true;
 }
 

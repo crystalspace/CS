@@ -79,7 +79,7 @@ awsSingleProctexCanvas::awsSingleProctexCanvas (
   iTextureManager *txtmgr,
   const char *name)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   canvas = new awsSimpleCanvas ();
   canvas->DisableAutoUpdate ();

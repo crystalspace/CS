@@ -110,7 +110,7 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (buf);
-  if (error != NULL)
+  if (error != 0)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
     	"XML error '%s' for file '%s'!", error, fileName);
@@ -138,7 +138,7 @@ iSequence* DemoSequenceLoader::GetSequence (const char* name)
     NamedSequence* ns = (NamedSequence*)sequences[i];
     if (!strcmp (ns->name, name)) return ns->sequence;
   }
-  return NULL;
+  return 0;
 }
 
 void DemoSequenceLoader::LoadSequence (iDocumentNode* node, iSequence* seq)
@@ -261,7 +261,7 @@ void DemoSequenceLoader::LoadSequence (iDocumentNode* node, iSequence* seq)
 	}
 	pathName = pathnode->GetContentsValue ();
 	const char* name = meshName;
-	if (!strcmp ("camera", meshName)) name = NULL;
+	if (!strcmp ("camera", meshName)) name = 0;
         AttachOp* op = new AttachOp (name, pathName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -300,7 +300,7 @@ void DemoSequenceLoader::LoadSequence (iDocumentNode* node, iSequence* seq)
 
 	t = csTicks (float (t) * SPEED_FACTOR);
 	const char* name = meshName;
-	if (!strcmp ("camera", meshName)) name = NULL;
+	if (!strcmp ("camera", meshName)) name = 0;
         PathOp* op = new PathOp (t, name, pathName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -495,7 +495,7 @@ bool DemoSequenceLoader::ParseVectorList (iDocumentNode* node,
 csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	const char* pName)
 {
-  csNamedPath* np = NULL;
+  csNamedPath* np = 0;
 
   int seq = 0;
   int num = 0;
@@ -524,7 +524,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
 	csRef<iDocument> doc = xml->CreateDocument ();
 	const char* error = doc->Parse (buf);
-	if (error != NULL)
+	if (error != 0)
 	{
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
 	    "Error '%s' reading XML file '%s'!", error, fname);

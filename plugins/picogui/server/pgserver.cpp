@@ -84,7 +84,7 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
 
   if (! csPGInputDriver::Construct (evq)) return false;
 
-  e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, NULL);
+  e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, 0);
   if (iserror(e)) {
     os_show_error(e);
     return false;

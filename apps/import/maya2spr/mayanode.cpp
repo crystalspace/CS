@@ -155,25 +155,25 @@ NodeMesh::NodeMesh(csVector3& trans,csVector3& s)
     type = 0;       // indicator of using double, int, string, etc.
 
     count_uv=0;    //  how many u,v's are there?
-    u = v = NULL;       //  u,v mapping set for all vertices
+    u = v = 0;       //  u,v mapping set for all vertices
 
     count_vert=0;     //  how many x,y,z's follow?
-    vertex = NULL;      //  x,y,z coords for all vertices
-    animvertex = NULL;  //  x,y,z coords for all vertices
-    vertnorms = NULL;   //  Vertex normals for all vertices
+    vertex = 0;      //  x,y,z coords for all vertices
+    animvertex = 0;  //  x,y,z coords for all vertices
+    vertnorms = 0;   //  Vertex normals for all vertices
 
     count_edge=0;            // how many edges?
-    edgestart=NULL;
-    edgestop=NULL;  // edge definitions (index to vertices)
+    edgestart=0;
+    edgestop=0;  // edge definitions (index to vertices)
 
     count_face=0;      // how many faces are there (both e1,e2,e3 and uv1, etc.)
-    faceedge=NULL;    // edges of triangle faces (index to edges)
-    tri_normals=NULL; // normals to each poly
-    uv1 = uv2 = uv3 = NULL;  // indices into u[] and v[] for each point
+    faceedge=0;    // edges of triangle faces (index to edges)
+    tri_normals=0; // normals to each poly
+    uv1 = uv2 = uv3 = 0;  // indices into u[] and v[] for each point
     
     countcsverts=0;
-    CSVerts=NULL;
-    CSPoly[0] = CSPoly[1] = CSPoly[2] = NULL;
+    CSVerts=0;
+    CSPoly[0] = CSPoly[1] = CSPoly[2] = 0;
 }
 
 void NodeMesh::PrintStats(FILE *s,int level)

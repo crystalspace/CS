@@ -41,7 +41,7 @@ csPolEdgeIterator::csPolEdgeIterator (csHashMap &edges, int i1, int i2)
     }
   }
   else
-    current = NULL;
+    current = 0;
 }
 
 csPolEdgeIterator::~csPolEdgeIterator ()
@@ -51,7 +51,7 @@ csPolEdgeIterator::~csPolEdgeIterator ()
 
 csPolygon3D *csPolEdgeIterator::Next ()
 {
-  if (!current) return NULL;
+  if (!current) return 0;
 
   csPolygon3D *rc_p = current->p;
 
@@ -72,7 +72,7 @@ csEdgeIterator::csEdgeIterator (csHashMap &edges)
   if (iterator->HasNext ())
     current = (csPolEdge *) (iterator->Next ());
   else
-    current = NULL;
+    current = 0;
 }
 
 csEdgeIterator::~csEdgeIterator ()
@@ -82,7 +82,7 @@ csEdgeIterator::~csEdgeIterator ()
 
 csPolygon3D *csEdgeIterator::Next (int &e1, int &e2)
 {
-  if (!current) return NULL;
+  if (!current) return 0;
   e1 = current->i1;
   e2 = current->i2;
 

@@ -121,7 +121,7 @@ struct csColorBox;
  * contained in some picture(s).
  *<p>
  * Some routines accept an additional parameter (csRGBpixel *transp). If it
- * is NULL, nothing special is performed. If it is non-NULL, it should point
+ * is 0, nothing special is performed. If it is non-0, it should point
  * to an valid csRGBpixel object; the color of that pixel will be treated in
  * a special way: Count() will ignore pixels of that color,
  * Palette() will allocate color index 0 for that color, and
@@ -171,16 +171,16 @@ public:
    * It uses a variation of well-known Heckbert quantization algorithm.
    * The side bonus after quantization is that the palette is ordered
    * in most-used-first fashion.
-   * If outimage is NULL, it is allocated. If outpalette is NULL, it
-   * is allocated as well. If it is non-NULL, the routine supposes that
+   * If outimage is 0, it is allocated. If outpalette is 0, it
+   * is allocated as well. If it is non-0, the routine supposes that
    * the storage the pointers point to has enough size to store resulting
    * image and palette (the size of resulting image is exactly "pixels" bytes,
    * the size of resulting palette is palsize colors).
    * \param image input image
    * \param pixels number of pixels in input image
    * \param pixperline number of pixels in one line
-   * \param outimage output image (allocated if NULL)
-   * \param outpalette output palette (allocated if NULL)
+   * \param outimage output image (allocated if 0)
+   * \param outpalette output palette (allocated if 0)
    * \param maxcolors maximal number of colors in output palette
    *     (actual number of colors on return)
    * \param dither Use/do not use Floyd-Steinberg dithering
@@ -193,19 +193,19 @@ public:
   /// Finish quantization
   void End ();
   /// Count the colors in a image and update the color histogram
-  void Count (csRGBpixel *image, int pixels, csRGBpixel *transp = NULL);
+  void Count (csRGBpixel *image, int pixels, csRGBpixel *transp = 0);
   /// Bias the color histogram towards given colors (weight = 0..100)
   void Bias (csRGBpixel *colors, int count, int weight);
   /// Compute the optimal palette for all images passed to QuantizeCount()
   void Palette (csRGBpixel *&outpalette, int &maxcolors,
-    csRGBpixel *transp = NULL);
+    csRGBpixel *transp = 0);
   /// Remap a image to the palette computed by Palette()
   void Remap (csRGBpixel *image, int pixels, uint8 *&outimage,
-    csRGBpixel *transp = NULL);
+    csRGBpixel *transp = 0);
   /// Same but apply Floyd-Steinberg dithering for nicer (but slower) results.
   void RemapDither (csRGBpixel *image, int pixels, int pixperline,
     csRGBpixel *palette, int colors, uint8 *&outimage,
-    csRGBpixel *transp = NULL);
+    csRGBpixel *transp = 0);
 };
 
 /** @} */

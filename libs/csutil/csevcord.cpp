@@ -29,8 +29,8 @@ SCF_IMPLEMENT_IBASE_END
 csEventCord::csEventCord(int cat, int subcat) :
   category(cat), subcategory(subcat)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  plugins = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  plugins = 0;
   // By default, only pass along category 0, subcategory 0 events to the queue.
   pass = (category == 0 && subcategory == 0);
   SpinLock = 0;
@@ -45,7 +45,7 @@ int csEventCord::Insert(iEventHandler *plugin, int priority)
   if (plugins)
   {
     // Add a new record
-    PluginData *last = NULL, *curr = plugins;
+    PluginData *last = 0, *curr = plugins;
     while (curr)
     {
       if (priority > curr->priority)
@@ -77,7 +77,7 @@ int csEventCord::Insert(iEventHandler *plugin, int priority)
     plugins = new PluginData;
     plugins->plugin = plugin;
     plugins->priority = priority;
-    plugins->next = NULL;
+    plugins->next = 0;
   }
 
   Unlock ();
@@ -87,7 +87,7 @@ int csEventCord::Insert(iEventHandler *plugin, int priority)
 void csEventCord::Remove (iEventHandler *plugin)
 {
   Lock ();
-  PluginData *last = NULL, *curr = plugins;
+  PluginData *last = 0, *curr = plugins;
   // Walk the list until you find the plugin
   while (curr)
   {

@@ -98,7 +98,7 @@ void Demo::Report (int severity, const char* msg, ...)
 
 Demo::Demo ()
 {
-  seqmgr = NULL;
+  seqmgr = 0;
   message[0] = 0;
 }
 
@@ -111,7 +111,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -147,7 +147,7 @@ static void TestDemoFile (const char* zip, iVFS* myVFS, csStrVector& demos)
     testpath[l] = '/';
     testpath[l+1] = 0;
   }
-  else if (strstr (testpath, ".zip") == NULL)
+  else if (strstr (testpath, ".zip") == 0)
   {
     delete[] testpath;
     return;
@@ -156,7 +156,7 @@ static void TestDemoFile (const char* zip, iVFS* myVFS, csStrVector& demos)
   myVFS->Mount ("/tmp/csdemo_temp", testpath);
   if (myVFS->Exists ("/tmp/csdemo_temp/sequences"))
     demos.Push (csStrNew (testpath));
-  myVFS->Unmount ("/tmp/csdemo_temp", NULL);
+  myVFS->Unmount ("/tmp/csdemo_temp", 0);
   delete[] testpath;
 }
 
@@ -300,7 +300,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser));
   const char *val;
-  if ((val = cmdline->GetName ()) != NULL)
+  if ((val = cmdline->GetName ()) != 0)
   {
     if (!LoadDemoFile (val))
       return false;
@@ -326,7 +326,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
       char* zip = zips->Get (i);
       TestDemoFile (zip, myVFS, demos);
     }
-    myVFS->Unmount ("/tmp/csdemo_datadir", NULL);
+    myVFS->Unmount ("/tmp/csdemo_datadir", 0);
   }
 
   col_red = myG2D->FindRGB (255, 0, 0);
@@ -608,7 +608,7 @@ void Demo::SetupFrame ()
 void Demo::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 void Demo::DrawEditInfo ()
@@ -1332,7 +1332,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new Demo ();

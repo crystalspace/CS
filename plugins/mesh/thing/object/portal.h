@@ -67,7 +67,7 @@ protected:
   iTextureHandle* filter_texture;
 
   /**
-   * If filter_texture is NULL then this filter is used instead.
+   * If filter_texture is 0 then this filter is used instead.
    */
   float filter_r, filter_g, filter_b;
 
@@ -263,7 +263,7 @@ public:
   	//csVector3& isect, iPolygon3D** polygonPtr);
 
   /**
-   * Check if the destination sector is NULL and if so call
+   * Check if the destination sector is 0 and if so call
    * the callback. This function returns false if the portal should
    * not be traversed.
    */

@@ -94,7 +94,7 @@ public:
 
   csDynVisObjIt (csVector* vector, bool* vistest_objects_inuse)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csDynVisObjIt::vector = vector;
     csDynVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
     if (vistest_objects_inuse) *vistest_objects_inuse = true;
@@ -102,7 +102,7 @@ public:
   }
   virtual ~csDynVisObjIt ()
   {
-    // If the vistest_objects_inuse pointer is not NULL we set the
+    // If the vistest_objects_inuse pointer is not 0 we set the
     // bool to false to indicate we're no longer using the base
     // vector. Otherwise we delete the vector.
     if (vistest_objects_inuse) *vistest_objects_inuse = false;
@@ -123,7 +123,7 @@ public:
 
   virtual void Reset()
   {
-    if (vector == NULL || vector->Length () < 1)
+    if (vector == 0 || vector->Length () < 1)
       position = -1;
     else
       position = 0;
@@ -172,10 +172,10 @@ csDynaVis::csDynaVis (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  object_reg = NULL;
-  kdtree = NULL;
-  tcovbuf = NULL;
-  debug_camera = NULL;
+  object_reg = 0;
+  kdtree = 0;
+  tcovbuf = 0;
+  debug_camera = 0;
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
   current_visnr = 1;
@@ -229,7 +229,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   csDynaVis::object_reg = object_reg;
 
   delete kdtree;
-  delete tcovbuf; tcovbuf = NULL;
+  delete tcovbuf; tcovbuf = 0;
 
 #ifdef CS_USE_NEW_RENDERER
   csRef<iRender3D> g3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
@@ -248,7 +248,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
-  kdtree = new csKDTree (NULL);
+  kdtree = new csKDTree (0);
 
   tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
   csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
@@ -551,7 +551,7 @@ end:
     if (hist->reason != VISIBLE && hist->reason != VISIBLE_INSIDE)
     {
       printf ("  ");
-      treenode->Front2Back (data->pos, PrintObjects, NULL, 0);
+      treenode->Front2Back (data->pos, PrintObjects, 0, 0);
       printf ("\n");
     }
   }
@@ -767,7 +767,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   int i;
   // First transform all vertices.
   //@@@ MEMORY LEAK!!!
-  static csVector2* tr_verts = NULL;
+  static csVector2* tr_verts = 0;
   static int max_tr_verts = 0;
   if (vertex_count > max_tr_verts)
   {
@@ -1352,7 +1352,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   	(void*)&data, frustum_mask);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -1434,7 +1434,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
   	0);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -1518,7 +1518,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
   kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data, 0);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -1544,7 +1544,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 
   const csBox3& node_bbox = treenode->GetNodeBBox ();
 
-  // If mesh != NULL then we have already found our mesh. In that
+  // If mesh != 0 then we have already found our mesh. In that
   // case we will compare the distance of the origin with the the
   // box of the treenode and the already found shortest distance to
   // see if we have to proceed.
@@ -1648,7 +1648,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	        else if (r < data->r)
 		{
 		  data->r = r;
-		  data->polygon = NULL;
+		  data->polygon = 0;
 		  if (identity)
 		    data->isect = obj_isect;
 		  else
@@ -1679,9 +1679,9 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
   data.r = 10000000000.;
-  data.mesh = NULL;
-  data.polygon = NULL;
-  data.vector = NULL;
+  data.mesh = 0;
+  data.polygon = 0;
+  data.vector = 0;
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
@@ -1690,7 +1690,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   if (poly) *poly = data.polygon;
   isect = data.isect;
 
-  return data.mesh != NULL;
+  return data.mesh != 0;
 }
 
 csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
@@ -1702,13 +1702,13 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
   data.r = 10000000000.;
-  data.mesh = NULL;
-  data.polygon = NULL;
+  data.mesh = 0;
+  data.polygon = 0;
   data.vector = new csVector ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
-  csDynVisObjIt* vobjit = new csDynVisObjIt (data.vector, NULL);
+  csDynVisObjIt* vobjit = new csDynVisObjIt (data.vector, 0);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -1794,7 +1794,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginDist ();
 	data->shadobjs[data->num_shadobjs].caster = visobj_wrap->caster;
-	data->shadobjs[data->num_shadobjs].mesh = NULL;
+	data->shadobjs[data->num_shadobjs].mesh = 0;
 	data->shadobjs[data->num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
 	data->num_shadobjs++;
@@ -1803,7 +1803,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
 	data->shadobjs[data->num_shadobjs].mesh = visobj_wrap->mesh;
-	data->shadobjs[data->num_shadobjs].caster = NULL;
+	data->shadobjs[data->num_shadobjs].caster = 0;
 	data->shadobjs[data->num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
 	data->num_shadobjs++;
@@ -1907,7 +1907,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 
 csPtr<iString> csDynaVis::Debug_UnitTest ()
 {
-  csKDTree* kdtree = new csKDTree (NULL);
+  csKDTree* kdtree = new csKDTree (0);
   csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
   if (dbghelp)
   {
@@ -1933,17 +1933,17 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   }
   tcovbuf->DecRef();
 
-  return NULL;
+  return 0;
 }
 
 csPtr<iString> csDynaVis::Debug_StateTest ()
 {
-  return NULL;
+  return 0;
 }
 
 csPtr<iString> csDynaVis::Debug_Dump ()
 {
-  return NULL;
+  return 0;
 }
 
 struct color { int r, g, b; };
@@ -1969,7 +1969,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     if (fntsvr)
     {
       fnt = fntsvr->GetFont (0);
-      if (fnt == NULL)
+      if (fnt == 0)
         fnt = fntsvr->LoadFont (CSFONT_COURIER);
     }
 
@@ -2168,7 +2168,7 @@ public:
 
   DynavisRenderObject (csDynaVis* dynavis, iBugPlug* bugplug, int w, int h)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     DynavisRenderObject::dynavis = dynavis;
     tcovbuf = new csTiledCoverageBuffer (w, h);
 
@@ -2630,7 +2630,7 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
 {
   csTicks rc = 0;
 
-  csKDTree* kdtree = new csKDTree (NULL);
+  csKDTree* kdtree = new csKDTree (0);
   csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
   if (dbghelp)
   {

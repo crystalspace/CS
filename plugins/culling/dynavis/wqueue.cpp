@@ -37,12 +37,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csWriteQueue::csWriteQueue ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
 
-  free_elements = NULL;
-  queue_min = NULL;
-  queue_max = NULL;
+  free_elements = 0;
+  queue_min = 0;
+  queue_max = 0;
 }
 
 csWriteQueue::~csWriteQueue ()
@@ -62,16 +62,16 @@ void csWriteQueue::Initialize ()
 {
   if (queue_min)
   {
-    CS_ASSERT (queue_max != NULL);
+    CS_ASSERT (queue_max != 0);
     queue_max->next = free_elements;
     free_elements = queue_min;
-    queue_min = queue_max = NULL;
+    queue_min = queue_max = 0;
   }
 }
 
 void csWriteQueue::Append (const csBox2& box, float depth, void* obj)
 {
-  CS_ASSERT ((queue_min != NULL) == (queue_max != NULL));
+  CS_ASSERT ((queue_min != 0) == (queue_max != 0));
 
   //-----
   // Find a free element to use or allocate one.
@@ -97,10 +97,10 @@ void csWriteQueue::Append (const csBox2& box, float depth, void* obj)
   //-----
   // If the queue is empty the situation is easy.
   //-----
-  if (queue_min == NULL)
+  if (queue_min == 0)
   {
     queue_min = queue_max = el;
-    el->next = el->prev = NULL;
+    el->next = el->prev = 0;
     return;
   }
 
@@ -118,7 +118,7 @@ void csWriteQueue::Append (const csBox2& box, float depth, void* obj)
   {
     // Insert new element at the start.
     el->next = queue_min;
-    el->prev = NULL;
+    el->prev = 0;
     queue_min->prev = el;
     queue_min = el;
   }
@@ -137,12 +137,12 @@ void csWriteQueue::Append (const csBox2& box, float depth, void* obj)
 
 void* csWriteQueue::Fetch (const csBox2& box, float depth, float& out_depth)
 {
-  CS_ASSERT ((queue_min != NULL) == (queue_max != NULL));
+  CS_ASSERT ((queue_min != 0) == (queue_max != 0));
 
   csWriteQueueElement* el = queue_min;
   while (el)
   {
-    if (el->depth > depth) return NULL;	// No useful occluder found.
+    if (el->depth > depth) return 0;	// No useful occluder found.
     if (el->box.TestIntersect (box))
     {
       // The boxes intersect.
@@ -166,7 +166,7 @@ void* csWriteQueue::Fetch (const csBox2& box, float depth, float& out_depth)
     }
     el = el->next;
   }
-  return NULL;
+  return 0;
 }
 
 csPtr<iString> csWriteQueue::Debug_UnitTest ()
@@ -174,6 +174,6 @@ csPtr<iString> csWriteQueue::Debug_UnitTest ()
   scfString* rc = new scfString ();
 
   rc->DecRef ();
-  return NULL;
+  return 0;
 }
 

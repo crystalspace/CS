@@ -132,7 +132,7 @@ struct _FreeEdge
   LinkedEdge* list;
   LinkedEdge* next;
   
-  _FreeEdge(): list(NULL), next(NULL) {};
+  _FreeEdge(): list(0), next(0) {};
   ~_FreeEdge()
   {
     while (list)
@@ -161,7 +161,7 @@ csPolygonMeshEdge* csPolygonMeshTools::CalculateEdges (iPolygonMesh* mesh,
 
   // Loop over every polygon and add the edges.
   num_edges = 0;
-  LinkedEdge* edge_collector = NULL;	// Here we collect edges.
+  LinkedEdge* edge_collector = 0;	// Here we collect edges.
   int i, j;
   csMeshedPolygon* poly = mesh->GetPolygons ();
   for (i = 0 ; i < num_polygons ; i++, poly++)
@@ -187,7 +187,7 @@ csPolygonMeshEdge* csPolygonMeshTools::CalculateEdges (iPolygonMesh* mesh,
       // it from the edge table. If we later discover another polygon
       // with that edge then it will become a new edge.
       // If the edge is not in the table yet we will add it.
-      LinkedEdge* prev = NULL;
+      LinkedEdge* prev = 0;
       while (le)
       {
         CS_ASSERT (le->vt1 == vt1s);

@@ -61,7 +61,7 @@ public:
 
   /**
     * Returns a pointer to the sector, which contains the given Point, or
-    * returns a NULL pointer, if there is no such sector.
+    * returns a 0 pointer, if there is no such sector.
     */
   CISector* FindSectorForPoint(CdVector3& v);
 

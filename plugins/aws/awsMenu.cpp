@@ -18,16 +18,16 @@ const int awsMenuEntry::signalClicked = 1;
 const int awsMenuEntry::signalSelected = 2;
 
 awsMenuEntry::awsMenuEntry() :
-  caption(NULL),
-  popup(NULL),
+  caption(0),
+  popup(0),
   selected(false),
   mouse_down(false),
   mouse_over(false),
-  user_param(NULL),
-  image(NULL),
+  user_param(0),
+  image(0),
   image_width(0),
   image_height(0),
-  sub_menu_image(NULL),
+  sub_menu_image(0),
   sub_menu_image_width(0),
   sub_menu_image_height(0)
 {}
@@ -48,7 +48,7 @@ bool awsMenuEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   pm->GetString (settings, "Caption", caption);
   
-  iString* image_name = NULL;
+  iString* image_name = 0;
   pm->GetString (settings, "Image", image_name);
   if(image_name)
     image = pm->GetTexture(image_name->GetData(), image_name->GetData());
@@ -60,7 +60,7 @@ bool awsMenuEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->LookupIntKey("MenuItemImageHeigth", image_width);
   pm->GetInt(settings, "ImageHeight", image_width);
 
-  image_name = NULL;
+  image_name = 0;
   pm->LookupStringKey("MenuItemSubMenuImage", image_name);
   if(image_name)
   {
@@ -85,7 +85,7 @@ bool awsMenuEntry::GetProperty(const char* name, void **parm)
 	
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
     
     if (caption) st = caption->GetData ();
     
@@ -146,7 +146,7 @@ bool awsMenuEntry::SetProperty(const char *name, void *parm)
     else
     {
       if (caption) caption->DecRef ();
-      caption = NULL;
+      caption = 0;
     }
     
     return true;
@@ -349,7 +349,7 @@ iAwsComponent* awsMenuEntryFactory::Create()
 
 
 awsMenuBarEntry::awsMenuBarEntry() :
-popup(NULL)
+popup(0)
 {
 style = fsToolbar;
 is_switch = true;
@@ -377,7 +377,7 @@ bool awsMenuBarEntry::GetProperty(const char* name, void **parm)
 	
 	if (strcmp ("Caption", name) == 0)
 	{
-		char *st = NULL;
+		char *st = 0;
 		
 		if (caption) st = caption->GetData ();
 		
@@ -429,7 +429,7 @@ bool awsMenuBarEntry::SetProperty(const char *name, void *parm)
 
 bool awsMenuBarEntry::OnMouseEnter()
 {
-  iAwsComponent* cmp = NULL;
+  iAwsComponent* cmp = 0;
   Parent()->GetProperty("Selected", (void**) &cmp);
   if(cmp)
   {
@@ -463,10 +463,10 @@ iAwsComponent* awsMenuBarEntryFactory::Create()
 
 awsMenu::awsMenu() 
   : awsControlBar(),
-    select(NULL),
-    popup_showing(NULL),
-    child_menu(NULL),
-    parent_menu(NULL),
+    select(0),
+    popup_showing(0),
+    child_menu(0),
+    parent_menu(0),
     mouse_pos(0,0),
     sink(this),
     let_mouse_exit(true)
@@ -533,7 +533,7 @@ iAwsSource* awsMenu::AddChild(const char* caption, iTextureHandle* image, awsPop
   child->SetProperty("PopupMenu", popup);
 
   // create will link the component to us
-  child->Create(WindowManager(), this, NULL);
+  child->Create(WindowManager(), this, 0);
   child->DecRef();
   return (iAwsSource*) child;
 }
@@ -715,7 +715,7 @@ void awsMenu::OnSelect(void* p, iAwsSource* src)
   if(selected)  // make this entry selected
     m->Select(src->GetComponent());
   else  // make the selected entry unselected
-    m->Select(NULL);
+    m->Select(0);
 }
 
 void awsMenu::OnClose(void* p, iAwsSource* )
@@ -729,11 +729,11 @@ void awsMenu::Hide()
   if(child_menu)
   {
     child_menu->Hide();
-    child_menu = NULL;
-    popup_showing = NULL;
+    child_menu = 0;
+    popup_showing = 0;
   }
 
-  Select(NULL);
+  Select(0);
   awsControlBar::Hide();
 }
 
@@ -748,10 +748,10 @@ void awsMenu::SwitchPopups()
   if(child_menu)
   {
     child_menu->Hide();
-    child_menu = NULL;
+    child_menu = 0;
   }
 
-  popup_showing = NULL;
+  popup_showing = 0;
 
   // get the new popup if any
 
@@ -809,7 +809,7 @@ void awsMenuBar::StartPopupChange()
 
 void awsMenuBar::HideAllPopups()
 {
-  Select(NULL);
+  Select(0);
 }
 
 bool awsMenuBar::ShouldTrackMouse()
@@ -842,7 +842,7 @@ bool awsMenuBar::Create(iAws* wmgr, iAwsComponent *parent, iAwsComponentNode *se
   else
   {
     // Link into the current hierarchy, at the top.
-    if (wmgr->GetTopComponent () == NULL)
+    if (wmgr->GetTopComponent () == 0)
     {
       wmgr->SetTopComponent (this);
     }
@@ -882,7 +882,7 @@ iAwsComponent* awsMenuBarFactory::Create()
 
 
 awsPopupMenu::awsPopupMenu() :
-timer(NULL)
+timer(0)
 {
   SetStretchComponents(true);
   style = fsRaised;
@@ -899,7 +899,7 @@ awsPopupMenu::~awsPopupMenu()
 bool awsPopupMenu::Create(iAws* wmgr, iAwsComponent *parent, iAwsComponentNode *settings)
 {
   SetID(settings->Name());
-  SetParent(NULL);
+  SetParent(0);
   
   if(!Setup(wmgr, settings)) return false;
 
@@ -908,7 +908,7 @@ bool awsPopupMenu::Create(iAws* wmgr, iAwsComponent *parent, iAwsComponentNode *
   else
   {
     // Link into the current hierarchy, at the top.
-    if (wmgr->GetTopComponent () == NULL)
+    if (wmgr->GetTopComponent () == 0)
     {
       wmgr->SetTopComponent (this);
     }

@@ -307,7 +307,7 @@ public:
   void SetObjectToCamera (csReversibleTransform* wvmatrix);
   csReversibleTransform* GetWVMatrix ();
 
-  /// Set the current render target (NULL for screen).
+  /// Set the current render target (0 for screen).
   virtual void SetRenderTarget (iTextureHandle* handle,
 	  bool persistent = false)
   {
@@ -316,7 +316,7 @@ public:
     rt_cliprectset = false;
   }
 
-  /// Get the current render target (NULL for screen).
+  /// Get the current render target (0 for screen).
   virtual iTextureHandle* GetRenderTarget ()
   {
     return render_target;
@@ -476,7 +476,7 @@ public:
   public:
     EventHandler (csGLRender3D* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     

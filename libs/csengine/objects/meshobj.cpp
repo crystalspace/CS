@@ -80,12 +80,12 @@ csMeshWrapper::csMeshWrapper (
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
     shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
   }
-  factory = NULL;
+  factory = 0;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
   imposter_active = false;
-  imposter_mesh = NULL;
+  imposter_mesh = 0;
 #ifdef CS_USE_NEW_RENDERER
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
@@ -106,14 +106,14 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   last_anim_time = 0;
   visnr = 0;
   imposter_active = false;
-  imposter_mesh = NULL;
+  imposter_mesh = 0;
   wor_bbox_movablenr = -1;
   Parent = theParent;
   movable.SetMeshWrapper (this);
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
-  factory = NULL;
+  factory = 0;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
@@ -133,8 +133,8 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
   }
   else
   {
-    light_info = NULL;
-    shadow_receiver = NULL;
+    light_info = 0;
+    shadow_receiver = 0;
   }
 }
 
@@ -237,7 +237,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
   while (i >= 0)
   {
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (meshwrap, rview)) return NULL;
+    if (!cb->BeforeDrawing (meshwrap, rview)) return 0;
     i--;
   }*/
 
@@ -257,7 +257,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
     UpdateDeferedLighting (movable.GetFullPosition ());
     return meshobj->GetRenderMeshes (n);
 /*  }
-  return NULL;*/
+  return 0;*/
 
   /*
   for (i = 0; i < children.GetCount (); i++)
@@ -566,7 +566,7 @@ bool csMeshWrapper::HitBeam (
     endObj = trans.Other2This (end);
   }
   bool rc = false;
-  if (HitBeamBBox (startObj, endObj, isect, NULL) > -1)
+  if (HitBeamBBox (startObj, endObj, isect, 0) > -1)
   {
     rc = HitBeamOutline (startObj, endObj, isect, pr);
     if (rc)
@@ -737,7 +737,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csMeshFactoryWrapper::meshFact = meshFact;
-  parent = NULL;
+  parent = 0;
   children.SetMeshFactory (this);
   csEngine::current_engine->AddToCurrentRegion (this);
 }
@@ -745,7 +745,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
-  parent = NULL;
+  parent = 0;
   children.SetMeshFactory (this);
   csEngine::current_engine->AddToCurrentRegion (this);
 }
@@ -762,7 +762,7 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
 {
   csRef<iMeshObject> basemesh (meshFact->NewInstance ());
-  iMeshWrapper *mesh = &(new csMeshWrapper (NULL, basemesh))->scfiMeshWrapper;
+  iMeshWrapper *mesh = &(new csMeshWrapper (0, basemesh))->scfiMeshWrapper;
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
   mesh->SetFactory (&scfiMeshFactoryWrapper);
@@ -795,7 +795,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csMeshList::csMeshList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csMeshList::~csMeshList ()
@@ -817,7 +817,7 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
       return m->GetChildren ()->FindByName (p+1);
     }
   }
-  return NULL;
+  return 0;
 }
 
 int csMeshList::Add (iMeshWrapper *obj)
@@ -869,7 +869,7 @@ iMeshWrapper *csMeshList::FindByName (const char *Name) const
 //--------------------------------------------------------------------------
 void csMeshMeshList::PrepareItem (iMeshWrapper* child)
 {
-  CS_ASSERT (mesh != NULL);
+  CS_ASSERT (mesh != 0);
   csMeshList::PrepareItem (child);
 
   // unlink the mesh from the engine or another parent.
@@ -895,7 +895,7 @@ void csMeshMeshList::PrepareItem (iMeshWrapper* child)
 
 void csMeshMeshList::FreeItem (iMeshWrapper* item)
 {
-  CS_ASSERT (mesh != NULL);
+  CS_ASSERT (mesh != 0);
 
   for (int i = 0 ; i < mesh->GetMovable().GetSectors()->GetCount() ; i++)
   {
@@ -904,8 +904,8 @@ void csMeshMeshList::FreeItem (iMeshWrapper* item)
     sector->UnprepareMesh (item);
   }
 
-  item->SetParentContainer (NULL);
-  item->GetMovable ()->SetParent (NULL);
+  item->SetParentContainer (0);
+  item->GetMovable ()->SetParent (0);
   csMeshList::FreeItem (item);
 }
 
@@ -918,7 +918,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csMeshFactoryList::csMeshFactoryList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
@@ -968,7 +968,7 @@ iMeshFactoryWrapper *csMeshFactoryList::FindByName (
 //--------------------------------------------------------------------------
 void csMeshFactoryFactoryList::PrepareItem (iMeshFactoryWrapper* child)
 {
-  CS_ASSERT (meshfact != NULL);
+  CS_ASSERT (meshfact != 0);
   csMeshFactoryList::PrepareItem (child);
 
   // unlink the factory from another possible parent.
@@ -980,7 +980,7 @@ void csMeshFactoryFactoryList::PrepareItem (iMeshFactoryWrapper* child)
 
 void csMeshFactoryFactoryList::FreeItem (iMeshFactoryWrapper* item)
 {
-  CS_ASSERT (meshfact != NULL);
-  item->SetParentContainer (NULL);
+  CS_ASSERT (meshfact != 0);
+  item->SetParentContainer (0);
   csMeshFactoryList::FreeItem (item);
 }

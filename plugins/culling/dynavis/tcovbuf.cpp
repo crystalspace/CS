@@ -677,13 +677,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
 
-  tiles = NULL;
-  dirty_left = NULL;
-  dirty_right = NULL;
-  bugplug = NULL;
+  tiles = 0;
+  dirty_left = 0;
+  dirty_right = 0;
+  bugplug = 0;
 
   Setup (w, h);
 }
@@ -1309,7 +1309,7 @@ bool csTiledCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
   // y coordinate) and bottom vertex.
   //@@@ TODO: pre-shift x with 16
   //---------
-  static int* xa = NULL, * ya = NULL;
+  static int* xa = 0, * ya = 0;
   static int num_xa = 0;
   if (num_verts > num_xa)
   {
@@ -1723,7 +1723,7 @@ csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
   COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
 
   rc->DecRef ();
-  return NULL;
+  return 0;
 }
 
 csTicks csTiledCoverageBuffer::Debug_Benchmark (int /*num_iterations*/)

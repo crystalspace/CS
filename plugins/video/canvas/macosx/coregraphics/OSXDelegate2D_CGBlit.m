@@ -10,7 +10,7 @@
 
 
 // Initialized on first use, destroyed at program termination
-static CGColorSpaceRef colorSpace = NULL;        
+static CGColorSpaceRef colorSpace = 0;        
     
 
 
@@ -36,7 +36,7 @@ static CGColorSpaceRef colorSpace = NULL;
     if (window == nil)
         return NO;
 
-    if (colorSpace == NULL)
+    if (colorSpace == 0)
         colorSpace = CGColorSpaceCreateDeviceRGB();
 
     if ([contentView lockFocusIfCanDraw] == YES)
@@ -44,11 +44,11 @@ static CGColorSpaceRef colorSpace = NULL;
         // We only need new versions of these when the backing buffer changes
         // Using static variables will be a problem if the user creates more than
         // one canvas at a time
-        static CGDataProviderRef prov = NULL;
-        static CGImageRef image = NULL;
+        static CGDataProviderRef prov = 0;
+        static CGImageRef image = 0;
         static CGRect rect;
 
-        if ((prov == NULL) || 
+        if ((prov == 0) || 
             (width != rect.size.width) || (height != rect.size.height))
         {
             size_t bytesPerPixel = depth / 8;
@@ -56,16 +56,16 @@ static CGColorSpaceRef colorSpace = NULL;
             size_t bytesPerRow = bytesPerPixel * width;
             size_t bufferSize = height * bytesPerRow;
 
-            if (prov != NULL)
+            if (prov != 0)
             {
                 CGDataProviderRelease(prov);
                 CGImageRelease(image);            
             }
 
-            prov = CGDataProviderCreateWithData(NULL, buffer, bufferSize, NULL);
+            prov = CGDataProviderCreateWithData(0, buffer, bufferSize, 0);
             image = CGImageCreate(width, height, bitsPerComponent, depth, 
                                 bytesPerRow, colorSpace, kCGImageAlphaNoneSkipFirst, 
-                                prov, NULL, NO, kCGRenderingIntentDefault);
+                                prov, 0, NO, kCGRenderingIntentDefault);
             rect = CGRectMake(0, 0, width, height);
         }
         

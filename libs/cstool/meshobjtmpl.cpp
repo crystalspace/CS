@@ -31,9 +31,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshObject::eiObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshObject::csMeshObject (iEngine *eng)
-  : VisCallback (NULL), LogParent (NULL), Engine (eng)
+  : VisCallback (0), LogParent (0), Engine (eng)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
 }
 
@@ -123,7 +123,7 @@ bool csMeshObject::SetMaterialWrapper (iMaterialWrapper* material)
 
 iMaterialWrapper* csMeshObject::GetMaterialWrapper () const
 {
-  return NULL;
+  return 0;
 }
 
 void csMeshObject::GetObjectBoundingBox (csBox3& bbox, int type)
@@ -150,7 +150,7 @@ SCF_IMPLEMENT_IBASE_END
 csMeshFactory::csMeshFactory (iEngine *eng, iObjectRegistry* reg)
 	: Engine (eng), object_reg (reg)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csMeshFactory::~csMeshFactory ()
@@ -191,7 +191,7 @@ csMeshType::csMeshType (iBase *p)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  Engine = NULL;
+  Engine = 0;
 }
 
 csMeshType::~csMeshType ()

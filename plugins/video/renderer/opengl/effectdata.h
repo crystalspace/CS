@@ -71,7 +71,7 @@ public:
 
   csOpenGlEffectLayerData()
   {
-    SCF_CONSTRUCT_IBASE(NULL);
+    SCF_CONSTRUCT_IBASE(0);
 
     ccsource = ED_SOURCE_NONE;
 
@@ -142,7 +142,7 @@ public:
 
   csOpenGlEffectPassData()
   {
-    SCF_CONSTRUCT_IBASE(NULL);
+    SCF_CONSTRUCT_IBASE(0);
 
     doblending = false;
     sblend = GL_ONE;
@@ -158,7 +158,7 @@ public:
   virtual ~csOpenGlEffectPassData()
   {
     csOpenGlVPConstant* v;
-    while( (v = (csOpenGlVPConstant* )vertex_constants.Pop()) != NULL)
+    while( (v = (csOpenGlVPConstant* )vertex_constants.Pop()) != 0)
     {
       delete v;
     }

@@ -205,7 +205,7 @@ protected:
   iEmitGen3D *startspeed;
   /// the start accel generator
   iEmitGen3D *startaccel;
-  /// attractor position generator (can be NULL)
+  /// attractor position generator (can be 0)
   iEmitGen3D *attractor;
   /// the field speed
   iEmitGen3D *fieldspeed;
@@ -461,7 +461,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 
   //------------------------- iEmitFactoryState implementation ----------------
   class EmitFactoryState : public iEmitFactoryState

@@ -32,7 +32,7 @@ csIsoCellNode::~csIsoCellNode ()
 csIsoCell::csIsoCell (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  root = NULL;
+  root = 0;
 }
 
 /// helpder deleting function.
@@ -51,7 +51,7 @@ csIsoCell::~csIsoCell ()
 void csIsoCell::AddSprite(iIsoSprite *sprite, const csVector3& pos)
 {
   /// same in right subtree....
-  csIsoCellNode *p = root, *parent = NULL;
+  csIsoCellNode *p = root, *parent = 0;
   float inserty = pos.y;
   /// find a spot
   while(p)
@@ -64,8 +64,8 @@ void csIsoCell::AddSprite(iIsoSprite *sprite, const csVector3& pos)
   /// create new node;
   csIsoCellNode *newnode = new csIsoCellNode;
   newnode->drawpart = sprite;
-  newnode->left = NULL;
-  newnode->right = NULL;
+  newnode->left = 0;
+  newnode->right = 0;
   sprite->IncRef ();
 
   if(!parent)
@@ -85,7 +85,7 @@ void csIsoCell::AddSprite(iIsoSprite *sprite, const csVector3& pos)
 
 void csIsoCell::RemoveSprite(iIsoSprite *sprite, const csVector3& pos)
 {
-  csIsoCellNode *p = root, *parent = NULL;
+  csIsoCellNode *p = root, *parent = 0;
   float removey = pos.y;
   /// first find the node
   while(p && (p->drawpart != sprite))
@@ -96,14 +96,14 @@ void csIsoCell::RemoveSprite(iIsoSprite *sprite, const csVector3& pos)
     else p = p->right;
   }
   if(p==0) return; /// not found, nothing to do.
-  if(p->left==NULL)
+  if(p->left==0)
   {
     if(!parent) root = p->right;
     else if(removey < parent->drawpart->GetPosition().y)
       parent->left = p->right;
     else parent->right = p->right;
   }
-  else if(p->right == NULL)
+  else if(p->right == 0)
   {
     if(!parent) root = p->left;
     else if(removey < parent->drawpart->GetPosition().y)
@@ -116,7 +116,7 @@ void csIsoCell::RemoveSprite(iIsoSprite *sprite, const csVector3& pos)
     /// since possibly some drawpart with the same y can be in
     /// the right subtree, a member from that tree must replace this one.
     /// the leftmost member of the right subtree is thus used.
-    csIsoCellNode *leftmost = p->right, *leftmostparent = NULL;
+    csIsoCellNode *leftmost = p->right, *leftmostparent = 0;
     while(leftmost && leftmost->left)
     {
       leftmostparent = leftmost;

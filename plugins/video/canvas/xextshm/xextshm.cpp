@@ -47,10 +47,10 @@ csXExtSHM::csXExtSHM (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  dpy = NULL;
+  dpy = 0;
   screen_num = 0;
   Width = Height = 0;
-  shm_image = NULL;
+  shm_image = 0;
   shmi.shmaddr = (char*) -1;
   shmi.shmid = -1;
 }
@@ -98,7 +98,7 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
   if (!shm_image)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "XShmCreateImage failed!");
-    return NULL;
+    return 0;
   }
   shmi.shmid = shmget (IPC_PRIVATE, 
                        shm_image->bytes_per_line*shm_image->height,
@@ -107,14 +107,14 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
   {
     DestroyMemory ();
     Report (CS_REPORTER_SEVERITY_ERROR, "shmget failed!");
-    return NULL;
+    return 0;
   }
   shm_image->data = shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
   if (shmi.shmaddr == (char*) -1)
   {
     DestroyMemory ();
     Report (CS_REPORTER_SEVERITY_ERROR, "shmat failed!");
-    return NULL;
+    return 0;
   }
   shmi.readOnly = FALSE;
   XShmAttach (dpy, &shmi);
@@ -149,7 +149,7 @@ void csXExtSHM::DestroyMemory ()
   
   shmi.shmaddr = (char*) -1;
   shmi.shmid = -1;
-  shm_image = NULL;
+  shm_image = 0;
 }
 
 void csXExtSHM::Print (Window window, GC gc, csRect *area)

@@ -116,7 +116,7 @@ public:
 
   /**
     * Get the TextureFile for the given original Texture name. If the texture
-    * is not found, it will return NULL.
+    * is not found, it will return 0.
     */
   CTextureFile* GetTexture(const char* TextureName);
 

@@ -59,7 +59,7 @@ CS_IMPLEMENT_APPLICATION
 
 // The global pointer to simple
 Simple *simple;
-csVideoPreferences* vidprefs = NULL;
+csVideoPreferences* vidprefs = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
 {
@@ -103,7 +103,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 bool Simple::HandleEvent (iEvent& ev)
@@ -114,7 +114,7 @@ bool Simple::HandleEvent (iEvent& ev)
     {
       vidprefs->SelectMode ();
       delete vidprefs;
-      vidprefs = NULL;
+      vidprefs = 0;
       if (!Initialize2 ()) exit (0);
     }
     return true;
@@ -315,15 +315,15 @@ bool Simple::Initialize2 ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 

@@ -33,7 +33,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiKeyValuePair);
   SetName (Key);
   m_Value = csStrNew (Value);

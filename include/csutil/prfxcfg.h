@@ -33,7 +33,7 @@ class csPrefixConfig : public csConfigFile
 public:
   /// constructor
   csPrefixConfig(const char *fName, iVFS *vfs, const char *pref,
-    const char *AliasName = NULL);
+    const char *AliasName = 0);
   /// destructor
   ~csPrefixConfig();
 

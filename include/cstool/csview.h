@@ -42,9 +42,9 @@ private:
   /// the camera
   csRef<iCamera> Camera;
 
-  /// Rect clipping region (NULL if this is a polygon-based clipper)
+  /// Rect clipping region (0 if this is a polygon-based clipper)
   csBox2* RectView;
-  /// Poly clipping region (NULL if this is a rectangular clipper)
+  /// Poly clipping region (0 if this is a rectangular clipper)
   csPoly2D* PolyView;
   /// The prepared clipper
   iClipper2D* Clipper;

@@ -144,7 +144,7 @@ public:
   {
     return (f < frames.Length ())
     	? (csSpriteFrame *)frames [f]
-	: (csSpriteFrame*)NULL;
+	: (csSpriteFrame*)0;
 	}
   /// Returns the looping frame after frame number f.
   csSpriteFrame* GetCsNextFrame (int f)
@@ -169,7 +169,7 @@ public:
   {
     return (iSpriteFrame*)((f < frames.Length ())
     	? (csSpriteFrame *)frames [f]
-	: (csSpriteFrame*)NULL);
+	: (csSpriteFrame*)0);
   }
   /// Returns the looping frame after frame number f.
   virtual iSpriteFrame* GetNextFrame (int f)
@@ -540,7 +540,7 @@ public:
   {
     return (f < frames.Length ())
   	? (csSpriteFrame *)frames [f]
-	: (csSpriteFrame*)NULL;
+	: (csSpriteFrame*)0;
   }
 
   /// Create and add a new action frameset to the sprite.
@@ -570,7 +570,7 @@ public:
   {
     return (f < sockets.Length ())
   	? (csSpriteSocket *)sockets [f]
-	: (csSpriteSocket*)NULL;
+	: (csSpriteSocket*)0;
   }
 
 
@@ -664,14 +664,14 @@ public:
     virtual csMeshedPolygon* GetPolygons ();
 
     /// Cleanup.
-    virtual void Cleanup () { delete[] polygons; polygons = NULL; }
+    virtual void Cleanup () { delete[] polygons; polygons = 0; }
     
     virtual bool IsDeformable () const { return false;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () : polygons (NULL)
+    PolyMesh () : polygons (0)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
     }
     virtual ~PolyMesh () { Cleanup (); }
 
@@ -1385,7 +1385,7 @@ public:
   void SetBaseColor (const csColor& col)
   {
     delete[] vertex_colors;
-    vertex_colors = NULL;
+    vertex_colors = 0;
     base_color = col;
     ResetVertexColors ();
   }
@@ -1469,7 +1469,7 @@ public:
     single_step = false;
     SetReverseAction(false); // always go forward by default.
     csSpriteAction2 *act;
-    if ((act = factory->FindAction (name)) != NULL)
+    if ((act = factory->FindAction (name)) != 0)
     {
       cur_action = act;
       SetFrame (0);
@@ -1570,7 +1570,7 @@ public:
   {
     return (f < sockets.Length ())
   	? (csSpriteSocket *)sockets [f]
-	: (csSpriteSocket*)NULL;
+	: (csSpriteSocket*)0;
   }
 
   ///------------------------ iMeshObject implementation ----------------------
@@ -1637,12 +1637,12 @@ public:
     virtual csMeshedPolygon* GetPolygons ();
 
     /// Cleanup.
-    virtual void Cleanup () { delete[] polygons; polygons = NULL; }
+    virtual void Cleanup () { delete[] polygons; polygons = 0; }
     
     virtual bool IsDeformable () const { return false;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () : polygons (NULL) { }
+    PolyMesh () : polygons (0) { }
     virtual ~PolyMesh () { Cleanup (); }
 
     csMeshedPolygon* polygons;
@@ -1671,7 +1671,7 @@ public:
     return GetMaterial ();
   }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   //--------------------- iSprite3DState implementation -------------//
   struct Sprite3DState : public iSprite3DState

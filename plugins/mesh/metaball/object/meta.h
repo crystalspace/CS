@@ -265,7 +265,7 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return th; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState
@@ -318,7 +318,7 @@ public:
   virtual bool SupportsHardTransform() const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 };
 
 

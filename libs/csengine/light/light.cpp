@@ -56,7 +56,7 @@ csLight::csLight (
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
   DG_TYPE (this, "csLight");
-  light_id = NULL;
+  light_id = 0;
   center.x = x;
   center.y = y;
   center.z = z;
@@ -69,7 +69,7 @@ csLight::csLight (
 
   lightnr = 0;
 
-  halo = NULL;
+  halo = 0;
 
 #ifndef CS_USE_NEW_RENDERER
   dist = d;
@@ -616,7 +616,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csLightList::csLightList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 iLight *csLightList::FindByID (const char* id) const
@@ -628,7 +628,7 @@ iLight *csLightList::FindByID (const char* id) const
     if (memcmp (l->GetLightID (), id, 16) == 0) return l;
   }
 
-  return NULL;
+  return 0;
 }
 
 int csLightList::Add (iLight *obj)
@@ -677,7 +677,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csLightingProcessInfo::light = light;
   csLightingProcessInfo::dynamic = dynamic;
   csLightingProcessInfo::color = light->GetColor ();
@@ -701,7 +701,7 @@ csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
       return csPtr<iLightingProcessData> (ptr);
     }
   }
-  return NULL;
+  return 0;
 }
 
 void csLightingProcessInfo::FinalizeLighting ()

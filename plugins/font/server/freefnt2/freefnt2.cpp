@@ -56,7 +56,7 @@ csFreeType2Server::csFreeType2Server (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  library = NULL;
+  library = 0;
   freetype_inited = false;
 }
 
@@ -113,7 +113,7 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
   platform_id = ftconfig->GetInt ("Freetype2.Settings.PlatformID", 3);
   encoding_id = ftconfig->GetInt ("Freetype2.Settings.EncodingID", 1);
 
-  fontset = ftconfig->GetStr ("Freetype2.Settings.FontSet", NULL);
+  fontset = ftconfig->GetStr ("Freetype2.Settings.FontSet", 0);
   //  DEBUG_BREAK;
   csString s;
   s << fontset << '.';
@@ -134,7 +134,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
   {
     csString Keyname;
     Keyname << fontset << '.' << filename;
-    const char *s = ftconfig->GetStr (Keyname, NULL);
+    const char *s = ftconfig->GetStr (Keyname, 0);
     if (s) filename = s;
   }
 
@@ -152,7 +152,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
   if (!font->Load (VFS, this))
   {
     delete font;
-    return NULL;
+    return 0;
   }
   fonts.Put (font);
   return font;
@@ -165,7 +165,7 @@ iFont *csFreeType2Server::GetFont (int iIndex)
     csFreeType2Font *font = fonts.Get (iIndex);
     if (font) return font;
   }
-  return NULL;
+  return 0;
 }
 
 //-------------------------------------------// A FreeType font object //----//
@@ -176,11 +176,11 @@ SCF_IMPLEMENT_IBASE_END
 
 csFreeType2Font::csFreeType2Font (const char *filename) : DeleteCallbacks (4, 4)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   name = csStrNew (filename);
-  face = NULL;
-  current = NULL;
-  fontdata = NULL;
+  face = 0;
+  current = 0;
+  fontdata = 0;
 }
 
 csFreeType2Font::~csFreeType2Font ()
@@ -248,7 +248,7 @@ bool csFreeType2Font::GetGlyphSize (uint8 c, int &oW, int &oH)
 
 uint8 *csFreeType2Font::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
 {
-  if (!current || !current->glyphs[c].isOk) return NULL;
+  if (!current || !current->glyphs[c].isOk) return 0;
 
   const GlyphBitmap &glyph = current->glyphs[c];
   oW = MAX( glyph.advance, glyph.width);
@@ -261,7 +261,7 @@ uint8 *csFreeType2Font::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int
 
 uint8 *csFreeType2Font::GetGlyphBitmap (uint8 c, int &oW, int &oH)
 {
-  if (!current || !current->glyphs[c].isOk) return NULL;
+  if (!current || !current->glyphs[c].isOk) return 0;
 
   const GlyphBitmap &glyph = current->glyphs[c];
   oW = MAX( glyph.advance, glyph.width);
@@ -271,7 +271,7 @@ uint8 *csFreeType2Font::GetGlyphBitmap (uint8 c, int &oW, int &oH)
 
 uint8 *csFreeType2Font::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
 {
-  if (!current || !current->glyphs[c].isOk) return NULL;
+  if (!current || !current->glyphs[c].isOk) return 0;
 
   const GlyphBitmap &glyph = current->glyphs[c];
   oW = MAX( glyph.advance, glyph.width);
@@ -284,7 +284,7 @@ uint8 *csFreeType2Font::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv
 
 uint8 *csFreeType2Font::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH)
 {
-  if (!current || !current->glyphs[c].isOk) return NULL;
+  if (!current || !current->glyphs[c].isOk) return 0;
 
   const GlyphBitmap &glyph = current->glyphs[c];
   oW = MAX( glyph.advance, glyph.width);
@@ -358,7 +358,7 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
     if (size)
     {
       delete [] fontdata;
-      fontdata = NULL;
+      fontdata = 0;
       fontdata = new FT_Byte[size];
       if (file->Read ((char*)fontdata, size) != size)
       {
@@ -397,7 +397,7 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
   // next we scan the charmap table if there is an encoding
   // that matches the requested platform and encoding ids
   FT_UShort i = 0;
-  FT_CharMap charmap = NULL;
+  FT_CharMap charmap = 0;
   while (i < face->num_charmaps)
   {
     FT_CharMap cm = face->charmaps[i];

@@ -281,7 +281,7 @@ csPtr<iRenderBuffer> csVARRenderBufferManager::CreateBuffer(int buffersize,
     int compcount)
 {
   csVARRenderBuffer* buffer = new csVARRenderBuffer 
-    (NULL, buffersize, type, comptype, compcount, this);
+    (0, buffersize, type, comptype, compcount, this);
 
   printf("Created buffer at: %X\n", (long)buffer);
   //buffer->IncRef();
@@ -307,7 +307,7 @@ void csVARRenderBufferManager::AddBlockInLRU(csVARRenderBuffer* buf)
 
 void csVARRenderBufferManager::RemoveBlockInLRU(csVARRenderBuffer* buf)
 {
-  if (buf->listEl == NULL) return;
+  if (buf->listEl == 0) return;
 
   if (buf->type == CS_BUF_STATIC)
   {
@@ -323,7 +323,7 @@ void csVARRenderBufferManager::RemoveBlockInLRU(csVARRenderBuffer* buf)
 
 void csVARRenderBufferManager::TouchBlockInLRU(csVARRenderBuffer* buf)
 {
-  if (buf->listEl == NULL) return;
+  if (buf->listEl == 0) return;
 
   if (buf->type == CS_BUF_STATIC)
   {
@@ -368,7 +368,7 @@ void* csVARRenderBuffer::AllocData(int size)
 
   offset = (long) bm->myalloc->Alloc(size);
 
-  if(offset == -1) return NULL; //could not Alloc memory
+  if(offset == -1) return 0; //could not Alloc memory
 
   return bm->var_buffer + offset;
 }
@@ -377,7 +377,7 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, csRenderBufferType 
     csRenderBufferComponentType comptype, int compcount,
     csVARRenderBufferManager* bm)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   currentBlock = 0;
 
   csVARRenderBuffer::size = size;
@@ -396,7 +396,7 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, csRenderBufferType 
   int i;
   for(i = 0; i < MAXMEMORYBLOCKS; ++i)
   {
-    memblock[i].buffer = NULL;
+    memblock[i].buffer = 0;
     memblock[i].fence_id = -1;
   }
 }
@@ -428,7 +428,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
 {
   //if its already locked, we cannot return it
   if(locked) 
-    return NULL;
+    return 0;
 
   //first, if doing render-locking, just return our current memblock buffer
   if(lockType == CS_BUF_LOCK_RENDER)
@@ -440,7 +440,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
       //bm->TouchBlockInLRU(this);
       return memblock[currentBlock].buffer;
     }
-    return NULL;
+    return 0;
   }
 
   if(!memblock[currentBlock].buffer || discarded)
@@ -502,7 +502,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
       return Lock(lockType);
     }
   }
-  return NULL;
+  return 0;
 }
 
 void csVARRenderBuffer::Release()
@@ -529,12 +529,12 @@ bool csVARRenderBuffer::Discard()
   int i;
   for(i = 0; i < MAXMEMORYBLOCKS; ++i)
   {
-    if(memblock[i].buffer != NULL)
+    if(memblock[i].buffer != 0)
     {
       ext->glFinishFenceNV(memblock[i].fence_id);
       bm->myalloc->Free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
       ext->glDeleteFencesNV(1, &memblock[i].fence_id);
-      memblock[i].buffer = NULL;
+      memblock[i].buffer = 0;
     }
   }
   discarded = true;

@@ -83,7 +83,7 @@ public:
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   PolyMeshHelper (uint32 flag) :
-  	polygons (NULL), vertices (NULL), poly_flag (flag) { }
+  	polygons (0), vertices (0), poly_flag (flag) { }
   virtual ~PolyMeshHelper () { Cleanup (); }
 
   void Setup ();
@@ -291,7 +291,7 @@ public:
    * polygon index it intersects with (or -1) and the intersection point
    * in object coordinates.<p>
    *
-   * If 'pr' != NULL it will also return a value between 0 and 1
+   * If 'pr' != 0 it will also return a value between 0 and 1
    * indicating where on the 'start'-'end' vector the intersection
    * happened.<p>
    *
@@ -322,7 +322,7 @@ public:
 
   virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false);
+	float* pr = 0, bool only_portals = false);
 
   virtual void SetSmoothingFlag (bool smoothing) { smoothed = smoothing; }
   virtual bool GetSmoothingFlag () { return smoothed; }
@@ -640,7 +640,7 @@ public:
   csThing *GetTemplate () const
   { return ParentTemplate; }
 
-  /// Find the real material to use if it was replaced (or NULL if not).
+  /// Find the real material to use if it was replaced (or 0 if not).
   iMaterialWrapper* FindRealMaterial (iMaterialWrapper* old_mat);
 
   void ReplaceMaterial (iMaterialWrapper* oldmat, iMaterialWrapper* newmat);
@@ -827,7 +827,7 @@ public:
 
     virtual iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false);
+	float* pr = 0, bool only_portals = false);
 
     /// Prepare.
     virtual void Prepare ()
@@ -966,12 +966,12 @@ public:
     virtual csRenderMesh** GetRenderMeshes (int &n)
     {
       n = 0;
-      return NULL;
+      return 0;
     }
 #endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
-    { return NULL; }
+    { return 0; }
     virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/) { }
     virtual void HardTransform (const csReversibleTransform& t)
     {
@@ -997,7 +997,7 @@ public:
     virtual bool SetColor (const csColor&) { return false; }
     virtual bool GetColor (csColor&) const { return false; }
     virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
     virtual int GetPortalCount () const
     {
       return scfParent->static_data->GetPortalCount ();

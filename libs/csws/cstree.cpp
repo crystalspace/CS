@@ -48,13 +48,13 @@ csTreeItem::csTreeItem (csComponent *iParent, const char *iText, int iID,
   SetText (iText);
   id = iID;
   ItemStyle = iStyle;
-  ItemBitmap [0] = ItemBitmap [1] = NULL;
+  ItemBitmap [0] = ItemBitmap [1] = 0;
   DeleteBitmap = false;
   hChildrenOffset = 0;
   SetPalette (CSPAL_TREEITEM);
 
   // Create the expand/collapse button
-  button = NULL; // see ::Insert
+  button = 0; // see ::Insert
   button = new csButton (this, cscmdTreeItemToggle, CSBS_SELECTABLE, csbfsNone);
   button->SetState (CSS_TRANSPARENT, true);
   button->SetState (CSS_VISIBLE, false);
@@ -63,12 +63,12 @@ csTreeItem::csTreeItem (csComponent *iParent, const char *iText, int iID,
 csTreeItem::~csTreeItem ()
 {
   // First of all, delete child items (subbranch) before we notify the parent
-  button = NULL;
+  button = 0;
   DeleteAll ();
   // Now notify the parent to check if we're not the active item
   treebox->SendCommand (cscmdTreeItemDeleteNotify, this);
   // Forget user bitmaps, if any
-  SetBitmap (NULL, NULL, false);
+  SetBitmap (0, 0, false);
 }
 
 void csTreeItem::SetBitmap (csPixmap *iBitmap, csPixmap *iBitmapOpen, bool iDelete)
@@ -445,10 +445,10 @@ bool csTreeItem::HandleEvent (iEvent &Event)
           Event.Command.Info = NextItem ();
           return true;
         case cscmdTreeItemGetFirst:
-          Event.Command.Info = button && (button->next != button) ? button->next : NULL;
+          Event.Command.Info = button && (button->next != button) ? button->next : 0;
           return true;
         case cscmdTreeItemGetLast:
-          Event.Command.Info = button && (button->prev != button) ? button->prev : NULL;
+          Event.Command.Info = button && (button->prev != button) ? button->prev : 0;
           return true;
       } /* endswitch */
       break;
@@ -487,7 +487,7 @@ csTreeItem *csTreeItem::PrevItem ()
   csTreeItem *first = (csTreeItem *)parent->SendCommand (cscmdTreeItemGetFirst);
   if (!first || (first == this))
     return ((parent->SendCommand (cscmdTreeItemCheck) == CS_TREEITEM_MAGIC)) ?
-      (csTreeItem *)parent : NULL;
+      (csTreeItem *)parent : 0;
   csTreeItem *last = (csTreeItem *)prev;
   while (last->GetState (CSS_TREEITEM_OPEN))
     last = (csTreeItem *)last->SendCommand (cscmdTreeItemGetLast);
@@ -499,7 +499,7 @@ csTreeItem *csTreeItem::ForEachItem (bool (*func) (csTreeItem *child,
 {
   csTreeItem *item = (csTreeItem *)button->next;
   if ((csComponent *)item == button)
-    return NULL;
+    return 0;
   do
   {
     if (func (item, param))
@@ -511,7 +511,7 @@ csTreeItem *csTreeItem::ForEachItem (bool (*func) (csTreeItem *child,
     }
     item = (csTreeItem *)item->next;
   } while ((csComponent *)item != button);
-  return NULL;
+  return 0;
 }
 
 //--------------------------------------------------------// csTreeBox //-----//
@@ -525,9 +525,9 @@ csTreeBox::csTreeBox (csComponent *iParent, int iStyle,
   state |= CSS_SELECTABLE;
   SetPalette (CSPAL_TREEBOX);
   deltax = deltay = maxdeltax = maxdeltay = 0;
-  active = NULL;
-  hscroll = vscroll = NULL;
-  clipview = NULL; // See ::Insert
+  active = 0;
+  hscroll = vscroll = 0;
+  clipview = 0; // See ::Insert
   timer = new csTimer (this, MOUSE_SCROLL_INTERVAL);
   clipview = new csTreeView (this);
   SetStyle (TreeStyle = iStyle, FrameStyle = iFrameStyle);
@@ -592,15 +592,15 @@ void csTreeBox::SetStyle (int iStyle, csTreeFrameStyle iFrameStyle)
   delete hscroll;
   delete vscroll;
   csTreeView *oldclip = clipview;
-  clipview = NULL;
+  clipview = 0;
   if (iStyle & CSTS_HSCROLL)
     hscroll = new csScrollBar (this, sbsty);
   else
-    hscroll = NULL;
+    hscroll = 0;
   if (iStyle & CSTS_VSCROLL)
     vscroll = new csScrollBar (this, sbsty);
   else
-    vscroll = NULL;
+    vscroll = 0;
   clipview = oldclip;
 
   PlaceScrollbars ();
@@ -609,7 +609,7 @@ void csTreeBox::SetStyle (int iStyle, csTreeFrameStyle iFrameStyle)
   // Make expand/collapse buttons very small if 'small buttons' style
   // has been changed to force buttons to resize properly.
   if ((oldTreeStyle ^ TreeStyle) & CSTS_SMALLBUTTONS)
-    ForEachItem (do_hide_buttons, NULL, false);
+    ForEachItem (do_hide_buttons, 0, false);
 }
 
 void csTreeBox::Draw ()
@@ -809,7 +809,7 @@ bool csTreeBox::HandleEvent (iEvent &Event)
     case csevMouseUp:
       if ((Event.Mouse.Button == 1) && (app->MouseOwner == this))
       {
-        app->CaptureMouse (NULL);
+        app->CaptureMouse (0);
         return true;
       } /* endif */
       break;
@@ -921,9 +921,9 @@ bool csTreeBox::HandleEvent (iEvent &Event)
       {
         case cscmdTreeClear:
           if (app->MouseOwner == this)
-            app->CaptureMouse (NULL);
+            app->CaptureMouse (0);
           clipview->DeleteAll ();
-          active = NULL;
+          active = 0;
           return true;
         case cscmdTreeSetHorizOffset:
           if (deltax != (int)Event.Command.Info)
@@ -1027,7 +1027,7 @@ bool csTreeBox::HandleEvent (iEvent &Event)
           Event.Command.Info = clipview->top;
           return true;
         case cscmdTreeItemGetLast:
-          Event.Command.Info = clipview->top ? clipview->top->prev : NULL;
+          Event.Command.Info = clipview->top ? clipview->top->prev : 0;
           return true;
         case cscmdTreeItemDeleteNotify:
           if (active == Event.Command.Info)
@@ -1036,7 +1036,7 @@ bool csTreeBox::HandleEvent (iEvent &Event)
             if (item && item->button)
               FocusItem (item);
             else
-              active = NULL;
+              active = 0;
           }
           SetState (CSS_TREEBOX_PLACEITEMS, true);
           return true;
@@ -1060,7 +1060,7 @@ void csTreeBox::VScroll (int iDelta, bool iMoveCaret)
   int cx = 0, cy = 0;
   OtherToThis (active, cx, cy);
   cy += iDelta;
-  csTreeItem *best = NULL;
+  csTreeItem *best = 0;
   if (iMoveCaret)
   {
     // Find the nearest item with y == newcarety
@@ -1092,7 +1092,7 @@ csTreeItem *csTreeBox::ForEachItem (bool (*func) (csTreeItem *child,
 {
   csTreeItem *item = (csTreeItem *)clipview->top;
   if (!item)
-    return NULL;
+    return 0;
   do
   {
     if (func (item, param))
@@ -1104,7 +1104,7 @@ csTreeItem *csTreeBox::ForEachItem (bool (*func) (csTreeItem *child,
     }
     item = (csTreeItem *)item->next;
   } while ((csComponent *)item != clipview->top);
-  return NULL;
+  return 0;
 }
 
 void csTreeBox::SetState (int mask, bool enable)
@@ -1133,7 +1133,7 @@ void csTreeBox::Insert (csComponent *comp)
     // Alas, we can't do "SendCommand (cscmdTreeItemCheck)" because the
     // tree item may not be finished yet (it may call Insert() from csComponent
     // constructor) and thus csComponent's HandleEvent will be called.
-    // Thus we have to rely on the fact that if the clipview is non-NULL,
+    // Thus we have to rely on the fact that if the clipview is non-0,
     // any further components that are inserted here are tree items.
     ((csTreeItem *)comp)->treebox = this;
     if (!active)

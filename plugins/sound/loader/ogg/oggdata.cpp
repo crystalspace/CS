@@ -91,7 +91,7 @@ csOggSoundData::csOggSoundData (iBase *parent, uint8 *data, size_t len)
 
   ds = new datastore (data, len, true);
   ogg_ok = false;
-  buf = NULL;
+  buf = 0;
   this->len = 0;
   current_section = 0;
   fmt.Bits = 16;
@@ -110,7 +110,7 @@ bool csOggSoundData::Initialize(const csSoundFormat *fmt)
 {
   if (!ogg_ok)
   {
-    ogg_ok = ov_open_callbacks(ds, &vf, NULL, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+    ogg_ok = ov_open_callbacks(ds, &vf, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
     vorbis_info *vi=ov_info(&vf,-1);
     this->fmt.Channels = vi->channels;
     this->fmt.Freq = vi->rate;
@@ -128,7 +128,7 @@ bool csOggSoundData::IsOgg (void *Buffer, size_t len)
   datastore *dd = new datastore ((uint8*)Buffer, len, false);
   OggVorbis_File f;
   memset (&f, 0, sizeof(OggVorbis_File));
-  bool ok = ov_open_callbacks(dd, &f, NULL, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+  bool ok = ov_open_callbacks(dd, &f, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
   ov_clear (&f);
   delete dd;
   return ok;
@@ -151,7 +151,7 @@ long csOggSoundData::GetStaticSampleCount()
 
 void *csOggSoundData::GetStaticData()
 {
-  return NULL;
+  return 0;
 }
 
 void csOggSoundData::ResetStreamed()
@@ -198,7 +198,7 @@ void *csOggSoundData::ReadStreamed(long &NumSamples)
   }
 
   NumSamples = 0;
-  return NULL;
+  return 0;
 }
 
 
@@ -223,7 +223,7 @@ public:
 
   virtual csPtr<iSoundData> LoadSound (void *Buffer, uint32 Size)
   {
-    csOggSoundData *sd=NULL;
+    csOggSoundData *sd=0;
     if (csOggSoundData::IsOgg (Buffer, Size))
       sd = new csOggSoundData ((iBase*)this, (uint8*)Buffer, (size_t) Size);
 

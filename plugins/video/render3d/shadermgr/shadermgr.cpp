@@ -95,7 +95,7 @@ csShaderManager::csShaderManager(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE( parent );
   SCF_CONSTRUCT_EMBEDDED_IBASE( scfiComponent );
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 
   // alloc variables-hash
   variables = new csHashMap();
@@ -193,7 +193,7 @@ iShaderVariable* csShaderManager::privateGetVariable(int namehash)
     return (iShaderVariable*)cIter.Next();
   }
 
-  return NULL;
+  return 0;
 }
 
 csBasicVector csShaderManager::GetAllVariableNames()
@@ -257,28 +257,28 @@ iShader* csShaderManager::GetShader(const char* name)
     if( strcasecmp(((iShader*)shaders->Get(i))->GetName() ,name) == 0)
       return (iShader*)shaders->Get(i);
   }
-  return NULL;
+  return 0;
 }
 
 csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
 {
   int i;
 
-  if(!type) return NULL;
+  if(!type) return 0;
 
   for(i = 0; i < pluginlist.Length(); ++i)
   {
     if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
       return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateProgram(type);
   }
-  return NULL;
+  return 0;
 }
 
 
 //===================== csShader ====================//
 csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
 {
-  SCF_CONSTRUCT_IBASE( NULL );
+  SCF_CONSTRUCT_IBASE( 0 );
   this->name = 0;
   variables = new csHashMap();
   techniques = new csBasicVector();
@@ -288,7 +288,7 @@ csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
 
 csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* reg)
 {
-  SCF_CONSTRUCT_IBASE( NULL );
+  SCF_CONSTRUCT_IBASE( 0 );
   csShader::name = 0;
   variables = new csHashMap();
   techniques = new csBasicVector();
@@ -357,7 +357,7 @@ iShaderVariable* csShader::privateGetVariable(int namehash)
     return parent->privateGetVariable (namehash);
   }
 
-  return NULL;
+  return 0;
 }
 
 csBasicVector csShader::GetAllVariableNames()
@@ -385,7 +385,7 @@ csPtr<iShaderTechnique> csShader::CreateTechnique()
 
 iShaderTechnique* csShader::GetTechnique(int technique)
 {
-  if( technique >= techniques->Length()) return NULL;
+  if( technique >= techniques->Length()) return 0;
 
   return (iShaderTechnique*)techniques->Get(technique);
 }
@@ -394,7 +394,7 @@ iShaderTechnique* csShader::GetBestTechnique()
 {
   int i;
   int maxpriority = 0;
-  iShaderTechnique* tech = NULL;
+  iShaderTechnique* tech = 0;
 
   for (i = 0; i < techniques->Length(); ++i)
   {
@@ -488,7 +488,7 @@ bool csShader::Load(iDataBuffer* program)
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (program);
-  if (error != NULL)
+  if (error != 0)
   { 
     csReport( objectreg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glarb",
       "XML error '%s'!", error);
@@ -602,7 +602,7 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
   }
 
   iMaterialHandle* mathandle =
-    (mesh->material) ? (mesh->material->GetMaterialHandle()) : NULL;
+    (mesh->material) ? (mesh->material->GetMaterialHandle()) : 0;
   for (i=0; i<TEXMAX; i++)
   {
     if (texmappinglayer[i] != -1)
@@ -698,7 +698,7 @@ iShaderVariable* csShaderPass::privateGetVariable(int namehash)
     return parent->GetParent()->privateGetVariable (namehash);
   }
 
-  return NULL;
+  return 0;
 }
 
 void csShaderPass::BuildTokenHash()
@@ -953,7 +953,7 @@ bool csShaderPass::Prepare()
 //================= csShaderTechnique ============//
 csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 {
-  SCF_CONSTRUCT_IBASE( NULL );
+  SCF_CONSTRUCT_IBASE( 0 );
   passes = new csBasicVector();
   parent = owner;
   objectreg = reg;
@@ -979,7 +979,7 @@ csPtr<iShaderPass> csShaderTechnique::CreatePass()
 
 iShaderPass* csShaderTechnique::GetPass(int pass)
 {
-  if( pass >= passes->Length()) return NULL;
+  if( pass >= passes->Length()) return 0;
 
   return (iShaderPass*)passes->Get(pass);
 }

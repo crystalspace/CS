@@ -50,10 +50,10 @@ struct csFontDef
 
 static csFontDef const FontList [] =
 {
-  { CSFONT_LARGE,	8, 8, 0, 256, 1, 0, font_Police,  width_Police,  NULL	},
-  { CSFONT_ITALIC,	8, 8, 0, 256, 1, 0, font_Italic,  width_Italic,  NULL	},
-  { CSFONT_COURIER,	7, 8, 0, 256, 1, 0, font_Courier, width_Courier, NULL	},
-  { CSFONT_SMALL,	4, 6, 0, 256, 1, 0, font_Tiny,    width_Tiny,    NULL	}
+  { CSFONT_LARGE,	8, 8, 0, 256, 1, 0, font_Police,  width_Police,  0	},
+  { CSFONT_ITALIC,	8, 8, 0, 256, 1, 0, font_Italic,  width_Italic,  0	},
+  { CSFONT_COURIER,	7, 8, 0, 256, 1, 0, font_Courier, width_Courier, 0	},
+  { CSFONT_SMALL,	4, 6, 0, 256, 1, 0, font_Tiny,    width_Tiny,    0	}
 };
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
@@ -122,7 +122,7 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
     }
   }
 
-  return NULL;
+  return 0;
 }
 
 iFont *csDefaultFontServer::GetFont (int iIndex)
@@ -132,7 +132,7 @@ iFont *csDefaultFontServer::GetFont (int iIndex)
     iFont *font = fonts.Get (iIndex);
     if (font) return font;
   }
-  return NULL;
+  return 0;
 }
 
 void csDefaultFontServer::NotifyCreate (csDefaultFont *font)
@@ -160,14 +160,14 @@ csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.font.csfont",
       	"Could not read font file %s.", file);
-    return NULL;
+    return 0;
   }
 
   char *data = **fntfile;
   if (data [0] != 'C' || data [1] != 'S' ||  data [2] != 'F')
   {
 error:
-    return NULL;
+    return 0;
   }
 
   /// the new fontdef to store info into
@@ -311,8 +311,8 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
     cur += ((IndividualWidth [i] + 7) / 8) * Height;
   }
 
-  GlyphAlphaBitmap = NULL;
-  if (alpha != NULL)
+  GlyphAlphaBitmap = 0;
+  if (alpha != 0)
   {
     uint8 * cur = alpha;
     GlyphAlphaBitmap = new uint8 * [Glyphs];
@@ -417,8 +417,8 @@ uint8 *csDefaultFont::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH)
   if ((chr < 0) || (chr > Glyphs))
     chr = 0;
 
-  if (GlyphAlphaBitmap == NULL)
-    return NULL;
+  if (GlyphAlphaBitmap == 0)
+    return 0;
 
   oW = IndividualWidth ? IndividualWidth[chr] : Width;
   oH = Height;
@@ -431,8 +431,8 @@ uint8 *csDefaultFont::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, 
   if ((chr < 0) || (chr > Glyphs))
     chr = 0;
 
-  if (GlyphAlphaBitmap == NULL)
-    return NULL;
+  if (GlyphAlphaBitmap == 0)
+    return 0;
 
   oW = IndividualWidth ? IndividualWidth[chr] : Width;
   oH = Height;

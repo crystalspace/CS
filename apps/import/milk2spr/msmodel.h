@@ -66,11 +66,11 @@ struct Frame
   Frame(struct Vertex* inVertex)
   {
     vertex = inVertex;
-    frame = NULL;
+    frame = 0;
   }
   ~Frame()
   {
-    if(frame!=NULL)
+    if(frame!=0)
     {
       delete frame;
     }
@@ -92,11 +92,11 @@ struct TriangleList
   TriangleList(struct Triangle* inTriangle)
   {
     triangle = inTriangle;
-    triangleList = NULL;
+    triangleList = 0;
   }
   ~TriangleList()
   {
-    if(triangleList!=NULL)
+    if(triangleList!=0)
     {
       delete triangleList;
     }

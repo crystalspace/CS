@@ -159,7 +159,7 @@ public:
   /// update the system.
   virtual void Update (csTicks passedTime) = 0;
 
-  /// Returns NULL since there is no factory for a particle system
+  /// Returns 0 since there is no factory for a particle system
   virtual iMeshObjectFactory* GetFactory () const;
 
   /// quick visibility test

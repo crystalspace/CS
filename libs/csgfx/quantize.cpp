@@ -299,7 +299,7 @@ struct csColorBox
   }
 };
 
-static csColorQuantizer* compare_boxes_quant = NULL;
+static csColorQuantizer* compare_boxes_quant = 0;
 int csColorQuantizer::compare_boxes (const void *i1, const void *i2)
 {
   int count1 = compare_boxes_quant->box [*(uint8 *)i1].PixelCount;
@@ -309,11 +309,11 @@ int csColorQuantizer::compare_boxes (const void *i1, const void *i2)
 
 csColorQuantizer::csColorQuantizer ()
 {
-  hist = NULL;
+  hist = 0;
   hist_pixels = 0;
-  box = NULL;
+  box = 0;
   boxcount = 0;
-  color_index = NULL;
+  color_index = 0;
   qState = qsNone;
   Begin ();
 }
@@ -339,9 +339,9 @@ void csColorQuantizer::Begin ()
 /// Clean up quantization. Is automatically done at destruction time.
 void csColorQuantizer::End ()
 {
-  delete [] color_index; color_index = NULL;
-  delete [] box; box = NULL;
-  delete [] hist; hist = NULL;
+  delete [] color_index; color_index = 0;
+  delete [] box; box = 0;
+  delete [] hist; hist = 0;
 }
 
 void csColorQuantizer::Count (csRGBpixel *image, int pixels,
@@ -560,7 +560,7 @@ void csColorQuantizer::Palette (csRGBpixel *&outpalette,
   // Sort palette indices by usage (a side bonus to quantization)
   compare_boxes_quant = this;
   qsort (color_index, boxcount, sizeof (uint8), compare_boxes);
-  compare_boxes_quant = NULL;
+  compare_boxes_quant = 0;
 
   // Allocate the palette, if not already allocated
   if (!outpalette)

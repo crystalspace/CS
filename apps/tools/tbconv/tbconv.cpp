@@ -43,7 +43,7 @@ TerrBigTool::TerrBigTool (iObjectRegistry* object_reg)
   }
   
   cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  if (cmdline == NULL)
+  if (cmdline == 0)
   {
     ReportError ("Cannot query command line parser\n");
     abort ();
@@ -52,13 +52,13 @@ TerrBigTool::TerrBigTool (iObjectRegistry* object_reg)
   cmdline->AddOption ("scale_y", "10.0");
   cmdline->AddOption ("scale_z", "1.0");
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (vfs == NULL)
+  if (vfs == 0)
   {
     ReportError ("Unable to get vfs plugin\n");
     abort ();	
   }
   imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  if (imageio == NULL)
+  if (imageio == 0)
   {
     ReportError ("Unable to get imageio plugin\n");
     abort ();	
@@ -72,17 +72,17 @@ TerrBigTool::~TerrBigTool ()
 bool TerrBigTool::Init ()
 {
   const char *scalestr;
-  if ((scalestr = cmdline->GetOption ("scale_x")) == NULL) {
+  if ((scalestr = cmdline->GetOption ("scale_x")) == 0) {
     scale.x = 1.0;
   } else {
     sscanf (scalestr, "%f", &scale.x);
   }
-  if ((scalestr = cmdline->GetOption ("scale_y")) == NULL) {
+  if ((scalestr = cmdline->GetOption ("scale_y")) == 0) {
     scale.y = 10.0;
   } else {
     sscanf (scalestr, "%f", &scale.y);
   }
-  if ((scalestr = cmdline->GetOption ("scale_z")) == NULL) {
+  if ((scalestr = cmdline->GetOption ("scale_z")) == 0) {
     scale.z = 1.0;
   } else {
     sscanf (scalestr, "%f", &scale.z);
@@ -141,7 +141,7 @@ void TerrBigTool::ReportError (const char *description, ...)
 int main (int argc, char **argv)
 {
   iObjectRegistry* object_reg;
-  if ((object_reg = csInitializer::CreateEnvironment (argc, argv)) == NULL)
+  if ((object_reg = csInitializer::CreateEnvironment (argc, argv)) == 0)
   {
     printf ("Cannot create environment!\n");
     return -1;

@@ -34,16 +34,16 @@ csIsoSprite::csIsoSprite (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   position.Set(0,0,0);
-  material = NULL;
+  material = 0;
   g3dpolyfx.num = 0;
   g3dpolyfx.use_fog = false;
-  g3dpolyfx.mat_handle = NULL;
+  g3dpolyfx.mat_handle = 0;
   g3dpolyfx.mixmode = CS_FX_COPY;
   g3dpolyfx.flat_color_r = 1;
   g3dpolyfx.flat_color_g = 1;
   g3dpolyfx.flat_color_b = 1;
-  grid = NULL;
-  gridcall = NULL;
+  grid = 0;
+  gridcall = 0;
 }
 
 csIsoSprite::~csIsoSprite ()

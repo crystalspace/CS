@@ -44,7 +44,7 @@ csGLTexture::csGLTexture(csGLTextureHandle *p, iImage *Image)
   h = Image->GetHeight ();
   image_data = 0;
   Parent = p;
-  image_data = NULL;
+  image_data = 0;
   size = 0;
   compressed = GL_FALSE;
 }
@@ -66,7 +66,7 @@ SCF_IMPLEMENT_IBASE_END
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int bpp,
                                       GLenum sourceFormat, csGLRender3D *iR3D)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
   this->target = target;
   (R3D = iR3D)->IncRef();
   (txtmgr = R3D->txtmgr)->IncRef();
@@ -91,13 +91,13 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int 
     image->GetKeycolor (r,g,b);
     SetKeyColor (r, g, b);
   }
-  cachedata = NULL;
+  cachedata = 0;
 }
 
 csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLRender3D *iR3D)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
   this->target = target;
   (R3D = iR3D)->IncRef();
   (txtmgr = R3D->txtmgr)->IncRef();
@@ -122,7 +122,7 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int 
     (*images)[0]->GetKeycolor (r,g,b);
     SetKeyColor (r, g, b);
   }
-  cachedata = NULL;
+  cachedata = 0;
 }
 
 void csGLTextureManager::DetermineStorageSizes ()
@@ -146,7 +146,7 @@ void csGLTextureHandle::Clear()
 
 void csGLTextureHandle::FreeImage ()
 {
-  images = NULL;
+  images = 0;
 }
 
 int csGLTextureHandle::GetFlags ()
@@ -517,7 +517,7 @@ csGLTexture *csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
 void csGLTextureHandle::CreateMipMaps()
 {
   int thissize;
-  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
+  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
 
   //  printf ("delete old\n");
   // Delete existing mipmaps, if any
@@ -617,7 +617,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
   uint8 *h;
   uint8 *&image_data = tex->get_image_data ();
   //csRGBpixel *data = (csRGBpixel *)Image->GetImageData ();
-  csRGBpixel *data = NULL;
+  csRGBpixel *data = 0;
   int n = Image->GetWidth ()*Image->GetHeight ();
   int d = ImageVector->Length();
   int i=0, j=0;
@@ -768,7 +768,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csGLMaterialHandle::csGLMaterialHandle (iMaterial* m, csGLTextureManager *parent)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   num_texture_layers = 0;
   material = m;
@@ -795,7 +795,7 @@ csGLMaterialHandle::csGLMaterialHandle (iMaterial* m, csGLTextureManager *parent
 
 csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t, csGLTextureManager *parent)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   num_texture_layers = 0;
   diffuse = 0.7; ambient = 0; reflection = 0;
   texture = t;
@@ -885,7 +885,7 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLRender3D *iR3D) : textures (16, 16), materials (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
   verbose = false;
 
@@ -989,8 +989,8 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image, int fl
   if (!image)
   {
     R3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with NULL image!");
-    return NULL;
+      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with 0 image!");
+    return 0;
   }
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, iTextureHandle::CS_TEX_IMG_2D,pfmt.PixelBytes*8, GL_RGBA, R3D);
@@ -1003,8 +1003,8 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image, 
   if (!image)
   {
     R3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with NULL image array!");
-    return NULL;
+      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with 0 image array!");
+    return 0;
   }
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, target,pfmt.PixelBytes*8, GL_RGBA, R3D);

@@ -225,7 +225,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return 0;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -241,7 +241,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return 0;
 	  firestate->SetOrigin (box);
 	}
 	break;
@@ -249,7 +249,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 origin;
 	  if (!synldr->ParseVector (child, origin))
-	    return NULL;
+	    return 0;
 	  firestate->SetOrigin (origin);
 	}
 	break;
@@ -257,7 +257,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 dir;
 	  if (!synldr->ParseVector (child, dir))
-	    return NULL;
+	    return 0;
 	  firestate->SetDirection (dir);
 	}
 	break;
@@ -278,7 +278,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.fireloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -294,7 +294,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fireloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return NULL;
+	    return 0;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -303,7 +303,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return 0;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -311,7 +311,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return 0;
           firestate->SetLighting (do_lighting);
         }
         break;
@@ -320,7 +320,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
         break;
       default:
       	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

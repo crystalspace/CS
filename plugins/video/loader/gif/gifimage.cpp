@@ -65,7 +65,7 @@ csPtr<iImage> csGIFImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return 0;
   }
   return csPtr<iImage> (i);
 }
@@ -77,21 +77,21 @@ void csGIFImageIO::SetDithering (bool)
 csPtr<iDataBuffer> csGIFImageIO::Save (iImage* image, iImageIO::FileFormatDescription* format,
   const char* extraoptions)
 {
-  image = NULL;
-  format = NULL;
-  extraoptions = NULL;
+  image = 0;
+  format = 0;
+  extraoptions = 0;
 
-  return NULL;
+  return 0;
 }
 
 csPtr<iDataBuffer> csGIFImageIO::Save (iImage* image, const char* mime,
   const char* extraoptions)
 {
-  image = NULL;
-  mime = NULL;
-  extraoptions = NULL;
+  image = 0;
+  mime = 0;
+  extraoptions = 0;
 
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -122,7 +122,7 @@ private:
 
 public:
   GIFStream(uint8* b, long fsize, int offs=0) :
-   buf(b), ptr(b+offs), bmark(NULL), size(fsize), remaining(fsize-offs),
+   buf(b), ptr(b+offs), bmark(0), size(fsize), remaining(fsize-offs),
    bitoffs(0), EOFcode( fsize <= offs ) {}
 
   uint8 operator* () const

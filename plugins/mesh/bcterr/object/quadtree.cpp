@@ -415,7 +415,7 @@ csColQuad::csColQuad (csVector3 *cntrl_pt, int x_blocks, int z_blocks,
   int x, z, size, i;
   float half_x, half_z;
   num_blocks = 0;
-  blocks = NULL;
+  blocks = 0;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"csBCColQuad", "Big Create");
   x = (x_blocks * 3) + 1;
   z = (z_blocks * 3) + 1;
@@ -429,7 +429,7 @@ csColQuad::csColQuad (csVector3 *cntrl_pt, int x_blocks, int z_blocks,
   half_x = (bbox.MaxX () - bbox.MinX ()) / 2.0f;
   for (i = 0; i < 4; i++)
   {
-    children[i] = NULL;
+    children[i] = 0;
   }
   if ( (half_z < shortest) && (half_x < shortest) )
     return;	
@@ -442,14 +442,14 @@ csColQuad::csColQuad (float shortest, csBox3 nbbox, iObjectRegistry* object_reg)
   float half_x, half_z;
   int i;
   num_blocks = 0;
-  blocks = NULL;
+  blocks = 0;
   bbox = nbbox;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"csBCColQuad", "Small Create");
   half_z = (bbox.MaxZ () - bbox.MinZ ()) / 2.0f;
   half_x = (bbox.MaxX () - bbox.MinX ()) / 2.0f;
   for (i = 0; i < 4; i++)
   {
-    children[i] = NULL;
+    children[i] = 0;
   }
   if ( (half_z < shortest) && (half_x < shortest) )
     return;
@@ -520,7 +520,7 @@ void csColQuad::AddBlockToList (csBCTerrBlock *block)
     for (i = 0; i < num_blocks; i++)
     {
       new_blocks[i] = blocks[i];
-      blocks[i] = NULL;
+      blocks[i] = 0;
     }
     delete [] blocks;
     new_blocks[num_blocks] = block;
@@ -582,7 +582,7 @@ csColQuad::~csColQuad ()
   {
     for (i = 0; i < num_blocks; i++)
     {
-      blocks[i] = NULL;
+      blocks[i] = 0;
     }
     delete [] blocks;
   }
@@ -590,8 +590,8 @@ csColQuad::~csColQuad ()
 
 csBCCollisionQuad::csBCCollisionQuad ()
 {
-  root_quad = NULL;
-  object_reg = NULL;
+  root_quad = 0;
+  object_reg = 0;
 }
 
 csBCCollisionQuad::~csBCCollisionQuad ()
@@ -603,7 +603,7 @@ csBCCollisionQuad::csBCCollisionQuad (csVector3 *cntrl_pt,
 									  int x_blocks, int z_blocks,
 									  float shortest, iObjectRegistry* nobject_reg)
 {
-  root_quad = NULL;
+  root_quad = 0;
   object_reg = nobject_reg;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"csBCCollisionQuad","Building Quads");
   root_quad = new csColQuad (cntrl_pt, x_blocks, z_blocks, shortest, object_reg);

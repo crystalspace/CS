@@ -32,7 +32,7 @@ int SortedEigen (csMatrix3& M, csMatrix3& evecs);
 
 csCdModel::csCdModel (int NumberOfTriangles)
 {
-  m_pBoxes          = NULL;
+  m_pBoxes          = 0;
   m_NumBoxesAlloced = 0;
 
   m_pTriangles = new csCdTriangle [NumberOfTriangles];
@@ -96,7 +96,7 @@ bool csCdModel::BuildHierarchy ()
   if (!Moment::stack)
   {
     delete [] m_pBoxes;
-    m_pBoxes = NULL;
+    m_pBoxes = 0;
     return false;
   }
 
@@ -154,9 +154,9 @@ bool csCdModel::BuildHierarchy ()
   if (t == 0)
   {
     delete [] Moment::stack;
-    Moment::stack = NULL;
+    Moment::stack = 0;
     delete [] m_pBoxes;
-    m_pBoxes = NULL;
+    m_pBoxes = 0;
     delete [] t;
     return false;
   }
@@ -168,14 +168,14 @@ bool csCdModel::BuildHierarchy ()
   if (!m_pBoxes[0].BuildBBoxTree(t, m_NumTriangles, m_pTriangles, pool))
   {
     delete [] m_pBoxes;
-    m_pBoxes = NULL;
+    m_pBoxes = 0;
     delete [] t;
     return false;
   }
 
   // free the moment list
   delete [] Moment::stack;
-  Moment::stack = NULL;
+  Moment::stack = 0;
 
   // free the index list
   delete [] t;
@@ -375,8 +375,8 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   // this->m_Rotation, this->m_Radius, and
   // this->m_Translation are set herein.
 
-  m_pChild0 = NULL;
-  m_pChild1 = NULL;
+  m_pChild0 = 0;
+  m_pChild1 = 0;
 
   // Find the major axis: parallel to the longest edge.
   // First compute the squared-lengths of each edge

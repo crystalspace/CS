@@ -35,7 +35,7 @@ public:
 
   csObjectIterator (csObject *obj) : Object (obj)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     Object->IncRef ();
     Reset ();
   }
@@ -58,7 +58,7 @@ public:
   }
   virtual void Reset()
   {
-    if (Object->Children == NULL || Object->Children->Length () < 1)
+    if (Object->Children == 0 || Object->Children->Length () < 1)
       Position = -1;
     else
       Position = 0;
@@ -103,20 +103,20 @@ void csObject::InitializeObject ()
 {
   static CS_ID id = 0;
   csid = id++;
-  ParentObject = NULL;
-  DG_ADDI (this, NULL);
+  ParentObject = 0;
+  DG_ADDI (this, 0);
   DG_TYPE (this, "csObject");
 }
 
-csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
+csObject::csObject (iBase* pParent) : Children (0), Name (0)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   InitializeObject ();
 }
 
-csObject::csObject (csObject &o) : iObject(), Children (NULL), Name (NULL)
+csObject::csObject (csObject &o) : iObject(), Children (0), Name (0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   InitializeObject ();
 
   csRef<iObjectIterator> it (o.GetIterator ());
@@ -134,8 +134,8 @@ csObject::~csObject ()
 
   DG_REM (this);
 
-  if (Children) { delete Children; Children = NULL; }
-  delete [] Name; Name = NULL;
+  if (Children) { delete Children; Children = 0; }
+  delete [] Name; Name = 0;
 
   /*
    * @@@ This should not be required for two reasons:
@@ -204,7 +204,7 @@ void csObject::ObjRemove (iObject *obj)
   int n = Children->Find (obj);
   if (n>=0)
   {
-    obj->SetObjectParent (NULL);
+    obj->SetObjectParent (0);
     DG_REMPARENT (obj, this);
     DG_REMCHILD (this, obj);
     Children->Delete (n);
@@ -219,7 +219,7 @@ void csObject::ObjReleaseOld (iObject *obj)
   int n = Children->Find (obj);
   if (n>=0)
   {
-    obj->SetObjectParent (NULL);
+    obj->SetObjectParent (0);
     // @@@ WARNING! Doing only one DecRef() here does not prevent a second
     // deletion of 'obj'.  Keep in mind that we are currently executing
     // in the destructor of 'obj' itself. If only one 'IncRef()' is used
@@ -242,7 +242,7 @@ void csObject::ObjRemoveAll ()
   for (i=Children->Length ()-1; i>=0; i--)
   {
     iObject* child = Children->Get (i);
-    child->SetObjectParent (NULL);
+    child->SetObjectParent (0);
     DG_REMPARENT (child, this);
     DG_REMCHILD (this, child);
     Children->Delete (i);
@@ -263,12 +263,12 @@ void* csObject::GetChild (int InterfaceID, int Version,
 	const char *Name, bool fn) const
 {
   if (!Children)
-    return NULL;
+    return 0;
 
   if (fn)
   {
     iObject *obj = GetChild (Name);
-    return obj ? obj->QueryInterface (InterfaceID, Version) : NULL;
+    return obj ? obj->QueryInterface (InterfaceID, Version) : 0;
   }
 
   int i;
@@ -285,13 +285,13 @@ void* csObject::GetChild (int InterfaceID, int Version,
     if (obj) return obj;
   }
 
-  return NULL;
+  return 0;
 }
 
 iObject* csObject::GetChild (const char *Name) const
 {
   if (!Children || !Name)
-    return NULL;
+    return 0;
 
   int i;
   for (i = 0; i < Children->Length (); i++)
@@ -299,7 +299,7 @@ iObject* csObject::GetChild (const char *Name) const
     if (!strcmp (Children->Get (i)->GetName (), Name))
       return Children->Get (i);
   }
-  return NULL;
+  return 0;
 }
 
 csPtr<iObjectIterator> csObject::GetIterator ()

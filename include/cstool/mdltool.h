@@ -59,7 +59,7 @@ public:
     bool col = true, bool tex = true);
 
   /**
-   * Create a set from existing lists. If NULL is passed for a list then
+   * Create a set from existing lists. If 0 is passed for a list then
    * that list will not be used. Note that this is different from adding
    * all elements of the given lists because the lists will be kept and
    * modified every time a vertex is added to the set.
@@ -165,7 +165,7 @@ struct csModelDataTools
    * should be an empty list that will be filled with the 'single indices'. <p>
    *
    * You can omit those lists you do not need. For example, if you don't care
-   * about vertex colors, pass NULL for 'SpriteColors'. This has the effect that
+   * about vertex colors, pass 0 for 'SpriteColors'. This has the effect that
    * (obviously) you don't get a list of mapped vertex colors. It also tells
    * this function that vertices with different colors may be merged.
    */

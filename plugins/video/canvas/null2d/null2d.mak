@@ -1,5 +1,5 @@
 # This is a subinclude file used to define the rules needed
-# to build the NULL 2D driver -- null2d
+# to build the 0 2D driver -- null2d
 
 # Driver description
 DESCRIPTION.null2d = Crystal Space null 2D driver

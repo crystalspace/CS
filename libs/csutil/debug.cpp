@@ -56,25 +56,25 @@ struct csDGEL
 
   csDGEL ()
   {
-    object = NULL;
+    object = 0;
     scf = false;
     used = false;
     timestamp = 0;
-    description = NULL;
-    type = NULL;
-    file = NULL;
+    description = 0;
+    type = 0;
+    file = 0;
     num_parents = 0;
-    parents = NULL;
+    parents = 0;
     num_children = 0;
-    children = NULL;
+    children = 0;
   }
   void Clear ()
   {
-    delete[] description; description = NULL;
-    delete[] type; type = NULL;
-    delete[] parents; parents = NULL; num_parents = 0;
-    delete[] children; children = NULL; num_children = 0;
-    file = NULL;
+    delete[] description; description = 0;
+    delete[] type; type = 0;
+    delete[] parents; parents = 0; num_parents = 0;
+    delete[] children; children = 0; num_children = 0;
+    file = 0;
   }
   ~csDGEL ()
   {
@@ -103,7 +103,7 @@ struct csDGEL
     {
       if (child == children[0].link)
       {
-        delete[] children; children = NULL;
+        delete[] children; children = 0;
 	num_children = 0;
       }
       return;
@@ -137,7 +137,7 @@ struct csDGEL
     {
       if (parent == parents[0].link)
       {
-        delete[] parents; parents = NULL;
+        delete[] parents; parents = 0;
 	num_parents = 0;
       }
       return;
@@ -161,7 +161,7 @@ public:
 
   csDebugGraph ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     num_els = 0;
     max_els = 100;
     els = new csDGEL* [max_els];
@@ -211,7 +211,7 @@ public:
     {
       if (els[i]->object == object) return els[i];
     }
-    return NULL;
+    return 0;
   }
 
   SCF_DECLARE_IBASE;
@@ -230,7 +230,7 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
     {
       // If registering fails this probably means we are in the destruction
       // pass and the object registry doesn't allow new updates anymore.
-      return NULL;
+      return 0;
     }
   }
   return (csDebugGraph*)(iBase*)idg;	// DecRef() but that's ok in this case.
@@ -304,7 +304,7 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
     va_end (arg);
     el->description = csStrNew (buf);
   }
-  else el->description = NULL;
+  else el->description = 0;
 
   el->file = file;
   el->linenr = linenr;
@@ -321,7 +321,7 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
   if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
-  if (el == NULL)
+  if (el == 0)
   {
     printf ("ERROR! Cannot find object %p to add description:\n'", object);
     va_list arg;
@@ -344,7 +344,7 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
     va_end (arg);
     el->description = csStrNew (buf);
   }
-  else el->description = NULL;
+  else el->description = 0;
 }
 
 void csDebuggingGraph::AttachType (iObjectRegistry* object_reg,
@@ -358,7 +358,7 @@ void csDebuggingGraph::AttachType (iObjectRegistry* object_reg,
   if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
-  if (el == NULL)
+  if (el == 0)
   {
     printf ("ERROR! Cannot find object %p to add type '%s'\n", object, type);
     fflush (stdout);
@@ -369,7 +369,7 @@ void csDebuggingGraph::AttachType (iObjectRegistry* object_reg,
   delete[] el->type;
   if (type)
     el->type = csStrNew (type);
-  else el->type = NULL;
+  else el->type = 0;
 }
 
 void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
@@ -667,7 +667,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
   }
 
   csDGEL* el = dg->FindEl (object);
-  CS_ASSERT (el != NULL);
+  CS_ASSERT (el != 0);
 
   // First copy all elements that belong to this sub-graph
   // to a local array.

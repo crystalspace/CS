@@ -54,7 +54,7 @@ private:
   {
     void* memory;
     csFreeList* firstfree;	// Linked list of free items in this block.
-    csBlock () : memory (NULL) { }
+    csBlock () : memory (0) { }
     ~csBlock () { if (memory) free (memory); }
   };
 
@@ -93,7 +93,7 @@ private:
   {
     ++firstfreeblock;
     while (firstfreeblock < blocks.Length ()
-		&& blocks[firstfreeblock].firstfree == NULL)
+		&& blocks[firstfreeblock].firstfree == 0)
       ++firstfreeblock;
 
     if (firstfreeblock == blocks.Length ())
@@ -102,7 +102,7 @@ private:
       csBlock& bl = blocks[firstfreeblock];
       bl.memory = (void*)malloc (blocksize);
       bl.firstfree = (csFreeList*)bl.memory;
-      bl.firstfree->next = NULL;
+      bl.firstfree->next = 0;
       bl.firstfree->numfree = size;
     }
   }
@@ -124,7 +124,7 @@ public:
     csBlock& bl = blocks[idx];
     bl.memory = (void*)malloc (blocksize);
     bl.firstfree = (csFreeList*)bl.memory;
-    bl.firstfree->next = NULL;
+    bl.firstfree->next = 0;
     bl.firstfree->numfree = size;
 
     firstfreeblock = 0;
@@ -144,7 +144,7 @@ public:
     for (i = 0 ; i < blocks.Length () ; i++)
     {
       CS_ASSERT (blocks[i].firstfree == (csFreeList*)blocks[i].memory);
-      CS_ASSERT (blocks[i].firstfree->next == NULL);
+      CS_ASSERT (blocks[i].firstfree->next == 0);
       CS_ASSERT (blocks[i].firstfree->numfree == size);
     }
 #endif
@@ -182,7 +182,7 @@ public:
   }
 
   /**
-   * Deallocate an element. It is ok to give a NULL pointer here.
+   * Deallocate an element. It is ok to give a 0 pointer here.
    */
   void Free (T* el)
   {
@@ -199,12 +199,12 @@ public:
       firstfreeblock = idx;
 
     csBlock& bl = blocks[idx];
-    if (bl.firstfree == NULL)
+    if (bl.firstfree == 0)
     {
       // Block has no free items so we create the first free item
       // here.
       bl.firstfree = (csFreeList*)el;
-      bl.firstfree->next = NULL;
+      bl.firstfree->next = 0;
       bl.firstfree->numfree = 1;
     }
     else
@@ -237,7 +237,7 @@ public:
 	// free element.
 	csFreeList* fl_before = bl.firstfree;
 	csFreeList* fl_after = bl.firstfree->next;
-	while (fl_after != NULL && fl_after < p_el)
+	while (fl_after != 0 && fl_after < p_el)
 	{
 	  fl_before = fl_after;
 	  fl_after = fl_after->next;
@@ -261,7 +261,7 @@ public:
 	  else
 	  {
 	    // No, we have to create a new free block.
-	    p_el->next = NULL;
+	    p_el->next = 0;
 	    p_el->numfree = 1;
 	    fl_before->next = p_el;
 	  }

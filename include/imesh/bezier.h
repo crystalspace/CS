@@ -129,8 +129,8 @@ struct iBezierFactoryState : public iBase
    * Add polygons and vertices from the specified thing (seen as template).
    */
   virtual void MergeTemplate (iBezierFactoryState* tpl,
-  	iMaterialWrapper* default_material = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL) = 0;
+  	iMaterialWrapper* default_material = 0,
+	csVector3* shift = 0, csMatrix3* transform = 0) = 0;
 };
 
 SCF_VERSION (iBezierState, 0, 0, 1);

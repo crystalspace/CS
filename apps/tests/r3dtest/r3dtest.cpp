@@ -167,7 +167,7 @@ void R3DTest::SetupFrame ()
 
 void R3DTest::FinishFrame ()
 {
-  r3d->Print (NULL);
+  r3d->Print (0);
 }
 
 bool R3DTest::HandleEvent (iEvent& ev)
@@ -251,7 +251,7 @@ bool R3DTest::Initialize ()
   }
 
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  if (vc == NULL)
+  if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -260,7 +260,7 @@ bool R3DTest::Initialize ()
   }
 
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (vfs == NULL)
+  if (vfs == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -273,7 +273,7 @@ bool R3DTest::Initialize ()
 #else
   r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif
-  if (r3d == NULL)
+  if (r3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -283,7 +283,7 @@ bool R3DTest::Initialize ()
 
 
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (engine == NULL)
+  if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -292,7 +292,7 @@ bool R3DTest::Initialize ()
   }
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
-  if (kbd == NULL)
+  if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -301,7 +301,7 @@ bool R3DTest::Initialize ()
   }
 
   mouse = CS_QUERY_REGISTRY (object_reg, iMouseDriver);
-  if (mouse == NULL)
+  if (mouse == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -310,7 +310,7 @@ bool R3DTest::Initialize ()
   }
 
   csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (loader == NULL)
+  if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -328,7 +328,7 @@ bool R3DTest::Initialize ()
     return false;
   }
 
-  csRef<iMaterial> shadow (engine->CreateBaseMaterial (NULL));
+  csRef<iMaterial> shadow (engine->CreateBaseMaterial (0));
   csRef<iMaterialWrapper> mat = engine->GetMaterialList ()->NewMaterial (shadow);
   mat->QueryObject ()->SetName ("shadow extruder");
 

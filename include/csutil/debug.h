@@ -30,33 +30,33 @@ struct iObjectRegistry;
 // to be called with a valid object registry.
 #if defined(CS_DEBUG) && defined(CS_USE_GRAPHDEBUG)
 #define DG_ADD(obj,desc) \
-  csDebuggingGraph::AddObject(NULL,(void*)(obj),false,__FILE__,__LINE__,desc)
+  csDebuggingGraph::AddObject(0,(void*)(obj),false,__FILE__,__LINE__,desc)
 #define DG_ADDI(obj,desc) \
-  csDebuggingGraph::AddObject(NULL,(void*)(obj),true,__FILE__,__LINE__,desc)
+  csDebuggingGraph::AddObject(0,(void*)(obj),true,__FILE__,__LINE__,desc)
 #define DG_TYPE(obj,type) \
-  csDebuggingGraph::AttachType(NULL,(void*)(obj),type)
+  csDebuggingGraph::AttachType(0,(void*)(obj),type)
 #define DG_DESCRIBE0(obj,desc) \
-  csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc)
+  csDebuggingGraph::AttachDescription(0,(void*)(obj),desc)
 #define DG_DESCRIBE1(obj,desc,a) \
-  csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc,a)
+  csDebuggingGraph::AttachDescription(0,(void*)(obj),desc,a)
 #define DG_DESCRIBE2(obj,desc,a,b) \
-  csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc,a,b)
+  csDebuggingGraph::AttachDescription(0,(void*)(obj),desc,a,b)
 #define DG_REM(obj) \
-  csDebuggingGraph::RemoveObject(NULL,(void*)(obj),__FILE__,__LINE__)
+  csDebuggingGraph::RemoveObject(0,(void*)(obj),__FILE__,__LINE__)
 #define DG_ADDCHILD(parent,child) \
-  csDebuggingGraph::AddChild(NULL,(void*)(parent),(void*)(child))
+  csDebuggingGraph::AddChild(0,(void*)(parent),(void*)(child))
 #define DG_ADDPARENT(child,parent) \
-  csDebuggingGraph::AddParent(NULL,(void*)(child),(void*)(parent))
+  csDebuggingGraph::AddParent(0,(void*)(child),(void*)(parent))
 #define DG_REMCHILD(parent,child) \
-  csDebuggingGraph::RemoveChild(NULL,(void*)(parent),(void*)(child))
+  csDebuggingGraph::RemoveChild(0,(void*)(parent),(void*)(child))
 #define DG_REMPARENT(child,parent) \
-  csDebuggingGraph::RemoveParent(NULL,(void*)(child),(void*)(parent))
+  csDebuggingGraph::RemoveParent(0,(void*)(child),(void*)(parent))
 #define DG_LINK(parent,child) \
-  csDebuggingGraph::AddChild(NULL,(void*)(parent),(void*)(child)); \
-  csDebuggingGraph::AddParent(NULL,(void*)(child),(void*)(parent))
+  csDebuggingGraph::AddChild(0,(void*)(parent),(void*)(child)); \
+  csDebuggingGraph::AddParent(0,(void*)(child),(void*)(parent))
 #define DG_UNLINK(parent,child) \
-  csDebuggingGraph::RemoveChild(NULL,(void*)(parent),(void*)(child)); \
-  csDebuggingGraph::RemoveParent(NULL,(void*)(child),(void*)(parent))
+  csDebuggingGraph::RemoveChild(0,(void*)(parent),(void*)(child)); \
+  csDebuggingGraph::RemoveParent(0,(void*)(child),(void*)(parent))
 #else
 #define DG_ADD(obj,desc)
 #define DG_ADDI(obj,desc)

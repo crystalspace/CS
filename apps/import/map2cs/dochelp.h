@@ -27,7 +27,7 @@
 typedef csRef<iDocumentNode> DocNode;
 
 static inline DocNode CreateNode (DocNode parent, const char* name, 
-				  const char* content = NULL)
+				  const char* content = 0)
 {
   DocNode temp = parent->CreateNodeBefore (CS_NODE_ELEMENT);
   temp->SetValue (name);

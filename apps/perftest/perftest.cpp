@@ -82,7 +82,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -307,7 +307,7 @@ void PerfTest::SetupFrame ()
 void PerfTest::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool PerfTest::HandleEvent (iEvent &Event)
@@ -333,14 +333,14 @@ bool PerfTest::HandleEvent (iEvent &Event)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new PerfTest ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

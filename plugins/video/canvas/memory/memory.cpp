@@ -58,7 +58,7 @@ void *csGraphicsMemory::updateThread(void *obj)
     pthread_mutex_unlock(&(theObj->memoryUpdateLock_));
   }
   pthread_exit(0);
-  return NULL;
+  return 0;
 }
 #endif
 

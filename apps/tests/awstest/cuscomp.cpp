@@ -31,7 +31,7 @@ SCF_IMPLEMENT_IBASE_END
 
 CustomComponent::CustomComponent ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 CustomComponent::~CustomComponent () {}
@@ -86,7 +86,7 @@ void CustomComponent::OnDraw (csRect /*clip*/)
 
 CustomComponentFactory::CustomComponentFactory (iAws* manager) : awsEmbeddedComponentFactory (manager)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
   Register ("Demo Component");
 }
 

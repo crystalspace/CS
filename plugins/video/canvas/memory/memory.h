@@ -63,7 +63,7 @@ public:
   virtual bool BeginDraw();
   virtual void FinishDraw();
 
-  virtual void Print(csRect* area = NULL);
+  virtual void Print(csRect* area = 0);
   virtual unsigned char *GetImage();
 
 #if THREAD_SUPPORT

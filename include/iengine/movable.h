@@ -89,7 +89,7 @@ struct iMovable : public iBase
    * this thing is. This is a convenience funcion. Calling this function
    * makes the object visible in this sector. Use GetSectors() if you want
    * to have more control over where the object really is.
-   * This function does not do anything if the parent is not NULL.
+   * This function does not do anything if the parent is not 0.
    * You have to call UpdateMove() after changing the sector
    * information.
    */
@@ -99,7 +99,7 @@ struct iMovable : public iBase
    * Clear the list of sectors. This basically makes the object invisible
    * as it will not be present in any sector. The mesh will still be present
    * in the engine list of meshes though.
-   * This function does not do anything if the parent is not NULL.
+   * This function does not do anything if the parent is not 0.
    * You have to call UpdateMove() after changing the sector
    * information.
    */

@@ -216,7 +216,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return 0;
 	  rainstate->SetColor (color);
 	}
 	break;
@@ -232,7 +232,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return 0;
 	  rainstate->SetBox (box.Min (), box.Max ());
 	}
 	break;
@@ -240,7 +240,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return NULL;
+	    return 0;
 	  rainstate->SetFallSpeed (s);
 	}
 	break;
@@ -253,7 +253,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.rainloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
       rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
@@ -268,7 +268,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.rainloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return 0;
 	  }
 	  rainstate->SetMaterialWrapper (mat);
 	}
@@ -277,7 +277,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return 0;
           rainstate->SetMixMode (mode);
 	}
 	break;
@@ -285,7 +285,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
         {
           bool do_cd;
 	  if (!synldr->ParseBool (child, do_cd, true))
-	    return NULL;
+	    return 0;
           rainstate->SetCollisionDetection (do_cd);
         }
         break;
@@ -293,7 +293,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return 0;
           rainstate->SetLighting (do_lighting);
         }
         break;
@@ -302,7 +302,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

@@ -96,7 +96,7 @@ SCF_IMPLEMENT_IBASE_EXT_END
 // csGraphics2DSVGALib functions
 csGraphics2DSVGALib::csGraphics2DSVGALib(iBase *p) : csGraphics2D (p)
 {
-  EventOutlet = NULL;
+  EventOutlet = 0;
 }
 
 void csGraphics2DSVGALib::Report (int severity, const char* msg, ...)
@@ -133,7 +133,7 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("nosysmouse"))
     do_hwmouse = false;
 
-  Memory = NULL;
+  Memory = 0;
 
   // SVGALIB Starts here
 
@@ -142,7 +142,7 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
 
   gl_copyscreen (&physicalscreen);
 
-  Memory = NULL;
+  Memory = 0;
 
   switch (Depth)
   {

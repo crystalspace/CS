@@ -44,10 +44,10 @@ SCF_IMPLEMENT_IBASE_END;
 csSoundSourceEAX::csSoundSourceEAX(iBase *piBase) {
   SCF_CONSTRUCT_IBASE(piBase);
 
-  EaxKsPropertiesSet = NULL;
-  Buffer3D = NULL;
-  Buffer2D = NULL;
-  Renderer = NULL;
+  EaxKsPropertiesSet = 0;
+  Buffer3D = 0;
+  Buffer2D = 0;
+  Renderer = 0;
 
 }
 
@@ -56,7 +56,7 @@ csSoundSourceEAX::~csSoundSourceEAX() {
   if(EaxKsPropertiesSet)
   {
     EaxKsPropertiesSet->Release();
-    EaxKsPropertiesSet = NULL;
+    EaxKsPropertiesSet = 0;
   }
 
 
@@ -119,7 +119,7 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
   wfxFormat.nAvgBytesPerSec = wfxFormat.nBlockAlign*wfxFormat.nSamplesPerSec;
   wfxFormat.cbSize = 0;
 
-  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL);
+  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, 0);
   if (r != DS_OK) {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "cannot create secondary sound buffer "
@@ -154,7 +154,7 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
 
     //set the Defaultproperties
     r = EaxKsPropertiesSet->Set(DSPROPSETID_EAX_BufferProperties,
-                            DSPROPERTY_EAXBUFFER_ALLPARAMETERS, NULL, 0, &BufferProperties,
+                            DSPROPERTY_EAXBUFFER_ALLPARAMETERS, 0, 0, &BufferProperties,
                             sizeof(EAXBUFFERPROPERTIES));
 
     if (r != DS_OK)
@@ -278,7 +278,7 @@ bool csSoundSourceEAX::IsPlaying() {
 
 
 void csSoundSourceEAX::Write(void *Data, unsigned long NumBytes) {
-  void *Pointer1 = NULL, *Pointer2 = NULL;
+  void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
 
   bool ResetPlayPosition = false;
@@ -299,7 +299,7 @@ void csSoundSourceEAX::Write(void *Data, unsigned long NumBytes) {
 }
 
 void csSoundSourceEAX::WriteMute(unsigned long NumBytes) {
-  void *Pointer1 = NULL, *Pointer2 = NULL;
+  void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
 
   bool ResetPlayPosition = false;

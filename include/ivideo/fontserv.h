@@ -123,14 +123,14 @@ struct iFont : public iBase
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
-   * Returns NULL if error occured. The oW and oH parameters are
+   * Returns 0 if error occured. The oW and oH parameters are
    * filled with bitmap width and height.
    */
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH) = 0;
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
-   * Returns NULL if error occured. The oW and oH parameters are
+   * Returns 0 if error occured. The oW and oH parameters are
    * filled with bitmap width and height. adv holds the advance
    * in x-direction, left and top hold the x- and y-bearing.
    */
@@ -139,14 +139,14 @@ struct iFont : public iBase
 
   /**
    * Return a pointer to a bitmap containing the alpha bitmap for the
-   * rendered character. Returns NULL if error occured. The oW and oH
+   * rendered character. Returns 0 if error occured. The oW and oH
    * parameters are filled with bitmap width and height.
    */
   virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH) = 0;
 
   /**
    * Return a pointer to a bitmap containing the alpha bitmap for the
-   * rendered character. Returns NULL if error occured. The oW and oH
+   * rendered character. Returns 0 if error occured. The oW and oH
    * parameters are filled with bitmap width and height. adv holds the
    * advance in x-direction, left and top hold the x- and y-bearing.
    */
@@ -202,7 +202,7 @@ struct iFontServer : public iBase
 {
   /**
    * Load a font by name.
-   * Returns a new iFont object or NULL on failure.
+   * Returns a new iFont object or 0 on failure.
    */
   virtual csPtr<iFont> LoadFont (const char *filename) = 0;
 
@@ -212,9 +212,9 @@ struct iFontServer : public iBase
   virtual int GetFontCount () = 0;
 
   /**
-   * Get Nth loaded font or NULL.
+   * Get Nth loaded font or 0.
    * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get NULL.
+   * through all indices starting from 0 until you get 0.
    * Note that the returned font is NOT IncRef'd: do it yourself
    * if you store the pointer for long-term use.
    */

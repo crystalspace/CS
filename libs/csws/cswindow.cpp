@@ -184,7 +184,7 @@ bool csWindow::HandleEvent (iEvent &Event)
             client->id = CSWID_CLIENT;
             SetRect (bound.xmin, bound.ymin, bound.xmax, bound.ymax);
             SetFocused (client);
-            Event.Command.Info = NULL;
+            Event.Command.Info = 0;
           } /* endif */
           return true;
       } /* endswitch */

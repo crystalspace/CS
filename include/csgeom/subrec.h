@@ -37,10 +37,10 @@ public:
 
   /// Create a new rectangle.
   csSubRect (int ixmin, int iymin, int ixmax, int iymax)
-  	: csRect (ixmin, iymin, ixmax, iymax), next (NULL), prev (NULL) { }
+  	: csRect (ixmin, iymin, ixmax, iymax), next (0), prev (0) { }
 
   /// Copy constructor.
-  csSubRect (const csRect &copy) : csRect (copy), next (NULL), prev (NULL) { }
+  csSubRect (const csRect &copy) : csRect (copy), next (0), prev (0) { }
 };
 
 /**

@@ -57,7 +57,7 @@ public:
    * \param palette Palett for indexed images.
    */
   csImageMemory (int width, int height, void *buffer, bool destroy,
-    int format = CS_IMGFMT_TRUECOLOR, csRGBpixel *palette = NULL);
+    int format = CS_IMGFMT_TRUECOLOR, csRGBpixel *palette = 0);
 
   virtual ~csImageMemory ();
 

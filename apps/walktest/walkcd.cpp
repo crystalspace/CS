@@ -203,7 +203,7 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   float size = qsqrt (d.x * d.x + d.y * d.y + d.z * d.z);
   csRef<iSectorIterator> it (Sys->Engine->GetNearbySectors (s, v, size));
   iSector* sector;
-  while ((sector = it->Fetch ()) != NULL)
+  while ((sector = it->Fetch ()) != 0)
   {
     sa[c++] = sector;
     if (c >= MAXSECTORSOCCUPIED) break;
@@ -296,7 +296,7 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
       else
       {
 	ti = csPtr<TerrainInfo> (new TerrainInfo ());
-	ti->terrfunc = NULL;	// No terrain found yet.
+	ti->terrfunc = 0;	// No terrain found yet.
         int i;
         for (i = 0 ; i < ml->GetCount () ; i++)
         {

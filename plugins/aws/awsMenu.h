@@ -167,7 +167,7 @@ public:
   virtual void AddChild(iAwsComponent* comp);
 
   /// Adds a menu entry of the default type to the menu
-  virtual iAwsSource* AddChild(const char* caption, iTextureHandle* image, awsPopupMenu* popup = NULL); 
+  virtual iAwsSource* AddChild(const char* caption, iTextureHandle* image, awsPopupMenu* popup = 0); 
   
   /// Removes a menu entry from the component. If you created the entry by name and
   /// have not yet IncRef'ed the item it will be destroyed automatically

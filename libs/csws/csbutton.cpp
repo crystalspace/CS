@@ -30,8 +30,8 @@
 
 csButton::csButton (csComponent *iParent, int iCommandCode,
   int iButtonStyle, csButtonFrameStyle iFrameStyle) : csComponent (iParent),
-  ImageNormal (NULL), ImagePressed (NULL),
-  FrameNormal (NULL), FramePressed (NULL), FrameHighlighted (NULL),
+  ImageNormal (0), ImagePressed (0),
+  FrameNormal (0), FramePressed (0), FrameHighlighted (0),
   delImages (false), delFrameImages(false),
   CommandCode (iCommandCode), underline_pos (-1),
   ButtonStyle (iButtonStyle), FrameStyle (iFrameStyle),
@@ -116,7 +116,7 @@ void csButton::SetButtonTexture(csPixmap *iNormal, csPixmap *iPressed, bool iDel
 	else
 		FramePressed = iNormal;
 
-	FrameHighlighted = NULL;
+	FrameHighlighted = 0;
 
 	delFrameImages = iDelete;
 
@@ -154,8 +154,8 @@ void csButton::FreeBitmaps ()
       delete ImagePressed;
   } /* endif */
   delImages = false;
-  ImageNormal = NULL;
-  ImagePressed = NULL;
+  ImageNormal = 0;
+  ImagePressed = 0;
 }
 
 void csButton::FreeFrameBitmaps ()
@@ -173,9 +173,9 @@ void csButton::FreeFrameBitmaps ()
   } /* endif */
 
   delFrameImages = false;
-  FrameNormal = NULL;
-  FramePressed = NULL;
-  FrameHighlighted = NULL;
+  FrameNormal = 0;
+  FramePressed = 0;
+  FrameHighlighted = 0;
 }
 
 
@@ -214,7 +214,7 @@ bool csButton::HandleEvent (iEvent &Event)
             app->MouseOwner->LocalToGlobal (dX, dY);
             GlobalToLocal (dX, dY);
             // release mouse ownership so that csButton::HandleEvent can capture it
-            app->CaptureMouse (NULL);
+            app->CaptureMouse (0);
             if ((ev->Type == csevMouseMove)
              && app->MouseOwner->bound.ContainsRel (ev->Mouse.x, ev->Mouse.y))
               ev->Mouse.x = ev->Mouse.y = 0;
@@ -251,7 +251,7 @@ bool csButton::HandleEvent (iEvent &Event)
       {
         if (app->MouseOwner == this)
         {
-          app->CaptureMouse (NULL);
+          app->CaptureMouse (0);
           if (Pressed)
           {
             if (!(ButtonStyle & CSBS_MULTICHOOSE))
@@ -301,7 +301,7 @@ bool csButton::HandleEvent (iEvent &Event)
           if (!(ButtonStyle & CSBS_MULTICHOOSE))
             SetPressed (false);
           Invalidate ();
-          app->CaptureKeyboard (NULL);
+          app->CaptureKeyboard (0);
           Press ();
           return true;
         }
@@ -324,7 +324,7 @@ bool csButton::HandleKeyPress (iEvent &Event)
   // Check hot key
   if (!GetState (CSS_DISABLED))
     if (((underline_pos >= 0)
-      && (app->KeyboardOwner == NULL)
+      && (app->KeyboardOwner == 0)
       && CheckHotKey (Event, text [underline_pos]))
      || ((GetState (CSS_FOCUSED))
       && (Event.Key.Code == CSKEY_SPACE)
@@ -400,13 +400,13 @@ void csButton::SetState (int mask, bool enable)
     {
       SetPressed (false);
       if (app->KeyboardOwner == this)
-        app->CaptureKeyboard (NULL);
+        app->CaptureKeyboard (0);
     } /* endif */
     if ((state & CSS_DISABLED)
      && (app->MouseOwner))
     {
       if (app->MouseOwner == this)
-        app->CaptureMouse (NULL);
+        app->CaptureMouse (0);
       if (Pressed)
         if (!(ButtonStyle & CSBS_MULTICHOOSE))
           SetPressed (false);

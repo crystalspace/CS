@@ -92,7 +92,7 @@ public:
   csStringID Request (const char *s);
 
   /**
-   * Request the string for a given ID. Return NULL if the string
+   * Request the string for a given ID. Return 0 if the string
    * has not been requested (yet).
    */
   const char* Request (csStringID id);

@@ -139,7 +139,7 @@ public:
 
   /**
    * Get address of video RAM at given x,y coordinates.
-   * The OpenGL version of this function just returns NULL
+   * The OpenGL version of this function just returns 0
    * if not doing a screenshot.
    */
   virtual unsigned char *GetPixelAt (int x, int y);

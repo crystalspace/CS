@@ -39,7 +39,7 @@ public:
 public:
   /// Constructor: initialize the object with zero
   csLayoutConstraint ()
-  { comp = NULL; }
+  { comp = 0; }
   /// Constructor: initialize the object with given value
   csLayoutConstraint (csComponent *comp)
   { this->comp = comp; }

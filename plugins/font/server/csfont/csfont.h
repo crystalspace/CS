@@ -90,7 +90,7 @@ public:
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
-   * Returns NULL if error occured. The oW and oH parameters are
+   * Returns 0 if error occured. The oW and oH parameters are
    * filled with bitmap width and height.
    */
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
@@ -98,7 +98,7 @@ public:
 
   /**
    * Return a pointer to the alpha bitmap for rendered character.
-   * Returns NULL if error occured. The oW and oH parameters are
+   * Returns 0 if error occured. The oW and oH parameters are
    * filled with bitmap width and height.
    */
   virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
@@ -162,7 +162,7 @@ public:
 
   /**
    * Load a font by name.
-   * Returns a new iFont object or NULL on failure.
+   * Returns a new iFont object or 0 on failure.
    */
   virtual csPtr<iFont> LoadFont (const char *filename);
 
@@ -173,9 +173,9 @@ public:
   { return fonts.Length (); }
 
   /**
-   * Get Nth loaded font or NULL.
+   * Get Nth loaded font or 0.
    * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get NULL.
+   * through all indices starting from 0 until you get 0.
    */
   virtual iFont *GetFont (int iIndex);
 

@@ -38,7 +38,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csXmlReadDocumentSystem::csXmlReadDocumentSystem ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csXmlReadDocumentSystem::~csXmlReadDocumentSystem ()
@@ -59,9 +59,9 @@ SCF_IMPLEMENT_IBASE_END
 
 csXmlReadAttributeIterator::csXmlReadAttributeIterator (TrDocumentNode* parent)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csXmlReadAttributeIterator::parent = parent->ToElement ();
-  if (csXmlReadAttributeIterator::parent == NULL)
+  if (csXmlReadAttributeIterator::parent == 0)
   {
     current = -1;
     return;
@@ -104,13 +104,13 @@ csXmlReadNodeIterator::csXmlReadNodeIterator (
 	csXmlReadDocument* doc, TrDocumentNodeChildren* parent,
 	const char* value)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csXmlReadNodeIterator::doc = doc;
   csXmlReadNodeIterator::parent = parent;
-  csXmlReadNodeIterator::value = value ? csStrNew (value) : NULL;
+  csXmlReadNodeIterator::value = value ? csStrNew (value) : 0;
   use_contents_value = false;
   if (!parent)
-    current = NULL;
+    current = 0;
   else if (value)
     current = parent->FirstChild (value);
   else
@@ -129,7 +129,7 @@ csXmlReadNodeIterator::csXmlReadNodeIterator (
 
 bool csXmlReadNodeIterator::HasNext ()
 {
-  return use_contents_value || current != NULL;
+  return use_contents_value || current != 0;
 }
 
 csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
@@ -141,7 +141,7 @@ csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
     use_contents_value = false;
     current = parent->FirstChild ();
   }
-  else if (current != NULL)
+  else if (current != 0)
   {
     node = csPtr<iDocumentNode> (doc->Alloc (current, false));
     if (value)
@@ -177,9 +177,9 @@ SCF_IMPLEMENT_IBASE_END
 
 csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  node = NULL;
-  node_children = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  node = 0;
+  node_children = 0;
   csXmlReadNode::doc = doc;	// Increase reference.
 }
 
@@ -244,7 +244,7 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	doc, use_contents_value ? NULL : node_children, NULL));
+  	doc, use_contents_value ? 0 : node_children, 0));
   return it;
 }
 
@@ -252,13 +252,13 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes (const char* value)
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	doc, use_contents_value ? NULL : node_children, value));
+  	doc, use_contents_value ? 0 : node_children, value));
   return it;
 }
 
 csRef<iDocumentNode> csXmlReadNode::GetNode (const char* value)
 {
-  if (!node_children || use_contents_value) return NULL;
+  if (!node_children || use_contents_value) return 0;
   csRef<iDocumentNode> child;
   TrDocumentNode* c = node_children->FirstChild (value);
   if (!c) return child;
@@ -268,7 +268,7 @@ csRef<iDocumentNode> csXmlReadNode::GetNode (const char* value)
 
 const char* csXmlReadNode::GetContentsValue ()
 {
-  if (!node_children || use_contents_value) return NULL;
+  if (!node_children || use_contents_value) return 0;
   TrXmlElement* el = node->ToElement ();
   if (el && el->GetContentsValue ())
   {
@@ -285,7 +285,7 @@ const char* csXmlReadNode::GetContentsValue ()
     }
     child = child->NextSibling ();
   } 
-  return NULL;
+  return 0;
 }
 
 int csXmlReadNode::GetContentsValueAsInt ()
@@ -308,7 +308,7 @@ float csXmlReadNode::GetContentsValueAsFloat ()
 
 csRef<iDocumentAttributeIterator> csXmlReadNode::GetAttributes ()
 {
-  if (use_contents_value) return NULL;
+  if (use_contents_value) return 0;
   csRef<iDocumentAttributeIterator> it;
   it = csPtr<iDocumentAttributeIterator> (
   	new csXmlReadAttributeIterator (node));
@@ -317,7 +317,7 @@ csRef<iDocumentAttributeIterator> csXmlReadNode::GetAttributes ()
 
 TrDocumentAttribute* csXmlReadNode::GetAttributeInternal (const char* name)
 {
-  if (use_contents_value) return NULL;
+  if (use_contents_value) return 0;
   int count = node->ToElement ()->GetAttributeCount ();
   int i;
   for (i = 0 ; i < count ; i++)
@@ -327,12 +327,12 @@ TrDocumentAttribute* csXmlReadNode::GetAttributeInternal (const char* name)
       return &attrib;
   }
 
-  return NULL;
+  return 0;
 }
 
 csRef<iDocumentAttribute> csXmlReadNode::GetAttribute (const char* name)
 {
-  if (use_contents_value) return NULL;
+  if (use_contents_value) return 0;
   csRef<iDocumentAttribute> attr;
   TrDocumentAttribute* a = GetAttributeInternal (name);
   if (a)
@@ -344,10 +344,10 @@ csRef<iDocumentAttribute> csXmlReadNode::GetAttribute (const char* name)
 
 const char* csXmlReadNode::GetAttributeValue (const char* name)
 {
-  if (use_contents_value) return NULL;
+  if (use_contents_value) return 0;
   TrXmlElement* el = node->ToElement ();
   if (el) return el->Attribute (name);
-  else return NULL;
+  else return 0;
 }
 
 int csXmlReadNode::GetAttributeValueAsInt (const char* name)
@@ -374,10 +374,10 @@ SCF_IMPLEMENT_IBASE_END
 
 csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csXmlReadDocument::sys = sys;	// Increase ref.
-  pool = NULL;
-  root = NULL;
+  pool = 0;
+  root = 0;
 }
 
 csXmlReadDocument::~csXmlReadDocument ()
@@ -386,7 +386,7 @@ csXmlReadDocument::~csXmlReadDocument ()
   while (pool)
   {
     csXmlReadNode* n = pool->next_pool;
-    // The 'sys' member in pool should be NULL here.
+    // The 'sys' member in pool should be 0 here.
     delete pool;
     pool = n;
   }
@@ -396,7 +396,7 @@ void csXmlReadDocument::Clear ()
 {
   if (!root) return;
   delete root;
-  root = NULL;
+  root = 0;
 }
 
 csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf)
@@ -457,7 +457,7 @@ const char* csXmlReadDocument::Parse (const char* buf)
   root->Parse (root, root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
-  return NULL;
+  return 0;
 }
 
 const char* csXmlReadDocument::ParseInPlace (char* buf)
@@ -466,7 +466,7 @@ const char* csXmlReadDocument::ParseInPlace (char* buf)
   root->Parse (root, root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
-  return NULL;
+  return 0;
 }
 
 csXmlReadNode* csXmlReadDocument::Alloc ()

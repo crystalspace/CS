@@ -259,7 +259,7 @@ struct iSprite3DFactoryState : public iBase
   /**
    * Get the skeleton. Will only be valid if skeletal animation
    * has been enabled with EnableSkeletalAnimation(). Otherwise
-   * it will return NULL.
+   * it will return 0.
    */
   virtual iSkeleton* GetSkeleton () const = 0;
 
@@ -352,7 +352,7 @@ struct iSprite3DState : public iBase
   /**
    * Get the skeleton state. Will only be valid if skeletal animation
    * has been enabled for the factory that this sprite was created from.
-   * Otherwise it will return NULL.
+   * Otherwise it will return 0.
    */
   virtual iSkeletonState* GetSkeletonState () const = 0;
 

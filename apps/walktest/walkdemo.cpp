@@ -524,7 +524,7 @@ SCF_IMPLEMENT_IBASE_END
 
 AnimSkelTree::AnimSkelTree ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 bool AnimSkelTree::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
@@ -551,7 +551,7 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
   {
     tmpl = Sys->Engine->CreateMeshFactory (
     	"crystalspace.mesh.object.sprite.3d", skelname);
-    if (tmpl == NULL)
+    if (tmpl == 0)
     {
       Sys->Report (CS_REPORTER_SEVERITY_WARNING,
       	"Could not load the sprite 3d plugin!");
@@ -761,7 +761,7 @@ SCF_IMPLEMENT_IBASE_END
 
 AnimSkelGhost::AnimSkelGhost ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 bool AnimSkelGhost::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
@@ -912,7 +912,7 @@ void move_ghost (iMeshWrapper* spr)
 // Everything for bots.
 //===========================================================================
 
-Bot* first_bot = NULL;
+Bot* first_bot = 0;
 bool do_bots = false;
 
 // Add a bot with some size at the specified positin.
@@ -1161,7 +1161,7 @@ void fire_missile ()
   dyn->Setup ();
 
   MissileStruct* ms = new MissileStruct;
-  ms->snd = NULL;
+  ms->snd = 0;
   if (Sys->mySound)
   {
     ms->snd = Sys->wMissile_whoosh->CreateSource (SOUND3D_ABSOLUTE);
@@ -1173,7 +1173,7 @@ void fire_missile ()
   }
   ms->type = DYN_TYPE_MISSILE;
   ms->dir = (csOrthoTransform)(Sys->view->GetCamera ()->GetTransform ());
-  ms->sprite = NULL;
+  ms->sprite = 0;
   csDataObject* msdata = new csDataObject(ms);
   dyn->QueryObject ()->ObjAdd(msdata);
   msdata->DecRef ();
@@ -1227,7 +1227,7 @@ void light_statics ()
     iMeshWrapper* sp = meshes->Get (i);
     csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (sp->GetMeshObject (),
     	iSprite3DState));
-    if (state != NULL)
+    if (state != 0)
     {
       if (state->GetSkeletonState ())
       {
@@ -1476,7 +1476,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   csRef<iMeshWrapper> thing (
   	CreatePortalThing ("portalTo", room, tm, portalPoly));
 
-  bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != NULL);
+  bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != 0);
   Sys->Engine->SelectRegion (lev);
   // If the region did not already exist then we load the level in it.
   if (!regionExists)
@@ -1529,6 +1529,6 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
 
   if (!regionExists)
     Sys->InitCollDet (Sys->Engine, Sys->Engine->GetCurrentRegion ());
-  Sys->Engine->SelectRegion ((iRegion*)NULL);
+  Sys->Engine->SelectRegion ((iRegion*)0);
 }
 

@@ -69,7 +69,7 @@
  Internal Macros and Utilities for Parser
  ****************************************************************************/
 
-#define DO(val) if (!(val)) return NULL
+#define DO(val) if (!(val)) return 0
 #define CALLFUNC(ggg,fff) (*((ggg)->funcs.fff))
 #define SKIPSPACE(ccc) while (isspace(*ccc)) ccc++
 #define isvarfirstletter(ccc) (isalpha(ccc) || (ccc) == '_')
@@ -144,10 +144,10 @@ static const char *parse_character (const char *cp, long *valp)
 	val = '\"';
 	break;
       case 'x':
-	val = (char) strtol (cp + 2, NULL, 16);
+	val = (char) strtol (cp + 2, 0, 16);
 	break;
       default:
-	val = (char) strtol (cp + 1, NULL, 8);
+	val = (char) strtol (cp + 1, 0, 8);
 	break;
     }
   else

@@ -171,7 +171,7 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
@@ -292,7 +292,7 @@ public:
   int GetUVAnimationCount () const {return vAnims.Length ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
   {
-    csSprite2DUVAnimation *p = new csSprite2DUVAnimation (NULL);
+    csSprite2DUVAnimation *p = new csSprite2DUVAnimation (0);
     vAnims.Push (p);
     return (iSprite2DUVAnimation *)p;
   }
@@ -308,7 +308,7 @@ public:
   iSprite2DUVAnimation *GetUVAnimation (const char *name)
   {
     int idx = vAnims.FindKey ((void*) name);
-    return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : NULL);
+    return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : 0);
   }
   iSprite2DUVAnimation *GetUVAnimation (int idx)
   {
@@ -323,7 +323,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 
   //---------------------- iSprite2DFactoryState implementation ----------------
   class Sprite2DFactoryState : public iSprite2DFactoryState

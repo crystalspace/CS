@@ -62,13 +62,13 @@ struct iBugPlug : public iBase
   virtual void SetupDebugSector () = 0;
 
   /**
-   * Add a colored filled box to the debug sector. If name is not NULL it
+   * Add a colored filled box to the debug sector. If name is not 0 it
    * will be shown in BugPlug when the mouse is over the object. If
-   * iMeshObject* is not NULL it will be shown inside the box when the mouse
+   * iMeshObject* is not 0 it will be shown inside the box when the mouse
    * is over the object.
    */
   virtual void DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name = NULL, iMeshObject* mesh = NULL) = 0;
+  	const char* name = 0, iMeshObject* mesh = 0) = 0;
 
   /**
    * Add a transparent filled triangle to the debug sector.
@@ -144,7 +144,7 @@ struct iBugPlug : public iBase
 
   /**
    * Add some rendering code that will be rendered right before the
-   * points and lines are rendered. If NULL the current object will be removed.
+   * points and lines are rendered. If 0 the current object will be removed.
    */
   virtual void DebugViewRenderObject (iBugPlugRenderObject* obj) = 0;
 

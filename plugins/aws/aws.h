@@ -86,13 +86,13 @@ private:
   /// The current component that has keyboard focus.
   iAwsComponent *keyb_focus;
 
-  /// The current component that has mouse focus locked, if there is one, NULL otherwise.
+  /// The current component that has mouse focus locked, if there is one, 0 otherwise.
   iAwsComponent *mouse_focus;
 
-  /// The focused component, NULL otherwise.
+  /// The focused component, 0 otherwise.
   iAwsComponent *focused;
 
-  /// The current modal dialog, NULL if otherwise.
+  /// The current modal dialog, 0 if otherwise.
   iAwsComponent *modal_dialog;
 
   /// True if mouse events are locked into the top window
@@ -373,7 +373,7 @@ private:
 public:
     EventHandler(awsManager * parent)
     {
-      SCF_CONSTRUCT_IBASE(NULL);
+      SCF_CONSTRUCT_IBASE(0);
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;

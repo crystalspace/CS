@@ -58,9 +58,9 @@ extern int ApplicationShow;
 
 void SystemFatalError (char *s)
 {
-  ChangeDisplaySettings (NULL, 0);  // doesn't hurt
+  ChangeDisplaySettings (0, 0);  // doesn't hurt
   fprintf(stderr, "FATAL: %s\n", s);
-  MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
+  MessageBox(0, s, "Fatal Error", MB_OK | MB_ICONSTOP);
 }
 
 #define MAX_SCANCODE 0x100
@@ -142,10 +142,10 @@ static unsigned short ScanCodeToChar [MAX_SCANCODE] =
 // kills the whole process. It's brutal, but as I use another thread,
 // it's safer this way
 #define CHK_FAILED(x) \
-  { if(FAILED(x)) { MessageBox(NULL, #x " Failed!", NULL,MB_OK|MB_ICONERROR); ::ExitProcess(1); } }
+  { if(FAILED(x)) { MessageBox(0, #x " Failed!", 0,MB_OK|MB_ICONERROR); ::ExitProcess(1); } }
 // This macro is for COM Release calls
 #define CHK_RELEASE(x) \
-  { if((x) != NULL) { (x)->Release(); (x)=NULL; } }
+  { if((x) != 0) { (x)->Release(); (x)=0; } }
 
 /*
  * The thread entry point. Called by ::Open()
@@ -162,26 +162,26 @@ DWORD WINAPI s_threadroutine (LPVOID param)
   char *buffer;
   int i,lastkey = -1;
 #ifndef DI_USEGETDEVICEDATA
-  char *oldbuffer = NULL;
+  char *oldbuffer = 0;
 #endif
-  LPDIRECTINPUT lpdi = NULL;
-  LPDIRECTINPUTDEVICE lpKbd = NULL;
+  LPDIRECTINPUT lpdi = 0;
+  LPDIRECTINPUTDEVICE lpKbd = 0;
   //Setup for directinput mouse code
-  LPDIRECTINPUTDEVICE lpMouse = NULL;
+  LPDIRECTINPUTDEVICE lpMouse = 0;
 
   HANDLE hEvent [2];
 
-  CHK_FAILED (DirectInputCreate (ModuleHandle, DIRECTINPUT_VERSION, &lpdi, NULL));
-  CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, NULL));
+  CHK_FAILED (DirectInputCreate (ModuleHandle, DIRECTINPUT_VERSION, &lpdi, 0));
+  CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, 0));
   CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard));
-  CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, NULL),
+  CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, 0),
     DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 
   //Setup for directinput mouse code
 #if 0
-  CHK_FAILED(lpdi->CreateDevice (GUID_SysMouse, &lpMouse, NULL));
+  CHK_FAILED(lpdi->CreateDevice (GUID_SysMouse, &lpMouse, 0));
   CHK_FAILED(lpMouse->SetDataFormat(&c_dfDIMouse));
-  CHK_FAILED(lpMouse->SetCooperativeLevel(FindWindow (WINDOWCLASSNAME, NULL),
+  CHK_FAILED(lpMouse->SetCooperativeLevel(FindWindow (WINDOWCLASSNAME, 0),
     DISCL_EXCLUSIVE | DISCL_FOREGROUND));
   hevtMouse = CreateEvent(0, 0, 0, 0);
   CHK_FAILED(lpMouse->SetEventNotification(g_hevtMouse));
@@ -215,16 +215,16 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #endif
   }
 #endif
-  hEvent [0] = CreateEvent (NULL, FALSE, FALSE, NULL);
-  if (hEvent [0] == NULL)
+  hEvent [0] = CreateEvent (0, FALSE, FALSE, 0);
+  if (hEvent [0] == 0)
   {
-    MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
+    MessageBox (0, "CreateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
     ExitProcess (1);
   }
   if (!DuplicateHandle (GetCurrentProcess(), ((SysSystemDriver*)System)->m_hEvent,
                         GetCurrentProcess (), &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
   {
-    MessageBox (NULL, "DuplicateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
+    MessageBox (0, "DuplicateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
     ExitProcess (1);
   }
 
@@ -234,7 +234,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
     case DI_OK:
       break;
     default:
-      MessageBox (NULL, "lpKbd->SetEventNotification(hEvent) Failed!", NULL,
+      MessageBox (0, "lpKbd->SetEventNotification(hEvent) Failed!", 0,
         MB_OK|MB_ICONERROR);
       ExitProcess (1);
       break;
@@ -281,8 +281,8 @@ DWORD WINAPI s_threadroutine (LPVOID param)
             case DI_OK:
               break;
             default:
-              MessageBox (NULL, "lpKbd->GetDeviceState(hEvent) Failed!",
-                NULL, MB_OK|MB_ICONERROR);
+              MessageBox (0, "lpKbd->GetDeviceState(hEvent) Failed!",
+                0, MB_OK|MB_ICONERROR);
               ExitProcess (1);
               break;
           }
@@ -312,7 +312,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
         do
         {
           dwNb = INFINITE;
-          hr = lpKbd->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), NULL, &dwNb,DIGDD_PEEK);
+          hr = lpKbd->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), 0, &dwNb,DIGDD_PEEK);
           switch(hr)
           {
             case DIERR_NOTACQUIRED:
@@ -325,8 +325,8 @@ DWORD WINAPI s_threadroutine (LPVOID param)
               hr = DI_OK;
               break;
             default:
-              MessageBox(NULL, "lpKbd->GetDeviceState(hEvent) Failed!",
-                NULL, MB_OK|MB_ICONERROR);
+              MessageBox(0, "lpKbd->GetDeviceState(hEvent) Failed!",
+                0, MB_OK|MB_ICONERROR);
               ExitProcess (1);
               break;
           }
@@ -368,8 +368,8 @@ DWORD WINAPI s_threadroutine (LPVOID param)
             case DI_OK:
               break;
             default:
-              MessageBox (NULL, "lpKbd->GetDeviceState(hEvent) Failed!",
-                NULL, MB_OK|MB_ICONERROR);
+              MessageBox (0, "lpKbd->GetDeviceState(hEvent) Failed!",
+                0, MB_OK|MB_ICONERROR);
               ExitProcess (1);
               break;
           }
@@ -496,7 +496,7 @@ static inline bool AddToPathEnv (char *dir, char **pathEnv)
 	    gotpath = true;
 	  }
         }
-        ppos = npos ? strstr (npos+1, dir) : NULL;
+        ppos = npos ? strstr (npos+1, dir) : 0;
       }
       delete[] mypath;
     }
@@ -575,8 +575,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  if (ModuleHandle == NULL)
-    ModuleHandle = GetModuleHandle(NULL);
+  if (ModuleHandle == 0)
+    ModuleHandle = GetModuleHandle(0);
 
 // Cygwin has problems with freopen()
 #if defined(CS_DEBUG) || defined(__CYGWIN__)
@@ -621,7 +621,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   registry->IncRef();
 
   WNDCLASS wc;
-  wc.hCursor        = NULL;
+  wc.hCursor        = 0;
   // try the app icon...
   wc.hIcon          = LoadIcon (ModuleHandle, MAKEINTRESOURCE(1));
   // not? maybe executable.ico?
@@ -643,8 +643,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
       0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
   }
   // finally the default one
-  if (!wc.hIcon) wc.hIcon = LoadIcon (NULL, IDI_APPLICATION);
-  wc.lpszMenuName   = NULL;
+  if (!wc.hIcon) wc.hIcon = LoadIcon (0, IDI_APPLICATION);
+  wc.lpszMenuName   = 0;
   wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
   wc.hbrBackground  = ::CreateSolidBrush(RGB(0, 0, 0));
   wc.hInstance      = ModuleHandle;
@@ -660,7 +660,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
-  CS_ASSERT (q != NULL);
+  CS_ASSERT (q != 0);
   q->RegisterListener (this, CSMASK_Nothing | CSMASK_Broadcast);
 }
 
@@ -720,9 +720,9 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   if (e.Command.Code == cscmdPreProcess)
   {
     MSG msg;
-    while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
+    while (PeekMessage (&msg, 0, 0, 0, PM_NOREMOVE))
     {
-      if (!GetMessage (&msg, NULL, 0, 0))
+      if (!GetMessage (&msg, 0, 0, 0))
       {
         iEventOutlet* outlet = GetEventOutlet();
         outlet->Broadcast (cscmdQuit);
@@ -737,12 +737,12 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   {
 #   ifdef DO_DINPUT_KEYBOARD
     DWORD dwThreadId;
-    m_hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
+    m_hEvent = CreateEvent (0, FALSE, FALSE, 0);
     m_hThread =
-      CreateThread (NULL, 0, s_threadroutine, EventOutlet, 0, &dwThreadId);
+      CreateThread (0, 0, s_threadroutine, EventOutlet, 0, &dwThreadId);
     if (!m_hEvent || !m_hThread)
     {
-      MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
+      MessageBox (0, "CreateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
       ExitProcess (1);
     }
 #   endif
@@ -755,10 +755,10 @@ bool Win32Assistant::HandleEvent (iEvent& e)
     {
       SetEvent (m_hEvent);
       CloseHandle (m_hEvent);
-      m_hEvent = NULL;
+      m_hEvent = 0;
       WaitForSingleObject (m_hThread, 1000);
       CloseHandle (m_hThread);
-      m_hThread = NULL;
+      m_hThread = 0;
     }
 #   endif
   } 
@@ -995,12 +995,12 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	if ( (wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED) )
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasExposed, NULL);
+	  outlet->Broadcast (cscmdCanvasExposed, 0);
 	} 
 	else if (wParam == SIZE_MINIMIZED) 
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasHidden, NULL);
+	  outlet->Broadcast (cscmdCanvasHidden, 0);
 	}
       }
       return TRUE;
@@ -1012,12 +1012,12 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	if (wParam)
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasExposed, NULL);
+	  outlet->Broadcast (cscmdCanvasExposed, 0);
 	} 
 	else
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasHidden, NULL);
+	  outlet->Broadcast (cscmdCanvasHidden, 0);
 	}
       }
       break;
@@ -1050,12 +1050,12 @@ bool Win32Assistant::SetCursor (int cursor)
   HCURSOR cur;
   if (CursorID)
   {
-    cur = ((CursorID != (char *)-1) ? LoadCursor (NULL, CursorID) : NULL);
+    cur = ((CursorID != (char *)-1) ? LoadCursor (0, CursorID) : 0);
     success = true;
   }
   else
   {
-    cur = NULL;
+    cur = 0;
     success = false;
   }
   SetWinCursor (cur);

@@ -84,7 +84,7 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
     }
   }
   else
-    mesh = NULL;
+    mesh = 0;
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {
@@ -114,7 +114,7 @@ PathOp::PathOp (csTicks t, const char* meshName, const char* pathName)
     }
   }
   else
-    mesh = NULL;
+    mesh = 0;
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {

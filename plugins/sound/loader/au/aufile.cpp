@@ -83,8 +83,8 @@ csSoundLoader_AU::LoadSound(void *databuf, uint32 size)
 {
   uint8 *buf = (uint8*) databuf;
   unsigned long index=0;
-  csSoundDataRaw *sb= NULL;
-  char *data=NULL;
+  csSoundDataRaw *sb= 0;
+  char *data=0;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
   unsigned long offset, nbytes, flag, freq, nchannels;
@@ -131,7 +131,7 @@ csSoundLoader_AU::LoadSound(void *databuf, uint32 size)
   if(flag==BIT8)
   {
     data=new char[nbytes];
-    if (data==NULL)
+    if (data==0)
       goto exit_read;
 
     unsigned long i=0;
@@ -148,7 +148,7 @@ csSoundLoader_AU::LoadSound(void *databuf, uint32 size)
   else if(flag==BIT16)
   {
     data=new char[nbytes];
-    if(data==NULL)
+    if(data==0)
       goto exit_read;
 
     int i=0;
@@ -165,7 +165,7 @@ csSoundLoader_AU::LoadSound(void *databuf, uint32 size)
   else if(flag==BIT8ULAW)
   {
     data=new char[nbytes*2];
-    if(data==NULL)
+    if(data==0)
       goto exit_read;
 
     int i=0;
@@ -183,7 +183,7 @@ csSoundLoader_AU::LoadSound(void *databuf, uint32 size)
   Format.Freq=freq;
   Format.Bits=(flag==BIT16 || flag==BIT8ULAW)?16:8;
   Format.Channels=nchannels;
-  sb=new csSoundDataRaw(NULL, data,
+  sb=new csSoundDataRaw(0, data,
     (flag==BIT16)?(nbytes/2)-1:nbytes-1, Format);
 
   goto exit_ok;

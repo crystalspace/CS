@@ -65,7 +65,7 @@ class csGlobalHashIterator
   friend class csGlobalHashIteratorReversible;
 
 private:
-  /// Next bucket we are iterating over. NULL if no more elements.
+  /// Next bucket we are iterating over. 0 if no more elements.
   csHashBucket* bucket;
   /// index of next item in bucket.
   int element_index;
@@ -115,7 +115,7 @@ class csHashIterator
   friend class csHashIteratorReversible;
 
 private:
-  /// Next bucket we are iterating over. NULL if no more elements.
+  /// Next bucket we are iterating over. 0 if no more elements.
   csHashBucket* bucket;
   /// index of next item in bucket.
   int element_index;
@@ -212,7 +212,7 @@ public:
   void Put (csHashKey key, csHashObject object);
 
   /**
-   * Get an object from this map. Returns NULL if object
+   * Get an object from this map. Returns 0 if object
    * is not there. If there are multiple elements with
    * the same key then a random one will be returned.
    * Use an iterator to iterate over all elements with

@@ -24,11 +24,11 @@
 
 csBezierLightPatch::csBezierLightPatch ()
 {
-  next = prev = NULL;
+  next = prev = 0;
   num_vertices = 0;
   max_vertices = 0;
-  vertices = NULL;
-  light = NULL;
+  vertices = 0;
+  light = 0;
 }
 
 csBezierLightPatch::~csBezierLightPatch ()
@@ -41,7 +41,7 @@ void csBezierLightPatch::RemovePatch ()
 {
   if (curve) curve->UnlinkLightPatch (this);
   shadows->DeleteShadows ();
-  light_frustum = NULL;
+  light_frustum = 0;
 }
 
 void csBezierLightPatch::Initialize (int n)

@@ -31,7 +31,7 @@ typedef int csArrayCompareKeyFunction (void* item, void* key);
  * in many cases you probably want to use csRefArray instead of csPArray.
  * If you want elements to be deleted (with 'delete') you can use
  * csPDelArray instead of this one.
- * Warning! This array doesn't initializate the pointer to NULL for
+ * Warning! This array doesn't initializate the pointer to 0 for
  * new elements in the array. You have to do that on your own.
  */
 template <class T>
@@ -54,7 +54,7 @@ public:
     if (limit != 0)
       root = (T**)malloc (limit * sizeof(T*));
     else
-      root = NULL;
+      root = 0;
   }
 
   /**
@@ -65,7 +65,7 @@ public:
     if (root)
     {
       free (root);
-      root = NULL;
+      root = 0;
       limit = count = 0;
     }
   }
@@ -91,7 +91,7 @@ public:
     destination.count = count;
     destination.limit = limit;
     destination.threshold = threshold;
-    root = NULL;
+    root = 0;
     limit = count = 0;
   }
 
@@ -105,7 +105,7 @@ public:
       n = ((n + threshold - 1) / threshold ) * threshold;
       if (!n)
         DeleteAll ();
-      else if (root == NULL)
+      else if (root == 0)
         root = (T**)malloc (n * sizeof(T*));
       else
         root = (T**)realloc (root, n * sizeof(T*));
@@ -286,7 +286,7 @@ public:
  * array. Use csRefArray if you want ref counting to happen. Note that
  * in many cases you probably want to use csRefArray instead of csPArray.
  * This array will delete elements (using 'delete') as needed.
- * This array properly initializes new elements in the array to NULL.
+ * This array properly initializes new elements in the array to 0.
  */
 template <class T>
 class csPDelArray
@@ -308,7 +308,7 @@ public:
     if (limit != 0)
       root = (T**)calloc (limit, sizeof(T*));
     else
-      root = NULL;
+      root = 0;
   }
 
   /**
@@ -322,7 +322,7 @@ public:
       for (i = 0 ; i < limit ; i++)
         delete root[i];
       free (root);
-      root = NULL;
+      root = 0;
       limit = count = 0;
     }
   }
@@ -348,7 +348,7 @@ public:
     destination.count = count;
     destination.limit = limit;
     destination.threshold = threshold;
-    root = NULL;
+    root = 0;
     limit = count = 0;
   }
 
@@ -357,7 +357,7 @@ public:
   {
     // Free all items between new count and old count.
     int i;
-    for (i = n ; i < count ; i++) { delete root[i]; root[i] = NULL; }
+    for (i = n ; i < count ; i++) { delete root[i]; root[i] = 0; }
 
     int old_count = count;
     count = n;
@@ -369,7 +369,7 @@ public:
       {
         DeleteAll ();
       }
-      else if (root == NULL)
+      else if (root == 0)
       {
         root = (T**)calloc (n, sizeof(T*));
       }
@@ -452,7 +452,7 @@ public:
   T* Pop ()
   {
     T* ret = root [count - 1];
-    root [count-1] = NULL;
+    root [count-1] = 0;
     SetLength (count - 1);
     return ret;
   }
@@ -465,14 +465,14 @@ public:
 
   /**
    * Get and clear the element 'n' from vector. This spot in the array
-   * will be set to NULL. You are responsible for deleting the returned
+   * will be set to 0. You are responsible for deleting the returned
    * pointer later.
    */
   T* GetAndClear (int n)
   {
     CS_ASSERT (n >= 0 && n < count);
     T* ret = root[n];
-    root[n] = NULL;
+    root[n] = 0;
     return ret;
   }
 
@@ -483,16 +483,16 @@ public:
    */
   T* Extract (int n)
   {
-    T* rc = NULL;
+    T* rc = 0;
     if (n >= 0 && n < count)
     {
-      rc = root[n]; root[n] = NULL;
+      rc = root[n]; root[n] = 0;
       const int ncount = count - 1;
       const int nmove = ncount - n;
       if (nmove > 0)
       {
         memmove (&root [n], &root [n + 1], nmove * sizeof (T*));
-	root[count-1] = NULL;	// Clear last element to prevent deletion.
+	root[count-1] = 0;	// Clear last element to prevent deletion.
       }
       SetLength (ncount);
     }

@@ -123,13 +123,13 @@ public:
   GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
 
   csPolyQueue () :
-    mat_handle (NULL), mixmode (~0), z_buf_mode (CS_ZBUF_NONE),
+    mat_handle (0), mixmode (~0), z_buf_mode (CS_ZBUF_NONE),
     flat_color_r (0), flat_color_g (0), flat_color_b (0),
     use_fog (false), num_vertices (0), max_vertices (0),
-    glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
-    fog_color (NULL), fog_txt (NULL),
+    glverts (0), gltxt (0), glcol (0), layer_gltxt (0),
+    fog_color (0), fog_txt (0),
     num_triangles (0), max_triangles (0),
-    tris (NULL) { }
+    tris (0) { }
 
   ~csPolyQueue ()
   {
@@ -436,7 +436,7 @@ protected:
     csVector2* poly;
     int num_poly;
     csPlane3 normal;
-    csClipPortal () : poly (NULL) { }
+    csClipPortal () : poly (0) { }
     ~csClipPortal () { delete[] poly; }
   };
   csPDelArray<csClipPortal> clipportal_stack;
@@ -653,7 +653,7 @@ public:
 
   /// Get address of Z-buffer at specific point
   virtual uint32 *GetZBuffAt (int, int)
-  { return NULL; }
+  { return 0; }
 
   /// Dump the texture cache.
   virtual void DumpCache ();
@@ -890,7 +890,7 @@ public:
   public:
     EventHandler (csGraphics3DOGLCommon* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;

@@ -87,8 +87,8 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
     : csApp (object_reg, Skin)
 {
   SetBackgroundStyle(csabsNothing);
-  menu = NULL;
-  dialog = NULL;
+  menu = 0;
+  dialog = 0;
   cammode = movenormal;
   spritepos = csVector3(0,10,0);
   move_sprite_speed = 0;
@@ -114,7 +114,7 @@ struct ModalData : public iBase
 {
   uint code;
   SCF_DECLARE_IBASE;
-  ModalData() { SCF_CONSTRUCT_IBASE(NULL); }
+  ModalData() { SCF_CONSTRUCT_IBASE(0); }
 };
 
 SCF_IMPLEMENT_IBASE (ModalData)
@@ -241,7 +241,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  char filename[1024];
 	  csQueryFileDialog (dialog, filename, sizeof(filename));
 	  delete dialog;
-	  dialog = NULL;
+	  dialog = 0;
 	  ModalData *data = (ModalData *) GetTopModalUserdata();
 
 	  switch (data->code)
@@ -408,7 +408,7 @@ void ViewMesh::ConstructMenu()
   (void)new csMenuItem(menu,"Load TextureLib", VIEWMESH_COMMAND_LOADLIB);
 
   // AnimMenu
-  csMenu *animmenu = new csMenu(NULL);
+  csMenu *animmenu = new csMenu(0);
   (void)new csMenuItem(animmenu,"Move Sprite Faster", VIEWMESH_COMMAND_MOVEANIMFASTER);
   (void)new csMenuItem(animmenu,"Move Sprite Slower", VIEWMESH_COMMAND_MOVEANIMSLOWER);
   (void)new csMenuItem(animmenu,"Reverse Action",     VIEWMESH_COMMAND_REVERSEACTION);
@@ -416,7 +416,7 @@ void ViewMesh::ConstructMenu()
   (void)new csMenuItem(menu, "Action Effects",animmenu);
 
   // StateMenu
-  csMenu *statesmenu = new csMenu(NULL);
+  csMenu *statesmenu = new csMenu(0);
   for (i=0;i<stateslist.Length();i++)
   {
     (void)new csMenuItem(statesmenu, stateslist.Get(i),
@@ -425,7 +425,7 @@ void ViewMesh::ConstructMenu()
   (void)new csMenuItem(menu, "States", statesmenu);
 
   // OverrideActionMenu
-  csMenu *overridemenu = new csMenu(NULL);
+  csMenu *overridemenu = new csMenu(0);
   for (i=0;i<stateslist.Length();i++)
   {
     (void)new csMenuItem(overridemenu, stateslist.Get(i),
@@ -434,7 +434,7 @@ void ViewMesh::ConstructMenu()
   (void)new csMenuItem(menu, "Overrides", overridemenu);
 
   // Camera Mode
-  csMenu *cammode = new csMenu(NULL);
+  csMenu *cammode = new csMenu(0);
   (void)new csMenuItem(cammode, "Normal Movement", VIEWMESH_COMMAND_CAMMODE1);
   (void)new csMenuItem(cammode, "Look to Origin", VIEWMESH_COMMAND_CAMMODE2);
   (void)new csMenuItem(cammode, "Rotate", VIEWMESH_COMMAND_CAMMODE3);
@@ -661,19 +661,19 @@ bool ViewMesh::Initialize ()
 
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
-  light = engine->CreateLight (NULL, csVector3 (-3, 10, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-3, 10, 0), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (3, 10,  0), 10,
+  light = engine->CreateLight (0, csVector3 (3, 10,  0), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 10, -3), 10,
+  light = engine->CreateLight (0, csVector3 (0, 10, -3), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 10,  3), 10,
+  light = engine->CreateLight (0, csVector3 (0, 10,  3), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
 
@@ -693,7 +693,7 @@ bool ViewMesh::Initialize ()
   const char* texturename = cmdline->GetName (2);
   const char* scaleTxt = cmdline->GetOption("Scale");
 
-  if (scaleTxt != NULL)
+  if (scaleTxt != 0)
   {
     sscanf (scaleTxt, "%f", &scale);
     printf ("Scaling: %f\n", scale);
@@ -718,7 +718,7 @@ bool ViewMesh::Initialize ()
   {
     iTextureWrapper* txt = loader->LoadTexture (texturename,
   	  texturefilename);
-    if (txt == NULL)
+    if (txt == 0)
     {
       Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s'!",
       	texturefilename);
@@ -755,13 +755,13 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
 
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   iObjectRegistry *object_reg = csInitializer::CreateEnvironment(argc, argv);
   if (!object_reg)
     return 1;
 
-  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  if (!csInitializer::SetupConfigManager (object_reg, 0))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.application.viewmesh", "Couldn't load config file!");

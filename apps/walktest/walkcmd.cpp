@@ -91,7 +91,7 @@ void SaveRecording (iVFS* vfs, const char* fName)
   cf->Write ((char*)&l, sizeof (l));
   int i;
   csRecordedCameraFile camint;
-  iSector* prev_sector = NULL;
+  iSector* prev_sector = 0;
   for (i = 0 ; i < Sys->recording.Length () ; i++)
   {
     csRecordedCamera* reccam = (csRecordedCamera*)Sys->recording[i];
@@ -160,7 +160,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
   cf->Read ((char*)&l, sizeof (l));
   l = convert_endian (l);
   csRecordedCameraFile camint;
-  iSector* prev_sector = NULL;
+  iSector* prev_sector = 0;
   int i;
   for (i = 0 ; i < l ; i++)
   {
@@ -198,7 +198,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
     cf->Read ((char*)&len, 1);
     if (len == 100)
     {
-      reccam->cmd = NULL;
+      reccam->cmd = 0;
     }
     else
     {
@@ -208,7 +208,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
     cf->Read ((char*)&len, 1);
     if (len == 100)
     {
-      reccam->arg = NULL;
+      reccam->arg = 0;
     }
     else
     {
@@ -456,7 +456,7 @@ iMeshWrapper* GenerateSprite(const char* tname, char* sname, iSector* where,
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Unknown mesh factory '%s'!", tname);
-    return NULL;
+    return 0;
   }
   csRef<iMeshWrapper> spr (Sys->Engine->CreateMeshWrapper (tmpl, sname));
   spr->GetMovable()->SetPosition(where, pos);
@@ -475,7 +475,7 @@ iMeshWrapper* add_meshobj (const char* tname, char* sname, iSector* where,
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Unknown mesh factory '%s'!", tname);
-    return NULL;
+    return 0;
   }
   csRef<iMeshWrapper> spr (
   	Sys->Engine->CreateMeshWrapper (tmpl, sname, where, pos));
@@ -635,7 +635,7 @@ char* LookForKeyValue (iObjectIterator* it,const char* key)
     it->Next();
   }
   delete[] value;
-  return NULL;
+  return 0;
 }
 
 /**
@@ -1108,13 +1108,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       int idx;
       sscanf (arg, "%d", &idx);
       int i = 0;
-      iBase* plugin = NULL;
+      iBase* plugin = 0;
       csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
       while (it->HasNext ())
       {
         plugin = it->Next ();
         if (idx == i) break;
-        plugin = NULL;
+        plugin = 0;
         i++;
       }
 
@@ -1176,13 +1176,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       int idx;
       csScanStr (arg, "%d,%s,%s", &idx, name, val);
       int i = 0;
-      iBase* plugin = NULL;
+      iBase* plugin = 0;
       csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
       while (it->HasNext ())
       {
         plugin = it->Next ();
         if (idx == i) break;
-        plugin = NULL;
+        plugin = 0;
         i++;
       }
 
@@ -1227,9 +1227,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->perf_stats && Sys->recorded_perf_stats)
       Sys->perf_stats->FinishSubsection ();
-    Sys->recorded_perf_stats = NULL;
+    Sys->recorded_perf_stats = 0;
     delete [] Sys->recorded_perf_stats_name;
-    Sys->recorded_perf_stats_name = NULL;
+    Sys->recorded_perf_stats_name = 0;
     if (arg)
     {
       char buf[255];
@@ -1254,7 +1254,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Start recording camera movement...");
       if (Sys->perf_stats)
-        Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (NULL);
+        Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (0);
     }
     else
     {
@@ -1263,7 +1263,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       	"Stop recording.");
       if (Sys->perf_stats)
         Sys->perf_stats->FinishSubsection ();
-      Sys->recorded_perf_stats = NULL;
+      Sys->recorded_perf_stats = 0;
     }
   }
   else if (!strcasecmp (cmd, "play"))
@@ -1313,7 +1313,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
       if (Sys->perf_stats)
         Sys->perf_stats->FinishSubsection ();
-      Sys->recorded_perf_stats = NULL;
+      Sys->recorded_perf_stats = 0;
     }
   }
   else if (!strcasecmp (cmd, "recsubperf"))
@@ -1390,7 +1390,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #if 0
     csRadiosity* rad;
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    if ((rad = engine->GetRadiosity ()) != NULL)
+    if ((rad = engine->GetRadiosity ()) != 0)
     {
       int steps;
       if (arg)
@@ -1408,7 +1408,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #if 0
     csRadiosity* rad;
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    if ((rad = engine->GetRadiosity ()) != NULL)
+    if ((rad = engine->GetRadiosity ()) != 0)
     {
       rad->ToggleShowDeltaMaps ();
       engine->InvalidateLightmaps ();
@@ -1420,7 +1420,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #if 0
     csRadiosity* rad;
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    if ((rad = engine->GetRadiosity ()) != NULL)
+    if ((rad = engine->GetRadiosity ()) != 0)
     {
       csRef<iPolygon3D> p (SCF_QUERY_INTERFACE (rad->GetNextPolygon (),
       	iPolygon3D));
@@ -1453,7 +1453,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
 #if 0
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon3D (arg) : (csPolygon3D*)NULL;
+    csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon3D (arg) : (csPolygon3D*)0;
     if (hi) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Hilighting polygon: '%s'", arg);
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Disabled hilighting.");
@@ -2118,7 +2118,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_CMD (cmd);
     csRef<iLightIterator> lit (Sys->view->GetEngine ()->GetLightIterator ());
     iLight* l;
-    while ((l = lit->Fetch ()) != NULL)
+    while ((l = lit->Fetch ()) != 0)
     {
       l->SetColor (csColor (0, 0, 0));
     }
@@ -2170,7 +2170,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "dellight"))
   {
     iDynLight* dyn;
-    if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
+    if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != 0)
     {
       Sys->view->GetEngine ()->RemoveDynLight (dyn);
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light deleted.");
@@ -2180,7 +2180,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_CMD (cmd);
     iDynLight* dyn;
-    while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
+    while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != 0)
     {
       Sys->view->GetEngine ()->RemoveDynLight (dyn);
     }
@@ -2270,7 +2270,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     // disable farplane
     if (distance==0)
     {
-	Sys->view->GetCamera()->SetFarPlane(NULL);
+	Sys->view->GetCamera()->SetFarPlane(0);
 	// we can't disable zclear now... because we can't say for sure that
 	// the level didn't need it
 	Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "farplane disabled");

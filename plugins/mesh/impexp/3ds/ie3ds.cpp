@@ -150,7 +150,7 @@ const csModelConverterFormat *csModelConverter3ds::GetFormat( int idx )
   if( idx == 0 )
     return &FormatInfo;
   else
-    return NULL;
+    return 0;
 }
 
 
@@ -397,7 +397,7 @@ csPtr<iModelData> csModelConverter3ds::Load( uint8* buffer, uint32 size )
   /***  send the buffer in to be translated  ***/
   p3dsFile = LoadFileData( buffer, size );
   if( !p3dsFile )
-    return NULL; // kick out if there is a problem
+    return 0; // kick out if there is a problem
 
   // make a new instance of iModelData
   pModelData = new csModelData( );
@@ -421,7 +421,7 @@ Lib3dsCamera *pCurCamera;
 
     // now process that camera
     if( !LoadCameraData( pDataCamera, pCurCamera ) )
-      return NULL;
+      return 0;
 
     // get the next camera in the chain
     pCurCamera = pCurCamera->next;
@@ -444,7 +444,7 @@ Lib3dsLight *pCurLight;
 
     // now process that light
     if( !LoadLightData( pDataLight, pCurLight) )
-      return NULL;
+      return 0;
 
     // get the next light in the chain
     pCurLight = pCurLight->next;
@@ -467,7 +467,7 @@ Lib3dsMaterial *pCurMaterial;
 
     // now process that material
     if( !LoadMeshObjectData( pDataMaterial, pCurMaterial) )
-      return NULL;
+      return 0;
 
     // get the next material in the chain
     pCurMaterial = pCurMaterial->next;
@@ -495,7 +495,7 @@ Lib3dsMaterial *pCurMaterial;
 
     // now process that mesh
     if( !LoadMeshObjectData( pDataObject, pCurMesh, p3dsFile->materials) )
-      return NULL;
+      return 0;
 
     pDataObject->DecRef ();
 
@@ -513,7 +513,7 @@ csPtr<iDataBuffer> csModelConverter3ds::Save( iModelData* /*pMdl*/,
 {
   // not yet supported
 
-  return NULL;
+  return 0;
 }
 
 bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
@@ -589,7 +589,7 @@ Lib3dsFile *csModelConverter3ds::LoadFileData( uint8* pBuffer, uint32 size )
 
   pFile = lib3ds_file_new();
   if( !pFile )
-    return NULL;
+    return 0;
 
   // create a data stream from the buffer and don't delete it
   pData = new csDataStream( pBuffer, size, false );
@@ -606,17 +606,17 @@ Lib3dsFile *csModelConverter3ds::LoadFileData( uint8* pBuffer, uint32 size )
   if( !pLibIO )
   {
     lib3ds_file_free( pFile );
-    return NULL;
+    return 0;
   }
 
   if ( !lib3ds_file_read( pFile, pLibIO ) )
   {
     lib3ds_file_free( pFile );
-    return NULL;
+    return 0;
   }
 
   if( !pFile )
-    return NULL;
+    return 0;
 
   lib3ds_io_free( pLibIO );
   return pFile;

@@ -124,7 +124,7 @@ struct TriPolygonMesh : public iPolygonMesh
 
   TriPolygonMesh ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     vt_idx[0] = 0;
     vt_idx[1] = 1;
     vt_idx[2] = 2;
@@ -176,7 +176,7 @@ csPtr<iString> csRapidCollideSystem::Debug_UnitTest ()
   tri2->DecRef ();
 
   rc->DecRef ();
-  return NULL;
+  return 0;
 }
 
 //-------------------------------------------------------------------------

@@ -142,7 +142,7 @@ static int DoStuff (iObjectRegistry* object_reg)
 int main (int argc, char* argv[])
 {
   // Initialize the random number generator
-  srand (time (NULL));
+  srand (time (0));
 
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg)

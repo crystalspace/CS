@@ -137,21 +137,21 @@ CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo2, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo3, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo4, csClipInfo, [100])
 
-static ogl_g3dcom_tr_verts *tr_verts = NULL;
-static ogl_g3dcom_uv_verts *uv_verts = NULL;
-static ogl_g3dcom_uv_mul_verts *uv_mul_verts = NULL;
-static ogl_g3dcom_color_verts *color_verts = NULL;
-static ogl_g3dcom_rgba_verts *rgba_verts = NULL;
-static ogl_g3dcom_clipped_triangles *clipped_triangles = NULL;
-static ogl_g3dcom_clipped_translate *clipped_translate = NULL;
-static ogl_g3dcom_clipped_plane *clipped_plane = NULL;
-static ogl_g3dcom_clipped_vertices *clipped_vertices = NULL;
-static ogl_g3dcom_clipped_texels *clipped_texels = NULL;
-static ogl_g3dcom_clipped_colors *clipped_colors = NULL;
-static ogl_g3dcom_clipped_fog *clipped_fog = NULL;
+static ogl_g3dcom_tr_verts *tr_verts = 0;
+static ogl_g3dcom_uv_verts *uv_verts = 0;
+static ogl_g3dcom_uv_mul_verts *uv_mul_verts = 0;
+static ogl_g3dcom_color_verts *color_verts = 0;
+static ogl_g3dcom_rgba_verts *rgba_verts = 0;
+static ogl_g3dcom_clipped_triangles *clipped_triangles = 0;
+static ogl_g3dcom_clipped_translate *clipped_translate = 0;
+static ogl_g3dcom_clipped_plane *clipped_plane = 0;
+static ogl_g3dcom_clipped_vertices *clipped_vertices = 0;
+static ogl_g3dcom_clipped_texels *clipped_texels = 0;
+static ogl_g3dcom_clipped_colors *clipped_colors = 0;
+static ogl_g3dcom_clipped_fog *clipped_fog = 0;
 static ogl_g3dcom_clipped_user *clipped_user[CS_VBUF_TOTAL_USERA] = {
-  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0 };
 
 /*=========================================================================
  Method implementations
@@ -175,8 +175,8 @@ SCF_IMPLEMENT_IBASE (csGraphics3DOGLCommon::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
-csGLStateCache* csGraphics3DOGLCommon::statecache = NULL;
+csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = 0;
+csGLStateCache* csGraphics3DOGLCommon::statecache = 0;
 
 #define USE_OGL_EXT(ext) \
   bool csGraphics3DOGLCommon::ext = false;
@@ -186,7 +186,7 @@ csGLStateCache* csGraphics3DOGLCommon::statecache = NULL;
 # define _CSGLEXT_
 # define CSGL_FOR_ALL
 # define CSGL_FUNCTION(fType,fName) \
-fType  csGraphics3DOGLCommon::fName = (fType) NULL;
+fType  csGraphics3DOGLCommon::fName = (fType) 0;
 # include "csglext.h"
 # undef CSGL_FUNCTION
 
@@ -195,19 +195,19 @@ float sAc, sBc, sCc, sDc;
 //csVector3 sV;
 
 csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
-  object_reg (NULL)
+  object_reg (0)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
 
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 
   ogl_g3d = this;
-  texture_cache = NULL;
-  lightmap_cache = NULL;
-  txtmgr = NULL;
-  vbufmgr = NULL;
+  texture_cache = 0;
+  lightmap_cache = 0;
+  txtmgr = 0;
+  vbufmgr = 0;
   m_fogtexturehandle = 0;
   fps_limit = 0;
   debug_edges = false;
@@ -235,7 +235,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   clip_outer[2] = OPENGL_CLIP_SOFTWARE;
 
   ARB_texture_compression = false;
-  clipper = NULL;
+  clipper = 0;
   cliptype = CS_CLIPPER_NONE;
   toplevel_init = false;
   stencil_init = false;
@@ -342,7 +342,7 @@ void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)
 bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
-  CS_ASSERT (object_reg != NULL);
+  CS_ASSERT (object_reg != 0);
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
@@ -444,7 +444,7 @@ bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
 
 bool csGraphics3DOGLCommon::NewInitialize ()
 {
-  CS_ASSERT (object_reg != NULL);
+  CS_ASSERT (object_reg != 0);
   config.AddConfig(object_reg, "/config/opengl.cfg");
 
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
@@ -524,8 +524,8 @@ void csGraphics3DOGLCommon::PerfTest ()
   mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   mesh.mixmode = CS_FX_GOURAUD;
   mesh.morph_factor = 0;
-  mesh.mat_handle = NULL;
-  mesh.vertex_fog = NULL;
+  mesh.mat_handle = 0;
+  mesh.vertex_fog = 0;
   mesh.do_mirror = false;
   mesh.triangles = new csTriangle [mesh.num_triangles];
   csVector3* vertices = new csVector3 [num_vertices];
@@ -761,10 +761,10 @@ void csGraphics3DOGLCommon::PerfTest ()
   config->SetStr ("Video.OpenGL.ClipOptional", buf);
   config->Save ();
 
-  SetClipper (NULL, CS_CLIPPER_NONE);
+  SetClipper (0, CS_CLIPPER_NONE);
 
   FinishDraw ();
-  Print (NULL);
+  Print (0);
 }
 
 void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
@@ -800,7 +800,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
 #define OGLCONFIGS_PREFIX "Video.OpenGL.Config."
 #define OGLCONFIGS_SUFFIX ".config"
 
-  CS_ASSERT (object_reg != NULL);
+  CS_ASSERT (object_reg != 0);
 
   const char *sGL_RENDERER   = (const char *)glGetString (GL_RENDERER);
   const char *sGL_VENDOR     = (const char *)glGetString (GL_VENDOR);
@@ -993,14 +993,14 @@ bool csGraphics3DOGLCommon::NewOpen ()
     { "add", GL_ONE, GL_ONE } ,
     { "coloradd", GL_ONE, GL_SRC_COLOR } ,
     { "ps2tristage", (GLenum)696969, (GLenum)696969 } ,
-    { NULL, GL_DST_COLOR, GL_ZERO }
+    { 0, GL_DST_COLOR, GL_ZERO }
   };
 
   // try to match user's blend name with a name in the blendstyles table
   const char *lightmapstyle = config->GetStr
         ("Video.OpenGL.LightmapMode","multiplydouble");
   int bl_idx = 0;
-  while (blendstyles[bl_idx].blendstylename != NULL)
+  while (blendstyles[bl_idx].blendstylename != 0)
   {
     if (strcmp (lightmapstyle, blendstyles[bl_idx].blendstylename) == 0)
     {
@@ -1202,11 +1202,11 @@ void csGraphics3DOGLCommon::Close ()
   if (txtmgr)
   {
     txtmgr->Clear ();
-    txtmgr->DecRef (); txtmgr = NULL;
+    txtmgr->DecRef (); txtmgr = 0;
   }
   if (vbufmgr)
   {
-    vbufmgr->DecRef (); vbufmgr = NULL;
+    vbufmgr->DecRef (); vbufmgr = 0;
   }
 
   if (texture_cache)
@@ -1216,12 +1216,12 @@ void csGraphics3DOGLCommon::Close ()
       ((float)texture_cache->GetPeakTotalTextureSize() / (1024.0f * 1024.0f)));
   }
 
-  delete texture_cache; texture_cache = NULL;
-  delete lightmap_cache; lightmap_cache = NULL;
+  delete texture_cache; texture_cache = 0;
+  delete lightmap_cache; lightmap_cache = 0;
   if (clipper)
   {
     clipper->DecRef ();
-    clipper = NULL;
+    clipper = 0;
     cliptype = CS_CLIPPER_NONE;
   }
 
@@ -1519,7 +1519,7 @@ void csGraphics3DOGLCommon::FinishDraw ()
       	  txt_w, txt_h, 0);
     }
   }
-  render_target = NULL;
+  render_target = 0;
 }
 
 void csGraphics3DOGLCommon::Print (csRect * area)
@@ -1916,9 +1916,9 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   if (queue.num_triangles <= 0) return;
 
   csMaterialHandle* mat_handle = (csMaterialHandle*)queue.mat_handle;
-  iTextureHandle* txt_handle = NULL;
-  csTextureHandleOpenGL *txt_mm = NULL;
-  csTxtCacheData *texturecache_data = NULL;
+  iTextureHandle* txt_handle = 0;
+  csTextureHandleOpenGL *txt_mm = 0;
+  csTxtCacheData *texturecache_data = 0;
   GLuint texturehandle = 0;
   bool multimat = false;
   bool tex_transp = false;
@@ -2223,7 +2223,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
-  iTextureHandle *txt = poly.mat_handle?poly.mat_handle->GetTexture():NULL;
+  iTextureHandle *txt = poly.mat_handle?poly.mat_handle->GetTexture():0;
   float alpha = ((poly.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)?
     (poly.mixmode & CS_FX_MASK_ALPHA)/255.0f:1.0f;
 
@@ -2321,9 +2321,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   bool tex_transp = false;
   bool multimat = false;
   csMaterialHandle* mat_handle = (csMaterialHandle*)poly.mat_handle;
-  iTextureHandle* txt_handle = NULL;
-  csTextureHandleOpenGL *txt_mm = NULL;
-  csTxtCacheData *texturecache_data = NULL;
+  iTextureHandle* txt_handle = 0;
+  csTextureHandleOpenGL *txt_mm = 0;
+  csTxtCacheData *texturecache_data = 0;
   GLuint texturehandle = 0;
   bool tex_flip = false;
 
@@ -2607,7 +2607,7 @@ void csGraphics3DOGLCommon::DrawPolygonStartMaterial (
 {
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
-  iTextureHandle *txt = mat_handle?mat_handle->GetTexture():NULL;
+  iTextureHandle *txt = mat_handle?mat_handle->GetTexture():0;
   dp_alpha = ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)?
     (mixmode & CS_FX_MASK_ALPHA)/255.0f:1.0f;
 
@@ -2618,9 +2618,9 @@ void csGraphics3DOGLCommon::DrawPolygonStartMaterial (
   bool tex_transp = false;
   bool multimat = false;
   csMaterialHandle* cs_mat_handle = (csMaterialHandle*)mat_handle;
-  iTextureHandle* txt_handle = NULL;
-  csTextureHandleOpenGL *txt_mm = NULL;
-  csTxtCacheData *texturecache_data = NULL;
+  iTextureHandle* txt_handle = 0;
+  csTextureHandleOpenGL *txt_mm = 0;
+  csTxtCacheData *texturecache_data = 0;
   GLuint texturehandle = 0;
 
   if (cs_mat_handle)
@@ -3136,7 +3136,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   if (poly.num < 3) return;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
-  if (poly.mat_handle == NULL)
+  if (poly.mat_handle == 0)
   {
     flat_r = BYTE_TO_FLOAT (poly.flat_color_r);
     flat_g = BYTE_TO_FLOAT (poly.flat_color_g);
@@ -3621,7 +3621,7 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
       if (userarrays)
       {
         for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
-          if (userarrays[u] != NULL)
+          if (userarrays[u] != 0)
           {
             for (int c=0; c<userarraycomponents[u]; c++)
               (*clipped_user[u])[num_clipped_vertices] =
@@ -3723,7 +3723,7 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
 	    clip_texels,
 	    clip_colors,
 	    clipped_userpointers,
-	    vertex_fog != NULL ? clip_fog : NULL);
+	    vertex_fog != 0 ? clip_fog : 0);
 	  clip_vertices[num_clipped_vertices] = poly[j]+frust_origin;
 	  clipinfo[j].original.idx = num_clipped_vertices;
 	  num_clipped_vertices++;
@@ -3759,9 +3759,9 @@ typedef csGrowingArray<bool> dpmesh_visible;
 CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_visible, dpmesh_visible, ())
 
 #if 0
-static dpmesh_tr_verts *dp_tr_verts = NULL;
-static dpmesh_persp *dp_persp = NULL;
-static dpmesh_visible *dp_visible = NULL;
+static dpmesh_tr_verts *dp_tr_verts = 0;
+static dpmesh_persp *dp_persp = 0;
+static dpmesh_visible *dp_visible = 0;
 #endif
 
 struct DTM_Info
@@ -3805,7 +3805,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   trimesh.clip_portal = mesh.clip_portal;
   trimesh.clip_z_plane = mesh.clip_z_plane;
   trimesh.do_fog = false;
-  trimesh.vertex_fog = NULL;
+  trimesh.vertex_fog = 0;
   trimesh.do_mirror = mesh.do_mirror;
   trimesh.mixmode = mesh.mixmode;
   if (mesh.vertex_mode == G3DPolygonMesh::VM_VIEWSPACE)
@@ -3822,10 +3822,10 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   csVector2* total_lumels = polbuf->GetTotalLumels ();
 
   csTrianglesPerMaterial *t = polbuf->GetFirst ();
-  vbman->LockBuffer (vb, total_verts, total_texels, NULL,
+  vbman->LockBuffer (vb, total_verts, total_texels, 0,
       total_verts_count, 0, polbuf->GetBoundingBox ());
   bool something_was_drawn = false;
-  while (t != NULL)
+  while (t != 0)
   {
     // Clear the vertex arrays in the polygon buffer since they are only
     // needed while building the polygon buffer. Not later.
@@ -3885,17 +3885,17 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   }
 
   trimesh.use_vertex_color = false;
-  trimesh.mat_handle = NULL;
+  trimesh.mat_handle = 0;
   SetupDTMEffect (trimesh);
 
   csTrianglesPerSuperLightmap *sln = polbuf->GetFirstTrianglesSLM ();
   if (m_renderstate.lighting && sln)
   {
-    vbman->LockBuffer (vb, total_verts, total_lumels, NULL,
+    vbman->LockBuffer (vb, total_verts, total_lumels, 0,
           total_verts_count, 0, polbuf->GetBoundingBox ());
     bool dirty = polbuf->superLM.GetLightmapsDirtyState ();
     bool modified = false;
-    while (sln != NULL)
+    while (sln != 0)
     {
       lightmap_cache->Cache (sln, dirty, &modified);
       if (!sln->cacheData->IsUnlit ())
@@ -3916,7 +3916,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   //===========
   if (mesh.do_fog)
   {
-    vbman->LockBuffer (vb, polbuf->GetVertices (), NULL, NULL,
+    vbman->LockBuffer (vb, polbuf->GetVertices (), 0, 0,
       polbuf->GetVertexCount (), 0, polbuf->GetBoundingBox ());
     trimesh.triangles = polbuf->GetTriangles ();
     trimesh.num_triangles = polbuf->GetTriangleCount ();
@@ -4269,7 +4269,7 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
 {
   if( (((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount() > 0) ||
       !mesh.mat_handle->GetTexture() )
-    return NULL;
+    return 0;
 
   switch (mesh.mixmode & (CS_FX_MASK_MIXMODE | CS_FX_EXTRA_MODES))
   {
@@ -4289,7 +4289,7 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
       return effectserver->SelectAppropriateTechnique(
         StockEffects[0][mesh.do_fog?1:0][4] );
     case CS_FX_ALPHA:
-      return NULL;/*effectserver->SelectAppropriateTechnique(
+      return 0;/*effectserver->SelectAppropriateTechnique(
          StockEffects[0][mesh.do_fog?1:0][5] );*/
     case CS_FX_TRANSPARENT:
       return effectserver->SelectAppropriateTechnique(
@@ -4717,7 +4717,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         num_triangles, num_vertices, triangles,
         work_verts, work_uv_verts, work_colors, work_userarrays,
         userarraycomponents,
-        mesh.do_fog ? work_fog : NULL,
+        mesh.do_fog ? work_fog : 0,
         num_triangles, num_vertices,
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
       work_verts = clipped_vertices->GetArray ();
@@ -4729,7 +4729,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         if (work_userarrays[i])
           work_userarrays[i] = clipped_user[i]->GetArray();
         else
-          work_userarrays[i] = NULL;
+          work_userarrays[i] = 0;
       }
     }
     triangles = clipped_triangles->GetArray ();
@@ -4900,7 +4900,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       }
 
       GLuint texturehandle = 0;
-      iTextureHandle* txt_handle = NULL;
+      iTextureHandle* txt_handle = 0;
 
       if (layer_data->inputtex==-1)
       {
@@ -5031,12 +5031,12 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   FlushDrawPolygon ();
-  //iTextureHandle *tex = mesh.mat_handle?mesh.mat_handle->GetTexture():NULL;
+  //iTextureHandle *tex = mesh.mat_handle?mesh.mat_handle->GetTexture():0;
 
   if (setup)
   {
-    ci.technique = NULL;
-    ci.effect = NULL;
+    ci.technique = 0;
+    ci.effect = 0;
     SetupDTMClipping (mesh);
   }
 
@@ -5131,8 +5131,8 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     {
       ClipTriangleMeshExact (
 	num_triangles, num_vertices, triangles,
-	work_verts, work_uv_verts, work_colors, NULL, NULL,
-	mesh.do_fog ? work_fog : NULL,
+	work_verts, work_uv_verts, work_colors, 0, 0,
+	mesh.do_fog ? work_fog : 0,
 	num_triangles, num_vertices,
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
       work_verts = clipped_vertices->GetArray ();
@@ -5164,7 +5164,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
 
   GLuint texturehandle = 0;
   bool txt_alpha = false;
-  csMaterialHandle* m_multimat = NULL;
+  csMaterialHandle* m_multimat = 0;
   if (mesh.mat_handle && m_renderstate.textured)
   {
     CacheTexture (mesh.mat_handle);
@@ -5194,8 +5194,8 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
 
   SetGLZBufferFlags (z_buf_mode);
 
-  csMaterialHandle* mat = NULL;
-  iTextureHandle* txt_handle = NULL;
+  csMaterialHandle* mat = 0;
+  iTextureHandle* txt_handle = 0;
   if (mesh.mat_handle)
   {
     txt_handle = mesh.mat_handle->GetTexture ();
@@ -5458,8 +5458,8 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
 
   if (setup)
   {
-    ci.technique = NULL;
-    ci.effect = NULL;
+    ci.technique = 0;
+    ci.effect = 0;
     SetupDTMClipping (mesh);
   }
 
@@ -5512,8 +5512,8 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
     {
       ClipTriangleMeshExact (
 	num_triangles, num_vertices, triangles,
-	work_verts, work_uv_verts, work_colors, NULL, NULL,
-	mesh.do_fog ? work_fog : NULL,
+	work_verts, work_uv_verts, work_colors, 0, 0,
+	mesh.do_fog ? work_fog : 0,
 	num_triangles, num_vertices,
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
       work_verts = clipped_vertices->GetArray ();
@@ -6462,7 +6462,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
         {
           if( (layer->GetStateString( layer_state ) == csInvalidStringID) &&
             (layer->GetStateFloat( layer_state ) == 0) &&
-            layer->GetStateOpaque( layer_state ) == NULL )
+            layer->GetStateOpaque( layer_state ) == 0 )
             return false;
           else if( layer->GetStateString( layer_state) == efstrings->fog)
             layer_data->inputtex = -1;

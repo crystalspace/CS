@@ -83,7 +83,7 @@ void aws3DFrame::Draw (
   csRectRegion our_todraw;
   csRectRegion our_todraw_txt;
 
-  if(todraw == NULL)
+  if(todraw == 0)
   {
     todraw = &our_todraw;
 	  todraw->makeEmpty();

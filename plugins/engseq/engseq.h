@@ -51,7 +51,7 @@ private:
 public:
   csEngineSequenceParameters ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~csEngineSequenceParameters () { }
 
@@ -71,7 +71,7 @@ public:
     int i;
     for (i = 0 ; i < params.Length () ; i++)
       if (!strcmp (name, params[i]->name)) return params[i]->value;
-    return NULL;
+    return 0;
   }
   virtual int GetParameterIdx (const char* name) const
   {
@@ -85,7 +85,7 @@ public:
     CS_ASSERT (idx >= 0 && idx < params.Length ());
     return params[idx]->name;
   }
-  virtual void AddParameter (const char* name, iBase* def_value = NULL)
+  virtual void AddParameter (const char* name, iBase* def_value = 0)
   {
     par* p = new par;
     p->name = csStrNew (name);
@@ -404,21 +404,21 @@ public:
     }
     virtual void AddConditionInSector (iSector* sector)
     {
-      scfParent->AddConditionInSector (sector, true, NULL, NULL);
+      scfParent->AddConditionInSector (sector, true, 0, 0);
     }
     virtual void AddConditionInSector (iSector* sector,
 	const csBox3& box)
     {
-      scfParent->AddConditionInSector (sector, true, &box, NULL);
+      scfParent->AddConditionInSector (sector, true, &box, 0);
     }
     virtual void AddConditionInSector (iSector* sector,
 	const csSphere& sphere)
     {
-      scfParent->AddConditionInSector (sector, true, NULL, &sphere);
+      scfParent->AddConditionInSector (sector, true, 0, &sphere);
     }
     virtual void AddConditionSectorVisible (iSector* sector)
     {
-      scfParent->AddConditionInSector (sector, false, NULL, NULL);
+      scfParent->AddConditionInSector (sector, false, 0, 0);
     }
     virtual void AddConditionMeshClick (iMeshWrapper* mesh)
     {
@@ -577,7 +577,7 @@ public:
   virtual bool RunSequenceByName (const char *name,int delay) const;
   virtual void FireTimedOperation (csTicks delta,
   	csTicks duration, iSequenceTimedOperation* op,
-	iBase* params = NULL);
+	iBase* params = 0);
 
   /**
    * Register a trigger that will be called whenever a mesh is clicked.
@@ -605,7 +605,7 @@ public:
   public:
     EventHandler (csEngineSequenceManager* p)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       parent = p;
     }
     SCF_DECLARE_IBASE;

@@ -68,7 +68,7 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  virtual void Print (csRect *area = NULL);
+  virtual void Print (csRect *area = 0);
 
   virtual bool PerformExtensionV (char const* command, va_list);
 
@@ -100,7 +100,7 @@ public:
       return (void*)glXGetProcAddressARB ((const GLubyte *)funcname);
 # else
       (void)funcname;
-      return (void*)NULL;
+      return (void*)0;
 # endif
     }
   } scfiOpenGLInterface;

@@ -75,11 +75,11 @@ public:
   virtual CTextureFile* CreateTexture(const char* texturename);
 
   /**
-    * Get Info about the given Texture. LumpNr can be NULL if you are not
+    * Get Info about the given Texture. LumpNr can be 0 if you are not
     * interested in that info. Returns false, if no info about that texture
     * can be found.
     */
-  bool GetQtexInfo(const char* Texture, miptex_t* pInfo, int* LumpNr=NULL);
+  bool GetQtexInfo(const char* Texture, miptex_t* pInfo, int* LumpNr=0);
 
 protected:
   bool Seek(int Pos);

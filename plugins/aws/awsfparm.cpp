@@ -21,14 +21,14 @@ SCF_IMPLEMENT_IBASE_END
 static unsigned long NameToID (const char *name)
 {
   return aws_adler32 (
-      aws_adler32 (0, NULL, 0),
+      aws_adler32 (0, 0, 0),
       (unsigned char *)name,
       strlen (name));
 }
 
 awsParmList::awsParmList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 awsParmList::~awsParmList ()
@@ -53,7 +53,7 @@ awsParmList::parmItem * awsParmList::FindParm (const char *_name, int type)
 
     if (item->name == name && item->type == type) return item;
   }
-  return NULL;
+  return 0;
 }
 void awsParmList::Clear ()
 {

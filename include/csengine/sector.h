@@ -116,7 +116,7 @@ class csRenderMeshList : public iSectorRenderMeshList
     {
       count = 0;
       lastFrame = (csTicks)-1;
-      lastView = NULL;
+      lastView = 0;
     }
   };
 
@@ -261,7 +261,7 @@ private:
 #endif // CS_USE_NEW_RENDERER
 
   /**
-   * The visibility culler for this sector or NULL if none.
+   * The visibility culler for this sector or 0 if none.
    * In future we should support more than one visibility culler probably.
    */
   csRef<iVisibilityCuller> culler;
@@ -402,7 +402,7 @@ public:
 
   /**
    * Get the visibility culler that is used for this sector.
-   * NULL if none.
+   * 0 if none.
    */
   iVisibilityCuller* GetVisibilityCuller ();
 
@@ -469,16 +469,16 @@ public:
 
   /**
    * Intersects world-space sphere with polygons of this set. Return
-   * polygon it hits with (or NULL) and the intersection point
+   * polygon it hits with (or 0) and the intersection point
    * in world coordinates. It will also return the polygon with the
    * closest hit (the most nearby polygon).
-   * If 'pr' != NULL it will also return the distance where the
+   * If 'pr' != 0 it will also return the distance where the
    * intersection happened.
    * Note. This function correctly accounts for portal polygons
    * and could thus return a polygon not belonging to this sector.
    */
   iPolygon3D* IntersectSphere (csVector3& center, float radius,
-                               float* pr = NULL);
+                               float* pr = 0);
 
   /**
    * Follow a segment starting at this sector. If the segment intersects
@@ -503,10 +503,10 @@ public:
 
   /**
    * Intersect world-space segment with polygons of this sector. Return
-   * polygon it intersects with (or NULL) and the intersection point
+   * polygon it intersects with (or 0) and the intersection point
    * in world coordinates.<p>
    *
-   * If 'pr' != NULL it will also return a value between 0 and 1
+   * If 'pr' != 0 it will also return a value between 0 and 1
    * indicating where on the 'start'-'end' vector the intersection
    * happened.<p>
    *
@@ -515,12 +515,12 @@ public:
    *
    * If 'only_portals' == true only portals are checked.<p>
    *
-   * If 'mesh' != NULL the mesh will be filled in.
+   * If 'mesh' != 0 the mesh will be filled in.
    */
   iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false,
-	iMeshWrapper** p_mesh = NULL);
+	float* pr = 0, bool only_portals = false,
+	iMeshWrapper** p_mesh = 0);
 
   /**
    * Calculate the bounding box of all objects in this sector.

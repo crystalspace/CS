@@ -27,7 +27,7 @@ SCF_IMPLEMENT_IBASE_END;
 
 csSoundHandle::csSoundHandle(csRef<iSoundData> s)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   Data = s;
   Registered = false;
@@ -45,7 +45,7 @@ void csSoundHandle::ReleaseSoundData()
 {
   if (Data)
   {
-    Data = NULL;
+    Data = 0;
   }
 }
 

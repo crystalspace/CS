@@ -40,7 +40,7 @@ class csIsoMaterial : public iMaterial
 private:
   /// flat shading color
   csRGBcolor flat_color;
-  /// the texture of the material (can be NULL)
+  /// the texture of the material (can be 0)
   csRef<iTextureHandle> texture;
 
   /// The diffuse reflection value of the material
@@ -71,9 +71,9 @@ public:
   /// Get the flat shading color
   inline csRGBcolor& GetFlatColor () { return flat_color; }
 
-  /// Get the texture (if none NULL is returned)
+  /// Get the texture (if none 0 is returned)
   inline iTextureHandle *GetTextureHandle () const { return texture; }
-  /// Set the texture (pass NULL to set no texture)
+  /// Set the texture (pass 0 to set no texture)
   inline void SetTextureHandle (iTextureHandle *tex) { texture = tex; }
 
   /// Get diffuse reflection constant for the material
@@ -104,7 +104,7 @@ public:
   /// Number of texture layers.
   virtual int GetTextureLayerCount () { return 0; }
   /// Get a texture layer.
-  virtual csTextureLayer* GetTextureLayer (int) { return NULL; }
+  virtual csTextureLayer* GetTextureLayer (int) { return 0; }
   /// Set the flat shading color
   virtual void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
   /// Get flat color.
@@ -228,7 +228,7 @@ class csIsoMaterialList : public csRefArray<csIsoMaterialWrapper>
 {
   /// the last possibly free index
   int lastindex;
-  /// get an unused index (NULL), expands the array if necessary
+  /// get an unused index (0), expands the array if necessary
   int GetNewIndex();
 public:
   /// Initialize the array
@@ -261,13 +261,13 @@ public:
     {
       csIsoMaterialWrapper* mw = scfParent->NewMaterial (material);
       if (mw) return &(mw->scfiMaterialWrapper);
-      else return NULL;
+      else return 0;
     }
     virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith)
     {
       csIsoMaterialWrapper* mw = scfParent->NewMaterial (ith);
       if (mw) return &(mw->scfiMaterialWrapper);
-      else return NULL;
+      else return 0;
     }
     virtual int Add (iMaterialWrapper *imw)
     {
@@ -308,7 +308,7 @@ public:
     {
       csIsoMaterialWrapper* mw = scfParent->FindByName (iName);
       if (mw) return &(mw->scfiMaterialWrapper);
-      else return NULL;
+      else return 0;
     }
     virtual int Find (iMaterialWrapper *imw) const
     {

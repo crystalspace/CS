@@ -33,7 +33,7 @@ struct iOpenGLInterface : public iBase
 {
   /**
    * Retrieve the address of the function <funcname>.
-   * Return NULL if not available.
+   * Return 0 if not available.
    */
   virtual void *GetProcAddress (const char *funcname) = 0;
 };

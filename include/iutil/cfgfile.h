@@ -38,7 +38,7 @@ struct iConfigFile : public iBase
   virtual const char* GetFileName () const = 0;
 
   /**
-   * Get the VFS object on which this file is stored (if any).  Returns NULL
+   * Get the VFS object on which this file is stored (if any).  Returns 0
    * if this file resides within the real (non-VFS) filesystem.
    */
   virtual iVFS* GetVFS () const = 0;
@@ -53,7 +53,7 @@ struct iConfigFile : public iBase
    * Load a configuration file.
    * <p>
    * If the file resides in a real filesystem, rather than a VFS filesystem,
-   * then pass NULL for the VFS argument.
+   * then pass 0 for the VFS argument.
    * <p>
    * You can set the Merge flag to merge the newly loaded configuration
    * information into the existing information.  If you do so, nothing will
@@ -64,7 +64,7 @@ struct iConfigFile : public iBase
    * will be set to the name of the newly loaded file if the Merge flag is
    * false; otherwise it will retain the old name.
    */
-  virtual bool Load (const char* iFileName, iVFS* = NULL, bool Merge = false,
+  virtual bool Load (const char* iFileName, iVFS* = 0, bool Merge = false,
     bool NewWins = true) = 0;
 
   /**
@@ -79,7 +79,7 @@ struct iConfigFile : public iBase
    * to the physical filesystem, otherwise it is stored on given VFS
    * filesystem.  This method does not change the internally stored file name.
    */
-  virtual bool Save (const char *iFileName, iVFS* = NULL) = 0;
+  virtual bool Save (const char *iFileName, iVFS* = 0) = 0;
 
   /// Delete all options and rewind all iterators.
   virtual void Clear () = 0;
@@ -90,7 +90,7 @@ struct iConfigFile : public iBase
    * iterator does not yet point to a valid key.  You must call Next() to set
    * it to the first key.
    */
-  virtual csPtr<iConfigIterator> Enumerate (const char *Subsection = NULL) = 0;
+  virtual csPtr<iConfigIterator> Enumerate (const char *Subsection = 0) = 0;
 
   /// Test if a key exists.
   virtual bool KeyExists (const char *Key) const = 0;
@@ -117,7 +117,7 @@ struct iConfigFile : public iBase
    * value (Def parameter) will be used if the key was not found.
    */
   virtual bool GetBool (const char *Key, bool Def = false) const = 0;
-  /// Get the comment of the given key, or NULL if no comment exists.
+  /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment (const char *Key) const = 0;
 
   /// Set an null-terminated string value.
@@ -130,7 +130,7 @@ struct iConfigFile : public iBase
   virtual void SetBool (const char *Key, bool Value) = 0;
   /**
    * Set the comment for given key.  In addition to an actual comment, you can
-   * use "" for Text to place an empty comment line before this key, or NULL to
+   * use "" for Text to place an empty comment line before this key, or 0 to
    * remove the comment entirely.  The comment may contain newline characters.
    * Returns false if the key does not exist.
    */
@@ -177,7 +177,7 @@ struct iConfigIterator : public iBase
   virtual const char *GetStr () const = 0;
   /// Get a boolean value from the configuration.
   virtual bool GetBool () const = 0;
-  /// Get the comment of the given key, or NULL if no comment exists.
+  /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment () const = 0;
 };
 /** @} */

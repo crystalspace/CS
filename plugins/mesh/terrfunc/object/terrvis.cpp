@@ -33,10 +33,10 @@ int csTerrainQuad::global_visnr = 0;
 
 csTerrainQuad::csTerrainQuad ()
 {
-  children[0] = NULL;
-  children[1] = NULL;
-  children[2] = NULL;
-  children[3] = NULL;
+  children[0] = 0;
+  children[1] = 0;
+  children[2] = 0;
+  children[3] = 0;
   visnr = -1;
 }
 

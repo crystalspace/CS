@@ -28,7 +28,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csArtsHandle::csArtsHandle (csArtsRenderer *pRend)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   this->pRend = pRend;
 }
 

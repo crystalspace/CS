@@ -99,7 +99,7 @@ protected:
 
 // Our friendly interface
 public:
-  /// An MD5 digest is 16 unsigned characters (not NULL-terminated)
+  /// An MD5 digest is 16 unsigned characters (not 0-terminated)
   struct Digest { md5_byte_t data[16]; };
 
   /// Encode a null-terminated string buffer

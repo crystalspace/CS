@@ -40,7 +40,7 @@ struct RepMaterial
 {
   char* oldmat;
   char* newmat;
-  RepMaterial () : oldmat (NULL), newmat (NULL) { }
+  RepMaterial () : oldmat (0), newmat (0) { }
   ~RepMaterial () { delete[] oldmat; delete[] newmat; }
 };
 
@@ -60,7 +60,7 @@ public:
   bool global_factory;	// We are using a global factory ('factory' or 'clone').
   csArray<RepMaterial> replace_materials;
 
-  ThingLoadInfo () : default_material (NULL), default_texlen (1) {}
+  ThingLoadInfo () : default_material (0), default_texlen (1) {}
 };
 
 /**

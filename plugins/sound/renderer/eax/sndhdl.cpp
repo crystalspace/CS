@@ -44,14 +44,14 @@ void csSoundHandleEAX::Unregister() {
 
 csPtr<iSoundSource> csSoundHandleEAX::CreateSource(int Mode3d)
 {
-  if (!Registered) return NULL;
-  csSoundSourceEAX *src = new csSoundSourceEAX(NULL);
+  if (!Registered) return 0;
+  csSoundSourceEAX *src = new csSoundSourceEAX(0);
   if (src->Initialize(SoundRender, this, Mode3d, NumSamples))
     return csPtr<iSoundSource> (src);
   else
   {
     src->DecRef();
-    return NULL;
+    return 0;
   }
 }
 

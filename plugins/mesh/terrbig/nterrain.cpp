@@ -34,7 +34,7 @@ CS_IMPLEMENT_PLUGIN
 nTerrainInfo::nTerrainInfo (iObjectRegistry *obj_reg)
 {
   mesh = new G3DTriangleMesh;
-  mesh->vertex_fog = NULL;
+  mesh->vertex_fog = 0;
   mG3D = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
   if (mG3D)
   {
@@ -43,12 +43,12 @@ nTerrainInfo::nTerrainInfo (iObjectRegistry *obj_reg)
     vbuf = vbufmgr->CreateBuffer (1);
   }
   bufcount = 0;
-  triangles = NULL;
+  triangles = 0;
   triangle_count = triangle_size = 0;
   triangle_parity = true;
-  vertices = NULL;
-  texels = NULL;
-  colors = NULL;
+  vertices = 0;
+  texels = 0;
+  colors = 0;
   vertex_count = vertex_size = 0;
   parity = 0;
 }
@@ -500,7 +500,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(0), scale (1,1,1) 
+csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(0), nTextures(0), scale (1,1,1) 
 {
   SCF_CONSTRUCT_IBASE (_pFactory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrBigState);
@@ -788,7 +788,7 @@ void csBigTerrainObject::ComputeLod (nBlock *heightmap, int i, int j, int di, in
 void csBigTerrainObject::InitMesh (nTerrainInfo *info)
 {
   info->num_lights = 0;
-  info->light_list = NULL;
+  info->light_list = 0;
 
   info->GetMesh()->morph_factor = 0;
   info->GetMesh()->num_vertices_pool = 1;

@@ -142,7 +142,7 @@ void _csInitializer_RequestPlugins (pTHXo_ CV *thisfunc)
     SvREFCNT_dec (scfid_sv);
 
     bool ok1 = csInitializer::RequestPlugins
-      (reg, plug, iface, scfid, ver, NULL);
+      (reg, plug, iface, scfid, ver, 0);
     if (! ok1) ok = false;
   }
 
@@ -358,7 +358,7 @@ csVector3 CS_VEC_TILT_UP()	{ return csVector3 (-1,  0,  0); }
 csVector3 CS_VEC_TILT_DOWN()	{ return csVector3 ( 1,  0,  0); }
 #endif // 0
 
-TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), NULL, *)
+TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 
 %extend iString
 {

@@ -51,7 +51,7 @@ public:
     virtual void SetTitle(char *title);
 
     // Flip video page (or dump to framebuffer)
-    virtual void Print(csRect *area = NULL);
+    virtual void Print(csRect *area = 0);
 
     // Set mouse position
     virtual bool SetMousePosition(int x, int y);
@@ -79,11 +79,11 @@ public:
 	    symbolName = (char *)malloc (strlen (name) + 2);
 	    strcpy(symbolName + 1, name);
 	    symbolName[0] = '_';
-	    symbol = NULL;
+	    symbol = 0;
 	    if (NSIsSymbolNameDefined (symbolName))
 		symbol = NSLookupAndBindSymbol (symbolName);
 	    free (symbolName);
-	    return symbol ? NSAddressOfSymbol (symbol) : NULL;
+	    return symbol ? NSAddressOfSymbol (symbol) : 0;
 	}
     } scfiOpenGLInterface;
     

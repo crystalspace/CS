@@ -141,7 +141,7 @@ void CMapPolygonSet::RemoveCommonParts(const CMapPolygonSet& Other, bool optimis
 
 CMapTexturedPlane* CMapPolygonSet::GetBaseplane()
 {
-  if (GetPolygonCount()==0) return NULL;
+  if (GetPolygonCount()==0) return 0;
 
   CMapPolygon* pPoly1 = GetPolygon(0);
   assert(pPoly1);

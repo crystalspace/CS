@@ -203,7 +203,7 @@ public:
  *  // align component within cell
  *  gb->c.anchor = csGridBagConstraint::SOUTHWEST;
  *  gb->c.ipady = 5; // distance to listbox below
- *  csStatic *label = new csStatic (gb, NULL, "Message history");
+ *  csStatic *label = new csStatic (gb, 0, "Message history");
  *  label->SetSize (300, 20);
  *
  *  gb->c.ipady = 0;
@@ -217,7 +217,7 @@ public:
  *  gb->c.weighty = 0.0;
  *  gb->c.anchor = csGridBagConstraint::SOUTHWEST;
  *  gb->c.gridwidth = csGridBagConstraint::REMAINDER; // last component in row
- *  gb->label = new csStatic (gb, NULL, "Players");
+ *  gb->label = new csStatic (gb, 0, "Players");
  *  gb->label->SetSize (300, 20);
  *
  *  // add a listbox that shows the last few messages sent

@@ -46,7 +46,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csAmbientRenderStep::csAmbientRenderStep (csRenderLoop* rl)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   csAmbientRenderStep::rl = rl;
 }
@@ -73,9 +73,9 @@ void csAmbientRenderStep::Perform (csRenderView* rview, iSector* sector)
 
     iMaterialWrapper *matsave;
     //matsave = mesh->mathandle;
-    //mesh->mathandle = NULL;
+    //mesh->mathandle = 0;
     matsave = mesh->material;
-    mesh->material = NULL;
+    mesh->material = 0;
     uint mixsave = mesh->mixmode;
     mesh->mixmode = CS_FX_COPY;
     csZBufMode zsave = mesh->z_buf_mode;
@@ -100,7 +100,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csLightingRenderStep::csLightingRenderStep (csRenderLoop* rl)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   csLightingRenderStep::rl = rl;
 }
@@ -117,7 +117,7 @@ void csLightingRenderStep::RenderMeshes (iRender3D* r3d,
   for (int p=0; p<tech->GetPassCount (); p++)
   {
     iShaderPass *pass = tech->GetPass (p);
-    pass->Activate (NULL);
+    pass->Activate (0);
 
     int j;
     for (j = 0; j < num; j++)
@@ -161,7 +161,7 @@ void csLightingRenderStep::Perform (csRenderView* rview, iSector* sector)
   iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshes->GetCount());
   int numSSM = 0;
-  iShader* shader = NULL;
+  iShader* shader = 0;
   iLightList* lights = sector->GetLights();
 
   int nlights = lights->GetCount();
@@ -238,7 +238,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csRenderLoop::csRenderLoop (csEngine* engine)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   csRenderLoop::engine = engine;
 
@@ -321,7 +321,7 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
       if (!halos[halo]->Process (elapsed, *this)) halos.Delete (halo);
   }*/
 
-  engine->G3D->SetClipper (NULL, CS_CLIPPER_NONE);
+  engine->G3D->SetClipper (0, CS_CLIPPER_NONE);
 
   //csSleep (1000);
 }

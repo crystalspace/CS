@@ -85,12 +85,12 @@ struct iBase
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion) = 0;
   /**
    * Query a particular interface embedded into an object.
-   * This version will test if 'ibase' is NULL.
+   * This version will test if 'ibase' is 0.
    */
   static void* QueryInterfaceSafe (iBase* ibase, scfInterfaceID iInterfaceID,
   	int iVersion)
   {
-    if (ibase == NULL) return NULL;
+    if (ibase == 0) return 0;
     else return ibase->QueryInterface (iInterfaceID, iVersion);
   }
 };
@@ -217,7 +217,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  */
 #define SCF_IMPLEMENT_IBASE_QUERY_END					\
   return scfParent ?							\
-    scfParent->QueryInterface (iInterfaceID, iVersion) : NULL;		\
+    scfParent->QueryInterface (iInterfaceID, iVersion) : 0;		\
 }
 
 /**
@@ -517,7 +517,7 @@ CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		        \
 
 /** Add information about a exported class into the table. */
 #define SCF_EXPORT_CLASS(Class, ClassID, Description)			\
-    { ClassID, Description, NULL, Class##_Create },
+    { ClassID, Description, 0, Class##_Create },
 
 /** Add information about an exported class and dependency info into table. */
 #define SCF_EXPORT_CLASS_DEP(Class, ClassID, Description, Dependencies)	\
@@ -553,7 +553,7 @@ CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		        \
  * since a valid scfClassInfo structure should be created.
  */
 #define SCF_REGISTER_STATIC_CLASS(Class,ClassID,Description)		\
-  SCF_REGISTER_STATIC_CLASS_DEP (Class,ClassID,Description,NULL);
+  SCF_REGISTER_STATIC_CLASS_DEP (Class,ClassID,Description,0);
 
 /**
  * This is similar to SCF_REGISTER_STATIC_CLASS except that you can provide
@@ -645,7 +645,7 @@ inline static scfInterfaceID Name##_scfGetID ()				\
 /**
  * Shortcut macro to query given interface from given object.
  * This is a wrapper around iBase::QueryInterface method.
- * This version tests if Object is NULL and will return NULL in that case.
+ * This version tests if Object is 0 and will return 0 in that case.
  */
 #define SCF_QUERY_INTERFACE_SAFE(Object,Interface)			\
   csPtr<Interface> ((Interface *)(iBase::QueryInterfaceSafe ((Object),	\
@@ -717,13 +717,13 @@ struct iSCF : public iBase
 
   /**
    * Create an instance of a class that supports given interface.  The function
-   * returns NULL either if such a class ID is not found in class registry, or
+   * returns 0 either if such a class ID is not found in class registry, or
    * a object of given class does not support given interface or supports an
    * incompatible version of given interface.  If you want to make a difference
    * between these error conditions, you can check whenever such a class exists
    * using scfClassRegistered() function.
    * <p>
-   * If you specify NULL as iInterfaceID, you'll receive a pointer to the basic
+   * If you specify 0 as iInterfaceID, you'll receive a pointer to the basic
    * interface, no matter what it is.  <b>The reference count will be zero thus
    * you should increment it yourself if you use this approach.</b> You can
    * treat the pointer returned just as an iBase*, not more.  If you need more,
@@ -736,7 +736,7 @@ struct iSCF : public iBase
   /**
    * Query the description of a class.
    * NOTE: At least one instance of this class should exist, or the class
-   * should be a static class. Otherwise the function will return NULL
+   * should be a static class. Otherwise the function will return 0
    */
   virtual const char *GetClassDescription (const char *iClassID) = 0;
 
@@ -763,7 +763,7 @@ struct iSCF : public iBase
    * list.
    */
   virtual bool RegisterClass (const char *iClassID,
-	const char *iLibraryName, const char *Dependencies = NULL) = 0;
+	const char *iLibraryName, const char *Dependencies = 0) = 0;
 
   /**
    * Register a single static class (that is, implemented in SCF client

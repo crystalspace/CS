@@ -31,7 +31,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csVirtualClock::csVirtualClock ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   CurrentTime = csTicks (-1);
   ElapsedTime = csTicks (0);
 }

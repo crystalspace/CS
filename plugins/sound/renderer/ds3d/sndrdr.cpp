@@ -65,9 +65,9 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase)
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  Listener = NULL;
-  AudioRenderer = NULL;
-  object_reg = NULL;
+  Listener = 0;
+  AudioRenderer = 0;
+  object_reg = 0;
   mutex_Listener = csMutex::Create (true);
   mutex_ActiveSources = csMutex::Create (true);
   mutex_SoundHandles = csMutex::Create (true);
@@ -109,7 +109,7 @@ bool csSoundRenderDS3D::Open()
   HRESULT r;
   if (!AudioRenderer)
   {
-    r = DirectSoundCreate(NULL, &AudioRenderer, NULL);
+    r = DirectSoundCreate(0, &AudioRenderer, 0);
     if (r != DS_OK)
     {
       if (reporter)
@@ -197,11 +197,11 @@ void csSoundRenderDS3D::Close()
   mutex_SoundHandles->Release();
 
   mutex_Listener->LockWait();
-  Listener = NULL;
+  Listener = 0;
   mutex_Listener->Release();
 
   if (AudioRenderer) AudioRenderer->Release();
-  AudioRenderer = NULL;
+  AudioRenderer = 0;
 }
 
 void csSoundRenderDS3D::SetVolume(float vol)
@@ -225,8 +225,8 @@ float csSoundRenderDS3D::GetVolume()
 
 csPtr<iSoundHandle> csSoundRenderDS3D::RegisterSound(iSoundData *snd)
 {
-  if (!snd) return NULL;
-  if (!snd->Initialize(&LoadFormat)) return NULL;
+  if (!snd) return 0;
+  if (!snd->Initialize(&LoadFormat)) return 0;
   csSoundHandleDS3D *hdl = new csSoundHandleDS3D(this, snd,BufferLengthSeconds,!LazySourceSync);
   mutex_SoundHandles->LockWait();
   SoundHandles.Push(hdl);

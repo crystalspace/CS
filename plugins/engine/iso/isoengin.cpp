@@ -85,10 +85,10 @@ csIsoEngine::csIsoEngine (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
-  object_reg = NULL;
-  txtmgr = NULL;
-  world = NULL;
+  scfiEventHandler = 0;
+  object_reg = 0;
+  txtmgr = 0;
+  world = 0;
 }
 
 csIsoEngine::~csIsoEngine ()
@@ -254,24 +254,24 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   csRef<iDataBuffer> buf;
   csRef<iImage> image;
   csRef<iTextureHandle> handle;
-  csIsoMaterial *material = NULL;
+  csIsoMaterial *material = 0;
   csRef<iMaterialHandle> math;
-  iMaterialWrapper *mat_wrap = NULL;
+  iMaterialWrapper *mat_wrap = 0;
 
   imgloader = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  if(imgloader==NULL)
+  if(imgloader==0)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not get image loader plugin. "
     	"Failed to load file %s.", vfsfilename);
-    return NULL;
+    return 0;
   }
 
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if(VFS==NULL)
+  if(VFS==0)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not get VFS plugin. "
     	"Failed to load file %s.", vfsfilename);
-    return NULL;
+    return 0;
   }
 
   buf = VFS->ReadFile (vfsfilename);
@@ -279,7 +279,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not read vfs file %s\n",
       vfsfilename);
-    return NULL;
+    return 0;
   }
 
   image = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
@@ -288,7 +288,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "The imageloader could not load image %s", vfsfilename);
-    return NULL;
+    return 0;
   }
 
   handle = txtmgr->RegisterTexture (image, CS_TEXTURE_2D | CS_TEXTURE_3D);
@@ -296,7 +296,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Texturemanager could not register texture %s", vfsfilename);
-    return NULL;
+    return 0;
   }
 
   material = new csIsoMaterial(handle);
@@ -311,7 +311,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Texturemanager could not register material %s", materialname);
-    return NULL;
+    return 0;
   }
 
   return mat_wrap;
@@ -338,9 +338,9 @@ iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
   if(!mesh_type)
     mesh_type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
   if(!mesh_type)
-    return NULL;
+    return 0;
 
-  csIsoMeshFactoryWrapper* wrap = NULL;
+  csIsoMeshFactoryWrapper* wrap = 0;
   mesh_fact = mesh_type->NewFactory ();
   if (mesh_fact)
   {
@@ -353,7 +353,7 @@ iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
     wrap->DecRef ();
     return &(wrap->scfiMeshFactoryWrapper);
   }
-  return NULL;
+  return 0;
 }
 
 iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory (const char *name)

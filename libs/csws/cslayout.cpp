@@ -64,7 +64,7 @@ void csLayout::SetTwoPhaseLayoutingGlobally (bool on)
 
 csLayoutConstraint *csLayout::AddLayoutComponent (csComponent* comp)
 {
-  csLayoutConstraint *constr = NULL;
+  csLayoutConstraint *constr = 0;
   if (lc)
   {
     constr = lc->Clone ();

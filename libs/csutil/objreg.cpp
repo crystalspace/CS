@@ -50,7 +50,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csObjectRegistryIterator::csObjectRegistryIterator ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   cur_idx = 0;
 }
 
@@ -80,13 +80,13 @@ bool csObjectRegistryIterator::Restart ()
 
 iBase* csObjectRegistryIterator::GetCurrent ()
 {
-  if (cur_idx >= objects.Length ()) return NULL;
+  if (cur_idx >= objects.Length ()) return 0;
   return (iBase*)objects[cur_idx];
 }
 
 const char* csObjectRegistryIterator::GetCurrentTag ()
 {
-  if (cur_idx >= objects.Length ()) return NULL;
+  if (cur_idx >= objects.Length ()) return 0;
   return (const char*)tags[cur_idx];
 }
 
@@ -112,7 +112,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csObjectRegistry::csObjectRegistry () : clearing (false)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   // We need a recursive mutex.
   mutex = csMutex::Create (true);
 }
@@ -217,7 +217,7 @@ iBase* csObjectRegistry::Get (char const* tag)
       return b;
     }
   }
-  return NULL;
+  return 0;
 }
 
 iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
@@ -237,12 +237,12 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
       {
         printf ("WARNING! Suspicious: object with tag '%s' doesn't implement interface '%s'!\n", t, t);
 	fflush (stdout);
-	return NULL;
+	return 0;
       }
       return interf;
     }
   }
-  return NULL;
+  return 0;
 }
 
 csPtr<iObjectRegistryIterator> csObjectRegistry::Get (

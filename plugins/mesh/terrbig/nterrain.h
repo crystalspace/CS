@@ -241,9 +241,9 @@ public:
    */
   void CreateMaterialMap(iFile *matmap, iImage *terrtex);
 
-  nTerrain(csMemoryMappedIO *phm=NULL):max_levels(0), 
+  nTerrain(csMemoryMappedIO *phm=0):max_levels(0), 
              error_metric_tolerance(2), 
-	     info(NULL), hm(phm), materials(NULL), 
+	     info(0), hm(phm), materials(0), 
 	     map_scale(0), map_mode(0) {}
 
   ~nTerrain()
@@ -409,12 +409,12 @@ public:
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   /// Get write object.
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+  virtual iPolygonMesh* GetWriteObject () { return 0; }
 
   /// Check if the terrain is hit by the given object space vector
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
@@ -456,7 +456,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 };
 
 /**

@@ -165,7 +165,7 @@ protected:
   // The parameter can also be retrieved from the source component
   // by querying it's "User Param" property
   // If this component is the first that has been added it becomes the active one.
-  iAwsSource* AddTab (iString* caption, void* user_param = NULL);
+  iAwsSource* AddTab (iString* caption, void* user_param = 0);
 
   // This will remove the tab at index
   // The next tab will become active (or the prev if no next exist) if this was the active one.

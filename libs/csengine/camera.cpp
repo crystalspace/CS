@@ -40,16 +40,16 @@ long csCamera:: cur_cameranr = 0;
 csCamera::csCamera () :
   csOrthoTransform()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   mirror = false;
-  sector = NULL;
+  sector = 0;
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
   fov_angle = default_fov_angle;
   shift_x = csEngine::frame_width / 2;
   shift_y = csEngine::frame_height / 2;
-  fp = NULL;
+  fp = 0;
   cameranr = cur_cameranr++;
   only_portals = true;
 }
@@ -64,7 +64,7 @@ csCamera::csCamera (csCamera *c) :
     fp = new csPlane3 (*fp);
   }
 
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
 }
@@ -80,7 +80,7 @@ csCamera::csCamera (const csCamera &c) :
     fp = new csPlane3 (*fp);
   }
 
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
 }
@@ -96,7 +96,7 @@ void csCamera::SetFarPlane (const csPlane3 *farplane)
   if (farplane)
     fp = new csPlane3 (*farplane);
   else
-    fp = NULL;
+    fp = 0;
 }
 
 iPolygon3D *csCamera::GetHit (csVector3 &v)
@@ -138,7 +138,7 @@ void csCamera::Correct (int n)
   vals[0] = &w3.x;
   vals[1] = &w3.y;
   vals[2] = &w3.z;
-  vals[4] = NULL;
+  vals[4] = 0;
   Correct (n, vals);  /* perform the snap-to operation on the forward vector */
 
   /* Maybe w3 should be normalized.  Only necessary if there is
@@ -158,10 +158,10 @@ void csCamera::Correct (int n, float *vals[])
 {
   float r, angle;
 
-  if (vals == NULL) return ;
-  if (vals[0] == NULL) return ;
-  if (vals[1] == NULL) return ;
-  if (vals[2] != NULL)
+  if (vals == 0) return ;
+  if (vals[0] == 0) return ;
+  if (vals[1] == 0) return ;
+  if (vals[2] != 0)
   {
     if (*vals[0] < *vals[1])
     {

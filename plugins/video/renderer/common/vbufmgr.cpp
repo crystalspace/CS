@@ -32,7 +32,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csPolygonBuffer::csPolygonBuffer (iVertexBufferManager* mgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csPolygonBuffer::mgr = mgr;
 }
 
@@ -46,9 +46,9 @@ SCF_IMPLEMENT_IBASE (csVertexBuffer)
   SCF_IMPLEMENTS_INTERFACE (iVertexBuffer)
 SCF_IMPLEMENT_IBASE_END
 
-csVertexBuffer::csVertexBuffer (iVertexBufferManager* mgr) : verts (NULL)
+csVertexBuffer::csVertexBuffer (iVertexBufferManager* mgr) : verts (0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csVertexBuffer::mgr = mgr;
   locked = false;
 }
@@ -67,7 +67,7 @@ SCF_IMPLEMENT_IBASE_END
 csVertexBufferManager::csVertexBufferManager (iObjectRegistry* object_reg)
   : buffers (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csVertexBufferManager::object_reg = object_reg;
 }
 

@@ -57,9 +57,9 @@ csMouse::csMouse (csApp *iApp)
   invisible = false;
   VirtualX = NO_VIRTUAL_POS;
   AppFocused = true;
-  ActiveCursor = NULL;
+  ActiveCursor = 0;
   memset (&Under, 0, sizeof (Under));
-  Texture = NULL;
+  Texture = 0;
   LastVirtual = false;
 }
 
@@ -101,7 +101,7 @@ void csMouse::Undraw (int Page)
   if (under)
   {
     app->pplRestoreArea (under, true);
-    Under [Page] = NULL;
+    Under [Page] = 0;
   }
 }
 
@@ -116,7 +116,7 @@ void csMouse::NewPointer (const char *id, const char *posdef)
   {
     "Arrow", "Lens", "Cross", "Pen", "Move",
     "SizeNWSE", "SizeNESW", "SizeNS", "SizeEW",
-    "Stop", "Wait", NULL
+    "Stop", "Wait", 0
   };
 
   int cID;
@@ -171,7 +171,7 @@ bool csMouse::SetCursor (csMouseCursorID ID)
   bool virt = (VirtualX != NO_VIRTUAL_POS) &&
     ((VirtualX != MouseX) || (VirtualY != MouseY));
 
-  ActiveCursor = NULL;
+  ActiveCursor = 0;
   int i;
   for (i = 0; i < Pointers.Length (); i++)
     if (Pointers.Get (i)->id == ID)

@@ -52,12 +52,12 @@
 void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
 {
   LPVOID lpMsgBuf;
-  char *szMsg = NULL;
+  char *szMsg = 0;
   if (FAILED (hRes))
   {
     DWORD dwResult;
     dwResult = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      NULL, hRes, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
+      0, hRes, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, 0);
 
     if (dwResult != 0)
     {
@@ -95,8 +95,8 @@ void DirectDetection::SystemFatalError (char *str, HRESULT hRes)
 
 DirectDetection::DirectDetection ()
 {
-  Devices = NULL;
-  object_reg = NULL;
+  Devices = 0;
+  object_reg = 0;
 }
 
 DirectDetection::~DirectDetection ()
@@ -114,7 +114,7 @@ DirectDetection::~DirectDetection ()
     }
   }
 
-  Devices = NULL;
+  Devices = 0;
 }
 
 /// find the best 2d device
@@ -129,7 +129,7 @@ DirectDetectionDevice * DirectDetection::findBestDevice2D(int displayNumber)
   {
     csString devName2d("\\\\.\\Display");
     devName2d.Append(displayNumber);
-    for(cur = Devices; cur != NULL; cur = cur->next)
+    for(cur = Devices; cur != 0; cur = cur->next)
     {
       char const* const s = cur->DeviceName2D;
       if (s != 0 && devName2d.CompareNoCase(s))
@@ -138,23 +138,23 @@ DirectDetectionDevice * DirectDetection::findBestDevice2D(int displayNumber)
     // Requested display not found; fall through and search for primary.
   }
   
-  for (cur = Devices; cur != NULL; cur = cur->next)
+  for (cur = Devices; cur != 0; cur = cur->next)
   {
     if (cur->Only2D && cur->IsPrimary2D) 
       return cur;
   }
   
-  return NULL;
+  return 0;
 }
 
 /// find the best 3d device
 DirectDetectionDevice *DirectDetection::findBestDevice3D (bool fscreen)
 {
-  DirectDetectionDevice *ret = NULL;
+  DirectDetectionDevice *ret = 0;
   DirectDetectionDevice *cur = Devices;
   int poids = 0;
 
-  while (cur != NULL)
+  while (cur != 0)
   {
     // This device have 3d device
     if (!cur->Only2D && cur->Can3D)
@@ -234,7 +234,7 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
   // Record the D3D driver's information
   dd3d.DeviceName3D = _strdup (lpDeviceName);
   dd3d.DeviceDescription3D = _strdup (lpDeviceDescription);
-  if (lpGuid != NULL)
+  if (lpGuid != 0)
   {
     CopyMemory (&dd3d.Guid3D, lpGuid, sizeof (GUID));
     dd3d.IsPrimary3D = false;
@@ -301,14 +301,14 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext,
   HMONITOR p_notUsed)
 {
-  LPDIRECTDRAW pDD = NULL;
+  LPDIRECTDRAW pDD = 0;
   DDCAPS DriverCaps;
   DDCAPS HELCaps;
   DirectDetection2D dd2d;
   DirectDetection *ddetect = (DirectDetection *)lpContext;
   HRESULT hRes;
 
-  if (FAILED (hRes = DirectDrawCreate (lpGUID, &pDD, NULL)))
+  if (FAILED (hRes = DirectDrawCreate (lpGUID, &pDD, 0)))
   {
     ddetect->ReportResult (
       CS_REPORTER_SEVERITY_WARNING, 
@@ -334,7 +334,7 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   // some informations about device
   dd2d.DeviceName2D = _strdup (lpDriverName);
   dd2d.DeviceDescription2D = _strdup (lpDriverDescription);
-  if (lpGUID != NULL)
+  if (lpGUID != 0)
   {
     CopyMemory (&dd2d.Guid2D, lpGUID, sizeof (GUID));
     dd2d.IsPrimary2D = false;
@@ -389,19 +389,19 @@ bool DirectDetection::checkDevices3D ()
       // for each 2d device which have a 3d device
       if (cur->Only2D && cur->Can3D)
       {
-        LPDIRECTDRAW lpDD = NULL;
-        LPDIRECT3D lpD3D = NULL;
+        LPDIRECTDRAW lpDD = 0;
+        LPDIRECT3D lpD3D = 0;
         struct toy
         {
           DirectDetection * ddetect;
           DirectDetection2D * dd2d;
         } toy = {this, cur};
 
-        LPGUID pGuid = NULL;
+        LPGUID pGuid = 0;
         if (!cur->IsPrimary2D) pGuid = &cur->Guid2D;
 
         HRESULT hRes;
-        if (FAILED (hRes = DirectDrawCreate (pGuid, &lpDD, NULL)))
+        if (FAILED (hRes = DirectDrawCreate (pGuid, &lpDD, 0)))
 	{
 	  ReportResult (CS_REPORTER_SEVERITY_WARNING, 
 	    "Can't create DirectDraw device",
@@ -433,7 +433,7 @@ static BOOL WINAPI OldCallback(GUID FAR *lpGUID, LPSTR pDesc, LPSTR pName,
                                    LPVOID pContext)
 {
   return DirectDetectionDDrawEnumCallback (lpGUID, pDesc, pName, pContext,
-    NULL);
+    0);
 }
 
 /// check 2d devices
@@ -484,7 +484,7 @@ bool DirectDetection::checkDevices2D ()
   //Free the library.
   FreeLibrary (libraryHandle);
 
-  if (Devices == NULL)
+  if (Devices == 0)
   {
     ReportResult (CS_REPORTER_SEVERITY_WARNING, 
       "No 2D devices found.",

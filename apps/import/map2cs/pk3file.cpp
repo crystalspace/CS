@@ -29,7 +29,7 @@
 CTextureFile* CPk3File::CreateTexture(const char* texturename)
 {
   char texfilename[256];
-  CTextureFile* pTexture = NULL;
+  CTextureFile* pTexture = 0;
 
   sprintf (texfilename, "textures/%s.tga", texturename);
   pTexture = ExtractTexture(texturename, texfilename);
@@ -43,7 +43,7 @@ CTextureFile* CPk3File::CreateTexture(const char* texturename)
   pTexture = ExtractTexture(texturename, texfilename);
   if (pTexture) return pTexture;
 
-  return NULL;
+  return 0;
 }
 
 

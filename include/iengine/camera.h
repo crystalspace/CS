@@ -188,7 +188,7 @@ struct iCamera : public iBase
 
   /**
    * Get the 3D far plane that should be used to clip all geometry.
-   * If this function returns NULL no far clipping is required.
+   * If this function returns 0 no far clipping is required.
    * Otherwise it must be used to clip the object before
    * drawing.
    */
@@ -196,7 +196,7 @@ struct iCamera : public iBase
 
   /**
    * Set the 3D far plane used to clip all geometry.
-   * If the pointer is NULL then far plane clipping will be disabled.
+   * If the pointer is 0 then far plane clipping will be disabled.
    * Otherwise it will be enabled and the plane will be copied (so you
    * can free or reuse the pointer you give here). Note that the far-plane
    * will cull away geometry which is on the negative side of the plane

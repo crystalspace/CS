@@ -105,7 +105,7 @@ public:
   virtual bool Wait () = 0;
 
   /**
-   * Return the last error description, else NULL if there was none.
+   * Return the last error description, else 0 if there was none.
    */
   virtual char const* GetLastError () = 0;
 };

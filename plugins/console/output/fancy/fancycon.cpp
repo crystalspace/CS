@@ -85,7 +85,7 @@ csFancyConsole::csFancyConsole (iBase *p) :
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 }
 
 csFancyConsole::~csFancyConsole ()
@@ -121,7 +121,7 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
     return false;
   G2D = G3D->GetDriver2D ();
 
-  ImageLoader = NULL;
+  ImageLoader = 0;
 
   // Tell event queue that we want to handle broadcast events
   if (!scfiEventHandler)
@@ -220,7 +220,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   // first draw the background
   // do we draw gouraud/flat or with texture ?
 
-  bool with_color = (deco.bgnd.mat == NULL);
+  bool with_color = (deco.bgnd.mat == 0);
 
   csRect size (outersize);
   size.xmin +=  bordersize.xmin - deco.p2lx - deco.lx;
@@ -474,7 +474,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
   Keyname.Clear() << "FancyConsole." << sect << ".pic";
   const char* pix = ini->GetStr (Keyname, "");
 
-  border.mat = NULL;
+  border.mat = 0;
   border.do_keycolor = false;
   border.do_alpha = false;
   border.do_stretch = false;
@@ -482,7 +482,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
   if (strlen (pix))
   {
     size_t len = 0;
-    char *data = NULL;
+    char *data = 0;
     csRef<iFile> F (VFS->Open (pix, VFS_FILE_READ));
     if (F)
     {

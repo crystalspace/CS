@@ -108,7 +108,7 @@ void csImposterMesh::Draw(iRenderView *rview)
   m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
   v_cam2tex = o2c.Other2This (pol.v_obj2tex);
 
-  poly.poly_texture = NULL; // pol.poly_texture; when imposter is rendered correctly
+  poly.poly_texture = 0; // pol.poly_texture; when imposter is rendered correctly
 
   // project screen bounding box into poly vertex list here
 

@@ -30,10 +30,10 @@ SCF_IMPLEMENT_IBASE_END
 // Initialize graphics driver
 OSXDriver2D::OSXDriver2D(csGraphics2D *inCanvas)
 {
-    scfiEventHandler = NULL;
+    scfiEventHandler = 0;
 
     canvas = inCanvas;
-    originalMode = NULL;
+    originalMode = 0;
 
     origWidth = 0;
     origHeight = 0;
@@ -47,7 +47,7 @@ OSXDriver2D::OSXDriver2D(csGraphics2D *inCanvas)
 // Destroy driver
 OSXDriver2D::~OSXDriver2D()
 {
-    if (scfiEventHandler != NULL)
+    if (scfiEventHandler != 0)
     {
         csRef<iEventQueue> queue = CS_QUERY_REGISTRY(objectReg, iEventQueue);
         if (queue.IsValid())
@@ -71,7 +71,7 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
     assistant = CS_QUERY_REGISTRY(reg, iOSXAssistant);
 
     // Create event handler
-    if (scfiEventHandler == NULL)
+    if (scfiEventHandler == 0)
         scfiEventHandler = new EventHandler(this);
 
     // Listen for key down events
@@ -228,8 +228,8 @@ bool OSXDriver2D::EnterFullscreenMode()
 {
     // Find mode and copy parameters
     CFDictionaryRef mode = CGDisplayBestModeForParameters(display, 
-                        canvas->Depth, canvas->Width, canvas->Height, NULL);
-    if (mode == NULL)
+                        canvas->Depth, canvas->Width, canvas->Height, 0);
+    if (mode == 0)
         return false;
 
     // Fade to black
@@ -339,12 +339,12 @@ void OSXDriver2D::FadeToGammaTable(CGDirectDisplayID disp, GammaTable table)
     timeval start, current;
     GammaTable temp;
     
-    gettimeofday(&start, NULL);
+    gettimeofday(&start, 0);
     start_usec = (start.tv_sec * 1000000) + start.tv_usec;
     end_usec = start_usec + TOTAL_USEC;
     
     do {
-        gettimeofday(&current, NULL);
+        gettimeofday(&current, 0);
         current_usec = (current.tv_sec * 1000000) + current.tv_usec;
         
         // Calculate fraction of elapsed time
@@ -388,7 +388,7 @@ void OSXDriver2D::ChooseDisplay()
 {
     csRef<iCommandLineParser> parser = CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
     const char *s = parser->GetOption("screen");
-    if (s != NULL)
+    if (s != 0)
         screen = atoi(s);
     else
     {

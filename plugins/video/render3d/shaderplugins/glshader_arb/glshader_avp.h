@@ -73,11 +73,11 @@ public:
   csShaderGLAVP(iObjectRegistry* objreg, csGLExtensionManager* ext, csGLVertexArrayHelper* varr)
   {
     validProgram = true;
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     this->object_reg = objreg;
     this->ext = ext;
     this->varr = varr;
-    programstring = NULL;
+    programstring = 0;
   }
   virtual ~csShaderGLAVP ()
   {

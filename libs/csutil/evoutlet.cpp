@@ -33,7 +33,7 @@ SCF_IMPLEMENT_IBASE_END
 csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r):
   EnableMask((unsigned int)(-1)), Plug(p), Queue(q), Registry(r)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csEventOutlet::~csEventOutlet ()
@@ -41,7 +41,7 @@ csEventOutlet::~csEventOutlet ()
   int idx = Queue->EventOutlets.Find (this);
   if (idx >= 0)
   {
-    Queue->EventOutlets [idx] = NULL;
+    Queue->EventOutlets [idx] = 0;
     Queue->EventOutlets.Delete (idx);
   }
 }

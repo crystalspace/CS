@@ -35,16 +35,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSpider::csSpider ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  camera = NULL;
-  wrap = NULL;
-  logparent = NULL;
+  camera = 0;
+  wrap = 0;
+  logparent = 0;
 }
 
 csSpider::~csSpider ()
 {
-  CS_ASSERT (wrap == NULL);
+  CS_ASSERT (wrap == 0);
 }
 
 bool csSpider::DrawTest (iRenderView* rview, iMovable*)
@@ -59,7 +59,7 @@ bool csSpider::DrawTest (iRenderView* rview, iMovable*)
 
 bool csSpider::WeaveWeb (iEngine* engine)
 {
-  if (wrap) { engine->GetMeshes ()->Remove (wrap); wrap = NULL; }
+  if (wrap) { engine->GetMeshes ()->Remove (wrap); wrap = 0; }
   if (engine->GetSectors ()->GetCount () <= 0) return false;
   csRef<iMeshWrapper> ww (engine->CreateMeshWrapper (this, "_@Spider@_"));
   wrap = ww;
@@ -79,7 +79,7 @@ void csSpider::UnweaveWeb (iEngine* engine)
   if (wrap)
   {
     engine->GetMeshes ()->Remove (wrap);
-    wrap = NULL;
+    wrap = 0;
   }
 }
 

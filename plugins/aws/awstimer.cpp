@@ -57,7 +57,7 @@ bool awsTimer::Setup ()
   {
     if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-    bSetup = (vc != NULL);
+    bSetup = (vc != 0);
   }
 
   return bSetup;

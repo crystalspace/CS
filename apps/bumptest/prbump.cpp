@@ -34,10 +34,10 @@
 csProcBump::csProcBump () : csProcTexture()
 {
   palsize = 0;
-  palette = NULL;
+  palette = 0;
   mat_w = 256;
   mat_h = 256;
-  fastdhdx = fastdhdy = NULL;
+  fastdhdx = fastdhdy = 0;
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 }
@@ -46,10 +46,10 @@ csProcBump::csProcBump (iImage *map) : csProcTexture()
 {
   bumpmap = map;
   palsize = 0;
-  palette = NULL;
+  palette = 0;
   mat_w = map->GetWidth();
   mat_h = map->GetHeight();
-  fastdhdx = fastdhdy = NULL;
+  fastdhdx = fastdhdy = 0;
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 }

@@ -42,7 +42,7 @@ CISector::CISector(CMapBrush* pBrush)
 
   // If the brush has no assigned entity, then this is only
   // a default sector
-  m_IsDefaultsector = (pBrush->GetEntity() == NULL);
+  m_IsDefaultsector = (pBrush->GetEntity() == 0);
 
   // Create wall polygon sets for all sides of the brush
   int i;
@@ -133,7 +133,7 @@ void CISector::RemoveWallPolygon(CMapPolygonSet* pRemovePoly, WallOrientation Or
 CMapPolygonSet* CISector::GetCorrespondingWall(CMapTexturedPlane* pPlane,
                                                WallOrientation Orientation)
 {
-  if (!pPlane) return NULL;
+  if (!pPlane) return 0;
 
   int i;
   for (i=0; i<m_Walls.Length(); i++)
@@ -156,7 +156,7 @@ CMapPolygonSet* CISector::GetCorrespondingWall(CMapTexturedPlane* pPlane,
     }
   }
 
-  return NULL;
+  return 0;
 }
 
 void CISector::TextureWalls(CIWorld* pWorld)

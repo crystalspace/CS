@@ -40,8 +40,8 @@ class csOutlineInfo
 private:
   csOutlineInfo ()
   {
-    outline_edges = NULL;
-    outline_verts = NULL;
+    outline_edges = 0;
+    outline_verts = 0;
   }
   ~csOutlineInfo ()
   {
@@ -51,8 +51,8 @@ private:
 
   void Clear ()
   {
-    delete[] outline_edges; outline_edges = NULL;
-    delete[] outline_verts; outline_verts = NULL;
+    delete[] outline_edges; outline_edges = 0;
+    delete[] outline_verts; outline_verts = 0;
   }
 
 public:

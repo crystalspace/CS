@@ -56,16 +56,16 @@ public:
   { (void) iName; }
   /// Get image file name
   virtual const char *GetName ()
-  { return NULL; }
+  { return 0; }
   /// Qyery image format (see CS_IMGFMT_XXX above)
   virtual int GetFormat ()
   { return Format; }
-  /// Get image palette (or NULL if no palette)
+  /// Get image palette (or 0 if no palette)
   virtual csRGBpixel *GetPalette ()
   { return Palette; }
   /// Get alpha map for 8-bit paletted image.
   virtual uint8 *GetAlpha ()
-  { return NULL; }
+  { return 0; }
   /// Change image format
   virtual void SetFormat (int /*iFormat*/)
   { }

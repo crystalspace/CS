@@ -29,11 +29,11 @@
 #include "iutil/document.h"
 
 /// This is the registry for all class factories
-static class scfClassRegistry *ClassRegistry = NULL;
+static class scfClassRegistry *ClassRegistry = 0;
 /// If this bool is true, we should sort the registery
 static bool SortClassRegistry = false;
 /// This is our private instance of csSCF
-static class csSCF *PrivateSCF = NULL;
+static class csSCF *PrivateSCF = 0;
 
 /**
  * This class manages all SCF functionality.
@@ -64,7 +64,7 @@ public:
   virtual const char *GetClassDescription (const char *iClassID);
   virtual const char *GetClassDependencies (const char *iClassID);
   virtual bool RegisterClass (const char *iClassID,
-    const char *iLibraryName, const char *Dependencies = NULL);
+    const char *iLibraryName, const char *Dependencies = 0);
   virtual bool RegisterStaticClass (scfClassInfo *iClassInfo);
   virtual bool RegisterClassList (scfClassInfo *iClassInfo);
   virtual bool UnregisterClass (const char *iClassID);
@@ -108,7 +108,7 @@ public:
 
   /// Check if library object is okay
   bool ok ()
-  { return (LibraryHandle != NULL) && (ClassTable != NULL); }
+  { return (LibraryHandle != 0) && (ClassTable != 0); }
 
   /// Increment reference count for the library
   void IncRef ()
@@ -144,7 +144,7 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
   LibraryRegistry->Push (this);
 
   RefCount = 0;
-  ClassTable = NULL;
+  ClassTable = 0;
   LibraryName = csStrNew (iLibraryName);
   LibraryHandle = csFindLoadLibrary (LibraryName);
   if (!LibraryHandle)
@@ -158,7 +158,7 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
   // Then append "_scfInitialize" to the file name to get the name of
   // the exported function.
   char name [200];
-  csSplitPath (iLibraryName, NULL, 0, name, 200);
+  csSplitPath (iLibraryName, 0, 0, name, 200);
   strcat (name, "_scfInitialize");
 
   scfInitializeFunc func =
@@ -178,7 +178,7 @@ scfSharedLibrary::~scfSharedLibrary ()
     typedef void (*scfFinalizeFunc) ();
 
     char name [200];
-    csSplitPath (LibraryName, NULL, 0, name, 200);
+    csSplitPath (LibraryName, 0, 0, name, 200);
     strcat (name, "_scfFinalize");
 
     scfFinalizeFunc func = (scfFinalizeFunc)csGetLibrarySymbol (
@@ -197,7 +197,7 @@ scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
   for (scfClassInfo* cur = ClassTable; cur->ClassID; cur++)
     if (strcmp (iClassID, cur->ClassID) == 0)
       return cur;
-  return NULL;
+  return 0;
 }
 
 bool scfLibraryVector::FreeItem (void* Item)
@@ -226,9 +226,9 @@ public:
   // Information about this class
   const scfClassInfo *ClassInfo;
 #ifndef CS_STATIC_LINKED
-  // Shared module that implements this class or NULL for local classes
+  // Shared module that implements this class or 0 for local classes
   char *LibraryName;
-  // A pointer to shared library object (NULL for local classes)
+  // A pointer to shared library object (0 for local classes)
   scfSharedLibrary *Library;
 #endif
 
@@ -271,14 +271,14 @@ public:
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend)
 {
-  // Don't use SCF_CONSTRUCT_IBASE (NULL) since it will call IncRef()
-  scfRefCount = 0; scfParent = NULL;
+  // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
+  scfRefCount = 0; scfParent = 0;
   ClassID = csStrNew (iClassID);
-  ClassInfo = NULL;
+  ClassInfo = 0;
   Dependencies = csStrNew (iDepend);
 #ifndef CS_STATIC_LINKED
   LibraryName = csStrNew (iLibraryName);
-  Library = NULL;
+  Library = 0;
 #else
   (void)iLibraryName;
   // this branch should never be called
@@ -288,14 +288,14 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
 
 scfFactory::scfFactory (const scfClassInfo *iClassInfo)
 {
-  // Don't use SCF_CONSTRUCT_IBASE (NULL) since it will call IncRef()
-  scfRefCount = 0; scfParent = NULL;
+  // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
+  scfRefCount = 0; scfParent = 0;
   ClassID = csStrNew (iClassInfo->ClassID);
   ClassInfo = iClassInfo;
   Dependencies = csStrNew (iClassInfo->Dependencies);
 #ifndef CS_STATIC_LINKED
-  LibraryName = NULL;
-  Library = NULL;
+  LibraryName = 0;
+  Library = 0;
 #endif
 }
 
@@ -332,7 +332,7 @@ void scfFactory::IncRef ()
 
     if (!Library->ok () || !ClassInfo)
     {
-      Library = NULL;
+      Library = 0;
       return; // Signify that IncRef() failed by _not_ incrementing count.
     }
     
@@ -360,7 +360,7 @@ void scfFactory::DecRef ()
     if (Library)
     {
       Library->DecRef ();
-      Library = NULL;
+      Library = 0;
     }
   }
 #endif
@@ -374,7 +374,7 @@ int scfFactory::GetRefCount ()
 void *scfFactory::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 {
   SCF_IMPLEMENTS_INTERFACE (iFactory);
-  return NULL;
+  return 0;
 }
 
 void *scfFactory::CreateInstance ()
@@ -382,7 +382,7 @@ void *scfFactory::CreateInstance ()
   IncRef ();
   // If IncRef won't succeed, we'll have a zero reference counter
   if (!scfRefCount)
-    return NULL;
+    return 0;
 
   void *instance = ClassInfo->Factory (this);
 
@@ -401,7 +401,7 @@ const char *scfFactory::QueryDescription ()
   if (scfRefCount)
     return ClassInfo->Description;
   else
-    return NULL;
+    return 0;
 }
 
 const char *scfFactory::QueryDependencies ()
@@ -432,7 +432,7 @@ csSCF::csSCF ()
 {
   SCF = PrivateSCF = this;
 #ifdef CS_DEBUG
-  object_reg = NULL;
+  object_reg = 0;
 #endif
 
   if (!ClassRegistry)
@@ -450,14 +450,14 @@ csSCF::csSCF ()
 csSCF::~csSCF ()
 {
   delete ClassRegistry;
-  ClassRegistry = NULL;
+  ClassRegistry = 0;
 #ifndef CS_STATIC_LINKED
   UnloadUnusedModules ();
   delete LibraryRegistry;
-  LibraryRegistry = NULL;
+  LibraryRegistry = 0;
 #endif
 
-  SCF = PrivateSCF = NULL;
+  SCF = PrivateSCF = 0;
 }
 
 void csSCF::RegisterClasses (iDocument* doc)
@@ -547,7 +547,7 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
   }
 
   int idx = ClassRegistry->FindSortedKey (iClassID);
-  void *instance = NULL;
+  void *instance = 0;
 
   if (idx >= 0)
   {
@@ -650,7 +650,7 @@ const char *csSCF::GetClassDescription (const char *iClassID)
     return cf->QueryDescription ();
   }
 
-  return NULL;
+  return 0;
 }
 
 const char *csSCF::GetClassDependencies (const char *iClassID)
@@ -664,7 +664,7 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
     return cf->QueryDependencies ();
   }
 
-  return NULL;
+  return 0;
 }
 
 bool csSCF::ClassRegistered (const char *iClassID)

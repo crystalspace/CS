@@ -52,7 +52,7 @@ csArtsRenderer::csArtsRenderer (iBase *pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiSoundRender);
-  dispatcher = NULL;
+  dispatcher = 0;
   bInit = false;
   SetVolume (1.0f);
   SetEnvironment (ENVIRONMENT_GENERIC);
@@ -93,7 +93,7 @@ Arts::csSoundModule *csArtsRenderer::CreateArtsModule ()
   if (sm->isNull ())
   {
     delete sm;
-    return NULL;
+    return 0;
   }
   return sm;
 }
@@ -130,7 +130,7 @@ csPtr<iSoundHandle> csArtsRenderer::RegisterSound(iSoundData *sd)
   }
   else
     delete sh;
-  return NULL;
+  return 0;
 }
 
 void csArtsRenderer::UnregisterSound(iSoundHandle *sh)
@@ -153,7 +153,7 @@ csPtr<iSoundSource> csArtsRenderer::CreateSource (csArtsHandle *pHandle, int Mod
   }
   else
     delete sh;
-  return NULL;
+  return 0;
 }
 
 iSoundListener *csArtsRenderer::GetListener ()

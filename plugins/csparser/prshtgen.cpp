@@ -41,7 +41,7 @@ struct PrsHeightMapData : public iGenerateImageFunction
 
   PrsHeightMapData (bool s) : slope (s)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~PrsHeightMapData ()
   {
@@ -109,7 +109,7 @@ float PrsHeightMapData::GetValue (float x, float y)
 
 csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 {
-  csGenerateImageValue* v = NULL;
+  csGenerateImageValue* v = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -148,7 +148,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
 
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
-	  if (!img) return NULL;
+	  if (!img) return 0;
 	  PrsHeightMapData* data = new PrsHeightMapData (false);
   	  data->im = img;
   	  data->iw = img->GetWidth ();
@@ -182,7 +182,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	  if (shiftnode)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
-	  if (!img) return NULL;
+	  if (!img) return 0;
 	  PrsHeightMapData* data = new PrsHeightMapData (true);
   	  data->im = img;
   	  data->iw = img->GetWidth ();
@@ -206,7 +206,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	break;
       default:
 	SyntaxService->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
   return v;
@@ -214,7 +214,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 
 csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 {
-  csGenerateImageTexture* t = NULL;
+  csGenerateImageTexture* t = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -229,7 +229,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
         {
 	  csColor col;
           if (!SyntaxService->ParseColor (child, col))
-	    return NULL;
+	    return 0;
 	  csGenerateImageTextureSolid* ts = new csGenerateImageTextureSolid ();
 	  ts->color = col;
 	  t = ts;
@@ -243,7 +243,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	    ReportError (
 		    "crystalspace.maploader.parse.heightgen",
 		    "No 'image' child specified for 'single'!");
-	    return NULL;
+	    return 0;
 	  }
 	  const char* imagename = imagenode->GetContentsValue ();
 	  csVector2 scale (1, 1), offset (0, 0);
@@ -261,7 +261,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	  }
 
 	  csRef<iImage> img (LoadImage (imagename, CS_IMGFMT_TRUECOLOR));
-	  if (!img) return NULL;
+	  if (!img) return 0;
 	  csGenerateImageTextureSingle* ts =
 	  	new csGenerateImageTextureSingle ();
 	  ts->SetImage (img);
@@ -289,13 +289,13 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 		  ReportError (
 		    "crystalspace.maploader.parse.heightgen",
 		    "Problem with returned value!");
-		  return NULL;
+		  return 0;
 		}
 	        break;
 	      case XMLTOKEN_LAYER:
 	        {
 		  float height = 0;
-		  csGenerateImageTexture* txt = NULL;
+		  csGenerateImageTexture* txt = 0;
 		  csRef<iDocumentNode> texturenode = blend_child->GetNode (
 		  	"texture");
 		  if (!texturenode)
@@ -303,7 +303,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 		    ReportError (
 		      "crystalspace.maploader.parse.heightgen",
 		      "No 'texture' specified inside 'layer'!");
-		    return NULL;
+		    return 0;
 		  }
 	          txt = ParseHeightgenTexture (texturenode);
 		  if (!txt)
@@ -311,7 +311,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 		    ReportError (
 			    "crystalspace.maploader.parse.heightgen",
 			    "Problem with returned texture!");
-		    return NULL;
+		    return 0;
 		  }
 		  csRef<iDocumentNode> heightnode = blend_child->GetNode (
 		  	"height");
@@ -324,7 +324,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	        break;
 	      default:
 		SyntaxService->ReportBadToken (blend_child);
-		return NULL;
+		return 0;
 	    }
 	  }
 	  t = tb;
@@ -332,7 +332,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	break;
       default:
 	SyntaxService->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
   if (!t)

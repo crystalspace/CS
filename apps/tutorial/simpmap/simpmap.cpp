@@ -103,7 +103,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 bool Simple::HandleEvent (iEvent& ev)
@@ -127,10 +127,10 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == 'l')
   {
-    csDebuggingGraph::Dump (NULL);
+    csDebuggingGraph::Dump (0);
     engine->DeleteAll ();
-    csDebuggingGraph::Dump (NULL);
-    csDebuggingGraph::Clear (NULL);
+    csDebuggingGraph::Dump (0);
+    csDebuggingGraph::Clear (0);
     LoadMap ();
     return true;
   }

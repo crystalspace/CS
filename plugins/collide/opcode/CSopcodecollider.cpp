@@ -46,7 +46,7 @@ using namespace Opcode;
 //typedef csGrowingArray<csCollisionPair> prapid_CD_contact;
 //CS_IMPLEMENT_STATIC_VAR (GetCD_contact, prapid_CD_contact,())
 
-//static prapid_CD_contact *CD_contact = NULL;
+//static prapid_CD_contact *CD_contact = 0;
 
 //static int hits = 0;
 // Array of hits.
@@ -62,10 +62,10 @@ SCF_IMPLEMENT_IBASE_END
 
 csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  m_pCollisionModel = NULL;
-  indexholder = NULL;
-  vertholder = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  m_pCollisionModel = 0;
+  indexholder = 0;
+  vertholder = 0;
   transform.m[0][3] = 0;
   transform.m[1][3] = 0;
   transform.m[2][3] = 0;
@@ -147,7 +147,7 @@ csOPCODECollider::~csOPCODECollider ()
   if (m_pCollisionModel)
   {
     delete m_pCollisionModel;
-    m_pCollisionModel = NULL;
+    m_pCollisionModel = 0;
   }
 
   if (indexholder) delete[] indexholder;

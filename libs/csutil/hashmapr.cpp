@@ -58,7 +58,7 @@ csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r,
   csHashKey k) : csHashIterator (r, k)
 {
   hashr = r;
-  iterr = NULL;
+  iterr = 0;
 }
 
 csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r,
@@ -76,16 +76,16 @@ csHashObject csHashIteratorReversible::Next ()
   while ((obj = csHashIterator::Next ()))
     if (strcmp (GetKey (), iterr) == 0) return obj;
 
-  return NULL;
+  return 0;
 }
 
 const char* csHashIteratorReversible::GetKey () const
 {
-  if ((bucket != NULL) && (current_index > -1)
+  if ((bucket != 0) && (current_index > -1)
   	&& (current_index <= bucket->Length())) 
     return hashr->GetKey ( ((*bucket) [current_index]) .key);
   else
-    return NULL;
+    return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ csGlobalHashIteratorReversible::csGlobalHashIteratorReversible (
 
 csHashObject csGlobalHashIteratorReversible::Next ()
 {
-  if (bucket == NULL) return NULL;
+  if (bucket == 0) return 0;
   csHashObject obj = ((*bucket)[element_index]).object;
   current_index = element_index;
   current_bucket = bucket;
@@ -108,11 +108,11 @@ csHashObject csGlobalHashIteratorReversible::Next ()
 
 const char* csGlobalHashIteratorReversible::GetKey () const
 {
-  if ((current_bucket != NULL) && (current_index > -1)
+  if ((current_bucket != 0) && (current_index > -1)
   	&& (current_index <= current_bucket->Length())) 
     return hashr->GetKey ( ((*current_bucket)
     	[current_index]) .key);
   else
-    return NULL;
+    return 0;
 }
 

@@ -32,7 +32,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMapNode::MapNode)
   SCF_IMPLEMENTS_INTERFACE (iMapNode)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMapNode::csMapNode (const char* Name) : m_pSector(NULL), m_Position(0, 0, 0)
+csMapNode::csMapNode (const char* Name) : m_pSector(0), m_Position(0, 0, 0)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMapNode);
   SetName (Name);
@@ -74,7 +74,7 @@ iMapNode* csMapNode::GetNode (iSector *pSector, const char* name,
       return pNode;
   }
 
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------

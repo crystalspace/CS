@@ -96,7 +96,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -284,13 +284,13 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
-  light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10, csColor(1, 0, 0), false);
+  light = engine->CreateLight (0, csVector3(-3, 5, 0), 10, csColor(1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10, csColor(0, 0, 1), false);
+  light = engine->CreateLight (0, csVector3(3, 5, 0), 10, csColor(0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10, csColor(0, 1, 0), false);
+  light = engine->CreateLight (0, csVector3(0, 5, -3), 10, csColor(0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();
@@ -326,7 +326,7 @@ bool Video::Initialize (int argc, const char* const argv[],
 	iStreamIterator *it = pVideoFormat->GetStreamIterator ();
 	// look up an video stream
 	csStreamDescription desc;
-	iStream *pStream=NULL, *pS;
+	iStream *pStream=0, *pS;
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "Looking for video stream.");
 	while (it->HasNext ())
 	{
@@ -415,7 +415,7 @@ void Video::SetupFrame ()
 void Video::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool Video::HandleEvent (iEvent &Event)
@@ -436,14 +436,14 @@ bool Video::HandleEvent (iEvent &Event)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new Video ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

@@ -169,7 +169,7 @@ public:
   { return &Caps; }
 
   /// Get address of Z-buffer at specific point.
-  virtual uint32 *GetZBuffAt (int, int) { return NULL; }
+  virtual uint32 *GetZBuffAt (int, int) { return 0; }
 
   /// Dump the texture cache.
   virtual void DumpCache () { }
@@ -213,7 +213,7 @@ public:
   /// Set optional clipper.
   virtual void SetClipper (iClipper2D*, int) { }
   /// Get clipper.
-  virtual iClipper2D* GetClipper () { return NULL; }
+  virtual iClipper2D* GetClipper () { return 0; }
   /// Get cliptype.
   virtual int GetClipType () { return CS_CLIPPER_NONE; }
 
@@ -255,14 +255,14 @@ public:
   { return true; }
 
   virtual void SetRenderTarget (iTextureHandle*, bool) { }
-  virtual iTextureHandle* GetRenderTarget () const { return NULL; }
+  virtual iTextureHandle* GetRenderTarget () const { return 0; }
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int, int) { return 0; }
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float, float, float,
-    unsigned char *, int, int) { return NULL; }
+    unsigned char *, int, int) { return 0; }
 
   /**
    * Draw a sprite (possibly rescaled to given width (sw) and height (sh))
@@ -284,7 +284,7 @@ public:
   public:
     EventHandler (csGraphics3DNull* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;

@@ -52,21 +52,21 @@ csMetaGen::csMetaGen (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiMetaGen);
-  logparent = NULL;
+  logparent = 0;
 
   XStart = YStart = ZStart = 0.0;
   XFin = YFin = ZFin = 0.0;
   stepx = stepy = stepz = 0.0;
   istepx = istepy = istepz = 0.0;
   asin_table_res = 256;
-  asin_table = NULL;
+  asin_table = 0;
   initialized = false;
   do_lighting = false;
   splinter_size = 0.0005;
 
-  verts = NULL;
-  trigs = NULL;
-  tex = NULL;
+  verts = 0;
+  trigs = 0;
+  tex = 0;
   current_triangles = 0;
   current_vertices = 0;
   current_texels = 0;
@@ -143,7 +143,7 @@ void csMetaGen::FillArcSineTable()
 void csMetaGen::DeleteArcSineTable()
 {
   delete [] asin_table;
-  asin_table = NULL;
+  asin_table = 0;
 }
 
 bool csMetaGen::InitializeCache()
@@ -285,7 +285,7 @@ void csMetaGen::AddSlice( bool endcap )
   mb->slices[n] = (MetaSlice *)malloc(sizeof(MetaSlice));
   mb->slices[n]->is_endcap = endcap;
   mb->slices[n]->num_charges = 0;
-  mb->slices[n]->charges = NULL;
+  mb->slices[n]->charges = 0;
 
   mb->num_slices++;
 }
@@ -310,7 +310,7 @@ void csMetaGen::CreateField( float iso_level )
 {
   MetaField *fld = (MetaField *)malloc( sizeof(MetaField));
   fld->iso_level = iso_level;
-  fld->points = NULL;
+  fld->points = 0;
   fld->num_points = 0;
   fields.Push(fld);
 }
@@ -667,7 +667,7 @@ void csMetaGen::SetMaxVertices( int limit )
 	{
 	  free(verts->v);
 	  free(verts);
-	  verts = NULL;
+	  verts = 0;
 	}
 }
 
@@ -677,14 +677,14 @@ void csMetaGen::DeleteBuffers()
   {
 	free(trigs->t);
 	free(trigs);
-	trigs = NULL;
+	trigs = 0;
 	current_triangles = 0;
   }
   if ( tex )
   {
 	free(tex->v);
 	free(tex);
-	tex = NULL;
+	tex = 0;
 	current_texels = 0;
   }
 }

@@ -40,7 +40,7 @@ static const char* Q3Extensions[] =
 
 CTextureManager::CTextureManager()
 {
-  m_pMap = NULL;
+  m_pMap = 0;
 }
 
 CTextureManager::~CTextureManager()
@@ -73,7 +73,7 @@ void CTextureManager::LoadTextureArchives(CMapFile* pMap)
       if (filename[0])
       {
         nr++;
-        CTextureArchive* pArchive = NULL;
+        CTextureArchive* pArchive = 0;
         switch (type)
         {
           case wad: pArchive = new CWad3File;   break;
@@ -167,14 +167,14 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     }
   }
 
-  CTextureFile* pTexture = NULL;
+  CTextureFile* pTexture = 0;
 
   printf("Warning: texture '%s'('%s') is missing.\n        Making a new null texture.\n",
     TextureName, CleanedUpTextureName);
   pTexture = new CTextureFile;
   pTexture->SetTexturename (InternalName);
   pTexture->SetFilename    (CleanedUpTextureName);
-  pTexture->SetOriginalData(NULL,0);
+  pTexture->SetOriginalData(0,0);
   pTexture->SetOriginalSize(256, 256);
   m_StoredTextures.Push(pTexture);
   return pTexture;

@@ -761,7 +761,7 @@ lzo_adler32(lzo_uint32 adler, const lzo_byte *buf, lzo_uint len)
     lzo_uint32 s2 = (adler >> 16) & 0xffff;
     int k;
 
-    if (buf == NULL)
+    if (buf == 0)
 	return 1;
 
     while (len > 0)
@@ -1040,9 +1040,9 @@ static lzo_bool ptr_check(void)
     }
 
     memset(&a,0,sizeof(a));
-    r &= __lzo_assert(a.a_charp == NULL);
-    r &= __lzo_assert(a.a_lzo_bytep == NULL);
-    //    r &= __lzo_assert(((int)NULL) == 0);  (causes a warning in gcc3...)
+    r &= __lzo_assert(a.a_charp == 0);
+    r &= __lzo_assert(a.a_lzo_bytep == 0);
+    //    r &= __lzo_assert(((int)0) == 0);  (causes a warning in gcc3...)
     if (r == 1)
     {
 	for (i = 0; i < 10; i++)
@@ -1050,7 +1050,7 @@ static lzo_bool ptr_check(void)
 	BZERO8_PTR(dict+1,sizeof(dict[0]),8);
 	r &= __lzo_assert(dict[0] == wrkmem);
 	for (i = 1; i < 9; i++)
-	    r &= __lzo_assert(dict[i] == NULL);
+	    r &= __lzo_assert(dict[i] == 0);
 	r &= __lzo_assert(dict[9] == wrkmem);
     }
 
@@ -1198,7 +1198,7 @@ _lzo_config_check(void)
     if (r == 1)
     {
 	lzo_uint32 adler;
-	adler = lzo_adler32(0, NULL, 0);
+	adler = lzo_adler32(0, 0, 0);
 	adler = lzo_adler32(adler, lzo_copyright(), 200);
 	r &= __lzo_assert(adler == 0x7ea34377L);
     }
@@ -1533,7 +1533,7 @@ static void DVAL_ASSERT(lzo_uint32 dv, const lzo_byte *p)
 #if defined(LZO_DICT_USE_PTR)
 
 #define LZO_CHECK_MPOS_DET(m_pos,m_off,in,ip,max_offset) \
-	(m_pos == NULL || (m_off = (lzo_moff_t) (ip - m_pos)) > max_offset)
+	(m_pos == 0 || (m_off = (lzo_moff_t) (ip - m_pos)) > max_offset)
 
 #define LZO_CHECK_MPOS_NON_DET(m_pos,m_off,in,ip,max_offset) \
     (BOUNDS_CHECKING_OFF_IN_EXPR( \
@@ -2013,7 +2013,7 @@ DO_DECOMPRESS  ( const lzo_byte *in , lzo_uint  in_len,
     else
     {
 	dict_len = 0;
-	dict_end = NULL;
+	dict_end = 0;
     }
 #endif
 
@@ -2495,7 +2495,7 @@ DO_DECOMPRESS  ( const lzo_byte *in , lzo_uint  in_len,
     else
     {
 	dict_len = 0;
-	dict_end = NULL;
+	dict_end = 0;
     }
 #endif
 

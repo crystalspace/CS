@@ -133,7 +133,7 @@ const char* CMapEntity::GetValueOfKey(const char* key, const char* defaultvalue)
 
 double CMapEntity::GetNumValueOfKey(const char* key, double defaultvalue)
 {
-  const char* ValueStr = GetValueOfKey(key, NULL);
+  const char* ValueStr = GetValueOfKey(key, 0);
   if (!ValueStr) return defaultvalue;
 
   char   dummy;
@@ -149,7 +149,7 @@ double CMapEntity::GetNumValueOfKey(const char* key, double defaultvalue)
 
 bool CMapEntity::GetBoolValueOfKey(const char* key, bool defaultvalue)
 {
-  const char* ValueStr = GetValueOfKey(key, NULL);
+  const char* ValueStr = GetValueOfKey(key, 0);
   if (!ValueStr) return defaultvalue;
 
   if (strcasecmp (ValueStr, "yes")   == 0) return true;
@@ -164,7 +164,7 @@ bool CMapEntity::GetBoolValueOfKey(const char* key, bool defaultvalue)
 
 bool CMapEntity::GetTripleNumValueOfKey(const char* key, double& v1, double& v2, double& v3)
 {
-  const char* ValueStr = GetValueOfKey(key, NULL);
+  const char* ValueStr = GetValueOfKey(key, 0);
   if (!ValueStr) return false;
 
   char   dummy;

@@ -76,7 +76,7 @@ public:
    */
   virtual csPtr<iDataBuffer> GetAllData(bool nullterm = false);
   /**
-   * Returns a pointer to the memory buffer.  May return NULL if memory file
+   * Returns a pointer to the memory buffer.  May return 0 if memory file
    * is empty.  Use GetSize() for size info.
    */
   virtual const char* GetData() const;

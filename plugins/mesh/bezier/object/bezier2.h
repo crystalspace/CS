@@ -120,7 +120,7 @@ public:
    * the given resolution
    */
   static csVector3 GetPoint(double** aControls, int u, int v, int resolution,
-                            double *map = NULL);
+                            double *map = 0);
 
   /**
    * Find the texture coordinates at u, v where u, v are integers
@@ -128,14 +128,14 @@ public:
    * directions respectively at the given resolution
    */
   static csVector2 GetTextureCoord(double** aControls, int u, int v,
-                                   int resolution, double *map = NULL);
+                                   int resolution, double *map = 0);
 
   /**
    * Find the point at u,v where u and v a the parametric coordinates on the
    * curve
    */
   static csVector3 GetPoint(double** aControls, double u, double v,
-                            double (*func)(double, int, double, int) = NULL );
+                            double (*func)(double, int, double, int) = 0 );
 };
 
 #endif // __CS_BEZIER_H__

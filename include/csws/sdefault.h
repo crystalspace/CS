@@ -69,7 +69,7 @@ class csDefaultWindowSkin : public csWindowSkin
 
 public:
   /// Initialize the window skin slice
-  csDefaultWindowSkin () : ButtonTex (NULL), Skin (NULL) {}
+  csDefaultWindowSkin () : ButtonTex (0), Skin (0) {}
 
   /// Query the required resources from application
   virtual void Initialize (csApp *iApp, csSkin *Parent);

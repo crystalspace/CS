@@ -31,12 +31,12 @@ SCF_IMPLEMENT_IBASE_END
 csIsoLight::csIsoLight (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  grid = NULL;
+  grid = 0;
   attenuation = CSISO_ATTN_REALISTIC;
   position.Set(0,0,0);
   color.Set(1.,1.,1.);
   radius = 10;
-  vismap = NULL;
+  vismap = 0;
   visw = vish = 0;
   recalc_vis = true;
   fakelight = new csIsoFakeLight(this);
@@ -206,7 +206,7 @@ struct LightFunc : public iIsoCellTraverseCallback
 {
   iIsoLight* light;
   SCF_DECLARE_IBASE;
-  LightFunc () { SCF_CONSTRUCT_IBASE (NULL); }
+  LightFunc () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~LightFunc () { }
   virtual void Traverse (iIsoSprite* spr);
 };

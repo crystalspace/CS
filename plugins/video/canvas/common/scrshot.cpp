@@ -25,7 +25,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csScreenShot::csScreenShot (iGraphics2D *G2D)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   Width = G2D->GetWidth ();
   Height = G2D->GetHeight ();
@@ -51,7 +51,7 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
     Format = CS_IMGFMT_TRUECOLOR;
     Data = new csRGBpixel [Width * Height];
     csRGBpixel *dst = (csRGBpixel *)Data;
-    Palette = NULL;
+    Palette = 0;
     int rs = 8 - pfmt->RedBits;
     int gs = 8 - pfmt->GreenBits;
     int bs = 8 - pfmt->BlueBits;

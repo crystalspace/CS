@@ -209,11 +209,11 @@ struct iEmitState : public iBase
 
   /// Set the field speed emitter, increfs (given position determines speed)
   virtual void SetFieldSpeedEmit(iEmitGen3D *emit) = 0;
-  /// get field speed emitter, can be NULL
+  /// get field speed emitter, can be 0
   virtual iEmitGen3D* GetFieldSpeedEmit() const = 0;
   /// Set the field accel emitter, increfs (given position determines accel)
   virtual void SetFieldAccelEmit(iEmitGen3D *emit) = 0;
-  /// get field accel emitter, can be NULL
+  /// get field accel emitter, can be 0
   virtual iEmitGen3D* GetFieldAccelEmit() const = 0;
 
   /** Add an aging moment, they are interpolated.

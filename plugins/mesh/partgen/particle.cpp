@@ -33,21 +33,21 @@ csNewParticleSystem::csNewParticleSystem (
   ParticleFlags = flags;
   ParticleCount = 0;
   StorageCount = 0;
-  PositionArray = NULL;
+  PositionArray = 0;
   Scale = csVector2 (1.0f, 1.0f);
-  ScaleArray = NULL;
+  ScaleArray = 0;
   Angle = 0.0f;
-  AngleArray = NULL;
+  AngleArray = 0;
   Color = csColor (0, 0, 0);
-  ColorArray = NULL;
-  Material = NULL;
-  MaterialArray = NULL;
+  ColorArray = 0;
+  Material = 0;
+  MaterialArray = 0;
   Axis = csVector3 (0, 1, 0);
-  AxisArray = NULL;
+  AxisArray = 0;
   PrevTime = 0;
   MixMode = CS_FX_COPY;
   Lighting = true;
-  LitColors = NULL;
+  LitColors = 0;
 }
 
 csNewParticleSystem::~csNewParticleSystem ()
@@ -301,7 +301,7 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
 
   // set up a vertex buffer
   iVertexBufferManager *vbufmgr = g3d->GetVertexBufferManager ();
-  if (vbuf == NULL)
+  if (vbuf == 0)
   {
     vbuf = vbufmgr->CreateBuffer (100);
   }
@@ -324,7 +324,7 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   trimesh.morph_factor = 0;
   trimesh.buffers[0] = vbuf;
   trimesh.mat_handle = Material->GetMaterialHandle ();
-  trimesh.vertex_fog = NULL;
+  trimesh.vertex_fog = 0;
 
   // draw it!
   vbufmgr->LockBuffer (vbuf, vertices, texels, colors, VertexCount, 0, bbox);
@@ -364,7 +364,7 @@ bool csNewParticleSystem::SetMaterialWrapper (iMaterialWrapper* m)
 
 iMaterialWrapper* csNewParticleSystem::GetMaterialWrapper () const
 {
-  if (ParticleFlags & CS_PARTICLE_SEP_MATERIAL) return NULL;
+  if (ParticleFlags & CS_PARTICLE_SEP_MATERIAL) return 0;
   else return Material;
 }
 
@@ -378,5 +378,5 @@ void csNewParticleSystem::SetLighting (bool enable)
   if (Lighting) delete[] LitColors;
   Lighting = enable;
   if (Lighting) LitColors = new csColor [StorageCount];
-  else LitColors = NULL;
+  else LitColors = 0;
 }

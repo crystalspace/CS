@@ -42,7 +42,7 @@
 
 extern WalkTest* Sys;
 
-csKeyMap* mapping = NULL;
+csKeyMap* mapping = 0;
 
 iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh, iCamera *camera, csVector2 *screenCoord);
 
@@ -170,7 +170,7 @@ csKeyMap* find_mapping (const char* keyname)
       return m;
     m = m->next;
   }
-  return NULL;
+  return 0;
 }
 
 void bind_key (const char* arg)
@@ -199,7 +199,7 @@ void bind_key (const char* arg)
     {
       map = new csKeyMap ();
       map->next = mapping;
-      map->prev = NULL;
+      map->prev = 0;
       if (mapping) mapping->prev = map;
       mapping = map;
       map_key (arg, map);
@@ -227,7 +227,7 @@ void free_keymap ()
     delete [] prev->cmd;
     delete prev;
   }
-  mapping = NULL;
+  mapping = 0;
 }
 
 extern iCamera* c;
@@ -621,7 +621,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   if (sel)
   {
     if (Sys->selected_polygon == sel)
-      Sys->selected_polygon = NULL;
+      Sys->selected_polygon = 0;
     else
       Sys->selected_polygon = sel;
 
@@ -653,7 +653,7 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
 
   screenPoint.x = Event.Mouse.x;
   screenPoint.y = Event.Mouse.y;
-  closestMesh = FindNextClosestMesh (NULL, view->GetCamera(), &screenPoint);
+  closestMesh = FindNextClosestMesh (0, view->GetCamera(), &screenPoint);
   if (closestMesh)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Selected mesh %s", closestMesh->
@@ -785,11 +785,11 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
     	(camera, screenBoundingBox, bbox3);
     // if the baseMesh isn't in front of the camera, return
     if (closestZLocation < 0)
-      return NULL;
+      return 0;
   }
   else
   {
-    closestMesh = NULL;
+    closestMesh = 0;
     closestZLocation = 32000;
   }
 

@@ -146,7 +146,7 @@ int csModelConverterMD2::GetFormatCount ()
 
 const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx)
 {
-  return (idx == 0) ? &FormatInfo : NULL;
+  return (idx == 0) ? &FormatInfo : 0;
 }
 
 /*
@@ -232,7 +232,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 
   // check for the correct version
   if (!CheckMD2Version (in))
-    return NULL;
+    return 0;
 
   // build the object framework
   iModelData *Scene = new csModelData ();
@@ -293,7 +293,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 
   // now we read in the frames.  The number of frames is stored in 'num_object'
 
-  iModelDataVertices *DefaultFrame = NULL;
+  iModelDataVertices *DefaultFrame = 0;
 
   char currAction [256];
   memset (currAction, 0, 256);
@@ -371,7 +371,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 csPtr<iDataBuffer> csModelConverterMD2::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "md2"))
-    return NULL;
+    return 0;
 
-  return NULL;
+  return 0;
 }

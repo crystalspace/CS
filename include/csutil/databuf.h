@@ -40,14 +40,14 @@ public:
 
   /// Construct an preallocated data buffer (filled with garbage initially)
   csDataBuffer (size_t iSize)
-  { SCF_CONSTRUCT_IBASE (NULL); Data = new char [Size = iSize]; }
+  { SCF_CONSTRUCT_IBASE (0); Data = new char [Size = iSize]; }
   /// Construct an data buffer object given a existing (new char []) pointer
   csDataBuffer (char *iData, size_t iSize)
-  { SCF_CONSTRUCT_IBASE (NULL); Data = iData; Size = iSize; }
-  /// Duplicate an existing data buffer. Also appends a NULL char.
+  { SCF_CONSTRUCT_IBASE (0); Data = iData; Size = iSize; }
+  /// Duplicate an existing data buffer. Also appends a 0 char.
   csDataBuffer (iDataBuffer *source)
   {
-    SCF_CONSTRUCT_IBASE (NULL); 
+    SCF_CONSTRUCT_IBASE (0); 
     Data = new char [(Size = source->GetSize()) + 1];
     memcpy (Data, source->GetData(), Size);
     Data[Size] = 0;

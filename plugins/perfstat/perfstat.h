@@ -179,7 +179,7 @@ protected:
   virtual void FinishSubsection ();
 
   virtual bool IsSubsection ()
-  { return (sub_section != NULL); }
+  { return (sub_section != 0); }
 
   /**
    * Print this sections current summary stats, where severity is
@@ -209,7 +209,7 @@ protected:
   public:
     EventHandler (csPerfStats* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;

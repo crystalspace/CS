@@ -69,7 +69,7 @@ public:
     virtual bool Load(MayaInputFile& )     { return false; };
     virtual bool Write(FILE *)             { return false; };
 
-    DAGNode *Find(const char *)            { return NULL; };
+    DAGNode *Find(const char *)            { return 0; };
     void AddChild(DAGNode *child)
     {
         children.Push (child);

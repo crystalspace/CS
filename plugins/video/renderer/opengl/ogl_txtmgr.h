@@ -216,7 +216,7 @@ csTextureManagerOpenGL::formatDescription var[] = {
 {dsttype, #dsttype, srctype, size, 0, (GLenum)0, texelsize},
 
 #define CS_GL_FORMAT_TABLE_END \
-{(GLenum)0, NULL, (GLenum)0, 0, 0, (GLenum)0, 0}};
+{(GLenum)0, 0, (GLenum)0, 0, 0, (GLenum)0, 0}};
 
 
 #endif // __CS_TXTMGR_OPENGL_H__

@@ -66,7 +66,7 @@ IsoMap1 *System;
 
 IsoMap1::IsoMap1 ()
 {
-  mouse = NULL;
+  mouse = 0;
   lastclick.Set(0,0,0);
   walking = false;
 }
@@ -94,7 +94,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -118,7 +118,7 @@ struct PlayerGridChange : public iGridChangeCallback
 {
   IsoMap1* app;
   SCF_DECLARE_IBASE;
-  PlayerGridChange () { SCF_CONSTRUCT_IBASE (NULL); }
+  PlayerGridChange () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~PlayerGridChange() { }
   virtual void GridChange (iIsoSprite* spr);
 };
@@ -436,7 +436,7 @@ void IsoMap1::SetupFrame ()
 void IsoMap1::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 
@@ -486,14 +486,14 @@ bool IsoMap1::HandleEvent (iEvent &Event)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new IsoMap1 ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

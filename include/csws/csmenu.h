@@ -51,7 +51,7 @@ class csMenu;
 /// This class encapsulates a menu item
 class csMenuItem : public csComponent
 {
-  /// Menu item info (if not NULL) (placed to the right of menu item text)
+  /// Menu item info (if not 0) (placed to the right of menu item text)
   char *info;
   /// Character number that should be underlined (-1 == none)
   int underline_pos;
@@ -124,7 +124,7 @@ enum
    * Tell menu to capture the mouse, if its parent menu didn't so.
    * <pre>
    * IN: (csComponent *)Source;
-   * OUT: NULL if mouse has been captured
+   * OUT: 0 if mouse has been captured
    * </pre>
    */
   cscmdMenuCaptureMouse,
@@ -132,7 +132,7 @@ enum
    * Set menu's current item to command argument.
    * <pre>
    * IN: (csComponent *)Item;
-   * OUT: NULL if successfull
+   * OUT: 0 if successfull
    * </pre>
    */
   cscmdMenuSetItem,
@@ -143,7 +143,7 @@ enum
   /**
    * Query if submenus are dropped out automatically
    * <pre>
-   * IN:  NULL
+   * IN:  0
    * OUT: (bool)DropFlag
    * </pre>
    */
@@ -171,7 +171,7 @@ enum
   /**
    * Query menu item's style
    * <pre>
-   * IN: NULL
+   * IN: 0
    * OUT: (int)ItemStyle
    * </pre>
    */
@@ -181,7 +181,7 @@ enum
    * item has given id.
    * <pre>
    * IN: (int)id;
-   * OUT: (csComponent *)menuitem or NULL
+   * OUT: (csComponent *)menuitem or 0
    * </pre>
    */
   cscmdMenuItemFindId
@@ -308,7 +308,7 @@ private:
  * csMenu *menu = (csMenu *)window->GetChild (CSWID_MENUBAR);
  * if (menu)
  * {
- *   submenu = new csMenu (NULL);
+ *   submenu = new csMenu (0);
  *   (void)new csMenuItem (menu, "~File", submenu);
  *     (void)new csMenuItem (submenu, "~Open\tCtrl+O", cscmdNothing);
  *     (void)new csMenuItem (submenu, "~Save\tCtrl+S", cscmdNothing);

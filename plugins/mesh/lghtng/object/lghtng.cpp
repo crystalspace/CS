@@ -56,15 +56,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* factory)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightningState);
   csLightningMeshObject::factory = factory;
-  logparent = NULL;
+  logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
 
   initialized = false;
-  vis_cb = NULL;
+  vis_cb = 0;
   origin.Set(0,0,0);  
 
   CS_ASSERT(factory);
@@ -164,11 +164,11 @@ csLightningMeshObjectFactory::csLightningMeshObjectFactory (iBase *pParent, iObj
   
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightningFactoryState);
-  material = NULL;
+  material = 0;
   MixMode = 0;
   origin.Set (0, 0, 0);
   directional.Set (0, 0, 1);  
-  logparent = NULL;
+  logparent = 0;
   
   SCF_CONSTRUCT_IBASE (pParent);  
   csRef<iPluginManager> PlugMgr (CS_QUERY_REGISTRY (object_registry, iPluginManager));

@@ -78,7 +78,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-TerrBigTut *Sys = NULL;
+TerrBigTut *Sys = 0;
 
 TerrBigTut::TerrBigTut (iObjectRegistry* o) 
 {
@@ -123,37 +123,37 @@ bool TerrBigTut::Initialize ()
     return false;
   }
 
-  if ((vfs = CS_QUERY_REGISTRY (object_reg, iVFS)) == NULL) {
+  if ((vfs = CS_QUERY_REGISTRY (object_reg, iVFS)) == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR, 
 	  "Unable to initialize vfs");
 	return false;
   }
 
-  if ((vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock)) == NULL) {
+  if ((vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock)) == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to initialize virtual clock");
     return false;
   }
 
-  if ((engine = CS_QUERY_REGISTRY (object_reg, iEngine)) == NULL) {
+  if ((engine = CS_QUERY_REGISTRY (object_reg, iEngine)) == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to initialize engine");
     return false;
   }
 
-  if ((loader = CS_QUERY_REGISTRY (object_reg, iLoader)) == NULL) {
+  if ((loader = CS_QUERY_REGISTRY (object_reg, iLoader)) == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to initialize map loader");
     return false;
   }
 
-  if ((g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D)) == NULL) {
+  if ((g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D)) == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to initialize graphics");
     return false;
   }
 
-  if ((kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver)) == NULL) {
+  if ((kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver)) == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to initialize keyboard");
     return false;
@@ -259,15 +259,15 @@ bool TerrBigTut::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-50, 20, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-50, 20, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (50, 20,  0), 10,
+  light = engine->CreateLight (0, csVector3 (50, 20,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 20, -50), 10,
+  light = engine->CreateLight (0, csVector3 (0, 20, -50), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
@@ -337,7 +337,7 @@ void TerrBigTut::SetupFrame ()
 void TerrBigTut::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 int main (int argc, char *argv[])

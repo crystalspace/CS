@@ -47,7 +47,7 @@ char* BuildMaterialKey (int i, CMapEntity* pEntity)
   char* returnvalue = new char[1024];
   sprintf(key,"MaterialName%d",i);
   printf(key);
-  if(!pEntity->GetValueOfKey(key)) return NULL;
+  if(!pEntity->GetValueOfKey(key)) return 0;
   sprintf(returnvalue,"<key name=\"defmaterial\" value=\"%s\" />\n",
 	      pEntity->GetValueOfKey(key));
   return returnvalue;
@@ -550,7 +550,7 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
 
           /*Lets build all material definition
            *keys KEY("defmaterial","materialname, texturefile")
-           * It will declare materials until BuildMateriaKey returns a NULL
+           * It will declare materials until BuildMateriaKey returns a 0
            */
           int mIndex; //material Index
           char* key;

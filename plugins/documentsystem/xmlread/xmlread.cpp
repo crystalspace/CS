@@ -56,7 +56,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csXmlReadDocWrapper::csXmlReadDocWrapper (csRef<iDocument> doc)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   xmlreaddoc = doc;
 }
@@ -72,7 +72,7 @@ void csXmlReadDocWrapper::Clear ()
 
 csRef<iDocumentNode> csXmlReadDocWrapper::CreateRoot ()
 {
-  return NULL;
+  return 0;
 }
 
 csRef<iDocumentNode> csXmlReadDocWrapper::GetRoot ()
@@ -157,7 +157,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csXmlReadXMLPlugin (iBase* parent = NULL);
+  csXmlReadXMLPlugin (iBase* parent = 0);
   virtual ~csXmlReadXMLPlugin ();
 
   virtual bool Initialize (iObjectRegistry* objreg);

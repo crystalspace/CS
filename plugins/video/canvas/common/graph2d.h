@@ -152,7 +152,7 @@ public:
   virtual void FinishDraw ();
 
   /// (*) Flip video pages (or dump backbuffer into framebuffer).
-  virtual void Print (csRect *area = NULL) { }
+  virtual void Print (csRect *area = 0) { }
 
   /// Get active videopage number (starting from zero)
   virtual int GetPage ();
@@ -327,7 +327,7 @@ public:
    * Set mouse cursor to one of predefined shape classes
    * (see csmcXXX enum above). If a specific mouse cursor shape
    * is not supported, return 'false'; otherwise return 'true'.
-   * If system supports it and iBitmap != NULL, shape should be
+   * If system supports it and iBitmap != 0, shape should be
    * set to the bitmap passed as second argument; otherwise cursor
    * should be set to its nearest system equivalent depending on
    * iShape argument.
@@ -347,7 +347,7 @@ public:
   public:
     EventHandler (csGraphics2D* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;

@@ -89,7 +89,7 @@ public:
 class LV
 {
 public:
-  LV () : next (NULL), lv (NULL), ctxt (NULL) { }
+  LV () : next (0), lv (0), ctxt (0) { }
 
   LV* next;
   iFrustumView* lv;

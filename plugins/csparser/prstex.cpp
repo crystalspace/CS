@@ -134,14 +134,14 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 
   //char filename[256];
   //strcpy (filename, txtname);
-  const char* filename = NULL;
+  const char* filename = 0;
   csColor transp (0, 0, 0);
   bool do_transp = false;
   bool keep_image = false;
   bool always_animate = false;
   TextureLoaderContext context;
   csRef<iDocumentNode> ParamsNode;
-  const char* type = NULL;
+  const char* type = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -156,7 +156,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool for2d;
 	  if (!SyntaxService->ParseBool (child, for2d, true))
-	    return NULL;
+	    return 0;
           if (for2d)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_2D);
           else
@@ -167,7 +167,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool for3d;
 	  if (!SyntaxService->ParseBool (child, for3d, true))
-	    return NULL;
+	    return 0;
           if (for3d)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_3D);
           else
@@ -177,7 +177,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       case XMLTOKEN_TRANSPARENT:
         do_transp = true;
 	if (!SyntaxService->ParseColor (child, transp))
-	  return NULL;
+	  return 0;
         break;
       case XMLTOKEN_FILE:
 	{
@@ -187,7 +187,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.texture",
 	      child, "Expected VFS filename for 'file'!");
-	    return NULL;
+	    return 0;
 	  }
           //strcpy (filename, fname);
 	  filename = fname;
@@ -197,7 +197,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool mm;
 	  if (!SyntaxService->ParseBool (child, mm, true))
-	    return NULL;
+	    return 0;
           if (mm)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_NOMIPMAPS);
           else
@@ -208,7 +208,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool di;
 	  if (!SyntaxService->ParseBool (child, di, true))
-	    return NULL;
+	    return 0;
           if (di)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_DITHER);
           else
@@ -218,7 +218,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       case XMLTOKEN_KEEPIMAGE:
         {
 	  if (!SyntaxService->ParseBool (child, keep_image, true))
-	    return NULL;
+	    return 0;
 	}
 	break;
       case XMLTOKEN_PARAMS:
@@ -231,7 +231,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.texture",
 	      child, "Expected plugin ID for <type>!");
-	    return NULL;
+	    return 0;
 	  }
 	break;
       case XMLTOKEN_SIZE:
@@ -247,17 +247,17 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	break;
       case XMLTOKEN_ALWAYSANIMATE:
 	if (!SyntaxService->ParseBool (child, always_animate, false))
-	  return NULL;
+	  return 0;
 	break;
       default:
         SyntaxService->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 
   csRef<iLoaderPlugin> plugin;
 
-  iTextureManager* tm = G3D ? G3D->GetTextureManager() : NULL;
+  iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
   int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
   if (filename && (*filename != 0))
   {
@@ -277,7 +277,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	// shortcut, no need to go through the plugin list facility
 	if (!BuiltinImageTexLoader)
 	{
-	  csImageTextureLoader* itl = new csImageTextureLoader (NULL);
+	  csImageTextureLoader* itl = new csImageTextureLoader (0);
 	  itl->Initialize (object_reg);
 	  BuiltinImageTexLoader.AttachNew (itl);
 	}
@@ -289,7 +289,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   
   static bool deprecated_warned = false;
 
-  iLoaderPlugin* Plug = NULL;
+  iLoaderPlugin* Plug = 0;
   iBinaryLoaderPlugin* Binplug;
   if (type && !plugin)
   {
@@ -334,7 +334,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 
     if (!BuiltinImageTexLoader)
     {
-      csImageTextureLoader* itl = new csImageTextureLoader (NULL);
+      csImageTextureLoader* itl = new csImageTextureLoader (0);
       itl->Initialize (object_reg);
       BuiltinImageTexLoader.AttachNew (itl);
     }
@@ -356,7 +356,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 
     if (!BuiltinCheckerTexLoader)
     {
-      csCheckerTextureLoader* ctl = new csCheckerTextureLoader (NULL);
+      csCheckerTextureLoader* ctl = new csCheckerTextureLoader (0);
       ctl->Initialize (object_reg);
       BuiltinCheckerTexLoader.AttachNew (ctl);
     }
@@ -386,7 +386,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	iDocumentNode* node, const char *prefix)
 {
-  if (!Engine) return NULL;
+  if (!Engine) return 0;
 
   const char* matname = node->GetAttributeValue ("name");
   if (ldr_context->CheckDupes ())
@@ -428,7 +428,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
  	    ReportError (
  	      "crystalspace.maploader.parse.material",
  	      "Cannot find texture '%s' for material `%s'", txtname, matname);
- 	    return NULL;
+ 	    return 0;
           }
 	}
         break;
@@ -437,7 +437,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           col_set = true;
 	  csColor color;
           if (!SyntaxService->ParseColor (child, color))
-	    return NULL;
+	    return 0;
 	  col.red = QInt (color.red * 255.99f);
 	  col.green = QInt (color.green * 255.99f);
 	  col.blue = QInt (color.blue * 255.99f);
@@ -477,10 +477,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.material",
 	      child, "Only four texture layers supported!");
-	    return NULL;
+	    return 0;
 	  }
-	  txt_layers[num_txt_layer] = NULL;
-	  layers[num_txt_layer].txt_handle = NULL;
+	  txt_layers[num_txt_layer] = 0;
+	  layers[num_txt_layer].txt_handle = 0;
 	  layers[num_txt_layer].uscale = 1;
 	  layers[num_txt_layer].vscale = 1;
 	  layers[num_txt_layer].ushift = 0;
@@ -512,7 +512,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 			"crystalspace.maploader.parse.material",
 		    	child, "Cannot find texture `%s' for material `%s'!",
 			txtname, matname);
-		    return NULL;
+		    return 0;
                   }
 		}
 		break;
@@ -531,11 +531,11 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	      case XMLTOKEN_MIXMODE:
 		if (!SyntaxService->ParseMixmode (layer_child,
 		    layers[num_txt_layer].mode))
-		  return NULL;
+		  return 0;
 	        break;
 	      default:
 	        SyntaxService->ReportBadToken (layer_child);
-		return NULL;
+		return 0;
 	    }
 	  }
 	  num_txt_layer++;
@@ -562,7 +562,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 #endif //CS_USE_NEW_RENDERER
       default:
 	SyntaxService->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

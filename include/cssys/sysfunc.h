@@ -128,7 +128,7 @@ csString csGetUsername();
  * The data is stored in a platform-specific manner - e.g. the Registry on
  * Windows.
  * \param key Used to distinguish different stored configurations.
- * \return A config 'file'. Might return NULL on some platforms.
+ * \return A config 'file'. Might return 0 on some platforms.
  */
 csPtr<iConfigFile> csGetPlatformConfig (const char* key);
 

@@ -207,7 +207,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   font = myG2D->GetFontServer()->LoadFont (CSFONT_LARGE);
 
   // Initialize the console
-  if (myConsole != NULL)
+  if (myConsole != 0)
     // Don't let messages before this one appear
     myConsole->Clear ();
 
@@ -285,15 +285,15 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
-  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
@@ -321,7 +321,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   if (AWSTEST_CANVAS == AWSTEST_SINGLEPROC)
   {
-    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, NULL);
+    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, 0);
     //aws->SetFlag(AWSF_AlwaysEraseWindows);  // Only set for surface or direct-drawing w/o engine
   }
   else if (AWSTEST_CANVAS == AWSTEST_MULTIPROC)
@@ -438,7 +438,7 @@ void
 awsTest::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool

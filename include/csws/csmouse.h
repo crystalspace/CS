@@ -87,7 +87,7 @@ private:
   csApp *app;
   /// The array of pointers
   csPDelArray<csMousePointer> Pointers;
-  /// Current active mouse cursor (system cursor if NULL)
+  /// Current active mouse cursor (system cursor if 0)
   csMousePointer *ActiveCursor;
   /// Cursor texture
   iTextureHandle *Texture;

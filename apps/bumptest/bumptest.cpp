@@ -81,12 +81,12 @@ BumpTest *bumptest;
 BumpTest::BumpTest (iObjectRegistry* object_reg)
 {
   BumpTest::object_reg = object_reg;
-  prBump = NULL;
-  matBump = NULL;
-  bumplight = NULL;
+  prBump = 0;
+  matBump = 0;
+  bumplight = 0;
   animli = 0.0;
   going_right = true;
-  room = NULL;
+  room = 0;
 }
 
 BumpTest::~BumpTest ()
@@ -507,7 +507,7 @@ void BumpTest::SetupFrame ()
 void BumpTest::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool BumpTest::BumpHandleEvent (iEvent &Event)
@@ -533,7 +533,7 @@ void BumpTest::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;

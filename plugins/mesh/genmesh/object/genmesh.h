@@ -63,7 +63,7 @@ public:
   // For every vertex of the mesh a value.
   uint8* shadowmap;
 
-  csShadowArray () : shadowmap (NULL) { }
+  csShadowArray () : shadowmap (0) { }
   ~csShadowArray ()
   {
     delete[] shadowmap;
@@ -89,7 +89,7 @@ private:
     {
       memset (lightID, 0xff, sizeof (lightID));
       lightPos = csVector3(0,0,0);
-      shadow_index_buffer = NULL;
+      shadow_index_buffer = 0;
       edge_start = 0;
       index_range = 0;
     }
@@ -278,7 +278,7 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo
@@ -713,7 +713,7 @@ public:
     virtual bool IsDeformable () const { return false;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () { SCF_CONSTRUCT_IBASE (NULL); }
+    PolyMesh () { SCF_CONSTRUCT_IBASE (0); }
     virtual ~PolyMesh () { }
   } scfiPolygonMesh;
   friend struct PolyMesh;

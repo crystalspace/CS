@@ -69,7 +69,7 @@ struct iImageIO : public iBase
    * This routine will read from the buffer buf of length size, try to
    * recognize the type of image contained within, and return an csImageFile
    * of the appropriate type.  Returns a pointer to the iImage on
-   * success, or NULL on failure. The bits that fit the CS_IMGFMT_MASK
+   * success, or 0 on failure. The bits that fit the CS_IMGFMT_MASK
    * mask are mandatory: the image always will be loaded in the
    * appropiate format; the bits outside that mask (i.e. CS_IMGFMT_ALPHA)
    * are optional: if the image does not contain alpha mask, the GetFormat()
@@ -100,14 +100,14 @@ struct iImageIO : public iBase
    * <code>progressive,compress=30</code>
    */
   virtual csPtr<iDataBuffer> Save (iImage *image, FileFormatDescription *format,
-    const char* extraoptions = NULL) = 0;
+    const char* extraoptions = 0) = 0;
 
   /**
    * Save an image using format <mime>.
    * If omitted format selection is left to the plugin.
    */
-  virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = NULL,
-    const char* extraoptions = NULL) = 0;
+  virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
+    const char* extraoptions = 0) = 0;
 };
 
 /** @} */

@@ -43,9 +43,9 @@ class csTerrainQuadDiv
   csTerrainQuadDiv *parent;
   /// place in parent node (cs_quad_topleft, etc..)
   int parentplace;
-  /// children (all NULL - no children)
+  /// children (all 0 - no children)
   csTerrainQuadDiv *children[4];
-  /// direct neighbors (some can be NULL if you like)
+  /// direct neighbors (some can be 0 if you like)
   csTerrainQuadDiv *neighbors[4];
 
   /// is this quaddiv subdivided into smaller pieces? (true if equal to num)
@@ -73,16 +73,16 @@ class csTerrainQuadDiv
 public:
   /// create tree of certain depth (0 = create leaf node).
   csTerrainQuadDiv(int depth);
-  /// and destroy subtree  (please remove it from neighbors, set NULL)
+  /// and destroy subtree  (please remove it from neighbors, set 0)
   ~csTerrainQuadDiv();
 
-  /// Add/Remove a neighbor from the tree - give direction and ptr(can be NULL)
+  /// Add/Remove a neighbor from the tree - give direction and ptr(can be 0)
   void SetNeighbor(int dir, csTerrainQuadDiv *neigh);
-  /// Set a neighbor to NULL (it will be looked up next frame)
+  /// Set a neighbor to 0 (it will be looked up next frame)
   void RemoveNeighbor(int dir);
   /** 
-   * Get neighbor for a direction (will look it up if NULL is cached)
-   * NULL means no neighbor (of same size) in that direction.
+   * Get neighbor for a direction (will look it up if 0 is cached)
+   * 0 means no neighbor (of same size) in that direction.
   */
   csTerrainQuadDiv* GetNeighbor(int dir);
 
@@ -92,7 +92,7 @@ public:
   void SetVisQuad(csTerrainQuad *vis) {visquad = vis;}
 
   /// is this quad a leaf node? (nodes always have four or zero children)
-  bool IsLeaf() const {return children[0] == NULL;}
+  bool IsLeaf() const {return children[0] == 0;}
 
   /** Compute dmaxes from scratch.
    * Pass height func, and borders of this quad in flat space

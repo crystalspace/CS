@@ -58,13 +58,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csNullmeshMeshObject::csNullmeshMeshObject (iMeshObjectFactory* factory)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNullMeshState);
   csNullmeshMeshObject::factory = factory;
-  logparent = NULL;
-  vis_cb = NULL;
+  logparent = 0;
+  vis_cb = 0;
   radius = .1;
 }
 
@@ -187,7 +187,7 @@ csNullmeshMeshObjectType::~csNullmeshMeshObjectType ()
 
 csPtr<iMeshObjectFactory> csNullmeshMeshObjectType::NewFactory ()
 {
-  csNullmeshMeshObject* cm = new csNullmeshMeshObject (NULL);
+  csNullmeshMeshObject* cm = new csNullmeshMeshObject (0);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
   cm->DecRef ();

@@ -107,9 +107,9 @@ public:
 
   /**
     * Get the string value of the given key. If the given key is not present this
-    * function will return the given defaultvalue (NULL if nothing is given)
+    * function will return the given defaultvalue (0 if nothing is given)
     */
-  const char* GetValueOfKey(const char* key, const char* defaultvalue = NULL);
+  const char* GetValueOfKey(const char* key, const char* defaultvalue = 0);
 
   /**
     * Get the numeric value of the given key. If the given key is not present this

@@ -70,19 +70,19 @@ SCF_IMPLEMENT_IBASE_EXT_END
 #if SHADE_BUF
 #include "util/img.inc"
 static SDL_Surface
-*Sarrow_tga=NULL,
-*Scross_tga=NULL,
-*Shglass1_tga=NULL,
-*Shglass2_tga=NULL,
-*Slrarrow_tga=NULL,
-*Smagnify_tga=NULL,
-*Smove_tga=NULL,
-*Spen_tga=NULL,
-*Ss1arrow_tga=NULL,
-*Ss2arrow_tga=NULL,
-*Sstop_tga=NULL,
-*Sudarrow_tga=NULL,
-*Scurrent=NULL;
+*Sarrow_tga=0,
+*Scross_tga=0,
+*Shglass1_tga=0,
+*Shglass2_tga=0,
+*Slrarrow_tga=0,
+*Smagnify_tga=0,
+*Smove_tga=0,
+*Spen_tga=0,
+*Ss1arrow_tga=0,
+*Ss2arrow_tga=0,
+*Sstop_tga=0,
+*Sudarrow_tga=0,
+*Scurrent=0;
 static int cursorNo;
 
 static int hotspot[12][2]=
@@ -167,7 +167,7 @@ static int drawing_thread(void *_owner)
       dst.y = (Sint16)y-hotspot[cursorNo][1];
       dst.w = dst.h = 32;
 
-      SDL_BlitSurface(Scurrent, NULL, owner->screen, &dst);
+      SDL_BlitSurface(Scurrent, 0, owner->screen, &dst);
 
       if (Scurrent == Shglass1_tga)
         Scurrent = Shglass2_tga; else
@@ -185,7 +185,7 @@ static int drawing_thread(void *_owner)
 // csGraphics2DSDL functions
 csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D (iParent)
 {
-  EventOutlet = NULL;
+  EventOutlet = 0;
 }
 
 void csGraphics2DSDL::Report (int severity, const char* msg, ...)
@@ -241,7 +241,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
     if (!csGraphics2D::Initialize (object_reg))
       return false;
 
-    Memory = NULL;
+    Memory = 0;
 
     // SDL Starts here
 
@@ -254,7 +254,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Defaults to %dx%dx%d resolution.", Width, Height, Depth);
 
-    Memory = NULL;
+    Memory = 0;
 
 #if SHADE_BUF
     cursorNo = csmcNone;
@@ -298,7 +298,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
 csGraphics2DSDL::~csGraphics2DSDL(void)
 {
     // Destroy your graphic interface
-    Memory = NULL;
+    Memory = 0;
     Close();
 }
 
@@ -317,13 +317,13 @@ bool csGraphics2DSDL::Open()
   }
 
   screen = SDL_SetVideoMode(Width,Height,Depth,SDL_SWSURFACE);
-  if (screen == NULL) {
+  if (screen == 0) {
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't set %dx%dx%d video mode: %s",
                                Width, Height, Depth, SDL_GetError());
     return false;
   }
 
-  SDL_WM_SetCaption(win_title, NULL);
+  SDL_WM_SetCaption(win_title, 0);
   SDL_EnableKeyRepeat(250, 30);
   SDL_ShowCursor(1);
 
@@ -334,7 +334,7 @@ bool csGraphics2DSDL::Open()
   *((char **)&membuffer) =
     new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
   init_surfaces();
-  Scurrent = NULL;
+  Scurrent = 0;
   th_lock = SDL_CreateMutex();
   SDL_CreateThread(drawing_thread, (void *)this);
 #else
@@ -408,7 +408,7 @@ void csGraphics2DSDL::Close(void)
   delete[] ((char *)membuffer);
   SDL_DestroyMutex(th_lock);
 #endif
-  Memory = NULL;
+  Memory = 0;
 }
 
 struct keyconv_t
@@ -612,8 +612,8 @@ bool csGraphics2DSDL::SetMouseCursor (csMouseCursorID iShape)
     I csmcSizeEW    l Slrarrow_tga  J
     I csmcStop      l Sstop_tga     J
     I csmcWait      l Shglass1_tga  J
-    I 12            l NULL          J
-                      NULL;
+    I 12            l 0          J
+                      0;
 
     if (cursorNo >= 12) cursorNo = 0;
     if (cursorNo < 0) cursorNo = 0;

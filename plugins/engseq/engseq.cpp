@@ -67,7 +67,7 @@ protected:
   virtual ~OpStandard () { }
 
 public:
-  OpStandard () { SCF_CONSTRUCT_IBASE (NULL); }
+  OpStandard () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
 };
 
@@ -84,7 +84,7 @@ protected:
   virtual ~CondStandard () { }
 
 public:
-  CondStandard () { SCF_CONSTRUCT_IBASE (NULL); }
+  CondStandard () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
 };
 
@@ -127,7 +127,7 @@ public:
       sector->SetFog (density, color);
 #endif // CS_USE_NEW_RENDERER
     if (sectorpar)
-      sector = NULL;
+      sector = 0;
   }
 };
 
@@ -140,7 +140,7 @@ public:
 
   FadeFogInfo ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~FadeFogInfo () { }
   SCF_DECLARE_IBASE;
@@ -213,7 +213,7 @@ public:
     fi->DecRef ();
 #endif // CS_USE_NEW_RENDERER
     if (sectorpar)
-      sector = NULL;
+      sector = 0;
   }
 };
 
@@ -269,7 +269,7 @@ public:
 		iPolygon3D);
       polygon->GetStaticData ()->SetMaterial (material);
       if (polygonpar)
-        polygon = NULL;
+        polygon = 0;
     }
     else
     {
@@ -277,10 +277,10 @@ public:
         mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
       mesh->GetMeshObject ()->SetMaterialWrapper (material);
       if (meshpar)
-        mesh = NULL;
+        mesh = 0;
     }
     if (materialpar)
-      material = NULL;
+      material = 0;
   }
 };
 
@@ -312,7 +312,7 @@ public:
       light = SCF_QUERY_INTERFACE (lightpar->GetValue (params), iLight);
     light->SetColor (color);
     if (lightpar)
-      light = NULL;
+      light = 0;
   }
 };
 
@@ -324,7 +324,7 @@ public:
 
   FadeLightInfo ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~FadeLightInfo () { }
   SCF_DECLARE_IBASE;
@@ -379,7 +379,7 @@ public:
     eseqmgr->FireTimedOperation (dt, duration, fl);
     fl->DecRef ();
     if (lightpar)
-      light = NULL;
+      light = 0;
   }
 };
 
@@ -405,7 +405,7 @@ public:
       colorvar = varcolor;
     else
     {
-      colorvar = NULL;
+      colorvar = 0;
       OpSetAmbientLight::color = color;
     }
   }
@@ -424,7 +424,7 @@ public:
 
   FadeAmbientLightInfo ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~FadeAmbientLightInfo () { }
   SCF_DECLARE_IBASE;
@@ -503,7 +503,7 @@ public:
       mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
     mesh->GetMeshObject ()->SetColor (color);
     if (meshpar)
-      mesh = NULL;
+      mesh = 0;
   }
 };
 
@@ -516,7 +516,7 @@ public:
 
   FadeMeshColorInfo ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~FadeMeshColorInfo () { }
   SCF_DECLARE_IBASE;
@@ -571,7 +571,7 @@ public:
     eseqmgr->FireTimedOperation (dt, duration, fm);
     fm->DecRef ();
     if (meshpar)
-      mesh = NULL;
+      mesh = 0;
   }
 };
 
@@ -588,7 +588,7 @@ public:
 
   RotateInfo ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~RotateInfo () { }
   SCF_DECLARE_IBASE;
@@ -706,7 +706,7 @@ public:
     eseqmgr->FireTimedOperation (dt, duration, ri);
     ri->DecRef ();
     if (meshpar)
-      mesh = NULL;
+      mesh = 0;
   }
 };
 
@@ -721,7 +721,7 @@ public:
 
   MoveInfo ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~MoveInfo () { }
   SCF_DECLARE_IBASE;
@@ -777,7 +777,7 @@ public:
     eseqmgr->FireTimedOperation (dt, duration, mi);
     mi->DecRef ();
     if (meshpar)
-      mesh = NULL;
+      mesh = 0;
   }
 };
 
@@ -840,7 +840,7 @@ public:
       	triggerpar->GetValue (params), iSequenceTrigger);
     trigger->SetEnabled (en);
     if (triggerpar)
-      trigger = NULL;
+      trigger = 0;
   }
 };
 
@@ -873,7 +873,7 @@ public:
       	triggerpar->GetValue (params), iSequenceTrigger);
     trigger->TestConditions (delay);
     if (triggerpar)
-      trigger = NULL;
+      trigger = 0;
   }
 };
 
@@ -904,7 +904,7 @@ public:
       	triggerpar->GetValue (params), iSequenceTrigger);
     bool rc = trigger->CheckState ();
     if (triggerpar)
-      trigger = NULL;
+      trigger = 0;
     return rc;
   }
 };
@@ -919,12 +919,12 @@ private:
 public:
   esmPar (int idx)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     esmPar::idx = idx;
   }
   virtual ~esmPar () { }
   SCF_DECLARE_IBASE;
-  virtual iBase* GetValue (iBase* params = NULL) const
+  virtual iBase* GetValue (iBase* params = 0) const
   {
     // The following cast is in theory unsafe but in this case it is
     // ok since there is no way some other 'params' instance could get
@@ -950,12 +950,12 @@ private:
 public:
   constantPar (iBase* value)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     constantPar::value = value;
   }
   virtual ~constantPar () { }
   SCF_DECLARE_IBASE;
-  virtual iBase* GetValue (iBase* params = NULL) const
+  virtual iBase* GetValue (iBase* params = 0) const
   {
     (void)params;
     return value;
@@ -978,12 +978,12 @@ private:
 public:
   sharedvarPar (iBase* value)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     sharedvarPar::value = value;
   }
   virtual ~sharedvarPar () { }
   SCF_DECLARE_IBASE;
-  virtual iBase* GetValue (iBase* params = NULL) const
+  virtual iBase* GetValue (iBase* params = 0) const
   {
     (void)params;
     return value;
@@ -1008,7 +1008,7 @@ csPtr<iParameterESM> csEngineSequenceParameters::CreateParameterESM (
 	const char* name)
 {
   int idx = GetParameterIdx (name);
-  if (idx == -1) return NULL;
+  if (idx == -1) return 0;
   csRef<iParameterESM> par = csPtr<iParameterESM> (new esmPar (idx));
   return csPtr<iParameterESM>(par);
 }
@@ -1049,7 +1049,7 @@ iEngineSequenceParameters* csSequenceWrapper::GetBaseParameterBlock ()
 
 csPtr<iEngineSequenceParameters> csSequenceWrapper::CreateParameterBlock ()
 {
-  if (!params) return NULL;
+  if (!params) return 0;
   csEngineSequenceParameters* copyparams = new csEngineSequenceParameters ();
 
   int i;
@@ -1066,7 +1066,7 @@ csPtr<iEngineSequenceParameters> csSequenceWrapper::CreateParameterBlock ()
 void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,
 	iParameterESM* polygon, iParameterESM* material)
 {
-  OpSetMaterial* op = new OpSetMaterial (NULL, polygon, material);
+  OpSetMaterial* op = new OpSetMaterial (0, polygon, material);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }
@@ -1074,7 +1074,7 @@ void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,
 void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
 	iParameterESM* mesh, iParameterESM* material)
 {
-  OpSetMaterial* op = new OpSetMaterial (mesh, NULL, material);
+  OpSetMaterial* op = new OpSetMaterial (mesh, 0, material);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }
@@ -1243,7 +1243,7 @@ public:
   csTriggerSectorCallback (csSequenceTrigger* trigger,
 	bool insideonly, const csBox3* box, const csSphere* sphere)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csTriggerSectorCallback::trigger = trigger;
     csTriggerSectorCallback::insideonly = insideonly;
     if (box)
@@ -1281,7 +1281,7 @@ public:
       {
 	// It is potentially useful to fire. So we try to see if
 	// all conditions are met.
-	if (insideonly && rview->GetPreviousSector () != NULL)
+	if (insideonly && rview->GetPreviousSector () != 0)
 	  return;
 	if (do_sphere)
 	{
@@ -1327,7 +1327,7 @@ public:
   csTriggerLightCallback (csSequenceTrigger* trigger,
 	int oper, const csColor& col)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csTriggerLightCallback::trigger = trigger;
     operation = oper;
     trigger_color = col;
@@ -1505,7 +1505,7 @@ void csSequenceTrigger::ClearConditions ()
   fired_conditions = 0;
   framenr = 0;
   condition_cleanups.DeleteAll ();
-  click_mesh = NULL;
+  click_mesh = 0;
 }
 
 void csSequenceTrigger::Trigger ()
@@ -1640,13 +1640,13 @@ void csSequenceTrigger::TestConditions (csTicks delay)
     interval_seq = csPtr<iSequence> (
 	eseqmgr->GetSequenceManager ()->NewSequence ());
     CondTestConditions* cond = new CondTestConditions (this, delay);
-    interval_seq->AddCondition (delay, cond, interval_seq, NULL);
+    interval_seq->AddCondition (delay, cond, interval_seq, 0);
     cond->DecRef ();
     eseqmgr->GetSequenceManager ()->RunSequence (0, interval_seq, params);
   }
   else
   {
-    interval_seq = NULL;
+    interval_seq = 0;
   }
 }
 
@@ -1676,8 +1676,8 @@ csEngineSequenceManager::csEngineSequenceManager (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  scfiEventHandler = NULL;
-  object_reg = NULL;
+  scfiEventHandler = 0;
+  object_reg = 0;
   global_framenr = 1;
 debug_eseqmgr = this;//@@@@@@@@@@@@@
 }
@@ -1751,7 +1751,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
   {
     int mouse_x = event.Mouse.x;
     int mouse_y = event.Mouse.y;
-    if (camera != NULL && mesh_triggers.Length () > 0)
+    if (camera != 0 && mesh_triggers.Length () > 0)
     {
       csVector3 v;
       // Setup perspective vertex, invert mouse Y axis.
@@ -1764,7 +1764,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
       csVector3 isect, end = origin + (vw - origin) * 120;
 
-      iPolygon3D* poly = NULL;
+      iPolygon3D* poly = 0;
       iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
 
       int i;
@@ -1838,7 +1838,7 @@ iSequenceTrigger* csEngineSequenceManager::FindTriggerByName (
     if (!strcmp (name, triggers[i]->QueryObject ()->GetName ()))
       return triggers[i];
   }
-  return NULL;
+  return 0;
 }
 
 bool csEngineSequenceManager::FireTriggerByName (const char *name,
@@ -1892,7 +1892,7 @@ iSequenceWrapper* csEngineSequenceManager::FindSequenceByName (
     if (!strcmp (name, sequences[i]->QueryObject ()->GetName ()))
       return sequences[i];
   }
-  return NULL;
+  return 0;
 }
 
 bool csEngineSequenceManager::RunSequenceByName (
@@ -1901,7 +1901,7 @@ bool csEngineSequenceManager::RunSequenceByName (
   iSequenceWrapper *seq = FindSequenceByName(name);
   if (seq)
   {
-    seqmgr->RunSequence (delay, seq->GetSequence (), NULL);
+    seqmgr->RunSequence (delay, seq->GetSequence (), 0);
     return true;
   }
   return false;

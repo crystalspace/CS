@@ -122,7 +122,7 @@ struct jpg_datastore{
   unsigned char *data;
   size_t len;
 
-  jpg_datastore () { data = NULL; len = 0; }
+  jpg_datastore () { data = 0; len = 0; }
   ~jpg_datastore () { free (data); }
 };
 
@@ -184,7 +184,7 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
 {
   my_dst_mgr *dest;
 
-  if (cinfo->dest == NULL)
+  if (cinfo->dest == 0)
     cinfo->dest = (struct jpeg_destination_mgr*)(*cinfo->mem->alloc_small)
       ((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(my_dst_mgr));
 
@@ -201,7 +201,7 @@ csPtr<iImage> csJPGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return 0;
   }
   return csPtr<iImage> (i);
 }
@@ -220,7 +220,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
       break;
     default:
       // unknown format
-      return NULL;
+      return 0;
   } /* endswitch */
 
   // compression options
@@ -273,7 +273,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
   if (quality < 0) quality = 0;
   if (quality > 100) quality = 100;
 
-  JSAMPLE* volatile row = NULL;
+  JSAMPLE* volatile row = 0;
   struct jpg_datastore ds;
   struct jpeg_compress_struct cinfo;
   struct my_error_mgr jerr;
@@ -288,7 +288,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
     Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
       "%s\n", errmsg);
     jpeg_destroy_compress (&cinfo);
-    return NULL;
+    return 0;
   }
 
   jpeg_create_compress (&cinfo);
@@ -334,9 +334,9 @@ csPtr<iDataBuffer> csJPGImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
   if (!strcasecmp (mime, JPG_MIME))
-    return Save (Image, (iImageIO::FileFormatDescription *)NULL,
+    return Save (Image, (iImageIO::FileFormatDescription *)0,
       extraoptions);
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -420,7 +420,7 @@ static void jpeg_memory_src (j_decompress_ptr cinfo, char *inbfr, int len)
    * This makes it unsafe to use this manager and a different source
    * manager serially with the same JPEG object.  Caveat programmer.
    */
-  if (cinfo->src == NULL)
+  if (cinfo->src == 0)
   {
     /* first time for this JPEG object? */
     cinfo->src = (struct jpeg_source_mgr *)

@@ -239,7 +239,7 @@ bool ceControlWindow::HandleEvent (iEvent& Event)
           csWindow* d = csFileDialog (app, "Load a level");
           if (d)
           {
-	    app->StartModal (d, NULL);
+	    app->StartModal (d, 0);
           }
         }
         return true;
@@ -331,13 +331,13 @@ void ceCswsEngineApp::SetupDefaultWorld ()
 
   iLightList* ll = room->GetLights ();
   csRef<iStatLight> light;
-  light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3(-3, 5, 0), 10,
   	csColor(1, 0, 0), false);
   ll->Add (light->QueryLight ());
-  light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3(3, 5, 0), 10,
   	csColor(0, 0, 1), false);
   ll->Add (light->QueryLight ());
-  light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10,
+  light = engine->CreateLight (0, csVector3(0, 5, -3), 10,
   	csColor(0, 1, 0), false);
   ll->Add (light->QueryLight ());
 }
@@ -479,14 +479,14 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
     copy_filename[len-5] = 0;
   }
 
-  VFS->Unmount ("/tmp/levtool", NULL);
+  VFS->Unmount ("/tmp/levtool", 0);
   VFS->Mount ("/tmp/levtool", copy_filename);
   VFS->ChDir ("/tmp/levtool");
 
   // Load the map from the file.
   if (!LevelLoader->LoadMapFile ("world"))
   {
-    csMessageBox (this, "ERROR!", "Loading of map failed!", NULL);
+    csMessageBox (this, "ERROR!", "Loading of map failed!", 0);
     SetupDefaultWorld ();
     VFS->ChDir ("/tmp");
   }
@@ -527,9 +527,9 @@ int main (int argc, char* argv[])
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
 
-  srand (time (NULL));
+  srand (time (0));
 
-  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  if (!csInitializer::SetupConfigManager (object_reg, 0))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng",
@@ -589,7 +589,7 @@ int main (int argc, char* argv[])
     	"crystalspace.application.cswseng", "Error initializing system!");
 
   delete theApp;
-  g3d = NULL;
+  g3d = 0;
   csInitializer::DestroyApplication (object_reg);
 
   return 0;

@@ -212,9 +212,9 @@ TrDocument* TrDocumentNode::GetDocument() const
 
 TrXmlElement::TrXmlElement ()
 {
-  value = NULL;
+  value = 0;
   type = ELEMENT;
-  contentsvalue = NULL;
+  contentsvalue = 0;
 }
 
 TrXmlElement::~TrXmlElement()

@@ -49,13 +49,13 @@ const bool DEBUG_WINDOW_EVENTS = false;
 awsWindow::awsWindow () :
   frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
   title_bar_height(0),
-  title(NULL),
+  title(0),
   resizing_mode(false),
   moving_mode(false),
   sink(this),
   is_minimized(false),
-  popup(NULL),
-  menu(NULL)
+  popup(0),
+  menu(0)
 {
   // Window start off hidden.
   SetFlag (AWSF_CMP_HIDDEN);
@@ -229,7 +229,7 @@ bool awsWindow::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Title", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (title) st = title->GetData ();
 

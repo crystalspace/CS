@@ -90,7 +90,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -114,7 +114,7 @@ struct PlayerGridChange : public iGridChangeCallback
 {
   IsoTest* app;
   SCF_DECLARE_IBASE;
-  PlayerGridChange () { SCF_CONSTRUCT_IBASE (NULL); }
+  PlayerGridChange () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~PlayerGridChange() { }
   virtual void GridChange (iIsoSprite* spr);
 };
@@ -273,7 +273,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   grid->SetSpace(0, 0, -1.0, +10.0);
   int multx = 2, multy = 2;
   grid->SetGroundMult(multx, multy);
-  iIsoSprite *sprite = NULL;
+  iIsoSprite *sprite = 0;
   int x,y, mx,my;
   for(y=0; y<20; y++)
     for(x=0; x<10; x++)
@@ -675,7 +675,7 @@ void IsoTest::SetupFrame ()
 void IsoTest::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 
@@ -725,14 +725,14 @@ bool IsoTest::HandleEvent (iEvent &Event)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new IsoTest ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

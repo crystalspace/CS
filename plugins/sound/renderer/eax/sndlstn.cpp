@@ -35,11 +35,11 @@ SCF_IMPLEMENT_IBASE_END;
 
 csSoundListenerEAX::csSoundListenerEAX(iBase *piBase) {
   SCF_CONSTRUCT_IBASE(piBase);
-  PrimaryBuffer = NULL;
-  Listener = NULL;
-  Renderer = NULL;
+  PrimaryBuffer = 0;
+  Listener = 0;
+  Renderer = 0;
 
-	EaxKsPropertiesSet = NULL;
+	EaxKsPropertiesSet = 0;
 }
 
 csSoundListenerEAX::~csSoundListenerEAX() {
@@ -47,7 +47,7 @@ csSoundListenerEAX::~csSoundListenerEAX() {
 	if(EaxKsPropertiesSet)
 	{
 		EaxKsPropertiesSet->Release();
-		EaxKsPropertiesSet = NULL;
+		EaxKsPropertiesSet = 0;
 	}
 
   if (Renderer) Renderer->DecRef();
@@ -67,12 +67,12 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
   dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME;
   dsbd.dwReserved = 0;
   dsbd.dwBufferBytes = 0;
-  dsbd.lpwfxFormat = NULL;
+  dsbd.lpwfxFormat = 0;
 
   csRef<iReporter> reporter = CS_QUERY_REGISTRY (Renderer->object_reg, iReporter); ;
 
   HRESULT r;
-  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
+  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, 0);
   if (r != DS_OK) {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
@@ -103,7 +103,7 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
                             "crystalspace.sound.eax",
                             "EAX listener : this device don't support EAX 2.0\nSo only DirectSound3D will be used.");
 			EaxKsPropertiesSet->Release();
-			EaxKsPropertiesSet = NULL;
+			EaxKsPropertiesSet = 0;
 		}
 	}
 	else {
@@ -222,7 +222,7 @@ void csSoundListenerEAX::SetEnvironment(csSoundEnvironment env) {
 
 		EaxKsPropertiesSet->Set(DSPROPSETID_EAX_ListenerProperties,
 			DSPROPERTY_EAXLISTENER_ENVIRONMENT,
-			NULL,
+			0,
 			0,
 			&preset,
 			sizeof(DWORD));

@@ -219,7 +219,7 @@ struct iPolygon3DStatic : public iBase
    * true if it intersects and the intersection point in object coordinates.
    */
   virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
-                          csVector3& isect, float* pr = NULL) = 0;
+                          csVector3& isect, float* pr = 0) = 0;
 
   /**
    * Intersect object-space ray with this polygon. This function
@@ -296,7 +296,7 @@ struct iPolygon3D : public iBase
   /**
    * Set the material for this polygon. This material must have
    * the same size as the material given in the factory!
-   * If NULL then the factory material will be used.
+   * If 0 then the factory material will be used.
    */
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
   /// Get the material for this polygon.

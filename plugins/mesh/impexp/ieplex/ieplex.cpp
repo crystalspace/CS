@@ -94,8 +94,8 @@ csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 {
   if (classlist) classlist->DeleteAll ();
   // don't delete the elements of the 'formats' vector. We don't own them!
-  classlist = NULL;
-  plugin_mgr = NULL;
+  classlist = 0;
+  plugin_mgr = 0;
 }
 
 bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
@@ -116,14 +116,14 @@ bool csModelConverterMultiplexer::LoadNextPlugin ()
   csRef<iModelConverter> plugin;
   if (classlist && !plugin)
   {
-    char const* classname = NULL;
+    char const* classname = 0;
     do
     {
       if (classname) classlist->Delete (0);
       if (classlist->Length() == 0)
       {
-	classlist = NULL;
-	plugin_mgr = NULL;
+	classlist = 0;
+	plugin_mgr = 0;
 	return false;
       }
       classname = classlist->Get(0);
@@ -190,7 +190,7 @@ csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
     }
     consecutive = true;
   } while (LoadNextPlugin());
-  return NULL;
+  return 0;
 }
 
 csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl,
@@ -218,5 +218,5 @@ csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl,
     }
     consecutive = true;
   } while (LoadNextPlugin());
-  return NULL;
+  return 0;
 }

@@ -74,7 +74,7 @@ struct iImage : public iBase
    * Get image data: returns either (csRGBpixel *) or (unsigned char *)
    * depending on format. Note that for RGBA images the csRGBpixel structure
    * contains the alpha channel as well, so GetAlpha (see below) method
-   * will return NULL (because alpha is not stored separately, as for
+   * will return 0 (because alpha is not stored separately, as for
    * paletted images).
    */
   virtual void *GetImageData () = 0;
@@ -107,13 +107,13 @@ struct iImage : public iBase
 
   /// Qyery image format (see CS_IMGFMT_XXX above)
   virtual int GetFormat () = 0;
-  /// Get image palette (or NULL if no palette)
+  /// Get image palette (or 0 if no palette)
   virtual csRGBpixel *GetPalette () = 0;
   /**
    * Get alpha map for 8-bit paletted image.
    * RGBA images contains alpha within themself.
    * If image has no alpha map, or the image is in RGBA format,
-   * this function will return NULL.
+   * this function will return 0.
    */
   virtual uint8 *GetAlpha () = 0;
   /**

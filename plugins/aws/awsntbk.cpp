@@ -144,7 +144,7 @@ void awsNotebook::AddChild (iAwsComponent *child)
     child->Hide();
   awsComponent::AddChild (child);
 
-  iString *str = NULL;
+  iString *str = 0;
   child->GetProperty ("Caption", (void**)&str);
   iAwsSource* src = tab_ctrl.AddTab (str, (void*)child);
 
@@ -198,9 +198,9 @@ iAwsComponent *awsNotebookFactory::Create ()
 /********************************** Notebook Page ********************************/
 
 awsNotebookPage::awsNotebookPage ():
-  tex(NULL),
-  caption (NULL),
-  icon (NULL),
+  tex(0),
+  caption (0),
+  icon (0),
   iconalign(0)
 {
   SetFlag (AWSF_CMP_ALWAYSERASE);
@@ -231,7 +231,7 @@ bool awsNotebookPage::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -242,7 +242,7 @@ bool awsNotebookPage::GetProperty (const char *name, void **parm)
   else
   if (strcmp ("Icon", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (icon) st = icon->GetData ();
 
@@ -274,7 +274,7 @@ bool awsNotebookPage::SetProperty (const char *name, void *parm)
     if (s && s->Length ())
       (caption = s)->IncRef ();
     else
-      caption = NULL;
+      caption = 0;
     Invalidate ();
 
     return true;
@@ -289,7 +289,7 @@ bool awsNotebookPage::SetProperty (const char *name, void *parm)
     if (s && s->Length ())
       (icon = s)->IncRef ();
     else
-      icon = NULL;
+      icon = 0;
 
     return true;
   }
@@ -336,12 +336,12 @@ awsNotebookButton::awsNotebookButton ():
   is_active(false),
   is_first(false),
   is_top(true),
-  caption (NULL),
+  caption (0),
   captured(false),
   icon_align(0),
   alpha_level(92)
 {
-  tex[0]=tex[1]=tex[2]=NULL;
+  tex[0]=tex[1]=tex[2]=0;
 }
 
 awsNotebookButton::~awsNotebookButton ()
@@ -359,14 +359,14 @@ bool awsNotebookButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "IconAlign", icon_align);
   pm->GetString (settings, "Caption", caption);
 
-  iString *tn = NULL;
+  iString *tn = 0;
 
   tex[0] = pm->GetTexture ("Texture");
   pm->GetString (settings, "Image", tn);
 
   if (tn) tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
 
-  iString *in = NULL;
+  iString *in = 0;
   pm->GetString (settings, "Icon", in);
   if (in) tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
 
@@ -509,7 +509,7 @@ bool awsNotebookButton::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -533,7 +533,7 @@ bool awsNotebookButton::SetProperty (const char *name, void *parm)
     if (s && s->Length ())
       (caption = s)->IncRef ();
     else
-      caption = NULL;
+      caption = 0;
     Invalidate ();
 
     return true;
@@ -646,16 +646,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 const int awsNotebookButtonBar::HandleSize = 12;
 
 awsNotebookButtonBar::awsNotebookButtonBar ():
-  next(NULL),
-  prev(NULL),
-  next_slot(NULL),
-  prev_slot(NULL),
-  nextimg(NULL),
-  previmg(NULL),
+  next(0),
+  prev(0),
+  next_slot(0),
+  prev_slot(0),
+  nextimg(0),
+  previmg(0),
   first(-1),
   active(-1),
   is_top(true),
-  sink(NULL)
+  sink(0)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiAwsClientRect);
 }
@@ -835,7 +835,7 @@ csRect awsNotebookButtonBar::GetClientRect ()
 bool awsNotebookButtonBar::Add (iAwsComponent *comp)
 {
   // determine caption of tab
-  iString *str = NULL;
+  iString *str = 0;
 
   comp->GetProperty ("Caption", (void**)&str);
   if (!str || !str->GetData ())
@@ -855,7 +855,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   btninfo.Initialize (str->GetData(), "Notebook Button");
   btninfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (), Frame ().Height ()));
 
-  iString *icon = NULL;
+  iString *icon = 0;
   if (comp->GetProperty ("Icon", (void**)&icon) && icon && icon->Length ())
   {
     btninfo.AddStringKey ("Icon", icon ? icon->GetData() : "");

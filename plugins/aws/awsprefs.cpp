@@ -33,7 +33,7 @@ void awsKey::ComputeKeyID (const char* n, size_t len)
 {
   CS_ASSERT (n);
   
-  name = aws_adler32 (aws_adler32 (0, NULL, 0), (unsigned char *)n, len);
+  name = aws_adler32 (aws_adler32 (0, 0, 0), (unsigned char *)n, len);
   
   if (DEBUG_KEYS)
     printf ("aws-debug: new key %s mapped to %lu\n", n, name);
@@ -41,10 +41,10 @@ void awsKey::ComputeKeyID (const char* n, size_t len)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 awsPrefManager::awsPrefManager (iBase *iParent) :
-  def_skin(NULL),
-  awstxtmgr(NULL),
-  wmgr(NULL),
-  objreg(NULL)
+  def_skin(0),
+  awstxtmgr(0),
+  wmgr(0),
+  objreg(0)
 {
   SCF_CONSTRUCT_IBASE (iParent);
 }
@@ -89,7 +89,7 @@ unsigned long awsPrefManager::NameToId (const char *n)
   if (n)
   {
     unsigned long id = aws_adler32 (
-        aws_adler32 (0, NULL, 0),
+        aws_adler32 (0, 0, 0),
         (unsigned char *)n,
         strlen (n));
 
@@ -121,7 +121,7 @@ iTextureHandle *awsPrefManager::GetTexture (const char* name, const char* filena
   if (awstxtmgr)
     return awstxtmgr->GetTexture (name, filename, false);
   else
-    return NULL;
+    return 0;
 }
 
 iTextureHandle *awsPrefManager::GetTexture (const char* name,const char* filename, 
@@ -132,7 +132,7 @@ iTextureHandle *awsPrefManager::GetTexture (const char* name,const char* filenam
   if (awstxtmgr)
     return awstxtmgr->GetTexture (name, filename, false, key_r, key_g, key_b);
   else
-    return NULL;
+    return 0;
 }
 
 iFont *awsPrefManager::GetDefaultFont ()
@@ -142,7 +142,7 @@ iFont *awsPrefManager::GetDefaultFont ()
 
 iFont *awsPrefManager::GetFont (const char *)
 {
-  return NULL;
+  return 0;
 }
 
 void awsPrefManager::SetTextureManager (iTextureManager *txtmgr)
@@ -168,7 +168,7 @@ void awsPrefManager::SetupPalette ()
   printf ("aws-debug: setting up global AWS palette...\n");
 
   unsigned char red, green, blue;
-  iTextureManager *txtmgr = NULL;
+  iTextureManager *txtmgr = 0;
 
   if (awstxtmgr) txtmgr = awstxtmgr->GetTextureManager ();
 
@@ -245,7 +245,7 @@ void awsPrefManager::SetupPalette ()
 
 bool awsPrefManager::Load (const char *def_file)
 {
-  if (wmgr == NULL)
+  if (wmgr == 0)
   {
     printf (
       "\tunable to load definitions because of an internal error: no window manager.\n");
@@ -260,7 +260,7 @@ bool awsPrefManager::Load (const char *def_file)
   {
     printf ("Couldn't open def file\n");
     delete static_awsparser;
-    static_awsparser = NULL;
+    static_awsparser = 0;
     return false;
   }
 
@@ -543,7 +543,7 @@ iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
     if (win_defs[i]->Name () == id)
       return win_defs[i];
 
-  return NULL;
+  return 0;
 }
 
 iAwsKeyContainer *awsPrefManager::FindSkinDef (const char *name)
@@ -554,7 +554,7 @@ iAwsKeyContainer *awsPrefManager::FindSkinDef (const char *name)
     if (skin_defs[i]->Name () == id)
       return skin_defs[i];
 
-  return NULL;
+  return 0;
 }
 
 void awsPrefManager::RegisterConstant (const char *name, int value)

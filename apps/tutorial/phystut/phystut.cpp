@@ -128,7 +128,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 bool Simple::HandleEvent (iEvent& ev)
@@ -225,7 +225,7 @@ bool Simple::Initialize ()
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  if (vc == NULL)
+  if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -235,7 +235,7 @@ bool Simple::Initialize ()
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (engine == NULL)
+  if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -244,7 +244,7 @@ bool Simple::Initialize ()
   }
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (loader == NULL)
+  if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -253,7 +253,7 @@ bool Simple::Initialize ()
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (g3d == NULL)
+  if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -262,7 +262,7 @@ bool Simple::Initialize ()
   }
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
-  if (kbd == NULL)
+  if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -357,19 +357,19 @@ bool Simple::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (3, 0, 0), 8,
+  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8,
     csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 0,  0), 8,
+  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8,
     csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 0, 3), 8,
+  light = engine->CreateLight (0, csVector3 (0, 0, 3), 8,
     csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, -3, 0), 8,
+  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8,
     csColor (1, 1, 0), false);
   ll->Add (light->QueryLight ());
 
@@ -385,7 +385,7 @@ bool Simple::Initialize ()
 
   iTextureWrapper* txt = loader->LoadTexture ("spark",
     "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
-  if (txt == NULL)
+  if (txt == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -395,7 +395,7 @@ bool Simple::Initialize ()
 
   // Load the box mesh factory.
   boxFact = loader->LoadMeshObjectFactory ("/lib/std/sprite1");
-  if (boxFact == NULL)
+  if (boxFact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -411,7 +411,7 @@ bool Simple::Initialize ()
   // Create the ball mesh factory.
   ballFact = engine->CreateMeshFactory("crystalspace.mesh.object.ball",
    "ballFact");
-  if (ballFact == NULL)
+  if (ballFact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -422,7 +422,7 @@ bool Simple::Initialize ()
 
   // Create the dynamic system.
   dynSys = dyn->CreateSystem ();
-  if (dynSys == NULL)
+  if (dynSys == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.phystut",
@@ -555,7 +555,7 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
 {
   // Create a body for the room.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetMoveCallback(NULL);
+  rb->SetMoveCallback(0);
   rb->SetPosition (csVector3 (0));
   rb->MakeStatic ();
 

@@ -40,7 +40,7 @@ class awsEmbeddedComponent : public iAwsComponent
   iAwsComponent *comp;
 
 public:
-  awsEmbeddedComponent() :comp(NULL) {}
+  awsEmbeddedComponent() :comp(0) {}
   virtual ~awsEmbeddedComponent()
   { if (comp) comp->DecRef(); }
 
@@ -95,10 +95,10 @@ public:
       if(!Setup(m, settings)) return false;
       
       // if we are a top-level component link in to the top-level list
-      if(Parent() == NULL)
+      if(Parent() == 0)
       {
         // Link into the current hierarchy, at the top.
-        if (m->GetTopComponent () == NULL)
+        if (m->GetTopComponent () == 0)
         {
           m->SetTopComponent (this);
         }
@@ -340,11 +340,11 @@ public:
     virtual void SetParent(iAwsComponent *parent)
     { comp->SetParent(parent); }
 
-      /// Get's the component above this one, NULL if there is none.
+      /// Get's the component above this one, 0 if there is none.
     virtual iAwsComponent *ComponentAbove()
     { return comp->ComponentAbove(); }
 
-    /// Get's the component below this one, NULL if there is none.
+    /// Get's the component below this one, 0 if there is none.
     virtual iAwsComponent *ComponentBelow()
     { return comp->ComponentBelow(); }
 

@@ -29,7 +29,7 @@ csSoundHandleOpenAL::csSoundHandleOpenAL(csSoundRenderOpenAL *srdr, iSoundData *
   Data=snd;
 
 
-  local_buffer=NULL;  
+  local_buffer=0;  
 
   NumSamples = snd->IsStatic() ? snd->GetStaticSampleCount() :
   (long int)(((float)(snd->GetFormat()->Freq)) * BufferLengthSeconds);
@@ -49,7 +49,7 @@ csSoundHandleOpenAL::~csSoundHandleOpenAL()
 {
   if (local_buffer)
     free(local_buffer);
-  local_buffer=NULL;
+  local_buffer=0;
 }
 
 void csSoundHandleOpenAL::StartStream(bool Loop)

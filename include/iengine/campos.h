@@ -85,7 +85,7 @@ struct iCameraPosition : public iBase
 
   /**
    * Set the 3D far plane used to clip all geometry.
-   * If the pointer is NULL then far plane clipping will be disabled.
+   * If the pointer is 0 then far plane clipping will be disabled.
    * Otherwise it will be enabled and the plane will be copied (so you
    * can free or reuse the pointer you give here). Note that the far-plane
    * will cull away geometry which is on the negative side of the plane
@@ -95,12 +95,12 @@ struct iCameraPosition : public iBase
 
   /**
    * Clear the far plane so no clipping will occur. This is equivalent
-   * to SetFarPlane(NULL).
+   * to SetFarPlane(0).
    */
   virtual void ClearFarPlane () = 0;
 
   /**
-   * Get the current far plane (or NULL if none is defined).
+   * Get the current far plane (or 0 if none is defined).
    */
   virtual csPlane3* GetFarPlane () const = 0;
 };

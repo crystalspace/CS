@@ -84,11 +84,11 @@ public:
   csShaderGLCGFP(iObjectRegistry* objreg, CGcontext context)
   {
     validProgram = true;
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     this->object_reg = objreg;
     this->context = context;
-    programstring = NULL;
-    program = NULL;
+    programstring = 0;
+    program = 0;
   }
   virtual ~csShaderGLCGFP ()
   {

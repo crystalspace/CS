@@ -48,7 +48,7 @@ CS_IMPLEMENT_APPLICATION
 ceImageView::ceImageView (csComponent *iParent, iGraphics3D * /*G3D*/)
   	: csComponent (iParent)
 {
-  image = NULL;
+  image = 0;
 
   SetState (CSS_SELECTABLE, true);
   // set background color to use and make palette
@@ -259,7 +259,7 @@ void PicViewApp::LoadNextImage (int idx, int step)
   {
     image_view->image->GetTextureHandle ()->DecRef ();
     delete image_view->image;
-    image_view->image = NULL;
+    image_view->image = 0;
     image_view->SetSize(5, 5);
   }
   if (ifile)
@@ -297,7 +297,7 @@ int main (int argc, char* argv[])
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
 
-  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  if (!csInitializer::SetupConfigManager (object_reg, 0))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.picview",
@@ -329,7 +329,7 @@ int main (int argc, char* argv[])
     exit (0);
   }
 
-  srand (time (NULL));
+  srand (time (0));
 
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
@@ -355,8 +355,8 @@ int main (int argc, char* argv[])
     	"crystalspace.application.picview", "Error initializing system!");
 
   delete theApp;
-  g3d = NULL;	// Release before DestroyApplication().
-  cmdline = NULL;
+  g3d = 0;	// Release before DestroyApplication().
+  cmdline = 0;
 
   csInitializer::DestroyApplication (object_reg);
   return 0;

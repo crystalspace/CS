@@ -82,7 +82,7 @@ csTextureHandleNull::csTextureHandleNull (
   int flags) :
     csTextureHandle(image, flags)
 {
-  pal2glob = NULL;
+  pal2glob = 0;
   (texman = txtmgr)->IncRef ();
 }
 
@@ -171,7 +171,7 @@ void csTextureHandleNull::ComputeMeanColor ()
       // Very well, we don't need the iImage anymore, so free it
       DG_UNLINK (t, t->image);
       t->image->DecRef ();
-      t->image = NULL;
+      t->image = 0;
     }
   }
 
@@ -283,7 +283,7 @@ csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (
   iImage *image,
   int flags)
 {
-  if (!image) return NULL;
+  if (!image) return 0;
 
   csTextureHandleNull *txt = new csTextureHandleNull (this, image, flags);
   textures.Push (txt);

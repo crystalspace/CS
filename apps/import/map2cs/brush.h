@@ -114,7 +114,7 @@ public:
     */
   bool IsVisible();
 
-  /// returns a pointer to the entity that defined this brush (or NULL)
+  /// returns a pointer to the entity that defined this brush (or 0)
   CMapEntity* GetEntity() {return m_pEntity;}
 
   /// returns a pointer to the bounding box
@@ -136,7 +136,7 @@ protected:
   CMapPolygonVector       m_Polygons;
 
   /**
-    * Pointer to the entity that defined this brush (or NULL)
+    * Pointer to the entity that defined this brush (or 0)
     */
   CMapEntity*             m_pEntity;
 

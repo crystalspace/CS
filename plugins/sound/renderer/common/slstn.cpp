@@ -25,7 +25,7 @@ SCF_IMPLEMENT_IBASE_END;
 
 csSoundListener::csSoundListener()
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));

@@ -72,7 +72,7 @@ struct iTextureWrapper : public iBase
   /**
    * Change the texture handle. The changes will immediatly be visible. This
    * will also change the key color and registration flags to those of
-   * the new texture and the iImage to NULL.
+   * the new texture and the iImage to 0.
    */
   virtual void SetTextureHandle (iTextureHandle *tex) = 0;
   /// Get the texture handle.

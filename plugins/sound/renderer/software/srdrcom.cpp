@@ -63,14 +63,14 @@ SCF_IMPLEMENT_IBASE (csSoundRenderSoftware::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
+csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(0)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
-  object_reg = NULL;
-  Listener = NULL;
-  memory = NULL;
+  scfiEventHandler = 0;
+  object_reg = 0;
+  Listener = 0;
+  memory = 0;
   memorysize = 0;
   ActivateMixing = false;
   owning = downing = false;
@@ -143,7 +143,7 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
 bool csSoundRenderSoftware::Open()
 {
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Software Sound Renderer selected");
-  CS_ASSERT (Config != NULL);
+  CS_ASSERT (Config != 0);
 
   if (!SoundDriver) return false;
 
@@ -201,7 +201,7 @@ void csSoundRenderSoftware::Close()
   if (Listener)
   {
     Listener->DecRef();
-    Listener = NULL;
+    Listener = 0;
   }
 
   while (Sources.Length()>0)

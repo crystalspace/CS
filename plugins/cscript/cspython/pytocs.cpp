@@ -54,7 +54,7 @@ extern "C" PyObject* pytocs_printerr(PyObject *self, PyObject* args) {
 PyMethodDef PytocsMethods[]={
   {"printout", pytocs_printout, METH_VARARGS, ""},
   {"printerr", pytocs_printout, METH_VARARGS, ""},
-  {NULL, NULL, 0, ""}
+  {0, 0, 0, ""}
 };
 
 extern "C" void init_cspace();

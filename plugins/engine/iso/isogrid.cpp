@@ -35,12 +35,12 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
   grid = new iIsoCell* [width*height];
   int i;
   for(i=0; i<width*height; i++)
-    grid[i] = NULL;
+    grid[i] = 0;
   mingridx = 0; mingridy = 0;
   box.Set(0,-9999,0, height,+9999,width);
   groundmap = new csIsoGroundMap(this, 1, 1);
   recalc_staticlight = true;
-  fakelights = NULL;
+  fakelights = 0;
   num_fakelights = 0;
 }
 
@@ -77,7 +77,7 @@ void csIsoGrid::AddSprite(iIsoSprite *sprite, const csVector3& pos)
   if(!cell)
   {
     //printf("new cell\n");
-    cell = new csIsoCell(NULL);
+    cell = new csIsoCell(0);
     SetCell(pos, cell);
   }
   //printf("adding sprite at pos (%g, %g, %g) to cell %x\n", pos.x,
@@ -263,7 +263,7 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     // reset fakelight array
     if(fakelights)
     {
-      delete[] fakelights; fakelights = NULL;
+      delete[] fakelights; fakelights = 0;
       num_fakelights = 0;
     }
   }
@@ -327,7 +327,7 @@ int csIsoGrid::GetGroundMultY() const
 struct ResetSpriteLight : public iIsoCellTraverseCallback
 {
   SCF_DECLARE_IBASE;
-  ResetSpriteLight () { SCF_CONSTRUCT_IBASE (NULL); }
+  ResetSpriteLight () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~ResetSpriteLight () { }
   virtual void Traverse (iIsoSprite* spr);
 };
@@ -355,7 +355,7 @@ struct SetSpriteColor : public iIsoCellTraverseCallback
 {
   const csColor* col;
   SCF_DECLARE_IBASE;
-  SetSpriteColor () { SCF_CONSTRUCT_IBASE (NULL); }
+  SetSpriteColor () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~SetSpriteColor () { }
   virtual void Traverse (iIsoSprite* spr);
 };
@@ -389,7 +389,7 @@ struct SetSpriteStaticColor : public iIsoCellTraverseCallback
 {
   const csColor* col;
   SCF_DECLARE_IBASE;
-  SetSpriteStaticColor () { SCF_CONSTRUCT_IBASE (NULL); }
+  SetSpriteStaticColor () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~SetSpriteStaticColor () { }
   virtual void Traverse (iIsoSprite* spr);
 };

@@ -25,7 +25,7 @@ struct csRegisteredString
   csStringID ID;
   char *String;
   csRegisteredString()
-  { String = NULL; }
+  { String = 0; }
   ~csRegisteredString()
   { delete [] String; }
 };
@@ -91,7 +91,7 @@ const char* csStringHash::Request (csStringID id)
       return itf->String;
   }
 
-  return NULL;
+  return 0;
 }
 
 void csStringHash::Clear ()

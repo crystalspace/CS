@@ -271,7 +271,7 @@ void csEmitCone::GetContent(csVector3& origin, float& elevation,
 csEmitMix::csEmitMix(iBase *parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
-  list = NULL;
+  list = 0;
   totalweight = 0.0;
   nr = 0;
 }
@@ -643,20 +643,20 @@ csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitState);
   lighted_particles = false;
   number = 50;
-  ages = NULL;
-  part_pos = NULL;
-  part_speed = NULL;
-  part_accel = NULL;
-  part_attract = NULL;
+  ages = 0;
+  part_pos = 0;
+  part_speed = 0;
+  part_accel = 0;
+  part_attract = 0;
   attractor_force = 1.0;
-  attractor = NULL;
-  startpos = NULL;
-  startspeed = NULL;
-  startaccel = NULL;
-  fieldspeed = NULL;
-  fieldaccel = NULL;
+  attractor = 0;
+  startpos = 0;
+  startspeed = 0;
+  startaccel = 0;
+  fieldspeed = 0;
+  fieldaccel = 0;
   timetolive = 1000;
-  aging = NULL;
+  aging = 0;
   nr_aging_els = 0;
   using_rect_sprites = true;
   drop_width = 0.2;
@@ -950,7 +950,7 @@ csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *p, iObjectRegistry* s)
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
   object_reg = s;
-  logparent = NULL;
+  logparent = 0;
 }
 
 csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()

@@ -30,11 +30,11 @@ SCF_IMPLEMENT_IBASE(csFrustumView)
 SCF_IMPLEMENT_IBASE_END
 
 csFrustumView::csFrustumView () :
-  object_func (NULL),
+  object_func (0),
   things_shadow (false),
-  ctxt (NULL)
+  ctxt (0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csFrustumContext ();
 
   ctxt->SetNewShadows (new csShadowBlockList ());
@@ -89,9 +89,9 @@ SCF_IMPLEMENT_IBASE(csShadowBlock)
 SCF_IMPLEMENT_IBASE_END
 
 csShadowBlock::csShadowBlock (uint32 region, int max_shadows, int delta) :
-    next(NULL), prev(NULL), shadows(max_shadows, delta)
+    next(0), prev(0), shadows(max_shadows, delta)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   shadow_region = region;
   bbox_valid = false;
 }
@@ -249,10 +249,10 @@ SCF_IMPLEMENT_IBASE(csShadowBlockList)
 SCF_IMPLEMENT_IBASE_END
 
 csShadowBlockList::csShadowBlockList () :
-  first(NULL),
-  last(NULL)
+  first(0),
+  last(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   cur_shadow_region = 0;
 }
 
@@ -282,7 +282,7 @@ csShadowIterator::csShadowIterator (
   bool onlycur,
   int dir)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csShadowIterator::cur = cur;
   csShadowIterator::onlycur = onlycur;
   csShadowIterator::dir = dir;
@@ -297,7 +297,7 @@ csShadowIterator::csShadowIterator (
   bool onlycur,
   int dir)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csShadowIterator::cur = cur;
   csShadowIterator::onlycur = onlycur;
   csShadowIterator::dir = dir;
@@ -319,13 +319,13 @@ void csShadowIterator::Reset ()
 
 bool csShadowIterator::HasNext ()
 {
-  if (cur == NULL)
+  if (cur == 0)
     return false;
   if (i >= 0 && i < cur_num)
     return true;
   if (onlycur)
   {
-    cur = NULL;
+    cur = 0;
     return false;
   }
 
@@ -345,7 +345,7 @@ bool csShadowIterator::HasNext ()
         i = cur_num - 1;
     }
     else
-      cur = NULL;
+      cur = 0;
     return hn;
   }
   else
@@ -364,7 +364,7 @@ bool csShadowIterator::HasNext ()
         i = cur_num - 1;
     }
     else
-      cur = NULL;
+      cur = 0;
     return hn;
   }
 }
@@ -373,20 +373,20 @@ csFrustum *csShadowIterator::Next ()
 {
   if (!cur)
   {
-    cur_shad = NULL;
-    return NULL;
+    cur_shad = 0;
+    return 0;
   }
 
   csShadowFrustum *s;
   if (i >= 0 && i < cur_num)
     s = (csShadowFrustum *)cur->GetShadow (i);
   else
-    s = NULL;
+    s = 0;
   i += dir;
   if (i < 0 || i >= cur_num)
   {
     if (onlycur)
-      cur = NULL;
+      cur = 0;
     else if (dir == 1)
       cur = cur->next;
     else
@@ -409,7 +409,7 @@ csShadowBlock *csShadowIterator::GetCsCurrentShadowBlock ()
     if (i < cur_num - 1)
       return cur;
     else if (onlycur || !cur->next)
-      return NULL;
+      return 0;
     else
       return cur->next;
   }
@@ -418,7 +418,7 @@ csShadowBlock *csShadowIterator::GetCsCurrentShadowBlock ()
     if (i > 0)
       return cur;
     else if (onlycur || !cur->prev)
-      return NULL;
+      return 0;
     else
       return cur->prev;
   }

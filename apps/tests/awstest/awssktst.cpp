@@ -8,7 +8,7 @@
 static char *names[10] = { "Yellow", "Green", "Blue", "Orange", "Purple", "Red", "White", "Teal", "Black" };
 static int   namec = 0;
 
-awsTestSink::awsTestSink() : wmgr(NULL), user(NULL), pass(NULL), test(NULL)
+awsTestSink::awsTestSink() : wmgr(0), user(0), pass(0), test(0)
 {
 }
 
@@ -92,9 +92,9 @@ void awsTestSink::FillListBox(void *sk, iAwsSource *source)
   else
     printf("awstest: window manager is null.\n");
 
-  if (pl==NULL)
+  if (pl==0)
   {
-    printf("awstest: internal error, parameter list NULL.\n");
+    printf("awstest: internal error, parameter list 0.\n");
     return;
   }
 
@@ -329,7 +329,7 @@ void awsTestSink::SetUser(void *sk, iAwsSource *source)
 void awsTestSink::Login(void *sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
-  if (sink->user==NULL || sink->pass==NULL)
+  if (sink->user==0 || sink->pass==0)
     printf("awstest: You must enter a username AND password.\n");
 
   else {

@@ -86,7 +86,7 @@ void csRegion::DeleteAll ()
 
       engine->GetCollections ()->Remove (o);
       ObjRemove (obj);
-      copy[i] = NULL;
+      copy[i] = 0;
     }
   }
 
@@ -100,7 +100,7 @@ void csRegion::DeleteAll ()
 
       engine->GetMeshes ()->Remove (o);
       ObjRemove (obj);
-      copy[i] = NULL;
+      copy[i] = 0;
     }
   }
 
@@ -116,7 +116,7 @@ void csRegion::DeleteAll ()
 
       engine->GetMeshFactories ()->Remove (o);
       ObjRemove (obj);
-      copy[i] = NULL;
+      copy[i] = 0;
     }
   }
 
@@ -130,7 +130,7 @@ void csRegion::DeleteAll ()
 
       engine->GetSectors ()->Remove (o);
       ObjRemove (obj);
-      copy[i] = NULL;
+      copy[i] = 0;
     }
   }
 
@@ -144,7 +144,7 @@ void csRegion::DeleteAll ()
 
       engine->GetMaterialList ()->Remove (o);
       ObjRemove (obj);
-      copy[i] = NULL;
+      copy[i] = 0;
     }
   }
 
@@ -158,7 +158,7 @@ void csRegion::DeleteAll ()
 
       engine->GetTextureList ()->Remove (o);
       ObjRemove (obj);
-      copy[i] = NULL;
+      copy[i] = 0;
     }
   }
 
@@ -172,13 +172,13 @@ void csRegion::DeleteAll ()
 
       engine->GetCameraPositions ()->Remove (o);
       ObjRemove (obj);
-      copy[i] = NULL;
+      copy[i] = 0;
     }
   }
 
 #ifdef CS_DEBUG
   // Sanity check (only in debug mode). There should be no more
-  // non-NULL references in the copy array now.
+  // non-0 references in the copy array now.
   for (i = 0; i < copy.Length (); i++)
   {
     if (copy[i])
@@ -211,7 +211,7 @@ bool csRegion::PrepareTextures ()
       if (csth)
       {
         if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
-        if (!csth->KeepImage ()) csth->SetImageFile (NULL);
+        if (!csth->KeepImage ()) csth->SetImageFile (0);
       }
     }
   }
@@ -326,7 +326,7 @@ iMeshWrapper *csRegion::Region::FindMeshObject (const char *Name)
     {
       return m->GetChildren ()->FindByName (p+1);
     }
-    return NULL;
+    return 0;
   }
   else
   {
@@ -393,7 +393,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csRegionList::csRegionList () :
   csRefArrayObject<iRegion> (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegionList);
 }
 

@@ -45,8 +45,8 @@ typedef unsigned char  uch;
 typedef unsigned short ush;
 typedef unsigned int   u32;
 
-#if 0            /* Optimization: use the (const) result of crc32(0L,NULL,0) */
-#  define CRCVAL_INITIAL  crc32(0L, NULL, 0)
+#if 0            /* Optimization: use the (const) result of crc32(0L,0,0) */
+#  define CRCVAL_INITIAL  crc32(0L, 0, 0)
 #else
 #  define CRCVAL_INITIAL  0L
 #endif

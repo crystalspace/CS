@@ -33,8 +33,8 @@
 
 TrianglesList::TrianglesList ()
 {
-  first = NULL;
-  last = NULL;
+  first = 0;
+  last = 0;
 }
 
 TrianglesList::~TrianglesList ()
@@ -49,7 +49,7 @@ TrianglesList::~TrianglesList ()
 
 void TrianglesList::Add (csTrianglesPerMaterial* t)
 {
-  if (first == NULL)
+  if (first == 0)
   {
     first = last = t;
     return;
@@ -62,7 +62,7 @@ void TrianglesList::Add (csTrianglesPerMaterial* t)
 
 csTrianglesPerMaterial::csTrianglesPerMaterial()
 {
-  next = NULL;
+  next = 0;
 }
 
 csTrianglesPerMaterial::~csTrianglesPerMaterial ()
@@ -82,10 +82,10 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap (int size,
   region = new csSubRectangles (csRect (0, 0, size, size));
 
   csTrianglesPerSuperLightmap::queue_num = queue_num;
-  cacheData = NULL;
+  cacheData = 0;
   isUnlit = false;
   initialized = false;
-  prev = NULL;
+  prev = 0;
   cost = -1;
 }
 
@@ -106,8 +106,8 @@ int csTrianglesPerSuperLightmap::CalculateCost ()
 
 TrianglesSuperLightmapList::TrianglesSuperLightmapList ()
 {
-  first = NULL;
-  last = NULL;
+  first = 0;
+  last = 0;
   dirty = true;
 }
 
@@ -123,7 +123,7 @@ TrianglesSuperLightmapList::~TrianglesSuperLightmapList ()
 
 void TrianglesSuperLightmapList::Add (csTrianglesPerSuperLightmap* t)
 {
-  if (first == NULL) first = t;
+  if (first == 0) first = t;
   t->prev = last;
   last = t;
 }
@@ -133,7 +133,7 @@ void TrianglesSuperLightmapList::Add (csTrianglesPerSuperLightmap* t)
 csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (
   iVertexBufferManager* mgr) : csPolygonBuffer (mgr)
 {
-  vertices = NULL;
+  vertices = 0;
   matCount = 0;
 }
 
@@ -146,9 +146,9 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
     SearchFittingSuperLightmap (iPolygonTexture* poly_texture,
                                 csRect& rect, int size, int queue_num)
 {
-  if (poly_texture == NULL || poly_texture->GetLightMap () == NULL)
+  if (poly_texture == 0 || poly_texture->GetLightMap () == 0)
   {
-    return NULL;
+    return 0;
   }
   iLightMap* piLM = poly_texture->GetLightMap();
   int lm_width = piLM->GetWidth();
@@ -168,7 +168,7 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
 
   if (!curr->region->Alloc (lm_width, lm_height, rect))
   {
-    return NULL;
+    return 0;
   }
 
   superLM.Add (curr);
@@ -566,7 +566,7 @@ void csTriangleArrayPolygonBuffer::SetMaterial (int idx,
 
 void csTriangleArrayPolygonBuffer::Clear ()
 {
-  delete[] vertices; vertices = NULL;
+  delete[] vertices; vertices = 0;
   materials.DeleteAll ();
   ClearLmQueue ();
 }

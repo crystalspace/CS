@@ -66,7 +66,7 @@ void SetupPolygonDPFX (iGraphics3D* /*g3d*/, G3DPolygonDPFX& poly,
   poly.colors[3].green = 1;
   poly.colors[3].blue = 0;
   poly.use_fog = false;
-  poly.mat_handle = NULL;
+  poly.mat_handle = 0;
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
@@ -101,7 +101,7 @@ void SinglePolygonTesterFlat::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
 {
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
-  poly.mat_handle = NULL;
+  poly.mat_handle = 0;
 }
 
 void SinglePolygonTesterFlat::Draw (iGraphics3D* g3d)
@@ -298,7 +298,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
   mesh.mixmode = CS_FX_COPY;
   mesh.morph_factor = 0;
-  mesh.vertex_fog = NULL;
+  mesh.vertex_fog = 0;
   mesh_vertices = new csVector3 [num_mesh_vertices];
   mesh_texels = new csVector2 [num_mesh_vertices];
   mesh.mat_handle = perftest->GetMaterial (0);
@@ -346,10 +346,10 @@ void MeshTester::Draw (iGraphics3D* g3d)
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
   //g3d->SetObjectToCamera ();
-  g3d->SetClipper (NULL, CS_CLIPPER_NONE);
+  g3d->SetClipper (0, CS_CLIPPER_NONE);
   g3d->SetPerspectiveAspect (1);//g3d->GetHeight ());
   g3d->GetVertexBufferManager ()->LockBuffer (vbuf, mesh_vertices,
-  	mesh_texels, NULL, num_mesh_vertices, 0, bbox);
+  	mesh_texels, 0, num_mesh_vertices, 0, bbox);
   g3d->DrawTriangleMesh (mesh);
   g3d->GetVertexBufferManager ()->UnlockBuffer (vbuf);
 }
@@ -419,5 +419,5 @@ void MultiTexturePixmapTester::Draw (iGraphics3D* g3d)
 Tester* MultiTexturePixmapTester::NextTester ()
 {
 
-  return NULL;
+  return 0;
 }

@@ -22,15 +22,15 @@ awsScrollBar::awsScrollBar () :
   mouse_is_over(false),
   was_down(false),
   orientation(0),
-  decVal(NULL),
-  incVal(NULL),
-  knob(NULL),
-  timer(NULL),
-  sink(NULL),
-  dec_slot(NULL),
-  inc_slot(NULL),
-  knob_slot(NULL),
-  tick_slot(NULL),
+  decVal(0),
+  incVal(0),
+  knob(0),
+  timer(0),
+  sink(0),
+  dec_slot(0),
+  inc_slot(0),
+  knob_slot(0),
+  tick_slot(0),
   value(0),
   max(1),
   min(0),
@@ -714,11 +714,11 @@ iAwsComponent *awsScrollBarFactory::Create ()
 /************************************* Slider Button ****************/
 
 awsSliderButton::awsSliderButton () :
-  timer(NULL),
+  timer(0),
   captured(false),
   nTicks((csTicks) 0),
-  sink(NULL),
-  tick_slot(NULL)
+  sink(0),
+  tick_slot(0)
 {
 }
 

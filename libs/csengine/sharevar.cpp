@@ -41,7 +41,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSharedVariableList::csSharedVariableList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSharedVariableList);
 }
 

@@ -107,7 +107,7 @@ public:
   /// Get a vertex.
   csVector3& GetVertex (int i)
   {
-    CS_ASSERT (vertices != NULL);
+    CS_ASSERT (vertices != 0);
     CS_ASSERT (i >= 0 && i < num_vertices);
     return vertices[i];
   }
@@ -125,7 +125,7 @@ public:
   void AddList (csLightPatch*& first)
   {
     next = first;
-    prev = NULL;
+    prev = 0;
     if (first)
       first->prev = this;
     first = this;
@@ -136,8 +136,8 @@ public:
     if (next) next->prev= prev;
     if (prev) prev->next= next;
     else first = next;
-    prev= next= NULL;
-    polygon = NULL;
+    prev= next= 0;
+    polygon = 0;
   }
 
   /// Set the light frustum.

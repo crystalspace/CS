@@ -21,7 +21,7 @@
 
 csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture)
 {
-  hTex = NULL;
+  hTex = 0;
   if (hTexture)
   {
     int w,h;
@@ -34,7 +34,7 @@ csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture)
 
 csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture, int x, int y, int w, int h)
 {
-  hTex = NULL;
+  hTex = 0;
   if (hTexture)
   {
     (hTex = hTexture)->IncRef ();

@@ -24,12 +24,12 @@ SCF_IMPLEMENT_IBASE_END;
 
 csImageVector::csImageVector()
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 }
 
 csImageVector::~csImageVector()
 {
-  // image references are NULL'd in ~csRefArray
+  // image references are 0'd in ~csRefArray
 }
 
 void csImageVector::AddImage(csRef<iImage> img, int index)

@@ -31,7 +31,7 @@
 csProcPlasma::csProcPlasma () : csProcTexture()
 {
   palsize = 0;
-  palette = NULL;
+  palette = 0;
   costable = 0;
   mat_w = 64;
   mat_h = 64;

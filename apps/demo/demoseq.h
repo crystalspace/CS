@@ -61,7 +61,7 @@ class PathForMesh
 {
 public:
   csNamedPath* path;
-  iMeshWrapper* mesh;	// If NULL this path controls a camera.
+  iMeshWrapper* mesh;	// If 0 this path controls a camera.
   csTicks total_path_time;
   csTicks start_path_time;
 };
@@ -231,7 +231,7 @@ public:
   	csTicks total_fade_time, csTicks already_elapsed);
 
   /**
-   * Setup a path. If mesh == NULL we are setting up a path for the camera.
+   * Setup a path. If mesh == 0 we are setting up a path for the camera.
    */
   void SetupPath (csNamedPath* path, iMeshWrapper* mesh,
   	csTicks total_path_time,
@@ -239,7 +239,7 @@ public:
 
   /**
    * See if some path is already running. If so then replace the object
-   * that is attached to the running path with this one (mesh can be NULL
+   * that is attached to the running path with this one (mesh can be 0
    * for the camera).
    */
   void ReplacePathObject (csNamedPath* path, iMeshWrapper* mesh);
@@ -263,7 +263,7 @@ public:
       csNamedPath* p = (csNamedPath*)paths[i];
       if (!strcmp (p->GetName (), name)) return p;
     }
-    return NULL;
+    return 0;
   }
 
   /**

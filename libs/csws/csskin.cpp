@@ -68,7 +68,7 @@ void csSkin::Deinitialize ()
   int i;
   for (i = 0; i < count; i++)
     Get (i)->Deinitialize ();
-  app = NULL;
+  app = 0;
 }
 
 const char *csSkin::GetConfigStr (const char *iSection, const char *iKey,
@@ -135,12 +135,12 @@ void csSkin::Load (csBackground &oBack, const char *iSection, const char *iPrefi
   size_t sl = strlen (iPrefix);
   memcpy (temp, iPrefix, sl);
   strcpy (temp + sl, ".Texture");
-  const char *name = GetConfigStr (iSection, temp, NULL);
+  const char *name = GetConfigStr (iSection, temp, 0);
   if (name)
     oBack.SetTexture (app->GetTexture (name));
 
   strcpy (temp + sl, ".Color");
-  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 1))
+  if (ReadGradient (GetConfigStr (iSection, temp, 0), colors, 1))
   {
     oBack.SetColor (0, colors [0]);
     oBack.SetColor (1, colors [0]);
@@ -149,7 +149,7 @@ void csSkin::Load (csBackground &oBack, const char *iSection, const char *iPrefi
     oBack.SetColor (app->FindColor (colors [0].red, colors [0].green, colors [0].blue));
   }
   strcpy (temp + sl, ".HGradient");
-  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 2))
+  if (ReadGradient (GetConfigStr (iSection, temp, 0), colors, 2))
   {
     oBack.SetColor (0, colors [0]);
     oBack.SetColor (1, colors [1]);
@@ -157,7 +157,7 @@ void csSkin::Load (csBackground &oBack, const char *iSection, const char *iPrefi
     oBack.SetColor (3, colors [0]);
   }
   strcpy (temp + sl, ".VGradient");
-  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 2))
+  if (ReadGradient (GetConfigStr (iSection, temp, 0), colors, 2))
   {
     oBack.SetColor (0, colors [0]);
     oBack.SetColor (1, colors [0]);
@@ -165,7 +165,7 @@ void csSkin::Load (csBackground &oBack, const char *iSection, const char *iPrefi
     oBack.SetColor (3, colors [1]);
   }
   strcpy (temp + sl, ".Gradient");
-  if (ReadGradient (GetConfigStr (iSection, temp, NULL), colors, 4))
+  if (ReadGradient (GetConfigStr (iSection, temp, 0), colors, 4))
   {
     oBack.SetColor (0, colors [0]);
     oBack.SetColor (1, colors [1]);

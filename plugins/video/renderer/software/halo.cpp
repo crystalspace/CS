@@ -66,7 +66,7 @@ public:
    * Draw the halo given a center point and an intensity.
    * If either w and/or h is negative, the native width and/or height
    * is used instead. If the halo should be clipped against some
-   * polygon, that polygon should be given, otherwise if a NULL pointer
+   * polygon, that polygon should be given, otherwise if a 0 pointer
    * is passed, the halo is clipped just against screen bounds.
    */
   virtual void Draw (float x, float y, float w, float h, float iIntensity,
@@ -130,7 +130,7 @@ SCF_IMPLEMENT_IBASE_END
 csSoftHalo::csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   int iWidth, int iHeight, csGraphics3DSoftwareCommon *iG3D)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   R = iR; G = iG; B = iB;
   Alpha = new unsigned char [(Width = iWidth) * (Height = iHeight)];
   memcpy (Alpha, iAlpha, Width * Height);

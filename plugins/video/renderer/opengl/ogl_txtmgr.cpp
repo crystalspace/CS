@@ -39,7 +39,7 @@ csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
 {
   DG_TYPE (this, "csTextureOpenGL");
   parent = Parent;
-  image_data = NULL;
+  image_data = 0;
   w = Image->GetWidth ();
   h = Image->GetHeight ();
   compute_masks ();
@@ -430,7 +430,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
 {
   if (!image) return;
 
-  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
+  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
 
   //  printf ("delete old\n");
   // Delete existing mipmaps, if any
@@ -561,7 +561,7 @@ private:
 public:
   csOFSCbOpenGL (csTextureHandleOpenGL* txt)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csOFSCbOpenGL::txt = txt;
   }
   virtual ~csOFSCbOpenGL ()
@@ -834,7 +834,7 @@ csPtr<iTextureHandle> csTextureManagerOpenGL::RegisterTexture (
   if (!image)
   {
     G3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with NULL image!");
+      "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with 0 image!");
 
     csRef<iImage> im (csCreateXORPatternImage (32, 32, 5));
     image = im;

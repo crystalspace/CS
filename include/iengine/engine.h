@@ -160,7 +160,7 @@ struct iEngine : public iBase
    * locally now). The optional progress meter will be used to
    * report progress.
    */
-  virtual bool Prepare (iProgressMeter* meter = NULL) = 0;
+  virtual bool Prepare (iProgressMeter* meter = 0) = 0;
 
   /**
    * Prepare the textures. It will initialise all loaded textures
@@ -184,8 +184,8 @@ struct iEngine : public iBase
    * If the optional 'region' parameter is given then only lights will
    * be recalculated for the given region.
    */
-  virtual void ShineLights (iRegion* region = NULL,
-  	iProgressMeter* meter = NULL) = 0;
+  virtual void ShineLights (iRegion* region = 0,
+  	iProgressMeter* meter = 0) = 0;
 
   /**
    * Query the format to load textures (usually this depends on texture
@@ -194,17 +194,17 @@ struct iEngine : public iBase
   virtual int GetTextureFormat () const = 0;
 
   /**
-   * Create or select a new region (name can be NULL for the default main
+   * Create or select a new region (name can be 0 for the default main
    * region). All new objects will be marked as belonging to this region.
    */
   virtual void SelectRegion (const char* name) = 0;
   /**
-   * Create or select a new region (region can be NULL for the default main
+   * Create or select a new region (region can be 0 for the default main
    * region). All new objects will be marked as belonging to this region.
    */
   virtual void SelectRegion (iRegion* region) = 0;
   /**
-   * Get a reference to the current region (or NULL if the default main
+   * Get a reference to the current region (or 0 if the default main
    * region is selected).
    */
   virtual iRegion* GetCurrentRegion () const = 0;
@@ -256,7 +256,7 @@ struct iEngine : public iBase
   virtual void ClearRenderPriorities () = 0;
   /// Get the number of render priorities.
   virtual int GetRenderPriorityCount () const = 0;
-  /// Get the name of the render priority or NULL if none existant.
+  /// Get the name of the render priority or 0 if none existant.
   virtual const char* GetRenderPriorityName (long priority) const = 0;
 
   /**
@@ -330,87 +330,87 @@ struct iEngine : public iBase
   /**
    * Find the given material. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if region is not NULL in which case it will only
+   * except if region is not 0 in which case it will only
    * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
-   * NULL if that region doesn't contain the object or the region
+   * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iMaterialWrapper* FindMaterial (const char* name,
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
   /**
    * Find the given texture. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if region is not NULL in which case it will only
+   * except if region is not 0 in which case it will only
    * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
-   * NULL if that region doesn't contain the object or the region
+   * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iTextureWrapper* FindTexture (const char* name,
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
   /**
    * Find the given sector. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if region is not NULL in which case it will only
+   * except if region is not 0 in which case it will only
    * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
-   * NULL if that region doesn't contain the object or the region
+   * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iSector* FindSector (const char* name,
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
   /**
    * Find the given mesh object. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if region is not NULL in which case it will only
+   * except if region is not 0 in which case it will only
    * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
-   * NULL if that region doesn't contain the object or the region
+   * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iMeshWrapper* FindMeshObject (const char* name,
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
   /**
    * Find the given mesh factory. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if region is not NULL in which case it will only
+   * except if region is not 0 in which case it will only
    * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
-   * NULL if that region doesn't contain the object or the region
+   * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
   /**
    * Find the given camera position. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if region is not NULL in which case it will only
+   * except if region is not 0 in which case it will only
    * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
-   * NULL if that region doesn't contain the object or the region
+   * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iCameraPosition* FindCameraPosition (const char* name,
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
   /**
    * Find the given collection. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if region is not NULL in which case it will only
+   * except if region is not 0 in which case it will only
    * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
-   * NULL if that region doesn't contain the object or the region
+   * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iCollection* FindCollection (const char* name,
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
 
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
@@ -506,7 +506,7 @@ struct iEngine : public iBase
    */
   virtual csPtr<iCamera> CreateCamera () = 0;
   /**
-   * Create a static/pseudo-dynamic light. name can be NULL.
+   * Create a static/pseudo-dynamic light. name can be 0.
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iStatLight> CreateLight (const char* name, const csVector3& pos,
@@ -523,7 +523,7 @@ struct iEngine : public iBase
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef or use DecRef().
    */
-  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = NULL) = 0;
+  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0) = 0;
 
   /**
    * Create a dynamic light. After creating a dynamic light you have to
@@ -557,10 +557,10 @@ struct iEngine : public iBase
    * Conveniance function to create a mesh factory from a given type.
    * The type plugin will only be loaded if needed. 'classId' is the
    * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
-   * Returns NULL on failure. The factory will be registered with the engine
+   * Returns 0 on failure. The factory will be registered with the engine
    * under the given name. If there is already a factory with that name
    * no new factory will be created but the found one is returned instead.
-   * If the name is NULL then no name will be set and no check will happen
+   * If the name is 0 then no name will be set and no check will happen
    * if the factory already exists.
    * Assign to a csRef or use DecRef().
    */
@@ -583,11 +583,11 @@ struct iEngine : public iBase
   /**
    * Create a loader context that you can give to loader plugins.
    * It will basically allow loader plugins to find materials, ...
-   * If region != NULL then only that region will
+   * If region != 0 then only that region will
    * be searched. Assign to a csRef or use DecRef().
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
-  	iRegion* region = NULL) = 0;
+  	iRegion* region = 0) = 0;
 
   /**
    * Conveniance function to load a mesh factory from a given loader plugin.
@@ -599,21 +599,21 @@ struct iEngine : public iBase
 
   /**
    * Conveniance function to create a mesh object for a given factory.
-   * If 'sector' is NULL then the mesh object will not be set to a position.
-   * Returns NULL on failure. The object will be given the specified name.
-   * 'name' can be NULL if no name is wanted. Different mesh objects can
+   * If 'sector' is 0 then the mesh object will not be set to a position.
+   * Returns 0 on failure. The object will be given the specified name.
+   * 'name' can be 0 if no name is wanted. Different mesh objects can
    * have the same name (in contrast with factory objects).
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector = NULL,
+  	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /**
    * Create a mesh wrapper for an existing mesh object.
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject*,
-  	const char* name, iSector* sector = NULL,
+  	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /**
    * Create a mesh wrapper from a class id.
@@ -627,7 +627,7 @@ struct iEngine : public iBase
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
-  	const char* name, iSector* sector = NULL,
+  	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /**
    * Create an uninitialized mesh wrapper
@@ -637,7 +637,7 @@ struct iEngine : public iBase
 
   /**
    * Conveniance function to load a mesh object from a given loader plugin.
-   * If sector == NULL the object will not be placed in a sector.
+   * If sector == 0 the object will not be placed in a sector.
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iMeshWrapper> LoadMeshWrapper (
@@ -655,7 +655,7 @@ struct iEngine : public iBase
 
   /**
    * Set the drawing context. This is a texture handle that is used
-   * as the procedural texture to render on. If this is NULL then the
+   * as the procedural texture to render on. If this is 0 then the
    * screen is assumed.
    */
   virtual void SetContext (iTextureHandle* ctxt) = 0;

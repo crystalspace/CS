@@ -48,9 +48,9 @@ csTicks csGetTicks ()
 
   // Start counting from first time this function is called. 
   if (FirstCount.tv_sec == 0)
-    gettimeofday (&FirstCount, NULL);    
+    gettimeofday (&FirstCount, 0);    
 
-  gettimeofday (&now, NULL);
+  gettimeofday (&now, 0);
   return (now.tv_sec  - FirstCount.tv_sec ) * 1000 + 
          (now.tv_usec - FirstCount.tv_usec) / 1000;
 }

@@ -50,13 +50,13 @@
  * 			colormap will have N=(2^rbits)*(2^gbits)*(2^bbits)
  *                      entries.
  * 	dist_buf:	An array of N long integers to be used as scratch
- * 			space. If NULL, the dist_buff will be allocated
+ * 			space. If 0, the dist_buff will be allocated
  *                      and freed before exiting the routine.
  * Outputs:
  * 	rgbmap:		The output inverse colormap.  The entry
  * 			rgbmap[(r<<(gbits+bbits)) + (g<<bbits) + b]
  * 			is the colormap entry that is closest to the
- * 			(quantized) color (r,g,b). If NULL, it will be
+ * 			(quantized) color (r,g,b). If 0, it will be
  *                      allocated with "new uint8* []"
  * Assumptions:
  * 	Quantization is performed by right shift (low order bits are
@@ -87,6 +87,6 @@
  */
 extern void csInverseColormap (int colors, csRGBpixel *colormap,
   int rbits, int gbits, int bbits, uint8 *&rgbmap,
-  uint32 *dist_buf = NULL);
+  uint32 *dist_buf = 0);
 
 #endif // __CS_INV_CMAP_H__

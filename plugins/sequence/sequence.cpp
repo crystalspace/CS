@@ -35,9 +35,9 @@ SCF_IMPLEMENT_IBASE (csSequence)
   SCF_IMPLEMENTS_INTERFACE (iSequence)
 SCF_IMPLEMENT_IBASE_END
 
-csSequence::csSequence (iSequenceManager* seqmgr) : first (NULL), last (NULL)
+csSequence::csSequence (iSequenceManager* seqmgr) : first (0), last (0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csSequence::seqmgr = seqmgr;
 }
 
@@ -54,7 +54,7 @@ void csSequence::Clear ()
     delete first;
     first = n;
   }
-  last = NULL;
+  last = 0;
 }
 
 void csSequence::DeleteFirstSequence ()
@@ -64,8 +64,8 @@ void csSequence::DeleteFirstSequence ()
     csSequenceOp* n = first->next;
     delete first;
     first = n;
-    if (!first) last = NULL;
-    else first->prev = NULL;
+    if (!first) last = 0;
+    else first->prev = 0;
   }
 }
 
@@ -96,7 +96,7 @@ void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
     if (!o)
     {
       // Put it last.
-      op->next = NULL;
+      op->next = 0;
       op->prev = last;
       last->next = op;
       last = op;
@@ -106,7 +106,7 @@ void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
   {
     // The very first operation.
     first = last = op;
-    op->prev = op->next = NULL;
+    op->prev = op->next = 0;
   }
 }
 
@@ -187,8 +187,8 @@ csSequenceManager::csSequenceManager (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
-  object_reg = NULL;
+  scfiEventHandler = 0;
+  object_reg = 0;
   main_sequence = new csSequence (this);
   previous_time_valid = false;
   main_time = 0;
@@ -291,8 +291,8 @@ void csSequenceManager::TimeWarp (csTicks time, bool skip)
     }
 
     // Now really delete the operation.
-    op = NULL;
-    params = NULL;
+    op = 0;
+    params = 0;
 
     // And fetch the next one.
     seqOp = main_sequence->GetFirstSequence ();

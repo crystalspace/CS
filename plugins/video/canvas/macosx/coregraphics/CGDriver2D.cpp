@@ -98,7 +98,7 @@ bool CGDriver2D::Open()
     BeginDraw();
     Clear(0);
     FinishDraw();
-    Print(NULL);
+    Print(0);
 
     return true;
 }
@@ -114,7 +114,7 @@ void CGDriver2D::Close()
 
     // Free drawing buffer
     free(Memory);
-    Memory = NULL;
+    Memory = 0;
 
     // Superclasses
     csGraphics2D::Close();

@@ -28,7 +28,7 @@ struct csIsoCellNode {
   csIsoCellNode *left, *right;
   /// value in this node
   iIsoSprite *drawpart;
-  csIsoCellNode (){left = right = NULL; drawpart = NULL;}
+  csIsoCellNode (){left = right = 0; drawpart = 0;}
   ~csIsoCellNode ();
 };
 

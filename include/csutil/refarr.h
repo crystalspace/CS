@@ -48,7 +48,7 @@ public:
     if (limit != 0)
       root = (csRef<T>*)calloc (limit, sizeof(csRef<T>));
     else
-      root = NULL;
+      root = 0;
   }
 
   /**
@@ -64,7 +64,7 @@ public:
     destination.count = count;
     destination.limit = limit;
     destination.threshold = threshold;
-    root = NULL;
+    root = 0;
     limit = count = 0;
   }
 
@@ -77,9 +77,9 @@ public:
     {
       int i;
       for (i = 0 ; i < limit ; i++)
-        root[i] = NULL;	// Clear ref.
+        root[i] = 0;	// Clear ref.
       free (root);
-      root = NULL;
+      root = 0;
       limit = count = 0;
     }
   }
@@ -97,7 +97,7 @@ public:
   {
     // Free all items between new count and old count.
     int i;
-    for (i = n ; i < count ; i++) root[i] = NULL;
+    for (i = n ; i < count ; i++) root[i] = 0;
 
     int old_count = count;
     count = n;
@@ -109,7 +109,7 @@ public:
       {
         DeleteAll ();
       }
-      else if (root == NULL)
+      else if (root == 0)
         root = (csRef<T>*)calloc (n, sizeof(csRef<T>));
       else
       {
@@ -201,7 +201,7 @@ public:
   {
     if (n >= 0 && n < count)
     {
-      root[n] = NULL;	// Clear element.
+      root[n] = 0;	// Clear element.
       const int ncount = count - 1;
       const int nmove = ncount - n;
       if (nmove > 0)

@@ -158,7 +158,7 @@ csPtr<iBase> csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
     ReportError (reporter,
 		"crystalspace.starfactoryloader.setup.objecttype",
 		"Could not load the stars mesh object plugin!");
-    return NULL;
+    return 0;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   return csPtr<iBase> (fact);
@@ -237,7 +237,7 @@ csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return 0;
 	  starstate->SetBox (box);
 	}
 	break;
@@ -245,7 +245,7 @@ csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return NULL;
+	    return 0;
 	  starstate->SetColor (col);
 	}
 	break;
@@ -253,7 +253,7 @@ csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return NULL;
+	    return 0;
 	  starstate->SetMaxColor (col);
 	}
 	break;
@@ -272,7 +272,7 @@ csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.starloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           starstate = SCF_QUERY_INTERFACE (mesh, iStarsState);
@@ -280,7 +280,7 @@ csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,
 	break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

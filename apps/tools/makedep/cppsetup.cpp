@@ -102,11 +102,11 @@ struct symtab **lookup (symbol)
   static struct symtab *undefined;
   struct symtab **sp;
 
-  sp = isdefined (symbol, currentinc, NULL);
-  if (sp == NULL)
+  sp = isdefined (symbol, currentinc, 0);
+  if (sp == 0)
   {
     sp = &undefined;
-    (*sp)->s_value = NULL;
+    (*sp)->s_value = 0;
   }
   return (sp);
 }
@@ -151,7 +151,7 @@ static const char *my_if_errors (IfParser *ip, const char *cp, const char *expec
   for (i += prefixlen + 3; i > 0; i--)
     putc (' ', stderr);
   fprintf (stderr, "^--- expecting %s\n", expecting);
-  return NULL;
+  return 0;
 }
 
 #define MAXNAMELEN 256
@@ -166,7 +166,7 @@ static struct symtab **lookup_variable (IfParser *ip, const char *var, int len)
 
   strncpy (tmpbuf, var, len);
   tmpbuf[len] = '\0';
-  return isdefined (tmpbuf, pd->inc, NULL);
+  return isdefined (tmpbuf, pd->inc, 0);
 }
 
 static int my_eval_defined (IfParser *ip, const char *var, int len)
@@ -195,7 +195,7 @@ static long my_eval_variable (IfParser *ip, const char *var, int len)
   }
   while (s);
 
-  return strtol (var, NULL, 0);
+  return strtol (var, 0, 0);
 }
 
 int cppsetup (char *line, struct filepointer *filep, struct inclist *inc)

@@ -98,7 +98,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
 
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 
 
   frustum_valid = false;
@@ -111,7 +111,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
   stencil_enabled = false;
   clip_planes_enabled = false;
 
-  render_target = NULL;
+  render_target = 0;
 
   color_red_enabled = false;
   color_green_enabled = false;
@@ -133,12 +133,12 @@ csGLRender3D::csGLRender3D (iBase *parent)
   int i;
   for (i=0; i<16; i++)
   {
-    vertattrib[i] = NULL;
+    vertattrib[i] = 0;
     vertattribenabled[i] = false;
-    texunit[i] = NULL;
+    texunit[i] = 0;
     texunitenabled[i] = false;
   }
-  lastUsedShaderpass = NULL;
+  lastUsedShaderpass = 0;
 }
 
 csGLRender3D::~csGLRender3D()
@@ -813,16 +813,16 @@ void csGLRender3D::Close ()
   if (txtmgr)
   {
     txtmgr->Clear ();
-    //delete txtmgr; txtmgr = NULL;
+    //delete txtmgr; txtmgr = 0;
   }
-  txtmgr = NULL;
+  txtmgr = 0;
   if (txtcache)
   {
     txtcache->Clear ();
-    //delete txtcache; txtcache = NULL;
+    //delete txtcache; txtcache = 0;
   }
-  buffermgr = NULL;
-  shadermgr = NULL;
+  buffermgr = 0;
+  shadermgr = 0;
 
   if (G2D)
     G2D->Close ();
@@ -843,7 +843,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
   int i = 0;
   for (i = 0; i < 16; i++)
   {
-    texunit[i] = NULL;
+    texunit[i] = 0;
     texunitenabled[i] = false;
   }
 
@@ -1032,7 +1032,7 @@ void csGLRender3D::FinishDraw ()
       }
     }
   }
-  render_target = NULL;
+  render_target = 0;
 }
 
 void csGLRender3D::Print (csRect* area)
@@ -1113,7 +1113,7 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   if (bind && vertattrib[attrib])
   {
     vertattrib[attrib]->Release ();
-    vertattrib[attrib] = NULL;
+    vertattrib[attrib] = 0;
   }
   
   static GLenum type[] = {GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, 
@@ -1210,7 +1210,7 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 
 bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int unit)
 {
-  iTextureHandle* txthandle = NULL;
+  iTextureHandle* txthandle = 0;
   csMaterialHandle* mathand = (csMaterialHandle*)mathandle;
   if(layer == 0)
   {
@@ -1307,19 +1307,19 @@ void csGLRender3D::DeactivateTexture (int unit)
   {
   case iTextureHandle::CS_TEX_IMG_1D:
     statecache->Disable_GL_TEXTURE_1D (unit);
-    //glBindTexture (GL_TEXTURE_1D, NULL);
+    //glBindTexture (GL_TEXTURE_1D, 0);
     break;
   case iTextureHandle::CS_TEX_IMG_2D:
     statecache->Disable_GL_TEXTURE_2D (unit);
-    //glBindTexture (GL_TEXTURE_2D, NULL);
+    //glBindTexture (GL_TEXTURE_2D, 0);
     break;
   case iTextureHandle::CS_TEX_IMG_3D:
     statecache->Disable_GL_TEXTURE_3D (unit);
-    //glBindTexture (GL_TEXTURE_3D, NULL);
+    //glBindTexture (GL_TEXTURE_3D, 0);
     break;
   case iTextureHandle::CS_TEX_IMG_CUBEMAP:
     statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
-    //glBindTexture (GL_TEXTURE_CUBE_MAP, NULL);
+    //glBindTexture (GL_TEXTURE_CUBE_MAP, 0);
     break;
   }
   texunitenabled[unit] = false;
@@ -1399,7 +1399,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 //    (csMaterialHandle*)(mymesh->mathandle);
   csMaterialHandle* mathandle = mymesh->material ?
     ((csMaterialHandle*)(mymesh->material->GetMaterialHandle())) :
-    NULL;
+    0;
 
   statecache->SetShadeModel (GL_SMOOTH);
 
@@ -1488,17 +1488,17 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     {
       lastUsedShaderpass->ResetState ();
       lastUsedShaderpass->Deactivate ();
-      lastUsedShaderpass = NULL;
+      lastUsedShaderpass = 0;
     }*/
 
     iStreamSource* source = mymesh->streamsource;
     iRenderBuffer* vertexbuf =
       source->GetBuffer (string_vertices);
-    iRenderBuffer* texcoordbuf = NULL;
+    iRenderBuffer* texcoordbuf = 0;
       //source->GetBuffer (string_texture_coordinates);
-    iRenderBuffer* normalbuf = NULL;
+    iRenderBuffer* normalbuf = 0;
       //source->GetBuffer (string_normals);
-    iRenderBuffer* colorbuf = NULL;
+    iRenderBuffer* colorbuf = 0;
       //source->GetBuffer (string_colors);
     iRenderBuffer* indexbuf =
       source->GetBuffer (string_indices);
@@ -1797,7 +1797,7 @@ void* csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
     return (void*) (scfParent->txtcache);
   if(strcasecmp(name, "varr") == 0)
     return (void*) (&scfParent->varr);
-  return NULL;
+  return 0;
 }
 
 void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)

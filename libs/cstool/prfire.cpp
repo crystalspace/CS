@@ -39,11 +39,11 @@ SCF_IMPLEMENT_IBASE_EXT_END
 csProcFire::csProcFire (int w, int h) : csProcTexture()
 {
   palsize = 0;
-  palette = NULL;
-  palette_idx = NULL;
-  image[0] = NULL;
-  image[1] = NULL;
-  blitbuf = NULL;
+  palette = 0;
+  palette_idx = 0;
+  image[0] = 0;
+  image[1] = 0;
+  blitbuf = 0;
   mat_w = w;
   mat_h = h;
 
@@ -55,7 +55,7 @@ csProcFire::csProcFire (int w, int h) : csProcTexture()
 
   single_flame_mode = true;
   halfbase = mat_w/4;
-  fireline = NULL;
+  fireline = 0;
 
   postsmooth = 0;
 

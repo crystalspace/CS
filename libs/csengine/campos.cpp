@@ -43,7 +43,7 @@ csCameraPosition::csCameraPosition (
   csCameraPosition::position = position;
   csCameraPosition::forward = forward;
   csCameraPosition::upward = upward;
-  far_plane = NULL;
+  far_plane = 0;
 
   csEngine::current_engine->AddToCurrentRegion (this);
 }
@@ -91,7 +91,7 @@ void csCameraPosition::SetFarPlane (csPlane3 *fp)
 void csCameraPosition::ClearFarPlane ()
 {
   delete far_plane;
-  far_plane = NULL;
+  far_plane = 0;
 }
 
 iObject *csCameraPosition::CameraPosition::QueryObject ()

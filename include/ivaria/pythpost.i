@@ -68,7 +68,7 @@ struct _csPyEventHandler : public iEventHandler
 		SCF_DECLARE_IBASE;
 		_csPyEventHandler (PyObject * obj) : _pySelf(obj)
 		{
-			SCF_CONSTRUCT_IBASE(NULL);
+			SCF_CONSTRUCT_IBASE(0);
 			IncRef();
 		}
 		virtual ~_csPyEventHandler () { DecRef(); }

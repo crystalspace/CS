@@ -88,7 +88,7 @@ char *directives[] =
   "elif",
   "eject",
   "warning",
-  NULL
+  0
 };
 
 #define MAKEDEPEND
@@ -213,12 +213,12 @@ int main (int argc, char **argv)
   register char **incp = includedirs;
   register char *p;
   register struct inclist *ip;
-  char *makefile = NULL;
+  char *makefile = 0;
   struct filepointer *filecontent;
   struct symtab *psymp = predefs;
-  char *endmarker = NULL;
-  char *defincdir = NULL;
-  char **undeflist = NULL;
+  char *endmarker = 0;
+  char *defincdir = 0;
+  char **undeflist = 0;
   int i, numundefs = 0;
 
 #if defined (INITIALIZE)	// initialization code
@@ -290,7 +290,7 @@ int main (int argc, char **argv)
     /* if looking for endmarker then check before parsing */
     if (endmarker && strcmp (endmarker, *argv) == 0)
     {
-      endmarker = NULL;
+      endmarker = 0;
       continue;
     }
     if (**argv != '-')
@@ -579,7 +579,7 @@ int main (int argc, char **argv)
   for (fp = filelist; *fp; fp++)
   {
     filecontent = getfile (*fp);
-    ip = newinclude (*fp, (char *) NULL);
+    ip = newinclude (*fp, (char *) 0);
 
     find_includes (filecontent, ip, ip, 0, false);
     freefile (filecontent);
@@ -633,7 +633,7 @@ struct filepointer *getfile (char *file)
   size_t fsize = st.st_size;
 #endif
   content->f_base = (char *) malloc (fsize + 1);
-  if (content->f_base == NULL)
+  if (content->f_base == 0)
     fatalerr ("cannot allocate mem\n");
   if ((long)(fsize = read (fd, content->f_base, fsize)) < 0)
     fatalerr ("failed to read %s\n", file);
@@ -687,7 +687,7 @@ char *getline (struct filepointer *filep)
   p = filep->f_p;
   eof = filep->f_end;
   if (p >= eof)
-    return ((char *) NULL);
+    return ((char *) 0);
   lineno = filep->f_line;
 
   for (bol = p; p < eof; p++)
@@ -745,7 +745,7 @@ char *getline (struct filepointer *filep)
         bol++;
     }
   if (*bol != '#')
-    bol = NULL;
+    bol = 0;
 done:
   filep->f_p = p;
   filep->f_line = lineno;
@@ -813,7 +813,7 @@ void redirect (char *line, char *makefile)
     if (stat (makefile, &st))
       st.st_mode = 0640;
 
-  if ((fdin = fopen (makefile, "r")) == NULL)
+  if ((fdin = fopen (makefile, "r")) == 0)
   {
     /* Try to create file if it does not exist */
     if (opt_create)
@@ -848,10 +848,10 @@ void redirect (char *line, char *makefile)
   if (rename (makefile, backup) < 0)
     fatalerr ("cannot rename %s to %s\n", makefile, backup);
 #if defined(WIN32) || defined(__EMX__) || defined (__DJGPP__)
-  if ((fdin = fopen (backup, "r")) == NULL)
+  if ((fdin = fopen (backup, "r")) == 0)
     fatalerr ("cannot open \"%s\"\n", backup);
 #endif
-  if ((fdout = freopen (makefile, "w", stdout)) == NULL)
+  if ((fdout = freopen (makefile, "w", stdout)) == 0)
     fatalerr ("cannot open \"%s\"\n", backup);
   len = strlen (line);
   while (!found && fgets (buf, BUFSIZ, fdin))

@@ -254,7 +254,7 @@ public:
   iTextureHandle *GetTexture (const char *Name)
   {
     csWSTexture *tex = GetTextures ()->FindTexture (Name);
-    return tex ? tex->GetHandle () : (iTextureHandle*)NULL;
+    return tex ? tex->GetHandle () : (iTextureHandle*)0;
   }
 
   /// Return application's global mouse object
@@ -266,15 +266,15 @@ public:
   /// Query mouse cursor pointer
   csMouseCursorID GetMouseCursor () { return MouseCursorID; }
 
-  /// Capture all mouse events (or disable capture if NULL)
+  /// Capture all mouse events (or disable capture if 0)
   csComponent *CaptureMouse (csComponent *who)
   { csComponent *c = MouseOwner; MouseOwner = who; return c; }
 
-  /// Capture all keyboard events (or disable capture if NULL)
+  /// Capture all keyboard events (or disable capture if 0)
   csComponent *CaptureKeyboard (csComponent *who)
   { csComponent *c = KeyboardOwner; KeyboardOwner = who; return c; }
 
-  /// Capture all focused events (or disable capture if NULL)
+  /// Capture all focused events (or disable capture if 0)
   csComponent *CaptureFocus (csComponent *who)
   { csComponent *c = FocusOwner; FocusOwner = who; return c; }
 
@@ -312,13 +312,13 @@ public:
 
   /**
    * Get the top component which is currently modal.
-   * Or NULL if not in modality.
+   * Or 0 if not in modality.
    */
   csComponent* GetTopModalComponent ();
 
   /**
    * Get the userdata for the top modal component.
-   * Or NULL if not in modality.
+   * Or 0 if not in modality.
    */
   iBase* GetTopModalUserdata ();
 
@@ -351,7 +351,7 @@ public:
   csHintManager &GetHintManager ()
   { return *hints; }
 
-  /// Load a font and return its handle or NULL
+  /// Load a font and return its handle or 0
   csPtr<iFont> LoadFont (const char *iFontName)
   { return FontServer->LoadFont (iFontName); }
 

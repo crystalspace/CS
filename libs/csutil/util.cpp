@@ -34,7 +34,7 @@ char *csStrNew (const char *s)
     return r;
   }
   else
-    return NULL;
+    return 0;
 }
 
 #if defined (OS_DOS)

@@ -32,7 +32,7 @@
 
 csEffectTechnique::csEffectTechnique()
 {
-  SCF_CONSTRUCT_IBASE( NULL );
+  SCF_CONSTRUCT_IBASE( 0 );
   valid = CS_TECHNIQUE_NOTVALIDATED;
   quality = 0;
   clientflags = 0;

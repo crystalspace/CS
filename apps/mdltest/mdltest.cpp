@@ -276,7 +276,7 @@ Simple::~Simple ()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System; System = NULL;
+  delete System; System = 0;
 }
 
 static bool SimpleEventHandler (iEvent& ev)
@@ -555,7 +555,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 /*---------------------------------------------------------------------*
@@ -563,7 +563,7 @@ void Simple::FinishFrame ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
 
@@ -572,7 +572,7 @@ int main (int argc, char* argv[])
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (NULL))
+  if (!System->Initialize (0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

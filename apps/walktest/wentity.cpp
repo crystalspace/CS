@@ -47,7 +47,7 @@ SCF_IMPLEMENT_IBASE_END
 
 AnimPortalCallback::AnimPortalCallback ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 bool AnimPortalCallback::Traverse (iPortal*, iBase* )

@@ -51,9 +51,9 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (iParent), xim (NULL),
-  dpy (NULL), cmap (0), real_Memory (NULL),
-  sim_lt8 (NULL), sim_lt16 (NULL)
+  csGraphics2D (iParent), xim (0),
+  dpy (0), cmap (0), real_Memory (0),
+  sim_lt8 (0), sim_lt16 (0)
 {
   EventOutlet = 0;
 }
@@ -189,7 +189,7 @@ void csGraphics2DXLib::Close ()
   if (Memory && sim_depth && !xshm)
   {
     delete [] Memory;
-    Memory = NULL;
+    Memory = 0;
   }
 
   csGraphics2D::Close ();
@@ -666,7 +666,7 @@ void csGraphics2DXLib::SetRGB(int i, int r, int g, int b)
     if (sim_lt16)
     {
       delete [] sim_lt16;
-      sim_lt16 = NULL;
+      sim_lt16 = 0;
     }
 
   csGraphics2D::SetRGB (i, r, g, b);
@@ -869,7 +869,7 @@ bool csGraphics2DXLib::TryAllocateMemory ()
     int bitmap_pad = (disp_depth + 7) / 8;
     bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
     xim = XCreateImage(dpy, DefaultVisual(dpy,screen_num),
-		       disp_depth, ZPixmap, 0, NULL,
+		       disp_depth, ZPixmap, 0, 0,
 		       Width, Height, bitmap_pad, 0);
     xim->data = new char[xim->bytes_per_line*xim->height];
     real_Memory = (unsigned char*)(xim->data);
@@ -903,7 +903,7 @@ bool csGraphics2DXLib::Resize (int width, int height)
   {
     delete [] real_Memory;
     XDestroyImage (xim);
-    xim = NULL;
+    xim = 0;
   }
   if (!AllocateMemory())
     return false;

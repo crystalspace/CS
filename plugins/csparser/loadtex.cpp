@@ -45,7 +45,7 @@
 csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
 {
   if (!ImageLoader)
-     return NULL;
+     return 0;
 
   if (Format & CS_IMGFMT_INVALID)
   {
@@ -63,7 +63,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
     ReportWarning (
 	"crystalspace.maploader.parse.image",
     	"Could not open image file '%s' on VFS!", fname);
-    return NULL;
+    return 0;
   }
 
   // we don't use csRef because we need to return an Increfed object later
@@ -75,7 +75,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
 	"crystalspace.maploader.parse.image",
 	"Could not load image '%s'. Unknown format!",
 	fname);
-    return NULL;
+    return 0;
   }
   
   csRef<iDataBuffer> xname (VFS->ExpandPath (fname));
@@ -106,13 +106,13 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 	fname);
     Image = csCreateXORPatternImage (32, 32, 5);
     if (!Image)
-      return NULL;
+      return 0;
   }
 
   if(img) *img=Image;
 
   if (!tm)
-    return NULL;
+    return 0;
   
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, Flags));
   if (!TexHandle)
@@ -120,7 +120,7 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
     ReportError (
 	"crystalspace.maploader.parse.texture",
 	"Cannot create texture from '%s'!", fname);
-    return NULL;
+    return 0;
   }
 
   return csPtr<iTextureHandle> (TexHandle);
@@ -131,19 +131,19 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
 	bool create_material)
 {
   if (!Engine)
-    return NULL;
+    return 0;
 
   iImage *img;
   csRef<iTextureHandle> TexHandle (LoadTexture (fname, Flags, tm, &img));
   if (!TexHandle)
-    return NULL;
+    return 0;
 
   iTextureWrapper *TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
   TexWrapper->SetImageFile(img);
 
-  iMaterialWrapper* matwrap = NULL;
+  iMaterialWrapper* matwrap = 0;
   if (create_material)
   {
     csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
@@ -173,13 +173,13 @@ SCF_IMPLEMENT_IBASE_END;
 
 TextureLoaderContext::TextureLoaderContext ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   has_flags = false;
   flags = CS_TEXTURE_3D;
 
   has_image = false;
-  image = NULL;
+  image = 0;
 
   has_size = false;
   width = height = 128;
@@ -270,24 +270,24 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* node,
 					  iLoaderContext* ldr_context, 	
 					  iBase* context)
 {
-  if (!context) return NULL;
+  if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
     (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
-  if (!ctx) return NULL;
+  if (!ctx) return 0;
   if (!ctx->HasImage() || !ctx->GetImage())
-    return NULL;
+    return 0;
 
 #ifdef CS_USE_NEW_RENDERER
   csRef<iRender3D> G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
 #else
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif
-  if (!G3D) return NULL;
+  if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  if (!tm) return NULL;
+  if (!tm) return 0;
   csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!Engine)
-    return NULL;
+    return 0;
 
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (ctx->GetImage(), 
     ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
@@ -356,12 +356,12 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 #else
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif
-  if (!G3D) return NULL;
+  if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  if (!tm) return NULL;
+  if (!tm) return 0;
   csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!Engine)
-    return NULL;
+    return 0;
 
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, 
     (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D));

@@ -225,7 +225,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.sprite2dfactoryloader.setup.objecttype",
 		node, "Could not load the sprite.2d mesh object plugin!");
-    return NULL;
+    return 0;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   csRef<iSprite2DFactoryState> spr2dLook (
@@ -249,7 +249,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
 		child, "Couldn't find material named '%s'", matname);
-            return NULL;
+            return 0;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
 	}
@@ -258,7 +258,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return 0;
           spr2dLook->SetLighting (do_lighting);
         }
 	break;
@@ -266,18 +266,18 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return NULL;
+	    return 0;
           spr2dLook->SetMixMode (mm);
 	}
 	break;
       case XMLTOKEN_UVANIMATION:
 	if (!ParseAnim (child, reporter, spr2dLook,
 		child->GetAttributeValue ("name")))
-	  return NULL;
+	  return 0;
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 
@@ -341,7 +341,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite2DState> spr2dLook;
-  csColoredVertices* verts = NULL;
+  csColoredVertices* verts = 0;
   int vnum = 0;
   int uvnum = 0;
   int colnum = 0;
@@ -364,7 +364,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
@@ -380,7 +380,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return 0;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
 	}
@@ -389,7 +389,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return NULL;
+	    return 0;
           spr2dLook->SetMixMode (mm);
 	}
 	break;
@@ -434,7 +434,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return 0;
           spr2dLook->SetLighting (do_lighting);
         }
         break;
@@ -455,13 +455,13 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.uvanim",
 		child, "UVAnimation '%s' not found!", animname);
-	    return NULL;
+	    return 0;
 	  }
         }
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

@@ -59,7 +59,7 @@ private:
   } v;
 
 public:
-  csVariant () { type = CSVAR_LONG; v.s = NULL; }
+  csVariant () { type = CSVAR_LONG; v.s = 0; }
   ~csVariant () { if (type == CSVAR_STRING) delete[] v.s; }
   /// Assign a long
   void SetLong (long l)
@@ -90,7 +90,7 @@ public:
     if (s)
       v.s = csStrNew (s);
     else
-      v.s = NULL;
+      v.s = 0;
   }
   /// Assign a command
   void SetCommand ()

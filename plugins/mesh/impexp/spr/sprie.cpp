@@ -100,12 +100,12 @@ int csModelConverterSPR::GetFormatCount ()
 
 const csModelConverterFormat *csModelConverterSPR::GetFormat (int idx)
 {
-  return (idx == 0) ? &FormatInfo : NULL;
+  return (idx == 0) ? &FormatInfo : 0;
 }
 
 csPtr<iModelData> csModelConverterSPR::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 {
-  return NULL;
+  return 0;
 }
 
 /*
@@ -128,12 +128,12 @@ csPtr<iDataBuffer> csModelConverterSPR::Save (iModelData *Data,
 	const char *Format)
 {
   if (strcasecmp (Format, "spr"))
-    return NULL;
+    return 0;
 
   // only the first object is saved
   csRef<iModelDataObject> obj (
   	CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject));
-  if (!obj) return NULL;
+  if (!obj) return 0;
 
   csSpriteBuilderFile Builder;
   csRef<iDataBuffer> buf (Builder.Build (obj));

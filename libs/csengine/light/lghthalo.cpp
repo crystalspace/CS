@@ -44,7 +44,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csHalo::csHalo (csHaloType iType)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Intensity = 0;
   Type = iType;
 }
@@ -116,13 +116,13 @@ csFlareHalo::csFlareHalo () :
   csHalo(cshtFlare)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFlareHalo);
-  components = NULL;
-  last = NULL;
+  components = 0;
+  last = 0;
 }
 
 csFlareHalo::~csFlareHalo ()
 {
-  csFlareComponent *np = NULL, *p = components;
+  csFlareComponent *np = 0, *p = components;
   while (p)
   {
     np = p->next;
@@ -140,8 +140,8 @@ void csFlareHalo::AddComponent (
   iMaterialWrapper *image)
 {
   csFlareComponent *comp = new csFlareComponent;
-  comp->next = NULL;
-  if (components == NULL)
+  comp->next = 0;
+  if (components == 0)
     components = comp;
   else
     last->next = comp;
@@ -160,7 +160,7 @@ uint8 *csFlareHalo::Generate (int
 /*Size*/ )
 {
   // Not implemented for flares. (consist of multiple images)
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------+ csLightHalo +---//
@@ -292,7 +292,7 @@ csLightFlareHalo::csLightFlareHalo (
   int iHaloSize) :
     csLightHalo(light, 0)
 {
-  /// passes NULL as iHalo to csLightHalo.
+  /// passes 0 as iHalo to csLightHalo.
   halosize = iHaloSize;
   flare = halo;
 }

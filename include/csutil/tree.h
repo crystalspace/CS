@@ -41,7 +41,7 @@ class csTreeNode
   { children.Push (child); child->parent = this; }
 
   /// Create node, optionally as a child of <code>theParent</code>.
-  csTreeNode (csTreeNode *theParent=NULL)
+  csTreeNode (csTreeNode *theParent=0)
   { parent=theParent; if (parent) parent->children.Push (this); }
 
   virtual ~csTreeNode ()
@@ -58,19 +58,19 @@ class csTreeNode
    * before testing the next direct child.
    * Returns the last node where TreeFunc resulted in TRUE. If stopOnSuccess is true, then execution is stoped after first
    * successful execution of TreeFunc.
-   * SelBranch lets you decide which children to select for further investugation. NULL means all children.
+   * SelBranch lets you decide which children to select for further investugation. 0 means all children.
    */
   csTreeNode *DSF (bool (*TreeFunc)(csTreeNode *node, void* param, bool stopOnSuccess),
 		   bool (*SelBranch)(csTreeNode *node), void* param, bool stopOnSuccess)
   {
-    csTreeNode *foundNode = NULL;
+    csTreeNode *foundNode = 0;
     int i=0;
     bool dive;
     if (TreeFunc (this, param, stopOnSuccess))
       foundNode = this;
     while (i<children.Length () && !(foundNode && stopOnSuccess))
     {
-      dive = (SelBranch == NULL) || SelBranch ((csTreeNode*)children.Get (i));
+      dive = (SelBranch == 0) || SelBranch ((csTreeNode*)children.Get (i));
       if (dive)
         foundNode = ((csTreeNode*)children.Get (i))->DSF (TreeFunc, SelBranch,
 	                                                  param, stopOnSuccess);
@@ -84,12 +84,12 @@ class csTreeNode
    * direct children before diving into subchildren.
    * Returns the last node where TreeFunc resulted in TRUE. If stopOnSuccess is true, then execution is stoped after first
    * successful execution of TreeFunc.
-   * SelBranch lets you decide which children to select for further investugation. NULL means all children.
+   * SelBranch lets you decide which children to select for further investugation. 0 means all children.
    */
   csTreeNode *BSF (bool (*TreeFunc)(csTreeNode *node, void* param, bool stopOnSuccess),
 		   bool (*SelBranch)(csTreeNode *node), void* param, bool stopOnSuccess)
   {
-    csTreeNode *node, *foundNode = NULL;
+    csTreeNode *node, *foundNode = 0;
     csVector fifo;
 
     fifo.Push (this);
@@ -98,7 +98,7 @@ class csTreeNode
       node = (csTreeNode*)fifo.Get (0); fifo.Delete (0);
       if (TreeFunc (node, param, stopOnSuccess))
         foundNode = node;
-      if (!node->IsLeaf () && (SelBranch==NULL || SelBranch (node)))
+      if (!node->IsLeaf () && (SelBranch==0 || SelBranch (node)))
 	  {
 		int i;
         for (i=0; i < node->children.Length (); i++ )
@@ -110,7 +110,7 @@ class csTreeNode
   }
 
  public:
-  csTreeNode *parent; // parent node or NULL if toplevel
+  csTreeNode *parent; // parent node or 0 if toplevel
   csVector children; // node children
 };
 

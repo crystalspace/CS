@@ -55,13 +55,13 @@ private:
 public:
   csXmlReadAttribute ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
-    attr = NULL;
+    SCF_CONSTRUCT_IBASE (0);
+    attr = 0;
   }
 
   csXmlReadAttribute (TrDocumentAttribute* attr)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csXmlReadAttribute::attr = attr;
   }
 
@@ -170,7 +170,7 @@ public:
   virtual void RemoveNode (const csRef<iDocumentNode>&) { }
   virtual void RemoveNodes () { }
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType,
-  	iDocumentNode*) { return NULL; }
+  	iDocumentNode*) { return 0; }
 
   virtual const char* GetContentsValue ();
   virtual int GetContentsValueAsInt ();

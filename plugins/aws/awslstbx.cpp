@@ -88,16 +88,16 @@ awsListBox::awsListBox () :
   mouse_is_over(false),
   is_switch(false),
   was_down(false),
-  highlight(NULL),
-  tree_collapsed(NULL),
-  tree_expanded(NULL),
-  tree_hline(NULL),
-  tree_vline(NULL),
+  highlight(0),
+  tree_collapsed(0),
+  tree_expanded(0),
+  tree_hline(0),
+  tree_vline(0),
   hi_alpha_level(128),
   control_type(0),
   ncolumns(1),
-  sel(NULL),
-  map(NULL),
+  sel(0),
+  map(0),
   map_size(0),
   map_dirty(true),
   scroll_start(0),
@@ -121,7 +121,7 @@ const char *awsListBox::Type ()
 
 bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
-  iString *tn1 = NULL, *tn2 = NULL;
+  iString *tn1 = 0, *tn2 = 0;
   char buf[64];
   int i;
   int sb_h, sb_w;
@@ -431,7 +431,7 @@ void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
   // Add the item
   if (row->parent)
   {
-    if (row->parent->children == NULL)
+    if (row->parent->children == 0)
     {
       row->parent->children = new awsListRowVector ();
       row->parent->children->SetSortCol (lb->sortcol);
@@ -456,7 +456,7 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList* parmlist)
   awsListBox *lb = (awsListBox *)owner;
 
   int i, selidx = -1;
-  iString *str = NULL;
+  iString *str = 0;
 
   // Try and find out what they're searching for
   if (!parmlist->GetString ("text", &str))
@@ -485,7 +485,7 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList* parmlist)
       lb->Broadcast (awsListBox::signalSelected);
     }
     else
-      lb->sel = NULL;
+      lb->sel = 0;
     lb->Invalidate ();
   }
   // Pass back the result, in case they want it
@@ -611,7 +611,7 @@ void awsListBox::ClearList (void *owner, iAwsParmList* )
   DoRecursiveClearList (&lb->rows);
 
   // Clear the selected item.
-  lb->sel = NULL;
+  lb->sel = 0;
   lb->scroll_start = 0;
 
   lb->map_dirty = true;
@@ -855,7 +855,7 @@ void awsListBox::OnDraw (csRect clip)
 
     UpdateMap ();
 
-    if (map == NULL)
+    if (map == 0)
       start = (awsListRow *)rows[0];
     else
       start = map[scroll_start];
@@ -882,7 +882,7 @@ void awsListBox::OnDraw (csRect clip)
       // Find parent of current row.  If there is no parent, then go to the next row item.
       awsListRow *parent = row->parent;
 
-      if (parent == NULL)
+      if (parent == 0)
       { // Get next item from main list
         int i = rows.Find (row);
 
@@ -1389,9 +1389,9 @@ bool awsListBox::OnKeypress (int key, int cha, int modifiers)
  {
 	 case CSKEY_DOWN:
 		 {
-			 awsListRow *parent = sel ? sel->parent: NULL;
+			 awsListRow *parent = sel ? sel->parent: 0;
 
-				if (parent == NULL)
+				if (parent == 0)
 				{ 
 					int i = rows.Find (sel);
 					
@@ -1412,7 +1412,7 @@ bool awsListBox::OnKeypress (int key, int cha, int modifiers)
 						 row = map[drawable_count + scroll_start];
 
 					 if (sel == row)
-						 awsScrollBar::IncClicked (scrollbar, NULL);
+						 awsScrollBar::IncClicked (scrollbar, 0);
 
 					 ///@@@ END_HACK
 
@@ -1425,9 +1425,9 @@ bool awsListBox::OnKeypress (int key, int cha, int modifiers)
 
 	 case CSKEY_UP:
 		 {
-				awsListRow *parent = sel ? sel->parent: NULL;
+				awsListRow *parent = sel ? sel->parent: 0;
 
-				if (parent == NULL)
+				if (parent == 0)
 				{ 
 					int i = rows.Find (sel);
 
@@ -1448,7 +1448,7 @@ bool awsListBox::OnKeypress (int key, int cha, int modifiers)
 						 row = map[scroll_start -1];
 
 					 if (sel == row)
-						 awsScrollBar::DecClicked (scrollbar, NULL);
+						 awsScrollBar::DecClicked (scrollbar, 0);
 
 					 ///@@@ END_HACK
 

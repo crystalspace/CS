@@ -63,7 +63,7 @@ void csfxFadeToColor(iGraphics3D *g3d, float fadevalue, const csColor& color)
   uint8 blue = int(255*color.blue);
   float fade = 1.0 - fadevalue;
 #ifndef CS_USE_NEW_RENDERER
-  csfxScreenDPFX(g3d, NULL, CS_FX_SETALPHA(fade), red, green, blue);
+  csfxScreenDPFX(g3d, 0, CS_FX_SETALPHA(fade), red, green, blue);
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -71,7 +71,7 @@ void csfxFadeOut(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
 #ifndef CS_USE_NEW_RENDERER
-  csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, multval, multval);
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, multval, multval);
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -87,7 +87,7 @@ void csfxGreenScreen(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
 #ifndef CS_USE_NEW_RENDERER
-  csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, 255, multval);
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, 255, multval);
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -95,7 +95,7 @@ void csfxRedScreen(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
 #ifndef CS_USE_NEW_RENDERER
-  csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, 255, multval, multval);
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, 255, multval, multval);
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -103,7 +103,7 @@ void csfxBlueScreen(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
 #ifndef CS_USE_NEW_RENDERER
-  csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, multval, 255);
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, multval, 255);
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -112,7 +112,7 @@ void csfxWhiteOut(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = int(255.*fadevalue);
 #ifndef CS_USE_NEW_RENDERER
-  csfxScreenDPFX(g3d, NULL, CS_FX_ADD, multval, multval, multval);
+  csfxScreenDPFX(g3d, 0, CS_FX_ADD, multval, multval, multval);
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -156,7 +156,7 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   dpfx.colors[3].red = bottomcolor.red;
   dpfx.colors[3].green = bottomcolor.green;
   dpfx.colors[3].blue = bottomcolor.blue;
-  dpfx.mat_handle = NULL;
+  dpfx.mat_handle = 0;
   dpfx.mixmode = mixmode | CS_FX_GOURAUD;
   dpfx.flat_color_r = 255;
   dpfx.flat_color_g = 255;

@@ -26,7 +26,7 @@ int main (int argc, char* argv[])
 
   //construct a list of 1000 randoms in range 1..90000
   int i = 0;
-  srand ((unsigned) time (NULL));
+  srand ((unsigned) time (0));
   int numberlist [RANDOM_ELEMENTS+1];
   for (i = 0; i < RANDOM_ELEMENTS; ++i)
   {

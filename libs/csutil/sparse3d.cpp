@@ -23,7 +23,7 @@
 
 csWideSparse3D::csWideSparse3D ()
 {
-  first_x = NULL;
+  first_x = 0;
 }
 
 csWideSparse3D::~csWideSparse3D ()
@@ -39,31 +39,31 @@ csWideSparse3D::HdX* csWideSparse3D::get_header_x (int x)
     if (l->x == x) return l;
     l = l->next;
   }
-  return NULL;
+  return 0;
 }
 
 csWideSparse3D::HdY* csWideSparse3D::get_header_y (HdX* y_list, int y)
 {
-  if (!y_list) return NULL;
+  if (!y_list) return 0;
   HdY* l = y_list->first_y;
   while (l)
   {
     if (l->y == y) return l;
     l = l->next;
   }
-  return NULL;
+  return 0;
 }
 
 csWideSparse3D::SparseCell* csWideSparse3D::get_cell_z (HdY* z_list, int z)
 {
-  if (!z_list) return NULL;
+  if (!z_list) return 0;
   SparseCell* l = z_list->first_z;
   while (l)
   {
     if (l->z == z) return l;
     l = l->next;
   }
-  return NULL;
+  return 0;
 }
 
 
@@ -84,7 +84,7 @@ void csWideSparse3D::Set (int x, int y, int z, void* obj)
       lx = new HdX ();
       lx->x = x;
       lx->next = first_x;
-      lx->prev = NULL;
+      lx->prev = 0;
       if (first_x) first_x->prev = lx;
       first_x = lx;
     }
@@ -93,14 +93,14 @@ void csWideSparse3D::Set (int x, int y, int z, void* obj)
       ly = new HdY ();
       ly->y = y;
       ly->next = lx->first_y;
-      ly->prev = NULL;
+      ly->prev = 0;
       if (lx->first_y) lx->first_y->prev = ly;
       lx->first_y = ly;
     }
     lz = new SparseCell ();
     lz->z = z;
     lz->next = ly->first_z;
-    lz->prev = NULL;
+    lz->prev = 0;
     if (ly->first_z) ly->first_z->prev = lz;
     ly->first_z = lz;
   }
@@ -113,7 +113,7 @@ void* csWideSparse3D::Get (int x, int y, int z)
   HdY* ly = get_header_y (lx, y);
   SparseCell* lz = get_cell_z (ly, z);
   if (lz) return lz->obj;
-  return NULL;
+  return 0;
 }
 
 void csWideSparse3D::Del (int x, int y, int z)

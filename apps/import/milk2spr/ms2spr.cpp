@@ -102,7 +102,7 @@ int main(int argc,char *argv[])
   }
 
   const char* msfile = argv[argc - 2];
-  MsModel* ms = NULL;
+  MsModel* ms = 0;
   if (MsModel::IsFileMsModel(msfile))
     ms = new MsModel(msfile,frameDuration);
   else

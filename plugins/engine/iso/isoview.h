@@ -149,9 +149,9 @@ public:
   virtual bool IsMirrored() const {return mirror;}
   virtual void SetMirrored(bool m) {mirror = m;}
   virtual void SetFarPlane(csPlane3*) { }
-  virtual csPlane3* GetFarPlane() const {return NULL;}
+  virtual csPlane3* GetFarPlane() const {return 0;}
   virtual long GetCameraNumber() const {return camnum;}
-  virtual iPolygon3D *GetHit (csVector3 &) {return NULL;}
+  virtual iPolygon3D *GetHit (csVector3 &) {return 0;}
 
   /// but in isometric space :-)
   virtual void Perspective (const csVector3& v, csVector2& p) const

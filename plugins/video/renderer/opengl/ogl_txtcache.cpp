@@ -45,7 +45,7 @@ void csSLMCacheData::Alloc (csTrianglesPerSuperLightmap* s)
 
 void csSLMCacheData::Clear()
 {
-  source->cacheData = NULL;
+  source->cacheData = 0;
 }
 
 
@@ -71,7 +71,7 @@ void OpenGLTextureCache::Unload (csTxtCacheData *d)
   total_size -= d->Size;
 
   iTextureHandle *texh = (iTextureHandle *)d->Source;
-  if (texh) texh->SetCacheData (NULL);
+  if (texh) texh->SetCacheData (0);
 
   delete d;
 }
@@ -83,7 +83,7 @@ OpenGLTextureCache::OpenGLTextureCache (int max_size,
 {
   cache_size = max_size;
   num = 0;
-  head = tail = NULL;
+  head = tail = 0;
   total_size = 0;
   peak_total_size = 0;
   OpenGLTextureCache::g3d = g3d;
@@ -113,7 +113,7 @@ void OpenGLTextureCache::Cache (iTextureHandle *txt_handle)
       else
         tail = cached_texture->prev;
 
-      cached_texture->prev = NULL;
+      cached_texture->prev = 0;
       cached_texture->next = head;
       if (head)
         head->prev = cached_texture;
@@ -140,7 +140,7 @@ void OpenGLTextureCache::Cache (iTextureHandle *txt_handle)
     cached_texture = new csTxtCacheData;
 
     cached_texture->next = head;
-    cached_texture->prev = NULL;
+    cached_texture->prev = 0;
     if (head)
       head->prev = cached_texture;
     else
@@ -241,7 +241,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
 csSuperLightMap::csSuperLightMap ()
 {
-  cacheData = NULL;
+  cacheData = 0;
   Handle = 0;
 }
 
@@ -262,7 +262,7 @@ void csSuperLightMap::Clear ()
   {
     cacheData->Clear ();
     delete cacheData;
-    cacheData = NULL;
+    cacheData = 0;
   }
 }
 
@@ -279,7 +279,7 @@ OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
     if (super_lm_num[i])
       suplm[i] = new csSuperLightMap [super_lm_num[i]];
     else
-      suplm[i] = NULL;
+      suplm[i] = 0;
   }
   initialized = false;
   OpenGLLightmapCache::g3d = g3d;
@@ -331,7 +331,7 @@ void OpenGLLightmapCache::Setup ()
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       // Normally OpenGL specs say that the last parameter to glTexImage2D
-      // can be a NULL pointer. Unfortunatelly not all drivers seem to
+      // can be a 0 pointer. Unfortunatelly not all drivers seem to
       // support that. So I give a dummy texture here.
       char* buf = new char [size*size*4];
       memset (buf, 0, 4*size*size);
@@ -353,7 +353,7 @@ void OpenGLLightmapCache::Setup ()
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   // Normally OpenGL specs say that the last parameter to glTexImage2D
-  // can be a NULL pointer. Unfortunatelly not all drivers seem to
+  // can be a 0 pointer. Unfortunatelly not all drivers seem to
   // support that. So I give a dummy texture here.
   buf = new char [super_lm_size*super_lm_size*4];
   memset (buf, 0, 4*super_lm_size*super_lm_size);
@@ -369,7 +369,7 @@ void OpenGLLightmapCache::Setup ()
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   // Normally OpenGL specs say that the last parameter to glTexImage2D
-  // can be a NULL pointer. Unfortunatelly not all drivers seem to
+  // can be a 0 pointer. Unfortunatelly not all drivers seem to
   // support that. So I give a dummy texture here.
   buf = new char [64*64*4];
   memset (buf, 0, 4*64*64);
@@ -385,7 +385,7 @@ void OpenGLLightmapCache::Setup ()
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   // Normally OpenGL specs say that the last parameter to glTexImage2D
-  // can be a NULL pointer. Unfortunatelly not all drivers seem to
+  // can be a 0 pointer. Unfortunatelly not all drivers seem to
   // support that. So I give a dummy texture here.
   buf = new char [16*16*4];
   memset (buf, 0, 4*16*16);
@@ -435,7 +435,7 @@ int OpenGLLightmapCache::FindFreeSuperLightmap (int q)
   int i;
 
   for (i = 0 ; i < super_lm_num[q] ; i++)
-    if (suplm[q][i].cacheData == NULL) return i;
+    if (suplm[q][i].cacheData == 0) return i;
   return -1;
 }
 

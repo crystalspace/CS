@@ -66,7 +66,7 @@ enum
   /**
    * Query state of a listbox item
    * <pre>
-   * IN:  NULL
+   * IN:  0
    * OUT: (int)CS_LISTBOXITEMCHECK_SELECTED or
    *      (int)CS_LISTBOXITEMCHECK_UNSELECTED
    * </pre>
@@ -157,7 +157,7 @@ enum
    * Select first item that exactly matches the text.
    * <pre>
    * IN: (char *)text
-   * OUT: (csListBoxItem *)item (or NULL if not found)
+   * OUT: (csListBoxItem *)item (or 0 if not found)
    * </pre>
    */
   cscmdListBoxSelectItem
@@ -344,7 +344,7 @@ public:
    * Function returns the first child on which func returnes 'true'
    */
   csComponent *ForEachItem (bool (*func) (csComponent *child, void *param),
-    void *param = NULL, bool iSelected = true);
+    void *param = 0, bool iSelected = true);
 
   /// Override SetState method to disable scroll bars as well
   virtual void SetState (int mask, bool enable);

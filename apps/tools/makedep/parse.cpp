@@ -170,7 +170,7 @@ int deftype (char *line, struct filepointer *filep, struct inclist *file_red,
 
       /* Support ANSI macro substitution */
       {
-	struct symtab **sym = isdefined (p, file_red, NULL);
+	struct symtab **sym = isdefined (p, file_red, 0);
 
 	while (sym)
 	{
@@ -181,7 +181,7 @@ int deftype (char *line, struct filepointer *filep, struct inclist *file_red,
 	      (*sym)->s_value));
 	  /* mark file as having included a 'soft include' */
 	  file->i_flags |= INCLUDED_SYM;
-	  sym = isdefined (p, file_red, NULL);
+	  sym = isdefined (p, file_red, 0);
 	}
       }
 
@@ -230,12 +230,12 @@ struct symtab **fdefined (const char *symbol, struct inclist *file, struct incli
   static int recurse_lvl = 0;
 
   if (file->i_flags & DEFCHECKED)
-    return (NULL);
+    return (0);
   file->i_flags |= DEFCHECKED;
   if ((val = slookup (symbol, file)))
     debug (1, ("%s defined in %s as %s\n",
 	symbol, file->i_file, (*val)->s_value));
-  if (val == NULL && file->i_list)
+  if (val == 0 && file->i_list)
   {
     for (ip = file->i_list, i = 0; i < file->i_listlen; i++, ip++)
       if (file->i_merged[i] == false)
@@ -246,11 +246,11 @@ struct symtab **fdefined (const char *symbol, struct inclist *file, struct incli
 	  merge2defines (file, *ip);
 	  file->i_merged[i] = true;
 	}
-	if (val != NULL)
+	if (val != 0)
 	  break;
       }
   }
-  else if (val != NULL && srcfile != NULL)
+  else if (val != 0 && srcfile != 0)
     *srcfile = file;
   recurse_lvl--;
   file->i_flags &= ~DEFCHECKED;
@@ -265,14 +265,14 @@ struct symtab **isdefined (const char *symbol, struct inclist *file, struct incl
   if ((val = slookup (symbol, &maininclist)))
   {
     debug (1, ("%s defined on command line\n", symbol));
-    if (srcfile != NULL)
+    if (srcfile != 0)
       *srcfile = &maininclist;
     return (val);
   }
   if ((val = fdefined (symbol, file, srcfile)))
     return (val);
   debug (1, ("%s not defined in %s\n", symbol, file->i_file));
-  return (NULL);
+  return (0);
 }
 
 /*
@@ -289,11 +289,11 @@ int zero_value (char *exp, struct filepointer *filep, struct inclist *file_red)
 void define2 (const char *name, const char *val, struct inclist *file)
 {
   int first, last, below;
-  register struct symtab **sp = NULL, **dest;
+  register struct symtab **sp = 0, **dest;
   struct symtab *stab;
 
   /* Make space if it's needed */
-  if (file->i_defs == NULL)
+  if (file->i_defs == 0)
   {
     file->i_defs = (struct symtab **)
       malloc (sizeof (struct symtab *) * SYMTABINC);
@@ -305,7 +305,7 @@ void define2 (const char *name, const char *val, struct inclist *file)
       realloc (file->i_defs,
       sizeof (struct symtab *) * (file->i_ndefs + SYMTABINC));
 
-  if (file->i_defs == NULL)
+  if (file->i_defs == 0)
     fatalerr ("malloc()/realloc() failure in insert_defn()\n");
 
   below = first = 0;
@@ -346,7 +346,7 @@ void define2 (const char *name, const char *val, struct inclist *file)
 
   /* Search is done.  If we found an exact match to the symbol name,
      just replace its s_value */
-  if (sp != NULL)
+  if (sp != 0)
   {
     free ((*sp)->s_value);
     (*sp)->s_value = copy (val);
@@ -362,7 +362,7 @@ void define2 (const char *name, const char *val, struct inclist *file)
   }
   stab = (struct symtab *) malloc (sizeof (struct symtab));
 
-  if (stab == NULL)
+  if (stab == 0)
     fatalerr ("malloc()/realloc() failure in insert_defn()\n");
 
   stab->s_name = copy (name);
@@ -425,12 +425,12 @@ struct symtab **slookup (const char *symbol, struct inclist *file)
 	last = middle - 1;
       }
     }
-  return (NULL);
+  return (0);
 }
 
 int merge2defines (struct inclist *file1, struct inclist *file2)
 {
-  if ((file1 != NULL) && (file2 != NULL))
+  if ((file1 != 0) && (file2 != 0))
   {
     int first1 = 0;
     int last1 = file1->i_ndefs - 1;
@@ -439,7 +439,7 @@ int merge2defines (struct inclist *file1, struct inclist *file2)
     int last2 = file2->i_ndefs - 1;
 
     int first = 0;
-    struct symtab **i_defs = NULL;
+    struct symtab **i_defs = 0;
     int deflen = file1->i_ndefs + file2->i_ndefs;
 
     if (deflen > 0)
@@ -449,7 +449,7 @@ int merge2defines (struct inclist *file1, struct inclist *file2)
       i_defs = (struct symtab **)
 	malloc (deflen * sizeof (struct symtab *));
 
-      if (i_defs == NULL)
+      if (i_defs == 0)
 	return 0;
     }
 
@@ -493,7 +493,7 @@ void undefine (const char *symbol, struct inclist *file)
   register struct symtab **ptr;
   struct inclist *srcfile;
 
-  while ((ptr = isdefined (symbol, file, &srcfile)) != NULL)
+  while ((ptr = isdefined (symbol, file, &srcfile)) != 0)
   {
     srcfile->i_ndefs--;
     for (; ptr < srcfile->i_defs + srcfile->i_ndefs; ptr++)
@@ -549,8 +549,8 @@ int find_includes (struct filepointer *filep, struct inclist *file,
 	break;
       case IFDEF:
       case IFNDEF:
-	if ((type == IFDEF && isdefined (line, file_red, NULL))
-	  || (type == IFNDEF && !isdefined (line, file_red, NULL)))
+	if ((type == IFDEF && isdefined (line, file_red, 0))
+	  || (type == IFNDEF && !isdefined (line, file_red, 0)))
 	{
 	  debug (1, (type == IFNDEF ?
 	      "line %d: %s !def'd in %s via %s%s\n" : "",

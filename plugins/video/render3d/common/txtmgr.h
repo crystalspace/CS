@@ -163,7 +163,7 @@ public:
   virtual bool GetAlphaMap ()
   { return false; }
 
-  virtual iGraphics2D* GetCanvas () { return NULL; }
+  virtual iGraphics2D* GetCanvas () { return 0; }
 };
 
 /**

@@ -43,10 +43,10 @@ struct iAnimatedImage : public iBase
   /**
    * Update the image data.
    * \param time Time that passed since the last call to Animate().
-   * \param dirtyrect If not NULL, the area that has changed is filled in.
+   * \param dirtyrect If not 0, the area that has changed is filled in.
    * \return Whether any image data has changed at all.
    */
-  virtual bool Animate (csTicks time, csRect* dirtyrect = NULL) = 0;
+  virtual bool Animate (csTicks time, csRect* dirtyrect = 0) = 0;
 
   /**
    * Is this image really animated?

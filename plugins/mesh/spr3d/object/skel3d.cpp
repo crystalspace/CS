@@ -26,9 +26,9 @@ SCF_IMPLEMENT_IBASE (csSkelLimb)
 SCF_IMPLEMENT_IBASE_END
 
 csSkelLimb::csSkelLimb ()
-  : next (NULL), vertices (NULL), num_vertices (0), children (NULL), name(NULL)
+  : next (0), vertices (0), num_vertices (0), children (0), name(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csSkelLimb::~csSkelLimb ()
@@ -252,10 +252,10 @@ SCF_IMPLEMENT_IBASE (csSkelLimbState)
 SCF_IMPLEMENT_IBASE_END
 
 csSkelLimbState::csSkelLimbState ():
-  next (NULL), tmpl (NULL), vertices (NULL), num_vertices (0),
-  children (NULL), name (NULL), data (NULL)
+  next (0), tmpl (0), vertices (0), num_vertices (0),
+  children (0), name (0), data (0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csSkelLimbState::~csSkelLimbState ()

@@ -176,7 +176,7 @@ bool csSocketConnection::IsDataWaiting () const
   static fd_set readfds;
   FD_ZERO (& readfds);
   FD_SET (Socket, & readfds);
-  if (select (Socket + 1, & readfds, NULL, NULL, & nowait) < 1) return false;
+  if (select (Socket + 1, & readfds, 0, 0, & nowait) < 1) return false;
 
   if (Reliable)
     return true;
@@ -185,7 +185,7 @@ bool csSocketConnection::IsDataWaiting () const
     struct sockaddr addr;
     socklen_t addrlen = sizeof(addr);
     addr.sa_family = AF_INET;
-    if (recvfrom(Socket, NULL, 0, MSG_PEEK, & addr, & addrlen) == -1)
+    if (recvfrom(Socket, 0, 0, MSG_PEEK, & addr, & addrlen) == -1)
       return false;
     else
       return memcmp (& addr, & thisaddr, addrlen) == 0;
@@ -199,7 +199,7 @@ bool csSocketConnection::IsConnected () const
   static fd_set exceptfds;
   FD_ZERO (& exceptfds);
   FD_SET (Socket, & exceptfds);
-  return select (Socket + 1, NULL, NULL, & exceptfds, & nowait) < 1;
+  return select (Socket + 1, 0, 0, & exceptfds, & nowait) < 1;
 }
 
 csNetworkSocket csSocketConnection::csSocket::GetSocket() const
@@ -234,7 +234,7 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
 
 csPtr<iNetworkConnection> csSocketListener::Accept()
 {
-  iNetworkConnection* connection = NULL;
+  iNetworkConnection* connection = 0;
   if (ValidateSocket())
   {
     if (Reliable)
@@ -253,13 +253,13 @@ csPtr<iNetworkConnection> csSocketListener::Accept()
       static fd_set readfds;
       FD_ZERO (& readfds);
       FD_SET (Socket, & readfds);
-      select (Socket + 1, & readfds, NULL, NULL, & nowait);
+      select (Socket + 1, & readfds, 0, 0, & nowait);
       if (FD_ISSET (Socket, & readfds))
       {
         struct sockaddr addr;
         socklen_t addrlen = sizeof(addr);
         addr.sa_family = AF_INET;
-        if (recvfrom(Socket, NULL, 0, MSG_PEEK, & addr, & addrlen) != -1)
+        if (recvfrom(Socket, 0, 0, MSG_PEEK, & addr, & addrlen) != -1)
           connection = new csSocketConnection (scfParent, Socket, BlockingConnection, Reliable, addr);
         else
           LastError = CS_NET_ERR_CANNOT_RECEIVE;
@@ -338,14 +338,14 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
   const char* target, bool reliable, bool blocking)
 {
   ClearError();
-  iNetworkConnection* connection = NULL;
-  if (target != NULL)
+  iNetworkConnection* connection = 0;
+  if (target != 0)
   {
-    char* host = NULL;
+    char* host = 0;
     unsigned short port = 0;
     const char* p = strchr(target, ':');
     const char* proto = strchr(target, '/');
-    if (p != NULL)
+    if (p != 0)
     {
       host = strdup(target);
       host[p - target] = '\0';
@@ -381,7 +381,7 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
 	}
       }
     }
-    if (host != NULL)
+    if (host != 0)
       free(host);
   }
   return csPtr<iNetworkConnection> (connection);
@@ -391,7 +391,7 @@ csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   bool reliable, bool blockingListener, bool blockingConnection)
 {
   ClearError();
-  iNetworkListener* listener = NULL;
+  iNetworkListener* listener = 0;
 
   const char* proto = strchr(source, '/');
   if (proto)

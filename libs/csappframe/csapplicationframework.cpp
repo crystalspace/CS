@@ -23,8 +23,8 @@
 #include <csappframe/csapplicationframework.h>
 
 // Static 
-iObjectRegistry*  csApplicationFramework::mp_object_reg            = NULL;
-csApplicationFramework* csApplicationFramework::m_Ptr              = NULL;
+iObjectRegistry*  csApplicationFramework::mp_object_reg            = 0;
+csApplicationFramework* csApplicationFramework::m_Ptr              = 0;
 char*             csApplicationFramework::m_ApplicationStringName  = "user app";
 const char*       csApplicationFramework::m_FoundationStringName   = "crystalspace.libcsappframe";
 
@@ -34,28 +34,28 @@ csApplicationFramework::csApplicationFramework ()
 {
   // It is a fatal error to have more than one csApplicationFramework
   // derived class in an application.
-  CS_ASSERT ( NULL == m_Ptr );
+  CS_ASSERT ( 0 == m_Ptr );
   m_Ptr = this;
 }
 
 
 csApplicationFramework::~csApplicationFramework ()
 {
-  m_Ptr = NULL;
+  m_Ptr = 0;
 }
 
 
 bool csApplicationFramework::Start ()
 {
-  CS_ASSERT (NULL != m_Ptr);
+  CS_ASSERT (0 != m_Ptr);
   return m_Ptr->Application ();
 }
 
 void csApplicationFramework::End ()
 {
-  CS_ASSERT (NULL != m_Ptr);
+  CS_ASSERT (0 != m_Ptr);
   DestroyApplication (mp_object_reg);
-  mp_object_reg = NULL;
+  mp_object_reg = 0;
 	m_Ptr->OnExit ();
 }
 
@@ -72,7 +72,7 @@ bool csApplicationFramework::Initialize (int argc, char *argv[])
     return false;
   }
 
-  CS_ASSERT (NULL != m_Ptr);
+  CS_ASSERT (0 != m_Ptr);
   return m_Ptr->OnInitialize (argc, argv);
 }
 

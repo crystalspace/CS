@@ -36,7 +36,7 @@ struct iComponent;
  * Find a plugin by his class ID. First the plugin
  * with requested class identifier is found,
  * and after this it is queried for the respective interface; if it does
- * not implement the requested interface, NULL is returned.
+ * not implement the requested interface, 0 is returned.
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->QueryPlugin			\
@@ -70,7 +70,7 @@ struct iPluginIterator : public iBase
  * This is useful for unconditionally loading plugins.
  */
 #define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)			\
-  csPtr<iBase> ((Object)->LoadPlugin (ClassID, NULL, 0))
+  csPtr<iBase> ((Object)->LoadPlugin (ClassID, 0, 0))
 
 SCF_VERSION (iPluginManager, 0, 2, 0);
 
@@ -82,7 +82,7 @@ struct iPluginManager : public iBase
 {
   /// Load a plugin and (optionally) initialize it.
   virtual iBase *LoadPlugin (const char *classID,
-    const char *iInterface = NULL, int iVersion = 0, bool init = true) = 0;
+    const char *iInterface = 0, int iVersion = 0, bool init = true) = 0;
 
   /**
    * Get first of the loaded plugins that supports given interface ID.

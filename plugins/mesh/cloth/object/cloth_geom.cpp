@@ -14,7 +14,7 @@
 
 /*
  * bool Cloth::AddConstraint( int v0, int v1 , Constraint** edge ) { if
- * (v0==v1) { *edge=NULL; return false; }; Constraint* first; Constraint* 
+ * (v0==v1) { *edge=0; return false; }; Constraint* first; Constraint* 
  * p; p=first=(Constraint*)Edges->GetFirstItem(); do { if ((p->v0==v0) ||
  * (p->v0==v1)) { if ((p->v1==v0) || (p->v1==v1)) { *edge=p; return
  * false; }; }; p=(Constraint*)Edges->GetNextItem(); } while (p!=first);
@@ -26,7 +26,7 @@ bool Cloth::AddConstraint(int v0, int v1, Constraint ** edge, int *pos)
 {
   if (v0 == v1) 
   {
-    *edge = NULL;
+    *edge = 0;
     return false;
   };
   Constraint     *p;
@@ -54,7 +54,7 @@ bool Cloth::AddShearConstraint(int v0, int v1, Constraint ** edge, int *pos)
 {
   if (v0 == v1) 
   {
-    *edge = NULL;
+    *edge = 0;
     return false;
   };
   Constraint     *p;
@@ -86,8 +86,8 @@ Cloth::Cloth(iClothFactoryState * mesh,
   gravity = grav;
   // printf(" CREATING the cloth  %u... \n",sizeof(float));
   int            i;
-  vertices = NULL;
-  triangles = NULL;
+  vertices = 0;
+  triangles = 0;
   csVector3      *verts = mesh->GetVertices();
   nverts = mesh->GetVertexCount();
   csTriangle     *tris = mesh->GetTriangles();
@@ -250,7 +250,7 @@ Cloth::~Cloth()
   {
     delete          p;
     p = (Constraint *) Edges->Pop();
-  } while (p != NULL);
+  } while (p != 0);
   
   delete          Edges;
 }

@@ -27,11 +27,11 @@ SCF_IMPLEMENT_IBASE_END
 csIsoRenderView::csIsoRenderView (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  view = NULL;
-  g3d = NULL;
+  view = 0;
+  g3d = 0;
   renderpass = 0;
-  clipper = NULL;
-  buckets = NULL;
+  clipper = 0;
+  buckets = 0;
   maxbuckets = 0;
   prebuck = 0;
 }
@@ -66,13 +66,13 @@ void csIsoRenderView::DrawBuckets()
       p->next = prebuck;
       prebuck = p;
 #if CS_DEBUG
-      prebuck->g3dpolyfx = NULL;
+      prebuck->g3dpolyfx = 0;
 #endif
       p = np;
       //num++;
     }
     //printf("Drawn index %d for %d times\n", i, num);
-    buckets[i] = NULL;
+    buckets[i] = 0;
   }
 }
 

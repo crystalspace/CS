@@ -228,7 +228,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return 0;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -282,7 +282,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fountloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -298,7 +298,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fountloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return NULL;
+	    return 0;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -307,7 +307,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return 0;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -315,7 +315,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return 0;
           fountstate->SetLighting (do_lighting);
         }
         break;
@@ -324,7 +324,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

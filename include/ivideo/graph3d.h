@@ -165,7 +165,7 @@ struct G3DPolygonDPFX
   /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
   uint mixmode;
 
-  /// Use this color for drawing (if txt_handle == NULL) instead of a material.
+  /// Use this color for drawing (if txt_handle == 0) instead of a material.
   uint8 flat_color_r;
   uint8 flat_color_g;
   uint8 flat_color_b;
@@ -352,7 +352,7 @@ struct csGraphics3DCaps
  * <li>Clipping.
  * <li>Whatever else DrawPolygonFX can do.
  * </ul>
- * To disable the use of one of the components, set it to NULL.
+ * To disable the use of one of the components, set it to 0.
  */
 struct G3DTriangleMesh
 {
@@ -424,7 +424,7 @@ struct G3DTriangleMesh
  * <li>Clipping.
  * <li>Whatever else DrawPolygon can do.
  * </ul>
- * To disable the use of one of the components, set it to NULL.
+ * To disable the use of one of the components, set it to 0.
  */
 struct G3DPolygonMesh
 {
@@ -746,9 +746,9 @@ struct iGraphics3D : public iBase
   virtual bool IsLightmapOK (iPolygonTexture* poly_texture) = 0;
 
   /**
-   * Set the target of rendering. If this is NULL then the target will
+   * Set the target of rendering. If this is 0 then the target will
    * be the main screen. Otherwise it is a texture. After calling
-   * g3d->FinishDraw() the target will automatically be reset to NULL (main
+   * g3d->FinishDraw() the target will automatically be reset to 0 (main
    * screen). Note that on some implementions rendering on a texture
    * will overwrite the screen. So you should only do this BEFORE you
    * start rendering your frame.
@@ -762,7 +762,7 @@ struct iGraphics3D : public iBase
   	bool persistent = false) = 0;
 
   /**
-   * Get the current render target (NULL for screen).
+   * Get the current render target (0 for screen).
    */
   virtual iTextureHandle* GetRenderTarget () const = 0;
 };

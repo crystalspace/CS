@@ -41,7 +41,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csPlexDocument::csPlexDocument (csRef<csMplexDocumentSystem> aPlexer)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   plexer = aPlexer;
 }
@@ -83,7 +83,7 @@ csRef<iDocumentNode> csPlexDocument::CreateRoot ()
   }
   if (!wrappedDS)
   {
-    return NULL;
+    return 0;
   }
   wrappedDoc = wrappedDS->CreateDocument();
   return wrappedDoc->CreateRoot();
@@ -97,7 +97,7 @@ csRef<iDocumentNode> csPlexDocument::GetRoot ()
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -107,7 +107,7 @@ const char* csPlexDocument::Parse (iFile* file)
 
   int pluginnum = 0;
   csRef<iDocumentSystem> DS;
-  wrappedDoc = NULL;
+  wrappedDoc = 0;
   lasterr.Clear();
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
@@ -118,7 +118,7 @@ const char* csPlexDocument::Parse (iFile* file)
     {
       wrappedDoc = doc;
       plexer->RewardPlugin (pluginnum);
-      return NULL;
+      return 0;
     }
     else
     {
@@ -133,7 +133,7 @@ const char* csPlexDocument::Parse (iDataBuffer* buf)
 {
   int pluginnum = 0;
   csRef<iDocumentSystem> DS;
-  wrappedDoc = NULL;
+  wrappedDoc = 0;
   lasterr.Clear();
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
@@ -143,7 +143,7 @@ const char* csPlexDocument::Parse (iDataBuffer* buf)
     {
       wrappedDoc = doc;
       plexer->RewardPlugin (pluginnum);
-      return NULL;
+      return 0;
     }
     else
     {
@@ -158,7 +158,7 @@ const char* csPlexDocument::Parse (iString* str)
 {
   int pluginnum = 0;
   csRef<iDocumentSystem> DS;
-  wrappedDoc = NULL;
+  wrappedDoc = 0;
   lasterr.Clear();
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
@@ -168,7 +168,7 @@ const char* csPlexDocument::Parse (iString* str)
     {
       wrappedDoc = doc;
       plexer->RewardPlugin (pluginnum);
-      return NULL;
+      return 0;
     }
     else
     {
@@ -183,7 +183,7 @@ const char* csPlexDocument::Parse (const char* buf)
 {
   int pluginnum = 0;
   csRef<iDocumentSystem> DS;
-  wrappedDoc = NULL;
+  wrappedDoc = 0;
   lasterr.Clear();
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
@@ -193,7 +193,7 @@ const char* csPlexDocument::Parse (const char* buf)
     {
       wrappedDoc = doc;
       plexer->RewardPlugin (pluginnum - 1);
-      return NULL;
+      return 0;
     }
     else
     {
@@ -212,7 +212,7 @@ const char* csPlexDocument::Write (iFile* file)
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -224,7 +224,7 @@ const char* csPlexDocument::Write (iString* str)
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -236,7 +236,7 @@ const char* csPlexDocument::Write (iVFS* vfs, const char* filename)
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -333,15 +333,15 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
       {
 	while (classlist && !res)
 	{
-	  char const* classname = NULL;
+	  char const* classname = 0;
 	  do
 	  {
 	    if (classname) classlist->Delete (0);
 	    if (classlist->Length() == 0)
 	    {
-	      classlist = NULL;
-	      plugin_mgr = NULL;
-	      return NULL;
+	      classlist = 0;
+	      plugin_mgr = 0;
+	      return 0;
 	    }
 	    classname = classlist->Get(0);
 	  } while (!strcasecmp (classname, MY_CLASSNAME));

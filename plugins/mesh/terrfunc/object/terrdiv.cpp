@@ -25,13 +25,13 @@
 //-------------- csTerrainQuadDiv ------------------------------
 csTerrainQuadDiv::csTerrainQuadDiv(int depth)
 {
-  parent = NULL;
+  parent = 0;
   parentplace = -1;
   int i;
   for(i=0; i<4; i++)
   {
-    children[i] = NULL;
-    neighbors[i] = NULL;
+    children[i] = 0;
+    neighbors[i] = 0;
     corner_height[i] = 0.0;
     corner_texuv[i].Set(0,0);
     corner_color[i].Set(1,1,1);
@@ -45,7 +45,7 @@ csTerrainQuadDiv::csTerrainQuadDiv(int depth)
   dmax = 0;
   min_height = 0;
   max_height = 0;
-  visquad = NULL;
+  visquad = 0;
 
   /// subcreate
   if(depth > 0)
@@ -96,7 +96,7 @@ csTerrainQuadDiv::~csTerrainQuadDiv()
 
 void csTerrainQuadDiv::RemoveNeighbor(int dir)
 {
-  neighbors[dir] = NULL;
+  neighbors[dir] = 0;
   if(!IsLeaf())
   {
     /// call 2 children only
@@ -138,7 +138,7 @@ csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
     //(int)this, dir, (int)neighbors[dir]);
   if(neighbors[dir]) return neighbors[dir];
   /// find & cache it;
-  if(!parent) return NULL;
+  if(!parent) return 0;
 
   /// perhaps neighbor is sibling?
   /// Note that this is prestored and should (and is) never actually used.
@@ -168,7 +168,7 @@ csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
 
   /// it is a child of a neighbor of parent, get parent neighbor
   csTerrainQuadDiv *parneigh = parent->GetNeighbor(dir);
-  if(!parneigh) return NULL;
+  if(!parneigh) return 0;
 
   if((dir==CS_QUAD_LEFT) && (parentplace==CS_QUAD_BOTLEFT))
     pchild = CS_QUAD_BOTRIGHT;
@@ -196,9 +196,9 @@ csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
 csTerrainQuad *csTerrainQuadDiv::GetVisQuad()
 {
   if(visquad) return visquad;
-  if(!parent) return NULL;
+  if(!parent) return 0;
   csTerrainQuad *pquad = parent->GetVisQuad();
-  if(!pquad) return NULL;
+  if(!pquad) return 0;
   visquad = pquad->GetChild(parentplace);
   return visquad;
 }

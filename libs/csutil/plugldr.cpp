@@ -153,7 +153,7 @@ static int* strchr_int (int* str, int fnd)
 {
   while (*str != fnd)
   {
-    if (!*str) return NULL;
+    if (!*str) return 0;
     str++;
   }
   return str;
@@ -233,7 +233,7 @@ bool csPluginLoader::LoadPlugins ()
   // Collect all options from command line
   csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser));
-  CS_ASSERT (CommandLine != NULL);
+  CS_ASSERT (CommandLine != 0);
 
   // The list of plugins
   csPluginList PluginList;
@@ -351,10 +351,10 @@ bool csPluginLoader::LoadPlugins ()
   {
     csPluginLoadRec& r = PluginList.Get(n);
     // If plugin is VFS then skip if already loaded earlier.
-    r.plugin = NULL;
+    r.plugin = 0;
     if (VFS && r.Tag && strcmp (r.Tag, "iVFS") == 0)
       continue;
-    iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, NULL, 0, false);
+    iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, 0, 0, false);
     r.plugin = plg;
     if (plg)
     {

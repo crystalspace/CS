@@ -83,7 +83,7 @@ struct
   { "time", cmd_time },
   { "unmount", cmd_unmount },
   { "rpath", cmd_rpath },
-  { NULL, 0 }
+  { 0, 0 }
 };
 
 static void skipspc (char *&s)
@@ -91,13 +91,13 @@ static void skipspc (char *&s)
   while (*s && isspace(*s))
     s++;
   if (!*s)
-    s = NULL;
+    s = 0;
 }
 
 static void trimwhite (char*& s)
 {
   skipspc(s);
-  if (s != NULL)
+  if (s != 0)
   {
     int n = strlen(s);
     while (n-- > 0)
@@ -406,7 +406,7 @@ static void cmd_unmount (char *args)
     return;
 
   if (!*rpath)
-    rpath = NULL;
+    rpath = 0;
 
   if (!VFS->Unmount (vpath, rpath))
     fprintf (stderr, "unmount: cannot unmount \"%s\" from \"%s\"\n", rpath, vpath);
@@ -417,7 +417,7 @@ static void cmd_conf (char *args)
   bool real_fs;
   get_option (args, real_fs);
   iVFS *CfgVFS;
-  if (real_fs) CfgVFS = NULL; else CfgVFS = VFS;
+  if (real_fs) CfgVFS = 0; else CfgVFS = VFS;
 
   iConfigFile *config = Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
 
@@ -532,7 +532,7 @@ int main (int argc, char *argv [])
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
 
-  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  if (!csInitializer::SetupConfigManager (object_reg, 0))
   {
      fprintf (stderr, "couldn't setup config!\n");
      return 1;
@@ -577,7 +577,7 @@ int main (int argc, char *argv [])
     {
       char* s = command;
       trimwhite(s);
-      if (s != NULL && !execute (s))
+      if (s != 0 && !execute (s))
         fprintf (stderr, "vsh: unknown command: [%s]\n", s);
     }
   }

@@ -682,7 +682,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
     register int cc = 0;
     register int i;
 
-    register char *s = NULL;
+    register char *s = 0;
     char *q;
     int s_len = 0;
 
@@ -935,7 +935,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 
 	    case 's':
 		s = va_arg(ap, char *);
-		if (s != NULL) {
+		if (s != 0) {
 		    s_len = strlen(s);
 		    if (adjust_precision && precision < s_len)
 			s_len = precision;
@@ -1003,11 +1003,11 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 
 		s_len = strlen(s);
 
-		if (alternate_form && (q = strchr(s, '.')) == NULL) {
+		if (alternate_form && (q = strchr(s, '.')) == 0) {
 		    s[s_len++] = '.';
 		    s[s_len] = '\0'; /* delimit for following strchr() */
 		}
-		if (*fmt == 'G' && (q = strchr(s, 'e')) != NULL)
+		if (*fmt == 'G' && (q = strchr(s, 'e')) != 0)
 		    *q = 'E';
 		break;
 
@@ -1079,7 +1079,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 			struct sockaddr_in *si;
 
 			si = va_arg(ap, struct sockaddr_in *);
-			if (si != NULL) {
+			if (si != 0) {
 			    s = conv_sockaddr_in(si, &num_buf[NUM_BUF_SIZE], &s_len);
 			    if (adjust_precision && precision < s_len)
 				s_len = precision;
@@ -1098,7 +1098,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 			struct in_addr *ia;
 
 			ia = va_arg(ap, struct in_addr *);
-			if (ia != NULL) {
+			if (ia != 0) {
 			    s = conv_in_addr(ia, &num_buf[NUM_BUF_SIZE], &s_len);
 			    if (adjust_precision && precision < s_len)
 				s_len = precision;

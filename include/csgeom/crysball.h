@@ -71,7 +71,7 @@ class csCrystalBall
 
     int from, len; // contains <len> points in vPoints starting at <from>
     int divider; // index to point that divides this triangle
-    csTriNode (csTriNode *theParent=NULL, int from=-1, int len=0) : csTreeNode (theParent)
+    csTriNode (csTriNode *theParent=0, int from=-1, int len=0) : csTreeNode (theParent)
       {this->from = from; this->len = len;}
 
     // find a triangle for <normal> and return the index where its been inserted into vP

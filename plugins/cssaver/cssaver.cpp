@@ -42,7 +42,7 @@ csSaver::csSaver(iBase *p) {
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
-  object_reg = NULL;
+  object_reg = 0;
 }
 
 csSaver::~csSaver() {
@@ -58,21 +58,21 @@ bool csSaver::Initialize(iObjectRegistry *p) {
 }
 
 csRef<iDocumentNode> csSaver::CreateNode(csRef<iDocumentNode>& parent, const char* name) {
-  csRef<iDocumentNode> child = parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+  csRef<iDocumentNode> child = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   child->SetValue (name);
   return child;
 }
 
 csRef<iDocumentNode> csSaver::CreateValueNode(csRef<iDocumentNode>& parent, const char* name, const char* value) {
   csRef<iDocumentNode> child = CreateNode(parent, name);
-  csRef<iDocumentNode> text = child->CreateNodeBefore(CS_NODE_TEXT, NULL);
+  csRef<iDocumentNode> text = child->CreateNodeBefore(CS_NODE_TEXT, 0);
   text->SetValue (value);
   return child;
 }
 
 csRef<iDocumentNode> csSaver::CreateValueNodeAsFloat(csRef<iDocumentNode>& parent, const char* name, float value) {
   csRef<iDocumentNode> child = CreateNode(parent, name);
-  csRef<iDocumentNode> text = child->CreateNodeBefore(CS_NODE_TEXT, NULL);
+  csRef<iDocumentNode> text = child->CreateNodeBefore(CS_NODE_TEXT, 0);
   text->SetValueAsFloat (value);
   return child;
 }
@@ -92,7 +92,7 @@ bool csSaver::SaveTextures(csRef<iDocumentNode>& parent) {
   for(int i=0; i<texList->GetCount(); i++) {
     iTextureWrapper *texWrap=texList->Get(i);
 
-    csRef<iDocumentNode> child = current->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+    csRef<iDocumentNode> child = current->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 
     const char *name=texWrap->QueryObject()->GetName();
     if(name && *name) child->SetAttribute("name", name);
@@ -207,16 +207,16 @@ iString* csSaver::SaveMapFile() {
   csRef<iDocumentSystem> xml(csPtr<iDocumentSystem>(new csTinyDocumentSystem()));
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
-  csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+  csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
-  if(!SaveTextures(parent)) return NULL;
-  if(!SaveMaterials(parent)) return NULL;
+  if(!SaveTextures(parent)) return 0;
+  if(!SaveMaterials(parent)) return 0;
 
   iString* str=new scfString();
-  if(doc->Write(str)!=NULL) {
+  if(doc->Write(str)!=0) {
     delete str;
-    return NULL;
+    return 0;
   }
 
   return str;

@@ -143,7 +143,7 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
     delete np;
   }
   paths.DeleteAll ();
-  main_sequence = NULL;
+  main_sequence = 0;
   do_fade = false;
   fade_value = 0;
   suspended = true;
@@ -499,7 +499,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   // Get the current selected path.
   //=====
   csTicks start = 0, total = 0, seltime = 0;
-  csNamedPath* selnp = NULL;
+  csNamedPath* selnp = 0;
   if (hilight) selnp = GetSelectedPath (hilight, start, total);
   if (selnp)
   {
@@ -663,7 +663,7 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
     }
     i++;
   }
-  return NULL;
+  return 0;
 }
 
 void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,

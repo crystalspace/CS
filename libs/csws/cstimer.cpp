@@ -38,8 +38,8 @@ void csTimer::Init (unsigned iPeriod)
   TimerEvent.Time = 0;
   TimerEvent.Type = csevCommand;
   TimerEvent.Command.Code = cscmdTimerPulse;
-  eventh = NULL;
-  evento = NULL;
+  eventh = 0;
+  evento = 0;
   state |= CSS_TRANSPARENT;
   timeout = iPeriod;
   pausetime = 0;
@@ -53,7 +53,7 @@ csTimer::csTimer (csComponent *iParent, unsigned iPeriod)
 }
 
 csTimer::csTimer (iEventHandler *iEventH, unsigned iPeriod, void *iInfo)
-  : csComponent (NULL)
+  : csComponent (0)
 {
   Init (iPeriod);
   eventh = iEventH;
@@ -61,7 +61,7 @@ csTimer::csTimer (iEventHandler *iEventH, unsigned iPeriod, void *iInfo)
 }
 
 csTimer::csTimer (iEventQueue *iEventQ, unsigned iPeriod, void *iInfo)
-  : csComponent (NULL)
+  : csComponent (0)
 {
   Init (iPeriod);
   evento = iEventQ->GetEventOutlet ();
@@ -74,7 +74,7 @@ bool csTimer::HandleEvent (iEvent &Event)
    && (Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdPreProcess))
   {
-    unsigned current = app ? app->GetCurrentTime () : time (NULL);
+    unsigned current = app ? app->GetCurrentTime () : time (0);
     unsigned delta = current - start;
     if (pausetime >= delta)
       return false;
@@ -105,7 +105,7 @@ void csTimer::Stop ()
 void csTimer::Restart ()
 {
   Stopped = false;
-  start = app ? app->GetCurrentTime () : time (NULL);
+  start = app ? app->GetCurrentTime () : time (0);
 }
 
 void csTimer::Pause (unsigned iPause)

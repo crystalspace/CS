@@ -60,7 +60,7 @@ public:
    */
   virtual void SetCurrentType (const char* type);
   /**
-   * Get current type or NULL if none set.
+   * Get current type or 0 if none set.
    */
   virtual const char* GetCurrentType () const { return current_type; }
   /**
@@ -68,7 +68,7 @@ public:
    */
   virtual void SetCurrentScope (const char* scope);
   /**
-   * Get current scope or NULL if none set.
+   * Get current scope or 0 if none set.
    */
   virtual const char* GetCurrentScope () const { return current_scope; }
   /**
@@ -77,7 +77,7 @@ public:
   virtual bool CacheData (void* data, uint32 size,
   	const char* type, const char* scope, uint32 id);
   /**
-   * Retrieve some data from the cache. Returns NULL if the
+   * Retrieve some data from the cache. Returns 0 if the
    * data could not be found in the cache.
    */
   virtual csPtr<iDataBuffer> ReadCache (const char* type, const char* scope,
@@ -85,8 +85,8 @@ public:
   /**
    * Clear items from the cache. 
    */
-  virtual bool ClearCache (const char* type = NULL, const char* scope = NULL,
-  	const uint32* id = NULL);
+  virtual bool ClearCache (const char* type = 0, const char* scope = 0,
+  	const uint32* id = 0);
 };
 
 #endif // __CS_UTIL_VFSCACHE_H__

@@ -120,7 +120,7 @@ csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iForma
     if (img)
       return csPtr<iImage> (img);
   }
-  return NULL;
+  return 0;
 }
 
 /**
@@ -147,7 +147,7 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (
     if (buf)
       return csPtr<iDataBuffer> (buf);
   }
-  return NULL;
+  return 0;
 }
 
 csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
@@ -161,5 +161,5 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
     if (buf)
       return csPtr<iDataBuffer> (buf);
   }
-  return NULL;
+  return 0;
 }

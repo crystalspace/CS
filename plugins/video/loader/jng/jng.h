@@ -57,10 +57,10 @@ class csJNGImageIO : public iImageIO
   virtual const csVector& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
-  virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = NULL,
-    const char* extraoptions = NULL);
-  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format = NULL,
-    const char* extraoptions = NULL);
+  virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
+    const char* extraoptions = 0);
+  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format = 0,
+    const char* extraoptions = 0);
 
   virtual bool Initialize (iObjectRegistry* p) 
     { object_reg = p; return true; }
@@ -122,7 +122,7 @@ private:
 public:
   SCF_DECLARE_IBASE_EXT (csImageFile);
 
-  virtual bool Animate (csTicks time, csRect* dirtyrect = NULL);
+  virtual bool Animate (csTicks time, csRect* dirtyrect = 0);
   virtual bool IsAnimated ();
 };
 

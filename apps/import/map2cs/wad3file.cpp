@@ -232,7 +232,7 @@ bool CWad3File::Extract(const char* Texture, char*& Data, int& Size, csString& f
       Size = db->GetSize();
       Data = new char[Size];
       memcpy (Data, db->GetData(), Size);
-      db = NULL;
+      db = 0;
       fn.Format ("%s.png", Texture);
     }
     else
@@ -280,8 +280,8 @@ bool CWad3File::ExtractToFile(const char* texturename)
 
 CTextureFile* CWad3File::CreateTexture(const char* texturename)
 {
-  CTextureFile* pTexture = NULL;
-  char*         pData    = NULL;
+  CTextureFile* pTexture = 0;
+  char*         pData    = 0;
   int           Size     = 0;
   csString fn;
 

@@ -32,11 +32,11 @@
 #ifndef CSGL_EXT_STATIC_ASSERTION
 # define CSGL_FUNCTION(fType,fName) \
 fName = (fType) G2DGL->GetProcAddress ( #fName ); \
-allFound = allFound && fName != NULL;
+allFound = allFound && fName != 0;
 #else
 # define CSGL_FUNCTION(fType,fName) \
 csGraphics3DOGLCommon::fName = (fType) ::fName; \
-allFound = allFound && fName != NULL;
+allFound = allFound && fName != 0;
 #include "extstat.h"
 #endif
 

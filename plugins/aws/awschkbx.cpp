@@ -23,9 +23,9 @@ awsCheckBox::awsCheckBox () :
   frame_style(0),
   alpha_level(96),
   alignment(0),
-  caption(NULL)
+  caption(0)
 {
-  tex[0] = tex[1] = tex[2] = tex[3] = NULL;
+  tex[0] = tex[1] = tex[2] = tex[3] = 0;
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
 
@@ -67,7 +67,7 @@ bool awsCheckBox::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -105,7 +105,7 @@ bool awsCheckBox::SetProperty (const char *name, void *parm)
     else
     {
       if (caption) caption->DecRef ();
-      caption = NULL;
+      caption = 0;
     }
 
     return true;

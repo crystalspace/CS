@@ -65,7 +65,7 @@ public:
   ~TrianglesList ();
   int GetLastMaterial ()
   {
-    if (last == NULL) return -1;
+    if (last == 0) return -1;
     return last->matIndex;
   }
   void Add (csTrianglesPerMaterial* t);

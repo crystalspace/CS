@@ -69,17 +69,17 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
-  LineMessage = NULL;
-  Line = NULL;
-  LinesChanged = NULL;
+  scfiEventHandler = 0;
+  LineMessage = 0;
+  Line = 0;
+  LinesChanged = 0;
   CursorStyle = csConNoCursor;
   Update = true;
   SystemReady = false;
-  object_reg = NULL;
+  object_reg = 0;
   CursorPos = -1;
   ClearInput = false;
-  Client = NULL;
+  Client = 0;
   ConsoleMode = CONSOLE_MODE;
   CursorState = false;
   InvalidAll = true;
@@ -99,11 +99,11 @@ csSimpleConsole::~csSimpleConsole ()
   FreeBuffer ();
 
   // @@@@@@@@@@@@@@@@@@@@@@@@@ NEEDS DEBUGGING
-  // If console_font = NULL is moved AFTER the other two assignments
+  // If console_font = 0 is moved AFTER the other two assignments
   // then there will be a crash.
-  console_font = NULL;
-  G3D = NULL;
-  G2D = NULL;
+  console_font = 0;
+  G3D = 0;
+  G2D = 0;
 }
 
 bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)

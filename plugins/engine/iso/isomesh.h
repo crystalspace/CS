@@ -182,13 +182,13 @@ public:
     virtual void HardTransform (const csReversibleTransform& t)
       { scfParent->HardTransform (t); }
     virtual iMeshWrapper* CreateMeshWrapper ()
-      { return NULL; }
+      { return 0; }
     virtual iMeshFactoryWrapper* GetParentContainer () const
-      { return NULL; }
+      { return 0; }
     virtual void SetParentContainer (iMeshFactoryWrapper *p)
       { (void)p; }
     virtual iMeshFactoryList* GetChildren ()
-      { return NULL; }
+      { return 0; }
     virtual csReversibleTransform& GetTransform ()
       { return scfParent->tr; }
     virtual void SetTransform (const csReversibleTransform& tr)

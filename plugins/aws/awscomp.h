@@ -218,7 +218,7 @@ public:
   /// Set's the unique id of this component. Note: only to be used by window manager.
   virtual void SetID (unsigned long _id);
 
-  /// Gets a child awsComponent by name, returns NULL on failure.
+  /// Gets a child awsComponent by name, returns 0 on failure.
   virtual iAwsComponent *FindChild(const char* name);
 
   /// Returns the highet child (if any) whose frame contains (x,y).
@@ -313,7 +313,7 @@ public:
   /// Returns TabOrder length
   virtual int GetTabLength();
 
-  /// Returns "index" component from TabOrder, NULL if there is none
+  /// Returns "index" component from TabOrder, 0 if there is none
   virtual iAwsComponent *GetTabComponent(int index);
 
   /// Returns true if this component has children

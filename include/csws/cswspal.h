@@ -126,7 +126,7 @@ extern int cswsPaletteSize;
  * unregistered won't be.
  */
 extern int csRegisterPalette (int *Palette, int Size);
-/// Change the global color scheme (or restore scheme if NULL passed)
+/// Change the global color scheme (or restore scheme if 0 passed)
 extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /**

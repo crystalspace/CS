@@ -12,7 +12,7 @@ using namespace Arts;
 csSoundSource_impl::csSoundSource_impl ()
 {
   pos = 0;
-  leftsrc = rightsrc = NULL;
+  leftsrc = rightsrc = 0;
   bLoop = false;
 }
 

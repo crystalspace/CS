@@ -51,7 +51,7 @@ class TiXmlString
     TiXmlString ()
     {
         allocated = 0;
-        cstring = NULL;
+        cstring = 0;
 	clength = 0;
     }
 
@@ -180,7 +180,7 @@ class TiXmlString
     {
         if (cstring)
 	    free (cstring);
-        cstring = NULL;
+        cstring = 0;
 	clength = 0;
         allocated = 0;
     }

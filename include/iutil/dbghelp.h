@@ -77,7 +77,7 @@ struct iDebugHelper : public iBase
 
   /**
    * Perform a unit test. This function will try to test as much as possible
-   * of the given module. This function returns NULL if the test succeeded.
+   * of the given module. This function returns 0 if the test succeeded.
    * Otherwise an iString  is returned containing some information about
    * the errors. DecRef() this returned string after using it.
    */
@@ -85,7 +85,7 @@ struct iDebugHelper : public iBase
 
   /**
    * Perform a state test. This function will test if the current state
-   * of the object is ok. It will return NULL if it is ok.
+   * of the object is ok. It will return 0 if it is ok.
    * Otherwise an iString  is returned containing some information about
    * the errors. DecRef() this returned string after using it.
    */
@@ -98,7 +98,7 @@ struct iDebugHelper : public iBase
   virtual csTicks Benchmark (int num_iterations) = 0;
 
   /**
-   * Do a text dump of the current state of this object. Returns NULL if
+   * Do a text dump of the current state of this object. Returns 0 if
    * not supported or else a string which you should DecRef() after use.
    */
   virtual csPtr<iString> Dump () = 0;

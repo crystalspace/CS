@@ -38,7 +38,7 @@ SCF_VERSION (iAwsDockableWindow, 0, 0, 1);
 struct iAwsDockableWindow : iBase
 {
 public:
-	/// Returns the current dock site, or NULL if the window is floating
+	/// Returns the current dock site, or 0 if the window is floating
 	virtual iAwsDockSite* GetDockSite()=0;
 
 };

@@ -47,7 +47,7 @@ public:
   csSysRenderBuffer (void *buffer, int size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount)
   {
-    SCF_CONSTRUCT_IBASE (NULL)
+    SCF_CONSTRUCT_IBASE (0)
 
     csSysRenderBuffer::buffer = buffer;
     csSysRenderBuffer::size = size;
@@ -60,13 +60,13 @@ public:
 
   virtual ~csSysRenderBuffer ()
   {
-    if (buffer != NULL)
+    if (buffer != 0)
       delete[] (char *)buffer;
   }
   
   /**
    * Lock the buffer to allow writing and give us a pointer to the data
-   * The pointer will be NULL if there was some error
+   * The pointer will be 0 if there was some error
    */
   virtual void* Lock(csRenderBufferLockType lockType)
   {
@@ -102,7 +102,7 @@ public:
 
   csSysRenderBufferManager::csSysRenderBufferManager ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
 
   /// Allocate a buffer of the specified type and return it

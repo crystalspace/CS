@@ -143,7 +143,7 @@ struct iIsoWorld : public iBase
 
   /// Create a new isoGrid in this world.
   virtual iIsoGrid* CreateGrid(int width, int height) = 0;
-  /// Find an isoGrid that contains given position, can be NULL.
+  /// Find an isoGrid that contains given position, can be 0.
   virtual iIsoGrid* FindGrid(const csVector3& pos) = 0;
 
   /// Draw using given renderview

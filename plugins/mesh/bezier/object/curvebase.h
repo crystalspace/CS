@@ -418,7 +418,7 @@ inline bool csCurveTesselated::AreColorsValid () const
 { return ColorsValid; }
 
 inline iMaterialHandle* csCurve::GetMaterialHandle () const
-{ return Material ? Material->GetMaterialHandle() : NULL; }
+{ return Material ? Material->GetMaterialHandle() : 0; }
 inline iMaterialWrapper* csCurve::GetMaterial () const
 { return Material; }
 inline csCurveLightMap* csCurve::GetLightMap () const

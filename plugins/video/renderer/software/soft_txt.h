@@ -41,7 +41,7 @@ class csTextureSoftware : public csTexture
 public:
   /// The bitmap
   uint8 *bitmap;
-  /// The alpha map (NULL if no alphamap)
+  /// The alpha map (0 if no alphamap)
   uint8 *alphamap;
   /// The image (temporary storage)
   csRef<iImage> image;
@@ -50,8 +50,8 @@ public:
   csTextureSoftware (csTextureHandle *Parent, iImage *Image)
 	  : csTexture (Parent)
   {
-    bitmap = NULL;
-    alphamap = NULL;
+    bitmap = 0;
+    alphamap = 0;
     image = Image;
     DG_LINK (this, image);
     w = Image->GetWidth ();
@@ -63,7 +63,7 @@ public:
   {
     delete [] bitmap;
     delete [] alphamap;
-    image = NULL;
+    image = 0;
   }
 
   /// Return a pointer to texture data

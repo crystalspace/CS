@@ -227,7 +227,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return 0;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -235,7 +235,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 center;
 	  if (!synldr->ParseVector (child, center))
-	    return NULL;
+	    return 0;
 	  explostate->SetCenter (center);
 	}
 	break;
@@ -243,7 +243,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 push;
 	  if (!synldr->ParseVector (child, push))
-	    return NULL;
+	    return 0;
 	  explostate->SetPush (push);
 	}
 	break;
@@ -255,7 +255,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.exploader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -270,7 +270,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.exploader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return NULL;
+	    return 0;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -279,7 +279,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return 0;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -287,7 +287,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return 0;
           explostate->SetLighting (do_lighting);
         }
         break;
@@ -314,7 +314,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
         break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

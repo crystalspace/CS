@@ -57,7 +57,7 @@ public:
   /// Return the number of rendering queues (the maximum priority value).
   int GetQueueCount () { return Queues.Length (); }
 
-  /// Return a single queue, or NULL if no queue exists for the given priority.
+  /// Return a single queue, or 0 if no queue exists for the given priority.
   csMeshVectorNodelete *GetQueue (int priority)
   {
     return Queues[priority];
@@ -66,7 +66,7 @@ public:
   /**
    * Sort all priority queues and return a sorted list of all mesh
    * objects for all priorities. This list should be deleted with delete[]
-   * later. Returns NULL if there are no visible objects.
+   * later. Returns 0 if there are no visible objects.
    * The number of objects returned in 'tot_num' is the size of the
    * returned array. Note that this function will only add
    * visible objects to the array (i.e. iVisibilityObject)!

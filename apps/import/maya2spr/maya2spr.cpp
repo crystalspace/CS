@@ -164,7 +164,7 @@ int main(int argc,char *argv[])
   }
 
   const char* mdlfile = argv[1];
-  MayaModel* mdl = NULL;
+  MayaModel* mdl = 0;
   if (Maya4Model::IsFileMayaModel(mdlfile))
     mdl = new Maya4Model(mdlfile);
   else

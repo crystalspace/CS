@@ -47,14 +47,14 @@
 extern WalkTest* Sys;
 
 // Static csCommandProcessor variables
-iEngine* csCommandProcessor::engine = NULL;
-iCamera* csCommandProcessor::camera = NULL;
-iGraphics3D* csCommandProcessor::g3d = NULL;
-iConsoleOutput* csCommandProcessor::console = NULL;
-iObjectRegistry* csCommandProcessor::object_reg = NULL;
+iEngine* csCommandProcessor::engine = 0;
+iCamera* csCommandProcessor::camera = 0;
+iGraphics3D* csCommandProcessor::g3d = 0;
+iConsoleOutput* csCommandProcessor::console = 0;
+iObjectRegistry* csCommandProcessor::object_reg = 0;
 csRef<iFile> csCommandProcessor::script;
 // Additional command handler
-csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = NULL;
+csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = 0;
 
 SCF_IMPLEMENT_IBASE (csCommandProcessor::PerformCallback)
   SCF_IMPLEMENTS_INTERFACE (iConsoleExecCallback)
@@ -288,7 +288,7 @@ bool csCommandProcessor::perform_line (const char* line)
   char* space = strchr (cmd, ' ');
   if (space) { *space = 0; strcpy (arg, space+1); }
   else *arg = 0;
-  return perform (cmd, *arg ? arg : (char*)NULL);
+  return perform (cmd, *arg ? arg : (char*)0);
 }
 
 extern bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue);
@@ -511,7 +511,7 @@ bool csCommandProcessor::get_script_line (char* buf, int nbytes)
 
   if (script->AtEOF())
   {
-    script = NULL;
+    script = 0;
     return false;
   }
 

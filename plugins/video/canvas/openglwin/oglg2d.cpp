@@ -110,8 +110,8 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
   if (FAILED(hRes))
   {
     DWORD dwResult = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER
-    	| FORMAT_MESSAGE_FROM_SYSTEM, NULL, hRes,  MAKELANGID(LANG_NEUTRAL,
-      SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
+    	| FORMAT_MESSAGE_FROM_SYSTEM, 0, hRes,  MAKELANGID(LANG_NEUTRAL,
+      SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, 0 );
 
     if (dwResult != 0)
     {
@@ -123,7 +123,7 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 
       LocalFree( lpMsgBuf );
 
-      MessageBox (NULL, szMsg, "Fatal Error in glwin32.dll", 
+      MessageBox (0, szMsg, "Fatal Error in glwin32.dll", 
         MB_OK | MB_ICONERROR);
       delete szMsg;
 
@@ -131,7 +131,7 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
     }
   }
 
-  MessageBox (NULL, str, "Fatal Error in glwin32.dll", 
+  MessageBox (0, str, "Fatal Error in glwin32.dll", 
     MB_OK | MB_ICONERROR);
 
   exit (1);
@@ -156,7 +156,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
 
-static HPALETTE hWndPalette = NULL;
+static HPALETTE hWndPalette = 0;
 
 static void ClearSystemPalette ()
 {
@@ -180,7 +180,7 @@ static void ClearSystemPalette ()
     Palette.aEntries[c].peFlags = PC_NOCOLLAPSE;
   }
 
-  HDC hdc = GetDC (NULL);
+  HDC hdc = GetDC (0);
 
   HPALETTE BlackPal, OldPal;
   BlackPal = CreatePalette ((LOGPALETTE *)&Palette);
@@ -189,7 +189,7 @@ static void ClearSystemPalette ()
   SelectPalette (hdc, OldPal, FALSE);
   DeleteObject (BlackPal);
 
-  ReleaseDC (NULL, hdc);
+  ReleaseDC (0, hdc);
 }
 
 static void CreateIdentityPalette (csRGBpixel *p)
@@ -229,7 +229,7 @@ static void CreateIdentityPalette (csRGBpixel *p)
 csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   csGraphics2DGLCommon (iParent),
   m_nGraphicsReady (true),
-  m_hWnd (NULL),
+  m_hWnd (0),
   m_bPalettized (false),
   m_bPaletteChanged (false),
   modeSwitched (true)
@@ -385,12 +385,12 @@ bool csGraphics2DOpenGL::FindMultisampleFormat (int samples,
    */
   static const char* dummyClassName = "CSGL_DummyWindow";
 
-  HINSTANCE ModuleHandle = GetModuleHandle(NULL);
+  HINSTANCE ModuleHandle = GetModuleHandle(0);
 
   WNDCLASS wc;
-  wc.hCursor        = NULL;
-  wc.hIcon	    = NULL;
-  wc.lpszMenuName   = NULL;
+  wc.hCursor        = 0;
+  wc.hIcon	    = 0;
+  wc.lpszMenuName   = 0;
   wc.lpszClassName  = dummyClassName;
   wc.hbrBackground  = (HBRUSH)(COLOR_BTNFACE + 1);
   wc.hInstance      = ModuleHandle;
@@ -406,7 +406,7 @@ bool csGraphics2DOpenGL::FindMultisampleFormat (int samples,
   dwi.this_ = this;
   dwi.samples = samples;
 
-  HWND wnd = CreateWindow (dummyClassName, NULL, 0, CW_USEDEFAULT, 
+  HWND wnd = CreateWindow (dummyClassName, 0, 0, CW_USEDEFAULT, 
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
     ModuleHandle, (LPVOID)&dwi);
   DestroyWindow (wnd);
@@ -475,7 +475,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
       }
 
       wglDeleteContext (dwi->this_->hGLRC);
-      wglMakeCurrent (NULL, NULL);
+      wglMakeCurrent (0, 0);
 
       ReleaseDC (hWnd, dwi->this_->hDC);
     }
@@ -506,7 +506,7 @@ bool csGraphics2DOpenGL::Open ()
     exStyle = 0;/*WS_EX_TOPMOST;*/
     style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
     m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style, 0, 0, 
-      Width, Height, NULL, NULL, m_hInstance, NULL);
+      Width, Height, 0, 0, m_hInstance, 0);
   }
   else
   {
@@ -520,7 +520,7 @@ bool csGraphics2DOpenGL::Open ()
     int wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME) + GetSystemMetrics (SM_CYCAPTION);
     m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
       (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2, (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
-      wwidth, wheight, NULL, NULL, m_hInstance, NULL );
+      wwidth, wheight, 0, 0, m_hInstance, 0 );
   }
 
   if (!m_hWnd)
@@ -596,7 +596,7 @@ void csGraphics2DOpenGL::Close (void)
   if (hGLRC)
   {
     wglDeleteContext (hGLRC);
-    wglMakeCurrent (NULL, NULL);
+    wglMakeCurrent (0, 0);
   }
 
   ReleaseDC (m_hWnd, hDC);
@@ -622,7 +622,7 @@ HRESULT csGraphics2DOpenGL::SetColorPalette ()
     if (!FullScreen)
     {
       HPALETTE oldPal;
-      HDC dc = GetDC(NULL);
+      HDC dc = GetDC(0);
 
       SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
       PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
@@ -634,7 +634,7 @@ HRESULT csGraphics2DOpenGL::SetColorPalette ()
 
       RealizePalette (dc);
       SelectPalette (dc, oldPal, FALSE);
-      ReleaseDC (NULL, dc);
+      ReleaseDC (0, dc);
     }
 
     return ret;
@@ -653,7 +653,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
   csRef<iWin32Assistant> winhelper (
   	CS_QUERY_REGISTRY (object_reg, iWin32Assistant));
-  CS_ASSERT (winhelper != NULL);
+  CS_ASSERT (winhelper != 0);
   bool rc;
   if (!m_bHardwareCursor)
   {
@@ -820,7 +820,7 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
     if (modeSwitched)
     {
       // just do something when the mode was actually switched.
-      ChangeDisplaySettings (NULL, 0);
+      ChangeDisplaySettings (0, 0);
       modeSwitched = false;
     }
   }
@@ -831,7 +831,7 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
     ZeroMemory (&curdmode, sizeof(curdmode));
     curdmode.dmSize = sizeof (DEVMODE);
     curdmode.dmDriverExtra = 0;
-    EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &curdmode);
+    EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
     memcpy (&dmode, &curdmode, sizeof (DEVMODE));
 
     dmode.dmBitsPerPel = Depth;
@@ -898,7 +898,7 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
   ZeroMemory (&curdmode, sizeof(curdmode));
   curdmode.dmSize = sizeof (DEVMODE);
   curdmode.dmDriverExtra = 0;
-  EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &curdmode);
+  EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
   refreshRate = curdmode.dmDisplayFrequency;
 }
 

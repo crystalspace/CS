@@ -122,13 +122,13 @@ void ReportError (iReporter* reporter, const char* id,
 	                           float                default_texlen,
 	                           iClothFactoryState*  state )
 {
-  iMaterialWrapper* mat = NULL;
+  iMaterialWrapper* mat = 0;
 
   if (!type)
   {
     csRef<iPluginManager> plugin_mgr (
     	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-    CS_ASSERT (plugin_mgr != NULL);
+    CS_ASSERT (plugin_mgr != 0);
     type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	  "crystalspace.mesh.object.cloth", iMeshObjectType);
     if (!type)
@@ -136,7 +136,7 @@ void ReportError (iReporter* reporter, const char* id,
     	  "crystalspace.mesh.object.cloth", iMeshObjectType);
   }
 
-  CS_ASSERT (type != NULL);
+  CS_ASSERT (type != 0);
   //csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (*type, iThingEnvironment));
 
   uint V_nodes = 0;
@@ -177,7 +177,7 @@ void ReportError (iReporter* reporter, const char* id,
     {
       case XMLTOKEN_MATERIAL:
        // mat = ldr_context->FindMaterial (child->GetContentsValue ());
-       // if (mat == NULL)
+       // if (mat == 0)
        // {
        //   ReportError ("crystalspace.syntax.polygon", child,
        //     "Couldn't find material named '%s'!", child->GetContentsValue ());
@@ -581,7 +581,7 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return NULL;
+	    return 0;
 	  meshstate->SetManualColors (r);
 	}
 	break;
@@ -589,7 +589,7 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return NULL;
+	    return 0;
 	  meshstate->SetLighting (r);
 	}
 	break;
@@ -597,7 +597,7 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return NULL;
+	    return 0;
 	  meshstate->SetColor (col);
 	}
 	break;
@@ -610,7 +610,7 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.clothmeshloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh      = fact->GetMeshObjectFactory ()->NewInstance ();
       meshstate = SCF_QUERY_INTERFACE (mesh, iClothMeshState);
@@ -625,7 +625,7 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.clothmeshloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return 0;
 	  }
 	  meshstate->SetMaterialWrapper (mat);
 	}
@@ -634,13 +634,13 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return NULL;
+	    return 0;
           meshstate->SetMixMode (mm);
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 
@@ -669,7 +669,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.clothfactoryloader.setup.objecttype",
 		node, "Could not load the cloth mesh object plugin!");
-    return NULL;
+    return 0;
   }
   
   csRef<iMeshObjectFactory> fact;
@@ -718,7 +718,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.clothfactoryloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return 0;
 	  }
 	  state->SetMaterialWrapper (mat);
 	}
@@ -731,7 +731,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_AUTONORMALS:
 	  {  //flag autonormals to compute after finish parsing
         if (!synldr->ParseBool (child, auto_normals, true))
-	  return NULL;
+	  return 0;
 	}
 	break;
       case XMLTOKEN_NUMTRI:
@@ -840,7 +840,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
 						  "crystalspace.clothfactoryloader.parse.frame.badformat",
 						  atr,
 						  "Too many idx indices!!");
-						  return NULL;							  
+						  return 0;							  
 					  };	//end idx switch 					
 				 };  //end if uv 
 			  };
@@ -865,7 +865,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		    "crystalspace.clothfactoryloader.parse.frame.badformat",
 		    child, "Too many normals for a cloth mesh factory!");
-	    return NULL;
+	    return 0;
 	  }
 	  float x, y, z;
 	  x = child->GetAttributeValueAsFloat ("x");
@@ -883,7 +883,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		    "crystalspace.clothfactoryloader.parse.frame.badformat",
 		    child, "Too many colors for a cloth mesh factory!");
-	    return NULL;
+	    return 0;
 	  }
 	  float r, g, b;
 	  r = child->GetAttributeValueAsFloat ("red");
@@ -904,7 +904,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		    "crystalspace.clothfactoryloader.parse.frame.badformat",
 		    child, "Too many uv texels for a cloth mesh factory!");
-	    return NULL;
+	    return 0;
 	  }
 	  float x, y, z, u, v;
 	  x = child->GetAttributeValueAsFloat ("x");
@@ -921,7 +921,7 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

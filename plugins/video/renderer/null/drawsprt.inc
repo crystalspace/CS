@@ -56,7 +56,7 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
   iTextureHandle *hTex, int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  // don't do anything on the NULL 2d canvas
+  // don't do anything on the 0 2d canvas
   if (!G2D->GetPixelAt(0,0))
     return;
   

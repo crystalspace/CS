@@ -45,7 +45,7 @@ static iSequenceWrapper* CreateSequence (iEngineSequenceManager* eseqmgr,
 		const char* name)
 {
   iSequenceWrapper* sequence = eseqmgr->FindSequenceByName (name);
-  if (sequence) return NULL;	// Error! Already exists!
+  if (sequence) return 0;	// Error! Already exists!
   // We don't need the ref returned by CreateSequence().
   csRef<iSequenceWrapper> seqwrap = eseqmgr->CreateSequence (name);
   sequence = seqwrap;
@@ -95,7 +95,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
       "crystalspace.maploader.parse.sequence", opnode,
       "Missing attribute '%s' or '%s_par' in sequence '%s'!",
       partype, partype, seqname);
-    return NULL;
+    return 0;
   }
 
   if (do_ref)
@@ -106,22 +106,22 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	"crystalspace.maploader.parse.sequence", opnode,
 	"No parameters defined in sequence '%s'!",
 	seqname);
-      return NULL;
+      return 0;
     }
     csRef<iParameterESM> par = base_params->CreateParameterESM (parname);
-    if (par == NULL)
+    if (par == 0)
     {
       SyntaxService->ReportError (
 	"crystalspace.maploader.parse.sequence", opnode,
 	"Parameter '%s' is not defined in sequence '%s'!",
 	parname, seqname);
-      return NULL;
+      return 0;
     }
     return csPtr<iParameterESM>(par);
   }
   else
   {
-    iBase* value = NULL;
+    iBase* value = 0;
     switch (partypeidx)
     {
       case PARTYPE_LIGHT:
@@ -154,7 +154,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      "crystalspace.maploader.parse.sequenceparams", opnode,
 	      "Missing 'mesh' attribute in sequence '%s'!",
 	      seqname);
-	    return NULL;
+	    return 0;
 	  }
 	  iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
 	  if (!mesh)
@@ -163,7 +163,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      "crystalspace.maploader.parse.sequenceparams", opnode,
 	      "Couldn't find mesh '%s' in sequence '%s'!",
 	      meshname, seqname);
-	    return NULL;
+	    return 0;
 	  }
 	  csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
 		iThingState));
@@ -173,7 +173,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      "crystalspace.maploader.parse.sequenceparams", opnode,
 	      "Mesh '%s' is not a thing (sequence '%s')!",
 	      meshname, seqname);
-	    return NULL;
+	    return 0;
 	  }
 	  value = (iBase*)st->GetPolygon (parname);
 	  if (!value)
@@ -182,7 +182,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      "crystalspace.maploader.parse.sequenceparams", opnode,
 	      "Couldn't find polygon '%s' in mesh '%s' (sequence '%s')!",
 	      parname, meshname, seqname);
-	    return NULL;
+	    return 0;
 	  }
 	}
         break;
@@ -193,7 +193,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	"crystalspace.maploader.parse.sequence",
 	opnode, "Couldn't find %s '%s' (sequence '%s)'!",
 	partype, parname, seqname);
-      return NULL;
+      return 0;
     }
     csRef<iParameterESM> par = eseqmgr->CreateParameterESM (value);
     return csPtr<iParameterESM>(par);
@@ -221,7 +221,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	"Sequence '%s' doesn't have parameters (%s '%s')!",
 	sequence->QueryObject ()->GetName (), parenttype, parentname);
       error = true;
-      return NULL;
+      return 0;
     }
 
     const char* parname = child->GetAttributeValue ("name");
@@ -232,7 +232,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	"Missing 'name' attribute in %s '%s'!",
 	parenttype, parentname);
       error = true;
-      return NULL;
+      return 0;
     }
     int idx = params->GetParameterIdx (parname);
     if (idx == -1)
@@ -242,7 +242,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	"Bad parameter '%s' for sequence '%s' (%s '%s')!",
 	parname, sequence->QueryObject ()->GetName (), parenttype, parentname);
       error = true;
-      return NULL;
+      return 0;
     }
 
     const char* value = child->GetValue ();
@@ -259,7 +259,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Missing 'mesh' attribute in %s '%s'!",
 	      parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
 	  if (!mesh)
@@ -269,7 +269,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Couldn't find mesh '%s' in %s '%s'!",
 	      meshname, parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  params->SetParameter (idx, mesh);
 	  found_params++;
@@ -285,7 +285,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Missing 'light' attribute in %s '%s'!",
 	      parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  iStatLight* light = Engine->FindLight (lightname);
 	  if (!light)
@@ -295,7 +295,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Couldn't find light '%s' in %s '%s'!",
 	      lightname, parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  params->SetParameter (idx, light->QueryLight ());
 	  found_params++;
@@ -311,7 +311,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Missing 'sector' attribute in %s '%s'!",
 	      parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  iSector* sector = ldr_context->FindSector (sectname);
 	  if (!sector)
@@ -321,7 +321,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Couldn't find sector '%s' in %s '%s'!",
 	      sectname, parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  params->SetParameter (idx, (iBase*)sector);
 	  found_params++;
@@ -337,7 +337,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Missing 'material' attribute in %s '%s'!",
 	      parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  iMaterialWrapper* mat = Engine->FindMaterial (matname);
 	  if (!mat)
@@ -347,7 +347,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Couldn't find material '%s' in %s '%s'!",
 	      matname, parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  params->SetParameter (idx, (iBase*)mat);
 	  found_params++;
@@ -363,7 +363,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Missing 'mesh' attribute in %s '%s'!",
 	      parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
 	  if (!mesh)
@@ -373,7 +373,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Couldn't find mesh '%s' in %s '%s'!",
 	      meshname, parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  const char* polyname = child->GetAttributeValue ("polygon");
 	  if (!polyname)
@@ -383,7 +383,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Missing 'polygon' attribute in %s '%s'!",
 	      parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
 		iThingState));
@@ -394,7 +394,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Mesh '%s' is not a thing (%s '%s')!",
 	      meshname, parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 	  iPolygon3D* polygon = st->GetPolygon (polyname);
 	  if (!polygon)
@@ -404,7 +404,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	      "Couldn't find polygon '%s' in mesh '%s' (%s '%s')!",
 	      polyname, meshname, parenttype, parentname);
 	    error = true;
-	    return NULL;
+	    return 0;
 	  }
 
 	  params->SetParameter (idx, (iBase*)polygon);
@@ -414,7 +414,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
       default:
 	SyntaxService->ReportBadToken (child);
 	error = true;
-	return NULL;
+	return 0;
     }
   }
   if (params && found_params != params->GetParameterCount ())
@@ -424,7 +424,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	"Missing parameters for firing sequence in %s '%s'!",
 	parenttype, parentname);
     error = true;
-    return NULL;
+    return 0;
   }
 
   return csPtr<iEngineSequenceParameters> (params);
@@ -458,7 +458,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find 'mesh' attribute in trigger '%s'!",
 		trigname);
-	    return NULL;
+	    return 0;
 	  }
 
 	  iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
@@ -468,7 +468,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find mesh '%s' in trigger '%s'!", meshname,
 		trigname);
-	    return NULL;
+	    return 0;
 	  }
 	  trigger->AddConditionMeshClick (mesh);
 	}
@@ -482,7 +482,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find 'light' attribute in trigger '%s'!",
 		trigname);
-	    return NULL;
+	    return 0;
 	  }
 	  iLight* light = ldr_context->FindLight (lightname);
 	  if (!light)
@@ -491,7 +491,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find light '%s' in trigger '%s'!", lightname,
 		trigname);
-	    return NULL;
+	    return 0;
 	  }
 	  int oper = -1;
 	  float r,g,b;
@@ -523,7 +523,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find 'sector' attribute in trigger '%s'!",
 		trigname);
-	    return NULL;
+	    return 0;
 	  }
 
 	  iSector* sector = ldr_context->FindSector (sectname);
@@ -533,7 +533,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find sector '%s' in trigger '%s'!", sectname,
 		trigname);
-	    return NULL;
+	    return 0;
 	  }
 	  bool insideonly = false;
 	  csRef<iDocumentNode> ionode = child->GetNode ("insideonly");
@@ -541,12 +541,12 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 	  csRef<iDocumentNode> spherenode = child->GetNode ("sphere");
 	  if (ionode)
 	    if (!SyntaxService->ParseBool (ionode, insideonly, true))
-	      return NULL;
+	      return 0;
 	  if (boxnode)
 	  {
 	    csBox3 box;
 	    if (!SyntaxService->ParseBox (boxnode, box))
-	      return NULL;
+	      return 0;
 	    trigger->AddConditionInSector (sector, box);
 	  }
 	  else if (spherenode)
@@ -573,7 +573,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find 'sequence' attribute in trigger '%s'!",
 		trigname);
-	    return NULL;
+	    return 0;
 	  }
 
 	  iSequenceWrapper* sequence = FindSequence (
@@ -584,7 +584,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.trigger",
 		child, "Couldn't find sequence '%s' in trigger '%s'!",
 		seqname, trigname);
-	    return NULL;
+	    return 0;
 	  }
 
 	  csTicks delay = child->GetAttributeValueAsInt ("delay");
@@ -595,7 +595,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 	  if (error)
 	  {
 	    // There was an error already reported by CreateSequenceParameters.
-	    return NULL;
+	    return 0;
 	  }
 
 	  if (params) trigger->SetParameters (params);
@@ -609,7 +609,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 	break;
       default:
         SyntaxService->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 
@@ -656,7 +656,7 @@ iSequenceWrapper* csLoader::CreateSequence (iDocumentNode* node)
     SyntaxService->ReportError (
 		"crystalspace.maploader.parse.trigger",
 		node, "Duplicate sequence '%s'!", seqname);
-    return NULL;
+    return 0;
   }
 
   csRef<iDocumentNode> argsnode = node->GetNode ("args");
@@ -675,12 +675,12 @@ iSequenceWrapper* csLoader::CreateSequence (iDocumentNode* node)
         case XMLTOKEN_ARG:
 	  {
 	    const char* parname = child->GetAttributeValue ("name");
-	    params->AddParameter (parname, NULL);
+	    params->AddParameter (parname, 0);
 	  }
 	  break;
         default:
           SyntaxService->ReportBadToken (child);
-	  return NULL;
+	  return 0;
       }
     }
   }
@@ -697,7 +697,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 
   iSequenceWrapper* sequence = FindSequence (
 	GetEngineSequenceManager (), seqname);
-  CS_ASSERT (sequence != NULL);
+  CS_ASSERT (sequence != 0);
 
   iEngineSequenceParameters* base_params = sequence->GetBaseParameterBlock ();
 
@@ -724,7 +724,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.sequence",
 		child, "Missing 'sequence' in sequence '%s'!",
 		seqname);
-	    return NULL;
+	    return 0;
 	  }
 	  iSequenceWrapper* sequence2 = FindSequence (
 		GetEngineSequenceManager (), seqname2);
@@ -734,7 +734,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		"crystalspace.maploader.parse.sequence",
 		child, "Can't find sequence '%s' in sequence '%s'!",
 		seqname2, seqname);
-	    return NULL;
+	    return 0;
 	  }
 	  bool error;
 	  csRef<iEngineSequenceParameters> params2 = CreateSequenceParameters (
@@ -742,7 +742,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  if (error)
 	  {
 	    // There was an error already reported by CreateSequenceParameters.
-	    return NULL;
+	    return 0;
 	  }
 
 	  sequence->GetSequence ()->AddRunSequence (cur_time,
@@ -761,7 +761,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	      "crystalspace.maploader.parse.sequence", child,
 	      "Delay tag in sequence '%s' must specify time, or min and max!",
 	      seqname);
-	    return NULL;
+	    return 0;
 	  }
 	  if (!time)
 	  {
@@ -777,7 +777,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
-	  if (!mesh) return NULL;
+	  if (!mesh) return 0;
 
 	  int duration = child->GetAttributeValueAsInt ("duration");
 	  csVector3 offset;
@@ -794,7 +794,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
-	  if (!mesh) return NULL;
+	  if (!mesh) return 0;
 
 	  int nr = 0;
 	  int axis1 = -1, axis2 = -1, axis3 = -1;
@@ -835,18 +835,18 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 			"crystalspace.maploader.parse.sequence",
 			child2, "Maximum 3 rotations in sequence '%s'!",
 			seqname);
-		    return NULL;
+		    return 0;
 		}
 	        nr++;
 	        break;
 	      }
 	      case XMLTOKEN_V:
 	        if (!SyntaxService->ParseVector (child2, offset))
-		  return NULL;
+		  return 0;
 		break;
 	      default:
 		SyntaxService->ReportBadToken (child2);
-		return NULL;
+		return 0;
 	    }
 	  }
 
@@ -860,11 +860,11 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
-	  if (!mesh) return NULL;
+	  if (!mesh) return 0;
 	  csRef<iParameterESM> mat = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_MATERIAL, "material", seqname, base_params);
-	  if (!mat) return NULL;
+	  if (!mat) return 0;
 
 	  // optional polygon parameter.
 	  csRef<iParameterESM> polygon = ResolveOperationParameter (
@@ -882,7 +882,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
-	  if (!mesh) return NULL;
+	  if (!mesh) return 0;
 	  csColor col;
 	  col.red = child->GetAttributeValueAsFloat ("red");
 	  col.green = child->GetAttributeValueAsFloat ("green");
@@ -897,7 +897,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
-	  if (!mesh) return NULL;
+	  if (!mesh) return 0;
 	  csColor col;
 	  col.red = child->GetAttributeValueAsFloat ("red");
 	  col.green = child->GetAttributeValueAsFloat ("green");
@@ -910,7 +910,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> light = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_LIGHT, "light", seqname, base_params);
-	  if (!light) return NULL;
+	  if (!light) return 0;
 
 	  csColor col;
 	  col.red = child->GetAttributeValueAsFloat ("red");
@@ -927,7 +927,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> light = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_LIGHT, "light", seqname, base_params);
-	  if (!light) return NULL;
+	  if (!light) return 0;
 
 	  csColor col;
 	  col.red = child->GetAttributeValueAsFloat ("red");
@@ -941,7 +941,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
-	  if (!sector) return NULL;
+	  if (!sector) return 0;
 
 	  csColor col;
 	  col.red = child->GetAttributeValueAsFloat ("red");
@@ -958,8 +958,8 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
-	  if (!sector) return NULL;
-	  iSharedVariable *var=NULL;
+	  if (!sector) return 0;
+	  iSharedVariable *var=0;
 	  csColor col;
 	  const char *colvar;
 	  if ((colvar = child->GetAttributeValue ("color_var")) != 0)
@@ -971,7 +971,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 			"crystalspace.maploader.parse.sequence", child,
 			"Shared variable '%s' not found or not a color!",
 			colvar);
-	      return NULL;
+	      return 0;
 	    }
 	  }
 	  else
@@ -988,7 +988,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
-	  if (!sector) return NULL;
+	  if (!sector) return 0;
 
 	  csColor col;
 	  col.red = child->GetAttributeValueAsFloat ("red");
@@ -1006,7 +1006,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
-	  if (!sector) return NULL;
+	  if (!sector) return 0;
 
 	  csColor col;
 	  col.red = child->GetAttributeValueAsFloat ("red");
@@ -1022,7 +1022,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
-	  if (!trigger) return NULL;
+	  if (!trigger) return 0;
 
 	  sequence->AddOperationTriggerState (cur_time,
 	  	trigger, true);
@@ -1033,7 +1033,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
-	  if (!trigger) return NULL;
+	  if (!trigger) return 0;
 
 	  sequence->AddOperationTriggerState (cur_time,
 	  	trigger, false);
@@ -1044,7 +1044,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
-	  if (!trigger) return NULL;
+	  if (!trigger) return 0;
 
 	  csTicks delay = child->GetAttributeValueAsInt ("delay");
 	  sequence->AddOperationCheckTrigger (cur_time,
@@ -1056,9 +1056,9 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
-	  if (!trigger) return NULL;
+	  if (!trigger) return 0;
 
-	  iSequence* trueseq = NULL;
+	  iSequence* trueseq = 0;
 	  const char* trueseqname = child->GetAttributeValue ("truesequence");
 	  if (trueseqname)
 	  {
@@ -1070,11 +1070,11 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		  "crystalspace.maploader.parse.sequence",
 		  child, "Can't find sequence '%s' in sequence '%s'!",
 		  trueseqname, seqname);
-	      return NULL;
+	      return 0;
 	    }
 	    trueseq = trueseqwrap->GetSequence ();
 	  }
-	  iSequence* falseseq = NULL;
+	  iSequence* falseseq = 0;
 	  const char* falseseqname = child->GetAttributeValue("falsesequence");
 	  if (falseseqname)
 	  {
@@ -1086,7 +1086,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		  "crystalspace.maploader.parse.sequence",
 		  child, "Can't find sequence '%s' in sequence '%s'!",
 		  falseseqname, seqname);
-	      return NULL;
+	      return 0;
 	    }
 	    falseseq = falseseqwrap->GetSequence ();
 	  }
@@ -1096,7 +1096,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
         break;
       default:
         SyntaxService->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 
@@ -1164,5 +1164,5 @@ iSharedVariable *csLoader::FindSharedVariable(const char *colvar,
 	  found->GetType() == verify_type)
 	return found;
     }
-    return NULL;
+    return 0;
 }

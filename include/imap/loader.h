@@ -75,7 +75,7 @@ struct iLoader : public iBase
    * manager.
    */
   virtual csPtr<iTextureHandle> LoadTexture (const char* Filename,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL, iImage **image=NULL) = 0;
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0, iImage **image=0) = 0;
   /**
    * Load a texture as with LoadTexture() above and register it with the
    * engine. 'Name' is the name that the engine will use for the wrapper.
@@ -88,7 +88,7 @@ struct iLoader : public iBase
    */
   virtual iTextureWrapper* LoadTexture (const char *Name,
   	const char *FileName,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	bool reg = false, bool create_material = true) = 0;
 
   /// Load a sound file and return an iSoundData object

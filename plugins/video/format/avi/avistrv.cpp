@@ -36,9 +36,9 @@ SCF_IMPLEMENT_IBASE_END
 csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
 {
   SCF_CONSTRUCT_IBASE (pBase);
-  pChunk = NULL;
+  pChunk = 0;
   pAVI = (csAVIFormat*)pBase;
-  object_reg = NULL;
+  object_reg = 0;
 
   pIA = new csImageArea (1,1,1,1);
 }
@@ -71,7 +71,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
   pChunk->currentframe = -1;
-  pChunk->currentframepos = NULL;
+  pChunk->currentframepos = 0;
   sprintf (pChunk->id, "%02dd%c", nStreamNumber, pf->compression == 0 ? 'b' : 'c');
   pChunk->id[4] = '\0';
 
@@ -85,7 +85,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   pIA->x = 0;
   pIA->y = 0;
   delete pIA->data;
-  pIA->data = NULL;
+  pIA->data = 0;
 
   SetRect(0, 0, strdesc.width, strdesc.height);
 
@@ -109,7 +109,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
     polyfx.z[i] = 1;
   }
 
-  pMaterial = NULL;
+  pMaterial = 0;
   return LoadCodec (pInitData, nInitDataLen, pFormatEx, nFormatEx);
 }
 
@@ -179,7 +179,7 @@ iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
     makeMaterial ();
     return pMaterial;
   }
-  return NULL;
+  return 0;
 }
 
 void csAVIStreamVideo::PrepImageArea ()
@@ -454,7 +454,7 @@ bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
       		"CODEC class \"%s\" could not be initialized !", cn);
-      pCodec = NULL;
+      pCodec = 0;
     }
   }
   else

@@ -38,7 +38,7 @@ private:
 
   /// size of the grid
   int width, height;
-  /// the cells in this grid, NULL means an empty cell
+  /// the cells in this grid, 0 means an empty cell
   iIsoCell **grid;
   /**
    * minimum gridx and gridy coordinates

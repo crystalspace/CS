@@ -64,7 +64,7 @@ public:
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   BezierPolyMeshHelper () :
-  	polygons (NULL), vertices (NULL) { }
+  	polygons (0), vertices (0) { }
   virtual ~BezierPolyMeshHelper () { Cleanup (); }
 
   void Setup ();
@@ -405,8 +405,8 @@ public:
    * Add polygons and vertices from the specified thing (seen as template).
    */
   void MergeTemplate (iBezierFactoryState* tpl,
-  	iMaterialWrapper* default_material = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
+  	iMaterialWrapper* default_material = 0,
+	csVector3* shift = 0, csMatrix3* transform = 0);
 
   /// Set parent template.
   void SetTemplate (csBezierMesh *t)
@@ -605,8 +605,8 @@ public:
     { scfParent->RemoveCurves (); }
 
     virtual void MergeTemplate (iBezierFactoryState* tpl,
-  	iMaterialWrapper* default_material = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL)
+  	iMaterialWrapper* default_material = 0,
+	csVector3* shift = 0, csMatrix3* transform = 0)
     {
       scfParent->MergeTemplate (tpl, default_material, shift, transform);
     }
@@ -683,7 +683,7 @@ public:
   {
     SCF_DECLARE_IBASE;
     PolyMesh () : BezierPolyMeshHelper () 
-    { SCF_CONSTRUCT_IBASE (NULL); }
+    { SCF_CONSTRUCT_IBASE (0); }
   } scfiPolygonMesh;
 
   //------------------- Lower detail iPolygonMesh implementation ---------------
@@ -771,7 +771,7 @@ public:
 #endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
-    { return NULL; }
+    { return 0; }
     virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/) { }
     virtual void HardTransform (const csReversibleTransform& t)
     {
@@ -797,9 +797,9 @@ public:
     virtual bool SetColor (const csColor&) { return false; }
     virtual bool GetColor (csColor&) const { return false; }
     virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
     virtual int GetPortalCount () const { return 0; }
-    virtual iPortal* GetPortal (int) const { return NULL; }
+    virtual iPortal* GetPortal (int) const { return 0; }
   } scfiMeshObject;
   friend struct MeshObject;
 
@@ -815,7 +815,7 @@ public:
     virtual bool SupportsHardTransform () const { return true; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
-    virtual iObjectModel* GetObjectModel () { return NULL; }
+    virtual iObjectModel* GetObjectModel () { return 0; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;
 };

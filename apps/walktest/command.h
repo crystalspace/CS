@@ -50,7 +50,7 @@ private:
   static iConsoleOutput* console;
 
   /**
-   * If this variable is non-NULL there is a running script from
+   * If this variable is non-0 there is a running script from
    * which commands are read and executed (one command every frame).
    */
   static csRef<iFile> script;
@@ -64,13 +64,13 @@ public:
   struct PerformCallback : public iConsoleExecCallback
   {
     SCF_DECLARE_IBASE;
-    PerformCallback () { SCF_CONSTRUCT_IBASE (NULL); }
+    PerformCallback () { SCF_CONSTRUCT_IBASE (0); }
     virtual ~PerformCallback () { }
     virtual void Execute (const char* cmd);
   };
 
   /// Perform the command and return true if it was a valid command.
-  static bool perform (const char* cmd, const char* arg = NULL);
+  static bool perform (const char* cmd, const char* arg = 0);
 
   /**
    * Perform the command line (split in command and args),
@@ -104,7 +104,7 @@ public:
   static bool change_long (const char* arg, long* value, const char* what, long min, long max);
 
   /**
-   * Additional command handler. If not NULL, this handler will be called
+   * Additional command handler. If not 0, this handler will be called
    * BEFORE internal handler, giving your handler a chance to override
    * default behaviour. Should return TRUE if command has been recognized.
    */

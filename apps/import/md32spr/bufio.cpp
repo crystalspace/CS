@@ -62,7 +62,7 @@ bool DataBuffer::GetLine(char *line)
   int length = 0;
   char *ptr;
   if(!eof()) {
-    if((ptr = strchr((data + position), '\n')) != NULL) {
+    if((ptr = strchr((data + position), '\n')) != 0) {
       length = ptr - (data + position);
     } else {
       length = buffSize - position;
@@ -72,7 +72,7 @@ bool DataBuffer::GetLine(char *line)
     position += length + 1;
     return true;
   } else {
-    line = NULL;
+    line = 0;
     return false;
   }
 }

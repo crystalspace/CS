@@ -15,7 +15,7 @@ public:
   awsLayoutManager (iAwsComponent *_owner, iAwsComponentNode* , iAwsPrefManager* _pm)
     : owner(_owner), pm(_pm)
   { 
-    SCF_CONSTRUCT_IBASE(NULL);
+    SCF_CONSTRUCT_IBASE(0);
   }
   virtual ~awsLayoutManager ()
   { }

@@ -33,7 +33,7 @@ csString::~csString ()
 void csString::Free ()
 {
   delete[] Data;
-  Data = NULL;
+  Data = 0;
   Size = 0;
   MaxSize = 0;
 }

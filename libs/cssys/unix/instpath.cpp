@@ -87,7 +87,7 @@ char* csGetConfigPath ()
       "Couldn't find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
 
   delete[] path;
-  return NULL;
+  return 0;
 }
 
 char** csGetPluginPaths ()

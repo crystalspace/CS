@@ -26,18 +26,18 @@ bool MemoryMapFile(mmioInfo* info, char const* filename)
   bool ok = false;
   HANDLE file, mapping = INVALID_HANDLE_VALUE;
   file = CreateFile(
-    filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
   if (file != INVALID_HANDLE_VALUE)
   {
-    unsigned int const sz = GetFileSize(file, NULL);
+    unsigned int const sz = GetFileSize(file, 0);
     if (sz != 0xFFFFFFFF)
     {
-      mapping = CreateFileMapping(file, NULL, PAGE_READONLY, 0, 0, NULL);
-      if (mapping != NULL)
+      mapping = CreateFileMapping(file, 0, PAGE_READONLY, 0, 0, 0);
+      if (mapping != 0)
       {
 	unsigned char* p =
 	  (unsigned char*)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, sz);
-	if (p != NULL)
+	if (p != 0)
 	{
 	  info->hMappedFile = file;
 	  info->hFileMapping = mapping;
@@ -50,7 +50,7 @@ bool MemoryMapFile(mmioInfo* info, char const* filename)
   }
   if (!ok)
   {
-    if (mapping != NULL)
+    if (mapping != 0)
       CloseHandle(mapping);
     if (file != INVALID_HANDLE_VALUE)
       CloseHandle(file);
@@ -60,7 +60,7 @@ bool MemoryMapFile(mmioInfo* info, char const* filename)
 
 void UnMemoryMapFile(mmioInfo* info)
 {
-  if (info->data != NULL)
+  if (info->data != 0)
     UnmapViewOfFile(info->data);
 
   if (info->hMappedFile != INVALID_HANDLE_VALUE)

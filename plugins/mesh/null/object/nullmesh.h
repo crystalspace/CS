@@ -114,9 +114,9 @@ public:
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iGeneralMeshState implementation ----------------
   class NullMeshState : public iNullMeshState
@@ -151,7 +151,7 @@ public:
     virtual bool SupportsHardTransform () const { return false; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
-    virtual iObjectModel* GetObjectModel () { return NULL; }
+    virtual iObjectModel* GetObjectModel () { return 0; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;
 };

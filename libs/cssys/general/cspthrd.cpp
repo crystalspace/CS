@@ -47,9 +47,9 @@ csRef<csMutex> csMutex::Create (bool needrecursive)
     return csPtr<csMutex> (new csPosixMutex (&attr));
   }
   
-  return csPtr<csMutex> (new csPosixMutex (NULL));
+  return csPtr<csMutex> (new csPosixMutex (0));
 #else
-  return csPtr<csMutex>(new csPosixMutexRecursive (NULL));
+  return csPtr<csMutex>(new csPosixMutexRecursive (0));
 #endif
 }
 
@@ -189,7 +189,7 @@ csPosixSemaphore::csPosixSemaphore (uint32 value)
   if (rc)
     lasterr = strerror(errno);
   else
-    lasterr = NULL;
+    lasterr = 0;
   CS_SHOW_ERROR;
 }
 
@@ -210,7 +210,7 @@ bool csPosixSemaphore::LockTry ()
   if (rc)
     lasterr = strerror(errno);
   else
-    lasterr = NULL;
+    lasterr = 0;
   CS_SHOW_ERROR;
   return rc == 0;
 }
@@ -221,7 +221,7 @@ bool csPosixSemaphore::Release ()
   if (rc)
     lasterr = strerror(errno);
   else
-    lasterr = NULL;
+    lasterr = 0;
   CS_SHOW_ERROR;
   return rc == 0;
 }
@@ -239,7 +239,7 @@ bool csPosixSemaphore::Destroy ()
   if (rc)
     lasterr = strerror(errno);
   else
-    lasterr = NULL;
+    lasterr = 0;
   CS_SHOW_ERROR;
   return rc == 0;
 }
@@ -257,8 +257,8 @@ csRef<csCondition> csCondition::Create (uint32 conditionAttributes)
 
 csPosixCondition::csPosixCondition (uint32 /*conditionAttributes*/)
 {
-  pthread_cond_init (&cond, NULL);
-  lasterr = NULL;
+  pthread_cond_init (&cond, 0);
+  lasterr = 0;
 }
 
 csPosixCondition::~csPosixCondition ()
@@ -295,7 +295,7 @@ bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
       lasterr = "Wait interrupted";
       break;
     case 0:
-      lasterr = NULL;
+      lasterr = 0;
       break;
     default:
       lasterr = "Unknown error while timed waiting for condition";
@@ -317,7 +317,7 @@ bool csPosixCondition::Destroy ()
     lasterr = "Condition busy";
     break;
   case 0:
-    lasterr = NULL;
+    lasterr = 0;
     break;
   default:
     lasterr = "Unknown error while destroying condition";
@@ -343,7 +343,7 @@ csPosixThread::csPosixThread (csRunnable* r, uint32 /*options*/)
   runnable = r;
   running = false;
   created = false;
-  lasterr = NULL;
+  lasterr = 0;
 }
 
 csPosixThread::~csPosixThread ()
@@ -351,7 +351,7 @@ csPosixThread::~csPosixThread ()
   if (running)
     Stop ();
 //if (created)
-//  pthread_join (thread, NULL); // clean up resources
+//  pthread_join (thread, 0); // clean up resources
 }
 
 bool csPosixThread::Start ()
@@ -360,7 +360,7 @@ bool csPosixThread::Start ()
   {
     if (created)
     {
-      pthread_join (thread, NULL); // clean up resources
+      pthread_join (thread, 0); // clean up resources
       created = false;
     }
     pthread_attr_t attr;
@@ -386,7 +386,7 @@ bool csPosixThread::Start ()
       lasterr = "No permission to create thread";
       break;
     case 0:
-      lasterr = NULL;
+      lasterr = 0;
       running = true;
       created = true;
       break;
@@ -411,7 +411,7 @@ bool csPosixThread::Stop ()
       lasterr = "Trying to stop unknown thread";
       break;
     case 0:
-      lasterr = NULL;
+      lasterr = 0;
       running = false;
       break;
     default:
@@ -427,14 +427,14 @@ bool csPosixThread::Wait ()
 {
   if (running)
   {
-    int rc = pthread_join (thread,NULL);
+    int rc = pthread_join (thread,0);
     switch (rc)
     {
     case ESRCH:
       lasterr = "Trying to wait for unknown thread";
       break;
     case 0:
-      lasterr = NULL;
+      lasterr = 0;
       running = false;
       created=false;
       break;
@@ -458,8 +458,8 @@ void* csPosixThread::ThreadRun (void* param)
   csPosixThread* thread = (csPosixThread*)param;
   thread->runnable->Run ();
   thread->running = false;
-  pthread_exit (NULL);
-  return NULL;
+  pthread_exit (0);
+  return 0;
 }
 
 #undef CS_SHOW_ERROR

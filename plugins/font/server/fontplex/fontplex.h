@@ -70,7 +70,7 @@ public:
 
   /**
    * Load a font by name.
-   * Returns a new iFont object or NULL on failure.
+   * Returns a new iFont object or 0 on failure.
    */
   virtual csPtr<iFont> LoadFont (const char *filename);
 
@@ -80,9 +80,9 @@ public:
   virtual int GetFontCount ();
 
   /**
-   * Get Nth loaded font or NULL.
+   * Get Nth loaded font or 0.
    * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get NULL.
+   * through all indices starting from 0 until you get 0.
    */
   virtual iFont *GetFont (int iIndex);
 

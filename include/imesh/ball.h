@@ -83,7 +83,7 @@ struct iBallState : public iBase
    * the gradient is then interpolated to get the colour.
    * The gradient is specified using a float**, where entry
    * gradient[nr] is an array of 4 elements {height, r, g, b}.
-   * The entries must be in sorted order, low to high. End with a NULL
+   * The entries must be in sorted order, low to high. End with a 0
    * e.g. (0.0, 100.0, { {0.0, 1,0,1}, {1.0, 0,0,0}, 0} for a
    * gradient from purple to black.
    */
@@ -96,7 +96,7 @@ struct iBallState : public iBase
    * wrt. the center of the ball mesh.
    * The size gives the size of the spot, 1.0 for the sun.
    * The gradient is used to get the colours for the lightspot.
-   * pass NULL for a sunlike gradient.
+   * pass 0 for a sunlike gradient.
    */
   virtual void ApplyLightSpot(const csVector3& position, float size,
     float **gradient) = 0;
@@ -105,7 +105,7 @@ struct iBallState : public iBase
    * Animate the ball as a skydome for earth.
    * Give a time - from 0.0 to 1.0.
    * 0.0 is sunrise, daytime after, 0.5 is sunset, night following.
-   * If you pass NULL for the gradients, a default will be used.
+   * If you pass 0 for the gradients, a default will be used.
    * Note that both dayvert=nightvert and topsun=sunset, and only
    * the colors can be different in them. Thus those pairs must be
    * of the same length, and have the same interpolation values.

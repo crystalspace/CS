@@ -109,7 +109,7 @@ public:
 protected:
   /**
     * Finds two planes, who will create a valid point of the polygon. If there
-    * are no planes, plane1 and plane2 will be set to NULL.
+    * are no planes, plane1 and plane2 will be set to 0.
     */
   void GetStartplanes(const CMapTexturedPlaneVector& planes,
                       CMapTexturedPlane*&            pPlane1,

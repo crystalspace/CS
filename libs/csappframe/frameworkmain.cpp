@@ -31,7 +31,7 @@ int main (int argc, char* argv[])
   {
     iReturn = 1;
   }
-  else if ( NULL == csApplicationFramework::GetObjectRegistry () )
+  else if ( 0 == csApplicationFramework::GetObjectRegistry () )
   {
     iReturn = 1;
   }

@@ -21,7 +21,7 @@
 #include "csws/csapp.h"
 #include "csws/csbackgr.h"
 
-csBackground::csBackground () : tex (NULL)
+csBackground::csBackground () : tex (0)
 {
   Free ();
 }
@@ -65,7 +65,7 @@ void csBackground::Draw (csComponent &This, int x, int y, int w, int h,
       G3DPolygonDPFX poly;
       poly.use_fog = false;
       poly.num = 4;
-      poly.mat_handle = NULL;
+      poly.mat_handle = 0;
 	  int i;
       for (i = 0; i < 4; i++)
       {

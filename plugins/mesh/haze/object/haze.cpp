@@ -40,33 +40,33 @@ SCF_IMPLEMENT_IBASE_END
 
 csHazeHull::csHazeHull()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   total_poly = 0;
   total_vert = 0;
   total_edge = 0;
-  verts = NULL;
-  edgept1 = NULL;
-  edgept2 = NULL;
-  pol_num = NULL;
-  pol_verts = NULL;
-  pol_edges = NULL;
+  verts = 0;
+  edgept1 = 0;
+  edgept2 = 0;
+  pol_num = 0;
+  pol_verts = 0;
+  pol_edges = 0;
 }
 
 csHazeHull::~csHazeHull()
 {
   /// delete and clear the object
-  delete[] verts; verts = NULL;
-  delete[] edgept1; edgept1 = NULL;
-  delete[] edgept2; edgept2 = NULL;
+  delete[] verts; verts = 0;
+  delete[] edgept1; edgept1 = 0;
+  delete[] edgept2; edgept2 = 0;
   int p;
   for(p=0; p<total_poly; p++)
   {
-    delete[] pol_verts[p]; pol_verts[p] = NULL;
-    delete[] pol_edges[p]; pol_edges[p] = NULL;
+    delete[] pol_verts[p]; pol_verts[p] = 0;
+    delete[] pol_edges[p]; pol_edges[p] = 0;
   }
-  delete[] pol_verts; pol_verts = NULL;
-  delete[] pol_edges; pol_edges = NULL;
-  delete[] pol_num; pol_num = NULL;
+  delete[] pol_verts; pol_verts = 0;
+  delete[] pol_edges; pol_edges = 0;
+  delete[] pol_num; pol_num = 0;
   total_poly = 0;
   total_vert = 0;
   total_edge = 0;
@@ -267,7 +267,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
   : csHazeHull()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullBox);
   min = a;
   max = b;
@@ -342,7 +342,7 @@ csHazeHullCone::csHazeHullCone(int nr_sides, const csVector3& start,
     const csVector3& end, float srad, float erad)
   : csHazeHull()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullCone);
   csHazeHullCone::nr_sides = nr_sides;
   csHazeHullCone::start = start;
@@ -429,16 +429,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeState);
   csHazeMeshObject::factory = factory;
-  logparent = NULL;
+  logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   material = factory->GetMaterialWrapper ();
   MixMode = factory->GetMixMode ();
   initialized = false;
-  vis_cb = NULL;
+  vis_cb = 0;
   current_lod = 1;
   current_features = 0;
   origin.Set(0,0,0);
@@ -1098,11 +1098,11 @@ csHazeMeshObjectFactory::csHazeMeshObjectFactory (iBase *pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullCreation);
-  material = NULL;
+  material = 0;
   MixMode = 0;
   origin.Set(0,0,0);
   directional.Set(0,0,0);
-  logparent = NULL;
+  logparent = 0;
 }
 
 csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()

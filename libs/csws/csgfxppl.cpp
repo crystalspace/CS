@@ -309,7 +309,7 @@ void csGraphicsPipeline::FinishFrame (csMouse *Mouse)
   if (SyncArea [CurPage])
   {
     G2D->FreeArea (SyncArea [CurPage]);
-    SyncArea [CurPage] = NULL;
+    SyncArea [CurPage] = 0;
   }
 
   if (!RefreshRect.IsEmpty ())
@@ -393,7 +393,7 @@ void csGraphicsPipeline::Desync ()
     if (SyncArea [i])
     {
       G2D->FreeArea (SyncArea [i]);
-      SyncArea [i] = NULL;
+      SyncArea [i] = 0;
     } /* endif */
 }
 

@@ -27,8 +27,8 @@
 
 CMapPolygon::CMapPolygon()
 {
-  m_pBaseplane      = NULL;
-  m_pBrush          = NULL;
+  m_pBaseplane      = 0;
+  m_pBrush          = 0;
   m_BrushLineNumber = 0;
   m_PlaneNumber     = 0;
 }
@@ -102,8 +102,8 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   //to be outside of it.
   //they will also be sorted, so that one can contiue from plane1 to plane2 and
   //one will get a proper orientation of the polygon for backface culling.
-  CMapTexturedPlane* pPlane1 = NULL;
-  CMapTexturedPlane* pPlane2 = NULL;
+  CMapTexturedPlane* pPlane1 = 0;
+  CMapTexturedPlane* pPlane2 = 0;
   CdVector3          point(0,0,0);
   GetStartplanes(redplanes, pPlane1, pPlane2, point);
 
@@ -235,8 +235,8 @@ void CMapPolygon::Clear()
   //Remove previous vertices
   DELETE_VECTOR_MEMBERS(m_Vertices);
   m_Planes.DeleteAll();
-  m_pBaseplane = NULL;
-  m_pBrush     = NULL;
+  m_pBaseplane = 0;
+  m_pBrush     = 0;
 }
 
 bool CMapPolygon::IsEmpty()
@@ -387,8 +387,8 @@ void CMapPolygon::GetStartplanes(const CMapTexturedPlaneVector& planes,
 
   //if we arrive here, then there is a problem finding any starting pint
   //for the poly
-  pPlane1 = NULL;
-  pPlane2 = NULL;
+  pPlane1 = 0;
+  pPlane2 = 0;
 
 }
 

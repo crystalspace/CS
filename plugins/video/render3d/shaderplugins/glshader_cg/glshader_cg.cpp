@@ -81,10 +81,10 @@ void csGLShader_CG::ErrorCallback ()
 {
   CGerror error = cgGetError();
   csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glcg",
-    cgGetErrorString (error), NULL);
+    cgGetErrorString (error), 0);
   if (error == CG_COMPILER_ERROR)
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glcg",
-      cgGetLastListing (context), NULL);
+      cgGetLastListing (context), 0);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
     return csPtr<iShaderProgram>(new csShaderGLCGVP(object_reg, context));
   else if( strcasecmp(type, "gl_cg_fp") == 0)
     return csPtr<iShaderProgram>(new csShaderGLCGFP(object_reg, context));
-  else return NULL;
+  else return 0;
 }
 
 void csGLShader_CG::Open()

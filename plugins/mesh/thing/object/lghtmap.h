@@ -188,7 +188,7 @@ public:
   void DelShadowMap (csShadowMap* plm);
 
   /**
-   * Read lightmap from a file. Return NULL if succesful and
+   * Read lightmap from a file. Return 0 if succesful and
    * otherwise a description of the error.
    */
   const char* ReadFromCache (iFile* file, int w, int h,

@@ -39,7 +39,7 @@
 
 csListBoxItem::csListBoxItem (csComponent *iParent, const char *iText, int iID,
   csListBoxItemStyle iStyle) : csComponent (iParent),
-    ItemStyle(iStyle), deltax(0),  ItemBitmap(NULL),  DeleteBitmap(false),
+    ItemStyle(iStyle), deltax(0),  ItemBitmap(0),  DeleteBitmap(false),
     hOffset(0)
 {
   state |= CSS_SELECTABLE | CSS_TRANSPARENT;
@@ -191,7 +191,7 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
   csListBoxFrameStyle iFrameStyle) : csComponent (iParent),
     ListBoxStyle(iStyle),  FrameStyle(iFrameStyle),
     deltax(0), fPlaceItems(false),
-    FrameBitmap(NULL), fDelFrameBitmap(false), FrameAlpha(0)
+    FrameBitmap(0), fDelFrameBitmap(false), FrameAlpha(0)
 
 {
   state |= CSS_SELECTABLE;
@@ -230,11 +230,11 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
   if (iStyle & CSLBS_HSCROLL)
     hscroll = new csScrollBar (this, sbsty);
   else
-    hscroll = NULL;
+    hscroll = 0;
   if (iStyle & CSLBS_VSCROLL)
     vscroll = new csScrollBar (this, sbsty);
   else
-    vscroll = NULL;
+    vscroll = 0;
 
 
    ApplySkin (GetSkin ());
@@ -260,7 +260,7 @@ void csListBox::PlaceItems (bool setscrollbars)
     do
     {
       cur = cur->next;
-      if (unsigned (cur->SendCommand (cscmdListBoxItemCheck, NULL)) == CS_LISTBOXITEMCHECK_SELECTED)
+      if (unsigned (cur->SendCommand (cscmdListBoxItemCheck, 0)) == CS_LISTBOXITEMCHECK_SELECTED)
         break;
     } while (cur != focused);
     if (cur == focused)
@@ -421,7 +421,7 @@ bool csListBox::HandleEvent (iEvent &Event)
     case csevMouseUp:
       if ((Event.Mouse.Button == 1) && (app->MouseOwner == this))
       {
-        app->CaptureMouse (NULL);
+        app->CaptureMouse (0);
         return true;
       } /* endif */
       break;
@@ -437,7 +437,7 @@ bool csListBox::HandleEvent (iEvent &Event)
             while (mc && comp->GetState (CSS_LISTBOXITEM_SELECTED))
               comp = comp->prev;
             SendCommand (cscmdListBoxTrack, (void *)comp);
-            if (mc) app->CaptureMouse (NULL);
+            if (mc) app->CaptureMouse (0);
           } /* endif */
           return true;
         case CSKEY_DOWN:
@@ -449,7 +449,7 @@ bool csListBox::HandleEvent (iEvent &Event)
             while (mc && comp->GetState (CSS_LISTBOXITEM_SELECTED))
               comp = comp->next;
             SendCommand (cscmdListBoxTrack, (void *)comp);
-            if (mc) app->CaptureMouse (NULL);
+            if (mc) app->CaptureMouse (0);
           } /* endif */
           return true;
         case CSKEY_LEFT:
@@ -523,12 +523,12 @@ bool csListBox::HandleEvent (iEvent &Event)
         case '/':
           if ((ListBoxStyle & CSLBS_MULTIPLESEL)
            && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL))
-            ForEachItem (do_select, NULL, false);
+            ForEachItem (do_select, 0, false);
           return true;
         case '\\':
           if ((ListBoxStyle & CSLBS_MULTIPLESEL)
            && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL))
-            ForEachItem (do_deselect, NULL);
+            ForEachItem (do_deselect, 0);
           return true;
         default:
           if ((Event.Key.Char >= ' ')
@@ -538,7 +538,7 @@ bool csListBox::HandleEvent (iEvent &Event)
             // Find first next item that starts with this letter
             csComponent *cur = focused->next;
             while (cur != focused)
-              if (cur->SendCommand (cscmdListBoxItemCheck, NULL)
+              if (cur->SendCommand (cscmdListBoxItemCheck, 0)
                && (toupper (cur->GetText () [0]) == toupper (Event.Key.Char)))
               {
                 SendCommand (cscmdListBoxTrack, (void *)cur);
@@ -555,8 +555,8 @@ bool csListBox::HandleEvent (iEvent &Event)
       {
         case cscmdListBoxClear:
           if (app->MouseOwner == this)
-            app->CaptureMouse (NULL);
-          ForEachItem (do_deleteitem, NULL, false);
+            app->CaptureMouse (0);
+          ForEachItem (do_deleteitem, 0, false);
           firstvisible = first;
           return true;
         case cscmdListBoxItemSelected:
@@ -612,7 +612,7 @@ bool csListBox::HandleEvent (iEvent &Event)
           MakeItemVisible ((csComponent *)Event.Command.Info);
           return true;
         case cscmdListBoxQueryFirstSelected:
-          Event.Command.Info = ForEachItem (do_true, NULL, true);
+          Event.Command.Info = ForEachItem (do_true, 0, true);
           return true;
         case cscmdTimerPulse:
           if (app && app->MouseOwner == this)
@@ -650,7 +650,7 @@ bool csListBox::HandleEvent (iEvent &Event)
             csComponent *cur = first;
             do
             {
-              if (cur->SendCommand (cscmdListBoxItemCheck, NULL))
+              if (cur->SendCommand (cscmdListBoxItemCheck, 0))
               {
                 if (sbs.value == 0)
                 {
@@ -716,7 +716,7 @@ csComponent *csListBox::ForEachItem (bool (*func) (csComponent *child,
   void *param), void *param, bool iSelected)
 {
   if (!func)
-    return NULL;
+    return 0;
 
   csComponent *start = first;
   csComponent *cur = start;
@@ -724,7 +724,7 @@ csComponent *csListBox::ForEachItem (bool (*func) (csComponent *child,
   {
     csComponent *next = cur->next;
 
-    unsigned reply = (long)cur->SendCommand (cscmdListBoxItemCheck, NULL);
+    unsigned reply = (long)cur->SendCommand (cscmdListBoxItemCheck, 0);
     bool ok;
     if (iSelected)
       ok = (reply == CS_LISTBOXITEMCHECK_SELECTED);
@@ -735,7 +735,7 @@ csComponent *csListBox::ForEachItem (bool (*func) (csComponent *child,
     if ((cur == next) || ((cur = next) == start))
       break;
   } /* endwhile */
-  return NULL;
+  return 0;
 }
 
 void csListBox::SetState (int mask, bool enable)
@@ -759,7 +759,7 @@ bool csListBox::SetFocused (csComponent *comp)
   if (parent)
   {
     // Check if it is for real a list box item
-    unsigned rc = (unsigned)comp->SendCommand (cscmdListBoxItemCheck, NULL);
+    unsigned rc = (unsigned)comp->SendCommand (cscmdListBoxItemCheck, 0);
     if (rc == CS_LISTBOXITEMCHECK_SELECTED
      || rc == CS_LISTBOXITEMCHECK_UNSELECTED)
       parent->SendCommand (cscmdListBoxItemFocused, comp);

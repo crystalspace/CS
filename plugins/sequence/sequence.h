@@ -50,7 +50,7 @@ public:
     SCF_DECLARE_IBASE;
     StandardOperation (iSequenceManager* sm) : seqmgr (sm)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
     }
   };
 
@@ -124,16 +124,16 @@ public:
   void DeleteFirstSequence ();
 
   virtual void AddOperation (csTicks time, iSequenceOperation* operation,
-  	iBase* params = NULL);
+  	iBase* params = 0);
   virtual void AddRunSequence (csTicks time, iSequence* sequence,
-  	iBase* params = NULL);
+  	iBase* params = 0);
   virtual void AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence,
-	iBase* params = NULL);
+	iBase* params = 0);
   virtual void AddLoop (csTicks time, iSequenceCondition* condition,
-  	iSequence* sequence, iBase* params = NULL);
+  	iSequence* sequence, iBase* params = 0);
   virtual void Clear ();
-  virtual bool IsEmpty () { return first == NULL; }
+  virtual bool IsEmpty () { return first == 0; }
 };
 
 class csSequenceManager : public iSequenceManager
@@ -177,7 +177,7 @@ public:
   virtual csTicks GetDeltaTime () const;
   virtual iSequence* NewSequence ();
   virtual void RunSequence (csTicks time, iSequence* sequence,
-  	iBase* params = NULL);
+  	iBase* params = 0);
 
   struct eiComponent : public iComponent
   {
@@ -192,7 +192,7 @@ public:
   public:
     EventHandler (csSequenceManager* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;

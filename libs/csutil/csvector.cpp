@@ -44,7 +44,7 @@ void csBasicVector::SetLength (int n)
     if (!n)
     {
       free (root);
-      root = NULL;
+      root = 0;
     }
     else if (root == 0)
       root = (void**)malloc(n * sizeof(void*));

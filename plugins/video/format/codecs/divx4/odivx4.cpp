@@ -45,7 +45,7 @@ csDivX4::csDivX4 (iBase *pParent)
   decParam.buffers.mp4_tables = 0;
   decParam.buffers.mp4_stream = 0;
   decParam.buffers.mp4_reference = 0;
-  result = NULL;
+  result = 0;
 }
 
 csDivX4::~csDivX4 ()
@@ -53,7 +53,7 @@ csDivX4::~csDivX4 ()
   if (bOK)
   {
     // stop current processing
-    decore ((long) this, DEC_OPT_RELEASE, NULL, NULL);
+    decore ((long) this, DEC_OPT_RELEASE, 0, 0);
   }
    
   free(decParam.buffers.mp4_display_buffers);
@@ -100,11 +100,11 @@ bool csDivX4::Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *, u
     memset(decParam.buffers.mp4_stream, 0, decMemReqs.mp4_stream_size);
     memset(decParam.buffers.mp4_reference, 0, decMemReqs.mp4_reference_size);
     
-    bOK = (decore ((unsigned long) this, DEC_OPT_INIT, &decParam, NULL) == DEC_OK);
+    bOK = (decore ((unsigned long) this, DEC_OPT_INIT, &decParam, 0) == DEC_OK);
     if (bOK)
     {
       dec_set.postproc_level = 0; // no pp
-      bOK = (decore ((unsigned long)this, DEC_OPT_SETPP, &dec_set, NULL) == DEC_OK);
+      bOK = (decore ((unsigned long)this, DEC_OPT_SETPP, &dec_set, 0) == DEC_OK);
       result = new char [4*w*h];
     }
   }
@@ -130,7 +130,7 @@ bool csDivX4::Decode (char *indata, uint32 inlength, void *&outdata)
     dec_frame.bmp = result;
     dec_frame.render_flag = 1;
     dec_frame.stride=w;
-    succ = decore ((unsigned long)this, DEC_OPT_FRAME, &dec_frame, NULL) == DEC_OK;
+    succ = decore ((unsigned long)this, DEC_OPT_FRAME, &dec_frame, 0) == DEC_OK;
     outdata = result;
     return true;
   }

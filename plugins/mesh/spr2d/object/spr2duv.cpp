@@ -28,7 +28,7 @@ csSprite2DUVAnimationFrame::csSprite2DUVAnimationFrame (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   duration = 0;
-  name = NULL;
+  name = 0;
 }
 
 csSprite2DUVAnimationFrame::~csSprite2DUVAnimationFrame ()
@@ -106,7 +106,7 @@ SCF_IMPLEMENT_IBASE_END
 csSprite2DUVAnimation::csSprite2DUVAnimation (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  name = NULL;
+  name = 0;
 }
 
 csSprite2DUVAnimation::~csSprite2DUVAnimation ()
@@ -141,7 +141,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 {
   int idx = vFrames.FindKey ((void*) name);
-  return (iSprite2DUVAnimationFrame *)(idx != -1 ? vFrames.Get (idx) : NULL);
+  return (iSprite2DUVAnimationFrame *)(idx != -1 ? vFrames.Get (idx) : 0);
 }
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)

@@ -264,7 +264,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.sprite3dfactoryloader.setup.objecttype",
 		node, "Could not load the sprite.3d mesh object plugin!");
-    return NULL;
+    return 0;
   }
 
   // @@@ Temporary fix to allow to set actions for objects loaded
@@ -299,7 +299,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		  "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
 		  child, "Couldn't find material named '%s'", matname);
-            return NULL;
+            return 0;
 	  }
 	  spr3dLook->SetMaterialWrapper (mat);
         }
@@ -314,7 +314,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 	  const char* skelname = child->GetAttributeValue ("name");
           if (skelname) skellimb->SetName (skelname);
           if (!LoadSkeleton (child, reporter, skellimb))
-	    return NULL;
+	    return 0;
         }
         break;
 
@@ -346,14 +346,14 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 		      childchild,
 		      "Trying to add unknown frame '%s' to action '%s'!",
 		      fn, act->GetName ());
-                    return NULL;
+                    return 0;
 	          }
                   act->AddFrame (ff, d, disp);
                 }
                 break;
 	      default:
 	        synldr->ReportBadToken (childchild);
-	        return NULL;
+	        return 0;
             }
           }
         }
@@ -398,7 +398,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 		            childchild,
 			    "Trying to add too many vertices to frame '%s'!",
 		            fr->GetName ());
-		    return NULL;
+		    return 0;
                   }
                   spr3dLook->SetVertex (anm_idx, i, csVector3 (x, y, z));
                   spr3dLook->SetTexel  (tex_idx, i, csVector2 (u, v));
@@ -408,7 +408,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
                 break;
 	      default:
 		synldr->ReportBadToken (childchild);
-	        return NULL;
+	        return 0;
             }
 	  }
           if (i < spr3dLook->GetVertexCount ())
@@ -416,7 +416,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		 "crystalspace.sprite3dfactoryloader.parse.frame.vertices",
 		 child, "Too few vertices in frame '%s'!", fr->GetName ());
-	    return NULL;
+	    return 0;
           }
         }
         break;
@@ -455,7 +455,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 		  "crystalspace.sprite3dfactoryloader.parse.badsmooth",
 		  child,
 		  "Please specify 'base' when specifying 'frame' in 'smooth'!");
-	    return NULL;
+	    return 0;
 	  }
 	  if (base == -1)
 	    spr3dLook->MergeNormals ();
@@ -470,14 +470,14 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
         {
           bool do_tween;
           if (!synldr->ParseBool (child, do_tween, true))
-	    return NULL;
+	    return 0;
           spr3dLook->EnableTweening (do_tween);
         }
         break;
 
       default:
 	synldr->ReportBadToken (child);
-        return NULL;
+        return 0;
     }
   }
   return csPtr<iBase> (fact);
@@ -594,7 +594,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite3dloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
@@ -607,7 +607,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
 		child,
 		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return NULL;
+	  return 0;
 	}
 	spr3dLook->SetAction (child->GetContentsValue ());
         break;
@@ -618,13 +618,13 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
 		child,
 		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return NULL;
+	  return 0;
 	}
 	else
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return NULL;
+	    return 0;
 	  spr3dLook->SetBaseColor (col);
 	}
         break;
@@ -635,13 +635,13 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
 		child,
 		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return NULL;
+	  return 0;
 	}
 	else
 	{
 	  bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return 0;
 	  spr3dLook->SetLighting (do_lighting);
 	}
         break;
@@ -652,7 +652,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
 		child,
 		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return NULL;
+	  return 0;
 	}
 	else
 	{
@@ -663,7 +663,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite3dloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return 0;
 	  }
 	  spr3dLook->SetMaterialWrapper (mat);
 	}
@@ -675,13 +675,13 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
 		child,
 		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return NULL;
+	  return 0;
 	}
 	else
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return NULL;
+	    return 0;
           spr3dLook->SetMixMode (mm);
 	}
 	break;
@@ -698,7 +698,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite3dloader.setup.motion.motionmanager",
 		child, "Could not find motion manager!");
-	    return NULL;
+	    return 0;
 	  }
 	  if (!spr3dLook)
 	  {
@@ -706,7 +706,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
 		child,
 		"No Factory! Please define 'factory' before 'applymotion'!");
-	    return NULL;
+	    return 0;
 	  }
 	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
 	  csRef<iSkeletonLimbState> limb (SCF_QUERY_INTERFACE (skel_state,
@@ -717,7 +717,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite3dloader.parse.motion.nochildren",
 		child, "Skeleton has no libs. Cannot apply motion!");
-	    return NULL;
+	    return 0;
 	  }
 	  csRef<iSkeletonConnectionState> con (SCF_QUERY_INTERFACE (limb,
 	  	iSkeletonConnectionState));
@@ -727,7 +727,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite3dloader.parse.motion.nobones",
 		child, "The skeleton has no bones!");
-	    return NULL;
+	    return 0;
 	  }
           iMotionTemplate* motion = motman->FindMotionByName (motname);
 	  if (!motion)
@@ -735,7 +735,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite3dloader.parse.motion.nomotion",
 		child, "The motion '%s' does not exist!", motname);
-	    return NULL;
+	    return 0;
 	  }
           iMotionController* mc = motman->AddController (bone);
           mc->SetMotion (motion);
@@ -748,19 +748,19 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
 		child,
 		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return NULL;
+	  return 0;
 	}
 	else
 	{
 	  bool do_tween;
 	  if (!synldr->ParseBool (child, do_tween, true))
-	    return NULL;
+	    return 0;
           spr3dLook->EnableTweening (do_tween);
 	}
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

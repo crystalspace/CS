@@ -64,9 +64,9 @@ csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  Listener = NULL;
-  AudioRenderer = NULL;
-  object_reg = NULL;
+  Listener = 0;
+  AudioRenderer = 0;
+  object_reg = 0;
 }
 
 bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
@@ -102,7 +102,7 @@ bool csSoundRenderEAX::Open()
   HRESULT r;
   if (!AudioRenderer)
   {
-    r = DirectSoundCreate(NULL, &AudioRenderer, NULL);
+    r = DirectSoundCreate(0, &AudioRenderer, 0);
     if (r != DS_OK)
     {
       if (reporter)
@@ -170,10 +170,10 @@ void csSoundRenderEAX::Close()
   }
 
   if (Listener) Listener->DecRef();
-  Listener = NULL;
+  Listener = 0;
 
   if (AudioRenderer) AudioRenderer->Release();
-  AudioRenderer = NULL;
+  AudioRenderer = 0;
 }
 
 void csSoundRenderEAX::SetVolume(float vol)
@@ -194,8 +194,8 @@ float csSoundRenderEAX::GetVolume()
 
 csPtr<iSoundHandle> csSoundRenderEAX::RegisterSound(iSoundData *snd)
 {
-  if (!snd) return NULL;
-  if (!snd->Initialize(&LoadFormat)) return NULL;
+  if (!snd) return 0;
+  if (!snd->Initialize(&LoadFormat)) return 0;
   csSoundHandleEAX *hdl = new csSoundHandleEAX(this, snd);
   SoundHandles.Push(hdl);
   return csPtr<iSoundHandle> (hdl);

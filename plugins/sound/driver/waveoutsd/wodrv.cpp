@@ -58,13 +58,13 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 
-  object_reg = NULL;
-  SoundRender = NULL;
+  object_reg = 0;
+  SoundRender = 0;
   MemorySize = 0;
-  Memory = NULL;
-  WaveOut = NULL;
+  Memory = 0;
+  WaveOut = 0;
   Playback = 0;
   LastError = ~0;
 }
@@ -143,7 +143,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   // setup misc member variables
   MemorySize = Format.nAvgBytesPerSec/RefreshRate;
   MemorySize -=(MemorySize%Format.nBlockAlign);
-  Memory = NULL;
+  Memory = 0;
   SoundProcLocked = false;
   NumSoundBlocksToWrite = 0;
 
@@ -175,7 +175,7 @@ void csSoundDriverWaveOut::Close()
     /* @@@ error checking */
     waveOutReset(WaveOut);
     waveOutClose(WaveOut);
-    WaveOut=NULL;
+    WaveOut=0;
   }
 
   // wait for SoundProc() to exit
@@ -184,10 +184,10 @@ void csSoundDriverWaveOut::Close()
   if (SoundRender)
   {
     SoundRender->DecRef();
-    SoundRender = NULL;
+    SoundRender = 0;
   }
 
-  Memory = NULL;
+  Memory = 0;
 }
 
 void csSoundDriverWaveOut::LockMemory(void **mem, int *memsize)
@@ -232,9 +232,9 @@ bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
   // be enough to prevent sound gaps; if not, make this an option in the
   // config file.
     if (!Playback) {
-      SoundProc(NULL);
-      SoundProc(NULL);
-      SoundProc(NULL);
+      SoundProc(0);
+      SoundProc(0);
+      SoundProc(0);
     }
   }
   return false;

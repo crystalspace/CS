@@ -48,13 +48,13 @@ SCF_IMPLEMENT_IBASE_END
 
 csPolyTexture::csPolyTexture ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  lm = NULL;
-  cache_data = NULL;
-  polygon = NULL;
-  shadow_bitmap = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  lm = 0;
+  cache_data = 0;
+  polygon = 0;
+  shadow_bitmap = 0;
   light_version = 0;
-  mapping = NULL;
+  mapping = 0;
   lightmap_up_to_date = false;
 }
 
@@ -111,10 +111,10 @@ csPolyTexture::~csPolyTexture ()
 #endif // CS_USE_NEW_RENDERER
   if (cache_data)
   {
-    CS_ASSERT (cache_data[0] == NULL);
-    CS_ASSERT (cache_data[1] == NULL);
-    CS_ASSERT (cache_data[2] == NULL);
-    CS_ASSERT (cache_data[3] == NULL);
+    CS_ASSERT (cache_data[0] == 0);
+    CS_ASSERT (cache_data[1] == 0);
+    CS_ASSERT (cache_data[2] == 0);
+    CS_ASSERT (cache_data[3] == 0);
     delete[] cache_data;
   }
   delete shadow_bitmap;
@@ -453,7 +453,7 @@ void csPolyTexture::FillLightMap (
       //currently transformed and we cannot do that to the original polygon.
       // @@@ Optimization: Check for shadow_it->IsRelevant() here.
       csPolygon3D *shad_poly = (csPolygon3D *) (shadow_it->GetUserData ());
-      // It is possible that shad_poly is NULL. This can happen if we
+      // It is possible that shad_poly is 0. This can happen if we
       // are casting shadows from something that is not a thing.
       if (shad_poly == base_poly) continue;
 
@@ -560,7 +560,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
 
   // Calculate the uv's for all points of the frustum (the
   // frustum is actually a clipped version of the polygon).
-  csVector2 *f_uv = NULL;
+  csVector2 *f_uv = 0;
   if (lp->GetVertices ())
   {
     int mi;
@@ -813,7 +813,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   const csVector3 &lightpos,
   const csColor &lightcolor)
 {
-  CS_ASSERT (shadow_bitmap != NULL);
+  CS_ASSERT (shadow_bitmap != 0);
 
   int ww, hh;
   iMaterialHandle* mat_handle = polygon->GetStaticData ()->GetMaterialHandle ();
@@ -900,7 +900,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   }
 
   delete shadow_bitmap;
-  shadow_bitmap = NULL;
+  shadow_bitmap = 0;
 }
 
 void csPolyTexture::SetPolygon (csPolygon3D *p)
@@ -935,8 +935,8 @@ csShadowBitmap::csShadowBitmap (
   int quality,
   int default_light)
 {
-  shadow = NULL;
-  light = NULL;
+  shadow = 0;
+  light = 0;
   csShadowBitmap::lm_w = lm_w;
   csShadowBitmap::lm_h = lm_h;
   csShadowBitmap::quality = quality;
@@ -1603,7 +1603,7 @@ SCF_IMPLEMENT_IBASE_END
 csLightingPolyTexQueue::csLightingPolyTexQueue (
   iLight *light)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csLightingPolyTexQueue::light = light;
 }
 

@@ -34,31 +34,31 @@ SCF_IMPLEMENT_IBASE(csRenderView)
 SCF_IMPLEMENT_IBASE_END
 
 csRenderView::csRenderView () :
-  ctxt(NULL),
-  iengine(NULL),
-  g3d(NULL),
-  g2d(NULL),
-  original_camera(NULL)
+  ctxt(0),
+  iengine(0),
+  g3d(0),
+  g2d(0),
+  original_camera(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  top_frustum = NULL;
+  top_frustum = 0;
 }
 
 csRenderView::csRenderView (iCamera *c) :
-  ctxt(NULL),
-  iengine(NULL),
-  g3d(NULL),
-  g2d(NULL),
-  original_camera(NULL)
+  ctxt(0),
+  iengine(0),
+  g3d(0),
+  g2d(0),
+  original_camera(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();
   ctxt->icamera = c;
-  top_frustum = NULL;
+  top_frustum = 0;
 }
 
 csRenderView::csRenderView (
@@ -66,13 +66,13 @@ csRenderView::csRenderView (
   iClipper2D *v,
   iGraphics3D *ig3d,
   iGraphics2D *ig2d) :
-    ctxt(NULL),
-    iengine(NULL),
+    ctxt(0),
+    iengine(0),
     g3d(ig3d),
     g2d(ig2d),
-    original_camera(NULL)
+    original_camera(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();
@@ -85,7 +85,7 @@ csRenderView::csRenderView (
     UpdateFrustum (ctxt->iview, ctxt->iview_frustum);
   }
 
-  top_frustum = NULL;
+  top_frustum = 0;
 }
 
 csRenderView::~csRenderView ()
@@ -139,7 +139,7 @@ void csRenderView::SetEngine (iEngine *engine)
 // After such number of values fog density coefficient can be considered 0.
 #ifdef USE_EXP_FOG
 # define FOG_EXP_TABLE_SIZE  1600
-static float *fog_exp_table = NULL;
+static float *fog_exp_table = 0;
 
 static void InitializeFogTable ()
 {
@@ -914,7 +914,7 @@ bool csRenderView::TestBSphere (
   // Test if there is a chance we must clip to current portal.
   //------
   bool outside, inside;
-  CS_ASSERT (ctxt->iview_frustum != NULL);
+  CS_ASSERT (ctxt->iview_frustum != 0);
   if (!fully_inside)
   {
     TestSphereFrustum (
@@ -982,7 +982,7 @@ bool csRenderView::ClipBSphere (
   // Test if there is a chance we must clip to current portal.
   //------
   bool outside, inside;
-  CS_ASSERT (ctxt->iview_frustum != NULL);
+  CS_ASSERT (ctxt->iview_frustum != 0);
   if (fully_inside)
   {
     clip_portal = CS_CLIP_NEEDED;
@@ -1042,7 +1042,7 @@ bool csRenderView::ClipBSphere (
     }
     else
     {
-      CS_ASSERT (GetTopFrustum () != NULL);
+      CS_ASSERT (GetTopFrustum () != 0);
       TestSphereFrustum (
         GetTopFrustum (),
         tr_center,
@@ -1163,7 +1163,7 @@ void csRenderView::CreateRenderContext ()
   if (ctxt->icamera) ctxt->icamera->IncRef ();
   if (ctxt->iview) ctxt->iview->IncRef ();
   if (ctxt->iview_frustum) ctxt->iview_frustum->IncRef ();
-  ctxt->rcdata = NULL;
+  ctxt->rcdata = 0;
 }
 
 void csRenderView::RestoreRenderContext (csRenderContext *original)
@@ -1237,5 +1237,5 @@ iBase *csRenderView::FindRenderContextData (void *key)
     cd = cd->next;
   }
 
-  return NULL;
+  return 0;
 }

@@ -55,13 +55,13 @@ private:
 public:
   csTinyXmlAttribute ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
-    attr = NULL;
+    SCF_CONSTRUCT_IBASE (0);
+    attr = 0;
   }
 
   csTinyXmlAttribute (TiDocumentAttribute* attr)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csTinyXmlAttribute::attr = attr;
   }
 

@@ -39,10 +39,10 @@ csVaoRenderBuffer::csVaoRenderBuffer (int size, csRenderBufferType type,
   csRenderBufferComponentType comptype, int compcount,
   csVaoRenderBufferManager* vaomgr)
 {
-  SCF_CONSTRUCT_IBASE (NULL)
+  SCF_CONSTRUCT_IBASE (0)
 
-  tempbuffer = NULL;
-  indexbuffer = NULL;
+  tempbuffer = 0;
+  indexbuffer = 0;
   csVaoRenderBuffer::size = size;
   csVaoRenderBuffer::type = type;
   csVaoRenderBuffer::comptype = comptype;
@@ -54,7 +54,7 @@ csVaoRenderBuffer::csVaoRenderBuffer (int size, csRenderBufferType type,
 
   ext = vaomgr->render3d->ext;
   // Get a buffer-index to use
-  VAObufferID = ext->glNewObjectBufferATI(size, NULL, GL_STATIC_ATI);
+  VAObufferID = ext->glNewObjectBufferATI(size, 0, GL_STATIC_ATI);
 }
 
 csVaoRenderBuffer::~csVaoRenderBuffer()

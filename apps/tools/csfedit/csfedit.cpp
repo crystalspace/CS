@@ -215,7 +215,7 @@ struct ModalData : public iBase
   csWindow* parent;
   csWindow* d;
   SCF_DECLARE_IBASE;
-  ModalData () { SCF_CONSTRUCT_IBASE (NULL); }
+  ModalData () { SCF_CONSTRUCT_IBASE (0); }
 };
 
 SCF_IMPLEMENT_IBASE (ModalData)
@@ -328,7 +328,7 @@ bool csEditCharView::HandleEvent(iEvent &Event)
     if((Event.Type == csevCommand ) &&
       (Event.Command.Code == cscmdClose))
     {
-      delete this; /// delete me - sets view to NULL in editchar
+      delete this; /// delete me - sets view to 0 in editchar
       return true;
     }
     if((Event.Type == csevMouseMove) &&
@@ -368,7 +368,7 @@ bool csEditCharView::HandleEvent(iEvent &Event)
       (Event.Command.Code == cscmdScrollBarValueChanged))
     {
       int newoff = (int) ((csScrollBar*)Event.Command.Info)->SendCommand(
-        cscmdScrollBarQueryValue, NULL);
+        cscmdScrollBarQueryValue, 0);
       if(Event.Command.Info == scrhor) offx = newoff;
       if(Event.Command.Info == scrvert) offy = newoff;
       Invalidate();
@@ -759,7 +759,7 @@ bool csEditFontView::HandleEvent(iEvent &Event)
       (Event.Command.Code == cscmdScrollBarValueChanged))
     {
       int newoff = (int) ((csScrollBar*)Event.Command.Info)->SendCommand(
-        cscmdScrollBarQueryValue, NULL);
+        cscmdScrollBarQueryValue, 0);
       if(Event.Command.Info == scrhor) offx = newoff;
       if(Event.Command.Info == scrvert) offy = newoff;
       Invalidate();
@@ -834,8 +834,8 @@ bool csEditFontView::HandleEvent(iEvent &Event)
 //-- csEditChar ------------------------------------------------------------
 csEditChar::csEditChar()
 {
-  view = NULL;
-  pixels = NULL;
+  view = 0;
+  pixels = 0;
   width=10; height=10;
   pixels = new uint8[width*height];
   int i;
@@ -845,7 +845,7 @@ csEditChar::csEditChar()
 
 csEditChar::csEditChar(int w, int h, uint8 *bitmap)
 {
-  view = NULL;
+  view = 0;
   int l, i;
   width=w; height=h;
   pixels = new uint8[width*height];
@@ -944,8 +944,8 @@ int csEditChar::GetBitmap(int idx)
 csEditFont::csEditFont(csApp *iApp)
 {
   app = iApp;
-  filename = NULL;
-  view = NULL;
+  filename = 0;
+  view = 0;
   dirty = false;
   fontname = csStrNew("Untitled");
   startchar = 0;
@@ -962,14 +962,14 @@ csEditFont::csEditFont(csApp *iApp, const char *fromfile)
   int i;
   app = iApp;
   filename = csStrNew(fromfile);
-  view = NULL;
+  view = 0;
   dirty = false;
-  fontname = NULL;
+  fontname = 0;
   startchar = 0;
   numchars = 256;
   fontwidth = 10;
   fontheight = 10;
-  chars = NULL;
+  chars = 0;
 
   /// read the file
   /// taken from csfont plugin...
@@ -1116,7 +1116,7 @@ csEditFont::~csEditFont()
         //Save();
   //}
   /// delete font from memory
-  ((CsfEdit*)app)->SetEditFont(NULL);
+  ((CsfEdit*)app)->SetEditFont(0);
   if(view) delete view;
   if(filename) delete[] filename;
   if(fontname) delete[] fontname;
@@ -1143,7 +1143,7 @@ void csEditFont::Save()
     if (d)
     {
       SaveFontModalData* data = new SaveFontModalData ();
-      data->parent = NULL;
+      data->parent = 0;
       data->d = d;
       data->code = SAVE_FONT_MODAL_DATA;
       data->edit_font = this;
@@ -1343,9 +1343,9 @@ CsfEdit::CsfEdit (iObjectRegistry *object_reg, csSkin &Skin)
 {
   int pal = csRegisterPalette (palette_CsfEdit, sizeof (palette_CsfEdit) / sizeof (int));
   SetPalette (pal);
-  editfont = NULL;
-  saveitem = NULL;
-  closeitem = NULL;
+  editfont = 0;
+  saveitem = 0;
+  closeitem = 0;
 }
 
 CsfEdit::~CsfEdit ()
@@ -1377,7 +1377,7 @@ bool CsfEdit::Initialize ()
   csMenu *menu = new csMenu (this, csmfsBar, 0);
   menu->id = CSWID_MENUBAR;
   menu->SetFont(mainfont);
-  csMenu *submenu = new csMenu (NULL);
+  csMenu *submenu = new csMenu (0);
   (void)new csMenuItem (menu, "~File", submenu);
     (void)new csMenuItem (submenu, "~New Font\tCtrl+N", 66600);
     (void)new csMenuItem (submenu, "~Open Font\tCtrl+O", 66601);
@@ -1394,7 +1394,7 @@ bool CsfEdit::Initialize ()
     ka->Command ('s', CSMASK_CTRL, 66602);
     ka->Command ('w', CSMASK_CTRL, 66603);
 
-  submenu = new csMenu (NULL);
+  submenu = new csMenu (0);
   (void)new csMenuItem (menu, "~Windows", submenu);
     (void)new csMenuItem (submenu, "~Window list", 66699);
 
@@ -1409,9 +1409,9 @@ bool CsfEdit::Initialize ()
 void CsfEdit::SetEditFont(csEditFont *f)
 {
   editfont = f;
-  if(saveitem!=NULL)
+  if(saveitem!=0)
     saveitem->SetState(CSS_SELECTABLE, editfont!=0);
-  if(closeitem!=NULL)
+  if(closeitem!=0)
     closeitem->SetState(CSS_SELECTABLE, editfont!=0);
 }
 
@@ -1443,7 +1443,7 @@ bool CsfEdit::HandleEvent (iEvent &Event)
 	  }
 
 	  ModalData* data = (ModalData*)GetTopModalUserdata ();
-	  CS_ASSERT (data != NULL);
+	  CS_ASSERT (data != 0);
 	  csWindow* w = data->d;
 	    switch (data->code)
 	    {
@@ -1490,7 +1490,7 @@ bool CsfEdit::HandleEvent (iEvent &Event)
           if (d)
           {
 	    ModalData* data = new ModalData ();
-      	    data->parent = NULL;
+      	    data->parent = 0;
       	    data->d = d;
       	    data->code = LOAD_FONT_MODAL_DATA;
       	    app->StartModal (d, data);
@@ -1513,7 +1513,7 @@ bool CsfEdit::HandleEvent (iEvent &Event)
           if(editfont && editfont->IsDirty())
           {
             csMessageBox(app, "Save changes?", "There are unsaved changes. "
-              "Do you wish to save before continuing?", NULL,
+              "Do you wish to save before continuing?", 0,
               CSMBS_QUESTION | CSMBS_IGNORE | CSMBS_OK);
 	    return true;
           }
@@ -1581,7 +1581,7 @@ int main (int argc, char* argv[])
   csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
-    DefaultSkin.Prefix = cfg->GetStr ("CSWS.Skin.Variant", NULL);
+    DefaultSkin.Prefix = cfg->GetStr ("CSWS.Skin.Variant", 0);
 
   // Create our application object
   CsfEdit app (object_reg, DefaultSkin);

@@ -52,17 +52,17 @@ g_error csPGInputDriver::RegFunc (inlib *i)
 {
   i->init		= Init;
   i->close		= Close;
-  i->fd_init		= NULL;
-  i->fd_activate	= NULL;
-  i->poll		= NULL;
-  i->ispending		= NULL;
-  i->message		= NULL;
+  i->fd_init		= 0;
+  i->fd_activate	= 0;
+  i->poll		= 0;
+  i->ispending		= 0;
+  i->message		= 0;
   return 0;
 }
 
 g_error csPGInputDriver::Init ()
 {
-  g_error err = cursor_new (& Cursor, NULL, 1);
+  g_error err = cursor_new (& Cursor, 0, 1);
   if (err) return err;
 
   EvH = csPtr<iEventHandler> (new csPGInputHandler);

@@ -78,7 +78,7 @@ static float asin_table[2*MAP_RESOLUTION+1];
 
 csMetaBall::csMetaBall (iMeshObjectFactory *fact)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMetaBallState);
 #ifndef CS_USE_NEW_RENDERER
@@ -89,13 +89,13 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
 
 
 
-  logparent = NULL;
-  th = NULL;
+  logparent = 0;
+  th = 0;
   alpha = frame = 0;
-  meta_balls = NULL;
+  meta_balls = 0;
   factory = fact;
-  object_reg = NULL;
-  vis_cb = NULL;
+  object_reg = 0;
+  vis_cb = 0;
   do_lighting = false;
   initialize = false;
   cur_camera_num = 0;
@@ -113,7 +113,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   current_lod = 1;
   current_features = 0;
 #ifndef CS_USE_NEW_RENDERER
-  vbufmgr = NULL;
+  vbufmgr = 0;
 #endif
   num_mesh_vertices = 0;
 }
@@ -319,7 +319,7 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
 
       rndbuf_verts->Release ();
     }
-    if ( !rndbuf_verts) return NULL;
+    if ( !rndbuf_verts) return 0;
     if ( rndbuf_verts->IsDiscarded()|| true )
     {
       csVector3* tmpbuf = (csVector3*)rndbuf_verts->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -344,7 +344,7 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
 
       rndbuf_texels->Release ();
     }
-    if( !rndbuf_texels) return NULL;
+    if( !rndbuf_texels) return 0;
     if( rndbuf_texels->IsDiscarded() || true)
     {
       csVector2 *tmpbuf = (csVector2*)rndbuf_texels->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -372,7 +372,7 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
 
       rndbuf_colors->Release ();
     }
-    if( !rndbuf_colors ) return NULL;
+    if( !rndbuf_colors ) return 0;
     if( rndbuf_colors->IsDiscarded() || true)
     {
       csColor *tmpbuf = (csColor*)rndbuf_colors->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -396,7 +396,7 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
 
       rndbuf_index->Release ();
     }
-    if( !rndbuf_index ) return NULL;
+    if( !rndbuf_index ) return 0;
     if( rndbuf_index->IsDiscarded() || true)
     {
       csTriangle *tmpbuf = (csTriangle*)rndbuf_index->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -407,7 +407,7 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
     rndbuf_index->CanDiscard(false);
     return rndbuf_index;
   }
-  return NULL;
+  return 0;
 }
 
 int csMetaBall::GetComponentCount (csStringID name)
@@ -416,7 +416,7 @@ int csMetaBall::GetComponentCount (csStringID name)
   if (name == texel_name) return 2;
   if (name == color_name) return 4;
   if (name == index_name) return 1;
-  return NULL;
+  return 0;
 }
 #endif
 
@@ -807,8 +807,8 @@ void csMetaBall::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf = NULL;
-    scfParent->vbufmgr = NULL;
+    scfParent->vbuf = 0;
+    scfParent->vbufmgr = 0;
   }
 }
 #endif
@@ -821,7 +821,7 @@ csMetaBallFactory::csMetaBallFactory( iBase *par, iObjectRegistry* object_reg )
 {
   SCF_CONSTRUCT_IBASE(par);
   csMetaBallFactory::object_reg = object_reg;
-  logparent = NULL;
+  logparent = 0;
 }
 
 csMetaBallFactory::~csMetaBallFactory()

@@ -84,7 +84,7 @@ void csWindowList::SetState (int mask, bool enable)
 
 static bool do_sendcommand (csComponent *child, void *param)
 {
-  ((csComponent *)(child->id))->SendCommand ((int)param, NULL);
+  ((csComponent *)(child->id))->SendCommand ((int)param, 0);
   return false;
 }
 
@@ -158,7 +158,7 @@ bool csWindowList::do_addtowindowlist (csComponent *child, void *param)
 
 void csWindowList::RebuildList ()
 {
-  list->SendCommand (cscmdListBoxClear, NULL);
+  list->SendCommand (cscmdListBoxClear, 0);
   app->ForEach (do_addtowindowlist, (void *)this, true);
 }
 
@@ -197,7 +197,7 @@ csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   if (tex)
     spr = new csSimplePixmap (tex, tx, ty, tw, th);
   else
-    spr = NULL;
+    spr = 0;
 
   return spr;
 }
@@ -281,18 +281,18 @@ void RectUnion (cswsRectVector &rect, csRect &result)
 void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
   const char *id, int &x, int &y, int &w, int &h)
 {
-  const char *butdef = NULL;
+  const char *butdef = 0;
 
   if (prefix) {
     csString Keyname;
     Keyname << "CSWS." << prefix << '.' << section << '.' << id;
-    butdef = app->config->GetStr (Keyname, NULL);
+    butdef = app->config->GetStr (Keyname, 0);
   }
 
   if (!butdef) {
     csString Keyname;
     Keyname << "CSWS." << section << '.' << id;
-    butdef = app->config->GetStr (Keyname, NULL);
+    butdef = app->config->GetStr (Keyname, 0);
   }
 
   if (!butdef)

@@ -56,9 +56,9 @@ csStatic::~csStatic ()
 
 void csStatic::Init (csStaticStyle iStyle)
 {
-  Bitmap = NULL;
+  Bitmap = 0;
   underline_pos = -1;
-  link = NULL;
+  link = 0;
   SetPalette (CSPAL_STATIC);
   style = iStyle;
   if (style != csscsRectangle)
@@ -167,7 +167,7 @@ void csStatic::Draw ()
             lines++;
           }
         }
-        t = strtok (NULL, "\n");
+        t = strtok (0, "\n");
       }
 
       // determine the starting line
@@ -239,7 +239,7 @@ bool csStatic::HandleEvent (iEvent &Event)
           if (style == csscsBitmap)
           {
             Bitmap = (csPixmap *)Event.Command.Info;
-            Event.Command.Info = NULL;
+            Event.Command.Info = 0;
             Invalidate ();
           }
           break;
@@ -264,7 +264,7 @@ bool csStatic::HandleEvent (iEvent &Event)
           link->SendCommand (cscmdStaticMouseEvent, (void *)&Event);
           // if link did not captured the mouse, release it
           if (app->MouseOwner == this)
-            app->CaptureMouse (NULL);
+            app->CaptureMouse (0);
           CheckUp ();
           return true;
         } /* endif */

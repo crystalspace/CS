@@ -83,7 +83,7 @@ void operator delete[] (void* p)
 
 struct MemEntry
 {
-  char* start;		// NULL if not used or else pointer to memory.
+  char* start;		// 0 if not used or else pointer to memory.
   size_t size;
   bool freed;		// If true then this memory entry is freed.
   unsigned long age;	// Time when 'free' was done.
@@ -123,7 +123,7 @@ static void InitFreeMemEntries ()
   int i;
   for (i = 0 ; i < DETECT_TABLE_SIZE ; i++)
   {
-    mem_table[i].start = NULL;
+    mem_table[i].start = 0;
     mem_table[i].size = 0;
     mem_table[i].freed = true;
   }
@@ -131,7 +131,7 @@ static void InitFreeMemEntries ()
 }
 
 //=======================================================
-// Compact the table by removing all entries that are NULL
+// Compact the table by removing all entries that are 0
 // and shifting the others upwards.
 //=======================================================
 static void CompactMemEntries ()
@@ -142,14 +142,14 @@ static void CompactMemEntries ()
   int i, j;
   for (i = j = 0 ; i < DETECT_TABLE_SIZE ; i++)
   {
-    if (mem_table[i].start != NULL)
+    if (mem_table[i].start != 0)
     {
       if (j != i) mem_table[j] = mem_table[i];
       j++;
     }
   }
   for (i = j ; i < DETECT_TABLE_SIZE ; i++)
-    mem_table[i].start = NULL;
+    mem_table[i].start = 0;
   first_free_idx = j;
 }
 
@@ -165,7 +165,7 @@ static void CompactMemEntries (unsigned long older_age)
   int i, j;
   for (i = j = 0 ; i < DETECT_TABLE_SIZE ; i++)
   {
-    if (mem_table[i].start != NULL)
+    if (mem_table[i].start != 0)
     {
       if (mem_table[i].freed && mem_table[i].age < older_age)
       {
@@ -179,7 +179,7 @@ static void CompactMemEntries (unsigned long older_age)
     }
   }
   for (i = j ; i < DETECT_TABLE_SIZE ; i++)
-    mem_table[i].start = NULL;
+    mem_table[i].start = 0;
   first_free_idx = j;
 }
 
@@ -235,7 +235,7 @@ static MemEntry* FindMemEntry (char* mem)
   {
     if (mem == mem_table[i].start) return mem_table+i;
   }
-  return NULL;
+  return 0;
 }
 
 //=======================================================
@@ -262,7 +262,7 @@ static void MemoryCheck ()
   for (i = 0 ; i < first_free_idx ; i++)
   {
     MemEntry& me = mem_table[i];
-    if (me.start != NULL)
+    if (me.start != 0)
     {
       char* rc = me.start - DETECT_WALL - 4;
       size_t s;
@@ -368,7 +368,7 @@ void* operator new (size_t s)
   global_age++;
   if (global_age % DETECT_CHECK_MEMORY == 0) MemoryCheck ();
 #endif
-  if (s <= 0) DumpError ("BAD SIZE in new %d\n", s, NULL);
+  if (s <= 0) DumpError ("BAD SIZE in new %d\n", s, 0);
   char* rc = (char*)malloc (s+4+DETECT_WALL+DETECT_WALL);
   memcpy (rc, DETECT, DETECT_WALL);
   memcpy (rc+DETECT_WALL, &s, 4);
@@ -399,7 +399,7 @@ void* operator new[] (size_t s)
   global_age++;
   if (global_age % DETECT_CHECK_MEMORY == 0) MemoryCheck ();
 #endif
-  if (s <= 0) DumpError ("BAD SIZE in new[] %d\n", s, NULL);
+  if (s <= 0) DumpError ("BAD SIZE in new[] %d\n", s, 0);
   char* rc = (char*)malloc (s+4+DETECT_WALL+DETECT_WALL);
   memcpy (rc, DETECTAR, DETECT_WALL);
   memcpy (rc+DETECT_WALL, &s, 4);
@@ -457,7 +457,7 @@ void operator delete (void* p)
   me->freed = true;
   me->age = global_age;
 # else
-  me->start = NULL;
+  me->start = 0;
   free (rc);
 # endif
 #else
@@ -501,7 +501,7 @@ void operator delete[] (void* p)
   me->freed = true;
   me->age = global_age;
 # else
-  me->start = NULL;
+  me->start = 0;
   free (rc);
 # endif
 #else

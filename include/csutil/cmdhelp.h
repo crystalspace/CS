@@ -44,13 +44,13 @@ public:
    * parser from the registry will be used.
    */
   static void Help (iObjectRegistry* object_reg,
-  	iCommandLineParser* cmdline = NULL);
+  	iCommandLineParser* cmdline = 0);
 
   /**
    * Check if -help is given on the commandline and return true.
    */
   static bool CheckHelp (iObjectRegistry* object_reg,
-  	iCommandLineParser* cmdline = NULL);
+  	iCommandLineParser* cmdline = 0);
 };
 
 #endif // __CS_CMDHELP_H__

@@ -88,7 +88,7 @@ public:
   csEvent (csTicks, int type, int n, int x, int y, int button, int modifiers);
 
   /// Create a command event object
-  csEvent (csTicks, int type, int code, void* info = NULL);
+  csEvent (csTicks, int type, int code, void* info = 0);
 
   /// Destructor
   virtual ~csEvent ();

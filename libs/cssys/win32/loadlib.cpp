@@ -30,7 +30,7 @@ static csStrVector ErrorMessages;
 csLibraryHandle csFindLoadLibrary (const char *iName)
 {
   ErrorMessages.DeleteAll();
-  return csFindLoadLibrary (NULL, iName, ".dll");
+  return csFindLoadLibrary (0, iName, ".dll");
 }
 
 csLibraryHandle csLoadLibrary (const char* iName)
@@ -55,7 +55,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
  // A load attempt might fail if the DLL depends implicitly upon some other
  // DLLs which reside in the Cygwin /bin directory.  To deal with this case, we
  // add the Cygwin /bin directory to the PATH environment variable and retry.
- if (handle == NULL)
+ if (handle == 0)
  {
    char *OLD_PATH = new char[4096];
    char *DLLDIR = new char[1024];
@@ -80,19 +80,19 @@ csLibraryHandle csLoadLibrary (const char* iName)
   delete[] tmp;
 #endif
 
-  if (handle == NULL)
+  if (handle == 0)
   {
     char *buf;
     FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | 
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &buf, 0, NULL);
+        0, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &buf, 0, 0);
     char *str = new char[strlen(buf) + strlen(iName) + 50];
     sprintf (str, "LoadLibrary('%s') error %d: %s",
 	iName, (int)errorCode, buf);
     ErrorMessages.Push (str);
     LocalFree (buf);
-    return NULL;
+    return 0;
   }
 
   typedef const char* (*pfnGetPluginCompiler)();
@@ -106,7 +106,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     sprintf (msg, noPluginCompiler, iName);
     ErrorMessages.Push (msg);
     FreeLibrary ((HMODULE)handle);
-    return NULL;
+    return 0;
   }
   const char* plugin_compiler = get_plugin_compiler();
   if (strcmp(plugin_compiler, CS_COMPILER_NAME))
@@ -119,7 +119,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     sprintf (msg, compilerMismatch, iName, plugin_compiler);
     ErrorMessages.Push (msg);
     FreeLibrary ((HMODULE)handle);
-    return NULL;
+    return 0;
   }
 
   return handle;
@@ -154,7 +154,7 @@ bool csUnloadLibrary (csLibraryHandle Handle)
 void csPrintLibraryError (const char *iModule)
 {
   char *str;
-  while((str = (char*)ErrorMessages.Pop()) != NULL)
+  while((str = (char*)ErrorMessages.Pop()) != 0)
   {
     fprintf (stderr, "  %s", str);
     delete[] str;

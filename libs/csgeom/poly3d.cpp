@@ -88,7 +88,7 @@ void csPoly3D::MakeRoom (int new_max)
 
 int csPoly3D::AddVertex (float x, float y, float z)
 {
-  CS_ASSERT (vertices != NULL);
+  CS_ASSERT (vertices != 0);
   if (num_vertices >= max_vertices) MakeRoom (max_vertices + 5);
   vertices[num_vertices].x = x;
   vertices[num_vertices].y = y;

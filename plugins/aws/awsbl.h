@@ -56,7 +56,7 @@ public:
 
 
 public:
-  /// Constructor, clears all components to NULL
+  /// Constructor, clears all components to 0
   awsBorderLayout(iAwsComponent *owner, 
       iAwsComponentNode* settings,
 		  iAwsPrefManager *pm);

@@ -33,8 +33,8 @@ awsImageView::awsImageView () :
   is_down(false),
   mouse_is_over(false),
   was_down(false),
-  img1(NULL),
-  img2(NULL),
+  img1(0),
+  img2(0),
   draw_color(false),
   color(-1),
   frame_style(0),
@@ -61,7 +61,7 @@ bool awsImageView::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
 
-  iString *file = NULL;
+  iString *file = 0;
   pm->GetString (settings, "Image", file);
   if (file) 
   {

@@ -146,7 +146,7 @@ public:
   /// Destructor.
   ~csSuperLightMap ();
 
-  /// Try to allocate a lightmap here. Return NULL on failure.
+  /// Try to allocate a lightmap here. Return 0 on failure.
   void Alloc (csTrianglesPerSuperLightmap* s);
   /// Clear all lightmaps in this super lightmap.
   void Clear ();

@@ -144,7 +144,7 @@ public:
   public:
     EventHandler (csMovieRecorder* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual ~EventHandler () { }
@@ -167,7 +167,7 @@ public:
   public:
     VirtualClock (csMovieRecorder* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       VirtualClock::parent = parent;
     }
     virtual ~VirtualClock() { }

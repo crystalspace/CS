@@ -23,14 +23,14 @@ const int awsStatusBar:: signalClicked = 0x1;
 //static iAwsSink *chart_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,())
-static awsSlot *chart_slot = NULL;
+static awsSlot *chart_slot = 0;
 
 
 awsStatusBar::awsStatusBar () :
   frame_style(0),
   alpha_level(96),
-  bkg(NULL),
-  barimg(NULL),
+  bkg(0),
+  barimg(0),
   bar_color(0),
   status(0.0)
 {

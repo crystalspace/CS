@@ -56,21 +56,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   csSprite2DMeshObject::factory = factory;
-  logparent = NULL;
+  logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
   initialized = false;
-  vis_cb = NULL;
+  vis_cb = 0;
   current_lod = 1;
   current_features = 0;
-  uvani = NULL;
+  uvani = 0;
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -434,7 +434,7 @@ void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
   csVector3 new_pos = transform.This2Other (part_pos);
   cam = rview->GetCamera ()->GetTransform ().Other2This (new_pos);
   if (cam.z < SMALL_Z) return;
-  scfParent->Draw (rview, NULL, mode);
+  scfParent->Draw (rview, 0, mode);
 }
 
 void csSprite2DMeshObject::Particle::SetColor (const csColor& col)
@@ -501,7 +501,7 @@ void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name,
   {
     // stop animation and show the normal texture
     delete scfParent->uvani;
-    scfParent->uvani = NULL;
+    scfParent->uvani = 0;
   }
 }
 
@@ -707,10 +707,10 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
-  material = NULL;
+  material = 0;
   MixMode = 0;
   lighting = true;
-  logparent = NULL;
+  logparent = 0;
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

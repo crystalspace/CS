@@ -31,9 +31,9 @@ csIsoMaterial::csIsoMaterial () :
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
-  effect = NULL;
+  effect = 0;
 }
 
 csIsoMaterial::csIsoMaterial (iTextureHandle* w) :
@@ -41,10 +41,10 @@ csIsoMaterial::csIsoMaterial (iTextureHandle* w) :
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
   texture = w;
-  effect = NULL;
+  effect = 0;
 }
 
 csIsoMaterial::~csIsoMaterial ()
@@ -137,7 +137,7 @@ csIsoMaterialWrapper::~csIsoMaterialWrapper ()
 
 void csIsoMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
 {
-  material = NULL;
+  material = 0;
   handle = m;
 }
 
@@ -172,7 +172,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csIsoMaterialList::csIsoMaterialList () :
 	csRefArray<csIsoMaterialWrapper> (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
   lastindex = 0;
 }
@@ -187,7 +187,7 @@ int csIsoMaterialList::GetNewIndex()
   int i = lastindex;
   while(i < Length())
   {
-    if(Get(i)==NULL)
+    if(Get(i)==0)
     {
       lastindex = i+1;
       return i;
@@ -195,7 +195,7 @@ int csIsoMaterialList::GetNewIndex()
     i++;
   }
   /// no indices free
-  Push(NULL);
+  Push(0);
   lastindex = Length();
   return lastindex-1;
 }
@@ -205,7 +205,7 @@ void csIsoMaterialList::RemoveIndex(int i)
   CS_ASSERT (i >= 0);
   if(i>=Length()) return;
 
-  (*this)[i] = NULL;
+  (*this)[i] = 0;
 
   if(i==Length()-1)
   {
@@ -237,7 +237,7 @@ csIsoMaterialWrapper* csIsoMaterialList::FindByName (const char* name)
       return w;
     }
   }
-  return NULL;
+  return 0;
 }
 
 csIsoMaterialWrapper* csIsoMaterialList::NewMaterial (iMaterialHandle *ith)

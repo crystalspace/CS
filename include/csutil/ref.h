@@ -183,7 +183,7 @@ public:
       // It is very important to first assign the new value to
       // 'obj' BEFORE calling DecRef() on the old object. Otherwise
       // it is easy to get in infinite loops with objects being
-      // destructed forever (when ref=NULL is used for example).
+      // destructed forever (when ref=0 is used for example).
       obj = newobj;
       if (newobj)
   newobj->IncRef ();

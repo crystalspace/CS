@@ -393,7 +393,7 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
       }
       GetAttributeRegistered (attrib.Name()).
         TakeOverValue (attrib.Value());
-      attrib.TakeOverValue (NULL);
+      attrib.TakeOverValue (0);
     }
   }
   attributeSet.set.ShrinkBestFit ();

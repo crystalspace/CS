@@ -81,7 +81,7 @@ private:
 
   /**
    * Parent (for hierachical transformations).
-   * Note that if the parent is not NULL then the list of
+   * Note that if the parent is not 0 then the list of
    * sectors is ignored for this movable (the parent list is
    * returned) and the 'obj' transformation is relative to
    * the parent one. The pointer is not reference-counted.
@@ -124,13 +124,13 @@ public:
   /**
    * Initialize the list of sectors to one sector where
    * this thing is. This is a conveniance funcion.
-   * This function does not do anything if the parent is not NULL.
+   * This function does not do anything if the parent is not 0.
    */
   void SetSector (iSector* sector);
 
   /**
    * Clear the list of sectors.
-   * This function does not do anything if the parent is not NULL.
+   * This function does not do anything if the parent is not 0.
    */
   void ClearSectors ();
 
@@ -251,7 +251,7 @@ public:
   bool IsFullTransformIdentity () const
   {
     if (!is_identity) return false;
-    if (parent != NULL)
+    if (parent != 0)
       return parent->IsFullTransformIdentity ();
     return true;
   }

@@ -38,7 +38,7 @@ public:
   virtual bool BeginDraw();
   virtual void FinishDraw();
 
-  virtual void Print (csRect *area = NULL);
+  virtual void Print (csRect *area = 0);
   virtual void SetRGB (int i, int r, int g, int b);
 
   virtual bool SetMousePosition (int , int );
@@ -72,7 +72,7 @@ public:
   { }
 
   virtual unsigned char* GetPixelAt (int, int)
-  { return NULL; }
+  { return 0; }
 };
 
 #endif // __CS_NULL2D_H__

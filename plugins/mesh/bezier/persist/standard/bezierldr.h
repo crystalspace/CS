@@ -40,7 +40,7 @@ public:
   iMaterialWrapper* default_material;
   float default_texlen;
 
-  BezierLoadInfo () : default_material (NULL),
+  BezierLoadInfo () : default_material (0),
     default_texlen (1)
     {}
 };

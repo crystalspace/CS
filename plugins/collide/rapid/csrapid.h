@@ -39,8 +39,8 @@ public:
 
   /// Create an iCollider for the given geometry.
        virtual csPtr<iCollider> CreateCollider (iPolygonMesh*);
- virtual csPtr<iCollider> CreateSphereCollider (iMeshObject*) { return NULL; }; //to be implemented
-       virtual csPtr<iCollider> CreateBoxCollider (iMeshObject*) { return NULL; };
+ virtual csPtr<iCollider> CreateSphereCollider (iMeshObject*) { return 0; }; //to be implemented
+       virtual csPtr<iCollider> CreateBoxCollider (iMeshObject*) { return 0; };
 
 
   virtual bool Collide (
@@ -94,7 +94,7 @@ public:
     }
     virtual csPtr<iString> StateTest ()
     {
-      return NULL;
+      return 0;
     }
     virtual csTicks Benchmark (int)
     {
@@ -102,7 +102,7 @@ public:
     }
     virtual csPtr<iString> Dump ()
     {
-      return NULL;
+      return 0;
     }
     virtual void Dump (iGraphics3D*)
     {

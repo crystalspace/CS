@@ -176,13 +176,13 @@ bool run_event_tests(iObjectRegistry* object_reg)
   bool my_bool = false;
   fprintf (stdout, "Searching for my_bool...%s", e->Find("my_bool", my_bool) ? "Success!" : "Failure!");
   fprintf (stdout, "  (value: %s)\n", my_bool ? "true" : "false");
-  char *my_string = NULL;
+  char *my_string = 0;
   fprintf (stdout, "Searching for my_string...%s", e->Find("my_string", &my_string) ? "Success!" : "Failure!");
   fprintf (stdout, "  (value: %s)\n", my_string);
   char buffer[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
   fprintf (stdout, "Adding a databuffer 32 in length called my_databuffer... %s\n", e->Add("my_databuffer", (void*)buffer, 32) ? "Sucess!" : "Failure!");
-  my_string = NULL;
+  my_string = 0;
   uint32 l;
   bool found = false;
   fprintf (stdout, "Searching for my_databuffer...%s\n", (found = e->Find("my_databuffer", (void**)&my_string, (uint32&)l, 0)) ? "Success!" : "Failure!");
@@ -246,7 +246,7 @@ bool DoStuff (iObjectRegistry* object_reg)
 int main (int argc, char* argv[])
 {
   // Initialize the random number generator
-  srand (time (NULL));
+  srand (time (0));
 
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg)

@@ -78,11 +78,11 @@ void csMovieRecorder::Report (int severity, const char* msg, ...)
 csMovieRecorder::csMovieRecorder (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
-  scfiEventHandler = NULL;
-  scfiVirtualClock = NULL;
-  object_reg = NULL;
+  scfiEventHandler = 0;
+  scfiVirtualClock = 0;
+  object_reg = 0;
   initialized = false;
-  writer = NULL;
+  writer = 0;
   ffakeClockTicks = 0;
   fakeClockTicks = 0;
   fakeClockElapsed = 0;
@@ -199,7 +199,7 @@ void csMovieRecorder::SetupPlugin()
       else
       {
 	strcat (newstr, pos);
-	pos = NULL;
+	pos = 0;
       }
     }
     delete[] captureFormat;
@@ -342,7 +342,7 @@ bool csMovieRecorder::HandleEndFrame (iEvent& /*event*/)
 
 bool csMovieRecorder::IsRecording(void) const
 {
-  return writer != NULL;
+  return writer != 0;
 }
 
 void csMovieRecorder::Start(void) 
@@ -389,8 +389,8 @@ void csMovieRecorder::Stop(void)
 {
   if (IsRecording()) {
     delete writer;
-    writer = NULL;
-    movieFile = NULL;
+    writer = 0;
+    movieFile = 0;
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder stopped - %s", movieFileName);
   }
 }

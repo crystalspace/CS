@@ -138,7 +138,7 @@ typedef struct
 #define BD_NODE_MODIFIED	    BE (0x80000000)
 #define BD_ATTR_MODIFIED	    BD_NODE_MODIFIED
 
-/// used to save NULL strings
+/// used to save 0 strings
 #define BD_OFFSET_INVALID	    0xffffffff
 
 /// Binary document node
@@ -324,7 +324,7 @@ public:
   virtual ~csBinaryDocNodeIterator ();
   void SetTo (csBdNode* node,
     csBinaryDocNode* parent,
-    const char* onlyval = NULL);
+    const char* onlyval = 0);
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
@@ -423,7 +423,7 @@ public:
   virtual void RemoveNode (const csRef<iDocumentNode>& child);
   virtual void RemoveNodes ();
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
-  	iDocumentNode* before = NULL);
+  	iDocumentNode* before = 0);
   virtual const char* GetContentsValue ();
   virtual int GetContentsValueAsInt ();
   virtual float GetContentsValueAsFloat ();

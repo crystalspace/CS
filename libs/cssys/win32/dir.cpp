@@ -30,7 +30,7 @@ DIR *opendir (const char *name)
 {
   DIR *dh = new DIR;
   if (!dh)
-    return NULL;
+    return 0;
 
   char tname [CS_MAXPATHLEN + 1];
   strcpy (tname, name);
@@ -39,7 +39,7 @@ DIR *opendir (const char *name)
   if ((dh->handle = _findfirst (tname, &dh->fd)) == -1L)
   {
     delete dh;
-    return NULL;
+    return 0;
   } /* endif */
 
   dh->valid = true;
@@ -58,7 +58,7 @@ dirent *readdir (DIR *dirp)
      && strcmp (dirp->de.d_name, ".."))
       return &dirp->de;
   } /* endwhile */
-  return NULL;
+  return 0;
 }
 
 int closedir (DIR *dirp)

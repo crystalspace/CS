@@ -32,7 +32,7 @@
 
 csShadowMap::csShadowMap ()
 {
-  Light = NULL;
+  Light = 0;
   max_shadow = 255;  // use worst case until calc'd
 }
 
@@ -77,17 +77,17 @@ SCF_IMPLEMENT_IBASE_END
 
 csLightMap::csLightMap ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  first_smap = NULL;
-  cachedata = NULL;
-  delayed_light_info = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  first_smap = 0;
+  cachedata = 0;
+  delayed_light_info = 0;
   mean_recalc = true;
   max_static_color_values.Set(255,255,255);  // use slowest safest method by default
 }
 
 csLightMap::~csLightMap ()
 {
-  CS_ASSERT (cachedata == NULL);
+  CS_ASSERT (cachedata == 0);
   while (first_smap)
   {
     csShadowMap *smap = first_smap->next;
@@ -132,7 +132,7 @@ csShadowMap *csLightMap::FindShadowMap (iLight *light)
     smap = smap->next;
   }
 
-  return NULL;
+  return 0;
 }
 
 void csLightMap::SetSize (int w, int h)
@@ -384,7 +384,7 @@ const char* csLightMap::ReadFromCache (
 stop:
   CalcMaxStatic ();
   
-  return NULL;
+  return 0;
 }
 
 void csLightMap::Cache (

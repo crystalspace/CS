@@ -36,7 +36,7 @@ public:
   /// Store length for optimization.
   int len;
 
-  csTokenDesc () { id=0; token=NULL;  }
+  csTokenDesc () { id=0; token=0;  }
   ~csTokenDesc () { delete [] token; }
 };
 
@@ -144,7 +144,7 @@ public:
 #define CS_TOKEN_TABLE(name)		\
     Push (CS_TOKEN_ ## name, #name )->
 #define CS_TOKEN_TABLE_END		\
-    Push (0, NULL);
+    Push (0, 0);
 
 #define CS_PARSERR_EOF			-2
 #define CS_PARSERR_TOKENNOTFOUND	-1
@@ -206,10 +206,10 @@ public:
    * to the text after the object description. The token id for the object is
    * returned. The name pointer will point to the optional name string in the
    * buffer. The data pointer will point to the optional data for the object.
-   * NULL can be passed for name/data if this information is not wanted.
+   * 0 can be passed for name/data if this information is not wanted.
    * Otherwise the variables pointed to are ALWAYS modified; if the optional
    * name/data is not present or an error occured retrieving the token the
-   * variables pointed to by name/data are set to NULL.
+   * variables pointed to by name/data are set to 0.
    * <i>The text buffer will get modified so BEWARE.</i>
    * <p><b>eg text</b>:
    * <pre>
@@ -244,7 +244,7 @@ public:
   /**
    * Returns the string of text between the open and close characters.
    * Modifies the buffer. Moves the buffer pointer to after the last delimiter.
-   * Can return NULL; buffer MUST already be at the opening delimiter.
+   * Can return 0; buffer MUST already be at the opening delimiter.
    * Skips nested delimiters too.
    * <p><b>NOTE</b>: Should skip quoted text, does not at this time.
    */

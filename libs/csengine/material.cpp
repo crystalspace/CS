@@ -41,7 +41,7 @@ csMaterial::csMaterial () :
   reflection(CS_DEFMAT_REFLECTION),
   effect(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
@@ -51,9 +51,9 @@ csMaterial::csMaterial (iTextureWrapper *w) :
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION),
-  effect(NULL)
+  effect(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
   texture = w;
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
@@ -111,7 +111,7 @@ iShader* csMaterial::GetShader()
 
 iTextureHandle *csMaterial::GetTexture ()
 {
-  return texture ? texture->GetTextureHandle () : NULL;
+  return texture ? texture->GetTextureHandle () : 0;
 }
 
 int csMaterial::GetTextureLayerCount ()
@@ -127,7 +127,7 @@ csTextureLayer *csMaterial::GetTextureLayer (int idx)
     return &texture_layers[idx];
   }
   else
-    return NULL;
+    return 0;
 }
 
 void csMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
@@ -249,7 +249,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csMaterialList::csMaterialList () :
   csRefArrayObject<iMaterialWrapper> (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
 }
 

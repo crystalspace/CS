@@ -92,7 +92,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -260,8 +260,8 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   ballstate->SetColor( csColor(0,0,1) );
   float start[] = {0.0, 1,0,1};
   float end[] = {1.0, 0,0,0};
-  float* testgrad[] = { start, end, NULL};
-  //float* testgrad[] = { {0.0, 1,0,1}, {1.0, 0,0,0}, NULL};
+  float* testgrad[] = { start, end, 0};
+  //float* testgrad[] = { {0.0, 1,0,1}, {1.0, 0,0,0}, 0};
   ballstate->ApplyVertGradient( meshposition.y, meshposition.y+meshradius.y,
     testgrad);
 
@@ -269,25 +269,25 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   float sky0[] = {-0.01, 0.5,0.6,0.3};
   float sky1[] = {0.0, .5, .6, 1.};
   float sky2[] = {1.0, .1, .3, .8};
-  float* testgrad2[] = {sky0, sky1, sky2, NULL};
+  float* testgrad2[] = {sky0, sky1, sky2, 0};
   /// night
   //float night0[] = {-0.01, 0.5,0.6,0.3};
   //float night1[] = {0.0, 0.1,0.1,0.1};
   //float night2[] = {1.0, 0,0,0};
-  //float* testgrad3[] = {night0, night1, night2, NULL};
+  //float* testgrad3[] = {night0, night1, night2, 0};
   ballstate->ApplyVertGradient( meshposition.y, meshposition.y+meshradius.y,
     testgrad2);
 
-  ballstate->ApplyLightSpot( csVector3(20,30,100), 1.0, NULL);
+  ballstate->ApplyLightSpot( csVector3(20,30,100), 1.0, 0);
 
   float sunset0[] = {0.0, 0.9,0.9,-0.9};
   float sunset1[] = {0.5, 0.1,-0.6,-0.8};
   float sunset2[] = {1.0, 1,-0.9,1};
-  float* testgrad4[] = {sunset0, sunset1, sunset2, NULL};
+  float* testgrad4[] = {sunset0, sunset1, sunset2, 0};
   ballstate->ApplyLightSpot( csVector3(-30,-20,-20), 2.0, testgrad4);
   */
 
-  ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
+  ballstate->PaintSky(skytime, 0, 0, 0, 0);
 
   engine->Prepare ();
 
@@ -320,7 +320,7 @@ void DemoSky::SetupFrame ()
   while(skytime > 1.0f) skytime -= 1.0f;
   csRef<iBallState> ballstate (SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
     iBallState));
-  ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
+  ballstate->PaintSky(skytime, 0, 0, 0, 0);
 
   // Now rotate the camera according to keyboard state
 
@@ -361,7 +361,7 @@ void DemoSky::SetupFrame ()
 void DemoSky::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool DemoSky::HandleEvent (iEvent &Event)
@@ -383,14 +383,14 @@ bool DemoSky::HandleEvent (iEvent &Event)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new DemoSky ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
 	Cleanup ();

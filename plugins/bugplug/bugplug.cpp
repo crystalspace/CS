@@ -111,9 +111,9 @@ csBugPlug::csBugPlug (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBugPlug);
-  object_reg = NULL;
-  mappings = NULL;
-  visculler = NULL;
+  object_reg = 0;
+  mappings = 0;
+  visculler = 0;
   process_next_key = false;
   process_next_mouse = false;
   edit_mode = false;
@@ -122,20 +122,20 @@ csBugPlug::csBugPlug (iBase *iParent)
 #ifndef CS_USE_NEW_RENDERER
   spider = new csSpider ();
 #else
-  spider = NULL;
+  spider = 0;
 #endif
 #ifndef CS_USE_NEW_RENDERER
   shadow = new csShadow ();
 #else
-  shadow = NULL;
+  shadow = 0;
 #endif
-  selected_mesh = NULL;
+  selected_mesh = 0;
 #ifndef CS_USE_NEW_RENDERER
   shadow->SetShadowMesh (selected_mesh);
 #endif
   spider_hunting = false;
-  prev_selected_mesh = NULL;
-  scfiEventHandler = NULL;
+  prev_selected_mesh = 0;
+  scfiEventHandler = 0;
 
   do_fps = true;
   fps_frame_count = 0;
@@ -144,25 +144,25 @@ csBugPlug::csBugPlug (iBase *iParent)
   counter_frames = 0;
   counter_freeze = false;
 
-  debug_sector.sector = NULL;
-  debug_sector.view = NULL;
+  debug_sector.sector = 0;
+  debug_sector.view = 0;
   debug_sector.show = false;
 
   debug_view.show = false;
   debug_view.clear = true;
   debug_view.num_points = 0;
   debug_view.max_points = 0;
-  debug_view.points = NULL;
+  debug_view.points = 0;
   debug_view.num_lines = 0;
   debug_view.max_lines = 0;
-  debug_view.lines = NULL;
+  debug_view.lines = 0;
   debug_view.num_boxes = 0;
   debug_view.max_boxes = 0;
-  debug_view.boxes = NULL;
-  debug_view.object = NULL;
+  debug_view.boxes = 0;
+  debug_view.object = 0;
   debug_view.drag_point = -1;
 
-  captureFormat = NULL;
+  captureFormat = 0;
 
   do_shadow_debug = false;
 }
@@ -284,7 +284,7 @@ void csBugPlug::SetupPlugin ()
       else
       {
 	strcat (newstr, pos);
-	pos = NULL;
+	pos = 0;
       }
     }
     delete[] captureFormat;
@@ -397,7 +397,7 @@ void csBugPlug::VisculView (iCamera* camera)
 {
   if (visculler)
   {
-    visculler = NULL;
+    visculler = 0;
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Disabled visculler graphical dumping");
     return;
@@ -525,7 +525,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
   csVector3 isect, end = origin + (vw - origin) * 60;
 
-  iPolygon3D* poly = NULL;
+  iPolygon3D* poly = 0;
   iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
   const char* poly_name;
   if (poly)
@@ -535,7 +535,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   }
   else
   {
-    poly_name = NULL;
+    poly_name = 0;
   }
 
   vw = isect;
@@ -916,7 +916,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_MIPMAP:
         {
 	  if (!G3D) break;
-	  char* choices[6] = { "on", "off", "1", "2", "3", NULL };
+	  char* choices[6] = { "on", "off", "1", "2", "3", 0 };
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_MIPMAPENABLE);
 	  v = (v+1)%5;
 	  G3D->SetRenderState (G3DRENDERSTATE_MIPMAPENABLE, v);
@@ -927,7 +927,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_INTER:
 	{
 	  if (!G3D) break;
-	  char* choices[5] = { "smart", "step32", "step16", "step8", NULL };
+	  char* choices[5] = { "smart", "step32", "step16", "step8", 0 };
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
 	  v = (v+1)%4;
 	  G3D->SetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP, v);
@@ -1157,7 +1157,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  m->ClearSectors ();
 	  m->UpdateMove ();
 	  prev_selected_mesh = selected_mesh;
-	  selected_mesh = NULL;
+	  selected_mesh = 0;
 	}
 	else
 	{
@@ -1174,7 +1174,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  for (i = 0 ; i < mesh_num_sectors ; i++)
 	    sl->Add (mesh_sectors[i]);
 	  m->UpdateMove ();
-	  prev_selected_mesh = NULL;
+	  prev_selected_mesh = 0;
 	}
         break;
       case DEBUGCMD_COUNTERRESET:
@@ -1209,7 +1209,7 @@ bool csBugPlug::EatKey (iEvent& event)
 		(VFS->ReadFile("/shader/shadowdebug.xml")));
 	      if(!debugShadowShader->Prepare())
 	      {
-		debugShadowShader = NULL;
+		debugShadowShader = 0;
   		return true;
 	      }
 	    }
@@ -1256,10 +1256,10 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
     // In that case we also release it.
     if (selected_mesh->GetRefCount () == 1)
     {
-      shadow->SetShadowMesh (NULL);
+      shadow->SetShadowMesh (0);
       shadow->RemoveFromEngine (Engine);
       selected_mesh->DecRef ();
-      selected_mesh = NULL;
+      selected_mesh = 0;
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Selected mesh is deleted!");
     }
   }
@@ -1371,11 +1371,11 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     if (fntsvr)
     {
       csRef<iFont> fnt (fntsvr->GetFont (0));
-      if (fnt == NULL)
+      if (fnt == 0)
       {
         fnt = fntsvr->LoadFont (CSFONT_COURIER);
       }
-      CS_ASSERT (fnt != NULL);
+      CS_ASSERT (fnt != 0);
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
       int sh = G2D->GetHeight ();
@@ -1399,11 +1399,11 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     if (fntsvr)
     {
       csRef<iFont> fnt (fntsvr->GetFont (0));
-      if (fnt == NULL)
+      if (fnt == 0)
       {
         fnt = fntsvr->LoadFont (CSFONT_COURIER);
       }
-      CS_ASSERT (fnt != NULL);
+      CS_ASSERT (fnt != 0);
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
       int sw = G2D->GetWidth ();
@@ -1436,7 +1436,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     if (fntsvr)
     {
       csRef<iFont> fnt (fntsvr->GetFont (0));
-      if (fnt == NULL)
+      if (fnt == 0)
       {
         fnt = fntsvr->LoadFont (CSFONT_COURIER);
       }
@@ -1464,7 +1464,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       spider_timeout--;
       if (spider_timeout < 0)
       {
-	HideSpider (NULL);
+	HideSpider (0);
         Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Spider could not catch a camera!");
       }
@@ -1645,7 +1645,7 @@ int csBugPlug::GetCommandCode (int key, bool shift, bool alt, bool ctrl,
     }
     m = m->next;
   }
-  args = NULL;
+  args = 0;
   return DEBUGCMD_UNKNOWN;
 }
 
@@ -1675,11 +1675,11 @@ void csBugPlug::AddCommand (const char* keystring, const char* cmdstring)
   map->cmd = cmdcode;
   map->next = mappings;
   if (mappings) mappings->prev = map;
-  map->prev = NULL;
+  map->prev = 0;
   if (args[0])
     map->args = csStrNew (args);
   else
-    map->args = NULL;
+    map->args = 0;
   mappings = map;
 }
 
@@ -1804,7 +1804,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
     csRef<iFactory> fact (SCF_QUERY_INTERFACE (obj, iFactory));
     if (fact)
       Report (CS_REPORTER_SEVERITY_DEBUG, "        Plugin '%s'",
-  	  fact->QueryDescription () ? fact->QueryDescription () : "NULL");
+  	  fact->QueryDescription () ? fact->QueryDescription () : "0");
     csBox3 bbox;
     obj->GetObjectModel ()->GetObjectBoundingBox (bbox);
     Report (CS_REPORTER_SEVERITY_DEBUG, "        Object bounding box:");
@@ -1994,8 +1994,8 @@ void csBugPlug::CleanDebugSector ()
 
   delete debug_sector.view;
 
-  debug_sector.sector = NULL;
-  debug_sector.view = NULL;
+  debug_sector.sector = 0;
+  debug_sector.view = 0;
 }
 
 void csBugPlug::SetupDebugSector ()
@@ -2031,7 +2031,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   	Engine->GetCurrentRegion ());
   if (mw) return mw;
   // Create a new material.
-  csRef<iMaterial> mat (Engine->CreateBaseMaterial (NULL, 0, NULL, NULL));
+  csRef<iMaterial> mat (Engine->CreateBaseMaterial (0, 0, 0, 0));
   mat->SetFlatColor (csRGBcolor (int (r*255), int (g*255), int (b*255)));
   mw = Engine->GetMaterialList ()->NewMaterial (mat);
   mw->QueryObject ()->SetName (name);
@@ -2056,7 +2056,7 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   csRef<iGeneralFactoryState> gfs (
   	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
   	iGeneralFactoryState));
-  CS_ASSERT (gfs != NULL);
+  CS_ASSERT (gfs != 0);
   gfs->SetMaterialWrapper (mat);
   gfs->GenerateBox (tbox);
   gfs->CalculateNormals ();
@@ -2073,7 +2073,7 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos));
   csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
   	iGeneralMeshState));
-  CS_ASSERT (gms != NULL);
+  CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
@@ -2104,7 +2104,7 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   csRef<iGeneralFactoryState> gfs (
   	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
   	iGeneralFactoryState));
-  CS_ASSERT (gfs != NULL);
+  CS_ASSERT (gfs != 0);
   gfs->SetMaterialWrapper (mat);
   gfs->SetVertexCount (3);
   gfs->GetVertices ()[0] = ss1;
@@ -2130,7 +2130,7 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   	mf, "__BugPlug_tri__", debug_sector.sector, pos));
   csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
   	iGeneralMeshState));
-  CS_ASSERT (gms != NULL);
+  CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
@@ -2162,21 +2162,21 @@ void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans)
 void csBugPlug::CleanDebugView ()
 {
   delete[] debug_view.lines;
-  debug_view.lines = NULL;
+  debug_view.lines = 0;
   debug_view.num_lines = 0;
   debug_view.max_lines = 0;
   delete[] debug_view.boxes;
-  debug_view.boxes = NULL;
+  debug_view.boxes = 0;
   debug_view.num_boxes = 0;
   debug_view.max_boxes = 0;
   delete[] debug_view.points;
-  debug_view.points = NULL;
+  debug_view.points = 0;
   debug_view.num_points = 0;
   debug_view.max_points = 0;
   if (debug_view.object)
   {
     debug_view.object->DecRef ();
-    debug_view.object = NULL;
+    debug_view.object = 0;
   }
 }
 
@@ -2290,11 +2290,11 @@ void csBugPlug::ShowCounters ()
   iFontServer* fntsvr = G2D->GetFontServer ();
   if (!fntsvr) return;
   csRef<iFont> fnt (fntsvr->GetFont (0));
-  if (fnt == NULL)
+  if (fnt == 0)
   {
     fnt = fntsvr->LoadFont (CSFONT_COURIER);
   }
-  CS_ASSERT (fnt != NULL);
+  CS_ASSERT (fnt != 0);
   int fw, fh;
   fnt->GetMaxSize (fw, fh);
   int sh = G2D->GetHeight ();

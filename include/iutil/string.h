@@ -69,7 +69,7 @@ struct iString : public iBase
   /// Set string maximal capacity to current string length
   virtual void Reclaim () = 0;
 
-  /// Clear the string (so that it contains only ending NULL character)
+  /// Clear the string (so that it contains only ending 0 character)
   inline void Clear ()
   { Truncate (0); }
 

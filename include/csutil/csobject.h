@@ -42,7 +42,7 @@ protected:
   /// The array of child nodes
   csObjectContainer *Children;
 
-  /// Object's name or NULL if unnamed.
+  /// Object's name or 0 if unnamed.
   char *Name;
 
   /// Parent object
@@ -53,7 +53,7 @@ protected:
 
 public:
   /// Initialize the csObject
-  csObject (iBase* pParent = NULL);
+  csObject (iBase* pParent = 0);
 
   /**
    * Copy constructor. The copied object contains all children of the original
@@ -103,7 +103,7 @@ public:
    * Note that the returned object will be IncRef'ed.
    */
   virtual void* GetChild (int iInterfaceID, int iVersion,
-    const char *Name = NULL, bool FirstName = false) const;
+    const char *Name = 0, bool FirstName = false) const;
 
   /// Return the first child object with the given name
   virtual iObject *GetChild (const char *Name) const;

@@ -128,9 +128,9 @@ public:
 class csKDTree : public iBase
 {
 private:
-  csKDTree* child1;		// If child1 is not NULL then child2 will
-  csKDTree* child2;		// also be not NULL.
-  csKDTree* parent;		// NULL if this is the root.
+  csKDTree* child1;		// If child1 is not 0 then child2 will
+  csKDTree* child2;		// also be not 0.
+  csKDTree* parent;		// 0 if this is the root.
 
   iBase* userobject;		// An optional user object for this node.
 
@@ -233,7 +233,7 @@ public:
   iBase* GetUserObject () const { return userobject; }
 
   /**
-   * Set the user object for this node. Can be NULL to clear
+   * Set the user object for this node. Can be 0 to clear
    * it. The old user object will be DecRef'ed and the (optional)
    * new one will be IncRef'ed.
    */
@@ -343,7 +343,7 @@ public:
       if (!scfParent->Debug_CheckTree (rc->GetCsString ()))
         return csPtr<iString> (rc);
       delete rc;
-      return NULL;
+      return 0;
     }
     virtual csTicks Benchmark (int num_iterations)
     {

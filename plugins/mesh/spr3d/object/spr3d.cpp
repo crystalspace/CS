@@ -64,8 +64,8 @@ SCF_IMPLEMENT_IBASE_END
 
 csSpriteFrame::csSpriteFrame (int anm_idx, int tex_idx)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  name = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  name = 0;
   animation_index = anm_idx;
   texturing_index = tex_idx;
   normals_calculated = false;
@@ -80,7 +80,7 @@ void csSpriteFrame::SetName (char const* n)
 {
   delete [] name;
   if (n) name = csStrNew (n);
-  else name = NULL;
+  else name = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -91,8 +91,8 @@ SCF_IMPLEMENT_IBASE_END
 
 csSpriteAction2::csSpriteAction2() : frames (8, 8), delays (8, 8)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  name = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  name = 0;
   SetReverseAction (false);
 }
 
@@ -135,10 +135,10 @@ SCF_IMPLEMENT_IBASE_END
 
 csSpriteSocket::csSpriteSocket()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   triangle_index = 0;
-  name = NULL;
-  attached_mesh = NULL;
+  name = 0;
+  attached_mesh = 0;
 }
 
 csSpriteSocket::~csSpriteSocket ()
@@ -257,18 +257,18 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   scfiPolygonMesh.SetFactory (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (NULL);
-  scfiObjectModel.SetPolygonMeshShadows (NULL);
+  scfiObjectModel.SetPolygonMeshViscull (0);
+  scfiObjectModel.SetPolygonMeshShadows (0);
 
-  logparent = NULL;
-  cstxt = NULL;
-  emerge_from = NULL;
-  skeleton = NULL;
-  cachename = NULL;
+  logparent = 0;
+  cstxt = 0;
+  emerge_from = 0;
+  skeleton = 0;
+  cachename = 0;
 
   texel_mesh = new csTriangleMesh ();
 
-  tri_verts = NULL;
+  tri_verts = 0;
   do_tweening = true;
   lighting_quality = DEFAULT_LIGHTING;
   lighting_quality_config = CS_SPR_LIGHT_GLOBAL;
@@ -510,7 +510,7 @@ csSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n)
     if (strcmp (GetFrame (i)->GetName (), n) == 0)
       return GetFrame (i);
 
-  return NULL;
+  return 0;
 }
 
 csSpriteAction2* csSprite3DMeshObjectFactory::AddAction ()
@@ -534,7 +534,7 @@ csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (const char *n) const
     if (strcmp (GetSocket (i)->GetName (), n) == 0)
       return GetSocket (i);
 
-  return NULL;
+  return 0;
 }
 
 csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) const
@@ -544,7 +544,7 @@ csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) con
     if (GetSocket (i)->GetMeshWrapper() == mesh)
       return GetSocket (i);
 
-  return NULL;
+  return 0;
 }
 void csSprite3DMeshObjectFactory::SetMaterial (iMaterialWrapper *material)
 {
@@ -655,7 +655,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   char buf[100];
-  iCacheManager* cache_mgr = NULL;
+  iCacheManager* cache_mgr = 0;
   if (engine)
   {
     cache_mgr = engine->GetCacheManager ();
@@ -795,7 +795,7 @@ csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
     if (strcmp (GetAction (i)->GetName (), n) == 0)
       return GetAction (i);
 
-  return NULL;
+  return 0;
 }
 
 void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
@@ -980,26 +980,26 @@ CS_IMPLEMENT_STATIC_VAR (Get_obj_verts, spr3d_obj_verts, ())
 typedef csGrowingArray<csVector3> spr3d_tween_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tween_verts, spr3d_tween_verts, ())
 
-spr3d_tr_verts *tr_verts = NULL;
-spr3d_uv_verts *uv_verts = NULL;
-spr3d_fog_verts *fog_verts = NULL;
-spr3d_obj_verts *obj_verts = NULL;
-spr3d_tween_verts *tween_verts = NULL;
+spr3d_tr_verts *tr_verts = 0;
+spr3d_uv_verts *uv_verts = 0;
+spr3d_fog_verts *fog_verts = 0;
+spr3d_obj_verts *obj_verts = 0;
+spr3d_tween_verts *tween_verts = 0;
 
 csSprite3DMeshObject::csSprite3DMeshObject ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
-  logparent = NULL;
+  logparent = 0;
   cur_frame = 0;
-  factory = NULL;
+  factory = 0;
   force_otherskin = false;
-  cur_action = NULL;
-  vertex_colors = NULL;
-  skeleton_state = NULL;
+  cur_action = 0;
+  vertex_colors = 0;
+  skeleton_state = 0;
   tween_ratio = 0;
   do_lighting = true;
   num_verts_for_lod = -1;
@@ -1020,7 +1020,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   rand_num = new csRandomGen();
 
   do_tweening = true;
-  vis_cb = NULL;
+  vis_cb = 0;
 
   cur_cameranr = -1;
   cur_movablenr = -1;
@@ -1032,9 +1032,9 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   speedfactor = 1;
   loopaction = true;
   fullstop = false;
-  last_action = NULL;
+  last_action = 0;
 
-  vbufmgr = NULL;
+  vbufmgr = 0;
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
@@ -1061,7 +1061,7 @@ void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
 {
   factory = tmpl;
   delete skeleton_state;
-  skeleton_state = NULL;
+  skeleton_state = 0;
   if (tmpl->GetSkeleton ())
     skeleton_state = (csSkelState*)tmpl->GetSkeleton ()->CreateState ();
   EnableTweening (tmpl->IsTweeningEnabled ());
@@ -1077,7 +1077,7 @@ void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
     new_socket = AddSocket();  // mesh now
     new_socket->SetName (factory_socket->GetName() );
     new_socket->SetTriangleIndex (factory_socket->GetTriangleIndex() );
-    new_socket->SetMeshWrapper (NULL);
+    new_socket->SetMeshWrapper (0);
   }
 }
 
@@ -1109,7 +1109,7 @@ void csSprite3DMeshObject::ResetVertexColors ()
       vertex_colors [i] = base_color;
   }
   //delete [] vertex_colors;
-  //vertex_colors = NULL;
+  //vertex_colors = 0;
 }
 
 void csSprite3DMeshObject::FixVertexColors ()
@@ -1201,7 +1201,7 @@ void csSprite3DMeshObject::GetTransformedBoundingBox (
   }
   else
   {
-    CS_ASSERT (cur_action != NULL);
+    CS_ASSERT (cur_action != 0);
     csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     csBox3 box;
     cframe->GetBoundingBox (box);
@@ -1273,7 +1273,7 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
   }
   else
   {
-    CS_ASSERT (cur_action != NULL);
+    CS_ASSERT (cur_action != 0);
     csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     cframe->GetBoundingBox (b);
   }
@@ -1295,7 +1295,7 @@ void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
   }
   else
   {
-    CS_ASSERT (cur_action != NULL);
+    CS_ASSERT (cur_action != 0);
     csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     cframe->GetRadius (r);
   }
@@ -1325,7 +1325,7 @@ csSpriteSocket* csSprite3DMeshObject::FindSocket (const char *n) const
     if (strcmp (GetSocket (i)->GetName (), n) == 0)
       return GetSocket (i);
 
-  return NULL;
+  return 0;
 }
 
 csSpriteSocket* csSprite3DMeshObject::FindSocket (iMeshWrapper *mesh) const
@@ -1335,7 +1335,7 @@ csSpriteSocket* csSprite3DMeshObject::FindSocket (iMeshWrapper *mesh) const
     if (GetSocket (i)->GetMeshWrapper() == mesh)
       return GetSocket (i);
 
-  return NULL;
+  return 0;
 }
 
 bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
@@ -1421,7 +1421,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
                 else
                 {
                   // Get the verts for the next frame
-                  csSpriteFrame * nframe = NULL;
+                  csSpriteFrame * nframe = 0;
                   if (current_frame + 1 < current_action->GetFrameCount())
                     nframe = current_action->GetCsFrame (current_frame + 1);
                   else
@@ -1519,7 +1519,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   UpdateWorkTables (factory->GetVertexCount());
 
-  CS_ASSERT (cur_action != NULL);
+  CS_ASSERT (cur_action != 0);
   csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
 
   // Get next frame for animation tweening.
@@ -1539,7 +1539,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   int cf_idx = cframe->GetAnmIndex();
 
   csVector3* real_obj_verts;
-  csVector3* real_tween_verts = NULL;
+  csVector3* real_tween_verts = 0;
 
   real_obj_verts = factory->GetVertices (cf_idx);
   if (do_tween)
@@ -1568,7 +1568,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   // Select the appropriate mesh.
   csTriangleMesh* m;
-  int* emerge_from = NULL;
+  int* emerge_from = 0;
 
   float fnum = 0.0f;
 
@@ -1691,7 +1691,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   }
   else
   {
-    vbuf_tween_verts = NULL;
+    vbuf_tween_verts = 0;
     g3dmesh.morph_factor = 0;
     g3dmesh.num_vertices_pool = 1;
   }
@@ -1791,7 +1791,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
       // Restore overridden action
       SetAction(last_action->GetName(),last_loop,last_speed);
       SetReverseAction(last_reverse);
-      last_action = NULL;
+      last_action = 0;
       return true;
     }
   }
@@ -2459,8 +2459,8 @@ iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
 
 void csSprite3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 {
-  scfParent->vbuf = scfParent->vbuf_tween = NULL;
-  scfParent->vbufmgr = NULL;
+  scfParent->vbuf = scfParent->vbuf_tween = 0;
+  scfParent->vbufmgr = 0;
 }
 
 //----------------------------------------------------------------------

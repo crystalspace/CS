@@ -40,7 +40,7 @@ TiXmlString::TiXmlString (const char* instring)
     if (!instring)
     {
         allocated = 0;
-        cstring = NULL;
+        cstring = 0;
   clength = 0;
         return;
     }
@@ -61,7 +61,7 @@ TiXmlString::TiXmlString (const TiXmlString& copy)
   if (! copy . allocated)
   {
     allocated = 0;
-    cstring = NULL;
+    cstring = 0;
     clength = 0;
     return;
   }

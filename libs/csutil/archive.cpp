@@ -68,7 +68,7 @@ char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 
 csArchive::csArchive (const char *filename)
 {
-  comment = NULL;
+  comment = 0;
   comment_length = 0;
   csArchive::filename = csStrNew (filename);
 
@@ -247,7 +247,7 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
   if (comment && (comment_length != zipfile_comment_length))
   {
     delete [] comment;
-    comment = NULL;
+    comment = 0;
   }
 
   comment_length = zipfile_comment_length;
@@ -277,7 +277,7 @@ void *csArchive::FindName (const char *name) const
 {
   int idx = dir.FindSortedKey (name);
   if (idx < 0)
-    return NULL;
+    return 0;
   return dir.Get (idx);
 }
 
@@ -286,7 +286,7 @@ char *csArchive::Read (const char *name, size_t *size)
   ArchiveEntry *f = (ArchiveEntry *) FindName (name);
 
   if (!f)
-    return NULL;
+    return 0;
   if (size)
     *size = f->info.ucsize;
 
@@ -306,7 +306,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 
   out_buff = new char[f->info.ucsize + 1];
   if (!out_buff)
-    return NULL;
+    return 0;
   out_buff [f->info.ucsize] = 0;
 
   if ((fseek (infile, f->info.relative_offset_local_header, SEEK_SET))
@@ -316,7 +316,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       || (fseek (infile, lfh.filename_length + lfh.extra_field_length, SEEK_CUR)))
   {
     delete [] out_buff;
-    return NULL;
+    return 0;
   }
   switch (f->info.compression_method)
   {
@@ -325,7 +325,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
         if (fread (out_buff, 1, f->info.csize, infile) < f->info.csize)
         {
           delete [] out_buff;
-          return NULL;
+          return 0;
         } /* endif */
         break;
       }
@@ -344,7 +344,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
         if (err != Z_OK)
         {
           delete [] out_buff;
-          return NULL;
+          return 0;
         }
         while (bytes_left)
         {
@@ -369,7 +369,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
          && ((err != Z_BUF_ERROR) || bytes_left || zs.avail_out))
         {
           //delete [] out_buff;
-          //return NULL;
+          //return 0;
         }
         break;
       }
@@ -377,7 +377,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       {
         /* Can't handle this compression algorythm */
         delete [] out_buff;
-        return NULL;
+        return 0;
       }
   } /* endswitch */
   return out_buff;
@@ -402,7 +402,7 @@ void *csArchive::NewFile (const char *name, size_t size, bool pack)
 
   ArchiveEntry *f = new ArchiveEntry (name, cdfh);
 
-  time_t curtime = time (NULL);
+  time_t curtime = time (0);
   struct tm *curtm = localtime (&curtime);
   csFileTime ft;
   ASSIGN_FILETIME (ft, *curtm);
@@ -470,14 +470,14 @@ bool csArchive::WriteZipArchive ()
     
   cs_snprintf (&temp_file[tmplen], CS_MAXPATHLEN - tmplen, TEMP_FILE);
   //sprintf (&temp_file[tmplen], TEMP_FILE);
-  if ((temp = fopen (temp_file, "w+b")) == NULL)
+  if ((temp = fopen (temp_file, "w+b")) == 0)
     return false;               /* Cannot create temporary file */
   fseek (file, 0, SEEK_SET);
 
   while (fread (buff, 1, sizeof (hdr_local), file) == sizeof (hdr_local))
   {
     size_t bytes_to_copy, bytes_to_skip;
-    ArchiveEntry *this_file = NULL;
+    ArchiveEntry *this_file = 0;
 
     if (memcmp (buff, hdr_local, sizeof (hdr_local)) == 0)
     {
@@ -596,7 +596,7 @@ skip_entry:
     fseek (temp, 0, SEEK_SET);
     fclose (file);
 
-    if ((file = fopen (filename, "wb")) == NULL)
+    if ((file = fopen (filename, "wb")) == 0)
     {
       file = fopen (filename, "rb");
       goto temp_failed;
@@ -685,7 +685,7 @@ void csArchive::UpdateDirectory ()
     ArchiveEntry *e = lazy.Get (n);
     e->FreeBuffer ();
     dir.InsertSorted (e);
-    lazy [n] = NULL;
+    lazy [n] = 0;
   }
   lazy.DeleteAll ();
 }
@@ -807,9 +807,9 @@ csArchive::ArchiveEntry::ArchiveEntry (const char *name,
   filename = new char[strlen (name) + 1];
   strcpy (filename, name);
   info = cdfh;
-  buffer = NULL;
-  extrafield = NULL;
-  comment = NULL;
+  buffer = 0;
+  extrafield = 0;
+  comment = 0;
   buffer_pos = 0;
   buffer_size = 0;
 }
@@ -825,7 +825,7 @@ csArchive::ArchiveEntry::~ArchiveEntry ()
 void csArchive::ArchiveEntry::FreeBuffer ()
 {
   if (buffer) free (buffer);
-  buffer = NULL;
+  buffer = 0;
   buffer_pos = 0;
   buffer_size = 0;
 }
@@ -926,7 +926,7 @@ bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile, size_t extra_field_l
   if (extrafield && (info.extra_field_length != extra_field_length))
   {
     delete [] extrafield;
-    extrafield = NULL;
+    extrafield = 0;
   }
   info.extra_field_length = extra_field_length;
   if (extra_field_length)
@@ -943,7 +943,7 @@ bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment
   if (comment && (info.file_comment_length != file_comment_length))
   {
     delete [] comment;
-    comment = NULL;
+    comment = 0;
   }
   info.file_comment_length = file_comment_length;
   if (file_comment_length)

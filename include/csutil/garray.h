@@ -55,7 +55,7 @@ public:
     if (limit != 0)
       root = (T*)malloc (limit * sizeof(T));
     else
-      root = NULL;
+      root = 0;
   }
 
   /**
@@ -66,7 +66,7 @@ public:
     if (root)
     {
       free (root);
-      root = NULL;
+      root = 0;
       count = 0;
       limit = 0;
     }
@@ -96,7 +96,7 @@ public:
     if (limit == inlimit) return;
     if ((limit = inlimit) != 0)
       root = (T*)realloc (root, limit * sizeof (T));
-    else if (root) { free (root); root = NULL; }
+    else if (root) { free (root); root = 0; }
     if (count > limit) count = limit;
   }
 

@@ -44,7 +44,7 @@ public:
 public:
   csReporterIterator ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     idx = 0;
   }
 
@@ -99,7 +99,7 @@ csReporter::csReporter (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  object_reg = NULL;
+  object_reg = 0;
   mutex = csMutex::Create (true);
 }
 

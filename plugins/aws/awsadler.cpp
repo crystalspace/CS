@@ -32,7 +32,7 @@ unsigned long aws_adler32 (
   unsigned long s2 = (adler >> 16) & 0xffff;
   int k;
 
-  if (buf == NULL) return 1L;
+  if (buf == 0) return 1L;
 
   while (len > 0)
   {

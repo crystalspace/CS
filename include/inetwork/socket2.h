@@ -92,7 +92,7 @@ struct iNetworkSocket2 : public iBase
   virtual int WaitForConnection (int source, int port, int queue) = 0;
 
   /**
-   * Returns a NetworkSocket2 instance for the new connection.  Returns NULL on
+   * Returns a NetworkSocket2 instance for the new connection.  Returns 0 on
    * error.  Use LastError() for the actual error.
    */
   virtual iNetworkSocket2 *Accept () = 0;

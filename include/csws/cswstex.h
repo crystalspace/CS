@@ -129,7 +129,7 @@ public:
   csWSTexture *FindTexture (const char *iName)
   {
     int idx = FindKey (iName);
-    return idx >= 0 ? (csWSTexture *)Get (idx) : (csWSTexture*)NULL;
+    return idx >= 0 ? (csWSTexture *)Get (idx) : (csWSTexture*)0;
   }
 };
 

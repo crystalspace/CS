@@ -96,7 +96,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -273,7 +273,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   }
 
   csRef<iStatLight> light;
-  light = engine->CreateLight (NULL, csVector3 (0, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3 (0, 5, 0), 10,
   	csColor (1, 0, 0), false);
   room->GetLights ()->Add (light->QueryLight ());
 
@@ -328,7 +328,7 @@ void PySimple::FinishFrame ()
   // Drawing code ends here.
   myG3D->FinishDraw ();
   // Print the final output.
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool PySimple::HandleEvent (iEvent &Event)
@@ -349,14 +349,14 @@ bool PySimple::HandleEvent (iEvent &Event)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new PySimple ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

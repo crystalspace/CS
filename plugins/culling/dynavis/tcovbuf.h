@@ -395,7 +395,7 @@ public:
     }
     virtual csPtr<iString> StateTest ()
     {
-      return NULL;
+      return 0;
     }
     virtual csTicks Benchmark (int num_iterations)
     {

@@ -209,11 +209,11 @@ CS_IMPLEMENT_STATIC_VAR (Get_persp, dtmesh_persp, ())
 typedef csGrowingArray<csColor> dtmesh_color_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_color_verts, dtmesh_color_verts, ())
 
-static dtmesh_tr_verts *tr_verts = NULL;
-static dtmesh_z_verts *z_verts = NULL;
-static dtmesh_uv_verts *uv_verts = NULL;
-static dtmesh_persp *persp = NULL;
-static dtmesh_color_verts *color_verts = NULL;
+static dtmesh_tr_verts *tr_verts = 0;
+static dtmesh_z_verts *z_verts = 0;
+static dtmesh_uv_verts *uv_verts = 0;
+static dtmesh_persp *persp = 0;
+static dtmesh_color_verts *color_verts = 0;
 
 
 static void DrawTriangle (
@@ -294,7 +294,7 @@ static void DrawTriangle (
   }
   if (clip_result != CS_CLIP_INSIDE)
     G3DPreparePolygonFX (&poly, clipped_triangle, rescount, clipped_vtstats,
-		(csVector2 *)triangle, poly.use_fog, colors != NULL);
+		(csVector2 *)triangle, poly.use_fog, colors != 0);
   else
   {
     poly.vertices [0].x = triangle [0].x;
@@ -353,7 +353,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_col;
-  csColor* col1 = NULL;
+  csColor* col1 = 0;
   if (mesh.use_vertex_color)
     col1 = mesh.buffers[0]->GetColors ();
 
@@ -364,7 +364,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     float remainder = 1 - tween_ratio;
     csVector3* f2 = mesh.buffers[1]->GetVertices ();
     csVector2* uv2 = mesh.buffers[1]->GetTexels ();
-    csColor* col2 = NULL;
+    csColor* col2 = 0;
     if (mesh.use_vertex_color)
       col2 = mesh.buffers[1]->GetColors ();
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
@@ -575,7 +575,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int trivert [3] = { 0, 1, 2 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pb, pc, trivert,
-	zv, uv, work_col ? col : NULL, fog);
+	zv, uv, work_col ? col : 0, fog);
     }
     else
     {
@@ -655,11 +655,11 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int trivert1[3] = { 0, 1, 2 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pb, pc, trivert1,
-	zv, uv, work_col ? col : NULL, fog);
+	zv, uv, work_col ? col : 0, fog);
       int trivert2[3] = { 0, 2, 3 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pc, pd, trivert2,
-	zv, uv, work_col ? col : NULL, fog);
+	zv, uv, work_col ? col : 0, fog);
     }
   }
 }

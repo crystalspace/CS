@@ -34,7 +34,7 @@ csCollection::csCollection (
     csObject(),
     objects(8, 8)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollection);
 
   csCollection::engine = engine;
@@ -54,6 +54,6 @@ iObject *csCollection::FindObject (char *name)
     if (!strcmp (obj->GetName (), name)) return obj;
   }
 
-  return NULL;
+  return 0;
 }
 

@@ -43,7 +43,7 @@ public:
   rG2D(g2d),
   rG3D(g3d)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
 
     g2d->IncRef ();
     g3d->IncRef ();
@@ -59,8 +59,8 @@ public:
   iGraphics2D *G2D () { return rG2D; }
   iGraphics3D *G3D () { return rG3D; }
   virtual void Show (
-    csRect *area = NULL,
-    iGraphics3D *g3d = NULL,
+    csRect *area = 0,
+    iGraphics3D *g3d = 0,
     uint8 Alpha = 0)
   {
     (void)area;

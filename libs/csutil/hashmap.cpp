@@ -51,7 +51,7 @@ csHashKey csHashCompute(char const* s)
 csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
 {
   hash = hm;
-  bucket = NULL;
+  bucket = 0;
   bucket_len = 0;
   element_index = 0;
   bucket_index = (uint32)-1;
@@ -61,7 +61,7 @@ csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
 
 bool csGlobalHashIterator::HasNext ()
 {
-  return bucket != NULL;
+  return bucket != 0;
 }
 
 void csGlobalHashIterator::GotoNextElement ()
@@ -82,7 +82,7 @@ void csGlobalHashIterator::GotoNextElement ()
       }
       bucket_index++;
     }
-    bucket = NULL;
+    bucket = 0;
   }
 }
 
@@ -127,7 +127,7 @@ void csHashIterator::GotoNextSameKey ()
   {
     element_index++;
   }
-  if (element_index >= bucket->Length ()) bucket = NULL;
+  if (element_index >= bucket->Length ()) bucket = 0;
 }
 
 csHashObject csHashIterator::Next ()
@@ -233,7 +233,7 @@ csHashObject csHashMap::Get (csHashKey key) const
     const csHashElement& element = bucket[i];
     if (element.key == key) return element.object;
   }
-  return NULL;
+  return 0;
 }
 
 void csHashMap::Delete (csHashKey key, csHashObject object)

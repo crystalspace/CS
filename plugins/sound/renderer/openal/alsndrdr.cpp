@@ -69,8 +69,8 @@ csSoundRenderOpenAL::csSoundRenderOpenAL(iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
-  Listener = NULL;
-  object_reg = NULL;
+  Listener = 0;
+  object_reg = 0;
 
   roll = 1.0;
   dist = 1.0;
@@ -117,7 +117,7 @@ bool csSoundRenderOpenAL::Open()
     "SoundRender OpenAL selected");
 
   // OpenAL Initialization
-  alutInit (0, NULL);
+  alutInit (0, 0);
   alGetError ();
 
   // We have to pass new through a csPtr<> to avoid reference issues
@@ -188,7 +188,7 @@ void csSoundRenderOpenAL::Close()
   }
 
   // Release the listener reference
-  Listener = NULL;
+  Listener = 0;
 
   // Stop all sources
   csSoundSourceOpenAL *src;
@@ -239,7 +239,7 @@ float csSoundRenderOpenAL::GetVolume()
 csPtr<iSoundHandle> csSoundRenderOpenAL::RegisterSound(iSoundData *snd)
 {
   CS_ASSERT (snd);
-  if (!snd->Initialize (&format)) return NULL;
+  if (!snd->Initialize (&format)) return 0;
 
 #ifdef OPENAL_DEBUG_CALLS
   csRef<iReporter> reporter = CS_QUERY_REGISTRY (object_reg, iReporter);

@@ -77,7 +77,7 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
   // TreeCollider.SetFullPrimPrimTest (true);
   TreeCollider.SetTemporalCoherence (true);
   N_pairs = 0;
-  pairs = NULL;
+  pairs = 0;
 }
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
@@ -99,10 +99,10 @@ csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
 }
 
 csPtr<iCollider> csOPCODECollideSystem::CreateSphereCollider (iMeshObject*) 
-{ return NULL; };  //unimplemented yet
+{ return 0; };  //unimplemented yet
 
 csPtr<iCollider> csOPCODECollideSystem::CreateBoxCollider (iMeshObject*) 
-{ return NULL; };  //unimplemented yet
+{ return 0; };  //unimplemented yet
 
 bool csOPCODECollideSystem::Collide (
   iCollider* collider1, const csReversibleTransform* trans1,
@@ -171,7 +171,7 @@ bool csOPCODECollideSystem::Collide (
   // col2->transform.m[3][1] = u.y;
   // col2->transform.m[3][2] = u.z;
 
-  bool isOk = TreeCollider.Collide (ColCache ,&col1->transform , NULL);
+  bool isOk = TreeCollider.Collide (ColCache ,&col1->transform , 0);
   if (isOk)
   {
     bool Status = TreeCollider.GetContactStatus ();
@@ -219,7 +219,7 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
 {     
   int size = (int) (udword(TreeCollider.GetNbPairs ()));
   N_pairs = size;
-  if (N_pairs == 0) { return NULL; };
+  if (N_pairs == 0) { return 0; };
   const Pair* colPairs=TreeCollider.GetPairs ();
   Point* vertholder0 = col1->vertholder;
   Point* vertholder1 = col2->vertholder;
@@ -284,7 +284,7 @@ void csOPCODECollideSystem::ResetCollisionPairs ()
   if (pairs)
   {
     delete[] pairs;
-    pairs = NULL;
+    pairs = 0;
     N_pairs = 0;
   }
 }

@@ -111,7 +111,7 @@ int RTjpeg_width, RTjpeg_height;
 int RTjpeg_Ywidth, RTjpeg_Cwidth;
 int RTjpeg_Ysize, RTjpeg_Csize;
 
-int16 *RTjpeg_old=NULL;
+int16 *RTjpeg_old=0;
 
 #ifdef MMX
 mmx_t RTjpeg_lmask;

@@ -30,12 +30,12 @@ csStateHandler::csStateHandler()
   // Hardcoded hash size. Maybe it should be definable?
   // --Anders Stenberg
   states = new csHashMap( 31 );
-  iterator = NULL;
+  iterator = 0;
 }
 
 csStateHandler::~csStateHandler()
 {
-  if (iterator != NULL)
+  if (iterator != 0)
     delete iterator;
 
   csGlobalHashIterator cIterator (states);
@@ -136,7 +136,7 @@ void *csStateHandler::GetStateOpaque( csStringID state )
     if( data->type == CS_STATETYPE_OPAQUE )
       return data->opaque_value;
   }
-  return NULL;
+  return 0;
 }
 
 csEffectVector4 csStateHandler::GetStateVector4(csStringID state)
@@ -156,7 +156,7 @@ csEffectVector4 csStateHandler::GetStateVector4(csStringID state)
 
 csStringID csStateHandler::GetFirstState()
 {
-  if (iterator != NULL)
+  if (iterator != 0)
     delete iterator;
 
   iterator = new csGlobalHashIterator (states);
@@ -167,7 +167,7 @@ csStringID csStateHandler::GetFirstState()
 
 csStringID csStateHandler::GetNextState()
 {
-  if( iterator == NULL )
+  if( iterator == 0 )
     return csInvalidStringID;
 
   if( iterator->HasNext() )

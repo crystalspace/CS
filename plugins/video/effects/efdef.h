@@ -65,9 +65,9 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csEffectDefinition(): techniquename(NULL)
+  csEffectDefinition(): techniquename(0)
   {
-    SCF_CONSTRUCT_IBASE( NULL );
+    SCF_CONSTRUCT_IBASE( 0 );
   }
   virtual ~csEffectDefinition ()
   { 

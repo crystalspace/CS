@@ -90,8 +90,8 @@ csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent)
 csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
 {
   if (list) list->DeleteAll ();
-  list = NULL;
-  plugin_mgr = NULL;
+  list = 0;
+  plugin_mgr = 0;
 }
 
 bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
@@ -140,8 +140,8 @@ bool csSoundLoaderMultiplexer::LoadNextPlugin ()
     list->Delete (0);
     if (list->Length() == 0)
     {
-      list = NULL;
-      plugin_mgr = NULL;
+      list = 0;
+      plugin_mgr = 0;
     }
   }
   return true;
@@ -182,5 +182,5 @@ csPtr<iSoundData> csSoundLoaderMultiplexer::LoadSound (
     }
     consecutive = true;
   } while (LoadNextPlugin());
-  return NULL;
+  return 0;
 }

@@ -209,7 +209,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return 0;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -217,7 +217,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return NULL;
+	    return 0;
 	  spiralstate->SetSource (s);
 	}
 	break;
@@ -230,7 +230,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -246,7 +246,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return 0;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -255,7 +255,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return 0;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -264,7 +264,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

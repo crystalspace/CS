@@ -58,7 +58,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   initialized = false;
   csParticleSystem::factory = factory;
-  logparent = NULL;
+  logparent = 0;
   particles.SetLength (0);
   self_destruct = false;
   time_to_live = 0;
@@ -70,8 +70,8 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   // bbox is empty.
   prev_time = 0;
   MixMode = 0;
-  vis_cb = NULL;
-  mat = NULL;
+  vis_cb = 0;
+  mat = 0;
   radius.Set (0, 0, 0);
   color.Set (0, 0, 0);
   csRef<iPluginManager> plugin_mgr (
@@ -366,8 +366,8 @@ csNewtonianParticleSystem::csNewtonianParticleSystem (
   : csParticleSystem (object_reg, factory)
 {
   // create csVector3's
-  part_speed = NULL;
-  part_accel = NULL;
+  part_speed = 0;
+  part_accel = 0;
 }
 
 void csNewtonianParticleSystem::SetCount (int max)

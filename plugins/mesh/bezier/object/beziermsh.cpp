@@ -137,8 +137,8 @@ csBezierMeshStatic::csBezierMeshStatic (csBezierMesh* thing,
 
   curves_center.x = curves_center.y = curves_center.z = 0;
   curves_scale = 40;
-  curve_vertices = NULL;
-  curve_texels = NULL;
+  curve_vertices = 0;
+  curve_texels = 0;
   num_curve_vertices = max_curve_vertices = 0;
 
   obj_bbox_valid = false;
@@ -188,17 +188,17 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 
   last_thing_id++;
   thing_id = last_thing_id;
-  logparent = NULL;
+  logparent = 0;
 
   dynamic_ambient.Set (0,0,0);
   light_version = 1;
 
-  ParentTemplate = NULL;
+  ParentTemplate = 0;
 
   cameranr = -1;
   movablenr = -1;
   wor_bbox_movablenr = -1;
-  cached_movable = NULL;
+  cached_movable = 0;
 
   prepared = false;
   static_data_nr = 0;
@@ -387,9 +387,9 @@ void csBezierMesh::SetCurveTexel (int idx, const csVector2 &vt)
 void csBezierMesh::ClearCurveVertices ()
 {
   delete[] static_data->curve_vertices;
-  static_data->curve_vertices = NULL;
+  static_data->curve_vertices = 0;
   delete[] static_data->curve_texels;
-  static_data->curve_texels = NULL;
+  static_data->curve_texels = 0;
   static_data->obj_bbox_valid = false;
   curves_transf_ok = false;
 }
@@ -418,7 +418,7 @@ csCurve *csBezierMesh::GetCurve (char *name) const
     if (n && !strcmp (n, name))
       return curves[i];
   }
-  return NULL;
+  return 0;
 }
 
 void csBezierMesh::AddCurve (csCurve *curve)
@@ -675,7 +675,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csBezierMesh::PolyMeshLOD::PolyMeshLOD () : BezierPolyMeshHelper ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 //-------------------------------------------------------------------------
@@ -688,8 +688,8 @@ void BezierPolyMeshHelper::Setup ()
     return ;
   }
 
-  polygons = NULL;
-  vertices = NULL;
+  polygons = 0;
+  vertices = 0;
 
   // Count the number of needed polygons and vertices.
   num_verts = 0;
@@ -755,11 +755,11 @@ void BezierPolyMeshHelper::Cleanup ()
     }
 
     delete[] polygons;
-    polygons = NULL;
+    polygons = 0;
   }
 
   delete[] vertices;
-  vertices = NULL;
+  vertices = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -897,7 +897,7 @@ bool csBezierMesh::DrawCurves (
     bool gouraud = !!c->LightMap;
     mesh.mixmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
     mesh.use_vertex_color = gouraud;
-    if (mesh.mat_handle == NULL)
+    if (mesh.mat_handle == 0)
     {
       static_data->thing_type->Warn ("Warning! Curve without material!");
       continue;
@@ -1005,7 +1005,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
   delete[] cachename;
 
   // For error reporting.
-  const char* thing_name = NULL;
+  const char* thing_name = 0;
   if (static_data->thing_type->do_verbose && logparent)
   {
     csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
@@ -1013,7 +1013,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
   }
 
   bool rc = true;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bezier_lm", NULL, ~0);
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bezier_lm", 0, ~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
@@ -1021,7 +1021,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
     for (i = 0; i < GetCurveCount (); i++)
     {
       const char* error = curves.Get (i)->ReadFromCache (&mf);
-      if (error != NULL)
+      if (error != 0)
       {
         rc = false;
         if (static_data->thing_type->do_verbose)
@@ -1045,7 +1045,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
     rc = false;
   }
 
-  cache_mgr->SetCurrentScope (NULL);
+  cache_mgr->SetCurrentScope (0);
   return rc;
 }
 
@@ -1061,13 +1061,13 @@ bool csBezierMesh::WriteToCache (iCacheManager* cache_mgr)
   for (i = 0; i < GetCurveCount (); i++)
     if (!curves.Get (i)->WriteToCache (&mf)) goto stop;
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    	"bezier_lm", NULL, ~0))
+    	"bezier_lm", 0, ~0))
     goto stop;
 
   rc = true;
 
 stop:
-  cache_mgr->SetCurrentScope (NULL);
+  cache_mgr->SetCurrentScope (0);
   return rc;
 }
 
@@ -1140,7 +1140,7 @@ iCurve *csBezierMesh::BezierFactoryState::GetCurve (int idx) const
 //---------------------------------------------------------------------------
 iMeshObjectFactory *csBezierMesh::MeshObject::GetFactory () const
 {
-  if (!scfParent->ParentTemplate) return NULL;
+  if (!scfParent->ParentTemplate) return 0;
   return &scfParent->ParentTemplate->scfiMeshObjectFactory;
 }
 
@@ -1148,7 +1148,7 @@ iMeshObjectFactory *csBezierMesh::MeshObject::GetFactory () const
 csPtr<iMeshObject> csBezierMesh::MeshObjectFactory::NewInstance ()
 {
   csBezierMesh *thing = new csBezierMesh (scfParent, scfParent->static_data->thing_type);
-  thing->MergeTemplate (&(scfParent->scfiBezierFactoryState), NULL);
+  thing->MergeTemplate (&(scfParent->scfiBezierFactoryState), 0);
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
 
@@ -1188,7 +1188,7 @@ csBezierMeshObjectType::csBezierMeshObjectType (
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
-  lightpatch_pool = NULL;
+  lightpatch_pool = 0;
   do_verbose = false;
 }
 
@@ -1215,7 +1215,7 @@ bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
   	iCommandLineParser);
   if (cmdline)
   {
-    do_verbose = cmdline->GetOption ("verbose") != NULL;
+    do_verbose = cmdline->GetOption ("verbose") != 0;
   }
 
   return true;

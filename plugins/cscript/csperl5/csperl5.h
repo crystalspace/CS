@@ -147,7 +147,7 @@ protected:
   bool Init (iObjectRegistry *);
   bool CheckError (const char *caller) const;
   Object* Query (iScriptObject *obj) const;
-  SV* CallV (const char *name, const char *fmt, va_list va, SV *self = NULL);
+  SV* CallV (const char *name, const char *fmt, va_list va, SV *self = 0);
   SV* CallV (const char *name, const char *fmt, va_list va, const char *self)
   { return CallV (name, fmt, va, sv_2mortal (newSVpv (self, 0))); }
 

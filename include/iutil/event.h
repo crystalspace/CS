@@ -368,7 +368,7 @@ struct iEventOutlet : public iBase
    * has been closed (cscmdContextClose), to finish the application
    * immediately (cscmdQuit) and so on.
    */
-  virtual void Broadcast (int iCode, void *iInfo = NULL) = 0;
+  virtual void Broadcast (int iCode, void *iInfo = 0) = 0;
 
   /**
    * This is a special routine which is called for example when the

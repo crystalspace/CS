@@ -453,7 +453,7 @@ public:
    * be set to the start of the segment and *pr to 0.
    */
   static int BoxSegment (const csBox3& box, const csSegment3& segment,
-  	csVector3& isect, float* pr = NULL);
+  	csVector3& isect, float* pr = 0);
 
   /**
    * Intersect an AABB with a frustum. The frustum may contain up to

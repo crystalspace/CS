@@ -394,7 +394,7 @@ TiDocument* TiDocumentNode::GetDocument() const
 
 TiXmlElement::TiXmlElement ()
 {
-  value = NULL;
+  value = 0;
   type = ELEMENT;
 }
 
@@ -405,9 +405,9 @@ TiXmlElement::~TiXmlElement()
 
 void TiXmlElement::SetValue (const char * name)
 {
-  if (name == NULL)
+  if (name == 0)
   {
-    value = NULL;
+    value = 0;
   }
   else
   {
@@ -634,7 +634,7 @@ void TiDocumentAttribute::Print( iString* cfile, int /*depth*/ ) const
   TiXmlBase::PutString( Value(), &v );
 
   char* idx = strchr (value, '\"');
-  if (idx == NULL)
+  if (idx == 0)
     StrPrintf  (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
   else
     StrPrintf  (cfile, "%s='%s'", n.c_str(), v.c_str() );
@@ -688,9 +688,9 @@ TiDocumentNode* TiXmlComment::Clone(TiDocument* document) const
 
 void TiXmlText::SetValue (const char * name)
 {
-  if (name == NULL)
+  if (name == 0)
   {
-    value = NULL;
+    value = 0;
   }
   else
   {

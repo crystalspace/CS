@@ -191,7 +191,7 @@ void AwsTutorial::SetupFrame()
 void AwsTutorial::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool AwsTutorial::HandleEvent (iEvent &Event)

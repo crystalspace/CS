@@ -95,7 +95,7 @@ bool csLoader::ParseEffectList(iDocumentNode *node)
 
 bool csLoader::ParseEffect(iDocumentNode *node, iEffectServer *pParent)
 {
-  if(pParent == NULL) return false;
+  if(pParent == 0) return false;
 
   const char* effectname = node->GetAttributeValue("name");
 
@@ -152,7 +152,7 @@ bool csLoader::ParseEffect(iDocumentNode *node, iEffectServer *pParent)
 
 bool csLoader::ParseEffectTech(iDocumentNode* node, iEffectTechnique *tech)
 {
-  if(tech == NULL) return false;
+  if(tech == 0) return false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes();
   
@@ -187,7 +187,7 @@ bool csLoader::ParseEffectTech(iDocumentNode* node, iEffectTechnique *tech)
 
 bool csLoader::ParseEffectPass(iDocumentNode* node, iEffectPass* pass)
 {
-  if(pass == NULL) return false;
+  if(pass == 0) return false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes();
   
@@ -259,7 +259,7 @@ bool csLoader::ParseEffectPass(iDocumentNode* node, iEffectPass* pass)
 
 bool csLoader::ParseEffectLayer(iDocumentNode* node, iEffectLayer* layer)
 {
-  if(layer == NULL) return false;
+  if(layer == 0) return false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes();
   csRef<iEffectServer> effect_server = CS_QUERY_REGISTRY(csLoader::object_reg, iEffectServer);

@@ -27,14 +27,14 @@
 #define SKIN ((csDialogSkin *)skinslice)
 
 csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
-  : csComponent (iParent), FrameBitmap(NULL),  OverlayBitmap(NULL),
+  : csComponent (iParent), FrameBitmap(0),  OverlayBitmap(0),
     delFrameBitmap(false), delOverlayBitmap(false)
 {
   SetPalette (CSPAL_DIALOG);
   state |= CSS_SELECTABLE;
   DragStyle = 0;
   OverlayAlpha=0;
-  first = NULL;
+  first = 0;
   GridX = GridY = -1;
   SnapSizeToGrid = false;
   if (parent)
@@ -113,9 +113,9 @@ bool csDialog::HandleEvent (iEvent &Event)
           if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             csComponent *def = GetDefault ();
-            if (def->SendCommand (cscmdActivate, NULL) != def)
+            if (def->SendCommand (cscmdActivate, 0) != def)
               if (def != focused)
-                focused->SendCommand (cscmdActivate, NULL);
+                focused->SendCommand (cscmdActivate, 0);
             return true;
           }
           break;
@@ -300,7 +300,7 @@ csDialog::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
 	{
   	  delete FrameBitmap;
 	  delFrameBitmap=false;
-	  FrameBitmap=NULL;
+	  FrameBitmap=0;
 	}
 
 	// Set the new one only	if there's something to set
@@ -318,7 +318,7 @@ csDialog::SetOverlayBitmap(csPixmap *iOverlayBitmap, bool iDelOverlayBitmap)
 	{
   	  delete OverlayBitmap;
 	  delOverlayBitmap=false;
-	  OverlayBitmap=NULL;
+	  OverlayBitmap=0;
 	}
 
 	// Set the new one only if there's something to set

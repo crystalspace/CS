@@ -87,7 +87,7 @@ public:
 
   /**
    * Return the worldspawn entity. (All general map settings are stored there)
-   * returns NULL if there is no such entity. (I would consider this to be
+   * returns 0 if there is no such entity. (I would consider this to be
    * a map bug...)
    */
   CMapEntity* GetWorldspawn();

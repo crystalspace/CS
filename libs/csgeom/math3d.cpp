@@ -858,7 +858,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csGeomDebugHelper::csGeomDebugHelper ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 #define GEO_ASSERT(test,msg) \
@@ -901,7 +901,7 @@ SCF_IMPLEMENT_IBASE_END
 
 UnitCubeMesh::UnitCubeMesh ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csVector3 dim (1, 1, 1);
   csVector3 d = dim * .5;
   verts[0].Set (-d.x, -d.y, -d.z);

@@ -47,7 +47,7 @@ struct iConfigManager;
   Name, #Interface, iSCF::SCF->GetInterfaceID(#Interface), Interface##_VERSION
 /// Marker for the end of the requested plugins list.
 #define CS_REQUEST_END \
-  NULL
+  0
 /// Request VFS plugin.
 #define CS_REQUEST_VFS \
   CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
@@ -127,7 +127,7 @@ public:
   /**
    * This function should be called second. It will create the object
    * registry and return a pointer to it. If there is a problem it will
-   * return NULL.
+   * return 0.
    */
   static iObjectRegistry* CreateObjectRegistry ();
 
@@ -135,7 +135,7 @@ public:
    * You will almost certainly want to call this function. It will
    * create the plugin manager which is essential for nearly everything.
    * The created plugin manager will be registered with the object registry
-   * as the default plugin manager (using NULL tag).
+   * as the default plugin manager (using 0 tag).
    */
   static iPluginManager* CreatePluginManager (iObjectRegistry*);
 
@@ -143,7 +143,7 @@ public:
    * This essential function creates the event queue which is the main
    * driving force between the event-driven CS model. In addition this function
    * will register the created event queue with the object registry as
-   * the default event queue (using NULL tag).
+   * the default event queue (using 0 tag).
    */
   static iEventQueue* CreateEventQueue (iObjectRegistry*);
 
@@ -151,14 +151,14 @@ public:
    * Create the virtual clock. This clock is responsible for keeping
    * track of virtual time in the game system. This function will
    * register the created virtual clock with the object registry as the
-   * default virtual clock (using NULL tag).
+   * default virtual clock (using 0 tag).
    */
   static iVirtualClock* CreateVirtualClock (iObjectRegistry*);
 
   /**
    * Create the commandline parser. This function will register the created
    * commandline parser with the object registry as the default
-   * parser (using NULL tag).
+   * parser (using 0 tag).
    */
   static iCommandLineParser* CreateCommandLineParser (
     iObjectRegistry*, int argc, char const* const argv[]);
@@ -166,7 +166,7 @@ public:
   /**
    * Create the config manager. This function will register the created
    * config manager with the object registry as the default config manager
-   * (using NULL tag).
+   * (using 0 tag).
    */
   static iConfigManager* CreateConfigManager (iObjectRegistry*);
 
@@ -180,9 +180,9 @@ public:
 
   /**
    * Setup the config manager. If you have no config file then you can still
-   * call this routine using a NULL parameter. If you don't call this then
+   * call this routine using a 0 parameter. If you don't call this then
    * either RequestPlugins() or Initialize() will call this routine with
-   * NULL parameter. The 'ApplicationID' parameter is used to determine the
+   * 0 parameter. The 'ApplicationID' parameter is used to determine the
    * correct user-specific domain. It is possibly overriden by the application
    * config file option "System.ApplicationID".
    */

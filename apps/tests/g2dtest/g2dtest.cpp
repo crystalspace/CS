@@ -144,7 +144,7 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
 
   object_reg = csInitializer::CreateEnvironment (argc, argv);
 
-  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  if (!csInitializer::SetupConfigManager (object_reg, 0))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
@@ -377,7 +377,7 @@ void G2DTestSystemDriver::SetupFrame ()
       {
         if (SwitchBB)
         {
-          myG2D->Print (NULL);
+          myG2D->Print (0);
           csSleep (200);
         }
         else
@@ -390,7 +390,7 @@ void G2DTestSystemDriver::SetupFrame ()
 void G2DTestSystemDriver::FinishFrame ()
 {
   myG2D->FinishDraw ();
-  myG2D->Print (NULL);
+  myG2D->Print (0);
 }
 
 bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
@@ -594,7 +594,7 @@ void G2DTestSystemDriver::ResizeContext ()
   myG2D->Write (font, x, 0, red, -1, text);
 
   myG2D->FinishDraw ();
-  myG2D->Print (NULL);
+  myG2D->Print (0);
 }
 
 void G2DTestSystemDriver::DrawBackBufferText ()
@@ -619,7 +619,7 @@ void G2DTestSystemDriver::DrawBackBufferON ()
   myG2D->Clear (yellow);
   DrawBackBufferText ();
   myG2D->FinishDraw ();
-  myG2D->Print (NULL);
+  myG2D->Print (0);
 
   if (!myG2D->BeginDraw ())
     return;
@@ -631,7 +631,7 @@ void G2DTestSystemDriver::DrawBackBufferOFF ()
 {
   myG2D->Clear (white);
   myG2D->FinishDraw ();
-  myG2D->Print (NULL);
+  myG2D->Print (0);
   if (!myG2D->BeginDraw ())
     return;
 
@@ -1173,9 +1173,9 @@ int main (int argc, char *argv[])
   if (nw) nw->SetTitle (APP_TITLE);
 
   /*System.myG2D->Close();
-  System.myG2D = NULL;
-  plugin_mgr = NULL;
-  cmdline = NULL;*/
+  System.myG2D = 0;
+  plugin_mgr = 0;
+  cmdline = 0;*/
 
   csDefaultRunLoop(object_reg);
   return 0;

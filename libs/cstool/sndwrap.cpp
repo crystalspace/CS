@@ -34,7 +34,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundWrapper::csSoundWrapper (iSoundHandle *buf) : csObject()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSoundWrapper);
   SoundHandle = buf;
 }

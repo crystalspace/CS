@@ -78,8 +78,8 @@ csSoundLoader_IFF::LoadSound(void *databuf, uint32 size)
 {
   uint8 *buf = (uint8*) databuf;
   unsigned long index=0;
-  csSoundDataRaw *sb= NULL;
-  char *data=NULL;
+  csSoundDataRaw *sb= 0;
+  char *data=0;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
   unsigned long freq = 0, length_form, samples_size = 0, min_freq, max_freq;
@@ -154,7 +154,7 @@ csSoundLoader_IFF::LoadSound(void *databuf, uint32 size)
       int i=0;
 
       data= new char[chunk_size];
-      if(data==NULL) goto exit_read;
+      if(data==0) goto exit_read;
       char *ptr=(char *)data;
 
       while(i<chunk_size)
@@ -173,13 +173,13 @@ csSoundLoader_IFF::LoadSound(void *databuf, uint32 size)
     }
   }
 
-  if(data==NULL) goto exit_read;
+  if(data==0) goto exit_read;
 
   csSoundFormat Format;
   Format.Freq=freq;
   Format.Bits=8;
   Format.Channels=1;
-  sb = new csSoundDataRaw(NULL, data, samples_size, Format);
+  sb = new csSoundDataRaw(0, data, samples_size, Format);
 
   goto exit_ok;
 exit_read:

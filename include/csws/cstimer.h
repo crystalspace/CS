@@ -74,14 +74,14 @@ class csTimer : public csComponent
   struct csTimerEvent : public csEvent
   {
     SCF_DECLARE_IBASE;
-    csTimerEvent () { SCF_CONSTRUCT_IBASE(NULL); }
+    csTimerEvent () { SCF_CONSTRUCT_IBASE(0); }
   } TimerEvent;
   
 public:
   /// Create timer object: the timer is created in running state
   csTimer (csComponent *iParent, unsigned iPeriod);
-  csTimer (iEventHandler *iParent, unsigned iPeriod, void *iInfo = NULL);
-  csTimer (iEventQueue *iParent, unsigned iPeriod, void *iInfo = NULL);
+  csTimer (iEventHandler *iParent, unsigned iPeriod, void *iInfo = 0);
+  csTimer (iEventQueue *iParent, unsigned iPeriod, void *iInfo = 0);
 
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (iEvent &Event);

@@ -60,7 +60,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csApp::csAppPlugin::csAppPlugin (csApp *iParent)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   app = iParent;
 }
@@ -71,7 +71,7 @@ bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
   if (!app->VFS) return false;
 
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-  if (q != NULL)
+  if (q != 0)
   {
     app->EventOutlet = q->GetEventOutlet();
     // We want ALL the events! :)
@@ -103,16 +103,16 @@ bool csApp::csAppPlugin::HandleEvent (iEvent &Event)
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
 csApp::csApp (iObjectRegistry *r, csSkin &Skin)
-  : csComponent (NULL)
+  : csComponent (0)
 {
   Mouse = new csMouse(this);
   hints = new csHintManager(this);
   scfiPlugin = new csAppPlugin(this);
 
   app = this;			// so that all inserted windows will inherit it
-  MouseOwner = NULL;		// no mouse owner
-  KeyboardOwner = NULL;		// no keyboard owner
-  FocusOwner = NULL;		// no focus owner
+  MouseOwner = 0;		// no mouse owner
+  KeyboardOwner = 0;		// no keyboard owner
+  FocusOwner = 0;		// no focus owner
   WindowListChanged = false;
   BackgroundStyle = csabsSolid;
   InsertMode = true;
@@ -122,7 +122,7 @@ csApp::csApp (iObjectRegistry *r, csSkin &Skin)
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  LastMouseContainer = NULL;
+  LastMouseContainer = 0;
 
   KeyboardDriver = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   MouseDriver = CS_QUERY_REGISTRY (object_reg, iMouseDriver);
@@ -161,8 +161,8 @@ csApp::~csApp ()
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
-  // Set app to NULL so that ~csComponent() won't call NotifyDelete()
-  app = NULL;
+  // Set app to 0 so that ~csComponent() won't call NotifyDelete()
+  app = 0;
 
   delete scfiPlugin;
   delete hints;
@@ -248,7 +248,7 @@ void csApp::InitializeSkin ()
           csString Keyname;
           Keyname << SectionName << tn;
 
-          const char *fn2 = config->GetStr (Keyname, NULL);
+          const char *fn2 = config->GetStr (Keyname, 0);
           if (fn2 && !strcmp (fn1, fn2))
             unload = false;
         }
@@ -257,7 +257,7 @@ void csApp::InitializeSkin ()
           csString Keyname;
           Keyname << DefaultSection << tn;
 
-          const char *fn2 = config->GetStr (Keyname, NULL);
+          const char *fn2 = config->GetStr (Keyname, 0);
           if (fn2 && !strcmp (fn1, fn2))
             unload = false;
         }
@@ -359,7 +359,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   if (!ImageLoader)
     return false;
 
-  char *filename = NULL;
+  char *filename = 0;
   float tr = -1, tg = -1, tb = -1;
 
   while (*iTexParams)
@@ -727,14 +727,14 @@ void csApp::Delete (csComponent *comp)
 void csApp::NotifyDelete (csComponent *comp)
 {
   if (MouseOwner == comp)
-    CaptureMouse (NULL);
+    CaptureMouse (0);
   if (KeyboardOwner == comp)
-    CaptureKeyboard (NULL);
+    CaptureKeyboard (0);
   if (FocusOwner == comp)
-    CaptureFocus (NULL);
+    CaptureFocus (0);
 
    if (LastMouseContainer == comp)
-     LastMouseContainer = NULL;
+     LastMouseContainer = 0;
 
   hints->Remove (comp);
 }
@@ -776,14 +776,14 @@ void csApp::StopModal (int iCode)
 
 csComponent* csApp::GetTopModalComponent ()
 {
-  if (ModalInfo.Length () == 0) return NULL;
+  if (ModalInfo.Length () == 0) return 0;
   csModalInfo* mi = (csModalInfo*)ModalInfo[ModalInfo.Length ()-1];
   return mi->component;
 }
 
 iBase* csApp::GetTopModalUserdata ()
 {
-  if (ModalInfo.Length () == 0) return NULL;
+  if (ModalInfo.Length () == 0) return 0;
   csModalInfo* mi = (csModalInfo*)ModalInfo[ModalInfo.Length ()-1];
   return mi->userdata;
 }

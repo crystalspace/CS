@@ -40,7 +40,7 @@ public:
 
     void Close(void);
 
-    int IsValid(void) { return (f!=NULL); };
+    int IsValid(void) { return (f!=0); };
 
     long Length(void)
     {

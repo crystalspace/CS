@@ -57,22 +57,22 @@ Maya4Model::~Maya4Model()
 
 void Maya4Model::Clear()
 {
-    animnode = NULL;
-    meshnode = NULL;
-    filenode = NULL;
+    animnode = 0;
+    meshnode = 0;
+    filenode = 0;
 }
 
 bool Maya4Model::ReadMAFile(const char* mdlfile)
 {
     clearError();
 
-    if (mdlfile == NULL || strlen(mdlfile) == 0)
-        return setError("MA filename is NULL");
+    if (mdlfile == 0 || strlen(mdlfile) == 0)
+        return setError("MA filename is 0");
 
     MayaInputFile file(mdlfile);
 
     if (!file.IsValid())
-        return setError("MA filename is NULL");
+        return setError("MA filename is 0");
 
     while (!file.EndOfFile())
     {
@@ -101,7 +101,7 @@ bool Maya4Model::ReadMAFile(const char* mdlfile)
 
 bool Maya4Model::CreateNode(MayaInputFile& file,DAGNode& tree)
 {
-    DAGNode *newnode=NULL;
+    DAGNode *newnode=0;
     static int countanims = 0;
     static int vertices = 0;
 
@@ -135,7 +135,7 @@ bool Maya4Model::CreateNode(MayaInputFile& file,DAGNode& tree)
     if (!newnode->Load(file))
         return false;
 
-    static DAGNode *where=NULL;             // Use last specified parent if none specified
+    static DAGNode *where=0;             // Use last specified parent if none specified
 
     if (newnode == animnode && countanims>1)
         return true;        // don't add more than once
@@ -178,9 +178,9 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
   FILE *f;
   Maya4Model spr;
 
-  if (spritename == NULL || strlen(spritename) == 0)
+  if (spritename == 0 || strlen(spritename) == 0)
   {
-    fprintf(stderr, "Unable to save: NULL sprite name\n");
+    fprintf(stderr, "Unable to save: 0 sprite name\n");
     return false;
   }
 

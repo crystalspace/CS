@@ -21,7 +21,7 @@
 csSubRectangles::csSubRectangles (const csRect &region)
 {
   csSubRectangles::region = region;
-  first = NULL;
+  first = 0;
   Clear ();
 }
 
@@ -41,15 +41,15 @@ void csSubRectangles::Clear ()
   }
 
   first = new csSubRect (region);
-  first->prev = NULL;
-  first->next = NULL;
+  first->prev = 0;
+  first->next = 0;
 }
 
 bool csSubRectangles::Alloc (int w, int h, csRect &rect)
 {
   // @@@ This is not a good algo. Needs to be improved!
-  csSubRect *near_fit = NULL;
-  csSubRect *fit = NULL;
+  csSubRect *near_fit = 0;
+  csSubRect *fit = 0;
   csSubRect *s = first;
   while (s)
   {
@@ -114,7 +114,7 @@ bool csSubRectangles::Alloc (int w, int h, csRect &rect)
         fit->xmax,
         fit->ymin + h);
     s2->next = first;
-    s2->prev = NULL;
+    s2->prev = 0;
     if (first) first->prev = s2;
     first = s2;
     fit->Set (fit->xmin, fit->ymin + h, fit->xmax, fit->ymax);

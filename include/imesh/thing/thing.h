@@ -87,7 +87,7 @@ struct iThingFactoryState : public iBase
   /// Get a polygon from set by name.
   virtual iPolygon3DStatic *GetPolygon (const char* name) = 0;
   /// Create a new polygon and return a pointer to it.
-  virtual iPolygon3DStatic *CreatePolygon (const char *iName = NULL) = 0;
+  virtual iPolygon3DStatic *CreatePolygon (const char *iName = 0) = 0;
   /// Find the index for a polygon. Returns -1 if polygon cannot be found.
   virtual int FindPolygonIndex (iPolygon3DStatic* polygon) const = 0;
   /// Delete a polygon given an index.
@@ -137,7 +137,7 @@ struct iThingFactoryState : public iBase
    */
   virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false) = 0;
+	float* pr = 0, bool only_portals = false) = 0;
 
   /**
    * Sets the smoothing flag.
@@ -235,7 +235,7 @@ struct iThingState : public iBase
    */
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false) = 0;
+	float* pr = 0, bool only_portals = false) = 0;
 
   /**
    * Prepare the thing to be ready for use. Normally this doesn't have
@@ -256,7 +256,7 @@ struct iThingState : public iBase
   /**
    * Scan all polygons and replace the given material with a new material.
    * Note that the new material MUST have the same size as the old material!
-   * If 'newmat' == NULL then the default from the factory will be used
+   * If 'newmat' == 0 then the default from the factory will be used
    * again. Note that 'oldmat' will always be compared from the factory
    * and not from the current material the polygon has!
    */

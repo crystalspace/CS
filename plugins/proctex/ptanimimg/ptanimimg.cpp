@@ -81,21 +81,21 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
       (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
   }
 
-  csRef<iImage> img = (ctx && ctx->HasImage()) ? ctx->GetImage() : NULL;
+  csRef<iImage> img = (ctx && ctx->HasImage()) ? ctx->GetImage() : 0;
   if (!img)
   {
     if (!node)
     {
       Report (CS_REPORTER_SEVERITY_WARNING, node, 
 	"Please provide a <file> node in the <texture> or <params> block");
-      return NULL;
+      return 0;
     }
 
     csRef<iLoader> LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
     if (!LevelLoader) 
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, NULL, "No level loader");
-      return NULL;
+      Report (CS_REPORTER_SEVERITY_WARNING, 0, "No level loader");
+      return 0;
     }
 
     csRef<iDocumentNode> file = node->GetNode ("file");
@@ -103,13 +103,13 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
     {
       Report (CS_REPORTER_SEVERITY_WARNING, node, 
 	"Please provide a <file> node in the <texture> or <params> block");
-      return NULL;
+      return 0;
     }
     const char* fname;
     if (!(fname = file->GetContentsValue())) 
     {
       Report (CS_REPORTER_SEVERITY_WARNING, file, "Empty <file> node");
-      return NULL;
+      return 0;
     }
 
     img = LevelLoader->LoadImage (fname,
@@ -118,7 +118,7 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
     {
       Report (CS_REPORTER_SEVERITY_WARNING, file, 
 	"Couldn't load image '%s'", fname);
-      return NULL;
+      return 0;
     }
   }
 
@@ -130,7 +130,7 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 

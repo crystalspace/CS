@@ -163,7 +163,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
         {
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return 0;
 	  iHazeHullBox *ebox = hullcreate->CreateBox (box.Min (), box.Max ());
 	  result = SCF_QUERY_INTERFACE (ebox, iHazeHull);
 	  CS_ASSERT (result);
@@ -174,7 +174,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
         {
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return 0;
 	  number = child->GetAttributeValueAsInt ("number");
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
@@ -190,7 +190,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 	break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
   result->IncRef ();	// Prevent smart pointer release.
@@ -237,7 +237,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
 		child, "Could not find material '%s'!", matname);
-            return NULL;
+            return 0;
 	  }
 	  hazefactorystate->SetMaterialWrapper (mat);
 	}
@@ -246,18 +246,18 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return 0;
           hazefactorystate->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
 	if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return 0;
         hazefactorystate->SetOrigin (a);
 	break;
       case XMLTOKEN_DIRECTIONAL:
 	if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return 0;
         hazefactorystate->SetDirectional (a);
 	break;
       case XMLTOKEN_LAYER:
@@ -270,7 +270,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 
@@ -389,7 +389,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badfactory",
 		child, "Could not find factory '%s'!", factname);
-	    return NULL;
+	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
@@ -406,7 +406,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
 		child, "Could not find material '%s'!", matname);
-	    return NULL;
+	    return 0;
 	  }
 	  hazestate->SetMaterialWrapper (mat);
 	}
@@ -415,18 +415,18 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return 0;
           hazestate->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
         if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return 0;
         hazestate->SetOrigin (a);
 	break;
       case XMLTOKEN_DIRECTIONAL:
         if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return 0;
         hazestate->SetDirectional (a);
 	break;
       case XMLTOKEN_LAYER:
@@ -439,7 +439,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return 0;
     }
   }
 

@@ -55,7 +55,7 @@ public:
   csObjectModel ()
   {
     shapenr = -1;
-    polymesh_base = NULL;
+    polymesh_base = 0;
   }
 
   virtual ~csObjectModel () { }
@@ -114,7 +114,7 @@ public:
   }
   virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
   {
-    return NULL;
+    return 0;
   }
   virtual void AddListener (iObjectModelListener* listener)
   {

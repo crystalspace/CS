@@ -37,7 +37,7 @@ csSingleIndexVertexSet::csSingleIndexVertexSet (bool v, bool n, bool c, bool t)
   Delete = true;
   Count = 0;
   if (v) Vertices = new csIntArray ();
-  else Vertices = NULL;
+  else Vertices = 0;
   if (n) Normals = new csIntArray ();
   else Normals = 0;
   if (c) Colors = new csIntArray ();
@@ -405,7 +405,7 @@ static iModelDataVertices *BuildMappedVertexFrame (iModelDataVertices *Orig,
  */
 static bool CheckMaterialConflict (iModelDataObject *obj1)
 {
-  iModelDataMaterial *mat = NULL;
+  iModelDataMaterial *mat = 0;
 
   csModelDataPolygonIterator it = (obj1->QueryObject ());
   while (!it.IsFinished ())
@@ -519,7 +519,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     if (!Action) break;
 
     ActionMap1.Push (Action);
-    ActionMap2.Push (NULL);
+    ActionMap2.Push (0);
     dest->QueryObject ()->ObjRemove (Action->QueryObject ());
   }
 
@@ -532,7 +532,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     int n = ActionMap1.GetIndexByName (Action->QueryObject ()->GetName ());
     if (n == -1)
     {
-      ActionMap1.Push (NULL);
+      ActionMap1.Push (0);
       ActionMap2.Push (Action);
     }
     else
@@ -556,7 +556,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 	{
           // this should not happen
 	  CS_ASSERT ("Action conflict detection missed a conflict!!!" && false);
-	  NewAction = NULL;
+	  NewAction = 0;
 	}
 
 	NewAction = MergeAction (Action1, Action2, total);
@@ -840,7 +840,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 void csModelDataTools::Describe (iObject *obj, csString &out)
 {
   static int Indent = 0;
-  static char *Indention = NULL;
+  static char *Indention = 0;
   int i;
   if (!Indention) {
     Indention = new char [2000];
@@ -1031,7 +1031,7 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
   for (i=0; i<obj##Sets.Length (); i++)					\
   {									\
     csIntArray *Set = obj##Sets [i];					\
-    csIntArray *Removed = NULL;						\
+    csIntArray *Removed = 0;						\
     type o1 = ver->Get##obj (Set->Get (0));				\
     for (j=1; j<Set->Length (); j++)					\
     {									\

@@ -109,7 +109,7 @@ public:
 
     /**
      * Get address of video RAM at given x,y coordinates.
-     * returns NULL at the moment
+     * returns 0 at the moment
      */
     virtual unsigned char *GetPixelAt (int x, int y);
 
@@ -123,7 +123,7 @@ public:
       (void)y;
       (void)w;
       (void)h;
-      return NULL;
+      return 0;
     }
 
     virtual void RestoreArea (csImageArea *Area, bool Free = true)
@@ -149,7 +149,7 @@ public:
     virtual iFontServer *GetFontServer () { return FontServer; }
     virtual int GetWidth ()               { return Width; }
     virtual int GetHeight ()              { return Height; }
-    virtual csRGBpixel *GetPalette ()     { return NULL; }
+    virtual csRGBpixel *GetPalette ()     { return 0; }
     virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
     virtual bool PerformExtension (const char* command, ...)
@@ -162,14 +162,14 @@ public:
       (void)command;
       return false;
     };
-    virtual csPtr<iImage> ScreenShot () { return NULL; };
+    virtual csPtr<iImage> ScreenShot () { return 0; };
 
     virtual void AllowResize (bool
 
     /*iAllow*/ ) { };
     virtual bool Resize (int w, int h)        { (void)w;
       (void)h; return false; };
-    virtual iNativeWindow *GetNativeWindow () { return NULL; };
+    virtual iNativeWindow *GetNativeWindow () { return 0; };
     virtual bool GetFullScreen ()             { return false; }
     virtual void SetFullScreen (bool b)       { (void)b; };
     virtual bool SetMousePosition (int x, int y)
@@ -200,13 +200,13 @@ public:
     virtual void Clear (int color);
     virtual void ClearAll (int color);
 
-    virtual void Print (csRect *area = NULL);
+    virtual void Print (csRect *area = 0);
     virtual bool SetGamma (float) { return false; }
     virtual float GetGamma () const { return 1.0; }
     virtual csPtr<iGraphics2D> CreateOffscreenCanvas (
     	void*, int, int, int, iOffscreenCanvasCallback*)
     {
-      return NULL;
+      return 0;
     }
   };
 
@@ -282,13 +282,13 @@ public:
     virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
 
     virtual csGraphics3DCaps *GetCaps ()                              { return &Caps; }
-    virtual uint32 *GetZBuffAt (int, int)                             { return NULL; }
+    virtual uint32 *GetZBuffAt (int, int)                             { return 0; }
     virtual void DumpCache ()                                         { }
     virtual void ClearCache ()                                        { }
     virtual void RemoveFromCache (iPolygonTexture *  /*poly_texture*/ )  { }
     bool IsLightmapOK (iPolygonTexture *)                             {return false;}
     void SetRenderTarget (iTextureHandle*, bool) { }
-    iTextureHandle* GetRenderTarget () const { return NULL; }
+    iTextureHandle* GetRenderTarget () const { return 0; }
 
     virtual int GetWidth ()                                           { return width; }
     virtual int GetHeight ()                                          { return height; }
@@ -311,7 +311,7 @@ public:
     /*o2c*/ ) { }
     virtual const csReversibleTransform &GetObjectToCamera ()       { return o2c; }
     virtual void SetClipper (iClipper2D *, int)                     { }
-    virtual iClipper2D *GetClipper ()                               { return NULL; }
+    virtual iClipper2D *GetClipper ()                               { return 0; }
     virtual int GetClipType ()                                      { return CS_CLIPPER_NONE; }
     virtual void SetNearPlane (const csPlane3 &)                    { }
     virtual void ResetNearPlane ()                                  { }
@@ -325,11 +325,11 @@ public:
     /*mesh*/ )         { }
     virtual iGraphics2D *GetDriver2D ()                             { return G2D; }
     virtual iTextureManager *GetTextureManager ()                   { return texman; }
-    virtual iVertexBufferManager *GetVertexBufferManager ()         { return NULL; }
+    virtual iVertexBufferManager *GetVertexBufferManager ()         { return 0; }
     virtual float GetZBuffValue (int, int)                          { return 0; }
     virtual iHalo *CreateHalo (float, float, float, unsigned char *, int, int)
     {
-      return NULL;
+      return 0;
     }
 
     virtual void DrawPixmap (
@@ -377,8 +377,8 @@ public:
   iGraphics2D *G2D () { return vG2D; }
   iGraphics3D *G3D () { return vG3D; }
   virtual void Show (
-                csRect *area = NULL,
-                iGraphics3D *g3d = NULL,
+                csRect *area = 0,
+                iGraphics3D *g3d = 0,
                 uint8 Alpha = 0);
 
   /// Returns the index to which the vertical and horizontal indices specify.

@@ -27,7 +27,7 @@ static iAwsSink *chart_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,())
 
-static awsSlot *chart_slot = NULL;
+static awsSlot *chart_slot = 0;
 
 static void DriveTimer (void *, iAwsSource *source)
 {
@@ -39,10 +39,10 @@ static void DriveTimer (void *, iAwsSource *source)
 awsBarChart::awsBarChart () :
 inner_frame_style(fsNone),
   chart_options(0),
-  caption(NULL),
-  yText(NULL),
-  xText(NULL),
-  items(NULL),
+  caption(0),
+  yText(0),
+  xText(0),
+  items(0),
   count_items(0),
   items_buffer_size(0),
   max_items(0),
@@ -99,7 +99,7 @@ bool awsBarChart::Setup (iAws *_wmgr, iAwsComponentNode *settings)
     // Setup blink event handling
     if (chart_sink == 0)
     {
-      chart_sink = WindowManager ()->GetSinkMgr ()->CreateSink (NULL);
+      chart_sink = WindowManager ()->GetSinkMgr ()->CreateSink (0);
       chart_sink->RegisterTrigger ("Tick", &DriveTimer);
     }
 
@@ -129,7 +129,7 @@ bool awsBarChart::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -159,7 +159,7 @@ bool awsBarChart::SetProperty (const char *name, void *parm)
     else
     {
       if (caption) caption->DecRef ();
-      caption = NULL;
+      caption = 0;
     }
 
     return true;

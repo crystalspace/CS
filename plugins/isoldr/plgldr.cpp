@@ -36,7 +36,7 @@ struct csLoaderPluginRec
 	const char *iClassID, iLoaderPlugin *iPlugin)
   {
     if (iShortName) ShortName = csStrNew (iShortName);
-    else ShortName = NULL;
+    else ShortName = 0;
     ClassID = csStrNew (iClassID);
     Plugin = iPlugin;
   }
@@ -51,7 +51,7 @@ struct csLoaderPluginRec
 csIsoLoader::csLoadedPluginVector::csLoadedPluginVector (
 	int iLimit, int iThresh) : csVector (iLimit, iThresh)
 {
-  plugin_mgr = NULL;
+  plugin_mgr = 0;
 }
 
 csIsoLoader::csLoadedPluginVector::~csLoadedPluginVector ()
@@ -87,7 +87,7 @@ csLoaderPluginRec* csIsoLoader::csLoadedPluginVector::FindPluginRec (
     if (!strcmp (name, pl->ClassID))
       return pl;
   }
-  return NULL;
+  return 0;
 }
 
 iLoaderPlugin* csIsoLoader::csLoadedPluginVector::GetPluginFromRec (
@@ -109,12 +109,12 @@ iLoaderPlugin* csIsoLoader::csLoadedPluginVector::FindPlugin (
     return GetPluginFromRec(pl);
 
   // create a new loading record
-  NewPlugin (NULL, Name);
+  NewPlugin (0, Name);
   return GetPluginFromRec((csLoaderPluginRec*)Get(Length()-1));
 }
 
 void csIsoLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, const char *ClassID)
 {
-  Push (new csLoaderPluginRec (ShortName, ClassID, NULL));
+  Push (new csLoaderPluginRec (ShortName, ClassID, 0));
 }

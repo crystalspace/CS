@@ -24,9 +24,9 @@ awsCmdButton::awsCmdButton () :
   was_down(false),
   icon_align(0),
   stretched(false),
-  caption(NULL)
+  caption(0)
 {
-  tex[0] = tex[1] = tex[2] = NULL;
+  tex[0] = tex[1] = tex[2] = 0;
   style = fsNormal;
 }
 
@@ -48,7 +48,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   // rather than "BitmapOverlay" to setup its overlay image
   // therefore we create a BitmapOverlay key from the Image key
   // for back compatibility
-  iString *tn = NULL;
+  iString *tn = 0;
   if(!pm->GetString(settings, "BitmapOverlay", tn) &&
 	  pm->GetString (settings, "Image", tn))
   {
@@ -68,14 +68,14 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   if(style == fsNormal || style == fsToolbar)
   {
-    iString *in = NULL;
+    iString *in = 0;
     pm->GetString (settings, "Icon", in);
     if (in) tex[0] = pm->GetTexture (in->GetData (), in->GetData ());
   }
   
   else if(style == fsBitmap)
   {
-	  iString *tn1 = NULL, *tn2 = NULL, *tn3 = NULL;
+	  iString *tn1 = 0, *tn2 = 0, *tn3 = 0;
 	  
 	  int stretch;
 
@@ -101,7 +101,7 @@ bool awsCmdButton::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -136,7 +136,7 @@ bool awsCmdButton::SetProperty (const char *name, void *parm)
     else
     {
       if (caption) caption->DecRef ();
-      caption = NULL;
+      caption = 0;
     }
 
     return true;

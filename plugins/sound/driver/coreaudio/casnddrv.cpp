@@ -49,9 +49,9 @@ csSoundDriverCoreAudio::csSoundDriverCoreAudio(iBase *base)
 {
     SCF_CONSTRUCT_IBASE(base);
     SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-    reg = NULL;
-    soundRender = NULL;
-    memory = NULL;
+    reg = 0;
+    soundRender = 0;
+    memory = 0;
     memorySize = 0;
     frequency = 0;
     is16Bit = false;
@@ -90,7 +90,7 @@ bool csSoundDriverCoreAudio::Open(iSoundRender *render, int freq, bool bit16, bo
     // Set buffer size
     propertySize = sizeof(bufferSize);
     bufferSize = SAMPLES_PER_BUFFER * sizeof(float);
-    status = AudioDeviceSetProperty(audioDevice, NULL, 0, false,
+    status = AudioDeviceSetProperty(audioDevice, 0, 0, false,
                                         kAudioDevicePropertyBufferSize, propertySize, &bufferSize);
     if (status != 0)
         return false;

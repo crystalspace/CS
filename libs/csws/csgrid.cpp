@@ -34,7 +34,7 @@
 csRegionTree2D::csRegionTree2D ()
 {
   region.MakeEmpty ();
-  data = NULL;
+  data = 0;
   memset (children, 0, 5 * sizeof (csRegionTree2D *));
 }
 
@@ -201,7 +201,7 @@ bool csSparseGrid::csGridRow::FreeItem (void* Item)
  * csGridCell
  ******************************************************************************/
 
-csGridCell::csGridCell () : csComponent (NULL), inUse (false)
+csGridCell::csGridCell () : csComponent (0), inUse (false)
 {
   state |= CSS_SELECTABLE;
   valuePattern = "%s";
@@ -319,12 +319,12 @@ csGridView::csGridView (csGrid *pParent, const csRect& region, int iStyle)
   if (Style & CSGVS_HSCROLL)
     hscroll = new csScrollBar (this, cssfsThinRect);
   else
-    hscroll = NULL;
+    hscroll = 0;
 
   if (Style & CSGVS_VSCROLL)
     vscroll = new csScrollBar (this, cssfsThinRect);
   else
-    vscroll = NULL;
+    vscroll = 0;
   SetPalette (CSPAL_GRIDVIEW);
   col = area.xmin;
   row = area.ymin;
@@ -340,12 +340,12 @@ csGridView::csGridView (const csGridView& view, int iStyle)
   if (Style & CSGVS_HSCROLL)
     hscroll = new csScrollBar (this, cssfsThinRect);
   else
-    hscroll = NULL;
+    hscroll = 0;
 
   if (Style & CSGVS_VSCROLL)
     vscroll = new csScrollBar (this, cssfsThinRect);
   else
-    vscroll = NULL;
+    vscroll = 0;
   SetPalette (view.palette, view.palettesize);
   row = view.row;
   col = view.col;
@@ -473,7 +473,7 @@ void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
   csRect rc;
   csRegionTree2D *r;
   csVector vRegions;
-  csGridCell *cell = NULL;
+  csGridCell *cell = 0;
 
   theCol = area.xmin -1;
   theRow = area.ymin -1;
@@ -533,7 +533,7 @@ void csGridView::Draw ()
   csRect rc;
   csRegionTree2D *r;
   csVector vRegions;
-  csGridCell *cell = NULL;
+  csGridCell *cell = 0;
   int cs = pGrid->GetCursorStyle ();
   int cr, cc;
   bool sel;
@@ -566,7 +566,7 @@ void csGridView::Draw ()
 	  (cs == CSGCS_COLUMN && c == cc);
 	cell->SetState (CSS_GRIDCELL_SELECTED, sel);
         cell->Draw ();
-        cell->ForEach (DrawCellComponents, NULL, true);
+        cell->ForEach (DrawCellComponents, 0, true);
         x += cell->bound.Width ();
       }
       Delete (cell);
@@ -675,7 +675,7 @@ csGridView *csGridView::CreateCopy (int iStyle)
 
 csGridView *csGridView::SplitX (int x, int iStyle)
 {
-  csGridView *sp = NULL;
+  csGridView *sp = 0;
   if (x > MIN_GRIDVIEW_SIZE && x < bound.Width () - MIN_GRIDVIEW_SIZE)
   {
     sp = CreateCopy (iStyle);
@@ -693,7 +693,7 @@ csGridView *csGridView::SplitX (int x, int iStyle)
 
 csGridView *csGridView::SplitY (int y, int iStyle)
 {
-  csGridView *sp = NULL;
+  csGridView *sp = 0;
   if (y > MIN_GRIDVIEW_SIZE && y < bound.Height () - MIN_GRIDVIEW_SIZE)
   {
     sp = CreateCopy (iStyle);
@@ -742,7 +742,7 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
   regions = new csRegionTree2D (rc, vRegionStyles.Get (0) );
   // rc below is a dummy and will be recalculated when SetRect is called
   viewlayout = new csRegionTree2D (rc, vViews.Get (0) );
-  splitterX = splitterY = NULL;
+  splitterX = splitterY = 0;
   if (iStyle & CSGS_HSPLIT)
     splitterX = new csSplitter (this);
   if (iStyle & CSGS_VSPLIT)
@@ -867,7 +867,7 @@ bool csGrid::HandleEvent (iEvent &Event)
 static bool ResizeViews (void* node, void* /*databag*/)
 {
   csRegionTree2D *t = (csRegionTree2D*)node;
-  if (t->children[0] == NULL)
+  if (t->children[0] == 0)
   {
     // leaf - we find the new size in the region variable
     ((csGridView*)t->data)->SetRect (t->region.xmin, t->region.ymin,
@@ -905,7 +905,7 @@ static bool ResizeViews (void* node, void* /*databag*/)
  */
 void csGrid::CalcMinimalSize (csRegionTree2D *node, int &w, int &h)
 {
-  if (node->children [0] == NULL)
+  if (node->children [0] == 0)
   {
     // leaf
     ((csGridView*)node->data)->SuggestSize (w, h);
@@ -981,7 +981,7 @@ void csGrid::SetStringAt (int row, int col, const char *data)
     else if (!data)
     {
       delete str;
-      grid->SetAt (row, col, NULL);
+      grid->SetAt (row, col, 0);
     }
     else
       str->Truncate (0).Append (data);

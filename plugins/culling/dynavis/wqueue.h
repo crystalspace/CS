@@ -71,7 +71,7 @@ public:
    * occlusion for the given box and depth (box must intersect
    * with object in queue and depth > depth of object in queue).
    * If such an object is found it is also removed from the queue.
-   * Returns the object if something was found or NULL otherwise.
+   * Returns the object if something was found or 0 otherwise.
    * When an object is found 'out_depth' will be set to the
    * depth of that object.
    */
@@ -93,7 +93,7 @@ public:
     }
     virtual csPtr<iString> StateTest ()
     {
-      return NULL;
+      return 0;
     }
     virtual csTicks Benchmark (int)
     {
@@ -101,7 +101,7 @@ public:
     }
     virtual csPtr<iString> Dump ()
     {
-      return NULL;
+      return 0;
     }
     virtual void Dump (iGraphics3D*)
     {

@@ -120,7 +120,7 @@ void CCSWorld::GenerateDefaultsector()
   };
 
   //Create the Brush for that sector;
-  CMapBrush* pBrush = new CMapBrush(NULL);
+  CMapBrush* pBrush = new CMapBrush(0);
 
   int i;
   for (i=0; i<6; i++)
@@ -237,7 +237,7 @@ CMapEntity* CCSWorld::GetWorldspawn()
     }
   }
 
-  return NULL;
+  return 0;
 }
 
 bool CCSWorld::NeedSkysector()
@@ -372,12 +372,12 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
   };
   
   static ThingSide ThingSides[] = {
-    {"f", { "4", "5", "1", "0"} , NULL},
-    {"r", { "5", "7", "3", "1"}, NULL},
-    {"b", { "7", "6", "2", "3"}, NULL},
-    {"l", { "6", "4", "0", "2"}, NULL},
-    {"u", { "6", "7", "5", "4"}, NULL},
-    {"d", { "3", "2", "0", "1"}, NULL}
+    {"f", { "4", "5", "1", "0"} , 0},
+    {"r", { "5", "7", "3", "1"}, 0},
+    {"b", { "7", "6", "2", "3"}, 0},
+    {"l", { "6", "4", "0", "2"}, 0},
+    {"u", { "6", "7", "5", "4"}, 0},
+    {"d", { "3", "2", "0", "1"}, 0}
   };
 
   int smallest_size = 0x7fffffff;

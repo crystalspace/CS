@@ -153,7 +153,7 @@ struct iMeshWrapper : public iBase
   /**
    * Get the optional lighting information that is implemented
    * by this mesh object. If the mesh object doesn't implement it
-   * then this will return NULL. This is similar (but more efficient)
+   * then this will return 0. This is similar (but more efficient)
    * to calling SCF_QUERY_INTERFACE on the mesh object for iLightingInfo.
    */
   virtual iLightingInfo* GetLightingInfo () const = 0;
@@ -161,7 +161,7 @@ struct iMeshWrapper : public iBase
   /**
    * Get the optional shadow receiver that is implemented
    * by this mesh object. If the mesh object doesn't implement it
-   * then this will return NULL. This is similar (but more efficient)
+   * then this will return 0. This is similar (but more efficient)
    * to calling SCF_QUERY_INTERFACE on the mesh object for iShadowReceiver.
    */
   virtual iShadowReceiver* GetShadowReceiver () const = 0;
@@ -382,8 +382,8 @@ struct iMeshWrapper : public iBase
    */
   virtual iMeshList* GetChildren () = 0;
   /**
-   * Get the parent of this mesh. Returns NULL if the mesh has no parent (i.e.
-   * it is contained in the engine directly). If not NULL then this mesh
+   * Get the parent of this mesh. Returns 0 if the mesh has no parent (i.e.
+   * it is contained in the engine directly). If not 0 then this mesh
    * is part of a hierarchical mesh.
    */
   virtual iMeshWrapper* GetParentContainer () = 0;
@@ -471,7 +471,7 @@ struct iMeshFactoryWrapper : public iBase
   virtual iMeshWrapper* CreateMeshWrapper () = 0;
 
   /**
-   * Get the parent of this factory. This will be NULL if this factory
+   * Get the parent of this factory. This will be 0 if this factory
    * has no parent.
    */
   virtual iMeshFactoryWrapper* GetParentContainer () const = 0;

@@ -46,7 +46,7 @@ public:
 
 public:
   ltPlane () : orig (0), first (0), second (0), firstlen (1), secondlen (1),
-  	name (NULL) { }
+  	name (0) { }
   ~ltPlane () { delete[] name; }
 };
 

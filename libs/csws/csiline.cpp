@@ -36,7 +36,7 @@ csInputLine::csInputLine (csComponent *iParent, int iMaxLen,
   selstart = selend = 0;
   textx = 0;
   text = new char [iMaxLen + 1];
-  SetText (NULL);
+  SetText (0);
   FrameStyle = iFrameStyle;
   SetPalette (CSPAL_INPUTLINE);
   timer = new csTimer (this, CURSOR_FLASHING_INTERVAL);
@@ -230,7 +230,7 @@ bool csInputLine::HandleEvent (iEvent &Event)
       return true;
     case csevMouseUp:
       if (Event.Mouse.Button == 1)
-        app->CaptureMouse (NULL);
+        app->CaptureMouse (0);
       return true;
     case csevMouseDoubleClick:
       if (Event.Mouse.Button == 1)

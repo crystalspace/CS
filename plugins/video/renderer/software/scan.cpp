@@ -197,10 +197,10 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
     if (tclt)
       Scan.bitmap2 = tclt->get_bitmap ();
     else
-      Scan.bitmap2 = NULL;	// Not a lighted texture.
+      Scan.bitmap2 = 0;	// Not a lighted texture.
   }
   else
-    Scan.bitmap2 = NULL;
+    Scan.bitmap2 = 0;
   const csLightMapMapping& mapping = tex->GetMapping ();
   Scan.tw2 = mapping.GetWidth () >> MipMap;
   Scan.th2 = mapping.GetHeight () >> MipMap;

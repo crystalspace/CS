@@ -106,7 +106,7 @@ struct iBCTerrFactoryState : public iBase
   virtual void SetLODDistance (int lod_level, float distance) = 0;
   /// newheight = startheight + HeightFromHeightMap * multiplier.
   virtual void SetMultiplier (float m ) = 0;
-  /// Will return NULL if unavailable CPU time or no free shared meshes.
+  /// Will return 0 if unavailable CPU time or no free shared meshes.
   virtual csSharedLODMesh* GetSharedMesh (int level, csBCTerrBlock *owner) = 0;
   virtual void FreeShared (csBCTerrBlock *owner, int level ) = 0;
   /// AddTime -> used to free lod in time increments / also cpu limiter.

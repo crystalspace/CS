@@ -182,7 +182,7 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
             synldr->ReportError (
                 "crystalspace.lightningloader.parse.badmaterial",
                 child, "Could not find material '%s'!", matname);
-            return NULL;
+            return 0;
           }
           LightningFactoryState->SetMaterialWrapper (mat);
         }
@@ -192,20 +192,20 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
         {
           uint mode;
           if (!synldr->ParseMixmode (child, mode))
-            return NULL;
+            return 0;
           LightningFactoryState->SetMixMode (mode);
         }
         break;
 
       case XMLTOKEN_ORIGIN:
         if (!synldr->ParseVector (child, a))
-          return NULL;
+          return 0;
         LightningFactoryState->SetOrigin (a);
         break;
 
       case XMLTOKEN_DIRECTIONAL:
         if (!synldr->ParseVector (child, a))
-          return NULL;
+          return 0;
         LightningFactoryState->SetDirectional (a);
         break;
 
@@ -246,7 +246,7 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
 
       default:
         synldr->ReportBadToken (child);
-        return NULL;
+        return 0;
     }
   }
 
@@ -330,7 +330,7 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
             synldr->ReportError (
                 "crystalspace.lightningloader.parse.badfactory",
                 child, "Could not find factory '%s'!", factname);
-            return NULL;
+            return 0;
           }
           mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           Lightningstate = SCF_QUERY_INTERFACE (mesh, iLightningState);
@@ -341,7 +341,7 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
 
       default:
         synldr->ReportBadToken (child);
-        return NULL;
+        return 0;
     }
   }
 

@@ -27,7 +27,7 @@ SCF_IMPLEMENT_IBASE_END
 csIsoWorld::csIsoWorld (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  gridlist = NULL;
+  gridlist = 0;
 }
 
 csIsoWorld::~csIsoWorld ()
@@ -73,7 +73,7 @@ void csIsoWorld::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
 
 iIsoGrid* csIsoWorld::CreateGrid(int width, int height)
 {
-  iIsoGrid *grid = new csIsoGrid(NULL, this, width, height);
+  iIsoGrid *grid = new csIsoGrid(0, this, width, height);
   csIsoGridListNode *node = new csIsoGridListNode;
   node->next = gridlist;
   node->grid = grid;
@@ -90,7 +90,7 @@ iIsoGrid* csIsoWorld::FindGrid(const csVector3& pos)
       return p->grid;
     p = p->next;
   }
-  return NULL;
+  return 0;
 }
 
 void csIsoWorld::Draw(iIsoRenderView *rview)

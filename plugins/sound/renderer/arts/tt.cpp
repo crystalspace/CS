@@ -38,7 +38,7 @@ int kbhit(void)
     FD_SET(0,&set);    /* Set watch on stdin (file descriptor 0) */
 
     /* Find out if characters are available in stdin */
-    tmp=select(1,&set,NULL,NULL,&tv);
+    tmp=select(1,&set,0,0,&tv);
     if (-1==tmp) {
         /* An error occurred with select */
         result=-1;

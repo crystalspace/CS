@@ -55,7 +55,7 @@ public:
     virtual void Close();
 
     // Flip video page (or dump to framebuffer) - pure virtual
-    virtual void Print(csRect *area = NULL) = 0;
+    virtual void Print(csRect *area = 0) = 0;
 
     // Pure virtual function - the driver must invlude code to handle resizing
     virtual bool Resize(int w, int h) = 0;
@@ -78,7 +78,7 @@ public:
     public:
         EventHandler(OSXDriver2D *p)
         {
-            SCF_CONSTRUCT_IBASE(NULL);
+            SCF_CONSTRUCT_IBASE(0);
             parent = p;
         };
 

@@ -58,7 +58,7 @@ public:
   bool Call(const char *name, csRef<iScriptObject> &ref, const char *fmt, ...)
     { return false; }
   csPtr<iScriptObject> NewObject(const char *type, const char *fmt, ...) const
-    { return NULL; }
+    { return 0; }
   bool Store(const char *name, int data)
     { return false; }
   bool Store(const char *name, float data)

@@ -50,7 +50,7 @@ csLayoutConstraint *csGridBagConstraint::Clone ()
 /***** Implementation for class GridBagLayout ******/
 
 csGridBagLayout::csGridBagLayout (csComponent *pParent) : csLayout2 (pParent),
-  c (NULL), mpHorizCellInfos (NULL), mpVertCellInfos (NULL)
+  c (0), mpHorizCellInfos (0), mpVertCellInfos (0)
 {
   lc = &c;
 }
@@ -267,7 +267,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
     for (y = 0; y != yCnt; ++y)
     {
       CellInfo& cell = CELL_AT(x,y);
-      if (cell.comp != NULL)
+      if (cell.comp != 0)
       {
 	cell.finalPos = curPos;
 	int compSize = 0;
@@ -480,7 +480,7 @@ void csGridBagLayout::CreateMatrix ()
 
     // create cells for the area covered by the component
 
-    CellHolder* pHolder = NULL;
+    CellHolder* pHolder = 0;
 
 	int xofs, yofs, x, y;
     for (xofs = 0; xofs != width; ++xofs)
@@ -608,13 +608,13 @@ void csGridBagLayout::ClearCachedData ()
   delete [] mpHorizCellInfos;
   delete [] mpVertCellInfos;
 
-  mpHorizCellInfos = NULL;
-  mpVertCellInfos  = NULL;
+  mpHorizCellInfos = 0;
+  mpVertCellInfos  = 0;
 }
 
 bool csGridBagLayout::HasCashedInfo ()
 {
-  return mpHorizCellInfos != NULL;
+  return mpHorizCellInfos != 0;
 }
 
 void csGridBagLayout::SetComponentLocations ()
@@ -625,7 +625,7 @@ void csGridBagLayout::SetComponentLocations ()
     {
       CellInfo& hCell = mpHorizCellInfos [y * mColCount + x]; // note the trick...
       CellInfo& vCell = mpVertCellInfos  [x * mRowCount + y]; // -/-
-      if (hCell.comp != NULL)
+      if (hCell.comp != 0)
 	hCell.comp->SetRect (hCell.finalCompPos, vCell.finalCompPos,
           hCell.finalCompPos + hCell.finalCompSize,
           vCell.finalCompPos + vCell.finalCompSize);

@@ -18,7 +18,7 @@ awsLabel::awsLabel () :
   is_down(false),
   mouse_is_over(false),
   alignment(0),
-  caption(NULL)
+  caption(0)
 {
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
@@ -54,7 +54,7 @@ bool awsLabel::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -84,7 +84,7 @@ bool awsLabel::SetProperty (const char *name, void *parm)
     else
     {
       if (caption) caption->DecRef ();
-      caption = NULL;
+      caption = 0;
     }
 
     return true;

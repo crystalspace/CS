@@ -79,22 +79,22 @@ public:
    * not false is returned.
    */
   bool Collide (csColliderWrapper& pOtherCollider,
-                csReversibleTransform* pThisTransform = NULL,
-                csReversibleTransform* pOtherTransform = NULL);
+                csReversibleTransform* pThisTransform = 0,
+                csReversibleTransform* pOtherTransform = 0);
   /**
    * Similar to Collide for csColliderWrapper. Calls GetColliderWrapper for
    * otherCollider.
    */
   bool Collide (csObject& otherObject,
-                csReversibleTransform* pThisTransform = NULL,
-                csReversibleTransform* pOtherTransform = NULL);
+                csReversibleTransform* pThisTransform = 0,
+                csReversibleTransform* pOtherTransform = 0);
   /**
    * Similar to Collide for csColliderWrapper. Calls GetColliderWrapper for
    * otherCollider.
    */
   bool Collide (iObject* otherObject,
-                csReversibleTransform* pThisTransform = NULL,
-                csReversibleTransform* pOtherTransform = NULL);
+                csReversibleTransform* pThisTransform = 0,
+                csReversibleTransform* pOtherTransform = 0);
 
   /**
    * If object has a child of type csColliderWrapper it is returned.
@@ -137,7 +137,7 @@ public:
    * the objects from that region will be initialized.
    */
   static void InitializeCollisionWrappers (iCollideSystem* colsys,
-  	iEngine* engine, iRegion* region = NULL);
+  	iEngine* engine, iRegion* region = 0);
 };
 
 #endif // __CS_COLLIDER_H__

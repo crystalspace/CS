@@ -65,14 +65,14 @@ csPtr<iImage> csDDSImageIO::Load (uint8* buffer, uint32 size, int format)
   if (!loader->IsDDS())                       
   {
     delete loader;
-    return NULL;
+    return 0;
   }
 
   csDDSImageFile* image = new csDDSImageFile(format);
   if (!image->Load (loader))
   {
     delete loader;
-    return NULL;
+    return 0;
   }
 
   delete loader;
@@ -82,13 +82,13 @@ csPtr<iImage> csDDSImageIO::Load (uint8* buffer, uint32 size, int format)
 csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image,
     iImageIO::FileFormatDescription* format, const char* options)
 {
-  return NULL;
+  return 0;
 }
 
 csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image, const char* mime,
 				       const char* options)
 {
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------

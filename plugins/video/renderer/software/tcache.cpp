@@ -60,7 +60,7 @@ static void compute_hash_table ()
 
 csTextureCacheSoftware::csTextureCacheSoftware (csTextureManagerSoftware *TexMan)
 {
-  head = tail = NULL;
+  head = tail = 0;
   texman = TexMan;
   frameno = 0;
   Clear ();
@@ -97,7 +97,7 @@ void csTextureCacheSoftware::Clear ()
     head = n;
   }
 
-  head = tail = NULL;
+  head = tail = 0;
   total_size = 0;
   total_textures = 0;
 }
@@ -165,7 +165,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
   	!= txt->GetUpdateNumber ())
   {
     uncache_texture (MipMap, pt);
-    cached_texture = NULL;
+    cached_texture = 0;
   }
 
   if (cached_texture)
@@ -183,7 +183,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
       else
         tail = cached_texture->prev;
 
-      cached_texture->prev = NULL;
+      cached_texture->prev = 0;
       cached_texture->next = head;
       if (head)
         head->prev = cached_texture;
@@ -275,7 +275,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
 
     // Add new texture to cache.
     cached_texture->next = head;
-    cached_texture->prev = NULL;
+    cached_texture->prev = 0;
     if (head)
       head->prev = cached_texture;
     else

@@ -80,7 +80,7 @@ void csBorderLayout::SuggestSize (int &w, int &h)
   if (WEST->comp) WEST->comp->SuggestSize (ww, wh);
 
   w = GetWidthSum (ww, cw, ew, mHgap,
-    WEST->comp != NULL,CENTER->comp != NULL, EAST->comp != NULL);
+    WEST->comp != 0,CENTER->comp != 0, EAST->comp != 0);
 
   h = nh + ch + sh;
 }
@@ -106,9 +106,9 @@ void csBorderLayout::LayoutContainer ()
   parentHeight -= insets.ymin + insets.ymax;
 
   DistributeSizes (ww, cw, ew, parentWidth, mHgap,
-    WEST->comp != NULL, CENTER->comp != NULL, EAST->comp != NULL);
+    WEST->comp != 0, CENTER->comp != 0, EAST->comp != 0);
   DistributeSizes (nh, ch, sh, parentHeight, mVgap,
-    NORTH->comp != NULL, CENTER->comp != NULL, SOUTH->comp != NULL);
+    NORTH->comp != 0, CENTER->comp != 0, SOUTH->comp != 0);
 
   eh = wh = ch;
   nw = sw = parentWidth;
@@ -169,11 +169,11 @@ void csBorderLayout::RemoveLayoutComponent (csComponent* comp)
     csBorderConstraint *c = (csBorderConstraint*)vConstraints.Get (idx);
     switch (c->mAlign)
     {
-      case _CENTER : CENTER->comp = NULL; break;
-      case _EAST   : EAST->comp   = NULL; break;
-      case _NORTH  : NORTH->comp  = NULL; break;
-      case _SOUTH  : SOUTH->comp  = NULL; break;
-      case _WEST   : WEST->comp   = NULL; break;
+      case _CENTER : CENTER->comp = 0; break;
+      case _EAST   : EAST->comp   = 0; break;
+      case _NORTH  : NORTH->comp  = 0; break;
+      case _SOUTH  : SOUTH->comp  = 0; break;
+      case _WEST   : WEST->comp   = 0; break;
       default: break;
     }
   }

@@ -31,7 +31,7 @@
 bool GetObjectNameSetting (const char* name, char setting);
 
 LevelWriter::LevelWriter ()
-    : p3dsFile(NULL), newpointmap(NULL), vectors(NULL), planes(NULL)
+    : p3dsFile(0), newpointmap(0), vectors(0), planes(0)
 {
   flags = 0;
   xml = csPtr<csTinyDocumentSystem> (new csTinyDocumentSystem);
@@ -71,7 +71,7 @@ void LevelWriter::SetFlags (int newflags)
 csPtr<iDocument> LevelWriter::WriteDocument ()
 {
   if (!p3dsFile)
-    return NULL;
+    return 0;
 
   csRef<iDocument> document = xml->CreateDocument();
   csRef<iDocumentNode> rootnode = document->CreateRoot ();
@@ -150,7 +150,7 @@ void LevelWriter::WriteTexturesMaterials (iDocumentNode* worldnode)
   Lib3dsMaterial *pMaterial = p3dsFile->materials;
 
   // iterate through materials
-  for (; pMaterial != NULL; pMaterial = pMaterial->next )
+  for (; pMaterial != 0; pMaterial = pMaterial->next )
   {
     csRef<iDocumentNode> texturenode =
       texturesnode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -297,7 +297,7 @@ void LevelWriter::WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh)
     for (unsigned int vn = 0; vn < mesh->points; vn++)
     {
       float *xyz = mesh->pointL[vn].pos;
-      Lib3dsTexel* texel = NULL;
+      Lib3dsTexel* texel = 0;
       if (mesh->texelL) texel = &mesh->texelL[vn];
       float u = 0, v = 0;
 

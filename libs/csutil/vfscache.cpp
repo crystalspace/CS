@@ -36,12 +36,12 @@ SCF_IMPLEMENT_IBASE_END
 csVfsCacheManager::csVfsCacheManager (iObjectRegistry* object_reg,
 	const char* vfsdir)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csVfsCacheManager::object_reg = object_reg;
   csVfsCacheManager::vfsdir = csStrNew (vfsdir);
   vfs = 0;
-  current_type = NULL;
-  current_scope = NULL;
+  current_type = 0;
+  current_scope = 0;
 }
 
 csVfsCacheManager::~csVfsCacheManager ()
@@ -63,7 +63,7 @@ void csVfsCacheManager::CacheName (char* buf, const char* type,
 {
   if (id == (uint32)~0)
   {
-    if (scope == NULL)
+    if (scope == 0)
       sprintf (buf, "%s", type);
     else
       sprintf (buf, "%s/%s", type, scope);
@@ -78,7 +78,7 @@ void csVfsCacheManager::SetCurrentType (const char* type)
   if (type)
     current_type = csStrNew (type);
   else
-    current_type = NULL;
+    current_type = 0;
 }
 
 void csVfsCacheManager::SetCurrentScope (const char* scope)
@@ -87,7 +87,7 @@ void csVfsCacheManager::SetCurrentScope (const char* scope)
   if (scope)
     current_scope = csStrNew (scope);
   else
-    current_scope = NULL;
+    current_scope = 0;
 }
 
 bool csVfsCacheManager::CacheData (void* data, uint32 size,

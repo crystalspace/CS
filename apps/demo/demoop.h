@@ -43,7 +43,7 @@ protected:
   virtual ~StandardOp () { }
 
 public:
-  StandardOp () { SCF_CONSTRUCT_IBASE (NULL); }
+  StandardOp () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
 };
 

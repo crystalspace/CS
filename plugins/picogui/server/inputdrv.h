@@ -60,7 +60,7 @@ class csPGInputDriver
 struct csPGInputHandler : public iEventHandler
 {
   SCF_DECLARE_IBASE;
-  csPGInputHandler () { SCF_CONSTRUCT_IBASE (NULL); }
+  csPGInputHandler () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~csPGInputHandler () {}
   bool HandleEvent (iEvent &ev);
 };

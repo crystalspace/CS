@@ -94,7 +94,7 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   /// defaults
   has_light = false;
-  light_sector = NULL;
+  light_sector = 0;
   scale_particles = false;
   push.Set (0, 0, 0);
   center.Set (0, 0, 0);
@@ -153,10 +153,10 @@ void csExploMeshObject::RemoveLight ()
   if (!has_light) return;
   has_light = false;
   light_engine->RemoveDynLight (explight);
-  explight = NULL;
-  ilight = NULL;
-  light_sector = NULL;
-  light_engine = NULL;
+  explight = 0;
+  ilight = 0;
+  light_sector = 0;
+  light_engine = 0;
 }
 
 void csExploMeshObject::HardTransform (const csReversibleTransform& t)
@@ -176,7 +176,7 @@ csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *p,
 	iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
-  logparent = NULL;
+  logparent = 0;
   object_reg = s;
 }
 

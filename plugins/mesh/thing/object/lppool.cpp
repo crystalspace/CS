@@ -24,12 +24,12 @@
 
 csLightPatch::csLightPatch ()
 {
-  next = prev = NULL;
+  next = prev = 0;
   num_vertices = 0;
   max_vertices = 0;
-  vertices = NULL;
-  polygon = NULL;
-  light = NULL;
+  vertices = 0;
+  polygon = 0;
+  light = 0;
 }
 
 csLightPatch::~csLightPatch ()
@@ -42,7 +42,7 @@ void csLightPatch::RemovePatch ()
 {
   if (polygon) polygon->UnlinkLightpatch (this);
   shadows->DeleteShadows ();
-  light_frustum = NULL;
+  light_frustum = 0;
 }
 
 void csLightPatch::Initialize (int n)

@@ -57,7 +57,7 @@ csRadElement::csRadElement ()
   last_shoot_priority = 0.0f;
   num_repeats = 0;
   deltamap = new csRGBFloatLightMap ();
-  copy_lightmap = NULL;
+  copy_lightmap = 0;
 }
 
 csRadElement::~csRadElement ()
@@ -303,7 +303,7 @@ csRGBMap *csRadElement::ComputeTextureLumelSized ()
   // get texture of element
   iMaterialWrapper *mathandle = GetMaterialWrapper ();
 
-  if (mathandle == NULL)                      // no material: flatcol is enough.
+  if (mathandle == 0)                      // no material: flatcol is enough.
     return map;
 
   int transr = 0, transg = 0, transb = 0;     // transparent color
@@ -432,7 +432,7 @@ void csRadElement::RestoreStaticMap ()
   lightmap->Copy (copy_lightmap);
 
   delete copy_lightmap;
-  copy_lightmap = NULL;
+  copy_lightmap = 0;
 }
 
 //--------------- csRadPoly --------------------------------------
@@ -613,8 +613,8 @@ void csRadTree::Insert (csRadElement *e)
 {
   // find spot
   csRadTree *spot = this;
-  csRadTree *parent = NULL;
-  while (spot != NULL)
+  csRadTree *parent = 0;
+  while (spot != 0)
   {
     parent = spot;
     if (e->GetPriority () >= spot->GetPriority ())
@@ -635,7 +635,7 @@ void csRadTree::Insert (csRadElement *e)
 void csRadTree::DelNode ()
 {
   // deletes this node with both left & right subtrees
-  // so left != NULL && right != NULL.
+  // so left != 0 && right != 0.
   // because tree has >= elements in its right subtree, we must
   // switch this element with the smallest el. of the right subtree.
   // Since that element may be equal in priority to this one.
@@ -645,18 +645,18 @@ void csRadTree::DelNode ()
   // swap contents of replacement and this
   element = replacement->element;
 
-  // get rid of replacment. replacement.left == NULL.
-  if (parent == NULL)
+  // get rid of replacment. replacement.left == 0.
+  if (parent == 0)
   {
     // I am parent
     right = replacement->right;
-    replacement->right = NULL;
+    replacement->right = 0;
     delete replacement;
     return ;
   }
 
   parent->left = replacement->right;
-  replacement->right = NULL;
+  replacement->right = 0;
   delete replacement;
 }
 
@@ -664,9 +664,9 @@ csRadTree *csRadTree::Delete (csRadElement *e)
 {
   // find spot containing p, and its parent
   csRadTree *spot = this;
-  csRadTree *parent = NULL;
+  csRadTree *parent = 0;
 
-  while (spot != NULL && spot->element != e)
+  while (spot != 0 && spot->element != e)
   {
     parent = spot;
     if (e->GetPriority () >= spot->GetPriority ())
@@ -675,25 +675,25 @@ csRadTree *csRadTree::Delete (csRadElement *e)
       spot = spot->left;
   }
 
-  if (spot == NULL)       // no such element
+  if (spot == 0)       // no such element
     return this;
 
   // spot is the element containing p, parent is parent of spot.
-  if (parent == NULL)     // no parent, this el. contains things.
+  if (parent == 0)     // no parent, this el. contains things.
   {
     csRadTree *newroot = 0;
-    if (left == NULL)
+    if (left == 0)
     {
       newroot = right;
-      right = NULL;
+      right = 0;
       delete this;
       return newroot;
     }
 
-    if (right == NULL)
+    if (right == 0)
     {
       newroot = left;
-      left = NULL;
+      left = 0;
       delete this;
       return newroot;
     }
@@ -704,7 +704,7 @@ csRadTree *csRadTree::Delete (csRadElement *e)
   }
 
   // spot has a parent
-  if (spot->left != NULL && spot->right != NULL)
+  if (spot->left != 0 && spot->right != 0)
   {
     // spot has both subtrees
     spot->DelNode ();
@@ -712,20 +712,20 @@ csRadTree *csRadTree::Delete (csRadElement *e)
   }
 
   // one subtree is missing, substitute the remaining one for spot.
-  // remaining one may be NULL.
+  // remaining one may be 0.
   csRadTree *replacement = 0;
   float spotpri = spot->GetPriority ();
-  if (spot->left == NULL)
+  if (spot->left == 0)
   {
     replacement = spot->right;
-    spot->right = NULL;
+    spot->right = 0;
     delete spot;
   }
   else                    // else! do not do both.
-  if (spot->right == NULL)
+  if (spot->right == 0)
   {
     replacement = spot->left;
-    spot->left = NULL;
+    spot->left = 0;
     delete spot;
   }
 
@@ -744,14 +744,14 @@ csRadTree *csRadTree::PopHighest (csRadElement * &e)
   if (parent)
   {
     parent->right = spot->left;
-    spot->left = NULL;
+    spot->left = 0;
     delete spot;
     return this;
   }
   else
   { // this node is deleted, and no right subtree
     csRadTree *newroot = spot->left;
-    spot->left = NULL;
+    spot->left = 0;
     delete spot;
     return newroot;
   }
@@ -759,10 +759,10 @@ csRadTree *csRadTree::PopHighest (csRadElement * &e)
 
 csRadTree *csRadTree::FindLeftMost (csRadTree * &parent)
 {
-  parent = NULL;
+  parent = 0;
 
   csRadTree *spot = this;
-  while (spot->left != NULL)
+  while (spot->left != 0)
   {
     parent = spot;
     spot = spot->left;
@@ -773,10 +773,10 @@ csRadTree *csRadTree::FindLeftMost (csRadTree * &parent)
 
 csRadTree *csRadTree::FindRightMost (csRadTree * &parent)
 {
-  parent = NULL;
+  parent = 0;
 
   csRadTree *spot = this;
-  while (spot->right != NULL)
+  while (spot->right != 0)
   {
     parent = spot;
     spot = spot->right;
@@ -842,7 +842,7 @@ csRadElement *csRadList::PopHighest ()
 
   if (!tree)
   {
-    return NULL;
+    return 0;
   }
 
   tree = tree->PopHighest (e);
@@ -917,10 +917,10 @@ csRadiosity::csRadiosity (csEngine *current_engine, iProgressMeter *meter)
   csPolyIt poly_it (engine);
 
   csPolygon3D *poly;
-  while ((poly = poly_it.Fetch ()) != NULL)
+  while ((poly = poly_it.Fetch ()) != 0)
   {
     if (
-      (poly->GetUnsplitPolygon () == NULL) && // only for original polygons
+      (poly->GetUnsplitPolygon () == 0) && // only for original polygons
         // in the list, not the split children also in list.
         poly->
           GetLightMapInfo () &&               // only for lightmapped polys
@@ -933,7 +933,7 @@ csRadiosity::csRadiosity (csEngine *current_engine, iProgressMeter *meter)
   // fill list with curves
   csCurveIt curve_it (engine);
   csCurve *curve;
-  while ((curve = curve_it.Fetch ()) != NULL)
+  while ((curve = curve_it.Fetch ()) != 0)
   {
     if (curve->GetLightMap ())                // only for lightmapped curves
     {
@@ -1005,7 +1005,7 @@ csPolygon3D *csRadiosity::GetNextPolygon ()
     return radpoly->GetPolygon3D ();
   }
 
-  return NULL;
+  return 0;
 }
 
 bool csRadiosity::DoRadiosityStep (int steps)
@@ -1025,7 +1025,7 @@ bool csRadiosity::DoRadiosityStep (int steps)
   // Take RadPoly with highest unshot light amount, and distribute
   // the light to other polys (incrementing their unshot amount).
   // until stability, in theory, in practice some stop-condition.
-  while (steps > 0 && (shoot = FetchNext ()) != NULL)
+  while (steps > 0 && (shoot = FetchNext ()) != 0)
   {
     steps--;
     iterations++;
@@ -1074,7 +1074,7 @@ void csRadiosity::DoRadiosity ()
   // Take RadPoly with highest unshot light amount, and distribute
   // the light to other polys (incrementing their unshot amount).
   // until stability, in theory, in practice some stop-condition.
-  while ((shoot = FetchNext ()) != NULL)
+  while ((shoot = FetchNext ()) != 0)
   {
     iterations++;
 
@@ -1102,7 +1102,7 @@ void csRadiosity::DoRadiosity ()
 csRadElement *csRadiosity::FetchNext ()
 {
   // you can define any stop moment you like. And stop here anytime you like
-  // by returning NULL. The remaining unshot light will be added as
+  // by returning 0. The remaining unshot light will be added as
   // ambient light
   float stop_value = 0.1000f;                 // the amount of unshot light, where we can stop.
   /// /// take first stop moment, do the least work expected.
@@ -1144,7 +1144,7 @@ csRadElement *csRadiosity::FetchNext ()
   bool stop_now = false;
   char reason[80];
 
-  if (element == NULL)
+  if (element == 0)
   {
     stop_now = true;
     sprintf (reason, "no polygons to light");
@@ -1177,7 +1177,7 @@ csRadElement *csRadiosity::FetchNext ()
     csEngine::current_engine->Report ("Finished radiosity (%s).", reason);
 
     if (element) list->InsertElement (element); // to prevent memory leak.
-    return NULL;
+    return 0;
   }
 
   if (nextpriority == element->GetLastShootingPriority ())
@@ -1311,7 +1311,7 @@ static void frustum_polygon_report_func (
   lview->CreateFrustumContext ();
 
   csFrustumContext *new_ctxt = lview->GetFrustumContext ();
-  new_ctxt->SetLightFrustum (NULL);
+  new_ctxt->SetLightFrustum (0);
 
   csVector3 poly[40];
   const csVector3 &center = light_frustum->GetOrigin ();

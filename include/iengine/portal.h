@@ -94,7 +94,7 @@ SCF_VERSION (iPortalCallback, 0, 0, 1);
  * returns false then this portal will not be traversed. Otherwise this
  * callback has to set up the destination sector and return true.
  * The given context will be either an instance of iRenderView, iFrustumView,
- * or else NULL.
+ * or else 0.
  */
 struct iPortalCallback : public iBase
 {
@@ -260,7 +260,7 @@ struct iPortal : public iReference
   //-------------------------------------------------------------------------
 
   /**
-   * Check if the destination sector is NULL and if so call
+   * Check if the destination sector is 0 and if so call
    * the callback. This function returns false if the portal should
    * not be traversed.
    */

@@ -204,8 +204,8 @@ SCF_IMPLEMENT_IBASE_END
 
 InfPortalCS::InfPortalCS ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  lviews = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  lviews = 0;
 }
 
 bool InfPortalCS::Traverse (iPortal* portal, iBase* context)

@@ -60,7 +60,7 @@
 typedef csGrowingArray<csVector3> engine3d_VectorArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, engine3d_VectorArray,())
 
-static engine3d_VectorArray *VectorArray = NULL;
+static engine3d_VectorArray *VectorArray = 0;
 
 //---------------------------------------------------------------------------
 
@@ -75,15 +75,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csPolygon3DStatic::csPolygon3DStatic () : vertices(4)
 {
   VectorArray = GetStaticVectorArray();
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3DStatic);
-  thing_static = NULL;
+  thing_static = 0;
 
-  material = NULL;
-  name = NULL;
+  material = 0;
+  name = 0;
 
-  mapping = NULL;
-  portal = NULL;
+  mapping = 0;
+  portal = 0;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
@@ -103,9 +103,9 @@ csPolygon3DStatic::~csPolygon3DStatic ()
 
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   {
-    portal->SetSector (NULL);
+    portal->SetSector (0);
     delete portal;
-    portal = NULL;
+    portal = 0;
   }
 
   VectorArray->DecRef ();
@@ -124,7 +124,7 @@ csPolygon3DStatic* csPolygon3DStatic::Clone ()
     clone->portal->SetParentPolygon (this);
   }
   else
-    clone->portal = NULL;
+    clone->portal = 0;
   clone->plane_obj = plane_obj;
   if (mapping)
   {
@@ -146,7 +146,7 @@ csPolygon3DStatic* csPolygon3DStatic::Clone ()
   }
   else
   {
-    clone->mapping = NULL;
+    clone->mapping = 0;
   }
   clone->Alpha = Alpha;
   clone->MixMode = MixMode;
@@ -271,8 +271,8 @@ void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
 
 void csPolygon3DStatic::EnableTextureMapping (bool enable)
 {
-  if (enable && mapping != NULL) return;
-  if (!enable && mapping == NULL) return;
+  if (enable && mapping != 0) return;
+  if (!enable && mapping == 0) return;
 
   if (thing_static) thing_static->scfiObjectModel.ShapeChanged ();
   if (enable)
@@ -282,7 +282,7 @@ void csPolygon3DStatic::EnableTextureMapping (bool enable)
   else
   {
     thing_static->thing_type->blk_lightmapmapping.Free (mapping);
-    mapping = NULL;
+    mapping = 0;
   }
 }
 
@@ -313,7 +313,7 @@ void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   {
     delete portal;
-    portal = NULL;
+    portal = 0;
     if (thing_static) thing_static->UpdatePortalList ();
   }
 
@@ -324,7 +324,7 @@ void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
   if (sector)
     portal->SetSector (sector);
   else
-    portal->SetSector (NULL);
+    portal->SetSector (0);
   flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
   if (thing_static) thing_static->UpdatePortalList ();
 }
@@ -333,9 +333,9 @@ void csPolygon3DStatic::SetPortal (csPortal *prt)
 {
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   {
-    portal->SetSector (NULL);
+    portal->SetSector (0);
     delete portal;
-    portal = NULL;
+    portal = 0;
     if (thing_static) thing_static->UpdatePortalList ();
   }
 
@@ -387,7 +387,7 @@ void csPolygon3DStatic::SetMaterial (iMaterialWrapper *material)
 
 iMaterialHandle *csPolygon3DStatic::GetMaterialHandle ()
 {
-  return material ? material->GetMaterialHandle () : NULL;
+  return material ? material->GetMaterialHandle () : 0;
 }
 
 iThingFactoryState *csPolygon3DStatic::eiPolygon3DStatic::GetParent ()
@@ -1064,13 +1064,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csPolygon3D::csPolygon3D ()
 {
   VectorArray = GetStaticVectorArray();
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-  thing = NULL;
-  static_data = NULL;
+  thing = 0;
+  static_data = 0;
 
-  txt_info = NULL;
-  lightpatches = NULL;
+  txt_info = 0;
+  lightpatches = 0;
 }
 
 csPolygon3D::~csPolygon3D ()
@@ -1109,7 +1109,7 @@ void csPolygon3D::RefreshFromStaticData ()
 {
   static_data->thing_static->thing_type->blk_polytex.Free (txt_info);
   //delete txt_info;
-  txt_info = NULL;
+  txt_info = 0;
   if (static_data->IsTextureMappingEnabled ())
   {
     txt_info = static_data->thing_static->thing_type->blk_polytex.Alloc ();
@@ -1161,7 +1161,7 @@ void csPolygon3D::Finish ()
   if (static_data->IsTextureMappingEnabled ())
   {
     txt_info->SetPolygon (this);
-    txt_info->SetLightMap (NULL);
+    txt_info->SetLightMap (0);
     if (static_data->flags.Check (CS_POLY_LIGHTING))
     {
       csLightMap *lm = static_data->thing_static->thing_type
@@ -1467,13 +1467,13 @@ bool csPolygon3D::DoPerspective (
   // Check if special or mixed processing is required
   if (ind == end) return true;
 
-  // If we are processing a triangle (uv_coords != NULL) then
+  // If we are processing a triangle (uv_coords != 0) then
   // we stop here because the triangle is only visible if all
   // vertices are visible (this is not exactly true but it is
   // easier this way! @@@ CHANGE IN FUTURE).
 
-  csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
-  csVector2 *evert = NULL;
+  csVector3 *exit = 0, *exitn = 0, *reenter = 0, *reentern = 0;
+  csVector2 *evert = 0;
 
   if (ind == source)
   {
@@ -1742,7 +1742,7 @@ void csPolygon3D::InitializeDefault ()
 {
   if (txt_info)
   {
-    if (txt_info->lm == NULL) return ;
+    if (txt_info->lm == 0) return ;
     txt_info->InitLightMaps ();
     txt_info->lightmap_up_to_date = false;
     return ;
@@ -1753,15 +1753,15 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
 {
   if (txt_info)
   {
-    CS_ASSERT (txt_info != NULL);
-    if (txt_info->lm == NULL) return NULL;
+    CS_ASSERT (txt_info != 0);
+    if (txt_info->lm == 0) return 0;
     const char* error = txt_info->lm->ReadFromCache (
           file,
           static_data->mapping->w_orig,
           static_data->mapping->h,
           this,
     thing->GetStaticData ()->thing_type->engine);
-    if (error != NULL)
+    if (error != 0)
     {
       txt_info->InitLightMaps ();
     }
@@ -1769,14 +1769,14 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
     return error;
   }
 
-  return NULL;
+  return 0;
 }
 
 bool csPolygon3D::WriteToCache (iFile* file)
 {
   if (txt_info)
   {
-    if (txt_info->lm == NULL) return true;
+    if (txt_info->lm == 0) return true;
     txt_info->lightmap_up_to_date = true;
     if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
       & CS_ENGINE_CACHE_WRITE)
@@ -1867,7 +1867,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
     else
     {
       csPolygon3D *sfp = (csPolygon3D *) (shadow_it->GetUserData ());
-      if (sfp == NULL)
+      if (sfp == 0)
       {
         shadow_it->MarkRelevant (true);
   continue;

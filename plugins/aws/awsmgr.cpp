@@ -61,21 +61,21 @@
 // Implementation //////////////////////////////////////////////////////
 awsManager::awsManager (iBase *p) :
   updatestore_dirty(true),
-  top(NULL),
-  mouse_in(NULL),
-  keyb_focus(NULL),
-  mouse_focus(NULL),
-  focused(NULL),
-  modal_dialog(NULL),
+  top(0),
+  mouse_in(0),
+  keyb_focus(0),
+  mouse_focus(0),
+  focused(0),
+  modal_dialog(0),
   mouse_captured(false),
-  ptG2D(NULL),
-  ptG3D(NULL),
-  object_reg(NULL),
+  ptG2D(0),
+  ptG3D(0),
+  object_reg(0),
   flags(0)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 }
 
 awsManager::~awsManager ()
@@ -171,14 +171,14 @@ iAwsComponentFactory *awsManager::FindComponentFactory (const char *name)
       return component_factories[i].factory;
   }
   
-  return NULL;
+  return 0;
 }
 
 iAwsComponent *awsManager::CreateEmbeddableComponentFrom(const char *name)
 {
   iAwsComponentFactory *factory = FindComponentFactory(name);
   if (!factory)
-    return NULL;
+    return 0;
   
   return factory->Create ();
 }
@@ -249,7 +249,7 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
 
   return canvas;
 */
-  return NULL;
+  return 0;
 }
 
 iAwsCanvas *awsManager::CreateDefaultCanvas (
@@ -281,7 +281,7 @@ iAwsCanvas *awsManager::CreateCustomCanvas (
 
 void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size)
 {
-  if (win==NULL) return;
+  if (win==0) return;
 
   awsWindowTransition *t = new awsWindowTransition;
   int w = G2D()->GetWidth();
@@ -345,7 +345,7 @@ void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, 
 
 void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user)
 {
-  if (win==NULL) return;
+  if (win==0) return;
 
   awsWindowTransition *t = new awsWindowTransition;
   
@@ -475,7 +475,7 @@ iAwsComponent* awsManager::ComponentAt(int x, int y)
       return cur;
   }
   
-  return NULL;
+  return 0;
 }
 
 bool awsManager::MouseInComponent(int x, int y)
@@ -846,20 +846,20 @@ iAwsComponent *awsManager::CreateWindowFrom (const char* defname)
 {
   // Find the window definition
   iAwsComponentNode *cmpnode = GetPrefMgr ()->FindWindowDef (defname);
-  if (cmpnode == NULL)
-    return NULL;
+  if (cmpnode == 0)
+    return 0;
 
   // Create a new component
   iAwsComponentFactory *factory =
       FindComponentFactory (cmpnode->ComponentTypeName ()->GetData ());
   if (!factory)
-    return NULL;
+    return 0;
   
   iAwsComponent *comp = factory->Create ();
 
   // Setup the component
-  if(!comp->Create(this, NULL, cmpnode))
-    return NULL;
+  if(!comp->Create(this, 0, cmpnode))
+    return 0;
 
   /* Now recurse through all of the child nodes, creating them and setting them
   up.  Nodes are created via their factory functions.  If a factory cannot be
@@ -878,7 +878,7 @@ void awsManager::CreateChildrenFromDef (
   {
     iAwsKey *key = settings->GetAt (i);
 
-    if (key == NULL)
+    if (key == 0)
       continue;
 
     if (key->Type () == KEY_COMPONENT)
@@ -936,7 +936,7 @@ void awsManager::CaptureMouse (iAwsComponent *comp)
 #endif
 
   mouse_captured = true;
-  if (comp == NULL) comp = GetTopComponent ();
+  if (comp == 0) comp = GetTopComponent ();
 
   mouse_focus = comp;
 }
@@ -948,7 +948,7 @@ void awsManager::ReleaseMouse ()
 #endif
 
   mouse_captured = false;
-  mouse_focus = NULL;
+  mouse_focus = 0;
 }
 
 void awsManager::SetModal (iAwsComponent *comp)
@@ -960,7 +960,7 @@ void awsManager::SetModal (iAwsComponent *comp)
 
 
   // return out if the new modal window is null or there is already a modal_dialog
-  if (comp == NULL || modal_dialog)
+  if (comp == 0 || modal_dialog)
 	return;
 
 
@@ -976,7 +976,7 @@ void awsManager::UnSetModal()
   printf("aws-debug: Modal Unset: %p\n", modal_dialog);
 #endif
 
-  modal_dialog = NULL;
+  modal_dialog = 0;
 }
 
 
@@ -998,7 +998,7 @@ bool awsManager::HandleEvent (iEvent &Event)
 
     }
 
-    if (comp == NULL)
+    if (comp == 0)
       return true;
 
   }
@@ -1049,7 +1049,7 @@ bool awsManager::HandleEvent (iEvent &Event)
       
     case csevKeyDown:
 			{
-        iAwsComponent *cmp = NULL;
+        iAwsComponent *cmp = 0;
 
 				if( flags & AWSF_KeyboardControl)	
 				{
@@ -1138,7 +1138,7 @@ iAwsComponent* awsManager::FindCommonParent(iAwsComponent* cmp1, iAwsComponent* 
     testParent1 = testParent1->Parent();
   }
 
-  return NULL;
+  return 0;
 }
 
 // note, if this is too slow common_parent could be calculated once and then

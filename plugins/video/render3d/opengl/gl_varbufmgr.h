@@ -125,7 +125,7 @@ public:
   
   /**
    * Lock the buffer to allow writing and give us a pointer to the data
-   * The pointer will be NULL if there was some error
+   * The pointer will be 0 if there was some error
    */
   virtual void* Lock(csRenderBufferLockType lockType);
 

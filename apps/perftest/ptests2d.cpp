@@ -84,7 +84,7 @@ Tester* PixelTester::NextTester ()
 //-----------------------------------------------------------------------------
 void StringTester::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
 {
-  Tester2D::Setup (g3d, NULL);
+  Tester2D::Setup (g3d, 0);
   font = G2D->GetFontServer ()->LoadFont (CSFONT_SMALL);
   char tl [] = "aA1! bB2 cC3 dD4$ 5%eE fF^6 gG&7hH8*iI9(j0)Jk[K1lL]}mM@n2No+O5p> Qq<r;RSs Tt =Uu|uv;Vwxyz WXYZ Crystal Space, the open sourced graphics engine.";
   int tl_len = strlen (tl);
@@ -136,7 +136,7 @@ void StringTester::Draw (iGraphics3D* /*g3d*/)
 
 Tester* StringTester::NextTester ()
 {
-  font = NULL;
+  font = 0;
   delete [] line;
-  return NULL;
+  return 0;
 }

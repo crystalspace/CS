@@ -55,7 +55,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csRLECodec::csRLECodec (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  pixel = NULL;
+  pixel = 0;
 }
 
 csRLECodec::~csRLECodec ()

@@ -169,11 +169,11 @@ SCF_IMPLEMENT_IBASE_END
 
 csShaderGLMTEX::csShaderGLMTEX(iObjectRegistry* objreg)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   this->object_reg = objreg;
   this->ext = ext;
-  programstring = NULL;
+  programstring = 0;
   validProgram = true;
 
   SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
@@ -254,7 +254,7 @@ bool csShaderGLMTEX::Load(iDocumentNode* node)
 
 bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
 {
-  if(layer == NULL || node == NULL)
+  if(layer == 0 || node == 0)
     return false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes();
@@ -297,7 +297,7 @@ bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
 
 bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
 {
-  if(layer == NULL || node == NULL)
+  if(layer == 0 || node == 0)
     return false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes();
@@ -370,7 +370,7 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
         if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
           o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
           layer->colorp = o;
-        if(child->GetAttribute("scale") != NULL)
+        if(child->GetAttribute("scale") != 0)
           layer->scale_rgb = child->GetAttributeValueAsFloat ("scale");
       }
       break;
@@ -380,7 +380,7 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
         if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
           o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
           layer->alphap = o;
-        if(child->GetAttribute("scale") != NULL)
+        if(child->GetAttribute("scale") != 0)
           layer->scale_alpha = child->GetAttributeValueAsFloat ("scale");
       }
       break;
@@ -395,7 +395,7 @@ bool csShaderGLMTEX::Load(iDataBuffer* program)
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (program);
-  if (error != NULL)
+  if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glmtex",
       "Document error '%s'!", error);
@@ -513,7 +513,7 @@ iShaderVariable* csShaderGLMTEX::GetVariable(int namehash)
     return (iShaderVariable*)c.Next();
   }
 
-  return NULL;
+  return 0;
 }
 
 csPtr<iString> csShaderGLMTEX::GetProgramID()

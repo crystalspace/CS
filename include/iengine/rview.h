@@ -139,9 +139,9 @@ public:
   /// The frustum corresponding with iview.
   csRenderContextFrustum* iview_frustum;
 
-  /// The portal polygon (or NULL if the first sector).
+  /// The portal polygon (or 0 if the first sector).
   iPolygon3D* portal_polygon;
-  /// The previous sector (or NULL if the first sector).
+  /// The previous sector (or 0 if the first sector).
   iSector* previous_sector;
   /// This sector.
   iSector* this_sector;

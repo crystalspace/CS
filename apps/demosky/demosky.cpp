@@ -83,14 +83,14 @@ void DemoSky::Report (int severity, const char* msg, ...)
 
 DemoSky::DemoSky ()
 {
-  sky = NULL;
-  sky_f = NULL;
-  sky_b = NULL;
-  sky_l = NULL;
-  sky_r = NULL;
-  sky_u = NULL;
-  sky_d = NULL;
-  flock = NULL;
+  sky = 0;
+  sky_f = 0;
+  sky_b = 0;
+  sky_l = 0;
+  sky_r = 0;
+  sky_u = 0;
+  sky_d = 0;
+  flock = 0;
 }
 
 DemoSky::~DemoSky ()
@@ -103,7 +103,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -406,7 +406,7 @@ void DemoSky::SetupFrame ()
 void DemoSky::FinishFrame ()
 {
   myG3D->FinishDraw ();
-  myG3D->Print (NULL);
+  myG3D->Print (0);
 }
 
 bool DemoSky::HandleEvent (iEvent &Event)
@@ -498,7 +498,7 @@ Flock::~Flock()
 {
   int i;
   for(i=0; i<nr; i++)
-    spr[i] = NULL;
+    spr[i] = 0;
   delete[] spr;
   delete[] speed;
   delete[] accel;
@@ -566,14 +566,14 @@ void Flock::Update(csTicks elapsed)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new DemoSky ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

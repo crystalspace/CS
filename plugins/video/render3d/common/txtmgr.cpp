@@ -32,7 +32,7 @@
 csTexture::csTexture (csTextureHandle *Parent)
 {
   parent = Parent;
-  DG_ADD (this, NULL);
+  DG_ADD (this, 0);
   DG_TYPE (this, "csTexture");
 }
 
@@ -49,15 +49,15 @@ SCF_IMPLEMENT_IBASE_END
 
 csTextureHandle::csTextureHandle (iImage* Image, int Flags)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, NULL);
+  SCF_CONSTRUCT_IBASE (0);
+  DG_ADDI (this, 0);
   DG_TYPE (this, "csTextureHandle");
 
   (image = Image)->IncRef ();
   DG_LINK (this, image);
   flags = Flags;
 
-  tex [0] = tex [1] = tex [2] = tex [3] = NULL;
+  tex [0] = tex [1] = tex [2] = tex [3] = 0;
 
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
@@ -68,7 +68,7 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
     image->GetKeycolor (r,g,b);
     SetKeyColor (r, g, b);
   }
-  cachedata = NULL;
+  cachedata = 0;
 }
 
 csTextureHandle::~csTextureHandle ()
@@ -91,14 +91,14 @@ void csTextureHandle::FreeImage ()
   if (!image) return;
   DG_UNLINK (this, image);
   image->DecRef ();
-  image = NULL;
+  image = 0;
 }
 
 void csTextureHandle::CreateMipmaps ()
 {
   if (!image) return;
 
-  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
+  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
 
   // Delete existing mipmaps, if any
   int i;
@@ -209,8 +209,8 @@ SCF_IMPLEMENT_IBASE_END
 
 csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, NULL);
+  SCF_CONSTRUCT_IBASE (0);
+  DG_ADDI (this, 0);
   DG_TYPE (this, "csMaterialHandle");
   num_texture_layers = 0;
   material = m;
@@ -241,8 +241,8 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 
 csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, NULL);
+  SCF_CONSTRUCT_IBASE (0);
+  DG_ADDI (this, 0);
   DG_TYPE (this, "csMaterialHandle");
   num_texture_layers = 0;
   diffuse = 0.7; ambient = 0; reflection = 0;
@@ -308,7 +308,7 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 	iGraphics2D *iG2D)
 	: textures (16, 16), materials (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csTextureManager::object_reg = object_reg;
   verbose = false;
 

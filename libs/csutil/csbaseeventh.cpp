@@ -27,7 +27,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csBaseEventHandler::csBaseEventHandler()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 
@@ -47,7 +47,7 @@ bool csBaseEventHandler::RegisterQueue (iEventQueue* q, unsigned int trigger)
   }
 
   queue = q;
-  if (NULL != q)
+  if (0 != q)
   {
     q->RegisterListener(this, trigger);
   }
@@ -57,7 +57,7 @@ bool csBaseEventHandler::RegisterQueue (iEventQueue* q, unsigned int trigger)
 bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, unsigned int trigger)
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
-  if (NULL == q)
+  if (0 == q)
   {
     return false;
   }

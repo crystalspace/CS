@@ -294,7 +294,7 @@ struct mmioInfo
   inline void
   csPlatformExpandPath(const char* path, char* buffer, int bufsize)
   {
-    GetFullPathName (path, bufsize, buffer, NULL);
+    GetFullPathName (path, bufsize, buffer, 0);
   }
 
 #endif
@@ -390,9 +390,9 @@ struct mmioInfo
    static inline char *win32_tempdir()
    {
      char *tmp;
-     if ((tmp = getenv ("TMP")) != NULL)
+     if ((tmp = getenv ("TMP")) != 0)
        return tmp;
-     if ((tmp = getenv ("TEMP")) != NULL)
+     if ((tmp = getenv ("TEMP")) != 0)
        return tmp;
      return "";
    }
@@ -468,7 +468,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 // cygwin has no _beginthread and _endthread functions
 #ifdef __CYGWIN32__
 #ifndef _beginthread
-#define _beginthread(func, stack, ptr)	CreateThread (NULL, 0, \
+#define _beginthread(func, stack, ptr)	CreateThread (0, 0, \
 	  LPTHREAD_START_ROUTINE(func), ptr, CREATE_SUSPENDED, 0)
 #endif
 #ifndef _endthread
@@ -481,7 +481,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 
 #ifdef __CYGWIN32__
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
-HINSTANCE ModuleHandle = NULL; \
+HINSTANCE ModuleHandle = 0; \
 int ApplicationShow = csSW_SHOWNORMAL;
 #else
 
@@ -504,7 +504,7 @@ int ApplicationShow = csSW_SHOWNORMAL;
 
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
 int _cs_main (int argc, char* argv[]); \
-HINSTANCE ModuleHandle = NULL; \
+HINSTANCE ModuleHandle = 0; \
 int ApplicationShow = csSW_SHOWNORMAL; \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 { \
@@ -527,7 +527,7 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 #if !defined(CS_STATIC_LINKED)
 
 #define CS_IMPLEMENT_PLATFORM_PLUGIN \
-HINSTANCE ModuleHandle = NULL; \
+HINSTANCE ModuleHandle = 0; \
 int ApplicationShow = csSW_SHOWNORMAL; \
 int _cs_main(int argc, char* argv[]) { return 0; } \
 extern "C" BOOL WINAPI \

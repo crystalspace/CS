@@ -447,7 +447,7 @@ private:
    * given, all material names will be prefixed with the corresponding string.
    */
   bool ParseMaterialList (iLoaderContext* ldr_context,
-  	iDocumentNode* node, const char* prefix = NULL);
+  	iDocumentNode* node, const char* prefix = 0);
   /// Parse a list of shared variables and add them each to the engine
   bool ParseVariableList (iDocumentNode* node);
   /// Process the attributes of one shared variable
@@ -462,7 +462,7 @@ private:
   //iTextureWrapper* ParseProcTex (iDocumentNode* node);
   /// Parse a material definition and add the material to the engine
   iMaterialWrapper* ParseMaterial (iLoaderContext* ldr_context,
-  	iDocumentNode* node, const char* prefix = NULL);
+  	iDocumentNode* node, const char* prefix = 0);
   /// Parse a collection definition and add the collection to the engine
   iCollection* ParseCollection (iLoaderContext* ldr_context,
   	iDocumentNode* node);
@@ -527,7 +527,7 @@ private:
    */
   bool LoadMeshObjectFactory (
   	iLoaderContext* ldr_context, iMeshFactoryWrapper* meshFact,
-  	iDocumentNode* node, csReversibleTransform* transf = NULL);
+  	iDocumentNode* node, csReversibleTransform* transf = 0);
 
   /**
    * Handle various common mesh object parameters.
@@ -670,10 +670,10 @@ public:
 
   virtual csPtr<iImage> LoadImage (const char *fname, int Format);
   virtual csPtr<iTextureHandle> LoadTexture (const char* fname,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL, iImage **img=NULL);
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0, iImage **img=0);
   virtual iTextureWrapper* LoadTexture (const char *name,
   	const char *fname,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	bool reg = false, bool create_material = true);
 
   virtual csPtr<iSoundData> LoadSoundData (const char *fname);

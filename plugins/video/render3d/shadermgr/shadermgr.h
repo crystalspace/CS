@@ -112,7 +112,7 @@ public:
   public:
     EventHandler (csShaderManager* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     
@@ -298,7 +298,7 @@ public:
 
   csShaderPass(csShaderTechnique* owner, iObjectRegistry* reg)
   {
-    SCF_CONSTRUCT_IBASE( NULL );
+    SCF_CONSTRUCT_IBASE( 0 );
     r3d = CS_QUERY_REGISTRY (reg, iRender3D);
     vp = 0; fp = 0;
     parent = owner;
@@ -310,7 +310,7 @@ public:
     for (i=0; i<TEXMAX; i++)
     {
       texmappinglayer[i] = -1;
-      texmappingdirect[i] = NULL;
+      texmappingdirect[i] = 0;
     }
 
     writemaskRed = true;

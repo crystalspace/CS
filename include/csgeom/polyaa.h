@@ -48,7 +48,7 @@ typedef void (*csAAPFCBBox) (int x, int y, int w, int h, void *arg);
  * passed as argument.
  */
 extern void csAntialiasedPolyFill (csVector2 *iVertices, int iVertexCount,
-  void *iArg, csAAPFCBPixel iPutPixel, csAAPFCBBox iDrawBox = NULL);
+  void *iArg, csAAPFCBPixel iPutPixel, csAAPFCBBox iDrawBox = 0);
 
 /** @} */
 

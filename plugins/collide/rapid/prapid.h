@@ -86,7 +86,7 @@ class csCdBBox
   friend class csRapidCollider;
 
 protected:
-  /// Pointer to the contained triangle. May be NULL, if the BBox is a node.
+  /// Pointer to the contained triangle. May be 0, if the BBox is a node.
   csCdTriangle* m_pTriangle;
 
   // placement in parent's space
@@ -136,7 +136,7 @@ protected:
     * returns true, if this is a leaf bounding box, Maybe, this would be
     * faster and more secure, if we would return true, if m_pTriangle is
     * set. For this we need to make sure, that m_pTriangle is always
-    * properly initialised to NULL, which is currently not the case.
+    * properly initialised to 0, which is currently not the case.
     * - thieber 14.03.2000 -
     */
   bool IsLeaf() const { return (!m_pChild0 && !m_pChild1); }
@@ -151,11 +151,11 @@ public:
 
   /// Construct a default bounding box
   csCdBBox() :
-  	m_pTriangle (NULL),
+  	m_pTriangle (0),
   	m_Translation(0, 0, 0),
 	m_Radius(0, 0, 0),
-  	m_pChild0 (NULL),
-	m_pChild1 (NULL)
+  	m_pChild0 (0),
+	m_pChild1 (0)
   { }
 
   /// returns the "Radius", that is, half the measure of each side's length

@@ -158,11 +158,11 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
   while (!it.IsFinished ())
   {
     csRef<iMeshFactoryWrapper> SubWrapper (Engine->CreateMeshFactory (
-      "crystalspace.mesh.object.sprite.3d", NULL));
+      "crystalspace.mesh.object.sprite.3d", 0));
     if (!SubWrapper)
     {
       // seems like building 3d sprites is impossible
-      return NULL;
+      return 0;
     }
 
     csRef<iSprite3DFactoryState> sfState (SCF_QUERY_INTERFACE (
@@ -172,7 +172,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
       // impossible to query the correct interface, maybe because
       // of a version conflict
       Engine->GetMeshFactories ()->Remove (SubWrapper);
-      return NULL;
+      return 0;
     }
 
     sfState->SetMaterialWrapper (DefaultMaterial);

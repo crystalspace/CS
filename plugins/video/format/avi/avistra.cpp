@@ -30,10 +30,10 @@ SCF_IMPLEMENT_IBASE_END
 csAVIStreamAudio::csAVIStreamAudio (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
-  pChunk = NULL;
+  pChunk = 0;
   pAVI = (csAVIFormat*)pBase;
-  object_reg = NULL;
-  pCodec = NULL;
+  object_reg = 0;
+  pCodec = 0;
 }
 
 bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
@@ -65,7 +65,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
   pChunk->currentframe = 0;
-  pChunk->currentframepos = NULL;
+  pChunk->currentframepos = 0;
   sprintf (pChunk->id, "%02dwb", nStreamNumber);
   pChunk->id[4] = '\0';
 
@@ -146,7 +146,7 @@ bool csAVIStreamAudio::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
 		"crystalspace.video.avi",
 		"CODEC class \"%s\" could not be initialized !", cn);
       pCodec->DecRef ();
-      pCodec = NULL;
+      pCodec = 0;
     }
   }
   else

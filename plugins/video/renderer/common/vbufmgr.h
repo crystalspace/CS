@@ -96,7 +96,7 @@ public:
     csVertexBuffer::colors = colors;
     csVertexBuffer::num_verts = num_verts;
     for( int i=0; i<CS_VBUF_TOTAL_USERA; i++ )
-      user[i] = NULL;
+      user[i] = 0;
     bbox = b;
   }
 

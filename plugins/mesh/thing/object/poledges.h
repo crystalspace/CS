@@ -63,7 +63,7 @@ public:
   /// Is there a next polygon in this iterator?
   bool HasNext ()
   {
-    return current != NULL;
+    return current != 0;
   }
 
   /// Get the next polygon.
@@ -97,7 +97,7 @@ public:
   /// Is there a next edge in this iterator?
   bool HasNext ()
   {
-    return current != NULL;
+    return current != 0;
   }
 
   /// Get the next polygon/edge.

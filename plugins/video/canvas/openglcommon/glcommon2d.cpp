@@ -35,10 +35,10 @@ SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
-  csGraphics2D (iParent), FontCache (NULL)
+  csGraphics2D (iParent), FontCache (0)
 {
-  EventOutlet = NULL;
-  screen_shot = NULL;
+  EventOutlet = 0;
+  screen_shot = 0;
   multiSamples = 0;
   multiFavorQuality = false;
 }
@@ -189,7 +189,7 @@ void csGraphics2DGLCommon::Close ()
 {
   if (!is_open) return;
   delete FontCache;
-  FontCache = NULL;
+  FontCache = 0;
   ext.Close ();
   csGraphics2D::Close ();
 }
@@ -435,14 +435,14 @@ void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
   FontCache->Write (font, x, Height - y, text);
 }
 
-// This variable is usually NULL except when doing a screen shot:
+// This variable is usually 0 except when doing a screen shot:
 // in this case it is a temporarily allocated buffer for glReadPixels ()
-//static uint8 *screen_shot = NULL;
+//static uint8 *screen_shot = 0;
 
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
   return screen_shot ?
-    (screen_shot + pfmt.PixelBytes * ((Height - y - 1) * Width + x)) : NULL;
+    (screen_shot + pfmt.PixelBytes * ((Height - y - 1) * Width + x)) : 0;
 }
 
 csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
@@ -450,7 +450,7 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   // For the time being copy data into system memory.
 #ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
-    return NULL;
+    return 0;
 #endif
   // Convert to Opengl co-ordinate system
   y = Height - (y + h);
@@ -464,18 +464,18 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   if (y + h > Height)
     h = Height - y;
   if ((w <= 0) || (h <= 0))
-    return NULL;
+    return 0;
 
   csImageArea *Area = new csImageArea (x, y, w, h);
   if (!Area)
-    return NULL;
+    return 0;
   int actual_width = pfmt.PixelBytes * w;
   GLubyte* dest = new GLubyte [actual_width * h];
   Area->data = (char *)dest;
   if (!dest)
   {
     delete Area;
-    return NULL;
+    return 0;
   }
   bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
@@ -501,7 +501,7 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
       break;
     default:
       delete Area;
-      return NULL; // invalid format
+      return 0; // invalid format
   }
   glReadPixels (x, y, w, h, format, type, dest);
 
@@ -554,7 +554,7 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 {
 /*#ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
-    return NULL;
+    return 0;
 #endif*/
 
   // Need to resolve pixel alignment issues
@@ -564,7 +564,7 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
   int screen_width = Width * (pfmt.PixelBytes == 1? 1 : 4);
 #endif
   if (!screen_shot) screen_shot = new uint8 [screen_width * Height];
-  //if (!screen_shot) return NULL;
+  //if (!screen_shot) return 0;
 
   // glPixelStore ()?
   switch (pfmt.PixelBytes)
@@ -641,7 +641,7 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 #endif
 
   //delete [] screen_shot;
-  //screen_shot = NULL;
+  //screen_shot = 0;
 
   return ss;
 }

@@ -72,7 +72,7 @@ SCF_IMPLEMENT_IBASE_END
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   int iWidth, int iHeight, csGraphics3DOGLCommon *iG3D)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   // Initialization
   R = iR; G = iG; B = iB;

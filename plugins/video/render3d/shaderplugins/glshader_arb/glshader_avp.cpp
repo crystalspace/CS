@@ -156,7 +156,7 @@ bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
       start++;
 
     csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
-      "Couldn't load vertexprogram", NULL);
+      "Couldn't load vertexprogram", 0);
     csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
       "Programerror at: \"%s\"", start);
     csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
@@ -186,7 +186,7 @@ bool csShaderGLAVP::Load(iDataBuffer* program)
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (program);
-  if (error != NULL)
+  if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glarb",
       "XML error '%s'!", error);
@@ -309,7 +309,7 @@ iShaderVariable* csShaderGLAVP::GetVariable(int namehash)
     return (iShaderVariable*)c.Next();
   }
 
-  return NULL;
+  return 0;
 }
 
 csPtr<iString> csShaderGLAVP::GetProgramID()

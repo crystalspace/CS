@@ -41,7 +41,7 @@ public:
   /// Create the polygon array object
   csPolygonStaticArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
   {
-    thing_type = NULL;
+    thing_type = 0;
   }
 
   /// Destroy the polygon array and all inserted polygons
@@ -81,7 +81,7 @@ public:
   /// Create the polygon array object
   csPolygonArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
   {
-    thing_type = NULL;
+    thing_type = 0;
   }
 
   /// Destroy the polygon array and all inserted polygons

@@ -83,7 +83,7 @@ public:
 
   csFrustVisObjIt (csVector* vector, bool* vistest_objects_inuse)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csFrustVisObjIt::vector = vector;
     csFrustVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
     if (vistest_objects_inuse) *vistest_objects_inuse = true;
@@ -91,7 +91,7 @@ public:
   }
   virtual ~csFrustVisObjIt ()
   {
-    // If the vistest_objects_inuse pointer is not NULL we set the
+    // If the vistest_objects_inuse pointer is not 0 we set the
     // bool to false to indicate we're no longer using the base
     // vector. Otherwise we delete the vector.
     if (vistest_objects_inuse) *vistest_objects_inuse = false;
@@ -112,7 +112,7 @@ public:
 
   virtual void Reset()
   {
-    if (vector == NULL || vector->Length () < 1)
+    if (vector == 0 || vector->Length () < 1)
       position = -1;
     else
       position = 0;
@@ -155,8 +155,8 @@ csFrustumVis::csFrustumVis (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  object_reg = NULL;
-  kdtree = NULL;
+  object_reg = 0;
+  kdtree = 0;
   current_visnr = 1;
   vistest_objects_inuse = false;
   updating = false;
@@ -204,7 +204,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
-  kdtree = new csKDTree (NULL);
+  kdtree = new csKDTree (0);
 
   return true;
 }
@@ -555,7 +555,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   	(void*)&data, frustum_mask);
 
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -637,7 +637,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
   	0);
 
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -722,7 +722,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
   	0);
 
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -748,7 +748,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 
   const csBox3& node_bbox = treenode->GetNodeBBox ();
 
-  // If mesh != NULL then we have already found our mesh. In that
+  // If mesh != 0 then we have already found our mesh. In that
   // case we will compare the distance of the origin with the the
   // box of the treenode and the already found shortest distance to
   // see if we have to proceed.
@@ -851,7 +851,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 	        else if (r < data->r)
 		{
 		  data->r = r;
-		  data->polygon = NULL;
+		  data->polygon = 0;
 		  if (identity)
 		    data->isect = obj_isect;
 		  else
@@ -880,9 +880,9 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
   data.r = 10000000000.;
-  data.mesh = NULL;
-  data.polygon = NULL;
-  data.vector = NULL;
+  data.mesh = 0;
+  data.polygon = 0;
+  data.vector = 0;
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
@@ -891,7 +891,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   if (poly) *poly = data.polygon;
   isect = data.isect;
 
-  return data.mesh != NULL;
+  return data.mesh != 0;
 }
 
 csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
@@ -903,13 +903,13 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
   data.r = 10000000000.;
-  data.mesh = NULL;
-  data.polygon = NULL;
+  data.mesh = 0;
+  data.polygon = 0;
   data.vector = new csVector ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
-  csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, NULL);
+  csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, 0);
   return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
@@ -994,7 +994,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginDist ();
 	data->shadobjs[data->num_shadobjs].caster = visobj_wrap->caster;
-	data->shadobjs[data->num_shadobjs].mesh = NULL;
+	data->shadobjs[data->num_shadobjs].mesh = 0;
 	data->shadobjs[data->num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
 	data->num_shadobjs++;
@@ -1003,7 +1003,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
 	data->shadobjs[data->num_shadobjs].mesh = visobj_wrap->mesh;
-	data->shadobjs[data->num_shadobjs].caster = NULL;
+	data->shadobjs[data->num_shadobjs].caster = 0;
 	data->shadobjs[data->num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
 	data->num_shadobjs++;

@@ -58,7 +58,7 @@ private:
 public:
   ProcEventHandler (iObjectRegistry* object_reg)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     ProcEventHandler::object_reg = object_reg;
   }
   virtual ~ProcEventHandler () { }
@@ -125,10 +125,10 @@ csProcTexture::csProcTexture ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProcTexture);
 
   ptReady = false;
-  tex = NULL;
+  tex = 0;
   texFlags = 0;
   key_color = false;
-  object_reg = NULL;
+  object_reg = 0;
   use_cb = true;
   last_cur_time = 0;
   anim_prepared = false;
@@ -160,7 +160,7 @@ struct ProcCallback : public iTextureCallback
 {
   csRef<csProcTexture> pt;
   SCF_DECLARE_IBASE;
-  ProcCallback () { SCF_CONSTRUCT_IBASE (NULL); }
+  ProcCallback () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~ProcCallback () { }
   virtual void UseTexture (iTextureWrapper*);
 };
@@ -193,7 +193,7 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
 
   csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   tex = engine->GetTextureList ()->NewTexture (proc_image);
-  proc_image = NULL;
+  proc_image = 0;
   if (!tex)
     return false;
 

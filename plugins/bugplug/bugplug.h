@@ -255,7 +255,7 @@ private:
   /*
    * The Spider has done its job. Send him back to his hiding place.
    * Also perform the Spider command on the camera we found (only if
-   * camera != NULL).
+   * camera != 0).
    */
   void HideSpider (iCamera* camera);
 
@@ -365,7 +365,7 @@ private:
   void SetupPlugin ();
 
   /// Enter edit mode.
-  void EnterEditMode (int cmd, const char* msg, const char* def = NULL);
+  void EnterEditMode (int cmd, const char* msg, const char* def = 0);
   /// Process a command after finishing edit mode.
   void ExitEditMode ();
 
@@ -383,7 +383,7 @@ public:
   void CleanDebugSector ();
   void SetupDebugSector ();
   void DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name = NULL, iMeshObject* mesh = NULL);
+  	const char* name = 0, iMeshObject* mesh = 0);
   void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   	const csVector3& s3, float r, float g, float b);
   void SwitchDebugSector (const csReversibleTransform& trans);
@@ -433,7 +433,7 @@ public:
       scfParent->SetupDebugSector ();
     }
     virtual void DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name = NULL, iMeshObject* mesh = NULL)
+  	const char* name = 0, iMeshObject* mesh = 0)
     {
       scfParent->DebugSectorBox (box, r, g, b, name, mesh);
     }
@@ -535,7 +535,7 @@ public:
   public:
     EventHandler (csBugPlug* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual ~EventHandler () { }

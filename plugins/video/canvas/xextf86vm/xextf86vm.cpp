@@ -48,7 +48,7 @@ csXExtF86VM::csXExtF86VM (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  dpy = NULL;
+  dpy = 0;
   screen_num = 0;
   width = height = 0;
   fs_win = wm_win = ctx_win = 0;

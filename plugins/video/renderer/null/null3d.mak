@@ -1,5 +1,5 @@
 # This is a subinclude file used to define the rules needed
-# to build the 3D NULL rendering driver -- null3d
+# to build the 3D 0 rendering driver -- null3d
 
 # Driver description
 DESCRIPTION.null3d = Crystal Space null 3D renderer

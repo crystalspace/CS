@@ -89,7 +89,7 @@ csPtr<iShaderProgram> csGLShader_ARB::CreateProgram(const char* type)
   if( strcasecmp(type, "gl_arb_vp") == 0)
     return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext, varr));
   else
-    return NULL;
+    return 0;
 }
 
 void csGLShader_ARB::Open()

@@ -21,7 +21,7 @@
 
 csStaticArray::csStaticArray (int s)
 {
-  Map = NULL;
+  Map = 0;
   Size = 0;
   Alloc (s);
 }
@@ -33,7 +33,7 @@ csStaticArray::~csStaticArray ()
 void csStaticArray::Clear (bool DeleteOld)
 {
   if (Map && DeleteOld) DeleteArray (Map);
-  Map = NULL; Size = 0;
+  Map = 0; Size = 0;
 }
 
 void csStaticArray::Alloc (int s, bool DeleteOld)

@@ -175,7 +175,7 @@ class           csStuffObject:public iMeshObject
        { material = mat; return true; }
   virtual iMaterialWrapper *GetMaterialWrapper() const { return material; }
   virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
 // --------------------| BEGIN iClothMeshState implementation// |----------------// 
 bool LightsEnabled;
@@ -237,7 +237,7 @@ class           StuffFactory:public iMeshObjectFactory
     virtual ~ StuffFactory();
     virtual bool    Initialize(iObjectRegistry * iO_R);
     virtual         csPtr < iMeshObject > NewInstance();
-    virtual iObjectModel* GetObjectModel () { return NULL; }
+    virtual iObjectModel* GetObjectModel () { return 0; }
 
     virtual void    HardTransform(const csReversibleTransform &);
     virtual bool    SupportsHardTransform() const;
@@ -302,7 +302,7 @@ class           StuffFactory:public iMeshObjectFactory
    * because the normals are used for lighting.
    */
     virtual csVector3 *GetNormals() 
-      {  return NULL; };
+      {  return 0; };
     // Set the number of triangles to use for this mesh.
     virtual void    SetTriangleCount(int n) 
       {

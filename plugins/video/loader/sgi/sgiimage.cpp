@@ -66,7 +66,7 @@ csPtr<iImage> csSGIImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return 0;
   }
   return csPtr<iImage> (i);
 }
@@ -79,22 +79,22 @@ csPtr<iDataBuffer> csSGIImageIO::Save (iImage* image,
   iImageIO::FileFormatDescription* format, const char* extraoptions)
 {
   // Following block to kill compiler warnings ONLY
-  image = NULL;
-  format = NULL;
-  extraoptions = NULL;
+  image = 0;
+  format = 0;
+  extraoptions = 0;
 
-  return NULL;
+  return 0;
 }
 
 csPtr<iDataBuffer> csSGIImageIO::Save (iImage* image, const char* mime,
   const char* extraoptions)
 {
   // Following block to kill compiler warnings ONLY
-  image = NULL;
-  mime = NULL;
-  extraoptions = NULL;
+  image = 0;
+  mime = 0;
+  extraoptions = 0;
 
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -134,8 +134,8 @@ bool ImageSGIFile::Load (uint8* iBuffer, uint32 iSize)
 
   uint8 *line = new uint8 [Width];
 
-  uint32 *starttable = NULL;
-  uint32 *lengthtable = NULL;
+  uint32 *starttable = 0;
+  uint32 *lengthtable = 0;
 
   // Indicates if it's rle encoded or not
   if (header.Packed)

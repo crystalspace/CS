@@ -56,14 +56,14 @@ public:
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
 
-  // Optional data for shadows. Both fields can be NULL.
+  // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
   csRef<iThingState> thing_state;
 
   csFrustVisObjectWrapper (csFrustumVis* frustvis)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csFrustVisObjectWrapper::frustvis = frustvis;
   }
   virtual ~csFrustVisObjectWrapper ()
@@ -147,8 +147,8 @@ public:
   virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
     const csVector3& start, const csVector3& end, bool accurate = false);
   virtual bool IntersectSegment (const csVector3& start,
-    const csVector3& end, csVector3& isect, float* pr = NULL,
-    iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL,
+    const csVector3& end, csVector3& isect, float* pr = 0,
+    iMeshWrapper** p_mesh = 0, iPolygon3D** poly = 0,
     bool accurate = false);
   virtual void CastShadows (iFrustumView* fview);
   virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }

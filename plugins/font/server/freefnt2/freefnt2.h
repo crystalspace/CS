@@ -42,7 +42,7 @@ class csFreeType2Font : public iFont
     int descender, ascender, advance, left, top;
     bool isOk;
 
-    GlyphBitmap (){isOk=false; bitmap = NULL; alphabitmap = NULL; }
+    GlyphBitmap (){isOk=false; bitmap = 0; alphabitmap = 0; }
     ~GlyphBitmap ()
     { if (isOk) { delete [] bitmap; if (alphabitmap) delete[] alphabitmap; } }
   };
@@ -78,7 +78,7 @@ class csFreeType2Font : public iFont
   GlyphSet *FindGlyphSet (int size)
   {
     int idx = cache.FindKey ((const void*)size);
-    return (idx == -1 ? NULL : cache.Get (idx));
+    return (idx == -1 ? 0 : cache.Get (idx));
   }
 
   bool CreateGlyphBitmaps (int size);
@@ -140,7 +140,7 @@ public:
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
-   * Returns NULL if error occured. The oW and oH parameters are
+   * Returns 0 if error occured. The oW and oH parameters are
    * filled with bitmap width and height.
    */
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
@@ -230,7 +230,7 @@ public:
 
   /**
    * Load a font by name.
-   * Returns a new iFont object or NULL on failure.
+   * Returns a new iFont object or 0 on failure.
    */
   virtual csPtr<iFont> LoadFont (const char *filename);
 
@@ -241,9 +241,9 @@ public:
   { return fonts.Length(); }
 
   /**
-   * Get Nth loaded font or NULL.
+   * Get Nth loaded font or 0.
    * You can query all loaded fonts with this method, by looping
-   * through all indices starting from 0 until you get NULL.
+   * through all indices starting from 0 until you get 0.
    */
   virtual iFont *GetFont (int iIndex);
 

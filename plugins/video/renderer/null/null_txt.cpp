@@ -74,7 +74,7 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
 csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
   iImage *image, int flags) : csTextureHandle (image, flags)
 {
-  pal2glob = NULL;
+  pal2glob = 0;
   (texman = txtmgr)->IncRef ();
 }
 
@@ -145,7 +145,7 @@ void csTextureHandleNull::ComputeMeanColor ()
       // Very well, we don't need the iImage anymore, so free it
       DG_UNLINK (t, t->image);
       t->image->DecRef ();
-      t->image = NULL;
+      t->image = 0;
     }
 
   quant.End ();

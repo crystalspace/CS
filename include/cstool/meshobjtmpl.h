@@ -219,7 +219,7 @@ public:
    * See imesh/object.h for sepcification. The default implementation
    * does not support portals.
    */
-  virtual iPortal* GetPortal (int) const { return NULL; }
+  virtual iPortal* GetPortal (int) const { return 0; }
 
   /**
    * See igeom/objmodel.h for specification. The default implementation
@@ -307,7 +307,7 @@ public:
   /**
    * See imesh/object.h for specification.
    */
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 
 };
 

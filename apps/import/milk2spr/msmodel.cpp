@@ -51,7 +51,7 @@ bool MsModel::IsFileMsModel(const char* msfile)
     return false;
   char szLine[256];
 
-  if (get_line (szLine, 256, file) != NULL)
+  if (get_line (szLine, 256, file) != 0)
   {
      if (strcmp(szLine,"// MilkShape 3D ASCII\n") == 0)
      {
@@ -64,14 +64,14 @@ bool MsModel::IsFileMsModel(const char* msfile)
 }
 
 
-MsModel::MsModel(const char* msfile) : sError(NULL)
+MsModel::MsModel(const char* msfile) : sError(0)
 {
-  frames = NULL;
+  frames = 0;
   nbFrames = 0;
-  triangleList = NULL;
+  triangleList = 0;
   strcpy(material,"spark");
   strcpy(materialFile,"spark.gif");
-  joints = NULL;
+  joints = 0;
   nbJoints = 0;
   
   frameDuration = FRAME_DURATION_DEFAULT;
@@ -80,14 +80,14 @@ MsModel::MsModel(const char* msfile) : sError(NULL)
   ReadMsFile(msfile);
 }
 
-MsModel::MsModel(const char* msfile,float i_frameDuration) : sError(NULL)
+MsModel::MsModel(const char* msfile,float i_frameDuration) : sError(0)
 {
-  frames = NULL;
+  frames = 0;
   nbFrames = 0;
-  triangleList = NULL;
+  triangleList = 0;
   strcpy(material,"spark");
   strcpy(materialFile,"spark.gif");
-  joints = NULL;
+  joints = 0;
   nbJoints = 0;
   
   frameDuration = i_frameDuration;
@@ -98,7 +98,7 @@ MsModel::MsModel(const char* msfile,float i_frameDuration) : sError(NULL)
 
 MsModel::~MsModel()
 {
-  if (sError != NULL)
+  if (sError != 0)
     free(sError);
   clearMemory();
   free(material);
@@ -107,40 +107,40 @@ MsModel::~MsModel()
 
 void MsModel::clearMemory()
 {
-  if(frames!=NULL)
+  if(frames!=0)
   {
     int i;
     for(i=0;i<nbFrames;i++)
     {
-      if(frames[i] != NULL)
+      if(frames[i] != 0)
       {
         delete frames[i];
       }
     }
   }
-  if(triangleList!=NULL)
+  if(triangleList!=0)
   {
     delete triangleList;
   }
-  frames = NULL;
-  triangleList = NULL;
+  frames = 0;
+  triangleList = 0;
   nbFrames = 0;
   
   strcpy(material,"spark");
   strcpy(materialFile,"spark.gif");
     
-  if(joints !=NULL)
+  if(joints !=0)
   {
     int i;
     for(i=0;i<nbJoints;i++)
     {
-      if(joints[i] != NULL)
+      if(joints[i] != 0)
       {
         delete joints[i];
       }
     }
   }
-  joints = NULL;
+  joints = 0;
   nbJoints = 0;
 }
 
@@ -149,10 +149,10 @@ bool MsModel::setError(const char* errorstring, FILE* closethis)
   if (closethis != 0)
     fclose(closethis);
 
-  if (sError != NULL)
+  if (sError != 0)
     free(sError);
 
-  if (errorstring == NULL)
+  if (errorstring == 0)
     sError = strdup("Unknown error");
   else
     sError = strdup(errorstring);
@@ -214,7 +214,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   frames = new struct Frame*[nbFrames];
   for(frameIndex = 0;frameIndex<nbFrames;frameIndex++)
   {
-    frames[frameIndex] = NULL;
+    frames[frameIndex] = 0;
   }
   struct Frame** currentFrame = frames;
   struct TriangleList** currentTriangle = &triangleList;
@@ -620,7 +620,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   int i;
   for(i = 0;i<nbJoints;i++)
   {
-    joints[i] = NULL;
+    joints[i] = 0;
   }
   char** parents = new char*[nbJoints];
   for(i = 0;i<nbJoints;i++)
@@ -799,9 +799,9 @@ bool MsModel::WriteSPR(const char* spritename)
   FILE *f;
   char *spritefilename;
 
-  if (spritename == NULL || strlen(spritename) == 0)
+  if (spritename == 0 || strlen(spritename) == 0)
   {
-    fprintf(stderr, "Unable to save: NULL sprite name\n");
+    fprintf(stderr, "Unable to save: 0 sprite name\n");
     return false;
   }
 
@@ -809,7 +809,7 @@ bool MsModel::WriteSPR(const char* spritename)
   strcpy(spritefilename, spritename);
   strcat(spritefilename, ".lib");
 
-  if ((f = fopen(spritefilename, "w")) == NULL)
+  if ((f = fopen(spritefilename, "w")) == 0)
   {
     fprintf(stderr, "Cannot open sprite file %s for writing\n", spritename);
     return false;
@@ -846,77 +846,77 @@ bool MsModel::WriteSPR(const char* spritename)
   csRef<iDocument> doc = xml->CreateDocument ();
   csRef<iDocumentNode> root = doc->CreateRoot ();
   csRef<iDocumentNode> library = root->CreateNodeBefore (
-    	CS_NODE_ELEMENT, NULL);
+    	CS_NODE_ELEMENT, 0);
   library->SetValue ("library");
   //fprintf(f, "LIBRARY \n(\n");
   // begin hard work now
   csRef<iDocumentNode> textures;
-  textures = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  textures = library->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   textures->SetValue ("textures");
   csRef<iDocumentNode> texture;
-  texture = textures->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  texture = textures->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   texture->SetValue ("texture");
   texture->SetAttribute("name",material);
   csRef<iDocumentNode> file;
-  file = texture->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  file = texture->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   file->SetValue ("file");
   csRef<iDocumentNode> text;
-  text = file->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = file->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValue (materialFile);
   //fprintf(f, "TEXTURES (\n");
   //fprintf(f, "  TEXTURE '%s' ( FILE(/lib/std/%s))\n",material,materialFile);
   //fprintf(f, ")\n");
   
   csRef<iDocumentNode> materials;
-  materials = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  materials = library->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   materials->SetValue ("materials");
   csRef<iDocumentNode> materialnode;
-  materialnode = materials->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  materialnode = materials->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   materialnode->SetValue ("material");
   materialnode->SetAttribute("name",material);
-  texture = materialnode->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  texture = materialnode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   texture->SetValue ("texture");
-  text = texture->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = texture->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValue (material);
   //fprintf(f, "MATERIALS (\n");
   //fprintf(f, "  MATERIAL '%s' ( TEXTURE('%s'))\n",material,material);
   //fprintf(f, ")\n");
   
   csRef<iDocumentNode> meshfact;
-  meshfact = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  meshfact = library->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   meshfact->SetValue ("meshfact");
   meshfact->SetAttribute("name",spritename);
   csRef<iDocumentNode> plugin;
-  plugin = meshfact->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  plugin = meshfact->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   plugin->SetValue ("plugin");
-  text = plugin->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = plugin->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValue ("crystalspace.mesh.loader.factory.sprite.3d");
   csRef<iDocumentNode> params;
-  params = meshfact->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  params = meshfact->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   params->SetValue ("params");
-  materialnode = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  materialnode = params->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   materialnode->SetValue ("material");
-  text = materialnode->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = materialnode->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValue (material);
   //fprintf(f, "MESHFACT '%s' \n(\n", spritename);
   //fprintf(f, "  PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
   //fprintf(f, "  PARAMS \n  (\n");
   //fprintf(f, "    MATERIAL ('%s')\n", material);
   
-  if(frames!=NULL)
+  if(frames!=0)
   {
     int i;
     for(i = 0; i < nbFrames;i++)
     {
-      if(frames[i]!=NULL)
+      if(frames[i]!=0)
       {
         csRef<iDocumentNode> frame;
-        frame = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+        frame = params->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         frame->SetValue ("frame");
         frame->SetAttributeAsInt("name",i);
         //fprintf(f, "    FRAME '%d' \n    (\n", i);
         struct Frame* currentFrame = frames[i];
-        while(currentFrame!=NULL)
+        while(currentFrame!=0)
         {
           if(nbJoints>0)
           {
@@ -924,7 +924,7 @@ bool MsModel::WriteSPR(const char* spritename)
             currentFrame->vertex->normal   = inv[currentFrame->vertex->boneIndex].GetT2O()*currentFrame->vertex->normal;
           }
           csRef<iDocumentNode> v;
-          v = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+          v = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
           v->SetValue ("v");
           v->SetAttributeAsFloat("x",currentFrame->vertex->position.x);
           v->SetAttributeAsFloat("y",currentFrame->vertex->position.y);
@@ -951,19 +951,19 @@ bool MsModel::WriteSPR(const char* spritename)
     }
   }
   csRef<iDocumentNode> action;
-  action = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  action = params->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   action->SetValue ("action");
   action->SetAttribute("name","default");
   //fprintf(f, "    ACTION 'default' (");  
-  if(frames!=NULL)
+  if(frames!=0)
   {
     int i;
     for(i = 0; i < nbFrames;i++)
     {
-      if(frames[i]!=NULL)
+      if(frames[i]!=0)
       {
         csRef<iDocumentNode> f;
-        f = action->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+        f = action->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         f->SetValue ("f");
         f->SetAttributeAsInt("name",i);
         f->SetAttributeAsInt("delay",(int)(frameDuration*1000.0));
@@ -974,10 +974,10 @@ bool MsModel::WriteSPR(const char* spritename)
   //fprintf(f, " )\n");
   
   struct TriangleList* currentTri = triangleList;
-  while(currentTri !=NULL)
+  while(currentTri !=0)
   {
     csRef<iDocumentNode> t;
-    t = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    t = params->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     t->SetValue ("t");
     t->SetAttributeAsInt("v1",currentTri->triangle->index1);
     t->SetAttributeAsInt("v2",currentTri->triangle->index2);
@@ -992,7 +992,7 @@ bool MsModel::WriteSPR(const char* spritename)
   if(nbJoints>0)
   {
     csRef<iDocumentNode> skeleton;
-    skeleton = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    skeleton = params->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     skeleton->SetValue ("skeleton");
     skeleton->SetAttribute("name","skeleton");
     //fprintf(f,"    SKELETON 'skeleton' ( \n");
@@ -1014,28 +1014,28 @@ bool MsModel::WriteSPR(const char* spritename)
   if(nbJoints > 0 )
   {
     csRef<iDocumentNode> addon;
-    addon = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    addon = library->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     addon->SetValue ("addon");
-    plugin = addon->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    plugin = addon->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     plugin->SetValue ("plugin");
-    text = plugin->CreateNodeBefore (CS_NODE_TEXT, NULL);
+    text = plugin->CreateNodeBefore (CS_NODE_TEXT, 0);
     text->SetValue ("crystalspace.motion.loader.default");
-    params = addon->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    params = addon->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     params->SetValue ("params");
     csRef<iDocumentNode> motion;
-    motion = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    motion = params->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     motion->SetValue ("motion");
     motion->SetAttribute("name","default");
     csRef<iDocumentNode> duration;
-    duration = motion->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    duration = motion->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     duration->SetValue ("duration");
     csRef<iDocumentNode> time;
-    time = duration->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    time = duration->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     time->SetValue ("time");
-    text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+    text = time->CreateNodeBefore (CS_NODE_TEXT, 0);
     text->SetValueAsFloat ( ((float)nbFrames)*frameDuration);
     csRef<iDocumentNode> loop;
-    loop = duration->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    loop = duration->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     loop->SetValue ("loop");
     //fprintf(f, "ADDON (\n");
     //fprintf(f, "  PLUGIN ('crystalspace.motion.loader.default')\n");
@@ -1054,7 +1054,7 @@ bool MsModel::WriteSPR(const char* spritename)
         for(k = 0;k < joints[i]->nbRotationKeys;k++) rotUsed[k] = false;
         
         csRef<iDocumentNode> bone;
-        bone = motion->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+        bone = motion->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         bone->SetValue ("bone");
         bone->SetAttribute("name",joints[i]->name);
         //fprintf(f, "      BONE '%s' (\n",joints[i]->name); 
@@ -1073,23 +1073,23 @@ bool MsModel::WriteSPR(const char* spritename)
               csVector3 vy = - transy.GetO2T() * transy.GetO2TTranslation();
               
               csRef<iDocumentNode> frame;
-              frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, 0);
               frame->SetValue ("frame");
-              time = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              time = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
               time->SetValue ("time");
-              text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+              text = time->CreateNodeBefore (CS_NODE_TEXT, 0);
               text->SetValueAsFloat (joints[i]->positionKeys[j].time*frameDuration);
               csRef<iDocumentNode> pos;
-              pos = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              pos = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
               pos->SetValue ("pos");
               pos->SetAttributeAsFloat("x",vy.x);
               pos->SetAttributeAsFloat("y",vy.y);
               pos->SetAttributeAsFloat("z",vy.z);
               csRef<iDocumentNode> rot;
-              rot = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              rot = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
               rot->SetValue ("rot");
               csRef<iDocumentNode> q;
-              q = rot->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              q = rot->CreateNodeBefore (CS_NODE_ELEMENT, 0);
               q->SetValue ("q");
               q->SetAttributeAsFloat("x",qy.x);
               q->SetAttributeAsFloat("y",qy.y);
@@ -1112,14 +1112,14 @@ bool MsModel::WriteSPR(const char* spritename)
           if(!found)
           {
             csRef<iDocumentNode> frame;
-            frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             frame->SetValue ("frame");
-            time = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            time = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             time->SetValue ("time");
-            text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+            text = time->CreateNodeBefore (CS_NODE_TEXT, 0);
             text->SetValueAsFloat (joints[i]->positionKeys[j].time*frameDuration);
             csRef<iDocumentNode> pos;
-            pos = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            pos = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             pos->SetValue ("pos");
             pos->SetAttributeAsFloat("x",joints[i]->positionKeys[j].data.x);
             pos->SetAttributeAsFloat("y",joints[i]->positionKeys[j].data.y);
@@ -1141,17 +1141,17 @@ bool MsModel::WriteSPR(const char* spritename)
             csQuaternion qy = csQuaternion(matrixy);
             
             csRef<iDocumentNode> frame;
-            frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             frame->SetValue ("frame");
-            time = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            time = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             time->SetValue ("time");
-            text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+            text = time->CreateNodeBefore (CS_NODE_TEXT, 0);
             text->SetValueAsFloat (joints[i]->rotationKeys[j].time*frameDuration);
             csRef<iDocumentNode> rot;
-            rot = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            rot = frame->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             rot->SetValue ("rot");
             csRef<iDocumentNode> q;
-            q = rot->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            q = rot->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             q->SetValue ("q");
             q->SetAttributeAsFloat("x",qy.x);
             q->SetAttributeAsFloat("y",qy.y);
@@ -1184,30 +1184,30 @@ bool MsModel::WriteSPR(const char* spritename)
 void MsModel::printJoint(struct Joint* joint,csRef<iDocumentNode> parent)
 {
   csRef<iDocumentNode> child;
-  child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  child = parent->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   child->SetValue("limb");
   child->SetAttribute("name",joint->name);
   //fprintf(f, "      LIMB '%s' ( \n" , joint->name);
   
   //bool vertices=false;
-  if(frames!=NULL)
+  if(frames!=0)
   {
     int i;
     for(i = 0; i < nbFrames;i++)
     {
-      if(frames[i]!=NULL)
+      if(frames[i]!=0)
       {
         struct Frame* currentFrame = frames[i];
         long vertexCount=0;
-        while(currentFrame!=NULL)
+        while(currentFrame!=0)
         {
           if(currentFrame->vertex->boneIndex == joint->index)
           {
             csRef<iDocumentNode> v;
-            v = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            v = child->CreateNodeBefore (CS_NODE_ELEMENT, 0);
             v->SetValue("v");
             csRef<iDocumentNode> text;
-            text = v->CreateNodeBefore (CS_NODE_TEXT, NULL);
+            text = v->CreateNodeBefore (CS_NODE_TEXT, 0);
             text->SetValueAsInt (vertexCount);
             //if(!vertices)
             //{
@@ -1234,62 +1234,62 @@ void MsModel::printJoint(struct Joint* joint,csRef<iDocumentNode> parent)
   //  fprintf(f, ")\n");
   //}
   csRef<iDocumentNode> transform;
-  transform = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  transform = child->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   transform->SetValue("transform");
   
   csRef<iDocumentNode> matrix;
-  matrix = transform->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  matrix = transform->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   matrix->SetValue("matrix");
   
   csRef<iDocumentNode> mxx;
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m11");
   csRef<iDocumentNode> text;
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m11);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m12");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m12);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m13");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m13);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m21");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m21);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m22");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m22);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m23");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m23);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m31");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m31);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m32");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m32);
   
-  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   mxx->SetValue("m33");
-  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, 0);
   text->SetValueAsFloat (joint->transform->matrix.m33);
   
   csRef<iDocumentNode> v;
-  v = transform->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  v = transform->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   v->SetValue("v");
   v->SetAttributeAsFloat("x",joint->transform->move.x);
   v->SetAttributeAsFloat("y",joint->transform->move.y);

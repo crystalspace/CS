@@ -25,13 +25,13 @@ awsTab::awsTab ():
   is_active(false),
   is_first(false),
   is_top(true),
-  caption (NULL),
+  caption (0),
   captured(false),
   icon_align(0),
   alpha_level(92),
-  user_param(NULL)
+  user_param(0)
 {
-  tex[0]=tex[1]=tex[2]=NULL;
+  tex[0]=tex[1]=tex[2]=0;
 }
 
 awsTab::~awsTab ()
@@ -49,14 +49,14 @@ bool awsTab::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "IconAlign", icon_align);
   pm->GetString (settings, "Caption", caption);
 
-  iString *tn = NULL;
+  iString *tn = 0;
 
   tex[0] = pm->GetTexture ("Texture");
   pm->GetString (settings, "Image", tn);
 
   if (tn) tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
 
-  iString *in = NULL;
+  iString *in = 0;
   pm->GetString (settings, "Icon", in);
   if (in) tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
 
@@ -181,7 +181,7 @@ bool awsTab::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -210,7 +210,7 @@ bool awsTab::SetProperty (const char *name, void *parm)
     if (s && s->Length ())
       (caption = s)->IncRef ();
     else
-      caption = NULL;
+      caption = 0;
     Invalidate ();
 
     return true;
@@ -321,9 +321,9 @@ awsTabCtrl::awsTabCtrl ():
   first(-1),
   active(-1),
   is_top(true),
-  sink(NULL),
-  nextimg(NULL),
-  previmg(NULL)
+  sink(0),
+  nextimg(0),
+  previmg(0)
 {
 }
 

@@ -27,7 +27,7 @@
 
 csConfigAccess::csConfigAccess()
 {
-  object_reg = NULL;
+  object_reg = 0;
 }
 
 csConfigAccess::csConfigAccess(iObjectRegistry *object_reg, const char *fname,
@@ -60,7 +60,7 @@ void csConfigAccess::AddConfig (iObjectRegistry *object_reg, const char *fname,
   if (vfs)
   {
     VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-    //CS_ASSERT (VFS != NULL);
+    //CS_ASSERT (VFS != 0);
   }
   ConfigFiles.Push (cfgmgr->AddDomain (fname, VFS, priority));
 }

@@ -47,7 +47,7 @@ SCF_IMPLEMENT_FACTORY (csMotionManager)
 
 SCF_EXPORT_CLASS_TABLE (motion)
   SCF_EXPORT_CLASS_DEP (csMotionManager, "crystalspace.motion.manager.default",
-    "Skeletal Motion Manager for Crystal Space", NULL)
+    "Skeletal Motion Manager for Crystal Space", 0)
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csMotionTemplate)
@@ -62,8 +62,8 @@ SCF_IMPLEMENT_IBASE_END
 
 csMotionTemplate::csMotionTemplate()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  name = NULL;
+  SCF_CONSTRUCT_IBASE (0);
+  name = 0;
   hash = 0;
   duration = 0.0f;
   loopcount = 0;
@@ -229,11 +229,11 @@ void csMotionBone::Animate(float time,float duration, csVector3 &v, csQuaternion
 
 csMotionController::csMotionController(iSkeletonBone *Tskel)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   paused=0;
   stackchanged=0;
   skel=Tskel;
-  bonecache=NULL;
+  bonecache=0;
   bonecachesize=0;
   bonecachelimit=0;
 }
@@ -299,7 +299,7 @@ iSkeletonBone *csFindBone ( iSkeletonBone *bone, unsigned int hash )
 	if (newbone) return newbone;
 	else child = child->GetNext();
   }
-  return NULL;
+  return 0;
 }
 
 #define BONE_CACHE_ADD_SIZE 64
@@ -441,7 +441,7 @@ csMotionManager::csMotionManager(iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   oldtime=0;
-  object_reg=NULL;
+  object_reg=0;
 }
 
 csMotionManager::~csMotionManager()
@@ -478,7 +478,7 @@ csMotionTemplate* csMotionManager::FindMotionTemplateByName (const char* name)
   int index = motions.FindSortedKey ((void*)csHashCompute(name),
   	comparekey_motions);
   if (index == -1)
-    return NULL;
+    return 0;
   return motions.Get(index);
 }
 
@@ -525,7 +525,7 @@ csMotionController* csMotionManager::FindMotionControllerBySkeleton (
 {
   int index = controllers.FindSortedKey (skel, comparekey_skeleton);
   if (index == -1)
-    return NULL;
+    return 0;
   return controllers.Get(index);
 }
 

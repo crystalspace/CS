@@ -91,13 +91,13 @@ SCF_IMPLEMENT_IBASE_END
 
 csImageFile::csImageFile (int iFormat) : iImage()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, NULL);
+  SCF_CONSTRUCT_IBASE (0);
+  DG_ADDI (this, 0);
   DG_TYPE (this, "csImageFile");
-  Image = NULL;
-  Palette = NULL;
-  fName = NULL;
-  Alpha = NULL;
+  Image = 0;
+  Palette = 0;
+  fName = 0;
+  Alpha = 0;
   Format = iFormat;
   has_keycolour = 0;
   keycolour_r = 0;
@@ -178,7 +178,7 @@ void csImageFile::FreeImage ()
   }
   delete [] Palette;
   delete [] Alpha;
-  Image = NULL; Palette = NULL; Alpha = NULL;
+  Image = 0; Palette = 0; Alpha = 0;
 }
 
 void csImageFile::Rescale (int newwidth, int newheight)
@@ -449,7 +449,7 @@ void csImageFile::CheckAlpha ()
   {
     if (Alpha)
     { 
-      delete [] Alpha; Alpha = NULL; 
+      delete [] Alpha; Alpha = 0; 
     }
     Format &= ~CS_IMGFMT_ALPHA;
   }
@@ -555,7 +555,7 @@ void csImageFile::convert_pal8 (uint8 *iImage, csRGBpixel *iPalette,
       else
         while (pixels--)
           *out++ = iPalette [*in++];
-      delete [] Alpha; Alpha = NULL;
+      delete [] Alpha; Alpha = 0;
       delete [] iImage; 
       delete [] iPalette; 
       break;
@@ -582,7 +582,7 @@ void csImageFile::SetFormat (int iFormat)
   int pixels = Width * Height;
   int oldformat = Format;
   void *oldimage = Image;
-  Image = NULL;
+  Image = 0;
   Format = iFormat;
 
   if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
@@ -612,11 +612,11 @@ csPtr<iImage> csImageFile::Clone ()
   csRef<csImageFile> nimg = csPtr<csImageFile> (new csImageFile (Format));
   nimg->Width = Width;
   nimg->Height = Height;
-  nimg->fName = NULL;
+  nimg->fName = 0;
   nimg->Format = Format;
-  nimg->Image = NULL;
-  nimg->Palette = NULL;
-  nimg->Alpha = NULL;
+  nimg->Image = 0;
+  nimg->Palette = 0;
+  nimg->Alpha = 0;
 
   int pixels = Width * Height;
   if (Alpha)
@@ -657,11 +657,11 @@ csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height )
   csRef<csImageFile> nimg = csPtr<csImageFile> (new csImageFile (Format));
   nimg->Width = width;
   nimg->Height = height;
-  nimg->fName = NULL;
+  nimg->fName = 0;
   nimg->Format = Format;
-  nimg->Image = NULL;
-  nimg->Palette = NULL;
-  nimg->Alpha = NULL;
+  nimg->Image = 0;
+  nimg->Palette = 0;
+  nimg->Alpha = 0;
 
   int pixels = width * height;
   int i;

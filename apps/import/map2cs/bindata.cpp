@@ -25,7 +25,7 @@
 
 CBinaryData::CBinaryData()
 {
-  m_pData = NULL;
+  m_pData = 0;
   m_Size  = 0;
 }
 

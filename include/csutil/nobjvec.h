@@ -61,7 +61,7 @@ public:
     if (i != -1)
       return (*this)[i];
     else
-      return NULL;
+      return 0;
   }
 };
 

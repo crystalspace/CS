@@ -45,7 +45,7 @@ bool HandleEvent (iEvent &ev)
     else if (ev.Command.Code == cscmdPostProcess)
     {
       G3D->FinishDraw ();
-      G3D->Print (NULL);
+      G3D->Print (0);
     }
     else return false;
   }

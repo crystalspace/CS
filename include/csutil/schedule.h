@@ -79,7 +79,7 @@ private:
 
   /// internal, insert part given msec after now into list
   void InsertCall(csSchedulePart *part, int afternow);
-  /// internal, unlink part from list given prev. (prev can be NULL)
+  /// internal, unlink part from list given prev. (prev can be 0)
   void RemoveCall(csSchedulePart *prev, csSchedulePart *part);
 
 public:

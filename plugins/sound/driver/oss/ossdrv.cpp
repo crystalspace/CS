@@ -215,13 +215,13 @@ csSoundDriverOSS::csSoundDriverOSS(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  object_reg = NULL;
+  object_reg = 0;
   memorysize = 0;
-  memory = NULL;
+  memory = 0;
   block_size=0;
   writeblock = 0;
   fragments = 0;
-  soundbuffer = NULL;
+  soundbuffer = 0;
 }
 
 csSoundDriverOSS::~csSoundDriverOSS()
@@ -247,7 +247,7 @@ bool csSoundDriverOSS::Open(iSoundRender *, int frequency, bool bit16,
   {
     lasterr = err_alloc_soundbuffer;
     soundbuffer = new unsigned char[fragments * block_size];
-    Active = soundbuffer != NULL;
+    Active = soundbuffer != 0;
   }
   else
     lasterr = device.lasterr;
@@ -263,9 +263,9 @@ bool csSoundDriverOSS::Open(iSoundRender *, int frequency, bool bit16,
 
 void csSoundDriverOSS::Close()
 {
-  if (soundbuffer) { delete[] soundbuffer; soundbuffer=NULL; }
+  if (soundbuffer) { delete[] soundbuffer; soundbuffer=0; }
   device.Close();
-  memory=NULL;
+  memory=0;
   memorysize=0;
 }
 

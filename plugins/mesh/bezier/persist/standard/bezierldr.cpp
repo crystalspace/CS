@@ -159,7 +159,7 @@ bool csBezierLoader::ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
 	{
 	  const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-          if (mat == NULL)
+          if (mat == 0)
           {
 	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.material",
@@ -344,7 +344,7 @@ Nag to Jorrit about this feature if you want it.");
 	{
 	  const char* matname = child->GetContentsValue ();
           info.default_material = ldr_context->FindMaterial (matname);
-          if (info.default_material == NULL)
+          if (info.default_material == 0)
           {
 	    synldr->ReportError (
 	        "crystalspace.bezierloader.parse.material",
@@ -378,7 +378,7 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.bezierloader.setup.objecttype",
 		node, "Could not load the bezier mesh object plugin!");
-    return NULL;
+    return 0;
   }
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
@@ -396,7 +396,7 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
   if (!LoadThingPart (node, ldr_context, object_reg, reporter, synldr, info,
   	engine, thing_state, thing_fact_state, true))
   {
-    fact = NULL;
+    fact = 0;
   }
   return csPtr<iBase> (fact);
 }

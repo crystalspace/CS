@@ -271,7 +271,7 @@ static csPaletteExport defaultPalette [] =
 
 csPaletteExport *cswsPalette = defaultPalette;
 int cswsPaletteSize = sizeof (defaultPalette) / sizeof (csPaletteExport);
-static int **savedPalette = NULL;
+static int **savedPalette = 0;
 
 int csRegisterPalette (int *Palette, int Size)
 {
@@ -322,7 +322,7 @@ static void csFreePalette ()
   for (i = 0; i < cswsPaletteSize; i++)
     delete [] savedPalette [i];
   delete [] savedPalette;
-  savedPalette = NULL;
+  savedPalette = 0;
 }
 
 static void csRestorePalette ()

@@ -157,7 +157,7 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
   ifprintf(f, ind++, "FRAME 'base' (\n");
   for(i=0; i<submesh->getVertexCount(); i++) {
     CalCoreSubmesh::Vertex *v=&submesh->getVectorVertex()[i];
-    CalCoreSubmesh::TextureCoordinate *t=NULL;
+    CalCoreSubmesh::TextureCoordinate *t=0;
     std::vector<std::vector<CalCoreSubmesh::TextureCoordinate> > &tc=submesh->getVectorVectorTextureCoordinate();
     if(tc.size()>0) {
       if(tc[0].size()>(unsigned)i) {
@@ -166,7 +166,7 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
     }
 
 //CS doesn't support per-vertex influences yet, so pick the biggest one
-    CalCoreSubmesh::Influence *useinf=NULL;
+    CalCoreSubmesh::Influence *useinf=0;
     float useweight=0.0f;
     for(unsigned int j=0; j<v->vectorInfluence.size(); j++) {
       CalCoreSubmesh::Influence *i=&v->vectorInfluence[j];
@@ -369,7 +369,7 @@ int ConvertModel(const char *filename) {
     }
   }
   fclose(f);
-  f=NULL;
+  f=0;
 
   //Verify there is data to export
   if(!calCoreModel.getCoreMeshCount()) {

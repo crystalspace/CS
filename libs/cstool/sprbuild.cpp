@@ -42,7 +42,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 {
   int i,j;
   csRef<iObjectIterator> it1;
-  iModelDataMaterial *Material = NULL;
+  iModelDataMaterial *Material = 0;
 
   //--- preparation stage: arrange and validate incoming data locally --------
 
@@ -118,7 +118,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       // build the vertex array
       csIntArray PolyVertices;
       csModelDataTools::BuildVertexArray (poly, &SpriteVertices,
-        &SpriteNormals, NULL, &SpriteTexels, &PolyVertices);
+        &SpriteNormals, 0, &SpriteTexels, &PolyVertices);
 
       // split the polygon into triangles and copy them
       for (i=2; i<PolyVertices.Length (); i++)

@@ -28,7 +28,7 @@
 csPolArrayPolygonBuffer::csPolArrayPolygonBuffer (iVertexBufferManager* mgr)
 	: csPolygonBuffer (mgr)
 {
-  vertices = NULL;
+  vertices = 0;
 }
 
 csPolArrayPolygonBuffer::~csPolArrayPolygonBuffer ()
@@ -93,7 +93,7 @@ void csPolArrayPolygonBuffer::Clear ()
 
   materials.SetLength (0);
 
-  delete[] vertices; vertices = NULL;
+  delete[] vertices; vertices = 0;
   num_vertices = 0;
 }
 

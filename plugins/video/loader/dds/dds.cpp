@@ -31,9 +31,9 @@ namespace dds
   ((uint32) c1 | ((uint32) c2<<8) | ((uint32) c3<<16) | ((uint32) c4<<24))
 
 Loader::Loader ()
-  : source(NULL), sourcelen(0), header(NULL), lasterror(NULL)
+  : source(0), sourcelen(0), header(0), lasterror(0)
 {
-  positions = NULL;
+  positions = 0;
 }
 
 Loader::~Loader ()
@@ -46,7 +46,7 @@ void Loader::SetSource (void* buffer, size_t bufferlen)
 {
   source = (uint8*) buffer;
   sourcelen = bufferlen;
-  header = NULL;
+  header = 0;
 }
 
 bool Loader::IsDDS ()
@@ -112,7 +112,7 @@ uint8* Loader::LoadImage ()
 uint8* Loader::LoadMipmap (int number)
 {
   if (number >= GetMipmapCount())
-    return NULL;
+    return 0;
 
   int width = GetWidth() >> (number+1);
   int height = GetHeight() >> (number+1);

@@ -53,12 +53,12 @@ public:
   ///
   void Clear ()
   {
-    delete [] map; map = NULL;
+    delete [] map; map = 0;
     max_sizeRGB = 0;
   }
 
   ///
-  csRGBFloatLightMap () : max_sizeRGB (0), map (NULL) { }
+  csRGBFloatLightMap () : max_sizeRGB (0), map (0) { }
   ///
   ~csRGBFloatLightMap () { Clear (); }
 
@@ -438,10 +438,10 @@ private:
   /// deletes this node which must have non-null left and right subtrees.
   void DelNode();
 
-  /// Returns Leftmost node in this tree, parent is also stored or NULL
+  /// Returns Leftmost node in this tree, parent is also stored or 0
   csRadTree* FindLeftMost(csRadTree*& parent);
 
-  /// Returns rightost node in this tree, parent is also stored or NULL
+  /// Returns rightost node in this tree, parent is also stored or 0
   csRadTree* FindRightMost(csRadTree*& parent);
 
 public:
@@ -627,7 +627,7 @@ public:
    */
   void RestoreStaticMaps ();
 
-  /// get next best poly to shoot, or NULL if we should stop.
+  /// get next best poly to shoot, or 0 if we should stop.
   csRadElement* FetchNext();
   /// Start a sector frustum to shoot from the source. callback is used.
   void StartFrustum();

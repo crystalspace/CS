@@ -37,7 +37,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csTextureWrapper::csTextureWrapper (iImage *Image) :
     csObject(),
     flags(CS_TEXTURE_3D),
-    use_callback(NULL)
+    use_callback(0)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
@@ -50,7 +50,7 @@ csTextureWrapper::csTextureWrapper (iImage *Image) :
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
-  use_callback(NULL)
+  use_callback(0)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
@@ -76,7 +76,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
 csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   csObject(t),
   flags(CS_TEXTURE_3D),
-  use_callback(NULL)
+  use_callback(0)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
@@ -195,7 +195,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   }
 
   if (!keep_image)
-    SetImageFile (NULL);
+    SetImageFile (0);
 }
 
 iObject *csTextureWrapper::TextureWrapper::QueryObject ()
@@ -282,7 +282,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csTextureList::csTextureList () :
   csRefArrayObject<iTextureWrapper> (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
 }
 

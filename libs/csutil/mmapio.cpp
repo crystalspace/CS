@@ -33,7 +33,7 @@ csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename,
                                    iVFS* vfs):
   block_size(_block_size)
 {
-  const char* realpath = NULL;
+  const char* realpath = 0;
   if (vfs)
   {
     csRef<iDataBuffer> rpath = vfs->GetRealPath (filename);
@@ -83,7 +83,7 @@ bool
 csMemoryMappedIO::SoftMemoryMapFile(emulatedMmioInfo *_platform, char const *filename)
 {
   // Clear the page map
-  page_map = NULL;
+  page_map = 0;
 
   // Initialize cache management variables
   cache_block_size = csmmioDefaultCacheBlockSize;
@@ -119,7 +119,7 @@ csMemoryMappedIO::SoftMemoryMapFile(emulatedMmioInfo *_platform, char const *fil
   misses=0;
 #endif
   
-  if ((_platform->hMappedFile=fopen(filename, "rb")) == NULL)
+  if ((_platform->hMappedFile=fopen(filename, "rb")) == 0)
   {
     return false;
   }
@@ -180,7 +180,7 @@ csMemoryMappedIO::CachePage(unsigned int page)
     cache[bucket]=cp;
 
     // Initialize it
-    assert((cp->data = new unsigned char[block_size * cache_block_size])!=NULL);
+    assert((cp->data = new unsigned char[block_size * cache_block_size])!=0);
   }
   else
   {
@@ -228,7 +228,7 @@ csMemoryMappedIO::GetPointer(unsigned int index)
   {
     unsigned int page = index/cache_block_size;
   
-    if (!valid_mmio_object) return NULL;
+    if (!valid_mmio_object) return 0;
 
     if (!(*page_map)[page])
     {
@@ -258,7 +258,7 @@ csMemoryMappedIO::GetPointer(unsigned int index)
     }
 
     //Serious error! The page is marked as here, but we could not find it!
-    return NULL;
+    return 0;
   }
 }
 

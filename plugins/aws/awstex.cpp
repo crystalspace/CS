@@ -18,7 +18,7 @@ const bool DEBUG_GETTEX = false;
 static unsigned long NameToId (const char *txt)
 {
   return aws_adler32 (
-      aws_adler32 (0, NULL, 0),
+      aws_adler32 (0, 0, 0),
       (unsigned char *)txt,
       strlen (txt));
 }
@@ -27,7 +27,7 @@ awsTextureManager::awsTexture::~awsTexture ()
 {
 }
 
-awsTextureManager::awsTextureManager () : object_reg(NULL)
+awsTextureManager::awsTextureManager () : object_reg(0)
 {
   // empty
 }
@@ -98,7 +98,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   unsigned char key_b
   )
 {
-  awsTexture *awstxt = NULL;
+  awsTexture *awstxt = 0;
   bool txtfound = false;
 
   /*  Perform a lookup on the texture list.  We may consider doing this a little more
@@ -121,32 +121,32 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
 
     if (awstxt && id == awstxt->id)
     {
-      if (replace && filename != NULL)
+      if (replace && filename != 0)
         txtfound = true;
       else
         return awstxt->tex;
     }
   }
 
-  if (!txtfound && filename == NULL) return NULL;
-  if (!txtfound) awstxt = NULL;
+  if (!txtfound && filename == 0) return 0;
+  if (!txtfound) awstxt = 0;
 
   /*  If we have arrived here, then we know that the texture does not exist in the cache.
   * Therefore, we will now attempt to load it from the disk, register it, and pass back a handle.
-  * If this fails, we'll return NULL.
+  * If this fails, we'll return 0.
   */
   if (DEBUG_GETTEX)
   {
-    if (txtmgr == NULL)
+    if (txtmgr == 0)
       printf (
         "aws-debug: GetTexturebyID (%s) no texture manager.\n",
         __FILE__);
-    if (vfs == NULL)
+    if (vfs == 0)
       printf ("aws-debug: GetTexturebyID (%s) no vfs.\n", __FILE__);
-    if (loader == NULL)
+    if (loader == 0)
       printf ("aws-debug: GetTexturebyID (%s) no loader.\n", __FILE__);
 
-    if (!txtmgr || !vfs || !loader) return NULL;
+    if (!txtmgr || !vfs || !loader) return 0;
   }
 
   int Format = txtmgr->GetTextureFormat ();
@@ -154,7 +154,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   csRef<iImage> ifile;
   csRef<iDataBuffer> buf (vfs->ReadFile (filename));
 
-  if (buf == NULL || buf->GetSize () == 0)
+  if (buf == 0 || buf->GetSize () == 0)
   {
     csReport (
       object_reg,
@@ -163,7 +163,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
       "Could not open image file '%s' on VFS!",
       filename);
 
-    return NULL;
+    return 0;
   }
 
   ifile = loader->Load (buf->GetUint8 (), buf->GetSize (), Format);
@@ -177,14 +177,14 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
       "Could not load image '%s'. Unknown format or wrong extension!",
       filename);
 
-    return NULL;
+    return 0;
   }
 
   /*  At this point, we have loaded the file from the disk, and all we're doing now is creating
   * a texture handle to the image.  The texture handle is necessary to draw a pixmap with
   * iGraphics3D::DrawPixmap()
   */
-  if (awstxt == NULL)
+  if (awstxt == 0)
   {
     awstxt = new awsTexture;
     memset (awstxt, 0, sizeof (awsTexture));

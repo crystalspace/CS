@@ -104,7 +104,7 @@ struct iOSXAssistant : public iBase
    * allow this method to do so.  The first argument is a pointer to an
    * NSEvent, but is cast as an opaque OSXEvent handle for representation in
    * the C++ world.  The second argument is a pointer to the view with which
-   * the event is associated, or NULL if not associated with any view.  The
+   * the event is associated, or 0 if not associated with any view.  The
    * view argument refers to an NSView, but is cast as an opaque OSXView
    * handle for representation in the C++ world.
    */

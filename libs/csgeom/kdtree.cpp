@@ -28,7 +28,7 @@
 
 csKDTreeChild::csKDTreeChild ()
 {
-  object = NULL;
+  object = 0;
   num_leafs = 0;
   max_leafs = 2;
   leafs = new csKDTree* [max_leafs];
@@ -125,13 +125,13 @@ uint32 csKDTree::global_timestamp = 1;
 
 csKDTree::csKDTree (csKDTree* parent)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
 
-  child1 = NULL;
-  child2 = NULL;
+  child1 = 0;
+  child2 = 0;
   csKDTree::parent = parent;
-  objects = NULL;
+  objects = 0;
   num_objects = max_objects = 0;
   disallow_distribute = false;
   split_axis = CS_KDTREE_AXISINVALID;
@@ -142,7 +142,7 @@ csKDTree::csKDTree (csKDTree* parent)
   	-KDTREE_MAX, KDTREE_MAX,
 	KDTREE_MAX, KDTREE_MAX);
 
-  userobject = NULL;
+  userobject = 0;
 }
 
 csKDTree::~csKDTree ()
@@ -168,20 +168,20 @@ void csKDTree::Clear ()
       delete objects[i];
   }
   delete[] objects;
-  objects = NULL;
+  objects = 0;
   num_objects = 0;
   max_objects = 0;
-  delete child1; child1 = NULL;
-  delete child2; child2 = NULL;
+  delete child1; child1 = 0;
+  delete child2; child2 = 0;
   disallow_distribute = false;
   obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
-  SetUserObject (NULL);
+  SetUserObject (0);
 }
 
 void csKDTree::AddObject (csKDTreeChild* obj)
 {
-  CS_ASSERT ((max_objects == 0) == (objects == NULL));
+  CS_ASSERT ((max_objects == 0) == (objects == 0));
   if (num_objects >= max_objects)
   {
     max_objects += MIN (max_objects+2, 80);
@@ -494,7 +494,7 @@ void csKDTree::Distribute ()
   // is not allowed.
   if (num_objects == 0 || disallow_distribute) return;
 
-  CS_ASSERT ((child1 == NULL) == (child2 == NULL));
+  CS_ASSERT ((child1 == 0) == (child2 == 0));
   if (child1)
   {
     // This node has children. So we have to see to what child (or both)
@@ -564,7 +564,7 @@ void csKDTree::FullDistribute ()
   if (child1)
   {
     child1->FullDistribute ();
-    CS_ASSERT (child2 != NULL);
+    CS_ASSERT (child2 != 0);
     child2->FullDistribute ();
   }
 }
@@ -578,8 +578,8 @@ void csKDTree::FlattenTo (csKDTree* node)
   child1->FlattenTo (node);
   child2->FlattenTo (node);
 
-  csKDTree* c1 = child1; child1 = NULL;
-  csKDTree* c2 = child2; child2 = NULL;
+  csKDTree* c1 = child1; child1 = 0;
+  csKDTree* c2 = child2; child2 = 0;
 
   int i;
   for (i = 0 ; i < c1->num_objects ; i++)
@@ -631,11 +631,11 @@ void csKDTree::FlattenTo (csKDTree* node)
     }
   }
   delete[] c1->objects;
-  c1->objects = NULL;
+  c1->objects = 0;
   c1->num_objects = 0;
   c1->max_objects = 0;
   delete[] c2->objects;
-  c2->objects = NULL;
+  c2->objects = 0;
   c2->num_objects = 0;
   c2->max_objects = 0;
   delete c1;
@@ -656,7 +656,7 @@ void csKDTree::Flatten ()
 bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
 {
-  CS_ASSERT (this != NULL);
+  CS_ASSERT (this != 0);
   if (!func (this, userdata, cur_timestamp, frustum_mask))
     return false;
   if (child1)
@@ -665,13 +665,13 @@ bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
     if (pos[split_axis] <= split_location)
     {
       child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
-      CS_ASSERT (child2 != NULL);
+      CS_ASSERT (child2 != 0);
       child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
     }
     else
     {
       child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
-      CS_ASSERT (child1 != NULL);
+      CS_ASSERT (child1 != 0);
       child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
     }
   }
@@ -733,7 +733,7 @@ bool csKDTree::Debug_CheckTree (csString& str)
 {
   bool rc = false;
 
-  KDT_ASSERT_BOOL ((child1 == NULL) == (child2 == NULL), "child consistency");
+  KDT_ASSERT_BOOL ((child1 == 0) == (child2 == 0), "child consistency");
 
   if (child1)
   {
@@ -821,7 +821,7 @@ struct Debug_TraverseData
   const csBox3* min_node_bbox[CS_UNITTEST_OBJECTS*10];
 
   // The obj_bbox array contains pointers to the object bounding
-  // boxes we encounter during traversing a node. Or NULL
+  // boxes we encounter during traversing a node. Or 0
   // if this is a node entry.
   const csBox3* obj_bbox[CS_UNITTEST_OBJECTS*10];
 
@@ -837,7 +837,7 @@ static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
   treenode->Distribute ();
 
   data->min_node_bbox[data->num_bbox_pointers] = &(treenode->GetNodeBBox ());
-  data->obj_bbox[data->num_bbox_pointers] = NULL;
+  data->obj_bbox[data->num_bbox_pointers] = 0;
   data->num_bbox_pointers++;
   CS_ASSERT (data->num_bbox_pointers < CS_UNITTEST_OBJECTS * 10);
 
@@ -876,9 +876,9 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   // Test if after Clear() the tree is sufficiently empty :-)
   //=================
   Clear ();
-  KDT_ASSERT (child1 == NULL, "clear ok?");
-  KDT_ASSERT (child2 == NULL, "clear ok?");
-  KDT_ASSERT (objects == NULL, "clear ok?");
+  KDT_ASSERT (child1 == 0, "clear ok?");
+  KDT_ASSERT (child2 == 0, "clear ok?");
+  KDT_ASSERT (objects == 0, "clear ok?");
   KDT_ASSERT (num_objects == 0, "clear ok?");
   KDT_ASSERT (max_objects == 0, "clear ok?");
 
@@ -917,7 +917,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   // if RemoveObject() is working properly.
   //=================
   int i, j;
-  csKDTreeChild* remove_obj = NULL;
+  csKDTreeChild* remove_obj = 0;
   for (i = 0 ; i < CS_UNITTEST_OBJECTS ; i++)
   {
     float x = rnd (100.0)-50.0;
@@ -1090,7 +1090,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   printf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
 
   rc->DecRef ();
-  return NULL;
+  return 0;
 }
 
 static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,
@@ -1137,7 +1137,7 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 
   for (i = 0 ; i < num_iterations ; i++)
   {
-    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL, 0);
+    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, 0, 0);
   }
 
   csTicks pass2 = csGetTicks ();
@@ -1152,7 +1152,7 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 
   for (i = 0 ; i < num_iterations ; i++)
   {
-    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL, 0);
+    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, 0, 0);
   }
 
   csTicks pass4 = csGetTicks ();

@@ -460,11 +460,11 @@ public:
   /// Gets the current default font
   virtual iFont *GetDefaultFont()=0;
 
-  /// Gets a font.  If it's not loaded, it will be.  Returns NULL on error.
+  /// Gets a font.  If it's not loaded, it will be.  Returns 0 on error.
   virtual iFont *GetFont(const char* filename)=0;
 
   /// Gets a texture from the global AWS cache
-  virtual iTextureHandle *GetTexture(const char* name, const char* filename=NULL)=0;
+  virtual iTextureHandle *GetTexture(const char* name, const char* filename=0)=0;
 
   /// Gets a texture from the global AWS cache, if its loaded for the first time then
   /// the keycolor (key_r,key_g,key_b) is set
@@ -645,7 +645,7 @@ struct iAwsComponent : public iAwsSource
   virtual bool SetProperty(const char* name, void *parm)=0;
 
   /// Executes a scriptable action
-  virtual bool Execute(const char* action, iAwsParmList* parmlist = NULL) = 0;
+  virtual bool Execute(const char* action, iAwsParmList* parmlist = 0) = 0;
 
   /// Invalidation routine: allow the component to be redrawn when you call this
   virtual void Invalidate()=0;
@@ -776,10 +776,10 @@ struct iAwsComponent : public iAwsSource
   /// Set's the unique id of this component. Note: only to be used by window manager.
   virtual void SetID(unsigned long _id)=0;
 
-  /// Gets a child component by name, returns NULL on failure.
+  /// Gets a child component by name, returns 0 on failure.
   virtual iAwsComponent *FindChild(const char *name)=0;
 
-  /// Gets a child component by id, returns NULL on failure
+  /// Gets a child component by id, returns 0 on failure
   virtual iAwsComponent *DoFindChild(unsigned id)=0;
 
   /// Returns the highest child (if any) whose frame contains (x,y)
@@ -797,10 +797,10 @@ struct iAwsComponent : public iAwsSource
   /// Get's a specific child
   virtual iAwsComponent *GetTopChild()=0;
 
-  /// Get's the component above this one, NULL if there is none.
+  /// Get's the component above this one, 0 if there is none.
   virtual iAwsComponent *ComponentAbove()=0;
 
-  /// Get's the component below this one, NULL if there is none.
+  /// Get's the component below this one, 0 if there is none.
   virtual iAwsComponent *ComponentBelow()=0;
 
   /// Set's the component above this one
@@ -817,17 +817,17 @@ struct iAwsComponent : public iAwsSource
   virtual bool AddToTabOrder(iAwsComponent *child)=0;
 
   /// Get's next child component in parent TabOrder, 
-	//  First if there is none, NULL, if child not belongs to this component
+	//  First if there is none, 0, if child not belongs to this component
   virtual iAwsComponent *TabNext(iAwsComponent *child)=0;
 
   /// Get's previous child component in parent TabOrder,
-	//  Last if there is none, NULL, if child not belongs to this component
+	//  Last if there is none, 0, if child not belongs to this component
   virtual iAwsComponent *TabPrev(iAwsComponent *child)=0;
 
   /// Returns TabOrder length
   virtual int GetTabLength()=0;
 
-  /// Returns component from TabOrder, NULL if there is none or index is invalid
+  /// Returns component from TabOrder, 0 if there is none or index is invalid
   virtual iAwsComponent *GetTabComponent(int index)=0;
 
   /// Moves this component above all its siblings

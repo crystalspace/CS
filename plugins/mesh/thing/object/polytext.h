@@ -303,7 +303,7 @@ public:
   /**
    * Set the lightmap for this polytexture (and call IncRef()
    * on the lightmap). Can also be used to clear the reference
-   * to the lightmap if 'lightmap' is NULL.
+   * to the lightmap if 'lightmap' is 0.
    */
   void SetLightMap (csLightMap* lightmap);
 

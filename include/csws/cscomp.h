@@ -138,8 +138,8 @@ enum
    * The control is 'default' if it has a 'default' attribute (this is
    * control-specific, for example buttons have the CSBSTY_DEFAULT style).
    * <pre>
-   * IN: NULL
-   * OUT: (csComponent *) or NULL;
+   * IN: 0
+   * OUT: (csComponent *) or 0;
    * </pre>
    */
   cscmdAreYouDefault = 0x80,
@@ -148,7 +148,7 @@ enum
    * whatever action it does. For example, this message is sent by a
    * dialog window to its active child when user presses Enter key.
    * <pre>
-   * IN: NULL
+   * IN: 0
    * OUT: (csComponent *)this if successful;
    * </pre>
    */
@@ -180,7 +180,7 @@ enum
    * component still owns the focus)
    * <pre>
    * IN: (csComponent *)Component
-   * OUT: NULL if you prohibit the focus change operation
+   * OUT: 0 if you prohibit the focus change operation
    * </pre>
    */
   cscmdLoseFocus,
@@ -190,7 +190,7 @@ enum
    * component still does not own the focus)
    * <pre>
    * IN: (csComponent *)Component
-   * OUT: NULL if you prohibit the focus change operation
+   * OUT: 0 if you prohibit the focus change operation
    * </pre>
    */
   cscmdReceiveFocus,
@@ -332,7 +332,7 @@ enum
  * This is an abstract base class: all windowing system classes should be
  * subclassed from csComponent. Each component can have a number of child
  * components. Child components are chained together in a ring list; the only
- * case when a NULL can be encountered in this list is when component has
+ * case when a 0 can be encountered in this list is when component has
  * no children. When a component has at least one child and if you traverse the
  * child list you should take care to avoid looping forever through them.<p>
  *
@@ -373,7 +373,7 @@ protected:
   csComponent *clipparent;
   /// Most components contain a text string. Unify the interface.
   char *text;
-  /// Current font (or NULL if should use parent font)
+  /// Current font (or 0 if should use parent font)
   iFont *Font;
   /// Current font size
   int FontSize;
@@ -389,7 +389,7 @@ public:
   csComponent *top;
   /// Next and previous neightbours
   csComponent *next, *prev;
-  /// Parent component or NULL
+  /// Parent component or 0
   csComponent *parent;
   /// Top-level application object
   csApp *app;
@@ -402,7 +402,7 @@ public:
   /// Component size/position rectangle
   csRect bound;
 
-  /// Create a component and insert it into parent's child list if parent != NULL
+  /// Create a component and insert it into parent's child list if parent != 0
   csComponent (csComponent *iParent);
   /// Destroy component and remove it from parent't child list
   virtual ~csComponent ();
@@ -437,28 +437,28 @@ public:
   bool Select ();
 
   /// Return next visible selectable child window after 'start'
-  virtual csComponent *NextChild (csComponent *start = NULL, bool disabled = false);
+  virtual csComponent *NextChild (csComponent *start = 0, bool disabled = false);
 
   /// Return previous visible selectable child window before 'start'
-  virtual csComponent *PrevChild (csComponent *start = NULL, bool disabled = false);
+  virtual csComponent *PrevChild (csComponent *start = 0, bool disabled = false);
 
   /// Return next control after 'start', looping through groups
-  virtual csComponent *NextControl (csComponent *start = NULL);
+  virtual csComponent *NextControl (csComponent *start = 0);
 
   /// Return previous control before 'start', looping through groups
-  virtual csComponent *PrevControl (csComponent *start = NULL);
+  virtual csComponent *PrevControl (csComponent *start = 0);
 
   /// Return control in next group after 'start'
-  virtual csComponent *NextGroup (csComponent *start = NULL);
+  virtual csComponent *NextGroup (csComponent *start = 0);
 
   /// Return control in previous group before 'start'
-  virtual csComponent *PrevGroup (csComponent *start = NULL);
+  virtual csComponent *PrevGroup (csComponent *start = 0);
 
   /// Fix the focused child if it is not selectable (find another)
   bool FixFocused ();
 
   /**
-   * Change Z-order of a child component above 'below' (can be NULL
+   * Change Z-order of a child component above 'below' (can be 0
    * for lowest Z-order) neightbour.
    */
   bool SetZorder (csComponent *comp, csComponent *below);
@@ -513,7 +513,7 @@ public:
    * focused child (Zorder == false).
    */
   csComponent *ForEach (bool (*func) (csComponent *child, void *param),
-    void *param = NULL, bool Zorder = false);
+    void *param = 0, bool Zorder = false);
 
   /// Find a child component by its ID
   csComponent *GetChild (int find_id) const;
@@ -536,9 +536,9 @@ public:
   virtual bool PostHandleEvent (iEvent &Event);
 
   /// Send a command to this window and returns the Info field of iEvent object
-  void *SendCommand (int CommandCode, void *Info = NULL);
+  void *SendCommand (int CommandCode, void *Info = 0);
   /// Send a broadcast to this window and returns the Info field of iEvent object
-  void *SendBroadcast (int CommandCode, void *Info = NULL);
+  void *SendBroadcast (int CommandCode, void *Info = 0);
 
   /// Find the 'default' child
   csComponent *GetDefault ();
@@ -586,23 +586,23 @@ public:
    * Invalidate a area of component (force a redraw of this area).
    * If fIncludeChildren is true, all child components that covers
    * this area of parent will be partially invalidated as well.
-   * Additionaly, if 'below' is not NULL, only the child components
+   * Additionaly, if 'below' is not 0, only the child components
    * that are below 'below' in Z-order or CSS_TRANSPARENT components
    * that are 'above' in Z-order will be invalidated.
    */
   void Invalidate (csRect &area, bool IncludeChildren = false,
-    csComponent *below = NULL);
+    csComponent *below = 0);
 
   /// Same, but with coordinates instead of rectangle
   void Invalidate (int xmin, int ymin, int xmax, int ymax,
-    bool IncludeChildren = false, csComponent *below = NULL)
+    bool IncludeChildren = false, csComponent *below = 0)
   {
     csRect inv (xmin, ymin, xmax, ymax);
     Invalidate (inv, IncludeChildren, below);
   }
 
   /// Same, but invalidates entire component (and possibly all children)
-  void Invalidate (bool IncludeChildren = false, csComponent *below = NULL)
+  void Invalidate (bool IncludeChildren = false, csComponent *below = 0)
   { Invalidate (-99999, -99999, +99999, +99999, IncludeChildren, below); }
 
   /// Set/clear given component state flags
@@ -660,12 +660,12 @@ public:
    * mouse cursor. You can provide a test function that will be called
    * for "transparent" childs; if the child has the CSS_TRANSPARENT
    * flag set, this routine will be called to determine whenever we
-   * should go further below this child. If the routine is NULL, it
+   * should go further below this child. If the routine is 0, it
    * will stop at the first transparent child. If the routine returns
    * true, GetChildAt() will return given child component.
    */
   csComponent *GetChildAt (int x, int y,
-    bool (*func) (csComponent *, void *) = NULL, void *data = NULL);
+    bool (*func) (csComponent *, void *) = 0, void *data = 0);
 
   /**
    * Set mouse cursor to one of sizing cursors depending on drag mode
@@ -715,7 +715,7 @@ public:
   /// Find the maximal rectangle uncovered by child windows
   void FindMaxFreeRect (csRect &area);
 
-  /// Get the name of the skip slice for this component (if not NULL)
+  /// Get the name of the skip slice for this component (if not 0)
   virtual char *GetSkinName ();
 
   /// Get the closest in window hierarchy skin object
@@ -776,7 +776,7 @@ public:
     int orgx, int orgy, uint8 Alpha = 0);
 
   /// Return the width of given text using current font (and possibly height)
-  int GetTextSize (const char *text, int *oHeight = NULL);
+  int GetTextSize (const char *text, int *oHeight = 0);
   /// Return how many letters from given string fits in this number of pixels
   int GetTextChars (const char *text, int iWidth);
 

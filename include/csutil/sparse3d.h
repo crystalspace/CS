@@ -71,7 +71,7 @@ private:
   ///
   struct HdY
   {
-    HdY () { first_z = NULL; }
+    HdY () { first_z = 0; }
     int y;
     HdY* next, * prev;
     SparseCell* first_z;
@@ -79,7 +79,7 @@ private:
   ///
   struct HdX
   {
-    HdX () { first_y = NULL; }
+    HdX () { first_y = 0; }
     int x;
     HdX* next, * prev;
     HdY* first_y;

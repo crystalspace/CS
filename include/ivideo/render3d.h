@@ -359,9 +359,9 @@ struct iRender3D : public iBase
   virtual csReversibleTransform* GetWVMatrix () = 0;
 
   /**
-   * Set the target of rendering. If this is NULL then the target will
+   * Set the target of rendering. If this is 0 then the target will
    * be the main screen. Otherwise it is a texture. After calling
-   * g3d->FinishDraw() the target will automatically be reset to NULL (main
+   * g3d->FinishDraw() the target will automatically be reset to 0 (main
    * screen). Note that on some implementions rendering on a texture
    * will overwrite the screen. So you should only do this BEFORE you
    * start rendering your frame.
@@ -374,7 +374,7 @@ struct iRender3D : public iBase
   virtual void SetRenderTarget (iTextureHandle* handle, 
     bool persistent = false) = 0;
 
-  /// Get the current render target (NULL for screen).
+  /// Get the current render target (0 for screen).
   virtual iTextureHandle* GetRenderTarget () = 0;
 
   /// Begin drawing in the renderer

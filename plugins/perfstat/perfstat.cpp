@@ -60,13 +60,13 @@ csPerfStats::csPerfStats (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
-  Engine = NULL;
-  file_name = NULL;
-  statlog_section = NULL;
-  statvec = NULL;
-  framevec = NULL;
-  margin = NULL;
+  scfiEventHandler = 0;
+  Engine = 0;
+  file_name = 0;
+  statlog_section = 0;
+  statvec = 0;
+  framevec = 0;
+  margin = 0;
   indent = 0;
   frame = new FrameEntry ();
   frame_by_frame = false;
@@ -100,10 +100,10 @@ bool csPerfStats::Initialize (iObjectRegistry *object_reg)
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
-  sub_section = super_section = NULL;
+  sub_section = super_section = 0;
   // default resolution
   resolution = 500;
-  name = NULL;
+  name = 0;
   head_section = this;
   return true;
 }
@@ -254,7 +254,7 @@ void csPerfStats::PrintSectionStats (int severity)
 iPerfStats *csPerfStats::StartNewSubsection (const char *name)
 {
   if (sub_section)
-    return NULL;
+    return 0;
 
   sub_section = new csPerfStats (this);
   sub_section->SetName (name);
@@ -263,7 +263,7 @@ iPerfStats *csPerfStats::StartNewSubsection (const char *name)
   sub_section->Engine = Engine;
   sub_section->statlog_section = statlog_section;
   sub_section->super_section = this;
-  sub_section->sub_section = NULL;
+  sub_section->sub_section = 0;
   sub_section->paused = false;
   sub_section->head_section = head_section;
 
@@ -286,7 +286,7 @@ void csPerfStats::FinishSubsection ()
   {
     sub_section->FinishSection ();
     sub_section->DecRef ();
-    sub_section = NULL;
+    sub_section = 0;
   }
 }
 
@@ -504,7 +504,7 @@ bool csPerfStats::WriteFile ()
   total_len -= statvec_num;
 
   int framevec_num=0;
-  char *f_buf = NULL;
+  char *f_buf = 0;
   int f_buf_len;
 
   // Here the reason for writing to a buffer first is to format the frame
@@ -559,7 +559,7 @@ bool csPerfStats::WriteFile ()
   {
     char *tbuf = f_buf;
     int j = 0, frame_count = resolution;
-    StatEntry* se = NULL;
+    StatEntry* se = 0;
     if (j < (statvec_num - 2))
     {
       se = (StatEntry*)statvec->Get (j);
@@ -571,7 +571,7 @@ bool csPerfStats::WriteFile ()
       {
 	strncpy (buf, se->buf, se->len - 1);
 	buf += se->len - 1;
-	se = NULL;
+	se = 0;
 	if (j < (statvec_num - 2))
 	{
 	  se = (StatEntry*)statvec->Get (j);
@@ -597,8 +597,8 @@ bool csPerfStats::WriteFile ()
   delete statvec;
   delete head_section->framevec;
   head_section->frame_by_frame = false;
-  statvec = NULL;
-  head_section->framevec = NULL;
+  statvec = 0;
+  head_section->framevec = 0;
 
   csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
   if (!vfs)

@@ -29,7 +29,7 @@ csTextProgressMeter::csTextProgressMeter (iConsoleOutput* cons, int n)
 	: console (cons), granularity(10), tick_scale(2),
 	  total(n), current(0), anchor(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 void csTextProgressMeter::Step()

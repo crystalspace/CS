@@ -127,7 +127,7 @@ csOBBTreeNode::csOBBTreeNode (csVector3 **left, csVector3 **right)
     mBox.AddBoundingVertex (**c);
   }
   mLeftPoint = left; mRightPoint = right;
-  mLeft = mRight = NULL;
+  mLeft = mRight = 0;
 }
 
 csOBBTreeNode::~csOBBTreeNode ()
@@ -139,7 +139,7 @@ csOBBTreeNode::~csOBBTreeNode ()
 bool csOBBTreeNode::Split ()
 {
   if (mLeftPoint == mRightPoint) { return false; }
-  if (mLeft != NULL || mRight != NULL) { return true; }
+  if (mLeft != 0 || mRight != 0) { return true; }
   int dim = 0;
   float max = mBox.MaxX () - mBox.MinX ();
   float d = mBox.MaxY () - mBox.MinY ();
@@ -268,7 +268,7 @@ void csOBBTreePair::Split (float dist_bound)
 
 csOBBTreePairHeap::csOBBTreePairHeap ()
 {
-  mArray = NULL;
+  mArray = 0;
   mCount = mSize = 0;
 }
 
@@ -307,7 +307,7 @@ csOBBTreePair *csOBBTreePairHeap::Pop ()
   CS_ASSERT (mArray[0] && mArray[mCount]);
   csOBBTreePair *res = mArray[0];
   mArray[0] = mArray[mCount];
-  mArray[mCount] = NULL;
+  mArray[mCount] = 0;
   if (mCount <= 2) { return res; }
   int i = 0, l = 1, r = 2;
   int m = (mArray[l]->Diameter() > mArray[r]->Diameter()) ?  l : r;
@@ -345,7 +345,7 @@ void csOBBTreePairHeap::Resize ()
 
 csOBBTree::csOBBTree (const csVector3 *array, int num)
 {
-  CS_ASSERT (array != NULL && num > 0);
+  CS_ASSERT (array != 0 && num > 0);
   mArray = new csVector3 *[num];
   for (int i = 0; i < num; i ++)
   {

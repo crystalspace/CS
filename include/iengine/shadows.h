@@ -83,7 +83,7 @@ struct iShadowBlock : public iBase
    * a copy is made and the shadows are transformed.
    */
   virtual void AddRelevantShadows (iShadowBlock* source,
-    csTransform* trans = NULL) = 0;
+    csTransform* trans = 0) = 0;
 
   /**
    * Copy all relevant shadow frustums from another shadow block list

@@ -54,7 +54,7 @@ SCF_IMPLEMENT_IBASE_END
 csGfxProgressMeter::csGfxProgressMeter (int n)
 	: granularity(10), total(n), current(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 void csGfxProgressMeter::SetProgressDescription (const char* id,
@@ -94,7 +94,7 @@ void csGfxProgressMeter::Step()
     System->g2d->DrawBox (10, fh*3/4-10, where, 20, System->color_done);
     System->g2d->DrawBox (10+where, fh*3/4-10, fw-where-20, 20, System->color_todo);
     System->g3d->FinishDraw ();
-    System->g3d->Print (NULL);
+    System->g3d->Print (0);
   }
 }
 
@@ -148,7 +148,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
+  delete System; System = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -273,11 +273,11 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   if (fntsvr)
   {
     font = fntsvr->GetFont (0);
-    if (font == NULL)
+    if (font == 0)
       font = fntsvr->LoadFont (CSFONT_COURIER);
   }
   else
-    font = NULL;
+    font = 0;
 
   // Load logo.
   logo = loader->LoadTexture ("/lib/std/cslogo.gif",
@@ -313,7 +313,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 
       // First we force a clear of the cache manager in the engine
       // so that a new one will be made soon.
-      engine->SetCacheManager (NULL);
+      engine->SetCacheManager (0);
       // And then we get the cache manager which will force it
       // to be created based on current VFS dir.
       engine->GetCacheManager ();
@@ -381,13 +381,13 @@ bool Lighter::Initialize (int argc, const char* const argv[],
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class.
   System = new Lighter ();
 
   // Initialize the main system. This will load all needed plug-ins.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, 0))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();

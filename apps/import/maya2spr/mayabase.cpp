@@ -26,7 +26,7 @@ bool MayaModel::CheckMagic(const char* mdlfile, const char* magic)
 {
   bool ok = false;
   FILE* file = fopen(mdlfile, "rb");
-  if (file != NULL)
+  if (file != 0)
   {
     char buff[512];
     if (fread(buff, strlen(magic), 1, file) == 1)
@@ -50,7 +50,7 @@ bool MayaModel::setError(const char* errorstring, FILE* closethis)
   if (closethis != 0)
     fclose(closethis);
 
-  if (errorstring == NULL)
+  if (errorstring == 0)
     sError = "Unknown error";
   else
     sError = errorstring;

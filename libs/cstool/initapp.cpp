@@ -70,10 +70,10 @@
 #define CS_LOAD_LIB_VERBOSE false
 #endif
 
-static SysSystemDriver* global_sys = NULL;
+static SysSystemDriver* global_sys = 0;
 static bool config_done = false;
 static bool sys_init_done = false;
-static iEventHandler* installed_event_handler = NULL;
+static iEventHandler* installed_event_handler = 0;
 
 iObjectRegistry* csInitializer::CreateEnvironment (
   int argc, char const* const argv[])
@@ -303,7 +303,7 @@ bool csInitializer::SetupConfigManager (
 
 bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
 {
-  SetupConfigManager (r, NULL);
+  SetupConfigManager (r, 0);
   SetupPluginLoadErrVerbosity(r);
 
   csPluginLoader* plugldr = new csPluginLoader (r);
@@ -311,7 +311,7 @@ bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
   va_list arg;
   va_start (arg, r);
   char* plugName = va_arg (arg, char*);
-  while (plugName != NULL)
+  while (plugName != 0)
   {
     char* intName = va_arg (arg, char*);
     int scfId = va_arg (arg, scfInterfaceID);
@@ -361,7 +361,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
   csAppEventHandler (csEventHandlerFunc h) : evhdlr(h)
-  { SCF_CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (0); }
   virtual bool HandleEvent (iEvent& e) { return evhdlr (e); }
 };
 
@@ -380,7 +380,7 @@ bool csInitializer::SetupEventHandler (
 
 bool csInitializer::OpenApplication (iObjectRegistry* r)
 {
-  SetupConfigManager (r, NULL);
+  SetupConfigManager (r, 0);
 
   // @@@ Temporary.
   if (!sys_init_done)
@@ -392,7 +392,7 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
   // Pass the open event to all interested listeners.
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
-  CS_ASSERT (EventQueue != NULL);
+  CS_ASSERT (EventQueue != 0);
   EventQueue->Dispatch (Event);
   return true;
 }
@@ -402,7 +402,7 @@ void csInitializer::CloseApplication (iObjectRegistry* r)
   // Notify all interested listeners that the system is going down
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
-  CS_ASSERT (EventQueue != NULL);
+  CS_ASSERT (EventQueue != 0);
   EventQueue->Dispatch (Event);
 }
 
@@ -414,7 +414,7 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   //  if (installed_event_handler)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
-    CS_ASSERT (q != NULL);
+    CS_ASSERT (q != 0);
     // This will remove the installed_event_handler (if used) as well as free
     // all other event handlers which are registered through plug-ins or
     // other sources.

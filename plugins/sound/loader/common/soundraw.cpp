@@ -58,7 +58,7 @@ void csSoundDataRaw::ResetStreamed() {
 }
 
 void *csSoundDataRaw::ReadStreamed(long &) {
-  return NULL;
+  return 0;
 }
 
 /*** format conversion functions follow ***/

@@ -49,7 +49,7 @@ class SendPacket : public iNetworkPacket
   SCF_DECLARE_IBASE;
   SendPacket ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~SendPacket () {}
 
@@ -79,7 +79,7 @@ class RecvPacket : public iNetworkPacket
   SCF_DECLARE_IBASE;
   RecvPacket ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     position = 0;
   }
   virtual ~RecvPacket () {}
@@ -97,7 +97,7 @@ class RecvPacket : public iNetworkPacket
     else
       return false;
   }
-  virtual char* Write (size_t &size) { return NULL; }
+  virtual char* Write (size_t &size) { return 0; }
   virtual csPtr<iNetworkPacket> New ()
     { return csPtr<iNetworkPacket> (new RecvPacket ()); }
   virtual bool FilterSocket (iNetworkConnection *s) { return true; }

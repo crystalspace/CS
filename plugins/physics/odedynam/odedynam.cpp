@@ -84,7 +84,7 @@ csODEDynamics::csODEDynamics (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  object_reg = NULL;
+  object_reg = 0;
 
   // Initialize the colliders so that the class isn't overwritten
   dGeomID id = dCreateSphere (0, 1);
@@ -153,7 +153,7 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   csODERigidBody *b2 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o2));
 
   if (b1->IsStatic() && b2->IsStatic()) return;
-  if (b1->GetGroup() != NULL && (b1->GetGroup() == b2->GetGroup())) return;
+  if (b1->GetGroup() != 0 && (b1->GetGroup() == b2->GetGroup())) return;
 
   dContact contact[10];
   int a = dCollide (o1, o2, 10, &(contact[0].geom), sizeof (dContact));
@@ -597,7 +597,7 @@ dColliderFn* csODEDynamics::CollideSelector (int num)
   if (num == dBoxClass) return (dColliderFn *)&CollideMeshBox;
   if (num == dCCylinderClass) return (dColliderFn *)&CollideMeshCylinder;
   if (num == dSphereClass) return (dColliderFn *)&CollideMeshSphere;
-  return NULL;
+  return 0;
 }
 
 void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
@@ -706,7 +706,7 @@ void csODEDynamicSystem::Step (float stepsize)
 
 csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   system = sys;
 }
 
@@ -746,12 +746,12 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   groupID = dCreateGeomGroup (dynsys->GetSpaceID());
   dGeomSetBody (groupID, bodyID);
   statjoint = 0;
-  collision_group = NULL;
+  collision_group = 0;
 
-  mesh = NULL;
-  bone = NULL;
-  move_cb = NULL;
-  coll_cb = NULL;
+  mesh = 0;
+  bone = 0;
+  move_cb = 0;
+  coll_cb = 0;
 }
 
 csODERigidBody::~csODERigidBody ()
@@ -1084,9 +1084,9 @@ void csODERigidBody::GetProperties (float* mass,
 {
   dMass m;
   dBodyGetMass (bodyID, &m);
-  if (mass != NULL) *mass = m.mass;
-  if (center != NULL) center->Set (m.c[0], m.c[1], m.c[2]);
-  if (inertia != NULL) {
+  if (mass != 0) *mass = m.mass;
+  if (center != 0) center->Set (m.c[0], m.c[1], m.c[2]);
+  if (inertia != 0) {
     inertia->Set (m.I[0], m.I[1], m.I[2],
      m.I[4], m.I[5], m.I[6],
      m.I[8], m.I[9], m.I[10]);
@@ -1207,10 +1207,10 @@ void csODERigidBody::Update ()
 
 csODEJoint::csODEJoint (csODEDynamicSystem *sys)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   jointID = 0;
 
-  body[0] = body[1] = NULL;
+  body[0] = body[1] = 0;
   bodyID[0] = bodyID[1] = 0;
 
   transConstraint[0] = 1;
@@ -1445,7 +1445,7 @@ void csODEJoint::BuildJoint ()
 
 csODEDefaultMoveCallback::csODEDefaultMoveCallback ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csODEDefaultMoveCallback::~csODEDefaultMoveCallback ()

@@ -207,7 +207,7 @@ public:
    * Enable or disable texture mapping.
    */
   void EnableTextureMapping (bool enabled);
-  bool IsTextureMappingEnabled () const { return mapping != NULL; }
+  bool IsTextureMappingEnabled () const { return mapping != 0; }
 
   /**
    * Copy texture type settings from another polygon.
@@ -286,7 +286,7 @@ public:
    * If the polygon is a portal this will set the sector
    * that this portal points to. If this polygon has no portal
    * one will be created.
-   * If 'null' is true and sector == 'NULL' then a NULL portal
+   * If 'null' is true and sector == '0' then a 0 portal
    * is created.
    */
   void SetCSPortal (iSector* sector, bool null = false);
@@ -319,7 +319,7 @@ public:
     if (n)
       name = csStrNew (n);
     else
-      name = NULL;
+      name = 0;
   }
 
   /**
@@ -511,14 +511,14 @@ public:
    * true if it intersects and the intersection point in world coordinates.
    */
   bool IntersectSegmentPlane (const csVector3& start, const csVector3& end,
-                          csVector3& isect, float* pr = NULL) const;
+                          csVector3& isect, float* pr = 0) const;
 
   /**
    * Intersect object-space segment with this polygon. Return
    * true if it intersects and the intersection point in world coordinates.
    */
   bool IntersectSegment (const csVector3& start, const csVector3& end,
-                          csVector3& isect, float* pr = NULL);
+                          csVector3& isect, float* pr = 0);
 
   /**
    * Intersect object-space ray with this polygon. This function
@@ -637,7 +637,7 @@ public:
 
     virtual iPortal* CreateNullPortal ()
     {
-      scfParent->SetCSPortal (NULL, true);
+      scfParent->SetCSPortal (0, true);
       return &(scfParent->GetPortal ()->scfiPortal);
     }
     virtual iPortal* CreatePortal (iSector *target)
@@ -651,7 +651,7 @@ public:
       if (prt)
         return &(prt->scfiPortal);
       else
-        return NULL;
+        return 0;
     }
 
     virtual void SetTextureSpace (
@@ -711,7 +711,7 @@ public:
       return scfParent->GetMixMode ();
     }
     virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
-                          csVector3& isect, float* pr = NULL)
+                          csVector3& isect, float* pr = 0)
     {
       return scfParent->IntersectSegment (start, end, isect, pr);
     }
@@ -818,7 +818,7 @@ public:
   iMaterialWrapper* GetMaterial () { return material; }
   /**
    * Get the real material to use for rendering this polygon.
-   * This will first check the local material and if that is NULL
+   * This will first check the local material and if that is 0
    * return the one from the factory.
    */
   iMaterialWrapper* GetRealMaterial ()
@@ -942,7 +942,7 @@ public:
 
   /**
    * This function will try to read the lightmap from the given file.
-   * Return NULL on success or else an error message.
+   * Return 0 on success or else an error message.
    */
   const char* ReadFromCache (iFile* file);
 
@@ -1036,11 +1036,11 @@ public:
   void ObjectToWorld (const csReversibleTransform& t, const csVector3& vwor);
 
   /**
-   * Clip this camera space polygon to the given plane. 'plane' can be NULL
+   * Clip this camera space polygon to the given plane. 'plane' can be 0
    * in which case no clipping happens.<p>
    *
    * If this function returns false then the polygon is not visible (backface
-   * culling, no visible vertices, ...) and 'verts' will be NULL. Otherwise
+   * culling, no visible vertices, ...) and 'verts' will be 0. Otherwise
    * this function will return true and 'verts' will point to the new
    * clipped polygon (this is a pointer to a static table of vertices.
    * WARNING! Because of this you cannot do new ClipToPlane calls until
@@ -1087,7 +1087,7 @@ public:
     virtual iLightMap *GetLightMap ()
     {
       csPolyTexture *lm = scfParent->txt_info;
-      return lm ? lm->GetLightMap () : (iLightMap*)NULL;
+      return lm ? lm->GetLightMap () : (iLightMap*)0;
     }
     virtual iPolygonTexture *GetTexture ()
     {

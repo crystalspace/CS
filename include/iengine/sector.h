@@ -57,7 +57,7 @@ SCF_VERSION (iSectorCallback, 0, 0, 1);
 /**
  * Set a callback which is called when this sector is traversed.
  * The given context will be either an instance of iRenderView, iFrustumView,
- * or else NULL.
+ * or else 0.
  */
 struct iSectorCallback : public iBase
 {
@@ -331,7 +331,7 @@ struct iSectorIterator : public iBase
   /// Restart iterator.
   virtual void Restart () = 0;
 
-  /// Get sector from iterator. Return NULL at end.
+  /// Get sector from iterator. Return 0 at end.
   virtual iSector* Fetch () = 0;
 
   /**

@@ -34,7 +34,7 @@
 
 void csRandomGen::Initialize ()
 {
-  Initialize (time (NULL));
+  Initialize (time (0));
 }
 
 void csRandomGen::Initialize (unsigned iSeed)

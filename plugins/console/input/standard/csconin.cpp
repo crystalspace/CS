@@ -52,9 +52,9 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiConsoleWatcher);
-  Callback = NULL;
-  Console = NULL;
-  Prompt = NULL;
+  Callback = 0;
+  Console = 0;
+  Prompt = 0;
   CursorPos = 0;
   Prompt = csStrNew ("# ");
   PromptLen = strlen(Prompt);
@@ -71,7 +71,7 @@ csConsoleInput::~csConsoleInput ()
 
   if (Console)
   {
-    Console->RegisterWatcher (NULL);
+    Console->RegisterWatcher (0);
     Console->DecRef ();
   }
   if (Callback) Callback->DecRef ();
@@ -203,7 +203,7 @@ void csConsoleInput::Bind (iConsoleOutput *iCon)
   if (Console)
   {
     Console->DecRef ();
-    Console->RegisterWatcher (NULL);
+    Console->RegisterWatcher (0);
   }
   Console = iCon;
   if (Console)
@@ -221,7 +221,7 @@ void csConsoleInput::Bind (iConsoleOutput *iCon)
 const char *csConsoleInput::GetText (int iLine) const
 {
   return ((iLine >= -1) && (iLine < History.Length ())) ?
-         History.Get (iLine == -1 ? History.Length () - 1 : iLine) : NULL;
+         History.Get (iLine == -1 ? History.Length () - 1 : iLine) : 0;
 }
 
 int csConsoleInput::GetCurLine () const

@@ -53,9 +53,9 @@ csFrustum::csFrustum (
     memcpy (vertices, verts, sizeof (csVector3) * num_vertices);
   }
   else
-    vertices = NULL;
+    vertices = 0;
 
-  backplane = backp ? new csPlane3 (*backp) : NULL;
+  backplane = backp ? new csPlane3 (*backp) : 0;
 }
 
 csFrustum::csFrustum (
@@ -73,7 +73,7 @@ csFrustum::csFrustum (
   ref_count = 1;
 
   vertices = pool->GetVertexArray (max_vertices);
-  backplane = backp ? new csPlane3 (*backp) : NULL;
+  backplane = backp ? new csPlane3 (*backp) : 0;
 }
 
 csFrustum::csFrustum (const csFrustum &copy)
@@ -92,9 +92,9 @@ csFrustum::csFrustum (const csFrustum &copy)
     memcpy (vertices, copy.vertices, sizeof (csVector3) * num_vertices);
   }
   else
-    vertices = NULL;
+    vertices = 0;
 
-  backplane = copy.backplane ? new csPlane3 (*copy.backplane) : NULL;
+  backplane = copy.backplane ? new csPlane3 (*copy.backplane) : 0;
 }
 
 csFrustum::~csFrustum ()
@@ -106,10 +106,10 @@ csFrustum::~csFrustum ()
 void csFrustum::Clear ()
 {
   pool->FreeVertexArray (vertices, max_vertices);
-  vertices = NULL;
+  vertices = 0;
   num_vertices = max_vertices = 0;
   delete backplane;
-  backplane = NULL;
+  backplane = 0;
   wide = false;
   mirrored = false;
 }
@@ -123,7 +123,7 @@ void csFrustum::SetBackPlane (csPlane3 &plane)
 void csFrustum::RemoveBackPlane ()
 {
   delete backplane;
-  backplane = NULL;
+  backplane = 0;
 }
 
 void csFrustum::ExtendVertexArray (int num)
@@ -636,7 +636,7 @@ void csFrustum::ClipToPlane (
 
 csPtr<csFrustum> csFrustum::Intersect (const csFrustum &other)
 {
-  if (other.IsEmpty ()) return NULL;
+  if (other.IsEmpty ()) return 0;
   if (other.IsInfinite ())
   {
     csFrustum *f = new csFrustum (*this);
@@ -671,9 +671,9 @@ csPtr<csFrustum> csFrustum::Intersect (
     new_frustum->ClipToPlane (frust[i1], frust[i]);
     if (new_frustum->IsEmpty ())
     {
-      // Intersection has become empty. Return NULL.
+      // Intersection has become empty. Return 0.
       delete new_frustum;
-      return NULL;
+      return 0;
     }
 
     i1 = i;
@@ -703,9 +703,9 @@ csPtr<csFrustum> csFrustum::Intersect (
     new_frustum->ClipToPlane (frust[i1], frust[i]);
     if (new_frustum->IsEmpty ())
     {
-      // Intersection has become empty. Return NULL.
+      // Intersection has become empty. Return 0.
       delete new_frustum;
-      return NULL;
+      return 0;
     }
 
     i1 = i;
@@ -728,7 +728,7 @@ csPtr<csFrustum> csFrustum::Intersect (csVector3 *poly, int num)
   {
     // If this frustum is empty then the intersection will be empty
     // as well.
-    return NULL;
+    return 0;
   }
   else
   {
@@ -745,9 +745,9 @@ csPtr<csFrustum> csFrustum::Intersect (csVector3 *poly, int num)
       new_frustum->ClipToPlane (vertices[i1], vertices[i]);
       if (new_frustum->IsEmpty ())
       {
-        // Intersection has become empty. Return NULL.
+        // Intersection has become empty. Return 0.
         delete new_frustum;
-        return NULL;
+        return 0;
       }
 
       i1 = i;
@@ -760,9 +760,9 @@ csPtr<csFrustum> csFrustum::Intersect (csVector3 *poly, int num)
       new_frustum->ClipPolyToPlane (backplane);
       if (new_frustum->IsEmpty ())
       {
-        // Intersection has become empty. Return NULL.
+        // Intersection has become empty. Return 0.
         delete new_frustum;
-        return NULL;
+        return 0;
       }
     }
   }

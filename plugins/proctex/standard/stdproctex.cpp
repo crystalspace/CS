@@ -128,7 +128,7 @@ csPtr<iBase> csBaseProctexLoader::PrepareProcTex (csProcTexture* pt)
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 

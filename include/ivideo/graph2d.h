@@ -118,7 +118,7 @@ struct csImageArea
   char *data;
 
   inline csImageArea (int sx, int sy, int sw, int sh)
-  { x = sx; y = sy; w = sw; h = sh; data = NULL; }
+  { x = sx; y = sy; w = sw; h = sh; data = 0; }
 };
 
 SCF_VERSION (iOffscreenCanvasCallback, 1, 0, 0);
@@ -312,7 +312,7 @@ struct iGraphics2D : public iBase
 
   /**
    * Get the native window corresponding with this canvas.
-   * If this is an off-screen canvas then this will return NULL.
+   * If this is an off-screen canvas then this will return 0.
    */
   virtual iNativeWindow* GetNativeWindow () = 0;
 

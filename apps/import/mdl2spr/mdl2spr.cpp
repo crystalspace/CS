@@ -181,10 +181,10 @@ int main(int argc,char *argv[])
     }
   }
 
-  scfInitialize (NULL);
+  scfInitialize (0);
 
   const char* mdlfile = argv[argc - 2];
-  QModel* mdl = NULL;
+  QModel* mdl = 0;
   if (Mdl::IsFileMDLModel(mdlfile))
     mdl = new Mdl(mdlfile);
   else if (Md2::IsFileMD2Model(mdlfile))
@@ -207,7 +207,7 @@ int main(int argc,char *argv[])
   mdl->WriteSPR(argv[argc - 1], scaleMdl, delayMdl, positionMdlX,
     positionMdlY, positionMdlZ, actionNamingMdl, resizeSkin, maxFrames);
 
-  mdl2spr_imageio = NULL;
+  mdl2spr_imageio = 0;
   iSCF::SCF->Finish ();
 
   delete mdl;

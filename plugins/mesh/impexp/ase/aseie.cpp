@@ -131,7 +131,7 @@ int csModelConverterASE::GetFormatCount ()
 
 const csModelConverterFormat *csModelConverterASE::GetFormat (int idx)
 {
-  return (idx == 0) ? &FormatInfo : NULL;
+  return (idx == 0) ? &FormatInfo : 0;
 }
 
 // Load a single word from the stream
@@ -263,9 +263,9 @@ bool csASEInterpreter_GEOMOBJECT (csModelConverterASE *conv, csDataStream &in,
       conv->Vertices->AddTexel (csVector2 (0, 0));
 
     conv->Object->DecRef ();
-    conv->Object = NULL;
+    conv->Object = 0;
     conv->Vertices->DecRef ();
-    conv->Vertices = NULL;
+    conv->Vertices = 0;
     conv->Polygons.DeleteAll ();
 
     CS_ASE_LEAVE_SUBSECTION (csASEInterpreter_MAIN);
@@ -492,9 +492,9 @@ csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
   csDataStream in (Buffer, Size, false);
   interp = &csASEInterpreter_MAIN;
   Scene = new csModelData ();
-  Object = NULL;
-  Vertices = NULL;
-  CurrentPolygon = NULL;
+  Object = 0;
+  Vertices = 0;
+  CurrentPolygon = 0;
 
   while (!in.Finished ())
   {
@@ -520,13 +520,13 @@ csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
     if (!(*interp) (this, Line, Token))
     {
       if (Scene) Scene->DecRef ();
-      Scene = NULL;
+      Scene = 0;
       if (Object) Object->DecRef ();
-      Object = NULL;
+      Object = 0;
       if (Vertices) Vertices->DecRef ();
-      Vertices = NULL;
+      Vertices = 0;
       Polygons.DeleteAll ();
-      return NULL;
+      return 0;
     }
   }
 
@@ -577,7 +577,7 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "ase"))
-    return NULL;
+    return 0;
 
 /*
   Purpose:
@@ -600,7 +600,7 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
   // only the first object is saved
   csRef<iModelDataObject> obj (
   	CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject));
-  if (!obj) return NULL;
+  if (!obj) return 0;
   csString out;
   iModelDataVertices *ver = obj->GetDefaultVertices ();
 

@@ -35,14 +35,14 @@ SCF_IMPLEMENT_IBASE_END;
 csSoundListenerDS3D::csSoundListenerDS3D(iBase *piBase) 
 {
   SCF_CONSTRUCT_IBASE(piBase);
-  PrimaryBuffer = NULL;
-  Listener = NULL;
-  Renderer = NULL;
+  PrimaryBuffer = 0;
+  Listener = 0;
+  Renderer = 0;
 }
 
 csSoundListenerDS3D::~csSoundListenerDS3D() 
 {
-  if (Renderer) Renderer = NULL;
+  if (Renderer) Renderer = 0;
   if (Listener) Listener->Release();
   if (PrimaryBuffer) {
     PrimaryBuffer->Stop();
@@ -59,13 +59,13 @@ bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr)
   dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME;
   dsbd.dwReserved = 0;
   dsbd.dwBufferBytes = 0;
-  dsbd.lpwfxFormat = NULL;
+  dsbd.lpwfxFormat = 0;
 
   csRef<iReporter> reporter = CS_QUERY_REGISTRY (Renderer->object_reg,
     iReporter);
 
   HRESULT r;
-  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
+  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, 0);
   if (r != DS_OK) {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,

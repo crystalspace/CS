@@ -13,7 +13,7 @@
 const int awsGroupFrame:: signalClicked = 0x1;
 
 awsGroupFrame::awsGroupFrame () :
-  caption(NULL)
+  caption(0)
 {
 }
 
@@ -43,7 +43,7 @@ bool awsGroupFrame::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (caption) st = caption->GetData ();
 
@@ -73,7 +73,7 @@ bool awsGroupFrame::SetProperty (const char *name, void *parm)
     else
     {
       if (caption) caption->DecRef ();
-      caption = NULL;
+      caption = 0;
     }
 
     return true;

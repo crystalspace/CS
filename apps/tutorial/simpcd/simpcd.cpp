@@ -68,8 +68,8 @@ Simple::Simple ()
 {
   rot1_direction = 1;
   rot2_direction = -1;
-  sprite1_col = NULL;
-  sprite2_col = NULL;
+  sprite1_col = 0;
+  sprite2_col = 0;
 
 }
 
@@ -159,7 +159,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 }
 
 bool Simple::HandleEvent (iEvent& ev)
@@ -206,7 +206,7 @@ iCollider* Simple::InitCollider (iMeshWrapper* mesh)
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simpcd",
 	"Object doesn't support collision detection!");
-    return NULL;
+    return 0;
   }
 }
 
@@ -384,15 +384,15 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
@@ -409,7 +409,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",
   	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
-  if (txt == NULL)
+  if (txt == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simpcd",
@@ -422,7 +422,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   //---------
   csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
   	"/lib/std/sprite2"));
-  if (imeshfact == NULL)
+  if (imeshfact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simpcd",

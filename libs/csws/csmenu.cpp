@@ -36,8 +36,8 @@
 // Amount of space for \t character in menu items
 #define MENUITEM_TABSPACE       20
 
-csPixmap *csMenuItem::sprchecked = NULL;
-csPixmap *csMenuItem::sprsubmenu = NULL;
+csPixmap *csMenuItem::sprchecked = 0;
+csPixmap *csMenuItem::sprsubmenu = 0;
 static int menuitemref = 0;
 
 csMenuItem::csMenuItem (csComponent *iParent, const char *iText,
@@ -74,8 +74,8 @@ csMenuItem::csMenuItem (csComponent *iParent, const char *iText,
 void csMenuItem::Init ()
 {
   SetPalette (CSPAL_MENUITEM);
-  text = NULL;
-  info = NULL;
+  text = 0;
+  info = 0;
   underline_pos = -1;
 
   menuitemref++;
@@ -95,8 +95,8 @@ csMenuItem::~csMenuItem ()
 {
   if (--menuitemref == 0)
   {
-    delete sprchecked; sprchecked = NULL;
-    delete sprsubmenu; sprsubmenu = NULL;
+    delete sprchecked; sprchecked = 0;
+    delete sprsubmenu; sprsubmenu = 0;
   }
   delete [] info;
 }
@@ -106,8 +106,8 @@ void csMenuItem::SetText (const char *iText)
   delete [] text;
   delete [] info;
 
-  text = NULL;
-  info = NULL;
+  text = 0;
+  info = 0;
   underline_pos = -1;
 
   if (!iText)
@@ -273,7 +273,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
           return true;
         case cscmdMenuCaptureMouse:
           parent->SendCommand (cscmdMenuCaptureMouse, this);
-          Event.Command.Info = NULL;
+          Event.Command.Info = 0;
           return true;
         case cscmdActivate:
           Press ();
@@ -295,7 +295,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
             if (CommandCode == (int)Event.Command.Info)
               Event.Command.Info = this;
             else
-              Event.Command.Info = NULL;
+              Event.Command.Info = 0;
           return true;
         default:
           // resend unknown commands to parent
@@ -322,14 +322,14 @@ void csMenuItem::Draw ()
     if (((!vis) || (!selected)) && (focused->GetState (CSS_VISIBLE)))
     {
       focused->Hide ();
-      focused->SendCommand (cscmdMenuSetItem, NULL);
+      focused->SendCommand (cscmdMenuSetItem, 0);
     }
     else if ((vis) && (selected) && (focused->GetState (CSS_VISIBLE) == 0))
     {
       focused->SendCommand (cscmdMenuSetDropFlag, (void *)false);
       focused->Show (true);
       // If no menu has captured the mouse, select last selected item
-      if (!((csMenu *)focused)->current && app->MouseOwner == NULL)
+      if (!((csMenu *)focused)->current && app->MouseOwner == 0)
         focused->SendCommand (cscmdMenuSetLastItem);
     } /* endif */
   } /* endif */
@@ -396,7 +396,7 @@ csMenu::csMenu (csComponent *iParent, csMenuFrameStyle iFrameStyle,
   FrameStyle = iFrameStyle;
   SetPalette (CSPAL_MENU);
   MenuStyle = iMenuStyle;
-  oldparentfocus = NULL;
+  oldparentfocus = 0;
   SubMenuOpened = false;
   fPlaceItems = false;
   switch (iFrameStyle)
@@ -418,9 +418,9 @@ csMenu::csMenu (csComponent *iParent, csMenuFrameStyle iFrameStyle,
   state |= CSS_SELECTABLE;
   if (!IsMenuBar ())
     state |= CSS_TOPSELECT;
-  current = NULL;
-  first = NULL;
-  last = NULL;
+  current = 0;
+  first = 0;
+  last = 0;
 }
 
 void csMenu::Draw ()
@@ -517,8 +517,8 @@ bool csMenu::ExecuteKey (int key)
 
   int closedist = 9999, oppdist = 0;
   csComponent *cur = current;
-  csComponent *closest = NULL;
-  csComponent *opposite = NULL;
+  csComponent *closest = 0;
+  csComponent *opposite = 0;
 
   do
   {
@@ -694,7 +694,7 @@ bool csMenu::HandleEvent (iEvent &Event)
       switch (Event.Key.Code)
       {
         case CSKEY_ESC:
-          if (parent->SendCommand (cscmdMenuSetDropFlag, (void *)false) == NULL)
+          if (parent->SendCommand (cscmdMenuSetDropFlag, (void *)false) == 0)
           {
             Deactivate (cscmdCancel);
             return true;
@@ -736,7 +736,7 @@ bool csMenu::HandleEvent (iEvent &Event)
         case cscmdDeactivateMenu:
           if (parent->SendCommand (cscmdDeactivateMenu, Event.Command.Info))
             Deactivate ((int)Event.Command.Info);
-          Event.Command.Info = NULL;
+          Event.Command.Info = 0;
           return true;
         case cscmdMenuPlaceItems:
           PlaceItems ();
@@ -744,11 +744,11 @@ bool csMenu::HandleEvent (iEvent &Event)
         case cscmdMenuCaptureMouse:
           if (parent->SendCommand (cscmdMenuCaptureMouse, this))
             app->CaptureMouse (this);
-          Event.Command.Info = NULL;
+          Event.Command.Info = 0;
           return true;
         case cscmdMenuSetItem:
           if (SetCurrent ((csComponent *)Event.Command.Info))
-            Event.Command.Info = NULL;
+            Event.Command.Info = 0;
           return true;
         case cscmdMenuSetLastItem:
           if (!current)
@@ -820,7 +820,7 @@ void csMenu::Deactivate (int DismissCode)
 
   // If we captured the mouse, release it
   if (app->MouseOwner == this)
-    app->CaptureMouse (NULL);
+    app->CaptureMouse (0);
 }
 
 void csMenu::SetItemWidth (csComponent *start, int count, int width)
@@ -872,7 +872,7 @@ void csMenu::PlaceItems ()
 
   csComponent *cur = (csComponent *)first;
   csComponent *colstart = cur;
-  csComponent *lastcol = NULL;
+  csComponent *lastcol = 0;
 
   while (cur)
   {
@@ -1005,7 +1005,7 @@ csComponent *csMenu::GetItem (int iCommandCode)
 {
   finditem_rec fr;
   fr.id = iCommandCode;
-  fr.result = NULL;
+  fr.result = 0;
   ForEach (do_finditem, (void *)&fr);
   return fr.result;
 }

@@ -56,8 +56,8 @@ bool csSector:: do_radiosity = false;
 //---------------------------------------------------------------------------
 csSectorLightList::csSectorLightList ()
 {
-  sector = NULL;
-  kdtree = new csKDTree (NULL);
+  sector = 0;
+  kdtree = new csKDTree (0);
 }
 
 csSectorLightList::~csSectorLightList ()
@@ -84,7 +84,7 @@ void csSectorLightList::PrepareItem (iLight* item)
 
 void csSectorLightList::FreeItem (iLight* item)
 {
-  item->SetSector (NULL);
+  item->SetSector (0);
   kdtree->RemoveObject (item->GetPrivateObject ()->GetChildNode ());
   csLightList::FreeItem (item);
 }
@@ -92,19 +92,19 @@ void csSectorLightList::FreeItem (iLight* item)
 //---------------------------------------------------------------------------
 csSectorMeshList::csSectorMeshList ()
 {
-  sector = NULL;
+  sector = 0;
 }
 
 void csSectorMeshList::PrepareItem (iMeshWrapper* item)
 {
-  CS_ASSERT (sector != NULL);
+  CS_ASSERT (sector != 0);
   csMeshList::PrepareItem (item);
   sector->PrepareMesh (item);
 }
 
 void csSectorMeshList::FreeItem (iMeshWrapper* item)
 {
-  CS_ASSERT (sector != NULL);
+  CS_ASSERT (sector != 0);
   sector->UnprepareMesh (item);
   csMeshList::FreeItem (item);
 }
@@ -434,7 +434,7 @@ void csRenderMeshList::PrepareFrame (iRenderView* rview)
 
 csRenderMeshList::csRenderMeshList(csSector* sector)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   csRenderMeshList::sector = sector;
 }
@@ -592,7 +592,7 @@ void csSector::CleanupReferences ()
     iReferencedObject *refobj = ref->GetReferencedObject ();
     CS_ASSERT (refobj == &scfiReferencedObject);
 #endif
-    ref->SetReferencedObject (NULL);
+    ref->SetReferencedObject (0);
   }
 }
 
@@ -659,7 +659,7 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 
 bool csSector::UseCullerPlugin (const char *plugname)
 {
-  culler = NULL;
+  culler = 0;
 
   // Load the culler plugin.
   csRef<iPluginManager> plugmgr (CS_QUERY_REGISTRY (csEngine::object_reg,
@@ -690,7 +690,7 @@ bool csSector::UseCullerPlugin (const char *plugname)
 iVisibilityCuller* csSector::GetVisibilityCuller ()
 {
   if (!culler) UseCullerPlugin ("crystalspace.culling.frustvis");
-  CS_ASSERT (culler != NULL);
+  CS_ASSERT (culler != 0);
   return culler;
 }
 
@@ -700,7 +700,7 @@ iPolygon3D *csSector::HitBeam (
   csVector3 &isect)
 {
   iMeshWrapper* mesh;
-  iPolygon3D *p = IntersectSegment (start, end, isect, NULL, false,
+  iPolygon3D *p = IntersectSegment (start, end, isect, 0, false,
 		  &mesh);
   if (p)
   {
@@ -720,7 +720,7 @@ iPolygon3D *csSector::HitBeam (
       return p;
   }
   else
-    return NULL;
+    return 0;
 }
 
 iMeshWrapper *csSector::HitBeam (
@@ -740,7 +740,7 @@ iMeshWrapper *csSector::HitBeam (
   if (rc)
     return mesh;
   else
-    return NULL;
+    return 0;
 }
 
 iPolygon3D *csSector::IntersectSegment (
@@ -754,7 +754,7 @@ iPolygon3D *csSector::IntersectSegment (
   GetVisibilityCuller ();
   float r, best_r = 10000000000.;
   csVector3 cur_isect;
-  iPolygon3D *best_p = NULL;
+  iPolygon3D *best_p = 0;
   csVector3 obj_start, obj_end, obj_isect;
 
   if (!only_portals)
@@ -847,7 +847,7 @@ iSector *csSector::FollowSegment (
       t.GetOrigin (),
       new_position,
       isect,
-      NULL,
+      0,
       only_portals,
       &mesh);
   iPortal *po;
@@ -858,7 +858,7 @@ iSector *csSector::FollowSegment (
     po = ps->GetPortal ();
     if (po)
     {
-      po->CompleteSector (NULL);
+      po->CompleteSector (0);
       if (!po->GetSector ())
       {
         new_position = isect;
@@ -889,11 +889,11 @@ iPolygon3D *csSector::IntersectSphere (
   float *pr)
 {
   float min_d = radius;
-  iPolygon3D *min_p = NULL;
+  iPolygon3D *min_p = 0;
   (void)center;
 #if 0
   float d = .0f;
-  iPolygon3D *p = NULL, *min_p = NULL;
+  iPolygon3D *p = 0, *min_p = 0;
   csVector3 obj_center;
   csReversibleTransform movtrans;
 
@@ -1421,7 +1421,7 @@ void csSector::DrawZ (iRenderView* rview)
   {
 /*	iMaterialHandle *matsave;
     matsave = draw_objects[i]->mathandle;
-    draw_objects[i]->mathandle = NULL;
+    draw_objects[i]->mathandle = 0;
     uint mixsave = draw_objects[i]->mixmode;
 	draw_objects[i]->mixmode = CS_FX_COPY;
     r3d->DrawMesh (draw_objects[i]);
@@ -1567,13 +1567,13 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
     bugplug->ResetCounter ("Activates");
   const csBasicVector &shader_list = shmgr->GetShaders ();
   for (i = 0; i < shader_list.Length(); i ++) {
-	if (shader_sort.Get ((csHashKey)shader_list[i]) == NULL) { continue; }
+	if (shader_sort.Get ((csHashKey)shader_list[i]) == 0) { continue; }
     iShaderTechnique *tech = ((iShader *)shader_list[i])->GetBestTechnique ();
 
     for (int p=0; p<tech->GetPassCount (); p++)
     {
       iShaderPass *pass = tech->GetPass (p);
-      pass->Activate (NULL);
+      pass->Activate (0);
       csHashIterator iter (&shader_sort, (csHashKey)shader_list[i]);
       while (iter.HasNext ()) {
         csRenderMesh *mesh = (csRenderMesh *)iter.Next();
@@ -1723,10 +1723,10 @@ iMeshWrapper *csSector::eiSector::HitBeam (
   iPolygon3D **polygonPtr,
   bool accurate)
 {
-  iPolygon3D *p = NULL;
+  iPolygon3D *p = 0;
   iMeshWrapper *obj = scfParent->HitBeam (
       start, end, isect,
-      polygonPtr ? &p : NULL, accurate);
+      polygonPtr ? &p : 0, accurate);
   if (obj)
   {
     if (p)
@@ -1783,7 +1783,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csSectorList::csSectorList (bool cr)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   CleanupReferences = cr;
 }

@@ -316,7 +316,7 @@ private:
 };
 
 // The global archive cache
-static VfsArchiveCache *ArchiveCache = NULL;
+static VfsArchiveCache *ArchiveCache = 0;
 
 // -------------------------------------------------------------- csFile --- //
 
@@ -377,12 +377,12 @@ SCF_IMPLEMENT_IBASE_END
 
 csMMapDataBuffer::csMMapDataBuffer (const char* filename)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   status = MemoryMapFile (&mapping, filename);
   if (!status)
   {
-    mapping.data = NULL; 
+    mapping.data = 0; 
     mapping.file_size = 0;
   }
 }
@@ -418,7 +418,7 @@ SCF_IMPLEMENT_IBASE_END
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
   size_t nsl = strlen (NameSuffix);
@@ -485,7 +485,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     if (alldata)
     {
       fclose (file);
-      file = NULL;
+      file = 0;
       SetPos (0);
       buffernt = false;
     }
@@ -512,7 +512,7 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
   size_t pl = pbl + strlen (PathSuffix) + 1;
   char *path = new char [pl];
   char *cur = path + pbl;
-  char *prev = NULL;
+  char *prev = 0;
 
   strcpy (path, PathBase);
   strcpy (cur, PathSuffix);
@@ -715,7 +715,7 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
     // do we already have everything?
     if (!alldata)
     {
-      iDataBuffer* newbuf = NULL;
+      iDataBuffer* newbuf = 0;
       // attempt to create file mapping
       size_t oldpos = GetPos();
       if (!nullterm)
@@ -737,7 +737,7 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
       }
       // close file, set correct pos
       fclose (file);
-      file = NULL;
+      file = 0;
       SetPos (oldpos);
       // setup buffer.
       alldata = csPtr<iDataBuffer> (newbuf);
@@ -760,7 +760,7 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -777,7 +777,7 @@ iDataBuffer* DiskFile::TryCreateMapping ()
     delete buf;
   }
 #endif
-  return NULL;
+  return 0;
 }
 
 // --------------------------------------------------------- ArchiveFile --- //
@@ -790,12 +790,12 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix, VfsArchive *ParentArchive) :
   csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Archive = ParentArchive;
   Error = VFS_STATUS_OTHER;
   Size = 0;
-  fh = NULL;
-  data = NULL;
+  fh = 0;
+  data = 0;
   fpos = 0;
 
   csScopedMutexLock lock (Archive->archive_mutex);
@@ -918,7 +918,7 @@ csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -1075,17 +1075,17 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   // Now look in "VFS.Solaris" section, for example
   csString Keyname;
   Keyname << "VFS." CS_PLATFORM_NAME "." << VarName;
-  value = Config->GetStr (Keyname, NULL);
+  value = Config->GetStr (Keyname, 0);
   if (value)
     return value;
 
   // Now look in "VFS.Alias" section for alias section name
-  const char *alias = Config->GetStr ("VFS.Alias." CS_PLATFORM_NAME, NULL);
+  const char *alias = Config->GetStr ("VFS.Alias." CS_PLATFORM_NAME, 0);
   // If there is one, look into that section too
   if (alias) {
     Keyname.Clear();
     Keyname << alias << '.' << VarName;
-    value = Config->GetStr (Keyname, NULL);
+    value = Config->GetStr (Keyname, 0);
   }
   if (value)
     return value;
@@ -1110,7 +1110,7 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   if (strcmp (VarName, "@") == 0) // Installation directory?
     return Parent->basedir;
 
-  return NULL;
+  return 0;
 }
 
 void VfsNode::FindFiles (const char *Suffix, const char *Mask,
@@ -1139,9 +1139,9 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
        && ((tpath [rpl - 1] == '/') || (tpath [rpl - 1] == PATH_SEPARATOR)))
         tpath [rpl - 1] = 0;		// remove trailing PATH_SEPARATOR
 
-      if ((dh = opendir (tpath)) == NULL)
+      if ((dh = opendir (tpath)) == 0)
         continue;
-      while ((de = readdir (dh)) != NULL)
+      while ((de = readdir (dh)) != 0)
       {
         if ((strcmp (de->d_name, ".") == 0)
          || (strcmp (de->d_name, "..") == 0))
@@ -1223,7 +1223,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
 
 iFile* VfsNode::Open (int Mode, const char *FileName)
 {
-  csFile *f = NULL;
+  csFile *f = 0;
 
   // Look through all RPathV's for file or directory
   int i;
@@ -1239,7 +1239,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
       else
       {
         delete f;
-	f = NULL;
+	f = 0;
       }
     }
     else
@@ -1267,7 +1267,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
       else
       {
         delete f;
-	f = NULL;
+	f = 0;
       }
     }
   }
@@ -1288,7 +1288,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
       size_t rl = strlen (rpath);
       memcpy (RealPath, rpath, rl);
       strcpy (RealPath + rl, Suffix);
-      Archive = NULL;
+      Archive = 0;
       if (access (RealPath, F_OK) == 0)
         return true;
     }
@@ -1309,7 +1309,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
 
       VfsArchive *a = ArchiveCache->Get (idx);
       a->UpdateTime ();
-      if (a->FileExists (Suffix, NULL))
+      if (a->FileExists (Suffix, 0))
       {
         Archive = a;
         strcpy (RealPath, Suffix);
@@ -1461,15 +1461,15 @@ SCF_EXPORT_CLASS_TABLE_END
 
 csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {
-  object_reg = NULL;
+  object_reg = 0;
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
-  cnode = NULL;
+  cnode = 0;
   cnsufx [0] = 0;
-  basedir = NULL;
+  basedir = 0;
   CS_ASSERT (!ArchiveCache);
   ArchiveCache = new VfsArchiveCache ();
 
@@ -1483,7 +1483,7 @@ csVFS::~csVFS ()
   delete [] basedir;
   CS_ASSERT (ArchiveCache);
   delete ArchiveCache;
-  ArchiveCache = NULL;
+  ArchiveCache = 0;
 }
 
 bool csVFS::Initialize (iObjectRegistry *object_reg)
@@ -1627,20 +1627,20 @@ VfsNode *csVFS::GetNode (const char *Path, char *NodePrefix,
     }
     return (VfsNode *)NodeList [best_i];
   }
-  return NULL;
+  return 0;
 }
 
 bool csVFS::PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
   char *Suffix, size_t SuffixSize) const
 {
-  Node = NULL; *Suffix = 0;
+  Node = 0; *Suffix = 0;
   char *fname = _ExpandPath (Path, IsDir);
   if (!fname)
     return false;
 
   Node = GetNode (fname, Suffix, SuffixSize);
   delete [] fname;
-  return (Node != NULL);
+  return (Node != 0);
 }
 
 bool csVFS::ChDir (const char *Path)

@@ -486,7 +486,7 @@ void csRectRegion::ClipTo (csRect &clip)
 
 csRectRegionDebug::csRectRegionDebug() 
 {
-  rand_seed = time(NULL);
+  rand_seed = time(0);
   num_tests_complete = 0;
   rand = new csRandomGen(rand_seed);
   MakeEmpty();

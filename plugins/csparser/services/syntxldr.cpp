@@ -240,7 +240,7 @@ void csTextSyntaxService::OptimizePolygon (iPolygon3DStatic *p)
   if (mat)
   {
     iMaterial *m = mat->GetMaterial ();
-    iTextureHandle *th = m ? m->GetTexture () : NULL;
+    iTextureHandle *th = m ? m->GetTexture () : 0;
     if (th && th->GetKeyColor ())
       return;
   }
@@ -257,7 +257,7 @@ public:
   SCF_DECLARE_IBASE;
   MissingSectorCallback (iLoaderContext* ldr_context, const char* sector)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     MissingSectorCallback::ldr_context = ldr_context;
     sectorname = csStrNew (sector);
   }
@@ -273,7 +273,7 @@ public:
     portal->SetSector (sector);
     // For efficiency reasons we deallocate the name here.
     delete[] sectorname;
-    sectorname = NULL;
+    sectorname = 0;
     portal->RemoveMissingSectorCallback (this);
     return true;
   }
@@ -708,13 +708,13 @@ bool csTextSyntaxService::ParsePoly3d (
 	float default_texlen,
 	iThingFactoryState* thing_fact_state, int vt_offset)
 {
-  iMaterialWrapper* mat = NULL;
+  iMaterialWrapper* mat = 0;
 
   if (!thing_type)
   {
     csRef<iPluginManager> plugin_mgr (
     	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-    CS_ASSERT (plugin_mgr != NULL);
+    CS_ASSERT (plugin_mgr != 0);
     thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	  "crystalspace.mesh.object.thing", iMeshObjectType);
     if (!thing_type)
@@ -722,7 +722,7 @@ bool csTextSyntaxService::ParsePoly3d (
     	  "crystalspace.mesh.object.thing", iMeshObjectType);
   }
 
-  CS_ASSERT (thing_type != NULL);
+  CS_ASSERT (thing_type != 0);
   csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
   	thing_type, iThingEnvironment));
 
@@ -756,7 +756,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       case XMLTOKEN_MATERIAL:
         mat = ldr_context->FindMaterial (child->GetContentsValue ());
-        if (mat == NULL)
+        if (mat == 0)
         {
           ReportError ("crystalspace.syntax.polygon", child,
             "Couldn't find material named '%s'!", child->GetContentsValue ());
@@ -1323,11 +1323,11 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
       </mixmode>\
     </root>\
   ");
-  SYN_ASSERT (error == NULL, error);
+  SYN_ASSERT (error == 0, error);
 
   csRef<iDocumentNode> root = doc->GetRoot ()->GetNode ("root");
   csRef<iDocumentNode> vector_node = root->GetNode ("v");
-  SYN_ASSERT (vector_node != NULL, "vector_node");
+  SYN_ASSERT (vector_node != 0, "vector_node");
   csVector3 v;
   SYN_ASSERT (ParseVector (vector_node, v) == true, "");
   SYN_ASSERT (v.x == 1, "x");
@@ -1335,7 +1335,7 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (v.z == 3, "z");
 
   csRef<iDocumentNode> matrix_node = root->GetNode ("matrix");
-  SYN_ASSERT (matrix_node != NULL, "matrix_node");
+  SYN_ASSERT (matrix_node != 0, "matrix_node");
   csMatrix3 m;
   SYN_ASSERT (ParseMatrix (matrix_node, m) == true, "");
   SYN_ASSERT (m.m11 == 3, "m");
@@ -1349,7 +1349,7 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (m.m33 == 3, "m");
 
   csRef<iDocumentNode> mixmode_node = root->GetNode ("mixmode");
-  SYN_ASSERT (mixmode_node != NULL, "mixmode_node");
+  SYN_ASSERT (mixmode_node != 0, "mixmode_node");
   uint mixmode;
   SYN_ASSERT (ParseMixmode (mixmode_node, mixmode) == true, "");
   uint desired_mixmode = CS_FX_TILING;
@@ -1357,5 +1357,5 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
   desired_mixmode |= CS_FX_SETALPHA (.5);
   SYN_ASSERT (mixmode == desired_mixmode, "mixmode");
 
-  return NULL;
+  return 0;
 }

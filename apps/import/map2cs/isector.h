@@ -82,7 +82,7 @@ protected:
   void RemoveWallPolygon(CMapPolygonSet* pRemovePoly, WallOrientation Orientation);
 
   /**
-    * Returns a pointer to the matching wall or NULL, if that plane is
+    * Returns a pointer to the matching wall or 0, if that plane is
     * coplanar with any wall.
     */
   CMapPolygonSet* GetCorrespondingWall(CMapTexturedPlane* pPlane, WallOrientation Orientation);

@@ -40,7 +40,7 @@ protected:
   int Height;
   /// The image data.
   void* Image;
-  /// The image palette or NULL
+  /// The image palette or 0
   csRGBpixel *Palette;
   /// The alpha map
   uint8 *Alpha;
@@ -61,7 +61,7 @@ protected:
   /**
    * Set the width and height.
    * This will also free the 'image' buffer to hold the bitmap,
-   * but it will NOT allocate a new buffer (thus `image' is NULL
+   * but it will NOT allocate a new buffer (thus `image' is 0
    * after calling this function). You should pass an appropiate
    * pointer to one of convert_xxx functions below to define the
    * image itself (or assign something to `image' manually).
@@ -117,7 +117,7 @@ public:
    * Get image data: returns either (csRGBpixel *) or (unsigned char *)
    * depending on format. Note that for RGBA images the csRGBpixel structure
    * contains the alpha channel as well, so GetAlpha (see below) method
-   * will return NULL (because alpha is not stored separately, as for
+   * will return 0 (because alpha is not stored separately, as for
    * paletted images).
    */
   virtual void *GetImageData ();
@@ -149,7 +149,7 @@ public:
   virtual const char *GetName ();
   /// Get image format
   virtual int GetFormat ();
-  /// Get image palette (or NULL if no palette)
+  /// Get image palette (or 0 if no palette)
   virtual csRGBpixel *GetPalette ();
   /// Get alpha map for image
   virtual uint8 *GetAlpha ();

@@ -38,20 +38,20 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csShadow::csShadow ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  wrap = NULL;
-  shadow_mesh = NULL;
+  wrap = 0;
+  shadow_mesh = 0;
   do_bbox = true;
   do_rad = true;
   do_beam = true;
   beam[0] = beam[1] = isec = csVector3();
-  logparent = NULL;
+  logparent = 0;
 }
 
 csShadow::~csShadow ()
 {
-  CS_ASSERT (wrap == NULL);
+  CS_ASSERT (wrap == 0);
 }
 
 bool csShadow::DrawTest (iRenderView* rview, iMovable*)
@@ -146,7 +146,7 @@ void csShadow::SetShadowMesh (iMeshWrapper* sh)
 
 bool csShadow::AddToEngine (iEngine* engine)
 {
-  if (wrap) { engine->GetMeshes ()->Remove (wrap); wrap = NULL; }
+  if (wrap) { engine->GetMeshes ()->Remove (wrap); wrap = 0; }
   if (engine->GetSectors ()->GetCount () <= 0) return false;
   csRef<iMeshWrapper> ww (engine->CreateMeshWrapper (this, "_@Shadow@_"));
   wrap = ww;
@@ -167,7 +167,7 @@ void csShadow::RemoveFromEngine (iEngine* engine)
   if (wrap)
   {
     engine->GetMeshes ()->Remove (wrap);
-    wrap = NULL;
+    wrap = 0;
   }
 }
 

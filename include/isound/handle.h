@@ -50,7 +50,7 @@ struct iSoundHandle : public iBase
   /// For Loop == true it returns a iSoundSource you have to Stop ()
   /// if you want to get rid of the looping sound
   /// (also if you want to unload your SoundRenderer)
-  /// If Loop is false NULL is returned
+  /// If Loop is false 0 is returned
   virtual csPtr<iSoundSource> Play(bool Loop = false) = 0;
   /// create a sound source
   virtual csPtr<iSoundSource> CreateSource(int Mode3d) = 0;

@@ -26,7 +26,7 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* key)
   csRegistryConfig* cfg = new csRegistryConfig ();
   if (!cfg->Open (key))
   {
-    delete cfg; cfg = NULL;
+    delete cfg; cfg = 0;
   }
   return csPtr<iConfigFile> (cfg);
 }
@@ -39,10 +39,10 @@ SCF_IMPLEMENT_IBASE_END
 
 csRegistryConfig::csRegistryConfig ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
-  Prefix = NULL;
-  hKey = NULL;
+  Prefix = 0;
+  hKey = 0;
   status = new rcStatus ();
 }
 
@@ -50,7 +50,7 @@ csRegistryConfig::~csRegistryConfig()
 {
   delete status;
 
-  if (hKey != NULL)
+  if (hKey != 0)
   {
     RegCloseKey (hKey);
   }
@@ -77,9 +77,9 @@ bool csRegistryConfig::Open (const char* Key)
   ReplaceSeparators (key);
 
   LONG err = RegCreateKeyEx (HKEY_CURRENT_USER,
-    key, 0, NULL, 0, 
+    key, 0, 0, 0, 
     REG_KEY_ACCESS, 
-    NULL, &hKey, NULL);
+    0, &hKey, 0);
 
   return (err == ERROR_SUCCESS);
 }
@@ -91,7 +91,7 @@ const char* csRegistryConfig::GetFileName () const
 
 iVFS* csRegistryConfig::GetVFS () const
 {
-  return NULL;
+  return 0;
 }
 
 void csRegistryConfig::SetFileName (const char*, iVFS*)
@@ -128,7 +128,7 @@ void csRegistryConfig::Clear ()
   DWORD nlen = sizeof (Name);
 
   while ((err = RegEnumValue (hKey, index, Name,
-    &nlen, 0, NULL, NULL, NULL)) == ERROR_SUCCESS)
+    &nlen, 0, 0, 0, 0)) == ERROR_SUCCESS)
   {
     RegDeleteValue (hKey, Name);
 
@@ -139,7 +139,7 @@ void csRegistryConfig::Clear ()
 
 csPtr<iConfigIterator> csRegistryConfig::Enumerate (const char *Subsection)
 {
-  if (!SubsectionExists (Subsection)) return NULL;
+  if (!SubsectionExists (Subsection)) return 0;
 
   csRegistryIterator* it = new csRegistryIterator (this, Subsection);
   iters.Push (it);
@@ -149,7 +149,7 @@ csPtr<iConfigIterator> csRegistryConfig::Enumerate (const char *Subsection)
 bool csRegistryConfig::KeyExists (const char *Key) const
 {
   LONG err = RegQueryValueEx (hKey,
-    Key, 0, NULL, NULL, NULL);
+    Key, 0, 0, 0, 0);
 
   return (err == ERROR_SUCCESS);
 }
@@ -164,8 +164,8 @@ bool csRegistryConfig::SubsectionExists (const char *Subsection) const
   do 
   {
     namelen = sizeof (Name);
-    if ((err = RegEnumValue (hKey, index++, Name, &namelen, NULL, NULL,
-      NULL, NULL)) != ERROR_SUCCESS) 
+    if ((err = RegEnumValue (hKey, index++, Name, &namelen, 0, 0,
+      0, 0)) != ERROR_SUCCESS) 
     {
       return false;
     }
@@ -186,13 +186,13 @@ bool csRegistryConfig::InternalGetValue (const char* Key,
 {
   DWORD datasize;
   LONG err = RegQueryValueEx (hKey,
-    Key, 0, &type, NULL, &datasize);
+    Key, 0, &type, 0, &datasize);
 
   if (err == ERROR_SUCCESS)
   {
     data.SetSize (datasize);
     err = RegQueryValueEx (hKey,
-      Key, 0, NULL, data.data, &data.size);
+      Key, 0, 0, data.data, &data.size);
   }
 
   return (err == ERROR_SUCCESS);
@@ -347,7 +347,7 @@ bool csRegistryConfig::GetBool (const char *Key, bool Def) const
 
 const char *csRegistryConfig::GetComment (const char *Key) const
 {
-  return NULL;
+  return 0;
 }
 
 bool csRegistryConfig::InternalSetValue (const char* Key,
@@ -392,7 +392,7 @@ void csRegistryConfig::DeleteKey (const char *Key)
 
 const char *csRegistryConfig::GetEOFComment () const
 {
-  return NULL;
+  return 0;
 }
 
 void csRegistryConfig::SetEOFComment (const char *Text)
@@ -406,7 +406,7 @@ SCF_IMPLEMENT_IBASE_END
 csRegistryIterator::csRegistryIterator (csRegistryConfig* Owner, 
   const char* Subsection)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   status = new riStatus();
 
@@ -452,7 +452,7 @@ bool csRegistryIterator::Next()
     namelen = sizeof (Name);
 
     if ((err = RegEnumValue (owner->hKey, EnumIndex,
-      Name, &namelen, 0, NULL, NULL, NULL)) != ERROR_SUCCESS)
+      Name, &namelen, 0, 0, 0, 0)) != ERROR_SUCCESS)
     {
       return false;
     }
@@ -474,9 +474,9 @@ const char *csRegistryIterator::GetKey (bool Local) const
 
   if ((err = RegEnumValue (owner->hKey, 
     EnumIndex - 1, Name, 
-    &namelen, 0, NULL, NULL, NULL)) != ERROR_SUCCESS)
+    &namelen, 0, 0, 0, 0)) != ERROR_SUCCESS)
   {
-    return NULL;
+    return 0;
   }
 
   const char* str = status->strings.Register (Name, 0);
@@ -493,14 +493,14 @@ bool csRegistryIterator::GetCurrentData (DWORD& type,
 
   if (RegEnumValue (owner->hKey, 
     EnumIndex - 1, Name, 
-    &namelen, 0, &type, NULL, &datasize) != ERROR_SUCCESS)
+    &namelen, 0, &type, 0, &datasize) != ERROR_SUCCESS)
   {
     return false;
   }
   data.SetSize (datasize);
 
-  if (RegQueryValueEx (owner->hKey, Name, NULL,
-    NULL, data.data, &datasize) != ERROR_SUCCESS)
+  if (RegQueryValueEx (owner->hKey, Name, 0,
+    0, data.data, &datasize) != ERROR_SUCCESS)
   {
     return false;
   }
@@ -562,7 +562,7 @@ bool csRegistryIterator::GetBool () const
 
 const char *csRegistryIterator::GetComment () const
 {
-  return NULL;
+  return 0;
 }
 
 

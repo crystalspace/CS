@@ -137,7 +137,7 @@ inline int csStaticArray::GetSize () const
 inline void csStaticArray::TakeOver (csStaticArray *other, bool DeleteOld)
   {
     TakeOver (other->Map, other->Size, DeleteOld);
-    other->Map = NULL;
+    other->Map = 0;
     other->Size = 0;
   }
 inline void csStaticArray::TakeOver (void *NewData, int NewSize, bool DeleteOld)

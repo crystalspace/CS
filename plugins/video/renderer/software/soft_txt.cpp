@@ -41,7 +41,7 @@ csTextureHandleSoftware::csTextureHandleSoftware (
 	csTextureManagerSoftware *texman, iImage *image, int flags)
 	: csTextureHandle (image, flags)
 {
-  pal2glob = NULL;
+  pal2glob = 0;
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
   (this->texman = texman)->IncRef ();
@@ -129,7 +129,7 @@ csTexture *csTextureHandleSoftware::NewTexture (iImage *newImage,
   csRef<iImage> Image;
   if (ismipmap && texman->sharpen_mipmaps)
   { 
-    csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
+    csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
     Image = newImage->Sharpen (tc, texman->sharpen_mipmaps);
   }
   else
@@ -173,7 +173,7 @@ void csTextureHandleSoftware::ComputeMeanColor ()
     bias[i].green = g;
     bias[i].blue = b;
   }
-  quant.Count (bias, 256, NULL);
+  quant.Count (bias, 256, 0);
 #endif
 
   csRGBpixel *pal = palette;
@@ -215,7 +215,7 @@ void csTextureHandleSoftware::ComputeMeanColor ()
       {
 	// Very well, we don't need the iImage anymore, so free it
 	DG_UNLINK (t, t->image);
-	t->image = NULL;
+	t->image = 0;
       }
     }
 
@@ -281,7 +281,7 @@ private:
 public:
   csOFSCbSoftware (csTextureHandleSoftware* txt)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     csOFSCbSoftware::txt = txt;
   }
   virtual ~csOFSCbSoftware ()
@@ -474,7 +474,7 @@ csPtr<iTextureHandle> csTextureManagerSoftware::RegisterTexture (iImage* image,
   if (!image)
   {
     G3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAD!!! csTextureManagerSoftware::RegisterTexture with NULL image!");
+      "BAAAD!!! csTextureManagerSoftware::RegisterTexture with 0 image!");
 
     csRef<iImage> im (csCreateXORPatternImage(32, 32, 5));
     image = im;

@@ -87,7 +87,7 @@ private:
   csMeshWrapper* mesh;
 
 public:
-  csMeshMeshList () : mesh (NULL) { }
+  csMeshMeshList () : mesh (0) { }
   virtual ~csMeshMeshList () { RemoveAll (); }
   void SetMesh (csMeshWrapper* m) { mesh = m; }
   virtual void PrepareItem (iMeshWrapper* item);
@@ -130,7 +130,7 @@ private:
   csMeshFactoryWrapper* meshfact;
 
 public:
-  csMeshFactoryFactoryList () : meshfact (NULL) {}
+  csMeshFactoryFactoryList () : meshfact (0) {}
   virtual ~csMeshFactoryFactoryList () { RemoveAll (); }
   void SetMeshFactory (csMeshFactoryWrapper* m) { meshfact = m; }
   virtual void PrepareItem (iMeshFactoryWrapper* item);
@@ -148,7 +148,7 @@ class csMeshWrapper : public csObject
   friend class csMovableSectorList;
 
 protected:
-  /// The parent mesh object, or NULL
+  /// The parent mesh object, or 0
   iMeshWrapper *Parent;
 
   /**
@@ -781,7 +781,7 @@ private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
   csRef<iMeshObjectFactory> meshFact;
 
-  /// Optional parent of this object (can be NULL).
+  /// Optional parent of this object (can be 0).
   iMeshFactoryWrapper* parent;
 
   /// Optional relative transform to parent.

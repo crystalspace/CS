@@ -85,9 +85,9 @@ csFountainMeshObject::csFountainMeshObject (iObjectRegistry* object_reg,
   iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
-  part_pos = NULL;
-  part_speed = NULL;
-  part_age = NULL;
+  part_pos = 0;
+  part_speed = 0;
+  part_age = 0;
   accel.Set (0, -1, 0);
   origin.Set (0, 0, 0);
   fall_time = 1;
@@ -191,7 +191,7 @@ csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *p,
 	iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
-  logparent = NULL;
+  logparent = 0;
   object_reg = s;
 }
 

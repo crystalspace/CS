@@ -40,10 +40,10 @@
 #define SCROLLBAR_TEXTURE_NAME  "csws::ScrollBar"
 
 csPixmap *csScrollBar::sprarrows[12] =
-{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+{ 0, 0, 0, 0, 0, 0, 0, 0 };
 
 csPixmap *csScrollBar::sprscroller[2] =
-{ NULL, NULL };
+{ 0, 0 };
 
 static int scrbarref = 0;
 
@@ -92,10 +92,10 @@ csScrollBar::~csScrollBar ()
     for (i = 0; i < 12; i++)
     {
       delete sprarrows [i];
-      sprarrows [i] = NULL;
+      sprarrows [i] = 0;
     } /* endfor */
-    delete sprscroller [0]; sprscroller[0] = NULL;
-    delete sprscroller [1]; sprscroller[1] = NULL;
+    delete sprscroller [0]; sprscroller[0] = 0;
+    delete sprscroller [1]; sprscroller[1] = 0;
   } /* endif */
 }
 
@@ -189,7 +189,7 @@ pagescroll:
         } /* endif */
         if (app->MouseOwner == this)
         {
-          app->CaptureMouse (NULL);
+          app->CaptureMouse (0);
           active_button = 0;
           Invalidate ();
         } /* endif */
@@ -234,12 +234,12 @@ pulse:      if (active_button == SCROLL_UL)
           int oldvalue = status.value;
           status.value = -1;
           SetValue (oldvalue);
-          Event.Command.Info = NULL;
+          Event.Command.Info = 0;
           return true;
         }
         case cscmdScrollBarGetStatus:
           *((csScrollBarStatus *)Event.Command.Info) = status;
-          Event.Command.Info = NULL;
+          Event.Command.Info = 0;
           return true;
         case cscmdScrollBarQueryValue:
           Event.Command.Info = (void *)status.value;
@@ -282,7 +282,7 @@ pulse:      if (active_button == SCROLL_UL)
           if (IsHorizontal != ((Event.Key.Code == CSKEY_LEFT) || (Event.Key.Code == CSKEY_RIGHT)))
             break;
           if (app->KeyboardOwner == this)
-            app->CaptureKeyboard (NULL);
+            app->CaptureKeyboard (0);
           return true;
       } /* endswitch */
   } /* endswitch */
@@ -399,10 +399,10 @@ noscrollbut:
   // Set up arrows on scroll buttons
   if (IsHorizontal)
   {
-    scroller->SetBitmap (sprscroller[1], NULL, false);
+    scroller->SetBitmap (sprscroller[1], 0, false);
     if (disable || (status.maxvalue <= 0) || (status.value <= 0))
     {
-      topleft->SetBitmap (sprarrows[8], NULL, false);
+      topleft->SetBitmap (sprarrows[8], 0, false);
       topleft->SetState (CSS_DISABLED, true);
     } else
     {
@@ -411,7 +411,7 @@ noscrollbut:
     } /* endif */
     if (disable || (status.maxvalue <= 0) || (status.value >= status.maxvalue))
     {
-      botright->SetBitmap (sprarrows[9], NULL, false);
+      botright->SetBitmap (sprarrows[9], 0, false);
       botright->SetState (CSS_DISABLED, true);
     } else
     {
@@ -421,10 +421,10 @@ noscrollbut:
   }
   else
   {
-    scroller->SetBitmap (sprscroller[0], NULL, false);
+    scroller->SetBitmap (sprscroller[0], 0, false);
     if (disable || (status.maxvalue <= 0) || (status.value <= 0))
     {
-      topleft->SetBitmap (sprarrows[2], NULL, false);
+      topleft->SetBitmap (sprarrows[2], 0, false);
       topleft->SetState (CSS_DISABLED, true);
     } else
     {
@@ -433,7 +433,7 @@ noscrollbut:
     } /* endif */
     if (disable || (status.maxvalue <= 0) || (status.value >= status.maxvalue))
     {
-      botright->SetBitmap (sprarrows[3], NULL, false);
+      botright->SetBitmap (sprarrows[3], 0, false);
       botright->SetState (CSS_DISABLED, true);
     } else
     {

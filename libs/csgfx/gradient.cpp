@@ -89,7 +89,7 @@ bool csGradient::Render (csRGBcolor* pal, int count,
 
   // current shade index
   int csi = 0;
-  const csGradientShade* currshade = NULL;
+  const csGradientShade* currshade = 0;
   const csGradientShade* nextshade = &shades[0];
 
   for (int i = 0; i < count; i++)

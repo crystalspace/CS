@@ -138,14 +138,14 @@ awsGridBagLayout::GridBagLayoutInfo *
 }
 awsGridBagLayout::awsGridBagLayout (iAwsComponent *o, iAwsComponentNode* settings, iAwsPrefManager* pm ) :
   awsLayoutManager(o, settings, pm),
-  layoutInfo(NULL),
-  columnWidths(NULL),
+  layoutInfo(0),
+  columnWidths(0),
   columnWidthsLength(0),
-  rowHeights(NULL),
+  rowHeights(0),
   rowHeightsLength(0),
-  columnWeights(NULL),
+  columnWeights(0),
   columnWeightsLength(0),
-  rowWeights(NULL),
+  rowWeights(0),
   rowWeightsLength(0)
 {
 }
@@ -207,7 +207,7 @@ awsGridBagConstraints awsGridBagLayout::getConstraints (iAwsComponent *cmp)
       awsGridBagConstraints *,
       comptable.Get ((csHashKey) cmp));
 
-  if (constraints == NULL)
+  if (constraints == 0)
   {
     setConstraints (cmp, defaultConstraints);
     constraints = (awsGridBagConstraints *)comptable.Get ((csHashKey) cmp);
@@ -234,7 +234,7 @@ awsGridBagConstraints *awsGridBagLayout::lookupConstraints (
       awsGridBagConstraints *,
       comptable.Get ((csHashKey) cmp));
 
-  if (constraints == NULL)
+  if (constraints == 0)
   {
     setConstraints (cmp, defaultConstraints);
     constraints = (awsGridBagConstraints *)comptable.Get ((csHashKey) cmp);
@@ -251,7 +251,7 @@ void awsGridBagLayout::removeConstraints (iAwsComponent *cmp)
 csPoint awsGridBagLayout::getLayoutOrigin ()
 {
   csPoint origin (0, 0);
-  if (layoutInfo != NULL)
+  if (layoutInfo != 0)
   {
     origin.x = layoutInfo->startx;
     origin.y = layoutInfo->starty;
@@ -264,10 +264,10 @@ void awsGridBagLayout::getLayoutDimensions (int **row, int **col)
 {
   if (!row || !col) return ;
 
-  if (layoutInfo == NULL)
+  if (layoutInfo == 0)
   {
-    *row = NULL;
-    *col = NULL;
+    *row = 0;
+    *col = 0;
     return ;
   }
 
@@ -282,10 +282,10 @@ void awsGridBagLayout::getLayoutWeights (double **row, double **col)
 {
   if (!row || !col) return ;
 
-  if (layoutInfo == NULL)
+  if (layoutInfo == 0)
   {
-    *row = NULL;
-    *col = NULL;
+    *row = 0;
+    *col = 0;
     return ;
   }
 
@@ -301,7 +301,7 @@ csPoint awsGridBagLayout::location (int x, int y)
   csPoint loc (0, 0);
   int i, d;
 
-  if (layoutInfo == NULL) return loc;
+  if (layoutInfo == 0) return loc;
 
   d = layoutInfo->startx;
   for (i = 0; i < layoutInfo->width; ++i)
@@ -445,10 +445,10 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
   /*
      * Apply minimum row/column dimensions
      */
-  if (columnWidths != NULL && r.width < columnWidthsLength)
+  if (columnWidths != 0 && r.width < columnWidthsLength)
     r.width = columnWidthsLength;
 
-  if (rowHeights != NULL && r.height < rowHeightsLength)
+  if (rowHeights != 0 && r.height < rowHeightsLength)
     r.height = rowHeightsLength;
 
   /*
@@ -553,13 +553,13 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
   /*
      * Apply minimum row/column dimensions and weights
      */
-  if (columnWidths != NULL)
+  if (columnWidths != 0)
     memcpy(r.minWidth, columnWidths, columnWidthsLength * sizeof (int));
-  if (rowHeights != NULL)
+  if (rowHeights != 0)
     memcpy(r.minHeight, rowHeights, rowHeightsLength * sizeof (int));
-  if (columnWeights != NULL)
+  if (columnWeights != 0)
     memcpy(r.weightX, columnWeights, columnWeightsLength * sizeof (double));
-  if (rowWeights != NULL)
+  if (rowWeights != 0)
     memcpy(r.weightY, rowWeights, rowWeightsLength * sizeof (double));
 
   /*
@@ -824,8 +824,8 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
      */
   if (
     parent->GetChildCount () == 0 &&
-    (columnWidths == NULL || columnWidthsLength == 0) &&
-    (rowHeights == NULL || rowHeightsLength == 0))
+    (columnWidths == 0 || columnWidthsLength == 0) &&
+    (rowHeights == 0 || rowHeightsLength == 0))
   {
     return ;
   }

@@ -22,7 +22,7 @@
 
 csEffectLayer::csEffectLayer ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csEffectLayer::~csEffectLayer ()

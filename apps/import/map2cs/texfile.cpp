@@ -65,7 +65,7 @@ static const char* UnstoredTextures[] =
 
 CTextureFile::CTextureFile()
 {
-  m_pImage         = NULL;
+  m_pImage         = 0;
   m_OriginalWidth  = 1;
   m_OriginalHeight = 1;
   m_Visible        = false;

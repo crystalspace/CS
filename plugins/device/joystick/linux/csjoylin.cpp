@@ -48,11 +48,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csLinuxJoystick::eiEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLinuxJoystick::csLinuxJoystick (iBase *parent):
-  object_reg(NULL),
-  joystick(NULL),
+  object_reg(0),
+  joystick(0),
   nJoy(0),
   bHooked(false),
-  EventOutlet(NULL)
+  EventOutlet(0)
 {
   SCF_CONSTRUCT_IBASE(parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
@@ -119,7 +119,7 @@ bool csLinuxJoystick::Init ()
 
   nJoy=0;
   bHooked = false;
-  EventOutlet = NULL;
+  EventOutlet = 0;
 
   while (it->Next ())
   {
@@ -199,13 +199,13 @@ bool csLinuxJoystick::Close ()
     bHooked = false;
   }
 
-  EventOutlet = NULL;
+  EventOutlet = 0;
 
   for (int i=0; i<nJoy; i++)
     close (joystick[i].fd);
 
   delete [] joystick;
-  joystick = NULL;
+  joystick = 0;
   nJoy = 0;
 
   return true;

@@ -25,7 +25,7 @@ static iAwsSink *textbox_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())
 
-static awsSlot *textbox_slot = NULL;
+static awsSlot *textbox_slot = 0;
 
 static void BlinkCursor (void *, iAwsSource *source)
 {
@@ -41,15 +41,15 @@ awsTextBox::awsTextBox () :
   mouse_is_over(false),
   has_focus(false),
   should_mask(0),
-  bkg(NULL),
+  bkg(0),
   frame_style(0),
   alpha_level(92),
-  text(NULL),
-  disallow(NULL),
-  maskchar(NULL),
+  text(0),
+  disallow(0),
+  maskchar(0),
   start(0),
   cursor(0),
-  blink_timer(NULL),
+  blink_timer(0),
   blink(true)
 {
   textbox_slot = GetTextBoxBlinkingCursorSlot ();
@@ -80,7 +80,7 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   // Setup blink event handling
   if (textbox_sink == 0)
   {
-    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (NULL);
+    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (0);
     textbox_sink->RegisterTrigger ("Blink", &BlinkCursor);
   }
 
@@ -123,7 +123,7 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
     case fsBitmap:
       {
-        iString *tn1 = NULL;
+        iString *tn1 = 0;
 
         pm->GetString (settings, "Bitmap", tn1);
 
@@ -141,7 +141,7 @@ bool awsTextBox::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Text", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (text) st = text->GetData ();
 
@@ -151,7 +151,7 @@ bool awsTextBox::GetProperty (const char *name, void **parm)
   }
   else if (strcmp ("Disallow", name) == 0)
   {
-    char *st = NULL;
+    char *st = 0;
 
     if (disallow) st = disallow->GetData ();
 
@@ -328,7 +328,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
   if (text && text->Length ())
   {
     int tw, th, tx, ty, mcc;
-    iString *saved = NULL;
+    iString *saved = 0;
 
     if (should_mask && maskchar)
     {

@@ -217,7 +217,7 @@ struct iShaderPass : iBase
   /// Check if valid
   virtual bool IsValid() = 0;
 
-  /// Activate the whole pass for the indicated mesh (which might be NULL)
+  /// Activate the whole pass for the indicated mesh (which might be 0)
   virtual void Activate(csRenderMesh* mesh) = 0;
 
   /// Deactivate the whole pass

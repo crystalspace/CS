@@ -40,7 +40,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
   
-  csMplexDocumentSystem (iBase* parent = NULL);
+  csMplexDocumentSystem (iBase* parent = 0);
   virtual ~csMplexDocumentSystem ();
 	
   virtual bool Initialize (iObjectRegistry* objreg);

@@ -36,7 +36,7 @@ struct csLoaderPluginRec
 	iBinaryLoaderPlugin* binPlugin)
   {
     if (shortName) ShortName = csStrNew (shortName);
-    else ShortName = NULL;
+    else ShortName = 0;
     ClassID = csStrNew (classID);
     Component = component;
     Plugin = plugin;
@@ -52,7 +52,7 @@ struct csLoaderPluginRec
 
 csLoader::csLoadedPluginVector::csLoadedPluginVector ()
 {
-  plugin_mgr = NULL;
+  plugin_mgr = 0;
   mutex = csMutex::Create (true);
 }
 
@@ -90,7 +90,7 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
     if (!strcmp (name, pl->ClassID))
       return pl;
   }
-  return NULL;
+  return 0;
 }
 
 bool csLoader::csLoadedPluginVector::GetPluginFromRec (
@@ -110,7 +110,7 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
   }
   plug = rec->Plugin;
   binplug = rec->BinPlugin;
-  return rec->Component != NULL;
+  return rec->Component != 0;
 }
 
 bool csLoader::csLoadedPluginVector::FindPlugin (
@@ -126,7 +126,7 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
   }
 
   // create a new loading record
-  NewPlugin (NULL, Name);
+  NewPlugin (0, Name);
   return GetPluginFromRec (vector.Get(vector.Length()-1),
   	plug, binplug);
 }
@@ -135,6 +135,6 @@ void csLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, const char *ClassID)
 {
   csScopedMutexLock lock (mutex);
-  vector.Push (new csLoaderPluginRec (ShortName, ClassID, NULL, NULL, NULL));
+  vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
 }
 

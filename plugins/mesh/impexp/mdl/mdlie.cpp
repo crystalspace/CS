@@ -138,7 +138,7 @@ int csModelConverterMDL::GetFormatCount ()
 
 const csModelConverterFormat *csModelConverterMDL::GetFormat (int idx)
 {
-  return (idx == 0) ? &FormatInfo : NULL;
+  return (idx == 0) ? &FormatInfo : 0;
 }
 
 /*
@@ -226,7 +226,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
 
   // check for the correct version
   if (!CheckMDLVersion (in))
-    return NULL;
+    return 0;
 
   // build the object framework
   iModelData *Scene = new csModelData ();
@@ -253,7 +253,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
     } else {
       Scene->DecRef ();
       Object->DecRef ();
-      return NULL;
+      return 0;
     }
   }
 
@@ -305,7 +305,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
 
   // read action information
   csVector3 *Vertices = new csVector3 [Header.VertexCount];
-  iModelDataVertices *DefaultVertices = NULL;
+  iModelDataVertices *DefaultVertices = 0;
 
   for (i=0; i<Header.ActionCount; i++)
   {
@@ -379,7 +379,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
 csPtr<iDataBuffer> csModelConverterMDL::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "mdl"))
-    return NULL;
+    return 0;
 
-  return NULL;
+  return 0;
 }

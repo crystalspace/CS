@@ -43,9 +43,9 @@ CS_IMPLEMENT_STATIC_VAR (Get_persp, dpmesh_persp, ())
 typedef csGrowingArray<bool> dpmesh_visible;
 CS_IMPLEMENT_STATIC_VAR (Get_visible, dpmesh_visible, ())
 
-static dpmesh_tr_verts *tr_verts = NULL;
-static dpmesh_persp *persp = NULL;
-static dpmesh_visible *visible = NULL;
+static dpmesh_tr_verts *tr_verts = 0;
+static dpmesh_persp *persp = 0;
+static dpmesh_visible *visible = 0;
 
 static void PlaneZ (
   const csVector3 &u,
@@ -121,7 +121,7 @@ static bool ClipPolygonZ (
 /*
  * Default implementation of DrawPolygonMesh which works with polygon
  * buffers that are equal to csPolArrayPolygonBuffer.
- * If 'clipper' == NULL then no clipping will happen.
+ * If 'clipper' == 0 then no clipping will happen.
  * If 'lazyclip' == true then only a lazy clip will happen (currently
  * not supported).
  * WARNING: This version does NOT support vertex_fog. It is supposed

@@ -163,12 +163,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCurve::csCurve (csBezierMeshObjectType* thing_type) :
   csObject(),
-  LightPatches(NULL),
-  O2W(NULL),
-  uv2World(NULL),
-  uv2Normal(NULL),
-  ParentThing(NULL),
-  LightMap(NULL),
+  LightPatches(0),
+  O2W(0),
+  uv2World(0),
+  uv2Normal(0),
+  ParentThing(0),
+  LightMap(0),
   LightmapUpToDate(false)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
@@ -179,7 +179,7 @@ csCurve::csCurve (csBezierMeshObjectType* thing_type) :
   csCurve::thing_type = thing_type;
 
 #ifndef CS_USE_NEW_RENDERER
-  vbufmgr = NULL;
+  vbufmgr = 0;
   SetupVertexBuffer ();
 #endif // CS_USE_NEW_RENDERER
 
@@ -599,7 +599,7 @@ void csCurve::InitializeDefaultLighting ()
 
 const char* csCurve::ReadFromCache (iFile* file)
 {
-  if (!IsLightable ()) return NULL;
+  if (!IsLightable ()) return 0;
   LightMap = new csCurveLightMap ();
 
   // Allocate space for the LightMap and initialize it to ambient color.
@@ -675,7 +675,7 @@ void csCurve::GetCoverageMatrix (
       // if we have any shadow frustrums
       if (has_shadows)
       {
-        csFrustum *csf = NULL;
+        csFrustum *csf = 0;
         bool shadowed = false;
         shadow_it->Reset ();
         while (shadow_it->HasNext ())
@@ -859,7 +859,7 @@ void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
   if (scfParent->vbuf)
   {
     scfParent->vbuf = 0;
-    scfParent->vbufmgr = NULL;
+    scfParent->vbufmgr = 0;
   }
 }
 #endif // CS_USE_NEW_RENDERER
@@ -975,7 +975,7 @@ csBezierCurve::csBezierCurve (csBezierMeshObjectType* thing_type)
       texture_coords[i][j].y = (0.5f * j);
     }
 
-  previous_tesselation = NULL;
+  previous_tesselation = 0;
   previous_resolution = -1;
   valid_bbox = false;
 

@@ -132,10 +132,10 @@ csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
 		iBase* /*context*/)
 {
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  CS_ASSERT (engine != NULL);
+  CS_ASSERT (engine != 0);
   csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (object_reg, iDynamics);
-  if (dynamics == NULL) {
-    return NULL;
+  if (dynamics == 0) {
+    return 0;
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -148,11 +148,11 @@ csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
     if (id == XMLTOKEN_SYSTEM) {
       csRef<iDynamicSystem> system = dynamics->CreateSystem ();
       if (!ParseSystem (child, system)) {
-	    return NULL;
+	    return 0;
 	  }
     } else {
       synldr->ReportBadToken (child);
-      return NULL;
+      return 0;
     }
   }
   return csPtr<iBase>(dynamics);
@@ -392,7 +392,7 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
     switch (id)
     {
       case XMLTOKEN_BODY:
-        if (body1 == NULL) {
+        if (body1 == 0) {
           if (child->GetContentsValue ()) {
             body1 = system->FindBody (child->GetContentsValue());
           } else {
@@ -400,7 +400,7 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
               child, "Body should have a name");
             return false;
           }
-        } else if (body2 == NULL) {
+        } else if (body2 == 0) {
           if (child->GetContentsValue ()) {
             body2 = system->FindBody (child->GetContentsValue());
           } else {

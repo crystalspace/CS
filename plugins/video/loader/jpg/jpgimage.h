@@ -44,10 +44,10 @@ class csJPGImageIO : public iImageIO
   virtual const csVector& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
-  virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = NULL,
-    const char* extraoptions = NULL);
-  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format = NULL,
-    const char* extraoptions = NULL);
+  virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
+    const char* extraoptions = 0);
+  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format = 0,
+    const char* extraoptions = 0);
 
   bool Initialize (iObjectRegistry* p) 
     { object_reg = p; return true; }

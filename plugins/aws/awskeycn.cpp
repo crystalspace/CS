@@ -10,7 +10,7 @@ iAwsKey* awsKeyContainer::Find (iString *n)
 {
   return Find (
       aws_adler32 (
-        aws_adler32 (0, NULL, 0),
+        aws_adler32 (0, 0, 0),
         (unsigned char *)n->GetData (),
         n->Length ()));
 }
@@ -19,7 +19,7 @@ iAwsKey* awsKeyContainer::Find (const char* n)
 {
   return Find (
       aws_adler32 (
-	aws_adler32 (0, NULL, 0),
+	aws_adler32 (0, 0, 0),
 	(unsigned char*) n,
 	strlen(n)));
 }
@@ -45,7 +45,7 @@ iAwsKey *awsKeyContainer::Find (unsigned long idname)
 
   if (aws_debug) printf ("aws-debug: search failed.\n");
 
-  return NULL;
+  return 0;
 }
 
 void awsKeyContainer::Remove (iString* name)

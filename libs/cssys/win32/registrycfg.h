@@ -56,7 +56,7 @@ private:
   {
     BYTE* data;
     DWORD size;
-    Block_O_Mem () : data(NULL), size(0) { }
+    Block_O_Mem () : data(0), size(0) { }
     void Clear() { delete[] data; }
     void SetSize (DWORD sz) { Clear(); size = sz; data = new BYTE[sz]; }
     ~Block_O_Mem() { Clear(); }
@@ -87,14 +87,14 @@ public:
   virtual const char* GetFileName () const;
   virtual iVFS* GetVFS () const;
   virtual void SetFileName (const char*, iVFS*);
-  virtual bool Load (const char* iFileName, iVFS* = NULL, bool Merge = false,
+  virtual bool Load (const char* iFileName, iVFS* = 0, bool Merge = false,
     bool NewWins = true);
   virtual bool Save ();
-  virtual bool Save (const char *iFileName, iVFS* = NULL);
+  virtual bool Save (const char *iFileName, iVFS* = 0);
   
   virtual void Clear ();
   
-  virtual csPtr<iConfigIterator> Enumerate (const char *Subsection = NULL);
+  virtual csPtr<iConfigIterator> Enumerate (const char *Subsection = 0);
   virtual bool KeyExists (const char *Key) const;
   virtual bool SubsectionExists (const char *Subsection) const;
   

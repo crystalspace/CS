@@ -124,7 +124,7 @@ void csDefaultButtonSkin::Draw (csComponent &This)
     	int			  OrgX, OrgY;
 
     	// Retrieve info needed for texture operations
-    	This.GetFrameBitmaps(&FrameNormal, &FramePressed, NULL);
+    	This.GetFrameBitmaps(&FrameNormal, &FramePressed, 0);
     	This.GetTextureOrigin(&OrgX, &OrgY);
 
 			// Tile texture using user origins and user alpha

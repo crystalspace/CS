@@ -273,7 +273,7 @@ static bool output_heightmap (const char *fname, iImage *ifile)
 
   // And now write the 3D file
   *eol = 0;
-  csSplitPath (outname, NULL, 0, outname, sizeof (outname));
+  csSplitPath (outname, 0, 0, outname, sizeof (outname));
   fprintf (f, "WORLD\n(\n  THING '%s'\n  (\n", outname);
 
   int x, y;
@@ -444,7 +444,7 @@ static bool process_file (const char *fname)
   {
     printf ("Creating mipmap level %d from image\n", opt.mipmap);
     csRef<iImage> ifile2 (csPtr<iImage> (ifile->MipMap (opt.mipmap,
-      opt.transp ? &transpcolor : NULL)));
+      opt.transp ? &transpcolor : 0)));
     ifile = ifile2;
     sprintf (strchr (suffix, 0), "-m%d", opt.mipmap);
   }
@@ -514,7 +514,7 @@ static bool process_file (const char *fname)
   {
     printf ("Sharpening image with strength %d\n", opt.sharpen);
     csRef<iImage> ifile2 (csPtr<iImage> (
-    	ifile->Sharpen (opt.transp ? &transpcolor : NULL, opt.sharpen)));
+    	ifile->Sharpen (opt.transp ? &transpcolor : 0, opt.sharpen)));
     ifile = ifile2;
   }
 
@@ -545,7 +545,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S::M:O:P:U::H::IhvVF", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S::M:O:P:U::H::IhvVF", long_options, 0)) != EOF)
     switch (c)
     {
       case '?':
@@ -688,7 +688,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
 
   for (; optind < argc; ++optind)
     process_file (argv [optind]);
-  ImageLoader = NULL;
+  ImageLoader = 0;
 
   return 0;
 }
@@ -698,7 +698,7 @@ int main (int argc, char *argv[])
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
 
-  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  if (!csInitializer::SetupConfigManager (object_reg, 0))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.graphics3d.gfxtest",
@@ -722,7 +722,7 @@ int main (int argc, char *argv[])
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
-    ImageLoader = NULL;
+    ImageLoader = 0;
     csInitializer::DestroyApplication (object_reg);
     exit (0);
   }
@@ -737,7 +737,7 @@ int main (int argc, char *argv[])
 
   int ret = gfxtest_main (object_reg, argc, argv);
   
-  ImageLoader = NULL;
+  ImageLoader = 0;
   csInitializer::DestroyApplication (object_reg);
   return ret;
 }

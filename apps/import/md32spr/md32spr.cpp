@@ -81,10 +81,10 @@ csRef < iDocumentNode > MD32spr::CreateValueNode(csRef < iDocumentNode >
 						 const char *value)
 {
   csRef < iDocumentNode > child =
-    parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   child->SetValue(name);
   csRef < iDocumentNode > text =
-    child->CreateNodeBefore(CS_NODE_TEXT, NULL);
+    child->CreateNodeBefore(CS_NODE_TEXT, 0);
   text->SetValue(value);
   return child;
 }
@@ -96,10 +96,10 @@ csRef < iDocumentNode > MD32spr::CreateValueNodeAsInt(csRef <
 						      int value)
 {
   csRef < iDocumentNode > child =
-    parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   child->SetValue(name);
   csRef < iDocumentNode > text =
-    child->CreateNodeBefore(CS_NODE_TEXT, NULL);
+    child->CreateNodeBefore(CS_NODE_TEXT, 0);
   text->SetValueAsInt(value);
   return child;
 }
@@ -111,10 +111,10 @@ csRef < iDocumentNode > MD32spr::CreateValueNodeAsFloat(csRef <
 							float value)
 {
   csRef < iDocumentNode > child =
-    parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   child->SetValue(name);
   csRef < iDocumentNode > text =
-    child->CreateNodeBefore(CS_NODE_TEXT, NULL);
+    child->CreateNodeBefore(CS_NODE_TEXT, 0);
   text->SetValueAsFloat(value);
   return child;
 }
@@ -170,7 +170,7 @@ MD32spr::MD32spr(iObjectRegistry * object_reg)
 {
   MD32spr::object_reg = object_reg;
   player = false;
-  headModel = upperModel = lowerModel = NULL;
+  headModel = upperModel = lowerModel = 0;
   scaleFactor = 1;
 }
 
@@ -543,8 +543,8 @@ bool MD3Model::LoadSkin(char *skinFile)
 	  int k = line.Length();
 	  char *name = new char[line.Length() + 1];
 	  strcpy(name, line.GetData());
-	  if(strtok(name, ",") != NULL)
-	    strcpy(meshes[j].skins[0].name, strtok(NULL, ","));
+	  if(strtok(name, ",") != 0)
+	    strcpy(meshes[j].skins[0].name, strtok(0, ","));
 	  k--;
 	  while (line.GetAt(k) != '/' && line.GetAt(k) != '\\')
 	    k--;
@@ -628,9 +628,9 @@ bool MD32spr::LoadAnimation(char *animFile)
 void MD32spr::Write()
 {
   int i = 0;
-  char* vfspath = NULL;
-  char* fileName = NULL;
-  char* mdlName = NULL;
+  char* vfspath = 0;
+  char* fileName = 0;
+  char* mdlName = 0;
 
   if (outZipName)
   {
@@ -672,7 +672,7 @@ void MD32spr::Write()
         csRef <iDocument> doc = xml->CreateDocument();
         csRef <iDocumentNode> root = doc->CreateRoot();
         csRef <iDocumentNode> parent =
-          root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+          root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         parent->SetValue("library");
 	
         WriteGeneric(mdl, parent);
@@ -695,7 +695,7 @@ void MD32spr::Write()
       csRef < iDocument > doc = xml->CreateDocument();
       csRef < iDocumentNode > root = doc->CreateRoot();
       csRef < iDocumentNode > parent =
-	root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       parent->SetValue("library");
       WriteGeneric(headModel, parent);
       csString outFile(vfspath);
@@ -713,7 +713,7 @@ void MD32spr::Write()
       csRef < iDocument > doc = xml->CreateDocument();
       csRef < iDocumentNode > root = doc->CreateRoot();
       csRef < iDocumentNode > parent =
-	root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       parent->SetValue("library");
 
       WriteGeneric(upperModel, parent);
@@ -732,7 +732,7 @@ void MD32spr::Write()
       csRef < iDocument > doc = xml->CreateDocument();
       csRef < iDocumentNode > root = doc->CreateRoot();
       csRef < iDocumentNode > parent =
-	root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       parent->SetValue("library");
 
       WriteGeneric(lowerModel, parent);
@@ -748,7 +748,7 @@ void MD32spr::Write()
 	csRef < iDocument > doc = xml->CreateDocument();
 	csRef < iDocumentNode > root = doc->CreateRoot();
 	csRef < iDocumentNode > parent =
-	  root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	  root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	parent->SetValue("library");
 
 	WriteGeneric(mdl, parent);
@@ -799,7 +799,7 @@ void MD32spr::WriteXMLTags(md3Model * model,
       csString position;
       csString taginfo;
       child = 
-	root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       child->SetValue("key");
       child->SetAttribute("name", "md3tag");
       rotationMatrix = &model->tags[i * model->header->numTags + j].rotation[0][0];
@@ -842,14 +842,14 @@ void MD32spr::WriteXMLTextures(md3Model * model,
   for (i = 0; i < model->header->numMeshes; i++) {
     for (j = 0; j < model->meshes[i].meshHeader->numSkins; j++) {
       csRef < iDocumentNode > child =
-	parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       child->SetValue("texture");
       char *name = new char[strlen(model->meshes[i].skins[j].name) + 1];
-      if(basename(model->meshes[i].skins[j].name, name) == NULL)
+      if(basename(model->meshes[i].skins[j].name, name) == 0)
 	continue;
       child->SetAttribute("name", lowercase(name));
       char *fname = new char[strlen(model->meshes[i].skins[j].name) + 1];
-      if(filename(model->meshes[i].skins[j].name, fname) == NULL)
+      if(filename(model->meshes[i].skins[j].name, fname) == 0)
 	continue;
       CreateValueNode(child, "file", lowercase(fname));
     }
@@ -863,14 +863,14 @@ void MD32spr::WriteXMLMaterials(md3Model * model,
   for (i = 0; i < model->header->numMeshes; i++)
     for (j = 0; j < model->meshes[i].meshHeader->numSkins; j++) {
       csRef < iDocumentNode > child =
-	parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       child->SetValue("material");
       char *name = new char[strlen(model->meshes[i].skins[j].name) + 1];
-      if(basename(model->meshes[i].skins[j].name, name) == NULL)
+      if(basename(model->meshes[i].skins[j].name, name) == 0)
 	continue;
       child->SetAttribute("name", strcat(lowercase(name), ".mat"));
       char *tname = new char[strlen(model->meshes[i].skins[j].name) + 1];
-      if(basename(model->meshes[i].skins[j].name, tname) == NULL)
+      if(basename(model->meshes[i].skins[j].name, tname) == 0)
 	continue;
       CreateValueNode(child, "texture", lowercase(tname));
     }
@@ -883,30 +883,30 @@ void MD32spr::WriteGeneric(md3Model * model,
   csRef < iDocumentNode > localParent;
 
   localParent =
-    parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   localParent->SetValue("textures");
 
   if (model->header->numMeshes > 0) {
     WriteXMLTextures(model, localParent);
       
-    localParent = parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+    localParent = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     localParent->SetValue("materials");
     WriteXMLMaterials(model, localParent);
 
 
     for (i = 0; i < model->header->numMeshes; i++) {
-      localParent = parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+      localParent = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       localParent->SetValue("meshfact");
       localParent->SetAttribute("name", model->meshes[i].meshHeader->name);
       CreateValueNode(localParent, "plugin",
 		      "crystalspace.mesh.loader.factory.sprite.3d");
       csRef < iDocumentNode > child =
-	localParent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	localParent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       child->SetValue("params");
 
       for (j = 0; j < model->meshes[i].meshHeader->numSkins; j++) {
 	char *matName = new char[strlen(model->meshes[i].skins[j].name) + 1];
-	if(basename(model->meshes[i].skins[j].name, matName) == NULL)
+	if(basename(model->meshes[i].skins[j].name, matName) == 0)
 	  continue;
 	CreateValueNode(child, "material",
 			strcat(matName, ".mat"));
@@ -917,7 +917,7 @@ void MD32spr::WriteGeneric(md3Model * model,
 	char fNum[10];
 	int numVertices = model->meshes[i].meshHeader->numVertices;
 
-	frame = child->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	frame = child->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	frame->SetValue("frame");
 	sprintf(fNum, "f%d", j);
 	frame->SetAttribute("name", fNum);
@@ -925,7 +925,7 @@ void MD32spr::WriteGeneric(md3Model * model,
 	for (k = 0; k < model->meshes[i].meshHeader->numVertices; k++) {
 	  float u, v, x, y, z;
 	  csRef < iDocumentNode > texel =
-	    frame->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	    frame->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	  texel->SetValue("v");
 	  x = model->meshes[i].vertices[j * numVertices + k].vec[0];
 	  y = model->meshes[i].vertices[j * numVertices + k].vec[1];
@@ -946,14 +946,14 @@ void MD32spr::WriteGeneric(md3Model * model,
 	for(j = 0; j < model->numActions; j++) {
 	  if(model->numActions == 1) {
 	    csRef < iDocumentNode > action =
-	      child->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	      child->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	    action->SetValue("action");
 	    action->SetAttribute("name", "default");
 
 	    for (k = 0; k < model->meshes[i].meshHeader->numMeshFrames; k++) {
 	      char fNum[10];
 	      csRef < iDocumentNode > f =
-		action->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+		action->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	      sprintf(fNum, "f%d", k);
 	      f->SetValue("f");
 	      f->SetAttribute("name", fNum);
@@ -961,7 +961,7 @@ void MD32spr::WriteGeneric(md3Model * model,
 	    }
 	  } else {
 	    csRef < iDocumentNode > action =
-	      child->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	      child->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	    action->SetValue("action");
 	    action->SetAttribute("name", model->animInfo[j].actionName);
 	  
@@ -970,7 +970,7 @@ void MD32spr::WriteGeneric(md3Model * model,
 		k++) {
 	      char fNum[10];
 	      csRef < iDocumentNode > f =
-		action->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+		action->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	      sprintf(fNum, "f%d", k);
 	      f->SetValue("f");
 	      f->SetAttribute("name", fNum);
@@ -981,14 +981,14 @@ void MD32spr::WriteGeneric(md3Model * model,
 	}
       } else {
 	csRef < iDocumentNode > action =
-	  child->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	  child->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	action->SetValue("action");
 	action->SetAttribute("name", "default");
 
 	for (j = 0; j < model->meshes[i].meshHeader->numMeshFrames; j++) {
 	  char fNum[10];
 	  csRef < iDocumentNode > f =
-	    action->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	    action->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	  sprintf(fNum, "f%d", j);
 	  f->SetValue("f");
 	  f->SetAttribute("name", fNum);
@@ -997,7 +997,7 @@ void MD32spr::WriteGeneric(md3Model * model,
       }
       for (j = 0; j < model->meshes[i].meshHeader->numTriangles; j++) {
 	csRef < iDocumentNode > triangles =
-	  child->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	  child->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	triangles->SetValue("t");
 	triangles->SetAttributeAsInt("v1",
 				     model->meshes[i].triangles[j].
@@ -1011,7 +1011,7 @@ void MD32spr::WriteGeneric(md3Model * model,
       }
     }
     for (i = 0; i < model->header->numMeshes; i++) {
-      localParent = parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+      localParent = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       localParent->SetValue("meshobj");
       char *name =
 	new char[strlen(model->fileName.GetData()) +
@@ -1023,7 +1023,7 @@ void MD32spr::WriteGeneric(md3Model * model,
       CreateValueNode(localParent, "plugin",
 		      "crystalspace.mesh.loader.sprite.3d");
       csRef < iDocumentNode > params =
-	localParent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+	localParent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       params->SetValue("params");
       CreateValueNode(params, "factory",
 		      model->meshes[i].meshHeader->name);
@@ -1059,7 +1059,7 @@ void MD32spr::WriteTextures(const char *inPath, const char *outPath)
 int main(int argc, char *argv[])
 {
   // Initialize the random number generator
-  srand(time(NULL));
+  srand(time(0));
 
   iObjectRegistry *object_reg =
     csInitializer::CreateEnvironment(argc, argv);
@@ -1119,7 +1119,7 @@ char *stristr(const char *String, const char *Pattern)
       /* if pattern longer than string */
 
       if (slen < plen)
-	return (NULL);
+	return (0);
     }
 
     sptr = start;
@@ -1135,7 +1135,7 @@ char *stristr(const char *String, const char *Pattern)
 	return (start);
     }
   }
-  return (NULL);
+  return (0);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1146,15 +1146,15 @@ char *basename(char *path, char *base)
   char *ptr, *point;
   int sz = 0;
   if (!path || !base)
-    return NULL;
+    return 0;
   if(!strlen(path))
-    return NULL;
+    return 0;
   dir = new char[strlen(path)];
   file = new char[strlen(path)];
   splitpath(path, dir, strlen(path), file, strlen(path));
   point = stristr(file, ".");
   ptr = file;
-  if(point != NULL) {
+  if(point != 0) {
     while (ptr++ != point)
       sz++;
   } else {
@@ -1170,9 +1170,9 @@ char *filename(char *path, char *file)
   char *dir, *fname;
   int sz = 0;
   if (!path || !file)
-    return NULL;
+    return 0;
   if(!strlen(path))
-    return NULL;
+    return 0;
   dir = new char[strlen(path)];
   fname = new char[strlen(path)];
   splitpath(path, dir, strlen(path), fname, strlen(path));

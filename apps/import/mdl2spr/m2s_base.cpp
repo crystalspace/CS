@@ -25,7 +25,7 @@ bool QModel::CheckMagic(const char* mdlfile, const char* magic)
 {
   bool ok = false;
   FILE* file = fopen(mdlfile, "rb");
-  if (file != NULL)
+  if (file != 0)
   {
     char buff[4];
     if (fread(buff, 4, 1, file) == 1)
@@ -35,14 +35,14 @@ bool QModel::CheckMagic(const char* mdlfile, const char* magic)
   return ok;
 }
 
-QModel::QModel() : sError(NULL)
+QModel::QModel() : sError(0)
 {
   clearError();
 }
 
 QModel::~QModel()
 {
-  if (sError != NULL)
+  if (sError != 0)
     free(sError);
 }
 
@@ -51,10 +51,10 @@ bool QModel::setError(const char* errorstring, FILE* closethis)
   if (closethis != 0)
     fclose(closethis);
 
-  if (sError != NULL)
+  if (sError != 0)
     free(sError);
 
-  if (errorstring == NULL)
+  if (errorstring == 0)
     sError = strdup("Unknown error");
   else
     sError = strdup(errorstring);

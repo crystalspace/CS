@@ -83,7 +83,7 @@ static inline char* NewPathWOTrailingDelim (const char *path)
 // cache configuration path
 struct _CfgPath {
   char* path;
-  _CfgPath() { path = NULL; };
+  _CfgPath() { path = 0; };
   ~_CfgPath() { if (path) delete[] path; };
 };
 
@@ -118,7 +118,7 @@ static inline char* FindConfigPath ()
 
   // perhaps current drive/dir?
   FILE *test = fopen("vfs.cfg", "r");
-  if(test != NULL)
+  if(test != 0)
   {
     // use current dir
     fclose(test);
@@ -137,7 +137,7 @@ static inline char* FindConfigPath ()
   strcat(testfn, "vfs.cfg");
 
   test = fopen(testfn, "r");
-  if(test != NULL)
+  if(test != 0)
   {
     // use current dir
     fclose(test);
@@ -180,7 +180,7 @@ static inline char* FindConfigPath ()
 char* csGetConfigPath ()
 {
   _CfgPath *cachedCfgPath = getCachedCfgPath();
-  if (cachedCfgPath->path == NULL)
+  if (cachedCfgPath->path == 0)
   {
     cachedCfgPath->path = FindConfigPath();
   }

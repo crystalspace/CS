@@ -136,8 +136,8 @@ struct csClipInfo
  * every edge of the polygon form the frustum. The plane
  * is the back plane of the frustum.
  * It is also possible to have an infinite frustum in which
- * case the polygon will be NULL (not specified). The back
- * plane can also be NULL.
+ * case the polygon will be 0 (not specified). The back
+ * plane can also be 0.
  */
 class csFrustum
 {
@@ -150,7 +150,7 @@ private:
 
   /**
    * The polygon vertices for non-wide frustum.
-   * If not NULL, the frustum is a pyramid with origin in "origin"
+   * If not 0, the frustum is a pyramid with origin in "origin"
    * and with the basis given by this polygon.
    */
   csVector3* vertices;
@@ -190,23 +190,23 @@ public:
 
   /// Create a new empty frustum.
   csFrustum (const csVector3& o) : pool (&csDefaultVertexArrayPool::GetDefaultPool()),
-    origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
-  backplane (NULL), wide (false), mirrored (false), ref_count (1)
+    origin (o), vertices (0), num_vertices (0), max_vertices (0),
+  backplane (0), wide (false), mirrored (false), ref_count (1)
   { }
 
   /// Create a new empty frustum with another pool.
   csFrustum (const csVector3& o, csVertexArrayPool* pl) : pool (pl),
-    origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
-  backplane (NULL), wide (false), mirrored (false), ref_count (1)
+    origin (o), vertices (0), num_vertices (0), max_vertices (0),
+  backplane (0), wide (false), mirrored (false), ref_count (1)
   { }
 
   /**
    * Create a frustum given a polygon and a backplane.
    * The polygon is given relative to the origin 'o'.
-   * If the given polygon is NULL then we create an empty frustum.
+   * If the given polygon is 0 then we create an empty frustum.
    */
   csFrustum (const csVector3& o, csVector3* verts, int num_verts,
-        csPlane3* backp = NULL);
+        csPlane3* backp = 0);
 
   /**
    * Create a frustum given a number of vertices and a backplane.
@@ -214,7 +214,7 @@ public:
    * The polygon is given relative to the origin 'o'.
    */
   csFrustum (const csVector3& o, int num_verts,
-        csVertexArrayPool* pl, csPlane3* backp = NULL);
+        csVertexArrayPool* pl, csPlane3* backp = 0);
 
   /// Copy constructor.
   csFrustum (const csFrustum &copy);
@@ -331,7 +331,7 @@ public:
    * result is undefined.
    * Returns new frustum which you should delete
    * after usage. If there is no intersection this function
-   * returns NULL.
+   * returns 0.
    */
   csPtr<csFrustum> Intersect (const csFrustum& other);
 
@@ -344,7 +344,7 @@ public:
    * which is part of this frustum and which 'sees' exactly
    * the same of the given polygon as this frustum).<p>
    *
-   * This function returns NULL if there is no intersection.<p>
+   * This function returns 0 if there is no intersection.<p>
    *
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given polygon.
@@ -360,7 +360,7 @@ public:
    * which is part of this frustum and which 'sees' exactly
    * the same of the given polygon as this frustum).<p>
    *
-   * This function returns NULL if there is no intersection.<p>
+   * This function returns 0 if there is no intersection.<p>
    *
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given polygon.
@@ -378,7 +378,7 @@ public:
    * which is part of this frustum and which 'sees' exactly
    * the same of the given polygon as this frustum).<p>
    *
-   * This function returns NULL if there is no intersection.<p>
+   * This function returns 0 if there is no intersection.<p>
    *
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given triangle.
@@ -426,13 +426,13 @@ public:
     const csPlane3& plane, const csVector3& point);
 
   /// Return true if frustum is empty.
-  bool IsEmpty () const { return !wide && vertices == NULL; }
+  bool IsEmpty () const { return !wide && vertices == 0; }
 
   /// Return true if frustum is infinite.
-  bool IsInfinite () const { return wide && vertices == NULL && backplane == NULL; }
+  bool IsInfinite () const { return wide && vertices == 0 && backplane == 0; }
 
   /// Return true if frustum is infinitely wide but it can still have a back plane.
-  bool IsWide () const { return wide && vertices == NULL; }
+  bool IsWide () const { return wide && vertices == 0; }
 
   /**
    * Make the frustum infinite (i.e. clear the polygon and

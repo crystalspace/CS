@@ -25,19 +25,19 @@
 
 CIPortal::CIPortal()
 {
-  m_pSector = NULL;
+  m_pSector = 0;
 }
 
 CIPortal::CIPortal(const CMapPolygonSet& Set)
  : CMapPolygonSet(Set)
 {
-  m_pSector = NULL;
+  m_pSector = 0;
 }
 
 CIPortal::CIPortal(const CIPortal& Portal)
  : CMapPolygonSet(Portal)
 {
-  m_pSector = NULL;
+  m_pSector = 0;
 }
 
 CIPortal::~CIPortal()

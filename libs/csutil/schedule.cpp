@@ -46,7 +46,7 @@ public:
 
 csSchedule::csSchedule()
 {
-  first = NULL;
+  first = 0;
 }
 
 csSchedule::~csSchedule()
@@ -105,7 +105,7 @@ void csSchedule::AddCallback(void (*func)(void*), void *arg, int delay)
   p->arg = arg;
   p->period = 0;
   p->after=0;
-  p->next=NULL;
+  p->next=0;
   InsertCall(p, delay);
 }
 
@@ -117,14 +117,14 @@ void csSchedule::AddRepeatCallback(void (*func)(void*), void *arg, int period)
   p->arg = arg;
   p->period = period;
   p->after=0;
-  p->next=NULL;
+  p->next=0;
   InsertCall(p, period);
 }
 
 void csSchedule::RemoveCallback(void (*func)(void*), void *arg, int period)
 {
   /// find it
-  csSchedulePart *prev=NULL, *p=first;
+  csSchedulePart *prev=0, *p=first;
   while(p)
   {
     if((p->callback == func) && (p->arg==arg) && (p->period == period))
@@ -143,7 +143,7 @@ void csSchedule::RemoveCallback(void (*func)(void*), void *arg, int period)
 void csSchedule::RemoveCallback(void (*func)(void*), void *arg)
 {
   /// find it
-  csSchedulePart *prev=NULL, *p=first;
+  csSchedulePart *prev=0, *p=first;
   while(p)
   {
     if((p->callback == func) && (p->arg==arg) && (p->period == 0))
@@ -162,7 +162,7 @@ void csSchedule::RemoveCallback(void (*func)(void*), void *arg)
 void csSchedule::RemoveCallback(void *arg)
 {
   /// find all that match
-  csSchedulePart *prev=NULL, *p=first;
+  csSchedulePart *prev=0, *p=first;
   while(p)
   {
     if(p->arg==arg)
@@ -190,7 +190,7 @@ void csSchedule::RemoveCallback(void *arg)
 void csSchedule::InsertCall(csSchedulePart *part, int afternow)
 {
   csSchedulePart *p = first;
-  csSchedulePart *prev= NULL;
+  csSchedulePart *prev= 0;
   int afterprev = afternow; /// nr of msec part must go after 'prev'
   while(p && (p->after <= afterprev))
   {
@@ -204,7 +204,7 @@ void csSchedule::InsertCall(csSchedulePart *part, int afternow)
     return;
   }
   /// Link the part into the list
-  if(prev==NULL)
+  if(prev==0)
   { // insert as first part
     part->next = first;
     first = part;
@@ -223,12 +223,12 @@ void csSchedule::InsertCall(csSchedulePart *part, int afternow)
 
 void csSchedule::RemoveCall(csSchedulePart *prev, csSchedulePart *part)
 {
-  if(part==NULL) return;
+  if(part==0) return;
   /// handle timing
   if(part->next)
     part->next->after += part->after;
   /// unlink
-  if(prev==NULL)
+  if(prev==0)
   {
     // part is the first in the list.
     first = part->next;
@@ -237,6 +237,6 @@ void csSchedule::RemoveCall(csSchedulePart *prev, csSchedulePart *part)
   {
     prev->next = part->next;
   }
-  part->next = NULL;
+  part->next = 0;
   part->after = 0;
 }

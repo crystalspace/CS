@@ -194,12 +194,12 @@ struct iSprite2DFactoryState : public iBase
   virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim) = 0;
 
   /**
-   * Get a specific UV animation by name. Returns NULL if not found.
+   * Get a specific UV animation by name. Returns 0 if not found.
    */
   virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) = 0;
 
   /**
-   * Get a specific UV animation by index. Returns NULL if not found.
+   * Get a specific UV animation by index. Returns 0 if not found.
    */
   virtual iSprite2DUVAnimation *GetUVAnimation (int idx) = 0;
 };
@@ -222,7 +222,7 @@ struct iSprite2DState : public iSprite2DFactoryState
   virtual void CreateRegularVertices (int n, bool setuv) = 0;
 
   /**
-   * Select an UV animation to play. Set name to NULL to select
+   * Select an UV animation to play. Set name to 0 to select
    * no animation to show.
    * Style:
    * 0   .. use the time values supplied in the frames

@@ -80,7 +80,7 @@ public:
    */
   csVector3* GetVertex (int i) const
   {
-    if (i<0 || i>=num_vertices) return NULL;
+    if (i<0 || i>=num_vertices) return 0;
     return &vertices[i];
   }
 
@@ -106,13 +106,13 @@ public:
    * Get the first vertex.
    */
   csVector3* GetFirst () const
-  { if (num_vertices<=0) return NULL;  else return vertices; }
+  { if (num_vertices<=0) return 0;  else return vertices; }
 
   /**
    * Get the last vertex.
    */
   csVector3* GetLast () const
-  { if (num_vertices<=0) return NULL; else return &vertices[num_vertices-1]; }
+  { if (num_vertices<=0) return 0; else return &vertices[num_vertices-1]; }
 
   /**
    * Test if this vector is inside the polygon.

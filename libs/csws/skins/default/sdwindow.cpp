@@ -51,7 +51,7 @@ void csDefaultWindowSkin::Deinitialize ()
   if (ButtonTex)
   {
     ButtonTex->DecRef ();
-    ButtonTex = NULL;
+    ButtonTex = 0;
   }
   Back.Free ();
 }
@@ -83,7 +83,7 @@ csButton *csDefaultWindowSkin::CreateButton (csWindow &This, int ButtonID)
 //    defid = "Minimize";
 //    break;
     default:
-      return NULL;
+      return 0;
   }
 
   csButton *bt = new csButton (&This, command, 0, csbfsNone);

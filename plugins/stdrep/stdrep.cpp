@@ -98,9 +98,9 @@ csReporterListener::csReporterListener (iBase *iParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
   mutex = csMutex::Create (true);
-  object_reg = NULL;
-  reporter = NULL;
-  scfiEventHandler = NULL;
+  object_reg = 0;
+  reporter = 0;
+  scfiEventHandler = 0;
 
   debug_filename = DefaultDebugFilename ();
 #ifdef CS_DEBUG
@@ -316,7 +316,7 @@ void csReporterListener::SetDebugFile (const char* s)
 void csReporterListener::SetDefaults ()
 {
   console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
-  nativewm = NULL;
+  nativewm = 0;
 #ifndef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
 #else

@@ -66,7 +66,7 @@ void csRenderQueueSet::Remove (iMeshWrapper *mesh)
   long pri = mesh->GetRenderPriority ();
 
   // look if the queue of the mesh exists
-  if (pri < Queues.Length () && Queues[pri] != NULL)
+  if (pri < Queues.Length () && Queues[pri] != 0)
   {
     // delete the object from the queue
     Queues[pri]->Delete (mesh);
@@ -124,7 +124,7 @@ iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
     if (v)
       tot_objects += v->Length ();
   }
-  if (!tot_objects) return NULL;
+  if (!tot_objects) return 0;
 
   iMeshWrapper** meshes = new iMeshWrapper* [tot_objects];
   for (priority = 0 ; priority < Queues.Length () ; priority++)

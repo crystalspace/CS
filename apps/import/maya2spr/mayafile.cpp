@@ -34,7 +34,7 @@
 File::File(const char *str)
 {
     Filename = str;
-    f = NULL;
+    f = 0;
 }
 
 File::~File()
@@ -48,7 +48,7 @@ void File::Close()
     if (f)
     {
         fclose(f);
-        f = NULL;
+        f = 0;
     }
 }
 

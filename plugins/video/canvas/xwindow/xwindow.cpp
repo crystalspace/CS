@@ -65,21 +65,21 @@ csXWindow::csXWindow (iBase* parent)
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   wm_win = ctx_win = 0;
-  win_title = NULL;
+  win_title = 0;
   EventOutlet = 0;
 
   wm_width = wm_height = 0;
 
-  dpy = NULL;
-  xvis = NULL;
+  dpy = 0;
+  xvis = 0;
   gc = 0;
   screen_num = 0;
-  Canvas = NULL;
+  Canvas = 0;
 
   keyboard_grabbed = 0;
 }
@@ -121,7 +121,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("sysmouse")) do_hwmouse = true;
   if (cmdline->GetOption ("nosysmouse")) do_hwmouse = false;
   // Open display
-  dpy = XOpenDisplay (NULL);
+  dpy = XOpenDisplay (0);
 
   if (!dpy)
   {
@@ -245,8 +245,8 @@ bool csXWindow::Open ()
   class_hint->res_name = win_title;
   class_hint->res_class = win_title;
   XmbSetWMProperties (dpy, wm_win,
-		      NULL, NULL, NULL, 0,
-		      NULL, NULL, class_hint);
+		      0, 0, 0, 0,
+		      0, 0, class_hint);
 
   XFree (class_hint);
 
@@ -285,9 +285,9 @@ bool csXWindow::Open ()
   XChangeProperty (dpy, ctx_win, wm_client_leader, XA_WINDOW, 32,
 		   PropModeReplace, (const unsigned char*)&wm_win, 1);
   XmbSetWMProperties (dpy, ctx_win, win_title, win_title,
-                      NULL, 0, NULL, NULL, NULL);
+                      0, 0, 0, 0, 0);
   XmbSetWMProperties (dpy, wm_win, win_title, win_title,
-                      NULL, 0, NULL, NULL, NULL);
+                      0, 0, 0, 0, 0);
   XMapWindow (dpy, ctx_win);
   XMapRaised (dpy, wm_win);
 
@@ -529,7 +529,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	  (XPointer)&event);
         down = (event.type == KeyPress);
         charcount = XLookupString ((XKeyEvent *)&event, charcode,
-				   sizeof (charcode), &key, NULL);
+				   sizeof (charcode), &key, 0);
         switch (key)
         {
           case XK_Meta_L:
@@ -677,21 +677,21 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	switch(event.xvisibility.state)
 	{
 	  case VisibilityUnobscured:
-	    EventOutlet->Broadcast (cscmdCanvasExposed, NULL);
+	    EventOutlet->Broadcast (cscmdCanvasExposed, 0);
 	    break;
 	  case VisibilityPartiallyObscured:
-	    EventOutlet->Broadcast (cscmdCanvasExposed, NULL);
+	    EventOutlet->Broadcast (cscmdCanvasExposed, 0);
 	    break;
 	  case VisibilityFullyObscured:
-	    EventOutlet->Broadcast (cscmdCanvasHidden, NULL);
+	    EventOutlet->Broadcast (cscmdCanvasHidden, 0);
 	    break;
 	}
 	break;
       case UnmapNotify:
-	EventOutlet->Broadcast (cscmdCanvasHidden, NULL);
+	EventOutlet->Broadcast (cscmdCanvasHidden, 0);
 	break;
       case MapNotify:
-	EventOutlet->Broadcast (cscmdCanvasExposed, NULL);
+	EventOutlet->Broadcast (cscmdCanvasExposed, 0);
 	break;
       default:
         break;

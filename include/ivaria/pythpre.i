@@ -112,7 +112,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	{
 		// Calling IncRef() failed; something wrong here.
 		Py_XDECREF(result);
-		result = NULL;
+		result = 0;
 	}
 	Py_XDECREF(ibase_obj);
 	Py_XDECREF(res_obj);
@@ -133,7 +133,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	if (!PyList_Check($input))
 	{
 		PyErr_SetString(PyExc_TypeError, "not a list");
-		return NULL;
+		return 0;
 	}
 	$1 = PyList_Size($input);
 	typedef char * Char_Ptr;
@@ -145,7 +145,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 		{
 			PyErr_SetString(PyExc_TypeError, "list must contain strings");
 			delete [] $2;
-			return NULL;
+			return 0;
 		}
 		$2[i] = PyString_AsString(o);
 	}
@@ -229,7 +229,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	if (PyList_Check($input))
 	{
 		PyErr_SetString(PyExc_TypeError, "not a list");
-		return NULL;
+		return 0;
 	}
 	cnt = PyList_Size($input);
 	typedef array_type Array_Type;
@@ -245,7 +245,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 				PyExc_TypeError, "list must contain " #base_type "'s"
 			);
 			delete [] ptr;
-			return NULL;
+			return 0;
 		}
 		ptr[i] = to_item p;
 	}

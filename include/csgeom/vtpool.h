@@ -39,13 +39,13 @@ public:
 
   /**
    * Fetch a new array of n vertices.
-   * Return NULL on failure.
+   * Return 0 on failure.
    */
   virtual csVector3* GetVertexArray (int n) = 0;
 
   /**
    * Free an array of n vertices. Implementations of FreeVertexArray()
-   * are guaranteed to check if 'ar' == NULL and do nothing in that case.
+   * are guaranteed to check if 'ar' == 0 and do nothing in that case.
    */
   virtual void FreeVertexArray (csVector3* ar, int n) = 0;
 };
@@ -62,7 +62,7 @@ public:
 
   /**
    * Fetch a new array of n vertices.
-   * Return NULL on failure.
+   * Return 0 on failure.
    */
   virtual csVector3* GetVertexArray (int n)
   {
@@ -106,10 +106,10 @@ public:
     delete[] pool;
   }
 
-   /// Fetch a new array of n vertices.  Return NULL on failure.
+   /// Fetch a new array of n vertices.  Return 0 on failure.
   virtual csVector3* GetVertexArray (int n)
   {
-    if (lastn+n > maxn) return NULL;
+    if (lastn+n > maxn) return 0;
     lastn += n;
     return pool+lastn-n;
   }
@@ -152,7 +152,7 @@ public:
   /// Destroy pool and all vertex arrays in it.
   virtual ~csPooledVertexArrayPool ();
 
-  /// Fetch a new array of n vertices.  Return NULL on failure.
+  /// Fetch a new array of n vertices.  Return 0 on failure.
   virtual csVector3* GetVertexArray (int n);
 
   /// Free an array of n vertices.

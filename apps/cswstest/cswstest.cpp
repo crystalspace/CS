@@ -217,25 +217,25 @@ bool csWsTest::Initialize ()
 
   // Create a menu for all test dialogs we implement
   csMenu *menu = new csMenu (this, csmfs3D, 0);
-  csMenu *submenu = new csMenu (NULL);
+  csMenu *submenu = new csMenu (0);
   (void)new csMenuItem (menu, "~Standard dialogs", submenu);
     (void)new csMenuItem (submenu, "~File open", 66600);
     (void)new csMenuItem (submenu, "~Color choice", 66601);
 
-  submenu = new csMenu (NULL);
+  submenu = new csMenu (0);
   (void)new csMenuItem (menu, "~Windows", submenu);
     (void)new csMenuItem (submenu, "No top when selected", 66610);
     (void)new csMenuItem (submenu, "Complex dialog", 66611);
     (void)new csMenuItem (submenu, "Semi-transparent window", 66612);
 
-  submenu = new csMenu (NULL);
+  submenu = new csMenu (0);
   (void)new csMenuItem (menu, "~Tests", submenu);
     (void)new csMenuItem (submenu, "Notebook", 66620);
     (void)new csMenuItem (submenu, "Grid", 66621);
     (void)new csMenuItem (submenu, "Tree", 66622);
     (void)new csMenuItem (submenu, "Layouts", 66623);
 
-  submenu = new csMenu (NULL);
+  submenu = new csMenu (0);
   (void)new csMenuItem (menu, "~Color scheme", submenu);
     (void)new csMenuItem (submenu, "Green", 66630);
     (void)new csMenuItem (submenu, "Red", 66631);
@@ -270,7 +270,7 @@ void csWsTest::MiscDialog ()
   {
     csMenu *submenu;
 
-    submenu = new csMenu (NULL);
+    submenu = new csMenu (0);
     (void)new csMenuItem (menu, "~File", submenu);
       (void)new csMenuItem (submenu, "~Open\tCtrl+O", cscmdNothing);
       (void)new csMenuItem (submenu, "~Save\tCtrl+S", cscmdNothing);
@@ -278,7 +278,7 @@ void csWsTest::MiscDialog ()
       (void)new csMenuItem (submenu);
       (void)new csMenuItem (submenu, "~Quit\tCtrl+Q", cscmdQuit);
 
-    submenu = new csMenu (NULL);
+    submenu = new csMenu (0);
     (void)new csMenuItem (menu, "~Edit", submenu);
       (void)new csMenuItem (submenu, "~Undo\tAlt+BackSpace", cscmdNothing);
       (void)new csMenuItem (submenu);
@@ -289,23 +289,23 @@ void csWsTest::MiscDialog ()
       (void)new csMenuItem (submenu, "~Select all\tCtrl+/", cscmdNothing);
       (void)new csMenuItem (submenu, "~Deselect all\tCtrl+\\", cscmdNothing);
 
-    submenu = new csMenu (NULL);
+    submenu = new csMenu (0);
     (void)new csMenuItem (menu, "~Modify", submenu);
      (void)new csMenuItem (submenu, "~Scale", cscmdNothing);
       (void)new csMenuItem (submenu, "~Rotate", cscmdNothing);
       (void)new csMenuItem (submenu, "~Move", cscmdNothing);
 
-    submenu = new csMenu (NULL);
+    submenu = new csMenu (0);
     (void)new csMenuItem (menu, "~Test submenu", submenu);
       (void)new csMenuItem (submenu, "~One", cscmdNothing, CSMIS_DEFAULTVALUE | CSMIS_CHECKED);
       (void)new csMenuItem (submenu, "~Two", cscmdNothing);
       (void)new csMenuItem (submenu, "T~hree", cscmdNothing);
-      csMenu *subsubmenu = new csMenu (NULL);
+      csMenu *subsubmenu = new csMenu (0);
       (void)new csMenuItem (submenu, "~Four", subsubmenu);
         (void)new csMenuItem (subsubmenu, "Four / ~One", cscmdNothing);
         (void)new csMenuItem (subsubmenu, "Four / ~Two", cscmdNothing);
         (void)new csMenuItem (subsubmenu, "Four / T~hree", cscmdNothing);
-      subsubmenu = new csMenu (NULL);
+      subsubmenu = new csMenu (0);
       (void)new csMenuItem (submenu, "Fi~ve", subsubmenu, CSMIS_NEWCOLUMN);
         (void)new csMenuItem (subsubmenu, "Five / ~One", cscmdNothing);
         (void)new csMenuItem (subsubmenu, "Five / ~Two", cscmdNothing);
@@ -325,7 +325,7 @@ void csWsTest::MiscDialog ()
 
     (void)new csMenuItem (menu, CSMIS_NEWCOLUMN);
 
-    submenu = new csMenu (NULL);
+    submenu = new csMenu (0);
     (void)new csMenuItem (menu, "~Help", submenu);
       (void)new csMenuItem (submenu, "~Index", cscmdNothing);
       (void)new csMenuItem (submenu, "~General", cscmdNothing);
@@ -815,7 +815,7 @@ struct ModalData : public iBase
   uint code;
   csWindow* d;
   SCF_DECLARE_IBASE;
-  ModalData () { SCF_CONSTRUCT_IBASE (NULL); }
+  ModalData () { SCF_CONSTRUCT_IBASE (0); }
 };
 
 SCF_IMPLEMENT_IBASE (ModalData)
@@ -851,14 +851,14 @@ bool csWsTest::HandleEvent (iEvent &Event)
 	  if (mbd) { delete d; return true; }
 
 	  ModalData* data = (ModalData*)GetTopModalUserdata ();
-	  CS_ASSERT (data != NULL);
+	  CS_ASSERT (data != 0);
 	    switch (data->code)
 	    {
 	      case 66600:
 	      {
                 char filename [CS_MAXPATHLEN + 1];
                 csQueryFileDialog ((csWindow*)d, filename, sizeof (filename));
-                csMessageBox (app, "Result", filename, NULL);
+                csMessageBox (app, "Result", filename, 0);
 	      }
 	      break;
               case 66601:
@@ -867,7 +867,7 @@ bool csWsTest::HandleEvent (iEvent &Event)
                 csQueryColorDialog ((csWindow*)d, color);
                 char buff [100];
                 sprintf (buff, "color value: %08X\n", color);
-                csMessageBox (app, "Result", buff, NULL);
+                csMessageBox (app, "Result", buff, 0);
 	      }
 	      break;
 	    }
@@ -936,7 +936,7 @@ bool csWsTest::HandleEvent (iEvent &Event)
           return true;
 	}
         case 66639:
-          csSetColorScheme (this, *(csColorScheme *)NULL);
+          csSetColorScheme (this, *(csColorScheme *)0);
           return true;
         case 66699:
           WindowList ();
@@ -1050,7 +1050,7 @@ int main (int argc, char* argv[])
   // Look for skin variant from config file
   DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
-    DefaultSkin.Prefix = config->GetStr ("CSWS.Skin.Variant", NULL);
+    DefaultSkin.Prefix = config->GetStr ("CSWS.Skin.Variant", 0);
 
   // Create our application object
   csWsTest *app = new csWsTest (object_reg, DefaultSkin);
@@ -1059,8 +1059,8 @@ int main (int argc, char* argv[])
     csDefaultRunLoop(object_reg);
 
   // Explicit release before DestroyApplication().
-  cmdline = NULL;
-  config = NULL;
+  cmdline = 0;
+  config = 0;
 
   delete app;
   csInitializer::DestroyApplication (object_reg);

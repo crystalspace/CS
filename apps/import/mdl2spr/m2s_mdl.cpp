@@ -58,13 +58,13 @@ void Mdl::Clear()
 {
   nbskins = 0;
   skinheight = skinwidth = 0;
-  skins = NULL;
+  skins = 0;
   nbframesets = 0;
-  framesets = NULL;
+  framesets = 0;
   nbtriangles = 0;
-  triangles = NULL;
+  triangles = 0;
   nbvertices = 0;
-  vertices = NULL;
+  vertices = 0;
   originX = originY = originZ = 0.0;
   scaleX = scaleY = scaleZ = 1.0;
   skinheight = skinwidth = 0;
@@ -77,10 +77,10 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
 
   clearError();
 
-  if (mdlfile == NULL || strlen(mdlfile) == 0)
-    return setError("MDL filename is NULL");
+  if (mdlfile == 0 || strlen(mdlfile) == 0)
+    return setError("MDL filename is 0");
 
-  if ((f = fopen(mdlfile, "rb")) == NULL)
+  if ((f = fopen(mdlfile, "rb")) == 0)
     return setError("Cannot find MDL file");
 
   // read mdl magic
@@ -322,9 +322,9 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   float x = 0;
   float y = 0;
 
-  if (spritename == NULL || strlen(spritename) == 0)
+  if (spritename == 0 || strlen(spritename) == 0)
   {
-    fprintf(stderr, "Unable to save: NULL sprite name\n");
+    fprintf(stderr, "Unable to save: 0 sprite name\n");
     return false;
   }
 
@@ -428,7 +428,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
     }
   }
 
-  if ((f = fopen(spritefilename, "w")) == NULL)
+  if ((f = fopen(spritefilename, "w")) == 0)
   {
     fprintf(stderr, "Cannot open sprite file %s for writing\n", spritename);
     return false;

@@ -83,7 +83,7 @@ public:
   /// Initialize the lighted texture object
   SoftwareCachedTexture (int MipMap, iPolygonTexture *Source)
   {
-    data = bitmap = NULL; next = prev = NULL;
+    data = bitmap = 0; next = prev = 0;
     (source = Source)->SetCacheData (mipmap = MipMap, this);
   }
   /// Destroy the lighted texture
@@ -93,7 +93,7 @@ public:
 	//      in combination with procedural textures, when
 	//      run in Windows. If line is removed it causes
 	//	lock-ups in "appwalktest".
-    source->SetCacheData (mipmap, NULL);
+    source->SetCacheData (mipmap, 0);
 
     delete [] data;
   }

@@ -159,15 +159,15 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
   scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
 
   max_vertices = num_vertices = 0;
-  obj_verts = NULL;
-  obj_normals = NULL;
+  obj_verts = 0;
+  obj_normals = 0;
   smoothed = false;
 
   obj_bbox_valid = false;
 
   prepared = false;
   cosinus_factor = -1;
-  logparent = NULL;
+  logparent = 0;
 }
 
 csThingStatic::~csThingStatic ()
@@ -279,7 +279,7 @@ void csThingStatic::DeleteVertices (int from, int to)
     // Delete everything.
     delete[] obj_verts;
     max_vertices = num_vertices = 0;
-    obj_verts = NULL;
+    obj_verts = 0;
   }
   else
   {
@@ -552,7 +552,7 @@ iPolygon3DStatic *csThingStatic::GetPolygon (int idx)
 iPolygon3DStatic *csThingStatic::GetPolygon (const char* name)
 {
   int idx = static_polygons.FindKey (name);
-  return idx >= 0 ? &(static_polygons.Get (idx)->scfiPolygon3DStatic) : NULL;
+  return idx >= 0 ? &(static_polygons.Get (idx)->scfiPolygon3DStatic) : 0;
 }
 
 void csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
@@ -659,7 +659,7 @@ iPolygon3DStatic* csThingStatic::IntersectSegment (
 {
   int p = IntersectSegmentIndex (start, end, isect, pr,
   	only_portals);
-  return p != -1 ? &(static_polygons.Get (p)->scfiPolygon3DStatic) : NULL;
+  return p != -1 ? &(static_polygons.Get (p)->scfiPolygon3DStatic) : 0;
 }
 
 csPtr<csThingStatic> csThingStatic::Clone ()
@@ -684,7 +684,7 @@ csPtr<csThingStatic> csThingStatic::Clone ()
   }
   else
   {
-    clone->obj_verts = NULL;
+    clone->obj_verts = 0;
   }
   if (obj_normals)
   {
@@ -693,7 +693,7 @@ csPtr<csThingStatic> csThingStatic::Clone ()
   }
   else
   {
-    clone->obj_normals = NULL;
+    clone->obj_normals = 0;
   }
 
   int i;
@@ -786,7 +786,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csThingStatic::PolyMesh::PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) 
 { 
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 //----------------------------------------------------------------------------
@@ -797,7 +797,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csThingStatic::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper (CS_POLY_VISCULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 //-------------------------------------------------------------------------
@@ -821,10 +821,10 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
 
   last_thing_id++;
   thing_id = last_thing_id;
-  logparent = NULL;
+  logparent = 0;
 
-  wor_verts = NULL;
-  cam_verts = NULL;
+  wor_verts = 0;
+  cam_verts = 0;
   num_cam_verts = 0;
 
   draw_busy = 0;
@@ -832,12 +832,12 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
   dynamic_ambient.Set (0,0,0);
   light_version = 1;
 
-  ParentTemplate = NULL;
+  ParentTemplate = 0;
 
   cameranr = -1;
   movablenr = -1;
   wor_bbox_movablenr = -1;
-  cached_movable = NULL;
+  cached_movable = 0;
 
   cfg_moving = CS_THING_MOVE_NEVER;
 
@@ -848,9 +848,9 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
   current_features = 0;
 
 #ifndef CS_USE_NEW_RENDERER
-  polybuf = NULL;
+  polybuf = 0;
 #endif // CS_USE_NEW_RENDERER
-  polybuf_materials = NULL;
+  polybuf_materials = 0;
 
   current_visnr = 1;
 }
@@ -965,7 +965,7 @@ void csThing::SetMovingOption (int opt)
       break;
 
     case CS_THING_MOVE_OCCASIONAL:
-      if ((wor_verts == NULL || wor_verts == static_data->obj_verts)
+      if ((wor_verts == 0 || wor_verts == static_data->obj_verts)
       	&& static_data->max_vertices)
       {
         wor_verts = new csVector3[static_data->max_vertices];
@@ -973,7 +973,7 @@ void csThing::SetMovingOption (int opt)
 		static_data->max_vertices * sizeof (csVector3));
       }
 
-      cached_movable = NULL;
+      cached_movable = 0;
       break;
   }
 
@@ -1123,12 +1123,12 @@ void csThing::Prepare ()
   if (polybuf)
   {
     polybuf->DecRef ();
-    polybuf = NULL;
+    polybuf = 0;
   }
 #endif // CS_USE_NEW_RENDERER
 
   delete[] polybuf_materials;
-  polybuf_materials = NULL;
+  polybuf_materials = 0;
 
   int i;
   csPolygon3DStatic *ps;
@@ -1154,7 +1154,7 @@ iMaterialWrapper* csThing::FindRealMaterial (iMaterialWrapper* old_mat)
     if (replace_materials[i].old_mat == old_mat)
       return replace_materials[i].new_mat;
   }
-  return NULL;
+  return 0;
 }
 
 void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
@@ -1173,7 +1173,7 @@ void csThing::ClearReplacedMaterials ()
 csPolygon3D *csThing::GetPolygon3D (const char *name)
 {
   int idx = polygons.FindKey (name);
-  return idx >= 0 ? polygons.Get (idx) : NULL;
+  return idx >= 0 ? polygons.Get (idx) : 0;
 }
 
 int csThing::FindPolygonIndex (iPolygon3D *polygon) const
@@ -1188,16 +1188,16 @@ void csThing::InvalidateThing ()
   if (polybuf)
   {
     polybuf->DecRef ();
-    polybuf = NULL;
+    polybuf = 0;
   }
 #endif // CS_USE_NEW_RENDERER
 
   delete[] polybuf_materials;
-  polybuf_materials = NULL;
+  polybuf_materials = 0;
   prepared = false;
   static_data->obj_bbox_valid = false;
 
-  delete [] static_data->obj_normals; static_data->obj_normals = NULL;
+  delete [] static_data->obj_normals; static_data->obj_normals = 0;
   static_data->scfiObjectModel.ShapeChanged ();
 }
 
@@ -1361,7 +1361,7 @@ void csThing::DrawPolygonArray (
   if (do_clip_plane)
     pclip_plane = &clip_plane;
   else
-    pclip_plane = NULL;
+    pclip_plane = 0;
 
   csPlane3 *plclip = icam->GetFarPlane ();
   bool mirrored = icam->IsMirrored ();
@@ -1496,8 +1496,8 @@ void csThing::PreparePolygonBuffer ()
     csPolygon3D *poly = matpol[i].poly;
     csPolyTexture* lmi = poly->GetPolyTexture ();
 
-    // @@@ what if lmi == NULL?
-    //CS_ASSERT (lmi != NULL);
+    // @@@ what if lmi == 0?
+    //CS_ASSERT (lmi != 0);
     if (mapping)
     {
       polybuf->AddPolygon (
@@ -1520,7 +1520,7 @@ void csThing::PreparePolygonBuffer ()
           matpol[i].mat_index,
           m_obj2tex,
           v_obj2tex,
-          NULL);
+          0);
     }
   }
 
@@ -1570,7 +1570,7 @@ void csThing::DrawPolygonArrayDPM (
   mesh.do_fog = false;
   mesh.do_mirror = icam->IsMirrored ();
   mesh.vertex_mode = G3DPolygonMesh::VM_WORLDSPACE;
-  mesh.vertex_fog = NULL;
+  mesh.vertex_fog = 0;
   mesh.mixmode = CS_FX_COPY;
 
   rview->CalculateFogMesh(tr_o2c,mesh);
@@ -1671,7 +1671,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csThing::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper (CS_POLY_VISCULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 //-------------------------------------------------------------------------
@@ -1698,7 +1698,7 @@ void PolyMeshHelper::Setup ()
     if (vertices == thing->obj_verts) return ;
   }
 
-  vertices = NULL;
+  vertices = 0;
 
   // Count the number of needed polygons and vertices.
   num_verts = thing->GetVertexCount ();
@@ -1738,8 +1738,8 @@ void PolyMeshHelper::Setup ()
 void PolyMeshHelper::Cleanup ()
 {
   delete[] polygons;
-  polygons = NULL;
-  vertices = NULL;
+  polygons = 0;
+  vertices = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -1884,7 +1884,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   delete[] cachename;
 
   // For error reporting.
-  const char* thing_name = NULL;
+  const char* thing_name = 0;
   if (static_data->thing_type->do_verbose && logparent)
   {
     csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
@@ -1892,7 +1892,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   }
 
   bool rc = true;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", NULL, (uint32) ~0);
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", 0, (uint32) ~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
@@ -1900,7 +1900,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
     for (i = 0; i < polygons.Length (); i++)
     {
       const char* error = polygons.Get (i)->ReadFromCache (&mf);
-      if (error != NULL)
+      if (error != 0)
       {
         rc = false;
         if (static_data->thing_type->do_verbose)
@@ -1924,7 +1924,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
     rc = false;
   }
 
-  cache_mgr->SetCurrentScope (NULL);
+  cache_mgr->SetCurrentScope (0);
   return rc;
 }
 
@@ -1940,13 +1940,13 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr)
   for (i = 0; i < polygons.Length (); i++)
     if (!polygons.Get (i)->WriteToCache (&mf)) goto stop;
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    	"thing_lm", NULL, (uint32) ~0))
+    	"thing_lm", 0, (uint32) ~0))
     goto stop;
 
   rc = true;
 
 stop:
-  cache_mgr->SetCurrentScope (NULL);
+  cache_mgr->SetCurrentScope (0);
   return rc;
 }
 
@@ -1972,7 +1972,7 @@ void csThing::Merge (csThing *other)
     for (j = 0; j < sp->GetVertices ().GetVertexCount (); j++)
       idx[j] = merge_vertices[idx[j]];
     static_data->AddPolygon (sp);
-    other->polygons[i] = NULL;
+    other->polygons[i] = 0;
   }
 
   delete[] merge_vertices;
@@ -1983,14 +1983,14 @@ void csThing::Merge (csThing *other)
 iPolygon3D *csThing::ThingState::GetPolygon (int idx)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (idx);
-  if (!p) return NULL;
+  if (!p) return 0;
   return &(p->scfiPolygon3D);
 }
 
 iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (name);
-  if (!p) return NULL;
+  if (!p) return 0;
   return &(p->scfiPolygon3D);
 }
 
@@ -2008,13 +2008,13 @@ iPolygon3D* csThing::ThingState::IntersectSegment (
 {
   int p = scfParent->static_data->IntersectSegmentIndex (start, end, isect, pr,
   	only_portals);
-  return p != -1 ? &(scfParent->polygons.Get (p)->scfiPolygon3D) : NULL;
+  return p != -1 ? &(scfParent->polygons.Get (p)->scfiPolygon3D) : 0;
 }
 
 //---------------------------------------------------------------------------
 iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 {
-  if (!scfParent->ParentTemplate) return NULL;
+  if (!scfParent->ParentTemplate) return 0;
   return (iMeshObjectFactory*)(scfParent->ParentTemplate->GetStaticData ());
 }
 
@@ -2059,8 +2059,8 @@ printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"); fflush (stdou
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
-  lightpatch_pool = NULL;
-  render_pol2d_pool = NULL;
+  lightpatch_pool = 0;
+  render_pol2d_pool = 0;
   do_verbose = false;
 }
 
@@ -2090,7 +2090,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   	iCommandLineParser);
   if (cmdline)
   {
-    do_verbose = cmdline->GetOption ("verbose") != NULL;
+    do_verbose = cmdline->GetOption ("verbose") != 0;
   }
 
   return true;

@@ -80,9 +80,9 @@ public:
   // Retrieves the default pallete along with
   // textures and alpha levels
   void Setup(iAws *wmgr, 
-             iTextureHandle* bkg = NULL,
+             iTextureHandle* bkg = 0,
              int bkg_alpha = 0,
-             iTextureHandle* ovl = NULL,
+             iTextureHandle* ovl = 0,
              int ovl_alpha = 0);
 
   /// Draws a frame of the given type
@@ -93,20 +93,20 @@ public:
   void Draw (
         csRect frame,
         int frame_style, 
-		    csRectRegion* rgn = NULL);
+		    csRectRegion* rgn = 0);
 
   void Draw(
         csRect frame,
         int frame_style,
         csRect bkg_align,
-        csRectRegion* rgn = NULL);
+        csRectRegion* rgn = 0);
   
   void Draw(
         csRect frame,
         int frame_style,
         csRect bkg_align,
         csRect ovl_align,
-        csRectRegion* rgn = NULL);
+        csRectRegion* rgn = 0);
 
 
   csRect SubRectToAlign(csRect comp_frame, csRect txt_sub_rect);

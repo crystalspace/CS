@@ -257,7 +257,7 @@ char* TrDocument::Parse( TrDocument*,  char* p )
     return 0;
   }
 
-  TrDocumentNode* lastChild = NULL;
+  TrDocumentNode* lastChild = 0;
   while ( p && *p )
   {
     TrDocumentNode* node = Identify( this, p );
@@ -376,7 +376,7 @@ char* TrXmlElement::Parse( TrDocument* document, char* p )
       }
       GetAttributeRegistered (attrib.Name()).
         TakeOverValue ((char*)attrib.Value(), attrib.GetValueLength ());
-      attrib.TakeOverValue (NULL, 0);
+      attrib.TakeOverValue (0, 0);
     }
   }
   attributeSet.set.ShrinkBestFit ();
@@ -390,7 +390,7 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
   // Read in text and elements in any order.
   p = SkipWhiteSpace( p );
   bool first_text = false;
-  TrDocumentNode* lastChild = NULL;
+  TrDocumentNode* lastChild = 0;
   while ( p && *p )
   {
     if ( *p != '<' )
@@ -402,7 +402,7 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
       {
         // If we are parsing the first child we use an optimization
 	// to store the text in this node instead of a child.
-	if (lastChild == NULL && !first_text)
+	if (lastChild == 0 && !first_text)
 	{
 	  first_text = true;
 	  const char* end = "<";

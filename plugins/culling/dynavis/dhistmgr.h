@@ -60,7 +60,7 @@ public:
 
   csVisibilityObjectHistory ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     vis_cnt = 0;
     history_frame_cnt = 0;
   }

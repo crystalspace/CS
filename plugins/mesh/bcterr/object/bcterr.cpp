@@ -134,11 +134,11 @@ void csSharedLODMesh::CreateMesh (int new_x_verts, int new_z_verts, int edge_res
   if (x_verts > z_verts) longest = x_verts; else longest = z_verts;
   num_tris = (x_verts - 1) * (z_verts - 1) * 2;
   num_tris += (edge_res + longest) * 8;
-  mesh->triangles = NULL;
+  mesh->triangles = 0;
   mesh->triangles = new csTriangle[num_tris];
   level = (unsigned char)nlevel;
-  buf = NULL;
-  mesh->vertex_fog = NULL;
+  buf = 0;
+  mesh->vertex_fog = 0;
   mesh->num_vertices_pool = 1;
   mesh->morph_factor = 0;
   mesh->use_vertex_color = true;
@@ -167,12 +167,12 @@ csSharedLODMesh::~csSharedLODMesh ()
 
 csSharedLODMesh::csSharedLODMesh ()
 {
-  buf = NULL;
-  verts = NULL;
-  normals = NULL;
-  texels = NULL;
-  mesh = NULL;
-  color = NULL;
+  buf = 0;
+  verts = 0;
+  normals = 0;
+  texels = 0;
+  mesh = 0;
+  color = 0;
   level = 0;
   x_verts = 0;
   z_verts = 0;
@@ -193,7 +193,7 @@ csBCLODOwner::csBCLODOwner (int newsize)
   owners = new csBCTerrBlock*[newsize];
   for ( i = 0; i < newsize; i++)
   {
-    owners[i] = NULL;
+    owners[i] = 0;
   }
 
 }
@@ -203,7 +203,7 @@ csBCLODOwner::~csBCLODOwner ()
   int i;
   for ( i = 0; i < size; i++)
   {
-    owners[i] = NULL;
+    owners[i] = 0;
   }
   delete [] owners;
 }
@@ -216,37 +216,37 @@ csBCLODOwner::~csBCLODOwner ()
 // freeing from itself
 void csBCTerrBlock::FreeLOD ()
 {
-  if (current_lod == NULL) return;
+  if (current_lod == 0) return;
   // current_lod->free = true;
   if (current_lod->buf)
   {
     if (current_lod->buf->IsLocked ())
       owner->vbufmgr->UnlockBuffer (current_lod->buf);
-    current_lod->buf = NULL;
+    current_lod->buf = 0;
   }
   if (current_lod->mesh->vertex_fog) delete current_lod->mesh->vertex_fog;
   owner->factory_state->FreeShared (this, current_lod->level);
-  current_lod = NULL;
+  current_lod = 0;
 }
 // freed from outside
 bool csBCTerrBlock::FreeSharedLOD ()
 {
-  if (current_lod == NULL) return true;
+  if (current_lod == 0) return true;
   // current_lod->free = true;
   if (current_lod->buf)
   {
     if (current_lod->buf->IsLocked ())
       owner->vbufmgr->UnlockBuffer (current_lod->buf);
-    current_lod->buf = NULL;
+    current_lod->buf = 0;
   }
   if (current_lod->mesh->vertex_fog) delete current_lod->mesh->vertex_fog;
-  current_lod = NULL;
+  current_lod = 0;
   return true;
 }
 
 void SetNil (G3DTriangleMesh *mesh)
 {
-  mesh->vertex_fog = NULL;
+  mesh->vertex_fog = 0;
   mesh->num_vertices_pool = 1;
   mesh->morph_factor = 0;
   mesh->use_vertex_color = false;
@@ -258,34 +258,34 @@ void SetNil (G3DTriangleMesh *mesh)
   mesh->clip_portal = CS_CLIP_NOT;
   mesh->clip_plane = CS_CLIP_NOT;
   mesh->clip_z_plane = CS_CLIP_NOT;
-  mesh->triangles = NULL;
-  mesh->buffers[0] = NULL;
-  mesh->mat_handle = NULL;
+  mesh->triangles = 0;
+  mesh->buffers[0] = 0;
+  mesh->mat_handle = 0;
 }
 
 csBCTerrBlock::csBCTerrBlock ()
 {
-  controlpoint = NULL;
-  current_lod = NULL;
-  default_lod = NULL;
-  material = NULL;
+  controlpoint = 0;
+  current_lod = 0;
+  default_lod = 0;
+  material = 0;
   //lod_level = 0;
   max_LOD = 0;
-  owner = NULL;
+  owner = 0;
   //vis = false;
   x1_end = 0;
   x2_end = 0;
   z1_end = 0;
   z2_end = 0;
   SetNil (&draw_mesh);
-  buf = NULL;
+  buf = 0;
 }
 csBCTerrBlock::~csBCTerrBlock ()
 {
   if (default_lod)
   {
     if (default_lod->buf)
-      default_lod->buf = NULL;
+      default_lod->buf = 0;
     if (default_lod->mesh->vertex_fog)
       delete default_lod->mesh->vertex_fog;
   }
@@ -370,7 +370,7 @@ void csBCTerrBlock::SetupBaseMesh ()
       owner->correct_sv;
   }
   draw_mesh.mat_handle = material->GetMaterialHandle ();
-  owner->SetupVertexBuffer (buf, NULL);
+  owner->SetupVertexBuffer (buf, 0);
   /*if (buf)
   {
     if (owner->vbufmgr)
@@ -1111,12 +1111,12 @@ void csBCTerrBlock::ManagerClosed ()
   if (current_lod)
   {
     if (current_lod->buf) current_lod->buf->DecRef ();
-    current_lod->buf = NULL;
+    current_lod->buf = 0;
   }
   if (default_lod)
   {
     if (default_lod->buf) default_lod->buf->DecRef ();
-    default_lod->buf = NULL;
+    default_lod->buf = 0;
   }
 }
 /*
@@ -1149,7 +1149,7 @@ void csBCTerrBlock::CreateNewMesh (int level)
   AddEdgesToCurrent ();
   owner->ComputeSharedMesh (newmesh, controlpoint);
   AddEdgeTriangles (current_lod);
-  current_lod->buf = NULL; // make sure, can cause memory leak?
+  current_lod->buf = 0; // make sure, can cause memory leak?
   owner->SetupVertexBuffer ( current_lod->buf, &current_lod->mesh->buffers[0] );
   // lock buffer?
   end = current_lod->x_verts * current_lod->z_verts;
@@ -1378,10 +1378,10 @@ SCF_IMPLEMENT_IBASE_END
 
 BCPolyMesh::BCPolyMesh ()
 {
-  SCF_CONSTRUCT_IBASE (NULL)
+  SCF_CONSTRUCT_IBASE (0)
   culling = false;
-  square_verts = NULL;
-  culling_mesh = NULL;
+  square_verts = 0;
+  culling_mesh = 0;
 }
 BCPolyMesh::~BCPolyMesh ()
 {
@@ -1422,21 +1422,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csBCTerrObject::csBCTerrObject (iObjectRegistry* object_reg,
   iMeshObjectFactory *newpFactory)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBCTerrState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csBCTerrObject::object_reg = object_reg;
   pFactory = newpFactory;
-  logparent = NULL;
-  vbufmgr = NULL;
+  logparent = 0;
+  vbufmgr = 0;
   factory_state = SCF_QUERY_INTERFACE (pFactory, iBCTerrFactoryState);
   initialized = false;
   topleft.Set (0,0,0);
   x_blocks = z_blocks = 0;
-  vis_cb = NULL;
-  collision = NULL;
+  vis_cb = 0;
+  collision = 0;
   initheight = false;
   toph = 0.0;
   righth = 0.0;
@@ -1480,8 +1480,8 @@ void csBCTerrObject::RebuildBlocks ()
     for (j = 0; j < z_blocks; j++)
     {      
       end = i * (x_blocks) + j;
-      if (i != 0) up = &blocks[end - x_blocks]; else up = NULL;
-      if (j == 0) left = NULL; else left = &blocks[end - 1];
+      if (i != 0) up = &blocks[end - x_blocks]; else up = 0;
+      if (j == 0) left = 0; else left = &blocks[end - 1];
       blocks[end].RebuildBlock (up, left);
     }
   }
@@ -1837,8 +1837,8 @@ void csBCTerrObject::SetupMesh ()
     for (j = 0; j < x_blocks; j++)
     {
       size = (i * x_blocks) + j;
-      if (i != 0) up = &blocks[size - x_blocks]; else up = NULL;
-      if (j == 0) left = NULL; else left = &blocks[size - 1];
+      if (i != 0) up = &blocks[size - x_blocks]; else up = 0;
+      if (j == 0) left = 0; else left = &blocks[size - 1];
       //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Mesh Setup: SetInfo");
       blocks[size].SetInfo ( this, cntrl_pt, up, left);
       //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Mesh Setup: End SetInfo");
@@ -2186,7 +2186,7 @@ void csBCTerrObject::eiVertexBufferManagerClient::ManagerClosing ()
       csBCTerrBlock& block = scfParent->blocks[i];
       block.ManagerClosed ();
     }
-    scfParent->vbufmgr = NULL;
+    scfParent->vbufmgr = 0;
   }
 }
 
@@ -2221,10 +2221,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csBCTerrObjectFactory::csBCTerrObjectFactory (iObjectRegistry* object_reg)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBCTerrFactoryState);
   csBCTerrObjectFactory::object_reg = object_reg;
-  logparent = NULL;
+  logparent = 0;
   owners = 0;
 
   LOD_Levels = 0;
@@ -2233,17 +2233,17 @@ csBCTerrObjectFactory::csBCTerrObjectFactory (iObjectRegistry* object_reg)
   edge_res = 4;
   height_multiplier = 0;
   initialized = false;
-  LOD_Distance = NULL;
-  LOD_UV = NULL;
-  LOD_Mesh_Numbers = NULL;
-  Shared_Meshes = NULL;
-  owners = NULL;
+  LOD_Distance = 0;
+  LOD_UV = 0;
+  LOD_Mesh_Numbers = 0;
+  Shared_Meshes = 0;
+  owners = 0;
   ResetOwner ();
   time = 0;
-  default_mat = NULL;
+  default_mat = 0;
   sys_distance = 20000;
   start_sys = 10000;
-  object_list = NULL;
+  object_list = 0;
   num_objects = 0;
   time_count = 0;
   free_lods = false;
@@ -2258,8 +2258,8 @@ csBCTerrObjectFactory::~csBCTerrObjectFactory ()
     {
       delete [] Shared_Meshes[i];
       delete owners[i];
-      Shared_Meshes[i] = NULL;
-      owners[i] = NULL;
+      Shared_Meshes[i] = 0;
+      owners[i] = 0;
     }
     delete [] Shared_Meshes;
     delete [] LOD_Distance;
@@ -2270,7 +2270,7 @@ csBCTerrObjectFactory::~csBCTerrObjectFactory ()
   if (default_mat) default_mat->DecRef ();
   for (i = 0; i < num_objects; i++)
   {
-    object_list[i] = NULL;
+    object_list[i] = 0;
   }
   if (object_list) delete [] object_list;
 }
@@ -2284,7 +2284,7 @@ void csBCTerrObjectFactory::AddTerrObject (csBCTerrObject* obj)
   for (i = 0; i < (num_objects - 1); i++)
   {    
     new_list[i] = object_list[i];
-    object_list[i] = NULL;
+    object_list[i] = 0;
   }
   new_list[num_objects - 1] = obj;
   delete [] object_list;
@@ -2404,7 +2404,7 @@ csPtr<iMeshObject> csBCTerrObjectFactory::NewInstance ()
       float longest;
       int coverage;
       if (blocksize.x > blocksize.y) longest = blocksize.x; else longest = blocksize.y;
-      if (longest <= 0) return NULL;
+      if (longest <= 0) return 0;
       longest = longest * longest;
       Shared_Meshes = new csSharedLODMesh*[LOD_Levels];
       LOD_Mesh_Numbers = new int[LOD_Levels];
@@ -2444,14 +2444,14 @@ csPtr<iMeshObject> csBCTerrObjectFactory::NewInstance ()
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
 csSharedLODMesh* csBCTerrObjectFactory::GetSharedMesh ( int level, csBCTerrBlock *owner)
 {
   // cpu considerations
-  if (time < cpu_time_limit) return NULL;
+  if (time < cpu_time_limit) return 0;
   time = 0;
   int i;
   // find an free LOD mesh
@@ -2477,7 +2477,7 @@ csSharedLODMesh* csBCTerrObjectFactory::GetSharedMesh ( int level, csBCTerrBlock
       }
     }
   }
-  return NULL;
+  return 0;
 }
 
 void csBCTerrObjectFactory::FreeShared (csBCTerrBlock *owner, int level  )
@@ -2488,7 +2488,7 @@ void csBCTerrObjectFactory::FreeShared (csBCTerrBlock *owner, int level  )
   list = owners[level]->owners;
   for (i = 0; i < LOD_Mesh_Numbers[level]; i++)
   {
-    if (list[i] == owner) list[i] = NULL;
+    if (list[i] == owner) list[i] = 0;
   }
 }
 
@@ -2506,8 +2506,8 @@ csSharedLODMesh* csBCTerrObjectFactory::CreateFreeMesh ()
 {
   int x_verts, z_verts, lod_level;
   csSharedLODMesh* mesh;
-  mesh = NULL;
-  if (LOD_Levels < 1) return NULL;
+  mesh = 0;
+  if (LOD_Levels < 1) return 0;
   lod_level = LOD_Levels - 1;
   GetXZFromLOD (lod_level, x_verts, z_verts);
   mesh = new csSharedLODMesh;

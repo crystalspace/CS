@@ -23,7 +23,7 @@
 
 csBumpMap::csBumpMap (iImage* src, int fmt)
 {
-  bumpmap = NULL;
+  bumpmap = 0;
   width = src->GetWidth ();
   height = src->GetHeight ();
   format = fmt;

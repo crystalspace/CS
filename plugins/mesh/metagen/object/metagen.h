@@ -100,7 +100,7 @@ struct TexelArray
 };
 
 // Note: MetaGen is just a factory, there is no mesh object here and
-// New Instance returns NULL. This is to avoid having NextFrame visiting
+// New Instance returns 0. This is to avoid having NextFrame visiting
 // through here all the time ( which is not necessary ).
 class csMetaGen : public iMeshObjectFactory
 {
@@ -247,12 +247,12 @@ public:
   void CreateBoundingBoxLinear(int num);
   void CreateBoundingBoxBlob(int num);
   virtual void GetObjectBoundingBox(csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual csPtr<iMeshObject> NewInstance() { return NULL; }
+  virtual csPtr<iMeshObject> NewInstance() { return 0; }
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
 

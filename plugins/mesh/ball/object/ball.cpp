@@ -79,7 +79,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
@@ -88,10 +88,10 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   scfiPolygonMesh.SetBall (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (NULL);
-  scfiObjectModel.SetPolygonMeshShadows (NULL);
+  scfiObjectModel.SetPolygonMeshViscull (0);
+  scfiObjectModel.SetPolygonMeshShadows (0);
 
-  logparent = NULL;
+  logparent = 0;
   initialized = false;
   cur_cameranr = -1;
   cur_movablenr = -1;
@@ -99,15 +99,15 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   max_radius.Set (0.0f, 0.0f, 0.0f);
   shift.Set (0.0f, 0.0f, 0.0f);
   verts_circle = 6;
-  material = NULL;
+  material = 0;
   MixMode = 0;
-  vis_cb = NULL;
-  top_normals = NULL;
-  ball_vertices = NULL;
-  ball_colors = NULL;
-  ball_texels = NULL;
-  top_mesh.triangles = NULL;
-  top_mesh.vertex_fog = NULL;
+  vis_cb = 0;
+  top_normals = 0;
+  ball_vertices = 0;
+  ball_colors = 0;
+  ball_texels = 0;
+  top_mesh.triangles = 0;
+  top_mesh.vertex_fog = 0;
   reversed = false;
   toponly = false;
   cyl_mapping = false;
@@ -117,8 +117,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   color.blue = 0.0f;
   current_lod = 1.0f;
   current_features = 0;
-  vbufmgr = NULL;
-  polygons = NULL;
+  vbufmgr = 0;
+  polygons = 0;
 }
 
 csBallMeshObject::~csBallMeshObject ()
@@ -462,12 +462,12 @@ void csBallMeshObject::SetupObject ()
     delete[] ball_texels;
     delete[] top_mesh.triangles;
     delete[] top_mesh.vertex_fog;
-    top_normals = NULL;
-    ball_vertices = NULL;
-    ball_colors = NULL;
-    ball_texels = NULL;
-    top_mesh.triangles = NULL;
-    top_mesh.vertex_fog = NULL;
+    top_normals = 0;
+    ball_vertices = 0;
+    ball_colors = 0;
+    ball_texels = 0;
+    top_mesh.triangles = 0;
+    top_mesh.vertex_fog = 0;
 
     GenerateSphere (verts_circle, top_mesh, top_normals);
     object_bbox.StartBoundingBox (
@@ -742,8 +742,8 @@ void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf = NULL;
-    scfParent->vbufmgr = NULL;
+    scfParent->vbuf = 0;
+    scfParent->vbufmgr = 0;
   }
 }
 
@@ -751,14 +751,14 @@ void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 /// interpolate a gradient
 static void GetGradientColor(float **gradient, float val, csColor& col)
 {
-  if(gradient == NULL || gradient[0] == NULL)
+  if(gradient == 0 || gradient[0] == 0)
   {
     col.Set(0.0f, 0.0f, 0.0f);
     return;
   }
   int entry = 0;
   while( gradient[entry] && (gradient[entry][0] < val) ) entry++;
-  if(gradient[entry] == NULL)
+  if(gradient[entry] == 0)
   {
     if(entry>0) col.Set( gradient[entry-1][1], gradient[entry-1][2],
       gradient[entry-1][3]);
@@ -813,7 +813,7 @@ void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
   /// see if gradient is given
   float sun1[] = {0.0f, 1.0f, 1.0f, 0.6f};
   float sun2[] = {1.0f, 1.0f, 0.8f, 0.6f};
-  float *sungrad[] = {sun1, sun2, NULL};
+  float *sungrad[] = {sun1, sun2, 0};
   float **grad = sungrad;
   if(gradient) grad = gradient;
   /// compute the max distance for the lightspot given radius.
@@ -842,21 +842,21 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   // apply defaults if needed
   float sky1[] = {0.0f, 0.5f, 0.6f, 1.0f};
   float sky2[] = {1.0f, 0.1f, 0.3f, 0.8f};
-  float* def_dayvert[] = {sky1, sky2, NULL};
+  float* def_dayvert[] = {sky1, sky2, 0};
 
   float night1[] = {0.0f, 0.1f, 0.1f, 0.1f};
   float night2[] = {1.0f, 0.0f, 0.0f, 0.0f};
-  float* def_nightvert[] = {night1, night2, NULL};
+  float* def_nightvert[] = {night1, night2, 0};
 
   float sun0[] = {0.0f, 1.0f, 1.0f, 0.6f};
   float sun1[] = {0.5f, 1.0f, 0.9f, 0.6f};
   float sun2[] = {1.0f, 1.0f, 0.8f, 0.6f};
-  float *def_topsun[] = {sun0, sun1, sun2, NULL};
+  float *def_topsun[] = {sun0, sun1, sun2, 0};
 
   float sunset0[] = {0.0f, 0.9f, 0.9f, -0.9f};
   float sunset1[] = {0.5f, 0.1f, -0.8f, -0.6f};
   float sunset2[] = {1.0f, 1.0f, -0.9f, 1.0f};
-  float* def_sunset[] = {sunset0, sunset1, sunset2, NULL};
+  float* def_sunset[] = {sunset0, sunset1, sunset2, 0};
 
   if(!dayvert) dayvert = def_dayvert;
   if(!nightvert) nightvert = def_nightvert;
@@ -990,7 +990,7 @@ csMeshedPolygon* csBallMeshObject::GetPolygons ()
 void csBallMeshObject::PolyMesh::Cleanup ()
 {
   delete[] ball->polygons;
-  ball->polygons = NULL;
+  ball->polygons = 0;
 }
 
 int csBallMeshObject::PolyMesh::GetVertexCount ()
@@ -1024,7 +1024,7 @@ csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent,
 {
   SCF_CONSTRUCT_IBASE (pParent);
   csBallMeshObjectFactory::object_reg = object_reg;
-  logparent = NULL;
+  logparent = 0;
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want a circular reference.
 }

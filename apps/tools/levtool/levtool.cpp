@@ -77,7 +77,7 @@ void LevTool::Report (int severity, const char* description, ...)
 
 ltVertex::ltVertex ()
 {
-  polygons = NULL;
+  polygons = 0;
   num_polygons = 0;
   max_polygons = 0;
 }
@@ -94,7 +94,7 @@ ltVertex::ltVertex (const ltVertex& vt) : csVector3 (vt.x, vt.y, vt.z)
   else
   {
     max_polygons = num_polygons = 0;
-    polygons = NULL;
+    polygons = 0;
   }
 }
 
@@ -123,10 +123,10 @@ void ltVertex::AddPolygon (int idx)
 
 ltPolygon::ltPolygon (iDocumentNode* polynode)
 {
-  name = NULL;
+  name = 0;
   num_vertices = 0;
   max_vertices = 0;
-  vertices = NULL;
+  vertices = 0;
   ltPolygon::polynode = polynode;
 }
 
@@ -155,7 +155,7 @@ void ltPolygon::AddVertex (int idx)
 void ltPolygon::SetName (const char* name)
 {
   delete[] ltPolygon::name;
-  ltPolygon::name = name ? csStrNew (name) : NULL;
+  ltPolygon::name = name ? csStrNew (name) : 0;
 }
 
 void ltPolygon::RemoveDuplicateVertices ()
@@ -182,11 +182,11 @@ void ltPolygon::RemoveDuplicateVertices ()
 
 ltThing::ltThing (iDocumentNode* meshnode, iDocumentNode* partnode)
 {
-  name = NULL;
-  vertices = NULL;
+  name = 0;
+  vertices = 0;
   num_vertices = 0;
   max_vertices = 0;
-  polygons = NULL;
+  polygons = 0;
   num_polygons = 0;
   max_polygons = 0;
   ltThing::meshnode = meshnode;
@@ -255,7 +255,7 @@ ltPolygon* ltThing::AddPolygon (iDocumentNode* polynode)
 void ltThing::SetName (const char* name)
 {
   delete[] ltThing::name;
-  ltThing::name = name ? csStrNew (name) : NULL;
+  ltThing::name = name ? csStrNew (name) : 0;
 }
 
 struct CompressVertex
@@ -558,7 +558,7 @@ void ltThing::SplitThingSeperateUnits ()
 
   while (true)
   {
-    ltPolygon* sweep = NULL;
+    ltPolygon* sweep = 0;
     for (i = 0 ; i < num_polygons ; i++)
     {
       ltPolygon* p = polygons[i];
@@ -1156,7 +1156,7 @@ void LevTool::CloneAndSplitDynavis (iDocumentNode* node, iDocumentNode* newnode,
   }
   if (is_dynavis && is_world)
   {
-    if (settingsnode == NULL)
+    if (settingsnode == 0)
     {
       settingsnode = newnode->CreateNodeBefore (CS_NODE_ELEMENT);
       settingsnode->SetValue ("settings");
@@ -1405,7 +1405,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
   }
   if (is_thing)
   {
-    ltThing* th = NULL;
+    ltThing* th = 0;
     int i;
     for (i = 0 ; i < things.Length () ; i++)
     {
@@ -1460,7 +1460,7 @@ void LevTool::CloneNode (iDocumentNode* from, iDocumentNode* to)
   {
     csRef<iDocumentNode> child = it->Next ();
     csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
-    	child->GetType (), NULL);
+    	child->GetType (), 0);
     CloneNode (child, child_clone);
   }
   csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
@@ -1617,7 +1617,7 @@ void LevTool::ValidateContents ()
 
 LevTool::LevTool ()
 {
-  object_reg = NULL;
+  object_reg = 0;
 }
 
 LevTool::~LevTool ()
@@ -1760,13 +1760,13 @@ void LevTool::Main ()
 
   {
     const char* minsize_arg = cmdline->GetOption ("minsize");
-    if (minsize_arg != NULL) sscanf (minsize_arg, "%d", &minsize);
+    if (minsize_arg != 0) sscanf (minsize_arg, "%d", &minsize);
     const char* maxsize_arg = cmdline->GetOption ("maxsize");
-    if (maxsize_arg != NULL) sscanf (maxsize_arg, "%d", &maxsize);
+    if (maxsize_arg != 0) sscanf (maxsize_arg, "%d", &maxsize);
     const char* minpoly_arg = cmdline->GetOption ("minpoly");
-    if (minpoly_arg != NULL) sscanf (minpoly_arg, "%d", &minpoly);
+    if (minpoly_arg != 0) sscanf (minpoly_arg, "%d", &minpoly);
     const char* maxpoly_arg = cmdline->GetOption ("maxpoly");
-    if (maxpoly_arg != NULL) sscanf (maxpoly_arg, "%d", &maxpoly);
+    if (maxpoly_arg != 0) sscanf (maxpoly_arg, "%d", &maxpoly);
   }
 
   csRef<iDocumentSystem> inputDS;
@@ -1866,8 +1866,8 @@ void LevTool::Main ()
   csTicks parse_start = csGetTicks();
   const char* error = doc->Parse (buf);
   csTicks parse_end = csGetTicks();
-  buf = NULL;
-  if (error != NULL)
+  buf = 0;
+  if (error != 0)
   {
     ReportError ("Error parsing XML: %s!", error);
     return;
@@ -1988,7 +1988,7 @@ void LevTool::Main ()
 	csRef<iDocument> newdoc = newsys->CreateDocument ();
 	CloneAndMovePlanes (doc, newdoc);
         error = newdoc->Write (vfs, filename);
-	if (error != NULL)
+	if (error != 0)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
@@ -2012,7 +2012,7 @@ void LevTool::Main ()
 
 	CloneAndSplitDynavis (doc, newdoc, true);
         error = newdoc->Write (vfs, filename);
-	if (error != NULL)
+	if (error != 0)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
@@ -2039,7 +2039,7 @@ void LevTool::Main ()
 
 	CloneAndSplitDynavis (doc, newdoc, false);
         error = newdoc->Write (vfs, filename);
-	if (error != NULL)
+	if (error != 0)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
@@ -2089,7 +2089,7 @@ void LevTool::Main ()
 
 	CloneAndSplitDynavis (doc, newdoc, false);
         error = newdoc->Write (vfs, filename);
-	if (error != NULL)
+	if (error != 0)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
@@ -2138,7 +2138,7 @@ void LevTool::Main ()
 
 	CloneAndSplitDynavis (doc, newdoc, false);
         error = newdoc->Write (vfs, filename);
-	if (error != NULL)
+	if (error != 0)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
@@ -2174,7 +2174,7 @@ void LevTool::Main ()
 		minpoly, maxpoly, global_area);
 	if (op != OP_FLAGCLEAR) printf ("%d things flagged!\n", cnt);
         error = newdoc->Write (vfs, filename);
-	if (error != NULL)
+	if (error != 0)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
@@ -2193,13 +2193,13 @@ void LevTool::Main ()
 	csTicks cloning_end = csGetTicks();
 	Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
 	  (float)(cloning_end - cloning_start) / (float)1000);
-	root = NULL;
-	doc = NULL;
+	root = 0;
+	doc = 0;
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "Writing...");
 	csTicks writing_start = csGetTicks();
         error = newdoc->Write (vfs, filename);
 	csTicks writing_end = csGetTicks();
-	if (error != NULL)
+	if (error != 0)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
@@ -2209,8 +2209,8 @@ void LevTool::Main ()
 	  Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
 	    (float)(writing_end - writing_start) / (float)1000);
 	}
-	newroot = NULL;
-	newdoc = NULL;
+	newroot = 0;
+	newdoc = 0;
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "Updating VFS...");
 	vfs->Sync();
       }
@@ -2226,7 +2226,7 @@ void LevTool::Main ()
 int main (int argc, char* argv[])
 {
   // Initialize the random number generator
-  srand (time (NULL));
+  srand (time (0));
 
   LevTool* lt = new LevTool ();
 

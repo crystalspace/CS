@@ -76,7 +76,7 @@
 typedef csGrowingArray<csCollisionPair> prapid_CD_contact;
 CS_IMPLEMENT_STATIC_VAR (GetCD_contact, prapid_CD_contact,())
 
-static prapid_CD_contact *CD_contact = NULL;
+static prapid_CD_contact *CD_contact = 0;
 
 static int hits = 0;
 // Array of hits.
@@ -101,11 +101,11 @@ SCF_IMPLEMENT_IBASE (csRapidCollider)
 SCF_IMPLEMENT_IBASE_END
 
 
-Moment *Moment::stack = NULL;
+Moment *Moment::stack = 0;
 
 csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   CD_contact = GetCD_contact ();
   GetMR ();
   GetMT ();
@@ -120,7 +120,7 @@ inline float max3(float a, float b, float c)
 
 void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
 {
-  m_pCollisionModel = NULL;
+  m_pCollisionModel = 0;
 
   CD_contact->IncRef ();
 
@@ -174,7 +174,7 @@ csRapidCollider::~csRapidCollider ()
   if (m_pCollisionModel)
   {
     delete m_pCollisionModel;
-    m_pCollisionModel = NULL;
+    m_pCollisionModel = 0;
   }
 
   CD_contact->DecRef ();
@@ -187,7 +187,7 @@ bool csRapidCollider::Collide (csRapidCollider &otherCollider,
   csRapidCollider *pRAPIDCollider2 = (csRapidCollider *)&otherCollider;
   if (pRAPIDCollider2 == this) return false;
 
-  // JTY: also skip objects with m_pCollisionModel NULL. This fixes
+  // JTY: also skip objects with m_pCollisionModel 0. This fixes
   // a bug with bezier curves and collision detection.
   if (!m_pCollisionModel ||
       !pRAPIDCollider2->m_pCollisionModel) return 0;

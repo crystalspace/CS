@@ -237,12 +237,12 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent)
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
-  tcache = NULL;
-  scfiEventHandler = NULL;
-  texman = NULL;
-  vbufmgr = NULL;
-  partner = NULL;
-  clipper = NULL;
+  tcache = 0;
+  scfiEventHandler = 0;
+  texman = 0;
+  vbufmgr = 0;
+  partner = 0;
+  clipper = 0;
   cliptype = CS_CLIPPER_NONE;
   do_near_plane = false;
 
@@ -256,15 +256,15 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent)
   ilace_fastmove = false;
   bilinear_filter = 0;
   do_smaller_rendering = false;
-  smaller_buffer = NULL;
+  smaller_buffer = 0;
   pixel_shift = 0;
   rstate_mipmap = 0;
   do_gouraud = true;
 
   dbg_max_polygons_to_draw = 2000000000; // After 2 billion polygons we give up :-)
 
-  z_buffer = NULL;
-  line_table = NULL;
+  z_buffer = 0;
+  line_table = 0;
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -275,12 +275,12 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent)
   Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
   width = height = -1;
-  partner = NULL;
+  partner = 0;
   is_for_procedural_textures = false;
 
   dpfx_valid = false;
 
-  object_reg = NULL;
+  object_reg = 0;
 }
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
@@ -298,7 +298,7 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
   if (clipper)
   {
     clipper->DecRef ();
-    clipper = NULL;
+    clipper = 0;
     cliptype = CS_CLIPPER_NONE;
   }
 }
@@ -426,7 +426,7 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   alpha_mask |= 1 << (pfmt.BlueShift);
   alpha_mask = ~alpha_mask;
 
-  fog_buffers = NULL;
+  fog_buffers = 0;
 
   // Create the texture manager
   texman = new csTextureManagerSoftware (object_reg, this, config);
@@ -437,7 +437,7 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
 
   tcache = new csTextureCacheSoftware (texman);
   const char *cache_size = config->GetStr
-        ("Video.Software.TextureManager.Cache", NULL);
+        ("Video.Software.TextureManager.Cache", 0);
   int csize = DEFAULT_CACHE_SIZE;
   if (cache_size)
   {
@@ -493,7 +493,7 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
   memset (&ScanProc, 0, sizeof (ScanProc));
   memset (&ScanProcPI, 0, sizeof (ScanProcPI));
   memset (&ScanProcPIG, 0, sizeof (ScanProcPIG));
-  ScanProc_Alpha = NULL;
+  ScanProc_Alpha = 0;
 
 #ifdef DO_MMX
   bool UseMMX = (cpu_mmx && do_mmx);
@@ -1008,12 +1008,12 @@ csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_16_Alpha
   (csGraphics3DSoftwareCommon *This, int alpha, bool keycolor, bool alphamap)
 {
   csDrawScanline* const ScanProcs[24] = {
-    NULL, csScan_16_scan_map_fixalpha50, csScan_16_scan_map_zfil, csScan_16_565_scan_map_fixalpha,
-    NULL, csScan_16_scan_map_fixalpha50_key, csScan_16_scan_map_key_zfil, csScan_16_565_scan_map_fixalpha_key,
-    NULL, csScan_16_565_scan_map_fixalpha50_alphamap, csScan_16_565_scan_map_alpha_zfil, csScan_16_565_scan_map_fixalpha_alphamap,
-    NULL, csScan_16_scan_map_fixalpha50, csScan_16_scan_map_zfil, csScan_16_555_scan_map_fixalpha,
-    NULL, csScan_16_scan_map_fixalpha50_key, csScan_16_scan_map_key_zfil, csScan_16_555_scan_map_fixalpha_key,
-    NULL, csScan_16_555_scan_map_fixalpha50_alphamap, csScan_16_555_scan_map_alpha_zfil, csScan_16_555_scan_map_fixalpha_alphamap
+    0, csScan_16_scan_map_fixalpha50, csScan_16_scan_map_zfil, csScan_16_565_scan_map_fixalpha,
+    0, csScan_16_scan_map_fixalpha50_key, csScan_16_scan_map_key_zfil, csScan_16_565_scan_map_fixalpha_key,
+    0, csScan_16_565_scan_map_fixalpha50_alphamap, csScan_16_565_scan_map_alpha_zfil, csScan_16_565_scan_map_fixalpha_alphamap,
+    0, csScan_16_scan_map_fixalpha50, csScan_16_scan_map_zfil, csScan_16_555_scan_map_fixalpha,
+    0, csScan_16_scan_map_fixalpha50_key, csScan_16_scan_map_key_zfil, csScan_16_555_scan_map_fixalpha_key,
+    0, csScan_16_555_scan_map_fixalpha50_alphamap, csScan_16_555_scan_map_alpha_zfil, csScan_16_555_scan_map_fixalpha_alphamap
   };
 
   Scan.AlphaMask = This->alpha_mask;
@@ -1045,9 +1045,9 @@ csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_32_Alpha
   (csGraphics3DSoftwareCommon* /*This*/, int alpha, bool keycolor, bool alphamap)
 {
   csDrawScanline* const ScanProcs[12] = {
-    NULL, csScan_32_scan_map_fixalpha50, csScan_32_scan_map_zfil, csScan_32_scan_map_fixalpha,
-    NULL, csScan_32_scan_map_fixalpha50_key, csScan_32_scan_map_key_zfil, csScan_32_scan_map_fixalpha_key,
-    NULL, csScan_32_scan_map_fixalpha50_alphamap, csScan_32_scan_map_alpha_zfil, csScan_32_scan_map_fixalpha_alphamap};
+    0, csScan_32_scan_map_fixalpha50, csScan_32_scan_map_zfil, csScan_32_scan_map_fixalpha,
+    0, csScan_32_scan_map_fixalpha50_key, csScan_32_scan_map_key_zfil, csScan_32_scan_map_fixalpha_key,
+    0, csScan_32_scan_map_fixalpha50_alphamap, csScan_32_scan_map_alpha_zfil, csScan_32_scan_map_fixalpha_alphamap};
 
   Scan.AlphaFact = alpha;
 
@@ -1083,21 +1083,21 @@ void csGraphics3DSoftwareCommon::Close ()
   if (!partner)
   {
     delete tcache;
-    tcache = NULL;
+    tcache = 0;
     texman->Clear();
-    texman->DecRef(); texman = NULL;
-    vbufmgr->DecRef (); vbufmgr = NULL;
+    texman->DecRef(); texman = 0;
+    vbufmgr->DecRef (); vbufmgr = 0;
   }
   if (clipper)
   {
     clipper->DecRef ();
-    clipper = NULL;
+    clipper = 0;
     cliptype = CS_CLIPPER_NONE;
   }
 
-  delete [] z_buffer; z_buffer = NULL;
-  delete [] smaller_buffer; smaller_buffer = NULL;
-  delete [] line_table; line_table = NULL;
+  delete [] z_buffer; z_buffer = 0;
+  delete [] smaller_buffer; smaller_buffer = 0;
+  delete [] line_table; line_table = 0;
 
   G2D->Close ();
   width = height = -1;
@@ -1121,7 +1121,7 @@ void csGraphics3DSoftwareCommon::SetDimensions (int nwidth, int nheight)
   height2 = height/2;
 
   delete [] smaller_buffer;
-  smaller_buffer = NULL;
+  smaller_buffer = 0;
   if (do_smaller_rendering)
   {
     smaller_buffer = new uint8 [(width*height) * pfmt.PixelBytes];
@@ -1372,7 +1372,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
       }
     }
   }
-  render_target = NULL;
+  render_target = 0;
 }
 
 #define SMALL_D 0.01
@@ -1525,8 +1525,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
     return;
 
-  iPolygonTexture *tex = NULL;
-  iLightMap *lm = NULL;
+  iPolygonTexture *tex = 0;
+  iLightMap *lm = 0;
   if (do_lighting)
   {
     tex = poly.poly_texture;
@@ -2160,7 +2160,7 @@ texr_done:
     uint mode = poly.mixmode;
     Scan.PaletteTable = tex_mm->GetPaletteToGlobal ();
     Scan.TexturePalette = tex_mm->GetColorMap ();
-    Scan.BlendTable = NULL;
+    Scan.BlendTable = 0;
     // array to select blend tables from
     unsigned char **BlendingTable = Scan.BlendingTable;
     switch (mode & CS_FX_MASK_MIXMODE)
@@ -2362,14 +2362,14 @@ FogBuffer* csGraphics3DSoftwareCommon::find_fog_buffer (CS_ID id)
     if (f->id == id) return f;
     f = f->next;
   }
-  return NULL;
+  return 0;
 }
 
 void csGraphics3DSoftwareCommon::OpenFogObject (CS_ID id, csFog* fog)
 {
   FogBuffer* fb = new FogBuffer ();
   fb->next = fog_buffers;
-  fb->prev = NULL;
+  fb->prev = 0;
   fb->id = id;
   fb->density = fog->density;
   fb->red = fog->red;
@@ -2511,7 +2511,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
   Scan.dM = M*Scan.InterpolStep;
 
   // Select the right scanline drawing function.
-  csDrawScanline* dscan = NULL;
+  csDrawScanline* dscan = 0;
   int scan_index =
   	fog_type == CS_FOG_FRONT ? SCANPROC_FOG :
 	fog_type == CS_FOG_BACK ? SCANPROC_ZFIL :
@@ -2702,7 +2702,7 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
 
   pqinfo.mat_handle = handle;
 
-  iTextureHandle *txt_handle = handle ? handle->GetTexture () : NULL;
+  iTextureHandle *txt_handle = handle ? handle->GetTexture () : 0;
   if (txt_handle)
   {
     csTextureHandleSoftware *tex_mm = (csTextureHandleSoftware*)
@@ -2724,13 +2724,13 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
 
   Scan.AlphaMask = alpha_mask;
 
-  Scan.BlendTable = NULL;
+  Scan.BlendTable = 0;
   // array to select blend tables from
   unsigned char **BlendingTable = Scan.BlendingTable;
   if(is_for_procedural_textures) // proc manager uses its own blend tables
     BlendingTable = Scan.BlendingTableProc;
-  pqinfo.drawline = NULL;
-  pqinfo.drawline_gouraud = NULL;
+  pqinfo.drawline = 0;
+  pqinfo.drawline_gouraud = 0;
 
   if (pqinfo.textured && Scan.AlphaMap)
   {
@@ -2771,7 +2771,7 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
 zfill_only:
       mode &= ~CS_FX_GOURAUD;
       pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE)
-      	? NULL
+      	? 0
 	: csScan_scan_pi_zfil;
       break;
     default:
@@ -2912,7 +2912,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 // End of MSVC specific code
 
   // Decide whenever we should use Gouraud or flat (faster) routines
-  bool do_gouraud = (pqinfo.drawline_gouraud != NULL)
+  bool do_gouraud = (pqinfo.drawline_gouraud != 0)
     && (pqinfo.mixmode & CS_FX_GOURAUD);
 
   //-----
@@ -3166,7 +3166,7 @@ void csGraphics3DSoftwareCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (mesh.clip_portal >= CS_CLIPPER_NONE)
     cl = clipper;
   else
-    cl = NULL;
+    cl = 0;
   DefaultDrawTriangleMesh (mesh, this, o2c, cl,
 	false /*lazyclip*/, aspect, width2, height2);
 }
@@ -3177,7 +3177,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   if (mesh.clip_portal >= CS_CLIPPER_NONE)
     cl = clipper;
   else
-    cl = NULL;
+    cl = 0;
   DefaultDrawPolygonMesh (mesh, this, o2c, cl,
 	false /*lazyclip*/, aspect, width2, height2);
 }

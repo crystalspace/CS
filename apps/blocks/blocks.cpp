@@ -126,7 +126,7 @@ void Blocks::Report (int severity, const char* msg, ...)
     return -1; \
   }
 
-Blocks* Sys = NULL;
+Blocks* Sys = 0;
 
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
@@ -143,7 +143,7 @@ HighScore::HighScore ()
   for (i = 0 ; i < 10 ; i++)
   {
     scores[i] = -1;
-    names[i] = NULL;
+    names[i] = 0;
   }
 }
 
@@ -168,7 +168,7 @@ bool HighScore::RegisterScore (const char* name, int score)
 	names[j] = names[j-1];
       }
       scores[i] = score;
-      names[i] = NULL;
+      names[i] = 0;
       SetName (i, name);
       return true;
     }
@@ -189,7 +189,7 @@ bool HighScore::CheckScore (int score)
 void HighScore::SetName (int i, const char* name)
 {
   delete names[i];
-  names[i] = NULL;
+  names[i] = 0;
   if (!name) return;
   names[i] = new char [strlen (name)+1];
   strcpy (names[i], name);
@@ -199,7 +199,7 @@ void HighScore::SetName (int i, const char* name)
 
 TextEntryMenu::TextEntryMenu ()
 {
-  entries = last = NULL;
+  entries = last = 0;
   num_entries = 0;
   selected = 0;
   hisel = false;
@@ -221,7 +221,7 @@ void TextEntryMenu::Clear ()
     delete entries;
     entries = n;
   }
-  last = NULL;
+  last = 0;
   num_entries = 0;
   hisel = false;
   selected = 0;
@@ -236,7 +236,7 @@ void TextEntryMenu::Add (const char* txt, const char* entry, void* userdata)
   n->entry = new char [strlen (entry)+1];
   strcpy (n->entry, entry);
   n->userdata = userdata;
-  n->next = NULL;
+  n->next = 0;
   if (last)
   {
     last->next = n;
@@ -373,7 +373,7 @@ Blocks::Blocks ()
   since_last_check = 0;
 #endif
 
-  keyconf_menu = NULL;
+  keyconf_menu = 0;
 
   // State changes.
   player1 = new States();
@@ -392,7 +392,7 @@ Blocks::Blocks ()
   menu_hor_new_x_src = 0.0;
   menu_hor_new_x_dst = 0.0;
 
-  menu_hor_old_menu = NULL;
+  menu_hor_old_menu = 0;
 }
 
 Blocks::~Blocks ()
@@ -1436,7 +1436,7 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 #if defined(BLOCKS_NETWORKING)
 	  // Start Networking stuff.
 	  // Send disconect stuff here.
-	  if (Connection != NULL)
+	  if (Connection != 0)
             Connection->Send ("BYE", sizeof("BYE"));
 
 	  TerminateConnection ();
@@ -1894,7 +1894,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
   {
     menu_hor_old_menu->GetMovable ()->ClearSectors ();
     menu_hor_old_menu->GetMovable ()->UpdateMove ();
-    menu_hor_old_menu = NULL;
+    menu_hor_old_menu = 0;
   }
 
   if (!(ABS (menu_trans) > SMALL_EPSILON) &&
@@ -2175,26 +2175,26 @@ void Blocks::InitGameRoom ()
 
   iLightList* ll = room->GetLights ();
   csRef<iStatLight> light;
-  light = engine->CreateLight (NULL,
+  light = engine->CreateLight (0,
     csVector3(-3, 5, 0), 10, csColor(.8, .4, .4), false);
   ll->Add (light->QueryLight ());
-  light = engine->CreateLight (NULL,
+  light = engine->CreateLight (0,
     csVector3(3, 5, 0), 10, csColor(.4, .4, .8), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL,
+  light = engine->CreateLight (0,
     csVector3(0, 5, -3), 10, csColor(.4, .8, .4), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL,
+  light = engine->CreateLight (0,
     csVector3(0, 5, 3), 10, csColor(.8, .4, .8), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
+  light = engine->CreateLight (0, csVector3(0, (ZONE_HEIGHT-3-3) *
     CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
+  light = engine->CreateLight (0, csVector3(0, (ZONE_HEIGHT-3+3) *
     CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false);
   ll->Add (light->QueryLight ());
 }
@@ -2219,7 +2219,7 @@ void Blocks::InitDemoRoom ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 100);
 
   csRef<iStatLight> light;
-  light = engine->CreateLight (NULL, csVector3 (0, 0, -2),
+  light = engine->CreateLight (0, csVector3 (0, 0, -2),
 	10, csColor (.4, .4, .4), false);
   demo_room->GetLights ()->Add (light->QueryLight ());
 
@@ -2292,7 +2292,7 @@ void Blocks::StartDemo ()
   player1->fog_density = 1;
 
   InitMainMenu ();
-  menu_hor_old_menu = NULL;
+  menu_hor_old_menu = 0;
 }
 
 void Blocks::InitMainMenu ()
@@ -2314,7 +2314,7 @@ void Blocks::StartNewGame ()
   if (player1->new_zone_dim != player1->zone_dim)
     ChangePlaySize (player1->new_zone_dim);
 
-  dynlight = NULL;
+  dynlight = 0;
 
   // First delete all cubes that may still be in the engine.
   int i = 0;
@@ -2503,7 +2503,7 @@ void Blocks::SetupFrame ()
     {
 //      printf("I am server hear me roar!!!\n");
 
-      if (Connection != NULL)
+      if (Connection != 0)
       {
         CheckConnection();
 //        Connection->Send("You suck", sizeof("You suck"));
@@ -2517,7 +2517,7 @@ void Blocks::SetupFrame ()
 
           Connection = csPtr<iNetworkConnection> (Listener->Accept());
 	  // These slow down blocks too much.
-	  if (Connection != NULL)
+	  if (Connection != 0)
 	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Connection accepted");
 	  else
 	    Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -2531,7 +2531,7 @@ void Blocks::SetupFrame ()
     else  // We are not a blocks server.
     {
 
-      if (Connection != NULL)
+      if (Connection != 0)
         CheckConnection();
       else
       {
@@ -2666,7 +2666,7 @@ void Blocks::SetupFrame ()
 void Blocks::FinishFrame ()
 {
   Gfx3D->FinishDraw ();
-  Gfx3D->Print (NULL);
+  Gfx3D->Print (0);
 }
 
 bool Blocks::BlHandleEvent (iEvent &Event)
@@ -2831,7 +2831,7 @@ void Blocks::ReadConfig ()
         highscores[level][size-3].Set (i, keys->GetInt (key, -1));
         sprintf (key, "Blocks.HighScores.Name%d_%dx%d_%d",
 		level, size, size, i);
-        highscores[level][size-3].SetName (i, keys->GetStr (key, NULL));
+        highscores[level][size-3].SetName (i, keys->GetStr (key, 0));
       }
     }
 #if defined(BLOCKS_NETWORKING)
@@ -2937,7 +2937,7 @@ void Blocks::ClientCheckConnection()
     if (err != CS_NET_ERR_NO_ERROR)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Receive error %d", err);
-      Connection = NULL;
+      Connection = 0;
     }
   }
 }
@@ -2974,7 +2974,7 @@ void Blocks::ServerCheckConnection()
     if (err != CS_NET_ERR_NO_ERROR)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Receive error %d", err);
-      Connection = NULL;
+      Connection = 0;
     }
 
 //    Connection->Send("You are a poo poo", sizeof("You are a poo poo"));
@@ -3007,13 +3007,13 @@ bool Blocks::InitNet()
     if (!myNetDrv) return false;
     Listener = csPtr<iNetworkListener> (
     	myNetDrv->NewListener (source, true, false, false));
-    if (Listener != NULL)
+    if (Listener != 0)
       Report  (CS_REPORTER_SEVERITY_NOTIFY, "Listening on port %s", source);
     else
       Report  (CS_REPORTER_SEVERITY_NOTIFY,"Error creating network listener (%d)",
         myNetDrv->GetLastError ());
 
-    return (Listener != NULL);
+    return (Listener != 0);
   }
   else  // We are the client.
   {
@@ -3030,7 +3030,7 @@ void Blocks::Connect ()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Attempting connection to %s...", target);
   Connection = csPtr<iNetworkConnection> (
   	myNetDrv->NewConnection(target, true, false));
-  if (Connection == NULL)
+  if (Connection == 0)
     Report  (CS_REPORTER_SEVERITY_NOTIFY,"Error %d", myNetDrv->GetLastError());
   else
     Report (CS_REPORTER_SEVERITY_NOTIFY, "OK\nPress a key [A-Z] to send a"
@@ -3039,15 +3039,15 @@ void Blocks::Connect ()
 
 void Blocks::TerminateConnection()
 {
-  if (Connection != NULL)
+  if (Connection != 0)
   {
     Connection->Terminate();
-    Connection = NULL;
+    Connection = 0;
   }
-  if (Listener != NULL)
+  if (Listener != 0)
   {
     Listener->Terminate();
-    Listener = NULL;
+    Listener = 0;
   }
 }
 
@@ -3057,14 +3057,14 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   iObjectRegistry* object_reg = Sys->object_reg;
-  delete Sys; Sys = NULL;
+  delete Sys; Sys = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
 //----------------------------------------------------------------------------
 int main (int argc, char* argv[])
 {
-  srand (time (NULL));
+  srand (time (0));
 
   // Create our main class which is the driver for Blocks.
   Sys = new Blocks ();
@@ -3211,7 +3211,7 @@ int main (int argc, char* argv[])
 #endif
   csDefaultRunLoop(object_reg);
 
-  config = NULL;	// Clean this up before DestroyApplicatoin happens.
+  config = 0;	// Clean this up before DestroyApplicatoin happens.
 
   Cleanup ();
   return 0;

@@ -101,7 +101,7 @@ void remove_dotdot (char *path)
       from = end;
     }
   *cp++ = from;
-  *cp = NULL;
+  *cp = 0;
 
   /* Recursively remove all 'x/..' component pairs. */
   cp = components;
@@ -157,7 +157,7 @@ struct inclist *newinclude (char *newfile, char *incstring)
     fatalerr ("out of space: increase MAXFILES\n");
   ip->i_file = copy (newfile);
 
-  if (incstring == NULL)
+  if (incstring == 0)
     ip->i_incstring = ip->i_file;
   else
     ip->i_incstring = copy (incstring);
@@ -169,15 +169,15 @@ void included_by (struct inclist *ip, struct inclist *newfile)
 {
   register int i;
 
-  if (ip == NULL)
+  if (ip == 0)
     return;
   /*
      Put this include file (newfile) on the list of files included
-     by 'file'.  If 'file' is NULL, then it is not an include
+     by 'file'.  If 'file' is 0, then it is not an include
      file itself (i.e. was probably mentioned on the command line).
      If it is already on the list, don't stick it on again.
    */
-  if (ip->i_list == NULL)
+  if (ip->i_list == 0)
   {
     ip->i_list = (struct inclist **)
       malloc (sizeof (struct inclist *) * ++ip->i_listlen);
@@ -305,6 +305,6 @@ struct inclist *inc_path (char *file, char *include, bool dot)
     }
 
   if (!found)
-    ip = NULL;
+    ip = 0;
   return (ip);
 }

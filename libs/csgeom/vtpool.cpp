@@ -27,10 +27,10 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF(csDefaultVertexArrayPool,
 
 csPooledVertexArrayPool::csPooledVertexArrayPool ()
 {
-  miscpool = NULL;
+  miscpool = 0;
 
   int i;
-  for (i = 0; i < 6; i++) pool[i] = NULL;
+  for (i = 0; i < 6; i++) pool[i] = 0;
 }
 
 csPooledVertexArrayPool::~csPooledVertexArrayPool ()

@@ -32,7 +32,7 @@
 CMapFile::CMapFile()
 {
   m_pConfigFile    = new csConfigFile;
-  m_IniFilename = NULL;
+  m_IniFilename = 0;
   m_NumBrushes  = 0;
 }
 

@@ -158,7 +158,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     ReportError (reporter,
 		"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 		"Could not load the sprite.3d mesh object plugin!");
-    return NULL;
+    return 0;
   }
 
   // @@@ Temporary fix to allow to set actions for objects loaded
@@ -186,7 +186,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     ReportError (reporter,
 	"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 	"Input was not binary sprite data!");
-    return NULL;
+    return 0;
   }
   p += 4;
 
@@ -198,7 +198,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 	"Unexpected format version %d.%d!", 
 	(uint8)*p, (uint8)*(p+1));
-    return NULL;
+    return 0;
   }
   has_normals = (uint8)*(p+1) >= 0x01;
   p += 2;
@@ -213,7 +213,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     ReportError (reporter,
 	"crystalspace.sprite3dbinfactoryloader.parse.unknownmaterial",
 	"Couldn't find material named '%s'", mat_name);
-    return NULL;
+    return 0;
   }
   spr3dLook->SetMaterialWrapper (mat);
   p += strlen(mat_name) + 1;
@@ -273,7 +273,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	    "crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
 	    "Trying to add too many vertices to frame '%s'!",
 	    fr->GetName ());
-	return NULL;
+	return 0;
       }
       spr3dLook->SetVertex (anm_idx, j, csVector3 (x, y, z));
       spr3dLook->SetTexel  (tex_idx, j, csVector2 (u, v));
@@ -286,7 +286,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	"crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
 	"Too few vertices in frame '%s'!",
 	fr->GetName ());
-      return NULL;
+      return 0;
     }
   }
 
@@ -321,7 +321,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	  "crystalspace.sprite3dbinfactoryloader.parse.action.badframe",
 	  "Trying to add unknown frame '%s' to action '%s'!",
 	  fn, act->GetName ());
-	return NULL;
+	return 0;
       }
 
       // Read the delay
@@ -383,7 +383,7 @@ csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
+  reporter = 0;
 }
 
 /**

@@ -58,7 +58,7 @@ public:
 public:
   csPluginIterator ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     idx = 0;
   }
   virtual ~csPluginIterator ()
@@ -92,7 +92,7 @@ SCF_IMPLEMENT_IBASE_END
 csPluginManager::csPluginManager (iObjectRegistry* object_reg) :
   Plugins (8, 8), OptionList (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   csPluginManager::object_reg = object_reg;
   // We need a recursive mutex.
   mutex = csMutex::Create (true);
@@ -248,7 +248,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
     if (added_here)
       Plugins.Delete (index);
   }
-  return NULL;
+  return 0;
 }
 
 bool csPluginManager::RegisterPlugin (const char *classID,
@@ -295,7 +295,7 @@ iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
     if (ret)
       return ret;
   }
-  return NULL;
+  return 0;
 }
 
 iBase *csPluginManager::QueryPlugin (const char* classID,
@@ -312,7 +312,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 	return (iBase*)Plugins.Get(i)->Plugin->QueryInterface(ifID,iVersion);
       }
   }
-  return NULL;
+  return 0;
 }
 
 bool csPluginManager::UnloadPlugin (iComponent* obj)
@@ -333,7 +333,7 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
     }
   }
 
-  object_reg->Unregister ((iBase *)obj, NULL);
+  object_reg->Unregister ((iBase *)obj, 0);
   return Plugins.Delete (idx);
 }
 

@@ -129,7 +129,7 @@ public:
 
   /// Load a plugin and (optionally) initialize it.
   virtual iBase *LoadPlugin (const char *iClassID,
-        const char *iInterface = NULL, int iVersion = 0,
+        const char *iInterface = 0, int iVersion = 0,
 	bool init = true);
 
   /**

@@ -180,7 +180,7 @@ public:
 
   virtual ~csShaderGLMTEX ()
   {
-    Deactivate(NULL);
+    Deactivate(0);
     if(programstring) delete programstring;
   }
 

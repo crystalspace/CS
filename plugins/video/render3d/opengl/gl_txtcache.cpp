@@ -61,7 +61,7 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
   total_size -= d->Size;
 
   iTextureHandle *texh = (iTextureHandle *)d->Source;
-  if (texh) texh->SetCacheData (NULL);
+  if (texh) texh->SetCacheData (0);
 
   delete d;
 }
@@ -74,7 +74,7 @@ csGLTextureCache::csGLTextureCache (int max_size,
   rstate_bilinearmap = true;
   cache_size = max_size;
   num = 0;
-  head = tail = NULL;
+  head = tail = 0;
   total_size = 0;
   (csGLTextureCache::R3D = R3D)/*->IncRef ()*/;
 }
@@ -104,7 +104,7 @@ void csGLTextureCache::Cache (iTextureHandle *txt_handle)
       else
         tail = cached_texture->prev;
 
-      cached_texture->prev = NULL;
+      cached_texture->prev = 0;
       cached_texture->next = head;
       if (head)
         head->prev = cached_texture;
@@ -130,7 +130,7 @@ void csGLTextureCache::Cache (iTextureHandle *txt_handle)
     cached_texture = new csTxtCacheData;
 
     cached_texture->next = head;
-    cached_texture->prev = NULL;
+    cached_texture->prev = 0;
     if (head)
       head->prev = cached_texture;
     else

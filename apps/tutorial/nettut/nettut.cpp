@@ -29,9 +29,9 @@
 CS_IMPLEMENT_APPLICATION
 
 /// these are our interfaces
-iNetworkDriver2 *driver = NULL;
-iNetworkSocket2 *server = NULL;
-iNetworkSocket2 *client = NULL;
+iNetworkDriver2 *driver = 0;
+iNetworkSocket2 *server = 0;
+iNetworkSocket2 *client = 0;
 
 void usage ( char *arg )
 {
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 	// act as a server
 	/// create server socket of *proto* type
 	server = driver->CreateSocket(proto);
-	if (server == NULL)
+	if (server == 0)
 	{
 	  printf("unable to create socket\n");
 	  return 0;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 	{
 		/// accept any incoming connections
 		client = server->Accept();
-		if (client == NULL) 
+		if (client == 0) 
 		{
 		  printf("unable to accept connection\n");
 		  return 0;
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
 	// act as a client
 	/// create a client connect of *proto* type
 	client = driver->CreateSocket(proto);
-	if (client == NULL)
+	if (client == 0)
 	{
 	  printf("unable to create socket\n");
 	  return 0;

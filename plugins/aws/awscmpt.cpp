@@ -46,7 +46,7 @@ awsMultiProctexCanvas::awscG2D::awscG2D (
   awsMultiProctexCanvas *parent,
   iGraphics2D *aG2D)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   rG2D = aG2D;
   awsc = parent;
@@ -358,7 +358,7 @@ unsigned char *awsMultiProctexCanvas::awscG2D::GetPixelAt (int x, int y)
     }
   }
 
-  return NULL;
+  return 0;
 }
 
 void awsMultiProctexCanvas::awscG2D::GetPixel (
@@ -485,7 +485,7 @@ csPixelFormat *awsMultiProctexCanvas::awscG2D::GetPixelFormat ()
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
@@ -531,16 +531,16 @@ SCF_IMPLEMENT_IBASE_END
 awsMultiProctexCanvas::awscG3D::awscG3D (
   awsMultiProctexCanvas *parent,
   iGraphics3D *aG3D) :
-    G2D(NULL)
+    G2D(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   awsc = parent;
 
   rG3D = aG3D;
-  G2D = NULL;
+  G2D = 0;
 
-  texman = NULL;
+  texman = 0;
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -557,7 +557,7 @@ awsMultiProctexCanvas::awscG3D::~awscG3D ()
   Close ();
   texman->Clear ();
   texman->DecRef ();
-  texman = NULL;
+  texman = 0;
   if (G2D) G2D->DecRef ();
 }
 
@@ -619,7 +619,7 @@ void awsMultiProctexCanvas::awscG3D::Close ()
 
   texman->Clear ();
   texman->DecRef ();
-  texman = NULL;
+  texman = 0;
 
   G2D->Close ();
   width = height = -1;
@@ -682,7 +682,7 @@ void awsMultiProctexCanvas::awscG3D::FinishDraw ()
   for (i = 0; i < count; ++i)
   {
     awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-    canvas->GetG3D ()->Print (NULL);
+    canvas->GetG3D ()->Print (0);
     canvas->GetG3D ()->FinishDraw ();
   }
 }
@@ -799,7 +799,7 @@ awsMultiProctexCanvas::awsMultiProctexCanvas (
     canvas_list(0),
     rect_list(0)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 
   const int DesiredCanvasWidth = w;
   const int DesiredCanvasHeight = h;
@@ -830,7 +830,7 @@ awsMultiProctexCanvas::awsMultiProctexCanvas (
     canvas->DisableAutoUpdate ();
     canvas->SetSize (MaxCanvasWidth, MaxCanvasHeight);
     canvas->SetKeyColor (255, 0, 255);
-    canvas->Initialize (object_reg, engine, txtmgr, NULL);
+    canvas->Initialize (object_reg, engine, txtmgr, 0);
     canvas->PrepareAnim ();
 
     // Setup the rect that identifies where we are in screen coords.

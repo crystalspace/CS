@@ -32,7 +32,7 @@ csAnimationTemplate::~csAnimationTemplate()
 csPixmap *csAnimationTemplate::GetFrameByTime(csTicks Time)
 {
   // test for empty animation
-  if (GetFrameCount() == 0) return NULL;
+  if (GetFrameCount() == 0) return 0;
   // wrap time
   Time %= GetLength();
   // search for frame (@@@ optimize this!)
@@ -43,7 +43,7 @@ csPixmap *csAnimationTemplate::GetFrameByTime(csTicks Time)
   }
   // this should never happen because it means that this class is buggy
   CS_ASSERT(false);
-  return NULL;
+  return 0;
 }
 
 csAnimatedPixmap *csAnimationTemplate::CreateInstance() {
@@ -56,7 +56,7 @@ csAnimatedPixmap::csAnimatedPixmap(csAnimationTemplate *tpl)
 {
   Template = tpl;
   CurrentTime = 0;
-  CurrentFrame = (tpl->GetFrameCount()>0) ? tpl->GetFrame(0) : NULL;
+  CurrentFrame = (tpl->GetFrameCount()>0) ? tpl->GetFrame(0) : 0;
 }
 
 csAnimatedPixmap::~csAnimatedPixmap()
@@ -92,5 +92,5 @@ void csAnimatedPixmap::Advance(csTicks ElapsedTime)
 }
 
 iTextureHandle *csAnimatedPixmap::GetTextureHandle() {
-  return CurrentFrame ? CurrentFrame->GetTextureHandle() : NULL;
+  return CurrentFrame ? CurrentFrame->GetTextureHandle() : 0;
 }

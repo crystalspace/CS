@@ -41,7 +41,7 @@ class csLinuxJoystick : public iComponent
     int16 *axis; // current values of all axis
     int16 *button; // current values of all buttons
 
-    joydata(){axis=NULL; button=NULL;}
+    joydata(){axis=0; button=0;}
     ~joydata(){delete[]axis; delete[] button;}
   };
     

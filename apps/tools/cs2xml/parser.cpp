@@ -50,8 +50,8 @@ int csParser::GetParserLine()
 long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
   char **data)
 {
-  if (name) *name = NULL;
-  if (data) *data = NULL;
+  if (name) *name = 0;
+  if (data) *data = 0;
 
   SkipCharacters (buf, kWhiteSpace);
 
@@ -138,7 +138,7 @@ long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
 
 long csParser::GetCommand (char **buf, csTokenVector * tokens, char **params)
 {
-  return GetObject (buf, tokens, NULL, params);
+  return GetObject (buf, tokens, 0, params);
 }
 
 int csParser::SkipToken (char *buf)
@@ -165,7 +165,7 @@ void csParser::SkipCharacters (char **buf, const char *toSkip)
   while ((ch = **buf) != 0)
   {
     if (ch == '\n') parser_line++;
-    if (strchr (toSkip, ch) == NULL)
+    if (strchr (toSkip, ch) == 0)
       return;
     ++*buf;                     // skip this character
   }

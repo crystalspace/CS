@@ -40,7 +40,7 @@ struct iStringSet : public iBase
   virtual csStringID Request (const char *s) = 0;
 
   /**
-  * Request the string for a given ID. Return NULL if the string
+  * Request the string for a given ID. Return 0 if the string
   * has not been requested (yet).
   */
   virtual const char* Request (csStringID id) = 0;

@@ -26,7 +26,7 @@
 #define COLORWHEEL_TEXTURE_NAME	"csws::ColorWheel"
 
 static int cwref = 0;
-static csPixmap *cwspr = NULL;
+static csPixmap *cwspr = 0;
 
 csColorWheel::csColorWheel (csComponent *iParent) : csStatic (iParent, csscsBitmap)
 {
@@ -49,9 +49,9 @@ csColorWheel::~csColorWheel ()
   if (--cwref == 0)
   {
     delete cwspr;
-    cwspr = NULL;
+    cwspr = 0;
   }
-  Bitmap = NULL;
+  Bitmap = 0;
 }
 
 bool csColorWheel::HandleEvent (iEvent &Event)
@@ -84,7 +84,7 @@ bool csColorWheel::HandleEvent (iEvent &Event)
     case csevMouseUp:
       if (trackmouse)
       {
-        app->CaptureMouse (NULL);
+        app->CaptureMouse (0);
         trackmouse = false;
       }
       return true;

@@ -64,13 +64,13 @@ NSOpenGLContext *context;
     // Create a pixel format
     pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
     if (pixelFormat == nil)
-        return NULL;
+        return 0;
 
     // Create a GL context
     context = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
     [pixelFormat release];
     if (context == nil)
-        return NULL;
+        return 0;
 
     // Need to know when window is resized so we can update the OpenGL context
     if (window != nil)

@@ -29,7 +29,7 @@
 
 CZipArchive::CZipArchive()
 {
-  m_pZipFile = NULL;
+  m_pZipFile = 0;
 }
 
 CZipArchive::~CZipArchive()
@@ -41,7 +41,7 @@ CZipArchive::~CZipArchive()
 CTextureFile* CZipArchive::CreateTexture(const char* texturename)
 {
   char texfilename[256];
-  CTextureFile* pTexture = NULL;
+  CTextureFile* pTexture = 0;
 
   const char* Extensions[] = {"tga", "jpg", "jpeg", "bmp", "wal", "gif", "png"};
 
@@ -53,14 +53,14 @@ CTextureFile* CZipArchive::CreateTexture(const char* texturename)
     if (pTexture) return pTexture;
   }
 
-  return NULL;
+  return 0;
 }
 
 extern iImageIO* ImageLoader;
 
 CTextureFile* CZipArchive::ExtractTexture(const char* texturename, const char* texfilename)
 {
-  CTextureFile* pTexture = NULL;
+  CTextureFile* pTexture = 0;
   CBinaryData   TextureData;
 
   if (m_pZipFile->ExtractData(&TextureData, texfilename))

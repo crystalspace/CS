@@ -78,7 +78,7 @@ class csEditFont
 {
   /// the gui app
   csApp *app;
-  /// a new[] alloced filename (can be NULL- 'Untitled')
+  /// a new[] alloced filename (can be 0- 'Untitled')
   char *filename;
   /// is font edited since last save?
   bool dirty;
@@ -174,9 +174,9 @@ public:
 
   virtual bool Initialize ();
 
-  /// get the edited font, can be NULL.
+  /// get the edited font, can be 0.
   csEditFont *GetEditFont() const {return editfont;}
-  /// set editfont (to NULL for example) -- does not delete the editfont
+  /// set editfont (to 0 for example) -- does not delete the editfont
   void SetEditFont(csEditFont* f);
   /// get main font
   iFont *GetMainFont() const {return mainfont;}

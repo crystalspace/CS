@@ -3,7 +3,7 @@
 
 awsKeyFactory::awsKeyFactory ()
 {
-    SCF_CONSTRUCT_IBASE(NULL);
+    SCF_CONSTRUCT_IBASE(0);
 }
 
 awsKeyFactory::~awsKeyFactory ()

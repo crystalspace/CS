@@ -48,7 +48,7 @@ public:
 
   /// Get a node with the given name and a given classname. (shortcut)
   static iMapNode *GetNode (iSector *pSector, const char *name,
-    const char *classname = NULL);
+    const char *classname = 0);
 
   SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iMapNode --------------------------
@@ -90,13 +90,13 @@ public:
    * responsible to take care, that the string is available while
    * the Iterator is alive.
    */
-  csNodeIterator (iSector *pSector, const char *classname = NULL);
+  csNodeIterator (iSector *pSector, const char *classname = 0);
 
   /// The destructor as usual
   ~csNodeIterator ();
 
   /// Reuse the iterator for an other search
-  void Reset (iSector *pSector, const char *classname = NULL);
+  void Reset (iSector *pSector, const char *classname = 0);
   /// Get the object we are pointing at
   iMapNode *GetNode ();
   /// Move forward

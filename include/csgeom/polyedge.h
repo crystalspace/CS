@@ -74,7 +74,7 @@ public:
    */
   csSegment2* GetEdge (int i)
   {
-    if (i<0 || i>=num_edges) return NULL;
+    if (i<0 || i>=num_edges) return 0;
     return &edges[i];
   }
 
@@ -91,13 +91,13 @@ public:
    * Get the first edge.
    */
   csSegment2* GetFirst ()
-  { if (num_edges<=0) return NULL;  else return edges; }
+  { if (num_edges<=0) return 0;  else return edges; }
 
   /**
    * Get the last edge.
    */
   csSegment2* GetLast ()
-  { if (num_edges<=0) return NULL;  else return &edges[num_edges-1]; }
+  { if (num_edges<=0) return 0;  else return &edges[num_edges-1]; }
 
   /**
    * Test if this vector is inside the polygon.
@@ -166,7 +166,7 @@ private:
 
 public:
   /// Create an empty pool.
-  csPoly2DEdgesPool () : alloced (NULL), freed (NULL) { }
+  csPoly2DEdgesPool () : alloced (0), freed (0) { }
 
   /// Destroy pool and all objects in the pool.
   ~csPoly2DEdgesPool ()

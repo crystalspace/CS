@@ -324,7 +324,7 @@ class TrDocumentAttribute
 
 public:
   /// Construct an empty attribute.
-  TrDocumentAttribute() { name = NULL; value = NULL; }
+  TrDocumentAttribute() { name = 0; value = 0; }
   ~TrDocumentAttribute () { }
 
   const char* Name()  const { return name; }
@@ -473,7 +473,7 @@ class TrXmlComment : public TrDocumentNode
 {
 public:
   /// Constructs an empty comment.
-  TrXmlComment() { value = NULL; type = COMMENT; }
+  TrXmlComment() { value = 0; type = COMMENT; }
   virtual ~TrXmlComment() { }
 
   virtual const char * Value () { value[vallen] = 0; return value; }
@@ -500,7 +500,7 @@ public:
   /// Constructor.
   TrXmlText ()
   {
-    value = NULL;
+    value = 0;
     type = TEXT;
   }
   virtual ~TrXmlText()
@@ -599,7 +599,7 @@ private:
 class TrXmlUnknown : public TrDocumentNode
 {
 public:
-  TrXmlUnknown() { value = NULL; type = UNKNOWN; }
+  TrXmlUnknown() { value = 0; type = UNKNOWN; }
   virtual ~TrXmlUnknown() {}
 
   virtual const char * Value () { value[vallen] = 0; return value; }
@@ -631,7 +631,7 @@ public:
   char* input_data;
 
   /// Create an empty document. Optional buf is given as input data.
-  TrDocument(char* buf = NULL);
+  TrDocument(char* buf = 0);
 
   virtual ~TrDocument();
 
@@ -649,7 +649,7 @@ public:
     }
   }
 
-  virtual const char * Value () { return NULL; }
+  virtual const char * Value () { return 0; }
 
   /// Parse the given null terminated block of xml data.
   virtual char* Parse( TrDocument* document,  char* p );

@@ -55,7 +55,7 @@ class csGlobalHashIteratorReversible : public csGlobalHashIterator
 
 private:
   csHashMapReversible *hashr;
-  /// Current bucket we are iterating over. NULL if no more elements.
+  /// Current bucket we are iterating over. 0 if no more elements.
   csHashBucket* current_bucket;
   /// Current index in bucket.
   int current_index;

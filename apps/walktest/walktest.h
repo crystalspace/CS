@@ -141,7 +141,7 @@ public:
   /// All maps we want to load.
   csMapToLoad* first_map, * last_map;
   int num_maps;
-  csMapToLoad* cache_map;	// If NULL no cache: entry was given.
+  csMapToLoad* cache_map;	// If 0 no cache: entry was given.
   /// A script to execute at startup.
   char* auto_script;
 

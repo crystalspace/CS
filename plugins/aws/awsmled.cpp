@@ -57,7 +57,7 @@ static iAwsSink *textbox_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())
 
-static awsSlot *textbox_slot = NULL;
+static awsSlot *textbox_slot = 0;
 
 awsMultiLineEdit::awsMultiLineEdit ()
 {
@@ -72,13 +72,13 @@ awsMultiLineEdit::awsMultiLineEdit ()
   nMarkMode = nClipMarkMode = MARK_ROWWRAP;
   xmaxchar = ymaxchar = 0;
   vText.Push ((void*) new csString);
-  blink_timer = NULL;
+  blink_timer = 0;
   bBlinkOn = false;
   textbox_slot = GetTextBoxBlinkingCursorSlot ();
   cursorcolor = 0;
 
   alpha_level = 128;
-  img = NULL;
+  img = 0;
 
   actions.Register ("InsertRow", &actInsertRow);
   actions.Register ("DeleteRow", &actDeleteRow);
@@ -270,7 +270,7 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
   {
   case meBitmap:
     {
-      iString *tn1 = NULL;
+      iString *tn1 = 0;
       pm->GetString (settings, "Bitmap", tn1);
       if (tn1) img = pm->GetTexture (tn1->GetData (), tn1->GetData ());
     }
@@ -282,7 +282,7 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
 
   }
 
-  iString *fontname=NULL;
+  iString *fontname=0;
   pm->GetString (settings, "Font", fontname);
 
   if (fontname)
@@ -295,7 +295,7 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
   // Setup blink event handling
   if (textbox_sink == 0)
   {
-    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (NULL);
+    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (0);
     textbox_sink->RegisterTrigger ("Blink", &BlinkCursor);
   }
 
@@ -1134,7 +1134,7 @@ void awsMultiLineEdit::actInsertRow (void *owner, iAwsParmList* parmlist)
   
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   int row;
-  iString *str=NULL;
+  iString *str=0;
 
   if (parmlist->GetInt ("row", &row) && parmlist->GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
   {
@@ -1167,7 +1167,7 @@ void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList* parmlist)
   
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   int row;
-  iString *str=NULL;
+  iString *str=0;
 
   if (parmlist->GetInt ("row", &row) && parmlist->GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
   {
@@ -1233,7 +1233,7 @@ void awsMultiLineEdit::actSetText (void *owner, iAwsParmList* parmlist)
     return;
   
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
-  iString *text = NULL;
+  iString *text = 0;
 
   if (parmlist->GetString ("text", &text))
   {

@@ -64,7 +64,7 @@ struct iParameterESM : public iBase
    * operations. If IsConstant() returns true then the params
    * parameter will not be used!
    */
-  virtual iBase* GetValue (iBase* params = NULL) const = 0;
+  virtual iBase* GetValue (iBase* params = 0) const = 0;
 
   /**
    * Returns true if the value is constant and immediatelly available
@@ -122,7 +122,7 @@ struct iEngineSequenceParameters : public iBase
    * base parameter block. Don't use this to set the values for
    * parameters later on blocks created with CreateParameterBlock()!
    */
-  virtual void AddParameter (const char* name, iBase* def_value = NULL) = 0;
+  virtual void AddParameter (const char* name, iBase* def_value = 0) = 0;
 
   /**
    * Set a parameter by index.
@@ -137,7 +137,7 @@ struct iEngineSequenceParameters : public iBase
   /**
    * Create a parameter ESM which keeps a reference to this parameter
    * block and knows how to resolve the specified parameter. Returns
-   * NULL if the parameter 'name' is not known in this block. You can use
+   * 0 if the parameter 'name' is not known in this block. You can use
    * the return of this function to give as an argument for operations.
    */
   virtual csPtr<iParameterESM> CreateParameterESM (const char* name) = 0;
@@ -182,7 +182,7 @@ struct iSequenceWrapper : public iBase
   virtual iEngineSequenceParameters* CreateBaseParameterBlock () = 0;
 
   /**
-   * Get the pointer to the base parameter block (or NULL if there is
+   * Get the pointer to the base parameter block (or 0 if there is
    * no such block).
    */
   virtual iEngineSequenceParameters* GetBaseParameterBlock () = 0;
@@ -195,7 +195,7 @@ struct iSequenceWrapper : public iBase
    * returned by this function have no effect on the parameter block
    * which is kept internally. You should only set the values
    * of the given parameter block and not create/remove variables.
-   * This function returns NULL if there is no parameter block
+   * This function returns 0 if there is no parameter block
    * for this sequence.
    */
   virtual csPtr<iEngineSequenceParameters> CreateParameterBlock () = 0; 
@@ -302,7 +302,7 @@ struct iSequenceWrapper : public iBase
   /**
    * Operation: test trigger state and run a sequence if trigger
    * is still valid or another sequence if not (both sequences
-   * can be NULL in which case nothing is run).
+   * can be 0 in which case nothing is run).
    * Use in combination with AddOperationCheckTrigger().
    */
   virtual void AddOperationTestTrigger (csTicks time,
@@ -583,7 +583,7 @@ struct iEngineSequenceManager : public iBase
    * can release your reference.
    */
   virtual void FireTimedOperation (csTicks delta, csTicks duration,
-  	iSequenceTimedOperation* op, iBase* params = NULL) = 0;
+  	iSequenceTimedOperation* op, iBase* params = 0) = 0;
 
   //-----------------------------------------------------------------------
 };

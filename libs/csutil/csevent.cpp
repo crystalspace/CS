@@ -89,12 +89,12 @@ char *GetTypeName(attribute::Type t)
 
 csEvent::csEvent ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csEvent::csEvent (csTicks iTime,int eType,int kCode,int kChar,int kModifiers)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -106,7 +106,7 @@ csEvent::csEvent (csTicks iTime,int eType,int kCode,int kChar,int kModifiers)
 csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
   int mButton, int mModifiers)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -119,7 +119,7 @@ csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
 csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
   int jButton, int jModifiers)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -132,7 +132,7 @@ csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
 
 csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -144,7 +144,7 @@ csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo)
 
 csEvent::csEvent (csEvent const& e) : iEvent()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   Type = e.Type;
   Category = e.Category;
   SubCategory = e.SubCategory;
@@ -404,7 +404,7 @@ bool csEvent::Add(const char *name, void *v, uint32 size)
 
 bool csEvent::CheckForLoops(csEvent *current, csEvent *e)
 {
-  csEvent *temp = NULL;
+  csEvent *temp = 0;
   if (current->Find("_parent", (iEvent **)&temp))
   {
     if (temp == e)
@@ -666,8 +666,8 @@ bool csEvent::Remove(const char *name, int index)
     csArray<attribute *> *v = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
     if (v)
     {
-      attribute *object = NULL;
-      while((object = (attribute *) v->Pop()) != NULL)
+      attribute *object = 0;
+      while((object = (attribute *) v->Pop()) != 0)
       {
         if (object)
         {
@@ -726,10 +726,10 @@ bool csEvent::RemoveAll()
     {
       if (v)
       {
-        attribute *object = NULL;
+        attribute *object = 0;
         while(v->Length() > 0)
         {
-          if ((object = (attribute *) v->Pop()) != NULL)
+          if ((object = (attribute *) v->Pop()) != 0)
           {
             if (object->type == attribute::tag_event)
               object->Event->DecRef();
@@ -760,11 +760,11 @@ bool csEvent::Print(int32 level)
     csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
     if (v)
     {
-      attribute *object = NULL;
+      attribute *object = 0;
       int32 index = 0;
       while(index < v->Length())
       {
-        if ((object = (attribute *) v->Get(index)) != NULL)
+        if ((object = (attribute *) v->Get(index)) != 0)
         {
           IndentLevel(level); printf ("------\n");
           IndentLevel(level); printf ("Name: %s\n", iter.GetKey());
@@ -849,11 +849,11 @@ uint32 csEvent::FlattenSizeCrystal()
     csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
     if (v)
     {
-      attribute *object = NULL;
+      attribute *object = 0;
       int index = 0;
       while(index < v->Length())
       {
-        if ((object = (attribute *) v->Get(index)) != NULL)
+        if ((object = (attribute *) v->Get(index)) != 0)
         {
           if (object->type == attribute::tag_event)
           {
@@ -1035,11 +1035,11 @@ bool csEvent::FlattenCrystal(char * buffer)
     csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
     if (v)
     {
-      attribute *object = NULL;
+      attribute *object = 0;
       int index = 0;
       while(index < v->Length())
       {
-        if ((object = (attribute *) v->Get(index)) != NULL)
+        if ((object = (attribute *) v->Get(index)) != 0)
         {
           switch (object->type)
           {
@@ -1464,7 +1464,7 @@ bool csEvent::Pooled()
 csPoolEvent::csPoolEvent(csEventQueue *q) 
 {
     pool = q;
-    next = NULL;
+    next = 0;
 }
  
 void csPoolEvent::DecRef() 

@@ -49,8 +49,8 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DAA::csGraphics2DAA (iBase *iParent) : csGraphics2D (iParent)
 {
-  context = NULL;
-  EventOutlet = NULL;
+  context = 0;
+  EventOutlet = 0;
 }
 
 csGraphics2DAA::~csGraphics2DAA (void)
@@ -137,7 +137,7 @@ bool csGraphics2DAA::Open ()
 {
   if (is_open) return true;
   context = aa_autoinit (&aa_defparams);
-  if (context == NULL)
+  if (context == 0)
   {
     printf ("Cannot initialize AA-lib. Sorry\n");
     return false;
@@ -162,7 +162,7 @@ void csGraphics2DAA::Close ()
   aa_uninitmouse (context);
   aa_uninitkbd (context);
   aa_close (context);
-  context = NULL;
+  context = 0;
 }
 
 static int oldmousebut = 0;
@@ -292,7 +292,7 @@ void csGraphics2DAA::FinishDraw ()
   if (FrameBufferLocked)
     return;
 
-  Memory = NULL;
+  Memory = 0;
 }
 
 bool csGraphics2DAA::SetMousePosition (int x, int y)

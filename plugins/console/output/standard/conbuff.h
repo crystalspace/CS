@@ -29,7 +29,7 @@ public:
 
   void NewLine(bool snap = true);
   csString *WriteLine();
-  const csString *GetLine(int line, bool *dirty = NULL);
+  const csString *GetLine(int line, bool *dirty = 0);
   void SetLength(int length);
   void Clear();
   void SetPageSize(int size);

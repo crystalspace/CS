@@ -29,30 +29,30 @@ int SkinImage::GetWidth () { return Width; }
 int SkinImage::GetHeight () { return Height; }
 int SkinImage::GetSize () { return Size; }
 void SkinImage::Rescale (int, int) {}
-csPtr<iImage> SkinImage::MipMap (int, csRGBpixel*) { return NULL; }
+csPtr<iImage> SkinImage::MipMap (int, csRGBpixel*) { return 0; }
 void SkinImage::SetName (const char*) {}
-const char *SkinImage::GetName () { return NULL; }
+const char *SkinImage::GetName () { return 0; }
 int SkinImage::GetFormat () { return CS_IMGFMT_PALETTED8; }
 csRGBpixel *SkinImage::GetPalette () { return Palette; }
-uint8 *SkinImage::GetAlpha () { return NULL; }
+uint8 *SkinImage::GetAlpha () { return 0; }
 void SkinImage::CheckAlpha () { }
 void SkinImage::SetFormat (int) {}
-csPtr<iImage> SkinImage::Clone () { return NULL; }
-csPtr<iImage> SkinImage::Crop (int, int, int, int) { return NULL; }
+csPtr<iImage> SkinImage::Clone () { return 0; }
+csPtr<iImage> SkinImage::Crop (int, int, int, int) { return 0; }
 
 csPtr<iImage> SkinImage::Sharpen (csRGBpixel *transp, int strength)
 {
   // Following block added so silence compiler warnings ONLY
-  transp = NULL;
+  transp = 0;
   strength = 0;
 
-  return NULL;
+  return 0;
 }
 
 SkinImage::SkinImage(void* Data, const void* Pal, int w, int h) :
   Image(Data), Width(w), Height(h), Size(w * h)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
   const unsigned char* src = (const unsigned char*)Pal;
   csRGBpixel* dst = Palette;
   int i;

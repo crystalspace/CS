@@ -110,7 +110,7 @@ enum
    * Set given component as client window
    * <pre>
    * IN:  (csComponent *)client;
-   * OUT: NULL if successful
+   * OUT: 0 if successful
    * </pre>
    */
   cscmdWindowSetClient

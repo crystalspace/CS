@@ -79,8 +79,8 @@ csSnowMeshObject::csSnowMeshObject (iObjectRegistry* object_reg,
   iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSnowState);
-  part_pos = NULL;
-  part_speed = NULL;
+  part_pos = 0;
+  part_speed = 0;
   rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
   swirl_amount = 1;
   rain_dir.Set (0, -1, 0);
@@ -158,7 +158,7 @@ csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase* p, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   object_reg = s;
-  logparent = NULL;
+  logparent = 0;
 }
 
 csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()

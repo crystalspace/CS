@@ -38,7 +38,7 @@ protected:
 public:
   /// Initialize this object with data pointer initialized to 'd'
   csDataObject (void *d) : csObject (), data (d)
-  { SCF_CONSTRUCT_IBASE (NULL); SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDataObject); }
+  { SCF_CONSTRUCT_IBASE (0); SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDataObject); }
   /// Get the data associated with this object
   void* GetData () const
   { return data; }
@@ -48,7 +48,7 @@ public:
   static void* GetData (iObject* obj)
   {
     csRef<iDataObject> d (CS_GET_CHILD_OBJECT (obj, iDataObject));
-    void *res = (d ? d->GetData () : NULL);
+    void *res = (d ? d->GetData () : 0);
     return res;
   }
 

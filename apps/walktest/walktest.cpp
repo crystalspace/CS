@@ -112,14 +112,14 @@ WalkTest::WalkTest () :
 {
   extern bool CommandHandler (const char *cmd, const char *arg);
   csCommandProcessor::ExtraHandler = CommandHandler;
-  auto_script = NULL;
-  view = NULL;
-  infinite_maze = NULL;
-  wMissile_boom = NULL;
-  wMissile_whoosh = NULL;
-  cslogo = NULL;
-  anim_sky = NULL;
-  anim_dirlight = NULL;
+  auto_script = 0;
+  view = 0;
+  infinite_maze = 0;
+  wMissile_boom = 0;
+  wMissile_whoosh = 0;
+  cslogo = 0;
+  anim_sky = 0;
+  anim_dirlight = 0;
 
   do_stats = false;
   do_edges = false;
@@ -134,15 +134,15 @@ WalkTest::WalkTest () :
   player_spawned = false;
   do_gravity = true;
   inverse_mouse = false;
-  selected_light = NULL;
-  selected_polygon = NULL;
+  selected_light = 0;
+  selected_polygon = 0;
   move_forward = false;
   cfg_recording = -1;
-  recorded_perf_stats_name = NULL;
-  recorded_perf_stats = NULL;
-  perf_stats = NULL;
-  recorded_cmd = NULL;
-  recorded_arg = NULL;
+  recorded_perf_stats_name = 0;
+  recorded_perf_stats = 0;
+  perf_stats = 0;
+  recorded_cmd = 0;
+  recorded_arg = 0;
   cfg_playrecording = -1;
   cfg_debug_check_frustum = 0;
   do_fs_inter = false;
@@ -165,8 +165,8 @@ WalkTest::WalkTest () :
 
   SmallConsole = false;
 
-  vc = NULL;
-  plugin_mgr = NULL;
+  vc = 0;
+  plugin_mgr = 0;
 
   debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
   debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
@@ -176,9 +176,9 @@ WalkTest::WalkTest () :
 
   canvas_exposed = true;
 
-  first_map = last_map = NULL;
+  first_map = last_map = 0;
   num_maps = 0;
-  cache_map = NULL;
+  cache_map = 0;
 }
 
 WalkTest::~WalkTest ()
@@ -236,8 +236,8 @@ void WalkTest::SetDefaults ()
     val = Config->GetStr ("Walktest.Settings.WorldFile");
 
   int idx = 0;
-  cache_map = NULL;
-  while (val != NULL)
+  cache_map = 0;
+  while (val != 0)
   {
     num_maps++;
     idx++;
@@ -248,7 +248,7 @@ void WalkTest::SetDefaults ()
     // be used as a map file (no loading of 'world' there) but instead the
     // lightmap cache will be placed there. This cache:xxx.zip can
     // only occur once (subsequence cache: entries will be ignored).
-    if (cache_map == NULL && strlen (val) > 7 && !strncmp ("cache:", val, 6))
+    if (cache_map == 0 && strlen (val) > 7 && !strncmp ("cache:", val, 6))
     {
       cache_map = map;
       val += 6;
@@ -261,7 +261,7 @@ void WalkTest::SetDefaults ()
       sprintf (map_dir, "/lev/%s", val);
 
     map->map_dir = csStrNew (map_dir);
-    map->next_map = NULL;
+    map->next_map = 0;
     if (last_map)
       last_map->next_map = map;
     else
@@ -389,7 +389,7 @@ void WalkTest::FinishFrame ()
   // Drawing code ends here
   Gfx3D->FinishDraw ();
   // Print the output.
-  Gfx3D->Print (NULL);
+  Gfx3D->Print (0);
 }
 
 
@@ -579,7 +579,7 @@ void WalkTest::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
 void WalkTest::DrawFrameConsole ()
 {
   if (myConsole)
-    myConsole->Draw2D (NULL);
+    myConsole->Draw2D (0);
 
   if (!myConsole || !myConsole->GetVisible ())
   {
@@ -740,7 +740,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 
   // Display the 3D parts of the console
   if (myConsole)
-    myConsole->Draw3D (NULL);
+    myConsole->Draw3D (0);
 }
 
 
@@ -805,7 +805,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
       reccam->sector = c->GetSector ();
       reccam->cmd = recorded_cmd;
       reccam->arg = recorded_arg;
-      recorded_cmd = recorded_arg = NULL;
+      recorded_cmd = recorded_arg = 0;
       recording.Push ((void*)reccam);
     }
     if (cfg_playrecording >= 0 && recording.Length () > 0)
@@ -822,7 +822,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 	  // file
 	  cfg_playrecording = -1;
 	  if (perf_stats) perf_stats->FinishSubsection ();
-	  recorded_perf_stats = NULL;
+	  recorded_perf_stats = 0;
 	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Demo '%s' finished",
 		       recorded_perf_stats_name);
 	}
@@ -954,7 +954,7 @@ void Cleanup ()
   free_keymap ();
   Sys->EndEngine ();
   iObjectRegistry* object_reg = Sys->object_reg;
-  delete Sys; Sys = NULL;
+  delete Sys; Sys = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -966,7 +966,7 @@ void start_console ()
 
 void WalkTest::EndEngine ()
 {
-  //  delete view; view = NULL;
+  //  delete view; view = 0;
 }
 
 void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
@@ -1108,7 +1108,7 @@ public:
     csSleep (2000);
     printf ("================ START PARSING!\n"); fflush (stdout);
     const char* error = doc->Parse (buf);
-    if (error != NULL)
+    if (error != 0)
     {
       printf ("Document system error for file '%s'!", error);
     }
@@ -1393,7 +1393,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     if (num_maps == 1)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
       	first_map->map_dir);
-    else if (num_maps == 2 && cache_map != NULL)
+    else if (num_maps == 2 && cache_map != 0)
     {
       if (cache_map != first_map)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
@@ -1416,11 +1416,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     if (cmdline->GetOption ("dupes"))
       do_dupes = true;
       
-    if ((!do_regions) && cache_map != NULL)
+    if ((!do_regions) && cache_map != 0)
     {
       // First we force a clear of the cache manager in the engine
       // so that a new one will be made soon.
-      Engine->SetCacheManager (NULL);
+      Engine->SetCacheManager (0);
       // Then we set the current directory right.
       if (!SetMapDir (cache_map->map_dir))
 	return false;
@@ -1455,13 +1455,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       {
         // First we force a clear of the cache manager in the engine
         // so that a new one will be made soon.
-        Engine->SetCacheManager (NULL);
+        Engine->SetCacheManager (0);
         // And finally we get the cache manager which will force it
         // to be created based on current VFS dir.
         Engine->GetCacheManager ();
 
         Engine->GetCurrentRegion ()->Prepare ();
-        Engine->SelectRegion ((iRegion*)NULL);
+        Engine->SelectRegion ((iRegion*)0);
       }
     }
 
@@ -1471,7 +1471,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     if (do_regions)
     {
       Engine->GetCurrentRegion ()->Prepare ();
-      Engine->SelectRegion ((iRegion*)NULL);
+      Engine->SelectRegion ((iRegion*)0);
     }
     Inititalize2DTextures ();
     ParseKeyCmds ();
@@ -1547,17 +1547,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Initialize collision detection system (even if disabled so
   // that we can enable it later).
-  InitCollDet (Engine, NULL);
+  InitCollDet (Engine, 0);
 
   // Load a few sounds.
   if (mySound)
   {
     csRef<iSoundWrapper> w (CS_GET_NAMED_CHILD_OBJECT (
     	Engine->QueryObject (), iSoundWrapper, "boom.wav"));
-    wMissile_boom = w ? w->GetSound () : NULL;
+    wMissile_boom = w ? w->GetSound () : 0;
     w = CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (),
 					iSoundWrapper, "whoosh.wav");
-    wMissile_whoosh = w ? w->GetSound () : NULL;
+    wMissile_whoosh = w ? w->GetSound () : 0;
   }
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -1649,7 +1649,7 @@ static void CreateSystem(void)
 int main (int argc, char* argv[])
 {
   // Initialize the random number generator
-  srand (time (NULL));
+  srand (time (0));
 
   CreateSystem();
 

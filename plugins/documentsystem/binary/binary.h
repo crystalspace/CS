@@ -28,7 +28,7 @@ class csBinaryDocumentSystem : public iDocumentSystem, public iComponent
 public:
   SCF_DECLARE_IBASE;
   
-  csBinaryDocumentSystem (iBase* parent = NULL);
+  csBinaryDocumentSystem (iBase* parent = 0);
   virtual ~csBinaryDocumentSystem ();
 	
   virtual bool Initialize (iObjectRegistry* objreg);

@@ -61,10 +61,10 @@ csLibraryHandle csFindLoadLibrary (char const* iModule);
 /**
  * Same but you give the possible suffix and prefix. This is usually called
  * by the system-dependent implementation of csFindLoadLibrary, and not
- * by the user. iPrefix can be either NULL or something like "lib";
- * the routine tries both with (if it is not NULL) and without prefix.
+ * by the user. iPrefix can be either 0 or something like "lib";
+ * the routine tries both with (if it is not 0) and without prefix.
  * Same about iSuffix - it can be something like ".dll" or ".so", but
- * not NULL (because all OSes use some suffix for shared libs).
+ * not 0 (because all OSes use some suffix for shared libs).
  */
 csLibraryHandle csFindLoadLibrary (char const* iPrefix,
   char const* iName, char const* iSuffix);

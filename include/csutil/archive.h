@@ -135,7 +135,7 @@ public:
    * it will be overwritten. Calling NewFile twice with same filename
    * without calling Flush() inbetween will cause unpredictable results.
    * <p>
-   * Returns NULL if not succesful. Otherwise it returns a pointer
+   * Returns 0 if not succesful. Otherwise it returns a pointer
    * that can be passed to 'Write' routine. You won't see any changes
    * to archive until 'Flush' will be called.
    * <p>
@@ -157,15 +157,15 @@ public:
    * Return true if a file exists. Also return the
    * size of the file if needed.
    */
-  bool FileExists (const char *name, size_t *size = NULL) const;
+  bool FileExists (const char *name, size_t *size = 0) const;
 
   /**
    * Read a file completely. After finishing with the returned
    * data you need to 'delete[]' it. If the file does not exists
-   * this function returns NULL. If "size" is not null, it is set
+   * this function returns 0. If "size" is not null, it is set
    * to unpacked size of the file.
    */
-  char *Read (const char *name, size_t *size = NULL);
+  char *Read (const char *name, size_t *size = 0);
 
   /**
    * Write data to a file. Note that 'size' need not be
@@ -186,11 +186,11 @@ public:
    */
   bool Flush ();
 
-  /// Get Nth file in archive or NULL
+  /// Get Nth file in archive or 0
   void *GetFile (int no)
-  { return (no >= 0) && (no < dir.Length ()) ? dir.Get (no) : NULL; }
+  { return (no >= 0) && (no < dir.Length ()) ? dir.Get (no) : 0; }
 
-  /// Find a file in archive; returns a handle or NULL
+  /// Find a file in archive; returns a handle or 0
   void *FindName (const char *name) const;
   /// Query name from handle
   char *GetFileName (void *entry) const

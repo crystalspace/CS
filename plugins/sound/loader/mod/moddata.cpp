@@ -54,7 +54,7 @@ static long cs_modreader_tell (MREADER* mr)
 static int cs_modreader_read (MREADER* mr, void *dest, size_t length)
 {
   csModSoundData::cs_mod_reader *r = (csModSoundData::cs_mod_reader *)mr;
-  if (r->ds.data == NULL) return 0;
+  if (r->ds.data == 0) return 0;
 
   size_t maxsize = MIN (((size_t)(r->ds.length - r->ds.pos)), length);
   memcpy (dest, r->ds.data + r->ds.pos, maxsize);
@@ -105,16 +105,16 @@ csModSoundData::csModSoundData (iBase *parent, uint8 *data, size_t len)
   SCF_CONSTRUCT_IBASE (parent);
 
   mod_ok = false;
-  buf = NULL;
+  buf = 0;
   bytes_left = 0;
-  pos = NULL;
+  pos = 0;
   this->len = 0;
   fmt.Bits = 16;
   fmt.Channels = 2;
   fmt.Freq = 44100;
 
   mod_reader = new cs_mod_reader (data, len, true);
-  module = NULL;
+  module = 0;
 }
 
 csModSoundData::~csModSoundData ()
@@ -171,7 +171,7 @@ bool csModSoundData::Initialize (const csSoundFormat *fmt)
     this->fmt.Channels = channels;
   }
 
-  if (mod_reader == NULL)
+  if (mod_reader == 0)
   {
     printf ("csModSoundData: Not enough memory to load sample\n");
     return false;
@@ -181,9 +181,9 @@ bool csModSoundData::Initialize (const csSoundFormat *fmt)
 
   // now we can free the reader already
   delete mod_reader;
-  mod_reader = NULL;
+  mod_reader = 0;
 
-  if (module == NULL) // no mod file
+  if (module == 0) // no mod file
     return false;
 
   md_mixfreq = this->fmt.Freq;
@@ -219,7 +219,7 @@ bool csModSoundData::IsMod (void *Buffer, size_t len)
   csModSoundData::cs_mod_reader mod_reader ((uint8*)Buffer, len, false);
   MODULE *module = Player_LoadGeneric ((MREADER*)&mod_reader, 64, 0);
 
-  bool is_mod = module != NULL;
+  bool is_mod = module != 0;
 
   if (is_mod)
     Player_Free (module);
@@ -246,7 +246,7 @@ long csModSoundData::GetStaticSampleCount()
 
 void *csModSoundData::GetStaticData()
 {
-  return NULL;
+  return 0;
 }
 
 void csModSoundData::ResetStreamed()
@@ -280,7 +280,7 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
       else
       {
 	NumSamples = 0;
-	return NULL;
+	return 0;
       }
     }
 
@@ -305,7 +305,7 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
   }
 
   NumSamples = 0;
-  return NULL;
+  return 0;
 }
 
 
@@ -336,7 +336,7 @@ public:
 
   virtual csPtr<iSoundData> LoadSound (void *Buffer, uint32 Size)
   {
-    csModSoundData *sd=NULL;
+    csModSoundData *sd=0;
     if (csModSoundData::IsMod (Buffer, Size))
       sd = new csModSoundData ((iBase*)this, (uint8*)Buffer, Size);
     return csPtr<iSoundData> (sd);

@@ -58,7 +58,7 @@ class csPosixThread : public csThread
   virtual bool Wait ();
 
   /**
-   * Return the last eror description and NULL if there was none.
+   * Return the last eror description and 0 if there was none.
    */
   virtual char const* GetLastError ();
 

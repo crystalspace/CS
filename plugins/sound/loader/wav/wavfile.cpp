@@ -195,7 +195,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
 {
   uint8* buf = (uint8*) databuf;
   csSoundFormat format;
-  char* data = NULL;
+  char* data = 0;
 
   int index = 0;
 
@@ -206,7 +206,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
     return 0;
 
   // copy RIFF-header
-  if (memcpy(&riffchk, &buf[0], sizeof (riffchk)) == NULL)
+  if (memcpy(&riffchk, &buf[0], sizeof (riffchk)) == 0)
     return 0;
 
   // check RIFF-header
@@ -230,7 +230,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
        index += fmtchk.len + 8
       )
   {
-    if (memcpy(&fmtchk, &buf[index], sizeof (fmtchk)) == NULL)
+    if (memcpy(&fmtchk, &buf[index], sizeof (fmtchk)) == 0)
       return 0;
 
     if (memcmp(fmtchk.chunk_id, "fmt ", 4) == 0)
@@ -274,7 +274,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
        index += wavchk.len + 8
       )
   {
-    if (memcpy(&wavchk, &buf[index], sizeof (wavchk)) == NULL)
+    if (memcpy(&wavchk, &buf[index], sizeof (wavchk)) == 0)
       return 0;
 
     if (memcmp(wavchk.chunk_id, "data", 4) == 0)
@@ -297,7 +297,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
   data = new char[wavchk.len];
 
   // copy the wav-data into the buffer
-  if (memcpy(data, &buf[index], wavchk.len)==NULL)
+  if (memcpy(data, &buf[index], wavchk.len)==0)
   {
     delete[] data;
     return 0;
@@ -315,7 +315,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
 
   // set up sound-buffer
   int n = (fmtchk.bits_per_sample == 16 ? 2 : 1) * fmtchk.channel;
-  csSoundDataRaw* rawSound = new csSoundDataRaw(NULL, data,
+  csSoundDataRaw* rawSound = new csSoundDataRaw(0, data,
 						(wavchk.len/n)-1, format);
 
   return rawSound;

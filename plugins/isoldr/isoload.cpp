@@ -160,7 +160,7 @@ SCF_IMPLEMENT_IBASE_END;
 
 StdIsoLoaderContext::StdIsoLoaderContext (iIsoEngine* Engine)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (0);
   StdIsoLoaderContext::Engine = Engine;
 }
 
@@ -170,7 +170,7 @@ StdIsoLoaderContext::~StdIsoLoaderContext ()
 
 iSector* StdIsoLoaderContext::FindSector (const char* /*name*/)
 {
-  return NULL;
+  return 0;
 }
 
 iMaterialWrapper* StdIsoLoaderContext::FindMaterial (const char* name)
@@ -185,18 +185,18 @@ iMeshFactoryWrapper* StdIsoLoaderContext::FindMeshFactory (const char* name)
 
 iMeshWrapper* StdIsoLoaderContext::FindMeshObject (const char* /*name*/)
 {
-  return NULL;
+  return 0;
 }
 
 iTextureWrapper* StdIsoLoaderContext::FindTexture (const char* /*name*/)
 {
-  return NULL;
+  return 0;
 }
 
 iLight* StdIsoLoaderContext::FindLight(const char *name)
 {
   // TODO: Implement this.
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -260,7 +260,7 @@ iMaterialWrapper *csIsoLoader::FindMaterial (const char *iName)
 
   ReportError ("crystalspace.iso.loader.findmaterial",
     "Could not find material named '%s'!", iName);
-  return NULL;
+  return 0;
 }
 
 iMeshFactoryWrapper *csIsoLoader::FindMeshFactory (const char *iName)
@@ -273,7 +273,7 @@ iMeshFactoryWrapper *csIsoLoader::FindMeshFactory (const char *iName)
 
   ReportError("crystalspace.iso.loader.findmeshfactory",
     "Could not find mesh factory named '%s'!",iName);
-  return NULL;
+  return 0;
 }
 
 //-- End - Helpers -----------------------------------------------
@@ -294,12 +294,12 @@ bool csIsoLoader::TestXml (const char* file, iDataBuffer* buf,
     if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
     doc = xml->CreateDocument ();
     const char* error = doc->Parse (buf);
-    if (error != NULL)
+    if (error != 0)
     {
       ReportError (
 	      "crystalspace.maploader.parse.xml",
     	      "XML error '%s' for file '%s'!", error, file);
-      doc = NULL;
+      doc = 0;
       return false;
     }
   }
@@ -635,7 +635,7 @@ bool csIsoLoader::ParseTile2D (iDocumentNode* node, const char* /*prefix*/)
   csVector3 start, end;
   int offx, offz;
   int height_map = false;
-  iMaterialWrapper *mat_wrap = NULL;
+  iMaterialWrapper *mat_wrap = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -850,11 +850,11 @@ bool csIsoLoader::ParseMaterialList (iDocumentNode* node, const char* /*prefix*/
 bool csIsoLoader::ParseMeshFactory(iDocumentNode* node, const char *prefix)
 {
   char* tag = "crystalspace.iso.loader.parsemeshfactory";
-  iLoaderPlugin* plug = NULL;
+  iLoaderPlugin* plug = 0;
 
   iMeshFactoryWrapper* mfw = Engine->CreateMeshFactory (prefix);
 
-  ldr_context = NULL;
+  ldr_context = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -922,11 +922,11 @@ bool csIsoLoader::ParseMeshObject (iDocumentNode* node, const char* prefix)
   char* tag = "crystalspace.iso.loader.parsemeshobject"; 
 
   csRef<iMeshObject> meshobj;
-  iLoaderPlugin* plug = NULL;
+  iLoaderPlugin* plug = 0;
   csMatrix3 m;
   csVector3 v;
 
-  ldr_context = NULL;
+  ldr_context = 0;
 
   iIsoMeshSprite* meshspr = Engine->CreateMeshSprite();
 
@@ -1009,7 +1009,7 @@ bool csIsoLoader::ParseMeshObject (iDocumentNode* node, const char* prefix)
 
       case XMLTOKEN_PARAMS:
         {
-          csRef<iBase> mo (plug->Parse (child, GetLoaderContext(), NULL));
+          csRef<iBase> mo (plug->Parse (child, GetLoaderContext(), 0));
 	  if (!mo)
           {
             ReportError (tag,"Error in PARAMS() for %s.",prefix);
@@ -1090,8 +1090,8 @@ csIsoLoader::csIsoLoader(iBase *p)
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
-  current_grid = NULL;
-  object_reg = NULL;
+  current_grid = 0;
+  object_reg = 0;
 }
 
 csIsoLoader::~csIsoLoader()

@@ -78,8 +78,8 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
 bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 {
   const char *strDriver;
-  dispdriver = NULL;
-  xvis = NULL;
+  dispdriver = 0;
+  xvis = 0;
 
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
@@ -88,13 +88,13 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
+  if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", 0)))
   {
     dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, iOpenGLDisp);
     if (!dispdriver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
-        "Could not create an instance of %s ! Using NULL instead.",
+        "Could not create an instance of %s ! Using 0 instead.",
         strDriver);
     }
     else if (!dispdriver->open ())
@@ -180,10 +180,10 @@ void csGraphics2DGLX::Close(void)
     
   // Close your graphic interface
   csGraphics2DGLCommon::Close ();
-  if (active_GLContext != NULL)
+  if (active_GLContext != 0)
   {
     glXDestroyContext(dpy,active_GLContext);
-    active_GLContext = NULL;
+    active_GLContext = 0;
   }
 
   if (dispdriver)

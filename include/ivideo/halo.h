@@ -58,7 +58,7 @@ struct iHalo : public iBase
    * Draw the halo given a center point and an intensity.
    * If either w and/or h is negative, the native width and/or height
    * is used instead. If the halo should be clipped against some
-   * polygon, that polygon should be given, otherwise if a NULL pointer
+   * polygon, that polygon should be given, otherwise if a 0 pointer
    * is passed, the halo is clipped just against screen bounds.
    */
   virtual void Draw (float x, float y, float w, float h, float iIntensity,

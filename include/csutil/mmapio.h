@@ -149,7 +149,7 @@ public:
    * \c filename is tried to be resolved to a native path. Otherwise, \c filename is
    * used as is, hence it must already be a native path.
    */
-  csMemoryMappedIO(unsigned _block_size, char const *filename, iVFS* vfs = NULL);
+  csMemoryMappedIO(unsigned _block_size, char const *filename, iVFS* vfs = 0);
 
   /** 
    * Destroys the mmapio object, closes open files, and releases memory.

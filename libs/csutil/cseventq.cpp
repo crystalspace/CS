@@ -31,7 +31,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0), SpinLock(0),
-  busy_looping (0), delete_occured (false), EventPool(NULL)
+  busy_looping (0), delete_occured (false), EventPool(0)
 {
   SCF_CONSTRUCT_IBASE (0);
   Resize (iLength);
@@ -276,7 +276,7 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
       Listeners.Delete(n);
     else
     {
-      Listeners[n].object = NULL;
+      Listeners[n].object = 0;
       delete_occured = true;
     }
     listener->DecRef();
@@ -294,7 +294,7 @@ void csEventQueue::RemoveAllListeners ()
     }
     else
     {
-      Listeners[i].object = NULL;
+      Listeners[i].object = 0;
       delete_occured = true;
     }
     listener->DecRef();

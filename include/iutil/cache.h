@@ -46,31 +46,31 @@ SCF_VERSION (iCacheManager, 0, 0, 1);
  * <p>
  * Note that both 'type' and 'scope' can be made default using
  * SetCurrentType() and SetCurrentScope(). If those are set then
- * you can use NULL for type and/or scope in CacheData() and
- * ReadCache(). If you don't use NULL then the given value will
+ * you can use 0 for type and/or scope in CacheData() and
+ * ReadCache(). If you don't use 0 then the given value will
  * override the default values.
  */
 struct iCacheManager : public iBase
 {
   /**
    * Set current type. This will be used in CacheData() and
-   * ReadCache() when the given 'type' there is NULL.
+   * ReadCache() when the given 'type' there is 0.
    */
   virtual void SetCurrentType (const char* type) = 0;
 
   /**
-   * Get current type or NULL if none set.
+   * Get current type or 0 if none set.
    */
   virtual const char* GetCurrentType () const = 0;
 
   /**
    * Set current scope. This will be used in CacheData() and
-   * ReadCache() when the given 'scope' there is NULL.
+   * ReadCache() when the given 'scope' there is 0.
    */
   virtual void SetCurrentScope (const char* scope) = 0;
 
   /**
-   * Get current scope or NULL if none set.
+   * Get current scope or 0 if none set.
    */
   virtual const char* GetCurrentScope () const = 0;
 
@@ -81,7 +81,7 @@ struct iCacheManager : public iBase
   	const char* type, const char* scope, uint32 id) = 0;
 
   /**
-   * Retrieve some data from the cache. Returns NULL if the
+   * Retrieve some data from the cache. Returns 0 if the
    * data could not be found in the cache.
    * \remark Returned buffer is NOT null-terminated. 
    * \remark Don't modify returned buffer!
@@ -93,16 +93,16 @@ struct iCacheManager : public iBase
    * Clear items from the cache. There are four ways to call
    * this function:
    * <ul>
-   * <li>NULL, NULL, NULL: clear entire cache.
-   * <li>'type', NULL, NULL: clear everything of this type.
-   * <li>'type', 'scope', NULL: clear everything of this type and scope.
+   * <li>0, 0, 0: clear entire cache.
+   * <li>'type', 0, 0: clear everything of this type.
+   * <li>'type', 'scope', 0: clear everything of this type and scope.
    * <li>'type', 'scope', id: clear the specific item.
    * </ul>
    * Returns true if items were deleted. Returns false if item was not
    * found or deletion is not possible.
    */
-  virtual bool ClearCache (const char* type = NULL, const char* scope = NULL,
-  	const uint32* id = NULL) = 0;
+  virtual bool ClearCache (const char* type = 0, const char* scope = 0,
+  	const uint32* id = 0) = 0;
 };
 
 #endif // __CS_IUTIL_CACHE_H__

@@ -40,10 +40,10 @@ protected:
       : next(newnext), prev(newprev), data(d)
     {}
   
-    /// Next element in list. If this is the last one, then next is NULL
+    /// Next element in list. If this is the last one, then next is 0
     csListElement* next;
   
-    /// Previous element in list. If this is the first one, prev is NULL
+    /// Previous element in list. If this is the first one, prev is 0
     csListElement* prev;
   
     /// Accual data
@@ -107,7 +107,7 @@ public:
     /// Sets iterator to an invalid element
     inline void Clear ()
     {
-      ptr = NULL;
+      ptr = 0;
     }
 
     inline Iterator operator++(int)
@@ -222,7 +222,7 @@ template <class T> void csList<T>::DeleteAll ()
 /// add one item last in the list
 template <class T> typename csList<T>::Iterator csList<T>::PushBack (const T& item)
 {
-  csListElement* el = new csListElement (item, NULL, tail);
+  csListElement* el = new csListElement (item, 0, tail);
   if (tail)
     tail->next = el;
   else
@@ -235,7 +235,7 @@ template <class T> typename csList<T>::Iterator csList<T>::PushBack (const T& it
 /// add one item first in the list
 template <class T> typename csList<T>::Iterator csList<T>::PushFront (const T& item)
 {
-  csListElement* el = new csListElement (item, head, NULL);
+  csListElement* el = new csListElement (item, head, 0);
   if (head)
     head->prev = el;
   else

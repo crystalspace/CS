@@ -6,7 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics3d.null</name>
-        <description>NULL 3D graphics driver for Crystal Space</description>
+        <description>0 3D graphics driver for Crystal Space</description>
         <requires>
           <class>crystalspace.font.server.</class>
         </requires>

@@ -139,7 +139,7 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
   }
 
   //No mirror plane for this plane yet.
-  m_pMirrorPlane = NULL;
+  m_pMirrorPlane = 0;
 }
 
 CMapTexturedPlane::CMapTexturedPlane(CMapTexturedPlane* pPlane, bool mirrored)
@@ -164,7 +164,7 @@ CMapTexturedPlane::CMapTexturedPlane(CMapTexturedPlane* pPlane, bool mirrored)
   }
 
   //No mirror plane for this plane yet.
-  m_pMirrorPlane = NULL;
+  m_pMirrorPlane = 0;
 }
 
 CMapTexturedPlane::CMapTexturedPlane(CdVector3 v0, CdVector3 v1, CdVector3 v2,
@@ -183,7 +183,7 @@ CMapTexturedPlane::CMapTexturedPlane(CdVector3 v0, CdVector3 v1, CdVector3 v2,
   D() = D() / len;
 
   //This plane is flatshaded
-  m_pTexture  = NULL;
+  m_pTexture  = 0;
   m_PlaneName = "";
 
   m_tx[0] = CdVector3(0,0,0);
@@ -191,7 +191,7 @@ CMapTexturedPlane::CMapTexturedPlane(CdVector3 v0, CdVector3 v1, CdVector3 v2,
   m_tx[2] = CdVector3(0,0,0);
 
   //No mirror plane for this plane yet.
-  m_pMirrorPlane = NULL;
+  m_pMirrorPlane = 0;
 }
 
 

@@ -53,7 +53,7 @@ struct iMaterialWrapper : public iBase
 
   /**
    * Change the material handle. Note: This will also change the base
-   * material to NULL.
+   * material to 0.
    */
   virtual void SetMaterialHandle (iMaterialHandle *mat) = 0;
   /// Get the material handle.

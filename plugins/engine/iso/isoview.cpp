@@ -48,7 +48,7 @@ csIsoView::csIsoView (iBase *iParent, iIsoEngine *eng, iIsoWorld *world)
   invx_axis_y = 1.0 / x_axis.y;
 
   // prealloc a renderview
-  rview = new csIsoRenderView(NULL);
+  rview = new csIsoRenderView(0);
   fakecam = new csIsoFakeCamera();
 }
 
@@ -118,7 +118,7 @@ void csIsoView::Draw()
     }
   }
 
-  rview->GetG3D()->SetClipper(NULL, CS_CLIPPER_NONE);
+  rview->GetG3D()->SetClipper(0, CS_CLIPPER_NONE);
   delete clipper;
   //printf("IsoView::Draw done\n");
 }

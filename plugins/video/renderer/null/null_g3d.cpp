@@ -42,7 +42,7 @@ SCF_IMPLEMENT_FACTORY (csGraphics3DNull)
 
 SCF_EXPORT_CLASS_TABLE (null3d)
   SCF_EXPORT_CLASS_DEP (csGraphics3DNull, "crystalspace.graphics3d.null",
-    "NULL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
+    "0 3D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csGraphics3DNull)
@@ -63,10 +63,10 @@ csGraphics3DNull::csGraphics3DNull (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
-  scfiEventHandler = NULL;
+  scfiEventHandler = 0;
 
-  texmgrnull = NULL;
-  vbufmgr = NULL;
+  texmgrnull = 0;
+  vbufmgr = 0;
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -188,8 +188,8 @@ void csGraphics3DNull::Close()
     return;
 
   texmgrnull->Clear ();
-  texmgrnull->DecRef (); texmgrnull = NULL;
-  vbufmgr->DecRef (); vbufmgr = NULL;
+  texmgrnull->DecRef (); texmgrnull = 0;
+  vbufmgr->DecRef (); vbufmgr = 0;
 
   G2D->Close ();
   G2D = 0;

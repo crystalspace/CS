@@ -28,7 +28,7 @@
 
 extern "C" void xs_init (pTHX); // defined in csperlxs.c
 
-iObjectRegistry *scripts_iObjectRegistry = NULL;
+iObjectRegistry *scripts_iObjectRegistry = 0;
 
 SCF_IMPLEMENT_IBASE (csPerl5)
   SCF_IMPLEMENTS_INTERFACE (iScript)
@@ -91,7 +91,7 @@ bool csPerl5::Init (iObjectRegistry *objreg)
   char *realinc = (char *) incbuff->GetData ();
   char *argv [] = { "perl5", "-T", "-I", realinc, "-e", "0" };
   int argc = 5;
-  perl_parse (my_perl, xs_init, argc, argv, NULL);
+  perl_parse (my_perl, xs_init, argc, argv, 0);
   perl_run (my_perl);
   return true;
 }
@@ -274,7 +274,7 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
   if (ok)
     return ret;
   else
-    return NULL;
+    return 0;
 }
 
 SCF_IMPLEMENT_IBASE (csPerl5::Object)
@@ -317,5 +317,5 @@ csPtr<iScriptObject> csPerl5::NewObject
   if (sv)
     return csPtr<iScriptObject> (new Object (this, type, sv));
   else
-    return NULL;
+    return 0;
 }

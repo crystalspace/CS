@@ -102,7 +102,7 @@ struct iObject : public iBase
    * Note that the returned object will be IncRef'ed.
    */
   virtual void* GetChild (int iInterfaceID, int iVersion,
-    const char *Name = NULL, bool FirstName = false) const = 0;
+    const char *Name = 0, bool FirstName = false) const = 0;
 
   /// Return the first child object with the given name
   virtual iObject *GetChild (const char *Name) const = 0;

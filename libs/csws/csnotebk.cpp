@@ -117,8 +117,8 @@ csNotebook::cspPageData::cspPageData (csComponent *ipage, unsigned char iflags)
   page = ipage;
   flags = iflags;
   zorder = -1;
-  image = NULL;
-  text = NULL;
+  image = 0;
+  text = 0;
 }
 
 csNotebook::cspPageData::~cspPageData ()
@@ -145,7 +145,7 @@ static int notebkref = 0;
 
 // The sprites
 csPixmap *csNotebook::sprites [12] =
-{ NULL };
+{ 0 };
 
 csNotebook::csNotebook (csComponent *iParent, int iStyle) : csComponent (iParent)
 {
@@ -195,7 +195,7 @@ csNotebook::~csNotebook ()
     for (i = 0; i < 12; i++)
     {
       delete sprites [i];
-      sprites [i] = NULL;
+      sprites [i] = 0;
     }
 }
 
@@ -629,7 +629,7 @@ bool csNotebook::HandleEvent (iEvent &Event)
           }
           break;
         default:
-          if ((app->KeyboardOwner == NULL)
+          if ((app->KeyboardOwner == 0)
            && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
            && (Event.Key.Modifiers & CSMASK_FIRST))
 		  {
@@ -750,7 +750,7 @@ bool csNotebook::AddTab (cspPageData *iPageData, const char *iInfo,
 
   // Tell component to stay below any controls we may overlay above
   iPageData->page->SetState (CSS_TOPSELECT, false);
-  SetZorder (iPageData->page, NULL);
+  SetZorder (iPageData->page, 0);
 
   // Select this page if no other is
   if (!focused || focused->id != ID_NOTEBOOK_PAGE)

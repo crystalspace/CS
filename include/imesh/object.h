@@ -205,7 +205,7 @@ struct iMeshObject : public iBase
 
   /**
    * Get the material of the mesh. If not supported this will
-   * return NULL.
+   * return 0.
    */
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
 
@@ -269,7 +269,7 @@ struct iMeshObjectFactory : public iBase
 
   /**
    * Get the generic interface describing the geometry of this mesh factory.
-   * It is possible that this will return NULL if the factory itself doesn't
+   * It is possible that this will return 0 if the factory itself doesn't
    * support the geometry. In that case you need to get the object model
    * from the individual instance instead. Note that for collision detection
    * and other parts of CS it is prefered to use the factory object model

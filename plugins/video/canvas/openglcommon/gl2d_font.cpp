@@ -96,7 +96,7 @@ struct FontDeleteNotify : public iFontDeleteNotify
 {
   void* glyphset;
   SCF_DECLARE_IBASE;
-  FontDeleteNotify () { SCF_CONSTRUCT_IBASE (NULL); }
+  FontDeleteNotify () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~FontDeleteNotify () { }
   virtual void BeforeDelete (iFont* font);
 };
@@ -244,7 +244,7 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
     {
       for (pixelx = 0; pixelx < width; pixelx++)
       {
-	if (alphasource == NULL)
+	if (alphasource == 0)
 	{
 	  // strip a bit off and dump it into the base bitmap
 	  *characterbitmapbase++ = (currentsourcebyte & 128) ? 255 : 0;

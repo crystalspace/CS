@@ -27,7 +27,7 @@ csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSound
 {
   SoundRender = srdr;
   Registered = true;
-  buffer=NULL;  
+  buffer=0;  
 
   NumSamples = Data->IsStatic() ? Data->GetStaticSampleCount() :
   (((float)(Data->GetFormat()->Freq)) * BufferLengthSeconds);
@@ -45,10 +45,10 @@ csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSound
 
 csSoundHandleDS3D::~csSoundHandleDS3D() 
 {
-  SoundRender = NULL;
+  SoundRender = 0;
   if (buffer)
     free(buffer);
-  buffer=NULL;
+  buffer=0;
 }
 
 void csSoundHandleDS3D::Unregister() 
@@ -59,8 +59,8 @@ void csSoundHandleDS3D::Unregister()
 
 csPtr<iSoundSource> csSoundHandleDS3D::CreateSource(int Mode3d) 
 {
-  if (!Registered) return NULL;
-  csSoundSourceDS3D *src = new csSoundSourceDS3D(NULL);
+  if (!Registered) return 0;
+  csSoundSourceDS3D *src = new csSoundSourceDS3D(0);
 
 
   if (src->Initialize(SoundRender, this, Mode3d, NumSamples))
@@ -68,7 +68,7 @@ csPtr<iSoundSource> csSoundHandleDS3D::CreateSource(int Mode3d)
   else
   {
     src->DecRef();
-    return NULL;
+    return 0;
   }
 
 
