@@ -32,7 +32,7 @@
  * Use this macro in the Initialize() method of a module that wants
  * to use RTTI.
  */
-#define INTIALIZE_OBJECT_TYPE(StringServer, type);			\
+#define INITIALIZE_OBJECT_TYPE(StringServer, type);			\
 	csObjectType_##type = (StringServer)->Request (#type);
 
 /// This is the 'dynamic cast'.
@@ -51,11 +51,11 @@
 #define IMPLEMENT_OBJECT_INTERFACE(object)				\
 	void *object::QueryObjectType (int Type) {
 
-#define IMPLEMENTS_OBJECT_TYPE(tvar)					\
-	if (Type == tvar) return this;
+#define IMPLEMENTS_OBJECT_TYPE(type)					\
+	if (Type == csObjectType_##type) return this;
 
-#define IMPLEMENTS_EMBEDDED_OBJECT_TYPE(object, tvar)			\
-	if (Type == tvar) return (object)->QueryObjectType (Type);
+#define IMPLEMENTS_EMBEDDED_OBJECT_TYPE(object, type)			\
+	if (Type == csObjectType_##type) return (object)->QueryObjectType (Type);
 
 #define IMPLEMENT_OBJECT_INTERFACE_END					\
 	return NULL; }
