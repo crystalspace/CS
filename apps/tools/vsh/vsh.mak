@@ -52,7 +52,7 @@ all: $(VSH.EXE)
 vshell: $(OUTDIRS) $(VSH.EXE)
 clean: vshellclean
 
-$(VSH.EXE): $(OBJ.VSH) $(LIB.VSH)
+$(VSH.EXE): $(DEP.EXE) $(OBJ.VSH) $(LIB.VSH)
 	$(DO.LINK.CONSOLE.EXE)
 
 vshellclean:
