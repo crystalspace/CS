@@ -72,8 +72,7 @@ LFLAGS.profile = -pg
 DFLAGS.optimize += -s
 
 # Flags for linking DLLs in debug mode
-DFLAGS.debug = 
-#DFLAGS.debug = -Xlinker --export-all-symbols
+DFLAGS.debug = -Xlinker --export-all-symbols
 
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL = $(DFLAGS.$(MODE)) -shared
