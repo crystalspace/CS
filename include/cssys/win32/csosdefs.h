@@ -149,7 +149,9 @@
 #include <winbase.h>
 #include <malloc.h>
 
+#ifndef WINGDIAPI
 #define WINGDIAPI DECLSPEC_IMPORT
+#endif
 
 #undef min
 #undef max
