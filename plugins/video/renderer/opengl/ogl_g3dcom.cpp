@@ -2675,6 +2675,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // OpenGL matrices.
   //===========
 
+  // @@@ CACHE matrix mode too!!!???
+  // Probably very worthwhile!
   glMatrixMode (GL_PROJECTION);
   glPushMatrix ();
   glLoadIdentity ();

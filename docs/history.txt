@@ -1,8 +1,44 @@
 The history order is reversed so that new features are at the top.
 
+10-Jun-2001
+	- Norman Kramer did the following:
+	    - Blocks now decrefs its queried soundwrapper, releases/stops the
+	      background sound and decrefs the loaded font ... this all
+	      results in blocks not leaving any unreleased instances at exit
+	      anymore.
+	    - csEngine::Clear now releases all collected objects via
+	      ObjRemoveAll (this will assure for instance soundwrappers are
+	      decref'd correctly).
+	    - DecRef'ed the created proc_image (think there must be a Ref
+	      bug in the software procedural texture interface - boy do I
+	      hate that).
+	    - Made iSoundHandle::Play return a soundsource for looping sounds.
+	    - Soundsources parent is the originating soundhandle instead of
+	      soundrender: this prevents circular dependency with
+	      IncRef/DecRef.
+	- Michael Voasse did the following:
+	    - Normalized metaball default rendering area to be symmetrical
+	      on all axes.
+	    - The metaballs should now render around (0,0,0) where you place
+	      them rather than at (0,0,10).
+	- Wouter Wijngaards fixed his latest fix to terrvis.
 9-Jun-2001
+	- Fixed a bug in csRenderView::ClipBBox() with regards to clipping
+	  to the near plane in combination with mirroring. This would
+	  result in meshes not being culled away when seen through a mirror
+	  when they should have been culled away.
 	- Fixed a crash in terrain engine where dx/dy for the height
 	  function would go slightly out of bounds.
+	- Norman Kramer added missing engine->DecRef() in csView.
+	- Norman did: interface id has been requested for every plugin loaded
+	  when querying an interface.
+	- Wouter Wijngaards did a few fixes to terrain visibility:
+	    - Fixed a bug where the terrainvis front to back was not
+	      working. Need to XOR, not add to the camchild.
+	    - Fixed GetHorIndex() routine, now the angle-indices are arranged
+	      so that idx=0 and idx=horsize/2 have the x-axis running through
+	      their middle. So z<0 or z>0 will not make much of a difference
+	      anymore in these cases.
 8-Jun-2001
 	- Added iMeshObjectType::GetFeatures(), also added iMeshObject
 	  GetLODFeatures(), SetLODFeatures(), GetLOD(), SetLOD(), and
@@ -87,6 +123,17 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed the binary meta.zip file from CVS and re-added
 	  the `world' as a simple text file in CS/data/metaball/world.  Updated
 	  vfs.cfg to point at this new location.
+	- Robert Bate did updates to the Mac port again:
+	    - Codewarrior is very picky with the floating point constants
+	      passed to templated routines.  Making sure they all are floats.
+	    - Enhanced carbon compatibility.
+	    - Updated all Mac project files.
+	    - Cleaned up the 2d driver code for OpenGL.
+	    - Added the Mac to the extension detection code.
+	- Norman Kramer changed format directives in scf.cfg.
+	- Norman also fixed the iso engine after Jorrit broke it (missing
+	  Callback related methods in iRenderView implementation of iso
+	  engine).
 7-Jun-2001
 	- Justin Miller fixed a minor syntax error in csview.h.
 	- Wouter Wijngaards gave the start to implementing a visibility

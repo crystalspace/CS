@@ -514,12 +514,21 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
   clip_plane = CS_CLIP_NOT;
   if (ctxt->do_clip_plane)
   {
+    bool mirror = GetCamera ()->IsMirrored ();
     int cnt = 0;
     for (i = 0 ; i < 8 ; i++)
     {
       csVector3 c = cbox.GetCorner (i);
-      if (ctxt->clip_plane.Classify (c) < 0)
-	cnt++;
+      if (mirror)
+      {
+        if (ctxt->clip_plane.Classify (c) > 0)
+	  cnt++;
+      }
+      else
+      {
+        if (ctxt->clip_plane.Classify (c) < 0)
+	  cnt++;
+      }
     }
     if (cnt == 8) return false;	// Object not visible.
     if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
