@@ -1,6 +1,23 @@
 The history order has been reversed so that new features are at the top.
 
 6-Apr-2001
+	- Martin Geisse did the first changes towards moving csparser to
+	  a plugin:
+	    - Added iLoaderNew interface which should finally replace iLoader
+	      (in imap/parser.h).
+	    - csLoader no more contains only static member functions. It is
+	      also an implementation of iLoaderNew. In the end the static
+	      member should all disappear. In the meantime, it csLoader
+	      contains a static pointer to an instance of that class, as
+	      soon as an instance is created. This is used by the static
+	      functions to access non-static functions. This means that if you
+	      want to use csLoader functions, even static functions, you
+	      should first create an instance of it. You should do this
+	      by loading it as a plug-in. The plug-in must be statically
+	      registered (e.g. with REGISTER_STATIC_LIBRARY).
+	    - Changed the load_image function to a plugin method (as the
+	      first of all).
+	    - Changed the applications to match the above rules.
 	- Martin Geisse fixed a bug in cctest.
 	- Martin fixed a bug in csstring.
 	- Philip Wyett fixed a bug in simple.
