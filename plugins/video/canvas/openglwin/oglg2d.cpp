@@ -598,4 +598,16 @@ unsigned char* csGraphics2DOpenGL::GetPixelAtGL (int /*x*/, int /*y*/)
   return NULL;
 }
 
+bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
+{
+  POINT p;
+  
+  p.x = x;
+  p.y = y;
 
+  ClientToScreen(m_hWnd, &p);
+
+  ::SetCursorPos(p.x, p.y);
+
+  return true;
+}

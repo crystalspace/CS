@@ -82,6 +82,7 @@ public:
   virtual HRESULT SetColorPalette();
   
   virtual bool SetMouseCursor (int iShape, csTextureHandle* iBitmap);
+  virtual bool SetMousePosition (int x, int y);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);
   virtual bool DoubleBuffer ();
