@@ -280,6 +280,8 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 	csGraphics2DGLCommon::Open( Title );
 
 	aglSwapBuffers( mGLContext );
+
+	glViewport (0, 0, Width, Height);
   
 	return true;
 }
@@ -341,6 +343,8 @@ bool csGraphics2DOpenGL::BeginDraw()
   glOrtho(0.,(GLdouble)Width,0.,(GLdouble)Height,-1.0,100.0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
+
+  glViewport (0, 0, Width, Height);
 
   return true;
 }

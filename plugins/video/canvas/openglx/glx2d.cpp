@@ -401,6 +401,8 @@ bool csGraphics2DGLX::Open(const char *Title)
     return false;
 
   Clear (0);
+  glViewport (0, 0, Width, Height);
+
   return true;
 }
 
@@ -450,6 +452,12 @@ void csGraphics2DGLX::Print (csRect * /*area*/)
   glXSwapBuffers (dpy,window);
   //glFlush (); // not needed?
   XSync (dpy, False);
+}
+
+bool csGraphics2DGLX::BeginDraw ()
+{
+  glViewport (0, 0, Width, Height);
+  return csGraphics2DGLCommon::BeginDraw ();
 }
 
 bool csGraphics2DGLX::SetMousePosition (int x, int y)

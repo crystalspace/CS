@@ -95,6 +95,7 @@ bool csGraphics2DGLBe::Open(const char* title)
     window->Unlock();
   }
 
+  glViewport (0, 0, Width, Height);
   return superclass::Open (title);
 }
 
@@ -111,6 +112,7 @@ bool csGraphics2DGLBe::BeginDraw ()
   superclass::BeginDraw ();
   if (FrameBufferLocked == 1)
     view->LockGL();
+  glViewport (0, 0, Width, Height);
   return true;
 }
 

@@ -78,6 +78,7 @@ public:
   virtual void Close ();
 
   virtual void Print (csRect *area = NULL);
+  virtual bool BeginDraw ();
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);

@@ -313,6 +313,8 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 
   m_bPaletteChanged = false;
 
+  glViewport (0, 0, Width, Height);
+
   return true;
 }
 
@@ -370,6 +372,12 @@ void csGraphics2DOpenGL::Print (csRect* /*area*/)
     m_nActivePage = 1;
   else
     m_nActivePage = 0;
+}
+
+bool csGraphics2DOpenGL::BeginDraw ()
+{
+  glViewport (0, 0, Width, Height);
+  return csGraphics2DGLCommon::BeginDraw ();
 }
 
 HRESULT csGraphics2DOpenGL::SetColorPalette()

@@ -176,6 +176,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
 
   UpdatePalette = FALSE;
 
+  glViewport (0, 0, Width, Height);
   if (!csGraphics2DGLCommon::Open (Title))
     return false;
 
@@ -240,6 +241,8 @@ bool csGraphics2DOS2GL::BeginDraw ()
     glW->SetPalette (GLPalette, 256);
     UpdatePalette = FALSE;
   }
+
+  glViewport (0, 0, Width, Height);
 
   return csGraphics2D::BeginDraw ();
 }

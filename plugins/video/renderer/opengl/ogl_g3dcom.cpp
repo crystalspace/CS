@@ -374,7 +374,8 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 1.0);
-  glViewport(0,0,width,height);
+  // glViewport has moved to the 2D canvas drivers.
+  //glViewport(0,0,width,height);
 
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -465,7 +466,8 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
-    glViewport(0,0,width,height);
+    // glViewport has moved to the 2D canvas drivers.
+    //glViewport(0,0,width,height);
 
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
