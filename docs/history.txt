@@ -13,6 +13,38 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+22-Sep-1999
+	- Optimization for sprites. Sprites are now only clipped to the
+	  frustrum when really needed. This means they are clipped to the
+	  top-level frustrum (the screen in most cases) and to portals
+	  which indicate that they require this kind of clipping.
+	  In addition the clipping first happens with a bounding box
+	  clip. According to that test CS decides what to do next with
+	  all the individual triangles.
+	- Fixed bug with creation of bounding box for skeletal sprites.
+	  The transformation of the connections was not properly taken
+	  into account.
+	- Fixed another bug with creation of bounding box for skeletal
+	  sprites. The assumption that rotating an object space bounding
+	  box is still a valid bounding box after rotation is invalid
+	  if you're only using two corners to rotate.
+	- Created new csBox3 similar to csBox (but a 3D version). It
+	  is part of csgeom. I also put both csBox and csBox3 in
+	  libs/csgeom/box.cpp.
+	- Fixed handling of sprite bounding boxes in general.
+	- Added csClipper::ClassifyBox().
+	- Added csPoly2D::In().
+	- Added csPoly3D::In().
+	- Rendering of sprites is much smarter now. Clipping is only done
+	  when it is really required. The bounding box of the sprite is first
+	  tested against the clipper. If this bounding box is entirely
+	  visible then no clipping of the individual triangles is needed.
+	  If bounding box is entirely not visible then sprite need not
+	  be processed further. This enhancement will greatly improve
+	  speed of drawing sprites.
+	- Fragdance contributed a WAL gfx loader to CS (Quake format).
+	- I fixed a bug in the X 2D driver. It didn't correctly detect 32
+	  bit display mode in all cases.
 21-Sep-1999
 	- Jorrit reverted a fix on sprite lighting which Eric accidentally
 	  removed.
@@ -27,7 +59,8 @@ Short-term cleanups that need to be done:
 	- Fix from Brandon Ehle which could cause WalkTest to crash
 	  at cleanup (especially with OpenGL).
 	- Fixed the creation of the texture mapping transformation matrix.
-	  Now 45 degree polygons will work in all cases.
+	  Now 45 degree polygons will work in all cases (thanks to Ivan
+	  Avramovic for providing the fix).
 	- Eric Sunshine fixed a signed-versus-unsigned comparison warning in
 	  vfs.cpp which afflicted the DOS port.
 	- Eric Sunshine fixed compilation errors in csLoader which showed up
