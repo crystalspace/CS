@@ -70,7 +70,10 @@ want to try it anyway, you should read this:
 @itemize @bullet
 @item
 Version 5 doesn't include any supported DirectX @sc{sdk}, so you'll have to
-download them.
+download it. We recommend the DirectX 8a SDK for release 0.18 or above. It
+can be downloaded from:
+
+@uref{http://www.msdn.microsoft.com/}
 
 @item
 You may get additional warnings which you should ignore. The problem is, you
