@@ -20,6 +20,14 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 
+11-May-99:
+	- Added support for flat texture mapping in 32-bit mode. Enhanced
+	  speed of 8-bit flat texture mapper. Also added support for flat
+	  texture mapping based on lightmap lighting.
+	- Lighting and texture flag now work as expected. The 'texture'
+	  flag enables flat texture drawing in all display modes. The
+	  'lighting' flag enables/disabled lighting also in all display
+	  modes and also works with flat texture drawing enabled.
 10-May-99:
 	- Texture mapping toggle works again (it was broken).
 	  (use the 't' key).
