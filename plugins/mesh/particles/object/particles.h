@@ -413,8 +413,6 @@ private:
 
   int buffer_length;
 
-  //int dead_particles;
-
   bool point_sprites;
 
   csRef<iRenderBuffer> vertex_buffer;
@@ -810,26 +808,16 @@ public:
   } scfiObjectModel;
   friend struct eiObjectModel;
 
-  class ShaderVariableAccessor : public iShaderVariableAccessor
+  class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
-    SCF_DECLARE_IBASE;
-
-    csParticlesObject* parent;
-    ShaderVariableAccessor (csParticlesObject* p) : parent(p)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-    }
-    virtual ~ShaderVariableAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
+    SCF_DECLARE_EMBEDDED_IBASE (csParticlesObject);
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      parent->PreGetShaderVariableValue (variable);
+      scfParent->PreGetShaderVariableValue (variable);
     }
-  } shaderVarAccessor;
-  friend class ShaderVariableAccessor;
+  } scfiShaderVariableAccessor;
+  friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
 };

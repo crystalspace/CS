@@ -388,27 +388,16 @@ public:
 
   //------------------ iShaderVariableAccessor implementation ------------
 #ifdef CS_USE_NEW_RENDERER
-  class ShaderVariableAccessor : public iShaderVariableAccessor
+  class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
-    SCF_DECLARE_IBASE;
-
-    csGenmeshMeshObject* parent;
-    ShaderVariableAccessor (csGenmeshMeshObject* p) : parent(p)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-    }
-    virtual ~ShaderVariableAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      parent->PreGetShaderVariableValue (variable);
+      scfParent->PreGetShaderVariableValue (variable);
     }
-  } shaderVarAccessor;
-  friend class ShaderVariableAccessor;
+  } scfiShaderVariableAccessor;
+  friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
 #endif // CS_USE_NEW_RENDERER
@@ -728,27 +717,16 @@ public:
 
   //------------------ iShaderVariableAccessor implementation ------------
 #ifdef CS_USE_NEW_RENDERER
-  class ShaderVariableAccessor : public iShaderVariableAccessor
+  class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
-    SCF_DECLARE_IBASE;
-
-    csGenmeshMeshObjectFactory* parent;
-    ShaderVariableAccessor (csGenmeshMeshObjectFactory* p) : parent(p)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-    }
-    virtual ~ShaderVariableAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      parent->PreGetShaderVariableValue (variable);
+      scfParent->PreGetShaderVariableValue (variable);
     }
-  } shaderVarAccessor;
-  friend class ShaderVariableAccessor;
+  } scfiShaderVariableAccessor;
+  friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
 #endif // CS_USE_NEW_RENDERER
