@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "csengine/bsp.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
@@ -880,6 +881,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void* GetPrivateObject () { return (void*)scfParent; }
+    virtual iObject* QueryObject () { return scfParent; }
     virtual void CompressVertices () { scfParent->CompressVertices(); }
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
     virtual iPolygon3D *GetPolygon (int idx);
@@ -1117,6 +1119,20 @@ class csThingObjectType : public iMeshObjectType
 private:
   iObjectRegistry* object_reg;
 
+  /**
+   * List of planes. This vector contains objects of type
+   * csPolyTxtPlane*. Note that this vector only contains named
+   * planes. Default planes which are created for polygons
+   * are not in this list.
+   */
+  csNamedObjVector planes;
+
+  /**
+   * List of curve templates (bezier templates). This vector contains objects of
+   * type csCurveTemplate*.
+   */
+  csNamedObjVector curve_templates;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -1137,6 +1153,32 @@ public:
   {
     return ALL_FEATURES;
   }
+
+  iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
+  iPolyTxtPlane* FindPolyTxtPlane (const char* name);
+  iCurveTemplate* CreateBezierTemplate (const char* name = NULL);
+  iCurveTemplate* FindCurveTemplate (const char *iName);
+
+  struct eiThingEnvironment : public iThingEnvironment
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
+    virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL)
+    {
+      return scfParent->CreatePolyTxtPlane (name);
+    }
+    virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name)
+    {
+      return scfParent->FindPolyTxtPlane (name);
+    }
+    virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL)
+    {
+      return scfParent->CreateBezierTemplate (name);
+    }
+    virtual iCurveTemplate* FindCurveTemplate (const char* name)
+    {
+      return scfParent->FindCurveTemplate (name);
+    }
+  } scfiThingEnvironment;
 
   struct eiComponent : public iComponent
   {

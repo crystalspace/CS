@@ -616,10 +616,12 @@ void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMa
 
 bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 {
-  csPolyTxtPlane *ppl =
-    (csPolyTxtPlane *)csEngine::current_engine->planes.FindByName (iName);
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (csEngine::current_engine->
+  	GetThingType (), iThingEnvironment);
+  iPolyTxtPlane* ppl = te->FindPolyTxtPlane (iName);
+  te->DecRef ();
   if (!ppl) return false;
-  scfParent->SetTextureSpace (ppl);
+  scfParent->SetTextureSpace (ppl->GetPrivateObject ());
   return true;
 }
 

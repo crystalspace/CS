@@ -859,7 +859,12 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     else poly3d->SetTextureSpace (tx_orig, tx1, tx1_len);
   }
   else if (plane_name[0])
-    poly3d->SetTextureSpace (engine->FindPolyTxtPlane (plane_name));
+  {
+    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment);
+    poly3d->SetTextureSpace (te->FindPolyTxtPlane (plane_name));
+    te->DecRef ();
+  }
   else if (tx_len)
   {
     // If a length is given (with 'LEN') we will take the first two vertices
@@ -1105,8 +1110,10 @@ Nag to Jorrit about this feature if you want it.\n");
         {
 	  char cname[100];
 	  csScanStr (params, "%s", cname);
-	  iCurveTemplate* ct =
-	    engine->FindCurveTemplate (cname/* @@@ Onlyregion?*/);
+	  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+	    iThingEnvironment);
+	  iCurveTemplate* ct = te->FindCurveTemplate (cname);
+	  te->DecRef ();
 	  iCurve* p = thing_state->CreateCurve (ct);
 	  p->QueryObject()->SetName (name);
           if (!ct->GetMaterial ())
@@ -1266,7 +1273,10 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
   char* xname;
   long cmd;
   char* params;
-  iPolyTxtPlane* ppl = engine->CreatePolyTxtPlane ();
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment);
+  iPolyTxtPlane* ppl = te->CreatePolyTxtPlane ();
+  te->DecRef ();
 
   bool tx1_given = false, tx2_given = false;
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
@@ -1424,7 +1434,10 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
   char *params;
   char name[100];
 
-  iCurveTemplate* tmpl = engine->CreateBezierTemplate ();
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+	    iThingEnvironment);
+  iCurveTemplate* tmpl = te->CreateBezierTemplate ();
+  te->DecRef ();
 
   iMaterialWrapper* mat = NULL;
   char str[255];

@@ -27,6 +27,22 @@ The history order is reversed so that new features are at the top.
 	  Added the following two functions:
 	    - GetCollections() (returns new iCollectionList)
 	    - GetCameraPositions() (returns new iCameraPositionList)
+	- Removed two versions of csEngine::FindObjectInRegion().
+	- Moved the list of planes and the list of bezier templates from
+	  the engine to the csThingObjectType class. These are private for
+	  things.
+	- Removed csEngine and iEngine::CreatePlane().
+	- Removed the following functions from iEngine:
+	    - CreatePolyTxtPlane()
+	    - FindPolyTxtPlane()
+	    - CreateBezierTemplate()
+	    - FindCurveTemplate()
+	- Added new iThingEnvironment interface which is implemented by
+	  the iObjectType of things. This interface contains access to all
+	  objects that are global to things (currently planes and curve
+	  factories). It now contains the four functions deleted from
+	  iEngine (see above).
+	- Added iThingState::QueryObject().
 	- Eric Sunshine fixed a problem in csutil.mak where CFG.CSUTIL was
 	  incorrectly given the value "scf.cfg mouse.cfg", rather than the
 	  correct value of "scf.cfg data/config/mouse.cfg".

@@ -122,20 +122,6 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iCurveTemplate* o = SCF_QUERY_INTERFACE_FAST (obj, iCurveTemplate);
-      if (!o) continue;
-      o->DecRef ();
-      scfParent->engine->curve_templates.Delete (
-        scfParent->engine->curve_templates.Find (
-	  ((csCurveTemplate::CurveTemplate*)o)->scfParent));
-      scfParent->ObjRemove (obj);	// Remove from this region.
-      copy[i] = NULL;
-    }
-
-  for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i])
-    {
-      iObject* obj = (iObject*)copy[i];
       iSector* o = SCF_QUERY_INTERFACE_FAST (obj, iSector);
       if (!o) continue;
       o->DecRef ();
@@ -194,21 +180,6 @@ void csRegion::Region::DeleteAll ()
       else
         o->DecRef ();
       scfParent->ObjRemove (obj);	// Remove from this region.
-      copy[i] = NULL;
-    }
-
-  for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i])
-    {
-      iObject* obj = (iObject*)copy[i];
-      iPolyTxtPlane* o = SCF_QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
-      if (!o) continue;
-      o->DecRef ();
-      int idx = scfParent->engine->planes.Find (o->GetPrivateObject ());
-      o->DecRef ();
-      if (idx != -1)
-        scfParent->engine->planes[idx] = 0;
-      scfParent->ObjRemove (obj);
       copy[i] = NULL;
     }
 

@@ -382,14 +382,6 @@ public:
   csSectorList sectors;
 
   /**
-   * List of planes. This vector contains objects of type
-   * csPolyTxtPlane*. Note that this vector only contains named
-   * planes. Default planes which are created for polygons
-   * are not in this list.
-   */
-  csNamedObjVector planes;
-
-  /**
    * List of all collections in the engine. This vector contains objects
    * of type iCollection*.
    */
@@ -400,12 +392,6 @@ public:
    * type csMeshFactoryWrapper*.
    */
   csMeshFactoryList mesh_factories;
-
-  /**
-   * List of curve templates (bezier templates). This vector contains objects of
-   * type csCurveTemplate*.
-   */
-  csNamedObjVector curve_templates;
 
   /**
    * List of all meshes in the engine. This vector contains objects
@@ -545,20 +531,6 @@ private:
    * Setup for starting a Draw or DrawFunc.
    */
   void StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview);
-
-  /**
-   * Find some object (given a name) which is both in a region
-   * and the given vector.
-   */
-  csObject* FindObjectInRegion (csRegion* region,
-	const csNamedObjVector& vector, const char* name) const;
-
-  /**
-   * Find some object (given a name) which is both in a region
-   * and the given vector.
-   */
-  iObject* FindObjectInRegion (csRegion* region,
-	const csNamedObjectVector& vector, const char* name) const;
 
   /**
    * Controll animation and delete meshes that want to die.
@@ -1075,9 +1047,6 @@ public:
     csColor *iTransp, int iFlags);
   /// Register a material to be loaded during Prepare()
   virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture);
-  /// Create a texture plane
-  virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
-    const csMatrix3 &iMatrix);
 
   /// Create a empty sector with given name.
   virtual iSector *CreateSector (const char *iName, bool link = true);
@@ -1143,13 +1112,6 @@ public:
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
-
-  virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
-  virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name,
-  	bool regionOnly = false) const;
-  virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL);
-  virtual iCurveTemplate* FindCurveTemplate (const char *iName,
-  	bool regionOnly = false) const;
 
   virtual iClipper2D* GetTopLevelClipper () const;
 

@@ -48,8 +48,6 @@ struct iCameraPositionList;
 struct iRegion;
 struct iGraphics3D;
 struct iClipper2D;
-struct iPolyTxtPlane;
-struct iCurveTemplate;
 struct iObject;
 struct iCollection;
 struct iCollectionList;
@@ -146,7 +144,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 5, 0);
+SCF_VERSION (iEngine, 0, 6, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -249,9 +247,6 @@ struct iEngine : public iBase
   /// Register a material to be loaded during Prepare()
   virtual iMaterialWrapper* CreateMaterial (const char *iName,
   	iTextureWrapper* texture) = 0;
-  /// Create a texture plane
-  virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
-	const csMatrix3 &iMatrix) = 0;
   /**
    * Create a empty sector with given name.
    * If link == true (default) the sector will be linked to the engine.
@@ -377,30 +372,6 @@ struct iEngine : public iBase
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
-
-  /**
-   * @@@ Temporary function to create a polygon plane. This is temporary
-   * until planes are managed by the thing plugin.
-   */
-  virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL) = 0;
-  /**
-   * @@@ Temporary function to find a polygon plane. This is temporary until
-   * planes are managed by the thing plugin.
-   */
-  virtual iPolyTxtPlane* FindPolyTxtPlane (const char *iName,
-  	bool regionOnly = false) const = 0;
-
-  /**
-   * @@@ Temporary function to create a bezier template. This is temporary
-   * until planes are managed by the thing plugin.
-   */
-  virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL) = 0;
-  /**
-   * @@@ Temporary function to find a curve template. This is temporary until
-   * planes are managed by the thing plugin.
-   */
-  virtual iCurveTemplate* FindCurveTemplate (const char *iName,
-  	bool regionOnly = false) const = 0;
 
   /// @@@ Temporary function until things are moved to a plugin.
   virtual iMeshObjectType* GetThingType () const = 0;

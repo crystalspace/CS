@@ -35,6 +35,9 @@ struct iCurveTemplate;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
+struct iObject;
+struct iPolyTxtPlane;
+struct iCurveTemplate;
 struct csFog;
 
 /**
@@ -58,7 +61,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 0, 10);
+SCF_VERSION (iThingState, 0, 0, 11);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -68,6 +71,9 @@ struct iThingState : public iBase
 {
   /// @@@ UGLY
   virtual void* GetPrivateObject () = 0;
+
+  /// Get the object for this thing.
+  virtual iObject* QueryObject () = 0;
 
   /**
    * Compress the vertex table so that all nearly identical vertices
@@ -213,6 +219,21 @@ struct iThingState : public iBase
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled).
   virtual csFog* GetFog () const = 0;
+};
+
+SCF_VERSION (iThingEnvironment, 0, 0, 1);
+
+/**
+ * This interface is implemented by the iObjectType for things.
+ * Using this interface you can access objects (planes and curve templates)
+ * that are global to all things.
+ */
+struct iThingEnvironment : public iBase
+{
+  virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL) = 0;
+  virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name) = 0;
+  virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL) = 0;
+  virtual iCurveTemplate* FindCurveTemplate (const char *iName) = 0;
 };
 
 #endif

@@ -2891,10 +2891,15 @@ iMeshObject* csThing::MeshObjectFactory::NewInstance ()
 SCF_IMPLEMENT_IBASE (csThingObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iThingEnvironment)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiThingEnvironment)
+  SCF_IMPLEMENTS_INTERFACE (iThingEnvironment)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
@@ -2908,10 +2913,21 @@ csThingObjectType::csThingObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiThingEnvironment);
 }
 
 csThingObjectType::~csThingObjectType ()
 {
+  int i;
+  for (i = 0 ; i < planes.Length () ; i++)
+  {
+    csPolyTxtPlane* p = (csPolyTxtPlane*)planes[i];
+    planes[i] = NULL;
+    p->DecRef ();
+  }
+  planes.DeleteAll ();
+  curve_templates.DeleteAll ();
+
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry* object_reg)
@@ -2928,6 +2944,43 @@ iMeshObjectFactory* csThingObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
+
+iPolyTxtPlane* csThingObjectType::CreatePolyTxtPlane (const char* name)
+{
+  csPolyTxtPlane* pl = new csPolyTxtPlane ();
+  planes.Push (pl);
+  if (name) pl->SetName (name);
+  return &(pl->scfiPolyTxtPlane);
+}
+
+iPolyTxtPlane* csThingObjectType::FindPolyTxtPlane (const char *iName)
+{
+  csPolyTxtPlane* pl;
+  pl = (csPolyTxtPlane*)planes.FindByName (iName);
+  if (!pl) return NULL;
+  return &(pl->scfiPolyTxtPlane);
+}
+
+iCurveTemplate* csThingObjectType::CreateBezierTemplate (const char* name)
+{
+  csBezierTemplate* ptemplate = new csBezierTemplate ();
+  if (name) ptemplate->SetName (name);
+  curve_templates.Push (ptemplate);
+  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE_FAST (ptemplate, iCurveTemplate);
+  itmpl->DecRef ();
+  return itmpl;
+}
+
+iCurveTemplate* csThingObjectType::FindCurveTemplate (const char *iName)
+{
+  csCurveTemplate* pl;
+  pl = (csCurveTemplate*)curve_templates.FindByName (iName);
+  if (!pl) return NULL;
+  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE_FAST (pl, iCurveTemplate);
+  itmpl->DecRef ();
+  return itmpl;
+}
+
 
 //---------------------------------------------------------------------------
 

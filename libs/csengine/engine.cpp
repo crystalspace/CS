@@ -25,11 +25,8 @@
 #include "csengine/camera.h"
 #include "csengine/campos.h"
 #include "csengine/light.h"
-#include "csengine/polyplan.h"
-#include "csengine/polytmap.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
-#include "csengine/polytext.h"
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
@@ -760,7 +757,6 @@ void csEngine::DeleteAll ()
   collections.DeleteAll ();
   meshes.DeleteAll ();
   mesh_factories.DeleteAll ();
-  curve_templates.DeleteAll ();
 
 // @@@ I suppose the loop below is no longer needed?
   int i;
@@ -772,14 +768,6 @@ void csEngine::DeleteAll ()
   sectors.DeleteAll ();
 
   camera_positions.DeleteAll ();
-
-  for (i = 0 ; i < planes.Length () ; i++)
-  {
-    csPolyTxtPlane* p = (csPolyTxtPlane*)planes[i];
-    planes[i] = NULL;
-    p->DecRef ();
-  }
-  planes.DeleteAll ();
 
   while (first_dyn_lights)
   {
@@ -1794,16 +1782,6 @@ iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* 
   return wrapper;
 }
 
-bool csEngine::CreatePlane (const char *iName, const csVector3 &iOrigin,
-  const csMatrix3 &iMatrix)
-{
-  csPolyTxtPlane *ppl = new csPolyTxtPlane ();
-  ppl->SetName (iName);
-  ppl->SetTextureSpace (iMatrix, iOrigin);
-  planes.Push (ppl);
-  return true;
-}
-
 iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
 	const char *iName)
 {
@@ -1842,36 +1820,6 @@ iSector* csEngine::CreateSector (const char *iName, bool link)
     sector->DecRef ();
   }
   return sector;
-}
-
-csObject* csEngine::FindObjectInRegion (csRegion* region,
-	const csNamedObjVector& vector, const char* name) const
-{
-  int i;
-  for (i = vector.Length () - 1; i >= 0; i--)
-  {
-    csObject* o = (csObject *)vector[i];
-    if (!region->IsInRegion (o)) continue;
-    const char* oname = o->GetName ();
-    if (name == oname || (name && oname && !strcmp (oname, name)))
-      return o;
-  }
-  return NULL;
-}
-
-iObject* csEngine::FindObjectInRegion (csRegion* region,
-	const csNamedObjectVector& vector, const char* name) const
-{
-  int i;
-  for (i = vector.Length () - 1; i >= 0; i--)
-  {
-    iObject* o = vector.Get (i);
-    if (!region->IsInRegion (o)) continue;
-    const char* oname = o->GetName ();
-    if (name == oname || (name && oname && !strcmp (oname, name)))
-      return o;
-  }
-  return NULL;
 }
 
 iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt)
@@ -2091,50 +2039,6 @@ iMeshWrapper* csEngine::CreateMeshWrapper (const char* name)
   if (name) meshwrap->SetName (name);
   GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
   return &meshwrap->scfiMeshWrapper;
-}
-
-iPolyTxtPlane* csEngine::CreatePolyTxtPlane (const char* name)
-{
-  csPolyTxtPlane* pl = new csPolyTxtPlane ();
-  planes.Push (pl);
-  if (name) pl->SetName (name);
-  return &(pl->scfiPolyTxtPlane);
-}
-
-iPolyTxtPlane* csEngine::FindPolyTxtPlane (const char *iName,
-  bool regionOnly) const
-{
-  csPolyTxtPlane* pl;
-  if (regionOnly && region)
-    pl = (csPolyTxtPlane*)FindObjectInRegion (region, planes, iName);
-  else
-    pl = (csPolyTxtPlane*)planes.FindByName (iName);
-  if (!pl) return NULL;
-  return &(pl->scfiPolyTxtPlane);
-}
-
-iCurveTemplate* csEngine::CreateBezierTemplate (const char* name)
-{
-  csBezierTemplate* ptemplate = new csBezierTemplate ();
-  if (name) ptemplate->SetName (name);
-  curve_templates.Push (ptemplate);
-  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE_FAST (ptemplate, iCurveTemplate);
-  itmpl->DecRef ();
-  return itmpl;
-}
-
-iCurveTemplate* csEngine::FindCurveTemplate (const char *iName,
-	bool regionOnly) const
-{
-  csCurveTemplate* pl;
-  if (regionOnly && region)
-    pl = (csCurveTemplate*)FindObjectInRegion (region, curve_templates, iName);
-  else
-    pl = (csCurveTemplate*)curve_templates.FindByName (iName);
-  if (!pl) return NULL;
-  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE_FAST (pl, iCurveTemplate);
-  itmpl->DecRef ();
-  return itmpl;
 }
 
 //----------------Begin-Multi-Context-Support------------------------------
