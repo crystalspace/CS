@@ -37,6 +37,11 @@ The history order is reversed so that new features are at the top.
 	  CS_JAMCONFIG_OUTPUT()'s filter was using a non-portable sed
 	  expression which failed with some sed implementations (such as the
 	  one shipped with MacOS/X).
+	- Oktal updated the Perl plugin to support the new version, Perl 5.8:
+	    - Renamed the interpreter plugin to my_perl, in line with the
+	      assumptions of the macros in the Perl API.
+	    - Fixed the incorrectly-defined function prototype of the xs_init
+	      function, which only worked by chance before 5.8.
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an

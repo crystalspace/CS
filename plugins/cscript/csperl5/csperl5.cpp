@@ -26,7 +26,7 @@
 
 #include <string.h>
 
-extern "C" void xs_init (); // defined in csperlxs.c
+extern "C" void xs_init (pTHX); // defined in csperlxs.c
 
 iObjectRegistry *scripts_iObjectRegistry = NULL;
 
@@ -84,27 +84,27 @@ bool csPerl5::Initialize (iObjectRegistry *objreg)
     return false;
   }
 
-  perl = perl_alloc ();
-  if (! perl)
+  my_perl = perl_alloc ();
+  if (! my_perl)
   {
     reporter->ReportError ("crystalspace.perl5.init.alloc",
       "perl5: Can't allocate memory for perl interpreter");
     return false;
   }
-  perl_construct (perl);
+  perl_construct (my_perl);
 
   char *realinc = (char *) incbuff->GetData ();
   char *argv [] = { "perl5", "-T", "-I", realinc, "-e", "0" };
   int argc = 5;
-  perl_parse (perl, xs_init, argc, argv, NULL);
-  perl_run (perl);
+  perl_parse (my_perl, xs_init, argc, argv, NULL);
+  perl_run (my_perl);
   return true;
 }
 
 csPerl5::~csPerl5 ()
 {
-  perl_destruct (perl);
-  perl_free (perl);
+  perl_destruct (my_perl);
+  perl_free (my_perl);
 }
 
 bool csPerl5::RunText (const char *text)

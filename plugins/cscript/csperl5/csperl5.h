@@ -30,7 +30,7 @@ struct iObjectRegistry;
 class csPerl5 : public iScript
 {
   private:
-  PerlInterpreter *perl;
+  PerlInterpreter *my_perl;
 
   protected:
   csRef<iReporter> reporter;
