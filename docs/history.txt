@@ -25,6 +25,10 @@ The history order is reversed so that new features are at the top.
 		type of operations (the ones that cause a timed operation
 		will not work properly).
 	- Eric Sunshine eliminated comilation warnings.
+	- Changed the way that timed operations are created in the
+	  engine sequence manager. They are now much more optimal (only
+	  query for the object on which they operate once instead of
+	  every frame) and they also work properly with parameters now.
 2-Oct-2002
 	- Cleaned up new thing smoothing code (code style, please people
 	  a tab == 8 spaces but indentation MUST be with 2 spaces!!!).
