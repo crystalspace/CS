@@ -87,7 +87,7 @@ class csPosixMutex : public csMutex
   bool Destroy ();
  protected:
   pthread_mutex_t mutex;
-#ifndef PTHREAD_HAS_RECURSIVE_NP
+#ifndef CS_PTHREAD_MUTEX_RECURSIVE
   int count;
   pthread_t owner;
 #endif

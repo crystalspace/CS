@@ -40,12 +40,12 @@ csPosixMutex::csPosixMutex (bool needrecursive)
 {
   lasterr = NULL;
 
-#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+#ifdef CS_PTHREAD_MUTEX_RECURSIVE
   if (needrecursive)
   {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init (&attr);
-    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+    pthread_mutexattr_settype (&attr, CS_PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init (&mutex, &attr);
   }
   else
@@ -87,7 +87,7 @@ bool csPosixMutex::Destroy ()
 bool csPosixMutex::LockWait()
 {
   int rc;
-#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+#ifdef CS_PTHREAD_MUTEX_RECURSIVE
   rc = pthread_mutex_lock (&mutex);
 #else
   pthread_t self = pthread_self();
@@ -123,7 +123,7 @@ bool csPosixMutex::LockWait()
 bool csPosixMutex::LockTry ()
 {
   int rc;
-#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+#ifdef CS_PTHREAD_MUTEX_RECURSIVE
   rc = pthread_mutex_trylock (&mutex);
 #else
   pthread_t self = pthread_self();
@@ -166,7 +166,7 @@ bool csPosixMutex::Release ()
 {
   int rc;
   
-#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+#ifdef CS_PTHREAD_MUTEX_RECURSIVE
   rc = pthread_mutex_unlock (&mutex);
 #else
   CS_ASSERT (pthread_self() == owner);

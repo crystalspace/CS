@@ -1067,7 +1067,7 @@ CS_CHECK_COMMON_LIBS
 
 #------------------------------------------------------------------------------
 # Check for pthread.  Also check if pthread implementation supports the
-# RECURSIVE_NP extension.
+# recursive mutex extension.
 #------------------------------------------------------------------------------
 m4_define([cs_pthread_flags],
     [CS_CREATE_TUPLE() \
@@ -1087,19 +1087,25 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 CS_CHECK_PTHREAD
 
 AS_IF([test $cs_cv_sys_pthread = yes],
-    [CS_CHECK_BUILD([for pthread recursive mutexes],
-	[cs_cv_sys_pthread_mutex_recursive],
-	[AC_LANG_PROGRAM(
-	    [#include <pthread.h>],
-	    [pthread_mutex_t mutex;
-	    pthread_mutexattr_t attr;
-	    pthread_mutexattr_init (&attr);
-	    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);])],
-	[], [C++], [CS_HEADER_PROPERTY([PTHREAD_MUTEX_HAS_RECURSIVE_NP])], [], [],
-	[$cs_cv_sys_pthread_cflags],
-	[$cs_cv_sys_pthread_lflags],
-	[$cs_cv_sys_pthread_libs])])
-
+    [AC_CACHE_CHECK([for pthread recursive mutexes],
+	[cs_cv_sys_pthread_recursive],
+	[CS_BUILD_IFELSE(
+	    [AC_LANG_PROGRAM(
+		[#include <pthread.h>],
+		[pthread_mutexattr_t attr;
+		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
+	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
+	    CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
+	    [C++],
+	    [cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
+		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
+	    [cs_cv_sys_pthread_recursive=no],
+	    [$cs_cv_sys_pthread_cflags],
+	    [$cs_cv_sys_pthread_lflags],
+	    [$cs_cv_sys_pthread_libs])])
+    AS_IF([test $cs_cv_sys_pthread_recursive != no],
+	[CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
+	    [$cs_cv_sys_pthread_recursive])])])
 
 
 #------------------------------------------------------------------------------
@@ -1306,7 +1312,7 @@ AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
 
 
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Check for libmikmod.  In addition to the standard installed locations, we
 # also search CS/libs/libmikmod*.
 #------------------------------------------------------------------------------
@@ -1319,7 +1325,7 @@ CS_CHECK_LIB_WITH([mikmod],
 
 
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Check for libogg/libvorbis/libvorbisfile.
 # In addition to the standard installed locations, we
 # also search CS/libs/libogg*.CS/libs/libvorbis.* CS/libs/libvorbisfile*
@@ -1356,7 +1362,7 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 
 
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Check for lib3ds.  In addition to the standard installed locations, we
 # also search CS/libs/lib3ds*.
 #------------------------------------------------------------------------------
@@ -1376,23 +1382,28 @@ CS_CHECK_LIB3DS
 
 
 
-#-----------------------------------------------------------------------------
-# Check for libode.  In addition to the standard installed locations, we
-# also search CS/libs/libode*.
+#------------------------------------------------------------------------------
+# Check for libode.  In addition to the standard installed locations, we also
+# search CS/libs/libode*.  Also check if it is a sufficiently recent version
+# (0.035 as of this writing).
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ode],
-    [AC_LANG_PROGRAM(
-	[#include <ode/ode.h>],
-	[dWorldCreate();
-	 dBodySetGravityMode (0, 0);
-	 dCloseODE();
-	])],
-    [libs/libode*], [C++],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])])
+    [AC_LANG_PROGRAM([#include <ode/ode.h>], [dWorldCreate()])],
+    [libs/libode*], [C++])
+
+AS_IF([test $cs_cv_libode = yes],
+    [CS_CHECK_BUILD([if libode is sufficiently recent], [cs_cv_libode_recent],
+	[AC_LANG_PROGRAM(
+	    [#include <ode/ode.h>],
+	    [dWorldCreate();
+	    dBodySetGravityMode(0,0);
+	    dCloseODE();])],
+	[], [C++], [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
+	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])])
 
 
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Check for libopenal.  In addition to the standard installed locations, we
 # also search CS/libs/libopenal*.
 #------------------------------------------------------------------------------
@@ -1419,9 +1430,9 @@ CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 
 
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Check for FreeType2.
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 AC_CHECK_FT2([2.0],
     [CS_MAKEFILE_PROPERTY([FT2.AVAILABLE], [yes])
     CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
@@ -1815,9 +1826,9 @@ AS_IF([test $cs_cv_cxx_qint_ok = no],
 
 
 
-#----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Check if Linux joystick plugin should be built.
-#----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to enable Linux joystick support])
 AC_ARG_ENABLE([linux-joystick],
     [AC_HELP_STRING([--enable-linux-joystick],

@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+4-Feb-2003
+	- Augmented the ODE check in configure.ac so that it works in two
+	  phases.  First it checks for libode.  Second, it checks if the
+	  installed libode is sufficiently recent.  This approach will provide
+	  better feedback and debugging information for a user than the old
+	  approach where the checks were combined.
+	- Eric Sunshine enhanced the "recursive pthread mutex" check in
+	  configure.ac so that it recognizes both PTHREAD_MUTEX_RECURSIVE and
+	  PTHREAD_MUTEX_RECURSIVE_NP, rather than only recognizing the _NP
+	  variation.  The detected macro, if any, is now properly employed by
+	  cspthrd.cpp.
 3-Feb-2003
 	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
 	  improved portability since not all platforms have fabsf().  (An
