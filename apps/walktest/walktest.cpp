@@ -126,7 +126,6 @@ WalkTest::WalkTest () :
   wf = NULL;
   map_mode = MAP_OFF;
   map_projection = WF_ORTHO_PERSP;
-  do_fps = true;
   do_stats = false;
   do_edges = false;
   do_show_coord = false;
@@ -232,7 +231,6 @@ void WalkTest::Report (int severity, const char* msg, ...)
 void WalkTest::SetDefaults ()
 {
   csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  do_fps = Config->GetBool ("Walktest.Settings.FPS", true);
   do_stats = Config->GetBool ("Walktest.Settings.Stats", false);
   do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
   do_logo = Config->GetBool ("Walktest.Settings.DrawLogo", true);
@@ -290,17 +288,6 @@ void WalkTest::SetDefaults ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics disabled.");
   }
 
-  if (cmdline->GetOption ("fps"))
-  {
-    do_fps = true;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second enabled.");
-  }
-  else if (cmdline->GetOption ("nofps"))
-  {
-    do_fps = false;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second disabled.");
-  }
-
   if (cmdline->GetOption ("infinite"))
     do_infinite = true;
 
@@ -343,7 +330,6 @@ void WalkTest::Help ()
   printf ("Options for WalkTest:\n");
   printf ("  -exec=<script>     execute given script at startup\n");
   printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
-  printf ("  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
@@ -615,11 +601,6 @@ void WalkTest::DrawFrameConsole ()
     int fw, fh;
     Font->GetMaxSize (fw, fh);
 
-    if (do_fps)
-    {
-      GfxWrite (11, FRAME_HEIGHT - fh - 3, 0, -1, "FPS=%.2f", timeFPS);
-      GfxWrite (10, FRAME_HEIGHT - fh - 2, fgcolor_stats, -1, "FPS=%.2f", timeFPS);
-    }
     if (do_stats)
     {
       char buffer[50];
@@ -1061,43 +1042,6 @@ void perf_test (int num)
   cnt = 1;
   time0 = (csTicks)-1;
   Sys->busy_perf_test = false;
-}
-
-void CaptureScreen ()
-{
-  int i = 0;
-  char name [25];
-  do
-  {
-    sprintf (name, "/this/cryst%03d.png", i++);
-  } while (i < 1000 && Sys->myVFS->Exists(name));
-  if (i >= 1000)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Too many screenshot files in current directory");
-    return;
-  }
-
-  csRef<iImage> img (csPtr<iImage> (Gfx2D->ScreenShot ()));
-  if (!img)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "The 2D graphics driver does not support screen shots");
-    return;
-  }
-  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (Sys->object_reg, iImageIO));
-  if (imageio)
-  {
-    csRef<iDataBuffer> db (imageio->Save (img, "image/png"));
-    if (db)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
-      if (!Sys->myVFS->WriteFile (name, (const char*)db->GetData (),
-      		db->GetSize ()))
-      {
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"There was an error while writing screen shot");
-      }
-    }
-  }
 }
 
 /*---------------------------------------------

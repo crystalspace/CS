@@ -41,6 +41,9 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/dbghelp.h"
+#include "iutil/virtclk.h"
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -121,6 +124,11 @@ csBugPlug::csBugPlug (iBase *iParent)
   selected_mesh = NULL;
   scfiEventHandler = NULL;
   shadow->SetShadowMesh (selected_mesh);
+
+  do_fps = true;
+  fps_frame_count = 0;
+  fps_tottime = 0;
+  fps_cur = -1;
 
   debug_sector.sector = NULL;
   debug_sector.view = NULL;
@@ -216,6 +224,13 @@ void csBugPlug::SetupPlugin ()
   if (!VFS)
   {
     printf ("No VFS!\n");
+    return;
+  }
+
+  if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!vc)
+  {
+    printf ("No vc!\n");
     return;
   }
 
@@ -489,6 +504,46 @@ bool csBugPlug::EatMouse (iEvent& event)
   return true;
 }
 
+void csBugPlug::CaptureScreen ()
+{
+  int i = 0;
+  char name [25];
+  do
+  {
+    sprintf (name, "/this/cryst%03d.png", i++);
+  }
+  while (i < 1000 && VFS->Exists (name));
+  if (i >= 1000)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Too many screenshot files in current directory");
+    return;
+  }
+
+  csRef<iImage> img (csPtr<iImage> (G2D->ScreenShot ()));
+  if (!img)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"The 2D graphics driver does not support screen shots");
+    return;
+  }
+  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+  if (imageio)
+  {
+    csRef<iDataBuffer> db (imageio->Save (img, "image/png"));
+    if (db)
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
+      if (!VFS->WriteFile (name, (const char*)db->GetData (),
+      		db->GetSize ()))
+      {
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"There was an error while writing screen shot");
+      }
+    }
+  }
+}
+
 bool csBugPlug::EatKey (iEvent& event)
 {
   SetupPlugin ();
@@ -609,7 +664,8 @@ bool csBugPlug::EatKey (iEvent& event)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Nah nah! I will NOT quit!");
         break;
       case DEBUGCMD_STATUS:
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "I'm running smoothly, thank you...");
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"I'm running smoothly, thank you...");
         break;
       case DEBUGCMD_DEBUGGRAPH:
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Debug graph dumped!");
@@ -951,6 +1007,18 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"Debug sector is not active now!");
 	}
         break;
+      case DEBUGCMD_FPS:
+        do_fps = !do_fps;
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s fps display.",
+		do_fps ? "enabled" : "disabled");
+	fps_frame_count = 0;
+	fps_tottime = 0;
+	fps_cur = -1;
+        break;
+      case DEBUGCMD_SCRSHOT:
+        CaptureScreen ();
+	break;
     }
     process_next_key = false;
   }
@@ -984,10 +1052,36 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
   return false;
 }
 
+void GfxWrite (iGraphics2D* g2d, iFont* font,
+	int x, int y, int fg, int bg, char *str, ...)
+{
+  va_list arg;
+  char buf[256];
+
+  va_start (arg, str);
+  vsprintf (buf, str, arg);
+  va_end (arg);
+
+  g2d->Write (font, x, y, fg, bg, buf);
+}
+
 bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
   if (!G3D) return false;
+
+  if (do_fps)
+  {
+    csTicks elapsed_time = vc->GetElapsedTicks ();
+    fps_tottime += elapsed_time;
+    fps_frame_count++;
+    if (fps_tottime > 500)
+    {
+      fps_cur = (float (fps_frame_count) * 1000.0) / float (fps_tottime);
+      fps_frame_count = 0;
+      fps_tottime = 0;
+    }
+  }
 
   if (visculler)
   {
@@ -1104,6 +1198,25 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     fnt->GetDimensions (cursor, cursor_w, cursor_h);
     G2D->Write (fnt, x+5+cursor_w, y+5+fh+7, fgcolor, -1, "_");
   }
+
+  if (do_fps)
+  {
+    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
+    iFontServer* fntsvr = G2D->GetFontServer ();
+    CS_ASSERT (fntsvr != NULL);
+    csRef<iFont> fnt (fntsvr->GetFont (0));
+    if (fnt == NULL)
+    {
+      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+    }
+    int sh = G2D->GetHeight ();
+    int fw, fh;
+    fnt->GetMaxSize (fw, fh);
+    int fgcolor = G3D->GetTextureManager ()->FindRGB (255, 255, 255);
+    GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
+    GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
+  }
+
   if (spider_hunting)
   {
     iCamera* camera = spider->GetCamera ();
@@ -1273,6 +1386,8 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "ds_left"))		return DEBUGCMD_DS_LEFT;
   if (!strcmp (cmd, "ds_right"))	return DEBUGCMD_DS_RIGHT;
   if (!strcmp (cmd, "debugview"))	return DEBUGCMD_DEBUGVIEW;
+  if (!strcmp (cmd, "scrshot"))		return DEBUGCMD_SCRSHOT;
+  if (!strcmp (cmd, "fps"))		return DEBUGCMD_FPS;
 
   return DEBUGCMD_UNKNOWN;
 }
@@ -1386,7 +1501,8 @@ void csBugPlug::ReadKeyBindings (const char* filename)
 
 void csBugPlug::Dump (iEngine* engine)
 {
-  Report (CS_REPORTER_SEVERITY_DEBUG, "===========================================");
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+  	"===========================================");
   iSectorList* sectors = engine->GetSectors ();
   iMeshList* meshes = engine->GetMeshes ();
   iMeshFactoryList* factories = engine->GetMeshFactories ();
@@ -1411,7 +1527,8 @@ void csBugPlug::Dump (iEngine* engine)
     iMeshWrapper* mesh = meshes->Get (i);
     Dump (mesh);
   }
-  Report (CS_REPORTER_SEVERITY_DEBUG, "===========================================");
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+  	"===========================================");
 }
 
 void csBugPlug::Dump (iSector* sector)

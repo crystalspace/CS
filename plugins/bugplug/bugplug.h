@@ -36,6 +36,7 @@ struct iGraphics2D;
 struct iTextureManager;
 struct iConsoleOutput;
 struct iVFS;
+struct iVirtualClock;
 struct iFile;
 struct iSector;
 struct iMeshWrapper;
@@ -113,6 +114,8 @@ class csShadow;
 #define DEBUGCMD_DS_LEFT	1036	// Move left in debug sector
 #define DEBUGCMD_DS_RIGHT	1037	// Move right in debug sector
 #define DEBUGCMD_DEBUGVIEW	1038	// Toggle debug view
+#define DEBUGCMD_SCRSHOT	1039	// Screenshot
+#define DEBUGCMD_FPS		1040	// Toggle fps (default on)
 
 /**
  * For key mappings.
@@ -141,11 +144,18 @@ private:
   csRef<iGraphics2D> G2D;
   csRef<iConsoleOutput> Conout;
   csRef<iVFS> VFS;
+  csRef<iVirtualClock> vc;
   bool initialized;
 
   //------------------------------------------------------------------
   // Specific debugging options.
   //------------------------------------------------------------------
+
+  /// For fps
+  bool do_fps;
+  int fps_frame_count;
+  int fps_tottime;
+  float fps_cur;
 
   /// For 'clear' command.
   bool do_clear;
@@ -196,6 +206,11 @@ private:
    * camera != NULL).
    */
   void HideSpider (iCamera* camera);
+
+  /**
+   * Make a screenshot.
+   */
+  void CaptureScreen ();
 
   /// Current visibility culler we are monitoring.
   iVisibilityCuller* visculler;

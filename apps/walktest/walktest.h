@@ -318,7 +318,6 @@ public:
   iSoundHandle* wMissile_whoosh;
 
   /// Some flags.
-  bool do_fps;
   bool do_stats;
   bool do_show_coord;
   bool busy_perf_test;

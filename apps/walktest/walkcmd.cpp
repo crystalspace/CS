@@ -1120,7 +1120,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  i_rotleftw i_rotrightc i_rotrightw i_rotleftx i_rotleftz");
     CONPRI("  i_rotrightx i_rotrightz do_gravity colldet freelook");
     CONPRI("Statistics:");
-    CONPRI("  stats fps perftest coordshow");
+    CONPRI("  stats perftest coordshow");
     CONPRI("Special effects:");
     CONPRI("  addbot delbot addskel addghost fire explosion spiral rain");
     CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
@@ -1133,7 +1133,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  loadmesh addmesh delmesh listmeshes");
     CONPRI("  listactions setaction setmotion");
     CONPRI("Various:");
-    CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog");
+    CONPRI("  coordsave coordload bind map mapproj p_alpha s_fog");
     CONPRI("  snd_play snd_volume record play clrrec saverec");
     CONPRI("  loadrec action plugins conflist confset");
 
@@ -1399,8 +1399,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     (void)CS_LOAD_PLUGIN_ALWAYS (Sys->plugin_mgr,
     	"crystalspace.utilities.bugplug");
   }
-  else if (!strcasecmp (cmd, "fps"))
-    csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");
   else if (!strcasecmp (cmd, "do_gravity"))
     csCommandProcessor::change_boolean (arg, &Sys->do_gravity, "do_gravity");
   else if (!strcasecmp (cmd, "inverse_mouse"))
@@ -1710,8 +1708,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       f->blue = b;
     }
   }
-  else if (!strcasecmp (cmd, "capture"))
-    CaptureScreen ();
   else if (!strcasecmp (cmd, "portal"))
   {
     if (arg)

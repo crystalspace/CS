@@ -1,15 +1,22 @@
 The history order is reversed so that new features are at the top.
 
-20-Sep-2002 (Keith Fulton)
-	- Added Dynamic Ambient Lighting capability to all Things.
-	- Added sector convenience function to set Dyn Ambient for all things in sector.
 
 20-Sep-2002
+	- Keith Fulton added Dynamic Ambient Lighting capability to all Things.
+	- Keith also added sector convenience function to set Dyn Ambient
+	  for all things in sector.
 	- Fixed XML parsing for <scale> and <shift> for material layers.
 	  Thanks to Brandon for spotting this.
 	- Fixed cs2xml for texture layer scale. It was incorrectly outputting
 	  x,y attributes instead of u,v attributes.
 	- Fixed flarge/world for scale.
+	- Added 'scrshot' command to BugPlug to take a screenshot (similar
+	  to old f12 command in walktest). Assigned this command to
+	  'f12' key.
+	- Added 'fps' command to BugPlug to show fps. By default on.
+	  Assigned this command to 'p' key.
+	- Removed screenshot capability from walktest.
+	- Removed fps viewer from walktest.
 19-Sep-2002
 	- Fixed some memory leaks in csInitializer.
 	- Several enhancements to levtool. By default it now lists the
