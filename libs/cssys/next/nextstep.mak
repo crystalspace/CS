@@ -75,7 +75,7 @@ include libs/cssys/next/next.mak
 NEXT.FRIEND=no
 
 ifeq ($(MAKESECTION),postdefines)
-PUBDLLSYM = $(OUTOS)$(basename $@).sym
-DO.SHARED.PLUGIN  += ; echo "_$(basename $@)_GetClassTable" > $(PUBDLLSYM) ; \
-  $(STRIP) -s $(PUBDLLSYM) -u $(NEXT.STRIP_FLAGS) $@
+PUBDLLSYM = $(OUTOS)$(basename $(notdir $@)).sym
+DO.SHARED.PLUGIN  += ; echo "_$(basename $(notdir $@))_GetClassTable" > \
+  $(PUBDLLSYM) ; $(STRIP) -s $(PUBDLLSYM) -u $(NEXT.STRIP_FLAGS) $@
 endif

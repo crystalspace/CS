@@ -21,6 +21,10 @@ The history order has been reversed so that new features are at the top.
 	  potential problems which Paul Garceau introduced.  
 	- Changed a fix from Eric to octree.cpp to make it a bit more
 	  readable.
+	- Eric Sunshine changed the NeXT ports so that they utilize the
+	  makefile's $(OUTDLL) facility to locate dynamic load libraries in
+	  a subdirectory ("components") rather than polluting the root CS
+	  directory with them.
 16-May-2000
 	- Alex Pfaffe did some minor changes/cleanup to the terrain engine.
 	- Removed a few warnings in terrain.cpp.

@@ -84,10 +84,11 @@ static void initialize_loader()
 //-----------------------------------------------------------------------------
 csLibraryHandle csLoadLibrary( char const* lib )
     {
-    static char const LIBRARY_EXT[] = ".dylib";
-    char* file = new char[strlen(lib) + sizeof(LIBRARY_EXT)]; // Includes '\0'.
-    strcpy( file, lib );
-    strcat( file, LIBRARY_EXT );
+    char* file = new char[strlen(lib) + sizeof(OS_NEXT_PLUGIN_DIR) +
+	sizeof(OS_NEXT_PLUGIN_EXT)]; // Includes '\0'.
+    strcpy( file, OS_NEXT_PLUGIN_DIR );
+    strcat( file, lib );
+    strcat( file, OS_NEXT_PLUGIN_EXT );
 
     initialize_loader();
     csLibraryHandle handle = 0;
@@ -105,7 +106,7 @@ csLibraryHandle csLoadLibrary( char const* lib )
     else
 	fprintf( stderr, "Unable to load library '%s' (%d).\n", file, rc );
 
-    delete file;
+    delete[] file;
     return handle;
     }
 

@@ -4,9 +4,6 @@
 # Only one of the cover makefiles should be including this file.  Ignore others.
 ifeq ($(NEXT.FRIEND),yes)
 
-# None of the NeXT platforms can grok the assembly used by CS
-override DO_ASM=no
-
 # Choose which drivers you want to build/use
 PLUGINS+=video/canvas/next video/renderer/software video/renderer/line
 
@@ -52,6 +49,12 @@ OS=NEXT
 
 # Compiler. Can be one of: GCC, WCC (Watcom C++), MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
+
+NEXT.PLUGIN_DIR=components/
+NEXT.PLUGIN_EXT=.dylib
+
+# None of the NeXT platforms can grok the assembly used by CS
+override DO_ASM=no
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -138,6 +141,9 @@ NASMFLAGS.SYSTEM=
 SRC.SYS_CSSYS = libs/cssys/general/printf.cpp \
   $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)) support/gnu/getopt*.c)
 
+# Where to put dynamic libraries on this system?
+OUTDLL=$(NEXT.PLUGIN_DIR)
+
 # The C compiler.
 CC=cc -c
 
@@ -215,6 +221,8 @@ ifeq ($(ROOTCONFIG),volatile)
 
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_DIR "$(NEXT.PLUGIN_DIR)"$">>volatile.tmp
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_EXT "$(NEXT.PLUGIN_EXT)"$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)
 endif # ifeq ($(MAKESECTION),rootdefines)
