@@ -615,6 +615,14 @@ bool csConsoleOutput::PerformExtensionV (const char *iCommand, va_list args)
     int *fgcolor = va_arg (args, int *);
     *fgcolor = fg;
   }
+  else if (!strcmp (iCommand, "SetBackgroundColor"))
+  {
+    bg = va_arg (args, int);
+  }
+  else if (!strcmp (iCommand, "SetForegroundColor"))
+  {
+    fg = va_arg (args, int);
+  }
   else
     rc = false;
   return rc;

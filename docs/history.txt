@@ -26,6 +26,7 @@ The history order is reversed so that new features are at the top.
 	  perturbed so its no longer on-the-edge. This makes g2dtest
 	  for opengl and software perform about the same on all clip tests.
 	- Wouter fixed the normal cursor in the standard console output.
+	- Wouter added two extensions to standard console to set colours.
 20-Jun-2003
 	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
 	  which prevented it from compiling on msvc6
