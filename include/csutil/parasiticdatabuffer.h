@@ -117,6 +117,11 @@ public:
   SCF_DECLARE_IBASE_POOLED_EXTERN(CS_CRYSTALSPACE_EXPORT, 
     csParasiticDataBufferPooled);
 
+  virtual ~csParasiticDataBufferPooled ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
+
   /**
    * Set contents of this data buffer.
    * Warning: Only call if you did not pass this buffer around yet!

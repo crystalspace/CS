@@ -1843,10 +1843,10 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   }
 }
 
-bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
+bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, size_t num_verts,
 	csBox2Int& bbox)
 {
-  int i, j;
+  size_t i, j;
 
   //---------
   // First we copy the vertices to xa/ya. In the mean time
@@ -1881,7 +1881,7 @@ bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   //---------
   // First initialize dirty_left and dirty_right for every row.
   //---------
-  for (i = 0 ; i < num_tile_rows ; i++)
+  for (i = 0 ; i < (size_t)num_tile_rows ; i++)
   {
     dirty_left[i] = 1000;
     dirty_right[i] = -1;
@@ -1939,17 +1939,17 @@ static void Perspective (const csVector3& v, csVector2& p,
 
 bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
 	float fov, float sx, float sy,
-	csVector3* verts, int num_verts,
+	csVector3* verts, size_t num_verts,
 	bool* used_verts,
-	int* edges, int num_edges,
+	int* edges, size_t num_edges,
 	csBox2Int& bbox, float& max_depth,
 	bool splat_outline)
 {
-  int i;
+  size_t i;
 
   static int* xa = 0, * ya = 0;
   static csVector3* camv = 0;
-  static int max_tr_verts = 0;
+  static size_t max_tr_verts = 0;
   if (num_verts > max_tr_verts)
   {
     //@@@ MEMORY LEAK!!!
@@ -2028,7 +2028,7 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
   //---------
   // First initialize dirty_left and dirty_right for every row.
   //---------
-  for (i = 0 ; i < num_tile_rows ; i++)
+  for (i = 0 ; i < (size_t)num_tile_rows ; i++)
   {
     dirty_left[i] = 1000;
     dirty_right[i] = -1;
@@ -2095,7 +2095,7 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
   return true;
 }
 
-bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
+bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, size_t num_verts,
 	float min_depth)
 {
   csBox2Int bbox;
@@ -2169,7 +2169,7 @@ bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
 }
 
 void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
-	int num_verts, float max_depth)
+	size_t num_verts, float max_depth)
 {
   csBox2Int bbox;
   if (!DrawPolygon (verts, num_verts, bbox))
@@ -2190,7 +2190,7 @@ void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
 }
 
 void csTiledCoverageBuffer::InsertPolygonInvertedNoDepth (csVector2* verts,
-	int num_verts)
+	size_t num_verts)
 {
   csBox2Int bbox;
   if (!DrawPolygon (verts, num_verts, bbox))
@@ -2210,7 +2210,7 @@ void csTiledCoverageBuffer::InsertPolygonInvertedNoDepth (csVector2* verts,
   }
 }
 
-int csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
+int csTiledCoverageBuffer::InsertPolygon (csVector2* verts, size_t num_verts,
 	float max_depth, csBox2Int& modified_bbox)
 {
   csBox2Int bbox;
@@ -2250,7 +2250,7 @@ int csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 }
 
 int csTiledCoverageBuffer::InsertPolygonNoDepth (csVector2* verts,
-	int num_verts)
+	size_t num_verts)
 {
   csBox2Int bbox;
   if (!DrawPolygon (verts, num_verts, bbox))
@@ -2326,9 +2326,9 @@ int csTiledCoverageBuffer::StatusNoDepth ()
 
 int csTiledCoverageBuffer::InsertOutline (
 	const csReversibleTransform& trans, float fov, float sx, float sy,
-	csVector3* verts, int num_verts,
+	csVector3* verts, size_t num_verts,
 	bool* used_verts,
-	int* edges, int num_edges, bool splat_outline,
+	int* edges, size_t num_edges, bool splat_outline,
 	csBox2Int& modified_bbox)
 {
   csBox2Int bbox;

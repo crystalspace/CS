@@ -2736,12 +2736,12 @@ void csOpenGLHalo::DeleteTexture ()
 
 // Draw the halo. Wasn't that a suprise
 void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
-  csVector2 *iVertices, int iVertCount)
+  csVector2 *iVertices, size_t iVertCount)
 {
   //G3D->SwapIfNeeded();
   int swidth = G3D->GetWidth ();
   int sheight = G3D->GetHeight ();
-  int i;
+  size_t i;
 
   if (w < 0) w = Width;
   if (h < 0) h = Height;
@@ -2797,7 +2797,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   glColor4f (R, G, B, iIntensity);
 
   glBegin (GL_POLYGON);
-  for (i = iVertCount - 1; i >= 0; i--)
+  for (i = iVertCount; i-- > 0;)
   {
     float vx = iVertices [i].x, vy = iVertices [i].y;
     glTexCoord2f ((vx - x) * inv_W, (vy - y) * inv_H);

@@ -27,10 +27,3 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_IBASE_POOLED (csParasiticDataBufferPooled)
   SCF_IMPLEMENTS_INTERFACE (iDataBuffer);
 SCF_IMPLEMENT_IBASE_END
-
-void csParasiticDataBufferPooled::PoolRecycle ()
-{
-  parentBuffer = 0;
-  data = 0;
-  size = 0;
-}

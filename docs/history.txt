@@ -24,6 +24,12 @@ chronological order.
 	      computing the RGB intensity.
 	- res fixed some wrong types in ie3ds.
 	- Eric Sunshine added a test suite (strset.t) for csStringSet.
+	- res made the following changes:
+	    - Fixed some 64bit warnings on VC7.0.
+	    - Changed the SCF pooling stuff to use class dtors instead of a 
+	      custom "PoolRecycle()" method.
+	    - Added missing CS_CRYSTALSPACE_EXPORT to csMemoryPool.
+	    - Updates for upcoming cs-win32libs release 010.
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than

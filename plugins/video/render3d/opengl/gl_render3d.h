@@ -107,7 +107,7 @@ public:
   { oR = R; oG = G; oB = B; }
 
   virtual void Draw (float x, float y, float w, float h, float iIntensity,
-    csVector2 *iVertices, int iVertCount);
+    csVector2 *iVertices, size_t iVertCount);
 };
 
 class csGLGraphics3D : public iGraphics3D

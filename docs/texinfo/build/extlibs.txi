@@ -47,11 +47,11 @@ pre-compiled form from the following location:
 
 @noindent
 @ifnottex
-@uref{ftp://sunsite.dk/projects/crystal/support/win32/cs-win32libs-0.99r0_009.exe}
+@uref{ftp://sunsite.dk/projects/crystal/support/win32/cs-win32libs-0.99r0_010.exe}
 @end ifnottex
 @iftex
 @code{ftp://sunsite.dk/projects/crystal/support/win32/}@*
-@code{cs-win32libs-0.99r0_009.exe}
+@code{cs-win32libs-0.99r0_010.exe}
 @end iftex
 
 @subheading zlib

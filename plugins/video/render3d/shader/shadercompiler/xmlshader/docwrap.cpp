@@ -670,6 +670,7 @@ csTextNodeWrapper::csTextNodeWrapper (Pool* pool)
 
 csTextNodeWrapper::~csTextNodeWrapper ()
 {
+  delete[] nodeText;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -677,12 +678,6 @@ void csTextNodeWrapper::SetData (iDocumentNode* realMe, const char* text)
 {
   csTextNodeWrapper::realMe = realMe;
   nodeText = csStrNew (text);
-}
-
-void csTextNodeWrapper::PoolRecycle ()
-{
-  delete[] nodeText;
-  realMe = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -702,6 +697,7 @@ csWrappedDocumentNodeIterator::csWrappedDocumentNodeIterator (Pool* pool)
 
 csWrappedDocumentNodeIterator::~csWrappedDocumentNodeIterator ()
 {
+  delete[] filter; 
   SCF_DESTRUCT_IBASE();
 }
 
@@ -715,12 +711,6 @@ void csWrappedDocumentNodeIterator::SetData (csWrappedDocumentNode* node,
   walker.SetData (parentNode->wrappedChildren, parentNode->resolver);
 
   SeekNext();
-}
-
-void csWrappedDocumentNodeIterator::PoolRecycle ()
-{
-  delete[] filter; filter = 0;
-  next = 0;
 }
 
 void csWrappedDocumentNodeIterator::SeekNext()

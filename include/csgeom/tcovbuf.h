@@ -493,7 +493,7 @@ private:
    * polygon will be extended horizontally.
    * Returns false if polygon is outside screen.
    */
-  bool DrawPolygon (csVector2* verts, int num_verts, csBox2Int& bbox);
+  bool DrawPolygon (csVector2* verts, size_t num_verts, csBox2Int& bbox);
 
   /**
    * Draw an outline on the coverage buffer.
@@ -502,9 +502,9 @@ private:
    * If 'splat_outline' is true then outline splatting is used.
    */
   bool DrawOutline (const csReversibleTransform& trans,
-  	float fov, float sx, float sy, csVector3* verts, int num_verts,
+  	float fov, float sx, float sy, csVector3* verts, size_t num_verts,
   	bool* used_verts,
-  	int* edges, int num_edges, csBox2Int& bbox,
+  	int* edges, size_t num_edges, csBox2Int& bbox,
 	float& max_depth, bool splat_outline);
 
   /**
@@ -550,12 +550,12 @@ public:
    * Function returns false if polygon was not visible (i.e.
    * screen buffer was not modified).
    */
-  bool TestPolygon (csVector2* verts, int num_verts, float min_depth);
+  bool TestPolygon (csVector2* verts, size_t num_verts, float min_depth);
 
   /**
    * Insert an inverted polygon in the coverage buffer.
    */
-  void InsertPolygonInverted (csVector2* verts, int num_verts, float max_depth);
+  void InsertPolygonInverted (csVector2* verts, size_t num_verts, float max_depth);
 
   /**
    * Insert an inverted polygon in the coverage buffer.
@@ -563,7 +563,7 @@ public:
    * This function ignores depth in the depth buffer and should only
    * be used if you don't plan to use depth information nor depend on it.
    */
-  void InsertPolygonInvertedNoDepth (csVector2* verts, int num_verts);
+  void InsertPolygonInvertedNoDepth (csVector2* verts, size_t num_verts);
 
   /**
    * Insert a polygon in the coverage buffer.
@@ -575,7 +575,7 @@ public:
    * <p>
    * If this function returns the number of tiles that were modified.
    */
-  int InsertPolygon (csVector2* verts, int num_verts, float max_depth,
+  int InsertPolygon (csVector2* verts, size_t num_verts, float max_depth,
   	csBox2Int& modified_bbox);
 
   /**
@@ -589,7 +589,7 @@ public:
    * This function ignores depth in the depth buffer and should only
    * be used if you don't plan to use depth information nor depend on it.
    */
-  int InsertPolygonNoDepth (csVector2* verts, int num_verts);
+  int InsertPolygonNoDepth (csVector2* verts, size_t num_verts);
 
   /**
    * Insert an outline in the coverage buffer.
@@ -605,9 +605,9 @@ public:
    * If this function returns the number of tiles that were modified.
    */
   int InsertOutline (const csReversibleTransform& trans,
-  	float fov, float sx, float sy, csVector3* verts, int num_verts,
+  	float fov, float sx, float sy, csVector3* verts, size_t num_verts,
   	bool* used_verts,
-  	int* edges, int num_edges, bool splat_outline,
+  	int* edges, size_t num_edges, bool splat_outline,
 	csBox2Int& modified_bbox);
 
   /**

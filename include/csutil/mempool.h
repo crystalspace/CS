@@ -24,6 +24,7 @@
  */
 
 #include "cssysdef.h"
+#include "csextern.h"
 #include "csutil/parray.h"
 
 // Hack: Work around problems caused by #defining 'new'.
@@ -51,7 +52,7 @@
  * \sa csBlockAllocator
  * \sa csArray
  */
-class csMemoryPool
+class CS_CRYSTALSPACE_EXPORT csMemoryPool
 {
 private:
   /// Array of pointers to heap-allocated blocks.

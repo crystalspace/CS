@@ -33,7 +33,9 @@
 #define	SCF_DECLARE_IBASE_POOLED_DECL(Class, parentClass)\
   Class Pool						\
   {							\
-    parentClass* pool;					\
+    struct PoolEntry;					\
+    PoolEntry* pool;					\
+    PoolEntry* allocedEntries;				\
   public:						\
     Pool ();						\
     ~Pool ();						\
@@ -42,9 +44,7 @@
   };							\
   friend class Pool;					\
   Pool* scfPool;					\
-  parentClass* poolNext;				\
-  virtual void PoolRecycle ();				\
-  SCF_DECLARE_IBASE					\
+  SCF_DECLARE_IBASE
   
 /**
  * Embed this macro instead of #SCF_DECLARE_IBASE into an SCF class that is to 
@@ -54,7 +54,7 @@
  *  \code
  *  csFoo::Pool fooPool;
  *  ...
- *  csFoo* foo = fooPool.Alloc ();
+ *  csRef<csFoo> foo; foo.AttachNew (fooPool.Alloc ());
  *  \endcode
  * \remarks A pooled class \a Class must implement a constructor with the 
  *  following prototype:
@@ -65,11 +65,6 @@
  *  called.
  * \remarks If you need to set instance-specific data, you need to provide a
  *  custom method for that.
- * \remarks You have to provide a method \code void PoolRecycle(); \endcode
- *  to clean up instance-specific data (as due the pooling the destructor will
- *  not be called if all references are cleared). The 
- *  #SCF_IMPLEMENT_DEFAULT_POOLRECYCLE macro contains a default (empty)
- *  implementation.
  */
 #define	SCF_DECLARE_IBASE_POOLED(parentClass) \
   SCF_DECLARE_IBASE_POOLED_DECL(class, parentClass)
@@ -86,8 +81,14 @@
  */
 #define SCF_CONSTRUCT_IBASE_POOLED(Pool)		\
   SCF_CONSTRUCT_IBASE(0);				\
-  poolNext = 0;						\
   scfPool = (Pool)
+
+#define SCF_IMPLEMENT_IBASE_POOL_HELPERS(parentClass)	\
+  struct parentClass::Pool::PoolEntry			\
+  {							\
+    parentClass instance;				\
+    PoolEntry* next;					\
+  };
   
 /**
  * Implement the constructor for the pool manager of \a Class.
@@ -96,7 +97,8 @@
 Class::Pool::Pool ()					\
 { 							\
   pool = 0; 						\
-}						
+  allocedEntries = 0;					\
+}
     
 /**
  * Implement the destructor for the pool manager of \a Class.
@@ -106,10 +108,12 @@ Class::Pool::~Pool ()					\
 { 							\
   while (pool != 0)					\
   {							\
-    Class* n = pool->poolNext;				\
-    delete pool;					\
+    PoolEntry* n = pool->next;				\
+    free (pool);					\
     pool = n;						\
   }							\
+  CS_ASSERT_MSG ("not all SCF-pooled instances released",\
+    allocedEntries == 0);				\
 }							
 
 /**
@@ -118,14 +122,20 @@ Class::Pool::~Pool ()					\
 #define SCF_IMPLEMENT_IBASE_POOL_ALLOC(Class)		\
 Class* Class::Pool::Alloc ()				\
 {							\
-  Class* newInst;					\
+  PoolEntry* newEntry;					\
   if (pool != 0)					\
   {							\
-    newInst = pool;					\
-    pool = pool->poolNext;				\
+    newEntry = pool;					\
+    pool = pool->next;					\
   }							\
   else							\
-    newInst = new Class (this);				\
+  {							\
+    newEntry = (PoolEntry*)malloc (sizeof (PoolEntry));	\
+  }							\
+  Class* newInst = &newEntry->instance;			\
+  new (newInst) Class (this);				\
+  newEntry->next = allocedEntries;			\
+  allocedEntries = newEntry;				\
   return newInst;					\
 }
 
@@ -135,9 +145,20 @@ Class* Class::Pool::Alloc ()				\
 #define SCF_IMPLEMENT_IBASE_POOL_RECYCLE(Class)		\
 void Class::Pool::Recycle (Class* instance)		\
 {							\
-  instance->PoolRecycle ();				\
-  instance->poolNext = pool;				\
-  pool = instance;					\
+  PoolEntry* prev = 0;					\
+  PoolEntry* entry = allocedEntries;			\
+  while (&entry->instance != instance)			\
+  {							\
+    prev = entry;					\
+    entry = entry->next;				\
+  }							\
+  if (prev != 0)					\
+    prev->next = entry->next;				\
+  else							\
+    allocedEntries = entry->next;			\
+  instance->~Class();					\
+  entry->next = pool;					\
+  pool = entry;						\
 }
 
 /**
@@ -176,6 +197,7 @@ void Class::DecRef ()					\
  * Use this in the source module instead of #SCF_IMPLEMENT_IBASE.
  */
 #define SCF_IMPLEMENT_IBASE_POOLED(Class)		\
+  SCF_IMPLEMENT_IBASE_POOL_HELPERS(Class)		\
   SCF_IMPLEMENT_IBASE_POOL(Class)			\
   SCF_IMPLEMENT_IBASE_INCREF_POOLED(Class)		\
   SCF_IMPLEMENT_IBASE_DECREF_POOLED(Class)		\
@@ -183,12 +205,6 @@ void Class::DecRef ()					\
   SCF_IMPLEMENT_IBASE_REFOWNER(Class)			\
   SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(Class)		\
   SCF_IMPLEMENT_IBASE_QUERY(Class)
-
-/**
- * Implement a default \a Class::PoolRecycle().
- */
-#define SCF_IMPLEMENT_DEFAULT_POOLRECYCLE(Class)	\
-void Class::PoolRecycle () { }
 
 /** @} */
 

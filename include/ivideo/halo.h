@@ -62,7 +62,7 @@ struct iHalo : public iBase
    * is passed, the halo is clipped just against screen bounds.
    */
   virtual void Draw (float x, float y, float w, float h, float iIntensity,
-    csVector2 *iVertices, int iVertCount) = 0;
+    csVector2 *iVertices, size_t iVertCount) = 0;
 };
 
 /** @} */
