@@ -21,11 +21,12 @@
 #define __CS_PICOGUI_SERVER_HBITMAP_H__
 
 #include "ivideo/graph2d.h"
+#include "ivideo/texture.h"
 #include "igraphic/image.h"
 
 extern "C"
 {
-  #include <picogui.h>
+  #include <picogui/types.h>
   #include <pgserver/types.h>
   #include <pgserver/render.h>
 }
@@ -41,7 +42,6 @@ class csHwrBitmap
 {
  private:
   csRef<iGraphics2D> g2d;
-  csRef<iImage> image;
   groprender grop;
 
  public:
@@ -49,7 +49,7 @@ class csHwrBitmap
   inline csHwrBitmap (iGraphics2D *g2d0) : g2d (g2d0) {}
 
   /// Construct a bitmap.
-  inline csHwrBitmap (iImage *image0) : image (image0) {}
+  //inline csHwrBitmap (iImage *image0) : image (image0) {}
 
   /// Get the CS 2d graphics class stored in this canvas.
   inline csRef<iGraphics2D> G2D ()
@@ -58,11 +58,31 @@ class csHwrBitmap
   /// Get the CS image class stored in this bitmap,
   /// or take a screenshot if it is a canvas.
   inline csRef<iImage> Image ()
-    { if (image) return image; else return g2d->ScreenShot (); }
+    { /*return image; if (image) return image; else */return g2d->ScreenShot (); }
 
   /// Get the "grop render" structure associated with this bitmap.
   inline groprender* Grop ()
     { return & grop; }
+
+  /*inline void SetPixel (int x, int y, uint32 color)
+  {
+    if (image->GetFormat () == CS_IMGFMT_PALETTED8)
+    {
+      ((char*)image->GetImageData ())[x+y*image->GetWidth ()] = color;
+    } else {
+      ((uint32*)image->GetImageData ())[x+y*image->GetWidth ()] = color;
+    }
+  }
+
+  inline uint32 GetPixel (int x, int y)
+  {
+    if (image->GetFormat () == CS_IMGFMT_PALETTED8)
+    {
+      return ((char*)image->GetImageData ())[x+y*image->GetWidth ()];
+    } else {
+      return ((uint32*)image->GetImageData ())[x+y*image->GetWidth ()];
+    }
+  }*/
 };
 
 /// Cast a PicoGUI hwrbitmap (like a void*) to a csHwrBitmap pointer

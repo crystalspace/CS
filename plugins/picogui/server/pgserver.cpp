@@ -31,8 +31,11 @@
 
 extern "C"
 {
+  #include <picogui/types.h>
+  #include <pgserver/common.h>
   #include <pgserver/init.h>
   #include <pgserver/os.h>
+  #include <pgserver/configfile.h>
 }
 
 CS_IMPLEMENT_PLUGIN
@@ -58,6 +61,7 @@ csPicoGUIServer::csPicoGUIServer (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
@@ -78,6 +82,8 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
   if (! csPGFontEngine::Construct (fsv)) return false;
 
   if (! csPGInputDriver::Construct (evq)) return false;
+
+  //append_param_str("pgserver","themes"," ", "lucid.th");
 
   e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, 0);
   if (iserror(e)) {

@@ -21,9 +21,14 @@
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
 
+/// @@@ Solve this better. "timeval" is what we're after.
+#ifdef WIN32
+#include "winsock.h"
+#endif
 extern "C"
 {
-  #include <picogui.h>
+  #include <picogui/types.h>
+  #include <pgserver/common.h>
   #include <pgserver/types.h>
   #include <pgserver/input.h>
 }

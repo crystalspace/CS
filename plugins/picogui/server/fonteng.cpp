@@ -21,7 +21,8 @@
 
 extern "C"
 {
-  #include <picogui.h>
+  #include <picogui/types.h>
+  #include <pgserver/common.h>
   #include <pgserver/types.h>
   #include <pgserver/font.h>
 }
