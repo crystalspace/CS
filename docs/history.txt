@@ -1,5 +1,24 @@
 The history order is reversed so that new features are at the top.
 
+9-May-2001
+	- Martin Geisse added a version of typed vectors that don't delete
+	  their elements.
+	- Martin cleaned up the hashmap code using typed vectors.
+	- Philip Wyett hacked round commits of yesterday because of the
+	  following:
+	    - Commented out case constant "cslfsTexturedNoFrame"
+  	      which does not exist.
+	    - Added member variable "bool DrawTextOnHighlightOnly",
+  	      which was being initialized at construction, but
+  	      which also did not exist.
+	    - After diffing and finding out this was wrapping
+  	      existing code. Commented out code which made calls
+  	      to "GetDrawTextOnHighlightOnly()", which also does
+  	      not exist.
+	  libcsws now compiles again and all csws dependant
+	  apps seem to be Ok.
+	  In order to find the changes, just do a search for
+	  "redeye", which marks all the changes.
 8-May-2001
 	- Martin Geisse did some changes in the RTTI macros:
 	    - Extended object interfaces now use DECLARE_OBJECT_INTERFACE,
@@ -15,6 +34,8 @@ The history order is reversed so that new features are at the top.
 	  screen boundaries on my card (ATI Rage PRO Mobility).
 	- Moved the new ClipToPlane() routine which was specifically written
 	  for the OpenGL clipper to csFrustum and generalized it.
+	- Christopher Nelson did some minor bugfixes to the buttons to make
+	  drawing work better with transparent/translucent overlays.
 7-May-2001
 	- Martin Geisse started to change the engine to use the new RTTI
 	  system. Also changed IMPLEMENT_OBJECT_INTERFACE and
