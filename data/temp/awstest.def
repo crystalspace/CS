@@ -421,3 +421,74 @@ window "Layout Test"
     }
   }
 }
+
+window "Form1"
+{
+  Style: wfsNormal
+  Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl
+  Frame: (0,0) - (460,252)
+  Title: "Form1"
+
+
+  component "Notebook" is "Notebook"
+  {
+    Style: nbfsBump
+    Frame: (40,40) - (200,200)
+    Location: nbTop
+
+    component "Tab1" is "Notebook Page"
+    {
+       Caption: "Tab1"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test1"
+         Toggle: 1
+       }
+    }
+
+   component "Tab2" is "Notebook Page"
+   {
+       Caption: "Window2"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test2"
+         Toggle: 1
+       }
+    }
+
+   component "Tab3" is "Notebook Page"
+   {
+       Caption: "Win3"
+   }
+
+   component "Tab4" is "Notebook Page"
+   {
+       Caption: "Window4"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test3"
+         Toggle: 1
+       }
+   }
+
+   component "Tab5" is "Notebook Page"
+   {
+       Caption: "Window5"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test4"
+         Toggle: 1
+       }
+   }
+
+
+  }
+}
