@@ -121,6 +121,7 @@ public:
   void RemoveListener (iObjectModelListener* listener);
 
   //----------------------- Shadow and lighting system ----------------------
+  char* GenerateCacheName ();
   void InitializeDefault ();
   bool ReadFromCache (iCacheManager* cache_mgr);
   bool WriteToCache (iCacheManager* cache_mgr);

@@ -20,6 +20,9 @@
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "csgeom/frustum.h"
+#include "cssys/csendian.h"
+#include "csutil/csmd5.h"
+#include "csutil/memfile.h"
 #include "genmesh.h"
 #include "gmtri.h"
 #include "iengine/shadows.h"
@@ -30,11 +33,14 @@
 #include "ivideo/material.h"
 #include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
+#include "iengine/sector.h"
 #include "iengine/camera.h"
+#include "iengine/mesh.h"
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "iutil/objreg.h"
+#include "iutil/object.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -112,6 +118,86 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 
 void csGenmeshMeshObject::InitializeDefault ()
 {
+}
+
+char* csGenmeshMeshObject::GenerateCacheName ()
+{
+  const csBox3& b = factory->GetObjectBoundingBox ();
+
+  csMemFile mf;
+  mf.Write ("genmesh", 7);
+  long l;
+  l = convert_endian ((long)factory->GetVertexCount ());
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)factory->GetTriangleCount ());
+  mf.Write ((char*)&l, 4);
+
+  if (logparent)
+  {
+    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+    if (mw)
+    {
+      if (mw->QueryObject ()->GetName ())
+        mf.Write (mw->QueryObject ()->GetName (),
+		strlen (mw->QueryObject ()->GetName ()));
+      iMovable* movable = mw->GetMovable ();
+      iSector* sect = movable->GetSectors ()->Get (0);
+      if (sect && sect->QueryObject ()->GetName ())
+        mf.Write (sect->QueryObject ()->GetName (),
+		strlen (sect->QueryObject ()->GetName ()));
+      csVector3 pos = movable->GetFullPosition ();
+      l = convert_endian ((long)QInt ((pos.x * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((pos.y * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((pos.z * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      csReversibleTransform tr = movable->GetFullTransform ();
+      const csMatrix3& o2t = tr.GetO2T ();
+      l = convert_endian ((long)QInt ((o2t.m11 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m12 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m13 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m21 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m22 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m23 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m31 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m32 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((long)QInt ((o2t.m33 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+    }
+  }
+
+  l = convert_endian ((long)QInt ((b.MinX () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((b.MinY () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((b.MinZ () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((b.MaxX () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((b.MaxY () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((b.MaxZ () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+
+  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+
+  char* cachename = new char[33];
+  sprintf (cachename,
+  	"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+  	digest.data[0], digest.data[1], digest.data[2], digest.data[3],
+  	digest.data[4], digest.data[5], digest.data[6], digest.data[7],
+  	digest.data[8], digest.data[9], digest.data[10], digest.data[11],
+  	digest.data[12], digest.data[13], digest.data[14], digest.data[15]);
+  return cachename;
 }
 
 bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)

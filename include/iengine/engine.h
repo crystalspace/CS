@@ -458,12 +458,15 @@ struct iEngine : public iBase
 
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
-   * Default is #CS_ENGINE_CACHE_READ.
+   * Default is #CS_ENGINE_CACHE_READ | #CS_ENGINE_CACHE_NOUPDATE.
    * <ul>
    * <li>#CS_ENGINE_CACHE_READ: Read the cache.
    * <li>#CS_ENGINE_CACHE_WRITE: Write the cache.
    * <li>#CS_ENGINE_CACHE_NOUPDATE: Don't update lighting automatically
-   *     if it is not up-to-date. This is on by default.
+   *     if it is not up-to-date. This is on by default. If you disable
+   *     this then lighting will be calculated even if CS_ENGINE_CACHE_WRITE
+   *     is not set which means that the resulting calculation is not
+   *     written to the cache.
    * </ul>
    */
   virtual void SetLightingCacheMode (int mode) = 0;
