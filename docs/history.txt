@@ -60,6 +60,34 @@ The history order has been reversed so that new features are at the top.
 	- Fixed back2front and front2back traversal in 2D bsp.
 	- Started further debugger on system to select octree splitter
 	  based on solid space intersection.
+	- Michael Dale Long fixed a dependency problem that poppup up in
+	  the latest changes to fix vector3 / Dvector3 problems.
+	- Wouter Wijngaards changed walktest so that it now calls
+	  csWorld::UpdateParticleSystems. He also added more options to
+	  show them off in the explosion.
+	- Wouter also added more utility functions to csSprite2D: SetColor,
+	  AddColor to change the color_inits. Also added GetMixMode().
+	- Wouter added support for animated particles! Use the
+	  SetChangeXXX() functions to have the rotation, size, color,
+	  alpha change over time. For the explosion made lightfading and
+	  spritefading independent. Removed UpdateAll/DeleteAll, since a
+	  list of particlesystems is kept in the world.
+	- Wouter added particle_systems NobjVectorList, and a call to
+	  UpdateParticleSystems(elapsed time). Fixed typo in
+	  AdvanceSpriteFrames comment in .h; which said it used elapsed
+	  time, it used current_time. Dont forget to call
+	  UpdateParticleSystems from your app if you have particle
+	  systems. Also they are deleted in Clear().
+	- Wouter fixed casting problems for csVector3. Now precision will
+	  be kept, and float will be made double for innocent usage (i.e.
+	  * constant double and so on). Advanced math should not mix
+	  Vector3 and Dvector3 without casting.
+	- Michael Dale Long added initial DrawPolygonMesh() code to 3D
+	  drivers. Tested on all Linux drivers. Shouldn't interfere with
+	  anything since it is not called yet, but dpmesh.cpp will have to
+	  be added to all 3D drivers for non-UNIX Makefile builds.
+	- Thomas Hieber added project settings for the particle system
+	  (VC).
 7-Apr-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> contributed a particle
 	  system (check out include/csengine/particle.h).
@@ -124,6 +152,8 @@ The history order has been reversed so that new features are at the top.
 	      from the script's maintainer.
 	    - Documentation-related targets now reside in their own section
 	      within the makefile "help" message.
+	- Michael Dale Long did a fix for cctest. Now works with worlds that
+	  have a collidable object at the coordinates (0, 0, 0).
 6-Apr-2000
 	- Eric Sunshine made the following changes:
 	    - Fixed several Texinfo mark-up errors in cctest.txi.  Slight
