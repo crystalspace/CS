@@ -574,14 +574,14 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
 csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   float* pr)
 {
-  float d, min_d = radius;
-  int i;
-  csPolygon3D* p, * min_p = NULL;
+  float d = .0f, min_d = radius;
+  csPolygon3D* p = NULL, * min_p = NULL;
   csVector3 obj_center;
   csReversibleTransform movtrans;
 
 //@@@ Support for meshes!!!
 #if 0
+  int i;
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* sp = (csThing*)things[i];
