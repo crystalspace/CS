@@ -105,7 +105,8 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
 void csIsoGrid::Draw(iIsoRenderView *rview)
 {
   // only draw all the cells in the main render pass
-  if(rview->GetRenderPass() == CSISO_RENDERPASS_MAIN)
+  if((rview->GetRenderPass() == CSISO_RENDERPASS_MAIN)
+    || (rview->GetRenderPass() == CSISO_RENDERPASS_FG))
   {
     //printf("Grid::Draw() MAIN\n");
     // draw the cells in lines, worldspace z-x = c
@@ -116,9 +117,14 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     // each cell is considered infinite in height.
     // start grid x,y
     int startx, starty, scanw, scanh;
-    rview->GetPrecalcGrid(startx, starty, scanw, scanh);
+    float celpery;
+    rview->GetPrecalcGrid(startx, starty, scanw, scanh, celpery);
     startx -= mingridx;
     starty -= mingridy;
+    int extratop = QInt(box.Min().y*celpery+0.9);
+    startx += extratop;
+    starty -= extratop;
+    scanh += extratop + QInt(box.Max().y*celpery+0.9);
     //if( (startx < 0) || (starty < 0))
       //return; // nothing to do, we are not visible.
     iIsoCell *cell = 0;

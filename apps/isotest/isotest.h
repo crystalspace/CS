@@ -51,6 +51,11 @@ private:
   /// the light
   iIsoLight *light;
 
+  /// to keep track of mouseclicks and actions. last click pos in world space.
+  csVector3 lastclick;
+  /// we are moving to lastclick position
+  bool walking;
+
 public:
   IsoTest ();
   virtual ~IsoTest ();

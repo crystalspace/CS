@@ -245,26 +245,28 @@ struct iIsoView : public iBase
   virtual void SetAxes(float xscale, float yscale, float zscale,
     float zskew, float xskew) = 0;
 
-  /// See the world position scrolled to (shown in center of view)
+  /// See the screen position scrolled to.
   virtual const csVector2& GetScroll() const = 0;
+  /// See the world position scrolled to (as shown in center of viewport)
+  virtual csVector3 GetViewScroll() const = 0;
   /// Set the scroll position. Show world space pos as screen space coord.
   virtual void SetScroll(const csVector3& worldpos, const csVector2& coord) = 0;
   /// Move the scroll position by delta (in world space).
   virtual void MoveScroll(const csVector3& delta) = 0;
 
   /// Transform world space coordinate into a screen coordinate.
-  virtual void W2S(const csVector3& world, csVector2& screen) = 0;
+  virtual void W2S(const csVector3& world, csVector2& screen) const = 0;
   /** 
    *  Transform world space coordinate into a screen coordinate.
    *  The returned z value can be used for a zbuffer, is bigger when
    *  further away.
    */
-  virtual void W2S(const csVector3& world, csVector3& screen) = 0;
+  virtual void W2S(const csVector3& world, csVector3& screen) const = 0;
   /**
    *  Transform screen coordinate into a world space coordinate.
    *  The world space coordinate will have y=0.
    */
-  virtual void S2W(const csVector2& screen, csVector3& world) = 0;
+  virtual void S2W(const csVector2& screen, csVector3& world) const = 0;
 
   /** 
    * draw the view onto the screen.
@@ -302,7 +304,7 @@ struct iIsoRenderView : public iBase
   virtual iClipper2D* GetClipper() const = 0;
   /// get precalc grid values
   virtual void GetPrecalcGrid(int& startx, int& starty, int& scanw, 
-    int& scanh) const = 0;
+    int& scanh, float& cellpery) const = 0;
 };
 
 SCF_VERSION (iIsoSprite, 0, 0, 1);

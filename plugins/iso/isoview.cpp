@@ -55,14 +55,14 @@ csIsoView::~csIsoView ()
   delete rview;
 }
 
-void csIsoView::W2S(const csVector3& world, csVector2& screen)
+void csIsoView::W2S(const csVector3& world, csVector2& screen) const
 {
   screen.x = world.x*x_axis.x + world.z*z_axis.x;
   screen.y = world.x*x_axis.y + world.y*y_axis.y + world.z*z_axis.y;
   screen += scroll;
 }
 
-void csIsoView::W2S(const csVector3& world, csVector3& screen)
+void csIsoView::W2S(const csVector3& world, csVector3& screen) const
 {
   screen.x = scroll.x+ world.x*x_axis.x + world.z*z_axis.x;
   screen.y = scroll.y+ world.x*x_axis.y + world.y*y_axis.y + world.z*z_axis.y;
@@ -73,7 +73,7 @@ void csIsoView::W2S(const csVector3& world, csVector3& screen)
   screen.z = world.z - world.x;
 }
 
-void csIsoView::S2W(const csVector2& screen, csVector3& world)
+void csIsoView::S2W(const csVector2& screen, csVector3& world) const
 {
   // make x_axis.x + alpha*x_axis.y = 0.
   float alpha = -x_axis.x * invx_axis_y;
@@ -119,6 +119,15 @@ void csIsoView::MoveScroll(const csVector3& delta)
   scroll -= screen;
 }
 
+
+csVector3 csIsoView::GetViewScroll() const
+{
+  csVector2 screen((rect.xmin+rect.xmax)/2, (rect.ymin+rect.ymax)/2);
+  csVector3 worldpos;
+  S2W(screen, worldpos);
+  return csVector3(worldpos);
+}
+
 void csIsoView::PreCalc()
 {
   csVector3 topleft, topright, botleft, botright;
@@ -136,8 +145,12 @@ void csIsoView::PreCalc()
   int scanw = QInt(topright.z) - QInt(topleft.z) + 2;
   int scanh = QInt(botright.x) - QInt(topright.x) + 2;
 
+  // nr of grid cells per 1.0 world y,
+  // the number of cells that fit in y_axis.y
+  float celpery = y_axis.y / (z_axis.y - x_axis.y);
+
   //printf("scanw, scasnh %d %d\n", scanw, scanh);
-  rview->SetPrecalcGrid(startx, starty, scanw, scanh);
+  rview->SetPrecalcGrid(startx, starty, scanw, scanh, celpery);
 }
 
 void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew, 

@@ -66,13 +66,14 @@ public:
   //------- iIsoView ----------------------------------------------
   virtual void SetWorld(iIsoWorld* world) {csIsoView::world=world;}
   virtual iIsoWorld* GetWorld() const {return world;}
-  virtual void W2S(const csVector3& world, csVector2& screen);
-  virtual void W2S(const csVector3& world, csVector3& screen);
-  virtual void S2W(const csVector2& screen, csVector3& world);
+  virtual void W2S(const csVector3& world, csVector2& screen) const;
+  virtual void W2S(const csVector3& world, csVector3& screen) const;
+  virtual void S2W(const csVector2& screen, csVector3& world) const;
   virtual void Draw();
   virtual const csRect& GetRect() const {return rect;}
   virtual void SetRect(const csRect& rect) {csIsoView::rect = rect;}
   virtual const csVector2& GetScroll() const {return scroll;}
+  virtual csVector3 GetViewScroll() const;
   virtual void SetScroll(const csVector3& worldpos, const csVector2& coord);
   virtual void MoveScroll(const csVector3& delta);
   virtual void SetAxes(float xscale, float yscale, float zscale,

@@ -203,8 +203,8 @@ void csIsoLight::ShineGrid()
   ymax += QInt(MaxRadius())+1;
   if(xmin < 0) xmin = 0;
   if(ymin < 0) ymin = 0;
-  if(xmax >= visw) xmax = grid->GetWidth()-1;
-  if(ymax >= vish) ymax = grid->GetHeight()-1;
+  if(xmax >= grid->GetWidth()) xmax = grid->GetWidth()-1;
+  if(ymax >= grid->GetHeight()) ymax = grid->GetHeight()-1;
   for(int y = ymin; y<=ymax; y++)
   {
     for(int x = xmin; x<=xmax; x++)
@@ -220,17 +220,17 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
   if(recalc_vis) CalcVis();
   int mingridx, mingridy;
   grid->GetGridOffset(mingridx, mingridy);
-  int multx = grid->GetGroundMultX();
-  int multy = grid->GetGroundMultY();
+  float multx = grid->GetGroundMultX();
+  float multy = grid->GetGroundMultY();
   // light position in the objects space
   csVector3 relpos = position - sprite->GetPosition();
-  int sprx = QInt(sprite->GetPosition().z * float(multx)) - mingridx*multx; 
-  int spry = QInt(sprite->GetPosition().x * float(multy)) - mingridy*multy;
+  int sprx = QInt(sprite->GetPosition().z * multx) - mingridx*QInt(multx); 
+  int spry = QInt(sprite->GetPosition().x * multy) - mingridy*QInt(multy);
   for(int i=0; i<sprite->GetNumVertices(); i++)
   {
     csVector3 vpos = sprite->GetVertexPosition(i);
-    int x = QInt(vpos.z * float(multx)) + sprx;
-    int y = QInt(vpos.x * float(multy)) + spry;
+    int x = QInt(vpos.z * multx) + sprx;
+    int y = QInt(vpos.x * multy) + spry;
     float vis = GetVis(x,y);
     vis += GetVis(x-1,y) + GetVis(x,y-1) + GetVis(x+1,y) + GetVis(x,y+1);
     vis *= 0.2;
@@ -255,11 +255,11 @@ float csIsoLight::MaxRadius() const
       return radius;
       break;
     case CSISO_ATTN_INVERSE:
-      return radius*100.;
+      return radius*25.;
       break;
     case CSISO_ATTN_REALISTIC:
     default:
-      return radius*10.;
+      return radius*5.;
       break;
   };
 }

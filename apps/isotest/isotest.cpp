@@ -28,6 +28,7 @@
 #include "isomater.h"
 #include "imap/parser.h"
 #include "igraphic/loader.h"
+#include "csgeom/box.h"
 
 
 IsoTest::IsoTest ()
@@ -37,6 +38,8 @@ IsoTest::IsoTest ()
   world = NULL;
   font = NULL;
   light = NULL;
+  lastclick.Set(0,0,0);
+  walking = false;
 }
 
 IsoTest::~IsoTest ()
@@ -175,6 +178,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   csVector3 startpos(10,0,5);
   player = engine->CreateFrontSprite(startpos, 0.7, 2.7);
   player->SetMaterialHandle(snow);
+  player->SetMixmode(CS_FX_ADD);
   world->AddSprite(player);
   player->SetGridChangeCallback(PlayerGridChange, (void*)this);
 
@@ -294,12 +298,40 @@ void IsoTest::NextFrame ()
   if (GetKeyState (CSKEY_LEFT)) playermotion += csVector3(0,0,-speed);
   if (GetKeyState (CSKEY_PGUP)) playermotion += csVector3(0,speed,0);
   if (GetKeyState (CSKEY_PGDN)) playermotion += csVector3(0,-speed,0);
-  if (GetKeyState (CSKEY_UP)) playermotion += csVector3(speed,0,0);
-  if (GetKeyState (CSKEY_DOWN)) playermotion += csVector3(-speed,0,0);
+  if (GetKeyState (CSKEY_UP)) playermotion += csVector3(-speed,0,0);
+  if (GetKeyState (CSKEY_DOWN)) playermotion += csVector3(speed,0,0);
+  if(!playermotion.IsZero()) // keyboard stops player movement by mouse
+    walking = false;
+  if (GetMouseButton(1))
+  {
+    walking = true;
+    int mousex, mousey; 
+    GetMousePosition(mousex, mousey);
+    // y is up in camera view
+    csVector2 screenpos(mousex, G3D->GetHeight() - mousey);
+    view->S2W(screenpos, lastclick);
+  }
+  if(walking) 
+  {
+    // if no keyboard cursor use, and there was a click,
+    // move towards last click position.
+    speed *= 1.412; // mouse move is as fast as keyboard can be
+    playermotion = lastclick - player->GetPosition();
+    float playermove = playermotion.Norm(); // distance moved
+    if(playermove > speed) playermotion *= speed / playermove;
+
+    // make sure we do not scroll too far
+    csBox3 maxbox = player->GetGrid()->GetBox();
+    maxbox.SetSize( (maxbox.Max() - maxbox.Min())*1.5 );
+    if(!player->GetGrid()->Contains(lastclick) 
+      && !maxbox.In(view->GetViewScroll())) 
+      walking = false;
+  }
   if(!playermotion.IsZero())
   {
+    csVector3 oldpos = player->GetPosition();
     player->MovePosition(playermotion);
-    view->MoveScroll(playermotion); 
+    view->MoveScroll(player->GetPosition() - oldpos); 
     light->SetPosition(player->GetPosition()+csVector3(0,5,0));
   }
 

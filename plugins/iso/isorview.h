@@ -34,6 +34,8 @@ private:
   int renderpass;
   /// precalced minmaxes 
   int startx, starty, scanw, scanh;
+  /// the precalced nr of cells per 1.0 world y
+  float celpery;
   /// the clipper
   iClipper2D *clipper;
 
@@ -54,17 +56,17 @@ public:
   /// set the clipper
   void SetClipper(iClipper2D *c) {clipper = c;}
   /// set precalc grid values
-  void SetPrecalcGrid(int sx, int sy, int sw, int sh)
-  { startx = sx; starty = sy; scanw = sw; scanh = sh; }
+  void SetPrecalcGrid(int sx, int sy, int sw, int sh, float cpy)
+  { startx = sx; starty = sy; scanw = sw; scanh = sh; celpery = cpy; }
 
   //-------- iIsoRenderView -----------------------------------
   virtual iIsoView* GetView() const {return view;}
   virtual iGraphics3D* GetG3D() const {return g3d;}
   virtual int GetRenderPass() const {return renderpass;}
   virtual iClipper2D* GetClipper() const {return clipper;}
-  virtual void GetPrecalcGrid(int& sx, int& sy, int& sw, int& sh) const
-  { sx = startx; sy = starty; sw = scanw; sh = scanh; }
-
+  virtual void GetPrecalcGrid(int& sx, int& sy, int& sw, int& sh, 
+    float& cpy) const
+  { sx = startx; sy = starty; sw = scanw; sh = scanh; cpy = celpery; } 
 };
 
 #endif
