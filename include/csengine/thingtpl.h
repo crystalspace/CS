@@ -150,8 +150,6 @@ private:
   /// Polygon name
   char *name;
 
-  /// Should mipmapping be used for this polygon?
-  int no_mipmap;
   /// Should this polygon be lighted?
   int no_lighting;
   /// The texture used for this polygon.
@@ -248,11 +246,7 @@ public:
   ///
   void SetLighting (int yes) { no_lighting = !yes; }
   ///
-  void SetMipmapping (int yes) { no_mipmap = !yes; }
-  ///
   int IsLighted () { return !no_lighting; }
-  ///
-  int IsMipmapped () { return !no_mipmap; }
 };
 
 #endif /*THINGTPL_H*/

@@ -19,8 +19,6 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "scan.h"
-#include "ipolygon.h"
-#include "ilghtmap.h"
 #include "soft_g3d.h"
 
 #include "sttest.h"

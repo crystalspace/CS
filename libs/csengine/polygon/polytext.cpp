@@ -38,8 +38,8 @@ bool csPolyTexture::do_accurate_things = true;
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
 
-int csPolyTexture::subtex_size = DEFAULT_SUBTEX_SIZE;
-bool csPolyTexture::subtex_dynlight = true;
+#define lightcell_size	csPolygon3D::lightcell_size
+#define lightcell_shift	csPolygon3D::lightcell_shift
 
 IMPLEMENT_IBASE (csPolyTexture)
   IMPLEMENTS_INTERFACE (iPolygonTexture)
@@ -49,35 +49,13 @@ csPolyTexture::csPolyTexture ()
 {
   CONSTRUCT_IBASE (NULL);
   dyn_dirty = true;
-  dirty_matrix = NULL;
   lm = NULL;
-  dirty_w = dirty_h = 0;
-  dirty_cnt = 0;
-  mipmap_level = 0;
-  mipmap_size = 0;
-  mipmap_shift = 0;
-  cache_data = NULL;
+  cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;
 }
 
 csPolyTexture::~csPolyTexture ()
 {
   if (lm) lm->DecRef ();
-  CHK (delete dirty_matrix);
-}
-
-void csPolyTexture::SetMipmapSize (int mm)
-{
-  mipmap_size = mm;
-  switch (mipmap_size)
-  {
-    case 2: mipmap_shift = 1; break;
-    case 4: mipmap_shift = 2; break;
-    case 8: mipmap_shift = 3; break;
-    case 16: mipmap_shift = 4; break;
-    case 32: mipmap_shift = 5; break;
-    case 64: mipmap_shift = 6; break;
-    default: mipmap_size = 2; mipmap_shift = 1; break;
-  }
 }
 
 void csPolyTexture::SetLightMap (csLightMap* lightmap)
@@ -99,7 +77,7 @@ void csPolyTexture::CreateBoundingTextureBox ()
 
   int i;
   csVector3 v1, v2;
-  for (i = 0 ; i < polygon->GetVertices ().GetNumVertices () ; i++)
+  for (i = 0; i < polygon->GetVertices ().GetNumVertices (); i++)
   {
     v1 = polygon->Vwor (i);   // Coordinates of vertex in world space.
     v1 -= txt_pl->v_world2tex;
@@ -110,21 +88,21 @@ void csPolyTexture::CreateBoundingTextureBox ()
     if (v2.y > max_v) max_v = v2.y;
   }
 
-  int ww, hh;
-  txt_handle->GetMipMapDimensions (mipmap_level, ww, hh);
-  Imin_u = QRound (min_u*ww);
-  Imin_v = QRound (min_v*hh);
-  Imax_u = QRound (max_u*ww);
-  Imax_v = QRound (max_v*hh);
-  
   // DAN: used in hardware accel drivers
   Fmin_u = min_u;
   Fmax_u = max_u;
   Fmin_v = min_v;
   Fmax_v = max_v;
 
-  h = Imax_v-Imin_v;
-  w_orig = Imax_u-Imin_u;
+  int ww, hh;
+  txt_handle->GetMipMapDimensions (0, ww, hh);
+  Imin_u = QRound (min_u * ww);
+  Imin_v = QRound (min_v * hh);
+  Imax_u = QRound (max_u * ww);
+  Imax_v = QRound (max_v * hh);
+  
+  h = Imax_v - Imin_v;
+  w_orig = Imax_u - Imin_u;
   w = 1;
   shf_u = 0;
   and_u = 0;
@@ -133,15 +111,11 @@ void csPolyTexture::CreateBoundingTextureBox ()
     if (w_orig <= w) break;
     w <<= 1;
     shf_u++;
-    and_u = (and_u<<1)+1;
+    and_u = (and_u << 1) + 1;
   }
 
-  fdu = min_u*ww;
-  fdv = min_v*hh;
-
-  // The size of the whole texture is extended by an upper and lower
-  // margin to prevent overflow in the texture mapper.
-  size = w*(H_MARGIN+H_MARGIN+h);
+  fdu = min_u * ww;
+  fdv = min_v * hh;
 }
 
 void csPolyTexture::MakeDirtyDynamicLights ()
@@ -155,8 +129,6 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (!lm) return false;
 
   dyn_dirty = false;
-  bool dm = csPolyTexture::subtex_size
-    && csPolyTexture::subtex_dynlight && dirty_matrix;
 
   //---
   // First copy the static lightmap to the real lightmap.
@@ -166,14 +138,7 @@ bool csPolyTexture::RecalculateDynamicLights ()
   long lm_size = lm->GetSize ();
   csRGBLightMap& stmap = lm->GetStaticMap ();
   csRGBLightMap& remap = lm->GetRealMap ();
-  // @@@ Memory leak here:
-  static csRGBLightMap oldmap;
 
-  if (dm)
-  {
-    if (lm_size > oldmap.GetMaxSize ()) oldmap.Alloc (lm_size);
-    memcpy (oldmap.GetMap (), remap.GetMap (), 3 * lm_size);
-  }
   memcpy (remap.GetMap (), stmap.GetMap (), 3 * lm_size);
 
   //---
@@ -189,66 +154,34 @@ bool csPolyTexture::RecalculateDynamicLights ()
   {
     csShadowMap* smap = lm->first_smap;
 
-    //@@@
-    //if (Textures::mixing != MIX_NOCOLOR)
+    // Color mode.
+    do
     {
-      // Color mode.
+      mapR = remap.GetRed ();
+      mapG = remap.GetGreen ();
+      mapB = remap.GetBlue ();
+      light = smap->light;
+      red = light->GetColor ().red;
+      green = light->GetColor ().green;
+      blue = light->GetColor ().blue;
+      csLight::CorrectForNocolor (&red, &green, &blue);
+      p = smap->map;
+      last_p = p+lm_size;
       do
       {
-        mapR = remap.GetRed ();
-        mapG = remap.GetGreen ();
-        mapB = remap.GetBlue ();
-        light = smap->light;
-        red = light->GetColor ().red;
-        green = light->GetColor ().green;
-        blue = light->GetColor ().blue;
-        csLight::CorrectForNocolor (&red, &green, &blue);
-  	p = smap->map;
-  	last_p = p+lm_size;
-  	do
-  	{
-    	  s = *p++;
-          l = *mapR + QRound (red * s);
-          *mapR++ = l < 255 ? l : 255;
-          l = *mapG + QRound (green * s);
-    	  *mapG++ = l < 255 ? l : 255;
-          l = *mapB + QRound (blue * s);
-          *mapB++ = l < 255 ? l : 255;
-  	}
-        while (p < last_p);
-
-        smap = smap->next;
+        s = *p++;
+        l = *mapR + QRound (red * s);
+        *mapR++ = l < 255 ? l : 255;
+        l = *mapG + QRound (green * s);
+        *mapG++ = l < 255 ? l : 255;
+        l = *mapB + QRound (blue * s);
+        *mapB++ = l < 255 ? l : 255;
       }
-      while (smap);
-    }
-//@@@
-#if 0
-    else
-    {
-      // NOCOLOR mode.
-      do
-      {
-        mapR = remap.GetRed ();
-        light = smap->light;
-        red = light->get_red ();
-        green = light->get_green ();
-        blue = light->get_blue ();
-        csLight::mixing_dependent_strengths (&red, &green, &blue);
-  	p = smap->map;
-  	last_p = p+lm_size;
-  	do
-  	{
-          l = *mapR + QRound (red * (*p++));
-    	  if (l > 255) l = 255;
-          *mapR++ = l;
-  	}
-  	while (p < last_p);
+      while (p < last_p);
 
-        smap = smap->next;
-      }
-      while (smap);
+      smap = smap->next;
     }
-#endif
+    while (smap);
   }
 
   //---
@@ -261,75 +194,6 @@ bool csPolyTexture::RecalculateDynamicLights ()
     lp = lp->GetNextPoly ();
   }
 
-  if (dm)
-  {
-    //---
-    // Now compare the old map with the new one and
-    // see where there are changes. Tag the corresponding
-    // sub-textures as dirty.
-    //---
-    int lw = lm->GetWidth ();
-    int lh = lm->GetHeight ();
-    int ru, rv, idx;
-    int lv, lu, luv, luv_v;
-    int num = csPolyTexture::subtex_size >> mipmap_shift; // Horiz/vert number of lightmap boxes in one sub-texture
-    int numu, numv;
-    int uu, vv;
-
-    unsigned char* old_mr = oldmap.GetRed ();
-    unsigned char* old_mg = oldmap.GetGreen ();
-    unsigned char* old_mb = oldmap.GetBlue ();
-    unsigned char* re_mr = remap.GetRed ();
-    unsigned char* re_mg = remap.GetGreen ();
-    unsigned char* re_mb = remap.GetBlue ();
-    idx = 0;
-    for (rv = 0 ; rv < dirty_h ; rv++)
-    {
-      lv = (rv * csPolyTexture::subtex_size) >> mipmap_shift;
-      luv_v = lv * lw;
-      if (lv+num >= lh)
-        numv = lh-lv-1;
-      else
-        numv = num;
-
-      for (ru = 0 ; ru < dirty_w ; ru++, idx++)
-      {
-        // If already dirty we don't need to check.
-        if (!dirty_matrix->Get (idx))
-  	{
-          lu = (ru * csPolyTexture::subtex_size) >> mipmap_shift;
-    	  luv = luv_v + lu;
-          if (lu+num >= lw-1) numu = lw-lu-1;
-    	  else numu = num;
-    	  // <= num here because I want to include the boundaries of the next
-    	  // sub-texture in the test as well.
-    	  for (vv = 0 ; vv <= numv ; vv++)
-    	  {
-      
-      	    for (uu = 0 ; uu <= numu ; uu++)
-      	    {
-              // If we find a difference this sub-texture is dirty. I would
-	      // like to have a multi-break statement but unfortunatelly C++
-	      // does not have this. That's why I use the goto. Yes I know!
-	      // goto's are EVIL!
-              if ((old_mr[luv] != re_mr[luv]) ||
-                  (old_mg && (old_mg[luv] != re_mg[luv])) ||
-                  (old_mb && (old_mb[luv] != re_mb[luv])))
-              {
-          	dirty_matrix->Set (idx);
-    		dirty_cnt++;
-    		goto stop;
-              }
-              luv++;
-            }
-            luv += lw-num-1;
-          }
-stop: ;
-        }
-      }
-    }
-  }
-
   return true;
 }
 
@@ -338,9 +202,10 @@ void csPolyTexture::InitLightMaps ()
 }
 
 /*
- * Added by Denis Dmitriev for correct lightmaps shining. This code above draws perfectly (like perfect
- * texture mapping -- I mean most correctly) anti-aliased polygon on lightmap and adjusts it according
- * to the actual polygon shape on the texture
+ * Added by Denis Dmitriev for correct lightmaps shining. This code above draws
+ * perfectly (like perfect texture mapping -- I mean most correctly)
+ * anti-aliased polygon on lightmap and adjusts it according to the actual
+ * polygon shape on the texture
  */
 #define EPS   0.0001
 
@@ -388,21 +253,21 @@ static void lixel_intensity (int x, int y, float density)
 
 static void correct_results (int x, int y, float density)
 {
-  if (density<EPS||density>=1-EPS)
+  if (density < EPS || density >= 1 - EPS)
     return;
 
-  int addr=x+y*__texture_width;
-  float res=__texture[addr]/density;
+  int addr = x + y * __texture_width;
+  float res = __texture [addr] / density;
 
-  if (res>1)
-    res=1;
+  if (res > 1)
+    res = 1;
 
-  __texture[addr]=res;
-  __mark[addr]=1;
+  __texture [addr] = res;
+  __mark [addr] = 1;
 }
 
 /* I was interested in these values */
-static int max_depth=0,depth=0;
+static int max_depth = 0, depth = 0;
 
 static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 {
@@ -415,12 +280,10 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   //   0 -- horizontal
   //   1 -- vertical
 
-  //@@@Note from Jorrit, I tried to use QInt() here but this didn't work?
-  //@@@Answer from A.Z: there was a BIGBUG{tm} in QInt - 1.0 was rounded to 0.
   int height = QInt (visible.bottom - visible.top);
   int width = QInt (visible.right - visible.left);
 
-  float a=calc_area (n,p2d);
+  float a = calc_area (n,p2d);
   if (fabs (a - height * width) < EPS)
   {
     // this area is completely covered
@@ -585,7 +448,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   float d, dl;
 
   int ww, hh;
-  txt_handle->GetMipMapDimensions (mipmap_level, ww, hh);
+  txt_handle->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   csPolyPlane* pl = polygon->GetPlane ();
@@ -637,8 +500,10 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   if (dyn)
   {
     smap = lm->FindShadowMap (light);
-    if (!smap) { smap = lm->NewShadowMap (light, w, h, mipmap_size); first_time = true; }
-    else first_time = false;
+    if (!smap)
+    { smap = lm->NewShadowMap (light, w, h); first_time = true; }
+    else
+      first_time = false;
     mapR = smap->map;
     mapG = NULL;
     mapB = NULL;
@@ -673,31 +538,34 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   csVector3 projector;
 
-  for(i=0;i<rpv;i++)
+  for (i = 0; i < rpv; i++)
   {
-    projector=txt_pl->m_world2tex * (polygon->Vwor(i) - txt_pl->v_world2tex);
-    rp[i].x=(projector.x*ww-Imin_u) / (mipmap_size)+0.5;
-    rp[i].y=(projector.y*hh-Imin_v) / (mipmap_size)+0.5;
+    projector = txt_pl->m_world2tex * (polygon->Vwor (i) - txt_pl->v_world2tex);
+    rp [i].x = (projector.x * ww - Imin_u) / lightcell_size + 0.5;
+    rp [i].y = (projector.y * hh - Imin_v) / lightcell_size + 0.5;
   }
 
-  for (i = 0 ; i < num_frustrum ; i++)
+  for (i = 0; i < num_frustrum; i++)
   {
-    if (lview.mirror) mi = num_frustrum-i-1;
-    else mi = i;
+    if (lview.mirror)
+      mi = num_frustrum - i - 1;
+    else
+      mi = i;
 
     // T = Mwt * (W - Vwt)
-    v1 = txt_pl->m_world2tex * (frustrum[mi] + light_frustrum->GetOrigin () - txt_pl->v_world2tex);
-    f_uv[i].x = (v1.x*ww-Imin_u) / (mipmap_size) + 0.5;
-    f_uv[i].y = (v1.y*hh-Imin_v) / (mipmap_size) + 0.5;
-    if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
-    if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
+    v1 = txt_pl->m_world2tex *
+      (frustrum [mi] + light_frustrum->GetOrigin () - txt_pl->v_world2tex);
+    f_uv [i].x = (v1.x * ww - Imin_u) / lightcell_size + 0.5;
+    f_uv [i].y = (v1.y * hh - Imin_v) / lightcell_size + 0.5;
+    if (f_uv [i].y < miny) miny = f_uv [MinIndex = i].y;
+    if (f_uv [i].y > maxy) maxy = f_uv [MaxIndex = i].y;
   }
 
   csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
 
-  __texture_width=lw;
-  __texture=(float*)calloc(lh*lw,sizeof(float));
-  __mark=(unsigned char*)calloc(lh,lw);
+  __texture_width = lw;
+  __texture = (float *)calloc (lh * lw, sizeof (float));
+  __mark = (unsigned char *)calloc (lh,lw);
 
   __rect vis={0,lw,0,lh};
 
@@ -717,145 +585,145 @@ void csPolyTexture::FillLightMap (csLightView& lview)
       // but it appears to be anyway. 'uv' can get too large.
       if (uv >= lm_size) continue;
 
-        float usual_value=1.0;
+      float usual_value=1.0;
 
-//      __uv=uv;
-        float lightintensity=__texture[uv];
+//    __uv=uv;
+      float lightintensity=__texture[uv];
 
-        if(!lightintensity)
+      if(!lightintensity)
+      {
+        usual_value=0.0;
+
+        if(u&&__mark[uv-1])
         {
-          usual_value=0.0;
-
-          if(u&&__mark[uv-1])
-          {
-            lightintensity+=__texture[uv-1];
-            usual_value++;
-          }
-
-          if(sy&&__mark[uv-lw])
-          {
-            lightintensity+=__texture[uv-lw];
-            usual_value++;
-          }
-
-          if((u!=lw-1)&&__mark[uv+1])
-          {
-            lightintensity+=__texture[uv+1];
-            usual_value++;
-          }
-
-          if((sy!=lh-1)&&__mark[uv+lw])
-          {
-            lightintensity+=__texture[uv+lw];
-            usual_value++;
-          }
-
-          if(!lightintensity)
-            continue;
+          lightintensity+=__texture[uv-1];
+          usual_value++;
         }
 
-        float lightness=lightintensity/usual_value;
+        if(sy&&__mark[uv-lw])
+        {
+          lightintensity+=__texture[uv-lw];
+          usual_value++;
+        }
+
+        if((u!=lw-1)&&__mark[uv+1])
+        {
+          lightintensity+=__texture[uv+1];
+          usual_value++;
+        }
+
+        if((sy!=lh-1)&&__mark[uv+lw])
+        {
+          lightintensity+=__texture[uv+lw];
+          usual_value++;
+        }
+
+        if(!lightintensity)
+          continue;
+      }
+
+      float lightness=lightintensity/usual_value;
 //      if(lightness>1||lightness<0)
 //        fprintf(fo,"(%d, %d) -> lightness=%.2f/%.2f=%.2f\n",u,sy,lightintensity,usual_value,lightness);
 
-        ru = u  << mipmap_shift;
-        rv = sy << mipmap_shift;
+      ru = u << lightcell_shift;
+      rv = sy << lightcell_shift;
 
-        bool rc = false;
-        int tst;
-        static int shift_u[5] = { 0, 2, 0, -2, 0 };
-        static int shift_v[5] = { 0, 0, 2, 0, -2 };
-        for (tst = 0 ; tst < 5 ; tst++)
-        {
-          v1.x = (float)(ru+shift_u[tst]+Imin_u)*invww;
-          v1.y = (float)(rv+shift_v[tst]+Imin_v)*invhh;
-          if (ABS (txt_C) < SMALL_EPSILON)
-            v1.z = 0;
-          else
-            v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
-          v2 = vv + m_t2w * v1;
+      bool rc = false;
+      int tst;
+      static int shift_u[5] = { 0, 2, 0, -2, 0 };
+      static int shift_v[5] = { 0, 0, 2, 0, -2 };
+      for (tst = 0 ; tst < 5 ; tst++)
+      {
+        v1.x = (float)(ru+shift_u[tst]+Imin_u)*invww;
+        v1.y = (float)(rv+shift_v[tst]+Imin_v)*invhh;
+        if (ABS (txt_C) < SMALL_EPSILON)
+          v1.z = 0;
+        else
+          v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
+        v2 = vv + m_t2w * v1;
 
-	  // Check if the point on the polygon is shadowed. To do this
-	  // we traverse all shadow frustrums and see if it is contained in any of them.
-	  csShadowFrustrum* shadow_frust;
-	  shadow_frust = lview.shadows.GetFirst ();
-	  bool shadow = false;
+        // Check if the point on the polygon is shadowed. To do this
+        // we traverse all shadow frustrums and see if it is contained in any of them.
+        csShadowFrustrum* shadow_frust;
+        shadow_frust = lview.shadows.GetFirst ();
+        bool shadow = false;
 #if QUADTREE_SHADOW
-	  int state = qc->TestPoint (v2-light_frustrum->GetOrigin ());
-	  if (state == CS_QUAD_FULL)
-	  {
-	    // The quadtree indicates that we have shadow. However, it is possible
-	    // that we have an adjacent polygon which gives false shadows. Therefor
-	    // we test if the lumel coordinate falls outside the polygon and if so
-	    // we do the full frustrum test below.
-	    if (!light_frustrum->Contains (v2)) state = CS_QUAD_PARTIAL;
-	  }
-
-	  if (state == CS_QUAD_EMPTY) shadow = false;
-	  else if (state == CS_QUAD_FULL) shadow = true;
-	  else
-#endif
-	  {
-	    while (shadow_frust)
-	    {
-	      if (shadow_frust->relevant && shadow_frust->polygon != polygon)
-	        if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-		  { shadow = true; break; }
-	      shadow_frust = shadow_frust->next;
-	    }
-	  }
-	  if (!shadow) { rc = false; break; }
-
-	  if (!do_accurate_things) break;
-	  rc = true;
-        }
-
-        if (!rc)
+        int state = qc->TestPoint (v2-light_frustrum->GetOrigin ());
+        if (state == CS_QUAD_FULL)
         {
-          d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
-          if (d >= light->GetSquaredRadius ()) continue;
-
-	  d = sqrt (d);
-	  hit = true;
-	  l1 = mapR[uv];
-
-	  float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
-	  cosinus /= d;
-	  cosinus += cosfact;
-	  if (cosinus < 0) cosinus = 0;
-	  else if (cosinus > 1) cosinus = 1;
-
-	  if (dyn)
-	  {
-	    dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-	    l1 = l1 + QInt (lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
-	    if (l1 > 255) l1 = 255;
-	    mapR[uv] = l1;
-	  }
-	  else
-	  {
-            float brightness = cosinus * light->GetBrightnessAtDistance (d);
-
-	    if (lview.r > 0)
-	    {
-	      l1 = l1 + QInt (lightness*QRound (color.red * brightness));
-	      if (l1 > 255) l1 = 255;
-	      mapR[uv] = l1;
-	    }
-	    if (lview.g > 0 && mapG)
-	    {
-	      l2 = mapG[uv] + QInt (lightness*QRound (color.green * brightness));
-	      if (l2 > 255) l2 = 255;
-	      mapG[uv] = l2;
-	    }
-	    if (lview.b > 0 && mapB)
-	    {
-	      l3 = mapB[uv] + QInt (lightness*QRound (color.blue * brightness));
-	      if (l3 > 255) l3 = 255;
-	      mapB[uv] = l3;
-	    }
-	  }
+          // The quadtree indicates that we have shadow. However, it is possible
+          // that we have an adjacent polygon which gives false shadows. Therefor
+          // we test if the lumel coordinate falls outside the polygon and if so
+          // we do the full frustrum test below.
+          if (!light_frustrum->Contains (v2)) state = CS_QUAD_PARTIAL;
         }
+
+        if (state == CS_QUAD_EMPTY) shadow = false;
+        else if (state == CS_QUAD_FULL) shadow = true;
+        else
+#endif
+        {
+          while (shadow_frust)
+          {
+            if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+              if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+                { shadow = true; break; }
+            shadow_frust = shadow_frust->next;
+          }
+        }
+        if (!shadow) { rc = false; break; }
+
+        if (!do_accurate_things) break;
+        rc = true;
+      }
+
+      if (!rc)
+      {
+        d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
+        if (d >= light->GetSquaredRadius ()) continue;
+
+        d = sqrt (d);
+        hit = true;
+        l1 = mapR[uv];
+
+        float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
+        cosinus /= d;
+        cosinus += cosfact;
+        if (cosinus < 0) cosinus = 0;
+        else if (cosinus > 1) cosinus = 1;
+
+        if (dyn)
+        {
+          dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
+          l1 = l1 + QInt (lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
+          if (l1 > 255) l1 = 255;
+          mapR[uv] = l1;
+        }
+        else
+        {
+          float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
+          if (lview.r > 0)
+          {
+            l1 = l1 + QInt (lightness*QRound (color.red * brightness));
+            if (l1 > 255) l1 = 255;
+            mapR[uv] = l1;
+          }
+          if (lview.g > 0 && mapG)
+          {
+            l2 = mapG[uv] + QInt (lightness*QRound (color.green * brightness));
+            if (l2 > 255) l2 = 255;
+            mapG[uv] = l2;
+          }
+          if (lview.b > 0 && mapB)
+          {
+            l3 = mapB[uv] + QInt (lightness*QRound (color.blue * brightness));
+            if (l3 > 255) l3 = 255;
+            mapB[uv] = l3;
+          }
+        }
+      }
       //mapR[uv] = 128;
       //mapG[uv] = 128;
       //mapB[uv] = 128;
@@ -895,19 +763,8 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 /* Modified by me to correct some lightmap's border problems -- D.D. */
 void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 {
-  // @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
-
-  //thieber: I added some parentheses, to change operator precedence.
-  //         originally the term looked like this:
-  //         1 + (w_orig + mipmap_size - 1) >> mipmap_shift;
-  //         in C++ that is the same as 
-  //         1 + w_orig + mipmap_size - 1 >> mipmap_shift;
-  //         So I assume, the version below is, what was really
-  //         intended. The autor of that routine should remove
-  //         this comment, when he has confirmed, that it is
-  //         correct, or add some own parentheses. Feb. 25th, 2000
-  int lw = 1 + ((w_orig + mipmap_size - 1) >> mipmap_shift);
-  int lh = 1 + ((h + mipmap_size - 1) >> mipmap_shift);
+  int lw = 1 + ((w_orig + lightcell_size - 1) >> lightcell_shift);
+  int lh = 1 + ((h + lightcell_size - 1) >> lightcell_shift);
 
   int u, uv;
 
@@ -915,7 +772,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   float d;
 
   int ww, hh;
-  txt_handle->GetMipMapDimensions (mipmap_level, ww, hh);
+  txt_handle->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   csPolyPlane* pl = polygon->GetPlane ();
@@ -978,8 +835,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
       //@@@ This is only right if we don't allow reflections on dynamic lights
       v1 = txt_pl->m_world2tex * (lp->vertices[mi] + light->GetCenter () - txt_pl->v_world2tex);
-      f_uv[i].x = (v1.x*ww-Imin_u) / mipmap_size;
-      f_uv[i].y = (v1.y*hh-Imin_v) / mipmap_size;
+      f_uv[i].x = (v1.x * ww - Imin_u) / lightcell_size;
+      f_uv[i].y = (v1.y * hh - Imin_v) / lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
       if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
     }
@@ -1092,8 +949,8 @@ b:      if (scanL2 == MinIndex) goto finish;
 	// but it appears to be anyway. 'uv' can get both negative and too large.
 	if (uv < 0 || uv >= lm_size) continue;
 
-        ru = u  << mipmap_shift;
-        rv = sy << mipmap_shift;
+        ru = u << lightcell_shift;
+        rv = sy << lightcell_shift;
 
         v1.x = (float)(ru + Imin_u) * invww;
         v1.y = (float)(rv + Imin_v) * invhh;
@@ -1178,34 +1035,6 @@ finish:
   CHK (delete [] f_uv);
 }
 
-void csPolyTexture::CreateDirtyMatrix ()
-{
-  if (dirty_matrix) return;
-  int dw = w/csPolyTexture::subtex_size + 1;
-  int dh = h/csPolyTexture::subtex_size + 1;
-  // Dirty matrix does not exist.
-  dirty_w = dw;
-  dirty_h = dh;
-  CHK (dirty_matrix = new csBitSet (dw * dh));
-  MakeAllDirty ();
-}
-
-void csPolyTexture::DestroyDirtyMatrix ()
-{
-  CHK (delete dirty_matrix);
-  dirty_matrix = NULL;
-}
-
-void csPolyTexture::MakeAllDirty ()
-{
-  if (dirty_matrix)
-  {
-    dirty_matrix->Set ();
-    dirty_cnt = dirty_matrix->GetByteCount ();
-  }
-  dyn_dirty = true;
-}
-
 void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV)
 {
   fMinU = Fmin_u; fMaxU = Fmax_u;
@@ -1218,54 +1047,6 @@ iPolygon3D *csPolyTexture::GetPolygon ()
   return polygon;
 }
 
-static UByte bit_count [16] =
-{
-  0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
-};
-
-#define COUNT_BITS(x)	bit_count [(x) & 0xf]
-
-bool csPolyTexture::CleanIfDirty (csBitSet *bs)
-{
-  if (!dirty_cnt)
-    return false;
-
-  int dc = dirty_cnt;
-  unsigned sz = MIN (bs->GetByteCount (), dirty_matrix->GetByteCount ());
-  ULong *lsrc = (ULong *)bs->GetBits ();
-  ULong *ldst = (ULong *)dirty_matrix->GetBits ();
-  while (sz >= sizeof (ULong))
-  {
-    ULong s = *lsrc;
-    ULong d = *ldst;
-    s &= d; // leave in bs only the bits that are marked dirty in dirty_matrix
-    d ^= s; // drop the bits in dirty_matrix that are going to be refreshed
-    if (s)
-      dirty_cnt -= COUNT_BITS (s      ) - COUNT_BITS (s >> 4 ) -
-                   COUNT_BITS (s >> 8 ) - COUNT_BITS (s >> 12) -
-                   COUNT_BITS (s >> 16) - COUNT_BITS (s >> 20) -
-                   COUNT_BITS (s >> 24) - COUNT_BITS (s >> 28);
-    *lsrc++ = s;
-    *ldst++ = d;
-    sz -= sizeof (ULong);
-  }
-  UByte *bsrc = (UByte *)lsrc;
-  UByte *bdst = (UByte *)ldst;
-  while (sz--)
-  {
-    UByte s = *bsrc;
-    UByte d = *bdst;
-    if (s)
-      dirty_cnt -= COUNT_BITS (s) - COUNT_BITS (s >> 4);
-    s &= d; // leave in bs only the bits that are marked dirty in dirty_matrix
-    d ^= s; // drop the bits in dirty_matrix that are going to be refreshed
-    *bsrc++ = s;
-    *bdst++ = d;
-  }
-
-  return (dc != dirty_cnt);
-}
-
 iLightMap *csPolyTexture::GetLightMap () { return lm; }
 iTextureHandle *csPolyTexture::GetTextureHandle () { return txt_handle; }
 int csPolyTexture::GetWidth () { return w; }
@@ -1274,15 +1055,10 @@ float csPolyTexture::GetFDU () { return fdu; }
 float csPolyTexture::GetFDV () { return fdv; }
 int csPolyTexture::GetShiftU () { return shf_u; }
 int csPolyTexture::GetOriginalWidth () { return w_orig; }
-int csPolyTexture::GetSize () { return size; }
-int csPolyTexture::GetNumPixels () { return size; }
-int csPolyTexture::GetMipMapSize () { return mipmap_size; }
-int csPolyTexture::GetMipMapShift () { return mipmap_shift; }
-int csPolyTexture::GetMipmapLevel () { return mipmap_level; }
 int csPolyTexture::GetIMinU () { return Imin_u; }
 int csPolyTexture::GetIMinV () { return Imin_v; }
-int csPolyTexture::GetNumberDirtySubTex (){ return dirty_cnt; }
-int csPolyTexture::GetSubtexSize () { return subtex_size; }
-bool csPolyTexture::GetDynlightOpt () { return subtex_dynlight; }
-void *csPolyTexture::GetCacheData () { return cache_data; }
-void csPolyTexture::SetCacheData (void *d) { cache_data = d; }
+void *csPolyTexture::GetCacheData (int idx) { return cache_data [idx]; }
+void csPolyTexture::SetCacheData (int idx, void *d) { cache_data [idx] = d; }
+bool csPolyTexture::DynamicLightsDirty () { return dyn_dirty && lm; }
+int csPolyTexture::GetLightCellSize () { return lightcell_size; }
+int csPolyTexture::GetLightCellShift () { return lightcell_shift; }

@@ -774,7 +774,6 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       }
 
     g3dpoly.alpha           = poly->GetAlpha();
-    g3dpoly.uses_mipmaps    = poly->CheckFlags (CS_POLY_MIPMAP);
     g3dpoly.z_value         = poly->Vcam(0).z;
 #ifdef DO_HW_UVZ
     g3dpoly.mirror          = mirror;
@@ -789,9 +788,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     }
 #endif
 
-    for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)
-      g3dpoly.poly_texture[mipmaplevel] = poly->GetLightMapInfo ()->GetPolyTex
-      	(mipmaplevel);
+    g3dpoly.poly_texture = poly->GetLightMapInfo ()->GetPolyTex ();
 
     csPolyTxtPlane* txt_plane = poly->GetLightMapInfo ()->GetTxtPlane ();
     csMatrix3 m_cam2tex;

@@ -133,10 +133,7 @@ void Dumper::dump (csPolygon3D* p)
   {
     csLightMapped* lmi = p->GetLightMapInfo ();
     dump (lmi->GetTxtPlane ());
-    if (lmi->GetPolyTex (0)) dump (lmi->GetPolyTex (0), "PolyTexture 1");
-    if (lmi->GetPolyTex (1)) dump (lmi->GetPolyTex (1), "PolyTexture 2");
-    if (lmi->GetPolyTex (2)) dump (lmi->GetPolyTex (2), "PolyTexture 3");
-    if (lmi->GetPolyTex (3)) dump (lmi->GetPolyTex (3), "PolyTexture 4");
+    if (lmi->GetPolyTex ()) dump (lmi->GetPolyTex (), "PolyTexture");
   }
 
   csLightPatch* lp = p->light_info.lightpatches;
@@ -234,22 +231,6 @@ void Dumper::dump (csSprite3D* s)
 void Dumper::dump (csPolyTexture* p, char* name)
 {
   CsPrintf (MSG_DEBUG_0, "  PolyTexture '%s'\n", name);
-  //@@@CsPrintf (MSG_DEBUG_0, "    in_cache=%d dyn_dirty=%d\n", in_cache, dyn_dirty);
-  CsPrintf (MSG_DEBUG_0, "    dirty_size=%dx%d dirty_cnt=%d\n", p->dirty_w, p->dirty_h, p->dirty_cnt);
-  if (p->dirty_matrix)
-  {
-    CsPrintf (MSG_DEBUG_0, "    dirty_matrix=[\n");
-    int i, j;
-    for (i = 0 ; i < p->dirty_h ; i++)
-    {
-      CsPrintf (MSG_DEBUG_0, "        ");
-      for (j = 0 ; j < p->dirty_w ; j++)
-        CsPrintf (MSG_DEBUG_0, "%d ", p->dirty_matrix->Get(p->dirty_w*i + j));
-      CsPrintf (MSG_DEBUG_0, "\n");
-    }
-    CsPrintf (MSG_DEBUG_0, "    ]\n");
-  }
-  else CsPrintf (MSG_DEBUG_0, "    dirty_matrix=NULL\n");
   CsPrintf (MSG_DEBUG_0, "    Imin_u=%d Imin_v=%d Imax_u=%d Imax_v=%d\n", p->Imin_u, p->Imin_v, p->Imax_u, p->Imax_v);
   CsPrintf (MSG_DEBUG_0, "    Fmin_u=%f Fmin_v=%f Fmax_u=%f Fmax_v=%f\n", p->Fmin_u, p->Fmin_v, p->Fmax_u, p->Fmax_v);
   if (p->lm)
@@ -263,8 +244,7 @@ void Dumper::dump (csPolyTexture* p, char* name)
     CsPrintf (MSG_DEBUG_0, "    lm: no lightmap\n");
   CsPrintf (MSG_DEBUG_0, "    shf_u=%d and_u=%d\n", p->shf_u, p->and_u);
   CsPrintf (MSG_DEBUG_0, "    fdu=%f fdv=%f\n", p->fdu, p->fdv);
-  CsPrintf (MSG_DEBUG_0, "    w=%d h=%d w_orig=%d size=%d\n", p->w, p->h, p->w_orig, p->size);
-  CsPrintf (MSG_DEBUG_0, "    mipmap_size=%d mipmap_shift=%d\n", p->mipmap_size, p->mipmap_shift);
+  CsPrintf (MSG_DEBUG_0, "    w=%d h=%d w_orig=%d\n", p->w, p->h, p->w_orig);
 }
 
 void Dumper::dump (csPolygon2D* p, char* name)

@@ -41,16 +41,26 @@
 
 #include "pixtype.inc"
 
-void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
-  void *dst, csTextureManagerSoftware *texman)
+void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
+  csTextureManagerSoftware *texman,
+  float u_min, float v_min, float u_max, float v_max)
 {
-  int pt_minu = pt->GetIMinU ();
-  int pt_minv = pt->GetIMinV ();
-  int pt_mipmap_size = pt->GetMipMapSize ();
-  int pt_mipmap_shift = pt->GetMipMapShift ();
-  int pt_shfw = pt->GetShiftU ();
-  int pt_deltaw = pt->GetWidth ();
-  int pt_h = pt->GetHeight ();
+  int mipmap = ct->mipmap;
+  int mipmap_delta = (1 << mipmap) - 1;
+
+  csTextureMMSoftware *texmm =
+    (csTextureMMSoftware *)pt->GetTextureHandle ()->GetPrivateObject ();
+  csTexture *tx = texmm->get_texture (mipmap);
+  RGBPixel *tx_palette = texmm->GetColorMap ();
+  UByte *tx_bitmap = (UByte *)tx->get_bitmap ();
+
+  int pt_minu = pt->GetIMinU () >> mipmap;
+  int pt_minv = pt->GetIMinV () >> mipmap;
+  int pt_cell_size = pt->GetLightCellSize () >> mipmap;
+  int pt_cell_shift = pt->GetLightCellShift () - mipmap;
+  int pt_shfw = pt->GetShiftU () - mipmap;
+  int pt_w = 1 << pt_shfw;
+  int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
 
   iLightMap *lm = pt->GetLightMap ();
   int lm_w = lm->GetWidth ();
@@ -58,11 +68,8 @@ void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
   UByte *lm_G = lm->GetMap (1);
   UByte *lm_B = lm->GetMap (2);
 
-  csTextureMMSoftware *texmm =
-    (csTextureMMSoftware *)pt->GetTextureHandle ()->GetPrivateObject ();
-  csTexture *tx = texmm->get_texture (pt->GetMipmapLevel ());
-  RGBPixel *tx_palette = texmm->GetColorMap ();
-  UByte *tx_bitmap = (UByte *)tx->get_bitmap ();
+  void *dst = ct->get_bitmap ();
+  ULong *old_lm = (ULong *)ct->get_lightmap ();
 
   int tx_shfw = tx->get_w_shift ();
   int tx_andw = tx->get_w_mask ();
@@ -84,10 +91,6 @@ void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
     01      11
 */
 
-  int max_lu = ((pt->GetOriginalWidth () + pt_mipmap_size - 1) >> pt_mipmap_shift);
-  int max_lv = lm->GetHeight ();
-  int src = 0;
-
   // Get the multiplication tables for red, green and blue
   UByte *lt_R = texman->lightmap_tables [0];
   UByte *lt_G = texman->lightmap_tables [1];
@@ -97,19 +100,30 @@ void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
   UByte *inv_cmap = texman->inv_cmap;
 #endif
 
-  // The pointer to the end of the texture minus the mipmap size.
-  // This is used to check for overflow in the loops below.
-  PI_PIXTYPE* out_end = (((PI_PIXTYPE*)dst)-H_MARGIN*pt_deltaw)
-	-pt_mipmap_size+pt->GetSize ();
+  int min_lu = QRound (floor (u_min)) >> pt_cell_shift;
+  int max_lu = (QRound (ceil (u_max)) + pt_cell_size - 1) >> pt_cell_shift;
+  int min_lv = QRound (floor (v_min)) >> pt_cell_shift;
+  int max_lv = (QRound (ceil (v_max)) + pt_cell_size - 1) >> pt_cell_shift;
 
-  int dirty_bit = 0;
-  for (int lv = 0; lv < max_lv; lv++)
+  if (min_lu < 0) min_lu = 0;
+  if (min_lv < 0) min_lv = 0;
+
+  if (min_lu >= max_lu) return;
+  if (min_lv >= max_lv) return;
+
+  int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mipmap) +
+    pt_cell_size - 1) >> pt_cell_shift);
+  if (max_lu > max_lu2) max_lu = max_lu2;
+
+  int max_lv2 = lm->GetHeight ();
+  if (max_lv > max_lv2) max_lv = max_lv2;
+
+  int src = min_lu + min_lv * lm_w;
+  int src_dlu = lm_w - (max_lu - min_lu);
+  for (int lv = min_lv; lv < max_lv; lv++)
   {
-    for (int lu = 0; lu < max_lu; lu++)
+    for (int lu = min_lu; lu < max_lu; lu++)
     {
-      if (dirty && !dirty->Get (dirty_bit++))
-        continue;
-
 #define GET(map, col)				\
       UByte col##00, col##10, col##01, col##11;	\
       col##00 = map [src];			\
@@ -123,34 +137,49 @@ void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
 
 #undef GET
 
-      int u = lu << pt_mipmap_shift;
-      int v = lv << pt_mipmap_shift;
+      // this is somewhat tricky but in practice it works well
+      ULong cellid = ((r00 + g00 + b00)      ) ^
+                     ((r01 + g01 + b01) << 8 ) ^
+                     ((r10 + g10 + b10) << 16) ^
+                     ((r11 + g11 + b11) << 24);
+
+      // If this lightmap cell did not changed, do not recalculate
+      if (old_lm [src] == cellid)
+      { src++; continue; }
+
+      old_lm [src] = cellid;
+      src++;
+
+      int u = lu << pt_cell_shift;
+      int v = lv << pt_cell_shift;
       PI_PIXTYPE *out = ((PI_PIXTYPE *)dst) + (v << pt_shfw) + u;
 
-      int r0 = r00 << 6, r0d = ((r01 - r00) << (6 - pt_mipmap_shift));
-      int r1 = r10 << 6, r1d = ((r11 - r10) << (6 - pt_mipmap_shift));
-      int g0 = g00 << 6, g0d = ((g01 - g00) << (6 - pt_mipmap_shift));
-      int g1 = g10 << 6, g1d = ((g11 - g10) << (6 - pt_mipmap_shift));
-      int b0 = b00 << 6, b0d = ((b01 - b00) << (6 - pt_mipmap_shift));
-      int b1 = b10 << 6, b1d = ((b11 - b10) << (6 - pt_mipmap_shift));
+      int r0 = r00 << 6, r0d = ((r01 - r00) << (6 - pt_cell_shift));
+      int r1 = r10 << 6, r1d = ((r11 - r10) << (6 - pt_cell_shift));
+      int g0 = g00 << 6, g0d = ((g01 - g00) << (6 - pt_cell_shift));
+      int g1 = g10 << 6, g1d = ((g11 - g10) << (6 - pt_cell_shift));
+      int b0 = b00 << 6, b0d = ((b01 - b00) << (6 - pt_cell_shift));
+      int b1 = b10 << 6, b1d = ((b11 - b10) << (6 - pt_cell_shift));
 
-      for (int vv = 0; vv < pt_mipmap_size; vv++)
+      // If the texture is less than one lightcell width,
+      // we shouldn't fill past the borders of the texture
+      int lc_w = pt_w - u;
+      if (lc_w > pt_cell_size) lc_w = pt_cell_size;
+
+      int lc_h = pt_h - v;
+      if (lc_h > pt_cell_size) lc_h = pt_cell_size;
+
+      for (int vv = 0; vv < lc_h; vv++)
       {
-        if (v + vv >= pt_h) break;
-
         int tx_idx = ((v + vv + pt_minv) & tx_andh) << tx_shfw;
         PI_PIXTYPE *__out = out;
 
-        int r = r0, rd = (r1 - r0) >> pt_mipmap_shift;
-        int g = g0, gd = (g1 - g0) >> pt_mipmap_shift;
-        int b = b0, bd = (b1 - b0) >> pt_mipmap_shift;
+        int r = r0, rd = (r1 - r0) >> pt_cell_shift;
+        int g = g0, gd = (g1 - g0) >> pt_cell_shift;
+        int b = b0, bd = (b1 - b0) >> pt_cell_shift;
 
         int uu = u + pt_minu;
-        int end_uu = uu + pt_mipmap_size;
-
-	// Test for horizontal overflow.
-	int overflow = (out-out_end);
-	if (overflow > 0) end_uu -= overflow;
+        int end_uu = uu + lc_w;
 
         for (; uu < end_uu; uu++)
         {
@@ -169,16 +198,14 @@ void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
           r += rd; g += gd; b += bd;
         }
 
-        out = __out + pt_deltaw;
+        out = __out + pt_w;
 
         r0 += r0d; r1 += r1d;
         g0 += g0d; g1 += g1d;
         b0 += b0d; b1 += b1d;
       }
-
-      src++;
     }
-    src += lm_w - max_lu;
+    src += src_dlu;
   }
 }
 

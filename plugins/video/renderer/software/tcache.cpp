@@ -17,6 +17,9 @@
 */
 
 #include "sysdef.h"
+#include "qint.h"
+#include "csutil/garray.h"
+#include "csutil/util.h"
 #include "tcache.h"
 #include "soft_g3d.h"
 #include "soft_txt.h"
@@ -43,8 +46,9 @@
 
 //------------------------------------------------- csTextureCacheSoftware ---//
 
-static void (*create_lighted_texture) (csBitSet *dirty, iPolygonTexture *pt,
-  void *dst, csTextureManagerSoftware *texman);
+static void (*create_lighted_texture) (iPolygonTexture *pt,
+  SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
+  float u_min, float v_min, float u_max, float v_max);
 
 csTextureCacheSoftware::csTextureCacheSoftware (csTextureManagerSoftware *TexMan)
 {
@@ -90,10 +94,11 @@ void csTextureCacheSoftware::Clear ()
   total_textures = 0;
 }
 
-SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (iPolygonTexture* pt)
+SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (int MipMap,
+  iPolygonTexture* pt)
 {
   SoftwareCachedTexture *cached_texture =
-    (SoftwareCachedTexture *)pt->GetCacheData ();
+    (SoftwareCachedTexture *)pt->GetCacheData (MipMap);
 
   if (cached_texture)
   {
@@ -122,7 +127,10 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (iPolygonTexture* p
   else
   {
     // Texture is not in the cache.
-    int bitmap_size = pt->GetSize () * bytes_per_texel;
+    int lightmap_size = pt->GetLightMap ()->GetSize () * sizeof (ULong);
+    int bitmap_w = (pt->GetWidth () >> MipMap);
+    int bitmap_h = ((pt->GetHeight () + (1 << MipMap) - 1) >> MipMap);
+    int bitmap_size = lightmap_size + bytes_per_texel * bitmap_w * (H_MARGIN * 2 + bitmap_h);
 
     total_textures++;
     total_size += bitmap_size;
@@ -144,16 +152,14 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (iPolygonTexture* p
       delete cached_texture;
     }
 
-    CHK (cached_texture = new SoftwareCachedTexture (pt));
+    CHK (cached_texture = new SoftwareCachedTexture (MipMap, pt));
 
-    int margin_size = H_MARGIN * pt->GetWidth () * bytes_per_texel;
-    UByte *bitmap = new UByte [bitmap_size];
-    //memset (bitmap, 0, margin_size);
-    //memset (bitmap + bitmap_size - margin_size, 0, margin_size);
-    cached_texture->data = bitmap;
-    cached_texture->bitmap = bitmap + margin_size; // Skip margin.
+    int margin_size = H_MARGIN * bitmap_w * bytes_per_texel;
+    UByte *data = new UByte [bitmap_size];
+    memset (data, 0, lightmap_size);
+    cached_texture->data = data;
+    cached_texture->bitmap = data + lightmap_size + margin_size; // Skip margin.
     cached_texture->size = bitmap_size;
-    pt->MakeAllDirty ();
 
     // Add new texture to cache.
     cached_texture->next = head;
@@ -167,80 +173,17 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (iPolygonTexture* p
   return cached_texture;
 }
 
-void csTextureCacheSoftware::init_texture (iPolygonTexture *pt)
+void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
+  float u_min, float v_min, float u_max, float v_max)
 {
-  pt->CreateDirtyMatrix ();
+  // Recalculate the lightmaps
+  pt->RecalculateDynamicLights ();
 
-  cache_texture (pt);
+  // Now cache the texture
+  SoftwareCachedTexture *cached_texture = cache_texture (MipMap, pt);
 
-  if (pt->RecalculateDynamicLights ())
-  {
-    // Texture is in cache and we just recalculated
-    // the dynamic lighting information.
-    if (!pt->GetDynlightOpt ())
-      pt->MakeAllDirty ();
-  }
-}
-
-void csTextureCacheSoftware::use_sub_texture (iPolygonTexture *pt,
-  csBitSet *dirty)
-{
-  if (pt->CleanIfDirty (dirty))
-  {
-    SoftwareCachedTexture *cached_texture = (SoftwareCachedTexture *)pt->GetCacheData ();
-    if (texman->do_lightmapgrid)
-      show_lightmap_grid (dirty, pt, cached_texture->bitmap, texman);
-    else
-      create_lighted_texture (dirty, pt, cached_texture->bitmap, texman);
-  }
-}
-
-void csTextureCacheSoftware::use_texture (iPolygonTexture* pt)
-{
-  SoftwareCachedTexture *cached_texture = cache_texture (pt);
-
-  if (pt->RecalculateDynamicLights ())
-    if (texman->do_lightmapgrid)
-      show_lightmap_grid (NULL, pt, cached_texture->bitmap, texman);
-    else
-      create_lighted_texture (NULL, pt, cached_texture->bitmap, texman);
-}
-
-void csTextureCacheSoftware::show_lightmap_grid (csBitSet *dirty,
-  iPolygonTexture *pt, void *dst, csTextureManagerSoftware *texman)
-{
-  (void) dirty;
-  (void) pt;
-  (void) dst;
-  (void) texman;
-#if 0
-  // not converted yet
-
-  int w = tcd.width;
-
-  unsigned char* mapR = tcd.mapR;
-  unsigned char* mapG = tcd.mapG;
-  unsigned char* mapB = tcd.mapB;
-
-  unsigned char* tm;
-  int u, v;
-
-  int lu, lv, luv;
-  luv = tcd.lv1 * tcd.lw + tcd.lu1;
-  for (lv = tcd.lv1 ; lv < tcd.lv2 ; lv++)
-  {
-    for (lu = tcd.lu1 ; lu < tcd.lu2 ; lu++)
-    {
-      u = lu << tcd.mipmap_shift;
-      v = lv << tcd.mipmap_shift;
-      tm = &cached_texture->bitmap [w*v+u];	//@@@
-      //@@@ This is NOT optimal but luckily it is a debug function only.
-      *tm = texman->find_rgb (mapR[luv], mapG[luv], mapB[luv]);
-      luv++;
-    }
-    luv += tcd.d_lw;
-  }
-#endif
+  // Compute the rectangle on the lighted texture, if it is dirty
+  create_lighted_texture (pt, cached_texture, texman, u_min, v_min, u_max, v_max);
 }
 
 #define SysPrintf iG3D->System->Printf

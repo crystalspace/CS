@@ -167,11 +167,11 @@ void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   csSector* sector = owner->GetSector ();
   if (!sector) sector = (csSector*)owner;
   sector->GetAmbientColor (r, g, b);
-  lightmap->Alloc (CURVE_LM_SIZE*16, CURVE_LM_SIZE*16, 16, r, g, b);
+  lightmap->Alloc (CURVE_LM_SIZE, CURVE_LM_SIZE, r, g, b);
 
   if (!do_cache) { lightmap_up_to_date = false; return; }
   if (csPolygon3D::do_force_recalc) lightmap_up_to_date = false;
-  else if (!lightmap->ReadFromCache (CURVE_LM_SIZE*16, CURVE_LM_SIZE*16, 16, owner, NULL, index, csWorld::current_world))
+  else if (!lightmap->ReadFromCache (CURVE_LM_SIZE, CURVE_LM_SIZE, owner, NULL, index, csWorld::current_world))
     lightmap_up_to_date = true;
   else lightmap_up_to_date = true;
 }

@@ -869,7 +869,7 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
   //Mipmapping is done for us by DirectX, so we will always select the texture with
   //the highest resolution.
-  iPolygonTexture *pTex = poly.poly_texture[0];
+  iPolygonTexture *pTex = poly.poly_texture;
 
   if (!pTex)
     return;

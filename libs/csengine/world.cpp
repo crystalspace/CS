@@ -595,7 +595,7 @@ void csWorld::ShineLights ()
     current.radiosity = (int)csSector::do_radiosity;
     current.accurate_things = csPolyTexture::do_accurate_things;
     current.cosinus_factor = csPolyTexture::cfg_cosinus_factor;
-    current.lightmap_size = csPolygon3D::def_mipmap_size;
+    current.lightmap_size = csPolygon3D::lightcell_size;
     current.lightmap_highqual = (int)csPolygon3D::do_lightmap_highqual;
     bool force = false;
     char* reason = NULL;
@@ -677,7 +677,7 @@ void csWorld::ShineLights ()
   csPolygon3D* p;
   int polygon_count = 0;
   if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
-    csPolygon3D::def_mipmap_size /= 2;
+    csPolygon3D::SetLightCellSize (csPolygon3D::lightcell_size / 2);
   pit->Restart ();
   while ((p = pit->Fetch ()) != NULL)
   {
@@ -723,12 +723,12 @@ void csWorld::ShineLights ()
   if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
   {
     CsPrintf (MSG_INITIALIZATION, "\nScaling lightmaps (%d maps):\n  ", polygon_count);
-    csPolygon3D::def_mipmap_size *= 2;
+    csPolygon3D::SetLightCellSize (csPolygon3D::lightcell_size * 2);
     meter.SetTotal (polygon_count);
     pit->Restart ();
     while ((p = pit->Fetch ()) != NULL)
     {
-      p->ScaleLightMaps ();
+      p->ScaleLightMaps2X ();
       meter.Step();
     }
   }
@@ -792,27 +792,6 @@ void csWorld::ShineLights ()
   cnt_GetIndex_hor,
   cnt_GetIndex_ver);
 #endif
-}
-
-void csWorld::SetSubtexSize (int s)
-{
-  csPolyTexture::subtex_size = s;
-  csPolygon3D* p;
-  csPolyIt* pit = NewPolyIterator ();
-  pit->Restart ();
-  while ((p = pit->Fetch ()) != NULL)
-  {
-    csLightMapped* lmi = p->GetLightMapInfo ();
-    if (lmi)
-    {
-      lmi->GetPolyTex (0)->DestroyDirtyMatrix ();
-      lmi->GetPolyTex (1)->DestroyDirtyMatrix ();
-      lmi->GetPolyTex (2)->DestroyDirtyMatrix ();
-      lmi->GetPolyTex (3)->DestroyDirtyMatrix ();
-    }
-  }
-
-  CHK (delete pit);
 }
 
 bool csWorld::CheckConsistency ()
@@ -1228,7 +1207,7 @@ void csWorld::AdvanceSpriteFrames (time_t current_time)
 void csWorld::ReadConfig ()
 {
   if (!System) return;
-  csPolygon3D::def_mipmap_size = System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16);
+  csPolygon3D::SetLightCellSize (System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16));
   csPolygon3D::do_lightmap_highqual = System->ConfigGetYesNo ("Lighting", "LIGHTMAP_HIGHQUAL", true);
   csLight::ambient_red = System->ConfigGetInt ("World", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_green = System->ConfigGetInt ("World", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);

@@ -131,6 +131,9 @@ class csGraphics3DSoftware : public iGraphics3D
   /// Current inverse aspect ratio for perspective correction.
   float inv_aspect;
 
+  /// Mipmap selection coefficient (normal == 1.0)
+  float mipmap_coef;
+
   /// Do we want dithering? (dummy for now)
   bool rstate_dither;
   /// Do we want specular lighting? (dummy for now)
@@ -215,8 +218,6 @@ public:
   bool do_bilin_filt;
   /// Option variable: do perfect texture mapping?
   bool do_perfect;
-  /// Option variables: mipmap distances
-  float zdist_mipmap1, zdist_mipmap2, zdist_mipmap3;
   /// Do we want Gouraud Shaded polygons?
   bool rstate_gouraud;
 

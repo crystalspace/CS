@@ -264,7 +264,7 @@ void csScan_Finalize ();
 /// Calculate blending tables (should be called each time pixel format changes)
 void csScan_CalcBlendTables (int rbits, int gbits, int bbits);
 /// Initialize the scanline variables
-void csScan_InitDraw (csGraphics3DSoftware* g3d,
+void csScan_InitDraw (int MipMap, csGraphics3DSoftware* g3d,
   iPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt);
 /// Dump debugging information about last polygon
 void csScan_dump (csGraphics3DSoftware* pG3D);

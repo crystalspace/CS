@@ -766,7 +766,7 @@ void csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
   SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
 
   // retrieve the texture.
-  pTex = poly.poly_texture[0];
+  pTex = poly.poly_texture;
 
   if (!pTex)
      return E_INVALIDARG;

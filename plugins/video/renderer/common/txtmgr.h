@@ -289,9 +289,6 @@ public:
   /// The translation table for applying gamma
   UByte GammaTable [256];
 
-  /// For debugging: show lightmapgrid.
-  bool do_lightmapgrid;
-
   /// Texture gamma
   float Gamma;
 
@@ -309,9 +306,6 @@ public:
   virtual void Clear ()
   { textures.DeleteAll (); }
 
-  /// Query whenever mipmap level 0 is twice smaller
-  virtual bool GetVeryNice ()
-  { return (mipmap_mode == MIPMAP_VERYNICE); }
   /// Toggle verbose mode
   virtual void SetVerbose (bool enable)
   { verbose = enable; }

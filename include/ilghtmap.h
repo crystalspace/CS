@@ -47,6 +47,8 @@ struct iLightMap : public iBase
   virtual void SetCacheData (void *d) = 0;
   /// Get mean color for the lightmaps
   virtual void GetMeanLighting (int& r, int& g, int& b) = 0;
+  /// Get size of one lightmap
+  virtual long GetSize () = 0;
 };
 
 #endif

@@ -242,7 +242,6 @@ csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
   Gamma = 1.0;
   mipmap_mode = MIPMAP_NICE;
   do_blend_mipmap0 = false;
-  do_lightmapgrid = false;
   pfmt = *iG2D->GetPixelFormat ();
 }
 

@@ -57,9 +57,7 @@ private:
   unsigned char* GetShadowMap () { return map; }
 
   ///
-  void Alloc (csLight* light, int w, int h, int lms);
-  ///
-  void MipmapLightMap (int w, int h, int lms, csShadowMap* source, int w2, int h2, int lms2);
+  void Alloc (csLight* light, int w, int h);
   ///
   void CopyLightMap (csShadowMap* source, int size);
 };
@@ -120,7 +118,7 @@ public:
 };
 
 /**
- * The static and all dynamic lightmaps for one or more mipmap-levels of a polygon.
+ * The static and all dynamic lightmaps for one polygon.
  */
 class csLightMap : public iLightMap
 {
@@ -186,7 +184,7 @@ private:
   /**
    * Calculate the sizes of this lightmap.
    */
-  void SetSize (int w, int h, int lms);
+  void SetSize (int w, int h);
 
 public:
   ///
@@ -199,20 +197,12 @@ public:
   ///
   csRGBLightMap& GetRealMap () { return real_lm; }
 
-  ///
-  long GetSize () { return lm_size; }
-
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
    * bounding box in lightmap space.
    * r,g,b is the ambient light color used to initialize the lightmap.
    */
-  void Alloc (int w, int h, int lms, int r, int g, int b);
-
-  /**
-   * Allocate this lightmap by mipmapping the given source lightmap.
-   */
-  void MipmapLightMap (int w, int h, int lms, csLightMap* source, int w2, int h2, int lms2);
+  void Alloc (int w, int h, int r, int g, int b);
 
   /// Copy a lightmap.
   void CopyLightMap (csLightMap* source);
@@ -220,12 +210,12 @@ public:
   /**
    * Create a ShadowMap for this LightMap.
    */
-  csShadowMap* NewShadowMap (csLight* light, int w, int h, int lms);
+  csShadowMap* NewShadowMap (csLight* light, int w, int h);
 
   /**
    * Allocate the static RGBLightMap.
    */
-  void AllocStaticLM (int w, int h, int lms);
+  void AllocStaticLM (int w, int h);
 
   /**
    * Find a ShadowMap for a specific pseudo-dynamic light.
@@ -245,7 +235,7 @@ public:
    * Index is the index of the polygon in the containing object. It is used
    * for identifying the lightmap on disk.
    */
-  bool ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
+  bool ReadFromCache (int w, int h, csPolygonSet* owner,
     csPolygon3D* poly, int index, csWorld* world);
 
   /**
@@ -258,7 +248,7 @@ public:
    * Scale the lightmap one step down. This is used in
    * 'High Quality Lightmap Mode'.
    */
-  void Scale (int w, int h, int new_lms);
+  void Scale2X (int w, int h);
 
   /**
    * Convert the lightmaps to the correct mixing mode.
@@ -299,6 +289,9 @@ public:
   ///
   virtual void GetMeanLighting (int &r, int &g, int &b)
   { r = mean_r; g = mean_g; b = mean_b; }
+  /// Get size of one lightmap
+  virtual long GetSize ()
+  { return lm_size; }
 };
 
 #endif // LIGHTMAP_H

@@ -254,9 +254,7 @@ public:
   csPolygon3D* HitBeam (csVector3& start, csVector3& end);
 
   /**
-   * Given the first lightmap as calculated by the lighting
-   * routines create the lightmaps for the other mipmap levels and
-   * also convert the lightmaps so that they are suitable for the
+   * Prepare the lightmaps so that they are suitable for the
    * 3D rasterizer.
    */
   void CreateLightMaps (iGraphics3D* g3d);

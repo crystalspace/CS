@@ -108,7 +108,6 @@ csPolygonTemplate::csPolygonTemplate (csThingTemplate* iParent, char* iName,
   name = strnew (iName);
   texture = iTexture;
 
-  no_mipmap = false;
   no_lighting = false;
 
   use_flat_color = false;

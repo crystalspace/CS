@@ -35,13 +35,6 @@ class csTextureManagerSoftware;
 #define RGB2PAL_BITS_B	5
 
 /**
- * Define a small (3 pixels) margin at the bottom and top of
- * the texture. This is the easiest way I could find to 'fix' the
- * overflow problems with the texture mapper.
- */
-#define H_MARGIN	3
-
-/**
  * Lookup table for alpha mapping. Converts two palette entries
  * to a new palette entry (alpha blended).
  * (used for display output of 8-bit).

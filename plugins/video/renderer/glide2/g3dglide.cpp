@@ -971,7 +971,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   bool is_colorkeyed = false;
 
   // retrieve the texture.
-  pTex = poly.poly_texture[0];
+  pTex = poly.poly_texture;
   // cache the tex if neccessary
   if ( pTex && ( m_renderstate.textured || m_renderstate.lighting ) )
     CacheTexture (pTex);

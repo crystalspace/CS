@@ -17,6 +17,7 @@
 */
 
 #include <stdarg.h>
+#include <alloca.h>
 
 #include "sysdef.h"
 #include "qint.h"
@@ -155,10 +156,6 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 
   clipper = NULL;
 
-  zdist_mipmap1 = 12;
-  zdist_mipmap2 = 24;
-  zdist_mipmap3 = 40;
-
 #ifdef DO_MMX
   do_mmx = true;
 #endif
@@ -234,9 +231,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
     config->GetYesNo ("Hardware", "INTERLACING", false));
 
-  zdist_mipmap1 = config->GetFloat ("Mipmapping", "DMIPMAP1", 12.0);
-  zdist_mipmap2 = config->GetFloat ("Mipmapping", "DMIPMAP2", 24.0);
-  zdist_mipmap3 = config->GetFloat ("Mipmapping", "DMIPMAP3", 40.0);
+  mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
 
   return true;
 }
@@ -666,12 +661,9 @@ void csGraphics3DSoftware::SetClipper (csVector2* vertices, int num_vertices)
 
 bool csGraphics3DSoftware::BeginDraw (int DrawFlags)
 {
-  //ASSERT( G2D );
-
   if ((G2D->GetWidth() != display_width) || 
       (G2D->GetHeight() != display_height)) 
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
-
 
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
@@ -890,7 +882,7 @@ void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
   iLightMap *lm = NULL;
   if (do_lighting)
   {
-    tex = poly.poly_texture[0];
+    tex = poly.poly_texture;
     lm = tex->GetLightMap ();
   }
 
@@ -1150,58 +1142,6 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
     return;
 
-  // Correct 1/z -> z.
-  min_z = 1/min_z;
-
-  // Mipmapping.
-  int mipmap;
-  if (poly.uses_mipmaps == false || rstate_mipmap == 1)
-    mipmap = 0;
-  else if (rstate_mipmap == 0)
-  {
-    if (min_z < zdist_mipmap1) mipmap =  0;
-    else if (min_z < zdist_mipmap2) mipmap = 1;
-    else if (min_z < zdist_mipmap3) mipmap = 2;
-    else mipmap = 3;
-  }
-  else
-    mipmap = rstate_mipmap - 1;
-  iPolygonTexture *tex = poly.poly_texture [mipmap];
-  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
-  csTexture *txt_unl = tex_mm->get_texture (mipmap);
-
-  /// Check if polygon has a lightmap (i.e. if it is lighted)
-  bool has_lightmap = (tex->GetLightMap () != NULL);
-
-  // Initialize our static drawing information and cache
-  // the texture in the texture cache (if this is not already the case).
-  // If we are using the sub-texture optimization then we just allocate
-  // the needed memory in the cache but don't do any calculations yet.
-#if 0
-  int subtex_size = tex->GetSubtexSize ();
-#endif
-  if (has_lightmap && do_lighting)
-  {
-#if 0
-    if (subtex_size)
-    {
-      // If the size of the lighted polygon is too small we don't
-      // bother with the subtex optimization because it will be
-      // counter-productive. The problem is finding the exact value
-      // of 'too small'.
-      int size = tex->GetNumPixels ();
-      if (size < 64*64) subtex_size = 0;
-    }
-
-    if (subtex_size)
-      tcache->init_texture (tex);
-    else
-#endif
-      tcache->use_texture (tex);
-  }
-
-  csScan_InitDraw (this, tex, tex_mm, txt_unl);
-
   // @@@ The texture transform matrix is currently written as T = M*(C-V)
   // (with V being the transform vector, M the transform matrix, and C
   // the position in camera space coordinates. It would be better (more
@@ -1220,6 +1160,116 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         + Q2 * poly.plane.v_cam2tex->y
         + Q3 * poly.plane.v_cam2tex->z);
 
+  iPolygonTexture *tex = poly.poly_texture;
+  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
+  if (tex)
+  {
+    Scan.fdu = tex->GetFDU ();
+    Scan.fdv = tex->GetFDV ();
+  }
+  else
+  {
+    Scan.fdu = 0;
+    Scan.fdv = 0;
+  }
+
+  // Now we're in the right shape to determine the mipmap level.
+  // We'll use the following formula to determine the required level of
+  // mipmap: we'll take the x and y screen coordinates of nearest point.
+  // Now we compute u (x + delta, y) and u (x, y). Since u is expressed as:
+  //
+  //   u (x, y) = (J1 * x + J2 * y + J3) / (M * x + N * y + O)
+  //
+  // Now we compute u (x + delta, y + delta) - u (x, y), and we have:
+  //
+  //   J1 * delta + J2 * delta
+  //   -----------------------
+  //      M * x + N * y + O
+  //
+  // As we know, M * x + N * y + O == 1/z. Since we will examine the closest
+  // Z point, we already have it (in the min_z variable). Thus final formula
+  // is: (J1 * delta + J2 * delta) / min_z. Similary we deduce the formula for
+  // v (x + delta, y + delta) - v (x, y) = (K1 * delta + K2 * delta) / min_z.
+  //
+  // To get the texel density, we'll take delta = 1, and compute the following
+  // two values: u (x + 1, y + 1) - u (x, y) and v (x + 1, y + 1) - v (x, y).
+  // Thus, we have:
+  //
+  //   du = (J1 + J2) / inv_z
+  //   dv = (K1 + K2) / inv_z
+  // 
+  // Now we should take sqrt (du^2 + dv^2) and decide the mipmap level
+  // depending on this value. We can ommit the square root and work with the
+  // squared value. Thus, we can select the required mipmap level depending
+  // on this value this way:
+  //
+  //   if <= 2^2, mipmap level 0
+  //   if <= 4^2, mipmap level 1
+  //   if <= 8^2, mipmap level 2
+  //   if above, mipmap level 3
+
+  // Mipmapping.
+  int mipmap;
+  if (rstate_mipmap == 1)
+    mipmap = 0;
+  else if (rstate_mipmap == 0)
+  {
+    if (!min_z)
+      mipmap = 0;
+    else
+    {
+      // Mipmap level 0 size
+      int m0w = tex_mm->get_texture (0)->get_width ();
+      int m0h = tex_mm->get_texture (0)->get_height ();
+      float _J1 = (ABS (Dc) < SMALL_D) ? 0 : P1 * m0w * inv_aspect +
+                  (P4 * m0w - Scan.fdu) * M;
+      float _J2 = (ABS (Dc) < SMALL_D) ? 0 : P2 * m0w * inv_aspect +
+                  (P4 * m0w - Scan.fdu) * N;
+      float _K1 = (ABS (Dc) < SMALL_D) ? 0 : Q1 * m0h * inv_aspect +
+                  (Q4 * m0w - Scan.fdv) * M;
+      float _K2 = (ABS (Dc) < SMALL_D) ? 0 : Q2 * m0h * inv_aspect +
+                  (Q4 * m0w - Scan.fdv) * N;
+      min_z = 1 / min_z;
+      float _du = (_J1 + _J2) * min_z;
+      float _dv = (_K1 + _K2) * min_z;
+
+      _du = mipmap_coef * (_du * _du + _dv * _dv);
+
+      // Now look which mipmap we should use
+      if (_du <= 2 * 2)
+        mipmap = 0;
+      else if (_du <= 4 * 4)
+        mipmap = 1;
+      else if (_du <= 8 * 8)
+        mipmap = 2;
+      else
+        mipmap = 3;
+
+      // If mipmap is too small, use the level that is still visible ...
+      int shf_u = tex->GetShiftU () - mipmap;
+      if (shf_u < 0) mipmap += shf_u;
+      if (mipmap < 0) mipmap = 0;
+    }
+  }
+  else
+    mipmap = rstate_mipmap - 1;
+  if (mipmap)
+  {
+    int duv = (1 << mipmap);
+    Scan.fdu /= duv;
+    Scan.fdv /= duv;
+  }
+
+  // Now get the unlighted texture corresponding to mipmap level we choosen
+  csTexture *txt_unl = tex_mm->get_texture (mipmap);
+
+  // Check if polygon has a lightmap (i.e. if it is lighted)
+  bool has_lightmap = tex->GetLightMap () && do_lighting;
+
+  // Continue with texture mapping
+  Scan.tw = txt_unl->get_width ();
+  Scan.th = txt_unl->get_height ();
+
   P1 *= Scan.tw; P2 *= Scan.tw; P3 *= Scan.tw; P4 *= Scan.tw;
   Q1 *= Scan.th; Q2 *= Scan.th; Q3 *= Scan.th; Q4 *= Scan.th;
   P4 -= Scan.fdu; Q4 -= Scan.fdv;
@@ -1233,7 +1283,8 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     // The Dc component of the plane of the polygon is too small.
     J1 = J2 = J3 = 0;
     K1 = K2 = K3 = 0;
-  } else
+  }
+  else
   {
     J1 = P1 * inv_aspect + P4 * M;
     J2 = P2 * inv_aspect + P4 * N;
@@ -1271,12 +1322,133 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   Scan.M = M;
   Scan.J1 = J1;
   Scan.K1 = K1;
-  Scan.dM = M*Scan.InterpolStep;
-  Scan.dJ1 = J1*Scan.InterpolStep;
-  Scan.dK1 = K1*Scan.InterpolStep;
+  Scan.dM = M * Scan.InterpolStep;
+  Scan.dJ1 = J1 * Scan.InterpolStep;
+  Scan.dK1 = K1 * Scan.InterpolStep;
+
+  // Scan both sides of the polygon at once.
+  // We start with two pointers at the top (as seen in y-inverted
+  // screen-space: bottom of display) and advance them until both
+  // join together at the bottom. The way this algorithm works, this
+  // should happen automatically; the left pointer is only advanced
+  // when it is further away from the bottom than the right pointer
+  // and vice versa.
+  // Using this we effectively partition our polygon in trapezoids
+  // with at most two triangles (one at the top and one at the bottom).
+
+  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
+  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
+  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  int xL, xR;
+  int screenY;
+
+  // If we have a lighted polygon, prepare the texture
+  if (has_lightmap)
+  {
+    sxL = sxR = dxL = dxR = 0;
+    scanL2 = scanR2 = max_i;
+    sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
+
+    // Find the largest texture rectangle that is going to be displayed
+    float u_min = +99999999;
+    float v_min = +99999999;
+    float u_max = -99999999;
+    float v_max = -99999999;
+    int fin_y = sy;
+
+    // Do a quick polygon scan at the edges to find mi/max u and v
+    for ( ; ; )
+    {
+      bool leave;
+      do
+      {
+        leave = true;
+        if (sy <= fyR)
+        {
+          // Check first if polygon has been finished
+          if (scanR2 == min_i)
+            goto texr_done;
+          scanR1 = scanR2;
+          if (++scanR2 >= poly.num)
+            scanR2 = 0;
+
+          leave = false;
+          fyR = QRound (poly.vertices [scanR2].sy);
+          if (sy <= fyR)
+            continue;
+
+          float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
+          if (dyR)
+          {
+            sxR = poly.vertices [scanR1].sx;
+            dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
+            // horizontal pixel correction
+            sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
+          }
+        }
+        if (sy <= fyL)
+        {
+          scanL1 = scanL2;
+          if (--scanL2 < 0)
+            scanL2 = poly.num - 1;
+
+          leave = false;
+          fyL = QRound (poly.vertices [scanL2].sy);
+          if (sy <= fyL)
+            continue;
+
+          float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
+          if (dyL)
+          {
+            sxL = poly.vertices [scanL1].sx;
+            dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
+            // horizontal pixel correction
+            sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
+          }
+        }
+      } while (!leave);
+
+      // Compute U/V and check against bounding box
+#define CHECK(sx)					\
+      {							\
+        float cx = (sx - float (width2));		\
+        float z = 1 / (M * cx + N * cy + O);		\
+        float u = (J1 * cx + J2 * cy + J3) * z;		\
+        float v = (K1 * cx + K2 * cy + K3) * z;		\
+							\
+        if (u < u_min) u_min = u;			\
+        if (u > u_max) u_max = u;			\
+        if (v < v_min) v_min = v;			\
+        if (v > v_max) v_max = v;			\
+      }
+
+      float cy = (float (sy) - 0.5 - float (height2));
+      CHECK (sxL);
+      CHECK (sxR);
+
+      // Find the trapezoid top (or bottom in inverted Y coordinates)
+      fin_y = sy;
+      if (fyL > fyR)
+        sy = fyL;
+      else
+        sy = fyR;
+    }
+texr_done:
+
+    float cy = (float (sy) - 0.5 - float (height2));
+    sxL += dxL * (fin_y - sy);
+    sxR += dxR * (fin_y - sy);
+    CHECK (sxL);
+    CHECK (sxR);
+
+#undef CHECK
+
+    tcache->fill_texture (mipmap, tex, u_min, v_min, u_max, v_max);
+  }
+  csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
 
   // Select the right scanline drawing function.
-  bool tex_transp = Scan.Texture->GetTransparent ();
+  bool tex_transp = tex_mm->GetTransparent ();
   int  scan_index = -2;
   csDrawScanline* dscan = NULL;
 
@@ -1304,82 +1476,6 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   if (!dscan)
     if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
       return; // nothing to do
-
-  // If sub-texture optimization is enabled we will convert the 2D screen polygon
-  // to texture space and then triangulate this texture polygon to cache all
-  // needed sub-textures.
-  // Note that we will not do this checking if there are no dirty sub-textures.
-  // This is an optimization.
-#if 0
-  int nDirty = tex->GetNumberDirtySubTex ();
-  if (has_lightmap && do_lighting && subtex_size && nDirty)
-  {
-    // To test if the idea is feasible I'll first implement a more naive
-    // algorithm here. I will search the bounding box in texture space
-    // that is visible and cache all sub-textures inside that bounding box.
-
-    // @@@ When everything works this algorithm needs to be rewritten so
-    // that only the visible shape is used. One way to do this would be
-    // to triangulate and do this thing a triangle at a time.
-
-    float min_u = 0, max_u = 0, min_v = 0, max_v = 0;
-    for (int vertex = 0; vertex < poly.num; vertex++)
-    {
-      float cx = poly.vertices [vertex].sx - float (width2);
-      // apply sub-pixel correction
-      int nextvert = (vertex == 0) ? poly.num - 1 : vertex - 1;
-      float y1 = poly.vertices [vertex].sy;
-      float y2 = poly.vertices [nextvert].sy;
-      int iy = QRound (y1);
-      if (iy != QRound (y2))
-      {
-        float dx = (poly.vertices [nextvert].sx - poly.vertices [vertex].sx) / (y1 - y2);
-        cx += dx * (poly.vertices [vertex].sy - (float (iy) - 0.5));
-      } /* endif */
-      cx = float (QRound (cx));
-
-      float cy = (float (iy) - 0.5) - float (height2);
-      float inv_z = M * cx + N * cy + O;
-      float u_div_z = J1 * cx + J2 * cy + J3;
-      float v_div_z = K1 * cx + K2 * cy + K3;
-      float z = 1. / inv_z;
-      float u = u_div_z * z;
-      float v = v_div_z * z;
-
-      if (vertex == 0)
-        min_u = max_u = u, min_v = max_v = v;
-      else
-      {
-        if (u < min_u) min_u = u; else if (u > max_u) max_u = u;
-        if (v < min_v) min_v = v; else if (v > max_v) max_v = v;
-      }
-    } /* endfor */
-    if (min_u < 0) min_u = 0; else if (max_u > Scan.tw2) max_u = Scan.tw2;
-    if (min_v < 0) min_v = 0; else if (max_v > Scan.th2) max_v = Scan.th2;
-
-    if ((min_u < Scan.tw2)
-     && (min_v < Scan.th2)
-     && (max_u > 0)
-     && (max_v > 0))
-      CacheRectTexture (tex, QInt (min_u), QInt (min_v), QInt (max_u), QInt (max_v));
-  }
-#endif
-
-  // Scan both sides of the polygon at once.
-  // We start with two pointers at the top (as seen in y-inverted
-  // screen-space: bottom of display) and advance them until both
-  // join together at the bottom. The way this algorithm works, this
-  // should happen automatically; the left pointer is only advanced
-  // when it is further away from the bottom than the right pointer
-  // and vice versa.
-  // Using this we effectively partition our polygon in trapezoids
-  // with at most two triangles (one at the top and one at the bottom).
-
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
-  int xL, xR;
-  int screenY;
 
   sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
@@ -1461,14 +1557,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 
     while (sy > fin_y)
     {
-      //@@@ Normally I would not need to have to check against screen
-      // boundaries but apparantly there are cases where this test is
-      // needed (maybe a bug in the clipper?). I have to look at this later.
-#if 1
       if ((sy & 1) != do_interlaced)
-#else
-      if (((sy & 1) != do_interlaced) && (sxR >= 0) && (sxL < width) && (screenY >= 0) && (screenY < height))
-#endif
       {
         // Compute the rounded screen coordinates of horizontal strip
         xL = QRound (sxL);
@@ -1489,8 +1578,6 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
-        //if (dscanFog)
-	  //dscanFog (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
       }
 
       sxL += dxL;
@@ -2553,7 +2640,7 @@ IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
   IMPLEMENTS_INTERFACE (iConfig)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-#define NUM_OPTIONS 14
+#define NUM_OPTIONS 10
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
 {
@@ -2565,12 +2652,8 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 5, "bifilt", "Bilinear filtering", CSVAR_BOOL },
   { 6, "mmx", "MMX support", CSVAR_BOOL },
   { 7, "gamma", "Gamma value", CSVAR_FLOAT },
-  { 8, "dmipmap1", "Mipmap distance 1", CSVAR_FLOAT },
-  { 9, "dmipmap2", "Mipmap distance 2", CSVAR_FLOAT },
-  { 10, "dmipmap3", "Mipmap distance 3", CSVAR_FLOAT },
-  { 11, "gouraud", "Gouraud shading", CSVAR_BOOL },
-  { 12, "smaller", "Smaller rendering", CSVAR_BOOL },
-  { 13, "lmgrid", "Lightmap grid", CSVAR_BOOL },
+  { 8, "gouraud", "Gouraud shading", CSVAR_BOOL },
+  { 9, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 
 bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
@@ -2589,12 +2672,8 @@ bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
     case 6: scfParent->do_mmx = value->v.b; break;
 #endif
     case 7: scfParent->texman->Gamma = value->v.f; break;
-    case 8: scfParent->zdist_mipmap1 = value->v.f; break;
-    case 9: scfParent->zdist_mipmap2 = value->v.f; break;
-    case 10: scfParent->zdist_mipmap3 = value->v.f; break;
-    case 11: scfParent->rstate_gouraud = value->v.b; break;
-    case 12: scfParent->do_smaller_rendering = value->v.b; break;
-    case 13: scfParent->texman->do_lightmapgrid = value->v.b; break;
+    case 8: scfParent->rstate_gouraud = value->v.b; break;
+    case 9: scfParent->do_smaller_rendering = value->v.b; break;
     default: return false;
   }
   scfParent->ScanSetup ();
@@ -2616,12 +2695,8 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
     case 6: value->v.b = scfParent->do_mmx; break;
 #endif
     case 7: value->v.f = scfParent->texman->Gamma; break;
-    case 8: value->v.f = scfParent->zdist_mipmap1; break;
-    case 9: value->v.f = scfParent->zdist_mipmap2; break;
-    case 10: value->v.f = scfParent->zdist_mipmap3; break;
-    case 11: value->v.b = scfParent->rstate_gouraud; break;
-    case 12: value->v.b = scfParent->do_smaller_rendering; break;
-    case 13: value->v.b = scfParent->texman->do_lightmapgrid; break;
+    case 8: value->v.b = scfParent->rstate_gouraud; break;
+    case 9: value->v.b = scfParent->do_smaller_rendering; break;
     default: return false;
   }
   return true;

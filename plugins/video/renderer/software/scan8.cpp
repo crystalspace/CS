@@ -19,9 +19,6 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "scan.h"
-#include "tcache.h"
-#include "isystem.h"
-#include "ipolygon.h"
 #include "soft_g3d.h"
 
 #include "sttest.h"

@@ -2076,7 +2076,6 @@ void Blocks::InitDemoRoom ()
   p->AddVertex (50, -50, 50);
   p->AddVertex (-50, -50, 50);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 100);
-  p->SetFlags (CS_POLY_MIPMAP, 0);
 
   demo_room->AddLight (new csStatLight (0, 0, -2, 10, .4, .4, .4, false));
 

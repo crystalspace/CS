@@ -1455,11 +1455,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         }
         break;
       case TOKEN_MIPMAP:
-        {
-          int do_mipmap;
-          ScanStr (params, "%b", &do_mipmap);
-          poly3d->SetFlags (CS_POLY_MIPMAP, do_mipmap ? CS_POLY_MIPMAP : 0);
-        }
+        //@@@ OBSOLETE
         break;
       case TOKEN_COSFACT:
         {
@@ -1476,9 +1472,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         }
         break;
       case TOKEN_FOG:
-        {
-          //@@@ OBSOLETE
-        }
+        //@@@ OBSOLETE
         break;
       case TOKEN_PORTAL:
         {
@@ -2066,11 +2060,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         }
         break;
       case TOKEN_MIPMAP:
-        {
-          int do_mipmap;
-          ScanStr (params, "%b", &do_mipmap);
-          ptemplate->SetMipmapping (do_mipmap);
-        }
+        //@@@ OBSOLETE
         break;
       case TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
@@ -2958,7 +2948,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
   csVector3 vm (0, 0, 0);
   csTextureHandle* texture = NULL;
   float tscale = 1;
-  int no_mipmap = false, no_lighting = false;
+  int no_lighting = false;
 
   int num_portals = 0;
   RPortal portals[MAX_ROOM_PORTALS];
@@ -3024,7 +3014,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         ScanStr (params, "%b", &no_lighting); no_lighting = !no_lighting;
         break;
       case TOKEN_TEXTURE_MIPMAP:
-        ScanStr (params, "%b", &no_mipmap); no_mipmap = !no_mipmap;
+        //@@@ OBSOLETE
         break;
       case TOKEN_CEIL_TEXTURE:
       case TOKEN_FLOOR_TEXTURE:
@@ -3410,8 +3400,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
                               sector->Vwor (todo[done].tv2), len);
       else
         p->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (colors[idx].plane));
-      p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING,
-        (no_mipmap ? 0 : CS_POLY_MIPMAP) | (no_lighting ? 0 : CS_POLY_LIGHTING));
+      p->SetFlags (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
       csLightMapped* pol_lm = p->GetLightMapInfo ();
       if (pol_lm) pol_lm->SetUniformDynLight (todo[done].light);
     }
@@ -3651,7 +3640,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
+      p->SetFlags (CS_POLY_LIGHTING, CS_POLY_LIGHTING);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (new_vertices[(j+1)%num]);
@@ -3672,7 +3661,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
+      p->SetFlags (CS_POLY_LIGHTING, CS_POLY_LIGHTING);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (prev_vertices[(j+1)%num]);
@@ -3715,7 +3704,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     p->SetName (poly_name);
     p->SetSector (&sector);
     p->SetParent (&sector);
-    p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
+    p->SetFlags (CS_POLY_LIGHTING, CS_POLY_LIGHTING);
     p->SetCosinusFactor (1);
     p->AddVertex (top_vertex);
     p->AddVertex (prev_vertices[j]);
@@ -4008,14 +3997,14 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
   CHK (csIniFile* cfg = new csIniFile ("world.cfg"));
   if (cfg)
   {
-    csPolygon3D::def_mipmap_size = cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
-    	csPolygon3D::def_mipmap_size);
+    csPolygon3D::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
+    	csPolygon3D::lightcell_size));
     csPolygon3D::do_lightmap_highqual = cfg->GetInt ("Lighting", "LIGHTMAP_HIGHQUAL",
     	csPolygon3D::do_lightmap_highqual);
     CHK (delete cfg);
   }
-  CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d%s.\n", csPolygon3D::def_mipmap_size,
-      csPolygon3D::def_mipmap_size,
+  CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d%s.\n",
+      csPolygon3D::lightcell_size, csPolygon3D::lightcell_size,
       csPolygon3D::do_lightmap_highqual ? " (high quality)" : " (normal quality)");
 
   if (!LoadWorld (buf))

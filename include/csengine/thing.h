@@ -170,8 +170,8 @@ public:
   void Transform ();
 
   /**
-   * Create all mipmaps for all textures for all polygons of
-   * this thing.
+   * Prepare the lightmaps for all polys so that they are suitable
+   * for the 3D rasterizer.
    */
   void CreateLightMaps (iGraphics3D* g3d);
 

@@ -298,16 +298,14 @@ bool csGraphics3DOpenGL::Open (const char *Title)
 
   // need some good way of determining a good texture map size and
   // bit depth for the texture 'cache', since GL hides most of the
-  // details
-  // from us.  Maybe we should just not worry about it... GJH
+  // details from us. Maybe we should just not worry about it... GJH
 
   CHK (texture_cache = new OpenGLTextureCache (1 << 24, 24));
   CHK (lightmap_cache = new OpenGLLightmapCache (1 << 24, 24));
   texture_cache->SetBilinearMapping (config->GetYesNo ("OpenGL", "ENABLE_BILINEARMAP", true));
 
   // tells OpenGL driver we align texture data on byte boundaries,
-  // instead
-  // of perhaps word or dword boundaries
+  // instead of perhaps word or dword boundaries
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
   // generate the exponential 1D texture for use in vertex fogging
@@ -563,7 +561,7 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   if (num_vertices < 3)
     return;
 
-  iPolygonTexture *tex = poly.poly_texture[0];
+  iPolygonTexture *tex = poly.poly_texture;
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
@@ -1319,7 +1317,7 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 {
 // work in progress - GJH
 #if USE_MULTITEXTURE
-  iPolygonTexture *tex = poly.poly_texture[0];
+  iPolygonTexture *tex = poly.poly_texture;
 
   // find lightmap information, if any
   iLightMap *thelightmap = tex->GetLightMap ();
@@ -1394,27 +1392,7 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   if (num_vertices < 3)
     return false;
 
-  // Mipmapping.
-  int mipmap;
-  if (!poly.uses_mipmaps || m_renderstate.mipmap == 1)
-    mipmap = 0;
-  else if (m_renderstate.mipmap == 0)
-  {
-    // @@@ The ZDIST_... config values should move to the 3D
-    // rasterizer
-    if (min_z < 8)
-      mipmap = 0;
-    else if (min_z < 16)
-      mipmap = 1;
-    else if (min_z < 28)
-      mipmap = 2;
-    else
-      mipmap = 3;
-  }
-  else
-    mipmap = m_renderstate.mipmap - 1;
-
-  tex = poly.poly_texture[mipmap];
+  tex = poly.poly_texture;
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any

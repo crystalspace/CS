@@ -1048,7 +1048,7 @@ float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox& boundin
     return -1;
 
   // Transform from camera to screen space.
-  if (cbox.MinZ () < 0)
+  if (cbox.MinZ () <= 0)
   {
     // Sprite is very close to camera.
     // Just return a maximum bounding box.

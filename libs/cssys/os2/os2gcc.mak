@@ -98,7 +98,7 @@ LFLAGS.optimize=-s
 ifeq ($(USE_OMF)/$(USE_CRTDLL),yes/no)
   LFLAGS.optimize+=-Zsmall-conv -Zsys -lemx
 else
-  LFLAGS.optimize+=-Zcrtdll
+  LFLAGS.optimize+=-Zcrtdll -Zstack 512
 endif
 
 # Flags for the linker which are used when debugging.

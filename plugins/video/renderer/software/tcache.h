@@ -32,20 +32,29 @@ struct csPixelFormat;
 #define DEFAULT_CACHE_SIZE	8*1024*1024
 
 /**
+ * Define a small (3 pixels) margin at the bottom and top of
+ * the texture. This is the easiest way I could find to 'fix' the
+ * overflow problems with the texture mapper.
+ */
+#define H_MARGIN	3
+
+/**
  * This structure represents a lighted texture as used
  * by the software texture cache.
  */
 class SoftwareCachedTexture
 {
-  friend class csTextureCacheSoftware;
-
+public:
   /// Linked in the texture cache.
   SoftwareCachedTexture *next, *prev;
 
   /// Size (in bytes).
   long size;
 
-  /// The lighted texture data.
+  /**
+   * The lighted texture data. The beginning of this array
+   * holds the lightmap used to generate this lighted texture.
+   */
   UByte *data;
 
   /**
@@ -57,23 +66,29 @@ class SoftwareCachedTexture
   /// The original polygon texture
   iPolygonTexture *source;
 
-public:
+  /// Mipmap level for this texture
+  int mipmap;
+
   /// Initialize the lighted texture object
-  SoftwareCachedTexture (iPolygonTexture *Source)
+  SoftwareCachedTexture (int MipMap, iPolygonTexture *Source)
   {
     data = bitmap = NULL; next = prev = NULL;
-    (source = Source)->SetCacheData (this);
+    (source = Source)->SetCacheData (mipmap = MipMap, this);
   }
   /// Destroy the lighted texture
   ~SoftwareCachedTexture ()
   {
-    source->SetCacheData (NULL);
+    source->SetCacheData (mipmap, NULL);
     delete [] data;
   }
 
   /// Get the pointer to the bitmap
-  inline UByte *get_bitmap ()
+  UByte *get_bitmap ()
   { return bitmap; }
+
+  /// Get the pointer to lightmap
+  UByte *get_lightmap ()
+  { return data; }
 };
 
 /**
@@ -101,10 +116,6 @@ protected:
   /// The texture manager
   csTextureManagerSoftware *texman;
 
-  /// Debugging: show the lightmap without the texture
-  void show_lightmap_grid (csBitSet *dirty, iPolygonTexture *pt,
-    void *dst, csTextureManagerSoftware *texman);
-
 public:
   /// Initialize the texture cache
   csTextureCacheSoftware (csTextureManagerSoftware *TexMan);
@@ -126,31 +137,15 @@ public:
    * overall size of all textures exceeds maximal cache size, the
    * least used texture is discarded.
    */
-  SoftwareCachedTexture *cache_texture (iPolygonTexture* pt);
-
-  /**
-   * Load a texture in the texture cache but do not do any calculations yet.
-   * This is meant to be used in combination with use_sub_texture.
-   * This function will also make sure that the dirty matrix is allocated
-   * and has the right size. If changes need to be made here it will set
-   * the dirty matrix to all dirty.
-   */
-  void init_texture (iPolygonTexture* pt);
+  SoftwareCachedTexture *cache_texture (int MipMap, iPolygonTexture* pt);
 
   /**
    * Check if the given texture is in the cache and possibly
-   * add it if not.
+   * add it if not. The parts of lighted texture that were changed
+   * will be recomputed.
    */
-  void use_texture (iPolygonTexture* pt);
-
-  /**
-   * Check if the given sub-texture is in the cache and possibly
-   * add it if not. WARNING! This function assumes that the texture is
-   * already in the cache (put there with init_texture possibly).
-   * The bit set contains a bit matrix with "1" in the positions that
-   * should be updated.
-   */
-  void use_sub_texture (iPolygonTexture* pt, csBitSet *dirty);
+  void fill_texture (int MipMap, iPolygonTexture* pt,
+    float u_min, float v_min, float u_max, float v_max);
 
   /**
    * Do a debugging dump.

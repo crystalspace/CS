@@ -212,7 +212,7 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
 
 void csScan_Finalize ()
 {
-  for (int i = 0; i < 6; i++)
+  for (int i = 0; i < NUMBLENDINGTABLES; i++)
     CHKB (delete [] Scan.BlendingTable [i]);
   CHK (delete [] Scan.exp_16);
   CHK (delete [] Scan.exp_256);
@@ -221,12 +221,10 @@ void csScan_Finalize ()
   CHK (delete [] Scan.filter_mul_table);
 }
 
-void csScan_InitDraw (csGraphics3DSoftware* g3d, iPolygonTexture* tex,
-  csTextureMMSoftware* texture, csTexture* untxt)
+void csScan_InitDraw (int MipMap, csGraphics3DSoftware* g3d,
+  iPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt)
 {
   Scan.Texture = texture;
-  Scan.tw = untxt->get_width ();
-  Scan.th = untxt->get_height ();
   Scan.bitmap = (UByte *)untxt->get_bitmap ();
   Scan.shf_w = untxt->get_w_shift ();
   Scan.and_w = untxt->get_w_mask ();
@@ -239,28 +237,25 @@ void csScan_InitDraw (csGraphics3DSoftware* g3d, iPolygonTexture* tex,
 
   if (g3d->do_lighting)
   {
-    SoftwareCachedTexture *tclt = (SoftwareCachedTexture *)tex->GetCacheData ();
+    SoftwareCachedTexture *tclt = (SoftwareCachedTexture *)tex->GetCacheData (MipMap);
     if (tclt)
       Scan.bitmap2 = tclt->get_bitmap ();
     else
       Scan.bitmap2 = NULL;	// Not a lighted texture.
-
-    Scan.fdu = tex->GetFDU ();
-    Scan.fdv = tex->GetFDV ();
   }
   else
   {
     Scan.bitmap2 = NULL;
     Scan.fdu = Scan.fdv = 0;
   }
-  Scan.tw2 = tex->GetWidth ();
-  Scan.th2 = tex->GetHeight ();
+  Scan.tw2 = tex->GetWidth () >> MipMap;
+  Scan.th2 = tex->GetHeight () >> MipMap;
 
 #ifdef STUPID_TEST
   Scan.tw2fp = (Scan.tw2 << 16) - 1;
   Scan.th2fp = (Scan.th2 << 16) - 1;
 #endif
-  Scan.shf_u = tex->GetShiftU ();
+  Scan.shf_u = tex->GetShiftU () - MipMap;
 
   Scan.and_h <<= Scan.shf_w;
   Scan.shf_h = 16 - Scan.shf_w;

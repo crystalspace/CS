@@ -49,23 +49,17 @@ struct iGraphics2D;
 struct iGraphics3D;
 
 /**
- * If CS_POLY_MIPMAP is set for a polygon then mipmapping will be used.
- * It is set by default.
- */
-#define CS_POLY_MIPMAP		0x00000001
-
-/**
  * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
  * It is set by default.
  */
-#define CS_POLY_LIGHTING	0x00000002
+#define CS_POLY_LIGHTING	0x00000001
 
 /**
  * If CS_POLY_FLATSHADING is set for a polygon then the polygon will not
  * be texture mapped but instead it will be flat shaded (possibly with gouraud).
  * It is unset by default.
  */
-#define CS_POLY_FLATSHADING	0x00000004
+#define CS_POLY_FLATSHADING	0x00000002
 
 /// Texture type is lightmapped
 #define POLYTXT_LIGHTMAP	1
@@ -136,17 +130,8 @@ class csLightMapped : public csPolygonTextureType
   friend class csPolygon3D;
 
 private:
-  /**
-   * The textures and lightmaps for the four mipmap levels.
-   * The transformed texture for this polygon.
-   */
+  /// The transformed texture for this polygon.
   csPolyTexture* tex;
-  /// A mipmapped texture: one step further.
-  csPolyTexture* tex1;
-  /// A mipmapped texture: two steps further.
-  csPolyTexture* tex2;
-  /// A mipmapped texture: three steps further.
-  csPolyTexture* tex3;
 
   /**
    * The csPolyTxtPlane for this polygon.
@@ -180,11 +165,8 @@ public:
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
 
-  /**
-   * Get the polytexture (lighted texture) with a given mipmap level
-   * (0, 1, 2 or 3).
-   */
-  csPolyTexture* GetPolyTex (int mipmap);
+  /// Get the polytexture (lighted texture)
+  csPolyTexture* GetPolyTex ();
 
   /**
    * Return the texture plane of this polygon.
@@ -222,7 +204,7 @@ class csGouraudShaded : public csPolygonTextureType
 private:
   /**
    * If the following arrays is non-NULL then this polygon is drawn
-   * using a different technique (all previous mipmap and lightmap stuff
+   * using a different technique (all previous lightmap stuff
    * is ignored). The polygon will be drawn with perspective incorrect
    * texture mapping and (in the future) Gouroud shading. The following
    * array specifies the u,v coordinates for every vertex of the polygon.
@@ -454,8 +436,10 @@ public:
   static bool do_force_recalc;
   /// Option variable: inhibit lightmap recalculation?
   static bool do_not_force_recalc;
-  /// Option variable: shadow mipmap size
-  static int def_mipmap_size;
+  /// Option variable: shadow cell size
+  static int lightcell_size;
+  /// Log base 2 of lightcell_size
+  static int lightcell_shift;
   /// Option variable: high quality lightmap rendering.
   static bool do_lightmap_highqual;
   /// Option variable: cache lightmaps.
@@ -502,6 +486,13 @@ public:
    * already correct.
    */
   void SetTextureType (int type);
+
+  /**
+   * Set the size of one lightmap cell (default = 16).
+   * Do not directly assign to the lightcell_size variable, as
+   * lightmap_shift also has to be updated.
+   */
+  static void SetLightCellSize (int size);
 
   /**
    * Short-hand to get the texture type from the csPolygonTextureType
@@ -842,7 +833,7 @@ public:
   void SetTextureSpace (const csMatrix3& tx_matrix, const csVector3& tx_vector);
 
   /**
-   * Prepare the lightmaps for use (different mipmap levels).
+   * Prepare the lightmaps for use.
    * This function also converts the lightmaps to the correct
    * format required by the 3D driver. This function does NOT
    * create the first lightmap. This is done by the precalculated
@@ -997,7 +988,7 @@ public:
    * Scale the lightmaps one step down. This is used in 'High Quality
    * Lightmap Mode' and is generally only called by csWorld.
    */
-  void ScaleLightMaps ();
+  void ScaleLightMaps2X ();
 
   /**
    * Redo some init of the polygon when the lumel size of
@@ -1112,9 +1103,7 @@ public:
   ///
   virtual csVector3 *GetCameraVector (int idx);
   ///
-  virtual iPolygonTexture *GetObjectTexture (int nLevel);
-  /// 
-  virtual bool UsesMipMaps ();
+  virtual iPolygonTexture *GetObjectTexture ();
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha ();
   ///

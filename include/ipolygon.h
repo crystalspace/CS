@@ -54,16 +54,14 @@ struct iPolygon3D : public iBase
   ///
   virtual csVector3 *GetCameraVector (int idx) = 0;
   ///
-  virtual iPolygonTexture *GetObjectTexture (int nLevel) = 0;
-  /// 
-  virtual bool UsesMipMaps () = 0;
+  virtual iPolygonTexture *GetObjectTexture () = 0;
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha () = 0;
   ///
   virtual iLightMap *GetLightMap () = 0;
 };
 
-SCF_VERSION (iPolygonTexture, 0, 0, 1);
+SCF_VERSION (iPolygonTexture, 1, 0, 0);
 
 /// temporary - subject to change
 struct iPolygonTexture : public iBase
@@ -79,18 +77,8 @@ struct iPolygonTexture : public iBase
   /// Get height of lighted texture.
   virtual int GetHeight () = 0;
   ///
-  virtual int GetMipmapLevel () = 0;
-  ///
   virtual int GetShiftU () = 0;
-  ///
-  virtual int GetSize () = 0;
 
-  ///
-  virtual int GetNumPixels () = 0;
-  ///
-  virtual int GetMipMapSize () = 0;
-  ///
-  virtual int GetMipMapShift () = 0;
   ///
   virtual int GetIMinU () = 0;
   ///
@@ -102,6 +90,8 @@ struct iPolygonTexture : public iBase
 
   ///
   virtual iPolygon3D *GetPolygon () = 0;
+  /// Check if dynamic lighting information should be recalculated
+  virtual bool DynamicLightsDirty () = 0;
   /**
    * Recalculate all pseudo and real dynamic lights if the
    * texture is dirty. The function returns true if there
@@ -109,38 +99,18 @@ struct iPolygonTexture : public iBase
    * from the texture cache).
    */
   virtual bool RecalculateDynamicLights () = 0;
-  /**
-   * Create the dirty matrix if needed. This function will also check
-   * if the dirty matrix has the right size. If not it will recreate it.
-   * The dirty matrix is used in combination with the sub-texture optimization.
-   * If recreation of the dirty matrix was needed it will be made all dirty.
-   */
-  virtual void CreateDirtyMatrix () = 0;
-  /**
-   * Make the dirty matrix completely dirty.
-   */
-  virtual void MakeAllDirty () = 0;
-  /**
-   * Check if there are any dirty lightmap cells, and clean the dirty
-   * matrix in the corresponding places if so. Returns true if there are
-   * any coincident bits in both bit sets (and thus we need to compute
-   * any lightmap cells in texture cache).
-   */
-  virtual bool CleanIfDirty (csBitSet *bs) = 0;
 
   /// 
   virtual iLightMap *GetLightMap () = 0;
+  /// Query the size of one light cell (always a power of two)
+  virtual int GetLightCellSize () = 0;
+  /// Query log2 (cell size)
+  virtual int GetLightCellShift () = 0;
 
-  /// Return the number of dirty sub-textures.
-  virtual int GetNumberDirtySubTex () = 0;
-  ///
-  virtual int GetSubtexSize () = 0;
-  ///
-  virtual bool GetDynlightOpt () = 0;
   /// Get data used internally by texture cache
-  virtual void *GetCacheData () = 0;
+  virtual void *GetCacheData (int idx) = 0;
   /// Set data used internally by texture cache
-  virtual void SetCacheData (void *d) = 0;
+  virtual void SetCacheData (int idx, void *d) = 0;
 };
 
 #endif

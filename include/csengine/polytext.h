@@ -33,20 +33,8 @@ class Dumper;
 struct iTextureHandle;
 struct LightInfo;
 
-/// The default sub-texture size.
-#define DEFAULT_SUBTEX_SIZE 32
-
-/**
- * Define a small (3 pixels) margin at the bottom and top of
- * the texture. This is the easiest way I could find to 'fix' the
- * overflow problems with the texture mapper.
- */
-#define H_MARGIN 3
-
 /**
  * This class represents a lighted texture for a polygon.
- * A polygon generally has four of these (one for every mipmap
- * level).
  */
 class csPolyTexture : public iPolygonTexture
 {
@@ -55,23 +43,6 @@ class csPolyTexture : public iPolygonTexture
   friend class Dumper;
 
 private:
-  /**
-   * Dirty matrix used in combination with the sub-texture optimization.
-   */
-  csBitSet *dirty_matrix;
-
-  /// Width of dirty matrix.
-  UShort dirty_w;
-
-  /// Height of dirty matrix.
-  UShort dirty_h;
-
-  /**
-   * Number of dirty sub-textures (if 0 whole texture is clean
-   * and in the cache.
-   */
-  UShort dirty_cnt;
-
   /// The corresponding polygon.
   csPolygon3D* polygon;
 
@@ -111,13 +82,6 @@ private:
   /// Original width (not a power of 2) (w_orig <= w).
   int w_orig;
 
-  /**
-   * Size including vertical margins (note: size is in pixels,
-   * multiply this value by the real number of bytes for every
-   * pixel to get the real size).
-   */
-  int size;
-
   ///
   float fdu;
   ///
@@ -126,20 +90,11 @@ private:
   /// LightMap.
   csLightMap* lm;
 
-  /// The mipmap level (0..3) that this PolyTexture is used for.
-  UByte mipmap_level;
-
-  /// Mipmap size to use for lightmap boxes: 16, 8, 4, or 2.
-  UByte mipmap_size;
-
-  /// Mipmap shift corresponding to the mipmap_size above.
-  UByte mipmap_shift;
-
   /// If true, dynamic lighting needs to be recalculated.
   UByte dyn_dirty;
 
   /// Internally used by (software) texture cache
-  void *cache_data;
+  void *cache_data [4];
 
 public:
   /// Option variable: do accurate lighting of things. This is much slower however.
@@ -155,36 +110,10 @@ public:
    */
   static float cfg_cosinus_factor;
 
-  /**
-   * The size of the sub-textures.
-   * Calculations of the textures in the texture cache are done on
-   * parts of the textures (sub-textures). This number defines the
-   * horizontal and vertical dimensions of such sub-textures.
-   * If this value is set to 0 then this sub-texture optimization
-   * is not used.<br>
-   * Must be a power of 2 and larger or equal than the largest lightmap
-   * box-size that is used.
-   */
-  static int subtex_size;
-
-  /**
-   * If the sub-texture optimization is enabled (subtex_size != 0) then
-   * this option gives an additional optimization. With this option enabled
-   * dynamic lights will only cause updating of the really touched sub-textures.
-   * This results in even more efficient behaviour.
-   */
-  static bool subtex_dynlight;
-
   ///
   csPolyTexture ();
   ///
   virtual ~csPolyTexture ();
-
-  /// Get the mipmap size used for this texture.
-  int GetMipmapSize () { return mipmap_size; }
-
-  /// Set the mipmap size used for this texture.
-  void SetMipmapSize (int mm);
 
   /**
    * Set the corresponding polygon for this polytexture.
@@ -197,9 +126,6 @@ public:
    * to the lightmap if 'lightmap' is NULL.
    */
   void SetLightMap (csLightMap* lightmap);
-
-  ///
-  void SetMipmapLevel (int mm) { mipmap_level = mm; }
 
   /// Set the texture to be used for this polytexture.
   void SetTextureHandle (iTextureHandle* th) { txt_handle = th; }
@@ -228,12 +154,6 @@ public:
   ///
   void MakeDirtyDynamicLights ();
 
-  /**
-   * Destroy the dirty matrix. This needs to be done after
-   * changing subtex_size.
-   */
-  void DestroyDirtyMatrix ();
-
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;
   ///
@@ -247,18 +167,7 @@ public:
   /// Get height of lighted texture.
   virtual int GetHeight ();
   ///
-  virtual int GetMipmapLevel ();
-  ///
   virtual int GetShiftU ();
-  ///
-  virtual int GetSize ();
-
-  ///
-  virtual int GetNumPixels ();
-  ///
-  virtual int GetMipMapSize ();
-  ///
-  virtual int GetMipMapShift ();
   ///
   virtual int GetIMinU ();
   ///
@@ -270,6 +179,8 @@ public:
 
   ///
   virtual iPolygon3D *GetPolygon ();
+  /// Check if dynamic lighting information should be recalculated
+  virtual bool DynamicLightsDirty ();
   /**
    * Recalculate all pseudo and real dynamic lights if the
    * texture is dirty. The function returns true if there
@@ -277,38 +188,18 @@ public:
    * from the texture cache).
    */
   virtual bool RecalculateDynamicLights ();
-  /**
-   * Create the dirty matrix if needed. This function will also check
-   * if the dirty matrix has the right size. If not it will recreate it.
-   * The dirty matrix is used in combination with the sub-texture optimization.
-   * If recreation of the dirty matrix was needed it will be made all dirty.
-   */
-  virtual void CreateDirtyMatrix ();
-  /**
-   * Make the dirty matrix completely dirty.
-   */
-  virtual void MakeAllDirty ();
-  /**
-   * Check if there are any dirty lightmap cells, and clean the dirty
-   * matrix in the corresponding places if so. Returns true if there are
-   * any coincident bits in both bit sets (and thus we need to compute
-   * any lightmap cells in texture cache).
-   */
-  virtual bool CleanIfDirty (csBitSet *bs);
 
   /// 
   virtual iLightMap *GetLightMap ();
+  /// Query the size of one light cell
+  virtual int GetLightCellSize ();
+  /// Query log2 (cell size)
+  virtual int GetLightCellShift ();
 
-  /// Return the number of dirty sub-textures.
-  virtual int GetNumberDirtySubTex ();
-  ///
-  virtual int GetSubtexSize ();
-  ///
-  virtual bool GetDynlightOpt ();
   /// Get data used internally by texture cache
-  virtual void *GetCacheData ();
+  virtual void *GetCacheData (int idx);
   /// Set data used internally by texture cache
-  virtual void SetCacheData (void *d);
+  virtual void SetCacheData (int idx, void *d);
 };
 
 #endif /*POLYTEXT_H*/

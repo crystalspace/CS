@@ -40,7 +40,8 @@
 
 bool csPolygon3D::do_force_recalc = false;
 bool csPolygon3D::do_not_force_recalc = false;
-int csPolygon3D::def_mipmap_size = 16;
+int csPolygon3D::lightcell_size = 16;
+int csPolygon3D::lightcell_shift = 4;
 bool csPolygon3D::do_lightmap_highqual = true;
 bool csPolygon3D::do_cache_lightmaps = true;
 
@@ -63,53 +64,24 @@ csLightMapped::csLightMapped () : csPolygonTextureType ()
   txt_plane = NULL;
   theDynLight = NULL;
   CHK (tex = new csPolyTexture ());
-  CHK (tex1 = new csPolyTexture ());
-  CHK (tex2 = new csPolyTexture ());
-  CHK (tex3 = new csPolyTexture ());
   lightmap_up_to_date = false;
 }
 
 csLightMapped::~csLightMapped ()
 {
   if (tex) tex->DecRef ();
-  if (tex1) tex1->DecRef ();
-  if (tex2) tex2->DecRef ();
-  if (tex3) tex3->DecRef ();
   if (txt_plane) txt_plane->DecRef ();
 }
 
 void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* txtMM)
 {
   tex->SetPolygon (poly3d);
-  tex1->SetPolygon (poly3d);
-  tex2->SetPolygon (poly3d);
-  tex3->SetPolygon (poly3d);
-
-  tex->SetMipmapLevel (0);
-  tex1->SetMipmapLevel (1);
-  tex2->SetMipmapLevel (2);
-  tex3->SetMipmapLevel (3);
-
   tex->SetTextureHandle (txtMM->GetTextureHandle ());
-  tex1->SetTextureHandle (txtMM->GetTextureHandle ());
-  tex2->SetTextureHandle (txtMM->GetTextureHandle ());
-  tex3->SetTextureHandle (txtMM->GetTextureHandle ());
-
   tex->CreateBoundingTextureBox ();
-  tex1->CreateBoundingTextureBox ();
-  tex2->CreateBoundingTextureBox ();
-  tex3->CreateBoundingTextureBox ();
 }
 
-csPolyTexture* csLightMapped::GetPolyTex (int mipmap)
+csPolyTexture* csLightMapped::GetPolyTex ()
 {
-  switch (mipmap)
-  {
-    case 0: return tex;
-    case 1: return tex1;
-    case 2: return tex2;
-    case 3: return tex3;
-  }
   return tex;
 }
 
@@ -262,7 +234,7 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
   orig_poly = NULL;
   dont_draw = false;
 
-  flags = CS_POLY_MIPMAP | CS_POLY_LIGHTING;
+  flags = CS_POLY_LIGHTING;
 
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
@@ -348,6 +320,12 @@ void csPolygon3D::SetTextureType (int type)
       CHK (txt_info = (csPolygonTextureType *)new csGouraudShaded ());
       break;
   }
+}
+
+void csPolygon3D::SetLightCellSize (int size)
+{
+  lightcell_size = size;
+  lightcell_shift = csLog2 (size);
 }
 
 void csPolygon3D::Reset ()
@@ -588,8 +566,11 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
   if (portal) portal->ObjectToWorld (t);
 }
 
-#define TEXW(t) ((t)->w_orig)
-#define TEXH(t) ((t)->h)
+#define TEXW(t)	((t)->w_orig)
+#define TEXH(t)	((t)->h)
+
+#define LMW(t)	(((t)->w_orig + lightcell_size - 1) >> lightcell_shift)
+#define LMH(t)	(((t)->h + lightcell_size - 1) >> lightcell_shift)
 
 void csPolygon3D::Finish ()
 {
@@ -608,24 +589,16 @@ void csPolygon3D::Finish ()
   }
   lmi->Setup (this, txtMM);
   lmi->tex->SetLightMap (NULL);
-  lmi->tex1->SetLightMap (NULL);
-  lmi->tex2->SetLightMap (NULL);
-  lmi->tex3->SetLightMap (NULL);
   if (portal)
     portal->SetTexture (txtMM->GetTextureHandle ());
 
-  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex)*TEXH(lmi->tex) < 1000000)
+  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex) * TEXH(lmi->tex) < 1000000)
   {
     CHK (csLightMap* lm = new csLightMap ());
     lmi->tex->SetLightMap (lm);
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
-    lmi->tex->lm->Alloc (TEXW(lmi->tex), TEXH(lmi->tex),
-      def_mipmap_size, r, g, b);
-    lmi->tex->SetMipmapSize (def_mipmap_size);
-    lmi->tex1->SetLightMap (lm);
-    lmi->tex2->SetLightMap (lm);
-    lmi->tex3->SetLightMap (lm);
+    lmi->tex->lm->Alloc (LMW (lmi->tex), LMH (lmi->tex), r, g, b);
     lm->DecRef ();
 #ifdef DO_HW_UVZ
     SetupHWUV();
@@ -653,39 +626,11 @@ void csPolygon3D::SetupHWUV()
 void csPolygon3D::CreateLightMaps (iGraphics3D* g3d)
 {
   if (orig_poly) return;
-  csLightMapped* lmi = GetLightMapInfo ();
-  if (!lmi || lmi->tex->lm == NULL) return;
+  csLightMapped *lmi = GetLightMapInfo ();
+  if (!lmi || !lmi->tex->lm) return;
 
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  if (txtmgr->GetVeryNice ())
-    lmi->tex1->SetMipmapSize (def_mipmap_size);
-  else
-    lmi->tex1->SetMipmapSize (def_mipmap_size>>1);
-
-  lmi->tex2->SetMipmapSize (lmi->tex1->mipmap_size>>1);
-
-  if (lmi->tex2->mipmap_size < 1)
-  {
-    lmi->tex2->SetMipmapSize (1);
-    lmi->tex3->SetMipmapSize (1);
-  }
-  else
-  {
-    lmi->tex3->SetMipmapSize (lmi->tex2->mipmap_size>>1);
-
-    if (lmi->tex3->mipmap_size < 1)
-    {
-      lmi->tex3->SetMipmapSize (1);
-    }
-  }
-
-  bool po2 = (g3d->NeedsPO2Maps ());
-  int aspect = g3d->GetMaximumAspectRatio ();
-
-  if (lmi->tex->lm) lmi->tex->lm->ConvertFor3dDriver (po2, aspect);
-  lmi->tex1->SetLightMap (lmi->tex->lm);
-  lmi->tex2->SetLightMap (lmi->tex->lm);
-  lmi->tex3->SetLightMap (lmi->tex->lm);
+  if (lmi->tex->lm)
+    lmi->tex->lm->ConvertFor3dDriver (g3d->NeedsPO2Maps (), g3d->GetMaximumAspectRatio ());
 }
 
 void csPolygon3D::SetTextureSpace (csPolyTxtPlane* txt_pl)
@@ -779,15 +724,14 @@ void csPolygon3D::SetTextureSpace (
 void csPolygon3D::MakeDirtyDynamicLights ()
 {
   csPolygon3D* p;
-  if (orig_poly) p = orig_poly;
-  else p = this;
+  if (orig_poly)
+    p = orig_poly;
+  else
+    p = this;
   p->light_info.dyn_dirty = true;
-  csLightMapped* lmi = GetLightMapInfo ();
-  if (!lmi) return;
-  if (lmi->tex) lmi->tex->MakeDirtyDynamicLights ();
-  if (lmi->tex1) lmi->tex1->MakeDirtyDynamicLights ();
-  if (lmi->tex2) lmi->tex2->MakeDirtyDynamicLights ();
-  if (lmi->tex3) lmi->tex3->MakeDirtyDynamicLights ();
+  csLightMapped *lmi = GetLightMapInfo ();
+  if (lmi && lmi->tex)
+    lmi->tex->MakeDirtyDynamicLights ();
 }
 
 void csPolygon3D::UnlinkLightpatch (csLightPatch* lp)
@@ -1402,8 +1346,8 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = false;
   }
-  else if (!lmi->tex->lm->ReadFromCache (TEXW(lmi->tex), TEXH(lmi->tex),
-  	def_mipmap_size, owner, this, index, csWorld::current_world))
+  else if (!lmi->tex->lm->ReadFromCache (LMW (lmi->tex), LMH (lmi->tex),
+    owner, this, index, csWorld::current_world))
   {
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = true;
@@ -1688,26 +1632,23 @@ void csPolygon3D::UpdateLightMapSize ()
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
 
-  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex)*TEXH(lmi->tex) < 1000000)
+  if (CheckFlags (CS_POLY_LIGHTING) && TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
   {
     CHK (csLightMap* lm = new csLightMap ());
     lmi->tex->SetLightMap (lm);
     lm->DecRef ();
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
-    lmi->tex->lm->Alloc (TEXW(lmi->tex), TEXH(lmi->tex), def_mipmap_size,
-    	r, g, b);
-    lmi->tex->SetMipmapSize (def_mipmap_size);
+    lmi->tex->lm->Alloc (LMW (lmi->tex), LMH (lmi->tex), r, g, b);
   }
 }
 
-void csPolygon3D::ScaleLightMaps ()
+void csPolygon3D::ScaleLightMaps2X ()
 {
   if (orig_poly) return;
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
-  lmi->tex->SetMipmapSize (def_mipmap_size);
-  lmi->tex->lm->Scale (TEXW (lmi->tex), TEXH (lmi->tex), lmi->tex->mipmap_size);
+  lmi->tex->lm->Scale2X (LMW (lmi->tex), LMH (lmi->tex));
 }
 
 int csPolygon3D::GetAlpha ()
@@ -1720,22 +1661,13 @@ csVector3 *csPolygon3D::GetCameraVector (int idx)
   return &Vcam (idx);
 }
 
-iPolygonTexture *csPolygon3D::GetObjectTexture (int nLevel)
+iPolygonTexture *csPolygon3D::GetObjectTexture ()
 {
   csLightMapped* lmi = GetLightMapInfo ();
-  if (lmi)
-  {
-     iPolygonTexture *tex = lmi->GetPolyTex (nLevel);
-     tex->IncRef ();
-     return (tex);
-  }
-  else
+  if (!lmi)
     return NULL;
-}
 
-bool csPolygon3D::UsesMipMaps ()
-{
-  return CheckFlags (CS_POLY_MIPMAP);
+  return lmi->GetPolyTex ();
 }
 
 iLightMap *csPolygon3D::GetLightMap ()

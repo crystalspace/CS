@@ -166,13 +166,6 @@ struct iTextureManager : public iBase
    * bits that fit the CS_IMGFMT_MASK mask matters.
    */
   virtual int GetTextureFormat () = 0;
-
-  /**
-   * Return true if VERYNICE mipmap mode is used. This is an
-   * ugly way to get this value. We need better user-config
-   * capabilities for this.@@@
-   */
-  virtual bool GetVeryNice () = 0;
 };
 
 #endif // __ITXTMGR_H__

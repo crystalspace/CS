@@ -165,17 +165,14 @@ struct G3DPolygonDP
   /// The plane equation in camera space of this polygon. @@@ BAD NAME
   G3DPolyNormal normal;
 
-  /// Handle to lighted textures (texture+lightmap) (for all mipmap levels).
-  iPolygonTexture* poly_texture[4];
+  /// Handle to lighted textures (texture + lightmap)
+  iPolygonTexture* poly_texture;
 
-  /** 
-    * AlphaValue of the polygon. Ranges from 0 to 100. 0 means opaque, 100 is 
-    * completely transparent.
-    */
+  /**
+   * AlphaValue of the polygon. Ranges from 0 to 100. 0 means opaque, 100 is 
+   * completely transparent.
+   */
   int alpha;
-
-  /// True, if it is ok, to use mipmaps.
-  bool uses_mipmaps;
 
   /// Z value (in camera space) of vertex[0].
   float z_value;

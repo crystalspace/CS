@@ -565,9 +565,8 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     int* idx = pt->GetVerticesIdx ();
     for (j = 0 ; j < pt->GetNumVertices () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
-    p->SetFlags (CS_POLY_LIGHTING|CS_POLY_MIPMAP|CS_POLY_FLATSHADING,
+    p->SetFlags (CS_POLY_LIGHTING|CS_POLY_FLATSHADING,
       (pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
-      (pt->IsMipmapped () ? CS_POLY_MIPMAP : 0) |
       (pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
     if (pt->GetUVCoords ())
     {
