@@ -1538,7 +1538,9 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   if (mesh_tri_normals)
     delete [] mesh_tri_normals;
   mesh_tri_normals = new csVector3[num_triangles];
+#ifdef CS_USE_NEW_RENDERER
   mesh_tri_normals_dirty_flag = true;
+#endif
 
   // Calculate triangle normals.
   // Get the cross-product of 2 edges of the triangle and normalize it.
