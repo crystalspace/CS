@@ -36,7 +36,7 @@ chronological order.
 	- res changed configure to emit a CS_PROCSIZE #define to volatile.h
 	  containing the processor's bit size, superseding the 
 	  CS_PLATFORM_IS_64BITS #define.
-	- res changed configure to emit a TARGET.PROCESSORSIZE buil property,
+	- res changed configure to emit a TARGET.PROCESSORSIZE build property,
 	  containing the processor's bit size.
 	- res changed the software renderer to not use asm on 64bit machines.
 7-Jul-2004
