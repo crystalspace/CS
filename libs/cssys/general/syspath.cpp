@@ -56,10 +56,10 @@ char* csExpandPath (const char* path)
 
 char* csGetAppPath (const char* argv0)
 {
+  if (!argv0 || (*argv0 == 0)) return 0;
+
   char* app = csStrNew (argv0);
   char* fullPath = 0;
-
-  if (!app) return 0;
 
   if (*app == PATH_SEPARATOR)
   {

@@ -69,6 +69,7 @@ char* csExpandPath (const char* path);
 
 /**
  * Return the path the application was started from.
+ * \remark May return 0.
  * \remark Caller is responsible to free the returend string with delete[] 
  *   after using it.
  * \remark This function is primarily intended for very low-level use before 

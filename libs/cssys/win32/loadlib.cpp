@@ -319,7 +319,7 @@ void InternalScanPluginDir (iStrVector*& messages,
       {
 	/*
 	  instead of processing them immediately, first a list of
-	  diectories is filled.
+	  directories is filled.
 	 */
 	if (recursive && (strcmp (findData.cFileName, ".") != 0)
 	  && (strcmp (findData.cFileName, "..") != 0))

@@ -49,14 +49,16 @@ class csSCF : public iSCF
 private:
   csRef<csMutex> mutex;
 
+  csStringSet contexts;
+
   void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
-    int context = -1);
+    const char* context = 0);
 public:
   SCF_DECLARE_IBASE;
 
   /// The global table of all known interface names
   csStringSet InterfaceRegistry;
-
+  
   /// constructor
   csSCF ();
   /// destructor
@@ -65,12 +67,14 @@ public:
   virtual void RegisterClasses (iDocument*);
   virtual void RegisterClasses (char const*);
   virtual void RegisterClasses (char const* pluginPath, 
-    iDocument* scfnode, int context = -1);
+    iDocument* scfnode, const char* context = 0);
   virtual bool RegisterClass (const char *iClassID,
     const char *iLibraryName, const char *iFactoryClass,
-    const char *Description, const char *Dependencies = 0, int context = -1);
+    const char *Description, const char *Dependencies = 0, 
+    const char* context = 0);
   virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
-    const char *Description, const char *Dependencies = 0, int context = -1);
+    const char *Description, const char *Dependencies = 0, 
+    const char* context = 0);
   virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass);
   virtual bool ClassRegistered (const char *iClassID);
   virtual void *CreateInstance (const char *iClassID,
@@ -79,6 +83,8 @@ public:
   virtual const char *GetClassDependencies (const char *iClassID);
   virtual bool UnregisterClass (const char *iClassID);
   virtual void UnloadUnusedModules ();
+  virtual void ScanPluginsPath (const char* path, bool recursive = false,
+    const char* context = 0);
   virtual scfInterfaceID GetInterfaceID (const char *iInterface);
   virtual void Finish ();
   virtual iStrVector* QueryClassList (char const* pattern);
@@ -221,7 +227,7 @@ public:
     "Context" of this class (used to decide whether a class conflict will 
     be reported)
   */
-  int classContext;
+  csStringID classContext;
 #ifndef CS_STATIC_LINKED
   // Shared module that implements this class or 0 for local classes
   char *LibraryName;
@@ -232,7 +238,7 @@ public:
   // Create the factory for a class located in a shared library
   scfFactory (const char *iClassID, const char *iLibraryName,
     const char *iFactoryClass, scfFactoryFunc iCreateFunc, const char *iDesc,
-    const char *iDepend, int context = -1);
+    const char *iDepend, csStringID context = csInvalidStringID);
   // Free the factory object (but not objects created by this factory)
   virtual ~scfFactory ();
   // Create a insance of class this factory represents
@@ -266,7 +272,7 @@ public:
 
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,
-  const char *iDepend, int context)
+  const char *iDepend, csStringID context)
 {
   // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
   scfRefCount = 0; scfParent = 0;
@@ -418,58 +424,67 @@ SCF_IMPLEMENT_IBASE (csSCF);
   SCF_IMPLEMENTS_INTERFACE (iSCF);
 SCF_IMPLEMENT_IBASE_END;
 
-void scfInitialize (int argc, const char* const argv[], 
-  csPluginPaths* pluginPaths)
+static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF ();
 
 #ifndef CS_STATIC_LINKED
-  // Search plugins in pluginpaths
-  csRef<iStrVector> plugins;
-  csRefArray<iDocument> metadata;
-
-  bool freePaths = false;
-  if (!pluginPaths)
+  if (pluginPaths)
   {
-    pluginPaths = csGetPluginPaths (argv[0]);
-    freePaths = true;
-  }
+    // Search plugins in pluginpaths
+    csRef<iStrVector> plugins;
+    csRefArray<iDocument> metadata;
 
-  int i, j;
-  for (i = 0; i < pluginPaths->GetCount(); i++)
-  {
-    if (plugins) plugins->DeleteAll();
-    metadata.DeleteAll();
-
-    csRef<iStrVector> messages = 
-      csScanPluginDir ((*pluginPaths)[i].path, plugins, metadata,
-        (*pluginPaths)[i].scanRecursive);
-
-    if ((messages != 0) && (messages->Length() > 0))
+    int i, j;
+    for (i = 0; i < pluginPaths->GetCount(); i++)
     {
-      fprintf (stderr,
-	"The following issue(s) came up while scanning '%s':",
-	(*pluginPaths)[i].path);
+      if (plugins) plugins->DeleteAll();
+      metadata.DeleteAll();
 
-      for (j = 0; j < messages->Length(); j++)
+      csRef<iStrVector> messages = 
+	csScanPluginDir ((*pluginPaths)[i].path, plugins, metadata,
+	  (*pluginPaths)[i].scanRecursive);
+
+      if ((messages != 0) && (messages->Length() > 0))
       {
-	fprintf(stderr,
-	  " %s\n", messages->Get (j));
+	fprintf (stderr,
+	  "The following issue(s) came up while scanning '%s':",
+	  (*pluginPaths)[i].path);
+
+	for (j = 0; j < messages->Length(); j++)
+	{
+	  fprintf(stderr,
+	    " %s\n", messages->Get (j));
+	}
+      }
+      for (j = 0; j < metadata.Length(); j++)
+      {
+	PrivateSCF->RegisterClasses (plugins->Get (j), metadata[j], 
+	  context ? context : (*pluginPaths)[i].path);
       }
     }
-    for (j = 0; j < metadata.Length(); j++)
-    {
-      PrivateSCF->RegisterClasses (plugins->Get (j), metadata[j], i);
-    }
+  #endif
   }
-
-  if (freePaths)
-  {
-    delete pluginPaths;
-  }
-#endif
 }
+
+void scfInitialize (csPluginPaths* pluginPaths)
+{
+  if (!PrivateSCF)
+    PrivateSCF = new csSCF ();
+
+  scfScanPlugins (pluginPaths, 0);
+}
+
+void scfInitialize (int argc, const char* const argv[])
+{
+  csPluginPaths* pluginPaths = csGetPluginPaths (argv[0]);
+
+  scfInitialize (pluginPaths);
+
+  delete pluginPaths;
+}
+
 
 csSCF::csSCF ()
 {
@@ -518,7 +533,7 @@ void csSCF::RegisterClasses (iDocument* doc)
 }
 
 void csSCF::RegisterClasses (char const* pluginPath, 
-    iDocument* doc, int context)
+    iDocument* doc, const char* context)
 {
   if (doc)
   {
@@ -548,7 +563,7 @@ static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
 }
 
 void csSCF::RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
-				int context)
+				const char* context)
 {
   csRef<iDocumentNode> classesnode = scfnode->GetNode("classes");
   if (classesnode)
@@ -638,21 +653,24 @@ void csSCF::UnloadUnusedModules ()
 #endif
 }
 
-inline static bool SameContext (int contextA, int contextB)
+inline static bool SameContext (csStringID contextA, csStringID contextB)
 {
-  return ((contextA != -1) && (contextB != -1) && (contextA == contextB));
+  return ((contextA != csInvalidStringID) && 
+    (contextB != csInvalidStringID) && (contextA == contextB));
 }
 
 bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, const char *iDesc, const char *Dependencies, 
-  int context)
+  const char* context)
 {
   csScopedMutexLock lock (mutex);
   int idx;
+  csStringID contextID = 
+    context ? contexts.Request (context) : csInvalidStringID;
   if ((idx = ClassRegistry->FindKey (iClassID)) >= 0)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
-    if (SameContext (cf->classContext, context))
+    if (SameContext (cf->classContext, contextID))
     {
       fprintf (stderr,
 	"SCF_WARNING: class %s has already been registered in the same context\n", 
@@ -677,21 +695,23 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
     return false;
   }
   scfFactory* factory = new scfFactory (iClassID, iLibraryName, iFactoryClass,
-    0, iDesc, Dependencies, context);
+    0, iDesc, Dependencies, contextID);
   ClassRegistry->Push (factory);
   SortClassRegistry = true;
   return true;
 }
 
 bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
-  const char *Desc, const char *Dependencies, int context)
+  const char *Desc, const char *Dependencies, const char* context)
 {
   csScopedMutexLock lock (mutex);
   int idx;
+  csStringID contextID = 
+    context ? contexts.Request (context) : csInvalidStringID;
   if ((idx = ClassRegistry->FindKey (iClassID)) >= 0)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
-    if (SameContext (cf->classContext, context))
+    if (SameContext (cf->classContext, contextID))
     {
       fprintf (stderr,
 	"SCF_WARNING: class %s has already been registered in the same context\n", 
@@ -711,7 +731,7 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
     return false;
   }
   scfFactory* factory =
-    new scfFactory (iClassID, 0, 0, Func, Desc, Dependencies, context);
+    new scfFactory (iClassID, 0, 0, Func, Desc, Dependencies, contextID);
   ClassRegistry->Push (factory);
   SortClassRegistry = true;
   return true;
@@ -759,6 +779,14 @@ bool csSCF::UnregisterClass (const char *iClassID)
   ClassRegistry->Delete (idx);
   SortClassRegistry = true;
   return true;
+}
+
+void csSCF::ScanPluginsPath (const char* path, bool recursive,
+  const char* context)
+{
+  csPluginPaths paths;
+  paths.AddOnce (path, recursive);
+  scfScanPlugins (&paths, context);
 }
 
 const char *csSCF::GetClassDescription (const char *iClassID)

@@ -34,6 +34,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated incorrect statement in documentation of
 	  iConfigManager in iutil/cfgmgr.h where it claimed that the dynamic
 	  domain's iConfigFile could not be changed after construction.
+	- res made the following changes:
+	    - Split scfInitialize() into two versions, one with (argc, argv),
+	      one with (csPluginPaths*) arguments.
+	    - Improved 'context' handling a bit.
+	    - Added iSCF->ScanPluginsPath() for convenience.
+	    - Fixed general csGetAppPath () to return 0 on an empty argv[0].
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.

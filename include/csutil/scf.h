@@ -512,8 +512,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit__()						\
     {									\
-      const char* dummyArgv[] = {0}; 					\
-      scfInitialize(0, dummyArgv);					\
+      scfInitialize(0);					\
       iSCF::SCF->RegisterClass(						\
         CS_EXPORTED_NAME(Class,_Create), Ident, Desc, Dep);		\
     }									\
@@ -529,8 +528,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Module##_StaticInit()						\
     {									\
-      const char* dummyArgv[] = {0}; 					\
-      scfInitialize(0, dummyArgv);					\
+      scfInitialize(0);					\
       iSCF::SCF->RegisterClasses(MetaInfo);				\
     }									\
   } Module##_static_init__;
@@ -550,8 +548,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit()						\
     {									\
-      const char* dummyArgv[] = {0}; 					\
-      scfInitialize(0, dummyArgv);					\
+      scfInitialize(0);					\
       iSCF::SCF->RegisterFactoryFunc(CS_EXPORTED_NAME(Class,_Create),#Class); \
     }									\
   } Class##_static_init__;
@@ -653,8 +650,13 @@ inline static scfInterfaceID Name##_scfGetID ()				\
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
  * \remark The path list is ignored for static builds. 
  */
-extern void scfInitialize (int argc, const char* const argv[], 
-  csPluginPaths* pluginPaths = 0);
+extern void scfInitialize (csPluginPaths* pluginPaths);
+
+/**
+ * This function should be called to initialize client SCF library.  
+ * It uses the default plugin paths provided by csGetPluginPaths().
+ */
+extern void scfInitialize (int argc, const char* const argv[]);
 
 /**
  * This function checks whenever an interface is compatible with given version.
@@ -715,7 +717,7 @@ struct iSCF : public iBase
    * Read additional class descriptions from the given iDocument.  
    */
   virtual void RegisterClasses (const char* pluginPath, 
-    iDocument* metadata, int context = -1) = 0;
+    iDocument* metadata, const char* context = 0) = 0;
 
   /**
    * Check whenever the class is present in SCF registry.
@@ -770,12 +772,15 @@ struct iSCF : public iBase
    * function tells SCF kernel that a specific class is implemented within a
    * specific shared library.  There can be multiple classes within a single
    * shared library.  You also can provide an application-specific dependency
-   * list.
+   * list. 'context' is an information about the source of the plugin. It
+   * primarily affects whether a class conflict is reported. If the same
+   * class already exists in the same context, a warning is emitted; if it's
+   * in a different context, only there is a notification only in debug mode. 
    */
   virtual bool RegisterClass (const char *iClassID,
 	const char *iLibraryName, const char *iFactoryClass,
 	const char *Description, const char *Dependencies = 0,
-	int context = -1) = 0;
+	const char* context = 0) = 0;
 
   /**
    * Register a single dynamic class.  This function tells SCF kernel that a
@@ -785,7 +790,7 @@ struct iSCF : public iBase
    */
   virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
 	const char *Description, const char *Dependencies = 0,
-	int context = -1) = 0;
+	const char* context = 0) = 0;
 
   /**
    * Associate a factory function (the function which instantiates a class)
@@ -830,6 +835,12 @@ struct iSCF : public iBase
    * DecRef() on the returned list when the list is no longer needed.
    */
   virtual iStrVector* QueryClassList (char const* pattern) = 0;
+
+  /**
+   * Scan a specified native path for plugins and auto-register them.
+   */
+  virtual void ScanPluginsPath (const char* path, bool recursive = false,
+    const char* context = 0) = 0;
 };
 
 SCF_VERSION (iFactory, 0, 0, 1);
