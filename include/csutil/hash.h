@@ -198,7 +198,7 @@ public:
   }
 
   /// Delete all the elements, returning false if there are none.
-  void DeleteAll ()
+  bool DeleteAll ()
   {
     bool ret = false;
     int elen = Elements.Length ();
@@ -261,12 +261,9 @@ public:
 
     void Seek ()
     {
-      do 
-      {
-        element++;
-      }
       while ((element < size) && 
-        !KeyHandler::CompareKeys (hash->Elements[bucket][element].key, key));
+        ! KeyHandler::CompareKeys (hash->Elements[bucket][element].key, key))
+          element++;
     }
 
   protected:
@@ -290,8 +287,15 @@ public:
     const T& Next ()
     {
       const T &ret = hash->Elements[bucket][element].value;
+      element++;
       Seek ();
       return ret;
+    }
+
+    /// Delete the next element.
+    void DeleteNext ()
+    {
+      hash->Elements[bucket].DeleteIndex (element);
     }
 
     /// Move the iterator back to the first element.
@@ -361,19 +365,33 @@ public:
       return Next ();
     }
 
+    /// Delete the next element.
+    void DeleteNext ()
+    {
+      hash->Elements[bucket].DeleteIndex (element);
+    }
+
     /// Move the iterator back to the first element.
     void Return () { Zero (); Init (); }
   };
   friend class csHash<T, K, KeyHandler>::GlobalIterator;
 
-  /// Return an iterator for the hash, to iterate only over the elements
-  /// with the given key.
+  /**
+   * Return an iterator for the hash, to iterate only over the elements
+   * with the given key.
+   * Modifying the hash (except with DeleteNext) while you have open iterators
+   * will cause undefined behaviour.
+   */
   Iterator GetIterator (K key) const
   {
     return Iterator (this, key);
   }
 
-  /// Return an iterator for the hash, to iterate over all elements.
+  /**
+   * Return an iterator for the hash, to iterate over all elements.
+   * Modifying the hash (except with DeleteNext) while you have open iterators
+   * will cause undefined behaviour.
+   */
   GlobalIterator GetIterator () const
   {
     return GlobalIterator (this);
