@@ -13,6 +13,8 @@ chronological order.
  	  bbox calcs to be more efficient.   This requires cal3d cvs as
 	  of Jan-04-04, or later.
 	- Jorrit fixed a compile error in glrender3d.
+	- Jorrit fixed a few occurances of 'crystalspace.renderer.stringset'
+	  and replaced them with the correct 'crystalspace.shared.stringset'.
 4-Jan-2004
 	- Luca fixed a compilation error for the VC6 compiler.
 	- res added the creation of a global string set to InitApplication().

@@ -93,10 +93,8 @@ int csXMLShaderCompiler::CompareTechniqueKeeper(void const* item1, void const* i
 
 csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
 {
-printf ("1\n"); fflush (stdout);
   if (!ValidateTemplate (templ))
     return csPtr<iShader> (0);
-printf ("2\n"); fflush (stdout);
 
   csRef<iDocumentNodeIterator> it = templ->GetNodes();
 
@@ -105,30 +103,25 @@ printf ("2\n"); fflush (stdout);
   //read in the techniques
   while(it->HasNext ())
   {
-printf ("3\n"); fflush (stdout);
     csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () == CS_NODE_ELEMENT &&
       xmltokens.Request (child->GetValue ()) == XMLTOKEN_TECHNIQUE)
     {
       //save it
-printf ("4\n"); fflush (stdout);
       unsigned int p = child->GetAttributeValueAsInt ("priority");
       techniquesTmp.Push (techniqueKeeper (child, p));
     }
   }
 
-printf ("5\n"); fflush (stdout);
   techniquesTmp.Sort (&CompareTechniqueKeeper);
 
   //now try to load them one in a time, until we are successful
   csRef<csXMLShader> shader;
   const char* shaderName = templ->GetAttributeValue ("name");
   csArray<techniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
-printf ("6\n"); fflush (stdout);
   while (techIt.HasNext ())
   {
     techniqueKeeper tk = techIt.Next();
-printf ("7\n"); fflush (stdout);
     shader = CompileTechnique (tk.node, shaderName, templ);
     if (shader != 0) break;
   }
@@ -140,7 +133,6 @@ printf ("7\n"); fflush (stdout);
       "No technique validated for shader '%s'", shaderName);
   }
 
-printf ("8\n"); fflush (stdout);
   return csPtr<iShader> (csRef<iShader> (shader));
 }
 

@@ -1055,7 +1055,7 @@ bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
 {
   csRef<iStringSet> strings = 
 	CS_QUERY_REGISTRY_TAG_INTERFACE (pFactory->object_reg,
-	"crystalspace.renderer.stringset", iStringSet);
+	"crystalspace.shared.stringset", iStringSet);
   csRef<iTextureManager> mgr = pFactory->r3d->GetTextureManager ();
   csRef<csShaderVariable> splat_var = 
     new csShaderVariable (strings->Request ("splat map scale"));

@@ -54,7 +54,7 @@ bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBuffe
 
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+    "crystalspace.shared.stringset", iStringSet);
   
   anonbuffer *newrb = new anonbuffer();
 
@@ -100,7 +100,7 @@ bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int 
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+    "crystalspace.shared.stringset", iStringSet);
   csStringID nameid = strings->Request (name);
   int i;
   for (i = 0; i < anon_buffers.Length(); i ++)
@@ -119,7 +119,7 @@ bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int 
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+    "crystalspace.shared.stringset", iStringSet);
   csStringID nameid = strings->Request (name);
   int i;
   for (i = 0; i < anon_buffers.Length(); i ++)
@@ -138,7 +138,7 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, float *value,
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+    "crystalspace.shared.stringset", iStringSet);
 
   csStringID nameid = strings->Request (name);
   int i;
@@ -158,7 +158,7 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, int *value, i
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+    "crystalspace.shared.stringset", iStringSet);
 
   csStringID nameid = strings->Request (name);
   int i;
