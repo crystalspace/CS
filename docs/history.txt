@@ -24,6 +24,8 @@ chronological order.
 	- Jorrit added a function to return an estimate of the amount of
 	  objects that are in a kdtree node and its children. Currently
 	  unused.
+	- Eric Sunshine corrected typographical errors in build/msvc6.txi and
+	  msvc7.txi.
 9-Nov-2003
 	- Rhad added functions to handle reversing some operations with
 	  particle emitters.  These take care of some simple situations where
