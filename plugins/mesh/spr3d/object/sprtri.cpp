@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "plugins/mesh/spr3d/object/sprtri.h"
+#include "sprtri.h"
 
 //---------------------------------------------------------------------------
 

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "plugins/mesh/spr3d/object/spr3d.h"
+#include "spr3d.h"
 
 IMPLEMENT_IBASE (csSkelLimb)
   IMPLEMENTS_INTERFACE (iSkeletonLimb)
