@@ -242,6 +242,7 @@ csWorld::~csWorld ()
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
   if (System) System->DecRef ();
+  CHK (delete textures);
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
   CHK (delete quadcube);
