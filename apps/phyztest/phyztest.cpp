@@ -175,7 +175,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 
   if( !csLoader::LoadLibraryFile (world, "/lib/std/library" ) ){
     Printf (MSG_INITIALIZATION, "LIBRARY NOT LOADED!...\n");
-    StartShutdown ();
+    Shutdown = true;
     return false;
   }
   csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
@@ -447,7 +447,7 @@ bool Phyztest::HandleEvent (csEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    StartShutdown ();
+    Shutdown = true;
     return true;
   }
 
