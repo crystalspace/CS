@@ -41,6 +41,10 @@ chronological order.
 	- Eric Sunshine upgraded cal3d check in configure.ac so that it demands
 	  at least the 2004/06/28 version of Cal3D since this is required by
 	  Keith's changes to sprcal3d.
+	- Jorrit optimized Dynavis a bit. Removed an unneeded optimization that
+	  caused more overhead then it is worth and also considerably cleaned
+	  up the loop for FlushGeneral(). Overall this gives about a 6-8%
+	  speedup on my system.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.

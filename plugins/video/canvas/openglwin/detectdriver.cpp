@@ -155,22 +155,22 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
 void csDetectDriver::DetermineDriverVersion()
 {
   DWORD dummy;
-  DWORD verInfoSize = GetFileVersionInfoSizeA (DriverDLL, &dummy);
+  DWORD verInfoSize = 0;//GetFileVersionInfoSizeA (DriverDLL, &dummy);
   if (verInfoSize == 0)
   {
     // Try appending ".dll"
     csString newName (DriverDLL);
     newName.Append (".dll");
-    verInfoSize = GetFileVersionInfoSizeA (newName.GetData(), &dummy);
+    verInfoSize = 0;//GetFileVersionInfoSizeA (newName.GetData(), &dummy);
   }
   if (verInfoSize != 0)
   {
     uint8* buffer = new uint8[verInfoSize];
-    if (GetFileVersionInfoA (DriverDLL, 0, verInfoSize, buffer))
+    if (0 /*GetFileVersionInfoA (DriverDLL, 0, verInfoSize, buffer)*/)
     {
       void* data;
       UINT dataLen;
-      if (VerQueryValueA (buffer, "\\", &data, &dataLen) && 
+      if (0 /*VerQueryValueA (buffer, "\\", &data, &dataLen)*/ && 
 	(dataLen == sizeof (VS_FIXEDFILEINFO)))
       {
 	VS_FIXEDFILEINFO& ffi = *((VS_FIXEDFILEINFO*)data);
