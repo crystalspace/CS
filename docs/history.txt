@@ -13,6 +13,8 @@ chronological order.
 	  (csImageFile) was already doing those deletes.
 	- Marten made a first attempt to preliminary fix for re-entrant portals
 	  and disabled floating portals for new renderer.
+	- Jorrit reverted Marten's last portal fix as it causes totally new
+	  and much worse problems.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during
