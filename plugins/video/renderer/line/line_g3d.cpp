@@ -205,7 +205,8 @@ void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
   if (poly.num < 3)
     return;
   int i;
-  int color = txtmgr->FindRGB (255, 255, 255);
+  int color = txtmgr->FindRGB (128+QInt (poly.flat_color_r*128),
+  	128+QInt (poly.flat_color_g*128), 128+QInt (poly.flat_color_b*128));
   for (i = 0 ; i < poly.num ; i++)
   {
     G2D->DrawLine (poly.vertices[i].sx, height-poly.vertices[i].sy,
@@ -219,7 +220,8 @@ void csGraphics3DLine::DrawPolygonFX (G3DPolygonDPFX& poly)
   if (poly.num < 3)
     return;
   int i;
-  int color = txtmgr->FindRGB (255, 0, 0);
+  int color = txtmgr->FindRGB (QInt (poly.flat_color_r*255),
+  	QInt (poly.flat_color_g*255), QInt (poly.flat_color_b*255));
   for (i = 0 ; i < poly.num ; i++)
   {
     G2D->DrawLine (poly.vertices[i].sx, height-poly.vertices[i].sy,
