@@ -28,7 +28,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),defines)
 
 NEXT.SOURCE_2D_PATHS=$(addprefix libs/cs2d/next/,$(NEXT.SEARCH_PATH))
-CFLAGS.INCLUDE+=$(addprefix -I,$(NEXT.SOURCE_2D_PATHS))
+CFLAGS.INCLUDE+=$(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
 
 endif # ifeq ($(MAKESECTION),defines)
 
