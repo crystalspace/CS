@@ -58,7 +58,8 @@ bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
       case XMLTOKEN_MATERIAL:
         //if (!ParseMaterial (child, prefix))
 	//  return false;
-	ParseMaterial (child, prefix);
+	if (!ParseMaterial (child, prefix))
+	  return false;
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -106,6 +107,11 @@ bool csLoader::ParseTextureList (iDocumentNode* node)
 iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 {
   const char* txtname = node->GetAttributeValue ("name");
+  if (checkDupes)
+  {
+    iTextureWrapper* t = Engine->FindTexture (txtname);
+    if (t) return t;
+  }
 
   char filename[256];
   strcpy (filename, txtname);
@@ -292,6 +298,11 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
   if (!Engine) return NULL;
 
   const char* matname = node->GetAttributeValue ("name");
+  if (checkDupes)
+  {
+    iMaterialWrapper* m = Engine->FindMaterial (matname);
+    if (m) return m;
+  }
 
   iTextureWrapper* texh = 0;
   bool col_set = false;
@@ -327,7 +338,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
  	      "crystalspace.maploader.parse.material",
  	      "Cannot find texture '%s' for material `%s'", txtname, matname);
  	    return NULL;
-           }
+          }
 	}
         break;
       case XMLTOKEN_COLOR:

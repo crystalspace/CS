@@ -381,11 +381,12 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
 //---------------------------------------------------------------------------
 
 bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
-  bool iOnlyRegion)
+  bool iOnlyRegion, bool checkdupes)
 {
   Stats->Init ();
   if (iClearEngine) Engine->DeleteAll ();
   ResolveOnlyRegion = iOnlyRegion;
+  csLoader::checkDupes = checkdupes;
   ldr_context = NULL;
 
   csRef<iDataBuffer> buf (VFS->ReadFile (file));
@@ -444,6 +445,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
   }
 
   ResolveOnlyRegion = false;
+  checkDupes = false;
   ldr_context = NULL;
 
   csRef<iDocument> doc;
@@ -468,6 +470,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
   if (!Engine) return NULL;
 
   ResolveOnlyRegion = false;
+  checkDupes = false;
   ldr_context = NULL;
 
   csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
@@ -602,6 +605,7 @@ csLoader::csLoader (iBase *p)
 
   flags = 0;
   ResolveOnlyRegion = false;
+  checkDupes = false;
   Stats = new csLoaderStats ();
 }
 
@@ -885,6 +889,11 @@ bool csLoader::LoadMap (iDocumentNode* node)
         case XMLTOKEN_MESHFACT:
           {
 	    const char* name = child->GetAttributeValue ("name");
+	    if (checkDupes)
+	    {
+	      iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
+	      if (t) break;
+	    }
             csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
 	    if (!t || !LoadMeshObjectFactory (t, child))
 	    {

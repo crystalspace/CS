@@ -34,6 +34,15 @@ The history order is reversed so that new features are at the top.
 	  jerky movement during running.
 	- Eric Sunshine moved crystal.fgd from scripts/worldcraft to
 	  scripts/hammer at the request of its author.
+	- Extended iLoader->LoadMapFile() with a fourth 'checkDupes' parameter.
+	  By default this is false. But when it is set to true the loader
+	  will not load textures, materials, and mesh factories for which
+	  another same-named object is already in the engine (ignoring regions).
+	  This can be useful in cases where you have multiple map files
+	  which need to share objects but which also need to be able to
+	  work standalone.
+	- Added '-dupes' commandline option to walktest which enables this
+	  option.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 

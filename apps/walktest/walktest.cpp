@@ -326,6 +326,7 @@ void WalkTest::Help ()
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -regions           load every map in a seperate region (default off)\n");
+  printf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
   printf ("  -prepare           after loading, pre-prepare all things (default off)\n");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
@@ -1349,6 +1350,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     bool do_regions = false;
     if (cmdline->GetOption ("regions"))
       do_regions = true;
+    bool do_dupes = false;
+    if (cmdline->GetOption ("dupes"))
+      do_dupes = true;
       
     if ((!do_regions) && cache_map != NULL)
     {
@@ -1382,7 +1386,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 		map->map_dir);
       if (do_regions)
         Engine->SelectRegion (map->map_dir);
-      if (!LevelLoader->LoadMapFile ("world", false, !do_regions))
+      if (!LevelLoader->LoadMapFile ("world", false, !do_regions, do_dupes))
         return false;
       if (do_regions)
       {

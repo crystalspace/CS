@@ -105,15 +105,22 @@ struct iLoader : public iBase
   	const char *fname) = 0;
 
   /**
-   * Load a map file. If 'ClearEngine' is true then the current contents
-   * of the engine will be deleted before loading. If 'ResolveOnlyRegion'
+   * Load a map file. If 'clearEngine' is true then the current contents
+   * of the engine will be deleted before loading. If 'resolveOnlyRegion'
    * is true then portals will only connect to the sectors in the current
    * region, things will only use thing templates defined in the current
    * region and meshes will only use mesh factories defined in the current
    * region.
+   * <p>
+   * If you use 'checkDupes' == true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legel for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
    */
-  virtual bool LoadMapFile (const char* filename, bool ClearEngine = true,
-	bool ResolveOnlyRegion = true) = 0;
+  virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
+	bool resolveOnlyRegion = true, bool checkDupes = false) = 0;
   /// Load library from a VFS file
   virtual bool LoadLibraryFile (const char* filename) = 0;
 

@@ -322,6 +322,11 @@ private:
   bool ResolveOnlyRegion;
   /// Statistics
   class csLoaderStats *Stats;
+  /**
+   * If true we only load objects (materials, textures and mesh factories)
+   * that are not already in memory (ignoring regions).
+   */
+  bool checkDupes;
 
   //------------------------------------------------------------------------
 
@@ -573,7 +578,7 @@ public:
   virtual csPtr<iSoundWrapper> LoadSound (const char *name, const char *fname);
 
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
-	bool onlyRegion);
+	bool onlyRegion, bool checkDupes);
   virtual bool LoadLibraryFile (const char* filename);
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
