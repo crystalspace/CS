@@ -627,4 +627,16 @@ bool csBspTree::ReadFromCache (iFile* cf,
   return rc;
 }
 
+bool csBspTree::ClassifyPoint (csBspNode* node, const csVector3& p)
+{
+  //@@@@@@@@@@@@@@@@
+  return false;
+}
+
+int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
+{
+  //@@@@@@@@@@@@@@@@
+  return 0;
+}
+
 //---------------------------------------------------------------------------

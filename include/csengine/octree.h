@@ -238,8 +238,18 @@ public:
   /// Return type (NODE_???).
   int Type () { return NODE_OCTREE; }
 
+  /// Count the number of children (octree nodes) for this node.
+  int CountChildren ();
+
   /// Get the PVS.
   csPVS& GetPVS () { return pvs; }
+
+  /**
+   * Test if this node can see the leaf containing the given position
+   * with the PVS. This function will return true (i.e. visible) if the PVS 
+   * for this node has not been computed yet.
+   */
+  bool PVSCanSee (const csVector3& v);
 };
 
 /**
@@ -295,6 +305,31 @@ private:
   /**
    * Help function for BoxCanSeeOccludee.
    */
+  bool CalculatePolygonShadow (
+	const csVector3& corner,
+	csPoly3D& cur_poly,
+	csPoly2D& result_poly, bool first_time,
+	int plane_nr, float plane_pos);
+
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
+  void InsertShadowIntoCBuffer (csPoly2D& result_poly,
+	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift);
+  /**
+   * Help function for BoxCanSeeOccludee.
+   * This function returns false if it couldn't do the test (because
+   * the box is too close to the test plane for example).
+   */
+  bool BoxOccludeeShadowOutline (const csBox3& occluder_box,
+  	const csBox3& occludee,
+	csCBuffer* cbuffer,
+  	const csVector2& scale, const csVector2& shift,
+	int plane_nr, float plane_pos);
+
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
   void BoxOccludeeShadowPolygons (const csBox3& box,
   	const csBox3& occludee,
 	csPolygonInt** polygons, int num_polygons,
@@ -304,12 +339,18 @@ private:
 
   /**
    * Help function for BoxCanSeeOccludee.
+   * If 'do_polygons' is true then this function will also call
+   * BoxOccludeeShadowPolygons on the polygons in the occluder.
+   * Otherwise the only thing that is tested is if the occluder
+   * can itself see the occludee in which case the entire occluder
+   * can be seen as a solid polygon.
    */
   void BoxOccludeeAddShadows (csOctreeNode* occluder, csCBuffer* cbuffer,
   	const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
   	const csBox3& box, const csBox3& occludee,
-	csVector3& box_center, csVector3& occludee_center);
+	csVector3& box_center, csVector3& occludee_center,
+	bool do_polygons);
 
   /**
    * Test if 'box' can see 'occludee' through all the polygons
@@ -337,6 +378,16 @@ private:
    * Set up a dummy PVS for this node.
    */
   void SetupDummyPVS (csOctreeNode* node);
+
+  /**
+   * Classify a point with respect to this tree.
+   */
+  bool ClassifyPoint (csOctreeNode* node, const csVector3& p);
+
+  /**
+   * Classify a polygon with respect to this tree.
+   */
+  int ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly);
 
   /// Cache this node and children.
   void Cache (csOctreeNode* node, iFile* cf);
@@ -450,6 +501,33 @@ public:
 
   /// Print statistics about this octree.
   void Statistics ();
+
+  /**
+   * Classify a point with respect to this tree.
+   * Return true if the point is in solid space or false otherwise.
+   * This routine is not exact. In badly formed worlds it is possible
+   * that it will generate a bad result (i.e. say solid if it isn't
+   * solid space).
+   */
+  bool ClassifyPoint (const csVector3& p)
+  {
+    return ClassifyPoint ((csOctreeNode*)root, p);
+  }
+
+  /**
+   * Take a 3D polygon and classify it with respect to this tree.
+   * The value returned is 1 if the polygon is entirely in solid space,
+   * 0 if the polygon is entirely in open space and -1 otherwise (i.e.
+   * if the polygon would have to be split). The polygon is not actually
+   * inserted. Note that this algorithm cannot be 100% perfect. If a world
+   * is not properly formed (i.e. there are floating single polygons)
+   * then it is possible (but unlikely) that a polygon is misclassified
+   * as being in solid space while it actually isn't.
+   */
+  int ClassifyPolygon (const csPoly3D& poly)
+  {
+    return ClassifyPolygon ((csOctreeNode*)root, poly);
+  }
 
   /**
    * Cache this entire octree to disk (VFS).

@@ -172,6 +172,16 @@ private:
   bool ReadFromCache (iFile* cf, csBspNode* node,
   	csPolygonInt** polygons, int num);
 
+  /**
+   * Classify a point with respect to this tree.
+   */
+  bool ClassifyPoint (csBspNode* node, const csVector3& p);
+
+  /**
+   * Classify a polygon with respect to this tree.
+   */
+  int ClassifyPolygon (csBspNode* node, const csPoly3D& poly);
+
 public:
   /**
    * Create an empty tree for a parent container.
@@ -242,6 +252,34 @@ public:
 
   /// Read this tree from cache.
   bool ReadFromCache (iFile* cf, csPolygonInt** polygons, int num);
+
+  /**
+   * Classify a point with respect to this tree.
+   * Return true if the point is in solid space or false otherwise.
+   * This routine is not exact. In badly formed worlds it is possible
+   * that it will generate a bad result (i.e. say solid if it isn't
+   * solid space).
+   */
+  bool ClassifyPoint (const csVector3& p)
+  {
+    return ClassifyPoint ((csBspNode*)root, p);
+  }
+
+  /**
+   * Take a 3D polygon and classify it with respect to this tree.
+   * The value returned is 1 if the polygon is entirely in solid space,
+   * 0 if the polygon is entirely in open space and -1 otherwise (i.e.
+   * if the polygon would have to be split). The polygon is not actually
+   * inserted. Note that this algorithm cannot be 100% perfect. If a world
+   * is not properly formed (i.e. there are floating single polygons)
+   * then it is possible (but unlikely) that a polygon is misclassified
+   * as being in solid space while it actually isn't.
+   */
+  int ClassifyPolygon (const csPoly3D& poly)
+  {
+    return ClassifyPolygon ((csBspNode*)root, poly);
+  }
+
 };
 
 #endif /*BSP_H*/

@@ -20,12 +20,7 @@
 #define POLYINT_H
 
 #include "csgeom/math3d.h"
-
-// Values returned by classify.
-#define POL_SAME_PLANE 0
-#define POL_FRONT 1
-#define POL_BACK 2
-#define POL_SPLIT_NEEDED 3
+#include "csgeom/poly3d.h"
 
 class csPolygonIntPool;
 

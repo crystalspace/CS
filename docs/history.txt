@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 14-May-2000
+	- Added csPoly3D::ClassifyXYZ() routines.
+	- Started work on new optimization for PVS.
 	- Eric Sunshine fixed rendering of fog by software renderer in 32-bit
 	  mode on NeXT for both big- and little-endian.  There were several
 	  problems:
@@ -57,6 +59,45 @@ The history order has been reversed so that new features are at the top.
 	  32-bit big- and little-endian on NeXT.  The problem was that the
 	  32-bit 'filt2' routines neglected to apply PIXEL_POSTPROC() to the
 	  composed pixel value.
+	- Thomas Riemer added lock functions to skeleton (iAuth).
+	  Add CmdList - change NetProtocol variable to Protocol.
+	- Paul Garceau did an update for Mingw/NT4/Win98.
+	  user.mak commented to ignore PLUGINS reference.  PLUGINS are
+	  determined by Mingw.mak, win32vc.mak, unix.mak, etc.  If you
+	  require that PLUGINS be referenced in user.mak,  then
+	  uncomment PLUGINS references in user.mak, etc.
+	- Big update of terrain engine from Alex Pfaffe. Currently broken
+	  though.
+13-May-2000
+	- Did some fixes on PVS again. For the very first time PVS seems
+	  to be doing what it is supposed to do: cull invisible nodes :-)
+	  Quality of the PVS is still bad (too few invisible nodes) but
+	  Wouter and me discussed various techniques to solve that.
+	  Note that polygons are not yet included in PVS. This is only
+	  the node -> node PVS part.
+	- Added PVS optimization suggested by Wouter Wijngaards which
+	  treats nodes that cannot see an occludee as completely solid.
+	  This both makes PVS creation faster and increases the quality
+	  of the PVS as well. This is still not the full set of quality
+	  improvements that is planned.
+	- Frank O'Connor changed main signature of mdl2spr for Win32/CSsys
+	  compatibility.
+	- Frank O'Connor did part 2 of the big MSVC/win32 overhaul.
+	    - Split cspace into multiple smaller libs, more like the make
+	      file system.
+	    - Removed all unused libs from projects. Projects attempt
+	      to link to things the explictly need only.
+	    - New naming scheme for projects. Groups them by their function
+		plg* = plugin
+		lib* = libaray
+		grp = project use for grouping only
+		app = application
+	    - Converted a few more apps they didn't have MSVC projects
+	      built for them.
+	- Norman Kramer fixed csview which Wouter accidently broke.
+	- Paul Garceay modified ddraw.mak to once again allow for all
+	  required source files in plugins/video/canvas/common.
+	  Extended vpath to include plugins/video/canvas/common.
 12-May-2000
 	- Michael Dale Long did some bug fixes to csConsole. No longer has
 	  crashes when editing history items.
@@ -84,6 +125,13 @@ The history order has been reversed so that new features are at the top.
 	  used in MazeD.
 	- Removed all CHK and CHKB from the code. That memory debugger
 	  is now obsolete.
+	- Fixed bug in OpenGL makefile. The inclusion of the software
+	  renderer caused problems if the CS version of NASM was present.
+	  The NASM asm files were not included in the OpenGL makefile
+	  causing undefined symbols in the included software renderer.
+	- Fixed bug in PVS. Correctly does backface culling now.
+	- ProjectAxisPlane() in csgeom now returns a boolean to indicate
+	  if the projection was possible.
 	- Eric Sunshine eliminated a compilation warning in csnotebk.cpp.
 	- Eric Sunshine moved declaration and definition of cspExtDialog
 	  outside of the function within which it was defined since the BeOS
@@ -95,6 +143,12 @@ The history order has been reversed so that new features are at the top.
 	  which contains the executable.  This allows CS applications to find
 	  their resources even when launched via double-click from the Tracker
 	  application.
+	- Wouter Wijngaards added SetLastFrustumId(int) public routine
+	  to csLightMap. He needs it for radiosity.
+	- Wouter cleaned up the radiosity code a lot and removed various
+	  unused routines. Should be somewhat faster. Ambient and
+	  priority are calculated better (better formulas). Extra fixes
+	  for bound check overflow.
 11-May-2000
 	- Changes from Michael Dale Long:
 	    - Added a CHK_DECREF() macro to cctest.h that checks if an

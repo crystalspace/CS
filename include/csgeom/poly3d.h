@@ -21,6 +21,12 @@
 
 #include "csgeom/math3d.h"
 
+// Values returned by classify.
+#define POL_SAME_PLANE 0
+#define POL_FRONT 1
+#define POL_BACK 2
+#define POL_SPLIT_NEEDED 3
+
 class Dumper;
 class csPoly2D;
 
@@ -137,27 +143,30 @@ public:
    * Project this polygon onto a X plane as seen from some
    * point in space. Fills the given 2D polygon with the projection
    * on the plane. This function assumes that there actually is
-   * a projection.
+   * a projection. If the polygon to project comes on the same plane
+   * as 'point' then it will return false (no valid projection).
    */
-  void ProjectXPlane (const csVector3& point, float plane_x,
+  bool ProjectXPlane (const csVector3& point, float plane_x,
   	csPoly2D* poly2d);
 
   /**
    * Project this polygon onto a Y plane as seen from some
    * point in space. Fills the given 2D polygon with the projection
    * on the plane. This function assumes that there actually is
-   * a projection.
+   * a projection. If the polygon to project comes on the same plane
+   * as 'point' then it will return false (no valid projection).
    */
-  void ProjectYPlane (const csVector3& point, float plane_y,
+  bool ProjectYPlane (const csVector3& point, float plane_y,
   	csPoly2D* poly2d);
 
   /**
    * Project this polygon onto a Z plane as seen from some
    * point in space. Fills the given 2D polygon with the projection
    * on the plane. This function assumes that there actually is
-   * a projection.
+   * a projection. If the polygon to project comes on the same plane
+   * as 'point' then it will return false (no valid projection).
    */
-  void ProjectZPlane (const csVector3& point, float plane_z,
+  bool ProjectZPlane (const csVector3& point, float plane_z,
   	csPoly2D* poly2d);
 
   /**
@@ -166,16 +175,35 @@ public:
    * on the plane. This function assumes that there actually is
    * a projection. Plane_nr is 0 for the X plane, 1 for Y, and 2 for Z.
    */
-  void ProjectAxisPlane (const csVector3& point, int plane_nr, float plane_pos,
+  bool ProjectAxisPlane (const csVector3& point, int plane_nr, float plane_pos,
   	csPoly2D* poly2d)
   {
     switch (plane_nr)
     {
-      case 0: ProjectXPlane (point, plane_pos, poly2d); break;
-      case 1: ProjectYPlane (point, plane_pos, poly2d); break;
-      case 2: ProjectZPlane (point, plane_pos, poly2d); break;
+      case 0: return ProjectXPlane (point, plane_pos, poly2d); break;
+      case 1: return ProjectYPlane (point, plane_pos, poly2d); break;
+      case 2: return ProjectZPlane (point, plane_pos, poly2d); break;
     }
+    return false;
   }
+
+  /**
+   * Classify this polygon with regards to a plane (in world space). If this poly
+   * is on same plane it returns POL_SAME_PLANE. If this poly is
+   * completely in front of the given plane it returnes POL_FRONT. If this poly
+   * is completely back of the given plane it returnes POL_BACK. Otherwise it
+   * returns POL_SPLIT_NEEDED.
+   */
+  int Classify (const csPlane3& pl);
+
+  /// Same as Classify() but for X plane only.
+  int ClassifyX (float x);
+
+  /// Same as Classify() but for Y plane only.
+  int ClassifyY (float y);
+
+  /// Same as Classify() but for Z plane only.
+  int ClassifyZ (float z);
 };
 
 /**

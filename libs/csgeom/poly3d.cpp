@@ -90,7 +90,7 @@ int csPoly3D::AddVertex (float x, float y, float z)
   return num_vertices-1;
 }
 
-void csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
+bool csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
 	csPoly2D* poly2d)
 {
   poly2d->SetNumVertices (0);
@@ -102,13 +102,15 @@ void csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
   for (i = 0 ; i < num_vertices ; i++)
   {
     v = vertices[i]-point;
+    if (ABS (v.x) < SMALL_EPSILON) return false;
     p.x = point.y + x_dist * v.y / v.x;
     p.y = point.z + x_dist * v.z / v.x;
     poly2d->AddVertex (p);
   }
+  return true;
 }
 
-void csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
+bool csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
 	csPoly2D* poly2d)
 {
   poly2d->SetNumVertices (0);
@@ -120,13 +122,15 @@ void csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
   for (i = 0 ; i < num_vertices ; i++)
   {
     v = vertices[i]-point;
+    if (ABS (v.y) < SMALL_EPSILON) return false;
     p.x = point.x + y_dist * v.x / v.y;
     p.y = point.z + y_dist * v.z / v.y;
     poly2d->AddVertex (p);
   }
+  return true;
 }
 
-void csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
+bool csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
 	csPoly2D* poly2d)
 {
   poly2d->SetNumVertices (0);
@@ -138,11 +142,81 @@ void csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
   for (i = 0 ; i < num_vertices ; i++)
   {
     v = vertices[i]-point;
+    if (ABS (v.z) < SMALL_EPSILON) return false;
     p.x = point.x + z_dist * v.x / v.z;
     p.y = point.y + z_dist * v.y / v.z;
     poly2d->AddVertex (p);
   }
+  return true;
 }
+
+
+int csPoly3D::Classify (const csPlane3& pl)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    float dot = pl.Classify (vertices[i]);
+    if (ABS (dot) < EPSILON) dot = 0;
+    if (dot > 0) back++;
+    else if (dot < 0) front++;
+  }
+  if (back == 0 && front == 0) return POL_SAME_PLANE;
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+int csPoly3D::ClassifyX (float x)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    float xx = vertices[i].x-x;
+    if (xx < -EPSILON) front++;
+    else if (xx > EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+int csPoly3D::ClassifyY (float y)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    float yy = vertices[i].y-y;
+    if (yy < -EPSILON) front++;
+    else if (yy > EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+int csPoly3D::ClassifyZ (float z)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    float zz = vertices[i].z-z;
+    if (zz < -EPSILON) front++;
+    else if (zz > EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
 
 //---------------------------------------------------------------------------
 

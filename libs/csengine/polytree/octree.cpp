@@ -106,6 +106,30 @@ void csOctreeNode::BuildVertexTables ()
     if (children[i]) ((csOctreeNode*)children[i])->BuildVertexTables ();
 }
 
+bool csOctreeNode::PVSCanSee (const csVector3& v)
+{
+  if (!pvs.GetFirst ()) return true; // PVS not yet computed.
+  csOctreeVisible* vis;
+  vis = pvs.GetFirst ();
+  while (vis)
+  {
+    csOctreeNode* node = vis->GetOctreeNode ();
+    if (node->IsLeaf () && node->GetBox ().In (v)) return true;
+    vis = pvs.GetNext (vis);
+  }
+  return false;
+}
+
+int csOctreeNode::CountChildren ()
+{
+  int i;
+  int count = 0;
+  for (i = 0 ; i < 8 ; i++)
+    if (children[i])
+      count += 1+((csOctreeNode*)children[i])->CountChildren ();
+  return count;
+}
+
 //---------------------------------------------------------------------------
 
 csOctree::csOctree (csSector* sect, const csVector3& imin_bbox,
@@ -795,7 +819,68 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
 #define PLANE_X 0
 #define PLANE_Y 1
 #define PLANE_Z 2
-//bool glob_verbose = false;
+
+bool csOctree::CalculatePolygonShadow (
+	const csVector3& corner,
+	csPoly3D& cur_poly,
+	csPoly2D& result_poly, bool first_time,
+	int plane_nr, float plane_pos)
+{
+  csPoly2D proj_poly;
+
+  // If ProjectAxisPlane returns false then the projection is not possible
+  // without clipping the polygon to a plane near the plane going through
+  // 'corner'. We just ignore this polygon to avoid clipping and make
+  // things simple.
+  if (!cur_poly.ProjectAxisPlane (corner, plane_nr, plane_pos, &proj_poly))
+    return false;
+  if (first_time)
+    result_poly = proj_poly;
+  else
+  {
+    float ar = csMath2::Area2 (proj_poly[0], proj_poly[1], proj_poly[2]);
+    csClipper* clipper = new csPolygonClipper (&proj_poly, ar > 0);
+    result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
+    int num_verts = result_poly.GetNumVertices ();
+    UByte rc = clipper->Clip (result_poly.GetVertices (), num_verts,
+	  result_poly.GetBoundingBox ());
+    delete clipper;
+    if (rc == CS_CLIP_OUTSIDE)
+      num_verts = 0;
+    result_poly.SetNumVertices (num_verts);
+    if (num_verts == 0) return true;
+  }
+  return true;
+}
+
+void csOctree::InsertShadowIntoCBuffer (csPoly2D& result_poly,
+	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift)
+{
+  int j;
+  // First scale the polygon to cbuffer dimensions.
+  for (j = 0 ; j < result_poly.GetNumVertices () ; j++)
+  {
+    csVector2& v = result_poly[j];
+    v = v-shift;
+    v.x *= scale.x;
+    v.y *= scale.y;
+  }
+  // Then clip to cbuffer dimensions.
+  // @@@ WE NEED TO MAKE THIS CLIPPER EARLIER AND
+  // GIVE IT TO THIS ROUTINE!
+  csBox2 b (0, 0, 1024, 1024);
+  csClipper* clipper = new csBoxClipper (b);
+  result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
+  int num_verts = result_poly.GetNumVertices ();
+  if (clipper->Clip (result_poly.GetVertices (), num_verts,
+	  result_poly.GetBoundingBox ()))
+  {
+    result_poly.SetNumVertices (num_verts);
+    cbuffer->InsertPolygon (result_poly.GetVertices (),
+  	  result_poly.GetNumVertices ());
+  }
+  delete clipper;
+}
 
 void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 	const csBox3& occludee,
@@ -806,133 +891,87 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
   int i, j;
   csPolygon3D* p;
   csPoly3D cur_poly;
-  csPoly2D proj_poly;
   csPoly2D result_poly;
   bool first_time;
   for (i = 0 ; i < num_polygons ; i++)
     if (polygons[i]->GetType () == 1)
     {
       p = (csPolygon3D*)polygons[i];
-      // @@@ EXPERIMENT: go to the unsplit polygon.
-      //if (p->GetUnsplitPolygon ()) p = (csPolygon3D*)p->GetUnsplitPolygon ();
-
       cur_poly.SetNumVertices (0);
       for (j = 0 ; j < p->GetNumVertices () ; j++)
         cur_poly.AddVertex (p->Vwor (j));
-//bool verbose = glob_verbose && strcmp (p->GetName (), "Lwall_n") == 0;
-//if (verbose)
-//{
-//printf ("  plane_nr=%d plane_pos=%f\n", plane_nr, plane_pos);
-//for (j = 0 ; j < cur_poly.GetNumVertices () ; j++)
-//printf ("  %d: %f,%f,%f\n", j, cur_poly[j].x, cur_poly[j].y, cur_poly[j].z);
-//}
       first_time = true;
+      csPlane3* wplane = p->GetPolyPlane ();
       for (j = 0 ; j < 8 ; j++)
       {
 	const csVector3& corner = occludee.GetCorner (j);
-	cur_poly.ProjectAxisPlane (corner, plane_nr, plane_pos, &proj_poly);
-//if (verbose)
-//{
-//printf ("  Projection %d corner=%f,%f,%f\n", j, corner.x, corner.y, corner.z);
-//int k;
-//for (k = 0 ; k < proj_poly.GetNumVertices () ; k++)
-//printf ("    %d: %f,%f\n", k, proj_poly[k].x, proj_poly[k].y);
-//}
-	if (first_time)
+
+	// Backface culling: if plane is totally on edge with corner or
+	// if corner can see polygon then we ignore it.
+	if (csMath3::Visible (corner, *wplane) ||
+		ABS (wplane->Classify (corner)) < SMALL_EPSILON)
 	{
-	  result_poly = proj_poly;
-	  first_time = false;
+	  result_poly.SetNumVertices (0);
+	  break;
 	}
-	else
+
+	if (!CalculatePolygonShadow (corner, cur_poly, result_poly,
+		first_time, plane_nr, plane_pos))
 	{
-	  //@@@BUG? The 'true' for 'mirror' in the next alloc is probably
-	  // dependent on which side of the axis plane our corner is.
-{
-printf ("================\n");
-printf ("corner=%f,%f,%f plane_nr=%f plane_pos=%f\n",
-corner.x, corner.y, corner.z, plane_nr, plane_pos);
-int k;
-for (k = 0 ; k < cur_poly.GetNumVertices () ; k++)
-printf ("  %d:%f,%f,%f %f,%f\n", k, cur_poly[k].x, cur_poly[k].y,
-cur_poly[k].z, proj_poly[k].x, proj_poly[k].y);
-printf ("%f\n", csMath2::Area2 (proj_poly[0], proj_poly[1], proj_poly[2]));
-}
-	  csClipper* clipper = new csPolygonClipper (&proj_poly, true);
-	  result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
-	  int num_verts = result_poly.GetNumVertices ();
-//if (verbose)
-//{
-//int k;
-//for (k = 0 ; k < num_verts ; k++) printf ("      RES %d:%f,%f\n", k, result_poly[k].x, result_poly[k].y);
-//printf ("      RES BBOX: %f,%f %f,%f\n",
-//result_poly.GetBoundingBox ().MinX (),
-//result_poly.GetBoundingBox ().MinY (),
-//result_poly.GetBoundingBox ().MaxX (),
-//result_poly.GetBoundingBox ().MaxY ());
-//for (k = 0 ; k < clipper->GetNumVertices () ; k++) printf ("      CLI %d:%f,%f\n", k, clipper->GetClipPoly ()[k].x, clipper->GetClipPoly ()[k].y);
-//printf ("      CLI BBOX: %f,%f %f,%f\n",
-//proj_poly.GetBoundingBox ().MinX (),
-//proj_poly.GetBoundingBox ().MinY (),
-//proj_poly.GetBoundingBox ().MaxX (),
-//proj_poly.GetBoundingBox ().MaxY ());
-//}
-	  UByte rc = clipper->Clip (result_poly.GetVertices (), num_verts,
-	  	result_poly.GetBoundingBox ());
-	  delete clipper;
-	  if (rc == CS_CLIP_OUTSIDE)
-	    num_verts = 0;
-//if (verbose) printf ("      rc=%d num_verts=%d\n", rc, num_verts);
-	  result_poly.SetNumVertices (num_verts);
-	  if (num_verts == 0) break;
+	  result_poly.SetNumVertices (0);
+	  break;
 	}
+	first_time = false;
+        if (result_poly.GetNumVertices () == 0) break;
       }
       if (result_poly.GetNumVertices () != 0)
       {
-//if (verbose)
-//{
-//int k;
-//printf ("############\nRESULT ->\n");
-//for (k = 0 ; k < result_poly.GetNumVertices () ; k++) printf ("      RES %d:%f,%f\n", k, result_poly[k].x, result_poly[k].y);
-//}
-	// First scale the polygon to cbuffer dimensions.
-	for (j = 0 ; j < result_poly.GetNumVertices () ; j++)
-	{
-	  csVector2& v = result_poly[j];
-	  v = v-shift;
-	  v.x *= scale.x;
-	  v.y *= scale.y;
-	}
-//if (verbose)
-//{
-//int k;
-//for (k = 0 ; k < result_poly.GetNumVertices () ; k++) printf ("      SCA %d:%f,%f\n", k, result_poly[k].x, result_poly[k].y);
-//}
-	// Then clip to cbuffer dimensions.
-	// @@@ WE NEED TO MAKE THIS CLIPPER EARLIER AND
-	// GIVE IT TO THIS ROUTINE!
-	csBox2 b (0, 0, 1024, 1024);
-	csClipper* clipper = new csBoxClipper (b);
-	result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
-	int num_verts = result_poly.GetNumVertices ();
-	if (clipper->Clip (result_poly.GetVertices (), num_verts,
-		result_poly.GetBoundingBox ()))
-	{
-//if (verbose)printf ("cbuffer INSERT\n");
-	  result_poly.SetNumVertices (num_verts);
-	  cbuffer->InsertPolygon (result_poly.GetVertices (),
-	  	result_poly.GetNumVertices ());
-	  if (cbuffer->IsFull ()) return;
-	}
-	delete clipper;
+        InsertShadowIntoCBuffer (result_poly, cbuffer, scale, shift);
+	if (cbuffer->IsFull ()) return;
       }
     }
+}
+
+bool csOctree::BoxOccludeeShadowOutline (const csBox3& occluder_box,
+	const csBox3& occludee,
+	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
+	int plane_nr, float plane_pos)
+{
+  int j;
+  csPolygon3D* p;
+  csPoly3D cur_poly;
+  csPoly2D result_poly;
+  bool first_time = true;
+
+  for (j = 0 ; j < 8 ; j++)
+  {
+    const csVector3& corner = occludee.GetCorner (j);
+    cur_poly.MakeRoom (6);
+    int num_verts;
+    occluder_box.GetConvexOutline (corner, cur_poly.GetVertices (),
+    	num_verts);
+    cur_poly.SetNumVertices (num_verts);
+
+    if (!CalculatePolygonShadow (corner, cur_poly, result_poly,
+	first_time, plane_nr, plane_pos))
+      return false;
+    first_time = false;
+    if (result_poly.GetNumVertices () == 0) break;
+  }
+  if (result_poly.GetNumVertices () != 0)
+  {
+    InsertShadowIntoCBuffer (result_poly, cbuffer, scale, shift);
+    if (cbuffer->IsFull ()) return true;
+  }
+  return true;
 }
 
 void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
 	const csBox3& box, const csBox3& occludee,
-	csVector3& box_center, csVector3& occludee_center)
+	csVector3& box_center, csVector3& occludee_center,
+	bool do_polygons)
 {
   if (!occluder) return;
   if (cbuffer->IsFull ()) return;
@@ -943,20 +982,36 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
     for (i = 0 ; i < 8 ; i++)
       BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
       	cbuffer, scale, shift, plane_nr, plane_pos,
-	box, occludee, box_center, occludee_center);
+	box, occludee, box_center, occludee_center, do_polygons);
   }
   else if (occluder_box.Between (box, occludee))
   {
-    //if (occluder->IsLeaf ())
+    // First see if this occluder can see occludee. If not then
+    // we take the outline of this node and insert that instead
+    // of the polygons in the node.
+    if (!occluder->PVSCanSee (occludee_center))
+    {
+ printf ("#");
+      if (BoxOccludeeShadowOutline (occluder_box, occludee,
+	cbuffer, scale, shift, plane_nr, plane_pos))
+      return;
+    }
+
+    // Even though this box is between we will continue recursing
+    // to the children to test for their outline (if an entire
+    // node cannot see an occludee then we can take the outline of
+    // that node to insert in the c-buffer).
+    for (i = 0 ; i < 8 ; i++)
+      BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
+      	cbuffer, scale, shift, plane_nr, plane_pos,
+	box, occludee, box_center, occludee_center, false);
+    if (cbuffer->IsFull ()) return;
+
+    if (do_polygons)
       BoxOccludeeShadowPolygons (box, occludee,
 	occluder->unsplit_polygons.GetPolygons (),
 	occluder->unsplit_polygons.GetNumPolygons (),
 	cbuffer, scale, shift, plane_nr, plane_pos);
-    //else
-      //for (i = 0 ; i < 8 ; i++)
-        //BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
-      	  //cbuffer, scale, shift, plane_nr, plane_pos,
-	  //box, occludee, box_center, occludee_center);
   }
 }
 
@@ -1030,28 +1085,6 @@ void CalcBBoxFromBoxes (const csBox3& box1, const csBox3& box2,
 
 bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
 {
-//glob_verbose= (box.MaxX ()-box.MinX () < 1 &&
-    //box.MaxY ()-box.MinY () < .3 &&
-    //box.MaxZ ()-box.MinZ () < .7) &&
-    //(occludee.MaxX ()-occludee.MinX () < 1 &&
-    //occludee.MaxY ()-occludee.MinY () < .2 &&
-    //occludee.MaxZ ()-occludee.MinZ () < .4);
-//if (glob_verbose){printf ("box_dim=%f,%f,%f occludee_dim=%f,%f,%f\n",
-//box.MaxX ()-box.MinX (),
-//box.MaxY ()-box.MinY (),
-//box.MaxZ ()-box.MinZ (),
-//occludee.MaxX ()-occludee.MinX (),
-//occludee.MaxY ()-occludee.MinY (),
-//occludee.MaxZ ()-occludee.MinZ ());
-//printf("box=%f,%f,%f %f,%f,%f\noccludee=%f,%f,%f %f,%f,%f\n",
-//box.MinX (), box.MinY (), box.MinZ (),
-//box.MaxX (), box.MaxY (), box.MaxZ (),
-//occludee.MinX (), occludee.MinY (), occludee.MinZ (),
-//occludee.MaxX (), occludee.MaxY (), occludee.MaxZ ());
-//}
-
-
-
   // This routine works as follows: first we find a suitable plane
   // between 'box' and 'occludee' on which we're going to project all
   // the potentially occluding polygons (which are between box and occludee).
@@ -1132,7 +1165,7 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
   cbuffer->Initialize ();
   BoxOccludeeAddShadows ((csOctreeNode*)root, cbuffer, scale, shift,
   	plane_nr, plane_pos,
-  	box, occludee, box_center, occludee_center);
+  	box, occludee, box_center, occludee_center, true);
 
   // If the c-buffer is full then the occludee will not be visible.
   bool full = cbuffer->IsFull ();
@@ -1159,14 +1192,16 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     if (rc) printf ("+");
     else
     {
-      printf ("-");
-      const csBox3& lb = leaf->GetBox ();
-      const csBox3& ob = occludee->GetBox ();
-      printf ("\nleaf=%f,%f,%f %f,%f,%f\noccludee=%f,%f,%f %f,%f,%f\n",
-      	lb.MinX (), lb.MinY (), lb.MinZ (),
-      	lb.MaxX (), lb.MaxY (), lb.MaxZ (),
-      	ob.MinX (), ob.MinY (), ob.MinZ (),
-      	ob.MaxX (), ob.MaxY (), ob.MaxZ ());
+      int j;
+      for (j = 0 ; j < occludee->CountChildren ()+1 ; j++)
+        printf ("-");
+      //const csBox3& lb = leaf->GetBox ();
+      //const csBox3& ob = occludee->GetBox ();
+      //printf ("\nleaf=%f,%f,%f %f,%f,%f\noccludee=%f,%f,%f %f,%f,%f\n",
+      	//lb.MinX (), lb.MinY (), lb.MinZ (),
+      	//lb.MaxX (), lb.MaxY (), lb.MaxZ (),
+      	//ob.MinX (), ob.MinY (), ob.MinZ (),
+      	//ob.MaxX (), ob.MaxY (), ob.MaxZ ());
     }
     fflush (stdout);
     if (rc) visible = true;
@@ -1253,6 +1288,30 @@ printf ("*"); fflush (stdout);
 void csOctree::BuildPVS (csThing* thing)
 {
   BuildPVS (thing, (csOctreeNode*)root);
+}
+
+bool csOctree::ClassifyPoint (csOctreeNode* node, const csVector3& p)
+{
+  //@@@@@@@@@@@@@@@@
+  return false;
+}
+
+int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
+{
+#if 0
+  if (node->GetMiniBsp ())
+  {
+    csBspTree* bsp = node->GetMiniBsp ();
+    return bsp->ClassifyPolygon (poly);
+  }
+  @@@
+  const csVector3& center = node->GetCenter ();
+    case 0: rc = np->ClassifyX (xyz_val); break;
+    case 1: rc = np->ClassifyY (xyz_val); break;
+    case 2: rc = np->ClassifyZ (xyz_val); break;
+    //@@@@@@@@@@@@@@@@
+#endif
+  return 0;
 }
 
 void csOctree::Statistics ()
