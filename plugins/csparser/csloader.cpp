@@ -2152,7 +2152,7 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
     else
     {
       mesh = Engine->CreateMeshWrapper (name);
-      if (!LoadMeshObject (mesh, buf))
+      if (!LoadMeshObject (mesh, data))
       {
 	mesh->DecRef ();
 	ReportError (

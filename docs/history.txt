@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+25-Feb-2002
+	- Michael O'Shea found a bug in iLoader::LoadMeshObject(char*fname).
+	  This function was totally broken :-)
 22-Feb-2002
 	- Added iLoaderContext interface (include/imap/ldrctxt.h). This
 	  new interface gives loader plugins a way to find out about
