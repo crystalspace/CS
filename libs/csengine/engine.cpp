@@ -564,7 +564,12 @@ iObject* csObjectIt::Fetch ()
           float r = dl->QueryLight ()->GetRadius () + radius;
           if (csSquaredDist::PointPoint (dl->QueryLight ()->GetCenter (),
 		cur_pos) <= r*r)
-          return rc;
+	  {
+	    dl->DecRef ();
+            return rc;
+	  }
+	  else
+	    dl->DecRef ();
 	}
       }
       while (cur_object);
@@ -607,8 +612,13 @@ iObject* csObjectIt::Fetch ()
 	{
           float r = sl->QueryLight ()->GetRadius () + radius;
           if (csSquaredDist::PointPoint (sl->QueryLight ()->GetCenter (),
-	    cur_pos) <= r*r)
-              return rc;
+	    	cur_pos) <= r*r)
+	  {
+	    sl->DecRef ();
+	    return rc;
+	  }
+	  else
+	    sl->DecRef ();
 	}
       }
       while (cur_idx < ll->GetCount ());
