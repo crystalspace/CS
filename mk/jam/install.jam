@@ -31,16 +31,18 @@ rule InstallPlugin
 {
   local dir = [ FDirName $(INSTALLDIR.PLUGIN) $(2) ] ;
   local target = $(<:R=$(dir):G=install) ;
-  local scf = $(<:R=$(dir):S=.scf:G=installscf) ;
 
   Install $(target) : $(<) ;
   MODE on $(target) = $(EXEMODE) ;
   
-  ScfFileGen $(scf) : $(target) ;
-  Depends $(scf) : $(target) ;
-  Depends $(scf) : scfreg ;
+  if $(CMD.SCFREG)
+  {
+    local scf = $(<:R=$(dir):S=.scf:G=installscf) ;
+    ScfFileGen $(scf) : $(target) ;
+    Depends install_plugins : $(scf) ;
+  }
 
-  Depends install_plugins : $(scf) $(target) ;
+  Depends install_plugins : $(target) ;
 }
 
 ##  InstallLibrary libraryname [ : subdir ]
@@ -232,9 +234,14 @@ actions Install
   $(CMD.INSTALL) -m$(MODE) $(>) $(<) $(INSTALLFLAGS) ;
 }
 
+rule ScfFileGen
+{
+  Depends $(<) : $(>) ;
+}
+
 actions ScfFileGen
 {
-  $(BUILDTOP)/scfreg $(>) > /dev/null
+  $(CMD.SCFREG) $(>) > /dev/null
 }
 
 actions CopyDirs

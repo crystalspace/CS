@@ -24,9 +24,12 @@ The history order is reversed so that new features are at the top.
 	- Matze separated installation path handling for Jamconfig and moved
 	  the filter stuff to the install macros.
         - JTarbox updated the event object from csVector to csArray<>
-    - res added some missing includes to glextmanager.h
-    - res changed the new GL renderer to utilize the modified extension
-      manager.
+	- res added some missing includes to glextmanager.h
+	- res changed the new GL renderer to utilize the modified extension
+	  manager.
+	- Matze changed the way the jam install rule looks for scfreg. Now you
+	  can also use it easily in external projects by simply setting
+	  CMD.SCFREG
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build
