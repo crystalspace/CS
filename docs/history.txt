@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	  when object_reg is NULL in destructor (this can happen for example if
 	  you compiled imgplex but didn't compile the individual GIF, BMP
 	  etc... loaders).
+	- Andrew added "imgplexall" target which makes imgplex and all
+	  available graphics format loaders.
 	- Corrected the ^M chars in csstring.cpp. These prevented proper
 	  compilation.
 	- Added patch to fix 3dsie loader from Norman Kramer.
@@ -69,6 +71,10 @@ The history order is reversed so that new features are at the top.
 	      (i.e. more broken).  The macosx.sh configuration script is
 	      invoked at makefile configuration time, and augments
 	      CS/config.mak as needed.
+	- Added new csSphere class to csgeom. This class is not yet used
+	  but it will be extended to handle operations on bounding spheres.
+	  At this moment it has a function to calculate the union of two
+	  bounding spheres. This is untested however.
 28-Aug-2001
 	- Norman Kramer reported a fix for the freefont plugin.
 	- Added aws and ie3ds to mk/user.mak.
