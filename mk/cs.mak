@@ -10,7 +10,7 @@ include mk/user.mak
 include mk/common.mak
 -include config.mak
 
-.PHONY: doc api depend clean cleanlib cleandep distclean
+.PHONY: doc api depend clean cleanlib cleandep distclean html pdf classpdf pdfbook cleandoc detex zips
 
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
@@ -64,6 +64,7 @@ OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 ############################################
 
 HEADER=$(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
+SOURCE=$(wildcard *.cpp */*.cpp */*/*.cpp */*/*/*.cpp */*/*/*/*.cpp)
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   $(CFLAGS.I)./apps $(CFLAGS.I)./support
@@ -150,7 +151,7 @@ depend: $(OUTBASE) $(OUTOS)
 distclean: clean
 	-$(RM) config.mak include/volatile.h
 
-clean:
+clean: cleandoc
 	-$(RMDIR) $(subst /,,$(OUTBASE))
 ifneq ($(strip $(OUTDLL)),)
 	-$(RMDIR) $(subst /,,$(OUTDLL))
@@ -164,27 +165,47 @@ cleanlib:
 cleandep:
 	-$(RM) $(OUTOS)*.dep
 
-api:
-	doc++ -H -d csapi -f \
-		$(wildcard include/csengine/*.h) \
-		$(wildcard include/csobject/*.h) \
-		$(wildcard include/csgeom/*.h)
-		
-doc:
-	doc++ -H -d csdoc -f $(HEADER)
+CSAPI=$(wildcard include/csengine/*.h include/csobject/*.h include/csgeom/*.h)
+CSDOC=$(HEADER)
+
+pics: 
+	mkdir pics
+	cp newdoc/pics/* ./pics/
+
+csapi/index.html: $(CSAPI) newdoc/html/docxxbanner.html
+	doc++ -F -B newdoc/html/docxxbanner.html -j -H -d csapi -f $(CSAPI)		
+
+api: csapi/index.html pics
+
+csdoc/index.html: $(CSDOC) newdoc/html/docxxbanner.html
+	doc++ -F -B newdoc/html/docxxbanner.html -j -H -d csdoc -f $(CSDOC)
+	rm -f csdoc/HIERjava.html
+	
+doc: csdoc/index.html pics
 
 PDFLATEX=pdflatex -interaction=nonstopmode
 PDF_FILES=csgeom.pdf csengine.pdf csobject.pdf
 
-VPATH=newdoc:out:include/csgeom
+VPATH=newdoc
 
-html: api doc
+html/index.html: $(wildcard newdoc/*.tex)
 	latex2html newdoc/html
+	python bin/mshelp.py crystal
 
-%.tex: $(wildcard include/$(*F)/*.h)
-	doc++ -t -o $(*F).tex $(wildcard include/$(*F)/*.h)
+html: doc html/index.html pics
+
+cs-help-html.zip: html/index.html
+	zip -9 -rp cs-help-html.zip csdoc html pics crystal.hh*
+
+zips: cs-help-html.zip
 
 %.pdf: %.tex
+	$(PDFLATEX) $<
+
+%.ttx: $(wildcard include/$(*F)/*.h)
+	doc++ -t -o $(*F).ttx $(wildcard include/$(*F)/*.h)
+
+%.pdf: %.ttx
 	$(PDFLATEX) $<
 
 classpdf: $(PDF_FILES)
@@ -199,11 +220,14 @@ cleandoc:
 	rm -f *.pdf
 	rm -f *.idx
 	rm -f *.toc
-	rm -f *.tex
+	rm -f *.ttx
 	rm -f *.txt
 	rm -rf csdoc
 	rm -rf csapi
 	rm -rf html
+	rm -f crystal.hhc
+	rm -f crystal.hhk
+	rm -f crystal.hhp
 
 %.txt: %.tex
 	detex $< > $(*F).txt
