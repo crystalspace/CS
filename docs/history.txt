@@ -45,6 +45,42 @@ The history order is reversed so that new features are at the top.
 	  monolithic-oriented csSystemDriver::CheckDrivers() method.
 	- Eric Sunshine removed the csjava plugin since it was completely
 	  unimplemented.
+	- Eric Sunshine added a "CS_" prefix to the following platform-specific
+	  configuration macros:
+	    SOFTWARE_2D_DRIVER --> CS_SOFTWARE_2D_DRIVER
+	    OPENGL_2D_DRIVER   --> CS_OPENGL_2D_DRIVER
+	    GLIDE_2D_DRIVER    --> CS_GLIDE_2D_DRIVER
+	    SOUND_DRIVER       --> CS_SOUND_DRIVER
+	- Eric Sunshine added a "CS_" prefix to the following csVector-related
+	  macros.  Furthermore, DECLARE_TYPED_SCF_VECTOR has been renamed to
+	  CS_DECLARE_TYPED_IBASE_VECTOR in order to more clearly indicate that
+	  this array type works with reference-counted iBase objects.
+	    BEGIN_TYPED_VECTOR()       --> CS_BEGIN_TYPED_VECTOR()
+	    FINISH_TYPED_VECTOR()      --> CS_FINISH_TYPED_VECTOR()
+	    DECLARE_TYPED_VECTOR()     --> CS_DECLARE_TYPED_VECTOR()
+	    DECLARE_TYPED_SCF_VECTOR() --> CS_DECLARE_TYPED_IBASE_VECTOR()
+	    DECLARE_TYPED_VECTOR_HELPER()
+		--> CS_CS_DECLARE_TYPED_VECTOR_HELPER()
+	    DECLARE_TYPED_VECTOR_NODELETE()
+		--> CS_CS_DECLARE_TYPED_VECTOR_NODELETE()
+	- Eric Sunshine added a "CS_" prefix to the following `sysdef' request
+	  macros.  Furthermore, each macro name now contains the word "provide"
+	  since these macros are used by client code to request that
+	  cssysdef.h provides certain facilities.
+	    SYSDEF_ACCESS  --> CS_SYSDEF_PROVIDE_ACCESS
+	    SYSDEF_ALLOCA  --> CS_SYSDEF_PROVIDE_ALLOCA
+	    SYSDEF_CASE    --> CS_SYSDEF_PROVIDE_CASE
+	    SYSDEF_DIR     --> CS_SYSDEF_PROVIDE_DIR
+	    SYSDEF_GETCWD  --> CS_SYSDEF_PROVIDE_GETCWD
+	    SYSDEF_GETOPT  --> CS_SYSDEF_PROVIDE_GETOPT
+	    SYSDEF_MKDIR   --> CS_SYSDEF_PROVIDE_MKDIR
+	    SYSDEF_PATH    --> CS_SYSDEF_PROVIDE_PATH
+	    SYSDEF_SELECT  --> CS_SYSDEF_PROVIDE_SELECT
+	    SYSDEF_SOCKETS --> CS_SYSDEF_PROVIDE_SOCKETS
+	    SYSDEF_TEMP    --> CS_SYSDEF_PROVIDE_TEMP
+	    SYSDEF_UNLINK  --> CS_SYSDEF_PROVIDE_UNLINK
+	- Eric Sunshine updated apimod19.txi to mention the above macro name
+	  changes.
 28-Jun-2001
 	- Fixed error handling in spr2dldr (for mixmode) a little.
 	- Added error reporting to ballldr (using reporter plugin).

@@ -20,8 +20,8 @@
 
 #include <stdarg.h>
 
-#define SYSDEF_ALLOCA
-#define SYSDEF_SOFTWARE2D
+#define CS_SYSDEF_PROVIDE_ALLOCA
+#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "csutil/csvector.h"
@@ -785,7 +785,7 @@ int main (int argc, char *argv[])
   {
     const char *canvas = System.GetOptionCL ("canvas");
     if (!canvas || !*canvas)
-      canvas = SOFTWARE_2D_DRIVER;
+      canvas = CS_SOFTWARE_2D_DRIVER;
     else if (strncmp ("crystalspace.", canvas, 13))
     {
       char *tmp = (char *)alloca (strlen (canvas) + 25);

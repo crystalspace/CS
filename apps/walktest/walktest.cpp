@@ -18,8 +18,8 @@
 
 #include <stdarg.h>
 
-#define SYSDEF_PATH
-#define SYSDEF_ACCESS
+#define CS_SYSDEF_PROVIDE_PATH
+#define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
 #include "walktest.h"
 #include "infmaze.h"

@@ -542,6 +542,73 @@ avoid polluting the global namespace.
 @code{IS_NETWORK_EVENT} @result{} @code{CS_IS_NETWORK_EVENT}
 @end itemize
 
+Platform-specific configuration macros are now prefixed with @samp{CS_} in
+order to avoid polluting the global namespace.
+
+@itemize @bullet
+@item
+@code{SOFTWARE_2D_DRIVER} @result{} @code{CS_SOFTWARE_2D_DRIVER}
+@item
+@code{OPENGL_2D_DRIVER} @result{} @code{CS_OPENGL_2D_DRIVER}
+@item
+@code{GLIDE_2D_DRIVER} @result{} @code{CS_GLIDE_2D_DRIVER}
+@item
+@code{SOUND_DRIVER} @result{} @code{CS_SOUND_DRIVER}
+@end itemize
+
+All @samp{csVector}-related macros are now prefixed with @samp{CS_} in order to
+avoid polluting the global namespace.  Furthermore,
+@code{DECLARE_TYPED_SCF_VECTOR()} has been renamed to
+@code{CS_DECLARE_TYPED_IBASE_VECTOR()} in order to more clearly indicate that
+this array type works with reference-counted @samp{iBase} objects.
+
+@itemize @bullet
+@item
+@code{BEGIN_TYPED_VECTOR()} @result{} @code{CS_BEGIN_TYPED_VECTOR()}
+@item
+@code{FINISH_TYPED_VECTOR()} @result{} @code{CS_FINISH_TYPED_VECTOR()}
+@item
+@code{DECLARE_TYPED_VECTOR()} @result{} @code{CS_DECLARE_TYPED_VECTOR()}
+@item
+@code{DECLARE_TYPED_VECTOR_HELPER()} @result{} @code{CS_CS_DECLARE_TYPED_VECTOR_HELPER()}
+@item
+@code{DECLARE_TYPED_VECTOR_NODELETE()} @result{} @code{CS_CS_DECLARE_TYPED_VECTOR_NODELETE()}
+@item
+@code{DECLARE_TYPED_SCF_VECTOR()} @result{} @code{CS_DECLARE_TYPED_IBASE_VECTOR()}
+@end itemize
+
+All @samp{SYSDEF_BLAH} request macros are now prefixed with @samp{CS_} in order
+to avoid polluting the global namespace.  Furthermore, each macro name now
+contains the word ``provide'' since these macros are used by client code to
+request that @file{cssysdef.h} @emph{provides} certain facilities.
+
+@itemize @bullet
+@item
+@code{SYSDEF_ACCESS} @result{} @code{CS_SYSDEF_PROVIDE_ACCESS}
+@item
+@code{SYSDEF_ALLOCA} @result{} @code{CS_SYSDEF_PROVIDE_ALLOCA}
+@item
+@code{SYSDEF_CASE} @result{} @code{CS_SYSDEF_PROVIDE_CASE}
+@item
+@code{SYSDEF_DIR} @result{} @code{CS_SYSDEF_PROVIDE_DIR}
+@item
+@code{SYSDEF_GETCWD} @result{} @code{CS_SYSDEF_PROVIDE_GETCWD}
+@item
+@code{SYSDEF_GETOPT} @result{} @code{CS_SYSDEF_PROVIDE_GETOPT}
+@item
+@code{SYSDEF_MKDIR} @result{} @code{CS_SYSDEF_PROVIDE_MKDIR}
+@item
+@code{SYSDEF_PATH} @result{} @code{CS_SYSDEF_PROVIDE_PATH}
+@item
+@code{SYSDEF_SELECT} @result{} @code{CS_SYSDEF_PROVIDE_SELECT}
+@item
+@code{SYSDEF_SOCKETS} @result{} @code{CS_SYSDEF_PROVIDE_SOCKETS}
+@item
+@code{SYSDEF_TEMP} @result{} @code{CS_SYSDEF_PROVIDE_TEMP}
+@item
+@code{SYSDEF_UNLINK} @result{} @code{CS_SYSDEF_PROVIDE_UNLINK}
+@end itemize
+
 Methods in many classes and @sc{scf} interfaces have been renamed in order to
 improve naming consistency throughout the project.
 The following method names changes follow the pattern where
