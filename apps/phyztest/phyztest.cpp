@@ -31,6 +31,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "imesh/sprite3d.h"
+#include "imap/parser.h"
 
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"
@@ -198,13 +199,13 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
 
-  if ( !csLoader::LoadLibraryFile (engine, "/lib/std/library" ) )
+  if (!LevelLoader->LoadLibraryFile ("/lib/std/library" ) )
   {
     Printf (MSG_INITIALIZATION, "LIBRARY NOT LOADED!...\n");
     Shutdown = true;
     return false;
   }
-  csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
+  LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
   room = engine->CreateCsSector ("room");

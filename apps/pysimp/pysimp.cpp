@@ -30,6 +30,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivaria/script.h"
 #include "csengine/dumper.h"
+#include "imap/parser.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -103,7 +104,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
+  LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   csSector *room = engine->CreateCsSector ("room");
   csThing* walls = engine->CreateSectorWalls (room, "walls");
 
