@@ -251,5 +251,8 @@ requirement, so be sure to follow this guideline for maximum portability.
 @item
 @emph{Avoid Templates}
 
-Some compilers don't support templates, so you should not use them.
+These days, C++ compilers used with Crystal Space support templates, and the
+project makes use of templates for several utility classes.  For portability
+reasons, however, the entire template implementation should be placed into the
+header file.  There should be no associated source code file.
 @end enumerate

@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.
+	- Eric Sunshine updated the discussion of C++ templates in the
+	  coding/portability section of the user manual to reflect the fact
+	  that we do now allow templates, though with certain restrictions.
 17-Jun-2003
 	- Marten fixed an error with uninitialized extensions in render3d.
 	- Marten fixed jamfiles for glshader_. They need to link to GL.
