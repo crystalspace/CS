@@ -38,7 +38,7 @@ class csJNGImageIO : public iImageIO
 
  private:
   csMemFile *outfile;
-  iImage *imgRGBA;
+  csRef<iImage> imgRGBA;
 
   /// write something to our output stream
   static mng_bool MNG_DECL cb_writedata (mng_handle hHandle, mng_ptr pBuf,

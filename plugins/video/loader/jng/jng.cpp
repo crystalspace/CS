@@ -315,8 +315,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
       imgRGBA->SetFormat (CS_IMGFMT_TRUECOLOR | (Image->GetFormat() & CS_IMGFMT_ALPHA));
       break;
     case CS_IMGFMT_TRUECOLOR:
-      imgRGBA = Image;
-      imgRGBA->IncRef();
+      imgRGBA = csPtr<iImage>(Image);
       break;
     default:
       // unknown format
@@ -430,7 +429,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     ReportLibmngError (object_reg, handle, "failed to create new jng");
     mng_cleanup (&handle);
     delete outfile;
-    imgRGBA->DecRef();
+    imgRGBA = 0;
     return NULL;
   }
 
@@ -448,7 +447,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     ReportLibmngError (object_reg, handle, "failed to put JHDR chunk");
     mng_cleanup (&handle);
     delete outfile;
-    imgRGBA->DecRef();
+    imgRGBA = 0;
     return NULL;
   }
 
@@ -490,7 +489,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 	delete [] row;
 	delete[] alpha;
 	jpeg_destroy_compress (&cinfo);
-	imgRGBA->DecRef();
+	imgRGBA = 0;
 	return NULL;
       }
 
@@ -531,7 +530,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 	mng_cleanup (&handle);
 	delete outfile;
 	delete[] alpha;
-	imgRGBA->DecRef();
+	imgRGBA = 0;
 	return NULL;
       }
     }
@@ -576,7 +575,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 	delete outfile;
 	delete[] chunkdata;
 	delete[] alpha;
-	imgRGBA->DecRef();
+	imgRGBA = 0;
 	return NULL;
       }
 
@@ -599,7 +598,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 	  delete outfile;
 	  delete[] chunkdata;
 	  delete[] alpha;
-	  imgRGBA->DecRef();
+	  imgRGBA = 0;
 	  return NULL;
 	}
         if (rc == Z_STREAM_END)
@@ -629,7 +628,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     delete outfile;
     delete [] row;
     jpeg_destroy_compress (&cinfo);
-    imgRGBA->DecRef();
+    imgRGBA = 0;
     return NULL;
   }
 
@@ -668,11 +667,11 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     ReportLibmngError (object_reg, handle, "failed to put JDAT chunk");
     mng_cleanup (&handle);
     delete outfile;
-    imgRGBA->DecRef();
+    imgRGBA = 0;
     return NULL;
   }
   
-  imgRGBA->DecRef();
+  imgRGBA = 0;
 
   if (mng_putchunk_iend (handle) != MNG_NOERROR)
   {
