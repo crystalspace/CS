@@ -26,7 +26,7 @@
 bool ddgUtil::DetectSIMD(void)
 {
 bool found_simd = false;
-#if defined(WIN32) && !defined(COMP_GCC)
+#if defined(WIN32) && !defined(__CRYSTAL_SPACE__)
 _asm
 {
 pushfd
