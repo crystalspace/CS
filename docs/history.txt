@@ -33,6 +33,9 @@ chronological order.
 	      be 'true' for the triangle buffer.
 	- Jorrit added stdpt, ieplex, motion, and gtreeldr to walkall target
 	  for jam.
+	- res changed csStringArray::CaseSensitiveCompareKey() and
+	  CaseInsensitiveCompareKey() to not treat the key parameter as a
+	  pointer to a string, but a string itself.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.

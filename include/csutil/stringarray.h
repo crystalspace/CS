@@ -62,13 +62,13 @@ public:
 
   static int CaseSensitiveCompareKey (char const* const& item1, void* p)
   {
-    char const* item2 = *(char const**)p;
+    char const* item2 = (char const*)p;
     return strcmp (item1, item2);
   }
 
   static int CaseInsensitiveCompareKey (char const* const& item1, void* p)
   {
-    char const* item2 = *(char const**)p;
+    char const* item2 = (char const*)p;
     return strcasecmp (item1, item2);
   }
 
