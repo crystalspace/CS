@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,6 +28,7 @@
 #include "csengine/portal.h"
 #include "cstool/meshobjtmpl.h"
 #include "iengine/shadcast.h"
+#include "ivideo/rendermesh.h"
 
 /**
  * A helper class for iPolygonMesh implementations used by csPortalContainer.
@@ -152,6 +154,8 @@ private:
 	const csReversibleTransform& movtrans, iRenderView *rview,
 	const csPlane3& camera_plane);
 
+  csRenderMesh rmesh;
+  csRenderMesh *rmeshPtr;
 protected:
   /**
    * Destructor.  This is private in order to force clients to use DecRef()
@@ -191,6 +195,14 @@ public:
   virtual void RemovePortal (iPortal* portal);
   virtual int GetPortalCount () const { return portals.Length () ; }
   virtual iPortal* GetPortal (int idx) const { return (iPortal*)portals[idx]; }
+  virtual void Draw (iRenderView* rview, iMovable* movable)
+  {
+    //get the movable from parent
+    iBase *parent = GetLogicalParent();
+    csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE(parent, iMeshWrapper);
+    if (wrap)
+      Draw (rview, wrap->GetMovable (), CS_ZBUF_NONE);
+  }
 
   //--------------------- For iMeshObject ------------------------------//
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
@@ -203,6 +215,13 @@ public:
   	const csVector3& end, csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
+
+  virtual csRenderMesh** GetRenderMeshes (int& num)
+  {
+    num = 1;
+    rmeshPtr = &rmesh;
+    return &rmeshPtr;
+  }
 
   //--------------------- For csMeshObject ------------------------------//
   virtual void GetObjectBoundingBox (csBox3& bbox, int)

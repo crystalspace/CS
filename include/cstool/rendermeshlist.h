@@ -25,7 +25,7 @@
 
 struct iEngine;
 struct iObjectRegistry;
-class csRenderMesh;
+struct csRenderMesh;
 
 /**
  * This class is used when we need to store, sort and then render a list of

@@ -1,6 +1,7 @@
 /*
     Crystal Space 3D engine
     Copyright (C) 1998-2001 by Jorrit Tyberghein
+                  2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -141,6 +142,16 @@ struct iSector : public iBase
    * Get the current draw recursion level.
    */
   virtual int GetRecLevel () const = 0;
+
+  /**
+   * Add one draw recursion level.
+   */
+  virtual void IncRecLevel () = 0;
+
+  /**
+   * Remove one draw recursion level.
+   */
+  virtual void DecRecLevel () = 0;
 
   /**
    * Follow a beam from start to end and return the first polygon that

@@ -2,6 +2,7 @@
     Crystal Space 3D engine
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,7 +36,8 @@ struct iCamera;
 struct iClipper2D;
 struct iSector;
 struct iRenderStep;
-class csRenderView;
+//class csRenderView;
+struct iRenderView;
 
 /**
  * Name of the default render loop created by the engine.
@@ -52,6 +54,7 @@ SCF_VERSION (iRenderLoop, 0, 0, 3);
 struct iRenderLoop : public iRenderStepContainer
 {
   virtual void Draw (iCamera* c, iClipper2D* clipper) = 0;
+  virtual void Draw (iRenderView *rview, iSector *s) = 0;
 };
 
 SCF_VERSION (iRenderLoopManager, 0, 0, 2);

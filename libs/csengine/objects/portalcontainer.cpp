@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -153,6 +154,10 @@ void csPortalContainer::Prepare ()
   object_radius = object_bbox.Max () - object_bbox.GetCenter ();
   max_object_radius = qsqrt (csSquaredDist::PointPoint (
   	object_bbox.Max (), object_bbox.Min ())) * 0.5f;
+
+#ifdef CS_USE_NEW_RENDERER
+  rmesh.portal = this;
+#endif
 }
 
 //------------------- For iPortalContainer ---------------------------//
@@ -741,7 +746,7 @@ void csPortalContainer::DrawOnePortal (
   const csPlane3& camera_plane)
 {
   iGraphics3D* g3d = rview->GetGraphics3D ();
-
+#ifndef CS_USE_NEW_RENDERER
   if (rview->AddedFogInfo ())
   {
     // If fog info was added then we are dealing with vertex fog and
@@ -749,7 +754,7 @@ void csPortalContainer::DrawOnePortal (
     // fog_info structure with the plane of the current polygon.
     rview->GetFirstFogInfo ()->outgoing_plane = camera_plane;
   }
-
+#endif
   // is_this_fog is true if this sector is fogged.
   bool is_this_fog = rview->GetThisSector ()->HasFog ();
 
@@ -761,7 +766,7 @@ void csPortalContainer::DrawOnePortal (
   {
     keep_camera_z = camera_vertices[po->GetVertexIndices ()[0]].z;
   }
-
+#ifndef CS_USE_NEW_RENDERER
   // First call OpenPortal() if needed.
   bool use_float_portal = po->flags.Check (CS_PORTAL_FLOAT);
   if (use_float_portal)
@@ -773,12 +778,13 @@ void csPortalContainer::DrawOnePortal (
     g3dpoly.normal = camera_plane;
     g3d->OpenPortal (&g3dpoly);
   }
-
+#endif
   // Draw through the portal. If this fails we draw the original polygon
   // instead. Drawing through a portal can fail because we have reached
   // the maximum number that a sector is drawn (for mirrors).
   if (po->Draw (poly, movtrans, rview, keep_plane))
   {
+#ifndef CS_USE_NEW_RENDERER
     if (is_this_fog)
     {
       AddFogPolygon (poly, g3d,
@@ -793,11 +799,14 @@ void csPortalContainer::DrawOnePortal (
     // into the others sector space (we cannot trust the Z-buffer here).
     if (po->flags.Check (CS_PORTAL_ZFILL))
       FillZBuf (poly, rview, keep_camera_z, keep_plane);
+#endif
   }
 
+#ifndef CS_USE_NEW_RENDERER
   // Make sure to close the portal again.
   if (use_float_portal)
     g3d->ClosePortal ();
+#endif
 }
 
 //------------------- For iShadowReceiver ----------------------------//
@@ -847,6 +856,9 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
       return false;
   }
 
+#ifdef CS_USE_NEW_RENDERER
+  rmesh.object2camera = camtrans / movtrans;
+#endif
   return true;
 }
 

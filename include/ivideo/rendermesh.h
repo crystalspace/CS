@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2002 by Marten Svanfeldt
-Anders Stenberg
+                      Anders Stenberg
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -41,6 +41,7 @@ class csReversibleTransform;
 struct iTextureHandle;
 struct iMaterialWrapper;
 struct iRenderBufferSource;
+struct iPortalContainer;
 
 /// Type of mesh
 enum csRenderMeshType
@@ -56,9 +57,8 @@ enum csRenderMeshType
 };
 
 /// Document me! @@@
-class csRenderMesh
+struct csRenderMesh
 {
-public:
   csRenderMesh () 
   {
     z_buf_mode = CS_ZBUF_NONE;
@@ -69,17 +69,10 @@ public:
     do_mirror = false;
     indexstart = indexend = 0;
     dynDomain = 0;
+    portal = 0;
   }
 
-  virtual ~csRenderMesh () {}
-
-  /*/// Special attributes. Please don't change, it's used as flags
-  typedef enum
-  {
-  SPECIAL_NONE = 0,
-  SPECIAL_BILLBOARD = 1,
-  SPECIAL_ZFILL = 2
-  } specialattributes;*/
+  ~csRenderMesh () {}
 
   /// Z mode to use
   csZBufMode z_buf_mode;
@@ -108,9 +101,6 @@ public:
   /// End of the range of indices to use
   unsigned int indexend;
 
-  /// Source to get buffers from
-  //iRenderBufferSource* buffersource;
-
   /// Material used for this mesh
   //iMaterialHandle* mathandle;
   iMaterialWrapper* material;
@@ -121,6 +111,9 @@ public:
   csRef<iShaderVariableContext> dynDomain;
   
   csAlphaMode::AlphaType alphaType;
+
+  //pointer to a portalcontainer, if there is any
+  iPortalContainer* portal;
 };
 
 /** @} */

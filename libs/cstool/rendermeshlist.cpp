@@ -149,11 +149,18 @@ static int SortMeshMaterial (void const* item1,
 {
   csRenderMesh* m1 = *(csRenderMesh**) item1;
   csRenderMesh* m2 = *(csRenderMesh**) item2;
-
-  if (m1->material > m2->material)
+  
+  if (m1->portal != 0 && m2->portal == 0)
     return 1;
-  if (m1->material < m2->material)
+  else if (m2->portal != 0 && m1->portal == 0)
     return -1;
+  else
+  {
+    if (m1->material > m2->material)
+      return 1;
+    if (m1->material < m2->material)
+      return -1;
+  }
   return 0;
 }
 
@@ -190,6 +197,7 @@ void csRenderMeshList::GetSortedMeshList (
   }
 
   meshes.DeleteAll ();
+  meshes.SetCapacity (numObjects);
   int currentElement;
   
   it.Reset ();

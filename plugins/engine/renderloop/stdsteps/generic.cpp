@@ -31,6 +31,7 @@
 #include "iengine/material.h"
 #include "ivideo/material.h"
 #include "imesh/object.h"
+#include "iengine/portalcontainer.h"
 
 #include "generic.h"
 
@@ -203,15 +204,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 
   g3d->SetZMode (zmode);
 
-  //g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
-/*
-  iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
-  ViscullCallback callback (rview, objreg);
-  viscull->VisTest (rview, &callback);
-  
-  //draw
-  callback.meshList.GetSortedMeshList (meshes);*/
-
+  // This is a work array we use for getting all meshes.
+  csArray<csRenderMesh*> meshes;
   sector->GetVisibleMeshes (rview)->GetSortedMeshList (meshes);
   int num = meshes.Length ();
  
@@ -222,22 +216,29 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   for (int n = 0; n < num; n++)
   {
     csRenderMesh* mesh = meshes[n];
-
-    iShader* meshShader = 
-      mesh->material->GetMaterialHandle()->GetShader(shadertype);
-    if (meshShader != shader)
+    
+    if (mesh->portal) 
     {
-      // @@@ Need error reporter
-      if (shader != 0)
-      {
-        RenderMeshes (g3d, shader, sameShaderMeshes, 
-          numSSM);
-      }
-
-      shader = meshShader;
-      numSSM = 0;
+      mesh->portal->Draw (rview,0);
     }
-    sameShaderMeshes[numSSM++] = mesh;
+    else 
+    {
+      iShader* meshShader = 
+        mesh->material->GetMaterialHandle()->GetShader(shadertype);
+      if (meshShader != shader)
+      {
+        // @@@ Need error reporter
+        if (shader != 0)
+        {
+          RenderMeshes (g3d, shader, sameShaderMeshes, 
+            numSSM);
+        }
+
+        shader = meshShader;
+        numSSM = 0;
+      }
+      sameShaderMeshes[numSSM++] = mesh;
+    }
   }
   
   if (numSSM != 0)
@@ -249,8 +250,6 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
         numSSM);
     }
   }
-   
-  //g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
 
   if (zOffset)
     g3d->DisableZOffset ();

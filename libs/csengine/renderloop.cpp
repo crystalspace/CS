@@ -2,6 +2,7 @@
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
               (C) 2003 by Anders Stenberg
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -93,30 +94,8 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   engine->G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   engine->G3D->ResetNearPlane ();
   engine->G3D->SetPerspectiveAspect (c->GetFOV ());
-
-  iSector *s = c->GetSector ();
-  //if (s) s->Draw (&rview);
-  if (s)
-  {
-    s->PrepareDraw (&rview);
-
-    int i;
-    for (i = 0; i < steps.Length(); i++)
-    {
-      steps[i]->Perform (&rview, s);
-    }
-/*    csRenderMeshList meshes;
-    s->CollectMeshes (&rview, meshes);
-
-    if (meshes.num) 
-    {
-      int i;
-      for (i = 0; i < steps.Length(); i++)
-      {
-	steps[i]->Perform (&rview, &meshes);
-      }
-    }*/
-  }
+  
+  Draw (&rview, c->GetSector());
 
   // draw all halos on the screen
 /*  if (halos.Length () > 0)
@@ -127,8 +106,23 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   }*/
 
   engine->G3D->SetClipper (0, CS_CLIPPER_NONE);
+}
 
-  //csSleep (1000);
+void csRenderLoop::Draw (iRenderView *rview, iSector *s)
+{
+  //if (s) s->Draw (&rview);
+  if (s)
+  {
+    s->IncRecLevel ();
+    s->PrepareDraw (rview);
+
+    int i;
+    for (i = 0; i < steps.Length(); i++)
+    {
+      steps[i]->Perform (rview, s);
+    }
+    s->DecRecLevel ();
+  }
 }
 
 int csRenderLoop::AddStep (iRenderStep* step)

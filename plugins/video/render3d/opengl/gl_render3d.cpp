@@ -426,13 +426,13 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
   /*add_near_clip = false;
   add_z_clip = false;*/
   /*if (clipplane_initialized)
-    return;
+    return 0;
   
-  clipplane_initialized = true;*/
-
+  clipplane_initialized = true;
+*/
   glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
   glPushMatrix ();
+  glLoadIdentity ();
 
   int i = 0;
   GLdouble plane_eq[4];
@@ -606,7 +606,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   }
 
-  /*int planes = SetupClipPlanes (how_clip == 'p', 
+  int planes = SetupClipPlanes (how_clip == 'p', 
     do_near_plane && clip_plane != CS_CLIP_NOT,
     clip_z_plane != CS_CLIP_NOT);
   if (planes>0)
@@ -614,7 +614,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     clip_planes_enabled = true;
     for (int i = 0; i < planes; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
-  }*/
+  }
 }
 
 void csGLGraphics3D::ApplyObjectToCamera ()
@@ -719,6 +719,7 @@ bool csGLGraphics3D::Open ()
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
+  ext->InitGL_EXT_texture3D ();
   ext->InitGL_EXT_texture_compression_s3tc ();
   ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_SGIS_generate_mipmap ();
@@ -1595,9 +1596,9 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 
 void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
 {
-  /*SetupClipper (mymesh->clip_portal, 
+  SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
-                mymesh->clip_z_plane);*/
+                mymesh->clip_z_plane);
 
   SetObjectToCamera (&mymesh->object2camera);
   //SetObjectToCamera (mymesh->transform);
@@ -1725,7 +1726,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     indexbuf->Release();
   }
 
-  /*if (clip_planes_enabled)
+  //if (clip_planes_enabled)
   {
     clip_planes_enabled = false;
     for (int i = 0; i < 6; i++)
@@ -1735,7 +1736,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   {
     //stencil_enabled = false;
     //statecache->Disable_GL_STENCIL_TEST ();
-  }*/
+  }
 }
 
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -139,17 +140,11 @@ csSector::csSector (csEngine *engine) : csObject()
   meshes.SetSector (this);
   //portal_containers.SetSector (this);
   lights.SetSector (this);
-
-  current_visnr = 1;
-  visibleMeshCache = new csRenderMeshList (engine->object_reg);
-  cachedFrameNumber = 0;
-  cachedCamera = 0;
 }
 
 csSector::~csSector ()
 {
   lights.RemoveAll ();
-  delete visibleMeshCache;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListener);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSector);
 }
@@ -322,7 +317,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   // sensible.
   current_visnr++;
 
-  if (engine->GetCurrentFrameNumber () != cachedFrameNumber ||
+/*  if (engine->GetCurrentFrameNumber () != cachedFrameNumber ||
       rview->GetCamera () != cachedCamera )
   {
     visibleMeshCache->Empty ();
@@ -333,7 +328,54 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
     cachedCamera = rview->GetCamera();
   }
 
-  return visibleMeshCache;
+  return visibleMeshCache;*/
+  
+  csList<visibleMeshCacheHolder>::Iterator it (visibleMeshCache);
+  bool firstEntry = true;
+  while (it.HasNext())
+  {
+    visibleMeshCacheHolder *entry = it.Next();
+    if (entry->cachedFrameNumber == engine->GetCurrentFrameNumber () &&
+        entry->cachedRView == rview)
+    {
+      if (!firstEntry)
+      {
+        visibleMeshCacheHolder h = *entry;
+        visibleMeshCache.Delete(it);
+        visibleMeshCache.PushFront(h);
+      }
+      return entry->meshList;
+    }
+    firstEntry = false;
+  }
+
+  //try to find a spot to do a new cache
+  csList<visibleMeshCacheHolder>::Iterator it2 (visibleMeshCache);
+  while (it2.HasNext())
+  {
+    visibleMeshCacheHolder *entry = it2.Next();
+    if (entry->cachedFrameNumber != engine->GetCurrentFrameNumber () )
+    {
+      //use this slot
+      entry->meshList->Empty ();
+      cb.Setup (entry->meshList, rview);
+      GetVisibilityCuller()->VisTest (rview, &cb);
+
+      entry->cachedFrameNumber = engine->GetCurrentFrameNumber ();
+      entry->cachedRView = rview;
+      return entry->meshList;
+    }
+  }
+
+  //create a new cache entry
+  visibleMeshCacheHolder holder;
+  holder.cachedFrameNumber = engine->GetCurrentFrameNumber ();
+  holder.cachedRView = rview;
+  holder.meshList = new csRenderMeshList(engine->object_reg);
+  cb.Setup (holder.meshList, rview);
+  GetVisibilityCuller()->VisTest (rview, &cb);
+  visibleMeshCache.PushFront (holder);
+  return holder.meshList;
 }
 
 
@@ -529,7 +571,7 @@ iSector *csSector::FollowSegment (
 void csSector::PrepareDraw (iRenderView *rview)
 {
 #ifdef CS_USE_NEW_RENDERER
-  draw_busy++;
+  //draw_busy++;
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
@@ -867,6 +909,8 @@ void csSector::Draw (iRenderView *rview)
   }
 
   draw_busy--;
+#else
+  engine->GetCurrentDefaultRenderloop ()->Draw (rview, (iSector*)&scfiSector);
 #endif // CS_USE_NEW_RENDERER
 }
 

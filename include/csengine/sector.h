@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,6 +26,7 @@
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
+#include "csutil/list.h"
 #include "csutil/hash.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
@@ -150,10 +152,14 @@ private:
   csRef<iVisibilityCuller> culler;
 
   /// Caching of visible meshes
-  csRenderMeshList *visibleMeshCache;
-  uint32 cachedFrameNumber;
-  iCamera *cachedCamera;
-
+  struct visibleMeshCacheHolder {
+    csRenderMeshList *meshList;
+    uint32 cachedFrameNumber;
+    iRenderView *cachedRView;
+  };
+  
+  csList<visibleMeshCacheHolder> visibleMeshCache;
+  
 
 private:
   /**
@@ -486,6 +492,10 @@ public:
       { return scfParent; }
     virtual int GetRecLevel () const
       { return scfParent->draw_busy; }
+    virtual void IncRecLevel ()
+      { scfParent->draw_busy++; }
+    virtual void DecRecLevel ()
+      { scfParent->draw_busy--; }
     virtual bool SetVisibilityCullerPlugin (const char *Name)
       { return scfParent->UseCullerPlugin (Name); }
     virtual iVisibilityCuller* GetVisibilityCuller ()

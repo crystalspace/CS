@@ -2,6 +2,7 @@
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
               (C) 2003 by Anders Stenberg
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -51,6 +52,7 @@ public:
 
   void StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview);
   virtual void Draw (iCamera* c, iClipper2D* clipper);
+  virtual void Draw (iRenderView *rview, iSector *s);
 
   virtual int AddStep (iRenderStep* step);
   virtual int GetStepCount ();

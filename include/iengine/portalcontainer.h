@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -47,6 +48,9 @@ struct iPortalContainer : public iBase
 
   /// Remove a portal.
   virtual void RemovePortal (iPortal* portal) = 0;
+
+  /// Render the portal container
+  virtual void Draw (iRenderView* rview, iMovable* movable) = 0;
 };
 
 /** @} */
