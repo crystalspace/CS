@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    ENSOCKET Plugin
+    Copyright (C) 2002 by Erik Namtvedt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -15,15 +16,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-/***********************************************************************
-  
-  This code is provided as-is by Erik Namtvedt.
-  Help with the SCF interface was provided by Norman Kraemer.
-  Help with Win32 projects was provided by Philip Wyett.
-  Help with CS in general was provided by Jorrit Tyberghein.
-
-***********************************************************************/
 
 #define CS_SYSDEF_PROVIDE_SOCKETS
 #include "cssysdef.h"
@@ -120,7 +112,7 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type)
     socketfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     if (socketfd != socket_error) 
     {
-      proto_type = SOCK_DGRAM;
+	proto_type = SOCK_DGRAM;
     }
     else
     {
@@ -189,7 +181,7 @@ int csNetworkSocket2::Disconnect()
 
   return CS_NET_SOCKET_NOERROR;
 }
-
+	
 int csNetworkSocket2::SetSocketBlock (bool block) 
 {
   if (socketfd) 
@@ -216,6 +208,7 @@ int csNetworkSocket2::SetSocketBlock (bool block)
       return CS_NET_SOCKET_NOERROR;
     else
       return CS_NET_SOCKET_CANNOT_SETBLOCK;
+
 #else
 //    IOCTL(socketfd,O_NONBLOCK,&arg);
     IOCTL(socketfd, FIONBIO, &arg);
@@ -224,6 +217,7 @@ int csNetworkSocket2::SetSocketBlock (bool block)
       return CS_NET_SOCKET_NOERROR;
     else
       return CS_NET_SOCKET_CANNOT_SETBLOCK;
+
 #endif
   }
   else
@@ -289,6 +283,7 @@ int csNetworkSocket2::set (SOCKET socket_fd, bool bConnected, struct sockaddr_in
 
 int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set *expectfds) 
 {
+  
   struct timeval to;
   to.tv_sec = 0;
   to.tv_usec = 0;
@@ -302,7 +297,7 @@ int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set
     last_error = CS_NET_SOCKET_CANNOT_SELECT;
     return last_error;
   }
-  
+
   return result;
 }
 
@@ -338,7 +333,10 @@ iNetworkSocket2* csNetworkSocket2::Accept()
   last_error = CS_NET_SOCKET_NOERROR;
 
   if (proto_type == SOCK_DGRAM) 
+  {
+	last_error = CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE;
     return 0;
+  }
 
   if (!blocking) 
   {
@@ -347,7 +345,8 @@ iNetworkSocket2* csNetworkSocket2::Accept()
     FD_SET(fd_list[0],&fd_mask);
     if (SELECT(FD_SETSIZE,&fd_mask,0,0) != 1)
     {
-      return 0; 
+	  last_error = CS_NET_SOCKET_NODATA;
+	  return 0; 
     }
   }
 
@@ -365,7 +364,9 @@ iNetworkSocket2* csNetworkSocket2::Accept()
   tmpSocket->socketfd = socket_fd;
   tmpSocket->connected = true;
   memcpy(&tmpSocket->local_addr,&remote_addr,sizeof(struct sockaddr_in));
-  // printf("connection from %s\n",inet_ntoa(remote_addr.sin_addr));
+  /*
+  printf("connection from %s\n",inet_ntoa(remote_addr.sin_addr));
+  */
 
   if (!blocking) 
   {
@@ -401,7 +402,9 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
         if (FD_ISSET(socketfd,&fd_mask)) 
         {
           result = recv(socketfd,buff,1,0);
-          //if (result > 0) printf("%c",buff[0]);
+          /*
+          if (result > 0) printf("%c",buff[0]);
+          */
 
           if (result == 0)
           {
@@ -449,6 +452,7 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
         result = recvfrom(socketfd,buff,size,0,(struct sockaddr *)&local_addr,&addr_len);
         if (result == socket_error)
           last_error = CS_NET_SOCKET_NOTCONNECTED;
+
       }
       buff[result] = 0;
     }
@@ -462,7 +466,6 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
 int csNetworkSocket2::ReadLine (char *buff, size_t size ) 
 {
   char inbuff[2];
-  
   last_error = CS_NET_SOCKET_NOERROR;
 
   if (!connected)
@@ -531,7 +534,6 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
           strcpy(buff,read_buffer);
           buffer_size = -1;
           return strlen(buff);
-
         }
     		
         return 0;
@@ -548,7 +550,7 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
         if (Recv(inbuff,1) == 1) 
         {
           inbuff[1] = 0;
-        
+
           if (inbuff[0] == '\r') break;
           if (inbuff[0] == '\n') break;
           if (inbuff[0] == '\0') break;
@@ -607,6 +609,7 @@ int csNetworkSocket2::Send (char *buff, size_t size)
   {
     last_error = CS_NET_SOCKET_NOTCONNECTED;
   }
+
   return result;
 }
 
