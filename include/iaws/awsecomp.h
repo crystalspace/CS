@@ -258,6 +258,35 @@ public:
     virtual void AddToLayout(iAwsComponent *cmp, iAwsComponentNode* settings)
     { comp->AddToLayout(cmp, settings); }
 
+    virtual void SetFocusable (bool _focusable)
+		{ comp->SetFocusable(_focusable); }
+
+    virtual bool Focusable ()
+		{ return comp->Focusable(); }
+
+    virtual bool isFocused ()
+		{ return comp->isFocused(); }
+
+    virtual void SetFocus ()
+		{ comp->SetFocus(); }
+
+    virtual void UnsetFocus ()
+		{ comp->UnsetFocus(); }
+
+    virtual bool AddToTabOrder (iAwsComponent *cmp)
+		{ return comp->AddToTabOrder(cmp); }
+
+    virtual iAwsComponent *TabNext (iAwsComponent *cmp)
+		{ return comp->TabNext (cmp); }
+
+    virtual iAwsComponent *TabPrev (iAwsComponent *cmp)
+		{ return comp->TabPrev (cmp); }
+
+    virtual int GetTabLength ()
+		{ return comp->GetTabLength (); }
+
+    virtual iAwsComponent *GetTabComponent (int index)
+		{ return comp->GetTabComponent (index); }
 
 public:
     /// Adds a child
@@ -453,6 +482,12 @@ public:
     /// Sets the top child
     virtual void SetTopChild(iAwsComponent* child)
     { comp->SetTopChild(child); }
+
+    virtual void OnSetFocus()
+    { comp->OnSetFocus(); }
+
+    virtual void OnUnsetFocus()
+    { comp->OnUnsetFocus(); }
 };
 
 /**
