@@ -114,4 +114,8 @@
 typedef int socklen_t;
 #endif
 
+#ifdef SYSDEF_ACCESS
+#  include <io.h>
+#endif
+
 #endif // __OSDEFS_H__

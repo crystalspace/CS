@@ -108,4 +108,8 @@
 #  undef SYSDEF_SOCKETS
 #endif
 
+#ifdef SYSDEF_ACCESS
+#  include <io.h>
+#endif
+
 #endif // __OSDEFS_H__

@@ -27,4 +27,8 @@
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined (SYSDEF_ACCESS)
+#  include <io.h>
+#endif
+
 #endif // __OSDEFS_H__
