@@ -88,7 +88,7 @@ private:
   {
     int32 capFlags;
     int CPUnum;
-    int maxEax;
+    int maxEax = 0;
 
     bool have_cpuid;
     char *processorName = new char [14];
