@@ -230,10 +230,11 @@ void csSpriteTemplate::GenerateLOD ()
 
   for (i = 0 ; i < frames.Length () ; i++)
   {
+    int j;
     CHK (csVector2* new_texels = new csVector2 [GetNumTexels()]);
-    for (int j = 0 ; j < GetNumTexels() ; j++)
+    for (j = 0 ; j < GetNumTexels() ; j++)
       new_texels[translate[j]] = GetTexel (GetFrame(i), j);
-    for (int j = 0 ; j < GetNumTexels() ; j++)
+    for (j = 0 ; j < GetNumTexels() ; j++)
       GetTexel (GetFrame(i), j) = new_texels[j];
     CHK (delete [] new_texels);
   }
