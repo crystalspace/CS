@@ -196,7 +196,7 @@ public:
    * config file option "System.ApplicationID".
    */
   static bool SetupConfigManager (iObjectRegistry*, const char* configName,
-    const char *ApplicationID = "Noname");
+    const char *ApplicationID = "CrystalSpace.Noname");
 
   /**
    * Request a few widely used standard plugins and also read

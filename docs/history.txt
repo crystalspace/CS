@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	  on Win32. Still disabled, though.
 	- res changed the way special folder paths are retrieved on Win32; 
 	  now shfolder.dll is used.
+	- res added "CrystalSpace." prefixes to the default "Noname" 
+	  application ID and to those of CS demo apps.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().
