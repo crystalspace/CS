@@ -16,8 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
+#include "cssys/system.h"
+#include "cssys/csshlib.h"
 #include "cstool/initapp.h"
 #include "isys/system.h"
 #include "iutil/eventh.h"
@@ -34,6 +37,10 @@
 #include "ivideo/fontserv.h"
 #include "imap/parser.h"
 #include "isys/plugin.h"
+#include "csutil/cseventq.h"
+#include "csutil/cmdline.h"
+#include "csutil/cfgfile.h"
+#include "csutil/cfgmgr.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
 #include "iutil/virtclk.h"
@@ -62,6 +69,26 @@ iObjectRegistry* csInitializer::CreateEnvironment ()
 
 bool csInitializer::InitializeSCF ()
 {
+  // Initialize Shared Class Facility|
+  char scfconfigpath [MAXPATHLEN + 1];
+
+#ifndef CS_STATIC_LINKED
+  // Add both installpath and installpath/lib dirs to search for plugins
+  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
+  csAddLibraryPath (scfconfigpath);
+  strcat (scfconfigpath, "lib");   
+  int scfconfiglen = strlen(scfconfigpath);
+  scfconfigpath[scfconfiglen] = PATH_SEPARATOR;
+  scfconfigpath[scfconfiglen+1] = 0;
+  csAddLibraryPath (scfconfigpath);
+#endif
+
+  // Find scf.cfg and initialize SCF
+  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
+  strcat (scfconfigpath, "scf.cfg");
+  csConfigFile scfconfig (scfconfigpath);
+  scfInitialize (&scfconfig);
+
   global_sys = new SysSystemDriver ();
   return true;
 }
@@ -74,7 +101,12 @@ iPluginManager* csInitializer::CreatePluginManager (
 
 iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* object_reg)
 {
-  return CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  //return CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  // Register the shared event queue.
+  iEventQueue* q = new csEventQueue (object_reg);
+  object_reg->Register (q, NULL);
+  q->DecRef();
+  return q;
 }
 
 iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* object_reg)
@@ -85,13 +117,21 @@ iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* object_reg)
 iCommandLineParser* csInitializer::CreateCommandLineParser (
   	iObjectRegistry* object_reg)
 {
-  return CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  iCommandLineParser* cmdline = new csCommandLineParser ();
+  object_reg->Register (cmdline, NULL);
+  cmdline->DecRef ();
+  return cmdline;
 }
 
 iConfigManager* csInitializer::CreateConfigManager (
 	iObjectRegistry* object_reg)
 {
-  return CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  iConfigFile *cfg = new csConfigFile ();
+  iConfigManager* Config = new csConfigManager (cfg, true);
+  object_reg->Register (Config, NULL);
+  Config->DecRef ();
+  cfg->DecRef ();
+  return Config;
 }
 
 iObjectRegistry* csInitializer::CreateObjectRegistry ()

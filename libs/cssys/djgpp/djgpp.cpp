@@ -90,9 +90,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   DosHelper* doshelper = new DosHelper (this);
   object_reg.Register (doshelper, "SystemHelper");
 
-  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
-  if (q != 0)
-    EventOutlet = q->CreateEventOutlet (this);
+  EventOutlet = NULL;
 }
 
 SysSystemDriver::~SysSystemDriver ()
@@ -103,6 +101,12 @@ SysSystemDriver::~SysSystemDriver ()
 
 void SysSystemDriver::NextFrame ()
 {
+  if (!EventOutlet)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
+    if (q != 0) EventOutlet = q->CreateEventOutlet (this);
+  }
+
   bool ExtKey = false;
   // Fill in events ...
   while (event_queue_tail != event_queue_head)

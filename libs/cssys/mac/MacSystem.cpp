@@ -221,9 +221,7 @@ SysSystemDriver::SysSystemDriver()
         }
     }
 #endif
-    iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
-    if (q != 0)
-      EventOutlet = q->CreateEventOutlet (this);
+    EventOutlet = NULL;
 }
 
 
@@ -444,6 +442,13 @@ void SysSystemDriver::Loop ()
 #endif
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
+
+  if (!EventOutlet)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0) EventOutlet = q->CreateEventOutlet (this);
+  }
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   mG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
 

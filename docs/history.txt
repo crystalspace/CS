@@ -1,5 +1,25 @@
 The history order is reversed so that new features are at the top.
 
+8-Oct-2001
+	- Moved the creation of the config manager and the command line
+	  parser from the system driver to the respective csInitializer
+	  function.
+	- Some sub-classes of the system driver (Win32, DJGPP,
+	  and Mac) created an iEventOutlet in the constructor. The problem
+	  is that I want to move the creation of the event queue away
+	  from that constructor. So I changed those system drivers to
+	  create the event outlet later when I'm sure the event queue
+	  will be created and registered in the object registry.
+	- Moved the creation of the event queue from the system driver
+	  to csInitializer::InitializeSCF().
+	- Jorge Acereda Maciá <al004046@anubis.uji.es> fixed two bugs in
+	  csSector::HitBeam() when no mesh was hit. In that case a null
+	  pointer would result in a crash.
+	- Thanks to some research from Matze Braun I fixed a fairly big
+	  bug in csVector3Array. There was no constructor in that class
+	  which means that the constructor from the parent csPoly3D
+	  was not called. This resulted in a non-initialized csPoly3D which
+	  could cause big problems in some cases.
 5-Oct-2001
 	- Removed csInitializer::SetupObjectRegistry(). Instead
 	  csInitializer::Initialize() will now setup the object registry

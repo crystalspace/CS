@@ -425,7 +425,7 @@ csMeshWrapper* csSector::HitBeam (const csVector3& start,
   // The mesh is closer (or there is no mesh).
   if (polygonPtr) *polygonPtr = NULL;
   isect = tsect;
-  return near_mesh->GetPrivateObject ();
+  return near_mesh ? near_mesh->GetPrivateObject () : NULL;
 }
 
 
@@ -1147,7 +1147,7 @@ iMeshWrapper* csSector::eiSector::HitBeam (const csVector3& start,
       *polygonPtr = &(p->scfiPolygon3D);
     }
   }
-  return &(obj->scfiMeshWrapper);
+  return obj ? &(obj->scfiMeshWrapper) : NULL;
 }
 
 iSector* csSector::eiSector::FollowSegment (csReversibleTransform& t,

@@ -66,6 +66,16 @@ void SystemFatalError (char *s)
 static SysSystemDriver* System = NULL;
 static iEventOutlet *EventOutlet = NULL;
 
+static void CreateEventOutlet (iObjectRegistry* object_reg, iEventPlug* ep)
+{
+  if (!EventOutlet)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    CS_ASSERT (q != NULL);
+    EventOutlet = q->CreateEventOutlet (ep);
+  }
+}
+
 //-----------------------------------------------// The System Driver //------//
 
 #ifdef DO_DINPUT_KEYBOARD
@@ -443,10 +453,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 
   Win32Helper* winhelper = new Win32Helper (this);
   object_reg.Register (winhelper, "SystemHelper");
-
-  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
-  if (q != 0)
-    EventOutlet = q->CreateEventOutlet (this);
 }
 
 SysSystemDriver::~SysSystemDriver ()
@@ -467,6 +473,8 @@ bool SysSystemDriver::Open ()
 {
   if (!csSystemDriver::Open ())
     return false;
+
+  CreateEventOutlet (&object_reg, this);
 
 #ifdef DO_DINPUT_KEYBOARD
   DWORD dwThreadId;
@@ -506,6 +514,7 @@ void SysSystemDriver::NextFrame ()
   {
     if (!GetMessage (&msg, NULL, 0, 0))
     {
+      CreateEventOutlet (&object_reg, this);
       EventOutlet->Broadcast (cscmdQuit);
       return;
     }
@@ -647,8 +656,11 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
       break;
     case WM_ACTIVATE:
       if (System)
+      {
+	CreateEventOutlet (&(System->object_reg), System);
         EventOutlet->Broadcast (cscmdFocusChanged,
           (void *)(LOWORD (wParam) != WA_INACTIVE));
+      }
       break;
     case WM_DESTROY:
       PostQuitMessage (0);
@@ -661,6 +673,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
       int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
       if (key || (wParam >= ' '))
       {
+	CreateEventOutlet (&(System->object_reg), System);
         EventOutlet->Key (key, wParam, true);
         LastCharCode [scancode] = wParam;
       }
@@ -681,6 +694,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
       if ((scancode < MAX_SCANCODE) && LastCharCode [scancode])
       {
         int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
+	CreateEventOutlet (&(System->object_reg), System);
         EventOutlet->Key (key, LastCharCode [scancode], false);
         LastCharCode [scancode] = 0;
       }
@@ -691,6 +705,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
     case WM_RBUTTONDOWN:
     case WM_MBUTTONDOWN:
       SetCapture (hWnd);
+      CreateEventOutlet (&(System->object_reg), System);
       EventOutlet->Mouse ((message == WM_LBUTTONDOWN) ? 1 :
         (message == WM_RBUTTONDOWN) ? 2 : 3, true,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
@@ -699,12 +714,14 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
       ReleaseCapture ();
+      CreateEventOutlet (&(System->object_reg), System);
       EventOutlet->Mouse ((message == WM_LBUTTONUP) ? 1 :
         (message == WM_RBUTTONUP) ? 2 : 3, false,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
       return TRUE;
     case WM_MOUSEMOVE:
       SetCursor (System->m_hCursor);
+      CreateEventOutlet (&(System->object_reg), System);
       EventOutlet->Mouse (0, false,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
       return TRUE;

@@ -323,48 +323,13 @@ csSystemDriver::csSystemDriver () :
   Shutdown = false;
   CurrentTime = csTicks (-1);
 
-  // Register the shared event queue.
-  iEventQueue* q = new csEventQueue (&object_reg);
-  object_reg.Register (q, NULL);
-  q->DecRef();
-
   object_reg.Register (&scfiPluginManager, NULL);
   object_reg.Register (&scfiVirtualClock, NULL);
-  iCommandLineParser* cmdline = new csCommandLineParser ();
-  object_reg.Register (cmdline, "CommandLine");
-  //@@@ cmdline->DecRef (); Uncomment when object registry moves out
-  // of system driver.
 
   //@@@ We temporarily register iSystem with the object registry too.
   // That allows us to remove the usage of iSystem everywhere except in
   // a few places where this is still needed. This is only transitionary.
   object_reg.Register (this, "System");
-
-  // Initialize Shared Class Facility|
-  char scfconfigpath [MAXPATHLEN + 1];
-
-#ifndef CS_STATIC_LINKED
-  // Add both installpath and installpath/lib dirs to search for plugins
-  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
-  csAddLibraryPath (scfconfigpath);
-  strcat (scfconfigpath, "lib");   
-  int scfconfiglen = strlen(scfconfigpath);
-  scfconfigpath[scfconfiglen] = PATH_SEPARATOR;
-  scfconfigpath[scfconfiglen+1] = 0;
-  csAddLibraryPath (scfconfigpath);
-#endif
-
-  // Find scf.cfg and initialize SCF
-  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
-  strcat (scfconfigpath, "scf.cfg");
-  csConfigFile scfconfig (scfconfigpath);
-  scfInitialize (&scfconfig);
-
-  iConfigFile *cfg = new csConfigFile();
-  iConfigManager* Config = new csConfigManager(cfg, true);
-  object_reg.Register (Config, NULL);
-  Config->DecRef ();
-  cfg->DecRef ();
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -424,14 +389,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // config file the dynamic one.
 
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Initializing system driver!\n");
-
-#if 0
-  iConfigFile *cfg = new csConfigFile();
-  iConfigManager* Config = new csConfigManager(cfg, true);
-  object_reg.Register (Config, NULL);
-  Config->DecRef ();
-  cfg->DecRef ();
-#endif
 
   iConfigManager* Config = CS_QUERY_REGISTRY (&object_reg, iConfigManager);
   iConfigFile* cfg = Config->GetDynamicDomain ();
@@ -705,10 +662,8 @@ void csSystemDriver::QueryOptions (iComponent *iObject)
 
 void csSystemDriver::RequestPlugin (const char *iPluginName)
 {
-  // @@@ WARNING we have to query for the commandline by tag name
-  // because SCF is not yet initialized at the point we come here.
-  iCommandLineParser* CommandLine = (iCommandLineParser*)(
-  	CS_QUERY_REGISTRY_TAG (&object_reg, "CommandLine"));
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
+  	iCommandLineParser);
   CommandLine->AddOption ("plugin", iPluginName);
 }
 
