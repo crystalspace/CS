@@ -68,7 +68,7 @@ public:
                     bool replace = false,
                     unsigned char key_r = 255,
                     unsigned char key_g = 0,
-                    unsigned char key_r = 255
+                    unsigned char key_b = 255
                     );
 
   /** Get's a texture.  If the texture is already cached, it returns the cached texture.
@@ -81,7 +81,7 @@ public:
                     bool replace = false,
                     unsigned char key_r = 255,
                     unsigned char key_g = 0,
-                    unsigned char key_r = 255
+                    unsigned char key_b = 255
                     );
 
   /** Changes the texture manager: unregisters all current textures, and then re-registers them
