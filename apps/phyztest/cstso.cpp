@@ -36,69 +36,24 @@ void set_no_rewind( ctEntity *ppe )
   ppe->set_rewind(false);
 }
 
-// using sloooooooow but accurate collision detection.
-// this can be sped up in many ways.
-// - use eulers method or mid-point for ODE just during CD
-// - use prune and sweep algorithm with axis aligned, sorted bounding boxes
-// - only evolve objects related to colliding objects when searching for c-time
-// - don't forget to handle 'tunneling' problem as well.
 void csRigidSpaceTimeObj::evolve_system( real t1, real t2, ctWorld *time_world, csWorld *space_world )
 {
-  static real collision_epsilon = 0.02;
-  static real time_epsilon = 0.001;
   real ta, tb;
- 
-  long loops = 300;  //make sure we don't go into an infinite loop
-
   ta = t1;
   tb = t2;
-  real min_col_dist;
-
-  time_world->apply_function_to_body_list( set_no_rewind );
-
-  while( ta < t2 && loops-- > 0){
- 
-    time_world->evolve( ta, tb );
-
-    min_col_dist = collision_check( space_world );
-    // if there are objects intersecting
-    if( min_col_dist > 0 ){
-      // if interpenetrations distance is very small => time of impact found
-      // or if the time step is really small
-      if( min_col_dist <= collision_epsilon || ( tb - ta ) <= time_epsilon ){
-        // respond to collision
-        collision_response( space_world );
-        ta = tb;
-        tb = t2;
-      }else{
-        // bisect time backwards to search for time of impact
-        time_world->rewind(ta, tb);   // rewind state back to ta
-        tb -= (tb - ta)*0.5;
-  //      ctVector3 px = space_time_continuum[0]->rb->get_pos();
-    //    px = space_time_continuum[0]->rb->get_pos();
-      }
-    // if we have not arrived at the end of our time interval 
-    }else if( tb < t2 ){
-      // search forward in time for time of impact for collision(s)
-      ta = tb;
-      // if we are at our min time step, just finish this time step, collision
-      // will get resolved next time.
-      if( (t2 - ta) <= time_epsilon ){
-        tb = t2;
-        time_world->evolve( ta, tb );
-
-        ta = tb;
-      }else{
-        tb += (t2 - tb)*0.5;
-      }
-    }else{
-      ta = tb;
-      tb = t2;
+  
+  // don't take any time-steps greater than .1 s
+  // otherwise things get kinda unstable.  Could probably even be safe with .05
+  while( ta < t2 ){
+    if( tb - ta > 0.1 ){
+      tb = ta + 0.1;
     }
+    time_world->evolve( ta, tb ); 
+    ta = tb;
+    tb = t2;
   }
 
   update_space();
-
 }
 
 void csRigidSpaceTimeObj::update_space()
@@ -124,7 +79,7 @@ csRigidSpaceTimeObj *sto;
 }
 
 
-real csRigidSpaceTimeObj::collision_check( csWorld* /*space*/ )
+real csRigidSpaceTimeObj::collision_check()
 {
 csCollider *coli;
 //csSprite3D *sprt;
@@ -261,7 +216,7 @@ collision_pair *CD_contact = NULL;
 }
 
 
-void csRigidSpaceTimeObj::collision_response( csWorld* /*space*/ )
+void csRigidSpaceTimeObj::collision_response()
 {
 csRigidSpaceTimeObj *sto;
 
@@ -271,4 +226,19 @@ csRigidSpaceTimeObj *sto;
       sto->rb->resolve_collision( sto->contact );
     }
   }
+}
+
+
+// check for a catastrophe and return a real indicating the "magnitude"
+// of the worst ( bigger number ) catastrophe.  Return 0 for no catastrophe
+real ctLameCollisionCatastrophe::check_catastrophe()
+{
+  return csRigidSpaceTimeObj::collision_check();
+}
+  
+// take care of the catastrophe so that when integrated forward that
+// catasrophe will not exist.
+void ctLameCollisionCatastrophe::handle_catastrophe()
+{
+  csRigidSpaceTimeObj::collision_response();
 }

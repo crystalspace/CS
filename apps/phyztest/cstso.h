@@ -4,6 +4,7 @@
 // hideously inefficient collision detection/response algorithm
 // just wanted to see some stuff bouncing around for now. 
 
+#include "csphyzik/ctcat.h"
 #include "csengine/collider.h"
 
 class csWorld;
@@ -11,6 +12,7 @@ class csSprite3D;
 class ctRigidBody;
 class ctCollidingContact;
 class ctWorld;
+class ctLameCollisionCatastrophe;
 
 #define MAX_SPACE_TIME_NUM 100
 #define MAX_COL_PER_STO 50
@@ -33,6 +35,8 @@ public:
 class csRigidSpaceTimeObj : public csSpaceTimeObj
 {
 public:
+  friend ctLameCollisionCatastrophe;
+
 	static csRigidSpaceTimeObj *space_time_continuum[ MAX_SPACE_TIME_NUM ];
 	static long continuum_end;
 
@@ -51,10 +55,23 @@ public:
 
 protected:
   static void update_space();
-  static real collision_check( csWorld *space );
-  static void collision_response( csWorld *space );
-
+  static real collision_check();
+  static void collision_response();
 
 };
+
+class ctLameCollisionCatastrophe : public ctCatastropheManager
+{
+public: 
+  
+  // check for a catastrophe and return a real indicating the "magnitude"
+  // of the worst ( bigger number ) catastrophe.  Return 0 for no catastrophe
+  virtual real check_catastrophe();
+  
+  // take care of the catastrophe so that when integrated forward that
+  // catasrophe will not exist.
+  virtual void handle_catastrophe();
+};
+
 
 #endif
