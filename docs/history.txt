@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  The way it is now prevents people from modifying the strings.
 	  This needs to be redone but preferably by someone who TESTS
 	  the changes!
+	- Wouter updated viewmesh to call ShineLights on the meshwrapper.
+	  This lights thing objects correctly.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

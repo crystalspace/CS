@@ -375,6 +375,9 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
   sprite->GetWorldBoundingBox(box);
   spritepos = box.GetCenter();
 
+  // light the sprite (needed for things).
+  room->ShineLights(sprite);
+
   return true;
 }
 
