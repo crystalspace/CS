@@ -273,17 +273,21 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       }
     }
 
+    pass->wmRed = true;
+    pass->wmGreen = true;
+    pass->wmBlue = true;
+    pass->wmAlpha = true;
     csRef<iDocumentNode> nodeWM = node->GetNode ("writemask");
     if (nodeWM != 0)
     {
       if (nodeWM->GetAttributeValue ("r") != 0)
-	pass->wmRed = strcasecmp (nodeWM->GetAttributeValue ("r"), "true") == 0;
+	pass->wmRed = !strcasecmp (nodeWM->GetAttributeValue ("r"), "true");
       if (nodeWM->GetAttributeValue ("g") != 0)
-	pass->wmGreen = strcasecmp (nodeWM->GetAttributeValue ("g"), "true") == 0;
+	pass->wmGreen = !strcasecmp (nodeWM->GetAttributeValue ("g"), "true");
       if (nodeWM->GetAttributeValue ("b") != 0)
-	pass->wmBlue = strcasecmp (nodeWM->GetAttributeValue ("b"), "true") == 0;
+	pass->wmBlue = !strcasecmp (nodeWM->GetAttributeValue ("b"), "true");
       if (nodeWM->GetAttributeValue ("a") != 0)
-	pass->wmAlpha = strcasecmp (nodeWM->GetAttributeValue ("a"), "true") == 0;
+	pass->wmAlpha = !strcasecmp (nodeWM->GetAttributeValue ("a"), "true");
     }
   }
   if (pass->alphaMode.autoAlphaMode)
