@@ -633,7 +633,10 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
 
   awsComponent *child = cmp->GetFirstChild();
 
-  while (child) 
+  if (!child)
+    return false;
+
+  do 
    {
    
     switch(Event.Type)
@@ -684,7 +687,7 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
        
     child = cmp->GetNextChild();
 
-    } // End while
+    } while (!cmp->FinishedChildren()); // End while
 
   return false;
 
