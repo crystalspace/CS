@@ -6,15 +6,13 @@ Some parts of CrystalSpace are NOT covered under @sc{LGPL} license, you might
 have to consider this, depending on how you intend to distribute your finished 
 product.
 
-@subheading Parts of CS using libraries not under the @sc{LGPL}
-
-@itemize bullet
+@itemize @bullet
 @item 
 @code{map2cs}, the Quake MAP to Crystal Space converter in 
-@file{apps/import/map2cs}.
+@file{apps/import/map2cs}
 
 Currently licensed under the GNU General Public License (can be downloaded 
-at @uref{http://www.fsf.org/licenses/gpl.txt}):
+at @uref{http://www.fsf.org/licenses/gpl.txt}).
 
 @end itemize
 
