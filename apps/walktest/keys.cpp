@@ -111,8 +111,8 @@ void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 {
   sprite->SetMove (pos);
   sprite->MoveToSector (where);
-  csLight* lights[2];
-  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+  csLight *lights [10];
+  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 10);
   sprite->UpdateLighting (lights, num_lights);
 }
 
@@ -282,7 +282,6 @@ void HandleDynLight (csDynLight* dyn)
       break;
     }
   }
-  light_statics ();
 }
 
 void map_key (char* keyname, csKeyMap* map)
