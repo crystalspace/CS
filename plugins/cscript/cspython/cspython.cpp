@@ -22,21 +22,31 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
-#include "cspython.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "ivaria/reporter.h"
+#include "iutil/cmdline.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
+
+#include "cspython.h"
+#include "pytocs.h"
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csPython)
   SCF_IMPLEMENTS_INTERFACE(iScript)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csPython::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPython::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csPython)
@@ -44,49 +54,77 @@ SCF_IMPLEMENT_FACTORY(csPython)
 
 csPython* csPython::shared_instance = 0;
 
-csPython::csPython(iBase *iParent) :object_reg(0),
-	Mode(CS_REPORTER_SEVERITY_NOTIFY)
+csPython::csPython(iBase *iParent) :
+  object_reg(0), Mode(CS_REPORTER_SEVERITY_NOTIFY), use_debugger(false)
 {
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   shared_instance = this;
 }
 
 csPython::~csPython()
 {
-  Mode=CS_REPORTER_SEVERITY_BUG;
+  csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (queue.IsValid())
+    queue->RemoveListener(&scfiEventHandler);
+  Mode = CS_REPORTER_SEVERITY_BUG;
   Py_Finalize();
-  object_reg=0;
+  object_reg = 0;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
 }
 
-extern "C" {
-  extern PyObject * csWrapTypedObject(void *objptr, const char *tagtype, int own);
-  extern void init_cspace();
+extern "C"
+{
+  PyObject* csWrapTypedObject(void *objptr, const char *tagtype, int own);
+  void init_cspace();
+}
+
+static csString const& path_append(csString& path, char const* component)
+{
+  char c;
+  size_t n = path.Length();
+  if (n > 0 && (c = path[n - 1]) != '/' && c != '\\')
+    path << '/';
+  path << component;
+  return path;
 }
 
 bool csPython::Initialize(iObjectRegistry* object_reg)
 {
   csPython::object_reg = object_reg;
 
+  csRef<iCommandLineParser> cmdline(
+    CS_QUERY_REGISTRY(object_reg, iCommandLineParser));
+  bool const reporter = cmdline->GetOption("python-enable-reporter") != 0;
+  use_debugger = cmdline->GetOption("python-enable-debugger") != 0;
+
   Py_SetProgramName("Crystal Space -- Python");
   Py_Initialize();
   InitPytocs();
 
-  char path[256];
-  csString temp = csGetConfigPath();
-  strncpy (path, temp, 256);
-  strcat (path, "/");
-
   if (!LoadModule ("sys")) return false;
+
   csString cmd;
-  cmd << "sys.path.append('" << path << "scripts/python/')";
+  csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+  if (vfs.IsValid())
+  {
+    csRef<iStringArray> paths(vfs->GetRealMountPaths("/scripts"));
+    for (size_t i = 0, n = paths->Length(); i < n; i++)
+    {
+      csString path = paths->Get(i);
+      cmd << "sys.path.append('" << path_append(path, "python") << "')\n";
+    }
+  }
+
+  csString cfg(csGetConfigPath());
+  cmd << "sys.path.append('" << path_append(cfg, "scripts/python") << "')\n";
   if (!RunText (cmd)) return false;
-#if 0 // Enable this to send python script prints to the crystal space console.
-  if (!LoadModule ("cshelper")) return false;
-#endif
-  if (!LoadModule ("pdb")) return false;
+
+  if (reporter && !LoadModule ("cshelper")) return false;
+  if (use_debugger && !LoadModule ("pdb")) return false;
   if (!LoadModule ("cspace")) return false;
 
   Mode = CS_REPORTER_SEVERITY_NOTIFY;
@@ -94,7 +132,29 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   // Store the object registry pointer in 'cspace.object_reg'.
   Store("cspace.object_reg", object_reg, (void *) "iObjectRegistry *");
 
+  csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (queue.IsValid())
+    queue->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
+
   return true;
+}
+
+bool csPython::HandleEvent(iEvent& e)
+{
+  bool handled = false;
+  if (e.Type == csevBroadcast && e.Command.Code == cscmdCommandLineHelp)
+  {
+#undef indent
+#define indent "                     "
+    printf("Options for csPython plugin:\n"
+	   "  -python-enable-reporter\n"
+	   indent "Redirect sys.stdout and sys.stderr to iReporter\n"
+	   "  -python-enable-debugger\n"
+	   indent "When Python exception is thrown, launch Python debugger\n");
+#undef indent
+    handled = true;
+  }
+  return handled;
 }
 
 void csPython::ShowError()
@@ -108,12 +168,11 @@ void csPython::ShowError()
 
 bool csPython::RunText(const char* Text)
 {
-  csString str(Text);
-  bool worked=!PyRun_SimpleString(str.GetData());
-  if(!worked)
+  bool ok = !PyRun_SimpleString(Text);
+  if(!ok && use_debugger)
     PyRun_SimpleString("pdb.pm()");
   ShowError();
-  return worked;
+  return ok;
 }
 
 bool csPython::Store(const char* name, void* data, void* tag)

@@ -19,5 +19,6 @@
 
 #include <stdarg.h>
 
+void InitPytocs();
 void PythonToCS_stderr(char *format, va_list va);
 void PythonToCS_stdout(char *format, va_list va);

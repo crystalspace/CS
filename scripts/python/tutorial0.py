@@ -3,24 +3,26 @@
 CsPython Tutorial Example 0
 By Mark Gossage (mark@gossage.cjb.net)
 
-Minimal script to setup Crystal Space called from python
+Minimal pure-Python script to setup Crystal Space from Python.
 
-To use this, go to the CS root directory any type
-python scripts/python/tutorial0.py
-(this MUST be run in the CS root directory to find all the plugins)
+To use this, ensure that your PYTHONPATH, CRYSTAL, and LD_LIBRARY_PATH
+(or DYLD_LIBRARY_PATH for MacOS/X; or PATH for Windows) variables are set
+approrpriately, and then run the script with the command:
+
+    python scripts/python/tutorial1.py
 
 Trivial example, sets up CS, opens the app & waits for the escape key
 
 ===========================================================================
 There are two ways to use the CsPython module.
 Either as a plugin within CS (pysimp.py), 
-or as a python module (this example).
+or as a pure Python module (this example).
 
 If you refer to the first part of the CS Tutorial 1, this is quite similar
-Just about all the C++ fns are mirrored in python.
+Just about all the C++ functions are mirrored in Python.
 
-The prgram structure is deliberately done without functions, 
-just to keep it simple
+The program structure is deliberately done without functions, 
+just to keep it simple.
 """
 
 import types, string, re, sys
@@ -60,7 +62,7 @@ def EventHandler(ev):
                 return 1
     except: # the exception catcher
         traceback.print_exc()   # prints the usual error messages
-        sys.exit(1)            # stop dead
+        sys.exit(1)             # stop dead
     return 0
 
 # startup code

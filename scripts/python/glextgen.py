@@ -1,3 +1,7 @@
+# Utility to create Crystal Space's glextmanager.h compatibility header.
+# The header is constructed from the database metaglext.xml, and the templates
+# in the glext subdirectory.
+
 from xml.dom import minidom
 from string import *
 

@@ -4,39 +4,44 @@ By Mark Gossage (mark@gossage.cjb.net)
 
 A script to show the use of CsPython from within a plugin.
 
-To use this, either modify the Pysimp app, changing the python calls
-from "pysimp" to "pysimp2"
-Or, just copy this file over Pysimp.py
-Then execute:
-    pysimp -python
-This performs the same features at tutorial2.
-This creates a room & a semi-transparent 3d sprite
+This is an adjunct script to the "pysimp" demonstration program.
+To use this, just run the pysimp program which the name of this script
+(sans the .py extension) as its sole argument. For example:
+
+    pysimp pysimp2
+
+Or, to select a different renderer, you could use:
+
+    pysimp --video=software pysimp2
+
+This script demonstrates the same features as the C++ tutorial2.
+It creates a room and a 3D sprite.
 
 ===========================================================================
 There are two ways to use the CsPython module.
 Either as a plugin within CS (this example), 
-or as a python module (see Tutorial2.py).
+or as a pure Python module (see Tutorial2.py).
 
 As a CS plugin, the python code is loaded by the C++ app (pysimp.cpp)
 This example only has one function CreateRoom()
 However it is simple to add more functions & add the C++ code to call them.
 
-There is no event handling in this code, merely the creation of the 3d objects
-However as a plugin, events could be incorperated in one of two ways:
-By creating fns such as SetupFrame(), FinishFrame() and then calling them
-from the C++ code
-Or, by using csInitializer.SetupEventHandler(...) to create an 
-event handler within python
-(believe it or not, it is possible to have 2 event handlers, on in python
-& one in C++)
-See tutorial0.py as an example of how it could be done.
+There is no event handling in this code, merely the creation of the 3D objects.
+Instead, the event handling is done by the C++ code.  However, as a plugin,
+events could be incorperated in one of two ways: By creating functions such as
+SetupFrame(), FinishFrame() and then calling them from the C++ code; or, by
+using csInitializer.SetupEventHandler(...) to create an event handler within
+Python (believe it or not, it is possible to have 2 event handlers, one in
+Python & one in C++). See tutorial0.py as an example of how it can be done.
 
-Most of this code looks very much like the original C++ code, 
-any changes will be marked.
+Most of this code looks very much like the original C++ code; any changes will
+be marked.
 
-Should you have any errors when modifying this code, 
-the python debugger pdb will be activated
-To leave the debugger, type 'quit'
+Should you have any errors when modifying this code, you will see the exception
+message on Python's sys.stderr (unless you ran pysimp with the
+--python-enable-reporter option). You can instruct the CsPython plugin to run
+the Python debugger upon an exception by launching pysimp with the
+--python-enable-debugger option). To leave the debugger, type 'quit'
 """
 
 import types, string, re
@@ -49,8 +54,8 @@ except:
     traceback.print_exc()
 
 def CreateRoom(matname):
-    """This fn is the only fn called by the C++ code in pysimp
-    We will do everything here
+    """This function is the only one called by the C++ code in pysimp.
+    We will do everything here.
     """
     print 'Start creating polygons from Python script...'
     
@@ -62,10 +67,10 @@ def CreateRoom(matname):
 def CreateTheRoom(matname):
     """This is just the original code from pysimp.py"""
 
-    # note: when using CsPython as a plugin
+    # Note: When using CsPython as a plugin,
     # the variable object_reg (cspace.object_reg actually)
     # is defined as a pointer/reference to the C++ iObjectRegistry
-    # with this we can do just about everything
+    # with this we can do just about everything.
     
     # as you can see, CS_QUERY_REGISTRY() works
     # as does SCF_QUERY_INTERFACE()
@@ -81,8 +86,8 @@ def CreateTheRoom(matname):
     walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
     walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
-    # note: it is no longer neccesary to DecRef & IncRef objects
-    # this it automatically handled by python
+    # note: it is no longer neccesary to DecRef() & IncRef() objects, or to
+    # use csRef<> since reference counting is handled automatically.
 
 def FatalError(msg="FatalError"):
     "A 'Panic & die' routine"
@@ -124,12 +129,10 @@ def LoadSprite():            # new stuff
     sprite.GetMovable().UpdateMove()
     spstate=SCF_QUERY_INTERFACE(sprite.GetMeshObject(),iSprite3DState)
     spstate.SetAction("default")
-    spstate.SetMixMode(CS_FX_SETALPHA (.5))
+    #spstate.SetMixMode(CS_FX_SETALPHA (.5))
 
     # The following two calls are not needed since CS_ZBUF_USE and
     # Object render priority are the default but they show how you
     # can do this.
     sprite.SetZBufMode(CS_ZBUF_USE)
     sprite.SetRenderPriority(engine.GetObjectRenderPriority())
-
-    sprite.DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10)

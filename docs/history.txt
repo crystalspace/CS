@@ -6,6 +6,55 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Nov-2004
+	- Eric Sunshine made the following Python-related changes:
+	    - Fixed cspython plugin so that it works correctly when installed.
+	      In particular, it now knows how to locate its installed adjunct
+	      scripts, whereas it previously knew only where the scripts were
+	      in the CS source tree.
+	    - Added a --python-enable-reporter command-line option to the
+	      cspython plugin. When enabled, sys.stdout and sys.stderr are
+	      redirected to iReporter (via CS/scripts/python/cshelper.py).
+	      Previously, this was a rather useless compile-time option only
+	      (i.e. one had to change the C++ source code and recompile).
+	    - Added a --python-enable-debugger command-line option to the
+	      cspython plugin. When enabled, a Python exception causes the
+	      Python debugger to be launched. Previously, this functionality
+	      was the default behavior, but it caused problems because it
+	      required that the main application be linked against Python,
+	      despite the fact that the cspython plugin can otherwise be used
+	      by programs which do not link against Python. In practice, the
+	      unconditional loading of the Python debugger caused the oft-seen
+	      run-time exception regarding cStringIO load failure, which
+	      cascaded into initialization abortion for cspython.
+	    - The cspython plugin now responds to the cscmdCommandLineHelp
+	      broadcast event.
+	    - Augmented pysimp so that it accepts an optional command-line
+	      argument specifying the script to load (ex. "./pysimp pysimp2").
+	      This makes it easy to load the pysimp2.py script in place of
+	      pysimp.py. Previously, one either had to edit pysimp.cpp to
+	      achive this, or copy pysimp2.py over top of pysimp.py.
+	    - pysimp now links explicitly against the Python library. This
+	      allows the cspython --python-enable-debugger option to work.
+	      (Other than that, there is no reason for pysimp to link against
+	      Python.)
+	    - Updated the Python scripts in CS/scripts/python so that they
+	      actually work again. Many of them had become dysfunctional over
+	      time as changes were made in other parts of the project.
+	    - Added file comments to all of the scripts in CS/scripts/python in
+	      order to let people know their purpose. Without this, they were
+	      mostly just a bunch of uncommented and mostly meaningless pieces
+	      of Python code.
+	    - Removed several unused, incomplete, or useless Python scripts
+	      from CS/scripts/python.
+	    - Renamed testpymod.py to tutorial1.py since it approximates nicely
+	      the simple1 C++ tutorial. This complements the existing
+	      tutorial0.py, tutorial2.py, and tutorial3.py.
+	    - The installed vfs.cfg now publishes a CS_SHAREDIR vfs variable
+	      which points at the "shared data" directory (parent of the CS
+	      "data" directory). Fixed the "scripts/" mount so that it actually
+	      points at the installed script directory, rather than the
+	      unrelated CS "data" directory.
 4-Nov-2004
 	- Eric Sunshine changed jamtemplate/configure.template so that it now
 	  expects CS and CEL versions 0.99. This way, external projects created

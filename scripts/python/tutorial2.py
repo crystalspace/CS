@@ -3,24 +3,26 @@
 CsPython Tutorial Example 2
 By Mark Gossage (mark@gossage.cjb.net)
 
-A script to show the use of Crystal Space called from python
+A pure-Python script to show the use of Crystal Space.
 
-To use this, go to the CS root directory any type
-python scripts/python/tutorial2.py
-(this MUST be run in the CS root directory to find all the plugins)
+To use this, ensure that your PYTHONPATH, CRYSTAL, and LD_LIBRARY_PATH
+(or DYLD_LIBRARY_PATH for MacOS/X; or PATH for Windows) variables are set
+approrpriately, and then run the script with the command:
 
-This performs the same features at tutorial2.
-This creates a room & a semi-transparent 3d sprite
+    python scripts/python/tutorial1.py
+
+This performs the same features as the C++ tutorial2.
+It creates a room and a 3D sprite.
 
 ===========================================================================
 There are two ways to use the CsPython module.
 Either as a plugin within CS (pysimp), 
-or as a python module (this example).
+or as a pure Python module (this example).
 
-This is just the CS tutorial 2 rewritten in Python.
+This is just the CS C++ tutorial 2 rewritten in Python.
 Overall it looks remarkable like the original C++ code, 
-just with python syntax. But the fns are all the same names & formats
-(use None instead of NULL, and "" instead of (char*)NULL)
+just with Python syntax; but the functions are all the same names and formats
+(use None instead of NULL, and "" instead of (char*)NULL).
 
 Please refer to the CS Tutorial 2 in the documentation
 for detail on how the C++ works.
@@ -133,7 +135,7 @@ class MyCsApp:
         sprite.GetMovable().UpdateMove()
         spstate=SCF_QUERY_INTERFACE(sprite.GetMeshObject(),iSprite3DState)
         spstate.SetAction("default")
-        spstate.SetMixMode(CS_FX_SETALPHA (.5))
+        #spstate.SetMixMode(CS_FX_SETALPHA (.5))
 
         # The following two calls are not needed since CS_ZBUF_USE and
         # Object render priority are the default but they show how you

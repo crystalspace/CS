@@ -17,6 +17,7 @@ actions VfsCfgGen
   cat $(>) > $(<)
   echo "" >> $(<)
   echo "; Configuration-time installation paths." >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_SHAREDIR = $(appdatadir)" >> $(<)
   echo "VFS.$(TARGET.OS.NORMALIZED).CS_DATADIR = $(appdatadir)/data" >> $(<)
   echo "VFS.$(TARGET.OS.NORMALIZED).CS_CONFIGDIR = $(appconfdir)" >> $(<)
   echo "VFS.$(TARGET.OS.NORMALIZED).CS_MAPDIR = $(appdatadir)/data/maps" >>$(<)

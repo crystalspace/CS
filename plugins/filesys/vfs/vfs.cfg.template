@@ -18,7 +18,7 @@ VFS.Mount.data = $(CS_DATADIR)$/
 
 ; Miscellaneous resources.
 VFS.Mount.varia = $(CS_DATADIR)$/varia$/
-VFS.Mount.scripts = $(CS_DATADIR)$/
+VFS.Mount.scripts = $(CS_SHAREDIR)$/bindings$/
 
 VFS.Mount.shader = $(CS_DATADIR)$/shader$/
 ; The Unifont

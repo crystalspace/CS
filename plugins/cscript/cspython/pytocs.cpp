@@ -17,10 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-//extern "C" {
 #include <Python.h>
-//}
-
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "cspython.h"
@@ -29,37 +26,41 @@
 // functions.  This thin cover function works around that limitation.
 static inline csPython* shared_cspython() { return csPython::shared_instance; }
 
-extern "C" PyObject* pytocs_printout(PyObject *self, PyObject* args) {
+extern "C" PyObject* pytocs_printout(PyObject *self, PyObject* args)
+{
   char *command;
 
   (void)self;
   if (PyArg_ParseTuple(args, "s", &command))
-    shared_cspython()->Print(0, command);
+    shared_cspython()->Print(false, command);
 
   Py_INCREF(Py_None);
   return Py_None;
 }
 
-extern "C" PyObject* pytocs_printerr(PyObject *self, PyObject* args) {
+extern "C" PyObject* pytocs_printerr(PyObject *self, PyObject* args)
+{
   char *command;
 
   (void)self;
   if (PyArg_ParseTuple(args, "s", &command))
-    shared_cspython()->Print(1, command);
+    shared_cspython()->Print(true, command);
 
   Py_INCREF(Py_None);
   return Py_None;
 }
 
-PyMethodDef PytocsMethods[]={
-  {"printout", pytocs_printout, METH_VARARGS, ""},
-  {"printerr", pytocs_printout, METH_VARARGS, ""},
-  {0, 0, 0, ""}
+PyMethodDef PytocsMethods[] =
+{
+  { "printout", pytocs_printout, METH_VARARGS, "" },
+  { "printerr", pytocs_printout, METH_VARARGS, "" },
+  { 0, 0, 0, "" }
 };
 
 extern "C" void init_cspace();
 
-void InitPytocs() {
+void InitPytocs()
+{
   Py_InitModule("pytocs", PytocsMethods);
   init_cspace();
 }

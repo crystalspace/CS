@@ -25,7 +25,8 @@
 #include "iutil/comp.h"
 #include "csutil/csinput.h"
 
-class csPython : public iScript {
+class csPython : public iScript
+{
 public:
   csPython(iBase *iParent);
   virtual ~csPython();
@@ -33,54 +34,59 @@ public:
   static csPython* shared_instance;
   iObjectRegistry* object_reg;
   int Mode;
+  bool use_debugger;
 
-  bool Initialize(iObjectRegistry* object_reg);
-  bool RunText(const char *Text);
-  bool LoadModule(const char *Text);
-  bool Store(const char* name, void* data, void* tag);
+  virtual bool Initialize(iObjectRegistry* object_reg);
+  virtual bool HandleEvent(iEvent&);
+  virtual bool RunText(const char *Text);
+  virtual bool LoadModule(const char *Text);
+  virtual bool Store(const char* name, void* data, void* tag);
 
   /*
     @@@ New functions not yet implemented
   */
-  bool Call(const char *name, const char *fmt, ...)
+  virtual bool Call(const char *name, const char *fmt, ...)
     { return false; }
-  bool Call(const char *name, int &ret, const char *fmt, ...)
+  virtual bool Call(const char *name, int &ret, const char *fmt, ...)
     { return false; }
-  bool Call(const char *name, float &ret, const char *fmt, ...)
+  virtual bool Call(const char *name, float &ret, const char *fmt, ...)
     { return false; }
-  bool Call(const char *name, double &ret, const char *fmt, ...)
+  virtual bool Call(const char *name, double &ret, const char *fmt, ...)
     { return false; }
-  bool Call(const char *name, csRef<iString> &ref, const char *fmt, ...)
+  virtual bool Call(const char *name, csRef<iString> &ref,
+    const char *fmt, ...)
     { return false; }
-  bool Call(const char *name, csRef<iScriptObject> &ref, const char *fmt, ...)
+  virtual bool Call(const char *name, csRef<iScriptObject> &ref,
+    const char *fmt, ...)
     { return false; }
-  csRef<iScriptObject> NewObject(const char *type, const char *fmt, ...)
+  virtual csRef<iScriptObject> NewObject(const char *type,
+    const char *fmt, ...)
     { return 0; }
-  bool Store(const char *name, int data)
+  virtual bool Store(const char *name, int data)
     { return false; }
-  bool Store(const char *name, float data)
+  virtual bool Store(const char *name, float data)
     { return false; }
-  bool Store(const char *name, double data)
+  virtual bool Store(const char *name, double data)
     { return false; }
-  bool Store(const char *name, char const *data)
+  virtual bool Store(const char *name, char const *data)
     { return false; }
-  bool Store(const char *name, iScriptObject *data)
+  virtual bool Store(const char *name, iScriptObject *data)
     { return false; }
-  bool SetTruth(const char *name, bool data)
+  virtual bool SetTruth(const char *name, bool data)
     { return false; }
-  bool Retrieve(const char *name, int &data) const
+  virtual bool Retrieve(const char *name, int &data) const
     { return false; }
-  bool Retrieve(const char *name, float &data) const
+  virtual bool Retrieve(const char *name, float &data) const
     { return false; }
-  bool Retrieve(const char *name, double &data) const
+  virtual bool Retrieve(const char *name, double &data) const
     { return false; }
-  bool Retrieve(const char *name, csRef<iString> &data) const
+  virtual bool Retrieve(const char *name, csRef<iString> &data) const
     { return false; }
-  bool Retrieve(const char *name, csRef<iScriptObject> &data) const
+  virtual bool Retrieve(const char *name, csRef<iScriptObject> &data) const
     { return false; }
-  bool GetTruth(const char *name, bool &data) const
+  virtual bool GetTruth(const char *name, bool &data) const
     { return false; }
-  bool Remove(const char *name)
+  virtual bool Remove(const char *name)
     { return false; }
 
   void ShowError();
@@ -95,12 +101,14 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
+
+  // Implement iEventHandler interface.
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csPython);
+    virtual bool HandleEvent (iEvent& e)
+    { return scfParent->HandleEvent(e); }
+  } scfiEventHandler;
 };
 
-void InitPytocs();
 #endif // __CS_CSPYTHON_H__
-
-
-
-
-

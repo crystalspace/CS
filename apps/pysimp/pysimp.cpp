@@ -15,41 +15,44 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-    
-    pysimp - A simple application demonstrating the usage of the python
-    plugin.
 */
 
+/*
+ * pysimp - A simple application demonstrating the usage of the python plugin.
+ */
+
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "csutil/scanstr.h"
-#include "csutil/cscolor.h"
-#include "pysimp.h"
-#include "iengine/sector.h"
-#include "iengine/engine.h"
-#include "iengine/camera.h"
-#include "iengine/light.h"
-#include "igraphic/imageio.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/natwin.h"
-#include "ivideo/fontserv.h"
-#include "ivaria/script.h"
+#include "csutil/cmdhelp.h"
+#include "csutil/cscolor.h"
+#include "csutil/event.h"
+#include "csutil/scanstr.h"
+#include "csutil/sysfunc.h"
+#include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/light.h"
+#include "iengine/sector.h"
+#include "igraphic/imageio.h"
 #include "imap/parser.h"
-#include "iutil/eventh.h"
+#include "iutil/cmdline.h"
 #include "iutil/comp.h"
+#include "iutil/csinput.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "iutil/csinput.h"
-#include "iutil/virtclk.h"
-#include "ivaria/reporter.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
-#include "csutil/cmdhelp.h"
-#include "csutil/event.h"
+#include "iutil/virtclk.h"
+#include "ivaria/reporter.h"
+#include "ivaria/script.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/natwin.h"
+
+#include "pysimp.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -144,6 +147,14 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
+    printf("\nTo load a Python script other than the default `pysimp.py',\n"
+	   "specify its name (without the .py extension) as the one and only\n"
+	   "argument to pysimp. The script must define a Python function\n"
+	   "named CreateRoom() which accepts a material name as its only\n"
+	   "argument, and which sets up the geometry for a `room' in the\n"
+	   "sector named \"room\". The specified script will be `imported',\n"
+	   "so it must be found in Python's search path (possibly augmented\n"
+	   "by PYTHONPATH).\n");
     exit (0);
   }
 
@@ -209,14 +220,28 @@ bool PySimple::Initialize (int argc, const char* const argv[],
       "crystalspace.script.python", iScript));
   if (is)
   {
-    // Load a python module (scripts/python/pysimp.py).
-    if (!is->LoadModule ("pysimp"))
+    char const* module = "pysimp";
+    csRef<iCommandLineParser> cmd =
+	CS_QUERY_REGISTRY(object_reg, iCommandLineParser);
+    if (cmd.IsValid())
+    {
+      char const* file = cmd->GetName(0);
+      if (file != 0)
+	module = file;
+    }
+
+    // Load a python module.
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Loading script file `%s'...\n", module);
+    if (!is->LoadModule (module))
       return 0;
 
     // Set up our room.
     // Execute one method defined in pysimp.py
     // This will create the polygons in the room.
-    if (!is->RunText ("pysimp.CreateRoom('stone')"))
+    csString run;
+    run << module << ".CreateRoom('stone')";
+    if (!is->RunText(run))
       return 0;
   }
 
@@ -227,7 +252,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "------------------------------------");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by

@@ -1,3 +1,29 @@
+#!/usr/bin/env python
+"""
+CsPython Tutorial Example 1
+
+A pure-Python script to show the use of Crystal Space.
+
+To use this, ensure that your PYTHONPATH, CRYSTAL, and LD_LIBRARY_PATH
+(or DYLD_LIBRARY_PATH for MacOS/X; or PATH for Windows) variables are set
+approrpriately, and then run the script with the command:
+
+    python scripts/python/tutorial1.py
+
+This performs the same features as the C++ tutorial1.
+It creates a room and allows movement with the arrow keys, page-up, and
+page-down.
+
+===========================================================================
+There are two ways to use the CsPython module.
+Either as a plugin within CS (pysimp), 
+or as a pure Python module (this example).
+
+This is performs a function similar to the CS tutorial 1, rewritten in Python.
+Please refer to the CS Tutorial 1 in the documentation
+for detail on how the C++ version works.
+"""
+
 import sys, time, traceback
 from cspace import *
 
@@ -20,11 +46,11 @@ def CreateRoom (matname):
     if DEBUG: print 'walls=',walls
     thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
     material=engine.GetMaterialList().FindByName(matname)
+    thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
     walls_state = thingstate.GetFactory()
     walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
     walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
     walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-                                        
     thingstate.DecRef()
     if DEBUG: print 'Finished!'
 
@@ -59,40 +85,42 @@ def FinishFrame ():
     myG3D.Print(None)
     if DEBUG: print 'FinishFrame done'
 
-class EventHandler (csPyEventHandler):
-    def __init__ (self):
-        csPyEventHandler.__init__(self)
-    def HandleEvent (self, ev):
-        if DEBUG: print 'EventHandler called'
-        if DEBUG: print '   ev=%s' % ev.Type
-        if ev.Type == csevBroadcast and ev.Command.Code == cscmdProcess:
-            try:
-                SetupFrame()
-            except:
-                traceback.print_exc()
+def HandleEvent (ev):
+    if DEBUG: print 'HandleEvent called'
+    if ((ev.Type  == csevKeyboard ) and
+        (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+        (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
+        
+        q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
+        if q:
+            q.GetEventOutlet().Broadcast(cscmdQuit)
             return 1
-        elif ev.Type == csevBroadcast and ev.Command.Code == cscmdFinalProcess:
-            try:
-                FinishFrame()
-            except:
-                traceback.print_exc()
-            return 1
-        elif ev.Type == csevBroadcast and ev.Command.Code == cscmdCommandLineHelp:
-            print 'No help today...'
-            return 1
-        else:
-            try:
-                if ((ev.Type  == csevKeyboard ) and
-                    (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
-                    (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-            
-                    q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
-                    if q:
-                        q.GetEventOutlet().Broadcast(cscmdQuit)
-                        return 1
-            except:
-                traceback.print_exc()
-        return 0
+    return 0
+
+def EventHandler (ev):
+    if DEBUG: print 'EventHandler called'
+    if DEBUG: print '   ev=%s' % ev
+    if ev.Type == csevBroadcast and ev.Command.Code == cscmdProcess:
+        try:
+            SetupFrame()
+        except:
+            traceback.print_exc()
+        return 1
+    elif ev.Type == csevBroadcast and ev.Command.Code == cscmdFinalProcess:
+        try:
+            FinishFrame()
+        except:
+            traceback.print_exc()
+        return 1
+    elif ev.Type == csevBroadcast and ev.Command.Code == cscmdCommandLineHelp:
+        print 'No help today...'
+        return 1
+    else:
+        try:
+            return HandleEvent(ev)
+        except:
+            traceback.print_exc()
+    return 0
 
 object_reg = csInitializer.CreateEnvironment(sys.argv)
 
@@ -114,8 +142,7 @@ if not csInitializer.RequestPlugins(object_reg, plugin_requests):
     sys.exit(1)
 
 if DEBUG: print 'Setting up event handler...'
-event_handler = EventHandler()
-if not csInitializer._SetupEventHandler(object_reg, event_handler, int(CSMASK_FrameProcess|CSMASK_Broadcast|CSMASK_Input)):
+if not csInitializer.SetupEventHandler(object_reg, EventHandler):
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not initialize event handler!")
     sys.exit(1)
   
@@ -164,7 +191,6 @@ Report(
     "Simple Crystal Space Python Application version 0.1."
 )
 txtmgr = myG3D.GetTextureManager()
-txtmgr.SetVerbose(1)
 
 # First disable the lighting cache. Our app is simple enough not to need this.
 engine.SetLightingCacheMode(0)
@@ -219,6 +245,3 @@ g2d = myG3D.GetDriver2D()
 view.SetRectangle(2, 2, g2d.GetWidth() - 4, g2d.GetHeight() - 4)
 
 csDefaultRunLoop(object_reg)
-
-
-

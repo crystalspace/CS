@@ -1,3 +1,8 @@
+# This is a pure-Python program which demonstrates simple collision detection,
+# just as does the C++ tutorial program "simpcd". Run this script by invoking
+# "python pysimpcd.py" after setting PYTYHONPATH, CRYSTAL, LD_LIBRARY_PATH (or
+# DLYD_LIBRARY_PATH for MacOS/X; or PATH for Windows) appropriately.
+
 import sys, time, traceback, math
 from cspace import *
 
@@ -49,8 +54,6 @@ def SetupFrame ():
         sprite2.GetMovable().UpdateMove()
         rot1_direction = -rot1_direction
         rot2_direction = -rot2_direction
-
-    parent_sprite.DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10)
 
     # Now rotate the camera according to keyboard state
     c = view.GetCamera()
@@ -211,7 +214,6 @@ Report(
     "Simple Crystal Space Python Application version 0.1."
 )
 txtmgr = myG3D.GetTextureManager()
-txtmgr.SetVerbose(1)
 
 # First disable the lighting cache. Our app is simple enough not to need this.
 engine.SetLightingCacheMode(0)
@@ -270,7 +272,6 @@ parent_sprite = engine.CreateMeshWrapper(
 )
 spstate = SCF_QUERY_INTERFACE(parent_sprite.GetMeshObject(), iSprite3DState)
 spstate.SetAction("default")
-parent_sprite.DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10)
 parent_sprite.GetMovable().Transform(csZRotMatrix3(math.pi/2.))
 parent_sprite.GetMovable().UpdateMove()
 
@@ -315,4 +316,3 @@ csDefaultRunLoop(object_reg)
 
 #csInitializer.DestroyApplication(object_reg)
 #object_reg = None
-

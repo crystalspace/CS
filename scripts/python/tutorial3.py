@@ -3,24 +3,26 @@
 CsPython Tutorial Example 3
 By Mark Gossage (mark@gossage.cjb.net)
 
-A script to show the use of Crystal Space called from python
+A pure-Python script to show the use of Crystal Space.
 
-To use this, go to the CS root directory any type
-python scripts/python/tutorial3.py
-(this MUST be run in the CS root directory to find all the plugins)
+To use this, ensure that your PYTHONPATH, CRYSTAL, and LD_LIBRARY_PATH
+(or DYLD_LIBRARY_PATH for MacOS/X; or PATH for Windows) variables are set
+approrpriately, and then run the script with the command:
 
-This performs the same features at tutorial example 'simpmap'
-Loading a map with all the nice mesh effects
+    python scripts/python/tutorial1.py
+
+This performs the same features at tutorial C++ tutorial 'simpmap',
+loading a map with all the nice mesh effects.
 
 ===========================================================================
 There are two ways to use the CsPython module.
 Either as a plugin within CS (pysimp), 
-or as a python module (this example).
+or as a pure Python module (this example).
 
 This is just the CS tutorial 'simpmap' rewritten in Python.
 Overall it looks quite like the original C++ code, 
-just with python syntax. But the fns are all the same names & formats
-(use None instead of NULL, and "" instead of (char*)NULL)
+just with Python syntax; but the functions are all the same names and formats
+(use None instead of NULL, and "" instead of (char*)NULL).
 
 Please refer to the CS Tutorial 3 in the documentation
 for detail on how the C++ works.
