@@ -79,6 +79,20 @@ void Combinations (int m, int n, bool (*callback) (int *vector, int count,
   CHK (delete [] vector);
 }
 
+#if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
+// We need a function to retrieve current working directory on specific drive
+
+static int __getcwd (char drive, char *buffer, int buffersize)
+{
+  char old_drive = _getdrive ();
+  _chdrive (drive);
+  getcwd (buffer, buffersize);
+  _chdrive (old_drive);
+  return strlen (buffer);
+}
+
+#endif // defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
+
 char *expandname (char *iName)
 {
   char outname [MAXPATHLEN + 1];
@@ -106,7 +120,7 @@ char *expandname (char *iName)
 #endif
         )
     {
-      getcwd  (outname, sizeof (outname));
+      getcwd (outname, sizeof (outname));
       outp = strlen (outname);
       if (strcmp (tmp, "."))
         outname [outp++] = PATH_SEPARATOR;
@@ -155,14 +169,18 @@ char *expandname (char *iName)
     }
     else
     {
-      int sl = strlen (tmp);
-      memcpy (&outname [outp], tmp, sl);
-      outp += sl;
+      memcpy (&outname [outp], tmp, ptmp);
+      outp += ptmp;
       if (inp < namelen)
       {
 #if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
-        if (iName [inp] == ':')
-          outname [outp++] = ':';
+        if ((inp == 1)
+         && (iName [inp] == ':'))
+          if ((iName [inp + 1] == '/')
+           || (iName [inp + 1] == PATH_SEPARATOR))
+            outname [outp++] = ':';
+          else
+            outp += __getcwd (iName [inp - 1], outname + outp - 1, sizeof (outname) - outp + 1) - 1;
 #endif
         outname [outp++] = PATH_SEPARATOR;
       }
@@ -178,7 +196,7 @@ char *expandname (char *iName)
       inp++;
   } /* endwhile */
 
-  CHK (char *ret = new char [outp + 1]);
+  char *ret = new char [outp + 1];
   memcpy (ret, outname, outp);
   ret [outp] = 0;
   return ret;
