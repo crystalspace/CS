@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Jan-2004
+        - Steven Geens added HitBeamOutline and HitBeamObject for sprcal3d.
+	  He's not completely sure it works, but it doesn't seem to break
+	  anything.
+17-Jan-2004
 	- Steven Geens updated a test of configure.ac and configure so it
 	  checks correctly for the cal3d cvs version.
 16-Jan-2004

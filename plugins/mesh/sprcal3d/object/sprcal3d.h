@@ -632,9 +632,9 @@ public:
 
   ///------------------------ iMeshObject implementation ----------------------
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
-      csVector3& intersect, float* pr) { return false; }
+      csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-      csVector3& intersect, float* pr, int* = 0) { return false; }
+      csVector3& intersect, float* pr, int* = 0);
 
   virtual bool SetColor (const csColor& col)
   {

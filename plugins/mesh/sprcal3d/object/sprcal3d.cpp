@@ -1123,6 +1123,95 @@ void csSpriteCal3DMeshObject::SetupObject()
   }
 }
 
+bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr)
+{
+
+  csSegment3 seg (start, end);
+  float dist, temp, max;
+  temp = dist = max = csSquaredDist::PointPoint (start, end);
+  csVector3 tsect;
+
+  std::vector<CalMesh *>& vectorMesh = calModel.getVectorMesh ();
+  std::vector<CalMesh *>::iterator iteratorMesh = vectorMesh.begin();
+  while (iteratorMesh != vectorMesh.end())
+  {
+    std::vector<CalSubmesh * >& vectorSubmesh = (*iteratorMesh)->getVectorSubmesh ();
+    std::vector<CalSubmesh *>::iterator iteratorSubmesh = vectorSubmesh.begin();
+    while (iteratorSubmesh != vectorSubmesh.end())
+    {
+      csVector3* pVertexBuffer = new csVector3[(*iteratorSubmesh)->getVertexCount ()];
+      calModel.getPhysique()->calculateVertices(*iteratorSubmesh,(float*)pVertexBuffer);
+
+      std::vector<CalCoreSubmesh::Face>& vectorFace = (*iteratorSubmesh)->getCoreSubmesh()->getVectorFace();
+      std::vector<CalCoreSubmesh::Face>::iterator iteratorFace = vectorFace.begin();
+      while(iteratorFace != vectorFace.end())
+      {
+	if (csIntersect3::IntersectTriangle (pVertexBuffer[(*iteratorFace).vertexId[0]],
+	      pVertexBuffer[(*iteratorFace).vertexId[1]],
+	      pVertexBuffer[(*iteratorFace).vertexId[2]], seg, tsect))
+	{
+	  if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+	      csSquaredDist::PointPoint (start, end));
+	  return true;
+	}
+	++iteratorFace;
+      }
+      ++iteratorSubmesh;
+    }
+    ++iteratorMesh;
+  }
+  return false;
+}
+
+
+bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
+    const csVector3& end, csVector3& isect, float* pr, int*)
+{
+  // This routine is slow, but it is intended to be accurate.
+
+  csSegment3 seg (start, end);
+  float dist, temp, max;
+  temp = dist = max = csSquaredDist::PointPoint (start, end);
+  csVector3 tsect;
+  
+  std::vector<CalMesh *>& vectorMesh = calModel.getVectorMesh ();
+  std::vector<CalMesh *>::iterator iteratorMesh = vectorMesh.begin();
+  while (iteratorMesh != vectorMesh.end())
+  {
+    std::vector<CalSubmesh * >& vectorSubmesh = (*iteratorMesh)->getVectorSubmesh ();
+    std::vector<CalSubmesh *>::iterator iteratorSubmesh = vectorSubmesh.begin();
+    while (iteratorSubmesh != vectorSubmesh.end())
+    {
+      csVector3* pVertexBuffer = new csVector3[(*iteratorSubmesh)->getVertexCount ()];
+      calModel.getPhysique()->calculateVertices(*iteratorSubmesh,(float*)pVertexBuffer);
+
+      std::vector<CalCoreSubmesh::Face>& vectorFace = (*iteratorSubmesh)->getCoreSubmesh()->getVectorFace();
+      std::vector<CalCoreSubmesh::Face>::iterator iteratorFace = vectorFace.begin();
+      while(iteratorFace != vectorFace.end())
+      {
+	if (csIntersect3::IntersectTriangle (pVertexBuffer[(*iteratorFace).vertexId[0]], 
+	      pVertexBuffer[(*iteratorFace).vertexId[1]],
+	      pVertexBuffer[(*iteratorFace).vertexId[2]], seg, tsect))
+	{
+	  temp = csSquaredDist::PointPoint (start, tsect);
+	  if (temp < dist)
+	  {
+	    dist = temp;
+	    isect = tsect;
+	  }
+	}
+	++iteratorFace;
+      }
+      ++iteratorSubmesh;
+    }
+    ++iteratorMesh;
+  }
+  if (pr) *pr = qsqrt (dist / max);
+  if (dist >= max) return false;
+  return true;
+}
+
 void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,csTicks current_time)
 {
   iSpriteCal3DSocket* socket = 0;
