@@ -2624,6 +2624,7 @@ void csThing::PrepareLighting ()
   for (i = 0; i < polygons.Length (); i++)
     polygons.Get (i)->PrepareLighting ();
 
+  ClearLMs ();
   PrepareLMs ();
 }
 

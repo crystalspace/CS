@@ -35,6 +35,10 @@ chronological order.
 	  the texture cache when g3d->ClearCache() is called. Unfortunatelly
 	  this doesn't fix engine->ForceRelight() so more debugging is
 	  needed.
+	- Jorrit fixed a bug in the thing plugin. PrepareLighting() wasn't
+	  updating the super lightmap data really. This fixes ForceRelight()
+	  in the sense that something happens now but it appears to be too
+	  bright.
 15-Dec-2003
 	- Matze reworked some jam rules so that subdirs are more robust now.
 	  This should also fix some msvcgen problems on jam.
