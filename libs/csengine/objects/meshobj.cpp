@@ -391,6 +391,11 @@ float csMeshWrapper::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
+void csMeshWrapper::MeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
+{
+  scfParent->SetFactory (factory->GetPrivateObject ());
+}
+
 //--------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csMeshFactoryWrapper)

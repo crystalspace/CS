@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Written by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
 
+struct iBase;
 struct iImage;
 struct csRGBcolor;
 struct iMotion;
@@ -162,7 +163,13 @@ class csLoader
   /**
    * Load the terrain object from the map file.
    */
-  static bool LoadTerrainObject( csTerrainWrapper *pTerrain, char* buf, csSector* pSector );
+  static bool LoadTerrainObject( csTerrainWrapper *pTerrain, char* buf,
+  	csSector* pSector );
+
+  /**
+   * Load a plugin in general.
+   */
+  static bool LoadAddOn (char* buf, iBase* context);
 
   /**
    * Load sounds from a SOUNDS(...) argument.

@@ -401,6 +401,7 @@ public:
     {
       return scfParent->GetDrawCallback ();
     }
+    virtual void SetFactory (iMeshFactoryWrapper* factory);
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 
@@ -467,6 +468,10 @@ public:
   struct MeshFactoryWrapper : public iMeshFactoryWrapper
   {
     DECLARE_EMBEDDED_IBASE (csMeshFactoryWrapper);
+    virtual csMeshFactoryWrapper* GetPrivateObject ()
+    {
+      return (csMeshFactoryWrapper*)scfParent;
+    }
     virtual iMeshObjectFactory* GetMeshObjectFactory ()
     {
       return scfParent->GetMeshObjectFactory ();

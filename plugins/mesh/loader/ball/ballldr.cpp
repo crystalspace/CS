@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
@@ -104,12 +104,15 @@ bool csBallFactoryLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csBallFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
+iBase* csBallFactoryLoader::Parse (const char* /*string*/,
+	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  	"crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
+    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.ball",
+    	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.ball\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
@@ -210,7 +213,8 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csBallLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
+iBase* csBallLoader::Parse (const char* string, iEngine* engine,
+	iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -228,6 +232,8 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine, iBase* /* conte
 
   iMeshObject* mesh = NULL;
   iBallState* ballstate = NULL;
+  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  imeshwrap->DecRef ();
 
   char* buf = (char*)string;
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -271,6 +277,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine, iBase* /* conte
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  imeshwrap->SetFactory (fact);
           ballstate = QUERY_INTERFACE (mesh, iBallState);
 	}
 	break;

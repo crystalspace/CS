@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
@@ -108,12 +108,15 @@ bool csRainFactoryLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csRainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
+iBase* csRainFactoryLoader::Parse (const char* /*string*/,
+	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.rain", "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  	"crystalspace.mesh.object.rain", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.rain", "MeshObj", iMeshObjectType);
+    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.rain",
+    	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.rain\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
@@ -148,7 +151,8 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
   if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
   if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
   if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
-  if(mixmode&CS_FX_ALPHA) {
+  if(mixmode&CS_FX_ALPHA)
+  {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
     str->Push(strnew(buf));
@@ -223,13 +227,15 @@ static UInt ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
+    printf ("Token '%s' not found while parsing the modes!\n",
+    	csGetLastOffender ());
     return 0;
   }
   return Mixmode;
 }
 
-iBase* csRainLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
+iBase* csRainLoader::Parse (const char* string, iEngine* engine,
+	iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -247,6 +253,9 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine, iBase* /* conte
   long cmd;
   char* params;
   char str[255];
+
+  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
   iParticleState* partstate = NULL;

@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csutil/flags.h"
 
+class csVector2;
 class csVector3;
 class csMatrix3;
 class csThing;

@@ -1067,6 +1067,10 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
   iMeshObjectFactory* fact = NULL;
   iThingState* thing_state = NULL;
 
+  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  imeshwrap->DecRef ();
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // If context==NULL we are loading for a factory.
   if (context == NULL)
   {

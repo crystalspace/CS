@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
@@ -153,7 +153,8 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
+iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
+	iBase* /* context */)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -168,10 +169,12 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine, iBase* /
   char* params;
   char str[255];
 
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.cube", "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  	"crystalspace.mesh.object.cube", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.cube", "MeshObj", iMeshObjectType);
+    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.cube",
+    	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.cube\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
@@ -250,18 +253,19 @@ bool csCubeFactorySaver::Initialize (iSystem* system)
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
   str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
-  if(mixmode&CS_FX_ALPHA) {
+  if (mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if (mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if (mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if (mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if (mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if (mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if (mixmode&CS_FX_ALPHA)
+  {
     char buf[MAXLINE];
-    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    sprintf (buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
     str->Push(strnew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push (strnew(")"));
 }
 
 void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
@@ -314,7 +318,8 @@ bool csCubeLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csCubeLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
+iBase* csCubeLoader::Parse (const char* string, iEngine* engine,
+	iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -324,6 +329,9 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine, iBase* /* conte
   long cmd;
   char* params;
   char str[255];
+
+  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  imeshwrap->DecRef ();
 
   iMeshObject* mesh = 0;
 
@@ -346,6 +354,7 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine, iBase* /* conte
 	  return NULL;
 	}
 	mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	imeshwrap->SetFactory (fact);
 	break;
     }
   }

@@ -26,6 +26,8 @@
 struct iMeshObject;
 struct iMeshObjectFactory;
 struct iMeshWrapper;
+struct csMeshFactoryWrapper;
+struct iMeshFactoryWrapper;
 struct iRenderView;
 struct iMovable;
 struct iLight;
@@ -34,7 +36,7 @@ struct iLight;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 2);
+SCF_VERSION (iMeshWrapper, 0, 0, 3);
 
 /**
  * This interface corresponds to the object in the engine
@@ -97,9 +99,12 @@ struct iMeshWrapper : public iBase
 
   /// Get the draw callback.
   virtual csDrawCallback* GetDrawCallback () = 0;
+
+  /// Set the parent factory.
+  virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 0, 1);
+SCF_VERSION (iMeshFactoryWrapper, 0, 0, 2);
 
 /**
  * This interface corresponds to the object in the engine
@@ -107,6 +112,8 @@ SCF_VERSION (iMeshFactoryWrapper, 0, 0, 1);
  */
 struct iMeshFactoryWrapper : public iBase
 {
+  /// UGLY!!!@@@
+  virtual csMeshFactoryWrapper* GetPrivateObject () = 0;
   /// Get the iMeshObjectFactory.
   virtual iMeshObjectFactory* GetMeshObjectFactory () = 0;
 };

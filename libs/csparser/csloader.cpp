@@ -114,6 +114,7 @@ int csLoaderStat::sounds_loaded   = 0;
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ACTIVE)
   CS_TOKEN_DEF (ADD)
+  CS_TOKEN_DEF (ADDON)
   CS_TOKEN_DEF (ALPHA)
   CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ANIM)
@@ -530,6 +531,7 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
 csCollection* csLoader::load_collection (char* name, char* buf)
 {
   CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (COLLECTION)
@@ -555,6 +557,9 @@ csCollection* csLoader::load_collection (char* name, char* buf)
     str[0] = 0;
     switch (cmd)
     {
+      case CS_TOKEN_ADDON:
+        CsPrintf (MSG_WARNING, "ADDON not yet supported in collection!\n");
+      	break;
       case CS_TOKEN_THING:
         {
           ScanStr (params, "%s", str);
@@ -843,12 +848,13 @@ csKeyValuePair* csLoader::load_key (char* buf, csObject* pParent)
 csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (POSITION)
   CS_TOKEN_TABLE_END
 
-   csMapNode* pNode = new csMapNode(name);
-  pNode->SetSector(sec);
+  csMapNode* pNode = new csMapNode (name);
+  pNode->SetSector (sec);
 
   long  cmd;
   char* xname;
@@ -867,6 +873,9 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
     }
     switch (cmd)
     {
+      case CS_TOKEN_ADDON:
+        CsPrintf (MSG_WARNING, "ADDON not yet supported in node!\n");
+      	break;
       case CS_TOKEN_KEY:
         load_key(params, pNode);
         break;
@@ -2229,6 +2238,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
 csSector* csLoader::load_sector (char* secname, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (STATBSP)
     CS_TOKEN_TABLE (THING)
@@ -2261,6 +2271,9 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     }
     switch (cmd)
     {
+      case CS_TOKEN_ADDON:
+	LoadAddOn (params, &(sector->scfiSector));
+      	break;
       case CS_TOKEN_STATBSP:
         do_stat_bsp = true;
         break;
@@ -2603,6 +2616,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (SECTOR)
     CS_TOKEN_TABLE (ROOM)
     CS_TOKEN_TABLE (PLANE)
@@ -2647,6 +2661,9 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
       }
       switch (cmd)
       {
+        case CS_TOKEN_ADDON:
+	  LoadAddOn (params, (iEngine*)Engine);
+      	  break;
         case CS_TOKEN_MOTION:
 	  {
 	    iMotionManager* motionmanager = System->MotionMan;
@@ -2942,6 +2959,7 @@ bool csLoader::LoadLibrary (char* buf)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (MESHOBJ)
@@ -2972,6 +2990,9 @@ bool csLoader::LoadLibrary (char* buf)
 
       switch (cmd)
       {
+        case CS_TOKEN_ADDON:
+	  LoadAddOn (params, (iEngine*)Engine);
+      	  break;
         case CS_TOKEN_PLANE:
           Engine->planes.Push ( load_polyplane (params, name) );
           break;
@@ -3143,7 +3164,8 @@ csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
   if (!databuff || !databuff->GetSize ())
   {
     if (databuff) databuff->DecRef ();
-    CsPrintf (MSG_FATAL_ERROR, "Could not open mesh object file \"%s\" on VFS!\n", fname);
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Could not open mesh object file \"%s\" on VFS!\n", fname);
     return NULL;
   }
 
@@ -3185,6 +3207,7 @@ csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
 bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (PARAMS)
@@ -3207,6 +3230,9 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
     }
     switch (cmd)
     {
+      case CS_TOKEN_ADDON:
+	LoadAddOn (params, &(stemp->scfiMeshFactoryWrapper));
+      	break;
       case CS_TOKEN_PARAMS:
 	if (!plug)
 	{
@@ -3215,20 +3241,17 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	}
 	else
 	{
-	  iBase* mof = stemp->GetMeshObjectFactory();
-	  mof = plug->Parse (params, csEngine::current_iengine, mof);
+	  iBase* mof = plug->Parse (params, csEngine::current_iengine,
+	  	&(stemp->scfiMeshFactoryWrapper));
 	  if (!mof)
 	  {
-	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
-	    	str);
+	    CsPrintf (MSG_FATAL_ERROR,
+	    	"Plugin '%s' did not return a factory!\n", str);
 	    fatal_exit (0, false);
 	  }
 	  else
 	  {
-		// This is a glorified type cast.
-//	    iMeshObjectFactory* mof2 = QUERY_INTERFACE (mof, iMeshObjectFactory);
 	    stemp->SetMeshObjectFactory ((iMeshObjectFactory *)mof);
-	    mof->DecRef ();
 	  }
 	}
         break;
@@ -3265,19 +3288,20 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	    delete filedata;
 	    fatal_exit (0, false);
 	  }
-  	  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+  	  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System,
+	  	"crystalspace.mesh.object.sprite.3d", "MeshObj",
+		iMeshObjectType);
   	  if (!type)
   	  {
-    	    type = LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+    	    type = LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d",
+	    	"MeshObj", iMeshObjectType);
     	    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   	  }
 	  iMeshObjectFactory* fact = type->NewFactory ();
 	  stemp->SetMeshObjectFactory (fact);
 	  fact->DecRef ();
-	  //iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
 	  csCrossBuild_SpriteTemplateFactory builder;
 	  builder.CrossBuild (fact, *filedata);
-//	  state->DecRef ();
 	  delete filedata;
         }
         break;
@@ -3298,7 +3322,8 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a mesh factory!\n",
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing the a mesh factory!\n",
         csGetLastOffender ());
     fatal_exit (0, false);
   }
@@ -3309,6 +3334,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (MOVE)
@@ -3350,6 +3376,9 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
     }
     switch (cmd)
     {
+      case CS_TOKEN_ADDON:
+	LoadAddOn (params, &(mesh->scfiMeshWrapper));
+      	break;
       case CS_TOKEN_NOLIGHTING:
         mesh->flags.Set (CS_ENTITY_NOLIGHTING);
         break;
@@ -3399,13 +3428,14 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
       case CS_TOKEN_MOVE:
         {
           char* params2;
-          mesh->GetMovable ().SetTransform (csMatrix3 ());     // Identity matrix.
-          mesh->GetMovable ().SetPosition (csVector3 (0, 0, 0));
+          mesh->GetMovable ().SetTransform (csMatrix3 ());     // Identity
+          mesh->GetMovable ().SetPosition (csVector3 (0));
           while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
             {
-              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              CsPrintf (MSG_FATAL_ERROR,
+	      	"Expected parameters instead of '%s'!\n", params);
               fatal_exit (0, false);
             }
             switch (cmd)
@@ -3438,25 +3468,12 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (params, csEngine::current_iengine, NULL);
+	  iBase* mo = plug->Parse (params, csEngine::current_iengine,
+	  	&(mesh->scfiMeshWrapper));
 	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
 	  mesh->SetMeshObject (mo2);
 	  mo2->DecRef ();
 	  mo->DecRef ();
-	  // This is a bit ugly but I don't know another way to do it.
-	  // Here we find the csMeshFactoryWrapper which is holding the
-	  // reference to the factory that created this object.
-	  iMeshObjectFactory* fact = mo2->GetFactory ();
-	  int i;
-	  for (i = 0 ; i < Engine->mesh_factories.Length () ; i++)
-	  {
-	    csMeshFactoryWrapper* factwrap = (csMeshFactoryWrapper*)(Engine->mesh_factories[i]);
-	    if (factwrap->GetMeshObjectFactory () == fact)
-	    {
-	      mesh->SetFactory (factwrap);
-	      break;
-	    }
-	  }
 	}
         break;
 
@@ -3476,7 +3493,9 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the mesh object!\n", csGetLastOffender ());
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing the mesh object!\n",
+	csGetLastOffender ());
     fatal_exit (0, false);
   }
 
@@ -3485,9 +3504,11 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper, char *pBuf)
+bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper,
+	char *pBuf)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (PARAMS)
     CS_TOKEN_TABLE (PLUGIN)
   CS_TOKEN_TABLE_END
@@ -3503,11 +3524,15 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper, char
   {
     if (!params)
     {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", pBuf);
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
+      	pBuf);
       fatal_exit( 0, false );
     }
     switch (cmd)
     {
+      case CS_TOKEN_ADDON:
+	LoadAddOn (params, &(pWrapper->scfiTerrainFactoryWrapper));
+      	break;
       case CS_TOKEN_PARAMS:
 	if (!iPlugIn)
 	{
@@ -3516,22 +3541,24 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper, char
 	}
 	else
 	{
-          // use the plugin to parse through the parameters the engine is passed also
-          // a pointer to the factory is returned
-	  iBase *pBaseFactory = iPlugIn->Parse (params, csEngine::current_iengine,NULL);
-          // if we couldn't get the factory leave
+          // Use the plugin to parse through the parameters the engine is
+	  // passed also a pointer to the factory is returned.
+	  iBase *pBaseFactory = iPlugIn->Parse (params,
+	  	csEngine::current_iengine,
+		&(pWrapper->scfiTerrainFactoryWrapper));
+          // If we couldn't get the factory leave.
 	  if (!pBaseFactory)
 	  {
-	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
-	    	    pStr);
+	    CsPrintf (MSG_FATAL_ERROR,
+	    	"Plugin '%s' did not return a factory!\n", pStr);
 	    fatal_exit (0, false);
 	  }
 	  else
 	  {
-            // convert the iBase to iTerrainObjectFactory
+            // Convert the iBase to iTerrainObjectFactory.
 	    iTerrainObjectFactory *pFactory = 
-            QUERY_INTERFACE (pBaseFactory, iTerrainObjectFactory);
-            // set the factory into the csTerrainFactoryWrapper
+              QUERY_INTERFACE (pBaseFactory, iTerrainObjectFactory);
+            // Set the factory into the csTerrainFactoryWrapper.
 	    pWrapper->SetTerrainObjectFactory (pFactory);
 	    pFactory->DecRef ();
 	  }
@@ -3554,7 +3581,8 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper, char
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a terrain factory!\n",
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing the a terrain factory!\n",
         csGetLastOffender ());
     fatal_exit (0, false);
   }
@@ -3562,9 +3590,11 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper, char
   return true;
 }
 
-bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper, char *pBuf, csSector* sector)
+bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper,
+	char *pBuf, csSector* sector)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (PARAMS)
   CS_TOKEN_TABLE_END
@@ -3582,11 +3612,15 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper, char *pBuf, csSect
   {
     if (!params)
     {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", pBuf);
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
+      	pBuf);
       fatal_exit (0, false);
     }
     switch (cmd)
     {
+      case CS_TOKEN_ADDON:
+	LoadAddOn (params, &(pWrapper->scfiTerrainWrapper));
+      	break;
       case CS_TOKEN_PARAMS:
         if (!iPlugIn)
         {
@@ -3595,20 +3629,22 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper, char *pBuf, csSect
         }
         else
         {
-          // use the plugin to parse through the parameters the engine is passed also
-          // a pointer to the factory is returned
-	  iBase *iBaseObject = iPlugIn->Parse (params, csEngine::current_iengine, NULL);
+          // Use the plugin to parse through the parameters the engine
+	  // is passed also a pointer to the factory is returned.
+	  iBase *iBaseObject = iPlugIn->Parse (params,
+	  	csEngine::current_iengine, &(pWrapper->scfiTerrainWrapper));
           // if we couldn't get the factory leave
 	  if (!iBaseObject)
 	  {
-	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
-	    	      pStr);
+	    CsPrintf (MSG_FATAL_ERROR,
+	    	"Plugin '%s' did not return a factory!\n", pStr);
 	    fatal_exit (0, false);
 	  }
 	  else
 	  {
             // convert the iBase to iTerrainObject
-            iTerrainObject *iTerrObj = QUERY_INTERFACE (iBaseObject, iTerrainObject);
+            iTerrainObject *iTerrObj = QUERY_INTERFACE (iBaseObject,
+	    	iTerrainObject);
             pWrapper->SetTerrainObject (iTerrObj);
 
             iTerrObj->DecRef ();
@@ -3633,12 +3669,77 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper, char *pBuf, csSect
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the mesh object!\n", csGetLastOffender ());
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing the mesh object!\n",
+	csGetLastOffender ());
     fatal_exit (0, false);
   }
 
   // add new terrain to sector
   sector->AddTerrain (pWrapper);
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+bool csLoader::LoadAddOn (char* buf, iBase* context)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (PLUGIN)
+    CS_TOKEN_TABLE (PARAMS)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char str[255];
+  str[0] = 0;
+
+  iLoaderPlugIn* plug = NULL;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_PARAMS:
+	if (!plug)
+	{
+          CsPrintf (MSG_FATAL_ERROR, "Could not load plugin '%s'!\n", str);
+          fatal_exit (0, false);
+	}
+	else
+	{
+	  plug->Parse (params, csEngine::current_iengine, context);
+	}
+        break;
+
+      case CS_TOKEN_PLUGIN:
+	{
+	  ScanStr (params, "%s", str);
+	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str);
+	  if (!plug)
+	  {
+	    printf ("Plugin '%s' loaded!\n", str);
+	    plug = LOAD_PLUGIN (System, str, "Loader", iLoaderPlugIn);
+	    if (plug) loaded_plugins.NewPlugIn (str, plug);
+	  }
+	}
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing the plugin!\n",
+	csGetLastOffender ());
+    fatal_exit (0, false);
+  }
 
   return true;
 }
@@ -3654,7 +3755,8 @@ csThing * csLoader::LoadThing (csEngine* engine, const char* fname)
   if (!databuff || !databuff->GetSize ())
   {
     if (databuff) databuff->DecRef ();
-    CsPrintf (MSG_FATAL_ERROR, "Could not open thing file file \"%s\" on VFS!\n", fname);
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Could not open thing file file \"%s\" on VFS!\n", fname);
     return NULL;
   }
 

@@ -3,6 +3,26 @@ The history order has been reversed so that new features are at the top.
 5-Apr-2001
 	- Fixed a bug in iPortal which prevented proper linking of all
 	  CS apps on some platforms.
+	- Fixed compile problem for python plugin.
+	- Added the concept of general loader plugins to the loader. With
+	  the new 'ADDON' keyword you can now use any loader plugin in
+	  general. This can be used for loading game entities for example.
+	  ADDON is supported for WORLD, LIBRARY, SECTOR, MESHOBJ (both as
+	  factory and object), and TERROBJ (both as factory and object).
+	  ADDON will in the future also be supported for COLLECTION and
+	  NODE. The Parse() function in the plugin will be called with the
+	  given parent object as the context.
+	- The Parse() function for mesh and terrain loader plugins will now
+	  also be called with the wrapper object as context. Unfortunatelly
+	  this breaks a fix from Michael Voase which allowed the setting
+	  of actions on 3D sprites loaded with the impexp importers.
+	- Added 'SetFactory()' to iMeshWrapper.
+	- Added 'GetPrivateObject()' to iMeshFactoryWrapper.
+	- Fixed some ugliness in csparser where it would have to find the
+	  original factory again after loading a mesh object. All loader
+	  plugins are now responsible for setting the factory itself. They
+	  can do this now because they receive the wrapper pointer as a
+	  context.
 4-Apr-2001
 	- Started work on thing loader and saver. Although things haven't
 	  moved to a plugin yet it is already possible to make real
