@@ -509,7 +509,8 @@ void csLightFlareHalo::ProcessFlareComponent (
   // draw the halo
   float intensity = flare->GetIntensity ();
   uint mode = comp->mixmode;
-  if (intensity < 1.0) mode |= CS_FX_GOURAUD;
+  if ((mode&CS_FX_ADD) && (intensity < 1.0)) mode |= CS_FX_GOURAUD;
+  else intensity = 1.0;
 
   //if(flare->GetIntensity() < 1.0)
 
