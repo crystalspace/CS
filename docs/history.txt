@@ -107,6 +107,10 @@ chronological order.
 	    - Converted aws.mak to new build style where generated resources
 	      are placed in a aws-specific build directory, rather than
 	      directly in $(OUT).
+	- Rhad fixed a bug in the particle emitter plugin.  Attractors were
+	  adjusting acceleration instead of speed of particles.  This alters
+	  the effects of any particle system using the emitter plugin with
+	  an attractor noticably.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.
