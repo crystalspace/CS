@@ -31,6 +31,11 @@ The history order is reversed so that new features are at the top.
 	- Added a VERY short and incomplete Schema for the CS map file format.
 	  This is very much work in progress as I'm still learning Schema.
 	  Look in scripts/xml.
+	- Eric Sunshine fixed numerous problems introduced recently into
+	  csconf.mak, including garbled sed commands, many improper quoting
+	  issues, and invalid expansion of makefile variables by the shell when
+	  the shell synthesized the makefile fragment in response to
+	  --makevars.
 8-Aug-2002
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip
