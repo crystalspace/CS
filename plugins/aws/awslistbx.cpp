@@ -1290,7 +1290,21 @@ awsListBox::OnGainFocus()
 void
 awsListBox::OnAdded()
 {
-  AddChild(scrollbar);
+  AddChild(scrollbar, (Parent()->Layout()!=NULL));
+}
+
+void 
+awsListBox::OnResized()
+{
+  int w = scrollbar->Frame().Width(),
+      h = scrollbar->Frame().Width();
+
+
+  scrollbar->Frame().SetPos(Frame().xmax-w, Frame().ymin);
+  scrollbar->Frame().xmax=Frame().xmax;
+  scrollbar->Frame().ymax=Frame().ymax;
+
+  scrollbar->OnResized();
 }
 
 

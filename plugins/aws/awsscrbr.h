@@ -179,6 +179,9 @@ public:
 
   /// Adds in the inc and dec buttons appropriately
   virtual void OnAdded();
+
+  /// Fixes the inc and dec buttons for layouts.
+  virtual void OnResized();
 };
 
 class awsScrollBarFactory : public awsComponentFactory

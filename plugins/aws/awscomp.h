@@ -257,6 +257,9 @@ public:
 
     /// Triggered when a child is added to the parent (triggered on the child)
     virtual void OnAdded();
+
+    /// Triggered when a component is resized by the layout manager.
+    virtual void OnResized();
 };
 
 class awsComponentFactory : public iAwsComponentFactory

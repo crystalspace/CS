@@ -369,6 +369,9 @@ public:
 
     /// Updates the scrollbar so that it's in the right place and has the right stuff.
     virtual void OnAdded();
+
+    /// Updates the scrollbar so that it's in the right place, etc.
+    virtual void OnResized();
 };
 
 class awsListBoxFactory : public awsComponentFactory

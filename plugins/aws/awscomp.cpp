@@ -497,6 +497,11 @@ void awsComponent::OnAdded()
   return;
 }
 
+void awsComponent::OnResized()
+{
+ return;
+}
+
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////
 
 /**

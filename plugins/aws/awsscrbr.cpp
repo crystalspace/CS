@@ -582,6 +582,20 @@ awsScrollBar::OnAdded()
   AddChild(knob);
 }
 
+void 
+awsScrollBar::OnResized()
+{
+  int h = incVal->Frame().Height();
+  int w = incVal->Frame().Width();
+  
+  decVal->Frame().SetPos(Frame().xmax-w, Frame().ymin);
+  incVal->Frame().SetPos(Frame().xmax-w, Frame().ymax-h);
+
+  incVal->Frame().SetSize(w,h);
+  decVal->Frame().SetSize(w,h);
+}
+
+
 /************************************* Command Button Factory ****************/
 SCF_IMPLEMENT_IBASE(awsScrollBarFactory)
 SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)

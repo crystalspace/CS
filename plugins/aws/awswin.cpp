@@ -610,6 +610,12 @@ awsWindow::OnMouseMove(int button, int x, int y)
   return false;
 }
 
+void
+awsWindow::OnResized()
+{
+ return;
+}
+
 bool
 awsWindow::HandleEvent(iEvent& Event)
 {

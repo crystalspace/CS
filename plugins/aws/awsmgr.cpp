@@ -633,8 +633,6 @@ awsManager::CreateWindowFrom(char *defname)
     win->MoveChildren(r.xmin, r.ymin);
   }
 
-  
-
   return win;
 }
 

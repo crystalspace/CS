@@ -951,6 +951,7 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
 	    cmp->Frame().Height() != r.Height()) 
 	{
 	    cmp->Frame().Set(r);
+	    cmp->OnResized();
 	}
       }
     }
