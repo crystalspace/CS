@@ -24,22 +24,22 @@
 struct iObjectRegistry;
 
 /**
- * Implements a default run-loop for stand-alone applications.<p> This function
- * implements a run-loop for stand-alone applications which do not provide
- * their own run-loop.  You only need to call this function if your application
- * does not otherwise implement its own run-loop.  For example, an existing
- * Microsoft Windows-based application will already have a run-loop which
- * processes the Windows event-queue, among other tasks.  Such an application
- * should not call this function, since doing so would interrupt the existing
- * run-loop and prevent it from running.  For each iteration of the run-loop,
- * this function increments the Crystal Space virtual clock (if it is present
- * in the shared-object registry at the time of the call to this function) and
- * processes the Crystal Space event queue (which must be present in the
- * shared-object registry at the time of the call to this function).  This
- * function only returns after a csevBroadcast message has been received in the
- * Crystal Space event queue with command code cscmdQuit.  The return value of
- * this function indicates whether or not the run-loop was actually able to
- * run.  If there was a problem starting the run-loop, then `false' is
+ * Implements a default run-loop for stand-alone applications.<p>
+ * This function implements a run-loop for stand-alone applications which do
+ * not provide their own run-loop.  You only need to call this function if your
+ * application does not otherwise implement its own run-loop.  For example, an
+ * existing Microsoft Windows-based application will already have a run-loop
+ * which processes the Windows event-queue, among other tasks.  Such an
+ * application should not call this function, since doing so would interrupt
+ * the existing run-loop and prevent it from running.  For each iteration of
+ * the run-loop, this function increments the Crystal Space virtual clock (if
+ * it is present in the shared-object registry at the time of the call to this
+ * function) and processes the Crystal Space event queue (which must be present
+ * in the shared-object registry at the time of the call to this function).
+ * This function only returns after a csevBroadcast message has been received
+ * in the Crystal Space event queue with command code cscmdQuit.  The return
+ * value of this function indicates whether or not the run-loop was actually
+ * able to run.  If there was a problem starting the run-loop, then `false' is
  * returned, otherwise `true' is returned.
  */
 extern bool csDefaultRunLoop(iObjectRegistry*);
