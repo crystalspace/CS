@@ -530,7 +530,7 @@ ND_PROTO(void,dispatch_event)
 
 
 //-----------------------------------------------------------------------------
-// Activation / Deactivation
+// Activation / Deactivation / Hide / Unhide
 //-----------------------------------------------------------------------------
 - (void)pause
 {
@@ -570,6 +570,16 @@ ND_PROTO(void,dispatch_event)
 {
   autoResume = !paused;
   [self pause];
+}
+
+- (void)applicationDidHide: (NSNotification*)n
+{
+    OSXAssistant_application_hidden(assistant);
+}
+
+- (void)applicationDidUnhide: (NSNotification*)n
+{
+    OSXAssistant_application_unhidden(assistant);
 }
 
 
@@ -674,6 +684,19 @@ ND_PROTO(void,stop_event_loop)(OSXDelegateHandle handle)
     selector:@selector(applicationDidResignActive:)
     name:NSApplicationDidResignActiveNotification
     object:NSApp];
+
+  [[NSNotificationCenter defaultCenter]
+    addObserver:controller
+    selector:@selector(applicationDidHide:) 
+    name:NSApplicationDidHideNotification   
+    object:NSApp];
+
+  [[NSNotificationCenter defaultCenter]
+    addObserver:controller
+    selector:@selector(applicationDidUnhide:)
+    name:NSApplicationDidUnhideNotification
+    object:NSApp];
+
   [[NSNotificationCenter defaultCenter]
     addObserver:controller
     selector:@selector(applicationDefined:)

@@ -390,3 +390,15 @@ by default, you could add this line to @file{user.cfg}:
 @example
 CsDemo.Video.FullScreen = yes
 @end example
+
+On the Mac, Crystal Space will pause execution when the window is de-activated,
+and resume execution when the window is re-activated.  Paused state is
+indicated by the text ``[Paused]'' in the title of the window. If you
+wish to disable this behavior, then add this line to @file{user.cfg}:
+
+@example
+System.RunWhenNotFocused = yes
+@end example
+
+You can also use the command-line parameter @samp{--alwaysruns}.
+

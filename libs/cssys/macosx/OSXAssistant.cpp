@@ -204,6 +204,16 @@ void OSXAssistant::application_deactivated()
   event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
 }
 
+void OSXAssistant::application_hidden()
+{
+    event_outlet->ImmediateBroadcast(cscmdCanvasHidden, (void*)false);
+}
+
+void OSXAssistant::application_unhidden()
+{
+    event_outlet->ImmediateBroadcast(cscmdCanvasExposed, (void*)false);
+}
+
 void OSXAssistant::flush_graphics_context()
 { OSXDelegate_flush_graphics_context(controller); }
 
@@ -265,6 +275,10 @@ NSD_PROTO(void,mouse_up)(OSXAssistantHandle h, int button, int x, int y)
     { NSD_ASSIST(h)->mouse_up(button, x, y); }
 NSD_PROTO(void,mouse_moved)(OSXAssistantHandle h, int x, int y)
     { NSD_ASSIST(h)->mouse_moved(x, y); }
+NSD_PROTO(void,application_hidden)(OSXAssistantHandle h)
+    { NSD_ASSIST(h)->application_hidden(); }
+NSD_PROTO(void,application_unhidden)(OSXAssistantHandle h)
+    { NSD_ASSIST(h)->application_unhidden(); }
 
 
 //=============================================================================

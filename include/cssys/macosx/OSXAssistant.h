@@ -10,6 +10,10 @@
 // PARTICULAR PURPOSE.  You may distribute this file provided that this
 // copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 //
+// Changes:
+// --------
+// 9/30/03   Reed added application_hidden and application_unhidden methods
+//           and incremented SCF version to 0.0.2.
 //=============================================================================
 //-----------------------------------------------------------------------------
 // OSXAssistant.h
@@ -26,7 +30,7 @@ typedef void* OSXEvent;
 /// An opaque handle to an Objective-C view object represented in C++.
 typedef void* OSXView;
 
-SCF_VERSION (iOSXAssistant, 0, 0, 1);
+SCF_VERSION (iOSXAssistant, 0, 0, 2);
 
 /**
  * This is an interface for an object which provides assistance to
@@ -145,6 +149,20 @@ struct iOSXAssistant : public iBase
    * bottom.
    */
   virtual void mouse_moved(int x, int y) = 0;
+
+  /** 
+   * Notify Crystal Space that the AppKit application has been hidden. This
+   * causes a `cscmdCanvasHidden' event to be immediately posted to the CS
+   * event queue.
+   */
+  virtual void application_hidden() = 0;
+
+  /** 
+   * Notify Crystal Space that the AppKit application has been unhidden. This
+   * causes a `cscmdCanvasExposed' event to be immediately posted to the CS
+   * event queue.
+   */
+  virtual void application_unhidden() = 0;
 };
 
 #endif // __CSSYS_MACOSX_OSXAssistant_h

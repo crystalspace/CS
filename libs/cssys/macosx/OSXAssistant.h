@@ -19,6 +19,11 @@
 //	This object owns the OSXDelegate, thus OSXDelegate only gets
 //	destroyed when the last reference to this object is removed.
 //
+// Changes:
+// --------
+// 9/30/03:  Reed Hedges added application_hidden/unhidden and incremented
+//           SCF version of iOSXAssistantLocal to 0.0.2
+//
 //-----------------------------------------------------------------------------
 #if defined(__cplusplus)
 
@@ -31,7 +36,7 @@ struct iVirtualClock;
 struct iConfigFile;
 typedef void* OSXDelegateHandle;
 
-SCF_VERSION (iOSXAssistantLocal, 0, 0, 1);
+SCF_VERSION (iOSXAssistantLocal, 0, 0, 2);
 struct iOSXAssistantLocal : public iOSXAssistant
 {
   virtual void start_event_loop() = 0;
@@ -73,6 +78,8 @@ public:
   virtual void mouse_down(int button, int x, int y);
   virtual void mouse_up(int button, int x, int y);
   virtual void mouse_moved(int x, int y);
+  virtual void application_hidden();
+  virtual void application_unhidden();
 
   struct eiEventPlug : public iEventPlug
   {
@@ -114,6 +121,8 @@ NSD_PROTO(void,key_up)(OSXAssistant, int raw, int cooked);
 NSD_PROTO(void,mouse_down)(OSXAssistant, int button, int x, int y);
 NSD_PROTO(void,mouse_up)(OSXAssistant, int button, int x, int y);
 NSD_PROTO(void,mouse_moved)(OSXAssistant, int x, int y);
+NSD_PROTO(void,application_hidden)(OSXAssistant);
+NSD_PROTO(void,application_unhidden)(OSXAssistant);
 
 #undef NSD_PROTO
 
