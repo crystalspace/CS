@@ -113,48 +113,50 @@ bool csOPCODECollideSystem::Collide (
 
   ColCache.Model0= col1->m_pCollisionModel ;
   ColCache.Model1= col2->m_pCollisionModel ;
-    
-  csMatrix3 m1 = trans1->GetO2T();
-  csMatrix3 m2 = trans2->GetO2T();
+  
+  csReversibleTransform NetTransform = *trans1 / *trans2;
+  
+  csMatrix3 m1 = NetTransform.GetO2T();
+ // csMatrix3 m2 = trans2->GetO2T();
   csVector3 u;
  
   u=m1.Row1();
    col1->transform.m[0][0] = u.x;
    col1->transform.m[1][0] = u.y;
    col1->transform.m[2][0] = u.z;
-                                           u=m2.Row1();
-  					 col2->transform.m[0][0] = u.x;
-					 col2->transform.m[1][0] = u.y;
-					 col2->transform.m[2][0] = u.z;
+  //                                         u=m2.Row1();
+  //					 col2->transform.m[0][0] = u.x;
+//					 col2->transform.m[1][0] = u.y;
+//					 col2->transform.m[2][0] = u.z;
    u=m1.Row2();
  col1->transform.m[0][1] = u.x;
  col1->transform.m[1][1] = u.y;
  col1->transform.m[2][1] = u.z;
- 					      u=m2.Row2();
-					 col2->transform.m[0][1] = u.x;
-					 col2->transform.m[1][1] = u.y;
-					 col2->transform.m[2][1] = u.z;	
+ //					      u=m2.Row2();
+//					 col2->transform.m[0][1] = u.x;
+//					 col2->transform.m[1][1] = u.y;
+//					 col2->transform.m[2][1] = u.z;	
    u=m1.Row3();
  col1->transform.m[0][2] = u.x;
  col1->transform.m[1][2] = u.y;
  col1->transform.m[2][2] = u.z;
- 						  u=m2.Row3();
- 					 col2->transform.m[0][2] = u.x;
-					 col2->transform.m[1][2] = u.y;
-   					 col2->transform.m[2][2] = u.z;
+ //						  u=m2.Row3();
+ //					 col2->transform.m[0][2] = u.x;
+//					 col2->transform.m[1][2] = u.y;
+  // 					 col2->transform.m[2][2] = u.z;
      
-   u=trans1->GetO2TTranslation();
+   u=NetTransform.GetO2TTranslation();
      col1->transform.m[3][0] = u.x;
       col1->transform.m[3][1] = u.y;
        col1->transform.m[3][2] = u.z;
  
- 						 u=trans2->GetO2TTranslation();
-    						 col2->transform.m[3][0] = u.x;
-						   col2->transform.m[3][1] = u.y;
-					             col2->transform.m[3][2] = u.z;
+ //						 u=trans2->GetO2TTranslation();
+   // 						 col2->transform.m[3][0] = u.x;
+//						   col2->transform.m[3][1] = u.y;
+//					             col2->transform.m[3][2] = u.z;
  
 
-  bool isOk = TreeCollider.Collide ( ColCache   , &col1->transform , &col2->transform  );
+  bool isOk = TreeCollider.Collide ( ColCache   , &col1->transform , NULL  );
   if (isOk)
   {
     bool Status = TreeCollider.GetContactStatus();
