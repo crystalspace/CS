@@ -1,3 +1,6 @@
+# Application target only valid if associated module is listed in PLUGINS.
+ifneq (,$(findstring video/format,$(PLUGINS)))
+
 # Application description
 DESCRIPTION.vid = Crystal Space video example
 
@@ -5,7 +8,7 @@ DESCRIPTION.vid = Crystal Space video example
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make vid         Make the $(DESCRIPTION.vid)$"
+APPHELP += $(NEWLINE)echo $"  make vid          Make the $(DESCRIPTION.vid)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,14 +28,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/video apps/support
+vpath %.cpp apps/video
 
 CSVID.EXE=csvid$(EXE)
 INC.CSVID = $(wildcard apps/video/*.h)
 SRC.CSVID = $(wildcard apps/video/*.cpp)
 OBJ.CSVID = $(addprefix $(OUT),$(notdir $(SRC.CSVID:.cpp=$O)))
-DEP.CSVID = \
-  CSPARSER CSFX CSENGINE CSTERR CSFX CSGFXLDR CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL
+DEP.CSVID = CSPARSER CSFX CSENGINE CSTERR CSFX CSGFXLDR CSUTIL CSSYS CSGEOM \
+  CSOBJECT CSUTIL
 LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
 
 #TO_INSTALL.EXE += $(CSVID.EXE)
@@ -67,3 +70,4 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+endif # ifneq (,$(findstring video/format,$(PLUGINS)))
