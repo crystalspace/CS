@@ -14,6 +14,15 @@ The history order is reversed so that new features are at the top.
 	  GetObjectModel().
 	- Removed iVisibilityObject::GetShapeNumber(), GetBoundingBox(),
 	  and GetWriteObject(). Replaced with GetObjectModel().
+	- Added a new csObjectModelManager to Dynavis. This manager is
+	  responsible for managing iObjectModel instances that are registered
+	  to it from the engine. The model manager will detect (using a
+	  hashmap) that two different objects in the visibility system use
+	  the same model and in that case be able to optimize a lot of the
+	  calculations (in future the calculation of the OBB and outline
+	  can be cached per model instead of per object). At this moment
+	  no objects in the engine actually support sharing models yet but
+	  this is planned.
 20-May-2002
 	- csThing now implements GetWriteObject(). Currently it will
 	  just return the full detail version of the thing. A lower

@@ -75,6 +75,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   kdtree = NULL;
   covbuf = NULL;
   debug_camera = NULL;
+  model_mgr = new csObjectModelManager ();
 
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
@@ -98,6 +99,7 @@ csDynaVis::~csDynaVis ()
   }
   delete kdtree;
   delete covbuf;
+  delete model_mgr;
 }
 
 bool csDynaVis::Initialize (iObjectRegistry *object_reg)
@@ -155,7 +157,10 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj->IncRef ();
   iMovable* movable = visobj->GetMovable ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
-  visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
+
+  visobj_wrap->model = model_mgr->CreateObjectModel (visobj->GetObjectModel ());
+  visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
+  model_mgr->CheckObjectModel (visobj_wrap->model);
 
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
@@ -173,6 +178,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
     {
+      model_mgr->ReleaseObjectModel (visobj_wrap->model);
       kdtree->RemoveObject (visobj_wrap->child);
       visobj->DecRef ();
       delete visobj_wrap;
@@ -191,14 +197,14 @@ void csDynaVis::UpdateObjects ()
       visobj_vector[i];
     iVisibilityObject* visobj = visobj_wrap->visobj;
     iMovable* movable = visobj->GetMovable ();
-    iObjectModel* objmodel = visobj->GetObjectModel ();
-    if (objmodel->GetShapeNumber () != visobj_wrap->shape_number ||
+    model_mgr->CheckObjectModel (visobj_wrap->model);
+    if (visobj_wrap->model->GetShapeNumber () != visobj_wrap->shape_number ||
     	movable->GetUpdateNumber () != visobj_wrap->update_number)
     {
       csBox3 bbox;
       CalculateVisObjBBox (visobj, bbox);
       kdtree->MoveObject (visobj_wrap->child, bbox);
-      visobj_wrap->shape_number = objmodel->GetShapeNumber ();
+      visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
       visobj_wrap->update_number = movable->GetUpdateNumber ();
     }
     visobj->MarkInvisible ();

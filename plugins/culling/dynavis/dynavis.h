@@ -26,6 +26,7 @@
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "iengine/viscull.h"
+#include "dmodel.h"
 
 class csKDTree;
 class csKDTreeChild;
@@ -61,8 +62,9 @@ public:
   iVisibilityObject* visobj;
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
-  long shape_number;	// Last used shape_number from visobj.
+  long shape_number;	// Last used shape_number from model.
   csVisReason reason;	// Reason object is visible/invisible.
+  csObjectModel* model;
 };
 
 /**
@@ -75,6 +77,7 @@ private:
   csKDTree* kdtree;
   csCoverageBuffer* covbuf;
   csVector visobj_vector;
+  csObjectModelManager* model_mgr;
 
   // For Debug_Dump(g3d): keep the last original camera.
   iCamera* debug_camera;
