@@ -981,12 +981,25 @@ work mesh wrappers will be renamed like that.
 Renamed @code{csFilenameMatches()} to @code{csGlobMatches()} (from
 @file{csutil} library).
 
-Removed @code{iEngine::EnableLightingCache()} and
-@code{iEngine::IsLightingCacheEnabled()}. Replaced with
-@code{iEngine::SetLightingCacheMode()} and
-@code{iEngine::GetLightingCacheMode()}.
+From the @samp{iEngine} interface, these two methods were removed:
+
+@itemize @bullet
+@item
+@code{iEngine::EnableLightingCache()}
+@item
+@code{iEngine::IsLightingCacheEnabled()}
+@end itemize
+
+@noindent
+They were replaced by these methods:
+
+@itemize @bullet
+@item
+@code{iEngine::SetLightingCacheMode()}
+@item
+@code{GetLightingCacheMode()}
+@end itemize
 
 @code{FrameWidth} and @code{FrameHeight} are no longer available
 in @code{SysSystemDriver}. Instead you have to call @code{GetWidth()}
 and @code{GetHeight()} on the pointer to the canvas (@code{iGraphics2D}).
-

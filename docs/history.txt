@@ -47,6 +47,8 @@ The history order is reversed so that new features are at the top.
 	      Don't forget to include "isys/plugin.h" and "iutil/objreg.h".
 	    - Fixed all apps and plugins in CS that I could compile. Also
 	      tried to fix the others but no guarantees.
+	- Eric Sunshine repaired several `overfull hbox' and `underfull hbox'
+	  warnings reported by TeX for the Texinfo documentation.
 20-Jul-2001
 	- Added iMeshWrapper::Draw() so that it is now possible to draw
 	  mesh wrappers on your own. This can be useful if you want to display
