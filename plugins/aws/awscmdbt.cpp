@@ -93,10 +93,10 @@ awsCmdButton::OnDraw(csRect clip)
       int tw, th, tx, ty;
 
       // Get the size of the text
-      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetMaxSize(tw, th);
+      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(caption->GetData(), tw, th);
 
       // Calculate the center
-      tx = (Frame().Width()>>1) - ((tw*caption->Length())>>1);
+      tx = (Frame().Width()>>1) -  (tw>>1);
       ty = (Frame().Height()>>1) - (th>>1);
 
       // Draw the text
