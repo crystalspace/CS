@@ -254,9 +254,11 @@ void csXExtF86VM::EnterFullScreen ()
 
   FindBestMode (wa.width, wa.height);
 
-  printf ("Entering fullscreen: win %d, %d to fs_mode %d, %d\n\n",
-	  wa.width, wa.height, fs_mode.hdisplay, fs_mode.vdisplay);
-
+  #ifdef CS_DEBUG
+    printf ("Entering fullscreen: win %d, %d to fs_mode %d, %d\n\n",
+      wa.width, wa.height, fs_mode.hdisplay, fs_mode.vdisplay);
+  #endif
+        
   XResizeWindow (dpy, fs_win, fs_mode.hdisplay, fs_mode.vdisplay);
   XClearWindow (dpy, fs_win);
   XMapRaised (dpy, fs_win);
@@ -308,7 +310,8 @@ void csXExtF86VM::LeaveFullScreen ()
 
   if (!ret)
   {
-    printf ("Unable to return to windowed mode....aborting\n");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "Unable to return to windowed mode....aborting\n");
     exit (-1);
   }
 

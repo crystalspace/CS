@@ -47,6 +47,9 @@ chronological order.
 	  services, ParsePortal() routine. Instead added a sector return
 	  parameter. By doing this, ParsePortal() is now independent of
 	  polygons and also no longer creates the portal itself.
+	- Eric Sunshine applied a few small patches from Dariusz Dawidowski
+	  <truman@go2.pl> protecting some printf()'s in CS_DEBUG and changing
+	  others to use iReporter.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.

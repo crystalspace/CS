@@ -2825,7 +2825,6 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
 	blk_polytex (2000),
 	blk_lightmap (2000)
 {
-printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"); fflush (stdout);
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
@@ -2840,8 +2839,6 @@ csThingObjectType::~csThingObjectType ()
 {
   delete render_pol2d_pool;
   delete lightpatch_pool;
-
-printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"); fflush (stdout);
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
