@@ -189,6 +189,13 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   Caps.fog = G3DFOGMETHOD_VERTEX;
   Caps.NeedsPO2Maps = true;
   Caps.MaxAspectRatio = 32768;
+  GLCaps.need_screen_clipping = false;
+  GLCaps.use_stencil = false;
+  clip_optional[0] = OPENGL_CLIP_NONE;
+  clip_optional[1] = OPENGL_CLIP_SOFTWARE;
+  clip_required[0] = OPENGL_CLIP_SOFTWARE;
+  clip_outer[0] = OPENGL_CLIP_ZBUF;
+  clip_outer[1] = OPENGL_CLIP_SOFTWARE;
 
   // default extension state is for all extensions to be OFF
   ARB_multitexture = false;
@@ -269,6 +276,48 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);
   GLCaps.need_screen_clipping =
   	config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
+
+  unsigned int i, j;
+  const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "nsp0");
+  for (j = i = 0 ; i < strlen (clip_opt) ; i++)
+  {
+    char c = clip_opt[i];
+    if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+    if (c == 'z' || c == 'Z') continue;
+    clip_optional[j++] = c;
+    if (j >= 3) break;
+  }
+  while (j < 3) clip_optional[j++] = '0';
+  SysPrintf (MSG_INITIALIZATION, "  Optional Clipping: %c%c%c\n",
+      clip_optional[0], clip_optional[1], clip_optional[2]);
+
+  const char* clip_req = config->GetStr ("Video.OpenGL.ClipRequired", "sp0");
+  for (j = i = 0 ; i < strlen (clip_req) ; i++)
+  {
+    char c = clip_req[i];
+    if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+    if (c == 'z' || c == 'Z') continue;
+    if (c == 'n' || c == 'N') continue;
+    clip_required[j++] = c;
+    if (j >= 3) break;
+  }
+  while (j < 3) clip_required[j++] = '0';
+  SysPrintf (MSG_INITIALIZATION, "  Required Clipping: %c%c%c\n",
+      clip_required[0], clip_required[1], clip_required[2]);
+
+  const char* clip_out = config->GetStr ("Video.OpenGL.ClipOuter", "zsp0");
+  for (j = i = 0 ; i < strlen (clip_out) ; i++)
+  {
+    char c = clip_out[i];
+    if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+    if (c == 'n' || c == 'N') continue;
+    clip_outer[j++] = c;
+    if (j >= 3) break;
+  }
+  while (j < 3) clip_outer[j++] = '0';
+  SysPrintf (MSG_INITIALIZATION, "  Outer Clipping: %c%c%c\n",
+      clip_outer[0], clip_outer[1], clip_outer[2]);
+
 
   m_renderstate.alphablend = true;
   m_renderstate.mipmap = 0;
@@ -1737,12 +1786,53 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   end_draw_poly ();
 
-  // yet another work in progress - GJH
+#if 0
+  //@@@ Work in progress...
+  char how_clip = OPENGL_CLIP_NONE;
 
-  // fallback to "default" implementation if something comes up that we can't
-  // handle.  This includes software clipping.
+  // @@@ Todo: what to do with clip_plane?
+  if (mesh.clip_portal != CS_CLIP_NOT)
+  {
+    // Some clipping may be required.
+
+    // In some z-buf modes we cannot use clipping modes that depend on
+    // zbuffer ('n','N', 'z', or 'Z').
+    bool no_zbuf_clipping = (z_buf_mode == CS_ZBUF_NONE || z_buf_mode = CS_ZBUF_FILL
+      	|| z_buf_mode == CS_ZBUF_FILLONLY);
+
+    // Select the right clipping mode variable depending on the
+    // type of clipper.
+    char* clip_modes;
+    switch (cliptype)
+    {
+      case CS_CLIPPER_OPTIONAL: clip_modes = clip_optional; break;
+      case CS_CLIPPER_REQUIRED: clip_modes = clip_required; break;
+      case CS_CLIPPER_TOPLEVEL: clip_modes = clip_outer; break;
+      default: clip_modes = clip_optional;
+    }
+
+    // Go through all the modes and select the first one that is
+    // appropriate.
+    int i;
+    for (i = 0 ; i < 3 ; i++)
+    {
+      switch (clip_modes[i])
+      {
+	case 'n':
+	case 'N':
+	case 'z':
+	case 'Z':
+	  if (!no_zbuf_clipping) break;
+      }
+    }
+  }
+
+#endif
+
+  
   bool stencil_enabled = false;
   bool want_clipping = false;
+
   if (mesh.clip_portal != CS_CLIP_NOT &&
       (mesh.clip_portal == CS_CLIP_NEEDED && cliptype != CS_CLIPPER_OPTIONAL))
     want_clipping = true;

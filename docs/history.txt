@@ -19,6 +19,7 @@ The history order is reversed so that new features are at the top.
 	  apps seem to be Ok.
 	  In order to find the changes, just do a search for
 	  "redeye", which marks all the changes.
+	- More work on a better way to select mesh clippers for OpenGL.
 8-May-2001
 	- Martin Geisse did some changes in the RTTI macros:
 	    - Extended object interfaces now use DECLARE_OBJECT_INTERFACE,

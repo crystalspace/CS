@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -51,6 +51,16 @@ struct csOpenGLCaps
   // Do we have broken driver that requires clipping to screen boundaries?
   bool need_screen_clipping;
 };
+
+#define OPENGL_CLIP_NONE		'n'
+#define OPENGL_CLIP_ZBUF		'z'
+#define OPENGL_CLIP_STENCIL		's'
+#define OPENGL_CLIP_PLANES		'p'
+#define OPENGL_CLIP_SOFTWARE		'0'
+#define OPENGL_CLIP_LAZY_NONE		'N'
+#define OPENGL_CLIP_LAZY_ZBUF		'Z'
+#define OPENGL_CLIP_LAZY_STENCIL	'S'
+#define OPENGL_CLIP_LAZY_PLANES		'P'
 
 ///
 class csGraphics3DOGLCommon : public iGraphics3D
@@ -155,7 +165,14 @@ protected:
    * OpenGL capabilities.
    */
   csOpenGLCaps GLCaps;
-
+  
+  /// Prefered clipping modes to use for optional portals.
+  char clip_optional[3];
+  /// Prefered clipping modes to use for required portals.
+  char clip_required[3];
+  /// Prefered clipping modes to use for outer portal.
+  char clip_outer[3];
+  
   /**
    * handle of a local 1D alpha-blend texture; this texture holds an
    * exponential alpha curve from 0 to 1.  Using this texture, you
