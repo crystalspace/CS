@@ -551,7 +551,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   //---
   if (dyn_ambient_r || dyn_ambient_g || dyn_ambient_b)
   {
-    csRGBcolor ambient;
+    csRGBpixel ambient;
     ambient.Set ((unsigned char)(dyn_ambient_r * (255/1.5)),
                  (unsigned char)(dyn_ambient_g * (255/1.5)),
                  (unsigned char)(dyn_ambient_b * (255/1.5)));
@@ -564,9 +564,9 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       for (int i=0; i<lm_size; i++)
       {
         real_lm[i] = static_lm[i];
-        real_lm[i] += ambient;
+        real_lm[i].UnsafeAdd (ambient);
       }
-      temp_max_color_values += ambient;
+      temp_max_color_values.UnsafeAdd (ambient);
 #ifdef DEBUG_OVERFLOWOPT
       countfast++;
 #endif

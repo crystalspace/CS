@@ -1,6 +1,9 @@
 The history order is reversed so that new features are at the top.
 
 26-Sep-2002
+	- Keith Fulton added optimization at Jorrit's request which
+	  uses integer add for non-overflow addition of pixels
+	  instead of per component addition in dynamic ambient lighting.
 	- Engine sequence manager is now registered to the object
 	  registry when it is loaded by the main loader (it will also
 	  first check if it is already in the registry and then use that).
