@@ -111,8 +111,22 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   csSimpleConsole::object_reg = object_reg;
 
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (!G3D) return false;
+  if (G3D == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.console.output.simple",
+	"Console: Unable to locate 3D renderer plugin!");
+    return false;
+  }
+
   G2D = G3D->GetDriver2D ();
+  if (G2D == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.console.output.simple",
+	"Console: Unable to locate 2D canvas plugin!");
+    return false;
+  }
 
   FrameWidth = G2D->GetWidth ();
   FrameHeight = G2D->GetHeight ();
@@ -128,7 +142,9 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   mingap = Config->GetInt ("SimpleConsole.MinimumLineGap", 2);
 
   const char *fontname;
-  if (!strcasecmp (buf, "auto"))
+  if (strcasecmp (buf, "auto") != 0)
+    fontname = buf;
+  else
   {
     // choose a font that allows at least 80 columns of text
     if (FrameWidth <= 560)
@@ -138,20 +154,20 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
     else
       fontname = CSFONT_LARGE;
   }
-  else
-    fontname = buf;
+
   iFontServer *fs = G2D->GetFontServer ();
   if (!fs)
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.console.output.simple",
-	"Console: No font server plug-in loaded!");
+	"Console: Unable to locate font server plugin!");
   else
     console_font = fs->LoadFont (fontname);
+
   if (!console_font)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.console.output.simple",
-        "Cannot load font CONFONT=%s defined in configuration file.\n"
+        "Failed to load font CONFONT=%s defined in configuration file.\n"
         "Try '*large', '*courier', '*italic' or '*small'", buf);
     return false;
   }
@@ -490,8 +506,9 @@ void csSimpleConsole::Draw2D (csRect* area)
       if (console_transparent_bg)
       {
         for (i = 0; i <= LineNumber; i++)
-          WRITE2 (1, th * i, console_fg, console_bg, Line [i], dblbuff);
-        WRITE2 (1 + curx, th * LineNumber, console_fg, -1, (char*)cursor, dblbuff);
+          WRITE2(1, th * i, console_fg, console_bg, Line [i], dblbuff);
+        WRITE2(1 + curx, th * LineNumber, console_fg, -1, (char*)cursor,
+	  dblbuff);
       }
       else
       {
@@ -499,8 +516,8 @@ void csSimpleConsole::Draw2D (csRect* area)
         if (dblbuff && area)
           area->Union (0, 0, FrameWidth - 1, FrameHeight - 1);
         for (i = 0; i <= LineNumber; i++)
-          WRITE (1, th * i, console_fg, -1, Line [i], false);
-        WRITE (1 + curx, th * LineNumber, console_fg, -1, (char*)cursor, false);
+          WRITE(1, th * i, console_fg, -1, Line [i], false);
+        WRITE(1 + curx, th * LineNumber, console_fg, -1, (char*)cursor, false);
       }
       break;
     }

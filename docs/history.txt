@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Apr-2004
+	- Eric Sunshine fixed crasher in csSimpleConsole::Initialize()
+	  (simpcon.cpp) where it would blindly access its G2D member without
+	  first checking if it had managed to actually locate a canvas.
 22-Apr-2004
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.
