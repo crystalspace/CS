@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
+#include "csutil/dirtyaccessarray.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "iengine/viscull.h"
@@ -90,6 +91,13 @@ private:
 
   bool currentSettings;
   csArray<csShaderVariableContext> shadervars;
+
+  // This is a growing array of visible meshes. It will contain
+  // the visible meshes from every recursion level appended. At
+  // exit of this step the visible meshes from the current recursion
+  // level are removed again.
+  csDirtyAccessArray<csRenderMesh*> visible_meshes;
+  int visible_meshes_index;	// First free index in the visible meshes.
 
   static csStringID o2c_matrix_name;
   static csStringID o2c_vector_name;

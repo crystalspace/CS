@@ -18,6 +18,17 @@ chronological order.
 	  world file alone but ideally it should remove the mesh from that
 	  world file. There is an example config file in
 	  data/config/heightmapgen.cfg. This one is not used by default though.
+	- Jorrit fixed a very critical bug in the generic renderloop. In
+	  ShaderTicketHelper a reference was kept to an entry in a growing
+	  array as kept in the step itself. However, during recursion this
+	  growing array may actually grow which may cause the entry to be
+	  relocated in memory. This would make the reference invalid. Fixed
+	  this by using an index instead of a reference. In heavy portalized
+	  worlds this could cause crashes.
+	- Jorrit fixed the generic renderloop so that it no longer allocates
+	  the array of visible meshes on the stack. This can potentially cause
+	  a stack overflow very soon. Especially in combination with portal
+	  based worlds.
 22-Dec-2004
 	- Philipp Aumayr fixed a bug in the thing where the bounding box was not
 	  invalidated when a quad was added.. this fixes a culling probs with

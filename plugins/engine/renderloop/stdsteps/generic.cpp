@@ -171,6 +171,8 @@ csGenericRenderStep::csGenericRenderStep (
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
+
+  visible_meshes_index = 0;
 }
 
 csGenericRenderStep::~csGenericRenderStep ()
@@ -271,8 +273,11 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 
 class ShaderTicketHelper
 {
+private:
   csShaderVarStack& stacks;
-  csShaderVariableContext& shadervars;
+  const csArray<csShaderVariableContext>& shadervars;
+  int shadervars_idx;
+  //csShaderVariableContext& shadervars;
 
   iMaterial* lastMat;
   iShader* lastShader;
@@ -282,10 +287,14 @@ class ShaderTicketHelper
   {
     matShadTicket = (size_t)~0;
   }
+
 public:
   ShaderTicketHelper (csShaderVarStack& Stacks,
-    csShaderVariableContext& svcontext) : stacks (Stacks), 
-    shadervars (svcontext)
+    const csArray<csShaderVariableContext>& sv,
+    int sv_idx) :
+    	stacks (Stacks), 
+    	shadervars (sv),
+	shadervars_idx (sv_idx)
   {
     lastMat = 0;
     lastShader = 0;
@@ -306,10 +315,10 @@ public:
       shader->PushVariables (stacks);
       material->PushVariables (stacks);
       mesh->variablecontext->PushVariables (stacks);
-      shadervars.PushVariables (stacks);
+      shadervars[shadervars_idx].PushVariables (stacks);
       csRenderMeshModes modes (*mesh);
       size_t retTicket = shader->GetTicket (modes, stacks);
-      shadervars.PopVariables (stacks);
+      shadervars[shadervars_idx].PopVariables (stacks);
       mesh->variablecontext->PopVariables (stacks);
       material->PopVariables (stacks);
       shader->PopVariables (stacks);
@@ -321,10 +330,10 @@ public:
       {
         shader->PushVariables (stacks);
         material->PushVariables (stacks);
-	shadervars.PushVariables (stacks);
+	shadervars[shadervars_idx].PushVariables (stacks);
 	csRenderMeshModes modes (*mesh);
 	matShadTicket = shader->GetTicket (modes, stacks);
-	shadervars.PopVariables (stacks);
+	shadervars[shadervars_idx].PopVariables (stacks);
 	material->PopVariables (stacks);
 	shader->PopVariables (stacks);
       }
@@ -350,7 +359,11 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   }
 #endif
   size_t num = meshlist->SortMeshLists ();
-  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
+  visible_meshes.SetLength (visible_meshes_index+num);
+  csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ()
+  	+ visible_meshes_index;
+  int prev_visible_meshes_index = visible_meshes_index;
+  visible_meshes_index += num;
   meshlist->GetSortedMeshes (sameShaderMeshes);
  
   size_t lastidx = 0;
@@ -368,7 +381,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     sv = shadervars.Top ().GetVariableAdd (fogdensity_name);
     sv->SetValue (sector->GetFog()->density);
     sv = shadervars.Top ().GetVariableAdd (fogcolor_name);
-    sv->SetValue (csVector3(sector->GetFog()->red, sector->GetFog()->green, sector->GetFog()->blue));
+    sv->SetValue (csVector3 (sector->GetFog()->red,
+    	sector->GetFog()->green,
+	sector->GetFog()->blue));
 
     //construct a cameraplane
     csVector4 fogPlane;
@@ -386,12 +401,14 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     }
     sv = shadervars.Top ().GetVariableAdd (fogplane_name);
     sv->SetValue (fogPlane);
-  } else {
+  }
+  else
+  {
     sv = shadervars.Top ().GetVariableAdd (fogdensity_name);
     sv->SetValue (0);
   }
 
-  ShaderTicketHelper ticketHelper (stacks, shadervars.Top ());
+  ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.Length ()-1);
 
   for (size_t n = 0; n < num; n++)
   {
@@ -417,6 +434,13 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         mesh->portal->Draw (rview);
         shadervars.Top ().PopVariables (stacks);
       }
+
+      // Portal traversal can relocate the visible_meshes
+      // growing array. So after portal traversal we have to fix
+      // the sameShaderMeshes pointer because it may now point
+      // to an invalid area.
+      sameShaderMeshes = visible_meshes.GetArray ()
+	  	+ prev_visible_meshes_index;
     }
     else 
     {
@@ -468,6 +492,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   shadervars.Pop ();
 
   ToggleStepSettings (g3d, false);
+
+  visible_meshes_index = prev_visible_meshes_index;
 }
 
 void csGenericRenderStep::SetShaderType (const char* type)
