@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+7-Mar-2003
+	- Philip Wyett fixed some old legacy instructions reported
+	  by 'Sqee' (docs mailing list) in the MSVC7 build documentation,
+	  still around from before we had MSVC7 projects files in CVS.
 6-Mar-2003
 	- Reworked the notion of curve templates. The iCurveTemplate has
 	  been removed and it's functionality has moved to iCurve itself.

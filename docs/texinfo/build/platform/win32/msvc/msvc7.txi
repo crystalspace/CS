@@ -105,11 +105,7 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\visualc\csall.dsw}.
-
-@item
-You will now be prompted to convert all older @emph{MSVC 6} project files to the new
-@emph{MSVC 7} format. Click on @emph{Yes To All}.
+Load @file{CS\mk\visualc7\csall.sln}.
 
 @item
 From the file menu select @emph{Build->Build Solution}.
