@@ -162,6 +162,10 @@ private:
   iObjectRegistry *object_reg;
   csRef<iBugPlug> bugplug;
   csKDTree* kdtree;
+  // Ever growing box of all objects that were ever in the tree.
+  // This puts an upper limit of all boxes in the kdtree itself because
+  // those go off to infinity.
+  csBox3 kdtree_box;
   csTiledCoverageBuffer* tcovbuf;
   csArray<csVisibilityObjectWrapper*> visobj_vector;
   csObjectModelManager* model_mgr;

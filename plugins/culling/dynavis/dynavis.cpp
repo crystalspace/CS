@@ -337,6 +337,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj_wrap->full_transform_identity = movable->IsFullTransformIdentity ();
   CalculateVisObjBBox (visobj, bbox, visobj_wrap->full_transform_identity);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
+  kdtree_box += bbox;
 
   // Only add the listeners at the very last moment to prevent them to
   // be called by the calls above (i.e. especially the calculation of
@@ -447,6 +448,7 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   visobj_wrap->full_transform_identity = movable->IsFullTransformIdentity ();
   CalculateVisObjBBox (visobj, bbox, visobj_wrap->full_transform_identity);
   kdtree->MoveObject (visobj_wrap->child, bbox);
+  kdtree_box += bbox;
   visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
@@ -525,7 +527,8 @@ struct VisTest_Front2BackData
 bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 	VisTest_Front2BackData* data, uint32& frustum_mask)
 {
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  csBox3 node_bbox;
+  const csBox3& orig_node_bbox = treenode->GetNodeBBox ();
   const csVector3& pos = data->pos;
 
   csVisibilityObjectHistory* hist = (csVisibilityObjectHistory*)
@@ -553,7 +556,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     goto end;
   }
 
-  if (node_bbox.Contains (pos))
+  if (orig_node_bbox.Contains (pos))
   {
     hist->reason = VISIBLE_INSIDE;
     hist->vis_cnt = history_frame_cnt + dist_history ();
@@ -562,6 +565,9 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     cnt_node_visible++;
     goto end;
   }
+
+  node_bbox = orig_node_bbox;
+  node_bbox *= kdtree_box;
 
   if (do_cull_frustum)
   {
@@ -694,8 +700,8 @@ end:
   if (do_state_dump)
   {
     printf ("Node (%g,%g,%g)-(%g,%g,%g) %s\n",
-    	node_bbox.MinX (), node_bbox.MinY (), node_bbox.MinZ (),
-    	node_bbox.MaxX (), node_bbox.MaxY (), node_bbox.MaxZ (),
+    	orig_node_bbox.MinX (), orig_node_bbox.MinY (), orig_node_bbox.MinZ (),
+    	orig_node_bbox.MaxX (), orig_node_bbox.MaxY (), orig_node_bbox.MaxZ (),
 	hist->reason == INVISIBLE_FRUSTUM ? "outside frustum" :
 	hist->reason == INVISIBLE_TESTRECT ? "covered" :
 	hist->reason == VISIBLE_INSIDE ? "visible inside" :

@@ -96,6 +96,14 @@ chronological order.
 	  Also fixed GetRadius() to use this bbox.
 	- Jorrit fixed nullmesh so it properly implements iNullMeshState
 	  now.
+	- Jorrit changed frustvis so that it now keeps a global bbox of
+	  everything that enters the kdtree. This box will always grow
+	  (never shrink). When testing nodes against the frustum this box
+	  will be used to calculate the REAL bbox of every kdtree node.
+	  This makes the kdtree nodes much smaller (they are now artificially
+	  big) and this will greatly increase the efficiency of frustvis
+	  (and especially in combination with the optimization above).
+	- Jorrit also changed Dynavis in a similar manner.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.

@@ -248,6 +248,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
+  kdtree_box += bbox;
 
   iMeshWrapper* mesh = visobj->GetMeshWrapper ();
   visobj_wrap->mesh = mesh;
@@ -322,6 +323,7 @@ void csFrustumVis::UpdateObject (csFrustVisObjectWrapper* visobj_wrap)
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   kdtree->MoveObject (visobj_wrap->child, bbox);
+  kdtree_box += bbox;
   visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
@@ -345,7 +347,8 @@ struct FrustTest_Front2BackData
 int csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 	FrustTest_Front2BackData* data, uint32& frustum_mask)
 {
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  csBox3 node_bbox = treenode->GetNodeBBox ();
+  node_bbox *= kdtree_box;
 
   if (node_bbox.Contains (data->pos))
   {
