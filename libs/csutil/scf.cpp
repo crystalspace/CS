@@ -63,6 +63,7 @@ public:
   virtual void UnloadUnusedModules ();
   virtual uint32 GetInterfaceID (const char *iInterface);
   virtual void Finish ();
+  virtual void QueryClassList (const char *substring, csVector &vList);
 };
 
 #ifndef CS_STATIC_LINKED
@@ -556,4 +557,24 @@ bool csSCF::ClassRegistered (const char *iClassID)
 uint32 csSCF::GetInterfaceID (const char *iInterface)
 {
   return InterfaceRegistry.Request (iInterface);
+}
+
+void csSCF::QueryClassList (const char *substring, csVector &vList)
+{
+  // wade through the ClassRegistry to find what we are looking for
+  if (substring)
+  {
+    int len = strlen (substring);
+    for (int i=0; i<ClassRegistry->Length (); i++)
+    {
+      iFactory *fact = (iFactory *)ClassRegistry->Get(i);
+      if (!strncasecmp (substring, fact->QueryClassID (), len))
+	vList.Push ((csSome)fact->QueryClassID ());
+    }
+  }
+  else
+  {
+    for (int i=0; i<ClassRegistry->Length (); i++)
+      vList.Push ((csSome)((iFactory *)ClassRegistry->Get(i))->QueryClassID ());
+  }
 }
