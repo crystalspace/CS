@@ -82,7 +82,7 @@ You can now run the executable @file{walktest}.
 @subsubheading Renderer Selection
 
 The OpenGL renderer is used by default when you run Crystal Space programs.  To
-select a different renderruer, such as the software renderer, you can edit your
+select a different renderer, such as the software renderer, you can edit your
 local configuration file @file{$HOME/.crystal/Global.cfg}.  Add the following
 line to select the software renderer for all applications:
 
@@ -90,16 +90,15 @@ line to select the software renderer for all applications:
 System.Plugins.iGraphics3D = crystalspace.graphics3d.software
 @end example
 
-The software renderer can run with the X11 or SVGAlib drivers.  If the
-@samp{DISPLAY} environment variable is defined it will choose the X11 driver,
-otherwise it will try the @samp{SVGAlib} driver, if SVGAlib is available on
-your platform.
-
+@noindent
 Alternately, you can choose the software renderer from the command-line:
 
 @example
 ./walktest -video=software
 @end example
+
+The software renderer interacts with X11, placing output on the display
+indicated by the @samp{DISPLAY} environment variable.
 
 Finally, if you want to utilize Crystal Space as a software development kit
 (@sc{sdk}), you can install it and then clean up the detritus of the build

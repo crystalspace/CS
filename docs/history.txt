@@ -94,6 +94,7 @@ chronological order.
 	    demosky     --> DEMOSKY_OBSOLETE
 	    demosky2    --> DEMOSKY_OBSOLETE
 	    simplecloth --> CLOTH_OBSOLETE
+	    svgalib     --> SVGALIB_OBSOLETE
 	- res added a note about the CS_FX_GOURAUD removal to the API 
 	  modification appendix.
 1-May-2004

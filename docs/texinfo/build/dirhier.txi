@@ -360,7 +360,7 @@ Windows DirectDraw (version 8) driver.
 Common DirectX (Win32) code.
 
 @item CS/plugins/video/canvas/macosx
-MacOS/X OpenGL, CoreGraphics, and Cocoa 2D graphics drivers.
+MacOS/X OpenGL and CoreGraphics graphics drivers.
 
 @item CS/plugins/video/canvas/memory
 Memory driver (render a scene directly to memory).
@@ -379,9 +379,6 @@ OpenGL 2D driver for X11.
 
 @item CS/plugins/video/canvas/softx
 X11 software 2D driver.
-
-@item CS/plugins/video/canvas/svgalib
-SVGAlib driver (Linux).
 
 @item CS/plugins/video/canvas/xextf86vm
 X-extension driver (X11).

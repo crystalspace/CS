@@ -28,22 +28,7 @@
 #define PATH_SEPARATOR  '/'
 #define PATH_DELIMITER	':'
 
-#ifdef CS_SYSDEF_PROVIDE_SOFTWARE2D
-#  define CS_SOFTWARE_2D_DRIVER get_software_2d_driver ()
-   static inline char* get_software_2d_driver ()
-   {
-     if (getenv ("GGI_DISPLAY"))
-       return "crystalspace.graphics2d.ggi";
-     else if (getenv ("DISPLAY"))
-       return "crystalspace.graphics2d.x2d";
-#  if defined (CS_HAS_SVGALIB)
-     else
-       return "crystalspace.graphics2d.svgalib";
-#  endif
-     return 0;
-   }
-#endif
-
+#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.x2d"
 
 #ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
 
