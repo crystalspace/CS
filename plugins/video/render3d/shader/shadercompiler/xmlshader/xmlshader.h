@@ -108,7 +108,7 @@ private:
     shaderPass () 
     { 
       SCF_CONSTRUCT_IBASE (0);
-      mixMode = CS_FX_COPY;
+      mixMode = CS_FX_MESH;
       overrideZmode = false;
     }
 

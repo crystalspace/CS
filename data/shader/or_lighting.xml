@@ -2,7 +2,6 @@
 <shader type="xmlshader" name="or_lighting">
     <technique priority="100">
 	<pass>
-	    <mixmode><copy /></mixmode>
 	    <buffer name="vertices" destination="position" />
 	    <buffer name="colors" destination="primary color" />
 	    <buffer name="texture coordinates" destination="texture coordinate 0" />
@@ -31,14 +30,13 @@
     </technique>
     <technique priority="50">
 	<pass>
-	    <mixmode><copy /></mixmode>
 	    <buffer name="vertices" destination="position" />
 	    <buffer name="colors" destination="primary color" />
 	    <buffer name="texture coordinates" destination="texture coordinate 0" />
 	    <texture name="tex diffuse" destination="unit 0" />
 	</pass>
 	<pass>
-	    <mixmode><multiply2 /></mixmode>
+	    <mixmode><multiply2 /></mixmode><!-- @@@ probably not always desired -->
 	    <zmode><zmesh2 /></zmode>
 	    <buffer name="vertices" destination="position" />
 	    <buffer name="lightmap coordinates" destination="texture coordinate 0" />

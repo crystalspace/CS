@@ -834,7 +834,6 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   lastTexturesCount = thispass->textureCount;
 
   // @@@ Is it okay to modify the render mesh here?
-  mesh->mixmode = thispass->mixMode;
   if (thispass->alphaMode.autoAlphaMode)
   {
     iTextureHandle* tex = 0;
@@ -847,7 +846,14 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   }
   else
     mesh->alphaType = thispass->alphaMode.alphaType;
-
+  // Override mixmode, if requested
+  if ((thispass->mixMode & CS_FX_MASK_MIXMODE) == CS_FX_MESH)
+  {
+    if ((mesh->mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+      mesh->alphaType = csAlphaMode::alphaSmooth;
+  }
+  else
+    mesh->mixmode = thispass->mixMode;
 
   if(thispass->vp) thispass->vp->SetupState (mesh, dynamicDomains);
   if(thispass->fp) thispass->fp->SetupState (mesh, dynamicDomains);

@@ -10,6 +10,10 @@ chronological order.
         - Fritz Elfert fixed conversion of bezier mesh factories in map2cs
           and re-enabled them (With wrong cvs log-message: "Before big
           camera change", sorry).
+	- res added a "mesh" mixmode. Works similar to the "mesh" zmode, if 
+	  used as the mixmode in a shader pass the rendered mesh's resp. 
+	  mixmode will be used.
+	- res made some fixes so NR properly respects the "alpha" mixmode.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it

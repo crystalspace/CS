@@ -214,7 +214,8 @@ bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
   return true;
 }
 
-bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
+bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
+					bool allowFxMesh)
 {
 #define MIXMODE_EXCLUSIVE				\
   if (mixmode & CS_FX_MASK_MIXMODE)			\
@@ -263,6 +264,12 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
       case XMLTOKEN_TRANSPARENT: mixmode |= CS_FX_TRANSPARENT; break;
       case XMLTOKEN_KEYCOLOR: mixmode |= CS_FX_KEYCOLOR; break;
       case XMLTOKEN_TILING: mixmode |= CS_FX_TILING; break;
+      case XMLTOKEN_MESH:
+	if (allowFxMesh)
+	{
+	  MIXMODE_EXCLUSIVE mixmode |= CS_FX_SRCALPHAADD; 
+	  break;
+	}
       default:
         ReportBadToken (child);
         return false;

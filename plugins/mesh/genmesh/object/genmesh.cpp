@@ -996,7 +996,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   //mesh.object2world = movable->GetFullTransform ();
 
   // Prepare for rendering.
-  mesh.mixmode = CS_FX_COPY; // MixMode;
+  mesh.mixmode = MixMode;
 
   mesh.indexstart = 0;
   mesh.indexend = factory->GetTriangleCount () * 3;

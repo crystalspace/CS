@@ -1666,7 +1666,10 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
       }*/
     }
 
-    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
+    float alpha = 1.0f;
+    if ((mymesh->mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+      alpha = (float)(mymesh->mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+    glColor4f (1.0f, 1.0f, 1.0f, alpha);
     glDrawElements (
       primitivetype,
       mymesh->indexend - mymesh->indexstart,
@@ -1677,7 +1680,8 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     indexbuf->Release();
   }
 
-  if(mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) {
+  if(mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
+  {
       glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
       glDisable(GL_POINT_SPRITE_ARB);
   }

@@ -56,7 +56,7 @@ struct iStringSet;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 4, 0);
+SCF_VERSION (iSyntaxService, 1, 5, 0);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -104,7 +104,8 @@ struct iSyntaxService : public iBase
   /**
    * Parse a mixmode description. Returns true if successful.
    */
-  virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode) = 0;
+  virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode,
+    bool allowFxMesh = false) = 0;
 
   /**
    * Handles a common portal parameter.
