@@ -744,7 +744,8 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
   }
   if (!strcasecmp (command, "userendertarget"))
   {
-    hasRenderTarget = va_arg (args, bool);
+    int hasRenderTarget = va_arg (args, int);
+    csGraphics2DGLCommon::hasRenderTarget = (hasRenderTarget != 0);
     return true;
   }
   return false;

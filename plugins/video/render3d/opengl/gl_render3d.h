@@ -382,7 +382,7 @@ public:
     rt_onscreen = !persistent;
     rt_cliprectset = false;
 
-    bool hasRenderTarget = (handle != 0);
+    int hasRenderTarget = (handle != 0) ? 1 : 0;
     G2D->PerformExtension ("userendertarget", hasRenderTarget);
   }
 

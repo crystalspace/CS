@@ -665,6 +665,9 @@ bool csTerrBlock::IsMaterialUsed (int index)
     // Jorrit: for some reason we must cap mmRight and mmBottom.
     if (mmRight >= terr->materialMapW) mmRight = terr->materialMapW-1;
     if (mmBottom >= terr->materialMapH) mmBottom = terr->materialMapH-1;
+    // res: and mmLeft/mmTop... :)
+    if (mmLeft < 0) mmLeft = 0;
+    if (mmTop < 0) mmTop = 0;
 
     bool matUsed = false;
     for (int y = mmTop; y <= mmBottom; y++)

@@ -344,6 +344,15 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
   ci->pixmap = pixmap;
 
   // Add to hashlist
+  {
+    csHash<CursorInfo*, csStrKey, csConstCharHashKeyHandler>::Iterator it =
+      cursors.GetIterator (name);
+    while (it.HasNext ())
+    {
+      CursorInfo* ci = it.Next ();
+      delete ci;
+    }
+  }
   cursors.DeleteAll (name);
   cursors.Put (name, ci);
 }
@@ -454,5 +463,12 @@ bool csCursor::RemoveCursor (const char *name)
 
 void csCursor::RemoveAllCursors ()
 {
+  csHash<CursorInfo*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
+    cursors.GetIterator ();
+  while (it.HasNext ())
+  {
+    CursorInfo* ci = it.Next ();
+    delete ci;
+  }
   cursors.DeleteAll ();
 }
