@@ -26079,8 +26079,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalCoreSkeleton* s = (CalCoreSkeleton*)0;
-	    s->calculateBoundingBoxes((CalCoreModel*)0);
+CalPhysique* p = (CalPhysique*)0;
+	    p->calculateVertex((CalSubmesh*)0,0);
   ;
   return 0;
 }
@@ -26231,8 +26231,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalCoreSkeleton* s = (CalCoreSkeleton*)0;
-	    s->calculateBoundingBoxes((CalCoreModel*)0);
+CalPhysique* p = (CalPhysique*)0;
+	    p->calculateVertex((CalSubmesh*)0,0);
   ;
   return 0;
 }
