@@ -320,5 +320,45 @@ public:
   virtual bool Prepare();
 };
 
+class csShaderVariable : public iShaderVariable
+{
+private:
+  csString name;
+
+  VariableType type;
+
+  int intval;
+  float floatval;
+  csRef<iString> istring;
+  csVector3 v3;
+  csVector4 v4;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csShaderVariable()
+  {
+    type = INT;
+    intval = 0;
+  }
+  virtual ~csShaderVariable() { }
+
+  virtual VariableType GetType() { return type; }
+  virtual void SetType(VariableType newtype) { type = newtype; }
+
+  virtual void SetName(const char* name) { csShaderVariable::name = csString(name); }
+  virtual const char* GetName() { return name; }
+  virtual bool GetValue(int& value) { if(type==INT) {value = intval; return true;} return false; }
+  virtual bool GetValue(float& value) { if(type==VECTOR1) {value = floatval; return true;} return false; }
+  virtual bool GetValue(iString* value) { if(type==STRING) {value = istring; return true;} return false; }
+  virtual bool GetValue(csVector3& value) { if(type==VECTOR3) {value = v3; return true;} return false; }
+  virtual bool GetValue(csVector4& value) { if(type==VECTOR4) {value = v4; return true;} return false; }
+  virtual bool SetValue(int value) { type=INT; intval = value; return true; }
+  virtual bool SetValue(float value) { type=VECTOR1; floatval = value; return true; }
+  virtual bool SetValue(iString* value) { type=STRING; istring = value; return true; }
+  virtual bool SetValue(csVector3 value) { type=VECTOR3; v3 = value; return true; }
+  virtual bool SetValue(csVector4 value) { type=VECTOR4; v4 = value; return true; }
+};
+
 #endif //__SHADERMGR_H__
 

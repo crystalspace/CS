@@ -37,7 +37,7 @@
 #include "ivaria/reporter.h"
 
 #include "ivideo/shader/shader.h"
-#include "ivideo/shader/shadervar.h"
+//#include "ivideo/shader/shadervar.h"
 #include "ivideo/render3d.h"
 #include "shadermgr.h"
 
@@ -75,6 +75,10 @@ SCF_IMPLEMENT_IBASE_END
 SCF_EXPORT_CLASS_TABLE( shadermgr )
   SCF_EXPORT_CLASS( csShaderManager, "crystalspace.render3d.shadermanager", "Shader manager" )
 SCF_EXPORT_CLASS_TABLE_END
+
+SCF_IMPLEMENT_IBASE( csShaderVariable )
+  SCF_IMPLEMENTS_INTERFACE( iShaderVariable )
+SCF_IMPLEMENT_IBASE_END
 
 //=================== csShaderManager ================//
 
