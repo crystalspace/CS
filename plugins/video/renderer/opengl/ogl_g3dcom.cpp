@@ -5756,7 +5756,7 @@ void csGraphics3DOGLCommon::ClearCache ()
   // become invalid. We won't clear texture cache since texture items are
   // cleaned up individually when an iTextureHandle's RefCount reaches zero.
   FlushDrawPolygon ();
-  texture_cache->Clear ();
+  if (texture_cache) texture_cache->Clear ();
 }
 
 void csGraphics3DOGLCommon::DumpCache ()

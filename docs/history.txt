@@ -12,6 +12,8 @@ chronological order.
 	  get random color effects in the new renderer.
 	- Jorrit fixed waterdemo.cfg which was depending on the font
 	  multiplexer for some reason.
+	- Jorrit fixed a crash bug in the OpenGL renderer introduced
+	  yesterday. This would cause walktest to crash at exit.
 16-Dec-2003
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.
