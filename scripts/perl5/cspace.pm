@@ -4653,6 +4653,38 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iEngineSectorCallback ##############
+
+package cspace::iEngineSectorCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*NewSector = *cspacec::iEngineSectorCallback_NewSector;
+*RemoveSector = *cspacec::iEngineSectorCallback_RemoveSector;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iEngineSectorCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iEngine ##############
 
 package cspace::iEngine;
@@ -4684,6 +4716,8 @@ package cspace::iEngine;
 *CreateBlackTexture = *cspacec::iEngine_CreateBlackTexture;
 *CreateMaterial = *cspacec::iEngine_CreateMaterial;
 *CreateSector = *cspacec::iEngine_CreateSector;
+*AddEngineSectorCallback = *cspacec::iEngine_AddEngineSectorCallback;
+*RemoveEngineSectorCallback = *cspacec::iEngine_RemoveEngineSectorCallback;
 *CreateSectorWallsMesh = *cspacec::iEngine_CreateSectorWallsMesh;
 *CreateThingMesh = *cspacec::iEngine_CreateThingMesh;
 *GetSectors = *cspacec::iEngine_GetSectors;
