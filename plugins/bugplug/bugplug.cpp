@@ -162,16 +162,16 @@ csBugPlug::~csBugPlug ()
   CleanDebugSector ();
   CleanDebugView ();
 
-  if (spider)
-  {
-    if (Engine) spider->UnweaveWeb (Engine);
-    delete spider;
-  }
-  if (shadow)
-  {
-    if (Engine) shadow->RemoveFromEngine (Engine);
-    delete shadow;
-  }
+  //if (spider)
+  //{
+    //if (Engine) spider->UnweaveWeb (Engine);
+    //delete spider;
+  //}
+  //if (shadow)
+  //{
+    //if (Engine) shadow->RemoveFromEngine (Engine);
+    //delete shadow;
+  //}
   while (mappings)
   {
     csKeyMap* n = mappings->next;
