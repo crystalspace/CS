@@ -11,6 +11,12 @@ The history order is reversed so that new features are at the top.
 	  'effects' to 'drivers' and 'drivers3d' targets.
 	- Sound loaders are no longer listed in the 'drivers' and 'snddrivers'
 	  targett. Those are not drivers.
+	- Fixed a bug in the OpenGL renderer where a 'modified' flag was
+	  not exactly set in the right way.
+	- Fixed a bug in DrawPolygonMesh() with regards to lightmaps (in the
+	  OpenGL renderer). The bug was that GL_RGBA8 was used in case
+	  the super lightmap was not in the cache and GL_RGBA was used
+	  otherwise. Now GL_RGBA is used in all cases.
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.

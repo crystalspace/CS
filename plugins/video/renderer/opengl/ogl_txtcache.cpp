@@ -367,7 +367,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   bool* modified)
 {
   Setup ();
-  modified = false;
+  *modified = false;
   //First: Try to find a free superlightmap
   //Check if the superLightmap is already in the cache
 
@@ -379,6 +379,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   int numLightmaps = s->lightmaps.Length ();
   if (s->cacheData)
   {
+//printf ("in cache!\n"); fflush (stdout);
     //The data is already in cache, let's see
     // if we need to recalculate the lightmaps
     // due the effect of dynamic lights
@@ -406,6 +407,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
 
     return;
   }
+//printf ("NOT in cache!\n"); fflush (stdout);
 
   // The superlightmap isn't in the cache, so we have to cache it.
   int index = FindFreeSuperLightmap ();
@@ -438,7 +440,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
     csRect r = rectangleArray[i];
     csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
     glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-      lmwidth, lmheigth, GL_RGBA8, GL_UNSIGNED_BYTE, lm_data);
+      lmwidth, lmheigth, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
   }
   s->initialized = true;
 }
