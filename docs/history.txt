@@ -4,6 +4,9 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 12-Apr-2003
+	- Rhad added frequency adjustment capabilities to the software
+	  sound renderer.  These changes only take effect if 
+	  SetFrequencyFactor() is called with a value >0.0 and !=1.0.  
 	- Philip Wyett fixed clean of 'CS' root dir for 'jam distclean'
 	  after recent configure merge/changes.
 	    - Eliminated DO_ASM redefinition in jam build.

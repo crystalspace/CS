@@ -88,6 +88,8 @@ public:
   float CalcVolL, CalcVolR;
   // calculated frequency factor
   float CalcFreqFactor;
+  // stored sample offset used between steps  0.0<=SampleOffset<1.0
+  float SampleOffset;
 
 protected:
   // restart the sound to the beginning

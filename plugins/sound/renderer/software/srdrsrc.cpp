@@ -44,6 +44,7 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
   Active = false;
   SoundPos = 0;
   SoundHandle = hdl;
+  SampleOffset=0.0f;
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
@@ -331,12 +332,14 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
   long NumSamples = size / OutBPS;
 
   if (snd->IsStatic ())
-    while (1)
+    if (CalcFreqFactor == 1.0 || CalcFreqFactor <= 0.0)
     {
+      while (1)
+      {
       long Num = NumSamples;
 
       if (SoundPos + Num > snd->GetStaticSampleCount())
-	Num = snd->GetStaticSampleCount() - SoundPos;
+  	Num = snd->GetStaticSampleCount() - SoundPos;
       unsigned char *Input = (unsigned char*)snd->GetStaticData();
 
       WriteBuffer(Input + SoundPos * InBPS, mem, Num);
@@ -347,10 +350,176 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
       if (NumSamples == 0) break;
       if (!(PlayMethod & SOUND_LOOP))
       {
-	Active = (SoundPos  < snd->GetStaticSampleCount()); 
-	break;
+        Active = (SoundPos  < snd->GetStaticSampleCount()); 
+        break;
       }
       Restart();
+      }
+    }
+    else
+    {
+      /* Frequency shifted sound.
+       *  
+       *  The concept here is that a normal step size is 1 sample.
+       *  The Frequency Factor can be thought of as a multiplier to
+       *  the step size, so that the real step size is 1*FreqFactor
+       *  or just FreqFactor.
+       *  Any given step will either fall directly on a source sample
+       *  or part way between two samples.
+       *  In the first case, we simply use the source sample.
+       *  In the other case, we read the two samples surrounding this
+       *  step and calculate what value the step would have if the
+       *  sample values were linearly connected.
+       * 
+       *         B=1.0
+       *        /
+       *       /
+       *      Step=.7
+       *     /
+       *    A=.5
+       */
+      int channels=snd->GetFormat()->Channels;
+      int bits=snd->GetFormat()->Bits;
+      long WriteSample=0;
+      long SampleCount=snd->GetStaticSampleCount();
+
+      if (bits==8)
+      {
+        unsigned char InterpolatedData[2];
+        unsigned char *Input = (unsigned char*)snd->GetStaticData();
+        /* This loop has to move 1 sample at a time to perform 
+        *  linear interpolation between actual data points. 
+        */
+        while (WriteSample<NumSamples)
+        {
+          // Each channel must be calculated separately
+          for (int channel_num=0;channel_num<channels;channel_num++)
+          {
+            if (SampleOffset==0.0f || SoundPos>=SampleCount)
+            {
+              /* If this sample falls exactly on a source sample
+              *  or if it falls after the last sample, use only
+              *  one sample.
+              */
+              InterpolatedData[channel_num]=Input[SoundPos*channels+channel_num];
+            }
+            else
+            {
+              /* If this sample point falls betwee two source points
+              *  perform a linear interpolation between the two points 
+              *  to estimate this value.
+              */
+              InterpolatedData[channel_num]=(unsigned char)((float)(Input[(SoundPos+1)*channels+channel_num]-Input[SoundPos*channels+channel_num])*SampleOffset)+Input[SoundPos*channels+channel_num];
+            }
+
+
+          }
+
+          WriteBuffer(InterpolatedData,mem,1);
+          mem = ((unsigned char *)mem) + OutBPS;
+
+          // SampleOffset may be >= 1.0 after this addition
+          SampleOffset+=CalcFreqFactor;
+          /* SoundPos is an integer value, so only the integer portion
+          *  of SampleOffset is added here.
+          */
+          SoundPos+=(int)SampleOffset;
+          /* By subtracting the integer portion of SampleOffset
+          *  from the floating point number, we are left with
+          *  0.0 <= SampleOffset < 1.0 which we can use in the
+          *  linear calculation in the next write cycle.
+          */
+          SampleOffset=SampleOffset -(int)SampleOffset;
+
+          // Advance the write sample as well
+          WriteSample++;
+
+          /* If we are past the end of the static buffer
+          *  we are either done, or need to restart at
+          *  the begining.
+          */
+          if (SoundPos>SampleCount)
+          {
+            if (!(PlayMethod & SOUND_LOOP))
+            {
+              Active = (SoundPos  < snd->GetStaticSampleCount()); 
+              break;
+            }
+            else
+            {
+              SoundPos%=SampleCount;
+              Restart();
+            }
+          } 
+        }
+      }
+      else
+      {
+        short InterpolatedData[2];
+        short *Input = (short *)snd->GetStaticData();
+        /* This loop has to move 1 sample at a time to perform 
+        *  linear interpolation between actual data points. 
+        */
+        while (WriteSample<NumSamples)
+        {
+          // Each channel must be calculated separately
+          for (int channel_num=0;channel_num<channels;channel_num++)
+          {
+            if (SampleOffset==0.0f || SoundPos>=SampleCount)
+            {
+              /* If this sample falls exactly on a source sample
+              *  or if it falls after the last sample, use only
+              *  one sample.
+              */
+              InterpolatedData[channel_num]=Input[SoundPos*channels+channel_num];
+            }
+            else
+            {
+              /* If this sample point falls betwee two source points
+              *  perform a linear interpolation between the two points 
+              *  to estimate this value.
+              */
+              InterpolatedData[channel_num]=(short)((float)(Input[(SoundPos+1)*channels+channel_num]-Input[SoundPos*channels+channel_num])*SampleOffset)+Input[SoundPos*channels+channel_num];
+            }
+          }
+          WriteBuffer(InterpolatedData,mem,1);
+          mem = ((unsigned char *)mem) + OutBPS;
+
+          // SampleOffset may be >= 1.0 after this addition
+          SampleOffset+=CalcFreqFactor;
+          /* SoundPos is an integer value, so only the integer portion
+          *  of SampleOffset is added here.
+          */
+          SoundPos+=(int)SampleOffset;
+          /* By subtracting the integer portion of SampleOffset
+          *  from the floating point number, we are left with
+          *  0.0 <= SampleOffset < 1.0 which we can use in the
+          *  linear calculation in the next write cycle.
+          */
+          SampleOffset=SampleOffset -(int)SampleOffset;
+
+          // Advance the write sample as well
+          WriteSample++;
+
+          /* If we are past the end of the static buffer
+          *  we are either done, or need to restart at
+          *  the begining.
+          */
+          if (SoundPos>SampleCount)
+          {
+            if (!(PlayMethod & SOUND_LOOP))
+            {
+              Active = (SoundPos  < snd->GetStaticSampleCount()); 
+              break;
+            }
+            else
+            {
+              SoundPos%=SampleCount;
+              Restart();
+            }
+          } 
+        }
+      }
     }
   else // streamed sound
   {
@@ -362,26 +531,26 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
       void *Buffer = snd->ReadStreamed (Num);
       if (Num)
       {
-	WriteBuffer(Buffer, mem, Num);
-	NumSamples -= Num;
-	mem = ((unsigned char *)mem) + Num * OutBPS;
+        WriteBuffer(Buffer, mem, Num);
+        NumSamples -= Num;
+        mem = ((unsigned char *)mem) + Num * OutBPS;
       }
       if (NumSamples == 0) break;
 
       if (Num == 0)
       {
-	if (!(PlayMethod & SOUND_LOOP))
-	{
-	  Active = false;
-	  break;
-	}
-	if (wait == 0)
-	{
-	  Restart();
-	  wait++;
-	}
-	else
-	  break;
+        if (!(PlayMethod & SOUND_LOOP))
+        {
+          Active = false;
+          break;
+        }
+        if (wait == 0)
+        {
+          Restart();
+          wait++;
+        }
+        else
+          break;
       }
     }
   }
