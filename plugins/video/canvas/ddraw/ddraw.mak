@@ -2,39 +2,18 @@
 # to build the Windows DirectDraw 2D driver
 
 # Driver description
-ifeq ($(COMP),BC)
-DESCRIPTION.ddraw5 = Crystal Space Windows DirectDraw 2D driver
-else
 DESCRIPTION.ddraw = Crystal Space Windows DirectDraw 2D driver
-endif
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-ifeq ($(COMP),BC)
-DRIVERHELP += $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw5)$"
-else
 DRIVERHELP += $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw)$"
-endif
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
-
-ifeq ($(COMP),BC)
-
-.PHONY: ddraw5
-
-all plugins drivers drivers2d: ddraw5
-
-ddraw5:
-	$(MAKE_TARGET) MAKE_DLL=yes
-ddraw5clean:
-	$(MAKE_CLEAN)
-
-else
 
 .PHONY: ddraw
 
@@ -45,35 +24,12 @@ ddraw:
 ddrawclean:
 	$(MAKE_CLEAN)
 
-endif
-
 endif # ifeq ($(MAKESECTION),roottargets)
 
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifeq ($(COMP),BC)
-LIBS.DDRAW5+=ddraw.lib
-ifeq ($(USE_SHARED_PLUGINS),yes)
-  DDRAW5=ddraw5$(DLL)
-  DEP.DDRAW5=$(CSUTIL.LIB) $(CSSYS.LIB)
-  LIBS.LOCAL.DDRAW5=$(LIBS.DDRAW5)
-else
-  DDRAW5=$(OUT)$(LIB_PREFIX)ddraw5$(LIB)
-  DEP.EXE+=$(DDRAW5)
-  LIBS.EXE+=$(LIBS.DDRAW5)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DDRAW2D
-endif
-
-DESCRIPTION.$(DDRAW5)=$(DESCRIPTION.ddraw5)
-
-else
-#		COMP_GCC/COMP_VC
-ifeq ($(COMP),VC)
-LIBS.DDRAW+=ddraw.lib
-else
-LIBS.DDRAW+=-lddraw
-endif
+LIBS.DDRAW+=$(LFLAGS.l)ddraw$(LIB)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   DDRAW=ddraw2d$(DLL)
@@ -88,9 +44,7 @@ endif
 
 DESCRIPTION.$(DDRAW)=$(DESCRIPTION.ddraw)
 
-endif
-
-SRC.DDRAW = $(wildcard libs/cs2d/ddraw/*.cpp $(SRC.COMMON.DRV2d)) \
+SRC.DDRAW = $(wildcard libs/cs2d/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \
 	libs/cssys/win32/directdetection.cpp
 OBJ.DDRAW = $(addprefix $(OUT),$(notdir $(SRC.DDRAW:.cpp=$O)))
 
@@ -101,29 +55,6 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/ddraw
 
-ifeq ($(COMP),BC)
-.PHONY: ddraw5 ddraw5clean
-
-# Chain rules
-clean: ddraw5clean
-
-ddraw5: $(OUTDIRS) $(DDRAW5)
-
-$(DDRAW5): $(OBJ.DDRAW5) $(DEP.DDRAW5)
-	$(DO.PLUGIN) $(LIBS.LOCAL.DDRAW5)
-
-ddraw5clean:
-	$(RM) $(DDRAW5) $(OBJ.DDRAW5)
-
-ifdef DO_DEPEND
-depend: $(OUTOS)ddraw5.dep
-$(OUTOS)ddraw5.dep: $(SRC.DDRAW5)
-	$(DO.DEP)
-else
--include $(OUTOS)ddraw5.dep
-endif
-
-else
 .PHONY: ddraw ddrawclean
 
 # Chain rules
@@ -145,6 +76,5 @@ else
 -include $(OUTOS)ddraw.dep
 endif
 
-endif
-   
 endif # ifeq ($(MAKESECTION),targets)
+
