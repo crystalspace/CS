@@ -1026,16 +1026,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
   csRef<iRender3D> r3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
   if (name == vertex_name)
   {
-#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_vertices_dirty_flag)
     {
+#ifndef CS_USE_SHADOW_VOLUMES
       vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
       csVector3* vbuf = (csVector3*)vertex_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
 #else
-    if (mesh_vertices_dirty_flag || mesh_triangle_dirty_flag) {
       vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
       csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -1053,16 +1052,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
   }
   if (name == texel_name)
   {
-#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_texels_dirty_flag)
     {
+#ifndef CS_USE_SHADOW_VOLUMES
       texel_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
 #else
-    if (mesh_texels_dirty_flag || mesh_triangle_dirty_flag) {
       texel_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector2)*num_mesh_triangles*3, CS_BUF_STATIC);
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -1080,16 +1078,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
   }
   if (name == normal_name)
   {
-#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_normals_dirty_flag)
     {
+#ifndef CS_USE_SHADOW_VOLUMES
       normal_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
 #else
-    if (mesh_normals_dirty_flag || mesh_triangle_dirty_flag) {
       normal_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -1105,8 +1102,10 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     }
     return normal_buffer;
   }
-  if (name == trinormal_name) {
-    if (mesh_tri_normals_dirty_flag || mesh_triangle_dirty_flag) {
+  if (name == trinormal_name) 
+  {
+    if (mesh_tri_normals_dirty_flag)  /* autonormalized */
+	{
       trinormal_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
       csVector3 *tbuf = (csVector3*)trinormal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -1119,20 +1118,34 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       trinormal_buffer->Release ();
       mesh_tri_normals_dirty_flag = false;
     }
+	else if (mesh_triangle_dirty_flag) /* computed without autonormal */
+	{
+      trinormal_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
+      csVector3 *tbuf = (csVector3*)trinormal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      int tbuf_index = 0;
+      for (int i = 0; i < num_mesh_triangles; i ++) {
+        csVector3 ab = mesh_vertices [mesh_triangles[i].b] - mesh_vertices [mesh_triangles[i].a];
+        csVector3 bc = mesh_vertices [mesh_triangles[i].c] - mesh_vertices [mesh_triangles[i].b];
+        csVector3 face_normal = ab % bc;
+        tbuf[tbuf_index++] = face_normal;
+        tbuf[tbuf_index++] = face_normal;
+        tbuf[tbuf_index++] = face_normal;
+      }
+	}
     return trinormal_buffer;
   }
   if (name == color_name)
   {
-#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_colors_dirty_flag)
     {
+#ifndef CS_USE_SHADOW_VOLUMES
       color_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
       csColor *cbuf = (csColor*)color_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
 #else
-    if (mesh_colors_dirty_flag || mesh_triangle_dirty_flag) {
       color_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csColor)*num_mesh_triangles*3, CS_BUF_STATIC);
       csColor *cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
