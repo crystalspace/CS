@@ -282,12 +282,18 @@ bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
   int rc = 0;
   if (timeout > 0)
   {
+    long const nsec_per_sec = 1000 * 1000 * 1000;
     struct timeval now;
     struct timezone tz;
     struct timespec to;
     gettimeofday (&now, &tz);
     to.tv_sec = now.tv_sec + (timeout / 1000);
     to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
+    if (to.tv_nsec > nsec_per_sec) // Catch overflow.
+    {
+      to.tv_sec += to.tv_nsec / nsec_per_sec;
+      to.tv_nsec %= nsec_per_sec;
+    }
     rc = pthread_cond_timedwait (&cond, &((csPosixMutex*)mutex)->mutex, &to);
     switch (rc)
     {

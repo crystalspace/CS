@@ -19,6 +19,15 @@ chronological order.
 	      targets unless some other 2D op was done prior FinishDraw().
 	    - Made the Win32Assistant unregister the CS window class on
 	      destruction.
+	- Eric Sunshine fixed bug in csPosixCondition::Wait() where it was not
+	  taking nanosecond overflow into account when computing the absolute
+	  time for the invocation of pthread_cond_timedwait(), with the result
+	  that it would store an invalid (> 1 billion) number of nanoseconds in
+	  the timespec::tv_nsec member. Although some pthread implementations
+	  seem to ignore this erroneous value, others, such as NPTL (Native
+	  Posix Thread Library), are more strict and correctly return the error
+	  code EINVAL when handed this bogus time value. A big thanks to Andrew
+	  Mann for catching this bug.
 19-Jan-2005
 	- Jorrit fixed a bug in csMeshList::Add() and csMeshFactoryList::Add().
 	  It was returning true on success instead of the last added index.
