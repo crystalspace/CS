@@ -333,7 +333,8 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
    */
   m_nDepthBits = pfd.cDepthBits;
 
-  if (pfd.dwFlags & PFD_GENERIC_FORMAT)
+  hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT);
+  if (!hardwareAccelerated)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "No hardware acceleration!");
@@ -543,6 +544,12 @@ bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
 
 bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
 {
+  if (!strcasecmp (command, "hardware_accelerated"))
+  {
+    bool* hasAccel = (bool*)va_arg (args, bool*);
+    *hasAccel = hardwareAccelerated;
+    return true;
+  }
   if (!strcasecmp (command, "configureopengl"))
   {
     // Ugly hack needed to work around an interference between the 3dfx opengl

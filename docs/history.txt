@@ -15,6 +15,9 @@ The history order is reversed so that new features are at the top.
 	  iReporter->GetMessageIterator().
 	- Removed the loaderthread.h header again. This is going to be done
 	  differently.
+	- res added a facility to thje glwin32 canvas to check whether 
+	  hardware acceleration is present. Usage is: PerformExtension 
+	    ("hardware_accelerated", &hasAccel) where hasAccel is a bool.
 22-Apr-2003
 	- Eric Sunshine added links for the new CrystalDoc translation project
 	  to the Crystal Space web site.  Also cleaned up the web site's main

@@ -118,6 +118,8 @@ protected:
   bool modeSwitched;
   /// Setup/leave fullscreen display mode
   void SwitchDisplayMode (bool userMode);
+  /// hardware accelerated?
+  bool hardwareAccelerated;
 
   /**
    * try to get wglGetExtensionsStringARB() and retrieve the extensions 
