@@ -77,3 +77,39 @@ bool DataBuffer::GetLine(char *line)
   }
 }
 
+void DataBuffer::SetPosition(int p)
+{
+  position = p;
+}
+
+int DataBuffer::GetPosition()
+{
+  return position;
+}
+
+void DataBuffer::ResetPosition()
+{
+  position = 0;
+}
+
+int DataBuffer::GetSize()
+{
+  return buffSize;
+}
+
+void DataBuffer::SetData(char *d, int bSize)
+{
+  data = d;
+  buffSize = bSize;
+  position = 0;
+}
+
+int DataBuffer::GetMaxLineLength()
+{
+  return maxline;
+}
+
+bool DataBuffer::eof()
+{
+  return ((position >= buffSize) ? true : false);
+}

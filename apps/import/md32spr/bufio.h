@@ -28,15 +28,15 @@ class DataBuffer {
   DataBuffer(char*, int);
   //DataBuffer(csString);
   ~DataBuffer();
-  void SetPosition(int p) { position = p; }
-  int GetPosition() { return position; }
-  void ResetPosition() {  position = 0; }
-  int GetSize() { return buffSize; }
-  void SetData(char *d, int bSize) { data = d; buffSize = bSize; position = 0; }
+  void SetPosition(int p);
+  int GetPosition();
+  void ResetPosition();
+  int GetSize();
+  void SetData(char *d, int bSize);
   bool GetData(char *,int);
   bool GetLine(char *);
-  int GetMaxLineLength() { return maxline; }
-  bool eof() { return ((position >= buffSize) ? true : false); }
+  int GetMaxLineLength() ;
+  bool eof();
 };
 
 

@@ -1312,7 +1312,7 @@ void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
     // children of `child' component.
 
     // transform all rectangles to child coordinate system
-    int dX, dY;
+    int dX = 0, dY = 0;
     if (child->parent != this)
     {
       child->LocalToGlobal (dX, dY);
