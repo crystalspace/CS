@@ -10,6 +10,8 @@ chronological order.
 	- res reduced the iImage interface to a container for pixel data,
 	  merged csImageFile and csImageMemory and moved the image 
 	  manipulation functions into helper classes.
+	- res fixed a bug where a csImageMemory with Image == 0 would exit
+	  from the ConvertXXX() methods.
 15-Jan-2004
 	- Jorrit fixed a bug in engine->GetNearbyObjects() and
 	  GetNearbyMeshes(). These functions could get confused in situations

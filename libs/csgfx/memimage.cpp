@@ -259,7 +259,6 @@ void csImageMemory::CheckAlpha ()
 
 void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 {
-  if (Image == 0) return;
   int pixels = Width * Height;
 
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
@@ -304,7 +303,6 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
 				     int nPalColors)
 {
-  if (Image == 0) return;
   int pixels = Width * Height;
 
   // ensure the palette has at least 256 entries.
@@ -369,7 +367,6 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage,
 				     const csRGBcolor *iPalette, 
 				     int nPalColors)
 {
-  if (Image == 0) return;
   csRGBpixel *newpal = new csRGBpixel [256];
   int i;
   for (i = 0; i < nPalColors; i++) // Default csRGBpixel constructor ensures
