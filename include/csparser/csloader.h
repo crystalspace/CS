@@ -22,6 +22,7 @@
 
 #include "csparser/loadinfo.h"
 #include "csutil/csvector.h"
+#include "csutil/util.h"
 #include "csgeom/quaterni.h"
 
 struct iImage;
@@ -70,12 +71,34 @@ class csLoader
 {
   struct LoadedPlugin
   {
+    LoadedPlugin (const char *theName, iPlugIn *thePlugin);
+    ~LoadedPlugin ();
     char* name;
     iPlugIn* plugin;
   };
-  static csVector loaded_plugins;
-  static iPlugIn* FindPlugIn (const char* name);
-  static void NewPlugIn (char* name, iPlugIn* plugin);
+  
+  class csLoadedPluginVector : public csVector
+  {
+    public:
+      csLoadedPluginVector (int iLimit = 8, int iThresh = 16) : csVector (iLimit, iThresh) {}
+      ~csLoadedPluginVector () { DeleteAll (); }
+      
+      virtual bool FreeItem (csSome Item)
+      { delete (LoadedPlugin*)Item; return true;}
+  
+      iPlugIn* FindPlugIn (const char* name)
+      { int i;
+        for (i=0; i<Length (); i++) 
+	  if (!strcmp (name, ((LoadedPlugin*)Get(i))->name)) 
+	    return ((LoadedPlugin*)Get(i))->plugin;
+	return NULL;
+      }
+      
+      void NewPlugIn (char* name, iPlugIn* plugin)
+      { Push (new LoadedPlugin (name, plugin)); }
+  };
+  
+  static csLoadedPluginVector loaded_plugins;
   
   /// Parse a matrix definition
   static bool load_matrix (char* buf, csMatrix3 &m);
