@@ -84,6 +84,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine modified the `msvcgen' template files so that they now
 	  define CS_DEBUG when building in debug mode in order to be consistent
 	  with the Unix build process.
+	- Eric Sunshine modified msvcgen.mak so that it now disables makefile
+	  NASM flags, thus preventing NASM assembly files from appearing in
+	  generated DSP files even if the environment which is generating the
+	  DSP files has NASM enabled.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the

@@ -168,7 +168,7 @@ msvcgen:
 	@echo $(SEPARATOR)
 	@echo $"  Generating $(DESCRIPTION.$@)$"
 	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ DO_ASM=no \
 	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
 
 msvcinst: msvcgen
