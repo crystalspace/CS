@@ -4,7 +4,7 @@
 #----------------------------------------------------#
 
 # Several symbols with special meaning
-# the following macro should contain TWO empty lines
+# The following macro should contain TWO empty lines
 define NEWLINE
 
 
@@ -32,7 +32,7 @@ endif
 
 # This macro should update target only if it has changed
 define UPD
-  cmp -s $@ DEST || cp -f $@ DEST
+  cmp -s $@ DEST || rm -f DEST && cp $@ DEST
   rm -f $@
 endef
 
