@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	  to graph2d with a correctly functional procedural texture
 	  clipping. Side note: last (buggy) revision in CVS was 1.84.
 	  I reverted back to version 1.81.
+	- Reverted my own reversion of graph2d.cpp. Don't know why it didn't
+	  work at first.
 12-Jul-2002
 	- csPluginManager::LoadPlugin() is now a bit smarter. If a plugin
 	  is already on the plugin list it will not add it anymore. So you
