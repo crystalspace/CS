@@ -98,7 +98,7 @@ void D3DCache::cache_texture (iTextureHandle *texture)
     {
       // out of memory. remove units from bottom of list.
       cached_texture = tail;
-      iTextureHandle *texh = (iTextureHandle *)cached_texture->Source;
+      iTextureHandle *texh = (iTextureHandle *)cached_texture->pSource;
       texh->SetCacheData (NULL);
       ASSERT( texh );
             
@@ -122,18 +122,24 @@ void D3DCache::cache_texture (iTextureHandle *texture)
     total_size += size;
         
     CHK (cached_texture = new csD3DCacheData);
+    memset(cached_texture, 0, sizeof(cached_texture));
         
     cached_texture->next = head;
     cached_texture->prev = NULL;
-    if(head) head->prev = cached_texture;
-    else tail = cached_texture;
+    if (head) 
+    {
+      head->prev = cached_texture;
+    }
+    else 
+    {
+      tail = cached_texture;
+    }
     head = cached_texture;
     cached_texture->pSource = texture;
-    cached_texture->lSize = size;
+    cached_texture->lSize   = size;
         
     txt_mm->SetCacheData (cached_texture);
 
-    cached_texture->pData = NULL;
     Load (cached_texture);				// load it.
   }
 }
@@ -217,12 +223,19 @@ void D3DCache::cache_lightmap (iPolygonTexture *polytex)
     total_size += size;
         
     CHK (cached_texture = new csD3DCacheData);
-        
+    memset(cached_texture, 0, sizeof(cached_texture));
+
     cached_texture->next = head;
     cached_texture->prev = NULL;
         
-    if (head) head->prev = cached_texture;
-    else tail = cached_texture;
+    if (head) 
+    {
+      head->prev = cached_texture;
+    }
+    else 
+    {
+      tail = cached_texture;
+    }
     head = cached_texture;
 
     cached_texture->pSource = piLM;
@@ -230,7 +243,6 @@ void D3DCache::cache_lightmap (iPolygonTexture *polytex)
         
     piLM->SetCacheData(cached_texture);
         
-    cached_texture->pData = NULL;
     Load(cached_texture);				// load it.
   }
 }
@@ -290,10 +302,10 @@ void D3DTextureCache::Dump ()
 {
 }
 
-void D3DTextureCache::Load (csD3DCacheData *cached_texture)
+void D3DTextureCache::Load (csD3DCacheData* cached_texture)
 {
-  iTextureHandle *txt_handle = (iTextureHandle *)d->pSource;
-  csTextureMM *txt_mm = (csTextureMM *)txt_handle->GetPrivateObject ();
+  iTextureHandle* txt_handle = (iTextureHandle *)cached_texture->pSource;
+  csTextureMM*    txt_mm     = (csTextureMM *)   txt_handle->GetPrivateObject ();
 
   bool transp = txt_handle->GetTransparent ();
   DDCOLORKEY key;
@@ -309,7 +321,7 @@ void D3DTextureCache::Load (csD3DCacheData *cached_texture)
   DDSCAPS2 ddsCaps;
 
   // get the texture
-  csTexture *txt_unl = txt_mm->get_texture (0);
+  csTextureDirect3D* txt_unl = (csTextureDirect3D*) txt_mm->get_texture (0);
  
   // create a texture surface in system memory and move it there.
   DDSURFACEDESC2 ddsd;
@@ -346,7 +358,7 @@ void D3DTextureCache::Load (csD3DCacheData *cached_texture)
   // go through each mip map level and fill it in.
   for (int level = 0; level < cLevels; level++)
   {
-    txt_unl = txt_mm->get_texture (level);
+    txt_unl  = (csTextureDirect3D*) txt_mm->get_texture (level);
     int size = txt_unl->get_size ();
 
     // lock the texture surface for writing
@@ -456,7 +468,7 @@ void D3DLightMapCache::Dump()
 
 void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
 {
-  iLightMap *piLM = (iLightMap *)d->pSource;
+  iLightMap *piLM = (iLightMap *)cached_lightmap->pSource;
   ASSERT( piLM );
   
   int lwidth = piLM->GetWidth();
@@ -479,7 +491,7 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
   ASSERT (!(lwidth%2));
   
   VERIFY_SUCCESS (m_lpDD->CreateSurface (&ddsd,
-    &cached_lightmap->Lightmap.lpsurf, NULL));
+    &cached_lightmap->LightMap.lpsurf, NULL));
   
   unsigned long m;
   int s;
@@ -513,7 +525,7 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
   // lock the lightmap surface
   memset (&ddsd, 0, sizeof(DDSURFACEDESC2));
   ddsd.dwSize = sizeof (ddsd);
-  VERIFY_SUCCESS (cached_lightmap->Lightmap.lpsurf->Lock(NULL, &ddsd, 0, NULL));
+  VERIFY_SUCCESS (cached_lightmap->LightMap.lpsurf->Lock(NULL, &ddsd, 0, NULL));
   
   // get the red, green, and blue lightmaps.
   unsigned char *lpRed; 
@@ -541,9 +553,9 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
         {
           int r,g,b;
         
-          r = m_GammaCorrect[*(lpRed + (i + (lwidth * j)))];
-          g = m_GammaCorrect[*(lpGreen + (i + (lwidth * j)))];
-          b = m_GammaCorrect[*(lpBlue + (i + (lwidth * j)))];
+          r = *(lpRed + (i + (lwidth * j)));
+          g = *(lpGreen + (i + (lwidth * j)));
+          b = *(lpBlue + (i + (lwidth * j)));
         
           *lpL =  ((r / red_scale) << red_shift) |
             ((g / green_scale) << green_shift) |
@@ -562,9 +574,9 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
         {
           int r,g,b;
         
-          r = m_GammaCorrect[*(lpRed + (i + (lwidth * j)))];
-          g = m_GammaCorrect[*(lpGreen + (i + (lwidth * j)))];
-          b = m_GammaCorrect[*(lpBlue + (i + (lwidth * j)))];
+          r = *(lpRed + (i + (lwidth * j)));
+          g = *(lpGreen + (i + (lwidth * j)));
+          b = *(lpBlue + (i + (lwidth * j)));
         
           *lpS =  ((r / red_scale) << red_shift) |
             ((g / green_scale) << green_shift) |
@@ -583,13 +595,11 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
       
         for(i=0; i<lwidth; i++)
         {
-          int r,g,b,mean;
+          int r = *(lpRed   + (i + (lwidth * j)));
+          int g = *(lpGreen + (i + (lwidth * j)));
+          int b = *(lpBlue  + (i + (lwidth * j)));
         
-          r = *(lpRed + (i + (lwidth * j)));
-          g = *(lpGreen + (i + (lwidth * j)));
-          b = *(lpBlue + (i + (lwidth * j)));
-        
-          mean = m_GammaCorrect[(r+g+b)/3];
+          int mean = (r+g+b)/3;
         
           *lpC = mean;
           lpC++;
@@ -603,14 +613,14 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
   }
   
   // unlock the lightmap
-  cached_lightmap->Lightmap.lpsurf->Unlock(NULL);
+  cached_lightmap->LightMap.lpsurf->Unlock(NULL);
   
-  cached_lightmap->Lightmap.ratio_width = (rwidth*0.95)/(lwidth*1.1);
-  cached_lightmap->Lightmap.ratio_height = (rheight*0.95)/(lheight*1.1);
+  cached_lightmap->LightMap.ratio_width = (rwidth*0.95)/(lwidth*1.1);
+  cached_lightmap->LightMap.ratio_height = (rheight*0.95)/(lheight*1.1);
   
   // get the texture interfaces and handles
-  VERIFY_SUCCESS( cached_lightmap->Lightmap.lpsurf->QueryInterface (
-    IID_IDirect3DTexture2, (LPVOID *)&cached_lightmap->Lightmap.lptex) );
+  VERIFY_SUCCESS( cached_lightmap->LightMap.lpsurf->QueryInterface (
+    IID_IDirect3DTexture2, (LPVOID *)&cached_lightmap->LightMap.lptex) );
   
   if (m_bHardware)
     LoadIntoVRAM (cached_lightmap);
@@ -626,7 +636,7 @@ void D3DLightMapCache::LoadIntoVRAM(csD3DCacheData *cached_lightmap)
   
   memset(&ddsd, 0, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
-  cached_lightmap->Lightmap.lpsurf->GetSurfaceDesc(&ddsd);
+  cached_lightmap->LightMap.lpsurf->GetSurfaceDesc(&ddsd);
   ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
   ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_ALLOCONLOAD;
   
@@ -634,26 +644,26 @@ void D3DLightMapCache::LoadIntoVRAM(csD3DCacheData *cached_lightmap)
   
   lpddts->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&ddtex);     
   
-  VERIFY_SUCCESS (ddtex->Load (cached_lightmap->Lightmap.lptex));
+  VERIFY_SUCCESS (ddtex->Load (cached_lightmap->LightMap.lptex));
   
-  cached_lightmap->Lightmap.lptex->Release();
-  cached_lightmap->Lightmap.lpsurf->Release();
+  cached_lightmap->LightMap.lptex->Release();
+  cached_lightmap->LightMap.lpsurf->Release();
   
-  cached_lightmap->Lightmap.lptex = ddtex;
-  cached_lightmap->Lightmap.lpsurf = lpddts;
+  cached_lightmap->LightMap.lptex = ddtex;
+  cached_lightmap->LightMap.lpsurf = lpddts;
 }
 
 void D3DLightMapCache::Unload(csD3DCacheData *cached_lightmap)
 {
-  if (cached_lightmap->Lightmap.lpsurf)
+  if (cached_lightmap->LightMap.lpsurf)
   {
-    cached_lightmap->Lightmap.lpsurf->Release();
-    cached_lightmap->Lightmap.lpsurf = NULL;
+    cached_lightmap->LightMap.lpsurf->Release();
+    cached_lightmap->LightMap.lpsurf = NULL;
   }
-  if (cached_lightmap->Lightmap.lptex)
+  if (cached_lightmap->LightMap.lptex)
   {
-    cached_lightmap->Lightmap.lptex->Release();
-    cached_lightmap->Lightmap.lptex = NULL;
+    cached_lightmap->LightMap.lptex->Release();
+    cached_lightmap->LightMap.lptex = NULL;
   }
 }
 

@@ -33,6 +33,74 @@
 
 //---------------------------------------------------------------------------
 
+csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent, 
+                                      iImage*                  Image,
+                                      csGraphics3DDirect3DDx6* iG3D) 
+  : csTexture (Parent)
+{
+  w = Image->GetWidth ();
+  h = Image->GetHeight ();
+  compute_masks ();
+
+  // Convert the texture to the screen-dependent format
+  int rsl = iG3D->rsl;
+  int rsr = iG3D->rsr;
+  int gsl = iG3D->gsl;
+  int gsr = iG3D->gsr;
+  int bsl = iG3D->bsl;
+  int bsr = iG3D->bsr;
+
+  RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
+  int       NumPixels = get_size ();
+
+  switch (iG3D->m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount)
+  {
+    case 16:
+    {
+      image = new UByte [NumPixels * sizeof (UShort)];
+      UShort *dst = (UShort *)image;
+      while (NumPixels--)
+      {
+        *dst = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+               ((unsigned (pPixels->green) >> gsr) << gsl) |
+               ((unsigned (pPixels->blue ) >> bsr) << bsl);
+        pPixels++;
+      }
+      break;
+    }
+    case 32:
+    {
+      image = new UByte [NumPixels * sizeof (ULong)];
+      ULong *dst = (ULong *)image;
+      while (NumPixels--)
+      {
+        *dst = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+               ((unsigned (pPixels->green) >> gsr) << gsl) |
+               ((unsigned (pPixels->blue ) >> bsr) << bsl);
+        pPixels++;
+      }
+      break;
+    }
+  }
+
+  Image->DecRef ();
+}
+
+csTextureDirect3D::~csTextureDirect3D ()
+{
+  delete [] image;
+}
+
+void *csTextureDirect3D::get_bitmap ()
+{
+  csGraphics3DDirect3DDx6 *G3D = ((csTextureMMDirect3D *)parent)->G3D;
+  G3D->GetTextureCache()->cache_texture (parent);
+  csD3DCacheData *cd = (csD3DCacheData *)parent->GetCacheData ();
+  return (void *)cd;
+}
+
+//---------------------------------------------------------------------------
+
 csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
   csGraphics3DDirect3DDx6 *iG3D) : csTextureMM (image, flags)
 {
@@ -42,18 +110,7 @@ csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
   int w = image->GetWidth ();
   int h = image->GetHeight ();
 
-  if (w / h > G3D->m_MaxAspectRatio)
-    h = w / G3D->m_MaxAspectRatio;
-  if (h / w > G3D->m_MaxAspectRatio)
-    w = h / G3D->m_MaxAspectRatio;
-  if (w < G3D->m_Caps.minTexWidth)
-    w  = G3D->m_Caps.minTexWidth;
-  if (h < G3D->m_Caps.minTexHeight)
-    h = G3D->m_Caps.minTexHeight;
-  if (w > G3D->m_Caps.maxTexWidth)
-    w  = G3D->m_Caps.maxTexWidth;
-  if (h > G3D->m_Caps.maxTexHeight)
-    h = G3D->m_Caps.maxTexHeight;
+  G3D->AdjustToOptimalTextureSize(w,h);
 
   // this is a NOP if size do not change
   image->Rescale (w, h);
@@ -83,91 +140,17 @@ void csTextureMMDirect3D::compute_mean_color ()
 
 //---------------------------------------------------------------------------
 
-csTextureDirect3D::csTextureDirect3D (csTextureMM *Parent, iImage *Image,
-  csGraphics3DDirect3DDx6 *iG3D) : csTexture (Parent)
+csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem*                 iSys,
+                                                    iGraphics2D*             iG2D, 
+                                                    csIniFile*               config, 
+                                                    csGraphics3DDirect3DDx6* iG3D) 
+  : csTextureManager (iSys, iG2D)
 {
-  w = Image->GetWidth ();
-  h = Image->GetHeight ();
-  compute_masks ();
+  m_pG2D = iG2D;
+  m_pG3D = iG3D;
 
-  // Convert the texture to the screen-dependent format
-  int rsl = G3D->txtmgr->rsl;
-  int rsr = G3D->txtmgr->rsr;
-  int gsl = G3D->txtmgr->gsl;
-  int gsr = G3D->txtmgr->gsr;
-  int bsl = G3D->txtmgr->bsl;
-  int bsr = G3D->txtmgr->bsr;
-
-  RGBPixel *src = (RGBPixel *)Image->GetData ();
-  int pixels = get_size ();
-  switch (G3D->m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount)
-  {
-    case 16:
-    {
-      image = new UByte [pixels * sizeof (UShort)];
-      UShort *dst = (UShort *)image;
-      while (pixels--)
-      {
-        *dst = ((unsigned (src->red  ) >> rsr) << rsl) |
-               ((unsigned (src->green) >> gsr) << gsl) |
-               ((unsigned (src->blue ) >> bsr) << bsl);
-        src++;
-      }
-      break;
-    }
-    case 32:
-    {
-      image = new UByte [pixels * sizeof (ULong)];
-      ULong *dst = (ULong *)image;
-      while (pixels--)
-      {
-        *dst = ((unsigned (src->red  ) >> rsr) << rsl) |
-               ((unsigned (src->green) >> gsr) << gsl) |
-               ((unsigned (src->blue ) >> bsr) << bsl);
-        src++;
-      }
-      break;
-    }
-  }
-
-  Image->DecRef ();
-}
-
-csTextureDirect3D::~csTextureDirect3D ()
-{
-  delete [] image;
-}
-
-void *csTextureDirect3D::get_bitmap ()
-{
-  csGraphics3DDirect3DDx6 *G3D = ((csTextureMMDirect3D *)parent)->G3D;
-  G3D->texture_cache->cache_texture (parent);
-  csD3DCacheData *cd = (csD3DCacheData *)parent->GetCacheData ();
-  return (void *)cd;
-}
-
-//---------------------------------------------------------------------------
-
-csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem* iSys,
-  iGraphics2D* iG2D, csIniFile *config) : csTextureManager (iSys, iG2D)
-{
   read_config (config);
   Clear ();
-
-  // Compute the shift masks for converting R8G8B8 into texture format
-#define COMPUTE(sr, sl, mask)               \
-  sr = 8; sl = 0;                           \
-  {                                         \
-    unsigned m = mask;                      \
-    while ((m & 1) == 0) { sl++; m >>= 1; } \
-    while ((m & 1) == 1) { sr--; m >>= 1; } \
-    if (sr < 0) { sl -= sr; sr = 0; }       \
-  }
-
-  COMPUTE (rsr, rsl, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask);
-  COMPUTE (gsr, gsl, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask);
-  COMPUTE (bsr, bsl, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask);
-#undef COMPUTE
 }
 
 csTextureManagerDirect3D::~csTextureManagerDirect3D ()
@@ -191,11 +174,11 @@ void csTextureManagerDirect3D::PrepareTextures ()
 }
 
 iTextureHandle *csTextureManagerDirect3D::RegisterTexture (iImage* image,
-  int flags)
+                                                           int     flags)
 {
   if (!image) return NULL;
 
-  csTextureMMDirect3D* txt = new csTextureMMDirect3D (image, flags, G3D);
+  csTextureMMDirect3D* txt = new csTextureMMDirect3D (image, flags, m_pG3D);
   textures.Push (txt);
   return txt;
 }
@@ -211,8 +194,8 @@ void csTextureManagerDirect3D::PrepareTexture (iTextureHandle *handle)
 
 void csTextureManagerDirect3D::UnregisterTexture (iTextureHandle* handle)
 {
-  G3D->UncacheTexture (handle);
-  csTextureMMOpenGL *tex_mm = (csTextureMMOpenGL *)handle->GetPrivateObject ();
-  int idx = textures.Find (tex_mm);
+  csTextureMMDirect3D*     pTextureMM = (csTextureMMDirect3D*)handle->GetPrivateObject ();
+  m_pG3D->UncacheTexture (handle);
+  int idx = textures.Find (pTextureMM);
   if (idx >= 0) textures.Delete (idx);
 }

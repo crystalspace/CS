@@ -71,17 +71,19 @@ public:
  */
 class csTextureManagerDirect3D : public csTextureManager
 {
-public:
-  /// Shift counters for converting R8G8B8 to internal texture format
-  rsr, rsl, gsr, gsl, bsr, bsl;
+protected:
+  /// Pointer to the 2D driver
+  iGraphics2D*             m_pG2D;
+  csGraphics3DDirect3DDx6* m_pG3D;
 
+public:
   ///
-  csTextureManagerDirect3D (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config);
+  csTextureManagerDirect3D (iSystem*                 iSys, 
+                            iGraphics2D*             iG2D, 
+                            csIniFile*               config,
+                            csGraphics3DDirect3DDx6* iG3D);
   ///
   virtual ~csTextureManagerDirect3D ();
-
-  ///
-  virtual void Clear ();
 
   ///
   virtual void PrepareTextures ();

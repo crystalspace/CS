@@ -20,19 +20,22 @@
 #define D3DCACHE_H
 
 #include <windows.h>
-#include "ddraw.h"
-#include "d3d.h"
-#include "d3dcaps.h"
+#include <ddraw.h>
+#include <d3d.h>
+#include <d3dcaps.h>
 
 #include "d3d_g3d.h"
+#include "igraph3d.h"
 
+struct iTextureHandle;
+struct iPolygonTexture;
 ///
 struct csD3DCacheData
 {
   /// size this takes up.
   long lSize;
   /// The source iTextureHandle/iLightMap
-  void *Source;
+  void* pSource;
   /// Internal texture cache data
   union
   {
@@ -40,14 +43,14 @@ struct csD3DCacheData
     struct
     {
       LPDIRECTDRAWSURFACE4 lpsurf;	// texture data surface
-      LPDIRECT3DTEXTURE2 lptex;		// texture interface
-      LPDIRECTDRAWPALETTE lpddpal;	// texture palette
+      LPDIRECT3DTEXTURE2   lptex;	// texture interface
+      LPDIRECTDRAWPALETTE  lpddpal;	// texture palette
     } Texture;
     ///
     struct
     {
       LPDIRECTDRAWSURFACE4 lpsurf;	// texture data surface
-      LPDIRECT3DTEXTURE2 lptex;		// texture interface
+      LPDIRECT3DTEXTURE2   lptex;	// texture interface
       float ratio_width;
       float ratio_height;
     } LightMap;

@@ -199,6 +199,9 @@ public:
   static DDSURFACEDESC2 m_ddsdLightmapSurfDesc;
   static DDSURFACEDESC2 m_ddsdTextureSurfDesc;
   static DDSURFACEDESC2 m_ddsdHaloSurfDesc;
+
+  /// Shift counters for converting R8G8B8 to internal texture format
+  int rsr, rsl, gsr, gsl, bsr, bsl;
   
   /// The constructor. It is passed an interface to the system using it.
   csGraphics3DDirect3DDx6 (iBase*);
@@ -298,7 +301,13 @@ public:
     DefaultDrawTriangleMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_nHalfWidth, m_nHalfHeight);
   }
  
-  ///
+  /** Adjust the given texture size to an optimal size. This will take into
+   *  consideration maximum sizes, limitations to power of two, max aspect
+   *  ratio and so on.
+   */
+  virtual void AdjustToOptimalTextureSize(int& w, int& h);
+
+  /// Returns true if the driver needs PO2 lightmaps and texture maps
   virtual bool NeedsPO2Maps(void) { return true; }
   ///
   virtual int GetMaximumAspectRatio () { return m_MaxAspectRatio; }
@@ -313,6 +322,12 @@ public:
   /// Get the ITextureManager.
   virtual iTextureManager *GetTextureManager ()
   { return txtmgr; }
+
+  /// Get the texture cache.
+  D3DTextureCache*  GetTextureCache()  {return m_pTextureCache;}
+
+  /// Get the lightmap cache.
+  D3DLightMapCache* GetLightmapCache() {return m_pLightmapCache;}
 
   /// 
   virtual iGraphics2D *GetDriver2D () 

@@ -336,7 +336,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   if (!m_piG2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D, config));
+  CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D, config, this));
 
   m_bVerbose = config->GetYesNo("Direct3DDX6", "VERBOSE", false);
 
@@ -564,6 +564,21 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     memcpy(&m_ddsdLightmapSurfDesc, &m_ddsdTextureSurfDesc, sizeof(DDSURFACEDESC2));
     bGotLitDesc = true;
   }
+
+  // Compute the shift masks for converting R8G8B8 into texture format
+#define COMPUTE(sr, sl, mask)               \
+  sr = 8; sl = 0;                           \
+  {                                         \
+    unsigned m = mask;                      \
+    while ((m & 1) == 0) { sl++; m >>= 1; } \
+    while ((m & 1) == 1) { sr--; m >>= 1; } \
+    if (sr < 0) { sl -= sr; sr = 0; }       \
+  }
+
+  COMPUTE (rsr, rsl, csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask);
+  COMPUTE (gsr, gsl, csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask);
+  COMPUTE (bsr, bsl, csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask);
+#undef COMPUTE
 
   if (!bGotTexDesc && !bGotLitDesc)
   {
@@ -1162,6 +1177,7 @@ void csGraphics3DDirect3DDx6::CacheTexture (iPolygonTexture *texture)
 
 void csGraphics3DDirect3DDx6::UncacheTexture (iTextureHandle *handle)
 {
+  (void) handle;
   //@@guess what.... right, todo.
 }
 
@@ -1314,9 +1330,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
     m_States.SetColorKeyEnable(false);
   }
 
-  csD3DCacheData *pD3D_texcache = (csD3DCacheData *)pTexCache->pData;
-
-  m_States.SetTexture(0, pD3D_texcache->lptex);
+  m_States.SetTexture(0, pTexCache->Texture.lptex);
 
   float lightmap_scale_u, lightmap_scale_v;
   float lightmap_low_u, lightmap_low_v;
@@ -1325,11 +1339,12 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
     // set lightmap stuff
     iLightMap *thelightmap = pTex->GetLightMap ();
 
-    int lmwidth = thelightmap->GetWidth ();
-    int lmrealwidth = thelightmap->GetRealWidth ();
-    int lmheight = thelightmap->GetHeight ();
+    int lmwidth      = thelightmap->GetWidth ();
+    int lmrealwidth  = thelightmap->GetRealWidth ();
+    int lmheight     = thelightmap->GetHeight ();
     int lmrealheight = thelightmap->GetRealHeight ();
-    float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
+
+    float scale_u = (float)(lmrealwidth-1)  / (float)lmwidth;
     float scale_v = (float)(lmrealheight-1) / (float)lmheight;
 
     float lightmap_high_u, lightmap_high_v;
@@ -1339,7 +1354,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
     lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
     lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
-    m_States.SetTexture(1, ((csD3DCacheData *)pLightCache->pData)->lptex);
+    m_States.SetTexture   (1, pLightCache->LightMap.lptex);
     m_States.SetStageState(1, D3DTSS_COLOROP, m_LightmapTextureOp);
   }
   else
@@ -1545,9 +1560,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     m_States.SetColorKeyEnable(false);
   }
 
-  csD3DCacheData *pD3D_texcache = (csD3DCacheData *)pTexCache->pData;
-
-  m_States.SetTexture(0, pD3D_texcache->lptex);
+  m_States.SetTexture(0, pTexCache->Texture.lptex);
 
   D3DCOLOR vertex_color;
 
@@ -1620,7 +1633,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
     lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
-    m_States.SetTexture(0, ((csD3DCacheData *)pLightCache->pData)->lptex);
+    m_States.SetTexture(0, pLightCache->LightMap.lptex);
 
     for (i=0; i < poly.num; i++)
     {
@@ -1746,7 +1759,7 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
   }
 
   if (m_textured)
-    m_States.SetTexture(0, ((csD3DCacheData *)pTexData->pData)->lptex);
+    m_States.SetTexture(0, pTexData->Texture.lptex);
   else
     m_States.SetTexture(0, NULL);
 } // end of StartPolygonFX()
@@ -2191,6 +2204,22 @@ void csGraphics3DDirect3DDx6::SetClipper (csVector2* vertices, int num_vertices)
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
   CHK (m_pClipper = new csPolygonClipper (vertices, num_vertices, false, true));
+}
+
+void csGraphics3DDirect3DDx6::AdjustToOptimalTextureSize(int& w, int& h)
+{
+  if (w / h > m_MaxAspectRatio)
+    h = w / m_MaxAspectRatio;
+  if (h / w > m_MaxAspectRatio)
+    w = h / m_MaxAspectRatio;
+  if (w < m_Caps.minTexWidth)
+    w  = m_Caps.minTexWidth;
+  if (h < m_Caps.minTexHeight)
+    h = m_Caps.minTexHeight;
+  if (w > m_Caps.maxTexWidth)
+    w  = m_Caps.maxTexWidth;
+  if (h > m_Caps.maxTexHeight)
+    h = m_Caps.maxTexHeight;
 }
 
 void csGraphics3DDirect3DDx6::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
