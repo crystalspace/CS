@@ -67,17 +67,17 @@ public:
   inline bool FindName (const char* name);
 };
 
-bool csTypedObjectIterator::Next()
+inline bool csTypedObjectIterator::Next()
   { bool r = iter->Next (); FetchObject (); return r; }
-void csTypedObjectIterator::Reset()
+inline void csTypedObjectIterator::Reset()
   { iter->Reset (); FetchObject (); }
-iObject *csTypedObjectIterator::GetObject () const
+inline iObject *csTypedObjectIterator::GetObject () const
   { return iter->GetObject (); }
-iObject *csTypedObjectIterator::GetParentObj() const
+inline iObject *csTypedObjectIterator::GetParentObj() const
   { return iter->GetParentObj (); }
-bool csTypedObjectIterator::IsFinished () const
+inline bool csTypedObjectIterator::IsFinished () const
   { return iter->IsFinished (); }
-bool csTypedObjectIterator::FindName (const char* name)
+inline bool csTypedObjectIterator::FindName (const char* name)
   { bool r = iter->FindName (name); FetchObject (); return r; }
 
 #endif // __OBJITER_H__
