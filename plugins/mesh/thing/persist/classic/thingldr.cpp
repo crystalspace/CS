@@ -923,8 +923,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       csScanStr (xplane_name, "%f,%f", &x, &dens);
       pl = te->CreatePolyTxtPlane ();
       pl->QueryObject()->SetName (buf);
-      pl->SetTextureSpace (csVector3 (x, 0, 0), csVector3 (x, 1, 0), dens,
-      	csVector3 (x, 0, 1), dens);
+      pl->SetTextureSpace (csVector3 (x, 0, 0), csVector3 (x, 0, 1), dens,
+      	csVector3 (x, 1, 0), dens);
     }
     poly3d->SetTextureSpace (pl);
     te->DecRef ();

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+18-Sep-2001
+	- Changed orientation for default XPLANE so it matches better
+	  with ZPLANE.
 17-Sep-2001
 	- Added the following short-hands to the thing loader:
 	    - V for VERTEX in a thing or thing-part.
@@ -19,6 +22,20 @@ The history order is reversed so that new features are at the top.
 	  give much control over how the texture will be aligned on the
 	  polygon (i.e. the uv shift). If you want full control you still
 	  have to use the ADDON keyword with the plane plugin.
+	- Fixed a bug in the thingldr plugin.
+	- Norman Kramer did the following:
+	    - In ObjRemoveAll the counting was from 0 to vec-length, of
+	      course it should be the other way around. that prevented
+	      removal (and thus destruction) of added objects. fixed.
+	    - The GetColliderWrapper did not decref its results.
+	    - Walktest now cleans up the colliderwrappers and thus the
+	      collision plugin (did not test with -hugeroom and -infinite),
+	      now only the proc texture issue remains for cleanly exiting.
+	    - Ok, could not go sleep w/o having tested the -infinite and
+	      -huge switches. inifite now works and huge does at least not
+	      crash (previously a NULL material was assigned to polygons),
+	      however, nothing can be seen.
+	- Philip Wyett added an IncRef to sprstate in demosky.
 16-Sep-2001
 	- Print out polygon name in error message indicating overflow
 	  in number of vertices.
