@@ -31,7 +31,7 @@ The history order is reversed so that new features are at the top.
 	      detect when control becomes focused.  It's nessesary to add
 	      property "Focusable: Yes" in .def file.  By default this property
 	      is false.
-	    - Added TabOrder in iAwsComponent. It is full not functionally 
+	    - Added TabOrder in iAwsComponent. It is full not functionally
 	      because children are ordered by their creation.
 	    - Added functions for TabOrder manipulations: TabNext(), TabPrev(),
 	      AddToTabOrder(), GetTabComponent() in iAwsComponent.
@@ -63,30 +63,30 @@ The history order is reversed so that new features are at the top.
 	  objects. This bug also caused the missiles in walktest to miss the
 	  walls often.
 	- DeSigna modified parts of the CS texinfo manual:
-	  - Boilerplate rewrite: intro/chapter.txi
-	  - Some sections rewritten, grammar corrections, removal of
-	    obsolete/misleading information: intro/foreward.txi
-	  - Text tweaks and grammar fixups: intro/guide.txi
-	  - Updated bug reporting practice: intro/feedback.txi
+	    - Boilerplate rewrite: intro/chapter.txi
+	    - Some sections rewritten, grammar corrections, removal of
+	      obsolete/misleading information: intro/foreward.txi
+	    - Text tweaks and grammar fixups: intro/guide.txi
+	    - Updated bug reporting practice: intro/feedback.txi
 	- Oktal added empty stub functions to cspython for the new iScript
 	  interface methods, until they get implemented. Then the csperl5
 	  implementation of the update can be used.
 	- Oktal made the following changes to csperl5:
-	  - Somewhere a macro was being defined called "ref", which was
-	    interfering with variables of the same name, so renamed them.
-	  - Swig was causing a "conversion lacks cast" error when it tried to
-	    store an int8 as a string of length 1, so overrode the typemap to
-	    force it to store it as an int32.
-	  - Added an %ignore csGetPlatformConfig; to cspace.i because that
-	    function is only defined for win32 and will cause a link error on
-	    other platforms.
-	  - Added #undef for MIN and MAX to csperl5.cpp to stop the macro
-	    redefinition errors when they're defined by the Perl headers.
+	    - Somewhere a macro was being defined called "ref", which was
+	      interfering with variables of the same name, so renamed them.
+	    - Swig was causing a "conversion lacks cast" error when it tried to
+	      store an int8 as a string of length 1, so overrode the typemap to
+	      force it to store it as an int32.
+	    - Added an %ignore csGetPlatformConfig; to cspace.i because that
+	      function is only defined for win32 and will cause a link error on
+	      other platforms.
+	    - Added #undef for MIN and MAX to csperl5.cpp to stop the macro
+	      redefinition errors when they're defined by the Perl headers.
 	- Oktal fixed a segfault when NewConnection() returns NULL in
 	  netmantest. This was a left-over from the ensocket API.
 	- res further worked on storing rendermeshes in the sector. Z sorting
 	  as specified by the renderpriorities works now.
-	- res fixed a bug in the new renderer where not binding of a render 
+	- res fixed a bug in the new renderer where not binding of a render
 	  buffer caused visual distortions.
 	- Matze did several changes to the jam build system:
 	    - Reworked the Application, Library and Plugin rules. Code should
@@ -124,7 +124,7 @@ The history order is reversed so that new features are at the top.
 	- Matze renamed the .fnt files to .h since they're really headers.
 22-May-2003
 	- res made the following changes:
-	    - when using the new renderer, the sector now stores the 
+	    - when using the new renderer, the sector now stores the
 	      rendermeshes of the contained meshobjects. This is different
 	      from the old system where only the mesh objects themselves
 	      knew about the rendered meshes. Not all necessary adjustments
@@ -138,7 +138,7 @@ The history order is reversed so that new features are at the top.
 	      from the config; the actual application is still platform-
 	      dependent and only implemented on Win32 so far.
 	    - Added a GL configuration for ATI R300 (Radeon 9700/9700Pro.)
-	- res added resizing to the glwin32 canvas, fixed a typo and some 
+	- res added resizing to the glwin32 canvas, fixed a typo and some
 	  possible NULL pointer accesses in glcommon.
 	- Matze added possibility to specify msvc version for the msvcgen.sh
 	  script which is used to regenerate msvc-projectfiles on jam.
@@ -176,7 +176,7 @@ The history order is reversed so that new features are at the top.
 	      concept and not only for things. The only portal implementation
 	      is currently still in thing though.
 	    - Added the ability to get the portal vertices from iPortal.
-	    - Added iMeshObject->GetPortalCount() and 
+	    - Added iMeshObject->GetPortalCount() and
 	      iMeshObject->GetPortal().
 	    - Also added default implementations of those to csMeshObject
 	      (supporting no portals).
@@ -190,7 +190,7 @@ The history order is reversed so that new features are at the top.
 	- DeSigna brought manual section 6.4.6 (SCF Examples) up-to-date with
 	  current SCF workings.
 	- res made a few changes to bugplug to have it work more nicely with
-	  the new renderer. The most 'drastic' changes is that 
+	  the new renderer. The most 'drastic' changes is that
 	  G3D->FinishDraw() is now called after the FPS is shown.
 	- res changed render3d to push the current modelview/projection
 	  matrices when beginning 2D drawing and popping them when it ends.
@@ -285,17 +285,16 @@ The history order is reversed so that new features are at the top.
 	- Jorrit changed the commandline help in the softx canvas to mention
 	  -noXSHM instead of -noshm.
 	- res fixed csTextureHandleOpenGL::GetMipMapDimensions() to return the
-	  size without applied downsampling (via 
+	  size without applied downsampling (via
 	  Video.OpenGL.TextureDownsample cfg. This is done in addition to po2
 	  adjustments)
 	- res added GetArray() methods to csArray and csPArray.
-	- res made the following changes related to the new renderer:
-	  - started working on new render loop. csEngine::Draw() is in a 
-	    different file now for NR builds. Also, drawing isn't done in 
-	    csSector::Draw() any more, csSector now merely returns a list of
-	    meshes in this sector. Currently, the loop isn't doing much more 
-	    than the old stuff, and has to be activated by uncommenting a line
-	    in renderloop.h.
+	- res started working on new render loop.  csEngine::Draw() is in a
+	  different file now for NR builds.  Also, drawing isn't done in
+	  csSector::Draw() any more, csSector now merely returns a list of
+	  meshes in this sector.  Currently, the loop isn't doing much more
+	  than the old stuff, and has to be activated by uncommenting a line in
+	  renderloop.h.
 	- res fixed a compiling error he introduced in ogl_txtmgr.cpp earlier.
 	- Eric Sunshine removed the now obsolete SCF references for line and
 	  infinite renderers from scf.cfg.  Also fixed problem where entry for
@@ -346,9 +345,9 @@ The history order is reversed so that new features are at the top.
 	      fire instead of 'raindrop' texture.
 	- res fixed a crash caused by too much memory being memset() in the
 	  fire texture default palette creation.
-	- res fixed map2cs so that the <moveable> token is written at the 
-	  correct location for the skybox. Also changes the UV coords of the 
-	  sides a bit; they are now calculated from the actual size of the 
+	- res fixed map2cs so that the <moveable> token is written at the
+	  correct location for the skybox. Also changes the UV coords of the
+	  sides a bit; they are now calculated from the actual size of the
 	  smallest side instead being a hardcoded value.
 16-May-2003
 	- Wouter added csgeom/objmodel.h and igeom/objmodel.h to css.h.
@@ -372,15 +371,15 @@ The history order is reversed so that new features are at the top.
 15-May-2003
 	- res made the following changes to the fire proctex:
 	    - changed the algorithm a bit so it doesn't look tilted any more.
-	    - added the ability to smooth the whole image after calculating 
+	    - added the ability to smooth the whole image after calculating
 	      a pass.
 	    - added an interface to control some animation parameters.
 	    - uses csRandomGen now.
 	- res changed csProcTex to support an 'always animate' mode: the
 	  texture is updated even if it's not visible.
-	- res changed the csProcTex class implementation a bit: 
-	  iTextureWrapper is now embedded. This way, procedural textures can 
-	  provide interfaces that can be queried from the texture wrapper 
+	- res changed the csProcTex class implementation a bit:
+	  iTextureWrapper is now embedded. This way, procedural textures can
+	  provide interfaces that can be queried from the texture wrapper
 	  (e.g. the fire properties.)
 	- res fixed an uninitialized variable in the checkerboard loader.
 	- res added interfaces for texture factories.
@@ -417,17 +416,17 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a bug he introduced in his last commit with the engine.
 	- Jorrit fixed a bug he introduced in his last commit with the iso
 	  map loader.
-	- res changed the GL renderer to flip procedural textures  vertically, 
-	  so that up/down have the same coordinates as normal textures 
+	- res changed the GL renderer to flip procedural textures  vertically,
+	  so that up/down have the same coordinates as normal textures
 	  (previously, the texture coordinated had to be flipped manually.)
 	- res fixed the flarge for above change.
-	- res removed the MNG from flarge due to warnings caused on most 
+	- res removed the MNG from flarge due to warnings caused on most
 	  systems.
-	- res changed the software renderer to not flip procedural textures 
+	- res changed the software renderer to not flip procedural textures
 	  any more.
-	- groton (groton@gmx.net) modified the comment about the method 
+	- groton (groton@gmx.net) modified the comment about the method
 	  iEventQueue::Register in the file include/iutil/eventq.h, so now
-	  that comment is up to date with the introduction of two pseudo-event 
+	  that comment is up to date with the introduction of two pseudo-event
 	  types that have a Code value of cscmdProcess and cscmdFinalProcess.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
@@ -978,24 +977,25 @@ The history order is reversed so that new features are at the top.
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2
 	  flags.
 	- Matze did several changes in the jamrules:
-	  - Rewrote custom filetype registration in the jamrules.  Now the
-	    rules can decide themself what objects result from sourcefiles.
-	    This allows cleaner handling of header files and makes it possible
-	    to output multiple object files from one source file.
-	  - Headerfile scanning has to be enabled explicitely for registered
-	    rules. This avoids incorrect headerfilescanning in bison and flex
-	    files.
-	  - Cleaned up and improved bison and flex rules. They are alot more
-	    robust now as jam is aware that bison produces 2 files (a cpp and
-	    a header file).
+	    - Rewrote custom filetype registration in the jamrules.  Now the
+	      rules can decide themself what objects result from sourcefiles.
+	      This allows cleaner handling of header files and makes it
+	      possible to output multiple object files from one source file.
+	    - Headerfile scanning has to be enabled explicitely for registered
+	      rules.  This avoids incorrect headerfilescanning in bison and
+	      flex files.
+	    - Cleaned up and improved bison and flex rules.  They are alot more
+	      robust now as jam is aware that bison produces 2 files (a cpp and
+	      a header file).
 	- Oktal updated the Perl module:
-	  - Rearranged the generation of csperlxs.c. Configure now generates a
-	    csperlxs.inc file with Perl, and echoes out a one-line csperlxs.c
-	    file which just #include's the inc file. If that fails, the
-	    fallback inc file is switched to, by changing the #include line.
-	  - Reenabled the Jamfile (see Matze 29-Apr-2003).
-	  - Updated the Makefile in line with the changes.
-	  - Fixed the example Perl code in perl5test so it follows the
+	    - Rearranged the generation of csperlxs.c.  Configure now generates
+	      a csperlxs.inc file with Perl, and echoes out a one-line
+	      csperlxs.c file which just #include's the inc file.  If that
+	      fails, the fallback inc file is switched to, by changing the
+	      #include line.
+	    - Reenabled the Jamfile (see Matze 29-Apr-2003).
+	    - Updated the Makefile in line with the changes.
+	    - Fixed the example Perl code in perl5test so it follows the
 	    conventions of the new SWIG module.
 	- Norman Kraemer extended progver.m4 for patterns to contain optional
 	    components.  Thus we can now have a pattern like this:
@@ -1911,9 +1911,10 @@ The history order is reversed so that new features are at the top.
           - Clarified some comments
         - Boyan added boolean property "Stretched" on AWS Command Button
 	- Matze
-	  - fixed (blindly) lots of errors when using the jambuild on  macosx.
-	  - fixed several warnings through the whole project.
-	  - put back csSchedul, seems this class was used.
+	    - Fixed (blindly) lots of errors when using the jambuild on
+	      MacOS/X.
+	    - Fixed several warnings through the whole project.
+	    - Put back csSchedul, seems this class was used.
 	- Fixed BugPlug so that it compiles again without the new renderer
 	  enabled.
 	- Fixed csArray assignment operator so that it returns a ref to the
@@ -2076,13 +2077,13 @@ The history order is reversed so that new features are at the top.
 	  is very common) is now treated specially.
 	- Added level load timing code to Walktest.
 	- Matze cleaned up csutil:
-	  -removed 2bitary.h bitay2d.h schedule.h
-	  -renamed cstreend.h to tree.h
-	  -renamed blkalloc.h to blockallocator.h
-	  -added comments to csVector that it is deprecated now
-	  -renamed rng.h to randomgen.h
-	  -moved halogen code to csengine
-	  -renamed ptrarr.h to parray.h
+	    - Removed 2bitary.h bitay2d.h schedule.h.
+	    - Renamed cstreend.h to tree.h.
+	    - Renamed blkalloc.h to blockallocator.h.
+	    - Added comments to csVector that it is deprecated now.
+	    - Renamed rng.h to randomgen.h.
+	    - Moved halogen code to csengine.
+	    - Renamed ptrarr.h to parray.h.
 	- Matze reverted the namespace stuff as this is creating unexpected
 	  problems when the user declares classes and structs ahead of their
 	  real declaration.
