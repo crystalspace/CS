@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+23-May-2001
+	- Added 'virtual' before the csView destructor and also fixed a
+	  warning in the csView constructor.
+	- Fixed a warning in csLightMap.
 22-May-2001
 	- Implemented improved OpenGL lightmap cache. There is now the notion
 	  of a super-lightmap which is a collection of smaller lightmaps.
@@ -26,6 +30,12 @@ The history order is reversed so that new features are at the top.
 	  its own cache and they are rendered one by one when needed.
 	- Fog has its own seperate queue now and this is rendered in a
 	  totally seperate pass.
+	- Martin Geisse continued cleanup of the engine.
+	- Thomas Hieber updated map2cs again. Still not completely ready
+	  though.
+	- Michael Knorr (damage-list@freenet.de) by way of Thomas Hieber
+	  fixed curve handling in map2cs (for the new map format).
+	- Norman Kramer did some fixing to the new aRts sound renderer.
 21-May-2001
 	- Added non-functional emit loader/saver which Wouter can complete.
 	- Wouter worked on emit loader. I did a small enhancement too.
