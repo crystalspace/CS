@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	  due to the fix above.
 	- Matze fixed csgfx which was making the wrong assumption that
 	  uint32 is always unsigned long.
+	- Matze changed definition from uint32 and int32 from long to int
 25-Mar-2003
 	- Changed API of OpenPortal() to accept a G3DPolygonDFP instead
 	  of a 2D polygon. I need z-information.
