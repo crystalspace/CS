@@ -314,7 +314,7 @@ install_build_lightmaps:
 	@echo $"CRYSTAL=$(INSTALL_DIR)$"
 
 # The Big Kafoozy!
-install_all: \
+install: \
   install_data \
   install_config \
   install_plugin \

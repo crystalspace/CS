@@ -76,6 +76,11 @@ chronological order.
 	  destinations didn't work (was only bound to the first destination).
 	- res augmented the chunklod plugin to also provide normalized tex 
 	  coords (ie go from 0 to 1 over the area of the terrain).
+	- Eric Sunshine fixed a stupid oversight in install.mak where the
+	  'install' target failed to be recognized by the sub-make invocation,
+	  despite the fact that the other targets, such as 'install_config',
+	  'install_plugin', etc., were recognized.  Reported by Atis Elsts
+	  <prophet@balticom.lv>.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
