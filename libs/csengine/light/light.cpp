@@ -89,6 +89,39 @@ float csLight::GetBrightnessAtDistance (float d)
   return 0;
 }
 
+csLight* csLight::Light::GetPrivateObject ()
+  { return scfParent; }
+unsigned long csLight::Light::GetLightID ()
+  { return scfParent->GetLightID (); }
+iObject *csLight::Light::QueryObject()
+  { return scfParent; }
+const csVector3& csLight::Light::GetCenter ()
+  { return scfParent->GetCenter (); }
+void csLight::Light::SetCenter (const csVector3& pos)
+  { scfParent->SetCenter (pos); }
+iSector *csLight::Light::GetSector ()
+  { return &scfParent->GetSector ()->scfiSector; }
+void csLight::Light::SetSector (iSector* sector)
+  { scfParent->SetSector (sector->GetPrivateObject ()); }
+float csLight::Light::GetRadius ()
+  { return scfParent->GetRadius (); }
+float csLight::Light::GetSquaredRadius ()
+  { return scfParent->GetSquaredRadius (); }
+float csLight::Light::GetInverseRadius ()
+  { return scfParent->GetInverseRadius (); }
+void csLight::Light::SetRadius (float r)
+  { scfParent->SetRadius (r); }
+const csColor& csLight::Light::GetColor ()
+  { return scfParent->GetColor (); }
+void csLight::Light::SetColor (const csColor& col)
+  { scfParent->SetColor (col); }
+int csLight::Light::GetAttenuation ()
+  { return scfParent->GetAttenuation (); }
+void csLight::Light::SetAttenuation (int a)
+  { scfParent->SetAttenuation (a); }
+float csLight::Light::GetBrightnessAtDistance (float d)
+  { return scfParent->GetBrightnessAtDistance (d); }
+
 iCrossHalo* csLight::Light::CreateCrossHalo (float intensity, float cross)
 {
   csCrossHalo* halo = new csCrossHalo (intensity, cross);
@@ -400,3 +433,35 @@ void csDynLight::AddLightpatch (csLightPatch* lp)
   lp->SetLight (this);
 }
 
+// --- csLightList -----------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csLightList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLightList::LightList)
+  SCF_IMPLEMENTS_INTERFACE (iLightList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csLightList::csLightList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightList);
+}
+
+int csLightList::LightList::GetCount () const
+  { return scfParent->Length (); }
+iLight *csLightList::LightList::Get (int n) const
+  { return scfParent->Get (n); }
+int csLightList::LightList::Add (iLight *obj)
+  { return scfParent->Push (obj); }
+bool csLightList::LightList::Remove (iLight *obj)
+  { return scfParent->Delete (obj); }
+bool csLightList::LightList::Remove (int n)
+  { return scfParent->Delete (n); }
+void csLightList::LightList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csLightList::LightList::Find (iLight *obj) const
+  { return scfParent->Find (obj); }
+iLight *csLightList::LightList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }

@@ -58,27 +58,17 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csLightList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightList::LightList)
-  SCF_IMPLEMENTS_INTERFACE (iLightList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csLightList::csLightList ()
+csSectorLightList::csSectorLightList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightList);
   sector = NULL;
 }
 
-csLightList::~csLightList ()
+csSectorLightList::~csSectorLightList ()
 {
   DeleteAll ();
 }
 
-bool csLightList::PrepareItem (csSome Item)
+bool csSectorLightList::PrepareItem (csSome Item)
 {
   iLight* light = (iLight*)Item;
   light->IncRef ();
@@ -86,7 +76,7 @@ bool csLightList::PrepareItem (csSome Item)
   return true;
 }
 
-bool csLightList::FreeItem (csSome Item)
+bool csSectorLightList::FreeItem (csSome Item)
 {
   iLight* light = (iLight*)Item;
   light->SetSector (NULL);
@@ -94,28 +84,16 @@ bool csLightList::FreeItem (csSome Item)
   return true;
 }
 
-int csLightList::LightList::GetCount () const
-  { return scfParent->Length (); }
-iLight *csLightList::LightList::Get (int n) const
-  { return scfParent->Get (n); }
-int csLightList::LightList::Add (iLight *obj)
-  { return scfParent->Push (obj); }
-bool csLightList::LightList::Remove (iLight *obj)
-  { return scfParent->Delete (obj); }
-bool csLightList::LightList::Remove (int n)
-  { return scfParent->Delete (n); }
-void csLightList::LightList::RemoveAll ()
-  { scfParent->DeleteAll (); }
-int csLightList::LightList::Find (iLight *obj) const
-  { return scfParent->Find (obj); }
-iLight *csLightList::LightList::FindByName (const char *Name) const
-  { return scfParent->FindByName (Name); }
-
 //---------------------------------------------------------------------------
 
 csSectorMeshList::csSectorMeshList ()
 {
   sector = NULL;
+}
+
+csSectorMeshList::~csSectorMeshList ()
+{
+  DeleteAll ();
 }
 
 bool csSectorMeshList::PrepareItem (csSome item)

@@ -19,73 +19,47 @@
 #ifndef __CS_SECTOR_H__
 #define __CS_SECTOR_H__
 
+#include "csgeom/math3d.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
-#include "csgeom/math3d.h"
-#include "csengine/bsp.h"
-#include "csengine/meshobj.h"
-#include "csengine/rdrprior.h"
 #include "csutil/cscolor.h"
 #include "iutil/objref.h"
-#include "iengine/movable.h"
-#include "iengine/sector.h"
-#include "iengine/mesh.h"
-#include "iengine/light.h"
 #include "ivideo/graph3d.h"
+#include "csengine/light.h"
+#include "csengine/meshobj.h"
+#include "csengine/rdrprior.h"
+#include "iengine/sector.h"
 
 class csEngine;
+class csProgressPulse;
+class csSector;
 class csStatLight;
 class csMeshWrapper;
 class csPolygon3D;
-class csCamera;
-class csDynLight;
-class csPolygon2DQueue;
-class csProgressPulse;
-class csSector;
-struct iGraphics3D;
 struct iStatLight;
 struct iVisibilityCuller;
 struct iRenderView;
 struct iMeshWrapper;
 struct iFrustumView;
 
-CS_DECLARE_OBJECT_VECTOR (csLightListHelper, iLight);
-
-/**
- * List of lights for a sector. This class implements iLightList.
- */
-class csLightList : public csLightListHelper
+/// A list of lights for a sector.
+class csSectorLightList : public csLightList
 {
 private:
   csSector* sector;
+
 public:
-  SCF_DECLARE_IBASE;
-
   /// constructor
-  csLightList ();
+  csSectorLightList ();
   /// destructor
-  ~csLightList ();
-
+  ~csSectorLightList ();
   /// Set the sector.
   void SetSector (csSector* s) { sector = s; }
 
-  /// Override FreeItem
-  virtual bool FreeItem (csSome Item);
   /// Override PrepareItem
   virtual bool PrepareItem (csSome Item);
-
-  class LightList : public iLightList
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csLightList);
-    virtual int GetCount () const;
-    virtual iLight *Get (int n) const;
-    virtual int Add (iLight *obj);
-    virtual bool Remove (iLight *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iLight *obj) const;
-    virtual iLight *FindByName (const char *Name) const;
-  } scfiLightList;
+  /// Override FreeItem
+  virtual bool FreeItem (csSome Item);
 };
 
 /// A list of meshes for a sector.
@@ -95,10 +69,16 @@ private:
   csSector* sector;
 
 public:
+  /// constructor
   csSectorMeshList ();
+  /// destructor
+  ~csSectorMeshList ();
+  /// Set the sector.
   void SetSector (csSector* sec) { sector = sec; }
 
+  /// Override PrepareItem
   virtual bool PrepareItem (csSome item);
+  /// Override FreeItem
   virtual bool FreeItem (csSome item);
 };
 
@@ -134,7 +114,7 @@ private:
    * All static and pseudo-dynamic lights in this sector.
    * This vector contains objects of type iLight*.
    */
-  csLightList lights;
+  csSectorLightList lights;
 
   /// Engine handle.
   csEngine* engine;
