@@ -18,7 +18,20 @@
 
 #ifdef SWIGPERL5
 
+/*
+    Recent releases of Swig contain a nasty bug where invocations of
+    function-like macros taking zero arguments are incorrectly transformed into
+    non-function-like macros. For instance, when Swig sees SCF_DESTRUCT_IBASE()
+    in inline code, it transforms it to SCF_DESTRUCT_IBASE, which later results
+    in a compilation error since the C-preprocessor does not have knowledge of
+    this non-function-like macro. We work around the problem by preventing Swig
+    from knowing that SCF_DESTRUCT_IBASE is a macro.
+*/
+#undef SCF_DESTRUCT_IBASE
+
+%{
 #include <csutil/csstring.h>
+%}
 
 /****************************************************************************
  * The AUTOLOAD function is called by Perl if the user tries to call a

@@ -21,4 +21,14 @@
   #undef Zero
 %}
 
+/*
+    Very recent versions of Swig #undef the Perl ENTER macro, yet we require
+    the macro for our custom functions which access PerlAPI.
+*/
+%{
+#ifndef ENTER
+#define ENTER push_scope()
+#endif
+%}
+
 #endif // SWIGPERL5

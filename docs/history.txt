@@ -34,12 +34,23 @@ chronological order.
 	  first set the "GUI subsystem", then the "console subsystem" flags.)
 	- res fixed the waveout sound driver to convert error descriptions from
 	  the system to UTF-8.
-	- Wouter Wijngaards changed the csfx DrawPartial to work under the
+	- Wouter Wijngaards changed the csfx DrawPartial() to work under the
 	  new renderer, it forgot to flip the y coord.
 	- res fixed a problem in csGLGraphics3D::BeginDraw(). It set  
 	  "current drawflags" to the "new drawflags" at the very beginning of
 	  the method, causing the test for whether G2D BeginDraw() should be
 	  called to always fail.
+	- Eric Sunshine made the following changes to deal with recent versions
+	  of Swig's Perl support:
+	    - Worked around a nasty bug where Swig transforms invocations of
+	      function-like macros taking zero-arguments in inline code into
+	      invocations of non-function-like macros. For instance, it
+	      transforms SCF_DESTRUCT_IBASE() into SCF_DESTRUCT_IBASE, which
+	      later causes a compilation error since the C-preprocessor does
+	      not know about this non-function-like macro.
+	    - Worked around problem where recent Swig's unconditionally #undef
+	      Perl's 'ENTER' macro. This caused inline code in perlpost.i,
+	      which utilizes that macro, to fail to compile.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
