@@ -24,6 +24,7 @@ chronological order.
 	  physical DLL in which each declaration is made. This should make it
 	  much easier to debug problems, rather than trying to guess about the
 	  locations of the plugins.
+	- res applied patch 1071736, "Adds vector2 shadervars in cg programs".
 22-Nov-2004
 	- Eric Sunshine added blurb to apimod100.txi regarding newly supported
 	  Java bindings.
@@ -59,6 +60,11 @@ chronological order.
 	  where it neglected to install config.sub, config.guess, and
 	  install-sh into ${datadir}/build/autoconf. These are needed by
 	  jamtemplate.
+	- res generalized csGetPlatformConfigPath() by removing the 'directory'
+	  flag. The function now returns a base for a filename.
+	- res changed the simple1, simple2 and simpmap apps to use an 
+	  application name of the style "CrystalSpace....". (As suggested by
+	  the SetApplicationName() documentation.)
 	- PK changed PicView to use csApplicationFramework and AWS.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding

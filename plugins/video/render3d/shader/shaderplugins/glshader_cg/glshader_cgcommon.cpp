@@ -111,6 +111,13 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
               cgGLSetParameter1f (param, fval);
           }
           break;
+        case csShaderVariable::VECTOR2:
+          {
+            csVector2 v2;
+            if(lvar->GetValue(v2))
+              cgGLSetParameter2f(param, v2.x, v2.y);
+          }
+          break;    
         case csShaderVariable::VECTOR3:
           {
             csVector3 v3;
