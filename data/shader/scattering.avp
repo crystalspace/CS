@@ -41,6 +41,7 @@
       # Output information
       OUTPUT oPos		= result.position;
       OUTPUT oCol0		= result.color;
+      OUTPUT oTex0		= result.texcoord[0];
       
       # Temporaries
       TEMP worldPos;
@@ -55,6 +56,8 @@
       TEMP extinction;
       TEMP inscatter;
       
+      MOV oTex0, ones;
+
       ###
       # transform positon to perspective space
       DP4 oPos.x, mvp[0], iPos;
