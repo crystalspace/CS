@@ -564,15 +564,16 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
       continue;
     }
     int vcount = poly.num_vertices;
-    for (int j = 0; j < vcount-1; j ++)
+    int j1 = vcount-1;
+    for (int j = 0; j < vcount; j1 = j, j++)
     {
-      int ind1 = poly.vertices[j];
-      int ind2 = poly.vertices[j+1];
+      int ind1 = poly.vertices[j1];
+      int ind2 = poly.vertices[j];
       csVector3 v1 = vertex_table[ind1] / mesht;
       csVector3 v2 = vertex_table[ind2] / mesht;
       csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
       edgeplane.Normalize();
-      if (edgeplane.Classify (center) < 0)
+      if (edgeplane.Classify (center) < SMALL_EPSILON)
       {
         csVector3 line = v2 - v1;
 	float linelen = line.SquaredNorm();
@@ -597,38 +598,6 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
           /* this is an invalid the ball is outside the poly at this edge */
           depth = -1;
         }
-      }
-    }
-    /* get the one last edge from END to 0 */
-    int ind1 = poly.vertices[vcount-1];
-    int ind2 = poly.vertices[0];
-    csVector3 v1 = vertex_table[ind1] / mesht;
-    csVector3 v2 = vertex_table[ind2] / mesht;
-    csPlane3 edgeplane (v1, v2, v2 - plane.Normal());
-    edgeplane.Normalize ();
-    if (edgeplane.Classify (center) < 0)
-    {
-      csVector3 line = v2 - v1;
-      float linelen = line.SquaredNorm ();
-      line.Normalize();
-      float proj = center * line;
-      /* if the point projects on this edge, but outside the poly test
-       * for depth to this edge (especially important on sharp corners)
-       */
-      if ((proj >= (v1 * line)) && (proj <= (v2 * line)))
-      {
-	float t = ((v1 - center) * (v2 - center)) / linelen;
-        csVector3 projpt = v1 + (line * t);
-        csVector3 newnorm = center - projpt;
-        float dist = newnorm.Norm();
-        depth = rad - dist;
-        newnorm /= dist;
-        plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
-      }
-      else
-      {
-        /* this is an invalid the ball is outside the poly at this edge */
-        depth = -1;
       }
     }
     if (depth < 0)
