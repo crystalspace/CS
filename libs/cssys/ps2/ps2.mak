@@ -132,7 +132,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make linux        Prepare for building on $(DESCRIPTION.linux)$"
+  $(NEWLINE)echo $"  make ps2          Prepare for building on $(DESCRIPTION.ps2)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
