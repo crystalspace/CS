@@ -63,8 +63,12 @@
 #define MAX_ORDER 10
 #define MAX_TEXMAP 5
 
+#ifndef FALSE
 #define FALSE 0
+#endif
+#ifndef TRUE
 #define TRUE 1
+#endif
 
 #define ERROR 0
 #define SUCCESS 1

@@ -17,6 +17,9 @@ Short-term cleanups that need to be done:
 	- Octree visibility culling works.  Preliminary results on a 50000
 	  polygon level are encouraging.
 	- Eric Sunshine fixed some compilation warnings in the octree code.
+	- Eric Sunshine applied a number of patches to the MacOS port which
+	  were provided by Anthony Hubble for compilation with CodeWarrior
+	  Pro 5.
 1-Sep-1999
 	- Made first provisions for culling of octree nodes.  Added a function
 	  to get the outline of an octree node and also added a cull function
