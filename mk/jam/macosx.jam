@@ -14,17 +14,26 @@ PLUGIN.LFLAGS += -bundle -framework AppKit -framework Foundation ;
 SUFPLUGIN ?= $(MACOSX.PLUGIN_EXT) ;
 MACOSX.APP_DIR = . ;
 MACOSX.APP_ICON = $(TOP)/libs/cssys/macosx/appicon.icns ;
+MACOSX_ENVIRON = export MACOSX_DEPLOYMENT_TARGET=10.2 ;
+APPLICATION.SUFFIX.GUI = .app ;
+APPLICATION.SUFFIX.CONSOLE = ;
 
-# XXX: The actions here are just guesses, I wasn't able to properly test them.
 actions LinkPlugin bind NEEDLIBS
 {
+  $(MACOSX_ENVIRON)
   $(CMD.LINK) -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
 }
 
 actions LinkApplication bind NEEDLIBS
 {
+  $(MACOSX_ENVIRON)
   $(TOP)/libs/cssys/macosx/appwrap.sh $(NAME) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(TOP)/include/csver.h
-  $(CMD.LINK) -o $(NAME)/Contents/MacOS/$(NAME) $(>) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.LINK) -o $(<)/Contents/MacOS/$(NAME) $(>) $(NEEDLIBS) $(LINKLIBS)
   touch $(<)
 }
 
+actions LinkApplicationConsole bind NEEDLIBS
+{
+  $(MACOSX_ENVIRON)
+  $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}

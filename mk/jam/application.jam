@@ -39,6 +39,24 @@ rule Application
     sources += $(STATICINITFILE:S=.o) ;
   }
 
+  # Allow overriding of application suffix for gui/console (if defined).
+  local suffix = $(SUFEXE) ;
+  if $(CONSOLEAPP_$(<)) = "yes"
+  {
+    if $(APPLICATION.SUFFIX.CONSOLE)
+    {
+      suffix = $(APPLICATION.SUFFIX.CONSOLE) ;
+    }
+  }
+  else
+  {
+    if $(APPLICATION.SUFFIX.GUI)
+    {
+      suffix = $(APPLICATION.SUFFIX.GUI) ;
+    }
+  }
+  local SUFEXE = $(suffix) ;
+
   $(<)_type = application ;
   $(<)_target = [ FAppendSuffix $(<) : $(SUFEXE) ] ;
   $(<)_objects = $(sources:S=$(SUFOBJ)) ;
@@ -63,7 +81,7 @@ rule ApplicationFromObjects
   
   target = $($(<)_target) ;
 
-  # so 'jam foo' works when it's really foo.exe
+  # so 'jam foo' works when it's really foo.exe (Windows) or foo.app (MacOS/X)
   if $(target) != $(<)
   {
     Depends $(<) : $(target) ;
@@ -88,12 +106,19 @@ rule ApplicationFromObjects
 
   # Invoke Link rule
   NAME on $(target) = $(<) ;
-  LinkApplication $(target) : $(>) ;
+  if $(CONSOLEAPP_$(<)) = "yes"
+  {
+    LinkApplicationConsole $(target) : $(>) ;
+  }
+  else
+  {
+    LinkApplication $(target) : $(>) ;
+  }
 }
 
 rule Option_console
 {
-  # XXX this needs some cflags and stuff for macosx I think
+  CONSOLEAPP_$(<) = yes ;
 }
 
 rule Option_noinstall

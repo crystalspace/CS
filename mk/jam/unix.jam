@@ -24,3 +24,8 @@ actions LinkApplication bind NEEDLIBS
 {
   $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
 }
+
+actions LinkApplicationConsole bind NEEDLIBS
+{
+  $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}
