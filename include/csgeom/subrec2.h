@@ -26,7 +26,6 @@
  * @{ */
 
 #include "csgeom/csrect.h"
-#include "csutil/blockallocator.h"
 
 class csSubRect2;
 
@@ -43,8 +42,6 @@ protected:
   csRect region;
   /// First empty region.
   csSubRect2* root;
-
-  csBlockAllocator<csSubRect2> alloc;
 
   csSubRect2* AllocSubrect ();
   

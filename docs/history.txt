@@ -9,6 +9,8 @@ chronological order.
 13-Feb-2004
 	- Jorrit updated the todo_newrenderer.txt document and added a list
 	  of visual differences between walktest/NR and walktest/OR.
+	- Jorrit changed csSubRectangles2 to use a global block allocator
+	  instead of one allocator per instance.
 12-Feb-2004
 	- Jorrit did several documentation enhancements:
 	    - Added a link to the new level building section in the

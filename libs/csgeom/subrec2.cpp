@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/subrec2.h"
+#include "csutil/blockallocator.h"
 
 #if 0//defined(CS_DEBUG)
 #define DUMP_TO_IMAGES
@@ -130,6 +131,16 @@ public:
 
 // --------------------------------------------------------------------------
 
+class csSubRectAlloc : public csBlockAllocator<csSubRect2>
+{
+public:
+  csSubRectAlloc () : csBlockAllocator<csSubRect2> (100) { }
+};
+
+CS_IMPLEMENT_STATIC_VAR (GetSubRecAlloc, csSubRectAlloc, ());
+
+// --------------------------------------------------------------------------
+
 csSubRect2::csSubRect2 ()
 {
   splitType = SPLIT_UNSPLIT;
@@ -141,8 +152,9 @@ csSubRect2::csSubRect2 ()
 
 csSubRect2::~csSubRect2 ()
 {
-  superrect->alloc.Free (children[0]);
-  superrect->alloc.Free (children[1]);
+  csSubRectAlloc* alloc = GetSubRecAlloc ();
+  alloc->Free (children[0]);
+  alloc->Free (children[1]);
 }
 
 void csSubRect2::TestAlloc (int w, int h, AllocInfo& ai)
@@ -470,16 +482,16 @@ void csSubRect2::TestCollapse ()
   {
     splitType = SPLIT_UNSPLIT;
     allocedRect.MakeEmpty ();
-    superrect->alloc.Free (children[0]); children[0] = 0;
-    superrect->alloc.Free (children[1]); children[1] = 0;
+    csSubRectAlloc* alloc = GetSubRecAlloc ();
+    alloc->Free (children[0]); children[0] = 0;
+    alloc->Free (children[1]); children[1] = 0;
     if (parent != 0) parent->TestCollapse ();
   }
 }
 
 // --------------------------------------------------------------------------
 
-csSubRectangles2::csSubRectangles2 (const csRect &region) :
- alloc (100)
+csSubRectangles2::csSubRectangles2 (const csRect &region)
 {
   csSubRectangles2::region = region;
   root = 0;
@@ -488,19 +500,19 @@ csSubRectangles2::csSubRectangles2 (const csRect &region) :
 
 csSubRectangles2::~csSubRectangles2 ()
 {
-  alloc.Free (root);
+  GetSubRecAlloc ()->Free (root);
 }
 
 csSubRect2* csSubRectangles2::AllocSubrect ()
 {
-  return alloc.Alloc ();
+  return GetSubRecAlloc ()->Alloc ();
 }
 
 void csSubRectangles2::Clear ()
 {
-  alloc.Free (root);
+  GetSubRecAlloc ()->Free (root);
 
-  root = alloc.Alloc ();
+  root = GetSubRecAlloc ()->Alloc ();
   root->rect = region;
   root->superrect = this;
 }
