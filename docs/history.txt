@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  prevents RefCounts on csObject's from going below zero. Also
 	  removed unecessary while() loop in csObjectIterator::Next(). This
 	  loop was never used. The engine now exit's *slightly* faster.
+	- Samuel Humphreys did several fixes to get -mode working again for
+	  X windows. He broke this yesterday.
 7-Aug-2001
 	- Removed PerformExtension() in the Windows system driver. Instead
 	  the Windows system driver now creates an object Win32Helper which
