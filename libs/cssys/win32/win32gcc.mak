@@ -127,8 +127,7 @@ DFLAGS.optimize = -s
 DFLAGS.debug = -g3
 
 # Flags for the linker which are used when building a shared library.
-#was
-#LFLAGS.DLL=$(DFLAGS.$(MODE)) -q --no-export-all-symbols --dllname $*
+
 LFLAGS.DLL=$(DFLAGS.$(MODE)) -shared
 
 # Typical extension for objects and static libraries
