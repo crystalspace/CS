@@ -4753,19 +4753,32 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	printf ("<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
 	goto error;
       case XMLTOKEN_CULLERP:
-	culplugname = csStrNew (child->GetContentsValue ());
-	culler_params = child;	// Remember for later.
-	if (!culplugname)
-	{
-	  SyntaxService->ReportError (
-		"crystalspace.maploader.parse.sector",
-	  	child,
-		"CULLERP expects the name of a visibility culling plugin!");
-	  goto error;
-	}
-	else
-	{
-          do_culler = true;
+        {
+	  const char* pluginname = child->GetAttributeValue ("plugin");
+	  if (pluginname)
+	  {
+	    // New way to write cullerp.
+	    culplugname = csStrNew (pluginname);
+	    culler_params = child;	// Remember for later.
+	  }
+	  else
+	  {
+	    // Old way.
+	    culplugname = csStrNew (child->GetContentsValue ());
+	    culler_params = 0;
+	  }
+	  if (!culplugname)
+	  {
+	    SyntaxService->ReportError (
+		  "crystalspace.maploader.parse.sector",
+	  	  child,
+		  "CULLERP expects the name of a visibility culling plugin!");
+	    goto error;
+	  }
+	  else
+	  {
+            do_culler = true;
+	  }
 	}
         break;
       case XMLTOKEN_MESHREF:

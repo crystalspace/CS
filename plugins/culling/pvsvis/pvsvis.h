@@ -94,10 +94,6 @@ public:
 
 private:
   iObjectRegistry *object_reg;
-  // Ever growing box of all objects that were ever in the tree.
-  // This puts an upper limit of all boxes in the kdtree itself because
-  // those go off to infinity.
-  csBox3 kdtree_box;
   csPDelArray<csPVSVisObjectWrapper> visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
@@ -176,7 +172,7 @@ public:
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
   virtual void CastShadows (iFrustumView* fview);
-  virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
+  virtual const char* ParseCullerParameters (iDocumentNode* node);
 
   struct eiComponent : public iComponent
   {

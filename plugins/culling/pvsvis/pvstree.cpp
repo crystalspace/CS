@@ -20,6 +20,9 @@
 #include <string.h>
 #include "csutil/databuf.h"
 #include "csutil/csendian.h"
+#include "iutil/cache.h"
+#include "iutil/objreg.h"
+#include "iengine/engine.h"
 #include "pvstree.h"
 #include "pvsvis.h"
 
@@ -209,9 +212,6 @@ void* csStaticPVSTree::CreateRootNode ()
 {
   Clear ();
   root = CreateNode ();
-  root->node_bbox.Set (-KDTREE_MAX, -KDTREE_MAX,
-  	-KDTREE_MAX, KDTREE_MAX,
-	KDTREE_MAX, KDTREE_MAX);
   return (void*)root;
 }
 
@@ -268,11 +268,10 @@ void csStaticPVSTree::WriteOut (char*& data, csStaticPVSNode* node)
   WriteOut (data, node->child2);
 }
 
-csPtr<iDataBuffer> csStaticPVSTree::WriteOut ()
+bool csStaticPVSTree::WriteOut ()
 {
   size_t total_len =
   	4 +	// marker
-	6 * 4 + // root_box
 	CalculateSize (root);
   csDataBuffer* buf = new csDataBuffer (total_len);
 
@@ -283,7 +282,10 @@ csPtr<iDataBuffer> csStaticPVSTree::WriteOut ()
   *data++ = '1';
   WriteOut (data, root);
 
-  return buf;
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+  return cache_mgr->CacheData ((void*)buf->GetData (), buf->GetSize (),
+  	"PVS", pvscache, 0);
 }
 
 const char* csStaticPVSTree::ReadPVS (char*& data, csStaticPVSNode*& node)
@@ -318,6 +320,17 @@ const char* csStaticPVSTree::ReadPVS (char*& data, csStaticPVSNode*& node)
   return 0;
 }
 
+const char* csStaticPVSTree::ReadPVS ()
+{
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+  csRef<iDataBuffer> buf = cache_mgr->ReadCache (
+  	"PVS", pvscache, 0);
+  if (!buf)
+    return "Couldn't get PVS cache from cache manager!";
+  return ReadPVS (buf);
+}
+
 const char* csStaticPVSTree::ReadPVS (iDataBuffer* buf)
 {
   Clear ();
@@ -334,9 +347,6 @@ const char* csStaticPVSTree::ReadPVS (iDataBuffer* buf)
   const char* err = ReadPVS (data, root);
   if (err) return err;
 
-  csBox3 root_box (-KDTREE_MAX, -KDTREE_MAX,
-  	-KDTREE_MAX, KDTREE_MAX,
-	KDTREE_MAX, KDTREE_MAX);
   root->PropagateBBox (root_box);
   return 0;
 }
@@ -427,5 +437,17 @@ void csStaticPVSTree::TraverseRandom (csPVSTreeVisitFunc* func,
 void csStaticPVSTree::MarkInvisible (const csVector3& pos, uint32 cur_timestamp)
 {
   root->MarkInvisible (pos, cur_timestamp);
+}
+
+void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
+{
+  root_box = bbox;
+  if (root)
+    root->PropagateBBox (root_box);
+}
+
+void csStaticPVSTree::SetPVSCacheName (const char* pvscache)
+{
+  csStaticPVSTree::pvscache = pvscache;
 }
 

@@ -19,6 +19,20 @@ chronological order.
 	- Keith Fulton fixed problem with sprcal3d animation reversal only 
 	  working in certain cases due to missplaced check for this 
 	  condition after the function might have returned.
+	- Jorrit introduced a new way to specify cullers in a sector in the
+	  map file. The old way of using <cullerp>bla</cullerp> still works
+	  but you can now also write <cullerp plugin="bla" /> instead.
+	- Jorrit continued work on PVS. To use a PVS in your map you
+	  must supply parameters to the cullerp node like this:
+		<cullerp plugin="crystalspace.culling.pvsvis">
+		    <box>
+		    	<min x="-100" y="-100" z="-100" />
+		    	<max x="100" y="100" z="100" />
+		    </box>
+		</cullerp>
+	  The box is not optional. PVS requires to know the bounding box
+	  of the level in advance. Visibility calculations of objects outside
+	  that box are undefined.
 22-Jan-2005
 	- res made the following changes:
 	    - Silenced some compiler warnings on VC2005.

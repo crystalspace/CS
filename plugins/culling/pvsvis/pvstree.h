@@ -20,12 +20,11 @@
 #define __CS_PVSTREE_H__
 
 #include "csutil/scf.h"
+#include "csutil/csstring.h"
 #include "csgeom/box.h"
 #include "ivaria/pvstree.h"
 
 class csPVSVisObjectWrapper;
-
-#define KDTREE_MAX 100000.
 
 class csStaticPVSNode;
 
@@ -113,9 +112,17 @@ private:
   // 'id' is the index, the pointer to the node is the contents.
   csArray<csStaticPVSNode*> nodes_by_id;
 
+  iObjectRegistry* object_reg;
+
   // Current timestamp we are using for Front2Back(). Objects that
   // have the same timestamp are already visited during Front2Back().
   static uint32 global_timestamp;
+
+  // File name to write out this tree.
+  csString pvscache;
+
+  // Bounding box of the root.
+  csBox3 root_box;
 
   // Create a node and assign an id to it.
   csStaticPVSNode* CreateNode ();
@@ -132,6 +139,11 @@ private:
 public:
   csStaticPVSTree ();
   virtual ~csStaticPVSTree ();
+
+  void SetObjectRegistry (iObjectRegistry* o)
+  {
+    object_reg = o;
+  }
 
   /**
    * Add a dynamic object to the tree.
@@ -208,13 +220,29 @@ public:
     where = ((csStaticPVSNode*)node)->where;
   }
   virtual void MarkInvisible (void* source, void* target);
-  virtual csPtr<iDataBuffer> WriteOut ();
+  virtual bool WriteOut ();
+
+  /**
+   * Set the bounding box for this PVS.
+   */
+  virtual void SetBoundingBox (const csBox3& bbox);
 
   /**
    * Clear PVS and read it from the data buffer.
    * Return 0 on success and otherwise a description of the error.
    */
   const char* ReadPVS (iDataBuffer* buf);
+
+  /**
+   * Clear PVS and read it from the cache.
+   * Return 0 on success and otherwise a description of the error.
+   */
+  const char* ReadPVS ();
+
+  /**
+   * Set the PVS cache name.
+   */
+  void SetPVSCacheName (const char* pvscache);
 };
 
 

@@ -48,6 +48,14 @@ SCF_VERSION (iStaticPVSTree, 0, 0, 1);
 struct iStaticPVSTree : public iBase
 {
   /**
+   * Setup a PVS tree with the given bounding box. This is mostly
+   * used in situations where you want to setup a PVS culler at
+   * runtime. Normally this information is present in the XML parameters
+   * for the PVS culler.
+   */
+  virtual void SetBoundingBox (const csBox3& bbox) = 0;
+
+  /**
    * Clear the PVS information. This must be called if you want
    * to recreate the PVS.
    */
@@ -96,10 +104,10 @@ struct iStaticPVSTree : public iBase
   virtual void MarkInvisible (void* source, void* target) = 0;
 
   /**
-   * Write out the PVS information to a databuffer which will
-   * be returned by this function.
+   * Write out the PVS information to the cache. Returns false
+   * on failure.
    */
-  virtual csPtr<iDataBuffer> WriteOut () = 0;
+  virtual bool WriteOut () = 0;
 };
 
 #endif // __CS_IVARIA_PVSTREE_H__

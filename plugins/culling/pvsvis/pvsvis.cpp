@@ -33,6 +33,7 @@
 #include "igeom/objmodel.h"
 #include "csutil/flags.h"
 #include "iutil/objreg.h"
+#include "iutil/document.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -47,6 +48,7 @@
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
+#include "imap/services.h"
 #include "pvsvis.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -187,13 +189,48 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
-  pvstree.Clear ();
-
+  pvstree.SetObjectRegistry (object_reg);
+  pvstree.SetBoundingBox (csBox3 (-100, -100, -100, 100, 100, 100));
   return true;
 }
 
-void csPVSVis::Setup (const char* /*name*/)
+void csPVSVis::Setup (const char* name)
 {
+  pvstree.SetPVSCacheName (name);
+  const char* err = pvstree.ReadPVS ();
+  if (err)
+  {
+    // This is not an error as it is possible that we're loading a world
+    // for pvscalc so that the pvs is calculated.
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+    	"crystalspace.culler.pvsvis",
+    	"Couldn't load PVS because of: %s", err);
+  }
+}
+
+const char* csPVSVis::ParseCullerParameters (iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    if (!strcmp ("box", value))
+    {
+      csRef<iSyntaxService> syn = CS_QUERY_REGISTRY (object_reg,
+        iSyntaxService);
+      csBox3 b;
+      if (!syn->ParseBox (child, b))
+        return "Error parsing box for the PVS visibility culler!";
+      pvstree.SetBoundingBox (b);
+    }
+    else
+    {
+      return "Unrecognized parameter for the PVS visibility culler!";
+    }
+  }
+  return 0;
 }
 
 void csPVSVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
@@ -242,7 +279,6 @@ void csPVSVis::RegisterVisObject (iVisibilityObject* visobj)
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   pvstree.AddObject (bbox, visobj_wrap);
-  kdtree_box += bbox;
 
   iMeshWrapper* mesh = visobj->GetMeshWrapper ();
   visobj_wrap->mesh = mesh;
@@ -316,7 +352,6 @@ void csPVSVis::UpdateObject (csPVSVisObjectWrapper* visobj_wrap)
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   pvstree.MoveObject (visobj_wrap, bbox);
-  kdtree_box += bbox;
   visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
@@ -334,7 +369,6 @@ int csPVSVis::TestNodeVisibility (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data, uint32& frustum_mask)
 {
   csBox3 node_bbox = treenode->GetNodeBBox ();
-  node_bbox *= kdtree_box;
 
   if (node_bbox.Contains (data->pos))
   {
@@ -1182,3 +1216,4 @@ void csPVSVis::CastShadows (iFrustumView* fview)
   }
   shadows->RestoreRegion (prev_region);
 }
+
