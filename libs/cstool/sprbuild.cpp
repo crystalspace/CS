@@ -21,6 +21,7 @@
 #include "csutil/csstring.h"
 #include "csutil/typedvec.h"
 #include "csutil/intarray.h"
+#include "csutil/databuf.h"
 #include "cstool/sprbuild.h"
 #include "cstool/mdltool.h"
 #include "imesh/mdldata.h"
@@ -203,64 +204,80 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 
 // --- file version ----------------------------------------------------------
 
-/*
 void csSpriteBuilderFile::Begin ()
 {
+  char *name = "obj";
+  Out << "MESHOBJ '" << name << "' (\n";
+  Out << "  PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n";
+  Out << "  PARAMS (\n";
 }
 
 void csSpriteBuilderFile::Finish ()
 {
+  Out << "  )\n";
+  Out << ")\n";
 }
 
 void csSpriteBuilderFile::StoreTriangle (int a, int b, int c)
 {
+  Out << "    TRIANGLE (" << a << ',' << b << ',' << c << ")\n";
 }
 
 void csSpriteBuilderFile::StoreMaterial (iModelDataMaterial *mat)
 {
+  char *name = "obj";
+  Out << "    MATERIAL ('" << name << "skin')\n";
 }
 
-int csSpriteBuilderFile::StoreFrameInfo (int FrameCount, int VertexCount)
+int csSpriteBuilderFile::StoreFrameInfo (int /*FrameCount*/, int /*VertexCount*/)
 {
+  return 0;
 }
 
 void csSpriteBuilderFile::EnableTiling ()
 {
+  Out << "    MIXMODE (TILING ())\n";
 }
 
 void csSpriteBuilderFile::BeginFrame (int Num)
 {
+  Out << "    FRAME 'frame" << Num << "' (\n";
 }
 
 void csSpriteBuilderFile::FinishFrame ()
 {
+  Out << "    )\n";
 }
 
 void csSpriteBuilderFile::AddVertex (const csVector3 &pos,
 	const csVector3 &nrm, const csVector2 &tex)
 {
+  Out << "      V (" << pos.x << ',' << pos.y << ',' << pos.z;
+  Out << ':' << tex.x << ',' << tex.y << ")\n";
 }
 
 void csSpriteBuilderFile::BeginAction (const char *Name)
 {
+  Out << "    ACTION '" << Name << "' (\n";
 }
 
 void csSpriteBuilderFile::FinishAction ()
 {
+  Out << "    )\n";
 }
 
 void csSpriteBuilderFile::StoreActionFrame (int Frame, csTicks Delay)
 {
+  Out << "      F ('frame" << Frame << "', " << Delay << ")\n";
 }
 
-iDataBuffer csSpriteBuilderFile::Build (iModelDataObject *Input)
+iDataBuffer *csSpriteBuilderFile::Build (iModelDataObject *Input)
 {
   Out.Clear ();
-  Build (Input);
+  csSpriteBuilder::Build (Input);
   int Size = Out.Length () + 1;
   return new csDataBuffer (Out.Detach (), Size);
 }
-*/
 
 // --- mesh version ----------------------------------------------------------
 

@@ -21,6 +21,7 @@
 #include "iutil/objreg.h"
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
+#include "cstool/sprbuild.h"
 
 class csModelConverterSPR : iModelConverter
 {
@@ -105,10 +106,33 @@ iModelData *csModelConverterSPR::Load (UByte * /*Buffer*/, ULong /*Size*/)
   return NULL;
 }
 
+/*
+  Purpose:
+   
+    csModelConverterSPR::Save() writes a standard CS SPR file.
+
+  Modified:
+
+    12 April 2001
+
+  Author:
+
+    Luca Pancallo
+
+  Modified by Martin Geisse to work with the new converter interface.
+*/
+
 iDataBuffer *csModelConverterSPR::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "spr"))
     return NULL;
 
-  return NULL;
+  // only the first object is saved
+  iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
+  if (!obj) return NULL;
+
+  csSpriteBuilderFile Builder;
+  iDataBuffer *buf = Builder.Build (obj);
+  obj->DecRef ();
+  return buf;
 }

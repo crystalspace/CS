@@ -19,6 +19,8 @@
 #ifndef __SPRBUILD_H__
 #define __SPRBUILD_H__
 
+#include "csutil/csstring.h"
+
 class csVector3;
 class csVector2;
 struct iModelDataMaterial;
@@ -26,6 +28,7 @@ struct iModelDataObject;
 struct iSprite3DFactoryState;
 struct iSpriteFrame;
 struct iSpriteAction;
+struct iDataBuffer;
 
 /**
  * This is a generic sprite builder interface. It takes a model data object
@@ -67,7 +70,6 @@ public:
   bool Build (iModelDataObject *Input);
 };
 
-/*
 /// This sprite builder writes the data to a buffer
 class csSpriteBuilderFile : private csSpriteBuilder
 {
@@ -82,15 +84,15 @@ private:
   virtual void EnableTiling ();
   virtual void BeginFrame (int Num);
   virtual void FinishFrame ();
-  virtual void AddVertex (csVector3 pos, csVector3 nrm, csVector3 tex);
+  virtual void AddVertex (const csVector3 &pos, const csVector3 &nrm,
+	const csVector2 &tex);
   virtual void BeginAction (const char *Name);
   virtual void FinishAction ();
   virtual void StoreActionFrame (int Frame, csTicks Delay);
 public:
 
   iDataBuffer *Build (iModelDataObject *Input);
-}
-*/
+};
 
 /// This sprite builder takes a sprite factory and adds the input information
 class csSpriteBuilderMesh : private csSpriteBuilder
