@@ -45,6 +45,9 @@ chronological order.
 	  uses CalculateClipSettings.
 	- Eric Sunshine augmented scripts/python/Jamfile so that it also cleans
 	  up the evil .pyc and .pyo files which are excreted by Python.
+	- Eric Sunshine augmented configure.ac to determine the file extensions
+	  of pure Python and pure Perl modules. cspython.mak and csperl.mak now
+	  utilize the results of these checks.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render

@@ -611,7 +611,9 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 	    [cs_cv_perl_cflags=`AC_RUN_LOG(
 		[$PERL -MExtUtils::Embed -e ccopts])`
 	    cs_cv_perl_lflags=`AC_RUN_LOG(
-		[$PERL -MExtUtils::Embed -e ldopts])`],
+		[$PERL -MExtUtils::Embed -e ldopts])`
+	    cs_cv_perl_ext=`AC_RUN_LOG([$PERL -MConfig -e \
+		'$e = $Config{"dlext"} || $Config{"so"} || ""; print "$e"'])`],
 	    [AS_IF([test $cs_cv_perl_mod_config = yes],
 		[cs_perl_core=`AC_RUN_LOG(
 		    [$PERL -MConfig -e 'print $Config{archlib}'])`
@@ -621,7 +623,9 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 		cs_cv_perl_cflags="${cs_cv_perl_cflags} -I${cs_perl_core}"
 		cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MConfig -e \
 		    'print $Config{ldflags}, " ", $Config{libs}'])`
-		cs_cv_perl_lflags="${cs_cv_perl_lflags} -L${cs_perl_core}"],
+		cs_cv_perl_lflags="${cs_cv_perl_lflags} -L${cs_perl_core}"
+		cs_cv_perl_ext=`AC_RUN_LOG([$PERL -MConfig -e \
+		    '$e = $Config{"dlext"}||$Config{"so"}||""; print "$e"'])`],
 		[cs_perl_core=`AC_RUN_LOG([$PERL -V:archlib | \
 		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`
 		cs_perl_core="${cs_perl_core}/CORE"
@@ -633,7 +637,9 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 		cs_perl_lflags_tmp=`AC_RUN_LOG([$PERL -V:libs | \
 		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`
 		cs_cv_perl_lflags="${cs_cv_perl_lflags} ${cs_perl_lflags_tmp}
-		    -L${cs_perl_core}"])])
+		    -L${cs_perl_core}"
+		cs_cv_perl_ext=`AC_RUN_LOG([$PERL -V:dlext | \
+		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`])])
 	cs_cv_perl_cflags=CS_PATH_NORMALIZE([$cs_cv_perl_cflags])
 	cs_cv_perl_cflags=CS_TRIM([$cs_cv_perl_cflags])
 	cs_cv_perl_lflags=CS_PATH_NORMALIZE([$cs_cv_perl_lflags])
@@ -645,8 +651,11 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 		[[#include <EXTERN.h>
 		#include <perl.h>]],
 		[perl_run(0);])],
-	    [CS_CREATE_TUPLE([$cs_cv_perl_cflags],[],[$cs_cv_perl_lflags])],
-	    [], [CS_EMIT_BUILD_RESULT([cs_cv_perl], [PERL5])])])])
+	    [CS_CREATE_TUPLE([$cs_cv_perl_cflags],[],[$cs_cv_perl_lflags])])
+	AS_IF([test $cs_cv_perl = yes],
+	    [CS_EMIT_BUILD_RESULT([cs_cv_perl], [PERL5])
+	    CS_BUILD_PROPERTY([PERL5.MODULE_EXT], [.$cs_cv_perl_ext])])])])
+	
 
 
 
@@ -685,11 +694,15 @@ AS_IF([test -n "$PYTHON" && test "$with_python" != no],
 	cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
 
 	cs_cv_pybase_libs=`AC_RUN_LOG([$PYTHON -c \
-	    'import distutils.sysconfig ; \
+	    'import distutils.sysconfig; \
 	    print (distutils.sysconfig.get_config_var("LIBS") or "") + " " + \
 		  (distutils.sysconfig.get_config_var("SYSLIBS") or "")'])`
 	cs_cv_pybase_libs=CS_PATH_NORMALIZE([$cs_cv_pybase_libs])
 	cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
+
+	cs_cv_pybase_ext=`AC_RUN_LOG([$PYTHON -c \
+	    'import distutils.sysconfig; \
+	    print (distutils.sysconfig.get_config_var("SO") or "")'])`
 
 	AS_IF([test -n "$cs_pyver" &&
 	       test -n "$cs_cv_pybase_cflags" &&
@@ -718,11 +731,13 @@ AS_IF([test -n "$PYTHON" && test "$with_python" != no],
 	CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
 	    [AC_LANG_PROGRAM([[#include <Python.h>]],
 		[Py_Initialize(); Py_Finalize();])],
-	    [$cs_pytuples], [],
-	    [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
+	    [$cs_pytuples], [], [], [], [],
 	    [$cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags],
 	    [$cs_cv_pybase_lflags $cs_cv_sys_pthread_lflags],
-	    [$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])])
+	    [$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])
+	AS_IF([test $cs_cv_python = yes],
+	    [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])
+	    CS_BUILD_PROPERTY([PYTHON.MODULE_EXT], [$cs_cv_pybase_ext])])])
 
 
 

@@ -68,6 +68,10 @@ CSPERL5.DERIVED = $(OUTDERIVED)/perl5
 PERLXSI.C = $(CSPERL5.DERIVED)/csperlxs.c
 PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))
 
+ifeq (,$(PERL5.MODULE_EXT))
+PERL5.MODULE_EXT = $(DLL)
+endif
+
 SWIG.I = $(SRCDIR)/include/ivaria/cspace.i
 SWIG.MOD = cspace
 SWIG.PERL5.DIR = $(SRCDIR)/scripts/perl5
@@ -80,7 +84,7 @@ SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.CPP:.cpp=$O))
 SWIG.PERL5.MOD = $(SRCDIR)/plugins/cscript/csperl5/perl5mod.cpp
 SWIG.PERL5.MOD.O = $(OUT)/$(notdir $(SWIG.PERL5.MOD:.cpp=$O))
 SWIG.PERL5.INSTALLDIR = $(OUTPROC)/perl5
-SWIG.PERL5.DLL = $(SWIG.PERL5.INSTALLDIR)/$(SWIG.MOD)$(DLL)
+SWIG.PERL5.DLL = $(SWIG.PERL5.INSTALLDIR)/$(SWIG.MOD)$(PERL5.MODULE_EXT)
 SWIG.PERL5.INSTALLPM = $(SWIG.PERL5.INSTALLDIR)/$(notdir $(SWIG.PERL5.PM))
 
 CEX.CSPERL5 = perl5.cex
