@@ -18,6 +18,10 @@
 
 #include <stdarg.h>
 
+// Include platform.h here. Otherwise we don't get the CS_EXTENSIVE_MEMDEBUG
+// definition.
+#include "platform.h"
+
 #ifdef CS_EXTENSIVE_MEMDEBUG
   // in cssysdef.h is a "#define new" which affects the operator
   // implementations as well
@@ -29,6 +33,9 @@
 #include "cssysdef.h"
 
 #if defined(COMP_VC)
+//========================================================================
+// Branch: For VC
+//========================================================================
 
 // The VC runtime has it's own memory debugging facility, always
 // enabled when using the debug runtime.
@@ -54,12 +61,14 @@ void operator delete[] (void* p)
 {
   if (p) _free_dbg (p, _NORMAL_BLOCK);
 }
-#endif
+#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#elif 0
-
+#elif 0	// COMP_VC
 //========================================================================
-// CONFIGURATION OF THE MEMORY DEBUGGER:
+// Extensive memory debugger.
+//========================================================================
+
+// Configuration:
 
 // If the following define is 1 we will use a table and then we're able
 // to do much more extensive (but lots slower) memory debugging.
@@ -509,10 +518,36 @@ void operator delete[] (void* p)
 #endif
 }
 
-#else
+#elif 0	// COMP_VC
+//========================================================================
+// This alternative branch allows for dumping all memory allocations.
+//========================================================================
 
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+#undef new
+void* operator new (size_t s, void* filename, int line)
+{
+  return (void*)malloc (s);
+}
+void* operator new[] (size_t s, void*, int)
+{
+  return (void*)malloc (s);
+}
+void operator delete (void* p)
+{
+  if (p) free (p);
+}
+void operator delete[] (void* p)
+{
+  if (p) free (p);
+}
+#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+
+#else	// COMP_VC
+//========================================================================
 // If CS_EXTENSIVE_MEMDEBUG is defined we still have to provide
 // the correct overloaded operators even if we don't do debugging.
+//========================================================================
 
 #ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 #undef new
@@ -532,6 +567,7 @@ void operator delete[] (void* p)
 {
   if (p) free (p);
 }
-#endif
+#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#endif
+#endif	// COMP_VC
+

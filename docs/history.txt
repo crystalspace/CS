@@ -10,6 +10,11 @@ chronological order.
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.
 	- Jorrit fixed another similar warning in shadervar.cpp.
+	- Jorrit fixed memdebug.cpp so that it now includes platform.h
+	  before testing for CS_EXTENSIVE_MEMDEBUG. That flag is set in
+	  volatile.h but since memdebug.cpp needs to test for that flag
+	  BEFORE loading cssysdef.h we have to include volatile.h (through
+	  platform.h) manually.
 15-Dec-2003
 	- Matze reworked some jam rules so that subdirs are more robust now.
 	  This should also fix some msvcgen problems on jam.
