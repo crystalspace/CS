@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+6-Aug-2002
+	- Extended iXmlNode with functions to create and move nodes
+	  and attributes. Added iXmlDocument as a representation of a document.
+	  Added iXmlSystem which represents the XML system in general.
 5-Aug-2002
 	- Removed CS_GNUC_PRINTF macros with iGraphics2D->PerformExtension()
 	  since this doesn't make sense. PerformExtension() doesn't follow

@@ -25,6 +25,12 @@
 
 struct iXmlNode;
 struct iXmlAttribute;
+struct iFile;
+struct iDataBuffer;
+struct iString;
+class csString;
+
+//===========================================================================
 
 SCF_VERSION (iXmlAttributeIterator, 0, 0, 1);
 
@@ -38,6 +44,8 @@ struct iXmlAttributeIterator : public iBase
   /// Get next element.
   virtual csRef<iXmlAttribute> Next () = 0;
 };
+
+//===========================================================================
 
 SCF_VERSION (iXmlAttribute, 0, 0, 1);
 
@@ -56,6 +64,8 @@ struct iXmlAttribute : public iBase
   virtual void SetValue (const char* value) = 0;
 };
 
+//===========================================================================
+
 SCF_VERSION (iXmlNodeIterator, 0, 0, 1);
 
 /**
@@ -69,6 +79,8 @@ struct iXmlNodeIterator : public iBase
   virtual csRef<iXmlNode> Next () = 0;
 };
 
+//===========================================================================
+
 SCF_VERSION (iXmlNode, 0, 0, 1);
 
 /**
@@ -76,9 +88,15 @@ SCF_VERSION (iXmlNode, 0, 0, 1);
  */
 struct iXmlNode : public iBase
 {
+  /// Get the type of this node.
+  virtual const char* GetType () = 0;
+  /// Set the type of this node.
+  virtual void SetType (const char* type) = 0;
   /// Get number of children.
   virtual int GetChildCount () const = 0;
 
+  //---------------------------------------------------------------------
+  
   /// Get child with index.
   virtual csRef<iXmlNode> GetChild (int idx) = 0;
   /// Get child by type.
@@ -99,6 +117,21 @@ struct iXmlNode : public iBase
   /// Remove all children.
   virtual void RemoveChildren () = 0;
 
+  /**
+   * Create a new node of the given type at the given index.
+   * The node at that index (and all following nodes) will be shifted
+   * up. If index is -1 then the node will be created last.
+   */
+  virtual csRef<iXmlNode> CreateNode (const char* type, int index = -1) = 0;
+  /**
+   * Move a node (which should be a child of this node) to the given index.
+   * All nodes at that index (and all following nodes) will be shifted up.
+   * If index is -1 then the node will be moved to the last position.
+   */
+  virtual void MoveNode (const csRef<iXmlNode>& node, int index) = 0;
+
+  //---------------------------------------------------------------------
+
   /// Get number of attributes.
   virtual int GetAttributeCount () const = 0;
 
@@ -113,9 +146,6 @@ struct iXmlNode : public iBase
   /// Get an iterator over all attributes of the specified name.
   virtual csRef<iXmlAttributeIterator> GetAttributes (const char* name) = 0;
 
-  /// Change or add an attribute.
-  virtual void SetAttribute (const char* name, const char* value) = 0;
-
   /// Remove an attribute by index.
   virtual void RemoveAttribute (int idx) = 0;
   /// Remove all attributes with that name.
@@ -124,7 +154,117 @@ struct iXmlNode : public iBase
   virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr) = 0;
   /// Remove all attributes.
   virtual void RemoveAttributes () = 0;
+
+  /// Change or add an attribute.
+  virtual void SetAttribute (const char* name, const char* value) = 0;
+  /**
+   * Create a new attribute at the given index.
+   * The attribute at that index (and all following attributes) will be shifted
+   * up. If index is -1 then the attribute will be created last.
+   */
+  virtual csRef<iXmlAttribute> CreateAttribute (int index = -1) = 0;
+  /**
+   * Move an attribute (which should be a child of this node) to the given
+   * index. The attribute at that index (and all following attributes) will
+   * be shifted up. If index is -1 then the attribute will be moved to
+   * the last position.
+   */
+  virtual void MoveAttribute (const csRef<iXmlAttribute>& attr, int index) = 0;
 };
+
+//===========================================================================
+
+SCF_VERSION (iXmlDocument, 0, 0, 1);
+
+/**
+ * This represents a document in XML.
+ */
+struct iXmlDocument : public iBase
+{
+  /// Clear the document fully.
+  virtual void Clear () = 0;
+
+  /// Create a root node. This will clear the previous root node if any.
+  virtual csRef<iXmlNode> CreateRoot () = 0;
+
+  /// Get the current root node.
+  virtual csRef<iXmlNode> GetRoot () = 0;
+
+  /**
+   * Parse XML file from an iFile.
+   * This will clear the previous root node if any.
+   * Returns NULL if all is ok. Otherwise it will return an error
+   * string.
+   */
+  virtual const char* ParseXML (iFile* file) = 0;
+
+  /**
+   * Parse XML file from an iDataBuffer.
+   * This will clear the previous root node if any.
+   * Returns NULL if all is ok. Otherwise it will return an error
+   * string.
+   */
+  virtual const char* ParseXML (iDataBuffer* buf) = 0;
+
+  /**
+   * Parse XML file from an iString.
+   * This will clear the previous root node if any.
+   * Returns NULL if all is ok. Otherwise it will return an error
+   * string.
+   */
+  virtual const char* ParseXML (iString* str) = 0;
+
+  /**
+   * Parse XML file from a csString.
+   * This will clear the previous root node if any.
+   * Returns NULL if all is ok. Otherwise it will return an error
+   * string.
+   */
+  virtual const char* ParseXML (const csString& str) = 0;
+
+  /**
+   * Parse XML file from a char array.
+   * This will clear the previous root node if any.
+   * Returns NULL if all is ok. Otherwise it will return an error
+   * string.
+   */
+  virtual const char* ParseXML (const char* buf) = 0;
+
+  /**
+   * Write out XML file to an iFile.
+   * This will return NULL if all is ok. Otherwise it will return an
+   * error string.
+   */
+  virtual const char* WriteXML (iFile* file) = 0;
+
+  /**
+   * Write out XML file to an iString.
+   * This will return NULL if all is ok. Otherwise it will return an
+   * error string.
+   */
+  virtual const char* WriteXML (iString& str) = 0;
+
+  /**
+   * Write out XML file to a csString.
+   * This will return NULL if all is ok. Otherwise it will return an
+   * error string.
+   */
+  virtual const char* WriteXML (csString& str) = 0;
+};
+
+//===========================================================================
+
+SCF_VERSION (iXmlSystem, 0, 0, 1);
+
+/**
+ * The XML plugin.
+ */
+struct iXmlSystem : public iBase
+{
+  /// Create a new empty document.
+  virtual csRef<iXmlDocument> CreateDocument () = 0;
+};
+
 
 #endif // __IUTIL_XML_H__
 
