@@ -25,6 +25,8 @@ chronological order.
 	- Jorrit removed the 'camera' flag for render priorities in the
 	  engine and the loader. The keyword is still recognized by the loader
 	  but only a deprecated warning is given.
+	- Neil Mosafi added forward declare for iGraphics3D to 
+	  ivideo/custcursor.h
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render
