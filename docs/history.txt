@@ -59,6 +59,16 @@ chronological order.
 	  100MB.  Finally, documentation offered for download is now only
 	  published in .tar.bz2 format (rather than .tar.bz2, .tgz, and .zip).
 	- John Harger fixed the warnings in glshader_ps1.
+	- res fixed a problem in csPortalContainer::Draw() where a ref to an
+	  object on the stack was stored (and thus the data was subsequently 
+	  corrupted).
+	- res added a workaround to the generic render step for the issue that
+	  the transforms in the rendermeshes will be changed to reflect the 
+	  portal transform. However, as meshes usually keep just 1 copy RM, 
+	  it'll affect the original mesh as well. Now the RMs are copied before
+	  drawing behind the portal and restored afterwards. Makes the shape
+	  room mirror in flarge work, but a better solution should be 
+	  researched.
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.

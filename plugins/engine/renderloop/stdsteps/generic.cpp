@@ -224,6 +224,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
   int num = meshlist->SortMeshLists ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
+  csArray<csRenderMesh> saveMeshes;
   meshlist->GetSortedMeshes (sameShaderMeshes);
  
   int lastidx = 0;
@@ -248,7 +249,20 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       }
 
       ToggleStepSettings (g3d, false);
+      /*
+        When drawing the contents of a portal, the transforms in the
+	rendermeshes will be changed to reflect the portal transform.
+	However, as meshes usually keep just 1 copy RM, it'll affect
+	the original mesh as well.
+	@@@ Uuuugly workaround: copy the RMs before drawing behind the
+	portal and copy them back afterwards.
+       */
+      saveMeshes.SetLength (num - n);
+      for (int i = n; i < num; i++)
+	saveMeshes[i - n] = *sameShaderMeshes[i - n];
       mesh->portal->Draw (rview);
+      for (int i = n; i < num; i++)
+	*sameShaderMeshes[i - n] = saveMeshes[i - n];
     }
     else 
     {

@@ -900,8 +900,8 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   float shift_x = camera->GetShiftX ();
   float shift_y = camera->GetShiftY ();
 
-  const csReversibleTransform& movtrans = meshwrapper
-  	->GetCsMovable ().GetFullTransform ();
+  const csReversibleTransform movtrans = 
+    meshwrapper->GetCsMovable ().GetFullTransform ();
 
   int i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
