@@ -44,6 +44,9 @@ chronological order.
 	- Eric Sunshine applied a patch from Michael D. Adams
 	  <mdmkolbe@yahoo.com> which fixes problem in winprintf.cpp where
 	  Cygwin did not understand _fileno() and _isatty().
+	- res fixed compiling of Opcode under Cygwin (and probably other 
+	  platforms where uintptr_t isn't basically the same as Opcode's 
+	  udword).
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and
