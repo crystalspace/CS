@@ -215,6 +215,12 @@ public:
     (void)relevantcount; (void)oldcount;
     return (T*)realloc (mem, newcount * sizeof(T));
   }
+
+  // Move memory.
+  static void MemMove (T* mem, int dest, int src, int count)
+  {
+    memmove (mem + dest, mem + src, count * sizeof(T));
+  }
 };
 
 /**
@@ -258,6 +264,29 @@ public:
     }
     Free (mem);
     return newmem;
+  }
+
+  static void MemMove (T* mem, int dest, int src, int count)
+  {
+    int i;
+    if (dest < src)
+    {
+      for (i = 0 ; i < count ; i++)
+      {
+        ElementHandler::Construct (mem + dest + i, mem[src + i]);
+	ElementHandler::Destroy (mem + src + i);
+      }
+    }
+    else
+    {
+      i = count;
+      while (i > 0)
+      {
+	i--;
+        ElementHandler::Construct (mem + dest + i, mem[src + i]);
+	ElementHandler::Destroy (mem + src + i);
+      }
+    }
   }
 };
 
@@ -622,7 +651,7 @@ public:
       SetLengthUnsafe (count + 1); // Increments 'count' as a side-effect.
       int const nmove = (count - n - 1);
       if (nmove > 0)
-        memmove (root + n + 1, root + n, nmove * sizeof(T));
+	MemoryAllocator::MemMove (root, n+1, n, nmove);
       ElementHandler::Construct (root + n, item);
       return true;
     }
@@ -816,7 +845,7 @@ public:
       int const nmove = ncount - n;
       ElementHandler::Destroy (root + n);
       if (nmove > 0)
-        memmove (root + n, root + n + 1, nmove * sizeof(T));
+	MemoryAllocator::MemMove (root, n, n+1, nmove);
       SetLengthUnsafe (ncount);
       return true;
     }
@@ -842,7 +871,7 @@ public:
     int const ncount = count - range_size;
     int const nmove = count - end - 1;
     if (nmove > 0)
-      memmove (root + start, root + start + range_size, nmove * sizeof(T));
+      MemoryAllocator::MemMove (root, start, start + range_size, nmove);
     SetLengthUnsafe (ncount);
   }
 

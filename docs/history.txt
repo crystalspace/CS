@@ -40,6 +40,11 @@ chronological order.
 	  (again) fixes a bug in VFS where it would sometimes fail to delete
 	  old entries and this could cause duplicate entries in a zip file
 	  (happened a lot with relight).
+	- Jorrit fixed a big bug in csSafeCopyArray.  The problem was that
+	  csArray was using 'memmove' but that function is illegal in the
+	  context of csSafeCopyArray.  Solved this by adding a new MemMove()
+	  function to the memory allocator used by csArray.  This fixes
+	  InsertSorted(), Insert(), DeleteRange(), and DeleteIndex().
 11-Aug-2004
 	- Oktal fixed a problem in the console input plugin where a '%' sign in
 	  the input would cause problems because of iConsoleOutput::PutText's
