@@ -314,8 +314,10 @@ void csTextureManagerNull::create_inv_cmap ()
   // Greg Ewing, 12 Oct 1998
   delete inv_cmap;
   inv_cmap = NULL; // let the routine allocate the array itself
+  UByte* im;
   csInverseColormap (256, &cmap [0], RGB2PAL_BITS_R, RGB2PAL_BITS_G,
-    RGB2PAL_BITS_B, inv_cmap);
+    RGB2PAL_BITS_B, im);
+  inv_cmap = im;
 
   // Color number 0 is reserved for transparency
   inv_cmap [encode_rgb (cmap [0].red, cmap [0].green, cmap [0].blue)] =
