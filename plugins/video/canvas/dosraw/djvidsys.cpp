@@ -165,7 +165,7 @@ VideoSystem::VideoSystem ()
   VideoMode = 0;
   VideoPage = 0;
   WaitVR = true;
-  UseDoubleBuffering = true;
+  UseDoubleBuffering = false;
 
   // Sanity check
   if ((sizeof (VESAInformation) != 512)
@@ -358,6 +358,10 @@ int VideoSystem::Open ()
     regs.x.es = __tb >> 4;
     regs.x.di = 0;
 
+    // clear the mode info buffer
+    memset (&mb, 0, sizeof (mb));
+    dosmemput (&mb, sizeof (VESAModeInfoBlock), __tb);
+
     // Get mode information.
     __dpmi_int (0x10, &regs);
     if (regs.x.ax != 0x004f)
@@ -477,6 +481,7 @@ allocate:
     return -4;
   }
 
+  DoubleBuffer (true);
 #ifdef DEBUG
   printf("IsBanked: %d\n" "IsXmode: %d\n" "VideoPages: %d\n"
          "VRAMSelector: %08lX\n" "VRAMBuffer: %08lX\n" "VRAM: %08lX\n",
