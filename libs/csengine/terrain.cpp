@@ -186,10 +186,27 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 		    s++;
 		  ci = tn->next();
 		}
+
 		bt->visTriangle(s);
 	  }
 	  i++;
 	}
+	// Ugly hack to help software renderer, reindex the triangles per block.
+	  i = 0;
+	  int j;
+	  s = 0;
+	  while (i < mesh->getBinTreeNo())
+	  {
+		d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
+		if (d > 0)
+		{
+		  for (j = s*3; j < 3*(s+d); j++)
+			  vbuf->ibuf[j] -= s*3;
+		  s = s+d;
+		}
+		i = i+2;
+	  }
+
   }
 
   rview.g3d->SetObjectToCamera (&rview);
@@ -217,10 +234,11 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
 	init = true;
   }
-  g3dmesh.num_vertices = vbuf->num();	  // number of shared vertices for all triangles
+  // Cant dothis in one step for software renderer.
+//  g3dmesh.num_vertices = vbuf->num();	  // number of shared vertices for all triangles
   // All the three below arrays have num_vertices elements.
-  g3dmesh.vertices[0] = (csVector3*) vbuf->vbuf; // pointer to array of csVector3 for all those verts
-  g3dmesh.texels[0][0] = (csVector2*) vbuf->tbuf;	 // pointer to array of csVector2 for uv coordinates
+//  g3dmesh.vertices[0] = (csVector3*) vbuf->vbuf; // pointer to array of csVector3 for all those verts
+//  g3dmesh.texels[0][0] = (csVector2*) vbuf->tbuf;	 // pointer to array of csVector2 for uv coordinates
 
   // Render the vertex buffer piece by piece (per texture).
   i = 0;
@@ -232,10 +250,14 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	{
       if (_textureMap && _textureMap[i/2])
 	    g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
-	  // Render this bintree.
+	  // Render this block.
+	  // For software renderer we need to pass in a little bit at a time.
+	  g3dmesh.num_vertices = d*3;	  // number of shared vertices for all triangles
+	  g3dmesh.vertices[0] = (csVector3*) &(vbuf->vbuf[s*3]); // pointer to array of csVector3 for all those verts
+	  g3dmesh.texels[0][0] = (csVector2*) &(vbuf->tbuf[s*3]);	 // pointer to array of csVector2 for uv coordinates
       g3dmesh.num_triangles = d; // number of triangles
       g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
-	  // Render this bintree.
+
       rview.g3d->DrawTriangleMesh (g3dmesh);
 	  // Increment the starting offset by the number of triangles that were in this block.
 	  s = s+d;
