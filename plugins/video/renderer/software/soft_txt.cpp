@@ -215,7 +215,6 @@ void csTextureHandleSoftware::ComputeMeanColor ()
       {
 	// Very well, we don't need the iImage anymore, so free it
 	DG_UNLINK (t, t->image);
-	t->image->DecRef ();
 	t->image = NULL;
       }
     }

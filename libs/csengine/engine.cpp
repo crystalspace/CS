@@ -1106,6 +1106,7 @@ void csEngine::PrepareTextures ()
   {
     iTextureWrapper *csth = textures->Get (i);
     if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
+    if (!csth->KeepImage ()) csth->SetImageFile (NULL);
   }
 
   // Prepare all the textures.

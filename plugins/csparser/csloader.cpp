@@ -676,6 +676,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("hardmove", XMLTOKEN_HARDMOVE);
   xmltokens.Register ("heightgen", XMLTOKEN_HEIGHTGEN);
   xmltokens.Register ("invisible", XMLTOKEN_INVISIBLE);
+  xmltokens.Register ("key", XMLTOKEN_KEEPIMAGE);
   xmltokens.Register ("key", XMLTOKEN_KEY);
   xmltokens.Register ("layer", XMLTOKEN_LAYER);
   xmltokens.Register ("level", XMLTOKEN_LEVEL);

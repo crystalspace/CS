@@ -107,6 +107,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   strcpy (filename, txtname);
   csColor transp (0, 0, 0);
   bool do_transp = false;
+  bool keep_image = false;
   int flags = CS_TEXTURE_3D;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -180,6 +181,12 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
             flags &= ~CS_TEXTURE_DITHER;
 	}
         break;
+      case XMLTOKEN_KEEPIMAGE:
+        {
+	  if (!SyntaxService->ParseBool (child, keep_image, true))
+	    return NULL;
+	}
+	break;
       default:
         SyntaxService->ReportBadToken (child);
 	return NULL;
@@ -203,7 +210,11 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	      node, "Could not load texture '%s'\n", txtname);
   }
 
-  if (tex) tex->IncRef ();	// To avoid smart pointer release.
+  if (tex)
+  {
+    tex->SetKeepImage (keep_image);
+    tex->IncRef ();	// To avoid smart pointer release.
+  }
   return tex;
 }
 

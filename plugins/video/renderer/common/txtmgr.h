@@ -59,7 +59,7 @@ class csTextureHandle : public iTextureHandle
 {
 protected:
   /// The original image object.
-  iImage *image;
+  csRef<iImage> image;
 
   /// Texture usage flags: 2d/3d/etc
   int flags;

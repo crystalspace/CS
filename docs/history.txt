@@ -4,6 +4,21 @@ The history order is reversed so that new features are at the top.
 	- Fixed csVfsCacheManager so it no longer tries to use 'scope' if
 	  that is NULL. This has an effect on 'precalc_info' which will now
 	  be placed in that file instead of in '(null)'.
+	- Use csRef for storing the images in the texture manager.
+	- Fixed a pseudo-'memory leak' with images. After registering textures
+	  the original source images are (usually) no longer needed. But CS
+	  was keeping them in memory anyway. This resulted in a big overhead
+	  since those textures can be very big. Now by default the original
+	  image pointers (iImage instances) are removed after registering
+	  a texture wrapper (iTextureWrapper->Register() will release it's
+	  link and iTextureManager->FreeImages() will then release the link
+	  in the renderer).
+	- Added iTextureWrapper->SetKeepImage() and KeepImage() to control
+	  this new behaviour. If you call SetKeepImage(true) then the
+	  texture wrapper will keep a pointer to the image when Register()
+	  is called.
+	- Added <keepimage> option for textures so that you can indicate
+	  in a map file that you want to keep the image.
 19-Nov-2002
 	- 'genmesh' objects now also cast shadows (they don't receive
 	  shadows yet). Generalized the shadow casting system in the engine

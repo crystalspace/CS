@@ -42,6 +42,7 @@ csTextureWrapper::csTextureWrapper (iImage *Image) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
   image = Image;
+  keep_image = false;
   DG_LINK (this, image);
   UpdateKeyColorFromImage ();
 
@@ -53,6 +54,8 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
+
+  keep_image = false;
 
   handle = ith;
   if (handle)
@@ -81,6 +84,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   DG_LINK (this, handle);
   image = t.image;
   DG_LINK (this, image);
+  keep_image = t.keep_image;
 
   UpdateKeyColorFromImage ();
 
@@ -116,7 +120,8 @@ void csTextureWrapper::SetImageFile (iImage *Image)
 
   image = Image;
 
-  UpdateKeyColorFromImage ();
+  if (image)
+    UpdateKeyColorFromImage ();
 }
 
 void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
@@ -188,6 +193,9 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
     DG_LINK (this, handle);
     SetKeyColor (key_col_r, key_col_g, key_col_b);
   }
+
+  if (!keep_image)
+    SetImageFile (NULL);
 }
 
 iObject *csTextureWrapper::TextureWrapper::QueryObject ()

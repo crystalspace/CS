@@ -44,6 +44,13 @@ class csTextureWrapper : public csObject
 private:
   /// The corresponding iImage.
   csRef<iImage> image;
+  /**
+   * Keep image. If this flag is true the image will not be removed
+   * after registering to the texture manager. This is important
+   * if you want to be able to modify the texture later.
+   * By default images are removed when they are no longer needed.
+   */
+  bool keep_image;
   /// The handle as returned by iTextureManager.
   csRef<iTextureHandle> handle;
   // key color
@@ -175,6 +182,8 @@ public:
     virtual void SetUseCallback (iTextureCallback* callback);
     virtual iTextureCallback* GetUseCallback ();
     virtual void Visit ();
+    virtual void SetKeepImage (bool k) { scfParent->keep_image = k; }
+    virtual bool KeepImage () const { return scfParent->keep_image; }
   } scfiTextureWrapper;
   friend struct TextureWrapper;
 };

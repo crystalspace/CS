@@ -44,7 +44,7 @@ public:
   /// The alpha map (NULL if no alphamap)
   uint8 *alphamap;
   /// The image (temporary storage)
-  iImage *image;
+  csRef<iImage> image;
 
   /// Create a csTexture object
   csTextureSoftware (csTextureHandle *Parent, iImage *Image)
@@ -54,7 +54,6 @@ public:
     alphamap = NULL;
     image = Image;
     DG_LINK (this, image);
-    image->IncRef ();
     w = Image->GetWidth ();
     h = Image->GetHeight ();
     compute_masks ();
@@ -64,7 +63,7 @@ public:
   {
     delete [] bitmap;
     delete [] alphamap;
-    if (image) image->DecRef ();
+    image = NULL;
   }
 
   /// Return a pointer to texture data

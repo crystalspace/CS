@@ -456,7 +456,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
     // Create each new level by creating a level 2 mipmap from previous level
     // we do this down to 1x1 as opengl defines it
 
-    iImage *prevImage = image;
+    csRef<iImage> prevImage = image;
     csRef<iImage> thisImage;
 
     int w = prevImage->GetWidth ();
@@ -466,7 +466,6 @@ void csTextureHandleOpenGL::CreateMipmaps ()
     ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (),
           (csRGBpixel *)prevImage->GetImageData ());
 
-    prevImage->IncRef ();
     while (w != 1 || h != 1)
     {
       nTex++;
@@ -484,12 +483,8 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       transform (thisImage, vTex[nTex]);
       w = thisImage->GetWidth ();
       h = thisImage->GetHeight ();
-      prevImage->DecRef ();
-      thisImage->IncRef ();
       prevImage = thisImage;
     }
-
-    prevImage->DecRef ();
   }
   else
     ComputeMeanColor (vTex[0]->get_width (), vTex[0]->get_height (),
