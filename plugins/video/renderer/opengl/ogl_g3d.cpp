@@ -90,6 +90,7 @@ static const unsigned int FOGTABLE_SIZE = 64;
 // 
 static const double FOGTABLE_MEDIANDISTANCE = 10.0;
 static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
+static const double FOGTABLE_DISTANCESCALE = 1.0 / FOGTABLE_MAXDISTANCE;
 
 // fog (distance*density) is mapped to a texture coordinate and then
 // clamped.  This determines the clamp value.  Some OpenGL drivers don't
@@ -351,6 +352,7 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);
 
+
   // if the user tries to draw lines, text, etc. before calling
   // BeginDraw() they will not see anything since the transforms are
   // not set up correctly until you call BeginDraw().  However,
@@ -360,8 +362,9 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   // appear on the screen.
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-
   glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 1.0);
+  glViewport(0,0,width,height);
+
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
 
@@ -423,12 +426,15 @@ bool csGraphics3DOpenGL::BeginDraw (int DrawFlags)
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
+    glViewport(0,0,width,height);
+
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
     glColor3f (1., 0., 0.);
     glClearColor (0., 0., 0., 0.);
     dbg_current_polygon = 0;
   }
+
   if (DrawFlags & CSDRAW_CLEARZBUFFER)
   {
     if (DrawFlags & CSDRAW_CLEARSCREEN)
@@ -447,6 +453,7 @@ bool csGraphics3DOpenGL::BeginDraw (int DrawFlags)
 void csGraphics3DOpenGL::FinishDraw ()
 {
   // ASSERT( G2D );
+
 
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
   {
@@ -837,9 +844,9 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
       // specify fog vertex alpha value using the fog table and fog
       // distance
       if (poly.fog_info[i].intensity > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
-	glTexCoord1f (FOGTABLE_CLAMPVALUE);
+	glTexCoord2f (FOGTABLE_CLAMPVALUE,0.0);
       else
-	glTexCoord1f (poly.fog_info[i].intensity / FOGTABLE_MAXDISTANCE);
+	glTexCoord2f (poly.fog_info[i].intensity / FOGTABLE_MAXDISTANCE, 0.0);
 
       // specify fog vertex location
       glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1.0, sz);
@@ -1054,6 +1061,15 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   // yet another work in progress - GJH
 
+  // fallback to "default" implementation if something comes up that we can't
+  // handle.  This includes software clipping.
+  if (mesh.do_clip && clipper)
+  {
+  //  SysPrintf(MSG_DEBUG_0, "Falling back to software clipping in DrawTriangleMesh\n");
+    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    return;
+  }
+
   //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
   /// Static vertex array.
   static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
@@ -1102,7 +1118,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   csVector2* work_uv_verts;
   csColor* work_colors;
 
-/*  if (mesh.num_vertices_pool > 1)
+  if (mesh.num_vertices_pool > 1)
   {
     // Vertex morphing.
     float tween_ratio = mesh.morph_factor;
@@ -1132,16 +1148,9 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     else
       work_colors = col1;
   }
-  else*/
+  else
   {
-    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
-    {
-      for (i = 0 ; i < mesh.num_vertices ; i++)
-        tr_verts[i] = o2c * f1[i]; //o2c.GetO2T() *  (f1[i] - o2c.GetO2TTranslation() );
-      work_verts = tr_verts.GetArray ();
-    }
-    else
-      work_verts = f1;
+    work_verts = f1;
     work_uv_verts = uv1;
     work_colors = col1;
   }
@@ -1153,15 +1162,54 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPushMatrix();
   glLoadIdentity();
 
+  glTranslatef(width2,height2,0);
+
+
+  // Set up perspective transform.  This is done in the modelview matrix.
+  // We could do it in the projection matrix like a normal app would,
+  // but manipulating multiple transform matrices per DrawTriangleMesh() call
+  // would simply add to the complexity and overhead.
+  for (i = 0 ; i < 16 ; i++)
+    matrixholder[i] = 0.0;
+  
+  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
+  
+  matrixholder[10] = 0.0;
+  matrixholder[11] = 1.0/aspect;
+  matrixholder[14] = -1.0/aspect;
+  matrixholder[15] = 0.0;
+
+  glMultMatrixf(matrixholder);
+
   // set up world->camera transform, if needed
-  if (0)//(mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+  if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
   {
+    // we basically have to duplicate the
+    // original transformation code:
+    //   tr_verts[i] = o2c.GetO2T() *  (f1[i] - o2c.GetO2TTranslation() );
+    //
+    // we do this by applying both a translation and rotation matrix
+    // using values pulled from the o2c quantity, which represents
+    // the current world->camera transform
+    //
+    // Wonder why we do the orientation before the translation?
+    // Wonder why we apply this AFTER the perspective transform,
+    // applied in the preceding code block?
+    // Many 3D graphics and OpenGL books discuss how the order
+    // of 4x4 transform matrices represent certain transformations,
+    // and they do a much better job than I ever could.  Please refer
+    // to an OpenGL reference for good insight into proper manipulation
+    // of the modelview matrix.
+
     csMatrix3 orientation = o2c.GetO2T();
     
-//    csVector3 translation = o2c.GetO2TTranslation();
-//    glTranslatef(-translation.x, -translation.y, -translation.z);
+    // this zeroing is probably not needed, but I'm playing it safe in case
+    // this code is changed later... GJH
+    for (i=0; i<16; i++) matrixholder[i] = 0.0;
 
-    matrixholder[3] = matrixholder[7] = matrixholder[11] = 0.0;
+    matrixholder[0] = 1.0;
+    matrixholder[5] = 1.0;
+    matrixholder[10] = 1.0;
 
     matrixholder[0] = orientation.m11;
     matrixholder[1] = orientation.m21;
@@ -1175,31 +1223,14 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     matrixholder[9] = orientation.m23;
     matrixholder[10] = orientation.m33;
 
-    matrixholder[12] = 0.0;
-    matrixholder[13] = 0.0;
-    matrixholder[14] = 0.0;
     matrixholder[15] = 1.0;
 
+    csVector3 translation = o2c.GetO2TTranslation();
+
     glMultMatrixf(matrixholder);
+
+    glTranslatef(-translation.x, -translation.y, -translation.z);
   }
-
-  // setup camera perspective+viewport projection.  This is accumulated
-  // in the modelview matrix as well; we could stuff this into
-  // the projection and viewport state but that would require manipulating
-  // three separate OpenGL entities which would be supremely messy.
-  glTranslatef(width2,height2,0);
-
-  for (i = 0 ; i < 16 ; i++)
-    matrixholder[i] = 0.0;
-  
-  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
-  
-  matrixholder[10] = 0.0;
-  matrixholder[11] = 1.0/aspect;
-  matrixholder[14] = -1.0/aspect;
-  matrixholder[15] = 0.0;
-
-  glMultMatrixf(matrixholder);
 
   // old perspective transform
   //for (i = 0 ; i < mesh.num_vertices ; i++)
@@ -1226,7 +1257,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
       if (I > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
       	I = FOGTABLE_CLAMPVALUE;
       else
-	I = I / FOGTABLE_MAXDISTANCE;
+	I = I * FOGTABLE_DISTANCESCALE;
 
       fog_intensities[i] = I; 
       fog_color_verts[i].red = mesh.vertex_fog[i].r;
@@ -1235,26 +1266,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
   }
 
-  // build a set of visible triangles for drawing.  We basically go through
-  // the provided triangles and filter out any that have one or more visible vertices
-  int visible_index_count = 0;
   csTriangle *triangles = mesh.triangles;
-
-  for (i=0; i<mesh.num_triangles; i++)
-  {
-    //if ( ( visible [ triangles[i].a ] ) &&
-         //( visible [ triangles[i].b ] ) &&
-         //( visible [ triangles[i].c ] ) )
-    //{
-      visible_indices[visible_index_count++] = triangles[i].a;
-      visible_indices[visible_index_count++] = triangles[i].b;
-      visible_indices[visible_index_count++] = triangles[i].c;
-    //}
-  }
-
-  // no vertices?
-  if (visible_index_count == 0)
-    return;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
@@ -1279,7 +1291,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glVertexPointer(3, GL_FLOAT, 0, & work_verts[0]);
   glTexCoordPointer(2, GL_FLOAT, 0, & work_uv_verts[0]);
-  glDrawElements(GL_TRIANGLES, visible_index_count, GL_UNSIGNED_INT, & visible_indices[0]);
+  glDrawElements(GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
 
   // If there is vertex fog then we apply that last.
   if (mesh.do_fog)
@@ -1305,7 +1317,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glTexCoordPointer(1, GL_FLOAT, 0, & fog_intensities[0]);
     glColorPointer(3, GL_FLOAT, 0, & fog_color_verts[0]);
 
-    glDrawElements(GL_TRIANGLES, visible_index_count, GL_UNSIGNED_INT, & visible_indices[0]);
+    glDrawElements(GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
 
 
     // Restore state (blend mode, texture handle, etc.) for next
@@ -1785,7 +1797,6 @@ void csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP & poly)
 void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  /// Retrieve clipping rectangle
   int ClipX1, ClipY1, ClipX2, ClipY2;
   G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 
