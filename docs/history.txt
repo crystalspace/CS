@@ -9,6 +9,11 @@ The history order is reversed so that new features are at the top.
 	- Removed the no longer functional DO_HW_UVZ define and all code
 	  related to that. If we still need that we're going to have to
 	  solve that differently anyway.
+	- Matze removed his libxml2 plugin again. The tinyxml plugin improved
+	  alot lately, so it doesn't make sense to keep the half-finished
+	  libxml2 plugin. (We can still revive it from attic when someone
+	  wants to use it)
+	  
 19-Mar-2003
 	- Removed a few unused flags from csPolygon3D.
 	- In order to be able to make real thing factories (that don't use

@@ -148,9 +148,6 @@ endif
 ifeq ($(LINUXJOYSTICK.AVAILABLE),yes)
 PLUGINS.DYNAMIC += device/joystick/linux
 endif
-ifeq ($(LIBXML2.AVAILABLE),yes)
-PLUGINS.DYNAMIC += documentsystem/xml
-endif
 #PLUGINS.DYNAMIC += video/render3d/opengl
 #PLUGINS.DYNAMIC += video/render3d/shadermgr
 #PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb

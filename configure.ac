@@ -1482,18 +1482,6 @@ AC_CHECK_FT2([2.0],
     CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
     CS_MAKEFILE_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
 
-
-
-#------------------------------------------------------------------------------
-# Check for libxml2
-#------------------------------------------------------------------------------
-PKG_CHECK_MODULES(LIBXML2, libxml-2.0,
-    [CS_MAKEFILE_PROPERTY([LIBXML2.AVAILABLE], [yes])
-    CS_MAKEFILE_PROPERTY([LIBXML2.LFLAGS], [$LIBXML2_LIBS])
-    CS_MAKEFILE_PROPERTY([LIBXML2.CFLAGS], [$LIBXML2_CFLAGS])])
-
-
-
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older
 # versions of Mingw did not have this library, whereas newer interim versions
