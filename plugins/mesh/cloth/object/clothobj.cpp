@@ -298,8 +298,9 @@ bool csStuffObject::HitBeamOutline (const csVector3& start,
   {
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],vrt[tr[i].c], seg, isect))
     {
-      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) / csSquaredDist::PointPoint (start, end))
-        return true;
+      if (pr)
+		*pr = qsqrt (csSquaredDist::PointPoint (start, isect) / csSquaredDist::PointPoint (start, end));
+      return true;
     }
   }
   return false;
@@ -320,8 +321,9 @@ bool csStuffObject::HitBeamObject (const csVector3& start,
   {
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],vrt[tr[i].c], seg, isect))
     {
-      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) / csSquaredDist::PointPoint (start, end))
-        return true;
+      if (pr)
+		*pr = qsqrt (csSquaredDist::PointPoint (start, isect) / csSquaredDist::PointPoint (start, end));
+      return true;
     }
   }
   return false;
