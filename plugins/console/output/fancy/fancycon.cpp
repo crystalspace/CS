@@ -385,8 +385,9 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
     poly.mat_handle = border.mat;
 
     float alpha = border.do_alpha ? border.alpha : 0.0;
-    poly.mixmode = CS_FX_SETALPHA (alpha)
-      | (border.do_keycolor ? CS_FX_KEYCOLOR : 0);
+
+    poly.mixmode = CS_FX_SETALPHA (alpha) 
+      | (border.do_keycolor ? CS_FX_GOURAUD : 0);
     G3D->DrawPolygonFX (poly);
   }
 }
