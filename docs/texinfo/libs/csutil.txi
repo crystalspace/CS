@@ -139,11 +139,8 @@ used in new code.  @emph{Do not use this array type.} Instead, you should use
 @code{csArray<T>}.  Include file is @file{csutil/ptrarr.h}.
 
 @item
-@code{csPDelArray<T>}: @emph{This class is deprecated.} This is similar to
-@code{csPArray<T>}.  It is for pointers only.  It differs from
-@code{csPArray<T>} in that it invokes @samp{delete} for elements removed from
-the array.  Other than that difference, all of the warnings which apply to
-@code{csPArray<T>} also apply to this class.  You should not use this class for
-new code.  Instead, use @code{csArray<T>} or @code{csRefArray<T>}, depending
-upon your requirements.  Include file is @file{csutil/ptrarr.h}.
+@code{csPDelArray<T>}: This is similar to @code{csPArray<T>}. It is for
+pointers only.  It differs from @code{csPArray<T>} in that it invokes
+@samp{delete} for elements removed from the array.  Include file is
+@file{csutil/ptrarr.h}.
 @end itemize

@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 21-Jul-2003
 	- Oktal added missing doxygen comment at the top of csSymbolTable.
         - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
+	- Jorrit removed a comment about csPDelArray<T> being deprecated
+	  from the documentation. csArray<T> nor csRefArray<T> can provide
+	  the functionality given by csPDelArray<T>.
 20-Jul-2003
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object
