@@ -22,6 +22,7 @@
 // Enable the following define to have the DG_... macros.
 //#define CS_USE_GRAPHDEBUG
 
+struct iBase;
 struct iObjectRegistry;
 
 // The following versions of the defines are only available in
@@ -30,6 +31,8 @@ struct iObjectRegistry;
 #if defined(CS_DEBUG) && defined(CS_USE_GRAPHDEBUG)
 #define DG_ADD(obj,desc) \
   csDebuggingGraph::AddObject(NULL,(void*)(obj),__FILE__,__LINE__,desc)
+#define DG_ADDI(obj,desc) \
+  csDebuggingGraph::AddInterface(NULL,(iBase*)(obj),__FILE__,__LINE__,desc)
 #define DG_DESCRIBE0(obj,desc) \
   csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc)
 #define DG_DESCRIBE1(obj,desc,a) \
@@ -54,6 +57,7 @@ struct iObjectRegistry;
   csDebuggingGraph::RemoveParent(NULL,(void*)(child),(void*)(parent))
 #else
 #define DG_ADD(obj,desc)
+#define DG_ADDI(obj,desc)
 #define DG_DESCRIBE0(obj,desc)
 #define DG_DESCRIBE1(obj,desc,a)
 #define DG_DESCRIBE2(obj,desc,a,b)
@@ -99,6 +103,15 @@ public:
    */
   static void AddObject (iObjectRegistry* object_reg,
   	void* object, char* file, int linenr,
+  	char* description, ...);
+
+  /**
+   * Add a new object to the debug graph and link to its parent.
+   * This version is for an iBase interface. If you use this then
+   * the dump will also show ref count.
+   */
+  static void AddInterface (iObjectRegistry* object_reg,
+  	iBase* object, char* file, int linenr,
   	char* description, ...);
 
   /**

@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+15-Nov-2001
+	- Added DG_ADDI and csDebuggingGraph::AddInterface() with which you
+	  can add an SCF interface (instance of iBase) to the debug graph.
+	  This will make no difference except that when the graph is
+	  dumped the ref-count will be shown.
+	- Fixed a bad bug in csDebuggingGraph where it would fail to
+	  properly unlink objects if objects were created and deleted
+	  and happened to get the same pointer (which is not too unlikely).
 14-Nov-2001
 	- It is very hard to properly debug the huge graph or tree structures
 	  that are used a lot in Crystal Space. Using 'printf' just doesn't

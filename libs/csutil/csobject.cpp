@@ -108,7 +108,7 @@ csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
   static CS_ID id = 0;
   csid = id++;
   ParentObject = NULL;
-  DG_ADD (this, "csObject(NONAME)");
+  DG_ADDI (this, "csObject(NONAME)");
 }
 
 csObject::csObject (csObject &o) : Children (NULL), Name (NULL)

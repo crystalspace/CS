@@ -32,6 +32,7 @@
 struct csDGEL
 {
   void* object;
+  bool scf;		// Is true 'object' is an iBase.
   bool used;
   char* description;
   char* file;
@@ -45,6 +46,7 @@ struct csDGEL
   csDGEL ()
   {
     object = NULL;
+    scf = false;
     used = false;
     description = NULL;
     file = NULL;
@@ -204,11 +206,17 @@ public:
 
   csDGEL* FindEl (void* object, bool all = false)
   {
-    int i;
+    int i, last_i = -1;
+    // First we see if there isn't an object that is in use.
     for (i = 0 ; i < num_els ; i++)
     {
-      if ((all || els[i]->used) && els[i]->object == object) return els[i];
+      if (els[i]->object == object)
+        if (els[i]->used) return els[i];
+	else last_i = i;
     }
+    // If 'all' is true we see if we found any other entry that
+    // is not used and return the last one.
+    if (all && last_i != -1) return els[last_i];
     return NULL;
   }
 
@@ -266,6 +274,37 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
   else el->description = NULL;
 
   el->object = object;
+  el->scf = false;
+  el->file = file ? csStrNew (file) : NULL;
+  el->linenr = linenr;
+}
+
+void csDebuggingGraph::AddInterface (iObjectRegistry* object_reg,
+	iBase* object, char* file, int linenr,
+  	char* description, ...)
+{
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
+  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  csDGEL* el = dg->FindEl ((void*)object);
+  CS_ASSERT (el == NULL);	// Object should not occur!
+  el = dg->AddEl ();
+
+  if (description)
+  {
+    char buf[1000];
+    va_list arg;
+    va_start (arg, description);
+    vsprintf (buf, description, arg);
+    va_end (arg);
+    el->description = csStrNew (buf);
+  }
+  else el->description = NULL;
+
+  el->object = (void*)object;
+  el->scf = true;
   el->file = file ? csStrNew (file) : NULL;
   el->linenr = linenr;
 }
@@ -306,7 +345,7 @@ void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
   csDGEL* el = dg->FindEl (object);
   if (!el)
   {
-    printf ("Suspicious! Cannot find element!\n");
+    printf ("Suspicious! Cannot find element for object %p!\n", object);
     fflush (stdout);
     return;
   }
@@ -456,18 +495,29 @@ static void DumpSubTree (int indent, const char* type, csDGEL* el)
   }
   *sp = 0;
 
+  // Show the ref count if it is an scf interface. If the object
+  // is no longer used then show '?' instead of ref count to avoid
+  // calling an invalid pointer.
+  if (el->scf)
+  {
+    if (el->used)
+      printf ("%s%s %p(r%d) %s", spaces, type, el->object,
+    	  ((iBase*)(el->object))->GetRefCount (), el->description);
+    else
+      printf ("%s%s %p(r?) %s", spaces, type, el->object, el->description);
+  }
+  else
+    printf ("%s%s %p %s", spaces, type, el->object, el->description);
+
   if (el->marker || *type == 'P' || !el->used)
   {
-    printf ("%s%s %p %s%s\n", spaces, type, el->object,
-    	el->description,
-    	el->used ? (el->marker ? " (REF)" : "") : " (BAD LINK!)");
+    printf ("%s\n", el->used ? (el->marker ? " (REF)" : "") : " (BAD LINK!)");
     if (*type != 'P') el->marker = true;
   }
   else
   {
     el->marker = true;
-    printf ("%s%s %p %s (%s,%d) #p=%d #c=%d\n",
-    	spaces, type, el->object, el->description,
+    printf (" (%s,%d) #p=%d #c=%d\n",
     	el->file, el->linenr, el->num_parents, el->num_children);
     int i;
     for (i = 0 ; i < el->num_parents ; i++)
