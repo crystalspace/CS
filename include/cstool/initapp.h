@@ -30,6 +30,16 @@ struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
 
+// Defines to select what plugins you want to have.
+#define CS_PLUGIN_NONE 0
+#define CS_PLUGIN_3D 1
+#define CS_PLUGIN_ENGINE 2
+#define CS_PLUGIN_LEVELLOADER 4
+#define CS_PLUGIN_IMAGELOADER 8
+#define CS_PLUGIN_FONTSERVER 16
+#define CS_PLUGIN_DEFAULT (CS_PLUGIN_3D|CS_PLUGIN_ENGINE|CS_PLUGIN_FONTSERVER)
+#define CS_PLUGIN_ALL (~0)
+
 /**
  * Function to handle events for apps.
  */
@@ -131,9 +141,7 @@ public:
   static bool RequestPlugins (iObjectRegistry* object_reg,
 	const char* config_name,
 	int argc, const char* const argv[],
-	bool want_3d = true, bool want_engine = true,
-	bool want_imgldr = true, bool want_lvlldr = true,
-	bool want_fontsvr = true);
+	unsigned long want_plugins = CS_PLUGIN_DEFAULT);
 
   /**
    * Really initialize the application. This will initialize all loaded

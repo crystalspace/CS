@@ -21,7 +21,6 @@
 #define BUMPTEST_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
@@ -35,12 +34,16 @@ struct iEngine;
 struct iDynLight;
 struct iMaterialWrapper;
 struct iKeyboardDriver;
+struct iObjectRegistry;
+struct iVirtualClock;
+struct iEvent;
+struct iGraphics3D;
+struct iGraphics2D;
 class csProcBump;
 
-class BumpTest : public SysSystemDriver
+class BumpTest
 {
-  typedef SysSystemDriver superclass;
-private:
+public:
   iSector* room;
   iView* view;
   iEngine* engine;
@@ -50,6 +53,8 @@ private:
   iLoader *LevelLoader;
   iGraphics3D *myG3D;
   iKeyboardDriver* kbd;
+  iObjectRegistry* object_reg;
+  iVirtualClock* vc;
 
   float animli;
   bool going_right;
@@ -61,10 +66,11 @@ public:
   BumpTest ();
   virtual ~BumpTest ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool BumpHandleEvent (iEvent &Event);
   void Report (int severity, const char* msg, ...);
 };
 

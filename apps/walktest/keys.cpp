@@ -669,12 +669,8 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
 }
 
 
-bool WalkTest::HandleEvent (iEvent &Event)
+bool WalkTest::WalkHandleEvent (iEvent &Event)
 {
-  // First pass the event to all plugins
-  if (SysSystemDriver::HandleEvent (Event))
-    return true;
-
   switch (Event.Type)
   {
     case csevBroadcast:

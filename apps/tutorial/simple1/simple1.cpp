@@ -45,6 +45,7 @@
 #include "ivideo/material.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "csutil/cmdhelp.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -78,7 +79,7 @@ void Cleanup ()
   csInitializer::DestroyApplication ();
 }
 
-bool SimpleEventHandler (iEvent& ev)
+static bool SimpleEventHandler (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
@@ -102,7 +103,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return false;
 
-  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_PLUGIN_ALL))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -140,6 +142,13 @@ bool Simple::Initialize (int argc, const char* const argv[],
     	"crystalspace.application.simple1",
 	"Can't initialize event handler!");
     return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
   }
 
   // The virtual clock.

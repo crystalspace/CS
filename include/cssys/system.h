@@ -162,9 +162,6 @@ private: //@@@
   /// Set to non-zero to exit csSystemDriver::Loop()
   bool Shutdown;
 
-  /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
-  int debug_level;
-
   /// List of all options for all plug-in modules.
   CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
 
@@ -211,14 +208,6 @@ public:
   /// Sleep for given number of 1/1000 seconds (very inacurate)
   virtual void Sleep (int /*SleepTime*/) {}
 
-  /**
-   * This is a function that prints the commandline help text.
-   * If system driver has system-dependent switches, it should override
-   * this method and type its own text (possibly after invoking
-   * csSystemDriver::Help() first).
-   */
-  virtual void Help ();
-
   /// A shortcut for requesting to load a plugin (before Initialize())
   void RequestPlugin (const char *iPluginName);
 
@@ -258,11 +247,6 @@ protected:
   /// Query the elapsed time between last frames and absolute time.
   void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime) const
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
-
-  /**
-   * Print help for an iConfig interface.
-   */
-  void Help (iConfig* Config);
 
   /**
    * Query default width/height/depth from config file

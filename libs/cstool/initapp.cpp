@@ -101,8 +101,7 @@ iObjectRegistry* csInitializer::CreateObjectRegistry ()
 bool csInitializer::RequestPlugins (iObjectRegistry* /*object_reg*/,
 	const char* config_name,
 	int argc, const char* const argv[],
-	bool want_3d, bool want_engine, bool want_imgldr,
-	bool want_lvlldr, bool want_fontsvr)
+	unsigned long want_plugins)
 {
   if (config_name) global_config_name = csStrNew (config_name);
   else global_config_name = NULL;
@@ -110,15 +109,15 @@ bool csInitializer::RequestPlugins (iObjectRegistry* /*object_reg*/,
   global_argv = argv;
 
   global_sys->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  if (want_fontsvr)
+  if (want_plugins & CS_PLUGIN_FONTSERVER)
     global_sys->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  if (want_imgldr)
+  if (want_plugins & CS_PLUGIN_IMAGELOADER)
     global_sys->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  if (want_3d)
+  if (want_plugins & CS_PLUGIN_3D)
     global_sys->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  if (want_engine)
+  if (want_plugins & CS_PLUGIN_ENGINE)
     global_sys->RequestPlugin ("crystalspace.engine.3d:Engine");
-  if (want_lvlldr)
+  if (want_plugins & CS_PLUGIN_LEVELLOADER)
     global_sys->RequestPlugin ("crystalspace.level.loader:LevelLoader");
   return true;
 }

@@ -63,6 +63,8 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
+#include "csutil/cmdhelp.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -103,7 +105,7 @@ void BumpTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.bumptest", msg, arg);
   else
@@ -118,6 +120,7 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   delete System;
+  csInitializer::DestroyApplication ();
 }
 
 bool BumpTest::InitProcDemo ()
@@ -134,7 +137,7 @@ bool BumpTest::InitProcDemo ()
   iImage *map = bptex->GetImageFile();
   prBump = new csProcBump (map);
 
-  matBump = prBump->Initialize (GetObjectRegistry (), engine, txtmgr, "bumps");
+  matBump = prBump->Initialize (object_reg, engine, txtmgr, "bumps");
   prBump->PrepareAnim ();
 
   iMeshObjectType* thing_type = engine->GetThingType ();
@@ -259,19 +262,70 @@ bool BumpTest::InitProcDemo ()
   return true;
 }
 
+static bool BumpEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    System->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    System->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return System->BumpHandleEvent (ev);
+  }
+}
+
 bool BumpTest::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_PLUGIN_NONE))
   {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't init app! (plugins missing?)");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
     return false;
   }
+
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
+    return false;
+  }
+
+  if (!csInitializer::LoadReporter (object_reg, true))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
+    return false;
+  }
+
+  if (!csInitializer::SetupObjectRegistry (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
+    return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, BumpEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -309,7 +363,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG3D->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Bumptest Crystal Space Application");
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
@@ -437,11 +491,11 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-void BumpTest::NextFrame ()
+void BumpTest::SetupFrame ()
 {
-  SysSystemDriver::NextFrame ();
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
@@ -493,22 +547,18 @@ void BumpTest::NextFrame ()
 
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+}
 
-  // Drawing code ends here.
+void BumpTest::FinishFrame ()
+{
   myG3D->FinishDraw ();
-
-  // Print the final output.
   myG3D->Print (NULL);
 }
 
-bool BumpTest::HandleEvent (iEvent &Event)
+bool BumpTest::BumpHandleEvent (iEvent &Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iObjectRegistry* object_reg = GetObjectRegistry ();
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
@@ -537,7 +587,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  System->Loop ();
+  csInitializer::MainLoop (System->object_reg);
 
   // Cleanup.
   Cleanup ();

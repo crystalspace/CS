@@ -97,15 +97,6 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
   // copy the system pointer
   object_reg = r;
 
-  // set event callback
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-  if (q != 0)
-    q->RegisterListener(&scfiEventHandler,
-      CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
-
-  // read the config file
-  Config.AddConfig(object_reg, "/config/sound.cfg");
-
   // load the sound driver plug-in
 #ifdef CS_SOUND_DRIVER
   char *drv = CS_SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
@@ -115,11 +106,21 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, NULL, iSoundDriver);
-  if (!SoundDriver) {	
+  if (!SoundDriver)
+  {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "csSoundRenderSoftware: Failed to load sound driver: %s", drv);
     return false;
   }
+
+  // set event callback
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener(&scfiEventHandler,
+      CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+
+  // read the config file
+  Config.AddConfig(object_reg, "/config/sound.cfg");
 
   return true;
 }
@@ -133,8 +134,11 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
 bool csSoundRenderSoftware::Open()
 {
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Software Sound Renderer selected");
+  CS_ASSERT (Config != NULL);
 
-  SoundDriver->Open(this,
+  if (!SoundDriver) return false;
+
+  SoundDriver->Open (this,
     Config->GetInt("Sound.Software.Frequency", 22050),
     Config->GetBool("Sound.Software.16Bits", true),
     Config->GetBool("Sound.Software.Stereo", true));
@@ -155,6 +159,7 @@ bool csSoundRenderSoftware::Open()
 
   csTicks et, ct;
   iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
   LastTime = ct;
@@ -165,14 +170,16 @@ bool csSoundRenderSoftware::Open()
 void csSoundRenderSoftware::Close()
 {
   ActivateMixing = false;
-  if (SoundDriver) {
+  if (SoundDriver)
+  {
     iSoundDriver *d = SoundDriver;
     SoundDriver = NULL;
     d->Close ();
     d->DecRef ();
   }
 
-  if (Listener) {
+  if (Listener)
+  {
     Listener->DecRef();
     Listener = NULL;
   }
@@ -180,7 +187,8 @@ void csSoundRenderSoftware::Close()
   while (Sources.Length()>0)
     ((iSoundSource*)Sources.Get(0))->Stop();
 
-  while (SoundHandles.Length()>0) {
+  while (SoundHandles.Length()>0)
+  {
     csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)SoundHandles.Pop();
     hdl->Unregister();
     hdl->DecRef();

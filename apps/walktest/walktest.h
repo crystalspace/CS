@@ -61,6 +61,7 @@ struct iMotionManager;
 struct iModelConverter;
 struct iCrossBuilder;
 struct iKeyboardDriver;
+struct iVirtualClock;
 
 // type information
 
@@ -143,6 +144,7 @@ public:
   iObjectRegistry* object_reg;
   iPluginManager* plugin_mgr;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
 
   int FrameWidth, FrameHeight;
 
@@ -414,8 +416,10 @@ public:
    */
   virtual void ParseKeyCmds ();
 
-  ///
-  virtual void NextFrame ();
+  /// Draw the frame.
+  void SetupFrame ();
+  /// Finalize the frame.
+  void FinishFrame ();
   ///
   void PrepareFrame (csTicks elapsed_time, csTicks current_time);
 
@@ -471,12 +475,12 @@ public:
   virtual void Create2DSprites(void);
 
   ///
-  virtual bool HandleEvent (iEvent &Event);
+  bool WalkHandleEvent (iEvent &Event);
 
-  /// Override SetSystemDefaults to handle additional configuration defaults.
+  /// SetSystemDefaults to handle additional configuration defaults.
   virtual void SetSystemDefaults (iConfigManager*);
-  /// Override Help to show additional arguments help
-  virtual void Help ();
+  /// Commandline help for WalkTest.
+  void Help ();
 
   /// Inits all the collision detection stuff
   virtual void InitCollDet (iEngine* engine, iRegion* region);

@@ -650,13 +650,13 @@ SetCacheData(idx,d)
 1.30.  class iSectorList
 ------------------------
 
-GetSectorCount()
+GetCount()
 
-GetSector(idx)
+Get(idx)
 
-AddSector(sec)
+Add(sec)
 
-RemoveSector(sec)
+Remove(sec)
 
 FindByName(name)
 

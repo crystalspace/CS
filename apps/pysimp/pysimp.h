@@ -29,6 +29,7 @@ struct iSector;
 struct iEngine;
 struct iLoader;
 struct iKeyboardDriver;
+struct iVirtualClock;
 
 class PySimple : public SysSystemDriver
 {
@@ -40,16 +41,18 @@ public:
   iLoader* LevelLoader;
   iGraphics3D* myG3D;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
 
 public:
   PySimple ();
   virtual ~PySimple ();
 
-  virtual void Help ();
+  void Help ();
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool PyHandleEvent (iEvent &Event);
 
   void Report (int severity, const char* msg, ...);
 };

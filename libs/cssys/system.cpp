@@ -320,7 +320,6 @@ csSystemDriver::csSystemDriver () :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
-  debug_level = 0;
   Shutdown = false;
   CurrentTime = csTicks (-1);
 
@@ -557,13 +556,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     if (plg) plg->DecRef ();
   }
 
-  // See if user wants help
-  if ((val = CommandLine->GetOption ("help")))
-  {
-    Help ();
-    exit (0);
-  }
-
   /// Now find the drivers that are known by the system driver
   if (!VFS)
     VFS = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
@@ -645,9 +637,6 @@ void csSystemDriver::SetSystemDefaults (iConfigManager*)
   // Now analyze command line
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
   	iCommandLineParser);
-  const char *val;
-  if ((val = CommandLine->GetOption ("debug")))
-    debug_level = atoi(val);
 }
 
 iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,
@@ -656,82 +645,6 @@ iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,
   // the default implementation does not make a difference between different
   // users. It always uses /config/user.cfg, with the application ID as prefix.
   return new csPrefixConfig("/config/user.cfg", VFS, ApplicationID, Alias);
-}
-
-void csSystemDriver::Help (iConfig* Config)
-{
-  int i;
-  for (i = 0; ; i++)
-  {
-    csOptionDescription option;
-    if (!Config->GetOptionDescription (i, &option))
-      break;
-    char opt [30], desc [80];
-    csVariant def;
-    Config->GetOption (i, &def);
-    switch (option.type)
-    {
-      case CSVAR_BOOL:
-        sprintf (opt, "  -[no]%s", option.name);
-	sprintf (desc, "%s (%s) ", option.description, def.GetBool ()
-		? "yes" : "no");
-	break;
-      case CSVAR_CMD:
-        sprintf (opt, "  -%s", option.name);
-	strcpy (desc, option.description);
-	break;
-      case CSVAR_FLOAT:
-        sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%g)", option.description, def.GetFloat ());
-	break;
-      case CSVAR_LONG:
-        sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%ld)", option.description, def.GetLong ());
-	break;
-      case CSVAR_STRING:
-        sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%s)", option.description, def.GetString ()
-		? def.GetString () : "none");
-	break;
-    }
-    //@@@????
-    printf ("%-21s%s\n", opt, desc);
-    //ReportSys (CS_MSG_STDOUT, "%-21s%s\n", opt, desc);
-  }
-}
-
-void csSystemDriver::Help ()
-{
-  csEvent HelpEvent (csGetTicks (), csevBroadcast, cscmdCommandLineHelp);
-  int i;
-  for (i = 0; i < Plugins.Length (); i++)
-  {
-    csPlugin *plugin = Plugins.Get (i);
-    iConfig *Config = SCF_QUERY_INTERFACE (plugin->Plugin, iConfig);
-    if (Config)
-    {
-      //@@@???
-      printf ("Options for %s:\n",
-        iSCF::SCF->GetClassDescription (plugin->ClassID));
-      Help (Config);
-      Config->DecRef ();
-    }
-    iEventHandler* evhdlr = SCF_QUERY_INTERFACE (plugin->Plugin, iEventHandler);
-    if (evhdlr)
-    {
-      evhdlr->HandleEvent (HelpEvent);
-      evhdlr->DecRef ();
-    }
-  }
-
-  //@@@???
-  printf (
-"General options:\n"
-"  -help              this help\n"
-"  -video=<s>         the 3D rendering driver (opengl, software, ...)\n"
-"  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n"
-"  -plugin=<s>        load the plugin after all others\n"
-"  -debug=<n>         set debug level (default=%d)\n", debug_level);
 }
 
 void csSystemDriver::QueryOptions (iComponent *iObject)

@@ -733,9 +733,9 @@ void SysSystemDriver::SetSystemDefaults (iConfigManager *Config)
 #endif
 }
 
+//@@@ THIS PART OF COMMANDLINE HELP IS CURRENTLY BROKEN!!!
 void SysSystemDriver::Help ()
 {
-  csSystemDriver::Help();
   //@@@???
   printf ("  -[no]console       Create a debug console (default = %s)\n",
     need_console ? "yes" : "no");

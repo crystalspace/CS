@@ -1,5 +1,69 @@
 The history order is reversed so that new features are at the top.
 
+4-Oct-2001
+	- Removed support for old and obsolete 'debug_level' in system
+	  driver.
+	- Made a new class csCommandLineHelper (in csutil/cmdhelp.h) which
+	  now has the functionality to give commandline help to the user
+	  (i.e. support the '-help' commandline option).
+	  Previously this functionality used to be in the system driver.
+	  If you want to have commandline help in your application you need
+	  to do something like:
+	  	if (csCommandLineHelper::CheckHelp (object_reg))
+		{
+		  csCommandLineHelper::Help (object_reg);
+		  exit (0);
+		}
+	  This should be done after loading all plugins so that those plugins
+	  get a chance to give their commandline help.
+	  WARNING! This change breaks commandline help for ALL applications
+	  except simple1 tutorial. The other apps will get commandline help
+	  back as soon as they are converted to the new csInitializer system.
+	- Implemented commandline help in Walktest to use the new system.
+	  This means that it will use the new csCommandLineHelper to check
+	  for commandline help and it also means that listens to the
+	  global cscmdCommandLineHelp message to give its own additional
+	  help (csCommandLineHelper will send such a global broadcast message).
+	- Since we have an event handler in WalkTest now I also used it
+	  to drive the frame drawing. This means that WalkTest now has a
+	  SetupFrame() and FinishFrame() which are called in cscmdProcess
+	  and cscmdFinalProcess respectively. As a consequence bugplug will
+	  now again work correctly with WalkTest.
+	- Did the same as I did with WalkTest to all other apps that also
+	  required their own commandline help (metademo, ptlab, pysimp,
+	  and squawk). Those programs now also use SetupFrame() and
+	  FinishFrame().
+	- csInitializer::RequestPlugins() no longer loads the image loader,
+	  the level loader and the font server by default.
+	- Changed csInitializer::RequestPlugins() so that it accepts a
+	  bit-field for all plugins that need to be loaded. The following
+	  values are currently accepted:
+		- CS_PLUGIN_NONE
+		- CS_PLUGIN_3D
+		- CS_PLUGIN_ENGINE
+		- CS_PLUGIN_LEVELLOADER
+		- CS_PLUGIN_IMAGELOADER
+		- CS_PLUGIN_FONTSERVER
+		- CS_PLUGIN_DEFAULT
+		- CS_PLUGIN_ALL
+	  CS_PLUGIN_DEFAULT corresponds to CS_PLUGIN_3D, CS_PLUGIN_ENGINE,
+	  and CS_PLUGIN_FONTSERVER.
+	- Modified Blocks so it no longer inherits from SysSystemDriver.
+	- Fixed a bug in the software sound renderer where it would not
+	  test if the sound driver was actually there in Open().
+	- Fixed a signficant bug in the sound renderer. The Initialize()
+	  routine could fail if the sound driver was not found. In that
+	  case the plugin will not be loaded. However, earlier in the
+	  Initialize() routine the sound renderer was actually registering
+	  it's iEventHandler to the event manager. And this was not
+	  unregistered if there was an error. The end result was that
+	  the next event send to the system would cause a crash since the
+	  registered event handler was no longer valid. I fixed this problem
+	  by moving the registration of the event handler after checking
+	  if the sound driver is there. However this is an IMPORTANT point
+	  and I hope there are no other plugins that are making the same
+	  mistake!
+	- Converted Bumptest so it no longer inherits from SysSystemDriver.
 3-Oct-2001
 	- Added the following functions to csInitializer:
 	    - InitializeSCF()

@@ -41,8 +41,10 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "isys/plugin.h"
+#include "csutil/cmdhelp.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -89,8 +91,8 @@ void PySimple::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-void PySimple::Help () {
-  SysSystemDriver::Help ();
+void PySimple::Help ()
+{
   printf ("  -python            Test the csPython plugin\n");
   printf ("  -lua               Test the csLua plugin\n");
 }
@@ -99,6 +101,29 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   delete System;
+}
+
+static bool PyEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    System->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    System->FinishFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdCommandLineHelp)
+  {
+    System->Help ();
+    return true;
+  }
+  else
+  {
+    return System->PyHandleEvent (ev);
+  }
 }
 
 bool PySimple::Initialize (int argc, const char* const argv[],
@@ -111,11 +136,25 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   
   if (!csInitializeApplication (object_reg))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't init app! (perhaps some plugins are missing?");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Couldn't init app! (perhaps some plugins are missing?");
     return false;
   }
 
+  if (!csInitializer::SetupEventHandler (object_reg, PyEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not initialize event handler!");
+    return false;
+  }
+
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -256,11 +295,11 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-void PySimple::NextFrame ()
+void PySimple::SetupFrame ()
 {
-  SysSystemDriver::NextFrame ();
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
@@ -283,18 +322,18 @@ void PySimple::NextFrame ()
 
   if (view)
     view->Draw ();
+}
 
+void PySimple::FinishFrame ()
+{
   // Drawing code ends here.
   myG3D->FinishDraw ();
   // Print the final output.
   myG3D->Print (NULL);
 }
 
-bool PySimple::HandleEvent (iEvent &Event)
+bool PySimple::PyHandleEvent (iEvent &Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);

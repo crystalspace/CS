@@ -22,7 +22,6 @@
 #include <stdarg.h>
 #include "blocdefs.h"
 #include "states.h"
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
@@ -41,6 +40,12 @@ struct iMeshWrapper;
 struct iDynLight;
 struct iView;
 struct iSoundSource;
+struct iVirtualClock;
+struct iGraphics2D;
+struct iGraphics3D;
+struct iEvent;
+struct iVFS;
+struct iObjectRegistry;
 
 class KeyMapping
 {
@@ -155,7 +160,7 @@ public:
   bool CheckScore (int score);
 };
 
-class Blocks : public SysSystemDriver
+class Blocks
 {
 private:
   iMeshFactoryWrapper* cube_tmpl;
@@ -315,6 +320,8 @@ public:
   iVFS *myVFS;
   iNetworkDriver *myNetDrv;
   iSoundSource *backsound;
+  iVirtualClock* vc;
+  iObjectRegistry* object_reg;
 
   static int white, black, red;
 
@@ -361,8 +368,8 @@ public:
   void ReplaceMenuItem (int idx, int menu_nr);
 
   // Handling of basic events and frame drawing.
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
   void HandleKey (int key, bool shift, bool alt, bool ctrl);
   void HandleGameKey (int key, bool shift, bool alt, bool ctrl);
   void HandleGameOverKey (int key, bool shift, bool alt, bool ctrl);
@@ -412,6 +419,7 @@ public:
   void HandleGameMovement (csTicks elapsed_time);
   // Handle lowering of planes.
   void HandleLoweringPlanes (csTicks elapsed_time);
+  bool BlHandleEvent (iEvent &Event);
 
   // Conveniance functions.
   csMatrix3 create_rotate_x (float angle);

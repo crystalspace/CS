@@ -36,6 +36,7 @@
 #include "csgeom/textrans.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "csutil/cmdhelp.h"
 
 #include "isys/vfs.h"
 #include "isys/plugin.h"
@@ -98,7 +99,7 @@ void Blocks::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.blocks", msg, arg);
   else
@@ -444,6 +445,24 @@ Blocks::~Blocks ()
   if (myG3D) myG3D->DecRef ();
   if (myVFS) myVFS->DecRef ();
   if (backsound) backsound->Stop ();
+}
+
+static bool BlocksEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    Sys->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    Sys->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return Sys->BlHandleEvent (ev);
+  }
 }
 
 void Blocks::InitGame ()
@@ -1496,7 +1515,7 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 	  TerminateConnection ();
 	  // Finish networking stuff.
 #endif
-	  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+	  iObjectRegistry* object_reg = Sys->object_reg;
 	  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
 	  if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
 	  break;
@@ -2326,7 +2345,8 @@ void Blocks::InitEngine ()
   InitDemoRoom ();
   Sys->engine->Prepare ();
 
-  iSoundRender *snd = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND, iSoundRender);
+  iSoundRender *snd = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND,
+  	iSoundRender);
   if (snd)
   {
     // Load the blocks.zip library where sound refs are stored
@@ -2540,11 +2560,11 @@ void Blocks::HandleLoweringPlanes (csTicks elapsed_time)
       }
 }
 
-void Blocks::NextFrame ()
+void Blocks::SetupFrame ()
 {
-  SysSystemDriver::NextFrame ();
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   // -----------------------------------------------------------------
   // Start network stuff.
@@ -2745,17 +2765,16 @@ void Blocks::NextFrame ()
       Gfx2D->Write (font, x+10, y+24+2, white, black, name);
     }
   }
+}
 
-  // Drawing code ends here
+void Blocks::FinishFrame ()
+{
   Gfx3D->FinishDraw ();
   Gfx3D->Print (NULL);
 }
 
-bool Blocks::HandleEvent (iEvent &Event)
+bool Blocks::BlHandleEvent (iEvent &Event)
 {
-  if (SysSystemDriver::HandleEvent (Event))
-    return false;
-
   switch (Event.Type)
   {
     case csevKeyDown:
@@ -2880,7 +2899,7 @@ const char* Blocks::KeyName (const KeyMapping& map)
 
 void Blocks::ReadConfig ()
 {
-  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iObjectRegistry* object_reg = Sys->object_reg;
   iConfigFile* keys = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   NamedKey (keys->GetStr ("Blocks.Keys.Up", "up"), key_up);
   NamedKey (keys->GetStr ("Blocks.Keys.Down", "down"), key_down);
@@ -2926,7 +2945,7 @@ void Blocks::ReadConfig ()
 
 void Blocks::WriteConfig ()
 {
-  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iObjectRegistry* object_reg = Sys->object_reg;
   iConfigFile* keys = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   keys->SetStr ("Blocks.Keys.Up", KeyName (key_up));
   keys->SetStr ("Blocks.Keys.Down", KeyName (key_down));
@@ -3141,6 +3160,7 @@ void Blocks::TerminateConnection()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
+  csInitializer::DestroyApplication ();
   delete Sys;
   Sys = NULL;
 }
@@ -3153,25 +3173,65 @@ int main (int argc, char* argv[])
   // Create our main class which is the driver for Blocks.
   Sys = new Blocks ();
 
-  if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return -1;
+  Sys->object_reg = object_reg;
+
+  if (!csInitializer::RequestPlugins (object_reg, "/config/blocks.cfg",
+  	argc, argv, 0))
   {
-    Sys->Report  (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-    Cleanup ();
-    exit (-1);
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    return -1;
   }
 
-  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    return -1;
+  }
+
+  if (!csInitializer::SetupObjectRegistry (object_reg))
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    return -1;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, BlocksEventHandler))
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    return -1;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  Sys->vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
 
-  QUERY_PLUG_ID (Sys->myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin!");
-  QUERY_PLUG (Sys->myG2D, iGraphics2D, "No iGraphics2D plugin!");
+  Sys->myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!Sys->myG3D)
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
+    return -1;
+  }
+  Sys->myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  if (!Sys->myG2D)
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
+    return -1;
+  }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = Gfx2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("3D Blocks");
-  if (!Sys->Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
@@ -3182,19 +3242,24 @@ int main (int argc, char* argv[])
   Sys->FrameHeight = Gfx2D->GetHeight ();
 
   // Find the pointer to engine plugin
-  QUERY_PLUG_ID (Sys->engine, CS_FUNCID_ENGINE, iEngine, "No iEngine plugin!\n");
+  Sys->engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!Sys->engine)
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No engine plugin!");
+    return -1;
+  }
 
   Sys->thing_type = Sys->engine->GetThingType ();
 
   QUERY_PLUG_ID (Sys->myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin!");
-  QUERY_PLUG_NM (Sys->myNetDrv, CS_FUNCID_NETDRV, iNetworkDriver, "No iNetworkDriver plugin!");
+  QUERY_PLUG_NM (Sys->myNetDrv, CS_FUNCID_NETDRV, iNetworkDriver,
+  	"No iNetworkDriver plugin!");
 
   // Get a font handle
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Get the level loader
-  Sys->LevelLoader = CS_QUERY_PLUGIN_ID(plugin_mgr,
-  	CS_FUNCID_LVLLOADER, iLoader);
+  Sys->LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!Sys->LevelLoader)
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
@@ -3247,7 +3312,9 @@ int main (int argc, char* argv[])
 #if defined(BLOCKS_NETWORKING)
   do_network = Sys->InitNet();
 #endif
-  Sys->Loop ();
+  csInitializer::MainLoop (object_reg);
+
   Cleanup ();
   return 0;
 }
+

@@ -59,6 +59,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "imap/parser.h"
+#include "csutil/cmdhelp.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
@@ -313,8 +314,7 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
 void WalkTest::Help ()
 {
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-  SysSystemDriver::Help ();
-  //@@@???
+  printf ("Options for WalkTest:\n");
   printf ("  -exec=<script>     execute given script at startup\n");
   printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
   printf ("  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
@@ -329,13 +329,11 @@ void WalkTest::Help ()
 //-----------------------------------------------------------------------------
 extern bool CommandHandler (const char *cmd, const char *arg);
 
-void WalkTest::NextFrame ()
+void WalkTest::SetupFrame ()
 {
-  // The following will fetch all events from queue and handle them
-  SysSystemDriver::NextFrame ();
-
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   if (perf_stats) timeFPS = perf_stats->GetFPS ();
   else timeFPS = 0;
@@ -373,6 +371,14 @@ void WalkTest::NextFrame ()
     char buf[256];
     if (csCommandProcessor::get_script_line (buf, 255)) csCommandProcessor::perform_line (buf);
   }
+}
+
+void WalkTest::FinishFrame ()
+{
+  // Drawing code ends here
+  Gfx3D->FinishDraw ();
+  // Print the output.
+  Gfx3D->Print (NULL);
 }
 
 
@@ -955,11 +961,6 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
   if (!myConsole
    || !myConsole->GetVisible ())
     DrawFrame2D ();
-
-  // Drawing code ends here
-  Gfx3D->FinishDraw ();
-  // Print the output.
-  Gfx3D->Print (NULL);
 }
 
 int cnt = 1;
@@ -1091,7 +1092,8 @@ void CaptureScreen ()
     {
        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
       if (!Sys->myVFS->WriteFile (name, (const char*)db->GetData (), db->GetSize ()))
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "There was an error while writing screen shot");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"There was an error while writing screen shot");
       db->DecRef ();
     }
     imageio->DecRef ();
@@ -1231,6 +1233,28 @@ void WalkTest::Create2DSprites(void)
   }
 }
 
+static bool WalkEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    Sys->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    Sys->FinishFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdCommandLineHelp)
+  {
+    Sys->Help ();
+    return true;
+  }
+  else
+  {
+    return Sys->WalkHandleEvent (ev);
+  }
+}
 
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
@@ -1240,18 +1264,33 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   object_reg = Sys->GetObjectRegistry ();
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize SysSystemDriver!");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Failed to initialize SysSystemDriver!");
     return false;
   }
 
   if (!csInitializeApplication (object_reg))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to init application! (plugins missing?)");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Failed to init application! (plugins missing?)");
     return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, WalkEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not initialize event handler!");
+    return false;
+  }
+
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
   }
 
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
