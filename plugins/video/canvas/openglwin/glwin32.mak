@@ -30,20 +30,25 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+ifndef OPENGL.LIBS.DEFINED
+LIBS.GLLIBS=-lGL
+else
+LIBS.GLLIBS=$(OPENGL.LIBS.DEFINED)
+endif
+
 # We need also the GL libs
 CFLAGS.GLWIN32+=
-
 # The 2D GL Win32 driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLWIN32=$(OUTDLL)glwin32$(DLL)
   DEP.GLWIN32 = $(CSUTIL.LIB) $(CSSYS.LIB)
-  LIBS.GLWIN32=-lGL
+  LIBS.GLWIN32=$(LIBS.GLLIBS)
   TO_INSTALL.DYNAMIC_LIBS+=$(GLWIN32)
 else
   GLWIN32=$(OUT)$(LIB_PREFIX)glwin32$(LIB)
   DEP.EXE+=$(GLWIN32)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLWIN32
-  LIBS.EXE+=-lGL
+  LIBS.EXE+=$(LIBS.GLLIBS)
   TO_INSTALL.STATIC_LIBS+=$(GLWIN32)
 endif
 DESCRIPTION.$(GLWIN32) = $(DESCRIPTION.glwin32)
