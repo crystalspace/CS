@@ -7,20 +7,16 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
-[H] msvcgen.jam: Update to respect the new ApplicationIconDefault and
-    ApplicationIcon rules.
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
 
+[M] Upgrade jamtemplate/createproject.sh so that it can optionally set up
+    msvcgen support (6 and/or 7) for the newly created project.
 [M] Add a Jamfile for cscript/csjava.
 [M] Figure out how to create MSVC project files for the pure Python and pure
     Perl extension modules.
 [M] Write complete documentation about the Jam build system for the CS user
     manual.
-[M] msvcgen.jam: Eliminate dependency upon external scripts for creation of the
-    .rc resources. win32.jam is already capable of performing these tasks
-    stand-alone, so it should be possible to do the same for msvcgen.jam,
-    possibly by invoking the rules provided by win32.jam.
 [M] Write a tutorial (maybe we could just link to the text in the RoboRun
     project?).  Another interesting topic would be integrating Crystal Space
     with other build systems like Automake or Ant.
@@ -85,6 +81,17 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] msvcgen.jam: Generalize so that external projects can take advantage of
+    this facility.  For instance, stop assuming that "../.." is always suitable
+    for reaching the root of the project tree from the location of the project
+    files; and stop assuming that project files always reside at
+    $(TOP)/mk/visual#, and that templates reside at
+    $(TOP)/mk/msvcgen/template#.
+[*] msvcgen.jam: Eliminate dependency upon external scripts for merging .rc
+    files and munging the content of ICON resource paths (this is highly ugly
+    and prevents generic use by external projects).
+[*] msvcgen.jam: Update to respect the new ApplicationIconDefault and
+    ApplicationIcon rules.
 [*] Introduce a new rule named Description and change all invocations of the
     Help rule (except the ones using the "verbatim" option) to invocations of
     the Description rule throughout the project.  Next, remove the "verbatim"

@@ -18,7 +18,8 @@ chronological order.
 	      icons assigned by ApplicationIconDefault and ApplicationIcon.
 	    - Augmented Jamrules so that it sets a default icon for GUI
 	      applications on Windows.  This means that all GUI Crystal Space
-	      applications now get an icon; not just Walktest and csdemo.
+	      applications now get an icon; not just Walktest, csdemo, and
+	      cslight.
 	    - Added a flashy new Windows ICO in place of the old drab one.
 	    - Removed the MacOS/X-specific ApplicationIconDefaultOSX and
 	      ApplicationIconOSX rules.  Instead, macosx.jam now respect icons
@@ -44,7 +45,27 @@ chronological order.
 	- res updated msvcgen.jam to honor application icon specified by
 	  ApplicationIconDefault and ApplicationIcon.
 	- res changed the cslight Jamfile to use the ApplicationIcon rule to
-	  set its icon.
+	  set its custom icon.
+	- Eric Sunshine made the following changes to msvcgen.jam:
+	    - Fully generalized msvcgen (finally) for use by external projects
+	      by removing hardcoded assumptions about resource and tool
+	      locations, availability, and configuration.
+	    - Added new user-visible MsvcGenSubDir rule which informs msvcgen
+	      where in the source tree the project files are expected to live,
+	      and provides sufficient information for msvcgen to compose
+	      relative paths for reference to other resources from within the
+	      generated project and .rc files.  (In the future, this
+	      information will also be used for "freeze" rules which copy the
+	      generated files from the build directory back to the source
+	      tree.)
+	    - Added new user-visible MsvcGenTemplateDir rule which informs
+	      msvcgen where the project template files reside.
+	    - No longer blindly publishes various top-level msvcgen targets.
+	      This did not make sense when msvcgen support was not enabled for
+	      a particular client.  Now, only publishes targets appropriate to
+	      the MSVC versions requested by invocations of MsvcGenSubDir.
+	    - Eliminated dependency upon ugly libs/csutil/win32/mergres.sh
+	      script
 3-May-2004
 	- Eric Sunshine augmented all the "build" instructions in the user
 	  manual to indicate that the project can be built with both Jam and

@@ -22,6 +22,9 @@ GREP ?= grep ;
 
 SubDir TOP mk msvcgen ;
 
+MsvcGenSubDir TOP mk visualc ;
+MsvcGenTemplateDir TOP mk msvcgen template ;
+
 # Set up the workspaces we want msvcgen to synthesize.
 include [ ConcatDirs $(SUBDIR) workspaces.jam ] ;
 
