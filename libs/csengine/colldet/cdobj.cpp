@@ -32,20 +32,18 @@ csColliderPointerObject::csColliderPointerObject(csCollider* pCollider, bool Aut
 csColliderPointerObject::~csColliderPointerObject()
 {
   if (m_AutoDelete)
-  {
-    delete (m_pCollider);
-  }
+    delete m_pCollider;
 }
 
 csCollider* csColliderPointerObject::GetCollider(csObject& csobj)
 {
-  csObject *o = csobj.GetObj(csColliderPointerObject::Type());
+  csObject *o = csobj.GetObj (csColliderPointerObject::Type ());
   if (o) return ((csColliderPointerObject*) o)->m_pCollider;
   return NULL;
 }
 
 void csColliderPointerObject::SetCollider(csObject& csobj, csCollider* pCollider, bool AutoDelete)
 {
-  CHK(csColliderPointerObject* collobj = new csColliderPointerObject(pCollider, AutoDelete));
-  csobj.ObjAdd(collobj); 
+  CHK(csColliderPointerObject* collobj = new csColliderPointerObject (pCollider, AutoDelete));
+  csobj.ObjAdd (collobj); 
 }

@@ -53,6 +53,8 @@ public:
 
   CDTriangle *trp;
 
+  BBox () : pT (0, 0, 0), d (0, 0, 0) { }
+
   int leaf() { return (!P && !N); } 
   float size() { return d.x; } 
 
@@ -79,8 +81,11 @@ public:
 
 public:
 
-  // these are for the client
-  int addTriangle(const csVector3 p1, const csVector3 p2, const csVector3 p3, int id);
+  /// Create a model object given number of triangles
+  CD_model::CD_model (int n_triangles);
+
+  /// Add a triangle to the model
+  int AddTriangle (int id, const csVector3 &p1, const csVector3 &p2, const csVector3 &p3);
   
 };
 
@@ -107,7 +112,7 @@ class csCollider
   /// The internal collision object.
   CD_model *_rm;
 
- public:
+public:
   typedef enum { POLYGONSET, SPRITE3D } ColliderType;
   ColliderType _type;
   union {

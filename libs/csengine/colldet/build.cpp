@@ -20,65 +20,40 @@
 #include "csgeom/math3d.h"
 #include "csengine/colldet/collider.h"
 
-int
-CD_model::addTriangle(const csVector3 p1, const csVector3 p2, const csVector3 p3, int id)
+CD_model::CD_model (int n_triangles)
 {
+  b = 0;
+  num_boxes_alloced = 0;
 
-  int rc = false; // we'll return this unless a problem is found
+  CHK (tris = new CDTriangle [n_triangles]);
+  num_tris = 0;
+  num_tris_alloced = tris ? n_triangles : 0;
+}
 
-  
+int CD_model::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
+  const csVector3 &p3)
+{
   // first make sure that we haven't filled up our allocation.
-  // if we have, allocate a new array of twice the size, and copy
-  // the old data to it.
-
-  if (num_tris == num_tris_alloced)
-    {
-      // decide on new size -- accounting for first time, where none are 
-      // allocated
-      int n = num_tris_alloced*2;
-      if (n == 0) n = 1;
-
-      // make new array, and copy the old one to it
-      CHK (CDTriangle *t = new CDTriangle[n]);
-
-      // if we can't get any more space, return an error
-      if (!t)
-	{
-	  // we are leaving the model unchanged.
-	  return true;
-	}
-      
-      int i;
-      for(i=0; i<num_tris; i++) t[i] = tris[i]; 
-
-      // free the old array and reassign.  
-      CHK (delete [] tris);
-      tris = t;
-      
-      // update the allocation counter.
-      num_tris_alloced = n;
-    }
+  if (num_tris >= num_tris_alloced)
+    return false;
 
   // now copy the new tri into the array
-  tris[num_tris].p1= p1;
-  tris[num_tris].p2= p2;
-  tris[num_tris].p3= p3;
-  tris[num_tris].id = id;
+  tris [num_tris].id = id;
+  tris [num_tris].p1 = p1;
+  tris [num_tris].p2 = p2;
+  tris [num_tris].p3 = p3;
 
   // update the counter
   num_tris++;
 
-  return rc;
+  return true;
 }
-
 
 static CDTriangle *CD_tri = 0;
 static BBox *CD_boxes = 0;
 static int CD_boxes_inited = 0;
 
-
 /*
-
   There are <n> CDTriangle structures in an array starting at <t>.
   
   We are told that the mean point is <mp> and the orientation
@@ -86,13 +61,8 @@ static int CD_boxes_inited = 0;
   vector given by <ax>.
 
   <or>, <ax>, and <mp> are model space coordinates.
-
 */
-
-
-
-int
-CD_model::build_hierarchy()
+int CD_model::build_hierarchy ()
 {
   // allocate the boxes and set the box list globals
 
@@ -105,88 +75,89 @@ CD_model::build_hierarchy()
   // Determine initial orientation, mean point, and splitting axis.
 
   int i; 
-
   Accum _M;
   
   CHK (Moment::stack = new Moment[num_tris]);
 
   if (Moment::stack == 0)
-    {
-      CHK (delete [] b);
-      return true;
-    }
+  {
+    CHK (delete [] b);
+    return true;
+  }
 
   // first collect all the moments, and obtain the area of the 
   // smallest nonzero area triangle.
   float Amin = 0.0;
   int zero = 0;
   int nonzero = 0;
-  for(i=0; i<num_tris; i++)
-    {
-      Moment::stack[i].compute(tris[i].p1,tris[i].p2,tris[i].p3);
+  for (i = 0; i < num_tris; i++)
+  {
+    Moment::stack [i].compute (tris [i].p1, tris [i].p2, tris [i].p3);
  
-      if (Moment::stack[i].A == 0.0)
-	{
-	  zero = 1;
-	}
-      else
-	{
-	  nonzero = 1;
-	  if (Amin == 0.0) Amin = Moment::stack[i].A;
-	  else if (Moment::stack[i].A < Amin) Amin = Moment::stack[i].A;
-	}
+    if (Moment::stack[i].A == 0.0)
+      zero = 1;
+    else
+    {
+      nonzero = 1;
+      if (Amin == 0.0)
+        Amin = Moment::stack [i].A;
+      else if (Moment::stack [i].A < Amin)
+        Amin = Moment::stack [i].A;
     }
+  }
 
   if (zero)
-    {
-      // if there are any zero area triangles, go back and set their area
-      // if ALL the triangles have zero area, then set the area thingy
-      // to some arbitrary value. Should never happen.
-      if (Amin == 0.0) Amin = 1.0;
+  {
+    // if there are any zero area triangles, go back and set their area
+    // if ALL the triangles have zero area, then set the area thingy
+    // to some arbitrary value. Should never happen.
+    if (Amin == 0.0)
+      Amin = 1.0;
 
-      for(i=0; i<num_tris; i++)
-	{
-	  if (Moment::stack[i].A == 0.0) Moment::stack[i].A = Amin;
-	}
-      
-    }
+    for (i = 0; i < num_tris; i++)
+      if (Moment::stack [i].A == 0.0)
+        Moment::stack [i].A = Amin;
+  }
 
-  _M.clear();
+  _M.clear ();
 
-  for(i=0; i<num_tris; i++) { _M.moment(Moment::stack[i]); }
+  for (i = 0; i < num_tris; i++)
+    _M.moment (Moment::stack [i]);
 
-  //  csVector3 _pT;
+  // csVector3 _pT;
   csMatrix3 _C;
-  _M.mean(&(b[0].pT));
+  _M.mean (&(b [0].pT));
 
-  _M.covariance(&_C);
+  _M.covariance (&_C);
 
-  _C.Eigens1(&(b[0].pR));
+  _C.Eigens1 (&(b [0].pR));
 
   // create the index list
-  CHK (int *t = new int[num_tris]);
+  CHK (int *t = new int [num_tris]);
   if (t == 0)
-    {
-      CHK (delete [] b);
-      CHK (delete [] Moment::stack);
-      return true;
-    }
-  for(i=0; i<num_tris; i++) t[i] = i;
+  {
+    CHK (delete [] b);
+    CHK (delete [] Moment::stack);
+    return true;
+  }
+  for (i = 0; i < num_tris; i++)
+    t [i] = i;
 
   // set the tri pointer
   CD_tri = tris;
   
   // do the build
-  int rc = b[0].split_recurse(t, num_tris);
+  int rc = b [0].split_recurse (t, num_tris);
   if (rc != false)
-    {
-      CHK (delete [] b);
-      CHK (delete [] t);
-      return true;
-    }
+  {
+    CHK (delete [] b);
+    CHK (delete [] t);
+    return true;
+  }
   
   // free the moment list
-  CHK (delete [] Moment::stack); Moment::stack = 0;
+  CHK (delete [] Moment::stack);
+  Moment::stack = 0;
 
   // null the tri pointer
   CD_tri = 0;
@@ -197,8 +168,7 @@ CD_model::build_hierarchy()
   return false;
 }
 
-int
-BBox::split_recurse(int *t, int n)
+int BBox::split_recurse (int *t, int n)
 {
   // The orientation for the parent box is already assigned to this->pR.
   // The axis along which to split will be column 0 of this->pR.
@@ -209,9 +179,7 @@ BBox::split_recurse(int *t, int n)
   // will be constructed and placed in the parent's CS.
 
   if (n == 1)
-    {
-      return split_recurse(t);
-    }
+    return split_recurse(t);
   
   // walk along the tris for the box, and do the following:
   //   1. collect the max and min of the vertices along the axes of <or>.
@@ -220,8 +188,6 @@ BBox::split_recurse(int *t, int n)
 
   Accum _M1, _M2;
   csMatrix3 C;
-  csVector3 c;
-  csVector3 minval, maxval;
 
   int rc;   // for return code on procedure calls.
   int in;
@@ -232,74 +198,71 @@ BBox::split_recurse(int *t, int n)
   // Group 2 will have n - n1 tris.
 
   // project approximate mean point onto splitting axis, and get coord.
-  axdmp = (pR.m11*pT.x + pR.m21 * pT.y + pR.m31 * pT.z);
+  axdmp = (pR.m11 * pT.x + pR.m21 * pT.y + pR.m31 * pT.z);
 
-  _M1.clear();
-  _M2.clear();
+  _M1.clear ();
+  _M2.clear ();
 
-  c = pR.GetTranspose () * CD_tri[t[0]].p1;
+  csVector3 c = pR.GetTranspose () * CD_tri[t[0]].p1;
+  csVector3 minval = c, maxval = c;
 
-  minval = c;
-  maxval = c;
+  for (i=0 ; i<n ; i++)
+  {
+    in = t[i];
+    ptr = CD_tri + in;
 
-  for(i=0; i<n; i++)
-    {
-      in = t[i];
-      ptr = CD_tri + in;
+    c = pR.GetTranspose () * ptr->p1;
+    csMath3::SetMinMax (c, minval, maxval); 
 
-      c = pR.GetTranspose () * ptr->p1;
-      csMath3::SetMinMax (c, minval, maxval); 
+    c = pR.GetTranspose () * ptr->p2;
+    csMath3::SetMinMax (c, minval, maxval); 
 
-      c = pR.GetTranspose () * ptr->p2;
-      csMath3::SetMinMax (c, minval, maxval); 
+    c = pR.GetTranspose () * ptr->p3;
+    csMath3::SetMinMax (c, minval, maxval); 
 
-      c = pR.GetTranspose () * ptr->p3;
-      csMath3::SetMinMax (c, minval, maxval); 
-
-      // grab the mean point of the in'th triangle, project
-      // it onto the splitting axis (1st column of pR) and
-      // see where it lies with respect to axdmp.
+    // grab the mean point of the in'th triangle, project
+    // it onto the splitting axis (1st column of pR) and
+    // see where it lies with respect to axdmp.
      
-      Moment::stack[in].mean(&c);
+    Moment::stack[in].mean (&c);
 
-      if ((( pR.m11 * c.x + pR.m21 * c.y + pR.m31 * c.z) < axdmp)
+    if ((( pR.m11 * c.x + pR.m21 * c.y + pR.m31 * c.z) < axdmp)
 	  && ((n!=2)) || ((n==2) && (i==0)))    
-	{
-	  // accumulate first and second order moments for group 1
-          _M1.moment(Moment::stack[in]);
-	  // put it in group 1 by swapping t[i] with t[n1]
-	  int temp = t[i];
-	  t[i] = t[n1];
-	  t[n1] = temp;
-	  n1++;
-	}
-      else
-	{
-	  // accumulate first and second order moments for group 2
-          _M2.moment(Moment::stack[in]);
-	  // leave it in group 2
-	  // do nothing...it happens by default
-	}
+    {
+      // accumulate first and second order moments for group 1
+      _M1.moment (Moment::stack[in]);
+      // put it in group 1 by swapping t[i] with t[n1]
+      int temp = t[i];
+      t[i] = t[n1];
+      t[n1] = temp;
+      n1++;
     }
+    else
+    {
+      // accumulate first and second order moments for group 2
+     _M2.moment (Moment::stack[in]);
+      // leave it in group 2
+      // do nothing...it happens by default
+    }
+  }
 
   // done using this->pT as a mean point.
 
-
   // error check!
   if ((n1 == 0) || (n1 == n))
-    {
-      // our partitioning has failed: all the triangles fell into just
-      // one of the groups.  So, we arbitrarily partition them into
-      // equal parts, and proceed.
+  {
+    // our partitioning has failed: all the triangles fell into just
+    // one of the groups.  So, we arbitrarily partition them into
+    // equal parts, and proceed.
 
-      n1 = n/2;
+    n1 = n/2;
       
-      // now recompute accumulated stuff
-      _M1.clear();
-      _M2.clear();
-      _M1.moments(t,n1);
-      _M2.moments(t+n1,n-n1);
-    }
+    // now recompute accumulated stuff
+    _M1.clear ();
+    _M2.clear ();
+    _M1.moments (t,n1);
+    _M2.moments (t+n1,n-n1);
+  }
 
   // With the max and min data, determine the center point and dimensions
   // of the parent box.
@@ -322,25 +285,26 @@ BBox::split_recurse(int *t, int n)
   // the split axis for each child.
   csMatrix3 tR;
   if (n1 > 1)
+  {
+    _M1.mean (&P->pT);
+    _M1.covariance (&C);
+
+    int nn = C.Eigens1 (&tR);
+    if ( nn > 30 || nn == -1)
     {
-
-      _M1.mean(&P->pT);
-      _M1.covariance(&C);
-
-      int nn = C.Eigens1(&tR);
-      if ( nn > 30 || nn == -1)
-	{
-	  // unable to find an orientation.  We'll just pick identity.
-	  tR.Identity();
-	}
-
-      P->pR = tR;
-      if ((rc = P->split_recurse(t, n1)) != false) return rc;
+      // unable to find an orientation.  We'll just pick identity.
+      tR.Identity ();
     }
+
+    P->pR = tR;
+    if ((rc = P->split_recurse (t, n1)) != false)
+      return rc;
+  }
   else
-    {
-      if ((rc = P->split_recurse(t)) != false) return rc;
-    }
+  {
+    if ((rc = P->split_recurse(t)) != false)
+      return rc;
+  }
 
   C = P->pR;
   P->pR = pR.GetTranspose () * C;
@@ -348,24 +312,26 @@ BBox::split_recurse(int *t, int n)
   P->pT = pR.GetTranspose () * c;
 
   if ((n-n1) > 1)
-    {      
-      _M2.mean(&N->pT);
-      _M2.covariance(&C);
-      int nn = C.Eigens1(&tR);
+  {      
+    _M2.mean (&N->pT);
+    _M2.covariance (&C);
+    int nn = C.Eigens1 (&tR);
 
-      if (nn > 30 || nn == -1)
-	{
-	  // unable to find an orientation.  We'll just pick identity.
-	  tR.Identity();
-	}
-      
-      N->pR = tR;
-      if ((rc = N->split_recurse(t + n1, n - n1)) != false) return rc;
-    }
-  else
+    if (nn > 30 || nn == -1)
     {
-      if ((rc = N->split_recurse(t+n1)) != false) return rc;
+      // unable to find an orientation.  We'll just pick identity.
+      tR.Identity ();
     }
+      
+    N->pR = tR;
+    if ((rc = N->split_recurse(t + n1, n - n1)) != false)
+      return rc;
+  }
+  else
+  {
+    if ((rc = N->split_recurse(t+n1)) != false)
+      return rc;
+  }
 
   C = N->pR;
   N->pR = pR.GetTranspose () * C;
@@ -377,7 +343,7 @@ BBox::split_recurse(int *t, int n)
   return false;
 }
 
-int BBox::split_recurse(int *t)
+int BBox::split_recurse (int *t)
 {
   // For a single triangle, orientation is easily determined.
   // The major axis is parallel to the longest edge.
@@ -390,17 +356,15 @@ int BBox::split_recurse(int *t)
   CDTriangle *ptr = CD_tri + t[0];
 
   // Find the major axis: parallel to the longest edge.
-  csVector3 u12, u23, u31;
-  
   // First compute the squared-lengths of each edge
 
-  u12 = ptr->p1 - ptr->p2;
+  csVector3 u12 = ptr->p1 - ptr->p2;
   float d12 = u12 * u12;
  
-  u23 = ptr->p2 - ptr->p3;
+  csVector3 u23 = ptr->p2 - ptr->p3;
   float d23 = u23 * u23;
 
-  u31 = ptr->p3 - ptr->p1;
+  csVector3 u31 = ptr->p3 - ptr->p1;
   float d31 = u31 * u31;
 
   // Find the edge of longest squared-length, normalize it to
@@ -435,16 +399,14 @@ int BBox::split_recurse(int *t)
     }
   }
 
-  sv = sqrt(sv);
+  sv = sqrt (sv);
   a0 = a0 / (sv > SMALL_EPSILON ? sv : SMALL_EPSILON);
   // Now compute unit normal to triangle, and put into a2.
-  csVector3 a2;
-  a2 = u12 % u23;
+  csVector3 a2 = u12 % u23;
   if (a2.Norm () != 0) a2 = csVector3::Unit (a2);
 
   // a1 is a2 cross a0.
-  csVector3 a1;
-  a1 = a2 % a0;
+  csVector3 a1 = a2 % a0;
   // Now make the columns of this->pR the vectors a0, a1, and a2.
   pR.m11 = a0.x; pR.m12 = a1.x; pR.m13 = a2.x;
   pR.m21 = a0.y; pR.m22 = a1.y; pR.m23 = a2.y;
@@ -453,12 +415,8 @@ int BBox::split_recurse(int *t)
   // Now compute the maximum and minimum extents of each vertex 
   // along each of the box axes.  From this we will compute the 
   // box center and box dimensions.
-  csVector3 minval, maxval;
-  csVector3 c;
-  c = pR.GetTranspose () * ptr->p1;
-
-  minval = c;
-  maxval = c;
+  csVector3 c = pR.GetTranspose () * ptr->p1;
+  csVector3 minval = c, maxval = c;
 
   c = pR.GetTranspose () * ptr->p2;
   csMath3::SetMinMax (c, minval, maxval);
