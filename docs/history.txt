@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Aug-2003
+	- Jorrit did some documentation fixes on the new lod section.
 14-Aug-2003
 	- Jorrit added iSharedVariableListener. With this interface you can
 	  listen to a variable and get notified when its value changes.

@@ -1,7 +1,9 @@
 @c -*-texinfo-*-
 @node Level of Detail, , Dynamic Worlds, Dynamic Worlds
 @subsection Level of Detail
-@cindex Dynamic Worlds
+@cindex Level of Detail
+@cindex static lod
+@cindex progressive lod
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
@@ -43,7 +45,7 @@ is purely distance based but for a given distance the level of detail will
 not change. A @sc{lod} manager can decide to reduce the lod levels for
 certain objects in order to improve overall performance.
 
-@subsubsection Static @sc{lod} From Map File
+@subsubheading Static @sc{lod} From Map File
 
 Using static @sc{lod} from a map file is fairly easy. Here is an example:
 
@@ -138,7 +140,7 @@ The advantage of this technique is that one can then use the same
 @sc{lod} values for different objects and modify them easily. Also one
 can modify the variables at runtime too with an immediate effect.
 
-@subsubsection Static @sc{lod} From Code
+@subsubheading Static @sc{lod} From Code
 
 Using static @sc{lod} from code is very easy. One basically has to create
 a hierarchical mesh, followed by a static @sc{lod} object and then the
@@ -169,7 +171,7 @@ section:
   @dots{}
 @end example
 
-@subsubsection Progressive @sc{lod}
+@subsubheading Progressive @sc{lod}
 
 Todo... @@@
 

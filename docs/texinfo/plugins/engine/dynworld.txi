@@ -169,3 +169,4 @@ to be removed (for example because it is destroyed by a missile or something).
 You can set the intensity of the pseudo-dynamic light to black and then remove
 it from the world.
 @end itemize
+
