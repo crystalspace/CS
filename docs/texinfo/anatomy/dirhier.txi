@@ -1,10 +1,8 @@
 @c -*-texinfo-*-
-@node Directory Structure, Makefile Structure, Library List, Anatomy
-@section Directory Structure
-
-@emph{NOTE} : This section is outdated. Only the description of the
-@file{apps} directory is close to the real directory structure. The
-dependency graph also needs heavy updates.
+@node Directory Hierarchy, Makefile Structure, Dependencies, Anatomy
+@section Directory Hierarchy
+@cindex Directory Hierarchy
+@cindex Hierarchy, Directory
 
 This section is intended to explain the general CS directory structure. It
 contains all directories, so maybe some will be missing, if you just
@@ -12,98 +10,29 @@ downloaded the files for a specific port like Linux or Win32.
 
 Documentation written by Thomas Hieber (@email{thieber@@gmx.net}).
 
-@menu
-* Source Tree:: The Source Tree
-* Dependencies::
-@end menu
-
-@node Source Tree, Dependencies, Directory Structure, Directory Structure
-@subsection The Source Tree
+@emph{Note}: This section may be slightly outdated and missing a few
+directories which have shown up since this description was written.
 
 Crystal Space consists of the following directories:
 
 @c --------------------------------------------------------------------------
-@c MOST DIRECTORIES SHOULD GET A VERY SHORT NOTE AND A LINK TO THEIR
-@c REAL DOCUMENTATION.
+@c Most directories should get a very short note and a link to their real
+@c documentation.
 @c --------------------------------------------------------------------------
 @table @file
 @item CS
-
-The main directory for Crystal Space. You can choose any path for it, as long
-as it is supported by your OS. This is the path that all executables are
-being generated to. This should be your working directory for these
-executables, and there should be all configuration files (@file{*.cfg}).
+The main directory for Crystal Space.  You can choose any path for it, as long
+as it is supported by your operating system.  This is the path that all
+compiled programs end up in.  This should be your working directory for these
+executables.  Configuration files (@file{.cfg}) also reside here.
 
 @item CS/apps
-Here go all applications developed, using Crystal Space.
+This is where all applications which ship with Crystal Space reside.
+@xref{Applications}.
 
 @table @file
-@item CS/apps/blocks
-Blocks, a Tetris clone. @xref{Blocks}.
-
-@item CS/apps/cctest
-A test application for the CrystalClear plug-in. @xref{CCtest}.
-
-@item CS/apps/cswstest
-A simple Hello-World like aplication, to show the use of the Crystal Space
-Windowing System. @xref{CSWStest}.
-
-@item CS/apps/makedep
-A portable dependency generation tool which can be used on platforms which do
-not use GCC. @xref{MakeDep}.
-
-@item CS/apps/map2cs
-A utility that converts Quake MAP files to CS worlds. @xref{Map2CS}.
-
-@item CS/apps/mazed
-MazEd, a simple 3D world and sprite editor. @xref{MazeD}.
-
-@item CS/apps/mdl2spr
-A Quake MDL to CS sprite coverter. @xref{Mdl2spr}.
-
-@item CS/apps/metademo
-A cool demo showing some metaballs. Balls that look like quicksilver. Really
-cool. @xref{MetaDemo}.
-
-@item CS/apps/ndrvdemo
-Demo application for the networkdriver library. @xref{NDrvDemo}.
-
-@item CS/apps/phyztest
-A test application for the csPhyzik plug-in. @xref{Phyztest}.
-
-@item CS/apps/pysimp
-(???) @xref{PySimp}.
-
-@item CS/apps/scfreg
-Tool to register the SCF components created within the build process. Not
-needed for the standard CS plug-ins on Win32. @xref{SCFReg}.
-
-@item CS/apps/scftutor
-(???) @xref{SCFTutor}.
-
-@item CS/apps/simple
-A kind of Hello World app using Crystal Space. @xref{SimpleApp}.
-
-@item CS/apps/shooter
-Crystal Shooter. An application that is intended to grow into a classic First
-Person Shooter. Right now it is more some sort of feasability study. It is
-also a demo application of the csgame gameing library. @xref{Shooter}.
-
-@item CS/apps/squawk
-(???) @xref{Squawk}.
-
-@item CS/apps/support
-Some files that are potentially needed by all applications.
-
 @item CS/apps/tests
-(???)
-
-@item CS/apps/vsh
-A shell program to test the virtual file system. @xref{Vsh}.
-
-@item CS/apps/Walktest
-Walktest. @emph{The} reference application for Crystal Space. If this
-application wont work, probably no other application will. @xref{Walktest}.
+Applications for testing specific features of the project reside here.
 @end table
 
 @item CS/bin
@@ -112,328 +41,295 @@ Some scripts to support the build process on various platforms.
 @item CS/data
 Here you should place your levels like @file{large.zip}. You can use any
 directory for this, so this is only a suggestion. If you change the name, you
-must update the information in the configuration for the Virtual File System
+must update the information in the configuration for the Virtual File System,
 (@file{vfs.cfg}).
 
-@table @file
-@item CS/data/Models/Test
-Directory containing testdata for the built in converter classes.
-@end table
-
 @item CS/docs
-Various docs concerning Crystal Space are here. Though not complete, they
-will answer a lot of questions.
+The root of the Crystal Space documentation hierarchy.  There are several
+subdirectories.
+
+@table @file
+@item CS/docs/texinfo
+Texinfo is the master format for all Crystal Space documentation.  This
+directory and its subdirectories contain all of the Texinfo source and images
+which comprise the Crystal Space manual.  Most users need not concern
+themselves with this directory since the Texinfo documentation is
+automatically converted to @sc{html} which is more accessible to the general
+user.  Documentation writers and maintainers may be interested in this
+directory.
+
+@item CS/docs/html
+This directory contains the @sc{html} conversion of the Texinfo Crystal Space
+documentation.  Most users will want to look at @file{CS/docs/html/index.htm}
+which resides here.
+
+@item CS/docs/incoming
+This is a temporary staging area for documentation which has not yet been
+converted to Texinfo format.  Much of this documentation is useful and worth
+perusing.
+@end table
 
 @item CS/include
 Here are the headers that can be used from other modules. The path for the
 headers reflect the structure of the modules in the lib directory. So for
-furter explanation of a specific directory see the CS/lib section.
+furter explanation of a specific directory see the @file{CS/lib} section.
 
 @item CS/libs
 Here are all Modules provided be Crystal Space. Some modules will consist of
-only on subdirectory in libs, some will be a combination of several
+only one subdirectory in libs, some will be a combination of several
 subdirectories.
 
 @table @file
 @item CS/libs/cs2d
-2D Driver@*
-This component manages the creation of the Crystal Space window used for
-rendering and also supports limited 2D drawing capabilities (including 2D
-sprites). It can be used standalone but it is currently very limited and not
-very useful (may change in the future). There are several implementations of
-this component. All are specific to some 3D Rasterizer (for example, the
-OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib Driver).
+The 2D driver component which manages creation of the Crystal Space window
+used for rendering and also supports limited 2D drawing capabilities
+(including 2D pixmaps).  It can be used standalone but it is currently very
+limited and not very useful (may change in the future).  There are several
+implementations of this component.  All are specific to some 3D Rasterizer
+(for example, the OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib
+Driver).
 
-@table @file
-@item CS/libs/cs2d/common
-Common code for all 2D drivers
+@multitable @columnfractions .25 .75
+@item @file{CS/libs/cs2d/common}
+@tab Common code for 2D drivers
 
-@item CS/libs/cs2d/be
-BeOS version
+@item @file{CS/libs/cs2d/be}
+@tab BeOS version
 
-@item CS/libs/cs2d/csdive
-OS/2 version
+@item @file{CS/libs/cs2d/csdive}
+@tab @sc{os}/2 version
 
-@item CS/libs/cs2d/ddraw
-Win32 using Direct Draw
+@item @file{CS/libs/cs2d/ddraw}
+@tab Win32 using Direct Draw
 
-@item CS/libs/cs2d/ddraw6
-Win32 using Direct Draw (DirectX 6)
+@item @file{CS/libs/cs2d/ddraw6}
+@tab Win32 using Direct Draw (DirectX 6)
 
-@item CS/libs/cs2d/dosraw
-DOS
+@item @file{CS/libs/cs2d/dosraw}
+@tab @sc{dos}
 
-@item CS/libs/cs2d/ggi
-Unix, using ggi
+@item @file{CS/libs/cs2d/ggi}
+@tab Unix, using @sc{ggi}
 
-@item CS/libs/cs2d/softx
-Unix, using X
+@item @file{CS/libs/cs2d/softx}
+@tab Unix, using X
 
-@item CS/libs/cs2d/svgalib
-Unix, using SVGAlib
+@item @file{CS/libs/cs2d/svgalib}
+@tab Unix, using @sc{svga}lib
 
-@item CS/libs/cs2d/mac
-Macintosh
+@item @file{CS/libs/cs2d/mac}
+@tab Macintosh
 
-@item CS/libs/cs2d/next
-MacOS/X Server, OpenStep, NextStep
+@item @file{CS/libs/cs2d/next}
+@tab MacOS/X Server, OpenStep, NextStep
 
-@item CS/libs/cs2d/glid2dcommon
-Common code for all Glide2 drivers
+@item @file{CS/libs/cs2d/glid2dcommon}
+@tab Common code for to Glide2 drivers
 
-@item CS/libs/cs2d/beglide2
-Glide2X 2D driver for BeOS
+@item @file{CS/libs/cs2d/beglide2}
+@tab Glide2X 2D driver for BeOS
 
-@item CS/libs/cs2d/macglide2
-Glide2x 2D driver for Mac
+@item @file{CS/libs/cs2d/macglide2}
+@tab Glide2x 2D driver for Macintosh
 
-@item CS/libs/cs2d/unxglide2
-Glide2x 2D driver for Unix
+@item @file{CS/libs/cs2d/unxglide2}
+@tab Glide2x 2D driver for Unix
 
-@item CS/libs/cs2d/winglide2
-Glide2x 2D driver for Win32
+@item @file{CS/libs/cs2d/winglide2}
+@tab Glide2x 2D driver for Win32
 
-@item CS/libs/cs2d/winglide3
-Glide3x 2D driver for Win32
+@item @file{CS/libs/cs2d/winglide3}
+@tab Glide3x 2D driver for Win32
 
-@item CS/libs/cs2d/openglcommon
-Common code for all OpenGL 2D drivers
+@item @file{CS/libs/cs2d/openglcommon}
+@tab Common code for all OpenGL 2D drivers
 
-@item CS/libs/cs2d/openglbe
-OpenGL 2D driver for BeOS
+@item @file{CS/libs/cs2d/openglbe}
+@tab OpenGL 2D driver for BeOS
 
-@item CS/libs/cs2d/openglmac
-OpenGL 2D driver for Max
+@item @file{CS/libs/cs2d/openglmac}
+@tab OpenGL 2D driver for Macintosh
 
-@item CS/libs/cs2d/openglos2
-OpenGL 2D driver for OS/2
+@item @file{CS/libs/cs2d/openglos2}
+@tab OpenGL 2D driver for @sc{os}/2
 
-@item CS/libs/cs2d/openglwin
-OpenGL 2D driver for Win32
+@item @file{CS/libs/cs2d/openglwin}
+@tab OpenGL 2D driver for Win32
 
-@item CS/libs/cs2d/openglx
-OpenGL 2D driver for Unix/X Windows
-@end table
+@item @file{CS/libs/cs2d/openglx}
+@tab OpenGL 2D driver for Unix/X Windows
+@end multitable
 
 @item CS/libs/cs3d
-3D Rasterizer @*
-This component is required by the 3D Engine but is also useful standalone. It
-needs a 2D Driver. There are currently four implementations of this
-component: Software, OpenGL, Glide, and Direct3D. These rasterizers are
-mostly OS independant (like OpenGL oder software). Some rasterizer techonolgy
-is only available on certain OS (like DirectX) so these are limited to their
-respective OS.
+The 3D rasterizer component is required by the 3D engine but may also be
+useful standalone.  It needs a 2D Driver.  There are currently several classes
+of this component which correspond to particular @sc{api}s: software, OpenGL,
+Glide, and Direct3D.  Some rasterizers are operating system independent, such
+as OpenGL and software.  Some rasterizer techonolgy is only available on
+certain operating systems, such as DirectX.
 
-@table @file
-@item CS/libs/cs3d/common
-Common code for all 3D rasterizers
+@multitable @columnfractions .25 .75
+@item @file{CS/libs/cs3d/common}
+@tab Common code for 3D rasterizers
 
-@item CS/libs/cs3d/direct3d5
-Direct3D rasterizer using DirectX 5
+@item @file{CS/libs/cs3d/direct3d5}
+@tab Direct3D rasterizer using DirectX 5
 
-@item CS/libs/cs3d/direct3d6
-Direct3D rasterizer using DirectX 6
+@item @file{CS/libs/cs3d/direct3d6}
+@tab Direct3D rasterizer using DirectX 6
 
-@item CS/libs/cs3d/glide2
-3D rasterizer using glide2x
+@item @file{CS/libs/cs3d/glide2}
+@tab 3D rasterizer using glide2x
 
-@item CS/libs/cs3d/glide3
-3D rasterizer using glide3x
+@item @file{CS/libs/cs3d/glide3}
+@tab 3D rasterizer using glide3x
 
-@item CS/libs/cs3d/opengl
-3D rasterizer using OpenGL
+@item @file{CS/libs/cs3d/opengl}
+@tab 3D rasterizer using OpenGL
 
-@item CS/libs/cs3d/software
-Software based rasterizer
-@end table
+@item @file{CS/libs/cs3d/software}
+@tab Software based rasterizer
+
+@item @file{CS/libs/cs3d/line}
+@tab A vector based rasterizer (draws only lines)
+
+@item @file{CS/libs/cs3d/inf}
+@tab The @emph{infinite} rasterizer (draws nothing at all)
+@end multitable
 
 @item CS/libs/csengine
-3D Engine @*
-This is one of the corner stones of Crystal Space and also what originally
-sparked the birth of the Crystal Space project. It needs the 3D Rasterizer
-component to display output and also requires a number of other libraries
-(csutil, csgeom, csgfxldr). The 3D Engine exports a number of SCF interfaces
-to allow access through the SCF mechanism.
+The 3D engine is one of the corner stones of Crystal Space and also what
+originally sparked the birth of the Crystal Space project.  It needs the 3D
+rasterizer component to display output and also requires a number of other
+libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
+@sc{scf} interfaces to allow access through the @sc{scf} mechanism.
 
-@table @file
-@item CS/libs/csengine/2d
-???
+@multitable @columnfractions .25 .75
+@item @file{CS/libs/csengine/colldet}
+@tab Collision detection system
 
-@item CS/libs/csengine/basic
-???
+@item @file{CS/libs/csengine/light}
+@tab Lighting system
 
-@item CS/libs/csengine/colldet
-Collision detection system
+@item @file{CS/libs/csengine/objects}
+@tab Sprites and things
 
-@item CS/libs/csengine/light
-Lighting system
-
-@item CS/libs/csengine/objects
-Sprites and things
-
-@item CS/libs/csengine/polygon
-???
-
-@item CS/libs/csengine/scripts
-Scripting
-@end table
+@item @file{CS/libs/csengine/polygon}
+@tab Polygon related functionality
+@end multitable
 
 @item CS/libs/csgame
-Crystal Space Game Library. @*
-A set of utility classes that focus on creating a real game. You can think of
-it, as an easier way to use Crystal Space in your own games, at the cost of
-some flexibility.
+The Crystal Space Game library.  This is set of utility classes that focus on
+creating a real game.  You can think of it, as an easier way to use Crystal
+Space in your own games, at the cost of some flexibility.
 
 @item CS/libs/csgeom
-Geometry Library @*
-Various geometry related stuff can be found here: matrices, vectors, BSP
-trees, clipper, planes, ...
+The geometry library.  Various geometry related functions and classes can be
+found here: matrices, vectors, @sc{bsp} trees, clipper, planes, etc.
 
 @item CS/libs/csgfxldr
-Graphics Loader Library @*
-Routines to support loading various graphic file formats and put them
-internally in the same format. This library supports JPG, GIF, TGA, PNG, and
-BMP.
+The graphics loader library.  Routines to support loading various graphic file
+formats and put them internally in the same format.  This library supports
+@sc{jpg}, @sc{gif}, @sc{tga}, @sc{png}, and @sc{bmp}.
 
 @item CS/libs/csinput
-Input System @*
-An input library (mouse, keyboard, joystick, ...).
+The input library (mouse, keyboard, joystick, etc.).
 
 @item CS/libs/csnetdrv
-Network Driver @*
-System dependent network drivers. There is currently only a sockets driver
-and a Null driver in case you don't want networking.
-
-@table @file
-@item CS/libs/csnetdrv/null
-No network
-
-@item CS/libs/csnetdrv/sockets
-Socket based network (TCP/IP)
-@end table
-
-@item CS/libs/csnetman
-Network Manager @*
-System dependent network managers. There is currently only a simple manager
-and a Null driver in case you don't want a manager.
-
-@table @file
-@item CS/libs/csnetman/null
-No network manager
-
-@item CS/libs/csnetman/simple
-An simple network manager
-@end table
+Network drivers.  The only existing driver is a @sc{bsd} socket-based
+@sc{tcp/ip} driver.
 
 @item CS/libs/csobject
-Hierarchy of CS independant classes, that are used as base for most CS
-classes. The main use for these classes is a system for runtime type
-information and for management of attributes like names that can dynamically
-be attached to objects at runtime.
+Hierarchy of Crystal Space independant classes, that are used as base for most
+Crystal Space classes.  The main use for these classes is a system for
+run-time type information and for management of attributes like names that can
+dynamically be attached to objects at run-time.
 
 @item CS/libs/csparser
-World Parser. @*
-A library which parses ASCII world files and creates a world in the 3D
-Engine.
+A library which parses @sc{ascii} world files and imports the world into the
+3D engine.
 
 @item CS/libs/csscript
-Scripting Engine. @*
-This library contains a very primitive scripting engine. It is not very
-powerful and needs to be replaced by something better. However, it is still
-used by some of the current levels. It stays until we got better scripting.
+This library contains a very primitive scripting engine.  It is not very
+powerful and needs to be replaced by something better.  However, it is still
+used by some of the current levels.
 
 @item CS/libs/cssnddrv
-Sound Driver.
-System dependent sound drivers. There are currently drivers for Macintosh,
-OSS (Linux), and Windows. There is also a Null driver for systems without
-sound.
+System dependent sound drivers.  There are currently drivers for Macintosh,
+@sc{oss} (Linux), and Windows.
 
-@table @file
-@item CS/libs/cssnddrv/null
-No sound
+@multitable @columnfractions .25 .75
+@item @file{CS/libs/cssnddrv/macsnd}
+@tab Sounddriver for Macintosh
 
-@item CS/libs/cssnddrv/macsnd
-Sounddriver for Mac
+@item @file{CS/libs/cssnddrv/oss}
+@tab Sounddriver for Unix
 
-@item CS/libs/cssnddrv/oss
-Sounddriver for Unix
+@item @file{CS/libs/cssnddrv/waveoutsd}
+@tab Sounddriver for Win32
+@end multitable
 
-@item CS/libs/cssnddrv/waveoutsd
-Sounddriver for Win32
-@end table
+@item CS/libs/cssfxldr
+Routines to support loading various sound file formats and put them internally
+in the same format.  This library supports @sc{wav}, @sc{aiff}, @sc{au}, etc.
 
-@item CS/libs/cssndldr
-Sound Loader Library @*
-Routines to support loading various sound file formats and put them
-internally in the same format. This library supports WAV, AIFF, AU, ...
-
-@table @file
-@item CS/libs/cssndldr/common
-???
-@end table
+@multitable @columnfractions .25 .75
+@item @file{CS/libs/cssfxldr/common}
+@tab Code common to many sound loaders.
+@end multitable
 
 @item CS/libs/cssndrdr
-Sound Renderer @*
-System dependent sound renderers. There are currently renderers for a3d,
-ds3d, eax, and software. There is also a Null renderer used with the Null
-sound driver.
+System dependent sound renderers.
 
-@table @file
-@item CS/libs/cssndrdr/null
-No sound renderer
+@multitable @columnfractions .25 .75
+@item @file{CS/libs/cssndrdr/software}
+@tab Software based sound renderer
 
-@item CS/libs/cssndrdr/software
-Software based sound renderer
+@item @file{CS/libs/cssndrdr/a3d}
+@tab 3D sound renderer for @sc{a3d}
 
-@item CS/libs/cssndrdr/a3d
-3D sound renderer for A3D
+@item @file{CS/libs/cssndrdr/ds3d}
+@tab 3D sound renderer for Direct Sound 3D
 
-@item CS/libs/cssndrdr/ds3d
-3D sound renderer for Direct Sound 3D
-
-@item CS/libs/cssndrdr/eax
-3D sound renderer for EAX
-@end table
+@item @file{CS/libs/cssndrdr/eax}
+@tab 3D sound renderer for @sc{eax}
+@end multitable
 
 @item CS/libs/cssys
-System Dependent Stuff @*
 All system dependent stuff (non-graphics and non-sound related) is in this
 library.
 
-@table @file
-@item CS/libs/cssys/common
-Common code for all system drivers
+@multitable @columnfractions .25 .75
+@item @file{CS/libs/cssys/general}
+@tab Code which may be shared between system drivers which can make use of it.
 
-@item CS/libs/cssys/general
-???
+@item @file{CS/libs/cssys/be}
+@tab BeOS
 
-@item CS/libs/cssys/be
-BeOS
+@item @file{CS/libs/cssys/djgpp}
+@tab @sc{dos} using the @sc{djgpp} compiler
 
-@item CS/libs/cssys/djgppDOS
-using the djgpp compiler
+@item @file{CS/libs/cssys/wcc}
+@tab @sc{dos} using the Watcom compiler
 
-@item CS/libs/cssys/wcc
-DOS using the Watcom compiler
+@item @file{CS/libs/cssys/mac}
+@tab Macintosh
 
-@item CS/libs/cssys/mac
-Macintosh
+@item @file{CS/libs/cssys/next}
+@tab MacOS/X Server, OpenStep, NextStep
 
-@item CS/libs/cssys/next
-MacOS/X Server, OpenStep, NextStep
+@item @file{CS/libs/cssys/os2}
+@tab @sc{os}/2
 
-@item CS/libs/cssys/os2
-OS/2
+@item @file{CS/libs/cssys/unix}
+@tab Unix, including Linux, Solaris, Irix, etc.
 
-@item CS/libs/cssys/unix
-Unix
+@item @file{CS/libs/cssys/win32}
+@tab Win32
 
-@item CS/libs/cssys/win32
-Win32
-
-@item CS/libs/cssys/amiga
-Amiga
-@end table
+@item @file{CS/libs/cssys/amiga}
+@tab Amiga
+@end multitable
 
 @item CS/libs/tools
 High level application tools. This are specialized objects which provide
@@ -443,167 +339,63 @@ example is csSimpleConsole which provides basic input/output facilities
 within an application framework.
 
 @item CS/libs/csutil
-Utility library @*
-This library contains various utilities. There is an Archive class which can
-read/write ZIP archives. There is a vector class, a sparse matrix class and
-some other useful goodies. This library requires the use of the external ZLib
-library which is used to read/write ZIP archives.
+This library contains various utilities.  There is an Archive class which can
+read/write @sc{zip} archives.  There is a vector class, a sparse matrix class
+and some other useful goodies.  This library requires the use of the external
+@file{zlib} library which is used to read/write @sc{zip} archives.
 
 @item CS/libs/csws
-Crystal Space Window System @*
-A window system nicely integrated with Crystal Space. It is also platform
-independent.
+The Crystal Space Window System which is nicely integrated with Crystal Space.
+It is also platform independent.
 
 @item CS/libs/libjpeg
-Library to handle jpeg files. This library is not part of Crystal Space.
+Library to handle @sc{jpeg} format files.  This library is not part of Crystal
+Space.
 
 @item CS/libs/libpng
-Library to handle png files. This library is not part of Crystal Space.
+Library to handle @sc{png} format files.  This library is not part of Crystal
+Space.
 
 @item CS/libs/zlib
-Library to handle zip files. This library is not part of Crystal Space.
+Library to handle @sc{zip} format files.  This library is not part of Crystal
+Space.
 @end table
 
 @item CS/mk
 This directory contains the common parts of the makefiles for many systems
 
-@table @file
-@item CS/mk/system
-System specific makefiles for most supported systems
+@multitable @columnfractions .25 .75
+@item @file{CS/mk/mwcw}
+@tab Project files for Macintosh CodeWarrior
 
-@item CS/mk/mwcw
-Project files for Macintosh CodeWarrior
+@item @file{CS/mk/visualc}
+@tab Project files for Win32 using MSVC 5.0/ 6.0
+@end multitable
 
-@item CS/mk/visualc
-Project files for Win32 using MSVC 5.0/ 6.0
-@end table
+@item CS/plugins
+Plug-in, dynamically loaded modules.  Communication with these modules is
+performed strictly via @sc{scf} interfaces.  @xref{SCF}.
+
+@multitable @columnfractions .25 .75
+@item @file{CS/plugins/csclear}
+@tab The Crystal Clear plug-in, a game abstraction library.
+
+@item @file{CS/plugins/cscon}
+@tab A console plug-in for displaying a textual console within the graphic
+environment.
+
+@item @file{CS/plugins/cspython}
+@tab A Python interpreter plug-in (unfinished).
+@end multitable
 
 @item CS/support
 Support routines.
 
-@table @file
-@item CS/support/debug
-Support routines for extensive memory checking
+@multitable @columnfractions .25 .75
+@item @file{CS/support/debug}
+@tab Support routines for extensive memory checking.
 
-@item CS/support/gnu
-Replacement for getopt (missing on some systems)
+@item @file{CS/support/gnu}
+@tab Replacement for getopt (missing on some systems).
+@end multitable
 @end table
-@end table
-
-@node Dependencies, , Source Tree, Directory Structure
-@subsection Dependencies
-
-To make sure, some parts of Crystal Space can be used by themselfes, there is
-a philosophy, about whis parts of Crystal Space are allowed to use other
-parts. You can think of the various modules as sitting on a specific level:
-
-@table @emph
-@item level1 (utility - independant of CS):
-@itemize @bullet
-@item
-libjpeg
-
-@item
-libpng
-
-@item
-zlib
-
-@item
-csgeom
-
-@item
-csobject
-
-@item
-csutil
-@end itemize
-
-@item level2 (basics - common base of various CS parts):
-@itemize @bullet
-@item
-cscom
-
-@item
-csgfxldr
-
-@item
-cssndldr
-
-@item
-cssys
-@end itemize
-
-@item level3 (com - various interchangeable plug-in modules of CS):
-@itemize @bullet
-@item
-cs2d
-
-@item
-cs3d
-
-@item
-csnetdrv
-
-@item
-csnetman
-
-@item
-cssnddrv
-
-@item
-cssndrdr
-@end itemize
-
-@item level4 (engine - binds togehter all the engines components):
-@itemize @bullet
-@item
-csengine
-
-@item
-csinput
-
-@item
-csparser
-
-@item
-csscript
-@end itemize
-
-@item level5 (support - adds a common layer of engine abstraction):
-@itemize @bullet
-@item
-csws
-
-@item
-csgame
-
-@item
-(console)
-@end itemize
-
-@item level6 (application):
-@itemize @bullet
-@item
-walktest
-
-@item
-metademo
-
-@item
-MazeD
-@end itemize
-@end table
-
-Every modules is only allowed to include headers from the same modules or
-from lower levels. So for example, csengine may include headers from cscom,
-but not from csws or csparser.
-
-All communication between level 3 libraries happens through SCF interfaces.
-Those are defined in the @file{CS/include} directory. That's the ONLY way to
-communicate on level 3. @file{csengine} can use level3 libraries only through
-SCF.
-
-csinput has a special role. Though sitting logically at level 4, it can and
-must be included in some 2d drivers and some system specific modules, because
-these module will generate the events that are being distributed be csinput.

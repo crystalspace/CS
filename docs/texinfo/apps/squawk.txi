@@ -1,6 +1,8 @@
 @c -*-texinfo-*-
-@node Squawk, Vsh, Shooter, Applications
+@node Squawk, , CCtest, Applications
 @section Squawk
+@cindex @file{squawk}
+@cindex Applications, @file{squawk}
 
 Created by Seth Galbraith (@email{sgalbrai@@krl.org}), also known as
 @emph{The Serpent Lord} (@uref{http://www.planetquake.com/simitar}).

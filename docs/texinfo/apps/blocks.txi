@@ -1,6 +1,8 @@
 @c -*-texinfo-*-
 @node Blocks, CCtest, Walktest, Applications
 @section Blocks
+@cindex @file{blocks}
+@cindex Applications, @file{blocks}
 
 Blocks is a small 3D Tetris type game being developed by Jorrit Tyberghein
 using Crystal Space. Though not currently finished, it is still playable. The

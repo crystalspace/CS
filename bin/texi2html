@@ -156,7 +156,7 @@ $T2H_TOP_FILE = '';
 $T2H_SHOW_MENU = 1;
 
 # -number
-# if set, number sections, show sections ins menu
+# if set, number sections and show section names and numbers in menus
 $T2H_NUMBER_SECTIONS = 1;
 
 # -split section|chapter|none 
@@ -260,7 +260,15 @@ $T2H_SMALL_EXAMPLE_INDENT_CELL = '<td>&nbsp;</td>';
 # font size for @small
 $T2H_SMALL_FONT_SIZE = '-1';
 
+# if set, and no @..heading appeared in Top node, 
+# use this as header for top node/section, otherwise use value of 
+# @settitle or @shorttitle (in that order)
+$T2H_TOP_HEADING = '';
 
+# if set, use this chapter for Index buttons, else
+# use first chapter whose name matches 'index' (case insensitive)
+$T2H_INDEX_CHAPTER = '';
+  
 ########################################################################
 # Language dependencies: 
 # To add a new language extend T2H_WORDS hash and create $T2H_<...>_WORDS hash
@@ -430,7 +438,9 @@ sub T2H_DEFAULT_print_Top
   &$T2H_print_Top_header($fh);
   if ($T2H_THIS_SECTION)
   {
-    # if top-level node has content, then print it
+    # if top-level node has content, then print it with extra header
+    print $fh "<H1>$T2H_NAME{Top}</H1>"
+      unless ($T2H_HAS_TOP_HEADING);
     t2h_print_lines($fh, $T2H_THIS_SECTION)
   }
   else
@@ -1686,7 +1696,7 @@ $value{'html'} = 1;			# predefine html (the output format)
 $value{'texi2html'} = $THISVERSION;	# predefine texi2html (the translator)
 # _foo: internal to track @foo
 foreach ('_author', '_title', '_subtitle',
-	 '_settitle', '_setfilename') {
+	 '_settitle', '_setfilename', '_shorttitle') {
     $value{$_} = '';		        # prevent -w warnings
 }
 %node2sec = ();				# node to section name
@@ -2762,7 +2772,12 @@ INPUT_LINE: while ($_ = &next_line) {
 		$name = $1;
 		$name = &normalise_node($name);
 		$level = $sec2level{$tag};
+		# check for index
+		$first_index_chapter = $name
+		  if ($level == 1 && !$first_index_chapter && 
+		      $name =~ /index/i);
 		if ($in_top && /heading/){
+		    $T2H_TOP_HEADING = 1;
                     $_ = &debug("<H$level>$name</H$level>\n", __LINE__);
 		    &html_push_if('body');
 		    print "# top heading, section $name, level $level\n"
@@ -2773,9 +2788,9 @@ INPUT_LINE: while ($_ = &next_line) {
 		else
 		{
 		  $node = $name unless $node;
-		  unless (/^\w+heading/)
+		  unless (/^\@\w*heading/)
 		  {
-		    unless (/^unnumbered/)
+		    unless (/^\@unnumbered/)
 		    {
 		      my $number = &update_sec_num($tag, $level);
 		      $name = $number. ' ' . $name if $T2H_NUMBER_SECTIONS;
@@ -2798,13 +2813,13 @@ INPUT_LINE: while ($_ = &next_line) {
 		    push(@sections, $name);
 		    next_doc() if ($T2H_SPLIT eq 'section' ||
 				   $T2H_SPLIT && $level == $toplevel);
-		    $sec_num++;
-		    $docid = "SEC$sec_num";
-		    $tocid = "TOC$sec_num";
-		    # check biblio and glossary
-		    $in_bibliography = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*bibliography$/i);
-		    $in_glossary = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*glossary$/i);
 		  }
+		  $sec_num++;
+		  $docid = "SEC$sec_num";
+		  $tocid = (/^\@\w*heading/ ? undef : "TOC$sec_num");
+		  # check biblio and glossary
+		  $in_bibliography = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*bibliography$/i);
+		  $in_glossary = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*glossary$/i);
 		  # check node
 		  if ($node2sec{$node}) {
 		    warn "$ERROR Duplicate node found: $node\n";
@@ -2825,23 +2840,32 @@ INPUT_LINE: while ($_ = &next_line) {
 		  $node_next = '';
 		  $node_prev = '';
 		  $node_next = '';
-		  # update TOC
-		  while ($level > $curlevel) {
-		    $curlevel++;
-		    push(@toc_lines, "<UL>\n");
+		  if ($tocid)
+		  {
+		    # update TOC
+		    while ($level > $curlevel) {
+		      $curlevel++;
+		      push(@toc_lines, "<UL>\n");
+		    }
+		    while ($level < $curlevel) {
+		      $curlevel--;
+		      push(@toc_lines, "</UL>\n");
+		    }
+		    $_ = &t2h_anchor($tocid, "$docu_doc#$docid", $name, 1);
+		    $_ = &substitute_style($_);
+		    push(@stoc_lines, "$_<BR>\n") if ($level == 1);
+		    if ($T2H_NUMBER_SECTIONS)
+		    {
+		      push(@toc_lines, $_ . "<BR>\n")
+		    }
+		    else
+		    {
+		      push(@toc_lines, "<LI>" . $_ ."</LI>");
+		    }
 		  }
-		  while ($level < $curlevel) {
-		    $curlevel--;
-		    push(@toc_lines, "</UL>\n");
-		  }
-		  $_ = &t2h_anchor($tocid, "$docu_doc#$docid", $name, 1);
-		  $_ = &substitute_style($_);
-		  push(@stoc_lines, "$_<BR>\n") if ($level == 1);
-		  push(@toc_lines, "<LI>" . $_ ."</LI>");
 		  # update DOC
 		  push(@lines, &html_debug('', __LINE__));
 		  &html_reset;
-		  #		    $_ =  "<H$level>".&t2h_anchor($docid, '', $name)."</H$level>\n";
 		  $_ =  "<H$level> $name </H$level>\n<!--docid::${docid}::-->\n";
 		  
 		  $_ = &debug($_, __LINE__);
@@ -2860,6 +2884,7 @@ INPUT_LINE: while ($_ = &next_line) {
 	    $value{$1} = Unprotect_texi($2), next if /^\@set\s+($VARRE)\s+(.*)$/o;
 	    delete $value{$1}, next if /^\@clear\s+($VARRE)\s*$/o;
 	    # store things
+	    $value{'_shorttitle'} = Unprotect_texi($1), next if /^\@shorttitle\s+(.*)$/;
 	    $value{'_setfilename'}   = Unprotect_texi($1), next if /^\@setfilename\s+(.*)$/;
 	    $value{'_settitle'}      = Unprotect_texi($1), next if /^\@settitle\s+(.*)$/;
 	    $value{'_author'}   .= Unprotect_texi($1)."\n", next if /^\@author\s+(.*)$/;
@@ -3045,7 +3070,9 @@ while (@lines) {
       next;
     }
     if ($in_menu) {
-	if (/^\*\s+($NODERE)::/o) {
+	if (/^\*\s+($NODERE)::/o || /^\*\s+(.+):\s+([^\t,\.\n]+)[\t,\.\n]/) 
+	{
+	  $descr = $';
 	  if (! $in_menu_listing)
 	  {
 	    $in_menu_listing = 1;
@@ -3053,20 +3080,12 @@ while (@lines) {
 	       push(@lines2, &debug("<TABLE BORDER=0 CELLSPACING=0>\n", __LINE__)) :
 		 push(@lines2, &debug("<UL>\n", __LINE__));
 	  }
-	    $descr = $';
-	    chop($descr);
-	    &menu_entry($1, $1, $descr);
-	} elsif (/^\*\s+(.+):\s+([^\t,\.\n]+)[\t,\.\n]/) {
-	  if (! $in_menu_listing)
+	  # look for continuation
+	  while ($lines[0] =~ /^\s+\w+/)
 	  {
-	    $in_menu_listing = 1;
-	     $T2H_NUMBER_SECTIONS ?
-	       push(@lines2, &debug("<TABLE BORDER=0 CELLSPACING=0>\n", __LINE__)) :
-		 push(@lines2, &debug("<UL>\n", __LINE__));
+	    $descr .= shift(@lines);
 	  }
-	    $descr = $';
-	    chop($descr);
-	    &menu_entry($1, $2, $descr);
+	  &menu_entry($1, $1, $descr);
 	} elsif (/^\*/) {
 	    warn "$ERROR Bad menu line: $_";
 	} else { # description continued?
@@ -3144,7 +3163,7 @@ while (@lines) {
 		$last_letter = $letter;
 	    }
 	    foreach (split(/$;$;/, $ary{$key})) {
-	        my ($idx, $section) = split(/$;/, $_);
+	        my ($idx, $section) = split(/$;/, $_, 2);
 		push(@lines2, 
 		     "<TR><TD></TD><TD>" . 
 		     &t2h_anchor('', $idx, $key, 0) .
@@ -3444,6 +3463,7 @@ $T2H_THISDOC{fulltitle} = $value{'_title'} || $value{'_settitle'} || "Untitled D
 $T2H_THISDOC{title} = $value{'_settitle'} || $T2H_THISDOC{fulltitle};
 $T2H_THISDOC{author} = $value{'_author'};
 $T2H_THISDOC{subtitle} = $value{'_subtitle'};
+$T2H_THISDOC{shorttitle} = $value{'_shorttitle'};
 for $key (keys %T2H_THISDOC)
 {
   $_ = &substitute_style($T2H_THISDOC{$key});
@@ -3452,7 +3472,7 @@ for $key (keys %T2H_THISDOC)
   $T2H_THISDOC{$key} = $_;
 }
 
-# if no sections, then simply print docuemnt as is
+# if no sections, then simply print document as is
 unless (@sections)
 {
   print "# Writing content into $docu_top_file \n" if $T2H_VERBOSE;
@@ -3497,7 +3517,22 @@ else
 $node2href{Top} = $T2H_HREF{Top};
 $T2H_HREF{Contents} = $docu_toc.'#SEC_Contents' if @toc_lines;
 $T2H_HREF{Overview} = $docu_stoc.'#SEC_OVERVIEW' if @stoc_lines;
-$T2H_HREF{Index} = $node2href{'Index'};
+
+# settle on index
+if ($T2H_INDEX_CHAPTER)
+{
+  $T2H_HREF{Index} = $node2href{normalise_node($T2H_INDEX_CHAPTER)};
+  warn "$ERROR T2H_INDEX_CHAPTER '$T2H_INDEX_CHAPTER' not found\n"
+    unless $T2H_HREF{Index};
+}
+if (! $T2H_HREF{Index} && $first_index_chapter)
+{
+  $T2H_INDEX_CHAPTER = $first_index_chapter;
+  $T2H_HREF{Index} = $node2href{$T2H_INDEX_CHAPTER};
+}
+
+print "# Using '" . clean_name($T2H_INDEX_CHAPTER) . "' as index page\n"
+  if ($T2H_VERBOSE && $T2H_HREF{Index});
 
 %T2H_NAME =
   (
@@ -3506,8 +3541,8 @@ $T2H_HREF{Index} = $node2href{'Index'};
    'About',    $T2H_WORDS->{$T2H_LANG}->{'About_Title'},
    'Contents', $T2H_WORDS->{$T2H_LANG}->{'ToC_Title'},
    'Overview', $T2H_WORDS->{$T2H_LANG}->{'Overview_Title'},
-   'Index' ,   '',
-   'Top',      '' 
+   'Index' ,   clean_name($T2H_INDEX_CHAPTER),
+   'Top',      $T2H_TOP_TITLE || $T2H_THISDOC{'title'} || $T2H_THISDOC{'shorttitle'},
   );
 
 #############################################################################
@@ -3729,6 +3764,8 @@ if (@stoc_lines)
   $T2H_HREF{This} = $T2H_HREF{Overview};
   $T2H_NAME{This} = $T2H_NAME{Overview};
   $T2H_THIS_SECTION = \@stoc_lines;
+  unshift @$T2H_THIS_SECTION, "<BLOCKQUOTE>\n";
+  push @$T2H_THIS_SECTION, "\n</BLOCKQUOTE>\n";
   &$T2H_print_Overview(\*FILE);
   close(FILE) if $T2H_SPLIT;
 }
@@ -3854,7 +3891,8 @@ sub Sec2PrevNode
     }
     elsif ($i ne '1')
     {
-      $i--;
+      # unfortunately, -- operator is not magical
+      $i = chr(ord($i) + 1);
     }
     else
     {
@@ -4063,15 +4101,18 @@ sub menu_entry {
 	$descr =~ s/^\s+//;
 	if ($T2H_NUMBER_SECTIONS)
 	{
-	  $entry = $node2sec{$entry} if ! $descr && $node2sec{$entry};
-	  push(@lines2, 
-	       '<TR><TD ALIGN="left">' . 
-	       &t2h_anchor('', $href, $entry) . 
-	       '</TD><TD ALIGN="left">' . $descr . "</TD><TR>\n");
+	  $entry = $node2sec{$entry} if $node2sec{$entry};
+	  push(@lines2,&debug('<TR><TD ALIGN="left" VALIGN="TOP">' . 
+			      &t2h_anchor('', $href, $entry) . 
+			      '</TD><TD ALIGN="left" VALIGN="TOP">' . $descr . 
+			      "</TD><TR>\n", __LINE__));
 	}
 	else
 	{
-	  push(@lines2, "<LI>" . &t2h_anchor('', $href, $entry) . ": $descr\n");
+	  push(@lines2, &debug("<LI>" . 
+			       &t2h_anchor('', $href, $entry) . 
+			       ": $descr\n", __LINE__));
+	  
 	}
     } else {
 	warn "$ERROR Undefined node of menu_entry ($node): $_";

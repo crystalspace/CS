@@ -209,7 +209,7 @@ Pause when not foreground application. Make sure that screen redraws
 correctly even when paused.
 @end itemize
 
-@strong{IGNORE}: @emph{This text is from an earlier edition of this
+@strong{IGNORE}: @emph{The following text is from an earlier edition of this
 documentation and is now mostly inaccurate and obsolete, and will be removed
 in the future.}
 
@@ -231,4 +231,5 @@ You will also need to comment out the following line in @file{glrender.mak}:
 @example
 LIBS._GL3D+=-L$(X11_PATH)/lib -lXext -lX11
 @end example
-<<< IGNORE: THIS SECTION WILL SOON BE OBSOLETE <<<
+
+@strong{END IGNORE}

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 #==============================================================================
 #
 #    Texinfo @node and @menu Repair Script
@@ -22,19 +22,16 @@
 #------------------------------------------------------------------------------
 # nodefix.pl
 #
-#    A tool for repairing broken and out-of-date @node directives and @menu 
-#    blocks.  Understands @include and @import{} directives and will correctly 
-#    repair an entire Texinfo tree when given a root Texinfo file which 
+#    A tool for repairing broken and out-of-date @node directives and @menu
+#    blocks.  Understands @include and @import{} directives and will correctly
+#    repair an entire Texinfo tree when given a root Texinfo file which
 #    directly or indirectly includes all other files within the tree.
 #
-#    (The @import{} directive is a special macro developed by Eric Sunshine to 
-#    deal gracefully with differences in pathname syntax between platforms.) 
+#    (The @import{} directive is a special macro developed by Eric Sunshine to
+#    deal gracefully with differences in pathname syntax between platforms.)
 #
 # To-Do List
 #    * Add support for @detailmenu.
-#
-# Bug List
-#    * Fails to repair a @menu if no @node directive appears in the same file.
 #
 #------------------------------------------------------------------------------
 use strict;
@@ -43,12 +40,11 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'nodefix.pl';
-my $PROG_VERSION = '1.0';
+my $PROG_VERSION = '1.1';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
-my $divider = '-' x 40;
 my @include_dirs = ();
 my $verbose = 0;
 my $debug = 0;
@@ -64,7 +60,11 @@ my $broken_nodes = 0;
 my $broken_menus = 0;
 my $broken_files = 0;
 
-use vars qw($current_file $line_number);
+use vars qw($current_file $line_number $scan_depth);
+$current_file = undef;
+$line_number = 0;
+$scan_depth = 0;
+
 my $current_node = undef;
 my $current_depth = 0;
 my $depth_adjustment = 0;
@@ -120,6 +120,14 @@ sub warning {
 }
 
 #------------------------------------------------------------------------------
+# Print an underlined title.
+#------------------------------------------------------------------------------
+sub print_title {
+    my $msg = shift;
+    print "$msg\n", '-' x length($msg), "\n";
+}
+
+#------------------------------------------------------------------------------
 # Find a file, possibly searching a list of alternate directories specified
 # on the command line.
 #------------------------------------------------------------------------------
@@ -143,9 +151,9 @@ sub open_input_file {
     my $handle = new FileHandle($path, "r")
 	or fatal "Failed to open file: $path";
     $current_file = {
-	path  => $path,
-	nodes => [],
-	menus => [],
+	'path'  => $path,
+	'nodes' => [],
+	'menus' => [],
     };
     push(@file_list, $current_file);
     $line_number = 0;
@@ -160,7 +168,7 @@ sub input_line {
     my $handle = shift;
     my $line = <$handle>;
     return () unless $line;
-    my ($key, $option);
+    my ($key, $option) = ('', '');
     if ($line =~ /^\@(\w+)\s*(.*)$/) {		# Got a @directive?
 	($key, $option) = ($1, $2);		# Extract components.
 	$option =~ s/\@c(?:omment)?\b.*$//;	# Strip trailing comment.
@@ -174,6 +182,7 @@ sub input_line {
 #------------------------------------------------------------------------------
 sub canonicalize {
     local $_ = $_[0];
+    $_ = '' unless $_;
     s/\s+/ /g;
     s/^ //;
     s/ $//;
@@ -202,15 +211,14 @@ sub scan_node {
     fatal "Malformed \@node at line $line_number in $current_file->{'path'}."
 	unless $nname;
     $current_node = {
-	name  => $nname,
-	next  => $nnext,
-	prev  => $nprev,
-	up    => $nup,
-	title => $nname,
-	file  => $current_file,
-	depth => $current_depth,
-	menu  => undef,
-	dirty => 0,
+	'name'  => $nname,
+	'old'   => { 'next' => $nnext, 'prev' => $nprev, 'up' => $nup, },
+	'new'   => { 'next' => '',     'prev' => '',     'up' => '',   },
+	'title' => $nname,
+	'file'  => $current_file,
+	'depth' => $current_depth,
+	'menu'  => undef,
+	'dirty' => 0,
     };
     $node_map{$nname} = $current_node;
     push(@node_list, $current_node);
@@ -224,8 +232,8 @@ sub add_menu_item {
     my ($item_list, $node, $title) = @_;
     $title = '' if $node eq $title;
     my $item = {
-	node  => $node,
-	title => $title,
+	'node'  => $node,
+	'title' => $title,
     };
     push(@{$item_list}, $item);
 }
@@ -254,11 +262,11 @@ sub scan_menu {
     my $handle = shift;
     my $start_line = $line_number;
     my $menu = {
-	node   => $current_node,
-	file   => $current_file,
-	items  => [],
-	detail => undef,
-	dirty  => 0,
+	'node'   => $current_node,
+	'file'   => $current_file,
+	'items'  => [],
+	'detail' => undef,
+	'dirty'  => 0,
     };
     $current_node->{'menu'} = $menu;
     push(@menu_list, $menu);
@@ -312,8 +320,10 @@ sub scan_depth {
 sub scan_include {
     my $line = shift;
     my $child;
-    $line =~ /^\@include\s+(.+)$/ && do{ $child = $1; };
-    $line =~ /^\@imports*\s*\{(.+)\}/ && do{ $child = $1; $child =~ tr|,|/| };
+    $line =~ /^\@include\s+(.+)$/ && do { $child = $1; };
+    $line =~ /^\@imports*\s*\{(.+)\}/ && do { $child = $1; $child =~ tr|,|/| };
+    fatal "Missing filename following \@include or \@import{} at line " .
+	"$line_number in $current_file->{'path'}" unless $child;
     return scan_file($child);
 }
 
@@ -328,7 +338,6 @@ sub scan_file {
     my $handle = open_input_file($file);
     my $path = $current_file->{'path'};
 
-    use vars '$scan_depth';
     local $scan_depth = $scan_depth + 1;
     print ' ' x ($scan_depth - 1) . "$path\n" if $verbose;
 
@@ -359,9 +368,9 @@ sub scan_file {
 #------------------------------------------------------------------------------
 sub scan_root_file {
     my $file = shift;
-    print "Scanning:\n" if $verbose;
-    scan_file($file) and warning "Missing \"\@end\" directive.";
-    print "$divider\n" if $verbose;
+    print_title("Scanning") if $verbose;
+    scan_file($file) and warning "Missing \"\@bye\" directive.";
+    print "\n" if $verbose;
 }
 
 #------------------------------------------------------------------------------
@@ -369,10 +378,7 @@ sub scan_root_file {
 #------------------------------------------------------------------------------
 sub node_set {
     my ($node, $key, $value) = @_;
-    if ($node->{$key} ne $value->{'name'}) {
-	$node->{$key} = $value->{'name'};
-	$node->{'dirty'} = 1;
-    }
+    $node->{'new'}{$key} = ($value ? $value->{'name'} : '');
 }
 
 sub node_set_next { node_set(shift, 'next', shift); }
@@ -413,11 +419,18 @@ sub repair_nodes {
 	if ($last_depth == 0) { # 'top' special case.
 	    my $top_node = $prev_at_depth[$last_depth];
 	    node_set_next($top_node, $node);
-	    node_set_up($top_node, { name => '(dir)'});
+	    node_set_up($top_node, { 'name' => '(dir)' });
 	}
 
 	$prev_at_depth[$depth] = $node;
 	$last_depth = $depth;
+    }
+
+    foreach my $node (@node_list) {
+	$node->{'dirty'} = 1 if
+	    $node->{'new'}{'next'} ne $node->{'old'}{'next'} ||
+	    $node->{'new'}{'prev'} ne $node->{'old'}{'prev'} ||
+	    $node->{'new'}{'up'  } ne $node->{'old'}{'up'  };
     }
 }
 
@@ -471,13 +484,12 @@ sub patch_node {
     my ($lines, $node_line) = @_;
     my ($nname, $nnext, $nprev, $nup) = parse_node($node_line);
     if (exists $node_map{$nname}) {
-	$current_node = $node_map{$nname};
-	if ($current_node->{'dirty'}) {
-	    $node_line =
-		"$current_node->{'name'}, " .
-		"$current_node->{'next'}, " .
-		"$current_node->{'prev'}, " .
-		"$current_node->{'up'}";
+	my $node = $node_map{$nname};
+	if ($node->{'dirty'}) {
+	    $node_line = "$nname, " .
+		"$node->{'new'}{'next'}, " .
+		"$node->{'new'}{'prev'}, " .
+		"$node->{'new'}{'up'}";
 	    $broken_nodes++;
 	}
     }
@@ -491,9 +503,8 @@ sub patch_node {
 # be automatically gleaned from any source, whereas Node and Title can.
 #------------------------------------------------------------------------------
 sub patch_menu {
-    my ($lines, $handle) = @_;
+    my ($lines, $menu, $handle) = @_;
     push(@{$lines}, "\@menu\n"); # Always emit whether dirty or not.
-    my $menu = $current_node->{'menu'};
     if ($menu->{'dirty'}) {
 	scan_ignored('menu', $handle);		 # Skip the old menu.
 	foreach my $item (@{$menu->{'items'}}) { # Emit the new menu.
@@ -512,16 +523,17 @@ sub patch_menu {
 sub patch_file {
     my $file = shift;
     my $path = $file->{'path'};
+    my $menu_number = 0;
     print "$path\n" if $verbose;
     $broken_files++;
 
     my $handle = new FileHandle($path, "r")
 	or fatal "Failed to open file: $path";
     my $lines = [];
-    my ($line, $key, $option);
-    while (($line, $key, $option) = input_line($handle)) {
+    while (my ($line, $key, $option) = input_line($handle)) {
 	patch_node($lines, $option), next if $key eq 'node';
-	patch_menu($lines, $handle), next if $key eq 'menu';
+	patch_menu($lines, $file->{'menus'}[$menu_number++], $handle), next
+	    if $key eq 'menu';
 	push(@{$lines}, $line);
     }
     $handle->close();
@@ -538,7 +550,7 @@ sub patch_file {
 # Patch all files which contain broken nodes or menus.
 #------------------------------------------------------------------------------
 sub patch_files {
-    print "Repairing:\n" if $verbose;
+    print_title("Repairing") if $verbose;
     FILE: foreach my $file (@file_list) {
 	foreach my $node (@{$file->{'nodes'}}) {
 	    patch_file($file), next FILE if $node->{'dirty'};
@@ -547,17 +559,18 @@ sub patch_files {
 	    patch_file($file), next FILE if $menu->{'dirty'};
 	}
     }
-    print "$divider\n" if $verbose;
+    print "\n" if $verbose;
 }
 
 #------------------------------------------------------------------------------
 # Display repair summary.
 #------------------------------------------------------------------------------
 sub summary {
+    print_title("Repair Summary");
     print <<EOS;
-Nodes repaired: $broken_nodes of ${\scalar(@node_list)}
-Menus repaired: $broken_menus of ${\scalar(@menu_list)}
-Files repaired: $broken_files of ${\scalar(@file_list)}
+Nodes: $broken_nodes of ${\scalar(@node_list)}
+Menus: $broken_menus of ${\scalar(@menu_list)}
+Files: $broken_files of ${\scalar(@file_list)}
 EOS
 }
 
@@ -582,15 +595,25 @@ Usage: $PROG_NAME [options] <file>
        repaired along with all files which it directly or indirectly includes.
 
 Options:
+    -I <dir>
     --include-dir=<dir>
-              Search directory <dir> when looking for files included by
-              \@include or \@import{}.  May be used multiple times to specify
-              additional directories to search.  This option may be
-              abbreviated as -I (as in "-I <dir>").
-    --verbose Emit informational messages as processing proceeds.
-    --debug   Perform all repair work but do not actually modify any files.
-    --help    Print this usage message.
+                 Search directory <dir> when looking for files included by
+                 \@include or \@import{}.  May be used multiple times to
+                 specify additional search directories.
+    -v --verbose Emit informational messages as processing proceeds.
+    -d --debug   Perform all repair work but do not actually modify any files.
+    -h --help    Print this usage message.
 EOT
+}
+
+#------------------------------------------------------------------------------
+# Process command-line options.
+#------------------------------------------------------------------------------
+sub process_options {
+    GetOptions(@script_options) or usage_error('');
+    usage_error("Must specify exactly one input file.\n") unless @ARGV == 1;
+    print "$PROG_NAME version $PROG_VERSION\n$COPYRIGHT\n\n";
+    print "Debugging enabled.\n\n" if $debug;
 }
 
 sub print_help {
@@ -598,13 +621,11 @@ sub print_help {
     exit(0);
 }
 
-#------------------------------------------------------------------------------
-# Process command-line options.
-#------------------------------------------------------------------------------
-sub process_options {
-    GetOptions(@script_options) or print("\n"), print_usage(\*STDERR), exit(1);
-    fatal "Must specify exactly one source file." unless @ARGV == 1;
-    print "Debugging enabled.\n" if $debug;
+sub usage_error {
+    my $msg = shift;
+    print STDERR "$msg\n";
+    print_usage(\*STDERR);
+    exit(1);
 }
 
 #------------------------------------------------------------------------------

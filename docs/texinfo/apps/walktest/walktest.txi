@@ -1,7 +1,8 @@
 @c -*-texinfo-*-
-@node Walktest, Blocks, Applications, Applications
+@node Walktest, Blocks, Applications Overview, Applications
 @section Walktest
-@cindex Applications, Walktest
+@cindex @file{walktest}
+@cindex Applications, @file{walktest}
 
 This is the quintessential test application for the project, and the
 application most likely to be up-to-date any time a change is

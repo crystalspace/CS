@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Makefile Structure, csPhyzik, Directory Structure, Anatomy
+@node Makefile Structure, csPhyzik, Directory Hierarchy, Anatomy
 @section Structure of the Makefile
 @cindex Makefile
 

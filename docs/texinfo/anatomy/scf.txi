@@ -659,6 +659,11 @@ scfRegisterClass ("csDog", "libDog.dll");
 @emph{advanced guy} type man (I'm personally not one :-).  Here I will
 describe them in details.
 
+@menu
+* SCF dynamic class registration:: Dynamic class registration
+* SCF Non-registered classes:: Non-registered classes
+@end menu
+
 @node SCF dynamic class registration, SCF Non-registered classes, SCF Advanced techniques, SCF Advanced techniques
 @subsubsection Dynamic class registration
 

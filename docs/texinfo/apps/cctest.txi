@@ -1,7 +1,8 @@
 @c -*-texinfo-*-
-@node CCtest, CSWStest, Blocks, Applications
+@node CCtest, Squawk, Blocks, Applications
 @section CCtest
-@cindex Applications, CCtest
+@cindex @file{cctest}
+@cindex Applications, @file{cctest}
 
 The CrystalClear test application.  @xref{CrystalClear}.  This is under heavy
 development.  Currently you can load a level, and move around.  There is now

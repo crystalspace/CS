@@ -3,143 +3,21 @@
 @chapter Applications
 @cindex Applications
 
-This section describes the various applications which are bundled with
-Crystal Space.  The applications serve as good demonstrations of how features
-of Crystal Space can be utilized in your own programs and also serve as
-good examples of how to actually program with Crystal Space.
+This chapter describes the various applications which are bundled with Crystal
+Space.  The applications often serve as good demonstrations of how features of
+Crystal Space can be utilized in your own programs and also serve as good
+examples of how to actually program with Crystal Space.
 
 @menu
+* Applications Overview:: Quick Overview
 * Walktest::
 * Blocks::
 * CCtest::
-* CSWStest::
-* MakeDep::
-* Map2CS::
-* MazeD::
-* Mdl2spr::
-* MetaDemo::
-* NDrvDemo::
-* Phyztest::
-* PySimp::
-* SCFReg::
-* SCFTutor::
-* SimpleApp:: Simple
-* Shooter::
 * Squawk::
-* Vsh::
-* Vfstest::
 @end menu
 
+@imports{apps,overview.txi}
 @importss{apps,walktest,walktest.txi}
 @imports{apps,blocks.txi}
 @imports{apps,cctest.txi}
-
-@node CSWStest, MakeDep, CCtest, Applications
-@section CSWStest
-@cindex Applications, CSWStest
-
-This application tests the Crystal Space Windowing System (CSWS),
-which is designed to provide a clean, effective and cross-platform
-base for creating CrystalSpace-related utilites. Currently there
-is only one such utility under development, the CrystalSpace maze
-editor (MazeD). @xref{CSWS}.
-
-@node MakeDep, Map2CS, CSWStest, Applications
-@section MakeDep
-
-A header file dependency generation tool for platforms which are otherwise
-lacking such a tool.
-
-@node Map2CS, MazeD, MakeDep, Applications
-@section Map2CS
-@cindex Applications, Map2CS
-
-This is one of the map convertors which converts between Quake style
-@file{*.map} format, and the native CS @samp{world} format. It is known to
-work with WorldCraft 2.1 Beta and QuArK (Quake Army Knife).
-
-@node MazeD, Mdl2spr, Map2CS, Applications
-@section MazeD
-@cindex Applications, MazeD
-
-This application is the CrystalSpace map editor. It is a work
-currently in progress.
-
-@node Mdl2spr, MetaDemo, MazeD, Applications
-@section Mdl2spr
-@cindex Applications, Mdl2spr
-
-This application is a quake @file{.mdl} model convertor. It converts
-model files into sprites.
-
-@node MetaDemo, NDrvDemo, Mdl2spr, Applications
-@section MetaDemo
-@cindex Applications, MetaDemo
-
-This is another demostration application which draws texture-mapped
-balls in a freeform @samp{blob}.
-
-@node NDrvDemo, Phyztest, MetaDemo, Applications
-@section NDrvDemo
-
-An example demonstrating use of the Crystal Space network driver.
-
-@node Phyztest, PySimp, NDrvDemo, Applications
-@section Phyztest
-@cindex Applications, Phyztest
-
-This application tests the physics library for proper operation.
-@xref{csPhyzik}.
-
-@node PySimp, SCFReg, Phyztest, Applications
-@section PySimp
-
-An example demonstrating use of the Python plug-in module.
-
-@node SCFReg, SCFTutor, PySimp, Applications
-@section SCFReg
-@cindex Applications, SCFReg
-
-This application is required to register all the shared libraries,
-such as the software and hardware renderer(s).
-
-@node SCFTutor, SimpleApp, SCFReg, Applications
-@section SCFTutor
-
-An example demonstrating the ins and outs of Crystal Space's SCF system.
-@xref{SCF}.
-
-@node SimpleApp, Shooter, SCFTutor, Applications
-@section Simple
-@cindex Applications, Simple
-
-Developers should use this application as a guide when devloping
-their new programs. It's code tends to be much cleaner than
-Walktest's, and makes proper use of various modules in the engine.
-@xref{Tutorials}.
-
-@node Shooter, Squawk, SimpleApp, Applications
-@section Shooter
-@cindex Applications, Shooter
-
-Crystal Shooter.  An application that is intended to grow into a classic
-@dfn{First Person Shooter}.  Right now it is more some sort of feasability
-study.  It is also a demo application of the csgame gameing library.
-@xref{csGame}.
-
-@c ---------------------
 @imports{apps,squawk.txi}
-@c ---------------------
-
-@node Vsh, Vfstest, Squawk, Applications
-@section Vsh
-@cindex Applications, Vsh
-
-This is the test application for the Virtual File System (VFS). It
-works very similar to the standard Unix shell programs. @xref{VFS}.
-
-@node Vfstest, , Vsh, Applications
-@section Vfstest
-@cindex Applications, Vfstest
-
-A simple test program which measures the speed of the Virtual File System.

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 #==============================================================================
 #
 #    Automated Texinfo to HTML Conversion and CVS Update Script
@@ -75,7 +75,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'docproc.pl';
-my $PROG_VERSION = '1.1';
+my $PROG_VERSION = '1.2';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -141,7 +141,7 @@ sub expire {
     print STDERR "FATAL: $msg failed: $!\n";
     dump_captured();
     destroy_transient($CONV_DIR);
-    croak "Stopped";
+    croak 'Stopped';
 }
 
 #------------------------------------------------------------------------------
@@ -235,8 +235,8 @@ sub cvs_add {
     }
     else {
 	my $isbin = -B $src;
-	my $flags = "-kb" if $isbin;
-	print "Adding file: $file [" . ($isbin ? "binary" : "text") . "]\n";
+	my $flags = ($isbin ? '-kb' : '');
+	print "Adding file: $file [" . ($isbin ? 'binary' : 'text') . "]\n";
 	copy_file($src, $dst);
 	run_command("cvs -Q add $flags $dst") if !$DEBUG;
     }
@@ -372,7 +372,7 @@ sub create_transient {
 sub destroy_transient {
     my $dir = shift;
     print "Purging temporary directory.\n";
-    change_directory("/");
+    change_directory('/');
     rmtree($dir);
 }
 
@@ -380,23 +380,23 @@ sub destroy_transient {
 # Return a canonical representation of the current time.
 #------------------------------------------------------------------------------
 sub time_now {
-    return gmtime() . " UTC";
+    return gmtime() . ' UTC';
 }
 
 #------------------------------------------------------------------------------
 # Perform the complete documentation repair and conversion process.
 #------------------------------------------------------------------------------
 sub process_docs {
-    print "$PROG_NAME version $PROG_VERSION\nBEGIN: " . time_now() . "\n";
+    print 'BEGIN: ' . time_now() . "\n";
     create_transient($CONV_DIR);
     extract_docs();
-    change_directory("CS");
+    change_directory('CS');
     build_docs();
     apply_diffs();
     cvs_update();
     cvs_commit();
     destroy_transient($CONV_DIR);
-    print "END: " . time_now() . "\n";
+    print 'END: ' . time_now() . "\n";
 }
 
 #------------------------------------------------------------------------------
@@ -423,8 +423,9 @@ the results.
 Usage: $PROG_NAME [options]
 
 Options:
-    --debug  Process the documentation but do not modify the CVS repository.
-    --help   Print this usage message.
+    -h --help   Print this usage message.
+    -d --debug  Process the documentation but do not modify the CVS
+                repository.
 EOT
 }
 
@@ -432,13 +433,20 @@ EOT
 # Process command-line options.
 #------------------------------------------------------------------------------
 sub process_options {
-    GetOptions(@SCRIPT_OPTIONS) or print("\n"), option_abort();
-    print "Debugging enabled.\n" if $DEBUG;
+    GetOptions(@SCRIPT_OPTIONS) or usage_error('');
+    print "$PROG_NAME version $PROG_VERSION\n$COPYRIGHT\n\n";
+    print "Debugging enabled.\n\n" if $DEBUG;
 }
 
 sub option_help  { print_usage(\*STDOUT); exit(0); }
-sub option_abort { print_usage(\*STDERR); exit(1); }
-sub option_error { print STDERR "Unknown option: @_\n\n"; option_abort(); }
+sub option_error { usage_error("Unknown option: @_\n"); }
+
+sub usage_error {
+    my $message = shift;
+    print STDERR "$message\n";
+    print_usage(\*STDERR);
+    exit(1);
+}
 
 #------------------------------------------------------------------------------
 # Run the conversion.

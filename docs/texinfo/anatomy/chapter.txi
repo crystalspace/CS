@@ -40,7 +40,8 @@ Utility Library (@code{csutil})
 
 @menu
 * Library List:: Quick Overview of Modules and Libraries
-* Directory Structure::
+* Dependencies::
+* Directory Hierarchy::
 * Makefile Structure:: Structure of the Makefile
 * csPhyzik:: csPhyziks Library @code{csphyzik}
 * SCF:: Crystal Space Shared Class Facility (@sc{scf})
@@ -48,6 +49,7 @@ Utility Library (@code{csutil})
 @end menu
 
 @imports{anatomy,liblist.txi}
+@imports{anatomy,depend.txi}
 @imports{anatomy,dirhier.txi}
 @imports{anatomy,makefile.txi}
 @imports{anatomy,phyziks.txi}

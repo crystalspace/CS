@@ -296,8 +296,8 @@ psdoc: \
 
 # Rule to perform actual Info conversion of $(CSMANUAL_FILE).
 do-infodoc:
-	cd $(OUT.DOC.INFO); $(MAKEINFO) --no-validate --output=cs \
-	-I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) $(CSMANUAL_FILE)
+	cd $(OUT.DOC.INFO); $(MAKEINFO) -I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) \
+	--output=cs $(CSMANUAL_FILE)
 
 # Rule to generate Info format output.  Target images are removed after
 # conversion since images are incorporated directly into generated Info files.

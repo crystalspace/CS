@@ -1,0 +1,112 @@
+@c -*-texinfo-*-
+@node Dependencies, Directory Hierarchy, Library List, Anatomy
+@section Dependencies
+@cindex Dependencies
+@cindex Dependency Graph
+
+To make sure some parts of Crystal Space can be used by themselves, there is
+a philosophy, about which parts of Crystal Space are allowed to use other
+parts. You can think of the various modules as sitting on a specific level:
+
+@emph{Note}: This information may not be fully accurate at the time you read
+this.  Crystal Space is moving toward a system of plug-in modules which
+advertise pure, abstract interfaces which often imply much less dependency
+than actually linking with a library.
+
+@itemize @bullet
+@item Level 1@*
+Utility---independant of CS.
+
+@itemize @w
+@item
+@file{libjpeg}
+@item
+@file{libpng}
+@item
+@file{zlib}
+@item
+@file{csgeom}
+@item
+@file{csobject}
+@item
+@file{csutil}
+@end itemize
+
+@item Level 2@*
+Basics---common base of various CS parts.
+
+@itemize @w
+@item
+@file{csgfxldr}
+@item
+@file{cssfxldr}
+@item
+@file{cssys}
+@end itemize
+
+@item Level 3@*
+SCF---various interchangeable plug-in modules of CS.
+
+@itemize @w
+@item
+@file{cs2d}
+@item
+@file{cs3d}
+@item
+@file{csnetdrv}
+@item
+@file{cssnddrv}
+@item
+@file{cssndrdr}
+@end itemize
+
+@item Level 4@*
+Engine---binds togehter all the engines components.
+
+@itemize @w
+@item
+@file{csengine}
+@item
+@file{csinput}
+@item
+@file{csparser}
+@item
+@file{csscript}
+@end itemize
+
+@item Level 5@*
+Support---adds a common layer of engine abstraction.
+
+@itemize @w
+@item
+@file{csws}
+@item
+@file{csgame}
+@end itemize
+
+@item Level 6@*
+Application.
+
+@itemize @w
+@item
+@file{walktest}
+@item
+@file{metademo}
+@item
+@file{MazeD}
+@end itemize
+@end itemize
+
+Every modules is only allowed to include headers from the same modules or from
+lower levels.  So for example, @file{csengine} may include headers from
+@file{csutil} but not from @file{csws} or @file{csparser}.
+
+All communication between level 3 libraries happens through @sc{scf}
+interfaces.  Those are defined in the @file{CS/include} directory.  That is
+the @emph{only} way to communicate on level 3.  @file{csengine} can use level
+3 libraries only through @sc{scf}.
+
+@file{csinput} has a special role.  Though sitting logically at level 4, it
+can and must be included in some 2D drivers and some system specific modules,
+because these module will generate the events that are being distributed be
+@file{csinput}.
