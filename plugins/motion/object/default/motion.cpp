@@ -45,10 +45,11 @@ csMotionManager::csMotionManager(iBase *iParent)
 
 csMotionManager::~csMotionManager()
 {
+  int i;
   motions.DeleteAll();
-  for ( int i = 0; i < skels.Length(); i++ )
+  for ( i = 0; i < skels.Length(); i++ )
 	DeleteAppliedMotion( i, false );
-  for ( int i = 0; i < cache.Length(); i++ )
+  for ( i = 0; i < cache.Length(); i++ )
 	DeleteAppliedMotion( i, true );
   skels.DeleteAll();
   cache.DeleteAll();
@@ -89,12 +90,13 @@ void csMotionManager::DeleteMotion( const char *name )
   if (mot)
   {
 	int len = skels.Length();
-	for (int i = 0; i < len; i++ )
+	int i;
+	for (i = 0; i < len; i++ )
 	  if (skels[i]->curmotion == mot )
 		DeleteAppliedMotion( i, false );
 
 	len = cache.Length();
-	for (int i = 0; i < len; i++ )
+	for (i = 0; i < len; i++ )
 	  if (cache[i]->curmotion == mot )
 		DeleteAppliedMotion( i, true );
 	delete mot;
