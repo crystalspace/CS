@@ -49,6 +49,7 @@ enum
   XMLTOKEN_AGING = 1,
   XMLTOKEN_ATTRACTORFORCE,
   XMLTOKEN_ATTRACTOR,
+  XMLTOKEN_CONTAINERBOX,
   XMLTOKEN_EMITBOX,
   XMLTOKEN_EMITCONE,
   XMLTOKEN_EMITCYLINDERTANGENT,
@@ -59,6 +60,8 @@ enum
   XMLTOKEN_EMITSPHERETANGENT,
   XMLTOKEN_EMITSPHERE,
   XMLTOKEN_FACTORY,
+  XMLTOKEN_FIELDSPEED,
+  XMLTOKEN_FIELDACCEL,
   XMLTOKEN_LIGHTING,
   XMLTOKEN_MATERIAL,
   XMLTOKEN_MIXMODE,
@@ -204,6 +207,7 @@ bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("aging", XMLTOKEN_AGING);
   xmltokens.Register ("attractorforce", XMLTOKEN_ATTRACTORFORCE);
   xmltokens.Register ("attractor", XMLTOKEN_ATTRACTOR);
+  xmltokens.Register ("containerbox", XMLTOKEN_CONTAINERBOX);
   xmltokens.Register ("emitbox", XMLTOKEN_EMITBOX);
   xmltokens.Register ("emitcone", XMLTOKEN_EMITCONE);
   xmltokens.Register ("emitcylindertangent", XMLTOKEN_EMITCYLINDERTANGENT);
@@ -214,6 +218,8 @@ bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("emitspheretangent", XMLTOKEN_EMITSPHERETANGENT);
   xmltokens.Register ("emitsphere", XMLTOKEN_EMITSPHERE);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("fieldspeed", XMLTOKEN_FIELDSPEED);
+  xmltokens.Register ("fieldaccel", XMLTOKEN_FIELDACCEL);
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
@@ -559,6 +565,28 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  SCF_DEC_REF (emit);
 	}
 	break;
+      case XMLTOKEN_FIELDSPEED:
+	{
+	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emitstate->SetFieldSpeedEmit (emit);
+	  SCF_DEC_REF (emit);
+	}
+	break;
+      case XMLTOKEN_FIELDACCEL:
+	{
+	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emitstate->SetFieldAccelEmit (emit);
+	  SCF_DEC_REF (emit);
+	}
+	break;
+      case XMLTOKEN_CONTAINERBOX:
+	{
+	  csBox3 box;
+	  if(!synldr->ParseBox(child, box))
+	    return NULL;
+	  emitstate->SetContainerBox(true, box.Min(), box.Max());
+	}
+	break;
       default:
 	synldr->ReportBadToken (child);
         return NULL;
@@ -739,6 +767,27 @@ void csEmitSaver::WriteDown (iBase* obj, iFile *file)
     WriteEmit(str, state->GetAttractorEmit());
     str.Append(")\n");
     sprintf(buf, "ATTRACTORFORCE (%g)\n", state->GetAttractorForce());
+    str.Append(buf);
+  }
+
+  if(state->GetFieldSpeedEmit())
+  {
+    str.Append("FIELDSPEED(\n");
+    WriteEmit(str, state->GetFieldSpeedEmit());
+    str.Append(")\n");
+  }
+  if(state->GetFieldAccelEmit())
+  {
+    str.Append("FIELDACCEL(\n");
+    WriteEmit(str, state->GetFieldAccelEmit());
+    str.Append(")\n");
+  }
+  csVector3 contain_min, contain_max;
+  if(state->GetContainerBox(contain_min, contain_max))
+  {
+    sprintf(buf, "CONTAINERBOX (%g,%g,%g, %g,%g,%g)\n", 
+	contain_min.x, contain_min.y, contain_min.z,
+	contain_max.x, contain_max.y, contain_max.z);
     str.Append(buf);
   }
 

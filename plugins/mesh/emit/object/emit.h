@@ -21,14 +21,17 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
+#include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/emit.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iengine/movable.h"
 
 struct iMaterialWrapper;
+class csEmitMeshObject;
 
 /** fixed value emitter */
 class csEmitFixed : public iEmitFixed
@@ -204,6 +207,10 @@ protected:
   iEmitGen3D *startaccel;
   /// attractor position generator (can be NULL)
   iEmitGen3D *attractor;
+  /// the field speed
+  iEmitGen3D *fieldspeed;
+  /// the field acceleration
+  iEmitGen3D *fieldaccel;
   /// attractor force
   float attractor_force;
   /// the time to live for particles in msec
@@ -218,7 +225,8 @@ protected:
   float drop_width, drop_height;
   /// shape for regular sprites
   int drop_sides; float drop_radius;
-
+  /// the min and max container box, if enabled
+  bool has_container_box; csVector3 container_min, container_max;
 
   /// the ages (time they lived) of the particles, in msec.
   int* ages;
@@ -292,6 +300,16 @@ public:
   void SetAttractorForce(float f) {attractor_force = f;}
   /// Get attractor force
   float GetAttractorForce() const {return attractor_force;}
+  /// set field speed emitter object
+  void SetFieldSpeedEmit(iEmitGen3D *emit)
+  {fieldspeed = emit; if(fieldspeed) fieldspeed->IncRef();}
+  /// get field speed emitter
+  iEmitGen3D* GetFieldSpeedEmit() const {return fieldspeed;}
+  /// set field accel emitter object
+  void SetFieldAccelEmit(iEmitGen3D *emit)
+  {fieldaccel = emit; if(fieldaccel) fieldaccel->IncRef();}
+  /// get field accel emitter
+  iEmitGen3D* GetFieldAccelEmit() const {return fieldaccel;}
 
   /// get the number of ageing moments
   int GetAgingCount() const {return nr_aging_els;}
@@ -304,6 +322,13 @@ public:
   /// replace an age
   void ReplaceAge(int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale);
+
+  /**
+   * Compensate for movement of the particle systems, to keep
+   * particles sitting in the same spot, if needed.
+   */
+  void CompensateForTransform(const csReversibleTransform& oldtrans,
+    const csReversibleTransform& newtrans);
 
   /// set rectangular particles
   void SetRectParticles(float w, float h)
@@ -319,6 +344,15 @@ public:
   /// get regular shape
   void GetRegularParticles(int& n, float& radius) const
   { n = drop_sides; radius = drop_radius;}
+
+  /// set container box, enabled to false disables the container box
+  void SetContainerBox(bool enabled, const csVector3& min,
+		      const csVector3& max)
+  {has_container_box=enabled; container_min=min; container_max=max;}
+  /// get the container box coords, returns true if enabled.
+  bool GetContainerBox(csVector3& min, csVector3& max) const
+  { if(!has_container_box)return false;
+    min=container_min; max=container_max; return has_container_box;}
 
   /// Update the particle system.
   virtual void Update (csTicks elapsed_time);
@@ -366,6 +400,14 @@ public:
     virtual void SetAttractorForce(float f) {scfParent->SetAttractorForce(f);}
     virtual float GetAttractorForce() const
     {return scfParent->GetAttractorForce();}
+    virtual void SetFieldSpeedEmit(iEmitGen3D *emit)
+    { scfParent->SetFieldSpeedEmit(emit); }
+    virtual iEmitGen3D* GetFieldSpeedEmit() const
+    { return scfParent->GetFieldSpeedEmit(); }
+    virtual void SetFieldAccelEmit(iEmitGen3D *emit)
+    { scfParent->SetFieldAccelEmit(emit); }
+    virtual iEmitGen3D* GetFieldAccelEmit() const
+    { return scfParent->GetFieldAccelEmit(); }
     virtual int GetAgingCount() const { return scfParent->GetAgingCount();}
     virtual void AddAge(int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)
@@ -386,6 +428,12 @@ public:
     { scfParent->GetRectParticles(w,h); }
     virtual void GetRegularParticles(int &s, float &r) const
     { scfParent->GetRegularParticles(s,r); }
+    virtual void SetContainerBox(bool enabled, const csVector3& min,
+      const csVector3& max)
+    { scfParent->SetContainerBox(enabled, min, max); }
+    virtual bool GetContainerBox(csVector3& min, csVector3& max) const
+    { return scfParent->GetContainerBox(min, max); }
+
   } scfiEmitState;
   friend class EmitState;
 };

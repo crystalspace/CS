@@ -207,6 +207,15 @@ struct iEmitState : public iBase
   /// Get the force of the attractor
   virtual float GetAttractorForce() const = 0;
 
+  /// Set the field speed emitter, increfs (given position determines speed)
+  virtual void SetFieldSpeedEmit(iEmitGen3D *emit) = 0;
+  /// get field speed emitter, can be NULL
+  virtual iEmitGen3D* GetFieldSpeedEmit() const = 0;
+  /// Set the field accel emitter, increfs (given position determines accel)
+  virtual void SetFieldAccelEmit(iEmitGen3D *emit) = 0;
+  /// get field accel emitter, can be NULL
+  virtual iEmitGen3D* GetFieldAccelEmit() const = 0;
+
   /** Add an aging moment, they are interpolated.
    * time is the time since creation of the particle in msec.
    * color is a gouraud color to set the particle to. (0..1)
@@ -238,6 +247,16 @@ struct iEmitState : public iBase
   /// Get the regular shaped particles sides and radius
   virtual void GetRegularParticles(int& n, float& radius) const = 0;
 
+  /// Set container box, particles are only allowed inside this box.
+  virtual void SetContainerBox(bool enabled, const csVector3& min, 
+    const csVector3& max) = 0;
+  /**
+   * Get container box, particles are only allowed inside this box.
+   * returns true if the container box is enabled.
+   * Objects outside this box are not drawn. But they are also
+   * not restarted, since that would cause many short-aged particles. 
+   */
+  virtual bool GetContainerBox(csVector3& min, csVector3& max) const = 0;
 };
 
 #endif // __CS_IMESH_EMIT_H__

@@ -526,6 +526,7 @@ void csEmitSphereTangent::GetContent(csVector3& center, float& min, float& max)
   max = csEmitSphereTangent::max;
 }
 
+
 //----------------- csEmitMeshObject -----------------------------------
 
 SCF_IMPLEMENT_IBASE_EXT (csEmitMeshObject)
@@ -556,6 +557,7 @@ void csEmitMeshObject::SetupObject ()
     part_accel = new csVector3[number];
     part_attract = new csVector3[number];
     bbox.StartBoundingBox();
+
 
     /// create new particles and add to particle system
     int i;
@@ -611,15 +613,23 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
   csReversibleTransform trans = movable->GetFullTransform ();
   csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform() / trans;
   cpa->SetLength(number);
+  int num_cpa_now = 0;
   for (i = 0 ; i < number ; i++)
   {
-    (*cpa)[i].z = (tr_o2c * part_pos[i]).z;
-    (*cpa)[i].part = GetParticle(i);
+    if(!has_container_box || (
+      container_min.x < part_pos[i].x && part_pos[i].x < container_max.x && 
+      container_min.y < part_pos[i].y && part_pos[i].y < container_max.y && 
+      container_min.z < part_pos[i].z && part_pos[i].z < container_max.z))
+    {
+      (*cpa)[num_cpa_now].z = (tr_o2c * part_pos[i]).z;
+      (*cpa)[num_cpa_now].part = GetParticle(i);
+      num_cpa_now++;
+    }
   }
-  qsort(cpa->GetArray(), number, sizeof( struct csEmitCompPart ),
+  qsort(cpa->GetArray(), num_cpa_now, sizeof( struct csEmitCompPart ),
     compareparticle);
   
-  for (i = 0 ; i < number ; i++)
+  for (i = 0 ; i < num_cpa_now ; i++)
     (*cpa)[i].part->Draw (rview, trans, mode);
 
   return true;
@@ -642,6 +652,8 @@ csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   startpos = NULL;
   startspeed = NULL;
   startaccel = NULL;
+  fieldspeed = NULL;
+  fieldaccel = NULL;
   timetolive = 1000;
   aging = NULL;
   nr_aging_els = 0;
@@ -650,6 +662,9 @@ csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   drop_height = 0.2;
   drop_sides = 6;
   drop_radius = 0.1;
+  has_container_box = false;
+  container_min.Set(0,0,0);
+  container_max.Set(0,0,0);
 }
 
 csEmitMeshObject::~csEmitMeshObject()
@@ -663,6 +678,8 @@ csEmitMeshObject::~csEmitMeshObject()
   if(startspeed) startspeed->DecRef();
   if(startaccel) startaccel->DecRef();
   if(attractor) attractor->DecRef();
+  if(fieldspeed) fieldspeed->DecRef();
+  if(fieldaccel) fieldaccel->DecRef();
   csEmitAge *p = aging, *np = 0;
   while(p)
   {
@@ -783,6 +800,8 @@ void csEmitMeshObject::MoveAgeParticle (int i, int elapsed, float delta_t)
   }
 
   /// move the particle
+  if(fieldaccel) fieldaccel->GetValue(part_accel[i], part_pos[i]);
+  if(fieldspeed) fieldspeed->GetValue(part_speed[i], part_pos[i]);
   if(attractor)
   {
     // do attractor influence
