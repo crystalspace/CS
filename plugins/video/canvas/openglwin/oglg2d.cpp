@@ -328,7 +328,7 @@ bool csGraphics2DOpenGL::Open()
   LONG ti;
 
   // create the window.
-  DWORD exStyle = 0;
+  DWORD exStyle = WS_EX_TOPMOST;
   DWORD style = WINDOW_STYLE;
   if (FullScreen)
   {
@@ -402,16 +402,16 @@ bool csGraphics2DOpenGL::Open()
   if (!m_hWnd)
     SystemFatalError ("Cannot create Crystal Space window", GetLastError());
 
-  ShowWindow (m_hWnd, m_nCmdShow);
-  UpdateWindow (m_hWnd);
-  SetForegroundWindow (m_hWnd);
-  SetFocus (m_hWnd);
-
   hDC = GetDC (m_hWnd);
   CalcPixelFormat ();
 
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
+
+  ShowWindow (m_hWnd, m_nCmdShow);
+  UpdateWindow (m_hWnd);
+  SetForegroundWindow (m_hWnd);
+  SetFocus (m_hWnd);
 
   if (!csGraphics2DGLCommon::Open ())
     return false;
