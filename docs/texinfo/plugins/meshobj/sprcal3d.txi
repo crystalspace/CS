@@ -307,7 +307,7 @@ mesh object then follows the triangle.  Adding a socket to a Cal3D file
 is maintained, so you can deduce which mesh you are using.
 
 @example
-<socket name="@dots{}" mesh="i" submesh="j" triangle="k"/>
+<socket name="@dots{}" mesh="i" submesh="j" tri="k"/>
 @end example
 
 You can test a socket if you load the Cal3D file in the @file{viewmesh} example
