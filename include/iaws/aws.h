@@ -320,6 +320,9 @@ struct iAwsSink : public iBase
 
   /// A sink should call this to register trigger events
   virtual void RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *))=0;
+
+  /// Returns the last error code set.  This code is good until the next call to this sink.
+  virtual unsigned int GetError()=0;
 };
 
 

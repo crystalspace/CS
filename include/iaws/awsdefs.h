@@ -40,5 +40,8 @@ const unsigned int AWS_TRANSITION_SLIDE_RIGHT = 9;  ///! window slides right
 const unsigned int AWS_TRANSITION_SLIDE_UP    = 10;  ///! window slides up
 const unsigned int AWS_TRANSITION_SLIDE_DOWN  = 11;  ///! window slides down
 
+const unsigned int AWS_ERR_SINK_NONE	      = 0;  ///! no error
+const unsigned int AWS_ERR_SINK_TRIGGER_NOT_FOUND   = 1;  ///! the requested trigger was not found
+const unsigned int AWS_ERR_SINK_NO_TRIGGERS         = 2;  ///! could not handle trigger, because there are none.
 
 #endif
