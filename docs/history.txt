@@ -10,6 +10,9 @@ chronological order.
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
 	  clients to create msvcgen %foo%-style template variables on-the-fly.
 	  This rule provides access to msvcgen.pl's new --set option.
+	- Eric Sunshine completely rewrote documentation for the ExternalLibs
+	  rule in flags.jam.  The existing documentation was 100% incorrect and
+	  highly misleading.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where

@@ -66,10 +66,17 @@ rule LFlags
   LINKLIBS on $($(<)_TARGET) += $(>) ;
 }
 
-##  ExternalLibs appname : linkerflags
-##    Link an application/library/plugin with external libraries. It is
-##    possible to give a set of flags which will be passed to the linker when
-##    building the application (typically -L and -l flags).
+##  ExternalLibs target : identifier
+##    Specify a dependency between 'target' and the external library indicated
+##    by 'identifier'.  If 'target' is an application or plugin, then it is
+##    linked against the indicated external library.  If 'target' is a library,
+##    then its dependency upon 'identifier' is noted, and applications or
+##    plugins which link against 'target' will also be linked against the
+##    library indicated by 'identifier'.  'identifier' is the base name of a
+##    set of variables which provide build tool information about the external
+##    library.  In particular, the value of $(identifier).CFLAGS should provide
+##    compiler flags needed for the external library indicated by 'identifier';
+##    and $(identifier).LFLAGS should provide linker flags for the library.
 rule ExternalLibs
 {
   local i ;
