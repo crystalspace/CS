@@ -127,6 +127,17 @@ define INSTALL.DEEP_COPY
 
 endef
 
+# Command to run "ranlib" on an installed static library archive.  The archive
+# to be processed must be stored in a variable named F.  The empty line in this
+# macro is important since it results in inclusion of a newline.  This is
+# desirable because we expect this macro to be invoked from $(foreach) for a
+# set of archives, and we want the expansion to be a series of "ranlib"
+# commands, one per line.
+define INSTALL.RANLIB
+  $(CMD.RANLIB) $(F)
+
+endef
+
 endif # ifeq ($(DO_INSTALL),yes)
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -181,6 +192,10 @@ endif
 # Install static libraries.
 install_staticlibs: $(INSTALL_LIB.DIR)
 	$(CP) $(TO_INSTALL.STATIC_LIBS) $(INSTALL_LIB.DIR)
+ifneq (,$(CMD.RANLIB))
+	$(foreach F,$(addprefix $(INSTALL_LIB.DIR)/,\
+	$(notdir $(TO_INSTALL.STATIC_LIBS))),$(INSTALL.RANLIB))
+endif
 	@echo $(addprefix $(INSTALL_LIB.DIR)/, \
 	  $(notdir $(TO_INSTALL.STATIC_LIBS))) >> $(INSTALL_LOG)
 

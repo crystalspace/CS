@@ -16,6 +16,9 @@
 #    CMD.MKDIRS
 #	Makefile variable emitted to the standard output stream.  Value is the
 #	command to create a directory plus any missing parent directories.
+#    CMD.RANLIB
+#	Makefile variable emitted to the standard output stream.  Value is the
+#	command to update/generate a static library archive symbol index.
 #    NASM.AVAILABLE
 #	Makefile variable emitted to the standard output stream.  Value is
 #	"yes" if nasm is available, otherwise the variable is not set.
@@ -59,6 +62,15 @@ if [ "${MKDIRS}" != "no" ]; then
   echo "CMD.MKDIRS = ${MKDIRS}"
 fi
 msg_result "${MKDIRS}"
+
+
+#------------------------------------------------------------------------------
+# Check for ranlib.
+#------------------------------------------------------------------------------
+RANLIB=`checktool ranlib`
+if [ -n "${RANLIB}" ]; then
+    echo "CMD.RANLIB = ${RANLIB}"
+fi
 
 
 #------------------------------------------------------------------------------

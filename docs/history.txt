@@ -49,6 +49,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a bug in csArchive where it was incapable of
 	  correctly reading Zip archive directories, and where it corrupted
 	  Zip archives on 64-bit hardware.
+	- Eric Sunshine made the following changes to support platforms for
+	  which "ranlib" must be run against newly installed libraries:
+	    - Augmented the project configuration phase so that it discovers
+	      the "ranlib" command.  If present, it sets the CMD.RANLIB
+	      makefile variable.
+	    - Augmented install.mak so that it runs "ranlib" on the installed
+	      static library archives.
 7-Oct-2002
 	- Removed some obsolete texmem.{cpp|h} files in the 3D renderer
 	  directories.
