@@ -310,8 +310,9 @@ fillCol:
           pop eax
           emms
         }
+  #endif // End of COMP_VC
 
-  #elif defined(COMP_GCC)
+  #if defined(COMP_GCC)
         csBits64 *fvalueTemp = &fvalue;
         __asm__  (
           "pushl %%eax                 \n"
@@ -363,7 +364,7 @@ fillCol:
           : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
           : "eax", "ecx", "esi", "edi", "edx");
         //fvalue = fvalueTemp;
-  #endif // End of COMP_VC, COMP_GCC or ELSE.
+  #endif // End of COMP_GCC
       }
       else
 #endif // End of PROC_X86
