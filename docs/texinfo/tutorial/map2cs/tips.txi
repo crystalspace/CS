@@ -8,10 +8,9 @@ Here are some general tips for creating maps to use with Crystal Space:
 @item
 Try to use only textures that have sizes that are a power of two: 128*64 would
 be okay for example, 192*32 is not good.  Crystal Space can handle any size of
-textures, but textures that are a power of two are most efficient.  Also try to
-limit yourself to sizes below 256.  Textures larger than that can't be handled
-for example by @sc{3d/fx} cards.  Crystal Space will do its best to work
-around that problem, but it is pretty easy for you to avoid.
+textures, but textures that are a power of two are most efficient. In 
+particular, non-power of two textures are scaled to a power of two size, so
+expect degraded quality when using such textures.
 
 @item
 Avoid open spaces.  You will get best performance, if you have lots of
@@ -45,8 +44,14 @@ provides quite a few features, that have not been covered in this tutorial,
 such as mirrors and volumetric fog.
 @end itemize
 
-If you know other tips, please email them to me at @email{thieber@@gmx.net}.
+@item
+@file{map2cs} will remove faces with certain textures (@code{aaatrigger},
+@code{clip}, @code{common/caulk} and others. See the map2cs source 
+[@file{apps/import/map2cs/texfile.cpp}] for the complete list). Assign such a
+texture to faces that won't be seen - like polygons facing "outside" the 
+level, or faces adjacent to a wall etc.
+@end itemize
 
-I would also really like to receive some prefabs, so if you have created nice
-furniture or things to use in maps, that you want to donate to the public,
-please send them to me.
+If you know other tips, send them to the Crystal Space mailing list 
+(@pxref{Mailing Lists}).
+

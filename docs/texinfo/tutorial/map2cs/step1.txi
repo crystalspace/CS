@@ -16,11 +16,11 @@ of the Crystal Space SDK. You can obtain it from:
 @uref{http://crystal.sourceforge.net/}
 
 @item
-WorldCraft 3.3 - The Half-Life editor.  You might be technically or legally
+Valve Hammer 3.4 - The Half-Life editor.  You might be technically or legally
 required to have a legal Half-Life on your PC too, so you might want to get
 this really cool game too, if you don't have it yet.
 
-@uref{http://halflife.gamedesign.net/}
+@uref{http://collective.valve-erc.com/}
 
 @item
 Texture Pack 1 - More than 150 free textures from the Crystal Space texture

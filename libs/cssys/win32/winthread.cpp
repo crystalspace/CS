@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "winthread.h"
+#include <windows.h>
 #include <process.h>
 
 #include "cssys/win32/wintools.h"

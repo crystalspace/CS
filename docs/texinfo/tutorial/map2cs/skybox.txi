@@ -68,6 +68,8 @@ the general world properties.  (For example, if your textures are called
 ``sample'').  Now every brush you assign a key ``sky'' with a value of ``1'' 
 will look like your skybox. 
 
+In addition, faces whose texture is ``sky'' will also let you see the skybox.
+
 Now you have to let map2cs know where @file{sample_f.bmp}, @file{sample_r.bmp}, etc.
 are located. We will put all the @file{sample_*.bmp} files on a single @sc{zip} file.
 Launch WinZip, WinRAR, or the program you use to open @sc{zip}

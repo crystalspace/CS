@@ -21,7 +21,7 @@
 
 #include "cssys/csunicode.h"
 #include "csutil/util.h"
-#include <windows.h>
+#include <winnls.h> // contains MultiByteToWideChar()/WideCharToMultiByte()
 
 static inline wchar_t* cswinAnsiToWide (const char* ansi, 
 					 UINT codePage = CP_ACP)
