@@ -488,6 +488,9 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     hist->reason = VISIBLE_HISTORY;
     hist->vis_cnt--;
     cnt_node_visible++;
+    // Here we do a bitwise and of the frustum mask that we have
+    // calculated so far and the frustum mask we remembered.
+    frustum_mask = frustum_mask & hist->history_frustum_mask;
     goto end;
   }
 
@@ -495,6 +498,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   {
     hist->reason = VISIBLE_INSIDE;
     hist->vis_cnt = RAND_HISTORY;
+    hist->history_frustum_mask = frustum_mask;
     cnt_node_visible++;
     goto end;
   }
@@ -516,14 +520,16 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
   if (do_cull_coverage != COVERAGE_NONE)
   {
-    // @@@ Do write queue here too? First tests indicate that this is not a good idea.
+    // @@@ Do write queue here too? First tests indicate that this is not
+    // a good idea.
     iCamera* camera = data->rview->GetCamera ();
     const csReversibleTransform& camtrans = camera->GetTransform ();
     float fov = camera->GetFOV ();
     float sx = camera->GetShiftX ();
     float sy = camera->GetShiftY ();
     float max_depth;
-    if (node_bbox.ProjectBox (camtrans, fov, sx, sy, sbox, min_depth, max_depth))
+    if (node_bbox.ProjectBox (camtrans, fov, sx, sy, sbox,
+    	min_depth, max_depth))
     {
 #     ifdef CS_DEBUG
       if (do_state_dump)
@@ -543,15 +549,16 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
         vis = false;
         goto end;
       }
-      else if (false)
+#if 0
+      else
       {
         csPoly2D outline;
         if (node_bbox.ProjectOutline (camtrans, fov, sx, sy, outline,
 		min_depth, max_depth))
         {
           // @@@ VPT tracking for nodes!!!
-          rc = tcovbuf->TestPolygon (outline.GetVertices (), outline.GetVertexCount (),
-      	    min_depth);
+          rc = tcovbuf->TestPolygon (outline.GetVertices (),
+	  	outline.GetVertexCount (), min_depth);
 
           if (!rc)
           {
@@ -561,11 +568,13 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
           }
         }
       }
+#endif
     }
   }
 
   hist->reason = VISIBLE;
   hist->vis_cnt = RAND_HISTORY;
+  hist->history_frustum_mask = frustum_mask;
   cnt_node_visible++;
 
 end:

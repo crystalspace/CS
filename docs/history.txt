@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Nov-2003
+	- Jorrit fixed a problem in Dynavis where history culling would
+	  invalidate the frustum mask that is used for hierarchical frustum
+	  culling. This is now fixed by remembering the last frustum mask
+	  and using that in combination with the mask we have so far.
 31-Oct-2003
 	- Eric Sunshine performed additional cleanup of the various "Release
 	  Notes" sections of the user manual.  Repaired some Texinfo mark-up

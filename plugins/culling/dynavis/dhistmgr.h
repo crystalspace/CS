@@ -56,6 +56,10 @@ public:
   // When this object was last made visible.
   uint32 history_frame_cnt;
 
+  // Here we remember the frustum mask which we will restore in case
+  // of history culling for a node.
+  uint32 history_frustum_mask;
+
   // 3D point to use for VPT testing (object space).
   bool has_vpt_point;
   csVector3 vpt_point;
