@@ -30,11 +30,11 @@
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
-#include "iengine/polygon.h"
 #include "iengine/mesh.h"
 #include "iengine/texture.h"
-#include "iengine/thing.h"
 #include "iengine/material.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/thing.h"
 #include "imesh/object.h"
 
 //------------------------------------------------- We need the 3D engine -----
