@@ -38,6 +38,16 @@
 #include <math.h>
 #include "qint.h"
 
+//------------ Utility ------------------------------------
+float FastPow2(float x, const int y)
+// computes x ** (2 ** y), using only y multiplies.
+{
+  float res = x;
+  for(int i=1; i<y; i++)
+    res *= res;
+  return res;
+}
+
 //--------------- csRadPoly --------------------------------------
 
 IMPLEMENT_CSOBJTYPE(csRadPoly, csObject);
@@ -58,7 +68,7 @@ csRadPoly :: csRadPoly(csPolygon3D *original)
   height = csmap->GetRealHeight();
   size = csmap->GetSize();
   lightmap = &csmap->GetStaticMap();
-  deltamap = new csRGBLightMap();
+  deltamap = new csRGBFloatLightMap();
   // all light in static map is unshot now, add it to delta. clear lightmap.
   deltamap->Copy(*lightmap, size);
   memset( lightmap->GetMap(), 0, size*3);
@@ -156,47 +166,37 @@ void csRadPoly :: ComputePriority()
 void csRadPoly :: AddDelta(csRadPoly *src, int suv, int ruv, float fraction,
   const csColor& filtercolor)
 {
-  int res;
-  res = deltamap->GetRed()[ruv] + 
-    QRound(fraction * src->deltamap->GetRed()[suv] * filtercolor.red);
-  if(res > 255) res = 255;
-  else if(res < 0) res = 0;
-  deltamap->GetRed()[ruv] = res;
-
-  res = deltamap->GetGreen()[ruv] + 
-    QRound(fraction * src->deltamap->GetGreen()[suv] * filtercolor.green);
-  if(res > 255) res = 255;
-  else if(res < 0) res = 0;
-  deltamap->GetGreen()[ruv] = res;
-
-  res = deltamap->GetBlue()[ruv] + 
-    QRound(fraction * src->deltamap->GetBlue()[suv] * filtercolor.blue);
-  if(res > 255) res = 255;
-  else if(res < 0) res = 0;
-  deltamap->GetBlue()[ruv] = res;
+  deltamap->GetRed()[ruv] +=
+    (fraction * src->deltamap->GetRed()[suv] * filtercolor.red);
+  deltamap->GetGreen()[ruv] +=
+    (fraction * src->deltamap->GetGreen()[suv] * filtercolor.green);
+  deltamap->GetBlue()[ruv] +=
+    (fraction * src->deltamap->GetBlue()[suv] * filtercolor.blue);
 }
 
 
 void csRadPoly :: CopyAndClearDelta()
 {
   int res;
-  for(int uv=0; uv<size*3; uv++)
+  int uv;
+  for(uv=0; uv<size*3; uv++)
   {
     if(lumel_coverage_map[uv%size] == 0.0) continue;
-    res = lightmap->GetMap()[uv] + deltamap->GetMap()[uv];
+    res = lightmap->GetMap()[uv] + QRound(deltamap->GetMap()[uv]);
     if(res > 255) res = 255;
     else if(res < 0) res = 0;
     lightmap->GetMap()[uv] = res;
   }
-  memset( deltamap->GetMap(), 0, size*3);
+  for(uv=0; uv<size*3; uv++)
+    deltamap->GetMap()[uv] = 0.0;
   total_unshot_light = 0.0;
 }
 
-void csRadPoly :: GetDeltaSums(int &red, int &green, int &blue)
+void csRadPoly :: GetDeltaSums(float &red, float &green, float &blue)
 {
-  red = 0;
-  green = 0;
-  blue = 0;
+  red = 0.0;
+  green = 0.0;
+  blue = 0.0;
   for(int uv=0; uv<size; uv++)
   {
     if(lumel_coverage_map[uv] == 0.0f) continue;
@@ -208,29 +208,29 @@ void csRadPoly :: GetDeltaSums(int &red, int &green, int &blue)
 
 void csRadPoly :: ApplyAmbient(int red, int green, int blue)
 {
-  int res;
+  float res;
   for(int uv=0; uv<size; uv++)
   {
     if(lumel_coverage_map[uv] == 0.0) continue;
 
-    res = lightmap->GetRed()[uv] + red;
+    res = deltamap->GetRed()[uv] + red;
     if(res>255)res=255; else if(res<0) res=0;
-    lightmap->GetRed()[uv] = res;
+    deltamap->GetRed()[uv] = res;
 
-    res = lightmap->GetGreen()[uv] + green;
+    res = deltamap->GetGreen()[uv] + green;
     if(res>255)res=255; else if(res<0) res=0;
-    lightmap->GetGreen()[uv] = res;
+    deltamap->GetGreen()[uv] = res;
 
-    res = lightmap->GetBlue()[uv] + blue;
+    res = deltamap->GetBlue()[uv] + blue;
     if(res>255)res=255; else if(res<0) res=0;
-    lightmap->GetBlue()[uv] = res;
+    deltamap->GetBlue()[uv] = res;
   }
 }
 
 
 /// the map and the width to draw in for draw_lumel_cov
-static int draw_lumel_cov_width = 0;
-static float *draw_lumel_coverage_map = 0;
+static volatile int draw_lumel_cov_width = 0;
+static volatile float *draw_lumel_coverage_map = 0;
 static void draw_lumel_cov( int x, int y, float density, void * )
 {
   int addr = x + y * draw_lumel_cov_width;
@@ -639,6 +639,15 @@ void csRadList :: Print()
 
 //--------------- csRadiosity --------------------------------------
 
+// configuration defaults
+bool  csRadiosity::do_static_specular = false;
+float csRadiosity::static_specular_amount = 0.70;
+int   csRadiosity::static_specular_tightness = 2;
+float csRadiosity::colour_bleed = 1.0;
+float csRadiosity::stop_priority = 0.1;
+float csRadiosity::stop_improvement = 10000.0;
+int   csRadiosity::stop_iterations = 1000;
+
 csRadiosity :: csRadiosity(csWorld *current_world)
 {
   CsPrintf (MSG_INITIALIZATION, "\nPreparing radiosity...\n");
@@ -718,18 +727,20 @@ csRadPoly* csRadiosity :: FetchNext()
   // ambient light
   bool stop_now = false;
   char reason[80];
-  float stop_value = 1.0000; // the amount of unshot light, where we can stop.
-  /// possibly a ''medium quality fast mode' could be:
-  stop_value = start_priority / 1000.0;
-  int max_iterations = 1000; // after this amount of shoot src's we stop.
-  int max_repeats = 10; // after n loops, stop.
+  float stop_value = 0.1000; // the amount of unshot light, where we can stop.
+  /// take first stop moment, do the least work expected.
+  if(stop_priority > start_priority < stop_improvement)
+    stop_value = stop_priority;
+  else stop_value = start_priority / stop_improvement;
+  int max_repeats = 10; // after n loops, stop. Should never be necessary.
+    // due to loop detection in csRadPoly. For robustness.
 
   csRadPoly *p = list->PopHighest();
 
   float nextpriority = p?p->GetPriority():0.0;
   float val = (start_priority - nextpriority ) / start_priority;
   if(val<0.0f) val=0.0f;
-  val = pow(val, 15.0) * 0.98f;
+  val = pow(val, 20.0) * 0.98f;
   int ticks_now = QRound( val * meter->GetTotal());
   //CsPrintf(MSG_STDOUT, "New value %g, ticks at %d / %d\n",
   //  val, ticks_now, meter->GetTotal());
@@ -746,7 +757,7 @@ csRadPoly* csRadiosity :: FetchNext()
     stop_now = true;
     sprintf(reason, "priority down to %g", p->GetPriority());
   }
-  else if(iterations > max_iterations)
+  else if(iterations > stop_iterations)
   {
     stop_now = true;
     sprintf(reason, "%d iterations reached", iterations);
@@ -867,14 +878,14 @@ void csRadiosity :: ShootRadiosityToPolygon(csRadPoly* dest)
    {
      // if source lumel delta == 0 or lumel not visible, skip.
      if(shoot_src->DeltaIsZero(suv)) continue;
-     if(shoot_src->LumelNotCovered(suv)) continue; 
+     //if(shoot_src->LumelNotCovered(suv)) continue; 
      // get source lumel info
      PrepareShootSourceLumel(sx, sy, suv);
      ruv = 0;
      for(ry=0; ry<dest->GetHeight(); ry++)
        for(rx=0; rx<dest->GetWidth(); rx++, ruv++)
        {
-         if(dest->LumelNotCovered(ruv)) continue;
+         //if(dest->LumelNotCovered(ruv)) continue;
          ShootPatch(rx, ry, ruv);
        }
    }
@@ -892,8 +903,8 @@ void csRadiosity :: PrepareShootSource(csRadPoly *src)
 }
 
 
-static float *static_shadow_map = 0;
-static int static_shadow_width = 0;
+static volatile float *static_shadow_map = 0;
+static volatile int static_shadow_width = 0;
 static void draw_light_frustum(int x, int y, float density, void *)
 {
   int addr = x + y*static_shadow_width;
@@ -942,7 +953,7 @@ void csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustumView *lview)
   //memset(static_shadow_map, 0, dest->GetSize() * sizeof(float));
   // factor in light frustum
   MapFrustum(lview->light_frustum, draw_light_frustum);
-  csRadPoly::FixCoverageMap(static_shadow_map, shoot_dest->GetWidth(),
+  csRadPoly::FixCoverageMap((float*)static_shadow_map, shoot_dest->GetWidth(),
     shoot_dest->GetHeight());
 
   // remove shadows
@@ -966,16 +977,25 @@ void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
   shoot_src->QuickLumel2World(src_lumel, sx, sy);
   /// use the size of a lumel in the source poly *
   /// the amount of the lumel visible to compute area of sender.
-  source_patch_area = source_poly_lumel_area * 
-    shoot_src->GetLumelCoverage(suv); 
+  /// factor is included, which saves a lot of multiplications.
+  source_patch_area = factor * source_poly_lumel_area;
+    // * shoot_src->GetLumelCoverage(suv); 
   // color is texture color filtered by trajectory (i.e. half-transparent-
   // portals passed by from source to dest poly)
-  src_lumel_color.red = texturemap->GetRed()[suv] / 255.0 
-    * trajectory_color.red;
-  src_lumel_color.green = texturemap->GetGreen()[suv] / 255.0 
-    * trajectory_color.green;
-  src_lumel_color.blue = texturemap->GetBlue()[suv] / 255.0 
-    * trajectory_color.blue;
+  src_lumel_color.red = texturemap->GetRed()[suv] / 255.0f 
+    * trajectory_color.red * colour_bleed;
+  src_lumel_color.green = texturemap->GetGreen()[suv] / 255.0f 
+    * trajectory_color.green * colour_bleed;
+  src_lumel_color.blue = texturemap->GetBlue()[suv] / 255.0f 
+    * trajectory_color.blue * colour_bleed;
+  // cap source delta to prevent explosions of light
+  float cap = 512.0f;
+  if(shoot_src->GetDeltaMap()->GetRed()[suv] > cap)
+    shoot_src->GetDeltaMap()->GetRed()[suv] = cap;
+  if(shoot_src->GetDeltaMap()->GetGreen()[suv] > cap)
+    shoot_src->GetDeltaMap()->GetGreen()[suv] = cap;
+  if(shoot_src->GetDeltaMap()->GetBlue()[suv] > cap)
+    shoot_src->GetDeltaMap()->GetBlue()[suv] = cap;
 }
 
 
@@ -1000,21 +1020,54 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   float cosdestangle = - (dest_normal * path);
   if(cosdestangle < 0.0) return; // facing away, negative light is not good.
 
-  float totalfactor = factor * cossrcangle * cosdestangle * 
+  float totalfactor = cossrcangle * cosdestangle * 
     source_patch_area * visibility / distance;
-  if(totalfactor < 0.5f/256.f) // cannot make a difference in unsigned chars
-    return;
+  if(totalfactor > 1.0f) totalfactor = 1.0f;
 
-  if(0)
-    CsPrintf(MSG_STDOUT, "totalfactor %g = factor %g * "
-  	"cosshoot %g * cosdest %g * area %g * vis %g * sqdis %g\n"
+#if 0
+    CsPrintf(MSG_STDOUT, "totalfactor %g = "
+  	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g)\n", 
-  	totalfactor, factor, cossrcangle, cosdestangle,
+  	totalfactor, cossrcangle, cosdestangle,
  	source_patch_area, visibility, distance,
 	src_lumel_color.red, src_lumel_color.green, src_lumel_color.blue);
+#endif
 
-  // add delta
   shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
+  // specular gloss
+  // direction of the 'light' on dest is -path
+  // normal at this destlumel is dest_normal
+  // viewing direction, below, equal to normal (look at polygon frontally)
+  if(!csRadiosity::do_static_specular) 
+  {
+    return;
+  }
+  csVector3 viewdir(0.577, 0.577, 0.577);
+  viewdir = dest_normal;
+  csVector3 reflectdir = (2.0f * dest_normal * (cosdestangle) - -path) * 
+    dest_normal;
+  double val = ( reflectdir * viewdir );
+  if(val<0.0f) return;
+  if(val>1.0) val=1.0;
+  //alternative specular computation
+  //csVector3 halfdir = (-path + viewdir);
+  //halfdir.Normalize();
+  //double val = ABS( halfdir * dest_normal );
+  //float gloss = spec_amt * pow(val, spec_tightness);
+  float gloss = static_specular_amount * 
+    FastPow2(val, static_specular_tightness);
+  
+#if 0
+    CsPrintf(MSG_STDOUT, "Gloss %g, val=%g, reflect %g,%g,%g\n",
+      gloss, val, reflectdir.x, reflectdir.y, reflectdir.z);
+#endif
+
+  // add delta using both gloss and totalfactor
+  //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss*totalfactor, src_lumel_color);
+
+  gloss *= source_patch_area * visibility / distance;
+  // add gloss seperately -- too much light this way
+  shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss, trajectory_color );
 }
 
 
@@ -1035,25 +1088,28 @@ float csRadiosity :: GetVisibility(csRadPoly *srcpoly, const csVector3& src,
 }
 
 
-static csColor total_delta_color;
-static float total_reflect = 0.0;
-static float total_area = 0.0;
+static volatile float total_delta_color_red;
+static volatile float total_delta_color_green;
+static volatile float total_delta_color_blue;
+static volatile float total_reflect = 0.0;
+static volatile float total_area = 0.0;
 
 static void calc_ambient_func(csRadPoly *p)
 {
   total_area += p->GetArea();
   total_reflect += p->GetDiffuse() * p->GetArea();
-  int red, green, blue;
+  float red, green, blue;
   p->GetDeltaSums(red, green, blue);
-  total_delta_color.red += red * p->GetArea() / (float)p->GetSize();
-  total_delta_color.green += green * p->GetArea() / (float)p->GetSize();
-  total_delta_color.blue += blue * p->GetArea() / (float)p->GetSize();
+  total_delta_color_red += red * p->GetArea() / (float)p->GetSize();
+  total_delta_color_green += green * p->GetArea() / (float)p->GetSize();
+  total_delta_color_blue += blue * p->GetArea() / (float)p->GetSize();
 }
 
 static void apply_ambient_func(csRadPoly *p)
 {
-  p->ApplyAmbient(QRound(total_delta_color.red), 
-    QRound(total_delta_color.green), QRound(total_delta_color.blue));
+  p->ApplyAmbient(QRound((float)total_delta_color_red), 
+    QRound((float)total_delta_color_green), 
+    QRound((float)total_delta_color_blue));
 }
 
 static void add_delta_func(csRadPoly *p)
@@ -1063,32 +1119,39 @@ static void add_delta_func(csRadPoly *p)
 
 void csRadiosity :: RemoveAmbient()
 {
-  total_delta_color.Set(-csLight::ambient_red,
-    -csLight::ambient_green, -csLight::ambient_blue);
+  total_delta_color_red = -csLight::ambient_red;
+  total_delta_color_green = -csLight::ambient_green;
+  total_delta_color_blue = -csLight::ambient_blue;
   list->Traverse(apply_ambient_func);
 }
 
 void csRadiosity :: ApplyDeltaAndAmbient()
 {
   /// first calculate the Ambient
-  total_delta_color.Set(0,0,0);
+  total_delta_color_red = 0.0;
+  total_delta_color_green = 0.0;
+  total_delta_color_blue = 0.0;
   total_reflect = 0.0;
   total_area = 0.0;
   list->Traverse(calc_ambient_func);
   total_reflect /= total_area;
   total_reflect = 1.0 / (1.0 - total_reflect);
-  total_delta_color *= total_reflect / total_area;
-  // add deltamaps
-  list->Traverse(add_delta_func);
-  // add in the system ambient light settings.
-  total_delta_color.red += csLight::ambient_red;
-  total_delta_color.green += csLight::ambient_green;
-  total_delta_color.blue += csLight::ambient_blue;
-  CsPrintf(MSG_INITIALIZATION, "Setting ambient (%g, %g, %g).\n",
-   total_delta_color.red, total_delta_color.green, total_delta_color.blue);
+  float mult = total_reflect / total_area;
+  total_delta_color_red *= mult;
+  total_delta_color_green *= mult;
+  total_delta_color_blue *= mult;
 
-  /// then apply delta & ambient
+  // add in the system ambient light settings.
+  total_delta_color_red += csLight::ambient_red;
+  total_delta_color_green += csLight::ambient_green;
+  total_delta_color_blue += csLight::ambient_blue;
+  CsPrintf(MSG_INITIALIZATION, "Setting ambient (%g, %g, %g).\n",
+   total_delta_color_red, total_delta_color_green, total_delta_color_blue);
+
+  /// then apply ambient to deltamaps
   list->Traverse(apply_ambient_func);
+  /// add deltamaps
+  list->Traverse(add_delta_func);
 }
 
 

@@ -1250,6 +1250,23 @@ void csWorld::ReadConfig ()
   csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
   csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
   csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SPRITE_HIGHQUAL", csSprite3D::do_quality_lighting);
+
+  // radiosity options
+  csRadiosity::do_static_specular = System->ConfigGetYesNo ("Lighting",
+    "RADIOSITY_DO_STATIC_SPECULAR", csRadiosity::do_static_specular);
+  csRadiosity::static_specular_amount = System->ConfigGetFloat ("Lighting",
+    "RADIOSITY_STATIC_SPECULAR_AMOUNT", csRadiosity::static_specular_amount);
+  csRadiosity::static_specular_tightness = System->ConfigGetInt ("Lighting",
+    "RADIOSITY_STATIC_SPECULAR_TIGHTNESS", 
+    csRadiosity::static_specular_tightness);
+  csRadiosity::colour_bleed = System->ConfigGetFloat ("Lighting",
+    "RADIOSITY_COLOUR_BLEED", csRadiosity::colour_bleed);
+  csRadiosity::stop_priority = System->ConfigGetFloat ("Lighting",
+    "RADIOSITY_STOP_PRIORITY", csRadiosity::stop_priority);
+  csRadiosity::stop_improvement = System->ConfigGetFloat ("Lighting",
+    "RADIOSITY_STOP_IMPROVEMENT", csRadiosity::stop_improvement);
+  csRadiosity::stop_iterations = System->ConfigGetInt ("Lighting",
+    "RADIOSITY_STOP_ITERATIONS", csRadiosity::stop_iterations);
 }
 
 void csWorld::UnlinkSprite (csSprite* sprite)

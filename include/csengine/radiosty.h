@@ -34,6 +34,79 @@ class csProgressPulse;
 class csFrustumView;
 class csShadowFrustum;
 
+/// computes x ** (2 ** y), using only y multiplies.
+float FastPow2(float x, const int y);
+
+/**
+ * A small class encapsulating an RGB lightmap.
+ * The float version of csRGBlightmap
+ * Helps radiosity.
+ */
+class csRGBFloatLightMap
+{
+private:
+  int max_sizeRGB;      // Max size for every map.
+  float* map;
+
+public:
+  ///
+  void Clear ()
+  {
+    CHK (delete [] map); map = NULL;
+    max_sizeRGB = 0;
+  }
+
+  ///
+  csRGBFloatLightMap () : max_sizeRGB (0), map (NULL) { }
+  ///
+  ~csRGBFloatLightMap () { Clear (); }
+
+  ///
+  int GetMaxSize () { return max_sizeRGB; }
+  ///
+  void SetMaxSize (int s) { max_sizeRGB = s; }
+
+  /// Get data.
+  float* GetMap () { return map; }
+  /// Get red map.
+  float* GetRed () { return map; }
+  /// Get green map.
+  float* GetGreen () { return map+max_sizeRGB; }
+  /// Get blue map.
+  float* GetBlue () { return map+(max_sizeRGB<<1); }
+
+  /// Set color maps.
+  void SetMap (float* m) { map = m; }
+
+  ///
+  void Alloc (int size)
+  {
+    max_sizeRGB = size;
+    CHK (delete [] map);
+    CHK (map = new float [size*3]);
+  }
+
+  /// copy from floatmap
+  void Copy (csRGBFloatLightMap& other, int size)
+  {
+    Clear ();
+    if (other.map) { Alloc (size); memcpy (map, other.map, 
+      size * 3 * sizeof(float)); }
+  }
+
+  /// copy from bytemap
+  void Copy (csRGBLightMap& other, int size)
+  {
+    Clear ();
+    if (other.GetMap()) { 
+      Alloc (size); 
+      for(int i=0; i<size*3; i++)
+        map[i] = other.GetMap()[i];
+    }
+  }
+};
+
+
 /**
  *  A radiosity polygon, containing lightmap patches, the lumels.
  *  Radiosity rendering specific info is kept here.
@@ -48,7 +121,7 @@ private:
   /// ptr to static lightmap of polygon
   csRGBLightMap *lightmap;
   /// the change to this lightmap, unshot light.
-  csRGBLightMap *deltamap;
+  csRGBFloatLightMap *deltamap;
   /// the lumels covered by this polygon
   float *lumel_coverage_map;
   /// to convert lumels to world coords.
@@ -89,6 +162,8 @@ public:
   /// get lumel coverage for a lumel
   inline float GetLumelCoverage(int suv)
   { return lumel_coverage_map[suv]; }
+  /// get the delta map
+  inline csRGBFloatLightMap* GetDeltaMap() { return deltamap; }
 
   /// Get last shooting priority of this radpoly
   inline float GetLastShootingPriority() { return last_shoot_priority;}
@@ -131,10 +206,10 @@ public:
   /**
    * Get the sums of red.green.blue in the delta map.
    */
-  void GetDeltaSums(int &red, int &green, int &blue);
+  void GetDeltaSums(float &red, float &green, float &blue);
 
   /** 
-   *  Add ambient value to lightmap 
+   *  Add ambient value to deltamap 
    */
   void ApplyAmbient(int red, int green, int blue);
 
@@ -232,6 +307,39 @@ public:
  *  calculates radiosity
  */
 class csRadiosity {
+public:
+  /**
+   * Configuration information
+   *
+   * when true static specular gloss is applied, giving extra light.
+   */
+  static bool do_static_specular;
+  /// amount of specular to add 0..1 is a sane setting. 
+  static float static_specular_amount;
+  /** 
+   *  Bigger value gives smaller highlight. Try between 0..10.
+   *  The value is the 2log(n), where n is the usual highlightsize used
+   *  with specular highlighting in other programs.
+   */
+  static int static_specular_tightness;
+
+  /** Multiplier for amount of texture colour used. Also gives more light.
+   *  regular value is 1.0, smaller will be darker, larger will make
+   *  surroundings blend eachothers colours more and be brighter.
+   */
+  static float colour_bleed;
+
+  /** when priority gets below this value calculation will stop.
+   *  > 0.0. Set higher for shorter calculation time, and less quality.
+   */
+  static float stop_priority;
+  /** The improvement factor in priority when calculation can stop.
+   *  Must be > 0. Try 1000. Larger values, better quality, more time needed.
+   */
+  static float stop_improvement;
+  /// max number of iterations, after that amount of polygons processed stop.
+  static int stop_iterations;
+
 private:
   /// world being radiosity rendered
   csWorld *world;
