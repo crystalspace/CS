@@ -100,7 +100,7 @@ bool csGraphics2DWX::Initialize (iObjectRegistry *object_reg)
   // Create the event outlet
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    eventOutlet = q->CreateEventOutlet (this);
+    EventOutlet = q->CreateEventOutlet (this);
 
   return true;
 }
@@ -135,6 +135,7 @@ bool csGraphics2DWX::Open()
   if(myParent == 0)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Parent frame in wxGLCanvas not initialized!!");
+	return false;
   }
 
   /*
@@ -165,6 +166,8 @@ bool csGraphics2DWX::Open()
     WX_GL_MIN_ACCUM_BLUE, accumComponentSize,
     WX_GL_MIN_ACCUM_GREEN, accumComponentSize,
     WX_GL_MIN_ACCUM_ALPHA, format[glpfvAccumAlphaBits],*/
+
+  AllowResize(true);
 
   int w, h;
   myParent->GetClientSize(&w, &h);
@@ -248,6 +251,7 @@ void csGraphics2DWX::SetFullScreen (bool yesno)
 
 void csGraphics2DWX::AllowResize (bool iAllow)
 {
+	AllowResizing = iAllow;
 }
 
 BEGIN_EVENT_TABLE(csGLCanvas, wxGLCanvas)
@@ -312,31 +316,31 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
 
   if(event.GetEventType() == wxEVT_MOTION)
   {
-    g2d->eventOutlet->Mouse(0, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(0, false, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_LEFT_DOWN)
   {
-    g2d->eventOutlet->Mouse(1, true, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(1, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_LEFT_UP)
   {
-    g2d->eventOutlet->Mouse(1, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(1, false, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_MIDDLE_DOWN)
   {
-    g2d->eventOutlet->Mouse(3, true, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(3, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_MIDDLE_UP)
   {
-    g2d->eventOutlet->Mouse(3, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(3, false, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_RIGHT_DOWN)
   {
-    g2d->eventOutlet->Mouse(2, true, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(2, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_RIGHT_UP)
   {
-    g2d->eventOutlet->Mouse(2, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(2, false, event.GetX(), event.GetY());
   }
 }
 
@@ -476,7 +480,7 @@ void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
 	  cskey_raw = cskey_cooked = wxCodeToCSCode(wxkey);
   }
 
-  if(cskey_raw != 0) g2d->eventOutlet->Key(cskey_raw, cskey_cooked, down);
+  if(cskey_raw != 0) g2d->EventOutlet->Key(cskey_raw, cskey_cooked, down);
 }
 
 void csGLCanvas::OnKeyDown( wxKeyEvent& event )

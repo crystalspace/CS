@@ -33,9 +33,6 @@ class csGraphics2DWX : public csGraphics2DGLCommon, public iWxWindow
   csGLCanvas* theCanvas;
 
 public:
-  csRef<iEventOutlet> eventOutlet;
-
-
   SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
   csGraphics2DWX (iBase *iParent);
