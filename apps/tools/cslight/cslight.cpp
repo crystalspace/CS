@@ -182,6 +182,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
+  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
@@ -189,6 +190,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
+  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
@@ -196,6 +198,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
+  g3d->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   g2d = g3d->GetDriver2D ();
@@ -281,7 +284,6 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   delete meter;
 
   txtmgr->SetPalette ();
-  VFS->DecRef ();
   return true;
 }
 
