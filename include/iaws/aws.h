@@ -50,12 +50,19 @@ struct  iFont;
 struct  iEvent;
 
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
-       
+
+
+/** This flag makes the windowing system perform erases before drawing.  This slows
+ * the engine down somewhat, but is necessary in some circumstances (such as when using
+ * the single proctex mode as a surface, or to draw to the high level visible context.)
+ */
+const int AWSF_AlwaysEraseWindows=1;
+
 
 SCF_VERSION (iAws, 0, 1, 0);
 
 struct iAws : public iBase
-{
+{  
 public:  
   /// Get a pointer to the preference manager
   virtual iAwsPrefManager *GetPrefMgr()=0;
@@ -86,6 +93,12 @@ public:
 
   /// Mark a section of the screen clean.
   virtual void       Unmark(csRect &rect)=0;
+
+  /// Erase a section of the screen next round (only useful if AlwaysEraseWindows flag is set)
+  virtual void       Erase(csRect &rect)=0;
+
+  /// Mask off a section that has been marked to erase.  This part won't be erased.
+  virtual void       MaskEraser(csRect &rect)=0;
 
   /// Tell the system to rebuild the update store
   virtual void       InvalidateUpdateStore()=0;
@@ -126,6 +139,15 @@ public:
 
   /// Creates a new parameter list
   virtual iAwsParmList *CreateParmList()=0;
+
+  /// Sets one or more flags for different operating modes
+  virtual void SetFlag(unsigned int flags)=0;
+
+  /// Clears one or more flags for different operating modes
+  virtual void ClearFlag(unsigned int flags)=0;
+
+  /// Returns the current flags 
+  virtual unsigned int GetFlags()=0;
 };
 
 
