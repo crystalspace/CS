@@ -37,7 +37,7 @@ viewed online.  @xref{Where to Get}.
 * Simple Locomotion:: Locomotion (Moving Around)
 @end menu
 
-@node Simple MinApp
+@node Simple MinApp, Simple System Driver, Tutorial Simple, Tutorial Simple
 @subsection Minimum Application
 @cindex Tutorial Minimum Application
 @cindex Minimum Application, Tutorial
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]);
 If you don't obey these rules, your program will not compile, or not compile
 on all supported systems.
 
-@node Simple System Driver, Simple Event Handling, Tutorial Simple, Tutorial Simple
+@node Simple System Driver, Simple Event Handling, Simple MinApp, Tutorial Simple
 @subsection Creating the Simple System Driver
 @cindex Tutorial Simple System Driver
 @cindex Simple System Driver, Tutorial
