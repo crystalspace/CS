@@ -17,6 +17,11 @@ The history order is reversed so that new features are at the top.
 	  crashes in that case. You can check if your level contains
 	  non-coplanar polygons by using levtool as follows:
 	  	levtool -validate your_level.zip
+	- Replaced the vector of textures in csProcTexture with a hash
+	  set. This greatly increases speed of using procedural textures
+	  when the same textures is visible multiple times at once (without
+	  this fix every texture would be updated as many times as it
+	  was visible).
 6-Nov-2002
 	- Enabled tiled culling by default in Dynavis. This gives a big
 	  improvement in fps and it seems to work properly.

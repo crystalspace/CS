@@ -38,6 +38,7 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "csutil/csvector.h"
+#include "csutil/hashmap.h"
 
 #include "cstool/proctex.h"
 
@@ -51,8 +52,8 @@ class ProcEventHandler : public iEventHandler
 {
 private:
   iObjectRegistry* object_reg;
-  // Array of textures that needs updating next frame.
-  csVector textures;
+  // Set of textures that needs updating next frame.
+  csHashSet textures;
 
 public:
   ProcEventHandler (iObjectRegistry* object_reg)
@@ -67,7 +68,7 @@ public:
 
   void PushTexture (csProcTexture* txt)
   {
-    textures.Push (txt);
+    textures.Add (txt);
   }
 };
 
@@ -83,12 +84,14 @@ bool ProcEventHandler::HandleEvent (iEvent& event)
   current_time = vc->GetCurrentTicks ();
   if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
   {
-    int i;
-    for (i = 0 ; i < textures.Length () ; i++)
     {
-      csProcTexture* pt = (csProcTexture*)textures[i];
-      pt->Animate (current_time);
-      pt->last_cur_time = current_time;
+      csHashIterator it (textures.GetHashMap ());
+      while (it.HasNext ())
+      {
+        csProcTexture* pt = (csProcTexture*)it.Next ();
+        pt->Animate (current_time);
+        pt->last_cur_time = current_time;
+      }
     }
     textures.DeleteAll ();
     return true;
