@@ -3268,7 +3268,7 @@ void csThing::AddPortalPolygon (csPolygon3D* poly)
 {
   int idx = portal_polygons.Find (poly);
   //@@@???CS_ASSERT (idx == -1);
-  if (idx == -1) return;
+  if (idx != -1) return;
  
   CS_ASSERT (poly->GetPortal () != NULL);
   CS_ASSERT (poly->GetParent () == this);
@@ -3279,7 +3279,7 @@ void csThing::RemovePortalPolygon (csPolygon3D* poly)
 {
   int idx = portal_polygons.Find (poly);
   //@@@???CS_ASSERT (idx != -1);
-  if (idx != -1) return;
+  if (idx == -1) return;
 
   CS_ASSERT (poly->GetPortal () == NULL || poly->GetParent () != this);
   portal_polygons.Delete (idx);
