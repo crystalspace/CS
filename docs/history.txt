@@ -1,6 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
 5-Oct-2000
+	- Samuel Humphreys fixed particle systems in STATBSP worlds. Their
+	  bsp bounding boxes would otherwise remain uninitialized and so
+	  always invisible. The loaders call to Movable.UpdateMove() has
+	  no effect as the sectors are not yet prepared.
+	- Norman Kramer did some fixes to icsgame.h and gamecore plugin so
+	  that it compiles on GNU/Linux. Norman also added a makefile.
+	- Wyatt Miler fixed campos.h so that it compiles on Mac.
+	- Wyatt also updated the Mac project files:
+	    - Added VFS plugin to MakeShared
+	    - Removed the Glide renderer from MakePlugins.
 	- Extended iPolygon3D interface with one of the SetTextureSpace
 	  functions so that I can get the python script pysimp.py working.
 	- Added iMaterialWrapper interface so that there is now an SCF
