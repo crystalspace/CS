@@ -41,9 +41,9 @@ Short-term cleanups that need to be done:
 	      existing poorly implemented progress meter displayed on the
 	      startup console during lighting.  Removed ill-conceived
 	      MSG_TICKER, SimpleConsole::ReplaceLastLine(), and
-	      SimpleConsole::ShowWork().  This *greatly* simplified the code.
-	      Progress meter functionality is now a high-level, very
-	      localized, and reusable object, rather than being spread around
+	      SimpleConsole::ShowWork().  This significantly simplified the
+	      code.  Progress meter functionality is now high-level, very
+	      localized, and reusable, rather than being spread around
 	      as numerous special-cases throughout all levels of the system.
 	    - Created a new library, csapputil, which contains high-level,
 	      specialized objects which may be useful to some application
@@ -59,11 +59,6 @@ Short-term cleanups that need to be done:
 	    - The Command class, apps/support/command.{h|cpp}, is now derived
 	      from a new class, csSimpleCommand which defines an interface for
 	      high-level command interpreters.
-	    - Fixed a number of sources and headers in the library directory
-	      which were incorrectly including files from apps/support.  Fixed
-	      some makefiles which were unnecessarily including apps/support.
-	      Hopefully the Crystal Space libraries no longer depend on
-	      application specific functionality.
 	    - Fixed a bug in csSystemDriver::DemoWrite().  It failed to send
 	      BeginDraw() to the 2D graphics driver.
 	    - Removed all custom application-specific DemoWrite() methods
@@ -75,7 +70,7 @@ Short-term cleanups that need to be done:
 	      Second, a change in the behavior of csWorld::Prepare() caused
 	      the color palette used for the startup console to be wiped clean
 	      after it was set up, but before it could be used.  Thus the
-	      startup console was incorrectly restricted to write text on a
+	      startup console was incorrectly restricted to white text on a
 	      white background.
 	    - Made tcache.cpp, tcache16.cpp, and tcache32.cpp compilable on
 	      NextStep for HPPA again.  The compiler, which apparently can not
@@ -86,6 +81,11 @@ Short-term cleanups that need to be done:
 	      named private methods for consistency.
 	    - Made various updates to a number of the documents in the 'docs'
 	      directory.
+	    - Fixed a number of sources and headers in the library directory
+	      which were incorrectly including files from apps/support.  Fixed
+	      some makefiles which were unnecessarily including apps/support.
+	      Hopefully the Crystal Space libraries no longer depend on
+	      application specific functionality.
 	    - Fixed a couple "unused variable" compiler warnings in
 	      mazed/me_app.cpp.
 	    - Fixed a broken .PHONY dependency in walktest.mak.
