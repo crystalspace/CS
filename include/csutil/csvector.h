@@ -136,6 +136,8 @@ public:
 
 inline csSome& csBasicVector::operator [] (int n)
 {
+  CS_ASSERT(n>=0);
+  CS_ASSERT(n<count);
   if (n >= count)
     SetLength (n + 1);
   return (root [n]);
@@ -143,11 +145,15 @@ inline csSome& csBasicVector::operator [] (int n)
 
 inline csSome& csBasicVector::operator [] (int n) const
 {
+  CS_ASSERT(n>=0);
+  CS_ASSERT(n<count);
   return (root [n]);
 }
 
 inline csSome& csBasicVector::Get (int n) const
 {
+  CS_ASSERT(n>=0);
+  CS_ASSERT(n<count);
   return (root [n]);
 }
 

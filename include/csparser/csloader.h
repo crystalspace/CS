@@ -26,6 +26,8 @@
 struct iImage;
 struct csRGBcolor;
 struct Color;
+struct iMotion;
+struct iMotionAnim;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csSkeletonLimb;
@@ -165,6 +167,21 @@ class csLoader
    * prefixed with the corresponding string.
    */
   static bool LoadMaterials (char* buf, const char* prefix = NULL);
+
+	/**
+	 * Loads a skeletal motion from a file
+	 */
+	static iMotion* LoadMotion (csWorld* world, const char* fname);
+
+	/**
+	 * Loads a skeletal motion from an existing stream
+	 */
+	static bool LoadMotion (iMotion* mot, char* buf);
+
+	/**
+	 * Loads an animation chunk (rotation data) from a motion section
+	 */
+	static bool LoadAnim (iMotionAnim* mot, char* buf);
 
   /**
    * Load a library into given world.<p>

@@ -44,6 +44,7 @@ struct iSoundRender;
 struct iConfig;
 struct iConsole;
 struct iConfigFile;
+struct iMotionManager;
 
 /**
  * This is the interface to operating system.<p>
@@ -250,6 +251,8 @@ public:
   iConsole *Console;
   /// Authentication method
   iAuth *Auth;  
+  /// Authentication method
+  iMotionManager *MotionMan;
 
   /// the width of this frame
   int FrameWidth;

@@ -56,6 +56,7 @@
 #include "isnddata.h"
 #include "isndrdr.h"
 #include "itxtmgr.h"
+#include "imotion.h"
 
 typedef char ObName[30];
 /// The world we are currently processing
@@ -100,13 +101,16 @@ int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (A)
   CS_TOKEN_DEF (ACCEL)
   CS_TOKEN_DEF (ACTION)
   CS_TOKEN_DEF (ACTIVATE)
   CS_TOKEN_DEF (ACTIVE)
   CS_TOKEN_DEF (ADD)
+  CS_TOKEN_DEF (AFFECTOR)
   CS_TOKEN_DEF (ALPHA)
   CS_TOKEN_DEF (AMBIENT)
+  CS_TOKEN_DEF (ANIM)
   CS_TOKEN_DEF (ATTENUATION)
   CS_TOKEN_DEF (AZIMUTH)
   CS_TOKEN_DEF (BECOMING_ACTIVE)
@@ -247,6 +251,9 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TEXTURE_SCALE)
   CS_TOKEN_DEF (MAT_SET)
   CS_TOKEN_DEF (MAT_SET_SELECT)
+  CS_TOKEN_DEF (MOTIONM)
+  CS_TOKEN_DEF (MOTIONQ)
+  CS_TOKEN_DEF (Q)
   CS_TOKEN_DEF (THING)
   CS_TOKEN_DEF (TOTALTIME)
   CS_TOKEN_DEF (TRANSFORM)
@@ -3959,6 +3966,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
 }
 
 //---------------------------------------------------------------------------
+//iMotionManager* csWorld::GetMotions () { return motions; }
 
 bool csLoader::LoadWorld (char* buf)
 {
@@ -3983,6 +3991,8 @@ bool csLoader::LoadWorld (char* buf)
     CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (SOUNDS)
     CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (MOTIONM)
+  	CS_TOKEN_TABLE (MOTIONQ)
   CS_TOKEN_TABLE_END
 
   csResetParserLine();
@@ -4009,6 +4019,22 @@ bool csLoader::LoadWorld (char* buf)
       }
       switch (cmd)
       {
+        case CS_TOKEN_MOTIONQ:
+        case CS_TOKEN_MOTIONM:
+					{
+						iMotionManager* motionmanager=System->MotionMan;
+						if (!motionmanager) {
+							CsPrintf(MSG_FATAL_ERROR, "No motion manager loaded!\n");
+							fatal_exit(0, false);
+						} else {
+							iMotion* m=motionmanager->FindByName(name);
+							if(!m) {
+								m=motionmanager->AddMotion(name, (cmd==CS_TOKEN_MOTIONM));
+								LoadMotion(m, params);
+							}
+						}
+					}
+					break;
         case CS_TOKEN_SPRITE:
           {
             csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
@@ -5067,6 +5093,184 @@ csFrame* csLoader::LoadFrame (csSpriteTemplate* stemp, char* buf)
     return (stemp->FindAction(action))->GetFrame(frame);
   else
     return stemp->GetFrame(frame);
+}
+
+iMotion* csLoader::LoadMotion (csWorld* world, const char* fname)
+{
+  World = world;
+
+  iDataBuffer *databuff = System->VFS->ReadFile (fname);
+
+  if (!databuff || !databuff->GetSize ())
+  {
+    if (databuff) databuff->DecRef ();
+    CsPrintf (MSG_FATAL_ERROR, "Could not open motion file \"%s\" on VFS!\n", fname);
+    return NULL;
+  }
+
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (MOTIONQ)
+  	CS_TOKEN_TABLE (MOTIONM)
+  CS_TOKEN_TABLE_END
+
+  char *name, *data;
+  char *buf = **databuff;
+	long cmd;
+
+  if (cmd=csGetObject (&buf, tokens, &name, &data))
+  {
+    if (!data)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+
+		iMotionManager* motionmanager=System->MotionMan;
+		if (!motionmanager) {
+			CsPrintf(MSG_FATAL_ERROR, "No motion manager loaded!\n");
+		} else {
+			iMotion* m=motionmanager->FindByName(name);
+			if(!m) {
+				m=motionmanager->AddMotion(name, (cmd==CS_TOKEN_MOTIONM));
+				if (LoadMotion (m, data))
+				{
+					databuff->DecRef ();
+					return m;
+				}
+				else
+				{
+					m->DecRef();
+					databuff->DecRef ();
+					return NULL;
+				}
+			}
+		}
+  }
+  databuff->DecRef ();
+  return NULL;
+}
+
+bool csLoader::LoadMotion (iMotion* mot, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+	  CS_TOKEN_TABLE (ANIM)
+    CS_TOKEN_TABLE (FRAME)
+  CS_TOKEN_TABLE_END
+
+	CS_TOKEN_TABLE_START (tok_frameset)
+		CS_TOKEN_TABLE (A)
+	CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char* params2;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+			case CS_TOKEN_ANIM:
+			{
+				iMotionAnim *motanim=mot->AddAnim(name);
+				LoadAnim(motanim, params);
+			}
+			break;
+      case CS_TOKEN_FRAME:
+			{
+				int framenum=0;
+
+				if(mot->GetFrame(framenum)) {
+					CsPrintf (MSG_FATAL_ERROR, "Frame %d for motion '%s' already defined!\n", framenum, mot->GetName());
+					fatal_exit (0, false);
+				}
+
+				iMotionFrame* frame=mot->AddFrame(framenum);
+
+				char fn[64];
+				while ((cmd = csGetObject (&params, tok_frameset, &name, &params2)) > 0)
+				{
+					if (!params2)
+					{
+						CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+						fatal_exit (0, false);
+					}
+					switch (cmd)
+					{
+						case CS_TOKEN_A:
+							ScanStr (params2, "%s", fn);
+							if(!frame->LinkAnim(fn)) {
+								CsPrintf (MSG_FATAL_ERROR, "Could not link in anim '%s' to frame %d in motion '%s'!\n", fn, framenum, mot->GetName());
+								fatal_exit (0, false);
+							}
+							break;
+					}
+				}
+			}
+			break;
+		}
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
+        csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+  return true;
+}
+
+bool csLoader::LoadAnim (iMotionAnim* mot, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+	  CS_TOKEN_TABLE (AFFECTOR)
+    CS_TOKEN_TABLE (Q)
+  	CS_TOKEN_TABLE (MATRIX)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char* params2;
+  char str[255];
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+			case CS_TOKEN_AFFECTOR:
+			  mot->AddAffector(params);
+				break;
+			case CS_TOKEN_Q:
+			{
+				csQuaternion q;
+				mot->Set(q);
+			}
+			break;
+			case CS_TOKEN_MATRIX:
+			{
+				csMatrix3 m;
+			  mot->Set(m);
+			}
+			break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
+        csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+  return true;
 }
 
 //---------------------------------------------------------------------------

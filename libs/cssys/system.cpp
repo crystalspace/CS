@@ -39,6 +39,7 @@
 #include "iconfig.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
+#include "imotion.h"
 
 // The global system variable
 csSystemDriver *System = NULL;
@@ -305,6 +306,7 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   NetProtocol = NULL;
   CmdManager = NULL;
   Sound = NULL;
+	MotionMan = NULL;
 
   Console = NULL;
 
@@ -338,7 +340,8 @@ csSystemDriver::~csSystemDriver ()
   if (G2D) G2D->DecRef ();
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
-  if (Config) Config->DecRef ();;
+  if (Config) Config->DecRef ();
+	if (MotionMan) MotionMan->DecRef();
 
   // Free all plugins
   PlugIns.DeleteAll ();
@@ -485,6 +488,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   CmdManager = QUERY_PLUGIN_ID (this, CS_FUNCID_CMDMGR, iCommandManager);
   Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
   Auth = QUERY_PLUGIN_ID (this, CS_FUNCID_AUTH, iAuth);
+	MotionMan = QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
 
   // Check if the minimal required drivers are loaded
   if (!CheckDrivers ())

@@ -103,6 +103,8 @@
 #define CS_FUNCID_CONSOLE	"Console"
 /// 3D engine
 #define CS_FUNCID_ENGINE	"Engine"
+/// Skeleton Animation
+#define CS_FUNCID_MOTION	"MotionManager"
 
 /**
  * Query a pointer to some plugin through the System interface.
