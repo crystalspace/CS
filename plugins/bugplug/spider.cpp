@@ -60,7 +60,7 @@ bool csSpider::WeaveWeb (iEngine* engine)
   for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
   {
     iSector* sec = engine->GetSectors ()->GetSector (i);
-    movable->AddSector (sec);
+    movable->GetSectors ()->AddSector (sec);
   }
   movable->UpdateMove ();
   return true;

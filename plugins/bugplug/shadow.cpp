@@ -54,9 +54,9 @@ bool csShadow::DrawTest (iRenderView* rview, iMovable*)
   iMovable* shadow_movable = shadow_mesh->GetMovable ();
   iSector* sector = rview->GetCamera ()->GetSector ();
   int i;
-  for (i = 0 ; i < shadow_movable->GetSectorCount () ; i++)
+  for (i = 0 ; i < shadow_movable->GetSectors ()->GetSectorCount () ; i++)
   {
-    iSector* sec = shadow_movable->GetSector (i);
+    iSector* sec = shadow_movable->GetSectors ()->GetSector (i);
     if (sec == sector)
     {
       return true;
@@ -147,7 +147,7 @@ bool csShadow::AddToEngine (iEngine* engine)
   for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
   {
     iSector* sec = engine->GetSectors ()->GetSector (i);
-    movable->AddSector (sec);
+    movable->GetSectors ()->AddSector (sec);
   }
   movable->UpdateMove ();
   return true;

@@ -1,5 +1,47 @@
 The history order is reversed so that new features are at the top.
 
+20-Aug-2001
+	- Added virtual destructor to csSpriteBuilderFile to remove warning.
+	- Made destructor of csModelConverterSPR private.
+	- Added iThingState::GetPortalPolygon() which returns the polygon
+	  of the portal (given with index). It complements GetPortalCount()
+	  and GetPortal().
+	- Added iPolygon3D::IntersectSegment, IntersectRay,
+	  IntersectRayNoBackFace, IntersectRayPlane, and PointOnPolygon.
+	  These functions were already in csPolygon3D.
+	- Removed the duplicate iMovable::AddSector(), GetSector(int), and
+	  GetSectorCount(). This functionality is present through iSectorList
+	  which you can get with iMovable::GetSectors(). Also actually added
+	  the implementation for iSectorList::AddSector() and RemoveSector().
+	- iMovable::GetSectors() no longer returns a 'const' pointer since
+	  you now have to use that object to actually add sectors.
+	- Completed iMeshWrapper::PlaceMesh(). The function currently has
+	  the following limitations:
+	    - Does not work correctly if the movable transform is not
+	      orthonormal (i.e. the transform scales the object in some way).
+	      In general this is not recommend either since there are other
+	      parts of CS (like collision detection) that don't work well in
+	      that case.
+	    - PlaceMesh() only goes one level deep. i.e. it only checks
+	      all portals in the current sector and adds the destination
+	      sectors from those portals. It will not recurse into those
+	      sectors to continue the test there. This limitation will only
+	      be a problem if you have portals that are very close to each
+	      other and an object happens to cross them all.
+	    - This function ignores children of the mesh object. So only the
+	      bounding sphere of the parent object is considered.
+	    - This function will only test against portals of things that
+	      cannot move (i.e. have flag CS_THING_MOVE_NEVER set).
+	    - This function is not super-efficient as it assumes no previous
+	      knowledge except for one sector. It would be nice to have
+	      extra PlaceMesh() versions that take a displacement vector
+	      and calculate the new set of sectors based on the old one
+	      (assuming this can be done more efficiently).
+	    - For huge sectors containing lots of portals or mesh objects
+	      this function should be optimized. This can probably be done
+	      by keeping an efficient portal representation structure on the
+	      csSector level.
+	  Otherwise it should work just fine but it is untested.
 19-Aug-2001
 	- Added iThingState::GetPortalCount() and GetPortal(int) so you
 	  can query all portals from a thing.

@@ -1173,7 +1173,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 void csThing::AppendShadows (iMovable* movable, iShadowBlockList* shadows,
 	csVector3& origin)
 {
-  iSector* isect = movable->GetSector (0);
+  iSector* isect = movable->GetSectors ()->GetSector (0);
   iShadowBlock* list = shadows->NewShadowBlock (
   	isect, isect->GetRecLevel (),
   	polygons.Length ());
@@ -2699,6 +2699,12 @@ iPortal* csThing::ThingState::GetPortal (int idx)
 {
   csPolygon3D* p = (csPolygon3D*)(scfParent->portal_polygons)[idx];
   return &(p->GetPortal ()->scfiPortal);
+}
+
+iPolygon3D* csThing::ThingState::GetPortalPolygon (int idx)
+{
+  csPolygon3D* p = (csPolygon3D*)(scfParent->portal_polygons)[idx];
+  return &(p->scfiPolygon3D);
 }
 
 //---------------------------------------------------------------------------

@@ -1156,16 +1156,16 @@ public:
    * poly is completely back of the given plane it returnes POL_BACK.
    * Otherwise it returns POL_SPLIT_NEEDED.
    */
-  int Classify (const csPlane3& pl);
+  virtual int Classify (const csPlane3& pl);
 
   /// Same as Classify() but for X plane only.
-  int ClassifyX (float x);
+  virtual int ClassifyX (float x);
 
   /// Same as Classify() but for Y plane only.
-  int ClassifyY (float y);
+  virtual int ClassifyY (float y);
 
   /// Same as Classify() but for Z plane only.
-  int ClassifyZ (float z);
+  virtual int ClassifyZ (float z);
 
   /**
    * Split this polygon with the given plane (A,B,C,D) and return the
@@ -1174,20 +1174,20 @@ public:
    * This function is mainly used by the BSP splitter. Note that splitting
    * happens in object space.
    */
-  void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
+  virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
   	const csPlane3& plane);
 
   /**
    * Check if this polygon (partially) overlaps the other polygon
    * from some viewpoint in space. This function works in object space.
    */
-  bool Overlaps (csPolygonInt* overlapped);
+  virtual bool Overlaps (csPolygonInt* overlapped);
 
   /**
    * Return 1 to indicate to the BSP tree routines that
    * this is a csPolygon3D.
    */
-  int GetType () { return 1; }
+  virtual int GetType () { return 1; }
 
   /**
    * Intersect object-space segment with this polygon. Return
@@ -1418,6 +1418,29 @@ public:
     virtual unsigned long GetPolygonID ()
     {
       return scfParent->GetPolygonID ();
+    }
+    virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
+                          csVector3& isect, float* pr = NULL)
+    {
+      return scfParent->IntersectSegment (start, end, isect, pr);
+    }
+    virtual bool IntersectRay (const csVector3& start, const csVector3& end)
+    {
+      return scfParent->IntersectRay (start, end);
+    }
+    virtual bool IntersectRayNoBackFace (const csVector3& start,
+      const csVector3& end)
+    {
+      return scfParent->IntersectRayNoBackFace (start, end);
+    }
+    virtual bool IntersectRayPlane (const csVector3& start,
+      const csVector3& end, csVector3& isect)
+    {
+      return scfParent->IntersectRayPlane (start, end, isect);
+    }
+    virtual bool PointOnPolygon (const csVector3& v)
+    {
+      return scfParent->PointOnPolygon (v);
     }
   } scfiPolygon3D;
   friend struct eiPolygon3D;

@@ -24,6 +24,8 @@
 #include "csengine/thing.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/portal.h"
 
 SCF_IMPLEMENT_IBASE_EXT_QUERY (csMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
@@ -205,12 +207,13 @@ static CS_DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
 
 void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
 {
-  if (defered_num_lights && movable.GetSectorCount()>0)
+  const iSectorList* movable_sectors = movable.GetSectors ();
+  if (defered_num_lights && movable_sectors->GetSectorCount () > 0)
   {
     if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
 
-    iSector* sect = movable.GetSector (0);
+    iSector* sect = movable_sectors->GetSector (0);
     int num_lights = csEngine::current_engine->GetNearbyLights (
       sect->GetPrivateObject (),
       pos, defered_lighting_flags,
@@ -292,12 +295,25 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
 
 void csMeshWrapper::PlaceMesh ()
 {
-  if (movable.GetSectorCount () == 0) return;	// Do nothing
+  iSectorList* movable_sectors = movable.GetSectors ();
+  if (movable_sectors->GetSectorCount () == 0) return;	// Do nothing
 
   csVector3 radius, center;
   mesh->GetRadius (radius, center);
-  iSector* sector = movable.GetSector (0);
+  iSector* sector = movable_sectors->GetSector (0);
   movable.SetSector (sector);	// Make sure all other sectors are removed
+
+  // Transform the center from object to world space given the current
+  // movable. Note! @@@ We assume here the transformation is an orthonormal
+  // transformation which means that it cannot scale the object. In general
+  // it is a good idea to keep the movable transformation orthonormalu
+  // (especially for things like collision detection).
+  center = movable.GetFullTransform ().This2Other (center);
+
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  float max_sq_radius = max_radius * max_radius;
 
   // @@@ This function is currently ignoring children but that's
   // not good!
@@ -312,10 +328,33 @@ void csMeshWrapper::PlaceMesh ()
 	iThingState);
     if (thing)
     {
-      for (j = 0 ; j < thing->GetPortalCount () ; j++)
+      // @@@ This function will currently only consider portals on things
+      // that cannot move.
+      if (thing->GetMovingOption () == CS_THING_MOVE_NEVER)
       {
-	iPortal* portal = thing->GetPortal (j);
-	// @@@ TODO!!!
+        for (j = 0 ; j < thing->GetPortalCount () ; j++)
+        {
+	  iPolygon3D* portal_poly = thing->GetPortalPolygon (j);
+	  const csPlane3& pl = portal_poly->GetWorldPlane ();
+
+	  float sqdist = csSquaredDist::PointPlane (center, pl);
+	  if (sqdist <= max_sq_radius)
+	  {
+	    // Plane of portal is close enough.
+	    // If N is the normal of the portal plane then center-N
+	    // will be the point on the plane that is closest to 'center'.
+	    // We check if that point is inside the portal polygon.
+	    if (portal_poly->PointOnPolygon (center - pl.Normal ()))
+	    {
+	      iPortal* portal = thing->GetPortal (j);
+	      iSector* dest_sector = portal->GetSector ();
+	      if (movable_sectors->Find (dest_sector) == -1)
+	      {
+	        movable_sectors->AddSector (dest_sector);
+	      }
+	    }
+	  }
+        }
       }
       thing->DecRef ();
     }

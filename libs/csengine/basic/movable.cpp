@@ -41,6 +41,7 @@ csMovableSectorList::csMovableSectorList ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSectorList);
+  movable = NULL;
 }
 
 iSector *csMovableSectorList::FindByName (const char *name) const
@@ -48,9 +49,9 @@ iSector *csMovableSectorList::FindByName (const char *name) const
   if (!name) return NULL;
 
   int i;
-  for (i=0; i<Length (); i++)
+  for (i=0 ; i<Length () ; i++)
   {
-    iSector *sec = Get(i);
+    iSector *sec = Get (i);
     if (sec->QueryObject ()->GetName ())
       if (!strcmp (sec->QueryObject ()->GetName (), name))
         return sec;
@@ -58,18 +59,36 @@ iSector *csMovableSectorList::FindByName (const char *name) const
   return NULL;
 }
 
+void csMovableSectorList::AddSector (iSector* sector)
+{
+  if (sector == NULL) return;
+  CS_ASSERT (movable != NULL);
+  if (movable->GetParent () == NULL)
+  {
+    Push (sector);
+    movable->GetMeshWrapper ()->GetPrivateObject ()->
+    	MoveToSector (sector->GetPrivateObject ());
+  }
+}
+
+void csMovableSectorList::RemoveSector (iSector* /*sector*/)
+{
+  // @@@ NOT IMPLEMENTED YET.
+  CS_ASSERT (false);
+}
+
 int csMovableSectorList::SectorList::GetSectorCount () const
 { return scfParent->Length (); }
 iSector *csMovableSectorList::SectorList::GetSector (int idx) const
 { return scfParent->Get (idx); }
-void csMovableSectorList::SectorList::AddSector (iSector *)
-{ }
-void csMovableSectorList::SectorList::RemoveSector (iSector *)
-{ }
+void csMovableSectorList::SectorList::AddSector (iSector* sect)
+{ scfParent->AddSector (sect); }
+void csMovableSectorList::SectorList::RemoveSector (iSector* sect)
+{ scfParent->RemoveSector (sect); }
 iSector *csMovableSectorList::SectorList::FindByName (const char *name) const
 { return scfParent->FindByName (name); }
 int csMovableSectorList::SectorList::Find (iSector *sec) const
-  { return scfParent->Find (sec); }
+{ return scfParent->Find (sec); }
 
 //---------------------------------------------------------------------------
 
@@ -89,6 +108,7 @@ csMovable::csMovable ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
   parent = NULL;
   updatenr = 0;
+  sectors.SetMovable (this);
 }
 
 csMovable::~csMovable ()
@@ -142,7 +162,7 @@ void csMovable::SetSector (iSector* sector)
   if (sectors.Length () == 1 && sector == sectors[0])
     return;
   ClearSectors ();
-  AddSector (sector);
+  sectors.AddSector (sector);
 }
 
 void csMovable::ClearSectors ()
@@ -151,16 +171,6 @@ void csMovable::ClearSectors ()
   {
     object->GetPrivateObject ()->RemoveFromSectors ();
     sectors.SetLength (0);
-  }
-}
-
-void csMovable::AddSector (iSector* sector)
-{
-  if (sector == NULL) return;
-  if (parent == NULL)
-  {
-    sectors.Push (sector);
-    object->GetPrivateObject ()->MoveToSector (sector->GetPrivateObject ());
   }
 }
 
@@ -209,16 +219,10 @@ void csMovable::eiMovable::SetSector (iSector* sector)
   { scfParent->SetSector (sector); }
 void csMovable::eiMovable::ClearSectors ()
   { scfParent->ClearSectors (); }
-void csMovable::eiMovable::AddSector (iSector* sector)
-  { scfParent->AddSector (sector); }
-const iSectorList *csMovable::eiMovable::GetSectors () const
+iSectorList *csMovable::eiMovable::GetSectors ()
   { return scfParent->GetSectors (); }
-iSector* csMovable::eiMovable::GetSector (int idx) const
-  { return scfParent->GetSectors ()->GetSector (idx); }
 bool csMovable::eiMovable::InSector () const
   { return scfParent->InSector (); }
-int csMovable::eiMovable::GetSectorCount () const
-  { return scfParent->GetSectorCount (); }
 void csMovable::eiMovable::SetPosition (iSector* home, const csVector3& v)
   { scfParent->SetPosition (home, v); }
 void csMovable::eiMovable::SetPosition (const csVector3& v)

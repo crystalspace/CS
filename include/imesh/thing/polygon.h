@@ -54,14 +54,14 @@ class csColor;
 #define CS_POLY_COLLDET	0x00000002
 
 
-SCF_VERSION (iPolygon3D, 0, 1, 13);
+SCF_VERSION (iPolygon3D, 0, 1, 14);
 
 /**
  * This is the interface to 3D polygons.
  */
 struct iPolygon3D : public iBase
 {
-  /// Used by engine to retrieve internal object structure
+  /// @@@ UGLY! Used by engine to retrieve internal object structure
   virtual csPolygon3D *GetPrivateObject () = 0;
 
   /// Get the iObject for this polygon.
@@ -245,6 +245,48 @@ struct iPolygon3D : public iBase
    * to the polygon parent.
    */
   virtual unsigned long GetPolygonID () = 0;
+
+  /**
+   * Intersect object-space segment with this polygon. Return
+   * true if it intersects and the intersection point in world coordinates.
+   */
+  virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
+                          csVector3& isect, float* pr = NULL) = 0;
+
+  /**
+   * Intersect object-space ray with this polygon. This function
+   * is similar to IntersectSegment except that it doesn't keep the lenght
+   * of the ray in account. It just tests if the ray intersects with the
+   * interior of the polygon. Note that this function also does back-face
+   * culling.
+   */
+  virtual bool IntersectRay (const csVector3& start, const csVector3& end) = 0;
+
+  /**
+   * Intersect object-space ray with this polygon. This function
+   * is similar to IntersectSegment except that it doesn't keep the lenght
+   * of the ray in account. It just tests if the ray intersects with the
+   * interior of the polygon. Note that this function doesn't do
+   * back-face culling.
+   */
+  virtual bool IntersectRayNoBackFace (const csVector3& start,
+    const csVector3& end) = 0;
+
+  /**
+   * Intersect object space ray with the plane of this polygon and
+   * returns the intersection point. This function does not test if the
+   * intersection is inside the polygon. It just returns the intersection
+   * with the plane (in or out). This function returns false if the ray
+   * is parallel with the plane (i.e. there is no intersection).
+   */
+  virtual bool IntersectRayPlane (const csVector3& start, const csVector3& end,
+  	csVector3& isect) = 0;
+
+  /**
+   * This is a given point is on (or very nearly on) this polygon.
+   * Test happens in object space.
+   */
+  virtual bool PointOnPolygon (const csVector3& v) = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);

@@ -25,6 +25,7 @@
 
 class csVector3;
 class csMatrix3;
+class csMovable;
 struct iMeshWrapper;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
@@ -33,11 +34,17 @@ CS_DECLARE_TYPED_VECTOR_NODELETE (csSectorVector, iSector);
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public csSectorVector
 {
+private:
+  csMovable* movable;
+
 public:
   SCF_DECLARE_IBASE;
 
   csMovableSectorList ();
+  void SetMovable (csMovable* mov) { movable = mov; }
   iSector *FindByName (const char *name) const;
+  void AddSector (iSector* sec);
+  void RemoveSector (iSector* sec);
   class SectorList : public iSectorList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMovableSectorList);
@@ -98,6 +105,9 @@ public:
   /// Set mesh on which this movable operates.
   void SetMeshWrapper (iMeshWrapper* obj) { object = obj; }
 
+  /// Get the mesh wrapper on which we operate.
+  iMeshWrapper* GetMeshWrapper () { return object; }
+
   /// Set the parent movable.
   void SetParent (iMovable* parent);
 
@@ -121,34 +131,14 @@ public:
   void ClearSectors ();
 
   /**
-   * Add a sector to the list of sectors.
-   * This function does not do anything if the parent is not NULL.
-   */
-  void AddSector (iSector* sector);
-
-  /**
    * Get list of sectors for this entity.
    * This will return the sectors of the parent if there
    * is a parent.
    */
-  const iSectorList *GetSectors () const
+  iSectorList *GetSectors ()
   {
     if (parent) return parent->GetSectors ();
     else return &sectors.scfiSectorList;
-  }
-
-  /**
-   * Get the specified sector where this entity lives.
-   * (conveniance function).
-   */
-  iSector* GetSector (int idx) const { return sectors[idx]; }
-
-  /**
-   * Get the number of sectors.
-   */
-  int GetSectorCount () const
-  {
-    return sectors.Length ();
   }
 
   /**
@@ -259,11 +249,8 @@ public:
     virtual iMovable* GetParent () const;
     virtual void SetSector (iSector* sector);
     virtual void ClearSectors ();
-    virtual void AddSector (iSector* sector);
-    virtual const iSectorList *GetSectors () const;
-    virtual iSector* GetSector (int idx) const;
+    virtual iSectorList *GetSectors ();
     virtual bool InSector () const;
-    virtual int GetSectorCount () const;
     virtual void SetPosition (iSector* home, const csVector3& v);
     virtual void SetPosition (const csVector3& v);
     virtual const csVector3& GetPosition () const;

@@ -38,6 +38,8 @@ struct iDataBuffer;
 class csSpriteBuilder
 {
 public:
+  virtual ~csSpriteBuilder () { }
+
   // begin the build process
   virtual void Begin () = 0;
   // finish the build process

@@ -1067,11 +1067,11 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
     csReversibleTransform& trans = movable->GetTransform ();
     Dump (8, trans.GetOrigin (), "Movable origin");
     Dump (8, trans.GetO2T (), "Movable O2T");
-    int cnt = movable->GetSectorCount ();
+    int cnt = movable->GetSectors ()->GetSectorCount ();
     int i;
     for (i = 0 ; i < cnt ; i++)
     {
-      iSector* sec = movable->GetSector (i);
+      iSector* sec = movable->GetSectors ()->GetSector (i);
       const char* sn = sec->QueryObject ()->GetName ();
       Report (CS_REPORTER_SEVERITY_DEBUG, "        In sector '%s'",
       	sn ? sn : "?");

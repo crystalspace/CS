@@ -43,7 +43,7 @@ struct iMovableListener : public iBase
   virtual void MovableDestroyed (iMovable* movable, void* userdata) = 0;
 };
 
-SCF_VERSION (iMovable, 0, 0, 9);
+SCF_VERSION (iMovable, 0, 1, 0);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -71,28 +71,11 @@ struct iMovable : public iBase
   virtual void ClearSectors () = 0;
 
   /**
-   * Add a sector to the list of sectors.
-   * This function does not do anything if the parent is not NULL.
-   */
-  virtual void AddSector (iSector* sector) = 0;
-
-  /**
    * Get list of sectors for this entity.
    * This will return the sectors of the parent if there
    * is a parent.
    */
-  virtual const iSectorList *GetSectors () const = 0;
-
-  /**
-   * Get the specified sector where this entity lives.
-   * (conveniance function).
-   */
-  virtual iSector* GetSector (int idx) const = 0;
-
-  /**
-   * Get the number of sectors.
-   */
-  virtual int GetSectorCount () const = 0;
+  virtual iSectorList* GetSectors () = 0;
 
   /**
    * Return true if we are placed in a sector.

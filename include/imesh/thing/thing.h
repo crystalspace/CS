@@ -52,7 +52,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 0, 9);
+SCF_VERSION (iThingState, 0, 0, 10);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -88,6 +88,8 @@ struct iThingState : public iBase
   virtual int GetPortalCount () = 0;
   /// Get a portal.
   virtual iPortal* GetPortal (int idx) = 0;
+  /// Get the polygon for the given portal (with index).
+  virtual iPolygon3D* GetPortalPolygon (int idx) = 0;
 
   /// Query number of vertices in set
   virtual int GetVertexCount () = 0;

@@ -85,7 +85,7 @@ void Bot::move (csTicks elapsed_time)
   GetMovable ().SetPosition (new_p);
 
   //@@@
-  s = GetMovable ().GetSector (0);
+  s = GetMovable ().GetSectors ()->GetSector (0);
   mirror = false;
   csOrthoTransform old_pos2 (GetMovable ().GetTransform ().GetO2T (), old_p);
   s = s->FollowSegment (old_pos2, new_p, mirror);

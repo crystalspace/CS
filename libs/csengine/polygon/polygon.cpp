@@ -1404,11 +1404,12 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     // Next, for the reentry point.
     float rx, ry, rpointx, rpointy;
 
+    csEngine* eng = csEngine::current_engine;
     // Perspective correct the point.
-    float iz = csEngine::current_engine->current_camera->GetFOV ()/reentern->z;
+    float iz = eng->current_camera->GetFOV ()/reentern->z;
     csVector2 rvert;
-    rvert.x = reentern->x * iz + csEngine::current_engine->current_camera->GetShiftX ();
-    rvert.y = reentern->y * iz + csEngine::current_engine->current_camera->GetShiftY ();
+    rvert.x = reentern->x * iz + eng->current_camera->GetShiftX ();
+    rvert.y = reentern->y * iz + eng->current_camera->GetShiftY ();
 
     if (reenter == exit && reenter->z > -SMALL_EPSILON)
     { rx = ex;  ry = ey; }
@@ -1495,7 +1496,8 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     {
       csVector3* ind2 = end - 1;
       for (ind = source;  ind < end;  ind2=ind, ind++)
-        if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x) > -SMALL_EPSILON)
+        if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x)
+		> -SMALL_EPSILON)
           return false;
       dest->AddVertex ( MAX_VALUE,-MAX_VALUE);
       dest->AddVertex ( MAX_VALUE, MAX_VALUE);
@@ -1506,7 +1508,8 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     {
       csVector3* ind2 = end - 1;
       for (ind = source;  ind < end;  ind2=ind, ind++)
-        if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x) < SMALL_EPSILON)
+        if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x)
+		< SMALL_EPSILON)
           return false;
       dest->AddVertex (-MAX_VALUE,-MAX_VALUE);
       dest->AddVertex (-MAX_VALUE, MAX_VALUE);
@@ -1573,7 +1576,8 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
   return true;
 }
 
-bool csPolygon3D::IntersectRayNoBackFace (const csVector3& start, const csVector3& end)
+bool csPolygon3D::IntersectRayNoBackFace (const csVector3& start,
+	const csVector3& end)
 {
 
   // If this vector is perpendicular to the plane of the polygon we
@@ -1605,22 +1609,24 @@ bool csPolygon3D::IntersectRayNoBackFace (const csVector3& start, const csVector
       if ( (relend * normal) < 0) return false;
     }
     else
+    {
       if ( (relend * normal) > 0) return false;
+    }
     i1 = i;
   }
 
   return true;
 }
 
-bool csPolygon3D::IntersectSegment (const csVector3& start, const csVector3& end,
-                                   csVector3& isect, float* pr)
+bool csPolygon3D::IntersectSegment (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
 {
   if (!IntersectRay (start, end)) return false;
   return plane->IntersectSegment (start, end, isect, pr);
 }
 
-bool csPolygon3D::IntersectRayPlane (const csVector3& start, const csVector3& end,
-                                   csVector3& isect)
+bool csPolygon3D::IntersectRayPlane (const csVector3& start,
+	const csVector3& end, csVector3& isect)
 {
   float r;
   plane->IntersectSegment (start, end, isect, &r);

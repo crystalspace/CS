@@ -46,6 +46,7 @@ SCF_VERSION (csMeshWrapper, 0, 0, 1);
 class csMeshWrapper : public csObject
 {
   friend class csMovable;
+  friend class csMovableSectorList;
 
 protected:
   /**

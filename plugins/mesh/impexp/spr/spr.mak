@@ -38,7 +38,7 @@ endif
 INC.SPRIE = $(wildcard plugins/mesh/impexp/spr/*.h)
 SRC.SPRIE = $(wildcard plugins/mesh/impexp/spr/*.cpp)
 OBJ.SPRIE = $(addprefix $(OUT),$(notdir $(SRC.SPRIE:.cpp=$O)))
-DEP.SPRIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL
+DEP.SPRIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += SPRIE
 DSP.SPRIE.NAME = sprie
