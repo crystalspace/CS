@@ -468,6 +468,7 @@ static bool CommandHandler (char *cmd, char *arg)
   {
     Command::perform (cmd, arg);
     Sys->Printf (MSG_CONSOLE, "-*- Additional commands -*-\n");
+    Sys->Printf (MSG_CONSOLE, " coordsave, coordload,\n");
     Sys->Printf (MSG_CONSOLE, " bind, fclear, addlight, dellight, dellights\n");
     Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustrum\n");
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
@@ -478,6 +479,44 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz\n");
+  }
+  else if (!strcasecmp (cmd, "coordsave"))
+  {
+    ISystem *s=GetISystemFromSystem(System);
+    
+    Sys->Printf (MSG_CONSOLE, "SAVE COORDS\n");
+    Sys->view->GetCamera()->SaveFile ("coord");
+    FILE *fo;
+    
+    s->FOpen("coord","a",&fo);
+
+    fprintf(fo,"Head=(%g,%g,%g)\n",Sys->angle.x,Sys->angle.y,Sys->angle.z);
+
+    s->FClose(fo);
+  }
+  else if (!strcasecmp (cmd, "coordload"))
+  {
+    ISystem *s=GetISystemFromSystem(System);
+    
+    Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
+    Sys->view->GetCamera()->LoadFile (Sys->world, "coord");
+    FILE *fp;
+    
+    s->FOpen("coord","r",&fp);
+
+    char buf[128];
+
+    while(!feof(fp))
+    {
+      fgets(buf,127,fp);
+      if(!strncmp(buf,"Head=(",6))
+      {
+        sscanf(buf+6,"%f,%f,%f",&Sys->angle.x,&Sys->angle.y,&Sys->angle.z);
+        break;
+      }
+    }
+
+    s->FClose(fp);
   }
   else if (!strcasecmp (cmd, "bind"))
     bind_key (arg);
