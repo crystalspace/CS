@@ -264,6 +264,9 @@ public:
   CSOBJTYPE;
 };
 
+/// A callback function for csSprite3D::Draw().
+typedef void (csSpriteCallback) (csSprite3D* spr, csRenderView* rview);
+
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames (a frame may be controlled by
@@ -361,6 +364,9 @@ private:
 
   /// Flags to use for defered lighting.
   int defered_lighting_flags;
+
+  /// The callback which is called just before drawing.
+  csSpriteCallback* draw_callback;
 
 public:
   ///
@@ -478,6 +484,19 @@ public:
    * Draw this sprite given a camera transformation.
    */
   void Draw (csRenderView& rview);
+
+  /**
+   * Set a callback which is called just before the sprite is drawn.
+   * This is useful to do some expensive computations which only need
+   * to be done on a visible sprite.
+   */
+  void SetDrawCallback (csSpriteCallback* callback) { draw_callback = callback; }
+
+  /**
+   * Get the draw callback. If there are multiple draw callbacks you can
+   * use this function to chain.
+   */
+  csSpriteCallback* GetDrawCallback () { return draw_callback; }
 
   /**
    * Go to the next frame depending on the current time in milliseconds.

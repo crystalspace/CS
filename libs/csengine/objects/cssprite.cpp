@@ -281,6 +281,7 @@ csSprite3D::csSprite3D () : csObject ()
   Alpha   = 0.0f;
   defered_num_lights = 0;
   defered_lighting_flags = 0;
+  draw_callback = NULL;
 }
 
 csSprite3D::~csSprite3D ()
@@ -482,6 +483,8 @@ void csSprite3D::UpdateDeferedLighting ()
 
 void csSprite3D::Draw (csRenderView& rview)
 {
+  if (draw_callback) draw_callback (this, &rview);
+
   if (!tpl->cstxt)
   {
     CsPrintf (MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no texture!\n");
