@@ -215,29 +215,6 @@ void csTinyXmlNode::RemoveNodes ()
   node->Clear ();
 }
 
-csRef<iDocumentNode> csTinyXmlNode::CreateNode (const char* type)
-{
-  csRef<iDocumentNode> child;
-  // @@@ TODO
-  return child;
-}
-
-csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (const char* type,
-  	const csRef<iDocumentNode>& node)
-{
-  csRef<iDocumentNode> child;
-  // @@@ TODO
-  return child;
-}
-
-csRef<iDocumentNode> csTinyXmlNode::CreateNodeAfter (const char* type,
-  	const csRef<iDocumentNode>& node)
-{
-  csRef<iDocumentNode> child;
-  // @@@ TODO
-  return child;
-}
-
 void csTinyXmlNode::MoveNodeBefore (const csRef<iDocumentNode>& node,
   	const csRef<iDocumentNode>& before)
 {
@@ -399,6 +376,35 @@ csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()
   TiDocument* doc = new TiDocument ();
   root.Take (new csTinyXmlNode (doc));
   return root;
+}
+
+csRef<iDocumentNode> csTinyXmlDocument::CreateElement ()
+{
+  // @@@ Will TinyXML clean up these nodes later? Who
+  // is responsible for this? If we create an element
+  // here and it is never linked into an XML tree then
+  // we have a memory leak for sure.
+  // Same for CreateComment() and CreateText().
+  TiXmlElement* el = new TiXmlElement (NULL);
+  csRef<iDocumentNode> node;
+  node.Take (new csTinyXmlNode (el));
+  return node;
+}
+
+csRef<iDocumentNode> csTinyXmlDocument::CreateComment ()
+{
+  TiXmlComment* el = new TiXmlComment ();
+  csRef<iDocumentNode> node;
+  node.Take (new csTinyXmlNode (el));
+  return node;
+}
+
+csRef<iDocumentNode> csTinyXmlDocument::CreateText (const char* value)
+{
+  TiXmlText* el = new TiXmlText (value);
+  csRef<iDocumentNode> node;
+  node.Take (new csTinyXmlNode (el));
+  return node;
 }
 
 csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()

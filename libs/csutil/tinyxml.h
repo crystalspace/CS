@@ -182,7 +182,7 @@ protected:
 	static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
 
 	// Return true if the next characters in the stream are any of the endTag sequences.
-	bool static StringEqual(	const char* p,
+	static bool StringEqual(	const char* p,
 								const char* endTag,
 								bool ignoreCase );
 

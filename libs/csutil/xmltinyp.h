@@ -161,11 +161,6 @@ public:
   virtual csRef<iDocumentNode> GetNode (const char* type);
   virtual void RemoveNode (const csRef<iDocumentNode>& child);
   virtual void RemoveNodes ();
-  virtual csRef<iDocumentNode> CreateNode (const char* type);
-  virtual csRef<iDocumentNode> CreateNodeBefore (const char* type,
-  	const csRef<iDocumentNode>& node);
-  virtual csRef<iDocumentNode> CreateNodeAfter (const char* type,
-  	const csRef<iDocumentNode>& node);
   virtual void MoveNodeBefore (const csRef<iDocumentNode>& node,
   	const csRef<iDocumentNode>& before);
   virtual void MoveNodeAfter (const csRef<iDocumentNode>& node,
@@ -210,6 +205,10 @@ public:
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
+  virtual csRef<iDocumentNode> CreateElement ();
+  virtual csRef<iDocumentNode> CreateComment ();
+  virtual csRef<iDocumentNode> CreateText (const char* value);
+
   virtual csRef<iDocumentNode> GetRoot ();
   virtual const char* ParseXML (iFile* file);
   virtual const char* ParseXML (iDataBuffer* buf);

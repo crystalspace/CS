@@ -101,7 +101,7 @@ struct iDocumentNodeIterator : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentNode, 0, 1, 0);
+SCF_VERSION (iDocumentNode, 0, 2, 0);
 
 /**
  * This represents a node in XML.
@@ -156,14 +156,6 @@ struct iDocumentNode : public iBase
   /// Remove all children.
   virtual void RemoveNodes () = 0;
 
-  /// Create a new node of the given type at the end.
-  virtual csRef<iDocumentNode> CreateNode (const char* type) = 0;
-  /// Create a new node of the given type before the specified node.
-  virtual csRef<iDocumentNode> CreateNodeBefore (const char* type,
-  	const csRef<iDocumentNode>& node) = 0;
-  /// Create a new node of the given type after the specified node.
-  virtual csRef<iDocumentNode> CreateNodeAfter (const char* type,
-  	const csRef<iDocumentNode>& node) = 0;
   /**
    * Move a node (which should be a child of this node) before the given
    * node.
@@ -246,7 +238,7 @@ struct iDocumentNode : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocument, 0, 0, 1);
+SCF_VERSION (iDocument, 0, 0, 2);
 
 /**
  * This represents a document in XML.
@@ -258,6 +250,15 @@ struct iDocument : public iBase
 
   /// Create a root node. This will clear the previous root node if any.
   virtual csRef<iDocumentNode> CreateRoot () = 0;
+
+  /// Create an unlinked element node.
+  virtual csRef<iDocumentNode> CreateElement () = 0;
+
+  /// Create an unlinked comment node.
+  virtual csRef<iDocumentNode> CreateComment () = 0;
+
+  /// Create an unlinked text node.
+  virtual csRef<iDocumentNode> CreateText (const char* value) = 0;
 
   /// Get the current root node.
   virtual csRef<iDocumentNode> GetRoot () = 0;
