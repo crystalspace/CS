@@ -244,6 +244,38 @@ void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
 
     piLM->SetCacheData (cached_texture);
     Load (cached_texture);              // load it.
+
+    // Precalculate the lm offsets relative to the original texture.
+    int lmwidth = piLM->GetWidth ();
+    int lmrealwidth = piLM->GetRealWidth ();
+    int lmheight = piLM->GetHeight ();
+    int lmrealheight = piLM->GetRealHeight ();
+    float scale_u = (float) (lmrealwidth) / (float) (lmwidth);
+    float scale_v = (float) (lmrealheight) / (float) (lmheight);
+
+    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
+    polytex->GetTextureBox (lightmap_low_u, lightmap_low_v,
+                        lightmap_high_u, lightmap_high_v);
+
+    // lightmap fudge factor
+    lightmap_low_u -= 0.125;
+    lightmap_low_v -= 0.125;
+    lightmap_high_u += 0.125;
+    lightmap_high_v += 0.125;
+    float lightmap_scale_u, lightmap_scale_v;
+
+    if (lightmap_high_u <= lightmap_low_u)
+      cached_texture->lm_scale_u = scale_u;       // @@@ Is this right?
+    else
+      cached_texture->lm_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
+
+    if (lightmap_high_v <= lightmap_low_v)
+      cached_texture->lm_scale_v = scale_v;       // @@@ Is this right?
+    else
+      cached_texture->lm_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+
+    cached_texture->lm_offset_u = lightmap_low_u;
+    cached_texture->lm_offset_v = lightmap_low_v;
   }
 }
 

@@ -38,6 +38,12 @@ struct csGLCacheData
   GLuint Handle;
   /// linked list
   csGLCacheData *next, *prev;
+  /**
+   * If lightmap then this contains the precalculated scale and offset
+   * for the lightmap relative to the texture.
+   */
+  float lm_offset_u, lm_scale_u;
+  float lm_offset_v, lm_scale_v;
 };
 
 ///

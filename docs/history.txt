@@ -1,5 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+24-Jun-2000
+	- Received another lighting patch from Travis McIntosh.
+	  Dynamic lighting on curves should be better now with no
+	  artifacts.
+	- Disabled multi-texture extension support again. At the moment
+	  it is not given much performance benefits (at least for me)
+	  and there are some bugs (i.e. disabling texture mapping doesn't
+	  work and blending mode isn't correct).
+	- OpenGL::DrawPolygon was doing some unneeded work. I removed
+	  it so this should speed it up a little.
+	- Moved scaling of lightmap from OpenGL::DrawPolygon to the
+	  lightmap cache so that this doesn't have to be repeated
+	  every time.
 23-Jun-2000
 	- Made tweening default again for sprites. Also added missing
 	  initialization of the tween setting in sprite templates.

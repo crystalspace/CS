@@ -53,11 +53,11 @@
 // multitexture support - this is independent of the extension detection,
 // but  it may rely on the extension module to supply proper function 
 // prototypes for the ARB_MULTITEXTURE functions
-#define USE_MULTITEXTURE 1
+//#define USE_MULTITEXTURE 1
 
 // Whether or not we should try  and use OpenGL extensions. This should be 
 // removed eventually, when all platforms have been updated.
-#define USE_EXTENSIONS 1
+//#define USE_EXTENSIONS 1
 
 // ---------------------------------------------------------------------------
 
@@ -86,6 +86,22 @@ void csglBindTexture (GLenum target, GLuint handle)
     glBindTexture (target, handle);
   //}
 }
+
+//@@@ For opt DrawPolygon:
+bool in_draw_poly = false;
+
+void start_draw_poly ()
+{
+  if (in_draw_poly) return;
+  in_draw_poly = true;
+}
+
+void end_draw_poly ()
+{
+  if (!in_draw_poly) return;
+  in_draw_poly = false;
+}
+
 
 /*===========================================================================
  Fog Variables Section
@@ -132,8 +148,6 @@ static DECLARE_GROWING_ARRAY (rgba_verts, GLfloat);
 static DECLARE_GROWING_ARRAY (fog_intensities, float);
 /// Array with fog colors
 static DECLARE_GROWING_ARRAY (fog_color_verts, csColor);
-/// Array with visible triangles
-static DECLARE_GROWING_ARRAY (visible_indices, int);
 
 /*=========================================================================
  Method implementations
@@ -173,7 +187,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   color_verts.IncRef ();
   fog_intensities.IncRef ();
   fog_color_verts.IncRef ();
-  visible_indices.IncRef ();
 }
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
@@ -190,7 +203,6 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   color_verts.DecRef ();
   fog_intensities.DecRef ();
   fog_color_verts.DecRef ();
-  visible_indices.DecRef ();
 }
 
 bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
@@ -395,6 +407,8 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
 
+  end_draw_poly ();
+
   return true;
 }
 
@@ -503,6 +517,8 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 
   DrawMode = DrawFlags;
 
+  end_draw_poly ();
+
   return true;
 }
 
@@ -539,13 +555,12 @@ void csGraphics3DOGLCommon::Print (csRect * area)
 
 void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 {
+  if (poly.num < 3)
+    return;
+
   int i;
   float P1, P2, P3, P4;
   float Q1, Q2, Q3, Q4;
-  float min_z, max_z;
-
-  if (poly.num < 3)
-    return;
 
   // take shortcut drawing if possible
   if (ShortcutDrawPolygon && (this->*ShortcutDrawPolygon) (poly))
@@ -557,6 +572,19 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   if (dbg_current_polygon == dbg_max_polygons_to_draw - 1)
     return;
   if (dbg_current_polygon >= dbg_max_polygons_to_draw - 1)
+    return;
+
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  for (i = 1; i < poly.num; i++)
+  {
+    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
+	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy))
+	 	> VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3)
     return;
 
   // Get the plane normal of the polygon. Using this we can calculate
@@ -589,33 +617,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     N = -Bc * inv_Dc * inv_aspect;
     O = -Cc * inv_Dc;
   }
-  // Compute the min_y and max_y for this polygon in screen space
-  // coordinates.
-  // We are going to use these to scan the polygon from top to bottom.
-  // Also compute the min_z/max_z in camera space coordinates. This is
-  // going to be used for mipmapping.
-  max_z = min_z = M * (poly.vertices[0].sx - width2)
-    + N * (poly.vertices[0].sy - height2) + O;
-  // count 'real' number of vertices
-  int num_vertices = 1;
-  for (i = 1; i < poly.num; i++)
-  {
-    float inv_z = M * (poly.vertices[i].sx - width2)
-    + N * (poly.vertices[i].sy - height2) + O;
-    if (inv_z > min_z)
-      min_z = inv_z;
-    if (inv_z < max_z)
-      max_z = inv_z;
-    // theoretically we should do here sqrt(dx^2+dy^2), but
-    // we can approximate it just by abs(dx)+abs(dy)
-    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
-	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
-      num_vertices++;
-  }
-
-  // if this is a 'degenerate' polygon, skip it
-  if (num_vertices < 3)
-    return;
 
   iPolygonTexture *tex = poly.poly_texture;
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
@@ -714,10 +715,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   csglBindTexture (GL_TEXTURE_2D, texturehandle);
 
-#if 0
-// Temporarily disabled this opt because it is worse. But I don't
-// throw away the code just yet because there may be better
-// alternatives.
+  // Check if there was a DrawPolygon the previous time.
+  start_draw_poly ();
+
   // First copy all data in an array so that we can minimize
   // the amount of code that goes between glBegin/glEnd. This
   // is from an OpenGL high-performance FAQ.
@@ -762,31 +762,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glVertex4fv (p_glverts); p_glverts += 4;
   }
   glEnd ();
-#else
-  glBegin (GL_TRIANGLE_FAN);
-  for (i = 0; i < poly.num; i++)
-  {
-    sx = poly.vertices[i].sx - width2;
-    sy = poly.vertices[i].sy - height2;
-    one_over_sz = M * sx + N * sy + O;
-    sz = 1.0 / one_over_sz;
-    u_over_sz = (J1 * sx + J2 * sy + J3);
-    v_over_sz = (K1 * sx + K2 * sy + K3);
-    // we must communicate the perspective correction (1/z) for
-    // textures by using homogenous coordinates in either texture 
-    // space or in object (vertex) space.  We do it in texture 
-    // space.
-    // glTexCoord4f(u_over_sz,v_over_sz,one_over_sz,one_over_sz);
-    // glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy,
-    // -one_over_sz);
-
-    // modified to use homogenous object space coordinates instead
-    // of homogenous texture space coordinates
-    glTexCoord2f (u_over_sz * sz, v_over_sz * sz);
-    glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1, sz);
-  }
-  glEnd ();
-#endif
 
   // next draw the lightmap over the texture.  The two are blended
   // together. If a lightmap exists, extract the proper 
@@ -795,49 +770,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   {
     csGLCacheData *lightmapcache_data = (csGLCacheData *)thelightmap->GetCacheData ();
     GLuint lightmaphandle = lightmapcache_data->Handle;
-
-    // Jorrit: this code was added to scale the lightmap.
-    // @@@ Note that many calculations in this routine are not very
-    // optimal  to do here and should in fact be precalculated.
-    int lmwidth = thelightmap->GetWidth ();
-    int lmrealwidth = thelightmap->GetRealWidth ();
-    int lmheight = thelightmap->GetHeight ();
-    int lmrealheight = thelightmap->GetRealHeight ();
-    float scale_u = (float) (lmrealwidth) / (float) (lmwidth);
-    float scale_v = (float) (lmrealheight) / (float) (lmheight);
-    // float scale_u = (float)(lmrealwidth) / (float)lmwidth;
-    // float scale_v = (float)(lmrealheight) / (float)lmheight;
-
-    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
-    tex->GetTextureBox (lightmap_low_u, lightmap_low_v,
-			lightmap_high_u, lightmap_high_v);
-
-    // lightmap fudge factor
-    lightmap_low_u -= 0.125;
-    lightmap_low_v -= 0.125;
-    lightmap_high_u += 0.125;
-    lightmap_high_v += 0.125;
-    float lightmap_scale_u, lightmap_scale_v;
-
-    if (lightmap_high_u <= lightmap_low_u)
-    {
-      lightmap_scale_u = scale_u;	// @@@ Is this right?
-
-      lightmap_high_u = lightmap_low_u;
-    }
-    else
-      lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
-
-    if (lightmap_high_v <= lightmap_low_v)
-    {
-      lightmap_scale_v = scale_v;	// @@@ Is this right?
-
-      lightmap_high_v = lightmap_low_v;
-    }
-    else
-      lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
-
-    float light_u, light_v;
 
     csglBindTexture (GL_TEXTURE_2D, lightmaphandle);
     glEnable (GL_TEXTURE_2D);
@@ -856,32 +788,30 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glBlendFunc (m_config_options.m_lightmap_src_blend,
 		 m_config_options.m_lightmap_dst_blend);
 
-    glBegin (GL_TRIANGLE_FAN);
+    txtidx = 0;
+    float lm_scale_u = lightmapcache_data->lm_scale_u;
+    float lm_scale_v = lightmapcache_data->lm_scale_v;
+    float lm_offset_u = lightmapcache_data->lm_offset_u;
+    float lm_offset_v = lightmapcache_data->lm_offset_v;
     for (i = 0; i < poly.num; i++)
     {
-      sx = poly.vertices[i].sx - width2;
-      sy = poly.vertices[i].sy - height2;
-      one_over_sz = M * sx + N * sy + O;
-      sz = 1.0 / one_over_sz;
-      u_over_sz = (J1 * sx + J2 * sy + J3);
-      v_over_sz = (K1 * sx + K2 * sy + K3);
-      light_u = (u_over_sz * sz - lightmap_low_u) * lightmap_scale_u;
-      light_v = (v_over_sz * sz - lightmap_low_v) * lightmap_scale_v;
-      // we must communicate the perspective correction (1/z) for
-      // textures by using homogenous coordinates in either texture 
-      // space or in object (vertex) space.  We do it in texture 
-      // space.
-      // glTexCoord4f(light_u/sz,light_v/sz,one_over_sz,one_over_sz);
-      // glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy,
-      // -one_over_sz);
+      gltxt[txtidx] = (gltxt[txtidx] - lm_offset_u) * lm_scale_u;
+      txtidx++;
+      gltxt[txtidx] = (gltxt[txtidx] - lm_offset_v) * lm_scale_v;
+      txtidx++;
+    }
 
-      // modified to use homogenous object space coordinates instead
-      // of homogenous texture space coordinates
-      glTexCoord2f (light_u, light_v);
-      glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1.0, sz);
+    p_gltxt = gltxt;
+    p_glverts = glverts;
+    glBegin (GL_TRIANGLE_FAN);
+    for (i = 0 ; i < poly.num ; i++)
+    {
+      glTexCoord2fv (p_gltxt); p_gltxt += 2;
+      glVertex4fv (p_glverts); p_glverts += 4;
     }
     glEnd ();
   }
+
   // An extra pass which improves the lighting on SRC*DST so that
   // it looks more like 2*SRC*DST.
   if (m_config_options.do_extra_bright)
@@ -896,15 +826,12 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glBlendFunc (GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
     // glBlendFunc (GL_ZERO, GL_SRC_COLOR);
 
+    p_glverts = glverts;
     glBegin (GL_TRIANGLE_FAN);
+    glColor4f (2, 2, 2, 0);
     for (i = 0; i < poly.num; i++)
     {
-      sx = poly.vertices[i].sx - width2;
-      sy = poly.vertices[i].sy - height2;
-      one_over_sz = M * sx + N * sy + O;
-      sz = 1.0 / one_over_sz;
-      glColor4f (2, 2, 2, 0);
-      glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1.0, sz);
+      glVertex4fv (p_glverts); p_glverts += 4;
     }
     glEnd ();
   }
@@ -922,14 +849,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    p_glverts = glverts;
     glBegin (GL_TRIANGLE_FAN);
     for (i = 0; i < poly.num; i++)
     {
-      sx = poly.vertices[i].sx - width2;
-      sy = poly.vertices[i].sy - height2;
-      one_over_sz = M * sx + N * sy + O;
-      sz = 1.0 / one_over_sz;
-
       // Formula for fog is:
       // C = I * F + (1-I) * P
       // I = intensity = density * thickness
@@ -948,7 +871,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 	glTexCoord2f (poly.fog_info[i].intensity / FOGTABLE_MAXDISTANCE, 0.0);
 
       // specify fog vertex location
-      glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1.0, sz);
+      glVertex4fv (p_glverts); p_glverts += 4;
     }
     glEnd ();
 
@@ -972,6 +895,8 @@ round16 (long f)
 
 void csGraphics3DOGLCommon::StartPolygonFX (iTextureHandle * handle, UInt mode)
 {
+  end_draw_poly ();
+
 //@@@ Experimental!!!
 // If the following code is enabled then speed goes up considerably in some
 // cases. However this doesn't work very well. We need a global state mechanism
@@ -1183,6 +1108,8 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
+  end_draw_poly ();
+
   // yet another work in progress - GJH
 
   // fallback to "default" implementation if something comes up that we can't
@@ -1193,8 +1120,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
     return;
   }
-
-
 
   int i;
 
@@ -1207,11 +1132,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     color_verts.SetLimit (mesh.num_vertices);
     fog_intensities.SetLimit (mesh.num_vertices);
     fog_color_verts.SetLimit (mesh.num_vertices);
-  }
-
-  if (mesh.num_triangles*3 > visible_indices.Limit() )
-  {
-    visible_indices.SetLimit(mesh.num_triangles*3);
   }
 
   // Do vertex tweening and/or transformation to camera space
@@ -1317,17 +1237,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glTranslatef(-translation.x, -translation.y, -translation.z);
   }
 
-  // old perspective transform
-  //for (i = 0 ; i < mesh.num_vertices ; i++)
-  //{
-    //{
-      //persp[i].x = work_verts[i].x;
-      //persp[i].y = work_verts[i].y;
-      //persp[i].z = work_verts[i].z;
-      //visible[i] = true;
-    //}
-  //}
-
   // Set up perspective transform.
   // we have to change the standard projection matrix used for
   // drawing in other parts of CS.  Normally an orthogonal projection
@@ -1372,6 +1281,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	I = I * FOGTABLE_DISTANCESCALE;
 
       fog_intensities[i] = I; 
+      // @@@ To avoid this copy we better structure this differently
+      // inside G3DTriangleMesh.
       fog_color_verts[i].red = mesh.vertex_fog[i].r;
       fog_color_verts[i].green = mesh.vertex_fog[i].g;
       fog_color_verts[i].blue = mesh.vertex_fog[i].b;
@@ -1442,11 +1353,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glDepthFunc (GL_EQUAL);
     glShadeModel (GL_SMOOTH);
 
-    glTexCoordPointer(1, GL_FLOAT, 0, & fog_intensities[0]);
-    glColorPointer(3, GL_FLOAT, 0, & fog_color_verts[0]);
+    glTexCoordPointer (1, GL_FLOAT, 0, & fog_intensities[0]);
+    glColorPointer (3, GL_FLOAT, 0, & fog_color_verts[0]);
 
-    glDrawElements(GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
-
+    glDrawElements (GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
 
     // Restore state (blend mode, texture handle, etc.) for next
     // triangle
@@ -1503,6 +1413,8 @@ void csGraphics3DOGLCommon::CacheLightedTexture (iPolygonTexture* /*texture*/)
 
 bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
 {
+  //@@@end_draw_poly ();
+
   switch (op)
   {
     case G3DRENDERSTATE_ZBUFFERMODE:
@@ -1583,6 +1495,8 @@ long csGraphics3DOGLCommon::GetRenderState (G3D_RENDERSTATEOPTION op)
 
 void csGraphics3DOGLCommon::ClearCache ()
 {
+  end_draw_poly ();
+
   // We will clear lightmap cache since when unloading a world lightmaps
   // become invalid. We won't clear texture cache since texture items are
   // cleaned up individually when an iTextureHandle's RefCount reaches zero.
@@ -1596,6 +1510,8 @@ void csGraphics3DOGLCommon::DumpCache ()
 void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1, const csVector3 & v2,
 	float fov, int color)
 {
+  end_draw_poly ();
+
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
 
@@ -1663,8 +1579,28 @@ void csGraphics3DOGLCommon::SetGLZBufferFlags ()
 // multitexture
 bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 {
+  end_draw_poly ();//@@@
+
 // work in progress - GJH
 #if USE_MULTITEXTURE
+
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  int i;
+  for (i = 1; i < poly.num; i++)
+  {
+    // theoretically we should do here sqrt(dx^2+dy^2), but
+    // we can approximate it just by abs(dx)+abs(dy)
+    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
+	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy))
+	 	> VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3)
+    return false;
+
   iPolygonTexture *tex = poly.poly_texture;
 
   // find lightmap information, if any
@@ -1707,34 +1643,6 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     N = -Bc * inv_Dc * inv_aspect;
     O = -Cc * inv_Dc;
   }
-  // Compute the min_y and max_y for this polygon in screen space
-  // coordinates. We are going to use these to scan the polygon from 
-  // top to bottom. Also compute the min_z/max_z in camera space 
-  // coordinates. This is  going to be used for mipmapping.
-  float max_z, min_z;
-  max_z = min_z = M * (poly.vertices[0].sx - width2)
-    + N * (poly.vertices[0].sy - height2) + O;
-  // count 'real' number of vertices
-  int num_vertices = 1;
-  int i;
-  for (i = 1; i < poly.num; i++)
-  {
-    float inv_z = M * (poly.vertices[i].sx - width2)
-    + N * (poly.vertices[i].sy - height2) + O;
-    if (inv_z > min_z)
-      min_z = inv_z;
-    if (inv_z < max_z)
-      max_z = inv_z;
-    // theoretically we should do here sqrt(dx^2+dy^2), but
-    // we can approximate it just by abs(dx)+abs(dy)
-    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
-	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
-      num_vertices++;
-  }
-
-  // if this is a 'degenerate' polygon, skip it
-  if (num_vertices < 3)
-    return false;
 
   tex = poly.poly_texture;
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
@@ -1826,38 +1734,10 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   SetGLZBufferFlags ();
 
-  // Jorrit: this code was added to scale the lightmap.
-  // @@@ Note that many calculations in this routine are not very
-  // optimal to do here and should in fact be precalculated.
-  int lmwidth = thelightmap->GetWidth ();
-  int lmrealwidth = thelightmap->GetRealWidth ();
-  int lmheight = thelightmap->GetHeight ();
-  int lmrealheight = thelightmap->GetRealHeight ();
-  // float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
-  // float scale_v = (float)(lmrealheight-1) / (float)lmheight;
-  float scale_u = (float) (lmrealwidth) / (float) lmwidth;
-  float scale_v = (float) (lmrealheight) / (float) lmheight;
-
-  float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
-  tex->GetTextureBox (lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v);
-  lightmap_low_u -= 0.125;
-  lightmap_low_v -= 0.125;
-  lightmap_high_u += 0.125;
-  lightmap_high_v += 0.125;
-
-  float lightmap_scale_u, lightmap_scale_v;
-
-  if (lightmap_high_u == lightmap_low_u)
-    lightmap_scale_u = scale_u;	// @@@ Is this right?
-
-  else
-    lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
-
-  if (lightmap_high_v == lightmap_low_v)
-    lightmap_scale_v = scale_v;	// @@@ Is this right?
-
-  else
-    lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+  float lm_scale_u = lightmapcache_data->lm_scale_u;
+  float lm_scale_v = lightmapcache_data->lm_scale_v;
+  float lm_offset_u = lightmapcache_data->lm_offset_u;
+  float lm_offset_v = lightmapcache_data->lm_offset_v;
 
   float light_u, light_v;
   float sx, sy, sz, one_over_sz;
@@ -1872,8 +1752,8 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     sz = 1.0 / one_over_sz;
     u_over_sz = (J1 * sx + J2 * sy + J3);
     v_over_sz = (K1 * sx + K2 * sy + K3);
-    light_u = (u_over_sz * sz - lightmap_low_u) * lightmap_scale_u;
-    light_v = (v_over_sz * sz - lightmap_low_v) * lightmap_scale_v;
+    light_u = (u_over_sz * sz - lm_offset_u) * lm_scale_u;
+    light_v = (v_over_sz * sz - lm_offset_v) * lm_scale_v;
 
     // modified to use homogenous object space coordinates instead
     // of homogenous texture space coordinates
@@ -1922,6 +1802,8 @@ void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
+  end_draw_poly ();
+
   int ClipX1, ClipY1, ClipX2, ClipY2;
   G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 
