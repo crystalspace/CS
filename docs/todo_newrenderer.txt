@@ -1,7 +1,31 @@
+Comparing walktest between NR and OR:
+	- Fog is missing.
+	- Halos are missing.
+	- Lens-flare is missing.
+	- Snow is missing.
+	- 2D sprites (bird, CS logo, ...) are missing.
+	- The torus in the street is missing (bezier mesh needs porting).
+	- Procedural textures are not working (rotating cube is black)
+	- Frame based interpolation for spr3d doesn't appear to be working.
+	  In OR the animation of the pulsating box is smooth. In NR it
+	  is choppy. Frame based interpolation should take care of the smooth
+	  animation. In OR this is done by giving two vertex arrays to the
+	  renderer in G3DTriangleMesh. Does the NR not support this yet?
+	- Mixmode of fountain is wrong. Seems to use COPY instead of ADD.
+	- The rotating door is full bright in NR and dark in OR (in OR it
+	  is actually too dark but in NR it is too bright).
+	- The start room of flarge has a multi-layered texture. We need
+	  to implement the equivalent functionality in NR.
+	- The spiked sprite in the main hall is green in OR and white in NR.
+	- The semi-transparent window left of the rotating door doesn't
+	  seem to be transparent with NR.
+	- The NR still has portal clipping portals in some situations.
+	- The space warping portal in the dungeon that goes back to the main
+	  hall is simply black with NR.
+	- partsys level: hazes are missing.
+
 Things that need to be done in new renderer:
 
-	- Support hierarchical meshes. Currently only the top-level mesh
-	  is considered.
 	- Support static LOD. This is a special case of a hierarchical mesh
 	  where only one of the children is drawn based on distance
 	  related conditions.
@@ -9,7 +33,6 @@ Things that need to be done in new renderer:
 	  Also add iRegion->PrepareShaders().
 	- Meshes remaining to be ported:
 		- spr2d (and the particle systems)
-		- rain
 		- haze
 		- beziermesh
 		- lightning
@@ -22,11 +45,6 @@ Things that need to be done in new renderer:
 	- Software renderer (partially done).
 	- Working loaders for all new features (partially done).
 	- Fog (can/should be implemented through shaders).
-	- Lightmaps:
-		- Add LM support to renderer (DONE, partially).
-		- Teach thing to use LM on NR (DONE, partially).
-		- Will need some way to distinguish between 'static' and
-		  'dynamic' lights and objects (move vs non-move).
 	- Portals.
 		- Basic portals, DONE
 		- Z-filling not done
