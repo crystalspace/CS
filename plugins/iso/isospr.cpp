@@ -275,8 +275,14 @@ void csIsoSprite::SetAllColors(const csColor& color)
 
 void csIsoSprite::AddToVertexColor(int i, const csColor& color)
 {
-  colors[i].x += color.red; if(colors[i].x>1.0) colors[i].x=1.0;
-  colors[i].y += color.green; if(colors[i].y>1.0) colors[i].y=1.0;
-  colors[i].z += color.blue; if(colors[i].z>1.0) colors[i].z=1.0;
+  colors[i].x += color.red; 
+  if(colors[i].x>1.0f) colors[i].x=1.0f;
+  else if(colors[i].x < 0.0f) colors[i].x = 0.0f;
+  colors[i].y += color.green; 
+  if(colors[i].y>1.0f) colors[i].y=1.0f;
+  else if(colors[i].y < 0.0f) colors[i].y = 0.0f;
+  colors[i].z += color.blue; 
+  if(colors[i].z>1.0f) colors[i].z=1.0f;
+  else if(colors[i].z < 0.0f) colors[i].z = 0.0f;
 }
 
