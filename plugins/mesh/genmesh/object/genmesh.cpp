@@ -976,8 +976,9 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 }*/
 #endif
 
-csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n, iRenderView* rview, 
-                                                     iMovable* movable)
+csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
+	int& n, iRenderView* rview, 
+	iMovable* movable)
 {
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();

@@ -117,6 +117,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
 
   use_hw_render_buffers = false;
   prefer_stencil = true;
+  broken_stencil = false;
 
   int i;
   for (i=0; i<16; i++)
@@ -472,7 +473,15 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
     int i1;
     i1 = frustum.GetVertexCount ()-1;
 
-    for (i = 0 ; i < frustum.GetVertexCount () ; i++)
+    int maxfrustplanes = 6;
+    if (add_near_clip) maxfrustplanes--;
+    if (add_z_clip) maxfrustplanes--;
+    int numfrustplanes = frustum.GetVertexCount ();
+    // Correct for broken stencil implementation.
+    if (numfrustplanes > maxfrustplanes)
+      numfrustplanes = maxfrustplanes;
+
+    for (i = 0 ; i < numfrustplanes ; i++)
     {
       pl.Set (csVector3 (0), frustum[i], frustum[i1]);
       plane_eq[0] = pl.A ();
@@ -553,7 +562,20 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     if (prefer_stencil)
       clip_with_stencil = true;
     else if (clipper->GetVertexCount () > 6-reserved_planes)
-      clip_with_stencil = true;
+    {
+      if (broken_stencil)
+      {
+        // If the stencil is broken we will clip with planes
+	// even if we don't have enough planes. We will just
+	// ignore the other planes then.
+        clip_with_stencil = false;
+        clip_with_planes = true;
+      }
+      else
+      {
+        clip_with_stencil = true;
+      }
+    }
     else
       clip_with_planes = true;
   }
@@ -776,11 +798,23 @@ bool csGLGraphics3D::Open ()
   {
     prefer_stencil = false;
   }
+  broken_stencil = false;
+  if (config->GetBool ("Video.OpenGL.BrokenStencil", false))
+  {
+    broken_stencil = true;
+    prefer_stencil = false;
+  }
   if (verbose)
-    if (prefer_stencil)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is prefered.");
+    if (broken_stencil)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
     else
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Hardware plane clipping is prefered.");
+    {
+      if (prefer_stencil)
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is prefered.");
+      else
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Hardware plane clipping is prefered.");
+    }
 
   shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   if (!shadermgr)

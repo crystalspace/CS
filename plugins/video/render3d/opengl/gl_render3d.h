@@ -123,6 +123,7 @@ private:
    * Clipping related stuff.
    */
   bool prefer_stencil;		// If true stencil clipping is prefered.
+  bool broken_stencil;		// Stencil clipping is broken and avoided.
   bool do_near_plane;
   csPlane3 near_plane;
 

@@ -26,6 +26,12 @@ chronological order.
 	- Jorrit added back the render steps so that they again compile in
 	  OR too. The plan is to merge OR and NR builds. Not bring them
 	  further apart.
+	- Jorrit added a new Video.OpenGL.BrokenStencil flag. When this flag
+	  is set stencil clipping is considered broken and will never be
+	  used. If there are too many planes to clip then it will just ignore
+	  the extra planes and not clip on those.
+	- Jorrit added an entry for the Linux Rage128 drivers to set
+	  the BrokenStencil option to true (in the gldrivers.xml database).
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to

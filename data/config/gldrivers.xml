@@ -25,6 +25,13 @@
   -->
 <gldriverdb>
   <configs>
+    <config name="brokenstencil">
+      <Video>
+	<OpenGL>
+	  <BrokenStencil>true</BrokenStencil>
+	</OpenGL>
+      </Video>
+    </config>
     <config name="preferclipplane">
       <Video>
 	<OpenGL>
@@ -111,14 +118,14 @@
       <notapplicable>
       </notapplicable>
     </rule -->
-    <rule description="Prefer clipplane for clipping">
+    <rule description="Broken stencil support">
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="renderer" pattern="Rage128" />
 	<regexp string="glversion" pattern="1.2" />
       </conditions>
       <applicable>
-	<usecfg>preferclipplane</usecfg>
+	<usecfg>brokenstencil</usecfg>
       </applicable>
     </rule>
     <rule description="Disable VBO for Linux ATI drivers 3.2.8">
