@@ -25,14 +25,9 @@
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
-
-#include "cstool/prdots.h"
-#include "cstool/prwater.h"
-#include "cstool/prfire.h"
-#include "cstool/prplasma.h"
+#include "cstool/proctex.h"
 
 #include "stdproctex.h"
-#include "fire.h"
 
 // Plugin stuff
 

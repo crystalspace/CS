@@ -24,9 +24,9 @@
 #include "iutil/plugin.h"
 #include "itexture/itexloaderctx.h"
 #include "imap/services.h"
-#include "cstool/prfire.h"
 #include "csgfx/gradient.h"
 
+#include "prfire.h"
 #include "stdproctex.h"
 #include "fire.h"
 

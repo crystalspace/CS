@@ -24,9 +24,9 @@
 #include "iutil/plugin.h"
 #include "itexture/itexloaderctx.h"
 #include "imap/services.h"
-#include "cstool/prplasma.h"
 #include "csgfx/gradient.h"
 
+#include "prplasma.h"
 #include "stdproctex.h"
 #include "plasma.h"
 

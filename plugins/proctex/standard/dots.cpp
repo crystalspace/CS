@@ -24,9 +24,9 @@
 #include "iutil/plugin.h"
 #include "itexture/itexloaderctx.h"
 #include "imap/services.h"
-#include "cstool/prdots.h"
 #include "csgfx/gradient.h"
 
+#include "prdots.h"
 #include "stdproctex.h"
 #include "dots.h"
 

@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Sep-2004
+	- PK added #include <ivaria/ode.h> to CS/apps/tutorial/phystut/phystut.h.
+	- PK moved the following files from cstool to plugin/proctex/standard:
+	    - prdots.cpp   / prdots.h
+	    - prfire.cpp   / prfire.h
+	    - prplasma.cpp / prplasma.h
+	    - prsky.cpp    / prsky.h
+	    - prwater.cpp  / prwater.h
 21-Sep-2004
 	- Eric Sunshine fixed a bug in the "subsystem"-related change to
 	  msvcgen/project6x.tlib on 19-Sep-2004 which caused the linker's /out:
