@@ -165,7 +165,7 @@ void csHashMap::DeleteAll ()
 
 //---------------------------------------------------------------------------
 
-csHashSet::csHashSet ()
+csHashSet::csHashSet (int size) : map (size)
 {
 }
 

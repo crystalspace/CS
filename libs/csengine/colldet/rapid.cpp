@@ -121,14 +121,16 @@ void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
   int i;
   int tri_count = 0;
   // first, count the number of triangles polyset contains
-  // @@@ If the csPolygonSet is the static thing then we
-  // should use the original polygons and not the BSP split polygons.
   for (i = 0; i < ps->GetNumPolygons () ; i++)
   {
     csPolygon3D *p = ps->GetPolygon3D (i);
-    // Handle solid walls and mirrors.
-    if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
-      tri_count += p->GetVertices ().GetNumVertices () - 2;
+    // Don't count polygons that are split. Only do CD on the original polygons.
+    if (!p->GetUnsplitPolygon ())
+    {
+      // Handle solid walls and mirrors.
+      if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
+        tri_count += p->GetVertices ().GetNumVertices () - 2;
+    }
   }
 
   if (tri_count)
@@ -140,18 +142,19 @@ void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
     for (i = 0; i < ps->GetNumPolygons () ; i++)
     {
       csPolygon3D *p = ps->GetPolygon3D (i);
-      // Handle solid walls and mirrors.
-      if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
-      {
-        // Collision detection only works with triangles.
-        int *vt = p->GetVertices ().GetVertexIndices ();
-        for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
+      if (!p->GetUnsplitPolygon ())
+        // Handle solid walls and mirrors.
+        if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
         {
-          m_pCollisionModel->AddTriangle (ps->Vwor (vt [v - 1]),
-                                          ps->Vwor (vt [v]), 
-                                          ps->Vwor (vt [0]));
+          // Collision detection only works with triangles.
+          int *vt = p->GetVertices ().GetVertexIndices ();
+          for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
+          {
+            m_pCollisionModel->AddTriangle (ps->Vwor (vt [v - 1]),
+                                            ps->Vwor (vt [v]), 
+                                            ps->Vwor (vt [0]));
+          }
         }
-      }
     }
     m_pCollisionModel->BuildHierarchy ();
   }

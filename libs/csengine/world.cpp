@@ -620,6 +620,23 @@ bool csWorld::Prepare ()
 
   CheckConsistency ();
 
+  long memory = 0;
+  long tree_memory = 0;
+  for (int i = 0 ; i < sectors.Length () ; i++)
+  {
+    csSector* s = (csSector*)sectors[i];
+    memory += Dumper::Memory (s, 0);
+    if (s->GetStaticTree ())
+    {
+      csOctree* otree = (csOctree*)(s->GetStaticTree ());
+      tree_memory += Dumper::Memory (otree, 0);
+    }
+  }
+  CsPrintf (MSG_INITIALIZATION, "World geometry is using %ld bytes.\n", memory);
+  CsPrintf (MSG_INITIALIZATION, "Octree/BSP trees are using %ld bytes.\n", tree_memory);
+  CsPrintf (MSG_INITIALIZATION, "Textures are using %ld texels.\n",
+  	Dumper::TotalTexels (textures));
+
   return true;
 }
 

@@ -402,7 +402,7 @@ private:
    */
   csPolyPlane* plane;
 
-  /*
+  /**
    * The material, this contains the texturehandle, the 3D engine texture 
    * reference (contains the handle as returned
    * by iTextureManager interface). And more.
@@ -741,12 +741,12 @@ public:
   /**
    * Set the material
    */
-  void SetMaterial(csMaterial *mat);
+  void SetMaterial (csMaterial *mat);
 
   /**
    * Get the material
    */
-  inline csMaterial *GetMaterial() const {return material;}
+  inline csMaterial* GetMaterial () const { return material; }
 
   /**
    * Return true if this polygon or the texture it uses is transparent.

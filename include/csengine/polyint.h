@@ -23,6 +23,7 @@
 #include "csgeom/poly3d.h"
 
 class csPolygonIntPool;
+class Dumper;
 
 /**
  * This class indicates what methods a class should use in order
@@ -181,6 +182,8 @@ public:
  */
 class csPolygonIntArray
 {
+  friend class Dumper;
+
 private:
   /// Array.
   csPolygonInt** polygons;

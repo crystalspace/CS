@@ -42,6 +42,7 @@ class csShadowMap
   ///
   friend class csPolyTexture;
   friend class csCurve;
+  friend class Dumper;
 
 private:
   csShadowMap* next;

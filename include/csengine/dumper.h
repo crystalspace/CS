@@ -25,11 +25,14 @@ class csVector2;
 class csPlane3;
 class csBox2;
 class csCamera;
+class csTextureList;
 class csPolyTxtPlane;
 class csPolyTreeObject;
 class csObjectStub;
 class csPolygon2D;
 class csPolygon3D;
+class csCurve;
+class csThing;
 class csPolygonSet;
 class csPolyTexture;
 class csSector;
@@ -51,6 +54,7 @@ class csLightPatchPool;
 class csQuadcube;
 class csQuadtree;
 class csQuadtreeNode;
+class csHashSet;
 
 /**
  * This class knows how to dump debug information about several
@@ -100,6 +104,17 @@ public:
   static void dump (csQuadtree* tree);
   static void dump_stubs (csOctree* octree);
   static void dump_stubs (csPolyTreeObject* ptobj);
+
+  static long Memory (csCurve* c, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csPolygon3D* p, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csPolygonSet* pset, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csThing* thing, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csSector* sect, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csBspNode* bnode, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csBspTree* btree, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csOctreeNode* onode, int verbose_level, csHashSet* done = NULL);
+  static long Memory (csOctree* otree, int verbose_level, csHashSet* done = NULL);
+  static long TotalTexels (csTextureList* txtlist);
 };
 
 #endif

@@ -8,6 +8,30 @@ The history order has been reversed so that new features are at the top.
 	  (in contrast with c-buffer which does 2D culling). It doesn't
 	  work yet though.
 	- Added 'quad3d' console command to enable the new culling system.
+	- Extended the Dumper class with a set of Memory() functions that
+	  are useful to estimate how much memory some geometry uses.
+	  It only calculates the static memory (i.e. no runtime information
+	  like light patches, or transformed coordinates, ...). And it
+	  only gives an estimate.
+	- Extended csHashSet so that you can give the size of the hashmap
+	  that is used. Also added a few example primes that can be used
+	  for good sizes.
+	- The number of estimated bytes for all world geometry and all
+	  bsp/octrees is calculated and displayed at startup.
+	  In addition the number of texels (not bytes) of all loaded
+	  textures is also displayed.
+	- Optimized csRAPIDCollider so that it only considers unsplit
+	  polygons (i.e. the original polygon and not the ones that are
+	  caused by a BSP or octree split). This speeds up CD init, speeds
+	  up CD itself and also reduces memory consumption somewhat.
+	  For the large level that I'm creating this reduced the number
+	  of triangles in the CD data from 47871 to 19294.
+	- Got a networking update to Blocks from Rene Dudfield.
+	    - New Server=yes/no option in blocks.cfg.
+	    - Blocks can now be either a server or a client.
+	    - Check out apps/blocks/todo.txt for more information.
+	  Note that this is work in progress. Currently you cannot really
+	  do a network game yet.
 13-Jul-2000
 	- Removed 'solidbsp' command from documentation.
 	- Added SetMainFrustum to csQuadTree3D to change the frustum for an

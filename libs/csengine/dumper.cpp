@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/bitset.h"
+#include "csutil/hashmap.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/polyclip.h"
@@ -31,10 +32,12 @@
 #include "csengine/quadcube.h"
 #include "csengine/lppool.h"
 #include "csengine/camera.h"
+#include "csengine/curve.h"
 #include "csengine/polytmap.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
+#include "csengine/texture.h"
 #include "csengine/polyset.h"
 #include "csengine/triangle.h"
 #include "csengine/thing.h"
@@ -663,5 +666,324 @@ void Dumper::dump_stubs (csPolyTreeObject* ptobj)
 {
   CsPrintf (MSG_DEBUG_0, "Dump csPolyTreeObject\n");
   dump_stubs_obj (ptobj->first_stub, "root", 0);
+}
+
+long Dumper::Memory (csCurve* c, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (211); alloc = true; }
+  long memory = sizeof (*c), itemmem;
+  memory += sizeof (csReversibleTransform);
+
+  csLightMap* lm = c->lightmap;
+  if (!done->In (lm))
+  {
+    done->Add (lm);
+    itemmem = sizeof (csLightMap);
+    itemmem += lm->static_lm.GetMaxSize () * 3;
+    itemmem += lm->real_lm.GetMaxSize () * 3;
+    csShadowMap* sm = lm->first_smap;
+    while (sm)
+    {
+      itemmem += lm->lm_size;
+      sm = sm->next;
+    }
+    memory += itemmem;
+    if (verbose_level > 0)
+      CsPrintf (MSG_DEBUG_0, "(curve '%s') lightmap (%ld bytes)\n",
+    	  c->GetName () ? c->GetName () : "<noname>",
+	  itemmem);
+  }
+
+  memory += sizeof (csVector3)*2*lm->lm_size;
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csPolygon3D* p, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (211); alloc = true; }
+  long memory = sizeof (*p), itemmem;
+  memory += p->vertices.max_vertices * sizeof (int);
+  if (p->material && !done->In (p->material))
+  {
+    done->Add (p->material);
+    memory += sizeof (csMaterial);
+  }
+  if (p->portal && !done->In (p->portal))
+  {
+    done->Add (p->portal);
+    itemmem = sizeof (csPortal);
+    memory += itemmem;
+    if (verbose_level > 0)
+      CsPrintf (MSG_DEBUG_0, "(poly '%s') portal (%ld bytes)\n",
+      	p->GetName () ? p->GetName () : "<noname>",
+	itemmem);
+  }
+  if (!done->In (p->plane))
+  {
+    done->Add (p->plane);
+    memory += sizeof (csPolyPlane);
+  }
+
+  // @@@ Here we assume that csMaterial are not shared.
+  // This is not true but it is a good approx.
+  itemmem = sizeof (csMaterial);
+  memory += itemmem;
+
+  csLightMapped* lmi = p->GetLightMapInfo ();
+  if (lmi && !done->In (lmi))
+  {
+    done->Add (lmi);
+    itemmem = sizeof (csLightMapped);
+    itemmem += sizeof (csPolyTexture);
+    itemmem += sizeof (csPolyTxtPlane);
+    memory += itemmem;
+    if (verbose_level > 0)
+      CsPrintf (MSG_DEBUG_0, "(poly '%s') lmi (%ld bytes)\n",
+      	p->GetName () ? p->GetName () : "<noname>",
+	itemmem);
+    csLightMap* lm = lmi->GetPolyTex ()->lm;
+    if (lm && !done->In (lm))
+    {
+      done->Add (lm);
+      itemmem = sizeof (csLightMap);
+      itemmem += lm->static_lm.GetMaxSize () * 3;
+      itemmem += lm->real_lm.GetMaxSize () * 3;
+      csShadowMap* sm = lm->first_smap;
+      while (sm)
+      {
+        itemmem += lm->lm_size;
+        sm = sm->next;
+      }
+      memory += itemmem;
+      if (verbose_level > 0)
+        CsPrintf (MSG_DEBUG_0, "(poly '%s') lightmap (%ld bytes)\n",
+      	  p->GetName () ? p->GetName () : "<noname>",
+	  itemmem);
+    }
+  }
+  csGouraudShaded* gs = p->GetGouraudInfo ();
+  if (gs && !done->In (gs))
+  {
+    done->Add (gs);
+    itemmem = sizeof (csGouraudShaded);
+    if (gs->GetUVCoords ()) itemmem += p->GetNumVertices () * sizeof (csVector2);
+    if (gs->GetColors ()) itemmem += p->GetNumVertices () * sizeof (csColor);
+    if (gs->GetStaticColors ()) itemmem += p->GetNumVertices () * sizeof (csColor);
+    memory += itemmem;
+    if (verbose_level > 0)
+      CsPrintf (MSG_DEBUG_0, "(poly '%s') gs (%ld bytes)\n",
+      	p->GetName () ? p->GetName () : "<noname>",
+	itemmem);
+  }
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csPolygonSet* pset, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (50119); alloc = true; }
+  long memory = sizeof (*pset), itemmem;
+  itemmem = pset->max_vertices * sizeof (csVector3);
+  memory += itemmem+itemmem;
+  if (verbose_level > 0)
+    CsPrintf (MSG_DEBUG_0, "(pset '%s') vertices (2*%ld)\n",
+    	pset->GetName () ? pset->GetName () : "<noname>",
+	itemmem);
+  memory += sizeof (csPolygonSetBBox);
+  int i;
+  itemmem = 0;
+  for (i = 0 ; i < pset->polygons.Length () ; i++)
+  {
+    csPolygon3D* p = pset->polygons.Get (i);
+    itemmem += Memory (p, verbose_level-1, done);
+  }
+  memory += itemmem;
+  if (verbose_level > 0)
+    CsPrintf (MSG_DEBUG_0, "(pset '%s') polygons (%ld)\n",
+    	pset->GetName () ? pset->GetName () : "<noname>",
+	itemmem);
+  itemmem = 0;
+  for (i = 0 ; i < pset->curves.Length () ; i++)
+  {
+    csCurve* c = pset->curves.Get (i);
+    itemmem += Memory (c, verbose_level-1, done);
+  }
+  memory += itemmem;
+  if (verbose_level > 0)
+    CsPrintf (MSG_DEBUG_0, "(pset '%s') curves (%ld)\n",
+    	pset->GetName () ? pset->GetName () : "<noname>",
+	itemmem);
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csThing* thing, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (50119); alloc = true; }
+  long memory = sizeof (*thing), itemmem;
+
+  // Subtract csPolygonSet size because that will be counted in the next call.
+  itemmem = Memory ((csPolygonSet*)thing, verbose_level, done) - sizeof (csPolygonSet);
+  memory += itemmem;
+  if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(thing '%s') pset (%ld bytes)\n",
+    	thing->GetName () ? thing->GetName () : "<noname>",
+	itemmem);
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csSector* sect, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (3541); alloc = true; }
+  long memory = sizeof (*sect), itemmem;
+  csThing* thing;
+  thing = sect->first_thing;
+  while (thing)
+  {
+    itemmem = Memory (thing, verbose_level-1, done);
+    memory += itemmem;
+    if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(sect '%s') thing '%s' (%ld bytes)\n",
+    	sect->GetName () ? sect->GetName () : "<noname>",
+    	thing->GetName () ? thing->GetName () : "<noname>", itemmem);
+    thing = (csThing*)(thing->GetNext ());
+  }
+  thing = sect->first_sky;
+  while (thing)
+  {
+    itemmem = Memory (thing, verbose_level-1, done);
+    memory += itemmem;
+    if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(sect '%s') sky '%s' (%ld bytes)\n",
+    	sect->GetName () ? sect->GetName () : "<noname>",
+    	thing->GetName () ? thing->GetName () : "<noname>", itemmem);
+    thing = (csThing*)(thing->GetNext ());
+  }
+  // Subtract csPolygonSet size because that will be counted in the next call.
+  itemmem = Memory ((csPolygonSet*)sect, verbose_level, done) - sizeof (csPolygonSet);
+  memory += itemmem;
+  if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(sect '%s') pset (%ld bytes)\n",
+    	sect->GetName () ? sect->GetName () : "<noname>",
+	itemmem);
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csBspNode* bnode, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (211); alloc = true; }
+  long memory = sizeof (*bnode), itemmem;
+
+  itemmem = 0;
+  if (bnode->front)
+    itemmem += Memory ((csBspNode*)bnode->front, verbose_level-1, done);
+  if (bnode->back)
+    itemmem += Memory ((csBspNode*)bnode->back, verbose_level-1, done);
+  memory += itemmem;
+  if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(octnode) children (%ld bytes)\n", itemmem);
+
+  itemmem = bnode->polygons.max * sizeof (void*);
+  memory += itemmem;
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csBspTree* btree, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (211); alloc = true; }
+  long memory = sizeof (*btree);
+  if (btree->root) memory += Memory ((csBspNode*)(btree->root), verbose_level-1, done);
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csOctreeNode* onode, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (211); alloc = true; }
+  long memory = sizeof (*onode), itemmem;
+
+  int i;
+  itemmem = 0;
+  for (i = 0 ; i < 8 ; i++)
+  {
+    if (onode->children[i])
+      itemmem += Memory ((csOctreeNode*)onode->children[i], verbose_level-1, done);
+  }
+  memory += itemmem;
+  if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(octnode) children (%ld bytes)\n", itemmem);
+
+  if (onode->minibsp)
+  {
+    itemmem = Memory (onode->minibsp, verbose_level-1, done);
+    memory += itemmem;
+    if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(octnode) bsp (%ld bytes)\n", itemmem);
+    itemmem = onode->minibsp_numverts * sizeof (int);
+    memory += itemmem;
+  }
+
+  itemmem = sizeof (csPVS);
+  csPVS& pvs = onode->pvs;
+  csOctreeVisible* ovis = pvs.GetFirst ();
+  while (ovis)
+  {
+    itemmem += sizeof (*ovis);
+    itemmem += ovis->GetPolygons ().Limit () * sizeof (void*);
+    ovis = pvs.GetNext (ovis);
+  }
+  memory += itemmem;
+  if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(octnode) pvs (%ld bytes)\n", itemmem);
+
+  itemmem = onode->unsplit_polygons.max * sizeof (void*);
+  memory += itemmem;
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::Memory (csOctree* otree, int verbose_level, csHashSet* done)
+{
+  bool alloc = false;
+  if (!done) { done = new csHashSet (211); alloc = true; }
+  long memory = sizeof (*otree);
+  if (otree->root) memory += Memory ((csOctreeNode*)(otree->root), verbose_level-1, done);
+
+  if (alloc) delete done;
+  return memory;
+}
+
+long Dumper::TotalTexels (csTextureList* txtlist)
+{
+  long texels = 0;
+
+  int i;
+  for (i = 0 ; i < txtlist->Length () ; i++)
+  {
+    iTextureHandle* handle = txtlist->Get (i)->GetTextureHandle ();
+    int mw, mh;
+    if (handle->GetMipMapDimensions (0, mw, mh))
+      texels += mw*mh;
+    if (handle->GetMipMapDimensions (1, mw, mh))
+      texels += mw*mh;
+    if (handle->GetMipMapDimensions (2, mw, mh))
+      texels += mw*mh;
+    if (handle->GetMipMapDimensions (3, mw, mh))
+      texels += mw*mh;
+  }
+
+  return texels;
 }
 

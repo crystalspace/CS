@@ -100,6 +100,7 @@ class csCurveTemplate;
 class csLightPatch;
 class csSector;
 class csRadCurve;
+class Dumper;
 struct csCoverageMatrix;
 
 /**
@@ -108,7 +109,8 @@ struct csCoverageMatrix;
 class csCurve : public csObject
 {
   // allow csRadCurve to use our UV Buffers
-  friend csRadCurve;
+  friend class csRadCurve;
+  friend class Dumper;
 
 private:
   // sector of this curve

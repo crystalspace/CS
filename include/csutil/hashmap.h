@@ -134,7 +134,11 @@ public:
   /**
    * Constructor. The parameter for the constructor
    * is the initial size of the hashtable. The best
-   * sizes are prime.
+   * sizes are prime.<br>
+   * Here are a few useful primes: 127, 211, 431, 701,
+   * 1201, 1559, 3541, 8087, 12263, 25247, 36923,
+   * 50119, 70951, 90313, 104707, ...
+   * For a bigger list go to www.utm.edu/research/primes.
    * The map will grow dynamically if needed (@@@ Not implemented yet).
    */
   csHashMap (int size = 211);
@@ -198,8 +202,11 @@ private:
   csHashMap map;
 
 public:
-  /// Construct a new empty set.
-  csHashSet ();
+  /**
+   * Construct a new empty set.
+   * The given size will be given to the hasmap.
+   */
+  csHashSet (int size = 211);
 
   /**
    * Add an object to this set.
