@@ -69,9 +69,11 @@ typedef unsigned char RGB8map[256];	// do we need entire soft_txt.h?
 #define BLENDTABLE_ADD                  0x00
 #define BLENDTABLE_MULTIPLY             0x01
 #define BLENDTABLE_MULTIPLY2            0x02
-#define BLENDTABLE_ALPHA25              0x03
-#define BLENDTABLE_ALPHA50              0x04
-#define BLENDTABLE_ALPHA75              0x05
+#define BLENDTABLE_ALPHA00              0x03
+#define BLENDTABLE_ALPHA25              0x04
+#define BLENDTABLE_ALPHA50              0x05
+#define BLENDTABLE_ALPHA75              0x06
+#define NUMBLENDINGTABLES               7
 
 //---//---//---//---//---//---//---//---//---//---//---/ Precomputed data /---//
 
@@ -225,7 +227,7 @@ struct csScanSetup
    * than maximum, BlendingTable has a twice larger SRC dimension (i.e.
    * it is a (BLENDTABLE_MAX*2 x BLENDTABLE_MAX) matrix);
    */
-  unsigned char *BlendingTable [6];
+  unsigned char *BlendingTable [NUMBLENDINGTABLES];
 };
 
 // The following should be accessible from assembly, so avoid C++ mangling

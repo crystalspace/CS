@@ -1910,7 +1910,12 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
     {
       int alpha = mode & CS_FX_MASK_ALPHA;
       if (alpha < 12)
-        pqinfo.drawline_gouraud = gouraud_proc;
+        //Please _dont't_ optimize this _again_! You can't replace a 
+        //BLENDTABLE_ALPHA00 with a pqinfo.drawline_gouraud = gouraud_proc,
+        //because gouraud_proc does not correctly handle colorkeying.
+        //so either fix gouraud_proc or leave this BLENDTABLE_ALPHA00 alone
+        //Thomas Hieber, Feb. 10th 2000
+        Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA00];
       else if (alpha < 96)
         Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA25];
       else if (alpha < 160)

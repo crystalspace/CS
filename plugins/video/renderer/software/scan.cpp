@@ -170,7 +170,7 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
   unsigned int table_size = 1 << (2 * bits + 1);
   if (bits2)
     table_size += 1 << (2 * bits2 + 1);
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < NUMBLENDINGTABLES; i++)
     CHKB (Scan.BlendingTable [i] = new unsigned char [table_size]);
 
   unsigned int index = 0;
@@ -199,6 +199,7 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
         CALC (BLENDTABLE_ADD,       dst + src);
         CALC (BLENDTABLE_MULTIPLY,  ((dst * src) + (max_val / 2)) >> max_bits);
         CALC (BLENDTABLE_MULTIPLY2, ((dst * src * 2) + (max_val / 2)) >> max_bits);
+        CALC (BLENDTABLE_ALPHA00,   src);
         CALC (BLENDTABLE_ALPHA25,   (dst + src * 3 + 2) / 4);
         CALC (BLENDTABLE_ALPHA50,   (dst + src + 1) / 2);
         CALC (BLENDTABLE_ALPHA75,   (dst * 3 + src + 2) / 4);
