@@ -12,6 +12,7 @@ chronological order.
 	  will be used for sorting alpha render priority.
 	- Jorrit optimized the alpha render priority sorter by using
 	  the new camera_origin field in csRenderMesh.
+	- Jorrit removed the unused and non-functional bcterr mesh object.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there

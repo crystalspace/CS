@@ -92,7 +92,6 @@ PLUGINS += mesh/terrbig
 endif
 PLUGINS += mesh/lghtng/object      mesh/lghtng/persist/standard
 PLUGINS += mesh/null/object        mesh/null/persist/standard
-PLUGINS += mesh/bcterr/object      mesh/bcterr/persist/standard
 PLUGINS += mesh/metagen/object
 PLUGINS += mesh/stars/object       mesh/stars/persist/standard
 PLUGINS += mesh/haze/object        mesh/haze/persist/standard
