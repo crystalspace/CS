@@ -27,7 +27,7 @@
 
 #include "cstool/prfire.h"
 
-#define NEW 0
+#define NEW_PROC 0
 
 /// the implementation of the plasma texture
 csProcFire::csProcFire () : csProcTexture()
@@ -112,7 +112,7 @@ void csProcFire::MakePalette (int max)
   int maxcolours = palsize/2;
   csColor col;
   int r,g,b;
-#if NEW
+#if NEW_PROC
   g2d = tex->GetTextureHandle ()->GetCanvas ();
   bool palette_mode = g2d->GetPixelBytes () == 1;
 #endif
@@ -131,7 +131,7 @@ void csProcFire::MakePalette (int max)
     palette[i*4+0] = r;
     palette[i*4+1] = g;
     palette[i*4+2] = b;
-#if NEW
+#if NEW_PROC
     if (palette_mode)
     {
       palette_idx[i] = i;
@@ -157,7 +157,7 @@ void csProcFire::MakePalette (int max)
     palette[i*4+0] = r;
     palette[i*4+1] = g;
     palette[i*4+2] = b;
-#if NEW
+#if NEW_PROC
     if (palette_mode)
     {
       palette_idx[i] = i;
@@ -244,7 +244,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
     fireline[x] = tot / (2*sm+1);
   }
 
-#if NEW
+#if NEW_PROC
   g2d = tex->GetTextureHandle ()->GetCanvas ();
   if (!g2d->BeginDraw ()) return;
   /// draw firetexture
