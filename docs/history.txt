@@ -1,6 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 27-Apr-2001
+	- Martin did some further work on csparser and csengine.
 	- Philip Wyett added csdemo.cfg to makefile inorder that it is
 	  generated into MSVC project workspace.
 	- Did some work on 3ds2lev:
@@ -39,6 +40,8 @@ The history order is reversed so that new features are at the top.
 	  on sequence manager time and no longer use the real time.
 	  This possibly fixes a time misalignment bug that sometimes
 	  seemed to occur when doing big time warps.
+	- Norman Kramer added saving to bmp plugin.
+	- Norman also added the ability to save tga files.
 26-Apr-2001
 	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
 	  outputs worm.dll and dog.dll.
