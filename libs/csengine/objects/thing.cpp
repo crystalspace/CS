@@ -681,9 +681,7 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
   if (do_clip_plane) pclip_plane = &clip_plane;
   else pclip_plane = NULL;
   csPlaneClip plclip;
-  bool do_plclip;
-  if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
-  else do_plclip = false;
+  bool do_plclip = icam->GetFarPlane (plclip);
 
   for (i = 0 ; i < num ; i++)
   {
@@ -868,9 +866,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  	verts, num_verts))
 	  {
       	    csPlaneClip plclip;
-      	    bool do_plclip;
-      	    if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
-      	    else do_plclip = false;
+      	    bool do_plclip = icam->GetFarPlane (plclip);
 	    if (!do_plclip || plclip.ClipPolygon (verts, num_verts))   
 	    {
                if (bsppol->DoPerspective (camtrans, verts,
@@ -942,9 +938,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     	if (do_clip_plane) pclip_plane = &clip_plane;
     	else pclip_plane = NULL;
       	csPlaneClip plclip;
-      	bool do_plclip;
-      	if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
-      	else do_plclip = false;
+      	bool do_plclip = icam->GetFarPlane (plclip);
 
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (
@@ -976,9 +970,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     	if (do_clip_plane) pclip_plane = &clip_plane;
     	else pclip_plane = NULL;
       	csPlaneClip plclip;
-      	bool do_plclip;
-      	if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
-      	else do_plclip = false;
+      	bool do_plclip = icam->GetFarPlane (plclip);
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (!(
            p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
