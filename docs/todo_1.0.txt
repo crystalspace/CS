@@ -18,6 +18,8 @@ Bugs to fix:
 	  doesn't. May be related to bug [Bug 471638].
 	- One of the halos in flarge seems to disappear in some cases
 	  with OpenGL.
+	- Walktest + newsky: it appears that there are some visibility
+	  culling problems in some rare cases.
 	- Fix radiosity so that it works again. Radiosity is currently
 	  disabled because several things had been rewritten and the
 	  radiosity code was left behind.
