@@ -140,12 +140,29 @@ csMemoryMappedIO::GetPointer(unsigned int index)
 
 #else
 
-  unsigned int i = index/cache_block_size;
+  unsigned int page = index/cache_block_size;
+  
+  if (!(*page_map)[page])
+    CachePage(page);
 
-  if (!(*page_map)[i])
-    CachePage(i);
+  // This MUST come AFTER CachPage b/c CachePage might re-orient things.
+  CacheBlock *cp = cache[page % csmmioDefaultHashSize];
 
-  return LookupIndex(i, index);
+  while(cp)
+  { 
+    if (cp->page==page)
+    {
+      // Decrease age     
+      ++cp->age;
+	      
+      return cp->data + ((index-cp->offset)*block_size);
+    }
+
+    cp=cp->next;
+  }
+
+  //Serious error! The page is marked as here, but we could not find it!
+  return NULL;
   
 #endif
 
@@ -201,26 +218,4 @@ csMemoryMappedIO::CachePage(unsigned int page)
   // Read the page from the file
   fseek(mapped_file, page*cache_block_size*block_size, SEEK_SET);
   fread(cp->data, block_size, cache_block_size, mapped_file);
-}
-
-void *
-csMemoryMappedIO::LookupIndex(unsigned int page, unsigned int index)
-{
-  CacheBlock *cp = cache[page % csmmioDefaultHashSize];
-
-  while(cp)
-  { 
-    if (cp->page==page)
-    {
-      // Decrease age     
-      ++cp->age;
-	      
-      return cp->data + ((index-cp->offset)*block_size);
-    }
-
-    cp=cp->next;
-  }
-
-  //Serious error! The page is marked as here, but we could not find it!
-  return NULL;
 }
