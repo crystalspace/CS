@@ -33,6 +33,10 @@
 #ifdef COMP_BC
 # define _strdup _fstrdup
 #endif
+#ifdef __CYGWIN__
+#include <string.h>
+# define _strdup strdup
+#endif
 
 void SystemFatalError (char *str, HRESULT hRes)
 {

@@ -1,6 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 19-Sep-2001
+	- Matze Braun <matze@braunis.de> made a cygwin port for CS.
 	- Fixed a bug in csFrustum::Classify() and BatchClassify().
 	  Unfortunatelly this does not yet fix the routine completely
 	  as there still is a test-case where it fails (returns COVERED

@@ -31,7 +31,11 @@
 #elif defined(OS_UNIX)
 #  include "cssys/unix/csosdefs.h"
 #elif defined(OS_WIN32)
-#  include "cssys/win32/csosdefs.h"
+#  if defined(__CYGWIN__)
+#    include "cssys/win32/cygosdef.h"
+#  else
+#    include "cssys/win32/csosdefs.h"
+#  endif
 #elif defined(OS_MACOS)
 #  include "cssys/mac/csosdefs.h"
 #elif defined(OS_OS2)

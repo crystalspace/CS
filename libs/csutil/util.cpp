@@ -87,6 +87,11 @@ static int __getcwd (char drive, char *buffer, int buffersize) {
 }
 #endif
 
+// cygwin doesn't behave like windows for files
+#if defined(__CYGWIN__)
+#undef OS_WIN32
+#endif
+
 #if defined (OS_OS2) || defined (OS_WIN32) && !defined(COMP_BC)
 // We need a function to retrieve current working directory on specific drive
 
@@ -291,6 +296,11 @@ bool csGlobMatches (const char *fName, const char *fMask)
   }
   return (!*fName) && (!*fMask);
 }
+
+// don't forget to revert the changes above
+#if defined(__CWGIN__)
+#define OS_WIN32
+#endif
 
 /*------------------------------------------------------------------------------
   Byte swap 32 bit data buffer
