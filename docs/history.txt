@@ -13,6 +13,15 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+10-Nov-1999
+	- Eric Sunshine performed the SCF conversion on the Win32 system-
+	  driver.  Both Thomas Hieber and Brandon Ehle made attempts to get
+	  the port to compile, however neither actually performed the SCF
+	  conversion.  Unfortunately, Brandon's changes were invalid and broke
+	  other ports.  Therefore, Eric reverted Brandon's changes and
+	  performed a real SCF conversion on the Win32 port.  (Note, however,
+	  that Eric is unable to test the conversion, so someone else will
+	  have to do so.)
 9-Nov-1999
 	- Eric Sunshine removed many, many obsolete COM references from
 	  documentation and source code comments.
