@@ -101,7 +101,8 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "video/canvas/openglcommon/iogl.h"
-
+#include "ivideo/graph2d.h"
+#include "csutil/cfgacc.h"
 
 // GL_version_1_2
 #ifndef GL_UNSIGNED_BYTE_3_3_2

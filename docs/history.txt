@@ -18,17 +18,13 @@ The history order is reversed so that new features are at the top.
 	  to aws scrollbar's setup. This enhancement was submitted by
 	  Logan Gabriel <gersh@sonn.com>. He also fixed documentation of
 	  aws scrollbat as hinted by Logan.
-	- res moved the imaging subset functions in the XML GL extensions list
-	  over to ARB_imaging. Although the subset is part of the OpenGL 1.2 spec,
-	  it states that it might not be supported by implementations. It is 
-	  indeed not supported by the ATI Catalyst drivers, causing the 
-	  GL_version_1_2 pseudo-extension to fail initialization.
 	- Matze disabled csperl5 Jamfile, until it is fixed, but I don't want to
 	  mess around here without having a working example (a working
 	  makefile).
 	- Matze separated installation path handling for Jamconfig and moved
 	  the filter stuff to the install macros.
         - JTarbox updated the event object from csVector to csArray<>
+    - res added some missing includes to glextmanager.h
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build
@@ -78,6 +74,11 @@ The history order is reversed so that new features are at the top.
 	    - Use of extensions can be enabled/disabled via config.
 	- res changed the OpenGL canvases to use the extension manager (to ease
 	  use of OpenGL extensions)
+	- res moved the imaging subset functions in the XML GL extensions list
+	  over to ARB_imaging. Although the subset is part of the OpenGL 1.2 spec,
+	  it states that it might not be supported by implementations. It is 
+	  indeed not supported by the ATI Catalyst drivers, causing the 
+	  GL_version_1_2 pseudo-extension to fail initialization.
 	- Duhprey (and also Dentoid) did the following (new renderer only):
 	    - Changed sector so the engine is now responsible for coordinating
 	      draw by setting the shader and then drawing all objects which use
