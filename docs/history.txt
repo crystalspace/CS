@@ -11,6 +11,8 @@ The history order has been reversed so that new features are at the top.
 	  GetObjectRenderPriority() and GetAlphaRenderPriority().
 	- When a new mesh object is created it will by default get object
 	  render priority.
+	- Fixed a crasher bug when cleaning up the mesh priority queues
+	  in csSector.
 9-Apr-2001
 	- Michael Voase did a slight visual change to MazeD.
 	- Michael also removed bogus comment about non existant bug

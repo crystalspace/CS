@@ -93,7 +93,7 @@ csSector::~csSector ()
   for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
   {
     csVector* m = (csVector*)mesh_priority_queues[i];
-    m->DeleteAll ();
+    if (m) m->DeleteAll ();
     delete m;
   }
   mesh_priority_queues.DeleteAll ();
