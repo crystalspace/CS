@@ -31,10 +31,19 @@ The package @file{ssh-1.2.14-win32.exe} can be downloaded by using the
 following @sc{url}:
 
 @ifnottex
-@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/ssh-1.2.14-win32.exe}
+@uref{ftp://sunsite.dk/projects/crystal/support/ssh/ssh-1.2.14-win32.exe}
 @end ifnottex
 @iftex
 @noindent
-@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{ftp://sunsite.dk/projects/crystal/support/ssh/}@*
+@code{ssh-1.2.14-win32.exe}
+@end iftex
+
+@ifnottex
+@uref{ftp://62.188.48.183/crystal_space/support/ssh/ssh-1.2.14-win32.exe}
+@end ifnottex
+@iftex
+@noindent
+@code{ftp://62.188.48.183/crystal_space/support/ssh/}@*
 @code{ssh-1.2.14-win32.exe}
 @end iftex
