@@ -14,8 +14,16 @@ chronological order.
 	  VisTest(iRenderView) takes an additional parameter, a callback to be
 	  called for all visible objects. The visnr have also been made internal
 	  to the culler (it is used to optimize culling). With the current
-	  renderer/engine implementation this callback sets a number on each mesh
-	  to be used when creating the rendering meshlist.
+	  renderer/engine implementation this callback sets a number on each
+	  mesh to be used when creating the rendering meshlist.
+	- Oktal applied a patch to cssocket from Ladislav Foldyna:
+	    - Adds an option called "loop" which controls whether multicast
+	      packets are echoed back to the host which sent them.
+	    - Adds ADD_MEMBERSHIP and DROP_MEMBERSHIP IGMP controls to the
+	      sockets to make multicast work properly.
+	    - Adds an overloaded function iNetworkConnection::Receive with
+	      and extra output parameter, "from", which gives the packet's
+	      originator's identifier, which makes multicast actually useful.
 22-Aug-2003
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
 	  const correctness in iScriptObject.

@@ -1,6 +1,10 @@
 /*
     Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
-    Written by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 2003 by Mat Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003 by Ladislav Foldyna <foldyna@unileoben.ac.at>
+    Originally written by Eric Sunshine
+    UDP support added by Mat Sutcliffe
+    Multicast support by Ladislav Foldyna, merged by Mat Sutcliffe
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,6 +30,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "csutil/util.h"
+#include "csutil/scfstr.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -126,6 +131,15 @@ bool csSocketEndPoint::SetOption (const char *name, int value)
       return false;
     }
   }
+  else if (strcasecmp (name, "loop") == 0)
+  {
+    if (setsockopt (Socket, IPPROTO_IP, IP_MULTICAST_LOOP,
+                    (char *) & value, sizeof (value)) == -1);
+    {
+      LastError = CS_NET_ERR_CANNOT_SET_OPTION;
+      return false;
+    }
+  }
   else 
   {
     LastError = CS_NET_ERR_NO_SUCH_OPTION;
@@ -137,30 +151,76 @@ bool csSocketEndPoint::SetOption (const char *name, int value)
 // csSocketConnection ---------------------------------------------------------
 
 csSocketConnection::csSocketConnection(
-  iBase* p, csNetworkSocket s, bool blocking, bool r, sockaddr addr)
-  : csSocketEndPoint(s, blocking, r), thisaddr (addr)
+  iBase* p, csNetworkSocket s, bool blocking, bool r, sockaddr addr,
+    sockaddr *maddr) : csSocketEndPoint(s, blocking, r), thisaddr (addr)
 {
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
+
+  if (maddr)
+  {
+    mcastaddr = *maddr;
+    struct sockaddr_in *thisaddr_in = (struct sockaddr_in *) &thisaddr;
+    struct sockaddr_in *mcastaddr_in = (struct sockaddr_in *) &mcastaddr;
+
+    if (ntohs (thisaddr_in->sin_port) == 0)
+    {
+      struct ip_mreq mreq;
+      mreq.imr_multiaddr.s_addr = mcastaddr_in->sin_addr.s_addr;
+      mreq.imr_interface.s_addr = htonl (INADDR_ANY);
+
+      if (bind (Socket, (const sockaddr *) & thisaddr, sizeof (thisaddr)) < 0)
+        LastError = CS_NET_ERR_CANNOT_BIND;
+      else if (setsockopt (Socket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                           (char *) & mreq, sizeof (mreq)) < 0)
+        LastError = CS_NET_ERR_CANNOT_SET_OPTION;
+      SetOption ("TTL", 1);
+      SetOption ("Loop", 0);
+    }
+  }
+  else memset (& mcastaddr, 0, sizeof(mcastaddr));
 }
 
-bool csSocketConnection::Send(const void* data, size_t nbytes)
+csSocketConnection::~csSocketConnection ()
 {
-  size_t totalsent = 0;
+  struct sockaddr_in *mcastaddr_in = (struct sockaddr_in *) & mcastaddr;
+  if (IN_MULTICAST (ntohl (mcastaddr_in->sin_addr.s_addr)))
+  {
+    struct ip_mreq mreq;
+    mreq.imr_multiaddr.s_addr = mcastaddr_in->sin_addr.s_addr;
+    mreq.imr_interface.s_addr = htonl (INADDR_ANY);
+
+    if (setsockopt (Socket, IPPROTO_IP, IP_DROP_MEMBERSHIP,
+                    (char *) & mreq, sizeof (mreq)) < 0)
+      LastError = CS_NET_ERR_CANNOT_SET_OPTION;
+  }
+}
+
+bool csSocketConnection::Send(const char* data, size_t nbytes)
+{
   if (ValidateSocket())
   {
-    do
+    size_t sent = (size_t) -1;
+    struct sockaddr_in *mcastaddr_in = (struct sockaddr_in *) & mcastaddr;
+    struct sockaddr_in *thisaddr_in = (struct sockaddr_in *) & thisaddr;
+
+    while (nbytes > 0)
     {
-      size_t sent = sendto(Socket, (char*)data + totalsent, nbytes, 0,
-        & thisaddr, sizeof(thisaddr));
-      if (sent == (size_t)-1)
+      if (ntohl (mcastaddr_in->sin_addr.s_addr) == 0)
+        sent = sendto(Socket, (char*)data, nbytes, 0,
+          & thisaddr, sizeof(thisaddr));
+      else if (ntohl (thisaddr_in->sin_addr.s_addr) == 0)
+        sent = sendto(Socket, (char*)data, nbytes, 0,
+          & mcastaddr, sizeof(mcastaddr));
+
+      if (sent == (size_t) -1)
       {
         LastError = CS_NET_ERR_CANNOT_SEND;
         return false;
       }
-      totalsent += sent;
+      data += sent;
+      nbytes -= sent;
     }
-    while (totalsent < nbytes);
     return true;
   }
   else
@@ -182,6 +242,38 @@ size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
       received = 0;
       if (CS_GETSOCKETERROR != EWOULDBLOCK)
         LastError = CS_NET_ERR_CANNOT_RECEIVE;
+    }
+  }
+  return received;
+}
+
+size_t csSocketConnection::Receive(void* buff, size_t maxbytes,
+  csRef<iString> &from)
+{
+  if (! Reliable) CS_ASSERT(IsDataWaiting ());
+  from = csPtr<iString> (new scfString);
+  size_t received = 0;
+  if (ValidateSocket())
+  {
+    struct sockaddr_in fromaddr;
+    socklen_t fromlen;
+    received = recvfrom(Socket, (char*)buff, maxbytes, 0,
+      (sockaddr *) &fromaddr, &fromlen);
+    if (received == (size_t)-1)
+    {
+      received = 0;
+      if (CS_GETSOCKETERROR != EWOULDBLOCK)
+        LastError = CS_NET_ERR_CANNOT_RECEIVE;
+    }
+    else
+    {
+      unsigned long addr = fromaddr.sin_addr.s_addr;
+      static const unsigned long bytemask = htonl (0xff);
+      from->Format ("%lu.%lu.%lu.%lu:%u",
+        (addr >> 24) & bytemask,
+        (addr >> 16) & bytemask,
+        (addr >> 8) & bytemask,
+        (addr) & bytemask, ntohs (fromaddr.sin_port));
     }
   }
   return received;
@@ -226,20 +318,26 @@ csNetworkSocket csSocketConnection::csSocket::GetSocket() const
 // csSocketListener -----------------------------------------------------------
 
 csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
-  unsigned short port, bool blockingListener, bool blockingConnection, bool r) :
-  csSocketEndPoint(s, blockingListener, r), BlockingConnection(blockingConnection)
+  unsigned short port, bool blockingListener, bool blockingConnection, bool r,
+  unsigned long mcastaddress) : csSocketEndPoint(s, blockingListener, r),
+    BlockingConnection(blockingConnection)
 {
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
 
-  struct sockaddr_in addr;
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  addr.sin_port = htons(port);
+  addr_in.sin_family = AF_INET;
+  addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr_in.sin_port = htons(port);
 
   bool ok = false;
-  if (bind(Socket, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+  if (bind(Socket, (struct sockaddr*)&addr_in, sizeof(addr_in)) == -1)
     LastError = CS_NET_ERR_CANNOT_BIND;
+  else if (mcastaddress)
+  {
+    mcast_in.sin_family = AF_INET;
+    mcast_in.sin_addr.s_addr = htonl (mcastaddress);
+    mcast_in.sin_port = htons (port);
+  }
   else if (Reliable && listen(Socket, CS_NET_LISTEN_QUEUE_SIZE) == -1)
     LastError = CS_NET_ERR_CANNOT_LISTEN;
   else
@@ -276,10 +374,20 @@ csPtr<iNetworkConnection> csSocketListener::Accept()
         struct sockaddr addr;
         socklen_t addrlen = sizeof(addr);
         addr.sa_family = AF_INET;
-        if (recvfrom(Socket, 0, 0, MSG_PEEK, & addr, & addrlen) != -1)
-          connection = new csSocketConnection (scfParent, Socket, BlockingConnection, Reliable, addr);
+
+        if (ntohl (mcast_in.sin_addr.s_addr))
+        {
+          connection = new csSocketConnection (scfParent, Socket,
+            BlockingConnection, Reliable, *(struct sockaddr *) & addr_in,
+            (struct sockaddr *) & mcast_in);
+        }
         else
-          LastError = CS_NET_ERR_CANNOT_RECEIVE;
+        {
+          if (recvfrom(Socket, 0, 0, MSG_PEEK, & addr, & addrlen) != -1)
+            connection = new csSocketConnection (scfParent, Socket, BlockingConnection, Reliable, addr);
+          else
+            LastError = CS_NET_ERR_CANNOT_RECEIVE;
+        }
       }
     }
   }
@@ -333,7 +441,7 @@ csNetworkSocket csSocketDriver::CreateSocket(bool reliable)
   return s;
 }
 
-unsigned long csSocketDriver::ResolveAddress(const char* host, short *fam)
+unsigned long csSocketDriver::ResolveAddress(const char* host)
 {
   if (host == 0 || *host == 0) host = "127.0.0.1";
   unsigned long address = ntohl(inet_addr((char*)host));
@@ -341,17 +449,14 @@ unsigned long csSocketDriver::ResolveAddress(const char* host, short *fam)
   {
     const struct hostent* const p = gethostbyname((char*)host);
     if (p != 0)
-    {
-      address = ntohl(*(unsigned long*)(p->h_addr_list[0]));
-      if (fam) *fam = p->h_addrtype;
-    }
+      return ntohl(*(unsigned long*)(p->h_addr_list[0]));
     else
     {
-      address = 0;
       LastError = CS_NET_ERR_CANNOT_RESOLVE_ADDRESS;
+      return 0;
     }
   }
-  return address;
+  else return address;
 }
 
 csPtr<iNetworkConnection> csSocketDriver::NewConnection(
@@ -387,8 +492,7 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
       LastError = CS_NET_ERR_CANNOT_PARSE_ADDRESS;
     else
     {
-      short family;
-      const unsigned long address = ResolveAddress(host, mc ? &family : 0);
+      const unsigned long address = ResolveAddress(host);
       if (address != 0)
       {
         csNetworkSocket s = CreateSocket(reliable);
@@ -396,19 +500,30 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
         {
 	  struct sockaddr_in addr;
 	  memset(&addr, 0, sizeof(addr));
-	  addr.sin_family = mc ? family : AF_INET;
-	  addr.sin_addr.s_addr = htonl(address);
-	  addr.sin_port = htons(port);
+	  addr.sin_family = AF_INET;
+          struct sockaddr_in mcast, *mcastp = 0;
           if (mc)
           {
+            mcastp = & mcast;
+            addr.sin_addr.s_addr = INADDR_ANY;
+            addr.sin_port = 0;
+            mcast.sin_family = AF_INET;
+            mcast.sin_addr.s_addr = htonl(address);
+            mcast.sin_port = htons(port);
+
             int ttl = 1;
             if (setsockopt (s, IPPROTO_IP, IP_MULTICAST_TTL,
                             (char *) & ttl, sizeof (ttl)) == -1)
               LastError = CS_NET_ERR_CANNOT_SET_OPTION;
           }
+          else
+          {
+	    addr.sin_addr.s_addr = htonl(address);
+            addr.sin_port = htons(port);
+          }
 	  if (connect(s, (struct sockaddr*)&addr, sizeof(addr)) != -1)
 	    connection = new csSocketConnection(this, s, blocking, reliable,
-              *(struct sockaddr*)&addr);
+              *(struct sockaddr*)&addr, (struct sockaddr *) mcastp);
 	  else
 	    LastError = CS_NET_ERR_CANNOT_CONNECT;
 	}
@@ -445,21 +560,19 @@ csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   else
   {
     csNetworkSocket s = CreateSocket(reliable);
-    if (mc)
-    {
-      struct ip_mreq mreq;
-      char *src = strdup (source);
-      *(src + (portstr - source)) = '\0';
-      mreq.imr_multiaddr.s_addr = ResolveAddress (source);
-      free (src);
-      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-      if (setsockopt (s, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                      (char *) & mreq, sizeof (mreq)) == -1)
-        LastError = CS_NET_ERR_CANNOT_SET_OPTION;
-    }
     if (s != CS_NET_SOCKET_INVALID)
+    {
+      unsigned long mcastaddress = 0;
+      if (mc)
+      {
+        char *src = strdup (source);
+        *(src + (portstr - source)) = '\0';
+        mcastaddress = ResolveAddress (source);
+        free (src);
+      }
       listener = new csSocketListener(this, s, port, blockingListener,
-        blockingConnection, reliable);
+        blockingConnection, reliable, mcastaddress);
+    }
   }
   return csPtr<iNetworkListener> (listener);
 }
@@ -480,7 +593,7 @@ csNetworkDriverCapabilities csSocketDriver::GetCapabilities() const
 bool csSocketDriver::PlatformDriverStart() { return true; }
 bool csSocketDriver::PlatformDriverStop()  { return true; }
 
-#else
+#else // WIN32
 
 bool csSocketDriver::PlatformDriverStart()
 {
@@ -507,7 +620,7 @@ bool csSocketDriver::PlatformDriverStop()
   return ok;
 }
 
-#endif
+#endif // WIN32
 
 bool csSocketDriver::eiEventHandler::HandleEvent (iEvent &e)
 {

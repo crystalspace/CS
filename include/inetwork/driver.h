@@ -23,6 +23,8 @@
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
+struct iString;
+
 /**
  * Potential network driver error codes.
  */
@@ -73,7 +75,7 @@ struct iNetworkEndPoint : public iBase
   /// Terminates the connection; destroying the object also auto-terminates.
   virtual void Terminate() = 0;
 
-  /// Set an option in the network implementation. For example, "TTL".
+  /// Set an option in the network implementation. See development API docs.
   virtual bool SetOption (const char *name, int value) = 0;
 
   /// Retrieve the code for the last error encountered.
@@ -90,7 +92,7 @@ SCF_VERSION (iNetworkConnection, 0, 1, 1);
 struct iNetworkConnection : public iNetworkEndPoint
 {
   /// Send nbytes of data over the connection.
-  virtual bool Send(const void* data, size_t nbytes) = 0;
+  virtual bool Send(const char* data, size_t nbytes) = 0;
 
   /// See if the connection is still connected.
   virtual bool IsConnected () const = 0;
@@ -105,6 +107,13 @@ struct iNetworkConnection : public iNetworkEndPoint
    * returns CS_NET_ERR_NO_ERROR.
    */
   virtual size_t Receive(void* buff, size_t maxbytes) = 0;
+
+  /**
+   * This version of Receive() is valid only for multicast connections.
+   *
+   * It returns a 'from' parameter indicating the sender of the data.
+   */
+  virtual size_t Receive(void* buff, size_t maxbytes, csRef<iString> &from) = 0;
 
   /**
    * This provides a lightweight alternative to bruteforce polling Receive

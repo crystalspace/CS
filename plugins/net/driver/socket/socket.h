@@ -1,6 +1,10 @@
 /*
     Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
-    Written by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 2003 by Mat Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003 by Ladislav Foldyna <foldyna@unileoben.ac.at>
+    Originally written by Eric Sunshine
+    UDP support added by Mat Sutcliffe
+    Multicast support by Ladislav Foldyna, merged by Mat Sutcliffe
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -42,7 +46,11 @@ public:
   virtual csNetworkDriverError GetLastError() const { return LastError; }
   csNetworkSocket GetSocket() const { return Socket; }
 
-  /// Supported option: "TTL": multicast packets' Time-To-Live.
+  /**
+   * Supported options:<br><ul>
+   * <li>"TTL": multicast packets' Time-To-Live.</li>
+   * <li>"Loop": bool 0 or 1 meaning multicast packets echo to sender.</li></ul>
+   */
   virtual bool SetOption (const char *name, int value);
 };
 
@@ -52,18 +60,25 @@ class csSocketConnection : public iNetworkConnection, public csSocketEndPoint
 {
   typedef csSocketEndPoint superclass;
   struct sockaddr thisaddr;
+  struct sockaddr mcastaddr;
 public:
   csSocketConnection(iBase* p, csNetworkSocket, bool blocking, bool reliable,
-    struct sockaddr addr);
-  virtual bool Send(const void* data, size_t nbytes);
+    struct sockaddr addr, struct sockaddr *mcastaddr = 0);
+  csSocketConnection::~csSocketConnection();
+  virtual bool Send(const char* data, size_t nbytes);
   virtual size_t Receive(void* buff, size_t maxbytes);
+  virtual size_t Receive(void* buff, size_t maxbytes, csRef<iString> &from);
   virtual bool IsDataWaiting() const;
   virtual void Terminate() { superclass::Terminate(); }
   virtual bool IsConnected() const;
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
 
-  /// Supported option: "TTL": multicast packets' Time-To-Live.
+  /**
+   * Supported options:<br><ul>
+   * <li>"TTL": multicast packets' Time-To-Live.</li>
+   * <li>"Loop": bool 0 or 1 meaning multicast packets echo to sender.</li></ul>
+   */
   virtual bool SetOption (const char *name, int value)
     { return superclass::SetOption (name, value); }
 
@@ -82,15 +97,22 @@ class csSocketListener : public iNetworkListener, public csSocketEndPoint
   typedef csSocketEndPoint superclass;
 protected:
   bool BlockingConnection;
+  struct sockaddr_in mcast_in;
+  struct sockaddr_in addr_in;
 public:
   csSocketListener(iBase* p, csNetworkSocket s, unsigned short port,
-    bool blockingListener, bool blockingConnection, bool reliable);
+    bool blockingListener, bool blockingConnection, bool reliable,
+    unsigned long mcastaddress);
   virtual csPtr<iNetworkConnection> Accept();
   virtual void Terminate() { superclass::Terminate(); }
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
 
-  /// Supported option: "TTL": multicast packets' Time-To-Live.
+  /**
+   * Supported options:<br><ul>
+   * <li>"TTL": multicast packets' Time-To-Live.</li>
+   * <li>"Loop": bool 0 or 1 meaning multicast packets echo to sender.</li></ul>
+   */
   virtual bool SetOption (const char *name, int value)
     { return superclass::SetOption (name, value); }
 
@@ -112,7 +134,7 @@ protected:
   bool PlatformDriverStart();
   bool PlatformDriverStop();
   csNetworkSocket CreateSocket(bool reliable);
-  unsigned long ResolveAddress(const char*, short *fam = 0);
+  unsigned long ResolveAddress(const char*);
 public:
   csSocketDriver(iBase*);
   virtual ~csSocketDriver();
