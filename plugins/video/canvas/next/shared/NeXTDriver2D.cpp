@@ -132,6 +132,7 @@ int NeXTDriver2D::determine_bits_per_sample( int simulate_depth )
     switch (simulate_depth)
 	{
 	case 15: bps = 4; break;
+	case 16: bps = 4; break; // An alias for 15-bit.
 	case 32: bps = 8; break;
 	default: bps = best_bits_per_sample(); break;
 	}

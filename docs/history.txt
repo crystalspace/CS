@@ -22,6 +22,8 @@ Short-term cleanups that need to be done:
 	- Michael Ewert fixed a nasty bug in the physiks library. Angular
 	  and linear velocity were being used in wrong frame of reference
 	  a number of times in various files.
+	- Eric Sunshine changed the NeXT 2D driver so that it understands
+	  --simdepth=16 (in addition to 15 and 32 which it already understood).
 19-Feb-2000
 	- Changed novice/average/expert menu in Blocks so that it is now
 	  one menu which you can rotate horizontally with arrow left/right
@@ -35,8 +37,8 @@ Short-term cleanups that need to be done:
 	- Seth Galbraith implemented MergeTexels for sprites.
 	- Norman Kramer moved screenshot functionality in Glide driver and
 	  also enabled the new DrawTriangleMesh.
-	- Thomas Hieber did some more documentation and cleanup of the collision
-	  detection code.
+	- Thomas Hieber did some more documentation and cleanup of the
+	  collision detection code.
 	- Thomas also added some fixed to Win32 networking by Eric Wigforss
 	  <ewigforss@novametrix.com>.
 18-Feb-2000

@@ -42,7 +42,7 @@ private:
     bool initialized;		// System initialized?
     NeXTDelegate* controller;	// Application & Window delegate.
     long ticks;			// Time of previous call to step_frame().
-    int simulated_depth;	// Simulated depth, either 15 or 32.
+    int simulated_depth;	// Simulated depth, either 15, 16, or 32.
     csIniFile* next_config;	// Platform-specific configuration options.
 
     void init_ticks() { ticks = Time(); }

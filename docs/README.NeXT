@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999,2000 by Eric Sunshine
-    2000/02/13
+    2000/02/20
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -486,6 +486,10 @@ This is a list of known problems with the current release of this project.
 
 9. History
 ----------
+2000/02/20 (15r001+CVS)
+    Added --simdepth=16 as an alias for --simdepth=15 since 15 & 16 bit result
+        in the same image accuracy on NeXT.
+
 2000/02/13 (15r001+CVS)
     Moved main menu configuration information for all Apple/NeXT platforms
         to the new configuration file "next.cfg" which is loaded at run-time.
