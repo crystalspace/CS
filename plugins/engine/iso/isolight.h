@@ -123,6 +123,7 @@ public:
   virtual float GetBrightnessAtDistance (float d)
   { return isolight->GetAttenuation(d); }
   virtual csFlags& GetFlags () { return flags; }
+  virtual bool IsDynamic() { return false; }
 };
 
 #endif

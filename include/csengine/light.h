@@ -209,6 +209,7 @@ public:
     virtual void SetRadius (float r);
     virtual const csColor& GetColor ();
     virtual void SetColor (const csColor& col);
+    virtual bool IsDynamic();
     virtual int GetAttenuation ();
     virtual void SetAttenuation (int a);
     virtual float GetBrightnessAtDistance (float d);
@@ -316,6 +317,8 @@ public:
     { return scfParent; }
     virtual iLight *QueryLight ()
     { return &scfParent->scfiLight; }
+    virtual bool IsDynamic ()
+    { return scfParent->IsDynamic (); }
   } scfiStatLight;
   friend struct eiStaticLight;
 };
