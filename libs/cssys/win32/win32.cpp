@@ -68,39 +68,6 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam
 
 //-----------------------------------------------// The System Driver //------//
 
-void SysSystemDriver::Alert (const char* s)
-{
-  bool FullScreen = false;
-  int width, height, depth;
-
-  System->GetSettings(width, height, depth, FullScreen);
-
-  if (FullScreen)
-  {
-    //If fullscreen mode is active, we switch to default screen, because
-    //otherwise this message will not be seen.
-    ChangeDisplaySettings(NULL,0);
-  }
-         
-  MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
-  debug_out (true, s);
-}
-
-void SysSystemDriver::Warn (const char* s)
-{
-  //In windows there is no safe way to display a messagebox and then continue work when
-  //you are in fullscreen mode. (If you know some way: You are welcome to change this)
-  //For the moment we will display Warning as console messages.
-  Printf (MSG_CONSOLE, "Warning:\n%s", s);
-  debug_out (true, s);
-}
-
-void SysSystemDriver::Close(void)
-{
-  csSystemDriver::Close();
-  ChangeDisplaySettings(NULL,0);
-}
-
 #ifdef DO_DINPUT_KEYBOARD
 
 /*
@@ -377,6 +344,10 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #undef CHK_FAILED
 #endif // DO_DINPUT_KEYBOARD
 
+IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iWin32SystemDriver)
+IMPLEMENT_IBASE_EXT_END
+
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   WNDCLASS wc;
@@ -391,12 +362,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.lpszClassName = WINDOWCLASSNAME;
 
   RegisterClass (&wc);
-}
-
-void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
-{
-  IMPLEMENTS_INTERFACE_COMMON (iWin32SystemDriver, (iWin32SystemDriver *)this)
-  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
 }
 
 bool SysSystemDriver::Open (const char *Title)
@@ -419,6 +384,9 @@ bool SysSystemDriver::Open (const char *Title)
 
 void SysSystemDriver::Close ()
 {
+  csSystemDriver::Close ();
+  ChangeDisplaySettings (NULL, 0);
+
 #ifdef DO_DINPUT_KEYBOARD
   if (m_hEvent)
   {
@@ -466,6 +434,33 @@ void SysSystemDriver::Loop ()
       NextFrame (elapsed, now);
     }
   }
+}
+
+void SysSystemDriver::Alert (const char* s)
+{
+  bool FullScreen = false;
+  int width, height, depth;
+
+  System->GetSettings(width, height, depth, FullScreen);
+
+  if (FullScreen)
+  {
+    //If fullscreen mode is active, we switch to default screen, because
+    //otherwise this message will not be seen.
+    ChangeDisplaySettings (NULL, 0);
+  }
+         
+  MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
+  debug_out (true, s);
+}
+
+void SysSystemDriver::Warn (const char* s)
+{
+  //In windows there is no safe way to display a messagebox and then continue work when
+  //you are in fullscreen mode. (If you know some way: You are welcome to change this)
+  //For the moment we will display Warning as console messages.
+  Printf (MSG_CONSOLE, "Warning:\n%s", s);
+  debug_out (true, s);
 }
 
 //----------------------------------------------// SCF Implementation //------//
@@ -520,7 +515,8 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
       ApplicationActive = wParam;
       break;
     case WM_ACTIVATE:
-      if (System) System->Keyboard->Reset ();
+      if (System)
+        System->QueueFocusEvent (LOWORD (wParam) != WA_INACTIVE);
       break;
     case WM_SETCURSOR:
       if (LOWORD(lParam) == HTCLIENT)
