@@ -89,7 +89,7 @@ rule ApplicationFromObjects
   }
 
   # make compiled sources a dependency of target
-  Depends exe : $(target) ;
+  Depends apps : $(target) ;
   Depends $(target) : $(>) ;
 	
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
@@ -130,4 +130,9 @@ rule Option_install
 {
   DONTINSTALL_$(<) = ;
 }
+
+# Construct pseudo target apps which is used instead of the pseudo target exe
+# in Jambase
+Depends exe : apps ;
+NotFile apps ;
 

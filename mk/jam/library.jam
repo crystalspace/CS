@@ -73,7 +73,7 @@ rule csLibraryFromObjects
   }
   else
   {
-    Depends lib : $(target) ;
+    Depends libs : $(target) ;
   }
 
   # Set LOCATE for the library and its contents.  The bound
@@ -191,4 +191,9 @@ rule Option_shared
 rule Option_static
 {
 }
+
+# Construct pseudo target libs which is used instead of the pseudo target lib
+# in Jambase
+Depends lib : libs ;
+NotFile libs ;
 

@@ -69,7 +69,7 @@ rule PluginFromObjects
   }
 
   Depends $(target) : $(>) ;
-  Depends exe : $(target) ;   
+  Depends plugins : $(target) ;   
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
 
   # Install rules
@@ -86,4 +86,9 @@ rule PluginFromObjects
   NAME on $(target) = $(<) ;
   LinkPlugin $(target) : $(>) ;
 }
+
+
+# Construct pseudo target plugins
+Depends exe : plugins ;
+NotFile plugins ;
 
