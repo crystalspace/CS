@@ -182,4 +182,6 @@ void Class::DecRef ()					\
 #define SCF_IMPLEMENT_DEFAULT_POOLRECYCLE(Class)	\
 void Class::PoolRecycle () { }
 
+/** @} */
+
 #endif // __CS_UTIL_POOLEDSCFCLASS_H__
