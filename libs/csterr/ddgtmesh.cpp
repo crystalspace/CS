@@ -86,12 +86,17 @@ ddgHeightMap *heightMap = 0;
 ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 {
 	heightMap = h;
+	_transform = NULL;
 	_bintreeMax = 2*(heightMap->cols()-1)/(ddgTBinMesh_size) * (heightMap->rows()-1)/(ddgTBinMesh_size);
 	typedef ddgTBinTree *ddgTBinTreeP;
 	_bintree = new ddgTBinTreeP[_bintreeMax];
 	_detail = 1000;
+#ifdef DDG
 	// Note Z axis is negative into the screen (Right Handed coord sys).
 	_farclip = -150;
+#else
+	_farclip = 150;
+#endif
 	_nearclip = 0;
 	_progDist = _farclip/3;
 
