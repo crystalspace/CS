@@ -29,6 +29,11 @@
 #include "csextern.h"
 #include "csgeom/math3d_d.h"
 
+#define CS_AXIS_NONE -1
+#define CS_AXIS_X 0
+#define CS_AXIS_Y 1
+#define CS_AXIS_Z 2
+
 /**
  * A 3D vector.
  */

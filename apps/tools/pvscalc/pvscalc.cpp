@@ -173,13 +173,7 @@ void PVSCalcSector::DistributePolygons (int axis, float where,
   size_t i;
   for (i = 0 ; i < polylist.Length () ; i++)
   {
-    int split = 0;
-    switch (axis)
-    {
-      case 0: split = polylist[i]->ClassifyX (where); break;
-      case 1: split = polylist[i]->ClassifyY (where); break;
-      case 2: split = polylist[i]->ClassifyZ (where); break;
-    }
+    int split = polylist[i]->ClassifyAxis (axis, where);
     if (split == CS_POL_FRONT || split == CS_POL_SPLIT_NEEDED)
       polylist_left.Push (polylist[i]);
     if (split == CS_POL_BACK || split == CS_POL_SPLIT_NEEDED)
@@ -187,32 +181,75 @@ void PVSCalcSector::DistributePolygons (int axis, float where,
   }
 }
 
+void PVSCalcSector::DistributePolygons (int axis, float where,
+	const csArray<csPoly3DAxis>& polylist,
+	csArray<csPoly3DAxis>& polylist_left,
+	csArray<csPoly3DAxis>& polylist_right)
+{
+  size_t i;
+  for (i = 0 ; i < polylist.Length () ; i++)
+  {
+    int split = polylist[i].GetPoly ()->ClassifyAxis (axis, where);
+    if (split == CS_POL_FRONT || split == CS_POL_SPLIT_NEEDED)
+      polylist_left.Push (polylist[i]);
+    if (split == CS_POL_BACK || split == CS_POL_SPLIT_NEEDED)
+      polylist_right.Push (polylist[i]);
+  }
+}
+
+float PVSCalcSector::FindBestSplitLocation (float from, float to, float& where,
+	const csArray<csPoly3DAxis>& axis_polylist)
+{
+  // Calculate center
+  where = from + (to-from) * 0.5;
+#if 0
+  float best_dist = 1000000.0;
+  float best_where = where;
+  size_t i;
+  // Find axis aligned plane that is closest to that center.
+  for (i = 0 ; i < axis_polylist.Length () ; i++)
+  {
+    float awhere = axis_polylist[i].GetWhere ();
+    printf ("i=%d awhere=%g\n", i, awhere); fflush (stdout);
+    if (awhere > from+EPSILON && awhere < to-EPSILON
+    	&& fabs (awhere-where) < best_dist)
+    {
+      best_dist = fabs (awhere-where);
+      best_where = awhere;
+    }
+  }
+  where = best_where;
+#endif
+  return to-from;
+}
+
 float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
+	const csArray<csPoly3DAxis>& axis_polylist,
 	const csBox3& bbox1, const csBox3& bbox2)
 {
   float max1 = bbox1.Max (axis);
   float min2 = bbox2.Min (axis);
   if (max1 < min2-.01)
   {
-    where = max1 + (min2-max1) * 0.5;
-    return min2-max1;
+    return FindBestSplitLocation (max1, min2, where, axis_polylist);
   }
   float min1 = bbox1.Min (axis);
   float max2 = bbox2.Max (axis);
   if (max2 < min1-.01)
   {
-    where = max2 + (min1-max2) * 0.5;
-    return min1-max2;
+    return FindBestSplitLocation (max2, min1, where, axis_polylist);
   }
   return -1.0;
 }
 
 float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
-	const csBox3& node_bbox, const csArray<csBox3>& boxlist)
+	const csBox3& node_bbox, const csArray<csPoly3DAxis>& axis_polylist,
+	const csArray<csBox3>& boxlist)
 {
   if (boxlist.Length () == 2)
   {
-    return FindBestSplitLocation (axis, where, boxlist[0], boxlist[1]);
+    return FindBestSplitLocation (axis, where, axis_polylist,
+    	boxlist[0], boxlist[1]);
   }
 
   size_t i, j;
@@ -259,6 +296,10 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     // split which we should never take.
     float qual;
     if (left == 0 || right == 0)
+    {
+      qual = -1.0;
+    }
+    else if (left == (int)boxlist.Length () || right == (int)boxlist.Length ())
     {
       qual = -1.0;
     }
@@ -345,6 +386,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
 }
 
 void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
+	const csArray<csPoly3DAxis>* axis_polylist,
 	const csBox3& bbox, bool minsize_only, int depth)
 {
   if (depth > maxdepth) maxdepth = depth;
@@ -352,56 +394,75 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   int axis;
   float where;
   csVector3 bbox_size = bbox.Max () - bbox.Min ();
-  if (minsize_only || boxlist.Length () <= 10)
+  if (minsize_only)
   {
-    // If we have 1 or less objects left then we continue splitting the
-    // node so that leafs are smaller then 'minsize'.
-    if (bbox_size.x > minsize.x)
+    float where0, where1, where2;
+    float q0 = bbox_size.x > minsize.x
+    	? FindBestSplitLocation (bbox.MinX (), bbox.MaxX (),
+		where0, axis_polylist[CS_AXIS_X])
+	: -1.0f;
+    float q1 = bbox_size.y > minsize.y
+    	? FindBestSplitLocation (bbox.MinY (), bbox.MaxY (),
+    		where1, axis_polylist[CS_AXIS_Y])
+	: -1.0f;
+    float q2 = bbox_size.z > minsize.z
+    	? FindBestSplitLocation (bbox.MinZ (), bbox.MaxZ (),
+    		where2, axis_polylist[CS_AXIS_Z])
+	: -1.0f;
+
+    if (q0 >= 0 && q0 >= q1 && q0 >= q2)
     {
-      axis = 0;
-      where = bbox.MinX () + bbox_size.x / 2;
+      axis = CS_AXIS_X;
+      where = where0;
     }
-    else if (bbox_size.y > minsize.y)
+    else if (q1 >= 0 && q1 >= q0 && q1 >= q2)
     {
-      axis = 1;
-      where = bbox.MinY () + bbox_size.y / 2;
+      axis = CS_AXIS_Y;
+      where = where1;
     }
-    else if (bbox_size.z > minsize.z)
+    else if (q2 >= 0)
     {
-      axis = 2;
-      where = bbox.MinZ () + bbox_size.z / 2;
+      axis = CS_AXIS_Z;
+      where = where2;
     }
     else
     {
       return;
     }
   }
+  else if (boxlist.Length () <= 10)
+  {
+    return;
+  }
   else
   {
     float where0, where1, where2;
-    float q0 = FindBestSplitLocation (0, where0, bbox, boxlist);
-    float q1 = FindBestSplitLocation (1, where1, bbox, boxlist);
-    float q2 = FindBestSplitLocation (2, where2, bbox, boxlist);
-    if (q0 > q1 && q0 > q2)
+    float q0 = FindBestSplitLocation (CS_AXIS_X, where0, bbox,
+    	axis_polylist[CS_AXIS_X], boxlist);
+    float q1 = FindBestSplitLocation (CS_AXIS_Y, where1, bbox,
+    	axis_polylist[CS_AXIS_Y], boxlist);
+    float q2 = FindBestSplitLocation (CS_AXIS_Z, where2, bbox,
+    	axis_polylist[CS_AXIS_Z], boxlist);
+    if (q0 >= 0 && q0 >= q1 && q0 >= q2)
     {
-      axis = 0;
+      axis = CS_AXIS_X;
       where = where0;
     }
-    else if (q1 > q0 && q1 > q2)
+    else if (q1 >= 0 && q1 >= q0 && q1 >= q2)
     {
-      axis = 1;
+      axis = CS_AXIS_Y;
       where = where1;
     }
     else if (q2 >= 0)
     {
-      axis = 2;
+      axis = CS_AXIS_Z;
       where = where2;
     }
     else
     {
       // All options are bad. Here we mark the traversal so that
       // we only continue to split for minsize.
-      BuildKDTree (node, boxlist, bbox, true, depth);
+      BuildKDTree (node, boxlist, axis_polylist, bbox, true, depth);
       return;	// No good split location.
     }
   }
@@ -410,13 +471,26 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   void* child2;
   csBox3 box1, box2;
   bbox.Split (axis, where, box1, box2);
+
   csArray<csBox3> boxlist_left;
   csArray<csBox3> boxlist_right;
   DistributeBoxes (axis, where, boxlist, boxlist_left, boxlist_right);
+
+  csArray<csPoly3DAxis> axis_polylist_left[3];
+  csArray<csPoly3DAxis> axis_polylist_right[3];
+  DistributePolygons (axis, where, axis_polylist[CS_AXIS_X],
+  	axis_polylist_left[CS_AXIS_X], axis_polylist_right[CS_AXIS_X]);
+  DistributePolygons (axis, where, axis_polylist[CS_AXIS_Y],
+  	axis_polylist_left[CS_AXIS_Y], axis_polylist_right[CS_AXIS_Y]);
+  DistributePolygons (axis, where, axis_polylist[CS_AXIS_Z],
+  	axis_polylist_left[CS_AXIS_Z], axis_polylist_right[CS_AXIS_Z]);
+
   pvstree->SplitNode (node, axis, where, child1, child2);
   countnodes += 2;
-  BuildKDTree (child1, boxlist_left, box1, minsize_only, depth+1);
-  BuildKDTree (child2, boxlist_right, box2, minsize_only, depth+1);
+  BuildKDTree (child1, boxlist_left, axis_polylist_left, box1,
+  	minsize_only, depth+1);
+  BuildKDTree (child2, boxlist_right, axis_polylist_right, box2,
+  	minsize_only, depth+1);
 }
 
 void PVSCalcSector::BuildKDTree ()
@@ -431,7 +505,7 @@ void PVSCalcSector::BuildKDTree ()
   }
   countnodes = 1;
   maxdepth = 0;
-  BuildKDTree (root, boxes, bbox, false, 0);
+  BuildKDTree (root, boxes, axis_polygons, bbox, false, 0);
   totalnodes = countnodes;
 }
 
@@ -476,19 +550,19 @@ void PVSCalcSector::BuildShadowTreePolygons (PVSPolygonNode* node,
   float q0 = FindBestSplitLocation (0, where0, bbox_node, polygons);
   float q1 = FindBestSplitLocation (1, where1, bbox_node, polygons);
   float q2 = FindBestSplitLocation (2, where2, bbox_node, polygons);
-  if (q0 > q1 && q0 > q2)
+  if (q0 >= 0 && q0 >= q1 && q0 >= q2)
   {
-    node->axis = 0;
+    node->axis = CS_AXIS_X;
     node->where = where0;
   }
-  else if (q1 > q0 && q1 > q2)
+  else if (q1 >= 0 && q1 >= q0 && q1 >= q2)
   {
-    node->axis = 1;
+    node->axis = CS_AXIS_Y;
     node->where = where1;
   }
   else if (q2 >= 0)
   {
-    node->axis = 2;
+    node->axis = CS_AXIS_Z;
     node->where = where2;
   }
   else
@@ -656,9 +730,23 @@ void PVSCalcSector::SortPolygonsOnSize ()
   }
   polygons = sorted_polygons;
 
-  parent->ReportInfo ("Average polygon area %g, min %g, max %g\n",
+  parent->ReportInfo ("Average polygon area %g, min %g, max %g",
   	float (total_area / double (polygons_with_area.Length ())),
 	min_area, max_area);
+}
+
+void PVSCalcSector::ExtractAxisAlignedPolygons ()
+{
+  size_t i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    float where;
+    int axis = polygons[i].IsAxisAligned (where);
+    if (axis != CS_AXIS_NONE)
+    {
+      axis_polygons[axis].Push (csPoly3DAxis (&polygons[i], where));
+    }
+  }
 }
 
 bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
@@ -677,7 +765,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 	sdx > dsy &&
 	sdx > dsz)
   {
-    axis = 0;
+    axis = CS_AXIS_X;
     where = dest.MinX ();
     where_other = source.MaxX ();
     return true;
@@ -689,7 +777,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 	dsx > dsy &&
 	dsx > dsz)
   {
-    axis = 0;
+    axis = CS_AXIS_X;
     where = dest.MaxX ();
     where_other = source.MinX ();
     return true;
@@ -701,7 +789,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 	sdy > dsy &&
 	sdy > dsz)
   {
-    axis = 1;
+    axis = CS_AXIS_Y;
     where = dest.MinY ();
     where_other = source.MaxY ();
     return true;
@@ -713,7 +801,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 	dsy > dsx &&
 	dsy > dsz)
   {
-    axis = 1;
+    axis = CS_AXIS_Y;
     where = dest.MaxY ();
     where_other = source.MinY ();
     return true;
@@ -725,7 +813,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 	sdz > dsy &&
 	sdz > dsz)
   {
-    axis = 2;
+    axis = CS_AXIS_Z;
     where = dest.MinZ ();
     where_other = source.MaxZ ();
     return true;
@@ -737,7 +825,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 	dsz > dsx &&
 	dsz > dsy)
   {
-    axis = 2;
+    axis = CS_AXIS_Z;
     where = dest.MaxZ ();
     where_other = source.MinZ ();
     return true;
@@ -1023,7 +1111,14 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   // traversing to the children so we only skip the testing part.
   if (!dest.Overlap (source))
   {
-    //if ((source.MaxZ()<5 && dest.MinZ()>5) || (source.MinZ()>5 && dest.MaxZ()<5))
+    DB(("\nTEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g)\n",
+	source.MinX (), source.MinY (), source.MinZ (),
+	source.MaxX (), source.MaxY (), source.MaxZ (),
+	dest.MinX (), dest.MinY (), dest.MinZ (),
+	dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
+
+    //float pz = 5;
+    //if ((source.MaxZ()<pz && dest.MinZ()>pz) || (source.MinZ()>pz && dest.MaxZ()<pz))
       //printf ("####################################################\n");
     //else
       //printf ("----------------------------------------------------\n");
@@ -1031,12 +1126,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
     // other.
     if (!NodesSurelyVisible (source, dest))
     {
-      DB(("\nTEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g)\n",
-	source.MinX (), source.MinY (), source.MinZ (),
-	source.MaxX (), source.MaxY (), source.MaxZ (),
-	dest.MinX (), dest.MinY (), dest.MinZ (),
-	dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
-
+      DB(("TEST\n"));
       // If the projection plane failed to set up we still have to test
       // children.
       if (SetupProjectionPlane (source, dest))
@@ -1129,6 +1219,7 @@ void PVSCalcSector::Calculate ()
 {
   parent->ReportInfo ("Calculating PVS for '%s'!",
   	sector->QueryObject ()->GetName ());
+  fflush (stdout);
 
   const csBox3& bbox = pvstree->GetBoundingBox ();
   parent->ReportInfo ("Total box (from culler) %g,%g,%g  %g,%g,%g",
@@ -1163,6 +1254,10 @@ void PVSCalcSector::Calculate ()
   // big polygons during visibility calculation.
   SortPolygonsOnSize ();
 
+  // Extract all axis aligned polygons. These will be useful during
+  // kd-tree building.
+  ExtractAxisAlignedPolygons ();
+
   parent->ReportInfo ("Total box (all geometry) %g,%g,%g  %g,%g,%g",
   	allbox.MinX (), allbox.MinY (), allbox.MinZ (),
   	allbox.MaxX (), allbox.MaxY (), allbox.MaxZ ());
@@ -1175,6 +1270,10 @@ void PVSCalcSector::Calculate ()
   	staticpcount, meta_polygons.Length (), allpcount);
   parent->ReportInfo ("%d static polygons have area larger then %g",
   	polygons.Length (), min_polygon_area);
+  parent->ReportInfo ("Aligned polygons: x %d, y %d, and z %d",
+  	axis_polygons[CS_AXIS_X].Length (),
+  	axis_polygons[CS_AXIS_Y].Length (),
+  	axis_polygons[CS_AXIS_Z].Length ());
   fflush (stdout);
 
   // From all geometry (static and dynamic) we now build the KDtree

@@ -932,19 +932,19 @@ public:
   {
     switch (axis)
     {
-      case 0:
+      case CS_AXIS_X:
         bl.Set (minbox.x, minbox.y, minbox.z,
       	        where,    maxbox.y, maxbox.z);
         br.Set (where,    minbox.y, minbox.z,
       	        maxbox.x, maxbox.y, maxbox.z);
         break;
-      case 1:
+      case CS_AXIS_Y:
         bl.Set (minbox.x, minbox.y, minbox.z,
       	        maxbox.x, where,    maxbox.z);
         br.Set (minbox.x, where,    minbox.z,
       	        maxbox.x, maxbox.y, maxbox.z);
         break;
-      case 2:
+      case CS_AXIS_Z:
         bl.Set (minbox.x, minbox.y, minbox.z,
       	        maxbox.x, maxbox.y, where);
         br.Set (minbox.x, minbox.y, where,

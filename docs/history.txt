@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Feb-2005
+	- Jorrit added csPoly3D::ClassifyAxis().
+	- Jorrit added constants CS_AXIS_X, CS_AXIS_Y, and CS_AXIS_Z, to
+	  replace the values 0, 1, and 2. There is also a CS_AXIS_NONE
+	  which has the value of -1.
+	- Jorrit added csPoly3D::IsAxisAligned() to test if a polygon
+	  is axis aligned.
+	- Jorrit made pvscalc kdtree calculation better. Also did a first
+	  attempt to use the axis aligned polygons present in the level
+	  to optimize the kdtree building. Not fully implemented yet.
 16-Feb-2005
 	- Jorrit significantly improved PVS quality by fixing the polygon
 	  clipper so that the orientation of the polygon clipper is

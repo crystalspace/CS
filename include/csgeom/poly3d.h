@@ -197,15 +197,16 @@ public:
    * point in space. Fills the given 2D polygon with the projection
    * on the plane. This function assumes that there actually is
    * a projection. Plane_nr is 0 for the X plane, 1 for Y, and 2 for Z.
+   * Or one of the CS_AXIX_ constants.
    */
   bool ProjectAxisPlane (const csVector3& point, int plane_nr,
 	float plane_pos, csPoly2D* poly2d) const
   {
     switch (plane_nr)
     {
-      case 0: return ProjectXPlane (point, plane_pos, poly2d);
-      case 1: return ProjectYPlane (point, plane_pos, poly2d);
-      case 2: return ProjectZPlane (point, plane_pos, poly2d);
+      case CS_AXIS_X: return ProjectXPlane (point, plane_pos, poly2d);
+      case CS_AXIS_Y: return ProjectYPlane (point, plane_pos, poly2d);
+      case CS_AXIS_Z: return ProjectZPlane (point, plane_pos, poly2d);
     }
     return false;
   }
@@ -240,6 +241,26 @@ public:
 
   /// Same as Classify() but for Z plane only.
   int ClassifyZ (float z) const;
+
+  /// Same as Classify() but for a given axis plane.
+  int ClassifyAxis (int axis, float where) const
+  {
+    switch (axis)
+    {
+      case CS_AXIS_X: return ClassifyX (where);
+      case CS_AXIS_Y: return ClassifyY (where);
+      case CS_AXIS_Z: return ClassifyZ (where);
+    }
+    return 0;
+  }
+
+  /**
+   * Test if this polygon is axis aligned and return
+   * the axis (one of CS_AXIS_ constants). The location
+   * of the axis is returned in 'where'.
+   * Returns CS_AXIS_NONE if the polygon is not axis aligned.
+   */
+  int IsAxisAligned (float& where) const;
 
   /// Cut this polygon with a plane and only keep the front side.
   void CutToPlane (const csPlane3& split_plane);

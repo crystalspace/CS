@@ -85,6 +85,26 @@ public:
 };
 
 /**
+ * An axis aligned polygon used during kdtree building.
+ */
+class csPoly3DAxis
+{
+private:
+  csPoly3DBox* poly;
+  // Axis is implicit because the polygons are kept in seperate arrays.
+  float where;
+
+public:
+  csPoly3DAxis (csPoly3DBox* poly, float where)
+  {
+    csPoly3DAxis::poly = poly;
+    csPoly3DAxis::where = where;
+  }
+  csPoly3DBox* GetPoly () const { return poly; }
+  float GetWhere () const { return where; }
+};
+
+/**
  * Every PVSCalcNode leaf (see below) will keep a kdtree of polygons
  * in that leaf.
  */
@@ -220,8 +240,15 @@ private:
 
   // All static polygons. Will be sorted on size.
   csArray<csPoly3DBox> polygons;
+
   // All world boxes for all objects. Will be used for calculating kdtree.
   csArray<csBox3> boxes;
+
+  /**
+   * All axis aligned polygons. This will be used during KDtree building
+   * for better kdtree quality.
+   */
+  csArray<csPoly3DAxis> axis_polygons[3];
 
   // Projection plane information.
   PVSCalcProjectionPlane plane;
@@ -231,15 +258,21 @@ private:
 	const csArray<csBox3>& boxlist,
 	csArray<csBox3>& boxlist_left,
 	csArray<csBox3>& boxlist_right);
-  /// Distribute a set of polygons to left right.
+  /// Distribute a set of polygons to left/right.
   static void DistributePolygons (int axis, float where,
 	const csArray<csPoly3DBox*>& polylist,
 	csArray<csPoly3DBox*>& polylist_left,
 	csArray<csPoly3DBox*>& polylist_right);
+  /// Distribute a set of axis aligned polygons to left/right.
+  static void DistributePolygons (int axis, float where,
+	const csArray<csPoly3DAxis>& polylist,
+	csArray<csPoly3DAxis>& polylist_left,
+	csArray<csPoly3DAxis>& polylist_right);
 
   /// Build the kdtree.
   void BuildKDTree ();
   void BuildKDTree (void* node, const csArray<csBox3>& boxlist,
+	const csArray<csPoly3DAxis>* axis_polylist,
 	const csBox3& bbox, bool minsize_only, int depth);
 
   /**
@@ -269,18 +302,34 @@ private:
   bool NodesSurelyVisible (const csBox3& source, const csBox3& dest);
 
   /**
+   * Find a good split between 'from' and 'to' for the given
+   * axis aligned polygons. The best split is the one that is closest
+   * to the center between from and to. If there are no polygons
+   * in the list the center location is returned.
+   */
+  static float FindBestSplitLocation (float from, float to, float& where,
+	const csArray<csPoly3DAxis>& axis_polylist);
+
+  /**
    * Try to find a split between two boxes along an axis and return the
    * quality of that split. This is used for the building of the kdtree.
+   * 'axis_polylist' is a list of polygons that are axis aligned with
+   * the current axis.
    */
   static float FindBestSplitLocation (int axis, float& where,
+	const csArray<csPoly3DAxis>& axis_polylist,
 	const csBox3& bbox1, const csBox3& bbox2);
 
   /**
    * Try to find the best split location for a number of boxes.
    * This is used for the building of the kdtree.
+   * 'axis_polylist' is a list of polygons that are axis aligned with
+   * the current axis.
    */
   static float FindBestSplitLocation (int axis, float& where,
-	const csBox3& node_bbox, const csArray<csBox3>& boxlist);
+	const csBox3& node_bbox,
+	const csArray<csPoly3DAxis>& axis_polylist,
+	const csArray<csBox3>& boxlist);
 
   /**
    * Try to find the best split location for a number of boxes.
@@ -292,6 +341,9 @@ private:
 
   /// Sort all polygons on size.
   void SortPolygonsOnSize ();
+
+  /// Extract all axis aligned polygons.
+  void ExtractAxisAlignedPolygons ();
 
   /**
    * Given two boxes, calculate the best plane to use for projecting

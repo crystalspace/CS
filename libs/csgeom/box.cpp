@@ -797,9 +797,9 @@ bool csBox3::ProjectOutline (const csVector3& origin,
     csVector2 v;
     switch (axis)
     {
-      case 0: v.x = isect.y; v.y = isect.z; break;
-      case 1: v.x = isect.x; v.y = isect.z; break;
-      case 2: v.x = isect.x; v.y = isect.y; break;
+      case CS_AXIS_X: v.x = isect.y; v.y = isect.z; break;
+      case CS_AXIS_Y: v.x = isect.x; v.y = isect.z; break;
+      case CS_AXIS_Z: v.x = isect.x; v.y = isect.y; break;
     }
     poly.Push (v);
   }
@@ -824,9 +824,9 @@ bool csBox3::ProjectOutline (const csVector3& origin,
       return false;
     switch (axis)
     {
-      case 0: poly[i].x = isect.y; poly[i].y = isect.z; break;
-      case 1: poly[i].x = isect.x; poly[i].y = isect.z; break;
-      case 2: poly[i].x = isect.x; poly[i].y = isect.y; break;
+      case CS_AXIS_X: poly[i].x = isect.y; poly[i].y = isect.z; break;
+      case CS_AXIS_Y: poly[i].x = isect.x; poly[i].y = isect.z; break;
+      case CS_AXIS_Z: poly[i].x = isect.x; poly[i].y = isect.y; break;
     }
   }
   return true;

@@ -228,6 +228,37 @@ int csPoly3D::ClassifyZ (float z) const
   return CS_POL_SPLIT_NEEDED;
 }
 
+int csPoly3D::IsAxisAligned (float& where) const
+{
+  bool ax = true, ay = true, az = true;
+  const csVector3& a = vertices[0];
+  size_t i;
+  for (i = 1 ; i < vertices.Length () ; i++)
+  {
+    const csVector3& b = vertices[i];
+    csVector3 d = a-b;
+    if (fabs (d.x) > SMALL_EPSILON)
+    {
+      ax = false;
+      if (!ay && !az) return CS_AXIS_NONE;
+    }
+    if (fabs (d.y) > SMALL_EPSILON)
+    {
+      ay = false;
+      if (!ax && !az) return CS_AXIS_NONE;
+    }
+    if (fabs (d.z) > SMALL_EPSILON)
+    {
+      az = false;
+      if (!ax && !ay) return CS_AXIS_NONE;
+    }
+  }
+  if (ax) { where = a.x; return CS_AXIS_X; }
+  if (ay) { where = a.y; return CS_AXIS_Y; }
+  if (az) { where = a.z; return CS_AXIS_Z; }
+  return CS_AXIS_NONE;
+}
+
 void csPoly3D::SplitWithPlane (
   csPoly3D &poly1,
   csPoly3D &poly2,
