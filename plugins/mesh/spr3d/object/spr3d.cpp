@@ -1715,11 +1715,14 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
       if (cur_displacement <= 0) tween_ratio = 0;
       else tween_ratio = cur_displacement /
         (cur_action->GetFrameDisplacement (cur_frame)/speedfactor);
+      last_time = current_time; // probably not 100% accurate
     }
   }
   else
+  {
+    last_time = current_time;
     tween_ratio = 0;
-
+  }
 //  printf("Disp: %1.4f Frame #%d TweenDisp:%1.4f  Tween:%1.4f\n",save_displacement,cur_frame,last_displacement,tween_ratio);
 
   return ret;
