@@ -645,6 +645,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Description = *cspacec::csVector2_Description;
 *Set = *cspacec::csVector2_Set;
 *Get = *cspacec::csVector2_Get;
 *Norm = *cspacec::csVector2_Norm;
@@ -707,6 +708,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Description = *cspacec::csVector3_Description;
 *Cross = *cspacec::csVector3_Cross;
 *__add_ass__ = *cspacec::csVector3___add_ass__;
 *__subtr_ass__ = *cspacec::csVector3___subtr_ass__;
@@ -2387,6 +2389,7 @@ sub new {
 *Set = *cspacec::csBox2_Set;
 *SetMin = *cspacec::csBox2_SetMin;
 *SetMax = *cspacec::csBox2_SetMax;
+*Description = *cspacec::csBox2_Description;
 *__add_ass__ = *cspacec::csBox2___add_ass__;
 *__mult_ass__ = *cspacec::csBox2___mult_ass__;
 *TestIntersect = *cspacec::csBox2_TestIntersect;
@@ -2461,6 +2464,7 @@ sub new {
 *Set = *cspacec::csBox3_Set;
 *SetMin = *cspacec::csBox3_SetMin;
 *SetMax = *cspacec::csBox3_SetMax;
+*Description = *cspacec::csBox3_Description;
 *Split = *cspacec::csBox3_Split;
 *TestSplit = *cspacec::csBox3_TestSplit;
 *AdjacentX = *cspacec::csBox3_AdjacentX;
