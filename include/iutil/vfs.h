@@ -88,13 +88,16 @@ struct csFileTime
 #define	VFS_STATUS_NOSPACE	2
 /// Not enough system resources
 #define VFS_STATUS_RESOURCES	3
-/// Access denied: either you have no write access, or readonly filesystem
+/**
+ * Access denied: either you have no write access, the filesystem is read-only
+ * your you tried to read a file opened for write access
+ */
 #define VFS_STATUS_ACCESSDENIED	4
 /// An error occured during reading or writing data
 #define VFS_STATUS_IOERROR	5
 /** @} */
 
-SCF_VERSION (iFile, 0, 0, 2);
+SCF_VERSION (iFile, 1, 0, 0);
 
 /// A replacement for FILE type in the virtual file space.
 struct iFile : public iBase
@@ -121,14 +124,27 @@ struct iFile : public iBase
   virtual size_t GetPos () = 0;
 
   /**
-   * This function is intended for VFS internal use only. It is not guaranteed
-   * to work for all file types (currently it works only for archive files)
+   * Request whole content of the file as a single data buffer.
+   * \param nullterm Set this to true if you want a null char to be appended
+   *  to the buffer (e.g. for use with string functions.)
+   * \remarks Null-termination might have a performance penalty (dependent on
+   *  where the file is stored.) Use only when needed.
+   * \return The complete data contained in the file, or NULL if this doesn't 
+   *  support this function (e.g. write-opened VFS files.) Don't modify the 
+   *  contained data!
    */
-  virtual csPtr<iDataBuffer> GetAllData () = 0;
+  virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
+
+  /**
+   * Set new file pointer.
+   * \param newpos New position in file.
+   * \return Whether the position was successfully changed.
+   */
+  virtual bool SetPos (size_t newpos) = 0;
 };
 
 
-SCF_VERSION (iVFS, 0, 0, 6);
+SCF_VERSION (iVFS, 1, 0, 0);
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -191,13 +207,19 @@ struct iVFS : public iBase
   virtual csPtr<iFile> Open (const char *FileName, int Mode) = 0;
 
   /**
-   * Get an entire file at once. You should DecRef() returned data
-   * after usage. This is more effective than opening files and reading
-   * the file in blocks.  Note that the returned buffer is always null-
-   * terminated (so that it can be conveniently used with string functions)
-   * but the extra null-terminator is not counted as part of the returned size.
+   * Get an entire file at once. This is more effective than opening files 
+   * and reading the file in blocks.  Note that the returned buffer can 
+   * be null-terminated (so that it can be conveniently used with string 
+   * functions) but the extra null-terminator is not counted as part of the 
+   * returned size.
+   * \param FileName VFS path of the file to be read.
+   * \param nullterm Null-terminate the returned buffer.
+   * \return Interface to the contained data.
+   * \remarks Null-termination might have a performance penalty (dependent on
+   *  where the file is stored.) Use only when needed.
    */
-  virtual csPtr<iDataBuffer> ReadFile (const char *FileName) = 0;
+  virtual csPtr<iDataBuffer> ReadFile (const char *FileName,
+    bool nullterm = true) = 0;
   /// Write an entire file in one pass.
   virtual bool WriteFile (const char *Name, const char *Data, size_t Size) = 0;
 

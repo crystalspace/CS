@@ -80,10 +80,9 @@ csRef<iDocumentNode> csTinyDocWrapper::GetRoot ()
 
 const char* csTinyDocWrapper::Parse (iFile* file)
 {
-  char *buf = new char[file->GetSize()];
-  file->Read (buf, file->GetSize());
-  const char *ret = Parse (buf);
-  delete[] buf;
+  csRef<iDataBuffer> buf = csPtr<iDataBuffer>
+    (file->GetAllData (true));
+  const char *ret = Parse (buf->GetData());
   return ret;
 }
 

@@ -1578,9 +1578,8 @@ csRef<iDocumentNode> csBinaryDocument::GetRoot ()
 
 const char* csBinaryDocument::Parse (iFile* file)
 {
-  csRef<csDataBuffer> newBuffer = csPtr<csDataBuffer> 
-    (new csDataBuffer(file->GetSize()));
-  file->Read ((char*)newBuffer->GetData(), file->GetSize());
+  csRef<iDataBuffer> newBuffer = csPtr<iDataBuffer> 
+    (file->GetAllData());
   return Parse (newBuffer);
 }
 

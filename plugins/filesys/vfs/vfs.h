@@ -24,7 +24,7 @@
 #include "csutil/csstrvec.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
-#include "iutil/comp.h"
+#include "iutil/comp.h"		  
 
 class VfsNode;
 struct iConfigFile;
@@ -69,8 +69,9 @@ public:
   /// Query current file pointer
   virtual size_t GetPos () = 0;
   /// Get entire file data at once, if possible, or NULL
-  virtual csPtr<iDataBuffer> GetAllData ();
-
+  virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
+  /// Set new file pointer
+  virtual bool SetPos (size_t newpos) = 0;
 protected:
   friend class csVFS;
 };
@@ -171,7 +172,7 @@ public:
    * terminated (so that it can be conveniently used with string functions)
    * but the extra null-terminator is not counted as part of the returned size.
    */
-  virtual csPtr<iDataBuffer> ReadFile (const char *FileName);
+  virtual csPtr<iDataBuffer> ReadFile (const char *FileName, bool nullterm);
   /// Write an entire file in one pass.
   virtual bool WriteFile (const char *FileName, const char *Data, size_t Size);
 

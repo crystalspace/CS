@@ -27,6 +27,7 @@
 #define CS_SYSDEF_PROVIDE_MKDIR
 #define CS_SYSDEF_PROVIDE_UNLINK
 #define CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
+#define CS_SYSDEF_PROVIDE_HARDWARE_MMIO 1
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "vfs.h"
@@ -57,11 +58,23 @@ class DiskFile : public csFile
 
   // The file
   FILE *file;
+  // Contains the complete file, if GetAllData() was called
+  csRef<iDataBuffer> alldata;
   // constructor
   DiskFile(int Mode, VfsNode* ParentNode, int RIndex, const char* NameSuffix);
   // set Error according to errno
   void CheckError ();
+  // whether this file was opened for writing or reading
+  bool writemode;
+  // 'real-world' path of this file
+  char *fName;
+  // position in the data buffer
+  size_t fpos;
+  // whether alldata is null-terminated
+  bool buffernt;
 
+  // attempt to create a file mapping buffer from this file
+  iDataBuffer* TryCreateMapping ();
 public:
   SCF_DECLARE_IBASE;
 
@@ -79,6 +92,10 @@ public:
   virtual size_t GetPos ();
   /// Clear file error after queriyng status
   virtual int GetStatus ();
+  /// Set file position
+  virtual bool SetPos (size_t newpos);
+  /// Get all data
+  virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
 private:
   // Create a directory or a series of directories starting from PathBase
   void MakeDir (const char *PathBase, const char *PathSuffix);
@@ -98,6 +115,8 @@ class ArchiveFile : public csFile
   void *fh;
   // file data (for read mode)
   char *data;
+  // buffer, where read mode data is contained
+  csRef<iDataBuffer> databuf;
   // current data pointer
   size_t fpos;
   // constructor
@@ -120,7 +139,9 @@ public:
   /// Query current file pointer
   virtual size_t GetPos ();
   /// Get all the data at once
-  virtual csPtr<iDataBuffer> GetAllData ();
+  virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  /// Set current file pointer
+  virtual bool SetPos (size_t newpos);
 };
 
 class VfsArchive : public csArchive
@@ -321,12 +342,53 @@ int csFile::GetStatus ()
   return rc;
 }
 
-csPtr<iDataBuffer> csFile::GetAllData ()
+// ------------------------------------------------------------ DiskFile --- //
+
+#ifdef CS_HAS_MEMORY_MAPPED_IO
+bool MemoryMapFile(mmioInfo*, char const* filename);
+void UnMemoryMapFile(mmioInfo*);
+
+class csMMapDataBuffer : public iDataBuffer
 {
-  return 0;
+  mmioInfo mapping;
+  bool status;
+public:
+  SCF_DECLARE_IBASE;
+
+  csMMapDataBuffer (const char* filename);
+  virtual ~csMMapDataBuffer ();
+
+  bool GetStatus() { return status; }
+
+  virtual size_t GetSize () const { return mapping.file_size; };
+  virtual char* GetData () const { return (char*)mapping.data; };
+};
+
+SCF_IMPLEMENT_IBASE (csMMapDataBuffer)
+  SCF_IMPLEMENTS_INTERFACE (iDataBuffer);
+SCF_IMPLEMENT_IBASE_END
+
+csMMapDataBuffer::csMMapDataBuffer (const char* filename)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+
+  status = MemoryMapFile (&mapping, filename);
+  if (!status)
+  {
+    mapping.data = NULL; 
+    mapping.file_size = 0;
+  }
 }
 
-// ------------------------------------------------------------ DiskFile --- //
+csMMapDataBuffer::~csMMapDataBuffer ()
+{
+  if (status)
+  {
+    UnMemoryMapFile (&mapping);
+  }
+}
+
+#endif
 
 SCF_IMPLEMENT_IBASE (DiskFile)
   SCF_IMPLEMENTS_INTERFACE (iFile)
@@ -339,6 +401,13 @@ SCF_IMPLEMENT_IBASE_END
 #define VFS_READ_MODE	(O_RDONLY | O_BINARY)
 #define VFS_WRITE_MODE	(O_CREAT | O_TRUNC | O_WRONLY | O_BINARY)
 
+// files above this size are attempted to be mapped into memory, 
+// instead of accessed via 'normal' file operations
+#define VFS_DISKFILE_MAPPING_THRESHOLD_MIN	    1 //0
+// same as above, but upper size limit
+#define VFS_DISKFILE_MAPPING_THRESHOLD_MAX	    0 //256*1024*1024
+// disabled for now.
+
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
@@ -346,7 +415,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
   size_t nsl = strlen (NameSuffix);
-  char *fName = new char [rpl + nsl + 1];
+  fName = new char [rpl + nsl + 1];
   memcpy (fName, rp, rpl);
   memcpy (fName + rpl, NameSuffix, nsl + 1);
 
@@ -356,29 +425,30 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     if (fName [rpl + n] == VFS_PATH_SEPARATOR)
       fName [rpl + n] = PATH_SEPARATOR;
 
+  writemode = (Mode & VFS_FILE_MODE) == VFS_FILE_WRITE;
+
   int t;
   for (t = 1; t <= 2; t++)
   {
 #ifdef VFS_DEBUG
     printf ("VFS: Trying to open disk file \"%s\"\n", fName);
 #endif
-    file = fopen (fName, (Mode & VFS_FILE_MODE) == VFS_FILE_WRITE ? "wb":"rb");
+    file = fopen (fName, writemode ? "wb" : "rb");
     if (file || (t != 1))
-      break;
-    char *lastps = strrchr (NameSuffix, VFS_PATH_SEPARATOR);
-    if (!lastps)
       break;
 
     // we don't need to create a directory if we only want to read
     if ((Mode & VFS_FILE_MODE) == VFS_FILE_READ)
+      break;
+    
+    char *lastps = strrchr (NameSuffix, VFS_PATH_SEPARATOR);
+    if (!lastps)
       break;
 
     *lastps = 0;
     MakeDir (rp, NameSuffix);
     *lastps = VFS_PATH_SEPARATOR;
   }
-
-  delete [] fName;
 
   if (!file)
     CheckError ();
@@ -399,6 +469,20 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   if (file)
     printf ("VFS: Successfully opened, handle = %d\n", fileno (file));
 #endif
+
+  if ((Error == VFS_STATUS_OK) && (!writemode) && 
+    (Size >= VFS_DISKFILE_MAPPING_THRESHOLD_MIN) &&
+    (Size <= VFS_DISKFILE_MAPPING_THRESHOLD_MAX))
+  {
+    alldata = csPtr<iDataBuffer> (TryCreateMapping ());
+    if (alldata)
+    {
+      fclose (file);
+      file = NULL;
+      SetPos (0);
+      buffernt = false;
+    }
+  }
 }
 
 DiskFile::~DiskFile ()
@@ -412,6 +496,7 @@ DiskFile::~DiskFile ()
 
   if (file)
     fclose (file);
+  delete [] fName;
 }
 
 void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
@@ -530,18 +615,44 @@ void DiskFile::CheckError ()
 
 size_t DiskFile::Read (char *Data, size_t DataSize)
 {
-  size_t rc = fread (Data, 1, DataSize, file);
-  if (rc < DataSize)
-    CheckError ();
-  return rc;
+  if (writemode)
+  {
+    Error = VFS_STATUS_ACCESSDENIED;
+    return 0;
+  }
+  else
+  {
+    if (file)
+    {
+      size_t rc = fread (Data, 1, DataSize, file);
+      if (rc < DataSize)
+	CheckError ();
+      return rc;
+    }
+    else
+    {
+      size_t rc = MIN (DataSize, Size - fpos);
+      memcpy (Data, (void*)(alldata->GetData() + fpos), rc);
+      fpos += rc;
+      return rc;
+    }
+  }
 }
 
 size_t DiskFile::Write (const char *Data, size_t DataSize)
 {
-  size_t rc = fwrite (Data, 1, DataSize, file);
-  if (rc < DataSize)
-    CheckError ();
-  return rc;
+  if (!writemode)
+  {
+    Error = VFS_STATUS_ACCESSDENIED;
+    return 0;
+  }
+  else
+  {
+    size_t rc = fwrite (Data, 1, DataSize, file);
+    if (rc < DataSize)
+      CheckError ();
+    return rc;
+  }
 }
 
 void DiskFile::Flush ()
@@ -552,12 +663,118 @@ void DiskFile::Flush ()
 
 bool DiskFile::AtEOF ()
 {
-  return feof (file);
+  if (file)
+  {
+    return feof (file);
+  }
+  else
+  {
+    return (fpos >= Size);
+  }
 }
 
 size_t DiskFile::GetPos ()
 {
-  return ftell (file);
+  if (file)
+  {
+    return ftell (file);
+  }
+  else
+  {
+    return fpos;
+  }
+}
+
+bool DiskFile::SetPos (size_t newpos)
+{
+  if (file)
+  {
+    return (fseek (file, newpos, SEEK_SET) == 0);
+  }
+  else
+  {
+    fpos = (newpos > Size) ? Size : newpos;
+    return true;
+  }
+}
+
+csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
+{
+// retrieve file contents
+
+  // refuse to work when writing
+  if (!writemode)
+  {
+    // do we already have everything?
+    if (!alldata)
+    {
+      iDataBuffer* newbuf = NULL;
+      // attempt to create file mapping
+      size_t oldpos = GetPos();
+      if (!nullterm)
+      {
+	newbuf = TryCreateMapping ();
+      }
+      // didn't succeed or not supported -
+      // old style readin'
+      if (!newbuf)
+      {
+	SetPos (0);
+
+	char* data = new char [Size + 1];
+	csDataBuffer* dbuf = new csDataBuffer (data, Size);
+	Read (data, Size);
+	*((char*)data + Size) = 0;
+
+	newbuf = dbuf;
+      }
+      // close file, set correct pos
+      fclose (file);
+      file = NULL;
+      SetPos (oldpos);
+      // setup buffer.
+      alldata = csPtr<iDataBuffer> (newbuf);
+      buffernt = nullterm;
+    }
+    else
+    {
+      // The data was already read.
+      if (nullterm && !buffernt)
+      {
+	// However, a null-terminated buffer is requested,
+	// but this one isn't yet - copy data, append null
+	char* data = new char [Size + 1];
+	csDataBuffer* dbuf = new csDataBuffer (data, Size);
+	memcpy (data, alldata->GetData(), Size);
+	*((char*)data + Size) = 0;
+	// discard old buffer
+	alldata = csPtr<iDataBuffer> (dbuf);
+
+        buffernt = nullterm;
+      }
+    }
+    return csPtr<iDataBuffer> (alldata);
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+iDataBuffer* DiskFile::TryCreateMapping ()
+{
+#ifdef CS_HAS_MEMORY_MAPPED_IO  
+  csMMapDataBuffer* buf = new csMMapDataBuffer (fName);
+  if (buf->GetStatus())
+  {
+    return buf;
+  }
+  else
+  {
+    delete buf;
+  }
+#endif
+  return NULL;
 }
 
 // --------------------------------------------------------- ArchiveFile --- //
@@ -592,7 +809,10 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
     if (Archive->Writing == 0)
       Archive->Flush ();
     if ((data = Archive->Read (NameSuffix, &Size)))
+    {
       Error = VFS_STATUS_OK;
+      databuf = csPtr<iDataBuffer> (new csDataBuffer (data, Size));
+    }
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
   {
@@ -611,7 +831,6 @@ ArchiveFile::~ArchiveFile ()
   printf ("VFS: Closing some file from archive \"%s\"\n", Archive->GetName ());
 #endif
 
-  delete [] data;
   if (fh)
     Archive->Writing--;
   Archive->DecRef ();
@@ -619,16 +838,29 @@ ArchiveFile::~ArchiveFile ()
 
 size_t ArchiveFile::Read (char *Data, size_t DataSize)
 {
-  size_t sz = DataSize;
-  if (fpos + sz > Size)
-    sz = Size - fpos;
-  memcpy (Data, data + fpos, sz);
-  fpos += sz;
-  return sz;
+  if (data)
+  {
+    size_t sz = DataSize;
+    if (fpos + sz > Size)
+      sz = Size - fpos;
+    memcpy (Data, data + fpos, sz);
+    fpos += sz;
+    return sz;
+  }
+  else
+  {
+    Error = VFS_STATUS_ACCESSDENIED;
+    return 0;
+  }
 }
 
 size_t ArchiveFile::Write (const char *Data, size_t DataSize)
 {
+  if (data)
+  {
+    Error = VFS_STATUS_ACCESSDENIED;
+    return 0;
+  }
   if (!Archive->Write (fh, Data, DataSize))
   {
     Error = VFS_STATUS_NOSPACE;
@@ -656,13 +888,29 @@ size_t ArchiveFile::GetPos ()
   return fpos;
 }
 
-csPtr<iDataBuffer> ArchiveFile::GetAllData ()
+bool ArchiveFile::SetPos (size_t newpos)
 {
-  iDataBuffer *db = new csDataBuffer (data, Size);
-  data = NULL;
-  fpos = 0;
-  Size = 0;
-  return csPtr<iDataBuffer> (db);
+  if (data)
+  {
+    fpos = (newpos > Size) ? Size : newpos;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
+{
+  if (data)
+  {
+    return csPtr<iDataBuffer> (databuf);
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 // ------------------------------------------------------------- VfsNode --- //
@@ -1560,14 +1808,14 @@ bool csVFS::Sync ()
   return (ArchiveCache->Length () == 0);
 }
 
-csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName)
+csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 {
   csRef<iFile> F (Open (FileName, VFS_FILE_READ));
   if (!F)
     return 0;
 
   size_t Size = F->GetSize ();
-  csRef<iDataBuffer> data (F->GetAllData ());
+  csRef<iDataBuffer> data (F->GetAllData (nullterm));
   if (data)
   {
     return csPtr<iDataBuffer> (data);

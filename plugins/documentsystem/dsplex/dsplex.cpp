@@ -22,11 +22,13 @@
 #include "csutil/util.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "csutil/databuf.h"
 #include "iutil/document.h"
 #include "iutil/databuff.h"
 #include "iutil/plugin.h"
 #include "iutil/objreg.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
 
 #include "dsplex.h"
 
@@ -101,6 +103,8 @@ csRef<iDocumentNode> csPlexDocument::GetRoot ()
 
 const char* csPlexDocument::Parse (iFile* file)
 {
+  size_t oldpos = file->GetPos ();
+
   int pluginnum = 0;
   csRef<iDocumentSystem> DS;
   wrappedDoc = NULL;
@@ -108,6 +112,7 @@ const char* csPlexDocument::Parse (iFile* file)
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
     csRef<iDocument> doc = DS->CreateDocument();
+    file->SetPos (oldpos);
     const char* err = doc->Parse (file);
     if (!err)
     {

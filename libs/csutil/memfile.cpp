@@ -32,7 +32,7 @@ int csMemFile::GetStatus() { return VFS_STATUS_OK; }
 void csMemFile::Flush() {}
 bool csMemFile::AtEOF() { return (cursor >= size); }
 size_t csMemFile::GetPos() { return cursor; }
-void csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; }
+bool csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; return true; }
 
 csMemFile::csMemFile() :
   disposition(DISPOSITION_FREE), buffer(0), capacity(0), size(0), cursor(0)
@@ -114,24 +114,12 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
   return written;
 }
 
-csPtr<iDataBuffer> csMemFile::GetAllData()
+csPtr<iDataBuffer> csMemFile::GetAllData(bool nullterm)
 {
-  char *data = buffer;
-  if (buffer && disposition == DISPOSITION_FREE)
-  {
-    data = new char [size];
-    memcpy (data, buffer, size);
-    free (buffer);
-  }
+  char* data = new char [size + 1];
+  memcpy (data, buffer, size);
+  *(data + size) = 0;
   iDataBuffer *db = new csDataBuffer (data, size);
-  // Set disposition to 'DELETE' so that if Write() is called later on,
-  // memory allocated for it will be correctly deallocated.  Do not use
-  // 'IGNORE' here.
-  disposition = DISPOSITION_FREE;
-  buffer = NULL;
-  capacity = 0;
-  size = 0;
-  cursor = 0;
   return csPtr<iDataBuffer> (db);
 }
 

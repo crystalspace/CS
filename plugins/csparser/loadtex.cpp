@@ -52,7 +52,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
       Format = CS_IMGFMT_TRUECOLOR;
   }
 
-  csRef<iDataBuffer> buf (VFS->ReadFile (fname));
+  csRef<iDataBuffer> buf (VFS->ReadFile (fname, false));
   if (!buf || !buf->GetSize ())
   {
     ReportWarning (

@@ -67,13 +67,14 @@ public:
   /// Query current cursor position
   virtual size_t GetPos();
   /// Set current cursor position
-  virtual void SetPos(size_t);
+  virtual bool SetPos(size_t);
 
   /**
    * Get entire file data in one go.
-   * When you're done call DecRef().
+   * Creates a copy of the data, so changing the file won't affect any
+   * buffers previously returned by this function. 
    */
-  virtual csPtr<iDataBuffer> GetAllData();
+  virtual csPtr<iDataBuffer> GetAllData(bool nullterm = false);
   /**
    * Returns a pointer to the memory buffer.  May return NULL if memory file
    * is empty.  Use GetSize() for size info.
