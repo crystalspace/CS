@@ -130,8 +130,8 @@ TO_INSTALL.EXE += $(FOOBAR.EXE)
 # This section defines files used by this module.
 DIR.FOOBAR = path/to/foobar
 OUT.FOOBAR = $(OUT)/$(DIR.FOOBAR)
-INC.FOOBAR = $(wildcard $(SRCDIR)/$(DIR.FOOBAR)/*.h)
-SRC.FOOBAR = $(wildcard $(SRCDIR)/$(DIR.FOOBAR)/*.cpp)
+INC.FOOBAR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.FOOBAR)/*.h))
+SRC.FOOBAR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.FOOBAR)/*.cpp))
 OBJ.FOOBAR = $(addprefix $(OUT.FOOBAR)/,$(notdir $(SRC.FOOBAR:.cpp=$O)))
 # Customise the following line.
 DEP.FOOBAR = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
@@ -171,6 +171,7 @@ ifeq ($(MAKESECTION),targets)
 
 # For GUI applications (omit for plugins).
 build.foobar: $(OUTDIRS) $(FOOBAR.EXE)
+
 $(FOOBAR.EXE): $(DEP.EXE) $(OBJ.FOOBAR) $(LIB.FOOBAR)
 	$(DO.LINK.EXE)
 
@@ -185,7 +186,7 @@ $(FOOBAR): $(OBJ.FOOBAR) $(LIB.FOOBAR)
 	$(DO.PLUGIN)
 
 # Rule to build foobar object files from foobar source code.
-$(OUT.FOOBAR)/%$O: $(DIR.FOOBAR)/%.cpp
+$(OUT.FOOBAR)/%$O: $(SRCDIR)/$(DIR.FOOBAR)/%.cpp
 	$(DO.COMPILE.CPP) $(FOOBAR.CFLAGS)
 
 # Cleanup generated resources for applications (omit for plugins)

@@ -6,6 +6,12 @@ The history order is reversed so that new features are at the top.
 8-May-2003
 	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
 	  specifying its SCF dependency properly.
+	- Eric Sunshine fixed bugs in the new stdpt.mak (standard procedural
+	  textures) makefile which prevented it from working correctly when
+	  the build directory differs from the source directory; and when
+	  building in static-link mode.
+	- Eric Sunshine fixed a couple $(SRCDIR)-related problems in
+	  CS/mk/template.mak.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no
