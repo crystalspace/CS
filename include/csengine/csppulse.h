@@ -37,18 +37,19 @@
  * objects in different parts of a program and have them appear to the user as
  * representing a single computational operation, without having to manually
  * pass around state information.  To animate the pulse object, call the
- * Step() method each time a unit of work has been completed.  Upon
- * construction, a '-' is printed.  At each step a backspace (\b) followed by
- * one of the pulse characters (-, \, |, or /) is printed.  When the object is
- * destroyed it prints a backspace, followed by a space (' '), followed by one
- * more backspace.
+ * Step() method each time a unit of work has been completed.  At each step a
+ * backspace (\b) followed by one of the pulse characters (-, \, |, or /) is
+ * printed, except for the very first step, in which case the backspace is
+ * omitted.  If Step() was called at any time during the object's life time,
+ * then when it is destroyed, it it prints a backspace, followed by a space
+ * (' '), followed by one more backspace.
  */
 class csProgressPulse : public csBase
 {
 private:
   int type;	// One of MSG_INITIALIZATION, MSG_CONSOLE, MSG_STDOUT, etc.
   int state;
-  void Step(char const* prefix);
+  bool inherit_global_state;
 
 public:
   csProgressPulse(bool inherit_global_state = false);

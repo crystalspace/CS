@@ -25,29 +25,32 @@ static char const ANIMATION[] = "-\\|/";
 int const ANIMATION_COUNT = sizeof(ANIMATION) / sizeof(ANIMATION[0]) - 1;
 
 static int GLOBAL_STATE = 0;
+int const NO_STATE = -1;
 
-csProgressPulse::csProgressPulse(bool inherit_global_state) :
-  type(MSG_INITIALIZATION), state(0)
+csProgressPulse::csProgressPulse(bool inherit) :
+  type(MSG_INITIALIZATION), state(NO_STATE), inherit_global_state(inherit)
 {
-  if (inherit_global_state)
-    state = GLOBAL_STATE;
-  Step("");
 }
 
 csProgressPulse::~csProgressPulse()
 {
-  CsPrintf (type, "\b \b");
-  GLOBAL_STATE = state;
-}
-
-void csProgressPulse::Step(char const* prefix)
-{
-  CsPrintf (type, "%s%c", prefix, ANIMATION[state]);
-  if (++state >= ANIMATION_COUNT)
-    state = 0;
+  if (state != NO_STATE)
+  {
+    CsPrintf (type, "\b \b");
+    GLOBAL_STATE = state;
+  }
 }
 
 void csProgressPulse::Step()
 {
-  Step("\b");
+  char const* prefix = "\b";
+  if (state == NO_STATE)
+  {
+    prefix = "";
+    state = (inherit_global_state ? GLOBAL_STATE : 0);
+  }
+
+  CsPrintf (type, "%s%c", prefix, ANIMATION[state]);
+  if (++state >= ANIMATION_COUNT)
+    state = 0;
 }
