@@ -60,6 +60,9 @@ chronological order.
 	  to the polygon in csPolyTexture).
 	- Jorrit removed 4 bytes for every polygon (removed lightmap_up_to_date
 	  field which was actually not needed).
+	- Eric Sunshine augmented the OpenAL check in configure.ac so that it
+	  utilizes -ldl (if available).  This seems to be needed by Suse 7.3
+	  Linux.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.

@@ -1536,6 +1536,7 @@ AC_DEFUN([CS_AL_INCLUDE],
 
 AC_DEFUN([CS_CHECK_LIBOPENAL],
     [AC_REQUIRE([CS_CHECK_LOCAL_INCLUDE])
+    AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 	[AC_LANG_PROGRAM(
 	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
@@ -1552,7 +1553,7 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
 	[$cs_use_local_include $cs_cv_sys_pthread_cflags],
 	[$cs_use_local_lib $cs_cv_sys_pthread_lflags],
-	[$cs_cv_sys_pthread_libs])])
+	[$cs_cv_sys_pthread_libs $cs_cv_libdl_libs])])
 
 CS_CHECK_LIBOPENAL
 
