@@ -32,20 +32,20 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-#LIBS._oglsvga+=-L$(X11_PATH)/lib -lXext -lX11
+#LIBS._OGLSVGA+=-L$(X11_PATH)/lib -lXext -lX11
 
 # The driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  oglsvga=$(OUTDLL)oglsvga$(DLL)
-  LIBS.OGLSVGA=$(LIBS._oglsvga)
+  OGLSVGA=$(OUTDLL)oglsvga$(DLL)
+  LIBS.OGLSVGA=$(LIBS._OGLSVGA)
   DEP.OGLSVGA=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  oglsvga=$(OUT)$(LIB_PREFIX)oglsvga$(LIB)
-  DEP.EXE+=$(oglsvga)
-  LIBS.EXE+=$(LIBS._oglsvga) $(CSUTIL.LIB) $(CSSYS.LIB)
+  OGLSVGA=$(OUT)$(LIB_PREFIX)oglsvga$(LIB)
+  DEP.EXE+=$(OGLSVGA)
+  LIBS.EXE+=$(LIBS._OGLSVGA) $(CSUTIL.LIB) $(CSSYS.LIB)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OGLSVGA
 endif
-DESCRIPTION.$(oglsvga) = $(DESCRIPTION.OGLSVGA)
+DESCRIPTION.$(OGLSVGA) = $(DESCRIPTION.oglsvga)
 SRC.OGLSVGA = $(wildcard plugins/video/canvas/openglx/svga/*.cpp)
 OBJ.OGLSVGA = $(addprefix $(OUT),$(notdir $(SRC.OGLSVGA:.cpp=$O)))
 
@@ -60,13 +60,13 @@ vpath %.cpp plugins/video/canvas/openglx/svga
 # Chain rules
 clean: oglsvgaclean
 
-oglsvga: $(OUTDIRS) $(oglsvga)
+oglsvga: $(OUTDIRS) $(OGLSVGA)
 
-$(oglsvga): $(OBJ.OGLSVGA) $(DEP.OGLSVGA)
+$(OGLSVGA): $(OBJ.OGLSVGA) $(DEP.OGLSVGA)
 	$(DO.PLUGIN) $(LIBS.OGLSVGA)
 
 oglsvgaclean:
-	$(RM) $(oglsvga) $(OBJ.OGLSVGA) $(OUTOS)oglsvga.dep
+	$(RM) $(OGLSVGA) $(OBJ.OGLSVGA) $(OUTOS)oglsvga.dep
  
 ifdef DO_DEPEND
 dep: $(OUTOS)oglsvga.dep

@@ -32,24 +32,24 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-#LIBS._oglglide+=-L$(X11_PATH)/lib -lXext -lX11
+#LIBS._OGLGLIDE+=-L$(X11_PATH)/lib -lXext -lX11
 
 CFLAGS.OGLGLIDE+=-I/usr/include/glide -I/usr/local/glide/include
-LIBS._oglglide+=-lglide2x
+LIBS._OGLGLIDE+=-lglide2x
 
 # The driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  oglglide=$(OUTDLL)oglglide$(DLL)
-  LIBS.OGLGLIDE=$(LIBS._oglglide)
-#  LIBS.OGLGLIDE=$(LIBS._oglglide) $(CSUTIL.LIB) $(CSSYS.LIB)
+  OGLGLIDE=$(OUTDLL)oglglide$(DLL)
+  LIBS.OGLGLIDE=$(LIBS._OGLGLIDE)
+#  LIBS.OGLGLIDE=$(LIBS._OGLGLIDE) $(CSUTIL.LIB) $(CSSYS.LIB)
   DEP.OGLGLIDE=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  oglglide=$(OUT)$(LIB_PREFIX)oglglide$(LIB)
-  DEP.EXE+=$(oglglide)
-  LIBS.EXE+=$(LIBS._oglglide) $(CSUTIL.LIB) $(CSSYS.LIB)
+  OGLGLIDE=$(OUT)$(LIB_PREFIX)oglglide$(LIB)
+  DEP.EXE+=$(OGLGLIDE)
+  LIBS.EXE+=$(LIBS._OGLGLIDE) $(CSUTIL.LIB) $(CSSYS.LIB)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OGLGLIDE
 endif
-DESCRIPTION.$(oglglide) = $(DESCRIPTION.OGLGLIDE)
+DESCRIPTION.$(OGLGLIDE) = $(DESCRIPTION.oglglide)
 SRC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.cpp)
 OBJ.OGLGLIDE = $(addprefix $(OUT),$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
 
@@ -63,16 +63,16 @@ ifeq ($(MAKESECTION),targets)
 # Chain rules
 clean: oglglideclean
 
-oglglide: $(OUTDIRS) $(oglglide)
+oglglide: $(OUTDIRS) $(OGLGLIDE)
 
 $(OUT)%$O: plugins/video/canvas/openglx/glide/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.OGLGLIDE)
  
-$(oglglide): $(OBJ.OGLGLIDE) $(DEP.OGLGLIDE)
+$(OGLGLIDE): $(OBJ.OGLGLIDE) $(DEP.OGLGLIDE)
 	$(DO.PLUGIN) $(LIBS.OGLGLIDE)
 
 oglglideclean:
-	$(RM) $(oglglide) $(OBJ.OGLGLIDE) $(OUTOS)oglglide.dep
+	$(RM) $(OGLGLIDE) $(OBJ.OGLGLIDE) $(OUTOS)oglglide.dep
  
 ifdef DO_DEPEND
 dep: $(OUTOS)oglglide.dep
