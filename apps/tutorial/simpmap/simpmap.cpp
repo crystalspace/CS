@@ -322,8 +322,6 @@ int main (int argc, char* argv[])
 {
   simple = new Simple ();
 
-    setupsig ();
-  
   if (simple->Initialize (argc, argv))
     simple->Start ();
 

@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.tbconv = Crystal Space Big Terrain Conversion Tool
+DESCRIPTION.tbconvert = Crystal Space Big Terrain Conversion Tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make tbconv       Make the $(DESCRIPTION.tbconv)$"
+APPHELP += $(NEWLINE)echo $"  make tbconvert    Make the $(DESCRIPTION.tbconvert)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: tbconv tbconvclean
+.PHONY: tbconvert tbconvertclean
 
-all apps: tbconv
-tbconv:
+all apps: tbconvert
+tbconvert:
 	$(MAKE_TARGET)
-tbconvclean:
+tbconvertclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -25,7 +25,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/tbconv
+vpath %.cpp apps/tools/tbconvert
 
 TBCONVERT.EXE = tbconvert$(EXE)
 INC.TBCONVERT = $(wildcard apps/tools/tbconv/*.h)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: tbconv tbconvclean
+.PHONY: build.tbconvert tbconvertclean
 
 all: $(TBCONVERT.EXE)
-tbconv: $(OUTDIRS) $(TBCONVERT.EXE)
-clean: tbconvclean
+build.tbconvert: $(OUTDIRS) $(TBCONVERT.EXE)
+clean: tbconvertclean
 
 $(TBCONVERT.EXE): $(DEP.EXE) $(OBJ.TBCONVERT) $(LIB.TBCONVERT)
 	$(DO.LINK.EXE)
 
-tbconvclean:
+tbconvertclean:
 	-$(RM) $(TBCONVERT.EXE) $(OBJ.TBCONVERT)
 
 ifdef DO_DEPEND

@@ -70,6 +70,7 @@
 #include "cssys/getopt.h"
 #include "cssys/sysfunc.h"
 #include "cssys/system.h"
+#include "cssys/sockets.h"
 #endif
 
 // CS Interfaces
