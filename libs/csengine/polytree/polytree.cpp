@@ -20,6 +20,7 @@
 #include "csengine/polytree.h"
 #include "csengine/polygon.h"
 #include "csengine/treeobj.h"
+#include "csengine/bspbbox.h"
 #include "csengine/engine.h"
 #include "cssys/csendian.h"
 #include "ivfs.h"
@@ -29,12 +30,12 @@ csPolygonTreeNode::~csPolygonTreeNode ()
 {
   while (first_stub || todo_stubs)
     if (first_stub)
-      csPolyTreeObject::stub_pool.Free (first_stub);
+      csPolyTreeBBox::stub_pool.Free (first_stub);
     else
-      csPolyTreeObject::stub_pool.Free (todo_stubs);
+      csPolyTreeBBox::stub_pool.Free (todo_stubs);
 }
 
-void csPolygonTreeNode::UnlinkStub (csObjectStub* ps)
+void csPolygonTreeNode::UnlinkStub (csPolygonStub* ps)
 {
   if (!ps->node) return;
   if (ps->next_tree) ps->next_tree->prev_tree = ps->prev_tree;
@@ -50,7 +51,7 @@ void csPolygonTreeNode::UnlinkStub (csObjectStub* ps)
   ps->node = NULL;
 }
 
-void csPolygonTreeNode::LinkStubTodo (csObjectStub* ps)
+void csPolygonTreeNode::LinkStubTodo (csPolygonStub* ps)
 {
   if (ps->node) return;
   ps->next_tree = todo_stubs;
@@ -60,7 +61,7 @@ void csPolygonTreeNode::LinkStubTodo (csObjectStub* ps)
   ps->node = this;
 }
 
-void csPolygonTreeNode::LinkStub (csObjectStub* ps)
+void csPolygonTreeNode::LinkStub (csPolygonStub* ps)
 {
   if (ps->node) return;
   ps->next_tree = first_stub;
@@ -73,7 +74,7 @@ void csPolygonTreeNode::LinkStub (csObjectStub* ps)
 void* csPolygonTreeNode::TraverseObjects (csThing* thing, 
 	const csVector3& /*pos*/, csTreeVisitFunc* func, void* data)
 {
-  csObjectStub* stub;
+  csPolygonStub* stub;
   void* rc;
   stub = first_stub;
   while (stub)
@@ -85,9 +86,9 @@ void* csPolygonTreeNode::TraverseObjects (csThing* thing,
   return NULL;
 }
 
-void csPolygonTree::AddObject (csPolyTreeObject* obj)
+void csPolygonTree::AddObject (csPolyTreeBBox* obj)
 {
-  csObjectStub* stub = obj->GetBaseStub ();
+  csPolygonStub* stub = obj->GetBaseStub ();
   root->LinkStubTodo (stub);
   obj->LinkStub (stub);
   stub->IncRef ();

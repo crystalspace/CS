@@ -762,22 +762,51 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
 
 //---------------------------------------------------------------------------
 
+csPolygonStubPool csPolyTreeBBox::stub_pool;
 csPolygonStubFactory csPolyTreeBBox::stub_fact (&csBspPolygon::GetPolygonPool());
 
-csPolyTreeBBox::csPolyTreeBBox () : csDetailedPolyTreeObject (&stub_fact)
+csPolyTreeBBox::csPolyTreeBBox ()
 {
-  base_stub = (csPolygonStub*)csDetailedPolyTreeObject::stub_pool.Alloc (&stub_fact);
+  first_stub = NULL;
+  base_stub = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.
   is_cam_transf = false;
 }
 
 csPolyTreeBBox::~csPolyTreeBBox ()
 {
+  RemoveFromTree ();
   if (base_stub)
   {
-    csDetailedPolyTreeObject::stub_pool.Free (base_stub);
-    csDetailedPolyTreeObject::stub_pool.Free (base_stub);
+    stub_pool.Free (base_stub);
+    stub_pool.Free (base_stub);
   }
+}
+
+void csPolyTreeBBox::RemoveFromTree ()
+{
+  while (first_stub)
+    stub_pool.Free (first_stub);
+}
+
+void csPolyTreeBBox::UnlinkStub (csPolygonStub* ps)
+{
+  if (!ps->object) return;
+  if (ps->next_obj) ps->next_obj->prev_obj = ps->prev_obj;
+  if (ps->prev_obj) ps->prev_obj->next_obj = ps->next_obj;
+  else first_stub = ps->next_obj;
+  ps->prev_obj = ps->next_obj = NULL;
+  ps->object = NULL;
+}
+
+void csPolyTreeBBox::LinkStub (csPolygonStub* ps)
+{
+  if (ps->object) return;
+  ps->next_obj = first_stub;
+  ps->prev_obj = NULL;
+  if (first_stub) first_stub->prev_obj = ps;
+  first_stub = ps;
+  ps->object = this;
 }
 
 void csPolyTreeBBox::World2Camera (const csTransform& trans)
@@ -895,7 +924,7 @@ void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
 
 void csPolyTreeBBox::Update (const csBox3& world_bbox, csVisObjInfo* originator)
 {
-  csPolyTreeObject::world_bbox = world_bbox;
+  csPolyTreeBBox::world_bbox = world_bbox;
 // printf ("%f,%f,%f %f,%f,%f\n", world_bbox.MinX (), world_bbox.MinY (), world_bbox.MinZ (),
 // world_bbox.MaxX (), world_bbox.MaxY (), world_bbox.MaxZ ());
 
@@ -980,3 +1009,255 @@ void csPolyTreeBBox::Update (const csBox3& world_bbox, csVisObjInfo* originator)
   poly->SetPolyPlane (csPlane3 (0, 1, 0, -b.MinY ()));
   poly->Transform (trans);
 }
+
+void csPolyTreeBBox::SplitWithPlane (csPolygonStub* stub,
+  	csPolygonStub** p_stub_on, csPolygonStub** p_stub_front,
+	csPolygonStub** p_stub_back,
+	const csPlane3& plane)
+{
+  csPolygonStub* stub_on, * stub_front, * stub_back;
+  stub_front = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_front);
+  stub_back = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_back);
+  if (p_stub_on)
+  {
+    stub_on = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+    LinkStub (stub_on);
+  }
+  else stub_on = stub_front;
+
+  // Fill the stubs with the needed polygons.
+  int i;
+  csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  {
+    int c = polygons[i]->Classify (plane);
+    switch (c)
+    {
+      case POL_SAME_PLANE:
+        stub_on->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_FRONT:
+        stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_BACK:
+        stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_SPLIT_NEEDED:
+	{
+	  csPolygonInt* np1, * np2;
+	  polygons[i]->SplitWithPlane (&np1, &np2, plane);
+	  stub_front->GetPolygonArray ().AddPolygon (np1);
+	  stub_back->GetPolygonArray ().AddPolygon (np2);
+	}
+	break;
+    }
+  }
+
+  // If the stubs are empty (no polygons) then free them again.
+  if (p_stub_on && stub_on->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_on);
+    stub_on = NULL;
+  }
+  if (stub_front->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_front);
+    stub_front = NULL;
+  }
+  if (stub_back->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_back);
+    stub_back = NULL;
+  }
+
+  // Fill in the return pointers.
+  if (p_stub_on) *p_stub_on = stub_on;
+  *p_stub_front = stub_front;
+  *p_stub_back = stub_back;
+
+  stub_pool.Free (stub);
+}
+
+void csPolyTreeBBox::SplitWithPlaneX (csPolygonStub* stub,
+  	csPolygonStub** p_stub_on, csPolygonStub** p_stub_front,
+	csPolygonStub** p_stub_back,
+	float x)
+{
+  csPolygonStub* stub_front, * stub_back;
+  stub_front = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_front);
+  stub_back = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_back);
+  if (p_stub_on) *p_stub_on = NULL;
+
+  // Fill the stubs with the needed polygons.
+  int i;
+  csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  {
+    int c = polygons[i]->ClassifyX (x);
+    switch (c)
+    {
+      case POL_SAME_PLANE:
+      case POL_FRONT:
+        stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_BACK:
+        stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_SPLIT_NEEDED:
+	{
+	  csPolygonInt* np1, * np2;
+	  polygons[i]->SplitWithPlaneX (&np1, &np2, x);
+	  stub_front->GetPolygonArray ().AddPolygon (np1);
+	  stub_back->GetPolygonArray ().AddPolygon (np2);
+	}
+	break;
+    }
+  }
+
+  // If the stubs are empty (no polygons) then free them again.
+  if (stub_front->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_front);
+    stub_front = NULL;
+  }
+  if (stub_back->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_back);
+    stub_back = NULL;
+  }
+
+  // Fill in the return pointers.
+  *p_stub_front = stub_front;
+  *p_stub_back = stub_back;
+
+  stub_pool.Free (stub);
+}
+
+void csPolyTreeBBox::SplitWithPlaneY (csPolygonStub* stub,
+  	csPolygonStub** p_stub_on, csPolygonStub** p_stub_front,
+	csPolygonStub** p_stub_back,
+	float y)
+{
+  csPolygonStub* stub_front, * stub_back;
+  stub_front = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_front);
+  stub_back = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_back);
+  if (p_stub_on) *p_stub_on = NULL;
+
+  // Fill the stubs with the needed polygons.
+  int i;
+  csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  {
+    int c = polygons[i]->ClassifyY (y);
+    switch (c)
+    {
+      case POL_SAME_PLANE:
+      case POL_FRONT:
+        stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_BACK:
+        stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_SPLIT_NEEDED:
+	{
+	  csPolygonInt* np1, * np2;
+	  polygons[i]->SplitWithPlaneY (&np1, &np2, y);
+	  stub_front->GetPolygonArray ().AddPolygon (np1);
+	  stub_back->GetPolygonArray ().AddPolygon (np2);
+	}
+	break;
+    }
+  }
+
+  // If the stubs are empty (no polygons) then free them again.
+  if (stub_front->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_front);
+    stub_front = NULL;
+  }
+  if (stub_back->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_back);
+    stub_back = NULL;
+  }
+
+  // Fill in the return pointers.
+  *p_stub_front = stub_front;
+  *p_stub_back = stub_back;
+
+  stub_pool.Free (stub);
+}
+
+void csPolyTreeBBox::SplitWithPlaneZ (csPolygonStub* stub,
+  	csPolygonStub** p_stub_on, csPolygonStub** p_stub_front,
+	csPolygonStub** p_stub_back,
+	float z)
+{
+  csPolygonStub* stub_front, * stub_back;
+  stub_front = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_front);
+  stub_back = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
+  LinkStub (stub_back);
+  if (p_stub_on) *p_stub_on = NULL;
+
+  // Fill the stubs with the needed polygons.
+  int i;
+  csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  {
+    int c = polygons[i]->ClassifyZ (z);
+    switch (c)
+    {
+      case POL_SAME_PLANE:
+      case POL_FRONT:
+        stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_BACK:
+        stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
+	polygons[i]->IncRefCount ();
+	break;
+      case POL_SPLIT_NEEDED:
+	{
+	  csPolygonInt* np1, * np2;
+	  polygons[i]->SplitWithPlaneZ (&np1, &np2, z);
+	  stub_front->GetPolygonArray ().AddPolygon (np1);
+	  stub_back->GetPolygonArray ().AddPolygon (np2);
+	}
+	break;
+    }
+  }
+
+  // If the stubs are empty (no polygons) then free them again.
+  if (stub_front->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_front);
+    stub_front = NULL;
+  }
+  if (stub_back->GetNumPolygons () == 0)
+  {
+    stub_pool.Free (stub_back);
+    stub_back = NULL;
+  }
+
+  // Fill in the return pointers.
+  *p_stub_front = stub_front;
+  *p_stub_back = stub_back;
+
+  stub_pool.Free (stub);
+}
+
+

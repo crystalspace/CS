@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csengine/polyint.h"
 #include "csengine/treeobj.h"
+#include "csengine/bspbbox.h"
 #include "csengine/bsp.h"
 #include "csengine/thing.h"
 #include "csengine/engine.h"
@@ -302,7 +303,7 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 
 void csBspTree::ProcessTodo (csBspNode* node)
 {
-  csObjectStub* stub;
+  csPolygonStub* stub;
   if (!node->front && !node->back)
   {
     // This node has no children. Currently we just add
@@ -324,7 +325,7 @@ void csBspTree::ProcessTodo (csBspNode* node)
   {
     stub = node->todo_stubs;
     node->UnlinkStub (stub);	// Unlink from todo list.
-    csObjectStub* stub_on, * stub_front, * stub_back;
+    csPolygonStub* stub_on, * stub_front, * stub_back;
     stub->GetObject ()->SplitWithPlane (stub, &stub_on, &stub_front, &stub_back,
     	node->splitter);
     // Link the stub with the polygons on this splitter plane to the current node.

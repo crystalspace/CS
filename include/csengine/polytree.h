@@ -29,8 +29,8 @@ class csThing;
 class csPolygonInt;
 class csPolygonTree;
 class csPolygonTreeNode;
-class csObjectStub;
-class csPolyTreeObject;
+class csPolygonStub;
+class csPolyTreeBBox;
 class Dumper;
 struct iFile;
 
@@ -68,13 +68,13 @@ protected:
    * to this node. These stubs represents parts of an object
    * that is located inside this node.
    */
-  csObjectStub* first_stub;
+  csPolygonStub* first_stub;
 
   /**
    * A linked list of all polygons stubs that still need to
    * be processed whenever this node becomse visible.
    */
-  csObjectStub* todo_stubs;
+  csPolygonStub* todo_stubs;
 
 public:
   /**
@@ -98,17 +98,17 @@ public:
    * Warning! This function does not test if the stub
    * is really on the list!
    */
-  void UnlinkStub (csObjectStub* ps);
+  void UnlinkStub (csPolygonStub* ps);
 
   /**
    * Link a stub to the todo list.
    */
-  void LinkStubTodo (csObjectStub* ps);
+  void LinkStubTodo (csPolygonStub* ps);
 
   /**
    * Link a stub to the stub list.
    */
-  void LinkStub (csObjectStub* ps);
+  void LinkStub (csPolygonStub* ps);
 
   /**
    * Traverse all the polygons in the dynamic objects
@@ -187,12 +187,12 @@ public:
   /**
    * Add a dynamic object to the tree.
    */
-  void AddObject (csPolyTreeObject* obj);
+  void AddObject (csPolyTreeBBox* obj);
 
   /**
    * Add a stub to the todo list of the tree.
    */
-  void AddStubTodo (csObjectStub* stub)
+  void AddStubTodo (csPolygonStub* stub)
   {
     root->LinkStubTodo (stub);
   }

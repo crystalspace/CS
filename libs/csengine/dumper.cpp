@@ -532,7 +532,7 @@ bool Dumper::check_stubs (csOctreeNode* node)
   return false;
 }
 
-void Dumper::dump_stubs_node (csObjectStub* stub, char const* name, int level)
+void Dumper::dump_stubs_node (csPolygonStub* stub, char const* name, int level)
 {
   while (stub)
   {
@@ -563,7 +563,7 @@ void Dumper::dump_stubs_node (csObjectStub* stub, char const* name, int level)
   }
 }
 
-void Dumper::dump_stubs_obj (csObjectStub* stub, char const* name, int level)
+void Dumper::dump_stubs_obj (csPolygonStub* stub, char const* name, int level)
 {
   while (stub)
   {
@@ -629,14 +629,14 @@ void Dumper::dump_stubs (csOctreeNode* onode, char const* name, int level)
 
 void Dumper::dump_stubs (csOctree* octree)
 {
-  csDetailedPolyTreeObject::stub_pool.Dump ();
+  csPolyTreeBBox::stub_pool.Dump ();
   CsPrintf (MSG_DEBUG_0, "Dump octree\n");
   dump_stubs ((csOctreeNode*)octree->root, "root", 0);
 }
 
-void Dumper::dump_stubs (csPolyTreeObject* ptobj)
+void Dumper::dump_stubs (csPolyTreeBBox* ptobj)
 {
-  CsPrintf (MSG_DEBUG_0, "Dump csPolyTreeObject\n");
+  CsPrintf (MSG_DEBUG_0, "Dump csPolyTreeBBox\n");
   dump_stubs_obj (ptobj->first_stub, "root", 0);
 }
 

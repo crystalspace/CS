@@ -22,6 +22,7 @@
 #include "csengine/bsp.h"
 #include "csengine/bsp2d.h"
 #include "csengine/treeobj.h"
+#include "csengine/bspbbox.h"
 #include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/covcube.h"
@@ -141,7 +142,7 @@ void csOctree::Build (csPolygonInt** polygons, int num)
 
 void csOctree::ProcessTodo (csOctreeNode* node)
 {
-  csObjectStub* stub;
+  csPolygonStub* stub;
 
   if (node->GetMiniBsp ())
   {
@@ -172,23 +173,23 @@ void csOctree::ProcessTodo (csOctreeNode* node)
   {
     stub = node->todo_stubs;
     node->UnlinkStub (stub);	// Unlink from todo list.
-    csObjectStub* xf, * xb;
-    csPolyTreeObject* pto = stub->GetObject ();
+    csPolygonStub* xf, * xb;
+    csPolyTreeBBox* pto = stub->GetObject ();
     pto->SplitWithPlaneX (stub, NULL, &xf, &xb, center.x);
     if (xf)
     {
-      csObjectStub* xfyf, * xfyb;
+      csPolygonStub* xfyf, * xfyb;
       pto->SplitWithPlaneY (xf, NULL, &xfyf, &xfyb, center.y);
       if (xfyf)
       {
-        csObjectStub* xfyfzf, * xfyfzb;
+        csPolygonStub* xfyfzf, * xfyfzb;
         pto->SplitWithPlaneZ (xfyf, NULL, &xfyfzf, &xfyfzb, center.z);
 	if (xfyfzf) node->children[OCTREE_FFF]->LinkStubTodo (xfyfzf);
 	if (xfyfzb) node->children[OCTREE_FFB]->LinkStubTodo (xfyfzb);
       }
       if (xfyb)
       {
-        csObjectStub* xfybzf, * xfybzb;
+        csPolygonStub* xfybzf, * xfybzb;
         pto->SplitWithPlaneZ (xfyb, NULL, &xfybzf, &xfybzb, center.z);
 	if (xfybzf) node->children[OCTREE_FBF]->LinkStubTodo (xfybzf);
 	if (xfybzb) node->children[OCTREE_FBB]->LinkStubTodo (xfybzb);
@@ -196,18 +197,18 @@ void csOctree::ProcessTodo (csOctreeNode* node)
     }
     if (xb)
     {
-      csObjectStub* xbyf, * xbyb;
+      csPolygonStub* xbyf, * xbyb;
       pto->SplitWithPlaneY (xb, NULL, &xbyf, &xbyb, center.y);
       if (xbyf)
       {
-        csObjectStub* xbyfzf, * xbyfzb;
+        csPolygonStub* xbyfzf, * xbyfzb;
         pto->SplitWithPlaneZ (xbyf, NULL, &xbyfzf, &xbyfzb, center.z);
 	if (xbyfzf) node->children[OCTREE_BFF]->LinkStubTodo (xbyfzf);
 	if (xbyfzb) node->children[OCTREE_BFB]->LinkStubTodo (xbyfzb);
       }
       if (xbyb)
       {
-        csObjectStub* xbybzf, * xbybzb;
+        csPolygonStub* xbybzf, * xbybzb;
         pto->SplitWithPlaneZ (xbyb, NULL, &xbybzf, &xbybzb, center.z);
 	if (xbybzf) node->children[OCTREE_BBF]->LinkStubTodo (xbybzf);
 	if (xbybzb) node->children[OCTREE_BBB]->LinkStubTodo (xbybzb);

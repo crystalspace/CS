@@ -179,11 +179,25 @@ public:
 };
 
 /**
- * A container for a bunch of BSP polygons.
+ * This class represents a (dynamic) object that can be placed
+ * in a polygon tree (BSP, octree, ...). Every engine entity that
+ * is interested in adding itself to the tree will be represented
+ * by such an object.
  */
-class csPolyTreeBBox : public csDetailedPolyTreeObject
+class csPolyTreeBBox
 {
+  friend class Dumper;
+
 private:
+  /**
+   * A linked list for all object stubs that are added
+   * to the tree. These stubs represents parts of
+   * this object that belong to the tree. In case of csPolygonStub
+   * every stub will represent a list of polygons that are coplanar
+   * with the splitter plane at that node.
+   */
+  csPolygonStub* first_stub;
+
   /// Array of vertices.
   csVector3Array vertices;
   /// Array of camera space vertices.
@@ -198,7 +212,12 @@ private:
    */
   bool is_cam_transf;
 
+  /// Bounding box for this object.
+  csBox3 world_bbox;
+
 public:
+  /// A pool of polygon stubs.
+  static csPolygonStubPool stub_pool;
   /// A factory for polygon stubs.
   static csPolygonStubFactory stub_fact;
 
@@ -206,10 +225,42 @@ public:
   /// Constructor.
   csPolyTreeBBox ();
   /// Destructor.
-  virtual ~csPolyTreeBBox ();
+  ~csPolyTreeBBox ();
 
-  /// Get the base set of polygons.
-  virtual csObjectStub* GetBaseStub () { return base_stub; }
+  /**
+   * Remove this object from its tree.
+   */
+  void RemoveFromTree ();
+
+  /**
+   * Unlink a stub from the stub list.
+   * Warning! This function does not test if the stub
+   * is really on the list!
+   */
+  void UnlinkStub (csPolygonStub* ps);
+
+  /**
+   * Link a stub to the stub list.
+   */
+  void LinkStub (csPolygonStub* ps);
+
+  /**
+   * Get the bounding box that represents this object.
+   * If the camera is inside this bbox then the object
+   * is certainly visible.
+   */
+  const csBox3& GetWorldBoundingBox ()
+  {
+    return world_bbox;
+  }
+
+  /**
+   * Get the base stub. In case of csPolygonStub this corresponds to the
+   * set of polygons that make up the desired object to be placed
+   * in the polygon tree. In most cases this will be a bounding
+   * box for the real object.
+   */
+  csPolygonStub* GetBaseStub () { return base_stub; }
 
   /// Get vector array for this container.
   csVector3Array& GetVertices () { return vertices; }
@@ -257,6 +308,50 @@ public:
 
   /// Clear camera transformation.
   void ClearTransform () { is_cam_transf = false; }
+
+  /**
+   * Split the given stub with a plane and return
+   * three new stubs (all on the plane, in front, or
+   * back of the plane).<p>
+   *
+   * Note that this function is responsible for freeing 'stub' itself
+   * if needed. Also this function can return NULL for stub_on, stub_front,
+   * and stub_back in which case there simply is no stub for that
+   * particular case.<p>
+   *
+   * Other note. This function will also correctly account for
+   * the case where the given stub_on pointer is NULL. In that case
+   * the tree is not interested in the polygons on the plane and those
+   * polygons will be distributed to stub_front.
+   */
+  void SplitWithPlane (csPolygonStub* stub,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
+	const csPlane3& plane);
+
+  /**
+   * Split the given stub with an X plane.
+   */
+  void SplitWithPlaneX (csPolygonStub* stub,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
+	float x);
+
+  /**
+   * Split the given stub with an Y plane.
+   */
+  void SplitWithPlaneY (csPolygonStub* stub,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
+	float y);
+
+  /**
+   * Split the given stub with an Z plane.
+   */
+  void SplitWithPlaneZ (csPolygonStub* stub,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
+	float z);
 };
 
 #endif // __CS_BSPBBOX_H__

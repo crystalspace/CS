@@ -21,6 +21,11 @@ The history order has been reversed so that new features are at the top.
 	  interface has changed a lot (check it out).
 	- Fixed CS_ENTITY_CAMERA flag for things. It is even slightly more
 	  efficient than it was before.
+	- Merged csDetailedPolyTreeObject into csPolyTreeBBox.
+	- Merged csPolyTreeObject into csPolyTreeBBox.
+	- Merged csObjectStub with csPolygonStub.
+	- Merged csObjectStubFactory with csPolygonStubFactory.
+	- Renamed csObjectStubPool to csPolygonStubPool.
 21-Feb-2001
 	- Wouter Wijngaards made animation of procedural sky work. The
 	  clouds move and change when you animate the sky.

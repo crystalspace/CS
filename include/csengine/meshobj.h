@@ -33,7 +33,6 @@ class Dumper;
 class csMeshWrapper;
 class csCamera;
 class csMeshFactoryWrapper;
-class csPolyTreeObject;
 class csLight;
 
 /**

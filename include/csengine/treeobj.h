@@ -26,11 +26,11 @@
 #include "csengine/polytree.h"
 
 class csObject;
-class csObjectStubPool;
+class csPolygonStubPool;
 class csPolygonInt;
 class csPolygonIntPool;
-class csPolyTreeObject;
 class csPolygonTreeNode;
+class csPolyTreeBBox;
 class csThing;
 class Dumper;
 
@@ -39,32 +39,37 @@ class Dumper;
  * many object stubs. Every stub represents some object (or
  * part of that object) that belongs to some node.
  */
-class csObjectStub
+class csPolygonStub
 {
-  friend class csPolyTreeObject;
+  friend class csPolyTreeBBox;
   friend class csPolygonTreeNode;
-  friend class csObjectStubPool;
+  friend class csPolygonStubPool;
   friend class Dumper;
 
 private:
   // Linked list in every tree node.
-  csObjectStub* next_tree, * prev_tree;
-  // Linked list in every csPolyTreeObject.
-  csObjectStub* next_obj, * prev_obj;
+  csPolygonStub* next_tree, * prev_tree;
+  // Linked list in every csPolyTreeBBox.
+  csPolygonStub* next_obj, * prev_obj;
   // Object where this stub lives.
-  csPolyTreeObject* object;
+  csPolyTreeBBox* object;
   // Tree node where this stub lives.
   csPolygonTreeNode* node;
   // Reference counter. This ref counter is managed by the
-  // csObjectStubPool.
+  // csPolygonStubPool.
   int ref_count;
 
+  // List of polygons.
+  csPolygonIntArray polygons;
+  // The pool that is used to create polygons.
+  csPolygonIntPool* poly_pool;
+
 public:
-  ///
-  csObjectStub () : next_tree (NULL), prev_tree (NULL), next_obj (NULL),
-  	prev_obj (NULL), object (NULL), node (NULL), ref_count (1) { }
-  ///
-  virtual ~csObjectStub ()
+  /// Initialize this stub with a polygon pool.
+  csPolygonStub (csPolygonIntPool* pool) : next_tree (NULL),
+  	prev_tree (NULL), next_obj (NULL), prev_obj (NULL),
+	object (NULL), node (NULL), ref_count (1), poly_pool (pool) { }
+  ~csPolygonStub ()
   {
     RemoveStub ();
   }
@@ -78,49 +83,7 @@ public:
   void RemoveStub ();
 
   /// Get parent object for this stub.
-  csPolyTreeObject* GetObject () { return object; }
-
-  /// Visit this stub while traversing the tree (octree or BSP tree).
-  virtual void* Visit (csThing* thing, csTreeVisitFunc* func, void* data) = 0;
-
-  /// Initialize this stub.
-  virtual void Initialize () = 0;
-
-  /**
-   * Clean up data from this stub (i.e. remove polygons and so on).
-   * This is a virtual function because in general the framework
-   * cannot know how the polygons need to be freed (i.e. is a
-   * pool used? reference counter? ...).
-   */
-  virtual void RemoveData () = 0;
-};
-
-/**
- * An ObjectStub factory. This factory will create objects
- * of type (or subclass of) csObjectStub.
- */
-class csObjectStubFactory
-{
-public:
-  /// Create a new stub.
-  virtual csObjectStub* Create () = 0;
-};
-
-/**
- * A specific implementation of csObjectStub implementing
- * a stub containing polygons.
- */
-class csPolygonStub : public csObjectStub
-{
-private:
-  // List of polygons.
-  csPolygonIntArray polygons;
-  // The pool that is used to create polygons.
-  csPolygonIntPool* poly_pool;
-
-public:
-  /// Initialize this stub with a polygon pool.
-  csPolygonStub (csPolygonIntPool* pool) : poly_pool (pool) { }
+  csPolyTreeBBox* GetObject () { return object; }
 
   /// Get access to the list of polygons in this stub.
   csPolygonIntArray& GetPolygonArray () { return polygons; }
@@ -130,14 +93,14 @@ public:
   int GetNumPolygons () { return polygons.GetNumPolygons (); }
 
   /// Visit this stub while traversing the tree (octree or BSP tree).
-  virtual void* Visit (csThing* thing, csTreeVisitFunc* func, void* data)
+  void* Visit (csThing* thing, csTreeVisitFunc* func, void* data)
   {
     return func (thing, polygons.GetPolygons (), polygons.GetNumPolygons (),
     	false, data);
   }
 
   /// Initialize this stub.
-  virtual void Initialize ()
+  void Initialize ()
   {
     polygons.Reset ();
   }
@@ -145,13 +108,14 @@ public:
   /**
    * Clean up data from this stub.
    */
-  virtual void RemoveData ();
+  void RemoveData ();
 };
 
 /**
- * Specific implementation of the factory for csPolygonStub.
+ * A csPolygonStub factory. This factory will create objects
+ * of type csPolygonStub.
  */
-class csPolygonStubFactory : public csObjectStubFactory
+class csPolygonStubFactory
 {
 private:
   // The pool that is used to create polygons.
@@ -162,7 +126,7 @@ public:
   csPolygonStubFactory (csPolygonIntPool* pool) : poly_pool (pool) { }
 
   /// Create a new stub.
-  virtual csObjectStub* Create ()
+  csPolygonStub* Create ()
   {
     return new csPolygonStub (poly_pool);
   }
@@ -170,13 +134,13 @@ public:
 
 /**
  * This is an object pool which holds objects of type
- * csObjectStub. You control which type of csObjectStub you need
+ * csPolygonStub. You control which type of csPolygonStub you need
  * by the factory that you give with Alloc().
  * You can ask new instances from this pool.
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
-class csObjectStubPool
+class csPolygonStubPool
 {
   friend class Dumper;
 
@@ -184,7 +148,7 @@ private:
   struct PoolObj
   {
     PoolObj* next;
-    csObjectStub* ps;
+    csPolygonStub* ps;
   };
   /// List of allocated polygon stubs.
   PoolObj* alloced;
@@ -193,16 +157,16 @@ private:
 
 public:
   /// Create an empty pool.
-  csObjectStubPool () : alloced (NULL), freed (NULL) { }
+  csPolygonStubPool () : alloced (NULL), freed (NULL) { }
 
   /// Destroy pool and all objects in the pool.
-  ~csObjectStubPool ();
+  ~csPolygonStubPool ();
 
   /**
    * Allocate a new object in the pool.
    * The object is initialized to empty.
    */
-  csObjectStub* Alloc (csObjectStubFactory* factory);
+  csPolygonStub* Alloc (csPolygonStubFactory* factory);
 
   /**
    * Free an object and put it back in the pool. This function will
@@ -211,177 +175,10 @@ public:
    * Note that it is only legal to free objects which were allocated
    * from the pool.
    */
-  void Free (csObjectStub* ps);
+  void Free (csPolygonStub* ps);
 
   /// Dump some information about this pool.
   void Dump ();
-};
-
-/**
- * This abstract class represents a (dynamic) object that can be placed
- * in a polygon tree (BSP, octree, ...). Every engine entity that
- * is interested in adding itself to the tree should either inherit
- * from this class or else let another class inherit from this one
- * and use composition (preferable).
- */
-class csPolyTreeObject
-{
-  friend class Dumper;
-
-private:
-  /**
-   * A linked list for all object stubs that are added
-   * to the tree. These stubs represents parts of
-   * this object that belong to the tree. In case of csPolygonStub
-   * every stub will represent a list of polygons that are coplanar
-   * with the splitter plane at that node.
-   */
-  csObjectStub* first_stub;
-
-protected:
-  /// Bounding box for this object.
-  csBox3 world_bbox;
-
-public:
-  /// A pool of polygon stubs.
-  static csObjectStubPool stub_pool;
-
-protected:
-  /// A factory which is responsible for creating stubs for this object.
-  csObjectStubFactory* stub_factory;
-
-public:
-  /// Constructor.
-  csPolyTreeObject (csObjectStubFactory* factory);
-  /// Destructor.
-  virtual ~csPolyTreeObject ();
-
-  /**
-   * Remove this object from its tree.
-   */
-  void RemoveFromTree ();
-
-  /**
-   * Create the base stub. In case of csPolygonStub this corresponds to the
-   * set of polygons that make up the desired object to be placed
-   * in the polygon tree. In most cases this will be a bounding
-   * box for the real object.
-   */
-  virtual csObjectStub* GetBaseStub () = 0;
-
-  /**
-   * Split the given stub with a plane and return
-   * three new stubs (all on the plane, in front, or
-   * back of the plane). This is a pure virtual function that will
-   * have to be implemented by a subclass.<p>
-   *
-   * Note that this function is responsible for freeing 'stub' itself
-   * if needed. Also this function can return NULL for stub_on, stub_front,
-   * and stub_back in which case there simply is no stub for that
-   * particular case.<p>
-   *
-   * Other note. This function will also correctly account for
-   * the case where the given stub_on pointer is NULL. In that case
-   * the tree is not interested in the polygons on the plane and those
-   * polygons will be distributed to stub_front.
-   */
-  virtual void SplitWithPlane (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	const csPlane3& plane) = 0;
-
-  /**
-   * Split the given stub with an X plane.
-   */
-  virtual void SplitWithPlaneX (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	float x) = 0;
-
-  /**
-   * Split the given stub with an Y plane.
-   */
-  virtual void SplitWithPlaneY (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	float y) = 0;
-
-  /**
-   * Split the given stub with an Z plane.
-   */
-  virtual void SplitWithPlaneZ (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	float z) = 0;
-
-  /**
-   * Unlink a stub from the stub list.
-   * Warning! This function does not test if the stub
-   * is really on the list!
-   */
-  void UnlinkStub (csObjectStub* ps);
-
-  /**
-   * Link a stub to the stub list.
-   */
-  void LinkStub (csObjectStub* ps);
-
-  /**
-   * Get the bounding box that represents this object.
-   * If the camera is inside this bbox then the object
-   * is certainly visible.
-   */
-  const csBox3& GetWorldBoundingBox ()
-  {
-    return world_bbox;
-  }
-};
-
-/**
- * Specific implementation of csPolyTreeObject for csPolygonStub.
- * This implementation is the most involved one where stubs represents
- * polygon lists and polygons are split to the tree.
- */
-class csDetailedPolyTreeObject : public csPolyTreeObject
-{
-  friend class Dumper;
-
-public:
-  /// Constructor.
-  csDetailedPolyTreeObject (csObjectStubFactory* stub_fact) :
-  	csPolyTreeObject (stub_fact) { }
-  /// Destructor.
-  virtual ~csDetailedPolyTreeObject () { }
-
-  /// Split to plane.
-  virtual void SplitWithPlane (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	const csPlane3& plane);
-
-  /**
-   * Split the given stub with an X plane.
-   */
-  virtual void SplitWithPlaneX (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	float x);
-
-  /**
-   * Split the given stub with an Y plane.
-   */
-  virtual void SplitWithPlaneY (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	float y);
-
-  /**
-   * Split the given stub with an Z plane.
-   */
-  virtual void SplitWithPlaneZ (csObjectStub* stub,
-  	csObjectStub** stub_on, csObjectStub** stub_front,
-	csObjectStub** stub_back,
-	float z);
 };
 
 #endif // __CS_TREEOBJ_H__
