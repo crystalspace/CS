@@ -57,14 +57,14 @@ private:
 
 public:
   /// Constructor.
-  csTerrainWrapper::csTerrainWrapper( iEngine *pEng, iTerrainObject *pTerr );
+  csTerrainWrapper (iEngine *pEng, iTerrainObject *pTerr);
   /// Constructor.
-  csTerrainWrapper( iEngine *pEng );
+  csTerrainWrapper (iEngine *pEng );
   /// Destructor.
   virtual ~csTerrainWrapper ();
 
   /// Set the terrain factory.
-  void SetFactory( csTerrainFactoryWrapper* factory)
+  void SetFactory (csTerrainFactoryWrapper* factory)
   {
     csTerrainWrapper::pFactory = factory;
   }
@@ -104,7 +104,6 @@ public:
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
-//  DECLARE_IBASE_EXT (csObject); // RDS NOTE:  should this be csTerrain
 
   //------------------- iTerrainWrapper implementation ------------------//
   struct TerrainWrapper : public iTerrainWrapper

@@ -123,51 +123,51 @@ iBase* csDDGLoader::Parse( const char* pString, iEngine *iEngine )
   {
     if (!pParams)
     {
-	    // @@@ Error handling!
-	    return NULL;
+      // @@@ Error handling!
+      return NULL;
     }
     switch (cmd)
     {
       case CS_TOKEN_FACTORY:
-	    {
-        ScanStr( pParams, "%s", pStr);
-	      iTerrainFactoryWrapper* iFactory = iEngine->FindTerrainFactory( pStr );
-	      if (!iFactory)
-	      {
-	        // @@@ Error handling!
-	        return NULL;
-	      }
-	      iTerrObj = iFactory->GetTerrainObjectFactory()->NewInstance();
-        iTerrainState = QUERY_INTERFACE( iTerrObj, iDDGState );
-        iTerrainState->SetEngine( iEngine );
-	    }
-	    break;
+	{
+          ScanStr( pParams, "%s", pStr);
+	  iTerrainFactoryWrapper* iFactory = iEngine->FindTerrainFactory( pStr );
+	  if (!iFactory)
+	  {
+	    // @@@ Error handling!
+	    return NULL;
+	  }
+	  iTerrObj = iFactory->GetTerrainObjectFactory()->NewInstance();
+          iTerrainState = QUERY_INTERFACE( iTerrObj, iDDGState );
+          iTerrainState->SetEngine( iEngine );
+	}
+	break;
       case CS_TOKEN_GROUPMATERIAL:
-	    {
-	    int rangeStart, rangeEnd;
-	      ScanStr( pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd );
-	      iTerrainState->LoadMaterialGroup( pStr, rangeStart, rangeEnd );
-	    }
+	{
+	  int rangeStart, rangeEnd;
+	  ScanStr( pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd );
+	  iTerrainState->LoadMaterialGroup( pStr, rangeStart, rangeEnd );
+	}
     	break;
       case CS_TOKEN_HEIGHTMAP:
-	    {
-        ScanStr( pParams, "%s", pStr);
-	      iTerrainState->LoadHeightMap( pStr );
-	    }
-	    break;  
+	{
+          ScanStr( pParams, "%s", pStr);
+	  iTerrainState->LoadHeightMap( pStr );
+	}
+	break;  
       case CS_TOKEN_LOD:
-      {
-      int detailLevel;
-        ScanStr( pParams, "%d", &detailLevel );
-        iTerrainState->SetLOD( detailLevel );
-      }
-      break;
+        {
+          int detailLevel;
+          ScanStr( pParams, "%d", &detailLevel );
+          iTerrainState->SetLOD( detailLevel );
+        }
+        break;
       case CS_TOKEN_MATERIAL:
-	    {
-        ScanStr( pParams, "%s", pStr);
-	      iTerrainState->LoadMaterial( pStr );
-	    }
-	    break;
+	{
+          ScanStr( pParams, "%s", pStr);
+	  iTerrainState->LoadMaterial( pStr );
+	}
+        break;
     }
   }
   iTerrainState->DecRef();
