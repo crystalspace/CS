@@ -160,6 +160,16 @@ csSpriteTemplate::~csSpriteTemplate ()
   CHK (delete [] emerge_from);
 }
 
+csSprite3D* csSpriteTemplate::NewSprite ()
+{
+  csSprite3D* spr;
+  CHK (spr = new csSprite3D ());
+  spr->SetTemplate (this);
+  spr->SetAction ("default");
+  spr->InitSprite ();
+  return spr;
+}
+
 void csSpriteTemplate::GenerateLOD ()
 {
   CHK (csTriangleVertices* verts = new csTriangleVertices (GetBaseMesh (), GetFrame (0)->GetVertices (), num_vertices));
@@ -527,7 +537,8 @@ void csSprite3D::Draw (csRenderView& rview)
   else
     poly.txt_handle = tpl->cstxt->GetTextureHandle ();
 
-  rview.g3d->StartPolygonQuick (poly.txt_handle, vertex_colors != NULL);
+  if (!rview.callback)
+    rview.g3d->StartPolygonQuick (poly.txt_handle, vertex_colors != NULL);
 
   // Draw all triangles.
   for (i = 0 ; i < m->GetNumTriangles () ; i++)
@@ -577,11 +588,15 @@ void csSprite3D::Draw (csRenderView& rview)
 
       PreparePolygonQuick (&poly, (csVector2 *)triangle, vertex_colors != NULL);
       // Draw resulting polygon
-      rview.g3d->DrawPolygonQuick (poly);
+      if (!rview.callback)
+        rview.g3d->DrawPolygonQuick (poly);
+      else
+        rview.callback (&rview, CALLBACK_POLYGONQ, (void*)&poly);
     }
   }
 
-  rview.g3d->FinishPolygonQuick ();
+  if (!rview.callback)
+    rview.g3d->FinishPolygonQuick ();
 }
 
 void csSprite3D::InitSprite ()

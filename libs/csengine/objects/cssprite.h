@@ -183,6 +183,14 @@ public:
   int GetNumVertices () { return num_vertices; }
 
   /**
+   * Create a new sprite for this template.
+   * The 'default' action will be made default. If there is
+   * no default action the first action will be made default.
+   * The sprite will also be initialized (csSprite3D::InitSprite()).
+   */
+  csSprite3D* NewSprite ();
+
+  /**
    * Get the base triangle mesh of this sprite.
    */
   csTriangleMesh* GetBaseMesh () { return base_mesh; }
