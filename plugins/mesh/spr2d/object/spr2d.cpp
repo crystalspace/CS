@@ -373,7 +373,7 @@ void csSprite2DMeshObject::HardTransform (const csReversibleTransform& t)
 
 void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 {
-  double angle_inc = 2.0 * PI / n;
+  double angle_inc = TWO_PI / n;
   double angle = 0.0;
   vertices.SetLimit (n);
   vertices.SetLength (n);

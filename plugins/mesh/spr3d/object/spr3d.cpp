@@ -1052,7 +1052,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     level_of_detail /= MAX (wor_sq_dist, SMALL_EPSILON);
 
     // reduce LOD based on field-of-view
-    float aspect = 2 * tan (camera->GetFOVAngle () * M_PI / 360);
+    float aspect = 2 * tan (camera->GetFOVAngle () * PI / 360);
     level_of_detail *= aspect;
   }
 

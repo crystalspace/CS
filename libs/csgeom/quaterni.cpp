@@ -96,8 +96,8 @@ csQuaternion csQuaternion::Slerp(const csQuaternion &quat2, float slerp) const
 	}
 	// The quaternions are nearly opposite so to avoid a divided by zero error
 	// Calculate a perpendicular quaternion and slerp that direction
-	scale0 = sin((1.0 - slerp) * (float)M_PI_2);
-	scale1 = sin(slerp * (float)M_PI_2);
+	scale0 = sin((1.0 - slerp) * PI);
+	scale1 = sin(slerp * PI);
 	return csQuaternion(scale0 * r + scale1 * quat2.z, 
                             scale0 * x + scale1 * -quat2.y, 
                             scale0 * y + scale1 * quat2.x, 

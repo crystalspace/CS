@@ -259,7 +259,7 @@ void Demo::SetupFactories ()
   	"crystalspace.mesh.object.sprite.2d",
 	"crystalspace.mesh.loader.factory.sprite.2d");
   fact = engine->GetMeshFactories ()->FindByName ("th_ship");
-  fact->HardTransform (csTransform (csXRotMatrix3 (-M_PI/2), csVector3 (0)));
+  fact->HardTransform (csTransform (csXRotMatrix3 (-HALF_PI), csVector3 (0)));
 }
 
 void Demo::LoadMaterial (const char* matname, const char* filename)
@@ -793,7 +793,7 @@ void Demo::SetupObjects ()
   spr3d_arm->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->Add (spr3d_arm);
   spr3d_arm->GetMovable ()->GetTransform ().RotateThis (csVector3 (0, 1, 0),
-  	M_PI/2.);
+  	HALF_PI);
   spr3d_arm->GetMovable ()->UpdateMove ();
   spr3d_arm->DecRef ();
 

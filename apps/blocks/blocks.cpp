@@ -345,12 +345,12 @@ Blocks::Blocks ()
   myNetDrv = NULL;
   backsound = NULL;
 
-  full_rotate_x = create_rotate_x (M_PI/2);
-  full_rotate_y = create_rotate_y (M_PI/2);
-  full_rotate_z = create_rotate_z (M_PI/2);
-  full_rotate_x_reverse = create_rotate_x (-M_PI/2);
-  full_rotate_y_reverse = create_rotate_y (-M_PI/2);
-  full_rotate_z_reverse = create_rotate_z (-M_PI/2);
+  full_rotate_x = create_rotate_x (HALF_PI);
+  full_rotate_y = create_rotate_y (HALF_PI);
+  full_rotate_z = create_rotate_z (HALF_PI);
+  full_rotate_x_reverse = create_rotate_x (-HALF_PI);
+  full_rotate_y_reverse = create_rotate_y (-HALF_PI);
+  full_rotate_z_reverse = create_rotate_z (-HALF_PI);
 
   pause = false;
 
@@ -1147,32 +1147,32 @@ void Blocks::start_rotation (BlRotType type)
     case ROT_PX:
       if (!check_new_shape_rotation (full_rotate_x_reverse)) return;
       rotate_shape_internal (full_rotate_x_reverse);
-      rot_px_todo = M_PI/2;
+      rot_px_todo = HALF_PI;
       break;
     case ROT_MX:
       if (!check_new_shape_rotation (full_rotate_x)) return;
       rotate_shape_internal (full_rotate_x);
-      rot_mx_todo = M_PI/2;
+      rot_mx_todo = HALF_PI;
       break;
     case ROT_PY:
       if (!check_new_shape_rotation (full_rotate_z)) return;
       rotate_shape_internal (full_rotate_z);
-      rot_py_todo = M_PI/2;
+      rot_py_todo = HALF_PI;
       break;
     case ROT_MY:
       if (!check_new_shape_rotation (full_rotate_z_reverse)) return;
       rotate_shape_internal (full_rotate_z_reverse);
-      rot_my_todo = M_PI/2;
+      rot_my_todo = HALF_PI;
       break;
     case ROT_PZ:
       if (!check_new_shape_rotation (full_rotate_y)) return;
       rotate_shape_internal (full_rotate_y);
-      rot_pz_todo = M_PI/2;
+      rot_pz_todo = HALF_PI;
       break;
     case ROT_MZ:
       if (!check_new_shape_rotation (full_rotate_y_reverse)) return;
       rotate_shape_internal (full_rotate_y_reverse);
-      rot_mz_todo = M_PI/2;
+      rot_mz_todo = HALF_PI;
       break;
     case ROT_NONE: break;
   }
@@ -1732,7 +1732,7 @@ void Blocks::HandleGameMovement (csTicks elapsed_time)
 {
   int i;
   float elapsed = (float)elapsed_time/1000.;
-  float elapsed_rot = 5 * elapsed * (M_PI/2);
+  float elapsed_rot = 5 * elapsed * HALF_PI;
   float elapsed_fall = elapsed * (player1->speed);
   float elapsed_move = elapsed*2;
 
@@ -1943,7 +1943,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     if (new_curi == 0 && old_curi == num_menus-1) new_curi = num_menus;
     float curi = menu_trans * ((float)old_curi) +
     	(1-menu_trans) * ((float)new_curi);
-    float angle = 2.*M_PI*curi/(float)num_menus;
+    float angle = TWO_PI * curi / (float)num_menus;
     float x = 0;
     if (i == cur_menu)
     {
@@ -2254,14 +2254,14 @@ void Blocks::InitGameRoom ()
   int i;
   for (i = 0 ; i < player1->zone_dim-1 ; i++)
   {
-    Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
-    Sys->add_vrast ((player1->zone_dim)-1, i, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
+    Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, HALF_PI);
+    Sys->add_vrast ((player1->zone_dim)-1, i, CUBE_DIM/2, CUBE_DIM/2, -HALF_PI);
     Sys->add_vrast (i, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
-    Sys->add_vrast (i, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, M_PI);
+    Sys->add_vrast (i, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, PI);
   }
 
-  Sys->add_hrast (-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
-  Sys->add_hrast ((player1->zone_dim)-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
+  Sys->add_hrast (-1, 2, CUBE_DIM/2, CUBE_DIM/2, -HALF_PI);
+  Sys->add_hrast ((player1->zone_dim)-1, 2, CUBE_DIM/2, CUBE_DIM/2, -HALF_PI);
   Sys->add_hrast (2, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
   Sys->add_hrast (2, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 

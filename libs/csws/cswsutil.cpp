@@ -280,7 +280,7 @@ void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
 }
 
 // Multiply with this constant to convert from range -1/3..+1/3 to -PI...+PI
-#define CONST_F2A	(M_PI * 3.0)
+#define CONST_F2A	(PI * 3.0)
 
 // HLS -> RGB
 void csHLS2RGB (float h, float l, float s, float &r, float &g, float &b)

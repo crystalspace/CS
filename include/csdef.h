@@ -59,22 +59,26 @@
   #define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 
+// PI
+#ifndef PI
+  static const float PI = 4.0f * (float) atan (1.0f);
+#endif
+#ifndef HALF_PI
+  static const float HALF_PI = 0.5f * PI;	// PI / 2
+#endif
+#ifndef TWO_PI
+	static const float TWO_PI = 2.0f * PI;
+#endif
+#ifndef INV_TWO_PI
+	static const float INV_TWO_PI = 1.0f / TWO_PI;
+#endif
+
 #undef EPSILON
   #define EPSILON 0.001f			/* Small value */
 #undef SMALL_EPSILON
   #define SMALL_EPSILON 0.000001f		/* Very small value */
 #undef SMALL_EPSILON_D
   #define SMALL_EPSILON_D 0.000000000001f	/* Very, very small value */
-
-#ifndef PI
-  #define PI 3.1415926535897932385f
-#endif
-#ifndef M_PI
-  #define M_PI PI
-#endif
-#ifndef M_PI_2
-  #define M_PI_2 1.57079632679489661925f	// PI / 2
-#endif
 
 // A macro for defining a constant static table.  The default expansion is
 // merely `static const'.  Typical usage is `CS_STATIC_TABLE Foo[] = {...};',

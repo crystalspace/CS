@@ -1481,7 +1481,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
       iMeshWrapper* thingBack = CreatePortalThing ("portalFrom",
 	  	start_sector, tm, portalPolyBack);
       thingBack->GetMovable ()->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
-      thingBack->GetMovable ()->Transform (csYRotMatrix3 (M_PI));//view->GetCamera ()->GetW2C ());
+      thingBack->GetMovable ()->Transform (csYRotMatrix3 (PI));//view->GetCamera ()->GetW2C ());
       thingBack->GetMovable ()->UpdateMove ();
       iPortal* portalBack = portalPolyBack->CreatePortal (room);
       portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);

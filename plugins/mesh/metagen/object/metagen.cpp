@@ -130,10 +130,10 @@ void csMetaGen::FillArcSineTable()
     switch(env_mapping)
     {
       case iMetaGen::TRUE_ENV_MAP:
-        asin_table[j] = env_map_mult * (0.5+asin(c)/M_PI);
+        asin_table[j] = env_map_mult * (0.5f + asin(c) / PI);
         break;
       case iMetaGen::FAKE_ENV_MAP:
-        asin_table[j] = 0.5 * env_map_mult * (1 + c);
+        asin_table[j] = 0.5f * env_map_mult * (1 + c);
         break;
     }
   }

@@ -72,7 +72,7 @@ public:
    * opening is the angle controlling the width of the stream.
    * azimuth is the angle of the direction (horizontally) of the stream.
    * elevation is the angle of the direction (up/down) of the stream.
-   *   angles in radians (2*PI is 360 degrees)
+   *   angles in radians (TWO_PI is 360 degrees)
    */
   csFountainMeshObject (iObjectRegistry* object_reg,
   	iMeshObjectFactory* factory);

@@ -378,8 +378,8 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
           for (i = 0 ; i < num ; i++)
           {
             float rad;
-            if (dir == 1) rad = 2.*M_PI*(num-i-1)/(float)num;
-            else rad = 2.*M_PI*i/(float)num;
+            if (dir == 1) rad = TWO_PI * (num-i-1)/(float)num;
+            else rad = TWO_PI * i / (float)num;
 
             float cx = 0, cy = 0, cz = 0;
             float cc = cos (rad);

@@ -332,7 +332,7 @@ static void ConeFillVerts(csVector3 *verts, int nr_sides,
   int i;
   for(i=0; i<nr_sides; i++)
   {
-    float angle = (float(i)*PI*2.0) / float(nr_sides);
+    float angle = (float(i)* TWO_PI) / float(nr_sides);
     verts[i] = pos;
     verts[i].x += sin(angle) * radius;
     verts[i].z += cos(angle) * radius;

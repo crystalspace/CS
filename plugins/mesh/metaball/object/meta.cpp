@@ -117,10 +117,10 @@ void csMetaBall::InitTables(void)
     switch(env_mapping)
     {
       case TRUE_ENV_MAP:
-        asin_table[j] = env_map_mult * (0.5+asin(c)/M_PI);
+        asin_table[j] = env_map_mult * (0.5f + asin(c) / PI);
         break;
       case FAKE_ENV_MAP:
-        asin_table[j] = 0.5 * env_map_mult * (1 + c);
+        asin_table[j] = 0.5f * env_map_mult * (1 + c);
         break;
     }
   }
@@ -416,12 +416,12 @@ void csMetaBall::NextFrame(csTicks)
 #if 1
   for (i = 0; i < num_meta_balls; i++)
   {
-    float m = fmod((i + 1) / 3.0, 1.5) + 0.5;
+    float m = fmod((i + 1) / 3.0f, 1.5f) + 0.5f;
 
     csVector3 &c = meta_balls[i].center;
-    c.x = 4 * m * sin (m * alpha + i * M_PI / 4);
-    c.y = 4 * m * cos (1.4 * m * alpha + m * M_PI / 6);
-    c.z = 4 * sin (m * alpha * 1.3214);
+    c.x = 4 * m * sin (m * alpha + i * PI / 4);
+    c.y = 4 * m * cos (1.4f * m * alpha + m * PI / 6);
+    c.z = 4 * sin (m * alpha * 1.3214f);
 
 //  printf("Ball %d, (%f,%f,%f)\n",i, c.x,c.y,c.z);
   }

@@ -871,7 +871,7 @@ bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char
 	  int j;
           for (j = 0; j < num; j++)
           {
-            float a = list [j * 3] * 2 * M_PI / 360.;
+            float a = list [j * 3] * TWO_PI / 360.;
             fs->SetUV (j, cos (a) * list [j * 3 + 1] + list [j * 3 + 2],
                           sin (a) * list [j * 3 + 1] + list [j * 3 + 2]);
           }

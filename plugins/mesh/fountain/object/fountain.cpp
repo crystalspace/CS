@@ -114,7 +114,7 @@ void csFountainMeshObject::RestartParticle (int index, float pre_move)
   float rotz_open = 2.0 * opening * (rand() / (1.0+RAND_MAX)) - opening;
   csZRotMatrix3 openrot(rotz_open);
   dest = openrot * dest;
-  float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
+  float rot_around = TWO_PI * (rand() / (1.0+RAND_MAX));
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
   // now dest point to somewhere in a circular cur of a sphere around the

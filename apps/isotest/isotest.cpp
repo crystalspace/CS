@@ -452,7 +452,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   fostate->SetOrigin( csVector3(0,0,0) );
   fostate->SetLighting(false);
   fostate->SetAcceleration( csVector3(0, -.3, 0) );
-  fostate->SetElevation(PI/2.0);
+  fostate->SetElevation(HALF_PI);
   fostate->SetAzimuth(1.0);
   fostate->SetOpening(0.14);
   fostate->SetSpeed(1.0);

@@ -70,7 +70,7 @@ bool csColorWheel::HandleEvent (iEvent &Event)
         float yc = bound.Height () / 2.0;
         float ns = sqrt (csSquareFloat (Event.Mouse.x - xc) + csSquareFloat (Event.Mouse.y - yc)) / xc;
         if (ns > 1) ns = 1;
-        float nh = atan2 (yc - Event.Mouse.y, Event.Mouse.x - xc) / (2 * M_PI);
+        float nh = atan2 (yc - Event.Mouse.y, Event.Mouse.x - xc) / TWO_PI;
         if (nh < 0) nh += 1;
         if ((ns != s) || (nh != h))
         {
@@ -101,8 +101,8 @@ void csColorWheel::Draw ()
   csStatic::Draw ();
   float xc = bound.Width () / 2.0;
   float yc = bound.Height () / 2.0;
-  int x = int (xc * (1 + s * cos (h * 2 * M_PI)));
-  int y = int (yc * (1 - s * sin (h * 2 * M_PI)));
+  int x = int (xc * (1 + s * cos (h * TWO_PI)));
+  int y = int (yc * (1 - s * sin (h * TWO_PI)));
   if (x >= bound.Width ()) x = bound.Width () - 1;
   if (y >= bound.Height ()) y = bound.Height () - 1;
   Line (x, 0, x, bound.Height (), CSPAL_STATIC_LIGHT3D);

@@ -78,9 +78,9 @@ void csProcBump::SetHSI (csColor& col, float H, float S, float I)
 {
   /// from Hue Saturation Intensity to Red Green Blue
   float Temp=H;
-  col.red = 1.0 + S * sin(Temp - 2.0*PI/3.0);
+  col.red = 1.0 + S * sin(Temp - TWO_PI / 3.0);
   col.green = 1.0 + S * sin(Temp);
-  col.blue = 1.0 + S * sin(Temp + 2.0*PI/3.0);
+  col.blue = 1.0 + S * sin(Temp + TWO_PI / 3.0);
   Temp = 63.999 * I / 512.0;
   col *= Temp;
 }

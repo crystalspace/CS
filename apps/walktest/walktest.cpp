@@ -407,21 +407,21 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     {
       case 0:
 	{
-          csXRotMatrix3 mat (anim_sky_speed * 2. * M_PI
+          csXRotMatrix3 mat (anim_sky_speed * TWO_PI
 	  	* (float)elapsed_time/1000.);
           move->Transform (mat);
 	  break;
 	}
       case 1:
 	{
-          csYRotMatrix3 mat (anim_sky_speed * 2. * M_PI
+          csYRotMatrix3 mat (anim_sky_speed * TWO_PI
 	  	* (float)elapsed_time/1000.);
           move->Transform (mat);
 	  break;
 	}
       case 2:
 	{
-          csZRotMatrix3 mat (anim_sky_speed * 2. * M_PI
+          csZRotMatrix3 mat (anim_sky_speed * TWO_PI
 	  	* (float)elapsed_time/1000.);
           move->Transform (mat);
 	  break;
@@ -437,7 +437,7 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
 	iTerrFuncState);
     csVector3 pos = state->GetDirLightPosition ();
     csColor col = state->GetDirLightColor ();
-    csYRotMatrix3 mat (.05* 2. * M_PI * (float)elapsed_time/1000.);
+    csYRotMatrix3 mat (.05 * TWO_PI * (float)elapsed_time/1000.);
     pos = mat * pos;
     state->SetDirLight (pos, col);
     state->DecRef ();

@@ -85,7 +85,7 @@ csProcSky::csProcSky()
 
   sunpos.Set(0,0,radius);  // at north  point
   //// try 0.95(edge of sun) -- 1.0(at top) for elevation.
-  float sunelevation = 0.99 * PI/2.0; // pi/2 is top.
+  float sunelevation = 0.99 * HALF_PI; // pi/2 is top.
   float sunazimuth = 0.0; // 0=north,+z
   csXRotMatrix3 elev(-sunelevation);
   sunpos = elev * sunpos;

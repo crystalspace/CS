@@ -676,7 +676,7 @@ void G2DTestSystemDriver::DrawLinePerf ()
   int a;
   for (a = 0; a < 360; a += 5)
   {
-    float angle = (a * 2 * PI) / 360.0;
+    float angle = (a * TWO_PI) / 360.0;
     float x = w2 + 80 * cos (angle);
     float y = 100 + 80 * sin (angle);
     myG2D->DrawLine (w2, 100, x, y, colors [a & 3]);

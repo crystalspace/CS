@@ -219,7 +219,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   {
     float new_radius = radius;
     float new_height = 0;
-    float angle = j*2.*radius_step * 2.*M_PI/360.;
+    float angle = j*2.*radius_step * TWO_PI / 360.;
     prev_verticesT[j] = num_vertices;
     prev_verticesB[j] = num_vertices;
     vertices[num_vertices].Set (
@@ -251,7 +251,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     // First create a new series of vertices.
     //-----
     // Angle from the center to the new circle of vertices.
-    float new_angle = i*radius_step * 2.*M_PI/360.;
+    float new_angle = i*radius_step * TWO_PI / 360.;
     // Radius of the new circle of vertices.
     float new_radius = radius * cos (new_angle);
     // Height of the new circle of vertices.
@@ -260,7 +260,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     float uv_radius = (1. - 2.*(float)i/(float)num) * .5;
     for (j = 0 ; j < num2 ; j++)
     {
-      float angle = j*2.*radius_step * 2.*M_PI/360.;
+      float angle = j*2.*radius_step * TWO_PI / 360.;
       if (cyl_mapping)
       {
         u = float (j) / float (num);
@@ -872,7 +872,7 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   /// compute sun position
   // 0.0 is east, 0.5 is west.
   csVector3 sunpos = shift;
-  float scaletime = time * PI * 2.0;
+  float scaletime = time * TWO_PI;
   sunpos.x += cos( scaletime ) * radiusx;
   sunpos.y += sin( scaletime ) * radiusy;
   sunpos.z -= sin( scaletime ) * radiusz;

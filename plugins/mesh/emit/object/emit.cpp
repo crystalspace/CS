@@ -158,10 +158,10 @@ void csEmitSphere::GetValue(csVector3& value, csVector3 & /*given*/)
   float sqdist = GetRandomFloat( min*min*min, max*max*max );
   float dist = pow(sqdist, (float)(1./3.));
   value.Set(dist, 0, 0);
-  float rotz_open = 2.0 * PI * (rand() / (1.0+RAND_MAX));
+  float rotz_open = TWO_PI * (rand() / (1.0+RAND_MAX));
   csZRotMatrix3 openrot(rotz_open);
   value = openrot * value;
-  float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
+  float rot_around = TWO_PI * (rand() / (1.0+RAND_MAX));
   csXRotMatrix3 xaround(rot_around);
   value = xaround * value;
   value += center;
@@ -216,7 +216,7 @@ void csEmitCone::GetValue(csVector3& value, csVector3 & /*given*/)
   float rotz_open = 2.0 * aperture * (rand() / (1.0+RAND_MAX)) - aperture;
   csZRotMatrix3 openrot(rotz_open);
   dest = openrot * dest;
-  float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
+  float rot_around = TWO_PI * (rand() / (1.0+RAND_MAX));
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
   // now dest point to somewhere in a circular cur of a sphere around the
@@ -392,7 +392,7 @@ void csEmitCylinder::GetValue(csVector3& value, csVector3 & /*given*/)
   csVector3 normal = (end-start).Unit();
   csVector3 udir; FindAxis(normal, udir);
   csVector3 vdir = udir % normal;
-  float angle = GetRandomFloat(0, 2.*PI);
+  float angle = GetRandomFloat(0, TWO_PI);
   // direction on the circle
   csVector3 oncirc = udir*cos(angle) + vdir*sin(angle);
 
@@ -491,7 +491,7 @@ void csEmitSphereTangent::GetValue(csVector3& value, csVector3 & given)
   csVector3 normal = path.Unit();
   csVector3 udir; FindAxis(normal, udir);
   csVector3 vdir = udir % normal;
-  float angle = GetRandomFloat(0, 2.*PI);
+  float angle = GetRandomFloat(0, TWO_PI);
   // direction on the circle
   csVector3 oncirc = udir*cos(angle) + vdir*sin(angle);
 

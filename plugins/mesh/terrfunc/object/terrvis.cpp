@@ -82,7 +82,7 @@ static void BuildHorIndexTable (int horsize)
   // Circle is split into horsize parts, each of size k (of 2*PI total)
   // the x-axis is right in the middle of parts 0 and horsize/2
   // thus precision around z==0 is not so important
-  float k = 2.0*PI / float(horsize);
+  float k = TWO_PI / float(horsize);
   int i;
   for (i = -127 ; i <= 127 ; i++)
   {

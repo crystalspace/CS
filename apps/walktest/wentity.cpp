@@ -64,7 +64,7 @@ printf ("Done opening door.\n");
   }
   transition -= elapsed_time/1000.;
   if (transition < 0) transition = 0;
-  csYRotMatrix3 mat ((M_PI/2.)*transition);
+  csYRotMatrix3 mat (HALF_PI * transition);
   mat.Invert ();
   tparent->GetMovable ()->SetTransform (mat);
   tparent->GetMovable ()->UpdateMove ();
@@ -111,7 +111,7 @@ void csRotatingObject::NextFrame (float elapsed_time)
   }
   else if (!always) return;
 
-  float trans = (2. * M_PI / 360.) * (elapsed_time / 1000.);
+  float trans = (TWO_PI / 360.) * (elapsed_time / 1000.);
   csXRotMatrix3 matx (angles.x * trans);
   csYRotMatrix3 maty (angles.y * trans);
   csZRotMatrix3 matz (angles.z * trans);

@@ -44,7 +44,7 @@ csGenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
       float l = u * u + v * v;
 
       // c is a float from 0..iNumSpokes
-      float c = (atan2 (u, v) / (2 * M_PI) + .5) * iNumSpokes;
+      float c = (atan2 (u, v) / TWO_PI + .5) * iNumSpokes;
       // i is the spoke number
       int i = QInt (c);
       // c is the float part of former c
