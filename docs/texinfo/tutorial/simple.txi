@@ -789,7 +789,9 @@ void Simple::SetupFrame ()
       c->Move (CS_VEC_UP * 4 * speed);
     if (kbd->GetKeyState (CSKEY_DOWN))
       c->Move (CS_VEC_DOWN * 4 * speed);
-  @} else @{
+  @}
+  else
+  @{
     // left and right cause the camera to rotate on the global Y
     // axis; page up and page down cause the camera to rotate on the
     // _camera's_ X axis (more on this in a second) and up and down
