@@ -28,19 +28,9 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if !defined (NO_ASSEMBLER)
-
-#  if defined(PROC_INTEL)
-#    if defined (DO_NASM)
-#      include "i386/scan16a.h"
-#    elif defined(COMP_GCC)
-#      include "i386/scanln16.h"
-#    elif defined(COMP_VC)
-#      include "i386/scanln16vc.h"
-#    endif //COMP_???
-#  endif //PROC_INTEL
-
-#endif //!NO_ASSEMBLER
+#if defined (PROC_INTEL) && defined (DO_NASM)
+#  include "i386/scan16a.h"
+#endif //PROC_INTEL
 
 #if defined (CS_LITTLE_ENDIAN)
 #  define LEFT(x)	(x & 0xffff)
@@ -89,7 +79,9 @@
       *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
       uu += duu;							\
       vv += dvv;							\
-  }
+    }									\
+  uu = uu1;								\
+  vv = vv1;
 
 #define SCANEND \
     do									\

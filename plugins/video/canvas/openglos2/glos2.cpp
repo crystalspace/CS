@@ -85,6 +85,8 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
+  System->SystemExtension ("StartGUI");
+
   // Initialize OpenGL
   if (!gdGLInitialize ())
   {

@@ -39,3 +39,28 @@ void SysSystemDriver::Sleep (int SleepTime)
 {
   DosSleep (SleepTime);
 }
+
+bool SysSystemDriver::SystemExtension (const char *iCommand, ...)
+{
+  if (!strcmp (iCommand, "StartGUI"))
+  {
+    /*
+      !!! This is a very nasty but VERY nice hack, it fools OS/2 and let the
+      program act as a PM program, while keeping its stdin/stdout/stderr
+      connected to the console (given that program is compiled as WINDOWCOMPAT
+      AKA VIO). This means we'll compile all the Crystal Space programs as
+      VIO and switch to "GUI mode" when required.
+
+      Credits and a great THANKS go to Michal Necasek (mike@mendelu.cz)
+      (one of FreeType library authors) for finding this!
+    */
+
+    PTIB tib;
+    PPIB pib;
+    DosGetInfoBlocks (&tib, &pib);
+    pib->pib_ultype = 3;
+    return true;
+  }
+
+  return false;
+}

@@ -64,14 +64,16 @@ void csDefaultDialogSkin::Draw (csComponent &This)
         CSPAL_DIALOG_DARK3D, CSPAL_DIALOG_LIGHT3D);
       break;
   } /* endswitch */
+
+  if (This.GetAlpha () >= 255)
+    return;
+
   int bw, bh;
   This.GetBorderSize (bw, bh);
   if (Back.GetType () == csbgNone)
   {
     Back.SetColor (CSPAL_DIALOG_BACKGROUND);
     Back.SetType (csbgNone);
-//  This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,
-//    CSPAL_DIALOG_BACKGROUND);
   }
 
   int orgx = 0, orgy = 0;

@@ -29,17 +29,6 @@ OUTSUFX. =
 OUTSUFX.no =
 OUTSUFX.yes = .pic
 
-# Depending on the type of optimization choosen we disable assembler support.
-ifneq ($(MODE),optimize)
-ifneq ($(NASM.INSTALLED),yes)
-  DO_ASM=no
-endif
-endif
-ifeq ($(DO_ASM),no)
-  NASM.INSTALLED=no
-  DO_MMX=no
-endif
-
 # This macro should update target only if it has changed
 define UPD
   cmp -s $@ DEST || (rm -f DEST && cp $@ DEST)

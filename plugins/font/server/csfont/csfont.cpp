@@ -35,17 +35,18 @@ struct csFontDef
   char *Name;
   int Width;
   int Height;
-  int BytesPerChar;
+  int First;
+  int Glyphs;
   uint8 *FontBitmap;
   uint8 *IndividualWidth;
 };
 
 static csFontDef const FontList [] =
 {
-  { CSFONT_LARGE,	8, 8, 8,	font_Police,	width_Police	},
-  { CSFONT_ITALIC,	8, 8, 8,	font_Italic,	width_Italic	},
-  { CSFONT_COURIER,	7, 8, 8,	font_Courier,	width_Courier	},
-  { CSFONT_SMALL,	4, 6, 8,	font_Tiny,	width_Tiny	}
+  { CSFONT_LARGE,	8, 8, 0, 256, font_Police,	width_Police	},
+  { CSFONT_ITALIC,	8, 8, 0, 256, font_Italic,	width_Italic	},
+  { CSFONT_COURIER,	7, 8, 0, 256, font_Courier,	width_Courier	},
+  { CSFONT_SMALL,	4, 6, 0, 256, font_Tiny,	width_Tiny	}
 };
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
@@ -98,27 +99,19 @@ iFont *csDefaultFontServer::LoadFont (const char *filename)
     for (int i = 0; i < FontListCount; i++)
       if (!strcmp (filename, FontList [i].Name))
         return new csDefaultFont (this, FontList [i].Name,
-          FontList [i].Width, FontList [i].Height, FontList [i].BytesPerChar,
+          FontList [i].First, FontList [i].Glyphs,
+          FontList [i].Width, FontList [i].Height,
           FontList [i].FontBitmap, FontList [i].IndividualWidth);
   }
   else
   {
     // Otherwise try to load the font as a .csf file
-    /// if it is a .fnt file we can load it
-    int len = strlen(filename);
-    if ( ((len > 4) && (strcmp(filename+len-4, ".fnt" )==0))
-     || ((len > 4) && (strcmp(filename+len-4, ".csf" )==0)) )
+    csDefaultFont *fontdef = ReadFontFile (filename);
+    if (fontdef)
     {
-      csDefaultFont *fontdef = ReadFntFile(filename);
-      if (fontdef)
-      {
-        /// add to registered fonts
-        if (fontdef->Name) delete [] fontdef->Name;
-        fontdef->Name = strnew(filename);
-        fonts.Push(fontdef);
-        fontdef->IncRef ();
-        return fontdef;
-      }
+      delete [] fontdef->Name;
+      fontdef->Name = strnew (filename);
+      return fontdef;
     }
   }
 
@@ -151,199 +144,106 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
   }
 }
 
-
-csDefaultFont* csDefaultFontServer::ReadFntFile(const char *file)
+csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
-  // read a .fnt file, originally meant for use as #include into CS.
-  // renamed to .csf file
-  iVFS *VFS = QUERY_PLUGIN(System, iVFS);
-  iDataBuffer *fntfile = VFS->ReadFile(file);
-  VFS->DecRef();
-  if(!fntfile)
+  iVFS *VFS = QUERY_PLUGIN (System, iVFS);
+  iDataBuffer *fntfile = VFS->ReadFile (file);
+  VFS->DecRef ();
+  if (!fntfile)
   {
-    System->Printf(MSG_WARNING, "Could not read file %s.\n", file);
-    return 0;
+    System->Printf (MSG_WARNING, "Could not read font file %s.\n", file);
+    return NULL;
   }
-  
-  /// the new fontdef to store info into
-  csDefaultFont *resultfont = 0;
-  csFontDef fontdef;
-  fontdef.Name = 0;
-  fontdef.Width = 0;
-  fontdef.Height = 0;
-  fontdef.BytesPerChar = 0;
-  fontdef.FontBitmap = 0;
-  fontdef.IndividualWidth = 0;
 
-  /// parse file
-  int skip = 0; 
-  char *cp = **fntfile;
-  int val = 0;
-  int FontSize = 10;
-  int span = 0;
-  /// find the //XX parts
-  while ((cp = strstr(cp, "//XX")) != 0)
+  char *data = **fntfile;
+  if (data [0] != 'C' || data [1] != 'S' ||  data [2] != 'F')
   {
-    // parse info
-    char option[50];
-    if(sscanf(cp, "//XX %50s %n", option, &skip)==1)
-    {
-      char *arg = cp+skip;
-      if(strcmp(option, "Name:")==0)
-      {
-        char name[50];
-        sscanf(arg, "%50s", name);
-        fontdef.Name = strnew(name);
-      }
-      else if(strcmp(option, "Size:")==0)
-      {
-        sscanf(arg, "%d", &val);
-        FontSize = val;
-      }
-      else if(strcmp(option, "MaxWidth:")==0)
-      {
-        sscanf(arg, "%d", &val);
-        fontdef.Width = val;
-      }
-      else if(strcmp(option, "MaxHeight:")==0)
-      {
-        sscanf(arg, "%d", &val);
-        fontdef.Height = val;
-      }
-      else if(strcmp(option, "BytesPerChar:")==0)
-      {
-        sscanf(arg, "%d", &val);
-        fontdef.BytesPerChar = val;
-      }
-      //// ignore unknown options...
-    }
-    // shift cp a little so that the current //XX is not found again
-    cp += 2;
+error:
+    fntfile->DecRef ();
+    return NULL;
   }
-  
-  int bitmaplen = 256*fontdef.BytesPerChar;
-  if (fontdef.Width  <= 0 || fontdef.Height <= 0 || bitmaplen <= 0)
+
+  /// the new fontdef to store info into
+  csFontDef fontdef;
+  memset (&fontdef, 0, sizeof (fontdef));
+  fontdef.Glyphs = 256;
+
+  char *end = strchr (data, '\n');
+  char *cur = strchr (data, '[');
+  if (!end || !cur)
+    goto error;
+
+  char *binary = end + 1;
+  while ((end > data) && ((end [-1] == ' ') || (end [-1] == ']')))
+    end--;
+
+  cur++;
+  while (cur < end)
   {
-      System->Printf(MSG_WARNING, "File %s contains invalid font metrics.\n",
-        file);
-      goto error_exit;
+    while ((cur < end) && (*cur == ' '))
+      cur++;
+
+    char kw [20];
+    size_t kwlen = 0;
+    while ((cur < end) && (*cur != '=') && (kwlen < sizeof (kw) - 1))
+      kw [kwlen++] = *cur++;
+    kw [kwlen] = 0;
+    if (!kwlen)
+      break;
+
+    cur = strchr (cur, '=');
+    if (!cur) break;
+    cur++;
+
+    if (!strcmp (kw, "Font"))
+    {
+      char *start = cur;
+      while ((cur < end) && (*cur != ' '))
+        cur++;
+      fontdef.Name = new char [cur - start + 1];
+      memcpy (fontdef.Name, start, cur - start);
+      fontdef.Name [cur - start] = 0;
+    }
+    else
+    {
+      char val [20];
+      size_t vallen = 0;
+      while ((cur < end) && (*cur != ' ') && (vallen < sizeof (val) - 1))
+        val [vallen++] = *cur++;
+      val [vallen] = 0;
+      int n = atoi (val);
+
+      if (!strcmp (kw, "Width"))
+        fontdef.Width = n;
+      else if (!strcmp (kw, "Height"))
+        fontdef.Height = n;
+      else if (!strcmp (kw, "First"))
+        fontdef.First = n;
+      else if (!strcmp (kw, "Glyphs"))
+        fontdef.Glyphs = n;
+    }
   }
 
 #if defined(CS_DEBUG)
-  printf("Reading Font %s, size %d, width %d, height %d, bytesperchar %d.\n",
-    fontdef.Name, FontSize, fontdef.Width, fontdef.Height, 
-    fontdef.BytesPerChar);
+  printf("Reading Font %s, width %d, height %d, First %d, %d Glyphs.\n",
+    fontdef.Name, fontdef.Width, fontdef.Height, fontdef.First, fontdef.Glyphs);
 #endif
 
-  /// alloc
-  fontdef.FontBitmap = new unsigned char [bitmaplen];
-  fontdef.IndividualWidth = new unsigned char [256];
-  
-  cp = **fntfile;
+  fontdef.IndividualWidth = new uint8 [fontdef.Glyphs];
+  memcpy (fontdef.IndividualWidth, binary, fontdef.Glyphs);
 
-  /// if this is a binary fnt file we can do it faster
-  if (strncmp (**fntfile, "FNTBINARY", 9) == 0)
-  {
-    const char * startstr = "STARTBINARY";
-    cp = strstr(cp, startstr);
-    if(!cp)
-    {
-      System->Printf(MSG_WARNING, "File %s has no binary part.\n", file);
-      goto error_exit;
-    }
-    cp += strlen(startstr) +1; /// also skip \n
-    if(fntfile->GetSize() - (cp - **fntfile) < (unsigned int)(bitmaplen + 256))
-    {
-      System->Printf(MSG_WARNING, "File %s is too short.\n", file);
-      goto error_exit;
-    }
-    memcpy(fontdef.FontBitmap, cp, bitmaplen);
-    cp += bitmaplen;
-    for(int i=0; i<256; i++)
-      fontdef.IndividualWidth[i] = cp[i];
-    goto success_exit;
-  }
+  // Compute the font size
+  int fontsize = 0;
+  for (int c = 0; c < fontdef.Glyphs; c++)
+    fontsize += ((fontdef.IndividualWidth [c] + 7) / 8) * fontdef.Height;
 
-  /// read fontbitmaps
-  /// find first 'unsigned char' then the '{' after that.
-  cp = strstr(cp, "unsigned char");
-  if(cp)
-    cp = strchr(cp, '{');
-  if(!cp) 
-  {
-    System->Printf(MSG_WARNING, "File %s has no font bitmap.\n", file);
-    goto error_exit;
-  }
-  cp++; /// skip the {
+  // allocate memory and copy the font
+  fontdef.FontBitmap = new uint8 [fontsize];
+  memcpy (fontdef.FontBitmap, binary + fontdef.Glyphs, fontsize);
 
-  int i;
-  int byte;
-  for(i=0; i<bitmaplen; i++)
-  {
-    if(sscanf(cp, " %x%n", &byte, &skip)==1)
-    {
-      fontdef.FontBitmap[i] = byte;
-      cp += skip;
-    }
-    else 
-    {
-      //printf("i = %d, cp %c%c%c%c\n", i, cp[0], cp[1], cp[2], cp[3]);
-      printf("Could not read font bitmap byte\n");
-      goto error_exit;
-    }
-    cp++; // go one further, to skip the ','
-  }
-  
-  /// read widths
-  cp = strstr(cp, "unsigned char");
-  if(cp)
-    cp = strchr(cp, '{');
-  if(!cp) 
-  {
-    System->Printf(MSG_WARNING, "File %s has no font bitmap.\n", file);
-    goto error_exit;
-  }
-  cp++;
-
-  for(span=0; span<16; span++)
-  {
-    for(i=span*16; i<span*16+16; i++)
-    {
-      if(sscanf(cp, " %d%n", &byte, &skip)==1)
-      {
-        fontdef.IndividualWidth[i] = byte;
-        cp += skip;
-      }
-      else 
-      {
-        //printf("i = %d, cp %c%c%c%c\n", i, cp[0], cp[1], cp[2], cp[3]);
-        printf("Could not read font character width\n");
-        goto error_exit;
-      }
-      cp ++; /// skip ,
-    }
-    // skip the comment to end of line
-    cp = strchr(cp, '\n');
-  }
-
-success_exit:
   fntfile->DecRef ();
-  resultfont = new csDefaultFont(this, fontdef.Name, fontdef.Width,
-    fontdef.Height, fontdef.BytesPerChar, fontdef.FontBitmap, 
-    fontdef.IndividualWidth);
-  if (fontdef.Name)
-    delete[] fontdef.Name;
-  return resultfont ;
-
-error_exit:
-   if (fontdef.Name)
-     delete[] fontdef.Name;
-   if (fontdef.FontBitmap)
-     delete[] fontdef.FontBitmap;
-   if (fontdef.IndividualWidth)
-     delete[] fontdef.IndividualWidth;
-   fntfile->DecRef();
-   return 0;
+  return new csDefaultFont (this, fontdef.Name, fontdef.First, fontdef.Glyphs,
+    fontdef.Width, fontdef.Height, fontdef.FontBitmap, fontdef.IndividualWidth);
 }
 
 
@@ -354,7 +254,7 @@ IMPLEMENT_IBASE (csDefaultFont)
 IMPLEMENT_IBASE_END
 
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
-  int width, int height, int bytesperchar, uint8 *bitmap,
+  int first, int glyphs, int width, int height, uint8 *bitmap,
   uint8 *individualwidth) : DeleteCallbacks (4, 4)
 {
   CONSTRUCT_IBASE (parent);
@@ -364,20 +264,30 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
     Name = strnew (name);
   else
     Name = CONST_CAST(char*)(name);
+  First = first;
+  Glyphs = glyphs;
   Width = width;
   Height = height;
-  BytesPerChar = bytesperchar;
   FontBitmap = bitmap;
   IndividualWidth = individualwidth;
+
   if (IndividualWidth)
   {
     MaxWidth = 0;
-    for (int i = 0; i < 256; i++)
+    for (int i = 0; i < Glyphs; i++)
       if (MaxWidth < IndividualWidth [i])
         MaxWidth = IndividualWidth [i];
   }
   else
     MaxWidth = Width;
+
+  uint8 *cur = bitmap;
+  GlyphBitmap = new uint8 * [Glyphs];
+  for (int i = 0; i < Glyphs; i++)
+  {
+    GlyphBitmap [i] = cur;
+    cur += ((IndividualWidth [i] + 7) / 8) * Height;
+  }
 }
 
 csDefaultFont::~csDefaultFont ()
@@ -412,16 +322,30 @@ void csDefaultFont::GetMaxSize (int &oW, int &oH)
 
 bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH)
 {
-  oW = IndividualWidth ? IndividualWidth [c] : Width;
+  int chr = int (c) - First;
+  if ((chr < 0) || (chr > Glyphs))
+  {
+    oW = oH = 0;
+    return false;
+  }
+
+  oW = IndividualWidth ? IndividualWidth [chr] : Width;
   oH = Height;
   return true;
 }
 
 uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
 {
-  oW = IndividualWidth ? IndividualWidth [c] : Width;
+  int chr = int (c) - First;
+  if ((chr < 0) || (chr > Glyphs))
+  {
+    oW = oH = 0;
+    return NULL;
+  }
+
+  oW = IndividualWidth ? IndividualWidth [chr] : Width;
   oH = Height;
-  return FontBitmap + c * BytesPerChar;
+  return GlyphBitmap [chr];
 }
 
 void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH)
@@ -434,7 +358,11 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH)
     oW = n * Width;
   else
     for (int i = 0; i < n; i++)
-      oW += IndividualWidth [*(uint8 *)text++];
+    {
+      int chr = (*(uint8 *)text++) - First;
+      if ((chr >= 0) && (chr < Glyphs))
+        oW += IndividualWidth [chr];
+    }
 }
 
 int csDefaultFont::GetLength (const char *text, int maxwidth)
@@ -445,10 +373,14 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
   int n = 0;
   while (*text)
   {
-    int w = IndividualWidth [*(uint8 *)text];
-    if (maxwidth < w)
-      return n;
-    maxwidth -= w;
+    int chr = (*(uint8 *)text) - First;
+    if ((chr >= 0) && (chr < Glyphs))
+    {
+      int w = IndividualWidth [chr];
+      if (maxwidth < w)
+        return n;
+      maxwidth -= w;
+    }
     text++; n++;
   }
   return n;

@@ -564,10 +564,13 @@ void WalkTest::DrawFrameConsole ()
 
   if (!Console || !Console->GetVisible ())
   {
+    int fw, fh;
+    Font->GetMaxSize (fw, fh);
+
     if (do_fps)
     {
-      GfxWrite(11, FRAME_HEIGHT-11, 0, -1, "FPS=%.2f", timeFPS);
-      GfxWrite(10, FRAME_HEIGHT-10, fgcolor_stats, -1, "FPS=%.2f", timeFPS);
+      GfxWrite (11, FRAME_HEIGHT - fh - 3, 0, -1, "FPS=%.2f", timeFPS);
+      GfxWrite (10, FRAME_HEIGHT - fh - 2, fgcolor_stats, -1, "FPS=%.2f", timeFPS);
     }
     if (do_stats)
     {
@@ -576,8 +579,8 @@ void WalkTest::DrawFrameConsole ()
       	Stats::polygons_considered, Stats::polygons_drawn,
 	Stats::portals_drawn, Stats::polygons_accepted,
 	Stats::polygons_rejected);
-      GfxWrite(FRAME_WIDTH-30*8-1, FRAME_HEIGHT-11, 0, -1, "%s", buffer);
-      GfxWrite(FRAME_WIDTH-30*8, FRAME_HEIGHT-10, fgcolor_stats, -1,
+      GfxWrite(FRAME_WIDTH - 30 * 8 - 1, FRAME_HEIGHT - fh - 3, 0, -1, "%s", buffer);
+      GfxWrite(FRAME_WIDTH - 30 * 8, FRAME_HEIGHT - fh - 2, fgcolor_stats, -1,
       	"%s", buffer);
     }
     else if (do_show_coord)
@@ -588,8 +591,8 @@ void WalkTest::DrawFrameConsole ()
 	view->GetCamera ()->GetW2CTranslation ().y,
         view->GetCamera ()->GetW2CTranslation ().z,
 	view->GetCamera ()->GetSector()->GetName ());
-      GfxWrite (FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
-      GfxWrite (FRAME_WIDTH-24*8, FRAME_HEIGHT-10, fgcolor_stats, -1, buffer);
+      GfxWrite (FRAME_WIDTH - 24 * 8 - 1, FRAME_HEIGHT - fh - 3, 0, -1, buffer);
+      GfxWrite (FRAME_WIDTH - 24 * 8, FRAME_HEIGHT - fh - 2, fgcolor_stats, -1, buffer);
     }
   }
 }

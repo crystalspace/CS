@@ -27,11 +27,9 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if !defined(NO_ASSEMBLER)
-#  if defined(PROC_INTEL) && defined (DO_NASM)
-#    include "i386/scan32a.h"
-#  endif //PROC_INTEL
-#endif //!NO_ASSEMBLER
+#if defined (PROC_INTEL) && defined (DO_NASM)
+#  include "i386/scan32a.h"
+#endif //PROC_INTEL
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ scan_XXXX --//--//
 

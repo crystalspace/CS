@@ -305,33 +305,24 @@ bool csFreeTypeFont::CreateGlyphBitmaps (int size)
   if (TT_Get_Instance_Metrics (instance, &im))
     return false;
 
+  int lineGap = prop.horizontal->Line_Gap;
+  int maxDesc = prop.horizontal->Descender;
+
+  /// @@@ EVIL: i found that some fonts incorrectly define descends
+  // as positive numbers while they should be negative - so i force
+  // the numbers being negative
+  if (maxDesc > 0) maxDesc = -maxDesc;
+
   // compute the maximum height a glyph from this font would have
   // including linegap
-  int maxY;
-  int maxDesc;
-  int lineGap;
-  if (prop.os2->version == 0xffff)
-  {
-    maxDesc = -ABS (prop.horizontal->Descender);
-    lineGap = prop.horizontal->Line_Gap;
-    maxY= prop.horizontal->Ascender - maxDesc + lineGap;
-  }
-  else
-  {
-    lineGap = prop.os2->sTypoLineGap;
-    /// @@@ EVIL: i found that some fonts incorrectly define descends
-    // as positive numbers while they should be negative - so i force
-    // the numbers being negative
-    maxDesc = -ABS (prop.os2->sTypoDescender);
-    maxY = prop.os2->sTypoAscender - maxDesc + lineGap;
-  }
+  int maxY = prop.horizontal->Ascender - maxDesc + lineGap;
 
   lineGap = (lineGap * im.y_scale) / 0x10000;
   maxDesc = (maxDesc * im.y_scale) / 0x10000;
   maxY    = (maxY * im.y_scale) / 0x10000;
 
   lineGap = lineGap / 64;
-  maxY    = (maxY + 32) / 64;
+  maxY    = (maxY + 63) / 64;
 
   // Create the glyphset
   GlyphSet *glyphset;
@@ -370,7 +361,6 @@ bool csFreeTypeFont::CreateGlyphBitmaps (int size)
     */
     // prepare the bitmap
     bitmap.rows  = maxY;
-    // bitmap.width = (m.bbox.xMax - m.bbox.xMin)/64;
     bitmap.width = MAX (m.horiAdvance,
       (m.horiBearingX + m.bbox.xMax - m.bbox.xMin)) / 64;
     bitmap.cols  = (bitmap.width + 7) / 8;

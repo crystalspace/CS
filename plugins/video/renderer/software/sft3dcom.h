@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSFT3DCOM_H__
-#define __CSSFT3DCOM_H__
+#ifndef __SFT3DCOM_H__
+#define __SFT3DCOM_H__
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
@@ -29,10 +29,6 @@
 #include "iplugin.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
-
-#if !defined (PROC_INTEL) || defined (NO_ASSEMBLER)
-#  undef DO_MMX
-#endif
 
 class csClipper;
 class csTextureCacheSoftware;
@@ -440,4 +436,4 @@ public:
     int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 };
 
-#endif // __CSSFT3DCOM_H__
+#endif // __SFT3DCOM_H__

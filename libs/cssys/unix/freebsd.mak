@@ -49,7 +49,6 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=-I/usr/local/include
 
 # General flags for the compiler which are used in any case.
-# CFLAGS.GENERAL=-Wall -DNO_ASSEMBLER
 CFLAGS.GENERAL=-Wall
 
 # Flags for the compiler which are used when optimizing.

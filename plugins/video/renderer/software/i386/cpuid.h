@@ -20,6 +20,9 @@
 #ifndef __CPUID_H__
 #define __CPUID_H__
 
+/*
+    80x86 processor family feature bits.
+*/
 #define CPUx86_FEATURE_FPU	0x00000001	// FPU on Chip
 #define CPUx86_FEATURE_VME	0x00000002	// Virtual Mode Extention
 #define CPUx86_FEATURE_DE	0x00000004	// Debbuging Extentions
@@ -38,118 +41,9 @@
 #define CPUx86_FEATURE_CMOV	0x00008000	// CMOV supported
 #define CPUx86_FEATURE_MMX	0x00800000	// MMX supported
 
-#ifdef DO_NASM
-
-// This is a "processor-independent" routine that is defined
-// independently for each processor type (if needed)
+/*
+    Detect 80x86 CPU and its feature bits.
+*/
 extern "C" void csDetectCPU (int *Family, char Vendor[13], int *Features);
-
-#elif defined (COMP_VC) || defined (COMP_WCC) || defined (COMP_BC)
-
-
-/**
- * Detect whenever current CPU supports MMX instructions and return its ID.
- * Memory block to hold id string should be at least 13 bytes size.
- */
-#if defined(COMP_BC)
-
-#define cpuid db 0x0f,0xa2
-
-static  // the rest of the function delaration follows below, (Borland doens't like inline asm)
-#else
-
-#if _MSC_VER < 1200     // If compiler version is below 6
-#  define cpuid __asm _emit 0x0F __asm _emit 0xA2
-#endif
-
-static inline
-#endif
-                void csDetectCPU (int *Family, char Vendor[13], int *Features)
-
-{
-  __asm{
-		pushfd
-		pop     eax
-		mov     ebx,eax
-		xor     eax,200000h
-		push    eax
-		popfd
-		pushfd
-		pop     eax
-		cmp     eax,ebx
-		jz      short notP5
-
-		xor	eax,eax
-		cpuid
-		mov     eax,Vendor
-		mov     dword ptr [eax],ebx
-		mov     dword ptr [eax+4],edx
-		mov     dword ptr [eax+8],ecx
-		mov     byte ptr [eax+12],0
-		mov     eax, 1
-		cpuid
-		mov	al,100
-                }
-                // Compute the ??86 number
-   __asm {
-                mul     ah
-		movzx	eax,ax
-		add	eax,86
-		jmp	short setVal
-
-notP5:		mov	eax,486
-		mov	edx,1
-		mov	ecx,Vendor
-		mov	byte ptr [ecx],0
-setVal:		mov     ecx,Family
-		mov	[ecx],eax
-		mov	ecx,Features
-		mov	[ecx],edx
-  }
-}
-
-#else
-
-static inline void csDetectCPU (int *Family, char Vendor[13], int *Features)
-{
-  asm (
-	"	pushfl			\n"
-	"	popl	%%eax		\n"
-	"	movl	%%eax,%%ebx	\n"
-	"	xorl	$0x200000,%%eax	\n"
-	"	pushl	%%eax		\n"
-	"	popfl			\n"
-	"	pushfl			\n"
-	"	popl	%%eax		\n"
-	"	cmpl	%%ebx,%%eax	\n"
-	"	jz	1f		\n"
-	"				\n"
-	"	xorl	%%eax,%%eax	\n"
-	"	cpuid			\n"
-	"	movl	%%ebx,0(%%esi)	\n"
-	"	movl	%%edx,4(%%esi)	\n"
-	"	movl	%%ecx,8(%%esi)	\n"
-	"	movb	$0,12(%%esi)	\n"
-	"	movl	$1,%%eax	\n"
-	"	cpuid			\n"
-	"	movb	$100,%%al	\n"
-	"	mulb	%%ah		\n"
-	"	movzwl	%%ax,%%eax	\n"
-	"	addl	$86,%%eax	\n"
-	"	jmp	2f		\n"
-	"				\n"
-	"1:	movl	$486,%%eax	\n"
-	"	movl	$1,%%edx	\n"
-	"	movb	$0,0(%%esi)	\n"
-	"2:	movl	%0,%%ecx	\n"
-	"	movl	%%eax,(%%ecx)	\n"
-	"	movl	%2,%%ecx	\n"
-	"	movl	%%edx,(%%ecx)	\n"
-  :
-  : "m" (Family), "S" (Vendor), "m" (Features)
-  : "ebx", "ecx", "edx");
-}
-
-#endif
 
 #endif // __CPUID_H__

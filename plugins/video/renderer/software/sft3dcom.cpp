@@ -622,7 +622,7 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_FLAT_ZUSE] = csScan_32_scan_flat_zuse;
 
       ScanProc [SCANPROC_TEX_ZFIL] =
-#if defined (DO_MMX) && defined (DO_NASM)
+#if defined (DO_MMX)
         UseMMX ? csScan_32_mmx_scan_tex_zfil :
 #endif
         csScan_32_scan_tex_zfil;
@@ -630,7 +630,7 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
 
       ScanProc [SCANPROC_MAP_ZFIL] =
         bilinear_filter == 2 ? csScan_32_scan_map_filt2_zfil :
-#if defined (DO_MMX) && defined (DO_NASM)
+#if defined (DO_MMX)
         UseMMX ? csScan_32_mmx_scan_map_zfil :
 #endif
         csScan_32_scan_map_zfil;

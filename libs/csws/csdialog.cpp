@@ -36,6 +36,16 @@ csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
   SnapSizeToGrid = false;
   if (parent)
     parent->SendCommand (cscmdWindowSetClient, (void *)this);
+
+  // If our parent is a dialog as well, mark ourselves as transparent
+  // to avoid untiled textures as backgrounds.
+  if (parent)
+  {
+    char *ps = parent->GetSkinName ();
+    if (ps && !strcmp (ps, "Dialog"))
+      SetAlpha (255);
+  }
+
   ApplySkin (GetSkin ());
   SetFrameStyle (iFrameStyle);
 }

@@ -44,12 +44,4 @@
 #	undef DO_DINPUT_KEYBOARD
 #endif
 
-#if defined(COMP_VC)
-// #ifdef _DEBUG
-    //Right now, Inline assembler doesn' work any more on MSVC, 
-    //This needs to be examined further. Thomas Hieber. 07/17/1999
-    #define NO_ASSEMBLER
-// #endif
-#endif
-
 #endif // __VOLATILE_H__

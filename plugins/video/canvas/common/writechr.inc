@@ -34,15 +34,13 @@ void csGraphics2D::WR_NAME (csGraphics2D *This, iFont *font, int x, int y,
   if (!font)
     return;
 
-  unsigned char c;
   int charW, charH;
-
-  for (c = *text; (c = *text); ++text, x += charW)
+  for (uchar c = *text; (c = *text); ++text, x += charW)
   {
     if (x > This->ClipX2)
       return;
 
-    register unsigned char *CharImage = font->GetGlyphBitmap (c, charW, charH);
+    register uint8 *CharImage = font->GetGlyphBitmap (c, charW, charH);
     if (!CharImage)
       continue;
 

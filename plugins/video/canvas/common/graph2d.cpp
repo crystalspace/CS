@@ -29,12 +29,6 @@
 #include "itexture.h"
 #include "icfgfile.h"
 
-#if defined(PROC_INTEL) && !defined(NO_ASSEMBLER)
-#  if defined(COMP_VC)
-#    include "video/canvas/common/i386/drline.h"
-#  endif
-#endif
-
 csGraphics2D::csGraphics2D ()
 {
   Memory = NULL;

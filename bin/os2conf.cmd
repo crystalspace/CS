@@ -208,6 +208,17 @@
       "OpenGL library has not been found along your LIBRARY_PATH. You"NL,
       " won't be able to build OpenGL renderer and OpenGL 2D drivers for OS/2";
 
+  call saycon ANSI.LGREEN"Checking whenever FreeType library is installed ..."
+  if (SysSearchPath("LIBRARY_PATH", "ttf.lib") \= "") then
+  do
+    say 'PLUGINS += font/server/freefont';
+    call saycon ANSI.LCYAN||"      found"
+  end
+  else
+    call problem "low",
+      "FreeType library has not been found along your LIBRARY_PATH. You"NL,
+      " won't be able to build the FreeType font server for OS/2";
+
   call saycon ANSI.LGREEN"Checking if XFree86/2 is installed ..."
   X11ROOT = value('X11ROOT',,'os2environment');
   if (X11ROOT \= "") then

@@ -34,20 +34,22 @@ class csDefaultFont : public iFont
 {
 public:
   char *Name;
+  int First;
+  int Glyphs;
   int Width;
   int MaxWidth;
   int Height;
-  int BytesPerChar;
   uint8 *FontBitmap;
   uint8 *IndividualWidth;
+  uint8 **GlyphBitmap;
   csDefaultFontServer *Parent;
   csVector DeleteCallbacks;
 
   DECLARE_IBASE;
 
   /// Create the font object
-  csDefaultFont (csDefaultFontServer *parent, const char *name, int width,
-    int height, int bytesperchar, uint8 *bitmap, uint8 *individualwidth);
+  csDefaultFont (csDefaultFontServer *parent, const char *name, int first,
+    int glyphs, int width, int height, uint8 *bitmap, uint8 *individualwidth);
 
   /// Destroy the font object
   virtual ~csDefaultFont ();
@@ -119,7 +121,7 @@ private:
   DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;
 
   /// read a font file from vfs
-  csDefaultFont* ReadFntFile(const char *file);
+  csDefaultFont *ReadFontFile(const char *file);
 
 public:
   DECLARE_IBASE;

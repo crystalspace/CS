@@ -426,11 +426,6 @@ PIG_SCAN_ROUTINE (16_565, tex_goufx)
 PIG_SCAN_ROUTINE (16_555, tex_goufxkey)
 PIG_SCAN_ROUTINE (16_565, tex_goufxkey)
 
-#if defined (DO_MMX) && !defined (DO_NASM)
-// There are no MMX perspective-incorrect routines for GAS and VC assembler
-#  define csScan_16_mmx_scan_pi_tex_zuse csScan_16_scan_pi_tex_zuse
-#endif
-
 #ifdef DO_MMX
 /// Draw one horizontal scanline (lighting) using MMX
 csDrawScanline csScan_16_mmx_scan_map_zfil;
@@ -500,7 +495,7 @@ PIG_SCAN_ROUTINE (32, tex_goufx)
 /// Draw a perspective-incorrect polygon scanline with various effects and color keying
 PIG_SCAN_ROUTINE (32, tex_goufxkey)
 
-#if defined (DO_MMX) && defined (DO_NASM)
+#if defined (DO_MMX)
 /// Draw a perspective-incorrect texture mapped polygon scanline using MMX
 csDrawScanline csScan_32_mmx_scan_map_zfil;
 /// Draw one horizontal scanline (no lighting) using MMX

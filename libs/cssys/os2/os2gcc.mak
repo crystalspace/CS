@@ -159,8 +159,9 @@ endif
 NETSOCK_LIBS=-lsocket
 
 # Override linker with os2link.exe
-LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" --verbose --out=$(OUT)
-LFLAGS.CONSOLE.EXE=--console
+LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" \
+  --verbose --console --out=$(OUT)
+LFLAGS.CONSOLE.EXE=
 
 # Defineds for OpenGL 3D driver
 LIBS.GL3D.SYSTEM=-lopengl
@@ -232,6 +233,11 @@ $(OS2LINK): libs/cssys/os2/support/os2link.cpp
 
 endif
 
+ifeq (1,0)
+# We're using a trick currently that allows a VIO program to run as a PM
+# program (see csos2.cpp). Thus we don't need this tricky program anymore;
+# However if somebody finds that the trick does not work, he'll want this
+# program.
 ifndef STARTFS
 
 # Also we need the full-screen launcher for MGL 2D driver
@@ -242,6 +248,7 @@ mgl2d: $(STARTFS)
 $(STARTFS): libs/cssys/os2/support/startfs.cpp
 	$(LD) $(LFLAGS.@) $(CFLAGS.GENERAL) $(CFLAGS.optimize) $(LFLAGS.optimize) $^ -Zomf -Zlinker /PM:NOVIO
 
+endif
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

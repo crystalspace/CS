@@ -28,25 +28,9 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if !defined(NO_ASSEMBLER)
-
-#  if defined(PROC_M68K)
-#    if defined(COMP_GCC)
-#      include "m68k/scanln8.h"
-#    endif // COMP_GCC
-#  endif // PROC_M68K
-
-#  if defined (PROC_INTEL)
-#    if defined (DO_NASM)
-#      include "i386/scan8a.h"
-#    elif defined (COMP_GCC)
-#      include "i386/scanln8.h"
-#    elif defined (COMP_VC) || defined (COMP_WCC)
-#      include "i386/scanln8vc.h"
-#    endif // COMP_???
-#  endif // PROC_INTEL
-
-#endif //!NO_ASSEMBLER
+#if defined (PROC_INTEL) && defined (DO_NASM)
+#  include "i386/scan8a.h"
+#endif // PROC_INTEL
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ scan_XXXX --//--//
 

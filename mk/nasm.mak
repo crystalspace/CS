@@ -7,6 +7,11 @@ ifneq ($(PROC),INTEL)
 override NASM.INSTALLED = no
 endif
 
+# If we don't want assembly, disable NASM
+ifeq ($(DO_ASM),no)
+override NASM.INSTALLED = no
+endif
+
 ifeq ($(NASM.INSTALLED),yes)
 
 # The executable name

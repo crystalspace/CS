@@ -54,8 +54,8 @@ extern char *expandname (const char *iName);
  * Split a pathname into separate path and name. Path delimiters are either
  * '/', PATH_SEPARATOR and, for OS/2, MS-DOS and Win32 targets, ':'.
  */
-extern void splitpath (const char *iPathName, char *iPath, size_t iPathSize,
-  char *iName, size_t iNameSize);
+extern void splitpath (const char *iPathName, char *oPath, size_t iPathSize,
+  char *oName, size_t iNameSize);
 /**
  * This is a really simple function that does very nice
  * "filename against filemask" comparisons. It understands

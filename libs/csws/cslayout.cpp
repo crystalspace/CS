@@ -34,10 +34,6 @@ csLayout::csLayout (csComponent *iParent, csDialogFrameStyle iFrameStyle)
 {
   bRecalcLayout = true;
   lc = &c;
-  // If our parent is a dialog as well, mark ourselves as transparent
-  // to avoid untiled textures as backgrounds.
-  if (parent && !strcmp (parent->GetSkinName (), "Dialog"))
-    state |= CSS_TRANSPARENT;
 }
 
 int csLayout::GetLayoutingPhase ()
@@ -106,8 +102,6 @@ void csLayout::Draw ()
     LayoutContainer ();
     bRecalcLayout = false;
   }
-  if (!GetState (CSS_TRANSPARENT))
-    csDialog::Draw ();
 }
 
 bool csLayout::SetRect (int xmin, int ymin, int xmax, int ymax)

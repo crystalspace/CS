@@ -42,6 +42,9 @@ public:
 
   /// The system is idle: we can sleep for a while
   virtual void Sleep (int SleepTime);
+
+  /// Perform extension function
+  bool SystemExtension (const char *iCommand, ...);
 };
 
 #endif // __CSOS2_H__
