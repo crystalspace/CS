@@ -20,9 +20,9 @@ Things are useful for static geometry objects or objects that don't animate.
 You can use it for walls, floor, staircases, and even doors that open. As
 long as the object itself doesn't have to animate (but just moves) a thing
 is perfectly fine. For very high detail objects it is probably better to
-use the @samp{genmesh} mesh object instead. Also if you want to use internal
-animation (like an actor or a creature in your game) you should
-use the @samp{sprite3d} mesh object (@pxref{MeshObject Spr3D}).
+use the @samp{genmesh} mesh object (@pxref{MeshObject Genmesh} instead. Also
+if you want to use internal animation (like an actor or a creature in your
+game) you should use the @samp{sprite3d} mesh object (@pxref{MeshObject Spr3D}).
 
 Things can share geometry if they are made from the same factory. Note that
 information like lightmaps is not shared because a lightmap is position
