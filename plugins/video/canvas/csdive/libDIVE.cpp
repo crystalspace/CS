@@ -23,55 +23,56 @@
 #include <limits.h>
 #include <malloc.h>
 #include "sysdef.h"
-#include "cs2d/csdive/libDIVE.h"
+#include "libDIVE.h"
 
 static long MAX_PHYS_COLORS = -1;
-static BOOL DEVICE_HAS_PALETTE = FALSE;
+static bool DEVICE_HAS_PALETTE = false;
 
 diveApp::diveApp ()
 {
   appWNlength = 0;
-  appAB = WinInitialize (0);
-  appMQ = WinCreateMsgQueue (appAB, 0);
+  AB = WinInitialize (0);
+  MQ = WinCreateMsgQueue (AB, 0);
 }
 
 diveApp::~diveApp ()
 {
   while (appWNlength--)
     WinDestroyWindow (appWN[appWNlength]);
-  WinDestroyMsgQueue (appMQ);
-  WinTerminate (appAB);
+  WinDestroyMsgQueue (MQ);
+  WinTerminate (AB);
 }
 
 void diveApp::Run ()
 {
   QMSG qmsg;
 
-  while (WinGetMsg (appAB, &qmsg, 0, 0, 0))
-    WinDispatchMsg (appAB, &qmsg);
+  while (WinGetMsg (AB, &qmsg, 0, 0, 0))
+    WinDispatchMsg (AB, &qmsg);
 }
 
-BOOL diveApp::ProcessQueuedMessages ()
+bool diveApp::ProcessQueuedMessages ()
 {
+#define MSG_MASK (QS_KEY | QS_MOUSE | QS_TIMER | QS_PAINT | QS_POSTMSG)
   QMSG qmsg;
 
-  while (WinQueryQueueStatus (appMQ) != 0)
+  while ((WinQueryQueueStatus (MQ) & MSG_MASK) != 0)
   {
-    if (WinGetMsg (appAB, &qmsg, 0, 0, 0))
-      WinDispatchMsg (appAB, &qmsg);
+    if (WinGetMsg (AB, &qmsg, 0, 0, 0))
+      WinDispatchMsg (AB, &qmsg);
     else
-      return FALSE;
+      return false;
   }
-  return TRUE;
+  return true;
 }
 
 HWND diveApp::CreateWindow (PSZ Title, HMODULE ModID, ULONG ResID, ULONG Flags)
 {
-  static PSZ diveWndCls = (PSZ) "diveView";
+#define DIVE_WINDOW_CLASS (PSZ)"diveView"
   ULONG flStyle;
   HWND diveFR, diveCL;
 
-  if (!WinRegisterClass (appAB, diveWndCls, NULL, 0, sizeof (void *)))
+  if (!WinRegisterClass (AB, DIVE_WINDOW_CLASS, NULL, 0, sizeof (void *)))
     return 0;
 
   flStyle = Flags | FCF_SIZEBORDER | FCF_AUTOICON;
@@ -82,16 +83,8 @@ HWND diveApp::CreateWindow (PSZ Title, HMODULE ModID, ULONG ResID, ULONG Flags)
   if (Title)
     flStyle = flStyle | FCF_TASKLIST;
 
-  diveFR = WinCreateStdWindow (
-    HWND_DESKTOP,
-    FS_NOBYTEALIGN,
-    &flStyle,
-    diveWndCls,
-    Title,
-    0,
-    ModID,
-    ResID,
-    &diveCL);
+  diveFR = WinCreateStdWindow (HWND_DESKTOP, FS_NOBYTEALIGN, &flStyle,
+    DIVE_WINDOW_CLASS, Title, 0, ModID, ResID, &diveCL);
 
   if (diveFR)
   {
@@ -107,7 +100,7 @@ HWND diveApp::CreateWindow (PSZ Title, HMODULE ModID, ULONG ResID, ULONG Flags)
       // Find handle of first submenu in menu bar
       WinSendMsg (hMenu, MM_QUERYITEM, MPFROM2SHORT (
           SHORT1FROMMR (WinSendMsg (hMenu, MM_ITEMIDFROMPOSITION, NULL, NULL)),
-          FALSE), MPFROMP (&mi));
+          false), MPFROMP (&mi));
       // Change menu ID so it will not appear below title bar
       WinSetWindowUShort (hMenu, QWS_ID, 0);
 
@@ -119,7 +112,7 @@ HWND diveApp::CreateWindow (PSZ Title, HMODULE ModID, ULONG ResID, ULONG Flags)
         // Find the handle of first submenu in system menu
         WinSendMsg (hSysMenu, MM_QUERYITEM, MPFROM2SHORT (
             SHORT1FROMMR (WinSendMsg (hSysMenu, MM_ITEMIDFROMPOSITION, NULL, NULL)),
-            FALSE), MPFROMP (&smi));
+            false), MPFROMP (&smi));
         HWND hSysSubMenu = smi.hwndSubMenu;
 
         smi.hwndSubMenu = mi.hwndSubMenu;
@@ -147,20 +140,20 @@ diveWindow::diveWindow (long Width, long Height, FOURCC Format, long nBuff)
   CLUT = NULL;
   hDive = NULLHANDLE;
   lastError = derrOK;
-  fFullScreen = FALSE;
-  fMinimized = FALSE;
-  fPhysCLUT = FALSE;
-  fAspect = FALSE;
-  fPause = TRUE;
-  fMouseVisible = TRUE;
+  fFullScreen = false;
+  fMinimized = false;
+  fPhysCLUT = false;
+  fAspect = false;
+  fPause = true;
+  fMouseVisible = true;
   MouseCursorID = SPTR_ARROW;
   FailedCount = 0;
   ActiveBuffer = 0;
   VisibleBuffer = 0;
   MouseButtonMask = 0;
-  MouseCaptured = FALSE;
-  MaintainAspectRatio (FALSE);
-  Pause (FALSE);
+  MouseCaptured = false;
+  MaintainAspectRatio (false);
+  Pause (false);
   OldClientWindowProc = NULL;
   OldFrameWindowProc = NULL;
   nBuffers = nBuff;
@@ -210,7 +203,7 @@ diveWindow::diveWindow (long Width, long Height, FOURCC Format, long nBuff)
 
 diveWindow::~diveWindow ()
 {
-  Unbind (FALSE);
+  Unbind (false);
   DosCloseEventSem (sRedrawComplete);   // Destroy redraw semaphore
   for (int i = 0; i <= nBuffers; i++)   // Free image buffers
     DiveFreeImageBuffer (hDive, hBuffer[i]);
@@ -218,7 +211,7 @@ diveWindow::~diveWindow ()
   ResetPhysCLUT ();
 }
 
-BOOL diveWindow::Bind (HWND winHandle)
+bool diveWindow::Bind (HWND winHandle)
 {
   diveFR = winHandle;
   diveCL = WinWindowFromID (diveFR, FID_CLIENT);
@@ -239,12 +232,12 @@ BOOL diveWindow::Bind (HWND winHandle)
   if (!WinSetWindowPtr (diveCL, QWL_USER, this))
   {
     lastError = derrBadWindow;
-    return FALSE;
+    return false;
   }
   if (diveFR && !WinSetWindowPtr (diveFR, QWL_USER, this))
   {
     lastError = derrBadWindow;
-    return FALSE;
+    return false;
   }
   // Query current window width and height
   SWP swp;
@@ -259,25 +252,25 @@ BOOL diveWindow::Bind (HWND winHandle)
   if (!WinSetVisibleRegionNotify (diveCL, TRUE))
   {
     lastError = derrBadWindow;
-    return FALSE;
+    return false;
   }
   if (!ResizeBuffer (BufferW, BufferH, BufferF))
   {
     lastError = derrAllocBuffer;
-    return FALSE;
+    return false;
   }
   if (!SetupPalette ())
   {
     lastError = derrPalette;
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::Unbind (BOOL Destroy)
+bool diveWindow::Unbind (bool Destroy)
 {
   if (!diveCL)
-    return FALSE;
+    return false;
   DiveSetupBlitter (hDive, NULL);
   oldDirtyRect.xLeft = -9999;
   if (Destroy)
@@ -297,15 +290,15 @@ BOOL diveWindow::Unbind (BOOL Destroy)
   diveCL = NULLHANDLE;
   diveFR = NULLHANDLE;
   diveMN = NULLHANDLE;
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::DisableAccelTable ()
+bool diveWindow::DisableAccelTable ()
 {
   return WinSetAccelTable (WinQueryAnchorBlock (diveFR), NULLHANDLE, NULLHANDLE);
 }
 
-void diveWindow::MouseVisible (BOOL State)
+void diveWindow::MouseVisible (bool State)
 {
   fMouseVisible = State;
   WinPostMsg (diveMN, MM_SETITEMATTR, MPFROM2SHORT (cmdToggleMouse, TRUE),
@@ -350,16 +343,16 @@ void diveWindow::EndPaint ()
   DiveEndImageBufferAccess (hDive, hBuffer[ActiveBuffer]);
 }
 
-BOOL diveWindow::SetupBlitter ()
+bool diveWindow::SetupBlitter ()
 {
   if (fMinimized || !diveCL)
-    return TRUE;                        // Don`t setup blitter when minimized
+    return true;                        // Don`t setup blitter when minimized
 
   if ((oldDirtyRect.xLeft == DirtyRect.xLeft)
     && (oldDirtyRect.xRight == DirtyRect.xRight)
     && (oldDirtyRect.yTop == DirtyRect.yTop)
     && (oldDirtyRect.yBottom == DirtyRect.yBottom))
-    return TRUE;                        // Blitter already set up
+    return true;                        // Blitter already set up
 
   oldDirtyRect.xLeft = DirtyRect.xLeft;
   oldDirtyRect.xRight = DirtyRect.xRight;
@@ -441,38 +434,38 @@ BOOL diveWindow::SetupBlitter ()
     DiveSetupBlitter (hDive, NULL);
   WinReleasePS (hps);
   GpiDestroyRegion (hps, hrgn);
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::SetupPalette ()
+bool diveWindow::SetupPalette ()
 {
   if (BufferF != FOURCC_LUT8)
-    return TRUE;                        // Only LUT8 buffers needs palette
+    return true;                        // Only LUT8 buffers needs palette
   DiveSetDestinationPalette (hDive, 0, MAX_PHYS_COLORS, DIVE_PALETTE_PHYSICAL);
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::SetCLUT (ULONG * NewCLUT, int Count)
+bool diveWindow::SetCLUT (ULONG * NewCLUT, int Count)
 {
   if (Count > MAX_PHYS_COLORS)
-    return FALSE;
+    return false;
 
   if (CLUT == NULL)
   {
     CLUT = (ULONG *) malloc (MAX_PHYS_COLORS * sizeof (ULONG));
     if (!CLUT)
-      return FALSE;
+      return false;
     memset (CLUT, 0, sizeof (CLUT));
   }
   memcpy (CLUT, NewCLUT, Count * sizeof (LONG));
   DiveSetSourcePalette (hDive, 0, Count, (BYTE *) CLUT);
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::SetPhysCLUT ()
+bool diveWindow::SetPhysCLUT ()
 {
   if (!CLUT)
-    return FALSE;
+    return false;
   HPS hps = WinGetScreenPS (HWND_DESKTOP);
   HDC hdc = GpiQueryDevice (hps);
 
@@ -499,15 +492,15 @@ BOOL diveWindow::SetPhysCLUT ()
         LCOLF_CONSECRGB, StartIndex, Count, (LONG *) tmpCLUT);
       Gre32Entry3 (hdc, 0L, 0x000060C6L);
       WinInvalidateRect (HWND_DESKTOP, (PRECTL) NULL, TRUE);
-      fPhysCLUT = TRUE;
+      fPhysCLUT = true;
     }
   }
   WinReleasePS (hps);
   SetupPalette ();
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::ResetPhysCLUT ()
+bool diveWindow::ResetPhysCLUT ()
 {
   if (fPhysCLUT)
   {
@@ -522,12 +515,12 @@ BOOL diveWindow::ResetPhysCLUT ()
     WinReleasePS (hps);
     SetupPalette ();
   }
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::Show (BOOL Visible)
+bool diveWindow::Show (bool Visible)
 {
-  BOOL rc = WinSetWindowPos (diveFR, NULLHANDLE, 0, 0, 0, 0,
+  bool rc = WinSetWindowPos (diveFR, NULLHANDLE, 0, 0, 0, 0,
     Visible ? SWP_SHOW + SWP_ACTIVATE : SWP_HIDE);
 
   DirtyRect.xLeft = 0;
@@ -561,7 +554,7 @@ MRESULT diveWindow::FrameHandler (HWND Handle, ULONG Message, MPARAM MsgParm1, M
 MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2)
 {
   SWP swp;
-  BOOL m_down;
+  bool m_down;
   int m_button;
   int m_capture;
 
@@ -622,19 +615,19 @@ MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgPar
             WinSetWindowPos (diveFR, NULLHANDLE, swp.x, ScreenH - swp.cy, 0, 0, SWP_MOVE);
           return 0;
         case cmdAlignCenter:
-          Resize (-1, -1, TRUE);
+          Resize (-1, -1, true);
           return 0;
         case cmdSnap1to1:
-          Resize (BufferW * 1, BufferH * 1, FALSE);
+          Resize (BufferW * 1, BufferH * 1, false);
           return 0;
         case cmdSnap2to1:
-          Resize (BufferW * 2, BufferH * 2, FALSE);
+          Resize (BufferW * 2, BufferH * 2, false);
           return 0;
         case cmdSnap3to1:
-          Resize (BufferW * 3, BufferH * 3, FALSE);
+          Resize (BufferW * 3, BufferH * 3, false);
           return 0;
         case cmdSnap4to1:
-          Resize (BufferW * 4, BufferH * 4, FALSE);
+          Resize (BufferW * 4, BufferH * 4, false);
           return 0;
         case cmdFullScreen:
           FullScreen (!fFullScreen);
@@ -643,7 +636,7 @@ MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgPar
           MaintainAspectRatio (!fAspect);
           if (fAspect)
             if (WinQueryWindowPos (diveCL, &swp))
-              Resize (swp.cx, swp.cy, FALSE);
+              Resize (swp.cx, swp.cy, false);
           return 0;
         case cmdPause:
           Pause (!fPause);
@@ -670,40 +663,40 @@ MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgPar
       if (fActive)
         WinSetPointer (HWND_DESKTOP, fMouseVisible ? WinQuerySysPointer (HWND_DESKTOP,
           MouseCursorID, FALSE) : NULL);
-      m_down = FALSE;
+      m_down = false;
       m_button = 0;
       goto ProcessMouse;
     case WM_BUTTON1DOWN:
     case WM_BUTTON1DBLCLK:
-      m_down = TRUE;
+      m_down = true;
       m_button = 1;
       MouseButtonMask |= 1;
       goto ProcessMouse;
     case WM_BUTTON2DOWN:
     case WM_BUTTON2DBLCLK:
-      m_down = TRUE;
+      m_down = true;
       m_button = 2;
       MouseButtonMask |= 2;
       goto ProcessMouse;
     case WM_BUTTON3DOWN:
     case WM_BUTTON3DBLCLK:
-      m_down = TRUE;
+      m_down = true;
       m_button = 3;
       MouseButtonMask |= 4;
       goto ProcessMouse;
     case WM_BUTTON1UP:
-      m_down = FALSE;
+      m_down = false;
       m_button = 1;
       MouseButtonMask &= ~1;
       goto ProcessMouse;
     case WM_BUTTON2UP:
-      m_down = FALSE;
+      m_down = false;
       m_button = 2;
       m_capture = 2;
       MouseButtonMask &= ~2;
       goto ProcessMouse;
     case WM_BUTTON3UP:
-      m_down = FALSE;
+      m_down = false;
       m_button = 3;
       m_capture = 2;
       MouseButtonMask &= ~4;
@@ -737,13 +730,13 @@ MRESULT diveWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm
       PSWP swp;
       SWP oldpos;
       MRESULT res;
-      BOOL cLS, cRS, cBS, cTS;
+      bool cLS, cRS, cBS, cTS;
       RECTL r;
 
       swp = (PSWP) MsgParm1;
 
       if (swp->fl & (SWP_MAXIMIZE | SWP_MINIMIZE | SWP_RESTORE))
-        FullScreen (FALSE);
+        FullScreen (false);
 
       if (fFullScreen)
       {
@@ -774,36 +767,36 @@ MRESULT diveWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm
         cTS = ((oldpos.y + oldpos.cy) == (swp->y + swp->cy));
       } else
       {
-        cLS = FALSE;
-        cRS = FALSE;
-        cBS = FALSE;
-        cTS = FALSE;
+        cLS = false;
+        cRS = false;
+        cBS = false;
+        cTS = false;
       }
 
       res = OldFrameWindowProc (diveFR, Message, MsgParm1, MsgParm2);
 
       if ((long) res & AWP_MAXIMIZED)
       {
-        fMinimized = FALSE;
-        cLS = FALSE;
-        cRS = FALSE;
-        cBS = FALSE;
-        cTS = FALSE;
+        fMinimized = false;
+        cLS = false;
+        cRS = false;
+        cBS = false;
+        cTS = false;
         WinEnableMenuItem (diveMN, cmdScale, FALSE);
       }
       if ((long) res & AWP_MINIMIZED)
       {
-        fMinimized = TRUE;
+        fMinimized = true;
         DiveSetupBlitter (hDive, NULL);
         oldDirtyRect.xLeft = -9999;
       }
       if ((long) res & AWP_RESTORED)
       {
-        fMinimized = FALSE;
-        cLS = FALSE;
-        cRS = FALSE;
-        cBS = FALSE;
-        cTS = FALSE;
+        fMinimized = false;
+        cLS = false;
+        cRS = false;
+        cBS = false;
+        cTS = false;
         WinEnableMenuItem (diveMN, cmdScale, TRUE);
       }
       if ((swp->fl & SWP_SIZE) && !fMinimized)
@@ -821,7 +814,7 @@ MRESULT diveWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm
           AdjustAspectRatio (&r.xRight, &r.yTop);
           r.xLeft = 0;
           r.yBottom = 0;
-          WinCalcFrameRect (diveFR, &r, FALSE);
+          WinCalcFrameRect (diveFR, &r, false);
           swp->cx = r.xRight - r.xLeft;
           swp->cy = r.yTop - r.yBottom;
         }
@@ -892,10 +885,10 @@ MRESULT diveWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm
   }
 }
 
-BOOL diveWindow::AdjustAspectRatio (long *Width, long *Height)
+bool diveWindow::AdjustAspectRatio (long *Width, long *Height)
 {
   if (!fAspect || fFullScreen)
-    return TRUE;
+    return true;
   ULONG K = ((*Width << 16) / BufferW + (*Height << 16) / BufferH) / 2;
 
   *Width = (BufferW * K) >> 16;
@@ -910,16 +903,16 @@ BOOL diveWindow::AdjustAspectRatio (long *Width, long *Height)
     *Width = (*Width * ScreenH) / *Height;
     *Height = ScreenH;
   }
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::SetPos (long X, long Y)
+bool diveWindow::SetPos (long X, long Y)
 {
   SWP swp;
   RECTL r;
 
   if (!WinQueryWindowPos (diveFR, &swp))
-    return FALSE;
+    return false;
   r.xLeft = swp.x;
   r.xRight = swp.x + swp.cx;
   r.yBottom = swp.y;
@@ -940,20 +933,20 @@ BOOL diveWindow::SetPos (long X, long Y)
     r.yBottom += deltaY;
   }
   if (!WinCalcFrameRect (diveFR, &r, FALSE))
-    return FALSE;
+    return false;
 
   return WinSetWindowPos (diveFR, NULLHANDLE, r.xLeft, r.yBottom,
     r.xRight - r.xLeft, r.yTop - r.yBottom,
     SWP_SIZE | SWP_MOVE);
 }
 
-BOOL diveWindow::Resize (long Width, long Height, BOOL Center)
+bool diveWindow::Resize (long Width, long Height, bool Center)
 {
   SWP swp;
   RECTL r;
 
   if (!WinQueryWindowPos (diveFR, &swp))
-    return FALSE;
+    return false;
   r.xLeft = swp.x;
   r.xRight = swp.x + swp.cx;
   r.yBottom = swp.y;
@@ -979,35 +972,35 @@ BOOL diveWindow::Resize (long Width, long Height, BOOL Center)
       r.yTop = r.yBottom + swp.cy;
     }
     if (!WinCalcFrameRect (diveFR, &r, FALSE))
-      return FALSE;
+      return false;
   }
   return WinSetWindowPos (diveFR, NULLHANDLE, r.xLeft, r.yBottom,
     r.xRight - r.xLeft, r.yTop - r.yBottom,
     SWP_SIZE | SWP_MOVE);
 }
 
-BOOL diveWindow::FullScreen (BOOL State)
+bool diveWindow::FullScreen (bool State)
 {
   if (fFullScreen != State)
     switch (State)
     {
-      case FALSE:
+      case false:
         ResetPhysCLUT ();
-        fFullScreen = FALSE;
+        fFullScreen = false;
         WinSetWindowPos (diveFR, NULLHANDLE, swpFullScreen.x, swpFullScreen.y,
           swpFullScreen.cx, swpFullScreen.cy, SWP_MOVE | SWP_SIZE);
         break;
-      case TRUE:
+      case true:
         WinQueryWindowPos (diveFR, &swpFullScreen);
-        fFullScreen = TRUE;
-        Resize (-1, -1, FALSE);
+        fFullScreen = true;
+        Resize (-1, -1, false);
         SetPhysCLUT ();
         break;
     }
-  return TRUE;
+  return true;
 }
 
-BOOL diveWindow::ResizeBuffer (long Width, long Height, FOURCC Format)
+bool diveWindow::ResizeBuffer (long Width, long Height, FOURCC Format)
 {
   int i;
   // Free image buffers
@@ -1024,7 +1017,7 @@ BOOL diveWindow::ResizeBuffer (long Width, long Height, FOURCC Format)
     {
       for (; i > 0; i--)
         DiveFreeImageBuffer (hDive, hBuffer[i]);
-      return FALSE;
+      return false;
     }
   DirtyRect.xLeft = 0;
   DirtyRect.xRight = WindowWidth ();
@@ -1032,5 +1025,5 @@ BOOL diveWindow::ResizeBuffer (long Width, long Height, FOURCC Format)
   DirtyRect.yTop = WindowHeight ();
   oldDirtyRect.xLeft = -9999;
   SetupBlitter ();
-  return TRUE;
+  return true;
 }

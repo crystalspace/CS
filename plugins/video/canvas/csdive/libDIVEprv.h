@@ -38,7 +38,6 @@ enum
 enum
 {
   pmrcOK,                               // PM thread return code: OK
-  pmrcBadVideomode,                     // return code: Unsupported mode
   pmrcWindowCreationError,              // return code:	Cannot create PM window
   pmrcDIVEfailure,                      // return code:	DIVE subsystem failure
   pmrcNotInitialized,                   // return code: Subsystem not initialized

@@ -69,7 +69,7 @@ class csGraphics2DOS2DIVE : public csGraphics2D
   HWND WinHandle;
   /// The palette
   ULONG DivePalette[256];
-  /// TRUE if palette has to be updated
+  /// true if palette has to be updated
   bool UpdatePalette;
   /// Do double buffering?
   bool dblbuff;

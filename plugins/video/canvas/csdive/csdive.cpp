@@ -404,7 +404,6 @@ bool csGraphics2DOS2DIVE::Open (char *Title)
   dW = rq.Parm.CreateCtx.dW;
 
   // Setup event handlers
-  OS2System->GetSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
   dW->SetKeyboardHandler (KeyboardHandlerStub, this);
   dW->SetMouseHandler (MouseHandlerStub, this);
   dW->SetTerminateHandler (TerminateHandlerStub, this);
@@ -469,7 +468,6 @@ bool csGraphics2DOS2DIVE::Open (char *Title)
   } /* endif */
 
   // Show window
-  dW->Show (TRUE);
   rq.Parm.ShowWin.dW = dW;
   rq.Parm.ShowWin.State = 1;
   if ((rc = PMcall (pmcmdShowWindow, &rq)) != pmrcOK)

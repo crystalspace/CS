@@ -24,11 +24,11 @@
 #include <process.h>
 #include <signal.h>
 #include "sysdef.h"
-#include "cs2d/csdive/libDIVE.h"
-#include "cs2d/csdive/libDIVEprv.h"
+#include "libDIVE.h"
+#include "libDIVEprv.h"
 
 #define WM_DiveCommand	0x9F37		// Choose a unused msg #
-#define defWindowStyle  dwfTitleBar|dwfSysMenu|dwfAccelTable
+#define defWindowStyle  FCF_TITLEBAR | FCF_SYSMENU | FCF_ACCELTABLE
 
 static volatile TID PMtid;              // PM thread ID
 static volatile HWND PMmng = NULLHANDLE;// PM request manager window
@@ -124,15 +124,15 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
               W = rqData->Parm.BindCtx.dW->BufferWidth () * Scale;
               H = rqData->Parm.BindCtx.dW->BufferHeight () * Scale;
             }
-            rqData->Parm.BindCtx.dW->Resize (W, H, TRUE);
+            rqData->Parm.BindCtx.dW->Resize (W, H, true);
             if ((W == rqData->Parm.BindCtx.DesktopW) && (H == rqData->Parm.BindCtx.DesktopH))
-              rqData->Parm.BindCtx.dW->FullScreen (TRUE);
+              rqData->Parm.BindCtx.dW->FullScreen (true);
           }
           break;
         }
         case pmcmdUnbindDIVEctx:
         {
-          if (!rqData->Parm.BindCtx.dW->Unbind (FALSE))
+          if (!rqData->Parm.BindCtx.dW->Unbind (false))
           {
             rc = pmrcNotBound;
             break;
@@ -209,10 +209,10 @@ static bool QueryDIVE ()
   DiveCaps.ulStructLen = sizeof (DIVE_CAPS);
 
   if (DiveQueryCaps (&DiveCaps, DIVE_BUFFER_SCREEN) != DIVE_ERR_INSUFFICIENT_LENGTH)
-    return FALSE;
+    return false;
   DiveCaps.pFormatData = malloc (DiveCaps.ulFormatLength);
   if (DiveQueryCaps (&DiveCaps, DIVE_BUFFER_SCREEN) != DIVE_SUCCESS)
-    return FALSE;
+    return false;
 
   DesktopW = DiveCaps.ulHorizontalResolution;
   DesktopH = DiveCaps.ulVerticalResolution;
@@ -239,15 +239,15 @@ static bool QueryDIVE ()
     }
   }
   free (DiveCaps.pFormatData);
-  return TRUE;
+  return true;
 }
 
 bool gdDiveInitialize ()
 {
   if (PMtid)
-    return TRUE;
+    return true;
   if (!QueryDIVE ())
-    return FALSE;
+    return false;
   PMtid = _beginthread (PMthread, NULL, 0x8000, NULL);
   for (int i = 0; i < 100; i++)
   {
@@ -255,20 +255,20 @@ bool gdDiveInitialize ()
     if (PMmng)
     {
       if (DosCreateMutexSem (NULL, (PHMTX) &semBusy, 0, FALSE))
-        return FALSE;
+        return false;
       if (DosCreateEventSem (NULL, (PHEV) &semSleep, 0, FALSE))
-        return FALSE;
-      return TRUE;
+        return false;
+      return true;
     }
   }
-  return FALSE;
+  return false;
 }
 
 bool gdDiveDeinitialize ()
 {
-  WinPostQueueMsg (dA->appMQ, WM_QUIT, (MPARAM) 0, (MPARAM) 0);
+  WinPostQueueMsg (dA->MQ, WM_QUIT, (MPARAM) 0, (MPARAM) 0);
   DosWaitThread ((PTID) &PMtid, DCWW_WAIT);
   DosCloseEventSem (semSleep);
   DosCloseMutexSem (semBusy);
-  return TRUE;
+  return true;
 }

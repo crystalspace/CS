@@ -122,7 +122,7 @@ void csGraphics2DGLX::Initialize ()
       CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
     }
   }
- 
+
   pfmt.RedMask = 0xf00;//visual->red_mask;
   pfmt.GreenMask = 0xf0;//visual->green_mask;
   pfmt.BlueMask = 0xf;//visual->blue_mask;
@@ -165,10 +165,10 @@ bool csGraphics2DGLX::Open(char *Title)
   winattr.border_pixel = 0;
   winattr.colormap = cmap;
   winattr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-    FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;  
+    FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
   window = XCreateWindow(dpy,RootWindow(dpy,active_GLVisual->screen), 0, 0,
     Width,Height, 0 /*border width */,
-    active_GLVisual->depth, InputOutput, active_GLVisual->visual, 
+    active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap | CWEventMask, &winattr);
   XMapWindow (dpy, window);
   XStoreName (dpy, window, Title);
@@ -180,14 +180,14 @@ bool csGraphics2DGLX::Open(char *Title)
   EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
     &Black, &Black, 0, 0);
   MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
-//MouseCursor [csmcLens] = XCreateFontCursor (dpy, 
+//MouseCursor [csmcLens] = XCreateFontCursor (dpy,
   MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
   MouseCursor [csmcPen] = XCreateFontCursor (dpy, XC_hand2/*XC_pencil*/);
   MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
   /// Diagonal (\) resizing cursor
-//MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy, 
+//MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy,
   /// Diagonal (/) resizing cursor
-//MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy, 
+//MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy,
   /// Vertical sizing cursor
   MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
   /// Horizontal sizing cursor

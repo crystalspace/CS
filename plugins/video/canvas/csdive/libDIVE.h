@@ -151,14 +151,14 @@ private:
   long ScreenW, ScreenH;                // Screen size
   ULONG *CLUT;                          // The palette for 256-color images
   HEV sRedrawComplete;                  // Redraw complete event semaphore
-  BOOL fAspect;                         // Maintain aspect ratio?
-  BOOL fPause;                          // Set to TRUE will freeze drawing
-  BOOL fMouseVisible;                   // If FALSE mouse pointer will be hidden
+  bool fAspect;                         // Maintain aspect ratio?
+  bool fPause;                          // Set to true will freeze drawing
+  bool fMouseVisible;                   // If false mouse pointer will be hidden
   ULONG MouseCursorID;			// Mouse cursor shape ID (SPTR_ARROW ...)
-  BOOL fMinimized;                      // This is TRUE when window is minimized
-  BOOL fFullScreen;                     // TRUE if we`re in full-screen
-  BOOL fPhysCLUT;                       // TRUE if we changed physical palette
-  BOOL fActive;                         // Window is active
+  bool fMinimized;                      // This is true when window is minimized
+  bool fFullScreen;                     // true if we`re in full-screen
+  bool fPhysCLUT;                       // true if we changed physical palette
+  bool fActive;                         // Window is active
   long FailedCount;                     // Count failed attempts to redraw between
                                         // WM_VRNDIS/ENABLED
   SWP swpFullScreen;                    // Window position before full-screen
@@ -167,7 +167,7 @@ private:
   RECTL DirtyRect;                      // Rectangle that should be updated
   RECTL oldDirtyRect;                   // Dirty rectangle that is already set up
   ULONG MouseButtonMask;		// Current mouse button states
-  BOOL MouseCaptured;			// Mouse captured flag
+  bool MouseCaptured;			// Mouse captured flag
 
   tKeyboardHandler hKeyboard;           // Keyboard handler if not NULL
   void *paramKeyboard;                  // Parameter passed to keyboard handler
@@ -190,25 +190,25 @@ public:
   virtual ~diveWindow ();
 
   /// Bind DIVE buffer to a PM window, either client or frame window
-  BOOL Bind (HWND winHandle);
+  bool Bind (HWND winHandle);
 
   /// Unbind from window; optionally destroy window
-  BOOL Unbind (BOOL Destroy);
+  bool Unbind (bool Destroy);
 
   /// Set *logical* color lookup table (AKA palette)
-  BOOL SetCLUT (ULONG * NewCLUT, int Count);
+  bool SetCLUT (ULONG * NewCLUT, int Count);
 
   /// Set physical CLUT to logical CLUT
-  BOOL SetPhysCLUT ();
+  bool SetPhysCLUT ();
 
   /// Restore default desktop palette
-  BOOL ResetPhysCLUT ();
+  bool ResetPhysCLUT ();
 
   /// Show the window
-  BOOL Show (BOOL Visible);
+  bool Show (bool Visible);
 
   /// Disable standard accelerator table for window so we can use ALT, ALT+F4 etc
-  BOOL DisableAccelTable ();
+  bool DisableAccelTable ();
 
   /// Two virtual functions that performs PM message management for frame and client
   virtual MRESULT ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2);
@@ -221,7 +221,7 @@ public:
   void EndPaint ();
 
   /// Enable or disable constant aspect ratio of window
-  inline void MaintainAspectRatio (BOOL State)
+  inline void MaintainAspectRatio (bool State)
   {
     if (!fFullScreen)
     {
@@ -231,14 +231,14 @@ public:
   }
 
   /// Pause window: application will skip ticks in BeginPaint ()
-  inline void Pause (BOOL State)
+  inline void Pause (bool State)
   {
     fPause = State;
     WinCheckMenuItem (diveMN, cmdPause, fPause);
   }
 
   /// Set mouse cursor visibility when it is over DIVE window
-  void MouseVisible (BOOL State);
+  void MouseVisible (bool State);
 
   /// Set mouse cursor shape when it is over DIVE window
   inline void MouseCursor (ULONG ID)
@@ -266,7 +266,7 @@ public:
   }
 
   /// Set window title: This function requires a message queue
-  inline BOOL SetTitle (char *Title)
+  inline bool SetTitle (char *Title)
   {
     return WinSetWindowText (diveFR, (PSZ) Title);
   }
@@ -278,19 +278,19 @@ public:
   }
 
   /// Adjust these variables so that Width/Height == BufferWidth/BufferHeight
-  BOOL AdjustAspectRatio (long *Width, long *Height);
+  bool AdjustAspectRatio (long *Width, long *Height);
 
   /// Resize *client* window, compute and set new frame window size
-  BOOL Resize (long Width, long Height, BOOL Center);
+  bool Resize (long Width, long Height, bool Center);
 
   /// Resize *image buffer*; all previous images will be lost
-  BOOL ResizeBuffer (long Width, long Height, FOURCC Format);
+  bool ResizeBuffer (long Width, long Height, FOURCC Format);
 
   /// Switch to/from full-screen mode
-  BOOL FullScreen (BOOL State);
+  bool FullScreen (bool State);
 
   /// Set DIVE window position
-  BOOL SetPos (long X, long Y);
+  bool SetPos (long X, long Y);
 
   /// Define Keyboard Handler
   inline void SetKeyboardHandler (tKeyboardHandler Handler, void *param)
@@ -321,19 +321,19 @@ public:
   }
 
   /// Return if window is paused
-  inline BOOL isPaused ()
+  inline bool isPaused ()
   {
     return fPause;
   }
 
   /// Return 'constant aspect ratio' flag
-  inline BOOL isAspectRatioConst ()
+  inline bool isAspectRatioConst ()
   {
     return fAspect;
   }
 
   /// Return minimized status
-  inline BOOL isMinimized ()
+  inline bool isMinimized ()
   {
     return fMinimized;
   }
@@ -362,25 +362,18 @@ public:
     return WindowH;
   }
 private:
-  BOOL SetupBlitter ();
-  BOOL SetupPalette ();
+  bool SetupBlitter ();
+  bool SetupPalette ();
   static MRESULT EXPENTRY ClientHandler (HWND Handle, ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2);
   static MRESULT EXPENTRY FrameHandler (HWND Handle, ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2);
 };
-
-// Constants for Flags in diveApp constructor
-#define dwfIcon		FCF_ICON
-#define dwfMenu		FCF_MENU
-#define dwfSysMenu	FCF_SYSMENU
-#define dwfTitleBar	FCF_TITLEBAR
-#define dwfAccelTable	FCF_ACCELTABLE
 
 // DIVE simple application class; you can use it for simple applications
 class diveApp
 {
 public:
-  HAB appAB;
-  HMQ appMQ;
+  HAB AB;
+  HMQ MQ;
   HWND appWN[16];
   u_int appWNlength;
 
@@ -388,7 +381,7 @@ public:
   ~diveApp ();
   HWND CreateWindow (PSZ Title, HMODULE ModID, ULONG ResID, ULONG Flags);
   void Run ();
-  BOOL ProcessQueuedMessages ();
+  bool ProcessQueuedMessages ();
 };
 
 #endif // RC_INVOKED
