@@ -31,6 +31,7 @@ struct iGraphics2D;
 struct iGraphics3D;
 struct iCamera;
 struct csFog;
+struct csRenderView;
 
 /**
  * Information for vertex based fog. There is an instance of this
@@ -66,7 +67,7 @@ public:
   csFog* fog;
 };
 
-SCF_VERSION (iRenderView, 0, 0, 4);
+SCF_VERSION (iRenderView, 0, 0, 5);
 
 /**
  * This interface represents all information needed to render
@@ -74,6 +75,8 @@ SCF_VERSION (iRenderView, 0, 0, 4);
  */
 struct iRenderView : public iBase
 {
+  /// Get the private csRenderView (UGLY).
+  virtual csRenderView* GetPrivateObject () = 0;
   /// Get the engine.
   virtual iEngine* GetEngine () = 0;
   /// Get the 2D clipper for this view.

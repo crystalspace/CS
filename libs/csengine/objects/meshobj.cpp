@@ -64,13 +64,13 @@ void csMeshWrapper::ScaleBy (float factor)
 }
 
 
-void csMeshWrapper::Rotate (float /*angle*/)
+void csMeshWrapper::Rotate (float angle)
 {
-  //csZRotMatrix3 rotz (angle);
-  //movable.Transform (rotz);
-  //csXRotMatrix3 rotx (angle);
-  //movable.Transform (rotx);
-  //UpdateMove ();
+  csZRotMatrix3 rotz (angle);
+  movable.Transform (rotz);
+  csXRotMatrix3 rotx (angle);
+  movable.Transform (rotx);
+  UpdateMove ();
 }
 
 
@@ -91,6 +91,44 @@ void csMeshWrapper::AddColor (const csColor& /*col*/)
 void csMeshWrapper::UpdateInPolygonTrees ()
 {
   bbox.RemoveFromTree ();
+
+  // If we are not in a sector which has a polygon tree
+  // then we don't really update. We should consider if this is
+  // a good idea. Do we only want this object updated when we
+  // want to use it in a polygon tree? It is certainly more
+  // efficient to do it this way when the object is currently
+  // moving in normal convex sectors.
+  int i;
+  csPolygonTree* tree = NULL;
+  csVector& sects = movable.GetSectors ();
+  for (i = 0 ; i < sects.Length () ; i++)
+  {
+    tree = ((csSector*)sects[i])->GetStaticTree ();
+    if (tree) break;
+  }
+  if (!tree) return;
+
+  csBox3 b;
+  mesh->GetObjectBoundingBox (b);
+
+  // This transform should be part of the object class and not just calculated
+  // every time we need it. @@@!!!
+  csTransform trans = movable.GetFullTransform ().GetInverse ();
+
+  bbox.Update (b, trans, this);
+
+  // Here we need to insert in trees where this sprite lives.
+  for (i = 0 ; i < sects.Length () ; i++)
+  {
+    tree = ((csSector*)sects[i])->GetStaticTree ();
+    if (tree)
+    {
+      // Temporarily increase reference to prevent free.
+      bbox.GetBaseStub ()->IncRef ();
+      tree->AddObject (&bbox);
+      bbox.GetBaseStub ()->DecRef ();
+    }
+  }
 }
 
 void csMeshWrapper::UpdateMove ()

@@ -20,11 +20,10 @@
 #define __IMESHCUBE_H__
 
 #include "csutil/scf.h"
-#include "iplugin.h"
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iCubeMeshObject, 0, 0, 3);
+SCF_VERSION (iCubeFactoryState, 0, 0, 3);
 
 /**
  * This interface describes the API for the cube mesh object.
@@ -32,7 +31,7 @@ SCF_VERSION (iCubeMeshObject, 0, 0, 3);
  * want it to have and the appearance. The cube plugin implements
  * this interface in addition to iMeshObjectFactory.
  */
-struct iCubeMeshObject : public iBase
+struct iCubeFactoryState : public iBase
 {
   /// Set size of cube.
   virtual void SetSize (float sizex, float sizey, float sizez) = 0;

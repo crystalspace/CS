@@ -33,6 +33,7 @@ class csSector;
 class csDynLight;
 class csLight;
 class csRenderView;
+struct iMeshObjectFactory;
 
 /**
  * This class represents a particle system. It is a set of iParticles.
@@ -65,6 +66,9 @@ protected:
 
   /// Bounding box for polygon trees.
   csPolyTreeBBox ptree_bbox;
+
+  /// Pointer to a mesh object factory for 2D sprites.
+  iMeshObjectFactory* spr_factory;
 
 protected:
   /// Update this sprite in the polygon trees.

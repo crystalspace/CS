@@ -236,6 +236,7 @@ public:
   struct Light : public iLight
   {
     DECLARE_EMBEDDED_IBASE (csLight);
+    virtual csLight* GetPrivateObject () { return (csLight*)scfParent; }
     virtual csVector3& GetCenter () { return scfParent->GetCenter (); }
     virtual float GetSquaredRadius () const { return scfParent->GetSquaredRadius (); }
     virtual csColor& GetColor () { return scfParent->GetColor (); }

@@ -46,6 +46,7 @@ private:
   G3DFogInfo fog[8];
   G3DTriangleMesh mesh;
   bool initialized;
+  csBox3 object_bbox;
 
   /**
    * Camera space bounding box is cached here.
@@ -90,10 +91,11 @@ public:
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable);
+  virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
 };
 
 /**
- * Factory for cubes. This factory also implements iCubeMeshObject
+ * Factory for cubes. This factory also implements iCubeFactoryState
  * so that you can set the size of the cube and the material to use
  * for all instances that are created from this factory.
  */
@@ -135,8 +137,8 @@ public:
   /// Draw.
   virtual iMeshObject* NewInstance ();
 
-  //------------------------- iCubeMeshObject implementation ----------------
-  class CubeMeshObject : public iCubeMeshObject
+  //------------------------- iCubeFactoryState implementation ----------------
+  class CubeFactoryState : public iCubeFactoryState
   {
     DECLARE_EMBEDDED_IBASE (csCubeMeshObjectFactory);
     virtual void SetSize (float sizex, float sizey, float sizez)
@@ -164,8 +166,8 @@ public:
     virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
     virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
     virtual UInt GetMixMode () { return scfParent->MixMode; }
-  } scfiCubeMeshObject;
-  friend class CubeMeshObject;
+  } scfiCubeFactoryState;
+  friend class CubeFactoryState;
 };
 
 /**

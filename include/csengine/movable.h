@@ -146,9 +146,16 @@ public:
   }
 
   /**
-   * Get the current position.
+   * Get the current local position.
    */
   const csVector3& GetPosition () const { return obj.GetOrigin (); }
+
+  /**
+   * Get the current position using the full transformation (using
+   * possible parent transformations).
+   * @@@ Currently not very efficient!
+   */
+  const csVector3 GetFullPosition () const { return GetFullTransform ().GetOrigin (); }
 
   /**
    * Set the transformation matrix for this entity.
@@ -166,10 +173,15 @@ public:
   csReversibleTransform& GetTransform () { return obj; }
 
   /**
+   * Get the local world to object tranformation.
+   */
+  const csReversibleTransform& GetTransform () const { return obj; }
+
+  /**
    * Construct the full world to object transformation given
    * this transformation and possible parents transformations.
    */
-  csReversibleTransform GetFullTransform ();
+  csReversibleTransform GetFullTransform () const;
 
   /**
    * Relative move.
@@ -218,6 +230,10 @@ public:
     virtual const csVector3& GetPosition ()
     {
       return scfParent->GetPosition ();
+    }
+    virtual const csVector3 GetFullPosition ()
+    {
+      return scfParent->GetFullPosition ();
     }
     virtual void SetTransform (const csMatrix3& matrix)
     {

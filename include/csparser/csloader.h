@@ -71,12 +71,12 @@ class csLoader
 {
   struct LoadedPlugin
   {
-    const char* name;
+    char* name;
     iPlugIn* plugin;
   };
   static csVector loaded_plugins;
   static iPlugIn* FindPlugIn (const char* name);
-  static void NewPlugIn (const char* name, iPlugIn* plugin);
+  static void NewPlugIn (char* name, iPlugIn* plugin);
   
   /// Parse a matrix definition
   static bool load_matrix (char* buf, csMatrix3 &m);

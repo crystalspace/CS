@@ -723,17 +723,15 @@ public:
   struct Particle : public iParticle
   {
     DECLARE_EMBEDDED_IBASE (csSprite);
-    virtual void MoveToSector(csSector*);
-    virtual void SetPosition(const csVector3&);
-    virtual void MovePosition(const csVector3&);
-    virtual void SetColor(const csColor&);
-    virtual void AddColor(const csColor&);
-    virtual void ScaleBy(float factor);
-    virtual void SetMixmode(UInt mode);
-    virtual void Rotate(float angle);
-    virtual void Draw(csRenderView&);
-    virtual void UpdateLighting(csLight**, int num_lights);
-    virtual void DeferUpdateLighting(int flags, int num_lights);
+    virtual void SetPosition (const csVector3&);
+    virtual void MovePosition (const csVector3&);
+    virtual void SetColor (const csColor&);
+    virtual void AddColor (const csColor&);
+    virtual void ScaleBy (float factor);
+    virtual void SetMixmode (UInt mode);
+    virtual void Rotate (float angle);
+    virtual void Draw (iRenderView*);
+    virtual void UpdateLighting (iLight**, int num_lights);
   } scfiParticle;
 
   //-------------------------- iSprite implementation -----------------------//

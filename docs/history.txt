@@ -1,5 +1,59 @@
 The history order has been reversed so that new features are at the top.
 
+3-Jan-2001
+	- Andrew Zabolotny did the following changes to CS:
+	    - Enhanced a little software DrawPixmap for
+	      textures-with-alphamap, where in 16 and 8 bpp modes alpha=0
+	      still would lead to a changing background a little.
+	    - Added a nice logo to MazeD's About box.
+	    - Fixed a few things here and there in MazeD.
+	    - A new QInt and QRound that will work on some big-endian CPUs
+	      as well.
+	    - Fix to slow QRound so that it works correctly for negative
+	      numbers.
+	    - A new fast sqrt() and 1/sqrt() implementation. Not used
+	      anywhere for now (I'll leave this on Jorrit's behalf) but it
+	      has a big potential. Engine is using 1/sqrt() in a lot of
+	      places, and computing 1/sqrt() in one go is a big win. Plain
+	      sqrt() is about 31% faster (on PII and Celeron) than FPU's
+	      FSQRT instruction, and 1/sqrt() is 38% faster than FSQRT
+	      (dunno how fast than actually computing 1/sqrt(x) - division
+	      is quite a slow operation, almost as slow as sqrt itself - 42
+	      and 71 clocks respectively).
+	- Wouter Wijngaards improved the portal more. It has a border around
+	  the portal polygon, showing a part of the portal texture mapped
+	  on it.
+	- Added GetObjectBoundingBox() to iMeshObject.
+	  Added implementation for this method to the cube plugin.
+	- Implemented UpdateInPolygonTrees() in csMeshWrapper so that
+	  mesh objects will now correctly be drawn in BSP type levels too.
+	- Implemented csMeshWrapper::Rotate().
+	- Started porting csSprite2D (2D sprites) to the new mesh
+	  plugin system. Created new directory plugins/meshobj/spr2d
+	  where it will be located.
+	- Also created iSprite2DFactoryState SCF interface which will
+	  be used to set the characteristics of 2D sprite factories. Also
+	  added iSprite2DState to set the characteristics of 2D sprite
+	  instances.
+	- Renamed iCubeMeshObject to iCubeFactoryState because I think this
+	  is a better name which also fits the name of the 2D sprite
+	  state interfaces better.
+	- Also created the 2D sprite loaders.
+	- Plugin 2D sprites are now working mostly. The old 2D sprites are not
+	  yet removed because the particle systems still depend on them.
+	- Extended iMovable and csMovable with GetFullPosition() which returns
+	  the position of the movable but keeps track of the hierarchical
+	  transformations (similar to GetFullTransform()).
+	- Fixed a serious bug in csloader with regards to the new plugin
+	  loaders. The wrong type plugin was taken in some cases.
+	- Removed MoveToSector from iParticle. It is not needed and wrong
+	  if used in combination with the new mesh object system (they have no
+	  notion of sectors).
+	- Removed DeferUpdateLighting() from iParticle.
+	- Changed iParticle::UpdateLighting() to take an array of iLight
+	  instead of csLight. SCF classes should not refer to engine classes.
+	- Changed iParticle::Draw() to use iRenderView instead of csRenderView.
+	- Added iLight::GetPrivateObject() and iRenderView::GetPrivateObject().
 2-Jan-2001
 	- Philip Wyett fixed a small VC compiler warning.
 	- Wouter Wijngaards fixed a compile warning.

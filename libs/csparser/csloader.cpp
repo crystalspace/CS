@@ -4671,10 +4671,11 @@ iPlugIn* csLoader::FindPlugIn (const char* name)
   return NULL;
 }
 
-void csLoader::NewPlugIn (const char* name, iPlugIn* plugin)
+void csLoader::NewPlugIn (char* name, iPlugIn* plugin)
 {
   LoadedPlugin* lp = new LoadedPlugin ();
-  lp->name = name;
+  lp->name = new char [strlen (name)+1];
+  strcpy (lp->name, name);
   lp->plugin = plugin;
   loaded_plugins.Push (lp);
 }

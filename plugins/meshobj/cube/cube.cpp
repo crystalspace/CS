@@ -140,10 +140,12 @@ void csCubeMeshObject::SetupObject ()
     vertices[6].Set (-sx,  sy,  sz);
     vertices[7].Set ( sx,  sy,  sz);
     int i;
+    object_bbox.StartBoundingBox ();
     for (i = 0 ; i < 8 ; i++)
     {
       normals[i] = vertices[i]; normals[i].Normalize ();
       vertices[i] += csVector3 (shiftx, shifty, shiftz);
+      object_bbox.AddBoundingVertex (vertices[i]);
     }
     uv[0].Set (0, 0);
     uv[1].Set (1, 0);
@@ -320,21 +322,27 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
   return true;
 }
 
+void csCubeMeshObject::GetObjectBoundingBox (csBox3& bbox, bool /*accurate*/)
+{
+  SetupObject ();
+  bbox = object_bbox;
+}
+
 //----------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csCubeMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCubeMeshObject)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iCubeFactoryState)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectFactory::CubeMeshObject)
-  IMPLEMENTS_INTERFACE (iCubeMeshObject)
+IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectFactory::CubeFactoryState)
+  IMPLEMENTS_INTERFACE (iCubeFactoryState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csCubeMeshObjectFactory::csCubeMeshObjectFactory ()
 {
   CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiCubeMeshObject);
+  CONSTRUCT_EMBEDDED_IBASE (scfiCubeFactoryState);
   sizex = 1;
   sizey = 1;
   sizez = 1;
@@ -399,7 +407,7 @@ bool csCubeMeshObjectType::Initialize (iSystem*)
 iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()
 {
   csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory ();
-  iCubeMeshObject* cubeLook = QUERY_INTERFACE (cm, iCubeMeshObject);
+  iCubeFactoryState* cubeLook = QUERY_INTERFACE (cm, iCubeFactoryState);
   cubeLook->SetSize (default_sizex, default_sizey, default_sizez);
   cubeLook->SetShift (default_shiftx, default_shifty, default_shiftz);
   return QUERY_INTERFACE (cm, iMeshObjectFactory);

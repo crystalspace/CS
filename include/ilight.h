@@ -25,13 +25,15 @@
 class csLight;
 class csColor;
 
-SCF_VERSION (iLight, 0, 0, 2);
+SCF_VERSION (iLight, 0, 0, 3);
 
 /**
  * The iLight interface is the SCF interface for the csLight class. 
  */
 struct iLight : public iBase
 {
+  /// Get private pointer to light object. UGLY
+  virtual csLight* GetPrivateObject () = 0;
   /// Get the position of this light.
   virtual csVector3& GetCenter () = 0;
   /// Get the squared radius.
@@ -43,3 +45,4 @@ struct iLight : public iBase
 };
 
 #endif // __ILIGHT_H__
+

@@ -135,7 +135,7 @@ void csMovable::UpdateMove ()
   }
 }
 
-csReversibleTransform csMovable::GetFullTransform ()
+csReversibleTransform csMovable::GetFullTransform () const
 {
   if (parent == NULL)
     return GetTransform ();

@@ -17,8 +17,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define USE_PLUGIN 0
+
 #include "cssysdef.h"
+#if !USE_PLUGIN
 #include "csengine/csspr2d.h"
+#endif
+#include "csengine/meshobj.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
 #include "csengine/particle.h"
@@ -26,6 +31,9 @@
 #include "csengine/sector.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/fastsqrt.h"
+#if USE_PLUGIN
+#include "imspr2d.h"
+#endif
 #include <math.h>
 #include <stdlib.h>
 
@@ -33,7 +41,7 @@ IMPLEMENT_CSOBJTYPE (csParticleSystem, csSprite)
 IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
 
 
-csParticleSystem :: csParticleSystem(csObject* theParent)
+csParticleSystem::csParticleSystem (csObject* theParent)
   : csSprite (theParent), ptree_bbox (NULL)
 {
   CONSTRUCT_IBASE (NULL);
@@ -51,15 +59,21 @@ csParticleSystem :: csParticleSystem(csObject* theParent)
   change_alpha = false;
   change_rotation = false;
   // bbox is empty.
+  
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (csEngine::System, "crystalspace.meshobj.spr2d",
+      "MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (csEngine::System, "crystalspace.meshobj.spr2d", "MeshObj", iMeshObjectType);
+  spr_factory = type->NewFactory ();
 }
 
 
-csParticleSystem :: ~csParticleSystem()
+csParticleSystem::~csParticleSystem()
 {
   // delete all my particles
-  for(int i=0; i<particles.Length(); i++)
-    if(particles[i])
-      GetParticle(i)->DecRef();
+  for (int i=0 ; i < particles.Length() ; i++)
+    if (particles[i])
+      GetParticle (i)->DecRef ();
+  spr_factory->DecRef ();
 }
 
 void csParticleSystem::UpdateInPolygonTrees ()
@@ -104,19 +118,32 @@ void csParticleSystem::UpdateInPolygonTrees ()
 void csParticleSystem :: AppendRectSprite(float width, float height, 
   csMaterialWrapper *mat, bool lighted)
 {
-  csSprite2D *part = new csSprite2D(this);
   iParticle *pTicle;
-  //csEngine::current_engine->sprites.Push(part);
+#if !USE_PLUGIN
+  csSprite2D *part = new csSprite2D(this);
   csColoredVertices& vs = part->GetVertices();
+#else
+  iMeshObject* sprmesh = spr_factory->NewInstance ();
+  csMeshWrapper* part = new csMeshWrapper (this, sprmesh);
+  iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
+  csColoredVertices& vs = state->GetVertices();
+#endif
+
   vs.SetLimit(4);
   vs.SetLength(4);
   vs[0].pos.Set(-width,-height); vs[0].u=0.; vs[0].v=1.;
   vs[1].pos.Set(-width,+height); vs[1].u=0.; vs[1].v=0.;
   vs[2].pos.Set(+width,+height); vs[2].u=1.; vs[2].v=0.;
   vs[3].pos.Set(+width,-height); vs[3].u=1.; vs[3].v=1.;
+#if !USE_PLUGIN
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
   part->SetMaterial (mat);
+#else
+  state->SetLighting( lighted );
+  part->SetColor( csColor(1.0, 1.0, 1.0) );
+  state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+#endif
   AppendParticle(pTicle = QUERY_INTERFACE(part, iParticle));
   pTicle->DecRef ();
   part->DecRef(); 
@@ -127,14 +154,25 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
 void csParticleSystem :: AppendRegularSprite(int n, float radius, 
   csMaterialWrapper* mat, bool lighted)
 {
-  csSprite2D *part = new csSprite2D(this);
   iParticle *pTicle;
-  //csEngine::current_engine->sprites.Push(part);
+#if !USE_PLUGIN
+  csSprite2D *part = new csSprite2D(this);
   part->CreateRegularVertices(n, true);
   part->ScaleBy(radius);
   part->SetMaterial (mat);
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
+#else
+  iMeshObject* sprmesh = spr_factory->NewInstance ();
+  csMeshWrapper* part = new csMeshWrapper (this, sprmesh);
+  iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
+  state->CreateRegularVertices(n, true);
+  part->ScaleBy(radius);
+  state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  state->SetLighting( lighted );
+  part->SetColor( csColor(1.0, 1.0, 1.0) );
+#endif
+
   AppendParticle(pTicle = QUERY_INTERFACE(part, iParticle));
   pTicle->DecRef ();
   part->DecRef(); 
@@ -229,29 +267,33 @@ void csParticleSystem :: Update(cs_time elapsed_time)
 
 void csParticleSystem::Draw (csRenderView& rview)
 {
+  UpdateDeferedLighting (movable.GetPosition ());
+  iRenderView* irview = QUERY_INTERFACE (&rview, iRenderView);
   for (int i = 0; i<particles.Length(); i++)
-    GetParticle(i)->Draw (rview);
+    GetParticle(i)->Draw (irview);
 }
 
 void csParticleSystem::UpdateLighting (csLight** lights, int num_lights)
 {
   defered_num_lights = 0;
-  for (int i = 0; i<particles.Length(); i++)
-    GetParticle(i)->UpdateLighting (lights, num_lights);
+  // @@@ NOT EFFICIENT!!!
+  iLight** ilights = new iLight*[num_lights];
+  int i;
+  for (i = 0 ; i < num_lights ; i++)
+    ilights[i] = QUERY_INTERFACE (lights[i], iLight);
+  for (i = 0; i<particles.Length(); i++)
+    GetParticle(i)->UpdateLighting (ilights, num_lights);
+  delete[] ilights;
 }
 
 void csParticleSystem::DeferUpdateLighting (int flags, int num_lights)
 {
   csSprite::DeferUpdateLighting (flags, num_lights);
-  for (int i = 0; i<particles.Length(); i++)
-    GetParticle(i)->DeferUpdateLighting (flags, num_lights);
 }
 
 const csVector3& csParticleSystem::GetPosition () const
 {
-  // @@@ Can we return anything useful here?
-  static csVector3 v (0);
-  return v;
+  return movable.GetPosition ();
 }
 
 //---------------------------------------------------------------------

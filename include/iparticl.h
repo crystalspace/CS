@@ -22,9 +22,10 @@
 #include "csutil/scf.h"
 class csColor;
 class csVector3;
-class csRenderView;
+class iRenderView;
+class iLight;
 
-SCF_VERSION (iParticle, 0, 0, 1);
+SCF_VERSION (iParticle, 0, 0, 2);
 
 /**
  * A iParticle can be used in particle Systems.
@@ -35,29 +36,25 @@ SCF_VERSION (iParticle, 0, 0, 1);
  */
 struct iParticle : public iBase
 {
-  /// A hint that this particle will start out in given sector.
-  virtual void MoveToSector(csSector *sector) = 0;
-  /// Set the position of this particle in world coordinates
-  virtual void SetPosition(const csVector3& pos) = 0;
+  /// Set the position of this particle in world coordinates.
+  virtual void SetPosition (const csVector3& pos) = 0;
   /// Move the particle relative to position.
-  virtual void MovePosition(const csVector3& move) = 0;
+  virtual void MovePosition (const csVector3& move) = 0;
 
   /// Set the color of this particle.
-  virtual void SetColor(const csColor& col) = 0;
+  virtual void SetColor (const csColor& col) = 0;
   /// Add color to the color of the sprite.
-  virtual void AddColor(const csColor& col) = 0;
+  virtual void AddColor (const csColor& col) = 0;
   /// Scale particle by this factor. 
-  virtual void ScaleBy(float factor) = 0;
+  virtual void ScaleBy (float factor) = 0;
   /// Set the Mixmode for the particle.
-  virtual void SetMixmode(UInt mode) = 0;
+  virtual void SetMixmode (UInt mode) = 0;
   /// Rotate the particle is some particle dependent manner, in radians.
-  virtual void Rotate(float angle) = 0;
+  virtual void Rotate (float angle) = 0;
   /// Draw this particle.
-  virtual void Draw (csRenderView& rview) = 0;
+  virtual void Draw (iRenderView* rview) = 0;
   /// Light this particle.
-  virtual void UpdateLighting (csLight** lights, int num_lights) = 0;
-  /// Light this particle as soon as it is visible.
-  virtual void DeferUpdateLighting (int flags, int num_lights) = 0;
+  virtual void UpdateLighting (iLight** lights, int num_lights) = 0;
 };
 
 #endif // __IPARTCL_H__

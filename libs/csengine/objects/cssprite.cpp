@@ -631,8 +631,6 @@ bool csSprite::HitBeam (const csVector3& start, const csVector3& end,
   return rc;
 }
 
-void csSprite::Particle::MoveToSector(csSector* s)
-  { scfParent->GetMovable ().SetSector (s); scfParent->GetMovable ().UpdateMove (); }
 void csSprite::Particle::SetPosition(const csVector3& v)
   { scfParent->GetMovable().SetPosition(v); scfParent->GetMovable ().UpdateMove (); }
 void csSprite::Particle::MovePosition(const csVector3& v)
@@ -647,12 +645,18 @@ void csSprite::Particle::SetMixmode(UInt mode)
   { scfParent->SetMixmode(mode); }
 void csSprite::Particle::Rotate(float angle)
   { scfParent->Rotate(angle); }
-void csSprite::Particle::Draw(csRenderView& v)
-  { scfParent->Draw(v); }
-void csSprite::Particle::UpdateLighting(csLight** lights, int num_lights)
-  { scfParent->UpdateLighting(lights, num_lights); }
-void csSprite::Particle::DeferUpdateLighting(int flags, int num_lights)
-  { scfParent->DeferUpdateLighting(flags, num_lights); }
+void csSprite::Particle::Draw (iRenderView* v)
+  { scfParent->Draw (*(v->GetPrivateObject ())); }
+void csSprite::Particle::UpdateLighting(iLight** lights, int num_lights)
+{
+  // @@@ NOT EFFICIENT: TEMPORARY
+  csLight** cslights = new csLight*[num_lights];
+  int i;
+  for (i = 0 ; i < num_lights ; i++)
+    cslights[i] = lights[i]->GetPrivateObject ();
+  scfParent->UpdateLighting (cslights, num_lights);
+  delete[] cslights;
+}
 
 //=============================================================================
 

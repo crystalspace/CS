@@ -91,7 +91,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
     printf ("Load TYPE plugin crystalspace.meshobj.cube\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
-  iCubeMeshObject* cubeLook = QUERY_INTERFACE (fact, iCubeMeshObject);
+  iCubeFactoryState* cubeLook = QUERY_INTERFACE (fact, iCubeFactoryState);
 
   char* buf = (char*)string;
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)

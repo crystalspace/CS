@@ -27,7 +27,7 @@ struct iRenderView;
 struct iMovable;
 struct iLight;
 
-SCF_VERSION (iMeshObject, 0, 0, 3);
+SCF_VERSION (iMeshObject, 0, 0, 4);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -57,6 +57,14 @@ struct iMeshObject : public iBase
    * this function (possibly with an UpdateLighting() in between.
    */
   virtual bool Draw (iRenderView* rview, iMovable* movable) = 0;
+
+  /**
+   * Get the bounding box in object space for this mesh object.
+   * If 'accurate' is true an effort has to be done to make the
+   * bounding box as accurate as possible. Otherwise it just has
+   * to be a bounding box.
+   */
+  virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false) = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 3);

@@ -24,6 +24,7 @@ PLUGINS += simpcon
 PLUGINS += font/server/csfont 
 PLUGINS += colldet/rapid
 PLUGINS += meshobj/cube meshldr/cube
+PLUGINS += meshobj/spr2d meshldr/spr2d
 PLUGINS += perfstat
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS.DYNAMIC += sound/loader

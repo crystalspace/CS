@@ -193,6 +193,10 @@ public:
   struct RenderView : public iRenderView
   {
     DECLARE_EMBEDDED_IBASE (csRenderView);
+    virtual csRenderView* GetPrivateObject ()
+    {
+      return (csRenderView*)scfParent;
+    }
     virtual iEngine* GetEngine ();
     virtual iClipper2D* GetClipper ();
     virtual bool IsClipperRequired () { return scfParent->do_clip_frustum; }
