@@ -87,6 +87,7 @@
 
 // csgeom/transfrm.h
 %ignore csTransform::operator*;
+%ignore csReversibleTransform::operator*;
 
 #ifndef CS_MINI_SWIG
 %extend csTransform

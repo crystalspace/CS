@@ -539,6 +539,7 @@ public:
                              t2.v_o2t + t2.m_t2o*t1.v_o2t);
   }
 
+#if !defined(SWIG) /* Otherwise Swig 1.3.22 thinks this is multiply declared */
   /**
    * Combine two transforms, rightmost first. Given the following
    * definitions:
@@ -553,6 +554,7 @@ public:
    */
   friend CS_CSGEOM_EXPORT csTransform operator* (const csTransform& t1,
                               const csReversibleTransform& t2);
+#endif
 
   /**
    * Combine two transforms, reversing t2 then applying t1.
