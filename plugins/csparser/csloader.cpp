@@ -2165,6 +2165,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
+      if (!mesh->GetMeshObject())
+      {
+	SyntaxService->ReportError (
+		"crystalspace.maploader.load.meshobject",
+		child, "Please sepcify the params of the meshobject fist!");
+	return false;
+      }
       else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
       {
         SyntaxService->ReportError (

@@ -9,6 +9,7 @@ The history order is reversed so that new features are at the top.
 	- res changed the Win32 port to eliminate the global ApplicationShow
 	  and ModuleHandle variables. Those are now members of the
 	  Win32Assistant and the values are retrieved at it's construction.
+	- Matze fixed a crasher in the maploader.
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
