@@ -1366,7 +1366,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   float gloss = static_specular_amount * 
     FastPow2(val, static_specular_tightness);
   
-#if 1
+#if 0
     CsPrintf(MSG_STDOUT, "Gloss %g, val=%g, reflect %g,%g,%g\n",
       gloss, val, reflectdir.x, reflectdir.y, reflectdir.z);
 #endif
