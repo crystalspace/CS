@@ -1003,7 +1003,7 @@ void csSector::Draw (iRenderView* rview)
   draw_busy--;
 }
 
-csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
+csObject** csSector::GetVisibleObjects (csFrustumView& lview, int& num_objects)
 {
   csFrustum* lf = lview.GetFrustumContext ()->GetLightFrustum ();
   bool infinite = lf->IsInfinite ();
@@ -1012,11 +1012,12 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
   int i, i1;
   int j;
 
-  num_things = things.Length ();
-  if (!num_things) { return NULL; }
-  csThing** visible_things = new csThing* [num_things];
+  num_objects = things.Length () + meshes.Length ();
+  if (!num_objects) { return NULL; }
+  csObject** visible_objects = new csObject* [num_objects];
 
-  num_things = 0;
+  num_objects = 0;
+  // @@@ Unify both loops below once csThing becomes a mesh object.
   for (j = 0 ; j < things.Length () ; j++)
   {
     csThing* sp = (csThing*)things[j];
@@ -1072,9 +1073,66 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
       }
     }
 
-    if (vis) visible_things[num_things++] = sp;
+    if (vis) visible_objects[num_objects++] = sp;
   }
-  return visible_things;
+  for (j = 0 ; j < meshes.Length () ; j++)
+  {
+    csMeshWrapper* sp = (csMeshWrapper*)meshes[j];
+    // If the light frustum is infinite then every thing
+    // in this sector is of course visible.
+    if (infinite) vis = true;
+    else
+    {
+      csBox3 bbox;
+      sp->GetWorldBoundingBox (bbox);
+      // Here we do a quick test to see if the bounding box is visible in
+      // in the frustum. This test is not complete in the sense that it will
+      // say that some bounding boxes are visible even if they are not. But
+      // it is correct in the sense that if it says a bounding box
+      // is invisible, then it certainly is invisible.
+      //
+      // It works by taking all vertices of the bounding box. If
+      // ALL of them are on the outside of the same plane from the
+      // frustum then the object is certainly not visible.
+      vis = true;
+      i1 = lf->GetNumVertices ()-1;
+      for (i = 0 ; i < lf->GetNumVertices () ; i1 = i, i++)
+      {
+        csVector3& v1 = lf->GetVertex (i);
+        csVector3& v2 = lf->GetVertex (i1);
+        if (csMath3::WhichSide3D (bbox.GetCorner (0)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (1)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (2)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (3)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (4)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (5)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (6)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (7)-c, v1, v2) < 0) continue;
+        // Here we have a case of all vertices of the bbox being on the
+        // outside of the same plane.
+        vis = false;
+        break;
+      }
+      if (vis && lf->GetBackPlane ())
+      {
+        // If still visible then we can also check the back plane.
+        // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
+        // HAVE A BACK PLANE YET.
+        if (!csMath3::Visible (bbox.GetCorner (0)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (1)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (2)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (3)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (4)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (5)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (6)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (7)-c, *lf->GetBackPlane ()))
+          vis = false;
+      }
+    }
+
+    if (vis) visible_objects[num_objects++] = sp;
+  }
+  return visible_objects;
 }
 
 void csSector::CheckFrustum (csFrustumView& lview)
@@ -1092,7 +1150,6 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
   draw_busy++;
 
   int i;
-  csThing* sp;
 
   // Translate this sector so that it is oriented around
   // the position of the light (position of the light becomes
@@ -1113,33 +1170,43 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
   else
   {
     // Here we have no octree so we know the sector polygons are
-    // convex. First find all things that are visible in the frustum.
-    int num_visible_things;
-    csThing** visible_things = GetVisibleThings (lview, num_visible_things);
+    // convex. First find all objects that are visible in the frustum.
+    int num_visible_objects;
+    csObject** visible_objects = GetVisibleObjects (lview, num_visible_objects);
 
-    // Append the shadows for these things to the shadow list.
+    // Append the shadows for these objects to the shadow list.
     // This list is appended to the one given in 'lview'. After
     // returning, the list in 'lview' will be restored.
     if (lview.ThingShadowsEnabled ())
     {
-      for (i = 0 ; i < num_visible_things ; i++)
+      for (i = 0 ; i < num_visible_objects ; i++)
       {
-        sp = visible_things[i];
-	// Only if the thing has the right flags do we consider it for shadows.
-	if (lview.CheckShadowMask (sp->flags.Get ()))
-	  sp->AppendShadows (shadows, center);
+        // @@@ unify with other mesh objects as soon as possible
+        csObject* o = visible_objects[i];
+	if (o->GetType () >= csThing::Type)
+	{
+          csThing* sp = (csThing*)o;
+	  // Only if the thing has right flags do we consider it for shadows.
+	  if (lview.CheckShadowMask (sp->flags.Get ()))
+	    sp->AppendShadows (shadows, center);
+        }
       }
     }
 
-    // Calculate lighting for all things in the current sector.
-    for (i = 0 ; i < num_visible_things ; i++)
+    // Calculate lighting for all objects in the current sector.
+    for (i = 0 ; i < num_visible_objects ; i++)
     {
-      sp = visible_things[i];
-      if (lview.CheckProcessMask (sp->flags.Get ()))
-        sp->RealCheckFrustum (lview);
+      // @@@ unify with other mesh objects as soon as possible
+      csObject* o = visible_objects[i];
+      if (o->GetType () >= csThing::Type)
+      {
+        csThing* sp = (csThing*)o;
+        if (lview.CheckProcessMask (sp->flags.Get ()))
+          sp->RealCheckFrustum (lview);
+      }
     }
       
-    delete [] visible_things;
+    delete [] visible_objects;
   }
 
   // Restore the shadow list in 'lview' and then delete

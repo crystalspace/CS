@@ -120,7 +120,7 @@ struct iMeshObject : public iBase
    *      estimate of a realistic maximum bounding box.
    * </ul>
    */
-  virtual void GetObjectBoundingBox(csBox3& bbox, int type = CS_BBOX_NORMAL)=0;
+  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)=0;
 
   /**
    * Get the radius of this object in object space.

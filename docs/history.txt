@@ -1,6 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
 2-Apr-2001
+	- Renamed csSector::GetVisibleThings() to GetVisibleObjects() and
+	  let it return a list of general objects instead of only things.
+	- Added csMeshWrapper::GetWorldBoundingBox() to calculate the bounding
+	  box of a mesh object in world space. This function will also cache
+	  the bounding box.
+	- Added 'imgload' to the 'make walkall' target.
+	- Added nine new console commands to walktest to demonstrate the new
+	  full screen effects. The commands are: fs_inter, fs_red, fs_green,
+	  fs_blue, fs_whiteout, fs_fadecol, fs_fadeout, fs_fadetxt, and
+	  fs_shadevert. Note that fs_fadetxt does not seem to work well
+	  with OpenGL. Probably a limitation in DrawPolygonFX. Also note
+	  that fs_fadetxt and fs_fadecol do work in software but since the
+	  software renderer is limited to five steps of alpha (0%, 25%, 50%,
+	  75%, and 100%) there is no smooth transition. Also assigned
+	  F4 to fs_inter, F5 to fs_fadeout, and F6 to fs_fadetxt spark.
 	- Integrated patches from Bob Ham to compile Crystal Space on
 	  the Hurd operating system.
 	- Bob also did some proofreading of the docs and did a few

@@ -56,6 +56,7 @@
 #include "csparser/snddatao.h"
 #include "cssys/system.h"
 #include "csfx/cspixmap.h"
+#include "csfx/csfxscr.h"
 #include "version.h"
 #include "qint.h"
 #include "iutil/cfgmgr.h"
@@ -142,6 +143,15 @@ WalkTest::WalkTest () :
   recorded_arg = NULL;
   cfg_playrecording = -1;
   cfg_debug_check_frustum = 0;
+  do_fs_inter = false;
+  do_fs_shadevert = false;
+  do_fs_whiteout = false;
+  do_fs_blue = false;
+  do_fs_red = false;
+  do_fs_green = false;
+  do_fs_fadetxt = false;
+  do_fs_fadecol = false;
+  do_fs_fadeout = false;
 
   plbody = pllegs = NULL;
 
@@ -603,6 +613,83 @@ void WalkTest::DrawFrameConsole ()
   }
 }
 
+void WalkTest::DrawFullScreenFX2D (cs_time /*elapsed_time*/,
+	cs_time current_time)
+{
+  if (do_fs_inter)
+  {
+    iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
+    csfxInterference (Gfx2D, txtmgr, fs_inter_amount, fs_inter_anim,
+    	fs_inter_length);
+    fs_inter_anim = fmod (fabs (float (current_time)/3000.0), 1.);
+  }
+}
+
+void WalkTest::DrawFullScreenFX3D (cs_time /*elapsed_time*/,
+	cs_time current_time)
+{
+  if (do_fs_fadeout)
+  {
+    csfxFadeOut (Gfx3D, fs_fadeout_fade);
+    float t3 = fabs (float (current_time)/3000.0);
+    fs_fadeout_fade = fmod (t3, 1.);
+    fs_fadeout_dir = fmod (t3, 2.) >= 1;
+    if (!fs_fadeout_dir) fs_fadeout_fade = 1-fs_fadeout_fade;
+  }
+  if (do_fs_fadecol)
+  {
+    csfxFadeToColor (Gfx3D, fs_fadecol_fade, fs_fadecol_color);
+    float t3 = fabs (float (current_time)/3000.0);
+    fs_fadecol_fade = fmod (t3, 1.);
+    fs_fadecol_dir = fmod (t3, 2.) >= 1;
+    if (!fs_fadecol_dir) fs_fadecol_fade = 1-fs_fadecol_fade;
+  }
+  if (do_fs_fadetxt)
+  {
+    csfxFadeTo (Gfx3D, fs_fadetxt_mat, fs_fadetxt_fade);
+    float t3 = fabs (float (current_time)/3000.0);
+    fs_fadetxt_fade = fmod (t3, 1.);
+    fs_fadetxt_dir = fmod (t3, 2.) >= 1;
+    if (!fs_fadetxt_dir) fs_fadetxt_fade = 1-fs_fadetxt_fade;
+  }
+  if (do_fs_red)
+  {
+    csfxRedScreen (Gfx3D, fs_red_fade);
+    float t3 = fabs (float (current_time)/3000.0);
+    fs_red_fade = fmod (t3, 1.);
+    fs_red_dir = fmod (t3, 2.) >= 1;
+    if (!fs_red_dir) fs_red_fade = 1-fs_red_fade;
+  }
+  if (do_fs_green)
+  {
+    csfxGreenScreen (Gfx3D, fs_green_fade);
+    float t3 = fabs (float (current_time)/3000.0);
+    fs_green_fade = fmod (t3, 1.);
+    fs_green_dir = fmod (t3, 2.) >= 1;
+    if (!fs_green_dir) fs_green_fade = 1-fs_green_fade;
+  }
+  if (do_fs_blue)
+  {
+    csfxBlueScreen (Gfx3D, fs_blue_fade);
+    float t3 = fabs (float (current_time)/3000.0);
+    fs_blue_fade = fmod (t3, 1.);
+    fs_blue_dir = fmod (t3, 2.) >= 1;
+    if (!fs_blue_dir) fs_blue_fade = 1-fs_blue_fade;
+  }
+  if (do_fs_whiteout)
+  {
+    csfxWhiteOut (Gfx3D, fs_whiteout_fade);
+    float t3 = fabs (float (current_time)/3000.0);
+    fs_whiteout_fade = fmod (t3, 1.);
+    fs_whiteout_dir = fmod (t3, 2.) >= 1;
+    if (!fs_whiteout_dir) fs_whiteout_fade = 1-fs_whiteout_fade;
+  }
+  if (do_fs_shadevert)
+  {
+    csfxShadeVert (Gfx3D, fs_shadevert_topcol, fs_shadevert_botcol,
+    	CS_FX_ADD);
+  }
+}
 
 void WalkTest::DrawFrame3D (int drawflags, cs_time /*current_time*/)
 {
@@ -832,11 +919,20 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
   {
     DrawFrame3D (drawflags, current_time);
     DrawFrameDebug3D ();
+    DrawFullScreenFX3D (elapsed_time, current_time);
   }
 
   // Start drawing 2D graphics
   if (!Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS))
     return;
+
+  if (!Console
+   || !Console->GetVisible ()
+   || SmallConsole
+   || Console->GetTransparency ())
+  {
+    DrawFullScreenFX2D (elapsed_time, current_time);
+  }
 
   if (map_mode != MAP_OFF)
     DrawFrameMap ();

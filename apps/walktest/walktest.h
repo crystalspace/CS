@@ -26,6 +26,7 @@
 #include "cssys/sysdriv.h"
 #include "csengine/collider.h"
 #include "csengine/light.h"
+#include "csutil/cscolor.h"
 #include "walktest/wentity.h"
 #include "iengine/engine.h"
 #include "ivaria/conout.h"
@@ -46,6 +47,7 @@ struct iSoundHandle;
 struct iCollideSystem;
 struct iPerfStats;
 struct iConfigFile;
+struct iMaterialHandle;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -193,8 +195,8 @@ public:
   bool player_spawned;
 
   /**
-   * If this flag is true we move in 3D (old system). Otherwise we move more like
-   * common 3D games do.
+   * If this flag is true we move in 3D (old system). Otherwise we move more
+   * like common 3D games do.
    */
   static bool move_3d;
 
@@ -211,6 +213,44 @@ public:
    * If true we show edges around all polygons (debugging).
    */
   bool do_edges;
+
+  // Various settings for fullscreen effects.
+  bool do_fs_inter;
+  float fs_inter_amount;
+  float fs_inter_anim;
+  float fs_inter_length;
+
+  bool do_fs_fadeout;
+  float fs_fadeout_fade;
+  bool fs_fadeout_dir;
+
+  bool do_fs_fadecol;
+  float fs_fadecol_fade;
+  bool fs_fadecol_dir;
+  csColor fs_fadecol_color;
+
+  bool do_fs_fadetxt;
+  float fs_fadetxt_fade;
+  bool fs_fadetxt_dir;
+  iMaterialHandle* fs_fadetxt_mat;
+
+  bool do_fs_red;
+  float fs_red_fade;
+  bool fs_red_dir;
+  bool do_fs_green;
+  float fs_green_fade;
+  bool fs_green_dir;
+  bool do_fs_blue;
+  float fs_blue_fade;
+  bool fs_blue_dir;
+
+  bool do_fs_whiteout;
+  float fs_whiteout_fade;
+  bool fs_whiteout_dir;
+
+  bool do_fs_shadevert;
+  csColor fs_shadevert_topcol;
+  csColor fs_shadevert_botcol;
 
   /// Engine plug-in handle.
   csEngine *engine;
@@ -376,6 +416,10 @@ public:
   virtual void DrawFrame3D (int drawflags, cs_time current_time);
   /// Draws 2D objects to screen
   virtual void DrawFrame2D (void);
+  /// Draw 3D fullscreen effects.
+  virtual void DrawFullScreenFX3D (cs_time elapsed_time, cs_time current_time);
+  /// Draw 2D fullscreen effects.
+  virtual void DrawFullScreenFX2D (cs_time elapsed_time, cs_time current_time);
 
   /// Load all the graphics libraries needed
   virtual void LoadLibraryData(void);

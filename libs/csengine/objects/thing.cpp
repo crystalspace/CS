@@ -1169,15 +1169,15 @@ void csThing::GetBoundingBox (iMovable* movable, csBox3& box)
     wor_bbox_movablenr = movable->GetUpdateNumber ();
     // @@@ Maybe it would be better to really calculate the bounding box
     // here instead of just transforming the object space bounding box?
-    csReversibleTransform movtrans = movable->GetFullTransform ();
-    wor_bbox.StartBoundingBox (movtrans.This2Other (obj_bbox.GetCorner (0)));
-    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (1)));
-    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (2)));
-    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (3)));
-    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (4)));
-    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (5)));
-    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (6)));
-    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (7)));
+    csReversibleTransform mt = movable->GetFullTransform ();
+    wor_bbox.StartBoundingBox (mt.This2Other (obj_bbox.GetCorner (0)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (1)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (2)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (3)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (4)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (5)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (6)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
   }
   box = wor_bbox;
 }

@@ -50,7 +50,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   is_visible = false;
-  cameranr = -1;
+  wor_bbox_movablenr = -1;
   myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
@@ -77,7 +77,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   is_visible = false;
-  cameranr = -1;
+  wor_bbox_movablenr = -1;
   myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
@@ -300,6 +300,28 @@ void csMeshWrapper::HardTransform (const csReversibleTransform& t)
     csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->HardTransform (t);
   }
+}
+
+void csMeshWrapper::GetWorldBoundingBox (csBox3& cbox)
+{
+  if (wor_bbox_movablenr != movable.GetUpdateNumber ())
+  {
+    wor_bbox_movablenr = movable.GetUpdateNumber ();
+    csBox3 obj_bbox;
+    mesh->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
+    // @@@ Maybe it would be better to really calculate the bounding box
+    // here instead of just transforming the object space bounding box?
+    csReversibleTransform mt = movable.GetFullTransform ();
+    wor_bbox.StartBoundingBox (mt.This2Other (obj_bbox.GetCorner (0)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (1)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (2)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (3)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (4)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (5)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (6)));
+    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
+  }
+  cbox = wor_bbox;
 }
 
 void csMeshWrapper::GetTransformedBoundingBox (

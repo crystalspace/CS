@@ -474,11 +474,12 @@ public:
   void CheckFrustum (csFrustumView& lview);
 
   /**
-   * Get a list of all things which are visible in the given frustum.
-   * Return an array to pointers to visible things.
+   * Get a list of all objects which are visible in the given frustum.
+   * Return an array to pointers to visible objects.
    * You must delete this array after you are ready using it.
+   * @@@ When csThing becomes a mesh object then change rc to csMeshWrapper**
    */
-  csThing** GetVisibleThings (csFrustumView& lview, int& num_things);
+  csObject** GetVisibleObjects (csFrustumView& lview, int& num_objects);
 
   /**
    * Intersects world-space sphere with polygons of this set. Return

@@ -635,7 +635,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  stats fps perftest coordshow\n");
     CONPRI("Special effects:\n");
     CONPRI("  addbot delbot addskel addghost fire explosion spiral rain\n");
-    CONPRI("  snow fountain flame portal\n");
+    CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol\n");
+    CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert\n");
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
@@ -1192,6 +1193,109 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       Sys->Printf (MSG_CONSOLE, "Expected parameter 'level'!\n");
+  }
+  else if (!strcasecmp (cmd, "fs_inter"))
+  {
+    Sys->do_fs_inter = !Sys->do_fs_inter;
+    if (Sys->do_fs_inter)
+    {
+      Sys->fs_inter_amount = .3;
+      Sys->fs_inter_length = 30;
+      Sys->fs_inter_anim = 0;
+      if (arg)
+        ScanStr (arg, "%f,%f", &Sys->fs_inter_amount, &Sys->fs_inter_length);
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_fadeout"))
+  {
+    Sys->do_fs_fadeout = !Sys->do_fs_fadeout;
+    if (Sys->do_fs_fadeout)
+    {
+      Sys->fs_fadeout_fade = 0;
+      Sys->fs_fadeout_dir = true;
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_fadecol"))
+  {
+    Sys->do_fs_fadecol = !Sys->do_fs_fadecol;
+    if (Sys->do_fs_fadecol)
+    {
+      Sys->fs_fadecol_fade = 0;
+      Sys->fs_fadecol_dir = true;
+      float r = 1, g = 0, b = 0;
+      if (arg) ScanStr (arg, "%f,%f,%f", &r, &g, &b);
+      Sys->fs_fadecol_color.Set (r, g, b);
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_fadetxt"))
+  {
+    Sys->do_fs_fadetxt = !Sys->do_fs_fadetxt;
+    if (Sys->do_fs_fadetxt)
+    {
+      Sys->fs_fadetxt_fade = 0;
+      Sys->fs_fadetxt_dir = true;
+      char buf[255];
+      *buf = 0;
+      if (arg) ScanStr (arg, "%s", buf);
+      csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
+      	FindByName (buf);
+      if (mat)
+      {
+        Sys->fs_fadetxt_mat = mat->GetMaterialHandle ();
+      }
+      else
+      {
+        Sys->Printf (MSG_CONSOLE, "Can't find material!\n");
+	Sys->do_fs_fadetxt = false;
+      }
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_red"))
+  {
+    Sys->do_fs_red = !Sys->do_fs_red;
+    if (Sys->do_fs_red)
+    {
+      Sys->fs_red_fade = 0;
+      Sys->fs_red_dir = true;
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_green"))
+  {
+    Sys->do_fs_green = !Sys->do_fs_green;
+    if (Sys->do_fs_green)
+    {
+      Sys->fs_green_fade = 0;
+      Sys->fs_green_dir = true;
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_blue"))
+  {
+    Sys->do_fs_blue = !Sys->do_fs_blue;
+    if (Sys->do_fs_blue)
+    {
+      Sys->fs_blue_fade = 0;
+      Sys->fs_blue_dir = true;
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_whiteout"))
+  {
+    Sys->do_fs_whiteout = !Sys->do_fs_whiteout;
+    if (Sys->do_fs_whiteout)
+    {
+      Sys->fs_whiteout_fade = 0;
+      Sys->fs_whiteout_dir = true;
+    }
+  }
+  else if (!strcasecmp (cmd, "fs_shadevert"))
+  {
+    Sys->do_fs_shadevert = !Sys->do_fs_shadevert;
+    if (Sys->do_fs_shadevert)
+    {
+      float tr = 1, tg = 0, tb = 0, br = 0, bg = 0, bb = 1;
+      if (arg) ScanStr (arg, "%f,%f,%f,%f,%f,%f", &tr, &tg, &tb, &br, &bg, &bb);
+      Sys->fs_shadevert_topcol.Set (tr, tg, tb);
+      Sys->fs_shadevert_botcol.Set (br, bg, bb);
+    }
   }
   else if (!strcasecmp (cmd, "perftest"))
   {

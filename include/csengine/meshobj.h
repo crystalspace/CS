@@ -54,14 +54,13 @@ protected:
   csObject* parent;
 
   /**
-   * Camera space bounding box is cached here.
-   * GetCameraBoundingBox() will check the last camera number from the
-   * camera to see if it needs to recalculate this.
+   * Bounding box in world space.
+   * This is a cache for GetWorldBoundingBox() which will recalculate this
+   * if the movable changes (by using movablenr).
    */
-  csBox3 camera_bbox;
-
-  /// Last used camera number for camera_bbox.
-  long cameranr;
+  csBox3 wor_bbox;
+  /// Last used movable number for wor_bbox.
+  long wor_bbox_movablenr;
 
   /// Defered lighting. If > 0 then we have defered lighting.
   int defered_num_lights;
@@ -250,18 +249,27 @@ public:
   void HardTransform (const csReversibleTransform& t);
 
   /**
+   * Get the bounding box of this object in world space.
+   * This routine will cache the bounding box and only recalculate it
+   * if the movable changes.
+   */
+  void GetWorldBoundingBox (csBox3& cbox);
+
+  /**
    * Get the bounding box of this object after applying a transformation to it.
    * This is really a very inaccurate function as it will take the bounding
    * box of the object in object space and then transform this bounding box.
    */
-  void GetTransformedBoundingBox (const csReversibleTransform& trans, csBox3& cbox);
+  void GetTransformedBoundingBox (const csReversibleTransform& trans,
+  	csBox3& cbox);
 
   /**
    * Get a very inaccurate bounding box of the object in screen space.
    * Returns -1 if object behind the camera or else the distance between
    * the camera and the furthest point of the 3D box.
    */
-  float GetScreenBoundingBox (const csCamera& camera, csBox2& sbox, csBox3& cbox);
+  float GetScreenBoundingBox (const csCamera& camera, csBox2& sbox,
+  	csBox3& cbox);
 
   /**
    * Rotate object in some manner in radians.
@@ -319,7 +327,7 @@ public:
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 
-  //-------------------- iVisibilityObject interface implementation ------------------
+  //-------------------- iVisibilityObject interface implementation ----------
   struct VisObject : public iVisibilityObject
   {
     DECLARE_EMBEDDED_IBASE (csMeshWrapper);

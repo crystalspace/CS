@@ -299,6 +299,32 @@ Create a new region with the given name and load the same named level
 into that region. Then create a portal on the spot you are standing to
 the start position of the new level and back.
 
+@item fs_inter @var{amount},@var{length}
+Toggle a fullscreen interference mode.
+
+@item fs_red
+Toggle a fullscreen fade-to-red effect.
+
+@item fs_green
+Toggle a fullscreen fade-to-green effect.
+
+@item fs_blue
+Toggle a fullscreen fade-to-blue effect.
+
+@item fs_whiteout
+Toggle a fullscreen fade-to-white effect.
+
+@item fs_fadecol @var{r},@var{g},@var{b}
+Toggle a fullscreen fade-to-color effect.
+
+@item fs_fadetxt @var{material}
+Toggle a fullscreen fade-to-material effect. The material should be
+the name of a loaded material (use 'spark' for a good example).
+
+@item fs_shadevert @var{topr},@var{topg},@var{topb},@var{botr},@var{botg},@var{botb}
+Toggle a fullscreen shading effect which is added to the 3D view using
+add-blending-mode.
+
 @item dumpvis
 This command takes the current view and dumps information for the rendering
 process.  You will see what sectors and polygons are rendered and how they are
