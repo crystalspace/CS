@@ -185,6 +185,10 @@ TextureLoaderContext::TextureLoaderContext ()
   width = height = 128;
 }
 
+TextureLoaderContext::~TextureLoaderContext ()
+{
+}
+
 void TextureLoaderContext::SetFlags (int Flags)
 {
   flags = Flags;
