@@ -1,4 +1,4 @@
-#include <config.h>
+#include "#PROJECTNAME#.h"
 
 CS_IMPLEMENT_APPLICATION
 

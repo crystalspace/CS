@@ -31,6 +31,13 @@ chronological order.
 	  library paths; (3) removed incorrect library references; (3) removed
 	  unused build modes; (4) fixed incorrect paths; (5) general cleanup
 	  and unification.
+	- Eric Sunshine made the following changes to 'jamtemplate':
+	    - Now synthesizes config-msvc.h, which is used by MSVC builds in
+	      which the configure script is not invoked (thus, config.h is not
+	      available).
+	    - Now synthesizes a project-global header which performs the
+	      appropriate abstraction of importing config.h or config-msvc.h,
+	      depending upon the build circumstances.
 14-May-2004
 	- Eric Sunshine worked around VS.NET warning C4345 in blockallocator.h.
 	- Eric Sunshine augmented the Jam check in configure.ac so that it now

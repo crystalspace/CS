@@ -4,7 +4,6 @@ CleanDir clean :
     out ;
 Clean distclean :
     aclocal.m4
-    config.h
     config.log
     config.status
     config.cache
@@ -14,8 +13,7 @@ CleanDir distclean :
 Depends distclean : clean ;
 
 Clean maintainerclean :
-  configure
-  config.h.in ;
+  configure ;
 Depends maintainerclean : distclean ;
 
 Help distclean : "Remove built targets and configuration" ;

@@ -22,9 +22,7 @@ AC_CANONICAL_HOST
 #----------------------------------------------------------------------------
 # Setup for the configuration header
 #----------------------------------------------------------------------------
-AC_CONFIG_HEADERS([config.h])
-AH_TOP([/* We expect to use CS everywhere, so include cssysdef.h. */
-#include <cssysdef.h>])
+AC_CONFIG_HEADERS([src/config.h])
 
 #----------------------------------------------------------------------------
 # Check for applications

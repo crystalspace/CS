@@ -1,0 +1,18 @@
+/*
+ * #PROJECTNAME#.h
+ *
+ * Master include file for #LONGNAME#.
+ * All other files should include this one.
+ */
+
+/* We expect to use Crystal Space everywhere. */
+#include <cssysdef.h>
+
+/* MSVC users do not run configure, so use special MSVC configuration file. */
+#if defined(WIN32_VOLATILE)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
+
+/* Insert additional project-specific declarations here. */
