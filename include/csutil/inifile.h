@@ -75,7 +75,7 @@ public:
   /// Initialize INI file object and load it from a file
   csIniFile (const char *fName, char iCommentChar = ';');
   /// Initialize INI file object and load it from a file on VFS volume
-  csIniFile (csVFS *vfs, const char *fName, char iCommentChar);
+  csIniFile (csVFS *vfs, const char *fName, char iCommentChar = ';');
   /// Destroy the object
   virtual ~csIniFile ();
 
