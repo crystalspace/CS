@@ -57,6 +57,7 @@ protected:
 
   /// Controls fragmentContainedRect, used to perform all-side clipping and edge intersection.
   void fragmentRect(csRect&, csRect&, int mode);
+  void nkSplit(csRect& r1, csRect& r2);
   /// Work method fragments rects properly when they intersect.
   void fragmentContainedRect(csRect &r1, csRect &r2);
   /// Marks the current region insertion point for gather.

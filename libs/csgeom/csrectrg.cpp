@@ -285,6 +285,31 @@ void csRectRegion::gatherFragments ()
   region_count = gather_mark;
 }
 
+void csRectRegion::nkSplit (csRect &r1, csRect &r2)
+{
+  r2.Intersect (r1);
+
+  if (r1.ymin < r2.ymin) // upper stripe
+  {
+    pushRect (csRect(r1.xmin,r1.ymin, r1.xmax, r2.ymin));
+  }
+
+  if (r1.xmin < r2.xmin) // left stripe
+  {
+    pushRect (csRect(r1.xmin,r2.ymin, r2.xmin, r2.ymax));
+  }
+
+  if (r1.xmax > r2.xmax) // right stripe
+  {
+    pushRect (csRect(r2.xmin, r2.ymin, r1.xmax, r2.ymax));
+  }
+
+  if (r1.ymax > r2.ymax) // lower stripe
+  {
+    pushRect (csRect(r1.xmin, r2.ymax, r1.xmax, r1.ymax));
+  }
+}
+
 void csRectRegion::Include (csRect &nrect)
 {
   // Ignore an empty rect
@@ -313,7 +338,8 @@ void csRectRegion::Include (csRect &nrect)
     // Otherwise, we have to see if this rect creates a union with any other
 
     // rectangles.
-    for (i = 0; i < region_count; i++)
+    int last_to_consider = region_count;
+    for (i = 0; i < last_to_consider; i++)
     {
       csRect &r1 = region[i];
       csRect r2 (rect);
@@ -338,11 +364,13 @@ void csRectRegion::Include (csRect &nrect)
       {
         // Kill from list
         deleteRect (i);
-
+        i--;
+        last_to_consider--;
         // Iterate
         continue;
       }
 
+      /*
       // Otherwise we have to do the most irritating part: A full split operation
 
       // that may create other rects that need to be tested against the database
@@ -359,9 +387,15 @@ void csRectRegion::Include (csRect &nrect)
 
       // Fragment it
       fragmentRect (r1, r2, MODE_INCLUDE);
+      */
 
+      r2.Set (rect);
+      nkSplit (r1, r2);
+      deleteRect (i);
+      i--;
+      last_to_consider--;
       // Mark it
-      untouched = false;
+      //      untouched = true;
     } // end for
 
     // In the end, we need to put the rect on the stack
