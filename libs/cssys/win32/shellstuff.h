@@ -19,58 +19,66 @@
 #ifndef __CS_SYS_WIN32_SHELLSTUFF_H__
 #define __CS_SYS_WIN32_SHELLSTUFF_H__
 
+#include <shlobj.h>
+
 // This file contains some newer SHELL32 stuff, for example not found
 // in MinGW Win32 headers.
 
-// from shfolder.h...
-typedef struct _DLLVERSIONINFO
-{
-    DWORD cbSize;
-    DWORD dwMajorVersion;                   // Major version
-    DWORD dwMinorVersion;                   // Minor version
-    DWORD dwBuildNumber;                    // Build number
-    DWORD dwPlatformID;                     // DLLVER_PLATFORM_*
-} DLLVERSIONINFO;
+typedef HRESULT (STDAPICALLTYPE* SHGETFOLDERPATHAPROC)(HWND hwndOwner, 
+					      int nFolder, 
+					      HANDLE hToken, 
+					      DWORD dwFlags, 
+					      LPCSTR pszPath);
 
-typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
-
+#ifndef CSIDL_APPDATA 
+#define CSIDL_APPDATA			0x001a
+#endif
 #ifndef CSIDL_PROGRAM_FILES
 #define CSIDL_PROGRAM_FILES             0x0026
 #endif
+#ifndef SHGFP_TYPE_CURRENT
+#define SHGFP_TYPE_CURRENT		0
+#endif
 
-static inline bool 
-MinShellDllVersion(DWORD vMajor, DWORD vMinor)
+static inline bool
+GetShellFolderPath (int CSIDL, char* path)
 {
   HINSTANCE hinstDll;
   bool result = false;
 
-  hinstDll = LoadLibrary ("shell32.dll");
+  // ShFolder.dll can 'emulate' special folders on older Windowses.
+  hinstDll = LoadLibrary ("shfolder.dll");
 	
   if(hinstDll)
   {
-    DLLGETVERSIONPROC pDllGetVersion;
+    SHGETFOLDERPATHAPROC SHGetFolderPathA;
 
-    pDllGetVersion = (DLLGETVERSIONPROC) GetProcAddress (hinstDll, "DllGetVersion");
+    SHGetFolderPathA = 
+      (SHGETFOLDERPATHAPROC) GetProcAddress (hinstDll, "SHGetFolderPathA");
 
-    if (pDllGetVersion)
+    if (SHGetFolderPathA)
     {
-      DLLVERSIONINFO dvi;
-      HRESULT hr;
-
-      memset (&dvi, 0, sizeof (dvi));
-      dvi.cbSize = sizeof (dvi);
-
-      hr = (*pDllGetVersion)(&dvi);
-
-      if (SUCCEEDED (hr))
-      {
-	result = ((dvi.dwMajorVersion > vMajor) ||
-	  ((dvi.dwMajorVersion == vMajor) && 
-	   (dvi.dwMinorVersion >= vMinor)));
-      }
+      result = (SHGetFolderPathA (0, CSIDL, 0, 
+	SHGFP_TYPE_CURRENT, path) == S_OK);
     }
-        
+
     FreeLibrary(hinstDll);
+  }
+  else
+  {
+    // no shfolder? Try normal shell32 instead
+    LPMALLOC MAlloc;
+    LPITEMIDLIST pidl;
+
+    if (SUCCEEDED(SHGetMalloc (&MAlloc)))
+    {
+      if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL, &pidl)))
+      {
+	result = SHGetPathFromIDList (pidl, path);
+	MAlloc->Free (pidl);
+      }
+      MAlloc->Release ();
+    }
   }
   return result;
 }

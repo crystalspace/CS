@@ -146,28 +146,15 @@ static inline char* FindConfigPath ()
 
   // retrieve the path of the Program Files folder and append 
   // a "\Crystal".
-  if (MinShellDllVersion(5, 0))
   {
-    LPMALLOC MAlloc;
-    LPITEMIDLIST pidl;
-    char programpath[MAX_PATH];
+    char programpath [MAX_PATH+1];
 
-    programpath[0] = 0;
-    if (SUCCEEDED(SHGetMalloc (&MAlloc)))
+    if (GetShellFolderPath (CSIDL_PROGRAM_FILES, programpath))
     {
-      if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL_PROGRAM_FILES, &pidl)))
-      {
-	if (SUCCEEDED(SHGetPathFromIDList (pidl, programpath)))
-	{
-	  strncpy (path, programpath, MIN(sizeof(programpath), 1024-30));
-	  strcat (path, "\\Crystal");
-	}
-	MAlloc->Free (pidl);
-      }
-      MAlloc->Release ();
-    }
-    if (programpath[0]) 
+      strncpy (path, programpath, MIN(sizeof(programpath), 1024-30));
+      strcat (path, "\\Crystal");
       return csStrNew (path);
+    }
   }
 
   // nothing helps, use default

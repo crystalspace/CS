@@ -14,6 +14,10 @@ The history order is reversed so that new features are at the top.
 	  were non-functional writing of settings.
         - DeSigna added an assertion that ensures csString::SubString()'s 
           csString& argument isn't itself.
+	- res added code to save user configuration in Documents & Settings
+	  on Win32. Still disabled, though.
+	- res changed the way special folder paths are retrieved on Win32; 
+	  now shfolder.dll is used.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().
@@ -48,8 +52,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit renamed strarr.h to stringarray.h.
 	- res made the following changes:
 	    - Moved CS_INITIALIZE_PLATFORM_APPLICATION invokation to 
-	      csInitializer::CreateEnvironment() and also augment the doxygen
-	      documentation, as suggested by ES.
+	      csInitializer::CreateEnvironment() and also augmented the 
+	      doxygen documentation, as suggested by ES.
 	    - Added iWin32Assistant::GetApplicationWindow().
 	    - Replace use of GetForegroundWindow() in DirectSound3D renderer
 	      with above (bug 751779).

@@ -19,7 +19,7 @@
 // Support for platform-specific VFS variables.
 #include "cssysdef.h"
 #include <windows.h>
-#include <shlobj.h>
+
 #include "shellstuff.h"
 
 // Windows has built-in var "SystemRoot"
@@ -44,18 +44,7 @@ csCheckPlatformVFSVar(const char* VarName)
 
     if (!*szMyDocs) 
     {
-      LPMALLOC MAlloc;
-      LPITEMIDLIST pidl;
-
-      if (SUCCEEDED(SHGetMalloc (&MAlloc)))
-      {
-	if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL_PERSONAL, &pidl)))
-	{
-	  SHGetPathFromIDList (pidl, szMyDocs);
-	  MAlloc->Free (pidl);
-	}
-	MAlloc->Release ();
-      }
+      if (!GetShellFolderPath (CSIDL_PERSONAL, szMyDocs)) return 0;
     }
     return szMyDocs;
   }
