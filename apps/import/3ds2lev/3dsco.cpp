@@ -146,9 +146,9 @@ void ConvertXYZ (H3dsScene * scene)
 
       ConvertXYZ (v1, v2, v3);
 
-	  fa->p0 = v1;
-	  fa->p1 = v2;
-	  fa->p2 = v3;
+	  fa->p0 = (word)v1;
+	  fa->p1 = (word)v2;
+	  fa->p2 = (word)v3;
     }
   }
 }

@@ -3,6 +3,8 @@ The history order is reversed so that new features are at the top.
 14-Sep-2001
 	- Eric Sunshine eliminated a compilation warning in meshobj.cpp
 	  regarding unused variable.
+	- Eric Sunshine eliminated several copmilation warnings from 3dsco.cpp
+	  regarding implicit conversion of float to int.
 6-Sep-2001
 	- Fixed a bug in iLoader::LoadTexture(). This function would still
 	  return a texture wrapper even if no texture handle could be loaded.
