@@ -190,7 +190,7 @@ all: $(OUTDIRS)
 dep: $(OUTBASE) $(OUTOS)
 
 distclean: clean
-	-$(RM) config.mak include/volatile.h
+	-$(RM) config.mak include/volatile.h data/config/user.cfg
 
 clean:
 	-$(RMDIR) $(patsubst %/,%,$(OUTBASE))
