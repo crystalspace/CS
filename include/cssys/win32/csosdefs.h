@@ -50,7 +50,7 @@
 
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
-#define OPENGL_2D_DRIVER "crystalspace.graphics2d.defaultgl"
+#define OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
 #define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidewin"
 #define SOUND_DRIVER "crystalspace.sound.driver.waveout"
 

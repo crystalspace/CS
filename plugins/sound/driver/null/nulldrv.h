@@ -24,7 +24,7 @@
 // SoundDriver.H
 // csSoundDriverNull class.
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "isnddrv.h"
 
 extern const CLSID CLSID_NullSoundDriver;
@@ -32,7 +32,7 @@ extern const CLSID CLSID_NullSoundDriver;
 class csSoundDriverNull : public ISoundDriver
 {
 protected:
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
   void * memory;
   int memorysize;
   float volume;
@@ -41,7 +41,7 @@ protected:
   bool m_bStereo;
 
 public:
-	csSoundDriverNull(ISystem* piSystem);
+	csSoundDriverNull(iSystem* piSystem);
 
 	virtual ~csSoundDriverNull();
 
@@ -67,7 +67,7 @@ public:
 
 class csSoundDriverNullFactory : public ISoundDriverFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

@@ -1002,16 +1002,14 @@ void csSprite3D::InitSprite ()
 
   if (!cur_action) { SetFrame (0); cur_action = tpl->GetFirstAction (); }
 
-  time_t tm;
-  csWorld::isys->GetTime (tm);
-  last_time = tm;
+  last_time = csWorld::System->GetTime ();
 
   m_world2obj = m_obj2world.GetInverse ();
 
   MixMode = CS_FX_COPY;
 }
 
-bool csSprite3D::NextFrame (long current_time, bool onestep, bool stoptoend)
+bool csSprite3D::NextFrame (time_t current_time, bool onestep, bool stoptoend)
 {
   bool ret = false;
 

@@ -34,7 +34,7 @@
 #define SIZE_LINE	256
 #define SIZE_HISTORY	32
 
-#define Gfx2D System->piG2D
+#define Gfx2D System->G2D
 
 void GfxWrite (int x, int y, int fg, int bg, char *str, ...)
 {
@@ -82,9 +82,7 @@ csSimpleConsole::csSimpleConsole (csIniFile *iConfig, csSimpleCommand* pc) : com
     fatal_exit (0, false);
   }
 
-  int i;
-
-  System->piGI->GetTextHeight (i, console_font);
+  int i = System->G2D->GetTextHeight (console_font);
   i += 2;
   LineMax = (System->FrameHeight / i) - 2;
   LineSize = (System->FrameWidth / 4) + 1;
@@ -326,7 +324,7 @@ void csSimpleConsole::Clear ()
 void csSimpleConsole::Print (csRect* area)
 {
   int i;
-  long CurrentTime = System->Time ();
+  time_t CurrentTime = System->Time ();
 
   Gfx2D->SetFontID (console_font);
 
@@ -335,8 +333,7 @@ void csSimpleConsole::Print (csRect* area)
     Gfx2D->Write (x, y, fc, bc, s);				\
     if ((changed) && area)					\
     {								\
-      int tw;							\
-      System->piGI->GetTextWidth (tw, console_font, s);		\
+      int tw = System->G2D->GetTextWidth (console_font, s);	\
       area->Union (x, y, x + tw, y + th);			\
     }								\
   }
@@ -347,19 +344,16 @@ void csSimpleConsole::Print (csRect* area)
     Gfx2D->Write (x, y, fc, -1, s);				\
     if ((changed) && area)					\
     {								\
-      int tw;							\
-      System->piGI->GetTextWidth (tw, console_font, s);		\
+      int tw = System->G2D->GetTextWidth (console_font, s);	\
       area->Union (x, y, x + 1 + tw, y + 1 + th);		\
     }								\
   }
 
   // text height
-  int th;
-  System->piGI->GetTextHeight (th, console_font);
+  int th = System->G2D->GetTextHeight (console_font);
   th += 2;
 
-  bool dblbuff;
-  Gfx2D->GetDoubleBufferState (dblbuff);
+  bool dblbuff = Gfx2D->GetDoubleBufferState ();
 
   switch (ConsoleMode)
   {
@@ -466,8 +460,8 @@ void csSimpleConsole::AddChar (int c)
   }
 }
 
-void csSimpleConsole::SetupColors (ITextureManager* txtmgr)
+void csSimpleConsole::SetupColors (iTextureManager* txtmgr)
 {
-  txtmgr->FindRGB (console_fg_r, console_fg_g, console_fg_b, console_fg);
-  txtmgr->FindRGB (console_bg_r, console_bg_g, console_bg_b, console_bg);
+  console_fg = txtmgr->FindRGB (console_fg_r, console_fg_g, console_fg_b);
+  console_bg = txtmgr->FindRGB (console_bg_r, console_bg_g, console_bg_b);
 }

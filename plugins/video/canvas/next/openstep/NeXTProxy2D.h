@@ -23,7 +23,7 @@
 #include "types.h"	// For bool.
 @class NeXTView, NSWindow;
 class NeXTFrameBuffer;
-class ITextureHandle;
+class iTextureHandle;
 
 class NeXTProxy2D
     {
@@ -41,7 +41,7 @@ public:
     bool open( char const* title );
     void close();
     void flush();
-    bool set_mouse_cursor( int shape, ITextureHandle* );
+    bool set_mouse_cursor( int shape, iTextureHandle* );
     };
 
 #endif //__NeXT_NeXTProxy2D_h

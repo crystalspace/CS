@@ -21,6 +21,8 @@ all drivers netdrivers: netdrvs
 
 netdrvs:
 	$(MAKE_TARGET) MAKE_DLL=yes
+netdrvsclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -53,12 +55,11 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/csnetdrv/sockets
 
-.PHONY: netdrvs netdrvsclean netdrvscleanlib
+.PHONY: netdrvs netdrvsclean
 
 # Chain rules
 net: netdrvs
 clean: netdrvsclean
-cleanlib: netdrvscleanlib
 
 netdrvs: $(OUTDIRS) $(NETDRVS)
 
@@ -66,10 +67,7 @@ $(NETDRVS): $(OBJ.NETDRVS) $(DEP.NETDRVS)
 	$(DO.PLUGIN) $(LIBS.NETDRVS)
 
 netdrvsclean:
-	$(RM) $(NETDRVS)
-
-netdrvscleanlib:
-	$(RM) $(OBJ.NETDRVS) $(NETDRVS)
+	$(RM) $(NETDRVS) $(OBJ.NETDRVS)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)netdrvs.dep

@@ -22,6 +22,8 @@
 
 #include "def.h"
 #include "csstrvec.h"
+#include "ivfs.h"
+#include "iplugin.h"
 
 // Composite path divider
 #define VFS_PATH_DIVIDER        ','
@@ -30,10 +32,52 @@
 // The maximal "virtual" path+filename length
 #define VFS_MAX_PATH_LEN        256
 
-class csFile;
 class VfsNode;
-class csStrVector;
 class csIniFile;
+
+/// A replacement for FILE type in the virtual file space
+class csFile : public iFile
+{
+protected:
+  // Index into parent node RPath
+  int Index;
+  // File node
+  VfsNode *Node;
+  // Filename in VFS
+  char *Name;
+  // File size (initialized in constructor)
+  size_t Size;
+  // last error code
+  int Error;
+
+  // The constructor for csFile
+  csFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix);
+
+public:
+  /// Instead of fclose() do "delete file" or file->DecRef ()
+  virtual ~csFile ();
+
+  /// Query file name (in VFS)
+  virtual const char *GetName () { return Name; }
+  /// Query file size
+  virtual size_t GetSize () { return Size; }
+  /// Check (and clear) file last error status
+  virtual int GetStatus ();
+
+  /// Replacement for standard fread()
+  virtual size_t Read (char *Data, size_t DataSize) = 0;
+  /// Replacement for standard fwrite()
+  virtual size_t Write (const char *Data, size_t DataSize) = 0;
+  /// Replacement for standard feof()
+  virtual bool AtEOF () = 0;
+  /// Query current file pointer
+  virtual size_t GetPos () = 0;
+  /// Get entire file data at once, if possible, or NULL
+  virtual char *GetAllData ();
+
+protected:
+  friend class csVFS;
+};
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -59,7 +103,7 @@ class csIniFile;
  * only a list of file names; no fancy things like file size, time etc
  * (file size can be determined after opening it for reading).
  */
-class csVFS : public csBase
+class csVFS : public iVFS
 {
   // A vector of VFS nodes
   class VfsVector : public csVector
@@ -83,65 +127,73 @@ class csVFS : public csBase
   csIniFile *config;
   // Directory stack (used in PushDir () and PopDir ())
   csStrVector dirstack;
+  // The pointer to system driver interface
+  iSystem *System;
 
 public:
+  DECLARE_IBASE;
+
   /// Initialize VFS by reading contents of given INI file
-  csVFS (csIniFile *Config);
+  csVFS (iBase *iParent);
   /// Virtual File System destructor
   virtual ~csVFS ();
 
   /// Add a virtual link: real path can contain $(...) macros
-  bool AddLink (const char *VirtualPath, const char *RealPath);
+  virtual bool AddLink (const char *VirtualPath, const char *RealPath);
 
   /// Set current working directory
-  bool ChDir (const char *Path);
+  virtual bool ChDir (const char *Path);
   /// Get current working directory
-  const char *GetCwd () const
+  virtual const char *GetCwd () const
   { return cwd; }
 
   /// Push current directory
-  void PushDir ();
+  virtual void PushDir ();
   /// Pop current directory
-  bool PopDir ();
+  virtual bool PopDir ();
 
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
    * 'currend virtual directory'. Return a (new char [...])'ed string.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  char *ExpandPath (const char *Path, bool IsDir = false) const;
+  virtual char *ExpandPath (const char *Path, bool IsDir = false) const;
 
   /// Check whenever a file exists
-  bool Exists (const char *Path) const;
+  virtual bool Exists (const char *Path) const;
 
   /// Find all files in a virtual directory and return an array with their names
-  csStrVector *FindFiles (const char *Path) const;
+  virtual iStrVector *FindFiles (const char *Path) const;
   /// Replacement for standard fopen()
-  csFile *Open (const char *FileName, int Mode);
+  virtual iFile *Open (const char *FileName, int Mode);
   /**
    * Get an entire file at once. You should delete[] returned data
    * after usage. This is more effective than opening files and reading
    * the file in blocks.
    */
-  char *ReadFile (const char *FileName, size_t &Size);
+  virtual char *ReadFile (const char *FileName, size_t &Size);
   /// Write an entire file in one pass.
-  bool WriteFile (const char *FileName, const char *Data, size_t Size);
+  virtual bool WriteFile (const char *FileName, const char *Data, size_t Size);
 
   /// Delete a file on VFS
-  bool DeleteFile (const char *FileName);
+  virtual bool DeleteFile (const char *FileName);
 
   /// Close all opened archives, free temporary storage etc.
-  bool Sync ();
+  virtual bool Sync ();
 
-  /// Set an entry in configuration file (like "CD = /proc/cd")
-  bool SetConfig (char *VarName, char *Value);
   /// Mount an VFS path on a "real-world-filesystem" path
-  bool Mount (const char *VirtualPath, const char *RealPath);
+  virtual bool Mount (const char *VirtualPath, const char *RealPath);
   /// Unmount an VFS path; if RealPath is NULL, entire VirtualPath is unmounted
-  bool Unmount (const char *VirtualPath, const char *RealPath);
+  virtual bool Unmount (const char *VirtualPath, const char *RealPath);
 
   /// Save current configuration back into configuration file
-  bool SaveMounts (const char *FileName);
+  virtual bool SaveMounts (const char *FileName);
+
+  /// Initialize the Virtual File System
+  virtual bool Initialize (iSystem *iSys);
+
+  /// Read and set the VFS config file
+  bool ReadConfig (csIniFile *Config);
 
 private:
   // Callback function used to read ini file
@@ -151,72 +203,6 @@ private:
   // Common routine for many functions
   bool PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
     char *Suffix, size_t SuffixSize) const;
-};
-
-/// File open mode mask
-#define VFS_FILE_MODE		0x0000000f
-/// Open file for reading
-#define VFS_FILE_READ		0x00000000
-/// Open file for writing
-#define VFS_FILE_WRITE		0x00000001
-/// Store file uncompressed (no gain possible)
-#define VFS_FILE_UNCOMPRESSED	0x80000000
-
-/// File status ok
-#define	VFS_STATUS_OK		0
-/// Unclassified error
-#define VFS_STATUS_OTHER	1
-/// Device has no more space for file data
-#define	VFS_STATUS_NOSPC	2
-/// Not enough system resources
-#define VFS_STATUS_RESOURCES	3
-/// Access denied: either you have no write access, or readonly filesystem
-#define VFS_STATUS_ACCESSDENIED	4
-/// An error occured during reading or writing data
-#define VFS_STATUS_IOERROR	5
-
-/// A replacement for FILE type in the virtual file space
-class csFile
-{
-protected:
-  // Index into parent node RPath
-  int Index;
-  // File node
-  VfsNode *Node;
-  // Filename in VFS
-  char *Name;
-  // File size (initialized in constructor)
-  size_t Size;
-  // last error code
-  int Error;
-
-  // The constructor for csFile
-  csFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix);
-
-public:
-  /// Instead of fclose() do "delete file"
-  virtual ~csFile ();
-
-  /// Query file name (in VFS)
-  const char *GetName () { return Name; }
-  /// Query file size
-  size_t GetSize () { return Size; }
-  /// Check (and clear) file last error status
-  virtual int GetStatus ();
-
-  /// Replacement for standard fread()
-  virtual size_t Read (char *Data, size_t DataSize) = 0;
-  /// Replacement for standard fwrite()
-  virtual size_t Write (const char *Data, size_t DataSize) = 0;
-  /// Replacement for standard feof()
-  virtual bool AtEOF () = 0;
-  /// Query current file pointer
-  virtual size_t GetPos () = 0;
-
-protected:
-  friend class csVFS;
-  // Get entire file data at once, if possible, or NULL
-  virtual char *GetAllData ();
 };
 
 #endif // __VFS_H__

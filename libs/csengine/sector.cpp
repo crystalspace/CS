@@ -56,7 +56,7 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csSector,csPolygonSet);
+CSOBJTYPE_IMPL (csSector,csPolygonSet);
 
 csSector::csSector () : csPolygonSet ()
 {
@@ -222,7 +222,7 @@ csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
   else return NULL;
 }
 
-void csSector::CreateLightMaps (IGraphics3D* g3d)
+void csSector::CreateLightMaps (iGraphics3D* g3d)
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)
@@ -240,7 +240,7 @@ void csSector::CreateLightMaps (IGraphics3D* g3d)
 }
 
 csPolygon3D* csSector::IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr)
+  const csVector3& end, csVector3& isect, float* pr)
 {
   csThing* sp = first_thing;
   while (sp)
@@ -254,7 +254,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 }
 
 csSector* csSector::FollowSegment (csReversibleTransform& t,
-	csVector3& new_position, bool& mirror)
+  csVector3& new_position, bool& mirror)
 {
   csVector3 isect;
   csPolygon3D* p = sector->IntersectSegment (t.GetOrigin (), new_position, isect);
@@ -274,7 +274,7 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
 
 
 csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
-	float* pr)
+  float* pr)
 {
   float d, min_d = radius;
   int i;
@@ -332,7 +332,7 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
 }
 
 void* csSector::DrawPolygons (csPolygonParentInt* pi,
-	csPolygonInt** polygon, int num, void* data)
+  csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
   csSector* sector = (csSector*)pi;
@@ -343,7 +343,7 @@ void* csSector::DrawPolygons (csPolygonParentInt* pi,
 csPolygon2DQueue* poly_queue;
 
 void* csSector::TestQueuePolygons (csPolygonParentInt* pi,
-	csPolygonInt** polygon, int num, void* data)
+  csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
   csSector* sector = (csSector*)pi;
@@ -356,7 +356,7 @@ void* csSector::TestQueuePolygons (csPolygonParentInt* pi,
 
 #if 0
 void* csSector::TestQueuePolygonsQuad (csPolygonParentInt* pi,
-	csPolygonInt** polygon, int num, void* data)
+  csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
   csSector* sector = (csSector*)pi;
@@ -367,7 +367,7 @@ void* csSector::TestQueuePolygonsQuad (csPolygonParentInt* pi,
 #endif
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
-	csRenderView* rview)
+  csRenderView* rview)
 {
   csPolygon3D* poly3d;
   csPolygon2D* poly2d;
@@ -521,8 +521,7 @@ void csSector::Draw (csRenderView& rview)
   }
   else if (HasFog ())
   {
-    rview.g3d->GetFogMode (fogmethod);
-    if (fogmethod == G3DFOGMETHOD_VERTEX)
+    if ((fogmethod = rview.g3d->GetFogMode ()) == G3DFOGMETHOD_VERTEX)
     {
       CHK (csFogInfo* fog_info = new csFogInfo ());
       fog_info->next = rview.fog_info;
@@ -572,7 +571,7 @@ void csSector::Draw (csRenderView& rview)
 	  sp3d->AddBoundingBox (spr_container);
         }
 	static_tree->AddDynamicPolygons (spr_container->GetPolygons (),
-		spr_container->GetNumPolygons ());
+          spr_container->GetNumPolygons ());
 	spr_container->World2Camera (rview);
       }
 
@@ -580,7 +579,7 @@ void csSector::Draw (csRenderView& rview)
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation ();
       static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
-      	(void*)&rview, CullOctreeNode, (void*)&rview);
+      	&rview, CullOctreeNode, &rview);
 
       if (sprites.Length () > 0)
       {
@@ -604,17 +603,15 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
     }
     csPolygon2DQueue* queue = poly_queue;
-    TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon,
-    	(void*)&rview);
+    TestQueuePolygons (this, polygons, num_polygon, &rview);
     DrawPolygonsFromQueue (queue, &rview);
     CHK (delete queue);
   }
   else if (bsp)
-    bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
+    bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, &rview);
   else
   {
-    DrawPolygons ((csPolygonParentInt*)this, polygons, num_polygon,
-    	(void*)&rview);
+    DrawPolygons (this, polygons, num_polygon, &rview);
     if (static_thing && do_things)
     {
       static_thing->UpdateTransformation (rview);
@@ -765,8 +762,8 @@ void csSector::Draw (csRenderView& rview)
   }
 
   // queue all halos in this sector to be drawn.
-  IHaloRasterizer* piHR = csWorld::current_world->GetHaloRastizer ();
-  if (!rview.callback && piHR)
+  iHaloRasterizer* HaloRast = csWorld::current_world->GetHaloRastizer ();
+  if (!rview.callback && HaloRast)
   {
     int numlights = lights.Length();
     
@@ -797,10 +794,9 @@ void csSector::Draw (csRenderView& rview)
         cshaloinfo->b = light->GetColor ().blue;
         cshaloinfo->intensity = 0.0f;
         
-        if (piHR->TestHalo(&cshaloinfo->v) == S_OK)
+        if (HaloRast->TestHalo(&cshaloinfo->v))
         {
-          piHR->CreateHalo(cshaloinfo->r, cshaloinfo->g, cshaloinfo->b,
-	  	&cshaloinfo->haloinfo);
+          cshaloinfo->haloinfo = HaloRast->CreateHalo(cshaloinfo->r, cshaloinfo->g, cshaloinfo->b);
           csWorld::current_world->AddHalo (cshaloinfo);
         }
       }

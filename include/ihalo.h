@@ -19,26 +19,25 @@
 #ifndef __IHALO_H__
 #define __IHALO_H__
 
-#include "cscom/com.h"
-
-extern const IID IID_IHaloRasterizer;
+#include "csutil/scf.h"
 
 class csVector3;
-typedef void* HALOINFO;
 
-/// IHaloRasterizer: used to render halos (aka "light globes").
-interface IHaloRasterizer : public IUnknown
+/// This is a handle to a halo
+typedef void *csHaloHandle;
+
+/// iHaloRasterizer: used to render halos (aka "light globes").
+SCF_INTERFACE (iHaloRasterizer, 0, 0, 1) : public iBase
 {
-  /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
-  STDMETHOD (CreateHalo) (float r, float g, float b, HALOINFO* pRetVal) PURE;
-  /// Destroy the halo.
-  STDMETHOD (DestroyHalo) (HALOINFO haloInfo) PURE;
+  /// Create a halo of the specified color and return a handle
+  virtual csHaloHandle CreateHalo (float r, float g, float b) = 0;
+  /// Destroy the halo
+  virtual void DestroyHalo (csHaloHandle halo) = 0;
   /// Test to see if a halo would be visible (but don't attempt to draw it)
-  STDMETHOD (TestHalo) (csVector3* pCenter) PURE;
+  virtual bool TestHalo (csVector3 *pCenter) = 0;
 
   /// Draw the halo given a center point and an intensity. 
-  STDMETHOD (DrawHalo) (csVector3* pCenter, float fIntensity, HALOINFO haloInfo) PURE;
+  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle halo) = 0;
 };
 
 #endif
-  

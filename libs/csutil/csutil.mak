@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csutil
 csutil:
 	$(MAKE_TARGET)
+csutilclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -84,7 +86,7 @@ $(CSUTIL.LIB): $(OBJ.CSUTIL)
 	$(DO.LIBRARY)
 
 csutilclean:
-	-$(RM) $(CSUTIL.LIB)
+	-$(RM) $(CSUTIL.LIB) $(OBJ.CSUTIL)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csutil.dep

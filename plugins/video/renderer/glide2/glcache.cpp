@@ -50,12 +50,12 @@ void GlideTextureCache::Dump()
 void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
 {
 
-  ITextureHandle* txt_handle = (ITextureHandle*)d->pSource;
-  csTextureMM* txt_mm = GetcsTextureMMFromITextureHandle (txt_handle);
+  iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
+  csTextureMM* txt_mm = (csTextureMM*)txt_handle->->GetPrivateObject ();
   csTexture* txt_unl = txt_mm->get_texture (0);
   
   /*
-  bool is_transparent = txt_mm->get_transparent ();
+  bool is_transparent = txt_mm->GetTransparent ();
 
   IMipMapContainer *piMMC = NULL;
   ITextureMap *piTM = NULL;
@@ -217,7 +217,7 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
 
     //piTM->GetBitmap(&lpSrc);
     //ASSERT( lpSrc != NULL );
-    lpSrc = txt_unl->get_bitmap8();
+    lpSrc = txt_unl->get_bitmap();
 
     //if(bpp==16)
     {
@@ -260,7 +260,6 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
     }
     //else
     //  texhnd->info.format=GR_TEXFMT_P_8;
-    //FINAL_RELEASE( piTM );
 
     texhnd->tmu = m_tmu;
     for(i=3;lod[i]==-1;i--);
@@ -297,11 +296,11 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
   /*piMMC->GetTexture(i, &piTM);
         ASSERT( piTM != NULL );
         
-        piTM->GetWidth(width);
-        piTM->GetHeight(height);
-        piTM->GetBitmap(&lpSrc);*/
+        width = piTM->GetWidth();
+        height = piTM->GetHeight();
+        lpSrc = piTM->GetBitmap();*/
         csTexture* txt_mip = txt_mm->get_texture (i);
-        src = txt_mip->get_bitmap8();
+        src = txt_mip->get_bitmap();
         ASSERT( src != NULL );
 
         GlideLib_grTexDownloadMipMapLevel(texhnd->tmu->tmu_id,
@@ -323,7 +322,6 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
     texhnd = NULL;
   }
   
-  //FINAL_RELEASE( piMMC );
   d->pData = texhnd;
 }
 
@@ -392,19 +390,13 @@ void GlideLightmapCache::Dump()
 void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
 {
   CHK (TextureHandler *texhnd = new TextureHandler);
-  ILightMap *piLM;
+  iLightMap *piLM = QUERY_INTERFACE (d->pSource->QueryInterface, iLightMap);
 
-  VERIFY_SUCCESS( d->pSource->QueryInterface( IID_ILightMap, (void**)&piLM ) );
-  ASSERT( piLM );
+  int width = piLM->GetWidth();
+  int height = piLM->GetHeight();
 
-  int height, rheight; 
-  int width, rwidth;
-
-  piLM->GetHeight(height);
-  piLM->GetWidth(width);
-
-  piLM->GetRealHeight(rheight);
-  piLM->GetRealWidth(rwidth);
+  int rheight = piLM->GetRealHeight();
+  int rwidth = piLM->GetRealWidth();
 
   ASSERT(!(height%2));
   ASSERT(!(width%2));
@@ -589,10 +581,10 @@ void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
   }
 
   d->pData = texhnd;
-  FINAL_RELEASE( piLM );
+  piLM->DecRef ();
 }
 
 void GlideLightmapCache::Unload(HighColorCacheAndManage_Data *d)
 {
-      manager->freeSpaceMem(d->mempos);
+  manager->freeSpaceMem(d->mempos);
 }

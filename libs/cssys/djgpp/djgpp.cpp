@@ -72,15 +72,14 @@ static unsigned short ScanCodeToChar[128] =
 
 //================================================================== System ====
 
-BEGIN_INTERFACE_TABLE (SysSystemDriver)
-  IMPLEMENTS_COMPOSITE_INTERFACE (System)
-  IMPLEMENTS_COMPOSITE_INTERFACE (DosSystemDriver)
-END_INTERFACE_TABLE ()
-
-IMPLEMENT_UNKNOWN_NODELETE (SysSystemDriver)
+IMPLEMENT_IBASE (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_INTERFACE (iDosSystemDriver)
+IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
+  CONSTRUCT_IBASE (NULL);
   // Sanity check
   if (sizeof (event_queue [0]) != 12)
   {
@@ -140,21 +139,15 @@ void SysSystemDriver::Loop ()
   } // while (!Shutdown && !ExitLoop)
 }
 
-//== class XDosSystemDriver ====================================================
-
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED (SysSystemDriver, DosSystemDriver)
-
-STDMETHODIMP SysSystemDriver::XDosSystemDriver::EnablePrintf (bool Enable)
+void SysSystemDriver::EnablePrintf (bool Enable)
 {
   extern void console_Enable (bool Enable);
   console_Enable (Enable);
-  return S_OK;
 }
 
-STDMETHODIMP SysSystemDriver::XDosSystemDriver::SetMousePosition (int x, int y)
+bool SysSystemDriver::SetMousePosition (int x, int y)
 {
-  METHOD_PROLOGUE (SysSystemDriver, DosSystemDriver);
-  return ((SysMouseDriver *)pThis->Mouse)->SetMousePosition (x, y) ? S_OK : E_FAIL;
+  return ((SysMouseDriver *)Mouse)->SetMousePosition (x, y);
 }
 
 //================================================================ Keyboard ====
@@ -210,7 +203,7 @@ SysMouseDriver::~SysMouseDriver ()
   Close ();
 }
 
-bool SysMouseDriver::Open (ISystem* System, csEventQueue *EvQueue)
+bool SysMouseDriver::Open (iSystem* System, csEventQueue *EvQueue)
 {
   if (!csMouseDriver::Open (System, EvQueue))
     return false;
@@ -218,9 +211,9 @@ bool SysMouseDriver::Open (ISystem* System, csEventQueue *EvQueue)
     return false;
 
   // Query screen size from System object
-  int FrameWidth, FrameHeight;
-  System->GetWidthSetting (FrameWidth);
-  System->GetHeightSetting (FrameHeight);
+  int FrameWidth, FrameHeight, Depth;
+  bool FullScreen;
+  System->GetSettings (FrameWidth, FrameHeight, Depth, FullScreen);
 
   // Query mouse sensivity
   __dpmi_regs regs;

@@ -21,11 +21,11 @@
 #ifndef __IGRAPH2D_H__
 #define __IGRAPH2D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
+#include "iplugin.h"
 #include "itexture.h"
 
 class csRect;
-interface ISystem;
 
 enum FontType
 {
@@ -38,17 +38,6 @@ enum FontType
   csFontCourierFixed,
   csFontTiny,
   csFontTinyFixed
-};
-
-/// This structure is used for saving/restoring areas of screen
-struct ImageArea
-{
-  int x, y, w, h;
-  char *data;
-
-  // @@@ not sure if this has binary compatibility in all cases - DAN
-  inline ImageArea (int sx, int sy, int sw, int sh)
-  { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
 /// A RGB palette entry
@@ -127,78 +116,87 @@ struct csPixelFormat
   int PixelBytes;
 };
 
-extern const IID IID_IGraphics2D;
-extern const IID IID_IGraphicsInfo;
+/// This structure is used for saving/restoring areas of screen
+struct csImageArea
+{
+  int x, y, w, h;
+  char *data;
+
+  inline csImageArea (int sx, int sy, int sw, int sh)
+  { x = sx; y = sy; w = sw; h = sh; data = NULL; }
+};
 
 /**
- * This is the interface for 2D renderer. System-dependent ports
- * should derive their own class from the standard implementation,
- * csGraphics2D, and implement required (marked with an asterisk (*))
- * functions. Functions not marked with an asterisk are optional,
- * but possibly slow since they are too general.</p>
- *
+ * This is the interface for 2D renderer. The 2D renderer is responsible
+ * for all 2D operations such as creating the window, switching pages,
+ * returning pixel format and so on.
  */
-interface IGraphics2D : public IUnknown
+SCF_INTERFACE (iGraphics2D, 0, 0, 1) : public iPlugIn
 {
-  /// Initialize the 2D graphics system.
-  STDMETHOD (Initialize) () PURE;
+  /// Open the device.
+  virtual bool Open (const char *Title) = 0;
+  /// Close the device.
+  virtual void Close () = 0;
+
+  /// Set clipping rectangle
+  virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY) = 0;
+  /// Retrieve clipping rectangle
+  virtual void GetClipRect (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY) = 0;
 
  /**
   * This routine should be called before any draw operations.
   * It should return S_OK if graphics context is ready.
   */
-  STDMETHOD (BeginDraw) () PURE;
+  virtual bool BeginDraw () = 0;
   /// This routine should be called when you finished drawing.
-  STDMETHOD (FinishDraw) () PURE;
+  virtual void FinishDraw () = 0;
 
-  /// (*) Flip video pages (or dump backbuffer into framebuffer).
-  STDMETHOD (Print) (csRect* pArea) PURE;
+  /// Flip video pages (or dump backbuffer into framebuffer).
+  virtual void Print (csRect *pArea) = 0;
+
+  /// Get active videopage number (starting from zero)
+  virtual int GetPage () = 0;
+  /// Enable or disable double buffering; returns success status
+  virtual bool DoubleBuffer (bool Enable) = 0;
+  /// Get the double buffer state
+  virtual bool GetDoubleBufferState () = 0;
 
   /// Clear backbuffer.
-  STDMETHOD (Clear) (int color) PURE;
+  virtual void Clear (int color) = 0;
   /// Clear all video pages.
-  STDMETHOD (ClearAll) (int color) PURE;
+  virtual void ClearAll (int color) = 0;
 
   /// Draw a line.
-  STDMETHOD (DrawLine) (float x1, float y1, float x2, float y2, int color) PURE;
+  virtual void DrawLine (float x1, float y1, float x2, float y2, int color) = 0;
   /// Draw a box
-  STDMETHOD (DrawBox) (int x1, int x2, int y1, int y2, int color) PURE;
+  virtual void DrawBox (int x1, int x2, int y1, int y2, int color) = 0;
  /**
   * Clip a line against given rectangle.
-  * Function returns S_OK if line is not visible.
+  * Function returns true if line is not visible.
   */
-  STDMETHOD (ClipLine) (float& x1, float& y1, float& x2, float& y2,
-    int xmin, int ymin, int xmax, int ymax) PURE;
+  virtual bool ClipLine (float& x1, float& y1, float& x2, float& y2,
+    int xmin, int ymin, int xmax, int ymax) = 0;
   /// Draw a pixel.
-  STDMETHOD (DrawPixel) (int x, int y, int color) PURE;
+  virtual void DrawPixel (int x, int y, int color) = 0;
   /// Returns the address of the pixel at the specified (x, y) coordinates.
-  STDMETHOD (GetPixelAt) (int x, int y, unsigned char** pPixel) PURE;
+  virtual unsigned char *GetPixelAt (int x, int y) = 0;
   /// Draw a sprite using a rectangle from given texture
-  STDMETHOD (DrawSprite) (ITextureHandle *hTex, int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th) PURE;
-
-  /// Enable or disable double buffering; returns S_OK or S_FALSE.
-  STDMETHOD (DoubleBuffer) (bool Enable) PURE;
-  /// Get the double buffer state
-  STDMETHOD (GetDoubleBufferState) (bool& State) PURE;
+  virtual void DrawSprite (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th) = 0;
 
  /**
-  * Save a subarea of screen area into the variable Data.
+  * Save a subarea of screen and return a handle to saved buffer.
   * Storage is allocated in this call, you should either FreeArea()
-  * it after usage or RestoreArea () it.
+  * the handle after usage or RestoreArea () it.
   */
-  STDMETHOD (SaveArea) (ImageArea** Area, int x, int y, int w, int h) PURE;
+  virtual csImageArea *SaveArea (int x, int y, int w, int h) = 0;
   /// Restore a subarea of screen saved with SaveArea()
-  STDMETHOD (RestoreArea) (ImageArea* Area, bool bFree) PURE;
+  virtual void RestoreArea (csImageArea *Area, bool Free) = 0;
   /// Free storage allocated for a subarea of screen
-  STDMETHOD (FreeArea) (ImageArea* Area) PURE;
-
-  /// Retrieve clipping rectangle
-  STDMETHOD (GetClipRect) (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY) PURE;
-  /// Set clipping rectangle
-  STDMETHOD (SetClipRect) (int nMinX, int nMinY, int nMaxX, int nMaxY) PURE;
+  virtual void FreeArea (csImageArea *Area) = 0;
 
   /// Set mouse position (relative to top-left of CS window).
-  STDMETHOD (SetMousePosition) (int x, int y) PURE;
+  virtual bool SetMousePosition (int x, int y) = 0;
 
  /**
   * Set mouse cursor to one of predefined shape classes
@@ -209,63 +207,44 @@ interface IGraphics2D : public IUnknown
   * should be set to its nearest system equivalent depending on
   * iShape argument.
   */
-  STDMETHOD (SetMouseCursor) (csMouseCursorID Shape, ITextureHandle *hBitmap) PURE;
-  /// (*) Set a color index to given R,G,B (0..255) values
-  STDMETHOD (SetRGB) (int i, int r, int g, int b) PURE;
+  virtual bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap) = 0;
+  /// Set a color index to given R,G,B (0..255) values
+  virtual void SetRGB (int i, int r, int g, int b) = 0;
   /// Write a text string into the back buffer
-  STDMETHOD (Write) (int x, int y, int fg, int bg, const char *str) PURE;
+  virtual void Write (int x, int y, int fg, int bg, const char *str) = 0;
   /// Write a single character.
-  STDMETHOD (WriteChar) (int x, int y, int fg, int bg, char c) PURE;
+  virtual void WriteChar (int x, int y, int fg, int bg, char c) = 0;
 
-  /// Gets the type of the font.
-  STDMETHOD (GetFontID) (int& id) PURE;
+  /// Gets the ID of current font.
+  virtual int GetFontID () = 0;
   /// Sets the type of the font.
-  STDMETHOD (SetFontID) (int id) PURE;
-
-  /// Open the device.
-  STDMETHOD (Open) (const char *Title) PURE;
-  /// Close the device.
-  STDMETHOD (Close) () PURE;
+  virtual void SetFontID (int FontID) = 0;
 
  /**
   * Perform a system specific exension.
   * This is probably not the good way to do this but I see no other
   * way currently.
   */
-  STDMETHOD (PerformExtension) (char *args) PURE;
-};
-
-/**
- * This interface is used to retrieve information
- * about the current pixel format and palette
- * entries.
- */
-interface IGraphicsInfo : public IUnknown
-{
-  /// Get active videopage number (starting from zero)
-  STDMETHOD (GetPage) (int& nPage) PURE;
+  virtual bool PerformExtension (char *args) = 0;
 
  /**
   * Return the number of bytes for every pixel.
   * This function is equivalent to the PixelBytes field that
   * you get from GetPixelFormat.
   */
-  STDMETHOD (GetPixelBytes) (int& nPixelBytes) PURE;
+  virtual int GetPixelBytes () = 0;
 
  /**
-  * Return information about about the pixel format.
+  * Return information about the pixel format.
   */
-  STDMETHOD (GetPixelFormat) (csPixelFormat* PixelFormat) PURE;
-
-  /// Get the current font ID
-  STDMETHOD (GetFontID) (int& nID) PURE;
+  virtual csPixelFormat *GetPixelFormat () = 0;
 
   /// Return the width of the framebuffer.
-  STDMETHOD (GetWidth) (int& nWidth) PURE;
+  virtual int GetWidth () = 0;
   /// Return the height of the framebuffer.
-  STDMETHOD (GetHeight) (int& nHeight) PURE;
+  virtual int GetHeight () = 0;
   /// Returns 'true' if the program is being run full-screen.
-  STDMETHOD (GetIsFullScreen) (bool& bIsFullScreen) PURE;
+  virtual bool GetFullScreen () = 0;
 
  /**
   * Return the number of palette entries that can be modified.
@@ -274,28 +253,14 @@ interface IGraphicsInfo : public IUnknown
   * get from GetPixelFormat. It is just a little bit easier to obtain
   * this way.
   */
-  STDMETHOD (GetNumPalEntries) (int& nEntries) PURE;
+  virtual int GetNumPalEntries () = 0;
   /// Get the palette (if there is one)
-  STDMETHOD (GetPalette) (RGBpaletteEntry** pPalette) PURE;
-
-  /// Get the string equivilent of the HRESULT.
-  STDMETHOD (GetStringError) (HRESULT hRes, char *szErrorString) PURE;
+  virtual RGBpaletteEntry *GetPalette () = 0;
 
   /// Get the width of a string if it would be drawn with given font
-  STDMETHOD (GetTextWidth) (int &Width, int Font, const char *text) PURE;
+  virtual int GetTextWidth (int FontID, const char *text) = 0;
   /// Get the height of given font
-  STDMETHOD (GetTextHeight) (int &Height, int Font) PURE;
+  virtual int GetTextHeight (int FontID) = 0;
 };
 
-extern const IID IID_IGraphics2DFactory;
-
-interface IGraphics2DFactory : public IUnknown
-{
-  /// Create the graphics context
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv) PURE;
-
-  /// Lock or unlock from memory.
-  STDMETHOD (LockServer) (COMBOOL bLock) PURE;
-};
-
-#endif      // __IGRAPH2D_H__
+#endif // __IGRAPH2D_H__

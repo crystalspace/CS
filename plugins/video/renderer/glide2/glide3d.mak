@@ -21,6 +21,8 @@ all drivers drivers3d: glide3d
 
 glide3d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+glide3dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -32,11 +34,11 @@ LIBS._GLIDE3D+=-lglide2x
 
 # The Glide driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLIDE3D=Glide2xRender$(DLL)
+  GLIDE3D=glide23d$(DLL)
   LIBS.GLIDE3D=$(LIBS._GLIDE3D)
   DEP.GLIDE3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  GLIDE3D=$(OUT)$(LIB_PREFIX)Glide2xRender$(LIB)
+  GLIDE3D=$(OUT)$(LIB_PREFIX)glide23d$(LIB)
   DEP.EXE+=$(GLIDE3D)
   LIBS.EXE+=$(LIBS._GLIDE3D)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GLIDE3D
@@ -53,11 +55,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glide3d glide3dclean glide3dcleanlib
+.PHONY: glide3d glide3dclean
 
 # Chain rules
 clean: glide3dclean
-cleanlib: glide3dcleanlib
 
 glide3d: $(OUTDIRS) $(GLIDE3D)
 
@@ -68,10 +69,7 @@ $(GLIDE3D): $(OBJ.GLIDE3D) $(DEP.GLIDE3D)
 	$(DO.PLUGIN) $(LIBS.GLIDE3D)
 
 glide3dclean:
-	$(RM) $(GLIDE3D)
-
-glide3dcleanlib:
-	$(RM) $(OBJ.GLIDE3D) $(GLIDE3D)
+	$(RM) $(GLIDE3D) $(OBJ.GLIDE3D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)glide3d.dep

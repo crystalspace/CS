@@ -55,72 +55,71 @@ void OpenGLTextureCache::Dump()
 }
 
 
-void OpenGLTextureCache::Load (HighColorCache_Data *d)
+void OpenGLTextureCache::Load (csHighColorCacheData *d)
 {
-    ITextureHandle* const txt_handle = (ITextureHandle*)d->pSource;
-    csTextureMM* const txt_mm = GetcsTextureMMFromITextureHandle (txt_handle);
-    bool const transparent = txt_mm->get_transparent ();
+  iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
+  csTextureMM* txt_mm = (csTextureMM*)txt_handle->GetPrivateObject ();
+  bool transparent = txt_handle->GetTransparent ();
 
-    CHK (GLuint *texturehandle = new GLuint);
+  CHK (GLuint *texturehandle = new GLuint);
 
-    // bind all 4 mipmap levels if possible
-    glGenTextures (1,texturehandle);
+  // bind all 4 mipmap levels if possible
+  glGenTextures (1,texturehandle);
 
-    glBindTexture (GL_TEXTURE_2D, *texturehandle);
+  glBindTexture (GL_TEXTURE_2D, *texturehandle);
 
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
-    csTexture* txt_unl = txt_mm->get_texture (0);
-    int texture_width = txt_unl->get_width ();
-    int texture_height = txt_unl->get_height ();
+  csTexture* txt_unl = txt_mm->get_texture (0);
+  int texture_width = txt_unl->get_width ();
+  int texture_height = txt_unl->get_height ();
 
-    CHK (unsigned char * const tempdata = new unsigned char[texture_width*texture_height*4]);
+  CHK (unsigned char * const tempdata = new unsigned char[texture_width*texture_height*4]);
 
-    for (int mipmaplevel=0; mipmaplevel < MAX_MIPMAP_LEVELS; mipmaplevel++)
+  for (int mipmaplevel=0; mipmaplevel < MAX_MIPMAP_LEVELS; mipmaplevel++)
+  {
+    txt_unl = txt_mm->get_texture (mipmaplevel);
+    texture_width = txt_unl->get_width ();
+    texture_height = txt_unl->get_height ();
+    ULong const *source = (ULong *)txt_unl->get_bitmap ();
+
+    unsigned char * dest = tempdata;
+    for (int count = texture_width * texture_height;
+    count > 0; count--)
     {
-      txt_unl = txt_mm->get_texture (mipmaplevel);
-      texture_width = txt_unl->get_width ();
-      texture_height = txt_unl->get_height ();
-      ULong const *source = txt_unl->get_bitmap32 ();
-
-      unsigned char * dest = tempdata;
-      for (int count = texture_width * texture_height;
-      count > 0; count--)
-      {
-	dest[0] = R24(*source);
-	dest[1] = G24(*source);
-	dest[2] = B24(*source);
+      dest[0] = R24(*source);
+      dest[1] = G24(*source);
+      dest[2] = B24(*source);
 	
-	if (transparent && (*source == 0))
-	dest[3] = 0;
-	else
-	dest[3] = 255;
-	
-	dest+=4; source++;
-      }
-      if (transparent)
-        glTexImage2D(GL_TEXTURE_2D,mipmaplevel,GL_RGBA,texture_width,
-			texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
-			tempdata);
+      if (transparent && (*source == 0))
+        dest[3] = 0;
       else
-        glTexImage2D(GL_TEXTURE_2D,mipmaplevel,GL_RGB,texture_width,
-			texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
-			tempdata);
+        dest[3] = 255;
+	
+      dest+=4; source++;
     }
+    if (transparent)
+      glTexImage2D(GL_TEXTURE_2D,mipmaplevel,GL_RGBA,texture_width,
+	texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
+	tempdata);
+    else
+      glTexImage2D(GL_TEXTURE_2D,mipmaplevel,GL_RGB,texture_width,
+	texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
+	tempdata);
+  }
 
-    delete []tempdata;
+  delete [] tempdata;
 
-    d->pData = texturehandle;
-
+  d->pData = texturehandle;
 }
 
 ///
-void OpenGLTextureCache::Unload(HighColorCache_Data *d)
+void OpenGLTextureCache::Unload (csHighColorCacheData *d)
 {
    if (d && d->pData)
    {
@@ -145,23 +144,21 @@ void OpenGLLightmapCache::Dump()
 }
 
 ///
-void OpenGLLightmapCache::Load(HighColorCache_Data *d)
+void OpenGLLightmapCache::Load(csHighColorCacheData *d)
 {
-  ILightMap *lightmap_info = (ILightMap *)d->pSource;
+  iLightMap *lightmap_info = (iLightMap *)d->pSource;
 
-  int lmheight, lmwidth, lmrealwidth, lmrealheight;
-  lightmap_info->GetWidth (lmwidth);
-  lightmap_info->GetHeight (lmheight);
-  lightmap_info->GetRealWidth (lmrealwidth);
-  lightmap_info->GetRealHeight (lmrealheight);
+  int lmwidth = lightmap_info->GetWidth ();
+  int lmheight = lightmap_info->GetHeight ();
+  int lmrealwidth = lightmap_info->GetRealWidth ();
+  int lmrealheight = lightmap_info->GetRealHeight ();
 
-//   lmheight = floor(pow(2.0, ceil(log(lmheight)/log(2.0)) ) );
-//   lmwidth = floor(pow(2.0, ceil(log(lmwidth)/log(2.0)) ) );
+//lmheight = floor(pow(2.0, ceil(log(lmheight)/log(2.0)) ) );
+//lmwidth = floor(pow(2.0, ceil(log(lmwidth)/log(2.0)) ) );
 
-  unsigned char *red_data, *green_data, *blue_data;
-  lightmap_info->GetMap (0,&red_data);
-  lightmap_info->GetMap (1,&green_data);
-  lightmap_info->GetMap (2,&blue_data);
+  unsigned char *red_data = lightmap_info->GetMap (0);
+  unsigned char *green_data = lightmap_info->GetMap (1);
+  unsigned char *blue_data = lightmap_info->GetMap (2);
 
   // @@@ Note @@@
   // The lightmap data used by Crystal Space is in another format
@@ -263,7 +260,7 @@ void OpenGLLightmapCache::Load(HighColorCache_Data *d)
 }
 
 ///
-void OpenGLLightmapCache::Unload(HighColorCache_Data *d)
+void OpenGLLightmapCache::Unload(csHighColorCacheData *d)
 {
   if (d && d->pData)
   {

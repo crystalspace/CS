@@ -1,4 +1,5 @@
 /*
+    Interface for the csAlphaHandle class.
     Copyright (C) 1998 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
@@ -16,20 +17,16 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// alpha.h: interface for the csAlphaHandle class.
-//
-//////////////////////////////////////////////////////////////////////
+#ifndef __ALPHA_H__
+#define __ALPHA_H__
 
-#ifndef ALPHA_H
-#define ALPHA_H
 #include "types.h"
 #include "csobject/csobj.h"
 #include "csgfxldr/boxfilt.h"
 #include "igraph2d.h"
 
-class csWorld;
 class AlphaMapFile;
-interface IAlphaMapHandle;
+scfInterface iAlphaMapHandle;
 
 /**
  * csAlphaMapHandle implements IAlphaMapHandle.
@@ -40,8 +37,8 @@ private:
   /// The corresponding ImageFile.
   AlphaMapFile* afile;
   /// The handle
-  IAlphaMapHandle* alpha_handle;
-  // Transparent color
+  iAlphaMapHandle* alpha_handle;
+
 public:
   /// Construct an alpha-map handle given a image file
   csAlphaMapHandle (AlphaMapFile* alphamap);
@@ -51,10 +48,10 @@ public:
   virtual ~csAlphaMapHandle ();
 
   /// Get the alph-map handle.
-  IAlphaMapHandle* GetAlphaHandle () { return alpha_handle; }
+  iAlphaMapHandle* GetAlphaHandle () { return alpha_handle; }
 
   /// Set the alpha-map handle.
-  void SetAlphaHandle (IAlphaMapHandle* h);
+  void SetAlphaHandle (iAlphaMapHandle* h);
 
   /// Get the ImageFile.
   AlphaMapFile* GetAlphaMapFile () { return afile; }
@@ -62,4 +59,4 @@ public:
   CSOBJTYPE;
 };
 
-#endif /*TEXTURE_H*/
+#endif // __ALPHA_H__

@@ -20,7 +20,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "cs3d/opengl/ogl_g3d.h"
@@ -46,7 +46,7 @@
 #endif
 
 #if USE_MULTITEXTURE
-// function to check for a certain extension - stolen from 
+// function to check for a certain extension - stolen from
 // an example by Mark Kilgard -GJH
 static int isExtensionSupported(const char * extension);
 #endif
@@ -61,7 +61,7 @@ static const unsigned int FOGTABLE_SIZE=64;
 // (distance*density) value represented by the texel at the center of
 // the fog table.  The fog calculation is:
 // alpha = 1.0 - exp( -(density*distance) / FOGTABLE_MEDIANDISTANCE)
-// 
+//
 static const double FOGTABLE_MEDIANDISTANCE=10.0;
 static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
 
@@ -70,66 +70,72 @@ static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
 // like clamping textures so we must do it ourself
 static const double FOGTABLE_CLAMPVALUE = 0.95;
 
-IMPLEMENT_UNKNOWN (csGraphics3DOpenGL)
+IMPLEMENT_FACTORY (csGraphics3DOpenGL)
 
-BEGIN_INTERFACE_TABLE (csGraphics3DOpenGL)
-    IMPLEMENTS_INTERFACE (IGraphics3D)
-END_INTERFACE_TABLE ()
+EXPORT_CLASS_TABLE (gl3d)
+  EXPORT_CLASS (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
+    "OpenGL 3D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csGraphics3DOpenGL::csGraphics3DOpenGL (ISystem* piSystem)
-  : m_fogtexturehandle(0),
-    m_piG2D (NULL), txtmgr(NULL), texture_cache(NULL), lightmap_cache(NULL),
-    m_piSystem(piSystem)
+IMPLEMENT_IBASE (csGraphics3DOpenGL)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics3D)
+IMPLEMENT_IBASE_END
+
+csGraphics3DOpenGL::csGraphics3DOpenGL (iBase *iParent) : G2D (NULL), System (NULL)
 {
+  CONSTRUCT_IBASE (iParent);
+
   ShortcutDrawPolygon = 0;
   ShortcutStartPolygonFX = 0;
   ShortcutDrawPolygonFX = 0;
   ShortcutFinishPolygonFX = 0;
 
-  HRESULT hRes;
-  CLSID clsid2dDriver;
-  char *sz2DDriver = OPENGL_2D_DRIVER;
-  IGraphics2DFactory* piFactory = NULL;
-
-  hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
-  if (FAILED(hRes))
-  {	
-      SysPrintf(MSG_FATAL_ERROR, "FATAL: Cannot open \"%s\" 2D Graphics driver", sz2DDriver);
-      exit(0);
-  }
-
-  hRes = csCoGetClassObject( clsid2dDriver, CLSCTX_INPROC_SERVER, NULL, (REFIID)IID_IGraphics2DFactory, (void**)&piFactory );
-  if (FAILED(hRes))
-  {
-      SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-      exit(0);
-  }
-
-  hRes = piFactory->CreateInstance( (REFIID)IID_IGraphics2D, m_piSystem, (void**)&m_piG2D );
-  if (FAILED(hRes))
-  {
-      SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-      exit(0);
-  }
-
-  FINAL_RELEASE( piFactory );
-
-  CHK (txtmgr = new csTextureManagerOpenGL (m_piSystem, m_piG2D));
-
   dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
+
+  texture_cache = NULL;
+  lightmap_cache = NULL;
+  txtmgr = NULL;
+  m_fogtexturehandle = 0;
+  dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
+  config = new csIniFile ("opengl.cfg");
 }
 
-STDMETHODIMP csGraphics3DOpenGL::Initialize ()
+csGraphics3DOpenGL::~csGraphics3DOpenGL ()
 {
-  txtmgr->SetConfig (config = new csIniFile ("opengl.cfg"));
+  CHK (delete config);
 
-  m_piG2D->Initialize ();
-  txtmgr->InitSystem ();
+  Close ();
+  if (G2D)
+    G2D->DecRef ();
+
+  if (System)
+  {
+    System->DeregisterDriver ("iGraphics3D", this);
+    System->DecRef ();
+  }
+}
+
+bool csGraphics3DOpenGL::Initialize (iSystem *iSys)
+{
+  (System = iSys)->IncRef ();
+
+  if (!System->RegisterDriver ("iGraphics3D", this))
+    return false;
+
+  G2D = LOAD_PLUGIN (System, OPENGL_2D_DRIVER, iGraphics2D);
+  if (!G2D)
+  {
+    SysPrintf (MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
+    return 0;
+  }
+
+  CHK (txtmgr = new csTextureManagerOpenGL (System, G2D));
+  txtmgr->SetConfig (config);
+  txtmgr->Initialize ();
 
   m_renderstate.dither = config->GetYesNo ("OpenGL", "ENABLE_DITHER", false);
-
   z_buf_mode = CS_ZBUF_NONE;
-
   width = height = -1;
 
   m_renderstate.alphablend = true;
@@ -139,50 +145,38 @@ STDMETHODIMP csGraphics3DOpenGL::Initialize ()
   m_renderstate.textured = true;
   m_renderstate.texel_filt = false;
   m_renderstate.perfect = false;
-  m_renderstate.interlaced = -1;
-  m_renderstate.ilace_fastmove = false;
 
   m_config_options.do_multitexture_level = 0;
   m_config_options.do_extra_bright = false;
-  return S_OK;
+
+  CHK (txtmgr = new csTextureManagerOpenGL (System, G2D));
+
+  return true;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
+bool csGraphics3DOpenGL::Open (const char *Title)
 {
   DrawMode = 0;
 
-  IGraphicsInfo* piGI = NULL;
-
-  VERIFY_SUCCESS( m_piG2D->QueryInterface((IID&)IID_IGraphicsInfo, (void**)&piGI) );
-
-  if (FAILED(m_piG2D->Open (Title)))
+  if (!G2D->Open (Title))
   {
-      SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.");
-      FINAL_RELEASE( piGI );
-      // set "not opened" flag
-      width = height = -1;
-
-      return E_UNEXPECTED;
+    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.");
+    // set "not opened" flag
+    width = height = -1;
+    return false;
   }
 
-  int nWidth, nHeight;
-  bool bFullScreen;
-
-  piGI->GetWidth(nWidth);
-  piGI->GetHeight(nHeight);
-  piGI->GetIsFullScreen(bFullScreen);
-
-  width = nWidth;
-  height = nHeight;
-  width2 = nWidth/2;
-  height2 = nHeight/2;
+  bool bFullScreen = G2D->GetFullScreen ();
+  width = G2D->GetWidth ();
+  height = G2D->GetHeight ();
+  width2 = width / 2;
+  height2 = height / 2;
   SetDimensions (width, height);
 
-  SysPrintf(MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
-            bFullScreen ? "full screen" : "windowed", nWidth, nHeight);
+  SysPrintf (MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
+             bFullScreen ? "full screen" : "windowed", width, height);
 
-  csPixelFormat pfmt;
-  piGI->GetPixelFormat (&pfmt);
+  csPixelFormat pfmt = *G2D->GetPixelFormat ();
 
   if (m_renderstate.dither)
     glEnable (GL_DITHER);
@@ -234,7 +228,7 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
     // texture, right?  Let's see how many we can get...
     GLint maxtextures;
     glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
-    
+
     if (maxtextures > 1)
     {
       m_config_options.do_multitexture_level = maxtextures;
@@ -270,7 +264,7 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
     transientfogdata[fogindex*4+0] = (unsigned char) 255;
     transientfogdata[fogindex*4+1] = (unsigned char) 255;
     transientfogdata[fogindex*4+2] = (unsigned char) 255;
-    double fogalpha = 
+    double fogalpha =
     	(256 * ( 1.0 - exp ( - float(fogindex) *FOGTABLE_MAXDISTANCE / FOGTABLE_SIZE ) ) );
     transientfogdata[fogindex*4+3] = (unsigned char) fogalpha;
   }
@@ -315,16 +309,13 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
 
-
-  FINAL_RELEASE (piGI);
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::Close()
+void csGraphics3DOpenGL::Close ()
 {
-  HRESULT rc = S_OK;
   if ((width == height) && height == -1)
-    return rc;
+    return;
 
   // we should remove all texture handles before we kill
   // the graphics context
@@ -342,47 +333,33 @@ STDMETHODIMP csGraphics3DOpenGL::Close()
   }
 
   // kill the graphics context
-  rc = m_piG2D->Close();
+  G2D->Close();
 
   width = height = -1;
-  return rc;
 }
 
-csGraphics3DOpenGL::~csGraphics3DOpenGL ()
-{
-  CHK (delete config);
-
-  Close ();
-  FINAL_RELEASE (m_piG2D);
-}
-
-STDMETHODIMP csGraphics3DOpenGL::SetDimensions (int width, int height)
+void csGraphics3DOpenGL::SetDimensions (int width, int height)
 {
   csGraphics3DOpenGL::width = width;
   csGraphics3DOpenGL::height = height;
   csGraphics3DOpenGL::width2 = width/2;
   csGraphics3DOpenGL::height2 = height/2;
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::SetPerspectiveCenter (int x, int y)
+void csGraphics3DOpenGL::SetPerspectiveCenter (int x, int y)
 {
   width2 = x;
   height2 = y;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::BeginDraw (int DrawFlags)
+bool csGraphics3DOpenGL::BeginDraw (int DrawFlags)
 {
-  //ASSERT( m_piG2D );
-
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
    && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
   {
-    if (FAILED (m_piG2D->BeginDraw()))
-      return E_UNEXPECTED;
+    if (!G2D->BeginDraw())
+      return false;
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -402,36 +379,33 @@ STDMETHODIMP csGraphics3DOpenGL::BeginDraw (int DrawFlags)
       glClear(GL_DEPTH_BUFFER_BIT);
   }
   else if (DrawFlags & CSDRAW_CLEARSCREEN)
-    m_piG2D->Clear(0);
+    G2D->Clear(0);
 
   DrawMode = DrawFlags;
 
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::FinishDraw ()
+void csGraphics3DOpenGL::FinishDraw ()
 {
-  //ASSERT( m_piG2D );
+  //ASSERT( G2D );
 
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
   {
-    m_piG2D->FinishDraw ();
+    G2D->FinishDraw ();
   }
   DrawMode = 0;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::Print (csRect *area)
+void csGraphics3DOpenGL::Print (csRect *area)
 {
-  m_piG2D->Print (area);
+  G2D->Print (area);
   //glClear(GL_COLOR_BUFFER_BIT);
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::SetZBufMode (G3DZBufMode mode)
+void csGraphics3DOpenGL::SetZBufMode (G3DZBufMode mode)
 {
   z_buf_mode = mode;
-  return S_OK;
 }
 
 #define SMALL_D 0.01
@@ -447,23 +421,26 @@ STDMETHODIMP csGraphics3DOpenGL::SetZBufMode (G3DZBufMode mode)
  */
 #define VERTEX_NEAR_THRESHOLD   0.001
 
-STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
+void csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
 {
   int i;
   float P1, P2, P3, P4;
   float Q1, Q2, Q3, Q4;
   float min_z, max_z;
 
-  if (poly.num < 3) return S_FALSE;
+  if (poly.num < 3)
+    return;
 
   // take shortcut drawing if possible
   if (ShortcutDrawPolygon && (this->*ShortcutDrawPolygon)(poly))
-  { return S_OK; }
+    return;
 
   // For debugging: is we reach the maximum number of polygons to draw we simply stop.
   dbg_current_polygon++;
-  if (dbg_current_polygon == dbg_max_polygons_to_draw-1) return E_FAIL;
-  if (dbg_current_polygon >= dbg_max_polygons_to_draw-1) return S_OK;
+  if (dbg_current_polygon == dbg_max_polygons_to_draw-1)
+    return;
+  if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
+    return;
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -516,7 +493,8 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   }
 
   // if this is a 'degenerate' polygon, skip it
-  if (num_vertices < 3) return S_FALSE;
+  if (num_vertices < 3)
+    return;
 /*
   // Mipmapping.
   int mipmap;
@@ -534,12 +512,11 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
     mipmap = m_renderstate.mipmap - 1;
 */
 
-  IPolygonTexture*   tex     = poly.poly_texture[0];
-  csTextureMMOpenGL* txt_mm  = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+  iPolygonTexture*   tex     = poly.poly_texture[0];
+  csTextureMMOpenGL* txt_mm  = (csTextureMMOpenGL*)poly.txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
-  ILightMap *thelightmap = NULL;
-  tex->GetLightMap(&thelightmap);
+  iLightMap *thelightmap = tex->GetLightMap ();
 
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
@@ -585,9 +562,9 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   bool tex_transp;
   int poly_alpha = poly.alpha;
 
-  HighColorCache_Data *texturecache_data;
-  texturecache_data = txt_mm->get_hicolorcache ();
-  tex_transp = txt_mm->get_transparent ();
+  csHighColorCacheData *texturecache_data;
+  texturecache_data = txt_mm->GetHighColorCacheData ();
+  tex_transp = txt_mm->GetTransparent ();
   GLuint texturehandle = *( (GLuint *) (texturecache_data->pData) );
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
@@ -651,18 +628,16 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   // texture coordinate bounds)
   if (thelightmap && m_renderstate.lighting)
   {
-    HighColorCache_Data *lightmapcache_data;
-    thelightmap->GetHighColorCache(&lightmapcache_data);
+    csHighColorCacheData *lightmapcache_data = thelightmap->GetHighColorCache();
     GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
 
     // Jorrit: this code was added to scale the lightmap.
     // @@@ Note that many calculations in this routine are not very optimal
     // to do here and should in fact be precalculated.
-    int lmwidth, lmrealwidth, lmheight, lmrealheight;
-    thelightmap->GetWidth (lmwidth);
-    thelightmap->GetRealWidth (lmrealwidth);
-    thelightmap->GetHeight (lmheight);
-    thelightmap->GetRealHeight (lmrealheight);
+    int lmwidth = thelightmap->GetWidth ();
+    int lmrealwidth = thelightmap->GetRealWidth ();
+    int lmheight = thelightmap->GetHeight ();
+    int lmrealheight = thelightmap->GetRealHeight ();
     float scale_u = (float)(lmrealwidth) / (float)(lmwidth);
     float scale_v = (float)(lmrealheight) / (float)(lmheight);
     //float scale_u = (float)(lmrealwidth) / (float)lmwidth;
@@ -710,7 +685,7 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
 
     glEnable(GL_BLEND);
     // The following blend function is configurable.
-    glBlendFunc (m_config_options.m_lightmap_src_blend, 
+    glBlendFunc (m_config_options.m_lightmap_src_blend,
     		 m_config_options.m_lightmap_dst_blend);
 
     glBegin(GL_TRIANGLE_FAN);
@@ -736,8 +711,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
       glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
     }
     glEnd();
-
-    FINAL_RELEASE (thelightmap);
   }
 
   // An extra pass which improves the lighting on SRC*DST so that
@@ -811,14 +784,10 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
     glEnd ();
 
   }
-
-  FINAL_RELEASE (tex);
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::DrawPolygonDebug (G3DPolygonDP& /*poly*/)
+void csGraphics3DOpenGL::DrawPolygonDebug (G3DPolygonDP& /*poly*/)
 {
-  return S_OK;
 }
 
 // Calculate round (f) of a 16:16 fixed pointer number
@@ -828,12 +797,11 @@ inline long round16 (long f)
   return (f + 0x8000) >> 16;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::StartPolygonFX (ITextureHandle* handle, UInt mode)
+void csGraphics3DOpenGL::StartPolygonFX (iTextureHandle* handle, UInt mode)
 {
-
   // try shortcut method if available
-  if (ShortcutStartPolygonFX && (this->*ShortcutStartPolygonFX)(handle, mode) ) 
-  { return S_OK; }
+  if (ShortcutStartPolygonFX && (this->*ShortcutStartPolygonFX)(handle, mode) )
+    return;
 
   m_gouraud = m_renderstate.lighting && m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
@@ -842,11 +810,11 @@ STDMETHODIMP csGraphics3DOpenGL::StartPolygonFX (ITextureHandle* handle, UInt mo
   GLuint texturehandle = 0;
   if (handle && m_renderstate.textured)
   {
-    csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (handle);
+    csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)handle->GetPrivateObject ();
     texture_cache->Add (handle);
 
-    HighColorCache_Data *cachedata;
-    cachedata = txt_mm->get_hicolorcache ();
+    csHighColorCacheData *cachedata;
+    cachedata = txt_mm->GetHighColorCacheData ();
     texturehandle = *( (GLuint *) (cachedata->pData) );
   }
 
@@ -922,24 +890,20 @@ STDMETHODIMP csGraphics3DOpenGL::StartPolygonFX (ITextureHandle* handle, UInt mo
     glDisable (GL_BLEND);
 
   SetGLZBufferFlags ();
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::FinishPolygonFX()
+void csGraphics3DOpenGL::FinishPolygonFX ()
 {
   // attempt shortcut method
   if (ShortcutFinishPolygonFX && (this->*ShortcutFinishPolygonFX)())
-  { return S_OK; }
-
-  return S_OK;
+    return;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
+void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
   // take shortcut if possible
   if (ShortcutDrawPolygonFX && (this->*ShortcutDrawPolygonFX)(poly))
-  { return S_OK; }
+    return;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
@@ -1022,8 +986,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
     if (!m_gouraud)
       glShadeModel (GL_FLAT);
   }
-
-  return S_OK;
 }
 
 /**
@@ -1035,13 +997,12 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
  * objects when
  * multiple objects are started.
  */
-STDMETHODIMP csGraphics3DOpenGL::OpenFogObject(CS_ID /*id*/, csFog* /*fog*/)
+void csGraphics3DOpenGL::OpenFogObject(CS_ID /*id*/, csFog* /*fog*/)
 {
-  return S_OK;
 }
 
 /**
- *   * Add a front or back-facing fog polygon in the current fog object.
+ * Add a front or back-facing fog polygon in the current fog object.
  * Note that it is guaranteed that all back-facing fog polygons
  * will have been added before the first front-facing polygon.
  * fogtype can be:
@@ -1049,9 +1010,8 @@ STDMETHODIMP csGraphics3DOpenGL::OpenFogObject(CS_ID /*id*/, csFog* /*fog*/)
  *    CS_FOG_BACK:    a back-facing polygon
  *    CS_FOG_VIEW:    the view-plane
  */
-STDMETHODIMP csGraphics3DOpenGL::AddFogPolygon(CS_ID /*id*/, G3DPolygonAFP &/*poly*/, int /*fogtype*/)
+void csGraphics3DOpenGL::AddFogPolygon(CS_ID /*id*/, G3DPolygonAFP &/*poly*/, int /*fogtype*/)
 {
-  return S_OK;
 }
 
 /**
@@ -1059,53 +1019,42 @@ STDMETHODIMP csGraphics3DOpenGL::AddFogPolygon(CS_ID /*id*/, G3DPolygonAFP &/*po
  * closed it should be rendered on screen (whether you do it here
  * or in DrawFrontFog/DrawBackFog is not important).
  */
-STDMETHODIMP csGraphics3DOpenGL::CloseFogObject(CS_ID /*id*/)
+void csGraphics3DOpenGL::CloseFogObject(CS_ID /*id*/)
 {
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::CacheTexture (IPolygonTexture* texture)
+void csGraphics3DOpenGL::CacheTexture (iPolygonTexture* texture)
 {
-  ITextureHandle* txt_handle;
-  texture->GetTextureHandle (&txt_handle);
+  iTextureHandle* txt_handle = texture->GetTextureHandle ();
   texture_cache->Add (txt_handle);
   lightmap_cache->Add (texture);
-
-  FINAL_RELEASE(txt_handle);
-
-  return S_OK;
 }
 
-void csGraphics3DOpenGL::CacheLightedTexture(IPolygonTexture* /*texture*/)
+void csGraphics3DOpenGL::CacheLightedTexture(iPolygonTexture* /*texture*/)
 {
 }
 
-void csGraphics3DOpenGL::CacheInitTexture (IPolygonTexture* /*texture*/)
+void csGraphics3DOpenGL::CacheInitTexture (iPolygonTexture* /*texture*/)
 {
 #if 0
-  ITextureContainer* piTC;
-  world->GetTextures (&piTC);
+  iTextureContainer* piTC = world->GetTextures ();
   tcache->init_texture (texture, piTC);
-  piTC->Release ();
 #endif
 }
 
-void csGraphics3DOpenGL::CacheSubTexture (IPolygonTexture* /*texture*/, int /*u*/, int /*v*/)
+void csGraphics3DOpenGL::CacheSubTexture (iPolygonTexture* /*texture*/, int /*u*/, int /*v*/)
 {
 #if 0
-  ITextureContainer* piTC;
-  world->GetTextures (&piTC);
+  iTextureContainer* piTC = world->GetTextures ();
   tcache->use_sub_texture (texture, piTC, u, v);
-  piTC->Release ();
 #endif
 }
 
-void csGraphics3DOpenGL::CacheRectTexture (IPolygonTexture* /*tex*/,
+void csGraphics3DOpenGL::CacheRectTexture (iPolygonTexture* /*tex*/,
   int /*minu*/, int /*minv*/, int /*maxu*/, int /*maxv*/)
 {
 #if 0
-  ITextureContainer* piTC;
-  world->GetTextures (&piTC);
+  iTextureContainer* piTC = world->GetTextures ();
   int subtex_size;
   tex->GetSubtexSize (subtex_size);
 
@@ -1119,29 +1068,26 @@ void csGraphics3DOpenGL::CacheRectTexture (IPolygonTexture* /*tex*/,
   for (iv = minv ; iv < maxv ; iv += subtex_size)
       tcache->use_sub_texture (tex, piTC, maxu, iv);
   tcache->use_sub_texture (tex, piTC, maxu, maxv);
-
-  piTC->Release();
 #endif
 }
 
-STDMETHODIMP csGraphics3DOpenGL::UncacheTexture (IPolygonTexture* texture)
+void csGraphics3DOpenGL::UncacheTexture (iPolygonTexture* texture)
 {
   (void)texture;
-  return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long value)
+bool csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long value)
 {
   switch(op)
   {
     case G3DRENDERSTATE_NOTHING:
-      return S_OK;
+      break;
 
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
       if (value)
       {
          if (z_buf_mode == CS_ZBUF_TEST)
-           return S_OK;
+           return true;
          if (z_buf_mode == CS_ZBUF_NONE)
            z_buf_mode = CS_ZBUF_TEST;
          else if (z_buf_mode == CS_ZBUF_FILL)
@@ -1150,7 +1096,7 @@ STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long v
       else
       {
          if (z_buf_mode == CS_ZBUF_FILL)
-           return S_OK;
+           return true;
          if (z_buf_mode == CS_ZBUF_USE)
            z_buf_mode = CS_ZBUF_FILL;
          else if (z_buf_mode == CS_ZBUF_TEST)
@@ -1161,7 +1107,7 @@ STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long v
       if (value)
       {
         if (z_buf_mode == CS_ZBUF_FILL)
-          return S_OK;
+          return true;
         if (z_buf_mode == CS_ZBUF_NONE)
           z_buf_mode = CS_ZBUF_FILL;
         else if (z_buf_mode == CS_ZBUF_TEST)
@@ -1170,7 +1116,7 @@ STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long v
       else
       {
         if (z_buf_mode == CS_ZBUF_TEST)
-          return S_OK;
+          return true;
         if (z_buf_mode == CS_ZBUF_USE)
           z_buf_mode = CS_ZBUF_TEST;
         else if (z_buf_mode == CS_ZBUF_FILL)
@@ -1200,12 +1146,9 @@ STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long v
       break;
 	// XAVIER: unhandled cases in enumerated switch (just to keep gcc happy)
     case G3DRENDERSTATE_MMXENABLE:
-      break;
+      return false;
     case G3DRENDERSTATE_INTERLACINGENABLE:
-      if (m_piG2D->DoubleBuffer (!value) != S_OK)
-        return E_FAIL;
-      m_renderstate.interlaced = value ? 0 : -1;
-      break;
+      return false;
     case G3DRENDERSTATE_FILTERINGENABLE:
       m_renderstate.texel_filt = value;
       break;
@@ -1220,81 +1163,63 @@ STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long v
       break;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
       dbg_max_polygons_to_draw = value;
-      if (dbg_max_polygons_to_draw < 0) dbg_max_polygons_to_draw = 0;
+      if (dbg_max_polygons_to_draw < 0)
+        dbg_max_polygons_to_draw = 0;
       break;
     default:
-      return E_INVALIDARG;
+      return false;
   }
 
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::GetRenderState(G3D_RENDERSTATEOPTION op, long& retval)
+long csGraphics3DOpenGL::GetRenderState(G3D_RENDERSTATEOPTION op)
 {
   switch(op)
   {
     case G3DRENDERSTATE_NOTHING:
-      retval = 0;
-      break;
+      return 0;
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      retval = (bool)(z_buf_mode & CS_ZBUF_TEST);
-      break;
+      return (bool)(z_buf_mode & CS_ZBUF_TEST);
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      retval = (bool)(z_buf_mode & CS_ZBUF_FILL);
-      break;
+      return (bool)(z_buf_mode & CS_ZBUF_FILL);
     case G3DRENDERSTATE_DITHERENABLE:
-      retval = m_renderstate.dither;
-      break;
+      return m_renderstate.dither;
     case G3DRENDERSTATE_SPECULARENABLE:
-      retval = m_renderstate.specular;
-      break;
+      return m_renderstate.specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      retval = texture_cache->GetBilinearMapping ();
-      break;
+      return texture_cache->GetBilinearMapping ();
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      retval = m_renderstate.trilinearmap;
-      break;
+      return m_renderstate.trilinearmap;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
-      retval = m_renderstate.alphablend;
-      break;
+      return m_renderstate.alphablend;
     case G3DRENDERSTATE_MIPMAPENABLE:
-      retval = m_renderstate.mipmap;
-      break;
+      return m_renderstate.mipmap;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-      retval = m_renderstate.textured;
-      break;
+      return m_renderstate.textured;
     case G3DRENDERSTATE_MMXENABLE:
-      break;
+      return 0;
     case G3DRENDERSTATE_INTERLACINGENABLE:
-      retval = m_renderstate.interlaced == -1 ? false : true;
-      break;
+      return false;
     case G3DRENDERSTATE_FILTERINGENABLE:
-      retval = m_renderstate.texel_filt;
-      break;
+      return m_renderstate.texel_filt;
     case G3DRENDERSTATE_PERFECTMAPPINGENABLE:
-      retval = m_renderstate.perfect;
-      break;
+      return m_renderstate.perfect;
     case G3DRENDERSTATE_LIGHTINGENABLE:
-      retval = m_renderstate.lighting;
-      break;
+      return m_renderstate.lighting;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      retval = m_renderstate.gouraud;
-      break;
+      return m_renderstate.gouraud;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
-      retval = dbg_max_polygons_to_draw;
-      break;
+      return dbg_max_polygons_to_draw;
     default:
-      retval = 0;
-      return E_INVALIDARG;
+      return 0;
   }
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::GetCaps(G3D_CAPS *caps)
+void csGraphics3DOpenGL::GetCaps(G3D_CAPS *caps)
 {
   if (!caps)
-    return E_INVALIDARG;
+    return;
 
   caps->ColorModel = G3DCOLORMODEL_RGB;
   caps->CanClip = false;
@@ -1311,23 +1236,20 @@ STDMETHODIMP csGraphics3DOpenGL::GetCaps(G3D_CAPS *caps)
   caps->PrimaryCaps.PerspectiveCorrects = true;
   caps->PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
   caps->fog = G3DFOGMETHOD_VERTEX;
-
-  return 1;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::ClearCache()
+void csGraphics3DOpenGL::ClearCache ()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::DumpCache()
+void csGraphics3DOpenGL::DumpCache ()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DOpenGL::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
+void csGraphics3DOpenGL::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
 {
-  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
+  if (v1.z < SMALL_Z && v2.z < SMALL_Z)
+    return;
 
   float x1 = v1.x, y1 = v1.y, z1 = v1.z;
   float x2 = v2.x, y2 = v2.y, z2 = v2.z;
@@ -1360,9 +1282,7 @@ STDMETHODIMP csGraphics3DOpenGL::DrawLine (csVector3& v1, csVector3& v2, float f
   int px2 = QInt (x2 * iz2 + (width/2));
   int py2 = height - 1 - QInt (y2 * iz2 + (height/2));
 
-  m_piG2D->DrawLine (px1, py1, px2, py2, color);
-
-  return S_OK;
+  G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
 void csGraphics3DOpenGL::SetGLZBufferFlags()
@@ -1399,7 +1319,7 @@ void csGraphics3DOpenGL::SysPrintf (int mode, char* szMsg, ...)
   vsprintf (buf, szMsg, arg);
   va_end (arg);
 
-  m_piSystem->Print(mode, buf);
+  System->Print(mode, buf);
 }
 
 #if USE_MULTITEXTURE
@@ -1423,7 +1343,7 @@ static int isExtensionSupported(const char *extension)
   for (;;) {
     where = (GLubyte *) strstr((const char *) start, extension);
     if (!where)
-      break;  
+      break;
     terminator = where + strlen(extension);
     if (where == start || *(where - 1) == ' ')
       if (*terminator == ' ' || *terminator == '\0')
@@ -1439,14 +1359,14 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
 {
 // work in progress - GJH
 #if USE_MULTITEXTURE
-  IPolygonTexture*   tex     = poly.poly_texture[0];
+  iPolygonTexture* tex = poly.poly_texture[0];
 
   // find lightmap information, if any
-  ILightMap *thelightmap = NULL;
-  tex->GetLightMap(&thelightmap);
+  iLightMap *thelightmap = tex->GetLightMap ();
 
   // the shortcut works only if there is a lightmap and no fog
-  if (!thelightmap || poly.use_fog) return false;
+  if (!thelightmap || poly.use_fog)
+    return false;
 
   // OK, we're gonna draw a polygon with a dual texture
   // Get the plane normal of the polygon. Using this we can calculate
@@ -1502,7 +1422,8 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
   }
 
   // if this is a 'degenerate' polygon, skip it
-  if (num_vertices < 3) return false;
+  if (num_vertices < 3)
+    return false;
 
   // Mipmapping.
   int mipmap;
@@ -1519,12 +1440,11 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
   else
     mipmap = m_renderstate.mipmap - 1;
 
-  tex     = poly.poly_texture[mipmap];
-  csTextureMMOpenGL* txt_mm  = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+  tex = poly.poly_texture[mipmap];
+  csTextureMMOpenGL* txt_mm  = (csTextureMMOpenGL*)poly.txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
-  thelightmap = NULL;
-  tex->GetLightMap(&thelightmap);
+  thelightmap = tex->GetLightMap ();
 
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
@@ -1571,13 +1491,12 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
   bool tex_transp;
   int poly_alpha = poly.alpha;
 
-  HighColorCache_Data *texturecache_data;
-  texturecache_data = txt_mm->get_hicolorcache ();
+  csHighColorCacheData *texturecache_data;
+  texturecache_data = txt_mm->GetHighColorCache ();
   tex_transp = txt_mm->get_transparent ();
   GLuint texturehandle = *( (GLuint *) (texturecache_data->pData) );
 
-  HighColorCache_Data *lightmapcache_data;
-  thelightmap->GetHighColorCache(&lightmapcache_data);
+  csHighColorCacheData *lightmapcache_data = thelightmap->GetHighColorCache();
   GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
 
   // configure base texture for texure unit 0
@@ -1608,20 +1527,19 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
   glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   SetGLZBufferFlags();
-  
+
   // Jorrit: this code was added to scale the lightmap.
   // @@@ Note that many calculations in this routine are not very optimal
   // to do here and should in fact be precalculated.
-  int lmwidth, lmrealwidth, lmheight, lmrealheight;
-  thelightmap->GetWidth (lmwidth);
-  thelightmap->GetRealWidth (lmrealwidth);
-  thelightmap->GetHeight (lmheight);
-  thelightmap->GetRealHeight (lmrealheight);
+  int lmwidth = thelightmap->GetWidth ();
+  int lmrealwidth = thelightmap->GetRealWidth ();
+  int lmheight = thelightmap->GetHeight ();
+  int lmrealheight = thelightmap->GetRealHeight ();
   //float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
   //float scale_v = (float)(lmrealheight-1) / (float)lmheight;
   float scale_u = (float)(lmrealwidth) / (float)lmwidth;
   float scale_v = (float)(lmrealheight) / (float)lmheight;
-  
+
   float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
   tex->GetTextureBox(lightmap_low_u,lightmap_low_v, lightmap_high_u,lightmap_high_v);
   lightmap_low_u-=0.125;
@@ -1630,21 +1548,21 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
   lightmap_high_v+=0.125;
 
   float lightmap_scale_u, lightmap_scale_v;
-  
+
   if (lightmap_high_u == lightmap_low_u)
     lightmap_scale_u = scale_u;	// @@@ Is this right?
   else
     lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
-  
+
   if (lightmap_high_v == lightmap_low_v)
     lightmap_scale_v = scale_v;	// @@@ Is this right?
   else
     lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
-  
+
   float light_u, light_v;
   float sx, sy, sz, one_over_sz;
   float u_over_sz, v_over_sz;
-  
+
   glBegin(GL_TRIANGLE_FAN);
   for (i=0; i<poly.num; i++)
   {
@@ -1664,7 +1582,7 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
     glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
   }
   glEnd();
-  
+
   // we must disable the 2nd texture unit, so that other parts of the
   // code won't accidently have a second texture applied if they
   // don't want it.
@@ -1672,9 +1590,6 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
   glActiveTextureARB(GL_TEXTURE1_ARB);
   glDisable (GL_TEXTURE_2D);
   glActiveTextureARB(GL_TEXTURE0_ARB);
-  
-  FINAL_RELEASE (thelightmap);
-  FINAL_RELEASE (tex);
 
   return true;
 #else
@@ -1687,7 +1602,7 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
 /// Shortcuts to replace the standard Start/Draw/Finish set of Draw...FX functions;
 /// this set collects up polygons and then draws them in batches, instead
 /// of drawing each individual poly with gl calls
-bool csGraphics3DOpenGL::BatchStartPolygonFX(ITextureHandle*, UInt /*mode*/)
+bool csGraphics3DOpenGL::BatchStartPolygonFX(iTextureHandle*, UInt /*mode*/)
 {
   // not done yet
   return false;
@@ -1704,5 +1619,3 @@ bool csGraphics3DOpenGL::BatchFlushPolygonFX()
   // not done yet
   return false;
 }
-
-

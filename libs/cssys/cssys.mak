@@ -30,6 +30,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: cssys
 cssys:
 	$(MAKE_TARGET)
+cssysclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -68,7 +70,7 @@ $(CSSYS.LIB): $(OBJ.CSSYS)
 	$(DO.LIBRARY)
 
 cssysclean:
-	-$(RM) $(CSSYS.LIB)
+	-$(RM) $(CSSYS.LIB) $(OBJ.CSSYS)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)cssys.dep

@@ -21,6 +21,8 @@ all drivers drivers3d: soft
 
 soft:
 	$(MAKE_TARGET) MAKE_DLL=yes
+softclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -30,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/cs3d/software
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SOFT3D=$(OUTDLL)softrndr$(DLL)
+  SOFT3D=$(OUTDLL)soft3d$(DLL)
   DEP.SOFT3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   SOFT3D=$(OUT)$(LIB_PREFIX)soft$(LIB)
@@ -52,12 +54,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: soft softclean softcleanlib
+.PHONY: soft softclean
 
 # Chain rules
 all: $(SOFT3D)
 clean: softclean
-cleanlib: softcleanlib
 
 soft: $(OUTDIRS) $(SOFT3D)
 
@@ -74,10 +75,7 @@ $(SOFT3D): $(OBJ.SOFT3D) $(DEP.SOFT3D)
 	$(DO.PLUGIN)
 
 softclean:
-	$(RM) $(SOFT3D)
-
-softcleanlib:
-	$(RM) $(OBJ.SOFT3D) $(SOFT3D)
+	$(RM) $(SOFT3D) $(OBJ.SOFT3D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)soft3d.dep

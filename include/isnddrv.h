@@ -21,55 +21,39 @@
 #ifndef __ISOUNDDRIVER_H__
 #define __ISOUNDDRIVER_H__
 
-#include "cscom/com.h"
-interface ISystem;
-interface ISoundRender;
+#include "csutil/scf.h"
 
-extern const GUID IID_ISoundDriver;
+scfInterface iSoundRender;
 
 /**
  * This is the sound render interface for CS.
  * All sound renders must implement this interface.
  * The standard implementation is ISoundDriver.
  */
-
-interface ISoundDriver : public IUnknown
+SCF_INTERFACE (iSoundDriver, 0, 0, 1) : public iBase
 {
-public:
-
   /// Open the sound render
-  STDMETHOD (Open) (ISoundRender *render, int frequency, bool bit16, bool stereo) PURE;
+  virtual bool Open (ISoundRender *render, int frequency, bool bit16, bool stereo) = 0;
   /// Close the sound render
-  STDMETHOD (Close) () PURE;
+  virtual void Close () = 0;
   /// Set Volume [0, 1]
-  STDMETHOD (SetVolume) (float vol) PURE;
+  virtual void SetVolume (float vol) = 0;
   /// Get Volume [0, 1]
-  STDMETHOD (GetVolume) (float *vol) PURE;
+  virtual float GetVolume () = 0;
   /// Lock and Get Sound Memory Buffer
-  STDMETHOD (LockMemory) (void **mem, int *memsize) PURE;
+  virtual void LockMemory (void **mem, int *memsize) = 0;
   /// Unlock Sound Memory Buffer
-  STDMETHOD (UnlockMemory) () PURE;
+  virtual void UnlockMemory () = 0;
   /// Is driver need to be updated 'manually' ?
-  STDMETHOD (IsBackground) (bool *back) PURE;
+  virtual bool IsBackground () = 0;
   /// Do driver is in 16 bits mode ?
-  STDMETHOD (Is16Bits) (bool *bit) PURE;
+  virtual bool Is16Bits () = 0;
   /// Do driver is in stereo mode ?
-  STDMETHOD (IsStereo) (bool *stereo) PURE;
+  virtual bool IsStereo () = 0;
   /// get current frequency of driver
-  STDMETHOD (GetFrequency) (int *freq) PURE;
+  virtual int GetFrequency () = 0;
   /// Is driver have it's own handler for no sound data else soundrender fill memory
-  STDMETHOD (IsHandleVoidSound) (bool *handle) PURE;
-};
-
-extern const IID IID_ISoundDriverFactory;
-
-interface ISoundDriverFactory : public IUnknown
-{
-  ///
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem * piSystem, void **ppv) PURE;
-
-  /// Lock or unlock from memory.
-  STDMETHOD (LockServer) (COMBOOL bLock) PURE;
+  virtual bool IsHandleVoidSound () = 0;
 };
 
 #endif //__ISOUNDDRIVER_H__

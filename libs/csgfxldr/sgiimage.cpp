@@ -48,7 +48,7 @@ bool RegisterSGI ()
   return ImageLoader::Register (&loader);
 }
 
-ImageFile* SGIImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* SGIImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageSGIFile* i = new ImageSGIFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -67,7 +67,7 @@ ImageSGIFile::~ImageSGIFile ()
 {
 }
 
-ImageSGIFile::ImageSGIFile (UByte* ptr, long filesize) : ImageFile ()
+ImageSGIFile::ImageSGIFile (UByte* ptr, long filesize) : csImageFile ()
 {
 	(void)filesize;
 	status=IFE_BadFormat;

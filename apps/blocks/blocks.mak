@@ -27,7 +27,7 @@ vpath %.cpp apps/blocks apps/support
 
 BLOCKS.EXE=blocks$(EXE)
 SRC.BLOCKS = $(wildcard apps/blocks/*.cpp) \
-  apps/support/static.cpp apps/support/cspace.cpp
+  apps/support/static.cpp
 OBJ.BLOCKS = $(addprefix $(OUT),$(notdir $(SRC.BLOCKS:.cpp=$O)))
 DESCRIPTION.$(BLOCKS.EXE) = $(DESCRIPTION.blks)
 

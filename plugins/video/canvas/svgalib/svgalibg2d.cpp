@@ -45,28 +45,36 @@ static unsigned short ScanCodeToChar[128] =
   0,        0,        0,        0,        0,        0,        0,        0       // 78..7F
 };
 
-BEGIN_INTERFACE_TABLE(csGraphics2DSVGALib)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DSVGALib)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DSVGALib)
+EXPORT_CLASS_TABLE (svga2d)
+  EXPORT_CLASS (csGraphics2DSVGALib, "crystalspace.graphics2d.svgalib",
+    "SVGALib 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csGraphics2DSVGALib)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
 
 // csGraphics2DSVGALib functions
-csGraphics2DSVGALib::csGraphics2DSVGALib(ISystem* piSystem) : csGraphics2D (piSystem)
+csGraphics2DSVGALib::csGraphics2DSVGALib(iBase *iParent) : csGraphics2D ()
 {
-  System = piSystem;
-  if (FAILED (System->QueryInterface (IID_IUnixSystemDriver, (void**)&UnixSystem)))
+  CONSTRUCT_IBASE (iParent);
+}
+
+bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
+{
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
+  if (!UnixSystem)
   {
     CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
                                "the IUnixSystemDriver interface\n");
-    exit (-1);
+    return false;
   }
-}
-
-void csGraphics2DSVGALib::Initialize ()
-{
-  csGraphics2D::Initialize ();
 
   Font = 0;
   Memory = NULL;
@@ -94,10 +102,10 @@ void csGraphics2DSVGALib::Initialize ()
       pfmt.PalEntries = 0;
       pfmt.PixelBytes = 2;
 
-      DrawPixel = DrawPixel16;
-      WriteChar = WriteChar16;
-      GetPixelAt = GetPixelAt16;
-      DrawSprite = DrawSprite16;
+      _DrawPixel = DrawPixel16;
+      _WriteChar = WriteChar16;
+      _GetPixelAt = GetPixelAt16;
+      _DrawSprite = DrawSprite16;
       break;
 
     case 16:
@@ -107,10 +115,10 @@ void csGraphics2DSVGALib::Initialize ()
       pfmt.PalEntries = 0;
       pfmt.PixelBytes = 2;
 
-      DrawPixel = DrawPixel16;
-      WriteChar = WriteChar16;
-      GetPixelAt = GetPixelAt16;
-      DrawSprite = DrawSprite16;
+      _DrawPixel = DrawPixel16;
+      _WriteChar = WriteChar16;
+      _GetPixelAt = GetPixelAt16;
+      _DrawSprite = DrawSprite16;
       break;
 
     case 32:
@@ -120,10 +128,10 @@ void csGraphics2DSVGALib::Initialize ()
       pfmt.PalEntries = 0;
       pfmt.PixelBytes = 4;
 
-      DrawPixel = DrawPixel32;
-      WriteChar = WriteChar32;
-      GetPixelAt = GetPixelAt32;
-      DrawSprite = DrawSprite32;
+      _DrawPixel = DrawPixel32;
+      _WriteChar = WriteChar32;
+      _GetPixelAt = GetPixelAt32;
+      _DrawSprite = DrawSprite32;
       break;
   }
 
@@ -132,25 +140,16 @@ void csGraphics2DSVGALib::Initialize ()
   mouse_x = mouse_y = -1;
   memset (mouse_button , 0, sizeof (mouse_button));
   memset (keydown, 0, sizeof (keydown));
+
+  return true;
 }
 
 csGraphics2DSVGALib::~csGraphics2DSVGALib(void)
 {
   // Destroy your graphic interface
   Close();
-}
-
-// Used to printf through system driver
-void csGraphics2DSVGALib::CsPrintf (int msgtype, const char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
+  if (UnixSystem)
+    UnixSystem->DecRef ();
 }
 
 bool csGraphics2DSVGALib::Open(const char *Title)
@@ -245,7 +244,7 @@ void csGraphics2DSVGALib::ProcessEvents (void* Param)
     if (down != Self->keydown [scancode])
     {
       Self->keydown [scancode] = down;
-      Self->UnixSystem->KeyboardEvent (key, down);
+      Self->System->QueueKeyboardEvent (key, down);
     }
   }
 
@@ -256,7 +255,7 @@ void csGraphics2DSVGALib::ProcessEvents (void* Param)
     if ((x != Self->mouse_x) || (y != Self->mouse_y))
     {
       Self->mouse_x = x; Self->mouse_y = y;
-      Self->UnixSystem->MouseEvent (0, false, x, y, 0);
+      Self->System->QueueMouseEvent (0, false, x, y, 0);
     }
     
     int buttons = mouse_getbutton ();
@@ -266,7 +265,7 @@ void csGraphics2DSVGALib::ProcessEvents (void* Param)
       if (down != Self->mouse_button [button])
       {
         Self->mouse_button [button] = down;
-        Self->UnixSystem->MouseEvent (button + 1, down, x, y, state);
+        Self->System->QueueMouseEvent (button + 1, down, x, y, state);
       }
     }
   }

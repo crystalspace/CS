@@ -26,47 +26,46 @@
 #include <View.h>
 #include <Bitmap.h>
 #include <DirectWindow.h>
-class ISystem;
+
+class iSystem;
 class csGraphics2DBeLib;
-class IBeLibSystemDriver;
+class iBeLibSystemDriver;
 
-class CrystView : public BView {
-
+class CrystView : public BView
+{
 public:
-		CrystView(BRect frame, IBeLibSystemDriver*); 
-virtual	~CrystView();
+	CrystView(BRect frame, iBeLibSystemDriver*); 
+	virtual	~CrystView();
 
-virtual void KeyDown(char const* bytes, int32 numBytes);
-virtual void KeyUp(char const* bytes, int32 numBytes);
-virtual void MouseDown(BPoint);
-virtual void MouseUp(BPoint);
-virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
+	virtual void KeyDown(char const* bytes, int32 numBytes);
+	virtual void KeyUp(char const* bytes, int32 numBytes);
+	virtual void MouseDown(BPoint);
+	virtual void MouseUp(BPoint);
+	virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
 
 protected:
-		IBeLibSystemDriver* be_system;
-		void ProcessUserEvent() const;
+	iBeLibSystemDriver* be_system;
+	void ProcessUserEvent() const;
 };
 
-class CrystWindow : public BDirectWindow { // BWindowScreen {
+class CrystWindow : public BDirectWindow
+{
 
 public:
-		CrystWindow(BRect, const char*, CrystView*,
-			csGraphics2DBeLib*, ISystem*, IBeLibSystemDriver*);
-virtual	~CrystWindow();
+	CrystWindow (BRect, const char*, CrystView*,
+		csGraphics2DBeLib*, iSystem*, iBeLibSystemDriver*);
+	virtual	~CrystWindow();
 
-virtual	bool QuitRequested();
-virtual	void MessageReceived(BMessage*);
+	virtual	bool QuitRequested();
+	virtual	void MessageReceived(BMessage*);
 
-virtual void DirectConnected(direct_buffer_info*);
+	virtual bool DirectConnected(direct_buffer_info*);
 
 protected:
-		CrystView* view;
-		ISystem* cs_system;
-		IBeLibSystemDriver* be_system;
-		// Stuff to implement BDirectWindow
-		// FIXME: Why keep pi_BeG2D when piG2D is around?
-		IBeLibGraphicsInfo* piG2D;   // New pointer to 2D driver info method interface.
-		csGraphics2DBeLib* pi_BeG2D; // Local copy of this pointer to csGraphics2DBeLib.
+	CrystView* view;
+	iSystem* cs_system;
+	iBeLibSystemDriver* be_system;
+	csGraphics2DBeLib* pG2D;
 };
 
 #endif CRYST_WINDOW_H

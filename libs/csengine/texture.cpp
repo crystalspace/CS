@@ -27,7 +27,7 @@
 
 CSOBJTYPE_IMPL(csTextureHandle,csObject);
 
-csTextureHandle::csTextureHandle (ImageFile* image) :
+csTextureHandle::csTextureHandle (csImageFile* image) :
   csObject (), txt_handle (NULL), for_2d (false), for_3d (true)
 {
   ifile = image;
@@ -52,13 +52,13 @@ csTextureHandle::~csTextureHandle ()
   SetTextureHandle (NULL);
 }
 
-void csTextureHandle::SetTextureHandle (ITextureHandle* h)
+void csTextureHandle::SetTextureHandle (iTextureHandle* h)
 {
   if (txt_handle)
-    txt_handle->Release ();
+    txt_handle->DecRef ();
   if ((txt_handle = h))
   {
-    txt_handle->AddRef ();
+    txt_handle->IncRef ();
     if (transp_r != -1)
       txt_handle->SetTransparent (transp_r, transp_g, transp_b);
   }
@@ -99,7 +99,7 @@ void csTextureList::Clear ()
   CHK (textures = new csTextureHandle* [10]);
 }
 
-csTextureHandle* csTextureList::NewTexture (ImageFile* image)
+csTextureHandle* csTextureList::NewTexture (csImageFile* image)
 {
   CHK (csTextureHandle* tm = new csTextureHandle (image));
   //if (tm->loaded_correctly ())

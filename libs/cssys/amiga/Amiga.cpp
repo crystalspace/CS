@@ -16,8 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef OS_AMIGAOS
-
 #include "sysdef.h"
 #include "util/inifile.h"
 #include "system/amiga/amiga.h"
@@ -122,6 +120,14 @@ void SysMouseDriver::Close(void)
 {
 }
 
+IMPLEMENT_IBASE (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+IMPLEMENT_IBASE_END
+
+SysSystemDriver::SysSystemDriver () : csSystemDriver()
+{
+  CONSTRUCT_IBASE (NULL);
+}
 
 bool SysSystemDriver::ParseArg(int argc, char* argv[], int& i)
 {
@@ -307,6 +313,3 @@ void SysSystemDriver::Loop(void)
 		prev_time = Time();
 	}
 }
-
-#endif
-

@@ -25,10 +25,10 @@
 
 #include <glide.h>
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "igraph3d.h"
-#include "igraph2d.h"
 #include "ihalo.h"
+#include "iplugin.h"
 #include "ipolygon.h"
 #include "icamera.h"
 
@@ -39,8 +39,7 @@ class GlideTextureCache;
 class GlideLightmapCache;
 
 /// the Glide implementation of the Graphics3D class.
-class csGraphics3DGlide2x : public IGraphics3D,
-			     public IHaloRasterizer
+class csGraphics3DGlide2x : public iGraphics3D, public iHaloRasterizer
 {
 private:
   /// the texture cache.
@@ -71,13 +70,13 @@ private:
   G3D_CAPS m_Caps;
   
   /// The camera object.
-  ICamera* m_pCamera;
+  iCamera* m_pCamera;
 
   /// the 2d graphics driver.
-  IGraphics2D* m_piG2D;
+  iGraphics2D* m_piG2D;
 
   /// The system driver
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
 
   /// The world driver
   //IWorld* m_piWorld;
@@ -109,136 +108,122 @@ private:
   /// use halo effect
   bool m_bHaloEffect;
 
+  /// Our private config file
+  csIniFile *config;
+
 public:
+  DECLARE_IBASE;
+
   /// The constructor. Pass all arguments to this.
-  csGraphics3DGlide2x (ISystem* piSystem);
+  csGraphics3DGlide2x (iBase* iParent);
   /// the destructor.
   virtual ~csGraphics3DGlide2x ();
   
-  STDMETHODIMP Initialize();
+  virtual bool Initialize (iSystem *iSys);
   /// opens Glide.
-  STDMETHODIMP Open(const char* Title);
+  virtual bool Open(const char* Title);
   /// closes Glide.
-  STDMETHODIMP Close();
+  virtual void Close();
   
   /// Change the dimensions of the display.
-  STDMETHODIMP SetDimensions (int width, int height);
+  virtual void SetDimensions (int width, int height);
   
   /// Start a new frame.
-  STDMETHODIMP BeginDraw (int DrawFlags);
+  virtual bool BeginDraw (int DrawFlags);
   
   /// End the frame and do a page swap.
-  STDMETHODIMP FinishDraw ();
+  virtual void FinishDraw ();
   
   /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
+  virtual void SetZBufMode (G3DZBufMode mode);
  
   /// Draw the projected polygon with light and texture.
-  STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
+  virtual void DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
-  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& /*poly*/)   { return E_NOTIMPL; }
+  virtual void DrawPolygonDebug(G3DPolygonDP& /*poly*/) { }
 
   /// Draw a Line.
-  STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov,  int color);
+  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
  
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, UInt mode);
+  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
-  STDMETHODIMP FinishPolygonFX ();
+  virtual void FinishPolygonFX ();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX (G3DPolygonDPFX& poly);
-
-  /// Draw a projected floating light on the screen.
-  STDMETHODIMP DrawFltLight(G3DFltLight& light);
+  virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to Graphics3D to cache it.
-  STDMETHODIMP CacheTexture (IPolygonTexture *piPT);
+  virtual CacheTexture (iPolygonTexture *piPT);
   
   /// Release a texture from the cache.
-  STDMETHODIMP UncacheTexture (IPolygonTexture *piPT);
+  virtual void UncacheTexture (iPolygonTexture *piPT);
 
   /// Dump the texture cache.
-  STDMETHODIMP DumpCache(void);
+  virtual void DumpCache ();
   
   /// Clear the texture cache.
-  STDMETHODIMP ClearCache(void);
+  virtual void ClearCache ();
 
-  STDMETHODIMP GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) ;
+  ///
+  virtual G3D_COLORMAPFORMAT GetColormapFormat ();
 
-    /// Print the screen.
-  STDMETHODIMP Print(csRect* rect);
+  /// Print the screen.
+  virtual void Print (csRect* rect);
 
   /// Set a renderstate boolean.
-  STDMETHODIMP SetRenderState (G3D_RENDERSTATEOPTION op, long val);
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
-  STDMETHODIMP GetCaps(G3D_CAPS *caps);
+  virtual void GetCaps (G3D_CAPS *caps);
 
   /// Get a render state
-  STDMETHODIMP GetRenderState(G3D_RENDERSTATEOPTION, long& nValue);
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION);
 
   /// Get a z-buffer point
-  STDMETHODIMP GetZBufPoint(int, int, unsigned long** retval);
+  virtual unsigned long *GetZBufPoint (int, int);
 
   /// Get the width
-  STDMETHODIMP GetWidth(int& nWidth) { nWidth = m_nWidth; return S_OK; }
+  virtual int GetWidth () { return m_nWidth; }
   ///
-  STDMETHODIMP GetHeight(int& nHeight) { nHeight = m_nHeight; return S_OK; }
+  virtual int GetHeight () { return m_nHeight; }
   /// Set center of projection.
-  STDMETHODIMP SetPerspectiveCenter (int x, int y);
+  virtual void SetPerspectiveCenter (int x, int y);
 
   ///
-  STDMETHODIMP NeedsPO2Maps(void) { return S_OK; }
+  virtual bool NeedsPO2Maps () { return true; }
   ///
-  STDMETHODIMP GetMaximumAspectRatio(int& ratio) { ratio = 8; return S_OK; }
+  virtual int GetMaximumAspectRatio () { return 8; }
 
   /// 
-  STDMETHODIMP Get2dDriver(IGraphics2D** pG2D) 
-  { 
-    ASSERT(m_piG2D);
-    
-    m_piG2D->AddRef(); 
-    *pG2D = m_piG2D; 
-    return S_OK; 
-  }
+  virtual iGraphics2D *GetDriver2D () 
+  { return m_piG2D; }
   
   /// Get the ITextureManager.
-  STDMETHODIMP GetTextureManager (ITextureManager** pi)
-  {
-    *pi = (ITextureManager*)txtmgr;
-    return S_OK;
-  }
+  virtual iTextureManager *GetTextureManager ()
+  { return txtmgr; }
 
   /// Set the camera object.
-  STDMETHODIMP SetCamera( ICamera* pCamera )
-  {
-      m_pCamera = pCamera;
-      return S_OK;
-  }
+  virtual void SetCamera (iCamera *pCamera)
+  { return pCamera; }
 
   /// Get the fog mode.
-  STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) 
-  { 
-    retval = G3DFOGMETHOD_VERTEX; return S_OK; 
-  }
+  virtual G3D_FOGMETHOD GetFogMode ()
+  { return G3DFOGMETHOD_VERTEX; }
 
   /// Get the fog mode.
-  STDMETHODIMP SetFogMode (G3D_FOGMETHOD fogm) 
-  { 
-    if (fogm == G3DFOGMETHOD_VERTEX) return S_OK; 
-    else return E_FAIL; 
-  }
+  virtual bool SetFogMode (G3D_FOGMETHOD fogm)
+  { return (fogm == G3DFOGMETHOD_VERTEX); }
 
-  STDMETHODIMP OpenFogObject (CS_ID id, csFog* fog);
-  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
-  STDMETHODIMP CloseFogObject (CS_ID id);
+  virtual void OpenFogObject (CS_ID id, csFog* fog);
+  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void CloseFogObject (CS_ID id);
 
-  STDMETHODIMP CreateHalo(float r, float g, float b, HALOINFO* pRetVal);  
-  STDMETHODIMP DestroyHalo(HALOINFO haloInfo);
-  STDMETHODIMP DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo);
-  STDMETHODIMP TestHalo(csVector3* pCenter);
+  virtual csHaloHandle CreateHalo(float r, float g, float b);
+  virtual void DestroyHalo (csHaloHandle haloInfo);
+  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
+  virtual void TestHalo (csVector3* pCenter);
 
   /// Our internal representation of halos.
   struct csG3DHardwareHaloInfo
@@ -251,7 +236,7 @@ public:
   {
   public:
     ///
-    csHaloDrawer(IGraphics2D* piG2D, float r, float g, float b);
+    csHaloDrawer(iGraphics2D* iG2D, float r, float g, float b);
     ///
     ~csHaloDrawer();
 
@@ -262,7 +247,7 @@ public:
     /// the width and height of the graphics context
     int mWidth, mHeight;
     /// the 2D graphics context.
-    IGraphics2D* mpiG2D;
+    iGraphics2D* m_piG2D;
     /// the size to be drawn (the diameter of the halo)
     int mDim;
     /// the color of the halo
@@ -281,45 +266,27 @@ public:
     void drawline_innerrim(int x1, int x2, int y);
   };
 
-public:
-  //bool GetWorld(IWorld** piWorld) { *piWorld = m_piWorld; return S_OK; }
 private:
   // print to the system's device
   void SysPrintf(int mode, char* str, ...);
 
   /// board selected
-	int board;
-	/// Select the board
-	int SelectBoard(GrHwConfiguration &);
-	/// Initialize Instance from Board Config
-	void InitializeBoard(GrHwConfiguration &);
-	/// ptr to Rendering Function
-	void (*RenderPolygon)(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
-	/// Rendering Function with MultiPass (One TMU)
-	static void RenderPolygonMultiPass(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
-	/// Rendering Function with SinglePass (Two (or more) TMUs)
-	static void RenderPolygonSinglePass(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  int board;
+  /// Select the board
+  int SelectBoard(GrHwConfiguration &);
+  /// Initialize Instance from Board Config
+  void InitializeBoard(GrHwConfiguration &);
+  /// ptr to Rendering Function
+  void (*RenderPolygon)(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  /// Rendering Function with MultiPass (One TMU)
+  static void RenderPolygonMultiPass(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  /// Rendering Function with SinglePass (Two (or more) TMUs)
+  static void RenderPolygonSinglePass(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
 
   /// used to set up polygon geometry before rasterization.
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
                                                 float& K1, float& K2, float& K3,
                                                 float& M,  float& N,  float& O  );
-
-  DECLARE_INTERFACE_TABLE(csGraphics3DGlide2x)
-  DECLARE_IUNKNOWN()
 };
-
-class csGraphics3DGlide2xFactory : public IGraphicsContextFactory
-{
-    /// Create the graphics context
-    STDMETHODIMP CreateInstance( REFIID riid, ISystem* piSystem, void** ppv );
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics3DGlide2xFactory)
-};
-
 
 #endif // G3D_GLIDE_H

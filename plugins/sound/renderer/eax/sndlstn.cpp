@@ -20,7 +20,7 @@
 
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "isystem.h"
 
 #include "dsound.h"
@@ -131,7 +131,7 @@ int csSoundListenerEAX::DestroyListener()
   
   if(m_pKsPropertiesSet)
   {
-    if ((hr = m_pKsPropertiesSet->Release()) < DS_OK)
+    if ((hr = m_pKsPropertiesSet->DecRef()) < DS_OK)
       return(hr);
 
     m_pKsPropertiesSet = NULL;
@@ -139,7 +139,7 @@ int csSoundListenerEAX::DestroyListener()
 
   if (m_pDS3DListener)
   {
-    if ((hr = m_pDS3DListener->Release()) < DS_OK)
+    if ((hr = m_pDS3DListener->DecRef()) < DS_OK)
       return(hr);
     
     m_pDS3DListener = NULL;
@@ -150,7 +150,7 @@ int csSoundListenerEAX::DestroyListener()
     if ((hr = m_pDS3DPrimaryBuffer->Stop()) < DS_OK)
       return(hr);
     
-    if ((hr = m_pDS3DPrimaryBuffer->Release()) < DS_OK)
+    if ((hr = m_pDS3DPrimaryBuffer->DecRef()) < DS_OK)
       return(hr);
     
     m_pDS3DPrimaryBuffer = NULL;

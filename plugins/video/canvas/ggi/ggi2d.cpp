@@ -19,7 +19,7 @@
 #include <stdarg.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/ggi/ggi2d.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
@@ -28,37 +28,43 @@
 
 #include <ggi/ggi.h>
 
-BEGIN_INTERFACE_TABLE(csGraphics2DGGI)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DGGI)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DGGI)
+EXPORT_CLASS_TABLE (ggi2d)
+  EXPORT_CLASS (csGraphics2DGGI, "crystalspace.graphics2d.ggi",
+    "GGI 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csGraphics2DGGI)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
 
 // csGraphics2DGGI functions
-csGraphics2DGGI::csGraphics2DGGI(ISystem* piSystem) : csGraphics2D (piSystem)
+csGraphics2DGGI::csGraphics2DGGI(iBase *iParent) : csGraphics2D ()
 {
-  System = piSystem;
-
-  if (FAILED (System->QueryInterface (IID_IUnixSystemDriver, (void**)&UnixSystem)))
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the IUnixSystemDriver interface\n");
-    exit (-1);
-  }
-
+  CONSTRUCT_IBASE (iParent);
 }
 
-void csGraphics2DGGI::Initialize ()
+bool csGraphics2DGGI::Initialize (iSystem *pSystem)
 {
-  csGraphics2D::Initialize ();
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
+  if (!UnixSystem)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
+                               "the iUnixSystemDriver interface\n");
+    return false;
+  }
 
   Font = 0;
   Memory = NULL;
 
   // GGI Starts here
 
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space LibGGI version.\n");
+  CsPrintf (MSG_INITIALIZATION, "Crystal Space GGI version.\n");
   CsPrintf (MSG_INITIALIZATION,  "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
 
   Memory = NULL;
@@ -131,28 +137,29 @@ void csGraphics2DGGI::Initialize ()
       break;
 
     case 2:
-      DrawPixel = DrawPixel16;
-      WriteChar = WriteChar16;
-      GetPixelAt = GetPixelAt16;
-      DrawSprite = DrawSprite16;
+      _DrawPixel = DrawPixel16;
+      _WriteChar = WriteChar16;
+      _GetPixelAt = GetPixelAt16;
+      _DrawSprite = DrawSprite16;
       break;
 
     case 3:
-      //DrawPixel = DrawPixel24;
-      //WriteChar = WriteChar24;
-      //GetPixelAt = GetPixelAt24;
-      //DrawSprite = DrawSprite24;
+      //_DrawPixel = DrawPixel24;
+      //_WriteChar = WriteChar24;
+      //_GetPixelAt = GetPixelAt24;
+      //_DrawSprite = DrawSprite24;
       break;
 
     case 4:
-      DrawPixel = DrawPixel32;
-      WriteChar = WriteChar32;
-      GetPixelAt = GetPixelAt32;
-      DrawSprite = DrawSprite32;
+      _DrawPixel = DrawPixel32;
+      _WriteChar = WriteChar32;
+      _GetPixelAt = GetPixelAt32;
+      _DrawSprite = DrawSprite32;
       break;
   }
 
   complete_pixel_format();
+  return true;
 }
 
 csGraphics2DGGI::~csGraphics2DGGI(void)
@@ -171,19 +178,6 @@ csGraphics2DGGI::~csGraphics2DGGI(void)
   }
 
   ggiExit();
-}
-
-// Used to printf through system driver
-void csGraphics2DGGI::CsPrintf (int msgtype, const char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
 }
 
 bool csGraphics2DGGI::Open(const char *Title)

@@ -33,11 +33,11 @@
 
 #include "cs3d/direct3d5/d3d_txtcache.h"
 #include "cs3d/direct3d5/d3d_txtmgr.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssys/win32/IDDetect.h"
 #include "igraph3d.h"
-#include "igraph2d.h"
 #include "ihalo.h"
+#include "iplugin.h"
 #include "ipolygon.h"
 
 //DIRECT3D DRIVER HRESULTS/////////////////////////////
@@ -59,10 +59,10 @@
 
 class D3DTextureCache;
 class D3DLightMapCache;
+class csIniFile;
 
 /// the Direct3D implementation of the Graphics3D class.
-class csGraphics3DDirect3DDx5 : public IGraphics3D,
-			     public IHaloRasterizer
+class csGraphics3DDirect3DDx5 : public iGraphics3D, public iHaloRasterizer
 {
   /// Pointer to DirectDraw class
   IDirectDraw* m_lpDD;
@@ -144,137 +144,139 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
   int m_MaxAspectRatio;
   
   /// the 2d graphics driver.
-  IGraphics2D* m_piG2D;
+  iGraphics2D* m_piG2D;
   
   /// The directdraw device description
   IDirectDetectionInternal* m_pDirectDevice;
   
   /// The system driver
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
 
   /// Verbose mode
   bool m_bVerbose;
+
+  /// The configuration file
+  csIniFile *config;
+
 public:
+  DECLARE_IBASE;
   
   static DDSURFACEDESC m_ddsdLightmapSurfDesc;
   static DDSURFACEDESC m_ddsdTextureSurfDesc;
   static DDSURFACEDESC m_ddsdHaloSurfDesc;
   
   /// The constructor. It is passed an interface to the system using it.
-  csGraphics3DDirect3DDx5 (ISystem*);
+  csGraphics3DDirect3DDx5 (iBase*);
   /// the destructor.
   ~csGraphics3DDirect3DDx5 ();
   
   ///
-  STDMETHODIMP Initialize ();
+  virtual bool Initialize (iSystem *iSys);
 
   /// opens Direct3D.
-  STDMETHODIMP Open(const char* Title);
+  virtual bool Open(const char* Title);
   /// closes Direct3D.
-  STDMETHODIMP Close();
+  virtual void Close();
   
   /// Change the dimensions of the display.
-  STDMETHODIMP SetDimensions (int width, int height);
+  virtual void SetDimensions (int width, int height);
   
   /// Start a new frame.
-  STDMETHODIMP BeginDraw (int DrawFlags);
+  virtual bool BeginDraw (int DrawFlags);
   
   /// End the frame and do a page swap.
-  STDMETHODIMP FinishDraw ();
+  virtual void FinishDraw ();
   
   /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
+  virtual void SetZBufMode (G3DZBufMode mode);
   
   /// Draw the projected polygon with light and texture.
-  STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
+  virtual void DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
-  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& /*poly*/)   { return E_NOTIMPL; }
+  virtual void DrawPolygonDebug(G3DPolygonDP& /*poly*/) { }
   
   /// Draw a Line.
-  STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
+  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
   
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX (ITextureHandle* handle, UInt mode);
+  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
-  STDMETHODIMP FinishPolygonFX ();
+  virtual void FinishPolygonFX ();
 
   /// Draw a polygon wit special effects.
-  STDMETHODIMP DrawPolygonFX (G3DPolygonDPFX& poly);
+  virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
-  /// Draw a projected floating light on the screen.
-  STDMETHODIMP DrawFltLight(G3DFltLight& light);
-  
   /// Give a texture to Graphics3D to cache it.
-  STDMETHODIMP CacheTexture (IPolygonTexture* texture);
+  virtual void CacheTexture (iPolygonTexture* texture);
   
   /// Release a texture from the cache.
-  STDMETHODIMP UncacheTexture (IPolygonTexture* texture);
+  virtual void UncacheTexture (iPolygonTexture* texture);
   
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
-  STDMETHODIMP GetCaps(G3D_CAPS *caps);
+  virtual void GetCaps (G3D_CAPS *caps);
   
   /// Dump the texture cache.
-  STDMETHODIMP DumpCache(void);
+  virtual void DumpCache ();
   
   /// Clear the texture cache.
-  STDMETHODIMP ClearCache(void);
+  virtual void ClearCache ();
   ///
-  STDMETHODIMP GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat );
+  virtual G3D_COLORMAPFORMAT GetColormapFormat ();
 
-  ///
-  STDMETHODIMP GetStringError( HRESULT hRes, char* szErrorString );
-  
   /// Print the screen.
-  STDMETHODIMP Print(csRect* rect) {  return m_piG2D->Print(rect);  }
+  virtual void Print (csRect* rect)
+  { return m_piG2D->Print (rect); }
   
   /// Set a render state
-  STDMETHODIMP SetRenderState(G3D_RENDERSTATEOPTION, long);
+  virtual bool SetRenderState(G3D_RENDERSTATEOPTION, long);
   /// Get a render state
-  STDMETHODIMP GetRenderState(G3D_RENDERSTATEOPTION, long& nValue);
+  virtual long GetRenderState(G3D_RENDERSTATEOPTION);
   
   /// Get a z-buffer point
-  STDMETHODIMP GetZBufPoint(int, int, unsigned long** retval) { *retval = NULL; return E_NOTIMPL; }
+  virtual long *GetZBufPoint (int, int)
+  { return NULL; }
   
   /// Get the width
-  STDMETHODIMP GetWidth(int& nWidth) { nWidth = m_nWidth; return S_OK; }
+  virtual int GetWidth ()
+  { return m_nWidth; }
   ///
-  STDMETHODIMP GetHeight(int& nHeight) { nHeight = m_nHeight; return S_OK; }
+  virtual int GetHeight ()
+  { return m_nHeight; }
   /// Set center of projection.
-  STDMETHODIMP SetPerspectiveCenter (int x, int y);
+  virtual void SetPerspectiveCenter (int x, int y);
 
   ///
-  STDMETHODIMP NeedsPO2Maps(void) { return S_OK; }
+  virtual bool NeedsPO2Maps ()
+  { return true; }
   ///
-  STDMETHODIMP GetMaximumAspectRatio(int& ratio) { ratio = m_MaxAspectRatio; return S_OK; }
+  virtual int GetMaximumAspectRatio ()
+  { return m_MaxAspectRatio; }
   
   /// Get the fog mode.
-  STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) { retval = G3DFOGMETHOD_VERTEX; return S_OK; }
+  virtual G3D_FOGMETHOD GetFogMode ()
+  { return G3DFOGMETHOD_VERTEX; }
 
   /// Get the fog mode.
-  STDMETHODIMP SetFogMode (G3D_FOGMETHOD fogm) { if (fogm == G3DFOGMETHOD_VERTEX) return S_OK; else return E_FAIL; }
+  virtual bool SetFogMode (G3D_FOGMETHOD fogm)
+  { return (fogm == G3DFOGMETHOD_VERTEX); }
 
   /// Get the ITextureManager.
-  STDMETHODIMP GetTextureManager (ITextureManager** pi) { *pi = (ITextureManager*)txtmgr; return S_OK; }
+  virtual ITextureManager *GetTextureManager ()
+  { return txtmgr; }
 
   /// 
-  STDMETHODIMP Get2dDriver(IGraphics2D** pG2D) 
-  { 
-    ASSERT(m_piG2D);
-    
-    m_piG2D->AddRef(); 
-    *pG2D = m_piG2D; 
-    return S_OK; 
-  }
+  virtual iGraphics2D *GetDriver2D () 
+  { return m_piG2D; }
   
-  STDMETHODIMP OpenFogObject (CS_ID id, csFog* fog);
-  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
-  STDMETHODIMP CloseFogObject (CS_ID id);
+  virtual void OpenFogObject (CS_ID id, csFog* fog);
+  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void CloseFogObject (CS_ID id);
 
-  STDMETHODIMP CreateHalo(float r, float g, float b, HALOINFO* pRetVal);  
-  STDMETHODIMP DestroyHalo(HALOINFO haloInfo);
-  STDMETHODIMP DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo);
-  STDMETHODIMP TestHalo(csVector3* pCenter);
+  virtual csHaloHandle CreateHalo (float r, float g, float b);
+  virtual void DestroyHalo (csHaloHandle haloInfo);
+  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
+  virtual bool TestHalo (csVector3* pCenter);
 
   /// Our internal representation of halos.
   struct csG3DHardwareHaloInfo
@@ -289,7 +291,7 @@ public:
   {
   public:
     ///
-    csHaloDrawer(IGraphics2D* piG2D, float r, float g, float b);
+    csHaloDrawer(iGraphics2D* m_piG2D, float r, float g, float b);
     ///
     ~csHaloDrawer();
 
@@ -300,7 +302,7 @@ public:
     /// the width and height of the graphics context
     int mWidth, mHeight;
     /// the 2D graphics context.
-    IGraphics2D* mpiG2D;
+    iGraphics2D* m_piG2D;
     /// the size to be drawn (the diameter of the halo)
     int mDim;
     /// the color of the halo
@@ -335,22 +337,6 @@ private:
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
     float& K1, float& K2, float& K3,
     float& M,  float& N,  float& O  );
-  
-  DECLARE_INTERFACE_TABLE(csGraphics3DDirect3DDx5)
-    DECLARE_IUNKNOWN()
-};
-
-
-class csGraphics3DDirect3DDx5Factory : public IGraphicsContextFactory
-{
-  /// Create the graphics context
-  STDMETHODIMP CreateInstance( REFIID riid, ISystem* piSystem, void** ppv );
-  
-  /// Lock or unlock from memory.
-  STDMETHODIMP LockServer(BOOL bLock);
-  
-  DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics3DDirect3DDx5Factory)
 };
 
 #endif // G3D_D3D_H

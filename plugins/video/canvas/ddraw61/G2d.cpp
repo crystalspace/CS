@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/ddraw61/g2d.h"
 #include "cssys/win32/directdetection.h"
 //#include "cssys/win32/win32itf.h"
@@ -61,13 +61,18 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
-BEGIN_INTERFACE_TABLE(csGraphics2DDDraw6)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IDDraw6GraphicsInfo, XDDraw6GraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DDDraw6)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DDDraw6)
+EXPORT_CLASS_TABLE (ddraw6)
+  EXPORT_CLASS (csGraphics2DDDraw6, "crystalspace.graphics2d.direct3d.dx6",
+    "DirectDraw DX6.1 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csGraphics2DDDraw6)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iGraphics2DDDraw6)
+IMPLEMENT_IBASE_END
 
 ///// Windowed-mode palette stuff //////
 
@@ -158,53 +163,53 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
 extern DirectDetection DDetection;
 extern DirectDetectionDevice * DirectDevice;
 
-csGraphics2DDDraw6::csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D) : 
-                   csGraphics2D (piSystem),
-                   m_hWnd(NULL),
-                   m_bDisableDoubleBuffer(false),
-                   m_bPaletteChanged(false),
-                   m_bPalettized(false),
-                   m_lpDD(NULL),
-                   m_lpddClipper(NULL),
-                   m_lpddPal(NULL),
-                   m_lpddsBack(NULL),
-                   m_lpddsPrimary(NULL),
-                   m_nActivePage(0),
-                   m_nDepth(-1),
-                   m_nGraphicsReady(true),
-                   m_bLocked(false),
-                   m_bUses3D(bUses3D)
+csGraphics2DDDraw6::csGraphics2DDDraw6(iBase *iParent, bool bUses3D) : 
+  csGraphics2D (),
+  m_hWnd(NULL),
+  m_bDisableDoubleBuffer(false),
+  m_bPaletteChanged(false),
+  m_bPalettized(false),
+  m_lpDD(NULL),
+  m_lpddClipper(NULL),
+  m_lpddPal(NULL),
+  m_lpddsBack(NULL),
+  m_lpddsPrimary(NULL),
+  m_nActivePage(0),
+  m_nDepth(-1),
+  m_nGraphicsReady(true),
+  m_bLocked(false),
+  m_bUses3D(bUses3D)
 {
-  HRESULT ddrval;
-  IWin32SystemDriver* piWin32System;
- 
-  // Get the creation parameters //
-  ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&piWin32System);
-  if (SUCCEEDED(ddrval))
-  {
-      piWin32System->GetInstance(&m_hInstance);
-      piWin32System->GetCmdShow(&m_nCmdShow);
-      FINAL_RELEASE(piWin32System);
-  }
-  else
-  {
-  	  sys_fatalerror("csGraphics2DDDraw6::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
-  }
+  CONSTRUCT_IBASE (iParent);
 }
 
-void csGraphics2DDDraw6::Initialize()
+bool csGraphics2DDDraw6::Initialize(iSystem *pSystem)
 {
   DDSURFACEDESC2 ddsd;
   HRESULT ddrval;
   DDPIXELFORMAT ddpf;
   //DDCAPS ddcaps;
   LPGUID pGuid = NULL;
-  //IWin32SystemDriver* piWin32System;
+  //iWin32SystemDriver* piWin32System;
 
   // Call original Initialize() function
-  csGraphics2D::Initialize();
+  if (!csGraphics2D::Initialize(pSystem))
+    return false;
 
-  system->GetDepthSetting(m_nDepth);
+  iWin32SystemDriver* piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
+  // Get the creation parameters //
+  if (piWin32System))
+  {
+      piWin32System->GetInstance (&m_hInstance);
+      piWin32System->GetCmdShow (&m_nCmdShow);
+      piWin32System->DecRef ();
+  }
+  else
+  {
+      sys_fatalerror ("csGraphics2DDDraw6::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
+  }
+
+  System->GetDepthSetting(m_nDepth);
   
   // Create the DirectDraw device //
   if (!m_bUses3D)
@@ -225,7 +230,7 @@ void csGraphics2DDDraw6::Initialize()
     pGuid = &DirectDevice->Guid2D;
   
   // create a DD object for either the primary device or the secondary. //
-/* DAN: commented this out until i allow this class to print to ISystem.  
+/* DAN: commented this out until i allow this class to print to iSystem.  
   if(!pGuid)
     message("Use the primary DirectDraw device : %s (%s)\n", DirectDevice->DeviceName2D, DirectDevice->DeviceDescription2D);
   else 
@@ -298,8 +303,8 @@ void csGraphics2DDDraw6::Initialize()
       exit(1);
     }
     
-    DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
-    GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
+    _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
+    _GetPixelAt = GetPixelAt16; _DrawSprite = DrawSprite16;
     
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 2;
@@ -322,8 +327,8 @@ void csGraphics2DDDraw6::Initialize()
       exit(1);
     }
     */
-    DrawPixel = DrawPixel32;   WriteChar = WriteChar32;
-    GetPixelAt = GetPixelAt32; DrawSprite = DrawSprite32;    
+    _DrawPixel = DrawPixel32;   _WriteChar = WriteChar32;
+    _GetPixelAt = GetPixelAt32; _DrawSprite = DrawSprite32;
       
 	RedMask = 0xff << 16;
 	GreenMask = 0xff << 8;
@@ -348,6 +353,8 @@ void csGraphics2DDDraw6::Initialize()
 
   m_nActivePage = 0;
   m_bDisableDoubleBuffer = false;
+
+  return true;
 }
 
 csGraphics2DDDraw6::~csGraphics2DDDraw6(void)
@@ -703,10 +710,8 @@ void csGraphics2DDDraw6::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-//bool csGraphics2DDDraw6::SetMouseCursor (int iShape, TextureMM* iBitmap)
-bool csGraphics2DDDraw6::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
+bool csGraphics2DDDraw6::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
 {
-//  (void)iBitmap;
   (void)hBitmap;
   switch(iShape)
   {
@@ -724,7 +729,6 @@ bool csGraphics2DDDraw6::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
   return true;
 }
 
-
 bool csGraphics2DDDraw6::SetMousePosition (int x, int y)
 {
   POINT p;
@@ -735,4 +739,25 @@ bool csGraphics2DDDraw6::SetMousePosition (int x, int y)
   ::SetCursorPos (p.x, p.y);
   
   return true;
+}
+
+void csGraphics2DDDraw3::GetDirectDrawDriver (LPDIRECTDRAW4* lplpDirectDraw)
+{
+  *lplpDirectDraw = m_lpDD4;
+}
+
+void csGraphics2DDDraw3::GetDirectDrawPrimary (LPDIRECTDRAWSURFACE4* lplpDirectDrawPrimary)
+{
+  *lplpDirectDrawPrimary = m_lpddsPrimary;
+}
+
+void csGraphics2DDDraw3::GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE4* lplpDirectDrawBackBuffer)
+{
+  *lplpDirectDrawBackBuffer = m_lpddsBack;
+}
+
+extern DirectDetectionDevice* DirectDevice;
+void csGraphics2DDDraw3::GetDirectDetection (IDirectDetectionInternal** lplpDDetection)
+{
+  *lplpDDetection = static_cast<IDirectDetectionInternal*>(DirectDevice);
 }

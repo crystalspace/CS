@@ -24,7 +24,7 @@
 // SoundRender.H
 // csSoundRenderNull class.
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssfxldr/common/snddata.h"
 #include "isndrdr.h"
 
@@ -35,7 +35,7 @@ extern const CLSID CLSID_NullSoundRender;
 class csSoundRenderNull : public ISoundRender
 {
 public:
-	csSoundRenderNull(ISystem* piSystem);
+	csSoundRenderNull(iSystem* piSystem);
 
 	virtual ~csSoundRenderNull();
 
@@ -59,7 +59,7 @@ public:
 	DECLARE_INTERFACE_TABLE(csSoundRenderNull)
 
 public:
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
   /// print to the system's device
   void SysPrintf(int mode, char* str, ...);
 
@@ -68,7 +68,7 @@ public:
 
 class csSoundRenderNullFactory : public ISoundRenderFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

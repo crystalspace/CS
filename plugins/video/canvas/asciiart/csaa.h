@@ -21,24 +21,10 @@
 #ifndef __CSAA_H__
 #define __CSAA_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "cssys/system.h"
 #include "cssys/os2/icsos2.h"
 #include <aalib.h>
-
-extern const CLSID CLSID_AAGraphics2D;
-
-/// IGraphics2DFactory interface implementation
-class csGraphics2DFactoryAA : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DFactoryAA)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
 
 /**
  * The Ascii Art driver. This is a cross-platform graphics driver which
@@ -49,8 +35,6 @@ class csGraphics2DAA : public csGraphics2D
 {
   /// The configuration file
   csIniFile* config;
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Use native mouse cursor, if possible?
   bool HardwareCursor;
   /// The AAlib context
@@ -59,10 +43,12 @@ class csGraphics2DAA : public csGraphics2D
   aa_palette palette;
 
 public:
-  csGraphics2DAA (ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DAA (iBase *iParent);
   virtual ~csGraphics2DAA ();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -75,11 +61,7 @@ public:
   virtual void FinishDraw ();
 
   virtual bool SetMousePosition (int x, int y);
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
-
-protected:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DAA)
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
 };
 
 #endif // __CSAA_H__

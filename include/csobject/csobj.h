@@ -26,7 +26,6 @@
 #include "csobject/fakertti.h"
 #include "csobject/treeitr.h"
 #include "csutil/csbase.h"
-//#include "csengine/ibase.h"
 
 // Note: this implementation of csObject doesn't include the 'name' field.
 // if a name is necessary, then a csNameObject can be created and attached.

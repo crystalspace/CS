@@ -19,7 +19,6 @@
 #ifndef TXTMGR_H
 #define TXTMGR_H
 
-#include "cscom/com.h"
 #include "csgfxldr/boxfilt.h"
 #include "cs3d/common/imgtools.h"
 #include "csengine/cscolor.h"	// @@@BAD?
@@ -32,7 +31,7 @@ class ImageColorInfo;
 class csTextureMM;
 class csTextureManager;
 class csTexture;
-interface IImageFile;
+scfInterface iImageFile;
 
 #define MIPMAP_UGLY 0
 #define MIPMAP_DEFAULT 1
@@ -42,33 +41,15 @@ interface IImageFile;
 #define MIX_TRUE_RGB 0
 #define MIX_NOCOLOR 1
 
-extern const IID IID_ITextureHandleMM;
-
-/**
- * TextureHandleMM represents a concrete subclass of ITextureHandle.
- */
-interface ITextureHandleMM : public ITextureHandle
-{
-  STDMETHOD (SetTransparent) (int red, int green, int blue);
-  STDMETHOD (GetTransparent) (bool& retval);
-  STDMETHOD (GetMipMapDimensions) (int mm, int& w, int& h);
-  STDMETHOD (GetBitmapDimensions) (int& bw, int& bh);
-  STDMETHOD (GetBitmapData) (void** bmdata);
-  STDMETHOD (GetMeanColor) (int& retval);
-  STDMETHOD (GetMeanColor) (float& r, float& g, float& b);
-  STDMETHOD (GetNumberOfColors) (int& retval);
-  DECLARE_IUNKNOWN();
-};
-
 /**
  * csTextureMM represents a texture and all its mipmapped
- * variants.
+ * variants. It implements the iTextureHandle interface.
  */
-class csTextureMM
+class csTextureMM : public iTextureHandle
 {
 protected:
   /// The corresponding ImageFile.
-  IImageFile* ifile;
+  iImageFile* ifile;
   /// A sorted table with all used colors in the image.
   ImageColorInfo* usage;
   /// Transparent color
@@ -112,11 +93,11 @@ protected:
   void create_blended_mipmap (csTextureManager* tex, unsigned char* bm);
 
   /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm) = 0;
+  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm) = 0;
 
 public:
   ///
-  csTextureMM (IImageFile* image);
+  csTextureMM (iImageFile* image);
   ///
   virtual ~csTextureMM ();
 
@@ -144,7 +125,7 @@ public:
   /// Free the color usage table linked to a texture.
   void free_usage_table ();
 
-  /// Release the original image (IImageFile) as given by the engine.
+  /// Release the original image (iImageFile) as given by the engine.
   void free_image ();
 
   /// Return true if the texture has been loaded correctly.
@@ -155,19 +136,6 @@ public:
 
   /// Set the transparent color.
   void set_transparent (int red, int green, int blue);
-
-  /// Query color 0 status (true - transparent; false - opaque)
-  bool get_transparent () { return istransp; }
-
-  /// Get the transparent color
-  void get_transparent (int &red, int &green, int &blue)
-  { red = transp_color.red; green = transp_color.green; blue = transp_color.blue; }
-
-  /// Get the mean color index.
-  int get_mean_color_idx () { return mean_idx; }
-
-  /// Get the mean color.
-  const csColor& get_mean_color () { return mean_color; }
 
   ///
   int get_num_colors () { return usage->get_num_colors (); }
@@ -204,12 +172,69 @@ public:
   const RGBPalEntry& get_usage (int idx) 
   { return usage->get_color_table()[idx]; }
 
-  DECLARE_INTERFACE_TABLE (csTextureMM)
-  DECLARE_IUNKNOWN()
-  DECLARE_COMPOSITE_INTERFACE (TextureHandleMM)
-};
+  ///---------------------- iTextureHandle implementation ----------------------
+  DECLARE_IBASE;
 
-struct HighColorCache_Data;
+  /// Set the transparent color.
+  virtual void SetTransparent (int red, int green, int blue);
+
+  /// Get the transparent status (false if no transparency, true if transparency).
+  virtual bool GetTransparent ();
+
+  /// Get the transparent color
+  virtual void GetTransparent (int &red, int &green, int &blue);
+
+  /**
+   * Get the dimensions for a given mipmap level (0 to 3).
+   * This function is only valid if the texture has been registered
+   * for 3D usage.
+   */
+  virtual void GetMipMapDimensions (int mm, int& w, int& h);
+
+  /**
+   * Get the bitmap data for the given mipmap.
+   * This function is not always available: it depends on implementation.
+   */
+  virtual void *GetMipMapData (int mm);
+
+  /**
+   * Get the dimensions for the 2D texture.
+   * This function is only valid if the texture has been registered
+   * for 2D usage.
+   */
+  virtual void GetBitmapDimensions (int& bw, int& bh);
+
+  /**
+   * Get the bitmap data for the 2D texture.
+   * This function is only valid if the texture has been registered
+   * for 2D usage.
+   */
+  virtual void *GetBitmapData ();
+
+  /// Get the mean color.
+  virtual void GetMeanColor (float& r, float& g, float& b);
+  /// Get the mean color index.
+  virtual int GetMeanColor () { return mean_idx; }
+
+  /// Returns the number of colors in this texture.
+  virtual int GetNumberOfColors ();
+
+  ///
+  virtual csHighColorCacheData *GetHighColorCacheData ()
+  { return NULL; }
+  ///
+  virtual void SetHighColorCacheData (csHighColorCacheData *d)
+  { (void)d; }
+
+  /// Query whenever the texture is in texture cache
+  virtual bool IsCached () { return false; }
+
+  /// Set "in-cache" state
+  virtual void SetInCache (bool InCache) { (void)InCache; }
+
+  /// Get the csTextureMM object associated with the texture handle
+  virtual void *GetPrivateObject () { return (csTextureMM *)this; }
+};
 
 /**
  * adds some methods and members needed for hardware accelerated renderers
@@ -218,31 +243,30 @@ class csHardwareAcceleratedTextureMM : public csTextureMM
 {
 protected:
   ///
-  HighColorCache_Data *hicolorcache;
+  csHighColorCacheData *hicolorcache;
   ///
   bool in_memory;
 
   /// Convert ImageFile to internal format. Will just convert to 24 bit in most HW renderers
-  virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm);
+  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm);
+
 public:
   ///
-  csHardwareAcceleratedTextureMM (IImageFile* image) 
-   : csTextureMM(image) {in_memory = false; hicolorcache=NULL;}
+  csHardwareAcceleratedTextureMM (iImageFile* image) : csTextureMM (image)
+  { CONSTRUCT_IBASE (NULL); in_memory = false; hicolorcache = NULL;}
 
   ///
-  HighColorCache_Data *get_hicolorcache () { return hicolorcache; }
+  virtual csHighColorCacheData *GetHighColorCacheData () { return hicolorcache; }
   ///
-  void set_hicolorcache (HighColorCache_Data *d) { hicolorcache = d; }
+  virtual void SetHighColorCacheData (csHighColorCacheData *d) { hicolorcache = d; }
 
-  ///
-  bool is_in_videomemory () { return in_memory; }
-  ///
-  void set_in_videomemory (bool vm) { in_memory = vm; }
+  /// Query whenever the texture is in texture cache
+  virtual bool IsCached () { return in_memory; }
+
+  /// Set "in-cache" state
+  virtual void SetInCache (bool InCache)
+  { in_memory = InCache; }
 };
-
-
-#define GetITextureHandleFromcsTextureMM(a)  &a->m_xTextureHandleMM
-#define GetcsTextureMMFromITextureHandle(a)  ((csTextureMM*)((size_t)a - offsetof(csTextureMM, m_xTextureHandleMM)))
 
 /**
  * A simple Texture.
@@ -258,6 +282,8 @@ protected:
   int height;
   int shf_w, shf_h;
   int and_w, and_h;
+  /// Raw data.
+  unsigned char* bitmap;
 
 private:
   void init ();
@@ -289,11 +315,7 @@ public:
   ///
   csTextureMM* get_parent () { return parent; }
   ///
-  virtual unsigned char* get_bitmap8 () = 0;
-  ///
-  virtual UShort* get_bitmap16 () = 0;
-  ///
-  virtual ULong* get_bitmap32 () = 0;
+  virtual unsigned char *get_bitmap () { return bitmap; }
   ///
   virtual void copy (csTexture* src) = 0;
 };
@@ -303,26 +325,14 @@ public:
  */
 class csTexture8 : public csTexture
 {
-private:
-  /// Raw data.
-  unsigned char* bitmap;
-
 public:
   /// Create a texture with a width and height.
   csTexture8 (csTextureMM* p, int w, int h);
   ///
   virtual ~csTexture8 ();
   ///
-  virtual unsigned char* get_bitmap8 () { return bitmap; }
-  ///
-  virtual UShort* get_bitmap16 () { return (UShort*)bitmap; }
-  ///
-  virtual ULong* get_bitmap32 () { return (ULong*)bitmap; }
-  ///
   virtual void copy (csTexture* src)
-  {
-    memcpy (bitmap, src->get_bitmap8 (), width*height);
-  }
+  { memcpy (bitmap, src->get_bitmap (), width*height); }
 };
 
 /**
@@ -330,26 +340,14 @@ public:
  */
 class csTexture16 : public csTexture
 {
-private:
-  /// Raw data.
-  UShort* bitmap;
-
 public:
   /// Create a texture with a width and height.
   csTexture16 (csTextureMM* p, int w, int h);
   ///
   virtual ~csTexture16 ();
   ///
-  virtual unsigned char* get_bitmap8 () { return (unsigned char*)bitmap; }
-  ///
-  virtual UShort* get_bitmap16 () { return bitmap; }
-  ///
-  virtual ULong* get_bitmap32 () { return (ULong*)bitmap; }
-  ///
   virtual void copy (csTexture* src)
-  {
-    memcpy (bitmap, src->get_bitmap16 (), width*height*sizeof (UShort));
-  }
+  { memcpy (bitmap, src->get_bitmap (), width*height*sizeof (UShort)); }
 };
 
 /**
@@ -357,26 +355,14 @@ public:
  */
 class csTexture32 : public csTexture
 {
-private:
-  /// Raw data.
-  ULong* bitmap;
-
 public:
   /// Create a texture with a width and height.
   csTexture32 (csTextureMM* p, int w, int h);
   ///
   virtual ~csTexture32 ();
   ///
-  virtual unsigned char* get_bitmap8 () { return (unsigned char*)bitmap; }
-  ///
-  virtual UShort* get_bitmap16 () { return (UShort*)bitmap; }
-  ///
-  virtual ULong* get_bitmap32 () { return bitmap; }
-  ///
   virtual void copy (csTexture* src)
-  {
-    memcpy (bitmap, src->get_bitmap32 (), width*height*sizeof (ULong));
-  }
+  { memcpy (bitmap, src->get_bitmap (), width*height*sizeof (ULong)); }
 };
 
 /**
@@ -397,10 +383,7 @@ class csTextureFactory8 : public csTextureFactory
 public:
   /// Create a texture.
   virtual csTexture* new_texture (csTextureMM* parent, int w, int h)
-  {
-    CHK (csTexture8* txt = new csTexture8 (parent, w, h));
-    return txt;
-  }
+  { CHK (csTexture8* txt = new csTexture8 (parent, w, h)); return txt; }
 };
 
 /**
@@ -411,10 +394,7 @@ class csTextureFactory16 : public csTextureFactory
 public:
   /// Create a texture.
   virtual csTexture* new_texture (csTextureMM* parent, int w, int h)
-  {
-    CHK (csTexture16* txt = new csTexture16 (parent, w, h));
-    return txt;
-  }
+  { CHK (csTexture16* txt = new csTexture16 (parent, w, h)); return txt; }
 };
 
 /**
@@ -425,16 +405,13 @@ class csTextureFactory32 : public csTextureFactory
 public:
   /// Create a texture.
   virtual csTexture* new_texture (csTextureMM* parent, int w, int h)
-  {
-    CHK (csTexture32* txt = new csTexture32 (parent, w, h));
-    return txt;
-  }
+  { CHK (csTexture32* txt = new csTexture32 (parent, w, h)); return txt; }
 };
 
 /**
  * General version of the texture manager.
  */
-class csTextureManager : public ITextureManager
+class csTextureManager : public iTextureManager
 {
 protected:
   /// List of textures.
@@ -452,11 +429,13 @@ protected:
   int black_color;
 
 public:
-  ///
-  ISystem* m_piSystem;
+  DECLARE_IBASE;
 
   ///
-  IGraphics2D* m_piG2D;
+  iSystem* System;
+
+  ///
+  iGraphics2D* G2D;
 
   /// Verbose mode.
   bool verbose;
@@ -500,11 +479,11 @@ public:
   bool use_rgb;
 
   ///
-  csTextureManager (ISystem* piSystem, IGraphics2D* piG2D);
+  csTextureManager (iSystem* iSys, iGraphics2D* iG2D);
   ///
   virtual ~csTextureManager ();
   ///
-  virtual void InitSystem ();
+  virtual void Initialize ();
 
   ///
   virtual int find_color (int r, int g, int b) = 0;
@@ -513,14 +492,13 @@ public:
   virtual void clear ();
 
   ///
-  STDMETHODIMP FindRGB (int r, int g, int b, int& color);
+  virtual int FindRGB (int r, int g, int b);
   ///
-  STDMETHODIMP GetVeryNice (bool& result) { result = (mipmap_nice == MIPMAP_VERYNICE); return S_OK; }
+  virtual bool GetVeryNice ()
+  { return (mipmap_nice == MIPMAP_VERYNICE); }
   ///
-  STDMETHODIMP SetVerbose (bool vb) { verbose = vb; return S_OK; }
-
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csTextureManager)
+  virtual void SetVerbose (bool vb)
+  { verbose = vb; }
 
   ///
   void SysPrintf (int mode, char* str, ...);
@@ -550,6 +528,4 @@ public:
   int get_almost_black ();
 };
 
-
 #endif // TXTMGR_H
-

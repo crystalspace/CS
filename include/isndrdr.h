@@ -21,10 +21,7 @@
 #ifndef __ISOUNDRENDER_H__
 #define __ISOUNDRENDER_H__
 
-#include "cscom/com.h"
-interface ISystem;
-
-extern const GUID IID_ISoundRender;
+#include "csutil/scf.h"
 
 /**
  * This is the sound render interface for CS.
@@ -32,45 +29,34 @@ extern const GUID IID_ISoundRender;
  * The standard implementation is ISoundDriver.
  */
 
-interface ISoundListener;
-interface ISoundSource;
-interface ISoundBuffer;
+scfInterface iSoundListener;
+scfInterface iSoundSource;
+scfInterface iSoundBuffer;
 class csSoundData;
 
-interface ISoundRender : public IUnknown
+SCF_INTERFACE (iSoundRender, 0, 0, 1) : public iBase
 {
 public:
   /// Open the sound render
-  STDMETHOD (Open) () PURE;
+  virtual bool Open () = 0;
   /// Close the sound render
-  STDMETHOD (Close) () PURE;
+  virtual void Close () = 0;
   /// Update Sound Render
-  STDMETHOD (Update) () PURE;
+  virtual void Update () = 0;
   /// Set Volume [0, 1]
-  STDMETHOD (SetVolume) (float vol) PURE;
+  virtual void SetVolume (float vol) = 0;
   /// Get Volume [0, 1]
-  STDMETHOD (GetVolume) (float *vol) PURE;
+  virtual float GetVolume () = 0;
   /// Play a sound buffer without control (it's play until his end)
-  STDMETHOD (PlayEphemeral) (csSoundData *snd) PURE;
+  virtual void PlayEphemeral (csSoundData *snd) = 0;
   /// Create a Listener object
-  STDMETHOD (GetListener) (ISoundListener ** ppv ) PURE;
+  virtual iSoundListener *GetListener () = 0;
   /// Create a Source object
-  STDMETHOD (CreateSource) (ISoundSource ** ppv, csSoundData *snd) PURE;
+  virtual iSoundSource *CreateSource (csSoundData *snd) = 0;
   /// Create a controled SoundBuffer object
-  STDMETHOD (CreateSoundBuffer) (ISoundBuffer ** ppv, csSoundData *snd) PURE;
+  virtual iSoundBuffer *CreateSoundBuffer (csSoundData *snd) = 0;
   /// Internal use : mixing function (need if your render use a driver)
-  STDMETHOD (MixingFunction) () PURE;
-};
-
-extern const IID IID_ISoundRenderFactory;
-
-interface ISoundRenderFactory : public IUnknown
-{
-  ///
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem * piSystem, void **ppv) PURE;
-
-  /// Lock or unlock from memory.
-  STDMETHOD (LockServer) (COMBOOL bLock) PURE;
+  virtual void MixingFunction () = 0;
 };
 
 #endif //__ISOUNDRENDER_H__

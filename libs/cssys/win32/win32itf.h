@@ -1,11 +1,11 @@
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 #define WINDOWCLASSNAME "Crystal"
 
 extern const IID IID_IWin32SystemDriver;
 
-interface IWin32SystemDriver : public IUnknown
+interface IWin32SystemDriver : public iBase
 {
 	/// Returns the HINSTANCE of the program
 	STDMETHOD(GetInstance)(HINSTANCE* retval) = 0;

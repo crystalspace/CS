@@ -19,7 +19,7 @@
 #ifndef __X2D_H__
 #define __X2D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
 
@@ -34,20 +34,6 @@
 #  include <sys/ipc.h>
 #  include <sys/shm.h>
 #endif /* DO_SHM */
-
-// The CLSID to create csGraphics2DXLib instances
-extern const CLSID CLSID_XLibGraphics2D;
-
-///
-class csGraphics2DXLibFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DXLibFactory)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
 
 /// XLIB version.
 class csGraphics2DXLib : public csGraphics2D
@@ -89,19 +75,19 @@ class csGraphics2DXLib : public csGraphics2D
   unsigned char* sim_lt8;	// 8-bit lookup table (with 16-bit index) for simulated depth
   UShort* sim_lt16;		// 16-bit lookup table (with 8-bit index) for simulated depth
   
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Pointer to DOS-specific interface
-  IUnixSystemDriver* UnixSystem;
+  iUnixSystemDriver* UnixSystem;
 
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
 
 public:
-  csGraphics2DXLib (ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DXLib (iBase *iParent);
   virtual ~csGraphics2DXLib ();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -135,14 +121,7 @@ public:
   virtual bool SetMousePosition (int x, int y);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *iBitmap);
-
-protected:
-  /// This function is functionally equivalent to csSystemDriver::CsPrintf
-  void CsPrintf (int msgtype, const char *format, ...);
-
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DXLib)
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
 };
 
 #endif // __X2D_H__

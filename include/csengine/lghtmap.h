@@ -19,7 +19,7 @@
 #ifndef LIGHTMAP_H
 #define LIGHTMAP_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "ilghtmap.h"
 
 class csPolyTexture;
@@ -29,7 +29,7 @@ class csLight;
 class csWorld;
 class Dumper;
 
-struct HighColorCache_Data;
+struct csHighColorCacheData;
 
 /**
  * This is a shadow-map for a pseudo-dynamic light.
@@ -131,7 +131,7 @@ public:
 /**
  * The static and all dynamic lightmaps for one or more mipmap-levels of a polygon.
  */
-class csLightMap
+class csLightMap : public iLightMap
 {
   ///
   friend class csPolyTexture;
@@ -170,7 +170,7 @@ private:
   int rwidth, rheight;
   
   /// The hicolor cache ptr.
-  HighColorCache_Data *hicolorcache;
+  csHighColorCacheData *hicolorcache;
 
   /**
    * Mean lighting value of this lightmap.
@@ -209,25 +209,14 @@ public:
   csRGBLightMap& GetRealMap () { return real_lm; }
 
   ///
-  void GetMeanLighting (int& r, int& g, int& b) { r = mean_r; g = mean_g; b = mean_b; }
-
-  ///
-  int GetWidth () { return lwidth; }
-  ///
-  int GetHeight () { return lheight; }
-  ///
-  int GetRealWidth () { return rwidth; }
-  ///
-  int GetRealHeight () { return rheight; }
-  ///
   long GetSize () { return lm_size; }
 
   // DAN: High color cache specific stuff
   bool in_memory;
   ///
-  HighColorCache_Data* GetHighColorCacheData () { return hicolorcache; }
+  csHighColorCacheData* GetHighColorCacheData () { return hicolorcache; }
   ///
-  void SetHighColorCacheData (HighColorCache_Data *d) { hicolorcache = d; }
+  void SetHighColorCacheData (csHighColorCacheData *d) { hicolorcache = d; }
 
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
@@ -272,13 +261,14 @@ public:
    * Index is the index of the polygon in the containing object. It is used
    * for identifying the lightmap on disk.
    */
-  bool ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPolygon3D* poly,
-  	int index, csWorld* world);
+  bool ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
+    csPolygon3D* poly, int index, csWorld* world);
 
   /**
    * Cache the lightmaps in the precalculation area.
    */
-  void Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWorld* world);
+  void Cache (csPolygonSet* owner, csPolygon3D* poly, int index,
+    csWorld* world);
 
   /**
    * Scale the lightmap one step down. This is used in
@@ -300,14 +290,28 @@ public:
    */
   void ConvertFor3dDriver (bool requirePO2, int maxAspect = 32767);
 
-  DECLARE_INTERFACE_TABLE( csLightMap )
-  DECLARE_IUNKNOWN()
-
-  DECLARE_COMPOSITE_INTERFACE( LightMap )
+  //------------------------ iLightMap implementation ------------------------
+  DECLARE_IBASE;
+  ///
+  virtual unsigned char *GetMap (int nMap);
+  ///
+  virtual int GetWidth ();
+  ///
+  virtual int GetHeight ();
+  ///
+  virtual int GetRealWidth ();
+  ///
+  virtual int GetRealHeight ();
+  ///
+  virtual bool IsCached ();
+  ///
+  virtual csHighColorCacheData *GetHighColorCache ();
+  ///
+  virtual void SetInCache (bool bVal);
+  ///
+  virtual void SetHighColorCache (csHighColorCacheData* pVal);
+  ///
+  virtual void GetMeanLighting (int& r, int& g, int& b);
 };
 
-#define GetILightMapFromcsLightMap(a)  &a->m_xLightMap
-#define GetcsLightMapFromILightMap(a)  ((csLightMap*)((size_t)a - offsetof(csLightMap, m_xLightMap)))
-
 #endif /*LIGHTMAP_H*/
-

@@ -20,7 +20,6 @@
 #include <math.h>
 
 #include "sysdef.h"
-
 #include "cs3d/opengl/ogl_txtmgr.h"
 #include "cs3d/common/inv_cmap.h"
 #include "csgfxldr/boxfilt.h"
@@ -30,30 +29,26 @@
 #include "iimage.h"
 #include "lightdef.h"
 
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#if ! __option( global_optimizer )
-#pragma global_optimizer on
-#endif
-#endif
-
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
 //---------------------------------------------------------------------------
 
-csTextureManagerOpenGL::csTextureManagerOpenGL (ISystem* piSystem, IGraphics2D* piG2D) :
-	csTextureManager (piSystem, piG2D)
+csTextureManagerOpenGL::csTextureManagerOpenGL (iSystem* iSys,
+  iGraphics2D* iG2D) : csTextureManager (iSys, iG2D)
 {
 }
 
-void csTextureManagerOpenGL::InitSystem ()
+void csTextureManagerOpenGL::Initialize ()
 {
-  csTextureManager::InitSystem ();
+  csTextureManager::Initialize ();
 
   num_red = (pfmt.RedMask >> pfmt.RedShift) + 1;
   num_green = (pfmt.GreenMask >> pfmt.GreenShift) + 1;
   num_blue = (pfmt.BlueMask >> pfmt.BlueShift) + 1;
-}
 
+  clear ();
+  read_config ();
+}
 
 bool csTextureManagerOpenGL::force_mixing (char* mix)
 {
@@ -202,7 +197,7 @@ void csTextureManagerOpenGL::clear ()
   textures.DeleteAll ();
 }
 
-csTextureMMOpenGL* csTextureManagerOpenGL::new_texture (IImageFile* image)
+csTextureMMOpenGL* csTextureManagerOpenGL::new_texture (iImageFile* image)
 {
   CHK (csTextureMMOpenGL* tm = new csTextureMMOpenGL (image));
   if (tm->loaded_correctly ()) textures.Push (tm);
@@ -294,15 +289,7 @@ int csTextureManagerOpenGL::find_rgb_map (int r, int g, int b, int map_type, int
   return find_color (nr, ng, nb);
 }
 
-STDMETHODIMP csTextureManagerOpenGL::Initialize ()
-{
-  clear ();
-  read_config ();
-
-  return S_OK;
-}
-
-STDMETHODIMP csTextureManagerOpenGL::Prepare ()
+void csTextureManagerOpenGL::Prepare ()
 {
   int i;
 
@@ -343,55 +330,41 @@ STDMETHODIMP csTextureManagerOpenGL::Prepare ()
     txt->free_usage_table ();
   }
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE!\n");
-
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::RegisterTexture (IImageFile* image,
-  ITextureHandle** handle, bool for3d, bool for2d)
+iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImageFile* image,
+  bool for3d, bool for2d)
 {
   csTextureMMOpenGL* txt = new_texture (image);
   txt->set_3d2d (for3d, for2d);
-  *handle = GetITextureHandleFromcsTextureMM (txt);
-  return S_OK;
+  return txt;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::UnregisterTexture (ITextureHandle* handle)
+void csTextureManagerOpenGL::UnregisterTexture (iTextureHandle* handle)
 {
   (void)handle;
   //@@@ Not implemented yet.
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::MergeTexture (ITextureHandle* handle)
+void csTextureManagerOpenGL::MergeTexture (iTextureHandle* handle)
 {
   (void)handle;
   //@@@ Not implemented yet.
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::FreeImages ()
+void csTextureManagerOpenGL::FreeImages ()
 {
-  int i;
-  for (i = 0 ; i < textures.Length () ; i++)
+  for (int i = 0 ; i < textures.Length () ; i++)
   {
     csTextureMMOpenGL* txt = (csTextureMMOpenGL*)textures[i];
     txt->free_image ();
   }
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
+void csTextureManagerOpenGL::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
 {
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::AllocPalette ()
+void csTextureManagerOpenGL::AllocPalette ()
 {
-  return S_OK;
 }
-
-//---------------------------------------------------------------------------
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#pragma global_optimizer reset
-#endif

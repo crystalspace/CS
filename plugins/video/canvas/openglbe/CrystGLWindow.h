@@ -27,14 +27,14 @@
 #include <Bitmap.h>
 #include <DirectWindow.h>
 #include <GLView.h>
-class ISystem;
+class iSystem;
 class csGraphics2DGLBe;
-class IBeLibSystemDriver;
+class iBeLibSystemDriver;
 
 class CrystGLView : public BGLView {
 
 public:
-		CrystGLView(BRect frame, IBeLibSystemDriver*); 
+		CrystGLView(BRect frame, iBeLibSystemDriver*); 
 virtual	~CrystGLView();
 virtual	void AttachedToWindow();
 
@@ -45,7 +45,7 @@ virtual	void MouseUp(BPoint);
 virtual	void MouseMoved(BPoint, uint32 transit, BMessage const*);
 
 protected:
-	IBeLibSystemDriver* be_system;
+	iBeLibSystemDriver* be_system;
 	void ProcessUserEvent() const;
 };
 
@@ -53,7 +53,7 @@ class CrystGLWindow : public BDirectWindow { // BGLScreen { //BWindow { // BWind
 
 public:
 		CrystGLWindow(BRect, const char*, CrystGLView*,
-			csGraphics2DGLBe*, ISystem*, IBeLibSystemDriver*); 
+			csGraphics2DGLBe*, iSystem*, iBeLibSystemDriver*); 
 virtual	~CrystGLWindow();
 
 virtual	bool QuitRequested();
@@ -63,8 +63,8 @@ virtual void DirectConnected(direct_buffer_info*);
 
 protected:
 		CrystGLView* view;
-		ISystem* cs_system;
-		IBeLibSystemDriver* be_system;
+		iSystem* cs_system;
+		iBeLibSystemDriver* be_system;
 		// Stuff to implement BDirectWindow
 		// FIXME: Why keep pi_BeG2D when piG2D is around?
 //		IBeLibGraphicsInfo* piG2D;  // New pointer to 2D driver info method interface.

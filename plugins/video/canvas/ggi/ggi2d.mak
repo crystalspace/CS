@@ -21,6 +21,8 @@ all drivers drivers2d: ggi2d
 
 ggi2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+ggi2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -51,11 +53,10 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/ggi
 
-.PHONY: ggi2d ggiclean ggicleanlib
+.PHONY: ggi2d ggi2dclean
 
 # Chain rules
-clean: ggiclean
-cleanlib: ggicleanlib
+clean: ggi2dclean
 
 ggi2d: $(OUTDIRS) $(GGI2D)
 
@@ -68,11 +69,8 @@ $(OUT)%$O: libs/cs2d/ggi/%.cpp
 $(GGI2D): $(OBJ.GGILIB2D) $(DEP.GGI2D)
 	$(DO.PLUGIN) $(LIBS.GGI2D)
 
-ggiclean:
-	$(RM) $(GGI2D)
-
-ggicleanlib:
-	$(RM) $(OBJ.GGI2D) $(GGI2D)
+ggi2dclean:
+	$(RM) $(GGI2D) $(OBJ.GGI2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)ggi2d.dep

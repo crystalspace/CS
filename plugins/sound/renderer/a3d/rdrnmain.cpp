@@ -28,7 +28,7 @@
 #include "ia3dapi.h"
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/a3d/sndrdr.h"
 #include "isndrdr.h"
 
@@ -120,7 +120,7 @@ BEGIN_INTERFACE_TABLE (csSoundRenderA3DFactory)
   IMPLEMENTS_INTERFACE (ISoundRenderFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csSoundRenderA3DFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csSoundRenderA3DFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

@@ -24,19 +24,19 @@
 #define HICACHE_H
 
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 ///
-struct HighColorCache_Data
+struct csHighColorCacheData
 {
   /// size this takes up.
   long lSize;
-  /// QueryInterface: ITextureMM successful if texture, ILightMap * if lightmap.
-  IUnknown *pSource;
+  /// QueryInterface: ITextureMM successful if texture, iLightMap * if lightmap.
+  iBase *pSource;
   /// internal cache data
   void *pData;
   /// linked list
-  HighColorCache_Data *next, *prev;
+  csHighColorCacheData *next, *prev;
 };
 
 ///
@@ -45,10 +45,6 @@ enum HIGHCOLOR_TYPE
   HIGHCOLOR_TEXCACHE, HIGHCOLOR_LITCACHE
 };
 
-interface ILightMap;
-interface IPolygonTexture;
-interface ITextureHandle;
-
 ///
 class HighColorCache
 {
@@ -56,7 +52,7 @@ protected:
 
   HIGHCOLOR_TYPE type;
   /// the head and tail of the cache data
-  HighColorCache_Data *head, *tail;
+  csHighColorCacheData *head, *tail;
 
 protected:
   /// the maximum size of the cache
@@ -73,9 +69,9 @@ public:
   virtual ~HighColorCache();
 
   ///
-  void Add (ITextureHandle *texture);
+  void Add (iTextureHandle *texture);
   ///
-  void Add (IPolygonTexture *polytex);
+  void Add (iPolygonTexture *polytex);
   ///
   void Clear ();
 
@@ -87,9 +83,9 @@ protected:
   int bpp;
 
   ///
-  virtual void Load (HighColorCache_Data *d) = 0;
+  virtual void Load (csHighColorCacheData *d) = 0;
   ///
-  virtual void Unload (HighColorCache_Data *d) = 0;
+  virtual void Unload (csHighColorCacheData *d) = 0;
 };
 
 #endif

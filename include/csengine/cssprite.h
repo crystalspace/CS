@@ -39,7 +39,7 @@ class csSkeleton;
 class csSkeletonState;
 class csSprite3D;
 class csBspContainer;
-interface ITextureHandle;
+scfInterface iTextureHandle;
 
 /**
  * A frame for 3D sprite animation.
@@ -185,7 +185,7 @@ private:
   friend class csSprite3D;
   friend class csCollider;
 
-  /// Texture handle as returned by ITextureManager.
+  /// Texture handle as returned by iTextureManager.
   csTextureHandle* cstxt;
 
   /// The vertices.
@@ -286,7 +286,7 @@ public:
   /// Get the texture
   csTextureHandle* GetTexture () const { return cstxt; }
   /// Get the texture handle.
-  ITextureHandle* GetTextureHandle () const { return cstxt->GetTextureHandle (); }
+  iTextureHandle* GetTextureHandle () const { return cstxt->GetTextureHandle (); }
   /// Set the texture used for this sprite
   void SetTexture (csTextureList* textures, const char *texname);
 
@@ -383,7 +383,7 @@ private:
   /// The template.
   csSpriteTemplate* tpl;
 
-  /// The texture handle as returned by ITextureManager.
+  /// The texture handle as returned by iTextureManager.
   csTextureHandle* cstxt;
 
   /// The current frame number.
@@ -392,7 +392,7 @@ private:
   csSpriteAction* cur_action;
 
   /// The last frame time action
-  int last_time;
+  time_t last_time;
 
   /// animation tweening ratio:  next frame / this frame
   float tween_ratio;
@@ -617,7 +617,7 @@ public:
   /**
    * Go to the next frame depending on the current time in milliseconds.
    */
-  bool NextFrame (long current_time, bool onestep = false, bool stoptoend = false);
+  bool NextFrame (time_t current_time, bool onestep = false, bool stoptoend = false);
 
   /**
    * Go to a specified frame.

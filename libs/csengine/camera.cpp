@@ -23,19 +23,16 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 
-//---------------------------------------------------------------------------
-
-IMPLEMENT_UNKNOWN_NODELETE (csCamera)
-
-BEGIN_INTERFACE_TABLE (csCamera)
-  IMPLEMENTS_COMPOSITE_INTERFACE (Camera)
-END_INTERFACE_TABLE ()
+IMPLEMENT_IBASE (csCamera)
+  IMPLEMENTS_INTERFACE (iCamera)
+IMPLEMENT_IBASE_END
 
 int csCamera::default_aspect = 0;
 float csCamera::default_inv_aspect = 0;
 
 csCamera::csCamera () : csOrthoTransform()
 {
+  CONSTRUCT_IBASE (NULL);
   mirror = false;
   sector = NULL;
   aspect = default_aspect;
@@ -184,4 +181,12 @@ void csCamera::Correct (int n, float* vals[])
   *vals[0] = r*cos(angle);  *vals[1] = r*sin(angle); 
 }
 
-//---------------------------------------------------------------------------
+float csCamera::GetAspect ()
+{
+  return inv_aspect;
+}
+
+float csCamera::GetInvAspect ()
+{
+  return aspect;
+}

@@ -19,7 +19,7 @@
 */
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "isystem.h"
 
 #include "dsound.h"
@@ -74,7 +74,7 @@ int csSoundSourceEAX::DestroySource()
   
   if (m_pDS3DBuffer3D)
   {
-    if ((hr = m_pDS3DBuffer3D->Release()) < DS_OK)
+    if ((hr = m_pDS3DBuffer3D->DecRef()) < DS_OK)
       return(hr);
     
     m_pDS3DBuffer3D = NULL;

@@ -23,7 +23,7 @@
 #include "ia3dapi.h"
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/a3d/sndrdr.h"
 #include "cssndrdr/a3d/sndlstn.h"
 #include "cssndrdr/a3d/sndbuf.h"
@@ -40,7 +40,7 @@ BEGIN_INTERFACE_TABLE(csSoundRenderA3D)
   IMPLEMENTS_INTERFACE(ISoundRender)
 END_INTERFACE_TABLE()
 
-csSoundRenderA3D::csSoundRenderA3D(ISystem* piSystem) : m_pListener(NULL)
+csSoundRenderA3D::csSoundRenderA3D(iSystem* piSystem) : m_pListener(NULL)
 {
   m_p3DAudioRenderer = NULL;
   m_piSystem = piSystem;

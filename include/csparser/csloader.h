@@ -31,7 +31,7 @@ class csPolyPlane;
 class csCollection;
 class csStatLight;
 class csThing;
-class ImageFile;
+class csImageFile;
 class csWorld;
 class LanguageLayer;
 class csCurveTemplate;
@@ -118,7 +118,7 @@ public:
         CLights* default_lightx, csSector* sec, csPolygonSet* parent);
 
   ///
-  static ImageFile* load_image(const char* name);
+  static csImageFile* load_image(const char* name);
   ///
   static void txt_process (char *name, char* buf, csTextureList* textures, csWorld *world);
   ///

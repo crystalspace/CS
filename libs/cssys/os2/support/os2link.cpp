@@ -193,11 +193,7 @@ int main (int argc, char *argv[])
     if (opt.description)
       fprintf (f, "DESCRIPTION \"%s\"\n", opt.description);
     fprintf (f, "EXPORTS\n");
-    fprintf (f, "	DllInitialize\n");
-    fprintf (f, "	DllCanUnloadNow\n");
-    fprintf (f, "	DllGetClassObject\n");
-    fprintf (f, "	DllRegisterServer\n");
-    fprintf (f, "	DllUnregisterServer\n");
+    fprintf (f, "	%s_GetClassTable\n", opt.modname);
   }
   else
   {

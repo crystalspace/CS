@@ -20,7 +20,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "cs3d/software/soft_g3d.h"
@@ -109,38 +109,19 @@ int csGraphics3DSoftware::filter_bf = 1;
 
 ///---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN (csGraphics3DSoftware)
+IMPLEMENT_FACTORY (csGraphics3DSoftware)
 
-#ifndef BUGGY_EGCS_COMPILER
+EXPORT_CLASS_TABLE (soft3d)
+  EXPORT_CLASS (csGraphics3DSoftware, "crystalspace.graphics3d.software",
+    "Software 3D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-BEGIN_INTERFACE_TABLE (csGraphics3DSoftware)
-    IMPLEMENTS_INTERFACE (IGraphics3D)
-    IMPLEMENTS_COMPOSITE_INTERFACE (HaloRasterizer)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX (IConfig, XConfig3DSoft)
-END_INTERFACE_TABLE ()
-
-#else
-
-// this is a fake routine to circumvent the compiler bug. const removed to allow assignment
-const INTERFACE_ENTRY *csGraphics3DSoftware::GetInterfaceTable ()
-{
-  static INTERFACE_ENTRY InterfaceTable[4];
-  InterfaceTable[0].pIID = &IID_IGraphics3D;
-  InterfaceTable[0].pfnFinder = ENTRY_IS_OFFSET;
-  InterfaceTable[0].dwData = BASE_OFFSET(csGraphics3DSoftware, IGraphics3D);
-  InterfaceTable[1].pIID = &IID_IHaloRasterizer;
-  InterfaceTable[1].pfnFinder = ENTRY_IS_OFFSET;
-  InterfaceTable[1].dwData = COMPOSITE_OFFSET(csGraphics3DSoftware, IHaloRasterizer, IHaloRasterizer, m_xHaloRasterizer);
-  InterfaceTable[2].pIID = &IID_IConfig;
-  InterfaceTable[2].pfnFinder = ENTRY_IS_OFFSET;
-  InterfaceTable[2].dwData = COMPOSITE_OFFSET(csGraphics3DSoftware, IConfig, IXConfig3DSoft, m_xXConfig3DSoft);
-  InterfaceTable[3].pIID = 0;
-  InterfaceTable[3].pfnFinder = 0;
-  InterfaceTable[3].dwData = 0;
-  return InterfaceTable;
-}
-
-#endif
+IMPLEMENT_IBASE (csGraphics3DSoftware)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iHaloRasterizer)
+  IMPLEMENTS_INTERFACE (iConfig)
+IMPLEMENT_IBASE_END
 
 #if defined (OS_LINUX)
 char* get_software_2d_driver ()
@@ -163,45 +144,14 @@ char* get_software_2d_driver ()
 }
 #endif
 
-csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
+csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 {
-  HRESULT hRes;
-  CLSID clsid2dDriver;
-  char *sz2DDriver;
-  IGraphics2DFactory* piFactory = NULL;
+  CONSTRUCT_IBASE (iParent);
+
+  config = new csIniFile ("soft3d.cfg");
+
   tcache = NULL;
   txtmgr = NULL;
-
-  config = new csIniFile ("softrndr.cfg");
-  sz2DDriver = config->GetStr ("Hardware", "DRIVER", SOFTWARE_2D_DRIVER);
-
-  m_piSystem = piSystem;
-
-  hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
-
-  if (FAILED(hRes))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "FATAL: Cannot open \"%s\" 2D Graphics driver", sz2DDriver);
-    exit(0);
-  }
-
-  hRes = csCoGetClassObject( clsid2dDriver, CLSCTX_INPROC_SERVER, NULL, (REFIID)IID_IGraphics2DFactory, (void**)&piFactory );
-  if (FAILED(hRes))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-    exit(0);
-  }
-
-  hRes = piFactory->CreateInstance( (REFIID)IID_IGraphics2D, m_piSystem, (void**)&m_piG2D );
-  if (FAILED(hRes))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-    exit(0);
-  }
-
-  FINAL_RELEASE( piFactory );
-
-  CHK (txtmgr = new csTextureManagerSoftware (m_piSystem, m_piG2D));
 
   zdist_mipmap1 = 12;
   zdist_mipmap2 = 24;
@@ -239,14 +189,60 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
 
 csGraphics3DSoftware::~csGraphics3DSoftware ()
 {
-  Close ();
-  CHK (delete [] z_buffer);
-  CHK (delete [] smaller_buffer);
-  FINAL_RELEASE (m_piG2D);
+  if (System)
+  {
+    System->DeregisterDriver ("iGraphics3D", this);
+    System->DecRef ();
+  }
 
+  Close ();
   csScan_Finalize ();
-  CHK (delete [] line_table);
-  CHK (delete txtmgr);
+  if (txtmgr)
+    CHKB (delete txtmgr);
+  if (z_buffer)
+    CHKB (delete [] z_buffer);
+  if (smaller_buffer)
+    CHKB (delete [] smaller_buffer);
+  if (G2D)
+    G2D->DecRef ();
+  if (line_table)
+    CHKB (delete [] line_table);
+}
+
+bool csGraphics3DSoftware::Initialize (iSystem *iSys)
+{
+  (System = iSys)->IncRef ();
+
+  if (!System->RegisterDriver ("iGraphics3D", this))
+    return false;
+
+  char *driver = config->GetStr ("Hardware", "Driver2D", SOFTWARE_2D_DRIVER);
+  G2D = LOAD_PLUGIN (System, driver, iGraphics2D);
+  if (!G2D)
+  {
+    SysPrintf(MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
+    return false;
+  }
+
+  CHK (txtmgr = new csTextureManagerSoftware (System, G2D));
+  txtmgr->SetConfig (config);
+  txtmgr->Initialize ();
+
+#ifdef DO_MMX
+  do_mmx = config->GetYesNo ("Hardware", "MMX", true);
+#endif
+  do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
+  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
+    config->GetYesNo ("Hardware", "INTERLACING", false));
+
+  SetCacheSize (config->GetInt ("TextureManager", "CACHE", DEFAULT_CACHE_SIZE));
+
+  zdist_mipmap1 = config->GetFloat ("Mipmapping", "DMIPMAP1", 12.0);
+  zdist_mipmap2 = config->GetFloat ("Mipmapping", "DMIPMAP2", 24.0);
+  zdist_mipmap3 = config->GetFloat ("Mipmapping", "DMIPMAP3", 40.0);
+
+  width = height = -1;
+  return true;
 }
 
 void csGraphics3DSoftware::ScanSetup ()
@@ -549,55 +545,23 @@ void csGraphics3DSoftware::SetCacheSize (long size)
     TextureCache::set_default_cache_size (size);
 }
 
-STDMETHODIMP csGraphics3DSoftware::Initialize ()
-{
-  txtmgr->SetConfig (config);
-
-  m_piG2D->Initialize ();
-  txtmgr->InitSystem ();
-
-#ifdef DO_MMX
-  do_mmx = config->GetYesNo ("Hardware", "MMX", true);
-#endif
-  do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
-  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
-    config->GetYesNo ("Hardware", "INTERLACING", false));
-
-  SetCacheSize (config->GetInt ("TextureManager", "CACHE", DEFAULT_CACHE_SIZE));
-
-  zdist_mipmap1 = config->GetFloat ("Mipmapping", "DMIPMAP1", 12.0);
-  zdist_mipmap2 = config->GetFloat ("Mipmapping", "DMIPMAP2", 24.0);
-  zdist_mipmap3 = config->GetFloat ("Mipmapping", "DMIPMAP3", 40.0);
-
-  width = height = -1;
-  return S_OK;
-}
-
-STDMETHODIMP csGraphics3DSoftware::Open (const char *Title)
+bool csGraphics3DSoftware::Open (const char *Title)
 {
   DrawMode = 0;
 
-  IGraphicsInfo* piGI = NULL;
-
-  VERIFY_SUCCESS (m_piG2D->QueryInterface((IID&)IID_IGraphicsInfo, (void**)&piGI));
-
-  if (FAILED (m_piG2D->Open (Title)))
+  if (!G2D->Open (Title))
   {
       SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.");
-      FINAL_RELEASE (piGI);
       // set "not opened" flag
       width = height = -1;
 
-      return E_UNEXPECTED;
+      return false;
   }
 
-  int nWidth, nHeight;
-  bool bFullScreen;
-
-  piGI->GetWidth (nWidth);
-  piGI->GetHeight (nHeight);
-  piGI->GetIsFullScreen (bFullScreen);
-  piGI->GetPixelFormat (&pfmt);
+  int nWidth = G2D->GetWidth ();
+  int nHeight = G2D->GetHeight ();
+  bool bFullScreen = G2D->GetFullScreen ();
+  pfmt = *G2D->GetPixelFormat ();
 
   SetDimensions (nWidth, nHeight);
 
@@ -640,18 +604,16 @@ STDMETHODIMP csGraphics3DSoftware::Open (const char *Title)
     (features & CPUx86_FEATURE_CMOV) ? "yes" : "no");
 #endif
 
-  FINAL_RELEASE (piGI);
-
   z_buf_mode = CS_ZBUF_NONE;
   fog_buffers = NULL;
   for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     fog_tables [i].table = NULL;
 
   ScanSetup ();
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csGraphics3DSoftware::Close()
+void csGraphics3DSoftware::Close()
 {
   for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     if (fog_tables [i].table)
@@ -667,13 +629,12 @@ STDMETHODIMP csGraphics3DSoftware::Close()
   CHK (delete tcache); tcache = NULL;
 
   if ((width == height) && (width == -1))
-    return S_OK;
-  HRESULT rc = m_piG2D->Close();
+    return;
+  G2D->Close ();
   width = height = -1;
-  return rc;
 }
 
-STDMETHODIMP csGraphics3DSoftware::SetDimensions (int nwidth, int nheight)
+void csGraphics3DSoftware::SetDimensions (int nwidth, int nheight)
 {
   if (do_smaller_rendering)
   {
@@ -701,34 +662,31 @@ STDMETHODIMP csGraphics3DSoftware::SetDimensions (int nwidth, int nheight)
 
   CHK (delete [] line_table);
   CHK (line_table = new UByte* [height+1]);
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::SetPerspectiveCenter (int x, int y)
+void csGraphics3DSoftware::SetPerspectiveCenter (int x, int y)
 {
   width2 = x;
   height2 = y;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
+bool csGraphics3DSoftware::BeginDraw (int DrawFlags)
 {
-  //ASSERT( m_piG2D );
+  //ASSERT( G2D );
 
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
    && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
   {
-    if (FAILED (m_piG2D->BeginDraw()))
-      return E_UNEXPECTED;
+    if (!G2D->BeginDraw())
+      return false;
   }
 
   if (DrawFlags & CSDRAW_CLEARZBUFFER)
     memset (z_buffer, 0, z_buf_size);
 
   if (DrawFlags & CSDRAW_CLEARSCREEN)
-    m_piG2D->Clear (0);
+    G2D->Clear (0);
 
   if (DrawFlags & CSDRAW_3DGRAPHICS)
   {
@@ -738,7 +696,7 @@ STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
       if (do_smaller_rendering)
         line_table[i] = smaller_buffer + ((i*width)*pfmt.PixelBytes);
       else
-        m_piG2D->GetPixelAt (0, i, &line_table[i]);
+        line_table[i] = G2D->GetPixelAt (0, i);
     dbg_current_polygon = 0;
   }
   else if (DrawMode & CSDRAW_3DGRAPHICS)
@@ -754,10 +712,8 @@ STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
             for (y = 0 ; y < height ; y++)
             {
               UShort* src = (UShort*)line_table[y];
-	      UByte* dst_b;
-	      UShort* dst1, * dst2;
-	      m_piG2D->GetPixelAt (0, y+y, &dst_b); dst1 = (UShort*)dst_b;
-	      m_piG2D->GetPixelAt (0, y+y+1, &dst_b); dst2 = (UShort*)dst_b;
+	      UShort* dst1 = (UShort*)G2D->GetPixelAt (0, y+y);
+              UShort* dst2 = (UShort*)G2D->GetPixelAt (0, y+y+1);
               for (x = 0 ; x < width ; x++)
 	      {
 	        dst1[x+x] = src[x];
@@ -770,10 +726,8 @@ STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
             for (y = 0 ; y < height ; y++)
             {
               UShort* src = (UShort*)line_table[y];
-	      UByte* dst_b;
-	      UShort* dst1, * dst2;
-	      m_piG2D->GetPixelAt (0, y+y, &dst_b); dst1 = (UShort*)dst_b;
-	      m_piG2D->GetPixelAt (0, y+y+1, &dst_b); dst2 = (UShort*)dst_b;
+	      UShort* dst1 = (UShort*)G2D->GetPixelAt (0, y+y);
+              UShort* dst2 = (UShort*)G2D->GetPixelAt (0, y+y+1);
               for (x = 0 ; x < width ; x++)
 	      {
 	        dst1[x+x] = src[x];
@@ -787,10 +741,8 @@ STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
           for (y = 0 ; y < height ; y++)
           {
             ULong* src = (ULong*)line_table[y];
-	    UByte* dst_b;
-	    ULong* dst1, * dst2;
-	    m_piG2D->GetPixelAt (0, y+y, &dst_b); dst1 = (ULong*)dst_b;
-	    m_piG2D->GetPixelAt (0, y+y+1, &dst_b); dst2 = (ULong*)dst_b;
+	    ULong* dst1 = (ULong*)G2D->GetPixelAt (0, y+y);
+            ULong* dst2 = (ULong*)G2D->GetPixelAt (0, y+y+1);
             for (x = 0 ; x < width ; x++)
 	    {
 	      dst1[x+x] = src[x];
@@ -806,33 +758,26 @@ STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
 
   DrawMode = DrawFlags;
 
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csGraphics3DSoftware::FinishDraw ()
+void csGraphics3DSoftware::FinishDraw ()
 {
-  //ASSERT( m_piG2D );
-
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
-  {
-    m_piG2D->FinishDraw ();
-  }
+    G2D->FinishDraw ();
   DrawMode = 0;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::Print (csRect *area)
+void csGraphics3DSoftware::Print (csRect *area)
 {
-  m_piG2D->Print (area);
+  G2D->Print (area);
   if (do_interlaced != -1)
     do_interlaced ^= 1;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::SetZBufMode (G3DZBufMode mode)
+void csGraphics3DSoftware::SetZBufMode (G3DZBufMode mode)
 {
   z_buf_mode = mode;
-  return S_OK;
 }
 
 #define SMALL_D 0.01
@@ -865,7 +810,7 @@ struct
   { 8, 3, 8, 3, 8, 3, 8, 3 }            // 8-steps
 };
 
-HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
+void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
 {
   int i;
   int max_i, min_i;
@@ -874,7 +819,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
   unsigned long *z_buf;
   float inv_aspect = poly.inv_aspect;
 
-  if (poly.num < 3) return S_FALSE;
+  if (poly.num < 3) return;
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -932,29 +877,30 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
   }
 
   // if this is a 'degenerate' polygon, skip it.
-  if (num_vertices < 3) return S_FALSE;
+  if (num_vertices < 3)
+    return;
 
   // For debugging: is we reach the maximum number of polygons to draw we simply stop.
   dbg_current_polygon++;
-  if (dbg_current_polygon == dbg_max_polygons_to_draw-1) return E_FAIL;
-  if (dbg_current_polygon >= dbg_max_polygons_to_draw-1) return S_OK;
+  if (dbg_current_polygon == dbg_max_polygons_to_draw-1)
+    return;
+  if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
+    return;
 
-  IPolygonTexture *tex = NULL;
-  ILightMap *lm = NULL;
+  iPolygonTexture *tex = NULL;
+  iLightMap *lm = NULL;
   if (do_lighting)
   {
     tex = poly.poly_texture[0];
-    tex->GetLightMap (&lm);
+    lm = tex->GetLightMap ();
   }
-  csTextureMMSoftware* txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
-  int mean_color_idx = txt_mm->get_mean_color_idx ();
+  int mean_color_idx = poly.txt_handle->GetMeanColor ();
+  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
   if (lm)
   {
     // Lighted polygon
     int lr, lg, lb;
     lm->GetMeanLighting (lr, lg, lb);
-    FINAL_RELEASE (lm);
-    FINAL_RELEASE (tex);
     if (pfmt.PixelBytes >= 2)
     {
       // Make lighting a little bit brighter because average
@@ -990,7 +936,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
       }
       else
       {
-        unsigned char * rgb, * rgb_values = txt_mm->get_colormap_private ();
+        unsigned char * rgb, * rgb_values = tex_mm->GetPrivateColorMap ();
         rgb = rgb_values + (mean_color_idx << 2);
         mean_color_idx = true_to_pal[lt_light[*rgb].red[lr] |
                    lt_light[*(rgb+1)].green[lg] |
@@ -1004,14 +950,14 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
 
   // Select the right scanline drawing function.
   if (do_transp
-   && (poly.alpha || (txt_mm && txt_mm->get_transparent ())))
-    return S_OK;
+   && (poly.alpha || (poly.txt_handle && poly.txt_handle->GetTransparent ())))
+    return;
   int scan_index = SCANPROC_FLAT_ZFIL;
   if (z_buf_mode == CS_ZBUF_USE)
     scan_index++;
   csDrawScanline* dscan = ScanProc [scan_index];
   if (!dscan)
-    goto finish;                        // Nothing to do.
+    return;				// Nothing to do.
 
   // Scan both sides of the polygon at once.
   // We start with two pointers at the top (as seen in y-inverted
@@ -1046,7 +992,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
       {
         // Check first if polygon has been finished
         if (scanR2 == min_i)
-	  goto finish;
+	  return;
         scanR1 = scanR2;
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
@@ -1133,12 +1079,9 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
       screenY++;
     } /* endwhile */
   } /* endfor */
-
-finish:
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
+void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 {
   if (!do_textured)
     return DrawPolygonFlat (poly);
@@ -1154,7 +1097,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3)
-    return S_FALSE;
+    return;
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -1219,12 +1162,15 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   }
 
   // if this is a 'degenerate' polygon, skip it.
-  if (num_vertices < 3) return S_FALSE;
+  if (num_vertices < 3)
+    return;
 
   // For debugging: is we reach the maximum number of polygons to draw we simply stop.
   dbg_current_polygon++;
-  if (dbg_current_polygon == dbg_max_polygons_to_draw-1) return E_FAIL;
-  if (dbg_current_polygon >= dbg_max_polygons_to_draw-1) return S_OK;
+  if (dbg_current_polygon == dbg_max_polygons_to_draw-1)
+    return;
+  if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
+    return;
 
   // Correct 1/z -> z.
   min_z = 1/min_z;
@@ -1242,16 +1188,15 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   }
   else
     mipmap = rstate_mipmap - 1;
-  IPolygonTexture *tex = poly.poly_texture[mipmap];
-  csTextureMMSoftware *txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
-  csTexture *txt_unl = txt_mm->get_texture (mipmap);
+  iPolygonTexture *tex = poly.poly_texture [mipmap];
+  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
+  csTexture *txt_unl = tex_mm->get_texture (mipmap);
 
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
   // If we are using the sub-texture optimization then we just allocate
   // the needed memory in the cache but don't do any calculations yet.
-  int subtex_size;
-  tex->GetSubtexSize (subtex_size);
+  int subtex_size = tex->GetSubtexSize ();
   if (do_lighting)
   {
     if (subtex_size)
@@ -1260,16 +1205,17 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       // bother with the subtex optimization because it will be
       // counter-productive. The problem is finding the exact value
       // of 'too small'.
-      int size;
-      tex->GetNumPixels (size);
+      int size = tex->GetNumPixels ();
       if (size < 64*64) subtex_size = 0;
     }
 
-    if (subtex_size) CacheInitTexture (tex);
-    else CacheTexture (tex);
+    if (subtex_size)
+      CacheInitTexture (tex);
+    else
+      CacheTexture (tex);
   }
 
-  csScan_InitDraw (this, tex, txt_mm, txt_unl);
+  csScan_InitDraw (this, tex, tex_mm, txt_unl);
 
   // @@@ The texture transform matrix is currently written as T = M*(C-V)
   // (with V being the transform vector, M the transform matrix, and C
@@ -1345,7 +1291,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   Scan.dK1 = K1*Scan.InterpolStep;
 
   // Select the right scanline drawing function.
-  bool tex_transp = Scan.Texture->get_transparent ();
+  bool tex_transp = Scan.Texture->GetTransparent ();
   int  scan_index = -2;
   csDrawScanline* dscan = NULL;
 
@@ -1365,7 +1311,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     int txtMode = txtmgr->txtMode;
     Scan.PaletteTable = txtmgr->lt_pal->pal_to_true;
     if (txtMode == TXT_PRIVATE)
-      Scan.PrivToGlobal = Scan.Texture->get_private_to_global ();
+      Scan.PrivToGlobal = Scan.Texture->GetPrivateToGlobal ();
     if (do_transp && tex_transp)
       scan_index = SCANPROC_TEX_KEY_ZFIL;
     else
@@ -1375,15 +1321,14 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     scan_index++;
   if (!dscan)
     if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
-      goto finish;              // nothing to do
+      return; // nothing to do
 
   // If sub-texture optimization is enabled we will convert the 2D screen polygon
   // to texture space and then triangulate this texture polygon to cache all
   // needed sub-textures.
   // Note that we will not do this checking if there are no dirty sub-textures.
   // This is an optimization.
-  int nDirty;
-  tex->GetNumberDirtySubTex (nDirty);
+  int nDirty = tex->GetNumberDirtySubTex ();
 
   if (do_lighting && subtex_size && nDirty)
   {
@@ -1469,7 +1414,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       {
         // Check first if polygon has been finished
         if (scanR2 == min_i)
-          goto finish;
+          return;
         scanR1 = scanR2;
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
@@ -1548,7 +1493,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         // Sub-pixel U & V correction
         float deltaX = (float)xL - sxL;
 
-        //m_piG2D->GetPixelAt(xL, screenY, &d);
+        //G2D->GetPixelAt(xL, screenY, &d);
         d = line_table [screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
 
@@ -1573,46 +1518,11 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       screenY++;
     } /* endwhile */
   } /* endfor */
-
-finish:
-  FINAL_RELEASE( tex );
-  return S_OK;
 }
 
-#if 0 // ----------------------------------------------------------------------
-// Experimental system to try to decrease the bluriness when moving
-// quickly. It's not very beautiful (there are artifacts) so I've disabled
-// it for the moment
-// This code should be called just after the if containing dscan().
-      else if (ilace_fastmove && yy < yy1)
-      {
-        // If there was a fast movement and we are using interlacing
-        // then copy the previous line to this one to minimize blurring.
-        // (only do this if we are not at the first line).
-        xxL = QRound (sxL+width2);
-        if (xxL < 0) xxL = 0;
-        int xxR = QRound (sxR+width2);
-        if (xxR >= width) xxR = width-1;
-
-        //int xx = QRound (sxR-sxL);
-        int xx = xxR-xxL;
-        if (xx > 0)
-        {
-          d = Graph2D->GetPixelAt (xxL, height-yy);
-          unsigned char* d2 = Graph2D->GetPixelAt (xxL, height-yy-1);
-          unsigned char* last_d = d + xx;
-          do
-          {
-            *d++ = *d2++;
-          } while (d <= last_d);
-        }
-      }
-#endif // ---------------------------------------------------------------------
-
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
+void csGraphics3DSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
 {
   (void)poly;
-  return S_OK;
 }
 
 FogBuffer* csGraphics3DSoftware::find_fog_buffer (CS_ID id)
@@ -1626,7 +1536,7 @@ FogBuffer* csGraphics3DSoftware::find_fog_buffer (CS_ID id)
   return NULL;
 }
 
-STDMETHODIMP csGraphics3DSoftware::OpenFogObject (CS_ID id, csFog* fog)
+void csGraphics3DSoftware::OpenFogObject (CS_ID id, csFog* fog)
 {
   CHK (FogBuffer* fb = new FogBuffer ());
   fb->next = fog_buffers;
@@ -1638,25 +1548,23 @@ STDMETHODIMP csGraphics3DSoftware::OpenFogObject (CS_ID id, csFog* fog)
   fb->blue = fog->blue;
   if (fog_buffers) fog_buffers->prev = fb;
   fog_buffers = fb;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::CloseFogObject (CS_ID id)
+void csGraphics3DSoftware::CloseFogObject (CS_ID id)
 {
   FogBuffer* fb = find_fog_buffer (id);
   if (!fb)
   {
     SysPrintf (MSG_INTERNAL_ERROR, "ENGINE FAILURE! Try to close a non-open fog object!\n");
-    return E_FAIL;
+    return;
   }
   if (fb->next) fb->next->prev = fb->prev;
   if (fb->prev) fb->prev->next = fb->next;
   else fog_buffers = fb->next;
   CHK (delete fb);
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog_type)
+void csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog_type)
 {
   int i;
   int max_i, min_i;
@@ -1666,9 +1574,9 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
   float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3)
-    return S_FALSE;
+    return;
   if (fogMode == G3DFOGMETHOD_VERTEX)
-    return S_FALSE;
+    return;
 
   float M = 0, N = 0, O = 0;
   if (fog_type == CS_FOG_FRONT || fog_type == CS_FOG_BACK)
@@ -1728,7 +1636,8 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
   }
 
   // if this is a 'degenerate' polygon, skip it
-  if (num_vertices < 3) return S_FALSE;
+  if (num_vertices < 3)
+    return;
 
   FogBuffer* fb = find_fog_buffer (id);
   if (!fb)
@@ -1781,7 +1690,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
 	-1;
 
   if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
-    goto finish;   // Nothing to do.
+    return;   // Nothing to do.
 
   //@@@ Optimization note! We should have a seperate loop for CS_FOG_VIEW
   // as that is much simpler and does not require the calculations for z.
@@ -1820,7 +1729,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
       {
         // Check first if polygon has been finished
         if (scanR2 == min_i)
-          goto finish;
+          return;
         scanR1 = scanR2;
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
@@ -1895,7 +1804,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
         // Sub-pixel U & V correction
         float deltaX = (float)xL - sxL;
 
-        //m_piG2D->GetPixelAt(xL, screenY, &d);
+        //G2D->GetPixelAt(xL, screenY, &d);
         d = line_table[screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
 
@@ -1911,9 +1820,6 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
       screenY++;
     } /* endwhile */
   } /* endfor */
-
-finish:
-  return S_OK;
 }
 
 // Calculate round (f) of a 16:16 fixed pointer number
@@ -1945,7 +1851,7 @@ static struct
 
 #define EPS   0.0001
 
-STDMETHODIMP csGraphics3DSoftware::StartPolygonFX (ITextureHandle* handle,
+void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   UInt mode)
 {
   if (!rstate_gouraud || !do_lighting)
@@ -1953,15 +1859,15 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX (ITextureHandle* handle,
 
   if (handle)
   {
-    csTextureMMSoftware *txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
-    csTexture *txt_unl = txt_mm->get_texture (0);
-    pqinfo.bm = txt_unl->get_bitmap8 ();
+    csTextureMMSoftware *tex_mm = (csTextureMMSoftware*)handle->GetPrivateObject ();
+    csTexture *txt_unl = tex_mm->get_texture (0);
+    pqinfo.bm = txt_unl->get_bitmap ();
     pqinfo.tw = txt_unl->get_width ();
     pqinfo.th = txt_unl->get_height ();
     pqinfo.shf_w = txt_unl->get_w_shift ();
     pqinfo.twfp = QInt16 (pqinfo.tw) - 1;
     pqinfo.thfp = QInt16 (pqinfo.th) - 1;
-    pqinfo.transparent = txt_mm->get_transparent();
+    pqinfo.transparent = tex_mm->GetTransparent ();
     pqinfo.textured = do_textured;
   }
   else
@@ -2045,19 +1951,16 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX (ITextureHandle* handle,
     pqinfo.greenFact = (pfmt.GreenMask >> pfmt.GreenShift);
     pqinfo.blueFact = (pfmt.BlueMask >> pfmt.BlueShift);
   } /* endif */
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::FinishPolygonFX()
+void csGraphics3DSoftware::FinishPolygonFX()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
+void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
   if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
-    return S_OK;
+    return;
 
   //-----
   // Calculate constant du,dv,dz.
@@ -2081,7 +1984,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 
   // Rejection of back-faced polygons
   if ((last == poly.num) || (dd == 0))
-    return S_OK;
+    return;
 
   float flat_r, flat_g, flat_b;
   if (pqinfo.textured)
@@ -2218,7 +2121,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
       {
         // Check first if polygon has been finished
         if (scanR2 == bot)
-          goto finish;
+          return;
         scanR1 = scanR2;
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
@@ -2241,7 +2144,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
       if (sy <= fyL)
       {
         if (scanL2 == bot)
-          goto finish;
+          return;
         scanL1 = scanL2;
 	if (--scanL2 < 0)
 	  scanL2 = poly.num - 1;
@@ -2394,32 +2297,27 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
       screenY++;
     }
   }
-
-finish:
-  return S_OK;
 };
 
-STDMETHODIMP csGraphics3DSoftware::CacheTexture (IPolygonTexture* texture)
+void csGraphics3DSoftware::CacheTexture (iPolygonTexture* texture)
 {
   tcache->use_texture (texture, txtmgr);
-  return S_OK;
 }
 
-void csGraphics3DSoftware::CacheInitTexture (IPolygonTexture* texture)
+void csGraphics3DSoftware::CacheInitTexture (iPolygonTexture* texture)
 {
   tcache->init_texture (texture, txtmgr);
 }
 
-void csGraphics3DSoftware::CacheSubTexture (IPolygonTexture* texture, int u, int v)
+void csGraphics3DSoftware::CacheSubTexture (iPolygonTexture* texture, int u, int v)
 {
   tcache->use_sub_texture (texture, txtmgr, u, v);
 }
 
-void csGraphics3DSoftware::CacheRectTexture (IPolygonTexture* tex,
+void csGraphics3DSoftware::CacheRectTexture (iPolygonTexture* tex,
         int minu, int minv, int maxu, int maxv)
 {
-  int subtex_size;
-  tex->GetSubtexSize (subtex_size);
+  int subtex_size = tex->GetSubtexSize ();
 
   int iu, iv;
   for (iu = minu ; iu < maxu ; iu += subtex_size)
@@ -2488,24 +2386,23 @@ unsigned char *csGraphics3DSoftware::BuildIndexedFogTable ()
   return fog_tables [fi].table;
 }
 
-STDMETHODIMP csGraphics3DSoftware::UncacheTexture (IPolygonTexture* texture)
+void csGraphics3DSoftware::UncacheTexture (iPolygonTexture* texture)
 {
   (void)texture;
-  return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
+bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
   long value)
 {
   switch (op)
   {
     case G3DRENDERSTATE_NOTHING:
-      return S_OK;
+      return true;
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
       if (value)
       {
          if (z_buf_mode == CS_ZBUF_TEST)
-           return S_OK;
+           return true;
          if (z_buf_mode == CS_ZBUF_NONE)
            z_buf_mode = CS_ZBUF_TEST;
          else if (z_buf_mode == CS_ZBUF_FILL)
@@ -2514,7 +2411,7 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       else
       {
          if (z_buf_mode == CS_ZBUF_FILL)
-           return S_OK;
+           return true;
          if (z_buf_mode == CS_ZBUF_USE)
            z_buf_mode = CS_ZBUF_FILL;
          else if (z_buf_mode == CS_ZBUF_TEST)
@@ -2525,7 +2422,7 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       if (value)
       {
         if (z_buf_mode == CS_ZBUF_FILL)
-          return S_OK;
+          return true;
         if (z_buf_mode == CS_ZBUF_NONE)
           z_buf_mode = CS_ZBUF_FILL;
         else if (z_buf_mode == CS_ZBUF_TEST)
@@ -2534,7 +2431,7 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       else
       {
         if (z_buf_mode == CS_ZBUF_TEST)
-          return S_OK;
+          return true;
         if (z_buf_mode == CS_ZBUF_USE)
           z_buf_mode = CS_ZBUF_TEST;
         else if (z_buf_mode == CS_ZBUF_FILL)
@@ -2574,11 +2471,11 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       ScanSetup ();
       break;
 #else
-      return E_FAIL;
+      return false;
 #endif
     case G3DRENDERSTATE_INTERLACINGENABLE:
-      if (m_piG2D->DoubleBuffer (!value) != S_OK)
-        return E_FAIL;
+      if (!G2D->DoubleBuffer (!value))
+        return false;
       do_interlaced = value ? 0 : -1;
       break;
     case G3DRENDERSTATE_INTERPOLATIONSTEP:
@@ -2599,83 +2496,63 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       rstate_gouraud = value;
       break;
     default:
-      return E_INVALIDARG;
+      return false;
   }
 
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op, long& retval)
+long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
 {
   switch (op)
   {
     case G3DRENDERSTATE_NOTHING:
-      retval = 0;
-      break;
+      return 0;
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      retval = (bool)(z_buf_mode & CS_ZBUF_TEST);
-      break;
+      return (bool)(z_buf_mode & CS_ZBUF_TEST);
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      retval = (bool)(z_buf_mode & CS_ZBUF_FILL);
-      break;
+      return (bool)(z_buf_mode & CS_ZBUF_FILL);
     case G3DRENDERSTATE_DITHERENABLE:
-      retval = rstate_dither;
-      break;
+      return rstate_dither;
     case G3DRENDERSTATE_SPECULARENABLE:
-      retval = rstate_specular;
-      break;
+      return rstate_specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      retval = do_texel_filt;
-      break;
+      return do_texel_filt;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      retval = do_bilin_filt;
-      break;
+      return do_bilin_filt;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
-      retval = do_transp;
-      break;
+      return do_transp;
     case G3DRENDERSTATE_MIPMAPENABLE:
-      retval = rstate_mipmap;
-      break;
+      return rstate_mipmap;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-      retval = do_textured;
-      break;
+      return do_textured;
     case G3DRENDERSTATE_MMXENABLE:
 #ifdef DO_MMX
-      retval = do_mmx;
+      return do_mmx;
 #else
-      retval = 0;
+      return 0;
 #endif
-      break;
     case G3DRENDERSTATE_INTERLACINGENABLE:
-      retval = do_interlaced == -1 ? false : true;
-      break;
+      return do_interlaced == -1 ? false : true;
     case G3DRENDERSTATE_INTERPOLATIONSTEP:
-      retval = Scan.InterpolMode;
-      break;
+      return Scan.InterpolMode;
     case G3DRENDERSTATE_FILTERINGENABLE:
-      retval = do_texel_filt;
-      break;
+      return do_texel_filt;
     case G3DRENDERSTATE_LIGHTINGENABLE:
-      retval = do_lighting;
-      break;
+      return do_lighting;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
-      retval = dbg_max_polygons_to_draw;
-      break;
+      return dbg_max_polygons_to_draw;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      retval = rstate_gouraud;
-      break;
+      return rstate_gouraud;
     default:
-      retval = 0;
-      return E_INVALIDARG;
+      return 0;
   }
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
+void csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
 {
   if (!caps)
-    return E_INVALIDARG;
+    return;
 
   caps->ColorModel = G3DCOLORMODEL_RGB;
   caps->CanClip = false;
@@ -2692,25 +2569,22 @@ STDMETHODIMP csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
   caps->PrimaryCaps.PerspectiveCorrects = true;
   caps->PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
   caps->fog = G3D_FOGMETHOD((int)G3DFOGMETHOD_ZBUFFER);
-
-  return 1;
 }
 
-STDMETHODIMP csGraphics3DSoftware::ClearCache()
+void csGraphics3DSoftware::ClearCache()
 {
   if (tcache) tcache->clear ();
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DumpCache()
+void csGraphics3DSoftware::DumpCache()
 {
   if (tcache) tcache->dump();
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
+void csGraphics3DSoftware::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
 {
-  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
+  if (v1.z < SMALL_Z && v2.z < SMALL_Z)
+    return;
 
   float x1 = v1.x, y1 = v1.y, z1 = v1.z;
   float x2 = v2.x, y2 = v2.y, z2 = v2.z;
@@ -2743,9 +2617,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawLine (csVector3& v1, csVector3& v2, float
   int px2 = QInt (x2 * iz2 + (width/2));
   int py2 = height - 1 - QInt (y2 * iz2 + (height/2));
 
-  m_piG2D->DrawLine (px1, py1, px2, py2, color);
-
-  return S_OK;
+  G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
 void csGraphics3DSoftware::SysPrintf (int mode, char* szMsg, ...)
@@ -2757,39 +2629,34 @@ void csGraphics3DSoftware::SysPrintf (int mode, char* szMsg, ...)
   vsprintf (buf, szMsg, arg);
   va_end (arg);
 
-  m_piSystem->Print (mode, buf);
+  System->Print (mode, buf);
 }
 
-// IHaloRasterizer Implementation //
-
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED(csGraphics3DSoftware, HaloRasterizer);
+// iHaloRasterizer Implementation //
 
 // NOTE!!! This only works in 16-bit mode!!!
-STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo)
+void csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
 {
-  METHOD_PROLOGUE(csGraphics3DSoftware, HaloRasterizer)
-
-  if (pThis->pfmt.PixelBytes != 2)
-    return S_FALSE;
+  if (pfmt.PixelBytes != 2)
+    return;
 
   int izz = QInt24 (1.0f / pCenter->z);
-  HRESULT hRes = S_OK;
 
   if (haloInfo == NULL)
-    return E_INVALIDARG;
+    return;
 
-  int hdiv3 = pThis->height / 3;
+  int hdiv3 = height / 3;
 
-  if (pCenter->x > pThis->width  || pCenter->x < 0 ||
-      pCenter->y > pThis->height || pCenter->y < 0 )
-    hRes=S_FALSE;
+  if (pCenter->x > width  || pCenter->x < 0 ||
+      pCenter->y > height || pCenter->y < 0 )
+    return;
   else
   {
-    unsigned long zb = pThis->z_buffer[(int)pCenter->x + (pThis->width * (int)pCenter->y)];
+    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
 
     // first, do a z-test to make sure the halo is visible
     if (izz < (int)zb)
-      hRes = S_FALSE;
+      return;
   }
 
   // now, draw the halo
@@ -2803,10 +2670,10 @@ STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DrawHalo(csVector3* pCenter,
   int hh = hdiv3, hw = hdiv3;
 
   if (fIntensity <= 0.0f)
-    return S_FALSE;
+    return;
 
-  if (nx >= pThis->width || ny >= pThis->height)
-    return S_FALSE;
+  if (nx >= width || ny >= height)
+    return;
 
   if (nx < 0)
   {
@@ -2820,11 +2687,11 @@ STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DrawHalo(csVector3* pCenter,
     ny = 0;
   }
 
-  if (nx + hw > pThis->width)
-    hw -= (nx + hw) - pThis->width;
+  if (nx + hw > width)
+    hw -= (nx + hw) - width;
 
-  if (ny + hh > pThis->height)
-    hh -= (ny + hh) - pThis->height;
+  if (ny + hh > height)
+    hh -= (ny + hh) - height;
 
   int startx = nx - (QInt(pCenter->x) - (hdiv3 >> 1)),
       starty = ny - (QInt(pCenter->y) - (hdiv3 >> 1));
@@ -2833,7 +2700,7 @@ STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DrawHalo(csVector3* pCenter,
       br2, bg2, bb2;
 
   int red_shift, green_mask;
-  if (pThis->pfmt.GreenBits == 5)
+  if (pfmt.GreenBits == 5)
   {
     red_shift = 10;
     green_mask = 0x1f;
@@ -2852,8 +2719,8 @@ STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DrawHalo(csVector3* pCenter,
     unsigned short* pBufY;
     unsigned char* pAlphaBufY;
 
-    //pThis->m_piG2D->GetPixelAt(nx, ny + y, (unsigned char**)&pScreen);
-    pScreen = (unsigned short*)(pThis->line_table[ny+y] + (nx << pThis->pixel_shift));
+    //G2D->GetPixelAt(nx, ny + y, (unsigned char**)&pScreen);
+    pScreen = (unsigned short*)(line_table[ny+y] + (nx << pixel_shift));
     pBufY = &pBuffer[startx + (hdiv3 * (starty + y))];
     pAlphaBufY = &pAlphaBuffer[startx + (hdiv3 * (starty + y))];
 
@@ -2881,79 +2748,61 @@ STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DrawHalo(csVector3* pCenter,
       pScreen[x] = (br1<<red_shift) | (bg1<<5) | bb1;
     }
   }
-
-  return hRes;
 }
 
-STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::CreateHalo(float r, float g, float b, HALOINFO* pRetVal)
+csHaloHandle csGraphics3DSoftware::CreateHalo(float r, float g, float b)
 {
-  METHOD_PROLOGUE(csGraphics3DSoftware, HaloRasterizer)
+  csGraphics3DSoftware::csHaloDrawer halo (G2D, r, g, b);
 
-  pThis->m_piG2D->AddRef();
-  csGraphics3DSoftware::csHaloDrawer halo (pThis, pThis->m_piG2D, r, g, b);
-
-  CHK (csG3DSoftwareHaloInfo* retval = new csG3DSoftwareHaloInfo());
+  CHK (csG3DSoftwareHaloInfo* retval = new csG3DSoftwareHaloInfo ());
 
   retval->pbuf = halo.GetBuffer();
   retval->palpha = halo.GetAlphaBuffer();
 
-  *pRetVal = (HALOINFO)retval;
-
-  return S_OK;
+  return (csHaloHandle)retval;
 }
 
-STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DestroyHalo(HALOINFO haloInfo)
+void csGraphics3DSoftware::DestroyHalo(csHaloHandle haloInfo)
 {
   CHK (delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->pbuf);
   CHK (delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->palpha);
 
   CHK (delete (csG3DSoftwareHaloInfo*)haloInfo);
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::TestHalo (csVector3* pCenter)
+bool csGraphics3DSoftware::TestHalo (csVector3* pCenter)
 {
-  METHOD_PROLOGUE(csGraphics3DSoftware, HaloRasterizer)
-
   int izz = QInt24 (1.0f / pCenter->z);
 
-  if (pCenter->x > pThis->width  || pCenter->x < 0 ||
-      pCenter->y > pThis->height || pCenter->y < 0  )
-    return S_FALSE;
+  if (pCenter->x > width  || pCenter->x < 0 ||
+      pCenter->y > height || pCenter->y < 0  )
+    return false;
 
-  unsigned long zb = pThis->z_buffer[(int)pCenter->x + (pThis->width * (int)pCenter->y)];
+  unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
 
-  if (izz < (int)zb)
-    return S_FALSE;
-
-  return S_OK;
+  return (izz >= (int)zb);
 }
 
 /////////////
 
 // csHaloDrawer implementation //
 
-csGraphics3DSoftware::csHaloDrawer::csHaloDrawer (IGraphics3D* piG3D, IGraphics2D* piG2D,
-	float r, float g, float b)
+csGraphics3DSoftware::csHaloDrawer::csHaloDrawer (iGraphics2D* iG2D,
+  float r, float g, float b)
 {
   mpBuffer = NULL;
   mpAlphaBuffer = NULL;
+  (G2D = iG2D)->IncRef();
 
-  IGraphicsInfo* piGI;
-
-  piG2D->QueryInterface(IID_IGraphicsInfo, (void**)&piGI);
-  mpiG2D = piG2D;
-
-  piG3D->GetWidth (mWidth);
-  piG3D->GetHeight (mHeight);
+  mWidth = iG2D->GetWidth ();
+  mHeight = iG2D->GetHeight ();
 
   csPixelFormat pfmt;
-  piGI->GetPixelFormat (&pfmt);
+  pfmt = *G2D->GetPixelFormat ();
 
   if (pfmt.PixelBytes != 2)
   {
     red_shift = 0;
-    FINAL_RELEASE (piGI);
     return;
   }
 
@@ -3105,13 +2954,11 @@ csGraphics3DSoftware::csHaloDrawer::csHaloDrawer (IGraphics3D* piG3D, IGraphics2
 #endif
 
 #endif
-
-  FINAL_RELEASE (piGI);
 }
 
 csGraphics3DSoftware::csHaloDrawer::~csHaloDrawer()
 {
-  FINAL_RELEASE (mpiG2D);
+  G2D->DecRef ();
 }
 
 void csGraphics3DSoftware::csHaloDrawer::drawline_vertical(int /*x*/, int y1, int y2)
@@ -3297,11 +3144,9 @@ void csGraphics3DSoftware::csHaloDrawer::drawline_innerrim(int x1, int x2, int y
 
 //---------------------------------------------------------------------------
 
-// IXConfig3DSoft implementation
+#define NUM_OPTIONS 15
 
-IMPLEMENT_COMPOSITE_UNKNOWN (csGraphics3DSoftware, XConfig3DSoft)
-
-csOptionDescription IXConfig3DSoft::config_options[] =
+csOptionDescription csGraphics3DSoftware::config_options [NUM_OPTIONS] =
 {
   { 0, "ilace", "Interlacing", CSVAR_BOOL },
   { 1, "light", "Texture lighting", CSVAR_BOOL },
@@ -3320,79 +3165,71 @@ csOptionDescription IXConfig3DSoft::config_options[] =
   { 14, "lmonly", "Lightmap only", CSVAR_BOOL },
 };
 
-#define NUM_OPTIONS 15
-
-STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
+int csGraphics3DSoftware::GetOptionCount ()
 {
-  METHOD_PROLOGUE (csGraphics3DSoftware, XConfig3DSoft);
-  if (value->type != config_options[id].type) return E_FAIL;
-  switch (id)
-  {
-    case 0: pThis->do_interlaced = value->v.bVal ? 0 : -1; break;
-    case 1: pThis->do_lighting = value->v.bVal; break;
-    case 2: pThis->do_transp = value->v.bVal; break;
-    case 3: pThis->do_textured = value->v.bVal; break;
-    case 4: pThis->do_texel_filt = value->v.bVal; break;
-    case 5: pThis->do_bilin_filt = value->v.bVal; break;
-#ifdef DO_MMX
-    case 6: pThis->do_mmx = value->v.bVal; break;
-#endif
-    case 7: pThis->txtmgr->Gamma = value->v.fVal; break;
-    case 8: pThis->zdist_mipmap1 = value->v.fVal; break;
-    case 9: pThis->zdist_mipmap2 = value->v.fVal; break;
-    case 10: pThis->zdist_mipmap3 = value->v.fVal; break;
-    case 11: pThis->rstate_gouraud = value->v.bVal; break;
-    case 12: pThis->do_smaller_rendering = value->v.bVal; break;
-    case 13: pThis->txtmgr->do_lightmapgrid = value->v.bVal; break;
-    case 14: pThis->txtmgr->do_lightmaponly = value->v.bVal; break;
-    default: return E_FAIL;
-  }
-  pThis->ScanSetup ();
-  return S_OK;
+  return NUM_OPTIONS;
 }
 
-STDMETHODIMP IXConfig3DSoft::GetOption (int id, csVariant* value)
+bool csGraphics3DSoftware::SetOption (int id, csVariant* value)
 {
-  METHOD_PROLOGUE (csGraphics3DSoftware, XConfig3DSoft);
+  if (value->type != config_options[id].type)
+    return false;
+  switch (id)
+  {
+    case 0: do_interlaced = value->v.bVal ? 0 : -1; break;
+    case 1: do_lighting = value->v.bVal; break;
+    case 2: do_transp = value->v.bVal; break;
+    case 3: do_textured = value->v.bVal; break;
+    case 4: do_texel_filt = value->v.bVal; break;
+    case 5: do_bilin_filt = value->v.bVal; break;
+#ifdef DO_MMX
+    case 6: do_mmx = value->v.bVal; break;
+#endif
+    case 7: txtmgr->Gamma = value->v.fVal; break;
+    case 8: zdist_mipmap1 = value->v.fVal; break;
+    case 9: zdist_mipmap2 = value->v.fVal; break;
+    case 10: zdist_mipmap3 = value->v.fVal; break;
+    case 11: rstate_gouraud = value->v.bVal; break;
+    case 12: do_smaller_rendering = value->v.bVal; break;
+    case 13: txtmgr->do_lightmapgrid = value->v.bVal; break;
+    case 14: txtmgr->do_lightmaponly = value->v.bVal; break;
+    default: return false;
+  }
+  ScanSetup ();
+  return true;
+}
+
+bool csGraphics3DSoftware::GetOption (int id, csVariant* value)
+{
   value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.bVal = pThis->do_interlaced != -1; break;
-    case 1: value->v.bVal = pThis->do_lighting; break;
-    case 2: value->v.bVal = pThis->do_transp; break;
-    case 3: value->v.bVal = pThis->do_textured; break;
-    case 4: value->v.bVal = pThis->do_texel_filt; break;
-    case 5: value->v.bVal = pThis->do_bilin_filt; break;
+    case 0: value->v.bVal = do_interlaced != -1; break;
+    case 1: value->v.bVal = do_lighting; break;
+    case 2: value->v.bVal = do_transp; break;
+    case 3: value->v.bVal = do_textured; break;
+    case 4: value->v.bVal = do_texel_filt; break;
+    case 5: value->v.bVal = do_bilin_filt; break;
 #ifdef DO_MMX
-    case 6: value->v.bVal = pThis->do_mmx; break;
+    case 6: value->v.bVal = do_mmx; break;
 #endif
-    case 7: value->v.fVal = pThis->txtmgr->Gamma; break;
-    case 8: value->v.fVal = pThis->zdist_mipmap1; break;
-    case 9: value->v.fVal = pThis->zdist_mipmap2; break;
-    case 10: value->v.fVal = pThis->zdist_mipmap3; break;
-    case 11: value->v.bVal = pThis->rstate_gouraud; break;
-    case 12: value->v.bVal = pThis->do_smaller_rendering; break;
-    case 13: value->v.bVal = pThis->txtmgr->do_lightmapgrid; break;
-    case 14: value->v.bVal = pThis->txtmgr->do_lightmaponly; break;
-    default: return E_FAIL;
+    case 7: value->v.fVal = txtmgr->Gamma; break;
+    case 8: value->v.fVal = zdist_mipmap1; break;
+    case 9: value->v.fVal = zdist_mipmap2; break;
+    case 10: value->v.fVal = zdist_mipmap3; break;
+    case 11: value->v.bVal = rstate_gouraud; break;
+    case 12: value->v.bVal = do_smaller_rendering; break;
+    case 13: value->v.bVal = txtmgr->do_lightmapgrid; break;
+    case 14: value->v.bVal = txtmgr->do_lightmaponly; break;
+    default: return false;
   }
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP IXConfig3DSoft::GetNumberOptions (int& num)
+bool csGraphics3DSoftware::GetOptionDescription (int idx, csOptionDescription* option)
 {
-//METHOD_PROLOGUE (csGraphics3DSoftware, XConfig3DSoft);
-  num = NUM_OPTIONS;
-  return S_OK;
-}
-
-STDMETHODIMP IXConfig3DSoft::GetOptionDescription (int idx, csOptionDescription* option)
-{
-//METHOD_PROLOGUE (csGraphics3DSoftware, XConfig3DSoft);
-  if (idx < 0 || idx >= NUM_OPTIONS) return E_FAIL;
+  if (idx < 0 || idx >= NUM_OPTIONS)
+    return false;
   *option = config_options[idx];
-  return S_OK;
+  return true;
 }
-
-//---------------------------------------------------------------------------
-

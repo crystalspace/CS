@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include "sysdef.h"
 #include "cs2d/openglx/glx2d.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "cssys/unix/iunix.h"
@@ -27,34 +27,38 @@
 #include "isystem.h"
 #include "itexture.h"
 
-BEGIN_INTERFACE_TABLE (csGraphics2DGLX)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DGLX)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DGLX)
+EXPORT_CLASS_TABLE (glx2d)
+  EXPORT_CLASS (csGraphics2DGLX, "crystalspace.graphics2d.glx",
+    "GL/X OpenGL 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
 // csGraphics2DGLX function
-csGraphics2DGLX::csGraphics2DGLX (ISystem* piSystem) :
-  csGraphics2DGLCommon (piSystem), xim (NULL), cmap (0)
+csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
+  csGraphics2DGLCommon (iParent), xim (NULL), cmap (0)
 {
-  if (FAILED (System->QueryInterface (IID_IUnixSystemDriver, (void**)&UnixSystem)))
+}
+
+bool csGraphics2DGLX::Initialize (iSystem *pSystem)
+{
+  if (!csGraphics2DGLCommon::Initialize (pSystem))
+    return false;
+
+  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
+  if (!UnixSystem)
   {
     CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
                                "the IUnixSystemDriver interface\n");
-    exit (-1);
+    return false;
   }
-}
 
-void csGraphics2DGLX::Initialize ()
-{
-  csGraphics2DGLCommon::Initialize ();
   Screen* screen_ptr;
 
   // Query system settings
   int sim_depth;
   bool do_shm;
-  UnixSystem->GetSettings (sim_depth, do_shm, do_hwmouse);
+  UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
   if (!dpy)
@@ -135,10 +139,7 @@ void csGraphics2DGLX::Initialize ()
   else
     pfmt.PixelBytes = 2;		// Truecolor mode
 
-  DrawPixel = DrawPixelGL;
-  WriteChar = WriteCharGL;
-  GetPixelAt = GetPixelAtGL;
-  DrawSprite = DrawSpriteGL;
+  return true;
 }
 
 csGraphics2DGLX::~csGraphics2DGLX ()
@@ -146,7 +147,7 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   // Destroy your graphic interface
   Close ();
   if (UnixSystem)
-    FINAL_RELEASE (UnixSystem);
+    UnixSystem->DecRef ();
   CHKB (delete [] Memory);
 }
 
@@ -309,7 +310,7 @@ bool csGraphics2DGLX::SetMousePosition (int x, int y)
   return true;
 }
 
-bool csGraphics2DGLX::SetMouseCursor (int iShape, ITextureHandle* /*iBitmap*/)
+bool csGraphics2DGLX::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* /*iBitmap*/)
 {
   if (do_hwmouse
    && (iShape >= 0)

@@ -1,30 +1,23 @@
-#include <ddraw.h>
-#include "cscom/com.h"
-#include "cssys/win32/iddetect.h"
-
 #ifndef __IDD6G2D_H__
 #define __IDD6G2D_H__
 
-extern const IID IID_IDDraw6GraphicsInfo;
+#include <ddraw.h>
+#include "csutil/scf.h"
+#include "cssys/win32/iddetect.h"
 
-/// IDDraw6GraphicsInfo interface -- for Win32-specific properties.
-interface IDDraw6GraphicsInfo : public IUnknown
+/// iGraphics2DDDraw6 interface -- for Win32-specific properties.
+SCF_INTERFACE (iGraphics2DDDraw6, 0, 0, 1) : public iBase
 {
-    ///
-    STDMETHOD(Open)(char* szTitle) = 0;
-    ///
-    STDMETHOD(Close)() = 0;
-    ///
-//    STDMETHOD(GetDirectDrawDriver)( LPDIRECTDRAW* lplpDirectDraw ) = 0;
-    STDMETHOD(GetDirectDrawDriver)( LPDIRECTDRAW4* lplpDirectDraw ) = 0;
-    ///
-    STDMETHOD(GetDirectDrawPrimary)( LPDIRECTDRAWSURFACE4* lplpDirectDrawPrimary ) = 0;
-    ///
-    STDMETHOD(GetDirectDrawBackBuffer)( LPDIRECTDRAWSURFACE4* lplpDirectDrawBackBuffer ) = 0;
-    ///
-    STDMETHOD(GetDirectDetection)(IDirectDetectionInternal** lplpDDetection ) = 0;
-    ///
-    STDMETHOD(SetColorPalette)(void) = 0;
+  ///
+  virtual void GetDirectDrawDriver (LPDIRECTDRAW4* lplpDirectDraw) = 0;
+  ///
+  virtual void GetDirectDrawPrimary (LPDIRECTDRAWSURFACE4* lplpDirectDrawPrimary) = 0;
+  ///
+  virtual void GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE4* lplpDirectDrawBackBuffer) = 0;
+  ///
+  virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection) = 0;
+  ///
+  virtual void SetColorPalette (void) = 0;
 };
 
 #endif

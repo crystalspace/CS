@@ -30,7 +30,7 @@
 
 #define	MAX_ARGS	25
 
-class IMacGraphicsInfo;
+class iMacGraphicsInfo;
 
 class SysSystemDriver : public csSystemDriver
 {
@@ -40,7 +40,7 @@ public:
 
 	virtual void Close();
 
-	virtual bool Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, IConfig* cfg_engine);
+	virtual bool Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, iConfig* cfg_engine);
 	virtual bool ParseArg(int argc, char* argv[], int &i);
 	virtual void SystemHelp(void);
 	virtual void Loop();
@@ -51,14 +51,14 @@ public:
 	OSErr		HandleAppleEvent( AppleEvent *theEvent );
 
 private:
-	void		DispatchEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D );
-	void		HandleMouseEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D );
+	void		DispatchEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D );
+	void		HandleMouseEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D );
 	void		HandleMenuUpdate( void );
 	void		HandleMenuSelection( const short menuNum, const short itemNum );
-	void		HandleKey( long current_time, const char key, const char keycode, const short modifiers, bool down );
-	void		HandleHLEvent( long current_time, EventRecord *theEvent );
-	void		HandleOSEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D );
-	void		ScanKeyboard( long current_time );
+	void		HandleKey( time_t current_time, const char key, const char keycode, const short modifiers, bool down );
+	void		HandleHLEvent( time_t current_time, EventRecord *theEvent );
+	void		HandleOSEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D );
+	void		ScanKeyboard( time_t current_time );
 	int			GetCommandLine( char ***arg );
 	int			ParseCommandLine( char *s );
 

@@ -21,89 +21,73 @@
 #ifndef __INETMAN_H__
 #define __INETMAN_H__
 
-#include "cscom/com.h"
-#include "csnetman/nmandefs.h"	        //@@@BAD
-
-interface ISystem;
-
-extern const GUID IID_INetworkManager;
+#include "csutil/scf.h"
 
 /**
  * This is the network manager interface for CS.
  * All network drivers must implement this interface.
  * The standard implementation is csNetworkManagerNull.
  */
-interface INetworkManager : public IUnknown
+SCF_INTERFACE (iNetworkManager, 0, 0, 1) : public iBase
 {
-public:
   /// Open the network manager (should not be called by user)
-  STDMETHOD (Open) () PURE;
+  virtual bool Open () = 0;
   /// Close the network manager (should not be called by user)
-  STDMETHOD (Close) () PURE;
+  virtual void Close () = 0;
 
   /// Should be called every frame
-  STDMETHOD (DoFrame) () PURE;
+  virtual void DoFrame () = 0;
 
   /// Game management
-  STDMETHOD (CreateGame) (unsigned short iNumOfPlayers) PURE;
+  virtual void CreateGame (unsigned short iNumPlayers) = 0;
 
-  STDMETHOD (KillGame) () PURE;
+  virtual void KillGame () = 0;
 
-  STDMETHOD (JoinGame) () PURE;
+  virtual void JoinGame () = 0;
 
-  STDMETHOD (LeaveGame) () PURE;
+  virtual void LeaveGame () = 0;
 
-  STDMETHOD (EnumerateGames) () PURE;
+  virtual void EnumerateGames () = 0;
 
-  STDMETHOD (GetGameData) () PURE;
+  virtual void GetGameData () = 0;
 
-  STDMETHOD (SetGameData) () PURE;
+  virtual void SetGameData () = 0;
 
   /// Player management
-  STDMETHOD (CreatePlayer) () PURE;
+  virtual void CreatePlayer () = 0;
 
-  STDMETHOD (KillPlayer) () PURE;
+  virtual void KillPlayer () = 0;
 
-  STDMETHOD (GetPlayerData) () PURE;
+  virtual void GetPlayerData () = 0;
 
-  STDMETHOD (SetPlayerData) () PURE;
+  virtual void SetPlayerData () = 0;
 
-  STDMETHOD (AddPlayerToGroup) () PURE;
+  virtual void AddPlayerToGroup () = 0;
 
-  STDMETHOD (RemovePlayerFromGroup) () PURE;
+  virtual void RemovePlayerFromGroup () = 0;
 
   /// Group management
-  STDMETHOD (CreateGroup) () PURE;
+  virtual void CreateGroup () = 0;
 
-  STDMETHOD (KillGroup) () PURE;
+  virtual void KillGroup () = 0;
 
-  STDMETHOD (GetGroupData) () PURE;
+  virtual void GetGroupData () = 0;
 
-  STDMETHOD (SetGroupData) () PURE;
+  virtual void SetGroupData () = 0;
 
   /// Message management
-  STDMETHOD (Send) () PURE;
+  virtual void Send () = 0;
 
-  STDMETHOD (Receive) () PURE;
+  virtual void Receive () = 0;
 
-  STDMETHOD (GetMessageCount) () PURE;
+  virtual void GetMessageCount () = 0;
 
-  STDMETHOD (PeekMessage) () PURE;
+  virtual void PeekMessage () = 0;
 
   /// Utility stuff
-  STDMETHOD (GetLastError) () PURE;
+  virtual void GetLastError () = 0;
 
-  STDMETHOD (GetCaps) () PURE;
-};
-
-extern const IID IID_INetworkManagerFactory;
-
-interface INetworkManagerFactory : public IUnknown
-{
-  ///
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem * piSystem, void **ppv) PURE;
-  /// Lock or unlock from memory.
-  STDMETHOD (LockServer) (COMBOOL bLock) PURE;
+  virtual void GetCaps () = 0;
 };
 
 #endif	//__INETMAN_H__

@@ -345,7 +345,7 @@ void TextureCache16::create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLighte
   int blu_0, blu_1, blu_d, blu_0d, blu_1d;
   int red, gre, blu;
 
-  unsigned char* rgb_values = tcd.txt_mm->get_colormap_private ();
+  unsigned char* rgb_values = tcd.txt_mm->GetPrivateColorMap ();
   unsigned char* rgb;
 
   PalIdxLookup* lt_light = txtmgr->lt_light;

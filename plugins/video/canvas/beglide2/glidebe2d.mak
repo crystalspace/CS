@@ -23,6 +23,8 @@ all drivers drivers2d: glidebe2d
 
 glidebe2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+glidebe2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -45,13 +47,7 @@ else
 endif
 DESCRIPTION.$(GLIDEBE2D) = $(DESCRIPTION.glidebe2d)
 SRC.GLIDEBE2D = $(wildcard libs/cs2d/beglide2/*.cpp \
-	$(SRC.GLIDE2COMMON2D) \
-	libs/cs3d/glide2/glcache.cpp libs/cs3d/glide2/hicache.cpp \
-	libs/cs3d/glide2/hicache2.cpp libs/cs3d/glide2/gl_txtmgr.cpp \
-	libs/cs3d/glide2/itexture.cpp \
-	libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
-	libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp \
-	$(SRC.COMMON.DRV2D))
+	$(SRC.COMMON.DRV2D.GLIDE) $(SRC.COMMON.DRV2D))
 OBJ.GLIDEBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLIDEBE2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -59,11 +55,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glidebe2d glidebeclean glidebecleanlib
+.PHONY: glidebe2d glidebeclean
 
 # Chain rules
 clean: glidebeclean
-cleanlib: glidebecleanlib
 
 glidebe2d: $(OUTDIRS) $(GLIDEBE2D)
 
@@ -74,10 +69,7 @@ $(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.
 	$(DO.PLUGIN) $(LIBS.GLIDEBE2D)
 
 glidebeclean:
-	$(RM) $(GLIDEBE2D)
-
-glidebecleanlib:
-	$(RM) $(OBJ.GLIDEBE2D) $(GLIDEBE2D)
+	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)glidebe2d.dep

@@ -16,87 +16,19 @@
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssys/csshlib.h"
 
-#ifdef NO_COM_SUPPORT
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "cscom/com.h"
-
-PROC SysGetProcAddress (CS_LIBRARY, const char*);
-
-struct LibraryList
+csLibraryHandle csLoadLibrary (const char* iName)
 {
-  CS_LIBRARY Handle;
-  LibraryList *Next;
-};
-
-static LibraryList *LibList = NULL;
-
-CS_HLIBRARY SysLoadLibrary (const char* szLibName)
-{
-#if 0
-  LibraryList* Item;
-  CS_LIBRARY Handle;
-  HRESULT (*DllInitialize) ();
-
-  Handle = (CS_LIBRARY)dlopen (szLibName, RTLD_LAZY);
-
-  if (Handle)
-  {
-	DllInitialize = (HRESULT (*) ())SysGetProcAddress (Handle, "DllInitialize");
-	if (!DllInitialize)
-	{
-	  printf("Unable to find DllInitialize in %s\n", szLibName);
-	  return 0;
-	}
-	(DllInitialize) ();
-
-	Item = new LibraryList;
-	Item->Next = LibList;
-	Item->Handle = Handle;
-	LibList = Item;
-  }
-  else
-  {
-	printf ("Error opening library '%s'!\nReason '%s'!\n", szLibName, dlerror ());
-  }
-
-  return Handle;
-#else
-	return 0;
-#endif
+  return 0;
 }
 
-PROC SysGetProcAddress (CS_LIBRARY Handle, const char* szProcName)
+void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
 {
-#if 0
-  return dlsym ((void*)Handle, szProcName);
-#else
-	return 0;
-#endif
+  return 0;
 }
 
-bool SysFreeLibrary(CS_HLIBRARY)
+bool csUnloadLibrary (csLibraryHandle Handle)
 {
   return true;
 }
-
-bool SysFreeAllLibraries()
-{
-#if 0
-  LibraryList* Current = LibList;
-
-  while (Current)
-  {
-	LibraryList* Next = Current->Next;
-	dlclose ((void*)Current->Handle);
-	delete Current;
-	Current = Next;
-  }
-#endif
-  return true;
-}
-
-#endif

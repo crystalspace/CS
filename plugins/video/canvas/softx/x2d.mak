@@ -21,6 +21,8 @@ all drivers drivers2d: x2d
 
 x2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+x2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -51,11 +53,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: x2d libxclean libxcleanlib
+.PHONY: x2d libxclean
 
 # Chain rules
 clean: libxclean
-cleanlib: libxcleanlib
 
 x2d: $(OUTDIRS) $(XLIB2D)
 
@@ -66,10 +67,7 @@ $(XLIB2D): $(OBJ.XLIB2D) $(DEP.X2D)
 	$(DO.PLUGIN) $(LIBS.LOCAL.X2D)
 
 libxclean:
-	$(RM) $(XLIB2D)
-
-libxcleanlib:
-	$(RM) $(OBJ.XLIB2D) $(XLIB2D)
+	$(RM) $(XLIB2D) $(OBJ.XLIB2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)x2d.dep

@@ -37,7 +37,7 @@ private:
   /// Texture X, Y, width, height, hotspot X and Y
   int tX, tY, tW, tH, hsX, hsY;
   /// Area under mouse cursor
-  ImageArea *Under;
+  csImageArea *Under;
 
 public:
   /// Initializes mouse cursor
@@ -57,7 +57,7 @@ public:
   void Free ();
 
   /// Set mouse cursor texture
-  void SetTexture (ITextureHandle *tex);
+  void SetTexture (iTextureHandle *tex);
 };
 
 /**

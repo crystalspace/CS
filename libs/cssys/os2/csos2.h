@@ -1,21 +1,20 @@
 /*
-  OS/2 support for Crystal Space 3D library
-  Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>
+    OS/2 support for Crystal Space 3D library
+    Copyright (C) 1998 by Andrew Zabolotny <bit@eltech.ru>
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef __CSOS2_H__
@@ -29,7 +28,7 @@
  * This is the System driver for OS/2. It implements all required
  * functionality for standard csSystemDriver class.
  */
-class SysSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver, public iOS2SystemDriver
 {
   /// Window position in percents
   int WindowX, WindowY;
@@ -39,6 +38,8 @@ class SysSystemDriver : public csSystemDriver
   bool HardwareCursor;
 
 public:
+  DECLARE_IBASE;
+
   /// Initialize system-dependent data
   SysSystemDriver ();
 
@@ -62,27 +63,13 @@ public:
   /// The system is idle: we can sleep for a while
   virtual void Sleep (int SleepTime);
 
-  /// Implementation of IOS2SystemDriver
-  class XOS2SystemDriver : public IOS2SystemDriver
-  {
-    DECLARE_IUNKNOWN ()
-    /// Get user settings
-    STDMETHOD (GetSettings) (int &WindowX, int &WindowY,
-      int &WindowWidth, int &WindowHeight, bool &HardwareCursor);
-    /// Put a keyboard event into event queue
-    STDMETHOD (KeyboardEvent) (int ScanCode, bool Down);
-    /// Put a mouse event into event queue
-    STDMETHOD (MouseEvent) (int Button, int Down, int x, int y, int ShiftFlags);
-    /// Put a focus change event into event queue
-    STDMETHOD (FocusEvent) (bool Enable);
-    /// Handle application termination event
-    STDMETHOD (TerminateEvent) ();
-  };
+  /// Implementation of iOS2SystemDriver
 
-  // COM stuff
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (SysSystemDriver)
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (OS2SystemDriver)
+  /// Get user settings
+  virtual void GetExtSettings (int &oWindowX, int &oWindowY,
+    int &oWindowWidth, int &oWindowHeight, bool &oHardwareCursor);
+  /// Put a keyboard event into event queue
+  virtual void KeyboardEvent (int ScanCode, bool Down);
 
 protected:
   /**
@@ -92,36 +79,26 @@ protected:
    * its parent class method.
    */
   virtual bool ParseArg (int argc, char* argv[], int& i);
-  /// Called when CrystalSpace window changes its "focused" state
-  void FocusHandler (bool Enable);
-  /// Called when window is closed by user
-  void TerminateHandler ();
 };
 
 /**
  * This is the Keyboard class for OS/2. All of its functionality
- * is included in the 2D graphics driver; this class is just a
- * container for the handler function.
+ * is included in the 2D graphics driver.
  */
 class SysKeyboardDriver : public csKeyboardDriver
 {
 public:
   SysKeyboardDriver ();
-
-  void Handler (unsigned char ScanCode, bool Down);
 };
 
 /**
  * This is the Mouse class for OS/2. All of its functionality
- * is included in the 2D graphics driver; this class is just a
- * container for the handler function.
+ * is included in the 2D graphics driver.
  */
 class SysMouseDriver : public csMouseDriver
 {
 public:
   SysMouseDriver ();
-
-  void Handler (int Button, int Down, int x, int y, int ShiftFlags);
 };
 
 #endif // __CSOS2_H__

@@ -17,7 +17,7 @@
 */ 
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 // ModuleHandle is defined once in libCsCOM
 extern HINSTANCE ModuleHandle;
@@ -26,10 +26,7 @@ extern HINSTANCE ModuleHandle;
 extern "C" BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/)
 {
   if (fdwReason == DLL_PROCESS_ATTACH)
-  {
     ModuleHandle = hinstDLL;
-    DllInitialize ();
-  }
 
   return TRUE;
 }

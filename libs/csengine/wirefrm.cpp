@@ -28,14 +28,14 @@
 #include "igraph2d.h"
 #include "itxtmgr.h"
 
-csWfColor::csWfColor (ITextureManager* txtmgr, int r, int g, int b)
+csWfColor::csWfColor (iTextureManager* txtmgr, int r, int g, int b)
 {
   csWfColor::r = r;
   csWfColor::g = g;
   csWfColor::b = b;
   int i;
   for (i = 0 ; i < 16 ; i++)
-    txtmgr->FindRGB (r*(20-i)/20, g*(20-i)/20, b*(20-i)/20, col_idx[i]);
+    col_idx[i] = txtmgr->FindRGB (r*(20-i)/20, g*(20-i)/20, b*(20-i)/20);
 }
 
 int csWfColor::GetColor (float z)
@@ -70,12 +70,12 @@ bool csWfObject::Perspective (csCamera* c, csVector3& v, csVector2& persp, float
   else return false;
 }
 
-void csWfVertex::Draw (IGraphics3D* g, csCamera* c)
+void csWfVertex::Draw (iGraphics3D* g, csCamera* c)
 {
   csVector2 persp;
   float rad;
   int r, px, py;
-  IGraphics2D* g2d;
+  iGraphics2D* g2d;
 
   if (Perspective (c, loc, persp, PLANE_VERTEX_RADIUS, rad))
   {
@@ -85,7 +85,7 @@ void csWfVertex::Draw (IGraphics3D* g, csCamera* c)
     r = QInt (rad);
     px = QInt (persp.x);
     py = QInt (persp.y);
-    g->Get2dDriver (&g2d);
+    g2d = g->GetDriver2D ();
     g2d->DrawLine (px-r, py-r, px+r, py+r, col);
     g2d->DrawLine (px+r, py-r, px-r, py+r, col);
     //if (cross)
@@ -96,7 +96,7 @@ void csWfVertex::Draw (IGraphics3D* g, csCamera* c)
   }
 }
 
-void csWfLine::Draw (IGraphics3D* g, csCamera* c)
+void csWfLine::Draw (iGraphics3D* g, csCamera* c)
 {
   csVector3 cam1 = c->Other2This (v1);
   csVector3 cam2 = c->Other2This (v2);
@@ -184,7 +184,7 @@ bool csWfPolygon::IsVisible (csCamera* camera)
   return csPlane::Classify (A, B, C, D, camera->GetOrigin ()) < 0;
 }
 
-void csWfPolygon::Draw (IGraphics3D* g, csCamera* c)
+void csWfPolygon::Draw (iGraphics3D* g, csCamera* c)
 {
   int i;
   csVector3 cam1, cam2;
@@ -203,7 +203,7 @@ void csWfPolygon::Draw (IGraphics3D* g, csCamera* c)
 
 //=================================================================================================
 
-csWireFrame::csWireFrame (ITextureManager* txtmgr)
+csWireFrame::csWireFrame (iTextureManager* txtmgr)
 {
   objects = NULL;
   numObjects = 0;
@@ -300,7 +300,7 @@ csWfPolygon* csWireFrame::AddPolygon ()
   return po;
 }
 
-void csWireFrame::Draw (IGraphics3D* g, csCamera* c)
+void csWireFrame::Draw (iGraphics3D* g, csCamera* c)
 {
   csWfObject* o = objects;
   while (o)
@@ -320,7 +320,7 @@ void csWireFrame::Apply (void (*func)( csWfObject*, void*), void *param)
   }
 }
 
-csWireFrameCam::csWireFrameCam (ITextureManager* txtmgr)
+csWireFrameCam::csWireFrameCam (iTextureManager* txtmgr)
 {
   CHK (wf = new csWireFrame (txtmgr));
   CHK (c = new csCamera ());

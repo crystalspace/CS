@@ -26,7 +26,7 @@
 #include "csengine/world.h"
 #include "csgfxldr/csimage.h"
 #include "cssys/system.h"
-#include "csutil/csstrvec.h"
+#include "csutil/scfstrv.h"
 #include "itexture.h"
 #include "itxtmgr.h"
 
@@ -205,11 +205,9 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
       if (!defaulttexture)
         defaulttexture = world->GetTextures()->NewTexture(newskin);
 /*
-      ITextureManager *txtmgr;
-      System->piG3D->GetTextureManager(&txtmgr);
-      ITextureHandle *th;
-      txtmgr->RegisterTexture(GetIImageFileFromImageFile(defaulttexture->GetImageFile()),&th,
-      			defaulttexture->for_3d,defaulttexture->for_2d);
+      iTextureManager *txtmgr = System->G3D->GetTextureManager ();
+      iTextureHandle *th = txtmgr->RegisterTexture(defaulttexture->GetImageFile(),
+        defaulttexture->for_3d, defaulttexture->for_2d);
       defaulttexture->SetTextureHandle(th);
       */
 
@@ -308,7 +306,7 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& mesh
 }
 
 csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer()
-      : localVFS (*(System->Vfs) )
+      : localVFS (*(System->VFS) )
 {
 }
 
@@ -415,14 +413,14 @@ csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
 			csWorld *importdestination) const
 {
   // go through and load all .pcx and .bmp files in the archive
-  csStrVector *skinlist = localVFS.FindFiles(skinpath);
+  iStrVector *skinlist = localVFS.FindFiles(skinpath);
   int const skinfilecount = skinlist->Length();
 
   csTextureHandle *defaulttexture = NULL;
 
   for (int skinfileindex = 0; skinfileindex < skinfilecount; skinfileindex++)
   {
-    char *skinfilename = (char *)skinlist->Get(skinfileindex);
+    char *skinfilename = skinlist->Get(skinfileindex);
 
     // if the file name ends in .pcx, load it
     char *fileextension = skinfilename + strlen(skinfilename) - 3;
@@ -433,19 +431,17 @@ csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
       size_t imagefilesize;
       char *imagedata = localVFS.ReadFile(skinfilename,imagefilesize);
 
-      ImageFile *newskin = ImageLoader::load((unsigned char *)imagedata,imagefilesize);
+      csImageFile *newskin = ImageLoader::load((unsigned char *)imagedata,imagefilesize);
 
       CHK (delete [] imagedata);
 
       //if (!defaulttexture)
       defaulttexture = importdestination->GetTextures()->NewTexture(newskin);
 
-      ITextureManager *txtmgr;
-      System->piG3D->GetTextureManager(&txtmgr);
-      ITextureHandle *th;
-      txtmgr->RegisterTexture(GetIImageFileFromImageFile(defaulttexture->GetImageFile()),&th,
-      			defaulttexture->for_3d,defaulttexture->for_2d);
-      defaulttexture->SetTextureHandle(th);
+      iTextureManager *txtmgr = System->G3D->GetTextureManager ();
+      iTextureHandle *th = txtmgr->RegisterTexture (defaulttexture->GetImageFile (),
+        defaulttexture->for_3d, defaulttexture->for_2d);
+      defaulttexture->SetTextureHandle (th);
 
       printf("added texture %s...\n",skinfilename);
 
@@ -463,7 +459,7 @@ csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
     }
   } /* end for(int skinfileindex...) */
 
-  delete skinlist;
+  skinlist->DecRef ();
 
   return defaulttexture;
 }

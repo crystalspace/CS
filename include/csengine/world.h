@@ -19,16 +19,14 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math3d.h"
 #include "csobject/nobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/tranman.h"
 #include "csobject/csobj.h"
-#include "csutil/cleanup.h"
-#include "csengine/ibase.h"
-#include "csengine/newclass.h"
-#include "csengine/iextensn.h"
+#include "iworld.h"
+#include "iconfig.h"
 
 class csSector;
 class csTextureList;
@@ -40,7 +38,6 @@ class csThingTemplate;
 class csCollection;
 class csStatLight;
 class csDynLight;
-class csLoaderExtensions;
 class csSpriteTemplate;
 class csClipper;
 class csQuadcube;
@@ -48,19 +45,14 @@ class csWorld;
 class Dumper;
 class csLight;
 class csHaloInformation;
-class csIniFile;
-class csEngineConfig;
 class csCBuffer;
 class csQuadtree;
 class csPoly2DPool;
 class csLightPatchPool;
-class csVFS;
-interface IHaloRasterizer;
-interface IGraphics3D;
-interface IGraphicsInfo;
-interface ISystem;
-interface IConfig;
-interface ISpriteTemplate;
+scfInterface iHaloRasterizer;
+scfInterface iGraphics3D;
+scfInterface iSystem;
+scfInterface iVFS;
 
 /**
  * Flag for GetNearbyLights().
@@ -147,7 +139,7 @@ public:
  * The world! This class basicly represents the 3D engine.
  * It is the main anchor class for working with Crystal Space.
  */
-class csWorld : public csObject
+class csWorld : public iWorld, public iConfig, public csObject
 {
   friend class Dumper;
 
@@ -160,18 +152,7 @@ public:
    * since they are highly system-dependent (for example, DOS uses
    * '\' as path separator, Mac uses ':' and Unix uses '/').
    */
-  static csVFS *vfs;
-
-  /**
-   * This is the Class Spawner, you use it to allow other processes
-	 * to create objects in this process for speed and compatibility
-   */
-  csClassSpawner *cs;
-
-  /**
-   * This is the Plugin Loader, you use it to load files by plugins
-   */
- 	csLoaderExtensions *plugins;
+  iVFS *VFS;
 
   /**
    * This is a vector which holds objects of type 'csCleanable'.
@@ -184,7 +165,7 @@ public:
    * encapsulating that memory to this array will ensure that the
    * memory is removed once the world is destroyed.
    */
-  csCleanup cleanup;
+  csObjVector cleanup;
 
   /**
    * List of sectors in the world. This vector contains
@@ -235,8 +216,8 @@ public:
 
   // Remember dimensions of display.
   static int frame_width, frame_height;
-  // Remember ISystem interface.
-  static ISystem* isys;
+  // Remember iSystem interface.
+  static iSystem* System;
   // Current world.
   static csWorld* current_world;
   // An object pool for 2D polygons used by the rendering process.
@@ -245,6 +226,8 @@ public:
   csLightPatchPool* lightpatch_pool;
   // The transformation manager.
   csTransformationManager tr_manager;
+  // The 3D driver
+  iGraphics3D* G3D;
 
 private:
   /// Texture and color information object.
@@ -254,9 +237,7 @@ private:
   /// List of halos (csHaloInformation).
   csVector halos;  
   /// The Halo rasterizer. If NULL halo's are not supported by the rasterizer.
-  IHaloRasterizer* piHR;
-  /// The engine configurator object.
-  csEngineConfig* cfg_engine;
+  iHaloRasterizer* HaloRast;
   /// If true then the lighting cache is enabled.
   bool do_lighting_cache;
 
@@ -270,7 +251,7 @@ private:
   csQuadcube* quadcube;
 
   ///
-  void ShineLights (IGraphics3D* g3d);
+  void ShineLights ();
 
 public:
   /**
@@ -303,7 +284,7 @@ public:
    * after creating the world is the configurator object which you
    * can use to configure the world before continuing (see GetEngineConfig()).
    */
-  csWorld ();
+  csWorld (iBase *iParent);
 
   /**
    * Delete the world and all entities in the world. All objects added to this
@@ -312,13 +293,6 @@ public:
    * the world.
    */
   virtual ~csWorld ();
-
-  /**
-   * Initialize the world. This function must be called before
-   * you do anything else with this world. It will read the configuration
-   * file (ReadConfig()) and start a new empty world (StartWorld()).
-   */
-  bool Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csVFS *vfs);
 
   /**
    * Check consistency of the loaded world. Currently this function only
@@ -333,7 +307,7 @@ public:
    * for the texture manager. (Normally you shouldn't call this function
    * directly, because it will be called by Prepare() for you.
    */
-  void PrepareTextures (IGraphics3D* g3d);
+  void PrepareTextures ();
 
   /**
    * Prepare all the loaded sectors. (Normally you shouldn't call this 
@@ -348,7 +322,7 @@ public:
    * the texture manager (the texture manager should have them
    * locally now).
    */
-  bool Prepare (IGraphics3D* g3d);
+  bool Prepare ();
 
   /**
    * Enable/disable c-buffer.
@@ -389,11 +363,11 @@ public:
   bool IsLightingCacheEnabled () { return do_lighting_cache; }
 
   /**
-   * Read configuration file for all engine specific values.
-   * This function is called by Initialize() so you normally do
-   * not need to call it yourselves.
+   * Read configuration file (using the system driver) for all engine
+   * specific values. This function is called by Initialize() so you
+   * normally do not need to call it yourselves.
    */
-  void ReadConfig (csIniFile* config);
+  void ReadConfig ();
 
   /**
    * Prepare for creation of a world. This function is called
@@ -405,20 +379,7 @@ public:
   /**
    * Get the Halo Rasterizer COM interface if supported (NULL if not).
    */
-  IHaloRasterizer* GetHaloRastizer () { return piHR; }
-
-  /**
-   * Get the configurator class for this engine. This class can be
-   * used to query/set engine specific settings.
-   */
-  csEngineConfig* GetEngineConfig () { return cfg_engine; }
-
-  /**
-   * Get the configurator interface for this engine. This interface
-   * can be used to query/set engine specific settings. This is the COM
-   * version.
-   */
-  IConfig* GetEngineConfigCOM ();
+  iHaloRasterizer* GetHaloRastizer () { return HaloRast; }
 
   /**
    * Clear everything in the world.
@@ -507,7 +468,7 @@ public:
    * Prepare()). Note that you need to call Prepare() again if
    * you switch to another 3D driver.
    */
-  void Draw (IGraphics3D* g3d, csCamera* c, csClipper* clipper);
+  void Draw (csCamera* c, csClipper* clipper);
 
   /**
    * This function is similar to Draw. It will do all the stuff
@@ -516,8 +477,8 @@ public:
    * every entity that it was planning to draw. This allows you to show
    * or draw debugging information (2D egdes for example).
    */
-  void DrawFunc (IGraphics3D* g3d, csCamera* c, csClipper* clipper,
-  	csDrawFunc* callback, void* callback_data = NULL);
+  void DrawFunc (csCamera* c, csClipper* clipper,
+    csDrawFunc* callback, void* callback_data = NULL);
 
   /**
    * Locate the first static light which is closer than 'dist' to the
@@ -529,7 +490,7 @@ public:
   /**
    * Advance the frames of all sprites given an elapsed time.
    */
-  void AdvanceSpriteFrames (long current_time);
+  void AdvanceSpriteFrames (time_t current_time);
 
   /**
    * Unlink a sprite from the world (but do not delete it).
@@ -563,16 +524,36 @@ public:
     return it;
   }
 
-	DEFAULT_COM(World);
-
-	STDMETHODIMP GetSpriteTemplate(IString *name, ISpriteTemplate** itmpl);
-
-	STDMETHODIMP PushSpriteTemplate(ISpriteTemplate* itmpl);
-
   CSOBJTYPE;
-};
+  DECLARE_IBASE;
 
-/// Since the global VFS object is often used, it is easier to use a shortcut
-#define VFS	csWorld::vfs
+  //--------------------- iPlugIn interface implementation --------------------
+
+  /**
+   * Initialize the world. This is automatically called by system driver
+   * at startup so that plugin can do basic initialization stuff, register
+   * with the system driver and so on.
+   */
+  virtual bool Initialize (iSystem* sys);
+
+  /// We need to handle some events
+  virtual bool HandleEvent (csEvent &Event);
+
+  //--------------------- iWorld interface implementation ---------------------
+
+  csWorld *GetCsWorld () { return this; };
+
+  //--------------------- iConfig interface implementation --------------------
+  static csOptionDescription config_options[];
+
+  ///
+  virtual int GetOptionCount ();
+  ///
+  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+  ///
+  virtual bool SetOption (int id, csVariant* value);
+  ///
+  virtual bool GetOption (int id, csVariant* value);
+};
 
 #endif /*WORLD_H*/

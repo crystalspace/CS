@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #define SYSDEF_SOCKETS
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csnetdrv/sockets/netsdrv.h"
 #include "inetdrv.h"
 
@@ -118,7 +118,7 @@ BEGIN_INTERFACE_TABLE (csNetworkDriverSocketsFactory)
   IMPLEMENTS_INTERFACE (INetworkDriverFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csNetworkDriverSocketsFactory::CreateInstance(REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csNetworkDriverSocketsFactory::CreateInstance(REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

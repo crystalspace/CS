@@ -4,8 +4,6 @@
 # Driver description
 DESCRIPTION.glx2d = Crystal Space GL/X 2D driver
 
-include libs/cs2d/openglcommon/glcommon2d.mak
-
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
@@ -23,6 +21,8 @@ all drivers drivers2d: glx2d
 
 glx2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+glx2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -57,12 +57,7 @@ else
 endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
 SRC.GLX2D = $(wildcard libs/cs2d/openglx/*.cpp \
-  libs/cs2d/openglcommon/*.cpp \
-  libs/cs3d/opengl/ogl_*cache.cpp libs/cs3d/opengl/ogl_txtmgr.cpp \
-  libs/cs3d/opengl/itexture.cpp \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
-  libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp\
-  $(SRC.COMMON.DRV2D))
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -70,11 +65,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glx2d glxclean glxcleanlib
+.PHONY: glx2d glxclean
 
 # Chain rules
 clean: glxclean
-cleanlib: glxcleanlib
 
 glx2d: $(OUTDIRS) $(GLX2D)
 
@@ -85,10 +79,7 @@ $(GLX2D): $(OBJ.GLX2D) $(DEP.GLX2D)
 	$(DO.PLUGIN) $(LIBS.GLX2D)
 
 glxclean:
-	$(RM) $(GLX2D)
-
-glxcleanlib:
-	$(RM) $(OBJ.GLX2D) $(GLX2D)
+	$(RM) $(GLX2D) $(OBJ.GLX2D)
  
 ifdef DO_DEPEND
 depend: $(OUTOS)glx2d.dep

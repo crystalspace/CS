@@ -25,7 +25,7 @@
 #include "eax.h"
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/eax/sndrdr.h"
 #include "cssndrdr/eax/sndlstn.h"
 #include "cssndrdr/eax/sndsrc.h"
@@ -41,7 +41,7 @@ BEGIN_INTERFACE_TABLE(csSoundRenderEAX)
   IMPLEMENTS_INTERFACE(ISoundRender)
 END_INTERFACE_TABLE()
 
-csSoundRenderEAX::csSoundRenderEAX(ISystem* piSystem) : m_pListener(NULL)
+csSoundRenderEAX::csSoundRenderEAX(iSystem* piSystem) : m_pListener(NULL)
 {
   m_p3DAudioRenderer = NULL;
   m_piSystem = piSystem;
@@ -147,12 +147,12 @@ STDMETHODIMP csSoundRenderEAX::Close()
   if(m_pListener)
   {
     m_pListener->DestroyListener();
-    m_pListener->Release();
+    m_pListener->DecRef();
   }
 
   if (m_p3DAudioRenderer)
   {
-    if ((hr = m_p3DAudioRenderer->Release()) < DS_OK)
+    if ((hr = m_p3DAudioRenderer->DecRef()) < DS_OK)
       return(hr);
     
     m_p3DAudioRenderer = NULL;

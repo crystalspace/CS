@@ -1,123 +1,125 @@
+/*
+    Copyright (C) 1998 by Jorrit Tyberghein
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __IPOLYGON_H__
 #define __IPOLYGON_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math3d.h"
 
-interface ILightMap;
-interface IPolygonTexture;
-interface ITextureContainer;
-interface ITextureMap;
-interface ITextureHandle;
-
-extern const IID IID_IPolygon3D;
-extern const IID IID_IPolygonSet;
-extern const IID IID_IPolygonTexture;
+scfInterface iLightMap;
+scfInterface iPolygonTexture;
+scfInterface iTextureContainer;
+scfInterface iTextureMap;
+scfInterface iTextureHandle;
 
 // forward declarations
-interface IPolygonSet;
-interface IPolygon3D;
-interface IPolygonTexture;
+scfInterface iPolygon3D;
+scfInterface iPolygonTexture;
 
 /// temporary - subject to change
-interface IPolygonSet : public IUnknown
+SCF_INTERFACE (iPolygonSet, 0, 0, 1) : public iBase
 {
   ///
-  STDMETHOD (GetName) (const char** szName);
-
-  DECLARE_IUNKNOWN ()
-};
-
-
-/// COM Vector type - for passing between DLL boundaries only!
-struct ComcsVector3
-{
-  float x, y, z;
+  virtual const char *GetObjectName () = 0;
 };
 
 /// temporary - subject to change
-interface IPolygon3D : public IUnknown
+SCF_INTERFACE (iPolygon3D, 0, 0, 1) : public iBase
 {
   ///
-  STDMETHOD (GetName) (const char** szName);
+  virtual const char *GetObjectName () = 0;
+  /// Get the polygonset (container) that this polygons belongs to.
+  virtual iPolygonSet *GetParentObject () = 0;
   ///
-  STDMETHOD (GetParent) (IPolygonSet** retval);
+  virtual csVector3 *GetCameraVector (int idx) = 0;
   ///
-  STDMETHOD (GetCameraVector) (int idx, ComcsVector3* retval);
-  ///
-  STDMETHOD (GetTexture) (int nLevel, IPolygonTexture** retval);
+  virtual iPolygonTexture *GetObjectTexture (int nLevel) = 0;
   /// 
-  STDMETHOD (UsesMipMaps) (void);
+  virtual bool UsesMipMaps () = 0;
+  /// Get the alpha transparency value for this polygon.
+  virtual int GetAlpha () = 0;
   ///
-  STDMETHOD (GetAlpha) (int& retval);
-  ///
-  STDMETHOD (GetLightMap) (ILightMap** retval);
-
-  DECLARE_IUNKNOWN ()
+  virtual iLightMap *GetLightMap () = 0;
 };
 
 /// temporary - subject to change
-interface IPolygonTexture : public IUnknown
+SCF_INTERFACE (iPolygonTexture, 0, 0, 1) : public iBase
 {
   ///
-  STDMETHOD (GetTextureHandle) (ITextureHandle** retval);
+  virtual iTextureHandle *GetTextureHandle () = 0;
   ///
-  STDMETHOD (GetFDU) (float& retval);
+  virtual float GetFDU () = 0;
   ///
-  STDMETHOD (GetFDV) (float& retval);
+  virtual float GetFDV () = 0;
+  /// Get width of lighted texture (power of 2)
+  virtual int GetWidth () = 0;
+  /// Get height of lighted texture.
+  virtual int GetHeight () = 0;
   ///
-  STDMETHOD (GetWidth) (int& retval);
+  virtual int GetMipmapLevel () = 0;
   ///
-  STDMETHOD (GetHeight) (int& retval);
+  virtual int GetShiftU () = 0;
   ///
-  STDMETHOD (GetMipmapLevel) (int& retval);
-  ///
-  STDMETHOD (GetShiftU) (int& retval);
-  ///
-  STDMETHOD (GetSize) (long& retval);
+  virtual int GetSize () = 0;
 
   ///
-  STDMETHOD (GetTCacheData) (void** retval);
+  virtual void *GetTCacheData () = 0;
   ///
-  STDMETHOD (SetTCacheData) (void* newval);
+  virtual void SetTCacheData (void *iCache) = 0;
 
   ///
-  STDMETHOD (GetNumPixels) (int& retval);
+  virtual int GetNumPixels () = 0;
   ///
-  STDMETHOD (GetMipMapSize) (int& retval);
+  virtual int GetMipMapSize () = 0;
   ///
-  STDMETHOD (GetMipMapShift) (int& retval);
+  virtual int GetMipMapShift () = 0;
   ///
-  STDMETHOD (GetIMinU) (int& retval);
+  virtual int GetIMinU () = 0;
   ///
-  STDMETHOD (GetIMinV) (int& retval);
+  virtual int GetIMinV () = 0;
   ///
-  STDMETHOD (GetTextureBox) (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV);
+  virtual void GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV) = 0;
   ///
-  STDMETHOD (GetOriginalWidth) (int& retval);
+  virtual int GetOriginalWidth () = 0;
 
   ///
-  STDMETHOD (GetPolygon) (IPolygon3D** retval);
+  virtual iPolygon3D *GetPolygon () = 0;
   ///
-  STDMETHOD (RecalculateDynamicLights) (bool& recalc);
+  virtual bool RecalculateDynamicLights () = 0;
   ///
-  STDMETHOD (CreateDirtyMatrix) ();
+  virtual void CreateDirtyMatrix () = 0;
   ///
-  STDMETHOD (MakeAllDirty) ();
+  virtual void MakeAllDirty () = 0;
   ///
-  STDMETHOD (CleanIfDirty) (int lu, int lv, bool& retval);
-
-  /// 
-  STDMETHOD (GetLightMap) (ILightMap** retval);
+  virtual bool CleanIfDirty (int lu, int lv) = 0;
 
   /// 
-  STDMETHOD (GetNumberDirtySubTex) (int& nDirty);
-  ///
-  STDMETHOD (GetSubtexSize) (int& retval);
-  ///
-  STDMETHOD (GetDynlightOpt) (bool& retval);
+  virtual iLightMap *GetLightMap () = 0;
 
-  DECLARE_IUNKNOWN ()
+  /// Return the number of dirty sub-textures.
+  virtual int GetNumberDirtySubTex () = 0;
+  /// Return the number of clean sub-textures.
+  virtual int GetNumberCleanSubTex () = 0;
+  ///
+  virtual int GetSubtexSize () = 0;
+  ///
+  virtual bool GetDynlightOpt () = 0;
 };
 
 #endif

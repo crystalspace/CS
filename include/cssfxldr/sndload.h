@@ -20,12 +20,12 @@
 #define __SOUNDLOADER_H
 
 #include <stdio.h>
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "types.h"
 
 class csSoundData;
 
-interface ISystem;
+struct iSystem;
 
 ///
 class csSoundLoader  
@@ -60,7 +60,7 @@ protected:
   /**
    * Load an image from the given buffer.
    * Attempts to read an image from the buffer 'buf' of length 'size'.
-   * If successful, returns a pointer to the resulting ImageFile.  Otherwise
+   * If successful, returns a pointer to the resulting csImageFile.  Otherwise
    * returns NULL.
    */
   virtual csSoundData* loadsound(UByte* buf, ULong size) = 0;

@@ -1,21 +1,20 @@
 /*
-  OS/2 support for Crystal Space 3D library
-  Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>
+    OS/2 support for Crystal Space 3D library
+    Copyright (C) 1998 by Andrew Zabolotny <bit@eltech.ru>
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <limits.h>
@@ -32,15 +31,14 @@
 
 //== class SysSystemDriver =====================================================
 
-BEGIN_INTERFACE_TABLE (SysSystemDriver)
-  IMPLEMENTS_COMPOSITE_INTERFACE (System)
-  IMPLEMENTS_COMPOSITE_INTERFACE (OS2SystemDriver)
-END_INTERFACE_TABLE ()
-
-IMPLEMENT_UNKNOWN_NODELETE (SysSystemDriver)
+IMPLEMENT_IBASE (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_INTERFACE (iOS2SystemDriver)
+IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
+  CONSTRUCT_IBASE (NULL)
   /* Set main thread to idle priority */
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0L);
 }
@@ -97,17 +95,6 @@ bool SysSystemDriver::ParseArg (int argc, char* argv[], int &i)
   return true;
 }
 
-void SysSystemDriver::TerminateHandler ()
-{
-  Shutdown = true;
-}
-
-void SysSystemDriver::FocusHandler (bool Enable)
-{
-  if (EventQueue)
-    do_focus (Enable);
-}
-
 void SysSystemDriver::Loop ()
 {
   while (!Shutdown && !ExitLoop)
@@ -126,48 +113,19 @@ void SysSystemDriver::Sleep (int SleepTime)
 
 //== class XOS2SystemDriver ====================================================
 
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED (SysSystemDriver, OS2SystemDriver)
-
-STDMETHODIMP SysSystemDriver::XOS2SystemDriver::GetSettings (int &WindowX,
-  int &WindowY, int &WindowWidth, int &WindowHeight, bool &HardwareCursor)
+void SysSystemDriver::GetExtSettings (int &oWindowX, int &oWindowY,
+  int &oWindowWidth, int &oWindowHeight, bool &oHardwareCursor)
 {
-  METHOD_PROLOGUE (SysSystemDriver, OS2SystemDriver)
-  WindowX = pThis->WindowX;
-  WindowY = pThis->WindowY;
-  WindowWidth = pThis->WindowWidth;
-  WindowHeight = pThis->WindowHeight;
-  HardwareCursor = pThis->HardwareCursor;
-  return S_OK;
+  oWindowX = WindowX;
+  oWindowY = WindowY;
+  oWindowWidth = WindowWidth;
+  oWindowHeight = WindowHeight;
+  oHardwareCursor = HardwareCursor;
 }
 
-STDMETHODIMP SysSystemDriver::XOS2SystemDriver::KeyboardEvent
-  (int ScanCode, bool Down)
+void SysSystemDriver::KeyboardEvent (int ScanCode, bool Down)
 {
-  METHOD_PROLOGUE (SysSystemDriver, OS2SystemDriver)
-  ((SysKeyboardDriver *)pThis->Keyboard)->Handler (ScanCode, Down);
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XOS2SystemDriver::MouseEvent
-  (int Button, int Down, int x, int y, int ShiftFlags)
-{
-  METHOD_PROLOGUE (SysSystemDriver, OS2SystemDriver)
-  ((SysMouseDriver *)pThis->Mouse)->Handler (Button, Down, x, y, ShiftFlags);
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XOS2SystemDriver::TerminateEvent ()
-{
-  METHOD_PROLOGUE (SysSystemDriver, OS2SystemDriver)
-  pThis->TerminateHandler ();
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XOS2SystemDriver::FocusEvent (bool Enable)
-{
-  METHOD_PROLOGUE (SysSystemDriver, OS2SystemDriver)
-  pThis->FocusHandler (Enable);
-  return S_OK;
+  QueueKeyEvent (ScancodeToChar [ScanCode], Down);
 }
 
 //== class SysKeyboardDriver ===================================================
@@ -219,42 +177,9 @@ SysKeyboardDriver::SysKeyboardDriver () : csKeyboardDriver ()
   ScancodeToChar [SCANCODE_CENTER]      = CSKEY_CENTER;
 }
 
-void SysKeyboardDriver::Handler (unsigned char ScanCode, bool Down)
-{
-  if (!Ready ())
-    return;
-
-  int key = ScancodeToChar [ScanCode];
-  if (key)
-  {
-    time_t time = System->Time ();
-
-    if (Down)
-      do_keypress (time, key);
-    else
-      do_keyrelease (time, key);
-  } /* endif */
-}
-
 //== class SysMouseDriver ======================================================
 
 SysMouseDriver::SysMouseDriver () : csMouseDriver ()
 {
   // Nothing to do
-}
-
-void SysMouseDriver::Handler (int Button, int Down, int x, int y, int ShiftFlags)
-{
-  if (!Ready ())
-    return;
-
-  time_t time = System->Time ();
-
-  if (Button == 0)
-    do_mousemotion (time, x, y);
-  else if (Down)
-    do_buttonpress (time, Button, x, y, ShiftFlags & CSMASK_SHIFT,
-      ShiftFlags & CSMASK_ALT, ShiftFlags & CSMASK_CTRL);
-  else
-    do_buttonrelease (time, Button, x, y);
 }

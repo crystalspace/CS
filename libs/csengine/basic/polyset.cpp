@@ -42,37 +42,18 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN_NODELETE( csPolygonSet )
+CSOBJTYPE_IMPL(csPolygonSet,csObject);
 
-#ifndef BUGGY_EGCS_COMPILER
-
-BEGIN_INTERFACE_TABLE( csPolygonSet )
-	IMPLEMENTS_COMPOSITE_INTERFACE( PolygonSet )
-END_INTERFACE_TABLE()
-
-#else
-
-const INTERFACE_ENTRY *csPolygonSet::GetInterfaceTable ()
-{
-  typedef csPolygonSet _InterfaceTableClassName;
-  static INTERFACE_ENTRY InterfaceTable[2];
-  InterfaceTable[0].pIID = &IID_IPolygonSet;
-  InterfaceTable[0].pfnFinder = ENTRY_IS_OFFSET;
-  InterfaceTable[0].dwData = COMPOSITE_OFFSET(csPolygonSet, IPolygonSet, IPolygonSet, m_xPolygonSet);
-  InterfaceTable[1].pIID = 0;
-  InterfaceTable[1].pfnFinder = 0;
-  InterfaceTable[1].dwData = 0;
-  return InterfaceTable;
-}
-
-#endif
+IMPLEMENT_IBASE (csPolygonSet)
+  IMPLEMENTS_INTERFACE (iPolygonSet)
+IMPLEMENT_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
 
-CSOBJTYPE_IMPL(csPolygonSet,csObject);
-
 csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt ()
 {
+  CONSTRUCT_IBASE (NULL);
+
   max_vertices = num_vertices = 0;
   max_polygon = num_polygon = 0;
 
@@ -480,9 +461,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // may be rendered again (through mirrors) possibly overwriting the plane.
     csPolyPlane* keep_plane = NULL;
 
-    long do_transp;
-    d->g3d->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE, do_transp);
-    if (do_transp)
+    if (d->g3d->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
       filtered = p->IsTransparent ();
               
     if (filtered || is_this_fog)
@@ -955,4 +934,3 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
 
   return final_data;
 }
-

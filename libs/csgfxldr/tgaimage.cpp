@@ -49,7 +49,7 @@ AlphaMapFile* TGAImageLoader::LoadAlphaMap(UByte *buf,ULong size)
   return NULL;
 }
 
-ImageFile* TGAImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* TGAImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageTgaFile* i = new ImageTgaFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -75,7 +75,7 @@ ImageTgaFile::~ImageTgaFile ()
 {
 }
 
-ImageTgaFile::ImageTgaFile (UByte* ptr, long filesize) : ImageFile ()
+ImageTgaFile::ImageTgaFile (UByte* ptr, long filesize) : csImageFile ()
 {
   (void)filesize;
   struct ImageHeader tga_head;

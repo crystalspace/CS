@@ -25,7 +25,7 @@
 #include "dsound.h"
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/eax/sndrdr.h"
 #include "isndrdr.h"
 
@@ -117,7 +117,7 @@ BEGIN_INTERFACE_TABLE (csSoundRenderEAXFactory)
   IMPLEMENTS_INTERFACE (ISoundRenderFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csSoundRenderEAXFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csSoundRenderEAXFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

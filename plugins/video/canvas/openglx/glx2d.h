@@ -19,8 +19,7 @@
 #ifndef __GLX2D_H__
 #define __GLX2D_H__
 
-#include "cscom/com.h"
-#include "cs2d/common/graph2d.h"
+#include "csutil/scf.h"
 #include "cssys/unix/iunix.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 
@@ -37,25 +36,6 @@
 #  include <sys/ipc.h>
 #  include <sys/shm.h>
 #endif /* DO_SHM */
-
-interface ITextureHandle;
-class OpenGLTextureCache;
-
-// The CLSID to create csGraphics2DGLX instances
-extern const CLSID CLSID_GLXGraphics2D;
-
-///
-class csGraphics2DGLXFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DGLXFactory)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
-
-///
 
 /// XLIB version.
 class csGraphics2DGLX : public csGraphics2DGLCommon
@@ -93,10 +73,10 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   IUnixSystemDriver* UnixSystem;
 
 public:
-  csGraphics2DGLX (ISystem* piSystem);
+  csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -110,14 +90,11 @@ public:
   virtual bool SetMousePosition (int x, int y);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
 
 protected:
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
-
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DGLX)
 };
 
 #endif // __XLIB2D_H__

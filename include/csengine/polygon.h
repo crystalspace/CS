@@ -19,7 +19,7 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyint.h"
 #include "csgeom/polyclip.h"
@@ -41,8 +41,8 @@ class csLightPatch;
 class Dumper;
 class csPolyTexture;
 class csPolygonSet;
-interface IGraphics2D;
-interface IGraphics3D;
+scfInterface iGraphics2D;
+scfInterface iGraphics3D;
 
 /**
  * If CS_POLY_MIPMAP is set for a polygon then mipmapping will be used.
@@ -330,7 +330,7 @@ public:
  * the texture is filtered in which case it is drawn on top of the other
  * sector.
  */
-class csPolygon3D : public csObject, public csPolygonInt
+class csPolygon3D : public iPolygon3D, public csObject, public csPolygonInt
 {
   friend class Dumper;
 
@@ -377,7 +377,7 @@ private:
 
   /*
    * The 3D engine texture reference (contains the handle as returned
-   * by ITextureManager interface).
+   * by iTextureManager interface).
    */
   csTextureHandle* txtMM;
 
@@ -696,7 +696,7 @@ public:
   /**
    * Get the texture handle for the texture manager.
    */
-  ITextureHandle* GetTextureHandle ();
+  iTextureHandle* GetTextureHandle ();
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
@@ -723,11 +723,6 @@ public:
    * only the closest possible to one of the above.
    */
   void SetAlpha (int da) { if (portal) portal->SetAlpha (da); }
-
-  /**
-   * Get the alpha transparency value for this polygon.
-   */
-  int GetAlpha () { return portal ? portal->GetAlpha () : 0; }
 
   /*
    * One of the SetTextureSpace functions should be called after
@@ -848,7 +843,7 @@ public:
    * create the first lightmap. This is done by the precalculated
    * lighting process (using CalculateLighting()).
    */
-  void CreateLightMaps (IGraphics3D* g3d);
+  void CreateLightMaps (iGraphics3D* g3d);
 
   /// Return the pointer to the original polygon (before any BSP splits).
   csPolygonInt* GetUnsplitPolygon () { return orig_poly; }
@@ -1092,15 +1087,23 @@ public:
 
   CSOBJTYPE;
 
-  // COM Stuff //
+  //-------------------- iPolygon interface implementation --------------------
+  DECLARE_IBASE;
 
-  DECLARE_INTERFACE_TABLE (csPolygon3D)
-  DECLARE_IUNKNOWN ()
-
-  DECLARE_COMPOSITE_INTERFACE (Polygon3D)
+  ///
+  virtual const char *GetObjectName () { return GetName (); }
+  /// Get the polygonset (container) that this polygons belongs to.
+  virtual iPolygonSet *GetParentObject () { return GetParent (); }
+  ///
+  virtual csVector3 *GetCameraVector (int idx);
+  ///
+  virtual iPolygonTexture *GetObjectTexture (int nLevel);
+  /// 
+  virtual bool UsesMipMaps ();
+  /// Get the alpha transparency value for this polygon.
+  virtual int GetAlpha ();
+  ///
+  virtual iLightMap *GetLightMap ();
 };
-
-#define GetIPolygon3DFromcsPolygon3D( poly3d )  &poly3d->m_xPolygon3D;
-#define GetcsPolygon3DFromIPolygon3D( iP3d )  ((csPolygon3D*)((size_t)iP3d - offsetof(csPolygon3D, m_xPolygon3D)))
 
 #endif /*POLYGON_H*/

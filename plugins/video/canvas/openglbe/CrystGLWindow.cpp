@@ -30,16 +30,16 @@
 #include "cs2d/openglbe/CrystGLWindow.h"
 #include "cssys/be/beitf.h"
 
-CrystGLView::CrystGLView(BRect frame, IBeLibSystemDriver* isys) :
+CrystGLView::CrystGLView(BRect frame, iBeLibSystemDriver* isys) :
 	BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE),
 	be_system(isys)
 {
-	be_system->AddRef();
+	be_system->IncRef();
 }
 
 CrystGLView::~CrystGLView()
 {
-	be_system->Release();
+	be_system->DecRef();
 }
 
 void CrystGLView::ProcessUserEvent() const
@@ -82,15 +82,15 @@ void CrystGLView::AttachedToWindow()
 }
 
 CrystGLWindow::CrystGLWindow(BRect frame, const char* name, CrystGLView *v,
-	csGraphics2DGLBe *piBeG2D, ISystem* isys, IBeLibSystemDriver* bsys) :
+	csGraphics2DGLBe *piBeG2D, iSystem* isys, iBeLibSystemDriver* bsys) :
 //	BWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE,0),
 //	BGLScreen(name, B_16_BIT_640x480, 0, &res, 0),
 	BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE, 0),
 //	BWindowScreen(name, B_8_BIT_640x480, res, 0),
 	view(v), cs_system(isys), be_system(bsys)
 {
-	cs_system->AddRef();
-	be_system->AddRef();
+	cs_system->IncRef();
+	be_system->IncRef();
 
 	// Initialise local flags
 #if 0
@@ -118,8 +118,8 @@ CrystGLWindow::~CrystGLWindow()
 {
 	Hide();
 	Flush();
-	be_system->Release();
-	cs_system->Release();
+	be_system->DecRef();
+	cs_system->DecRef();
 }
 
 bool CrystGLWindow::QuitRequested()

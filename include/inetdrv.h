@@ -21,64 +21,92 @@
 #ifndef __INETWORK_H__
 #define __INETWORK_H__
 
-#include "cscom/com.h"
-#include "csnetdrv/ndrvdefs.h" //@@@BAD  Why?
+#include "csutil/scf.h"
 
-interface ISystem;
+#define CS_NET_CONNORIENTED	0
+#define CS_NET_CONNLESS		1
 
-extern const GUID IID_INetworkDriver;
+enum csNetworkError
+{
+  CS_NET_NOT_INITIALIZED = 0,
+  CS_NET_ALREADY_CONNECTED,
+  CS_NET_CANNOT_RESOLVE_NAME,
+  CS_NET_CANNOT_CONNECT,
+  CS_NET_NOT_CONNECTED,
+  CS_NET_CANNOT_SEND,
+  CS_NET_CANNOT_GET_VERSION,
+  CS_NET_WRONG_VERSION,
+  CS_NET_CANNOT_CLEANUP,
+  CS_NET_INVALID_SOCKET,
+  CS_NET_ALREADY_LISTENING,
+  CS_NET_CANNOT_BIND,
+  CS_NET_CANNOT_LISTEN,
+  CS_NET_LIMIT_REACHED,
+  CS_NET_INVALID_TYPE,
+  CS_NET_CANNOT_CREATE,
+  CS_NET_CANNOT_CLOSE,
+  CS_NET_NOT_LISTENING,
+  CS_NET_CANNON_GET_SOCKOPT,
+  CS_NET_CANNOT_ACCEPT,
+  CS_NET_CANNOT_SET_PARAMS,
+  CS_NET_CANNOT_RECEIVE
+};
+
+struct csNetworkAddress
+{
+  char hostnm[512];
+  int port;
+};
+
+struct csNetworkCaps
+{
+  bool ConnOriented;
+  bool ConnLess;
+  unsigned int iMaxSockets;
+};
+
+/// This is a connection handle
+typedef unsigned int csNetHandle;
 
 /**
  * This is the network interface for CS.
  * All network drivers must implement this interface.
  * The standard implementation is csNetworkDriverNull.
  */
-interface INetworkDriver : public IUnknown
+SCF_INTERFACE (iNetworkDriver, 0, 0, 1) : public iBase
 {
 public:
 
   /// Open the network driver
-  STDMETHOD (Open) () PURE;
+  virtual bool Open () = 0;
   /// Close the network driver
-  STDMETHOD (Close) () PURE;
+  virtual void Close () = 0;
 
-  STDMETHOD (Connect) (DWORD dwID, CS_NET_ADDRESS *lpNetAddress) PURE;
+  virtual csNetHandle Connect (csNetworkAddress *iNetAddress) = 0;
 
-  STDMETHOD (Disconnect) (DWORD dwID) PURE;
+  virtual void Disconnect (csNetHandle iHandle) = 0;
 
-  STDMETHOD (Send) (DWORD dwID, DWORD dwBytesToSend, char *lpDataBuffer) PURE;
+  virtual void Send (csNetHandle iHandle, void *iData, size_t iSize) = 0;
 
-  STDMETHOD (Receive) (DWORD dwID, DWORD *lpdwBytesToReceive /* in/out */, char *lpDataBuffer) PURE;
+  virtual void Receive (csNetHandle iHandle, size_t *ioSize, void *iData) = 0;
 
-  STDMETHOD (SetListenState) (DWORD dwID, CS_NET_LISTENPARAMS *lpCSListenParams) PURE;
+  virtual void SetListenState (csNetHandle iHandle, int iPort) = 0;
 
-  STDMETHOD (Accept) (DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, CS_NET_ADDRESS *lpCSNetAddress/*out*/) PURE;
+  virtual void Accept (csNetHandle iListen, csNetHandle *iServer, csNetworkAddress *oAddress) = 0;
 
-  STDMETHOD (Spawn) (DWORD *lpdwID /*out*/, DWORD dwType) PURE;
+  virtual void Spawn (csNetHandle *oHandle, size_t iType) = 0;
 
-  STDMETHOD (Kill) (DWORD dwID) PURE;
+  virtual void Kill (csNetHandle Handle) = 0;
 
-  STDMETHOD (KillAll) () PURE;
+  virtual void KillAll () = 0;
 
-  STDMETHOD (GetDriverCaps) (CS_NET_DRIVERCAPS *lpCSNetDriverCaps) PURE;
+  virtual void GetDriverCaps (csNetworkCaps *oCaps) = 0;
 
-  STDMETHOD (GetLastError) () PURE;
+  virtual int GetLastError () = 0;
 
-//STDMETHOD (SetOnReceiveFunction) (void *lpFunction) PURE;
+//virtual void SetOnReceiveFunction (void (*iFunction) (void *), void *iParm) = 0;
 
-//STDMETHOD (GetOnReceiveFunction) (void *lpFunction) PURE;
-};
-
-extern const IID IID_INetworkDriverFactory;
-
-interface INetworkDriverFactory:
-public IUnknown
-{
-  ///
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem * piSystem, void **ppv) PURE;
-
-  /// Lock or unlock from memory.
-  STDMETHOD (LockServer) (COMBOOL bLock) PURE;
+//virtual void (*) (void *) GetOnReceiveFunction () = 0;
 };
 
 #endif	//__INETWORK_H__

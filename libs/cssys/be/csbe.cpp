@@ -35,18 +35,15 @@
 
 // The System driver ////////////////
 
-BEGIN_INTERFACE_TABLE(SysSystemDriver)
-  IMPLEMENTS_COMPOSITE_INTERFACE(System)
-  IMPLEMENTS_COMPOSITE_INTERFACE(BeLibSystemDriver)
-END_INTERFACE_TABLE()
-
-IMPLEMENT_UNKNOWN_NODELETE(SysSystemDriver)
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED(SysSystemDriver, BeLibSystemDriver)
+IMPLEMENT_IBASE (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_INTERFACE (iBeLibSystemDriver)
+IMPLEMENT_IBASE_END
 
 class CrystApp : public BApplication
 {
 public:
-	CrystApp(ISystem*);
+	CrystApp(iSystem*);
 	~CrystApp();
 	bool QuitRequested();
 	void MessageReceived(BMessage*);
@@ -56,7 +53,7 @@ public:
 	void checkMouseMoved();
 
 private:
-	ISystem* driver;
+	iSystem* driver;
 	bool shift_down;
 	bool alt_down;
 	bool ctrl_down;
@@ -77,19 +74,19 @@ private:
 	int classifyAsciiKey(int) const;
 };
 
-CrystApp::CrystApp(ISystem* isys) :
+CrystApp::CrystApp(iSystem* isys) :
 	BApplication("application/x-vnd.xsware-crystal"),
-	driver(isys), shift_down(false), alt_down(false), ctrl_down(false),
+	driver (isys), shift_down(false), alt_down(false), ctrl_down(false),
 	real_mouse(true), mouse_moved(false), mouse_point(0,0)
 {
-	driver->AddRef();
+	driver->IncRef();
 	for (int i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
 		button_state[i] = false;
 };
 
 CrystApp::~CrystApp()
 {
-	driver->Release();
+	driver->DecRef ();
 }
 
 bool CrystApp::QuitRequested()
@@ -291,28 +288,26 @@ int CrystApp::classifyAsciiKey(int c) const
 		case B_UP_ARROW:	cs_key = CSKEY_UP;					break;
 		case B_DOWN_ARROW: 	cs_key = CSKEY_DOWN;				break;
 		case B_LEFT_ARROW: 	cs_key = CSKEY_LEFT;				break;
-	    case B_RIGHT_ARROW:	cs_key = CSKEY_RIGHT;				break;
-	    case B_BACKSPACE:	cs_key = CSKEY_BACKSPACE;			break;
-	    case B_INSERT:		cs_key = CSKEY_INS;					break;
-	    case B_DELETE:		cs_key = CSKEY_DEL;					break;
-	    case B_PAGE_UP:		cs_key = CSKEY_PGUP;				break;
-	    case B_PAGE_DOWN:	cs_key = CSKEY_PGDN;				break;
-	    case B_HOME:		cs_key = CSKEY_HOME;				break;
-	    case B_END:			cs_key = CSKEY_END;					break;
-	    case B_ESCAPE:		cs_key = CSKEY_ESC;					break;
-	    case B_TAB:			cs_key = CSKEY_TAB;					break;
-	    case B_RETURN:		cs_key = CSKEY_ENTER;				break;
-		default:			cs_key = (c < ' ' ? c + '`' : c);	break; // *NOTE*
+		case B_RIGHT_ARROW:	cs_key = CSKEY_RIGHT;				break;
+		case B_BACKSPACE:	cs_key = CSKEY_BACKSPACE;			break;
+		case B_INSERT:		cs_key = CSKEY_INS;					break;
+		case B_DELETE:		cs_key = CSKEY_DEL;					break;
+		case B_PAGE_UP:		cs_key = CSKEY_PGUP;				break;
+		case B_PAGE_DOWN:	cs_key = CSKEY_PGDN;				break;
+		case B_HOME:		cs_key = CSKEY_HOME;				break;
+		case B_END:		cs_key = CSKEY_END;					break;
+		case B_ESCAPE:		cs_key = CSKEY_ESC;					break;
+		case B_TAB:		cs_key = CSKEY_TAB;					break;
+		case B_RETURN:		cs_key = CSKEY_ENTER;				break;
+		default:		cs_key = (c < ' ' ? c + '`' : c);	break; // *NOTE*
 	}
 	return cs_key;
 }
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
 {
-	ISystem* isys;
-	QueryInterface((REFIID)IID_ISystem, (void**)&isys);
-	CHK (app = new CrystApp(isys));
-	isys->Release();
+	CONSTRUCT_IBASE (NULL);
+	CHK (app = new CrystApp (this));
 };
 
 static int32 begin_loop(void* data)
@@ -370,22 +365,7 @@ void SysSystemDriver::ProcessUserEvent (BMessage* m)
 	}
 }
 
-bool SysSystemDriver::SetMouseCursor (int shape)
+bool SysSystemDriver::SetMouseCursor(int shape, iTextureHandle*)
 {
 	return app->SetMouse(shape);
-}
-
-STDMETHODIMP
-SysSystemDriver::XBeLibSystemDriver::ProcessUserEvent (BMessage* m)
-{
- 	METHOD_PROLOGUE (SysSystemDriver, BeLibSystemDriver)
-	pThis->ProcessUserEvent(m);
-	return S_OK;
-}
-
-STDMETHODIMP
-SysSystemDriver::XBeLibSystemDriver::SetMouseCursor(int shape, ITextureHandle*)
-{
- 	METHOD_PROLOGUE (SysSystemDriver, BeLibSystemDriver)
-	return (pThis->SetMouseCursor(shape) ? S_OK : S_FALSE);
 }

@@ -149,7 +149,10 @@ public:
   Blocks ();
 
   ///
-  virtual void NextFrame (long elapsed_time, long current_time);
+  virtual void NextFrame (time_t elapsed_time, time_t current_time);
+
+  ///
+  virtual bool HandleEvent (csEvent &Event);
 
   ///
   void eatkeypress (int key, bool shift, bool alt, bool ctrl);
@@ -176,7 +179,7 @@ public:
   void set_cube_room (csSector* s) { room = s; }
 
   ///
-  void move_cubes (long elapsed_time);
+  void move_cubes (time_t elapsed_time);
 
   ///
   void move_camera ();

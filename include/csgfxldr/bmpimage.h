@@ -24,16 +24,16 @@
 
 class BMPImageLoader;
 
-/** An ImageFile subclass for reading BMP files.
+/** An csImageFile subclass for reading BMP files.
  *
  *  Current Limitations:
  *  Only able to read 24 bits RGB encoded with no palette files and
  *                     8 bits RGB encoded files
  */
-class ImageBMPFile : public ImageFile
+class ImageBMPFile : public csImageFile
 {
   ///
-  friend class ImageFile;	// For constructor
+  friend class csImageFile;	// For constructor
   friend class BMPImageLoader;
 
 private:
@@ -54,7 +54,7 @@ class BMPImageLoader : public ImageLoader
 {
 protected:
   ///
-  virtual ImageFile* LoadImage (UByte* buf, ULong size);
+  virtual csImageFile* LoadImage (UByte* buf, ULong size);
   virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size);
 
 public:

@@ -20,7 +20,7 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csnetdrv/null/netndrv.h"
 #include "csnetdrv/null/drvndefs.h"
 #include "isystem.h"
@@ -34,7 +34,7 @@ BEGIN_INTERFACE_TABLE(csNetworkDriverNull)
   IMPLEMENTS_INTERFACE(INetworkDriver)
 END_INTERFACE_TABLE()
 
-csNetworkDriverNull::csNetworkDriverNull(ISystem* /*piSystem*/)
+csNetworkDriverNull::csNetworkDriverNull(iSystem* /*piSystem*/)
 {
 }
 
@@ -52,7 +52,7 @@ STDMETHODIMP csNetworkDriverNull::Close()
 	return S_OK;
 }
 
-STDMETHODIMP csNetworkDriverNull::Connect(DWORD /*dwID*/, CS_NET_ADDRESS * /*lpNetAddress*/)
+STDMETHODIMP csNetworkDriverNull::Connect(DWORD /*dwID*/, csNetworkAddress * /*lpNetAddress*/)
 {
 	return S_OK;
 }
@@ -72,12 +72,12 @@ STDMETHODIMP csNetworkDriverNull::Receive(DWORD /*dwID*/, DWORD * /*lpdwBytesToR
 	return S_OK;
 }
 
-STDMETHODIMP csNetworkDriverNull::SetListenState(DWORD /*dwID*/, CS_NET_LISTENPARAMS * /*lpCSListenParams*/)
+STDMETHODIMP csNetworkDriverNull::SetListenState(DWORD /*dwID*/, int /*iPort*/)
 {
 	return S_OK;
 }
 
-STDMETHODIMP csNetworkDriverNull::Accept(DWORD /*dwLID*//*listening socket*/, DWORD * /*lpdwID*//*server socket*/, CS_NET_ADDRESS * /*lpCSNetAddress*//*out*/)
+STDMETHODIMP csNetworkDriverNull::Accept(DWORD /*dwLID*//*listening socket*/, DWORD * /*lpdwID*//*server socket*/, csNetworkAddress * /*lpCSNetAddress*//*out*/)
 {
 	return S_OK;
 }
@@ -97,7 +97,7 @@ STDMETHODIMP csNetworkDriverNull::KillAll()
 	return S_OK;
 }
 
-STDMETHODIMP csNetworkDriverNull::GetDriverCaps(CS_NET_DRIVERCAPS *lpCSNetDriverCaps)
+STDMETHODIMP csNetworkDriverNull::GetDriverCaps(csNetworkCaps *lpCSNetDriverCaps)
 {
 	lpCSNetDriverCaps->bConnOriented = false;
 	lpCSNetDriverCaps->bConnLess = false;

@@ -14,7 +14,7 @@
   cp -f %1 %2
 
 :doremove
-  rm -f %1
+  del %1 >nul
 
   if /%WINDIR%/ == // goto nowindoze
   sleep 2

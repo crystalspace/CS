@@ -43,7 +43,7 @@ bool RegisterWAL ()
   return ImageLoader::Register (&loader);
 }
 
-ImageFile* WALImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* WALImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageWALFile* i = new ImageWALFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -61,7 +61,7 @@ ImageWALFile::~ImageWALFile ()
 {
 }
 
-ImageWALFile::ImageWALFile (UByte* ptr, long filesize) : ImageFile ()
+ImageWALFile::ImageWALFile (UByte* ptr, long filesize) : csImageFile ()
 {
   status=IFE_BadFormat;
   long chkfilesize;

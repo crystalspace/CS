@@ -21,6 +21,8 @@ all drivers drivers2d: glidex2d
 
 glidex2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+glidex2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -50,11 +52,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glidex2d glidexclean glidexcleanlib
+.PHONY: glidex2d glidexclean
 
 # Chain rules
 clean: glidexclean
-cleanlib: glidexcleanlib
 
 glidex2d: $(OUTDIRS) $(GLIDEX2D)
 
@@ -65,10 +66,7 @@ $(GLIDEX2D): $(OBJ.GLIDEX2D) $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LI
 	$(DO.PLUGIN) $(LIBS.GLIDEX2D)
 
 glidexclean:
-	$(RM) $(GLIDEX2D)
-
-glidexcleanlib:
-	$(RM) $(OBJ.GLIDEX2D) $(GLIDEX2D)
+	$(RM) $(GLIDEX2D) $(OBJ.GLIDEX2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)glidex2d.dep

@@ -21,9 +21,9 @@
 #define __INIFILE_H__
 
 #include "csutil/csvector.h"
-#include "csutil/strlist.h"
 
 class csVFS;
+class csStrVector;
 
 class csIniFile : public csBase
 {
@@ -89,18 +89,24 @@ public:
   bool Save (const char *fName);
 
   /// Enumerate sections in INI file: call iterator for each section
-  bool EnumSections (const char *SectionPath, bool (*iterator)
-    (csSome Parm, char *Name), csSome Parm) const;
+  bool EnumSections (
+    bool (*iterator) (csSome Parm, char *Name), csSome Parm) const;
 
-  /// Enumerate sections, but doesn't use crappy iterator
-  bool EnumSections(csSTRList*); 
+  /// Enumerate sections and put section names into a string vector
+  bool EnumSections (csStrVector *oList);
 
   /// Enumerate data entries: call iterator for each data entry
   bool EnumData (const char *SectionPath, bool (*iterator)
     (csSome Parm, char *Name, size_t DataSize, csSome Data), csSome Parm) const;
+  /// Enumerate data entries and put their names into a string vector
+  bool EnumData (const char *SectionPath, csStrVector *oList);
+
   /// Enumerate comments bound to a entry; KeyName can be NULL
   bool EnumComments (const char *SectionPath, const char *KeyName,
     bool (*iterator) (csSome Parm, char *Text), csSome Parm) const;
+  /// Enumerate comments bound to a entry; KeyName can be NULL
+  bool EnumComments (const char *SectionPath, const char *KeyName,
+    csStrVector *oList) const;
 
   /// Query if a specific section exists
   bool SectionExists (const char *SectionPath) const;
@@ -133,6 +139,8 @@ public:
 
   /// Delete an entry
   bool Delete (const char *SectionPath, const char *KeyName);
+  /// Delete all comments for a key or section (if KeyName == NULL)
+  bool DeleteComment (const char *SectionPath, const char *KeyName);
 
 private:
   /// Load a file given a "read from stream" routine

@@ -45,6 +45,7 @@
 #include "csutil/vfs.h"
 #include "csutil/inifile.h"
 #include "csutil/util.h"
+#include "cssys/system.h"
 #include "cssfxldr/sndload.h"
 #include "csparser/snddatao.h"
 #include "csgfxldr/csimage.h"
@@ -1727,11 +1728,11 @@ csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 
 //---------------------------------------------------------------------------
 
-ImageFile* csLoader::load_image (const char* name)
+csImageFile* csLoader::load_image (const char* name)
 {
   size_t size;
-  ImageFile *ifile = NULL;
-  char *buf = VFS->ReadFile (name, size);
+  csImageFile *ifile = NULL;
+  char *buf = System->VFS->ReadFile (name, size);
 
   if (!buf || !size)
   {
@@ -1797,7 +1798,7 @@ void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWo
     fatal_exit (0, false);
   }
 
-  ImageFile *image = load_image (filename);
+  csImageFile *image = load_image (filename);
   if (!image)
     return;
 
@@ -2307,7 +2308,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf,
         {
           ScanStr (params, "%s", str);
 	  CHK (converter* filedata = new converter);
-	  if (filedata->ivcon (str, true, false, NULL, VFS) == ERROR)
+	  if (filedata->ivcon (str, true, false, NULL, System->VFS) == ERROR)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
 	    CHK (delete filedata);
@@ -3626,7 +3627,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename, csWorl
   csSoundData* snd = NULL;
 
   size_t size;
-  char* buf = VFS->ReadFile (filename, size);
+  char* buf = System->VFS->ReadFile (filename, size);
 
   if (!buf || !size)
   {
@@ -3804,7 +3805,7 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
   LoadStat::Init ();
 
   size_t size;
-  char *buf = VFS->ReadFile (file, size);
+  char *buf = System->VFS->ReadFile (file, size);
 
   if (!buf || !size)
   {
@@ -3956,7 +3957,7 @@ bool csLoader::LoadLibrary (csWorld* world, char* buf)
 bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
 {
   size_t size;
-  char *buf = VFS->ReadFile (fname, size);
+  char *buf = System->VFS->ReadFile (fname, size);
 
   if (!buf || !size)
   {
@@ -3972,7 +3973,7 @@ bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
 
 csTextureHandle* csLoader::LoadTexture (csWorld* world, const char* name, const char* fname)
 {
-  ImageFile *image = load_image (fname);
+  csImageFile *image = load_image (fname);
   csTextureHandle *tm = world->GetTextures ()->NewTexture (image);
   tm->SetName (name);
   return tm;
@@ -4271,7 +4272,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
         {
           ScanStr (params, "%s", str);
 	  CHK (converter* filedata = new converter);
-	  if (filedata->ivcon (str, true, false, NULL, VFS) == ERROR)
+	  if (filedata->ivcon (str, true, false, NULL, System->VFS) == ERROR)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
 	    CHK (delete filedata);

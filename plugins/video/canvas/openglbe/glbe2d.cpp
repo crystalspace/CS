@@ -20,47 +20,52 @@
 #include <stdarg.h>
 #include <sys/param.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/openglbe/glbe2d.h"
 #include "cs2d/openglbe/CrystGLWindow.h"
 #include "cssys/be/beitf.h"
 #include "isystem.h"
 
-BEGIN_INTERFACE_TABLE(csGraphics2DGLBe)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DGLBe)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DGLBe)
+EXPORT_CLASS_TABLE (glbe2d)
+  EXPORT_CLASS (csGraphics2DGLBe, "crystalspace.graphics2d.glbe",
+    "BeOS OpenGL 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csGraphics2DGLBe::csGraphics2DGLBe(ISystem* piSystem) :
-  csGraphics2DGLCommon (piSystem)
+csGraphics2DGLBe::csGraphics2DGLBe(iBase *iParent) :
+  csGraphics2DGLCommon (iParent)
 {
-  HRESULT const rc = piSystem->QueryInterface(
-    (REFIID)IID_IBeLibSystemDriver, (void**)&be_system);
-  if (FAILED (rc)) {
-    system->Print (MSG_FATAL_ERROR, "FATAL: The system driver does not "
-      "implement the IBeLibSystemDriver interface\n");
-    exit (1);
-  }
-  system->Print (MSG_INITIALIZATION, "Crystal Space BeOS OpenGL version.\n");
 }
 
 csGraphics2DGLBe::~csGraphics2DGLBe ()
 {
   Close ();
-  be_system->Release();
+  be_system->DecRef();
 }
 
-void csGraphics2DGLBe::Initialize ()
+bool csGraphics2DGLBe::Initialize (iSystem *pSystem)
 {
-  csGraphics2DGLCommon::Initialize ();
+  if (!csGraphics2DGLCommon::Initialize (pSystem))
+    return false;
+
+  CsPrintf (MSG_INITIALIZATION, "Crystal Space BeOS OpenGL version.\n");
+
+  be_system = QUERY_INTERFACE (System, iBeLibSystemDriver);
+  if (!be_system)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not "
+      "implement the iBeLibSystemDriver interface\n");
+    return false;
+  }
 
   // Get current screen information.
   BScreen screen(B_MAIN_SCREEN_ID);
   screen_frame = screen.Frame();
   curr_color_space = screen.ColorSpace();
   ApplyDepthInfo(curr_color_space);
+
+  return true;
 }
 
 bool csGraphics2DGLBe::Open(const char* title)
@@ -149,12 +154,6 @@ void csGraphics2DGLBe::Print (csRect *area)
 void csGraphics2DGLBe::ApplyDepthInfo(color_space this_color_space)
 {
   unsigned long RedMask, GreenMask, BlueMask;
-  
-  // For OpenGL there is only one set.
-  DrawPixel = DrawPixelGL;
-  WriteChar = WriteCharGL;
-  GetPixelAt = GetPixelAtGL;
-  DrawSprite = DrawSpriteGL;
   
   switch (this_color_space) {
   	case B_RGB15: 

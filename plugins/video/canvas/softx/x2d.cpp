@@ -18,37 +18,46 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssys/unix/iunix.h"
 #include "csinput/csevent.h"
 #include "cs2d/softx/x2d.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 
-BEGIN_INTERFACE_TABLE (csGraphics2DXLib)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DXLib)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DXLib)
+EXPORT_CLASS_TABLE (x2d)
+  EXPORT_CLASS (csGraphics2DXLib, "crystalspace.graphics2d.xlib",
+    "X-Windows 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csGraphics2DXLib)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
 
 // csGraphics2DXLib functions
-csGraphics2DXLib::csGraphics2DXLib (ISystem* piSystem) :
-  csGraphics2D (piSystem), xim (NULL), cmap (0),
+csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
+  csGraphics2D (), xim (NULL), cmap (0),
   sim_lt8 (NULL), sim_lt16 (NULL)
 {
-  System = piSystem;
-  if (FAILED (System->QueryInterface (IID_IUnixSystemDriver, (void**)&UnixSystem)))
+  CONSTRUCT_IBASE (iParent);
+}
+
+bool csGraphics2DXLib::Initialize (iSystem *pSystem)
+{
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
+  if (!UnixSystem)
   {
     CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
                                "the IUnixSystemDriver interface\n");
-    exit (-1);
+    return false;
   }
-}
 
-void csGraphics2DXLib::Initialize ()
-{
-  csGraphics2D::Initialize ();
   Screen* screen_ptr;
 
   // Open display
@@ -61,7 +70,7 @@ void csGraphics2DXLib::Initialize ()
   }
 
   // Query system settings
-  UnixSystem->GetSettings (sim_depth, do_shm, do_hwmouse);
+  UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
 
   screen_num = DefaultScreen (dpy);
   screen_ptr = DefaultScreenOfDisplay (dpy);
@@ -214,44 +223,33 @@ void csGraphics2DXLib::Initialize ()
   // If in 16-bit mode, redirect drawing routines
   if (pfmt.PixelBytes == 2)
   {
-    DrawPixel = DrawPixel16;
-    WriteChar = WriteChar16;
-    GetPixelAt = GetPixelAt16;
-    DrawSprite = DrawSprite16;
+    _DrawPixel = DrawPixel16;
+    _WriteChar = WriteChar16;
+    _GetPixelAt = GetPixelAt16;
+    _DrawSprite = DrawSprite16;
   }
   else if (pfmt.PixelBytes == 4)
   {
-    DrawPixel = DrawPixel32;
-    WriteChar = WriteChar32;
-    GetPixelAt = GetPixelAt32;
-    DrawSprite = DrawSprite32;
+    _DrawPixel = DrawPixel32;
+    _WriteChar = WriteChar32;
+    _GetPixelAt = GetPixelAt32;
+    _DrawSprite = DrawSprite32;
   } /* endif */
 
   memset (MouseCursor, 0, sizeof (MouseCursor));
+
+  return true;
 }
 
 csGraphics2DXLib::~csGraphics2DXLib(void)
 {
   Close();
   if (UnixSystem)
-    FINAL_RELEASE (UnixSystem);
+    UnixSystem->DecRef ();
   CHK (delete [] sim_lt8);
   CHK (delete [] sim_lt16);
 }
 
-// Used to printf through system driver
-void csGraphics2DXLib::CsPrintf (int msgtype, const char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
-}
-  
 bool csGraphics2DXLib::Open(const char *Title)
 {
   CsPrintf (MSG_INITIALIZATION, "Crystal Space X windows driver");
@@ -951,7 +949,7 @@ bool csGraphics2DXLib::SetMousePosition (int x, int y)
   return true;
 }
 
-bool csGraphics2DXLib::SetMouseCursor (int iShape, ITextureHandle* hBitmap)
+bool csGraphics2DXLib::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* hBitmap)
 {
   if (do_hwmouse
    && (iShape >= 0)

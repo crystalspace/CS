@@ -50,13 +50,6 @@ extern HINSTANCE ModuleHandle;		// defined in the COM library
 bool ApplicationActive = true;
 int ApplicationShow;
 
-STDAPI DllInitialize ()
-{
-  // a Dummy function. required by the CS COM lib. This function would be
-  // called, if the cspace lib woul be loaded as a COM module.
-  return TRUE;
-}
-
 extern void cleanup();
 
 void sys_fatalerror(char *s)
@@ -76,10 +69,10 @@ void SysSystemDriver::Alert (const char* s)
 {
   bool FullScreen = false;
 
-  if (piGI)
+  if (piG2D)
   {
     //Check if we are in Fullscreenmode.
-    piGI->GetIsFullScreen(FullScreen);
+    piG2D->GetIsFullScreen(FullScreen);
   }
 
   if (FullScreen)
@@ -387,7 +380,7 @@ SysMouseDriver::~SysMouseDriver(void)
 
 bool SysMouseDriver::Open(csEventQueue *EvQueue)
 {
-  csMouseDriver::Open (GetISystemFromSystem(System), EvQueue);
+  csMouseDriver::Open (GetiSystemFromSystem(System), EvQueue);
   // Open mouse system
   return true;
 }
@@ -459,7 +452,7 @@ void SysSystemDriver::Loop ()
     {
       static long prev_time = -1;
       long now     = Time ();
-      long elapsed = (prev_time == -1) ? 0 : now - prev_time;
+      time_t elapsed = (prev_time == -1) ? 0 : now - prev_time;
       prev_time = now;
       NextFrame (elapsed, now);
     }

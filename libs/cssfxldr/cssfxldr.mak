@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: cssfxldr
 cssfxldr:
 	$(MAKE_TARGET)
+cssfxldrclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 

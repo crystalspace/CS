@@ -16,13 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
-#ifndef GL_TEXTURECACHE_H
-#define GL_TEXTURECACHE_H
+#ifndef __GL_TEXTURECACHE_H__
+#define __GL_TEXTURECACHE_H__
 
 #include "cs3d/opengl/ogl_hicache.h"
-
-
 
 ///
 class OpenGLTextureCache: public HighColorCache
@@ -45,9 +42,9 @@ public:
 
 protected:
   ///
-  virtual void Load(HighColorCache_Data *d);
+  virtual void Load(csHighColorCacheData *d);
   ///
-  virtual void Unload(HighColorCache_Data *d);
+  virtual void Unload(csHighColorCacheData *d);
 };
 
 ///
@@ -64,9 +61,9 @@ public:
 
 protected:
   ///
-  virtual void Load (HighColorCache_Data *d);
+  virtual void Load (csHighColorCacheData *d);
   ///
-  virtual void Unload (HighColorCache_Data *d);
+  virtual void Unload (csHighColorCacheData *d);
 };
 
-#endif // GL_TEXTURECACHE_H
+#endif // __GL_TEXTURECACHE_H__

@@ -28,48 +28,47 @@
     DRAWSPRITE_PIXTYPE - The type of a pixel (UByte, UShort, ULong)
 */
 
-void csGraphics2D::DRAWSPRITE_NAME (ITextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
+void csGraphics2D::DRAWSPRITE_NAME (csGraphics2D *This, iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  bool transp;
-  hTex->GetTransparent (transp);
+  bool transp = hTex->GetTransparent ();
 
   int bw, bh;
   hTex->GetBitmapDimensions (bw, bh);
 
-  DRAWSPRITE_PIXTYPE *bitmap;
-  hTex->GetBitmapData ((void **)&bitmap);
+  DRAWSPRITE_PIXTYPE *bitmap = (DRAWSPRITE_PIXTYPE *)hTex->GetBitmapData ();
 
   int dx = (tw << 16) / sw;
   int dy = (th << 16) / sh;
 
   // Clipping
-  if ((sx >= ClipX2) || (sy >= ClipY2) || (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
-    return;                             // Sprite is totally invisible
-  if (sx < ClipX1)                      // Left margin crossed?
+  if ((sx >= This->ClipX2) || (sy >= This->ClipY2) ||
+      (sx + sw <= This->ClipX1) || (sy + sh <= This->ClipY1))
+    return;				// Sprite is totally invisible
+  if (sx < This->ClipX1)		// Left margin crossed?
   {
-    int nw = sw - (ClipX1 - sx);        // New width
-    tx += (ClipX1 - sx) * tw / sw;      // Adjust X coord on texture
-    tw = (tw * nw) / sw;                // Adjust width on texture
-    sw = nw; sx = ClipX1;
+    int nw = sw - (This->ClipX1 - sx);	// New width
+    tx += (This->ClipX1 - sx) * tw / sw;// Adjust X coord on texture
+    tw = (tw * nw) / sw;		// Adjust width on texture
+    sw = nw; sx = This->ClipX1;
   } /* endif */
-  if (sx + sw > ClipX2)                 // Right margin crossed?
+  if (sx + sw > This->ClipX2)		// Right margin crossed?
   {
-    int nw = ClipX2 - sx;               // New width
-    tw = (tw * nw) / sw;                // Adjust width on texture
+    int nw = This->ClipX2 - sx;		// New width
+    tw = (tw * nw) / sw;		// Adjust width on texture
     sw = nw;
   } /* endif */
-  if (sy < ClipY1)                      // Top margin crossed?
+  if (sy < This->ClipY1)		// Top margin crossed?
   {
-    int nh = sh - (ClipY1 - sy);        // New height
-    ty += (ClipY1 - sy) * th / sh;      // Adjust Y coord on texture
-    th = (th * nh) / sh;                // Adjust height on texture
-    sh = nh; sy = ClipY1;
+    int nh = sh - (This->ClipY1 - sy);	// New height
+    ty += (This->ClipY1 - sy) * th / sh;// Adjust Y coord on texture
+    th = (th * nh) / sh;		// Adjust height on texture
+    sh = nh; sy = This->ClipY1;
   } /* endif */
-  if (sy + sh > ClipY2)                 // Bottom margin crossed?
+  if (sy + sh > This->ClipY2)		// Bottom margin crossed?
   {
-    int nh = ClipY2 - sy;               // New height
-    th = (th * nh) / sh;                // Adjust height on texture
+    int nh = This->ClipY2 - sy;		// New height
+    th = (th * nh) / sh;		// Adjust height on texture
     sh = nh;
   } /* endif */
 
@@ -79,7 +78,7 @@ void csGraphics2D::DRAWSPRITE_NAME (ITextureHandle *hTex, int sx, int sy,
   if (sw == tw)
     for (; sh > 0; sh--, ty += dy, sy++)
     {
-      DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)GetPixelAt (sx, sy);
+      DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)This->GetPixelAt (sx, sy);
       DRAWSPRITE_PIXTYPE *data = bitmap + (ty >> 16) * bw;
       if (transp)
         for (int w = sw; w; w--)
@@ -96,7 +95,7 @@ void csGraphics2D::DRAWSPRITE_NAME (ITextureHandle *hTex, int sx, int sy,
   else
     for (; sh > 0; sh--, ty += dy, sy++)
     {
-      DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)GetPixelAt (sx, sy);
+      DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)This->GetPixelAt (sx, sy);
       DRAWSPRITE_PIXTYPE *data = bitmap + (ty >> 16) * bw;
       int tx = 0;
       if (transp)

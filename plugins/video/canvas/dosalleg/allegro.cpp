@@ -24,109 +24,52 @@
 #include "csgeom/csrect.h"
 #include "isystem.h"
 #include "allegro.h"
+
 BITMAP *_cs_alleg2d;
-
-//--------------------------------------------------------- Static COM stuff ---
-
-static DllRegisterData gRegData =
-{
-  &CLSID_DosRawGraphics2D,
-  "crystalspace.graphics2d.allegro",
-  "Crystal Space 2D graphics driver for DOS/DJGPP using Allegro video library"
-};
-
-void Alleg2DRegister ()
-{
-  static csGraphics2DFactoryDOSAlleg gG2DAllegFactory;
-  gRegData.pClass = &gG2DAllegFactory;
-  csRegisterServer (&gRegData);
-}
-
-void Alleg2DUnregister ()
-{
-  csUnregisterServer (&gRegData);
-}
-
-//------------------------------------------------ csGraphics2DFactoryDOSAlleg ---
-
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DFactoryDOSAlleg)
-
-BEGIN_INTERFACE_TABLE (csGraphics2DFactoryDOSAlleg)
-  IMPLEMENTS_INTERFACE (IGraphics2DFactory)
-END_INTERFACE_TABLE ()
-
-STDMETHODIMP csGraphics2DFactoryDOSAlleg::CreateInstance (REFIID riid,
-  ISystem* piSystem, void**ppv)
-{
-  if (!piSystem)
-  {
-    *ppv = 0;
-    return E_INVALIDARG;
-  }
-
-  CHK (csGraphics2DDOSAlleg *pNew = new csGraphics2DDOSAlleg (piSystem));
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-
-  return pNew->QueryInterface (riid, ppv);
-}
-
-STDMETHODIMP csGraphics2DFactoryDOSAlleg::LockServer (COMBOOL bLock)
-{
-  (void)bLock;
-  return S_OK;
-}
 
 //------------------------------------------------------- csGraphics2DDOSAlleg ---
 
-BEGIN_INTERFACE_TABLE (csGraphics2DDOSAlleg)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DDOSAlleg)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DDOSAlleg)
+EXPORT_CLASS_TABLE (allegro)
+  EXPORT_CLASS (csGraphics2DDOSAlleg, "crystalspace.graphics2d.allegro",
+    "DOS/DJGPP Allegro 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-ISystem* csGraphics2DDOSAlleg::System = NULL;
+IMPLEMENT_IBASE (csGraphics2DDOSAlleg)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
+
+iSystem* csGraphics2DDOSAlleg::System = NULL;
 IDosSystemDriver* csGraphics2DDOSAlleg::DosSystem = NULL;
 
-csGraphics2DDOSAlleg::csGraphics2DDOSAlleg (ISystem* piSystem) :
-  csGraphics2D (piSystem)
+csGraphics2DDOSAlleg::csGraphics2DDOSAlleg (iBase *iParent) :
+  csGraphics2D ()
 {
-  Memory = NULL;
-  System = piSystem;
-
-  if (FAILED (System->QueryInterface (IID_IDosSystemDriver, (void**)&DosSystem)))
-  {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support "
-                             "the IDosSystemDriver interface\n");
-    exit (-1);
-  }
+  CONSTRUCT_IBASE (iParent);
 }
 
 csGraphics2DDOSAlleg::~csGraphics2DDOSAlleg ()
 {
-  Close();
-  FINAL_RELEASE (DosSystem);
+  Close ();
+  if (DosSystem)
+    DosSystem->DecRef ();
 }
 
-void csGraphics2DDOSAlleg::CsPrintf (int msgtype, char *format, ...)
+bool csGraphics2DDOSAlleg::Initialize (iSystem *pSystem)
 {
-  va_list arg;
-  char buf[256];
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
 
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
+  DosSystem = QUERY_INTERFACE (System, iDosSystemDriver);
+  if (!DosSystem)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support "
+                             "the IDosSystemDriver interface\n");
+    return false;
+  }
 
-  System->Print (msgtype, buf);
-}
-
-void csGraphics2DDOSAlleg::Initialize ()
-{
-  csGraphics2D::Initialize ();
   switch (Depth)
   {
     case 8:
@@ -156,6 +99,7 @@ void csGraphics2DDOSAlleg::Initialize ()
       break;
   }
   complete_pixel_format();
+  return true;
 }
 
 bool csGraphics2DDOSAlleg::Open (char* Title)
@@ -193,16 +137,16 @@ bool csGraphics2DDOSAlleg::Open (char* Title)
     case 1:
       break;
     case 2:
-      DrawPixel = DrawPixel16;
-      WriteChar = WriteChar16;
-      GetPixelAt = GetPixelAt16;
-      DrawSprite = DrawSprite16;
+      _DrawPixel = DrawPixel16;
+      _WriteChar = WriteChar16;
+      _GetPixelAt = GetPixelAt16;
+      _DrawSprite = DrawSprite16;
       break;
     case 4:
-      DrawPixel = DrawPixel32;
-      WriteChar = WriteChar32;
-      GetPixelAt = GetPixelAt32;
-      DrawSprite = DrawSprite32;
+      _DrawPixel = DrawPixel32;
+      _WriteChar = WriteChar32;
+      _GetPixelAt = GetPixelAt32;
+      _DrawSprite = DrawSprite32;
       break;
     default:
       CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
@@ -247,7 +191,7 @@ bool csGraphics2DDOSAlleg::SetMousePosition (int x, int y)
   return DosSystem->SetMousePosition (x, y);
 }
 
-bool csGraphics2DDOSAlleg::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
+bool csGraphics2DDOSAlleg::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
 {
   (void)iShape; (void)hBitmap;
   return false;

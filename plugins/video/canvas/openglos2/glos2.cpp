@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csutil/csrect.h"
 #include "csinput/csevent.h"
 #include "isystem.h"
@@ -33,130 +33,17 @@
 #include "libGL.h"
 #include "libGLprv.h"
 
-//------------------------------------------------------ Loading/Maintenance ---
-
-static unsigned int gRefCount = 0;
-static DllRegisterData gRegData =
-{
-  &CLSID_OpenGLGraphics2D,
-  "crystalspace.graphics2d.glos2",
-  "Crystal Space 2D OpenGL graphics driver for OS/2"
-};
-
-#ifdef CS_STATIC_LINKED
-
-void OS2GL2DRegister ()
-{
-  static csGraphics2DFactoryOS2GL gG2DGLFactory;
-  gRegData.pClass = &gG2DGLFactory;
-  csRegisterServer (&gRegData);
-}
-
-void OS2GL2DUnregister ()
-{
-  csUnregisterServer (&gRegData);
-}
-
-#else
-
-// Initialization entry point
-STDAPI DllInitialize ()
-{
-  csCoInitialize (0);
-  gRegData.szInProcServer = "glos2.dll";
-  return TRUE;
-}
-
-EXTERN_C void STDAPICALLTYPE ModuleRelease ()
-{
-  gRefCount--;
-}
-
-EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
-{
-  gRefCount++;
-}
-
-// return S_OK if it's ok to unload us now.
-STDAPI DllCanUnloadNow ()
-{
-  return gRefCount ? S_FALSE : S_OK;
-}
-
-// used to get a COM class object from us.
-STDAPI DllGetClassObject (REFCLSID rclsid, REFIID riid, void** ppv)
-{
-  static csGraphics2DFactoryOS2GL gG2DGLFactory;
-  if (rclsid == CLSID_OpenGLGraphics2D)
-    return gG2DGLFactory.QueryInterface (riid, ppv);
-
-  // if we get here, rclsid is a class we don't implement
-  *ppv = NULL;
-  return CLASS_E_CLASSNOTAVAILABLE;
-}
-
-// Called by regsvr
-STDAPI DllRegisterServer ()
-{
-  return csRegisterServer (&gRegData);
-}
-
-// Called by regsvr
-STDAPI DllUnregisterServer ()
-{
-  return csUnregisterServer (&gRegData);
-}
-
-#endif // CS_STATIC_LINKED
-
-//------------------------------------------------- csGraphics2DOS2GLFactory ---
-
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DFactoryOS2GL)
-
-BEGIN_INTERFACE_TABLE (csGraphics2DFactoryOS2GL)
-  IMPLEMENTS_INTERFACE (IGraphics2DFactory)
-END_INTERFACE_TABLE ()
-
-STDMETHODIMP csGraphics2DFactoryOS2GL::CreateInstance (REFIID riid,
-  ISystem* piSystem, void**ppv)
-{
-  if (!piSystem)
-  {
-    *ppv = 0;
-    return E_INVALIDARG;
-  }
-
-  CHK (csGraphics2DOS2GL *pNew = new csGraphics2DOS2GL (piSystem));
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-		
-  return pNew->QueryInterface (riid, ppv);
-}
-
-STDMETHODIMP csGraphics2DFactoryOS2GL::LockServer (COMBOOL bLock)
-{
-  if (bLock)
-    gRefCount++;
-  else
-    gRefCount--;
-
-  return S_OK;
-}
-
 //-------------------------------------------------------- csGraphics2DOS2GL ---
 
-BEGIN_INTERFACE_TABLE (csGraphics2DOS2GL)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DOS2GL)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DOS2GL)
+EXPORT_CLASS_TABLE (glos2)
+  EXPORT_CLASS (csGraphics2DOS2GL, "crystalspace.graphics2d.glos2",
+    "OS/2 OpenGL 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csGraphics2DOS2GL::csGraphics2DOS2GL (ISystem* piSystem) :
-  csGraphics2DGLCommon (piSystem),
+csGraphics2DOS2GL::csGraphics2DOS2GL (iBase *iParent) :
+  csGraphics2DGLCommon (iParent),
   HardwareCursor (true), WindowX (INT_MIN), WindowY (INT_MIN)
 {
   // Initialize module handle
@@ -166,21 +53,6 @@ csGraphics2DOS2GL::csGraphics2DOS2GL (ISystem* piSystem) :
   extern unsigned long dll_handle;
   gdMH = dll_handle;
 #endif
-
-  System = piSystem;
-
-  if (!SUCCEEDED (piSystem->QueryInterface (IID_IOS2SystemDriver, (void**)&OS2System)))
-  {
-    SysPrintf (MSG_FATAL_ERROR, "The system driver does not support the IOS2SystemDriver interface\n");
-    exit (-1);
-  }
-
-  // Initialize OpenGL
-  if (!gdGLInitialize ())
-  {
-    SysPrintf (MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
-    exit (-1);
-  }
 }
 
 csGraphics2DOS2GL::~csGraphics2DOS2GL (void)
@@ -188,16 +60,31 @@ csGraphics2DOS2GL::~csGraphics2DOS2GL (void)
   Close ();
   // Deallocate OpenGL resources
   gdGLDeinitialize ();
-  FINAL_RELEASE (OS2System);
+  OS2System->DecRef ();
 }
 
-void csGraphics2DOS2GL::Initialize ()
+bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
 {
-  csGraphics2DGLCommon::Initialize ();
+  if (!csGraphics2DGLCommon::Initialize (pSystem))
+    return false;
+
+  OS2System = QUERY_INTERFACE (System, iOS2SystemDriver);
+  if (!OS2System)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support the iOS2SystemDriver interface\n");
+    return false;
+  }
+
+  // Initialize OpenGL
+  if (!gdGLInitialize ())
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
+    return false;
+  }
 
   // Query settings from system driver
   int WindowWidth, WindowHeight;
-  OS2System->GetSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
+  OS2System->GetExtSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
 
   PixelFormat = GLCF_DBLBUFF | (1 << GLCF_DEPTH_SHFT);
   switch (Depth)
@@ -220,15 +107,12 @@ void csGraphics2DOS2GL::Initialize ()
       pfmt.BlueMask   = 0x00000f00;
       break;
     default:
-      SysPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
+      CsPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
       break;
   } /* endswitch */
   complete_pixel_format ();
 
-  DrawPixel = DrawPixelGL;
-  WriteChar = WriteCharGL;
-  GetPixelAt = GetPixelAtGL;
-  DrawSprite = DrawSpriteGL;
+  return true;
 }
 
 bool csGraphics2DOS2GL::Open (const char *Title)
@@ -243,7 +127,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   rq.Parm.CreateWindow.Title = Title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -254,7 +138,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   rq.Parm.CreateCtx.ContextFlags = PixelFormat;
   if ((rc = PMcall (pmcmdCreateGLctx, &rq)) != pmrcOK)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Cannot create OpenGL context\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot create OpenGL context\n");
     return false;
   }
 
@@ -271,7 +155,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   rq.Parm.BindCtx.Handle = WinHandle;
   if ((rc = PMcall (pmcmdBindGLctx, &rq)) != pmrcOK)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
     return false;
   }
 
@@ -372,18 +256,15 @@ void csGraphics2DOS2GL::FinishDraw ()
 
 bool csGraphics2DOS2GL::SetMousePosition (int x, int y)
 {
-  int fh;
-  System->GetHeightSetting (fh);
-
   POINTL pp;
   pp.x = x;
-  pp.y = fh - 1 - y;
+  pp.y = Height - 1 - y;
   WinMapWindowPoints (glW->hwndCL, HWND_DESKTOP, &pp, 1);
 
   return WinSetPointerPos (HWND_DESKTOP, pp.x, pp.y);
 }
 
-bool csGraphics2DOS2GL::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
+bool csGraphics2DOS2GL::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
 {
   if (!HardwareCursor)
   {
@@ -446,10 +327,7 @@ void csGraphics2DOS2GL::MouseHandlerStub (void *Self, int Button, int Down,
   if (!This)
     return;
 
-  int fh;
-  This->System->GetHeightSetting (fh);
-
-  This->OS2System->MouseEvent (Button, Down, x, fh - 1 - y,
+  This->System->QueueMouseEvent (Button, Down, x, This->Height - 1 - y,
     (ShiftFlags & GLKF_SHIFT ? CSMASK_SHIFT : 0) |
     (ShiftFlags & GLKF_CTRL ? CSMASK_CTRL : 0) |
     (ShiftFlags & GLKF_ALT ? CSMASK_ALT : 0));
@@ -467,11 +345,11 @@ void csGraphics2DOS2GL::KeyboardHandlerStub (void *Self, unsigned char ScanCode,
 void csGraphics2DOS2GL::FocusHandlerStub (void *Self, bool Enable)
 {
   csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
-  This->OS2System->FocusEvent (Enable);
+  This->System->QueueFocusEvent (Enable);
 }
 
 void csGraphics2DOS2GL::TerminateHandlerStub (void *Self)
 {
   csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
-  This->OS2System->TerminateEvent ();
+  This->System->StartShutdown ();
 }

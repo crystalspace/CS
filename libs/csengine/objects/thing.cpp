@@ -108,7 +108,7 @@ void csThing::Transform (csMatrix3& matrix)
   obj.SetT2O (matrix * obj.GetT2O ());
 }
 
-void csThing::CreateLightMaps (IGraphics3D* g3d)
+void csThing::CreateLightMaps (iGraphics3D* g3d)
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)

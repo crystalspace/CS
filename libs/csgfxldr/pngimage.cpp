@@ -43,7 +43,7 @@ AlphaMapFile* PNGImageLoader::LoadAlphaMap (UByte* buf, ULong size)
   return NULL;
 }
 
-ImageFile* PNGImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* PNGImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImagePngFile* i = new ImagePngFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat)) 
@@ -53,7 +53,7 @@ ImageFile* PNGImageLoader::LoadImage (UByte* buf, ULong size)
 
 //---------------------------------------------------------------------------
 
-ImagePngFile::ImagePngFile (UByte * ptr, size_t filesize):ImageFile ()
+ImagePngFile::ImagePngFile (UByte * ptr, size_t filesize):csImageFile ()
 {
   RGBPixel *Image;
   size_t rowbytes;

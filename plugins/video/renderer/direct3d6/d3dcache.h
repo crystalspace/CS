@@ -63,9 +63,9 @@ public:
   
 protected:
   ///
-  virtual void Load(HighColorCache_Data *d);
+  virtual void Load(csHighColorCacheData *d);
   ///
-  virtual void Unload(HighColorCache_Data *d);
+  virtual void Unload(csHighColorCacheData *d);
 private:
   ///
   void LoadIntoVRAM(D3DTextureCache_Data *tex);
@@ -89,9 +89,9 @@ public:
   
 protected:
   ///
-  virtual void Load(HighColorCache_Data *d);
+  virtual void Load(csHighColorCacheData *d);
   ///
-  virtual void Unload(HighColorCache_Data *d);
+  virtual void Unload(csHighColorCacheData *d);
 private:
   ///
   void LoadIntoVRAM(D3DLightCache_Data *tex);

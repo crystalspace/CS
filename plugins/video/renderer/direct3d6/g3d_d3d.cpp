@@ -47,8 +47,6 @@
 
 #include "cs3d/direct3d6/g3d_d3d.h"
 
-csIniFile *configd3d6;
-
 void out(char *str,...)
 {
   FILE *f;
@@ -86,12 +84,18 @@ DDPIXELFORMAT csGraphics3DDirect3DDx6::m_ddpfLightmapPixelFormat = { 0 };
 // Interface table definition
 //
 
-BEGIN_INTERFACE_TABLE(csGraphics3DDirect3DDx6)
-IMPLEMENTS_INTERFACE( IGraphics3D )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics3DDirect3DDx6)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics3DDirect3DDx6)
+EXPORT_CLASS_TABLE (dx53d)
+  EXPORT_CLASS (csGraphics3DDirect3DDx6, "crystalspace.graphics3d.direct3d.dx6",
+    "Direct3D DX6 3D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
+IMPLEMENT_IBASE (csGraphics3DDirect3DDx6)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iHaloRasterizer)
+IMPLEMENT_IBASE_END
 
 //
 // Implementation
@@ -134,60 +138,26 @@ HRESULT CALLBACK csGraphics3DDirect3DDx6::EnumZBufferCallback( DDPIXELFORMAT* pd
   return D3DENUMRET_OK;
 }
 
-csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6(ISystem* piSystem) : 
-m_bIsHardware(false),
-m_dwDeviceBitDepth(-1),
-m_hd3dBackMat(NULL),
-m_bIsLocked(false),
-m_iTypeLightmap(-1),
-m_pLightmapCache(NULL),
-m_lpD3D(NULL),
-m_lpd3dBackMat(NULL),
-m_lpd3dDevice(NULL),
-m_lpd3dViewport(NULL),
-m_lpDD(NULL),
-m_lpddDevice(NULL),
-m_lpddPrimary(NULL),
-m_lpddZBuffer(NULL),
-m_pTextureCache(NULL),
-m_piSystem(piSystem)
+csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6(iBase *iParent) : 
+  m_bIsHardware(false),
+  m_dwDeviceBitDepth(-1),
+  m_hd3dBackMat(NULL),
+  m_bIsLocked(false),
+  m_iTypeLightmap(-1),
+  m_pLightmapCache(NULL),
+  m_lpD3D(NULL),
+  m_lpd3dBackMat(NULL),
+  m_lpd3dDevice(NULL),
+  m_lpd3dViewport(NULL),
+  m_lpDD(NULL),
+  m_lpddDevice(NULL),
+  m_lpddPrimary(NULL),
+  m_lpddZBuffer(NULL),
+  m_pTextureCache(NULL),
+  m_piSystem(iSys)
 {
-  HRESULT hRes;
-  CLSID clsid2dDriver;
-  char *sz2DDriver = "crystalspace.graphics2d.direct3d.dx6";
-  IGraphics2DFactory* piFactory = NULL;
-  
-  cd3d6onfig = new csIniFile("Direct3DDX6.cfg");
+  CONSTRUCT_IBASE (iParent);
 
-  piSystem->AddRef();
-  ASSERT( m_piSystem );
-
-  SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender DX6 selected\n");
-  
-  hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
-  
-  if (FAILED(hRes))
-  {	  
-    SysPrintf(MSG_FATAL_ERROR, "FATAL: Cannot open \"%s\" 2D Graphics driver", sz2DDriver);
-    exit(0);
-  }
-  
-  hRes = csCoGetClassObject( clsid2dDriver, CLSCTX_INPROC_SERVER, NULL, IID_IGraphics2DFactory, (void**)&piFactory );
-  if (FAILED(hRes))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-    exit(0);
-  }
-  
-  hRes = piFactory->CreateInstance( IID_IGraphics2D, m_piSystem, (void**)&m_piG2D );
-  if (FAILED(hRes))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-    exit(0);
-  }
-  
-  FINAL_RELEASE( piFactory );
-  
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
   m_Caps.CanClip = false;
@@ -204,8 +174,6 @@ m_piSystem(piSystem)
   m_Caps.PrimaryCaps.PerspectiveCorrects = false;
   m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
 
-  use16BitTexture=cd3d6onfig->GetYesNo("Direct3DDX6","USE_16BIT_TEXTURE",false);
-
   rstate_dither = false;
   rstate_specular = false;
   rstate_bilinearmap = false;
@@ -216,7 +184,42 @@ m_piSystem(piSystem)
   rstate_gouraud = true;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
+csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
+{   
+  if (m_pCamera)
+    m_pCamera->DecRef ();
+  if (config)
+    delete config;
+  if (m_piG2D)
+    m_piG2D->DecRef ();
+  if (m_piSystem)
+  {
+    m_piSystem->DeregisterDriver ("iGraphics3D", this);
+    m_piSystem->DecRef ();
+  }
+}
+
+bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
+{
+  (m_piSystem = iSys)->IncRef ();
+
+  if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
+    return false;
+
+  SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender DX6 selected\n");
+
+  m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx6", iGraphics2D);
+  if (!m_piG2D)
+  {
+    SysPrintf(MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
+    return false;
+  }
+
+  config = new csIniFile("Direct3DDX6.cfg");
+  use16BitTexture=config->GetYesNo("Direct3DDX6","USE_16BIT_TEXTURE",false);
+}
+
+bool csGraphics3DDirect3DDx6::Open(const char* Title)
 {
   LPD3DDEVICEDESC lpD3dDeviceDesc;
   DWORD dwDeviceMemType;
@@ -231,24 +234,11 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
   IDirectDraw4* lpDD4 = NULL;
   DDSCAPS2 ddsCaps;
   DWORD dwTotal, dwFree;
-  
-  IDDraw6GraphicsInfo* pSysGInfo = NULL;
-  IGraphicsInfo*      pGraphicsInfo = NULL;
   D3DRECT rect;
   
-  hRes = m_piG2D->QueryInterface(IID_IDDraw6GraphicsInfo, (void**)&pSysGInfo);
-  if (FAILED(hRes))
-    goto OnError;
-  
-  m_piG2D->QueryInterface(IID_IGraphicsInfo, (void**)&pGraphicsInfo);
-  if (FAILED(hRes))
-    goto OnError;
-  
   // Open the 2D driver.
-  
-  hRes = m_piG2D->Open(Title);
-  if ( FAILED(hRes) )
-    goto OnError;
+  if (!m_piG2D->Open(Title))
+    return false;
 
   // Get the direct detection device.
   
@@ -259,29 +249,29 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
   pSysGInfo->GetDirectDrawPrimary(&m_lpddPrimary);
   pSysGInfo->GetDirectDrawBackBuffer(&m_lpddDevice);
   
-  pGraphicsInfo->GetWidth(m_nWidth);
+  m_nWidth = pGraphicsInfo->GetWidth();
   m_nHalfWidth = m_nWidth/2;
   
-  pGraphicsInfo->GetHeight(m_nHeight);
+  m_nHeight = pGraphicsInfo->GetHeight();
   m_nHalfHeight = m_nHeight/2;
   
   ZeroMemory(&ddsCaps, sizeof(ddsCaps)); 
   ddsCaps.dwCaps = DDSCAPS_TEXTURE;
   hRes = m_lpDD->GetAvailableVidMem(&ddsCaps, &dwTotal, &dwFree);
   if ( FAILED(hRes) )
-    goto OnError;
+    return false;
   
   // get direct3d interface
   
   hRes = m_lpDD->QueryInterface(IID_IDirect3D3, (LPVOID *)&m_lpD3D);
   if(FAILED(hRes))
-    goto OnError;
+    return false;
   
   memset(&ddsd, 0, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
   hRes = m_lpddPrimary->GetSurfaceDesc(&ddsd);
   if( FAILED(hRes) )
-    goto OnError;
+    return false;
   
   switch (ddsd.ddpfPixelFormat.dwRGBBitCount)
   {
@@ -330,7 +320,7 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
   if (!lpD3dDeviceDesc->dwDeviceZBufferBitDepth && m_bIsHardware)
   {
     hRes = CSD3DERR_NOZBUFFER;
-    goto OnError;
+    return false;
   }
 
   DDPIXELFORMAT ddpfZBuffer;
@@ -347,16 +337,16 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
   
   hRes = m_lpDD->CreateSurface(&ddsd, &m_lpddZBuffer, NULL);
   if (FAILED(hRes))
-    goto OnError;   
+    return false;   
   
   hRes = m_lpddDevice->AddAttachedSurface(m_lpddZBuffer);
   if (FAILED(hRes))
-    goto OnError; 
+    return false; 
   
   // get the device interface
   hRes = m_lpD3D->CreateDevice(m_Guid, m_lpddDevice, &m_lpd3dDevice, NULL);
   if (FAILED(hRes))
-    goto OnError;        
+    return false;        
   
   // get the texture format we want
   m_lpd3dDevice->EnumTextureFormats(EnumTextFormatsCallback, (LPVOID)&ddsdFound);
@@ -380,14 +370,14 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
   if (!bGotTexDesc && !bGotLitDesc)
   {
     hRes = E_FAIL;
-    goto OnError;
+    return false;
   }    
   
   // create a black background
   
   hRes = m_lpD3D->CreateMaterial(&m_lpd3dBackMat, NULL);
   if (FAILED(hRes))
-    goto OnError;
+    return false;
   
   memset(&d3dMaterial, 0, sizeof(d3dMaterial));
   d3dMaterial.dwSize = sizeof(d3dMaterial);
@@ -395,29 +385,29 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
   
   hRes = m_lpd3dBackMat->SetMaterial(&d3dMaterial);
   if (FAILED(hRes))
-    goto OnError;     
+    return false;     
   
   hRes = m_lpd3dBackMat->GetHandle(m_lpd3dDevice, &m_hd3dBackMat);
   if (FAILED(hRes))
-    goto OnError;
+    return false;
   
   // create the viewport
   
   hRes = m_lpD3D->CreateViewport(&m_lpd3dViewport, NULL);
   if (FAILED(hRes))
-    goto OnError;
+    return false;
   
   // assign the viewport
   
   hRes = m_lpd3dDevice->AddViewport(m_lpd3dViewport);
   if (FAILED(hRes))
-    goto OnError;
+    return false;
   
   // assign the background to the viewport
   
   hRes = m_lpd3dViewport->SetBackground(m_hd3dBackMat);
   if (FAILED(hRes))
-    goto OnError;
+    return false;
   
   // set default render-states.
   m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
@@ -502,27 +492,11 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
   
   hRes = m_lpd3dViewport->Clear(1, &rect, D3DCLEAR_ZBUFFER);
   if (FAILED(hRes))
-    goto OnError;
-  
-OnError:
-  
-  if (FAILED(hRes))
-    FINAL_RELEASE(m_piG2D);
-  
-  FINAL_RELEASE(pGraphicsInfo);
-  FINAL_RELEASE(pSysGInfo);
-  
-  return hRes;
+    return false;
+  return true;
 }
 
-csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
-{   
-  FINAL_RELEASE( m_pCamera );
-  FINAL_RELEASE( m_piG2D );
-  FINAL_RELEASE( m_piSystem );
-}
-
-STDMETHODIMP csGraphics3DDirect3DDx6::Close()
+void csGraphics3DDirect3DDx6::Close()
 {
   ClearCache();
   
@@ -532,11 +506,9 @@ STDMETHODIMP csGraphics3DDirect3DDx6::Close()
   FINAL_RELEASE(m_lpd3dBackMat);
   FINAL_RELEASE(m_lpd3dViewport);
   FINAL_RELEASE(m_lpD3D);
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::SetDimensions(int nWidth, int nHeight)
+void csGraphics3DDirect3DDx6::SetDimensions(int nWidth, int nHeight)
 {
   D3DVIEWPORT2 d3dViewport;
   
@@ -566,18 +538,15 @@ STDMETHODIMP csGraphics3DDirect3DDx6::SetDimensions(int nWidth, int nHeight)
   
   if (FAILED(m_lpd3dDevice->SetCurrentViewport(m_lpd3dViewport)))
     return E_FAIL;
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::SetPerspectiveCenter (int x, int y)
+void csGraphics3DDirect3DDx6::SetPerspectiveCenter (int x, int y)
 {
   m_nHalfWidth = x;
   m_nHalfHeight = y;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
+bool csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
 {
   if (nDrawFlags & CSDRAW_2DGRAPHICS)
   {
@@ -620,17 +589,15 @@ STDMETHODIMP csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
       
       hRes = m_lpd3dDevice->BeginScene();
       if (FAILED(hRes))
-        return E_FAIL;
-      
+        return false;
     } 
   } 
   
   m_nDrawMode = nDrawFlags;
-  
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::FinishDraw ()
+void csGraphics3DDirect3DDx6::FinishDraw ()
 {
   if (m_nDrawMode & CSDRAW_2DGRAPHICS)
   {
@@ -647,14 +614,12 @@ STDMETHODIMP csGraphics3DDirect3DDx6::FinishDraw ()
       return E_FAIL;
   }
   m_nDrawMode = 0;
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
+void csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
 {
   if (mode==m_ZBufMode) 
-    return S_OK;
+    return;
   
   m_ZBufMode = mode;
   
@@ -667,34 +632,24 @@ STDMETHODIMP csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
     VERIFY( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS) == DD_OK );
   else 
     VERIFY( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL) == DD_OK );
-  
-  return S_OK;
 }
 
 
-STDMETHODIMP csGraphics3DDirect3DDx6::DumpCache()
+void csGraphics3DDirect3DDx6::DumpCache()
 {
   m_pTextureCache->Dump();
   m_pLightmapCache->Dump();
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::ClearCache()
+void csGraphics3DDirect3DDx6::ClearCache()
 {
   if ( m_pTextureCache ) 
-  {
     m_pTextureCache->Clear();
-  }
   if ( m_pLightmapCache )
-  {
     m_pLightmapCache->Clear();
-  }
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::CacheTexture(IPolygonTexture *piPT)
+void csGraphics3DDirect3DDx6::CacheTexture(iPolygonTexture *piPT)
 {
   ITextureMap* piTM = NULL;
   IMipMapContainer* piMMC = NULL;
@@ -713,17 +668,11 @@ STDMETHODIMP csGraphics3DDirect3DDx6::CacheTexture(IPolygonTexture *piPT)
   {
     m_pLightmapCache->Add(piPT);
   } 
-  
-  FINAL_RELEASE( piTM );
-  FINAL_RELEASE( piMMC );
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::UncacheTexture(IPolygonTexture *texture)
+void csGraphics3DDirect3DDx6::UncacheTexture(iPolygonTexture *texture)
 {
   (void)texture;
-  return E_NOTIMPL;
 }
 
 void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
@@ -792,7 +741,7 @@ void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float
 }
 
 
-STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
+void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 {
   ASSERT( m_lpd3dDevice );
   
@@ -806,11 +755,11 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   float M, N, O;
   int i;
   
-  HighColorCache_Data* pTexCache;
-  HighColorCache_Data* pLightCache;
+  csHighColorCacheData* pTexCache;
+  csHighColorCacheData* pLightCache;
   D3DTLVERTEX vx;
   
-  IPolygonTexture* pTex;
+  iPolygonTexture* pTex;
   
   float z;
   
@@ -843,28 +792,22 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   piTM->GetParent( &piMMC );
   ASSERT( piMMC );
   
-  piMMC->GetTransparent (bColorKeyed);
+  bColorKeyed = piMMC->GetTransparent ();
  
   // retrieve the cached texture handle.
-  piMMC->GetHighColorCache( &pTexCache ); 
+  pTexCache = piMMC->GetHighColorCache (); 
   ASSERT( pTexCache );
   
-  FINAL_RELEASE( piTM );
-  FINAL_RELEASE( piMMC );
-  
   // retrieve the lightmap from the cache.
-  ILightMap* piLM = NULL;
-  pTex->GetLightMap( &piLM );
+  iLightMap* piLM = pTex->GetLightMap ();
   
   if ( piLM )
   {
-    piLM->GetHighColorCache( &pLightCache );
+    pLightCache = piLM->GetHighColorCache ();
     if (!pLightCache)
     {
       bLightmapExists = false;
     }
-    
-    piLM->Release();
   }
   else
   {
@@ -1013,19 +956,18 @@ lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT );
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
   }
 */  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygonDPQ& poly)
+void csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygonDPQ& poly)
 {    
   int i;
-  HighColorCache_Data *pTexData;
+  csHighColorCacheData *pTexData;
   D3DTLVERTEX vx;
   
   ASSERT( m_pTextureCache );
   
   m_pTextureCache->Add(poly.pi_texture);
-  poly.pi_texture->GetHighColorCache(&pTexData);
+  pTexData = poly.pi_texture->GetHighColorCache ();
   
   VERIFY( m_lpd3dDevice->SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex) == DD_OK);
   VERIFY( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
@@ -1045,31 +987,17 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygonDPQ& poly)
   }
   
   VERIFY( m_lpd3dDevice->End(0) == DD_OK );
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::DrawFltLight(G3DFltLight& light)
-{
-  return E_NOTIMPL;
-}
-
-STDMETHODIMP csGraphics3DDirect3DDx6::GetCaps(G3D_CAPS *caps)
+void csGraphics3DDirect3DDx6::GetCaps(G3D_CAPS *caps)
 {
   if (!caps)
-    return E_INVALIDARG;
+    return;
   
   memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::GetStringError( HRESULT hRes, char* szErrorString )
-{
-  return E_NOTIMPL;
-}
-
-STDMETHODIMP csGraphics3DDirect3DDx6::DrawLine (csVector3& v1, csVector3& v2, int color)
+void csGraphics3DDirect3DDx6::DrawLine (csVector3& v1, csVector3& v2, int color)
 {
   ASSERT( m_pCamera );
   if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
@@ -1109,129 +1037,107 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawLine (csVector3& v1, csVector3& v2, in
   int py2 = m_nHeight - 1 - QInt (y2 * iz2 + (m_nHeight/2));
   
   m_piG2D->DrawLine (px1, py1, px2, py2, color);
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
+bool csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
 {
   switch (option)
   {
-  case G3DRENDERSTATE_NOTHING:
-    return S_OK;
-    
-  case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-    if (value)
-      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
-    else
-      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
-    break;
-    
-  case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-    if (value)
-      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
-    else
-      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE);
-    break;
-    
-  case G3DRENDERSTATE_DITHERENABLE:
-    rstate_dither = value;
-    break;
-  case G3DRENDERSTATE_SPECULARENABLE:
-    rstate_specular = value;
-    break;
-  case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-    rstate_bilinearmap = value;
-    break;
-  case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-    rstate_trilinearmap = value;
-    break;
-  case G3DRENDERSTATE_TRANSPARENCYENABLE:
-    rstate_alphablend = value;
-    break;
-  case G3DRENDERSTATE_MIPMAPENABLE:
-    rstate_mipmap = value;
-    break;
-  case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-    rstate_flat = !value;
-    break;
-  case G3DRENDERSTATE_FILTERINGENABLE :
-  case G3DRENDERSTATE_PERFECTMAPPINGENABLE :
-  case G3DRENDERSTATE_LIGHTINGENABLE :
-  case G3DRENDERSTATE_INTERLACINGENABLE :
-  case G3DRENDERSTATE_MMXENABLE :
-    break;
-  case G3DRENDERSTATE_GOURAUDENABLE:
-    rstate_gouraud = value;
-    break;
-  default:
-    return E_INVALIDARG;
+    case G3DRENDERSTATE_NOTHING:
+      break;
+    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
+      if (value)
+        m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
+      else
+        m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
+      break;
+    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
+      if (value)
+        m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
+      else
+        m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE);
+      break;
+    case G3DRENDERSTATE_DITHERENABLE:
+      rstate_dither = value;
+      break;
+    case G3DRENDERSTATE_SPECULARENABLE:
+      rstate_specular = value;
+      break;
+    case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
+      rstate_bilinearmap = value;
+      break;
+    case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
+      rstate_trilinearmap = value;
+      break;
+    case G3DRENDERSTATE_TRANSPARENCYENABLE:
+      rstate_alphablend = value;
+      break;
+    case G3DRENDERSTATE_MIPMAPENABLE:
+      rstate_mipmap = value;
+      break;
+    case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
+      rstate_flat = !value;
+      break;
+    case G3DRENDERSTATE_FILTERINGENABLE :
+    case G3DRENDERSTATE_PERFECTMAPPINGENABLE :
+    case G3DRENDERSTATE_LIGHTINGENABLE :
+    case G3DRENDERSTATE_INTERLACINGENABLE :
+    case G3DRENDERSTATE_MMXENABLE :
+      break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      rstate_gouraud = value;
+      break;
+    default:
+      return false;
   }
-  
-  return S_OK;
+
+  return true;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op, long& retval)
+long csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op)
 {
   DWORD d3d_value;
   switch(op)
   {
     case G3DRENDERSTATE_NOTHING:
-      retval = 0;
-      break;
+      return 0;
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
       m_lpd3dDevice->GetRenderState(D3DRENDERSTATE_ZFUNC, &d3d_value);
-      retval = (bool)(D3DCMP_LESSEQUAL & d3d_value);
-      break;
+      return (bool)(D3DCMP_LESSEQUAL & d3d_value);
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
       m_lpd3dDevice->GetRenderState(D3DRENDERSTATE_ZWRITEENABLE, &d3d_value);
-      retval = (bool)(TRUE & d3d_value);
-      break;
+      return (bool)(TRUE & d3d_value);
     case G3DRENDERSTATE_DITHERENABLE:
-      retval = rstate_dither;
-      break;
+      return rstate_dither;
     case G3DRENDERSTATE_SPECULARENABLE:
-      retval = rstate_specular;
-      break;
+      return rstate_specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      retval = rstate_bilinearmap;
-      break;
+      return rstate_bilinearmap;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      retval = rstate_trilinearmap;
-      break;
+      return rstate_trilinearmap;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
-      retval = rstate_alphablend;
-      break;
+      return rstate_alphablend;
     case G3DRENDERSTATE_MIPMAPENABLE:
-      retval = rstate_mipmap;
-      break;
+      return rstate_mipmap;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-      retval = !rstate_flat;
-      break;
+      return !rstate_flat;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      retval = rstate_gouraud;
-      break;
+      return rstate_gouraud;
     default:
-      retval = 0;
-      return E_INVALIDARG;
+      return 0;
   }
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::OpenFogObject (CS_ID id, csFog* fog)
+void csGraphics3DDirect3DDx6::OpenFogObject (CS_ID id, csFog* fog)
 {
-  return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype)
+void csGraphics3DDirect3DDx6::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype)
 {
-  return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::CloseFogObject (CS_ID id)
+void csGraphics3DDirect3DDx6::CloseFogObject (CS_ID id)
 {
-  return E_NOTIMPL;
 }
 
 void csGraphics3DDirect3DDx6::SysPrintf(int mode, char* szMsg, ...)
@@ -1245,5 +1151,3 @@ void csGraphics3DDirect3DDx6::SysPrintf(int mode, char* szMsg, ...)
   
   m_piSystem->Print(mode, buf);
 }
-
-

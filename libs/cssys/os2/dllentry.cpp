@@ -18,7 +18,7 @@
 */
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 extern "C" int DosScanEnv (const char *pszName, char **ppszValue);
 
@@ -39,7 +39,6 @@ extern "C" unsigned long _DLL_InitTerm (unsigned long mod_handle, unsigned long 
     case 0:
       if (_CRT_init ()) return 0;
       __ctordtorInit ();
-      DllInitialize ();
       return 1;
     case 1:
       __ctordtorTerm ();
@@ -55,7 +54,6 @@ extern "C" unsigned long _DLL_InitTerm (unsigned long mod_handle, unsigned long 
 extern "C" unsigned __dll_initialize (unsigned long mod_handle)
 {
   dll_handle = mod_handle;
-  DllInitialize ();
   return 1;
 }
 

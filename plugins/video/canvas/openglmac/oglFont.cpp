@@ -161,5 +161,3 @@ void csGraphics2DOpenGLFontServer::WriteCharacter(char writeme, int fontnumber)
  
     glCallList(Font_Offsets[fontnumber] + writeme);
 }
-
-

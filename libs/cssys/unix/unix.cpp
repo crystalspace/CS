@@ -128,12 +128,6 @@ void SysSystemDriver::Help ()
     UseSHM ? "" : "no");
 }
 
-void SysSystemDriver::FocusHandler (int Enable)
-{
-  if (EventQueue)
-    do_focus (Enable);
-}
-
 void SysSystemDriver::Loop(void)
 {
   while (!Shutdown && !ExitLoop)
@@ -156,7 +150,7 @@ void SysSystemDriver::Sleep (int SleepTime)
 
 IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED (SysSystemDriver, UnixSystemDriver)
 
-STDMETHODIMP SysSystemDriver::XUnixSystemDriver::GetSettings (int &SimDepth,
+STDMETHODIMP SysSystemDriver::XUnixSystemDriver::GetExtSettings (int &SimDepth,
   bool &UseSHM, bool &HardwareCursor)
 {
   METHOD_PROLOGUE (SysSystemDriver, UnixSystemDriver)
@@ -172,29 +166,6 @@ STDMETHODIMP SysSystemDriver::XUnixSystemDriver::SetLoopCallback
   METHOD_PROLOGUE(SysSystemDriver, UnixSystemDriver)
   pThis->Callback = Callback;
   pThis->CallbackParam = Param;
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XUnixSystemDriver::KeyboardEvent
-  (int Key, bool Down)
-{
-  METHOD_PROLOGUE (SysSystemDriver, UnixSystemDriver)
-  ((SysKeyboardDriver *)pThis->Keyboard)->Handler (Key, Down);
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XUnixSystemDriver::MouseEvent
-  (int Button, int Down, int x, int y, int ShiftFlags)
-{
-  METHOD_PROLOGUE (SysSystemDriver, UnixSystemDriver)
-  ((SysMouseDriver *)pThis->Mouse)->Handler (Button, Down, x, y, ShiftFlags);
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XUnixSystemDriver::FocusEvent (int Enable)
-{
-  METHOD_PROLOGUE(SysSystemDriver, UnixSystemDriver)
-  pThis->FocusHandler (Enable);
   return S_OK;
 }
 

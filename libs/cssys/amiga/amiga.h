@@ -26,7 +26,9 @@
 class SysSystemDriver : public csSystemDriver
 {
 public:
-	SysSystemDriver () : csSystemDriver() {};
+	DECLARE_IBASE;
+
+	SysSystemDriver ();
 	~SysSystemDriver ();
 
 	virtual void Loop ();

@@ -20,7 +20,6 @@
 #include "cssys/system.h"
 #include "walktest/infmaze.h"
 #include "walktest/walktest.h"
-#include "csutil/sparse3d.h"
 #include "csengine/sector.h"
 #include "csengine/portal.h"
 #include "csengine/polygon.h"
@@ -31,6 +30,7 @@
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csobject/dataobj.h"
+#include "sparse3d.h"
 
 InfiniteMaze::InfiniteMaze ()
 {
@@ -241,7 +241,7 @@ void InfPortalCS::ConnectNewSector ()
   s->Prepare ();
   s->InitLightMaps (false);
   s->ShineLights ();
-  s->CreateLightMaps (System->piG3D);
+  s->CreateLightMaps (System->G3D);
   while (lviews)
   {
     int old_draw_busy = s->draw_busy;

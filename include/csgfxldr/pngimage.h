@@ -24,13 +24,13 @@
 class PNGImageLoader;
 
 /**
- * An ImageFile subclass for reading PNG files.<p>
+ * An csImageFile subclass for reading PNG files.<p>
  * This implementation needs both zlib and pnglib to read .PNG files.
  */
-class ImagePngFile : public ImageFile
+class ImagePngFile : public csImageFile
 {
   ///
-  friend class ImageFile;	// For constructor
+  friend class csImageFile;	// For constructor
   friend class PNGImageLoader;
 
 private:
@@ -55,7 +55,7 @@ class PNGImageLoader : public ImageLoader
 protected:
   ///
 
-  virtual ImageFile* LoadImage (UByte* buf, ULong size);
+  virtual csImageFile* LoadImage (UByte* buf, ULong size);
   virtual AlphaMapFile* LoadAlphaMap (UByte* buf, ULong size);
 
 public:

@@ -20,55 +20,27 @@
 #define __SYSG2D_H__
 
 #include <gl/gl.h>
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
-#include "cs2d/openglwin/xsysg2d.h"
 #include "cs2d/openglcommon/gl2d_font.h"
 #include "cs2d/openglcommon/glcommon2d.h"
-
-
-class csTextureHandle;
-class csGraphics2DOpenGLFontServer;
-class OpenGLTextureCache;
-
-// the CLSID to create csGraphics2DWin32 instances.
-extern const CLSID CLSID_OpenGLGraphics2D;
-
-extern const IID IID_IGraphics2DOpenGLFactory;
-/// dummy interface
-interface IGraphics2DOpenGLFactory : public IGraphics2DFactory
-{
-};
-
-///
-class csGraphics2DOpenGLFactory : public IGraphics2DOpenGLFactory 
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DOpenGLFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(BOOL bLock);
-};
 
 /// Windows version.
 class csGraphics2DOpenGL : public csGraphics2DGLCommon
 {
-  friend class csGraphics3DOpenGL;
-
 private:
   // Calculate the OpenGL pixel format.
   void CalcPixelFormat ();
 
 public:
-  csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D);
+  csGraphics2DOpenGL(iSystem* piSystem, bool bUses3D);
   virtual ~csGraphics2DOpenGL(void);
   
   virtual bool Open (const char *Title);
   virtual void Close ();
   
-  virtual void Initialize();
+  virtual bool Initialize(iSystem *pSystem);
 
   virtual void Print (csRect *area = NULL);
   
@@ -78,7 +50,7 @@ public:
   virtual void FinishDraw();
   virtual HRESULT SetColorPalette();
   
-  virtual bool SetMouseCursor (int iShape, csTextureHandle* iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle* iBitmap);
   virtual bool SetMousePosition (int x, int y);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);
@@ -100,7 +72,7 @@ protected:
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
   
-  IWin32SystemDriver* m_piWin32System;
+  iWin32SystemDriver* m_piWin32System;
 
   bool m_bPalettized;
   bool m_bPaletteChanged;
@@ -109,10 +81,6 @@ protected:
   
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DOpenGL)
-  DECLARE_COMPOSITE_INTERFACE(XOpenGLGraphicsInfo)
 };
 
 #endif

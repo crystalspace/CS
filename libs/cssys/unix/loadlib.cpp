@@ -16,15 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
-
-#ifdef NO_COM_SUPPORT
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "cssys/csshlib.h"
 #include <dlfcn.h>
 #include <unistd.h>
-#include "cscom/com.h"
+#include <string.h>
+#include <stdio.h>
 
 #ifdef DEBUG
 #  define DLOPEN_MODE 	RTLD_NOW		// handy for debugging
@@ -32,43 +28,40 @@
 #  define DLOPEN_MODE 	RTLD_LAZY
 #endif
 
-CS_HLIBRARY SysLoadLibrary (const char* szLibName)
+/**
+ * We try to find the library in the following sequence:
+ * <iName>.so, lib<iName>.so, <cwd><iName>.so, <cwd>lib<iName>.so
+ */
+csLibraryHandle csLoadLibrary (const char* iName)
 {
-  CS_HLIBRARY Handle;
-  Handle = (CS_HLIBRARY) dlopen (szLibName, DLOPEN_MODE);
-  if (!Handle)
+  csLibraryHandle Handle;
+  for (int Try = 0; Try < 4; Try++)
   {
-    char path [1255];
-    getcwd (path, 1024);
-    strcat (path, "/");
-    strcat (path, szLibName);
-    Handle = (CS_HLIBRARY) dlopen (path, DLOPEN_MODE);
-  }
-  if (Handle)
-  {
-    HRESULT (*DllInitialize) () = (HRESULT (*) ())dlsym ((void*)Handle, "DllInitialize");
-    if (!DllInitialize)
+    char name [1255];
+    name [0] = 0;
+    if (Try >= 2)
     {
-      fprintf (stderr, "%s: Unable to find DllInitialize entry\n", szLibName);
-      dlclose ((void*)Handle);
-      return (CS_HLIBRARY)0;
+      getcwd (name, sizeof (name));
+      strcat (name, "/");
     }
-    DllInitialize ();
+    if (Try & 1)
+      strcat (name, "lib");
+    strcat (strcat (name, iName), ".so");
+    if (Handle = dlopen (name, DLOPEN_MODE))
+      break;
   }
-  else
+  if (!Handle)
     fprintf (stderr, "%s\n", dlerror ());
 
   return Handle;
 }
 
-PROC SysGetProcAddress (CS_HLIBRARY Handle, const char* szProcName)
+void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
 {
-  return (PROC)dlsym ((void *)Handle, szProcName);
+  return dlsym (Handle, iName);
 }
 
-bool SysFreeLibrary (CS_HLIBRARY Handle)
+bool csUnloadLibrary (csLibraryHandle Handle)
 {
-  return (dlclose ((void *)Handle) == 0);
+  return (dlclose (Handle) == 0);
 }
-
-#endif

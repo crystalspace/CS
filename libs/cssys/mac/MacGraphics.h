@@ -22,7 +22,7 @@
 #include <QDOffscreen.h>
 #include <Palettes.h>
 #include <DrawSprocket.h>
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "xsysg2d.h"
 
@@ -36,7 +36,7 @@ public:
     DECLARE_IUNKNOWN()
     DECLARE_INTERFACE_TABLE(csGraphics2DMacFactory)
 
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHOD(CreateInstance)(REFIID riid, iSystem* piSystem, void** ppv);
     STDMETHOD(LockServer)(COMBOOL bLock);
 };
 
@@ -46,7 +46,7 @@ class csGraphics2DMac : public csGraphics2D
   friend class csGraphics3DSoftware;
 
 public:
-	 					 csGraphics2DMac( ISystem* piSystem );
+	 					 csGraphics2DMac( iSystem* piSystem );
 	virtual 			~csGraphics2DMac();
 
 					// this is handled in the constuctor
@@ -61,7 +61,7 @@ public:
 	virtual bool 		BeginDraw();
 	virtual void		FinishDraw ();
 
-	virtual bool		SetMouseCursor( int iShape, ITextureHandle *hBitmap );
+	virtual bool		SetMouseCursor( int iShape, iTextureHandle *hBitmap );
 	virtual int			GetPage();
 	virtual bool		DoubleBuffer( bool Enable );
 	virtual bool		DoubleBuffer() { return mDoubleBuffering; }

@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssnddrv/waveoutsd/wodrv.h"
 #include "isnddrv.h"
 
@@ -112,7 +112,7 @@ BEGIN_INTERFACE_TABLE (csSoundDriverWaveOutFactory)
   IMPLEMENTS_INTERFACE (ISoundDriverFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csSoundDriverWaveOutFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csSoundDriverWaveOutFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

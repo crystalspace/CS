@@ -27,27 +27,21 @@
 #include "cssys/system.h"
 
 /// DJGPP version.
-class SysSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver, public iDosSystemDriver
 {
 public:
+  DECLARE_IBASE;
+
   SysSystemDriver ();
 
   virtual void Loop ();
 
-  /// Implementation of IDosSystemDriver
-  class XDosSystemDriver : public IDosSystemDriver
-  {
-    DECLARE_IUNKNOWN ()
-    /// Enable or disable text-mode CsPrintf
-    STDMETHOD (EnablePrintf) (bool Enable);
-    /// Set mouse position since mouse driver is part of system driver
-    STDMETHOD (SetMousePosition) (int x, int y);
-  };
+  /// Implementation of iDosSystemDriver
 
-  // COM stuff
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (SysSystemDriver)
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (DosSystemDriver)
+  /// Enable or disable text-mode CsPrintf
+  virtual void EnablePrintf (bool Enable);
+  /// Set mouse position since mouse driver is part of system driver
+  virtual bool SetMousePosition (int x, int y);
 };
 
 /// DJGPP version.
@@ -78,7 +72,7 @@ public:
   SysMouseDriver();
   virtual ~SysMouseDriver ();
 
-  virtual bool Open (ISystem *System, csEventQueue*);
+  virtual bool Open (iSystem *System, csEventQueue*);
   virtual void Close ();
   bool SetMousePosition (int x, int y);
 };

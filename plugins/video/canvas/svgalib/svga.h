@@ -24,33 +24,17 @@
 #include <vgakeyboard.h>
 #include <vgamouse.h>
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
-
-// The CLSID to create csGraphics2DSVGA instances
-extern const CLSID CLSID_SVGALibGraphics2D;
-
-///
-class csGraphics2DSVGALibFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DSVGALibFactory)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
 
 /// SVGALIB version.
 class csGraphics2DSVGALib : public csGraphics2D
 {
   /// Physical graphics context
   GraphicsContext physicalscreen;
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Pointer to DOS-specific interface
-  IUnixSystemDriver* UnixSystem;
+  iUnixSystemDriver* UnixSystem;
 
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
@@ -63,12 +47,14 @@ class csGraphics2DSVGALib : public csGraphics2D
   int mouse_x, mouse_y;
   
 public:
-  csGraphics2DSVGALib (ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DSVGALib (iBase *iParent);
   virtual ~csGraphics2DSVGALib ();
 
   virtual bool Open (const char *Title);
   virtual void Close ();
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
 
   virtual bool BeginDraw () { return (Memory != NULL); }
   virtual bool DoubleBuffer (bool Enable) { return true; }
@@ -76,13 +62,6 @@ public:
 
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);
-
-protected:
-  /// This function is functionally equivalent to csSystemDriver::CsPrintf
-  void CsPrintf (int msgtype, const char *format, ...);
-
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DSVGALib)
 };
 
 #endif // __SVGA_H__

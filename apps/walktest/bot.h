@@ -52,7 +52,7 @@ public:
   virtual ~Bot ();
 
   ///
-  void move (long elapsed_time);
+  void move (time_t elapsed_time);
 
   ///
   void set_bot_move (const csVector3& v);

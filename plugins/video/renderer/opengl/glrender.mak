@@ -1,26 +1,28 @@
 # This is a subinclude file used to define the rules needed
-# to build the OpenGL 3D driver -- glrender
+# to build the OpenGL 3D driver -- gl3d
 
 # Driver description
-DESCRIPTION.glrender = Crystal Space OpenGL 3D driver
+DESCRIPTION.gl3d = Crystal Space OpenGL 3D driver
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glrender     Make the $(DESCRIPTION.glrender)$"
+DRVHELP += $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glrender
+.PHONY: gl3d
 
-all drivers drivers3d: glrender
+all drivers drivers3d: gl3d
 
-glrender:
+gl3d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+gl3dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -48,16 +50,16 @@ endif # OPENGL.LIBS.DEFINED
 
 # The 3D OpenGL driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GL3D=$(OUTDLL)glrender$(DLL)
+  GL3D=$(OUTDLL)gl3d$(DLL)
   LIBS.GL3D=$(LIBS.LOCAL.GL3D)
   DEP.GL3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  GL3D=$(OUT)$(LIB_PREFIX)glrender$(LIB)
+  GL3D=$(OUT)$(LIB_PREFIX)gl3d$(LIB)
   DEP.EXE+=$(GL3D)
   LIBS.EXE+=$(LIBS.LOCAL.GL3D)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_OPENGL3D
 endif
-DESCRIPTION.$(GL3D) = $(DESCRIPTION.glrender)
+DESCRIPTION.$(GL3D) = $(DESCRIPTION.gl3d)
 SRC.GL3D = $(wildcard libs/cs3d/opengl/*.cpp) \
   libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
   libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp
@@ -68,13 +70,12 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glrender glclean glcleanlib
+.PHONY: gl3d gl3dclean
 
 # Chain rules
-clean: glclean
-cleanlib: glcleanlib
+clean: gl3dclean
 
-glrender: $(OUTDIRS) $(GL3D)
+gl3d: $(OUTDIRS) $(GL3D)
 
 $(OUT)%$O: libs/cs3d/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GL3D)
@@ -82,18 +83,15 @@ $(OUT)%$O: libs/cs3d/opengl/%.cpp
 $(GL3D): $(OBJ.GL3D) $(DEP.GL3D)
 	$(DO.PLUGIN) $(LIBS.GL3D)
 
-glclean:
-	$(RM) $(GL3D)
-
-glcleanlib:
-	$(RM) $(OBJ.GL3D) $(GLX2D)
+gl3dclean:
+	$(RM) $(GL3D) $(OBJ.GL3D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glrender.dep
-$(OUTOS)glrender.dep: $(SRC.GL3D)
+depend: $(OUTOS)gl3d.dep
+$(OUTOS)gl3d.dep: $(SRC.GL3D)
 	$(DO.DEP)
 else
--include $(OUTOS)glrender.dep
+-include $(OUTOS)gl3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

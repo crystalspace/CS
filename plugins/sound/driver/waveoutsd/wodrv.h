@@ -24,7 +24,7 @@
 // SoundDriver.H
 // csSoundDriverWaveOut class.
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "isnddrv.h"
 
 extern const CLSID CLSID_waveOutSoundDriver;
@@ -32,7 +32,7 @@ extern const CLSID CLSID_waveOutSoundDriver;
 class csSoundDriverWaveOut : public ISoundDriver
 {
 public:
-	csSoundDriverWaveOut(ISystem* piSystem);
+	csSoundDriverWaveOut(iSystem* piSystem);
 
 	virtual ~csSoundDriverWaveOut();
 
@@ -55,7 +55,7 @@ public:
   /// print to the system's device
   void SysPrintf(int mode, char* str, ...);
 protected:
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
   ISoundRender *m_piSoundRender;
   void * Memory;
   int MemorySize;
@@ -77,7 +77,7 @@ protected:
 
 class csSoundDriverWaveOutFactory : public ISoundDriverFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

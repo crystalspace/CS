@@ -21,23 +21,15 @@
 #ifndef __ICSOS2_H__
 #define __ICSOS2_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
-extern const IID IID_IOS2SystemDriver;
-
-interface IOS2SystemDriver : public IUnknown
+SCF_INTERFACE (iOS2SystemDriver, 0, 0, 1) : public iBase
 {
   /// Get user settings
-  STDMETHOD (GetSettings) (int &WindowX, int &WindowY,
-    int &WindowWidth, int &WindowHeight, bool &HardwareCursor) PURE;
+  virtual void GetExtSettings (int &oWindowX, int &oWindowY,
+    int &oWindowWidth, int &oWindowHeight, bool &oHardwareCursor) = 0;
   /// Put a keyboard event into event queue
-  STDMETHOD (KeyboardEvent) (int ScanCode, bool Down) PURE;
-  /// Put a mouse event into event queue
-  STDMETHOD (MouseEvent) (int Button, int Down, int x, int y, int ShiftFlags) PURE;
-  /// Put a focus change event into event queue
-  STDMETHOD (FocusEvent) (bool Enable) PURE;
-  /// Handle application termination event
-  STDMETHOD (TerminateEvent) () PURE;
+  virtual void KeyboardEvent (int ScanCode, bool Down) = 0;
 };
 
 #endif // __ICSOS2_H__

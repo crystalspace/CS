@@ -19,7 +19,7 @@
 #ifndef CURVE_H
 #define CURVE_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csengine/bezier.h"
@@ -28,7 +28,7 @@
 #include "csengine/rview.h"
 #include "csobject/csobj.h"
 
-interface ITextureHandle;
+scfInterface iTextureHandle;
 
 /**
  * Vertex resulting from a tesselated curve.
@@ -120,7 +120,7 @@ public:
    */
   virtual void SetControlPoint (int index, int control_id) = 0;
   ///
-  ITextureHandle* GetTextureHandle () { return cstxt ? cstxt->GetTextureHandle () : (ITextureHandle*)NULL; }
+  iTextureHandle* GetTextureHandle () { return cstxt ? cstxt->GetTextureHandle () : (iTextureHandle*)NULL; }
   ///
   void SetTextureHandle (csTextureHandle* h) { cstxt = h; }
 

@@ -212,7 +212,7 @@ void NeXTProxy2D::flush()
 //-----------------------------------------------------------------------------
 // set_mouse_cursor
 //-----------------------------------------------------------------------------
-bool NeXTProxy2D::set_mouse_cursor( int shape, ITextureHandle* )
+bool NeXTProxy2D::set_mouse_cursor( int shape, iTextureHandle* )
     {
     bool handled = false;
     if (shape == 0)	// 0 == csmcArrow  (Can not include COM header.)

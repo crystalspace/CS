@@ -23,7 +23,7 @@
 #include <mmsystem.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssnddrv/waveoutsd/wodrv.h"
 #include "isystem.h"
 #include "csutil/inifile.h"
@@ -59,7 +59,7 @@ BEGIN_INTERFACE_TABLE(csSoundDriverWaveOut)
   IMPLEMENTS_INTERFACE(ISoundDriver)
 END_INTERFACE_TABLE()
 
-csSoundDriverWaveOut::csSoundDriverWaveOut(ISystem* piSystem)
+csSoundDriverWaveOut::csSoundDriverWaveOut(iSystem* piSystem)
 {
   m_piSystem = piSystem;
   m_piSoundRender = NULL;

@@ -24,13 +24,13 @@
 class JPGImageLoader;
 
 /**
- * An ImageFile subclass for reading JPG files.<p>
+ * An csImageFile subclass for reading JPG files.<p>
  * This implementation needs libjpeg to read JFIF files.
  */
-class ImageJpgFile : public ImageFile
+class ImageJpgFile : public csImageFile
 {
   ///
-  friend class ImageFile;	// For constructor
+  friend class csImageFile;	// For constructor
   friend class JPGImageLoader;
 
 private:
@@ -49,7 +49,7 @@ class JPGImageLoader : public ImageLoader
 {
 protected:
   ///
-  virtual ImageFile* LoadImage (UByte* buf, ULong size);
+  virtual csImageFile* LoadImage (UByte* buf, ULong size);
   virtual AlphaMapFile* LoadAlphaMap(UByte *buf,ULong size);
 public:
   ///

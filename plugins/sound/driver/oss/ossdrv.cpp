@@ -34,7 +34,7 @@
 #include <signal.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssnddrv/oss/ossdrv.h"
 #include "isystem.h"
 #include "isndlstn.h"
@@ -236,7 +236,7 @@ bool csSoundDriverOSS::SetupTimer( int nTimesPerSecond )
     return bTimerInstalled;
 }
 
-csSoundDriverOSS::csSoundDriverOSS(ISystem* piSystem)
+csSoundDriverOSS::csSoundDriverOSS(iSystem* piSystem)
 {
   m_piSystem = piSystem;
   m_piSoundRender = NULL;

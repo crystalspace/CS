@@ -25,8 +25,7 @@
 #include "csgfxldr/csimage.h"
 #include "csgfxldr/boxfilt.h"
 #include "csutil/csvector.h"
-
-//---------------------------------------------------------------------------
+#include "csutil/util.h"
 
 void box_filter3 (Filter3x3& f, RGBPixel* bm, int x, int y, int w, int h, int* pr, int* pg, int* pb)
 {
@@ -112,26 +111,65 @@ void box_filter5 (Filter5x5& f, RGBPixel* bm, int x, int y, int w, int h, int* p
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN_NODELETE (ImageFile)
-  
-BEGIN_INTERFACE_TABLE (ImageFile)
-	IMPLEMENTS_COMPOSITE_INTERFACE (ImageFile)
-END_INTERFACE_TABLE()
-	    
+IMPLEMENT_IBASE (csImageFile)
+  IMPLEMENTS_INTERFACE (iImageFile)
+IMPLEMENT_IBASE_END
 
-
-ImageFile::ImageFile ()
+csImageFile::csImageFile ()
 {
+  CONSTRUCT_IBASE (NULL);
   image = NULL;
+  fname = NULL;
   status = IFE_OK;
 }
 
-ImageFile::~ImageFile ()
+csImageFile::~csImageFile ()
 {
   CHK (delete [] image);
 }
 
-void ImageFile::set_dimensions (int w, int h)
+int csImageFile::GetWidth ()
+{
+  return width;
+}
+
+int csImageFile::GetHeight ()
+{
+  return height;
+}
+
+int csImageFile::GetSize ()
+{
+  return width * height;
+}
+
+RGBPixel *csImageFile::GetImageData ()
+{
+  return image;
+}
+
+iImageFile *csImageFile::MipMap (int steps, Filter3x3* filt1, Filter5x5* filt2)
+{
+  csImageFile* ifile = mipmap (steps, filt1, filt2);
+  ifile->IncRef ();
+  return ifile;
+}
+
+iImageFile *csImageFile::MipMap (int steps)
+{
+  csImageFile* ifile = mipmap (steps);
+  ifile->IncRef ();
+  return ifile;
+}
+
+iImageFile *csImageFile::Blend (Filter3x3* filter)
+{
+  csImageFile* ifile = blend (filter);
+  ifile->IncRef ();
+  return ifile;
+}
+
+void csImageFile::set_dimensions (int w, int h)
 {
   width = w;
   height = h;
@@ -142,16 +180,16 @@ void ImageFile::set_dimensions (int w, int h)
   CHK (image = new RGBPixel [(w+1)*(h+1)]); 
 }
 
-const char* ImageFile::get_status_mesg() const
+const char* csImageFile::get_status_mesg() const
 {
   if (status & IFE_BadFormat) return "wrong data format";
   else if (status & IFE_Corrupt) return "image file corrupt";
   else return "image successfully read";
 }
 
-ImageFile* ImageFile::mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2)
+csImageFile* csImageFile::mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2)
 {
-  CHK (ImageFile* nimg = new ImageFile ());
+  CHK (csImageFile* nimg = new csImageFile ());
   int w = width, h = height;
   int w2, h2;
   if (steps == 1) { w2 = width / 2; h2 = height / 2; }
@@ -232,7 +270,7 @@ ImageFile* ImageFile::mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2)
   // mipmap again for the final step.
   if (steps == 3)
   {
-    ImageFile* nimg2 = nimg->mipmap (1, filt1, filt2);
+    csImageFile* nimg2 = nimg->mipmap (1, filt1, filt2);
     CHK (delete nimg);
     nimg = nimg2;
   }
@@ -240,9 +278,9 @@ ImageFile* ImageFile::mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2)
   return nimg;
 }
 
-ImageFile* ImageFile::mipmap (int steps)
+csImageFile* csImageFile::mipmap (int steps)
 {
-  CHK (ImageFile* nimg = new ImageFile ());
+  CHK (csImageFile* nimg = new csImageFile ());
   int w = width;
   int w2, h2;
   if (steps == 1) { w2 = width / 2; h2 = height / 2; }
@@ -286,9 +324,9 @@ ImageFile* ImageFile::mipmap (int steps)
   return nimg;
 }
 
-ImageFile* ImageFile::blend (Filter3x3* filt1)
+csImageFile* csImageFile::blend (Filter3x3* filt1)
 {
-  CHK (ImageFile* nimg = new ImageFile ());
+  CHK (csImageFile* nimg = new csImageFile ());
   nimg->set_dimensions (width, height);
   RGBPixel* nimage = nimg->get_buffer ();
   RGBPixel* bm = image, * bm2 = nimage;
@@ -303,6 +341,18 @@ ImageFile* ImageFile::blend (Filter3x3* filt1)
       bm2++;
     }
   return nimg;
+}
+
+void csImageFile::SetName (const char *iName)
+{
+  if (fname)
+    delete [] fname;
+  fname = strnew (iName);
+}
+
+const char *csImageFile::GetName ()
+{
+  return fname;
 }
 
 //---------------------------------------------------------------------------
@@ -346,13 +396,13 @@ bool ImageLoader::Register (ImageLoader* loader)
   return true;
 }
 
-ImageFile* ImageLoader::load (UByte* buf, ULong size)
+csImageFile* ImageLoader::load (UByte* buf, ULong size)
 {
   int i=0;
   while (i < loaderlist->Length() )
   {
     ImageLoader* l = (ImageLoader*) (loaderlist->Get (i));
-    ImageFile* img = l->LoadImage (buf,size);
+    csImageFile* img = l->LoadImage (buf,size);
     if (img) return img;
     i++; 
   }
@@ -370,5 +420,3 @@ AlphaMapFile* ImageLoader::load_alpha(UByte *buf,ULong size)
 	}
 	return NULL;
 }
-
-//---------------------------------------------------------------------------

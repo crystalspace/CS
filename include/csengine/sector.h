@@ -37,7 +37,7 @@ class Dumper;
 class csPolygonTree;
 class csPolygon2DQueue;
 class csProgressPulse;
-interface IGraphics3D;
+scfInterface iGraphics3D;
 
 /**
  * A sector is a convex hull of polygons. It is
@@ -259,7 +259,7 @@ public:
    * also convert the lightmaps so that they are suitable for the
    * 3D rasterizer.
    */
-  void CreateLightMaps (IGraphics3D* g3d);
+  void CreateLightMaps (iGraphics3D* g3d);
 
   /**
    * Draw the sector in the given view and with the given transformation.

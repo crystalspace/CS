@@ -25,10 +25,10 @@
 #include "csengine/camera.h"
 #include "igraph3d.h"
 
-csView::csView (csWorld *iWorld, IGraphics3D* ig3d)
+csView::csView (csWorld *iWorld, iGraphics3D* ig3d)
 {
   world = iWorld;
-  g3d = ig3d;
+  (G3D = ig3d)->IncRef ();
   CHK (view = new csPolygon2D ());
   CHK (camera = new csCamera ());
   clipper = NULL;
@@ -36,6 +36,7 @@ csView::csView (csWorld *iWorld, IGraphics3D* ig3d)
 
 csView::~csView ()
 {
+  G3D->DecRef ();
   CHK (delete camera);
   CHK (delete view);
   CHK (delete clipper);
@@ -69,8 +70,8 @@ void csView::Draw ()
     else
       CHKB (clipper = new csBoxClipper (bview));
 
-  g3d->SetPerspectiveCenter ((int)camera->shift_x, (int)camera->shift_y);
-  world->Draw (g3d, camera, clipper);
+  G3D->SetPerspectiveCenter ((int)camera->shift_x, (int)camera->shift_y);
+  world->Draw (camera, clipper);
 }
 
 void csView::SetSector (csSector *sector)

@@ -156,10 +156,3 @@ SYSCONFIG += $(NEWLINE)type bin\dosconf.var>>config.tmp
 endif
 
 endif # rootdefines & config
-
-#--------------------------------------------------------------- volatile.h ---#
-ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/volatile)
-
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define USGISH$">>volatile.tmp
-
-endif # rootdefines & volatile

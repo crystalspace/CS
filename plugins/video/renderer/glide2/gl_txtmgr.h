@@ -19,7 +19,7 @@
 #ifndef TXTMGR_GLIDE_H
 #define TXTMGR_GLIDE_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 #include "cs3d/common/imgtools.h"
@@ -27,8 +27,7 @@
 class ImageColorInfo;
 class csTextureMMGlide;
 class csTextureManagerGlide;
-struct HighColorCache_Data;
-interface IImageFile;
+scfInterface iImageFile;
 
 // Colors are encoded in a 16-bit short using the following
 // distribution (only for 8-bit mode):
@@ -86,11 +85,11 @@ class csTextureMMGlide : public csHardwareAcceleratedTextureMM
 {
 private:
   /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm);
+  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm);
 
 public:
   ///
-  csTextureMMGlide (IImageFile* image);
+  csTextureMMGlide (iImageFile* image);
   ///
   virtual ~csTextureMMGlide ();
 
@@ -134,34 +133,32 @@ private:
 
 public:
   ///
-  csTextureManagerGlide (ISystem* piSystem, IGraphics2D* piG2D);
+  csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D);
   ///
   virtual ~csTextureManagerGlide ();
   ///
-  virtual void InitSystem ();
+  virtual void Initialize ();
 
   ///
   virtual void clear ();
 
   ///
-  STDMETHODIMP Initialize ();
+  virtual void Prepare ();
   ///
-  STDMETHODIMP Prepare ();
+  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d);
   ///
-  STDMETHODIMP RegisterTexture (IImageFile* image, ITextureHandle** handle, bool for3d, bool for2d);
+  virtual void UnregisterTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP UnregisterTexture (ITextureHandle* handle);
+  virtual void MergeTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP MergeTexture (ITextureHandle* handle);
+  virtual void FreeImages ();
   ///
-  STDMETHODIMP FreeImages ();
+  virtual void ReserveColor (int r, int g, int b);
   ///
-  STDMETHODIMP ReserveColor (int r, int g, int b);
-  ///
-  STDMETHODIMP AllocPalette ();
+  virtual void AllocPalette ();
 
   /// Create a new texture.
-  csTextureMMGlide* new_texture (IImageFile* image);
+  csTextureMMGlide* new_texture (iImageFile* image);
 
   ///
   bool force_mixing (char* mix);

@@ -19,7 +19,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "icamera.h"
 
@@ -46,7 +46,7 @@ class Dumper;
 /**
  * A camera positioned in the 3D world.
  */
-class csCamera : public csOrthoTransform
+class csCamera : public csOrthoTransform, public iCamera
 {
   friend class Dumper;
 
@@ -245,14 +245,16 @@ public:
   /// Change the shift for perspective correction.
   void SetPerspectiveCenter (float x, float y) { shift_x = x; shift_y = y; }
 
+  ///------------------------ iCamera implementation ------------------------
+  DECLARE_IBASE;
+  ///
+  virtual float GetAspect ();
+  ///
+  virtual float GetInvAspect ();
+
 private:
   ///
   void Correct (int n, float* vals[]);
-
-  DECLARE_INTERFACE_TABLE( csCamera )
-  DECLARE_IUNKNOWN()
-
-  DECLARE_COMPOSITE_INTERFACE( Camera )
 };
 
 #define GetICameraFromCamera(a)  &a->m_xCamera

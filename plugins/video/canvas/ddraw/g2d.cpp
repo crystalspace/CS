@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/ddraw/g2d.h"
 #include "cssys/win32/directdetection.h"
 #include "isystem.h"
@@ -60,15 +60,20 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
-#define NAME  "Crystal"
+IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
-BEGIN_INTERFACE_TABLE(csGraphics2DDDraw3)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IDDraw3GraphicsInfo, XDDraw3GraphicsInfo )
-END_INTERFACE_TABLE()
+EXPORT_CLASS_TABLE (ddraw)
+  EXPORT_CLASS (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
+    "DirectDraw DX3 2D graphics driver for Crystal Space")
+  EXPORT_CLASS (csGraphics2DDDraw3, "crystalspace.graphics2d.direct3d.dx5",
+    "DirectDraw DX5 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DDDraw3)
+IMPLEMENT_IBASE (csGraphics2DDDraw3)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iGraphics2DDDraw3)
+IMPLEMENT_IBASE_END
 
 ///// Windowed-mode palette stuff //////
 
@@ -159,54 +164,54 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
 extern DirectDetection DDetection;
 extern DirectDetectionDevice * DirectDevice;
 
-csGraphics2DDDraw3::csGraphics2DDDraw3(ISystem* piSystem, bool bUses3D) : 
-                   csGraphics2D (piSystem),
-                   m_hWnd(NULL),
-                   m_bDisableDoubleBuffer(false),
-                   m_bPaletteChanged(false),
-                   m_bPalettized(false),
-                   m_lpDD(NULL),
-                   m_lpddClipper(NULL),
-                   m_lpddPal(NULL),
-                   m_lpddsBack(NULL),
-                   m_lpddsPrimary(NULL),
-                   m_nActivePage(0),
-                   m_nGraphicsReady(true),
-                   m_bLocked(false),
-                   m_piWin32System(NULL),
-                   m_bUses3D(bUses3D)
+csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent, bool bUses3D) : 
+  csGraphics2D (),
+  m_hWnd(NULL),
+  m_bDisableDoubleBuffer(false),
+  m_bPaletteChanged(false),
+  m_bPalettized(false),
+  m_lpDD(NULL),
+  m_lpddClipper(NULL),
+  m_lpddPal(NULL),
+  m_lpddsBack(NULL),
+  m_lpddsPrimary(NULL),
+  m_nActivePage(0),
+  m_nGraphicsReady(true),
+  m_bLocked(false),
+  m_piWin32System(NULL),
+  m_bUses3D(bUses3D)
 {
+  CONSTRUCT_IBASE (iParent);
+
   HRESULT ddrval;
 
-  // QI for IWin32SystemDriver //
-  ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&m_piWin32System);
-  if (FAILED(ddrval))
-      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
+  // QI for iWin32SystemDriver //
+  m_piWin32System* piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
+  if (!m_piWin32System))
+      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.", ddrval);
 }
 
 csGraphics2DDDraw3::~csGraphics2DDDraw3(void)
 {
-  FINAL_RELEASE(m_piWin32System);
+  m_piWin32System->DecRef ();
   Close();
   m_nGraphicsReady=0;
 }
 
-void csGraphics2DDDraw3::Initialize ()
+bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
 {
   DDSURFACEDESC ddsd;
   HRESULT ddrval;
   DDPIXELFORMAT ddpf;
 
-  csGraphics2D::Initialize();
+  if (!csGraphics2D::Initialize(pSystem))
+    return false;
 
   // Get the creation parameters //
   m_piWin32System->GetInstance(&m_hInstance);
   m_piWin32System->GetCmdShow(&m_nCmdShow);
 
-  system->GetDepthSetting(Depth);
-  system->GetHeightSetting(Height);
-  system->GetWidthSetting(Width);
-  system->GetFullScreenSetting(FullScreen);
+  System->GetSetting(Width, Height, Depth, FullScreen);
   
   // Create the DirectDraw device //
   LPGUID pGuid = NULL;
@@ -229,9 +234,9 @@ void csGraphics2DDDraw3::Initialize ()
   
   // create a DD object for either the primary device or the secondary. //
   if(!pGuid)
-    SysPrintf(MSG_INITIALIZATION, "Use the primary DirectDraw device\n");
+    CsPrintf(MSG_INITIALIZATION, "Use the primary DirectDraw device\n");
   else 
-    SysPrintf(MSG_INITIALIZATION, "Use a secondary DirectDraw device : %s (%s)\n", DirectDevice->DeviceName2D, DirectDevice->DeviceDescription2D);
+    CsPrintf(MSG_INITIALIZATION, "Use a secondary DirectDraw device : %s (%s)\n", DirectDevice->DeviceName2D, DirectDevice->DeviceDescription2D);
   
   // Create DD Object 
   ddrval = DirectDrawCreate (pGuid, &m_lpDD, NULL);
@@ -307,8 +312,8 @@ void csGraphics2DDDraw3::Initialize ()
 
   if (Depth == 16)
   {
-    DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
-    GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
+    _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
+    _GetPixelAt = GetPixelAt16; _DrawSprite = DrawSprite16;
 
     // Set pixel format
     pfmt.PixelBytes = 2;
@@ -321,8 +326,8 @@ void csGraphics2DDDraw3::Initialize ()
   }
   else if (Depth == 32)
   {
-    DrawPixel = DrawPixel32;   WriteChar = WriteChar32;
-    GetPixelAt = GetPixelAt32; DrawSprite = DrawSprite32;
+    _DrawPixel = DrawPixel32;   _WriteChar = WriteChar32;
+    _GetPixelAt = GetPixelAt32; _DrawSprite = DrawSprite32;
     
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
@@ -345,6 +350,7 @@ void csGraphics2DDDraw3::Initialize ()
          pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask,
          pfmt.RedShift, pfmt.GreenShift, pfmt.BlueShift);
 #endif
+  return true;
 }
 
 bool csGraphics2DDDraw3::Open(const char *Title)
@@ -376,7 +382,7 @@ bool csGraphics2DDDraw3::Open(const char *Title)
     wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
     wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
-    m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
+    m_hWnd = CreateWindowEx(exStyle, "CrystalWindow", Title, style,
                           (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                             (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                             wwidth, wheight, NULL, NULL, m_hInstance, NULL );
@@ -705,7 +711,7 @@ void csGraphics2DDDraw3::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-bool csGraphics2DDDraw3::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
+bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
 {
   (void)hBitmap;
   (void)iShape;
@@ -742,4 +748,25 @@ bool csGraphics2DDDraw3::SetMousePosition (int x, int y)
   ::SetCursorPos(p.x, p.y);
 
   return true;
+}
+
+void csGraphics2DDDraw3::GetDirectDrawDriver (LPDIRECTDRAW* lplpDirectDraw)
+{
+  *lplpDirectDraw = m_lpDD;
+}
+
+void csGraphics2DDDraw3::GetDirectDrawPrimary (LPDIRECTDRAWSURFACE* lplpDirectDrawPrimary)
+{
+  *lplpDirectDrawPrimary = m_lpddsPrimary;
+}
+
+void csGraphics2DDDraw3::GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE* lplpDirectDrawBackBuffer)
+{
+  *lplpDirectDrawBackBuffer = m_lpddsBack;
+}
+
+extern DirectDetectionDevice* DirectDevice;
+void csGraphics2DDDraw3::GetDirectDetection (IDirectDetectionInternal** lplpDDetection)
+{
+  *lplpDDetection = static_cast<IDirectDetectionInternal*>(DirectDevice);
 }

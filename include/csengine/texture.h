@@ -25,20 +25,20 @@
 #include "igraph2d.h"
 
 class csWorld;
-class ImageFile;
-interface ITextureHandle;
+class csImageFile;
+scfInterface iTextureHandle;
 
 /**
  * csTextureHandle represents a texture and its link
- * to the ITextureHandle as returned by ITextureManager.
+ * to the iTextureHandle as returned by iTextureManager.
  */
 class csTextureHandle : public csObject
 {
 private:
-  /// The corresponding ImageFile.
-  ImageFile* ifile;
-  /// The handle as returned by ITextureManager.
-  ITextureHandle* txt_handle;
+  /// The corresponding csImageFile.
+  csImageFile* ifile;
+  /// The handle as returned by iTextureManager.
+  iTextureHandle* txt_handle;
   // Transparent color
   int transp_r, transp_g, transp_b;
 
@@ -49,20 +49,20 @@ public:
   bool for_3d;
 
   /// Construct a texture handle given a image file
-  csTextureHandle (ImageFile* image);
+  csTextureHandle (csImageFile* image);
   /// Copy contstructor
   csTextureHandle (csTextureHandle &th);
   /// Release texture handle
   virtual ~csTextureHandle ();
 
   /// Get the texture handle.
-  ITextureHandle* GetTextureHandle () { return txt_handle; }
+  iTextureHandle* GetTextureHandle () { return txt_handle; }
 
   /// Set the texture handle.
-  void SetTextureHandle (ITextureHandle* h);
+  void SetTextureHandle (iTextureHandle* h);
 
-  /// Get the ImageFile.
-  ImageFile* GetImageFile () { return ifile; }
+  /// Get the csImageFile.
+  csImageFile* GetImageFile () { return ifile; }
 
   /// Set the transparent color.
   void SetTransparent (int red, int green, int blue);
@@ -103,7 +103,7 @@ public:
   void Clear ();
 
   /// Create a new texture.
-  csTextureHandle* NewTexture (ImageFile* image);
+  csTextureHandle* NewTexture (csImageFile* image);
 
   /// Return number of textures
   int GetNumTextures () { return num_textures; }

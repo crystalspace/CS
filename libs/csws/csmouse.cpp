@@ -18,7 +18,6 @@
 */
 
 #include "sysdef.h"
-#include "cssys/system.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
 #include "csinput/csevent.h"
@@ -73,7 +72,7 @@ void csMousePointer::Free ()
   }
 }
 
-void csMousePointer::SetTexture (ITextureHandle *tex)
+void csMousePointer::SetTexture (iTextureHandle *tex)
 {
   if (Cursor)
     CHKB (delete Cursor);
@@ -128,13 +127,13 @@ void csMouse::NewPointer (char *id, char *posdef)
 
 static bool do_set_texture (csComponent *child, void *param)
 {
-  ((csMousePointer *)child)->SetTexture ((ITextureHandle *)param);
+  ((csMousePointer *)child)->SetTexture ((iTextureHandle *)param);
   return false;
 }
 
 void csMouse::Setup ()
 {
-  ITextureHandle *tex = app->GetTexture (MOUSE_TEXTURE_NAME);
+  iTextureHandle *tex = app->GetTexture (MOUSE_TEXTURE_NAME);
   if (tex)
     ForEach (do_set_texture, tex);
 }
@@ -169,8 +168,7 @@ bool csMouse::SetCursor (csMouseCursorID ID)
   csMousePointer *Cur = (csMousePointer *)GetChild (ID);
   if (Cur)
   {
-    if (SUCCEEDED (System->piG2D->SetMouseCursor (ID,
-      Cur->Cursor->GetTextureHandle ())))
+    if (app->SetMouseCursor (ID, Cur->Cursor->GetTextureHandle ()))
       invisible = true;
     else
     {
@@ -180,7 +178,7 @@ bool csMouse::SetCursor (csMouseCursorID ID)
     return true;
   } else
   {
-    System->piG2D->SetMouseCursor (csmcNone, NULL);
+    app->SetMouseCursor (csmcNone, NULL);
     invisible = true;
     return false;
   }

@@ -17,21 +17,14 @@
 */
 
 #include "sysdef.h"
-#include "csengine/config.h"
 #include "csengine/world.h"
 #include "csengine/sector.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
 
-//---------------------------------------------------------------------------
+#define NUM_OPTIONS 8
 
-IMPLEMENT_UNKNOWN_NODELETE (csEngineConfig)
-
-BEGIN_INTERFACE_TABLE (csEngineConfig)
-	IMPLEMENTS_COMPOSITE_INTERFACE (EngineConfig)
-END_INTERFACE_TABLE()
-
-csOptionDescription csEngineConfig::config_options[] =
+csOptionDescription csWorld::config_options [NUM_OPTIONS] =
 {
   { 0, "fov", "Field of Vision", CSVAR_LONG },
   { 1, "rad", "Pseudo-radiosity system", CSVAR_BOOL },
@@ -43,9 +36,12 @@ csOptionDescription csEngineConfig::config_options[] =
   { 7, "cache", "Enabling caching of generated lightmaps", CSVAR_BOOL },
 };
 
-#define NUM_OPTIONS 8
-
-bool csEngineConfig::SetOption (int id, csVariant* value)
+int csWorld::GetOptionCount ()
+{
+  return NUM_OPTIONS;
+}
+  
+bool csWorld::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
@@ -62,7 +58,7 @@ bool csEngineConfig::SetOption (int id, csVariant* value)
   return true;
 }
 
-bool csEngineConfig::GetOption (int id, csVariant* value)
+bool csWorld::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
@@ -80,47 +76,9 @@ bool csEngineConfig::GetOption (int id, csVariant* value)
   return true;
 }
 
-int csEngineConfig::GetNumberOptions ()
-{
-  return NUM_OPTIONS;
-}
-
-bool csEngineConfig::GetOptionDescription (int idx, csOptionDescription* option)
+bool csWorld::GetOptionDescription (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS) return false;
   *option = config_options[idx];
   return true;
 }
-
-IMPLEMENT_COMPOSITE_UNKNOWN (csEngineConfig, EngineConfig)
-
-STDMETHODIMP IEngineConfig::SetOption (int id, csVariant* value)
-{
-  METHOD_PROLOGUE (csEngineConfig, EngineConfig);
-  if (!pThis->SetOption (id, value)) return E_FAIL;
-  return S_OK;
-}
-
-STDMETHODIMP IEngineConfig::GetOption (int id, csVariant* value)
-{
-  METHOD_PROLOGUE (csEngineConfig, EngineConfig);
-  if (!pThis->GetOption (id, value)) return E_FAIL;
-  return S_OK;
-}
-
-STDMETHODIMP IEngineConfig::GetNumberOptions (int& num)
-{
-  METHOD_PROLOGUE (csEngineConfig, EngineConfig);
-  num = pThis->GetNumberOptions ();
-  return S_OK;
-}
-
-STDMETHODIMP IEngineConfig::GetOptionDescription (int idx, csOptionDescription* option)
-{
-  METHOD_PROLOGUE (csEngineConfig, EngineConfig);
-  if (!pThis->GetOptionDescription (idx, option)) return E_FAIL;
-  return S_OK;
-}
-
-//---------------------------------------------------------------------------
-

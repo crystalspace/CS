@@ -21,7 +21,7 @@
 #ifndef CSBE_H
 #define CSBE_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "def.h"
 #include "csinput/csinput.h"
 #include "cssys/system.h"
@@ -32,30 +32,24 @@ class CrystApp;
 class SysKeyboardDriver : public csKeyboardDriver {};
 class SysMouseDriver : public csMouseDriver {};
 
-class SysSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver, public iBeLibSystemDriver
 {
 protected:
   bool running;
   CrystApp* app;
-  void ProcessUserEvent(BMessage*);
-  bool SetMouseCursor(int shape);
+
 public:
-  SysSystemDriver();
+  DECLARE_IBASE;
+
+  SysSystemDriver ();
 
   // Main event loop
-  virtual void Loop();
-  long LoopThread();
+  virtual void Loop ();
+  long LoopThread ();
 
-  /// Implementation of IBeLibSystemDriver
-  class XBeLibSystemDriver : public IBeLibSystemDriver
-  {
-    DECLARE_IUNKNOWN()
-    STDMETHOD(ProcessUserEvent)(BMessage*);
-    STDMETHOD(SetMouseCursor)(int shape, ITextureHandle*);
-  };
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(SysSystemDriver)
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED(BeLibSystemDriver);
+  /// Implementation of iBeLibSystemDriver
+  void ProcessUserEvent (BMessage*);
+  void SetMouseCursor (int shape, iTextureHandle*);
 };
 
 #endif // CSBE_H

@@ -81,7 +81,7 @@ void csPolygon2D::AddPerspectiveUnit (float x, float y, float z)
 }
 
 
-void csPolygon2D::Draw (IGraphics2D* g2d, int col)
+void csPolygon2D::Draw (iGraphics2D* g2d, int col)
 {
   int i;
   int x1, y1, x2, y2;
@@ -643,10 +643,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
     g3dpoly.z_value         = poly->Vcam(0).z;
 
     for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)
-    {
-      g3dpoly.poly_texture[mipmaplevel] =
-        GetIPolygonTextureFromcsPolyTexture(poly->GetLightMapInfo ()->GetPolyTex(mipmaplevel));
-    }
+      g3dpoly.poly_texture[mipmaplevel] = poly->GetLightMapInfo ()->GetPolyTex (mipmaplevel);
 
     g3dpoly.plane.m_cam2tex = &plane->m_cam2tex;
     g3dpoly.plane.v_cam2tex = &plane->v_cam2tex;
@@ -663,17 +660,12 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
     else
     {
       CalculateFogPolygon (rview, g3dpoly);
-      if (FAILED (rview->g3d->DrawPolygon (g3dpoly)))
-      {
-        CsPrintf (MSG_STDOUT, "Drawing polygon '%s/%s' failed!\n",
-                  ((csSector*)poly->GetParent ())->GetName (),
-                  poly->GetName());
-      }
+      rview->g3d->DrawPolygon (g3dpoly);
     }
   }
 }
 
-void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* /*poly*/, csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
+void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/, csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
 {
   int i;
 

@@ -21,22 +21,45 @@
 #include <assert.h>
 #include "sysdef.h"
 #include "qint.h"
-#include "cssys/system.h"
 #include "csws/csgfxppl.h"
+#include "isystem.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 
-csGraphicsPipeline::csGraphicsPipeline ()
+csGraphicsPipeline::csGraphicsPipeline (iSystem *System)
 {
   MaxPage = 0;
   memset (SyncArea, 0, sizeof (SyncArea));
   ClearColor = -1;
   pipelen = 0;
+  iG3D = QUERY_PLUGIN (System, iGraphics3D);
+  iG2D = QUERY_PLUGIN (System, iGraphics2D);
+  if (iG2D)
+  {
+    FrameWidth = iG2D->GetWidth ();
+    FrameHeight = iG2D->GetHeight ();
+  }
 }
 
 csGraphicsPipeline::~csGraphicsPipeline ()
 {
   Desync ();
+  if (iG2D)
+    iG2D->DecRef ();
+  if (iG3D)
+    iG3D->DecRef ();
+}
+
+bool csGraphicsPipeline::ClipLine (float &x1, float &y1, float &x2, float &y2,
+  int ClipX1, int ClipY1, int ClipX2, int ClipY2)
+{
+  return iG2D->ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2);
+}
+
+bool csGraphicsPipeline::SetMouseCursor (csMouseCursorID Shape,
+  iTextureHandle *hBitmap)
+{
+  return iG2D->SetMouseCursor (Shape, hBitmap);
 }
 
 void csGraphicsPipeline::Box (int xmin, int ymin, int xmax, int ymax, int color)
@@ -78,7 +101,7 @@ void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, const cha
   pe->Text.y = y;
   pe->Text.fg = fg;
   pe->Text.bg = bg;
-  pe->Text.font = font;
+  pe->font = font;
   CHK (pe->Text.string = new char[strlen (s) + 1]);
   strcpy (pe->Text.string, s);
 }
@@ -94,7 +117,7 @@ void csGraphicsPipeline::Sprite2D (csSprite2D *s2d, int x, int y, int w, int h)
   pe->Spr2D.h = h;
 }
 
-void csGraphicsPipeline::SaveArea (ImageArea **Area, int x, int y, int w, int h)
+void csGraphicsPipeline::SaveArea (csImageArea **Area, int x, int y, int w, int h)
 {
   csPipeEntry *pe = AllocOp (pipeopSAVAREA);
   if (!pe) return;
@@ -105,7 +128,7 @@ void csGraphicsPipeline::SaveArea (ImageArea **Area, int x, int y, int w, int h)
   pe->SavArea.h = h;
 }
 
-void csGraphicsPipeline::RestoreArea (ImageArea *Area, bool Free)
+void csGraphicsPipeline::RestoreArea (csImageArea *Area, bool Free)
 {
   csPipeEntry *pe = AllocOp (pipeopRESAREA);
   if (!pe) return;
@@ -113,9 +136,9 @@ void csGraphicsPipeline::RestoreArea (ImageArea *Area, bool Free)
   pe->ResArea.Free = Free;
 }
 
-void csGraphicsPipeline::FreeArea (ImageArea *Area)
+void csGraphicsPipeline::FreeArea (csImageArea *Area)
 {
-  System->piG2D->FreeArea (Area);
+  iG2D->FreeArea (Area);
 }
 
 void csGraphicsPipeline::Clear (int color)
@@ -139,11 +162,66 @@ void csGraphicsPipeline::RestoreClipRect ()
   AllocOp (pipeopRESCLIP);
 }
 
+void *PackDPFX (G3DPolygonDPFX &poly)
+{
+  size_t size = sizeof (int) +
+    poly.num * (sizeof (G3DTexturedVertex) + sizeof (G3DFogInfo)) +
+    sizeof (bool) + sizeof (float) + sizeof (iTextureHandle *) +
+    sizeof (float) * 3;
+
+  void *ret = new char [size];
+
+#define PUT(t,v)  *((t *)ret) = v; ret = ((t *)ret) + 1
+
+  PUT (int, poly.num);
+  size = poly.num * sizeof (G3DTexturedVertex);
+  memcpy (ret, poly.vertices, size);
+  ret = ((char *)ret) + size;
+  size = poly.num * sizeof (G3DFogInfo);
+  memcpy (ret, poly.fog_info, size);
+  ret = ((char *)ret) + size;
+  PUT (bool, poly.use_fog);
+  PUT (float, poly.inv_aspect);
+  PUT (iTextureHandle *, poly.txt_handle);
+  PUT (float, poly.flat_color_r);
+  PUT (float, poly.flat_color_g);
+  PUT (float, poly.flat_color_b);
+
+#undef PUT
+
+  return ret;
+}
+
+void UnpackDPFX (void *Packed, G3DPolygonDPFX &poly)
+{
+  void *ret = Packed;
+
+#define GET(t,v)  v = *((t *)ret); ret = ((t *)ret) + 1
+
+  GET (int, poly.num);
+  size_t size = poly.num * sizeof (G3DTexturedVertex);
+  memcpy (poly.vertices, ret, size);
+  ret = ((char *)ret) + size;
+  size = poly.num * sizeof (G3DFogInfo);
+  memcpy (poly.fog_info, ret, size);
+  ret = ((char *)ret) + size;
+  GET (bool, poly.use_fog);
+  GET (float, poly.inv_aspect);
+  GET (iTextureHandle *, poly.txt_handle);
+  GET (float, poly.flat_color_r);
+  GET (float, poly.flat_color_g);
+  GET (float, poly.flat_color_b);
+
+#undef GET
+
+  delete [] (char *)Packed;
+}
+
 void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
 {
   csPipeEntry *pe = AllocOp (pipeopPOLY3D);
   if (!pe) return;
-  pe->Poly3D.poly = poly;
+  pe->Poly3D.poly = PackDPFX (poly);
   pe->Poly3D.mode = mode;
 }
 
@@ -159,8 +237,8 @@ void csGraphicsPipeline::Flush (int iCurPage)
   int old_font;
   int old_xmin, old_ymin, old_xmax, old_ymax;
   int clip_xmin, clip_ymin, clip_xmax, clip_ymax;
-  System->piGI->GetFontID (old_font);
-  System->piG2D->GetClipRect (old_xmin, old_ymin, old_xmax, old_ymax);
+  old_font = iG2D->GetFontID ();
+  iG2D->GetClipRect (old_xmin, old_ymin, old_xmax, old_ymax);
   clip_xmin = old_xmin; clip_xmax = old_xmax;
   clip_ymin = old_ymin; clip_ymax = old_ymax;
 
@@ -197,7 +275,7 @@ void csGraphicsPipeline::Flush (int iCurPage)
         break;
       case pipeopBOX:
       {
-        System->piG2D->DrawBox (op->Box.xmin, op->Box.ymin,
+        iG2D->DrawBox (op->Box.xmin, op->Box.ymin,
           op->Box.xmax - op->Box.xmin, op->Box.ymax - op->Box.ymin,
           op->Box.color);
         INCLUDE_MIN_POINT (op->Box.xmin, op->Box.ymin);
@@ -205,70 +283,74 @@ void csGraphicsPipeline::Flush (int iCurPage)
         break;
       }
       case pipeopLINE:
-        System->piG2D->DrawLine (op->Line.x1, op->Line.y1,
+        iG2D->DrawLine (op->Line.x1, op->Line.y1,
           op->Line.x2, op->Line.y2, op->Line.color);
         INCLUDE_POINT (QRound (op->Line.x1), QRound (op->Line.y1));
         INCLUDE_POINT (QRound (op->Line.x2), QRound (op->Line.y2));
         break;
       case pipeopPIXEL:
-        System->piG2D->DrawPixel (op->Pixel.x, op->Pixel.y, op->Pixel.color);
+        iG2D->DrawPixel (op->Pixel.x, op->Pixel.y, op->Pixel.color);
         INCLUDE_POINT (op->Pixel.x, op->Pixel.y);
         break;
       case pipeopTEXT:
       {
-        System->piG2D->SetFontID (op->Text.font);
-        System->piG2D->Write (op->Text.x, op->Text.y,
+        iG2D->SetFontID (op->font);
+        iG2D->Write (op->Text.x, op->Text.y,
          op->Text.fg, op->Text.bg, op->Text.string);
-        int tmpx = op->Text.x + TextWidth (op->Text.string, op->Text.font);
-        int tmpy = op->Text.y + TextHeight (op->Text.font);
+        int tmpx = op->Text.x + TextWidth (op->Text.string, op->font);
+        int tmpy = op->Text.y + TextHeight (op->font);
         INCLUDE_MIN_POINT (op->Text.x, op->Text.y);
         INCLUDE_MAX_POINT (tmpx, tmpy);
         CHK (delete[] op->Text.string);
         break;
       }
       case pipeopSPR2D:
-        op->Spr2D.s2d->Draw (System->piG2D, op->Spr2D.x, op->Spr2D.y, op->Spr2D.w, op->Spr2D.h);
+        op->Spr2D.s2d->Draw (iG2D, op->Spr2D.x, op->Spr2D.y, op->Spr2D.w, op->Spr2D.h);
         INCLUDE_MIN_POINT (op->Spr2D.x, op->Spr2D.y);
         INCLUDE_MAX_POINT (op->Spr2D.x + op->Spr2D.w, op->Spr2D.y + op->Spr2D.h);
         break;
       case pipeopSAVAREA:
-        System->piG2D->SaveArea (op->SavArea.Area, op->SavArea.x,
+        *op->SavArea.Area = iG2D->SaveArea (op->SavArea.x,
           op->SavArea.y, op->SavArea.w, op->SavArea.h);
         break;
       case pipeopRESAREA:
         INCLUDE_MIN_POINT (op->ResArea.Area->x, op->ResArea.Area->y);
         INCLUDE_MAX_POINT (op->ResArea.Area->x + op->ResArea.Area->w,
           op->ResArea.Area->y + op->ResArea.Area->h);
-        System->piG2D->RestoreArea (op->ResArea.Area, op->ResArea.Free);
+        iG2D->RestoreArea (op->ResArea.Area, op->ResArea.Free);
         break;
       case pipeopSETCLIP:
-        System->piG2D->SetClipRect (clip_xmin = op->ClipRect.xmin,
+        iG2D->SetClipRect (clip_xmin = op->ClipRect.xmin,
           clip_ymin = op->ClipRect.ymin, clip_xmax = op->ClipRect.xmax,
           clip_ymax = op->ClipRect.ymax);
         break;
       case pipeopRESCLIP:
-        System->piG2D->SetClipRect (clip_xmin = old_xmin, clip_ymin = old_ymin,
+        iG2D->SetClipRect (clip_xmin = old_xmin, clip_ymin = old_ymin,
           clip_xmax = old_xmax, clip_ymax = old_ymax);
         break;
       case pipeopPOLY3D:
-        if (System->piG3D->BeginDraw (CSDRAW_3DGRAPHICS) != S_OK)
-          return;
-        System->piG3D->StartPolygonFX (op->Poly3D.poly.txt_handle, op->Poly3D.mode);
-        System->piG3D->DrawPolygonFX (op->Poly3D.poly);
-        System->piG3D->FinishPolygonFX ();
-        System->piG3D->FinishDraw ();
-        System->piG3D->BeginDraw (CSDRAW_2DGRAPHICS);
+      {
+        static G3DPolygonDPFX poly;
+        UnpackDPFX (op->Poly3D.poly, poly);
+        if (!iG3D->BeginDraw (CSDRAW_3DGRAPHICS))
+          break;
+        iG3D->StartPolygonFX (poly.txt_handle, op->Poly3D.mode);
+        iG3D->DrawPolygonFX (poly);
+        iG3D->FinishPolygonFX ();
+        iG3D->FinishDraw ();
+        iG3D->BeginDraw (CSDRAW_2DGRAPHICS);
         break;
+      }
       default:
         assert ("unknown graphics pipeline operation in Pipeline::Flush()");
     } /* endswitch */
   } /* endfor */
   pipelen = 0;
-  System->piG2D->SetClipRect (old_xmin, old_ymin, old_xmax, old_ymax);
-  System->piG2D->SetFontID (old_font);
+  iG2D->SetClipRect (old_xmin, old_ymin, old_xmax, old_ymax);
+  iG2D->SetFontID (old_font);
 
-  if (xmin < 0) xmin = 0; if (xmax > System->FrameWidth)  xmax = System->FrameWidth;
-  if (ymin < 0) ymin = 0; if (ymax > System->FrameHeight) ymax = System->FrameHeight;
+  if (xmin < 0) xmin = 0; if (xmax > FrameWidth)  xmax = FrameWidth;
+  if (ymin < 0) ymin = 0; if (ymax > FrameHeight) ymax = FrameHeight;
   SyncRect [CurPage].xmin = xmin; SyncRect [CurPage].xmax = xmax;
   SyncRect [CurPage].ymin = ymin; SyncRect [CurPage].ymax = ymax;
   if (xmin < RefreshRect.xmin) RefreshRect.xmin = xmin;
@@ -277,12 +359,11 @@ void csGraphicsPipeline::Flush (int iCurPage)
   if (ymax > RefreshRect.ymax) RefreshRect.ymax = ymax;
 
   if (SyncArea [CurPage])
-    System->piG2D->FreeArea (SyncArea [CurPage]);
-  bool dblbuff;
-  System->piG2D->GetDoubleBufferState (dblbuff);
-  if (dblbuff
+    iG2D->FreeArea (SyncArea [CurPage]);
+
+  if (iG2D->GetDoubleBufferState ()
    && (xmin < xmax) && (ymin < ymax))
-    System->piG2D->SaveArea (&SyncArea [CurPage], xmin, ymin, xmax - xmin, ymax - ymin);
+    SyncArea [CurPage] = iG2D->SaveArea (xmin, ymin, xmax - xmin, ymax - ymin);
   else
     SyncArea [CurPage] = NULL;
 }
@@ -295,7 +376,7 @@ void csGraphicsPipeline::Desync ()
   for (i = 0; i < MAX_SYNC_PAGES; i++)
     if (SyncArea [i])
     {
-      System->piG2D->FreeArea (SyncArea [i]);
+      iG2D->FreeArea (SyncArea [i]);
       SyncArea [i] = NULL;
     } /* endif */
 
@@ -303,7 +384,7 @@ void csGraphicsPipeline::Desync ()
   for (i = 0; i < pipelen; i++)
     if (pipeline[i].Op == pipeopRESAREA)
     {
-      System->piG2D->FreeArea (pipeline[i].ResArea.Area);
+      iG2D->FreeArea (pipeline[i].ResArea.Area);
       pipeline[i].Op = pipeopNOP;
     }
 }
@@ -337,9 +418,9 @@ void csGraphicsPipeline::Sync (int CurPage, int &xmin, int &ymin,
       ClearColor = -1;
       goto sync;
     } /* endif */
-    System->piG2D->Clear (ClearColor);
+    iG2D->Clear (ClearColor);
     INCLUDE_MIN_POINT (0, 0);
-    INCLUDE_MAX_POINT (System->FrameWidth, System->FrameHeight);
+    INCLUDE_MAX_POINT (FrameWidth, FrameHeight);
   } /* endif */
 
 sync:
@@ -357,7 +438,7 @@ sync:
       INCLUDE_MIN_POINT (SyncArea [Page]->x, SyncArea [Page]->y);
       INCLUDE_MAX_POINT (SyncArea [Page]->x + SyncArea [Page]->w,
         SyncArea [Page]->y + SyncArea [Page]->h);
-      System->piG2D->RestoreArea (SyncArea [Page], false);
+      iG2D->RestoreArea (SyncArea [Page], false);
     }
 
     Page--;
@@ -366,26 +447,22 @@ sync:
 
 int csGraphicsPipeline::TextWidth (const char *text, int Font)
 {
-  int Width;
-  System->piGI->GetTextWidth (Width, Font, text);
-  return Width;
+  return iG2D->GetTextWidth (Font, text);
 }
 
 int csGraphicsPipeline::TextHeight (int Font)
 {
-  int Height;
-  System->piGI->GetTextHeight (Height, Font);
-  return Height;
+  return iG2D->GetTextHeight (Font);
 }
 
 bool csGraphicsPipeline::BeginDraw ()
 {
-  return SUCCEEDED (System->piG3D->BeginDraw (CSDRAW_2DGRAPHICS));
+  return iG3D->BeginDraw (CSDRAW_2DGRAPHICS);
 }
 
 void csGraphicsPipeline::FinishDraw ()
 {
   if (!RefreshRect.IsEmpty ())
-    System->piG3D->Print (&RefreshRect);
-  System->piG3D->FinishDraw ();
+    iG3D->Print (&RefreshRect);
+  iG3D->FinishDraw ();
 }

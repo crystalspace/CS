@@ -35,7 +35,7 @@
 #include <stdio.h>
 #include <SIOUX.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 #define kAppleMenuID			128
 #define kFileMenuID				129

@@ -21,14 +21,11 @@
 #define IMAGE_H
 
 #include <stdio.h>
-#include "cscom/com.h"
-#include "types.h"
+#include "csutil/scf.h"
 #include "csgfxldr/rgbpixel.h"
+#include "types.h"
 #include "iimage.h"
 #include "ialphmap.h"
-#include "csobject/csobj.h"
-
-interface ISystem;
 
 /// Status flag indicating that the image has loaded without problem.
 #define IFE_OK 0
@@ -40,32 +37,28 @@ interface ISystem;
 struct Filter3x3;
 struct Filter5x5;
 
-class AlphaMapFile: public csObject
+class AlphaMapFile
 {
 // @@@ FIXME: None of this is implemented anywhere.
 // @@@ FIXME: The COM stuff is completely broken.
 #if 0
 private:
-	int width;
-	int height;
-	UByte *alphamap;
+  int width;
+  int height;
+  UByte *alphamap;
 protected:
-	AlphaMapFile();
-	int status;
-	void set_dimensions(int w,int h);
-	UByte *get_buffer(){return alphamap;}
+  AlphaMapFile();
+  int status;
+  void set_dimensions(int w,int h);
+  UByte *get_buffer(){return alphamap;}
 public:
-	virtual ~AlphaMapFile();
-	int get_width() const{return width;}
-	int get_height() const{return height;}
-	ULong get_size() const{return width*height;}
-	const UByte* get_image() const {return alphamap;}
-	int get_status() const {return status;}
-	virtual const char* get_status_mesg() const;
-
-	DECLARE_INTERFACE_TABLE(AlphaMapFile)
-	DECLARE_IUNKNOWN()
-	DECLARE_COMPOSITE_INTERFACE(AlphaMapFile)
+  virtual ~AlphaMapFile();
+  int get_width() const{return width;}
+  int get_height() const{return height;}
+  ULong get_size() const{return width*height;}
+  const UByte* get_image() const {return alphamap;}
+  int get_status() const {return status;}
+  virtual const char* get_status_mesg() const;
 #endif
 };
 
@@ -75,24 +68,25 @@ public:
  * type.
  */
 
-class ImageFile : public csObject
+class csImageFile : public iImageFile
 {
 private:
   /// Width of image.
   int width;
   /// Height of image.
   int height;
-
   /// The image data.
   RGBPixel* image;
+  /// Image file name
+  char *fname;
 
 protected:
   /**
-   * ImageFile constructor.
+   * csImageFile constructor.
    * This object can only be created by an appropriate loader, which is why
    * the constructor is protected.
    */
-  ImageFile ();
+  csImageFile ();
 
   /**
    * Status of the loaded image.
@@ -113,17 +107,10 @@ protected:
   RGBPixel* get_buffer() { return image; }
 
 public:
-  ///
-  virtual ~ImageFile ();
+  DECLARE_IBASE
 
-  /// Returns the image width.
-  int get_width () const { return width; }
-  /// Returns the image height.
-  int get_height () const { return height; }
-  /// Returns the image size (in pixels)
-  long get_size () const { return width * (long)height; }
   ///
-  const RGBPixel* get_image () const { return image; }
+  virtual ~csImageFile ();
 
   /// Returns the error status of the loaded image.
   int get_status() const { return status; }
@@ -131,36 +118,49 @@ public:
   virtual const char* get_status_mesg() const;
 
   /**
-   * Create a new ImageFile which is a mipmapped version of this one.
+   * Create a new csImageFile which is a mipmapped version of this one.
    * 'steps' indicates how much the mipmap should be scaled down. Only
    * steps 1, 2, and 3 are supported.
    * If 'steps' is 1 then the 3x3 filter is used. Otherwise the 5x5 filter
    * is used. If the filters are NULL then the pixels are just
    * averaged.
    */
-  ImageFile* mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2);
+  csImageFile* mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2);
 
   /**
-   * Create a new ImageFile which is a mipmapped version of this one.
+   * Create a new csImageFile which is a mipmapped version of this one.
    * 'steps' indicates how much the mipmap should be scaled down. Only
    * steps 1, 2, and 3 are supported.
    * This version is required for transparent images. It preserves color
    * 0 (transparent).
    */
-  ImageFile* mipmap (int steps);
+  csImageFile* mipmap (int steps);
 
   /**
-   * Create a new ImageFile which is a blended version of this one.
+   * Create a new csImageFile which is a blended version of this one.
    */
-  ImageFile* blend (Filter3x3* filt1);
+  csImageFile* blend (Filter3x3* filt1);
 
-  DECLARE_INTERFACE_TABLE (ImageFile)
-  DECLARE_IUNKNOWN ()
-  DECLARE_COMPOSITE_INTERFACE (ImageFile)
+  /***************************** iImage interface *****************************/
+  ///
+  virtual RGBPixel *GetImageData ();
+  ///
+  virtual int GetWidth ();
+  ///
+  virtual int GetHeight ();
+  ///
+  virtual int GetSize ();
+  ///
+  virtual iImageFile *MipMap (int steps, Filter3x3* filt1, Filter5x5* filt2);
+  ///
+  virtual iImageFile *MipMap (int steps);
+  ///
+  virtual iImageFile *Blend (Filter3x3* filter);
+  /// Set image file name
+  virtual void SetName (const char *iName);
+  /// Get image file name
+  virtual const char *GetName ();
 };
-
-#define GetIImageFileFromImageFile(a)  &a->m_xImageFile
-#define GetImageFileFromIImageFile(a)  ((ImageFile*)((size_t)a - offsetof(ImageFile, m_xImageFile)))
 
 class csVector;
 
@@ -173,10 +173,10 @@ protected:
   /**
    * Load an image from the given buffer.
    * Attempts to read an image from the buffer 'buf' of length 'size'.
-   * If successful, returns a pointer to the resulting ImageFile.  Otherwise
+   * If successful, returns a pointer to the resulting csImageFile.  Otherwise
    * returns NULL.
    */
-  virtual ImageFile* LoadImage (UByte* buf, ULong size) = 0;
+  virtual csImageFile* LoadImage (UByte* buf, ULong size) = 0;
   virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size) =0;
 
   ///
@@ -199,11 +199,11 @@ public:
   /**
    * Load an image from a buffer.
    * This routine will read from the buffer buf of length size, try to
-   * recognize the type of image contained within, and return an ImageFile
-   * of the appropriate type.  Returns a pointer to the ImageFile on
+   * recognize the type of image contained within, and return an csImageFile
+   * of the appropriate type.  Returns a pointer to the csImageFile on
    * success, or NULL on failure.
    */
-  static ImageFile* load (UByte* buf, ULong size);
+  static csImageFile* load (UByte* buf, ULong size);
 
   /**
   * Load an alpha-map from an 8-bit image

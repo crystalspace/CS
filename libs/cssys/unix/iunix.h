@@ -19,24 +19,16 @@
 #ifndef __IUNIX_H__
 #define __IUNIX_H__
 
-#include "cscom/com.h"
-
-extern const IID IID_IUnixSystemDriver;
+#include "csutil/scf.h"
 
 typedef void (*LoopCallback) (void *param);
 
-interface IUnixSystemDriver : public IUnknown
+SCF_INTERFACE (iUnixSystemDriver, 0, 0, 1) : public iBase
 {
   /// Get user settings
-  STDMETHOD (GetSettings) (int &SimDepth, bool &UseSHM, bool &HardwareCursor) PURE;
+  virtual void GetExtSettings (int &SimDepth, bool &UseSHM, bool &HardwareCursor) = 0;
   /// Set a callback that gets called from inside the main event loop
-  STDMETHOD (SetLoopCallback) (LoopCallback Callback, void *Param) PURE;
-  /// Put a keyboard event into event queue
-  STDMETHOD (KeyboardEvent) (int Key, bool Down) PURE;
-  /// Put a mouse event into event queue
-  STDMETHOD (MouseEvent) (int Button, int Down, int x, int y, int ShiftFlags) PURE;
-  /// Put a focus change event into event queue
-  STDMETHOD (FocusEvent) (int Enable) PURE;
+  virtual void SetLoopCallback (LoopCallback Callback, void *Param) = 0;
 };
 
 #endif // __IUNIX_H__

@@ -57,7 +57,7 @@ SysSystemDriver::~SysSystemDriver()
 // Initialize -- Create the COM --> Objective-C proxy.
 //-----------------------------------------------------------------------------
 bool SysSystemDriver::Initialize( int argc, char* argv[],
-    char const* iConfigName, char const* iVfsConfigName, IConfig* iConfig )
+    char const* iConfigName, char const* iVfsConfigName, iConfig* iConfig )
     {
     proxy = new NeXTSystemProxy( this );
     return superclass::Initialize( argc, argv, iConfigName, iVfsConfigName,

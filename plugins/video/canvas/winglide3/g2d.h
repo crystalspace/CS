@@ -25,35 +25,21 @@
 
 #include <glide.h>
  
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cs2d/winglide3/xg2d.h"
+#include "cs2d/glide2common2d/iglide2d.h"
 
-extern const CLSID CLSID_Glide3xGraphics2D;
-
-///
-class csGraphics2DGlide3xFactory : public IGraphics2DFactory 
+class csGraphics2DGlide3x : public csGraphics2DGlideCommon
 {
 public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DGlide3xFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(BOOL bLock);
-};
-
-class csGraphics2DGlide3x : public csGraphics2D
-{
-  friend class csGraphics3DGlide;
-  friend class csGraphics2DGlide3x;
-  
-public:
-  csGraphics2DGlide3x(ISystem* piSystem);
+  csGraphics2DGlide3x(iBase *iParent);
   virtual ~csGraphics2DGlide3x(void);
   
   virtual bool Open (const char *Title);
   virtual void Close ();
   
+  bool Initialize (iSystem *pSystem);
   virtual void Print (csRect *area = NULL);
   
   virtual void SetRGB(int i, int r, int g, int b);
@@ -68,9 +54,6 @@ public:
   static int Depth;
   
 protected:
-  // print to the system's device
-  void SysPrintf(int mode, conat char* str, ...);
-
 #if defined(OS_WIN32)
   HWND m_hWnd;
 #endif
@@ -79,11 +62,6 @@ protected:
   int glDrawMode;
   GrLfbInfo_t lfbInfo;
   bool locked;
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DGlide3x)
-  DECLARE_COMPOSITE_INTERFACE(XGlide3xGraphicsInfo)
 };
 
 #endif // G3D_GLIDE_H
-

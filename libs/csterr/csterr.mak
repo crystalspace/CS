@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csterr
 csterr:
 	$(MAKE_TARGET)
+csterrclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -44,7 +46,7 @@ $(CSTERR.LIB): $(OBJ.CSTERR)
 	$(DO.LIBRARY)
 
 csterrclean:
-	-$(RM) $(CSTERR.LIB)
+	-$(RM) $(CSTERR.LIB) $(OBJ.CSTERR)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csterr.dep

@@ -26,9 +26,7 @@
 #include "csengine/light.h"
 #include "csengine/world.h"
 #include "csutil/util.h"
-#include "csutil/vfs.h"
-
-//---------------------------------------------------------------------------
+#include "ivfs.h"
 
 csShadowMap::csShadowMap ()
 {
@@ -90,14 +88,13 @@ void csShadowMap::CopyLightMap (csShadowMap* source, int size)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN_NODELETE( csLightMap )
-
-BEGIN_INTERFACE_TABLE( csLightMap )
-	IMPLEMENTS_COMPOSITE_INTERFACE( LightMap )
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE (csLightMap)
+  IMPLEMENTS_INTERFACE (iLightMap)
+IMPLEMENT_IBASE_END
 
 csLightMap::csLightMap ()
 {
+  CONSTRUCT_IBASE (NULL);
   first_smap = NULL;
   hicolorcache = NULL;
   in_memory = false;
@@ -314,7 +311,7 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
   CacheName (buf, owner, index, "");
 
   size_t size;
-  char* data = VFS->ReadFile (buf, size);
+  char* data = world->VFS->ReadFile (buf, size);
   if (!data) return false;
 
   char *d = data;
@@ -378,7 +375,7 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
   // Now load the dynamic data.
   //-------------------------------
   CacheName (buf, owner, index, "_d");
-  data = VFS->ReadFile (buf, size);
+  data = world->VFS->ReadFile (buf, size);
   if (!data) return true;	// No dynamic data. @@@ Recalculate dynamic data?
 
   d = data;
@@ -444,7 +441,7 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   // Write the normal lightmap data.
   //-------------------------------
   CacheName (buf, owner, index, "");
-  csFile *cf = VFS->Open (buf, VFS_FILE_WRITE);
+  iFile *cf = world->VFS->Open (buf, VFS_FILE_WRITE);
   cf->Write (ps.header, 4);
   f = convert_endian (ps.x1);      cf->Write ((char*)&f, 4);
   f = convert_endian (ps.y1);      cf->Write ((char*)&f, 4);
@@ -460,7 +457,7 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   if (static_lm.mapB) cf->Write ((char*)static_lm.mapB, lm_size);
 
   // close the file
-  delete cf;
+  cf->DecRef ();
 
   //-------------------------------
   // Write the dynamic data.
@@ -476,28 +473,29 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
     smap = first_smap;
 
     CacheName (buf, owner, index, "_d");
-    cf = VFS->Open (buf, VFS_FILE_WRITE);
+    cf = world->VFS->Open (buf, VFS_FILE_WRITE);
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);
     cf->Write ((char*)&l, 4);
-  }
-  while (smap)
-  {
-    csLight* light = smap->light;
-    if (smap->map)
+    while (smap)
     {
-      LightSave ls;
-      ls.x = light->GetCenter ().x;
-      ls.y = light->GetCenter ().y;
-      ls.z = light->GetCenter ().z;
-      ls.dist = light->GetRadius ();
-      f = convert_endian (ls.x);    cf->Write ((char*)&f, 4);
-      f = convert_endian (ls.y);    cf->Write ((char*)&f, 4);
-      f = convert_endian (ls.z);    cf->Write ((char*)&f, 4);
-      f = convert_endian (ls.dist); cf->Write ((char*)&f, 4);
-      cf->Write ((char*)(smap->map), lm_size);
+      csLight* light = smap->light;
+      if (smap->map)
+      {
+        LightSave ls;
+        ls.x = light->GetCenter ().x;
+        ls.y = light->GetCenter ().y;
+        ls.z = light->GetCenter ().z;
+        ls.dist = light->GetRadius ();
+        f = convert_endian (ls.x);    cf->Write ((char*)&f, 4);
+        f = convert_endian (ls.y);    cf->Write ((char*)&f, 4);
+        f = convert_endian (ls.z);    cf->Write ((char*)&f, 4);
+        f = convert_endian (ls.dist); cf->Write ((char*)&f, 4);
+        cf->Write ((char*)(smap->map), lm_size);
+      }
+      smap = smap->next;
     }
-    smap = smap->next;
+    cf->DecRef ();
   }
 }
 
@@ -741,4 +739,64 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   }
 }
 
-//---------------------------------------------------------------------------
+unsigned char *csLightMap::GetMap (int nMap)
+{
+  switch (nMap)
+  {
+    case 0:
+      return GetRealMap ().mapR;
+      break;
+    case 1:
+      return GetRealMap ().mapG;
+      break;
+    case 2:
+      return GetRealMap ().mapB;
+      break;
+  }
+  return NULL;
+}
+
+int csLightMap::GetWidth ()
+{
+  return lwidth;
+}
+
+int csLightMap::GetHeight ()
+{
+  return lheight;
+}
+
+int csLightMap::GetRealWidth ()
+{
+  return rwidth;
+}
+
+int csLightMap::GetRealHeight ()
+{
+  return rheight;
+}
+
+bool csLightMap::IsCached ()
+{
+  return in_memory;
+}
+
+void csLightMap::SetInCache (bool bVal)
+{
+  in_memory = bVal;
+}
+
+csHighColorCacheData *csLightMap::GetHighColorCache ()
+{
+  return hicolorcache;
+}
+
+void csLightMap::SetHighColorCache (csHighColorCacheData* pVal)
+{
+  hicolorcache = pVal;
+}
+
+void csLightMap::GetMeanLighting (int& r, int& g, int& b)
+{
+  r = mean_r; g = mean_g; b = mean_b;
+}

@@ -4,8 +4,6 @@
 # Driver description
 DESCRIPTION.glos2 = Crystal Space OS/2 OpenGL 2D driver
 
-include libs/cs2d/openglcommon/glcommon2d.mak
-
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,6 +23,8 @@ endif
 
 glos2:
 	$(MAKE_TARGET) MAKE_DLL=yes
+glos2clean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -50,12 +50,7 @@ else
 endif
 DESCRIPTION.$(GLOS2)=$(DESCRIPTION.glos2)
 SRC.GLOS2 = $(wildcard libs/cs2d/openglos2/*.cpp \
-  libs/cs2d/openglcommon/*.cpp \
-  libs/cs3d/opengl/ogl_*cache.cpp libs/cs3d/opengl/ogl_txtmgr.cpp \
-  libs/cs3d/opengl/itexture.cpp \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
-  libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp\
-  $(SRC.COMMON.DRV2D))
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLOS2 = $(addprefix $(OUT),$(notdir $(SRC.GLOS2:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -65,11 +60,10 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/openglos2
 
-.PHONY: glos2 os2clean os2cleanlib
+.PHONY: glos2 glos2clean
 
 # Chain rules
-clean: gl2dclean
-cleanlib: gl2dcleanlib
+clean: glos2clean
 
 glos2: $(OUTDIRS) $(GLOS2)
 
@@ -79,11 +73,8 @@ $(GLOS2): $(OBJ.GLOS2) $(DEP.GLOS2)
 $(GLOS2.RES): libs/cs2d/openglos2/libGL.rc
 	$(RC) $(RCFLAGS) $< $@
 
-gl2dclean:
-	$(RM) $(GLOS2)
-
-gl2dcleanlib:
-	$(RM) $(OBJ.GLOS2) $(GLOS2)
+glos2clean:
+	$(RM) $(GLOS2) $(OBJ.GLOS2)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)glos2.dep

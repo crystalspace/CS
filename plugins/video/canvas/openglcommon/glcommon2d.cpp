@@ -18,36 +18,36 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
+#include "csutil/scf.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
-#include "cscom/com.h"
+#include "cs3d/opengl/ogl_txtcache.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
-#include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
-#include "itexture.h"
 
-csGraphics2DOpenGLFontServer *csGraphics2DGLCommon::LocalFontServer = NULL;
-OpenGLTextureCache *csGraphics2DGLCommon::texture_cache = NULL;
+IMPLEMENT_IBASE (csGraphics2DGLCommon)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
 
 // csGraphics2DGLCommon function
-csGraphics2DGLCommon::csGraphics2DGLCommon (ISystem* piSystem) :
-  csGraphics2D (piSystem)
+csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
+  csGraphics2D (),
+  texture_cache (NULL),
+  LocalFontServer (NULL)
 {
-  System = piSystem;
+  CONSTRUCT_IBASE (iParent);
 }
 
-void csGraphics2DGLCommon::Initialize ()
+bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
 {
-  csGraphics2D::Initialize ();
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
 
-  DrawPixel = DrawPixelGL;
-  WriteChar = WriteCharGL;
-  GetPixelAt = GetPixelAtGL;
-  DrawSprite = DrawSpriteGL;
+  return true;
 }
-
 
 csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 {
@@ -123,12 +123,10 @@ void csGraphics2DGLCommon::Clear(int color)
   glClear(GL_COLOR_BUFFER_BIT);
 }
 
-
 void csGraphics2DGLCommon::SetRGB(int i, int r, int g, int b)
 {
   csGraphics2D::SetRGB (i, r, g, b);
 }
-
 
 void csGraphics2DGLCommon::setGLColorfromint(int color)
 {
@@ -178,27 +176,27 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   glEnd ();
 }
 
-void csGraphics2DGLCommon::DrawPixelGL (int x, int y, int color)
+void csGraphics2DGLCommon::DrawPixel (csGraphics2D *This, int x, int y, int color)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
-  setGLColorfromint(color);
+  ((csGraphics2DGLCommon *)This)->setGLColorfromint(color);
 
   glBegin (GL_POINTS);
-  glVertex2i (x, Height-y-1);
+  glVertex2i (x, This->Height - y - 1);
   glEnd ();
 }
 
-void csGraphics2DGLCommon::WriteCharGL (int x, int y, int fg, int /*bg*/, char c)
+void csGraphics2DGLCommon::WriteChar (csGraphics2D *This, int x, int y, int fg, int /*bg*/, char c)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
   
-  setGLColorfromint(fg);
+  ((csGraphics2DGLCommon *)This)->setGLColorfromint(fg);
 
   // in fact the WriteCharacter() method properly shifts over
   // the current modelview transform on each call, so that characters
@@ -208,23 +206,21 @@ void csGraphics2DGLCommon::WriteCharGL (int x, int y, int fg, int /*bg*/, char c
   // due to the Push/PopMatrix calls
 
   glPushMatrix();
-  glTranslatef (x, Height-y-FontList[Font].Height,0.0);
+  glTranslatef (x, This->Height - y - FontList [This->Font].Height,0.0);
 
-  LocalFontServer->WriteCharacter(c,Font);
-  glPopMatrix();
+  ((csGraphics2DGLCommon *)This)->LocalFontServer->WriteCharacter(c, This->Font);
+  glPopMatrix ();
 }
 
-void csGraphics2DGLCommon::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
+void csGraphics2DGLCommon::DrawSprite (csGraphics2D *This, iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  texture_cache->Add (hTex);
+  ((csGraphics2DGLCommon *)This)->texture_cache->Add (hTex);
 
   // cache the texture if we haven't already.
-  csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (hTex);
-
-  HighColorCache_Data *cachedata;
-  cachedata = txt_mm->get_hicolorcache ();
-  GLuint texturehandle = *( (GLuint *) (cachedata->pData) );
+  csHighColorCacheData *cachedata;
+  cachedata = hTex->GetHighColorCacheData ();
+  GLuint texturehandle = *(GLuint *)cachedata->pData;
 
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing
@@ -233,7 +229,7 @@ void csGraphics2DGLCommon::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (txt_mm->get_transparent())
+  if (hTex->GetTransparent ())
   {
     glEnable (GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -258,31 +254,17 @@ void csGraphics2DGLCommon::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
   // draw the bitmap - we could use GL_QUADS, but why?
   glBegin(GL_TRIANGLE_FAN);
   glTexCoord2f(ntx1,nty1);
-  glVertex2i(sx,Height-sy-1);
+  glVertex2i(sx,This->Height-sy-1);
   glTexCoord2f(ntx2,nty1);
-  glVertex2i(sx+sw,Height-sy-1);
+  glVertex2i(sx+sw,This->Height-sy-1);
   glTexCoord2f(ntx2,nty2);
-  glVertex2i(sx+sw,Height-sy-sh-1);
+  glVertex2i(sx+sw,This->Height-sy-sh-1);
   glTexCoord2f(ntx1,nty2);
-  glVertex2i(sx,Height-sy-sh-1);
+  glVertex2i(sx,This->Height-sy-sh-1);
   glEnd();
 }
 
-unsigned char* csGraphics2DGLCommon::GetPixelAtGL (int /*x*/, int /*y*/)
+unsigned char* csGraphics2DGLCommon::GetPixelAt (csGraphics2D *This, int /*x*/, int /*y*/)
 {
   return NULL;
 }
-
-// Used to printf through system driver
-void csGraphics2DGLCommon::CsPrintf (int msgtype, const char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
-}
-

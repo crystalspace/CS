@@ -4,10 +4,10 @@
 #include "csgfxldr/csimage.h"
 
 class SGIImageLoader;
-class ImageSGIFile : public ImageFile
+class ImageSGIFile : public csImageFile
 {
   ///
-  friend class ImageFile;	// For constructor
+  friend class csImageFile;	// For constructor
   friend class SGIImageLoader;
 
 private:
@@ -36,7 +36,7 @@ class SGIImageLoader : public ImageLoader
 {
 protected:
   ///
-  virtual ImageFile* LoadImage (UByte* buf, ULong size);
+  virtual csImageFile* LoadImage (UByte* buf, ULong size);
   virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size);
 
 public:

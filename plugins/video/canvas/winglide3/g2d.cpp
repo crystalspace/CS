@@ -28,7 +28,7 @@
 #include <glide.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #if defined(OS_WIN32)
 #include "cssys/win32/win32itf.h"
 #endif
@@ -42,13 +42,12 @@ extern void out(char *str, ...);
 #include "render/glide3/driver2d/xg2d.h"
 #include "render/glide3/g3dglide.h"
 
-BEGIN_INTERFACE_TABLE(csGraphics2DGlide3x)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGlide3xGraphicsInfo, XGlide3xGraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DGlide3x)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DGlide3x)
+EXPORT_CLASS_TABLE (glide2d3)
+  EXPORT_CLASS (csGraphics2DGlide3x, "crystalspace.graphics2d.glide3",
+    "Glide/Win32 v3 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
 int csGraphics2DGlide3x::Depth=16;
 
@@ -90,51 +89,60 @@ static void RestoreFPCW(WORD wSave)
 
 #endif
 
-csGraphics2DGlide3x::csGraphics2DGlide3x(ISystem* piSystem) : csGraphics2D (piSystem)
+csGraphics2DGlide3x::csGraphics2DGlide3x (iBase *iParent) : csGraphics2D ()
 {
-	m_hWnd=NULL;
+  CONSTRUCT_IBASE (iParent);
+  m_hWnd = NULL;
   locked = false;
-	// make a window for rush or banshee ?
+}
+
+csGraphics2DGlide3x::~csGraphics2DGlide3x ()
+{
+  GraphicsReady = 0;
+  Close ();
 #if defined(OS_WIN32)
- IWin32SystemDriver* piW32Sys = NULL;
+  RestoreFPCW (wOldCW);
+#endif
+}
+
+bool csGraphics2DGlide3x::Initialize (iSystem *pSystem)
+{
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  // make a window for rush or banshee ?
+#if defined(OS_WIN32)
+  iWin32SystemDriver* piW32Sys = NULL;
  
-  // QI for IWin32SystemDriver //
-  HRESULT res = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&piW32Sys);
-  if (FAILED(res))
-  	  sys_fatalerror("csGraphics2DWin32::Open(QI) -- ISystem passed does not support IWin32SystemDriver.");
+  // QI for iWin32SystemDriver //
+  piW32Sys = QUERY_INTERFACE (System, iWin32SystemDriver);
+  if (!piW32Sys)
+    sys_fatalerror("csGraphics2DWin32::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
 
   // Get the creation parameters //
   piW32Sys->GetInstance(&gb_hInstance);
   piW32Sys->GetCmdShow(&gb_nCmdShow);
-  FINAL_RELEASE(piW32Sys);
+  piW32Sys->DecRef ();
 
-	MungeFPCW(&wOldCW);
+  MungeFPCW(&wOldCW);
 
 #endif
 	
-	Depth=16;
+  Depth=16;
 	
-	DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
-	GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
+  _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
+  _GetPixelAt = GetPixelAt16; _DrawSprite = DrawSprite16;
     
-	// calculate CS's pixel format structure. 565
-	pfmt.PixelBytes = 2;
-	pfmt.PalEntries = 0;
-	pfmt.RedMask = (1+2+4+8+16)<<11;
-	pfmt.GreenMask = (1+2+4+8+16+32)<<5;
-	pfmt.BlueMask = (1+2+4+8+16);
-    
-	complete_pixel_format();
-	GraphicsReady=1;  
-}
+  // calculate CS's pixel format structure. 565
+  pfmt.PixelBytes = 2;
+  pfmt.PalEntries = 0;
+  pfmt.RedMask = (1+2+4+8+16)<<11;
+  pfmt.GreenMask = (1+2+4+8+16+32)<<5;
+  pfmt.BlueMask = (1+2+4+8+16);
 
-csGraphics2DGlide3x::~csGraphics2DGlide3x(void)
-{
-	GraphicsReady=0;
-	Close();
-#if defined(OS_WIN32)
-	RestoreFPCW(wOldCW);
-#endif
+  complete_pixel_format();
+  GraphicsReady=1;
+  return true;
 }
 
 bool csGraphics2DGlide3x::Open(const char *Title)
@@ -270,3 +278,10 @@ void csGraphics2DGlide3x::SetTMUPalette(int tmu)
   
   grTexDownloadTable(GR_TEXTABLE_PALETTE, &p);
 }
+
+#if defined(OS_WIN32)
+HWND csGraphics2DGlide3x::GethWnd ()
+{
+  return m_hWnd;
+}
+#endif

@@ -48,7 +48,7 @@ AlphaMapFile* JPGImageLoader::LoadAlphaMap(UByte *buf,ULong size)
   return NULL;
 }
 
-ImageFile* JPGImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* JPGImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageJpgFile* i = new ImageJpgFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -87,7 +87,7 @@ ImageJpgFile::~ImageJpgFile () {
   /* do nothing */
 }
 
-ImageJpgFile::ImageJpgFile (UByte* ptr, long filesize) : ImageFile () {
+ImageJpgFile::ImageJpgFile (UByte* ptr, long filesize) : csImageFile () {
   struct jpeg_decompress_struct cinfo;
   struct my_error_mgr jerr;
   JSAMPARRAY buffer;		/* Output row buffer */

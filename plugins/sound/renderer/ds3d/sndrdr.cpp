@@ -24,7 +24,7 @@
 #include "dsound.h"
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/ds3d/sndrdr.h"
 #include "cssndrdr/ds3d/sndbuf.h"
 #include "cssndrdr/ds3d/sndlstn.h"
@@ -41,7 +41,7 @@ BEGIN_INTERFACE_TABLE(csSoundRenderDS3D)
   IMPLEMENTS_INTERFACE(ISoundRender)
 END_INTERFACE_TABLE()
 
-csSoundRenderDS3D::csSoundRenderDS3D(ISystem* piSystem) : m_pListener(NULL)
+csSoundRenderDS3D::csSoundRenderDS3D(iSystem* piSystem) : m_pListener(NULL)
 {
   m_p3DAudioRenderer = NULL;
   m_piSystem = piSystem;

@@ -19,12 +19,12 @@
 #ifndef TXTMGR_DIRECT3D_H
 #define TXTMGR_DIRECT3D_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
 class csTextureManagerDirect3D;
-interface IImageFile;
+scfInterface iImageFile;
 
 // Colors are encoded in a 16-bit short using the following
 // distribution (only for 8-bit mode):
@@ -104,34 +104,32 @@ private:
 
 public:
   ///
-  csTextureManagerDirect3D (ISystem* piSystem, IGraphics2D* piG2D);
+  csTextureManagerDirect3D (iSystem* iSys, iGraphics2D* iG2D);
   ///
   virtual ~csTextureManagerDirect3D ();
   ///
-  virtual void InitSystem ();
+  virtual void Initialize ();
 
   ///
   virtual void clear ();
 
   ///
-  STDMETHODIMP Initialize ();
+  virtual void Prepare ();
   ///
-  STDMETHODIMP Prepare ();
+  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d);
   ///
-  STDMETHODIMP RegisterTexture (IImageFile* image, ITextureHandle** handle, bool for3d, bool for2d);
+  virtual void UnregisterTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP UnregisterTexture (ITextureHandle* handle);
+  virtual void MergeTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP MergeTexture (ITextureHandle* handle);
+  virtual void FreeImages ();
   ///
-  STDMETHODIMP FreeImages ();
+  virtual void ReserveColor (int r, int g, int b);
   ///
-  STDMETHODIMP ReserveColor (int r, int g, int b);
-  ///
-  STDMETHODIMP AllocPalette ();
+  virtual void AllocPalette ();
 
   /// Create a new texture.
-  csTextureMMDirect3D* new_texture (IImageFile* image);
+  csTextureMMDirect3D* new_texture (iImageFile* image);
 
   ///
   bool force_mixing (char* mix);

@@ -125,6 +125,9 @@ public:
 
   /// The world.
   csWorld *world;
+  /// The main engine interface
+  /// (when interface will be complete, csWorld will not be needed anymore)
+  iWorld *World;
 
   /// For scripting.
   LanguageLayer* layer;
@@ -176,24 +179,26 @@ public:
 
   bool on_ground;
   bool inverse_mouse;
+  bool move_forward;
 
 public:
   ///
   WalkTest ();
 
   ///
-  ~WalkTest ();
+  virtual ~WalkTest ();
 
   /// Perform some initialization work
-  virtual bool Initialize (int argc, char *argv[], const char *iConfigName,
-    const char *iVfsConfigName, IConfig* iOptions);
+  virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
 
   ///
-  virtual void NextFrame (long elapsed_time, long current_time);
+  virtual void NextFrame (time_t elapsed_time, time_t current_time);
   ///
-  void PrepareFrame (long elapsed_time, long current_time);
+  void PrepareFrame (time_t elapsed_time, time_t current_time);
   ///
-  void DrawFrame (long elapsed_time, long current_time);
+  void DrawFrame (time_t elapsed_time, time_t current_time);
+  ///
+  virtual bool HandleEvent (csEvent &Event);
 
   /// Override SetSystemDefaults to handle additional configuration defaults.
   virtual void SetSystemDefaults (csIniFile*);

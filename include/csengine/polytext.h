@@ -29,7 +29,7 @@ class csPolyPlane;
 class csLightMap;
 class csLightPatch;
 class Dumper;
-interface ITextureHandle;
+scfInterface iTextureHandle;
 struct LightInfo;
 
 /// The default sub-texture size.
@@ -47,7 +47,7 @@ struct LightInfo;
  * A polygon generally has four of these (one for every mipmap
  * level).
  */
-class csPolyTexture
+class csPolyTexture : public iPolygonTexture
 {
   friend class csPolygon3D;
   friend class csPolygon2D;
@@ -81,7 +81,7 @@ private:
   csPolygon3D* polygon;
 
   /// The corresponding unlighted texture.
-  ITextureHandle* txt_handle;
+  iTextureHandle* txt_handle;
 
   /**
    * Bounding box of corresponding polygon in 2D texture space.
@@ -187,27 +187,6 @@ public:
   /// Set the mipmap size used for this texture.
   void SetMipmapSize (int mm);
 
-  ///
-  csLightMap* GetLightMap () { return lm; }
-  /// Get width of lighted texture (power of 2).
-  int GetWidth () { return w; }
-  /// Get height of lighted texture.
-  int GetHeight () { return h; }
-  ///
-  int GetDu () { return du; }
-  ///
-  int GetDv () { return dv; }
-  ///
-  float GetFdu () { return fdu; }
-  ///
-  float GetFdv () { return fdv; }
-  ///
-  int GetShiftU () { return shf_u; }
-  ///
-  int GetAndU () { return and_u; }
-  ///
-  int GetOrigWidth() { return w_orig; }
-
   /**
    * Set the corresponding polygon for this polytexture.
    */
@@ -215,13 +194,9 @@ public:
 
   ///
   void SetMipmapLevel (int mm) { mipmap_level = mm; }
-  ///
-  int GetMipmapLevel () { return mipmap_level; }
 
   /// Set the texture to be used for this polytexture.
-  void SetTextureHandle (ITextureHandle* th) { txt_handle = th; }
-  ///
-  ITextureHandle* GetTextureHandle () { return txt_handle; }
+  void SetTextureHandle (iTextureHandle* th) { txt_handle = th; }
 
   /**
    * Calculate the bounding box in (u,v) space for the lighted texture.
@@ -250,47 +225,79 @@ public:
   /// fp bounding box (0..1 texture space)
   float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
 
+  //--------------------- iPolygonTexture implementation ---------------------
+  DECLARE_IBASE;
+  ///
+  virtual iTextureHandle *GetTextureHandle ();
+  ///
+  virtual float GetFDU ();
+  ///
+  virtual float GetFDV ();
+  /// Get width of lighted texture (power of 2)
+  virtual int GetWidth ();
+  /// Get height of lighted texture.
+  virtual int GetHeight ();
+  ///
+  virtual int GetMipmapLevel ();
+  ///
+  virtual int GetShiftU ();
+  ///
+  virtual int GetSize ();
+
+  ///
+  virtual void *GetTCacheData ();
+  ///
+  virtual void SetTCacheData (void *iCache);
+
+  ///
+  virtual int GetNumPixels ();
+  ///
+  virtual int GetMipMapSize ();
+  ///
+  virtual int GetMipMapShift ();
+  ///
+  virtual int GetIMinU ();
+  ///
+  virtual int GetIMinV ();
+  ///
+  virtual void GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV);
+  ///
+  virtual int GetOriginalWidth ();
+
+  ///
+  virtual iPolygon3D *GetPolygon ();
   /**
    * Recalculate all pseudo and real dynamic lights if the
    * texture is dirty. The function returns true if there
    * was a recalculation (then the texture needs to be removed
    * from the texture cache).
    */
-  bool RecalcDynamicLights ();
-
+  virtual bool RecalculateDynamicLights ();
   /**
    * Create the dirty matrix if needed. This function will also check if the dirty
    * matrix has the right size. If not it will recreate it.
    * The dirty matrix is used in combination with the sub-texture optimization.
    * If recreation of the dirty matrix was needed it will be made all dirty.
    */
-  void CreateDirtyMatrix ();
-
+  virtual void CreateDirtyMatrix ();
   /**
    * Make the dirty matrix completely dirty.
    */
-  void MakeAllDirty ();
+  virtual void MakeAllDirty ();
+  ///
+  virtual bool CleanIfDirty (int lu, int lv);
 
-  /**
-   * Return the number of dirty sub-textures.
-   */
-  int CountDirtySubtextures () { return dirty_cnt; }
+  /// 
+  virtual iLightMap *GetLightMap ();
 
-  /**
-   * Return the number of clean sub-textures.
-   */
-  int CountCleanSubtextures () { return dirty_size-dirty_cnt; }
-
-  // COM stuff
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE( csPolyTexture )
-
-  DECLARE_COMPOSITE_INTERFACE( PolygonTexture )
+  /// Return the number of dirty sub-textures.
+  virtual int GetNumberDirtySubTex ();
+  /// Return the number of clean sub-textures.
+  virtual int GetNumberCleanSubTex ();
+  ///
+  virtual int GetSubtexSize ();
+  ///
+  virtual bool GetDynlightOpt ();
 };
 
-#define GetIPolygonTextureFromcsPolyTexture(a)  &a->m_xPolygonTexture
-#define GetcsPolyTextureFromIPolygonTexture(a)  ((csPolyTexture*)((size_t)a - offsetof(csPolyTexture, m_xPolygonTexture)))
-
-
 #endif /*POLYTEXT_H*/
-

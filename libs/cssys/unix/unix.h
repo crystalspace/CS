@@ -19,7 +19,7 @@
 #ifndef __UNIX_H__
 #define __UNIX_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csinput/csinput.h"
 #include "cssys/system.h"
 #include "iunix.h"
@@ -39,10 +39,9 @@ class SysSystemDriver : public csSystemDriver
   /// The loop callback parameter
   void *CallbackParam;
 
-  /// Application focus change event handler
-  void FocusHandler (int Enable);
-  
 public:
+  DECLARE_IBASE;
+
   // Constructor
   SysSystemDriver ();
 
@@ -57,25 +56,12 @@ public:
   // Sleep for given number of 1/1000 seconds
   virtual void Sleep (int SleepTime);
 
-  /// Implementation of IUnixSystemDriver
-  class XUnixSystemDriver : public IUnixSystemDriver
-  {
-    DECLARE_IUNKNOWN()
-    /// Get user settings
-    STDMETHOD (GetSettings) (int &SimDepth, bool &UseSHM, bool &HardwareCursor);
-    /// Set a callback that gets called from inside the main event loop
-    STDMETHOD (SetLoopCallback) (LoopCallback Callback, void *Param);
-    /// Put a keyboard event into event queue
-    STDMETHOD (KeyboardEvent) (int Key, bool Down);
-    /// Put a mouse event into event queue
-    STDMETHOD (MouseEvent) (int Button, int Down, int x, int y, int ShiftFlags);
-    /// Put a focus change event into event queue
-    STDMETHOD (FocusEvent) (int Enable);
-  };
-  // COM stuff
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (SysSystemDriver)
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (UnixSystemDriver);
+  /// Implementation of iUnixSystemDriver
+
+  /// Get user settings
+  virtual void GetExtSettings (int &SimDepth, bool &UseSHM, bool &HardwareCursor);
+  /// Set a callback that gets called from inside the main event loop
+  virtual void SetLoopCallback (LoopCallback Callback, void *Param);
 };
 
 /// Unix version.

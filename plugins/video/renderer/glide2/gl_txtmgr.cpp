@@ -29,17 +29,9 @@
 #include "csutil/scanstr.h"
 #include "lightdef.h"
 
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#if ! __option( global_optimizer )
-#pragma global_optimizer on
-#endif
-#endif
-
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
-//---------------------------------------------------------------------------
-
-csTextureMMGlide::csTextureMMGlide (IImageFile* image) : 
+csTextureMMGlide::csTextureMMGlide (iImageFile* image) : 
   csHardwareAcceleratedTextureMM (image)
 {
 }
@@ -49,15 +41,14 @@ csTextureMMGlide::~csTextureMMGlide ()
 }
 
 void csTextureMMGlide::convert_to_internal (csTextureManager* /*tex*/,
-                                            IImageFile* imfile, unsigned char* bm)
+                                            iImageFile* imfile, unsigned char* bm)
 {
-  int w,h,x,y;
+  int x,y;
 
-  imfile->GetWidth (w);
-  imfile->GetHeight (h);
+  int w = imfile->GetWidth ();
+  int h = imfile->GetHeight ();
 
-  RGBPixel* bmsrc;
-  imfile->GetImageData (&bmsrc);
+  RGBPixel* bmsrc = imfile->GetImageData ();
   int r, g, b;
   
   UShort* bml = (UShort*)bm;
@@ -82,12 +73,10 @@ void csTextureMMGlide::remap_palette_24bit (csTextureManager*)
   compute_color_usage ();
   if (!usage) return;
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  UShort* dest = t1->get_bitmap16 ();
+  int w = ifile->GetWidth ();
+  int h = ifile->GetHeight ();
+  RGBPixel* src = ifile->GetImageData ();
+  UShort* dest = (UShort *)t1->get_bitmap ();
 
   // Map the texture to the RGB palette.
   int x, y;
@@ -104,18 +93,21 @@ void csTextureMMGlide::remap_palette_24bit (csTextureManager*)
 
 //---------------------------------------------------------------------------
 
-csTextureManagerGlide::csTextureManagerGlide (ISystem* piSystem, IGraphics2D* piG2D) :
-	csTextureManager (piSystem, piG2D)
+csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D) :
+	csTextureManager (iSys, iG2D)
 {
 }
 
-void csTextureManagerGlide::InitSystem ()
+void csTextureManagerGlide::Initialize ()
 {
-  csTextureManager::InitSystem ();
+  csTextureManager::Initialize ();
 
   num_red = (pfmt.RedMask >> pfmt.RedShift) + 1;
   num_green = (pfmt.GreenMask >> pfmt.GreenShift) + 1;
   num_blue = (pfmt.BlueMask >> pfmt.BlueShift) + 1;
+
+  clear ();
+  read_config ();
 }
 
 
@@ -134,10 +126,10 @@ bool csTextureManagerGlide::force_mixing (char* mix)
 void csTextureManagerGlide::read_config ()
 {
   char* p;
-  ISystem* sys = m_piSystem;
+  iSystem* sys = m_piSystem;
   // @@@ WARNING! The following code only examines the
   // main cryst.cfg file and not the one which overrides values
-  // in the world file. We need to support this someway in the ISystem
+  // in the world file. We need to support this someway in the iSystem
   // interface as well.
 
   sys->ConfigGetYesNo ("TextureMapper", "BLEND_MIPMAP", do_blend_mipmap0, false);
@@ -272,7 +264,7 @@ void csTextureManagerGlide::clear ()
   textures.DeleteAll ();
 }
 
-csTextureMMGlide* csTextureManagerGlide::new_texture (IImageFile* image)
+csTextureMMGlide* csTextureManagerGlide::new_texture (iImageFile* image)
 {
   CHK (csTextureMMGlide* tm = new csTextureMMGlide (image));
   if (tm->loaded_correctly ()) textures.Push (tm);
@@ -364,15 +356,7 @@ int csTextureManagerGlide::find_rgb_map (int r, int g, int b, int map_type, int 
   return find_color (nr, ng, nb);
 }
 
-STDMETHODIMP csTextureManagerGlide::Initialize ()
-{
-  clear ();
-  read_config ();
-
-  return S_OK;
-}
-
-STDMETHODIMP csTextureManagerGlide::Prepare ()
+void csTextureManagerGlide::Prepare ()
 {
   int i;
 
@@ -413,34 +397,29 @@ STDMETHODIMP csTextureManagerGlide::Prepare ()
     txt->free_usage_table ();
   }
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE!\n");
-
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerGlide::RegisterTexture (IImageFile* image, ITextureHandle** handle,
-	bool for3d, bool for2d)
+iTextureHandle *csTextureManagerGlide::RegisterTexture (iImageFile* image,
+  bool for3d, bool for2d)
 {
   csTextureMMGlide* txt = new_texture (image);
   txt->set_3d2d (for3d, for2d);
-  *handle = GetITextureHandleFromcsTextureMM (txt);
-  return S_OK;
+  return txt;
 }
 
-STDMETHODIMP csTextureManagerGlide::UnregisterTexture (ITextureHandle* handle)
+void csTextureManagerGlide::UnregisterTexture (iTextureHandle* handle)
 {
   (void)handle;
   //@@@ Not implemented yet.
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerGlide::MergeTexture (ITextureHandle* handle)
+void csTextureManagerGlide::MergeTexture (iTextureHandle* handle)
 {
   (void)handle;
   //@@@ Not implemented yet.
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerGlide::FreeImages ()
+void csTextureManagerGlide::FreeImages ()
 {
   int i;
   for (i = 0 ; i < textures.Length () ; i++)
@@ -448,20 +427,12 @@ STDMETHODIMP csTextureManagerGlide::FreeImages ()
     csTextureMMGlide* txt = (csTextureMMGlide*)textures[i];
     txt->free_image ();
   }
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerGlide::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
+void csTextureManagerGlide::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
 {
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerGlide::AllocPalette ()
+void csTextureManagerGlide::AllocPalette ()
 {
-  return S_OK;
 }
-
-//---------------------------------------------------------------------------
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#pragma global_optimizer reset
-#endif

@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csutil/csrect.h"
 #include "csinput/csevent.h"
 #include "isystem.h"
@@ -45,134 +45,27 @@ inline void memsetd (void *dest, unsigned int value, size_t count)
 }
 #endif
 
-//------------------------------------------------------ Loading/Maintenance ---
-
-static unsigned int gRefCount = 0;
-static DllRegisterData gRegData =
-{
-  &CLSID_OS2DiveGraphics2D,
-  "crystalspace.graphics2d.dive",
-  "Crystal Space 2D graphics driver for OS/2 using DIVE"
-};
-
-#ifdef CS_STATIC_LINKED
-
-void Dive2DRegister ()
-{
-  static csGraphics2DFactoryOS2DIVE gG2DDiveFactory;
-  gRegData.pClass = &gG2DDiveFactory;
-  csRegisterServer (&gRegData);
-}
-
-void Dive2DUnregister ()
-{
-  csUnregisterServer (&gRegData);
-}
-
-#else
-
-// Initialization entry point
-STDAPI DllInitialize ()
-{
-  csCoInitialize (0);
-  gRegData.szInProcServer = "csdive.dll";
-  return TRUE;
-}
-
-EXTERN_C void STDAPICALLTYPE ModuleRelease ()
-{
-  gRefCount--;
-}
-
-EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
-{
-  gRefCount++;
-}
-
-// return S_OK if it's ok to unload us now.
-STDAPI DllCanUnloadNow ()
-{
-  return gRefCount ? S_FALSE : S_OK;
-}
-
-// used to get a COM class object from us.
-STDAPI DllGetClassObject (REFCLSID rclsid, REFIID riid, void** ppv)
-{
-  static csGraphics2DFactoryOS2DIVE gG2DDiveFactory;
-  if (rclsid == CLSID_OS2DiveGraphics2D)
-    return gG2DDiveFactory.QueryInterface (riid, ppv);
-
-  // if we get here, rclsid is a class we don't implement
-  *ppv = NULL;
-  return CLASS_E_CLASSNOTAVAILABLE;
-}
-
-// Called by regsvr
-STDAPI DllRegisterServer ()
-{
-  return csRegisterServer (&gRegData);
-}
-
-// Called by regsvr
-STDAPI DllUnregisterServer ()
-{
-  return csUnregisterServer (&gRegData);
-}
-
-#endif // CS_STATIC_LINKED
-
-//----------------------------------------------- csGraphics2DOS2DIVEFactory ---
-
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DFactoryOS2DIVE)
-
-BEGIN_INTERFACE_TABLE (csGraphics2DFactoryOS2DIVE)
-  IMPLEMENTS_INTERFACE (IGraphics2DFactory)
-END_INTERFACE_TABLE ()
-
-STDMETHODIMP csGraphics2DFactoryOS2DIVE::CreateInstance (REFIID riid,
-  ISystem* piSystem, void**ppv)
-{
-  if (!piSystem)
-  {
-    *ppv = 0;
-    return E_INVALIDARG;
-  }
-
-  CHK (csGraphics2DOS2DIVE *pNew = new csGraphics2DOS2DIVE (piSystem));
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-		
-  return pNew->QueryInterface (riid, ppv);
-}
-
-STDMETHODIMP csGraphics2DFactoryOS2DIVE::LockServer (COMBOOL bLock)
-{
-  if (bLock)
-    gRefCount++;
-  else
-    gRefCount--;
-
-  return S_OK;
-}
-
 //------------------------------------------------------ csGraphics2DOS2DIVE ---
 
-BEGIN_INTERFACE_TABLE (csGraphics2DOS2DIVE)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DOS2DIVE)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DOS2DIVE)
+EXPORT_CLASS_TABLE (csdive)
+  EXPORT_CLASS (csGraphics2DOS2DIVE, "crystalspace.graphics2d.dive",
+    "OS/2 DIVE 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (ISystem* piSystem) :
-  csGraphics2D (piSystem),
+IMPLEMENT_IBASE (csGraphics2DOS2DIVE)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
+
+csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (iBase *iParent) :
+  csGraphics2D (),
   dblbuff (true), HardwareCursor (true),
   WindowX (INT_MIN), WindowY (INT_MIN),
   WindowWidth (-1), WindowHeight (-1)
 {
+  CONSTRUCT_IBASE (iParent);
   // Initialize module handle
 #ifdef CS_STATIC_LINKED
   gdMH = NULLHANDLE;
@@ -181,36 +74,39 @@ csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (ISystem* piSystem) :
   gdMH = dll_handle;
 #endif
 
-  System = piSystem;
-
-  if (!SUCCEEDED (piSystem->QueryInterface (IID_IOS2SystemDriver, (void**)&OS2System)))
-  {
-    SysPrintf (MSG_FATAL_ERROR, "The system driver does not support the IOS2SystemDriver interface\n");
-    exit (-1);
-  }
-
-  // Initialize DIVE
-  if (!gdDiveInitialize ())
-  {
-    SysPrintf (MSG_FATAL_ERROR, "Unable to initialize DIVE\n");
-    exit (-1);
-  }
+  OS2System = NULL;
 }
 
-csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE (void)
+csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE ()
 {
   Close ();
   // Deallocate DIVE resources
   gdDiveDeinitialize ();
-  FINAL_RELEASE (OS2System);
+  if (OS2System)
+    OS2System->DecRef ();
 }
 
-void csGraphics2DOS2DIVE::Initialize ()
+bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
 {
-  csGraphics2D::Initialize ();
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  // Initialize DIVE
+  if (!gdDiveInitialize ())
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize DIVE\n");
+    return false;
+  }
+
+  OS2System = QUERY_INTERFACE (pSystem, iOS2SystemDriver);
+  if (!OS2System)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support the iOS2SystemDriver interface\n");
+    return false;
+  }
 
   // Query settings from system driver
-  OS2System->GetSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
+  OS2System->GetExtSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
 
   // Set up FGVideoMode
   // Check first all available 16-bit modes for 'native' flag
@@ -287,7 +183,7 @@ void csGraphics2DOS2DIVE::Initialize ()
     case 8:
       break;
     default:
-      SysPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
+      CsPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
       break;
   } /* endswitch */
 
@@ -354,9 +250,12 @@ void csGraphics2DOS2DIVE::Initialize ()
 
   if ((Depth >> 3) != pfmt.PixelBytes)
   {
-    SysPrintf (MSG_WARNING, "WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
+    CsPrintf (MSG_WARNING, "WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
       Depth, pfmt.PixelBytes << 3);
+    Depth = pfmt.PixelBytes << 3;
   }
+
+  return true;
 }
 
 bool csGraphics2DOS2DIVE::Open (const char *Title)
@@ -369,14 +268,14 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
   FGVideoMode Mode = // selected mode with double buffering
   { Width, Height, PixelFormat, 2, vmfWindowed };
 
-  SysPrintf (MSG_INITIALIZATION, "Using %c%c%c%c pixel format\n",
+  CsPrintf (MSG_INITIALIZATION, "Using %c%c%c%c pixel format\n",
     PixelFormat, PixelFormat >> 8, PixelFormat >> 16, PixelFormat >> 24);
 
   // Create PM window
   rq.Parm.CreateWindow.Title = Title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -385,7 +284,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
   rq.Parm.CreateCtx.Mode = &Mode;
   if ((rc = PMcall (pmcmdCreateDIVEctx, &rq)) != pmrcOK)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Cannot create DIVE context\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot create DIVE context\n");
     return false;
   }
 
@@ -404,7 +303,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
   rq.Parm.BindCtx.DesktopH = DesktopH;
   if ((rc = PMcall (pmcmdBindDIVEctx, &rq)) != pmrcOK)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Cannot bind DIVE context to window!\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot bind DIVE context to window!\n");
     return false;
   }
 
@@ -439,19 +338,19 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
     case 1:
       break;
     case 2:
-      DrawPixel = DrawPixel16;
-      WriteChar = WriteChar16;
-      GetPixelAt = GetPixelAt16;
-      DrawSprite = DrawSprite16;
+      _DrawPixel = DrawPixel16;
+      _WriteChar = WriteChar16;
+      _GetPixelAt = GetPixelAt16;
+      _DrawSprite = DrawSprite16;
       break;
     case 4:
-      DrawPixel = DrawPixel32;
-      WriteChar = WriteChar32;
-      GetPixelAt = GetPixelAt32;
-      DrawSprite = DrawSprite32;
+      _DrawPixel = DrawPixel32;
+      _WriteChar = WriteChar32;
+      _GetPixelAt = GetPixelAt32;
+      _DrawSprite = DrawSprite32;
       break;
     default:
-      SysPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
+      CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
       break;
   } /* endif */
 
@@ -573,19 +472,15 @@ bool csGraphics2DOS2DIVE::BeginDraw ()
   // if paused, return false
   if (Memory == NULL)
   {
-    bool Shutdown;
-    System->GetShutdown (Shutdown);
-    if (Shutdown)
+    if (System->GetShutdown ())
       dW->Pause (FALSE);
     return false;
   } /* endif */
 
   if (bpl != LineAddressFrameW)
   {
-    int i,addr,height;
-    System->GetHeightSetting (height);
-
-    for (i = 0, addr = 0; i < height; i++, addr += bpl)
+    int i,addr;
+    for (i = 0, addr = 0; i < Height; i++, addr += bpl)
       LineAddress [i] = addr;
     LineAddressFrameW = bpl;
   } /* endif */
@@ -610,19 +505,15 @@ bool csGraphics2DOS2DIVE::SetMousePosition (int x, int y)
   if ((ww <= 0) || (wh <= 0))
     return false;
 
-  int fw, fh;
-  System->GetWidthSetting (fw);
-  System->GetHeightSetting (fh);
-
   POINTL pp;
-  pp.x = (x * ww) / fw;
-  pp.y = ((fh - 1 - y) * wh) / fh;
+  pp.x = (x * ww) / Width;
+  pp.y = ((Height - 1 - y) * wh) / Height;
   WinMapWindowPoints (dW->diveCL, HWND_DESKTOP, &pp, 1);
 
   return WinSetPointerPos (HWND_DESKTOP, pp.x, pp.y);
 }
 
-bool csGraphics2DOS2DIVE::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
+bool csGraphics2DOS2DIVE::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
 {
   if (!HardwareCursor)
   {
@@ -688,14 +579,10 @@ void csGraphics2DOS2DIVE::MouseHandlerStub (void *Self, int Button, int Down,
   if ((ww <= 0) || (wh <= 0))
     return;
 
-  int fwidth, fheight;
-  This->System->GetWidthSetting (fwidth);
-  This->System->GetHeightSetting (fheight);
+  x = (x * This->Width) / ww;
+  y = ((wh - 1 - y) * This->Height) / wh;
 
-  x = (x * fwidth) / ww;
-  y = ((wh - 1 - y) * fheight) / wh;
-
-  This->OS2System->MouseEvent (Button, Down, x, y,
+  This->System->QueueMouseEvent (Button, Down, x, y,
     (ShiftFlags & dkf_SHIFT ? CSMASK_SHIFT : 0) |
     (ShiftFlags & dkf_CTRL ? CSMASK_CTRL : 0) |
     (ShiftFlags & dkf_ALT ? CSMASK_ALT : 0));
@@ -713,11 +600,11 @@ void csGraphics2DOS2DIVE::KeyboardHandlerStub (void *Self, unsigned char ScanCod
 void csGraphics2DOS2DIVE::FocusHandlerStub (void *Self, bool Enable)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
-  This->OS2System->FocusEvent (Enable);
+  This->System->QueueFocusEvent (Enable);
 }
 
 void csGraphics2DOS2DIVE::TerminateHandlerStub (void *Self)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
-  This->OS2System->TerminateEvent ();
+  This->System->StartShutdown ();
 }

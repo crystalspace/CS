@@ -21,6 +21,8 @@ all drivers drivers2d: next2d
 
 next2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+next2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -55,11 +57,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: next2d next2dclean next2dcleanlib
+.PHONY: next2d next2dclean
 
 # Chain rules
 clean: next2dclean
-cleanlib: next2dcleanlib
 
 next2d: $(OUTDIRS) $(NEXT2D)
 
@@ -67,10 +68,7 @@ $(NEXT2D): $(OBJ.NEXT2D)
 	$(DO.PLUGIN)
 
 next2dclean:
-	$(RM) $(NEXT2D)
-
-next2dcleanlib:
-	$(RM) $(OBJ.NEXT2D) $(NEXT2D)
+	$(RM) $(NEXT2D) $(OBJ.NEXT2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)next2d.dep

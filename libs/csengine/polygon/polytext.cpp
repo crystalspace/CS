@@ -40,16 +40,13 @@ float csPolyTexture::cfg_cosinus_factor = 0;
 int csPolyTexture::subtex_size = DEFAULT_SUBTEX_SIZE;
 bool csPolyTexture::subtex_dynlight = true;
 
-//---------------------------------------------------------------------------
-
-IMPLEMENT_UNKNOWN_NODELETE( csPolyTexture )
-
-BEGIN_INTERFACE_TABLE( csPolyTexture )
-  IMPLEMENTS_COMPOSITE_INTERFACE( PolygonTexture )
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE (csPolyTexture)
+  IMPLEMENTS_INTERFACE (iPolygonTexture)
+IMPLEMENT_IBASE_END
   
 csPolyTexture::csPolyTexture ()
 {
+  CONSTRUCT_IBASE (NULL);
   dyn_dirty = true;
   dirty_matrix = NULL;
   lm = NULL;
@@ -146,7 +143,7 @@ void csPolyTexture::MakeDirtyDynamicLights ()
   dyn_dirty = true;
 }
 
-bool csPolyTexture::RecalcDynamicLights ()
+bool csPolyTexture::RecalculateDynamicLights ()
 {
   if (!dyn_dirty) return false;
   if (!lm) return false;
@@ -1200,4 +1197,52 @@ void csPolyTexture::MakeAllDirty ()
   }
 }
 
-//---------------------------------------------------------------------------
+void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV)
+{
+  fMinU = Fmin_u; fMaxU = Fmax_u;
+  fMinV = Fmin_v; fMaxV = Fmax_v;
+}
+
+iPolygon3D *csPolyTexture::GetPolygon ()
+{
+  polygon->IncRef ();
+  return polygon;
+}
+
+bool csPolyTexture::CleanIfDirty (int lu, int lv)
+{
+  int idx = dirty_w * lv + lu;
+  bool retval = (bool)(dirty_matrix [idx]);
+  if (retval)
+  {
+    dirty_matrix [idx] = 0;
+    dirty_cnt--;
+  }
+  return retval;
+}
+
+iLightMap *csPolyTexture::GetLightMap ()
+{
+  return lm;
+}
+
+iTextureHandle *csPolyTexture::GetTextureHandle () { return txt_handle; }
+int csPolyTexture::GetWidth () { return w; }
+int csPolyTexture::GetHeight () { return h; }
+float csPolyTexture::GetFDU () { return fdu; }
+float csPolyTexture::GetFDV () { return fdv; }
+int csPolyTexture::GetShiftU () { return shf_u; }
+int csPolyTexture::GetOriginalWidth () { return w_orig; }
+int csPolyTexture::GetSize () { return size; }
+void *csPolyTexture::GetTCacheData () { return tcache_data; }
+void csPolyTexture::SetTCacheData (void *iCache) { tcache_data = iCache; }
+int csPolyTexture::GetNumPixels () { return size; }
+int csPolyTexture::GetMipMapSize () { return mipmap_size; }
+int csPolyTexture::GetMipMapShift () { return mipmap_shift; }
+int csPolyTexture::GetMipmapLevel () { return mipmap_level; }
+int csPolyTexture::GetIMinU () { return Imin_u; }
+int csPolyTexture::GetIMinV () { return Imin_v; }
+int csPolyTexture::GetNumberDirtySubTex (){ return dirty_cnt; }
+int csPolyTexture::GetNumberCleanSubTex (){ return dirty_size-dirty_cnt; }
+int csPolyTexture::GetSubtexSize () { return subtex_size; }
+bool csPolyTexture::GetDynlightOpt () { return subtex_dynlight; }

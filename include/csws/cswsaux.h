@@ -26,10 +26,7 @@
 #include <string.h>
 
 #include "version.h"
-#include "igraph3d.h"
-#include "csutil/inifile.h"
 #include "csutil/parser.h"
 #include "csutil/util.h"
-#include "csutil/vfs.h"
 
 #endif // __CSWSAUX_H__

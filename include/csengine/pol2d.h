@@ -19,7 +19,7 @@
 #ifndef POL2D_H
 #define POL2D_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/poly2d.h"
@@ -28,8 +28,8 @@ class csPolygon3D;
 class csPolyPlane;
 class csClipper;
 class csRenderView;
-interface IGraphics2D;
-interface IGraphics3D;
+scfInterface iGraphics2D;
+scfInterface iGraphics3D;
 
 /**
  * The following class represents a 2D polygon (the 2D coordinates are
@@ -70,7 +70,7 @@ public:
   /**
    * Draw the polygon (wireframe version).
    */
-  void Draw (IGraphics2D* g2d, int col);
+  void Draw (iGraphics2D* g2d, int col);
   
   /**
    * Draw a texture mapped polygon.
@@ -85,7 +85,7 @@ public:
    * Add this polygon as a back or front polygon of a fog object.
    * NOTE! Don't forget to open the fog object first with g3d->OpenFogObject ();
    */
-  void AddFogPolygon (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane,
+  void AddFogPolygon (iGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane,
   	bool mirror, CS_ID id, int fog_type);
 };
 

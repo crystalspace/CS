@@ -1,13 +1,13 @@
 
 #include <QDOffscreen.h>
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "ISysG2D.h"
 
 #ifndef __XSYSG2D_H__
 #define __XSYSG2D_H__
 
-/// csGraphics2DMac's implementation of IMacGraphicsInfo
-class IXMacGraphicsInfo : public IMacGraphicsInfo
+/// csGraphics2DMac's implementation of iMacGraphicsInfo
+class IXMacGraphicsInfo : public iMacGraphicsInfo
 {
     DECLARE_IUNKNOWN()
     ///

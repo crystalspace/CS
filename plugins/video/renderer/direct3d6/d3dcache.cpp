@@ -57,7 +57,7 @@ void D3DTextureCache::Dump()
   CsPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);*/
 }
 
-void D3DTextureCache::Load(HighColorCache_Data *d)
+void D3DTextureCache::Load(csHighColorCacheData *d)
 {
   IMipMapContainer *piMMC = NULL;
   ITextureMap *piTM = NULL;
@@ -103,13 +103,11 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   ddsd.ddsCaps.dwCaps2 = DDSCAPS2_TEXTUREMANAGE;
   memcpy(&ddsd.ddpfPixelFormat, &csGraphics3DDirect3DDx6::m_ddpfTexturePixelFormat, sizeof(DDPIXELFORMAT));
   
-  piTM->GetHeight(nHeight); 
+  nHeight = piTM->GetHeight(); 
   ddsd.dwHeight = (unsigned long)nHeight;
   
-  piTM->GetWidth(nWidth); 
+  nWidth = piTM->GetWidth(); 
   ddsd.dwWidth = (unsigned long)nWidth;
-
-  FINAL_RELEASE( piTM );
   
   if(m_bMipMapping)
   {
@@ -151,7 +149,7 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_MIPMAP;
 
   // grab a reference to this level (we call Release later)
-  lpDDLevel->AddRef();
+  lpDDLevel->IncRef();
       
   // only process one level if we aren't mipmapping.
   int cLevels = m_bMipMapping ? 4 : 1;
@@ -164,12 +162,10 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
       piMMC->GetTexture(z, &piTM);
       ASSERT( piTM != NULL );
       
-      piTM->GetWidth(width);
-      piTM->GetHeight(height);
-      piTM->GetBitmap(&lpSrc);
+      width = piTM->GetWidth();
+      height = piTM->GetHeight();
+      lpSrc = piTM->GetBitmap();
       ASSERT( lpSrc != NULL );
-      
-      FINAL_RELEASE( piTM );
       
       // lock the texture surface for writing
       memset(&ddsd, 0, sizeof(DDSURFACEDESC));
@@ -270,7 +266,7 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
     LoadIntoVRAM(cached_texture);    
   }
 
-  FINAL_RELEASE( piMMC );
+  piMMC->DecRef ();
 }
 
 void D3DTextureCache::LoadIntoVRAM(D3DTextureCache_Data *tex)
@@ -307,7 +303,7 @@ void D3DTextureCache::LoadIntoVRAM(D3DTextureCache_Data *tex)
   tex->lpsurf = lpddts;
 }
 
-void D3DTextureCache::Unload(HighColorCache_Data *d)
+void D3DTextureCache::Unload(csHighColorCacheData *d)
 {
   D3DTextureCache_Data *t = (D3DTextureCache_Data *)d->pData;
   if (!t) return;
@@ -352,20 +348,17 @@ void D3DLightMapCache::Dump()
   CsPrintf (MSG_CONSOLE, "Bytes per lightmap: %d\n", mean);*/
 }
 
-void D3DLightMapCache::Load(HighColorCache_Data *d)
+void D3DLightMapCache::Load(csHighColorCacheData *d)
 {
-  ILightMap *piLM;
+  iLightMap *piLM;
   CHK (D3DLightCache_Data *cached_texture = new D3DLightCache_Data);
   d->pData = cached_texture;
   
-  VERIFY_SUCCESS( d->pSource->QueryInterface( IID_ILightMap, (void**)&piLM ) );
+  VERIFY_SUCCESS( d->pSource->QueryInterface( IID_iLightMap, (void**)&piLM ) );
   ASSERT( piLM );
 
-  int lheight; 
-  int lwidth;
-
-  piLM->GetHeight(lheight);
-  piLM->GetWidth(lwidth);
+  int lwidth = piLM->GetWidth();
+  int lheight = piLM->GetHeight();
   
   // create the lightmap surface. this is a hi/true color surface.
   DDSURFACEDESC2 ddsd;
@@ -509,7 +502,7 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
     LoadIntoVRAM(cached_texture);
   }
 
-  FINAL_RELEASE( piLM );
+  piLM->DecRef ();
 }	
 
 void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
@@ -557,7 +550,7 @@ void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
   tex->lpsurf = lpddts;  
 }
 
-void D3DLightMapCache::Unload(HighColorCache_Data *d)
+void D3DLightMapCache::Unload(csHighColorCacheData *d)
 {
   D3DTextureCache_Data *t = (D3DTextureCache_Data *)d->pData;
   if (!d->pData)

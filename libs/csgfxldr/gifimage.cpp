@@ -38,7 +38,7 @@ AlphaMapFile *GIFImageLoader::LoadAlphaMap(UByte *buf,ULong size)
   return NULL;
 }
 
-ImageFile* GIFImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* GIFImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageGifFile* i = new ImageGifFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -397,7 +397,7 @@ void ImageGifFile::decode_gif(UByte* ptr, long filesize,
 }
 
 
-ImageGifFile::ImageGifFile (UByte* ptr, long filesize) : ImageFile ()
+ImageGifFile::ImageGifFile (UByte* ptr, long filesize) : csImageFile ()
 {
   CHK (int* Prefix  = new int [4096]); // Hash table used by decompressor.
   CHK (int* Suffix  = new int [4096]); // Hash table used by decompressor.

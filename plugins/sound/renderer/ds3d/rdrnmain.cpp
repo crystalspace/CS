@@ -25,7 +25,7 @@
 #include "dsound.h"
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/ds3d/sndrdr.h"
 #include "isndrdr.h"
 
@@ -117,7 +117,7 @@ BEGIN_INTERFACE_TABLE (csSoundRenderDS3DFactory)
   IMPLEMENTS_INTERFACE (ISoundRenderFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csSoundRenderDS3DFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csSoundRenderDS3DFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

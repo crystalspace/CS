@@ -32,7 +32,7 @@
 
 //Com
 #ifndef NO_CSCOM
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "itxtmgr.h"
 #endif
 

@@ -23,41 +23,31 @@
 #include <GL/gl.h>
 #include "GraphicsDefs.h"
 #include "Rect.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/be/beitf.h"
 #include "cs2d/openglcommon/glcommon2d.h"
+
 class CrystGLView;
 class CrystGLWindow;
-
-extern const CLSID CLSID_GLBeGraphics2D;
-
-class csGraphics2DGLBeFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DGLBeFactory)
-  STDMETHOD(CreateInstance)(REFIID riid, ISystem*, void** ppv);
-  STDMETHOD(LockServer)(COMBOOL bLock);
-};
 
 /// Be 2D OpenGL Driver
 class csGraphics2DGLBe : public csGraphics2DGLCommon
 {
   friend CrystGLWindow;	// FIXME: Currently needs access to 'dpy'.
 protected:
-  ISystem* cs_system;
-  IBeLibSystemDriver* be_system;
+  iSystem* cs_system;
+  iBeLibSystemDriver* be_system;
   CrystGLView* dpy;
   CrystGLWindow* window;
   color_space curr_color_space;
   BRect screen_frame;
   
 public:
-  csGraphics2DGLBe (ISystem*);
+  csGraphics2DGLBe (iSystem*);
   virtual ~csGraphics2DGLBe();
   
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char* title);
   virtual void Close ();
   
@@ -66,10 +56,6 @@ public:
   virtual void FinishDraw ();
 
   virtual void ApplyDepthInfo(color_space this_color_space);
-
-protected:
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DGLBe)
 };
 
 #endif // __BELIB2D_H__

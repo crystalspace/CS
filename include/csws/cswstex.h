@@ -23,8 +23,8 @@
 #include "csgfxldr/csimage.h"
 #include "csutil/csvector.h"
 
-struct ITextureHandle;
-struct ITextureManager;
+scfInterface iTextureHandle;
+scfInterface iTextureManager;
 
 /**
  * Texture representation within the windowing system.
@@ -34,7 +34,7 @@ struct ITextureManager;
 class csWSTexture
 {
   // texture image
-  ImageFile *image;
+  csImageFile *image;
   // Will be this texture used for 3D and/or for 2D operations?
   bool for2D, for3D;
   // Red,Green and Blue components of transparent color
@@ -42,25 +42,25 @@ class csWSTexture
   // has texture transparent areas?
   bool istransp;
   // texture handle for the 3D/2D driver
-  ITextureHandle *Handle;
+  iTextureHandle *Handle;
   // texture name
   char *Name;
 
 public:
   /// Create the 2D texture
-  csWSTexture (const char *iName, ImageFile *iImage, bool i2D, bool i3D);
+  csWSTexture (const char *iName, csImageFile *iImage, bool i2D, bool i3D);
   /// Destroy the texture object
   ~csWSTexture ();
   /// Set texture transparent color
   void SetTransparent (int iR, int iG, int iB);
   /// Register the texture with texture manager
-  void Register (ITextureManager *iTextureManager);
+  void Register (iTextureManager *iTexMan);
   /// Define texture name
   void SetName (const char *iName);
   /// Get texture name
   const char *GetName ()
   { return Name; }
-  ITextureHandle *GetHandle ()
+  iTextureHandle *GetHandle ()
   { return Handle; }
 };
 

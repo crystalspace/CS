@@ -19,33 +19,17 @@
 #ifndef __CS_GGI2D_H__
 #define __CS_GGI2D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
 
 #include <ggi/ggi.h>
 
-// The CLSID to create csGraphics2DGGI instances
-extern const CLSID CLSID_GGIGraphics2D;
-
-///
-class csGraphics2DGGIFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DGGIFactory)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
-
 /// GGI version.
 class csGraphics2DGGI : public csGraphics2D
 {
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Pointer to OS-specific interface
-  IUnixSystemDriver* UnixSystem;
+  iUnixSystemDriver* UnixSystem;
 
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
@@ -70,10 +54,12 @@ private:
   virtual int translate_key(ggi_event *ev);
 
 public:
-  csGraphics2DGGI (ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DGGI (iBase *iParent);
   virtual ~csGraphics2DGGI ();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -81,13 +67,6 @@ public:
 
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);
-
-protected:
-  /// Used to printf through the system driver
-  void CsPrintf (int msgtype, const char *format, ...);
-
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DGGI)
 };
 
 #endif // __CS_GGI2D_H__

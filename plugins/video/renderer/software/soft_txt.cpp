@@ -93,7 +93,7 @@ int TxtCmapPrivate::alloc_rgb (int r, int g, int b, int dist)
 
 //---------------------------------------------------------------------------
 
-csTextureMMSoftware::csTextureMMSoftware (IImageFile* image) : csTextureMM (image)
+csTextureMMSoftware::csTextureMMSoftware (iImageFile* image) : csTextureMM (image)
 {
   priv_cmap = NULL;
 }
@@ -104,7 +104,7 @@ csTextureMMSoftware::~csTextureMMSoftware ()
 }
 
 void csTextureMMSoftware::convert_to_internal (csTextureManager* tex,
-  IImageFile* imfile, unsigned char* bm)
+  iImageFile* imfile, unsigned char* bm)
 {
   csTextureManagerSoftware* texs = (csTextureManagerSoftware*)tex;
   if (texs->txtMode == TXT_GLOBAL)
@@ -116,13 +116,11 @@ void csTextureMMSoftware::convert_to_internal (csTextureManager* tex,
 }
 
 void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* tex,
-  IImageFile* imfile, unsigned char* bm)
+  iImageFile* imfile, unsigned char* bm)
 {
-  int s;
-  imfile->GetSize (s);
-  RGBPixel *bmsrc;
-  imfile->GetImageData (&bmsrc);
-  if (get_transparent ())
+  int s = imfile->GetSize ();
+  RGBPixel *bmsrc = imfile->GetImageData ();
+  if (GetTransparent ())
     for (; s > 0; s--, bmsrc++)
       if (transp_color == *bmsrc)
         *bm++ = 0;
@@ -134,16 +132,14 @@ void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* 
 }
 
 void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware *tex,
-  IImageFile* imfile, unsigned char* bm)
+  iImageFile* imfile, unsigned char* bm)
 {
   (void)tex;
 
-  int s;
-  imfile->GetSize (s);
-  RGBPixel* bmsrc;
-  imfile->GetImageData (&bmsrc);
+  int s = imfile->GetSize ();
+  RGBPixel* bmsrc = imfile->GetImageData ();
   ULong *bml = (ULong*)bm;
-  if (get_transparent ())
+  if (GetTransparent ())
     for (; s > 0; s--, bmsrc++)
       if (transp_color == *bmsrc)
         *bml++ = 0;
@@ -155,13 +151,11 @@ void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware *t
 }
 
 void csTextureMMSoftware::convert_to_internal_private (csTextureManagerSoftware* /*tex*/,
-  IImageFile* imfile, unsigned char* bm)
+  iImageFile* imfile, unsigned char* bm)
 {
-  int s;
-  imfile->GetSize (s);
-  RGBPixel* bmsrc;
-  imfile->GetImageData (&bmsrc);
-  if (get_transparent ())
+  int s = imfile->GetSize ();
+  RGBPixel* bmsrc = imfile->GetImageData ();
+  if (GetTransparent ())
     for (; s > 0; s--, bmsrc++)
       if (transp_color == *bmsrc)
         *bm++ = 0;
@@ -217,23 +211,21 @@ void csTextureMMSoftware::remap_palette_global (csTextureManagerSoftware* new_pa
   CHK (trans = new int [num_col]);
   for (i = 0 ; i < num_col ; i++)
   {
-    if (get_transparent () && (transp_color == get_usage (i)))
+    if (GetTransparent () && (transp_color == get_usage (i)))
       trans[i] = 0;
     else
       trans[i] = ((csTextureManagerSoftware*)new_palette)->find_rgb
         (get_usage (i).red, get_usage (i).green, get_usage (i).blue);
   }
 
-  RGBPixel* src;
-  ifile->GetImageData (&src);
+  RGBPixel* src = ifile->GetImageData ();
 
   unsigned char *dest, *last;
   if (do_2d)
-    dest = t2d->get_bitmap8 ();
+    dest = t2d->get_bitmap ();
   else
-    dest = t1->get_bitmap8 ();
-  int size;
-  ifile->GetSize (size);
+    dest = t1->get_bitmap ();
+  int size = ifile->GetSize ();
   last = dest + size;
 
   i=0;
@@ -292,7 +284,7 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
   }
   for (i = 0 ; i < num_col ; i++)
   {
-    if (get_transparent () && (transp_color == get_usage (i)))
+    if (GetTransparent () && (transp_color == get_usage (i)))
       trans [i] = 0;
     else
       trans [i] = priv_cmap->alloc_rgb (get_usage(i).red, get_usage(i).green,
@@ -300,12 +292,10 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
     dist += ddist;
   }
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  unsigned char* dest = t1->get_bitmap8 ();
+  int w = ifile->GetWidth ();
+  int h = ifile->GetHeight ();
+  RGBPixel* src = ifile->GetImageData ();
+  unsigned char* dest = t1->get_bitmap ();
 
   // Map the texture to the private palette.
   int x, y;
@@ -336,17 +326,48 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
 
 UShort csTextureManagerSoftware::alpha_mask;
 
-csTextureManagerSoftware::csTextureManagerSoftware (ISystem* piSystem, IGraphics2D* piG2D) :
-  csTextureManager (piSystem, piG2D)
+csTextureManagerSoftware::csTextureManagerSoftware (iSystem* iSys, iGraphics2D* iG2D) :
+  csTextureManager (iSys, iG2D)
 {
   txtMode = TXT_GLOBAL;
   force_txtMode = -1;
   initialized = false;
 }
 
-void csTextureManagerSoftware::InitSystem ()
+void csTextureManagerSoftware::Initialize ()
 {
-  csTextureManager::InitSystem ();
+  csTextureManager::Initialize ();
+
+  // By allocating black at 0 and white at 255 we are compatible with
+  // the Windows palette (those two colors cannot be modified).
+  // This is important even for X Windows because X Windows can be run
+  // in Windows NT (or 95) under X emulation and the same limitation
+  // is also present then.
+  //
+  // Note that we can't use these colors for textures since it is
+  // possible that we apply gamma correction on the colormap and this
+  // is not possible for those two entries. However, they are very
+  // useful as fixed black and white entries no matter what the
+  // palette is (for messages and such).
+  //
+  // Another useful trick is to map color 0 to 0 in every lightlevel.
+  // Using this feature transparent colors in textures remain transparent
+  // even with lighting added.
+  memset (alloc, 0, sizeof (alloc));
+  memset (pal, 0, sizeof (pal));
+  alloc [0] = true;
+  pal [0].red = 0;
+  pal [0].green = 0;
+  pal [0].blue = 0;
+  alloc [255] = true;
+  pal [255].red = 255;
+  pal [255].green = 255;
+  pal [255].blue = 255;
+
+  clear ();
+  read_config ();
+
+  initialized = true;
 
   lt_truergb = NULL;
   lt_truergb_private = NULL;
@@ -605,7 +626,7 @@ void csTextureManagerSoftware::clear ()
   CHK (delete lt_alpha); lt_alpha = NULL;
 }
 
-csTextureMMSoftware* csTextureManagerSoftware::new_texture (IImageFile* image)
+csTextureMMSoftware* csTextureManagerSoftware::new_texture (iImageFile* image)
 {
   CHK (csTextureMMSoftware* tm = new csTextureMMSoftware (image));
   if (tm->loaded_correctly ())
@@ -1100,50 +1121,14 @@ void csTextureManagerSoftware::compute_light_tables ()
     SysPrintf (MSG_INITIALIZATION, "DONE\n");
 }
 
-STDMETHODIMP csTextureManagerSoftware::Initialize ()
-{
-  // By allocating black at 0 and white at 255 we are compatible with
-  // the Windows palette (those two colors cannot be modified).
-  // This is important even for X Windows because X Windows can be run
-  // in Windows NT (or 95) under X emulation and the same limitation
-  // is also present then.
-  //
-  // Note that we can't use these colors for textures since it is
-  // possible that we apply gamma correction on the colormap and this
-  // is not possible for those two entries. However, they are very
-  // useful as fixed black and white entries no matter what the
-  // palette is (for messages and such).
-  //
-  // Another useful trick is to map color 0 to 0 in every lightlevel.
-  // Using this feature transparent colors in textures remain transparent
-  // even with lighting added.
-  memset (alloc, 0, sizeof (alloc));
-  memset (pal, 0, sizeof (pal));
-  alloc [0] = true;
-  pal [0].red = 0;
-  pal [0].green = 0;
-  pal [0].blue = 0;
-  alloc [255] = true;
-  pal [255].red = 255;
-  pal [255].green = 255;
-  pal [255].blue = 255;
-
-  clear ();
-  read_config ();
-
-  initialized = true;
-
-  return S_OK;
-}
-
-STDMETHODIMP csTextureManagerSoftware::Prepare ()
+void csTextureManagerSoftware::Prepare ()
 {
   int i;
 
-  // Check: we have to call Initialize() before Prepare()
+  // Check: we have to call Initialize () before Prepare()
   if (!initialized)
   {
-    SysPrintf (MSG_FATAL_ERROR, "TextureManager::Initialize() should be called before TextureManager::Prepare()");
+    SysPrintf (MSG_FATAL_ERROR, "TextureManager::Initialize () should be called before TextureManager::Prepare()");
     abort ();
   }
   initialized = false;
@@ -1190,29 +1175,25 @@ STDMETHODIMP csTextureManagerSoftware::Prepare ()
     txt->free_usage_table ();
   }
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE\n");
-
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerSoftware::RegisterTexture (IImageFile* image,
-  ITextureHandle** handle, bool for3d, bool for2d)
+iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImageFile* image,
+  bool for3d, bool for2d)
 {
   csTextureMMSoftware* txt = new_texture (image);
   txt->set_3d2d (for3d, for2d);
-  *handle = GetITextureHandleFromcsTextureMM (txt);
-  return S_OK;
+  return txt;
 }
 
-STDMETHODIMP csTextureManagerSoftware::UnregisterTexture (ITextureHandle* handle)
+void csTextureManagerSoftware::UnregisterTexture (iTextureHandle* handle)
 {
   (void)handle;
   //@@@ Not implemented yet.
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerSoftware::MergeTexture (ITextureHandle* handle)
+void csTextureManagerSoftware::MergeTexture (iTextureHandle* handle)
 {
-  csTextureMMSoftware* txt = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
+  csTextureMMSoftware* txt = (csTextureMMSoftware*)handle->GetPrivateObject ();
   if (txt->for_3d ()) txt->alloc_mipmaps (this);
   if (txt->for_2d ()) txt->alloc_2dtexture (this);
   txt->compute_color_usage ();
@@ -1267,10 +1248,9 @@ STDMETHODIMP csTextureManagerSoftware::MergeTexture (ITextureHandle* handle)
   // create Mipmaps
   if (txt->for_3d ()) txt->create_mipmaps (this);
   txt->free_usage_table ();
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerSoftware::FreeImages ()
+void csTextureManagerSoftware::FreeImages ()
 {
   int i;
   for (i = 0 ; i < textures.Length () ; i++)
@@ -1278,16 +1258,14 @@ STDMETHODIMP csTextureManagerSoftware::FreeImages ()
     csTextureMMSoftware* txt = (csTextureMMSoftware*)textures[i];
     txt->free_image ();
   }
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerSoftware::ReserveColor (int r, int g, int b)
+void csTextureManagerSoftware::ReserveColor (int r, int g, int b)
 {
   alloc_rgb (r, g, b, 0);
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerSoftware::AllocPalette ()
+void csTextureManagerSoftware::AllocPalette ()
 {
   int i;
   int r, g, b;
@@ -1298,7 +1276,7 @@ STDMETHODIMP csTextureManagerSoftware::AllocPalette ()
       g = GAMMA (pal[i].green);
       b = GAMMA (pal[i].blue);
       CLIP_RGB;
-      m_piG2D->SetRGB (i, r, g, b);
+      G2D->SetRGB (i, r, g, b);
     }
 
   if (truecolor)
@@ -1318,5 +1296,4 @@ STDMETHODIMP csTextureManagerSoftware::AllocPalette ()
     white_color = 255;
   }
   black_color = 0;
-  return S_OK;
 }

@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csinput
 csinput:
 	$(MAKE_TARGET)
+csinputclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 

@@ -20,7 +20,7 @@
 #include "sysdef.h"
 #include "cs2d/glide2common/glide2common2d.h"
 #include "cs3d/glide2/gl_txtmgr.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
@@ -34,20 +34,26 @@
 #include "isystem.h"
 #include "itexture.h"
 
-//csGraphics2DOpenGlideFontServer *csGraphics2DGlideCommon::LocalFontServer = NULL; //dh: not implemented yet
-//GlideTextureCache *csGraphics2DGlideCommon::texture_cache = NULL; //dh: not implemented yet
-bool csGraphics2DGlideCommon::locked = false;
+IMPLEMENT_IBASE (csGraphics2DGlide2x)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iGraphics2DGlide)
+IMPLEMENT_IBASE_END
 
 // csGraphics2DGlideCommon function
-csGraphics2DGlideCommon::csGraphics2DGlideCommon (ISystem* piSystem) :
-  csGraphics2D (piSystem)
+csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
+  csGraphics2D ()
 {
-  System = piSystem;
+  CONSTRUCT_IBASE (iParent);
+  LocalFontServer = NULL;
+  texture_cache = NULL;
+  locked = false;
 }
 
-void csGraphics2DGlideCommon::Initialize ()
+bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
 {
-  csGraphics2D::Initialize ();
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
 
   // see if we need to go fullscreen or not...
   csIniFile* config = new csIniFile("cryst.cfg");
@@ -56,12 +62,13 @@ void csGraphics2DGlideCommon::Initialize ()
   
   Depth = 16;
 
-  DrawPixel = DrawPixelGlide;
-  WriteChar = WriteCharGlide;
-  GetPixelAt = GetPixelAtGlide;
-  DrawSprite = DrawSpriteGlide;
-}
+  _DrawPixel = DrawPixelGlide;
+  _WriteChar = WriteCharGlide;
+  _GetPixelAt = GetPixelAtGlide;
+  _DrawSprite = DrawSpriteGlide;
 
+  return true;
+}
 
 csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
 {
@@ -145,7 +152,7 @@ void csGraphics2DGlideCommon::DrawLine (int x1, int y1, int x2, int y2, int colo
   grDrawLine(&a,&b);
 }
 
-void csGraphics2DGlideCommon::DrawPixelGlide (int x, int y, int color)
+void csGraphics2DGlideCommon::DrawPixel (csGraphics2D *This, int x, int y, int color)
 {
    // can't do this while framebuffer is locked...
   if (locked) return;
@@ -157,32 +164,18 @@ void csGraphics2DGlideCommon::DrawPixelGlide (int x, int y, int color)
   grDrawPoint(&p);
 }
 
-void csGraphics2DGlideCommon::WriteCharGlide (int x, int y, int fg, int bg, char c)
+void csGraphics2DGlideCommon::WriteChar (csGraphics2D *This, int x, int y, int fg, int bg, char c)
 {
   // not implemented yet...
 }
 
-void csGraphics2DGlideCommon::DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy,
+void csGraphics2DGlideCommon::DrawSprite (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
   int sw, int sh, int tx, int ty, int tw, int th)
 {
   // not implemented yet...
 }
 
-unsigned char* csGraphics2DGlideCommon::GetPixelAtGlide (int /*x*/, int /*y*/)
+unsigned char* csGraphics2DGlideCommon::GetPixelAt (csGraphics2D *This, int /*x*/, int /*y*/)
 {
   return NULL;
 }
-
-// Used to printf through system driver
-void csGraphics2DGlideCommon::CsPrintf (int msgtype, const char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
-}
-

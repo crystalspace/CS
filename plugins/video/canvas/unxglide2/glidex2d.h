@@ -19,9 +19,10 @@
 #ifndef __GLIDEX2D_H__
 #define __GLIDEX2D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
+#include "cs2d/glide2common2d/iglide2d.h"
 
 #include <glide.h>
 
@@ -37,26 +38,8 @@
 #  include <sys/shm.h>
 #endif /* DO_SHM */
 
-interface ITextureHandle;
-
-// The CLSID to create csGraphics2DGlideX instances
-extern const CLSID CLSID_GlideXGraphics2D;
-
-///
-class csGraphics2DGlide2xFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DGlide2xFactory)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
-
-///
-
 /// XLIB version.
-class csGraphics2DGlideX : public csGraphics2D
+class csGraphics2DGlideX : public csGraphics2DGlideCommon
 {
 private:
   // The display context
@@ -93,17 +76,14 @@ private:
   /// A empty pixmap
   Pixmap EmptyPixmap;
 
-
-  /// Pointer to system driver interface
-  ISystem* System;
-  /// Pointer to DOS-specific interface
-  IUnixSystemDriver* UnixSystem;
+  /// Pointer to Unix-specific interface
+  iUnixSystemDriver* UnixSystem;
 
 public:
-  csGraphics2DGlideX (ISystem* piSystem);
+  csGraphics2DGlideX (iBase *iParent);
   virtual ~csGraphics2DGlideX ();
 
-  virtual void Initialize ();   
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
   
@@ -114,28 +94,25 @@ public:
   virtual void SetRGB (int i, int r, int g, int b);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
 
   virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
   
   static void DrawPixelGlide (int x, int y, int color);
   static void WriteCharGlide (int x, int y, int fg, int bg, char c);
-  static void DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy, 
+  static void DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy, 
                         int sw, int sh, int tx, int ty, int tw, int th);
   static unsigned char* GetPixelAtGlide (int x, int y);          
 
 protected:
-  /// This function is functionally equivalent to csSystemDriver::CsPrintf
-  void CsPrintf (int msgtype, const char *format, ...);
-
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
   
   /// This method is used for GlideInWindow...
   void FXgetImage();
 
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DGlideX)
+  /// Is framebuffer locked?
+  bool locked;
 };
 
 #endif // __GLIDEX2D_H__

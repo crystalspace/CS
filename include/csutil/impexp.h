@@ -1,4 +1,8 @@
 /*
+    Crystal Space utility library: 3D formats import library
+    Based on IVCON by John Burkardt, used with permission
+    C++ Class and CS interface: Bruce Williams
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -13,19 +17,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-  Based on IVCON 
-  Author:   John Burkardt  Used with permission
-
-  C++ Class and CS interface: Bruce Williams
-
 */
-// converter.h: interface for the converter class.
-//
-//////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CONVERTER_H__1B690D4B_0CC0_11D3_8D99_444553540000__INCLUDED_)
-#define AFX_CONVERTER_H__1B690D4B_0CC0_11D3_8D99_444553540000__INCLUDED_
+#ifndef __IMPEXP_H__
+#define __IMPEXP_H__
 
 // for CS defs.h 
 #define OK_TO_INCLUDE_DEFS_IM_A_FRIEND
@@ -37,7 +32,7 @@
 #include <string.h>
 #include "def.h"
 #include "csutil/inifile.h"
-class csVFS;
+#include "ivfs.h"
 
 #if _MSC_VER > 1000
 #pragma once
@@ -122,7 +117,7 @@ public:
 	virtual ~converter();
 	int ivcon ( const char* input_filename, bool keep_log = true,
 	  bool create_output_file = true, const char* output_filename = NULL,
-          csVFS* vfs = NULL );
+          iVFS* vfs = NULL );
 
         void ProcessConfig( csIniFile* config );
 	void set_reverse_normals( int yesno );
@@ -303,4 +298,4 @@ class csConverter_FrameManipulator
     converter* m_data_target;
 };
 
-#endif  // !defined(AFX_CONVERTER_H__1B690D4B_0CC0_11D3_8D99_444553540000__INCLUDED_)
+#endif // __IMPEXP_H__

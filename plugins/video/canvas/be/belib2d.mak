@@ -21,6 +21,8 @@ all drivers drivers2d: be2d
 
 be2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+be2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -49,22 +51,18 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/be
 
-.PHONY: be2d beclean becleanlib
+.PHONY: be2d be2dclean
 
 # Chain rules
-clean: beclean
-cleanlib: becleanlib
+clean: be2dclean
 
 be2d: $(OUTDIRS) $(BE2D)
 
 $(BE2D): $(OBJ.BE2D) $(DEP.BE2D)
 	$(DO.PLUGIN)
 
-beclean:
-	$(RM) $(BE2D)
-
-becleanlib:
-	$(RM) $(OBJ.BE2D) $(BE2D)
+be2dclean:
+	$(RM) $(BE2D) $(OBJ.BE2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)be2d.dep

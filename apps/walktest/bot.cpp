@@ -48,7 +48,7 @@ void Bot::set_bot_move (const csVector3& v)
   follow = v;
 }
 
-void Bot::move (long elapsed_time)
+void Bot::move (time_t elapsed_time)
 {
   csOrthoTransform old_pos (GetW2T (), follow);
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;

@@ -171,7 +171,7 @@ void SysSystemDriver::Warn(const char* s)
 }
 
 
-bool SysSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, IConfig* cfg_engine)
+bool SysSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, iConfig* cfg_engine)
 {
 	Handle			theMenuBar;
 	MenuHandle		theMenu;
@@ -245,14 +245,14 @@ void SysSystemDriver::SystemHelp()
 void SysSystemDriver::Loop(void)
 {
     long prev_time;
-    long current_time;
+    time_t current_time;
 	EventRecord anEvent;
-	IMacGraphicsInfo* piG2D = NULL;
+	iMacGraphicsInfo* piG2D = NULL;
 	bool outEventWasProcessed;
 	HRESULT	hRes;
 	bool	driverNeedsEvent = false;
 
-	hRes = piGI->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
+	hRes = piG2D->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
 
 	if (SUCCEEDED(hRes)) {
 		piG2D->DoesDriverNeedEvent( &driverNeedsEvent );
@@ -292,13 +292,13 @@ void SysSystemDriver::Loop(void)
 	}
 
 	if ( piG2D ) {
-		piG2D->Release();
+		piG2D->DecRef();
 		piG2D = NULL;
 	}
 }
 
 
-void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D )
+void SysSystemDriver::DispatchEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D )
 {
 	// dispatch the event according to its type and location
 	
@@ -361,7 +361,7 @@ void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent, I
 }
 
 
-void SysSystemDriver::HandleMouseEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D )
+void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D )
 {
 	WindowPtr	targetWindow;
 	short		partCode;
@@ -781,7 +781,7 @@ static int KeyToChar[128] = {
 	Check to see if any keys have been pressed or released.
 ----------------------------------------------------------------*/
 
-void SysSystemDriver::ScanKeyboard( long current_time )
+void SysSystemDriver::ScanKeyboard( time_t current_time )
 {
 	unsigned long	km[4];
 	unsigned long	keys;
@@ -821,7 +821,7 @@ void SysSystemDriver::ScanKeyboard( long current_time )
 		mKeyboardState[i] = km[i];
 }
 
-void SysSystemDriver::HandleKey( long current_time, const char key, const char /* keycode */, const short modifiers, bool /* down */ )
+void SysSystemDriver::HandleKey( time_t current_time, const char key, const char /* keycode */, const short modifiers, bool /* down */ )
 {
 	// A key has been pressed -- handle typical cases.
 	if (modifiers & cmdKey) {
@@ -890,7 +890,7 @@ void SysSystemDriver::HandleKey( long current_time, const char key, const char /
 }
 
 
-void SysSystemDriver::HandleOSEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D )
+void SysSystemDriver::HandleOSEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D )
 {
 	unsigned char	osEvtFlag;
 
@@ -914,7 +914,7 @@ void SysSystemDriver::HandleOSEvent( long current_time, EventRecord *theEvent, I
 }
 
 
-void SysSystemDriver::HandleHLEvent( long current_time, EventRecord *theEvent )
+void SysSystemDriver::HandleHLEvent( time_t current_time, EventRecord *theEvent )
 {
 #pragma unused( current_time )
 

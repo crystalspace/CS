@@ -21,9 +21,9 @@
 #define __SIMPCONS_H
 
 #include "cssys/console.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
-interface ITextureManager;
+scfInterface iTextureManager;
 
 class csRect;
 class csIniFile;
@@ -116,18 +116,18 @@ public:
   /// A character key has been pressed
   void AddChar(int c);
   /// Recalculate console colors
-  void SetupColors (ITextureManager* txtmgr);
+  void SetupColors (iTextureManager* txtmgr);
 
   /// Set the maximum number of lines (-1 = read from config file)
   void SetMaxLines (int ml = -1);
 
 private:
   /// Time left until messages will scroll up
-  long LineTime;
+  time_t LineTime;
   /// Cursor state
   bool CursorState;
   /// Cursor switch time
-  long CursorTime;
+  time_t CursorTime;
 
   /// Console contents
   char **Line;

@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csnetdrv/null/netndrv.h"
 #include "inetdrv.h"
 
@@ -120,7 +120,7 @@ BEGIN_INTERFACE_TABLE (csNetworkDriverNullFactory)
   IMPLEMENTS_INTERFACE (INetworkDriverFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csNetworkDriverNullFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csNetworkDriverNullFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

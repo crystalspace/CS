@@ -21,16 +21,15 @@
 #ifndef __IBEOS_H__
 #define __IBEOS_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
+
 class BMessage;
-class ITextureHandle;
+class iTextureHandle;
 
-extern const IID IID_IBeLibSystemDriver;
-
-interface IBeLibSystemDriver : public IUnknown
+SCF_INTERFACE (iBeLibSystemDriver, 0, 0, 1) : public iBase
 {
-  STDMETHOD (ProcessUserEvent) (BMessage*) PURE;
-  STDMETHOD (SetMouseCursor) (int shape, ITextureHandle*) PURE;
+  virtual void ProcessUserEvent (BMessage*) = 0;
+  virtual void SetMouseCursor (int shape, iTextureHandle*) = 0;
 };
 
-#endif // __IBE_H__
+#endif // __IBEOS_H__

@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csobject
 csobject:
 	$(MAKE_TARGET)
+csobjectclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 

@@ -31,8 +31,8 @@ class csPolygon3D;
 class csRenderView;
 class csLightView;
 struct csFog;
-interface IGraphics3D;
-interface IGraphics2D;
+scfInterface iGraphics3D;
+scfInterface iGraphics2D;
 
 /// A callback function for csWorld::DrawFunc().
 typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);
@@ -94,9 +94,9 @@ public:
   csClipper* view;
 
   /// The 3D graphics subsystem used for drawing.
-  IGraphics3D* g3d;
+  iGraphics3D* g3d;
   /// The 2D graphics subsystem used for drawing.
-  IGraphics2D* g2d;
+  iGraphics2D* g2d;
 
   /**
    * The portal polygon (or NULL if the first sector).
@@ -163,7 +163,7 @@ public:
 	callback (NULL), callback_data (NULL),
 	fog_info (NULL), added_fog_info (false) {}
   ///
-  csRenderView (const csCamera& c, csClipper* v, IGraphics3D* ig3d, IGraphics2D* ig2d) :
+  csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d, iGraphics2D* ig2d) :
 	csCamera (c), view (v), g3d (ig3d), g2d (ig2d),
 	portal_polygon (NULL), do_clip_plane (false), do_clip_frustrum (false),
 	callback (NULL), callback_data (NULL),

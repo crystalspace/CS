@@ -21,8 +21,8 @@
 #define __CSWSSYS_H__
 
 #include "cssys/sysdriv.h"
-#include "cssys/system.h"
-#include "csws/csapp.h"
+
+class csApp;
 
 // A special variation of SysSystemDriver for CSWS
 class cswsSystemDriver : public SysSystemDriver
@@ -41,10 +41,11 @@ public:
   /// Destroy the system driver object
   virtual ~cswsSystemDriver ();
   /// Initialize system driver and debug console
-  virtual bool Initialize (int argc, char *argv[],
-    const char *iConfigName, const char *iVfsConfigName, IConfig *config);
-  /// Call application to process queued events
-  virtual void NextFrame (long elapsed_time, long current_time);
+  virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
+  /// Call application on each frame
+  virtual void NextFrame (time_t elapsed_time, time_t current_time);
+  /// Called from NextFrame() to process all events
+  virtual bool ProcessEvents ();
   /// Replace DemoWrite() for output to debug console
   virtual void DemoWrite (const char *buf);
   /// Display an alert message

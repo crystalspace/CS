@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "MacGraphics.h"
 #include "sysg2d.h"
 #include "xsysg2d.h"

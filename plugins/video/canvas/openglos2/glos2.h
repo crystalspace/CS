@@ -21,9 +21,7 @@
 #ifndef __GLOS2_H__
 #define __GLOS2_H__
 
-#include "cscom/com.h"
-#include "cs2d/common/graph2d.h"
-#include "cssys/system.h"
+#include "csutil/scf.h"
 #include "cssys/os2/icsos2.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 
@@ -32,19 +30,6 @@ class glWindow;
 typedef ULong HWND;
 typedef ULong ULONG;
 typedef ULong HPAL;
-
-extern const CLSID CLSID_OpenGLGraphics2D;
-
-/// IGraphics2DFactory interface implementation
-class csGraphics2DFactoryOS2GL : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DFactoryOS2GL)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
 
 /**
  * This is the OS/2 OpenGL 2D driver. I did not had any chance to test
@@ -74,16 +59,14 @@ class csGraphics2DOS2GL : public csGraphics2DGLCommon
 
   /// Window position in percents
   int WindowX, WindowY;
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Pointer to the OS/2 system driver
-  IOS2SystemDriver* OS2System;
+  iOS2SystemDriver* OS2System;
 
 public:
-  csGraphics2DOS2GL (ISystem* piSystem);
+  csGraphics2DOS2GL (iBase *iParent);
   virtual ~csGraphics2DOS2GL ();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -98,11 +81,7 @@ public:
   virtual void FinishDraw ();
 
   virtual bool SetMousePosition (int x, int y);
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
-
-protected:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DOS2GL)
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
 
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode, int Down,

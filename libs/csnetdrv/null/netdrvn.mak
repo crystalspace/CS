@@ -21,6 +21,8 @@ all drivers netdrivers: netdrvn
 
 netdrvn:
 	$(MAKE_TARGET) MAKE_DLL=yes
+netdrvnclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -47,12 +49,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: netdrvn netdrvnclean netdrvncleanlib
+.PHONY: netdrvn netdrvnclean
 
 # Chain rules
 net: netdrvn
 clean: netdrvnclean
-cleanlib: netdrvncleanlib
 
 netdrvn: $(OUTDIRS) $(NETDRVN)
 
@@ -60,10 +61,7 @@ $(NETDRVN): $(OBJ.NETDRVN) $(DEP.NETDRVN)
 	$(DO.PLUGIN)
 
 netdrvnclean:
-	$(RM) $(NETDRVN)
-
-netdrvncleanlib:
-	$(RM) $(OBJ.NETDRVN) $(NETDRVN)
+	$(RM) $(NETDRVN) $(OBJ.NETDRVN)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)netdrvn.dep

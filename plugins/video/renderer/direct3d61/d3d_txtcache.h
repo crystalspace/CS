@@ -72,9 +72,9 @@ public:
   
 protected:
   ///
-  virtual void Load(HighColorCache_Data *d);
+  virtual void Load(csHighColorCacheData *d);
   ///
-  virtual void Unload(HighColorCache_Data *d);
+  virtual void Unload(csHighColorCacheData *d);
 
   unsigned char m_GammaCorrect[256];
 private:
@@ -102,9 +102,9 @@ public:
   
 protected:
   ///
-  virtual void Load(HighColorCache_Data *d);
+  virtual void Load(csHighColorCacheData *d);
   ///
-  virtual void Unload(HighColorCache_Data *d);
+  virtual void Unload(csHighColorCacheData *d);
 
   unsigned char m_GammaCorrect[256];
 private:

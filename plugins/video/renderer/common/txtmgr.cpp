@@ -27,16 +27,14 @@
 #include "isystem.h"
 #include "lightdef.h"
 
-//---------------------------------------------------------------------------
+IMPLEMENT_IBASE (csTextureMM)
+  IMPLEMENTS_INTERFACE (iTextureHandle)
+IMPLEMENT_IBASE_END
 
-IMPLEMENT_UNKNOWN_NODELETE (csTextureMM)
-
-BEGIN_INTERFACE_TABLE (csTextureMM)
-  IMPLEMENTS_COMPOSITE_INTERFACE (TextureHandleMM)
-END_INTERFACE_TABLE ()
-
-csTextureMM::csTextureMM (IImageFile* image)
+csTextureMM::csTextureMM (iImageFile* image)
 {
+  CONSTRUCT_IBASE (NULL);
+
   t1 = t2 = t3 = t4 = t2d = NULL;
   rs24 = 16; gs24 = 8; bs24 = 0;
 
@@ -44,16 +42,21 @@ csTextureMM::csTextureMM (IImageFile* image)
   istransp = false;
 
   ifile = image;
-  ifile->AddRef ();
+  ifile->IncRef ();
 }
 
 csTextureMM::~csTextureMM ()
 {
-  CHK (delete t1);
-  CHK (delete t2);
-  CHK (delete t3);
-  CHK (delete t4);
-  CHK (delete t2d);
+  if (t1)
+    CHKB (delete t1);
+  if (t2)
+    CHKB (delete t2);
+  if (t3)
+    CHKB (delete t3);
+  if (t4)
+  CHKB (delete t4);
+  if (t2d)
+    CHKB (delete t2d);
   free_image ();
   free_usage_table ();
 }
@@ -61,8 +64,8 @@ csTextureMM::~csTextureMM ()
 void csTextureMM::create_blended_mipmap (csTextureManager* tex, unsigned char* bm)
 {
   if (!ifile) return;
-  IImageFile* if2;
-  bool tran = get_transparent ();
+  iImageFile* if2;
+  bool tran = GetTransparent ();
   if (tran)
   {
     // Just copy.
@@ -70,9 +73,9 @@ void csTextureMM::create_blended_mipmap (csTextureManager* tex, unsigned char* b
   }
   else
   {
-    ifile->Blend (&csTextureManager::blend_filter, &if2);
+    if2 = ifile->Blend (&csTextureManager::blend_filter);
     convert_to_internal (tex, if2, bm);
-    if2->Release ();
+    if2->DecRef ();
   }
 }
 
@@ -85,9 +88,8 @@ void csTextureMM::alloc_mipmaps (csTextureManager* tex)
   CHK (delete t3); t3 = NULL;
   CHK (delete t4); t4 = NULL;
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int w = ifile->GetWidth ();
+  int h = ifile->GetHeight ();
 
   csTextureFactory* tfact = tex->factory_3d;
 
@@ -111,12 +113,11 @@ void csTextureMM::blend_mipmap0 (csTextureManager* tex)
   if (!ifile) return;
 
   csTexture* tt;
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int w = ifile->GetWidth ();
+  int h = ifile->GetHeight ();
 
   tt = tex->factory_3d->new_texture (this, w, h);
-  create_blended_mipmap (tex, tt->get_bitmap8 ());
+  create_blended_mipmap (tex, tt->get_bitmap ());
   t1->copy (tt);
 
   CHK (delete tt);
@@ -125,33 +126,35 @@ void csTextureMM::blend_mipmap0 (csTextureManager* tex)
 void csTextureMM::create_mipmap_bitmap (csTextureManager* tex, int steps, unsigned char* bm)
 {
   if (!ifile) return;
-  IImageFile* if2;
-  bool tran = get_transparent ();
-  if (tran || tex->mipmap_nice == MIPMAP_UGLY) ifile->MipMap (steps, &if2); 
-  else if (tex->mipmap_nice == MIPMAP_DEFAULT) ifile->MipMap (steps, NULL, NULL, &if2);
-  else ifile->MipMap (steps, &csTextureManager::mipmap_filter_1, &csTextureManager::mipmap_filter_2, &if2);
+  iImageFile* if2;
+  bool tran = GetTransparent ();
+  if (tran || tex->mipmap_nice == MIPMAP_UGLY)
+    if2 = ifile->MipMap (steps); 
+  else if (tex->mipmap_nice == MIPMAP_DEFAULT)
+    if2 = ifile->MipMap (steps, NULL, NULL);
+  else
+    if2 = ifile->MipMap (steps, &csTextureManager::mipmap_filter_1, &csTextureManager::mipmap_filter_2);
   convert_to_internal (tex, if2, bm);
-  if2->Release ();
+  if2->DecRef ();
 }
 
 void csTextureMM::create_mipmaps (csTextureManager* tex)
 {
   if (!ifile) return;
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int w = ifile->GetWidth ();
+  int h = ifile->GetHeight ();
 
   if (tex->mipmap_nice == MIPMAP_VERYNICE)
   {
     // Mipmap level 1 (the same size of texture as level 0 but blended a little)
-    create_blended_mipmap (tex, t2->get_bitmap8 ());
+    create_blended_mipmap (tex, t2->get_bitmap ());
 
     // Mipmap level 2 (mipmap starting from the blended version).
-    create_mipmap_bitmap (tex, 1, t3->get_bitmap8 ());
+    create_mipmap_bitmap (tex, 1, t3->get_bitmap ());
 
     // Mipmap level 3 (mipmap starting from the blended version).
-    create_mipmap_bitmap (tex, 2, t4->get_bitmap8 ());
+    create_mipmap_bitmap (tex, 2, t4->get_bitmap ());
 
     // Size of last mipmap (for computation of mean value).
     w /= 4; h /= 4;
@@ -159,13 +162,13 @@ void csTextureMM::create_mipmaps (csTextureManager* tex)
   else
   {
     // Mipmap level 1 (mipmap starting from original version).
-    create_mipmap_bitmap (tex, 1, t2->get_bitmap8 ());
+    create_mipmap_bitmap (tex, 1, t2->get_bitmap ());
 
     // Mipmap level 2 (mipmap starting from original version).
-    create_mipmap_bitmap (tex, 2, t3->get_bitmap8 ());
+    create_mipmap_bitmap (tex, 2, t3->get_bitmap ());
 
     // Mipmap level 3 (mipmap starting from level 1).
-    create_mipmap_bitmap (tex, 3, t4->get_bitmap8 ());
+    create_mipmap_bitmap (tex, 3, t4->get_bitmap ());
 
     // Size of last mipmap (for computation of mean value).
     w /= 8; h /= 8;
@@ -175,10 +178,9 @@ void csTextureMM::create_mipmaps (csTextureManager* tex)
   // mapping is disabled.
   int x, y;
   ULong r, g, b;
-  RGBPixel* d;
-  ifile->GetImageData (&d);
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  RGBPixel* d = ifile->GetImageData ();
+  w = ifile->GetWidth ();
+  h = ifile->GetHeight ();
   r = g = b = 0;
   for (x = 0 ; x < w ; x++)
     for (y = 0 ; y < h ; y++)
@@ -202,18 +204,17 @@ void csTextureMM::alloc_2dtexture (csTextureManager* tex)
 {
   if (!ifile) return;
 
-  CHK (delete t2d); t2d = NULL;
+  CHK (delete t2d);
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int w = ifile->GetWidth ();
+  int h = ifile->GetHeight ();
   t2d = tex->factory_2d->new_texture (this, w, h);
 }
 
 
 void csTextureMM::free_image ()
 {
-  if (ifile) { ifile->Release (); ifile = NULL; }
+  if (ifile) { ifile->DecRef (); ifile = NULL; }
 }
 
 void csTextureMM::free_usage_table ()
@@ -222,7 +223,7 @@ void csTextureMM::free_usage_table ()
 }
 
 // This function must be called BEFORE color remapping.
-void csTextureMM::set_transparent (int red, int green, int blue)
+void csTextureMM::SetTransparent (int red, int green, int blue)
 {
   transp_color.red = red;
   transp_color.green = green;
@@ -247,10 +248,8 @@ void csTextureMM::compute_color_usage ()
 {
   if (!ifile) return;
   if (usage) return;
-  int s;
-  ifile->GetSize (s);
-  RGBPixel* bm;
-  ifile->GetImageData (&bm);
+  int s = ifile->GetSize ();
+  RGBPixel* bm = ifile->GetImageData ();
   CHK (usage = new ImageColorInfo (bm, s));
 }
 
@@ -273,11 +272,9 @@ void csTextureMM::remap_palette_24bit (csTextureManager* new_palette)
   compute_color_usage ();
   if (!usage) return;
 
-  int s;
-  ifile->GetSize (s);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  ULong* dest = t1->get_bitmap32 ();
+  int s = ifile->GetSize ();
+  RGBPixel* src = ifile->GetImageData ();
+  ULong* dest = (ULong *)t1->get_bitmap ();
 
   // Map the texture to the RGB palette.
 
@@ -285,7 +282,7 @@ void csTextureMM::remap_palette_24bit (csTextureManager* new_palette)
   // reserved for transparent pixels!
   ULong black = new_palette->get_almost_black ();
 
-  if (get_transparent ())
+  if (GetTransparent ())
     // transparent Textures need special processing. Every texel, that is transp_color
     // will be transformed to 0, because that is the color we use internally to mark
     // transparent texels.
@@ -304,17 +301,15 @@ void csTextureMM::remap_palette_24bit (csTextureManager* new_palette)
 
 void csTextureMM::remap_texture_16 (csTextureManager* new_palette)
 {
-  int s;
-  ifile->GetSize (s);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  UShort* dest = t2d->get_bitmap16 ();
+  int s = ifile->GetSize ();
+  RGBPixel* src = ifile->GetImageData ();
+  UShort* dest = (UShort*)t2d->get_bitmap ();
 
   // Approximation for black, because we can't use real black. Value 0 is 
   // reserved for transparent pixels!
   UShort black = new_palette->get_almost_black();
 
-  if (get_transparent ())
+  if (GetTransparent ())
     // transparent Textures need special processing. Every texel, that is transp_color
     // will be transformed to 0, because that is the color we use internally to mark
     // transparent texels.
@@ -333,17 +328,15 @@ void csTextureMM::remap_texture_16 (csTextureManager* new_palette)
 
 void csTextureMM::remap_texture_32 (csTextureManager* new_palette)
 {
-  int s;
-  ifile->GetSize (s);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  ULong* dest = t2d->get_bitmap32 ();
+  int s = ifile->GetSize ();
+  RGBPixel* src = ifile->GetImageData ();
+  ULong* dest = (ULong *)t2d->get_bitmap ();
   
   // Approximation for black, because we can't use real black. Value 0 is 
   // reserved for transparent pixels!
   ULong black = new_palette->get_almost_black(); 
 
-  if (get_transparent ())
+  if (GetTransparent ())
     // transparent Textures need special processing. Every texel, that is transp_color
     // will be transformed to 0, because that is the color we use internally to mark
     // transparent texels.
@@ -360,14 +353,67 @@ void csTextureMM::remap_texture_32 (csTextureManager* new_palette)
       *dest++ = new_palette->find_color (src->red, src->green, src->blue);
 }
 
+bool csTextureMM::GetTransparent ()
+{
+  return istransp;
+}
+
+int csTextureMM::GetNumberOfColors ()
+{
+  return usage->get_num_colors();
+}
+ 
+void csTextureMM::GetMipMapDimensions (int mipmap, int& w, int& h) 
+{ 
+  csTexture* txt = get_texture (mipmap);
+  w = txt->get_width ();
+  h = txt->get_height ();
+}
+
+void *csTextureMM::GetMipMapData (int mm)
+{
+  switch (mm)
+  {
+    case -1: return t2d ? t2d->get_bitmap () : NULL;
+    case 0: return t1 ? t1->get_bitmap () : NULL;
+    case 1: return t2 ? t2->get_bitmap () : NULL;
+    case 2: return t3 ? t3->get_bitmap () : NULL;
+    case 3: return t4 ? t4->get_bitmap () : NULL;
+  }
+  return NULL;
+}
+
+void csTextureMM::GetBitmapDimensions (int& w, int& h) 
+{ 
+  w = t2d->get_width ();
+  h = t2d->get_height ();
+}
+
+void *csTextureMM::GetBitmapData ()
+{ 
+  return t2d->get_bitmap ();
+}
+
+void csTextureMM::GetMeanColor (float& r, float& g, float& b)
+{ 
+  r = mean_color.red;
+  g = mean_color.green;
+  b = mean_color.blue;
+}
+
+/// Get the transparent color
+void csTextureMM::GetTransparent (int &red, int &green, int &blue)
+{
+  red = transp_color.red;
+  green = transp_color.green;
+  blue = transp_color.blue;
+}
 
 void csHardwareAcceleratedTextureMM::convert_to_internal
-  (csTextureManager* tex, IImageFile* imfile, unsigned char* bm)
+  (csTextureManager* tex, iImageFile* imfile, unsigned char* bm)
 {
-  int s;
-  imfile->GetSize (s);
-  RGBPixel* src;
-  imfile->GetImageData (&src);
+  int s = imfile->GetSize ();
+  RGBPixel* src = imfile->GetImageData ();
   ULong* dest = (ULong*) bm;
 
   // Map the texture to the RGB palette.
@@ -376,7 +422,7 @@ void csHardwareAcceleratedTextureMM::convert_to_internal
   //reserved for transparent pixels!
   ULong  black = tex->get_almost_black(); 
 
-  if (get_transparent ())
+  if (GetTransparent ())
     // transparent Textures need special processing. Every texel, that is transp_color
     // will be transformed to 0, because that is the color we use internally to mark
     // transparent texels.
@@ -411,12 +457,12 @@ csTexture8::csTexture8 (csTextureMM* p, int w, int h) : csTexture (p, w, h)
 
 csTexture16::csTexture16 (csTextureMM* p, int w, int h) : csTexture (p, w, h)
 {
-  CHK (bitmap = new UShort [w*h]);
+  CHK (bitmap = (UByte *)new UShort [w*h]);
 }
 
 csTexture32::csTexture32 (csTextureMM* p, int w, int h) : csTexture (p, w, h)
 {
-  CHK (bitmap = new ULong [w*h]);
+  CHK (bitmap = (UByte *)new ULong [w*h]);
 }
 
 void csTexture::init ()
@@ -468,11 +514,9 @@ csTexture32::~csTexture32 ()
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN (csTextureManager)
-
-BEGIN_INTERFACE_TABLE (csTextureManager)
-    IMPLEMENTS_INTERFACE (ITextureManager)
-END_INTERFACE_TABLE ()
+IMPLEMENT_IBASE (csTextureManager)
+  IMPLEMENTS_INTERFACE (iTextureManager)
+IMPLEMENT_IBASE_END
 
 Filter3x3 csTextureManager::mipmap_filter_1 =
 {
@@ -481,6 +525,7 @@ Filter3x3 csTextureManager::mipmap_filter_1 =
   1, 2, 1,
   16
 };
+
 Filter5x5 csTextureManager::mipmap_filter_2 =
 {
   1, 1, 1, 1, 1,
@@ -490,6 +535,7 @@ Filter5x5 csTextureManager::mipmap_filter_2 =
   1, 1, 1, 1, 1,
   48
 };
+
 Filter3x3 csTextureManager::blend_filter =
 {
   1, 2, 1,
@@ -498,10 +544,10 @@ Filter3x3 csTextureManager::blend_filter =
   16
 };
 
-csTextureManager::csTextureManager (ISystem* piSystem, IGraphics2D* piG2D)
+csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D* iG2D)
 {
-  m_piSystem = piSystem;
-  m_piG2D = piG2D;
+  System = iSys;
+  (G2D = iG2D)->IncRef ();
   verbose = false;
   factory_3d = NULL;
   factory_2d = NULL;
@@ -517,12 +563,9 @@ csTextureManager::csTextureManager (ISystem* piSystem, IGraphics2D* piG2D)
 
 }
 
-void csTextureManager::InitSystem ()
+void csTextureManager::Initialize ()
 {
-  IGraphicsInfo* piGI = NULL;
-  VERIFY_SUCCESS (m_piG2D->QueryInterface((IID&)IID_IGraphicsInfo, (void**)&piGI));
-  piGI->GetPixelFormat (&pfmt);
-  piGI->Release ();
+  pfmt = *G2D->GetPixelFormat ();
 }
 
 csTextureManager::~csTextureManager()
@@ -530,6 +573,8 @@ csTextureManager::~csTextureManager()
   clear ();
   CHK (delete factory_3d);
   CHK (delete factory_2d);
+  if (G2D)
+    G2D->DecRef ();
 }
 
 void csTextureManager::clear ()
@@ -552,13 +597,12 @@ void csTextureManager::SysPrintf (int mode, char* szMsg, ...)
   vsprintf (buf, szMsg, arg);
   va_end (arg);
 
-  m_piSystem->Print (mode, buf);
+  System->Print (mode, buf);
 }
 
-STDMETHODIMP csTextureManager::FindRGB (int r, int g, int b, int& color)
+int csTextureManager::FindRGB (int r, int g, int b)
 {
-  color = find_color (r, g, b);
-  return S_OK;
+  return find_color (r, g, b);
 }
 
 int csTextureManager::get_almost_black ()
@@ -587,54 +631,4 @@ int csTextureManager::get_almost_black ()
   }
   // huh ?!
   return 0;
-}
-
-//---------------------------------------------------------------------------
-
-IMPLEMENT_COMPOSITE_UNKNOWN (csTextureMM, TextureHandleMM)
-
-IMPLEMENT_GET_PROPERTY (GetTransparent, istransp, bool, csTextureMM, TextureHandleMM)
-IMPLEMENT_GET_PROPERTY (GetMeanColor, mean_idx, int, csTextureMM, TextureHandleMM)
-IMPLEMENT_GET_PROPERTY (GetNumberOfColors, usage->get_num_colors(), int, csTextureMM, TextureHandleMM)
- 
-STDMETHODIMP ITextureHandleMM::SetTransparent (int red, int green, int blue) 
-{ 
-  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
-  pThis->set_transparent (red, green, blue);
-  return S_OK; 
-}
-
-STDMETHODIMP ITextureHandleMM::GetMipMapDimensions (int mipmap, int& w, int& h) 
-{ 
-  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
-  csTexture* txt = pThis->get_texture (mipmap);
-  w = txt->get_width ();
-  h = txt->get_height ();
-  return S_OK; 
-}
-
-STDMETHODIMP ITextureHandleMM::GetBitmapDimensions (int& w, int& h) 
-{ 
-  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
-  csTexture* txt = pThis->get_texture (-1);
-  w = txt->get_width ();
-  h = txt->get_height ();
-  return S_OK; 
-}
-
-STDMETHODIMP ITextureHandleMM::GetBitmapData (void** bmdata)
-{ 
-  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
-  csTexture* txt = pThis->get_texture (-1);
-  *bmdata = (void*)(txt->get_bitmap8 ());
-  return S_OK; 
-}
-
-STDMETHODIMP ITextureHandleMM::GetMeanColor (float& r, float& g, float& b)
-{ 
-  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
-  r = pThis->mean_color.red;
-  g = pThis->mean_color.green;
-  b = pThis->mean_color.blue;
-  return S_OK; 
 }

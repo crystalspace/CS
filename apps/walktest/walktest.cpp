@@ -45,7 +45,6 @@
 #include "csengine/collider.h"
 
 #include "csengine/csspr2d.h"
-#include "csutil/sparse3d.h"
 #include "csutil/inifile.h"
 #include "csutil/impexp.h"
 #include "csutil/csrect.h"
@@ -68,8 +67,16 @@
 WalkTest *Sys;
 converter *ImportExport;
 
-#define Gfx3D System->piG3D
-#define Gfx2D System->piG2D
+#define Gfx3D System->G3D
+#define Gfx2D System->G2D
+
+
+//------------------------------ We need the VFS plugin and the 3D engine -----
+
+REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
+  "Crystal Space Virtual File System plug-in")
+REGISTER_STATIC_CLASS (csWorld, "crystalspace.kernel.engine",
+  "Crystal Space 3D Engine plug-in")
 
 //-----------------------------------------------------------------------------
 
@@ -77,42 +84,29 @@ void DrawZbuffer ()
 {
   for (int y = 0; y < FRAME_HEIGHT; y++)
   {
-    int gi_pixelbytes;
-    System->piGI->GetPixelBytes (gi_pixelbytes);
+    int gi_pixelbytes = System->G2D->GetPixelBytes ();
 
-    if (gi_pixelbytes == 4)
-    {
-      ULong *dest;
-      Gfx2D->GetPixelAt(0, y, (unsigned char**)&dest);
+    ULong *zbuf = Gfx3D->GetZBufPoint(0, y);
 
-      ULong *zbuf;
-      Gfx3D->GetZBufPoint (0, y, &zbuf);
-
-      for (int x = 0; x < FRAME_WIDTH; x++)
-        *dest++ = *zbuf++ >> 10;
-    }
-    else if (gi_pixelbytes == 2)
-    {
-      UShort *dest;
-      Gfx2D->GetPixelAt(0, y, (unsigned char**)&dest);
-
-      ULong *zbuf;
-      Gfx3D->GetZBufPoint (0, y, &zbuf);
-
-      for (int x = 0; x < FRAME_WIDTH; x++)
-        *dest++ = (unsigned short)(*zbuf++ >> 13);
-    }
-    else
-    {
-      unsigned char *dest;
-      Gfx2D->GetPixelAt(0, y, &dest);
-
-      ULong *zbuf;
-      Gfx3D->GetZBufPoint(0, y, &zbuf);
-
-      for (int x = 0; x < FRAME_WIDTH; x++)
-        *dest++ = (unsigned char)(*zbuf++ >> 16);
-    }
+    if (zbuf)
+      if (gi_pixelbytes == 4)
+      {
+        ULong *dest = (ULong *)Gfx2D->GetPixelAt (0, y);
+        for (int x = 0; x < FRAME_WIDTH; x++)
+          *dest++ = *zbuf++ >> 10;
+      }
+      else if (gi_pixelbytes == 2)
+      {
+        UShort *dest = (UShort *)Gfx2D->GetPixelAt(0, y);
+        for (int x = 0; x < FRAME_WIDTH; x++)
+          *dest++ = (unsigned short)(*zbuf++ >> 13);
+      }
+      else
+      {
+        unsigned char *dest = Gfx2D->GetPixelAt (0, y);
+        for (int x = 0; x < FRAME_WIDTH; x++)
+          *dest++ = (unsigned char)(*zbuf++ >> 16);
+      }
   }
 }
 
@@ -127,11 +121,9 @@ int collcount = 0;
 // selected light.
 void show_frustrum (csLightView* lview, int type, void* /*entity*/)
 {
-  ITextureManager* txtmgr;
-  Gfx3D->GetTextureManager (&txtmgr);
-  int red, white;
-  txtmgr->FindRGB (255, 255, 255, white);
-  txtmgr->FindRGB (255, 0, 0, red);
+  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
+  int white = txtmgr->FindRGB (255, 255, 255);
+  int red = txtmgr->FindRGB (255, 0, 0);
 
   if (type == CALLBACK_POLYGON)
   {
@@ -241,13 +233,12 @@ void select_object (csRenderView* rview, int type, void* entity)
 // selected light and/or polygon.
 void draw_edges (csRenderView* rview, int type, void* entity)
 {
-  ITextureManager* txtmgr;
-  Gfx3D->GetTextureManager (&txtmgr);
-  int red, white, blue, yellow, selcol;
-  txtmgr->FindRGB (255, 255, 255, white);
-  txtmgr->FindRGB (255, 0, 0, red);
-  txtmgr->FindRGB (0, 0, 255, blue);
-  txtmgr->FindRGB (255, 255, 0, yellow);
+  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
+  int selcol;
+  int white = txtmgr->FindRGB (255, 255, 255);
+  int red = txtmgr->FindRGB (255, 0, 0);
+  int blue = txtmgr->FindRGB (0, 0, 255);
+  int yellow = txtmgr->FindRGB (255, 255, 0);
 
   bool hilighted_only = !!rview->callback_data;
   if (hilighted_only) selcol = yellow;
@@ -438,7 +429,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
 
 //------------------------------------------------------------------------
 
-void WalkTest::DrawFrame (long elapsed_time, long current_time)
+void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 {
   (void)elapsed_time; (void)current_time;
 
@@ -446,7 +437,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
   int drawflags = 0; /* do_clear ? CSDRAW_CLEARSCREEN : 0; */
   if (do_clear || map_mode == MAP_ON)
   {
-    if (Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS) != S_OK)
+    if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS))
       return;
     Gfx2D->Clear (map_mode == MAP_ON ? 0 : 255);
   }
@@ -455,7 +446,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
    || ((csSimpleConsole*)(System->Console))->IsTransparent ())
   {
     // Tell Gfx3D we're going to display 3D things
-    if (Gfx3D->BeginDraw (drawflags | CSDRAW_3DGRAPHICS) != S_OK)
+    if (!Gfx3D->BeginDraw (drawflags | CSDRAW_3DGRAPHICS))
       return;
 
     // Advance sprite frames
@@ -479,20 +470,20 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
   }
 
   // Start drawing 2D graphics
-  if (Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS) != S_OK)
+  if (!Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS))
     return;
 
   if (map_mode != MAP_OFF)
   {
     wf->GetWireframe ()->Clear ();
-    view->GetWorld ()->DrawFunc (Gfx3D, view->GetCamera (), view->GetClipper (), draw_map);
+    view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), draw_map);
     wf->GetWireframe ()->Draw (Gfx3D, wf->GetCamera ());
   }
   else
   {
     if (do_show_z) DrawZbuffer ();
-    if (do_edges) view->GetWorld ()->DrawFunc (Gfx3D, view->GetCamera (), view->GetClipper (), draw_edges);
-    if (selected_polygon || selected_light) view->GetWorld ()->DrawFunc (Gfx3D, view->GetCamera (), view->GetClipper (), draw_edges, (void*)1);
+    if (do_edges) view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), draw_edges);
+    if (selected_polygon || selected_light) view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), draw_edges, (void*)1);
     if (do_light_frust && selected_light) ((csStatLight*)selected_light)->LightingFunc (show_frustrum);
   }
 
@@ -979,7 +970,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     Sys->velocity.y -= SIGN (Sys->velocity.y) * MIN (0.017, fabs (Sys->velocity.y));
 }
 
-void WalkTest::PrepareFrame (long elapsed_time, long current_time)
+void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 {
   (void)elapsed_time; (void)current_time;
 
@@ -1102,8 +1093,7 @@ void CaptureScreen (void)
 
   if (i >= 100) return;
 
-  RGBpaletteEntry* pPalette;
-  System->piGI->GetPalette (&pPalette);
+  RGBpaletteEntry* pPalette = System->G2D->GetPalette ();
 
   if (pPalette)
   {
@@ -1119,8 +1109,9 @@ void CaptureScreen (void)
 			int width,int height);
   Gfx3D->BeginDraw(CSDRAW_2DGRAPHICS);
 
-  unsigned char* pFirstPixel;
-  Gfx2D->GetPixelAt(0,0, &pFirstPixel);
+  unsigned char* pFirstPixel = Gfx2D->GetPixelAt(0,0);
+  if (!pFirstPixel)
+    return;
 
   WritePCX (name, pFirstPixel, pall, FRAME_WIDTH, FRAME_HEIGHT);
   Gfx3D->FinishDraw();
@@ -1169,30 +1160,9 @@ void cleanup ()
   CHK (delete Sys); Sys = NULL;
 }
 
-/*---------------------------------------------------------------------*
- * Demo stuff
- *---------------------------------------------------------------------*/
-
-struct DemoInfo
+void start_console ()
 {
-  csWorld* world;
-};
-
-DemoInfo* demo_info = NULL;
-
-/*
- * Start the demo in the already open screen.
- */
-void start_demo ()
-{
-  CHK (demo_info = new DemoInfo);
-  CHK (Sys->world = demo_info->world = new csWorld ());
-
-  ITextureManager* txtmgr;
-  Gfx3D->GetTextureManager (&txtmgr);
-//Gfx2D->DoubleBuffer (false);
-  demo_info->world->Initialize (GetISystemFromSystem (System), Gfx3D,
-    Sys->Config, Sys->Vfs);
+  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
 
   // Initialize the texture manager
   txtmgr->Initialize ();
@@ -1211,19 +1181,7 @@ void start_demo ()
   ((csSimpleConsole *)System->Console)->SetMaxLines (1000);       // Some arbitrary high value.
   ((csSimpleConsole *)System->Console)->SetTransparent (0);
 
-  System->DemoReady = true;
-}
-
-/*
- * Stop the demo.
- */
-void stop_demo ()
-{
-  if (demo_info)
-  {
-    CHK (delete demo_info->world);
-    CHK (delete demo_info);
-  }
+  System->ConsoleReady = true;
 }
 
 void WalkTest::EndWorld() {}
@@ -1268,33 +1226,33 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 //  Sys->Printf (MSG_INITIALIZATION, "DONE\n");
 }
 
-/*---------------------------------------------------------------------*
- * Main function
- *---------------------------------------------------------------------*/
-int main (int argc, char* argv[])
+
+bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName)
 {
-  // Initialize the random number generator
-  srand (time (NULL));
+  if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
+    return false;
 
-  // Create our main class which is the driver for WalkTest.
-  CHK (Sys = new WalkTest ());
-
-  // Create our world. The world is the representation of the 3D engine.
-  CHK (csWorld* world = new csWorld ());
-
-  // Initialize the main system. This will load all needed
-  // COM drivers (3D, 2D, network, sound, ...) and initialize them.
-  if (!Sys->Initialize (argc, argv, "cryst.cfg", "VFS.cfg", world->GetEngineConfigCOM ()))
-  {
-    Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
-    fatal_exit (0, false);
-  }
+  // Get all collision detection and movement config file parameters.
+  cfg_jumpspeed = Config->GetFloat ("CD", "JUMPSPEED", 0.08);
+  cfg_walk_accelerate = Config->GetFloat ("CD", "WALKACCELERATE", 0.007);
+  cfg_walk_maxspeed = Config->GetFloat ("CD", "WALKMAXSPEED", 0.1);
+  cfg_walk_brake = Config->GetFloat ("CD", "WALKBRAKE", 0.014);
+  cfg_rotate_accelerate = Config->GetFloat ("CD", "ROTATEACCELERATE", 0.005);
+  cfg_rotate_maxspeed = Config->GetFloat ("CD", "ROTATEMAXSPEED", 0.03);
+  cfg_rotate_brake = Config->GetFloat ("CD", "ROTATEBRAKE", 0.015);
+  cfg_look_accelerate = Config->GetFloat ("CD", "LOOKACCELERATE", 0.028);
+  cfg_body_height = Config->GetFloat ("CD", "BODYHEIGHT", 1.4);
+  cfg_body_width = Config->GetFloat ("CD", "BODYWIDTH", 0.5);
+  cfg_body_depth = Config->GetFloat ("CD", "BODYDEPTH", 0.5);
+  cfg_eye_offset = Config->GetFloat ("CD", "EYEOFFSET", -0.7);
+  cfg_legs_width = Config->GetFloat ("CD", "LEGSWIDTH", 0.4);
+  cfg_legs_depth = Config->GetFloat ("CD", "LEGSDEPTH", 0.4);
+  cfg_legs_offset = Config->GetFloat ("CD", "LEGSOFFSET", -1.1);
 
   //--- create the converter class for testing
   CHK (ImportExport = new converter());
   // process import/export files from config and print log for testing
-  ImportExport->ProcessConfig (Sys->Config);
+  ImportExport->ProcessConfig (Config);
   // free memory - delete this if you want to use the data in the buffer
   CHK (delete ImportExport);
   //--- end converter test
@@ -1305,50 +1263,53 @@ int main (int argc, char* argv[])
   // library on loading/initialization resets the control word to default
   _control87 (0x33, 0x3f);
 #else
-  // this will disable exceptions on DJGPP (for the "industrial" version)
+  // this will disable exceptions on DJGPP (for the non-debug version)
   _control87 (0x3f, 0x3f);
 #endif
 
-  // Open the main system. This will open all the previously loaded
-  // COM drivers.
-  if (!Sys->Open ("Crystal Space"))
+  // Start the engine
+  if (!Open ("Crystal Space"))
   {
-    Sys->Printf (MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
-    fatal_exit (0, false);
+    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    return false;
   }
 
   // Create console object for text and commands.
-  CHK (System->Console = new csSimpleConsole (Sys->Config, Command::SharedInstance()));
+  CHK (System->Console = new csSimpleConsole (Config, Command::SharedInstance ()));
 
-  // Start the 'demo'. This is currently nothing more than
-  // the display of all startup messages on the console.
-  start_demo ();
+  // Open the startup console
+  start_console ();
 
   // Some commercials...
-  Sys->Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", VERSION, RELEASE_DATE);
-  Sys->Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
-  ITextureManager* txtmgr;
-  Gfx3D->GetTextureManager (&txtmgr);
+  Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", VERSION, RELEASE_DATE);
+  Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
+
+  // Set texture manager mode to verbose (useful for debugging)
+  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize our world now that the system is ready.
-  Sys->world = world;
-  world->Initialize (GetISystemFromSystem (System), Gfx3D, Sys->Config, Sys->Vfs);
+  // Find the world plugin and query the csWorld object from it...
+  World = QUERY_PLUGIN (Sys, iWorld);
+  if (!World)
+  {
+    Printf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    return false;
+  }
+  world = World->GetCsWorld ();
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  CHK (Sys->view = new csView (world, Gfx3D));
+  CHK (view = new csView (world, Gfx3D));
 
   // Initialize the command processor with the world and camera.
-  Command::Initialize (world, Sys->view->GetCamera (), Gfx3D, System->Console, GetISystemFromSystem (System));
+  Command::Initialize (world, view->GetCamera (), Gfx3D, System->Console, System);
 
   // Create the language layer needed for scripting.
   // Also register a small C script so that it can be used
   // by levels. large.zip uses this script.
-  CHK (Sys->layer = new LanguageLayer (world, Sys->view->GetCamera ()));
+  CHK (layer = new LanguageLayer (world, view->GetCamera ()));
   int_script_reg.reg ("message", &do_message_script);
 
   // Now we have two choices. Either we create an infinite
@@ -1356,18 +1317,17 @@ int main (int argc, char* argv[])
   // option is given. Otherwise we load the given world.
   csSector* room;
 
-  if (Sys->do_infinite || Sys->do_huge)
+  if (do_infinite || do_huge)
   {
     // The infinite maze.
 
-    if (!Sys->Vfs->ChDir ("/tmp"))
+    if (!VFS->ChDir ("/tmp"))
     {
-      Sys->Printf (MSG_FATAL_ERROR, "Temporary directory not mounted on VFS!\n");
-      cleanup ();
-      fatal_exit (0, false);
+      Printf (MSG_FATAL_ERROR, "Temporary directory /tmp not mounted on VFS!\n");
+      return false;
     }
 
-    Sys->Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
+    Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
     world->EnableLightingCache (false);
 
     // Unfortunately the current movement system does not allow the user to
@@ -1375,74 +1335,72 @@ int main (int argc, char* argv[])
     // though collision detection does not really make sense in this context.
     // Hopefully the movement system will be fixed some day so that the user
     // can move around even with collision detection disabled.
-    Sys->do_cd = true;
+    do_cd = true;
 
     // Load two textures that are used in the maze.
     csLoader::LoadTexture (world, "txt", "/lib/std/stone4.gif");
     csLoader::LoadTexture (world, "txt2", "/lib/std/mystone2.gif");
 
-    if (Sys->do_infinite)
+    if (do_infinite)
     {
       // Create the initial (non-random) part of the maze.
-      CHK (Sys->infinite_maze = new InfiniteMaze ());
-      room = Sys->infinite_maze->create_six_room (world, 0, 0, 0)->sector;
-      Sys->infinite_maze->create_six_room (world, 0, 0, 1);
-      Sys->infinite_maze->create_six_room (world, 0, 0, 2);
-      Sys->infinite_maze->create_six_room (world, 1, 0, 2);
-      Sys->infinite_maze->create_six_room (world, 0, 1, 2);
-      Sys->infinite_maze->create_six_room (world, 1, 1, 2);
-      Sys->infinite_maze->create_six_room (world, 0, 0, 3);
-      Sys->infinite_maze->create_six_room (world, 0, 0, 4);
-      Sys->infinite_maze->create_six_room (world, -1, 0, 4);
-      Sys->infinite_maze->create_six_room (world, -2, 0, 4);
-      Sys->infinite_maze->create_six_room (world, 0, -1, 3);
-      Sys->infinite_maze->create_six_room (world, 0, -2, 3);
-      Sys->infinite_maze->create_six_room (world, 0, 1, 3);
-      Sys->infinite_maze->create_six_room (world, 0, 2, 3);
-      Sys->infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
-      Sys->infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
-      Sys->infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
-      Sys->infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
-      Sys->infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
-      Sys->infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
-      Sys->infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
-      Sys->infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
-      Sys->infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
-      Sys->infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
-      Sys->infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
-      Sys->infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
-      Sys->infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
-      Sys->infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
-      Sys->infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
+      CHK (infinite_maze = new InfiniteMaze ());
+      room = infinite_maze->create_six_room (world, 0, 0, 0)->sector;
+      infinite_maze->create_six_room (world, 0, 0, 1);
+      infinite_maze->create_six_room (world, 0, 0, 2);
+      infinite_maze->create_six_room (world, 1, 0, 2);
+      infinite_maze->create_six_room (world, 0, 1, 2);
+      infinite_maze->create_six_room (world, 1, 1, 2);
+      infinite_maze->create_six_room (world, 0, 0, 3);
+      infinite_maze->create_six_room (world, 0, 0, 4);
+      infinite_maze->create_six_room (world, -1, 0, 4);
+      infinite_maze->create_six_room (world, -2, 0, 4);
+      infinite_maze->create_six_room (world, 0, -1, 3);
+      infinite_maze->create_six_room (world, 0, -2, 3);
+      infinite_maze->create_six_room (world, 0, 1, 3);
+      infinite_maze->create_six_room (world, 0, 2, 3);
+      infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
+      infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
+      infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
+      infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
+      infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
+      infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
+      infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
+      infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
+      infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
+      infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
+      infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
+      infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
+      infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
+      infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
+      infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
     }
     else
     {
       // Create the huge world.
-      CHK (Sys->huge_room = new HugeRoom ());
-      room = Sys->huge_room->create_huge_world (world);
+      CHK (huge_room = new HugeRoom ());
+      room = huge_room->create_huge_world (world);
     }
 
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    world->Prepare (Gfx3D);
+    world->Prepare ();
   }
   else
   {
     // Load from a world file.
-    Sys->Printf (MSG_INITIALIZATION, "Loading world '%s'...\n", WalkTest::world_dir);
-    if (!Sys->Vfs->ChDir (WalkTest::world_dir))
+    Printf (MSG_INITIALIZATION, "Loading world '%s'...\n", world_dir);
+    if (!VFS->ChDir (world_dir))
     {
-      Sys->Printf (MSG_FATAL_ERROR, "The directory on VFS for world file does not exist!\n");
-      cleanup ();
-      fatal_exit (0, false);
+      Printf (MSG_FATAL_ERROR, "The directory on VFS for world file does not exist!\n");
+      return false;
     }
 
     // Load the world from the file.
-    if (!csLoader::LoadWorldFile (world, Sys->layer, "world"))
+    if (!csLoader::LoadWorldFile (world, layer, "world"))
     {
-      Sys->Printf (MSG_FATAL_ERROR, "Loading of world failed!\n");
-      cleanup ();
-      fatal_exit (0, false);
+      Printf (MSG_FATAL_ERROR, "Loading of world failed!\n");
+      return false;
     }
 
     // Load the "standard" library
@@ -1451,24 +1409,24 @@ int main (int argc, char* argv[])
     // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
     // the use in the 2D part.
     csTextureList *texlist = world->GetTextures ();
-    ASSERT(texlist);
     csTextureHandle *texh = texlist->GetTextureMM ("cslogo.gif");
     if (texh)
     {
       texh->for_2d = true;
+      texh->for_3d = false;
     }
 
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    world->Prepare (Gfx3D);
+    world->Prepare ();
 
     // Create a 2D sprite for the Logo.
     if (texh)
     {
       int w, h;
-      ITextureHandle* phTex = texh->GetTextureHandle();
-      phTex->GetBitmapDimensions(w,h);
-      CHK (Sys->cslogo = new csSprite2D (phTex, 0, 0, w, h));
+      iTextureHandle* phTex = texh->GetTextureHandle();
+      phTex->GetBitmapDimensions (w,h);
+      CHK (cslogo = new csSprite2D (phTex, 0, 0, w, h));
     }
 
     // Look for the start sector in this world.
@@ -1476,18 +1434,32 @@ int main (int argc, char* argv[])
     room = (csSector*)world->sectors.FindByName (strt);
     if (!room)
     {
-      Sys->Printf (MSG_FATAL_ERROR,
+      Printf (MSG_FATAL_ERROR,
           "World file does not contain a room called '%s' which is used\nas a starting point!\n",
 	  strt);
-      cleanup ();
-      fatal_exit (0, false);
+      return false;
     }
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
-  Sys->InitWorld (Sys->world, Sys->view->GetCamera ());
+  InitWorld (world, view->GetCamera ());
 
-  Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  // Allocate the palette as calculated by the texture manager.
+  txtmgr->AllocPalette ();
+
+  // Create a wireframe object which will be used for debugging.
+  CHK (wf = new csWireFrameCam (txtmgr));
+
+  // Load a few sounds.
+#ifdef DO_SOUND
+  csSoundData* w = csSoundDataObject::GetSound(*world, "tada.wav");
+  if (w && Sound) Sound->PlayEphemeral (w);
+
+  wMissile_boom = csSoundDataObject::GetSound(*world, "boom.wav");
+  wMissile_whoosh = csSoundDataObject::GetSound(*world, "whoosh.wav");
+#endif
+
+  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
   // Wait one second before starting.
   long t = Sys->Time ()+1000;
@@ -1500,33 +1472,36 @@ int main (int argc, char* argv[])
   System->Console->Clear ();
 
   // Initialize our 3D view.
-  Sys->view->SetSector (room);
-  Sys->view->GetCamera ()->SetPosition (world->start_vec);
+  view->SetSector (room);
+  view->GetCamera ()->SetPosition (world->start_vec);
   // We use the width and height from the 3D renderer because this
-  // can be different from the frame size (rendering in less res than real window
-  // for example).
-  int w3d, h3d;
-  Gfx3D->GetWidth (w3d);
-  Gfx3D->GetHeight (h3d);
-  Sys->view->SetRectangle (2, 2, w3d - 4, h3d - 4);
+  // can be different from the frame size (rendering in less res than
+  // real window for example).
+  int w3d = Gfx3D->GetWidth ();
+  int h3d = Gfx3D->GetHeight ();
+  view->SetRectangle (2, 2, w3d - 4, h3d - 4);
 
-  // Stop the demo.
-  stop_demo ();
+  return true;
+}
 
-  // Allocate the palette as calculated by the texture manager.
-  txtmgr->AllocPalette ();
+/*---------------------------------------------------------------------*
+ * Main function
+ *---------------------------------------------------------------------*/
+int main (int argc, char* argv[])
+{
+  // Initialize the random number generator
+  srand (time (NULL));
 
-  // Create a wireframe object which will be used for debugging.
-  CHK (Sys->wf = new csWireFrameCam (txtmgr));
+  // Create the system driver object
+  CHK (Sys = new WalkTest ());
 
-  // Load a few sounds.
-#ifdef DO_SOUND
-  csSoundData* w = csSoundDataObject::GetSound(*world, "tada.wav");
-  if (w) Sys->piSound->PlayEphemeral (w);
-
-  Sys->wMissile_boom = csSoundDataObject::GetSound(*world, "boom.wav");
-  Sys->wMissile_whoosh = csSoundDataObject::GetSound(*world, "whoosh.wav");
-#endif
+  // Initialize the main system. This will load all needed plugins
+  // (3D, 2D, network, sound, ..., engine) and initialize them.
+  if (!Sys->Initialize (argc, argv, "cryst.cfg"))
+  {
+    Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    fatal_exit (-1, false);
+  }
 
   // Start the 'autoexec.cfg' script and fully execute it.
   Command::start_script ("autoexec.cfg");

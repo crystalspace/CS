@@ -32,10 +32,22 @@
 class csSprite2D : public csBase
 {
 private:
-  ITextureHandle *hTex;
+  iTextureHandle *hTex;
   int tx, ty, tw, th;
 
 public:
+  /// Initialize the sprite from a texture.
+  csSprite2D (iTextureHandle *hTexture, int x, int y, int w, int h)
+  {
+    hTex = hTexture;
+    SetTextureRectangle (x, y, w, h);
+  }
+
+  /// Deinitialize the sprite
+  virtual ~csSprite2D ()
+  {
+  }
+
   /// Return true if sprite has been initialized okay
   bool ok ()
   { return hTex != NULL; }
@@ -45,14 +57,14 @@ public:
   { tx = x; ty = y; tw = w; th = h; }
 
   /// Draw the sprite given the screen position and new size
-  virtual void Draw (IGraphics2D* g2d, int sx, int sy, int sw, int sh)
+  virtual void Draw (iGraphics2D* g2d, int sx, int sy, int sw, int sh)
   {
     if (hTex)
       g2d->DrawSprite (hTex, sx, sy, sw, sh, tx, ty, tw, th);
   }
 
   /// Draw the sprite without rescale
-  void Draw (IGraphics2D* g2d, int sx, int sy)
+  void Draw (iGraphics2D* g2d, int sx, int sy)
   { Draw (g2d, sx, sy, tw, th); }
 
   /// Return sprite width
@@ -63,23 +75,11 @@ public:
   { return th; }
 
   /// Change sprite texture handle
-  void SetTextureHandle (ITextureHandle *hTexture)
+  void SetTextureHandle (iTextureHandle *hTexture)
   { hTex = hTexture; }
   /// Query sprite texture handle
-  ITextureHandle *GetTextureHandle ()
+  iTextureHandle *GetTextureHandle ()
   { return hTex; }
-
-  /// Initialize the sprite from a texture.
-  csSprite2D (ITextureHandle *hTexture, int x, int y, int w, int h)
-  {
-    hTex = hTexture;
-    SetTextureRectangle (x, y, w, h);
-  }
-
-  /// Deinitialize the sprite
-  virtual ~csSprite2D ()
-  {
-  }
 };
 
 #endif // __CSSPR2D_H__

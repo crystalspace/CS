@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csgeom
 csgeom:
 	$(MAKE_TARGET)
+csgeomclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -44,7 +46,7 @@ $(CSGEOM.LIB): $(OBJ.CSGEOM)
 	$(DO.LIBRARY)
 
 csgeomclean:
-	-$(RM) $(CSGEOM.LIB)
+	-$(RM) $(CSGEOM.LIB) $(OBJ.CSGEOM)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csgeom.dep

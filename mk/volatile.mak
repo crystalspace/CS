@@ -5,9 +5,6 @@ DO.MAKE.VOLATILE=$(MAKE_VOLATILE_H)
 ifeq ($(USE_SHARED_PLUGINS),no)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>volatile.tmp
 endif
-ifeq ($(BUGGY_EGCS_COMPILER),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define BUGGY_EGCS_COMPILER$">>volatile.tmp
-endif
 ifeq ($(MODE),debug)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DEBUG$">>volatile.tmp
 endif

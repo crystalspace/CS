@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csengine
 csengine:
 	$(MAKE_TARGET)
+csengineclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -46,7 +48,7 @@ $(CSENGINE.LIB): $(OBJ.CSENGINE)
 	$(DO.LIBRARY)
 
 csengineclean:
-	-$(RM) $(CSENGINE.LIB)
+	-$(RM) $(CSENGINE.LIB) $(OBJ.CSENGINE)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csengine.dep

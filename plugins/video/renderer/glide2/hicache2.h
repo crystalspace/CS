@@ -22,7 +22,7 @@
 #include "cs3d/common/texmem.h"
 
 ///
-struct HighColorCacheAndManage_Data : public HighColorCache_Data
+struct HighColorCacheAndManage_Data : public csHighColorCacheData
 {
   /// texture memory position
   textMemSpace mempos;
@@ -38,9 +38,9 @@ public:
   virtual ~HighColorCacheAndManage();
 
   ///
-  virtual void Add (IPolygonTexture *polytex);
+  virtual void Add (iPolygonTexture *polytex);
   ///
-  virtual void Add (ITextureHandle *texture);
+  virtual void Add (iTextureHandle *texture);
 
   ///
   virtual void Clear();
@@ -55,11 +55,11 @@ protected:
   ///
   virtual void Unload (HighColorCacheAndManage_Data *d) = 0;
   ///
-  virtual void Load (HighColorCache_Data *d) {
+  virtual void Load (csHighColorCacheData *d) {
 	  Load ((HighColorCacheAndManage_Data *)d);
   }
   ///
-  virtual void Unload (HighColorCache_Data *d) {
+  virtual void Unload (csHighColorCacheData *d) {
 	  Unload ((HighColorCacheAndManage_Data *)d);
   }
 };

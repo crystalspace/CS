@@ -21,9 +21,7 @@
 #ifndef __CSDIVE_H__
 #define __CSDIVE_H__
 
-#include "cscom/com.h"
 #include "cs2d/common/graph2d.h"
-#include "cssys/system.h"
 #include "cssys/os2/icsos2.h"
 
 // avoid including os2.h
@@ -31,22 +29,9 @@ class diveWindow;
 typedef ULong HWND;
 typedef ULong ULONG;
 
-extern const CLSID CLSID_OS2DiveGraphics2D;
-
-/// IGraphics2DFactory interface implementation
-class csGraphics2DFactoryOS2DIVE : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DFactoryOS2DIVE)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
-
 /**
  * This is the SysGraphics2D class for OS/2. It implements drawing
- * on a DIVE context - either off-screen or memory, depending
+ * on a DIVE context - either off-screen or video memory, depending
  * on system parameters/available resources. Most system-dependent
  * code is in libDIVE*, the SysGraphics2D class contains only bindings.
  * Because of DIVE flexibility, we get also all the associated goodies -
@@ -80,16 +65,16 @@ class csGraphics2DOS2DIVE : public csGraphics2D
   int WindowX, WindowY;
   /// Window width and height
   int WindowWidth, WindowHeight;
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Pointer to the OS/2 system driver
-  IOS2SystemDriver* OS2System;
+  iOS2SystemDriver* OS2System;
 
 public:
-  csGraphics2DOS2DIVE (ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DOS2DIVE (iBase *iParent);
   virtual ~csGraphics2DOS2DIVE ();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem* pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -106,11 +91,7 @@ public:
   virtual void FinishDraw ();
 
   virtual bool SetMousePosition (int x, int y);
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
-
-protected:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DOS2DIVE)
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
 
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode, int Down,

@@ -21,15 +21,14 @@
 #define __SCAN_H__
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 //---//---//---//---//---//---//---//---//---//---/ Forward declarations //---//
 
 class csTexture;
 class csTextureMMSoftware;
 class csGraphics3DSoftware;
-interface IPolygon3D;
-interface IPolygonTexture;
+scfInterface iPolygonTexture;
 typedef unsigned char RGB8map[256];	// do we need entire soft_txt.h?
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//
@@ -260,7 +259,7 @@ void csScan_Finalize ();
 void csScan_CalcBlendTables (int rbits, int gbits, int bbits);
 /// Initialize the scanline variables
 void csScan_InitDraw (csGraphics3DSoftware* g3d,
-  IPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt);
+  iPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt);
 /// Dump debugging information about last polygon
 void csScan_dump (csGraphics3DSoftware* pG3D);
 /// Pixel-depth independent routine

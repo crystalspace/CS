@@ -22,7 +22,7 @@
 
 #define SYSDEF_SOCKETS
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csnetdrv/sockets/netsdrv.h"
 #include "csnetdrv/sockets/drvsdefs.h"
 #include "isystem.h"
@@ -33,7 +33,7 @@ BEGIN_INTERFACE_TABLE (csNetworkDriverSockets)
   IMPLEMENTS_INTERFACE (INetworkDriver)
 END_INTERFACE_TABLE ()
 
-csNetworkDriverSockets::csNetworkDriverSockets(ISystem* piSystem)
+csNetworkDriverSockets::csNetworkDriverSockets(iSystem* piSystem)
 {
 	m_piSystem = piSystem;
 	SocksReady = false;
@@ -86,7 +86,7 @@ STDMETHODIMP csNetworkDriverSockets::Close()
 	return S_OK;
 }
 
-STDMETHODIMP csNetworkDriverSockets::Connect(DWORD dwID, CS_NET_ADDRESS *lpNetAddress)
+STDMETHODIMP csNetworkDriverSockets::Connect(DWORD dwID, csNetworkAddress *lpNetAddress)
 {
 	if(!SocksReady)
 	{
@@ -272,7 +272,7 @@ HRESULT csNetworkDriverSockets::ReleaseSocks()
 	return S_OK;
 }
 
-STDMETHODIMP csNetworkDriverSockets::SetListenState(DWORD dwID, CS_NET_LISTENPARAMS *lpCSListenParams)
+STDMETHODIMP csNetworkDriverSockets::SetListenState(DWORD dwID, int iPort)
 {
 	if(!SocksReady)
 	{
@@ -443,7 +443,7 @@ STDMETHODIMP csNetworkDriverSockets::KillAll()
 	return hResult;
 }
 
-STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, CS_NET_ADDRESS *lpCSNetAddress/*out*/)
+STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, csNetworkAddress *lpCSNetAddress/*out*/)
 {
 	(void) lpCSNetAddress; //Use that line to remove a warning.
 
@@ -511,7 +511,7 @@ STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWO
 	return S_OK;
 }
 
-STDMETHODIMP csNetworkDriverSockets::GetDriverCaps(CS_NET_DRIVERCAPS *lpCSNetDriverCaps)
+STDMETHODIMP csNetworkDriverSockets::GetDriverCaps(csNetworkCaps *lpCSNetDriverCaps)
 {
 	lpCSNetDriverCaps->bConnOriented = true;
 	lpCSNetDriverCaps->bConnLess = true;

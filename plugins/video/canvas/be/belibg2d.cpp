@@ -21,30 +21,49 @@
 
 #include <sys/param.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/be/belibg2d.h"
 #include "cs2d/be/CrystWindow.h"
 #include "cssys/be/beitf.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 
-BEGIN_INTERFACE_TABLE(csGraphics2DBeLib)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IBeLibGraphicsInfo, XBeLibGraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DBeLib)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DBeLib)
+EXPORT_CLASS_TABLE (be2d)
+  EXPORT_CLASS (csGraphics2DBeLib, "crystalspace.graphics2d.be",
+    "BeOS 2D driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csGraphics2DBeLib::csGraphics2DBeLib(ISystem* piSystem) :
-  csGraphics2D(piSystem), curr_page(0), double_buffered(true)
+IMPLEMENT_IBASE (csGraphics2DBeLib)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
+
+csGraphics2DBeLib::csGraphics2DBeLib (iBase *iParent) :
+  csGraphics2D(), curr_page(0), double_buffered(true)
 {
-  HRESULT const rc = piSystem->QueryInterface(
-    (REFIID)IID_IBeLibSystemDriver, (void**)&be_system);
-  if (FAILED (rc)) {
-    system->Print (MSG_FATAL_ERROR, "FATAL: The system driver does not "
-      "implement the IBeLibSystemDriver interface\n");
-    exit (1);
+  CONSTRUCT_IBASE (iParent);
+}
+
+csGraphics2DBeLib::~csGraphics2DBeLib()
+{
+  Close();
+  // FIXME: Free the bitmaps in cryst_bitmap.
+  be_system->DecRef();
+}
+
+bool csGraphics2DBeLib::Initialize (iSystem *pSystem)
+{
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  be_system = QUERY_INTERFACE (System, iBeLibSystemDriver);
+  if (!be_system)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not "
+      "implement the iBeLibSystemDriver interface\n");
+    return false;
   }
   
   // set up interface flags
@@ -55,19 +74,7 @@ csGraphics2DBeLib::csGraphics2DBeLib(ISystem* piSystem) :
   fDrawingThreadSuspended=false;
 #endif
 
-  system->Print (MSG_INITIALIZATION, "Crystal Space BeOS version.\n");
-}
-
-csGraphics2DBeLib::~csGraphics2DBeLib()
-{
-  Close();
-  // FIXME: Free the bitmaps in cryst_bitmap.
-  be_system->Release();
-}
-
-void csGraphics2DBeLib::Initialize ()
-{
-  csGraphics2D::Initialize();
+  System->Print (MSG_INITIALIZATION, "Crystal Space BeOS version.\n");
 
   // Get current screen information.
   BScreen screen(B_MAIN_SCREEN_ID);
@@ -81,6 +88,7 @@ void csGraphics2DBeLib::Initialize ()
   BRect const r(0, 0, Width - 1, Height - 1);
   for (int i=0; i < BUFFER_COUNT; i++)
   	CHK (cryst_bitmap[i] = new BBitmap(r, curr_color_space));
+  return true;
 }
 
 bool csGraphics2DBeLib::Open(const char* title)
@@ -185,7 +193,8 @@ int csGraphics2DBeLib::GetPage ()
   return curr_page;
 }
 
-bool csGraphics2DBeLib::SetMouseCursor (int shape, ITextureHandle* bitmap) {
+bool csGraphics2DBeLib::SetMouseCursor (csMouseCursorID shape, iTextureHandle* bitmap)
+{
   return (be_system->SetMouseCursor(shape, bitmap) == S_OK);
 }
 
@@ -200,10 +209,10 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   		GreenMask = 0x1f << 5;
   		BlueMask  = 0x1f;
   		
-  		DrawPixel = DrawPixel16;
-  		WriteChar = WriteChar16;
-  		GetPixelAt= GetPixelAt16;
-  		DrawSprite= DrawSprite16;
+  		_DrawPixel = DrawPixel16;
+  		_WriteChar = WriteChar16;
+  		_GetPixelAt= GetPixelAt16;
+  		_DrawSprite= DrawSprite16;
   		
   		pfmt.PixelBytes = 2;
   		pfmt.PalEntries = 0;
@@ -219,10 +228,10 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   		GreenMask = 0x3f << 5;
   		BlueMask  = 0x1f;
   		
-  		DrawPixel = DrawPixel16;
-  		WriteChar = WriteChar16;
-  		GetPixelAt= GetPixelAt16;
-  		DrawSprite= DrawSprite16;
+  		_DrawPixel = DrawPixel16;
+  		_WriteChar = WriteChar16;
+  		_GetPixelAt= GetPixelAt16;
+  		_DrawSprite= DrawSprite16;
   		
   		pfmt.PixelBytes = 2;
   		pfmt.PalEntries = 0;
@@ -239,10 +248,10 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   		GreenMask = 0xff << 8;
   		BlueMask  = 0xff;
   		
-  		DrawPixel = DrawPixel32;
-  		WriteChar = WriteChar32;
-  		GetPixelAt= GetPixelAt32;
-  		DrawSprite= DrawSprite32;
+  		_DrawPixel = DrawPixel32;
+  		_WriteChar = WriteChar32;
+  		_GetPixelAt= GetPixelAt32;
+  		_DrawSprite= DrawSprite32;
   		
   		pfmt.PixelBytes = 4;
   		pfmt.PalEntries = 0;
@@ -257,4 +266,67 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   		exit(1);
   		break;
   }
+}
+
+bool csGraphics2DBeLib::DirectConnect (direct_buffer_info *info)
+{
+// FIXME: Re-implement/re-enable DirectWindow mode.
+#if 0
+	if (!fConnected && fConnectionDisabled) {
+		return S_OK;
+	}
+	locker->Lock();
+	
+	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
+		case B_DIRECT_START:
+			printf("DirectConnect: B_DIRECT_START \n");
+			fConnected = true;
+			if (fDrawingThreadSuspended)	{
+				while (resume_thread(find_thread("LoopThread")) == B_BAD_THREAD_STATE)	{
+					//	this is done to cope with thread setting fDrawingThreadSuspended then getting
+					//	rescheduled before it can suspend itself.  It just makes repeated attempts to
+					//	resume that thread.
+					snooze(1000);
+				}
+				fDrawingThreadSuspended = false;
+			}
+				
+		case B_DIRECT_MODIFY:
+			printf("DirectConnect: B_DIRECT_MODIFY \n");
+			Memory = (unsigned char *) info->bits;
+			printf("Memory allocated is %p. bytes_per_row is %ld \n", Memory, info->bytes_per_row);
+			curr_color_space = info->pixel_format;
+			ApplyDepthInfo(curr_color_space);
+			
+		// Create scanline address array
+		if (LineAddress == NULL)	{
+//			printf ("IXBeLibGraphicsInfo::DirectConnect() -- Creating LineAddress[].\n");
+			CHK (LineAddress = new int [Height]);
+			if (LineAddress == NULL)	{
+			    printf ("IXBeLibGraphicsInfo::DirectConnect() -- Couldn't create LineAddress[].\n");
+			    exit (1);
+			}
+		}
+		
+		//	initialise array
+		{
+//		printf("Window bounds: %ld %ld %ld %ld \n", info->window_bounds.left, info->window_bounds.top, info->window_bounds.right, info->window_bounds.bottom);
+		int i,addr,bpl = info->bytes_per_row;
+		for (i = 0, addr = info->window_bounds.left * pfmt.PixelBytes + info->window_bounds.top * bpl; 
+			i < Height; 
+			i++, addr += bpl)
+			LineAddress[i] = addr;
+		}
+		break;
+		
+		case B_DIRECT_STOP:
+			printf("DirectConnect: B_DIRECT_STOP \n");
+			fConnected = false;
+		break;
+	}
+	
+	locker->Unlock();
+//    printf("leaving IXBeLibGraphicsInfo::DirectConnected \n");
+#endif
+  return true;
 }

@@ -28,6 +28,8 @@
 #include "csinput/cseventq.h"
 #include "csutil/csstrvec.h"
 
+class cswsSystemDriver;
+
 /**
  * Application's background styles
  */
@@ -71,12 +73,16 @@ protected:
   int DismissCode;
   /// This is equal to 8 if any of physical r,g,b masks is 0xff000000
   int PhysColorShift;
+  /// Current time (passed by systemdriver to NextFrame())
+  time_t CurrentTime;
 
   /// Set up initial application layout (read configs, create windows, menus etc)
-  virtual bool InitialSetup (int argc, char *argv[],
-    const char *iConfigName, const char *iVfsConfigName, const char* iDataDir);
+  virtual bool InitialSetup (int argc, char *argv[], const char *iConfigName,
+    const char* iDataDir);
 
 public:
+  /// The system driver
+  cswsSystemDriver *System;
   /// Application's adaptive palette
   int Pal [cs_Color_Last];
   /// The component that captured the mouse
@@ -112,7 +118,10 @@ public:
   virtual void Draw ();
 
   /// This should be called once per frame by system driver
-  virtual void NextFrame ();
+  virtual void NextFrame (time_t ElapsedTime, time_t CurrentTime);
+
+  /// Process all events in event queue
+  virtual bool ProcessEvents ();
 
   /// Display a string on the console using almost usual printf() syntax
   void printf (int mode, char* str, ...);
@@ -132,7 +141,7 @@ public:
   { return &Textures; }
 
   /// Find a texture by name
-  ITextureHandle *GetTexture (char *Name)
+  iTextureHandle *GetTexture (char *Name)
   {
     csWSTexture *tex = GetTextures ()->FindTexture (Name);
     return tex ? tex->GetHandle () : NULL;
@@ -149,9 +158,6 @@ public:
 
   /// Add a event to event queue
   void PutEvent (csEvent *Event) { EventQueue->Put (Event); }
-
-  /// Process all queued messages
-  void Process ();
 
   /// Handle a event and return true if processed
   virtual bool HandleEvent (csEvent &Event);
@@ -173,6 +179,10 @@ public:
 
   /// Query shift key state
   bool GetKeyState (int iKey);
+
+  /// Query current time
+  time_t GetCurrentTime ()
+  { return CurrentTime; }
 
   /// Show window list
   void WindowList ();
@@ -233,13 +243,13 @@ public:
   { GfxPpl->Sprite2D (s2d, x, y, w, h); }
 
   /// Save a part of screen
-  void pplSaveArea (ImageArea *&Area, int x, int y, int w, int h)
+  void pplSaveArea (csImageArea *&Area, int x, int y, int w, int h)
   { GfxPpl->SaveArea (&Area, x, y, w, h); }
   /// Restore a part of screen
-  void pplRestoreArea (ImageArea *Area, bool Free = false)
+  void pplRestoreArea (csImageArea *Area, bool Free = false)
   { GfxPpl->RestoreArea (Area, Free); }
   /// Free buffer used to keep an area of screen
-  void pplFreeArea (ImageArea *Area)
+  void pplFreeArea (csImageArea *Area)
   { GfxPpl->FreeArea (Area); }
 
   /// Clear page with specified color
@@ -268,6 +278,15 @@ public:
   /// Return the height of currently selected font
   int TextHeight (int Font)
   { return GfxPpl->TextHeight (Font); }
+
+  /// Clip a line against a rectangle and return true if its clipped out
+  bool ClipLine (float &x1, float &y1, float &x2, float &y2,
+    int ClipX1, int ClipY1, int ClipX2, int ClipY2)
+  { return GfxPpl->ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2); }
+
+  /// Change system mouse cursor and return success status
+  bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap)
+  { return GfxPpl->SetMouseCursor (Shape, hBitmap); }
 
 protected:
   /// Initialize configuration data: load csws.cfg

@@ -20,7 +20,7 @@
 #define TCACHE_H
 
 #include "types.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 class csGraphics2D;
 class MemoryHeap;
@@ -29,8 +29,8 @@ class csTextureManagerSoftware;
 class csTextureMMSoftware;
 class csTexture;
 
-interface IPolygonTexture;
-interface ILightMap;
+scfInterface iPolygonTexture;
+scfInterface iLightMap;
 struct csPixelFormat;
 
 /// Structure used by the texture cache routines.
@@ -193,7 +193,7 @@ protected:
    * that (u,v) coordinate.
    * (u and v are in sub-texture space: blocks of subtex_size*subtex_size)
    */
-  void init_cache_filler (TCacheData& tcd, IPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u = -1, int v = -1);
+  void init_cache_filler (TCacheData& tcd, iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u = -1, int v = -1);
 
   /**
    * For debugging: overlay the lightmap grid on the lighted texture. This function should
@@ -229,14 +229,14 @@ public:
    * Check if the given texture is in the cache and possibly
    * add it if not.
    */
-  void use_texture (IPolygonTexture* pt, csTextureManagerSoftware* txtmgr);
+  void use_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr);
 
   /**
    * Check if the given sub-texture is in the cache and possibly
    * add it if not. WARNING! This function assumes that the texture is
    * already in the cache (put there with init_texture possibly).
    */
-  void use_sub_texture (IPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u, int v);
+  void use_sub_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u, int v);
 
   /**
    * Load a texture in the texture cache but do not do any calculations yet.
@@ -245,7 +245,7 @@ public:
    * and has the right size. If changes need to be made here it will set
    * the dirty matrix to all dirty.
    */
-  void init_texture (IPolygonTexture* pt, csTextureManagerSoftware* txtmgr);
+  void init_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr);
 
   /**
    * Do a debugging dump.

@@ -20,9 +20,7 @@
 #ifndef __ISYSTEM_H__
 #define __ISYSTEM_H__
 
-#include "cscom/com.h"
-
-extern const IID IID_ISystem;
+#include "csutil/scf.h"
 
 /// Several types of messages.
 #define MSG_INTERNAL_ERROR 1    // Internal error, this is a serious bug in CS
@@ -38,41 +36,81 @@ extern const IID IID_ISystem;
 #define MSG_DEBUG_1F 11         // Show message if debug level is 1 or 2 (debug mode) and flush
 #define MSG_DEBUG_2F 12         // Show message if debug level 2 (verbose mode) and flush
 
+#define QUERY_PLUGIN(Object,Interface)					\
+  (Interface *)Object->QueryPlugIn (#Interface, VERSION_##Interface)
+#define LOAD_PLUGIN(Object,ClassID,Interface)				\
+  (Interface *)Object->LoadPlugIn (ClassID, #Interface, VERSION_##Interface)
+
+scfInterface iPlugIn;
+
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about settings,
  * It also serves as a way for plug-ins to print through Crystal Space's printing
- * interfaces.
+ * interfaces.<p>
+ * Notes on plugin support: the list of plugins is queried from the [PlugIns]
+ * section in the config file. The plugins are loaded in the order they come
+ * in the .cfg file. If some plugin wants to be registered as a video/sound/etc
+ * driver, it should call the RegisterDriver method (see below) with the
+ * "iGraphics3D", "iNetworkDriver" and so on strings as first parameter.
+ * If registration fails, this mean that another such driver has already
+ * been registered with the system driver. The plugin should not complain,
+ * just quietely fail the Initialize() call. Upon this system driver will
+ * quietly unload the plugin as unuseful.<p>
+ * If the plugin won't register as a basical driver, it won't be called by
+ * the engine otherwise than for the cases where plugin registered himself.
  */
-interface ISystem : public IUnknown
+SCF_INTERFACE (iSystem, 0, 0, 1) : public iBase
 {
-  /// returns the width requested by the configuration.
-  STDMETHOD (GetWidthSetting) (int& retval) PURE;
-  /// returns the height requested by the configuration.
-  STDMETHOD (GetHeightSetting) (int& retval) PURE;
-  /// get the full screen setting
-  STDMETHOD (GetFullScreenSetting) (bool& retval) PURE;
-  /// get the depth setting
-  STDMETHOD (GetDepthSetting) (int& retval) PURE;
-  /// Get a subsystem pointer
-  STDMETHOD (GetSubSystemPtr) (void **retval, int iSubSystemID) PURE;
+  /// returns the configuration.
+  virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
+  /// Set one of basical drivers (plugins)
+  virtual bool RegisterDriver (const char *iInterface, iPlugIn *iObject) = 0;
+  /// Unload a driver
+  virtual bool DeregisterDriver (const char *iInterface, iPlugIn *iObject) = 0;
+  /// Load a plugin and initialize it
+  virtual iBase *LoadPlugIn (const char *iClassID, const char *iInterface, int iVersion) = 0;
+  /// Get first of the loaded plugins that supports given interface ID
+  virtual iBase *QueryPlugIn (const char *iInterface, int iVersion) = 0;
+  /// Remove a plugin from system driver's plugin list
+  virtual bool UnloadPlugIn (iPlugIn *iObject) = 0;
   /// print a string to the specified device.
-  STDMETHOD (Print) (int mode, const char *string) PURE;
+  virtual void Print (int mode, const char *string) = 0;
   /// get the time in milliseconds.
-  STDMETHOD (GetTime) (time_t& time) PURE;
+  virtual time_t GetTime () = 0;
   /// quit the system.
-  STDMETHOD (Shutdown) () PURE;
+  virtual void StartShutdown () = 0;
   /// check if system is shutting down
-  STDMETHOD (GetShutdown) (bool &Shutdown) PURE;
+  virtual bool GetShutdown () = 0;
   /// Get a integer configuration value
-  STDMETHOD (ConfigGetInt) (char *Section, char *Key, int &Value, int Default = 0) PURE;
+  virtual int ConfigGetInt (char *Section, char *Key, int Default = 0) = 0;
   /// Get a string configuration value
-  STDMETHOD (ConfigGetStr) (char *Section, char *Key, char *&Value, char *Default = NULL) PURE;
+  virtual char *ConfigGetStr (char *Section, char *Key, char *Default = NULL) = 0;
   /// Get a string configuration value
-  STDMETHOD (ConfigGetYesNo) (char *Section, char *Key, bool &Value, bool Default = false) PURE;
+  virtual bool ConfigGetYesNo (char *Section, char *Key, bool Default = false) = 0;
+  /// Get a float configuration value
+  virtual float ConfigGetFloat (char *Section, char *Key, float Default = 0) = 0;
+  /// Set an integer configuration value
+  virtual bool ConfigSetInt (char *Section, char *Key, int Value) = 0;
+  /// Set an string configuration value
+  virtual bool ConfigSetStr (char *Section, char *Key, char *Value) = 0;
+  /// Set an float configuration value
+  virtual bool ConfigSetFloat (char *Section, char *Key, float Value) = 0;
+  /// Save system configuration file
+  virtual bool ConfigSave () = 0;
   /// Put a keyboard event into event queue 
-  STDMETHOD (QueueKeyEvent) (int KeyCode, bool Down) PURE;
+  virtual void QueueKeyEvent (int KeyCode, bool Down) = 0;
   /// Put a mouse event into event queue 
-  STDMETHOD (QueueMouseEvent) (int Button, int Down, int x, int y, int ShiftFlags) PURE;
+  virtual void QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags) = 0;
+  /// Put a focus event into event queue 
+  virtual void QueueFocusEvent (bool Enable) = 0;
+  /// Register the plugin to receive specific events
+  virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask) = 0;
+  /// Query current state for given key
+  virtual bool GetKeyState (int key) = 0;
+  /// Query current state for given mouse button (0..9)
+  virtual bool GetMouseButton (int button) = 0;
+  /// Query current (last known) mouse position
+  virtual void GetMousePosition (int &x, int &y) = 0;
 };
 
 #endif

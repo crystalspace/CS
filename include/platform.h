@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PLATFORM_H
-#define __CS_PLATFORM_H
+#ifndef __CS_PLATFORM_H__
+#define __CS_PLATFORM_H__
 
 // Include volatile.h which contains the volatile configuration macros
 #if defined (WIN32_VOLATILE)
@@ -28,4 +28,4 @@
 #  include "volatile.h"
 #endif
 
-#endif // __CS_PLATFORM_H
+#endif // __CS_PLATFORM_H__

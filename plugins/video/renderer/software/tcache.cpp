@@ -151,18 +151,15 @@ void TextureCache::dump ()
   //CsPrintf (MSG_CONSOLE, "Sub-textures: dirty=%d clean=%d\n", cnt_dirty, cnt_clean);
 }
 
-void TextureCache::init_texture (IPolygonTexture* pt, csTextureManagerSoftware* /*txtmgr*/)
+void TextureCache::init_texture (iPolygonTexture* pt, csTextureManagerSoftware* /*txtmgr*/)
 {
-  IPolygon3D* i_pol;
-  ILightMap* i_lm;
-  pt->GetPolygon (&i_pol);
-  i_pol->GetLightMap (&i_lm);
+  iPolygon3D* i_pol = pt->GetPolygon ();
+  iLightMap* i_lm = i_pol->GetLightMap ();
   if (!i_lm) return;	// @@@ See if this test can be avoided.
 
   pt->CreateDirtyMatrix ();
 
-  void* rc;
-  pt->GetTCacheData (&rc);
+  void* rc = pt->GetTCacheData ();
   TCacheLightedTexture* tclt = (TCacheLightedTexture*)rc;
   if (!tclt)
   {
@@ -170,16 +167,12 @@ void TextureCache::init_texture (IPolygonTexture* pt, csTextureManagerSoftware* 
     pt->SetTCacheData ((void*)tclt);
   }
 
-  bool recalc;
-  pt->RecalculateDynamicLights (recalc);
-
-  if (recalc && tclt->in_cache)
+  if (pt->RecalculateDynamicLights () && tclt->in_cache)
   {
     // Texture is in cache and we just recalculated the dynamic lighting
     // information. Just return.
-    bool opt;
-    pt->GetDynlightOpt (opt);
-    if (!opt) pt->MakeAllDirty ();
+    if (!pt->GetDynlightOpt ())
+      pt->MakeAllDirty ();
     return;
   }
 
@@ -205,12 +198,9 @@ void TextureCache::init_texture (IPolygonTexture* pt, csTextureManagerSoftware* 
   else
   {
     // Texture is not in the cache.
-    long pt_size, size;
-    int w;
-    pt->GetSize (pt_size);
-    pt->GetWidth (w);
-
-    size = pt_size * gi_pixelbytes;
+    int pt_size = pt->GetSize ();
+    int w = pt->GetWidth ();
+    int size = pt_size * gi_pixelbytes;
     UByte* map;
     while ((map = (UByte*)alloc_pool (size)) == NULL)
     {
@@ -247,46 +237,36 @@ void TextureCache::init_texture (IPolygonTexture* pt, csTextureManagerSoftware* 
   }
 }
 
-void TextureCache::use_sub_texture (IPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u, int v)
+void TextureCache::use_sub_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u, int v)
 {
-  IPolygon3D* i_pol;
-  ILightMap* i_lm;
-  pt->GetPolygon (&i_pol);
-  i_pol->GetLightMap (&i_lm);
+  iPolygon3D* i_pol = pt->GetPolygon ();
+  iLightMap* i_lm = i_pol->GetLightMap ();
   if (!i_lm) return;	// @@@ See if this test can be avoided.
 
-  int w, h;
-  pt->GetWidth (w);
-  pt->GetHeight (h);
+  int w = pt->GetWidth ();
+  int h = pt->GetHeight ();
 
   if (u < 0) u = 0; else if (u >= w) u = w-1;
   if (v < 0) v = 0; else if (v >= h) v = h-1;
-  int subtex_size;
-  pt->GetSubtexSize (subtex_size);
+  int subtex_size = pt->GetSubtexSize ();
   int lu = u / subtex_size;
   int lv = v / subtex_size;
-  bool was_dirty;
-  pt->CleanIfDirty (lu, lv, was_dirty);
-  if (was_dirty)
+  if (pt->CleanIfDirty (lu, lv))
   {
     TCacheData tcd;
     init_cache_filler (tcd, pt, txtmgr, lu, lv);
-    void* rc;
-    pt->GetTCacheData (&rc);
+    void* rc = pt->GetTCacheData ();
     create_lighted_texture (tcd, (TCacheLightedTexture*)rc, txtmgr);
   }
 }
 
-void TextureCache::use_texture (IPolygonTexture* pt, csTextureManagerSoftware* txtmgr)
+void TextureCache::use_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr)
 {
-  IPolygon3D* i_pol;
-  ILightMap* i_lm;
-  pt->GetPolygon (&i_pol);
-  i_pol->GetLightMap (&i_lm);
+  iPolygon3D* i_pol = pt->GetPolygon ();
+  iLightMap* i_lm = i_pol->GetLightMap ();
   if (!i_lm) return;	// @@@ See if this test can be avoided.
 
-  void* rc;
-  pt->GetTCacheData (&rc);
+  void* rc = pt->GetTCacheData ();
   TCacheLightedTexture* tclt = (TCacheLightedTexture*)rc;
   if (!tclt)
   {
@@ -294,10 +274,7 @@ void TextureCache::use_texture (IPolygonTexture* pt, csTextureManagerSoftware* t
     pt->SetTCacheData ((void*)tclt);
   }
 
-  bool recalc;
-  pt->RecalculateDynamicLights (recalc);
-
-  if (recalc && tclt->in_cache)
+  if (pt->RecalculateDynamicLights () && tclt->in_cache)
   {
     // Just recalculate the texture.
     TCacheData tcd;
@@ -328,11 +305,9 @@ void TextureCache::use_texture (IPolygonTexture* pt, csTextureManagerSoftware* t
   else
   {
     // Texture is not in the cache.
-    long pt_size;
-    int w;
-    pt->GetSize (pt_size);
-    pt->GetWidth (w);
-    long size = pt_size * gi_pixelbytes;
+    int pt_size = pt->GetSize ();
+    int w = pt->GetWidth ();
+    int size = pt_size * gi_pixelbytes;
     UByte* map;
     while ((map = (UByte*)alloc_pool (size)) == NULL)
     {
@@ -387,31 +362,28 @@ void TextureCache::create_lighted_texture (TCacheData& tcd, TCacheLightedTexture
   if (tcd.lm_grid) show_lightmap_grid (tcd, tclt, txtmgr);
 }
 
-void TextureCache::init_cache_filler (TCacheData& tcd, IPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int stu, int stv)
+void TextureCache::init_cache_filler (TCacheData& tcd, iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int stu, int stv)
 {
   tcd.txtmode = txtmgr->txtMode;
   tcd.mixing = txtmgr->mixing;
   tcd.lm_only = txtmgr->do_lightmaponly;
   tcd.lm_grid = txtmgr->do_lightmapgrid;
 
-  ILightMap* i_lm;
-  pt->GetLightMap (&i_lm);
-  pt->GetWidth (tcd.width);
-  pt->GetHeight (tcd.height);
-  pt->GetMipMapSize (tcd.mipmap_size);
-  pt->GetMipMapShift (tcd.mipmap_shift);
-  pt->GetIMinU (tcd.Imin_u);
-  pt->GetIMinV (tcd.Imin_v);
+  iLightMap* i_lm = pt->GetLightMap ();
+  tcd.width = pt->GetWidth ();
+  tcd.height = pt->GetHeight ();
+  tcd.mipmap_size = pt->GetMipMapSize ();
+  tcd.mipmap_shift = pt->GetMipMapShift ();
+  tcd.Imin_u = pt->GetIMinU ();
+  tcd.Imin_v = pt->GetIMinV ();
 
   //@@@ CAN BE MORE OPTIMAL?
-  ITextureHandle* handle;
-  pt->GetTextureHandle (&handle);
-  tcd.txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
-  int mm;
-  pt->GetMipmapLevel (mm);
+  iTextureHandle* handle = pt->GetTextureHandle ();
+  tcd.txt_mm = (csTextureMMSoftware*)handle->GetPrivateObject ();
+  int mm = pt->GetMipmapLevel ();
 
   csTexture* txt_unl = tcd.txt_mm->get_texture (mm);
-  tcd.tdata = txt_unl->get_bitmap8 ();
+  tcd.tdata = txt_unl->get_bitmap ();
   int uw, uh;
   uw = txt_unl->get_width ();
   uh = txt_unl->get_height ();
@@ -419,14 +391,12 @@ void TextureCache::init_cache_filler (TCacheData& tcd, IPolygonTexture* pt, csTe
   tcd.and_w = txt_unl->get_w_mask ();
   tcd.and_h = txt_unl->get_h_mask ();
 
-  int lh;
-  i_lm->GetWidth (tcd.lw);
-  i_lm->GetHeight (lh);
-  i_lm->GetMap (0, &tcd.mapR);
-  i_lm->GetMap (1, &tcd.mapG);
-  i_lm->GetMap (2, &tcd.mapB);
-  int lw_orig;
-  pt->GetOriginalWidth (lw_orig);
+  tcd.lw = i_lm->GetWidth ();
+  int lh = i_lm->GetHeight ();
+  tcd.mapR = i_lm->GetMap (0);
+  tcd.mapG = i_lm->GetMap (1);
+  tcd.mapB = i_lm->GetMap (2);
+  int lw_orig = pt->GetOriginalWidth ();
   lw_orig = (lw_orig>>tcd.mipmap_shift)+2;
 
   if (stu == -1 || stv == -1)
@@ -440,8 +410,7 @@ void TextureCache::init_cache_filler (TCacheData& tcd, IPolygonTexture* pt, csTe
   else
   {
     // Calculate only one sub-texture.
-    int subtex_size;
-    pt->GetSubtexSize (subtex_size);
+    int subtex_size = pt->GetSubtexSize ();
     int lu = (stu*subtex_size) >> tcd.mipmap_shift;
     int lv = (stv*subtex_size) >> tcd.mipmap_shift;
     tcd.lu1 = lu;
@@ -752,7 +721,7 @@ void TextureCache::create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedT
   int blu_0, blu_1, blu_d, blu_0d, blu_1d;
   int red, gre, blu;
 
-  unsigned char* rgb_values = tcd.txt_mm->get_colormap_private ();
+  unsigned char* rgb_values = tcd.txt_mm->GetPrivateColorMap ();
   unsigned char* rgb;
 
   TextureTablesPalette* lt_pal = txtmgr->lt_pal;

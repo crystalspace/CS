@@ -27,7 +27,7 @@
 ----------------------------------------------------------------*/
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssys/system.h"
 #include "csutil/csrect.h"
 
@@ -60,9 +60,9 @@
 #define NAME  "Crystal"
 
 BEGIN_INTERFACE_TABLE(csGraphics2DMac)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IMacGraphicsInfo, XMacGraphicsInfo )
+    IMPLEMENTS_COMPOSITE_INTERFACE_EX( iGraphics2D, XGraphics2D )
+    IMPLEMENTS_COMPOSITE_INTERFACE_EX( iGraphicsInfo, XGraphicsInfo )
+    IMPLEMENTS_COMPOSITE_INTERFACE_EX( iMacGraphicsInfo, XMacGraphicsInfo )
 END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN(csGraphics2DMac)
@@ -72,7 +72,7 @@ IMPLEMENT_UNKNOWN(csGraphics2DMac)
 	Construct a graphics object.  This object provides a place on
 	screen to draw, and a place offscreen to render into.
 ----------------------------------------------------------------*/
-csGraphics2DMac::csGraphics2DMac(ISystem* piSystem)
+csGraphics2DMac::csGraphics2DMac(iSystem* piSystem)
 				: csGraphics2D (piSystem)
 {
 	mMainWindow = NULL;
@@ -730,7 +730,7 @@ int csGraphics2DMac::GetPage()
 /*----------------------------------------------------------------
 	Set the mouse cursor.
 ----------------------------------------------------------------*/
-bool csGraphics2DMac::SetMouseCursor( int iShape, ITextureHandle* iBitmap )
+bool csGraphics2DMac::SetMouseCursor( int iShape, iTextureHandle* iBitmap )
 {
 #pragma unused( iBitmap )
 	bool		cursorSet = true;

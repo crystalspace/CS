@@ -20,28 +20,9 @@
 #define __DD6G2D_H__
 
 #include "ddraw.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cs2d/ddraw6/xg2d.h"
-
-// the CLSID to create csGraphics2DDDraw6 instances.
-extern const CLSID CLSID_DirectDrawDX6With3DGraphics2D;
-
-extern const IID IID_IGraphics2DDirect3DFactory;
-/// dummy interface
-interface IGraphics2DDirect3DFactory : public IGraphics2DFactory
-{
-};
-
-class csGraphics2DWithDirect3DFactory : public IGraphics2DDirect3DFactory
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DWithDirect3DFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(BOOL bLock);
-};
 
 /// Windows version.
 class csGraphics2DDDraw6 : public csGraphics2D
@@ -50,7 +31,9 @@ class csGraphics2DDDraw6 : public csGraphics2D
   friend class csGraphics3DDirect3D;
   
 public:
-  csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D);
+  DECLARE_IBASE;
+
+  csGraphics2DDDraw6(iBase *iParent, bool bUses3D);
   virtual ~csGraphics2DDDraw6(void);
   
   virtual bool Open (const char *Title);
@@ -64,13 +47,27 @@ public:
   virtual void FinishDraw();
   virtual HRESULT SetColorPalette();
   
-  virtual bool SetMouseCursor (int iShape, TextureMM* iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, TextureMM* iBitmap);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);
   virtual bool DoubleBuffer ();
 
   int m_nGraphicsReady;
   int m_nDepth;
+
+  ///--------------- iGraphics2DDDraw6 interface implementation ---------------
+  ///
+  virtual void GetDirectDrawDriver (LPDIRECTDRAW* lplpDirectDraw);
+  ///
+  virtual void GetDirectDrawDriver (LPDIRECTDRAW4* lplpDirectDraw);
+  ///
+  virtual void GetDirectDrawPrimary (LPDIRECTDRAWSURFACE4* lplpDirectDrawPrimary);
+  ///
+  virtual void GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE4* lplpDirectDrawBackBuffer);
+  ///
+  virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection);
+  ///
+  virtual void SetColorPalette ();
   
 protected:
   LPDIRECTDRAW m_lpDD;
@@ -92,10 +89,6 @@ protected:
   
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DDDraw6)
-  DECLARE_COMPOSITE_INTERFACE(XDDraw6GraphicsInfo)
 };
 
 #endif

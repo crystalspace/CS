@@ -22,7 +22,7 @@
 #include <stdarg.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssnddrv/macsnd/macsdrv.h"
 #include "isystem.h"
 #include "isndlstn.h"
@@ -40,7 +40,7 @@ BEGIN_INTERFACE_TABLE(csSoundDriverMac)
   IMPLEMENTS_INTERFACE(ISoundDriver)
 END_INTERFACE_TABLE()
 
-csSoundDriverMac::csSoundDriverMac(ISystem* piSystem)
+csSoundDriverMac::csSoundDriverMac(iSystem* piSystem)
 {
 	m_piSystem = piSystem;
 	mStopPlayback = false;

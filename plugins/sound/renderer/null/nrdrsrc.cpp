@@ -19,7 +19,7 @@
 */
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/null/nrdrbuf.h"
 #include "cssndrdr/null/nrdrsrc.h"
 #include "isystem.h"

@@ -23,30 +23,20 @@
 
 #include "GraphicsDefs.h"
 #include "Rect.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cs2d/be/besysg2d.h"
 #include "cssys/be/beitf.h"
+
 class CrystView;
 class CrystWindow;
-
-extern const CLSID CLSID_BeLibGraphics2D;
-
-class csGraphics2DBeLibFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DBeLibFactory)
-  STDMETHOD(CreateInstance)(REFIID riid, ISystem*, void** ppv);
-  STDMETHOD(LockServer)(COMBOOL bLock);
-};
 
 /// Be 2D Graphics Driver
 class csGraphics2DBeLib : public csGraphics2D
 {
 protected:
-  ISystem* cs_system;
-  IBeLibSystemDriver* be_system;
+  iSystem* cs_system;
+  iBeLibSystemDriver* be_system;
   CrystView* dpy;
   CrystWindow* window;
   color_space curr_color_space;
@@ -69,10 +59,12 @@ protected:
 #endif		
 
 public:
-  csGraphics2DBeLib(ISystem*);
+  DECLARE_IBASE;
+
+  csGraphics2DBeLib(iSystem*);
   virtual ~csGraphics2DBeLib();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char* title);
   virtual void Close ();
 
@@ -83,14 +75,10 @@ public:
   virtual bool DoubleBuffer (bool Enable);
   virtual bool DoubleBuffer ();
   virtual int  GetPage ();
-  virtual bool SetMouseCursor (int shape, ITextureHandle*);
+  virtual bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*);
   virtual void ApplyDepthInfo(color_space);
 
-protected:
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DBeLib)
-  DECLARE_COMPOSITE_INTERFACE(XBeLibGraphicsInfo)
+  bool DirectConnect (direct_buffer_info *info);
 };
 
 #endif //BELibG2D_H
-

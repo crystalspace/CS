@@ -40,7 +40,7 @@
 #include "csengine/cssprite.h"
 #include "csengine/thingtpl.h"
 #include "csutil/vfs.h"
-
+#include "csutil/csstring.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -85,7 +85,7 @@ void converter::set_reverse_normals (int flag)
 /******************************************************************************/
 
 int converter::ivcon ( const char* input_filename, bool keep_log,
-  bool create_output_file, const char* output_filename, csVFS * vfs) {
+  bool create_output_file, const char* output_filename, iVFS * vfs) {
 
 /******************************************************************************/
 

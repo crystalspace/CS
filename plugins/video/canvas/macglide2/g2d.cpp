@@ -28,7 +28,7 @@
 #include <glide.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #if defined(OS_WIN32)
 #include "cssys/win32/win32itf.h"
 #endif
@@ -43,13 +43,12 @@ extern void out(char *str, ...);
 #include "cs3d/glide2/g3dglide.h"
 #include "cs3d/glide2/glidelib.h"
 
-BEGIN_INTERFACE_TABLE(csGraphics2DGlide2x)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGlide2xGraphicsInfo, XGlide2xGraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DGlide2x)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DGlide2x)
+EXPORT_CLASS_TABLE (glide2)
+  EXPORT_CLASS (csGraphics2DGlide2x, "crystalspace.graphics2d.glide2",
+    "Glide v2 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
 int csGraphics2DGlide2x::Depth=16;
 
@@ -102,61 +101,65 @@ static void RestoreFPCW(WORD wSave)
 
 #endif // OS_LINUX                             
 
-csGraphics2DGlide2x::csGraphics2DGlide2x(ISystem* piSystem) : csGraphics2D (piSystem)
+csGraphics2DGlide2x::csGraphics2DGlide2x(iBase *iParent) : csGraphics2D ()
 {
-
+  CONSTRUCT_IBASE (iParent);
   locked = false;
-	// make a window for rush or banshee ?
+}
+
+bool csGraphics2DGlide2x::Initialize (iSystem *pSystem)
+{
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  // make a window for rush or banshee ?
 #if defined(OS_WIN32)
-	m_hWnd=NULL;
+  m_hWnd=NULL;
    
-  IWin32SystemDriver* piW32Sys = NULL;
- 
-  // QI for IWin32SystemDriver //
-  HRESULT res = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&piW32Sys);
-  if (FAILED(res))
-  	  sys_fatalerror("csGraphics2DWin32::Open(QI) -- ISystem passed does not support IWin32SystemDriver.");
+  // QI for iWin32SystemDriver //
+  iWin32SystemDriver *piW32Sys = QUERY_INTERFACE (System, iWin32SystemDriver);
+  if (!piW32Sys)
+  	  sys_fatalerror("csGraphics2DWin32::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
 
   // Get the creation parameters //
   piW32Sys->GetInstance(&gb_hInstance);
   piW32Sys->GetCmdShow(&gb_nCmdShow);
-  FINAL_RELEASE(piW32Sys);
+  piW32Sys->DecRef ();
 
-	MungeFPCW(&wOldCW);
+  MungeFPCW(&wOldCW);
 
   CHK(glLib = new GlideLib);
 #endif
 	
 #if defined(OS_LINUX)
-        dpy = XOpenDisplay (NULL);
+  dpy = XOpenDisplay (NULL);
 
-        //CsPrintf(MSG_CONSOLE, "Display allocated dpy=%p\n", dpy);
+  //CsPrintf(MSG_CONSOLE, "Display allocated dpy=%p\n", dpy);
+  screen_num = DefaultScreen (dpy);
+  display_width = DisplayWidth (dpy, screen_num);
+  display_height = DisplayHeight (dpy, screen_num);
 
-        screen_num = DefaultScreen (dpy);
-        display_width = DisplayWidth (dpy, screen_num);
-        display_height = DisplayHeight (dpy, screen_num);
+  // No signals handling currently... TODO
+  //init_sig ();
 
-        // No signals handling currently... TODO
-        //init_sig ();
-
-        //CsPrintf (MSG_INITIALIZATION, "(using X windows system for input)\n");
-
+  //CsPrintf (MSG_INITIALIZATION, "(using X windows system for input)\n");
 #endif // OS_LINUX              
 
-	Depth=16;
+  Depth=16;
 	
-	DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
-	GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
+  _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
+  _GetPixelAt = GetPixelAt16; _DrawSprite = DrawSprite16;
     
-	// calculate CS's pixel format structure. 565
-	pfmt.PixelBytes = 2;
-	pfmt.PalEntries = 0;
-	pfmt.RedMask = (1+2+4+8+16)<<11;
-	pfmt.GreenMask = (1+2+4+8+16+32)<<5;
-	pfmt.BlueMask = (1+2+4+8+16);
+  // calculate CS's pixel format structure. 565
+  pfmt.PixelBytes = 2;
+  pfmt.PalEntries = 0;
+  pfmt.RedMask = (1+2+4+8+16)<<11;
+  pfmt.GreenMask = (1+2+4+8+16+32)<<5;
+  pfmt.BlueMask = (1+2+4+8+16);
     
-	complete_pixel_format();
-	GraphicsReady=1;  
+  complete_pixel_format();
+  GraphicsReady = 1;
+  return true;
 }
 
 csGraphics2DGlide2x::~csGraphics2DGlide2x(void)
@@ -317,3 +320,17 @@ void csGraphics2DGlide2x::SetTMUPalette(int tmu)
   
   GlideLib_grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, &p);		
 }
+
+#if defined(OS_WIN32)
+HWND csGraphics2DGlide2x::GethWnd ()
+{
+  return m_hWnd;
+}
+#endif
+
+#if defined(OS_LINUX)
+Display *csGraphics2DGlide2x::GetDisplay ()
+{
+  return dpy;
+}
+#endif    

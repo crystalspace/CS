@@ -17,47 +17,23 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <sys/param.h>
-#include "sysdef.h"
-
-#ifdef NO_COM_SUPPORT
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "cscom/com.h"
-
+#include "cssys/csshlib.h"
 #include <kernel/image.h>
 
-CS_HLIBRARY SysLoadLibrary (const char* szLibName)
+csLibraryHandle csLoadLibrary (const char* iName)
 {
-  image_id Handle = load_add_on (szLibName);
-  if (Handle > 0)
-  {
-    HRESULT (*DllInitialize) ();
-    if (get_image_symbol (Handle, "DllInitialize", B_SYMBOL_TYPE_TEXT, (void**)&DllInitialize) != B_OK)
-    {
-      printf ("Unable to find DllInitialize in %s\n", szLibName);
-      return 0;
-    }
-    DllInitialize ();
-  }
-  else
-    printf ("Error opening library '%s'!\n", szLibName);
-
-  return (CS_HLIBRARY)Handle;
+  char name [260];
+  strcat (strcpy (name, iName), ".so");
+  return (csLibraryHandle)load_add_on (name);
 }
 
-PROC SysGetProcAddress (CS_HLIBRARY Handle, const char* szProcName)
+void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
 {
   void *func;
-  return (get_image_symbol(Handle, szProcName, B_SYMBOL_TYPE_TEXT, &func) == B_OK) ? (PROC)func : NULL;
+  return (get_image_symbol (Handle, iName, B_SYMBOL_TYPE_TEXT, &func) == B_OK) ? func : NULL;
 }
 
-bool SysFreeLibrary (CS_HLIBRARY Handle)
+bool csUnloadLibrary (csLibraryHandle Handle)
 {
-//  -*- warning: should return true if success, false if failed
-//  -*- check the line below and remove this comment
   return (unload_add_on (Handle) == B_OK);
 }
-
-#endif

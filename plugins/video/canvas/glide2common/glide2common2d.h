@@ -19,7 +19,7 @@
 #ifndef __GLIDECOMMON2D_H__
 #define __GLIDECOMMON2D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
 #include "cssys/be/beitf.h"
@@ -30,10 +30,9 @@
 //#include "cs2d/glide2common/gl2d_font.h"
 #include "cs3d/glide2/gl_txtmgr.h"
 #include "cs3d/glide2/glcache.h"
+#include "iglide2d.h"
 
-
-
-//interface ITextureHandle;
+//scfInterface iTextureHandle;
 //class OpenGLTextureCache;
 
 /** Basic OpenGL version of the 2D driver class
@@ -46,7 +45,7 @@
  *  so that a fix or improvement will be inherited by all platforms
  *  instead of percolating via people copying code over. -GJH
  */
-class csGraphics2DGlideCommon : public csGraphics2D
+class csGraphics2DGlideCommon : public csGraphics2D, public iGraphics2DGlide
 {
 protected:
   /// flag to indicate whether to draw fullscreen or not.
@@ -56,21 +55,19 @@ protected:
   bool bPaletteChanged;
   
   /// flag to prevent 2D drawing
-  static bool locked;	
+  bool locked;	
   /// my own private texture cache--for 2D sprites!
-//  static OpenGLTextureCache *texture_cache; //dh: not implemented yet
+//  OpenGLTextureCache *texture_cache; //dh: not implemented yet
 
   /// hold the CS fonts in an OpenGL-friendly format
-//  static csGraphics2DOpenGLFontServer *LocalFontServer; //dh: not implemented yet
-
-  /// local copy of System interface for CsPrintf
-  ISystem *System;
+//  csGraphics2DOpenGLFontServer *LocalFontServer; //dh: not implemented yet
 
 public:
+  DECLARE_IBASE;
 
   /** constructor initializes System member.. LocalFontServer and
    *  texture_cache are initialized in Open() */
-  csGraphics2DGlideCommon (ISystem* piSystem);
+  csGraphics2DGlideCommon (iBase *iParent);
 
   /// Destructor deletes texture_cache and LocalFontServer
   virtual ~csGraphics2DGlideCommon ();
@@ -84,7 +81,7 @@ public:
 
   /** Figure out draw functions...little else done here, most of
    *  the work is done in Open() */
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
 
   /** initialize fonts, texture cache, prints renderer name and version.
    *  you should still print out the 2D driver type (X, Win, etc.) in your
@@ -107,26 +104,23 @@ public:
   //  Glide-specific procedures
   void SetTMUPalette(int tmu);
   /// Draw a line
-  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
+  virtual void DrawLine (csGraphics2D *This, int x1, int y1, int x2, int y2, int color);
   /// Draw a pixel
-  static void DrawPixelGlide (int x, int y, int color);
+  virtual void DrawPixel (csGraphics2D *This, int x, int y, int color);
   /// Write a single character
-  static void WriteCharGlide (int x, int y, int fg, int bg, char c);
+  virtual void WriteChar (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Draw a 2D sprite
-  static void DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy,
+  virtual void DrawSprite (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th);
 
   /// Figure out GL RGB color from a packed color format
-//  static void setGlideColorfromint(int color); //dh: not implemented yet
+//  virtual void setGlideColorfromint(int color); //dh: not implemented yet
 
   /**
    * Get address of video RAM at given x,y coordinates.
    * The Glide version of this function just returns NULL.
    */
-  static unsigned char* GetPixelAtGlide (int x, int y);
-
-protected:
-  void CsPrintf(int msgtype, const char *format, ...);
+  virtual unsigned char* GetPixelAt (int x, int y);
 };
 
 #endif

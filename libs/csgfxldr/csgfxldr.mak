@@ -21,6 +21,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csgfxldr
 csgfxldr:
 	$(MAKE_TARGET)
+csgfxldrclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -29,8 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csgfxldr
 
-SRC.CSGFXLDR = libs/csgfxldr/csimage.cpp libs/csgfxldr/iimage.cpp \
-  libs/csgfxldr/pcx.cpp
+SRC.CSGFXLDR = libs/csgfxldr/csimage.cpp libs/csgfxldr/pcx.cpp
 
 ifeq ($(DO_GIF),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/gifimage.cpp
@@ -74,7 +75,7 @@ $(CSGFXLDR.LIB): $(OBJ.CSGFXLDR)
 	$(DO.LIBRARY)
 
 csgfxldrclean:
-	-$(RM) $(CSGFXLDR.LIB)
+	-$(RM) $(CSGFXLDR.LIB) $(OBJ.CSGFXLDR)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csgfxldr.dep

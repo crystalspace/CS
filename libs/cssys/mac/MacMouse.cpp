@@ -36,7 +36,7 @@ SysMouseDriver::~SysMouseDriver( void )
   Close();
 }
 
-bool SysMouseDriver::Open( ISystem* system, csEventQueue *EvQueue )
+bool SysMouseDriver::Open( iSystem* system, csEventQueue *EvQueue )
 {
   csMouseDriver::Open ( system, EvQueue );
   return true;

@@ -1,5 +1,5 @@
 /*
-    Crystal Space Vector class interface
+    Crystal Space utility library: vector class interface
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -69,11 +69,11 @@ public:
   /// Find a element by key (using CompareKey method)
   int FindKey (csConstSome Key, int Mode = 0) const;
   /// Find a element in a SORTED array by key (using CompareKey method)
-  int FindSortedKey (csConstSome Key, int Mode) const;
+  int FindSortedKey (csConstSome Key, int Mode = 0) const;
   /// Partially sort the array
-  void QuickSort (int Left, int Right, int Mode);
+  void QuickSort (int Left, int Right, int Mode = 0);
   /// Same but for all elements
-  void QuickSort (int Mode);
+  void QuickSort (int Mode = 0);
   /// Push a element on 'top' of vector
   inline int Push (csSome what);
   /// Pop a element from vector 'top'
@@ -169,7 +169,7 @@ inline void csVector::QuickSort (int Mode)
 class NAME : protected BASE					\
 {								\
 public:								\
-    NAME (int ilimit = 8, int ithreshold = 16) :			\
+    NAME (int ilimit = 8, int ithreshold = 16) :		\
       BASE (ilimit, ithreshold) {}				\
     inline TYPE*& operator [] (int n)				\
     { return (TYPE*&)BASE::operator [] (n); }			\
@@ -181,16 +181,16 @@ public:								\
     { BASE::SetLength (n); }					\
     inline int Length () const					\
     { return BASE::Length (); }					\
-    int Find (TYPE* which) const					\
+    int Find (TYPE* which) const				\
     { return BASE::Find (which); }				\
-    int FindKey (const TYPE* value) const				\
+    int FindKey (const TYPE* value) const			\
     { return BASE::FindKey (value); }				\
-    inline void Push (TYPE* what)					\
+    inline void Push (TYPE* what)				\
     { BASE::Push (what); }					\
     inline TYPE* Pop ()						\
     { return (TYPE*)BASE::Pop (); }				\
     bool Delete (int n)						\
-    { return BASE::Delete (n); }					\
+    { return BASE::Delete (n); }				\
     void DeleteAll ()						\
     { BASE::DeleteAll (); }					\
     bool Insert (int n, TYPE* Item)				\

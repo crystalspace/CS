@@ -29,7 +29,7 @@ class csCamera;
 class csWorld;
 class csSector;
 class csClipper;
-struct IGraphics3D;
+struct iGraphics3D;
 
 /**
  * The csView class encapsulates the top-level Crystal Space
@@ -41,7 +41,7 @@ private:
   // csClipper.
   csClipper* clipper;
   //
-  IGraphics3D* g3d;
+  iGraphics3D* G3D;
 
   // Clipping rectangle.
   csBox bview;
@@ -55,7 +55,7 @@ private:
 
 public:
   /// Constructor.
-  csView (csWorld *iWorld, IGraphics3D* ig3d);
+  csView (csWorld *iWorld, iGraphics3D* ig3d);
   /// Destructor.
   ~csView ();
 

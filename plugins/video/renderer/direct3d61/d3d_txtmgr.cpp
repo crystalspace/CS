@@ -28,28 +28,25 @@
 #include "isystem.h"
 #include "lightdef.h"
 
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#if ! __option( global_optimizer )
-#pragma global_optimizer on
-#endif
-#endif
-
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
 //---------------------------------------------------------------------------
 
-csTextureManagerDirect3D::csTextureManagerDirect3D (ISystem* piSystem, IGraphics2D* piG2D) :
-	csTextureManager (piSystem, piG2D)
+csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem* iSys, iGraphics2D* iG2D) :
+	csTextureManager (iSys, iG2D)
 {
 }
 
-void csTextureManagerDirect3D::InitSystem ()
+void csTextureManagerDirect3D::Initialize ()
 {
-  csTextureManager::InitSystem ();
+  csTextureManager::Initialize ();
 
   num_red = (pfmt.RedMask >> pfmt.RedShift) + 1;
   num_green = (pfmt.GreenMask >> pfmt.GreenShift) + 1;
   num_blue = (pfmt.BlueMask >> pfmt.BlueShift) + 1;
+
+  clear ();
+  read_config ();
 }
 
 
@@ -68,10 +65,10 @@ bool csTextureManagerDirect3D::force_mixing (char* mix)
 void csTextureManagerDirect3D::read_config ()
 {
   char* p;
-  ISystem* sys = m_piSystem;
+  iSystem* sys = iSys;
   // @@@ WARNING! The following code only examines the
   // main cryst.cfg file and not the one which overrides values
-  // in the world file. We need to support this someway in the ISystem
+  // in the world file. We need to support this someway in the iSystem
   // interface as well.
 
   sys->ConfigGetYesNo ("TextureMapper", "BLEND_MIPMAP", do_blend_mipmap0, false);
@@ -206,7 +203,7 @@ void csTextureManagerDirect3D::clear ()
   textures.DeleteAll ();
 }
 
-csTextureMMDirect3D* csTextureManagerDirect3D::new_texture (IImageFile* image)
+csTextureMMDirect3D* csTextureManagerDirect3D::new_texture (iImageFile* image)
 {
   CHK (csTextureMMDirect3D* tm = new csTextureMMDirect3D (image));
   if (tm->loaded_correctly ()) textures.Push (tm);
@@ -299,15 +296,7 @@ int csTextureManagerDirect3D::find_rgb_map (int r, int g, int b, int map_type, i
   return find_color (nr, ng, nb);
 }
 
-STDMETHODIMP csTextureManagerDirect3D::Initialize ()
-{
-  clear ();
-  read_config ();
-
-  return S_OK;
-}
-
-STDMETHODIMP csTextureManagerDirect3D::Prepare ()
+void csTextureManagerDirect3D::Prepare ()
 {
   int i;
 
@@ -348,34 +337,29 @@ STDMETHODIMP csTextureManagerDirect3D::Prepare ()
     txt->free_usage_table ();
   }
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE!\n");
-
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerDirect3D::RegisterTexture (IImageFile* image, ITextureHandle** handle,
-	bool for3d, bool for2d)
+iTextureHandle *csTextureManagerDirect3D::RegisterTexture (iImageFile* image,
+  bool for3d, bool for2d)
 {
   csTextureMMDirect3D* txt = new_texture (image);
   txt->set_3d2d (for3d, for2d);
-  *handle = GetITextureHandleFromcsTextureMM (txt);
-  return S_OK;
+  return txt;
 }
 
-STDMETHODIMP csTextureManagerDirect3D::UnregisterTexture (ITextureHandle* handle)
+void csTextureManagerDirect3D::UnregisterTexture (iTextureHandle* handle)
 {
   (void)handle;
   //@@@ Not implemented yet.
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerDirect3D::MergeTexture (ITextureHandle* handle)
+void csTextureManagerDirect3D::MergeTexture (iTextureHandle* handle)
 {
   (void)handle;
   //@@@ Not implemented yet.
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerDirect3D::FreeImages ()
+void csTextureManagerDirect3D::FreeImages ()
 {
   int i;
   for (i = 0 ; i < textures.Length () ; i++)
@@ -383,20 +367,12 @@ STDMETHODIMP csTextureManagerDirect3D::FreeImages ()
     csTextureMMDirect3D* txt = (csTextureMMDirect3D*)textures[i];
     txt->free_image ();
   }
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerDirect3D::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
+void csTextureManagerDirect3D::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
 {
-  return S_OK;
 }
 
-STDMETHODIMP csTextureManagerDirect3D::AllocPalette ()
+void csTextureManagerDirect3D::AllocPalette ()
 {
-  return S_OK;
 }
-
-//---------------------------------------------------------------------------
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#pragma global_optimizer reset
-#endif

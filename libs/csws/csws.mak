@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csws
 csws:
 	$(MAKE_TARGET)
+cswsclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -44,7 +46,7 @@ $(CSWS.LIB): $(OBJ.CSWS)
 	$(DO.LIBRARY)
 
 cswsclean:
-	-$(RM) $(CSWS.LIB)
+	-$(RM) $(CSWS.LIB) $(OBJ.CSWS)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csws.dep

@@ -20,58 +20,40 @@
 #ifndef __ALLEGRO_H__
 #define __ALLEGRO_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/djgpp/idjgpp.h"
-
-extern const CLSID CLSID_DosRawGraphics2D;
-
-/// IGraphics2DFactory interface implementation
-class csGraphics2DFactoryDOSAlleg : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DFactoryDOSAlleg)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
 
 /// DOS Allegro 2D graphics driver COM class
 class csGraphics2DDOSAlleg : public csGraphics2D
 {
   /// Palette has been changed?
   bool PaletteChanged;
-  /// Pointer to system driver interface
-  static ISystem* System;
   /// Pointer to DOS-specific interface
-  static IDosSystemDriver* DosSystem;
+  static iDosSystemDriver* DosSystem;
 
 public:
-  csGraphics2DDOSAlleg (ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DDOSAlleg (iBase *iParent);
   virtual ~csGraphics2DDOSAlleg ();
 
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open(char* Title);
   virtual void Close(void);
 
   virtual void Print (csRect *area = NULL);
 
   virtual bool SetMousePosition (int x, int y);
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
 
   virtual void SetRGB(int i, int r, int g, int b);
 
   virtual bool BeginDraw ();
 
 private:
-  void CsPrintf (int msgtype, char *format, ...);
   void FillEvents ();
   void printf_Enable (bool Enable);
-
-protected:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DDOSAlleg)
 };
 
 #endif // __ALLEGRO_H__

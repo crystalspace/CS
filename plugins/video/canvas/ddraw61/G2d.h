@@ -20,47 +20,21 @@
 #define __DD61G2D_H__
 
 #include "ddraw.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
 #include "cs2d/ddraw61/xg2d.h"
 
-class csTextureHandle;
-
-//extern const CLSID CLSID_DirectDrawGraphics2D;
-//extern const CLSID CLSID_DirectDrawWith3DGraphics2D;
-extern const CLSID CLSID_DirectDrawDX61With3DGraphics2D;
-
-// the CLSID to create csGraphics2DDDraw61 instances.
-//extern const CLSID CLSID_DirectDrawDX61With3DGraphics2D;
-
-extern const IID IID_IGraphics2DDirect3DFactory;
-/// dummy interface
-interface IGraphics2DDirect3DFactory : public IGraphics2DFactory
-{
-};
-
-class csGraphics2DWithDirect3DFactory : public IGraphics2DDirect3DFactory
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DWithDirect3DFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(BOOL bLock);
-};
-
 /// Windows version.
 class csGraphics2DDDraw6 : public csGraphics2D
 {
-  friend class csGraphics3DSoftware;
-  friend class csGraphics3DDirect3D;
-  
 public:
-  csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D);
+  DECLARE_IBASE;
+
+  csGraphics2DDDraw6(iSystem* piSystem, bool bUses3D);
   virtual ~csGraphics2DDDraw6(void);
   
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
 
   virtual bool Open (char *Title);
   virtual void Close ();
@@ -73,8 +47,7 @@ public:
   virtual void FinishDraw();
   virtual HRESULT SetColorPalette();
   
-  //virtual bool SetMouseCursor (int iShape, TextureMM* iBitmap);
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
   virtual bool SetMousePosition (int x, int y);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);
@@ -82,6 +55,18 @@ public:
 
   int m_nGraphicsReady;
   int m_nDepth;
+
+  ///--------------- iGraphics2DDDraw6 interface implementation ---------------
+  ///
+  virtual void GetDirectDrawDriver (LPDIRECTDRAW4* lplpDirectDraw);
+  ///
+  virtual void GetDirectDrawPrimary (LPDIRECTDRAWSURFACE4* lplpDirectDrawPrimary);
+  ///
+  virtual void GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE4* lplpDirectDrawBackBuffer);
+  ///
+  virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection);
+  ///
+  virtual void SetColorPalette ();
   
 protected:
   LPDIRECTDRAW m_lpDD;
@@ -103,10 +88,6 @@ protected:
   
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DDDraw6)
-  DECLARE_COMPOSITE_INTERFACE(XDDraw6GraphicsInfo)
 };
 
 #endif

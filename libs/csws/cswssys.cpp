@@ -19,7 +19,12 @@
 
 #include "sysdef.h"
 #include "csws/cswssys.h"
+#include "csws/csapp.h"
 #include "itxtmgr.h"
+
+// We need the Virtual File System plugin
+REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
+  "Crystal Space Virtual File System plug-in")
 
 /*
  * Do a large debug dump just before the program
@@ -36,9 +41,6 @@ void debug_dump ()
  */
 void cleanup ()
 {
-  if (System && ((cswsSystemDriver *)System)->application)
-    CHKB (delete ((cswsSystemDriver *)System)->application);
-  System = NULL;
 }
 
 // -------------------------------------------------- cswsSystemDriver class ---
@@ -56,20 +58,20 @@ cswsSystemDriver::~cswsSystemDriver ()
 }
 
 bool cswsSystemDriver::Initialize (int argc, char *argv[],
-  const char *iConfigName, const char *iVfsConfigName, IConfig *config)
+  const char *iConfigName)
 {
-  if (!SysSystemDriver::Initialize (argc, argv, iConfigName, iVfsConfigName, config))
+  if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
     return false;
 
-  int Width, Height;
-  piGI->GetWidth (Width);
-  piGI->GetHeight (Height);
+  int Width = G2D->GetWidth ();
+  int Height = G2D->GetHeight ();
 
   // Initialize console data
   curline = 0;
   textcolor = cs_Color_White;
   maxwidth = Width / 4;
-  maxlines = Height / (((csComponent *) application)->TextHeight () + 2);
+  maxlines = Height / (G2D->GetTextHeight (application->GetFont ()) + 2);
+
   CHK (textline = new char *[maxlines]);
   CHK (linecolor = new int [maxlines]);
   for (int i = 0; i < maxlines; i++)
@@ -120,24 +122,24 @@ void cswsSystemDriver::DemoWrite (const char* buf)
   strcpy (textline [curline], buf);
   linecolor [curline] = textcolor;
 
-  if (piG2D)
+  if (G2D)
   {
-    if (SUCCEEDED (piG2D->BeginDraw ()))
+    if (G2D->BeginDraw ())
     {
       application->Invalidate(true);
-      piG2D->Clear (application->Pal [cs_Color_Gray_D]);
-      piG2D->SetFontID (application->GetFont ());
+      G2D->Clear (application->Pal [cs_Color_Gray_D]);
+      G2D->SetFontID (application->GetFont ());
       int fh = ((csComponent *) application)->TextHeight () + 2;
       for (int i = 0; i < maxlines; i++)
         if (*textline [i])
         {
-          piG2D->Write (1, 1 + i * fh,
+          G2D->Write (1, 1 + i * fh,
             application->Pal [cs_Color_Black], -1, textline [i]);
-          piG2D->Write (0, 0 + i * fh,
+          G2D->Write (0, 0 + i * fh,
             application->Pal [linecolor [i]], -1, textline [i]);
         } /* endfor */
-      piG2D->FinishDraw ();
-      piG2D->Print (NULL);
+      G2D->FinishDraw ();
+      G2D->Print (NULL);
     } /* endif */
   } /* endif */
 }
@@ -145,7 +147,7 @@ void cswsSystemDriver::DemoWrite (const char* buf)
 void cswsSystemDriver::Alert (const char *msg)
 {
   csSystemDriver::Alert (msg);
-  if (DemoReady)
+  if (ConsoleReady)
   {
     int oldcolor = textcolor;
     textcolor = cs_Color_Red_L;
@@ -157,7 +159,7 @@ void cswsSystemDriver::Alert (const char *msg)
 void cswsSystemDriver::Warn (const char *msg)
 {
   csSystemDriver::Warn (msg);
-  if (DemoReady)
+  if (ConsoleReady)
   {
     int oldcolor = textcolor;
     textcolor = cs_Color_Yellow;
@@ -166,8 +168,13 @@ void cswsSystemDriver::Warn (const char *msg)
   }
 }
 
-void cswsSystemDriver::NextFrame (long elapsed_time, long current_time)
+void cswsSystemDriver::NextFrame (time_t elapsed_time, time_t current_time)
 {
   SysSystemDriver::NextFrame (elapsed_time, current_time);
-  application->NextFrame ();
+  application->NextFrame (elapsed_time, current_time);
+}
+
+bool cswsSystemDriver::ProcessEvents ()
+{
+  return application->ProcessEvents ();
 }

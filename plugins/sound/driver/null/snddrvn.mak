@@ -21,6 +21,8 @@ all drivers snddrivers: snddrvn
 
 snddrvn:
 	$(MAKE_TARGET) MAKE_DLL=yes
+snddrvnclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -47,12 +49,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: snddrvn snddrvnclean snddrvncleanlib
+.PHONY: snddrvn snddrvnclean
 
 # Chain rules
 snd: snddrvn
 clean: snddrvnclean
-cleanlib: snddrvncleanlib
 
 snddrvn: $(OUTDIRS) $(SNDDRVN)
 
@@ -60,10 +61,7 @@ $(SNDDRVN): $(OBJ.SNDDRVN) $(DEP.SNDDRVN)
 	$(DO.PLUGIN)
 
 snddrvnclean:
-	$(RM) $(SNDDRVN)
-
-snddrvncleanlib:
-	$(RM) $(OBJ.SNDDRVN) $(SNDDRVN)
+	$(RM) $(SNDDRVN) $(OBJ.SNDDRVN)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)snddrvn.dep

@@ -33,7 +33,7 @@ bool RegisterBMP ()
   return ImageLoader::Register (&loader);
 }
 
-ImageFile* BMPImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* BMPImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageBMPFile* i = new ImageBMPFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -101,7 +101,7 @@ const char* ImageBMPFile::get_status_mesg() const
   else return "image successfully read";
 }
 
-ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : ImageFile ()
+ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
 {
   status = IFE_BadFormat;
 

@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssnddrv/macsnd/macsdrv.h"
 #include "isnddrv.h"
 
@@ -112,7 +112,7 @@ BEGIN_INTERFACE_TABLE (csSoundDriverMacFactory)
   IMPLEMENTS_INTERFACE (ISoundDriverFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csSoundDriverMacFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csSoundDriverMacFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

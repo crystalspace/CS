@@ -24,7 +24,7 @@
 // SoundRender.H
 // csSoundRenderA3D class.
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssfxldr/common/snddata.h"
 #include "isndrdr.h"
 
@@ -35,7 +35,7 @@ extern const CLSID CLSID_A3DSoundRender;
 class csSoundRenderA3D : public ISoundRender
 {
 public:
-	csSoundRenderA3D(ISystem* piSystem);
+	csSoundRenderA3D(iSystem* piSystem);
 
 	virtual ~csSoundRenderA3D();
 
@@ -60,7 +60,7 @@ public:
 
 public:
 	IA3d4 *m_p3DAudioRenderer;
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
 
   /// print to the system's device
   void SysPrintf(int mode, char* str, ...);
@@ -70,7 +70,7 @@ public:
 
 class csSoundRenderA3DFactory : public ISoundRenderFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

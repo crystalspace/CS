@@ -29,7 +29,7 @@ class csTextureHandle;
 class csPolygon3D;
 class CLights;
 class csThingTemplate;
-interface IGraphics3D;
+scfInterface iGraphics3D;
 
 /**
  * If CS_ENTITY_CONVEX is set then this entity is convex (what did
@@ -172,7 +172,7 @@ public:
    * Create all mipmaps for all textures for all polygons of
    * this thing.
    */
-  void CreateLightMaps (IGraphics3D* g3d);
+  void CreateLightMaps (iGraphics3D* g3d);
 
   /**
    * Draw this thing given a view and transformation.

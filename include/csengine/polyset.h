@@ -19,13 +19,13 @@
 #ifndef POLYSET_H
 #define POLYSET_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h" // texel coords
 #include "csgeom/polyint.h"
 #include "csobject/csobj.h"
-#include "csengine/fog.h"
 #include "csengine/tranman.h"
+#include "igraph3d.h"
 #include "ipolygon.h"
 
 class csPolygonInt;
@@ -43,7 +43,7 @@ class Dumper;
 class csRenderView;
 class csCurve;
 class csFrustrumList;
-interface IPolygonSet;
+scfInterface iPolygonSet;
 
 /**
  * This structure keeps the indices of the vertices which
@@ -100,7 +100,7 @@ struct csPolygonSetBBox
  * <li> Things do not require portals but can use them. 
  * </ul>
  */
-class csPolygonSet : public csObject, public csPolygonParentInt
+class csPolygonSet : public csObject, public csPolygonParentInt, public iPolygonSet
 {
   friend class Dumper;
   friend class csCollider;
@@ -521,14 +521,10 @@ public:
   csVector2* IntersectCameraZPlane (float z, csVector2* clipper, int num_clip, int& num_pts);
 
   CSOBJTYPE;
+  DECLARE_IBASE;
 
-  DECLARE_INTERFACE_TABLE( PolygonSet )
-  DECLARE_IUNKNOWN()
-
-  DECLARE_COMPOSITE_INTERFACE( PolygonSet )
+  /// Same as GetName()
+  virtual const char *GetObjectName () { return GetName (); }
 };
-
-#define GetIPolygonSetFromcsPolygonSet(a)  &a->m_xPolygonSet;
-#define GetcsPolygonSetFromIPolygonSet(a)  ((csPolygonSet*)((size_t)a - offsetof(csPolygonSet, m_xPolygonSet)))
 
 #endif /*POLYSET_H*/

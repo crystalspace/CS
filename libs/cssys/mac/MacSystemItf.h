@@ -1,9 +1,9 @@
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 extern const IID IID_IMacSystemDriver;
 
-interface IMacSystemDriver : public IUnknown
+interface IMacSystemDriver : public iBase
 {
 	/// Returns the HINSTANCE of the program
 	STDMETHOD(GetInstance)(HINSTANCE* retval) = 0;

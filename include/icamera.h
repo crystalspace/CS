@@ -16,21 +16,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cscom/com.h"
-
 #ifndef __ICAMERA_H__
 #define __ICAMERA_H__
 
-extern const IID IID_ICamera;
+#include "csutil/scf.h"
 
 /// temporary - subject to change
-interface ICamera : public IUnknown
+SCF_INTERFACE (iCamera, 0, 0, 1) : public iBase
 {
-  DECLARE_IUNKNOWN ()
   ///
-  STDMETHOD (GetInvAspect) (float& retval);
+  virtual float GetAspect () = 0;
   ///
-  STDMETHOD (GetAspect) (float& retval);
+  virtual float GetInvAspect () = 0;
 };
 
 #endif

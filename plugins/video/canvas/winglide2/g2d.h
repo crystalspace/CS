@@ -25,10 +25,10 @@
 
 #include <glide.h>
  
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cs2d/winglide2/xg2d.h"
-
+#include "cs2d/glide2common2d/iglide2d.h"
 
 #if defined(DISP_X11)
   #define XK_MISCELLANY 1
@@ -36,20 +36,7 @@
   #include <X11/keysymdef.h>
 #endif           
 
-extern const CLSID CLSID_Glide2xGraphics2D;
-
-///
-class csGraphics2DGlide2xFactory : public IGraphics2DFactory 
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DGlide2xFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(BOOL bLock);
-};
-
-class csGraphics2DGlide2x : public csGraphics2D
+class csGraphics2DGlide2x : public csGraphics2DGlideCommon
 {
   friend class csGraphics3DGlide;
   friend class csGraphics2DGlide2x;
@@ -63,11 +50,13 @@ private:
   GC gc;                 
 #endif
 public:
-  csGraphics2DGlide2x(ISystem* piSystem);
+  csGraphics2DGlide2x(iBase *iParent);
   virtual ~csGraphics2DGlide2x(void);
   
   virtual bool Open (const char *Title);
   virtual void Close ();
+
+  bool Initialize (iSystem *pSystem);
   
   virtual void Print (csRect *area = NULL);
   
@@ -80,11 +69,16 @@ public:
   
   int GraphicsReady;
   static int Depth;
+
+#if defined(OS_WIN32)
+  ///
+  virtual HWND GethWnd ();
+#endif
+#if defined (OS_LINUX)
+  virtual Display *GetDisplay ();
+#endif    
   
 protected:
-  // print to the system's device
-  void SysPrintf(int mode, const char* str, ...);
-
 #if defined(OS_WIN32)
   HWND m_hWnd;
 #endif
@@ -93,10 +87,6 @@ protected:
   int glDrawMode;
   GrLfbInfo_t lfbInfo;
   bool locked;
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DGlide2x)
-  DECLARE_COMPOSITE_INTERFACE(XGlide2xGraphicsInfo)
 };
 
 #endif // G3D_GLIDE_H

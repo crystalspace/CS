@@ -20,49 +20,18 @@
 #define __DD3G2D_H__
 
 #include "ddraw.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
-#include "cs2d/ddraw/xg2d.h"
-
-class csTextureHandle;
-
-extern const CLSID CLSID_DirectDrawGraphics2D;
-extern const CLSID CLSID_DirectDrawWith3DGraphics2D;
-
-extern const IID IID_IGraphics2DDirect3DFactory;
-/// dummy interface
-interface IGraphics2DDirect3DFactory : public IGraphics2DFactory
-{
-};
-
-///
-class csGraphics2DDDraw3Factory : public IGraphics2DDirect3DFactory 
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DDDraw3Factory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(BOOL bLock);
-};
-
-class csGraphics2DDDraw3WithDirect3DFactory : public csGraphics2DDDraw3Factory
-{
-public:
-    DECLARE_INTERFACE_TABLE(csGraphics2DDDraw3WithDirect3DFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-};
+#include "cs2d/ddraw/ig2d.h"
 
 /// Windows version.
-class csGraphics2DDDraw3 : public csGraphics2D
+class csGraphics2DDDraw3 : public csGraphics2D, public iGraphics2DDDraw3
 {
-  friend class csGraphics3DSoftware;
-  friend class csGraphics3DDirect3D;
-  
 public:
-  csGraphics2DDDraw3(ISystem* piSystem, bool bUses3D=false);
+  DECLARE_IBASE;
+
+  csGraphics2DDDraw3(iSystem* piSystem, bool bUses3D=false);
   virtual ~csGraphics2DDDraw3(void);
   
   virtual bool Open (const char *Title);
@@ -72,13 +41,12 @@ public:
   
   virtual void SetRGB(int i, int r, int g, int b);
  
-  virtual void Initialize ();
+  virtual bool Initialize (iSystem *pSystem);
 
   virtual bool BeginDraw();
   virtual void FinishDraw();
-  virtual HRESULT SetColorPalette();
   
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
 
   /// Set mouse cursor position; return success status
   virtual bool SetMousePosition (int x, int y);
@@ -88,7 +56,19 @@ public:
   virtual bool DoubleBuffer ();
 
   int m_nGraphicsReady;
-  
+
+  ///--------------- iGraphics2DDDraw3 interface implementation ---------------
+  ///
+  virtual void GetDirectDrawDriver (LPDIRECTDRAW* lplpDirectDraw);
+  ///
+  virtual void GetDirectDrawPrimary (LPDIRECTDRAWSURFACE* lplpDirectDrawPrimary);
+  ///
+  virtual void GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE* lplpDirectDrawBackBuffer);
+  ///
+  virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection);
+  ///
+  virtual HRESULT SetColorPalette ();
+
 protected:
   LPDIRECTDRAW m_lpDD;
   LPDIRECTDRAWSURFACE m_lpddsPrimary;
@@ -96,7 +76,7 @@ protected:
   LPDIRECTDRAWCLIPPER m_lpddClipper;
   LPDIRECTDRAWPALETTE m_lpddPal;
   
-  IWin32SystemDriver* m_piWin32System;
+  iWin32SystemDriver* m_piWin32System;
 
   HWND m_hWnd;
   HINSTANCE  m_hInstance;
@@ -112,10 +92,6 @@ protected:
   
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DDDraw3)
-  DECLARE_COMPOSITE_INTERFACE(XDDraw3GraphicsInfo)
 };
 
 #endif

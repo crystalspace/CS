@@ -1,25 +1,23 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "sysdef.h"
-#define CS_DISABLE_MODULE_LOCKING
-#include "cscom/com.h"
-#undef  CS_DISABLE_MODULE_LOCKING
+#include "csutil/scf.h"
 #include "csengine/sysitf.h"
 #include "csengine/world.h"
 #include "csengine/dumper.h"
@@ -40,16 +38,15 @@
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
-#include "csengine/config.h"
 #include "csengine/cspmeter.h"
 #include "csengine/cbuffer.h"
 #include "csengine/lppool.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
+#include "csinput/csevent.h"
 #include "csutil/util.h"
-#include "csutil/inifile.h"
-#include "csutil/vfs.h"
 #include "csgfxldr/csimage.h"
+#include "ivfs.h"
 #include "ihalo.h"
 #include "itxtmgr.h"
 #include "igraph3d.h"
@@ -179,33 +176,41 @@ csLight* csLightIt::Fetch ()
 
 int csWorld::frame_width;
 int csWorld::frame_height;
-ISystem* csWorld::isys = NULL;
+iSystem* csWorld::System = NULL;
 csWorld* csWorld::current_world = NULL;
-csVFS *csWorld::vfs = NULL;
 
 CSOBJTYPE_IMPL(csWorld,csObject);
 
-IMPLEMENT_DEFAULT_COM(World)
+IMPLEMENT_IBASE (csWorld)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iWorld)
+  IMPLEMENTS_INTERFACE (iConfig)
+IMPLEMENT_IBASE_END
 
-csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
+IMPLEMENT_FACTORY (csWorld)
+
+csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
 {
+  CONSTRUCT_IBASE (iParent);
   do_lighting_cache = true;
   first_dyn_lights = NULL;
   start_sector = NULL;
-  piHR = NULL;
+  System = NULL;
+  VFS = NULL;
+  G3D = NULL;
+  HaloRast = NULL;
   textures = NULL;
   c_buffer = NULL;
   quadtree = NULL;
   quadcube = NULL;
   current_camera = NULL;
-
+  current_world = this;
+  
   CHK (quadcube = new csQuadcube (8));
+  CHK (textures = new csTextureList ());
 
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (lightpatch_pool = new csLightPatchPool ());
-  CHK (cfg_engine = new csEngineConfig ());
-  CHK (cs = new csClassSpawner ());
-  CHK (plugins = new csLoaderExtensions (this));
 
   BuildSqrtTable ();
 }
@@ -216,17 +221,126 @@ csCamera* camera_hack = NULL;
 csWorld::~csWorld ()
 {
   Clear ();
-  if (piHR) { FINAL_RELEASE (piHR); piHR = NULL; }
-  CHK (delete textures);
-  CHK (delete cfg_engine);
+  if (HaloRast) HaloRast->DecRef ();
+  if (G3D) G3D->DecRef ();
+  if (VFS) VFS->DecRef ();
+  if (System) System->DecRef ();
+  if (textures)
+    CHKB (delete textures);
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
-  CHK (delete quadcube);
-  cs->Release();
-  CHK (delete plugins);
-  //  plugins->Release();
-  CHK (delete camera_hack);
+  if (quadcube)
+    CHKB (delete quadcube);
+
+  // @@@ temp hack
+  if (camera_hack)
+    CHKB (delete camera_hack);
   camera_hack = NULL;
+}
+
+bool csWorld::Initialize (iSystem* sys)
+{
+  System = sys;
+  System->IncRef ();
+
+  if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
+    return false;
+
+  if (!(VFS = QUERY_PLUGIN (sys, iVFS)))
+  {
+    G3D->DecRef ();
+    return false;
+  }
+
+  // Tell system driver that we want to handle broadcast events
+  if (!System->CallOnEvents (this, CSMASK_Broadcast))
+    return false;
+
+  ReadConfig ();
+
+  return true;
+}
+
+// Handle some system-driver broadcasts
+bool csWorld::HandleEvent (csEvent &Event)
+{
+  if (Event.Type == csevBroadcast)
+    switch (Event.Command.Code)
+    {
+      case cscmdSystemOpen:
+      {
+        frame_width = G3D->GetWidth ();
+        frame_height = G3D->GetHeight ();
+        if (csCamera::default_aspect == 0)
+          csCamera::default_aspect = frame_height;
+        csCamera::default_inv_aspect = 1./csCamera::default_aspect;
+
+        // @@@ Ugly hack to always have a camera in current_camera.
+        // This is needed for the lighting routines.
+        if (!current_camera)
+        {
+          CHK (current_camera = new csCamera ());
+          camera_hack = current_camera;
+        }
+
+        StartWorld ();
+
+#if 0
+        bool vis;
+        csBox box (0, 0, frame_width, frame_height);
+        CHK (csQuadtree* qt = new csQuadtree (box, 5));
+        qt->MakeEmpty ();
+        csPoly2D po;
+        po.MakeEmpty ();
+        po.AddVertex (30, 170);
+        po.AddVertex (290, 170);
+        po.AddVertex (30, 30);
+        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
+        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
+          CsPrintf (MSG_DEBUG_0, "Error 1\n");
+        Dumper::dump (qt);
+        po.MakeEmpty ();
+        po.AddVertex (290, 170);
+        po.AddVertex (290, 30);
+        po.AddVertex (30, 30);
+        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
+        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
+          CsPrintf (MSG_DEBUG_0, "Error 2\n");
+        Dumper::dump (qt);
+        po.MakeEmpty ();
+        po.AddVertex (150, 110);
+        po.AddVertex (170, 110);
+        po.AddVertex (170, 90);
+        po.AddVertex (150, 90);
+        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
+        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
+          CsPrintf (MSG_DEBUG_0, "Error 3\n");
+        Dumper::dump (qt);
+        po.MakeEmpty ();
+        po.AddVertex (50, 150);
+        po.AddVertex (250, 150);
+        po.AddVertex (250, 50);
+        po.AddVertex (50, 50);
+        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
+        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
+          CsPrintf (MSG_DEBUG_0, "Error 4\n");
+        Dumper::dump (qt);
+        po.MakeEmpty ();
+        po.AddVertex (150, 110);
+        po.AddVertex (170, 110);
+        po.AddVertex (170, 90);
+        po.AddVertex (150, 90);
+        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
+        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
+          CsPrintf (MSG_DEBUG_0, "Error 5 (vis=%d)\n", vis);
+        Dumper::dump (qt);
+        CHK (delete qt);
+#endif
+        return true;
+      } /* endif */
+    } /* endswitch */
+
+  return false;
 }
 
 void csWorld::Clear ()
@@ -294,11 +408,6 @@ void csWorld::EnableQuadtree (bool en)
   }
 }
 
-IConfig* csWorld::GetEngineConfigCOM ()
-{
-  return GetIConfigFromcsEngineConfig (cfg_engine);
-}
-
 csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name)
 {
   int sn = sprite_templates.Length ();
@@ -345,100 +454,16 @@ csThing* csWorld::GetThing (const char* name)
   return NULL;
 }
 
-bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csVFS *vfs)
+void csWorld::PrepareTextures ()
 {
-  g3d->GetWidth (frame_width);
-  g3d->GetHeight (frame_height);
-  isys = sys;
-  current_world = this;
-  VFS = vfs;
-
-  plugins->EnumExtensions ();
-
-  CHK (textures = new csTextureList ());
-  ReadConfig (config);
-
-  if (csCamera::default_aspect == 0) csCamera::default_aspect = frame_height;
-  csCamera::default_inv_aspect = 1./csCamera::default_aspect;
-
-  // @@@ Ugly hack to always have a camera in current_camera.
-  // This is needed for the lighting routines.
-  if (!current_camera)
-  {
-    CHK (current_camera = new csCamera ());
-    camera_hack = current_camera;
-  }
-
-  StartWorld ();
-
-#if 0
-{
-    bool vis;
-    csBox box (0, 0, frame_width, frame_height);
-    CHK (csQuadtree* qt = new csQuadtree (box, 5));
-    qt->MakeEmpty ();
-    csPoly2D po;
-    po.MakeEmpty ();
-    po.AddVertex (30, 170);
-    po.AddVertex (290, 170);
-    po.AddVertex (30, 30);
-    vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-    if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-      CsPrintf (MSG_DEBUG_0, "Error 1\n");
-    Dumper::dump (qt);
-    po.MakeEmpty ();
-    po.AddVertex (290, 170);
-    po.AddVertex (290, 30);
-    po.AddVertex (30, 30);
-    vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-    if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-      CsPrintf (MSG_DEBUG_0, "Error 2\n");
-    Dumper::dump (qt);
-    po.MakeEmpty ();
-    po.AddVertex (150, 110);
-    po.AddVertex (170, 110);
-    po.AddVertex (170, 90);
-    po.AddVertex (150, 90);
-    vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-    if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-      CsPrintf (MSG_DEBUG_0, "Error 3\n");
-    Dumper::dump (qt);
-    po.MakeEmpty ();
-    po.AddVertex (50, 150);
-    po.AddVertex (250, 150);
-    po.AddVertex (250, 50);
-    po.AddVertex (50, 50);
-    vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-    if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-      CsPrintf (MSG_DEBUG_0, "Error 4\n");
-    Dumper::dump (qt);
-    po.MakeEmpty ();
-    po.AddVertex (150, 110);
-    po.AddVertex (170, 110);
-    po.AddVertex (170, 90);
-    po.AddVertex (150, 90);
-    vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-    if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-      CsPrintf (MSG_DEBUG_0, "Error 5 (vis=%d)\n", vis);
-    Dumper::dump (qt);
-    CHK (delete qt);
-}
-#endif
-
-  return true;
-}
-
-void csWorld::PrepareTextures (IGraphics3D* g3d)
-{
-  ITextureManager* txtmgr;
-  g3d->GetTextureManager (&txtmgr);
+  iTextureManager* txtmgr = G3D->GetTextureManager ();
   txtmgr->Initialize ();
 
   // First register all textures to the texture manager.
   for (int i = 0 ; i < textures->GetNumTextures () ; i++)
   {
     csTextureHandle* th = textures->GetTextureMM (i);
-    ImageFile *image = th->GetImageFile ();
+    csImageFile *image = th->GetImageFile ();
 
     // Now we check the size of the loaded image. Having an image, that
     // is not a power of two will result in strange errors while
@@ -446,8 +471,8 @@ void csWorld::PrepareTextures (IGraphics3D* g3d)
     // already while loading them.
     if (th->for_3d)
     {
-      int Width  = image->get_width ();
-      int Height = image->get_height ();
+      int Width  = image->GetWidth ();
+      int Height = image->GetHeight ();
 
       if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
         CsPrintf (MSG_WARNING,
@@ -456,9 +481,8 @@ void csWorld::PrepareTextures (IGraphics3D* g3d)
           th->GetName (), Width, Height);
     }
 
-    ITextureHandle* handle;
-    txtmgr->RegisterTexture (GetIImageFileFromImageFile (th->GetImageFile ()),
-      &handle, th->for_3d, th->for_2d);
+    iTextureHandle* handle = txtmgr->RegisterTexture (th->GetImageFile (),
+      th->for_3d, th->for_2d);
     th->SetTextureHandle (handle);
   }
 
@@ -476,31 +500,29 @@ void csWorld::PrepareSectors()
   }
 }
 
-bool csWorld::Prepare (IGraphics3D* g3d)
+bool csWorld::Prepare ()
 {
-  PrepareTextures (g3d);
+  PrepareTextures ();
   PrepareSectors ();
 
   // The images are no longer needed by the 3D engine.
-  ITextureManager* txtmgr;
-  g3d->GetTextureManager (&txtmgr);
+  iTextureManager *txtmgr = G3D->GetTextureManager ();
   txtmgr->FreeImages ();
 
-  g3d->ClearCache ();
+  G3D->ClearCache ();
 
   // Prepare lightmaps if we have any sectors
   if (sectors.Length ())
-    ShineLights (g3d);
+    ShineLights ();
 
-  if (!SUCCEEDED (g3d->QueryInterface(IID_IHaloRasterizer, (void**)&piHR)))
-    piHR = NULL;
+  HaloRast = QUERY_INTERFACE (G3D, iHaloRasterizer);
 
   CheckConsistency ();
 
   return true;
 }
 
-void csWorld::ShineLights (IGraphics3D* g3d)
+void csWorld::ShineLights ()
 {
   tr_manager.NewFrame ();
 
@@ -638,7 +660,7 @@ void csWorld::ShineLights (IGraphics3D* g3d)
   int light_count = 0;
   lit->Restart ();
   while (lit->Fetch ()) light_count++;
-  
+
   int sn = 0;
   int num_sectors = sectors.Length ();
   csProgressMeter meter;
@@ -653,7 +675,7 @@ void csWorld::ShineLights (IGraphics3D* g3d)
   }
 
   time_t start, stop;
-  isys->GetTime (start);
+  start = System->GetTime ();
   meter.SetTotal (light_count);
   CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
   lit->Restart ();
@@ -662,7 +684,7 @@ void csWorld::ShineLights (IGraphics3D* g3d)
     ((csStatLight*)l)->CalculateLighting ();
     meter.Step();
   }
-  isys->GetTime (stop);
+  stop = System->GetTime ();
   CsPrintf (MSG_INITIALIZATION, "\n(%f seconds)", (float)(stop-start)/1000.);
 
   // Restore lumel size from 'High Quality Mode'
@@ -694,7 +716,7 @@ void csWorld::ShineLights (IGraphics3D* g3d)
   pit->Restart ();
   while ((p = pit->Fetch ()) != NULL)
   {
-    p->CreateLightMaps (g3d);
+    p->CreateLightMaps (G3D);
     meter.Step();
   }
 
@@ -758,7 +780,7 @@ void csWorld::StartWorld ()
   Clear ();
 }
 
-void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
+void csWorld::Draw (csCamera* c, csClipper* view)
 {
   Stats::polygons_considered = 0;
   Stats::polygons_drawn = 0;
@@ -769,9 +791,8 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   current_camera = c;
   top_clipper = view;
 
-  IGraphics2D* g2d;
-  g3d->Get2dDriver (&g2d);
-  csRenderView rview (*c, view, g3d, g2d);
+  iGraphics2D *G2D = G3D->GetDriver2D ();
+  csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = NULL;
 
@@ -795,23 +816,16 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   s->Draw (rview);
 
   // draw all halos on the screen
-  IHaloRasterizer* piHR = NULL;
-  bool supports_halos;
-
-  supports_halos = g3d->QueryInterface (IID_IHaloRasterizer, (void**)&piHR) == S_OK ? true : false;
-  
   csHaloInformation* pinfo;
-  
-  for (int cntHalos = 0; cntHalos <halos.Length(); cntHalos++)
+  for (int cntHalos = 0; cntHalos < halos.Length(); cntHalos++)
   {
-    HRESULT hres = S_FALSE;
-
+    bool halo_drawn = false;
     pinfo = (csHaloInformation*)halos.Get(cntHalos);
 
     float hintensity = pinfo->pLight->GetHaloIntensity ();
 
     if (pinfo->pLight->GetReferenceCount () == 0)
-    {      
+    {
       hintensity -= .15f;
 
       // this halo is completely invisible. kill it.
@@ -819,8 +833,8 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
       {
         halos.Delete(cntHalos);
         pinfo->pLight->SetHaloInQueue (false);
-        
-        piHR->DestroyHalo(pinfo->haloinfo);
+
+        HaloRast->DestroyHalo(pinfo->haloinfo);
         delete pinfo;
 
         cntHalos--;
@@ -831,49 +845,47 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
     }
     else
     {
-
       if (hintensity < pinfo->pLight->GetHaloMaxIntensity ())
         hintensity += .15f;
-      
+
       if (hintensity > pinfo->pLight->GetHaloMaxIntensity ())
         hintensity = pinfo->pLight->GetHaloMaxIntensity ();
 
       pinfo->pLight->SetHaloIntensity (hintensity);
     }
-  
-    if (supports_halos)
+
+    if (HaloRast)
     {
       // project the halo.
       pinfo->v = rview.World2Camera (pinfo->pLight->GetCenter ());
-      
+
       if (pinfo->v.z > SMALL_Z)
       {
         float iz = rview.aspect/pinfo->v.z;
         pinfo->v.x = pinfo->v.x * iz + rview.shift_x;
         pinfo->v.y = frame_height - 1 - (pinfo->v.y * iz + rview.shift_y);
-        
+
         pinfo->intensity = pinfo->pLight->GetHaloIntensity ();
 
-        hres = piHR->DrawHalo(&pinfo->v, pinfo->intensity, pinfo->haloinfo);
+        HaloRast->DrawHalo (&pinfo->v, pinfo->intensity, pinfo->haloinfo);
+        halo_drawn = true;
       }
     }
 
     // was this halo actually drawn?
-    if (hres == S_FALSE)
-      pinfo->pLight->RemoveReference();
+    if (!halo_drawn)
+      pinfo->pLight->RemoveReference ();
     else
-      if(!pinfo->pLight->GetReferenceCount())
+      if (!pinfo->pLight->GetReferenceCount ())
         pinfo->pLight->AddReference();
-  }   
-  if (piHR) piHR->Release();
+  }
 }
 
-void csWorld::DrawFunc (IGraphics3D* g3d, csCamera* c, csClipper* view,
+void csWorld::DrawFunc (csCamera* c, csClipper* view,
 	csDrawFunc* callback, void* callback_data)
 {
-  IGraphics2D* g2d;
-  g3d->Get2dDriver (&g2d);
-  csRenderView rview (*c, view, g3d, g2d);
+  iGraphics2D* G2D = G3D->GetDriver2D ();
+  csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = callback;
   rview.callback_data = callback_data;
@@ -936,7 +948,7 @@ void csWorld::RemoveDynLight (csDynLight* dyn)
   dyn->SetPrev (NULL);
 }
 
-void csWorld::AdvanceSpriteFrames (long current_time)
+void csWorld::AdvanceSpriteFrames (time_t current_time)
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
@@ -946,25 +958,25 @@ void csWorld::AdvanceSpriteFrames (long current_time)
   }
 }
 
-void csWorld::ReadConfig (csIniFile* config)
+void csWorld::ReadConfig ()
 {
-  if (!config) return;
-  csPolygon3D::def_mipmap_size = config->GetInt ("Lighting", "LIGHTMAP_SIZE", 16);
-  csPolygon3D::do_lightmap_highqual = config->GetYesNo ("Lighting", "LIGHTMAP_HIGHQUAL", true);
-  csLight::ambient_red = config->GetInt ("World", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_green = config->GetInt ("World", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_blue = config->GetInt ("World", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_white = config->GetInt ("World", "AMBIENT_WHITE", DEFAULT_LIGHT_LEVEL);
+  if (!System) return;
+  csPolygon3D::def_mipmap_size = System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16);
+  csPolygon3D::do_lightmap_highqual = System->ConfigGetYesNo ("Lighting", "LIGHTMAP_HIGHQUAL", true);
+  csLight::ambient_red = System->ConfigGetInt ("World", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_green = System->ConfigGetInt ("World", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_blue = System->ConfigGetInt ("World", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_white = System->ConfigGetInt ("World", "AMBIENT_WHITE", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_red += csLight::ambient_white;
   csLight::ambient_green += csLight::ambient_white;
   csLight::ambient_blue += csLight::ambient_white;
-  csSector::cfg_reflections = config->GetInt ("Lighting", "REFLECT", csSector::cfg_reflections);
-  csSector::do_radiosity = config->GetYesNo ("Lighting", "RADIOSITY", csSector::do_radiosity);
-  csPolyTexture::do_accurate_things = config->GetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
-  csPolyTexture::cfg_cosinus_factor = config->GetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
-  csSprite3D::do_quality_lighting = config->GetYesNo ("Lighting", "SPRITE_HIGHQUAL", csSprite3D::do_quality_lighting);
+  csSector::cfg_reflections = System->ConfigGetInt ("Lighting", "REFLECT", csSector::cfg_reflections);
+  csSector::do_radiosity = System->ConfigGetYesNo ("Lighting", "RADIOSITY", csSector::do_radiosity);
+  csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
+  csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
+  csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SPRITE_HIGHQUAL", csSprite3D::do_quality_lighting);
   //@@@
-  //Textures::Gamma = config->GetFloat ("TextureMapper", "GAMMA", 1.0);
+  //Textures::Gamma = System->ConfigGetFloat ("TextureMapper", "GAMMA", 1.0);
 }
 
 void csWorld::UnlinkSprite (csSprite3D* sprite)
@@ -992,7 +1004,7 @@ struct LightAndDist
 
 // csLightArray is a subclass of csCleanable which is registered
 // to csWorld.cleanup.
-class csLightArray : public csCleanable
+class csLightArray : public csBase
 {
 public:
   LightAndDist* array;
@@ -1100,18 +1112,4 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
       lights[i] = light_array->GetLight (i);
     return max_num_lights;
   }
-}
-
-//---------------------------------------------------------------------------
-
-STDMETHODIMP csWorld::GetSpriteTemplate(IString* /*name*/, ISpriteTemplate** /*itmpl*/) {
-//	*itmpl=GetSpriteTemplate(csSTR(name))->GetISpriteTemplate();
-
-	return S_OK;
-}
-
-STDMETHODIMP csWorld::PushSpriteTemplate(ISpriteTemplate* /*itmpl*/) {
-//	sprite_templates.Push(GET_PARENT(SpriteTemplate, tmpl));
-
-	return S_OK;
 }

@@ -26,7 +26,7 @@
 
 #include <Sound.h>
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "isnddrv.h"
 
 extern const CLSID CLSID_MacSoundDriver;
@@ -34,7 +34,7 @@ extern const CLSID CLSID_MacSoundDriver;
 class csSoundDriverMac : public ISoundDriver
 {
 protected:
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
   ISoundRender *m_piSoundRender;
   void * Memory;
   int MemorySize;
@@ -44,7 +44,7 @@ protected:
   bool m_bStereo;
 
 public:
-	csSoundDriverMac(ISystem* piSystem);
+	csSoundDriverMac(iSystem* piSystem);
 
 	virtual ~csSoundDriverMac();
 
@@ -84,7 +84,7 @@ private:
 
 class csSoundDriverMacFactory : public ISoundDriverFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

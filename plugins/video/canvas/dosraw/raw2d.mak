@@ -21,6 +21,8 @@ all drivers drivers2d: raw2d
 
 raw2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+raw2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -42,21 +44,17 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/dosraw
 
-.PHONY: raw2dclean raw2dcleanlib raw2d
+.PHONY: raw2d raw2dclean
 
 # Chain rules
 clean: raw2dclean
-cleanlib: raw2dcleanlib
 raw2d: $(OUTDIRS) $(RAW2D)
 
 $(RAW2D): $(OBJ.RAW2D)
 	$(DO.LIBRARY)
 
 raw2dclean:
-	$(RM) $(RAW2D)
-
-raw2dcleanlib:
-	$(RM) $(OBJ.RAW2D) $(RAW2D)
+	$(RM) $(RAW2D) $(OBJ.RAW2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)raw2d.dep

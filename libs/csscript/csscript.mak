@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csscript
 csscript:
 	$(MAKE_TARGET)
+csscriptclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 

@@ -220,24 +220,23 @@ void csScan_Finalize ()
   CHK (delete [] Scan.filter_mul_table);
 }
 
-void csScan_InitDraw (csGraphics3DSoftware* g3d, IPolygonTexture* tex,
+void csScan_InitDraw (csGraphics3DSoftware* g3d, iPolygonTexture* tex,
   csTextureMMSoftware* texture, csTexture* untxt)
 {
   Scan.Texture = texture;
   Scan.tw = untxt->get_width ();
   Scan.th = untxt->get_height ();
-  Scan.tmap = untxt->get_bitmap8 ();
+  Scan.tmap = untxt->get_bitmap ();
   Scan.shf_w = untxt->get_w_shift ();
   Scan.and_w = untxt->get_w_mask ();
   Scan.shf_h = untxt->get_h_shift ();
   Scan.and_h = untxt->get_h_mask ();
 
-  Scan.FlatColor = texture->get_mean_color_idx ();
+  Scan.FlatColor = texture->GetMeanColor ();
 
   if (g3d->do_lighting)
   {
-    void* td = NULL;
-    tex->GetTCacheData (&td);
+    void* td = tex->GetTCacheData ();
     if (td)
     {
       TCacheLightedTexture* tclt = (TCacheLightedTexture*)td;
@@ -246,22 +245,22 @@ void csScan_InitDraw (csGraphics3DSoftware* g3d, IPolygonTexture* tex,
     else
       Scan.tmap2 = NULL;	// Not a lighted texture.
 
-    tex->GetFDU (Scan.fdu);
-    tex->GetFDV (Scan.fdv);
+    Scan.fdu = tex->GetFDU ();
+    Scan.fdv = tex->GetFDV ();
   }
   else
   {
     Scan.tmap2 = NULL;
     Scan.fdu = Scan.fdv = 0;
   }
-  tex->GetWidth (Scan.tw2);
-  tex->GetHeight (Scan.th2);
+  Scan.tw2 = tex->GetWidth ();
+  Scan.th2 = tex->GetHeight ();
 
 #ifdef STUPID_TEST
   Scan.tw2fp = (Scan.tw2 << 16) - 1;
   Scan.th2fp = (Scan.th2 << 16) - 1;
 #endif
-  tex->GetShiftU (Scan.shf_u);
+  Scan.shf_u = tex->GetShiftU ();
 
   Scan.and_h <<= Scan.shf_w;
   Scan.shf_h = 16 - Scan.shf_w;

@@ -22,7 +22,6 @@
 #include "qint.h"
 #include "csparser/csloader.h"
 #include "csutil/inifile.h"
-#include "csutil/vfs.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
 #include "csinput/cseventq.h"
@@ -35,6 +34,7 @@
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 #include "isystem.h"
+#include "ivfs.h"
 #include "itxtmgr.h"
 
 // Archive path of CSWS.CFG
@@ -75,7 +75,6 @@ csApp::csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csC
 
   CHK (Mouse = new csMouse (NULL));
   Mouse->app = this;
-  CHK (GfxPpl = new csGraphicsPipeline ());
 
   // Create the system driver object
   CHK (System = new cswsSystemDriver (this));
@@ -112,32 +111,35 @@ void csApp::printf (int mode, char* str, ...)
 
 void csApp::ShutDown ()
 {
-  System->Shutdown = true;
+  System->StartShutdown ();
 }
 
-bool csApp::InitialSetup (int argc, char *argv[],
-  const char *iConfigName, const char *iVfsConfigName, const char* iDataDir)
+bool csApp::InitialSetup (int argc, char *argv[], const char *iConfigName,
+  const char* iDataDir)
 {
-  System->Initialize (argc, argv, iConfigName, iVfsConfigName, NULL);
+  if (!System->Initialize (argc, argv, iConfigName))
+    return false;
+
+  // Create the graphics pipeline
+  CHK (GfxPpl = new csGraphicsPipeline (System));
 
   // For GUI apps double buffering is a serious performance hit
-  System->piG2D->DoubleBuffer (false);
+  System->G2D->DoubleBuffer (false);
 
   // Change to the directory on VFS where we keep our data
-  System->Vfs->ChDir (iDataDir);
+  System->VFS->ChDir (iDataDir);
 
   EventQueue = System->EventQueue;
 
-  int Width, Height;
-  System->piGI->GetWidth (Width);
-  System->piGI->GetHeight (Height);
+  int Width = System->G2D->GetWidth ();
+  int Height = System->G2D->GetHeight ();
   bound.Set (0, 0, Width, Height);
   dirty.Set (bound);
   WindowListWidth = Width / 3;
   WindowListHeight = Width / 6;
 
   // Tell printf() console is ready
-  System->DemoReady = true;
+  System->ConsoleReady = true;
 
   LoadConfig ();
   // Compute and set the work palette (instead of console palette)
@@ -147,9 +149,7 @@ bool csApp::InitialSetup (int argc, char *argv[],
 
 int csApp::GetPage ()
 {
-  int Page;
-  System->piGI->GetPage (Page);
-  return Page;
+  return System->G2D->GetPage ();
 }
 
 void csApp::Loop ()
@@ -157,9 +157,10 @@ void csApp::Loop ()
   System->Loop();
 }
 
-void csApp::NextFrame ()
+void csApp::NextFrame (time_t elapsed_time, time_t current_time)
 {
-  Process ();
+  (void)elapsed_time;
+  CurrentTime = current_time;
 
   // Now update screen
   if (GfxPpl->BeginDraw ())
@@ -221,9 +222,9 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
     }
 
   // Now load the texture
-  ImageFile *image;
+  csImageFile *image;
   size_t size;
-  char *fbuffer = System->Vfs->ReadFile (filename, size);
+  char *fbuffer = System->VFS->ReadFile (filename, size);
   CHK (delete [] buffer);
   if (!fbuffer || !size)
   {
@@ -264,7 +265,7 @@ void csApp::LoadConfig ()
     CHKB (dialogdefs = new csStrVector (16, 16));
 
   size_t cswscfglen;
-  char *cswscfg = System->Vfs->ReadFile (CSWS_CFG, cswscfglen);
+  char *cswscfg = System->VFS->ReadFile (CSWS_CFG, cswscfglen);
   if (!cswscfg)
   {
     printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", CSWS_CFG);
@@ -308,8 +309,7 @@ void csApp::LoadConfig ()
 
 void csApp::PrepareTextures ()
 {
-  ITextureManager *txtmgr;
-  System->piG3D->GetTextureManager (&txtmgr);
+  iTextureManager *txtmgr = System->G3D->GetTextureManager ();
 
   // Clear all textures from texture manager
   txtmgr->Initialize ();
@@ -337,45 +337,42 @@ void csApp::PrepareTextures ()
 
 void csApp::SetupPalette ()
 {
-  csPixelFormat pfmt;
-  System->piGI->GetPixelFormat (&pfmt);
-  PhysColorShift = ((pfmt.RedShift >= 24) || (pfmt.GreenShift >= 24)
-    || (pfmt.BlueShift >= 24)) ? 8 : 0;
+  csPixelFormat *pfmt = System->G2D->GetPixelFormat ();
+  PhysColorShift = ((pfmt->RedShift >= 24) || (pfmt->GreenShift >= 24)
+    || (pfmt->BlueShift >= 24)) ? 8 : 0;
 
-  ITextureManager* txtmgr;
-  System->piG3D->GetTextureManager (&txtmgr);
-  txtmgr->FindRGB (  0,   0,   0, Pal [cs_Color_Black]);
-  txtmgr->FindRGB (255, 255, 255, Pal [cs_Color_White]);
-  txtmgr->FindRGB (128, 128, 128, Pal [cs_Color_Gray_D]);
-  txtmgr->FindRGB (160, 160, 160, Pal [cs_Color_Gray_M]);
-  txtmgr->FindRGB (204, 204, 204, Pal [cs_Color_Gray_L]);
-  txtmgr->FindRGB (  0,  20,  80, Pal [cs_Color_Blue_D]);
-  txtmgr->FindRGB (  0,  44, 176, Pal [cs_Color_Blue_M]);
-  txtmgr->FindRGB (  0,  64, 255, Pal [cs_Color_Blue_L]);
-  txtmgr->FindRGB ( 20,  80,  20, Pal [cs_Color_Green_D]);
-  txtmgr->FindRGB ( 44, 176,  44, Pal [cs_Color_Green_M]);
-  txtmgr->FindRGB ( 64, 255,  64, Pal [cs_Color_Green_L]);
-  txtmgr->FindRGB ( 80,   0,   0, Pal [cs_Color_Red_D]);
-  txtmgr->FindRGB (176,   0,   0, Pal [cs_Color_Red_M]);
-  txtmgr->FindRGB (255,   0,   0, Pal [cs_Color_Red_L]);
-  txtmgr->FindRGB (  0,  60,  80, Pal [cs_Color_Cyan_D]);
-  txtmgr->FindRGB (  0, 132, 176, Pal [cs_Color_Cyan_M]);
-  txtmgr->FindRGB (  0, 192, 255, Pal [cs_Color_Cyan_L]);
-  txtmgr->FindRGB ( 80,  60,  20, Pal [cs_Color_Brown_D]);
-  txtmgr->FindRGB (176, 132,  44, Pal [cs_Color_Brown_M]);
-  txtmgr->FindRGB (255, 192,  64, Pal [cs_Color_Brown_L]);
+  iTextureManager* txtmgr = System->G3D->GetTextureManager ();
+  Pal [cs_Color_Black]   = txtmgr->FindRGB (  0,   0,   0);
+  Pal [cs_Color_White]   = txtmgr->FindRGB (255, 255, 255);
+  Pal [cs_Color_Gray_D]  = txtmgr->FindRGB (128, 128, 128);
+  Pal [cs_Color_Gray_M]  = txtmgr->FindRGB (160, 160, 160);
+  Pal [cs_Color_Gray_L]  = txtmgr->FindRGB (204, 204, 204);
+  Pal [cs_Color_Blue_D]  = txtmgr->FindRGB (  0,  20,  80);
+  Pal [cs_Color_Blue_M]  = txtmgr->FindRGB (  0,  44, 176);
+  Pal [cs_Color_Blue_L]  = txtmgr->FindRGB (  0,  64, 255);
+  Pal [cs_Color_Green_D] = txtmgr->FindRGB ( 20,  80,  20);
+  Pal [cs_Color_Green_M] = txtmgr->FindRGB ( 44, 176,  44);
+  Pal [cs_Color_Green_L] = txtmgr->FindRGB ( 64, 255,  64);
+  Pal [cs_Color_Red_D]   = txtmgr->FindRGB ( 80,   0,   0);
+  Pal [cs_Color_Red_M]   = txtmgr->FindRGB (176,   0,   0);
+  Pal [cs_Color_Red_L]   = txtmgr->FindRGB (255,   0,   0);
+  Pal [cs_Color_Cyan_D]  = txtmgr->FindRGB (  0,  60,  80);
+  Pal [cs_Color_Cyan_M]  = txtmgr->FindRGB (  0, 132, 176);
+  Pal [cs_Color_Cyan_L]  = txtmgr->FindRGB (  0, 192, 255);
+  Pal [cs_Color_Brown_D] = txtmgr->FindRGB ( 80,  60,  20);
+  Pal [cs_Color_Brown_M] = txtmgr->FindRGB (176, 132,  44);
+  Pal [cs_Color_Brown_L] = txtmgr->FindRGB (255, 192,  64);
 }
 
 int csApp::FindColor (int r, int g, int b)
 {
   int color;
-  ITextureManager *txtmgr;
-  System->piG3D->GetTextureManager (&txtmgr);
-  txtmgr->FindRGB (r, g, b, color);
+  iTextureManager *txtmgr = System->G3D->GetTextureManager ();
+  color = txtmgr->FindRGB (r, g, b);
   return (color >> PhysColorShift) | 0x80000000;
 }
 
-void csApp::Process ()
+bool csApp::ProcessEvents ()
 {
   bool did_some_work = false;
   csEvent *ev;
@@ -386,12 +383,14 @@ void csApp::Process ()
     HandleEvent (ev);
   }
 
-  while ((ev = (EventQueue->Get ())))
+  while ((ev = EventQueue->Get ()))
   {
     did_some_work = true;
-    if (!PreHandleEvent (*ev))
-      if (!HandleEvent (*ev))
-        PostHandleEvent (*ev);
+    if (!System->HandleEvent (*ev)
+     && !PreHandleEvent (*ev)
+     && !HandleEvent (*ev)
+     && !PostHandleEvent (*ev))
+      ; // nobody handled the event
     CHK (delete ev);
   }
 
@@ -413,6 +412,8 @@ void csApp::Process ()
   // If event queue is empty, sleep for one timeslice
   if (!did_some_work)
     Idle ();
+
+  return did_some_work;
 }
 
 void csApp::Idle ()
@@ -552,27 +553,7 @@ void csApp::Draw ()
 
 bool csApp::GetKeyState (int iKey)
 {
-  switch (iKey)
-  {
-    case CSKEY_ESC:       return System->Keyboard->Key.esc;
-    case CSKEY_ENTER:     return System->Keyboard->Key.enter;
-    case CSKEY_TAB:       return System->Keyboard->Key.tab;
-    case CSKEY_BACKSPACE: return System->Keyboard->Key.backspace;
-    case CSKEY_UP:        return System->Keyboard->Key.up;
-    case CSKEY_DOWN:      return System->Keyboard->Key.down;
-    case CSKEY_LEFT:      return System->Keyboard->Key.left;
-    case CSKEY_RIGHT:     return System->Keyboard->Key.right;
-    case CSKEY_PGUP:      return System->Keyboard->Key.pgup;
-    case CSKEY_PGDN:      return System->Keyboard->Key.pgdn;
-    case CSKEY_HOME:      return System->Keyboard->Key.home;
-    case CSKEY_END:       return System->Keyboard->Key.end;
-    case CSKEY_INS:       return System->Keyboard->Key.ins;
-    case CSKEY_DEL:       return System->Keyboard->Key.del;
-    case CSKEY_CTRL:      return System->Keyboard->Key.ctrl;
-    case CSKEY_ALT:       return System->Keyboard->Key.alt;
-    case CSKEY_SHIFT:     return System->Keyboard->Key.shift;
-  }
-  return false;
+  return System->GetKeyState (iKey);
 }
 
 void csApp::Insert (csComponent *comp)

@@ -19,42 +19,47 @@
 #include <stdarg.h>
 #include "sysdef.h"
 #include "cs2d/beglide2/glidebe2d.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "cssys/be/beitf.h"
-#include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "cs3d/glide2/glidelib.h"
 #include "isystem.h"
 
-BEGIN_INTERFACE_TABLE (csGraphics2DBeGlide)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGlide2xGraphicsInfo, XGlide2xGraphicsInfo )
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DBeGlide)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DBeGlide)
+EXPORT_CLASS_TABLE (glidebe2d)
+  EXPORT_CLASS (csGraphics2DBeGlide, "crystalspace.graphics2d.glidebe",
+    "BeOS/Glide2 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-  // replace this with config stuff...
+IMPLEMENT_IBASE (csGraphics2DBeGlide)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
+
+// replace this with config stuff...
 bool DoGlideInWindow=true; 
 
 // csGraphics2DGLX functions
-csGraphics2DBeGlide::csGraphics2DBeGlide(ISystem* piSystem) :
-  csGraphics2DGlideCommon (piSystem)//, xim (NULL), cmap (0)
+csGraphics2DBeGlide::csGraphics2DBeGlide(iBase *iParent) :
+  csGraphics2DGlideCommon (iParent)//, xim (NULL), cmap (0)
 {
-  System = piSystem;
-  if (FAILED (System->QueryInterface (IID_IBeLibSystemDriver, (void**)&BeSystem)))
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the IBeSystemDriver interface\n");
-    exit (-1);
-  }
 }
 
-void csGraphics2DBeGlide::Initialize()
+bool csGraphics2DBeGlide::Initialize(iSystem *pSystem)
 {
-  csGraphics2D::Initialize ();
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  BeSystem = QUERY_INTERFACE (System, iBeLibSystemDriver);
+  if (!BeSystem))
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
+                               "the iBeSystemDriver interface\n");
+    return false;
+  }
 
   // get current screen depth
   curr_color_space = BScreen(B_MAIN_SCREEN_ID).ColorSpace();
@@ -69,7 +74,7 @@ void csGraphics2DBeGlide::Initialize()
   
   // temporary bitmap
   CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space));
-
+  return true;
 }
 
 csGraphics2DBeGlide::~csGraphics2DBeGlide () 
@@ -79,7 +84,7 @@ csGraphics2DBeGlide::~csGraphics2DBeGlide ()
   // Destroy your graphic interface
   GraphicsReady=0;
   if (BeSystem)
-    FINAL_RELEASE (BeSystem);
+    BeSystem->DecRef ();
 }
 
 bool csGraphics2DBeGlide::Open(const char *Title)
@@ -324,7 +329,7 @@ void csGraphics2DBeGlide::WriteCharGlide (int x, int y, int fg, int bg, char c)
   // not implemented yet...
 }
 
-void csGraphics2DBeGlide::DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy,
+void csGraphics2DBeGlide::DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy,
   int sw, int sh, int tx, int ty, int tw, int th)
 {
   // not implemented yet...
@@ -349,10 +354,10 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		GreenMask = 0x1f << 5;
   		BlueMask  = 0x1f;
   		
-  		DrawPixel = DrawPixel16;
-  		WriteChar = WriteChar16;
-  		GetPixelAt= GetPixelAt16;
-  		DrawSprite= DrawSprite16;
+  		_DrawPixel = DrawPixel16;
+  		_WriteChar = WriteChar16;
+  		_GetPixelAt= GetPixelAt16;
+  		_DrawSprite= DrawSprite16;
   		
   		pfmt.PixelBytes = 2;
   		pfmt.PalEntries = 0;
@@ -370,10 +375,10 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		GreenMask = 0x3f << 5;
   		BlueMask  = 0x1f;
   		
-  		DrawPixel = DrawPixel16;
-  		WriteChar = WriteChar16;
-  		GetPixelAt= GetPixelAt16;
-  		DrawSprite= DrawSprite16;
+  		_DrawPixel = DrawPixel16;
+  		_WriteChar = WriteChar16;
+  		_GetPixelAt= GetPixelAt16;
+  		_DrawSprite= DrawSprite16;
   		
   		pfmt.PixelBytes = 2;
   		pfmt.PalEntries = 0;
@@ -392,10 +397,10 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		GreenMask = 0xff << 8;
   		BlueMask  = 0xff;
   		
-  		DrawPixel = DrawPixel32;
-  		WriteChar = WriteChar32;
-  		GetPixelAt= GetPixelAt32;
-  		DrawSprite= DrawSprite32;
+  		_DrawPixel = DrawPixel32;
+  		_WriteChar = WriteChar32;
+  		_GetPixelAt= GetPixelAt32;
+  		_DrawSprite= DrawSprite32;
   		
   		pfmt.PixelBytes = 4;
   		pfmt.PalEntries = 0;

@@ -23,7 +23,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/software/srdrcom.h"
 #include "cssndrdr/software/srdrlst.h"
 #include "cssndrdr/software/srdrsrc.h"
@@ -55,7 +55,7 @@ enum PRIORITY_FUNC
   Priority_Down
 };
 
-csSoundRenderSoftware::csSoundRenderSoftware(ISystem* piSystem):m_pListener(NULL)
+csSoundRenderSoftware::csSoundRenderSoftware(iSystem* piSystem):m_pListener(NULL)
 {
   HRESULT hRes;
   m_piSystem = piSystem;

@@ -77,7 +77,7 @@ void Dumper::dump (csBox* b)
 void Dumper::dump (csCamera* c)
 {
   CsPrintf (MSG_DEBUG_0, "csSector: %s\n", 
-            c->sector ? c->sector->GetName () : "(?)");
+    c->sector ? c->sector->GetName () : "(?)");
   dump (&c->v_o2t, "Camera vector");
   dump (&c->m_o2t, "Camera matrix");
 }

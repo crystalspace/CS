@@ -24,7 +24,7 @@
 // NETWORK.H
 // csNetworkDriverNull class.
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csnetdrv/null/drvndefs.h"
 #include "inetdrv.h"
 
@@ -39,7 +39,7 @@ class csNetworkDriverNull : public INetworkDriver
 protected:
 
 public:
-	csNetworkDriverNull(ISystem* piSystem);
+	csNetworkDriverNull(iSystem* piSystem);
 
 	virtual ~csNetworkDriverNull();
 
@@ -47,7 +47,7 @@ public:
 
 	STDMETHODIMP Close();
 
-	STDMETHODIMP Connect(DWORD /*dwID*/, CS_NET_ADDRESS * /*lpNetAddress*/);
+	STDMETHODIMP Connect(DWORD /*dwID*/, csNetworkAddress * /*lpNetAddress*/);
 
 	STDMETHODIMP Disconnect(DWORD /*dwID*/);
 
@@ -55,9 +55,9 @@ public:
 
 	STDMETHODIMP Receive(DWORD /*dwID*/, DWORD * /*lpdwBytesToReceive*/ /* in/out */, char * /*lpDataBuffer*/);
 
-	STDMETHODIMP SetListenState(DWORD /*dwID*/, CS_NET_LISTENPARAMS * /*lpCSListenParams*/);
+	STDMETHODIMP SetListenState(DWORD /*dwID*/, int /*iPort*/);
 
-	STDMETHODIMP Accept(DWORD /*dwLID*//*listening socket*/, DWORD * /*lpdwID*//*server socket*/, CS_NET_ADDRESS * /*lpCSNetAddress*//*out*/);
+	STDMETHODIMP Accept(DWORD /*dwLID*//*listening socket*/, DWORD * /*lpdwID*//*server socket*/, csNetworkAddress * /*lpCSNetAddress*//*out*/);
 
 	STDMETHODIMP Spawn(DWORD * /*lpdwID*/ /*out*/, DWORD /*dwType*/);
 
@@ -65,7 +65,7 @@ public:
 
 	STDMETHODIMP KillAll();
 
-	STDMETHODIMP GetDriverCaps(CS_NET_DRIVERCAPS *lpCSNetDriverCaps);
+	STDMETHODIMP GetDriverCaps(csNetworkCaps *lpCSNetDriverCaps);
 
 	STDMETHODIMP GetLastError();
 
@@ -75,7 +75,7 @@ public:
 
 class csNetworkDriverNullFactory : public INetworkDriverFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

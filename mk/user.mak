@@ -24,6 +24,11 @@ ifndef MODE
   MODE=optimize
 endif
 
+# Default list of plugins
+ifndef PLUGINS
+  PLUGINS=csclear cspython
+endif
+
 # Should we use NASM for assembly?
 ifndef USE_NASM
   USE_NASM=no
@@ -97,10 +102,3 @@ USE_MESA=1
 ifndef DEPEND_TOOL
   DEPEND_TOOL=cc
 endif
-
-# Set this flag to 'yes' if you have a buggy egcs compiler.  You need to set
-# this flag if your EGCS compiler crashes with an "internal compiler error"
-# while compiling Crystal Space.
-BUGGY_EGCS_COMPILER=yes
-
-PYTHON_PATH=/usr/include/python1.5

@@ -31,7 +31,7 @@ public:
   virtual bool HandleEvent (csEvent &Event);
 
   virtual bool InitialSetup (int argc, char *argv[],
-    const char *ConfigName, const char *VfsConfigName, const char* DataDir);
+    const char *ConfigName, const char* DataDir);
 };
 
 csWsTest *app;                        // The main Windowing System object
@@ -53,13 +53,10 @@ csWsTest::csWsTest (char *AppTitle) : csApp (AppTitle)
 }
 
 bool csWsTest::InitialSetup (int argc, char *argv[],
-  const char *ConfigName, const char *VfsConfigName, const char* DataDir)
+  const char *ConfigName, const char* DataDir)
 {
-  if (!csApp::InitialSetup (argc, argv, ConfigName, VfsConfigName, DataDir))
+  if (!csApp::InitialSetup (argc, argv, ConfigName, DataDir))
     return false;
-
-  // For GUI apps double buffering is a performance hit
-  System->piG2D->DoubleBuffer (false);
 
   printf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
   printf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
@@ -327,7 +324,7 @@ int main (int argc, char* argv[])
 {
   app = new csWsTest ("Crystal Space 3D maze editor");
 
-  if (app->InitialSetup (argc, argv, "MazeD.cfg", "VFS.cfg", "/lib/MazeD"))
+  if (app->InitialSetup (argc, argv, "MazeD.cfg", "/lib/MazeD"))
     app->Loop ();
 
   return (0);

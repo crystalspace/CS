@@ -22,16 +22,14 @@
 #ifndef __IDJGPP_H__
 #define __IDJGPP_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
-extern const IID IID_IDosSystemDriver;
-
-interface IDosSystemDriver : public IUnknown
+SCF_INTERFACE (iDosSystemDriver, 0, 0, 1) : public iBase
 {
   /// Enable or disable text-mode CsPrintf
-  STDMETHOD (EnablePrintf) (bool Enable) PURE;
+  virtual void EnablePrintf (bool Enable) = 0;
   /// Set mouse position since mouse driver is part of system driver
-  STDMETHOD (SetMousePosition) (int x, int y) PURE;
+  virtual bool SetMousePosition (int x, int y) = 0;
 };
 
 #endif // __IDJGPP_H__

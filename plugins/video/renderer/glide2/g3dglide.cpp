@@ -62,18 +62,22 @@
 #include "cs3d/glide2/glidelib.h"
 #include "cs3d/glide2/g3dglide.h"
 
-csIniFile *configglide;
-
 //
 // Interface table definition
 //
 
-IMPLEMENT_UNKNOWN(csGraphics3DGlide2x)
+IMPLEMENT_FACTORY (csGraphics3DGlide2x)
 
-BEGIN_INTERFACE_TABLE(csGraphics3DGlide2x)
-  IMPLEMENTS_INTERFACE( IGraphics3D )
-  IMPLEMENTS_INTERFACE (IHaloRasterizer)
-END_INTERFACE_TABLE()
+EXPORT_CLASS_TABLE (glide23d)
+  EXPORT_CLASS (csGraphics3DGlide2x, "crystalspace.graphics3d.glide.2",
+    "Glide v2 3D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csGraphics3DGlide2x)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iHaloRasterizer)
+IMPLEMENT_IBASE_END
 
 // Error Message handling
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
@@ -229,7 +233,7 @@ void csGraphics3DGlide2x::InitializeBoard(GrHwConfiguration & hw)
       iTMULightMap=0;
     } break;
   }
-  if(configglide->GetYesNo("Glide2x","FORCEMULTIPASS",FALSE)&& m_iMultiPass==false)
+  if(config->GetYesNo("Glide2x","FORCEMULTIPASS",FALSE)&& m_iMultiPass==false)
     {
       SysPrintf (MSG_INITIALIZATION, " MultiPass Rendering enable by user.\n");
       m_iMultiPass=true;
@@ -368,106 +372,14 @@ int csGraphics3DGlide2x::SelectBoard(GrHwConfiguration & hwconfig)
   return board;
 }
 
-csGraphics3DGlide2x::csGraphics3DGlide2x(ISystem* piSystem) :
+csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
     m_pTextureCache(NULL),
-    m_pLightmapCache(NULL),
-    m_piSystem(piSystem)    
+    m_pLightmapCache(NULL)
 {
-  HRESULT hRes;
-// BM 21-02: Not existing definition replaced
-#if !defined (OS_WIN32) && !defined (OS_MACOS)
-#ifndef GLIDE_2D_DRIVER
-  char *sz2DDriver = "crystalspace.graphics3d.glide.2x";
-#else
-  char *sz2DDriver = GLIDE_2D_DRIVER;
-#endif
-#endif
+  CONSTRUCT_IBASE (iParent);
 
-  IGraphics2DFactory* piFactory = NULL;
- 
-
-  m_piSystem->AddRef();
-  ASSERT( m_piSystem );
-
-#if defined (OS_WIN32) || defined (OS_MACOS)
-  // we use a 2d driver include in dll (not separate) for win32 glide
-  piFactory = new csGraphics2DGlide2xFactory();
-#else
-  CLSID clsid2dDriver;
-  hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
-
-  if (FAILED(hRes))
-  {       
-      SysPrintf(MSG_FATAL_ERROR, "Error! 2D Graphics DLL with ProgID \"%s\" not found on this system.", sz2DDriver);
-      exit(0);
-  }
-
-  hRes = csCoGetClassObject( clsid2dDriver, CLSCTX_INPROC_SERVER, NULL, (REFIID)
-IID_IGraphics2DFactory, (void**)&piFactory );
-  if (FAILED(hRes))
-  {
-      SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-      exit(0);
-  }
-#endif
-
-  hRes = piFactory->CreateInstance( IID_IGraphics2D, m_piSystem, (void**)&m_piG2D );
-  if (FAILED(hRes))
-  {
-      SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-      exit(0);
-  }
-
-  FINAL_RELEASE( piFactory );
-
-  CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D));
-}
-
-STDMETHODIMP csGraphics3DGlide2x::Initialize ()
-{ 
-  m_piG2D->Initialize ();
-  txtmgr->InitSystem ();
-
-  SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide2x selected\n");
-
-  configglide = new csIniFile("Glide2x.cfg");
-  m_bVRetrace = configglide->GetYesNo("Glide2x","VRETRACE",FALSE);
-  GrHwConfiguration grconfig;
-  GlideLib_grSstQueryBoards(&grconfig);
-
-
-  if(grconfig.num_sst==0) 
-    sys_fatalerror("csGraphics3DGlide2x::Open : No 3dfx chip found");
-        
-  GlideLib_grGlideInit();
-        
-  if(!GlideLib_grSstQueryHardware(&grconfig))
-    sys_fatalerror("csGraphics3DGlide2x::Open : Unable to find any 3dfx chip");
-        
-  char szVersion[80];
-  GlideLib_grGlideGetVersion(szVersion);
-  SysPrintf (MSG_INITIALIZATION, " Glide %s detected.\n",szVersion);
-  SelectBoard(grconfig);
-  SysPrintf (MSG_INITIALIZATION, " Board %d selected.\n",board);
-        
-  InitializeBoard(grconfig);
-
-  GlideLib_grSstSelect(board);
-
-  m_bHaloEffect=configglide->GetYesNo("Glide2x","DISABLE_HALO", false);
-  if(m_bHaloEffect)
-    SysPrintf (MSG_INITIALIZATION, " Disable Halo Effect support.\n");
-
-  // gsteenss: glide now always uses 16-bit textures !
-
-  /*use16BitTexture=configglide->GetYesNo("Glide2x","USE_16BIT_TEXTURE", false);
-  if(use16BitTexture)
-    SysPrintf (MSG_INITIALIZATION, " Use 16 bits for texture.\n");
-    CHK (m_pTextureCache = new GlideTextureCache(&m_TMUs[0], (use16BitTexture)?16:8, new FixedTextureMemoryManager(m_TMUs[0].memory_size)));*/
-
-  CHK (m_pTextureCache = new GlideTextureCache(&m_TMUs[0], 16, new FixedTextureMemoryManager(m_TMUs[0].memory_size)));
-
-  CHK (m_pLightmapCache = new GlideLightmapCache(&m_TMUs[1],new FixedTextureMemoryManager(m_TMUs[1].memory_size)));
+  m_piSystem = NULL;
+  config = new csIniFile ("Glide2x.cfg");
 
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
@@ -493,8 +405,78 @@ STDMETHODIMP csGraphics3DGlide2x::Initialize ()
   rstate_flat = true;
   rstate_alphablend = true;
   rstate_mipmap = true;
+}
 
-  return S_OK;
+csGraphics3DGlide2x::~csGraphics3DGlide2x()
+{
+  GlideLib_grGlideShutdown();
+
+  if (m_pTextureCache)
+    CHKB (delete m_pTextureCache);
+  if (m_pLightmapCache)
+    CHKB (m_pLightmapCache);
+  if (config)
+    CHKB (delete config);
+  if (m_pCamera)
+    m_pCamera->DecRef ();
+  if (m_piG2D)
+    m_piG2D->DecRef ();
+  if (m_piSystem)
+  {
+    m_piSystem->DeregisterDriver ("iGraphics3D", this);
+    m_piSystem->DecRef ();
+  }
+}
+
+bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
+{
+  (m_piSystem = iSys)->IncRef ();
+
+  if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
+    return false;
+
+  SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide2x selected\n");
+
+  m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER, iGraphics2D);
+  if (!m_piG2D)
+  {
+    SysPrintf (MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
+    return false;
+  }
+
+  CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D));
+  txtmgr->Initialize ();
+
+  m_bVRetrace = config->GetYesNo("Glide2x","VRETRACE",FALSE);
+  GrHwConfiguration grconfig;
+  GlideLib_grSstQueryBoards(&grconfig);
+
+  if(grconfig.num_sst==0) 
+    sys_fatalerror("csGraphics3DGlide2x::Open : No 3dfx chip found");
+        
+  GlideLib_grGlideInit();
+        
+  if(!GlideLib_grSstQueryHardware(&grconfig))
+    sys_fatalerror("csGraphics3DGlide2x::Open : Unable to find any 3dfx chip");
+        
+  char szVersion[80];
+  GlideLib_grGlideGetVersion(szVersion);
+  SysPrintf (MSG_INITIALIZATION, " Glide %s detected.\n",szVersion);
+  SelectBoard(grconfig);
+  SysPrintf (MSG_INITIALIZATION, " Board %d selected.\n",board);
+        
+  InitializeBoard(grconfig);
+
+  GlideLib_grSstSelect(board);
+
+  m_bHaloEffect=config->GetYesNo("Glide2x","DISABLE_HALO", false);
+  if (m_bHaloEffect)
+    SysPrintf (MSG_INITIALIZATION, " Disable Halo Effect support.\n");
+
+  CHK (m_pTextureCache = new GlideTextureCache(&m_TMUs[0], 16, new FixedTextureMemoryManager(m_TMUs[0].memory_size)));
+  CHK (m_pLightmapCache = new GlideLightmapCache(&m_TMUs[1],new FixedTextureMemoryManager(m_TMUs[1].memory_size)));
+
+  return true;
 }
 
 static struct
@@ -537,34 +519,16 @@ static int getResolutionIndex(int width, int height)
   return -1;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::Open(const char* Title)
+bool csGraphics3DGlide2x::Open(const char* Title)
 {
   FxU32 hwnd=0;
   GrScreenResolution_t iRes;
-  HRESULT hRes;
-  IGraphicsInfo*      pGraphicsInfo = NULL;
 
-#if defined(OS_WIN32)
-  HWND w;
-  IGlide2xGraphicsInfo* pSysGInfo = NULL;
-#endif
-
-  
-  hRes=m_piG2D->QueryInterface(IID_IGraphicsInfo, (void**)&pGraphicsInfo);
-  if (FAILED(hRes))
-    goto OnError;
-
-   
   // Open the 2D driver.
-  hRes = m_piG2D->Open(Title);
-  if ( FAILED(hRes) )
-    goto OnError;
+  if (!m_piG2D->Open (Title))
+    goto false;
 
 #if defined(OS_WIN32)
-  hRes = m_piG2D->QueryInterface(IID_IGlide2xGraphicsInfo, (void**)&pSysGInfo);
-  if (FAILED(hRes))
-    goto OnError;
-  
   pSysGInfo->GethWnd(&w);
   if(w)
     hwnd=(FxU32)w;
@@ -573,13 +537,13 @@ STDMETHODIMP csGraphics3DGlide2x::Open(const char* Title)
   if(use16BitTexture)
     SysPrintf(MSG_INITIALIZATION, "  Use 16 bit textures\n");
 
-  pGraphicsInfo->GetWidth(m_nWidth);
+  m_nWidth = pGraphicsInfo->GetWidth();
   m_nHalfWidth = m_nWidth/2;
   
-  pGraphicsInfo->GetHeight(m_nHeight);
+  m_nHeight = pGraphicsInfo->GetHeight();
   m_nHalfHeight = m_nHeight/2;
   
-  if(/*configglide->GetYesNo("VideoDriver","FULL_SCREEN", true)*/true)
+  if(/*config->GetYesNo("VideoDriver","FULL_SCREEN", true)*/true)
     {
       iRes=::getResolutionIndex(m_nWidth, m_nHeight);
       if(iRes==-1)
@@ -668,67 +632,40 @@ STDMETHODIMP csGraphics3DGlide2x::Open(const char* Title)
 
   m_nDrawMode = 0;
 
-  return S_OK;
-
-OnError:
-  
-  if (FAILED(hRes))
-    FINAL_RELEASE(m_piG2D);
-  
-  FINAL_RELEASE(pGraphicsInfo);
-  
-#if defined (OS_WIN32)
-  FINAL_RELEASE(pSysGInfo);
-#endif
-     
-  return hRes;  
+  return true;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::Close()
+void csGraphics3DGlide2x::Close()
 {
   ClearCache();
 
   GlideLib_grSstWinClose();
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
+void csGraphics3DGlide2x::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
 {
   if (use16BitTexture)
     g3dFormat = G3DCOLORFORMAT_PRIVATE;
   else
     g3dFormat = G3DCOLORFORMAT_GLOBAL;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::SetDimensions (int width, int height)
+void csGraphics3DGlide2x::SetDimensions (int width, int height)
 {
   m_nWidth = width;
   m_nHeight = height;
   m_nHalfWidth = width/2;
   m_nHalfHeight = height/2;
   GlideLib_grClipWindow(0, 0, width, height);
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::SetPerspectiveCenter (int x, int y)
+void csGraphics3DGlide2x::SetPerspectiveCenter (int x, int y)
 {
   m_nHalfWidth = x;
   m_nHalfHeight = y;
-  return S_OK;
 }
 
-csGraphics3DGlide2x::~csGraphics3DGlide2x()
-{
-  GlideLib_grGlideShutdown();
-
-  FINAL_RELEASE( m_pCamera );
-  FINAL_RELEASE( m_piG2D );
-  FINAL_RELEASE( m_piSystem );
-}
-
-STDMETHODIMP csGraphics3DGlide2x::BeginDraw (int DrawFlags)
+bool csGraphics3DGlide2x::BeginDraw (int DrawFlags)
 {
   if (DrawFlags & CSDRAW_2DGRAPHICS)
     {
@@ -753,39 +690,35 @@ STDMETHODIMP csGraphics3DGlide2x::BeginDraw (int DrawFlags)
         } /* endif */
     } /* endif */
   m_nDrawMode = DrawFlags;
-  return S_OK;
+  return true;
 }
 
 /// End the frame
-STDMETHODIMP csGraphics3DGlide2x::FinishDraw ()
+void csGraphics3DGlide2x::FinishDraw ()
 {
   if (m_nDrawMode & CSDRAW_2DGRAPHICS)
-                m_piG2D->FinishDraw ();
+    m_piG2D->FinishDraw ();
 
   m_nDrawMode = 0;
-  return S_OK;
 }
 
 /// do the page swap.
-STDMETHODIMP csGraphics3DGlide2x::Print(csRect* rect)
+void csGraphics3DGlide2x::Print(csRect* rect)
 {
    // we need to tell the glide2d driver to update the screen...
   m_piG2D->Print (rect);
-
-
 
   if(m_bVRetrace)
     GlideLib_grBufferSwap(1);
   else
     GlideLib_grBufferSwap(0);
-  return S_OK;
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-STDMETHODIMP csGraphics3DGlide2x::SetZBufMode (G3DZBufMode mode)
+void csGraphics3DGlide2x::SetZBufMode (G3DZBufMode mode)
 {
   if (mode==m_ZBufMode) 
-    return S_OK;
+    return;
   
   m_ZBufMode = mode;
   
@@ -798,9 +731,6 @@ STDMETHODIMP csGraphics3DGlide2x::SetZBufMode (G3DZBufMode mode)
     GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);    
   else 
     GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);    
-  
-  return S_OK;
-
 }
 
 #define SNAP (( float ) ( 3L << 18 ))
@@ -968,7 +898,7 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
   }
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
+void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 {
   GrVertex * verts;
 
@@ -981,7 +911,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   bool is_transparent = false;
   bool is_colorkeyed = false;
   int  poly_alpha;
-  IPolygonTexture* pTex;
+  iPolygonTexture* pTex;
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
   
@@ -992,7 +922,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   pTex = poly.poly_texture[0];
 
   
-  csTextureMMGlide* txt_mm = (csTextureMMGlide*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+  csTextureMMGlide* txt_mm = (csTextureMMGlide*)poly.txt_handle->GetPrivateObject ();
   //csTexture* txt_unl = txt_mm->get_texture (mipmap);
   
 
@@ -1006,23 +936,19 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 
   //HighColorCacheAndManage_Data* tcache;
   //HighColorCacheAndManage_Data* lcache;
-  HighColorCache_Data* tcache = NULL;
-  HighColorCache_Data* lcache = NULL;
+  csHighColorCacheData* tcache = NULL;
+  csHighColorCacheData* lcache = NULL;
   
   // retrieve the cached texture handle.
-  tcache = txt_mm->get_hicolorcache();
+  tcache = txt_mm->GetHighColorCacheData ();
   ASSERT( tcache );
         
-  //FINAL_RELEASE( piTM );
-  //FINAL_RELEASE( piMMC );
-  
   // retrieve the lightmap from the cache.
-  ILightMap* piLM = NULL;
-  pTex->GetLightMap( &piLM );
+  iLightMap* piLM = pTex->GetLightMap ();
   
   if ( piLM )
   {
-    piLM->GetHighColorCache((HighColorCache_Data **) &lcache );
+    lcache = piLM->GetHighColorCache ();
     if (lcache==NULL)
     {
       lm_exists = false;
@@ -1088,16 +1014,12 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
       
       // gsteenss: following few lines were added to scale the lightmaps 
       // correctly (?)  
-      int lmwidth, lmrealwidth, lmheight, lmrealheight;
       float scale_u,scale_v;
  
-      piLM->GetWidth (lmwidth);
-      piLM->GetRealWidth (lmrealwidth);
-      piLM->GetHeight (lmheight);
-      piLM->GetRealHeight (lmrealheight);
-      
-      //piLM->Release();
-      FINAL_RELEASE(piLM);
+      int lmwidth = piLM->GetWidth ();
+      int lmrealwidth = piLM->GetRealWidth ();
+      int lmheight = piLM->GetHeight ();
+      int lmrealheight = piLM->GetRealHeight ();
       
       scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
       scale_v = (float)(lmrealheight-1) / (float)lmheight;
@@ -1129,37 +1051,34 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
     GlideLib_grConstantColorValue(0xFFFFFFFF);
   
   delete[] verts;
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle * /*handle*/,
+void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle * /*handle*/,
   UInt mode)
 {
   m_mixmode = mode;
   m_alpha   = float (mode & CS_FX_MASK_ALPHA) / 255.;
   m_gouraud = rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
+void csGraphics3DGlide2x::FinishPolygonFX()
 {
-  return S_OK; 
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
+void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
 {
   //This implementation is pretty wrong, because it does not take into account all the
   //possible mixmodes. Also performace could be improved pretty much, if the setup
   //stuff for the renderer would move into StartPolygonFX. - Thomas Hieber 07/18/1999
-  HighColorCache_Data* tcache=NULL;
+  csHighColorCacheData* tcache=NULL;
 
-  if (poly.num < 3) return S_OK;
+  if (poly.num < 3)
+    return;
 
-  csTextureMMGlide* txt_mm = (csTextureMMGlide*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+  csTextureMMGlide* txt_mm = (csTextureMMGlide*)poly.txt_handle->GetPrivateObject ();
 
   m_pTextureCache->Add(poly.txt_handle);
-  tcache=txt_mm->get_hicolorcache();
+  tcache = txt_mm->GetHighColorCacheData();
 
   ASSERT( tcache );
         
@@ -1220,60 +1139,45 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
     
     delete[] verts;
   }
-
-  return S_OK;
 }
 
 /// Give a texture to csGraphics3D to cache it.
-STDMETHODIMP csGraphics3DGlide2x::CacheTexture (IPolygonTexture *texture)
+void csGraphics3DGlide2x::CacheTexture (iPolygonTexture *texture)
 {
-  ITextureHandle* txt_handle = NULL;
-
-  texture->GetTextureHandle (&txt_handle);
+  iTextureHandle* txt_handle = texture->GetTextureHandle ();
   m_pTextureCache->Add (txt_handle);
   m_pLightmapCache->Add (texture);
-  return S_OK;  
 }
 
 /// Release a texture from the cache.
-STDMETHODIMP csGraphics3DGlide2x::UncacheTexture (IPolygonTexture *piPT)
+void csGraphics3DGlide2x::UncacheTexture (iPolygonTexture *piPT)
 {
   (void)piPT;
-  return E_NOTIMPL;
 }
 
 /// Dump the texture cache.
-STDMETHODIMP csGraphics3DGlide2x::DumpCache(void)
+void csGraphics3DGlide2x::DumpCache(void)
 {
   m_pTextureCache->Dump();
   m_pLightmapCache->Dump();
-  return S_OK;
 }
 
 /// Clear the texture cache.
-STDMETHODIMP csGraphics3DGlide2x::ClearCache(void)
+void csGraphics3DGlide2x::ClearCache(void)
 {
   if(m_pTextureCache) m_pTextureCache->Clear();
   if(m_pLightmapCache) m_pLightmapCache->Clear();
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawFltLight(G3DFltLight& /*light*/)
-{
-    return E_NOTIMPL;
-}
-
-STDMETHODIMP csGraphics3DGlide2x::GetCaps(G3D_CAPS *caps)
+void csGraphics3DGlide2x::GetCaps(G3D_CAPS *caps)
 {
   if (!caps)
     return E_INVALIDARG;
 
   memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
+void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
 
@@ -1309,17 +1213,15 @@ STDMETHODIMP csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float 
   int py2 = m_nHeight - 1 - QInt (y2 * iz2 + (m_nHeight/2));
 
   m_piG2D->DrawLine (px1, py1, px2, py2, color);
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
+bool csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
 {
   switch (option)
-    {
+  {
     case G3DRENDERSTATE_NOTHING:
-      return S_OK;
-      
+      return true;
+
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
       if (value)
         GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);
@@ -1370,78 +1272,59 @@ STDMETHODIMP csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, l
     rstate_gouraud = value;
     break;
   default:
-    return E_INVALIDARG;
+    return false;
   }
-  
-  return S_OK;
+
+  return true;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::GetRenderState(G3D_RENDERSTATEOPTION op, long& retval)
+long csGraphics3DGlide2x::GetRenderState(G3D_RENDERSTATEOPTION op)
 {
   switch(op)
   {
     case G3DRENDERSTATE_NOTHING:
-      retval = 0;
-      break;
+      return 0;
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      retval = (bool)(m_ZBufMode & CS_ZBUF_TEST);
-      break;
+      return (bool)(m_ZBufMode & CS_ZBUF_TEST);
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      retval = (bool)(m_ZBufMode & CS_ZBUF_FILL);
-      break;
+      return (bool)(m_ZBufMode & CS_ZBUF_FILL);
     case G3DRENDERSTATE_DITHERENABLE:
-      retval = false;
-      break;
+      return false;
     case G3DRENDERSTATE_SPECULARENABLE:
-      retval = rstate_specular;
-      break;
+      return rstate_specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      retval = rstate_bilinearmap;
-      break;
+      return rstate_bilinearmap;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      retval = rstate_trilinearmap;
-      break;
+      return rstate_trilinearmap;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
-      retval = rstate_alphablend;
-      break;
+      return rstate_alphablend;
     case G3DRENDERSTATE_MIPMAPENABLE:
-      retval = rstate_mipmap;
-      break;
+      return rstate_mipmap;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-      retval = !rstate_flat;
-      break;
+      return !rstate_flat;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      retval = rstate_gouraud;
-      break;
+      return rstate_gouraud;
     default:
-      retval = 0;
-      return E_INVALIDARG;
+      return 0;
   }
-  
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::GetZBufPoint(int, int, unsigned long** retval)
+unsigned long *csGraphics3DGlide2x::GetZBufPoint(int, int)
 {
-  *retval = NULL;
-  return E_NOTIMPL;
+  return NULL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
+void csGraphics3DGlide2x::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
 {
-  return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::AddFogPolygon (CS_ID /*id*/, 
-                                                 G3DPolygonAFP& /*poly*/, 
-                                                 int /*fogtype*/)
+void csGraphics3DGlide2x::AddFogPolygon (CS_ID /*id*/, G3DPolygonAFP& /*poly*/, 
+  int /*fogtype*/)
 {
-  return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::CloseFogObject (CS_ID /*id*/)
+void csGraphics3DGlide2x::CloseFogObject (CS_ID /*id*/)
 {
-  return E_NOTIMPL;
 }
 
 
@@ -1457,11 +1340,10 @@ void csGraphics3DGlide2x::SysPrintf(int mode, char* szMsg, ...)
   m_piSystem->Print(mode, buf);
 }
 
-STDMETHODIMP csGraphics3DGlide2x::CreateHalo(float r, float g, float b, HALOINFO* pRetVal)
+csHaloHandle csGraphics3DGlide2x::CreateHalo(float r, float g, float b)
 {
   if(m_bHaloEffect)
   {
-    m_piG2D->AddRef();
     csHaloDrawer halo(m_piG2D, r, g, b);
     
     csG3DHardwareHaloInfo* retval = new csG3DHardwareHaloInfo();
@@ -1493,24 +1375,21 @@ STDMETHODIMP csGraphics3DGlide2x::CreateHalo(float r, float g, float b, HALOINFO
     delete [] mem;
     delete [] lpbuf;
 
-    *pRetVal = (HALOINFO)retval;
-    return S_OK;
+    return (csHaloHandle)retval;
   }
-  *pRetVal = NULL;
-  return S_FALSE;
+  return NULL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DestroyHalo(HALOINFO haloInfo)
+void csGraphics3DGlide2x::DestroyHalo(csHaloHandle haloInfo)
 {
   if(haloInfo != NULL)
   {
     m_pTextureCache->UnloadHalo(((csG3DHardwareHaloInfo*)haloInfo)->halo);
     delete (csG3DHardwareHaloInfo*)haloInfo;
   }
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo)
+void csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
 {
   if(m_bHaloEffect)
   {
@@ -1606,18 +1485,15 @@ STDMETHODIMP csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity,
                             GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
                             FXFALSE,FXFALSE);
     }
-
-    return S_OK;
   }
-  return S_FALSE;
 };
 
-STDMETHODIMP csGraphics3DGlide2x::TestHalo(csVector3* pCenter)
+bool csGraphics3DGlide2x::TestHalo(csVector3* pCenter)
 {
   if(m_bHaloEffect)
   {
     if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
-      return S_FALSE;
+      return false;
 /*
     int izz = QInt24 (1.0f / pCenter->z);
     HRESULT hRes = S_OK;
@@ -1628,26 +1504,22 @@ STDMETHODIMP csGraphics3DGlide2x::TestHalo(csVector3* pCenter)
     if (izz < (int)zb)
       hRes = S_FALSE;
 */
-    return S_OK;
+    return true;
   }
-  return S_FALSE;
+  return false;
 };
 
 /////////////
 
 // csHaloDrawer implementation //
 
-csGraphics3DGlide2x::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, float g, float b)
+csGraphics3DGlide2x::csHaloDrawer::csHaloDrawer(iGraphics2D* iG2D, float r, float g, float b)
 {
   mpBuffer = NULL;
+  (m_piG2D = iG2D)->IncRef();
 
-  IGraphicsInfo* piGI;
-  
-  piG2D->QueryInterface(IID_IGraphicsInfo, (void**)&piGI);
-  mpiG2D = piG2D;
-
-  piGI->GetWidth(mWidth);
-  piGI->GetHeight(mHeight);
+  mWidth = m_piG2D->GetWidth ();
+  mHeight = m_piG2D->GetHeight ();
 
   int dim = 128;
 
@@ -1745,13 +1617,11 @@ csGraphics3DGlide2x::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, flo
 
   drawline_vertical(mx, y1, y2);
 #endif
-
-  FINAL_RELEASE(piGI);
 }
 
 csGraphics3DGlide2x::csHaloDrawer::~csHaloDrawer()
 {
-  FINAL_RELEASE(mpiG2D);
+  m_piG2D->DecRef ();
 }
 
 void csGraphics3DGlide2x::csHaloDrawer::drawline_vertical(int /*x*/, int y1, int y2)

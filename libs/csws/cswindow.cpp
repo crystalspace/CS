@@ -131,10 +131,10 @@ void csWindow::SetButtBitmap (csButton *button, char *id_n, char *id_p)
     return;
 
   int tx,ty,tw,th;
-  FindCFGBitmap (*(app->titlebardefs), id_n, &tx, &ty, &tw, &th);
+  FindCFGBitmap (app->System, *(app->titlebardefs), id_n, &tx, &ty, &tw, &th);
   CHK (csSprite2D *bmpn = new csSprite2D (app->GetTexture (
     TITLEBAR_TEXTURE_NAME), tx, ty, tw, th));
-  FindCFGBitmap (*(app->titlebardefs), id_p, &tx, &ty, &tw, &th);
+  FindCFGBitmap (app->System, *(app->titlebardefs), id_p, &tx, &ty, &tw, &th);
   CHK (csSprite2D *bmpp = new csSprite2D (app->GetTexture (
     TITLEBAR_TEXTURE_NAME), tx, ty, tw, th));
   button->SetBitmap (bmpn, bmpp);

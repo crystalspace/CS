@@ -20,7 +20,6 @@
 #include <stddef.h>
 #include <ctype.h>
 #include "sysdef.h"
-#include "cssys/system.h"
 #include "csengine/csspr2d.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
@@ -1107,8 +1106,8 @@ void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
 void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
 {
   // First clip the line against dirty rectangle
-  if (System->piG2D->ClipLine (x1, y1, x2, y2,
-        dirty.xmin, dirty.ymin, dirty.xmax, dirty.ymax) == S_OK)
+  if (app->ClipLine (x1, y1, x2, y2,
+        dirty.xmin, dirty.ymin, dirty.xmax, dirty.ymax))
     return;
 
  /* Do clipping as follows: create a minimal rectangle which fits the line,
@@ -1136,8 +1135,9 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   {
     csRect *cur = (csRect *)rect[i];
     float xx1 = x1, xx2 = x2, yy1 = y1, yy2 = y2;
-    if (System->piG2D->ClipLine (xx1, yy1, xx2, yy2,
-        cur->xmin, cur->ymin, cur->xmax, cur->ymax) != S_OK)
+
+    if (!app->ClipLine (xx1, yy1, xx2, yy2,
+        cur->xmin, cur->ymin, cur->xmax, cur->ymax))
       app->pplLine (xx1, yy1, xx2, yy2, color);
   }
 }
@@ -1575,7 +1575,7 @@ void csComponent::FindMaxFreeRect (csRect &area)
   if (rect.Length () > 6)
   {
     SetMouse (csmcWait);
-    app->NextFrame ();
+    app->NextFrame (0, app->GetCurrentTime ());
   } /* endif */
 
   // Search the one with maximal area

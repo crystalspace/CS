@@ -19,15 +19,12 @@
 #ifndef __SOFT_TXT_H__
 #define __SOFT_TXT_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
-class csIniFile;
-class csTextureMMSoftware;
 class csTextureManagerSoftware;
-struct HighColorCache_Data;
-interface IImageFile;
+scfInterface iImageFile;
 
 /// The internal texture mapping modes.
 #define TXT_GLOBAL	0	// Textures are mapped with a single palette
@@ -180,7 +177,6 @@ struct TextureTablesAlpha
 class TxtCmapPrivate
 {
   friend class csTextureMMSoftware;
-  friend interface ITextureHandle;
 
 private:
   /**
@@ -226,22 +222,16 @@ protected:
   TxtCmapPrivate* priv_cmap;
  
   /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_global (csTextureManagerSoftware* tex, IImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_24bit (csTextureManagerSoftware* tex, IImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_private (csTextureManagerSoftware* tex, IImageFile* imfile, unsigned char* bm);
+  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm);
+  void convert_to_internal_global (csTextureManagerSoftware* tex, iImageFile* imfile, unsigned char* bm);
+  void convert_to_internal_24bit (csTextureManagerSoftware* tex, iImageFile* imfile, unsigned char* bm);
+  void convert_to_internal_private (csTextureManagerSoftware* tex, iImageFile* imfile, unsigned char* bm);
 
 public:
   ///
-  csTextureMMSoftware (IImageFile* image);
+  csTextureMMSoftware (iImageFile* image);
   ///
   virtual ~csTextureMMSoftware ();
-
-  /// Get the private colormap if any.
-  unsigned char* get_colormap_private () { return priv_cmap->rgb_values; }
-
-  /// Get the conversion table from private to global colormap if any.
-  unsigned char* get_private_to_global () { return priv_cmap->priv_to_global; }
 
   /**
    * Remap the palette of this texture according to the internal
@@ -262,6 +252,12 @@ public:
    * and to the global palette (inside csTextureManagerSoftware).
    */
   void remap_palette_private (csTextureManagerSoftware* new_palette);
+
+  /// Query private colormap (if there is one)
+  unsigned char* GetPrivateColorMap () { return priv_cmap->rgb_values; }
+
+  /// Get the conversion table from private to global colormap if any.
+  unsigned char* GetPrivateToGlobal () { return priv_cmap->priv_to_global; }
 };
 
 /**
@@ -382,34 +378,32 @@ public:
   int force_txtMode;
 
   ///
-  csTextureManagerSoftware (ISystem* piSystem, IGraphics2D* piG2D);
+  csTextureManagerSoftware (iSystem* iSys, iGraphics2D* iG2D);
   ///
   virtual ~csTextureManagerSoftware ();
   ///
-  virtual void InitSystem ();
+  virtual void Initialize ();
 
   ///
   virtual void clear ();
 
   ///
-  STDMETHODIMP Initialize ();
+  virtual void Prepare ();
   ///
-  STDMETHODIMP Prepare ();
+  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d);
   ///
-  STDMETHODIMP RegisterTexture (IImageFile* image, ITextureHandle** handle, bool for3d, bool for2d);
+  virtual void UnregisterTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP UnregisterTexture (ITextureHandle* handle);
+  virtual void MergeTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP MergeTexture (ITextureHandle* handle);
+  virtual void FreeImages ();
   ///
-  STDMETHODIMP FreeImages ();
-  ///
-  STDMETHODIMP ReserveColor (int r, int g, int b);
+  virtual void ReserveColor (int r, int g, int b);
   /// Really allocate the palette on the system.
-  STDMETHODIMP AllocPalette ();
+  virtual void AllocPalette ();
 
   /// Create a new texture.
-  csTextureMMSoftware* new_texture (IImageFile* image);
+  csTextureMMSoftware* new_texture (iImageFile* image);
 
   /**
    * Find an rgb value using the palette directly (not use
@@ -511,7 +505,7 @@ public:
 	   pil->blue[b>>16];
   }
 
-  /// Set configuration file for use inside Initialize() call
+  /// Set configuration file for use inside Initialize () call
   void SetConfig (csIniFile* newconfig)
   { config = newconfig; }
 };

@@ -22,8 +22,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"  // texel coords
 #include "csobject/csobj.h"
-#include "csengine/fog.h"
 #include "csengine/cscolor.h"
+#include "igraph3d.h"
 
 class csPolygonTemplate;
 class csTextureHandle;

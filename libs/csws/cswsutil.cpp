@@ -28,10 +28,10 @@
 #include "csws/csstatic.h"
 #include "csws/csradbut.h"
 #include "csws/cscwheel.h"
+#include "csws/cswssys.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csinput/csinput.h"
-#include "cssys/system.h"
 #include "itxtmgr.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"
@@ -203,7 +203,7 @@ csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
 csSprite2D *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   int tw, int th)
 {
-  ITextureHandle *tex = app->GetTexture (texturename);
+  iTextureHandle *tex = app->GetTexture (texturename);
   csSprite2D *spr;
   if (tex)
     CHKB (spr = new csSprite2D (tex, tx, ty, tw, th))
@@ -417,7 +417,8 @@ void RectUnion (csObjVector &rect, csRect &result)
     Combinations (n, n, doRectUnion, &ru);
 }
 
-void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y, int *w, int *h)
+void FindCFGBitmap (cswsSystemDriver *System, csStrVector &sv, char *id,
+  int *x, int *y, int *w, int *h)
 {
   char temp[256];
   *x = -1;
@@ -983,11 +984,9 @@ void cspColorDialog::UpdateInfo (bool UpdateSlider)
 
 void cspColorDialog::SetColor (int iColor)
 {
-  csPixelFormat pfmt;
-  RGBpaletteEntry *palette;
-  System->piGI->GetPixelFormat (&pfmt);
-  System->piGI->GetPalette (&palette);
-  if (pfmt.PalEntries)
+  csPixelFormat *pfmt = System->G2D->GetPixelFormat ();
+  RGBpaletteEntry *palette = System->G2D->GetPalette ();
+  if (pfmt->PalEntries)
   {
     r = float (palette [iColor].red) / 255;
     g = float (palette [iColor].green) / 255;
@@ -995,9 +994,9 @@ void cspColorDialog::SetColor (int iColor)
   }
   else
   {
-    r = float ((iColor & pfmt.RedMask  ) >> pfmt.RedShift  ) / float ((1 << pfmt.RedBits  ) - 1);
-    g = float ((iColor & pfmt.GreenMask) >> pfmt.GreenShift) / float ((1 << pfmt.GreenBits) - 1);
-    b = float ((iColor & pfmt.BlueMask ) >> pfmt.BlueShift ) / float ((1 << pfmt.BlueBits ) - 1);
+    r = float ((iColor & pfmt->RedMask  ) >> pfmt->RedShift  ) / float ((1 << pfmt->RedBits  ) - 1);
+    g = float ((iColor & pfmt->GreenMask) >> pfmt->GreenShift) / float ((1 << pfmt->GreenBits) - 1);
+    b = float ((iColor & pfmt->BlueMask ) >> pfmt->BlueShift ) / float ((1 << pfmt->BlueBits ) - 1);
   }
   RGB2HLS ();
   UpdateInfo (true);

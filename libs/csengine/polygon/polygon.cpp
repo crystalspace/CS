@@ -63,10 +63,10 @@ csLightMapped::~csLightMapped ()
   CHK (delete tex1);
   CHK (delete tex2);
   CHK (delete tex3);
-  if (lightmap) lightmap->Release ();
-  if (lightmap1) lightmap1->Release ();
-  if (lightmap2) lightmap2->Release ();
-  if (lightmap3) lightmap3->Release ();
+  if (lightmap) lightmap->DecRef ();
+  if (lightmap1) lightmap1->DecRef ();
+  if (lightmap2) lightmap2->DecRef ();
+  if (lightmap3) lightmap3->DecRef ();
 }
 
 void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* txtMM)
@@ -218,35 +218,16 @@ void csGouraudShaded::SetDynamicColor (int i, float r, float g, float b)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN_NODELETE (csPolygon3D)
-
-#ifndef BUGGY_EGCS_COMPILER
-
-BEGIN_INTERFACE_TABLE (csPolygon3D)
-	IMPLEMENTS_COMPOSITE_INTERFACE (Polygon3D)
-END_INTERFACE_TABLE ()
-
-#else
-
-const INTERFACE_ENTRY *csPolygon3D::GetInterfaceTable ()
-{
-  static INTERFACE_ENTRY InterfaceTable[2];
-  InterfaceTable[0].pIID = &IID_IPolygon3D;
-  InterfaceTable[0].pfnFinder = ENTRY_IS_OFFSET;
-  InterfaceTable[0].dwData = COMPOSITE_OFFSET(csPolygon3D, IPolygon3D, IPolygon3D, m_xPolygon3D);
-  InterfaceTable[1].pIID = 0;
-  InterfaceTable[1].pfnFinder = 0;
-  InterfaceTable[1].dwData = 0;
-  return InterfaceTable;
-}
-
-#endif
-
 CSOBJTYPE_IMPL(csPolygon3D,csObject);
+
+IMPLEMENT_IBASE (csPolygon3D)
+  IMPLEMENTS_INTERFACE (iPolygon3D)
+IMPLEMENT_IBASE_END
 
 csPolygon3D::csPolygon3D (csTextureHandle* texture)
 	: csObject (), csPolygonInt (), vertices (4)
 {
+  CONSTRUCT_IBASE (NULL);
   txtMM = texture;
   if (texture) SetTexture (texture);
 
@@ -430,9 +411,9 @@ void csPolygon3D::SetTexture (csTextureHandle* texture)
   txtMM = texture;
 }
 
-ITextureHandle* csPolygon3D::GetTextureHandle ()
+iTextureHandle* csPolygon3D::GetTextureHandle ()
 {
-  return txtMM ? txtMM->GetTextureHandle () : (ITextureHandle*)NULL;
+  return txtMM ? txtMM->GetTextureHandle () : (iTextureHandle*)NULL;
 }
 
 
@@ -440,9 +421,7 @@ bool csPolygon3D::IsTransparent ()
 {
   if (GetAlpha ())
     return true;
-  bool transp;
-  GetTextureHandle ()->GetTransparent (transp);
-  return transp;
+  return GetTextureHandle ()->GetTransparent ();
 }
 
 int csPolygon3D::Classify (const csPlane& pl)
@@ -564,7 +543,7 @@ void csPolygon3D::Finish ()
   }
 }
 
-void csPolygon3D::CreateLightMaps (IGraphics3D* g3d)
+void csPolygon3D::CreateLightMaps (iGraphics3D* g3d)
 {
   if (orig_poly) return;
   csLightMapped* lmi = GetLightMapInfo ();
@@ -574,12 +553,8 @@ void csPolygon3D::CreateLightMaps (IGraphics3D* g3d)
   CHK (delete lmi->lightmap2); lmi->lightmap2 = NULL;
   CHK (delete lmi->lightmap3); lmi->lightmap3 = NULL;
 
-  ITextureManager* txtmgr;
-  g3d->GetTextureManager (&txtmgr);
-  bool vn;
-  txtmgr->GetVeryNice (vn);
-
-  if (vn)
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  if (txtmgr->GetVeryNice ())
     lmi->tex1->SetMipmapSize (def_mipmap_size);
   else
     lmi->tex1->SetMipmapSize (def_mipmap_size>>1);
@@ -627,10 +602,8 @@ void csPolygon3D::CreateLightMaps (IGraphics3D* g3d)
     }
   }
 
-  int aspect;
-  bool po2 = (g3d->NeedsPO2Maps() == S_OK);
-
-  g3d->GetMaximumAspectRatio(aspect);
+  bool po2 = (g3d->NeedsPO2Maps ());
+  int aspect = g3d->GetMaximumAspectRatio ();
 
   if (lmi->lightmap) lmi->lightmap->ConvertFor3dDriver (po2, aspect);
   if (lmi->lightmap1) lmi->lightmap1->ConvertFor3dDriver (po2, aspect);
@@ -1048,8 +1021,10 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
   ind = source;
   while (ind < end)
   {
-    if (ind->z >= SMALL_Z) dest->AddPerspective (*ind);
-    else break;
+    if (ind->z >= SMALL_Z)
+      dest->AddPerspective (*ind);
+    else
+      break;
     ind++;
   }
 
@@ -1060,7 +1035,8 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     // we stop here because the triangle is only visible if all
     // vertices are visible (this is not exactly true but it is
     // easier this way! @@@ CHANGE IN FUTURE).
-    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING)) return false;
+    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
+      return false;
 
     csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
     csVector2 *evert = NULL;
@@ -1651,4 +1627,43 @@ void csPolygon3D::ScaleLightMaps ()
   lmi->tex->lm->Scale (TEXW (lmi->tex), TEXH (lmi->tex), lmi->tex->mipmap_size);
 }
 
-//---------------------------------------------------------------------------
+int csPolygon3D::GetAlpha ()
+{
+  return portal ? portal->GetAlpha () : 0;
+}
+
+csVector3 *csPolygon3D::GetCameraVector (int idx)
+{
+  return &Vcam (idx);
+}
+
+iPolygonTexture *csPolygon3D::GetObjectTexture (int nLevel)
+{
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (lmi)
+  {
+     iPolygonTexture *tex = lmi->GetPolyTex (nLevel);
+     tex->IncRef ();
+     return (tex);
+  }
+  else
+    return NULL;
+}
+
+bool csPolygon3D::UsesMipMaps ()
+{
+  return CheckFlags (CS_POLY_MIPMAP);
+}
+
+iLightMap *csPolygon3D::GetLightMap ()
+{
+  csLightMapped *lmi = GetLightMapInfo ();
+  csLightMap *lm = lmi ? lmi->GetLightMap () : NULL;
+  if (lm)
+  {
+    lm->IncRef ();
+    return lm;
+  }
+  else
+    return NULL;
+}

@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include "sysdef.h"
 #include "cs2d/unxglide2/glidex2d.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "cssys/unix/iunix.h"
@@ -28,37 +28,39 @@
 #include "cs3d/glide2/glidelib.h"
 #include "isystem.h"
 
-BEGIN_INTERFACE_TABLE (csGraphics2DGlideX)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DGlideX)
+EXPORT_CLASS_TABLE (glidex2d)
+  EXPORT_CLASS (csGraphics2DGlideX, "crystalspace.graphics2d.glidex",
+    "Glide/X 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-  // replace this with config stuff...
+// replace this with config stuff...
 bool DoGlideInWindow=true; 
-
-bool locked;
 
 csGraphics2DGlideX* thisPtr=NULL;
 
 // csGraphics2DGLX functions
-csGraphics2DGlideX::csGraphics2DGlideX(ISystem* piSystem) :
-  csGraphics2D (piSystem), xim (NULL), cmap (0)
+csGraphics2DGlideX::csGraphics2DGlideX(iBase *iParent) :
+  csGraphics2D (), xim (NULL), cmap (0)
 {
-  System = piSystem;
-  if (FAILED (System->QueryInterface (IID_IUnixSystemDriver, (void**)&UnixSystem)))
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the IUnixSystemDriver interface\n");
-    exit (-1);
-  }
+  CONSTRUCT_IBASE (iParent);
 }
 
-void csGraphics2DGlideX::Initialize()
+bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
 {
   thisPtr=this;
-  csGraphics2D::Initialize ();
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
+  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
+  if (!UnixSystem)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
+                               "the iUnixSystemDriver interface\n");
+    return false;
+  }
+
   Screen* screen_ptr;
 
   // see if we need to go fullscreen or not...
@@ -79,7 +81,7 @@ void csGraphics2DGlideX::Initialize()
   // Query system settings
   int sim_depth;
   bool do_shm;
-  UnixSystem->GetSettings (sim_depth, do_shm, do_hwmouse);
+  UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
 
@@ -94,8 +96,8 @@ void csGraphics2DGlideX::Initialize()
   
   Depth=16;
 	  
-  DrawPixel = DrawPixelGlide; WriteChar = WriteCharGlide;
-  GetPixelAt = GetPixelAt16;  DrawSprite = DrawSpriteGlide;
+  _DrawPixel = DrawPixelGlide; _WriteChar = WriteCharGlide;
+  _GetPixelAt = GetPixelAt16;  _DrawSprite = DrawSpriteGlide;
     
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;
@@ -126,6 +128,7 @@ void csGraphics2DGlideX::Initialize()
  
   GraphicsReady=1;  
 
+  return true;
 }
 
 csGraphics2DGlideX::~csGraphics2DGlideX ()
@@ -134,21 +137,8 @@ csGraphics2DGlideX::~csGraphics2DGlideX ()
   GraphicsReady=0;
   Close ();
   if (UnixSystem)
-    FINAL_RELEASE (UnixSystem);
+    UnixSystem->DecRef ();
   CHKB (delete [] Memory);
-}
-
-// Used to printf through system driver
-void csGraphics2DGlideX::CsPrintf (int msgtype, const char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
 }
 
 bool csGraphics2DGlideX::Open(const char *Title)
@@ -398,7 +388,7 @@ void csGraphics2DGlideX::SetTMUPalette(int tmu)
   GlideLib_grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, &p);		
 }
 
-bool csGraphics2DGlideX::SetMouseCursor (int iShape, ITextureHandle* /*iBitmap*/)
+bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* /*iBitmap*/)
 {
   if (do_hwmouse
    && (iShape >= 0)
@@ -451,7 +441,7 @@ void csGraphics2DGlideX::WriteCharGlide (int x, int y, int fg, int bg, char c)
   // not implemented yet...
 }
 
-void csGraphics2DGlideX::DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy,
+void csGraphics2DGlideX::DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy,
   int sw, int sh, int tx, int ty, int tw, int th)
 {
  // if (!locked) thisPtr->BeginDraw();

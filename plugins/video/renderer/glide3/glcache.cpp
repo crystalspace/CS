@@ -68,11 +68,8 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
   piMMC->GetTexture(0, &piTM);
   ASSERT( piTM );
 
-	int height;
-	int width;
-
-  piTM->GetWidth(width); 
-  piTM->GetHeight(height); 
+  int width = piTM->GetWidth(); 
+  int height = piTM->GetHeight(); 
 
   GrLOD_t lod[4];
 	GrAspectRatio_t aspectRatio=GR_ASPECT_LOG2_1x1;
@@ -252,7 +249,6 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
     }
     else
       texhnd->info.format=GR_TEXFMT_P_8;
-    FINAL_RELEASE( piTM );
 
     texhnd->tmu = m_tmu;
 		for(i=3;lod[i]==-1;i--);
@@ -287,9 +283,9 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
         piMMC->GetTexture(i, &piTM);
         ASSERT( piTM != NULL );
         
-        piTM->GetWidth(width);
-        piTM->GetHeight(height);
-        piTM->GetBitmap(&lpSrc);
+        width = piTM->GetWidth();
+        height = piTM->GetHeight();
+        lpSrc = piTM->GetBitmap();
         ASSERT( lpSrc != NULL );
         
         if(bpp==16)
@@ -320,8 +316,6 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
           lpSrc = (unsigned char *)mem;
         }
 
-        FINAL_RELEASE( piTM );
-
 				grTexDownloadMipMapLevel(texhnd->tmu->tmu_id,
 					texhnd->loadAddress,
 					lod[i],
@@ -344,7 +338,6 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
     texhnd = NULL;
   }
 	
-  FINAL_RELEASE( piMMC );
   d->pData = texhnd;
 }
 
@@ -376,17 +369,11 @@ void GlideLightmapCache::Dump()
 
 void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
 {
-	CHK (TextureHandler *texhnd = new TextureHandler);
-  ILightMap *piLM;
+  CHK (TextureHandler *texhnd = new TextureHandler);
+  iLightMap *piLM = QUERY_INTERFACE (d->pSource, iLightMap);
 
-  VERIFY_SUCCESS( d->pSource->QueryInterface( IID_ILightMap, (void**)&piLM ) );
-  ASSERT( piLM );
-
-  int height; 
-  int width;
-
-  piLM->GetHeight(height);
-  piLM->GetWidth(width);
+  int width = piLM->GetWidth();
+  int height = piLM->GetHeight();
 
   ASSERT(!(height%2));
   ASSERT(!(width%2));
@@ -557,11 +544,11 @@ void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
     texhnd = NULL;
   }
 
-	d->pData = texhnd;
-  FINAL_RELEASE( piLM );
+  d->pData = texhnd;
+  piLM->DecRef ();
 }
 
 void GlideLightmapCache::Unload(HighColorCacheAndManage_Data *d)
 {
-			manager->freeSpaceMem(d->mempos);
+  manager->freeSpaceMem(d->mempos);
 }

@@ -18,7 +18,7 @@
 */ 
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 #undef main
 extern int csMain (int argc, char* argv[]);

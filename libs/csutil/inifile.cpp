@@ -22,7 +22,8 @@
 #include "sysdef.h"
 #include "types.h"
 #include "csutil/inifile.h"
-#include "csutil/archive.h"
+#include "csutil/csstrvec.h"
+#include "csutil/util.h"
 
 // Maximal INI line length
 #define CS_MAXINILINELEN	1024
@@ -480,7 +481,7 @@ bool csIniFile::Save (const char *fName)
     s.f = fopen (fName, "w");
     if (!s.f)
       return false;
-    s.ini->EnumSections (NULL, SaveEnumSec, &s);
+    s.ini->EnumSections (SaveEnumSec, &s);
     fclose (s.f);
     Dirty = false;
   }
@@ -495,29 +496,9 @@ bool csIniFile::Error (int LineNo, const char *Line, int Pos)
   return (false);                    // Continue loading
 }
 
-bool csIniFile::EnumSections (const char *SectionPath, bool (*iterator)
-  (csSome Parm, char *Name), csSome Parm) const
+bool csIniFile::EnumSections (
+  bool (*iterator) (csSome Parm, char *Name), csSome Parm) const
 {
-  int i, j;
-  PrvINIbranch *Sec = FindNode (SectionPath);
-
-  if (!Sec)
-    return (false);
-
-  j = Sec->Length ();
-
-  for (i = 0; i < j; i++)
-  {
-    PrvINInode *cn = (PrvINInode *)(*Sec)[i];
-
-    if (cn->Type == TYPE_SECTION)
-      if (iterator (Parm, cn->Section.Name))
-        break;
-  }
-  return (true);
-}
-
-bool csIniFile::EnumSections(csSTRList* List) {
   int i, j;
   PrvINIbranch *Sec = FindNode (NULL);
 
@@ -528,10 +509,31 @@ bool csIniFile::EnumSections(csSTRList* List) {
 
   for (i = 0; i < j; i++)
   {
-    PrvINInode *cn = (PrvINInode *)(*Sec)[i];
+    PrvINInode *cn = (PrvINInode *)Sec->Get (i);
 
     if (cn->Type == TYPE_SECTION)
-			List->Add(cn->Section.Name);	      
+      if (iterator (Parm, cn->Section.Name))
+        break;
+  }
+  return (true);
+}
+
+bool csIniFile::EnumSections (csStrVector *oList)
+{
+  int i, j;
+  PrvINIbranch *Sec = FindNode (NULL);
+
+  if (!Sec)
+    return (false);
+
+  j = Sec->Length ();
+
+  for (i = 0; i < j; i++)
+  {
+    PrvINInode *cn = (PrvINInode *)Sec->Get (i);
+
+    if (cn->Type == TYPE_SECTION)
+      oList->Push (strnew (cn->Section.Name));
   }
   return (true);
 }
@@ -554,6 +556,26 @@ bool csIniFile::EnumData (const char *SectionPath, bool (*iterator)
     if (cn->Type == TYPE_DATA)
       if (iterator (Parm, cn->Data.Name, cn->Data.Size, cn->Data.Pointer))
         break;
+  }
+  return (true);
+}
+
+bool csIniFile::EnumData (const char *SectionPath, csStrVector *oList)
+{
+  int i, j;
+  PrvINIbranch *Sec = FindNode (SectionPath);
+
+  if (!Sec)
+    return (false);
+
+  j = Sec->Length ();
+
+  for (i = 0; i < j; i++)
+  {
+    PrvINInode *cn = (PrvINInode *)(*Sec)[i];
+
+    if (cn->Type == TYPE_DATA)
+      oList->Push (strnew (cn->Data.Name));
   }
   return (true);
 }
@@ -582,7 +604,8 @@ bool csIniFile::EnumComments (const char *SectionPath, const char *KeyName,
         break;
       }
     }
-  } else
+  }
+  else
   {
     len = Root.Length ();
     for (i = 0; i < len; i++)
@@ -608,6 +631,60 @@ bool csIniFile::EnumComments (const char *SectionPath, const char *KeyName,
     if (cn->Type == TYPE_COMMENT)
       if (iterator (Parm, cn->Comment.Text))
         break;
+  }
+  return (true);
+}
+
+bool csIniFile::EnumComments (const char *SectionPath, const char *KeyName,
+  csStrVector *oList) const
+{
+  int i, len;
+  PrvINIbranch *Sec;
+  PrvINIbranch *Comments = NULL;
+
+  if (KeyName)
+  {
+    Sec = FindNode (SectionPath);
+    if (!Sec)
+      return (false);
+
+    len = Sec->Length ();
+    for (i = 0; i < len; i++)
+    {
+      PrvINInode *cn = (PrvINInode *)(*Sec)[i];
+
+      if ((cn->Type == TYPE_DATA) && (strcmp (KeyName, cn->Data.Name) == 0))
+      {
+        Comments = cn->Comments;
+        break;
+      }
+    }
+  }
+  else
+  {
+    len = Root.Length ();
+    for (i = 0; i < len; i++)
+    {
+      PrvINInode *cn = (PrvINInode *)Root [i];
+
+      if ((cn->Type == TYPE_SECTION) && (strcmp (SectionPath, cn->Section.Name) == 0))
+      {
+        Comments = cn->Comments;
+        break;
+      }
+    }
+  }
+
+  if (!Comments)
+    return (false);
+
+  len = Comments->Length ();
+  for (i = 0; i < len; i++)
+  {
+    PrvINInode *cn = (PrvINInode *)(*Comments)[i];
+
+    if (cn->Type == TYPE_COMMENT)
+      oList->Push (strnew (cn->Comment.Text));
   }
   return (true);
 }
@@ -691,6 +768,9 @@ bool csIniFile::SetData (const char *SectionPath, const char *KeyName,
     }
   }
 
+  if (!Data || !DataSize)
+    return (true);
+
   CHK (branch = new PrvINInode);
   Sec->Push (branch);
   branch->Type = TYPE_DATA;
@@ -749,7 +829,8 @@ bool csIniFile::SetComment (const char *SectionPath, const char *KeyName,
         break;
       }
     }
-  } else
+  }
+  else
   {
     len = Root.Length ();
     for (i = 0; i < len; i++)
@@ -778,6 +859,56 @@ bool csIniFile::SetComment (const char *SectionPath, const char *KeyName,
   else
     branch->Comment.Text = NULL;
   (*Comments)->Push (branch);
+  return (true);
+}
+
+bool csIniFile::DeleteComment (const char *SectionPath, const char *KeyName)
+{
+  int i, len;
+  PrvINIbranch *Sec;
+  PrvINIbranch **Comments = NULL;
+
+  Dirty = true;
+  if (KeyName)
+  {
+    Sec = FindNode (SectionPath);
+    if (!Sec)
+      return (false);
+
+    for (i = 0, len = Sec->Length (); i < len; i++)
+    {
+      PrvINInode *cn = (PrvINInode *)(*Sec)[i];
+
+      if ((cn->Type == TYPE_DATA) && (strcmp (KeyName, cn->Data.Name) == 0))
+      {
+        Comments = &cn->Comments;
+        break;
+      }
+    }
+  }
+  else
+  {
+    len = Root.Length ();
+    for (i = 0; i < len; i++)
+    {
+      PrvINInode *cn = (PrvINInode *)Root [i];
+
+      if ((cn->Type == TYPE_SECTION) && (strcmp (SectionPath, cn->Section.Name) == 0))
+      {
+        Comments = &cn->Comments;
+        break;
+      }
+    }
+  }
+
+  if (!Comments)
+    return (false);
+
+  if (!*Comments)
+    return (true);
+
+  CHK (delete *Comments);
+  *Comments = NULL;
   return (true);
 }
 

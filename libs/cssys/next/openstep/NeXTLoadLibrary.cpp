@@ -14,33 +14,10 @@
 //
 //	Implement OpenStep-specific dynamic library loading and symbol lookup.
 //
-//	When a module is loaded dynamically, Crystal Space expects the module
-//	to keep its symbols private.  When it wants to know the address of a
-//	symbol, it asks for it explicitly via SysGetProcAddress().  It further
-//	expects that all dynamically loaded modules define the functions
-//	DllInitialize(), DllGetClassObject(), DllRegisterServer(),
-//	DllUnregisterServer(), DllCanUnloadNow(), ModuleAddRef(), and
-//	ModuleRelease().
-//
-//	Unfortunately, OpenStep's dynamic loader, DYLD, behaves in a very
-//	different and completely imcompatible manner.  DYLD actually attempts
-//	to bind all symbols from the dynamically loaded module into the
-//	running application at load time.  This results in warnings about
-//	multiply-defined symbols since every Crystal Space module defines the
-//	same set of functions.
-//
-//	In order to work around this limitation, upon loading a module, this
-//	implementation manually looks up the aforementioned symbols and
-//	records their values locally.  When a collision occurs as the next
-//	module is loaded dynamically, DYLD is instructed to forget the old
-//	symbol and install the new.
-//
 //-----------------------------------------------------------------------------
 #include "sysdef.h"
 
-#ifdef NO_COM_SUPPORT
-
-#include "cscom/com.h"
+#include "csutil/scf.h"
 extern "C" {
 #include <stdio.h>
 #define bool dyld_bool
@@ -371,5 +348,3 @@ bool SysFreeLibrary( CS_HLIBRARY )
     {
     return true; // Unimplemented.
     }
-
-#endif // NO_COM_SUPPORT

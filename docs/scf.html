@@ -435,6 +435,31 @@ In fact, the IMPLEMENTS_INTERFACE and IMPLEMENTS_EMBEDDED_INTERFACE macros
 use this function.
 </p>
 
+<p>
+For easier definition of versioned interfaces you can use the SCF_INTERFACE
+macro instead of scfInterface. This way:
+</p>
+
+<pre>
+SCF_INTERFACE (MyGraphics3D, 0, 0, 1) : public IBase
+{
+  ...
+}
+</pre>
+
+<p>
+The above is equivalent to
+</p>
+
+<pre>
+#define VERSION_MyGraphics3D SCF_VERSION (0, 0, 1)
+
+scfInterface MyGraphics3D : public IBase
+{
+  ...
+}
+</pre>
+
 <h2>Client side</h2>
 
 <p>
@@ -716,6 +741,32 @@ function:
 <pre>
 extern bool scfUnregisterClass (char *iClassID);
 </pre>
+
+<h3>Non-registered classes</h3>
+
+<p>
+Sometimes you don't want to register your classes with the SCF kernel. That is,
+you create your objects manually, using "new" or whatever. In this case your
+object is not a part of the class tree (see above) and thus don't have a parent.
+In this case you have to pass NULL to the CONSTRUCT_IBASE macro in constructor.
+This way:
+</p>
+
+<pre>
+MyClass::MyClass ()
+{
+  CONSTRUCT_IBASE (NULL)
+}
+</pre>
+
+<p>
+If you also want your object to not be automatically deleted when reference
+count reaches zero, you can use the IMPLEMENT_EMBEDDED_IBASE instead of
+IMPLEMENT_IBASE, as if your object would be an embedded interface. Embedded
+interfaces don't have the habbit of deleting themselves when their reference
+count reaches zero. In this case you should take care and delete() your object
+manually.
+</p>
 
 <hr>
 <p>

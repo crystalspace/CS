@@ -1,5 +1,5 @@
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include <ddraw.h>
 #include <d3d.h>
 #include <d3dcaps.h>
@@ -11,7 +11,7 @@ extern const IID IID_IDirectDetectionInternal;
 
 /**
  * This interface is only used for communication between Direct3DRender.dll and Driver2D.dll. 
- * It is not a true COM interface (not derived from IUnknown), and should not be exposed by the API.
+ * It is not a true COM interface (not derived from iBase), and should not be exposed by the API.
  */
 interface IDirectDetectionInternal 
 {

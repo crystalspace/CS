@@ -43,7 +43,14 @@
 Blocks* Sys = NULL;
 csView* view = NULL;
 
-#define Gfx3D System->piG3D
+#define Gfx3D System->G3D
+
+//------------------------------ We need the VFS plugin and the 3D engine -----
+
+REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
+  "Crystal Space Virtual File System plug-in")
+REGISTER_STATIC_CLASS (csWorld, "crystalspace.kernel.engine",
+  "Crystal Space 3D Engine plug-in")
 
 //-----------------------------------------------------------------------------
 
@@ -522,7 +529,7 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       cam_move_dest = cam_move_src - .3 * (view_origin - cam_move_src);
       cam_move_up = csVector3 (0, -1, 0);
       break;
-    case CSKEY_F1: piG2D->PerformExtension ("sim_pal"); break;
+    case CSKEY_F1: G2D->PerformExtension ("sim_pal"); break;
     case 'q': start_rotation (ROT_PX); break;
     case 'a': start_rotation (ROT_MX); break;
     case 'w': start_rotation (ROT_PY); break;
@@ -643,7 +650,7 @@ void reset_vertex_colors (csThing* th)
   }
 }
 
-void Blocks::move_cubes (long elapsed_time)
+void Blocks::move_cubes (time_t elapsed_time)
 {
   int i;
   float elapsed = (float)elapsed_time/1000.;
@@ -752,47 +759,44 @@ void Blocks::move_cubes (long elapsed_time)
   csPolygonSet::current_light_frame_number++;
 }
 
-void Blocks::NextFrame (long elapsed_time, long current_time)
+void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 {
   SysSystemDriver::NextFrame (elapsed_time, current_time);
-
-  csEvent *Event;
-  while ((Event = Sys->EventQueue->Get ()))
-  {
-    switch (Event->Type)
-    {
-      case csevKeyDown:
-        eatkeypress (Event->Key.Code, Event->Key.ShiftKeys & CSMASK_SHIFT,
-            Event->Key.ShiftKeys & CSMASK_ALT, Event->Key.ShiftKeys & CSMASK_CTRL);
-        break;
-      case csevBroadcast:
-        //if ((Event->Command.Code == cscmdFocusChanged)
-         //&& (Event->Command.Info == NULL))
-          //memset (&Keyboard->Key, 0, sizeof (Keyboard->Key));
-        break;
-      case csevMouseDown:
-        break;
-      case csevMouseMove:
-        break;
-      case csevMouseUp:
-        break;
-    }
-    CHK (delete Event);
-  }
 
   move_cubes (elapsed_time);
 
   // Tell Gfx3D we're going to display 3D things
-  if (Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS) != S_OK) return;
+  if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
   view->Draw ();
 
   // Start drawing 2D graphics
-  //if (Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS) != S_OK) return;
+  //if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   // Drawing code ends here
   Gfx3D->FinishDraw ();
   // Print the output.
   Gfx3D->Print (NULL);
+}
+
+bool Blocks::HandleEvent (csEvent &Event)
+{
+  if (SysSystemDriver::HandleEvent (Event))
+    return false;
+
+  switch (Event.Type)
+  {
+    case csevKeyDown:
+      eatkeypress (Event.Key.Code, Event.Key.ShiftKeys & CSMASK_SHIFT,
+          Event.Key.ShiftKeys & CSMASK_ALT, Event.Key.ShiftKeys & CSMASK_CTRL);
+      break;
+    case csevMouseDown:
+      break;
+    case csevMouseMove:
+      break;
+    case csevMouseUp:
+      break;
+  }
+  return false;
 }
 
 int cnt = 1;
@@ -834,14 +838,12 @@ int main (int argc, char* argv[])
 
   // Create our main class which is the driver for Blocks.
   CHK (Sys = new Blocks ());
-
-  // Create our world. The world is the representation of
-  // the 3D engine.
-  CHK (Sys->world = new csWorld ());
+  // temp hack until we find a better way
+  csWorld::System = Sys;
 
   // Initialize the main system. This will load all needed
   // COM drivers (3D, 2D, network, sound, ...) and initialize them.
-  if (!Sys->Initialize (argc, argv, "blocks.cfg", "VFS.cfg", Sys->world->GetEngineConfigCOM ()))
+  if (!Sys->Initialize (argc, argv, "blocks.cfg"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
@@ -857,18 +859,24 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
+  // Find the pointer to world plugin
+  iWorld *world = QUERY_PLUGIN (Sys, iWorld);
+  if (!world)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    return -1;
+  }
+  CHK (Sys->world = world->GetCsWorld ());
+  world->DecRef ();
+
   // Some settings.
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
 
   // Some commercials...
   Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 0.1.\n");
   Sys->Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
-  ITextureManager* txtmgr;
-  Gfx3D->GetTextureManager (&txtmgr);
+  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
-
-  // Initialize our world.
-  Sys->world->Initialize (GetISystemFromSystem (System), Gfx3D, Sys->Config, Sys->Vfs);
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -882,7 +890,7 @@ int main (int argc, char* argv[])
   Sys->world->EnableLightingCache (false);
 
   // Change to virtual directory where Blocks data is stored
-  Sys->Vfs->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
+  Sys->VFS->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
 
   Sys->set_pilar_texture (csLoader::LoadTexture (Sys->world, "txt1", "stone4.gif"));
   Sys->set_cube_texture (csLoader::LoadTexture (Sys->world, "txt2", "cube.gif"));
@@ -948,7 +956,7 @@ int main (int argc, char* argv[])
   CHK (light = new csStatLight (0, (CUBE_HEIGHT-3+3)*BLOCK_DIM+1, 0, BLOCK_DIM*10, .5, .5, .5, false));
   room->AddLight (light);
 
-  Sys->world->Prepare (Gfx3D);
+  Sys->world->Prepare ();
 
   Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 

@@ -40,7 +40,7 @@
 
 #ifdef NO_COM_SUPPORT
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 extern "C" {
 #include <mach-o/rld.h>
 #include <objc/objc-load.h>

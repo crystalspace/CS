@@ -14,9 +14,6 @@ DRIVERS=cs3d/software cs2d/be cs2d/openglbe cs3d/opengl \
 # We don't want assembly for now
 override DO_ASM=no
 
-# Until this is auto-detected, we assume it to be true.
-override BUGGY_EGCS_COMPILER=yes
-
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -155,7 +152,6 @@ ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
 SYSCONFIG += $(NEWLINE)bin/haspythn.sh >> config.tmp
 SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
-SYSCONFIG += $(NEWLINE)echo override BUGGY_EGCS_COMPILER = $(BUGGY_EGCS_COMPILER)>>config.tmp
 
 endif # rootdefines & config
 
@@ -163,6 +159,5 @@ endif # rootdefines & config
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/volatile)
 
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_SOCKETS_SUPPORT$">>volatile.tmp
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define USGISH$">>volatile.tmp
 
 endif # rootdefines & volatile

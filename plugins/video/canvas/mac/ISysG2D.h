@@ -1,15 +1,12 @@
-
-#include <QDOffscreen.h>
-#include <Events.h>
-#include "cscom/com.h"
-
 #ifndef __ISYSG2D_H__
 #define __ISYSG2D_H__
 
-extern const IID IID_IMacGraphicsInfo;
+#include <QDOffscreen.h>
+#include <Events.h>
+#include "csutil/scf.h"
 
-/// IMacGraphicsInfo interface -- for Mac-specific properties.
-interface IMacGraphicsInfo : public IUnknown
+/// iMacGraphicsInfo interface -- for Mac-specific properties.
+SCF_INTERFACE (iMacGraphicsInfo, 0, 0, 1) : public iBase
 {
     ///
     STDMETHOD(Open)(char* szTitle) = 0;

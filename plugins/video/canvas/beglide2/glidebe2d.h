@@ -19,7 +19,7 @@
 #ifndef __GLIDEBE2D_H__
 #define __GLIDEBE2D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/be/csbe.h"
 #include "cs2d/glide2common/glide2common2d.h"
@@ -30,24 +30,6 @@
 #include "cs2d/beglide2/CrystGlideWindow.h"
 #endif
 #include "cs2d/beglide2/xg2d.h"
-
-interface ITextureHandle;
-
-// The CLSID to create csGraphics2DGlideX instances
-extern const CLSID CLSID_GlideBeGraphics2D;
-
-///
-class csGraphics2DGlide2xBeFactory : public IGraphics2DFactory
-{
-public:
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics2DGlide2xBeFactory)
-
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (COMBOOL bLock);
-};
-
-///
 
 /// BeOS version.
 class csGraphics2DBeGlide : public csGraphics2DGlideCommon
@@ -100,10 +82,8 @@ private:
   Pixmap EmptyPixmap;
 */
 
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Pointer to DOS-specific interface
-  IBeLibSystemDriver* BeSystem;
+  iBeLibSystemDriver* BeSystem;
 
 public:
   /// The "real" mouse handler
@@ -120,10 +100,12 @@ public:
   void *FocusHandlerParm;
   
 public:
-  csGraphics2DBeGlide (ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DBeGlide (iBase *iParent);
   virtual ~csGraphics2DBeGlide ();
 
-  virtual void Initialize ();   
+  virtual bool Initialize (iSystem *pSystem);
   virtual bool Open (const char *Title);
   virtual void Close ();
   
@@ -134,19 +116,17 @@ public:
 //  virtual void SetRGB (int i, int r, int g, int b);// dh: moved to glide2common2d.h
 /*
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
 
   virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
   
   void DrawPixelGlide (int x, int y, int color);
   static void WriteCharGlide (int x, int y, int fg, int bg, char c);
-  static void DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy, 
+  static void DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy, 
                         int sw, int sh, int tx, int ty, int tw, int th);
   static unsigned char* GetPixelAtGlide (int x, int y);          
 
 protected:
-  /// This function is functionally equivalent to csSystemDriver::CsPrintf
-  void CsPrintf (int msgtype, const char *format, ...);
 */
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
@@ -155,20 +135,6 @@ protected:
   void FXgetImage();
 
   void ApplyDepthInfo(color_space this_color_space);
-
-protected:
-  DECLARE_IUNKNOWN ()
-//protected: 
-//  AUTO_LONG m_cRef; 
-//public: 
-//  STDMETHOD (QueryInterface) (REFIID riid, void** ppv); 
-//  STDMETHOD_(ULong, AddRef) (); 
-//  STDMETHOD_(ULong, Release) ();  
-  DECLARE_INTERFACE_TABLE (csGraphics2DBeGlide)
-//virtual const INTERFACE_ENTRY* GetInterfaceTable();
-  DECLARE_COMPOSITE_INTERFACE (XGlide2xGraphicsInfo)
-//  friend IXGlide2xGraphicsInfo; \
-//  IXGlide2xGraphicsInfo m_xXGlide2xGraphicsInfo; 
 };
 
 #endif // __GLIDEBE2D_H__

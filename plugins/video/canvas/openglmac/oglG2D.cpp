@@ -23,33 +23,30 @@
 #include <TextUtils.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/openglmac/oglg2d.h"
 #include "cssys/mac/MacRSRCS.h"
 #include "isystem.h"
 
 /////The 2D Graphics Driver//////////////
 
-#define NAME  "Crystal"
+IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
-BEGIN_INTERFACE_TABLE(csGraphics2DOpenGL)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IMacGraphicsInfo, XMacGraphicsInfo )
-END_INTERFACE_TABLE()
+EXPORT_CLASS_TABLE (glmac)
+  EXPORT_CLASS (csGraphics2DOpenGL, "crystalspace.graphics2d.glmac",
+    "Mac OpenGL 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_UNKNOWN(csGraphics2DOpenGL)
-
-csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D) : 
-                   csGraphics2DGLCommon (piSystem)
+csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent, bool bUses3D) : 
+                   csGraphics2DGLCommon (iParent)
 {
 	mMainWindow = NULL;
 	mColorTable = NULL;
 	mGLContext = NULL;
-    mMainPalette = NULL;
-    mPaletteChanged = false;
-    mDoubleBuffering = true;
-    mOldDepth = 0;
+	mMainPalette = NULL;
+	mPaletteChanged = false;
+	mDoubleBuffering = true;
+	mOldDepth = 0;
 	mSavedPort = NULL;
 	mSavedGDHandle = NULL;
 	mActivePage = 0;
@@ -70,13 +67,14 @@ csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
 	}
 }
 
-void csGraphics2DOpenGL::Initialize(void)
+bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
 {
 	long					pixel_format;
 	OSErr					err;
 	Boolean					showDialogFlag;
 
-	csGraphics2DGLCommon::Initialize ();
+	if (!csGraphics2DGLCommon::Initialize (pSystem))
+		return false;
 
 	/*
 	 *	Get the depth of the main gdevice.
@@ -200,8 +198,9 @@ void csGraphics2DOpenGL::Initialize(void)
   		complete_pixel_format();
 	}
   
-	SysPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
+	CsPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
 
+	return true;
 }
 
 bool csGraphics2DOpenGL::Open(const char *Title)
@@ -375,7 +374,7 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
 	mPaletteChanged = true;
 }
 
-bool csGraphics2DOpenGL::SetMouseCursor( int iShape, ITextureHandle* iBitmap )
+bool csGraphics2DOpenGL::SetMouseCursor( csMouseCursorID iShape, iTextureHandle* iBitmap )
 {
 #pragma unused( iBitmap )
 	bool		cursorSet = true;

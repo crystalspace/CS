@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef LIGHTDEF_H
-#define LIGHTDEF_H
+#ifndef __LIGHTDEF_H__
+#define __LIGHTDEF_H__
 
 /// Light level that is used when there is no light on the texture.
 #define DEFAULT_LIGHT_LEVEL 20
@@ -30,4 +30,4 @@
 /// Dynamic lights can light maximum 200 polygons (@@@ Remove this arbitrary limit!)
 #define MAX_DYN_POLYGON 200
 
-#endif /*LIGHTDEF_H*/
+#endif // __LIGHTDEF_H__

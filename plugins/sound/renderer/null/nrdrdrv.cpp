@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/null/nrdrcom.h"
 #include "isndrdr.h"
 
@@ -120,7 +120,7 @@ BEGIN_INTERFACE_TABLE (csSoundRenderNullFactory)
   IMPLEMENTS_INTERFACE (ISoundRenderFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csSoundRenderNullFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csSoundRenderNullFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

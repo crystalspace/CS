@@ -28,6 +28,6 @@ public:
 			SysMouseDriver();
 	virtual	~SysMouseDriver(void);
 
-	virtual bool Open( ISystem* system, csEventQueue *EvQueue );
+	virtual bool Open( iSystem* system, csEventQueue *EvQueue );
 	virtual void Close(void);
 };

@@ -60,7 +60,7 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
     // Load arrow and scroller images
     if (!sprscroller[0])
     {
-      ITextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
+      iTextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
       for (int i = 0; i < 12; i++)
         CHKB (sprarrows [i] = new csSprite2D (scrolltex, i * 9, 0, 9, 9));
       CHK (sprscroller [0] = new csSprite2D (scrolltex, 12 * 9 + 0, 0, 7, 8));

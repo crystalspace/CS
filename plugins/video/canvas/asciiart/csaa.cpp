@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csutil/csrect.h"
 #include "csinput/csevent.h"
 #include "csutil/inifile.h"
@@ -30,136 +30,44 @@
 
 #include "csaa.h"
 
-//------------------------------------------------------ Loading/Maintenance ---
-
-static unsigned int gRefCount = 0;
-static DllRegisterData gRegData =
-{
-  &CLSID_AAGraphics2D,
-  "crystalspace.graphics2d.asciiart",
-  "Crystal Space 2D graphics driver using Ascii Art library"
-};
-
-#ifdef CS_STATIC_LINKED
-
-void AARegister ()
-{
-  static csGraphics2DFactoryAA gG2DFactory;
-  gRegData.pClass = &gG2DFactory;
-  csRegisterServer (&gRegData);
-}
-
-void AAUnregister ()
-{
-  csUnregisterServer (&gRegData);
-}
-
-#else
-
-// Initialization entry point
-STDAPI DllInitialize ()
-{
-  csCoInitialize (0);
-  gRegData.szInProcServer = "asciiart.dll";
-  return TRUE;
-}
-
-EXTERN_C void STDAPICALLTYPE ModuleRelease ()
-{
-  gRefCount--;
-}
-
-EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
-{
-  gRefCount++;
-}
-
-// return S_OK if it's ok to unload us now.
-STDAPI DllCanUnloadNow ()
-{
-  return gRefCount ? S_FALSE : S_OK;
-}
-
-// used to get a COM class object from us.
-STDAPI DllGetClassObject (REFCLSID rclsid, REFIID riid, void** ppv)
-{
-  static csGraphics2DFactoryAA gG2DFactory;
-  if (rclsid == CLSID_AAGraphics2D)
-    return gG2DFactory.QueryInterface (riid, ppv);
-
-  // if we get here, rclsid is a class we don't implement
-  *ppv = NULL;
-  return CLASS_E_CLASSNOTAVAILABLE;
-}
-
-// Called by regsvr
-STDAPI DllRegisterServer ()
-{
-  return csRegisterServer (&gRegData);
-}
-
-// Called by regsvr
-STDAPI DllUnregisterServer ()
-{
-  return csUnregisterServer (&gRegData);
-}
-
-#endif // CS_STATIC_LINKED
-
-//---------------------------------------------------- csGraphics2DAAFactory ---
-
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DFactoryAA)
-
-BEGIN_INTERFACE_TABLE (csGraphics2DFactoryAA)
-  IMPLEMENTS_INTERFACE (IGraphics2DFactory)
-END_INTERFACE_TABLE ()
-
-STDMETHODIMP csGraphics2DFactoryAA::CreateInstance (REFIID riid,
-  ISystem* piSystem, void**ppv)
-{
-  if (!piSystem)
-  {
-    *ppv = 0;
-    return E_INVALIDARG;
-  }
-
-  CHK (csGraphics2DAA *pNew = new csGraphics2DAA (piSystem));
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-		
-  return pNew->QueryInterface (riid, ppv);
-}
-
-STDMETHODIMP csGraphics2DFactoryAA::LockServer (COMBOOL bLock)
-{
-  if (bLock)
-    gRefCount++;
-  else
-    gRefCount--;
-
-  return S_OK;
-}
-
 //----------------------------------------------------------- csGraphics2DAA ---
 
-BEGIN_INTERFACE_TABLE (csGraphics2DAA)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
+IMPLEMENT_FACTORY (csGraphics2DAA)
 
-IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DAA)
+EXPORT_CLASS_TABLE (asciiart)
+  EXPORT_CLASS (csGraphics2DAA, "crystalspace.graphics2d.asciiart",
+    "Ascii Art 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csGraphics2DAA::csGraphics2DAA (ISystem* piSystem) :
-  csGraphics2D (piSystem)
+IMPLEMENT_IBASE (csGraphics2DAA)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
+
+csGraphics2DAA::csGraphics2DAA (iBase *iParent) :
+  csGraphics2D ()
 {
-  System = piSystem;
+  CONSTRUCT_IBASE (iParent);
+  config = NULL;
+  context = NULL;
+}
+
+csGraphics2DAA::~csGraphics2DAA (void)
+{
+  Close ();
+  if (config)
+    delete config;
+}
+
+bool csGraphics2DAA::Initialize (iSystem *pSystem)
+{
+  if (!csGraphics2D::Initialize (pSystem))
+    return false;
+
   config = new csIniFile ("asciiart.cfg");
 
   // Load settings from config file and setup the aa_defparams structure
-  System->ConfigGetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor, true);
+  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", true);
 
   aa_defparams.width =
   aa_defparams.recwidth = config->GetInt ("Console", "Width", 80);
@@ -201,18 +109,6 @@ csGraphics2DAA::csGraphics2DAA (ISystem* piSystem) :
   aa_defrenderparams.randomval = config->GetInt ("Rendering", "RandomDither", 0);
   aa_defrenderparams.bright = config->GetInt ("Rendering", "Bright", 1);
   aa_defrenderparams.contrast = config->GetInt ("Rendering", "Contrast", 1);
-}
-
-csGraphics2DAA::~csGraphics2DAA (void)
-{
-  Close ();
-  if (config)
-    delete config;
-}
-
-void csGraphics2DAA::Initialize ()
-{
-  csGraphics2D::Initialize ();
 
   Depth = 8;
   pfmt.PalEntries = 256;
@@ -221,6 +117,7 @@ void csGraphics2DAA::Initialize ()
   pfmt.GreenMask  = 0xff;
   pfmt.BlueMask   = 0xff;
   complete_pixel_format ();
+  return true;
 }
 
 bool csGraphics2DAA::Open (const char *Title)
@@ -228,7 +125,7 @@ bool csGraphics2DAA::Open (const char *Title)
   context = aa_autoinit (&aa_defparams);
   if (context == NULL)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Cannot initialize AA-lib. Sorry\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot initialize AA-lib. Sorry\n");
     return false;
   }
   Width = aa_imgwidth (context);
@@ -383,7 +280,7 @@ bool csGraphics2DAA::SetMousePosition (int x, int y)
   return false;
 }
 
-bool csGraphics2DAA::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
+bool csGraphics2DAA::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
 {
   if (!HardwareCursor)
   {
@@ -404,49 +301,3 @@ bool csGraphics2DAA::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
       return false;
   } /* endswitch */
 }
-
-#if 0
-void csGraphics2DAA::MouseHandlerStub (void *Self, int Button, int Down,
-  int x, int y, int ShiftFlags)
-{
-  csGraphics2DAA *This = (csGraphics2DAA *)Self;
-  if (!This)
-    return;
-  int ww = This->dW->WindowWidth (), wh = This->dW->WindowHeight ();
-  if ((ww <= 0) || (wh <= 0))
-    return;
-
-  int fwidth, fheight;
-  This->System->GetWidthSetting (fwidth);
-  This->System->GetHeightSetting (fheight);
-
-  x = (x * fwidth) / ww;
-  y = ((wh - 1 - y) * fheight) / wh;
-
-  This->OS2System->MouseEvent (Button, Down, x, y,
-    (ShiftFlags & dkf_SHIFT ? CSMASK_SHIFT : 0) |
-    (ShiftFlags & dkf_CTRL ? CSMASK_CTRL : 0) |
-    (ShiftFlags & dkf_ALT ? CSMASK_ALT : 0));
-}
-
-void csGraphics2DAA::KeyboardHandlerStub (void *Self, unsigned char ScanCode,
-  int Down, unsigned char RepeatCount, int ShiftFlags)
-{
-  csGraphics2DAA *This = (csGraphics2DAA *)Self;
-  if (!This)
-    return;
-  This->OS2System->KeyboardEvent (ScanCode, Down);
-}
-
-void csGraphics2DAA::FocusHandlerStub (void *Self, bool Enable)
-{
-  csGraphics2DAA *This = (csGraphics2DAA *)Self;
-  This->OS2System->FocusEvent (Enable);
-}
-
-void csGraphics2DAA::TerminateHandlerStub (void *Self)
-{
-  csGraphics2DAA *This = (csGraphics2DAA *)Self;
-  This->OS2System->TerminateEvent ();
-}
-#endif

@@ -148,7 +148,6 @@ void csTransformedSet::Update ()
   current_array = ar;
 }
 
-
 void csTransformedSet::Transform (csVector3* wor_verts, int num_vertices,
 	const csTransform& w2c)
 {

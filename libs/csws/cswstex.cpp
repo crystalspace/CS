@@ -25,7 +25,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//-- Windowing system texture --//--
 
-csWSTexture::csWSTexture (const char *iName, ImageFile *iImage,
+csWSTexture::csWSTexture (const char *iName, csImageFile *iImage,
   bool i2D, bool i3D)
 {
   image = iImage;
@@ -42,7 +42,7 @@ csWSTexture::~csWSTexture ()
     delete [] Name;
 //@@todo: sigsegv here? who freed the texture handle
 //  if (Handle)
-//    Handle->Release ();
+//    Handle->DecRef ();
 }
 
 void csWSTexture::SetTransparent (int iR, int iG, int iB)
@@ -51,10 +51,9 @@ void csWSTexture::SetTransparent (int iR, int iG, int iB)
   tr = iR; tg = iG; tb = iB;
 }
 
-void csWSTexture::Register (ITextureManager *iTextureManager)
+void csWSTexture::Register (iTextureManager *iTexMan)
 {
-  iTextureManager->RegisterTexture (GetIImageFileFromImageFile (image),
-    &Handle, for3D, for2D);
+  Handle = iTexMan->RegisterTexture (image, for3D, for2D);
   if (istransp)
     Handle->SetTransparent (tr, tg, tb);
 }

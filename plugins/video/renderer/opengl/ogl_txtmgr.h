@@ -19,34 +19,32 @@
 #ifndef TXTMGR_OPENGL_H
 #define TXTMGR_OPENGL_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
-class csIniFile;
-class csTextureManagerOpenGL;
-interface IImageFile;
+scfInterface iImageFile;
 
 // Colors are encoded in a 16-bit short using the following
 // distribution (only for 8-bit mode):
-#define BITS_RED 6
-#define BITS_GREEN 6
-#define BITS_BLUE 4
-#define MASK_RED ((1<<BITS_RED)-1)
-#define MASK_GREEN ((1<<BITS_GREEN)-1)
-#define MASK_BLUE ((1<<BITS_BLUE)-1)
-#define NUM_RED (1<<BITS_RED)
-#define NUM_GREEN (1<<BITS_GREEN)
-#define NUM_BLUE (1<<BITS_BLUE)
+#define BITS_RED	6
+#define BITS_GREEN	6
+#define BITS_BLUE	4
+#define MASK_RED	((1 << BITS_RED)   - 1)
+#define MASK_GREEN	((1 << BITS_GREEN) - 1)
+#define MASK_BLUE	((1 << BITS_BLUE)  - 1)
+#define NUM_RED		(1 << BITS_RED)
+#define NUM_GREEN	(1 << BITS_GREEN)
+#define NUM_BLUE	(1 << BITS_BLUE)
 
-#define TABLE_WHITE 0
-#define TABLE_RED 1
-#define TABLE_GREEN 2
-#define TABLE_BLUE 3
-#define TABLE_WHITE_HI 4
-#define TABLE_RED_HI 5
-#define TABLE_GREEN_HI 6
-#define TABLE_BLUE_HI 7
+#define TABLE_WHITE	0
+#define TABLE_RED	1
+#define TABLE_GREEN	2
+#define TABLE_BLUE	3
+#define TABLE_WHITE_HI	4
+#define TABLE_RED_HI	5
+#define TABLE_GREEN_HI	6
+#define TABLE_BLUE_HI	7
 
 typedef UShort RGB16map[256];
 typedef unsigned char RGB8map[256];
@@ -111,34 +109,32 @@ private:
 
 public:
   ///
-  csTextureManagerOpenGL (ISystem* piSystem, IGraphics2D* piG2D);
+  csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D);
   ///
   virtual ~csTextureManagerOpenGL ();
   ///
-  virtual void InitSystem ();
+  virtual void Initialize ();
 
   ///
   virtual void clear ();
 
   ///
-  STDMETHODIMP Initialize ();
+  virtual void Prepare ();
   ///
-  STDMETHODIMP Prepare ();
+  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d);
   ///
-  STDMETHODIMP RegisterTexture (IImageFile* image, ITextureHandle** handle, bool for3d, bool for2d);
+  virtual void UnregisterTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP UnregisterTexture (ITextureHandle* handle);
+  virtual void MergeTexture (iTextureHandle* handle);
   ///
-  STDMETHODIMP MergeTexture (ITextureHandle* handle);
+  virtual void FreeImages ();
   ///
-  STDMETHODIMP FreeImages ();
+  virtual void ReserveColor (int r, int g, int b);
   ///
-  STDMETHODIMP ReserveColor (int r, int g, int b);
-  ///
-  STDMETHODIMP AllocPalette ();
+  virtual void AllocPalette ();
 
   /// Create a new texture.
-  csTextureMMOpenGL* new_texture (IImageFile* image);
+  csTextureMMOpenGL* new_texture (iImageFile* image);
 
   ///
   bool force_mixing (char* mix);
@@ -163,7 +159,7 @@ public:
    */
   void remap_textures ();
 
-  /// Set configuration file for use inside Initialize() call
+  /// Set configuration file for use inside Initialize () call
   void SetConfig (csIniFile* newconfig)
   { config = newconfig; }
 };

@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssnddrv/null/nulldrv.h"
 #include "isystem.h"
 #include "isndlstn.h"
@@ -34,7 +34,7 @@ BEGIN_INTERFACE_TABLE(csSoundDriverNull)
   IMPLEMENTS_INTERFACE(ISoundDriver)
 END_INTERFACE_TABLE()
 
-csSoundDriverNull::csSoundDriverNull(ISystem* piSystem)
+csSoundDriverNull::csSoundDriverNull(iSystem* piSystem)
 {
   m_piSystem = piSystem;
   memorysize = 1024;

@@ -19,12 +19,12 @@
 #ifndef WIREFRM_H
 #define WIREFRM_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 
-interface IGraphics3D;
-interface ITextureManager;
+scfInterface iGraphics3D;
+scfInterface iTextureManager;
 class csCamera;
 
 #define PLANE_VERTEX_RADIUS .1
@@ -43,7 +43,7 @@ public:
 
 public:
   ///
-  csWfColor (ITextureManager* txtmgr, int r, int g, int b);
+  csWfColor (iTextureManager* txtmgr, int r, int g, int b);
   /// Get a color based on depth.
   int GetColor (float z);
 };
@@ -80,7 +80,7 @@ public:
   void SetPrev (csWfObject* ob) { prev = ob; }
 
   /// Draw this object given a camera.
-  virtual void Draw (IGraphics3D* g, csCamera* c) = 0;
+  virtual void Draw (iGraphics3D* g, csCamera* c) = 0;
 
   /// Do the perspective transform.
   bool Perspective (csCamera* c, csVector3& v, csVector2& persp, float radius, float& pradius);
@@ -104,7 +104,7 @@ public:
   void SetLocation (float x, float y, float z) { loc.x = x; loc.y = y; loc.z = z; }
 
   ///
-  virtual void Draw (IGraphics3D* g, csCamera* c);
+  virtual void Draw (iGraphics3D* g, csCamera* c);
 };
 
 /**
@@ -124,7 +124,7 @@ public:
   void SetLine (csVector3& vv1, csVector3& vv2) { v1 = vv1; v2 = vv2; }
 
   ///
-  virtual void Draw (IGraphics3D* g, csCamera* c);
+  virtual void Draw (iGraphics3D* g, csCamera* c);
 };
 
 /**
@@ -162,7 +162,7 @@ public:
   bool IsVisible (csCamera* camera);
 
   ///
-  virtual void Draw (IGraphics3D* g, csCamera* c);
+  virtual void Draw (iGraphics3D* g, csCamera* c);
 };
 
 /**
@@ -173,7 +173,7 @@ class csWireFrame
 {
 private:
   csWfObject* objects;
-  ITextureManager* txtmgr;
+  iTextureManager* txtmgr;
   csWfColor* colors;
   csWfColor* white;
   csWfColor* red;
@@ -185,7 +185,7 @@ private:
 
 public:
   ///
-  csWireFrame (ITextureManager* txtmgr);
+  csWireFrame (iTextureManager* txtmgr);
   ///
   virtual ~csWireFrame ();
 
@@ -233,7 +233,7 @@ public:
   csWfPolygon* AddPolygon ();
 
   ///
-  void Draw (IGraphics3D* g, csCamera* c);
+  void Draw (iGraphics3D* g, csCamera* c);
 
   /// Apply a function to all objects contained in the WireFrame
   void Apply (void (*func)( csWfObject*, void*), void*);
@@ -250,7 +250,7 @@ private:
 
 public:
   ///
-  csWireFrameCam (ITextureManager* txtmgr);
+  csWireFrameCam (iTextureManager* txtmgr);
   ///
   virtual ~csWireFrameCam ();
 

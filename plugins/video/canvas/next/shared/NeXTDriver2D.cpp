@@ -21,19 +21,25 @@
 #include "NeXTProxy2D.h"
 #include "isystem.h"
 
+IMPLEMENT_FACTORY (NeXTDriver2D)
+
+EXPORT_CLASS_TABLE (next2d)
+  EXPORT_CLASS (NeXTDriver2D, "crystalspace.graphics2d.next",
+    "MacOS/X Server, OpenStep, and NextStep 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (NeXTDriver2D)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END
+
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTDriver2D::NeXTDriver2D( ISystem* s ) :
-    csGraphics2D(s), next_system(0), proxy(0)
+NeXTDriver2D::NeXTDriver2D( iBase* iParent ) :
+    csGraphics2D(), next_system(0), proxy(0)
     {
-    if (FAILED(system->QueryInterface( IID_INeXTSystemDriver,
-	(void**)&next_system )))
-	{
-	system->Print( MSG_FATAL_ERROR, "FATAL: The system driver does not "
-		"support the INeXTSystemDriver interface\n" );
-	exit(1);
-	}
+    CONSTRUCT_IBASE (iParent);
     }
 
 
@@ -53,11 +59,20 @@ NeXTDriver2D::~NeXTDriver2D()
 // Initialize
 //	We only support depth of 15 or 32.  See README.NeXT for an explanation.
 //-----------------------------------------------------------------------------
-void NeXTDriver2D::Initialize()
+bool NeXTDriver2D::Initialize(iSystem *pSystem)
     {
-    superclass::Initialize();
-    int simulated_depth;
-    next_system->GetSimulatedDepth( simulated_depth );
+    if (!superclass::Initialize(pSystem))
+        return false;
+
+    next_system = QUERY_INTERFACE (System, iNeXTSystemDriver);
+    if (!next_system)
+	{
+	CsPrintf( MSG_FATAL_ERROR, "FATAL: The system driver does not "
+		"support the iNeXTSystemDriver interface\n" );
+	return false;
+	}
+
+    int simulated_depth = next_system->GetSimulatedDepth();
     proxy = new NeXTProxy2D( Width, Height, simulated_depth );
     NeXTFrameBuffer const* const frame_buffer = proxy->get_frame_buffer();
     if (frame_buffer != 0)
@@ -76,6 +91,7 @@ void NeXTDriver2D::Initialize()
 	    case 32: setup_rgb_32(); break;
 	    }
 	}
+    return true;
     }
 
 
@@ -110,7 +126,7 @@ bool NeXTDriver2D::Open( char const* title )
     {
     bool okay = false;
     if (proxy->get_frame_buffer() == 0)
-	system->Print( MSG_FATAL_ERROR, "Unsupported display depth\n" );
+	System->Print( MSG_FATAL_ERROR, "Unsupported display depth\n" );
     else if (superclass::Open( title ))
 	okay = proxy->open( title );
     return okay;
@@ -139,7 +155,7 @@ void NeXTDriver2D::Print( csRect* )
 //-----------------------------------------------------------------------------
 // SetMouseCursor
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::SetMouseCursor( int shape, ITextureHandle* bitmap )
+bool NeXTDriver2D::SetMouseCursor( csMouseCursorID shape, iTextureHandle* bitmap )
     {
     return proxy->set_mouse_cursor( shape, bitmap );
     }

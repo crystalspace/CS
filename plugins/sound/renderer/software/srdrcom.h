@@ -24,7 +24,7 @@
 // SoundRender.H
 // csSoundRenderSoftware class.
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssfxldr/common/snddata.h"
 #include "cssndrdr/software/srdrchan.h"
 #include "isndrdr.h"
@@ -37,7 +37,7 @@ extern const CLSID CLSID_SoftwareSoundRender;
 class csSoundRenderSoftware : public ISoundRender
 {
 public:
-	csSoundRenderSoftware(ISystem* piSystem);
+	csSoundRenderSoftware(iSystem* piSystem);
 
 	virtual ~csSoundRenderSoftware();
 
@@ -63,7 +63,7 @@ public:
 public:
 	void CalculEars3D();
 	void CalculSound3D(Channel *c);
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
   ISoundDriver *m_piSoundDriver;
 
   /// print to the system's device
@@ -110,7 +110,7 @@ private:
 
 class csSoundRenderSoftwareFactory : public ISoundRenderFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

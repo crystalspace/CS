@@ -26,60 +26,31 @@
 #include "igraph3d.h"
 #include "itexture.h"
 
-// Static csGraphics2D variables
-int csGraphics2D::ClipX1, csGraphics2D::ClipX2;
-int csGraphics2D::ClipY1, csGraphics2D::ClipY2;
-int csGraphics2D::Font;
-csPixelFormat csGraphics2D::pfmt;
-unsigned char *csGraphics2D::Memory = NULL;
-int *csGraphics2D::LineAddress;
-bool csGraphics2D::FullScreen;
-int csGraphics2D::Width, csGraphics2D::Height, csGraphics2D::Depth;
-RGBpaletteEntry csGraphics2D::Palette[256];
-bool csGraphics2D::PaletteAlloc[256];
-ISystem* csGraphics2D::system = NULL;
-
-// "Virtual functions" through pointers in csGraphics2D
-void (*csGraphics2D::DrawPixel) (int x, int y, int color);
-void (*csGraphics2D::WriteChar) (int x, int y, int fg, int bg, char c);
-void (*csGraphics2D::DrawSprite) (ITextureHandle *hTex, int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th);
-unsigned char* (*csGraphics2D::GetPixelAt) (int x, int y);
-
 #if defined(PROC_INTEL) && !defined(NO_ASSEMBLER)
-#if defined(COMP_VC)
-#  include "cs3d/software/i386/drline.h"
+#  if defined(COMP_VC)
+#    include "cs2d/common/i386/drline.h"
+#  endif
 #endif
-#endif
 
-BEGIN_INTERFACE_TABLE (csGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
-  IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphicsInfo, XGraphicsInfo)
-END_INTERFACE_TABLE ()
-
-IMPLEMENT_UNKNOWN (csGraphics2D)
-
-csGraphics2D::csGraphics2D (ISystem* piSystem)
+csGraphics2D::csGraphics2D ()
 {
-  ASSERT (piSystem != NULL);
-  system = piSystem;
+  Memory = NULL;
 }
 
-void csGraphics2D::Initialize ()
+bool csGraphics2D::Initialize (iSystem* pSystem)
 {
+  System = pSystem;
   // Get the system parameters
-  system->GetWidthSetting (Width);
-  system->GetHeightSetting (Height);
-  system->GetDepthSetting (Depth);
-  system->GetFullScreenSetting (FullScreen);
+  System->GetSettings (Width, Height, Depth, FullScreen);
 
   Font = 0;
   pfmt.PalEntries = 256;
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
-  DrawPixel = DrawPixel8;
-  WriteChar = WriteChar8;
-  GetPixelAt = GetPixelAt8;
-  DrawSprite = DrawSprite8;
+  _DrawPixel = DrawPixel8;
+  _WriteChar = WriteChar8;
+  _GetPixelAt = GetPixelAt8;
+  _DrawSprite = DrawSprite8;
   // Mark all slots in palette as free
   for (int i = 0; i < 256; i++)
   {
@@ -89,11 +60,17 @@ void csGraphics2D::Initialize ()
     Palette[i].blue = 0;
   }
 
+  // Now try to register ourselves with system driver as being the 2D driver
+  return System->RegisterDriver ("iGraphics2D", this);
 }
 
 csGraphics2D::~csGraphics2D ()
 {
-  Close ();
+  if (System)
+  {
+    System->DeregisterDriver ("iGraphics2D", this);
+    Close ();
+  }
 }
 
 bool csGraphics2D::Open (const char *Title)
@@ -115,7 +92,8 @@ bool csGraphics2D::Open (const char *Title)
 
 void csGraphics2D::Close ()
 {
-  if (LineAddress) { CHK (delete [] LineAddress); LineAddress = NULL; }
+  if (LineAddress)
+  { CHK (delete [] LineAddress); LineAddress = NULL; }
 }
 
 void csGraphics2D::complete_pixel_format ()
@@ -158,7 +136,7 @@ bool csGraphics2D::DoubleBuffer (bool Enable)
   return !Enable;
 }
 
-bool csGraphics2D::DoubleBuffer ()
+bool csGraphics2D::GetDoubleBufferState ()
 {
   return false;
 }
@@ -181,22 +159,25 @@ void csGraphics2D::ClearAll (int color)
   } while (GetPage () != CurPage);
 }
 
-void csGraphics2D::DrawPixel8 (int x, int y, int color)
+void csGraphics2D::DrawPixel8 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
-    *(GetPixelAt (x, y)) = color;
+  if ((x >= This->ClipX1) && (x < This->ClipX2)
+   && (y >= This->ClipY1) && (y < This->ClipY2))
+    *(This->GetPixelAt (x, y)) = color;
 }
 
-void csGraphics2D::DrawPixel16 (int x, int y, int color)
+void csGraphics2D::DrawPixel16 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
-    *(short *)(GetPixelAt (x, y)) = color;
+  if ((x >= This->ClipX1) && (x < This->ClipX2)
+   && (y >= This->ClipY1) && (y < This->ClipY2))
+    *(short *)(This->GetPixelAt (x, y)) = color;
 }
 
-void csGraphics2D::DrawPixel32 (int x, int y, int color)
+void csGraphics2D::DrawPixel32 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
-    *(long *)(GetPixelAt (x, y)) = color;
+  if ((x >= This->ClipX1) && (x < This->ClipX2)
+   && (y >= This->ClipY1) && (y < This->ClipY2))
+    *(long *)(This->GetPixelAt (x, y)) = color;
 }
 
 #ifndef NO_DRAWLINE
@@ -329,191 +310,17 @@ void csGraphics2D::Write (int x, int y, int fg, int bg, const char *text)
   }
 }
 
-void csGraphics2D::WriteChar8 (int x, int y, int fg, int bg, char c)
-{
-  int charH = FontList [Font].Height;
-  int charW;
-  if (FontList[Font].IndividualWidth)
-    charW = FontList[Font].IndividualWidth[(unsigned char)c];
-  else
-    charW = FontList[Font].Width;
+#define WRITECHAR_NAME WriteChar8
+#define WRITECHAR_PIXTYPE UByte
+#include "writechr.inc"
 
-  if ((x + charW <= ClipX1) || (x >= ClipX2) || (y + charH <= ClipY1) || (y >= ClipY2))
-    return;
+#define WRITECHAR_NAME WriteChar16
+#define WRITECHAR_PIXTYPE UShort
+#include "writechr.inc"
 
-  register unsigned char *CharImage =
-    &FontList[Font].FontBitmap[((unsigned char)c) * FontList[Font].BytesPerChar];
-
-  if ((x < ClipX1) || (x + charW > ClipX2) || (y < ClipY1) || (y + charH > ClipY2))
-  {
-    // Perform full clipping
-    int lX = x < ClipX1 ? ClipX1 - x : 0;
-    int rX = x + charW >= ClipX2 ? ClipX2 - x : charW;
-    x += lX;
-    for (int i = 0; i < charH; i++, y++)
-    {
-      register char CharLine = (*CharImage++) << lX;
-      if ((y < ClipY1) || (y >= ClipY2)) continue;
-      register unsigned char *VRAM = GetPixelAt (x, y);
-      for (int j = lX; j < rX; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else if (bg >= 0)
-          *VRAM++ = bg;
-        else
-          VRAM++;
-        CharLine <<= 1;
-      } /* endfor */
-    } /* endfor */
-  } else
-  for (int i = 0; i < charH; i++, y++)
-  {
-    register unsigned char *VRAM = GetPixelAt (x, y);
-    register char CharLine = *CharImage++;
-    if (bg < 0)
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          VRAM++;
-        CharLine <<= 1;
-      } else
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          *VRAM++ = bg;
-        CharLine <<= 1;
-      } /* endfor */
-  } /* endfor */
-}
-
-void csGraphics2D::WriteChar16 (int x, int y, int fg, int bg, char c)
-{
-  int charH = FontList [Font].Height;
-  int charW;
-  if (FontList[Font].IndividualWidth)
-    charW = FontList[Font].IndividualWidth[(unsigned char)c];
-  else
-    charW = FontList[Font].Width;
-
-  if ((x + charW <= ClipX1) || (x >= ClipX2) || (y + charH <= ClipY1) || (y >= ClipY2))
-    return;
-
-  register unsigned char *CharImage =
-    &FontList[Font].FontBitmap[((unsigned char)c) * FontList[Font].BytesPerChar];
-
-  if ((x < ClipX1) || (x + charW > ClipX2) || (y < ClipY1) || (y + charH > ClipY2))
-  {
-    // Perform full clipping
-    int lX = x < ClipX1 ? ClipX1 - x : 0;
-    int rX = x + charW >= ClipX2 ? ClipX2 - x : charW;
-    x += lX;
-    for (int i = 0; i < charH; i++, y++)
-    {
-      register char CharLine = (*CharImage++) << lX;
-      if ((y < ClipY1) || (y >= ClipY2)) continue;
-      register unsigned short *VRAM = (unsigned short *)GetPixelAt (x, y);
-      for (int j = lX; j < rX; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else if (bg >= 0)
-          *VRAM++ = bg;
-        else
-          VRAM++;
-        CharLine <<= 1;
-      } /* endfor */
-    } /* endfor */
-  } else
-  for (int i = 0; i < charH; i++, y++)
-  {
-    register unsigned short *VRAM = (unsigned short *)GetPixelAt (x, y);
-    register char CharLine = *CharImage++;
-    if (bg < 0)
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          VRAM++;
-        CharLine <<= 1;
-      } else
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          *VRAM++ = bg;
-        CharLine <<= 1;
-      } /* endfor */
-  } /* endfor */
-}
-
-void csGraphics2D::WriteChar32 (int x, int y, int fg, int bg, char c)
-{
-  int charH = FontList [Font].Height;
-  int charW;
-  if (FontList[Font].IndividualWidth)
-    charW = FontList[Font].IndividualWidth[(unsigned char)c];
-  else
-    charW = FontList[Font].Width;
-
-  if ((x + charW <= ClipX1) || (x >= ClipX2) || (y + charH <= ClipY1) || (y >= ClipY2))
-    return;
-
-  register unsigned char *CharImage =
-    &FontList[Font].FontBitmap[((unsigned char)c) * FontList[Font].BytesPerChar];
-
-  if ((x < ClipX1) || (x + charW > ClipX2) || (y < ClipY1) || (y + charH > ClipY2))
-  {
-    // Perform full clipping
-    int lX = x < ClipX1 ? ClipX1 - x : 0;
-    int rX = x + charW >= ClipX2 ? ClipX2 - x : charW;
-    x += lX;
-    for (int i = 0; i < charH; i++, y++)
-    {
-      register char CharLine = (*CharImage++) << lX;
-      if ((y < ClipY1) || (y >= ClipY2)) continue;
-      register unsigned long *VRAM = (unsigned long *)GetPixelAt (x, y);
-      for (int j = lX; j < rX; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else if (bg >= 0)
-          *VRAM++ = bg;
-        else
-          VRAM++;
-        CharLine <<= 1;
-      } /* endfor */
-    } /* endfor */
-  } else
-  for (int i = 0; i < charH; i++, y++)
-  {
-    register unsigned long *VRAM = (unsigned long *)GetPixelAt (x, y);
-    register char CharLine = *CharImage++;
-    if (bg < 0)
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          VRAM++;
-        CharLine <<= 1;
-      } else
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          *VRAM++ = bg;
-        CharLine <<= 1;
-      } /* endfor */
-  } /* endfor */
-}
+#define WRITECHAR_NAME WriteChar32
+#define WRITECHAR_PIXTYPE ULong
+#include "writechr.inc"
 
 #define DRAWSPRITE_NAME DrawSprite8
 #define DRAWSPRITE_PIXTYPE UByte
@@ -607,7 +414,7 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
   return Outside;
 }
 
-bool csGraphics2D::SaveArea (ImageArea *&Area, int x, int y, int w, int h)
+csImageArea *csGraphics2D::SaveArea (int x, int y, int w, int h)
 {
   if (x < 0)
   { w += x; x = 0; }
@@ -618,28 +425,28 @@ bool csGraphics2D::SaveArea (ImageArea *&Area, int x, int y, int w, int h)
   if (y + h > Height)
     h = Height - y;
   if ((w <= 0) || (h <= 0))
-  {
-    Area = NULL;
-    return true;
-  } /* endif */
+    return NULL;
 
-  CHK (Area = new ImageArea (x, y, w, h));
+  CHK (csImageArea *Area = new csImageArea (x, y, w, h));
   if (!Area)
-    return false;
+    return NULL;
   w *= pfmt.PixelBytes;
   CHK (char *dest = Area->data = new char [w * h]);
   if (!dest)
-    return false;
+  {
+    delete Area;
+    return NULL;
+  }
   for (; h > 0; y++, h--)
   {
     unsigned char *VRAM = GetPixelAt (x, y);
     memcpy (dest, VRAM, w);
     dest += w;
   } /* endfor */
-  return true;
+  return Area;
 }
 
-void csGraphics2D::RestoreArea (ImageArea *Area, bool Free)
+void csGraphics2D::RestoreArea (csImageArea *Area, bool Free)
 {
   if (Area)
   {
@@ -657,7 +464,7 @@ void csGraphics2D::RestoreArea (ImageArea *Area, bool Free)
   } /* endif */
 }
 
-void csGraphics2D::FreeArea (ImageArea *Area)
+void csGraphics2D::FreeArea (csImageArea *Area)
 {
   if (Area)
   {
@@ -675,19 +482,19 @@ void csGraphics2D::SetRGB (int i, int r, int g, int b)
   PaletteAlloc[i] = true;
 }
 
-unsigned char *csGraphics2D::GetPixelAt8 (int x, int y)
+unsigned char *csGraphics2D::GetPixelAt8 (csGraphics2D *This, int x, int y)
 {
-  return (Memory + (x + LineAddress[y]));
+  return (This->Memory + (x + This->LineAddress[y]));
 }
 
-unsigned char *csGraphics2D::GetPixelAt16 (int x, int y)
+unsigned char *csGraphics2D::GetPixelAt16 (csGraphics2D *This, int x, int y)
 {
-  return (Memory + (x + x + LineAddress[y]));
+  return (This->Memory + (x + x + This->LineAddress[y]));
 }
 
-unsigned char *csGraphics2D::GetPixelAt32 (int x, int y)
+unsigned char *csGraphics2D::GetPixelAt32 (csGraphics2D *This, int x, int y)
 {
-  return (Memory + ((x<<2) + LineAddress[y]));
+  return (This->Memory + ((x<<2) + This->LineAddress[y]));
 }
 
 bool csGraphics2D::SetMousePosition (int x, int y)
@@ -696,34 +503,16 @@ bool csGraphics2D::SetMousePosition (int x, int y)
   return false;
 }
 
-bool csGraphics2D::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
+bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
 {
   (void)hBitmap;
   return (iShape == csmcArrow);
-}
-
-void csGraphics2D::GetStringError(HRESULT hRes, char* szError)
-{
-  (void)hRes; (void)szError;
-  strcpy(szError, "Internal Error.");
 }
 
 bool csGraphics2D::PerformExtension (char* args)
 {
   (void)args;
   return false;
-}
-
-void csGraphics2D::SysPrintf(int mode, const char* text, ...)
-{
-  char buf[1024];
-  va_list arg;
-	
-  va_start (arg, text);
-  vsprintf (buf, text, arg);
-  va_end (arg);
-	
-  system->Print(mode, buf);
 }
 
 int csGraphics2D::GetTextWidth (int Font, const char *text)
@@ -741,4 +530,16 @@ int csGraphics2D::GetTextWidth (int Font, const char *text)
 int csGraphics2D::GetTextHeight (int Font)
 {
   return FontList [Font].Height;
+}
+
+void csGraphics2D::CsPrintf (int mode, const char* text, ...)
+{
+  char buf [1024];
+  va_list arg;
+	
+  va_start (arg, text);
+  vsprintf (buf, text, arg);
+  va_end (arg);
+	
+  System->Print (mode, buf);
 }

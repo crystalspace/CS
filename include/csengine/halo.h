@@ -36,7 +36,7 @@ public:
   ///
   float intensity;
   ///
-  HALOINFO haloinfo;
+  csHaloHandle haloinfo;
 
   ///
   csHaloInformation() : v (0, 0, 0)

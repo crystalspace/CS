@@ -28,15 +28,15 @@
 #include "cs2d/be/CrystWindow.h"
 #include "cssys/be/beitf.h"
 
-CrystView::CrystView(BRect frame, IBeLibSystemDriver* isys) :
+CrystView::CrystView(BRect frame, iBeLibSystemDriver* isys) :
 	BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), be_system(isys)
 {
-	be_system->AddRef();
+	be_system->IncRef();
 }
 
 CrystView::~CrystView()
 {
-	be_system->Release();
+	be_system->DecRef();
 }
 
 void CrystView::ProcessUserEvent() const
@@ -72,28 +72,21 @@ void CrystView::MouseUp(BPoint point)
 }
 
 CrystWindow::CrystWindow(BRect frame, const char* name, CrystView* v,
-	csGraphics2DBeLib* piBeG2D, ISystem* isys, IBeLibSystemDriver* bsys) :
+	csGraphics2DBeLib* ipG2D, iSystem* isys, iBeLibSystemDriver* bsys) :
 	BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
-	view(v), cs_system(isys), be_system(bsys)
+	view(v), cs_system(isys), be_system(bsys), pG2D(ipG2D)
 {
-	cs_system->AddRef();
-	be_system->AddRef();
+	cs_system->IncRef();
+	be_system->IncRef();
+	pG2D->IncRef ();
 	
 	// Initialise local flags
 #if 0
-	pi_BeG2D = piBeG2D;
-	pi_BeG2D->fConnected = false;
-	pi_BeG2D->fConnectionDisabled = false;
-	pi_BeG2D->locker = new BLocker();
+	pG2D->fConnected = false;
+	pG2D->fConnectionDisabled = false;
+	pG2D->locker = new BLocker();
 #endif
 	
-	// FIXME: Is this level of abstraction needed?  Why not just use the
-	// incoming piBeG2D?
-	HRESULT hRes = piBeG2D->QueryInterface ((REFIID)IID_IBeLibGraphicsInfo, (void**)&piG2D);
-	if (SUCCEEDED(hRes)) {
-//		printf("piBeG2D->QueryInterface succeeded \n");
-	}
-
 	view->SetViewColor(0, 0, 0);// remove for direct framebuffer access
 //	view->SetViewColor(B_TRANSPARENT_32_BIT);// uncomment for direct framebuffer access
 	AddChild(view);
@@ -108,14 +101,14 @@ CrystWindow::CrystWindow(BRect frame, const char* name, CrystView* v,
 
 CrystWindow::~CrystWindow()
 {
-//	pi_BeG2D->fConnectionDisabled = true;
+//	pG2D->fConnectionDisabled = true;
 	Hide();
 	Flush();
-//	delete pi_BeG2D->locker;
-//	pi_BeG2D->locker = 0;
-	piG2D->Release();
-	be_system->Release();
-	cs_system->Release();
+//	delete pG2D->locker;
+//	pG2D->locker = 0;
+	pG2D->DecRef ();
+	be_system->DecRef ();
+	cs_system->DecRef ();
 }
 
 bool CrystWindow::QuitRequested()
@@ -139,10 +132,10 @@ void CrystWindow::MessageReceived(BMessage* m)
 	}
 }
 
-void CrystWindow::DirectConnected(direct_buffer_info *info)
+bool CrystWindow::DirectConnected(direct_buffer_info *info)
 {
 //	printf("Entered CrystWindow::DirectConnected \n");
-//	HRESULT hRes = piG2D->DirectConnect(info); //dh:uncomment this to get direct framebuffer access
+//	return pG2D->DirectConnect (info); //dh:uncomment this to get direct framebuffer access
 
 //	This bit just keeps conventional window behaviour until DH has sorted out DirectConnected
 	BDirectWindow::DirectConnected(info);

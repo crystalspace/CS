@@ -26,7 +26,7 @@ class csSector;
 class csPolygon2D;
 class csPolygon3D;
 class csStatLight;
-interface ITextureHandle;
+scfInterface iTextureHandle;
 
 /**
  * This class represents a portal. It belongs to some polygon
@@ -83,7 +83,7 @@ protected:
    * A portal will change the intensity/color of the light that passes
    * through it depending on the texture.
    */
-  ITextureHandle* filter_texture;
+  iTextureHandle* filter_texture;
 
   /**
    * If filter_texture is NULL then this filter is used instead.
@@ -176,7 +176,7 @@ public:
   /**
    * Set the texture (used for filtering).
    */
-  void SetTexture (ITextureHandle* ft) { filter_texture = ft; }
+  void SetTexture (iTextureHandle* ft) { filter_texture = ft; }
 
   /**
    * Set the filter (instead of the texture).

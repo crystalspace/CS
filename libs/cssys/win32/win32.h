@@ -34,7 +34,7 @@
 #define strncasecmp(s1,s2,n) strnicmp(s1,s2,n)
 #endif
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssys/win32/win32itf.h"
 #include <objbase.h>
 

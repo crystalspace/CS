@@ -21,8 +21,6 @@
 #if !defined(__ISOUNDBUFFER_H__)
 #define __ISOUNDBUFFER_H__
 
-extern const GUID IID_ISoundBuffer;
-
 enum SoundBufferPlayMethod
 {
   SoundBufferPlay_Normal = 0,
@@ -32,25 +30,24 @@ enum SoundBufferPlayMethod
   SoundBufferPlay_DestroyAtEnd,
 };
 
-interface ISoundSource;
+scfInterface iSoundSource;
 
-interface ISoundBuffer : public IUnknown
+SCF_INTERFACE (iSoundBuffer, 0, 0, 1) : public iBase
 {
-public:
   /// Play the sound
-  STDMETHOD (Play) (SoundBufferPlayMethod playMethod = SoundBufferPlay_Normal) PURE;
+  virtual void Play (SoundBufferPlayMethod playMethod = SoundBufferPlay_Normal) = 0;
   /// Stop the sound
-  STDMETHOD (Stop) () PURE;
-  // Set volume
-  STDMETHOD (SetVolume) (float volume) PURE;
-  // Get volume
-  STDMETHOD (GetVolume) (float &volume) PURE;
-  // Set frequency factor : 1 = normal, >1 more speed, <1 more slow
-  STDMETHOD (SetFrequencyFactor) (float factor) PURE;
-  // Get frequency factor
-  STDMETHOD (GetFrequencyFactor) (float &factor) PURE;
-  // Create a 3d 
-  STDMETHOD (CreateSource) (ISoundSource **source) PURE;
+  virtual void Stop () = 0;
+  /// Set volume
+  virtual void SetVolume (float volume) = 0;
+  /// Get volume
+  virtual float GetVolume () = 0;
+  /// Set frequency factor : 1 = normal, >1 more speed, <1 more slow
+  virtual void SetFrequencyFactor (float factor) = 0;
+  /// Get frequency factor
+  virtual float GetFrequencyFactor () = 0;
+  /// Create a 3d 
+  virtual iSoundSource *CreateSource () = 0;
 };
 
 #endif // __ISOUNDBUFFER_H__

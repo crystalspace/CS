@@ -20,7 +20,7 @@
 #include <gl/gl.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/openglwin/oglg2d.h"
 #include "cs3d/opengl/ogl_txtcache.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
@@ -61,13 +61,12 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
-BEGIN_INTERFACE_TABLE(csGraphics2DOpenGL)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IOpenGLGraphicsInfo, XOpenGLGraphicsInfo )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DOpenGL)
+EXPORT_CLASS_TABLE (glwin32)
+  EXPORT_CLASS (csGraphics2DOpenGL, "crystalspace.graphics2d.glwin32",
+    "Win32 OpenGL 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
 
@@ -155,8 +154,8 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
     sys_fatalerror("Error creating identity palette.");
 }
 
-csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool /*bUses3D*/) : 
-                   csGraphics2DGLCommon (piSystem),
+csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent, bool /*bUses3D*/) : 
+                   csGraphics2DGLCommon (iParent),
                    m_hWnd(NULL),
                    m_bDisableDoubleBuffer(false),
                    m_bPaletteChanged(false),
@@ -165,32 +164,29 @@ csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool /*bUses3D*/) :
                    m_nGraphicsReady(true),
                    m_piWin32System(NULL)
 {
-  HRESULT ddrval;
- 
-  // QI for IWin32SystemDriver //
-  ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&m_piWin32System);
-  if (FAILED(ddrval))
-      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
 }
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
 {
-  FINAL_RELEASE(m_piWin32System);
+  m_piWin32System->DecRef ();
   m_nGraphicsReady=0;
 }
 
-void csGraphics2DOpenGL::Initialize(void)
+bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
 {
-  csGraphics2DGLCommon::Initialize();
+  if (!csGraphics2DGLCommon::Initialize (pSystem))
+    return false;
+
+  // QI for iWin32SystemDriver //
+  m_piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
+  if (!m_piWin32System)
+      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.", ddrval);
   
   // Get the creation parameters //
   m_piWin32System->GetInstance(&m_hInstance);
   m_piWin32System->GetCmdShow(&m_nCmdShow);
 
-  system->GetDepthSetting(Depth);
-  system->GetHeightSetting(Height);
-  system->GetWidthSetting(Width);
-  system->GetFullScreenSetting(FullScreen);
+  System->GetSetting(Width, Height, Depth, FullScreen);
     
   if (Depth==8)
   {
@@ -225,7 +221,8 @@ void csGraphics2DOpenGL::Initialize(void)
   else
     sys_fatalerror("Only support 8, 16 or 32 bits color depth");
   
-  SysPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
+  CsPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
+  return true;
 }
 
 void csGraphics2DOpenGL::CalcPixelFormat ()
@@ -446,7 +443,7 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-bool csGraphics2DOpenGL::SetMouseCursor (int iShape, csTextureHandle* iBitmap)
+bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape, csTextureHandle* iBitmap)
 {
   (void)iShape; (void)iBitmap;
   return false;

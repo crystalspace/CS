@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssndrdr/null/nrdrcom.h"
 #include "cssndrdr/null/nrdrlst.h"
 #include "cssndrdr/null/nrdrsrc.h"
@@ -38,7 +38,7 @@ BEGIN_INTERFACE_TABLE(csSoundRenderNull)
   IMPLEMENTS_INTERFACE(ISoundRender)
 END_INTERFACE_TABLE()
 
-csSoundRenderNull::csSoundRenderNull(ISystem* piSystem) : m_pListener(NULL)
+csSoundRenderNull::csSoundRenderNull(iSystem* piSystem) : m_pListener(NULL)
 {
   m_piSystem = piSystem;
 

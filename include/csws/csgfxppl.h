@@ -23,8 +23,10 @@
 #include "csutil/csbase.h"
 #include "csutil/csrect.h"
 #include "csengine/csspr2d.h"
-#include "igraph2d.h"
 #include "igraph3d.h"
+
+scfInterface iGraphics2D;
+scfInterface iSystem;
 
 // Maximal number of primitives which can be drawn IN ONE FRAME
 #define MAX_CSWS_PIPELINE_LENGTH 16384
@@ -60,71 +62,86 @@ private:
     pipeopRESCLIP,
     pipeopPOLY3D
   };
-  /// Graphics pipeline entry
+  /**
+   * Graphics pipeline entry.
+   * WARNING! Keep the size of this structure AS LOW AS POSSIBLE.
+   * The gfx pipeline is an static array that contains VERY many
+   * elements of this type.
+   */
   typedef struct
   {
-    int Op;
+    unsigned char Op;
+    unsigned char font;	// this is a part of Text struct (below)
     union
     {
-     struct
-     {
-       int xmin,ymin,xmax,ymax,color;
-     } Box;
-     struct
-     {
-       float x1,y1,x2,y2;
-       int color;
-     } Line;
-     struct
-     {
-       int x,y,color;
-     } Pixel;
-     struct
-     {
-       int x,y,fg,bg,font;
-       char *string;
-     } Text;
-     struct
-     {
-       csSprite2D *s2d;
-       int x, y, w, h;
-     } Spr2D;
-     struct
-     {
-       ImageArea **Area;
-       int x, y, w, h;
-     } SavArea;
-     struct
-     {
-       ImageArea *Area;
-       bool Free;
-     } ResArea;
-     struct
-     {
-       int xmin, ymin, xmax, ymax;
-     } ClipRect;
-     struct
-     {
-       G3DPolygonDPFX poly;
-       UInt mode;
-     } Poly3D;
+      struct
+      {
+        int xmin,ymin,xmax,ymax;
+        int color;
+      } Box;
+      struct
+      {
+        float x1,y1,x2,y2;
+        int color;
+      } Line;
+      struct
+      {
+        int x,y,color;
+      } Pixel;
+      struct
+      {
+        int x,y,fg,bg;
+        char *string;
+      } Text;
+      struct
+      {
+        csSprite2D *s2d;
+        int x, y, w, h;
+      } Spr2D;
+      struct
+      {
+        csImageArea **Area;
+        int x, y, w, h;
+      } SavArea;
+      struct
+      {
+        csImageArea *Area;
+        bool Free;
+      } ResArea;
+      struct
+      {
+        int xmin, ymin, xmax, ymax;
+      } ClipRect;
+      struct
+      {
+        void *poly;	/* A pointer to packed G3DPolygonDPFX structure */
+        int mode;
+      } Poly3D;
     };
   } csPipeEntry;
 
   int pipelen;
   csPipeEntry pipeline [MAX_CSWS_PIPELINE_LENGTH];
   // Used to propagate changes to all pages
-  ImageArea *SyncArea [MAX_SYNC_PAGES];
+  csImageArea *SyncArea [MAX_SYNC_PAGES];
   csRect SyncRect [MAX_SYNC_PAGES];
   csRect RefreshRect;
   int MaxPage;
   int CurPage;
 
+  // Frame width and height
+  int FrameWidth, FrameHeight;
+
+  // The 2D graphics driver
+  iGraphics2D *iG2D;
+  // The 3D graphics driver
+  iGraphics3D *iG3D;
+
   // Used to clear screen
   int ClearPage,ClearColor;
 
   /// Initialize pipeline
-  csGraphicsPipeline ();
+  csGraphicsPipeline (iSystem *System);
   /// Deinitialize pipeline
   virtual ~csGraphicsPipeline ();
 
@@ -153,13 +170,13 @@ private:
   void Sprite2D (csSprite2D *s2d, int x, int y, int w, int h);
 
   /// Save a part of screen
-  void SaveArea (ImageArea **Area, int x, int y, int w, int h);
+  void SaveArea (csImageArea **Area, int x, int y, int w, int h);
 
   /// Restore a part of screen
-  void RestoreArea (ImageArea *Area, bool Free);
+  void RestoreArea (csImageArea *Area, bool Free);
 
   /// Free buffer used to keep an area of screen
-  void FreeArea (ImageArea *Area);
+  void FreeArea (csImageArea *Area);
 
   /// Clear screen with specified color
   void Clear (int color);
@@ -184,6 +201,13 @@ private:
     else
       return NULL;
   }
+
+  /// Clip a line against a rectangle and return true if its clipped out
+  bool ClipLine (float &x1, float &y1, float &x2, float &y2,
+    int ClipX1, int ClipY1, int ClipX2, int ClipY2);
+
+  /// Change system mouse cursor and return success status
+  bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap);
 
   /// Return the width of given text using selected font
   int TextWidth (const char *text, int Font);

@@ -21,6 +21,8 @@ all drivers drivers2d: asciiart
 
 asciiart:
 	$(MAKE_TARGET) MAKE_DLL=yes
+asciiartclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -52,11 +54,10 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/asciiart
 
-.PHONY: asciiart asciiartclean asciiartcleanlib
+.PHONY: asciiart asciiartclean
 
 # Chain rules
 clean: asciiartclean
-cleanlib: asciiartcleanlib
 
 asciiart: $(OUTDIRS) $(ASCIIART)
 
@@ -64,10 +65,7 @@ $(ASCIIART): $(OBJ.ASCIIART) $(DEP.ASCIIART)
 	$(DO.PLUGIN) $(LIBS.LOCAL.ASCIIART)
 
 asciiartclean:
-	$(RM) $(ASCIIART)
-
-asciiartcleanlib:
-	$(RM) $(OBJ.ASCIIART) $(ASCIIART)
+	$(RM) $(ASCIIART) $(OBJ.ASCIIART)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)asciiart.dep

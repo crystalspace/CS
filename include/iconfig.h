@@ -16,10 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ICONFIG_H
-#define ICONFIG_H
+#ifndef __ICONFIG_H__
+#define __ICONFIG_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 enum csVariantType
 {
@@ -48,24 +48,21 @@ struct csOptionDescription
   csVariantType type;	// Type to use for this option.
 };
 
-extern const IID IID_IConfig;
-
 /**
- * Interface to a configurator object. If a COM module
+ * Interface to a configurator object. If a SCF module
  * has an object implementing this interface then this can
  * be used to query/set configuration options.
  */
-interface IConfig : public IUnknown
+SCF_INTERFACE (iConfig, 0, 0, 1) : public iBase
 {
   ///
-  COM_METHOD_DECL SetOption (int id, csVariant* value) PURE;
+  virtual int GetOptionCount () = 0;
   ///
-  COM_METHOD_DECL GetOption (int id, csVariant* value) PURE;
+  virtual bool GetOptionDescription (int idx, csOptionDescription *option) = 0;
   ///
-  COM_METHOD_DECL GetNumberOptions (int& num) PURE;
+  virtual bool SetOption (int id, csVariant* value) = 0;
   ///
-  COM_METHOD_DECL GetOptionDescription (int idx, csOptionDescription* option) PURE;
+  virtual bool GetOption (int id, csVariant* value) = 0;
 };
 
-#endif //ICONFIG_H
-
+#endif // __ICONFIG_H__

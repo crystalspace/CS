@@ -250,7 +250,6 @@ ifeq ($(ROOTCONFIG),volatile)
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define CS_NO_MODULE_LOCKING$">>volatile.tmp
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define USGISH$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)
 endif # ifeq ($(MAKESECTION),rootdefines)

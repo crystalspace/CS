@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include "sysdef.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssnddrv/null/nulldrv.h"
 #include "isnddrv.h"
 
@@ -120,7 +120,7 @@ BEGIN_INTERFACE_TABLE (csSoundDriverNullFactory)
   IMPLEMENTS_INTERFACE (ISoundDriverFactory)
 END_INTERFACE_TABLE ()
 
-STDMETHODIMP csSoundDriverNullFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
+STDMETHODIMP csSoundDriverNullFactory::CreateInstance (REFIID riid, iSystem* piSystem, void** ppv)
 {
   if (!piSystem)
   {

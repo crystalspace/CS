@@ -25,7 +25,7 @@ extern char* get_software_2d_driver ();
 
 // The 2D graphics drivers used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER_SVGA	"crystalspace.graphics2d.svgalib"
-#define SOFTWARE_2D_DRIVER_GGI	"crystalspace.graphics2d.libggi"
+#define SOFTWARE_2D_DRIVER_GGI	"crystalspace.graphics2d.ggi"
 #define SOFTWARE_2D_DRIVER_XLIB	"crystalspace.graphics2d.xlib"
 
 // The 2D graphics driver used by OpenGL renderer

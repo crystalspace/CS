@@ -25,7 +25,7 @@
 // SoundDriver.H
 // csSoundDriverOSS class.
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "isnddrv.h"
 
 extern const CLSID CLSID_OSSSoundDriver;
@@ -65,7 +65,7 @@ private:
 class csSoundDriverOSS : public ISoundDriver
 {
 protected:
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
   void * memory;
   int memorysize;
   float volume;
@@ -78,7 +78,7 @@ protected:
   unsigned char *soundbuffer;
 
 public:
-	csSoundDriverOSS(ISystem* piSystem);
+	csSoundDriverOSS(iSystem* piSystem);
 
 	virtual ~csSoundDriverOSS();
 
@@ -114,7 +114,7 @@ public:
 
 class csSoundDriverOSSFactory : public ISoundDriverFactory
 {
-    STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
+    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
     STDMETHODIMP LockServer(COMBOOL bLock);

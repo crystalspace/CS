@@ -17,20 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ITXTMGR_H
-#define ITXTMGR_H
+#ifndef __ITXTMGR_H__
+#define __ITXTMGR_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
 class Vector2;
 class csMatrix3;
 class csVector3;
 class csRect;
 
-interface IImageFile;
-interface ITextureHandle;
-
-extern const GUID IID_ITextureManager;
+scfInterface iImageFile;
+scfInterface iTextureHandle;
 
 /**
  * This is the standard texture manager interface.
@@ -42,14 +40,13 @@ extern const GUID IID_ITextureManager;
  * lookup tables related to the textures. Mipmap creation is
  * also done in this class.
  */
-interface ITextureManager : public IUnknown
+SCF_INTERFACE (iTextureManager, 0, 0, 1) : public iBase
 {
-public:
   /**
    * Initialize the texture system. This function must be called
    * at least once and everytime we want to start all over using the textures.
    */
-  COM_METHOD_DECL Initialize () PURE;
+  virtual void Initialize () = 0;
 
   /**
    * After all textures have been added, this function does all
@@ -57,7 +54,7 @@ public:
    * Prepare() must be able to handle being called twice or more
    * without ill effects.
    */
-  COM_METHOD_DECL Prepare () PURE;
+  virtual void Prepare () = 0;
 
   /**
    * Register a texture. In this function, the texture will be converted
@@ -74,15 +71,14 @@ public:
    * If 'for2d' is true then the texture is prepared for the 2D driver.
    * Both can be true at the same time.
    */
-  COM_METHOD_DECL RegisterTexture (IImageFile* image, ITextureHandle** handle,
-  	bool for3d, bool for2d) PURE;
+  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d) = 0;
 
   /**
    * Unregister a texture. Note that this will have no effect on the
    * possible palette and lookup tables until after Prepare() is called
    * again.
    */
-  COM_METHOD_DECL UnregisterTexture (ITextureHandle* handle) PURE;
+  virtual void UnregisterTexture (iTextureHandle* handle) = 0;
 
   /**
    * Merge a texture. If you just registered a texture with RegisterTexture()
@@ -92,17 +88,17 @@ public:
    * the palette and lookup tables but instead convert the given texture so
    * to the current palette.
    */
-  COM_METHOD_DECL MergeTexture (ITextureHandle* handle) PURE;
+  virtual void MergeTexture (iTextureHandle *handle) = 0;
 
   /**
-   * Call this function if you want to release all ImageFile's as
+   * Call this function if you want to release all csImageFile's as
    * given to this texture manager. After FreeImages() has been called
    * it is no longer allowed to call Prepare() again. So the advantage
    * of calling FreeImages() is that you gain memory (may be a lot)
    * but the disadvantage is that when you want to add textures later
    * you have to reload them all and start all over.
    */
-  COM_METHOD_DECL FreeImages () PURE;
+  virtual void FreeImages () = 0;
 
   /**
    * Reserve RGB. Call this function to reserve a color
@@ -110,29 +106,29 @@ public:
    * the next call to Prepare(). Note that black and white are already
    * preallocated colors.
    */
-  COM_METHOD_DECL ReserveColor (int r, int g, int b) PURE;
+  virtual void ReserveColor (int r, int g, int b) = 0;
 
   /**
    * After calling Prepare() you can call this function to allocate
    * the palette to the 2D driver. @@@ Is this the right place for this function?
    */
-  COM_METHOD_DECL AllocPalette () PURE;
+  virtual void AllocPalette () = 0;
 
   /**
    * Return a color.
    */
-  COM_METHOD_DECL FindRGB (int r, int g, int b, int& color) PURE;
+  virtual int FindRGB (int r, int g, int b) = 0;
 
   /**
    * Return true if VERYNICE mipmap mode is used. This is an
    * ugly way to get this value. We need better user-config capabilities for this.@@@
    */
-  COM_METHOD_DECL GetVeryNice (bool& result) PURE;
+  virtual bool GetVeryNice () = 0;
 
   /**
    * Set verbose mode on/off.
    */
-  COM_METHOD_DECL SetVerbose (bool vb) PURE;
+  virtual void SetVerbose (bool vb) = 0;
 };
 
-#endif      // ITXTMGR_H
+#endif // __ITXTMGR_H__

@@ -17,13 +17,11 @@
 //	A pure COM-compatible interface to the NeXT-specific csSystemDriver.
 //
 //-----------------------------------------------------------------------------
-#include "cscom/com.h"
+#include "csutil/scf.h"
 
-extern IID const IID_INeXTSystemDriver;
-
-interface INeXTSystemDriver : public IUnknown
+SCF_INTERFACE (iNeXTSystemDriver, 0, 0, 1) : public iBase
     {
-    STDMETHOD(GetSimulatedDepth)( int& ) PURE;
+    virtual int GetSimulatedDepth () = 0;
     };
 
 #endif // __NeXT_NeXTSystemInterface_h

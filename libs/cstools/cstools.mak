@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: cstools
 cstools:
 	$(MAKE_TARGET)
+cstoolsclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -44,7 +46,7 @@ $(CSTOOLS.LIB): $(OBJ.CSTOOLS)
 	$(DO.LIBRARY)
 
 cstoolsclean:
-	-$(RM) $(CSTOOLS.LIB)
+	-$(RM) $(CSTOOLS.LIB) $(OBJ.CSTOOLS)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)cstools.dep

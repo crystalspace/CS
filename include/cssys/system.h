@@ -21,24 +21,24 @@
 
 #include <stdio.h>
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
+#include "csutil/csobjvec.h"
 #include "iconfig.h"
 #include "isystem.h"
+#include "ivfs.h"
 
 class csEventQueue;
 class csKeyboardDriver;
 class csMouseDriver;
 class csConsole;
 class csIniFile;
-class csVFS;
 
-interface IGraphics3D;
-interface IGraphics2D;
-interface IGraphicsInfo;
-interface INetworkDriver;
-interface INetworkManager;
-interface ISoundRender;
-interface IConfig;
+scfInterface iGraphics3D;
+scfInterface iGraphics2D;
+scfInterface iNetworkDriver;
+scfInterface iNetworkManager;
+scfInterface iSoundRender;
+scfInterface iConfig;
 
 /// Class to collect all options for all COM modules in the system.
 class csColOption
@@ -49,9 +49,9 @@ public:
   int id;
   char* option_name;
   bool option_value;	// If type is CSVAR_BOOL
-  IConfig* config;
+  iConfig* config;
 
-  csColOption (csColOption* next, csVariantType type, int id, char* option_name, bool option_value, IConfig* config)
+  csColOption (csColOption* next, csVariantType type, int id, char* option_name, bool option_value, iConfig* config)
   {
     csColOption::next = next;
     csColOption::type = type;
@@ -78,24 +78,58 @@ public:
  * methods. Note that some methods it is required to override,
  * otherwise program simply will not compile (they are marked
  * as abstract).
+ * <p>
+ * This is an abstract class since it does not implement the iBase
+ * interface. The iBase interface is supposed to be implemented
+ * in SysSystemDriver which should be derived from csSystemDriver.
  */
-class csSystemDriver
+class csSystemDriver : public iSystem
 {
+  // This is a private structure used to keep the list of plugins
+  class csPlugIn : public csBase
+  {
+  public:
+    // The plugin itself
+    iPlugIn *PlugIn;
+    // The class ID of the plugin
+    char *ClassID;
+    // The mask of events this plugin wants to see
+    unsigned int EventMask;
+
+    // Construct the object that represents a plugin
+    csPlugIn (iPlugIn *iObject, const char *iClassID);
+    // Free storage
+    virtual ~csPlugIn ();
+  };
+
+  // This is a superset of csObjVector that can find by pointer a plugin
+  class csPlugInsVector : public csObjVector
+  {
+  public:
+    // Create the vector
+    csPlugInsVector (int iLimit, int iDelta) : csObjVector (iLimit, iDelta) {}
+    // Compare a vector element against a iPlugIn pointer
+    virtual int CompareKey (csSome Item, csConstSome Key, int) const
+    { return ((csPlugIn *)Item)->PlugIn == Key ? 0 : -1; }
+  };
+
 public:
-  /// Sound render
-  ISoundRender* piSound;
-  /// Program event queue
-  csEventQueue *EventQueue;
-  /// Network driver
-  INetworkDriver* piNetDrv;
-  /// Network manager
-  INetworkManager* piNetMan;
+  /// -------------------------- plug-ins --------------------------
+  /// The list of all plug-ins
+  csPlugInsVector PlugIns;
+  /// The Virtual File System object
+  iVFS *VFS;
   /// 3D Graphics context
-  IGraphics3D* piG3D;
+  iGraphics3D* G3D;
   /// 2D Graphics context
-  IGraphics2D* piG2D;
-  /// Graphics info context
-  IGraphicsInfo* piGI;
+  iGraphics2D* G2D;
+  /// Sound render
+  iSoundRender* Sound;
+  /// Network driver
+  iNetworkDriver* NetDrv;
+  /// Network manager
+  iNetworkManager* NetMan;
+
   /// the width of this frame
   int FrameWidth;
   /// the height of this frame
@@ -104,55 +138,41 @@ public:
   bool FullScreen;
   /// the bits-per-pixel of the display.
   int Depth;
+  /// The event queue
+  csEventQueue *EventQueue;
   /// Keyboard driver
   csKeyboardDriver *Keyboard;
   /// Mouse driver
   csMouseDriver *Mouse;
   /// The Configuration File object
   csIniFile *Config;
-  /// The Virtual File System configuration file object
-  csIniFile *VfsConfig;
-  /// The Virtual File System object
-  csVFS *Vfs;
   /// Set to non-zero to exit csSystemDriver::Loop()
   static bool Shutdown;
   /// Same as Shutdown but set manually by windowing system
   static bool ExitLoop;
   /// System console
   csConsole *Console;
-  /// Interface for the engine configuration values.
-  IConfig* cfg_engine;
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
   static int debug_level;
   /// true if demo console is ready
-  static bool DemoReady;
+  static bool ConsoleReady;
   /// true if CrystalSpace visual is active (focused)
   bool IsFocused;
   /// List of all options for all COM modules.
-  csColOption* com_options;
+  csColOption* OptionList;
+  /// System configuration file name
+  char *ConfigName;
 
   /// Initialize system-dependent data
   csSystemDriver ();
   /// Deinitialize system-dependent parts
   virtual ~csSystemDriver ();
 
-  /**
-   * This is usually called right after object creation.
-   * 'cfg_engine' is an instance of IConfig for the engine settings.
-   */
-  virtual bool Initialize (int argc, char *argv[], const char *iConfigName,
-    const char *iVfsConfigName, IConfig* iOptions);
+  /// This is usually called right after object creation.
+  virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
 
-  /// Initialize 3D Graphics context object
-  virtual bool InitGraphics ();
-  /// Initialize Keyboard object
-  virtual bool InitKeyboard ();
-  /// Initialize Mouse object
-  virtual bool InitMouse ();
-  /// Initialize Sound system
-  virtual bool InitSound ();
-  /// Initialize Network system
-  virtual bool InitNetwork ();
+  /// Check if all required drivers are loaded
+  virtual bool CheckDrivers ();
 
   /**
    * Open the graphics context (with optional title on titlebar),
@@ -161,6 +181,11 @@ public:
   virtual bool Open (const char *Title);
   /// Close the system
   virtual void Close ();
+
+  /// Initialize Keyboard object
+  virtual bool InitKeyboard ();
+  /// Initialize Mouse object
+  virtual bool InitMouse ();
 
   /**
    * System loop. This should be called last since it returns
@@ -174,7 +199,13 @@ public:
    * NextFrame. 'current_time' is a global time counter.
    * The time is expressed in milliseconds.
    */
-  virtual void NextFrame (long elapsed_time, long current_time);
+  virtual void NextFrame (time_t elapsed_time, time_t current_time);
+
+  /// Called from NextFrame() to process all events
+  virtual bool ProcessEvents ();
+
+  /// Pass a single event to all plugins until one eats it
+  virtual bool HandleEvent (csEvent &Event);
 
   /// Sleep for given number of 1/1000 seconds (very inacurate)
   virtual void Sleep (int /*SleepTime*/) {}
@@ -255,14 +286,14 @@ protected:
   virtual bool ParseArgDriver (int argc, char* argv[], int& i);
 
   /**
-   * Print help for an IConfig interface.
+   * Print help for an iConfig interface.
    */
-  void Help (IConfig* piConf);
+  void Help (iConfig* piConf);
 
   /**
-   * Collect all options for a IConfig interface.
+   * Collect all options for a iConfig interface.
    */
-  csColOption* CollectOptions (IConfig* config, csColOption* already_collected);
+  void CollectOptions (iConfig* config, csColOption* already_collected);
 
   /**
    * Show an alert. This function is called by CsPrintf and
@@ -289,7 +320,7 @@ protected:
 
   /**
    * This is a system independent function that just initilizes
-   * FRAME_WIDTH and FRAME_HEIGHT from the given mode string.
+   * FrameWidth and FrameHeight from the given mode string.
    */
   void SetMode (const char* mode);
 
@@ -299,32 +330,60 @@ protected:
    */
   void do_focus (int enable);
 
-  // the COM ISystem interface implementation.
-  class XSystem : public ISystem
-  {
-    DECLARE_IUNKNOWN()
-    STDMETHODIMP GetDepthSetting(int& retval);
-    STDMETHODIMP GetFullScreenSetting(bool& retval);
-    STDMETHODIMP GetHeightSetting(int& retval);
-    STDMETHODIMP GetWidthSetting(int& retval);
-    STDMETHODIMP GetSubSystemPtr(void **retval, int iSubSystemID);
-    STDMETHODIMP Print(int mode, const char* string);
-    STDMETHODIMP GetTime (time_t& time);
-    STDMETHODIMP Shutdown ();
-    STDMETHODIMP GetShutdown (bool &Shutdown);
-    STDMETHODIMP ConfigGetInt (char *Section, char *Key, int &Value, int Default = 0);
-    STDMETHODIMP ConfigGetStr (char *Section, char *Key, char *&Value, char *Default = NULL);
-    STDMETHODIMP ConfigGetYesNo (char *Section, char *Key, bool &Value, bool Default = false);
-    STDMETHODIMP QueueKeyEvent (int KeyCode, bool Down);
-    STDMETHODIMP QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags);
-  };
-  
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csSystemDriver)
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (System);
-};
+public:
+  /**************************** iSystem interface ****************************/
 
-#define GetISystemFromSystem(a) (&a->m_xSystem)
+  /// returns the configuration.
+  virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
+  /// Set one of basical drivers (plugins)
+  virtual bool RegisterDriver (const char *iInterface, iPlugIn *iObject);
+  /// Unload a driver
+  virtual bool DeregisterDriver (const char *iInterface, iPlugIn *iObject);
+  /// Load a plugin and initialize it
+  virtual iBase *LoadPlugIn (const char *iClassID, const char *iInterface, int iVersion);
+  /// Get first of the loaded plugins that supports given interface ID
+  virtual iBase *QueryPlugIn (const char *iInterface, int iVersion);
+  /// Remove a plugin from system driver's plugin list
+  virtual bool UnloadPlugIn (iPlugIn *iObject);
+  /// print a string to the specified device.
+  virtual void Print (int mode, const char *string);
+  /// get the time in milliseconds.
+  virtual time_t GetTime ();
+  /// quit the system.
+  virtual void StartShutdown ();
+  /// check if system is shutting down
+  virtual bool GetShutdown ();
+  /// Get a integer configuration value
+  virtual int ConfigGetInt (char *Section, char *Key, int Default = 0);
+  /// Get a string configuration value
+  virtual char *ConfigGetStr (char *Section, char *Key, char *Default = NULL);
+  /// Get a string configuration value
+  virtual bool ConfigGetYesNo (char *Section, char *Key, bool Default = false);
+  /// Get a float configuration value
+  virtual float ConfigGetFloat (char *Section, char *Key, float Default = 0);
+  /// Set an integer configuration value
+  virtual bool ConfigSetInt (char *Section, char *Key, int Value);
+  /// Set an string configuration value
+  virtual bool ConfigSetStr (char *Section, char *Key, char *Value);
+  /// Set an float configuration value
+  virtual bool ConfigSetFloat (char *Section, char *Key, float Value);
+  /// Save system configuration file
+  virtual bool ConfigSave ();
+  /// Put a keyboard event into event queue 
+  virtual void QueueKeyEvent (int KeyCode, bool Down);
+  /// Put a mouse event into event queue 
+  virtual void QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags);
+  /// Put a focus event into event queue 
+  virtual void QueueFocusEvent (bool Enable);
+  /// Register the plugin to receive specific events
+  virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask);
+  /// Query current state for given key
+  virtual bool GetKeyState (int key);
+  /// Query current state for given mouse button (0..9)
+  virtual bool GetMouseButton (int button);
+  /// Query current (last known) mouse position
+  virtual void GetMousePosition (int &x, int &y);
+};
 
 // Shortcuts for compatibility
 #define SysGetTime	csSystemDriver::Time

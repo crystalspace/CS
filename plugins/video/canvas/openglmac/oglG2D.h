@@ -23,30 +23,9 @@
 #include <Palettes.h>
 #include <gl/gl.h>
 #include <agl.h>
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/mac/xsysg2d.h"
 #include "cs2d/openglcommon/glcommon2d.h"
-
-
-// the CLSID to create csGraphics2DWin32 instances.
-extern const CLSID CLSID_OpenGLGraphics2D;
-
-extern const IID IID_IGraphics2DOpenGLFactory;
-/// dummy interface
-interface IGraphics2DOpenGLFactory : public IGraphics2DFactory
-{
-};
-
-///
-class csGraphics2DOpenGLFactory : public IGraphics2DOpenGLFactory 
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DOpenGLFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(COMBOOL bLock);
-};
 
 /// Windows version.
 class csGraphics2DOpenGL : public csGraphics2DGLCommon
@@ -54,13 +33,13 @@ class csGraphics2DOpenGL : public csGraphics2DGLCommon
 	friend class csGraphics3DOpenGL;
 
 public:
-	csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D);
+	csGraphics2DOpenGL(iBase* iParent, bool bUses3D);
 	virtual ~csGraphics2DOpenGL(void);
   
 	virtual bool	Open (const char *Title);
 	virtual void	Close ();
   
-	virtual void	Initialize();
+	virtual bool	Initialize(iSystem *pSystem);
 
 	virtual void	Print (csRect *area = NULL);
   
@@ -77,7 +56,7 @@ public:
  	void			WindowChanged( void );
 	void			HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed );
 
-	virtual bool	SetMouseCursor (int iShape, ITextureHandle* iBitmap);
+	virtual bool	SetMouseCursor (csMouseCursorID iShape, iTextureHandle* iBitmap);
 	virtual int		GetPage ();
 	virtual bool	DoubleBuffer (bool Enable);
 	virtual bool	DoubleBuffer ();
@@ -89,19 +68,15 @@ protected:
 	GDHandle			mMainGDevice;
 	CTabHandle			mColorTable;
 	AGLContext			mGLContext;
-    PaletteHandle		mMainPalette;
-    bool				mPaletteChanged;
-    bool				mDoubleBuffering;
-    short				mOldDepth;
+	PaletteHandle		mMainPalette;
+	bool				mPaletteChanged;
+	bool				mDoubleBuffering;
+	short				mOldDepth;
 	CGrafPtr			mSavedPort;
 	GDHandle			mSavedGDHandle;
-    short				mActivePage;
+	short				mActivePage;
 
 	void				DisplayErrorDialog( short errorIndex );
-
-	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csGraphics2DOpenGL)
-	DECLARE_COMPOSITE_INTERFACE(XMacGraphicsInfo)
 };
 
 #endif

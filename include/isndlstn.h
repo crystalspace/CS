@@ -53,44 +53,41 @@ enum SoundEnvironment
   ENVIRONMENT_PSYCHOTIC
 };
 
-extern const GUID IID_ISoundListener;
-
-interface ISoundListener : public IUnknown
+SCF_INTERFACE (iSoundListener, 0, 0, 1) : public iBase
 {
-public:
   /// Set direction of listener (front and top 3d vectors)
-  STDMETHOD (SetDirection) (float fx, float fy, float fz, float tx, float ty, float tz) PURE;
+  virtual void SetDirection (float fx, float fy, float fz, float tx, float ty, float tz) = 0;
   /// Set position of listener
-  STDMETHOD (SetPosition) (float x, float y, float z) PURE;
+  virtual void SetPosition (float x, float y, float z) = 0;
   /// Set velocity of listener
-  STDMETHOD (SetVelocity) (float x, float y, float z) PURE;
+  virtual void SetVelocity (float x, float y, float z) = 0;
   /// Set a distance attenuator
-  STDMETHOD (SetDistanceFactor) (float factor) PURE;
+  virtual void SetDistanceFactor (float factor) = 0;
   /// Set a RollOff factor
-  STDMETHOD (SetRollOffFactor) (float factor) PURE;
+  virtual void SetRollOffFactor (float factor) = 0;
   /// Set the Doppler attenuator
-  STDMETHOD (SetDopplerFactor) (float factor) PURE;
+  virtual void SetDopplerFactor (float factor) = 0;
   /// Set distance between the 2 'ears' of listener
-  STDMETHOD (SetHeadSize) (float size) PURE;
+  virtual void SetHeadSize (float size) = 0;
   /// set type of environment where 'live' listener
-  STDMETHOD (SetEnvironment) (SoundEnvironment env) PURE;
+  virtual void SetEnvironment (SoundEnvironment env) = 0;
 
   /// Get direction of listener (front and top 3d vectors)
-  STDMETHOD (GetDirection) (float &fx, float &fy, float &fz, float &tx, float &ty, float &tz) PURE;
+  virtual void GetDirection (float &fx, float &fy, float &fz, float &tx, float &ty, float &tz) = 0;
   /// Get position of listener
-  STDMETHOD (GetPosition) (float &x, float &y, float &z) PURE;
+  virtual void GetPosition (float &x, float &y, float &z) = 0;
   /// Get velocity of listener
-  STDMETHOD (GetVelocity) (float &x, float &y, float &z) PURE;
+  virtual void GetVelocity (float &x, float &y, float &z) = 0;
   /// Get a distance attenuator
-  STDMETHOD (GetDistanceFactor) (float &factor) PURE;
+  virtual float GetDistanceFactor () = 0;
   /// Get a RollOff factor
-  STDMETHOD (GetRollOffFactor) (float &factor) PURE;
+  virtual float GetRollOffFactor () = 0;
   /// Get the Doppler attenuator
-  STDMETHOD (GetDopplerFactor) (float &factor) PURE;
+  virtual float GetDopplerFactor () = 0;
   /// Get distance between the 2 'ears' of listener
-  STDMETHOD (GetHeadSize) (float &size) PURE;
+  virtual float GetHeadSize () = 0;
   /// Get type of environment where 'live' listener
-  STDMETHOD (GetEnvironment) (SoundEnvironment &env) PURE;
+  virtual SoundEnvironment GetEnvironment () = 0;
 };
 
 #endif // __ISOUNDLISTENER_H__

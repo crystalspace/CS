@@ -20,7 +20,8 @@
 #ifndef __GRAPH2D_H__
 #define __GRAPH2D_H__
 
-#include "cs2d/common/xgraph2d.h"
+#include "csutil/scf.h"
+#include "igraph2d.h"
 
 /// This structure is used to define a external list of bitmap fonts
 struct FontDef
@@ -47,43 +48,43 @@ extern FontDef FontList[];
  * Functions not marked with an asterisk are optional, but possibly
  * slow since they are too general.
  */
-class csGraphics2D
+class csGraphics2D : public iGraphics2D
 {
-protected:
+public:
   /// The clipping rectangle
-  static int ClipX1, ClipX2, ClipY1, ClipY2;
+  int ClipX1, ClipX2, ClipY1, ClipY2;
 
   /// The pixel format
-  static csPixelFormat pfmt;
+  csPixelFormat pfmt;
 
   /// Most systems have a pointer to (real or pseudo) video RAM
-  static unsigned char *Memory;
+  unsigned char *Memory;
 
   /// Keep a array of Y*width to avoid multiplications
-  static int *LineAddress;
+  int *LineAddress;
 
   /// The system driver.
-  static ISystem* system;
+  iSystem* System;
+
+  /// Current font number
+  int Font;
+  /// The width, height and depth of visual
+  int Width, Height, Depth;
+  /// True if visual is full-screen
+  bool FullScreen;
+  /// 256-color palette
+  RGBpaletteEntry Palette[256];
+  /// true if some palette entry is already allocated
+  bool PaletteAlloc[256];
 
 public:
-  /// Current font number
-  static int Font;
-  /// The width, height and depth of visual
-  static int Width, Height, Depth;
-  /// True if visual is full-screen
-  static bool FullScreen;
-  /// 256-color palette
-  static RGBpaletteEntry Palette[256];
-  /// true if some palette entry is already allocated
-  static bool PaletteAlloc[256];
-
   /// Create csGraphics2D object
-  csGraphics2D (ISystem* piSystem);
+  csGraphics2D ();
   /// Destroy csGraphics2D object
   virtual ~csGraphics2D ();
 
-  ///
-  virtual void Initialize ();
+  /// Initialize the plugin
+  virtual bool Initialize (iSystem *pSystem);
 
   /// (*) Open graphics system (set videomode, open window etc)
   virtual bool Open (const char *Title);
@@ -111,19 +112,23 @@ public:
   /// Enable or disable double buffering; return TRUE if supported
   virtual bool DoubleBuffer (bool Enable);
   /// Return current double buffering state
-  virtual bool DoubleBuffer ();
+  virtual bool GetDoubleBufferState ();
+
+  /// Clear backbuffer
+  virtual void Clear (int color);
   /// Clear all video pages
-  void ClearAll (int color);
+  virtual void ClearAll (int color);
 
   /**
    * To facilitate multiple pixel formats, the most critical drawing routines
    * are defined as pointers to functions, not as virtual methods.
    * This allows deciding at run-time which function we will choose.
    */
-  /// Clear backbuffer
-  virtual void Clear (int color);
   /// Draw a pixel
-  static void (*DrawPixel) (int x, int y, int color);
+  void (*_DrawPixel) (csGraphics2D *This, int x, int y, int color);
+  /// Same but exposed through iGraphics2D interface
+  virtual void DrawPixel (int x, int y, int color)
+  { _DrawPixel (this, x, y, color); }
   /// Draw a line
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
   /// Draw a box of given width and height
@@ -133,7 +138,10 @@ public:
   /// Write a text string into the back buffer
   virtual void Write (int x, int y, int fg, int bg, const char *text);
   /// Write a single character
-  static void (*WriteChar) (int x, int y, int fg, int bg, char c);
+  void (*_WriteChar) (csGraphics2D *This, int x, int y, int fg, int bg, char c);
+  /// Same but exposed through iGraphics2D interface
+  virtual void WriteChar (int x, int y, int fg, int bg, char c)
+  { _WriteChar (this, x, y, fg, bg, c); }
   /// Get the width of a string if it would be drawn with given font
   virtual int GetTextWidth (int Font, const char *text);
   /// Get the height of given font
@@ -142,10 +150,17 @@ public:
    * Draw a sprite (possibly rescaled to given width (sw) and height (sh))
    * using given rectangle from given texture
    */
-  static void (*DrawSprite) (ITextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
+  void (*_DrawSprite) (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
+    int sw, int sh, int tx, int ty, int tw, int th);
+  /// Same but exposed through iGraphics2D interface
+  virtual void DrawSprite (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th)
+  { _DrawSprite (this, hTex, sx, sy, sw, sh, tx, ty, tw, th); }
   /// (*) Get address of video RAM at given x,y coordinates
-  static unsigned char* (*GetPixelAt) (int x, int y);
+  unsigned char* (*_GetPixelAt) (csGraphics2D *This, int x, int y);
+  /// Same but exposed through iGraphics2D interface
+  virtual unsigned char *GetPixelAt (int x, int y)
+  { return _GetPixelAt (this, x, y); }
 
   /**
    * Return the number of palette entries that can be modified.
@@ -154,36 +169,39 @@ public:
    * get from GetPixelFormat. It is just a little bit easier to obtain
    * this way.
    */
-  int GetNumPalEntries () { return pfmt.PalEntries; }
+  virtual int GetNumPalEntries ()
+  { return pfmt.PalEntries; }
 
   /**
    * Return the number of bytes for every pixel.
    * This function is equivalent to the PixelBytes field that
    * you get from GetPixelFormat.
    */
-  int GetPixelBytes () { return pfmt.PixelBytes; }
+  virtual int GetPixelBytes ()
+  { return pfmt.PixelBytes; }
 
   /**
    * Return information about about the pixel format.
    */
-  csPixelFormat* GetPixelFormat () { return &pfmt; }
+  virtual csPixelFormat* GetPixelFormat ()
+  { return &pfmt; }
 
   /**
    * Save a subarea of screen area into the variable Data.
    * Storage is allocated in this call, you should either FreeArea()
    * it after usage or RestoreArea() it.
    */
-  virtual bool SaveArea (ImageArea *&Area, int x, int y, int w, int h);
+  virtual csImageArea *SaveArea (int x, int y, int w, int h);
   /// Restore a subarea of screen saved with SaveArea()
-  virtual void RestoreArea (ImageArea *Area, bool Free = true);
+  virtual void RestoreArea (csImageArea *Area, bool Free = true);
   /// Free storage allocated for a subarea of screen
-  virtual void FreeArea (ImageArea *Area);
+  virtual void FreeArea (csImageArea *Area);
 
   /**
    * Clip a line against given rectangle
    * Function returns true if line is not visible
    */
-  static bool ClipLine (float &x1, float &y1, float &x2, float &y2,
+  virtual bool ClipLine (float &x1, float &y1, float &x2, float &y2,
     int xmin, int ymin, int xmax, int ymax);
 
   /// Set mouse cursor position; return success status
@@ -198,7 +216,28 @@ public:
    * should be set to its nearest system equivalent depending on
    * iShape argument.
    */
-  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
+
+  /// Gets the ID of current font.
+  virtual int GetFontID ()
+  { return Font; }
+  /// Sets the type of the font.
+  virtual void SetFontID (int FontID)
+  { Font = FontID; }
+
+  /// Return the width of the framebuffer.
+  virtual int GetWidth ()
+  { return Width; }
+  /// Return the height of the framebuffer.
+  virtual int GetHeight ()
+  { return Height; }
+  /// Returns 'true' if the program is being run full-screen.
+  virtual bool GetFullScreen ()
+  { return FullScreen; }
+
+  /// Get the palette (if there is one)
+  virtual RGBpaletteEntry *GetPalette ()
+  { return pfmt.PalEntries ? Palette : NULL; }
 
   /**
    * Perform a system specific extension. Return false if extension
@@ -206,13 +245,10 @@ public:
    */
   virtual bool PerformExtension (char* args);
 
-  ///
-  void SysPrintf(int mode, const char* text, ...);
-
-  ///
-  virtual void GetStringError (HRESULT hRes, char* szValue);
-
 protected:
+  /// A replacement for ::CsPrintf() that works through system driver
+  void CsPrintf(int mode, const char* text, ...);
+
   /**
    * Little helper function to complete a csPixelFormat
    * structure given that the masks are correctly filled in.
@@ -226,45 +262,34 @@ protected:
    */
 
   /// Draw a pixel in 8-bit modes
-  static void DrawPixel8 (int x, int y, int color);
+  static void DrawPixel8 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 8-bit modes
-  static void WriteChar8 (int x, int y, int fg, int bg, char c);
+  static void WriteChar8 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Return address of a 8-bit pixel
-  static unsigned char *GetPixelAt8 (int x, int y);
+  static unsigned char *GetPixelAt8 (csGraphics2D *This, int x, int y);
   /// Draw a sprite on 8-bit display using a rectangle from given texture
-  static void DrawSprite8 (ITextureHandle *hTex, int sx, int sy, int sw, int sh,
+  static void DrawSprite8 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th);
 
   /// Draw a pixel in 16-bit modes
-  static void DrawPixel16 (int x, int y, int color);
+  static void DrawPixel16 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 16-bit modes
-  static void WriteChar16 (int x, int y, int fg, int bg, char c);
+  static void WriteChar16 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Return address of a 16-bit pixel
-  static unsigned char *GetPixelAt16 (int x, int y);
+  static unsigned char *GetPixelAt16 (csGraphics2D *This, int x, int y);
   /// Draw a sprite on 16-bit display using a rectangle from given texture
-  static void DrawSprite16 (ITextureHandle *hTex, int sx, int sy, int sw, int sh,
+  static void DrawSprite16 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th);
 
   /// Draw a pixel in 32-bit modes
-  static void DrawPixel32 (int x, int y, int color);
+  static void DrawPixel32 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 32-bit modes
-  static void WriteChar32 (int x, int y, int fg, int bg, char c);
+  static void WriteChar32 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Return address of a 32-bit pixel
-  static unsigned char *GetPixelAt32 (int x, int y);
+  static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
   /// Draw a sprite on 32-bit display using a rectangle from given texture
-  static void DrawSprite32 (ITextureHandle *hTex, int sx, int sy, int sw, int sh,
+  static void DrawSprite32 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th);
-
-public:
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE( csGraphics2D )
-  
-  /// the COM composite interface for IGraphics2D.
-  DECLARE_COMPOSITE_INTERFACE( XGraphics2D )
-  /// the COM composite interface for IGraphicsInfo.
-  DECLARE_COMPOSITE_INTERFACE( XGraphicsInfo )
 };
-
-#define GetIGraphics2DFromGraphics2D(a) &a->m_xXGraphics2D
 
 #endif // __GRAPH2D_H__

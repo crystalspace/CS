@@ -27,7 +27,7 @@ vpath %.cpp apps/walktest apps/support
 
 WALKTEST.EXE=walktest$(EXE)
 SRC.WALKTEST = $(wildcard apps/walktest/*.cpp) \
-  apps/support/static.cpp apps/support/cspace.cpp apps/support/command.cpp
+  apps/support/static.cpp apps/support/command.cpp
 OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DESCRIPTION.$(WALKTEST.EXE) = $(DESCRIPTION.walk)
 

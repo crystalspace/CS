@@ -29,5 +29,5 @@ void CsPrintf (int mode, char* str, ...)
   va_start (arg, str);
   vsprintf (buf, str, arg);
   va_end (arg);
-  csWorld::isys->Print (mode, buf);
+  csWorld::System->Print (mode, buf);
 }

@@ -20,7 +20,7 @@
 #include "sysdef.h"
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
-#include "cssys/system.h"
+#include "csws/cswssys.h"
 
 csTimer::csTimer (csComponent *iParent, unsigned long iPeriod)
   : csComponent (iParent)
@@ -30,7 +30,7 @@ csTimer::csTimer (csComponent *iParent, unsigned long iPeriod)
   pause = 0;
   Stopped = false;
   if (app)
-    start = System->Time ();
+    start = app->GetCurrentTime ();
 }
 
 bool csTimer::HandleEvent (csEvent &Event)
@@ -39,8 +39,8 @@ bool csTimer::HandleEvent (csEvent &Event)
    && (Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdPreProcess))
   {
-    unsigned long current = System->Time ();
-    unsigned long delta = current - start;
+    time_t current = app->GetCurrentTime ();
+    time_t delta = current - start;
     if (pause >= delta)
       return false;
     pause = 0;
@@ -66,7 +66,7 @@ void csTimer::Stop ()
 void csTimer::Restart ()
 {
   Stopped = false;
-  start = System->Time ();
+  start = app->GetCurrentTime ();
 }
 
 void csTimer::Pause (unsigned long iPause)

@@ -20,22 +20,17 @@
 #ifndef __IGRAPH3D_H__
 #define __IGRAPH3D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
+#include "iplugin.h"
 
-//@@@BAD!!!
-#include "csengine/fog.h"
-
-class csVector2;
 class csMatrix3;
 class csVector3;
 class csRect;
 
-interface IPolygon3D;
-interface IPolygonTexture;
-interface IGraphics2D;
-interface ISystem;
-interface ITextureManager;
-interface ITextureHandle;
+scfInterface iGraphics2D;
+scfInterface iPolygonTexture;
+scfInterface iTextureManager;
+scfInterface iTextureHandle;
 
 #define CS_FOG_FRONT		0
 #define CS_FOG_BACK		1
@@ -133,8 +128,8 @@ struct G3DPolygonDPFX
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
 
-  /// The texture handle as returned by ITextureManager.
-  ITextureHandle* txt_handle;
+  /// The texture handle as returned by iTextureManager.
+  iTextureHandle* txt_handle;
 
   /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
   float flat_color_r;
@@ -157,8 +152,8 @@ struct G3DPolygonDP
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
 
-  /// The texture handle as returned by ITextureManager.
-  ITextureHandle* txt_handle;
+  /// The texture handle as returned by iTextureManager.
+  iTextureHandle* txt_handle;
 
   /// Transformation matrices for the texture. @@@ BAD NAME
   G3DTexturePlane plane;
@@ -171,7 +166,7 @@ struct G3DPolygonDP
   float flat_color_b;
 
   ///Handle to lighted textures (texture+lightmap) (for all mipmap levels)
-  IPolygonTexture* poly_texture[4];
+  iPolygonTexture* poly_texture[4];
 
   /** 
     * AlphaValue of the polygon. Ranges from 0 to 100. 0 means opaque, 100 is 
@@ -202,18 +197,6 @@ struct G3DPolygonAFP
 
   /// The plane equation in camera space of this polygon. @@@ BAD NAME
   G3DPolyNormal normal;
-};
-
-///
-class G3DFltLight
-{
-public:
-  // all points are screen-projections.
-  // this is a 2d circle (it's incorrect, but works well as an approx)
-  float sx, sy, sz;
-  float srad;
-  float sqdist;       // camera space: radius squared.
-  float r, g, b;
 };
 
 /// Don't test/write, write, test, and write/test, respectively.
@@ -248,7 +231,7 @@ enum G3D_RENDERSTATEOPTION
   G3DRENDERSTATE_GOURAUDENABLE
 };
 
-/// Bit flags for IGraphics3D::BeginDraw ()
+/// Bit flags for iGraphics3D::BeginDraw ()
 /// We're going to draw 2D graphics
 #define CSDRAW_2DGRAPHICS   0x00000001
 /// We're going to draw 3D graphics
@@ -333,43 +316,56 @@ enum G3D_COLORMAPFORMAT
   G3DCOLORFORMAT_24BIT            // only uses 24 bit textures
 };
 
-extern const GUID IID_IGraphics3D;
+/**
+ * Fog structure.
+ */
+struct csFog
+{
+  /// If true then fog is enabled.
+  bool enabled;
+  /// Density (0 is off).
+  float density;
+  /// Color (red).
+  float red;
+  /// Color (green).
+  float green;
+  /// Color (blue).
+  float blue;
+};
 
 /**
  * This is the standard 3D graphics interface.
  * All 3D graphics rasterizer servers for Crystal Space
- * should implement this interface, as well as the 
- * IGraphics2D and IGraphicsInfo interface.
+ * should implement this interface, as well as the iGraphics2D interface.
  * The standard implementation is csGraphics3DSoftware.
  */
-interface IGraphics3D : public IUnknown
+SCF_INTERFACE (iGraphics3D, 0, 0, 1) : public iPlugIn
 {
-public:
   /// Initialize the 3D graphics system.
-  STDMETHOD (Initialize) () PURE;
+  virtual bool Initialize (iSystem *pSystem) = 0;
 
   /// Open the 3D graphics display.
-  STDMETHOD (Open) (const char *Title) PURE;
+  virtual bool Open (const char *Title) = 0;
   /// Close the 3D graphics display.
-  STDMETHOD (Close) () PURE;
+  virtual void Close () = 0;
 
   /// Change the dimensions of the display.
-  STDMETHOD (SetDimensions) (int width, int height) PURE;
+  virtual void SetDimensions (int width, int height) = 0;
 
   /// Start a new frame (see CSDRAW_XXX bit flags)
-  STDMETHOD (BeginDraw) (int DrawFlags) PURE;
+  virtual bool BeginDraw (int DrawFlags) = 0;
 
   /// End the frame and do a page swap.
-  STDMETHOD (FinishDraw) () PURE;
+  virtual void FinishDraw () = 0;
 
   /// Print the image in backbuffer
-  STDMETHOD (Print) (csRect *area) PURE;
+  virtual void Print (csRect *area) = 0;
 
   /// Set the mode for the Z buffer used for drawing the next polygon.
-  STDMETHOD (SetZBufMode) (G3DZBufMode mode) PURE;
+  virtual void SetZBufMode (G3DZBufMode mode) = 0;
 
   /// Draw the projected polygon with light and texture.
-  STDMETHOD (DrawPolygon) (G3DPolygonDP& poly) PURE;
+  virtual void DrawPolygon (G3DPolygonDP& poly) = 0;
 
   /**
    * Draw the projected polygon with light and texture.
@@ -377,10 +373,10 @@ public:
    * but it just prints debug information about what it would have
    * done.
    */
-  STDMETHOD (DrawPolygonDebug) ( G3DPolygonDP& poly) PURE;
+  virtual void DrawPolygonDebug (G3DPolygonDP& poly) = 0;
 
   /// Draw a line in camera space.
-  STDMETHOD (DrawLine) (csVector3& v1, csVector3& v2, float fov, int color) PURE;
+  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color) = 0;
 
   /**
    * Prepare for drawing a series of Polygon FX which all use
@@ -407,29 +403,29 @@ public:
    * create the image, but that would be very expensive.
    * 
    * parameters:
-   * handle:  The texture handle as returned by ITextureManager.
+   * handle:  The texture handle as returned by iTextureManager.
    * mode:    How shall the new polygon be combined with the current 
    *          screen content. This is any legal combination of CS_FX_XXX
    *          flags including alpha value (if CS_FX_ALPHA flag is set)
    */
-  STDMETHOD (StartPolygonFX) (ITextureHandle* handle, UInt mode) PURE;
+  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode) = 0;
 
   /**
    * Finish drawing a series of Polygon FX.
    */
-  STDMETHOD (FinishPolygonFX) () PURE;
+  virtual void FinishPolygonFX () = 0;
 
   /**
    * Draw a polygon with special effects. This is the most rich and slowest
    * variant of DrawPolygonXxx. (If you use these features) 
    */
-  STDMETHOD (DrawPolygonFX) (G3DPolygonDPFX& poly) PURE;
+  virtual void DrawPolygonFX (G3DPolygonDPFX& poly) = 0;
 
   /// Get the current fog mode (G3D_FOGMETHOD).
-  COM_METHOD_DECL GetFogMode (G3D_FOGMETHOD& fogMethod) = 0;
+  virtual G3D_FOGMETHOD GetFogMode () = 0;
 
   /// Set the current fog mode as supported by this 3D rasterizer.
-  COM_METHOD_DECL SetFogMode (G3D_FOGMETHOD fogMethod) = 0;
+  virtual bool SetFogMode (G3D_FOGMETHOD fogMethod) = 0;
 
   /**
    * Initiate a volumetric fog object. This function will be called
@@ -438,7 +434,7 @@ public:
    * The given CS_ID can be used to identify multiple fog objects when
    * multiple objects are started.
    */
-  STDMETHOD (OpenFogObject) (CS_ID id, csFog* fog) PURE;
+  virtual void OpenFogObject (CS_ID id, csFog* fog) = 0;
 
   /**
    * Add a front or back-facing fog polygon in the current fog object.
@@ -451,78 +447,67 @@ public:
    *	<li>CS_FOG_VIEW:	the view-plane
    * </ul>
    */
-  STDMETHOD (AddFogPolygon) (CS_ID id, G3DPolygonAFP& poly, int fogtype) PURE;
+  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype) = 0;
 
   /**
    * Close a volumetric fog object. After the volumetric object is
    * closed it should be rendered on screen (whether you do it here
    * or in AddFogPolygon is not important).
    */
-  STDMETHOD (CloseFogObject) (CS_ID id) PURE;
+  virtual void CloseFogObject (CS_ID id) = 0;
 
   /// Give a texture to csGraphics3D to cache it.
-  STDMETHOD (CacheTexture) (IPolygonTexture* texture) PURE;
+  virtual void CacheTexture (iPolygonTexture* texture) = 0;
 
   /// Release a texture from the cache.
-  STDMETHOD (UncacheTexture) (IPolygonTexture* texture) PURE;
+  virtual void UncacheTexture (iPolygonTexture* texture) = 0;
 
   /// Set a renderstate value.
-  STDMETHOD (SetRenderState) (G3D_RENDERSTATEOPTION op, long val) PURE;
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val) = 0;
 
   /// Get a renderstate value.
-  STDMETHOD (GetRenderState) (G3D_RENDERSTATEOPTION op, long& val) PURE;
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) = 0;
 
   /**
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  STDMETHOD (GetCaps) (G3D_CAPS* caps) PURE;
+  virtual void GetCaps (G3D_CAPS *caps) = 0;
 
-  /// Debugging: get the value of the Z buffer at some location.
-  STDMETHOD (GetZBufPoint) (int x, int y, unsigned long** nResult) PURE;
+  /// Debugging only: get a pointer to Z-buffer at some location
+  virtual unsigned long *GetZBufPoint (int x, int y) = 0;
 
   /// Dump the texture cache.
-  STDMETHOD (DumpCache) (void) PURE;
+  virtual void DumpCache () = 0;
 
   /// Clear the texture cache.
-  STDMETHOD (ClearCache) (void) PURE;
+  virtual void ClearCache () = 0;
 
   /// Get drawing buffer width
-  STDMETHOD (GetWidth) (int& nResult) PURE;
+  virtual int GetWidth () = 0;
   /// Get drawing buffer height
-  STDMETHOD (GetHeight) (int& nResult) PURE;
+  virtual int GetHeight () = 0;
 
   /**
    * Set center of projection for perspective projection.
    * Center is set in screen space coordinates.
    */
-  STDMETHOD (SetPerspectiveCenter) (int x, int y) PURE;
+  virtual void SetPerspectiveCenter (int x, int y) = 0;
 
   /// Get the texture representation scheme.
-  STDMETHOD (GetColormapFormat) (G3D_COLORMAPFORMAT& g3dFormat) PURE;
+  virtual G3D_COLORMAPFORMAT GetColormapFormat () = 0;
 
-  /// Returns S_OK if the driver needs PO2 lightmaps and texture maps, S_FALSE otherwise.
-  STDMETHOD (NeedsPO2Maps) () PURE;
+  /// Returns true if the driver needs PO2 lightmaps and texture maps
+  virtual bool NeedsPO2Maps () = 0;
 
   /// Get the maximum aspect ratio of texture maps.
-  STDMETHOD (GetMaximumAspectRatio) (int& retval) PURE;
+  virtual int GetMaximumAspectRatio () = 0;
 
-  /// Get the 2D Driver
-  STDMETHOD (Get2dDriver) (IGraphics2D** piG2D) PURE;
+  /// Get the 2D driver: This does NOT increment the refcount of 2D driver!
+  virtual iGraphics2D *GetDriver2D () = 0;
 
-  /// Get the texture manager.
-  STDMETHOD (GetTextureManager) (ITextureManager** piTxtMgr) PURE;
-};
-
-extern const IID IID_IGraphicsContextFactory;
-/// 
-interface IGraphicsContextFactory : public IUnknown
-{
-  /// Create the graphics context
-  STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv) PURE;
-
-  /// Lock or unlock from memory.
-  STDMETHOD (LockServer) (COMBOOL bLock) PURE;
+  /// Get the texture manager: do NOT increment the refcount of texture manager
+  virtual iTextureManager *GetTextureManager () = 0;
 };
 
 #endif // __IGRAPH3D_H__

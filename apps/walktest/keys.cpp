@@ -66,7 +66,7 @@ void SaveCamera (const char *fName)
   const csVector3& v_o2t = c->GetOrigin ();
   fprintf (f, "%f %f %f\n", v_o2t.x, v_o2t.y, v_o2t.z);
   fprintf (f, "%f %f %f\n", m_o2t.m11, m_o2t.m12, m_o2t.m13);
-  fprintf (f, "%f %f %f\n", m_o2t.m21, m_o2t.m22, m_o2t.m23); 
+  fprintf (f, "%f %f %f\n", m_o2t.m21, m_o2t.m22, m_o2t.m23);
   fprintf (f, "%f %f %f\n", m_o2t.m31, m_o2t.m32, m_o2t.m33);
   fprintf (f, "%s\n", c->GetSector ()->GetName ());
   fprintf (f, "%d\n", c->IsMirrored ());
@@ -90,7 +90,7 @@ bool LoadCamera (const char *fName)
 
   fscanf (f, "%f %f %f\n", &v.x, &v.y, &v.z);
   fscanf (f, "%f %f %f\n", &m.m11, &m.m12, &m.m13);
-  fscanf (f, "%f %f %f\n", &m.m21, &m.m22, &m.m23); 
+  fscanf (f, "%f %f %f\n", &m.m21, &m.m22, &m.m23);
   fscanf (f, "%f %f %f\n", &m.m31, &m.m32, &m.m33);
   fscanf (f, "%s\n", buf);
   s = (csSector*)Sys->world->sectors.FindByName (buf);
@@ -153,7 +153,7 @@ void load_sprite (char *filename, char *templatename, char* txtname)
 
   // read in the model file
   CHK (converter * filedata = new converter);
-  if (filedata->ivcon (filename, true, false, NULL, Sys->Vfs) == ERROR)
+  if (filedata->ivcon (filename, true, false, NULL, Sys->VFS) == ERROR)
   {
     Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
     CHK (delete filedata);
@@ -695,7 +695,7 @@ struct MissileStruct
   int type;		// type == DYN_TYPE_MISSILE
   csOrthoTransform dir;
   csSprite3D* sprite;
-  ISoundSource *snd;
+  iSoundSource *snd;
 };
 
 struct ExplosionStruct
@@ -703,7 +703,7 @@ struct ExplosionStruct
   int type;		// type == DYN_TYPE_EXPLOSION
   float radius;
   int dir;
-  ISoundSource *snd;
+  iSoundSource *snd;
 };
 
 struct RandomLight
@@ -746,26 +746,25 @@ void HandleDynLight (csDynLight* dyn)
 	}
         dyn->ObjRemove(dyn->GetObj(csDataObject::Type()));
         CHK (delete ms);
-	CHK (ExplosionStruct* es = new ExplosionStruct);
-	Sys->piSound->CreateSource (&es->snd, Sys->wMissile_boom);
-	if (es->snd)
-	{
-	  es->snd->SetPosition (v.x, v.y, v.z);
-	  ISoundBuffer *sb;
-    es->snd->GetSoundBuffer(&sb);
-    sb->Play ();
-	}
-	es->type = DYN_TYPE_EXPLOSION;
-	es->radius = 2;
-	es->dir = 1;
-        CHK(csDataObject* esdata = new csDataObject(es));
-	dyn->ObjAdd(esdata);
+        CHK (ExplosionStruct* es = new ExplosionStruct);
+        if (Sys->Sound)
+          if ((es->snd = Sys->Sound->CreateSource (Sys->wMissile_boom)))
+          {
+            es->snd->SetPosition (v.x, v.y, v.z);
+            iSoundBuffer *sb = es->snd->GetSoundBuffer();
+            sb->Play ();
+          }
+        es->type = DYN_TYPE_EXPLOSION;
+        es->radius = 2;
+        es->dir = 1;
+        CHK (csDataObject* esdata = new csDataObject (es));
+        dyn->ObjAdd (esdata);
         return;
       }
       dyn->Move (s, v.x, v.y, v.z);
       dyn->Setup ();
       if (ms->sprite) move_sprite (ms->sprite, s, v);
-      if (ms->snd) ms->snd->SetPosition (v.x, v.y, v.z);
+      if (Sys->Sound && ms->snd) ms->snd->SetPosition (v.x, v.y, v.z);
       break;
     }
     case DYN_TYPE_EXPLOSION:
@@ -781,13 +780,11 @@ void HandleDynLight (csDynLight* dyn)
         es->radius -= 2;
 	if (es->radius < 1)
 	{
-          if (es->snd)
+          if (Sys->Sound && es->snd)
 	  {
-	  ISoundBuffer *sb;
-    es->snd->GetSoundBuffer(&sb);
-    sb->Stop ();
-
-            FINAL_RELEASE (es->snd);
+            iSoundBuffer *sb = es->snd->GetSoundBuffer();
+            sb->Stop ();
+            es->snd->DecRef ();
 	  }
 	  CHK (delete es);
           Sys->view->GetWorld ()->RemoveDynLight (dyn);
@@ -1068,7 +1065,7 @@ static bool CommandHandler (char *cmd, char *arg)
     dump_visible_indent = 0;
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
     extern void dump_visible (csRenderView* rview, int type, void* entity);
-    Sys->view->GetWorld ()->DrawFunc (Sys->piG3D, Sys->view->GetCamera (), Sys->view->GetClipper (), dump_visible);
+    Sys->view->GetWorld ()->DrawFunc (Sys->view->GetCamera (), Sys->view->GetClipper (), dump_visible);
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
   }
   else if (!strcasecmp (cmd, "bind"))
@@ -1107,7 +1104,7 @@ static bool CommandHandler (char *cmd, char *arg)
   {
     Command::change_boolean (arg, &Sys->do_freelook, "freelook");
     if (Sys->do_freelook)
-      System->piG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+      System->G2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
   }
   else if (!strcasecmp (cmd, "stats"))
   {
@@ -1314,14 +1311,13 @@ static bool CommandHandler (char *cmd, char *arg)
     dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
     dyn->Setup ();
     CHK (MissileStruct* ms = new MissileStruct);
-    Sys->piSound->CreateSource (&ms->snd, Sys->wMissile_whoosh);
-    if (ms->snd)
-    {
-      ms->snd->SetPosition (pos.x, pos.y, pos.z);
-      ISoundBuffer *sb = NULL;
-      ms->snd->GetSoundBuffer(&sb);
-      sb->Play ();
-    }
+    if (Sys->Sound)
+      if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh)))
+      {
+        ms->snd->SetPosition (pos.x, pos.y, pos.z);
+        iSoundBuffer *sb = ms->snd->GetSoundBuffer();
+        sb->Play ();
+      }
     ms->type = DYN_TYPE_MISSILE;
     ms->dir = (csOrthoTransform)*(Sys->view->GetCamera ());
     ms->sprite = NULL;
@@ -1496,18 +1492,24 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "snd_play"))
   {
-    csSoundData *sb =
-         csSoundDataObject::GetSound(*(Sys->view->GetWorld()), arg);
-    if (sb)
-      Sys->piSound->PlayEphemeral(sb);
-    else Sys->Printf (MSG_CONSOLE, "Sound '%s' not found!\n", arg);
+    if (Sys->Sound)
+    {
+      csSoundData *sb =
+        csSoundDataObject::GetSound(*(Sys->view->GetWorld()), arg);
+      if (sb)
+        Sys->Sound->PlayEphemeral(sb);
+      else
+        Sys->Printf (MSG_CONSOLE, "Sound '%s' not found!\n", arg);
+    }
   }
   else if (!strcasecmp (cmd, "snd_volume"))
   {
-    float vol;
-    Sys->piSound->GetVolume (&vol);
-    Command::change_float (arg, &vol, "snd_volume", 0.0, 1.0);
-    Sys->piSound->SetVolume (vol);
+    if (Sys->Sound)
+    {
+      float vol = Sys->Sound->GetVolume ();
+      Command::change_float (arg, &vol, "snd_volume", 0.0, 1.0);
+      Sys->Sound->SetVolume (vol);
+    }
   }
   else
     return false;
@@ -1552,6 +1554,7 @@ WalkTest::WalkTest () :
   inverse_mouse = false;
   selected_light = NULL;
   selected_polygon = NULL;
+  move_forward = false;
 
   velocity.Set (0, 0, 0);
   angle.Set (0, 0, 0);
@@ -1564,6 +1567,8 @@ WalkTest::WalkTest () :
 
 WalkTest::~WalkTest ()
 {
+  if (World)
+    World->DecRef ();
   CHK (delete wf);
   CHK (delete [] auto_script);
   CHK (delete layer);
@@ -1571,32 +1576,6 @@ WalkTest::~WalkTest ()
   CHK (delete infinite_maze);
   CHK (delete huge_room);
   CHK (delete cslogo);
-  CHK (delete world);
-}
-
-bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName,
-    const char *iVfsConfigName, IConfig* iOptions)
-{
-  if (!SysSystemDriver::Initialize (argc, argv, iConfigName, iVfsConfigName, iOptions))
-    return false;
-
-  // Get all collision detection and movement config file parameters.
-  cfg_jumpspeed = Config->GetFloat ("CD", "JUMPSPEED", 0.08);
-  cfg_walk_accelerate = Config->GetFloat ("CD", "WALKACCELERATE", 0.007);
-  cfg_walk_maxspeed = Config->GetFloat ("CD", "WALKMAXSPEED", 0.1);
-  cfg_walk_brake = Config->GetFloat ("CD", "WALKBRAKE", 0.014);
-  cfg_rotate_accelerate = Config->GetFloat ("CD", "ROTATEACCELERATE", 0.005);
-  cfg_rotate_maxspeed = Config->GetFloat ("CD", "ROTATEMAXSPEED", 0.03);
-  cfg_rotate_brake = Config->GetFloat ("CD", "ROTATEBRAKE", 0.015);
-  cfg_look_accelerate = Config->GetFloat ("CD", "LOOKACCELERATE", 0.028);
-  cfg_body_height = Config->GetFloat ("CD", "BODYHEIGHT", 1.4);
-  cfg_body_width = Config->GetFloat ("CD", "BODYWIDTH", 0.5);
-  cfg_body_depth = Config->GetFloat ("CD", "BODYDEPTH", 0.5);
-  cfg_eye_offset = Config->GetFloat ("CD", "EYEOFFSET", -0.7);
-  cfg_legs_width = Config->GetFloat ("CD", "LEGSWIDTH", 0.4);
-  cfg_legs_depth = Config->GetFloat ("CD", "LEGSDEPTH", 0.4);
-  cfg_legs_offset = Config->GetFloat ("CD", "LEGSOFFSET", -1.1);
-  return true;
 }
 
 void WalkTest::SetSystemDefaults (csIniFile *Config)
@@ -1992,48 +1971,50 @@ void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
     Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .2);
 }
 
-void WalkTest::eatkeypress (int status,int key, bool shift, bool alt, bool ctrl)
+void WalkTest::eatkeypress (int status, int key, bool shift, bool alt, bool ctrl)
 {
-  if (System->Console->IsActive ()&&status)
+  if (System->Console->IsActive () && status)
     ((csSimpleConsole *)System->Console)->AddChar (key);
   else switch (key)
   {
     case CSKEY_TAB:
-      if(status)
+      if (status)
         System->Console->Show ();
       break;
 
     default:
       {
-	csKeyMap *m = mapping;
+        csKeyMap *m = mapping;
         while (m)
         {
           if (key == m->key && shift == m->shift
            && alt == m->alt && ctrl == m->ctrl)
           {
-            char buf[256];
-            if(m->need_status)
+            if (m->need_status)
             {
-              m->is_on=status;
-              sprintf(buf,"%s %d",m->cmd,status);
+              // Don't perform the command again if the key is already down
+              if (m->is_on != status)
+              {
+                char buf [256];
+                sprintf (buf,"%s %d", m->cmd, status);
+                Command::perform_line (buf);
+                m->is_on = status;
+              }
             }
             else
             {
-              if(!status)
-                break;
-              sprintf(buf,"%s",m->cmd);
+              if (status)
+                Command::perform_line (m->cmd);
             }
-            Command::perform_line(buf);
           }
-          else
-          if(!status&&m->is_on&&m->need_status)
+          else if (!status && m->is_on && m->need_status)
           {
-            if(key==m->key||(shift!=m->shift||alt!=m->alt||ctrl!=m->ctrl))
+            if (key == m->key || shift != m->shift || alt != m->alt || ctrl != m->ctrl)
             {
-              char buf[256];
-              sprintf(buf,"%s 0",m->cmd);
-              Command::perform_line(buf);
-              m->is_on=0;
+              char buf [256];
+              sprintf (buf,"%s 0", m->cmd);
+              Command::perform_line (buf);
+              m->is_on = 0;
             }
           }
 	  m = m->next;
@@ -2043,15 +2024,16 @@ void WalkTest::eatkeypress (int status,int key, bool shift, bool alt, bool ctrl)
   }
 }
 
-void WalkTest::NextFrame (long elapsed_time, long current_time)
+void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
 {
+  // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame (elapsed_time, current_time);
 
   // Record the first time this routine is called.
   if(do_bots)
   {
     static long first_time = -1;
-    static long next_bot_at;
+    static time_t next_bot_at;
     if (first_time == -1) { first_time = current_time; next_bot_at = current_time+1000*10; }
     if (current_time > next_bot_at)
     {
@@ -2088,136 +2070,31 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
     int alt,shift,ctrl;
     float speed = 1;
 
-    alt = Keyboard->Key.alt;
-    ctrl = Keyboard->Key.ctrl;
-    shift = Keyboard->Key.shift;
+    alt = GetKeyState (CSKEY_ALT);
+    ctrl = GetKeyState (CSKEY_CTRL);
+    shift = GetKeyState (CSKEY_SHIFT);
     if (ctrl) speed = .5;
     if (shift) speed = 2;
 
     /// Act as usual...
     strafe (0,1); look (0,1); step (0,1); rotate (0,1);
 
-    ISoundListener *sndListener;
-    Sys->piSound->GetListener(&sndListener);
-    if(sndListener)
+    if (Sys->Sound)
     {
-      // take position/direction from view->GetCamera ()
-      csVector3 v = view->GetCamera ()->GetOrigin ();
-      csMatrix3 m = view->GetCamera ()->GetC2W();
-      csVector3 f = m.Col3();
-      csVector3 t = m.Col2();
-      sndListener->SetPosition(v.x, v.y, v.z);
-      sndListener->SetDirection(f.x,f.y,f.z,t.x,t.y,t.z);
-      //sndListener->SetDirection(...);
+      iSoundListener *sndListener = Sys->Sound->GetListener();
+      if(sndListener)
+      {
+        // take position/direction from view->GetCamera ()
+        csVector3 v = view->GetCamera ()->GetOrigin ();
+        csMatrix3 m = view->GetCamera ()->GetC2W();
+        csVector3 f = m.Col3();
+        csVector3 t = m.Col2();
+        sndListener->SetPosition(v.x, v.y, v.z);
+        sndListener->SetDirection(f.x,f.y,f.z,t.x,t.y,t.z);
+        //sndListener->SetDirection(...);
+      }
     }
   } /* endif */
-
-  static bool move_forward = false;
-  if (move_forward) step (1, 0);
-
-  csEvent *Event;
-  while ((Event = Sys->EventQueue->Get ()) != NULL)
-  {
-    switch (Event->Type)
-    {
-      case csevKeyDown:
-        eatkeypress (1,Event->Key.Code,
-        		(Event->Key.ShiftKeys & CSMASK_SHIFT) != 0,
-          	(Event->Key.ShiftKeys & CSMASK_ALT) != 0,
-        		(Event->Key.ShiftKeys & CSMASK_CTRL) != 0);
-        break;
-      case csevKeyUp:
-        eatkeypress (0,Event->Key.Code,
-        		(Event->Key.ShiftKeys & CSMASK_SHIFT) != 0,
-          	(Event->Key.ShiftKeys & CSMASK_ALT) != 0,
-        		(Event->Key.ShiftKeys & CSMASK_CTRL) != 0);
-        break;
-      case csevBroadcast:
-        if ((Event->Command.Code == cscmdFocusChanged)
-         && (Event->Command.Info == NULL))
-          memset (&Keyboard->Key, 0, sizeof (Keyboard->Key));
-        break;
-      case csevMouseDown:
-        if (Event->Mouse.Button == 1)
-	  move_forward = true;
-        else if (Event->Mouse.Button == 3)
-        {
-          csVector2   screenPoint;
-          csSprite3D *closestSprite;
-
-          screenPoint.x = Event->Mouse.x;
-          screenPoint.y = Event->Mouse.y;
-          closestSprite = FindNextClosestSprite(NULL, view->GetCamera(), &screenPoint);
-          if (closestSprite)
-            Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", closestSprite->GetName ());
-          else
-            Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
-	}
-        else if (Event->Mouse.Button == 2)
-	{
-	  unsigned long real_zb;
-          unsigned long* zb = &real_zb;
-	  System->piG3D->GetZBufPoint(Event->Mouse.x, Event->Mouse.y, &zb);
-
-          if (zb)
-          {
-	    csVector3 v;
-	    v.z = 1. / (((float)*zb)/(256.*65536.));
-	    v.x = (Event->Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->aspect;
-	    v.y = (FRAME_HEIGHT-1-Event->Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->aspect;
-	    csVector3 vw = view->GetCamera ()->Camera2World (v);
-
-            Sys->Printf (MSG_CONSOLE, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
-            Sys->Printf (MSG_DEBUG_0, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
-	  }
-
-	  extern csVector2 coord_check_vector;
-          coord_check_vector.x = Event->Mouse.x;
-          coord_check_vector.y = FRAME_HEIGHT-Event->Mouse.y;
-	  extern bool check_poly, check_light;
-	  extern void select_object (csRenderView* rview, int type, void* entity);
-	  check_poly = check_light = true;
-  	  view->GetWorld ()->DrawFunc (System->piG3D, view->GetCamera (), view->GetClipper (), select_object);
-        }
-        break;
-      case csevMouseMove:
-	// additional command by Leslie Saputra -> freelook mode.
-	{
-	  static bool first_time = true;
-	  if (do_freelook)
-	  {
-	    int last_x, last_y;
-	    last_x = Event->Mouse.x;
-	    last_y = Event->Mouse.y;
-
-            System->piG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
-	    if (!first_time)
-	    {
-            /*
-	      if(move_3d)
-	        view->GetCamera ()->Rotate (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
-	      else
-	        view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
-	      view->GetCamera ()->Rotate (VEC_TILT_UP, -((float)( last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2) );
-            */
-
-              this->angle.y+=((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2);
-              this->angle.x+=((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse);
-	    }
-	    else
-              first_time = false;
-	  }
-	  else
-            first_time = true;
-	}
-      break;
-      case csevMouseUp:
-        if (Event->Mouse.Button == 1)
-	        move_forward = false;
-        break;
-    }
-    CHK(delete Event);
-  }
 
   if(first_bot)
   {
@@ -2228,6 +2105,8 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
       bot = bot->next;
     }
   }
+
+  if (move_forward) step (1, 0);
 
   PrepareFrame (elapsed_time, current_time);
   DrawFrame (elapsed_time, current_time);
@@ -2240,52 +2119,148 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
   }
 }
 
+bool WalkTest::HandleEvent (csEvent &Event)
+{
+  // First pass the event to all plugins
+  if (SysSystemDriver::HandleEvent (Event))
+    return true;
 
+  switch (Event.Type)
+  {
+    case csevKeyDown:
+      eatkeypress (1,Event.Key.Code,
+        (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0,
+        (Event.Key.ShiftKeys & CSMASK_ALT) != 0,
+        (Event.Key.ShiftKeys & CSMASK_CTRL) != 0);
+      break;
+    case csevKeyUp:
+      eatkeypress (0,Event.Key.Code,
+        (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0,
+        (Event.Key.ShiftKeys & CSMASK_ALT) != 0,
+        (Event.Key.ShiftKeys & CSMASK_CTRL) != 0);
+      break;
+    case csevMouseDown:
+      if (Event.Mouse.Button == 1)
+        move_forward = true;
+      else if (Event.Mouse.Button == 3)
+      {
+        csVector2   screenPoint;
+        csSprite3D *closestSprite;
+
+        screenPoint.x = Event.Mouse.x;
+        screenPoint.y = Event.Mouse.y;
+        closestSprite = FindNextClosestSprite(NULL, view->GetCamera(), &screenPoint);
+        if (closestSprite)
+          Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", closestSprite->GetName ());
+        else
+          Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
+      }
+      else if (Event.Mouse.Button == 2)
+      {
+        unsigned long* zb = System->G3D->GetZBufPoint(Event.Mouse.x, Event.Mouse.y);
+
+        if (zb)
+        {
+          csVector3 v;
+          v.z = 1. / (((float)*zb)/(256.*65536.));
+          v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->aspect;
+          v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->aspect;
+          csVector3 vw = view->GetCamera ()->Camera2World (v);
+
+          Sys->Printf (MSG_CONSOLE, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
+          Sys->Printf (MSG_DEBUG_0, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
+        }
+
+        extern csVector2 coord_check_vector;
+        coord_check_vector.x = Event.Mouse.x;
+        coord_check_vector.y = FRAME_HEIGHT-Event.Mouse.y;
+        extern bool check_poly, check_light;
+        extern void select_object (csRenderView* rview, int type, void* entity);
+        check_poly = check_light = true;
+	  view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), select_object);
+      }
+      break;
+    case csevMouseMove:
+      // additional command by Leslie Saputra -> freelook mode.
+      {
+        static bool first_time = true;
+        if (do_freelook)
+        {
+          int last_x, last_y;
+          last_x = Event.Mouse.x;
+          last_y = Event.Mouse.y;
+
+          System->G2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+          if (!first_time)
+          {
+          /*
+            if(move_3d)
+              view->GetCamera ()->Rotate (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
+            else
+              view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
+            view->GetCamera ()->Rotate (VEC_TILT_UP, -((float)( last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2) );
+          */
+
+            this->angle.y+=((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2);
+            this->angle.x+=((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse);
+          }
+          else
+            first_time = false;
+        }
+        else
+          first_time = true;
+      }
+      break;
+    case csevMouseUp:
+      if (Event.Mouse.Button == 1)
+        move_forward = false;
+      break;
+  }
+
+  return false;
+}
 
 csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVector2 *screenCoord)
-   {
-   int               spriteIndex;
-   float             thisZLocation;
-   float             closestZLocation;
-   csSprite3D *      closestSprite;
-   csSprite3D *      nextSprite;
-   csBox             screenBoundingBox;
+{
+  int spriteIndex;
+  float thisZLocation;
+  float closestZLocation;
+  csSprite3D *closestSprite;
+  csSprite3D *nextSprite;
+  csBox screenBoundingBox;
 
-   if (baseSprite)
+  if (baseSprite)
+  {
+    closestSprite = baseSprite;
+    closestZLocation = baseSprite->GetScreenBoundingBox(*camera, screenBoundingBox);
+    // if the baseSprite isn't in front of the camera, return
+    if (closestZLocation < 0)
+      return NULL;
+  }
+  else
+  {
+    closestSprite = NULL;
+    closestZLocation = 32000;
+  }
+
+  for (spriteIndex = 0; spriteIndex < Sys->world->sprites.Length(); spriteIndex++)
+  {
+    nextSprite = (csSprite3D*)Sys->world->sprites[spriteIndex];
+
+//  Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", nextSprite->GetName ());
+    if (nextSprite != baseSprite)
+    {
+      thisZLocation = nextSprite->GetScreenBoundingBox(*camera, screenBoundingBox);
+      if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
       {
-      closestSprite = baseSprite;
-      closestZLocation = baseSprite->GetScreenBoundingBox(*camera, screenBoundingBox);
-      // if the baseSprite isn't in front of the camera, return
-      if (closestZLocation < 0)
-         return NULL;
+        if (screenBoundingBox.In(screenCoord->x, screenCoord->y))
+        {
+          closestZLocation = thisZLocation;
+          closestSprite = nextSprite;
+        }
       }
-   else
-      {
-      closestSprite = NULL;
-      closestZLocation = 32000;
-      }
+    }
+  }
 
-   for (spriteIndex = 0; spriteIndex < Sys->world->sprites.Length(); spriteIndex++)
-      {
-      nextSprite = (csSprite3D*)Sys->world->sprites[spriteIndex];
-
-//      Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", nextSprite->GetName ());
-      if (nextSprite != baseSprite)
-         {
-         thisZLocation = nextSprite->GetScreenBoundingBox(*camera, screenBoundingBox);
-         if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
-            {
-            if (screenBoundingBox.In(screenCoord->x, screenCoord->y))
-               {
-               closestZLocation = thisZLocation;
-               closestSprite = nextSprite;
-               }
-            }
-         }
-      }
-
-   return closestSprite;
-   }
-
-
-
+  return closestSprite;
+}

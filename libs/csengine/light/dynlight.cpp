@@ -56,8 +56,7 @@ const char      *kDynamicLightID = "LIGHTX";
 
 inline unsigned long CLOCK ()
 {
-  time_t tm;
-  csWorld::isys->GetTime (tm);
+  time_t tm = csWorld::System->GetTime ();
   return (unsigned long)(tm*60 / 1000);
 
 }

@@ -24,12 +24,12 @@
 class TGAImageLoader;
 
 /**
- * An ImageFile subclass for reading TGA files.
+ * An csImageFile subclass for reading TGA files.
  */
-class ImageTgaFile : public ImageFile
+class ImageTgaFile : public csImageFile
 {
   ///
-  friend class ImageFile;	// For constructor
+  friend class csImageFile;	// For constructor
   friend class TGAImageLoader;
 
 private:
@@ -48,7 +48,7 @@ class TGAImageLoader : public ImageLoader
 {
 protected:
   ///
-  virtual ImageFile* LoadImage (UByte* buf, ULong size);
+  virtual csImageFile* LoadImage (UByte* buf, ULong size);
   virtual AlphaMapFile* LoadAlphaMap(UByte *buffer,ULong size);
 public:
   ///

@@ -21,23 +21,21 @@
 #if !defined(__ISOUNDSOURCE_H__)
 #define __ISOUNDSOURCE_H__
 
-extern const GUID IID_ISoundSource;
-interface ISoundBuffer;
+scfInterface iSoundBuffer;
 
-interface ISoundSource : public IUnknown
+SCF_INTERFACE (iSoundSource, 0, 0, 1) : public iBase
 {
-public:
   /// Set position of sound object
-  STDMETHOD (SetPosition) (float x, float y, float z) PURE;
+  virtual void SetPosition (float x, float y, float z) = 0;
   /// Set velocity of sound object
-  STDMETHOD (SetVelocity) (float x, float y, float z) PURE;
+  virtual void SetVelocity (float x, float y, float z) = 0;
   /// Get position of sound object
-  STDMETHOD (GetPosition) (float &x, float &y, float &z) PURE;
+  virtual void GetPosition (float &x, float &y, float &z) = 0;
   /// Get velocity of sound object
-  STDMETHOD (GetVelocity) (float &x, float &y, float &z) PURE;
+  virtual void GetVelocity (float &x, float &y, float &z) = 0;
 
   /// Get sound buffer
-  STDMETHOD (GetSoundBuffer) (ISoundBuffer **sound) PURE;
+  virtual iSoundBuffer *GetSoundBuffer () = 0;
 };
 
 #endif // __ISOUNDSOURCE_H__

@@ -21,6 +21,8 @@ all drivers drivers2d: alleg2d
 
 alleg2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+alleg2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -42,21 +44,17 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/dosalleg
 
-.PHONY: alleg2dclean alleg2dcleanlib alleg2d
+.PHONY: alleg2d alleg2dclean
 
 # Chain rules
 clean: alleg2dclean
-cleanlib: alleg2dcleanlib
 alleg2d: $(OUTDIRS) $(ALLEG2D)
 
 $(ALLEG2D): $(OBJ.ALLEG2D)
 	$(DO.LIBRARY)
 
 alleg2dclean:
-	$(RM) $(ALLEG2D)
-
-alleg2dcleanlib:
-	$(RM) $(OBJ.ALLEG2D) $(ALLEG2D)
+	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)alleg2d.dep

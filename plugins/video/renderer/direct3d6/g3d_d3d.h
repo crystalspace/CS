@@ -32,11 +32,11 @@ Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles
 #include "d3dcaps.h"
 
 #include "cs3d/direct3d6/d3dcache.h"
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cssys/win32/IDDetect.h"
 #include "igraph3d.h"
-#include "igraph2d.h"
 #include "ihalo.h"
+#include "iplugin.h"
 #include "ipolygon.h"
 
 //DIRECT3D DRIVER HRESULTS/////////////////////////////
@@ -69,7 +69,7 @@ struct D3D_TriangleFan
 };
 
 /// the Direct3D implementation of the Graphics3D class.
-class csGraphics3DDirect3DDx6 : public IGraphics3D
+class csGraphics3DDirect3DDx6 : public iGraphics3D, public iHaloRasterizer
 {
   /// Pointer to DirectDraw class
   IDirectDraw4* m_lpDD;
@@ -136,133 +136,126 @@ class csGraphics3DDirect3DDx6 : public IGraphics3D
   G3D_CAPS m_Caps;
   
   /// The camera object.
-  ICamera* m_pCamera;
+  iCamera* m_pCamera;
   
   /// the 2d graphics driver.
-  IGraphics2D* m_piG2D;
+  iGraphics2D* m_piG2D;
   
   /// The directdraw device description
   IDirectDetectionInternal* m_pDirectDevice;
   
   /// The system driver
-  ISystem* m_piSystem;
+  iSystem* m_piSystem;
 
   /// use 16 bit texture else 8 bit
   bool use16BitTexture;
+
+  /// The private configuration file
+  csIniFile *config;
   
 public:
+  DECLARE_IBASE;
+
   static DDPIXELFORMAT m_ddpfLightmapPixelFormat;
   static DDPIXELFORMAT m_ddpfTexturePixelFormat;
  
   /// The constructor. It is passed an interface to the system using it.
-  csGraphics3DDirect3DDx6 (ISystem*);
+  csGraphics3DDirect3DDx6 (iBase *iParent);
   /// the destructor.
-  ~csGraphics3DDirect3DDx6 ();
+  virtual ~csGraphics3DDirect3DDx6 ();
   
   /// opens Direct3D.
-  STDMETHODIMP Open(const char* Title);
+  virtual bool Open(const char* Title);
   /// closes Direct3D.
-  STDMETHODIMP Close();
+  virtual void Close();
+
+  ///
+  virtual bool Initialize (iSystem *iSys);
   
   /// Change the dimensions of the display.
-  STDMETHODIMP SetDimensions (int width, int height);
+  virtual void SetDimensions (int width, int height);
   
   /// Start a new frame.
-  STDMETHODIMP BeginDraw (int DrawFlags);
+  virtual bool BeginDraw (int DrawFlags);
   
   /// End the frame and do a page swap.
-  STDMETHODIMP FinishDraw ();
+  virtual void FinishDraw ();
   
   /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
+  virtual void SetZBufMode (G3DZBufMode mode);
   
   /// Draw the projected polygon with light and texture.
-  STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
+  virtual void DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
-  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& poly)   { return E_NOTIMPL; }
+  virtual void DrawPolygonDebug(G3DPolygonDP& poly) { }
   
   /// Draw a Line.
-  STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, int color);
+  virtual void DrawLine (csVector3& v1, csVector3& v2, int color);
   
   /// Draw a projected (non-perspective correct) polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
-  
-  /// Draw a projected floating light on the screen.
-  STDMETHODIMP DrawFltLight(G3DFltLight& light);
+  virtual void DrawPolygonQuick (G3DPolygonDPQ& poly);
   
   /// Give a texture to Graphics3D to cache it.
-  STDMETHODIMP CacheTexture (IPolygonTexture* texture);
+  virtual void CacheTexture (iPolygonTexture* texture);
   
   /// Release a texture from the cache.
-  STDMETHODIMP UncacheTexture (IPolygonTexture* texture);
+  virtual void UncacheTexture (iPolygonTexture* texture);
   
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
-  STDMETHODIMP GetCaps(G3D_CAPS *caps);
+  virtual void GetCaps (G3D_CAPS *caps);
   
   /// Dump the texture cache.
-  STDMETHODIMP DumpCache(void);
+  virtual void DumpCache ();
   
   /// Clear the texture cache.
-  STDMETHODIMP ClearCache(void);
+  virtual void ClearCache ();
   ///
-  STDMETHODIMP GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
-  {
-    g3dFormat = G3DCOLORFORMAT_PRIVATE;        // Direct3D driver only uses private color maps.
-    return S_OK;
-  }
-  ///
-  STDMETHODIMP GetStringError( HRESULT hRes, char* szErrorString );
+  virtual G3D_COLORMAPFORMAT GetColormapFormat ()
+  { return G3DCOLORFORMAT_PRIVATE; }
   
   /// Set the camera object.
-  STDMETHODIMP SetCamera( ICamera* pCamera )
-  {
-    m_pCamera = pCamera;
-    return S_OK;
-  }
+  virtual void SetCamera (iCamera *pCamera)
+  { m_pCamera = pCamera; }
   
   /// Print the screen.
-  STDMETHODIMP Print(csRect* rect) {  return m_piG2D->Print(rect);  }
+  virtual void Print(csRect* rect)
+  { return m_piG2D->Print(rect); }
   
   /// Set a render state
-  STDMETHODIMP SetRenderState(G3D_RENDERSTATEOPTION, long value);
+  virtual bool SetRenderState(G3D_RENDERSTATEOPTION, long value);
   /// Get a render state
-  STDMETHODIMP GetRenderState(G3D_RENDERSTATEOPTION, long& nValue);
+  virtual long GetRenderState(G3D_RENDERSTATEOPTION);
   
   /// Get a z-buffer point
-  STDMETHODIMP GetZBufPoint(int, int, unsigned long** retval) { *retval = NULL; return E_NOTIMPL; }
+  virtual long *GetZBufPoint(int, int)
+  { return NULL; }
   
   /// Get the width
-  STDMETHODIMP GetWidth(int& nWidth) { nWidth = m_nWidth; return S_OK; }
+  virtual int GetWidth () { return m_nWidth; }
   ///
-  STDMETHODIMP GetHeight(int& nHeight) { nHeight = m_nHeight; return S_OK; }
+  virtual int GetHeight () { return m_nHeight; }
   /// Set center of projection.
-  STDMETHODIMP SetPerspectiveCenter (int x, int y);
-  ///
-  STDMETHODIMP SetWorld(IWorld* piWorld) { return S_OK; }
+  virtual void SetPerspectiveCenter (int x, int y);
   
   ///
-  STDMETHODIMP NeedsPO2Maps(void) { return S_OK; }
+  virtual bool NeedsPO2Maps ()
+  { return true; }
   ///
-  STDMETHODIMP GetMaximumAspectRatio(int& ratio) { ratio = 32768; return S_OK; }
+  virtual int GetMaximumAspectRatio ()
+  { return 32768; }
   
   /// 
-  STDMETHODIMP Get2dDriver(IGraphics2D** pG2D) 
-  { 
-    ASSERT(m_piG2D);
-    
-    m_piG2D->AddRef(); 
-    *pG2D = m_piG2D; 
-    return S_OK; 
-  }
+  virtual iGraphics2D *GetDriver2D () 
+  { return m_piG2D; }
   
-  STDMETHODIMP OpenFogObject (CS_ID id, csFog* fog);
-  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
-  STDMETHODIMP CloseFogObject (CS_ID id);
+  virtual void OpenFogObject (CS_ID id, csFog* fog);
+  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void CloseFogObject (CS_ID id);
   
-  STDMETHODIMP CreateHalo(float r, float g, float b, HALOINFO* pRetVal) { return E_NOTIMPL;};  
-  STDMETHODIMP DestroyHalo(HALOINFO haloInfo) {return E_NOTIMPL;};
-  STDMETHODIMP DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo) {return E_NOTIMPL;};
-  STDMETHODIMP TestHalo(csVector3* pCenter) {return E_NOTIMPL;};
+  virtual csHaloHandle CreateHalo (float r, float g, float b) { return NULL; }
+  virtual void DestroyHalo (csHaloHandle haloInfo) { }
+  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo) { }
+  virtual bool TestHalo (csVector3* pCenter) { return false; }
 
 private:
   
@@ -282,22 +275,6 @@ private:
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
     float& K1, float& K2, float& K3,
     float& M,  float& N,  float& O  );
-  
-  DECLARE_INTERFACE_TABLE(csGraphics3DDirect3DDx6)
-    DECLARE_IUNKNOWN()
-};
-
-
-class csGraphics3DDirect3DDx6Factory : public IGraphicsContextFactory
-{
-  /// Create the graphics context
-  STDMETHODIMP CreateInstance( REFIID riid, ISystem* piSystem, void** ppv );
-  
-  /// Lock or unlock from memory.
-  STDMETHODIMP LockServer(BOOL bLock);
-  
-  DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics3DDirect3DDx6Factory)
 };
 
 #endif // G3D_D3D_H

@@ -4,8 +4,6 @@
 # Driver description
 DESCRIPTION.glbe2d = Crystal Space GL/Be 2D driver
 
-include libs/cs2d/openglcommon/glcommon2d.mak
-
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
@@ -23,6 +21,8 @@ all drivers drivers2d: glbe2d
 
 glbe2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+glbe2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -45,12 +45,7 @@ else
 endif
 DESCRIPTION.$(GLBE2D) = $(DESCRIPTION.glbe2d)
 SRC.GLBE2D = $(wildcard libs/cs2d/openglbe/*.cpp \
-  libs/cs2d/openglcommon/*.cpp \
-  libs/cs3d/opengl/ogl_*cache.cpp libs/cs3d/opengl/ogl_txtmgr.cpp \
-  libs/cs3d/opengl/itexture.cpp \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
-  libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp\
- $(SRC.COMMON.DRV2D))
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLBE2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -58,11 +53,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glbe2d glbeclean glbecleanlib
+.PHONY: glbe2d glbeclean
 
 # Chain rules
 clean: glbeclean
-cleanlib: glbecleanlib
 
 glbe2d: $(OUTDIRS) $(GLBE2D)
 
@@ -73,10 +67,7 @@ $(GLBE2D): $(OBJ.GLBE2D) $(DEP.BE2D)
 	$(DO.PLUGIN) $(LIBS.GLBE2D)
 
 glbeclean:
-	$(RM) $(GLBE2D)
-
-glbecleanlib:
-	$(RM) $(OBJ.GLBE2D) $(GLBE2D)
+	$(RM) $(GLBE2D) $(OBJ.GLBE2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)glbe2d.dep

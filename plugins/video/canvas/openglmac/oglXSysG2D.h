@@ -1,12 +1,12 @@
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/mac/ISysG2D.h"
 
 #ifndef __XSYSG2D_H__
 #define __XSYSG2D_H__
 
 /// csGraphics2DOpenGL's implementation if IOpenGLGraphicsInfo
-class IXOpenGLGraphicsInfo : public IMacGraphicsInfo
+class IXOpenGLGraphicsInfo : public iMacGraphicsInfo
 {
     DECLARE_IUNKNOWN()
     ///

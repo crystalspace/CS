@@ -19,20 +19,9 @@
 #ifndef __SYSG2D_H__
 #define __SYSG2D_H__
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "xsysg2d.h"
-
-///
-class csGraphics2DMacFactory : public IGraphics2DFactory 
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DMacFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(COMBOOL bLock);
-};
 
 /// Macintosh version.
 class csGraphics2DMac : public csGraphics2D
@@ -40,7 +29,9 @@ class csGraphics2DMac : public csGraphics2D
   friend class csGraphics3DSoftware;
   
 public:
-  csGraphics2DMac(ISystem* piSystem);
+  DECLARE_IBASE;
+
+  csGraphics2DMac(iBase *iParent);
   virtual ~csGraphics2DMac(void);
   
   virtual bool Open (const char *Title);
@@ -53,7 +44,7 @@ public:
   virtual bool BeginDraw();
   virtual void FinishDraw();
   
-  virtual bool SetMouseCursor (int iShape, TextureMM* iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, TextureMM* iBitmap);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);
   virtual bool DoubleBuffer ();
@@ -65,11 +56,6 @@ protected:
 //  HWND m_hWnd;
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DMac)
-
-  DECLARE_COMPOSITE_INTERFACE(XMacGraphicsInfo)
 };
 
 #endif

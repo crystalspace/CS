@@ -21,6 +21,8 @@ all drivers drivers2d: csdive
 
 csdive:
 	$(MAKE_TARGET) MAKE_DLL=yes
+csdiveclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -53,11 +55,10 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/csdive
 
-.PHONY: csdive os2clean os2cleanlib
+.PHONY: csdive csdiveclean
 
 # Chain rules
-clean: dive2dclean
-cleanlib: dive2dcleanlib
+clean: csdiveclean
 
 csdive: $(OUTDIRS) $(CSDIVE)
 
@@ -70,11 +71,8 @@ $(CSOS2.LIB): libs/cs2d/csdive/csdive.imp
 $(DIVE2D.RES): libs/cs2d/csdive/libDIVE.rc
 	$(RC) $(RCFLAGS) $< $@
 
-dive2dclean:
-	$(RM) $(CSDIVE)
-
-dive2dcleanlib:
-	$(RM) $(OBJ.CSDIVE) $(CSDIVE)
+csdiveclean:
+	$(RM) $(CSDIVE) $(OBJ.CSDIVE)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csdive.dep

@@ -178,19 +178,4 @@
 //#define SMALL_Z .1
 #define SMALL_Z .01
 
-// Some useful macros: these should be true at least for 32-bit processors
-#define LONGFROM2SHORT(s1,s2) (((short)s1) << 16 | (((short)s2) & 0xffff))
-#define SHORT1FROMLONG(l)     (short)(((long)l) >> 16)
-#define SHORT2FROMLONG(l)     (short)(((long)l) & 0xffff)
-
-enum SubSystemsIDs
-{
-  G3D_ID = 0,
-  G2D_ID,
-  GI_ID,
-  NetDrv_ID,
-  NetMan_ID,
-  SndDrv_ID
-};
-
 #endif // __DEF_H__

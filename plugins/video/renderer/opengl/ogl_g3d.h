@@ -28,19 +28,17 @@
 
 #include <GL/gl.h>
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
 #include "igraph3d.h"
+#include "iplugin.h"
 
-interface IPolygon3D;
-interface IGraphics2D;
+scfInterface iGraphics2D;
 class OpenGLTextureCache;
 class OpenGLLightmapCache;
 
-extern const CLSID CLSID_OpenGLGraphics3D;
-
 ///
-class csGraphics3DOpenGL : public IGraphics3D
+class csGraphics3DOpenGL : public iGraphics3D
 {
 private:
   // set proper GL flags based on ZBufMode.  This is usually
@@ -79,7 +77,7 @@ private:
   /// a StartPolygonFX call returns 'true', then calls to DrawPolygonFX and
   /// FinishPolygonFX must also return 'true' until the next time StartPolygonFX
   /// is called.
-  bool (csGraphics3DOpenGL::*ShortcutStartPolygonFX)(ITextureHandle *handle,UInt mode);
+  bool (csGraphics3DOpenGL::*ShortcutStartPolygonFX)(iTextureHandle *handle,UInt mode);
 
   /// Shortcut tried before executing standard DrawPolygonFX code.  The
   /// value returned by this must match the most recent return value of
@@ -100,7 +98,7 @@ private:
   /// Shortcuts to replace the standard Start/Draw/Finish set of Draw...FX functions;
   /// this set collects up polygons and then draws them in batches, instead
   /// of drawing each individual poly with gl calls
-  bool BatchStartPolygonFX(ITextureHandle *handle, UInt mode);
+  bool BatchStartPolygonFX(iTextureHandle *handle, UInt mode);
   bool BatchAccumulatePolygonFX(G3DPolygonDPFX &poly);
   bool BatchFlushPolygonFX();
 
@@ -118,10 +116,11 @@ protected:
   int height2;
 
   /**
-   * DAN: render-states
+   * render-states
    * these override any other variable settings.
    */
-  struct {
+  struct
+  {
     bool dither; // dither colors?
     bool specular; // draw specular highlights?
     bool trilinearmap; // texel/mipmap interpolate?
@@ -132,13 +131,6 @@ protected:
     bool textured; // Option variable: render textures?
     bool texel_filt; // Option variable: do expensive texel filtering?
     bool perfect; // Option variable: do perfect texture mapping?
-    int interlaced; // For interlacing. 0 = draw odd lines, 1 = draw even lines, -1 = draw all lines.
-    /**
-    * For interlacing. Temporary set to true if we moved quickly. This will decrease
-    * the bluriness a little.
-    */
-    bool ilace_fastmove;
-    
   } m_renderstate;
 
   /// Should DrawPolygonFX use Gouraud shading?
@@ -150,7 +142,9 @@ protected:
   /// Should DrawPolygonFX use texture?
   bool  m_textured;
 
-  struct { // load-time configuration options
+  // load-time configuration options
+  struct
+  {
     /**
     * Current settings of the user configurable blend parameters for
     * lightmaps.  Certain settings work better on certain cards
@@ -181,11 +175,13 @@ protected:
   int DrawMode;
 
 public:
+  DECLARE_IBASE;
+
   /**
    * Low-level 2D graphics layer.
    * csGraphics3DOpenGL is in charge of creating and managing this.
    */
-  IGraphics2D* m_piG2D;
+  iGraphics2D* G2D;
 
   /// The configuration file
   csIniFile* config;
@@ -200,37 +196,37 @@ public:
   OpenGLLightmapCache* lightmap_cache;
 
   /// The System interface. 
-  ISystem* m_piSystem;
+  iSystem* System;
 
   ///
-  csGraphics3DOpenGL (ISystem* piSystem);
+  csGraphics3DOpenGL (iBase *iParent);
   ///
   virtual ~csGraphics3DOpenGL ();
 
   ///
-  STDMETHODIMP Initialize ();
+  virtual bool Initialize (iSystem *iSys);
   ///
-  STDMETHODIMP Open(const char *Title);
+  virtual bool Open(const char *Title);
   ///
-  STDMETHODIMP Close();
+  virtual void Close();
 
   /// Change the dimensions of the display.
-  STDMETHODIMP SetDimensions (int width, int height);
+  virtual void SetDimensions (int width, int height);
 
   /// Start a new frame (see CSDRAW_XXX bit flags)
-  STDMETHODIMP BeginDraw (int DrawFlags);
+  virtual bool BeginDraw (int DrawFlags);
 
   /// End the frame and do a page swap.
-  STDMETHODIMP FinishDraw ();
+  virtual void FinishDraw ();
 
   /// Print the image in backbuffer
-  STDMETHODIMP Print (csRect *area);
+  virtual void Print (csRect *area);
 
   /// Set the mode for the Z buffer used for drawing the next polygon.
-  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
+  virtual void SetZBufMode (G3DZBufMode mode);
 
   /// Draw the projected polygon with light and texture.
-  STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
+  virtual void DrawPolygon (G3DPolygonDP& poly);
 
   /**
    * Draw the projected polygon with light and texture.
@@ -238,38 +234,38 @@ public:
    * but it just prints debug information about what it would have
    * done.
    */
-  STDMETHODIMP DrawPolygonDebug (G3DPolygonDP& poly);
+  virtual void DrawPolygonDebug (G3DPolygonDP& poly);
 
   /// Draw a line in camera space.
-  STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
+  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
 
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX (ITextureHandle* handle, UInt mode);
+  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
-  STDMETHODIMP FinishPolygonFX ();
+  virtual void FinishPolygonFX ();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX (G3DPolygonDPFX& poly);
+  virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to csGraphics3DOpenGL to cache it.
-  STDMETHODIMP CacheTexture (IPolygonTexture* texture);
+  virtual void CacheTexture (iPolygonTexture *texture);
 
   /**
    * Give a texture to csGraphics3DOpenGL to initialize the cache for it.
    * This is used together with the sub-texture optimization and is meant
    * to allocate the space in the cache but not do any actual calculations yet.
    */
-  void CacheInitTexture (IPolygonTexture* texture);
+  void CacheInitTexture (iPolygonTexture* texture);
 
   /// Give a sub-texture to csGraphics3DOpenGL to cache it.
-  void CacheSubTexture (IPolygonTexture* texture, int u, int v);
+  void CacheSubTexture (iPolygonTexture* texture, int u, int v);
 
   /**
    * Give a rectangle to csGraphics3DOpenGL so that all sub-textures
    * in this rectangle are cached.
    */
-  void CacheRectTexture (IPolygonTexture* texture, int minu, int minv, int maxu, int maxv);
+  void CacheRectTexture (iPolygonTexture* texture, int minu, int minv, int maxu, int maxv);
 
   /**
    * Allocate a 'lighted texture' in which the base texture and lightmap
@@ -277,55 +273,64 @@ public:
    * This emulates multi-texturing which is needed for transparent
    * lighted portals
    */
-  void CacheLightedTexture(IPolygonTexture *texture);
+  void CacheLightedTexture(iPolygonTexture *texture);
 
   /// Release a texture from the cache.
-  STDMETHODIMP UncacheTexture (IPolygonTexture* texture);
+  virtual void UncacheTexture (iPolygonTexture* texture);
 
   /// Set a renderstate boolean.
-  STDMETHODIMP SetRenderState (G3D_RENDERSTATEOPTION op, long val);
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
 
   /// Get a renderstate value.
-  STDMETHODIMP GetRenderState (G3D_RENDERSTATEOPTION op, long& val);
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
 
   /**
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  STDMETHODIMP GetCaps (G3D_CAPS *caps);
+  virtual void GetCaps (G3D_CAPS *caps);
 
   /// Get address of Z-buffer at specific point
-  STDMETHODIMP GetZBufPoint(int /*x*/, int /*y*/, unsigned long** retval) { *retval = NULL; return E_NOTIMPL; }
+  virtual unsigned long *GetZBufPoint(int /*x*/, int /*y*/)
+  { return NULL; }
 
   /// Dump the texture cache.
-  STDMETHODIMP DumpCache (void);
+  virtual void DumpCache ();
 
   /// Clear the texture cache.
-  STDMETHODIMP ClearCache (void);
+  virtual void ClearCache ();
 
   /// Get drawing buffer width
-  STDMETHODIMP GetWidth(int& retval) { retval = width; return S_OK; }
+  virtual int GetWidth ()
+  { return width; }
   /// Get drawing buffer height
-  STDMETHODIMP GetHeight(int& retval) { retval = height; return S_OK; }
+  virtual int GetHeight ()
+  { return height; }
   /// Set center of projection.
-  STDMETHODIMP SetPerspectiveCenter (int x, int y);
+  virtual void SetPerspectiveCenter (int x, int y);
 
-  /// Get the IGraphics2D driver.
-  STDMETHODIMP Get2dDriver(IGraphics2D** pi) { *pi = m_piG2D; return S_OK; }
+  /// Get the iGraphics2D driver.
+  virtual iGraphics2D *GetDriver2D ()
+  { return G2D; }
 
-  /// Get the ITextureManager.
-  STDMETHODIMP GetTextureManager (ITextureManager** pi) { *pi = (ITextureManager*)txtmgr; return S_OK; }
+  /// Get the iTextureManager.
+  virtual iTextureManager *GetTextureManager ()
+  { return txtmgr; }
 
-  /// Returns S_OK if this driver requires all maps to be PO2.
-  STDMETHODIMP NeedsPO2Maps() { return S_OK; }
+  /// Returns true if this driver requires all maps to be PO2.
+  virtual bool NeedsPO2Maps ()
+  { return true; }
   /// Returns the maximum aspect ratio of maps.
-  STDMETHODIMP GetMaximumAspectRatio(int& retval) { retval = 32768; return S_OK; }
+  virtual int GetMaximumAspectRatio ()
+  { return 32768; }
 
   /// Get the fog mode.
-  STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) { retval = G3DFOGMETHOD_VERTEX; return S_OK; }
+  virtual G3D_FOGMETHOD GetFogMode ()
+  { return G3DFOGMETHOD_VERTEX; }
 
   /// Get the fog mode.
-  STDMETHODIMP SetFogMode (G3D_FOGMETHOD fogm) { if (fogm == G3DFOGMETHOD_VERTEX) return S_OK; else return E_FAIL; }
+  virtual bool SetFogMode (G3D_FOGMETHOD fogm)
+  { if (fogm == G3DFOGMETHOD_VERTEX) return true; else return false; }
 
   /**
    * Initiate a volumetric fog object. This function will be called
@@ -335,7 +340,7 @@ public:
    * The given CS_ID can be used to identify multiple fog objects when
    * multiple objects are started.
    */
-  STDMETHODIMP OpenFogObject (CS_ID id, csFog* fog);
+  virtual void OpenFogObject (CS_ID id, csFog* fog);
     
   /**
    * Add a front or back-facing fog polygon in the current fog object.
@@ -348,35 +353,20 @@ public:
    *	<li>CS_FOG_VIEW:	the view-plane
    * </ul>
    */
-  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
         
   /**
    * Close a volumetric fog object. After the volumetric object is
    * closed it should be rendered on screen (whether you do it here
    * or in DrawFrontFog/DrawBackFog is not important).
    */
-  STDMETHODIMP CloseFogObject (CS_ID id);
+  virtual void CloseFogObject (CS_ID id);
 	  
   /// Get the colorformat you want.
-  STDMETHODIMP GetColormapFormat(G3D_COLORMAPFORMAT& retval) { retval = G3DCOLORFORMAT_24BIT; return S_OK; }
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE( csGraphics3DOpenGL )
+  virtual G3D_COLORMAPFORMAT GetColormapFormat ()
+  { return G3DCOLORFORMAT_24BIT; }
 
   void SysPrintf (int mode, char* str, ...);
 };
 
-class csGraphics3DOpenGLFactory : public IGraphicsContextFactory
-{
-    /// Create the graphics context
-    STDMETHODIMP CreateInstance( REFIID riid, ISystem* piSystem, void** ppv );
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE( csGraphics3DOpenGLFactory )
-};
-
 #endif
-

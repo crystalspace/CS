@@ -39,8 +39,6 @@
 //#include "render/glide3/driver2d/g2d.h" @@@
 #include "cs3d/glide3/g3dglide.h"
 
-csIniFile *configglide3;
-
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
 #if defined(OS_WIN32)
@@ -83,11 +81,18 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 // Interface table definition
 //
 
-BEGIN_INTERFACE_TABLE(csGraphics3DGlide3x)
-    IMPLEMENTS_INTERFACE( IGraphics3D )
-END_INTERFACE_TABLE()
+IMPLEMENT_FACTORY (csGraphics3DGlide3x)
 
-IMPLEMENT_UNKNOWN_NODELETE(csGraphics3DGlide3x)
+EXPORT_CLASS_TABLE (glide33d)
+  EXPORT_CLASS (csGraphics3DGlide3x, "crystalspace.graphics3d.glide.3",
+    "Glide v3 3D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csGraphics3DGlide3x)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iHaloRasterizer)
+IMPLEMENT_IBASE_END
 
 /**
 * This Function gets information from the Current Board selected.
@@ -129,12 +134,12 @@ void csGraphics3DGlide3x::InitializeBoard()
     iTMUTexture=1;
   }
 
-  if(configglide3->GetYesNo("Glide3x","FORCEMULTIPASS",FALSE)&&(m_iMultiPass==false))
+  if (config->GetYesNo("Glide3x","FORCEMULTIPASS",FALSE)&&(m_iMultiPass==false))
   {
     SysPrintf (MSG_INITIALIZATION, "Forced MultiPass Rendering.\n");
     m_iMultiPass=true;
   }
-  if(m_iMultiPass)
+  if (m_iMultiPass)
   {
     SysPrintf (MSG_INITIALIZATION, "Will use MultiPass Rendering.\n");
   }
@@ -144,14 +149,16 @@ void csGraphics3DGlide3x::InitializeBoard()
     SysPrintf (MSG_INITIALIZATION, "Affected %d TMU for Texture and %d for LightMap.\n",iTMUTexture,iTMULightMap);
   }
   m_TMUs = new TMUInfo[2];
-  if(m_iMultiPass)
+  if (m_iMultiPass)
   {
     m_TMUs[0].tmu_id=m_TMUs[1].tmu_id=0;
     m_TMUs[0].minAddress = grTexMinAddress(0);
     m_TMUs[1].maxAddress = grTexMaxAddress(0);
     m_TMUs[1].minAddress = m_TMUs[0].maxAddress = (m_TMUs[1].maxAddress -  m_TMUs[0].minAddress)/2;
     m_TMUs[1].minAddress = (m_TMUs[1].minAddress+7)&(~7);
-  } else {
+  }
+  else
+  {
     m_TMUs[0].tmu_id=0;
     m_TMUs[0].minAddress = grTexMinAddress(0);
     m_TMUs[0].maxAddress = grTexMaxAddress(0);
@@ -265,56 +272,11 @@ int csGraphics3DGlide3x::SelectBoard()
   return board;
 }
 
-csGraphics3DGlide3x::csGraphics3DGlide3x(ISystem* piSystem) :
+csGraphics3DGlide3x::csGraphics3DGlide3x(iBase *iParent) :
     m_pTextureCache(NULL),
     m_pLightmapCache(NULL),
-    m_piSystem(piSystem)
 {
-  HRESULT hRes;
-  IGraphics2DFactory* piFactory = NULL;
-  
-  configglide3 = new csIniFile("Glide3x.cfg");
-
-  m_piSystem->AddRef();
-  ASSERT( m_piSystem );
-
-  SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide3x selected\n");
-
-  piFactory = new csGraphics2DGlide3xFactory();
-  hRes = piFactory->CreateInstance( IID_IGraphics2D, m_piSystem, (void**)&m_piG2D );
-  if (FAILED(hRes))
-  {
-      SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
-      exit(0);
-  }
-
-  FINAL_RELEASE( piFactory );
-
-  m_bVRetrace = configglide3->GetYesNo("Glide3x","VRETRACE",FALSE);
-
-  FxI32 grncard=0;
-
-  grGet(GR_NUM_BOARDS, sizeof(FxI32), &grncard);
-  if(grncard==0) 
-    sys_fatalerror("csGraphics3DGlide3x::Open : No 3dfx chip found");
-
-  grGlideInit();
-
-  SelectBoard();
-
-  const char *szString;
-  szString = grGetString(GR_VERSION);
-  SysPrintf (MSG_INITIALIZATION, "Glide %s detected.\n",szString);
-  SysPrintf (MSG_INITIALIZATION, "Board %d selected.\n",board);
-  
-  grSstSelect(board);
-
-  InitializeBoard();
-
-  use16BitTexture=configglide3->GetYesNo("Glide3x","USE_16BIT_TEXTURE",false);
-
-  CHK (m_pTextureCache = new GlideTextureCache(&m_TMUs[0], (use16BitTexture)?16:8, new FixedTextureMemoryManager(m_TMUs[0].memory_size)));
-  CHK (m_pLightmapCache = new GlideLightmapCache(&m_TMUs[1],new FixedTextureMemoryManager(m_TMUs[1].memory_size)));
+  CONSTRUCT_IBASE (iParent);
 
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
@@ -332,7 +294,7 @@ csGraphics3DGlide3x::csGraphics3DGlide3x(ISystem* piSystem) :
   m_Caps.PrimaryCaps.PerspectiveCorrects = true;
   m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
 
-  /*
+/*
   rstate_dither = false;
   rstate_specular = false;
   rstate_bilinearmap = false;
@@ -343,6 +305,70 @@ csGraphics3DGlide3x::csGraphics3DGlide3x(ISystem* piSystem) :
   rstate_mipmap = false;
   rstate_edges = false;
 */
+  config = new csIniFile("Glide3x.cfg");
+}
+
+csGraphics3DGlide3x::~csGraphics3DGlide3x ()
+{
+  grGlideShutdown ();
+
+  if (m_pTextureCache)
+    CHKB (delete m_pTextureCache);
+  if (m_pLightmapCache)
+    CHKB (m_pLightmapCache);
+  if (config)
+    CHKB (delete config);
+  if (m_pCamera)
+    m_pCamera->DecRef ();
+  if (m_piG2D)
+    m_piG2D->DecRef ();
+  if (m_piSystem)
+  {
+    m_piSystem->DeregisterDriver ("iGraphics3D", this);
+    m_piSystem->DecRef ();
+  }
+}
+
+bool csGraphics3DGlide3x::Initialize (iSystem *iSys)
+{
+  (m_piSystem = iSys)->IncRef ();
+
+  if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
+    return false;
+
+  SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide3x selected\n");
+
+  m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER, iGraphics2D);
+  if (!m_piG2D)
+  {
+    SysPrintf (MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
+    return false;
+  }
+
+  m_bVRetrace = config->GetYesNo("Glide3x","VRETRACE",FALSE);
+
+  FxI32 grncard=0;
+
+  grGet(GR_NUM_BOARDS, sizeof(FxI32), &grncard);
+  if(grncard==0) 
+    sys_fatalerror("csGraphics3DGlide3x::Open : No 3dfx chip found");
+
+  grGlideInit();
+
+  SelectBoard();
+
+  const char *szString = grGetString(GR_VERSION);
+  SysPrintf (MSG_INITIALIZATION, "Glide %s detected.\n",szString);
+  SysPrintf (MSG_INITIALIZATION, "Board %d selected.\n",board);
+  
+  grSstSelect(board);
+
+  InitializeBoard();
+
+  use16BitTexture=config->GetYesNo("Glide3x","USE_16BIT_TEXTURE",false);
+
+  CHK (m_pTextureCache = new GlideTextureCache(&m_TMUs[0], (use16BitTexture)?16:8, new FixedTextureMemoryManager(m_TMUs[0].memory_size)));
+  CHK (m_pLightmapCache = new GlideLightmapCache(&m_TMUs[1],new FixedTextureMemoryManager(m_TMUs[1].memory_size)));
 }
 
 static struct
@@ -383,38 +409,26 @@ static int getResolutionIndex(int width, int height)
   return -1;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::Open(const char* Title)
+bool csGraphics3DGlide3x::Open(const char* Title)
 {
   FxU32 hwnd=NULL;
   GrScreenResolution_t iRes;
 
-  IGlide3xGraphicsInfo* pSysGInfo = NULL;
-  IGraphicsInfo*      pGraphicsInfo = NULL;
-
-  HRESULT hRes = m_piG2D->QueryInterface(IID_IGlide3xGraphicsInfo, (void**)&pSysGInfo);
-  if (FAILED(hRes))
-    goto OnError;
-  
-  m_piG2D->QueryInterface(IID_IGraphicsInfo, (void**)&pGraphicsInfo);
-  if (FAILED(hRes))
-    goto OnError;
-
   // Open the 2D driver.
-  hRes = m_piG2D->Open(Title);
-  if ( FAILED(hRes) )
-    goto OnError;
+  if (!m_piG2D->Open(Title))
+    return false;
   
 #if defined(OS_WIN32)
   //pSysGInfo->GethWnd((void**)hwnd);
 #endif
 
-  pGraphicsInfo->GetWidth(m_nWidth);
+  m_nWidth = pGraphicsInfo->GetWidth();
   m_nHalfWidth = m_nWidth/2;
   
-  pGraphicsInfo->GetHeight(m_nHeight);
+  m_nHeight = pGraphicsInfo->GetHeight();
   m_nHalfHeight = m_nHeight/2;
   
-  if(/*configglide3->GetYesNo("VideoDriver","FULL_SCREEN",TRUE)*/true)
+  if(/*config->GetYesNo("VideoDriver","FULL_SCREEN",TRUE)*/true)
   {
     iRes=::getResolutionIndex(m_nWidth, m_nHeight);
     if(iRes==-1)
@@ -501,65 +515,41 @@ STDMETHODIMP csGraphics3DGlide3x::Open(const char* Title)
   grVertexLayout(GR_PARAM_ST1, 11 << 2, GR_PARAM_ENABLE);
   grVertexLayout(GR_PARAM_ST2, 14 << 2, GR_PARAM_ENABLE);
 
-  return S_OK;
-
-OnError:
-  
-  if (FAILED(hRes))
-    FINAL_RELEASE(m_piG2D);
-  
-  FINAL_RELEASE(pGraphicsInfo);
-  FINAL_RELEASE(pSysGInfo);
-  
-  return hRes;  
+  return true;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::Close()
+void csGraphics3DGlide3x::Close()
 {
   ClearCache();
 
   if(grcontext)
     grSstWinClose(grcontext);
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
+void csGraphics3DGlide3x::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
 {
   if (use16BitTexture)
     g3dFormat = G3DCOLORFORMAT_PRIVATE;
   else
     g3dFormat = G3DCOLORFORMAT_GLOBAL;
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::SetDimensions (int width, int height)
+void csGraphics3DGlide3x::SetDimensions (int width, int height)
 {
   m_nWidth = width;
   m_nHeight = height;
   m_nHalfWidth = width/2;
   m_nHalfHeight = height/2;
   grClipWindow(0, 0, width, height);
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::SetPerspectiveCenter (int x, int y)
+void csGraphics3DGlide3x::SetPerspectiveCenter (int x, int y)
 {
   m_nHalfWidth = x;
   m_nHalfHeight = y;
-  return S_OK;
 }
 
-csGraphics3DGlide3x::~csGraphics3DGlide3x()
-{
-  grGlideShutdown();
-
-  FINAL_RELEASE( m_pCamera );
-  FINAL_RELEASE( m_piG2D );
-  FINAL_RELEASE( m_piSystem );
-}
-
-STDMETHODIMP csGraphics3DGlide3x::BeginDraw (int DrawFlags)
+bool csGraphics3DGlide3x::BeginDraw (int DrawFlags)
 {
   if (DrawFlags & CSDRAW_2DGRAPHICS)
   {
@@ -615,33 +605,29 @@ STDMETHODIMP csGraphics3DGlide3x::BeginDraw (int DrawFlags)
     } /* endif */
   } /* endif */
   m_nDrawMode = DrawFlags;
-  return S_OK;
 }
 
 /// End the frame
-STDMETHODIMP csGraphics3DGlide3x::FinishDraw ()
+void csGraphics3DGlide3x::FinishDraw ()
 {
   if (m_nDrawMode & CSDRAW_2DGRAPHICS)
     m_piG2D->FinishDraw ();
 
   m_nDrawMode = 0;
-  return S_OK;
 }
 
 /// do the page swap.
-STDMETHODIMP csGraphics3DGlide3x::Print(csRect* rect)
+void csGraphics3DGlide3x::Print(csRect* rect)
 {
   if(m_bVRetrace)
     grBufferSwap(1);
   else
     grBufferSwap(0);
-  return S_OK;
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-STDMETHODIMP csGraphics3DGlide3x::SetZBufMode (G3DZBufMode mode)
+void csGraphics3DGlide3x::SetZBufMode (G3DZBufMode mode)
 {
-  return E_NOTIMPL;   
 }
 
 #define SNAP (( float ) ( 3L << 18 ))
@@ -766,7 +752,7 @@ void csGraphics3DGlide3x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
     }
 }
 
-STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
+void csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
 {
   MyGrVertex * verts;
 
@@ -779,7 +765,7 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
   bool is_transparent = false;
   bool is_colorkeyed = false;
   int  poly_alpha;
-  IPolygonTexture* pTex;
+  iPolygonTexture* pTex;
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
   
@@ -806,32 +792,25 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
   piTM->GetParent( &piMMC );
   ASSERT( piMMC );
   
-  piMMC->GetTransparent (is_colorkeyed);
+  is_colorkeyed = piMMC->GetTransparent ();
   
   HighColorCacheAndManage_Data* tcache;
   HighColorCacheAndManage_Data* lcache;
   
   // retrieve the cached texture handle.
-  piMMC->GetHighColorCache((HighColorCache_Data **)&tcache ); 
+  tcache = piMMC->GetHighColorCache (); 
   ASSERT( tcache );
   
-  FINAL_RELEASE( piTM );
-  FINAL_RELEASE( piMMC );
-  
   // retrieve the lightmap from the cache.
-  ILightMap* piLM = NULL;
-  pTex->GetLightMap( &piLM );
+  iLightMap* piLM = pTex->GetLightMap ();
   
   if ( piLM )
   {
-    piLM->GetHighColorCache((HighColorCache_Data **) &lcache );
+    lcache = piLM->GetHighColorCache ();
     if (!lcache)
     {
       lm_exists = false;
     }
-    
-    //piLM->Release();
-    FINAL_RELEASE(piLM);
   }
   else
   {
@@ -908,17 +887,15 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
     grChromakeyMode(GR_CHROMAKEY_DISABLE);
   
   delete[] verts;
-
-  return S_OK;
 }
 
 /// Draw a projected (non-perspective correct) polygon.
-STDMETHODIMP csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly)
+void csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly)
 {
   HighColorCacheAndManage_Data* tcache=NULL;
 
   if (poly.num < 3) 
-    return S_OK;
+    return;
   
   CHK(MyGrVertex *verts = new MyGrVertex[poly.num]);
   
@@ -940,7 +917,7 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly)
   }
   
   m_pTextureCache->Add(poly.pi_texture);
-  poly.pi_texture->GetHighColorCache((HighColorCache_Data **)&tcache ); 
+  tcache = poly.pi_texture->GetHighColorCache (); 
   ASSERT( tcache );
   
   TextureHandler *thTex = (TextureHandler *)tcache->pData;
@@ -950,12 +927,10 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly)
   grDrawVertexArrayContiguous(GR_POLYGON, poly.num, verts, sizeof(MyGrVertex));
   
   delete[] verts;
-
-  return S_OK;
 }
 
 /// Give a texture to csGraphics3D to cache it.
-STDMETHODIMP csGraphics3DGlide3x::CacheTexture (IPolygonTexture *piPT)
+void csGraphics3DGlide3x::CacheTexture (iPolygonTexture *piPT)
 {
   ITextureMap* piTM = NULL;
   IMipMapContainer* piMMC = NULL;
@@ -974,52 +949,37 @@ STDMETHODIMP csGraphics3DGlide3x::CacheTexture (IPolygonTexture *piPT)
   {
     m_pLightmapCache->Add(piPT);
   } 
-  
-  FINAL_RELEASE( piTM );
-  FINAL_RELEASE( piMMC );
-  
-  return S_OK;  
 }
 
 /// Release a texture from the cache.
-STDMETHODIMP csGraphics3DGlide3x::UncacheTexture (IPolygonTexture *piPT)
+void csGraphics3DGlide3x::UncacheTexture (iPolygonTexture *piPT)
 {
   (void)piPT;
-  return E_NOTIMPL;
 }
 
 /// Dump the texture cache.
-STDMETHODIMP csGraphics3DGlide3x::DumpCache(void)
+void csGraphics3DGlide3x::DumpCache(void)
 {
   m_pTextureCache->Dump();
   m_pLightmapCache->Dump();
-  return S_OK;
 }
 
 /// Clear the texture cache.
-STDMETHODIMP csGraphics3DGlide3x::ClearCache(void)
+void csGraphics3DGlide3x::ClearCache(void)
 {
   if(m_pTextureCache) m_pTextureCache->Clear();
   if(m_pLightmapCache) m_pLightmapCache->Clear();
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::DrawFltLight(G3DFltLight& light)
-{
-    return E_NOTIMPL;
-}
-
-STDMETHODIMP csGraphics3DGlide3x::GetCaps(G3D_CAPS *caps)
+void csGraphics3DGlide3x::GetCaps(G3D_CAPS *caps)
 {
   if (!caps)
-    return E_INVALIDARG;
+    return;
 
   memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::DrawLine (csVector3& v1, csVector3& v2, int color)
+void csGraphics3DGlide3x::DrawLine (csVector3& v1, csVector3& v2, int color)
 {
   ASSERT( m_pCamera );
   if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
@@ -1059,11 +1019,9 @@ STDMETHODIMP csGraphics3DGlide3x::DrawLine (csVector3& v1, csVector3& v2, int co
   int py2 = m_nHeight - 1 - QInt (y2 * iz2 + (m_nHeight/2));
 
   m_piG2D->DrawLine (px1, py1, px2, py2, color);
-
-  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
+void csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
 {
   switch (op)
   {
@@ -1088,8 +1046,6 @@ STDMETHODIMP csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION op, long
   default:
     return E_NOTIMPL;
   }
-
-  return S_OK;
 }
 
 void csGraphics3DGlide3x::SysPrintf(int mode, char* szMsg, ...)

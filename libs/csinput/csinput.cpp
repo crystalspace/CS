@@ -62,65 +62,44 @@ void csKeyboardDriver::Close ()
 
 void csKeyboardDriver::Reset ()
 {
-  memset (&Key, 0, sizeof (Key));
-  memset (aKey, 0, sizeof (aKey));
+  memset (KeyState, 0, sizeof (KeyState));
 }
 
 void csKeyboardDriver::do_keypress (time_t evtime, int key)
 {
-  int smask = (Key.shift ? CSMASK_SHIFT : 0)
-            | (Key.ctrl ? CSMASK_CTRL : 0)
-            | (Key.alt ? CSMASK_ALT : 0);
-  if (key < 256)
-  {
-    if (!aKey [key])
-      smask |= CSMASK_FIRST;
-    aKey [key] = true;
-  }
+  int smask = (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+            | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
+            | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
+  if (!GetKeyState (key))
+    smask |= CSMASK_FIRST;
   if ((key >= 32) && (key < 128))
-    if (Key.shift) key = ShiftedKey [key - 32];
+    if (GetKeyState (CSKEY_SHIFT))
+      key = ShiftedKey [key - 32];
   if (EventQueue)
-  {
-    CHK (EventQueue->Put (new csEvent (evtime, csevKeyDown, key, smask)));
-  }
-  SetKey (key, true);
+    CHKB (EventQueue->Put (new csEvent (evtime, csevKeyDown, key, smask)));
+  SetKeyState (key, true);
 }
 
 void csKeyboardDriver::do_keyrelease (time_t evtime, int key)
 {
-  if (key < 256)
-    aKey [key] = false;
   if ((key >= 32) && (key < 128))
-    if (Key.shift) key = ShiftedKey [key - 32];
+    if (GetKeyState (CSKEY_SHIFT))
+      key = ShiftedKey [key - 32];
   if (EventQueue)
-  {
-    CHK (EventQueue->Put (new csEvent (evtime, csevKeyUp, key, 0)));
-  }
-  SetKey (key, false);
+    CHKB (EventQueue->Put (new csEvent (evtime, csevKeyUp, key, 0)));
+  SetKeyState (key, false);
 }
 
-void csKeyboardDriver::SetKey (int key, bool state)
+void csKeyboardDriver::SetKeyState (int key, bool state)
 {
-  switch (key)
-  {
-    case CSKEY_ESC:       Key.esc = state;       break;
-    case CSKEY_ENTER:     Key.enter = state;     break;
-    case CSKEY_TAB:       Key.tab = state;       break;
-    case CSKEY_BACKSPACE: Key.backspace = state; break;
-    case CSKEY_UP:        Key.up = state;        break;
-    case CSKEY_DOWN:      Key.down = state;      break;
-    case CSKEY_LEFT:      Key.left = state;      break;
-    case CSKEY_RIGHT:     Key.right = state;     break;
-    case CSKEY_PGUP:      Key.pgup = state;      break;
-    case CSKEY_PGDN:      Key.pgdn = state;      break;
-    case CSKEY_HOME:      Key.home = state;      break;
-    case CSKEY_END:       Key.end = state;       break;
-    case CSKEY_INS:       Key.ins = state;       break;
-    case CSKEY_DEL:       Key.del = state;       break;
-    case CSKEY_CTRL:      Key.ctrl = state;      break;
-    case CSKEY_ALT:       Key.alt = state;       break;
-    case CSKEY_SHIFT:     Key.shift = state;     break;
-  } /* endswitch */
+  int idx = (key < 256) ? key : (256 + key - CSKEY_FIRST);
+  KeyState [idx] = state;
+}
+
+bool csKeyboardDriver::GetKeyState (int key)
+{
+  int idx = (key < 256) ? key : (256 + key - CSKEY_FIRST);
+  return KeyState [idx];
 }
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--//
@@ -139,15 +118,12 @@ csMouseDriver::~csMouseDriver ()
   Close ();
 }
 
-bool csMouseDriver::Open (ISystem* System, csEventQueue *EvQueue)
+bool csMouseDriver::Open (iSystem* System, csEventQueue *EvQueue)
 {
   EventQueue = EvQueue;
   Reset ();
-  int val;
-  System->ConfigGetInt ("MouseDriver", "DoubleClockTime", val, 300);
-  DoubleClickTime = val;
-  System->ConfigGetInt ("MouseDriver", "DoubleClickDist", val, 2);
-  DoubleClickDist = val;
+  DoubleClickTime = System->ConfigGetInt ("MouseDriver", "DoubleClockTime", 300);
+  DoubleClickDist = System->ConfigGetInt ("MouseDriver", "DoubleClickDist", 2);
   LastMouseX = LastMouseY = -99999;
   return (EvQueue != NULL);
 }

@@ -21,6 +21,8 @@ all drivers snddrivers: oss
 
 oss:
 	$(MAKE_TARGET) MAKE_DLL=yes
+ossclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -47,11 +49,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: oss ossclean osscleanlib
+.PHONY: oss ossclean
 
 # Chain rules
 clean: ossclean
-cleanlib: osscleanlib
 
 oss: $(OUTDIRS) $(SNDOSS)
 
@@ -59,10 +60,7 @@ $(SNDOSS): $(OBJ.SNDOSS) $(DEP.OSS)
 	$(DO.PLUGIN)
 
 ossclean:
-	$(RM) $(SNDOSS)
-
-osscleanlib:
-	$(RM) $(OBJ.SNDOSS) $(SNDOSS)
+	$(RM) $(SNDOSS) $(OBJ.SNDOSS)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)oss.dep

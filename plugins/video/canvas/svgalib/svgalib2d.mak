@@ -21,6 +21,8 @@ all drivers drivers2d: svgalib2d
 
 svgalib2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
+svgalib2dclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -50,11 +52,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: svgalib2d svgalib2dclean svgalib2dcleanlib
+.PHONY: svgalib2d svgalib2dclean
 
 # Chain rules
 clean: svgalib2dclean
-cleanlib: svgalib2dcleanlib
 
 svgalib2d: $(OUTDIRS) $(SVGA2D)
 
@@ -65,10 +66,7 @@ $(SVGA2D): $(OBJ.SVGA2D) $(DEP.SVGA2D)
 	$(DO.PLUGIN) $(LIBS.SVGA2D)
 
 svgalib2dclean:
-	$(RM) $(SVGA2D)
-
-svgalib2dcleanlib:
-	$(RM) $(OBJ.SVGA2D) $(SVGA2D)
+	$(RM) $(SVGA2D) $(OBJ.SVGA2D)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)svgalib2d.dep

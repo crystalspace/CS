@@ -22,14 +22,13 @@
 // GRAPH3D.H
 // csGraphics3DSoftware software rasterizer class.
 
-// Concieved by Jorrit Tyberghein and Gary Clark
-// Expanded by Dan Ogles
-
-#include "cscom/com.h"
+#include "csutil/scf.h"
+#include "soft_txt.h"
 #include "iconfig.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 #include "ihalo.h"
+#include "iplugin.h"
 #include "scan.h"
 
 #if !defined (PROC_INTEL) || defined (NO_ASSEMBLER)
@@ -42,14 +41,10 @@
 
 class TextureCache;
 
-interface IPolygon3D;
-interface IGraphics2D;
-class csTextureManagerSoftware;
+scfInterface iGraphics2D;
 class TextureCache;
 class TextureCache16;
 class csIniFile;
-extern const CLSID CLSID_SoftwareGraphics3D;
-struct csFog;
 
 /// This structure is used to hold references to all current fog objects.
 struct FogBuffer
@@ -60,21 +55,9 @@ struct FogBuffer
   float red, green, blue;
 };
 
-/// Composite version of IConfig.
-interface IXConfig3DSoft : public IConfig
-{
-  DECLARE_IUNKNOWN ()
-  STDMETHODIMP SetOption (int id, csVariant* value);
-  STDMETHODIMP GetOption (int id, csVariant* value);
-  STDMETHODIMP GetNumberOptions (int& num);
-  STDMETHODIMP GetOptionDescription (int idx, csOptionDescription* option);
-
-private:
-  static csOptionDescription config_options[];
-};
-
 ///
-class csGraphics3DSoftware : public IGraphics3D
+class csGraphics3DSoftware : public iGraphics3D, public iHaloRasterizer,
+  public iConfig
 {
 private:
   /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
@@ -170,7 +153,7 @@ private:
    * Same as DrawPolygon but no texture mapping.
    * (Flat drawing).
    */
-  HRESULT DrawPolygonFlat (G3DPolygonDPF& poly);
+  void DrawPolygonFlat (G3DPolygonDPF& poly);
 
   /// The dynamically built fog tables
   struct
@@ -187,11 +170,13 @@ private:
   void SetCacheSize (long size);
 
 public:
+  DECLARE_IBASE;
+
   /**
    * Low-level 2D graphics layer.
    * csGraphics3DSoftware is in charge of creating and managing this.
    */
-  IGraphics2D* m_piG2D;
+  iGraphics2D* G2D;
 
   /// The configuration file
   csIniFile* config;
@@ -203,7 +188,7 @@ public:
   TextureCache* tcache;
 
   /// The System interface.
-  ISystem* m_piSystem;
+  iSystem* System;
 
   /// Option variable: do texture lighting?
   bool do_lighting;
@@ -234,7 +219,7 @@ public:
   static int filter_bf;
 
   ///
-  csGraphics3DSoftware (ISystem* piSystem);
+  csGraphics3DSoftware (iBase *iParent);
   ///
   virtual ~csGraphics3DSoftware ();
 
@@ -242,29 +227,29 @@ public:
   void ScanSetup ();
 
   ///
-  STDMETHODIMP Initialize ();
+  virtual bool Initialize (iSystem *iSys);
   ///
-  STDMETHODIMP Open (const char *Title);
+  virtual bool Open (const char *Title);
   ///
-  STDMETHODIMP Close ();
+  virtual void Close ();
 
   /// Change the dimensions of the display.
-  STDMETHODIMP SetDimensions (int width, int height);
+  virtual void SetDimensions (int width, int height);
 
   /// Start a new frame (see CSDRAW_XXX bit flags)
-  STDMETHODIMP BeginDraw (int DrawFlags);
+  virtual bool BeginDraw (int DrawFlags);
 
   /// End the frame and do a page swap.
-  STDMETHODIMP FinishDraw ();
+  virtual void FinishDraw ();
 
   /// Print the image in backbuffer
-  STDMETHODIMP Print (csRect *area);
+  virtual void Print (csRect *area);
 
   /// Set the mode for the Z buffer used for drawing the next polygon.
-  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
+  virtual void SetZBufMode (G3DZBufMode mode);
 
   /// Draw the projected polygon with light and texture.
-  STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
+  virtual void DrawPolygon (G3DPolygonDP& poly);
 
   /**
    * Draw the projected polygon with light and texture.
@@ -272,13 +257,15 @@ public:
    * but it just prints debug information about what it would have
    * done.
    */
-  STDMETHODIMP DrawPolygonDebug (G3DPolygonDP& poly);
+  virtual void DrawPolygonDebug (G3DPolygonDP& poly);
 
   /// Get the fog mode.
-  STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) { retval = fogMode; return S_OK; }
+  virtual G3D_FOGMETHOD GetFogMode ()
+  { return fogMode; }
 
   /// Get the fog mode.
-  STDMETHODIMP SetFogMode (G3D_FOGMETHOD fogm) { fogMode = fogm; return S_OK; }
+  virtual bool SetFogMode (G3D_FOGMETHOD fogm)
+  { fogMode = fogm; return true; }
 
   /**
    * Initiate a volumetric fog object. This function will be called
@@ -287,7 +274,7 @@ public:
    * The given CS_ID can be used to identify multiple fog objects when
    * multiple objects are started.
    */
-  STDMETHODIMP OpenFogObject (CS_ID id, csFog* fog);
+  virtual void OpenFogObject (CS_ID id, csFog* fog);
 
   /**
    * Add a front or back-facing fog polygon in the current fog object.
@@ -300,111 +287,113 @@ public:
    *    <li>CS_FOG_VIEW:        the view-plane
    * </ul>
    */
-  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
 
   /**
    * Close a volumetric fog object. After the volumetric object is
    * closed it should be rendered on screen (whether you do it here
    * or in DrawFrontFog/DrawBackFog is not important).
    */
-  STDMETHODIMP CloseFogObject (CS_ID id);
+  virtual void CloseFogObject (CS_ID id);
 
   /// Draw a line in camera space.
-  STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
+  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
 
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX (ITextureHandle* handle, UInt mode);
+  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
-  STDMETHODIMP FinishPolygonFX();
+  virtual void FinishPolygonFX ();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX (G3DPolygonDPFX& poly);
+  virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to csGraphics3DSoftware to cache it.
-  STDMETHODIMP CacheTexture (IPolygonTexture* texture);
+  virtual void CacheTexture (iPolygonTexture* texture);
 
   /**
    * Give a texture to csGraphics3DSoftware to initialize the cache for it.
    * This is used together with the sub-texture optimization and is meant
    * to allocate the space in the cache but not do any actual calculations yet.
    */
-  void CacheInitTexture (IPolygonTexture* texture);
+  void CacheInitTexture (iPolygonTexture* texture);
 
   /// Give a sub-texture to csGraphics3DSoftware to cache it.
-  void CacheSubTexture (IPolygonTexture* texture, int u, int v);
+  void CacheSubTexture (iPolygonTexture* texture, int u, int v);
 
   /**
    * Give a rectangle to csGraphics3DSoftware so that all sub-textures
    * in this rectangle are cached.
    */
-  void CacheRectTexture (IPolygonTexture* texture, int minu, int minv, int maxu, int maxv);
+  void CacheRectTexture (iPolygonTexture* texture, int minu, int minv, int maxu, int maxv);
 
   /// Release a texture from the cache.
-  STDMETHODIMP UncacheTexture (IPolygonTexture* texture);
+  virtual void UncacheTexture (iPolygonTexture* texture);
 
   /// Set a renderstate boolean.
-  STDMETHODIMP SetRenderState (G3D_RENDERSTATEOPTION op, long val);
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
 
   /// Get a renderstate value.
-  STDMETHODIMP GetRenderState (G3D_RENDERSTATEOPTION op, long& val);
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
 
   /**
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  STDMETHODIMP GetCaps (G3D_CAPS *caps);
+  virtual void GetCaps (G3D_CAPS *caps);
 
   /// Get address of Z-buffer at specific point
-  STDMETHODIMP GetZBufPoint(int x, int y, unsigned long** retval) { *retval = z_buffer + x + y*width; return S_OK; }
+  virtual unsigned long *GetZBufPoint(int x, int y)
+  { return z_buffer + x + y*width; }
 
   /// Dump the texture cache.
-  STDMETHODIMP DumpCache (void);
+  virtual void DumpCache ();
 
   /// Clear the texture cache.
-  STDMETHODIMP ClearCache (void);
+  virtual void ClearCache ();
 
   /// Get drawing buffer width
-  STDMETHODIMP GetWidth(int& retval) { retval = width; return S_OK; }
+  virtual int GetWidth ()
+  { return width; }
   /// Get drawing buffer height
-  STDMETHODIMP GetHeight(int& retval) { retval = height; return S_OK; }
+  virtual int GetHeight ()
+  { return height; }
   /// Set center of projection.
-  STDMETHODIMP SetPerspectiveCenter (int x, int y);
+  virtual void SetPerspectiveCenter (int x, int y);
 
-  /// Get the IGraphics2D driver.
-  STDMETHODIMP Get2dDriver(IGraphics2D** pi) { *pi = m_piG2D; return S_OK; }
+  /// Get the iGraphics2D driver.
+  virtual iGraphics2D *GetDriver2D ()
+  { return G2D; }
 
   /// Get the ITextureManager.
-  STDMETHODIMP GetTextureManager (ITextureManager** pi)
-  {
-    *pi = (ITextureManager*)txtmgr;
-    return S_OK;
-  }
+  virtual iTextureManager *GetTextureManager ()
+  { return txtmgr; }
 
-  /// Returns S_OK if this driver requires all maps to be PO2.
-  STDMETHODIMP NeedsPO2Maps() { return S_FALSE; }
+  /// Returns true if this driver requires all maps to be PO2.
+  virtual bool NeedsPO2Maps () { return false; }
   /// Returns the maximum aspect ratio of maps.
-  STDMETHODIMP GetMaximumAspectRatio(int& retval) { retval = 32768; return S_OK; }
+  virtual int GetMaximumAspectRatio ()
+  { return 32768; }
 
   /// Get the colorformat you want.
-  STDMETHODIMP GetColormapFormat(G3D_COLORMAPFORMAT& retval) { retval = G3DCOLORFORMAT_ANY; return S_OK; }
+  virtual G3D_COLORMAPFORMAT GetColormapFormat()
+  { return G3DCOLORFORMAT_ANY; }
 
-  ////// IHaloRasterizer Methods ////
+  ////// iHaloRasterizer Methods ////
 
-  class XHaloRasterizer : public IHaloRasterizer
-  {
-    DECLARE_IUNKNOWN()
-    /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
-    STDMETHODIMP CreateHalo(float r, float g, float b, HALOINFO* pRetVal);
-    /// Destroy the halo.
-    STDMETHODIMP DestroyHalo(HALOINFO haloInfo);
+  /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
+  virtual csHaloHandle CreateHalo (float r, float g, float b);
+  /// Destroy the halo.
+  virtual void DestroyHalo (csHaloHandle haloInfo);
 
-    /// Draw the halo given a center point and an intensity.
-    STDMETHODIMP DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo);
+  /// Draw the halo given a center point and an intensity.
+  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
 
-    /// Test to see if a halo would be visible (but don't attempt to draw it)
-    STDMETHODIMP TestHalo(csVector3* pCenter);
-  };
+  /// Test to see if a halo would be visible (but don't attempt to draw it)
+  virtual bool TestHalo (csVector3* pCenter);
+
+  /// Use to printf through system driver
+  void SysPrintf (int mode, char* str, ...);
 
   /// Our internal representation of halos.
   struct csG3DSoftwareHaloInfo
@@ -418,7 +407,7 @@ public:
   {
   public:
     ///
-    csHaloDrawer (IGraphics3D* piG3D, IGraphics2D* piG2D, float r, float g, float b);
+    csHaloDrawer (iGraphics2D* iG2D, float r, float g, float b);
     ///
     ~csHaloDrawer();
 
@@ -430,7 +419,7 @@ public:
     /// the width and height of the graphics context
     int mWidth, mHeight;
     /// the 2D graphics context.
-    IGraphics2D* mpiG2D;
+    iGraphics2D* G2D;
     /// the size to be drawn (the diameter of the halo)
     int mDim;
     /// the color of the halo
@@ -457,26 +446,14 @@ public:
     void drawline_innerrim(int x1, int x2, int y);
   };
 
-  void SysPrintf (int mode, char* str, ...);
+  ///------------------- iConfig interface implementation -------------------
+  virtual int GetOptionCount ();
+  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+  virtual bool SetOption (int id, csVariant* value);
+  virtual bool GetOption (int id, csVariant* value);
 
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csGraphics3DSoftware)
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED(HaloRasterizer)
-
-  /// the COM composite interface for IConfig.
-  DECLARE_COMPOSITE_INTERFACE (XConfig3DSoft)
-};
-
-class csGraphics3DSoftwareFactory : public IGraphicsContextFactory
-{
-    /// Create the graphics context
-    STDMETHODIMP CreateInstance( REFIID riid, ISystem* piSystem, void** ppv );
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE( csGraphics3DSoftwareFactory )
+private:
+  static csOptionDescription config_options[];
 };
 
 #endif // __SOFT_G3D_H__

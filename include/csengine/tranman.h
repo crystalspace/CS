@@ -19,7 +19,7 @@
 #ifndef TRANMAN_H
 #define TRANMAN_H
 
-#include "cscom/com.h"
+#include "csutil/scf.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"

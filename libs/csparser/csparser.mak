@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csparser
 csparser:
 	$(MAKE_TARGET)
+csparserclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -44,7 +46,7 @@ $(CSPARSER.LIB): $(OBJ.CSPARSER)
 	$(DO.LIBRARY)
 
 csparserclean:
-	-$(RM) $(CSPARSER.LIB)
+	-$(RM) $(CSPARSER.LIB) $(OBJ.CSPARSER)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csparser.dep

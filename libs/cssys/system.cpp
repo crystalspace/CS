@@ -29,6 +29,7 @@
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
 #include "csinput/csinput.h"
+#include "iplugin.h"
 #include "isndrdr.h"
 #include "inetdrv.h"
 #include "inetman.h"
@@ -43,34 +44,19 @@ csSystemDriver *System = NULL;
 // application can tell system driver to exit immediately
 bool csSystemDriver::Shutdown = false;
 bool csSystemDriver::ExitLoop = false;
-bool csSystemDriver::DemoReady = false;
+bool csSystemDriver::ConsoleReady = false;
 
 // Forced driver name.
-char *override_driver = NULL;
+csStrVector extra_plugins (8, 8);
 
 // Global debugging level.
 int csSystemDriver::debug_level = 0;
 
-// the CLSID of the rendersystem to use.
-static CLSID clsidRenderSystem;
-
-// the CLSID of the network driver system to use.
-static CLSID clsidNetworkDriverSystem;
-
-// the CLSID of the network manager system to use.
-static CLSID clsidNetworkManagerSystem;
-
-// the CLSID of the sound render system to use.
-static CLSID clsidSoundRenderSystem;
-
-// IUnknown implementation for csSystemDriver
-IMPLEMENT_UNKNOWN_NODELETE (csSystemDriver)
-
-BEGIN_INTERFACE_TABLE (csSystemDriver)
-    IMPLEMENTS_COMPOSITE_INTERFACE (System)
-END_INTERFACE_TABLE()
-
-
+// This is the default fatal exit function. The user can replace
+// it by some other function that lonjumps somewhere, for example.
+// The 'canreturn' indicates a error that can be ignored (i.e. a
+// not-too-fatal error) and if it is 'true', the function can return.
+// Returning when canreturn is 'false' will cause unpredictable behavior.
 void default_fatal_exit (int errorcode, bool canreturn)
 {
   (void)canreturn;
@@ -79,120 +65,130 @@ void default_fatal_exit (int errorcode, bool canreturn)
 
 void (*fatal_exit) (int errorcode, bool canreturn) = default_fatal_exit;
 
-csSystemDriver::csSystemDriver()
+//--- csPlugIn class ---//
+
+csSystemDriver::csPlugIn::csPlugIn (iPlugIn *iObject, const char *iClassID)
+{
+  PlugIn = iObject;
+  ClassID = strnew (iClassID);
+  EventMask = 0;
+}
+
+csSystemDriver::csPlugIn::~csPlugIn ()
+{
+  delete [] ClassID;
+  PlugIn->DecRef ();
+}
+
+//---------------------------------------------------- The System Driver -----//
+
+csSystemDriver::csSystemDriver () : PlugIns (8, 8)
 {
   console_open ();
   System = this;
+  IsFocused = true;
   FullScreen = false;
   Mouse = NULL;
   Keyboard = NULL;
   
-  piG3D = NULL;
-  piG2D = NULL;
-  piGI = NULL;
-  piNetDrv = NULL;
-  piNetMan = NULL;
-  piSound = NULL;
+  G3D = NULL;
+  G2D = NULL;
+  NetDrv = NULL;
+  NetMan = NULL;
+  Sound = NULL;
 
   EventQueue = NULL;
   Console = NULL;
-  IsFocused = true;
-  com_options = NULL;
-  cfg_engine = NULL;
-
-  csCoInitialize (0);
+  OptionList = NULL;
+  ConfigName = NULL;
 }
 
 csSystemDriver::~csSystemDriver ()
 {
+#ifdef DEBUG
+  printf ("System driver is going to shut down now!\n");
+#endif
+
   Close ();
 
-  if (Vfs)
-    CHKB (delete Vfs);
-  if (VfsConfig)
-    CHKB (delete VfsConfig);
   if (Config)
     CHKB (delete Config);
+  if (ConfigName)
+    CHKB (delete [] ConfigName);
 
   System = NULL;
+
+  CHK (delete OptionList);
+
+  // Decrement reference count for all known drivers
+  if (Sound) Sound->DecRef ();
+  if (NetDrv) NetDrv->DecRef ();
+  if (NetMan) NetMan->DecRef ();
+  if (G2D) G2D->DecRef ();
+  if (G3D) G3D->DecRef ();
+  if (VFS) VFS->DecRef ();
+
+  // Free all plugins
+  PlugIns.DeleteAll ();
   
+  CHK (delete Console);
   CHK (delete Mouse);
   CHK (delete Keyboard);
   CHK (delete EventQueue);
-  CHK (delete Console);
 
-  FINAL_RELEASE (piSound);
-  FINAL_RELEASE (piG3D);
-  FINAL_RELEASE (piGI);
-  FINAL_RELEASE (piNetDrv);
-  FINAL_RELEASE (piNetMan);
-
-  csCoUninitialize();
-
-  CHK (delete com_options);
+  scfFinish ();
   console_close ();
 }
 
-bool csSystemDriver::Initialize (int argc, char *argv[],
-  const char *iConfigName, const char *iVfsConfigName, IConfig* iOptions)
+bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName)
 {
+  // Increment our reference count to not get dumped when
+  // someone will do an IncRef() and then an DecRef().
+  IncRef ();
+
   // Initialize configuration file
   if (iConfigName)
-    Config = new csIniFile (iConfigName);
+    Config = new csIniFile (ConfigName = strnew (iConfigName));
   else
     Config = new csIniFile ();
-  // Initialize VFS configuration file
-  if (iVfsConfigName)
-    VfsConfig = new csIniFile (iVfsConfigName);
-  else
-    VfsConfig = new csIniFile ();
-  // Create the Virtual File System object
-  Vfs = new csVFS (VfsConfig);
 
-  cfg_engine = iOptions;
+  // Initialize Shared Class Facility
+  csIniFile *SCFconfig = new csIniFile ("scf.cfg");
+  scfInitialize (SCFconfig);
+  delete SCFconfig;
+
+  // Create the Event Queue
+  CHK (EventQueue = new csEventQueue ());
 
   SetSystemDefaults (Config);
   if (!ParseCmdLineDriver (argc, argv))
     return false;
 
-  char* pn;
-  if (override_driver)
-    pn = override_driver;
-  else
-    pn = Config->GetStr ("VideoDriver", "DRIVER", "crystalspace.graphics3d.software");
-  if (FAILED (csCLSIDFromProgID (&pn, &clsidRenderSystem)))
+  // Now load and initialize all plugins
+  csStrVector PluginList (8, 8);
+  Config->EnumData ("PlugIns", &PluginList);
+  while (extra_plugins.Length () || PluginList.Length ())
   {
-    Printf (MSG_FATAL_ERROR, "Bad value '%s' for DRIVER in configuration file\n", pn);
-    return false;
+    char *classID;
+    if (extra_plugins.Length ())
+      classID = (char *)extra_plugins.Get (0);
+    else
+      classID = Config->GetStr ("PlugIns", (char *)PluginList.Get (0));
+
+    LoadPlugIn (classID, NULL, 0);
+
+    if (extra_plugins.Length ())
+      extra_plugins.Delete (0);
+    else
+      PluginList.Delete (0);
   }
 
-  pn = Config->GetStr ("Network", "NetDriver", "crystalspace.network.driver.null");
-  if (FAILED (csCLSIDFromProgID (&pn, &clsidNetworkDriverSystem)))
-  {
-    Printf (MSG_FATAL_ERROR, "Bad value '%s' for network driver in configuration file\n", pn);
-    return false;
-  }
-
-  pn = Config->GetStr ("Network", "NetManager", "crystalspace.network.manager.null");
-  if (FAILED (csCLSIDFromProgID (&pn, &clsidNetworkManagerSystem)))
-  {
-    Printf(MSG_FATAL_ERROR, "Bad value '%s' for network manager in configuration file\n", pn);
-    return false;
-  }
-
-  pn = Config->GetStr ("Sound", "SoundRender", "crystalspace.sound.render.null");
-  if (FAILED (csCLSIDFromProgID (&pn, &clsidSoundRenderSystem)))
-  {
-    Printf(MSG_FATAL_ERROR, "Bad value '%s' for [Sound].SoundRender in configuration file\n", pn);
-    return false;
-  }
-
-  CHK (EventQueue = new csEventQueue ());
-  InitGraphics ();
   InitKeyboard ();
   InitMouse ();
-  InitSound ();
-  InitNetwork ();
+
+  // Check if the minimal required drivers are loaded
+  if (!CheckDrivers ())
+    return false;
 
   if (!ParseCmdLine (argc, argv))
   {
@@ -200,82 +196,64 @@ bool csSystemDriver::Initialize (int argc, char *argv[],
     return false;
   }
   
-  piG3D->Initialize ();
-
   return true;
 }
 
 bool csSystemDriver::Open (const char *Title)
 {
-  // the initialization order is crucial! do not reorder!
-  if (FAILED (piG3D->Open (Title)))
+  if (G3D && !G3D->Open (Title))
     return false;
   // Query frame width/height/depth as it possibly has been adjusted after open
-  piGI->GetWidth (FrameWidth);
-  piGI->GetHeight (FrameHeight);
-  piGI->GetPixelBytes (Depth);
+  FrameWidth = G2D->GetWidth ();
+  FrameHeight = G2D->GetHeight ();
+  Depth = G2D->GetPixelBytes ();
   Depth *= 8;
 
   if (!Keyboard->Open (EventQueue))
     return false;
-  if (!Mouse->Open (GetISystemFromSystem (this), EventQueue))
+  if (!Mouse->Open (this, EventQueue))
     return false;
-  if (piSound)
-    if (FAILED (piSound->Open ()))
+
+  if (Sound)
+    if (!Sound->Open ())
       return false;
-  if (piNetDrv)
-    if (FAILED (piNetDrv->Open ()))
+  if (NetDrv)
+    if (!NetDrv->Open ())
       return false;
-  if (piNetMan)
-    if (FAILED (piNetMan->Open ()))
+  if (NetMan)
+    if (!NetMan->Open ())
       return false;
+
+  // Now pass the open event to all plugins
+  csEvent e (GetTime (), csevBroadcast, cscmdSystemOpen);
+  HandleEvent (e);
+
   return true;
 }
 
 void csSystemDriver::Close(void)
 {
-  if (piSound)
-    piSound->Close ();
-  if (piNetMan)
-    piNetMan->Close ();
-  if (piNetDrv)
-    piNetDrv->Close ();
-  if (piG3D)
-    piG3D->Close ();
+  // Warn all plugins the system is going down
+  csEvent e (GetTime (), csevBroadcast, cscmdSystemClose);
+  HandleEvent (e);
+
+  if (Sound)
+    Sound->Close ();
+  if (NetMan)
+    NetMan->Close ();
+  if (NetDrv)
+    NetDrv->Close ();
+  if (G3D)
+    G3D->Close ();
   if (Keyboard)
     Keyboard->Close ();
   if (Mouse)
     Mouse->Close ();
 }
 
-bool csSystemDriver::InitGraphics ()
+bool csSystemDriver::CheckDrivers ()
 {
-  HRESULT hRes;
-  IGraphicsContextFactory* pFactory;
-
-  hRes = csCoGetClassObject (clsidRenderSystem, CLSCTX_INPROC_SERVER, NULL,
-    IID_IGraphicsContextFactory, (void**)&pFactory);
-  if (FAILED(hRes)) goto OnError;
-
-  hRes = pFactory->CreateInstance ((REFIID)IID_IGraphics3D,
-    GetISystemFromSystem(this), (void**)&piG3D);
-  if (FAILED(hRes)) goto OnError;
-
-  hRes = piG3D->Get2dDriver (&piG2D);
-  if (FAILED(hRes)) goto OnError;
-
-  hRes = piG2D->QueryInterface ((REFIID)IID_IGraphicsInfo, (void**)&piGI);
-  if (FAILED(hRes)) goto OnError;
-
-OnError:
-  
-  if (FAILED (hRes))
-  {
-    Printf (MSG_FATAL_ERROR, "Error loading graphics context server\n");
-    fatal_exit (0, false);
-  }
-
-  return (piG3D != NULL  &&  piG2D != NULL  &&  piGI != NULL);
+  return (VFS && G2D && G3D);
 }
 
 bool csSystemDriver::InitKeyboard ()
@@ -290,76 +268,56 @@ bool csSystemDriver::InitMouse ()
   return (Mouse != NULL);
 }
 
-bool csSystemDriver::InitSound ()
+void csSystemDriver::NextFrame (time_t /*elapsed_time*/, time_t /*current_time*/)
 {
-  HRESULT hRes;
-  ISoundRenderFactory* pFactory;
-
-  hRes = csCoGetClassObject( clsidSoundRenderSystem, CLSCTX_INPROC_SERVER, NULL, IID_ISoundRenderFactory, (void**)&pFactory );
-  if (FAILED (hRes))
-  {
-    Printf (MSG_FATAL_ERROR, "Error loading sound render context server\n");
-    fatal_exit (0, false);
-  }
-
-  hRes = pFactory->CreateInstance( (REFIID)IID_ISoundRender, GetISystemFromSystem(this), (void**)&piSound );
-  if (FAILED (hRes))
-  {
-    Printf (MSG_FATAL_ERROR, "Error creating sound render context server.");
-    fatal_exit (0, false);
-  }
-
-  return (piSound != NULL);
+  ProcessEvents ();
+  if (Sound)
+    Sound->Update ();
 }
 
-bool csSystemDriver::InitNetwork ()
+bool csSystemDriver::ProcessEvents ()
 {
-  HRESULT hRes;
-  INetworkDriverFactory* pDriverFactory;
-  INetworkManagerFactory* pManagerFactory;
-  
-  hRes = csCoGetClassObject( clsidNetworkDriverSystem, CLSCTX_INPROC_SERVER, NULL, IID_INetworkDriverFactory, (void**)&pDriverFactory );
-  if (FAILED (hRes))
+  csEvent *ev;
+  bool did_some_work = false;
+  while ((ev = EventQueue->Get ()))
   {
-    Printf (MSG_FATAL_ERROR, "Error loading network driver context server\n");
-    fatal_exit (0, false);
+    did_some_work = true;
+    HandleEvent (*ev);
+    CHK (delete ev);
   }
-
-  hRes = pDriverFactory->CreateInstance( (REFIID)IID_INetworkDriver, GetISystemFromSystem(this), (void**)&piNetDrv );
-  if (FAILED (hRes))
-  {
-    Printf (MSG_FATAL_ERROR, "Error loading network driver context server.");
-    fatal_exit (0, false);
-  }
-
-  hRes = csCoGetClassObject( clsidNetworkManagerSystem, CLSCTX_INPROC_SERVER, NULL, IID_INetworkManagerFactory, (void**)&pManagerFactory );
-  if (FAILED (hRes))
-  {
-    Printf (MSG_FATAL_ERROR, "Error loading network manager context server.");
-    fatal_exit (0, false);
-  }
-
-  hRes = pManagerFactory->CreateInstance( (REFIID)IID_INetworkManager, GetISystemFromSystem(this), (void**)&piNetMan );
-  if (FAILED (hRes))
-  {
-    Printf (MSG_FATAL_ERROR, "Error loading network manager context server.");
-    fatal_exit (0, false);
-  }
-
-  return ((piNetDrv != NULL) && (piNetMan != NULL));
+  return did_some_work;
 }
 
-void csSystemDriver::NextFrame (long /*elapsed_time*/, long /*current_time*/)
+bool csSystemDriver::HandleEvent (csEvent &Event)
 {
-  if (piSound) piSound->Update ();
+  int evmask = 1 << Event.Type;
+  bool canstop = (Event.Type == csevBroadcast);
+  for (int i = 0; i < PlugIns.Length (); i++)
+  {
+    csPlugIn *plugin = (csPlugIn *)PlugIns.Get (i);
+    if (plugin->EventMask & evmask)
+      if (plugin->PlugIn->HandleEvent (Event) && canstop)
+        return true;
+  }
+
+  // If user switches away from our application, reset keyboard and mouse state
+  if ((Event.Type == csevBroadcast)
+   && (Event.Command.Code == cscmdFocusChanged)
+   && (Event.Command.Info == NULL))
+  {
+    Keyboard->Reset ();
+    Mouse->Reset ();
+  }
+
+  return false;
 }
 
 void csSystemDriver::SetSystemDefaults (csIniFile *Config)
 {
-  FrameWidth = Config->GetInt ("VideoDriver", "WIDTH", 640);
-  FrameHeight = Config->GetInt ("VideoDriver", "HEIGHT", 480);
-  Depth = Config->GetInt ("VideoDriver", "DEPTH", 16);
-  FullScreen = Config->GetYesNo ("VideoDriver", "FULL_SCREEN", false);
+  FrameWidth = Config->GetInt ("VideoDriver", "Width", 640);
+  FrameHeight = Config->GetInt ("VideoDriver", "Height", 480);
+  Depth = Config->GetInt ("VideoDriver", "Depth", 16);
+  FullScreen = Config->GetYesNo ("VideoDriver", "FullScreen", false);
 }
 
 bool csSystemDriver::ParseCmdLineDriver (int argc, char* argv[])
@@ -380,89 +338,82 @@ bool csSystemDriver::ParseArgDriver (int argc, char* argv[], int& i)
     if (i < argc)
     {
       char temp [100];
-      sprintf (temp, "crystalspace.graphics3d.%s", argv[i]);
-      override_driver = strnew (temp);
-      Printf (MSG_INITIALIZATION, "Using 3D driver '%s'.\n", override_driver);
+      if (strchr (argv [i], '.'))
+      {
+        strcpy (temp, argv [i]);
+        Printf (MSG_INITIALIZATION, "Loading additional plug-in '%s'.\n", temp);
+      }
+      else
+      {
+        sprintf (temp, "crystalspace.graphics3d.%s", argv [i]);
+        Printf (MSG_INITIALIZATION, "Using 3D driver '%s'.\n", temp);
+      }
+      extra_plugins.Push (strnew (temp));
     }
   }
   return true;
 }
 
-csColOption* csSystemDriver::CollectOptions (IConfig* Config, csColOption* already_collected)
+void csSystemDriver::CollectOptions (iConfig* Config, csColOption* already_collected)
 {
-  int i, num;
-  csOptionDescription option;
-  Config->GetNumberOptions (num);
   char buf[100];
-  for (i = 0 ; i < num ; i++)
+  csOptionDescription option;
+  int num = Config->GetOptionCount ();
+  for (int i = 0 ; i < num ; i++)
   {
     Config->GetOptionDescription (i, &option);
     switch (option.type)
     {
       case CSVAR_BOOL:
-        CHK (already_collected = new csColOption (already_collected, option.type, option.id, option.name,
-		true, Config));
+        CHK (already_collected = new csColOption (already_collected, option.type,
+          option.id, option.name, true, Config));
 	strcpy (buf, "no");
 	strcat (buf, option.name);
-        CHK (already_collected = new csColOption (already_collected, option.type, option.id, buf,
-		false, Config));
+        CHK (already_collected = new csColOption (already_collected, option.type,
+          option.id, buf, false, Config));
 	break;
       case CSVAR_CMD:
-        CHK (already_collected = new csColOption (already_collected, option.type, option.id, option.name,
-		true, Config));
+        CHK (already_collected = new csColOption (already_collected, option.type,
+          option.id, option.name, true, Config));
 	break;
       case CSVAR_LONG:
       case CSVAR_FLOAT:
-        CHK (already_collected = new csColOption (already_collected, option.type, option.id, option.name,
-		false, Config));
+        CHK (already_collected = new csColOption (already_collected, option.type,
+          option.id, option.name, false, Config));
 	break;
     }
   }
-  return already_collected;
 }
 
 bool csSystemDriver::ParseCmdLine (int argc, char* argv[])
 {
-  CHK (delete com_options);
-  com_options = NULL;
+  CHK (delete OptionList);
+  OptionList = NULL;
   int i;
 
-  HRESULT hRes;
-  IConfig* piConf;
-  if (cfg_engine)
+  for (i = 0; i < PlugIns.Length (); i++)
   {
-    com_options = CollectOptions (cfg_engine, com_options);
-  }
-  if (piG3D)
-  {
-    hRes = piG3D->QueryInterface ((REFIID)IID_IConfig, (void**)&piConf);
-    if (SUCCEEDED (hRes))
+    csPlugIn *plugin = (csPlugIn *)PlugIns.Get (i);
+    iConfig *cfg = QUERY_INTERFACE (plugin->PlugIn, iConfig);
+    if (cfg)
     {
-      com_options = CollectOptions (piConf, com_options);
-      piConf->Release ();
+      CollectOptions (cfg, OptionList);
+      cfg->DecRef ();
     }
   }
-  if (piG2D)
-  {
-    hRes = piG2D->QueryInterface ((REFIID)IID_IConfig, (void**)&piConf);
-    if (SUCCEEDED (hRes))
-    {
-      com_options = CollectOptions (piConf, com_options);
-      piConf->Release ();
-    }
-  }
+
+  bool retcode = true;
 
   for (i = 1; i < argc; i++)
     if (!ParseArg (argc, argv, i))
     {
-      CHK (delete com_options);
-      com_options = NULL;
-      return false;
+      retcode = false;
+      break;
     }
 
-  CHK (delete com_options);
-  com_options = NULL;
-  return true;
+  CHK (delete OptionList);
+  OptionList = NULL;
+  return retcode;
 }
 
 bool csSystemDriver::ParseArg (int argc, char* argv[], int& i)
@@ -487,7 +438,7 @@ bool csSystemDriver::ParseArg (int argc, char* argv[], int& i)
   else if (argv[i][0] == '-')
   {
     csVariant val;
-    csColOption* opt = com_options;
+    csColOption* opt = OptionList;
     while (opt)
     {
       if (strcasecmp (opt->option_name, argv[i]+1) == 0)
@@ -521,82 +472,53 @@ bool csSystemDriver::ParseArg (int argc, char* argv[], int& i)
   return true;
 }
 
-void csSystemDriver::Help (IConfig* piConf)
+void csSystemDriver::Help (iConfig* piConf)
 {
-  int i, num;
   csOptionDescription option;
-  piConf->GetNumberOptions (num);
-  for (i = 0 ; i < num ; i++)
+  int num = piConf->GetOptionCount ();
+  for (int i = 0 ; i < num ; i++)
   {
-    piConf->GetOptionDescription (i, &option);
-    char buf[120];
-    strcpy (buf, "                                                                              ");
     csVariant def;
+    piConf->GetOptionDescription (i, &option);
+    char opt [30], desc [80];
     piConf->GetOption (i, &def);
     switch (option.type)
     {
       case CSVAR_BOOL:
-        sprintf (buf, "  -%s/no%s ", option.name, option.name);
-	buf[strlen (buf)] = ' ';
-	sprintf (buf+21, "%s (%s) ", option.description, def.v.bVal ? "yes" : "no");
-	buf[strlen (buf)] = ' ';
-	buf[78] = 0;
+        sprintf (opt, "  -%s/no%s", option.name, option.name);
+	sprintf (desc, "%s (%s) ", option.description, def.v.bVal ? "yes" : "no");
 	break;
       case CSVAR_CMD:
-        sprintf (buf, "  -%s ", option.name);
-	buf[strlen (buf)] = ' ';
-	sprintf (buf+21, "%s ", option.description);
-	buf[strlen (buf)] = ' ';
-	buf[78] = 0;
+        sprintf (opt, "  -%s", option.name);
+	strcpy (desc, option.description);
 	break;
       case CSVAR_FLOAT:
-        sprintf (buf, "  -%s <val> ", option.name);
-	buf[strlen (buf)] = ' ';
-	sprintf (buf+21, "%s (%f) ", option.description, def.v.fVal);
-	buf[strlen (buf)] = ' ';
-	buf[78] = 0;
+        sprintf (opt, "  -%s <val>", option.name);
+	sprintf (desc, "%s (%f)", option.description, def.v.fVal);
 	break;
       case CSVAR_LONG:
-        sprintf (buf, "  -%s <val> ", option.name);
-	buf[strlen (buf)] = ' ';
-	sprintf (buf+21, "%s (%ld) ", option.description, def.v.lVal);
-	buf[strlen (buf)] = ' ';
-	buf[78] = 0;
+        sprintf (opt, "  -%s <val>", option.name);
+	sprintf (desc, "%s (%ld)", option.description, def.v.lVal);
 	break;
     }
-    Printf (MSG_STDOUT, "%s\n", buf);
+    Printf (MSG_STDOUT, "%-21s%s\n", opt, desc);
   }
 }
 
 void csSystemDriver::Help ()
 {
-  HRESULT hRes;
-  IConfig* piConf;
-  if (cfg_engine)
+  for (int i = 0; i < PlugIns.Length (); i++)
   {
-    Printf (MSG_STDOUT, "Options for 3D engine:\n");
-    Help (cfg_engine);
-  }
-  if (piG3D)
-  {
-    hRes = piG3D->QueryInterface ((REFIID)IID_IConfig, (void**)&piConf);
-    if (SUCCEEDED (hRes))
+    csPlugIn *plugin = (csPlugIn *)PlugIns [i];
+    iConfig *cfg = QUERY_INTERFACE (plugin->PlugIn, iConfig);
+    if (cfg)
     {
-      Printf (MSG_STDOUT, "Options for 3D rasterizer:\n");
-      Help (piConf);
-      piConf->Release ();
+      Printf (MSG_STDOUT, "Options for %s:\n", scfGetClassDescription (plugin->ClassID));
+      Help (cfg);
+      cfg->DecRef ();
     }
   }
-  if (piG2D)
-  {
-    hRes = piG2D->QueryInterface ((REFIID)IID_IConfig, (void**)&piConf);
-    if (SUCCEEDED (hRes))
-    {
-      Printf (MSG_STDOUT, "Options for 2D rasterizer:\n");
-      Help (piConf);
-      piConf->Release ();
-    }
-  }
+
   Printf (MSG_STDOUT, "General options:\n");
   Printf (MSG_STDOUT, "  -help              this help\n");
   Printf (MSG_STDOUT, "  -mode <w>x<y>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
@@ -666,7 +588,7 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
     case MSG_INITIALIZATION:
       console_out (buf);
       debug_out (true, buf);
-      if (System->DemoReady)
+      if (System->ConsoleReady)
         System->DemoWrite (buf);
       break;
 
@@ -715,9 +637,9 @@ void csSystemDriver::DemoWrite (const char* buf)
 {
   if (Console)
   {
-    bool const ok2d = (piG2D != 0 && SUCCEEDED (piG2D->BeginDraw()));
+    bool const ok2d = (!!G2D && G2D->BeginDraw());
     if (ok2d)
-      piG2D->Clear (0);
+      G2D->Clear (0);
 
     Console->PutText ("%s", buf);
     csRect area;
@@ -730,15 +652,12 @@ void csSystemDriver::DemoWrite (const char* buf)
 
     if (ok2d)
     {
-      piG2D->FinishDraw ();
-      piG2D->Print (&area);
+      G2D->FinishDraw ();
+      G2D->Print (&area);
     }
   }
 }
 
-/*
-* Print a message on the console or in stdout/debug.txt.
-*/
 void csSystemDriver::debug_out (bool flush, const char *str)
 {
   static FILE *f = NULL;
@@ -752,174 +671,236 @@ void csSystemDriver::debug_out (bool flush, const char *str)
   }
 }
 
-void csSystemDriver::do_focus (int enable)
-{
-  if (enable == (int)IsFocused)
-    return;
-  IsFocused = enable;
+//--------------------------------- iSystem interface for csSystemDriver -----//
 
-  CHK (EventQueue->Put (new csEvent (Time(), csevBroadcast, cscmdFocusChanged, (void *)enable)));
-  if (!enable)
+void csSystemDriver::GetSettings (int &oWidth, int &oHeight, int &oDepth,
+  bool &oFullScreen)
+{
+  oWidth = FrameWidth;
+  oHeight = FrameHeight;
+  oDepth = Depth;
+  oFullScreen = FullScreen;
+}
+
+bool csSystemDriver::RegisterDriver (const char *iInterface, iPlugIn *iObject)
+{
+#define CHECK(Else, Object, Interface)				\
+  Else if (!Object && strcmp (iInterface, #Interface) == 0)	\
+    rc = !!(Object = QUERY_INTERFACE (iObject, Interface));
+
+  bool rc = false;
+  CHECK (    , VFS,    iVFS)
+  CHECK (else, G3D,    iGraphics3D)
+  CHECK (else, G2D,    iGraphics2D)
+  CHECK (else, Sound,  iSoundRender)
+  CHECK (else, NetDrv, iNetworkDriver)
+  CHECK (else, NetMan, iNetworkManager)
+  return rc;
+
+#undef CHECK
+}
+
+bool csSystemDriver::DeregisterDriver (const char *iInterface, iPlugIn *iObject)
+{
+#define CHECK(Else, Object, Interface)				\
+  Else if (strcmp (iInterface, #Interface) == 0)		\
+  {								\
+    Interface *p = QUERY_INTERFACE (iObject, Interface);	\
+    if (!p) return false;					\
+    if (p != Object) { p->DecRef (); return false; }		\
+    p->DecRef (); Object->DecRef (); Object = NULL;		\
+    return true;						\
+  }
+
+  CHECK (    , VFS,    iVFS)
+  CHECK (else, G3D,    iGraphics3D)
+  CHECK (else, G2D,    iGraphics2D)
+  CHECK (else, Sound,  iSoundRender)
+  CHECK (else, NetDrv, iNetworkDriver)
+  CHECK (else, NetMan, iNetworkManager)
+  return false;
+
+#undef CHECK
+}
+
+iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iInterface, int iVersion)
+{
+  iPlugIn *p = CREATE_INSTANCE (iClassID, iPlugIn);
+  if (!p)
+    Printf (MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
+  else
+  {
+    PlugIns.Push (new csPlugIn (p, iClassID));
+    if (p->Initialize (this))
+    {
+      iBase *ret;
+      if (iInterface)
+        ret = (iBase *)p->QueryInterface (iInterface, iVersion);
+      else
+        ret = p;
+      if (ret)
+        return p;
+    }
+    Printf (MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
+    PlugIns.Delete (PlugIns.Length () - 1);
+  }
+  return NULL;
+}
+
+iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
+{
+  for (int i = 0; i < PlugIns.Length (); i++)
+  {
+    iBase *ret = (iBase *)((csPlugIn *)PlugIns.Get (i))->PlugIn->
+      QueryInterface (iInterface, iVersion);
+    if (ret)
+      return ret;
+  }
+  return NULL;
+}
+
+bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
+{
+  int idx = PlugIns.FindKey (iObject);
+  if (idx < 0)
+    return false;
+
+  DeregisterDriver ("iVFS", iObject);
+  DeregisterDriver ("iGraphics3D", iObject);
+  DeregisterDriver ("iGraphics2D", iObject);
+  DeregisterDriver ("iSoundRender", iObject);
+  DeregisterDriver ("iNetworkDriver", iObject);
+  DeregisterDriver ("iNetworkManager", iObject);
+
+  return PlugIns.Delete (idx);
+}
+
+bool csSystemDriver::CallOnEvents (iPlugIn *iObject, unsigned int iEventMask)
+{
+  int idx = PlugIns.FindKey (iObject);
+  if (idx < 0)
+    return false;
+
+  csPlugIn *plugin = (csPlugIn *)PlugIns.Get (idx);
+  plugin->EventMask = iEventMask;
+  return true;
+}
+
+void csSystemDriver::Print (int mode, const char *string)
+{
+  Printf (mode, string);
+}
+
+time_t csSystemDriver::GetTime ()
+{
+  return Time ();
+}
+
+void csSystemDriver::StartShutdown ()
+{
+  Shutdown = true;
+}
+
+bool csSystemDriver::GetShutdown ()
+{
+  return Shutdown;
+}
+
+int csSystemDriver::ConfigGetInt (char *Section, char *Key, int Default)
+{
+  return Config->GetInt (Section, Key, Default);
+}
+
+char *csSystemDriver::ConfigGetStr (char *Section, char *Key, char *Default)
+{
+  return Config->GetStr (Section, Key, Default);
+}
+
+bool csSystemDriver::ConfigGetYesNo (char *Section, char *Key, bool Default)
+{
+  return Config->GetYesNo (Section, Key, Default);
+}
+
+float csSystemDriver::ConfigGetFloat (char *Section, char *Key, float Default)
+{
+  return Config->GetFloat (Section, Key, Default);
+}
+
+bool csSystemDriver::ConfigSetInt (char *Section, char *Key, int Value)
+{
+  return Config->SetInt (Section, Key, Value);
+}
+
+bool csSystemDriver::ConfigSetStr (char *Section, char *Key, char *Value)
+{
+  return Config->SetStr (Section, Key, Value);
+}
+
+bool csSystemDriver::ConfigSetFloat (char *Section, char *Key, float Value)
+{
+  return Config->SetFloat (Section, Key, Value);
+}
+
+bool csSystemDriver::ConfigSave ()
+{
+  return ConfigName ? Config->Save (ConfigName) : false;
+}
+
+void csSystemDriver::QueueKeyEvent (int KeyCode, bool Down)
+{
+  if (!KeyCode)
+    return;
+
+  time_t time = Time ();
+
+  if (Down)
+    Keyboard->do_keypress (time, KeyCode);
+  else
+    Keyboard->do_keyrelease (time, KeyCode);
+}
+
+void csSystemDriver::QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags)
+{
+  time_t time = Time ();
+
+  if (Button == 0)
+    Mouse->do_mousemotion (time, x, y);
+  else if (Down)
+    Mouse->do_buttonpress (time, Button, x, y, ShiftFlags & CSMASK_SHIFT,
+      ShiftFlags & CSMASK_ALT, ShiftFlags & CSMASK_CTRL);
+  else
+    Mouse->do_buttonrelease (time, Button, x, y);
+}
+
+void csSystemDriver::QueueFocusEvent (bool Enable)
+{
+  if (!EventQueue)
+    return;
+  if (Enable == (int)IsFocused)
+    return;
+  IsFocused = Enable;
+
+  CHK (EventQueue->Put (new csEvent (Time(), csevBroadcast, cscmdFocusChanged,
+    (void *)Enable)));
+  if (!Enable)
   {
     Keyboard->Reset ();
     Mouse->Reset ();
   }
 }
 
-// COM implementation
-
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED (csSystemDriver, System)
-
-STDMETHODIMP csSystemDriver::XSystem::GetDepthSetting(int& retval)
+bool csSystemDriver::GetKeyState (int key)
 {
-    METHOD_PROLOGUE (csSystemDriver, System);
-    retval = pThis->Depth;
-    return S_OK;
+  return Keyboard->GetKeyState (key);
 }
 
-STDMETHODIMP csSystemDriver::XSystem::GetFullScreenSetting(bool& retval)
+bool csSystemDriver::GetMouseButton (int button)
 {
-    METHOD_PROLOGUE (csSystemDriver, System);
-    retval = pThis->FullScreen;
-    return S_OK;
+  return Mouse->Button [button];
 }
 
-STDMETHODIMP csSystemDriver::XSystem::GetHeightSetting(int& retval)
+void csSystemDriver::GetMousePosition (int &x, int &y)
 {
-    METHOD_PROLOGUE (csSystemDriver, System);
-    retval = pThis->FrameHeight;
-    return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::GetWidthSetting(int& retval)
-{
-    METHOD_PROLOGUE (csSystemDriver, System);
-    retval = pThis->FrameWidth;
-    return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::Print(int mode, const char* string)
-{
-    METHOD_PROLOGUE (csSystemDriver, System);
-
-    pThis->Printf(mode, "%s", string);
-    return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::GetTime (time_t& time)
-{
-  time = csSystemDriver::Time ();
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::Shutdown ()
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  pThis->Shutdown = true;
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::GetShutdown (bool &Shutdown)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  Shutdown = pThis->Shutdown;
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::GetSubSystemPtr(void **retval, int iSubSystemID)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-
-  ///Note: You should call Release() by yourself.
-
-  ///@@@TODO: This method should support all subsystems
-
-  switch(iSubSystemID)
-  {
-  case G3D_ID:
-    *retval = pThis->piG3D;
-    pThis->piG3D->AddRef();
-    break;
-  case G2D_ID:
-    *retval = pThis->piG2D;
-    pThis->piG2D->AddRef();
-    break;
-  case GI_ID:
-    *retval = pThis->piGI;
-    pThis->piGI->AddRef();
-    break;
-  case NetDrv_ID:
-    *retval = pThis->piNetDrv;
-    pThis->piNetDrv->AddRef();
-    break;
-  case NetMan_ID:
-    *retval = pThis->piNetMan;
-    pThis->piNetMan->AddRef();
-    break;
-  case SndDrv_ID:
-    *retval = pThis->piSound;
-    pThis->piSound->AddRef();
-    break;
-  default:
-    *retval = NULL;
-    return E_FAIL;
-    break;
-  }
-
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::ConfigGetInt (char *Section, char *Key,
-  int &Value, int Default)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  Value = pThis->Config->GetInt (Section, Key, Default);
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::ConfigGetStr (char *Section, char *Key,
-  char *&Value, char *Default)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  Value = pThis->Config->GetStr (Section, Key, Default);
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::ConfigGetYesNo (char *Section, char *Key,
-  bool &Value, bool Default)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  Value = pThis->Config->GetYesNo (Section, Key, Default);
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::QueueKeyEvent (int KeyCode, bool Down)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  if (!KeyCode)
-    return E_FAIL;
-
-  time_t time = pThis->Time ();
-
-  if (Down)
-    pThis->Keyboard->do_keypress (time, KeyCode);
-  else
-    pThis->Keyboard->do_keyrelease (time, KeyCode);
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::QueueMouseEvent (int Button,
-  int Down, int x, int y, int ShiftFlags)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  time_t time = System->Time ();
-
-  if (Button == 0)
-    pThis->Mouse->do_mousemotion (time, x, y);
-  else if (Down)
-    pThis->Mouse->do_buttonpress (time, Button, x, y, ShiftFlags & CSMASK_SHIFT,
-      ShiftFlags & CSMASK_ALT, ShiftFlags & CSMASK_CTRL);
-  else
-    pThis->Mouse->do_buttonrelease (time, Button, x, y);
-  return S_OK;
+  x = Mouse->GetLastX ();
+  y = Mouse->GetLastY ();
 }

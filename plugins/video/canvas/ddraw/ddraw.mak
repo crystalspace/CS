@@ -21,6 +21,8 @@ all drivers drivers2d: ddraw
 
 ddraw:
 	$(MAKE_TARGET) MAKE_DLL=yes
+ddrawclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -30,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 LIBS.DDRAW+=ddraw.lib
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  DDRAW=csddraw$(DLL)
+  DDRAW=ddraw$(DLL)
   DEP.DDRAW=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
 else
-  DDRAW=$(OUT)$(LIB_PREFIX)csddraw$(LIB)
+  DDRAW=$(OUT)$(LIB_PREFIX)ddraw$(LIB)
   DEP.EXE+=$(DDRAW)
   LIBS.EXE+=$(LIBS.DDRAW)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_DDRAW2D
@@ -51,11 +53,10 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp libs/cs2d/ddraw
 
-.PHONY: ddraw ddrawclean ddrawcleanlib
+.PHONY: ddraw ddrawclean
 
 # Chain rules
 clean: ddrawclean
-cleanlib: ddrawcleanlib
 
 ddraw: $(OUTDIRS) $(DDRAW)
 
@@ -63,10 +64,7 @@ $(DDRAW): $(OBJ.DDRAW) $(DEP.DDRAW)
 	$(DO.PLUGIN) $(LIBS.LOCAL.DDRAW)
 
 ddrawclean:
-	$(RM) $(DDRAW)
-
-ddrawcleanlib:
-	$(RM) $(OBJ.DDRAW) $(DDRAW)
+	$(RM) $(DDRAW) $(OBJ.DDRAW)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)ddraw.dep
