@@ -247,8 +247,13 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   //rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
   // @@@ ALEX: to render a line in WORLD space (between worv1 and worv2) use:
   //csVector3 worv1, worv2;
-  csVector3 camv1 = rview.World2Camera (ftl);
-  csVector3 camv2 = rview.World2Camera (ftr);
+  csVector3 camv1, camv2;
+  camv1 = rview.World2Camera (csVector3 (-10, -10, 50));
+  camv2 = rview.World2Camera (csVector3 (10, 10, 50));
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 0, 0));
+
+  camv1 = rview.World2Camera (ftl);
+  camv2 = rview.World2Camera (ftr);
   rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
   camv1 = rview.World2Camera (fbl);
   camv2 = rview.World2Camera (fbr);
