@@ -35,15 +35,15 @@ The history order is reversed so that new features are at the top.
 	  use the standard while (HasNext()) { Next(); ...} construct too.
         - DeSigna corrected a range checking bug in csString::SubString(), 
 	  and made the second range argument a length instead of an index.
-	- Jorrit updated the documentation section about 3D plugins
-	  (plugins/graphics section).
-	- Jorrit updated the section about procedural textures in the
-	  documentation.
 	- Jorrit fixed csProcFile inheritance to use public inheritance
 	  for iFireTexture instead of private inheritance.
-	- Jorrit added a howto section on procedural textures which simply
-	  refers to the procedural texture section in plugins.
-	- Jorrit updated the engine components section in the documentation.
+	- Jorrit did the following documentation updates:
+	    - Plugin/graphics section (removed Direct3D and a few other
+	      updates).
+	    - Updated section about procedural textures in the documentation.
+	    - Added a howto section on procedural textures which simply
+	      refers to the procedural texture section in plugins.
+	    - Updated the engine components section in the documentation.
 	- Eric Sunshine fixed ddraw8/Jamfile so that it only enables the ddraw8
 	  target if DirectDraw8 is present (DDRAW8.AVAILABLE=yes).  This
 	  prevents Jam from trying to build this plugin when a lesser version
