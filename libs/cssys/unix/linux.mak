@@ -71,7 +71,7 @@ CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
 # -fno-exceptions and -fno-rtti have effect only for gcc >= 2.8.x
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-Wall -Wunused -W $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
 ifeq ($(PROC),INTEL)

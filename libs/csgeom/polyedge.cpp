@@ -23,16 +23,16 @@
 csPoly2DEdges::csPoly2DEdges (int start_size)
 {
   max_edges = start_size;
-  CHK (edges = new csEdge [max_edges]);
+  CHK (edges = new csSegment2 [max_edges]);
   MakeEmpty ();
 }
 
 csPoly2DEdges::csPoly2DEdges (csPoly2DEdges& copy)
 {
   max_edges = copy.max_edges;
-  CHK (edges = new csEdge [max_edges]);
+  CHK (edges = new csSegment2 [max_edges]);
   num_edges = copy.num_edges;
-  memcpy (edges, copy.edges, sizeof (csEdge)*num_edges);
+  memcpy (edges, copy.edges, sizeof (csSegment2)*num_edges);
 }
 
 csPoly2DEdges::~csPoly2DEdges ()
@@ -50,17 +50,19 @@ bool csPoly2DEdges::In (const csVector2& v)
   int i;
   for (i = 0 ; i < num_edges ; i++)
   {
-    if (csMath2::WhichSide2D (v, edges[i].v1, edges[i].v2) < 0) return false;
+    if (csMath2::WhichSide2D (v, edges[i].Start (), edges[i].End ()) < 0)
+      return false;
   }
   return true;
 }
 
-bool csPoly2DEdges::In (csEdge* poly, int num_edge, const csVector2& v)
+bool csPoly2DEdges::In (csSegment2* poly, int num_edge, const csVector2& v)
 {
   int i;
   for (i = 0 ; i < num_edge ; i++)
   {
-    if (csMath2::WhichSide2D (v, poly[i].v1, poly[i].v2) < 0) return false;
+    if (csMath2::WhichSide2D (v, poly[i].Start (), poly[i].End ()) < 0)
+      return false;
   }
   return true;
 }
@@ -68,8 +70,8 @@ bool csPoly2DEdges::In (csEdge* poly, int num_edge, const csVector2& v)
 void csPoly2DEdges::MakeRoom (int new_max)
 {
   if (new_max <= max_edges) return;
-  CHK (csEdge* new_edges = new csEdge [new_max]);
-  memcpy (new_edges, edges, num_edges*sizeof (csEdge));
+  CHK (csSegment2* new_edges = new csSegment2 [new_max]);
+  memcpy (new_edges, edges, num_edges*sizeof (csSegment2));
   CHK (delete [] edges);
   edges = new_edges;
   max_edges = new_max;
@@ -79,8 +81,7 @@ int csPoly2DEdges::AddEdge (const csVector2& v1, const csVector2& v2)
 {
   if (num_edges >= max_edges)
     MakeRoom (max_edges+5);
-  edges[num_edges].v1 = v1;
-  edges[num_edges].v2 = v2;
+  edges[num_edges].Set (v1, v2);
   num_edges++;
   return num_edges-1;
 }
@@ -110,8 +111,8 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
 
   for (i = 0 ; i < num_edges ; i++)
   {
-    c1 = plane.SquaredDistance (edges[i].v1);
-    c2 = plane.SquaredDistance (edges[i].v2);
+    c1 = plane.SquaredDistance (edges[i].Start ());
+    c2 = plane.SquaredDistance (edges[i].End ());
 
     if (ONPLANE (c1))
     {
@@ -132,10 +133,9 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
         left->AddEdge (edges[i]);
       else
       {
-        csIntersect2::PlaneNoTest (edges[i].v1, edges[i].v2,
-      	  plane, isect, dist);
-	left->AddEdge (edges[i].v1, isect);
-	right->AddEdge (isect, edges[i].v2);
+        csIntersect2::PlaneNoTest (edges[i], plane, isect, dist);
+	left->AddEdge (edges[i].Start (), isect);
+	right->AddEdge (isect, edges[i].End ());
       }
     }
     else // ATRIGHT (c1)
@@ -144,10 +144,9 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
         right->AddEdge (edges[i]);
       else
       {
-        csIntersect2::PlaneNoTest (edges[i].v1, edges[i].v2,
-      	  plane, isect, dist);
-	right->AddEdge (edges[i].v1, isect);
-	left->AddEdge (isect, edges[i].v2);
+        csIntersect2::PlaneNoTest (edges[i], plane, isect, dist);
+	right->AddEdge (edges[i].Start (), isect);
+	left->AddEdge (isect, edges[i].End ());
       }
     }
   }

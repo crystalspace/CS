@@ -96,6 +96,9 @@ typedef void* (csTree2DVisitFunc)(csSegment2**, int num, void*);
 
 /**
  * The BSP tree.
+ * This bsp tree is ment mostly for adding segments dynamically.
+ * As such it does not provide a global build routine. That can
+ * of course easily be added if needed.
  */
 class csBspTree2D
 {
@@ -104,19 +107,9 @@ private:
   csBspNode2D* root;
 
   /**
-   * Build the tree from the given node and number of segments.
-   */
-  void Build (csBspNode2D* node, csSegment2** segments, int num);
-
-  /**
    * Add one segment to the tree.
    */
   void Add (csBspNode2D* node, csSegment2* segment);
-
-  /**
-   * Select a splitter from a list of segments and return the index.
-   */
-  int SelectSplitter (csSegment2** segments, int num);
 
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
   void* Back2Front (csBspNode2D* node, const csVector2& pos,
@@ -135,19 +128,6 @@ public:
    * Destroy the whole BSP tree.
    */
   virtual ~csBspTree2D ();
-
-  /**
-   * Create the tree with a given set of segments.
-   */
-  void Build (csSegment2** segments, int num);
-
-  /**
-   * Create the tree with a given set of segments.
-   */
-  void Build (csSegmentArray& segments)
-  {
-    Build (segments.GetArray (), segments.Length ());
-  }
 
   /**
    * Add one segment to the tree. The segment will be freed

@@ -20,14 +20,7 @@
 #define POLYEDGE_H
 
 #include "csgeom/math2d.h"
-
-/**
- * A single edge.
- */
-struct csEdge
-{
-  csVector2 v1, v2;
-};
+#include "csgeom/segment.h"
 
 /**
  * The following class represents a general 2D polygon represented
@@ -37,7 +30,7 @@ class csPoly2DEdges
 {
 protected:
   /// The edges.
-  csEdge* edges;
+  csSegment2* edges;
   ///
   int num_edges;
   ///
@@ -68,12 +61,12 @@ public:
   /**
    * Get the array with all edges.
    */
-  csEdge* GetEdges () { return edges; }
+  csSegment2* GetEdges () { return edges; }
 
   /**
    * Get the specified edge.
    */
-  csEdge* GetEdge (int i) 
+  csSegment2* GetEdge (int i) 
   {
     if (i<0 || i>=num_edges) return NULL;
     return &edges[i];
@@ -82,7 +75,7 @@ public:
   /**
    * Get the specified edge.
    */
-  csEdge& operator[] (int i)
+  csSegment2& operator[] (int i)
   {
     return edges[i];
   }
@@ -90,13 +83,13 @@ public:
   /**
    * Get the first edge.
    */
-  csEdge* GetFirst ()
+  csSegment2* GetFirst ()
   { if (num_edges<=0) return NULL;  else return edges; }
 
   /**
    * Get the last edge.
    */
-  csEdge* GetLast ()
+  csSegment2* GetLast ()
   { if (num_edges<=0) return NULL;  else return &edges[num_edges-1]; }
 
   /**
@@ -107,7 +100,7 @@ public:
   /**
    * Test if a vector is inside the given polygon.
    */
-  static bool In (csEdge* poly, int num_edge, const csVector2& v);
+  static bool In (csSegment2* poly, int num_edge, const csVector2& v);
 
   /**
    * Make room for at least the specified number of edges.
@@ -123,7 +116,7 @@ public:
    * Add a edge (2D) to the polygon.
    * Return index of added edge.
    */
-  int AddEdge (const csEdge& e) { return AddEdge (e.v1, e.v2); }
+  int AddEdge (const csSegment2& e) { return AddEdge (e.Start (), e.End ()); }
 
   /**
    * Add a edge (2D) to the polygon.
