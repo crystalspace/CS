@@ -37,6 +37,10 @@ struct iCamera;
  */
 class csCameraPosition : public csObject
 {
+private:
+  /// Destroy this object and free all associated memory
+  virtual ~csCameraPosition ();
+
 public:
   /// The sector this camera points to
   char *Sector;
@@ -51,9 +55,6 @@ public:
   csCameraPosition (const char *iName, const char *iSector,
     const csVector3 &iPosition,
     const csVector3 &iForward, const csVector3 &iUpward);
-
-  /// Destroy this object and free all associated memory
-  virtual ~csCameraPosition ();
 
   /// Change camera position object
   void Set (const char *iSector, const csVector3 &iPosition,

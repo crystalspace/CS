@@ -110,33 +110,6 @@ public:
 };
 
 
-class csCurveTemplate;
-
-/**
- * A dynamic array of polygon templates.
- * Used in thing template class.
- */
-class csCurveTemplateArray : public csVector
-{
-public:
-  /// Create the polygon array object
-  csCurveTemplateArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-  { }
-
-  /// Destroy the polygon array and all inserted polygons
-  virtual ~csCurveTemplateArray ();
-
-  /// Delete a particular array element
-  virtual bool FreeItem (csSome Item);
-
-  /// Find a curve surface template by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-
-  /// Get a curve surface template given its index in the array
-  csCurveTemplate *Get (int iIndex) const
-  { return (csCurveTemplate *)csVector::Get (iIndex); }
-};
-
 class csLightHalo;
 
 // Private class for keeping an array of halos

@@ -17,7 +17,7 @@ PLUGINS+= video/canvas/ddraw8
 PLUGINS+= video/canvas/openglwin video/renderer/opengl
 
 # uncomment the line below to build the sound driver
-PLUGINS+= sound/driver/waveoutsd
+#PLUGINS+= sound/driver/waveoutsd
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

@@ -97,13 +97,15 @@ public:
  * Structure that is kept with a portal to remember lighting information
  * that still has to be computed.
  */
-class InfPortalCS
+struct InfPortalCS : public iPortalCallback
 {
-public:
   LV* lviews;
   int x1, y1, z1;
   int x2, y2, z2;
-  InfPortalCS () { lviews = NULL; }
+
+  InfPortalCS ();
+  DECLARE_IBASE;
+  virtual bool Traverse (iPortal* portal, iBase* context);
 };
 
 #endif //INFMAZE_H

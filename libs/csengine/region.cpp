@@ -89,9 +89,11 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iCollection* o = QUERY_INTERFACE_FAST (obj, iCollection);
       if (!o) continue;
-      scfParent->engine->RemoveCollection (((csCollection::Collection*)o)->scfParent);
+      o->DecRef ();	// Remove the ref from QUERY_INTERFACE_FAST above.
+      scfParent->engine->RemoveCollection (
+      	((csCollection::Collection*)o)->scfParent);
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -100,9 +102,10 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iMeshWrapper* o = QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
       scfParent->engine->RemoveMesh (o);
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -111,10 +114,11 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iMeshFactoryWrapper* o = QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
       if (!o) continue;
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
       scfParent->engine->mesh_factories.Delete (
         scfParent->engine->mesh_factories.Find (o->GetPrivateObject ()));
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -123,11 +127,12 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iCurveTemplate* o = QUERY_INTERFACE_FAST (obj, iCurveTemplate);
       if (!o) continue;
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
       scfParent->engine->curve_templates.Delete (
         scfParent->engine->curve_templates.Find (
 	  ((csCurveTemplate::CurveTemplate*)o)->scfParent));
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -136,13 +141,15 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iSector* o = QUERY_INTERFACE_FAST (obj, iSector);
       if (!o) continue;
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->GetPrivateObject ()->CleanupReferences ();
       int idx = scfParent->engine->sectors.Find (o->GetPrivateObject ());
       if (idx != -1)
         scfParent->engine->sectors.Delete (idx);
       else
         o->DecRef ();
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -151,13 +158,15 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iMaterialWrapper* o = QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
       if (!o) continue;
-      int idx = scfParent->engine->GetMaterials ()->Find (o->GetPrivateObject ());
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      int idx = scfParent->engine->GetMaterials ()->Find (
+      	o->GetPrivateObject ());
       if (idx != -1)
         scfParent->engine->GetMaterials ()->Delete (idx);
       else
         o->DecRef ();
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -166,13 +175,15 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iTextureWrapper* o = QUERY_INTERFACE_FAST (obj, iTextureWrapper);
       if (!o) continue;
-      int idx = scfParent->engine->GetTextures ()->Find (o->GetPrivateObject ());
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      int idx = scfParent->engine->GetTextures ()->Find (
+      	o->GetPrivateObject ());
       if (idx != -1)
         scfParent->engine->GetTextures ()->Delete (idx);
       else
         o->DecRef ();
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -181,14 +192,15 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iCameraPosition* o = QUERY_INTERFACE_FAST (obj, iCameraPosition);
       if (!o) continue;
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
       int idx = scfParent->engine->camera_positions.Find (
         ((csCameraPosition::CameraPosition*)o)->scfParent);
       if (idx != -1)
         scfParent->engine->camera_positions.Delete (idx);
       else
         o->DecRef ();
+      scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -197,13 +209,13 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iPolyTxtPlane* o = QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
       if (!o) continue;
-      scfParent->ObjRemove (o->QueryObject ());
+      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
       int idx = scfParent->engine->planes.Find (o->GetPrivateObject ());
       o->DecRef ();
       if (idx != -1)
         scfParent->engine->planes[idx] = 0;
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
 #if defined(CS_DEBUG)
@@ -217,6 +229,7 @@ void csRegion::Region::DeleteAll ()
 There is still an object in the array after deleting region contents!\n\
 Object name is '%s'\n",
 	o->GetName () ? o->GetName () : "<NoName>");
+      CS_ASSERT (false);
     }
 #endif // CS_DEBUG
 }

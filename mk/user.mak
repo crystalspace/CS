@@ -53,8 +53,8 @@ PLUGINS += mesh/stars/object
 PLUGINS += mesh/thing/persist/classic
 PLUGINS += terrain/function/object terrain/function/persist/classic
 PLUGINS += motion/standard/object  motion/standard/persist/classic
+PLUGINS += engine/3d
 
-PLUGINS.DYNAMIC += engine/3d
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += cslexan
 PLUGINS.DYNAMIC += sequence

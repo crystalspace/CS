@@ -1,5 +1,36 @@
 The history order is reversed so that new features are at the top.
 
+21-Jun-2001
+	- Fixed a bug in the cleanup of sectors in the engine. The
+	  portal references were not cleaned up.
+	- Made the destructors of the following classes private:
+		- csTextureWrapper
+		- csMaterialWrapper
+		- csCollection
+		- csSector
+		- csMeshFactoryWrapper
+		- csTerrainFactoryWrapper
+		- csCurveTemplate
+		- csCameraPosition
+	- Removed csCurveTemplateArray. It was not used.
+	- csThing no longer puts itself in the current region. That is
+	  not needed since csMeshWrapper already does that.
+	- Completely reworked the callback system for portals. A portal
+	  callback is no longer a function. Instead it is an SCF
+	  class (iPortalCallback) that you have to implement. This allows
+	  cleanup of that callback when the portal is deleted.
+	  There are also two types of portal callback now:
+	     - Missing sector: this is the old type. When a sector is missing
+	       (null portal) this will be called.
+	     - Portal callback: this will be called when the sector is not
+	       missing.
+	- Made a few things in the Window canvases static (ddraw, ddraw8,
+	  and glwin32) so that they can be static linked with each other.
+	- Fixed static linking for apps using the engine as a plugin by
+	  adding engine/3d to the PLUGINS section (instead of PLUGINS.DYNAMIC)
+	  in mk/user.mak.
+	- Norman Kramer removed UnlinkCollection() from csEngine.
+	- Fixed a problem with the transparent sphere in flarge.
 20-Jun-2001
 	- Made the resolving of portals to sectors a bit more robust
 	  by not resolving portals that point to sectors that already

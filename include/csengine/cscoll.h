@@ -51,11 +51,15 @@ private:
   /// Handle to the engine plug-in.
   csEngine* engine;
 
+private:
+  ///
+  virtual ~csCollection ();
+
 protected:
-  /// Move this collection to the specified sector. Can be called multiple times.
+  /// Move this collection to the specified sector.
   virtual void MoveToSector (csSector* s);
 
-  /// Remove this collection from all sectors it is in (but not from the engine).
+  /// Remove this collection from all sectors (but not from the engine).
   virtual void RemoveFromSectors ();
 
   /**
@@ -72,9 +76,6 @@ public:
    * Create a new csCollection with the given name.
    */
   csCollection (csEngine* engine);
-
-  ///
-  virtual ~csCollection ();
 
   /**
    * Get the movable instance for this collection.

@@ -33,8 +33,8 @@
 
 #define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 
-DirectDetection DDetection;
-DirectDetectionDevice *DirectDevice;
+static DirectDetection DDetection;
+static DirectDetectionDevice *DirectDevice;
 
 //--//--//--//--//--//--//--//--//--//--//--//--//-- csGraphics2DDDraw3 --//--//
 

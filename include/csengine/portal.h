@@ -51,9 +51,9 @@ protected:
   /// Warp transform in world space.
   csReversibleTransform warp_wor;
   /// Callback when a sector is missing.
-  csPortalSectorCallback sector_cb;
-  /// Data for sector_cb;
-  void* sector_cbData;
+  iPortalCallback* sector_cb;
+  /// Callback for traversing to a portal.
+  iPortalCallback* portal_cb;
 
   /**
    * A portal will change the intensity/color of the light that passes
@@ -93,14 +93,17 @@ public:
   /// Set portal flags (see CS_PORTAL_XXX values)
   csFlags& GetFlags ();
 
+  /// Set the portal callback.
+  void SetPortalCallback (iPortalCallback* cb);
+
+  /// Get the portal callback.
+  iPortalCallback* GetPortalCallback () const;
+
   /// Set the missing sector callback.
-  void SetPortalSectorCallback (csPortalSectorCallback cb, void* cbData);
+  void SetMissingSectorCallback (iPortalCallback* cb);
 
   /// Get the missing sector callback.
-  csPortalSectorCallback GetPortalSectorCallback () const;
-
-  /// Get the missing sector callback data.
-  void* GetPortalSectorCallbackData () const;
+  iPortalCallback* GetMissingSectorCallback () const;
 
   /// Set the filter texture
   void SetFilter (iTextureHandle* ft);
@@ -225,18 +228,21 @@ public:
     virtual iSector* GetSector () const { return scfParent->GetSector (); }
     virtual void SetSector (iSector* s) { scfParent->SetSector (s); }
     virtual csFlags& GetFlags () { return scfParent->GetFlags (); }
-    virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
-      void* cbData)
+    virtual void SetPortalCallback (iPortalCallback* cb)
     {
-      scfParent->SetPortalSectorCallback (cb, cbData);
+      scfParent->SetPortalCallback (cb);
     }
-    virtual csPortalSectorCallback GetPortalSectorCallback () const
+    virtual iPortalCallback* GetPortalCallback () const
     {
-      return scfParent->GetPortalSectorCallback ();
+      return scfParent->GetPortalCallback ();
     }
-    virtual void* GetPortalSectorCallbackData () const
+    virtual void SetMissingSectorCallback (iPortalCallback* cb)
     {
-      return scfParent->GetPortalSectorCallbackData ();
+      scfParent->SetMissingSectorCallback (cb);
+    }
+    virtual iPortalCallback* GetMissingSectorCallback () const
+    {
+      return scfParent->GetMissingSectorCallback ();
     }
     virtual void SetFilter (iTextureHandle* ft)
     {

@@ -454,13 +454,15 @@ private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
   iMeshObjectFactory* meshFact;
 
+private:
+  /// Destructor.
+  virtual ~csMeshFactoryWrapper ();
+
 public:
   /// Constructor.
   csMeshFactoryWrapper (iMeshObjectFactory* meshFact);
   /// Constructor.
   csMeshFactoryWrapper ();
-  /// Destructor.
-  virtual ~csMeshFactoryWrapper ();
 
   /// Set the mesh object factory.
   void SetMeshObjectFactory (iMeshObjectFactory* meshFact);

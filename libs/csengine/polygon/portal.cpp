@@ -49,7 +49,7 @@ csPortal::csPortal ()
   filter_b = 1;
   sector = NULL;
   sector_cb = NULL;
-  sector_cbData = NULL;
+  portal_cb = NULL;
 }
 
 csPortal::~csPortal ()
@@ -58,6 +58,8 @@ csPortal::~csPortal ()
   // set to NULL.
   CS_ASSERT (sector == NULL);
   if (filter_texture) filter_texture->DecRef ();
+  if (sector_cb) sector_cb->DecRef ();
+  if (portal_cb) portal_cb->DecRef ();
 }
 
 iReferencedObject* csPortal::GetReferencedObject () const
@@ -120,10 +122,15 @@ csFlags& csPortal::GetFlags ()
 bool csPortal::CompleteSector (iBase* context)
 {
   if (sector)
-    return true;
+  {
+    if (portal_cb)
+      return portal_cb->Traverse (&(this->scfiPortal), context);
+    else
+      return true;
+  }
   else if (sector_cb)
   {
-    return sector_cb (&(this->scfiPortal), context, sector_cbData);
+    return sector_cb->Traverse (&(this->scfiPortal), context);
   }
   return false;
 }
@@ -451,19 +458,27 @@ void csPortal::SetMirror (iPolygon3D *iPoly)
   SetWarp (csTransform::GetReflect (*(poly->GetPolyPlane ())));
 }
 
-void csPortal::SetPortalSectorCallback (csPortalSectorCallback cb,
-	void* cbData)
+void csPortal::SetPortalCallback (iPortalCallback* cb)
 {
-  sector_cb = cb;
-  sector_cbData = cbData;
+  if (cb) cb->IncRef ();
+  if (portal_cb) portal_cb->DecRef ();
+  portal_cb = cb;
 }
 
-csPortalSectorCallback csPortal::GetPortalSectorCallback () const
+iPortalCallback* csPortal::GetPortalCallback () const
+{
+  return portal_cb;
+}
+
+void csPortal::SetMissingSectorCallback (iPortalCallback* cb)
+{
+  if (cb) cb->IncRef ();
+  if (sector_cb) sector_cb->DecRef ();
+  sector_cb = cb;
+}
+
+iPortalCallback* csPortal::GetMissingSectorCallback () const
 {
   return sector_cb;
 }
 
-void* csPortal::GetPortalSectorCallbackData () const
-{
-  return sector_cbData;
-}

@@ -560,7 +560,13 @@ void csEngine::Clear ()
   terrain_factories.DeleteAll();
   curve_templates.DeleteAll ();
 
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    csSector* sect = (csSector*)sectors[i];
+    if (sect) sect->CleanupReferences ();
+  }
   sectors.DeleteAll ();
+
   camera_positions.DeleteAll ();
 
   for (i = 0 ; i < planes.Length () ; i++)

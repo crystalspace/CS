@@ -98,8 +98,6 @@ csThing::csThing (iBase* parent) : csObject (parent),
   thing_id = last_thing_id;
   last_polygon_id = 0;
 
-  csEngine::current_engine->AddToCurrentRegion (this);
-
   curves_center.x = curves_center.y = curves_center.z = 0;
   curves_scale = 40;  
   curve_vertices = NULL;

@@ -76,7 +76,7 @@ CS_IMPLEMENT_PLUGIN
 
 #define WINDOW_STYLE (WS_POPUP | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 
-void sys_fatalerror(char *str, HRESULT hRes = S_OK)
+static void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
   LPVOID lpMsgBuf;
   char* szMsg;

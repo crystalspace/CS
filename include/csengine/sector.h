@@ -114,6 +114,14 @@ private:
    */
   iVisibilityCuller* culler;
 
+private:
+  /**
+   * Destroy this sector. All things in this sector are also destroyed.
+   * Meshes are unlinked from the sector but not removed because they
+   * could be in other sectors.
+   */
+  virtual ~csSector ();
+
 public:
   /**
    * Option variable: render portals?
@@ -151,13 +159,6 @@ public:
    * Construct a sector. This sector will be completely empty.
    */
   csSector (csEngine*);
-
-  /**
-   * Destroy this sector. All things in this sector are also destroyed.
-   * Meshes are unlinked from the sector but not removed because they
-   * could be in other sectors.
-   */
-  virtual ~csSector ();
 
   /**
    * This function MUST be called before the sector is deleted in order

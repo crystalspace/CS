@@ -22,6 +22,8 @@
 #include "csutil/scf.h"
 #include "iutil/objref.h"
 
+class csReversibleTransform;
+
 /**
  * If this flag is set then this portal will clip all geometry in
  * the destination sector. This must be used for portals which arrive
@@ -72,17 +74,22 @@ struct iPolygon3D;
 struct iPortal;
 struct iFrustumView;
 
+SCF_VERSION (iPortalCallback, 0, 0, 1);
+
 /**
- * When a sector is missing this callback will be called. If this function
+ * When a sector is missing this callback will be called. If this callback
  * returns false then this portal will not be traversed. Otherwise this
- * function has to set up the destination sector and return true.
+ * callback has to set up the destination sector and return true.
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else NULL.
  */
-typedef bool (*csPortalSectorCallback) (iPortal* portal,
-	iBase* context, void* callbackData);
+struct iPortalCallback : public iBase
+{
+  /// Traverse to the portal.
+  virtual bool Traverse (iPortal* portal, iBase* context) = 0;
+};
 
-SCF_VERSION (iPortal, 0, 0, 6);
+SCF_VERSION (iPortal, 0, 0, 7);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -108,15 +115,25 @@ struct iPortal : public iReference
   /// Set portal flags (see CS_PORTAL_XXX values)
   virtual csFlags& GetFlags () = 0;
 
-  /// Set the missing sector callback.
-  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
-    void* cbData) = 0;
+  /**
+   * Set the portal callback. This will call IncRef() on the callback
+   * (and possible DecRef() on the old callback). So make sure you
+   * call DecRef() to release your own reference.
+   */
+  virtual void SetPortalCallback (iPortalCallback* cb) = 0;
+
+  /// Get the portal callback.
+  virtual iPortalCallback* GetPortalCallback () const = 0;
+
+  /**
+   * Set the missing sector callback. This will call IncRef() on the callback
+   * (and possible DecRef() on the old callback). So make sure you
+   * call DecRef() to release your own reference.
+   */
+  virtual void SetMissingSectorCallback (iPortalCallback* cb) = 0;
 
   /// Get the missing sector callback.
-  virtual csPortalSectorCallback GetPortalSectorCallback () const = 0;
-
-  /// Get the missing sector callback data.
-  virtual void* GetPortalSectorCallbackData () const = 0;
+  virtual iPortalCallback* GetMissingSectorCallback () const = 0;
 
   /// Set the filter texture
   virtual void SetFilter (iTextureHandle* ft) = 0;

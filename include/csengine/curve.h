@@ -308,11 +308,13 @@ class csCurveTemplate : public csObject
 protected:
   csMaterialWrapper* cstxt;
 
+protected:
+  ///
+  virtual ~csCurveTemplate () { }
+
 public:
   ///
   csCurveTemplate();
-  ///
-  virtual ~csCurveTemplate () { }
 
   ///
   virtual csCurve* MakeCurve () = 0;

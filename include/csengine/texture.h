@@ -61,14 +61,16 @@ private:
   // update our key color with that from the image
   inline void UpdateKeyColorFromImage ();
 
+private:
+  /// Release texture handle
+  virtual ~csTextureWrapper ();
+
 public:
 
   /// Construct a texture handle given a image file
   csTextureWrapper (iImage* Image);
   /// Construct a csTextureWrapper from a pre-registered texture
   csTextureWrapper (iTextureHandle *ith);
-  /// Release texture handle
-  virtual ~csTextureWrapper ();
 
   /**
    * Change the base iImage. The changes will not be visible until the

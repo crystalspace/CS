@@ -137,13 +137,15 @@ private:
   /// The handle as returned by iTextureManager.
   iMaterialHandle* handle;
 
+private:
+  /// Release material handle
+  virtual ~csMaterialWrapper ();
+
 public:
   /// Construct a material handle given a material.
   csMaterialWrapper (iMaterial* Image);
   /// Construct a csMaterialWrapper from a pre-registered material handle.
   csMaterialWrapper (iMaterialHandle *ith);
-  /// Release material handle
-  virtual ~csMaterialWrapper ();
 
   /**
    * Change the material handle. Note: This will also change the base

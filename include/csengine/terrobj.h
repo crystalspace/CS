@@ -149,13 +149,15 @@ private:
   /// Mesh object factory corresponding with this csTerrainFactoryWrapper.
   iTerrainObjectFactory* pTerrFact;
 
+private:
+  /// Destructor.
+  virtual ~csTerrainFactoryWrapper ();
+
 public:
   /// Constructor.
   csTerrainFactoryWrapper (iTerrainObjectFactory *pFactory);
   /// Constructor.
   csTerrainFactoryWrapper ();
-  /// Destructor.
-  virtual ~csTerrainFactoryWrapper ();
 
   /// Set the terrain object factory.
   void SetTerrainObjectFactory (iTerrainObjectFactory *pFactory);

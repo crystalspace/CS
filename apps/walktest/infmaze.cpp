@@ -190,9 +190,18 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
   po2->CreatePortal (s1->sector);
 }
 
-static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
+IMPLEMENT_IBASE (InfPortalCS)
+  IMPLEMENTS_INTERFACE (iPortalCallback)
+IMPLEMENT_IBASE_END
+
+InfPortalCS::InfPortalCS ()
 {
-  InfPortalCS* ipc = (InfPortalCS*)data;
+  CONSTRUCT_IBASE (NULL);
+  lviews = NULL;
+}
+
+bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
+{
   iFrustumView* fv;
   if (context) fv = QUERY_INTERFACE (context, iFrustumView);
   else fv = NULL;
@@ -203,8 +212,8 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
       // If we want to shine light through this portal but it doesn't
       // really exist yet then we remember the csFrustumView for later.
       LV* lv = new LV ();
-      lv->next = ipc->lviews;
-      ipc->lviews = lv;
+      lv->next = lviews;
+      lviews = lv;
       lv->lv = fv;
       // Make a copy of the current context and remember it.
       lv->ctxt = fv->CopyFrustumContext ();
@@ -218,13 +227,13 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
     extern WalkTest* Sys;
     InfiniteMaze* infinite_maze = Sys->infinite_maze;
     InfRoomData* ird = infinite_maze->create_six_room (Sys->Engine,
-    	ipc->x2, ipc->y2, ipc->z2);
+    	x2, y2, z2);
     iSector* is = ird->sector;
     csSector* s = is->GetPrivateObject (); //@@@
-    infinite_maze->connect_infinite (ipc->x1, ipc->y1, ipc->z1,
-    	ipc->x2, ipc->y2, ipc->z2, false);
+    infinite_maze->connect_infinite (x1, y1, z1,
+    	x2, y2, z2, false);
     portal->SetSector (is);
-    infinite_maze->random_loose_portals (ipc->x2, ipc->y2, ipc->z2);
+    infinite_maze->random_loose_portals (x2, y2, z2);
 
     int i;
     for (i = 0 ; i < is->GetMeshCount () ; i++)
@@ -251,20 +260,20 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
       }
     }
 
-    while (ipc->lviews)
+    while (lviews)
     {
       int old_draw_busy = s->draw_busy;
       s->draw_busy = 0;
-      iFrustumView* fv = ipc->lviews->lv;
+      iFrustumView* fv = lviews->lv;
       csFrustumContext* orig_ctxt = fv->GetFrustumContext ();
-      fv->SetFrustumContext (ipc->lviews->ctxt);
+      fv->SetFrustumContext (lviews->ctxt);
       portal->CheckFrustum (fv, 0);
       fv->RestoreFrustumContext (orig_ctxt);
       s->draw_busy = old_draw_busy;
 
-      LV* n = ipc->lviews->next;
-      delete ipc->lviews;
-      ipc->lviews = n;
+      LV* n = lviews->next;
+      delete lviews;
+      lviews = n;
     }
     iPolygonMesh* mesh = QUERY_INTERFACE (ird->walls->GetMeshObject (),
   	iPolygonMesh);
@@ -272,7 +281,6 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
     (void)new csColliderWrapper (io, Sys->collide_system, mesh);
     io->DecRef ();
     mesh->DecRef ();
-printf ("5\n"); fflush (stdout);
     return true;
   }
 }
@@ -298,8 +306,7 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,
   prt->x1 = x1; prt->y1 = y1; prt->z1 = z1;
   prt->x2 = x2; prt->y2 = y2; prt->z2 = z2;
   infinite_world->Set (x2, y2, z2, (void*)1);
-  portal->SetPortalSectorCallback (CompleteSectorCB,
-  	(void*)prt);
+  portal->SetMissingSectorCallback (prt);
 }
 
 void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)
