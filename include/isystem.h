@@ -174,6 +174,8 @@ struct iSystem : public iBase
   virtual bool ConfigSave () = 0;
   /// Put a keyboard event into event queue 
   virtual void QueueKeyEvent (int iKeyCode, bool iDown) = 0;
+  /// Put an extended keyboard event into event queue 
+  virtual void QueueExtendedKeyEvent (int iKeyCode, int iKeyCodeTranslated, bool iDown) = 0;
   /// Put a mouse event into event queue 
   virtual void QueueMouseEvent (int iButton, bool iDown, int x, int y) = 0;
   /// Put a joystick event into event queue
