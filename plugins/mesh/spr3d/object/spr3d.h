@@ -1516,9 +1516,34 @@ public:
   int GetFrameCount () const { return cur_action->GetFrameCount (); }
 
   /**
-   * Select an action.
+   * Select an action animation by name.
    */
   bool SetAction (const char * name, bool loop = true, float speed = 1)
+  {
+    csSpriteAction2 *act;
+    if ((act = factory->FindAction (name)) != 0)
+      return SetAction (act,loop,speed);
+    else
+      return false;
+  }
+
+  /**
+   * Select an action animation by index.
+   */
+  bool SetAction (int index, bool loop = true, float speed = 1)
+  {
+    csSpriteAction2 *act;
+    if ((act = factory->GetAction(index)) != 0)
+      return SetAction (act,loop,speed);
+    else
+      return false;
+  }
+
+  /**
+   * Internal function to actually set the action.  External users should
+   * not need to call this version.
+   */
+  bool SetAction (csSpriteAction2 *act, bool loop = true, float speed = 1)
   {
     speedfactor = speed;
     // If SetAction is called while an OverrideAction is in progress,
@@ -1529,8 +1554,7 @@ public:
     fullstop = false;
     single_step = false;
     SetReverseAction(false); // always go forward by default.
-    csSpriteAction2 *act;
-    if ((act = factory->FindAction (name)) != 0)
+    if (act != 0)
     {
       cur_action = act;
       SetFrame (0);
@@ -1565,6 +1589,20 @@ public:
     last_reverse = (frame_increment==-1)?true:false;
 
     bool flag = SetAction (name,false,speed);
+    last_action = save_last;
+    return flag;
+  }
+
+  bool SetOverrideAction (int index,float speed = 1)
+  {
+    csSpriteAction2* save_last;
+    
+    save_last    = cur_action;
+    last_loop    = loopaction;
+    last_speed   = speedfactor;
+    last_reverse = (frame_increment==-1)?true:false;
+
+    bool flag = SetAction (index,false,speed);
     last_action = save_last;
     return flag;
   }
@@ -1803,6 +1841,11 @@ public:
     {
       return scfParent->SetAction (name, loop, speed);
     }
+    virtual bool SetAction (int index, bool loop = true,
+    	float speed = 1)
+    {
+      return scfParent->SetAction (index, loop, speed);
+    }
     virtual void SetReverseAction (bool reverse)
     {
       scfParent->SetReverseAction (reverse);
@@ -1814,6 +1857,10 @@ public:
     virtual bool SetOverrideAction (const char *name,float speed = 1)
     {
       return scfParent->SetOverrideAction (name,speed);
+    }
+    virtual bool SetOverrideAction (int index,float speed = 1)
+    {
+      return scfParent->SetOverrideAction (index,speed);
     }
     virtual void SetSingleStepAction(bool singlestep)
     {

@@ -364,10 +364,17 @@ struct iSprite3DState : public iBase
   virtual int GetFrameCount () const = 0;
 
   /**
-   * Select an action.
+   * Select an action by name.
    * If 'loop'==false the animation will not loop.
    */
   virtual bool SetAction (const char * name,
+  	bool loop = true, float speed = 1) = 0;
+
+  /**
+   * Select an action by index.
+   * If 'loop'==false the animation will not loop.
+   */
+  virtual bool SetAction (int index,
   	bool loop = true, float speed = 1) = 0;
 
   /// Set whether action should run in reverse or not.
@@ -381,6 +388,13 @@ struct iSprite3DState : public iBase
    * sprite reverts to the prior action.
    */
   virtual bool SetOverrideAction(const char *name,
+        float speed = 1) = 0;
+
+  /**
+   * This sets an action to run one time, then the
+   * sprite reverts to the prior action.
+   */
+  virtual bool SetOverrideAction(int index,
         float speed = 1) = 0;
 
   /// Propogate set action to all children

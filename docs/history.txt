@@ -39,6 +39,8 @@ chronological order.
 	- res removed the 'privateGetVariable()' stuff from shader manager.
 	- DeSigna removed incorrect information about iEventQueue's name in 
 	  the object registry from ievq's doxygen comments.
+	- Keith Fulton added functions to Set the spr3d action by index instead
+	  of having to use action name strings.
 24-Sep-2003
 	- Jorrit finished implemented basic drawing of portals in
 	  csPortalContainer. Still some optimizations and testing to do.
