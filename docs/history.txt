@@ -15,10 +15,15 @@ chronological order.
 	  document.
 	- Marten fixed a few issues in NR software renderer:
 	    - Added triangulation of trianglestrips and fans
-	    - Added Blit() to texture handle. This is needed for most/all proc.
-	      textures.
-	    - Made sure DrawPolysMesh visits the materials before usage.
+	    - Added Blit() to texture handle. This is needed for most/all
+	      procedural textures.
+	    - Made sure DrawPolysMesh() visits the materials before usage.
 	    - Added a fallback-technique to the reflection shader.
+	- Eric Sunshine improved error reporting in SCF for when an SCF class
+	  is detected in more than on plugin module. It now reports the
+	  physical DLL in which each declaration is made. This should make it
+	  much easier to debug problems, rather than trying to guess about the
+	  locations of the plugins.
 22-Nov-2004
 	- Eric Sunshine added blurb to apimod100.txi regarding newly supported
 	  Java bindings.

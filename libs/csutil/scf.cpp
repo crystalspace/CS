@@ -55,6 +55,8 @@ private:
   csStringSet contexts;
   csStringID staticContextID;
 
+  char const* GetContextName(csStringID s)
+  { return s != csInvalidStringID ? contexts.Request(s) : "<unknown>"; }
   void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
     const char* context = 0);
 #ifdef CS_REF_TRACKER
@@ -105,6 +107,8 @@ public:
 class scfSharedLibrary;
 
 static class csStringSet* libraryNames = 0; 
+static char const* get_library_name(csStringID s)
+{ return s != csInvalidStringID ? libraryNames->Request(s) : "<unknown>"; }
 
 class scfLibraryVector : public csPDelArray<scfSharedLibrary>
 {
@@ -765,8 +769,9 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
     {
-      fprintf (stderr, "SCF_WARNING: class %s has already been registered in "
-        "the same context ('%s')\n", iClassID, context);
+      fprintf (stderr, "SCF_WARNING: class %s (in %s) has already been "
+	"registered in the same context '%s' (in %s)\n",
+        iClassID, iLibraryName, context, get_library_name(cf->LibraryName));
     }
     else
     {
@@ -781,11 +786,11 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
       if (cf->classContext != staticContextID)
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
-	fprintf (stderr, "SCF_NOTIFY: class %s has already been registered in "
-	  "a different context ('%s' vs '%s') (this message appears only in "
-	  "debug builds)\n", iClassID, context, 
-	  (cf->classContext != csInvalidStringID) ?
-	  contexts.Request (cf->classContext) : 0);
+	fprintf (stderr, "SCF_NOTIFY: class %s (in %s) has already been "
+	  "registered in a different context: '%s' vs. '%s' (in %s); this "
+	  "message appears only in debug builds\n",
+	  iClassID, iLibraryName, context, GetContextName(cf->classContext),
+          get_library_name(cf->LibraryName));
       }
     #endif
     }
@@ -810,8 +815,9 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
     {
-      fprintf (stderr, "SCF_WARNING: class %s has already been registered in "
-	"the same context (%s)\n", iClassID, context);
+      fprintf (stderr, "SCF_WARNING: class %s (statically linked) has already "
+	"been registered in the same context '%s' (in %s)\n",
+	iClassID, context, get_library_name(cf->LibraryName));
     }
     else
     {
@@ -826,10 +832,11 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
       if (cf->classContext != staticContextID)
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
-	fprintf (stderr, "SCF_NOTIFY: class %s has already been registered "
-	  "in a different context (%s vs %s) (this message appears only in "
-	  "debug builds)\n", iClassID, context,
-	  contexts.Request (cf->classContext));
+	fprintf (stderr, "SCF_NOTIFY: class %s (statically linked) has "
+          "already been registered in a different context: '%s' vs. '%s' (in "
+          "%s); this message appears only in debug builds\n",
+	  iClassID, context, GetContextName(cf->classContext),
+	  get_library_name(cf->LibraryName));
       }
     #endif
     }
