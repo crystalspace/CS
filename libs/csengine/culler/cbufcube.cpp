@@ -80,7 +80,6 @@ bool csCBufferPersp::DoPerspective (
         if (verts[i1].z < EPSILON)
         {
           // We need to intersect and add both intersection point and this
-
           // point.
           csIntersect3::ZPlane (EPSILON, verts[i], verts[i1], isect);
           persp.AddPerspectiveAspect (isect, 512, 512);

@@ -215,5 +215,6 @@ void csCamera::ComputeDefaultAngle (int width)
   float disp_width = (float)width / 2.0f;
   float inv_disp_radius = qisqrt (
       rview_fov * rview_fov + disp_width * disp_width);
-  default_fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius) * (360.0f / TWO_PI);
+  default_fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
+  	* (360.0f / TWO_PI);
 }

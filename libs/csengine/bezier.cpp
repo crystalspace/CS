@@ -73,7 +73,8 @@ double csBezier2::BernsteinDuAt (double u, int j, double v, int k)
     right = pow (u, j) * (2 - j) * pow (1 - u, 2 - j - 1);
   }
 
-  return bincoeff[j] * bincoeff[k] * pow (v, k) * pow (1 - v, 2 - k) * (left - right);
+  return bincoeff[j] * bincoeff[k] * pow (v, k) * pow (1 - v, 2 - k)
+  	* (left - right);
 }
 
 /**
@@ -95,7 +96,8 @@ double csBezier2::BernsteinDvAt (double u, int j, double v, int k)
     right = pow (v, k) * (2 - k) * pow (1 - v, 2 - k - 1);
   }
 
-  return bincoeff[j] * bincoeff[k] * pow (u, j) * pow (1 - u, 2 - j) * (left - right);
+  return bincoeff[j] * bincoeff[k] * pow (u, j) * pow (1 - u, 2 - j)
+  	* (left - right);
 }
 
 void csBezier2::Initialize ()
@@ -138,8 +140,7 @@ csVector3 csBezier2::GetNormal (
 {
   csVector3 result;
 
-  // our normal is the cross product of the vector derivitives in the u & v
-
+  // Our normal is the cross product of the vector derivitives in the u & v
   // directions
   result = GetPoint (aControls, u, v, resolution, bernsteinDuMap) % GetPoint (
       aControls,
@@ -216,7 +217,6 @@ csVector3 csBezier2::GetPoint (
       result.z += ctrl[2] * fact;
 
       //aResult[3] += ctrl[3] * fact;
-
       //aResult[4] += ctrl[4] * fact;
     }
   }
@@ -257,8 +257,7 @@ csVector3 csBezier2::GetNormal (double **aControls, double u, double v)
 {
   csVector3 result;
 
-  // our normal is the cross product of the vector derivitives in the u & v
-
+  // Our normal is the cross product of the vector derivitives in the u & v
   // directions
   result = GetPoint (aControls, u, v, BernsteinDuAt) % GetPoint (
       aControls,

@@ -156,9 +156,7 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (!lm->UpdateRealLightMap ()) return false;
 
   //---
-
   // Now add all dynamic lights.
-
   //---
   csLightPatch *lp = polygon->GetBasePolygon ()->GetLightpatches ();
   while (lp)
@@ -1058,11 +1056,8 @@ void csShadowBitmap::RenderPolygon (
   int i;
 
   //-------------------
-
   // First we convert the polygon from lightmap coordinates to shadow
-
   // bitmap coordinates.
-
   //-------------------
   if (quality > 0)
   {
@@ -1124,9 +1119,7 @@ float csShadowBitmap::GetLighting (int lm_u, int lm_v)
     int v = lm_v << quality;
 
     // Calculate the bounds in shadow-bitmap space for which we
-
     // are going to take the average. Make sure we don't exceed
-
     // the total bounds of the shadow-bitmap.
     int minu = u - d;
     if (minu < 0) minu = 0;
@@ -1169,9 +1162,7 @@ float csShadowBitmap::GetLighting (int lm_u, int lm_v)
   else
   {
     // Shadow-bitmap has lower quality.
-
     // Here we will interpolate shadow-bitmap values.
-
     // @@@ TODO!!!
     return 1;
   }

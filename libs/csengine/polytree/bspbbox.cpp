@@ -184,9 +184,7 @@ void csBspPolygon::SplitWithPlane (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -207,9 +205,7 @@ void csBspPolygon::SplitWithPlane (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -276,9 +272,7 @@ void csBspPolygon::SplitWithPlaneX (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -298,9 +292,7 @@ void csBspPolygon::SplitWithPlaneX (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -366,9 +358,7 @@ void csBspPolygon::SplitWithPlaneY (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -388,9 +378,7 @@ void csBspPolygon::SplitWithPlaneY (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -456,9 +444,7 @@ void csBspPolygon::SplitWithPlaneZ (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -478,9 +464,7 @@ void csBspPolygon::SplitWithPlaneZ (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -511,9 +495,7 @@ void csBspPolygon::Transform (const csTransform &trans)
   plane = trans.Other2This (plane);
 
   //@@@ We should avoid this if not needed!
-
   // Maybe we can mark transforms which do not change normalization
-
   // with some special flag.
   plane.Normalize ();
 }
@@ -538,11 +520,8 @@ bool csBspPolygon::ClipToPlane (
   bool vis[100];
 
   // Count the number of visible vertices for this polygon (note
-
   // that the transformation from world to camera space for all the
-
   // vertices has been done earlier).
-
   // If there are no visible vertices this polygon need not be drawn.
   csVector3 *vertices = GetParent ()->GetCameraVertices ().GetVertices ();
   cnt_vis = 0;
@@ -579,13 +558,9 @@ bool csBspPolygon::ClipToPlane (
   }
 
   // Otherwise we will have to clip this polygon in 3D against the
-
   // portal polygon. This is to make sure that objects behind the
-
   // portal polygon are not accidently rendered.
-
   // First count how many vertices are before the portal polygon
-
   // (so are visible as seen from the portal).
   cnt_vis = 0;
   for (i = 0; i < num_vertices; i++)
@@ -660,17 +635,11 @@ bool csBspPolygon::DoPerspective (
   dest->MakeEmpty ();
 
   // Classify all points as NORMAL (z>=SMALL_Z), NEAR (0<=z<SMALL_Z), or
-
   // BEHIND (z<0).  Use several processing algorithms: trivially accept if all
-
   // points are NORMAL, mixed process if some points are NORMAL and some
-
   // are not, special process if there are no NORMAL points, but some are
-
   // NEAR.  Assume that the polygon has already been culled if all points
-
   // are BEHIND.
-
   // Handle the trivial acceptance case:
   ind = source;
   while (ind < end)
@@ -717,7 +686,6 @@ bool csBspPolygon::DoPerspective (
       if (exit)
       {
         // we know where the polygon is no longer NORMAL, now we need to
-
         // to find out on which edge it becomes NORMAL again.
         while (ind < end)
         {
@@ -742,7 +710,6 @@ bool csBspPolygon::DoPerspective (
       else
       {
         // we know where the polygon becomes NORMAL, now we need to
-
         // to find out on which edge it ceases to be NORMAL.
         while (ind < end)
         {
@@ -982,11 +949,8 @@ bool csBspPolygon::IntersectSegment (
   if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
 
   // Now we generate a plane between the starting point of the ray and
-
   // every edge of the polygon. With the plane normal of that plane we
-
   // can then check if the end of the ray is on the same side for all
-
   // these planes.
   csVector3 normal;
   csVector3 relend = end;
@@ -1020,25 +984,15 @@ bool csBspPolygon::IntersectSegment (
   float r, num, denom;
 
   // So now we have the plane equation of the polygon:
-
   // A*x + B*y + C*z + D = 0
-
   //
-
   // We also have the parameter line equations of the ray
-
   // going through 'start' and 'end':
-
   // x = r*(x2-x1)+x1
-
   // y = r*(y2-y1)+y1
-
   // z = r*(z2-z1)+z1
-
   //
-
   // =>   A*(r*(x2-x1)+x1) + B*(r*(y2-y1)+y1) + C*(r*(z2-z1)+z1) + D = 0
-
   // Set *pr to -1 to indicate error if we return false now.
   if (pr) *pr = -1;
 
@@ -1048,9 +1002,7 @@ bool csBspPolygon::IntersectSegment (
   r = num / denom;
 
   // Calculate 'r' and 'isect' even if the intersection point is
-
   // not on the segment. That way we can use this function for testing
-
   // with rays as well.
   if (pr) *pr = r;
 

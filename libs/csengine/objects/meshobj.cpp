@@ -129,9 +129,7 @@ void csMeshWrapper::UpdateMove ()
 void csMeshWrapper::MoveToSector (csSector *s)
 {
   // Only add this mesh to a sector if the parent is the engine.
-
   // Otherwise we have a hierarchical object and in that case
-
   // the parent object controls this.
   if (!Parent) s->GetMeshes ()->Add (&scfiMeshWrapper);
 }
@@ -328,9 +326,7 @@ void csMeshWrapper::PlaceMesh ()
             if (sqdist <= max_sq_radius)
             {
               // Plane of portal is close enough.
-
               // If N is the normal of the portal plane then we
-
               // can use that to calculate the point on the portal plane.
               csVector3 testpoint = sphere.GetCenter () + pl.Normal () * qsqrt (
                   sqdist);
@@ -503,7 +499,6 @@ float csMeshWrapper::GetScreenBoundingBox (
   if (cbox.MinZ () <= 0)
   {
     // Mesh is very close to camera.
-
     // Just return a maximum bounding box.
     sbox.Set (-10000, -10000, 10000, 10000);
   }
@@ -534,9 +529,7 @@ float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (
 }
 
 // ---------------------------------------------------------------------------
-
 // csMeshFactoryWrapper
-
 // ---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csMeshFactoryWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshFactoryWrapper)
@@ -609,9 +602,7 @@ void csMeshFactoryWrapper::HardTransform (const csReversibleTransform &t)
 }
 
 //--------------------------------------------------------------------------
-
 // csMeshList
-
 //--------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csMeshList)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshList)
@@ -671,9 +662,7 @@ iMeshWrapper *csMeshList::MeshList::FindByName (const char *Name) const
 }
 
 //--------------------------------------------------------------------------
-
 // csMeshMeshList
-
 //--------------------------------------------------------------------------
 bool csMeshMeshList::PrepareItem (csSome item)
 {
@@ -705,9 +694,7 @@ bool csMeshMeshList::FreeItem (csSome item)
 }
 
 //--------------------------------------------------------------------------
-
 // csMeshFactoryList
-
 //--------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csMeshFactoryList)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshFactoryList)
@@ -768,9 +755,7 @@ iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (
 }
 
 //--------------------------------------------------------------------------
-
 // csMeshFactoryFactoryList
-
 //--------------------------------------------------------------------------
 bool csMeshFactoryFactoryList::PrepareItem (csSome item)
 {

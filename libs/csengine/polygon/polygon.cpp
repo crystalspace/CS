@@ -1465,17 +1465,11 @@ bool csPolygon3D::DoPerspective (
   dest->MakeEmpty ();
 
   // Classify all points as NORMAL (z>=SMALL_Z), NEAR (0<=z<SMALL_Z), or
-
   // BEHIND (z<0).  Use several processing algorithms: trivially accept if all
-
   // points are NORMAL, mixed process if some points are NORMAL and some
-
   // are not, special process if there are no NORMAL points, but some are
-
   // NEAR.  Assume that the polygon has already been culled if all points
-
   // are BEHIND.
-
   // Handle the trivial acceptance case:
   ind = source;
   while (ind < end)
@@ -1491,15 +1485,10 @@ bool csPolygon3D::DoPerspective (
   if (ind == end) return true;
 
   // If we are processing a triangle (uv_coords != NULL) then
-
   // we stop here because the triangle is only visible if all
-
   // vertices are visible (this is not exactly true but it is
-
   // easier this way! @@@ CHANGE IN FUTURE).
-
   //    if (GetTextureType () != POLYTXT_LIGHTMAP)
-
   //      return false;
 #ifdef DO_HW_UVZ
   isClipped = true;
@@ -1820,11 +1809,8 @@ bool csPolygon3D::IntersectRay (const csVector3 &start, const csVector3 &end)
   if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
 
   // Now we generate a plane between the starting point of the ray and
-
   // every edge of the polygon. With the plane normal of that plane we
-
   // can then check if the end of the ray is on the same side for all
-
   // these planes.
   csVector3 normal;
   csVector3 relend = end;
@@ -1861,17 +1847,11 @@ bool csPolygon3D::IntersectRayNoBackFace (
   if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
 
   // If dot1 > 0 the polygon would have been backface culled.
-
   // In this case we just use the result of this test to reverse
-
   // the test below.
-
   // Now we generate a plane between the starting point of the ray and
-
   // every edge of the polygon. With the plane normal of that plane we
-
   // can then check if the end of the ray is on the same side for all
-
   // these planes.
   csVector3 normal;
   csVector3 relend = end;
@@ -2140,9 +2120,7 @@ void csPolygon3D::FillLightMapDynamic (csFrustumView &lview)
   csFrustumContext *ctxt = lview.GetFrustumContext ();
 
   //@@@if (orig_poly) return; BE CAREFUL
-
   // We are working for a dynamic light. In this case we create
-
   // a light patch for this polygon.
   csLightPatch *lp = csEngine::current_engine->lightpatch_pool->Alloc ();
   GetBasePolygon ()->AddLightpatch (lp);
@@ -2171,9 +2149,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
   csPlane3 &plane)
 {
   // @@@ Currently this function only checks if a shadow frustum is inside
-
   // the light frustum. There is no checking done if shadow frustums obscure
-
   // each other.
   int i, i1, j, j1;
 
@@ -2197,9 +2173,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
     csFrustum *sf = shadow_it->Next ();
 
     // First check if the plane of the shadow frustum is close to the plane
-
     // of the polygon (the input parameter 'plane'). If so then we discard the
-
     // frustum as not relevant.
     if (csMath3::PlanesClose (*sf->GetBackPlane (), plane))
       shadow_it->MarkRelevant (false);
@@ -2221,9 +2195,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           shadow_it->MarkRelevant (true);
 
           // If partial then we first test if the light and shadow
-
           // frustums are adjacent. If so then we ignore the shadow
-
           // frustum as well (not relevant).
           i1 = GetVertexCount () - 1;
           for (i = 0; i < GetVertexCount (); i++)
@@ -2237,13 +2209,9 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
               if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
               {
                 // The two points of the shadow frustum are on the same
-
                 // edge as the current light frustum edge we are examining.
-
                 // In this case we test if the orientation of the two edges
-
                 // is different. If so then the shadow frustum is not
-
                 // relevant.
                 csVector3 d1 = Vwor (i) - Vwor (i1);
                 csVector3 d2 = sfp->Vwor (j) - sfp->Vwor (j1);

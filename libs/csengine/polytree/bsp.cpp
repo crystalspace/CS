@@ -124,11 +124,8 @@ int csBspTree::SelectSplitter (csPolygonInt **polygons, int num)
   poly_idx = -1;
 
   // Several modes in the end come down to BSP_BALANCE_AND_SPLITS
-
   // with a different balance_factor and split_factor. Those two
-
   // factors determine how important the balance or split quality
-
   // is for the total quality factor.
   float balance_factor, split_factor;
   int cur_mode = mode;
@@ -228,13 +225,11 @@ int csBspTree::SelectSplitter (csPolygonInt **polygons, int num)
       }
 
       // balance_penalty is 0 for a very good balanced tree and
-
       // 1 for a very bad one.
       float balance_penalty = ((float)ABS (front + splits - back)) /
         (float)num;
 
       // split_penalty is 0 for a very good tree with regards to splitting
-
       // and 1 for a very bad one.
       float split_penalty = (float)splits / (float)num;
 
@@ -245,9 +240,7 @@ int csBspTree::SelectSplitter (csPolygonInt **polygons, int num)
         split_penalty;
 
       // Add EPSILON to penalty before comparing to avoid system dependent
-
       // results because a cost result is ALMOST the same.
-
       // This is to try to get the same octree on all platforms.
       if ((penalty + EPSILON) < least_penalty)
       {
@@ -266,11 +259,8 @@ void csBspTree::Build (csBspNode *node, csPolygonInt **polygons, int num)
   if (!Overlaps (polygons, num))
   {
     // We have a convex set.
-
     // First we test if all polygons are coplanar. In that case
-
     // we still set polygons_on_splitter to true.
-
     // Some code optimizations may depend on this.
     node->polygons_on_splitter = true;
     node->splitter = *(polygons[0]->GetPolyPlane ());
@@ -343,15 +333,10 @@ void csBspTree::ProcessTodo (csBspNode *node)
   if (!node->front && !node->back)
   {
     // This node has no children. Currently we just add
-
     // this stub to the stub of this node then. This is not entirely
-
     // correct because the current stub may not be convex. However,
-
     // since the stub system is going to be used for visibility testing
-
     // and not for perfect rendering I don't think this is a major
-
     // problem. @@@
     while (node->todo_stubs)
     {
@@ -429,7 +414,6 @@ void *csBspTree::Back2Front (
   ProcessTodo (node);
 
   // Check if some polygon (just take the first) of the polygons array
-
   // is visible from the given point. If so, we are in front of this node.
   if (csMath3::Visible (pos, node->splitter))
   {
@@ -445,7 +429,6 @@ void *csBspTree::Back2Front (
     if (rc) return rc;
 
     // IMPORTANT: First the real polygons have to be traversed and
-
     // then the bounding box polygons!!!
     rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
@@ -488,7 +471,6 @@ void *csBspTree::Front2Back (
   ProcessTodo (node);
 
   // Check if some polygon (just take the first) of the polygons array
-
   // is visible from the given point. If so, we are in front of this node.
   if (csMath3::Visible (pos, node->splitter))
   {
@@ -497,7 +479,6 @@ void *csBspTree::Front2Back (
     if (rc) return rc;
 
     // IMPORTANT: First the bounding box polygons have to be traversed
-
     // before the polygons of this node!!!
     rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;

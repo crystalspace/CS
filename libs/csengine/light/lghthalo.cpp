@@ -250,7 +250,6 @@ bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
   halo_vis = IsVisible (Engine, v);
 
   //if (halo_vis) // originally here, but this removes any fading out
-
   // of the halo. I commented it out, Wouter 24/2/2001.
   {
     // Create a rectangle containing the halo and clip it against screen
@@ -513,11 +512,8 @@ void csLightFlareHalo::ProcessFlareComponent (
   else intensity = 1.0;
 
   //if(flare->GetIntensity() < 1.0)
-
   //return; // many drivers do not support combinations of weird modes
-
   //mode |= CS_FX_SETALPHA(1.0 - flare->GetIntensity());
-
   // prepare for drawing
   dpfx.num = num_clipped_verts;
   dpfx.use_fog = false;

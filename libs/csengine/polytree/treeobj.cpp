@@ -52,11 +52,8 @@ csPolygonStubPool::~csPolygonStubPool ()
     PoolObj *n = alloced->next;
 
     //delete alloced->ps; @@@ This free is not valid!
-
     // We should use a ref count on the pool itself so that we
-
     // now when all objects in the pool are freed and the
-
     // 'alloced' list will be empty.
     delete alloced;
     alloced = n;

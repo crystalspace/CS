@@ -319,12 +319,10 @@ private:
   float radius;
 
   // Polygon index (to loop over all portals).
-
   // If -1 then we return current sector first.
   int cur_poly;
 
   // If not null then this is a recursive sector iterator
-
   // that we are currently using.
   csSectorIt *recursive_it;
 
@@ -914,9 +912,7 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   if (!G3D)
   {
     // If there is no G3D then we still allow initialization of the
-
     // engine because it might be useful to use the engine stand-alone
-
     // (i.e. for calculating lighting and so on).
     Warn ("No 3D driver!");
   }
@@ -986,7 +982,6 @@ bool csEngine::HandleEvent (iEvent &Event)
             csCamera::SetDefaultFOV (frame_height, frame_width);
 
           // @@@ Ugly hack to always have a camera in current_camera.
-
           // This is needed for the lighting routines.
           if (!current_camera)
           {
@@ -1005,9 +1000,7 @@ bool csEngine::HandleEvent (iEvent &Event)
       case cscmdSystemClose:
         {
           // We must free all material and texture handles since after
-
           // G3D->Close() they all become invalid, no matter whenever
-
           // we did or didn't an IncRef on them.
           DeleteAll ();
           return true;
@@ -1051,20 +1044,13 @@ void csEngine::DeleteAll ()
 
   int i;
 
-  // @@ instead of simply calling DeleteAll() we do this loop, because:
-
+  // @@@ instead of simply calling DeleteAll() we do this loop, because:
   // if a mesh is not held by anything outside the engine, it will get
-
   // destructed (RefCounter hits 0 and destructor is called). Unfortunatly
-
   // upon destruction the meshobject checks if it is still in a meshlist.
-
   // But this is even more unfortunately true, since the entry is removed
-
   // from the meshlist vector after the DecRef/Destruction happens.
-
   // With the loop below we simply make sure that the mesh is not destructed
-
   // while removing from the meshlist. ... norman
   for (i = GetMeshes ()->GetCount () - 1; i >= 0; i--)
   {
@@ -1144,7 +1130,6 @@ void csEngine::RegisterRenderPriority (
   int i;
 
   // If our priority goes over the number of defined priorities
-
   // then we have to initialize.
   if (priority + 1 >= render_priority_sortflags.Limit ())
     render_priority_sortflags.SetLimit (priority + 2);
@@ -1220,17 +1205,11 @@ void csEngine::ResolveEngineMode ()
   if (engine_mode == CS_ENGINE_AUTODETECT)
   {
     // Here we do some heuristic. We scan all sectors and see if there
-
     // are some that have big octrees. If so we select CS_ENGINE_FRONT2BACK.
-
     // If not we select CS_ENGINE_BACK2FRONT.
-
     // @@@ It might be an interesting option to try to find a good engine
-
     // mode for every sector and switch dynamically based on the current
-
     // sector (only switch based on the position of the camera, not switch
-
     // based on the sector we are currently rendering).
     int switch_f2b = 0;
     int i;
@@ -2993,13 +2972,9 @@ void csEngine::csEngineState::Activate ()
 void csEngine::csEngineStateVector::Close (iGraphics2D *g2d)
 {
   // Hack-- with the glide back buffer implementations of procedural textures
-
   // circumstances are that many G3D can be associated with one G2D.
-
   // It is impossible to tell which is which so destroy them all, and rely on
-
   // regeneration the next time the context is set to the surviving G3Ds associated
-
   // with this G2D
   int i;
   for (i = 0; i < Length (); i++)
@@ -3013,9 +2988,7 @@ void csEngine::csEngineStateVector::Close (iGraphics2D *g2d)
 void csEngine::csEngineStateVector::Resize (iGraphics2D *g2d)
 {
   // With the glide back buffer implementation of procedural textures
-
   // circumstances are that many G3D can be associated with one G2D, so
-
   // we test for width and height also.
   int i;
   for (i = 0; i < Length (); i++)

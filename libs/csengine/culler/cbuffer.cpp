@@ -36,9 +36,7 @@ void csCBufferLine::Initialize (int startx, int endx)
   if (last_span)
   {
     // Append the current unused list to the last span
-
     // and set the new unused list to the first span.
-
     // This moves all used spans to the unused list.
     last_span->next = parent->first_unused;
     parent->first_unused = first_span;
@@ -83,9 +81,7 @@ bool csCBufferLine::TestSpan (int startx, int endx)
     if (startx <= s->endx)
     {
       // We have found a span which ends after the start of the full span.
-
       // If the start of the empty span is after the end of the full span
-
       // then the span is not visible. Otherwise it is visible.
       if (s->startx > endx) return false;
 
@@ -96,7 +92,6 @@ bool csCBufferLine::TestSpan (int startx, int endx)
   }
 
   // There are no empty spans which overlap with the given full span.
-
   // so span is not visible.
   return false;
 }
@@ -109,21 +104,17 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
   while (s)
   {
     // If the start of the empty span is after the end of the full span
-
     // then we can stop scanning.
     if (s->startx > endx) break;
 
     if (s->endx >= startx)
     {
       // We have found a span which ends after the start of the full span.
-
       // We know this empty span is going to modified somehow.
-
       // So the full span is visible.
       vis = true;
 
       // If empty span is fully enclosed in full span then we have to remove
-
       // empty span.
       if (s->startx >= startx && s->endx <= endx)
       {
@@ -139,7 +130,6 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       }
 
       // If start of empty span is before start of full span then we
-
       // have to shrink the empty span.
       else if (s->startx < startx && s->endx <= endx)
       {
@@ -147,7 +137,6 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       }
 
       // If end of empty span is after end of full span then we have
-
       // to shrink the empty span.
       else if (s->endx > endx && s->startx >= startx)
       {
@@ -155,7 +144,6 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       }
 
       // Else the empty span is totally covering the full scan. We
-
       // have to split the empty span.
       else
       {
@@ -224,7 +212,6 @@ void csCBuffer::Initialize ()
 bool csCBuffer::TestPolygon (csVector2 *verts, int num_verts)
 {
   // Compute the min_y and max_y for this polygon in screen space coordinates.
-
   // We are going to use these to scan the polygon from top to bottom.
   int min_i = 0, max_i = 0;
   float min_y, max_y;
@@ -247,7 +234,6 @@ bool csCBuffer::TestPolygon (csVector2 *verts, int num_verts)
     }
 
     // theoretically we should do sqrt(dx^2+dy^2) here, but
-
     // we can approximate it by just abs(dx)+abs(dy)
     if (
       (ABS (verts[i].x - verts[i - 1].x) + ABS (verts[i].y - verts[i - 1].y)) > VERTEX_NEAR_THRESHOLD)
@@ -267,7 +253,6 @@ bool csCBuffer::TestPolygon (csVector2 *verts, int num_verts)
   sy = fyL = fyR = QRound (verts[scanL2].y);
 
   // First test if the min/max y range isn't already full in the
-
   // c-buffer. In that case we don't need to do anything.
   int miny = QRound (verts[min_i].y);
   if (!vert_line.TestSpan (miny, sy)) return false;
@@ -275,9 +260,7 @@ bool csCBuffer::TestPolygon (csVector2 *verts, int num_verts)
   for (;;)
   {
     //-----
-
     // We have reached the next segment. Recalculate the slopes.
-
     //-----
     bool leave;
     do
@@ -383,7 +366,6 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
   bool vis = false;
 
   // Compute the min_y and max_y for this polygon in screen space coordinates.
-
   // We are going to use these to scan the polygon from top to bottom.
   int min_i = 0, max_i = 0;
   float min_y, max_y;
@@ -406,7 +388,6 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
     }
 
     // theoretically we should do sqrt(dx^2+dy^2) here, but
-
     // we can approximate it by just abs(dx)+abs(dy)
     if (
       (ABS (verts[i].x - verts[i - 1].x) + ABS (verts[i].y - verts[i - 1].y)) > VERTEX_NEAR_THRESHOLD)
@@ -426,7 +407,6 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
   sy = fyL = fyR = QRound (verts[scanL2].y);
 
   // First test if the min/max y range isn't already full in the
-
   // c-buffer. In that case we don't need to do anything.
   int miny = QRound (verts[min_i].y);
   if (!vert_line.TestSpan (miny, sy)) return false;
@@ -436,7 +416,6 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
   int start_full = sy;
 
   // If we are in 'negative' mode then we make the lines
-
   // above and below the polygon full.
   if (negative)
   {
@@ -450,9 +429,7 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
   for (;;)
   {
     //-----
-
     // We have reached the next segment. Recalculate the slopes.
-
     //-----
     bool leave;
     do
@@ -509,15 +486,10 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
       fin_y = fyR;
 
     // Make sure we work correctly for both orientations of the polygon.
-
     // To avoid rounding errors we test sxL+dxL with sxR+dxR. In other words
-
     // we already advance one step. This avoids a problem with the two top
-
     // x coordinates being almost equal and rounding errors causing the
-
     // wrong swap here.
-
     // @@@ INVESTIGATE IF THIS IS THE RIGHT FIX!
     bool swap;
     if (sxL + dxL > sxR + dxR)
@@ -553,7 +525,6 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
         if (!in_full)
         {
           // We are full but we were not full in the previous line.
-
           // In that case we start a new full span.
           in_full = true;
           start_full = sy;
@@ -564,7 +535,6 @@ bool csCBuffer::InsertPolygon (csVector2 *verts, int num_verts, bool negative)
         if (in_full)
         {
           // We are not full but we were full in the previous line.
-
           // In that case we end the previous full span.
           vert_line.InsertSpan (sy - 1, start_full);
           in_full = false;
@@ -592,7 +562,6 @@ finish:
   if (in_full)
   {
     // We are not full but we were full in the previous line.
-
     // In that case we end the previous full span.
     vert_line.InsertSpan (miny, start_full);
     in_full = false;

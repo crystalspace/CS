@@ -132,7 +132,6 @@ csSector::csSector (csEngine *engine) :
 csSector::~csSector ()
 {
   // The references to this sector MUST be cleaned up before this
-
   // sector is destructed.
   CS_ASSERT (references.Length () == 0);
 
@@ -188,7 +187,6 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
 void csSector::RelinkMesh (iMeshWrapper *mesh)
 {
   // @@@ this function would be a lot faster of the previous
-
   // priority was known!
   RenderQueues.RemoveUnknownPriority (mesh);
   RenderQueues.Add (mesh);
@@ -345,7 +343,8 @@ csPolygon3D *csSector::IntersectSegment (
       best_p = ip->GetPrivateObject ();
       best_r = r;
       if (p_mesh)
-        *p_mesh = mesh ? mesh->GetPrivateObject () : culler_mesh ? culler_mesh->GetPrivateObject () : NULL;
+        *p_mesh = mesh ? mesh->GetPrivateObject ()
+		: culler_mesh ? culler_mesh->GetPrivateObject () : NULL;
     }
   }
 
@@ -354,7 +353,8 @@ csPolygon3D *csSector::IntersectSegment (
   {
     iMeshWrapper *mesh = meshes.Get (i);
     if (mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
-    if (culler_mesh && !only_portals && mesh == culler_mesh) continue;  // Already handled above.
+    if (culler_mesh && !only_portals && mesh == culler_mesh)
+      continue;  // Already handled above.
 
     // @@@ UGLY!!!
     iThingState *ith = SCF_QUERY_INTERFACE_FAST (
@@ -856,7 +856,6 @@ csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)
           continue;
 
         // Here we have a case of all vertices of the bbox being on the
-
         // outside of the same plane.
         vis = false;
         break;
@@ -927,7 +926,6 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   iShadowBlockList *shadows = lview->GetFrustumContext ()->GetShadows ();
 
   // Remember the previous last shadow so that we can remove all
-
   // shadows that are added in this routine.
   iShadowBlock *previous_last = shadows->GetLastShadowBlock ();
 

@@ -199,23 +199,14 @@ void csPolyTxtPlane::WorldToCamera (
   csVector3 &v_cam2tex)
 {
   // Create the matrix to transform camera space to texture space.
-
   // From: T = Mwt * (W - Vwt)
-
   //       C = Mwc * (W - Vwc)
-
   // To:   T = Mct * (C - Vct)
-
   // Mcw * C + Vwc = W
-
   // T = Mwt * (Mcw * C + Mcw * Mwc * (Vwc - Vwt))
-
   // T = Mwt * Mcw * (C - Mwc * (Vwt-Vwc))
-
   // ===>
-
   // Mct = Mwt * Mcw
-
   // Vct = Mwc * (Vwt - Vwc)
   m_cam2tex = m_world2tex;
   m_cam2tex *= t.GetT2O ();
@@ -226,21 +217,13 @@ void csPolyTxtPlane::WorldToCamera (
 void csPolyTxtPlane::ObjectToWorld (const csReversibleTransform &obj)
 {
   // From: T = Mot * (O - Vot)
-
   //       W = Mow * O - Vow
-
   // To:   T = Mwt * (W - Vwt)
-
   // Mwo * (W + Vow) = O
-
   // T = Mot * (Mwo * (W + Vow) - (Mwo * Mow) * Vot)
-
   // T = Mot * Mwo * (W + Vow - Mow * Vot)
-
   // ===>
-
   // Mwt = Mot * Mwo
-
   // Vwt = Mow * Vot - Vow
   m_world2tex = m_obj2tex;
   m_world2tex *= obj.GetO2T ();

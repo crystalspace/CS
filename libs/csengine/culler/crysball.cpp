@@ -337,13 +337,9 @@ void csCrystalBall::Transform (
   long cookie)
 {
   // fill indexVector with the indices to those polygons that have a
-
   // normal vector with sign(z-coordinate) == <useSign>
-
   // first check the base triangles
-
   // for this we simply check the base vectors - luckily the form a unit matrix
-
   // so we can simply check o2c.
   const csMatrix3 &m = o2c.GetO2T ();
   csVector3 e1 = m.Col1 ();

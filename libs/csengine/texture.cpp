@@ -177,11 +177,8 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   }
 
   // Now we check the size of the loaded image. Having an image, that
-
   // is not a power of two will result in strange errors while
-
   // rendering. It is by far better to check the format of all textures
-
   // already while loading them.
   if (flags & CS_TEXTURE_3D)
   {

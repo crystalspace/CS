@@ -252,7 +252,6 @@ static void node_light_func (
   if (!vis)
   {
     // If this node is not visible we still have to mark all polygons
-
     // in this node as having no light.
     csPolygonIntArray &pols = node->GetUnsplitPolygons ();
     int i;
@@ -264,14 +263,11 @@ static void node_light_func (
         csPolygon3D *p = (csPolygon3D *)pi;
 
         // If this polygon is the top-level polygon (i.e. base or original
-
         // polygon) then we know the entire polygon is shadowed. In that
-
         // case we have to do nothing.
         if (p->GetBasePolygon () != p)
         {
           // Otherwise we have to calculate lighting (but with vis set
-
           // to false).
           p->CalculateLightingStatic (lview, false);
         }

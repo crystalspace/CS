@@ -47,11 +47,8 @@ void csPolyPlane::ObjectToWorld (
   obj.This2Other (plane_obj, vertex1, plane_wor);
 
   // This is not efficient and only needed in those cases where the
-
   // thing is really scaled. We have to see if this is a problem. Normally
-
   // it is a good thing to avoid calling csThing::Transform() to often.
-
   // So normally it should not be a problem.
   plane_wor.Normalize ();
 }
@@ -115,25 +112,15 @@ bool csPolyPlane::IntersectSegment (
   float r, num, denom;
 
   // So now we have the plane equation of the polygon:
-
   // A*x + B*y + C*z + D = 0
-
   //
-
   // We also have the parameter line equations of the ray
-
   // going through 'start' and 'end':
-
   // x = r*(x2-x1)+x1
-
   // y = r*(y2-y1)+y1
-
   // z = r*(z2-z1)+z1
-
   //
-
   // =>   A*(r*(x2-x1)+x1) + B*(r*(y2-y1)+y1) + C*(r*(z2-z1)+z1) + D = 0
-
   // Set *pr to -1 to indicate error if we return false now.
   if (pr) *pr = -1;
 
@@ -157,9 +144,7 @@ bool csPolyPlane::IntersectSegment (
   r = num / denom;
 
   // Calculate 'r' and 'isect' even if the intersection point is
-
   // not on the segment. That way we can use this function for testing
-
   // with rays as well.
   if (pr) *pr = r;
 

@@ -529,20 +529,14 @@ bool csLightMap::UpdateRealLightMap ()
   dyn_dirty = false;
 
   //---
-
   // First copy the static lightmap to the real lightmap.
-
   // Remember the real lightmap first so that we can see if
-
   // there were any changes.
-
   //---
   memcpy (real_lm.GetArray (), static_lm.GetArray (), 4 * lm_size);
 
   //---
-
   // Then add all pseudo-dynamic lights.
-
   //---
   csLight *light;
   csRGBpixel *map;

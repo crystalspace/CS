@@ -75,23 +75,18 @@ void csRadElement::ComputePriority ()
   GetDeltaSums (red, green, blue);
 
   // use maximum instead of average so very colourfully lighted
-
   // elements will be shot earlier - they are very brightly lit.
-
   // and should not colour the ambient light.
   max = red;
   if (green > max) max = green;
   if (blue > max) max = blue;
 
   // priority is the light we expect this polygon to deliver,
-
   // the noticeable change it will cause.
-
   // the avg_lumel_delta * the diffuse.
   total_unshot_light = GetDiffuse () * max / size;
 
   // to prevent loops, polygons with several repeats (at the same
-
   // priority) are ignored.
   if (num_repeats > 5) total_unshot_light = 0.0;
 }
@@ -330,9 +325,7 @@ csRGBMap *csRadElement::ComputeTextureLumelSized ()
   int lightcell_shift = csLightMap::lightcell_shift;
 
   // scale down texture
-
   // map each lumel to the texture and scan the lightcellsize x lightcellsize
-
   // region of the texture map.
   int texelsperlumel_shift = lightcell_shift * 2;
   int lumel_uv = 0;
@@ -459,9 +452,7 @@ csRadPoly::csRadPoly (
   total_unshot_light = area;
 
   //lightmap = polygon->GetLightMapInfo()->GetLightMap(); // returns the
-
   // 'real' lightmap, which includes dynamic lights.
-
   // but we need the static lightmap
   csmap = polygon->GetLightMapInfo ()->GetPolyTex ()->GetCSLightMap ();
 
@@ -476,9 +467,7 @@ csRadPoly::csRadPoly (
   memset (lightmap->GetArray (), 0, size * 4);
 
   // @@@ What about the fourth component? Doesn't this have to be 128 for
-
   // OpenGL? Need to check that!!!
-
   // Initialize some necessary values
   Setup ();
 
@@ -571,9 +560,7 @@ csRadCurve::csRadCurve (
   total_unshot_light = original->GetArea ();
 
   //lightmap = polygon->GetLightMapInfo()->GetLightMap(); // returns the
-
   // 'real' lightmap, which includes dynamic lights.
-
   // but we need the static lightmap
   csmap = curve->GetLightMap ();
 
@@ -588,9 +575,7 @@ csRadCurve::csRadCurve (
   memset (lightmap->GetArray (), 0, size * 4);
 
   // @@@ What about the fourth component? Doesn't this have to be 128 for
-
   // OpenGL? Need to check that!!!
-
   // Initialize some necessary values
   Setup ();
 
@@ -650,13 +635,9 @@ void csRadTree::Insert (csRadElement *e)
 void csRadTree::DelNode ()
 {
   // deletes this node with both left & right subtrees
-
   // so left != NULL && right != NULL.
-
   // because tree has >= elements in its right subtree, we must
-
   // switch this element with the smallest el. of the right subtree.
-
   // Since that element may be equal in priority to this one.
   csRadTree *parent = 0;
   csRadTree *replacement = right->FindLeftMost (parent);
@@ -731,7 +712,6 @@ csRadTree *csRadTree::Delete (csRadElement *e)
   }
 
   // one subtree is missing, substitute the remaining one for spot.
-
   // remaining one may be NULL.
   csRadTree *replacement = 0;
   float spotpri = spot->GetPriority ();
@@ -1042,11 +1022,8 @@ bool csRadiosity::DoRadiosityStep (int steps)
   }
 
   // do the work
-
   // Take RadPoly with highest unshot light amount, and distribute
-
   // the light to other polys (incrementing their unshot amount).
-
   // until stability, in theory, in practice some stop-condition.
   while (steps > 0 && (shoot = FetchNext ()) != NULL)
   {
@@ -1094,11 +1071,8 @@ void csRadiosity::DoRadiosity ()
   }
 
   // do the work
-
   // Take RadPoly with highest unshot light amount, and distribute
-
   // the light to other polys (incrementing their unshot amount).
-
   // until stability, in theory, in practice some stop-condition.
   while ((shoot = FetchNext ()) != NULL)
   {
@@ -1128,12 +1102,9 @@ void csRadiosity::DoRadiosity ()
 csRadElement *csRadiosity::FetchNext ()
 {
   // you can define any stop moment you like. And stop here anytime you like
-
   // by returning NULL. The remaining unshot light will be added as
-
   // ambient light
   float stop_value = 0.1000f;                 // the amount of unshot light, where we can stop.
-  ///8‹O
   /// /// take first stop moment, do the least work expected.
   if (stop_priority > start_priority / stop_improvement)
   {
@@ -1247,9 +1218,7 @@ void csRadiosity::StartFrustum ()
   csFrustumContext *ctxt = lview->GetFrustumContext ();
 
   // the resulting color can be used as a filter
-
   //linfo.SetColor (csColor (1, 1, 1));
-
   //@@@lview->SetUserData ((void*) this);
   lview->SetCurveFunction (frustum_curve_report_func);
   lview->SetPolygonFunction (frustum_polygon_report_func);
@@ -1259,9 +1228,7 @@ void csRadiosity::StartFrustum ()
   lview->SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
   // start from the center of the shooting poly.
-
   // this will lead to inaccuracy as each lumel of the shooting
-
   // poly is it's own center. But that is too slow.
   csVector3 center;
 
@@ -1277,17 +1244,12 @@ void csRadiosity::StartFrustum ()
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   // add a backplane to frustum to clip to it... But which plane?
-
   //csPlane3 *src_plane = shoot_src->GetPolygon3D()->GetPolyPlane();
-
   //lview->GetLightFrustum ()->SetBackPlane(* src_plane);
   //
   //  /// setup some vectors so we can test on plane location
-
   //plane_origin = shoot_src->GetPolygon3D()->Vwor(0);
-
   //plane_v1 = shoot_src->GetPolygon3D()->Vwor(1) - plane_origin;
-
   //plane_v2 = shoot_src->GetPolygon3D()->Vwor(2) - plane_origin;
   shoot_src->GetSector ()->CheckFrustum ((iFrustumView *)lview);
 
@@ -1308,9 +1270,7 @@ static void frustum_curve_report_func (
   if (dest)
   {
     /// radiosity to this curve.
-
     //@@@ FIXME! csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
-
     //@@@ rad->ProcessDest (dest, lview);
   }
 }
@@ -1394,9 +1354,7 @@ static void frustum_polygon_report_func (
   if (dest)
   {
     /// radiosity to this polygon.
-
     //@@@ FIXME csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
-
     //@@@rad->ProcessDest(dest, lview);
   }
 
@@ -1458,39 +1416,22 @@ bool csRadiosity::PrepareShootDest (csRadElement *dest, csFrustumView *lview)
   factor = source_poly_patch_area * shoot_dest->GetDiffuse () / (float)PI;
 
   // note that the Normal's must be UnitLength for this to work.
-
   // to do: factor *= cos(shootangle) * cos(destangle) * H(i,j) * src_area
-
   //                  ----------------------------------------------------
-
   //                      dist * dist
-
   // Note: when bumpmaps arrive, you can make radiosity take them
-
   // into account. Simply have GetNormal() return the normal vector
-
   // for the specific lumel-coords. This will shade according to
-
   // the bump-map.
-
   // The same sort of thing could be used to make curved surfaces look
-
   // smoother, i.e. compute the normal for the location again.
-
   // The Normal must have length 1, in order to work here.
-
   // @@@: this will be calculated elsewhere:
-
   // dest_normal = - shoot_dest->GetNormal();
-
   // use filter colour from lview
-
   //@@@ REWRITE trajectory_color = linfo.GetColor ();
-
   // use shadows and light from lview
-
   // gets coverage matrix from polytext.cpp, so the code is shared
-
   // between regular lighting and radiosity lighting, prevents bugs.
 #if 0
   //@@@@@@@@@@@@@@@@ NEEDS to be rewritten!
@@ -1525,21 +1466,13 @@ void csRadiosity::ShootRadiosityToElement (csRadElement *dest)
   int suv_x_inc = source_patch_size;
 
   // increment x by patch size, but at the end of every line, we will be
-
   // patchsize - width % patchsize too far to be on the start of the next line.
-
   // unless width % patchsize == 0, when we will be right on the good spot
-
   // so for a (10x5 lightmap) and a 3x3 source patches, it will be scanned
-
   // at uv = 0, 3, 6, 9, and uv=12 at end, 3 - 10%3 too far.
-
   // then 20 - 2, 18 have to be skipped more to arrive at uv = 30, the
-
   // start of line 3 where we can scan the rest.
-
   // But when the patch_size equals 1, no y skip is required, since the
-
   // uv will continue nicely.
   int suv_y_inc = (source_patch_size - 1) * shoot_src->GetWidth ();
   if (shoot_src->GetWidth () % source_patch_size != 0)
@@ -1603,7 +1536,6 @@ void csRadiosity::PrepareShootSourceLumel (int sx, int sy, int suv)
   source_patch_area = factor;
 
   // color is texture color filtered by trajectory (i.e. half-transparent-
-
   // portals passed by from source to dest poly)
   shoot_src->GetTextureColour (
       suv,
@@ -1616,15 +1548,10 @@ void csRadiosity::PrepareShootSourceLumel (int sx, int sy, int suv)
   src_lumel_color.blue *= trajectory_color.blue * colour_bleed / 255.0f;
 
   // cap source delta to prevent explosions of light
-
   // now in ComputePriority to prevent the queue to be soiled with
-
   // exploded values.
-
   //float cap = 255.0f;
-
   //shoot_src->CapDelta(suv, srcp_width, srcp_height, cap);
-
   // get delta in colour
   shoot_src->GetSummedDelta (suv, srcp_width, srcp_height, delta_color);
 
@@ -1647,7 +1574,6 @@ void csRadiosity::ShootPatch (int rx, int ry, int ruv)
   visibility = 1;
 
   //if(visibility <= SMALL_EPSILON) return;
-
   // prepare dest lumel info
   shoot_dest->Lumel2World (dest_lumel, rx, ry);
 
@@ -1659,9 +1585,7 @@ void csRadiosity::ShootPatch (int rx, int ry, int ruv)
   pathangle.Normalize ();
 
   // Since 'path' is not normalized the cosinus calculated below
-
   // is not really a cosinus. But it doesn't matter for our calculations.
-
   // If specular is enabled it matters and in that case we correct it.
   float cossrcangle;
   float cosdestangle;
@@ -1766,11 +1690,8 @@ void csRadiosity::ShootPatch (int rx, int ry, int ruv)
   shoot_dest->AddToDelta (ruv, delta_color * totalfactor * 1.);
 
   // specular gloss
-
   // direction of the 'light' on dest is -path
-
   // normal at this destlumel is dest_normal
-
   // viewing direction, below, equal to normal (look at polygon frontally)
   if (!csRadiosity::do_static_specular)
   {
@@ -1800,11 +1721,8 @@ void csRadiosity::ShootPatch (int rx, int ry, int ruv)
   if (val > 1.0) val = 1.0;
 
   //alternative specular computation
-
   //csVector3 halfdir = (-path + viewdir);
-
   //halfdir.Normalize();
-
   //double val = ABS( halfdir * dest_normal );
 
   //float gloss = spec_amt * pow(val, spec_tightness);
@@ -1813,9 +1731,7 @@ void csRadiosity::ShootPatch (int rx, int ry, int ruv)
       static_specular_tightness);
 
   // add delta using both gloss and totalfactor
-
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss*totalfactor,
-
   //  src_lumel_color);
   gloss *= source_patch_area * visibility / sqdistance;
 

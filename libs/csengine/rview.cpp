@@ -183,17 +183,13 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means that
-
     // the plane of the polygon is almost perpendicular to the eye of the
-
     // viewer. In this case, nothing much can be seen of the plane anyway
-
     // so we just take one value for the entire polygon.
     M = 0;
     N = 0;
 
     // For O choose the transformed z value of one vertex.
-
     // That way Z buffering should at least work.
     O = 1 / poly.z_value;
   }
@@ -231,7 +227,6 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
     poly.fog_info[i].intensity2 = 0;
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
-
     // fogged sector in between.
     csFogInfo *fi = ctxt->fog_info;
     while (fi)
@@ -274,19 +269,12 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
       if (poly.fog_info[i].intensity)
       {
         // We already have a previous fog level. In this case we do some
-
         // mathematical tricks to combine both fog levels. Substitute one
-
         // fog expresion in the other. The basic fog expression is:
-
         //	C = I*F + (1-I)*P
-
         //	with I = intensity
-
         //	     F = fog color
-
         //	     P = polygon color
-
         //	     C = result
         float I1 = poly.fog_info[i].intensity;
         float I = I1 + I2 - I1 * I2;
@@ -429,19 +417,12 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX &poly)
       if (poly.fog_info[i].intensity)
       {
         // We already have a previous fog level. In this case we do some
-
         // mathematical tricks to combine both fog levels. Substitute one
-
         // fog expresion in the other. The basic fog expression is:
-
         //	C = I*F + (1-I)*P
-
         //	with I = intensity
-
         //	     F = fog color
-
         //	     P = polygon color
-
         //	     C = result
         float I1 = poly.fog_info[i].intensity;
         float I = I1 + I2 - I1 * I2;
@@ -521,15 +502,10 @@ void csRenderView::CalculateFogMesh (
   for (i = 0; i < num_vertices; i++)
   {
     // This is stupid!!! The purpose of DrawTriangleMesh is to be
-
     // able to avoid doing camera transformation in the engine at all.
-
     // And here we do it again... So this remains here until someone
-
     // fixes this calculation to work with object/world space coordinates
-
     // (depending on how the mesh is defined). For now this works and
-
     // that's most important :-)
     csVector3 v;
     if (mesh.vertex_mode == G3DPolygonMesh::VM_VIEWSPACE)
@@ -596,19 +572,12 @@ void csRenderView::CalculateFogMesh (
       if (mesh.vertex_fog[i].intensity)
       {
         // We already have a previous fog level. In this case we do some
-
         // mathematical tricks to combine both fog levels. Substitute one
-
         // fog expresion in the other. The basic fog expression is:
-
         //	C = I*F + (1-I)*P
-
         //	with I = intensity
-
         //	     F = fog color
-
         //	     P = polygon color
-
         //	     C = result
         float I1 = mesh.vertex_fog[i].intensity;
         float I = I1 + I2 - I1 * I2;
@@ -688,15 +657,10 @@ void csRenderView::CalculateFogMesh (
   for (i = 0; i < num_vertices; i++)
   {
     // This is stupid!!! The purpose of DrawTriangleMesh is to be
-
     // able to avoid doing camera transformation in the engine at all.
-
     // And here we do it again... So this remains here until someone
-
     // fixes this calculation to work with object/world space coordinates
-
     // (depending on how the mesh is defined). For now this works and
-
     // that's most important :-)
     csVector3 v;
     if (mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE)
@@ -763,19 +727,12 @@ void csRenderView::CalculateFogMesh (
       if (mesh.vertex_fog[i].intensity)
       {
         // We already have a previous fog level. In this case we do some
-
         // mathematical tricks to combine both fog levels. Substitute one
-
         // fog expresion in the other. The basic fog expression is:
-
         //	C = I*F + (1-I)*P
-
         //	with I = intensity
-
         //	     F = fog color
-
         //	     P = polygon color
-
         //	     C = result
         float I1 = mesh.vertex_fog[i].intensity;
         float I = I1 + I2 - I1 * I2;
@@ -922,43 +879,32 @@ bool csRenderView::TestBSphere (
   const csSphere &sphere)
 {
   //------
-
   // First transform bounding sphere from object space to camera space
-
   // by using the given transform (if needed).
-
   //------
   csSphere tr_sphere = o2c.Other2This (sphere);
   const csVector3 &tr_center = tr_sphere.GetCenter ();
   float radius = tr_sphere.GetRadius ();
 
   //------
-
   // Test if object is behind the camera plane.
-
   //------
   if (tr_center.z + radius <= 0) return false;
 
   //------
-
   // Test against far plane if needed.
-
   //------
   csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
   if (far_plane)
   {
     // Ok, so this is not really far plane clipping - we just dont draw this
-
     // object if the bounding sphere is further away than the D
-
     // part of the farplane.
     if (tr_center.z - radius > far_plane->D ()) return false;
   }
 
   //------
-
   // Check if we're fully inside the bounding sphere.
-
   //------
   bool fully_inside = csSquaredDist::PointPoint (
         csVector3 (0),
@@ -966,9 +912,7 @@ bool csRenderView::TestBSphere (
     radius;
 
   //------
-
   // Test if there is a chance we must clip to current portal.
-
   //------
   bool outside, inside;
   CS_ASSERT (ctxt->iview_frustum != NULL);
@@ -984,9 +928,7 @@ bool csRenderView::TestBSphere (
   }
 
   //------
-
   // Test if there is a chance we must clip to current plane.
-
   //------
   if (ctxt->do_clip_plane)
   {
@@ -1007,43 +949,32 @@ bool csRenderView::ClipBSphere (
   int &clip_z_plane)
 {
   //------
-
   // First transform bounding sphere from object space to camera space
-
   // by using the given transform.
-
   //------
   csSphere tr_sphere = o2c.Other2This (sphere);
   const csVector3 &tr_center = tr_sphere.GetCenter ();
   float radius = tr_sphere.GetRadius ();
 
   //------
-
   // Test if object is behind the camera plane.
-
   //------
   if (tr_center.z + radius <= 0) return false;
 
   //------
-
   // Test against far plane if needed.
-
   //------
   csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
   if (far_plane)
   {
     // Ok, so this is not really far plane clipping - we just dont draw this
-
     // object if the bounding sphere is further away than the D
-
     // part of the farplane.
     if (tr_center.z - radius > far_plane->D ()) return false;
   }
 
   //------
-
   // Check if we're fully inside the bounding sphere.
-
   //------
   bool fully_inside = csSquaredDist::PointPoint (
         csVector3 (0),
@@ -1051,9 +982,7 @@ bool csRenderView::ClipBSphere (
     radius;
 
   //------
-
   // Test if there is a chance we must clip to current portal.
-
   //------
   bool outside, inside;
   CS_ASSERT (ctxt->iview_frustum != NULL);
@@ -1077,9 +1006,7 @@ bool csRenderView::ClipBSphere (
   }
 
   //------
-
   // Test if there is a chance we must clip to the z-plane.
-
   //------
   if (tr_center.z - radius > 0)
     clip_z_plane = CS_CLIP_NOT;
@@ -1087,9 +1014,7 @@ bool csRenderView::ClipBSphere (
     clip_z_plane = CS_CLIP_NEEDED;
 
   //------
-
   // Test if there is a chance we must clip to current plane.
-
   //------
   clip_plane = CS_CLIP_NOT;
   if (ctxt->do_clip_plane)
@@ -1103,21 +1028,13 @@ bool csRenderView::ClipBSphere (
   }
 
   //------
-
   // If we don't need to clip to the current portal then we
-
   // test if we need to clip to the top-level portal.
-
   // Top-level clipping is always required unless we are totally
-
   // within the top-level frustum.
-
   // IF it is decided that we need to clip here then we still
-
   // clip to the inner portal. We have to do clipping anyway so
-
   // why not do it to the smallest possible clip area.
-
   //------
   if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
   {
@@ -1136,9 +1053,7 @@ bool csRenderView::ClipBSphere (
         outside);
 
       // Because TestSphereFrustum() is not 100% accurate it is possible
-
       // that the test here returns 'outside' even though we previously
-
       // tested that the sphere was not outside a smaller frustum.
       if (outside) return false;
       if (!inside) clip_portal = CS_CLIP_TOPLEVEL;
@@ -1164,18 +1079,14 @@ bool csRenderView::ClipBBox (
   if (far_plane)
   {
     // Ok, so this is not really far plane clipping - we just dont draw this
-
     // object if no point of the camera_bounding box is further than the D
-
     // part of the farplane.
     if (cbox.SquaredOriginDist () > far_plane->D () * far_plane->D ())
       return false;
   }
 
   //------
-
   // Test if there is a chance we must clip to current portal.
-
   //------
   int i;
   int box_class;
@@ -1187,9 +1098,7 @@ bool csRenderView::ClipBBox (
     clip_portal = CS_CLIP_NOT;
 
   //------
-
   // Test if there is a chance we must clip to the z-plane.
-
   //------
   clip_z_plane = CS_CLIP_NOT;
 
@@ -1204,9 +1113,7 @@ bool csRenderView::ClipBBox (
   if (cntz > 0) clip_z_plane = CS_CLIP_NEEDED;
 
   //------
-
   // Test if there is a chance we must clip to current plane.
-
   //------
   clip_plane = CS_CLIP_NOT;
   if (ctxt->do_clip_plane)
@@ -1231,21 +1138,13 @@ bool csRenderView::ClipBBox (
   }
 
   //------
-
   // If we don't need to clip to the current portal then we
-
   // test if we need to clip to the top-level portal.
-
   // Top-level clipping is always required unless we are totally
-
   // within the top-level frustum.
-
   // IF it is decided that we need to clip here then we still
-
   // clip to the inner portal. We have to do clipping anyway so
-
   // why not do it to the smallest possible clip area.
-
   //------
   if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
   {
@@ -1261,9 +1160,7 @@ void csRenderView::CreateRenderContext ()
   csRenderContext *old_ctxt = ctxt;
 
   // @@@ Use a pool for render contexts?
-
   // A pool would work very well here since the number of render contexts
-
   // is limited by recursion depth.
   ctxt = new csRenderContext ();
   *ctxt = *old_ctxt;

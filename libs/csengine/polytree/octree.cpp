@@ -259,13 +259,9 @@ static void SplitOptPlane (
 }
 
 // Given an array of csPolygonInt (which we know to be csPolygon3D
-
 // in this case) fill three other arrays with x, y, and z values
-
 // for all the vertices of those polygons that are in the given box.
-
 // @@@@ UGLY CODE!!! EXPERIMENTAL ONLY!
-
 // If this works good it should be cleaned up a lot.
 static void GetVertexComponents (
   csPolygonInt **polygons,

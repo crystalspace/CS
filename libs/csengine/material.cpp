@@ -232,7 +232,6 @@ void csMaterialWrapper::Register (iTextureManager *txtmgr)
 void csMaterialWrapper::Visit ()
 {
   // @@@ This is not very clean! We shouldn't cast from iMaterial to csMaterial.
-
   // @@@ This is also not up-to-date because it doesn't deal with layers
   csMaterial *mat = (csMaterial *)material;
   if (mat && mat->GetTextureWrapper ()) mat->GetTextureWrapper ()->Visit ();

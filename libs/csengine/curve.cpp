@@ -225,9 +225,7 @@ bool csCurve::RecalculateDynamicLights ()
   if (!LightMap || !LightMap->UpdateRealLightMap ()) return false;
 
   //---
-
   // Now add all dynamic lights.
-
   //---
   csLightPatch *lp = LightPatches;
   while (lp)
@@ -521,7 +519,6 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
   csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)lview->GetUserdata ();
 
   // We are working for a dynamic light. In this case we create
-
   // a light patch for this polygon.
   csLightPatch *lp = csEngine::current_engine->lightpatch_pool->Alloc ();
 
@@ -531,7 +528,6 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
   dl->AddLightpatch (lp);
 
   // This light patch has exactly 4 vertices because it fits around our
-
   // LightMap
   lp->Initialize (4);
 
@@ -539,9 +535,7 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
   lp->GetShadowBlock ().DeleteShadows ();
 
   // @@@: It would be nice if we could optimize earlier
-
   // to determine relevant shadow frustums in curves and use
-
   // AddRelevantShadows instead.
   lp->GetShadowBlock ().AddAllShadows (
       lview->GetFrustumContext ()->GetShadows ());

@@ -187,11 +187,8 @@ void *csBspTree2D::Back2Front (
   void *rc;
 
   //@@@@@@ THIS VISIBILITY TEST IS REVERSED (also in Front2Back).
-
   //Check what the reason is for this.
-
   // Check if some polygon (just take the first) of the polygons array
-
   // is visible from the given point. If so, we are in front of this node.
   if (!csMath2::Visible (pos, node->splitter))
   {
@@ -228,7 +225,6 @@ void *csBspTree2D::Front2Back (
   void *rc;
 
   // Check if some polygon (just take the first) of the polygons array
-
   // is visible from the given point. If so, we are in front of this node.
   if (!csMath2::Visible (pos, node->splitter))
   {

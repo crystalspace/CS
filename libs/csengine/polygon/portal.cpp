@@ -470,13 +470,9 @@ void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
   else
   {
     // There is no space warping. In this case we still want to
-
     // remove all non-relevant shadow frustums if there are any.
-
     // We know that csPolygon3D::CalculateLighting() called
-
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
-
     // calling this function so the 'relevant' flags are still valid.
     iShadowBlock *slist = old_ctxt->GetShadows ()->GetFirstShadowBlock ();
     while (slist)

@@ -120,13 +120,9 @@ void csWfVertex::Draw (iGraphics3D *g, csCamera *c, int ortho)
       g2d->DrawLine (px + r, py - r, px - r, py + r, col);
 
       //if (cross)
-
       //{
-
       //g2d->DrawLine (px-r, py, px+r, py, col);
-
       //g2d->DrawLine (px, py-r, px, py+r, col);
-
       //}
     }
   }
@@ -148,13 +144,9 @@ void csWfVertex::Draw (iGraphics3D *g, csCamera *c, int ortho)
       g2d->DrawLine (px + r, py - r, px - r, py + r, col);
 
       //if (cross)
-
       //{
-
       //g2d->DrawLine (px-r, py, px+r, py, col);
-
       //g2d->DrawLine (px, py-r, px, py+r, col);
-
       //}
     }
   }

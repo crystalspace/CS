@@ -38,7 +38,6 @@ void csRenderQueueSet::Add (iMeshWrapper *mesh)
   long pri = mesh->GetRenderPriority ();
 
   // look if the desired priority queue exists, and possibly
-
   // extend the list of queues
   for (int i = Queues.Length (); i <= pri; i++) Queues[i] = NULL;
 

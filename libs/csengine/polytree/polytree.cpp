@@ -107,9 +107,7 @@ void csPolygonTree::AddObject (csPolyTreeBBox *obj)
 bool csPolygonTree::Overlaps (csPolygonInt **polygons, int num)
 {
   // Don't compute this if more than six vertices (overhead).
-
   // Return true in this case so that the tree build routine assumes
-
   // that we'll have non-convex polygons.
   if (num > 20) return true;
 

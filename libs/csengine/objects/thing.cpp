@@ -2283,9 +2283,7 @@ void csThing::PolyMesh::Setup ()
       vertices = alloc_vertices;
 
       // Copy the polygon vertices.
-
       // Set num_verts to the number of vertices in polygon set so
-
       // that we can continue copying vertices from curves.
       num_verts = scfParent->GetVertexCount ();
       if (num_verts)
@@ -3401,7 +3399,6 @@ static void *CheckFrustumPolygonsFB (
       csVisObjInfo *obj = bsppol->GetOriginator ();
 
       // @@@ The code below is all not very nice. We should not assume
-
       // that only meshes can be used in vis info.
       iMeshWrapper *mesh = SCF_QUERY_INTERFACE_FAST (
           obj->visobj,

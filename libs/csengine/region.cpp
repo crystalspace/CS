@@ -61,7 +61,6 @@ void csRegion::DeleteAll ()
   iObjectIterator *iter;
 
   // First we need to copy the objects to a csVector to avoid
-
   // messing up the iterator while we are deleting them.
   csObjectVectorNodelete copy;
   for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
@@ -73,17 +72,11 @@ void csRegion::DeleteAll ()
   iter->DecRef ();
 
   // Now we iterate over all objects in the 'copy' vector and
-
   // delete them. This will release them as csObject children
-
   // from this region parent.
-
   // Note that we traverse the list again and again for every
-
   // object type since the order in which objects types are deleted
-
   // is important. i.e. we should first delete all meshes and things
-
   // and only then delete the sectors.
   int i;
   for (i = 0; i < copy.Length (); i++)
@@ -234,7 +227,6 @@ void csRegion::DeleteAll ()
 
 #ifdef CS_DEBUG
   // Sanity check (only in debug mode). There should be no more
-
   // non-NULL references in the copy array now.
   for (i = 0; i < copy.Length (); i++)
   {
@@ -258,7 +250,6 @@ bool csRegion::PrepareTextures ()
   iTextureManager *txtmgr = csEngine::current_engine->G3D->GetTextureManager ();
 
   //txtmgr->ResetPalette ();
-
   // First register all textures to the texture manager.
   {
     for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
@@ -313,7 +304,6 @@ bool csRegion::PrepareTextures ()
   }
 
   // Prepare all the materials.
-
   //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
   {
     for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())

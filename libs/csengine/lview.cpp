@@ -389,7 +389,6 @@ void csShadowIterator::DeleteCurrent ()
     else
     {
       // We are the first element of this list (last since we do reverse)
-
       // so we delete the last element (first) of the previous (next) list.
       cur->next->UnlinkShadow (0);
     }
@@ -411,7 +410,6 @@ void csShadowIterator::DeleteCurrent ()
     else
     {
       // We are the first element of this list so we delete the last
-
       // element of the previous list.
       cur->prev->UnlinkShadow (cur->prev->GetShadowCount () - 1);
     }
