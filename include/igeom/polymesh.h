@@ -39,7 +39,7 @@ struct csMeshedPolygon
 
 class csVector3;
 
-SCF_VERSION (iPolygonMesh, 0, 2, 0);
+SCF_VERSION (iPolygonMesh, 0, 2, 1);
 
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
@@ -68,11 +68,18 @@ struct iPolygonMesh : public iBase
    */
   virtual void Cleanup () = 0;
   
-  //is this a deformable mesh?
-  virtual bool IsDeformable() const = 0;
+  /**
+   * Is this a deformable mesh? If yes you can use GetChangeNumber()
+   * to detect if a change actually occured.
+   */
+  virtual bool IsDeformable () const = 0;
   
-  //this returns the number of deformations occurred to the mesh
-  virtual uint32 GetChangeNumber() const = 0;
+  /**
+   * When this number changes you know the polygon mesh has changed
+   * (deformation has occured) since the last time you got another
+   * number from this function.
+   */
+  virtual uint32 GetChangeNumber () const = 0;
 };
 
 /** @} */
