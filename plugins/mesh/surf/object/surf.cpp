@@ -152,7 +152,7 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
   csVector2* uvverts = new csVector2[10000];
   csTriangle* triangles = new csTriangle[10000];
 
-  float rx, ry, u, v;
+  float rx = 0, ry = 0, u, v;
   int x, y;
   int num_vertices = 0;
   for (y = 0 ; y <= yres ; y++)
