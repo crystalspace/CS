@@ -28,7 +28,6 @@
 #include "csengine/world.h"
 #include "csengine/stats.h"
 #include "csengine/sector.h"
-#include "csengine/wirefrm.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
 #include "csengine/sysitf.h"
@@ -226,7 +225,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     }
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-    rview.g3d->StartPolygonQuick (poly.txt_handle, gouraud);
+    if (!rview.callback)
+      rview.g3d->StartPolygonQuick (poly.txt_handle, gouraud);
 
     for (j = 0 ; j < tess->GetNumTriangles () ; j++)
     {
@@ -309,11 +309,14 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   	//poly.pi_triangle = ; //DPQFIX
         PreparePolygonQuick (&poly, (csVector2 *)persp, gouraud);
   	// Draw resulting polygon
-  	rview.g3d->DrawPolygonQuick (poly);
+	if (!rview.callback)
+  	  rview.g3d->DrawPolygonQuick (poly);
+	else
+          rview.callback (&rview, CALLBACK_POLYGONQ, (void*)&poly);
       }
     }
-    rview.g3d->FinishPolygonQuick ();
-
+    if (!rview.callback)
+      rview.g3d->FinishPolygonQuick ();
   }
 }
 
@@ -322,9 +325,6 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
   draw_busy++;
   csVector3* old;
   NewTransformation (old);
-
-  csWireFrame* wf = NULL;
-  if (csWorld::current_world->map_mode != MAP_OFF) wf = csWorld::current_world->wf->GetWireframe ();
 
   if (TransformWorld2Cam (rview))
   {
@@ -367,13 +367,10 @@ void csThing::DrawFoggy (csRenderView& d)
   int num_verts;
   int i;
 
-  csWireFrame* wf = NULL;
-  if (csWorld::current_world->map_mode != MAP_OFF) wf = csWorld::current_world->wf->GetWireframe ();
-
   if (TransformWorld2Cam (d))
   {
     csVector2 orig_triangle[3];
-    d.g3d->OpenFogObject (GetID (), &GetFog ());
+    if (!d.callback) d.g3d->OpenFogObject (GetID (), &GetFog ());
     Stats::polygons_considered += num_polygon;
 
     d.SetMirrored (!d.IsMirrored ());
@@ -389,31 +386,16 @@ void csThing::DrawFoggy (csRenderView& d)
        && p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ())
        && csPolygon2D::clipped.ClipAgainst (d.view))
       {
-        if (wf)
-        {
-          int j;
-          csWfPolygon* po = wf->AddPolygon ();
-          po->SetVisColor (wf->GetYellow ());
-          po->SetNumVertices (p->GetNumVertices ());
-          for (j = 0 ; j < p->GetNumVertices () ; j++)
-            po->SetVertex (j, p->Vwor (j));
-          po->Prepare ();
-        }
+	if (d.callback)
+	{
+          d.callback (&d, CALLBACK_POLYGON, (void*)p);
+          d.callback (&d, CALLBACK_POLYGON2D, (void*)&csPolygon2D::clipped);
+	}
+
         Stats::polygons_drawn++;
 
-        csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (),
-          d.IsMirrored (), GetID (), CS_FOG_BACK);
-
-        long do_edges;
-        d.g3d->GetRenderState (G3DRENDERSTATE_EDGESENABLE, do_edges);
-  	if (do_edges)
-  	{
-      	  ITextureManager* txtmgr;
-      	  d.g3d->GetTextureManager (&txtmgr);
-      	  int white;
-      	  txtmgr->FindRGB (255, 255, 255, white);
-            csPolygon2D::clipped.Draw (d.g2d, white);
-  	}
+	if (!d.callback)
+          csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_BACK);
       }
     }
     d.SetMirrored (!d.IsMirrored ());
@@ -429,34 +411,19 @@ void csThing::DrawFoggy (csRenderView& d)
        && p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ())
        && csPolygon2D::clipped.ClipAgainst (d.view))
       {
-        if (wf)
-        {
-          int j;
-          csWfPolygon* po = wf->AddPolygon ();
-          po->SetVisColor (wf->GetYellow ());
-          po->SetNumVertices (p->GetNumVertices ());
-          for (j = 0 ; j < p->GetNumVertices () ; j++)
-            po->SetVertex (j, p->Vwor (j));
-          po->Prepare ();
-        }
+	if (d.callback)
+	{
+          d.callback (&d, CALLBACK_POLYGON, (void*)p);
+          d.callback (&d, CALLBACK_POLYGON2D, (void*)&csPolygon2D::clipped);
+	}
+
         Stats::polygons_drawn++;
 
-        csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (),
-	  d.IsMirrored (), GetID (), CS_FOG_FRONT);
-
-        long do_edges;
-        d.g3d->GetRenderState (G3DRENDERSTATE_EDGESENABLE, do_edges);
-  	if (do_edges)
-  	{
-      	  ITextureManager* txtmgr;
-      	  d.g3d->GetTextureManager (&txtmgr);
-      	  int white;
-      	  txtmgr->FindRGB (255, 255, 255, white);
-            csPolygon2D::clipped.Draw (d.g2d, white);
-  	}
+        if (!d.callback)
+	  csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_FRONT);
       }
     }
-    d.g3d->CloseFogObject (GetID ());
+    if (!d.callback) d.g3d->CloseFogObject (GetID ());
   }
 
   RestoreTransformation (old);
@@ -498,55 +465,6 @@ void csThing::CalculateLighting (csLightView& lview)
 
   RestoreTransformation (old);
   draw_busy--;
-}
-
-void csThing::DumpFrustrum (csStatLight* /*l*/, csVector3* /*frustrum*/, int /*num_frustrum*/,
-  csTransform& /*t*/)
-{
-//@@@
-#if 0
-  draw_busy++;
-  csVector3* old = NewTransformation ();
-
-  TranslateVector (l->get_center ());
-
-  int i;
-  csPolygon3D* p;
-  for (i = 0 ; i < num_polygon ; i++)
-  {
-    p = (csPolygon3D*)polygons[i];
-    csVector3* new_frustrum = NULL;
-    int new_num_frustrum = 0;
-    if (p->ClipFrustrum (l->get_center (), frustrum, num_frustrum, false/*@@@unsupported*/,
-      &new_frustrum, &new_num_frustrum))
-    {
-      ITextureManager* txtmgr;
-      g3d->GetTextureManager (&txtmgr);
-      int red, white;
-      txtmgr->FindRGB (255, 255, 255, white);
-      txtmgr->FindRGB (255, 0, 0, red);
-      int j;
-      csVector3 light_cam;
-      csVector3 v0, v1, v2;
-      light_cam = t.Other2This (l->get_center ());
-
-      for (j = 0 ; j < new_num_frustrum ; j++)
-      {
-        v0 = new_frustrum[j] + l->get_center ();
-        v1 = t.Other2This (v0);
-        v0 = new_frustrum[(j+1)%new_num_frustrum] + l->get_center ();
-        v2 = t.Other2This (v0);
-        g3d->DrawLine (light_cam, v1, csCamera::aspect, red);
-        g3d->DrawLine (light_cam, v2, csCamera::aspect, red);
-        g3d->DrawLine (v1, v2, csCamera::aspect, white);
-      }
-    }
-    if (new_frustrum) CHKB (delete [] new_frustrum);
-  }
-
-  RestoreTransformation (old);
-  draw_busy--;
-#endif
 }
 
 void csThing::InitLightmaps (bool do_cache)

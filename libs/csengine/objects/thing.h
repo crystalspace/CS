@@ -218,15 +218,6 @@ public:
   void CacheLightmaps ();
 
   /**
-   * This is a debugging function that will show the outlines
-   * on all polygons that are hit by a light in this Thing.
-   * It will draw perspective correct outlines so it is meant to
-   * be called with a camera transformation.
-   */
-  void DumpFrustrum (csStatLight* l, csVector3* frustrum, int num_frustrum,
-  	csTransform& t);
-
-  /**
    * Intersects world-space sphere with polygons of this set. Return
    * polygon it hits with (or NULL) and the intersection point
    * in world coordinates. It will also return the polygon with the
