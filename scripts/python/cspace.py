@@ -8241,6 +8241,7 @@ class iGraphics2D(iBase):
     def SetRGB(*args): return _cspace.iGraphics2D_SetRGB(*args)
     def FindRGB(*args): return _cspace.iGraphics2D_FindRGB(*args)
     def GetRGB(*args): return _cspace.iGraphics2D_GetRGB(*args)
+    def GetRGBA(*args): return _cspace.iGraphics2D_GetRGBA(*args)
     def SetClipRect(*args): return _cspace.iGraphics2D_SetClipRect(*args)
     def GetClipRect(*args): return _cspace.iGraphics2D_GetClipRect(*args)
     def BeginDraw(*args): return _cspace.iGraphics2D_BeginDraw(*args)
