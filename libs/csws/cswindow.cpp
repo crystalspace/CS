@@ -27,14 +27,17 @@
 
 #define TITLEBAR_TEXTURE_NAME	"csws::TitlebarButtons"
 
-#define ADD_SYSMENU_ENTRIES(menu) \
-  if (iWindowStyle & CSWS_BUTMAXIMIZE) \
-    (void) new csMenuItem (menu, "~Maximize", cscmdMaximize); \
-  if (iWindowStyle & CSWS_BUTHIDE) \
-    (void) new csMenuItem (menu, "~Hide",     cscmdHide); \
-  if (iWindowStyle & (CSWS_BUTMAXIMIZE | CSWS_BUTHIDE)) \
-    (void) new csMenuItem (menu); \
-  (void) new csMenuItem (menu, "~Close",    cscmdClose);
+#define ADD_SYSMENU_ENTRIES(menu)				\
+  if (iWindowStyle & CSWS_BUTMAXIMIZE)				\
+    (void) new csMenuItem (menu, "~Maximize", cscmdMaximize);	\
+  if (iWindowStyle & CSWS_BUTHIDE)				\
+    (void) new csMenuItem (menu, "~Hide",     cscmdHide);	\
+  if (iWindowStyle & CSWS_BUTCLOSE)				\
+  {								\
+    if (iWindowStyle & (CSWS_BUTMAXIMIZE | CSWS_BUTHIDE))	\
+      (void) new csMenuItem (menu);				\
+    (void) new csMenuItem (menu, "~Close",    cscmdClose);	\
+  }
 
 // Private menu class for system menu
 class csSysMenu : public csMenu
