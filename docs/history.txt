@@ -14,6 +14,14 @@ Short-term cleanups that need to be done:
 
 13-Jan-2000
 	- Some further work on dynamic objects in polygon trees.
+	- Eric Sunshine made a fairly major change to the CVS snapshot
+	  generation script.  It now generates packages based on a
+	  configurable list of archivers.  The current list now includes bzip2
+	  and zip in addition to the original gzip.  The 'diff' is no longer
+	  generated from an older existing package (since it is now difficult
+	  more to decide which older package to choose).  Instead the diff is
+	  performed based upon time-stamp of the last run, and the timestamp
+	  is stored in a file in the log directory.
 12-Jan-2000
 	- Added double linked list code from David Durant to csutil.
 	- Did first work on new system to add dynamic objects to
@@ -24,7 +32,7 @@ Short-term cleanups that need to be done:
 	  an actor pointer (csObject) to csSprite3D.
 	- Andrew Zabolotny added -f option to awk debug script so that it
 	  can be invoked manually.
-	- Some corrections to INSTALL.Win for SCF.
+	- Eric Sunshine made minor VFS-related corrections to INSTALL.Win.
 	- Norman Kramer fixed rle8 encoding and added little/big endian
 	  support in bmp loader class.
 10-Jan-2000
@@ -39,7 +47,8 @@ Short-term cleanups that need to be done:
 	  also help a little bit with performance).
 	- Thomas also updated the Win VC project files to reflect Jorrits
 	  latest move of files.
-	- Eric Sunshine did a few changes to NeXT documentation.
+	- Eric Sunshine made a few minor VFS-related corrections to
+	  docs/INSTALL.NeXT-Binary.
 	- Norman Kramer added support for RLE8 encoded BMP-files.
 8-Jan-2000
 	- Michael Dale Long added support for configurable colors using
@@ -73,7 +82,7 @@ Short-term cleanups that need to be done:
 	- Some fixes on lightmap deallocation. Now use DecRef()
 	  consistently. Unfortunatelly this still doesn't seem to fix
 	  the 'pure virtual method call' at exit.
-	- Michael Dale Long created the new iConsole interface and cscon 
+	- Michael Dale Long created the new iConsole interface and cscon
 	  plugin.  Modified csSimpleConsole and other code that used it
 	  (walktest, csgame) to use it instead of the old csConsole.
 	  The new cscon still needs a lot of work, so csSimpleConsole
