@@ -22,13 +22,13 @@
 #include "cssysdef.h"
 #include "csutil/csvector.h"
 
-csVector::csVector (int ilimit, int ithreshold)
+csBasicVector::csBasicVector (int ilimit, int ithreshold)
 {
   root = (csSome *)malloc ((limit = ilimit) * sizeof (csSome));
   count = 0; threshold = ithreshold;
 }
 
-csVector::~csVector ()
+csBasicVector::~csBasicVector ()
 {
 //not much sense to call DeleteAll () since even for inherited classes
 //anyway will be called csVector::FreeItem which is empty.
@@ -36,18 +36,7 @@ csVector::~csVector ()
   if (root) free (root);
 }
 
-void csVector::DeleteAll ()
-{
-  int idx;
-  for (idx = count - 1; idx >= 0; idx--)
-    if (!FreeItem (root [idx]))
-      break;
-  SetLength (idx + 1);
-  while (idx >= 0)
-    Delete (idx--);
-}
-
-void csVector::SetLength (int n)
+void csBasicVector::SetLength (int n)
 {
   count = n;
   if ((n > limit) || ((limit > threshold) && (n < limit - threshold)))
@@ -64,6 +53,55 @@ void csVector::SetLength (int n)
   }
 }
 
+int csBasicVector::Find (csSome which) const
+{
+  for (int i = 0; i < Length (); i++)
+    if (root [i] == which)
+      return i;
+  return -1;
+}
+
+bool csBasicVector::Insert (int n, csSome Item)
+{
+  if (n <= count)
+  {
+    SetLength (count + 1); // Increments 'count' as a side-effect.
+    const int nmove = (count - n - 1);
+    if (nmove > 0)
+      memmove (&root [n + 1], &root [n], nmove * sizeof (csSome));
+    root [n] = Item;
+    return true;
+  }
+  else
+   return false;
+}
+
+bool csBasicVector::Delete (int n)
+{
+  if (n >= 0 && n < count)
+  {
+    const int ncount = count - 1;
+    const int nmove = ncount - n;
+    if (nmove > 0)
+      memmove (&root [n], &root [n + 1], nmove * sizeof (csSome));
+    SetLength (ncount);
+    return true;
+  }
+  else
+    return false;
+}
+
+void csVector::DeleteAll ()
+{
+  int idx;
+  for (idx = count - 1; idx >= 0; idx--)
+    if (!FreeItem (root [idx]))
+      break;
+  SetLength (idx + 1);
+  while (idx >= 0)
+    Delete (idx--);
+}
+
 bool csVector::FreeItem (csSome Item)
 {
   (void)Item;
@@ -76,12 +114,7 @@ bool csVector::Delete (int n)
   {
     if (!FreeItem (root [n]))
       return false;
-    const int ncount = count - 1;
-    const int nmove = ncount - n;
-    if (nmove > 0)
-      memmove (&root [n], &root [n + 1], nmove * sizeof (csSome));
-    SetLength (ncount);
-    return true;
+    return csBasicVector::Delete(n);
   }
   else
     return false;
@@ -98,29 +131,6 @@ bool csVector::Replace (int n, csSome what)
   }
   else
     return false;
-}
-
-bool csVector::Insert (int n, csSome Item)
-{
-  if (n <= count)
-  {
-    SetLength (count + 1); // Increments 'count' as a side-effect.
-    const int nmove = (count - n - 1);
-    if (nmove > 0)
-      memmove (&root [n + 1], &root [n], nmove * sizeof (csSome));
-    root [n] = Item;
-    return true;
-  }
-  else
-   return false;
-}
-
-int csVector::Find (csSome which) const
-{
-  for (int i = 0; i < Length (); i++)
-    if (root [i] == which)
-      return i;
-  return -1;
 }
 
 int csVector::FindKey (csConstSome Key, int Mode) const
