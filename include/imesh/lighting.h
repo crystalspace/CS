@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001-2002 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,7 +21,9 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iLightingInfo, 0, 0, 2);
+struct iCacheManager;
+
+SCF_VERSION (iLightingInfo, 0, 0, 3);
 
 /**
  * This interface is implemented by mesh objects that have some kind
@@ -41,14 +43,14 @@ struct iLightingInfo : public iBase
    * This function will read the data from the current VFS dir.
    * The id is used to uniquely identify the elements of this cache.
    */
-  virtual bool ReadFromCache (int id) = 0;
+  virtual bool ReadFromCache (iCacheManager* cache_mgr, int id) = 0;
 
   /**
    * Write the lighting information to the cache. Returns false if there
    * was a problem. This function will write the data to the current VFS
    * dir. The id is used to uniquely identify the elements of this cache.
    */
-  virtual bool WriteToCache (int id) = 0;
+  virtual bool WriteToCache (iCacheManager* cache_mgr, int id) = 0;
 
   /**
    * Finally prepare the lighting for use. This function must be called

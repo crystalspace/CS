@@ -65,6 +65,7 @@ struct iReporter;
 struct iProgressMeter;
 struct iObjectRegistry;
 struct iVirtualClock;
+struct iCacheManager;
 
 SCF_DECLARE_FAST_INTERFACE (iEngine)
 SCF_DECLARE_FAST_INTERFACE (iSector)
@@ -441,6 +442,20 @@ private:
    * to true.
    */
   char* SplitRegionName (const char* name, iRegion*& region, bool& global);
+
+  /**
+   * Get the current cache from the object registry. If there is none
+   * we create a VFS cache for the 'current VFS directory/cache' and
+   * register that with the object registry.
+   */
+  iCacheManager* GetCacheManager ();
+
+  /**
+   * The following variable is only set if the engine had to create its
+   * own cache manager. In that case the engine is also responsible
+   * for cleaning this up.
+   */
+  iCacheManager* own_cache_mgr;
 
 public:
   /**

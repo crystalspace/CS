@@ -769,12 +769,12 @@ public:
   /**
    * Read the lightmaps from the cache.
    */
-  bool ReadFromCache (int id);
+  bool ReadFromCache (iCacheManager* cache_mgr, int id);
 
   /**
    * Cache the lightmaps for all polygons in this thing.
    */
-  bool WriteToCache (int id);
+  bool WriteToCache (iCacheManager* cache_mgr, int id);
 
   /**
    * Prepare the lightmaps for all polys so that they are suitable
@@ -1055,13 +1055,13 @@ public:
     {
       scfParent->InitializeDefault ();
     }
-    virtual bool ReadFromCache (int id)
+    virtual bool ReadFromCache (iCacheManager* cache_mgr, int id)
     {
-      return scfParent->ReadFromCache (id);
+      return scfParent->ReadFromCache (cache_mgr, id);
     }
-    virtual bool WriteToCache (int id)
+    virtual bool WriteToCache (iCacheManager* cache_mgr, int id)
     {
-      return scfParent->WriteToCache (id);
+      return scfParent->WriteToCache (cache_mgr, id);
     }
     virtual void PrepareLighting ()
     {

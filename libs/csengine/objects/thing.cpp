@@ -45,12 +45,13 @@
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/cache.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 #include "qint.h"
 #include "qsqrt.h"
 
-long csThing:: current_light_frame_number = 0;
+long csThing::current_light_frame_number = 0;
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csThing)
@@ -3794,64 +3795,60 @@ void csThing::InitializeDefault ()
     curves.Get (i)->InitializeDefaultLighting ();
 }
 
-bool csThing::ReadFromCache (int id)
+bool csThing::ReadFromCache (iCacheManager* cache_mgr, int id)
 {
   Prepare ();
   if (id == 0) id = thing_id;
   if (cachename)
   {
     id = 0;
-
-    csEngine *w = csEngine::current_engine;
-    w->VFS->PushDir ();
-    w->VFS->ChDir (cachename);
+    cache_mgr->SetCurrentScope (cachename);
+  }
+  else
+  {
+    char buf[20];
+    sprintf (buf, "def%d", id);
+    cache_mgr->SetCurrentScope (buf);
   }
 
   int i;
   bool rc = false;
   for (i = 0; i < polygons.Length (); i++)
-    if (!polygons.Get (i)->ReadFromCache (id)) goto stop;
+    if (!polygons.Get (i)->ReadFromCache (cache_mgr, id)) goto stop;
   for (i = 0; i < GetCurveCount (); i++)
-    if (!curves.Get (i)->ReadFromCache (id)) goto stop;
+    if (!curves.Get (i)->ReadFromCache (cache_mgr, id)) goto stop;
   rc = true;
 
 stop:
-  if (cachename)
-  {
-    csEngine *w = csEngine::current_engine;
-    w->VFS->PopDir ();
-  }
-
+  cache_mgr->SetCurrentScope (NULL);
   return rc;
 }
 
-bool csThing::WriteToCache (int id)
+bool csThing::WriteToCache (iCacheManager* cache_mgr, int id)
 {
   if (id == 0) id = thing_id;
   if (cachename)
   {
     id = 0;
-
-    csEngine *w = csEngine::current_engine;
-    w->VFS->PushDir ();
-    w->VFS->ChDir (cachename);
+    cache_mgr->SetCurrentScope (cachename);
+  }
+  else
+  {
+    char buf[20];
+    sprintf (buf, "def%d", id);
+    cache_mgr->SetCurrentScope (buf);
   }
 
   int i;
   bool rc = false;
   for (i = 0; i < polygons.Length (); i++)
-    if (!polygons.Get (i)->WriteToCache (id)) goto stop;
+    if (!polygons.Get (i)->WriteToCache (cache_mgr, id)) goto stop;
   for (i = 0; i < GetCurveCount (); i++)
-    if (!curves.Get (i)->WriteToCache (id)) goto stop;
+    if (!curves.Get (i)->WriteToCache (cache_mgr, id)) goto stop;
   rc = true;
 
 stop:
-  if (cachename)
-  {
-    csEngine *w = csEngine::current_engine;
-    w->VFS->PopDir ();
-  }
-
+  cache_mgr->SetCurrentScope (NULL);
   return rc;
 }
 

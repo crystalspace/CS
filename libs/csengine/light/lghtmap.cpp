@@ -26,7 +26,9 @@
 #include "csengine/curve.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
+#include "csutil/memfile.h"
 #include "iutil/vfs.h"
+#include "iutil/cache.h"
 
 csShadowMap::csShadowMap ()
 {
@@ -224,6 +226,7 @@ void CacheName (
 }
 
 bool csLightMap::ReadFromCache (
+  iCacheManager* cache_mgr,
   int id,
   int w,
   int h,
@@ -231,7 +234,6 @@ bool csLightMap::ReadFromCache (
   bool isPolygon,
   csEngine *engine)
 {
-  char buf[200];
   PolySave ps, pswanted;
   LightHeader lh;
   LightSave ls;
@@ -248,6 +250,9 @@ bool csLightMap::ReadFromCache (
 
   SetSize (w, h);
 
+  char* type;
+  uint32 uid;
+
   strcpy (pswanted.header, "LM02");
   if (poly)
   {
@@ -257,17 +262,19 @@ bool csLightMap::ReadFromCache (
     pswanted.x2 = convert_endian (float2short (poly->Vobj (1).x));
     pswanted.y2 = convert_endian (float2short (poly->Vobj (1).y));
     pswanted.z2 = convert_endian (float2short (poly->Vobj (1).z));
-    CacheName (buf, "P", id, poly->GetPolygonID (), "");
+    type = "lmpol";
+    uid = poly->GetPolygonID ();
   }
   else
   {
-    CacheName (buf, "C", id, curve->GetCurveID (), "");
+    type = "lmcur";
+    uid = curve->GetCurveID ();
   }
 
   pswanted.lm_size = convert_endian (lm_size);
   pswanted.lm_cnt = convert_endian ((int32) 111);
 
-  iDataBuffer *data = engine->VFS->ReadFile (buf);
+  iDataBuffer *data = cache_mgr->ReadCache (type, NULL, uid);
   if (!data) return false;
 
   char *d = **data;
@@ -291,9 +298,7 @@ bool csLightMap::ReadFromCache (
   d += sizeof (ps.lm_cnt);
 
   //-------------------------------
-
   // Check if cached item is still valid.
-
   //-------------------------------
   if (
     strncmp (ps.header, pswanted.header, 4) != 0 ||
@@ -317,9 +322,7 @@ bool csLightMap::ReadFromCache (
   }
 
   //-------------------------------
-
   // The cached item is valid.
-
   //-------------------------------
   static_lm.Clear ();
 
@@ -330,15 +333,14 @@ bool csLightMap::ReadFromCache (
   data->DecRef ();
 
   //-------------------------------
-
   // Now load the dynamic data.
-
   //-------------------------------
   if (poly)
-    CacheName (buf, "P", id, poly->GetPolygonID (), "_d");
+    type = "lmpol_d";
   else
-    CacheName (buf, "C", id, curve->GetCurveID (), "_d");
-  data = engine->VFS->ReadFile (buf);
+    type = "lmcur_d";
+
+  data = cache_mgr->ReadCache (type, NULL, uid);
   if (!data) return true;   // No dynamic data. @@@ Recalc dynamic data?
   d = **data;
   memcpy (lh.header, d, 4);
@@ -377,6 +379,7 @@ bool csLightMap::ReadFromCache (
 }
 
 void csLightMap::Cache (
+  iCacheManager* cache_mgr,
   int id,
   csPolygon3D *poly,
   csCurve *curve,
@@ -389,6 +392,9 @@ void csLightMap::Cache (
   long l;
   short s;
 
+  char* type;
+  uint32 uid;
+
   strcpy (ps.header, "LM02");
   if (poly)
   {
@@ -398,11 +404,13 @@ void csLightMap::Cache (
     ps.x2 = convert_endian (float2short (poly->Vobj (1).x));
     ps.y2 = convert_endian (float2short (poly->Vobj (1).y));
     ps.z2 = convert_endian (float2short (poly->Vobj (1).z));
-    CacheName (buf, "P", id, poly->GetPolygonID (), "");
+    type = "lmpol";
+    uid = poly->GetPolygonID ();
   }
   else
   {
-    CacheName (buf, "C", id, curve->GetCurveID (), "");
+    type = "lmcur";
+    uid = curve->GetCurveID ();
   }
 
   ps.lm_size = convert_endian (lm_size);
@@ -411,16 +419,9 @@ void csLightMap::Cache (
   ps.lm_cnt = convert_endian (ps.lm_cnt);
 
   //-------------------------------
-
   // Write the normal lightmap data.
-
   //-------------------------------
-  iFile *cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
-  if (!cf)
-  {
-    engine->Warn ("Could not open '%s' for writing!\n", buf);
-    return ;
-  }
+  csMemFile* cf = new csMemFile ();
 
   cf->Write (ps.header, 4);
   s = ps.x1;
@@ -443,13 +444,18 @@ void csLightMap::Cache (
   if (static_lm.GetArray ())
     cf->Write ((char *)static_lm.GetArray (), lm_size * 4);
 
-  // close the file
+  if (!cache_mgr->CacheData ((void*)(cf->GetData ()), cf->GetSize (),
+  	type, NULL, uid))
+  {
+    cf->DecRef ();
+    return;
+  }
+
+  // Close the file.
   cf->DecRef ();
 
   //-------------------------------
-
   // Write the dynamic data.
-
   //-------------------------------
   LightHeader lh;
 
@@ -467,15 +473,10 @@ void csLightMap::Cache (
     smap = first_smap;
 
     if (poly)
-      CacheName (buf, "P", id, poly->GetPolygonID (), "_d");
+      type = "lmpol_d";
     else
-      CacheName (buf, "C", id, curve->GetCurveID (), "_d");
-    cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
-    if (!cf)
-    {
-      engine->Warn ("Could not open '%s' for writing!\n", buf);
-      return ;
-    }
+      type = "lmcur_d";
+    cf = new csMemFile ();
 
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);
@@ -494,6 +495,12 @@ void csLightMap::Cache (
       smap = smap->next;
     }
 
+    if (!cache_mgr->CacheData ((void*)(cf->GetData ()), cf->GetSize (),
+    	type, NULL, uid))
+    {
+      cf->DecRef ();
+      return;
+    }
     cf->DecRef ();
   }
 }

@@ -1,5 +1,24 @@
 The history order is reversed so that new features are at the top.
 
+6-Mar-2002
+	- Added iCacheManager interface (include/iutil/cache.h). This is
+	  a generic interface to describe a cache mechanism. It can be used
+	  for storing data that is hard to calculate and doesn't change
+	  often. Since this is an interface you can create various
+	  implemetations that read/write cached items from several sources.
+	  Even a networked implementation could be possible.
+	- Added csVfsCacheManager implementation of iCacheManager
+	  (include/csutil/vfscache.h). This is an implementation of
+	  iCacheManager that will store cached items on VFS (file system).
+	- The engine will now find a cache manager in the object registry
+	  with the tag 'crystalspace.engine.cachemgr'. If this doesn't
+	  exist it will create an instance of csVfsCacheManager and
+	  register that (cache will be placed in 'cache' dir). By registering
+	  your own implementation of iCacheManager to that tag you can
+	  force the engine into using a different cache.
+	- Extended iLightingInfo interface with a iCacheManager* parameter.
+	- Lightmaps are already cached using the new system. Octree and
+	  bsp tree are still a todo.
 5-Mar-2002
 	- Oktal added new csParseInputDef and csGetInputDesc functions
 	  which replace the old functions in cskeys.h. With these functions

@@ -43,6 +43,7 @@ class csBspContainer;
 class csFrustumView;
 struct csCoverageMatrix;
 struct iMaterialHandle;
+struct iCacheManager;
 
 /**
  * Tesselated curve. This is basicly a list of triangles.
@@ -229,9 +230,9 @@ public:
   /// Initialize default lighting.
   void InitializeDefaultLighting ();
   /// Read lighting from cache.
-  bool ReadFromCache (int id);
+  bool ReadFromCache (iCacheManager* cache_mgr, int id);
   /// Cache the curve lightmaps.
-  bool WriteToCache (int id);
+  bool WriteToCache (iCacheManager* cache_mgr, int id);
   /// Prepare lighting.
   void PrepareLighting ();
 

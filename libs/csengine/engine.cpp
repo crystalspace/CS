@@ -46,12 +46,13 @@
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
 #include "csutil/debug.h"
+#include "csutil/vfscache.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
-#include "iutil/vfs.h"
 #include "ivideo/halo.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
+#include "iutil/vfs.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -829,6 +830,7 @@ csEngine::csEngine (iBase *iParent) :
   rad_debug = NULL;
   nextframe_pending = 0;
   virtual_clock = NULL;
+  own_cache_mgr = NULL;
 
   cbufcube = new csCBufferCube (1024);
   InitCuller ();
@@ -891,6 +893,12 @@ csEngine::~csEngine ()
   // @@@ temp hack
   if (camera_hack) camera_hack->DecRef ();
   camera_hack = NULL;
+
+  if (own_cache_mgr)
+  {
+    object_reg->Unregister (own_cache_mgr, "crystalspace.engine.cachemgr");
+    own_cache_mgr->DecRef ();
+  }
 }
 
 bool csEngine::Initialize (iObjectRegistry *object_reg)
@@ -1337,6 +1345,26 @@ bool csEngine::Prepare (iProgressMeter *meter)
   return true;
 }
 
+iCacheManager* csEngine::GetCacheManager ()
+{
+  iCacheManager* cache_mgr = CS_QUERY_REGISTRY_TAG_INTERFACE (
+  	object_reg, "crystalspace.engine.cachemgr", iCacheManager);
+  if (!cache_mgr)
+  {
+    char buf[512];
+    strcpy (buf, VFS->GetCwd ());
+    if (buf[strlen (buf)-1] == '/')
+      strcat (buf, "cache");
+    else
+      strcat (buf, "/cache");
+    own_cache_mgr = new csVfsCacheManager (object_reg, buf);
+    object_reg->Register (own_cache_mgr, "crystalspace.engine.cachemgr");
+    cache_mgr = own_cache_mgr;
+    cache_mgr->IncRef ();
+  }
+  return cache_mgr;
+}
+
 void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 {
   // If we have to read from the cache then we check if the 'precalc_info'
@@ -1458,7 +1486,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     csSector::cfg_reflections = 1;
   }
 
-  csLightIt *lit = NewLightIterator(iregion);
+  csLightIt *lit = NewLightIterator (iregion);
 
   // Count number of lights to process.
   csLight *l;
@@ -1486,6 +1514,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     }
   }
 
+  iCacheManager* cm = GetCacheManager ();
+
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
@@ -1499,7 +1529,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
         if (do_relight)
           linfo->InitializeDefault ();
         else
-          linfo->ReadFromCache (0);               // ID?
+          linfo->ReadFromCache (cm, 0);               // ID?
         linfo->DecRef ();
       }
     }
@@ -1578,7 +1608,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
           iLightingInfo);
       if (linfo)
       {
-        if (do_relight) linfo->WriteToCache (0);  // @@@ id
+        if (do_relight) linfo->WriteToCache (cm, 0);  // @@@ id
         linfo->PrepareLighting ();
         linfo->DecRef ();
       }
@@ -1592,6 +1622,9 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   if (do_relight) Report ("Updating VFS....");
   if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
   if (do_relight) Report ("DONE!");
+
+  // Release the cache manager again.
+  cm->DecRef ();
 
   delete lit;
 }

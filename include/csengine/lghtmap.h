@@ -33,6 +33,7 @@ class csEngine;
 class csDelayedLightingInfo;
 class csObject;
 struct iLight;
+struct iCacheManager;
 
 CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
 CS_DECLARE_STATIC_ARRAY (csShadowMapHelper, unsigned char);
@@ -194,14 +195,15 @@ public:
    * Read from the cache. Return true if succesful.
    * 'id' is a global id that is used to identify objects.
    */
-  bool ReadFromCache (int id, int w, int h,
+  bool ReadFromCache (iCacheManager* cache_mgr, int id, int w, int h,
     csObject* obj, bool isPolygon, csEngine*);
 
   /**
    * Cache the lightmaps in the precalculation area.
    * 'id' is a global id that is used to identify objects.
    */
-  void Cache (int id, csPolygon3D* poly, csCurve* curve, csEngine*);
+  void Cache (iCacheManager* cache_mgr, int id, csPolygon3D* poly,
+  	csCurve* curve, csEngine*);
 
   /**
    * Convert the lightmaps to the correct mixing mode.

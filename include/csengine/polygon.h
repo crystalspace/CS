@@ -51,6 +51,7 @@ class csThing;
 struct iLight;
 struct iGraphics2D;
 struct iGraphics3D;
+struct iCacheManager;
 
 /**
  * Structure containing lighting information valid
@@ -1014,14 +1015,14 @@ public:
    * If do_cache == false this function will not try to read the lightmap
    * from the cache.
    */
-  bool ReadFromCache (int id);
+  bool ReadFromCache (iCacheManager* cache_mgr, int id);
 
   /**
    * Call after calling InitializeDefault() and CalculateLighting to cache
    * the calculated lightmap to the level archive. This function does
    * nothing if the cached lightmap was already up-to-date.
    */
-  bool WriteToCache (int id);
+  bool WriteToCache (iCacheManager* cache_mgr, int id);
 
   /**
    * Prepare the lightmaps for use.

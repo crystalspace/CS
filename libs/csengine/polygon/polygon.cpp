@@ -34,6 +34,7 @@
 #include "csengine/thing.h"
 #include "csutil/garray.h"
 #include "csutil/debug.h"
+#include "csutil/memfile.h"
 #include "iutil/vfs.h"
 #include "csgeom/matrix2.h"
 #include "qint.h"
@@ -44,23 +45,14 @@
 #include "ivideo/txtmgr.h"
 
 // This is a static vector array which is adapted to the
-
 // right size everytime it is used. In the beginning it means
-
 // that this array will grow a lot but finally it will
-
 // stabilize to a maximum size (not big). The advantage of
-
 // this approach is that we don't have a static array which can
-
 // overflow. And we don't have to do allocation every time we
-
 // come here. We do an IncRef on this object each time a new
-
 // csPolygon3D is created and an DecRef each time it is deleted.
-
 // Thus, when the engine is cleaned, the array is automatically
-
 // cleaned too.
 static CS_DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
 
@@ -1974,7 +1966,7 @@ void csPolygon3D::InitializeDefault ()
   }
 }
 
-bool csPolygon3D::ReadFromCache (int id)
+bool csPolygon3D::ReadFromCache (iCacheManager* cache_mgr, int id)
 {
   if (orig_poly) return true;
 
@@ -1984,6 +1976,7 @@ bool csPolygon3D::ReadFromCache (int id)
     if (lmi->tex->lm == NULL) return true;
     if (
       !lmi->tex->lm->ReadFromCache (
+          cache_mgr,
           id,
           lmi->tex->w_orig,
           lmi->tex->h,
@@ -1998,16 +1991,10 @@ bool csPolygon3D::ReadFromCache (int id)
   csPolyTexGouraud *goi = GetGouraudInfo ();
   if (goi)
   {
-    extern void CacheName (
-                  char *buf,
-                  char *prefix,
-                  int id,
-                  unsigned long ident,
-                  char *suffix);
-    char buf[200];
-    CacheName (buf, "G", id, GetPolygonID (), "");
+    char* type = "lmpol_g";
+    uint32 uid = GetPolygonID ();
 
-    iDataBuffer *data = csEngine::current_engine->VFS->ReadFile (buf);
+    iDataBuffer *data = cache_mgr->ReadCache (type, NULL, uid);
     if (!data) return false;
 
     char *d = **data;
@@ -2045,7 +2032,7 @@ bool csPolygon3D::ReadFromCache (int id)
   return true;
 }
 
-bool csPolygon3D::WriteToCache (int id)
+bool csPolygon3D::WriteToCache (iCacheManager* cache_mgr, int id)
 {
   if (orig_poly) return true;
 
@@ -2059,7 +2046,8 @@ bool csPolygon3D::WriteToCache (int id)
       if (
         csEngine::current_engine->GetLightingCacheMode ()
           & CS_ENGINE_CACHE_WRITE)
-        lmi->tex->lm->Cache (id, this, NULL, csEngine::current_engine);
+        lmi->tex->lm->Cache (cache_mgr, id, this, NULL,
+		csEngine::current_engine);
     }
 
     return true;
@@ -2071,29 +2059,15 @@ bool csPolygon3D::WriteToCache (int id)
     if (!goi->gouraud_up_to_date)
     {
       goi->gouraud_up_to_date = true;
+      char* type = "lmpol_g";
+      uint32 uid = GetPolygonID ();
 
-      extern void CacheName (
-                    char *buf,
-                    char *prefix,
-                    int id,
-                    unsigned long ident,
-                    char *suffix);
       if (
         csEngine::current_engine->GetLightingCacheMode ()
           & CS_ENGINE_CACHE_WRITE)
       {
         csColor *sc = goi->GetStaticColors ();
-        char buf[200];
-        CacheName (buf, "G", id, GetPolygonID (), "");
-
-        iFile *cf = csEngine::current_engine->VFS->Open (buf, VFS_FILE_WRITE);
-        if (!cf)
-        {
-          csEngine::current_engine->Warn (
-              "Could not open '%s' for writing!\n",
-              buf);
-          return false;
-        }
+        csMemFile* cf = new csMemFile ();
 
         uint16 num_verts = convert_endian ((uint16) GetVertexCount ());
         cf->Write ((char *) &num_verts, sizeof (num_verts));
@@ -2110,6 +2084,12 @@ bool csPolygon3D::WriteToCache (int id)
           cf->Write ((char *) &b, sizeof (b));
         }
 
+	if (!cache_mgr->CacheData ((void*)(cf->GetData ()),
+		cf->GetSize (), type, NULL, uid))
+	{
+	  cf->DecRef ();
+	  return false;
+	}
         cf->DecRef ();
       }
     }

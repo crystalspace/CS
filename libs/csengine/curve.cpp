@@ -569,7 +569,7 @@ void csCurve::InitializeDefaultLighting ()
   LightmapUpToDate = false;
 }
 
-bool csCurve::ReadFromCache (int id)
+bool csCurve::ReadFromCache (iCacheManager* cache_mgr, int id)
 {
   if (!IsLightable ()) return true;
   LightMap = new csLightMap ();
@@ -587,6 +587,7 @@ bool csCurve::ReadFromCache (int id)
       b);
 
   LightMap->ReadFromCache (
+      cache_mgr,
       id,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
@@ -597,7 +598,7 @@ bool csCurve::ReadFromCache (int id)
   return true;
 }
 
-bool csCurve::WriteToCache (int id)
+bool csCurve::WriteToCache (iCacheManager* cache_mgr, int id)
 {
   if (!LightMap) return true;
   if (!LightmapUpToDate)
@@ -606,7 +607,7 @@ bool csCurve::WriteToCache (int id)
     if (
       csEngine::current_engine->GetLightingCacheMode ()
         & CS_ENGINE_CACHE_WRITE)
-      LightMap->Cache (id, NULL, this, csEngine::current_engine);
+      LightMap->Cache (cache_mgr, id, NULL, this, csEngine::current_engine);
   }
 
   return true;
