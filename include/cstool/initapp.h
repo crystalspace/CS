@@ -38,6 +38,7 @@ struct iPluginManager;
 struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
+struct iVFS;
 
 /**\name Plugin request macros
  * Utility macros to select what plugins you want to have loaded.
@@ -194,9 +195,26 @@ public:
    * 0 parameter. The 'ApplicationID' parameter is used to determine the
    * correct user-specific domain. It is possibly overriden by the application
    * config file option "System.ApplicationID".
+   *
+   * This method will load the VFS plugin if not already present in the given
+   * object registry.
    */
   static bool SetupConfigManager (iObjectRegistry*, const char* configName,
     const char *ApplicationID = "CrystalSpace.Noname");
+
+  /**
+   * Find or load the VFS plugin, add it to the given object registry, and
+   * return it. An alternate plugin ID for VFS may be given as well.
+   * Use this method if you need to make changes to VFS, or use an alternate
+   * VFS plugin, before calling SetupConfigManager. 
+   * Otherwise, SetupConfigManager will load the default VFS plugin
+   * automatically.
+   * objectReg can be the object registry object returned by CreateEnvironment,
+   * or one that you have manually set up with plugin and config manager
+   * objects.
+   */
+  static iVFS* SetupVFS(iObjectRegistry* objectReg, 
+          const char* pluginID = "crystalspace.kernel.vfs");
 
   /**
    * Request a few widely used standard plugins and also read

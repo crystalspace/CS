@@ -39,6 +39,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	  csGlobalHashIterator that allow them to be initialized from const
 	  hashmaps, and added methods to them for the manipulation of
 	  iterators initialized from const hashmaps.
+    - Reed Hedges added csInitializer::SetupVFS, and changed
+      csInitializer::SetupConfigManager to use that function.
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.

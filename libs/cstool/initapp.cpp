@@ -180,26 +180,8 @@ static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)
   }
 }
 
-bool csInitializer::SetupConfigManager (
-  iObjectRegistry* r, char const* configName, char const* AppID)
+iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
 {
-  SetupPluginLoadErrVerbosity(r);
-
-  if (config_done) return true;
-
-  // @@@ This is ugly.  We need a better, more generalized way of doing this.
-  // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
-  // Then later ensuring that we skip over this same plugin when requested
-  // by the client is even uglier.  The reason that the VFS plugin is required
-  // this early is that both the application configuration file and the
-  // configuration file for other plugins may (and almost always do) reside on
-  // a VFS volume.
-
-  // We first create an empty application config file, so we can create the
-  // config manager at all. Then we load the VFS. After that, all config files
-  // can be loaded. At the end, we make the user-and-application-specific
-  // config file the dynamic one.
-
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (r, iVFS));
   if (!VFS)
   {
@@ -209,14 +191,31 @@ bool csInitializer::SetupConfigManager (
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
-    VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs", iVFS);
+    VFS = CS_LOAD_PLUGIN (plugin_mgr, pluginID, iVFS);
     if (!VFS)
     {
-      fprintf (stderr, "Couldn't load vfs plugin!\n");
-      return false;
+      fprintf (stderr, "Couldn't load VFS plugin \"%s\"!\n", pluginID);
+      return 0;
     }
     r->Register (VFS, "iVFS");
   }
+  return VFS;
+}
+
+bool csInitializer::SetupConfigManager (
+  iObjectRegistry* r, char const* configName, char const* AppID)
+{
+  SetupPluginLoadErrVerbosity(r);
+
+  if (config_done) return true;
+
+  // @@@ Is this ugly? Do we need a better, more generalized way of doing this?
+  // The reason that the VFS plugin is required
+  // this early is that both the application configuration file and the
+  // configuration file for other plugins may (and almost always do) reside on
+  // a VFS volume.
+
+  csRef<iVFS> VFS = SetupVFS(r);
 
   csRef<iConfigManager> Config (CS_QUERY_REGISTRY (r, iConfigManager));
   csRef<iConfigFile> cfg = Config->GetDynamicDomain ();
