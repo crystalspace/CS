@@ -67,16 +67,6 @@ STDMETHODIMP csNetworkDriverSockets::Open()
 {
 	SysPrintf(MSG_INITIALIZATION, "\nNetwork driver stuff:\n");
 
-	SocksReady = false;
-	dwLastError = 0;
-
-	for(short i = 0; i < CS_NET_MAX_SOCKETS; i++)
-	{
-		SocketListening[CS_NET_MAX_SOCKETS] = false;
-		SocketConnected[CS_NET_MAX_SOCKETS] = false;
-		SocketInitialized[CS_NET_MAX_SOCKETS] = false;
-	}
-
 	if (InitSocks() == S_OK) SysPrintf(MSG_INITIALIZATION, "Network driver initialisation finished\n");
 	else SysPrintf(MSG_INITIALIZATION, "Network driver initialisation failed!\n");
 
@@ -145,7 +135,7 @@ STDMETHODIMP csNetworkDriverSockets::Disconnect(DWORD dwID)
 		dwLastError = CS_NET_DRV_ERR_NOT_INITIALIZED;
 		return S_FALSE;
 	}
-	if (!SocketConnected[dwID]) return S_FALSE;
+	if(!SocketConnected[dwID])
 	{
 		return S_OK;
 	}
@@ -198,7 +188,7 @@ STDMETHODIMP csNetworkDriverSockets::Send(DWORD dwID, DWORD dwBytesToSend, char 
 		dwLastError = CS_NET_DRV_ERR_NOT_INITIALIZED;
 		return S_FALSE;
 	}
-	if (!SocketConnected[dwID]) return S_FALSE;
+	if (!SocketConnected[dwID])
 	{
 		dwLastError = CS_NET_DRV_ERR_NOT_CONNECTED;
 		return S_FALSE;
@@ -221,7 +211,7 @@ STDMETHODIMP csNetworkDriverSockets::Receive(DWORD dwID, DWORD *lpdwBytesToRecei
 		dwLastError = CS_NET_DRV_ERR_NOT_INITIALIZED;
 		return S_FALSE;
 	}
-	if (!SocketConnected[dwID]) return S_FALSE;
+	if (!SocketConnected[dwID])
 	{
 		dwLastError = CS_NET_DRV_ERR_NOT_CONNECTED;
 		return S_FALSE;
@@ -411,7 +401,7 @@ STDMETHODIMP csNetworkDriverSockets::Kill(DWORD dwID)
 	if(!SocketInitialized[dwID]) return S_OK;
 
 #if !defined(NO_SOCKETS_SUPPORT)
-	#if defined(OS_WIN32)
+	#if (defined(OS_WIN32) || defined(OS_BE))
 	if(closesocket(Socket[dwID]))
 	{
 		dwLastError = CS_NET_DRV_ERR_CANNOT_CLOSE;
@@ -461,8 +451,6 @@ STDMETHODIMP csNetworkDriverSockets::KillAll()
 
 STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, CS_NET_ADDRESS *lpCSNetAddress/*out*/)
 {
-	(void) lpCSNetAddress;
-
 	if(!SocksReady)
 	{
 		dwLastError = CS_NET_DRV_ERR_NOT_INITIALIZED;
