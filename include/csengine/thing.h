@@ -956,6 +956,7 @@ public:
 
   void DynamicLightChanged (iDynLight* dynlight);
   void DynamicLightDisconnect (iDynLight* dynlight);
+  void StaticLightChanged (iStatLight* statlight);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -1123,6 +1124,8 @@ public:
     { scfParent->DynamicLightChanged (dynlight); }
     virtual void DynamicLightDisconnect (iDynLight* dynlight)
     { scfParent->DynamicLightDisconnect (dynlight); }
+    virtual void StaticLightChanged (iStatLight* statlight)
+    { scfParent->StaticLightChanged (statlight); }
   } scfiLightingInfo;
   friend struct LightingInfo;
 

@@ -30,8 +30,9 @@
 class csStatLight;
 struct iObject;
 struct iLight;
+struct iLightingInfo;
 
-SCF_VERSION (iStatLight, 0, 0, 1);
+SCF_VERSION (iStatLight, 0, 0, 3);
 
 /**
  * The iStatLight interface is the SCF interface
@@ -46,6 +47,12 @@ struct iStatLight : public iBase
   virtual iObject *QueryObject () = 0;
   /// Return the iLight for this light
   virtual iLight *QueryLight () = 0;
+
+  /**
+   * Add a mesh to this static light. This is usually
+   * called during the lighting procedure of a pseudo-dynamic light.
+   */
+  virtual void AddAffectedLightingInfo (iLightingInfo* li) = 0; 
 };
 
 /** @} */

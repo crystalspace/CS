@@ -530,7 +530,15 @@ struct iEngine : public iBase
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = NULL) = 0;
-  /// Create a dynamic light.
+
+  /**
+   * Create a dynamic light. After creating a dynamic light you have to
+   * call SetSector() on it. Do NOT add the light to the list of lights
+   * in a sector. That list is only for static or pseudo-dynamic lights.
+   * You also have to call Setup() on the dynamic light to actually calculate
+   * the lighting. This must be redone everytime the radius or the position
+   * changes (but not the color).
+   */
   virtual csPtr<iDynLight> CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
   /// Remove a dynamic light.

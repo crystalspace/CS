@@ -19,7 +19,6 @@
 #include "csgeom/frustum.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
-#include "csengine/lghtmap.h"
 #include "csengine/engine.h"
 #include "csengine/halo.h"
 #include "csengine/meshobj.h"
@@ -249,6 +248,7 @@ csStatLight::csStatLight (
 
 csStatLight::~csStatLight ()
 {
+  lightinginfos.DeleteAll ();
 }
 
 static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
@@ -305,24 +305,20 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   lpi->DecRef ();
 }
 
-void csStatLight::RegisterLightMap (csLightMap *lmap)
+void csStatLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
   if (!dynamic) return ;
-
-  int i;
-  for (i = 0; i < lightmaps.Length (); i++)
-    if (((csLightMap *)lightmaps[i]) == lmap) return ;
-  lightmaps.Push (lmap);
+  lightinginfos.Add (li);
 }
 
 void csStatLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
-
-  int i;
-  for (i = 0; i < lightmaps.Length (); i++)
+  csHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
   {
-    ((csLightMap *)lightmaps[i])->MakeDirtyDynamicLights ();
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->StaticLightChanged (&scfiStatLight);
   }
 }
 

@@ -291,8 +291,8 @@ private:
    */
   bool dynamic;
 
-  /// Vector of lightmaps that are affected by this dynamic light.
-  csVector lightmaps;
+  /// Set of meshes that we are currently affecting.
+  csHashSet lightinginfos;
 
 public:
   /**
@@ -330,12 +330,8 @@ public:
    */
   virtual void SetColor (const csColor& col);
 
-  /**
-   * Register a lightmap for a pseudo-dynamic light.
-   * Every lightmap which is interested in updating itself
-   * as this light changes should register itself to the light.
-   */
-  void RegisterLightMap (csLightMap* lmap);
+  /// Add affected mesh.
+  void AddAffectedLightingInfo (iLightingInfo* li);
 
   /**
    * Shine this light on all polygons visible from the light.
@@ -371,6 +367,8 @@ public:
     { return &scfParent->scfiLight; }
     virtual bool IsDynamic ()
     { return scfParent->IsDynamic (); }
+    virtual void AddAffectedLightingInfo (iLightingInfo* li)
+    { scfParent->AddAffectedLightingInfo (li); }
   } scfiStatLight;
   friend struct eiStaticLight;
 };

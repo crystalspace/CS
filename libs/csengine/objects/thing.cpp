@@ -296,7 +296,7 @@ void csThing::MarkLightmapsDirty ()
 #endif // CS_USE_NEW_RENDERER
 }
 
-void csThing::DynamicLightChanged (iDynLight* dynlight)
+void csThing::DynamicLightChanged (iDynLight* /*dynlight*/)
 {
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
@@ -323,6 +323,21 @@ void csThing::DynamicLightDisconnect (iDynLight* dynlight)
   {
     csCurve *c = GetCurve (i);
     c->DynamicLightDisconnect (dynlight);
+  }
+}
+
+void csThing::StaticLightChanged (iStatLight* /*statlight*/)
+{
+  int i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D *p = GetPolygon3D (i);
+    p->MakeDirtyDynamicLights ();
+  }
+  for (i = 0; i < curves.Length (); i++)
+  {
+    csCurve *c = GetCurve (i);
+    c->MakeDirtyDynamicLights ();
   }
 }
 
@@ -2717,6 +2732,9 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
     	  lpi->GetLight ()));
       lpi->AttachUserdata (lptq);
     }
+    csRef<iStatLight> sl = SCF_QUERY_INTERFACE (lpi->GetLight (),
+    	iStatLight);
+    sl->AddAffectedLightingInfo (&scfiLightingInfo);
   }
   else
   {

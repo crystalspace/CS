@@ -134,9 +134,6 @@ csShadowMap *csLightMap::NewShadowMap (csLight *light, int w, int h)
 
   smap->Alloc (&light->scfiLight, w, h);
 
-  csRef<iStatLight> slight (SCF_QUERY_INTERFACE (light, iStatLight));
-  slight->GetPrivateObject ()->RegisterLightMap (this);
-
   return smap;
 }
 
@@ -246,11 +243,18 @@ bool csLightMap::ReadFromCache (
 
   csPolygon3D *poly = NULL;
   csCurve *curve = NULL;
+  csThing* parent;
 
   if (isPolygon)
+  {
     poly = (csPolygon3D *)obj;
+    parent = poly->GetParent ();
+  }
   else
+  {
     curve = (csCurve *)obj;
+    parent = curve->GetParentThing ();
+  }
 
   SetSize (w, h);
 
@@ -357,6 +361,9 @@ bool csLightMap::ReadFromCache (
   if (expected_size != size)
     return false;
 
+  iLightingInfo* li;
+  li = &(parent->scfiLightingInfo);
+
   for (i = 0 ; i < lh.dyn_cnt ; i++)
   {
     if (file->Read ((char*)&ls.light_id, sizeof (ls.light_id))
@@ -369,6 +376,10 @@ bool csLightMap::ReadFromCache (
     {
       light = il->GetPrivateObject ();
       csShadowMap *smap = NewShadowMap (light, w, h);
+
+      csRef<iStatLight> slight (SCF_QUERY_INTERFACE (il, iStatLight));
+      slight->AddAffectedLightingInfo (li);
+
       if ((long) file->Read ((char*)(smap->GetArray ()), lm_size) != lm_size)
         return false;
       smap->CalcMaxShadow ();

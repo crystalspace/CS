@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+20-Dec-2002
+	- Clarified a few Doxygen comments in the engine.
+	- Added iLightingInfo->StaticLightChanged() to notify a mesh
+	  object that a pseudo-dynamic light has changed intensity.
+	- Added iStatLight->AddAffectedLightingInfo().
+	- Removed csStatLight->RegisterLightMap(). With this another
+	  dependency between csThing and csEngine is removed. This also
+	  fixes a bug where pseudo-dynamic lights changing wouldn't affect
+	  lighting on a mesh rendered with DrawPolygonMesh.
 19-Dec-2002
 	- Added iDynLight->AddAffectedLightingInfo(). The plan is to make
 	  dynamic lights work on a base of meshes instead of curves and
