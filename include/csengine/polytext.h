@@ -28,7 +28,7 @@ class csPolyPlane;
 class csLightMap;
 class csLightPatch;
 class csFrustumView;
-class csFrustumViewCleanup;
+struct csFrustumViewCleanup;
 class csBitSet;
 class Dumper;
 struct iMaterialHandle;
