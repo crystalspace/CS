@@ -43,6 +43,10 @@ chronological order.
 	  an existing super lightmap. This is done if the lightmaps to be 
 	  distributed would fit onto the enlarged super lightmap and less than
 	  a specified area of the SLM would be unused.
+	- Rhad added code to call existing signalListBoxScrolled.  Added
+	  signalListBoxStateChanged called when the state of a stateful
+	  column is changed.  Added documentation for both signals as well
+	  as the existing implemented signalListBoxFocused.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With
