@@ -1,7 +1,7 @@
 #ifndef __AWS_WINDOW_H__
 #define __AWS_WINDOW_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
+    Copyright (C) 2000-2001 by Christopher Nelson
     
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -49,6 +49,14 @@ private:
     void LinkBelow(awsWindow *win);
 
 public:
+   static const unsigned long sWindowRaised;
+   static const unsigned long sWindowLowered;
+   static const unsigned long sWindowHidden;
+   static const unsigned long sWindowShown;
+   static const unsigned long sWindowClosed;
+   
+   
+public:
     /// Raises a window to the top.
     void Raise();
 
@@ -65,11 +73,37 @@ public:
 
 public:
     /// Event triggered when a window is about to be raised
-    virtual bool OnRaise();
+    virtual void OnRaise();
 
     /// Event triggered when a window is about to be lowered
-    virtual bool OnLower();
+    virtual void OnLower();
 
+    /// Triggered when the component needs to draw
+    virtual void OnDraw(awsCanvas &canvas);
+
+    /// Triggered when the user presses a mouse button down
+    virtual bool OnMouseDown(int button, int x, int y);
+    
+    /// Triggered when the user unpresses a mouse button 
+    virtual bool OnMouseUp(int button, int x, int y);
+    
+    /// Triggered when the user moves the mouse
+    virtual bool OnMouseMove(int button, int x, int y);
+
+    /// Triggered when this component loses mouse focus
+    virtual bool OnMouseExit();
+
+    /// Triggered when this component gains mouse focus
+    virtual bool OnMouseEnter();
+
+    /// Triggered when the user presses a key
+    virtual bool OnKeypress(int key);
+    
+    /// Triggered when the keyboard focus is lost
+    virtual bool OnLostFocus();
+
+    /// Triggered when the keyboard focus is gained
+    virtual bool OnGainFocus();
 };
 
 

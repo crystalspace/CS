@@ -68,6 +68,23 @@ awsManager::SetDefaultContext()
   ptG3D = canvas.G3D();
 }
 
+void
+awsManager::Mark(csRect &rect)
+{
+   for(int i=0; i<dirty_lid; ++i)
+   {
+       if (dirty[i].Intersects(rect))
+	 dirty[i].AddAdjanced(rect);
+   }
+
+   //  If we get here it's because the rectangle didn't fit anywhere. So,
+   // add in a new one.
+   if (dirty_lid>15)
+     dirty[15].AddAdjanced(rect);
+
+   else
+     dirty[dirty_lid++].Set(rect);
+}
 
 
  //// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////

@@ -33,3 +33,10 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
 
 }
 
+void
+awsComponent::Invalidate()
+{
+  WindowManager()->Mark(frame);
+}
+
+

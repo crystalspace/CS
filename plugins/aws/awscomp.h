@@ -21,6 +21,7 @@
 #include "isys/plugin.h"
 #include "csgeom/csrect.h"
 #include "awsprefs.h"
+#include "awsslot.h"
 
 class awsCanvas;
 
@@ -43,7 +44,7 @@ class awsCanvas;
 *                                                                              
 *                                                                                                                         *
 **************************************************************************************************************************/
-class awsComponent
+class awsComponent : public awsSigSrc
 {
    /// The stored handle to the window manager, in case a component needs it.
    iAws  *wmgr;
@@ -68,6 +69,8 @@ public:
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent();
 
+    /// Invalidation routine: allow the component to be redrawn when you call this
+    virtual void Invalidate();
 
 protected:
     /// Get's this components idea of the window manager.  Should be used internally by the component ONLY.
@@ -101,6 +104,7 @@ public:
 
     /// Triggered when the keyboard focus is gained
     virtual bool OnGainFocus()=0;
+
 };
 
 #endif

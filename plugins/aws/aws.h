@@ -38,8 +38,16 @@ class awsManager : public iAws
    /// Handle to the preference manager.
    iAwsPrefs *prefmgr;
 
-   /// The rect which maintains what needs to be invalidated, and thus redrawn.
-   csRect     dirty;
+   /** The group of rects which maintain what needs to be invalidated, and
+    * thus redrawn.  Rectangles which overlap or contain each other will be merged
+    * too keep overdraw to a minimum.  Having multiple dirty zones allows us to
+    * perform a scatter/gather sort of update.  This is especially useful when
+    * updating several small areas.
+    */
+   csRect     dirty[16];
+
+   /// This contains the index of the highest dirty rect containing valid info.
+   int dirty_lid;
 
    /// The current top window
    awsWindow   *top;
@@ -73,6 +81,7 @@ class awsManager : public iAws
         { return ptG3D; }
    };
 
+   /// Procedural texture canvas instantiation
    awsCanvas canvas;
 
 public:
@@ -96,6 +105,9 @@ public:
     virtual void       SetTopWindow(awsWindow *_top);
 
     /// Redraw whatever portions of the screen need it.
+
+    /// Mark a section of the screen dirty
+    virtual void Mark(csRect &rect);
 
 public:
     /// Set the contexts however you want

@@ -1,6 +1,13 @@
 #include "cssysdef.h"
 #include "awswin.h"
 
+const unsigned long awsWindow::sWindowRaised  = 0x1;
+const unsigned long awsWindow::sWindowLowered = 0x2;
+const unsigned long awsWindow::sWindowShown   = 0x3;
+const unsigned long awsWindow::sWindowHidden  = 0x4;
+const unsigned long awsWindow::sWindowClosed  = 0x5;
+
+
 void 
 awsWindow::Unlink()
 {
@@ -72,13 +79,15 @@ awsWindow::Lower()
 }
 
 void
-OnRaise()
+awsWindow::OnRaise()
 {
+   Broadcast(sWindowRaised);
    return;
 }
 
 void 
-OnLower()
+awsWindow::OnLower()
 {
+   Broadcast(sWindowLowered);
    return;
 }
