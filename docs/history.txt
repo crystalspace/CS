@@ -58,6 +58,18 @@ chronological order.
 	- Jorrit removed CS_CULLER_HINT_CONVEX and CS_CULLER_HINT_CLOSED.
 	  These are now obsolete since they are replaced by CS_POLYMESH_...
 	  flags.
+	- res made the following changes wrt the stencil shadow render step:
+	    - Loading the shadow shader now happens upon a 'system load' event,
+	      not when a render step is created. The old way was problematic,
+	      as it required certain shader plugins that don't work well with
+	      unopened systems (e.g. the GL shaders need the extension manager.)
+	    - The hashes used now take advantage of templated key types.
+	    - There were circular references between csStencilShadowStep and
+	      csStencilShadowCacheEntry. Now only csStencilShadowStep holds
+	      csStencilShadowCacheEntry references.
+	    - csStencilShadowStep::Perform() now uses a viscallback to 
+	      iterate over shadowing meshes.
+	    - The CLOSED/NOTCLOSED flags of the shadow poly meshes are honored.
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap

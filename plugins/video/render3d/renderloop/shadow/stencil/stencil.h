@@ -40,12 +40,13 @@
 #include "../../common/parserenderstep.h"
 
 class csStencilShadowStep;
+class csStencilShadowType;
 
 class csStencilShadowCacheEntry : public iObjectModelListener,
 				  public iRenderBufferSource
 {
 private:
-  csRef<csStencilShadowStep> parent;
+  csStencilShadowStep* parent;
   iObjectModel* model;
   iMeshWrapper* meshWrapper;
 
@@ -56,7 +57,7 @@ private:
     csRef<iRenderBuffer> shadow_index_buffer;
     int edge_start, index_range;
   };
-  csHash<csLightCacheEntry*> lightcache;
+  csHash<csLightCacheEntry*, iLight*> lightcache;
 
   csRef<iRenderBuffer> shadow_vertex_buffer;
   csRef<iRenderBuffer> shadow_normal_buffer;
@@ -78,6 +79,8 @@ private:
 
   bool enable_caps;
 
+  bool meshShadows;
+
   void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
 public:
   SCF_DECLARE_IBASE;
@@ -93,6 +96,8 @@ public:
   void EnableShadowCaps () { enable_caps = true; }
   void DisableShadowCaps () { enable_caps = false; }
   bool ShadowCaps () { return enable_caps; }
+
+  bool MeshCastsShadow () { return meshShadows; }
 };
 
 class csStencilShadowStep : public iRenderStep,
@@ -104,8 +109,7 @@ private:
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics3D> g3d;
-  csRef<iShader> shadow;
-  csRef<iShaderWrapper> shadowWrapper;
+  csRef<csStencilShadowType> type;
 
   static csStringID shadow_vertex_name;
   static csStringID shadow_normal_name; 
@@ -113,7 +117,9 @@ private:
 
   csRefArray<iLightRenderStep> steps;
 
-  csHash< csRef<csStencilShadowCacheEntry> > shadowcache;
+  csArray<iMeshWrapper*> shadowMeshes;
+  csHash< csRef<csStencilShadowCacheEntry>, iMeshWrapper*> shadowcache;
+
   void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, 
     iShaderPass *pass);
 
@@ -122,7 +128,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csStencilShadowStep (iBase *parent);
+  csStencilShadowStep (csStencilShadowType* type);
   virtual ~csStencilShadowStep ();
 
   bool Initialize (iObjectRegistry* objreg);
@@ -133,7 +139,7 @@ public:
   virtual int AddStep (iRenderStep* step);
   virtual int GetStepCount ();
 
-/*  struct ShadowDrawVisCallback : public iVisibilityCullerListener
+  struct ShadowDrawVisCallback : public iVisibilityCullerListener
   {    
     csStencilShadowStep* parent;
 
@@ -143,16 +149,18 @@ public:
 
     virtual void ObjectVisible (iVisibilityObject *visobject, 
       iMeshWrapper *mesh);
-  } shadowDrawVisCallback;*/
+  } shadowDrawVisCallback;
 };
 
 class csStencilShadowFactory : public iRenderStepFactory
 {
   csRef<iObjectRegistry> object_reg;
+  csRef<csStencilShadowType> type;
 public:
   SCF_DECLARE_IBASE;
 
-  csStencilShadowFactory (iBase *p, iObjectRegistry* object_reg);
+  csStencilShadowFactory (iObjectRegistry* object_reg,
+      csStencilShadowType* type);
   virtual ~csStencilShadowFactory ();
 
   virtual csPtr<iRenderStep> Create ();
@@ -161,11 +169,38 @@ public:
 
 class csStencilShadowType : public csBaseRenderStepType
 {
+  void Report (int severity, const char* msg, ...);
+
+  void Open ();
+  void Close ();
 public:
+  csRef<iShader> shadow;
+  csRef<iShaderWrapper> shadowWrapper;
+
   csStencilShadowType (iBase* p);
   virtual ~csStencilShadowType ();
 
+  virtual bool Initialize (iObjectRegistry* object_reg);
+
   virtual csPtr<iRenderStepFactory> NewFactory ();
+
+  bool HandleEvent (iEvent& Event);
+
+  struct EventHandler : public iEventHandler
+  {
+  private:
+    csStencilShadowType* parent;
+  public:
+    EventHandler (csStencilShadowType* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      EventHandler::parent = parent;
+    }
+    
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev) 
+      { return parent->HandleEvent (ev); }
+  } *scfiEventHandler;
 };
 
 class csStencilShadowLoader : public csBaseRenderStepLoader
