@@ -11442,6 +11442,7 @@ package cspace::iView;
 *UpdateClipper = *cspacec::iView_UpdateClipper;
 *GetClipper = *cspacec::iView_GetClipper;
 *Draw = *cspacec::iView_Draw;
+*SetAutoResize = *cspacec::iView_SetAutoResize;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12417,6 +12418,7 @@ sub DESTROY {
 *ClearView = *cspacec::csView_ClearView;
 *AddViewVertex = *cspacec::csView_AddViewVertex;
 *RestrictClipperToScreen = *cspacec::csView_RestrictClipperToScreen;
+*SetAutoResize = *cspacec::csView_SetAutoResize;
 *UpdateClipper = *cspacec::csView_UpdateClipper;
 *GetClipper = *cspacec::csView_GetClipper;
 *Draw = *cspacec::csView_Draw;
