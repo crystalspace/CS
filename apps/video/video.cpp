@@ -126,8 +126,9 @@ bool Video::Initialize (int argc, const char* const argv[],
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
+  LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
+
   iMaterialWrapper *iMW = QUERY_INTERFACE (tm, iMaterialWrapper);
  
   room = engine->CreateCsSector ("room");
