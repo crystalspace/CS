@@ -1038,6 +1038,25 @@ AS_IF([test -d /usr/local/include],
 
 
 #------------------------------------------------------------------------------
+# Check for typical required libraries.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_COMMON_LIBS],
+    [AC_LANG_PUSH([C])
+    AC_CHECK_LIB([m], [pow],
+	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-lm], [+])
+	cs_cv_libm=yes],
+	[cs_cv_libm=no])
+    AC_CHECK_LIB([dl], [dlopen],
+	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-ldl], [+])])
+    AC_CHECK_LIB([nsl], [gethostbyname],
+	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-lnsl], [+])])
+    AC_LANG_POP([C])])
+
+CS_CHECK_COMMON_LIBS
+
+
+
+#------------------------------------------------------------------------------
 # Check for X-Windows.  If the X-Windows implementation is XFree86, then also
 # enable the `VideoMode' extension.
 #------------------------------------------------------------------------------
@@ -1286,13 +1305,21 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 # Check for lib3ds.  In addition to the standard installed locations, we
 # also search CS/libs/lib3ds*.
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([3ds],
-    [AC_LANG_PROGRAM(
-	[#include <lib3ds/file.h>],
-	[lib3ds_file_new();])],
-    [libs/lib3ds*], [],                                                         
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [],
-    [], [],[-lm])
+AC_DEFUN([CS_CHECK_LIB3DS],
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
+    AS_IF([test $cs_cv_libm = yes],
+	[cs_3ds_libs_test='-lm'], [cs_3ds_libs_test=''])
+    CS_CHECK_LIB_WITH([3ds],
+	[AC_LANG_PROGRAM(
+	    [#include <lib3ds/file.h>],
+	    [lib3ds_file_new();])],
+	[libs/lib3ds*], [],                                                         
+	[CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [],
+	[], [], [$cs_3ds_libs_test])])
+
+CS_CHECK_LIB3DS
+
+
 
 #-----------------------------------------------------------------------------
 # Check for libode.  In addition to the standard installed locations, we
@@ -1398,18 +1425,6 @@ CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
 	[pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
     [cs_pthread_flags], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for typical required libraries.
-#------------------------------------------------------------------------------
-AC_LANG_PUSH([C])
-AC_CHECK_LIB([m], [pow], [CS_MAKEFILE_PROPERTY([LIBS.EXE], [-lm], [+])])
-AC_CHECK_LIB([dl], [dlopen], [CS_MAKEFILE_PROPERTY([LIBS.EXE], [-ldl], [+])])
-AC_CHECK_LIB([nsl], [gethostbyname],
-    [CS_MAKEFILE_PROPERTY([LIBS.EXE], [-lnsl], [+])])
-AC_LANG_POP([C])
 
 
 

@@ -36,6 +36,9 @@ The history order is reversed so that new features are at the top.
 	- Matze Braun tweaked the list of apps "make install" installs and
 	  added a call to "cslight" with flarge and partsys to the end of the
 	  install process.
+	- Eric Sunshine fixed the lib3ds test in configure.ac so that it no
+	  longer assumes unconditionally that libm.a is present.  Not all
+	  platforms have libm.a
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
