@@ -93,7 +93,7 @@ rule CompileResources
 rule Win32Resource
 {
     local target = $($(<)_TARGET) ;
-    local rcobject = [ DoObjectGrist _resource.o ] ;
+    local rcobject = [ DoObjectGrist $(<)_resource.o ] ;
     LOCATE on $(rcobject) = $(LOCATE_TARGET) ;
     SEARCH on $(rcobject) = $(LOCATE_TARGET) ;
     
