@@ -44,6 +44,9 @@ chronological order.
 	  `ranlib' on the installed libraries.  (Instead, it incorrectly
 	  invoked ranlib just after building the libraries, which is completely
 	  ineffectual.)
+	- res fixed a cut'n'paste error in spr2d: the vertex/color/texcoord
+	  render buffers were errorneously flagged as 'index buffers', causing
+	  display corruption when VBO was enabled.
 31-Mar-2004
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
 	  be able to register hits on meshes that don't return a polygon

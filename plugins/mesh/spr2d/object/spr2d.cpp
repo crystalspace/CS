@@ -496,7 +496,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   csRenderMesh*& rm = rmHolder.GetUnusedMesh(meshCreated);
   if (meshCreated)
   {
-    rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;// CS_MESHTYPE_TRIANGLES;
+    rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
     rm->material = material;
     rm->variablecontext = svcontext;
     rm->geometryInstance = this;
@@ -508,7 +508,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   rm->clip_z_plane = clip_z_plane;
   rm->do_mirror = camera->IsMirrored ();
   rm->indexstart = 0;
-  rm->indexend = (vertices.Length()/* - 2*/)/* * 3*/;
+  rm->indexend = vertices.Length();
   rm->inUse = true;
   rm->object2camera = tr_o2c;
 
@@ -525,7 +525,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
   const csStringID name = variable->GetName ();
   if (name == index_name)
   {
-    size_t indexSize = sizeof (uint) * (vertices.Length()/* - 2*/)/* * 3*/;
+    size_t indexSize = sizeof (uint) * vertices.Length();
     if (!index_buffer.IsValid() || 
       (indicesSize != indexSize))
     {
@@ -537,11 +537,9 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       csRenderBufferLock<uint> indexLock (index_buffer);
       uint* ptr = indexLock;
 
-      for (int i = 0/*2*/; i < vertices.Length(); i++)
+      for (int i = 0; i < vertices.Length(); i++)
       {
 	*ptr++ = i;
-	//*ptr++ = i - 1;
-	//*ptr++ = i;
       }
       indicesSize = indexSize;
     }
@@ -556,7 +554,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 	texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  texelSize, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 2, true));
+	  CS_BUFCOMP_FLOAT, 2, false));
 	variable->SetValue (texel_buffer);
       }
 
@@ -581,7 +579,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 	color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  color_size, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 3, true));
+	  CS_BUFCOMP_FLOAT, 3, false));
 	variable->SetValue (color_buffer);
       }
 
@@ -604,7 +602,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 	vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  vertices_size, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 3, true));
+	  CS_BUFCOMP_FLOAT, 3, false));
 	variable->SetValue (vertex_buffer);
       }
 
