@@ -410,7 +410,6 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-     //@@@: Do the tests for >0 increase or decrease performance?
       if (color.red > 0)
       {
         lval = mapR[uv] + QRound (color.red * brightness);

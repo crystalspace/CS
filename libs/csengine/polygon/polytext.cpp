@@ -742,7 +742,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   bool first_time = false;  // Set to true if this is the first pass for the dynamic light
   csStatLight *light = (csStatLight *)lview.userdata;
   bool dyn = light->IsDynamic ();
-  csVector3 &lightpos = lview.light_frustum->GetOrigin ();
+  csVector3& lightpos = lview.light_frustum->GetOrigin ();
 
   if (dyn)
   {
@@ -872,6 +872,12 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   int MaxIndex = -1, MinIndex = -1;
   float inv_lightcell_size = 1.0 / lightcell_size;
 
+  csVector3 lightpos;
+  if (lp->light_frustum)
+    lightpos = lp->light_frustum->GetOrigin ();
+  else
+    lightpos = light->GetCenter ();
+
   // Calculate the uv's for all points of the frustum (the
   // frustum is actually a clipped version of the polygon).
   csVector2* f_uv = NULL;
@@ -887,8 +893,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 
       // T = Mwt * (W - Vwt)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
-      //@@@ This is only right if we don't allow reflections on dynamic lights
-      v1 = txt_pl->m_world2tex * (lp->vertices[mi] + light->GetCenter () - txt_pl->v_world2tex);
+      v1 = txt_pl->m_world2tex * (lp->vertices[mi] + lightpos - txt_pl->v_world2tex);
       f_uv[i].x = (v1.x * ww - Imin_u) * inv_lightcell_size;
       f_uv[i].y = (v1.y * hh - Imin_v) * inv_lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
@@ -983,11 +988,11 @@ b:      if (scanL2 == MinIndex) goto finish;
 
     while (sy >= fin_y)
     {
-      // @@@ This should not be needed. But if this line isn't here
-      // then I can get crashes with dynamic lights. This happens
-      // easily if I use room.zip. We need to investigate exactly
-      // why this can occur. In principle it shouldn't.
-      if (sy < 0) goto finish;
+      // @@@ The check below should not be needed but it is.
+      if (sy < 0)
+      {
+        goto finish;
+      }
     
       // Compute the rounded screen coordinates of horizontal strip
       float _l = sxL, _r = sxR;
@@ -1028,14 +1033,12 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 	if (!shadow)
 	{
-	  //@@@ This is only right if we don't allow reflections for dynamic lights
-	  d = csSquaredDist::PointPoint (light->GetCenter (), v2);
+	  d = csSquaredDist::PointPoint (lightpos, v2);
 
 	  if (d >= light->GetSquaredRadius ()) continue;
 	  d = qsqrt (d);
 
-	  //@@@ This is only right if we don't allow reflections for dynamic lights
-	  float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+	  float cosinus = (v2-lightpos)*polygon->GetPolyPlane ()->Normal ();
 	  cosinus /= d;
 	  cosinus += cosfact;
 	  if (cosinus < 0) cosinus = 0;

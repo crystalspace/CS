@@ -1887,7 +1887,10 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   }
 
   if (po)
-    po->CheckFrustum (new_lview, GetAlpha ());
+  {
+    if (!new_lview.dynamic || !po->flags.Check (CS_PORTAL_MIRROR))
+      po->CheckFrustum (new_lview, GetAlpha ());
+  }
   else if (!new_lview.dynamic && csSector::do_radiosity)
   {
     // If there is no portal we simulate radiosity by creating

@@ -1,9 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+16-Feb-2001
+	- Dynamic lights do not traverse through mirroring portals anymore.
+	  This caused a bug because the dynamic lighting routine can't handle
+	  this correctly. Rather than fixing this routine (which would make
+	  it slower) I choose to just disable this feature.
+	- The dynamic lighting routine also accounts for space warping
+	  portals now.
 15-Feb-2001
 	- Updated various parts of the documentation. The most important
 	  change is that the simple tutorial has been updated to the mesh
 	  object plugin system.
+	- Martin Geisse updated the documentation to deal with the new
+	  config system. Martin also added some hints from Paulo Candido
+	  to the win32 docs.
 	- Fixed an old bug in the OpenGL canvas. The ScreenShot() function
 	  did not work correctly on big-endian systems in 32-bit display
 	  mode. The colors were wrong.
