@@ -39,6 +39,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (PATHMESH)
   CS_TOKEN_DEF (PATHCAMERA)
   CS_TOKEN_DEF (PATH)
+  CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (TEST)
   CS_TOKEN_DEF (DELAY)
   CS_TOKEN_DEF (FADE)
@@ -345,6 +346,7 @@ static bool ParseVectorList (char* buf, csVector3* list, int num)
 csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (NUM)
     CS_TOKEN_TABLE (POS)
     CS_TOKEN_TABLE (FORWARD)
@@ -372,6 +374,22 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
     }
     switch (cmd)
     {
+      case CS_TOKEN_FILE:
+      {
+	char fname[255];
+	ScanStr (params, "%s", fname);
+  	iDataBuffer* buf = demo->VFS->ReadFile (fname);
+	if (!buf || !buf->GetSize ())
+	{
+	  if (buf) buf->DecRef ();
+	  demo->Printf (MSG_FATAL_ERROR,
+	    "Could not open path file '%s' on VFS!\n", fname);
+	  exit (0);
+	}
+	np = LoadPath (**buf, pName);
+	buf->DecRef ();
+	return np;
+      }
       case CS_TOKEN_NUM:
       {
         if (seq != 0)

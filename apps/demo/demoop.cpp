@@ -116,6 +116,7 @@ void ShowMeshOp::Do (cs_time dt)
     movable->SetSector (sector);
     movable->SetPosition (pos);
     movable->UpdateMove ();
+    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
 }
 

@@ -22,6 +22,7 @@
 #include "demoop.h"
 #include "demoldr.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "iengine/engine.h"
@@ -82,11 +83,12 @@ void DemoSequenceManager::Setup (const char* sequenceFileName)
 {
   DemoSequenceLoader* loader = new DemoSequenceLoader (
   	DemoSequenceManager::demo, this, seqmgr, sequenceFileName);
-  iSequence* seq = loader->GetSequence ("main");
-  seqmgr->RunSequence (0, seq);
-  seq->DecRef ();
+  main_sequence = loader->GetSequence ("main");
+  seqmgr->RunSequence (0, main_sequence);
+  // Don't decref main_sequence because we might need it later.
   seqmgr->Resume ();
   suspended = false;
+  delete loader;
 }
 
 void DemoSequenceManager::Suspend ()
@@ -119,9 +121,32 @@ void DemoSequenceManager::Resume ()
   }
 }
 
+void DemoSequenceManager::Restart (const char* sequenceFileName)
+{
+  seqmgr->Clear ();
+  int i;
+  for (i = 0 ; i < paths.Length () ; i++)
+  {
+    csNamedPath* np = (csNamedPath*)paths[i];
+    delete np;
+  }
+  paths.DeleteAll ();
+  for (i = 0 ; i < pathForMesh.Length () ; i++)
+  {
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    delete pfm;
+  }
+  pathForMesh.DeleteAll ();
+  do_camera_path = false;
+  do_fade = false;
+  fade_value = 0;
+  suspended = true;
+  suspend_one_frame = false;
+  Setup (sequenceFileName);
+}
+
 void DemoSequenceManager::TimeWarp (cs_time dt)
 {
-  seqmgr->TimeWarp (dt, false);
   // Now we correct all time information in the sequencer
   // so that it appears as if we just go on from here.
   start_fade_time -= dt;
@@ -132,6 +157,15 @@ void DemoSequenceManager::TimeWarp (cs_time dt)
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
     pfm->start_path_time -= dt;
   }
+
+  seqmgr->TimeWarp (dt, false);
+  if (seqmgr->IsEmpty ())
+  {
+    // If the sequence manager is empty we insert the main sequence
+    // again.
+    seqmgr->RunSequence (0, main_sequence);
+  }
+
   if (suspended)
   {
     Resume ();
@@ -234,6 +268,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time)
     movable->SetPosition (pos);
     movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
     movable->UpdateMove ();
+    pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
     if (!do_path)
     {
       delete pfm;
@@ -260,6 +295,246 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time)
     camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
   }
   if (suspend_one_frame) { Suspend (); suspend_one_frame = false; }
+}
+
+void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
+	const csVector2& tl, const csVector2& br, int selpoint)
+{
+  int dim = demo->G2D->GetHeight ()-10;
+  int col = demo->col_gray;
+  if (hi) col = demo->col_white;
+  float r;
+  csVector3 p;
+  for (r = 0 ; r <= 1 ; r += .001)
+  {
+    np->Calculate (r);
+    np->GetInterpolatedPosition (p);
+    int x = int ((p.x-tl.x)*dim / (br.x-tl.x));
+    int y = int ((p.z-tl.y)*dim / (br.y-tl.y));
+    if (x > 0 && x < dim && y > 0 && y < dim)
+      demo->G2D->DrawPixel (x, y, col);
+  }
+  float* px, * py, * pz;
+  px = np->GetDimensionValues (0);
+  py = np->GetDimensionValues (1);
+  pz = np->GetDimensionValues (2);
+  float* fx, * fy, * fz;
+  fx = np->GetDimensionValues (6);
+  fy = np->GetDimensionValues (7);
+  fz = np->GetDimensionValues (8);
+  int j;
+  for (j = 0 ; j < np->GetNumPoints () ; j++)
+  {
+    int col = demo->col_red;
+    if (hi && selpoint == j) col = demo->col_green;
+    int x = int ((px[j]-tl.x)*dim/(br.x-tl.x));
+    int y = int ((pz[j]-tl.y)*dim/(br.y-tl.y));
+    if (x > 0 && x < dim && y > 0 && y < dim)
+    {
+      demo->G2D->DrawPixel (x, y, col);
+      demo->G2D->DrawPixel (x-1, y, col);
+      demo->G2D->DrawPixel (x+1, y, col);
+      demo->G2D->DrawPixel (x, y-1, col);
+      demo->G2D->DrawPixel (x, y+1, col);
+      if (hi && selpoint == j)
+      {
+        csVector3 forward (fx[j], fy[j], fz[j]);
+        forward.Normalize ();
+        forward *= 20.;
+        demo->G2D->DrawLine (x, y, int (x+forward.x), int (y-forward.z),
+      	  demo->col_cyan);
+      }
+    }
+  }
+}
+
+void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
+	const char* hilight, const csVector2& tl, const csVector2& br,
+	int selpoint)
+{
+  int i;
+  int len = pathForMesh.Length ();
+
+  int dim = demo->G2D->GetHeight ()-10;
+  demo->G2D->DrawLine (0, 0, dim, 0, demo->col_cyan);
+  demo->G2D->DrawLine (0, dim, dim, dim, demo->col_cyan);
+  demo->G2D->DrawLine (0, 0, 0, dim, demo->col_cyan);
+  demo->G2D->DrawLine (dim, 0, dim, dim, demo->col_cyan);
+  i = 0;
+  while (i < len)
+  {
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    csNamedPath* np = pfm->path;
+    bool hi = (hilight && !strcmp (np->GetName (), hilight));
+    DebugDrawPath (np, hi, tl, br, selpoint);
+    i++;
+  }
+  if (do_camera_path && camera_path)
+  {
+    bool hi = (hilight && !strcmp (camera_path->GetName (), hilight));
+    DebugDrawPath (camera_path, hi, tl, br, selpoint);
+  }
+
+  i = 0;
+  while (i < len)
+  {
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    bool hi = (hilight && !strcmp (pfm->path->GetName (), hilight));
+    cs_time ct = current_time;
+    if (suspended) ct = suspend_time;
+    float r = float (ct - pfm->start_path_time)
+    	/ float (pfm->total_path_time);
+    if (r >= 1) r = 1;
+    pfm->path->Calculate (r);
+    csVector3 pos, forward;
+    pfm->path->GetInterpolatedPosition (pos);
+    pfm->path->GetInterpolatedForward (forward);
+    int col = demo->col_yellow;
+    int x = int ((pos.x-tl.x)*dim/(br.x-tl.x));
+    int y = int ((pos.z-tl.y)*dim/(br.y-tl.y));
+    if (x > 0 && x < dim && y > 0 && y < dim)
+    {
+      demo->G2D->DrawPixel (x, y, col);
+      demo->G2D->DrawPixel (x-1, y-1, col);
+      demo->G2D->DrawPixel (x-2, y-2, col);
+      demo->G2D->DrawPixel (x+1, y+1, col);
+      demo->G2D->DrawPixel (x+2, y+2, col);
+      demo->G2D->DrawPixel (x+1, y-1, col);
+      demo->G2D->DrawPixel (x+2, y-2, col);
+      demo->G2D->DrawPixel (x-1, y+1, col);
+      demo->G2D->DrawPixel (x-2, y+2, col);
+      forward.Normalize ();
+      forward *= 20.;
+      demo->G2D->DrawLine (x, y, int (x+forward.x), int (y-forward.z), col);
+    }
+    i++;
+  }
+
+  if (do_camera_path && camera_path)
+  {
+    bool hi = (hilight && !strcmp (camera_path->GetName (), hilight));
+    cs_time ct = current_time;
+    if (suspended) ct = suspend_time;
+    float r = GetCameraIndex (ct);
+    if (r >= 1) r = 1;
+    camera_path->Calculate (r);
+    csVector3 pos, forward;
+    camera_path->GetInterpolatedPosition (pos);
+    camera_path->GetInterpolatedForward (forward);
+    int col = demo->col_yellow;
+    int x = int ((pos.x-tl.x)*dim/(br.x-tl.x));
+    int y = int ((pos.z-tl.y)*dim/(br.y-tl.y));
+    if (x > 0 && x < dim && y > 0 && y < dim)
+    {
+      demo->G2D->DrawPixel (x, y, col);
+      demo->G2D->DrawPixel (x-1, y-1, col);
+      demo->G2D->DrawPixel (x-2, y-2, col);
+      demo->G2D->DrawPixel (x+1, y+1, col);
+      demo->G2D->DrawPixel (x+2, y+2, col);
+      demo->G2D->DrawPixel (x+1, y-1, col);
+      demo->G2D->DrawPixel (x+2, y-2, col);
+      demo->G2D->DrawPixel (x-1, y+1, col);
+      demo->G2D->DrawPixel (x-2, y+2, col);
+      forward.Normalize ();
+      forward *= 20.;
+      demo->G2D->DrawLine (x, y, int (x+forward.x), int (y-forward.z), col);
+    }
+  }
+}
+
+void DemoSequenceManager::SelectPreviousPath (char* hilight)
+{
+  csNamedPath* np = GetSelectedPath (hilight);
+  if (!np)
+  {
+    if (camera_path) strcpy (hilight, camera_path->GetName ());
+    return;
+  }
+  if (np == camera_path) return;
+  else
+  {
+    int i;
+    for (i = 0 ; i < pathForMesh.Length () ; i++)
+    {
+      PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+      if (pfm->path == np)
+      {
+        if (i == 0)
+	{
+	  if (camera_path) strcpy (hilight, camera_path->GetName ());
+	  return;
+	}
+	else
+	{
+          pfm = (PathForMesh*)pathForMesh[i-1];
+	  strcpy (hilight, pfm->path->GetName ());
+	}
+	return;
+      }
+    }
+    // We can't find the path. Switch back to camera.
+    if (camera_path) strcpy (hilight, camera_path->GetName ());
+    return;
+  }
+}
+
+void DemoSequenceManager::SelectNextPath (char* hilight)
+{
+  csNamedPath* np = GetSelectedPath (hilight);
+  if (!np)
+  {
+    if (camera_path) strcpy (hilight, camera_path->GetName ());
+    return;
+  }
+  if (np == camera_path)
+  {
+    // Fetch the first non-camera path.
+    if (pathForMesh.Length () <= 0) return;	// Do nothing.
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[0];
+    strcpy (hilight, pfm->path->GetName ());
+    return;
+  }
+  else
+  {
+    int i;
+    for (i = 0 ; i < pathForMesh.Length () ; i++)
+    {
+      PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+      if (pfm->path == np)
+      {
+        if (i != pathForMesh.Length ()-1)
+	{
+          pfm = (PathForMesh*)pathForMesh[i+1];
+	  strcpy (hilight, pfm->path->GetName ());
+	}
+	return;
+      }
+    }
+    // We can't find the path. Switch back to camera.
+    if (camera_path) strcpy (hilight, camera_path->GetName ());
+    return;
+  }
+}
+
+csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
+{
+  if (do_camera_path && camera_path)
+  {
+    bool hi = (hilight && !strcmp (camera_path->GetName (), hilight));
+    if (hi) return camera_path;
+  }
+
+  int i = 0;
+  int len = pathForMesh.Length ();
+  while (i < len)
+  {
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    csNamedPath* np = pfm->path;
+    bool hi = (hilight && !strcmp (np->GetName (), hilight));
+    if (hi) return np;
+    i++;
+  }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

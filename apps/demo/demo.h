@@ -27,6 +27,8 @@
 struct iEngine;
 struct iSector;
 struct iView;
+struct iFont;
+struct iFile;
 struct iImageLoader;
 struct iLoaderPlugIn;
 class DemoSequenceManager;
@@ -40,11 +42,19 @@ public:
   iSector* room;
   iView* view;
   DemoSequenceManager* seqmgr;
+  iFont* font;
+  int col_red, col_blue, col_white, col_black;
+  int col_yellow, col_cyan, col_green, col_gray;
+  char message[255];
+  cs_time message_timer;
+  bool message_error;
 
 private:
   void LoadMaterial (const char* matname, const char* filename);
   void LoadFactory (const char* factname, const char* filename,
   	const char* classId, iLoaderPlugIn* plug);
+  void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
+  void FileWrite (iFile* file, char *str, ...);
 
 public:
   Demo ();
@@ -54,6 +64,9 @@ public:
     const char *iConfigName);
   virtual void NextFrame ();
   virtual bool HandleEvent (iEvent &Event);
+
+  void ShowMessage (const char* msg, ...);
+  void ShowError (const char* msg, ...);
 
   void SetupFactories ();
   void SetupMaterials ();

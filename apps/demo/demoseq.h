@@ -73,6 +73,7 @@ public:
 
 private:
   iSequenceManager* seqmgr;
+  iSequence* main_sequence;
   bool suspended;
   bool suspend_one_frame;
   cs_time suspend_time;
@@ -98,6 +99,10 @@ private:
   cs_time total_camera_path_time;
   cs_time start_camera_path_time;
 
+private:
+  void DebugDrawPath (csNamedPath* np, bool hi,
+	const csVector2& tl, const csVector2& br, int selpoint);
+
 public:
   DemoSequenceManager (Demo* demo);
   virtual ~DemoSequenceManager ();
@@ -110,6 +115,9 @@ public:
 
   /// Resume.
   void Resume ();
+
+  /// Restart the sequence manager from zero.
+  void Restart (const char* sequenceFileName);
 
   /// Time warp.
   void TimeWarp (cs_time dt);
@@ -138,6 +146,29 @@ public:
    * This should be called from within NextFrame().
    */
   void ControlPaths (iCamera* camera, cs_time current_time);
+
+  /**
+   * For debugging, draw all active paths on screen. Draw the
+   * path with the given name highlighted.
+   */
+  void DebugDrawPaths (cs_time current_time,
+	const char* hilight, const csVector2& tl,
+	const csVector2& br, int selpoint);
+
+  /**
+   * Get the selected path.
+   */
+  csNamedPath* GetSelectedPath (const char* hilight);
+
+  /**
+   * Select previous path.
+   */
+  void SelectPreviousPath (char* hilight);
+
+  /**
+   * Select next path.
+   */
+  void SelectNextPath (char* hilight);
 
   /**
    * Start a fade effect.

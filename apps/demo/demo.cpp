@@ -23,6 +23,7 @@
 #include "csgeom/path.h"
 #include "csfx/csfxscr.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
@@ -44,6 +45,7 @@
 #include "imesh/object.h"
 #include "imap/reader.h"
 #include "igraphic/loader.h"
+#include "qsqrt.h"
 
 //-----------------------------------------------------------------------------
 
@@ -51,6 +53,7 @@ Demo::Demo ()
 {
   engine = NULL;
   seqmgr = NULL;
+  message[0] = 0;
 }
 
 Demo::~Demo ()
@@ -118,8 +121,8 @@ void Demo::SetupFactories ()
     Printf (MSG_FATAL_ERROR, "Could not open sprite 3d factory loader!\n");
     exit (0);
   }
-  //LoadFactory ("stars", "/data/demo/skymesh", "crystalspace.mesh.object.sprite.3d",
-	//plug);
+  LoadFactory ("fighter", "/data/demo/fighter", "crystalspace.mesh.object.sprite.3d",
+	plug);
   plug->DecRef ();
 }
 
@@ -132,8 +135,14 @@ void Demo::LoadMaterial (const char* matname, const char* filename)
 
 void Demo::SetupMaterials ()
 {
-  LoadMaterial ("flare_center", "/lib/std/snow.jpg");
-  LoadMaterial ("flare_spark", "/lib/std/spark.png");
+  //LoadMaterial ("flare_center", "/lib/std/snow.jpg");
+  //LoadMaterial ("flare_spark", "/lib/std/spark.png");
+  LoadMaterial ("flare_center", "/lib/stdtex/flare_center.jpg");
+  LoadMaterial ("flare_spark1", "/lib/stdtex/flare_rbow.jpg");
+  LoadMaterial ("flare_spark2", "/lib/stdtex/flare_purp.jpg");
+  LoadMaterial ("flare_spark3", "/lib/stdtex/flare_picir.jpg");
+  LoadMaterial ("flare_spark4", "/lib/stdtex/flare_grcir.jpg");
+  LoadMaterial ("flare_spark5", "/lib/stdtex/flare_pink.jpg");
   LoadMaterial ("stone", "/lib/std/stone4.gif");
   LoadMaterial ("sun", "/lib/std/white.gif");
   LoadMaterial ("jupiter", "/data/demo/jup0vtt2.jpg");
@@ -351,18 +360,22 @@ void Demo::SetupSector ()
   iLight* il = QUERY_INTERFACE (light, iLight);
   iFlareHalo* flare = il->CreateFlareHalo ();
   iMaterialWrapper* ifmc = engine->FindMaterial ("flare_center");
-  iMaterialWrapper* ifms = engine->FindMaterial ("flare_spark");
+  iMaterialWrapper* ifm1 = engine->FindMaterial ("flare_spark1");
+  iMaterialWrapper* ifm2 = engine->FindMaterial ("flare_spark2");
+  iMaterialWrapper* ifm3 = engine->FindMaterial ("flare_spark3");
+  iMaterialWrapper* ifm4 = engine->FindMaterial ("flare_spark4");
+  iMaterialWrapper* ifm5 = engine->FindMaterial ("flare_spark5");
   flare->AddComponent (0.0, 0.5, 0.5, CS_FX_ADD, ifmc); // pos, w, h, mixmode
-  flare->AddComponent (.01, 1.0, 1.0, CS_FX_ADD, ifms);
-  flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifms);
-  flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifms);
-  flare->AddComponent (0.8, .05, .05, CS_FX_ADD, ifms);
-  flare->AddComponent (1.0, 0.7, 0.7, CS_FX_ADD, ifmc);
-  flare->AddComponent (1.3, 0.1, 0.1, CS_FX_ADD, ifms);
-  flare->AddComponent (1.5, 0.3, 0.3, CS_FX_ADD, ifms);
-  flare->AddComponent (1.8, 0.1, 0.1, CS_FX_ADD, ifms);
-  flare->AddComponent (2.0, 0.5, 0.5, CS_FX_ADD, ifmc);
-  flare->AddComponent (2.1, .15, .15, CS_FX_ADD, ifms);
+  flare->AddComponent (.01, 1.0, 1.0, CS_FX_ADD, ifm2);
+  flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
+  flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
+  flare->AddComponent (0.8, .05, .05, CS_FX_ADD, ifm5);
+  flare->AddComponent (1.0, 0.7, 0.7, CS_FX_ADD, ifm1);
+  flare->AddComponent (1.3, 0.1, 0.1, CS_FX_ADD, ifm3);
+  flare->AddComponent (1.5, 0.3, 0.3, CS_FX_ADD, ifm4);
+  flare->AddComponent (1.8, 0.1, 0.1, CS_FX_ADD, ifm5);
+  flare->AddComponent (2.0, 0.5, 0.5, CS_FX_ADD, ifm2);
+  flare->AddComponent (2.1, .15, .15, CS_FX_ADD, ifm3);
   il->DecRef ();
   room->AddLight (light);
 }
@@ -442,6 +455,22 @@ void Demo::SetupObjects ()
   bs->SetMixMode (CS_FX_ADD);
   clouds->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   bs->DecRef ();
+ 
+  // Create fighters.
+  iMeshWrapper* fighter;
+  fighter = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("fighter"), "Fighter1",
+  	NULL, csVector3 (0));
+  fighter->SetRenderPriority (engine->GetRenderPriority ("object"));
+  fighter->SetZBufMode (CS_ZBUF_USE);
+  fighter->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+
+  fighter = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("fighter"), "Fighter2",
+  	NULL, csVector3 (0));
+  fighter->SetRenderPriority (engine->GetRenderPriority ("object"));
+  fighter->SetZBufMode (CS_ZBUF_USE);
+  fighter->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 }
 
 bool Demo::Initialize (int argc, const char* const argv[],
@@ -483,6 +512,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
 	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
   txtmgr->SetPalette ();
 
+  font = G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+
   // Initialize the console
   if (System->Console != NULL)
     // Don't let messages before this one appear
@@ -521,18 +552,71 @@ bool Demo::Initialize (int argc, const char* const argv[],
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
   txtmgr->SetPalette ();
+  col_red = txtmgr->FindRGB (255, 0, 0);
+  col_blue = txtmgr->FindRGB (0, 0, 255);
+  col_white = txtmgr->FindRGB (255, 255, 255);
+  col_gray = txtmgr->FindRGB (128, 128, 128);
+  col_black = txtmgr->FindRGB (0, 0, 0);
+  col_yellow = txtmgr->FindRGB (255, 255, 0);
+  col_cyan = txtmgr->FindRGB (0, 255, 255);
+  col_green = txtmgr->FindRGB (0, 255, 0);
 
   return true;
 }
 
-static csCubicSpline* spline_debug = NULL;
-static float spline_debug_dim[11] = { 200, 200, 200, 200, 250, 200, 200, 200, 200, 200, 200 };
+#define MAP_OFF 0
+#define MAP_OVERLAY 1
+#define MAP_EDIT 2
+#define MAP_EDIT_FORWARD 3
+static int map_enabled = MAP_OFF;
+static csVector2 map_tl (-1000, 1000);
+static csVector2 map_br (1000, -1000);
+static int map_selpoint = 0;
+static char map_selpath[255] = { 0 };
 
-static csNamedPath* spline_map = NULL;
-static csVector2 spline_topleft;
-static csVector2 spline_botright;
-static int spline_map_selpoint = 0;
-static bool spline_map_edit_forward = false;
+void Demo::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
+{
+  va_list arg;
+  char buf[256];
+
+  va_start (arg, str);
+  vsprintf (buf, str, arg);
+  va_end (arg);
+
+  G2D->Write (font, x, y, fg, bg, buf);
+}
+
+void Demo::FileWrite (iFile* file, char *str, ...)
+{
+  va_list arg;
+  char buf[256];
+
+  va_start (arg, str);
+  vsprintf (buf, str, arg);
+  va_end (arg);
+
+  file->Write (buf, strlen (buf));
+}
+
+void Demo::ShowMessage (const char* msg, ...)
+{
+  message_error = false;
+  va_list arg;
+  va_start (arg, msg);
+  vsprintf (message, msg, arg);
+  va_end (arg);
+  message_timer = GetTime () + 1500;
+}
+
+void Demo::ShowError (const char* msg, ...)
+{
+  message_error = true;
+  va_list arg;
+  va_start (arg, msg);
+  vsprintf (message, msg, arg);
+  va_end (arg);
+  message_timer = GetTime () + 1500;
+}
 
 void Demo::NextFrame ()
 {
@@ -542,7 +626,7 @@ void Demo::NextFrame ()
  
   // Now rotate the camera according to keyboard state
   csReversibleTransform& camtrans = view->GetCamera ()->GetTransform ();
-  if (!spline_map)
+  if (map_enabled < MAP_EDIT)
   {
     float speed = (elapsed_time / 1000.) * (0.03 * 20);
     if (GetKeyState (CSKEY_RIGHT))
@@ -557,19 +641,25 @@ void Demo::NextFrame ()
       view->GetCamera ()->Move (VEC_FORWARD * 400.0f * speed);
     if (GetKeyState (CSKEY_DOWN))
       view->GetCamera ()->Move (VEC_BACKWARD * 400.0f * speed);
-
-    seqmgr->ControlPaths (view->GetCamera (), current_time);
   }
-  else if (spline_map_edit_forward)
+
+  if (map_enabled < MAP_EDIT_FORWARD)
+    seqmgr->ControlPaths (view->GetCamera (), current_time);
+
+  if (map_enabled == MAP_EDIT_FORWARD)
   {
-    float r = spline_map->GetTimeValue (spline_map_selpoint);
-    spline_map->Calculate (r);
-    csVector3 pos, up, forward;
-    spline_map->GetInterpolatedPosition (pos);
-    spline_map->GetInterpolatedUp (up);
-    spline_map->GetInterpolatedForward (forward);
-    view->GetCamera ()->SetPosition (pos);
-    view->GetCamera ()->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+    csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+    if (np)
+    {
+      float r = np->GetTimeValue (map_selpoint);
+      np->Calculate (r);
+      csVector3 pos, up, forward;
+      np->GetInterpolatedPosition (pos);
+      np->GetInterpolatedUp (up);
+      np->GetInterpolatedForward (forward);
+      view->GetCamera ()->SetPosition (pos);
+      view->GetCamera ()->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+    }
   }
 
   // Tell 3D driver we're going to display 3D things.
@@ -577,69 +667,56 @@ void Demo::NextFrame ()
   	| CSDRAW_CLEARZBUFFER))
     return;
 
-  if (!spline_debug && (!spline_map || spline_map_edit_forward))
+  if (map_enabled != MAP_EDIT)
   {
     view->Draw ();
     seqmgr->Draw3DEffects (G3D, current_time);
-    if (spline_map_edit_forward) csfxFadeToColor (G3D, .3, csColor (0, 0, 1));
+    if (map_enabled == MAP_EDIT_FORWARD)
+      csfxFadeToColor (G3D, .3, csColor (0, 0, 1));
   }
 
   // Start drawing 2D graphics.
   if (!System->G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
-  if (spline_debug)
-  {
+  if (map_enabled == MAP_EDIT)
     G2D->Clear (0);
-    int x;
-    for (x = 0 ; x < 640 ; x++)
-    {
-      spline_debug->Calculate (float (x)/640.);
-      int y = int (spline_debug->GetInterpolatedDimension (0));
-      G2D->DrawPixel (x, y, 0xffffff);
-    }
-  }
-  else if (spline_map && !spline_map_edit_forward)
-  {
-    G2D->Clear (0);
-    G2D->DrawLine (0, 0, 600, 0, 0xff4444);
-    G2D->DrawLine (0, 600, 600, 600, 0xff4444);
-    G2D->DrawLine (0, 0, 0, 600, 0xff4444);
-    G2D->DrawLine (600, 0, 600, 600, 0xff4444);
-    float r;
-    csVector3 p;
-    for (r = 0 ; r <= 1 ; r += .001)
-    {
-      spline_map->Calculate (r);
-      spline_map->GetInterpolatedPosition (p);
-      int x = (p.x-spline_topleft.x)*600 / (spline_botright.x-spline_topleft.x);
-      int y = (p.z-spline_topleft.y)*600 / (spline_botright.y-spline_topleft.y);
-      if (x > 0 && x < 600 && y > 0 && y < 600)
-        G2D->DrawPixel (x, y, 0xffffff);
-    }
-    float* px, * py, * pz;
-    px = spline_map->GetDimensionValues (0);
-    py = spline_map->GetDimensionValues (1);
-    pz = spline_map->GetDimensionValues (2);
-    int i;
-    for (i = 0 ; i < spline_map->GetNumPoints () ; i++)
-    {
-      int col = 0xff0000;
-      if (spline_map_selpoint == i) col = 0x00ff00;
-      int x = (px[i]-spline_topleft.x)*600/(spline_botright.x-spline_topleft.x);
-      int y = (pz[i]-spline_topleft.y)*600/(spline_botright.y-spline_topleft.y);
-      if (x > 0 && x < 600 && y > 0 && y < 600)
-      {
-        G2D->DrawPixel (x, y, col);
-        G2D->DrawPixel (x-1, y, col);
-        G2D->DrawPixel (x+1, y, col);
-        G2D->DrawPixel (x, y-1, col);
-        G2D->DrawPixel (x, y+1, col);
-      }
-    }
-  }
-  else
-  {
+  else if (map_enabled < MAP_EDIT)
     seqmgr->Draw2DEffects (G2D, current_time);
+  if (map_enabled >= MAP_OVERLAY)
+    seqmgr->DebugDrawPaths (current_time, map_selpath,
+    	map_tl, map_br, map_selpoint);
+
+  int fw, fh;
+  font->GetMaxSize (fw, fh);
+  int tx = 10;
+  int ty = G2D->GetHeight ()-fh-3;
+  char messageLine[100];
+  messageLine[0] = 0;
+  switch (map_enabled)
+  {
+    case MAP_OFF:
+      if (seqmgr->IsSuspended ())
+        GfxWrite (tx, ty, col_black, col_white, "[PAUSED]");
+      break;
+    case MAP_OVERLAY:
+      GfxWrite (tx, ty, col_black, col_white, "%sOverlay (%s)",
+        seqmgr->IsSuspended () ? "[PAUSED] " : "",
+      	map_selpath);
+      break;
+    case MAP_EDIT:
+      GfxWrite (tx, ty, col_black, col_white, "Edit (%s)",
+      	map_selpath);
+      break;
+    case MAP_EDIT_FORWARD:
+      GfxWrite (tx, ty, col_black, col_white, "Forward/Up (%s)",
+      	map_selpath);
+      break;
+  }
+
+  if (message[0])
+  {
+    GfxWrite (10, 10, col_black, message_error ? col_red : col_white, message);
+    if (current_time > message_timer) message[0] = 0;
   }
 
   // Drawing code ends here.
@@ -661,254 +738,405 @@ bool Demo::HandleEvent (iEvent &Event)
     bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
     bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
 
-    if (spline_map && spline_map_edit_forward)
+    if (map_enabled == MAP_EDIT_FORWARD)
     {
       //==============================
       // Handle keys in path_edit_forward mode.
       //==============================
-      float dx = spline_botright.x - spline_topleft.x;
-      float speed;
-      if (shift) speed = dx/20.;
-      else if (ctrl) speed = dx/600.;
-      else speed = dx/100.;
-      if (Event.Key.Code == CSKEY_UP)
+      csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+      if (np)
       {
-        csVector3 v;
-	spline_map->GetPositionVector (spline_map_selpoint, v);
-        v.y += speed;
-	spline_map->SetPositionVector (spline_map_selpoint, v);
-        return true;
-      }
-      if (Event.Key.Code == CSKEY_DOWN)
-      {
-        csVector3 v;
-	spline_map->GetPositionVector (spline_map_selpoint, v);
-        v.y -= speed;
-	spline_map->SetPositionVector (spline_map_selpoint, v);
-        return true;
-      }
-      if (Event.Key.Code == CSKEY_LEFT)
-      {
-        csVector3 up, forward;
-	spline_map->GetUpVector (spline_map_selpoint, up);
-	spline_map->GetForwardVector (spline_map_selpoint, forward);
-	csReversibleTransform trans = view->GetCamera ()->GetTransform ();
-        trans.LookAt (forward.Unit (), up.Unit ());
-	trans.RotateThis (csVector3 (0, 0, 1), -.1);
-	spline_map->SetUpVector (spline_map_selpoint,
-		trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ());
-        return true;
-      }
-      if (Event.Key.Code == CSKEY_RIGHT)
-      {
-        csVector3 up, forward;
-	spline_map->GetUpVector (spline_map_selpoint, up);
-	spline_map->GetForwardVector (spline_map_selpoint, forward);
-	csReversibleTransform trans = view->GetCamera ()->GetTransform ();
-        trans.LookAt (forward.Unit (), up.Unit ());
-	trans.RotateThis (csVector3 (0, 0, 1), .1);
-	spline_map->SetUpVector (spline_map_selpoint,
-		trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ());
-        return true;
+        float dx = map_br.x - map_tl.x;
+        float speed;
+        if (shift) speed = dx/20.;
+        else if (ctrl) speed = dx/600.;
+        else speed = dx/100.;
+        if (Event.Key.Code == CSKEY_UP)
+        {
+          csVector3 v;
+	  np->GetPositionVector (map_selpoint, v);
+          v.y += speed;
+	  np->SetPositionVector (map_selpoint, v);
+          return true;
+        }
+        if (Event.Key.Code == CSKEY_DOWN)
+        {
+          csVector3 v;
+	  np->GetPositionVector (map_selpoint, v);
+          v.y -= speed;
+	  np->SetPositionVector (map_selpoint, v);
+          return true;
+        }
+        if (Event.Key.Code == CSKEY_LEFT)
+        {
+          csVector3 up, forward;
+	  np->GetUpVector (map_selpoint, up);
+	  np->GetForwardVector (map_selpoint, forward);
+	  csReversibleTransform trans = view->GetCamera ()->GetTransform ();
+          trans.LookAt (forward.Unit (), up.Unit ());
+	  trans.RotateThis (csVector3 (0, 0, 1), -.1);
+	  np->SetUpVector (map_selpoint,
+		  trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ());
+          return true;
+        }
+        if (Event.Key.Code == CSKEY_RIGHT)
+        {
+          csVector3 up, forward;
+	  np->GetUpVector (map_selpoint, up);
+	  np->GetForwardVector (map_selpoint, forward);
+	  csReversibleTransform trans = view->GetCamera ()->GetTransform ();
+          trans.LookAt (forward.Unit (), up.Unit ());
+	  trans.RotateThis (csVector3 (0, 0, 1), .1);
+	  np->SetUpVector (map_selpoint,
+		  trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ());
+          return true;
+        }
       }
       switch (Event.Key.Char)
       {
         case 'c':
-          spline_map_edit_forward = false;
+          map_enabled = MAP_EDIT;
 	  return true;
       }
     }
-    else if (spline_map)
+    else if (map_enabled == MAP_EDIT)
     {
       //==============================
       // Handle keys in path editing mode.
       //==============================
-      float dx = spline_botright.x - spline_topleft.x;
+      csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+      float dx = map_br.x - map_tl.x;
+      float dy = map_br.y - map_tl.y;
       float speed;
       if (shift) speed = dx/20.;
       else if (ctrl) speed = dx/600.;
       else speed = dx/100.;
-      if (Event.Key.Code == CSKEY_UP)
+      if (np)
       {
-        csVector3 v;
-	spline_map->GetPositionVector (spline_map_selpoint, v);
-        v.z += speed;
-	spline_map->SetPositionVector (spline_map_selpoint, v);
-        return true;
-      }
-      if (Event.Key.Code == CSKEY_DOWN)
-      {
-        csVector3 v;
-	spline_map->GetPositionVector (spline_map_selpoint, v);
-        v.z -= speed;
-	spline_map->SetPositionVector (spline_map_selpoint, v);
-        return true;
-      }
-      if (Event.Key.Code == CSKEY_LEFT)
-      {
-        csVector3 v;
-	spline_map->GetPositionVector (spline_map_selpoint, v);
-        v.x -= speed;
-	spline_map->SetPositionVector (spline_map_selpoint, v);
-        return true;
-      }
-      if (Event.Key.Code == CSKEY_RIGHT)
-      {
-        csVector3 v;
-	spline_map->GetPositionVector (spline_map_selpoint, v);
-        v.x += speed;
-	spline_map->SetPositionVector (spline_map_selpoint, v);
-        return true;
+        if (Event.Key.Code == CSKEY_UP)
+        {
+	  if (alt)
+	  {
+	    map_tl.y -= dy/10.;
+	    map_br.y -= dy/10.;
+	  }
+	  else
+	  {
+            csVector3 v;
+	    np->GetPositionVector (map_selpoint, v);
+            v.z += speed;
+	    np->SetPositionVector (map_selpoint, v);
+	  }
+          return true;
+        }
+        if (Event.Key.Code == CSKEY_DOWN)
+        {
+	  if (alt)
+	  {
+	    map_tl.y += dy/10.;
+	    map_br.y += dy/10.;
+	  }
+	  else
+	  {
+            csVector3 v;
+	    np->GetPositionVector (map_selpoint, v);
+            v.z -= speed;
+	    np->SetPositionVector (map_selpoint, v);
+	  }
+          return true;
+        }
+        if (Event.Key.Code == CSKEY_LEFT)
+        {
+	  if (alt)
+	  {
+	    map_tl.x -= dx/10.;
+	    map_br.x -= dx/10.;
+	  }
+	  else
+	  {
+            csVector3 v;
+	    np->GetPositionVector (map_selpoint, v);
+            v.x -= speed;
+	    np->SetPositionVector (map_selpoint, v);
+	  }
+          return true;
+        }
+        if (Event.Key.Code == CSKEY_RIGHT)
+        {
+	  if (alt)
+	  {
+	    map_tl.x += dx/10.;
+	    map_br.x += dx/10.;
+	  }
+	  else
+	  {
+            csVector3 v;
+	    np->GetPositionVector (map_selpoint, v);
+            v.x += speed;
+	    np->SetPositionVector (map_selpoint, v);
+	  }
+          return true;
+        }
       }
       switch (Event.Key.Char)
       {
 	case 'm':
-          //seqmgr->TimeWarp (seqmgr->GetCameraTimePoint (
-		  //spline_map->GetTimeValue (spline_map_selpoint))-current_time);
-          spline_map = NULL;
+          map_enabled = MAP_OFF;
           return true;
 	case 's':
+	  if (np)
 	  {
-	    char buf[200];
-	    strcpy (buf, "seq_"); strcat (buf, spline_map->GetName ());
-	    strcat (buf, ".txt");
-	    FILE* fp = fopen (buf, "w");
+	    char buf[200], backup[200];
+	    strcpy (buf, "/data/demo/path_"); strcat (buf, np->GetName ());
+	    // Make a backup of the original file.
+	    strcpy (backup, buf);
+	    strcat (backup, ".bak");
+	    VFS->DeleteFile (backup);
+	    iDataBuffer* dbuf = VFS->ReadFile (buf);
+	    if (dbuf)
+	    {
+	      if (dbuf->GetSize ())
+	        VFS->WriteFile (backup, **dbuf, dbuf->GetSize ());
+	      dbuf->DecRef ();
+	    }
+
+	    iFile* fp = VFS->Open (buf, VFS_FILE_WRITE);
 	    if (fp)
 	    {
-	      int i, num = spline_map->GetNumPoints ();
-	      fprintf (fp, "  PATH '%s' (\n", spline_map->GetName ());
-	      fprintf (fp, "    NUM (%d)\n", num);
-	      float* t = spline_map->GetTimeValues ();
-	      fprintf (fp, "    TIMES (%g", t[0]);
+	      int i, num = np->GetNumPoints ();
+	      FileWrite (fp, "    NUM (%d)\n", num);
+	      float* t = np->GetTimeValues ();
+	      FileWrite (fp, "    TIMES (%g", t[0]);
 	      for (i = 1 ; i < num ; i++)
-	        fprintf (fp, ",%g", t[i]);
-	      fprintf (fp, ")\n");
-	      fprintf (fp, "    POS (\n");
+	        FileWrite (fp, ",%g", t[i]);
+	      FileWrite (fp, ")\n");
+	      FileWrite (fp, "    POS (\n");
 	      for (i = 0 ; i < num ; i++)
 	      {
 	        csVector3 v;
-		spline_map->GetPositionVector (i, v);
-	        fprintf (fp, "      V (%g,%g,%g)\n", v.x, v.y, v.z);
+		np->GetPositionVector (i, v);
+	        FileWrite (fp, "      V (%g,%g,%g)\n", v.x, v.y, v.z);
 	      }
-	      fprintf (fp, "    )\n");
-	      fprintf (fp, "    FORWARD (\n");
+	      FileWrite (fp, "    )\n");
+	      FileWrite (fp, "    FORWARD (\n");
 	      for (i = 0 ; i < num ; i++)
 	      {
 	        csVector3 v;
-		spline_map->GetForwardVector (i, v);
-	        fprintf (fp, "      V (%g,%g,%g)\n", v.x, v.y, v.z);
+		np->GetForwardVector (i, v);
+	        FileWrite (fp, "      V (%g,%g,%g)\n", v.x, v.y, v.z);
 	      }
-	      fprintf (fp, "    )\n");
-	      fprintf (fp, "    UP (\n");
+	      FileWrite (fp, "    )\n");
+	      FileWrite (fp, "    UP (\n");
 	      for (i = 0 ; i < num ; i++)
 	      {
 	        csVector3 v;
-		spline_map->GetUpVector (i, v);
-	        fprintf (fp, "      V (%g,%g,%g)\n", v.x, v.y, v.z);
+		np->GetUpVector (i, v);
+	        FileWrite (fp, "      V (%g,%g,%g)\n", v.x, v.y, v.z);
 	      }
-	      fprintf (fp, "    )\n");
-	      fprintf (fp, "  )\n");
-	      fclose (fp);
+	      FileWrite (fp, "    )\n");
+	      fp->DecRef ();
+	      ShowMessage ("Wrote path to file '%s'", buf);
 	    }
+	    else
+	      ShowError ("Error writing to file '%s'!", buf);
 	  }
 	  break;
         case 'i':
-	  spline_map->InsertPoint (spline_map_selpoint);
-	  spline_map_selpoint++;
-	  if (spline_map_selpoint == spline_map->GetNumPoints ()-1)
+	  if (np)
 	  {
-	    csVector3 v;
-	    spline_map->GetPositionVector (spline_map_selpoint-1, v);
-	    spline_map->SetPositionVector (spline_map_selpoint, v);
-	    spline_map->GetUpVector (spline_map_selpoint-1, v);
-	    spline_map->SetUpVector (spline_map_selpoint, v);
-	    spline_map->GetForwardVector (spline_map_selpoint-1, v);
-	    spline_map->SetForwardVector (spline_map_selpoint, v);
-	    spline_map->SetTimeValue (spline_map_selpoint,
-	    	spline_map->GetTimeValue (spline_map_selpoint-1));
-	  }
-	  else
-	  {
-	    csVector3 v1, v2, v;
-	    spline_map->GetPositionVector (spline_map_selpoint-1, v1);
-	    spline_map->GetPositionVector (spline_map_selpoint+1, v2);
-	    spline_map->SetPositionVector (spline_map_selpoint, (v1+v2)/2.);
-	    spline_map->GetUpVector (spline_map_selpoint-1, v1);
-	    spline_map->GetUpVector (spline_map_selpoint+1, v2);
-	    spline_map->SetUpVector (spline_map_selpoint, (v1+v2)/2.);
-	    spline_map->GetForwardVector (spline_map_selpoint-1, v1);
-	    spline_map->GetForwardVector (spline_map_selpoint+1, v2);
-	    spline_map->SetForwardVector (spline_map_selpoint, (v1+v2)/2.);
-	    spline_map->SetTimeValue (spline_map_selpoint,
-	    	(spline_map->GetTimeValue (spline_map_selpoint-1)+
-		 spline_map->GetTimeValue (spline_map_selpoint+1))/2.);
+	    np->InsertPoint (map_selpoint);
+	    map_selpoint++;
+	    if (map_selpoint == np->GetNumPoints ()-1)
+	    {
+	      csVector3 v;
+	      np->GetPositionVector (map_selpoint-1, v);
+	      np->SetPositionVector (map_selpoint, v);
+	      np->GetUpVector (map_selpoint-1, v);
+	      np->SetUpVector (map_selpoint, v);
+	      np->GetForwardVector (map_selpoint-1, v);
+	      np->SetForwardVector (map_selpoint, v);
+	      np->SetTimeValue (map_selpoint,
+	    	  np->GetTimeValue (map_selpoint-1));
+	    }
+	    else
+	    {
+	      csVector3 v1, v2, v;
+	      np->GetPositionVector (map_selpoint-1, v1);
+	      np->GetPositionVector (map_selpoint+1, v2);
+	      np->SetPositionVector (map_selpoint, (v1+v2)/2.);
+	      np->GetUpVector (map_selpoint-1, v1);
+	      np->GetUpVector (map_selpoint+1, v2);
+	      np->SetUpVector (map_selpoint, (v1+v2)/2.);
+	      np->GetForwardVector (map_selpoint-1, v1);
+	      np->GetForwardVector (map_selpoint+1, v2);
+	      np->SetForwardVector (map_selpoint, (v1+v2)/2.);
+	      np->SetTimeValue (map_selpoint,
+	    	  (np->GetTimeValue (map_selpoint-1)+
+		   np->GetTimeValue (map_selpoint+1))/2.);
+	    }
 	  }
           break;
         case 'd':
-	  spline_map->RemovePoint (spline_map_selpoint);
-	  if (spline_map_selpoint >= spline_map->GetNumPoints ())
-	    spline_map_selpoint--;
+	  if (np)
+	  {
+	    np->RemovePoint (map_selpoint);
+	    if (map_selpoint >= np->GetNumPoints ())
+	      map_selpoint--;
+	  }
 	  break;
 	case ',':
-	  if (spline_map_selpoint > 0
-	  	&& spline_map_selpoint < spline_map->GetNumPoints ()-1)
+	  if (np)
 	  {
-	    float t = spline_map->GetTimeValue (spline_map_selpoint);
-	    float t1 = spline_map->GetTimeValue (spline_map_selpoint-1);
-	    float t2 = spline_map->GetTimeValue (spline_map_selpoint+1);
-	    float dt = (t2-t1);
-	    if (shift) dt /= 5.;
-	    else if (ctrl) dt /= 500.;
-	    else dt /= 50.;
-	    t -= dt;
-	    if (t < t1) t = t1;
-	    spline_map->SetTimeValue (spline_map_selpoint, t);
+	    if (map_selpoint > 0 && map_selpoint < np->GetNumPoints ()-1)
+	    {
+	      float t = np->GetTimeValue (map_selpoint);
+	      float t1 = np->GetTimeValue (map_selpoint-1);
+	      float t2 = np->GetTimeValue (map_selpoint+1);
+	      float dt = (t2-t1);
+	      if (shift) dt /= 5.;
+	      else if (ctrl) dt /= 500.;
+	      else dt /= 50.;
+	      t -= dt;
+	      if (t < t1) t = t1;
+	      np->SetTimeValue (map_selpoint, t);
+	    }
 	  }
 	  break;
 	case '.':
-	  if (spline_map_selpoint > 0
-	  	&& spline_map_selpoint < spline_map->GetNumPoints ()-1)
+	  if (np)
 	  {
-	    float t = spline_map->GetTimeValue (spline_map_selpoint);
-	    float t1 = spline_map->GetTimeValue (spline_map_selpoint-1);
-	    float t2 = spline_map->GetTimeValue (spline_map_selpoint+1);
-	    float dt = (t2-t1);
-	    if (shift) dt /= 5.;
-	    else if (ctrl) dt /= 500.;
-	    else dt /= 50.;
-	    t += dt;
-	    if (t > t2) t = t2;
-	    spline_map->SetTimeValue (spline_map_selpoint, t);
+	    if (map_selpoint > 0 && map_selpoint < np->GetNumPoints ()-1)
+	    {
+	      float t = np->GetTimeValue (map_selpoint);
+	      float t1 = np->GetTimeValue (map_selpoint-1);
+	      float t2 = np->GetTimeValue (map_selpoint+1);
+	      float dt = (t2-t1);
+	      if (shift) dt /= 5.;
+	      else if (ctrl) dt /= 500.;
+	      else dt /= 50.;
+	      t += dt;
+	      if (t > t2) t = t2;
+	      np->SetTimeValue (map_selpoint, t);
+	    }
 	  }
 	  break;
 	case '/':
-	  if (spline_map_selpoint > 0
-	  	&& spline_map_selpoint < spline_map->GetNumPoints ()-1)
+	  if (np && map_selpoint > 0 && map_selpoint < np->GetNumPoints ()-1)
 	  {
-	    float t1 = spline_map->GetTimeValue (spline_map_selpoint-1);
-	    float t2 = spline_map->GetTimeValue (spline_map_selpoint+1);
-	    spline_map->SetTimeValue (spline_map_selpoint, (t1+t2)/2.);
+	    float t1 = np->GetTimeValue (map_selpoint-1);
+	    float t2 = np->GetTimeValue (map_selpoint+1);
+	    np->SetTimeValue (map_selpoint, (t1+t2)/2.);
+	  }
+	  break;
+	case '?':
+	  if (np)
+	  {
+	    int num = np->GetNumPoints ();
+	    float* xv, * yv, * zv;
+	    xv = np->GetDimensionValues (0);
+	    yv = np->GetDimensionValues (1);
+	    zv = np->GetDimensionValues (2);
+	    csVector3 v0, v1;
+	    // Calculate the total length of the path.
+	    float totlen = 0;
+	    int i;
+	    v0.Set (xv[0], yv[0], zv[0]);
+	    for (i = 1 ; i < num ; i++)
+	    {
+	      v1.Set (xv[i], yv[i], zv[i]);
+	      float d = qsqrt (csSquaredDist::PointPoint (v0, v1));
+	      totlen += d;
+	      v0 = v1;
+	    }
+	    float list[10000];
+	    // Calculate the time value for every path segment,
+	    // given the total length of the path.
+	    v0.Set (xv[0], yv[0], zv[0]);
+	    list[0] = 0;
+	    float tot = 0;
+	    for (i = 1 ; i < num ; i++)
+	    {
+	      v1.Set (xv[i], yv[i], zv[i]);
+	      float d = qsqrt (csSquaredDist::PointPoint (v0, v1));
+	      tot += d;
+	      list[i] = tot / totlen;
+	      v0 = v1;
+	    }
+	    np->SetTimeValues (list);
 	  }
 	  break;
         case '>':
-          spline_map_selpoint++;
-	  if (spline_map_selpoint >= spline_map->GetNumPoints ())
-	    spline_map_selpoint = 0;
+	  if (np)
+	  {
+            map_selpoint++;
+	    if (map_selpoint >= np->GetNumPoints ())
+	      map_selpoint = 0;
+	  }
 	  break;
         case '<':
-          spline_map_selpoint--;
-	  if (spline_map_selpoint < 0)
-	    spline_map_selpoint = spline_map->GetNumPoints ()-1;
+	  if (np)
+	  {
+            map_selpoint--;
+	    if (map_selpoint < 0)
+	      map_selpoint = np->GetNumPoints ()-1;
+	  }
 	  break;
         case 'c':
-	  spline_map_edit_forward = true;
+	  ShowMessage ("Edit forward and up vectors, press 'c' to exit");
+	  map_enabled = MAP_EDIT_FORWARD;
+	  break;
+        case '+':
+	  {
+	    float dx = (map_br.x-map_tl.x)/2.;
+	    float dy = (map_br.y-map_tl.y)/2.;
+	    float cx = (map_br.x+map_tl.x)/2.;
+	    float cy = (map_br.y+map_tl.y)/2.;
+	    map_tl.x = cx-dx*.9;
+	    map_tl.y = cy-dy*.9;
+	    map_br.x = cx+dx*.9;
+	    map_br.y = cy+dy*.9;
+	  }
+	  break;
+        case '-':
+	  {
+	    float dx = (map_br.x-map_tl.x)/2.;
+	    float dy = (map_br.y-map_tl.y)/2.;
+	    float cx = (map_br.x+map_tl.x)/2.;
+	    float cy = (map_br.y+map_tl.y)/2.;
+	    map_tl.x = cx-dx*1.1;
+	    map_tl.y = cy-dy*1.1;
+	    map_br.x = cx+dx*1.1;
+	    map_br.y = cy+dy*1.1;
+	  }
+	  break;
+        case '=':
+	  map_tl.Set (-1000, 1000);
+	  map_br.Set (1000, -1000);
+	  break;
+        case '[':
+	  seqmgr->SelectPreviousPath (map_selpath);
+	  np = seqmgr->GetSelectedPath (map_selpath);
+	  if (np)
+	  {
+	    if (map_selpoint >= np->GetNumPoints ())
+	      map_selpoint = np->GetNumPoints ()-1;
+	  }
+	  break;
+        case ']':
+	  seqmgr->SelectNextPath (map_selpath);
+	  np = seqmgr->GetSelectedPath (map_selpath);
+	  if (np)
+	  {
+	    if (map_selpoint >= np->GetNumPoints ())
+	      map_selpoint = np->GetNumPoints ()-1;
+	  }
 	  break;
       }
     }
     else
     {
       //==============================
-      // Handle keys in demo mode.
+      // Handle keys in demo or overlay mode.
       //==============================
       if (Event.Key.Code == CSKEY_ESC)
       {
@@ -917,12 +1145,13 @@ bool Demo::HandleEvent (iEvent &Event)
       }
       switch (Event.Key.Char)
       {
+      	case 'R':
+	  ShowMessage ("Restarted sequence manager");
+  	  seqmgr->Restart ("/data/demo/sequences");
+	  break;
         case 'p':
-          if (!spline_debug)
-          {
-            if (seqmgr->IsSuspended ()) seqmgr->Resume ();
-            else seqmgr->Suspend ();
-          }
+          if (seqmgr->IsSuspended ()) seqmgr->Resume ();
+          else seqmgr->Suspend ();
 	  break;
         case '.':
           seqmgr->TimeWarp (100);
@@ -936,27 +1165,11 @@ bool Demo::HandleEvent (iEvent &Event)
         case '<':
           seqmgr->TimeWarp (-3000);
 	  break;
-        case 's':
-          if (spline_debug) { delete spline_debug; spline_debug = NULL; }
-          else
-          {
-            spline_map = NULL;
-            spline_debug = new csCubicSpline (1, 11);
-	    float time[11] = { 0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1 };
-	    spline_debug->SetTimeValues (time);
-	    spline_debug->SetDimensionValues (0, spline_debug_dim);
-          }
-          if (spline_debug) seqmgr->Suspend ();
-	  break;
         case 'm':
-          delete spline_debug; spline_debug = NULL;
-          spline_map = seqmgr->GetCameraPath (); //@@@FindPath ("ourShip");
-	  if (spline_map)
+	  map_enabled++;
+	  if (map_enabled == MAP_EDIT)
 	  {
-	    spline_topleft.Set (-1000, 1000);
-	    spline_botright.Set (1000, -1000);
-	    spline_map->Calculate (seqmgr->GetCameraIndex (current_time));
-	    spline_map_selpoint = spline_map->GetCurrentIndex ();
+	    ShowMessage ("Map editing mode, press 'm' to exit");
             seqmgr->Suspend ();
 	  }
 	  break;
@@ -971,15 +1184,32 @@ bool Demo::HandleEvent (iEvent &Event)
       csVector3 v;
       view->GetCamera ()->InvPerspective (p, 1, v);
       csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
-      if (spline_map && spline_map_edit_forward)
+      if (map_enabled == MAP_EDIT_FORWARD)
       {
-        vw -= view->GetCamera ()->GetTransform ().GetOrigin ();
-        spline_map->SetForwardVector (spline_map_selpoint, vw);
-	csVector3 up;
-	spline_map->GetUpVector (spline_map_selpoint, up);
-	up = up % vw;
-	up = - (up % vw);
-	spline_map->SetUpVector (spline_map_selpoint, up);
+        csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+	if (np)
+	{
+          vw -= view->GetCamera ()->GetTransform ().GetOrigin ();
+          np->SetForwardVector (map_selpoint, vw);
+	  csVector3 up;
+	  np->GetUpVector (map_selpoint, up);
+	  up = up % vw;
+	  up = - (up % vw);
+	  np->SetUpVector (map_selpoint, up);
+        }
+      }
+      else if (map_enabled == MAP_EDIT)
+      {
+        p.y = Event.Mouse.y;
+	int dim = G2D->GetHeight ()-10;
+	float dx = (map_br.x-map_tl.x)/2.;
+	float dy = (map_br.y-map_tl.y)/2.;
+	float cx = map_tl.x + (map_br.x-map_tl.x)*(1-(dim-p.x)/dim);
+	float cy = map_tl.y + (map_br.y-map_tl.y)*(1-(dim-p.y)/dim);
+	map_tl.x = cx-dx*.9;
+	map_tl.y = cy-dy*.9;
+	map_br.x = cx+dx*.9;
+	map_br.y = cy+dy*.9;
       }
     }
   }

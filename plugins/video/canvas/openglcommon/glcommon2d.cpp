@@ -44,19 +44,15 @@ bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
     return false;
 
   // We don't really care about pixel format, except for ScreenShot ()
-
-  // We do now with copying frame data about with the dynamic textures.
-  // Besides, screenshot doesn't work properly in 16bit modes.
-  // This is now over-ridden in the glX drivers
-#if defined (CS_BIG_ENDIAN)
-  pfmt.RedMask   = 0xff000000;
-  pfmt.GreenMask = 0x00ff0000;
-  pfmt.BlueMask  = 0x0000ff00;
-#else
-  pfmt.RedMask   = 0x000000ff;
-  pfmt.GreenMask = 0x0000ff00;
-  pfmt.BlueMask  = 0x00ff0000;
-#endif
+# if defined (CS_BIG_ENDIAN)
+	pfmt.RedMask   = 0xff000000;
+	pfmt.GreenMask = 0x00ff0000;
+	pfmt.BlueMask  = 0x0000ff00;
+# else
+	pfmt.RedMask   = 0x000000ff;
+	pfmt.GreenMask = 0x0000ff00;
+	pfmt.BlueMask  = 0x00ff0000;
+# endif
   pfmt.PixelBytes = 4;
   pfmt.PalEntries = 0;
   pfmt.complete ();
@@ -146,9 +142,9 @@ void csGraphics2DGLCommon::DecomposeColor (int iColor,
       break;
     case 2: // 16bit color
     case 4: // truecolor
-      oR = ((iColor & pfmt.RedMask  ) >> pfmt.RedShift  ) << (8 - pfmt.RedBits  );
-      oG = ((iColor & pfmt.GreenMask) >> pfmt.GreenShift) << (8 - pfmt.GreenBits);
-      oB = ((iColor & pfmt.BlueMask ) >> pfmt.BlueShift ) << (8 - pfmt.BlueBits );
+      oR = ((iColor & pfmt.RedMask  ) >> pfmt.RedShift  );
+      oG = ((iColor & pfmt.GreenMask) >> pfmt.GreenShift);
+      oB = ((iColor & pfmt.BlueMask ) >> pfmt.BlueShift );
       break;
   }
 }

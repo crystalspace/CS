@@ -1,8 +1,17 @@
 The history order is reversed so that new features are at the top.
 
+24-Apr-2001
+	- Tried to fix OpenGL colors on my system but it fails for text.
+	  Don't know what is wrong. I did fix a few things though. Colors
+	  should now be right for lines and other 2D features.
+	- Did a lot of enhancements on csdemo with regards to online editing
+	  of all the paths. Also improved the looks of the flare.
 23-Apr-2001
 	- Norman Kramer fixed phyztest. Now compiles again, the chain seems
 	  to work, but the spring falls through the sector walls.
+	- Norman changed CSFX to CSGFX in video.mak.
+	- Norman swapped red and blue in avi plugin.
+	- Philip Wyett did further work on the WinCVS tutorial.
 	- Fixed 'walkall' target. Removed obsolete 'imgload' target and
 	  added 'imgplex', 'gifimg', 'jpgimg', 'pngimg', and 'bmpimg'.
 	- Added csCubicSpline::InsertPoint(), RemovePoint(), SetTimeValue(),
