@@ -22,6 +22,14 @@
 // get a couple of compile errors, mostly due to conflicts in some #defines 
 // and __declspec()s
 #include <stdio.h>
+#include <memory.h>
+
+#include "cssysdef.h"
+#include "csutil/scf.h"
+#include "cssys/sysfunc.h"
+#include "csgfx/rgbpixel.h"
+#include "csutil/databuf.h"
+#include "ivaria/reporter.h"
 
 extern "C"
 {
@@ -35,15 +43,9 @@ extern "C"
 #include <jerror.h>
 }
 
+#define MNG_NO_CMS
 #define MNG_USE_DLL
 #include "libmng.h"
-
-#include "cssysdef.h"
-#include "csutil/scf.h"
-#include "cssys/sysfunc.h"
-#include "csgfx/rgbpixel.h"
-#include "csutil/databuf.h"
-#include "ivaria/reporter.h"
 
 #include "jng.h"
 #include "zlib.h"

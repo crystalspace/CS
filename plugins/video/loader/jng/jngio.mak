@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/loader/jng
 
-LIB.JNGIMG.LOCAL += $(JNG_LIBS) $(Z_LIBS) $(JPG_LIBS)
+LIB.JNGIMG.LOCAL += $(MNG_LIBS) $(Z_LIBS) $(JPG_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
   JNGIMG = $(OUTDLL)csjngimg$(DLL)
