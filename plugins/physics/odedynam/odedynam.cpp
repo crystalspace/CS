@@ -49,7 +49,7 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
 
-SCF_EXPORT_CLASS_TABLE (odedyna)
+SCF_EXPORT_CLASS_TABLE (odedynam)
   SCF_EXPORT_CLASS (csODEDynamics, "crystalspace.dynamics.ode",
 	"Dynamics system using ODE.")
 SCF_EXPORT_CLASS_TABLE_END
