@@ -1382,7 +1382,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
   cfg->DecRef ();
 
-#ifndef COMP_VC
   #ifdef CS_DEBUG
     // enable all kinds of useful FPU exceptions on a x86
     // note that we can't do it above since at least on OS/2 each dynamic
@@ -1392,7 +1391,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     // this will disable exceptions on DJGPP (for the non-debug version)
     csControl87 (0x3f, 0x3f);
   #endif
-#endif
 
   // Start the engine
   iNativeWindow* nw = Gfx2D->GetNativeWindow ();
