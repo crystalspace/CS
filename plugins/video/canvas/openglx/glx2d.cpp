@@ -187,14 +187,7 @@ bool csGraphics2DGLX::Open()
 void csGraphics2DGLX::Close(void)
 {
   if (!is_open) return;
-
-  if ( dispdriver ){
-      dispdriver->close();
-  }
-
-  if (xwin)
-    xwin->Close ();
-
+    
   // Close your graphic interface
   csGraphics2DGLCommon::Close ();
   if (active_GLContext != NULL)
@@ -202,6 +195,13 @@ void csGraphics2DGLX::Close(void)
     glXDestroyContext(dpy,active_GLContext);
     active_GLContext = NULL;
   }
+
+  if ( dispdriver ){
+      dispdriver->close();
+  }
+
+  if (xwin)
+    xwin->Close ();
 }
 
 static const char *visual_class_name (int cls)
