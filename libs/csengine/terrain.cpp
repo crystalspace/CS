@@ -240,6 +240,14 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     fbr.Set(fc[7].v[0],fc[7].v[1],fc[7].v[2]);
   }
   // NOW RENDER THIS USING WHITE LINES and look around to see where it is.
+  // @@@ ALEX: to render a line in CAMERA space use:
+  //csVector3 camv1, camv2;
+  //rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  // @@@ ALEX: to render a line in WORLD space (between worv1 and worv2) use:
+  //csVector3 worv1, worv2;
+  //csVector3 camv1 = rview.World2Camera (worv1);
+  //csVector3 camv2 = rview.World2Camera (worv2);
+  //rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
 
   // Optimize the mesh w.r.t. the current viewing location.
   modified = mesh->calculate(context);
