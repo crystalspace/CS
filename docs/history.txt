@@ -9,6 +9,10 @@ The history order has been reversed so that new features are at the top.
 	- Removed some comment from Andrew about a
 	  csPolygonClipper::ClassifyBox which was wrong according to
 	  Andrew. But it isn't. The function is correct.
+	- Fixed a bug in WalkTest with regards to particle systems. The
+	  new GetMovable().UpdateMove() function was not called which
+	  resulted in the particle systems not being visible in STATBSP
+	  levels.
 30-Aug-2000
      	- Andrew Zabolotny:
 	    - Some fixes to MazeD. Now it works, but is unusabled due to

@@ -132,6 +132,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
 	  csVector3 (0, -speed, 0));
     exp->GetMovable ().SetSector (sector);
     exp->SetColor (csColor (.25,.25,.25));
+    exp->GetMovable ().UpdateMove ();
   }
 }
 
@@ -191,6 +192,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
 	  csVector3 (0, -speed, 0), .2);
     exp->GetMovable ().SetSector (sector);
     exp->SetColor (csColor (.25,.25,.25));
+    exp->GetMovable ().UpdateMove ();
   }
 }
 
@@ -215,6 +217,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
      3.0, csVector3(0,0.5,0), origin,
      0.3, 0.40);
   exp->GetMovable ().SetSector (sector);
+  exp->GetMovable ().UpdateMove ();
 }
 
 //===========================================================================
@@ -242,6 +245,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   exp->SetChangeRotation(7.5);
   //exp->SetColor (csColor (.25,.25,.25));
   exp->SetColor (csColor (.25,.35,.55));
+  exp->GetMovable ().UpdateMove ();
 }
 
 //===========================================================================
@@ -270,6 +274,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   exp->SetColor( csColor(1,1,0) );
   exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
   exp->AddLight (Sys->world, sector, 1000);
+  exp->GetMovable ().UpdateMove ();
 }
 
 //===========================================================================
@@ -298,6 +303,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   exp->SetColor( csColor(1,1,0) );
   exp->SetChangeColor( csColor(+0.01,0.,-0.012) );
   //exp->AddLight (Sys->world, sector, 1000);
+  exp->GetMovable ().UpdateMove ();
 }
 
 //===========================================================================
