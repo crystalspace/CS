@@ -26,6 +26,14 @@ The history order is reversed so that new features are at the top.
 	- Added subtract operations to csColor.
 	- Did many optimizations to the fire particle system by
 	  precalculating a lot.
+	- Did an optimization in the engine. When a mesh is marked as
+	  invisible (CS_ENTITY_INVISIBLE) csEngine::NextFrame() will not
+	  process it.
+	- Did an additional optimization so that mesh objects will only call
+	  NextFrame() as soon as they are really drawn on screen. i.e. as
+	  soon as DrawTest() returns true. This should increase global
+	  speed of the engine if there are many particle systems and sprites
+	  in the world but they are all currently invisible.
 	- Martin Geisse did a small bug fix in engine.cpp.
 25-Apr-2001
 	- Philip Wyett cleaned up formatting in ptlab.cfg.

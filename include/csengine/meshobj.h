@@ -71,6 +71,15 @@ protected:
   int defered_lighting_flags;
 
   /**
+   * If this nextframe_pending is not 0 then a call of NextFrame
+   * has happened. As soon as the object is visible (DrawTest() returns
+   * true) we will really call NextFrame(). This should improve
+   * global speed of the engine as this means that invisible particle
+   * systems will now not be updated anymore until they are really visible.
+  */
+  cs_time nextframe_pending;
+
+  /**
    * Flag which is set to true when the object is visible.
    * This is used by the c-buffer/bsp routines. The object itself
    * will not use this flag in any way at all. It is simply intended

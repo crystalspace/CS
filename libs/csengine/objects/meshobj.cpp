@@ -49,6 +49,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   movable.scfParent = this;
   defered_num_lights = 0;
   defered_lighting_flags = 0;
+  nextframe_pending = 0;
   is_visible = false;
   wor_bbox_movablenr = -1;
   myOwner = NULL;
@@ -78,6 +79,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   movable.scfParent = this;
   defered_num_lights = 0;
   defered_lighting_flags = 0;
+  nextframe_pending = 0;
   is_visible = false;
   wor_bbox_movablenr = -1;
   myOwner = NULL;
@@ -210,6 +212,11 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
   if (draw_cb) draw_cb (meshwrap, rview, draw_cbData);
   if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
+    if (nextframe_pending != 0)
+    {
+      mesh->NextFrame (nextframe_pending);
+      nextframe_pending = 0;
+    }
     UpdateDeferedLighting (movable.GetFullPosition ());
     mesh->Draw (rview, &movable.scfiMovable, zbufMode);
   }
@@ -223,7 +230,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
 
 void csMeshWrapper::NextFrame (cs_time current_time)
 {
-  mesh->NextFrame (current_time);
+  nextframe_pending = current_time;
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
