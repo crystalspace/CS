@@ -518,7 +518,7 @@ bool csGraphics2DDDraw3::DoubleBuffer (bool Enable)
 
 bool csGraphics2DDDraw3::DoubleBuffer ()
 {
-  return false;
+  return true;
 }
 
 void csGraphics2DDDraw3::Print (csRect *area)
