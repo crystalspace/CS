@@ -1704,8 +1704,8 @@ bool csTextSyntaxService::ParseTextureMapping (
         texspec &= ~CSTEX_UV;
         texspec |= CSTEX_V1;
 	tx1.x = child->GetAttributeValueAsFloat ("x");
-	tx1.x = child->GetAttributeValueAsFloat ("y");
-	tx1.x = child->GetAttributeValueAsFloat ("z");
+	tx1.y = child->GetAttributeValueAsFloat ("y");
+	tx1.z = child->GetAttributeValueAsFloat ("z");
         len.y = tx1.Norm ();
         tx1 += tx_orig;
         break;
@@ -1713,8 +1713,8 @@ bool csTextSyntaxService::ParseTextureMapping (
         texspec &= ~CSTEX_UV;
         texspec |= CSTEX_V2;
 	tx2.x = child->GetAttributeValueAsFloat ("x");
-	tx2.x = child->GetAttributeValueAsFloat ("y");
-	tx2.x = child->GetAttributeValueAsFloat ("z");
+	tx2.y = child->GetAttributeValueAsFloat ("y");
+	tx2.z = child->GetAttributeValueAsFloat ("z");
         len.z = tx2.Norm ();
         tx2 += tx_orig;
         break;
