@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	  Now a pseudo-dynamic lightmap will only be created if the light
 	  REALLY affects the polygon and not when it theoretically could
 	  affect it due to distance.
+	- Fixed a few printf related bugs in map2cs. Thanks to Wouter
+	  for reporting this.
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.

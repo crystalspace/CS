@@ -150,7 +150,7 @@ bool CCSWorld::Write(const char* filename, CMapFile* pMap, const char * /*source
 
   CMapEntity* pEntity = GetWorldspawn();
 
-  fprintf(m_fd, "<settings><clearzbuf>yes</clearzbuf></settings>\n\n", m_ScaleFactor);
+  fprintf(m_fd, "<settings><clearzbuf>yes</clearzbuf></settings>\n\n");
     
   WriteIndent();
   fprintf(m_fd, "<key name=\"map2cs_scaling\" value=\"%g\" />\n\n", m_ScaleFactor);
@@ -1018,10 +1018,10 @@ void CCSWorld::WriteSpritesTemplate()
         if (sscanf(modelnamevalue, "%s%c",mdlname, &dummy) == 1)
         {
           WriteIndent();
-          fprintf(m_fd, "<meshfact name=\"s\">\n", csnamevalue);
+          fprintf(m_fd, "<meshfact name=\"%s\">\n", csnamevalue);
           Indent();
           WriteIndent();
-          fprintf(m_fd, "<plugin>spr3d</plugin>\n", csnamevalue);
+          fprintf(m_fd, "<plugin>spr3d</plugin>\n");
           WriteIndent();
           //TODO: see if we can initalize .3ds files
           fprintf(m_fd, "<file>/lib/models/%s.mdl</file>\n", mdlname);
