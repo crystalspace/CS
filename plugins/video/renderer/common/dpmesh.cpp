@@ -216,7 +216,8 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
 
     // Transform object to texture transform to
     // camera to texture transformation here.
-    csTransform t_obj2tex (pol.texmap->m_obj2tex, pol.texmap->v_obj2tex);
+    csTransform t_obj2tex (pol.texmap->GetO2T (),
+    	pol.texmap->GetO2TTranslation ());
     m_cam2tex = t_obj2tex.GetO2T () * o2c.GetT2O ();
     v_cam2tex = o2c.Other2This (t_obj2tex.GetO2TTranslation ());
 

@@ -178,20 +178,7 @@ csPolygon3DStatic* csPolygon3DStatic::Clone (csThingStatic* new_parent)
   if (polygon_data.tmapping)
   {
     clone->polygon_data.tmapping = t->blk_texturemapping.Alloc ();
-    clone->polygon_data.tmapping->m_obj2tex = polygon_data.tmapping->m_obj2tex;
-    clone->polygon_data.tmapping->v_obj2tex = polygon_data.tmapping->v_obj2tex;
-    clone->polygon_data.tmapping->fdu = polygon_data.tmapping->fdu;
-    clone->polygon_data.tmapping->fdv = polygon_data.tmapping->fdv;
-    clone->polygon_data.tmapping->Imin_u = polygon_data.tmapping->Imin_u;
-    clone->polygon_data.tmapping->Imin_v = polygon_data.tmapping->Imin_v;
-    clone->polygon_data.tmapping->Fmin_u = polygon_data.tmapping->Fmin_u;
-    clone->polygon_data.tmapping->Fmin_v = polygon_data.tmapping->Fmin_v;
-    clone->polygon_data.tmapping->Fmax_u = polygon_data.tmapping->Fmax_u;
-    clone->polygon_data.tmapping->Fmax_v = polygon_data.tmapping->Fmax_v;
-    clone->polygon_data.tmapping->shf_u = polygon_data.tmapping->shf_u;
-    clone->polygon_data.tmapping->w = polygon_data.tmapping->w;
-    clone->polygon_data.tmapping->h = polygon_data.tmapping->h;
-    clone->polygon_data.tmapping->w_orig = polygon_data.tmapping->w_orig;
+    *clone->polygon_data.tmapping = *polygon_data.tmapping;
   }
   else
   {
@@ -229,7 +216,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   float B = plane_wor.B ();
   float C = plane_wor.C ();
   csTextureTrans::compute_texture_space (
-      polygon_data.tmapping->m_obj2tex, polygon_data.tmapping->v_obj2tex,
+      polygon_data.tmapping->GetO2T (),
+      polygon_data.tmapping->GetO2TTranslation (),
       xo, yo, zo,
       x1, y1, z1,
       len1,
@@ -245,7 +233,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   float len2)
 {
   csTextureTrans::compute_texture_space (
-      polygon_data.tmapping->m_obj2tex, polygon_data.tmapping->v_obj2tex,
+      polygon_data.tmapping->GetO2T (),
+      polygon_data.tmapping->GetO2TTranslation (),
       v_orig, v1,
       len1, v2,
       len2);
@@ -258,8 +247,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 &v_v)
 {
   csTextureTrans::compute_texture_space (
-      polygon_data.tmapping->m_obj2tex,
-      polygon_data.tmapping->v_obj2tex,
+      polygon_data.tmapping->GetO2T (),
+      polygon_data.tmapping->GetO2TTranslation (),
       v_orig,
       v_u,
       v_v);
@@ -274,8 +263,10 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 o (xo, yo, zo);
   const csVector3 u (xu, yu, zu);
   const csVector3 v (xv, yv, zv);
-  csTextureTrans::compute_texture_space (polygon_data.tmapping->m_obj2tex,
-    polygon_data.tmapping->v_obj2tex, o, u, v);
+  csTextureTrans::compute_texture_space (
+      polygon_data.tmapping->GetO2T (),
+      polygon_data.tmapping->GetO2TTranslation (),
+      o, u, v);
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
@@ -286,7 +277,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   float xw, float yw, float zw)
 {
   csTextureTrans::compute_texture_space (
-      polygon_data.tmapping->m_obj2tex, polygon_data.tmapping->v_obj2tex,
+      polygon_data.tmapping->GetO2T (),
+      polygon_data.tmapping->GetO2TTranslation (),
       xo, yo, zo,
       xu, yu, zu,
       xv, yv, zv,
@@ -298,8 +290,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csMatrix3 &tx_matrix,
   const csVector3 &tx_vector)
 {
-  polygon_data.tmapping->m_obj2tex = tx_matrix;
-  polygon_data.tmapping->v_obj2tex = tx_vector;
+  polygon_data.tmapping->SetO2T (tx_matrix),
+  polygon_data.tmapping->SetO2TTranslation (tx_vector),
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
@@ -489,9 +481,9 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
   thing_static->scfiObjectModel.ShapeChanged ();
   if (polygon_data.tmapping)
   {
-    polygon_data.tmapping->m_obj2tex *= t.GetO2T ();
-    polygon_data.tmapping->v_obj2tex = t.This2Other (
-    	polygon_data.tmapping->v_obj2tex);
+    polygon_data.tmapping->GetO2T () *= t.GetO2T ();
+    polygon_data.tmapping->GetO2TTranslation () = t.This2Other (
+    	polygon_data.tmapping->GetO2TTranslation ());
   }
 }
 
@@ -506,11 +498,13 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
 
   int i;
   csVector3 v1, v2;
+  const csVector3& v_obj2tex = polygon_data.tmapping->GetO2TTranslation ();
+  const csMatrix3& m_obj2tex = polygon_data.tmapping->GetO2T ();
   for (i = 0; i < polygon_data.num_vertices; i++)
   {
-    v1 = Vobj (i);                  // Coordinates of vertex in object space.
-    v1 -= polygon_data.tmapping->v_obj2tex;
-    v2 = (polygon_data.tmapping->m_obj2tex) * v1;   // Coordinates of vertex in texture space.
+    v1 = Vobj (i);           // Coordinates of vertex in object space.
+    v1 -= v_obj2tex;
+    v2 = (m_obj2tex) * v1;   // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
     if (v2.x > max_u) max_u = v2.x;
     if (v2.y < min_v) min_v = v2.y;
@@ -518,10 +512,7 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   }
 
   // used in hardware accel drivers
-  polygon_data.tmapping->Fmin_u = min_u;
-  polygon_data.tmapping->Fmax_u = max_u;
-  polygon_data.tmapping->Fmin_v = min_v;
-  polygon_data.tmapping->Fmax_v = max_v;
+  polygon_data.tmapping->SetTextureBox (min_u, min_v, max_u, max_v);
 
   int ww, hh;
   iMaterialHandle* mat_handle = GetMaterialHandle ();
@@ -535,24 +526,27 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
     ww = hh = 64;
     rc = false;
   }
-  polygon_data.tmapping->Imin_u = QRound (min_u * ww);
-  polygon_data.tmapping->Imin_v = QRound (min_v * hh);
+  polygon_data.tmapping->SetIMinUV (QRound (min_u * ww),
+    QRound (min_v * hh));
   int Imax_u = QRound (max_u * ww);
   int Imax_v = QRound (max_v * hh);
 
-  polygon_data.tmapping->h = Imax_v - polygon_data.tmapping->Imin_v;
-  polygon_data.tmapping->w_orig = Imax_u - polygon_data.tmapping->Imin_u;
-  polygon_data.tmapping->w = 1;
-  polygon_data.tmapping->shf_u = 0;
+  polygon_data.tmapping->SetLitHeight (Imax_u -
+  	polygon_data.tmapping->GetIMinU ());
+  int w_orig = Imax_v - polygon_data.tmapping->GetIMinV ();
+  polygon_data.tmapping->SetLitOriginalWidth (w_orig);
+  int shf_u = 0;
+  int w = 1;
   while (true)
   {
-    if (polygon_data.tmapping->w_orig <= polygon_data.tmapping->w) break;
-    polygon_data.tmapping->w <<= 1;
-    polygon_data.tmapping->shf_u++;
+    if (w_orig <= w) break;
+    w <<= 1;
+    shf_u++;
   }
+  polygon_data.tmapping->SetShiftU (shf_u);
+  polygon_data.tmapping->SetLitWidth (w);
 
-  polygon_data.tmapping->fdu = min_u * ww;
-  polygon_data.tmapping->fdv = min_v * hh;
+  polygon_data.tmapping->SetFDUV (min_u * ww, min_v * hh);
   return rc;
 }
 
@@ -583,8 +577,10 @@ bool csPolygon3DStatic::Finish ()
 
   if (flags.Check (CS_POLY_LIGHTING))
   {
-    int lmw = csLightMap::CalcLightMapWidth (polygon_data.tmapping->w_orig);
-    int lmh = csLightMap::CalcLightMapHeight (polygon_data.tmapping->h);
+    int lmw = csLightMap::CalcLightMapWidth (
+    	polygon_data.tmapping->GetLitOriginalWidth ());
+    int lmh = csLightMap::CalcLightMapHeight (
+    	polygon_data.tmapping->GetLitHeight ());
     int max_lmw, max_lmh;
     thing_static->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
@@ -1083,8 +1079,8 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
         ->blk_lightmap.Alloc ();
       txt_info.SetLightMap (lm);
 
-      lm->Alloc (spoly->polygon_data.tmapping->w_orig,
-      	spoly->polygon_data.tmapping->h);
+      lm->Alloc (spoly->polygon_data.tmapping->GetLitOriginalWidth (),
+      	spoly->polygon_data.tmapping->GetLitHeight ());
 
 #ifndef CS_USE_NEW_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
@@ -1153,8 +1149,8 @@ const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
   if (txt_info.lm == 0) return 0;
   const char* error = txt_info.lm->ReadFromCache (
           file,
-          spoly->polygon_data.tmapping->w_orig,
-          spoly->polygon_data.tmapping->h,
+          spoly->polygon_data.tmapping->GetLitOriginalWidth (),
+          spoly->polygon_data.tmapping->GetLitHeight (),
           this, spoly,
 	  thing->GetStaticData ()->thing_type->engine);
   if (error != 0)

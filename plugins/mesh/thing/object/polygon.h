@@ -157,8 +157,8 @@ public:
   /// Get the transformation from object to texture space.
   void MappingGetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector)
   {
-    tx_matrix = polygon_data.tmapping->m_obj2tex;
-    tx_vector = polygon_data.tmapping->v_obj2tex;
+    tx_matrix = polygon_data.tmapping->GetO2T ();
+    tx_vector = polygon_data.tmapping->GetO2TTranslation ();
   }
 
   /**

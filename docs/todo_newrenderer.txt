@@ -27,6 +27,8 @@ Comparing walktest between NR and OR:
 Things that need to be done in new renderer:
 
 	- iThingState->ReplaceMaterial() will not work in NR.
+	- Fix lightmapped things to use an appropriate shader so that it
+	  doesn't get very slow in case only two TU's are available.
 	- Support static LOD. This is a special case of a hierarchical mesh
 	  where only one of the children is drawn based on distance
 	  related conditions.

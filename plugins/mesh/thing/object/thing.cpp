@@ -325,13 +325,13 @@ void csThingStatic::PrepareLMLayout ()
       polysSorted.Put (mat, lp);
     }
 
-    csPolyTextureMapping* lm = sp->GetTextureMapping ();
-    if ((lm != 0) && (sp->flags.Check (CS_POLY_LIGHTING)))
+    csPolyTextureMapping* lmi = sp->GetTextureMapping ();
+    if ((lmi != 0) && (sp->flags.Check (CS_POLY_LIGHTING)))
     {
       lp->numLitPolys++;
 
-      int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ()));
-      int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ()));
+      int lmw = (csLightMap::CalcLightMapWidth (lmi->GetLitOriginalWidth ()));
+      int lmh = (csLightMap::CalcLightMapHeight (lmi->GetLitHeight ()));
       lp->totalLumels += lmw * lmh;
     }
 
@@ -417,17 +417,17 @@ static int CompareStaticPolys (int const& i1, int const& i2)
   int maxdim1, mindim1, maxdim2, mindim2;
 
   maxdim1 = MAX (
-    csLightMap::CalcLightMapWidth (lm1->GetOriginalWidth ()), 
-    csLightMap::CalcLightMapHeight (lm1->GetHeight ()));
+    csLightMap::CalcLightMapWidth (lm1->GetLitOriginalWidth ()), 
+    csLightMap::CalcLightMapHeight (lm1->GetLitHeight ()));
   mindim1 = MIN (
-    csLightMap::CalcLightMapWidth (lm1->GetOriginalWidth ()), 
-    csLightMap::CalcLightMapHeight (lm1->GetHeight ()));
+    csLightMap::CalcLightMapWidth (lm1->GetLitOriginalWidth ()), 
+    csLightMap::CalcLightMapHeight (lm1->GetLitHeight ()));
   maxdim2 = MAX (
-    csLightMap::CalcLightMapWidth (lm2->GetOriginalWidth ()), 
-    csLightMap::CalcLightMapHeight (lm2->GetHeight ()));
+    csLightMap::CalcLightMapWidth (lm2->GetLitOriginalWidth ()), 
+    csLightMap::CalcLightMapHeight (lm2->GetLitHeight ()));
   mindim2 = MIN (
-    csLightMap::CalcLightMapWidth (lm2->GetOriginalWidth ()), 
-    csLightMap::CalcLightMapHeight (lm2->GetHeight ()));
+    csLightMap::CalcLightMapWidth (lm2->GetLitOriginalWidth ()), 
+    csLightMap::CalcLightMapHeight (lm2->GetLitHeight ()));
 
   if (maxdim1 == maxdim2)
   {
@@ -478,9 +478,9 @@ void csThingStatic::DistributePolyLMs (
       continue;
     }
 
-    int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ())
+    int lmw = (csLightMap::CalcLightMapWidth (lm->GetLitOriginalWidth ())
     	+ LM_BORDER);
-    int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ())
+    int lmh = (csLightMap::CalcLightMapHeight (lm->GetLitHeight ())
     	+ LM_BORDER);
 
     if ((lmw > thing_type->maxLightmapW) || 
@@ -535,9 +535,9 @@ void csThingStatic::DistributePolyLMs (
 
 	csPolyTextureMapping* lm = sp->GetTextureMapping ();
 
-	int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ())
+	int lmw = (csLightMap::CalcLightMapWidth (lm->GetLitOriginalWidth ())
 		+ LM_BORDER);
-	int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ())
+	int lmh = (csLightMap::CalcLightMapHeight (lm->GetLitHeight ())
 		+ LM_BORDER);
 
 	csRect r;
@@ -645,12 +645,13 @@ void csThingStatic::DistributePolyLMs (
       const csRect& r = litPolys[i]->lmRects[j];
 
       sp->polygon_data.useLightmap = true;
+      float lmu1, lmv1, lmu2, lmv2;
       thing_type->G3D->GetTextureManager ()->GetLightmapRendererCoords (
 	slm->width, slm->height, 
 	r.xmin, r.ymin, r.xmax, r.ymax,
-	sp->polygon_data.tmapping->lmu1, sp->polygon_data.tmapping->lmv1,
-	sp->polygon_data.tmapping->lmu2, sp->polygon_data.tmapping->lmv2);
-      //sp->polygon_data.lmu1
+	lmu1, lmv1, lmu2, lmv2);
+      sp->polygon_data.tmapping->SetCoordsOnSuperLM (
+      	lmu1, lmv1, lmu2, lmv2);
     }
   }
 }

@@ -188,9 +188,9 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
   }
 
   const csMatrix3& m_obj2tex =
-    tmapping ? tmapping->m_obj2tex : csMatrix3 (); // @@@
+    tmapping ? tmapping->GetO2T () : csMatrix3 (); // @@@
   const csVector3& v_obj2tex =
-    tmapping ? tmapping->v_obj2tex : csVector3 (); // @@@
+    tmapping ? tmapping->GetO2TTranslation () : csVector3 (); // @@@
   csTransform obj2tex (m_obj2tex, v_obj2tex);
 
   csTransform tex2lm;

@@ -147,8 +147,8 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       csVector3 t_v;
       if (static_data->tmapping)
       {
-        t_m = static_data->tmapping->m_obj2tex;
-        t_v = static_data->tmapping->v_obj2tex;
+        t_m = static_data->tmapping->GetO2T ();
+        t_v = static_data->tmapping->GetO2TTranslation ();
       }
       else
       {
@@ -167,15 +167,13 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 	csPolyLMCoords lmc;
 	/*lm->GetRendererCoords (lmc.u1, lmc.v1,
 	  lmc.u2, lmc.v2);*/
-	lmc.u1 = static_data->tmapping->lmu1;
-	lmc.v1 = static_data->tmapping->lmv1;
-	lmc.u2 = static_data->tmapping->lmu2;
-	lmc.v2 = static_data->tmapping->lmv2;
+	static_data->tmapping->GetCoordsOnSuperLM (lmc.u1, lmc.v1,
+		lmc.u2, lmc.v2);
 
 	float lm_low_u = 0.0f, lm_low_v = 0.0f;
 	float lm_high_u = 1.0f, lm_high_v = 1.0f;
-	if (static_data->tmapping)
-	  static_data->tmapping->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+	static_data->tmapping->GetTextureBox (
+		lm_low_u, lm_low_v, lm_high_u, lm_high_v);
 
 	float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
 	float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));

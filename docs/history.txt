@@ -19,6 +19,11 @@ chronological order.
 	- Jorrit moved csPolyTextureMapping from include/imesh/thing/polygon.h
 	  to include/ivideo/polyrender.h where it belongs.
 	- Jorrit moved include/imesh/thing/thing.h to include/imesh/thing.h.
+	- Jorrit made all fields in csPolyTextureMapping private and
+	  added appropriate getters. Also added an '=' operator so that
+	  the Clone() in csThings can use that. This also fixes a bug
+	  because res2k added fields to csPolyTextureMapping and forgot
+	  to update Clone().
 22-Feb-2004
 	- Duhprey made null renderer for the NR.  (Shaders currently try to
 	  load with error, but it appears to be harmless.)

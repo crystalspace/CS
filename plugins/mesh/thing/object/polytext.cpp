@@ -293,7 +293,8 @@ void csPolyTexture::FillLightMap (
     // @@@ Actually we only want to project the light and shadow frustums
     // on the polygon plane but I'm not sure yet how to do that efficiently.
     // poly will be the polygon to which we clip all frustums.
-    csPolyTextureMapping* tmapping = subpoly->GetStaticPoly ()->GetTextureMapping ();
+    csPolyTextureMapping* tmapping = subpoly->GetStaticPoly ()
+    	->GetTextureMapping ();
 
     csVector3 poly[4];
     int num_vertices = 4;
@@ -303,16 +304,16 @@ void csPolyTexture::FillLightMap (
     float inv_ww = 1.0f / float (ww);
     float inv_hh = 1.0f / float (hh);
     v.z = 0;
-    v.x = (-2 * csLightMap::lightcell_size + tmapping->Imin_u) * inv_ww;
-    v.y = (-2 * csLightMap::lightcell_size + tmapping->Imin_v) * inv_hh;
+    v.x = (-2 * csLightMap::lightcell_size + tmapping->GetIMinU ()) * inv_ww;
+    v.y = (-2 * csLightMap::lightcell_size + tmapping->GetIMinV ()) * inv_hh;
     poly[0] = m_t2w * v + v_t2w - lightpos;
-    v.x = ((lm->lwidth + 2) * csLightMap::lightcell_size + tmapping->Imin_u)
+    v.x = ((lm->lwidth + 2) * csLightMap::lightcell_size+tmapping->GetIMinU ())
       * inv_ww;
     poly[1] = m_t2w * v + v_t2w - lightpos;
-    v.y = ((lm->lheight + 2) * csLightMap::lightcell_size + tmapping->Imin_v)
+    v.y = ((lm->lheight + 2) * csLightMap::lightcell_size+tmapping->GetIMinV ())
       * inv_hh;
     poly[2] = m_t2w * v + v_t2w - lightpos;
-    v.x = (-2 * csLightMap::lightcell_size + tmapping->Imin_u) * inv_ww;
+    v.x = (-2 * csLightMap::lightcell_size + tmapping->GetIMinU ()) * inv_ww;
     poly[3] = m_t2w * v + v_t2w - lightpos;
 
     // To transform a frustum coordinate to lightmap space we use
@@ -355,8 +356,8 @@ void csPolyTexture::FillLightMap (
     csVector3 TL = Mw2t * (lightpos - Vw2t);
     float wl = float (ww) * inv_lightcell_size;
     float hl = float (hh) * inv_lightcell_size;
-    float ul = -float (tmapping->Imin_u) * inv_lightcell_size;
-    float vl = -float (tmapping->Imin_v) * inv_lightcell_size;
+    float ul = -float (tmapping->GetIMinU ()) * inv_lightcell_size;
+    float vl = -float (tmapping->GetIMinV ()) * inv_lightcell_size;
     csVector3 trans_u (Mw2t.m11 * wl, Mw2t.m12 * wl, Mw2t.m13 * wl);
     float shift_u = TL.x * wl + ul;
     csVector3 trans_v (Mw2t.m21 * hl, Mw2t.m22 * hl, Mw2t.m23 * hl);
@@ -462,10 +463,10 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
 {
   csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()->GetTextureMapping ();
   int lw = 1 +
-    ((tmapping->w_orig + csLightMap::lightcell_size - 1) >>
+    ((tmapping->GetLitOriginalWidth () + csLightMap::lightcell_size - 1) >>
       csLightMap::lightcell_shift);
   int lh = 1 +
-    ((tmapping->h + csLightMap::lightcell_size - 1) >>
+    ((tmapping->GetLitHeight () + csLightMap::lightcell_size - 1) >>
       csLightMap::lightcell_shift);
 
   int u, uv;
@@ -527,8 +528,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
       // T = Mwt * (W - Vwt)
       //v1 = pl->m_world2te *(lp->vertices[mi] + lp->center - pl->v_world2tex);
       v1 = m_world2tex * (lp->GetVertex (mi) + lightpos - v_world2tex);
-      f_uv[i].x = (v1.x * ww - tmapping->Imin_u) * inv_lightcell_size;
-      f_uv[i].y = (v1.y * hh - tmapping->Imin_v) * inv_lightcell_size;
+      f_uv[i].x = (v1.x * ww - tmapping->GetIMinU ()) * inv_lightcell_size;
+      f_uv[i].y = (v1.y * hh - tmapping->GetIMinV ()) * inv_lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
       if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
     }
@@ -667,8 +668,8 @@ b:
         ru = u << csLightMap::lightcell_shift;
         rv = sy << csLightMap::lightcell_shift;
 
-        v1.x = (float)(ru + tmapping->Imin_u) * invww;
-        v1.y = (float)(rv + tmapping->Imin_v) * invhh;
+        v1.x = (float)(ru + tmapping->GetIMinU ()) * invww;
+        v1.y = (float)(rv + tmapping->GetIMinV ()) * invhh;
         v1.z = 0;
         v2 = vv + m_t2w * v1;
 
@@ -802,7 +803,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
       bool created = false;
       if (!smap)
       {
-        smap = lm->NewShadowMap (light, tmapping->w, tmapping->h);
+        smap = lm->NewShadowMap (light, tmapping->GetLitWidth (),
+		tmapping->GetLitHeight ());
 	created = true;
       }
 
@@ -810,8 +812,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
       bool relevant = shadow_bitmap->UpdateShadowMap (
         shadowmap,
         csLightMap::lightcell_shift,
-        tmapping->Imin_u,
-        tmapping->Imin_v,
+        tmapping->GetIMinU (),
+        tmapping->GetIMinV (),
         mul_u,
         mul_v,
         m_t2w,
@@ -841,8 +843,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
     shadow_bitmap->UpdateLightMap (
         lightmap,
         csLightMap::lightcell_shift,
-        tmapping->Imin_u,
-        tmapping->Imin_v,
+        tmapping->GetIMinU (),
+        tmapping->GetIMinV (),
         mul_u,
         mul_v,
         m_t2w,
