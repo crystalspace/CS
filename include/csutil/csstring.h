@@ -46,7 +46,7 @@ public:
   {
     if (Data)
     {
-      free (Data);
+      delete[] Data;
       Data = NULL;
       Size = MaxSize = 0;
     }
@@ -360,7 +360,12 @@ public:
   bool operator == (const csString &iStr) const
   { return Compare (iStr); }
 
-  /// Detach the contents from the csString
+  /**
+   * Detach the low-level null-terminated string buffer from the csString
+   * object.  The caller of this function becomes the owner of the returned
+   * string buffer and is responsible for destroying it via `delete[]' when
+   * no longer needed.
+   */
   char *Detach ()
   { char *d = Data; Data = NULL; Size = MaxSize = 0; return d; }
 };

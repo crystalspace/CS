@@ -33,17 +33,19 @@ csString::~csString ()
 void csString::SetCapacity (size_t NewSize)
 {
   NewSize++;
-  if (NewSize == MaxSize)
+  if (NewSize <= MaxSize)
     return;
-
   MaxSize = NewSize;
-  Data = (char *)realloc (Data, MaxSize);
 
-  if (Size >= MaxSize)
-  {
-    Size = MaxSize - 1;
-    Data [Size] = 0;
-  }
+  char* buff = new char[MaxSize];
+  if (Data == 0 || Size == 0)
+    buff[0] = '\0';
+  else
+    memcpy(buff, Data, Size + 1);
+
+  if (Data)
+    delete[] Data;
+  Data = buff;
 }
 
 csString &csString::Truncate (size_t iPos)
