@@ -168,7 +168,7 @@ public:
    * This is a recursive function which traverses all limbs and creates
    * a combined transformation along the way.
    */
-  virtual void Transform (csTransform& tr, csFrame* source, csVector3* dest);
+  virtual void Transform (const csTransform& tr, csFrame* source, csVector3* dest);
 
   /// Get first child.
   csSkeletonLimbState* GetChildren () { return children; }
@@ -201,7 +201,7 @@ public:
   virtual ~csSkeletonConnectionState () { }
 
   /// Transform the vertices in the given frame to the destination frame.
-  virtual void Transform (csTransform& tr, csFrame* source, csVector3* dest);
+  virtual void Transform (const csTransform& tr, csFrame* source, csVector3* dest);
 
   /// Set the transformation.
   void SetTransformation (csTransform& tr) { trans = tr; }

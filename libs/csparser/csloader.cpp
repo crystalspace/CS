@@ -3999,7 +3999,6 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
   char* params;
   char* params2;
   char str[255];
-  int i, j;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {

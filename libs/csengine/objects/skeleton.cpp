@@ -126,7 +126,7 @@ csSkeletonLimbState::~csSkeletonLimbState ()
   }
 }
 
-void csSkeletonLimbState::Transform (csTransform& tr, csFrame* source, csVector3* dest)
+void csSkeletonLimbState::Transform (const csTransform& tr, csFrame* source, csVector3* dest)
 {
   csSkeletonLimbState* c = children;
   while (c)
@@ -142,7 +142,7 @@ void csSkeletonLimbState::Transform (csTransform& tr, csFrame* source, csVector3
   }
 }
 
-void csSkeletonConnectionState::Transform (csTransform& tr, csFrame* source, csVector3* dest)
+void csSkeletonConnectionState::Transform (const csTransform& tr, csFrame* source, csVector3* dest)
 {
   csTransform tr_new = tr * trans;
   csSkeletonLimbState::Transform (tr_new, source, dest);
