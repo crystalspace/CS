@@ -14,6 +14,9 @@ he history order is reversed so that new features are at the top.
 	      with walls taken into account.
 	    - AddWall() in isotest.cpp had a few fixes to render walls
 	      correctly.
+	-Diablo-D3 (unknown@panax.com) rewrote the autoconf macro from 
+	 scratch. The code is now cleaner, has more standard naming and
+	 can even check for a minimum CS version number
 18-Jan-2002
 	- Greatly enhanced and clarified the comments for the
 	  csTransform, csReversibleTransform, and csOrthoTransform classes
