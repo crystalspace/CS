@@ -1,9 +1,9 @@
 SubDir TOP plugins font server freefnt2 ;
 
-if $(FT2.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(FT2.AVAILABLE) = "yes"
 {
 Help freefnt2 : "Crystal Space FreeType font server" ;
 Plugin freefnt2 : [ Wildcard *.cpp *.h ] ;
 LinkWith freefnt2 : csutil ;
-ExternalLibs freefnt2 :  FT2 ;
+ExternalLibs freefnt2 : FT2 ;
 }

@@ -1,6 +1,6 @@
 SubDir TOP plugins physics odedynam ;
 
-if $(ODE.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(ODE.AVAILABLE) = "yes"
 {
 Help odedynam : "Crystal Space ODE dynamics plug-in" ;
 Plugin odedynam : [ Wildcard *.cpp *.h ] ;

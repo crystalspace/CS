@@ -1,13 +1,9 @@
 SubDir TOP plugins filesys vfs ;
 
-if $(ZLIB.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(ZLIB.AVAILABLE) = "yes"
 {
-
 Help vfs : "Virtual File System plug-in" ;
-
-Plugin vfs :
-	[ Wildcard *.cpp *.h ]
-;
+Plugin vfs : [ Wildcard *.cpp *.h ] ;
 LinkWith vfs : csutil ;
 ExternalLibs vfs : ZLIB ;
 
@@ -30,6 +26,6 @@ VFS_CONFIGFILE = vfs.cfg ;
 MakeLocate $(VFS_CONFIGFILE:G=config) : $(LOCATE_TARGET) ;
 SEARCH on $(VFS_CONFIGFILE:G=config) = $(LOCATE_TARGET) ;
 VfsCfgGen $(VFS_CONFIGFILE:G=config) : $(SUBDIR)/vfs.cfg.template ;
-Depends install_config : [ DoInstall $(VFS_CONFIGFILE:G=config) : $(appconfdir) ] ;
-
+Depends install_config :
+  [ DoInstall $(VFS_CONFIGFILE:G=config) : $(appconfdir) ] ;
 }

@@ -1,6 +1,6 @@
 SubDir TOP plugins video renderer opengl ;
 
-if $(GL.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(GL.AVAILABLE) = "yes"
 {
 Help gl3d : "Crystal Space OpenGL 3D renderer" ;
 Plugin gl3d : [ Wildcard *.cpp *.h ] [ Wildcard effects : *.cpp *.h ] ;

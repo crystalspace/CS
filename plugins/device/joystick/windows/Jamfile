@@ -1,6 +1,6 @@
 SubDir TOP plugins device joystick windows ;
 
-if $(DIRECTX.AVAILABLE) = "yes" || [ Property build : projgen ] = msvc
+if $(DIRECTX.AVAILABLE) = "yes"
 {
 Help joywin : "Crystal Space Joystick plugin for Windows" ;
 Plugin joywin : [ Wildcard *.cpp *.h ] ;

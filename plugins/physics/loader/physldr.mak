@@ -48,7 +48,6 @@ OUTDIRS += $(OUT.PHYSLDR)
 MSVC.DSP += PHYSLDR
 DSP.PHYSLDR.NAME = physldr
 DSP.PHYSLDR.TYPE = plugin
-DSP.PHYSLDR.LIBS = ode
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -1,12 +1,12 @@
 SubDir TOP plugins aws ;
 
-FILES = [ Wildcard *.cpp *.h ] ;
+FILES = [ Wildcard *.cpp *.h *.hpp ] ;
 
 if ! [ Property build : projgen ]
 {
   if $(CMD.BISON) && $(CMD.FLEX)
   {
-    FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp ] 
+    FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp skinparse.hpp ] 
 	skinlex.ll skinpars.yy ;
     BisonFlags skinpars.yy : "-p aws" ;
 
@@ -59,3 +59,8 @@ if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
 # directory" in this case, but we do this for that extra measure of insurance.)
 C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
   [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
+
+if [ Property build : projgen ] = msvc
+{
+  MsvcCFlags aws : "/D \"YY_NEVER_INTERACTIVE\"" ;
+}
