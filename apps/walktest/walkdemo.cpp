@@ -1467,7 +1467,8 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
 void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
 {
   iSector* room = view->GetCamera ()->GetSector ();
-  csVector3 pos = view->GetCamera ()->GetTransform ().This2Other (csVector3 (0, 0, 1));
+  csVector3 pos = view->GetCamera ()->GetTransform ().This2Other (
+  	csVector3 (0, 0, 1));
   iMaterialWrapper* tm = Sys->Engine->GetMaterialList ()->
   	FindByName ("portal");
 
@@ -1476,7 +1477,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   	CreatePortalThing ("portalTo", room, tm, portalPoly));
 
   bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != 0);
-  Sys->Engine->SelectRegion (lev);
+  iRegion* cur_region = Sys->Engine->CreateRegion (lev);
   // If the region did not already exist then we load the level in it.
   if (!regionExists)
   {
@@ -1484,8 +1485,8 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
     char buf[255];
     sprintf (buf, "/lev/%s", lev);
     Sys->myVFS->ChDir (buf);
-    LevelLoader->LoadMapFile ("world", false);
-    Sys->Engine->GetCurrentRegion ()->Prepare ();
+    LevelLoader->LoadMapFile ("world", cur_region);
+    cur_region->Prepare ();
   }
 
   thing->GetMovable ()->SetPosition (pos + csVector3 (0, Sys->cfg_legs_offset, 0));
@@ -1493,14 +1494,13 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   thing->GetMovable ()->UpdateMove ();
 
   // First make a portal to the new level.
-  iRegion* cur_region = Sys->Engine->GetCurrentRegion ();
   iCameraPosition* cp = cur_region->FindCameraPosition ("Start");
   const char* room_name;
   csVector3 topos;
   if (cp) { room_name = cp->GetSector (); topos = cp->GetPosition (); }
   else { room_name = "room"; topos.Set (0, 0, 0); }
   topos.y -= Sys->cfg_eye_offset;
-  iSector* start_sector = Sys->Engine->GetCurrentRegion ()->FindSector (room_name);
+  iSector* start_sector = cur_region->FindSector (room_name);
   if (start_sector)
   {
     iPortal* portal = portalPoly->CreatePortal (start_sector);
@@ -1527,7 +1527,6 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   }
 
   if (!regionExists)
-    Sys->InitCollDet (Sys->Engine, Sys->Engine->GetCurrentRegion ());
-  Sys->Engine->SelectRegion ((iRegion*)0);
+    Sys->InitCollDet (Sys->Engine, cur_region);
 }
 

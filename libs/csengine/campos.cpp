@@ -44,8 +44,6 @@ csCameraPosition::csCameraPosition (
   csCameraPosition::forward = forward;
   csCameraPosition::upward = upward;
   far_plane = 0;
-
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csCameraPosition::~csCameraPosition ()

@@ -142,7 +142,7 @@ struct iRenderLoop;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 19, 0);
+SCF_VERSION (iEngine, 0, 20, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -236,27 +236,6 @@ struct iEngine : public iBase
    * manager)
    */
   virtual int GetTextureFormat () const = 0;
-
-  /**
-   * Create or select a new region (name can be 0 for the default main
-   * region). All new objects will be marked as belonging to this region.
-   */
-  virtual void SelectRegion (const char* name) = 0;
-  /**
-   * Create or select a new region (region can be 0 for the default main
-   * region). All new objects will be marked as belonging to this region.
-   */
-  virtual void SelectRegion (iRegion* region) = 0;
-  /**
-   * Get a reference to the current region (or 0 if the default main
-   * region is selected).
-   */
-  virtual iRegion* GetCurrentRegion () const = 0;
-  /**
-   * Add an object to the current region. Normally you don't need to
-   * call this function as CS objects already do this automatically.
-   */
-  virtual void AddToCurrentRegion (iObject* obj) = 0;
 
   /// Delete everything in the engine.
   virtual void DeleteAll () = 0;
@@ -368,6 +347,13 @@ struct iEngine : public iBase
   virtual iMaterialList* GetMaterialList () const = 0;
   /// Get the list of all shared variables.
   virtual iSharedVariableList* GetVariableList () const = 0;
+
+  /**
+   * Create a new region and add it to the region list.
+   * If the region already exists then this function will just
+   * return the pointer to that region.
+   */
+  virtual iRegion* CreateRegion (const char* name) = 0;
   /// Get the list of all regions
   virtual iRegionList* GetRegions () = 0;
 

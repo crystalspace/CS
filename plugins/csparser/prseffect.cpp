@@ -45,7 +45,7 @@ bool csLoader::LoadEffectFile(const char* filename)
   }
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, false, this, false));
+	new StdLoaderContext (Engine, 0, this, false));
 
   csRef<iDocument> doc;
   bool er = TestXml (filename, buf, doc);
@@ -113,17 +113,18 @@ bool csLoader::ParseEffect(iDocumentNode *node, iEffectServer *pParent)
     {
     case XMLTOKEN_VARIABLE:
       {
-        int vn = efdef->GetVariableID( pParent->RequestString(child->GetAttributeValue("name")), true);
-        const char* type = child->GetAttributeValue("type");
+        int vn = efdef->GetVariableID (pParent->RequestString
+		(child->GetAttributeValue("name")), true);
+        const char* type = child->GetAttributeValue ("type");
         if (strcasecmp(type, "float") == 0)
         {
           //is float
-          float def = child->GetAttributeValueAsFloat("default");
+          float def = child->GetAttributeValueAsFloat ("default");
           efdef->SetVariableFloat(vn, def);
         }else if (strcasecmp(type, "vec4") == 0)
         {
           //is a vec4
-          const char* def = child->GetAttributeValue("default");
+          const char* def = child->GetAttributeValue ("default");
           csEffectVector4 vec;
           csScanStr(def, "%f,%f,%f,%f", &vec.x,&vec.y,&vec.z,&vec.w);
           efdef->SetVariableVector4(vn, vec);
@@ -132,7 +133,7 @@ bool csLoader::ParseEffect(iDocumentNode *node, iEffectServer *pParent)
       }
     case XMLTOKEN_TECHNIQUE:
       {
-        csRef<iEffectTechnique> tech = efdef->CreateTechnique();
+        csRef<iEffectTechnique> tech = efdef->CreateTechnique ();
        
         if(!ParseEffectTech(child, tech))
           return false;

@@ -1979,11 +1979,8 @@ bool csBugPlug::HandleEvent (iEvent& event)
 void csBugPlug::CleanDebugSector ()
 {
   if (!debug_sector.sector) return;
-  iRegion* cur_region = Engine->GetCurrentRegion ();
-  Engine->SelectRegion ("__BugPlug_region__");
-  iRegion* db_region = Engine->GetCurrentRegion ();
+  iRegion* db_region = Engine->CreateRegion ("__BugPlug_region__");
   db_region->DeleteAll ();
-  Engine->SelectRegion (cur_region);
 
   iRegionList* reglist = Engine->GetRegions ();
   reglist->Remove (db_region);
@@ -2003,13 +2000,9 @@ void csBugPlug::SetupDebugSector ()
     return;
   }
 
-  iRegion* cur_region = Engine->GetCurrentRegion ();
-  Engine->SelectRegion ("__BugPlug_region__");
-  //iRegion* db_region = Engine->GetCurrentRegion ();
-
+  iRegion* db_region = Engine->CreateRegion ("__BugPlug_region__");
   debug_sector.sector = Engine->CreateSector ("__BugPlug_sector__");
-
-  Engine->SelectRegion (cur_region);
+  db_region->QueryObject ()->ObjAdd (debug_sector.sector->QueryObject ());
 
   debug_sector.view = new csView (Engine, G3D);
   int w3d = G3D->GetWidth ();
@@ -2023,8 +2016,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   // Assumes the current region is the debug region.
   char name[100];
   sprintf (name, "mat%d,%d,%d\n", int (r*255), int (g*255), int (b*255));
-  iMaterialWrapper* mw = Engine->FindMaterial (name,
-  	Engine->GetCurrentRegion ());
+  iMaterialWrapper* mw = Engine->FindMaterial (name);
   if (mw) return mw;
   // Create a new material.
   csRef<iMaterial> mat (Engine->CreateBaseMaterial (0, 0, 0, 0));

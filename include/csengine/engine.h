@@ -322,8 +322,6 @@ public:
   bool NeedPO2Maps;
   /// Maximum texture aspect ratio
   int MaxAspectRatio;
-  /// A pointer to the current region.
-  iRegion* region;
   /// The list of all regions currently loaded.
   csRegionList regions;
 
@@ -463,11 +461,6 @@ private:
     const csVector3& pos, float radius, csPArray<iObject>& list,
     csPArray<iSector>& visited_sectors, bool crossPortals = true);
 
-  /**
-   * Get/create the engine sequence manager.
-   */
-  iEngineSequenceManager* GetEngineSequenceManager ();
-
 public:
   /**
    * The current camera for drawing the world.
@@ -478,6 +471,11 @@ public:
    * The top-level clipper we are currently using for drawing.
    */
   iClipper2D* top_clipper;
+
+  /**
+   * Get/create the engine sequence manager.
+   */
+  iEngineSequenceManager* GetEngineSequenceManager ();
 
 public:
   /**
@@ -763,6 +761,8 @@ public:
   virtual iSharedVariableList* GetVariableList () const;
   virtual iMaterialList* GetMaterialList () const;
   virtual iTextureList* GetTextureList () const;
+
+  virtual iRegion* CreateRegion (const char* name);
   virtual iRegionList* GetRegions ();
 
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
@@ -835,11 +835,6 @@ public:
     it = new csLightIt (this, region);
     return csPtr<iLightIterator> (it);
   }
-
-  /**
-   * Add an object to the current region.
-   */
-  virtual void AddToCurrentRegion (iObject* obj);
 
   /// Register a new render priority.
   virtual void RegisterRenderPriority (const char* name, long priority,
@@ -917,24 +912,6 @@ public:
    * (usually this depends on texture manager).
    */
   virtual int GetTextureFormat () const;
-
-  /**
-   * Create or select a new region (name can be 0 for the default main
-   * region). All new objects will be marked as belonging to this region.
-   */
-  virtual void SelectRegion (const char* iName);
-
-  /**
-   * Create or select a new region (region can be 0 for the default main
-   * region). All new objects will be marked as belonging to this region.
-   */
-  virtual void SelectRegion (iRegion* region);
-
-  /**
-   * Get a reference to the current region (or 0 if the default main
-   * region is selected).
-   */
-  virtual iRegion* GetCurrentRegion () const;
 
   /// Clear the entire engine.
   virtual void DeleteAll ();

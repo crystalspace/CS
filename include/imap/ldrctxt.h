@@ -32,7 +32,7 @@ struct iSector;
 struct iTextureWrapper;
 struct iLight;
 
-SCF_VERSION (iLoaderContext, 0, 0, 4);
+SCF_VERSION (iLoaderContext, 0, 0, 5);
 
 /**
  * This interface gives the context for the loader.
@@ -69,9 +69,10 @@ struct iLoaderContext : public iBase
   virtual bool CheckDupes () const = 0;
 
   /**
-   * Return true if we only check in the current region.
+   * Return a region if we only want to load in that region.
+   * 0 otherwise.
    */
-  virtual bool CurrentRegionOnly () const = 0;
+  virtual iRegion* GetRegion () const = 0;
 };
 
 /** @} */

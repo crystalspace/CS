@@ -38,7 +38,6 @@ csCollection::csCollection (
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollection);
 
   csCollection::engine = engine;
-  engine->AddToCurrentRegion (this);
 }
 
 csCollection::~csCollection ()

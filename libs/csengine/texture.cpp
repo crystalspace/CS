@@ -45,8 +45,6 @@ csTextureWrapper::csTextureWrapper (iImage *Image) :
   keep_image = false;
   DG_LINK (this, image);
   UpdateKeyColorFromImage ();
-
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
@@ -69,8 +67,6 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
   }
 
   UpdateKeyColorFromHandle ();
-
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
@@ -87,8 +83,6 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   keep_image = t.keep_image;
 
   UpdateKeyColorFromImage ();
-
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTextureWrapper::~csTextureWrapper ()

@@ -112,7 +112,7 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	  return false;
         break;
       case XMLTOKEN_HEIGHTGEN:
-        if (!ParseHeightgen (child))
+        if (!ParseHeightgen (ldr_context, child))
 	  return false;
         break;
       default:
@@ -317,8 +317,9 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	  deprecated_warned = true;
 	}
 
-	CS_ALLOC_STACK_ARRAY (char, newtype, strlen (PLUGIN_LEGACY_TEXTYPE_PREFIX) +
-	  strlen (type) + 1);
+	CS_ALLOC_STACK_ARRAY (char, newtype,
+		strlen (PLUGIN_LEGACY_TEXTYPE_PREFIX) +
+		strlen (type) + 1);
 	strcpy (newtype, PLUGIN_LEGACY_TEXTYPE_PREFIX);
 	strcat (newtype, type);
 	type = newtype;
@@ -384,6 +385,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       ipt->SetAlwaysAnimate (always_animate);
     }
   }
+  AddToRegion (ldr_context, tex->QueryObject ());
   return tex;
 }
 
@@ -508,9 +510,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 		{
 		  const char* txtname = layer_child->GetContentsValue ();
 		  iTextureWrapper* texh;
-		  if (ldr_context->CurrentRegionOnly ()
-		  	&& Engine->GetCurrentRegion ())
-		    texh = Engine->GetCurrentRegion ()->FindTexture (txtname);
+		  if (ldr_context->GetRegion ())
+		    texh = ldr_context->GetRegion ()->FindTexture (txtname);
 		  else
                     texh = Engine->GetTextureList ()->FindByName (txtname);
                   if (texh)
@@ -585,8 +586,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     }
   }
 
-  csRef<iMaterial> material (Engine->CreateBaseMaterial (texh,
-  	num_txt_layer, txt_layers, layers));
+  csRef<iMaterial> material = Engine->CreateBaseMaterial (texh,
+  	num_txt_layer, txt_layers, layers);
   if (col_set)
     material->SetFlatColor (col);
 #ifdef CS_USE_NEW_RENDERER
@@ -610,7 +611,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     delete [] prefixedname;
   }
   else
+  {
     mat->QueryObject()->SetName (matname);
+  }
 #ifdef CS_USE_NEW_RENDERER
   for (int i=0; i<shaders.Length (); i++)
     //if (shaders[i]->Prepare ())
@@ -618,6 +621,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 #endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it
 
+  AddToRegion (ldr_context, mat->QueryObject ());
   return mat;
 }
 

@@ -657,7 +657,6 @@ csEngine::csEngine (iBase *iParent) :
   materials = 0;
   render_context = 0;
   shared_variables = 0;
-  region = 0;
   current_camera = 0;
   current_engine = this;
   current_iengine = (iEngine*)this;
@@ -900,7 +899,6 @@ void csEngine::DeleteAll ()
   render_context = 0;
 
   // Clear all regions.
-  region = 0;
   regions.DeleteAll ();
 
   // Clear all render priorities.
@@ -1216,7 +1214,7 @@ iCacheManager* csEngine::GetCacheManager ()
   return cache_mgr;
 }
 
-void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
+void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
 {
   // If we have to read from the cache then we check if the 'precalc_info'
   // file exists on the VFS. If not then we cannot use the cache.
@@ -1357,7 +1355,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     csSector::cfg_reflections = 1;
   }
 
-  csRef<iLightIterator> lit = GetLightIterator (iregion);
+  csRef<iLightIterator> lit = GetLightIterator (region);
 
   // Count number of lights to process.
   iLight *l;
@@ -2461,41 +2459,18 @@ int csEngine::GetTextureFormat () const
   return txtmgr->GetTextureFormat ();
 }
 
-void csEngine::SelectRegion (const char *iName)
+iRegion* csEngine::CreateRegion (const char *name)
 {
-  if (iName == 0)
-  {
-    region = 0;          // Default engine region.
-    return ;
-  }
-
-  region = regions.FindByName (iName);
+  iRegion* region = regions.FindByName (name);
   if (!region)
   {
     csRegion *r = new csRegion (this);
     region = &r->scfiRegion;
-    r->SetName (iName);
+    r->SetName (name);
     regions.Push (region);
     r->DecRef ();
   }
-}
-
-void csEngine::SelectRegion (iRegion *region)
-{
-  csEngine::region = region;
-}
-
-iRegion *csEngine::GetCurrentRegion () const
-{
   return region;
-}
-
-void csEngine::AddToCurrentRegion (iObject *obj)
-{
-  if (region)
-  {
-    region->QueryObject ()->ObjAdd (obj);
-  }
 }
 
 iTextureWrapper *csEngine::CreateTexture (
@@ -2812,7 +2787,7 @@ public:
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iLight* FindLight(const char *name);
   virtual bool CheckDupes () const { return false; }
-  virtual bool CurrentRegionOnly () const { return false; }
+  virtual iRegion* GetRegion () const { return 0; }
 };
 
 SCF_IMPLEMENT_IBASE(EngineLoaderContext);

@@ -13,6 +13,25 @@ The history order is reversed so that new features are at the top.
 	  The way it is now prevents people from modifying the strings.
 	  This needs to be redone but preferably by someone who TESTS
 	  the changes!
+	- Jorrit did the following region related changes:
+	    - Removed the concept of the current region. The engine still
+	      manages regions but no longer knows about the current region.
+	    - Removed engine->SelectRegion(), engine->GetCurrentRegion(),
+	      and engine->AddToCurrentRegion().
+	    - Added engine->CreateRegion(). This function will create a region
+	      and add it to the region list. If the region already exists
+	      it will simply return a pointer to that.
+	    - Removed support for the <region> keyword in map files.
+	    - Added optional region parameter to iLoader->LoadLibraryFile().
+	    - Replaced boolean resolveOnlyRegion parameter in
+	      iLoader->LoadMapFile() with a pointer to the actual region
+	      instead.
+	    - Changed the parser to add all objects to the current region
+	      itself.
+	    - Sequences, triggers, and shared variables are also put in
+	      regions now.
+	    - The region code now supports removing sequences, triggers, and
+	      shared variables too.
 	- Wouter updated viewmesh to call ShineLights on the meshwrapper.
 	  This lights thing objects correctly.
         - Philip Wyett added physics loader plugin to MSVC build process.

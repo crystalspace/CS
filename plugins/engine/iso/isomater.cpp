@@ -106,7 +106,6 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   csIsoMaterialWrapper::material = material;
   index = 0;
-  //csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
@@ -118,7 +117,6 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
   handle = th.GetMaterialHandle ();
   SetName (th.GetName ());
   index = th.index;
-  //csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
@@ -128,7 +126,6 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   handle = ith;
   index = 0;
-  //csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csIsoMaterialWrapper::~csIsoMaterialWrapper ()

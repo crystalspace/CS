@@ -185,8 +185,6 @@ csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   DG_TYPE (this, "csMaterialWrapper");
   material = m;
-
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) : csObject()
@@ -196,8 +194,6 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) : csObject()
 
   handle = ith;
   DG_LINK (this, handle);
-
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject(w)
@@ -208,8 +204,6 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject(w)
   material = w.material;
   handle = w.handle;
   DG_LINK (this, handle);
-
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::~csMaterialWrapper ()

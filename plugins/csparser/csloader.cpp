@@ -105,16 +105,12 @@ SCF_IMPLEMENT_IBASE(StdLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
 StdLoaderContext::StdLoaderContext (iEngine* Engine,
-	bool resolveOnlyRegion, csLoader* loader,
+	iRegion* region, csLoader* loader,
 	bool checkDupes)
 {
   SCF_CONSTRUCT_IBASE (0);
   StdLoaderContext::Engine = Engine;
-  StdLoaderContext::resolveOnlyRegion = resolveOnlyRegion;
-  if (resolveOnlyRegion)
-    region = Engine->GetCurrentRegion ();
-  else
-    region = 0;
+  StdLoaderContext::region = region;
   StdLoaderContext::loader = loader;
   StdLoaderContext::checkDupes = checkDupes;
 }
@@ -146,6 +142,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
     csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
     iMaterialWrapper *mat = Engine->GetMaterialList ()
       	->NewMaterial (material);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
     // First we have to extract the optional region name from the name:
     char* n = strchr (name, '/');
     if (!n) n = (char*)name;
@@ -209,6 +206,7 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
     loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
       name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
+    if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
   }
   return result;
@@ -221,16 +219,11 @@ SCF_IMPLEMENT_IBASE(ThreadedLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
 ThreadedLoaderContext::ThreadedLoaderContext (iEngine* Engine,
-	bool resolveOnlyRegion, csLoader* loader,
+	iRegion* region, csLoader* loader,
 	bool checkDupes)
 {
   SCF_CONSTRUCT_IBASE (0);
-  ThreadedLoaderContext::resolveOnlyRegion = resolveOnlyRegion;
-  iRegion* region;
-  if (resolveOnlyRegion)
-    region = Engine->GetCurrentRegion ();
-  else
-    region = 0;
+  ThreadedLoaderContext::region = region;
   ThreadedLoaderContext::loader = loader;
   ThreadedLoaderContext::checkDupes = checkDupes;
 }
@@ -262,6 +255,7 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
     csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
     iMaterialWrapper *mat = Engine->GetMaterialList ()
       	->NewMaterial (material);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
     // First we have to extract the optional region name from the name:
     char* n = strchr (name, '/');
     if (!n) n = (char*)name;
@@ -325,6 +319,7 @@ iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
     loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
       name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
+    if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
   }
   return result;
@@ -493,17 +488,17 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderContext* ldr_context,
 //---------------------------------------------------------------------------
 
 csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* filename,
-	bool /*resolveOnlyRegion*/, bool /*checkDupes*/)
+	iRegion* /*region*/, bool /*checkDupes*/)
 {
   return 0;
 }
 
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
-  bool onlyRegion, bool checkdupes)
+  iRegion* region, bool checkdupes)
 {
   if (clearEngine) Engine->DeleteAll ();
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, onlyRegion, this, checkdupes));
+	new StdLoaderContext (Engine, region, this, checkdupes));
 
   csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
 
@@ -538,7 +533,7 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadLibraryFile (const char* fname)
+bool csLoader::LoadLibraryFile (const char* fname, iRegion* region)
 {
   csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
 
@@ -551,7 +546,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
   }
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, false, this, false));
+	new StdLoaderContext (Engine, region, this, false));
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
@@ -570,12 +565,20 @@ bool csLoader::LoadLibraryFile (const char* fname)
 
 //---------------------------------------------------------------------------
 
+void csLoader::AddToRegion (iLoaderContext* ldr_context, iObject* obj)
+{
+  if (ldr_context->GetRegion ())
+    ldr_context->GetRegion ()->QueryObject ()->ObjAdd (obj);
+}
+
+//---------------------------------------------------------------------------
+
 csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 {
   if (!Engine) return 0;
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, false, this, false));
+	new StdLoaderContext (Engine, 0, this, false));
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
 
@@ -600,10 +603,11 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
     	      "File '%s' does not seem to contain a 'meshfact'!", fname);
       return 0;
     }
-    csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
-      	meshfactnode->GetAttributeValue ("name")));
+    csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
+      	meshfactnode->GetAttributeValue ("name"));
     if (LoadMeshObjectFactory (ldr_context, t, meshfactnode))
     {
+      AddToRegion (ldr_context, t->QueryObject ());
       return csPtr<iMeshFactoryWrapper> (t);
     }
     else
@@ -634,7 +638,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
   csRef<iMeshWrapper> mesh;
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, false, this, false));
+	new StdLoaderContext (Engine, 0, this, false));
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -659,7 +663,11 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
     }
     mesh = Engine->CreateMeshWrapper (
     	meshobjnode->GetAttributeValue ("name"));
-    if (!LoadMeshObject (ldr_context, mesh, meshobjnode))
+    if (LoadMeshObject (ldr_context, mesh, meshobjnode))
+    {
+      AddToRegion (ldr_context, mesh->QueryObject ());
+    }
+    else
     {
       // Error is already reported.
       mesh = 0;
@@ -982,22 +990,22 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 	      iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
 	      if (t) break;
 	    }
-            csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
+            csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (name);
 	    if (!t || !LoadMeshObjectFactory (ldr_context, t, child))
 	    {
 	      // Error is already reported.
 	      return false;
 	    }
+	    else
+	    {
+	      AddToRegion (ldr_context, t->QueryObject ());
+	    }
           }
 	  break;
         case XMLTOKEN_REGION:
-	  {
-	    const char* regname = child->GetContentsValue ();
-	    if (regname)
-	      Engine->SelectRegion (regname);
-	    else
-	      Engine->SelectRegion ((iRegion*)0);
-	  }
+	  SyntaxService->ReportError (
+		"crystalspace.maploader.parse.region",
+		node, "<region> is no longer supported!");
 	  break;
         case XMLTOKEN_SECTOR:
           if (!ParseSector (ldr_context, child))
@@ -1028,7 +1036,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
             return false;
           break;
 	case  XMLTOKEN_VARIABLELIST:
-	  if (!ParseVariableList (child))
+	  if (!ParseVariableList (ldr_context, child))
 	    return false;
 	  break;
         case XMLTOKEN_SOUNDS:
@@ -1036,7 +1044,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
             return false;
           break;
         case XMLTOKEN_LIBRARY:
-	  if (!LoadLibraryFile (child->GetContentsValue ()))
+	  if (!LoadLibraryFile (child->GetContentsValue (),
+	  	ldr_context->GetRegion ()))
 	    return false;
 	  break;
         case XMLTOKEN_START:
@@ -1044,6 +1053,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 	  const char* name = child->GetAttributeValue ("name");
 	  iCameraPosition* campos = Engine->GetCameraPositions ()->
 	  	NewCameraPosition (name ? name : "Start");
+	  AddToRegion (ldr_context, campos->QueryObject ());
 	  if (!ParseStart (child, campos))
 	    return false;
           break;
@@ -1143,7 +1153,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
 #endif //CS_USE_NEW_RENDERER
 	case  XMLTOKEN_VARIABLELIST:
-	  if (!ParseVariableList (child))
+	  if (!ParseVariableList (ldr_context, child))
 	    return false;
 	  break;
         case XMLTOKEN_SOUNDS:
@@ -1165,25 +1175,33 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
         case XMLTOKEN_MESHOBJ:
           {
-	    csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (
-			    child->GetAttributeValue ("name")));
+	    csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
+			    child->GetAttributeValue ("name"));
             if (!LoadMeshObject (ldr_context, mesh, child))
 	    {
 	      // Error is already reported.
 	      return false;
 	    }
+	    else
+	    {
+	      AddToRegion (ldr_context, mesh->QueryObject ());
+	    }
           }
           break;
         case XMLTOKEN_MESHFACT:
           {
-            csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
-			    child->GetAttributeValue ("name")));
+            csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
+			    child->GetAttributeValue ("name"));
 	    if (t)
 	    {
 	      if (!LoadMeshObjectFactory (ldr_context, t, child))
 	      {
 	        // Error is already reported.
 		return false;
+	      }
+	      else
+	      {
+	        AddToRegion (ldr_context, t->QueryObject ());
 	      }
 	    }
 	  }
@@ -1828,13 +1846,17 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 
       case XMLTOKEN_MESHFACT:
         {
-          csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
-	  	child->GetAttributeValue ("name")));
+          csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
+	  	child->GetAttributeValue ("name"));
 	  csReversibleTransform child_transf;
           if (!LoadMeshObjectFactory (ldr_context, t, child, &child_transf))
 	  {
 	    // Error is already reported above.
 	    return false;
+	  }
+	  else
+	  {
+	    AddToRegion (ldr_context, t->QueryObject ());
 	  }
 	  stemp->GetChildren ()->Add (t);
 	  t->SetTransform (child_transf);
@@ -2285,6 +2307,10 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	    return 0;
 	  }
 	  mesh = t->CreateMeshWrapper ();
+	  if (mesh)
+	  {
+	    AddToRegion (ldr_context, mesh->QueryObject ());
+	  }
 	}
         break;
       default:
@@ -2450,12 +2476,16 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_MESHOBJ:
         {
-	  csRef<iMeshWrapper> sp (Engine->CreateMeshWrapper (
-			  child->GetAttributeValue ("name")));
+	  csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper (
+			  child->GetAttributeValue ("name"));
           if (!LoadMeshObject (ldr_context, sp, child))
 	  {
 	    // Error is already reported.
 	    return false;
+	  }
+	  else
+	  {
+	    AddToRegion (ldr_context, sp->QueryObject ());
 	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->Add (sp);
@@ -2969,6 +2999,7 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 {
   iCollection* collection = Engine->GetCollections ()->NewCollection (
 		  node->GetAttributeValue ("name"));
+  AddToRegion (ldr_context, collection->QueryObject ());
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -3009,9 +3040,8 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 	  for (i = 0 ; i < sl->GetCount () ; i++)
 	  {
 	    iSector* sect = sl->Get (i);
-	    if ((!ldr_context->CurrentRegionOnly ())
-	    	|| (!Engine->GetCurrentRegion ()) ||
-	        Engine->GetCurrentRegion ()->IsInRegion (sect->QueryObject ()))
+	    if ((!ldr_context->GetRegion ()) ||
+	        ldr_context->GetRegion ()->IsInRegion (sect->QueryObject ()))
 	    {
 	      l = sect->GetLights ()->FindByName (lightname);
 	      if (l) break;
@@ -3052,8 +3082,8 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 	  const char* colname = child->GetContentsValue ();
 	  //@@@$$$ TODO: Collection in regions.
 	  iCollection* th;
-	  if (ldr_context->CurrentRegionOnly () && Engine->GetCurrentRegion ())
-	    th = Engine->GetCurrentRegion ()->FindCollection (colname);
+	  if (ldr_context->GetRegion ())
+	    th = ldr_context->GetRegion ()->FindCollection (colname);
 	  else
             th = Engine->GetCollections ()->FindByName (colname);
           if (!th)
@@ -3416,8 +3446,9 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
     else dist = color.blue;
   }
 
-  csRef<iStatLight> l (Engine->CreateLight (lightname, pos,
-  	dist, color, dyn));
+  csRef<iStatLight> l = Engine->CreateLight (lightname, pos,
+  	dist, color, dyn);
+  AddToRegion (ldr_context, l->QueryObject ());
 
   switch (halo.type)
   {
@@ -3566,6 +3597,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
   if (sector == 0)
   {
     sector = Engine->CreateSector (secname);
+    AddToRegion (ldr_context, sector->QueryObject ());
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -3640,12 +3672,16 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		secname ? secname : "<noname>");
 	    return 0;
 	  }
-	  csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (
-	  	"crystalspace.mesh.object.nullmesh", meshname));
+	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
+	  	"crystalspace.mesh.object.nullmesh", meshname);
           if (!LoadPolyMeshInSector (ldr_context, mesh, child))
 	  {
 	    // Error is already reported.
 	    return 0;
+	  }
+	  else
+	  {
+	    AddToRegion (ldr_context, mesh->QueryObject ());
 	  }
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
@@ -3662,11 +3698,15 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		secname ? secname : "<noname>");
 	    return 0; // @@@ Leak
 	  }
-	  csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (meshname));
+	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname);
           if (!LoadMeshObject (ldr_context, mesh, child))
 	  {
 	    // Error is already reported.
 	    return 0; // @@@ Leak
+	  }
+	  else
+	  {
+	    AddToRegion (ldr_context, mesh->QueryObject ());
 	  }
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
@@ -3804,7 +3844,8 @@ iEngineSequenceManager* csLoader::GetEngineSequenceManager ()
   return eseqmgr;
 }
 
-bool csLoader::ParseVariableList (iDocumentNode* node)
+bool csLoader::ParseVariableList (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   if (!Engine) return false;
 
@@ -3818,7 +3859,7 @@ bool csLoader::ParseVariableList (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_VARIABLE:
-	if (!ParseSharedVariable (child))
+	if (!ParseSharedVariable (ldr_context, child))
 	  return false;
         break;
       default:
@@ -3830,9 +3871,11 @@ bool csLoader::ParseVariableList (iDocumentNode* node)
   return true;
 }
 
-bool csLoader::ParseSharedVariable (iDocumentNode* node)
+bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   csRef<iSharedVariable> v = Engine->GetVariableList()->New ();
+  AddToRegion (ldr_context, v->QueryObject ());
 
   v->SetName (node->GetAttributeValue ("name"));
 

@@ -52,16 +52,20 @@ static iSequenceWrapper* CreateSequence (iEngineSequenceManager* eseqmgr,
   return sequence;
 }
 
-static iSequenceTrigger* FindCreateTrigger (iEngineSequenceManager* eseqmgr,
+static iSequenceTrigger* FindTrigger (iEngineSequenceManager* eseqmgr,
+		const char* name)
+{
+  return eseqmgr->FindTriggerByName (name);
+}
+
+static iSequenceTrigger* CreateTrigger (iEngineSequenceManager* eseqmgr,
 		const char* name)
 {
   iSequenceTrigger* trigger = eseqmgr->FindTriggerByName (name);
-  if (!trigger)
-  {
-    // We don't need the ref returned by CreateTrigger().
-    csRef<iSequenceTrigger> trigwrap = eseqmgr->CreateTrigger (name);
-    trigger = trigwrap;
-  }
+  if (trigger) return 0;	// Error! Already exists!
+  // We don't need the ref returned by CreateTrigger().
+  csRef<iSequenceTrigger> trigwrap = eseqmgr->CreateTrigger (name);
+  trigger = trigwrap;
   return trigger;
 }
 
@@ -140,7 +144,14 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	value = (iBase*)ldr_context->FindSector (parname);
         break;
       case PARTYPE_TRIGGER:
-	value = FindCreateTrigger (GetEngineSequenceManager (), parname);
+	value = FindTrigger (GetEngineSequenceManager (), parname);
+	if (!value)
+	{
+	  iSequenceTrigger* trig = CreateTrigger (
+	  	GetEngineSequenceManager (), parname);
+	  AddToRegion (ldr_context, trig->QueryObject ());
+	  value = trig;
+	}
         break;
       case PARTYPE_SEQUENCE:
 	value = FindSequence (GetEngineSequenceManager (), parname);
@@ -437,8 +448,13 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
   // LoadTriggers() already checked for the presence of the engine
   // sequence manager.
 
-  iSequenceTrigger* trigger = FindCreateTrigger (
+  iSequenceTrigger* trigger = FindTrigger (
 	GetEngineSequenceManager (), trigname);
+  if (!trigger)
+  {
+    trigger = CreateTrigger (GetEngineSequenceManager (), trigname);
+    AddToRegion (ldr_context, trigger->QueryObject ());
+  }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -1122,8 +1138,11 @@ bool csLoader::LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_SEQUENCE:
-        if (!CreateSequence (child))
-	  return false;
+        {
+          iSequenceWrapper* sequence = CreateSequence (child);
+          if (!sequence) return false;
+	  AddToRegion (ldr_context, sequence->QueryObject ());
+	}
         break;
       default:
         SyntaxService->ReportBadToken (child);

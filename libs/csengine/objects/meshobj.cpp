@@ -73,7 +73,6 @@ csMeshWrapper::csMeshWrapper (
   movable.SetMeshWrapper (this);
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
-  csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::meshobj = meshobj;
   if (meshobj)
   {
@@ -112,7 +111,6 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   movable.SetMeshWrapper (this);
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
-  csEngine::current_engine->AddToCurrentRegion (this);
   factory = 0;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
@@ -739,7 +737,6 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (
   csMeshFactoryWrapper::meshFact = meshFact;
   parent = 0;
   children.SetMeshFactory (this);
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
@@ -747,7 +744,6 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   parent = 0;
   children.SetMeshFactory (this);
-  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()

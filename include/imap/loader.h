@@ -33,13 +33,14 @@ struct iTextureHandle;
 struct iTextureWrapper;
 struct iMaterialWrapper;
 struct iSector;
+struct iRegion;
 struct iSoundData;
 struct iSoundHandle;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iSoundWrapper;
 
-SCF_VERSION (iLoaderStatus, 0, 0, 1);
+SCF_VERSION (iLoaderStatus, 0, 1, 0);
 
 /**
  * An object to query about the status of the threaded loader.
@@ -75,7 +76,8 @@ struct iLoader : public iBase
    * manager.
    */
   virtual csPtr<iTextureHandle> LoadTexture (const char* Filename,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0, iImage **image=0) = 0;
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+	iImage **image=0) = 0;
   /**
    * Load a texture as with LoadTexture() above and register it with the
    * engine. 'Name' is the name that the engine will use for the wrapper.
@@ -101,10 +103,10 @@ struct iLoader : public iBase
 
   /**
    * Load a map file in a thread.
-   * If 'resolveOnlyRegion' is true then portals will only connect to the
-   * sectors in the current region, things will only use thing templates
-   * defined in the current region and meshes will only use mesh factories
-   * defined in the current region.
+   * If 'region' is not 0 then portals will only connect to the
+   * sectors in that region, things will only use thing templates
+   * defined in that region and meshes will only use mesh factories
+   * defined in that region.
    * <p>
    * If you use 'checkDupes' == true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
@@ -119,15 +121,15 @@ struct iLoader : public iBase
    * @@@ NOT IMPLEMENTED YET @@@
    */
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
-	bool resolveOnlyRegion = true, bool checkDupes = false) = 0;
+	iRegion* region = 0, bool checkDupes = false) = 0;
 
   /**
    * Load a map file. If 'clearEngine' is true then the current contents
-   * of the engine will be deleted before loading. If 'resolveOnlyRegion'
-   * is true then portals will only connect to the sectors in the current
-   * region, things will only use thing templates defined in the current
-   * region and meshes will only use mesh factories defined in the current
-   * region.
+   * of the engine will be deleted before loading.
+   * If 'region' is not 0 then portals will only connect to the
+   * sectors in that region, things will only use thing templates
+   * defined in that region and meshes will only use mesh factories
+   * defined in that region.
    * <p>
    * If you use 'checkDupes' == true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
@@ -137,9 +139,9 @@ struct iLoader : public iBase
    * objects have unique names accross all world files.
    */
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
-	bool resolveOnlyRegion = true, bool checkDupes = false) = 0;
+	iRegion* region = 0, bool checkDupes = false) = 0;
   /// Load library from a VFS file
-  virtual bool LoadLibraryFile (const char* filename) = 0;
+  virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0) = 0;
 
   /// Load a Mesh Object Factory from the map file.
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (

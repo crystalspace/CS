@@ -461,9 +461,9 @@ public:
   virtual void DrawFullScreenFX2D (csTicks elapsed_time, csTicks current_time);
 
   /// Load all the graphics libraries needed
-  virtual void LoadLibraryData(void);
-  virtual void Inititalize2DTextures(void);
-  virtual void Create2DSprites(void);
+  virtual void LoadLibraryData (iRegion* region);
+  virtual void Inititalize2DTextures ();
+  virtual void Create2DSprites ();
 
   ///
   bool WalkHandleEvent (iEvent &Event);

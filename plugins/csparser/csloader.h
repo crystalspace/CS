@@ -279,9 +279,8 @@ private:
   iRegion* region;
   csLoader* loader;
   bool checkDupes;
-  bool resolveOnlyRegion;
 public:
-  StdLoaderContext (iEngine* Engine, bool resolveOnlyRegion,
+  StdLoaderContext (iEngine* Engine, iRegion* region,
     csLoader* loader, bool checkDupes);
   virtual ~StdLoaderContext ();
 
@@ -294,7 +293,7 @@ public:
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iLight* FindLight (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
-  virtual bool CurrentRegionOnly () const { return resolveOnlyRegion; }
+  virtual iRegion* GetRegion () const { return region; }
 };
 
 /*
@@ -307,7 +306,6 @@ private:
   iRegion* region;
   csLoader* loader;
   bool checkDupes;
-  bool resolveOnlyRegion;
   csRefArray<iSector> sectors;
   csRefArray<iMaterialWrapper> materials;
   csRefArray<iTextureWrapper> textures;
@@ -316,7 +314,7 @@ private:
   csRefArray<iLight> lights;
 
 public:
-  ThreadedLoaderContext (iEngine* Engine, bool resolveOnlyRegion,
+  ThreadedLoaderContext (iEngine* Engine, iRegion* region,
     csLoader* loader, bool checkDupes);
   virtual ~ThreadedLoaderContext ();
 
@@ -329,7 +327,7 @@ public:
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iLight* FindLight (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
-  virtual bool CurrentRegionOnly () const { return resolveOnlyRegion; }
+  virtual iRegion* GetRegion () const { return region; }
 };
 
 /**
@@ -450,9 +448,9 @@ private:
   bool ParseMaterialList (iLoaderContext* ldr_context,
   	iDocumentNode* node, const char* prefix = 0);
   /// Parse a list of shared variables and add them each to the engine
-  bool ParseVariableList (iDocumentNode* node);
+  bool ParseVariableList (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Process the attributes of one shared variable
-  bool ParseSharedVariable (iDocumentNode* node);
+  bool ParseSharedVariable (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Process the attributes of an <imposter> tag in a mesh specification.
   bool ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
 
@@ -513,7 +511,7 @@ private:
   /// For heightgen.
   csGenerateImageValue* ParseHeightgenValue (iDocumentNode* node);
   /// Parse and load a height texture
-  bool ParseHeightgen (iDocumentNode* node);
+  bool ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node);
 
   /**
    * Load a LOD control object.
@@ -616,6 +614,12 @@ private:
   	iLoaderPlugin* plug, iFile* buf,
   	iBase* context, const char* fname);
 
+  /**
+   * Add the given object to the region in the context (if there is
+   * such a region).
+   */
+  void AddToRegion (iLoaderContext* ldr_context, iObject* obj);
+
   /// Report any error.
   void ReportError (const char* id, const char* description, ...)
 	CS_GNUC_PRINTF(3,4);
@@ -682,10 +686,10 @@ public:
   virtual csPtr<iSoundWrapper> LoadSound (const char *name, const char *fname);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
-	bool resolveOnlyRegion, bool checkDupes);
+	iRegion* region, bool checkDupes);
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
-	bool onlyRegion, bool checkDupes);
-  virtual bool LoadLibraryFile (const char* filename);
+	iRegion* region, bool checkDupes);
+  virtual bool LoadLibraryFile (const char* filename, iRegion* region);
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname);

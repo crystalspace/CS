@@ -134,7 +134,7 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
     return 0;
 
   iImage *img;
-  csRef<iTextureHandle> TexHandle (LoadTexture (fname, Flags, tm, &img));
+  csRef<iTextureHandle> TexHandle = LoadTexture (fname, Flags, tm, &img);
   if (!TexHandle)
     return 0;
 

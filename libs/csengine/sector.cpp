@@ -513,7 +513,6 @@ csSector::csSector (csEngine *engine) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
-  engine->AddToCurrentRegion (this);
 #ifndef CS_USE_NEW_RENDERER
   fog.enabled = false;
 #endif // CS_USE_NEW_RENDERER

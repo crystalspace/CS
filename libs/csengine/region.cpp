@@ -31,6 +31,7 @@
 #include "iengine/material.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
+#include "ivaria/engseq.h"
 #include "imesh/thing/thing.h"
 
 //---------------------------------------------------------------------------
@@ -57,6 +58,8 @@ csRegion::~csRegion ()
 void csRegion::DeleteAll ()
 {
   csRef<iObjectIterator> iter;
+  iEngineSequenceManager* engseq = csEngine::current_engine
+  	->GetEngineSequenceManager ();
 
   // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
@@ -76,6 +79,49 @@ void csRegion::DeleteAll ()
   // is important. i.e. we should first delete all meshes and things
   // and only then delete the sectors.
   int i;
+
+  for (i = 0; i < copy.Length (); i++)
+  {
+    if (copy[i])
+    {
+      iObject *obj = copy[i];
+      csRef<iSequenceWrapper> o (SCF_QUERY_INTERFACE (obj, iSequenceWrapper));
+      if (!o) continue;
+
+      engseq->RemoveSequence (o);
+      ObjRemove (obj);
+      copy[i] = 0;
+    }
+  }
+
+  for (i = 0; i < copy.Length (); i++)
+  {
+    if (copy[i])
+    {
+      iObject *obj = copy[i];
+      csRef<iSequenceTrigger> o (SCF_QUERY_INTERFACE (obj, iSequenceTrigger));
+      if (!o) continue;
+
+      engseq->RemoveTrigger (o);
+      ObjRemove (obj);
+      copy[i] = 0;
+    }
+  }
+
+  for (i = 0; i < copy.Length (); i++)
+  {
+    if (copy[i])
+    {
+      iObject *obj = copy[i];
+      csRef<iSharedVariable> o (SCF_QUERY_INTERFACE (obj, iSharedVariable));
+      if (!o) continue;
+
+      engine->GetVariableList ()->Remove (o);
+      ObjRemove (obj);
+      copy[i] = 0;
+    }
+  }
+
   for (i = 0; i < copy.Length (); i++)
   {
     if (copy[i])

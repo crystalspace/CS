@@ -344,7 +344,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
   return t;
 }
 
-bool csLoader::ParseHeightgen (iDocumentNode* node)
+bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   int totalw = 256, totalh = 256;
   int partw = 64, parth = 64;
@@ -400,6 +400,7 @@ bool csLoader::ParseHeightgen (iDocumentNode* node)
 	  	->NewTexture (TexHandle);
 	  TexWrapper->QueryObject ()->SetName (
 	  	child->GetAttributeValue ("name"));
+	  AddToRegion (ldr_context, TexWrapper->QueryObject ());
 	}
 	break;
       default:

@@ -981,10 +981,10 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
   }
 }
 
-void WalkTest::LoadLibraryData (void)
+void WalkTest::LoadLibraryData (iRegion* region)
 {
   // Load the "standard" library
-  if (!LevelLoader->LoadLibraryFile ("/lib/std/library"))
+  if (!LevelLoader->LoadLibraryFile ("/lib/std/library", region))
   {
     Cleanup ();
     exit (0);
@@ -1001,7 +1001,7 @@ void WalkTest::Inititalize2DTextures ()
 }
 
 
-void WalkTest::Create2DSprites(void)
+void WalkTest::Create2DSprites ()
 {
   int w, h;
   iTextureWrapper *texh;
@@ -1449,9 +1449,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       if (num_maps > 1)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'",
 		map->map_dir);
+      iRegion* region = 0;
       if (do_regions)
-        Engine->SelectRegion (map->map_dir);
-      if (!LevelLoader->LoadMapFile ("world", false, !do_regions, do_dupes))
+      {
+        region = Engine->CreateRegion (map->map_dir);
+      }
+      if (!LevelLoader->LoadMapFile ("world", false, region, do_dupes))
         return false;
       if (do_regions)
       {
@@ -1461,19 +1464,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
         // And finally we get the cache manager which will force it
         // to be created based on current VFS dir.
         Engine->GetCacheManager ();
-
-        Engine->GetCurrentRegion ()->Prepare ();
-        Engine->SelectRegion ((iRegion*)0);
+        region->Prepare ();
       }
     }
 
+    iRegion* region = 0;
     if (do_regions)
-      Engine->SelectRegion ("libdata");
-    LoadLibraryData ();
+      region = Engine->CreateRegion ("libdata");
+    LoadLibraryData (region);
     if (do_regions)
     {
-      Engine->GetCurrentRegion ()->Prepare ();
-      Engine->SelectRegion ((iRegion*)0);
+      region->Prepare ();
     }
     Inititalize2DTextures ();
     ParseKeyCmds ();
