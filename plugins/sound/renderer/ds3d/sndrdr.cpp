@@ -98,12 +98,14 @@ iSoundBuffer *csSoundRenderDS3D::CreateSoundBuffer(csSoundData *snd)
   return QUERY_INTERFACE(pNew, iSoundBuffer);
 }
 
-void csSoundRenderDS3D::PlayEphemeral(csSoundData* snd)
+void csSoundRenderDS3D::PlayEphemeral(csSoundData* snd, bool loop)
 {
   iSoundBuffer *played = CreateSoundBuffer(snd);
   if( NULL != played )
   {
-    played->Play(SoundBufferPlay_DestroyAtEnd);
+	//to loop or not, defaults to not
+	if (loop == true) played->Play(SoundBufferPlay_InLoop);
+	if (!loop) played->Play(SoundBufferPlay_DestroyAtEnd);
   }
 }
 
