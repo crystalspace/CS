@@ -101,7 +101,9 @@ chronological order.
 	  jobber.pl are entirely correct.  Consequently, it can not yet be
 	  placed into production.)
 	- Neil Mosafi added a #include directive to ivideo/custcursor.h because
-      it was not able to find the definition for csRGBcolor
+	  it was not able to find the definition for csRGBcolor
+	- Eric Sunshine fixed bug in joywin.mak where it was trying to install
+	  the non-existent data/joywin.zip.
 20-Apr-2004
 	- Jorrit added 'camera_origin' to csRenderMesh. The meshes will
 	  fill this field with the origin of that mesh in camera space. This

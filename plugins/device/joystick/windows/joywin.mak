@@ -83,11 +83,6 @@ DEP.JOYWIN = CSUTIL
 
 OUTDIRS += $(OUT.JOYWIN)
 
-# If your module should be installed and has associated resources, list them
-# here.
-TO_INSTALL.CONFIG += $(CFG.JOYWIN)
-TO_INSTALL.DATA += $(SRCDIR)/data/joywin.zip
-
 # This section is read by the Microsoft Visual C++ project file synthesis tool.
 MSVC.DSP += JOYWIN
 DSP.JOYWIN.NAME = joywin
