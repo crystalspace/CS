@@ -7,6 +7,10 @@ The history order is reversed so that new features are at the top.
 	- Removed JNG image target from walkall. It is not an essential
 	  target to have.
 	- More work on cs2xml.
+	- Eric Sunshine fixed a problem with libs/cssys/win32/mergeres.sh where
+	  it was outputting ICON lines with a leading, but no trailing
+	  quotation mark.  Also fixed this script so that it works with older
+	  versions of sed which do not understand alternation (`|').
 5-Aug-2002
 	- Removed CS_GNUC_PRINTF macros with iGraphics2D->PerformExtension()
 	  since this doesn't make sense. PerformExtension() doesn't follow
