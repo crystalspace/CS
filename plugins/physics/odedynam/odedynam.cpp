@@ -48,6 +48,10 @@ SCF_IMPLEMENT_IBASE (csODERigidBody)
   SCF_IMPLEMENTS_INTERFACE (iRigidBody)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csODEJoint)
+  SCF_IMPLEMENTS_INTERFACE (iJoint)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
 
 SCF_EXPORT_CLASS_TABLE (odedynam)
@@ -247,6 +251,18 @@ void csODEDynamicSystem::RemoveBody (iRigidBody* body)
   bodies.Delete (body, true);
 }
 
+iJoint* csODEDynamicSystem::CreateJoint ()
+{
+  csODEJoint* joint = new csODEJoint (this);
+  joints.Push (joint);
+  return (iJoint*)joint;
+}
+
+void csODEDynamicSystem::RemoveJoint (iJoint *joint)
+{
+  joints.Delete (joint, true);
+}
+
 void csODEDynamicSystem::SetGravity (const csVector3& v)
 {
   dWorldSetGravity (worldID, v.x, v.y, v.z);
@@ -363,7 +379,7 @@ bool csODERigidBody::AttachColliderBox (csVector3 size,
   mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
   mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
   mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
-  dGeomSetRotation (id, mat);
+  dGeomSetRotation (gid, mat);
   dMassRotate (&m, mat);
 
   dGeomSetPosition (gid,
@@ -628,3 +644,251 @@ void csODERigidBody::Update ()
   }
 }
 
+csODEJoint::csODEJoint (csODEDynamicSystem *sys)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  jointID = 0;
+
+  body[0] = body[1] = NULL;
+  bodyID[0] = bodyID[1] = 0;
+
+  transConstraint[0] = 1;
+  transConstraint[1] = 1;
+  transConstraint[2] = 1;
+  rotConstraint[0] = 1;
+  rotConstraint[1] = 1;
+  rotConstraint[2] = 1;
+
+  dynsys = sys;
+  SCF_INC_REF(dynsys);
+}
+
+csODEJoint::~csODEJoint ()
+{
+  SCF_DEC_REF (dynsys);
+  if (jointID) { dJointDestroy (jointID); }
+}
+
+void csODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
+{
+  bodyID[0] = ((csODERigidBody *)b1)->GetID();
+  bodyID[1] = ((csODERigidBody *)b2)->GetID();
+  body[0] = b1;
+  body[1] = b2;
+  BuildJoint ();
+}
+
+iRigidBody *csODEJoint::GetAttachedBody (int b)
+{
+  return (b == 0) ? body[0] : body[1];
+}
+
+void csODEJoint::SetTransform (const csOrthoTransform &trans)
+{
+  transform = trans;	
+  BuildJoint ();
+}
+
+csOrthoTransform csODEJoint::GetTransform ()
+{
+  return transform;
+}
+
+void csODEJoint::SetTransConstraints (bool X, bool Y, bool Z)
+{
+  /* 1 means free and 0 means constrained */
+  transConstraint[0] = (X) ? 0 : 1;
+  transConstraint[1] = (Y) ? 0 : 1;
+  transConstraint[2] = (Z) ? 0 : 1;
+  maxTrans = minTrans = csVector3(0,0,0);
+  BuildJoint ();
+}
+
+void csODEJoint::SetMinimumDistance (const csVector3 &min)
+{
+  minTrans = min;
+  BuildJoint ();
+}
+csVector3 csODEJoint::GetMinimumDistance ()
+{
+  return minTrans;
+}
+void csODEJoint::SetMaximumDistance (const csVector3 &max)
+{
+  maxTrans = max;
+  BuildJoint ();
+}
+csVector3 csODEJoint::GetMaximumDistance ()
+{
+  return maxTrans;
+}
+
+void csODEJoint::SetRotConstraints (bool X, bool Y, bool Z)
+{
+  /* 1 means free and 0 means constrained */
+  rotConstraint[0] = (X) ? 0 : 1;
+  rotConstraint[1] = (Y) ? 0 : 1;
+  rotConstraint[2] = (Z) ? 0 : 1;
+  maxAngle = minAngle = csVector3(0,0,0);
+  BuildJoint ();
+}
+void csODEJoint::SetMinimumAngle (const csVector3 &min)
+{
+  minAngle = min;
+  BuildJoint ();
+}
+csVector3 csODEJoint::GetMinimumAngle ()
+{
+  return minAngle;
+}
+void csODEJoint::SetMaximumAngle (const csVector3 &max)
+{
+  maxAngle = max;
+  BuildJoint ();
+}
+csVector3 csODEJoint::GetMaximumAngle ()
+{
+  return maxAngle;
+}
+
+void csODEJoint::BuildHinge (const csVector3 &axis, float min, float max) 
+{
+  dJointSetHingeAxis (jointID, axis.x, axis.y, axis.z);
+  if (max > min) {
+    dJointSetHingeParam (jointID, dParamLoStop, min);
+    dJointSetHingeParam (jointID, dParamHiStop, max);
+  } else {
+    dJointSetHingeParam (jointID, dParamLoStop, -dInfinity);
+    dJointSetHingeParam (jointID, dParamHiStop, dInfinity);
+  }
+}
+
+void csODEJoint::BuildHinge2 (const csVector3 &axis1, float min1, float max1, 
+	const csVector3 &axis2, float min2, float max2) 
+{
+  dJointSetHinge2Axis1 (jointID, axis1.x, axis1.y, axis1.z);
+  dJointSetHinge2Axis2 (jointID, axis2.x, axis2.y, axis2.z);
+  if (max1 > min1) {
+    dJointSetHingeParam (jointID, dParamLoStop, min1);
+    dJointSetHingeParam (jointID, dParamHiStop, max1);
+  } else {
+    dJointSetHingeParam (jointID, dParamLoStop, -dInfinity);
+    dJointSetHingeParam (jointID, dParamHiStop, dInfinity);
+  } 
+  if (max2 > min2) {
+    dJointSetHinge2Param (jointID, dParamLoStop2, min2);
+    dJointSetHinge2Param (jointID, dParamHiStop2, max2);
+  } else {
+    dJointSetHinge2Param (jointID, dParamLoStop2, -dInfinity);
+    dJointSetHinge2Param (jointID, dParamHiStop2, dInfinity);
+  } 
+}
+
+void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max) 
+{
+  dJointSetSliderAxis (jointID, axis.x, axis.y, axis.z);
+  if (max > min) {
+    dJointSetSliderParam (jointID, dParamLoStop, min);
+    dJointSetSliderParam (jointID, dParamHiStop, max);
+  } else {
+    dJointSetSliderParam (jointID, dParamLoStop, -dInfinity);
+    dJointSetSliderParam (jointID, dParamHiStop, dInfinity);
+  }
+}
+
+void csODEJoint::BuildJoint () 
+{
+  if (jointID) {
+    dJointDestroy (jointID);
+  }
+  int transcount = transConstraint[0] + transConstraint[1] + transConstraint[2];
+  int rotcount = rotConstraint[0] + rotConstraint[1] + rotConstraint[2];
+
+  csVector3 pos;
+  csMatrix3 rot;
+  if (transcount == 0) {
+    switch (rotcount) {
+      case 0:
+        jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
+        if (bodyID[0] && bodyID[1]) {
+          dJointAttach (jointID, bodyID[0], bodyID[1]);
+          dJointSetFixed (jointID);
+        }
+        break;
+      case 1:
+        jointID = dJointCreateHinge (dynsys->GetWorldID(), 0);
+        if (bodyID[0] && bodyID[1]) {
+          dJointAttach (jointID, bodyID[0], bodyID[1]);
+        }
+        pos = transform.GetOrigin();
+        dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
+        rot = transform.GetO2T();
+        if (transConstraint[0]) {
+          BuildHinge (rot.Col1(), minAngle.x, maxAngle.x);
+        } else if (transConstraint[1]) {
+          BuildHinge (rot.Col2(), minAngle.y, maxAngle.y);
+        } else if (transConstraint[2]) {
+          BuildHinge (rot.Col3(), minAngle.z, maxAngle.z);
+        }
+        // TODO: insert some mechanism for bounce, erp and cfm
+        break;
+      case 2:
+        jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
+        if (bodyID[0] && bodyID[1]) {
+          dJointAttach (jointID, bodyID[0], bodyID[1]);
+        }
+        pos = transform.GetOrigin();
+        dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
+        rot = transform.GetO2T();
+
+        if (transConstraint[0]) {
+          if (transConstraint[1]) {
+            BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
+             rot.Col1(), minAngle.x, maxAngle.x);
+          } else {
+            BuildHinge2 (rot.Col3(), minAngle.z, maxAngle.z,
+             rot.Col1(), minAngle.x, maxAngle.x);
+          }
+        } else {
+          BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
+           rot.Col3(), minAngle.z, maxAngle.z);
+        }
+        break;
+      case 3:
+        jointID = dJointCreateBall (dynsys->GetWorldID(), 0);
+        if (bodyID[0] && bodyID[1]) {
+          dJointAttach (jointID, bodyID[0], bodyID[1]);
+        }
+        pos = transform.GetOrigin();
+        dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
+        break;
+    }
+  }
+  else if (rotcount == 0) {
+    switch (transcount) {
+      /* 0 is accounted for in the previous condition */
+      case 1:
+        jointID = dJointCreateSlider (dynsys->GetWorldID(), 0);
+        if (bodyID[0] && bodyID[1]) {
+          dJointAttach (jointID, bodyID[0], bodyID[1]);
+        }
+        rot = transform.GetO2T();
+        if (transConstraint[0]) {
+          BuildSlider (rot.Col1(), minTrans.x, maxTrans.x);
+        } else if (transConstraint[1]) {
+          BuildSlider (rot.Col2(), minTrans.y, maxTrans.y);
+        } else {
+          BuildSlider (rot.Col3(), minTrans.z, maxTrans.z);
+        }
+        break;
+      case 2:
+// TODO fill this in with a contact joint
+        break;
+      case 3:
+/* doesn't exist */
+        break;
+    }
+  } else {
+    /* too unconstrained, don't create joint */
+  }
+}

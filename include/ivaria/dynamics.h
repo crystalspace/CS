@@ -74,6 +74,12 @@ struct iDynamicSystem : public iBase
 
   /// Create a rigid body and add it to the simulation
   virtual void RemoveBody( iRigidBody* body ) = 0;
+
+  /// Create a joint and add it to the simulation
+  virtual iJoint* CreateJoint () = 0;
+
+  /// Remove a joint from the simulation
+  virtual void RemoveJoint (iJoint* joint) = 0;
 };
 
 
@@ -166,7 +172,7 @@ struct iRigidBody : public iBase
   virtual const csVector3 GetForce () const = 0;
   /// Get total torque (world space)
   virtual const csVector3 GetTorque () const = 0;
-	
+
   /*
   /// Get total force (local space)
   virtual const csVector3& GetRelForce () const = 0;
@@ -183,7 +189,7 @@ struct iRigidBody : public iBase
   virtual void AttachMesh (iMeshWrapper* mesh) = 0;
   /// Attach a bone to this body
   virtual void AttachBone (iSkeletonBone* bone) = 0;
-	
+
   /// Update transforms for mesh and/or bone
   virtual void Update () = 0;
 };
@@ -191,9 +197,11 @@ struct iRigidBody : public iBase
 SCF_VERSION (iJoint, 0, 0, 1);
 
 /**
- * This is the interface for a joint.
- * It keeps all properties of a joint.
- * to automatically update it.
+ * This is the interface for a joint.  It works by constraining 
+ * the relative motion between the two bodies it attaches.  For 
+ * instance if all motion in along the local X axis is constrained
+ * then the bodies will stay motionless relative to each other 
+ * along an x axis rotated and positioned by the Joint's transform.
  */
 struct iJoint : public iBase
 {
@@ -201,6 +209,48 @@ struct iJoint : public iBase
   virtual void Attach (iRigidBody* body1, iRigidBody* body2) = 0;
   /// Get an attached body (valid values for body are 0 and 1)
   virtual iRigidBody* GetAttachedBody (int body) = 0;
+  /**
+   * Set the local transformation of the joint.  This transform 
+   * sets the position of the constraining axes in the world 
+   * not relative to the attached bodies.
+   */
+  virtual void SetTransform (const csOrthoTransform &trans) = 0;
+  /// Get the local transformation of the joint
+  virtual csOrthoTransform GetTransform () = 0;
+  /**
+   * Sets the translation constraints on the 3 axes.  If true is 
+   * passed for an axis the Joint will constrain all motion along
+   * that axis.  If false is passed in then all motion along that 
+   * axis free, but bounded by the minimum and maximum distance
+   * if set.
+   */
+  virtual void SetTransConstraints (bool X, bool Y, bool Z) = 0;
+  /// The following functions return the current axis trans constraints
+  virtual bool IsXTransConstrained () = 0;
+  virtual bool IsYTransConstrained () = 0;
+  virtual bool IsZTransConstrained () = 0;
+  /// Sets/Gets the minimum constrained distance between bodies
+  virtual void SetMinimumDistance (const csVector3 &min) = 0;
+  virtual csVector3 GetMinimumDistance () = 0;
+  /// Sets/Gets the maximum constrained distance between bodies
+  virtual void SetMaximumDistance (const csVector3 &max) = 0;
+  virtual csVector3 GetMaximumDistance () = 0;
+  /**
+   * Sets the rotational constraints on the 3 axes.  Works like
+   * the above translational constraints, but for rotation about
+   * the respective axes.
+   */
+  virtual void SetRotConstraints (bool X, bool Y, bool Z) = 0;
+  /// The following functions return the current axis rot constraints
+  virtual bool IsXRotConstrained () = 0;
+  virtual bool IsYRotConstrained () = 0;
+  virtual bool IsZRotConstrained () = 0;
+  /// Sets/Gets the minimum constrained angle between bodies
+  virtual void SetMinimumAngle (const csVector3 &min) = 0;
+  virtual csVector3 GetMinimumAngle () = 0;
+  /// Sets/Gets the maxium constrained angle between bodies
+  virtual void SetMaximumAngle (const csVector3 &max) = 0;
+  virtual csVector3 GetMaximumAngle () = 0;
 };
 
 #endif // __GAME_DYNAMICS_H__

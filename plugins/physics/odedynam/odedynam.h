@@ -136,6 +136,7 @@ private:
   iCollideSystem* collidesys;
 
   csObjVector bodies;
+  csObjVector joints;
 
 public:
   SCF_DECLARE_IBASE;
@@ -154,6 +155,9 @@ public:
 
   iRigidBody* CreateBody ();
   void RemoveBody (iRigidBody* body);
+
+  iJoint* CreateJoint ();
+  void RemoveJoint (iJoint* joint);
 };
 
 /**
@@ -235,6 +239,64 @@ public:
   void Update ();
 };
 
+/**
+ * This implements the joint.  It does this by determining
+ * which type of ODE joint best represents that described 
+ */
+class csODEJoint : public iJoint
+{
+  dJointID jointID;
+  iRigidBody *body[2];
+  dBodyID bodyID[2];
+
+  int transConstraint[3], rotConstraint[3];
+  csVector3 maxTrans, minTrans, maxAngle, minAngle;
+
+  csOrthoTransform transform;
+
+  csODEDynamicSystem* dynsys;
+
+
+public:
+  SCF_DECLARE_IBASE;
+  
+  csODEJoint (csODEDynamicSystem *sys);
+  virtual ~csODEJoint ();
+
+  inline dJointID GetID () { return jointID; }
+
+  void Attach (iRigidBody *body1, iRigidBody *body2);
+  iRigidBody *GetAttachedBody (int body);
+
+  void SetTransform (const csOrthoTransform &trans);
+  csOrthoTransform GetTransform ();
+
+  void SetTransConstraints (bool X, bool Y, bool Z);
+  inline bool IsXTransConstrained () { return transConstraint[0]; }
+  inline bool IsYTransConstrained () { return transConstraint[1]; }
+  inline bool IsZTransConstrained () { return transConstraint[2]; }
+  void SetMinimumDistance (const csVector3 &min);
+  csVector3 GetMinimumDistance ();
+  void SetMaximumDistance (const csVector3 &max);
+  csVector3 GetMaximumDistance ();
+
+  void SetRotConstraints (bool X, bool Y, bool Z);
+  inline bool IsXRotConstrained () { return rotConstraint[0]; }
+  inline bool IsYRotConstrained () { return rotConstraint[1]; }
+  inline bool IsZRotConstrained () { return rotConstraint[2]; }
+  void SetMinimumAngle (const csVector3 &min);
+  csVector3 GetMinimumAngle ();
+  void SetMaximumAngle (const csVector3 &max);
+  csVector3 GetMaximumAngle ();
+
+private:
+  void BuildHinge (const csVector3 &axis, float min, float max);
+  void BuildHinge2 (const csVector3 &axis1, float min1, float max1, 
+  	const csVector3 &axis2, float min2, float max2);
+  void BuildSlider (const csVector3 &axis, float min, float max);
+  void BuildJoint ();
+
+};
 
 #endif // __GAME_ODEDYNAMICS_H__
 
