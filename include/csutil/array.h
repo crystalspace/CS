@@ -153,7 +153,7 @@ public:
     return capacity;
   }
 
-  /*
+  /**
    * Set vector capacity to approximately 'n' elements.  Never sets the
    * capacity to fewer than the current number of elements in the array.  See
    * Truncate() if you need to adjust the number of actual array elements.
@@ -162,6 +162,24 @@ public:
   {
     if (n > Length())
       SetLengthUnsafe(n);
+  }
+
+  /**
+   * Make the array just as big as it needs to be. This is useful in cases
+   * where you know the array isn't going to be modified anymore in order
+   * to preserve memory.
+   */
+  void ShrinkBestFit ()
+  {
+    if (count == 0)
+    {
+      DeleteAll ();
+    }
+    else if (count != capacity)
+    {
+      capacity = count;
+      root = (T*)realloc (root, capacity * sizeof(T));
+    }
   }
 
   /// Get an element (const).

@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+12-Mar-2003
+	- Added csArray::ShrinkBestFit() routine. This routine will set
+	  the capacity of the array exactly to the current length. This
+	  routine is useful when you know you're not going to add new
+	  items to the array and when you want to preserve memory.
+	- Completely rewrote the way TinyXML parser reads attributes. Instead
+	  of using a double linked list it now uses csArray. This saves a
+	  LOT of memory for huge levels.
 11-Mar-2003
 	- Fixed a leak in the prepare textures code of regions. It was
 	  forgetting to reset the image pointer to NULL. This means

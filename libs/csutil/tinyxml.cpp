@@ -365,11 +365,10 @@ TiDocumentNode* TiDocumentNode::PreviousSibling( const char * value ) const
 
 void TiXmlElement::RemoveAttribute( const char * name )
 {
-	TiDocumentAttribute* node = attributeSet.Find( name );
-	if ( node )
+	int nodeidx = attributeSet.Find (name);
+	if ( nodeidx != -1 )
 	{
-		attributeSet.Remove( node );
-		delete node;
+		attributeSet.set.DeleteIndex (nodeidx);
 	}
 }
 
@@ -454,20 +453,14 @@ TiXmlElement::TiXmlElement (const char * _value)
 
 TiXmlElement::~TiXmlElement()
 {
-	while( attributeSet.First() )
-	{
-		TiDocumentAttribute* node = attributeSet.First();
-		attributeSet.Remove( node );
-		delete node;
-	}
 }
 
 const char * TiXmlElement::Attribute( const char * name ) const
 {
-	TiDocumentAttribute* node = attributeSet.Find( name );
+	int nodeidx = attributeSet.Find (name);
 
-	if ( node )
-		return node->Value();
+	if (nodeidx != -1)
+		return attributeSet.set[nodeidx].Value ();
 
 	return 0;
 }
@@ -497,23 +490,17 @@ void TiXmlElement::SetAttribute( const char * name, int val )
 
 void TiXmlElement::SetAttribute( const char * name, const char * value )
 {
-	TiDocumentAttribute* node = attributeSet.Find( name );
-	if ( node )
+	int nodeidx = attributeSet.Find (name);
+	if (nodeidx != -1)
 	{
-		node->SetValue( value );
+		attributeSet.set[nodeidx].SetValue (value);
 		return;
 	}
 
-	TiDocumentAttribute* attrib = new TiDocumentAttribute( name, value );
-	if ( attrib )
-	{
-		attributeSet.Add( attrib );
-	}
-	else
-	{
-		TiDocument* document = GetDocument();
-		if ( document ) document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
-	}
+	TiDocumentAttribute at;
+	int idx = attributeSet.set.Push (at);
+	attributeSet.set[idx].SetName (name);
+	attributeSet.set[idx].SetValue (value);
 }
 
 void TiXmlElement::Print( FILE* cfile, int depth ) const
@@ -526,11 +513,11 @@ void TiXmlElement::Print( FILE* cfile, int depth ) const
 
 	fprintf( cfile, "<%s", value.c_str() );
 
-	TiDocumentAttribute* attrib;
-	for ( attrib = attributeSet.First(); attrib; attrib = attrib->Next() )
+	for (i = 0 ; i < attributeSet.set.Length () ; i++)
 	{
-		fprintf( cfile, " " );
-		attrib->Print( cfile, depth );
+	  const TiDocumentAttribute& attrib = attributeSet.set[i];
+	  fprintf( cfile, " " );
+	  attrib.Print( cfile, depth );
 	}
 
 	// There are 3 different formatting approaches:
@@ -571,11 +558,12 @@ void TiXmlElement::StreamOut( TIXML_OSTREAM * stream ) const
 {
 	(*stream) << "<" << value;
 
-	TiDocumentAttribute* attrib;
-	for ( attrib = attributeSet.First(); attrib; attrib = attrib->Next() )
-	{	
-		(*stream) << " ";
-		attrib->StreamOut( stream );
+	int i;
+	for (i = 0 ; i < attributeSet.set.Length () ; i++)
+	{
+	  const TiDocumentAttribute& attrib = attributeSet.set[i];
+	  (*stream) << " ";
+	  attrib.StreamOut( stream );
 	}
 
 	// If this node has children, give it a closing tag. Else
@@ -606,12 +594,11 @@ TiDocumentNode* TiXmlElement::Clone() const
 	CopyToClone( clone );
 
 	// Clone the attributes, then clone the children.
-	TiDocumentAttribute* attribute = 0;
-	for(	attribute = attributeSet.First();
-	attribute;
-	attribute = attribute->Next() )
+	int i;
+	for (i = 0 ; i < attributeSet.set.Length () ; i++)
 	{
-		clone->SetAttribute( attribute->Name(), attribute->Value() );
+	  const TiDocumentAttribute& attrib = attributeSet.set[i];
+	  clone->SetAttribute (attrib.Name (), attrib.Value ());
 	}
 
 	TiDocumentNode* node = 0;
@@ -773,34 +760,15 @@ void TiDocument::StreamOut( TIXML_OSTREAM * out ) const
 	}
 }
 
-TiDocumentAttribute* TiDocumentAttribute::Next() const
-{
-	// We are using knowledge of the sentinel. The sentinel
-	// have a value or name.
-	if ( next->value.empty() && next->name.empty() )
-		return 0;
-	return next;
-}
-
-
-TiDocumentAttribute* TiDocumentAttribute::Previous() const
-{
-	// We are using knowledge of the sentinel. The sentinel
-	// have a value or name.
-	if ( prev->value.empty() && prev->name.empty() )
-		return 0;
-	return prev;
-}
-
-
 void TiDocumentAttribute::Print( FILE* cfile, int /*depth*/ ) const
 {
 	TIXML_STRING n, v;
 
-	PutString( Name(), &n );
-	PutString( Value(), &v );
+	TiXmlBase::PutString( Name(), &n );
+	TiXmlBase::PutString( Value(), &v );
 
-	if (value.find ('\"') == TIXML_STRING::npos)
+	char* idx = strchr (value, '\"');
+	if (idx == NULL)
 		fprintf (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
 	else
 		fprintf (cfile, "%s='%s'", n.c_str(), v.c_str() );
@@ -809,18 +777,19 @@ void TiDocumentAttribute::Print( FILE* cfile, int /*depth*/ ) const
 
 void TiDocumentAttribute::StreamOut( TIXML_OSTREAM * stream ) const
 {
-	if (value.find( '\"' ) != TIXML_STRING::npos)
+	char* idx = strchr (value, '\"');
+	if (idx != NULL)
 	{
-		PutString( name, stream );
+		TiXmlBase::PutString( name, stream );
 		(*stream) << "=" << "'";
-		PutString( value, stream );
+		TiXmlBase::PutString( value, stream );
 		(*stream) << "'";
 	}
 	else
 	{
-		PutString( name, stream );
+		TiXmlBase::PutString( name, stream );
 		(*stream) << "=" << "\"";
-		PutString( value, stream );
+		TiXmlBase::PutString( value, stream );
 		(*stream) << "\"";
 	}
 }
@@ -841,12 +810,12 @@ void TiDocumentAttribute::SetDoubleValue( double value )
 
 const int TiDocumentAttribute::IntValue() const
 {
-	return atoi (value.c_str ());
+	return atoi (value);
 }
 
 const double  TiDocumentAttribute::DoubleValue() const
 {
-	return atof (value.c_str ());
+	return atof (value);
 }
 
 void TiXmlComment::Print( FILE* cfile, int depth ) const
@@ -855,7 +824,7 @@ void TiXmlComment::Print( FILE* cfile, int depth ) const
 	{
 		fputs( "    ", cfile );
 	}
-	fprintf( cfile, "<!--%s-->", value.c_str() );
+	fprintf( cfile, "<!--%s-->", value.c_str () );
 }
 
 void TiXmlComment::StreamOut( TIXML_OSTREAM * stream ) const
@@ -992,61 +961,15 @@ TiDocumentNode* TiXmlUnknown::Clone() const
 }
 
 
-TiDocumentAttributeSet::TiDocumentAttributeSet()
+int TiDocumentAttributeSet::Find (const char * name) const
 {
-	sentinel.next = &sentinel;
-	sentinel.prev = &sentinel;
+  int i;
+  for (i = 0 ; i < set.Length () ; i++)
+  {
+    if (strcmp (set[i].name, name) == 0) return i;
+  }
+  return -1;
 }
-
-
-TiDocumentAttributeSet::~TiDocumentAttributeSet()
-{
-	assert( sentinel.next == &sentinel );
-	assert( sentinel.prev == &sentinel );
-}
-
-
-void TiDocumentAttributeSet::Add( TiDocumentAttribute* addMe )
-{
-	assert( !Find( addMe->Name() ) );	// Shouldn't be multiply adding to the set.
-
-	addMe->next = &sentinel;
-	addMe->prev = sentinel.prev;
-
-	sentinel.prev->next = addMe;
-	sentinel.prev      = addMe;
-}
-
-void TiDocumentAttributeSet::Remove( TiDocumentAttribute* removeMe )
-{
-	TiDocumentAttribute* node;
-
-	for( node = sentinel.next; node != &sentinel; node = node->next )
-	{
-		if ( node == removeMe )
-		{
-			node->prev->next = node->next;
-			node->next->prev = node->prev;
-			node->next = 0;
-			node->prev = 0;
-			return;
-		}
-	}
-	assert( 0 );		// we tried to remove a non-linked attribute.
-}
-
-TiDocumentAttribute*	TiDocumentAttributeSet::Find( const char * name ) const
-{
-	TiDocumentAttribute* node;
-
-	for( node = sentinel.next; node != &sentinel; node = node->next )
-	{
-		if ( node->name == name )
-			return node;
-	}
-	return 0;
-}
-
 
 #ifdef TIXML_USE_STL	
 TIXML_ISTREAM & operator >> (TIXML_ISTREAM & in, TiDocumentNode & base)

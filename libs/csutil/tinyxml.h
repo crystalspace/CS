@@ -45,6 +45,8 @@ distribution.
 // all FILE related routines (fprintf) to work on iString instead.
 #include "iutil/string.h"
 #include "csutil/scfstr.h"
+#include "csutil/array.h"
+#include "csutil/util.h"
 #undef FILE
 #define FILE iString
 #define fprintf new_fprintf
@@ -112,6 +114,25 @@ class TiDocumentAttribute;
 class TiXmlText;
 class TiXmlDeclaration;
 
+	enum
+	{
+		TIXML_NO_ERROR = 0,
+		TIXML_ERROR,
+		TIXML_ERROR_OPENING_FILE,
+		TIXML_ERROR_OUT_OF_MEMORY,
+		TIXML_ERROR_PARSING_ELEMENT,
+		TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME,
+		TIXML_ERROR_READING_ELEMENT_VALUE,
+		TIXML_ERROR_READING_ATTRIBUTES,
+		TIXML_ERROR_PARSING_EMPTY,
+		TIXML_ERROR_READING_END_TAG,
+		TIXML_ERROR_PARSING_UNKNOWN,
+		TIXML_ERROR_PARSING_COMMENT,
+		TIXML_ERROR_PARSING_DECLARATION,
+		TIXML_ERROR_DOCUMENT_EMPTY,
+
+		TIXML_ERROR_STRING_COUNT
+	};
 
 /** TiXmlBase is a base class for every class in TinyXml.
 	It does little except to establish that TinyXml classes
@@ -163,6 +184,32 @@ public:
 	/// Return the current white space setting.
 	static bool IsWhiteSpaceCondensed()						{ return condenseWhiteSpace; }
 
+	static const char*	SkipWhiteSpace( const char* );
+
+	/*	Reads an XML name into the string provided. Returns
+		a pointer just past the last character of the name,
+		or 0 if the function has an error.
+	*/
+	static const char* ReadName( const char* p, TIXML_STRING* name );
+	static const char* ReadName( const char* p, char** name );
+
+	/*	Reads text. Returns a pointer past the given end tag.
+		Wickedly complex options, but it keeps the (sensitive) code in one place.
+	*/
+	static const char* ReadText(	const char* in, TIXML_STRING* text,
+					bool ignoreWhiteSpace,
+					const char* endTag);
+	static const char* ReadText(	const char* in, char** text,
+					bool ignoreWhiteSpace,
+					const char* endTag);
+
+	// Puts a string to a stream, expanding entities as it goes.
+	// Note this should not contian the '<', '>', etc, or they will be transformed into entities!
+	static void PutString( const TIXML_STRING& str, TIXML_OSTREAM* out );
+
+	static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
+
+
 protected:
 	// See STL_STRING_BUG
 	// Utility class to overcome a bug.
@@ -174,7 +221,6 @@ protected:
 		char* buffer;
 	};
 
-	static const char*	SkipWhiteSpace( const char* );
 	inline static bool	IsWhiteSpace( int c )		{ return ( isspace( c ) || c == '\n' || c == '\r' ); }
 
 	virtual void StreamOut (TIXML_OSTREAM *) const = 0;
@@ -184,19 +230,6 @@ protected:
 	    static bool StreamTo( TIXML_ISTREAM * in, int character, TIXML_STRING * tag );
 	#endif
 
-	/*	Reads an XML name into the string provided. Returns
-		a pointer just past the last character of the name,
-		or 0 if the function has an error.
-	*/
-	static const char* ReadName( const char* p, TIXML_STRING* name );
-
-	/*	Reads text. Returns a pointer past the given end tag.
-		Wickedly complex options, but it keeps the (sensitive) code in one place.
-	*/
-	static const char* ReadText(	const char* in,				// where to start
-					TIXML_STRING* text,			// the string read
-					bool ignoreWhiteSpace,		// whether to keep the white space
-					const char* endTag);			// what ends this text
 	virtual const char* Parse( const char* p ) = 0;
 
 	// If an entity has been found, transform it into a character.
@@ -217,12 +250,6 @@ protected:
 		}
 	}
 
-	// Puts a string to a stream, expanding entities as it goes.
-	// Note this should not contian the '<', '>', etc, or they will be transformed into entities!
-	static void PutString( const TIXML_STRING& str, TIXML_OSTREAM* out );
-
-	static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
-
 	// Return true if the next characters in the stream are any of the endTag sequences.
 	static bool StringEqual(const char* p,
 					const char* endTag);
@@ -230,25 +257,6 @@ protected:
 					const char* endTag);
 
 
-	enum
-	{
-		TIXML_NO_ERROR = 0,
-		TIXML_ERROR,
-		TIXML_ERROR_OPENING_FILE,
-		TIXML_ERROR_OUT_OF_MEMORY,
-		TIXML_ERROR_PARSING_ELEMENT,
-		TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME,
-		TIXML_ERROR_READING_ELEMENT_VALUE,
-		TIXML_ERROR_READING_ATTRIBUTES,
-		TIXML_ERROR_PARSING_EMPTY,
-		TIXML_ERROR_READING_END_TAG,
-		TIXML_ERROR_PARSING_UNKNOWN,
-		TIXML_ERROR_PARSING_COMMENT,
-		TIXML_ERROR_PARSING_DECLARATION,
-		TIXML_ERROR_DOCUMENT_EMPTY,
-
-		TIXML_ERROR_STRING_COUNT
-	};
 	static const char* errorString[ TIXML_ERROR_STRING_COUNT ];
 
 private:
@@ -529,80 +537,53 @@ protected:
 
 	@note Attributes have a parent
 */
-class TiDocumentAttribute : public TiXmlBase
+class TiDocumentAttribute
 {
 	friend class TiDocumentAttributeSet;
 
 public:
 	/// Construct an empty attribute.
-	TiDocumentAttribute() : prev( 0 ), next( 0 )	{}
+	TiDocumentAttribute() { name = NULL; value = NULL; }
+	~TiDocumentAttribute () { delete[] name; delete[] value; }
 
-	#ifdef TIXML_USE_STL
-	/// std::string constructor.
-	TiDocumentAttribute( const std::string& _name, const std::string& _value )
-	{
-		name = _name;
-		value = _value;
-	}
-	#endif
-
-	/// Construct an attribute with a name and value.
-	TiDocumentAttribute( const char * _name, const char * _value ): name( _name ), value( _value ), prev( 0 ), next( 0 ) {}
-	const char*		Name()  const		{ return name.c_str (); }		///< Return the name of this attribute.
-	const char*		Value() const		{ return value.c_str (); }		///< Return the value of this attribute.
+	const char* Name()  const		{ return name; }		///< Return the name of this attribute.
+	const char* Value() const		{ return value; }		///< Return the value of this attribute.
 	const int       IntValue() const;									///< Return the value of this attribute, converted to an integer.
 	const double	DoubleValue() const;								///< Return the value of this attribute, converted to a double.
 
-	void SetName( const char* _name )	{ name = _name; }				///< Set the name of this attribute.
-	void SetValue( const char* _value )	{ value = _value; }				///< Set the value.
+	void SetName( const char* _name )	{ name = csStrNew (_name); }				///< Set the name of this attribute.
+	void SetValue( const char* _value )	{ value = csStrNew (_value); }				///< Set the value.
 
 	void SetIntValue( int value );										///< Set the value from an integer.
 	void SetDoubleValue( double value );								///< Set the value from a double.
 
-    #ifdef TIXML_USE_STL
-	/// STL std::string form.
-	void SetName( const std::string& _name )	
-	{	
-		StringToBuffer buf( _name );
-		SetName ( buf.buffer ? buf.buffer : "error" );	
+	bool operator==( const TiDocumentAttribute& rhs ) const
+	{
+	  return strcmp (rhs.name, name) == 0;
 	}
-	/// STL std::string form.	
-	void SetValue( const std::string& _value )	
-	{	
-		StringToBuffer buf( _value );
-		SetValue( buf.buffer ? buf.buffer : "error" );	
+	bool operator<( const TiDocumentAttribute& rhs ) const
+	{
+	  return strcmp (name, rhs.name) > 0;
 	}
-	#endif
-
-	/// Get the next sibling attribute in the DOM. Returns null at end.
-	TiDocumentAttribute* Next() const;
-	/// Get the previous sibling attribute in the DOM. Returns null at beginning.
-	TiDocumentAttribute* Previous() const;
-
-	bool operator==( const TiDocumentAttribute& rhs ) const { return rhs.name == name; }
-	bool operator<( const TiDocumentAttribute& rhs )	 const { return name < rhs.name; }
-	bool operator>( const TiDocumentAttribute& rhs )  const { return name > rhs.name; }
+	bool operator>( const TiDocumentAttribute& rhs ) const
+	{
+	  return strcmp (name, rhs.name) < 0;
+	}
 
 	/*	[internal use]
 		Attribtue parsing starts: first letter of the name
 						 returns: the next char after the value end quote
 	*/
-	virtual const char* Parse( const char* p );
+	const char* Parse( TiDocument* document, const char* p );
 
 	// [internal use]
-	virtual void Print( FILE* cfile, int depth ) const;
+	void Print( FILE* cfile, int depth ) const;
 
-	virtual void StreamOut( TIXML_OSTREAM * out ) const;
-	// [internal use]
-	// Set the document pointer so the attribute can report errors.
-	void SetDocument( TiDocument* doc )	{ document = doc; }
+	void StreamOut( TIXML_OSTREAM * out ) const;
 
 private:
-	TiDocument*	document;	// A pointer back to a document, for error reporting.
-	TIXML_STRING name;
-	TIXML_STRING value;
-	TiDocumentAttribute*	prev;
-	TiDocumentAttribute*	next;
+	char* name;
+	char* value;
 };
 
 
@@ -621,18 +602,10 @@ private:
 class TiDocumentAttributeSet
 {
 public:
-	TiDocumentAttributeSet();
-	~TiDocumentAttributeSet();
+	csArray<TiDocumentAttribute> set;
 
-	void Add( TiDocumentAttribute* attribute );
-	void Remove( TiDocumentAttribute* attribute );
-
-	TiDocumentAttribute* First() const	{ return ( sentinel.next == &sentinel ) ? 0 : sentinel.next; }
-	TiDocumentAttribute* Last()  const	{ return ( sentinel.prev == &sentinel ) ? 0 : sentinel.prev; }
-	TiDocumentAttribute*	Find( const char * name ) const;
-
-private:
-	TiDocumentAttribute sentinel;
+	TiDocumentAttributeSet() : set (0, 4) { }
+	int Find (const char * name) const;
 };
 
 
@@ -701,15 +674,25 @@ public:
 	*/
 	void SetAttribute( const char * name, int value );
 
+	/// Get number of attributes.
+	int GetAttributeCount () const { return attributeSet.set.Length (); }
+	/// Get attribute.
+	const TiDocumentAttribute& GetAttribute (int idx) const
+	{
+	  return attributeSet.set[idx];
+	}
+	/// Get attribute.
+	TiDocumentAttribute& GetAttribute (int idx)
+	{
+	  return attributeSet.set[idx];
+	}
+
 	/** Deletes an attribute with the given name.
 	*/
 	void RemoveAttribute( const char * name );
     #ifdef TIXML_USE_STL
 	void RemoveAttribute( const std::string& name )	{	RemoveAttribute (name.c_str ());	}	///< STL std::string form.
 	#endif
-
-	TiDocumentAttribute* FirstAttribute() const	{ return attributeSet.First(); }		///< Access the first attribute in this element.
-	TiDocumentAttribute* LastAttribute()	const 	{ return attributeSet.Last(); }		///< Access the last attribute in this element.
 
 	// [internal use] Creates a new Element and returs it.
 	virtual TiDocumentNode* Clone() const;

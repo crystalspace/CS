@@ -28,7 +28,8 @@
 struct csTinyXmlAttributeIterator : public iDocumentAttributeIterator
 {
 private:
-  TiDocumentAttribute* current;
+  int current;
+  int count;
   TiXmlElement* parent;
 
 public:
