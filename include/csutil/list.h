@@ -170,7 +170,7 @@ public:
     const T& FetchNext () const
     {
       CS_ASSERT(ptr != 0);
-      return ptr->next->data;
+      return visited ? ptr->next->data : ptr->data;
     }
     /**
      * Return previous element but don't modify iterator.
@@ -179,7 +179,7 @@ public:
     const T& FetchPrevious () const
     {
       CS_ASSERT(ptr != 0);
-      return ptr->prev->data;
+      return visited ? ptr->prev->data : ptr->data;
     }
     const T& FetchPrev () const { return FetchPrevious(); } // Backward compat.
 
