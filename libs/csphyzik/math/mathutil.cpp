@@ -27,17 +27,17 @@
 
 void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
 {
-ctVector3 Tx = pvec/pvec.length();
+ctVector3 Tx = pvec/pvec.Norm();
 ctVector3 Ty = ctVector3( 0.0,0.0,1.0 ) % Tx;
 ctVector3 Tz;
 
-	if( Ty.length() < VEC_X_NORM_THRESHOLD ){
+	if( Ty.Norm() < VEC_X_NORM_THRESHOLD ){
 		Tz = Tx % ctVector3( 0.0,1.0,0.0);
 		// make sure this is not a reflection.  That's why Tz is here not Ty
-		Tz = Tz/Tz.length();
+		Tz = Tz/Tz.Norm();
 		Ty = Tz % Tx;
 	}else{
-		Ty = Ty/Ty.length ();
+		Ty = Ty/Ty.Norm();
 		Tz = Tx % Ty;
 	}
 
@@ -67,8 +67,8 @@ real angle_diff( ctVector3 v1, ctVector3 v2 )
 real angle_abs;
 ctVector3 vxross;
 
-	v1.normalize();
-	v2.normalize();
+	v1.Normalize();
+	v2.Normalize();
 	
 	vxross = v2 % v1;
 
