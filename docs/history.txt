@@ -27,6 +27,9 @@ chronological order.
 	    - auto: select font based on size of display, similar like what
 	      simple output console does.
 	    - select the specified font.
+	- Jorrit fixed a bad bug in the standard output console which caused
+	  it to crash when the total size of the buffer would be exceeded and
+	  the top line would be deleted.
 	- res updated spr2d to work with NR.
 	- res made some changes to how the render mesh holders work internally.
 	- res added some documentation to csRenderMesh, csAlphaMode, the

@@ -23,6 +23,7 @@
 csConsoleBuffer::csConsoleBuffer (int length, int size)
 {
   buffer = 0;
+  dirty = 0;
   SetLength (length);
   page_size = size;
   empty = new csString ("");
@@ -57,7 +58,7 @@ void csConsoleBuffer::NewLine (bool snap)
     if (buffer [0] != empty)
       delete buffer [0];
     // Shift all the lines up by one
-    memmove (buffer, &buffer + 1, (len - 1) * sizeof (csString *));
+    memmove (buffer, buffer + 1, (len - 1) * sizeof (csString *));
     buffer [len - 1] = 0;
     current_line = len - 1;
 
