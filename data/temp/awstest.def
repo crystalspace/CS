@@ -8,7 +8,7 @@ skin "Normal Windows"
   TextForeColor:	0,0,0
   TextBackColor:        255,255,255
   ButtonTextColor:	0,0,192
-  ButtonTextureAlpha:	96
+  OverlayTextureAlpha:	96
   WindowMin:		"/aws/minimize.png"
   WindowZoom:		"/aws/zoom.png"
   WindowClose:		"/aws/close.png"
@@ -133,6 +133,55 @@ window "Another"
     Align: rbAlignRight
   }
 
+  component "HDWACC" is "Check Box"
+  {
+    Frame: (100, 90) - (300, 100)
+    Caption: "Use hardware acceleration"
+  }
+
+  component "Connection" is "Group Frame"
+  {
+    Frame: (100, 110) - (300, 200)
+    Caption: "Connection Type"
+
+    component "Modem" is "Radio Button"
+    {
+      Frame: (10, 30) - (70, 40)
+      Caption: "Modem"
+    }
+
+    component "DSL" is "Radio Button"
+    {
+      Frame: (10, 41) - (70, 51)
+      Caption: "DSL"
+    }
+
+    component "Cable" is "Radio Button"
+    {
+      Frame: (10, 51) - (70, 61)
+      Caption: "Cable"
+    }
+
+    component "T1" is "Radio Button"
+    {
+      Frame: (10, 61) - (70, 71)
+      Caption: "T1"
+    }
+
+    component "LAN" is "Radio Button"
+    {
+      Frame: (10, 71) - (70, 81)
+      Caption: "LAN"
+    }
+
+  }
+
+  component "Graphics" is "Group Frame"
+  {
+    Frame: (100, 210) - (300, 300)
+    Caption: " Graphics Card Type"
+    Style: gfsSunken
+  }
 
   component "Red" is "Command Button"
   {
