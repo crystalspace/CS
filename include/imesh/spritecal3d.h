@@ -314,9 +314,15 @@ struct iSpriteCal3DState : public iBase
 
   /**
    * This clears the active anims for this sprite and sets it to use only the
-   * specified anim. 
+   * specified anim, where the anim is specified by name.
    */
   virtual bool SetAnimCycle(const char *name, float weight) = 0;
+
+  /**
+   * This clears the active anims for this sprite and sets it to use only the
+   * specified anim, where the anim is specified by index.
+   */
+  virtual bool SetAnimCycle(int idx, float weight) = 0;
 
   /**
    * This adds the specified animation to the ones already being blended by
@@ -367,7 +373,16 @@ struct iSpriteCal3DState : public iBase
    * out the action for smoothness of response.
    */
   virtual bool SetAnimAction(const char *name, float delayIn,
-  	float delayOut) = 0;
+                             float delayOut) = 0;
+
+  /**
+   * This adds a non-looping animation to the blend set for the cal3d Mixer.
+   * This animation will play one time overlaid on top of the other currently
+   * active animations.  delayIn and delayOut allow you to fade in and fade
+   * out the action for smoothness of response.
+   */
+  virtual bool SetAnimAction(int idx, float delayIn,
+                             float delayOut) = 0;
 
   /**
    * This function searches all actions specified as type TRAVEL, and uses their

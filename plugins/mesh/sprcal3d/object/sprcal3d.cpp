@@ -1916,6 +1916,12 @@ bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
   return AddAnimCycle(name, weight, 0);
 }
 
+bool csSpriteCal3DMeshObject::SetAnimCycle(int idx, float weight)
+{
+  ClearAllAnims();
+  return AddAnimCycle(idx, weight, 0);
+}
+
 bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
 	float delay)
 {
@@ -1980,6 +1986,18 @@ void csSpriteCal3DMeshObject::SetActiveAnims(const char *buffer,int anim_count)
   {
     AddAnimCycle(buffer[i*2],buffer[i*2+1],0);
   }
+}
+
+bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
+	                                        float delayOut)
+{
+  if (idx < 0 || idx >=factory->anims.Length() )
+    return false;
+
+  calModel.getMixer()->executeAction(idx,delayIn,delayOut,
+  	1 /* ,factory->anims[idx]->lock */ );
+
+  return true;
 }
 
 bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn,

@@ -778,6 +778,7 @@ public:
   int  FindAnim(const char *name);
   void ClearAllAnims();
   bool SetAnimCycle(const char *name, float weight);
+  bool SetAnimCycle(int idx, float weight);
   bool AddAnimCycle(const char *name, float weight, float delay);
   bool AddAnimCycle(int idx, float weight, float delay);
   void ClearAnimCycle(int idx, float delay);
@@ -786,6 +787,7 @@ public:
   int  GetActiveAnims(char *buffer,int max_length);
   void SetActiveAnims(const char *buffer,int anim_count);
   bool SetAnimAction(const char *name, float delayIn, float delayOut);
+  bool SetAnimAction(int idx, float delayIn, float delayOut);
   bool SetVelocity(float vel,csRandomGen *rng=0);
   void SetLOD(float lod);
   void SetTimeFactor(float timeFactor);
@@ -843,6 +845,10 @@ public:
     {
 	return scfParent->SetAnimCycle(name,weight);
     }
+    virtual bool SetAnimCycle(int idx, float weight)
+    {
+	return scfParent->SetAnimCycle(idx,weight);
+    }
     virtual bool AddAnimCycle(const char *name, float weight, float delay)
     {
 	return scfParent->AddAnimCycle(name,weight,delay);
@@ -870,6 +876,10 @@ public:
     virtual bool SetAnimAction(const char *name, float delayIn, float delayOut)
     {
 	return scfParent->SetAnimAction(name,delayIn,delayOut);
+    }
+    virtual bool SetAnimAction(int idx, float delayIn, float delayOut)
+    {
+	return scfParent->SetAnimAction(idx,delayIn,delayOut);
     }
 
     virtual bool SetVelocity(float vel,csRandomGen *rng=0)
