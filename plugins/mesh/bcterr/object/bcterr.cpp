@@ -37,10 +37,11 @@
 #include "imap/ldrctxt.h"
 #include "csgfx/rgbpixel.h"
 #include "bcterr.h"
-//#include "quadtree.h"
+#include "quadtree.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "ivaria/reporter.h"
+#include "igeom/polymesh.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -273,7 +274,7 @@ csBCTerrBlock::csBCTerrBlock ()
   //lod_level = 0;
   max_LOD = 0;
   owner = NULL;
-  vis = false;
+  //vis = false;
   x1_end = 0;
   x2_end = 0;
   z1_end = 0;
@@ -314,7 +315,7 @@ void csBCTerrBlock::SetupBaseMesh ()
     u = 0.0;
     for (j = 0; j < 4; j++)
     {
-      verts[pos] = BezierCompute (u, work);
+      verts[pos] = work[j];
       if (j == 3) u = 1.0f;
       if (i == 3) v = 1.0f;
       texels[pos].Set (v,u);
@@ -1169,24 +1170,8 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
     iGraphics3D *pG3D = rview->GetGraphics3D();
     int end;
     if ((!current_lod) && (level == 0)) level = 1;
-    /* due to popping(if used incorrectly), the level = 2 or 3 isn't used
-
-      If you do decide to use it, only use it at extreme distances
-      Be sure to set a lod distance to cover atleast up to the sys_dist;
-      I may decide to change level = 2 into a higher resolution mesh
-      ie: increase triangle count from 18 to 40-50;
-      To enable:
-      1) uncomment out if ((!current_lod) && (level == 0)) level = 1;
-      2) comment out next line
-
-
-      I might also add another level that is 40-50 triangles that
-      will be used instead of a lod with shared edge triangles, would
-      have to edit the interface to support it though.
-
-      *Only allow level = 3 if you entities can fly, and block is seen from the sky?
-    */
     //if ((!current_lod) || (level > 1)) level = 1;
+    //if (level == 2) level = 3;
     if (level == 0)
     {
       if (!current_lod->mesh->mat_handle)
@@ -1285,16 +1270,42 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
 // csBCTerrObject
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
+SCF_IMPLEMENT_IBASE(BCPolyMesh)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
+BCPolyMesh::BCPolyMesh ()
+{
+  SCF_CONSTRUCT_IBASE (NULL)
+  culling = false;
+  square_verts = NULL;
+  culling_mesh = NULL;
+}
+BCPolyMesh::~BCPolyMesh ()
+{
+  if (culling)
+  {
+    delete [] square_verts;
+    delete [] culling_mesh[0].vertices;
+    delete culling_mesh;
+  }    
+} 
+
 
 SCF_IMPLEMENT_IBASE (csBCTerrObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBCTerrState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrFuncState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBCTerrObject::BCTerrState)
   SCF_IMPLEMENTS_INTERFACE (iBCTerrState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBCTerrObject::TerrFuncState)
+  SCF_IMPLEMENTS_INTERFACE (iTerrFuncState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBCTerrObject::BCTerrModel)
@@ -1311,6 +1322,7 @@ csBCTerrObject::csBCTerrObject (iObjectRegistry* object_reg,
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBCTerrState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csBCTerrObject::object_reg = object_reg;
@@ -1323,6 +1335,13 @@ csBCTerrObject::csBCTerrObject (iObjectRegistry* object_reg,
   x_blocks = z_blocks = 0;
   vis_cb = NULL;
   collision = NULL;
+  initheight = false;
+  flattenheight = false;
+  toph = 0.0;
+  righth = 0.0;
+  downh = 0.0;
+  lefth = 0.0;
+  vis = false;
 }
 
 int csBCTerrObject::HeightTest (csVector3 *point)
@@ -1332,6 +1351,17 @@ int csBCTerrObject::HeightTest (csVector3 *point)
   {
     if (collision)
       return collision->HeightTestExact (point);
+  }
+  return 0;
+}
+
+int csBCTerrObject::HeightTestExt (csVector3 *point)
+{
+	//csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Height Test");
+  if (initialized)
+  {
+    if (collision)
+      return collision->HeightTestExt (point);
   }
   return 0;
 }
@@ -1354,16 +1384,26 @@ void csBCTerrObject::UpdateLighting (iLight** lights, int num_lights,
 {
 }
 
-
+/*
+ * todo:
+ * make 2 seperate for loops
+ * 1 -> sys dist
+ * 2 -> normal checks
+ * remove visibilty system for terrblock
+ * add list of checking objects to factory
+*/
 
 bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
     csZBufMode zbufMode)
 {
   if ( !initialized) return true;
   int i, n, j, lod_levels, level;
+  bool do_sys_dist, sys_far;
+  do_sys_dist = false;
+  sys_far = false;
   float distance;
   csVector3 dist;
-  SetAllVisible (); // for now
+  //SetAllVisible (); // for now
   n = x_blocks * z_blocks;
   iGraphics3D *pG3D = rview->GetGraphics3D();
   iCamera* pCamera = rview->GetCamera();
@@ -1375,14 +1415,26 @@ bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
   float* Distances = factory_state->GetLODDistances ();
   float sys_dist = factory_state->GetSystemDistance ();
   lod_levels = factory_state->GetUserLOD ();
+
+  dist = bbox.GetCenter () - cam_origin;
+  distance = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
+  vis = true;
+  distance -= (radius * radius);
+  if (distance > Distances[lod_levels - 1])
+  {
+    if (distance < sys_dist)
+      do_sys_dist = true;
+    else
+      sys_far = true;
+  }
   // csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Drawing");
   for (i = 0; i < n; i++)
   {
-    if (blocks[i].vis)
-    {
+    //if (blocks[i].vis )
+    //{
       dist = blocks[i].bbox.GetCenter () - cam_origin;
       distance = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
-      if (blocks[i].current_lod)
+      if (blocks[i].current_lod && (do_sys_dist == false))
       {
         csSharedLODMesh* current_lod = blocks[i].current_lod;
         if ( current_lod->level == 0 )
@@ -1433,37 +1485,39 @@ bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
         blocks[i].Draw (rview, pCamera, 0);
       } else
       {
-        if (distance < Distances[lod_levels - 1])
+        if (do_sys_dist)
         {
-          // get new current_lod, draw current_lod
-          if (lod_levels > 1)
-          {
-            level = -1;
-            for (j = 0; j < (lod_levels - 1); j++)
-            {
-              if (distance < Distances[j])
-              {
-                level = j;
-                break;
-              }
-            }
-            if (level > -1)
-              blocks[i].CreateNewMesh (level);
-          }
-          blocks[i].Draw (rview, pCamera, 0);
+          if (sys_far)
+            blocks[i].Draw (rview, pCamera, 3);
+          else
+            blocks[i].Draw (rview, pCamera, 2);          
         } else
         {
-          if (distance > Distances[lod_levels - 1])
+          // get new current_lod, draw current_lod
+          if (distance < Distances[lod_levels - 1])
           {
-            if (distance < sys_dist)
-              blocks[i].Draw (rview, pCamera, 2);
-            else
-              blocks[i].Draw (rview, pCamera, 3);
+            if (lod_levels > 1)
+            {
+              level = -1;
+              for (j = 0; j < (lod_levels - 1); j++)
+              {
+                if (distance < Distances[j])
+                {
+                  level = j;
+                  break;
+                }
+              }
+              if (level > -1)
+                blocks[i].CreateNewMesh (level);
+            }
+            blocks[i].Draw (rview, pCamera, 0);
           } else
+          {
             blocks[i].Draw (rview, pCamera, 1);
+          }
         }
       }
-    } else
+    /*} else
     {
       if (blocks[i].current_lod)
       {
@@ -1474,8 +1528,9 @@ bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
         if (distance > (Distances[blocks[i].current_lod->level + 1]) )
           blocks[i].FreeLOD ();
       }
-    }
+    }*/
   }
+  factory_state->SetFocusPoint (cam_origin);
   return true;
 }
 
@@ -1515,6 +1570,7 @@ void csBCTerrObject::SetHeightMap (iImage* im)
   SetupControlPoints (im);
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Setup: Mesh");
   SetupMesh ();
+  BuildCullMesh ();
   initialized = true;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Setup: Complete");
 }
@@ -1595,6 +1651,75 @@ int csBCTerrObject::GetHeightFromImage (iImage* im, float x, float z)
 
 }
 
+void csBCTerrObject::FlattenSides ()
+{
+  int x_size, z_size, i, end;
+  x_size = (3 * x_blocks) + 1; // # of x control points
+  z_size = (3 * z_blocks) + 1;
+  end = x_size * z_size;
+  /*if (flattenheight)
+  {
+    // flatten colinearally
+  } else
+  {
+    if (initheight)
+    {
+      // flatten sides by value
+    } else
+    {*/
+      // flatten sides by topleft value
+      float y = topleft.y;
+      // top
+      for (i = 0; i < x_size; i++)
+      {
+        control_points[i].y = y;
+      }
+      // right
+      for (i = (x_size - 1); i < (end); i += x_size)
+      {
+        control_points[i].y = y;
+      }
+      // down
+      for (i = ((z_size - 1) * x_size); i < end; i++)
+      {
+        control_points[i].y = y;
+      }
+      // left
+      for (i = 0; i < end; i += x_size)
+      {
+        control_points[i].y = y;
+      }
+  /*  }
+  }*/
+}
+
+/*int num_vertices;
+   int* vertices;
+*/
+
+void csBCTerrObject::BuildCullMesh ()
+{
+  int x_size, z_size, end;
+  x_size = (3 * x_blocks) + 1;
+  z_size = (3 * z_blocks) + 1;
+  end = x_size * z_size;
+  int *verts;
+  culling_mesh.culling_mesh = new csMeshedPolygon;
+  verts = new int[4];
+  culling_mesh.square_verts = new csVector3[4];
+  culling_mesh.square_verts[0] = control_points[0];
+  culling_mesh.square_verts[1] = control_points[x_size - 1];
+  culling_mesh.square_verts[2] = control_points[end - 1];
+  culling_mesh.square_verts[3] = control_points[end - x_size];
+  verts[0] = 0;
+  verts[1] = 1;
+  verts[2] = 2;
+  verts[3] = 3;
+  culling_mesh.culling_mesh[0].vertices = verts;
+  culling_mesh.culling_mesh[0].num_vertices = 4; 
+  culling_mesh.culling = true;   
+}
+
 void csBCTerrObject::SetupControlPoints (iImage* im)
 {
   csVector2* size;
@@ -1629,9 +1754,37 @@ void csBCTerrObject::SetupControlPoints (iImage* im)
     }
     last_z -= z;
   }
+  FlattenSides ();
 }
-
-
+/*
+ * FreeSharedLOD
+ *
+ * free lods of non- visible objects
+ */
+void csBCTerrObject::FreeSharedLOD (const csVector3 point)
+{
+  if (!vis)
+  {
+    int i, n;
+    csVector3 dist;
+    float distance;
+    n = x_blocks * z_blocks;
+    float* Distances = factory_state->GetLODDistances ();
+    for (i = 0; i < n; i++)
+    {
+      if (blocks[i].current_lod)
+      {
+        // free lod if distance is correct
+        // currently unused and incomplete
+        dist = blocks[i].bbox.GetCenter () - point;
+        distance = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
+        if (distance > (Distances[blocks[i].current_lod->level + 1]) )
+          blocks[i].FreeLOD ();
+      }
+    }
+    vis = false;
+  }
+}
 
 
 /*
@@ -1779,7 +1932,7 @@ csBCTerrObjectFactory::csBCTerrObjectFactory (iObjectRegistry* object_reg)
 
   LOD_Levels = 0;
   blocksize.Set (0,0);
-  focus = NULL;
+  focus.Set (0,0,0);
   edge_res = 4;
   height_multiplier = 0;
   initialized = false;
@@ -1792,13 +1945,17 @@ csBCTerrObjectFactory::csBCTerrObjectFactory (iObjectRegistry* object_reg)
   time = 0;
   default_mat = NULL;
   sys_distance = 10000;
+  object_list = NULL;
+  num_objects = 0;
+  free_lods = false;
 }
 
 csBCTerrObjectFactory::~csBCTerrObjectFactory ()
 {
+  int i;
   if (LOD_Levels)
   {
-    for (int i = 0; i < LOD_Levels; i++)
+    for (i = 0; i < LOD_Levels; i++)
     {
       delete [] Shared_Meshes[i];
       delete owners[i];
@@ -1811,6 +1968,28 @@ csBCTerrObjectFactory::~csBCTerrObjectFactory ()
     delete [] LOD_Mesh_Numbers;
     delete [] owners;
   }
+  if (default_mat) default_mat->DecRef ();
+  for (i = 0; i < num_objects; i++)
+  {
+    object_list[i] = NULL;
+  }
+  if (object_list) delete [] object_list;
+}
+
+void csBCTerrObjectFactory::AddTerrObject (csBCTerrObject* obj)
+{
+  int i;
+  num_objects++;
+  csBCTerrObject** new_list;
+  new_list = new csBCTerrObject*[num_objects];
+  for (i = 0; i < (num_objects - 1); i++)
+  {    
+    new_list[i] = object_list[i];
+    object_list[i] = NULL;
+  }
+  new_list[num_objects - 1] = obj;
+  delete [] object_list;
+  object_list = new_list;
 }
 
 void csBCTerrObjectFactory::GetXZFromLOD ( int level, int &x_vert, int &z_vert)
@@ -1960,6 +2139,7 @@ iMeshObject* csBCTerrObjectFactory::NewInstance ()
     //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Factory","Passed New Instance Creation");
 
     csBCTerrObject* pTerrObj = new csBCTerrObject (object_reg, this);
+    AddTerrObject (pTerrObj);
     return (iMeshObject*)pTerrObj;
   } else
   {
@@ -1972,11 +2152,19 @@ csSharedLODMesh* csBCTerrObjectFactory::GetSharedMesh ( int level, csBCTerrBlock
   // cpu considerations
   if (time < cpu_time_limit) return NULL;
   time = 0;
+  int i;
   // find an free LOD mesh
+  if (free_lods)
+  {
+    for (i = 0; i < num_objects; i++)
+    {
+      object_list[i]->FreeSharedLOD (focus);
+    }
+    free_lods = false;
+  }
   level -= user_lod_start;
   if (level >= 0)
-  {
-    int i;
+  {    
     csBCLODOwner* list = owners[level];
     for ( i = 0; i < LOD_Mesh_Numbers[level]; i++)
     {
