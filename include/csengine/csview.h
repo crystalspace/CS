@@ -125,6 +125,7 @@ public:
       scfParent->Draw ();
     }
   } scfiView;
+  friend class View;
 };
 
 #endif // __CS_CSVIEW_H__
