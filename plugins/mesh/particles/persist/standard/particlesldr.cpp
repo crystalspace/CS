@@ -252,7 +252,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "No falloff type specified!");
-          return false;
+          return 0;
         }
         if (!strcmp (str, "constant"))
 	        heat = CS_PART_HEAT_CONSTANT;
@@ -377,7 +377,7 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "No falloff type specified!");
-          return false;
+          return 0;
         }
         if (!strcmp (str, "constant"))
 	  falloff = CS_PART_FALLOFF_CONSTANT;

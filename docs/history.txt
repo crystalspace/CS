@@ -24,6 +24,9 @@ chronological order.
 	  <dcalk@dejazzd.com>.
 	- Eric Sunshine fixed a bunch of Texinfo mark-up problems in msvc6.txi
 	  and msvc7.txi.
+	- Eric Sunshine fixed bugs in particlesldr.cpp which were reported by
+	  Randall Foreman's Borland compiler.  Was returning 'false' from a
+	  couple functions declared to return csPtr<>.
 18-Jan-2004
 	- Jorrit removed unused 'next'/'prev' fields in csLight. These
 	  are no longer needed after the redesign of two days ago.
