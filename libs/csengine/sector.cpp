@@ -910,22 +910,22 @@ csThing* csSector::GetThing (const char* name)
   return NULL;
 }
 
-void csSector::ShineLights ()
+void csSector::ShineLights (csProgressPulse* pulse)
 {
-  csProgressPulse pulse(true);
   for (int i = 0 ; i < lights.Length () ; i++)
   {
-    pulse.Step();
+    if (pulse != 0)
+      pulse->Step();
     ((csStatLight*)lights[i])->CalculateLighting ();
   }
 }
 
-void csSector::ShineLights (csThing* th)
+void csSector::ShineLights (csThing* th, csProgressPulse* pulse)
 {
-  csProgressPulse pulse(true);
   for (int i = 0 ; i < lights.Length () ; i++)
   {
-    pulse.Step();
+    if (pulse != 0)
+      pulse->Step();
     ((csStatLight*)lights[i])->CalculateLighting (th);
   }
 }

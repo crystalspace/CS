@@ -36,6 +36,7 @@ class csSprite3D;
 class Dumper;
 class csBspTree;
 class csPolygon2DQueue;
+class csProgressPulse;
 interface IGraphics3D;
 
 /**
@@ -329,10 +330,10 @@ public:
    * center of the light and use that to light all polygons that
    * are hit by the frustrum.
    */
-  void ShineLights ();
+  void ShineLights (csProgressPulse* = 0);
 
   /// Version of shine_lights() which only affects one thing.
-  void ShineLights (csThing* th);
+  void ShineLights (csThing*, csProgressPulse* = 0);
 
   CSOBJTYPE;
 };
