@@ -23,6 +23,8 @@
 #include "csgeom/box.h"
 #include "qint.h"
 
+class csIsoGroundMap;
+
 /**
  *
 */
@@ -42,6 +44,8 @@ private:
    * mingridx==minworldz, mingridy==minworldx
    */
   int mingridx, mingridy;
+  /// the ground map of this grid
+  csIsoGroundMap *groudmap;
 
 public:
   DECLARE_IBASE;
@@ -80,6 +84,39 @@ public:
   virtual iIsoWorld* GetWorld() const {return world;}
   virtual void SetSpace(int minx, int minz, float miny = -1.0, 
     float maxy = +10.0);
+  virtual int GetWidth() const {return width;}
+  virtual int GetHeight() const {return height;}
+  virtual void GetGridOffset(int& minx, int& miny) const 
+  {minx = mingridx; miny = mingridy;}
+
+};
+
+
+/**
+ * The ground map
+ */
+class csIsoGroundMap {
+  /// the grid
+  iIsoGrid *grid;
+  /// muliplier - number of ground values per cell
+  int multx, multy;
+  /// size of map
+  int width, height;
+  /// ground values
+  float *map;
+
+public:
+  ///
+  csIsoGroundMap(iIsoGrid *grid, int multx, int multy);
+  ///
+  ~csIsoGroundMap();
+
+  /// set a value
+  void SetGround(int x, int y, float val) {map[y*width+x]=val;}
+  /// get a value
+  float GetGround(int x, int y) const {return map[y*width+x];}
+  /// see if src can hit dest
+  bool HitBeam(const csVector3& src, const csVector3& dest);
 
 };
 

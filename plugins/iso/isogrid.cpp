@@ -218,3 +218,66 @@ void csIsoGrid::SetSpace(int minx, int minz, float miny = -1.0,
   box.Set(minx,miny,minz, minx+height,maxy,minz+width);
 }
 
+
+//-------------- csIsoGroundMap -------------------------------------------
+csIsoGroundMap::csIsoGroundMap(iIsoGrid *grid, int multx, int multy)
+{
+  csIsoGroundMap::grid = grid;
+  csIsoGroundMap::multx = multx;
+  csIsoGroundMap::multy = multy;
+  width = grid->GetWidth() * multx;
+  height = grid->GetHeight() * multy;
+  map = new float[width*height];
+}
+
+csIsoGroundMap::~csIsoGroundMap()
+{
+  delete[] map;
+}
+
+bool csIsoGroundMap::HitBeam(const csVector3& src, const csVector3& dest)
+{
+  /// go through each mapcell and keep track of visibility.
+  csVector3 delta = dest-src; // src + delta = dest
+  float dheight = delta.y;
+  int mingridx = 0, mingridy = 0;
+  grid->GetGridOffset(mingridx, mingridy);
+  int x0 = QInt(src.z*float(multx)) - mingridx;
+  int y0 = QInt(src.x*float(multy)) - mingridy;
+  int x1 = QInt(dest.z*float(multx)) - mingridx;
+  int y1 = QInt(dest.x*float(multy)) - mingridy;
+  int dx = x1-x0;
+  int dy = y1-y0;
+  float m,b;
+  float baseheight;
+
+  /// check x0,y0
+  if(src.y <= GetGround(x0, y0))
+    return false; // start is below ground
+  if (abs(dx) > abs(dy)) {            // slope < 1
+    m = (float) dy / (float) dx;      // compute slope
+    b = y0 - m*x0;
+    dheight = dheight / float(dx);
+    baseheight = src.y - dheight * x0;
+    dx = (dx < 0) ? -1 : 1;
+    while (x0 != x1) {
+      x0 += dx;
+      //check (x0, round(m*x0 + b))
+      if(dheight*x0+baseheight <= GetGround(x0, QRound(m*x0 + b)))
+        return false;
+    }
+  } else if (dy != 0) {               // slope >= 1
+    m = (float) dx / (float) dy;      // compute slope
+    b = x0 - m*y0;
+    dheight = dheight / float(dy);
+    baseheight = src.y - dheight * y0;
+    dy = (dy < 0) ? -1 : 1;
+    while (y0 != y1) {
+      y0 += dy;
+      //check (round(m*y0 + b), y0)
+      if(dheight*y0+baseheight <= GetGround(QRound(m*y0 + b), y0))
+        return false;
+    }
+  }
+  return true;
+}
