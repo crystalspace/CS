@@ -3,7 +3,7 @@
 # user-annotation capability.
 
 DIRS=$@
-EFED=perl bin/efed.pl
+EFED="perl bin/efed.pl"
 
 for d in $DIRS; do
   if test -d $d; then
