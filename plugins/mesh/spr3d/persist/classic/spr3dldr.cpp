@@ -510,7 +510,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
   // with impexp. Once those loaders move to another plugin this code
   // below should be removed.
   if (imeshfactwrap->GetMeshObjectFactory ())
-    fact = imeshfactwrap->GetMeshObjectFactory ();
+    (fact = imeshfactwrap->GetMeshObjectFactory ())->IncRef ();
   else
     fact = type->NewFactory ();
 
