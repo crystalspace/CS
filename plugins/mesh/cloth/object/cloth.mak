@@ -4,7 +4,7 @@ DESCRIPTION.cloth = Cloth mesh object plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make cloth      Make the $(DESCRIPTION.cloth)$"
+  $(NEWLINE)echo $"  make cloth        Make the $(DESCRIPTION.cloth)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

@@ -1,12 +1,12 @@
 # Application description
-DESCRIPTION.simplecloth = Crystal Space Cloth Demo application
+DESCRIPTION.simplecloth = Crystal Space Cloth demonstration
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make simplecloth      Make the $(DESCRIPTION.simplecloth)$"
+  $(NEWLINE)echo $"  make simplecloth  Make the $(DESCRIPTION.simplecloth)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

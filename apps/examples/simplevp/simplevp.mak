@@ -1,12 +1,12 @@
 # Application description
-DESCRIPTION.simplevp = Example application using Vertex-Programs
+DESCRIPTION.simplevp = Effects (vertex programs) demonstration
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make simplevp      Make the $(DESCRIPTION.simplevp)$"
+  $(NEWLINE)echo $"  make simplevp     Make the $(DESCRIPTION.simplevp)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
