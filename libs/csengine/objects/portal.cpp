@@ -179,6 +179,26 @@ void csPortal::GetColorFilter (float &r, float &g, float &b) const
   b = filter_b;
 }
 
+csPlane3 temporary_p;
+
+const csPlane3& csPortal::GetObjectPlane ()
+{
+  // @@@ TODO
+  return temporary_p;
+}
+
+const csPlane3& csPortal::GetWorldPlane ()
+{
+  // @@@ TODO
+  return temporary_p;
+}
+
+void csPortal::ComputeCameraPlane (const csReversibleTransform& t,
+	csPlane3& camplane)
+{
+  // @@@ TODO
+}
+
 csVector3 csPortal::Warp (const csReversibleTransform& t,
     const csVector3 &pos) const
 {

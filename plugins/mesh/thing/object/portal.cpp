@@ -103,6 +103,23 @@ int csPortalObsolete::GetVertexIndicesCount () const
   return parent->GetVertexCount ();
 }
 
+const csPlane3& csPortalObsolete::GetObjectPlane ()
+{
+  return parent->GetObjectPlane ();
+}
+
+const csPlane3& csPortalObsolete::GetWorldPlane ()
+{
+  // @@@ WRONG: but going to be removed anyway...
+  return parent->GetObjectPlane ();
+}
+
+void csPortalObsolete::ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& camplane)
+{
+  // @@@ WRONG: but going to be removed anyway...
+}
+
 bool csPortalObsolete::CompleteSector (iBase *context)
 {
   if (sector)
@@ -272,7 +289,7 @@ bool csPortalObsolete::Draw (
   rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
   rview->SetClipper (&new_view);
   rview->ResetFogInfo ();
-  rview->SetPortalPolygon (portal_polygon);
+  rview->SetLastPortal (&scfiPortal, portal_polygon);
   rview->SetPreviousSector (rview->GetThisSector ());
   rview->SetClipPlane (camera_plane);
   rview->GetClipPlane ().Invert ();

@@ -101,6 +101,11 @@ public:
    */
   virtual void SetSector (iSector* s);
 
+  virtual const csPlane3& GetObjectPlane ();
+  virtual const csPlane3& GetWorldPlane ();
+  virtual void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& camplane);
+
   /// Set portal flags (see CS_PORTAL_XXX values)
   virtual csFlags& GetFlags () { return flags; }
 

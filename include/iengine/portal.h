@@ -38,6 +38,15 @@ class csPlane3;
 #define CS_PORTAL_CLIPDEST 0x00000001
 
 /**
+ * If this flag is set then this portal will clip geometry of an object
+ * that is straddling this portal (i.e. the object is both in the source
+ * and destination sector and the portal 'cuts' the object). This is only
+ * needed if the portal is on a surface that is transparent. A space warping
+ * portal will do this automatically.
+ */
+#define CS_PORTAL_CLIPSTRADDLING 0x00000002
+
+/**
  * If this flag is set then this portal will do a Z-fill after
  * rendering the contents. This is mainly useful for floating portals
  * where it is possible that there is geometry in the same sector
@@ -45,7 +54,7 @@ class csPlane3;
  * get written in the portal sector because the Z-buffer cannot
  * be trusted).
  */
-#define CS_PORTAL_ZFILL 0x00000002
+#define CS_PORTAL_ZFILL 0x00000004
 
 /**
  * If this flag is set then this portal will do space warping.
@@ -53,14 +62,14 @@ class csPlane3;
  * Don't set this flag directly. Use SetWarp() instead. It is safe
  * to disable and query this flag though.
  */
-#define CS_PORTAL_WARP 0x00000004
+#define CS_PORTAL_WARP 0x00000008
 
 /**
  * If this flag is set then this portal mirrors space (changes order
  * of the vertices of polygons). Don't set this flag directly. It will
  * be automatically set if a mirroring space warp is used with SetWarp().
  */
-#define CS_PORTAL_MIRROR 0x00000008
+#define CS_PORTAL_MIRROR 0x00000010
 
 /**
  * A flag which indicates if the destination of this portal should not be
@@ -68,7 +77,7 @@ class csPlane3;
  * disable this flag because you want the destination to move with the
  * source.
  */
-#define CS_PORTAL_STATICDEST 0x00000010
+#define CS_PORTAL_STATICDEST 0x00000020
 
 /**
  * If this flag is used then the portal will use possible available
@@ -79,17 +88,17 @@ class csPlane3;
  * CS_PORTAL_CLIPDEST if the destination of the portal enters in the middle
  * of a sector.
  */
-#define CS_PORTAL_FLOAT 0x00000020
+#define CS_PORTAL_FLOAT 0x00000040
 
 /**
  * If this flag is set then this portal is used for collision detection.
  */
-#define CS_PORTAL_COLLDET 0x00000040
+#define CS_PORTAL_COLLDET 0x00000080
 
 /**
  * If this flag is set then this portal is used for visibility culling.
  */
-#define CS_PORTAL_VISCULL 0x00000080
+#define CS_PORTAL_VISCULL 0x00000100
 
 class csTransform;
 class csMatrix3;
@@ -120,7 +129,7 @@ struct iPortalCallback : public iBase
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 3, 0);
+SCF_VERSION (iPortal, 0, 4, 0);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -153,6 +162,24 @@ struct iPortal : public iBase
    * Get the number of vertex indices.
    */
   virtual int GetVertexIndicesCount () const = 0;
+
+  /**
+   * Get the object space plane of this portal.
+   */
+  virtual const csPlane3& GetObjectPlane () = 0;
+
+  /**
+   * Get the world space plane of this portal.
+   * Note! This function assumes the mesh containing this portal
+   * has previously been transformed to world space!
+   */
+  virtual const csPlane3& GetWorldPlane () = 0;
+
+  /**
+   * Calculate the camera space plane for this portal.
+   */
+  virtual void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& camplane) = 0;
 
   /**
    * Set the sector that this portal points too. To avoid circular

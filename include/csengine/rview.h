@@ -319,11 +319,15 @@ public:
    */
   virtual void SetPreviousSector (iSector* s) { ctxt->previous_sector = s; }
 
-  /// Get the portal polygon.
-  virtual iPolygon3D* GetPortalPolygon () { return ctxt->portal_polygon; }
-  /// Set the portal polygon.
-  virtual void SetPortalPolygon (iPolygon3D* por)
-  { ctxt->portal_polygon = por; }
+  /// Get the last portal.
+  virtual iPortal* GetLastPortal () { return ctxt->last_portal; }
+  virtual iPolygon3D* GetLastPortalP () { return ctxt->portal_polygon; }
+  /// Set the last portal.
+  virtual void SetLastPortal (iPortal* por, iPolygon3D* p)
+  {
+    ctxt->last_portal = por;
+    ctxt->portal_polygon = p;
+  }
 
   /**
    * Get render recursion level.

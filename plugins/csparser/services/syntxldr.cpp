@@ -86,6 +86,7 @@ enum
   XMLTOKEN_M31,
   XMLTOKEN_M32,
   XMLTOKEN_M33,
+  XMLTOKEN_CLIPSTRADDLING,
   XMLTOKEN_COPY,
   XMLTOKEN_MULTIPLY2,
   XMLTOKEN_MULTIPLY,
@@ -175,6 +176,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("m31", XMLTOKEN_M31);
   xmltokens.Register ("m32", XMLTOKEN_M32);
   xmltokens.Register ("m33", XMLTOKEN_M33);
+  xmltokens.Register ("clipstraddling", XMLTOKEN_CLIPSTRADDLING);
   xmltokens.Register ("copy", XMLTOKEN_COPY);
   xmltokens.Register ("multiply2", XMLTOKEN_MULTIPLY2);
   xmltokens.Register ("multiply", XMLTOKEN_MULTIPLY);
@@ -666,6 +668,15 @@ bool csTextSyntaxService::ParsePortal (
       case XMLTOKEN_MIRROR:
 	if (!ParseBool (child, mirror, true))
 	  return false;
+        break;
+      case XMLTOKEN_CLIPSTRADDLING:
+        flags |= CS_PORTAL_CLIPSTRADDLING;
+        break;
+      case XMLTOKEN_COLLDET:
+        flags |= CS_PORTAL_COLLDET;
+        break;
+      case XMLTOKEN_VISCULL:
+        flags |= CS_PORTAL_VISCULL;
         break;
       case XMLTOKEN_STATIC:
         flags |= CS_PORTAL_STATICDEST;

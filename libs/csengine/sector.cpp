@@ -736,24 +736,33 @@ void csSector::Draw (iRenderView *rview)
 
   if (HasFog ())
   {
-    if (
-      (fogmethod = csEngine::current_engine->fogmethod)
-		== G3DFOGMETHOD_VERTEX)
+    fogmethod = csEngine::current_engine->fogmethod;
+    if (fogmethod == G3DFOGMETHOD_VERTEX)
     {
       csFogInfo *fog_info = new csFogInfo ();
       fog_info->next = rview->GetFirstFogInfo ();
 
-      iPolygon3D *ipoly3d = rview->GetPortalPolygon ();
-      if (ipoly3d)
+      iPortal* last_portal = rview->GetLastPortal ();
+      if (last_portal)
       {
-        ipoly3d->ComputeCameraPlane (icam->GetTransform (),
-		fog_info->incoming_plane);
-        //fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
+        iPolygon3D *ipoly3d = rview->GetLastPortalP ();
+	if (ipoly3d)
+	{
+          ipoly3d->ComputeCameraPlane (icam->GetTransform (),
+		  fog_info->incoming_plane);
+	}
+	else
+	{
+          last_portal->ComputeCameraPlane (icam->GetTransform (),
+		  fog_info->incoming_plane);
+	}
         fog_info->incoming_plane.Invert ();
         fog_info->has_incoming_plane = true;
       }
       else
+      {
         fog_info->has_incoming_plane = false;
+      }
       fog_info->fog = &GetFog ();
       fog_info->has_outgoing_plane = true;
       rview->SetFirstFogInfo (fog_info);
@@ -799,10 +808,9 @@ void csSector::Draw (iRenderView *rview)
 
     if (prev_sector)
     {
-      iPolygon3DStatic* st = rview->GetPortalPolygon ()->GetStaticData ();
+      iPortal* portal = rview->GetLastPortal ();
       draw_prev_sector = prev_sector->HasFog () ||
-        st->IsTransparent () ||
-        st->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP);
+        portal->GetFlags ().Check (CS_PORTAL_WARP | CS_PORTAL_CLIPSTRADDLING);
     }
 
     // First sort everything based on render priority and return

@@ -109,6 +109,10 @@ public:
   const csVector3* GetVertices () const;
   int* GetVertexIndices () const;
   int GetVertexIndicesCount () const;
+  const csPlane3& GetObjectPlane ();
+  const csPlane3& GetWorldPlane ();
+  void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& camplane);
 
   /// Set the maximum sector visit.
   void SetMaximumSectorVisit (int msv)
@@ -240,18 +244,6 @@ public:
   	csVector3& isect);
 
   /**
-   * Follow a beam through this portal and return the object
-   * that it hits with. This function properly acounts for space
-   * warping portals and also checks for infinite recursion (does
-   * not allow traversing the same sector more than five times).
-   * Optionally returns the polygon in 'polygonPtr'.
-   * The given transform 't' is used to transform the warping matrix
-   * in the portal from object to world space (this==object, other==world).
-   */
-  //iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	//csVector3& isect, iPolygon3D** polygonPtr);
-
-  /**
    * Check if the destination sector is 0 and if so call
    * the callback. This function returns false if the portal should
    * not be traversed.
@@ -288,6 +280,19 @@ public:
     virtual int GetVertexIndicesCount () const
     {
       return scfParent->GetVertexIndicesCount ();
+    }
+    virtual const csPlane3& GetObjectPlane ()
+    {
+      return scfParent->GetObjectPlane ();
+    }
+    virtual const csPlane3& GetWorldPlane ()
+    {
+      return scfParent->GetWorldPlane ();
+    }
+    virtual void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& camplane)
+    {
+      scfParent->ComputeCameraPlane (t, camplane);
     }
 
     virtual csFlags& GetFlags () { return scfParent->GetFlags (); }

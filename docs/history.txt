@@ -28,6 +28,18 @@ chronological order.
 	  that's wrong. It should have all polygons.
 	- Jorrit renamed csPortal in thing to csPortalObsolete. This to avoid
 	  a clash with csPortal in engine.
+	- Jorrit added GetObjectPlane(), GetWorldPlane() and
+	  ComputeCameraPlane() to iPortal and the two current implementations.
+	- Jorrit added iRenderView->SetLastPortal() and GetLastError().
+	  This function replaces GetPortalPolygon() and SetPortalPolygon().
+	  Temporarily the function still accepts an iPolygon3D but that
+	  is going to change as soon as portal support is removed in thing.
+	- Jorrit added CS_PORTAL_CLIPSTRADDLING to indicate a portal has to
+	  cut geometry that goes through the portal itself. This is only needed
+	  if the portal surface is transparent.
+	- Jorrit added CS_PORTAL_VISCULL and CS_PORTAL_COLLDET.
+	- Jorrit added support for the three new portal flags in syntax
+	  services (<clipstraddling />, <viscull />, and <portal />).
 	- Eric Sunshine added adjustments for TeX parameters in cs.txi in order
 	  to reduce the likelihood of over- and underfull hbox warnings.
 	- DeSigna patched in jsquare's changes to the msvc7 external
