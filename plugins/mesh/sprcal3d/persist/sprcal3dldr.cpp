@@ -53,8 +53,7 @@ enum
   XMLTOKEN_SKELETON,
   XMLTOKEN_ANIMATION,
   XMLTOKEN_MESH,
-  XMLTOKEN_MATERIAL,
-  XMLTOKEN_MORPHTARGET
+  XMLTOKEN_MATERIAL
 };
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
@@ -115,13 +114,12 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
-  xmltokens.Register ("path",        XMLTOKEN_PATH);
-  xmltokens.Register ("scale",       XMLTOKEN_SCALE);
-  xmltokens.Register ("skeleton",    XMLTOKEN_SKELETON);
-  xmltokens.Register ("animation",   XMLTOKEN_ANIMATION);
-  xmltokens.Register ("mesh",        XMLTOKEN_MESH);
-  xmltokens.Register ("material",    XMLTOKEN_MATERIAL);
-  xmltokens.Register ("morphtarget", XMLTOKEN_MORPHTARGET);
+  xmltokens.Register ("path",      XMLTOKEN_PATH);
+  xmltokens.Register ("scale",     XMLTOKEN_SCALE);
+  xmltokens.Register ("skeleton",  XMLTOKEN_SKELETON);
+  xmltokens.Register ("animation", XMLTOKEN_ANIMATION);
+  xmltokens.Register ("mesh",      XMLTOKEN_MESH);
+  xmltokens.Register ("material",  XMLTOKEN_MATERIAL);
   return true;
 }
 
@@ -281,37 +279,11 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	      mat = LoadMaterialTag(newspr,child,ldr_context,def_matl);
 	  }
-	  int mesh_index = newspr->LoadCoreMesh(file,name,attach,mat);
-          if (mesh_index == -1)
+	  if (!newspr->LoadCoreMesh(file,name,attach,mat))
 	  {
 	    newspr->ReportLastError();
 	    return 0;
 	  }
-          csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
-          while (child_it->HasNext ())
-          {
-            csRef<iDocumentNode> childchild = child_it->Next ();
-            if (childchild->GetType () != CS_NODE_ELEMENT) continue;
-            const char* child_value = childchild->GetValue ();
-            csStringID child_id = xmltokens.Request (child_value);
-            switch (child_id)
-            {
-              case XMLTOKEN_MORPHTARGET:
-              {
-                const char *morph_file = childchild->GetAttributeValue("file");
-                const char *morph_name = childchild->GetAttributeValue("name");
-                if (morph_file)
-                {
-                  int morph_index = newspr->LoadCoreMorphTarget(mesh_index,morph_file,morph_name);
-                  if (morph_index == -1)
-                  {
-                    newspr->ReportLastError();
-                    return 0;
-                  }
-                }
-              }
-            }
-          }
 	}
 	else
 	{

@@ -54,6 +54,9 @@ chronological order.
 	    - Simplified some csStringArray::Push() invocations in
 	      win32/loadlib.cpp.
 	- Eric Sunshine eliminated compilation warning in csengine/meshobj.cpp.
+        - Philip Wyett rolled back cal3d plugin to pre Steven Geens Morph
+          target changes. These changes were exclusively in the cal3d CVS only
+          and experimental whereas CS requires the stable 0.9 cal3d release.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate

@@ -88,19 +88,8 @@ struct iSpriteCal3DFactoryState : public iBase
    * later.
    * defmat is the material which should be used when the object is created, if any.
    */
-  virtual int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
+  virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
 
-  /**
-   * This adds a mesh as a morph target of another mesh.
-   *
-   * @param mesh_index The index of the mesh we are going to add a morph target to.
-   * @param filename The name of the file of the mesh of the morph tarrget.
-   * @param name The name of the morph target.
-   *
-   * @return The index of the morph target.
-   */
-  virtual int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name) = 0;
-  
   /**
    * This jams a CS material into a cal3d material struct.
    * Don't try this at home!
@@ -118,16 +107,6 @@ struct iSpriteCal3DFactoryState : public iBase
    * to the core model.
    */
   virtual int  GetMeshCount() = 0;
-
-  /**
-   * Returns the number of morph targets of a mesh.
-   *
-   * @parm mesh_id The id of the mesh.
-   *
-   * @return The number of morph targets of a mesh.
-   *         -1 if something went wrong.
-   */
-  virtual int GetMorphTargetCount(int mesh_id) = 0;
 
   /**
    * Returns the xml name of the mesh at a certain index in the array.
@@ -244,51 +223,6 @@ struct iSpriteCal3DState : public iBase
    * by name to prevent behavior changes when xml order is updated.
    */
   virtual bool DetachCoreMesh(int mesh_id) = 0;
-
-  /**
-   * Blends the morph target.
-   *
-   * @parm mesh_id The id of the mesh we want to blend.
-   * @parm morph_id The id of the morph target.
-   * @parm weight The weight of the morph target.
-   * @parm delay The delay untill the full weight is reached.
-   *
-   * @return False if something went wrong.
-   */
-  virtual bool BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay) = 0;
-
-  /**
-   * Clears the morph target.
-   *
-   * @parm mesh_id The id of the mesh we want to clear.
-   * @parm morph_id The id of the morph target.
-   * @parm delay The delay untill the morph target is cleared.
-   *
-   * @return False if something went wrong.
-   */
-  virtual bool ClearMorphTarget(int mesh_id, int morph_id, float delay) = 0;
-
-  /**
-   * Blends the base vectors of a mesh.
-   *
-   * @parm mesh_id The id of the mesh we want to blend.
-   * @parm weight The weight of the morph target.
-   * @parm delay The delay untill the full weight is reached.
-   *
-   * @return False if something went wrong.
-   */
-  virtual bool BlendBase(int mesh_id, float weight, float delay) = 0;
-
-  /**
-   * Clears the base vectors of a mesh.
-   *
-   * @parm mesh_id The id of the mesh we want to clear.
-   * @parm delay The delay untill the morph target is cleared.
-   *
-   * @return False if something went wrong.
-   */
-  virtual bool ClearBase(int mesh_id, float delay) = 0;
-  
 };
 
-#endif// __CS_IMESH_SPRITECAL3D_H__
+#endif // __CS_IMESH_SPRITE3D_H__
