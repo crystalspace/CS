@@ -32,6 +32,10 @@ skin "Normal Windows"
   TreeChkMarked:	"/aws/treechkf.png"
   TreeGrpUnmarked:	"/aws/treegrpe.png"
   TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
 }
 
 skin "Metal Windows"
