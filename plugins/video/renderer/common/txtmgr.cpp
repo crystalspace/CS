@@ -131,10 +131,13 @@ void csTextureHandle::CreateMipmaps ()
 
     tex [1] = NewTexture (i1);
     DG_LINK (this, tex[1]);
+    i1->DecRef ();
     tex [2] = NewTexture (i2);
     DG_LINK (this, tex[2]);
+    i2->DecRef ();
     tex [3] = NewTexture (i3);
     DG_LINK (this, tex[3]);
+    i3->DecRef ();
   }
 
   ComputeMeanColor ();
