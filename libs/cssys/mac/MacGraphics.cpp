@@ -310,14 +310,7 @@ void csGraphics2DMac::Initialize()
 		 *	The 8 bit pixel data was filled in by csGraphics2D
 		 *	so all we need to do is get the default 8 bit color table.
 		 */
-#if 1
 		mColorTable = GetCTable( 72 );
-#else
-		mColorTable = (CTabHandle)NewHandleClear( sizeof(ColorSpec) * 256 + 8 );
-		(*mColorTable)->ctSeed = GetCTSeed();
-		(*mColorTable)->ctFlags = 0;
-		(*mColorTable)->ctSize = 255;
-#endif
 	}
 
 	if ( mDrawSprocketsEnabled ) {
@@ -396,7 +389,7 @@ bool csGraphics2DMac::Open(char* Title)
 		// set the color table into the video card
 		SetGWorld( (CGrafPtr)mMainWindow, mMainGDevice );
 		if ( Depth == 8 ) {
-			mMainPalette = ::NewPalette( 256, mColorTable, pmTolerant, 0x2000 );
+			mMainPalette = ::NewPalette( 256, mColorTable, pmExplicit + pmTolerant, 0 );
 			SetPalette( (WindowPtr)mMainWindow, mMainPalette, false );
 			mPaletteChanged = true;
 		} else {
@@ -504,6 +497,8 @@ void csGraphics2DMac::SetRGB(int i, int r, int g, int b)
 		(*mColorTable)->ctTable[i].value = i;
 		(*mColorTable)->ctTable[i].rgb = theColor.rgb;
 		CTabChanged( mColorTable );
+		SetEntryColor( mMainPalette, i, &theColor.rgb );
+		SetEntryUsage( mMainPalette, i, pmExplicit + pmTolerant, 0 );
 	}
 	mPaletteChanged = true;
 }
@@ -542,8 +537,6 @@ void csGraphics2DMac::GetColorfromInt( int color, RGBColor *outColor )
 ----------------------------------------------------------------*/
 bool csGraphics2DMac::BeginDraw()
 {
-	GetGWorld( &mSavedPort, &mSavedGDHandle );
-
 	if ( mDrawSprocketsEnabled ) {
 		CGrafPtr port;
 		int		 i;
@@ -552,16 +545,10 @@ bool csGraphics2DMac::BeginDraw()
 
 		if ( mGetBufferAddress ) {
 			DSpContext_GetBackBuffer(mDisplayContext, kDSpBufferKind_Normal, &mOffscreen);
-			SetPort((GrafPtr) mOffscreen);
 
 			Memory = (unsigned char*)::GetPixBaseAddr(mOffscreen->portPixMap);
 			mGetBufferAddress = false;
 		}
-	} else {
-//		if ( mDoubleBuffering )
-//			SetGWorld( mOffscreen, NULL );
-//		else
-//			SetGWorld( (GWorldPtr)mMainWindow, mMainGDevice );
 	}
 
   return true;
@@ -573,8 +560,6 @@ bool csGraphics2DMac::BeginDraw()
 ----------------------------------------------------------------*/
 void csGraphics2DMac::FinishDraw()
 {
-	SetGWorld( (GWorldPtr)mSavedPort, mSavedGDHandle );
-
 	if ( mActivePage == 0 )
 		mActivePage = 1;
 	else
@@ -770,7 +755,7 @@ void csGraphics2DMac::ActivateWindow( WindowPtr inWindow, bool active )
 
 		if ( active ) {
 			SelectWindow( (WindowPtr)mMainWindow );
-			if ( mColorTable )
+			if ( mMainPalette )
 				ActivatePalette( (WindowPtr)mMainWindow );
 		}
 	}
@@ -915,10 +900,6 @@ void csGraphics2DMac::SetColorPalette( void )
 		if ( mPaletteChanged ) {
 			SelectWindow( (WindowPtr)mMainWindow );
 
-			GetGWorld( &thePort, &theGDHandle );
-
-			SetGWorld( (GWorldPtr)mMainWindow, mMainGDevice );
-
 			if ( mOffscreen ) {
 				Rect	theBounds;
 
@@ -928,9 +909,7 @@ void csGraphics2DMac::SetColorPalette( void )
 				theBounds.bottom = Height;
 				UpdateGWorld( &mOffscreen, Depth, &theBounds, mColorTable, NULL, 0 );
 			}
-			SetGWorld( thePort, theGDHandle );
 
-			CTab2Palette( mColorTable, mMainPalette, pmTolerant, 0x2000 );
 			ActivatePalette( (WindowPtr)mMainWindow );
 
 			mPaletteChanged = false;
