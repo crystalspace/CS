@@ -129,7 +129,7 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q = System->CreateEventOutlet (this);
+    EventOutlet = System->CreateEventOutlet (this);
     q->DecRef ();
   }
   return true;

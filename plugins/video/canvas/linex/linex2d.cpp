@@ -139,9 +139,10 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
 csGraphics2DLineXLib::~csGraphics2DLineXLib(void)
 {
   Close();
+  if (EventOutlet)
+    EventOutlet->DecRef();
   if (xwin)
-    xwin->DecRef ();
- 
+    xwin->DecRef();
 }
 
 bool csGraphics2DLineXLib::Open()

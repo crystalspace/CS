@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  any other targets, and thus become the "default" target.  Typically,
 	  the `help' target from CS/Makefile is supposed to be the default
 	  target, but `testecho' was subverting it.
+	- Eric Sunshine fixed several modules which were leaking iEventOutlets
+	  which they had created.
 7-Nov-2001
 	- Eric Sunshine fixed simpcon.cpp so that it now uses an octal
 	  character constant for cursor assignment, rather than using an 8-bit
