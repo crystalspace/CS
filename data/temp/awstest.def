@@ -48,6 +48,29 @@ window "Another"
   Frame: (100,100)-(600,440)
   Style: wfsNormal
   Title: "A window with lots of stuff"
+
+  component "Horz" is "Scroll Bar"
+  {
+   Frame: (350, 30) - (450, 50)
+   Orientation: sboHorizontal
+   Min: 0
+   Max: 100
+   PageSize: 30
+   Change: 1
+   BigChange: 5
+  }
+
+  component "Vert" is "Scroll Bar"
+  {
+   Frame: (460, 50) - (480, 120)
+   Orientation: sboVertical
+   Min: 0
+   Max: 100
+   PageSize: 30
+   Change: 1
+   BigChange: 5
+  }
+
   component "Red" is "Command Button"
   {
     Frame: (20, 30) - (90, 50)
