@@ -87,7 +87,7 @@ public:
    * This function will return the pointer to the object registry where
    * all the created objects will be registered.
    */
-  static iObjectRegistry* CreateEnvironment ();
+  static iObjectRegistry* CreateEnvironment (int argc, const char* const argv[]);
 
   /**
    * This very important function initializes the SCF sub-system.
@@ -147,13 +147,6 @@ public:
    * called after creating the config manager (CreateConfigManager()).
    */
   static bool CreateInputDrivers (iObjectRegistry*);
-
-  /**
-   * Setup the commandline parser. This must be called after
-   * CreateCommandLineParser().
-   */
-  static bool SetupCommandLineParser (
-    iObjectRegistry*, int argc, const char* const argv[]);
 
   /**
    * Setup the config manager. If you have no config file then you can still
