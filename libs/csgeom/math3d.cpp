@@ -502,13 +502,13 @@ bool csIntersect3::IntersectTriangle (
   // 'isect' is the intersection of the segment and the
   // plane. Now we have to see if this intersection is
   // in the triangle.
-  if (plane.D () > SMALL_EPSILON)   // Check if plane is not near origin.
-  {
-    if (csMath3::WhichSide3D (isect, tr3, tr1) > 0) return false;
-    if (csMath3::WhichSide3D (isect, tr1, tr2) > 0) return false;
-    if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
-  }
-  else
+  //if (plane.D () > SMALL_EPSILON)   // Check if plane is not near origin.
+  //{
+    //if (csMath3::WhichSide3D (isect, tr3, tr1) > 0) return false;
+    //if (csMath3::WhichSide3D (isect, tr1, tr2) > 0) return false;
+    //if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
+  //}
+  //else
   {
     // Bug fix for WichSide3D. Slower but valid.
     csVector3 norm = plane.Normal ();

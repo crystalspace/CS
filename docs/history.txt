@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Aug-2003
+	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
+	  some cases it would fail to register a hit.
 	- Eric Sunshine moved an MSVC6 specialization (added by Boyan) out of
 	  csutil/array.h and into cssys/win32/csosdefs.h where it belongs.
 	- Eric Sunshine fixed compilation erorr in shadervar.cpp.
