@@ -41473,7 +41473,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  Thomas also updated some VC project files and removed a few
 	  warnings in dungeon plugin and software renderer.
 13-Jun-2000
-       - Samuel verbosely has been busy with the now called procedural textures:
+	- Samuel Humphreys made the following changes:
 	   - Changed names from dynamic textures to the more correct term
 	     procedural textures.
 	   - The iGraphics3D method CreateOffScreenRenderer is now gone. All
@@ -41498,7 +41498,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	     fine grained control of mip-mapping. The software texture
 	     manager now keeps a single linked list of all 8bit canvases
 	     it services.
-	   - Rewritten the opengl software procedural texture implementation.
+	   - Rewritten the OpenGL software procedural texture implementation.
 	     So that it can be rendered to by the engine.
 	   - Added a force32bitsoftware additional flag to opengl.cfg, which
 	     performs better with mesa and 16bit displays with a voodoo2.
@@ -41535,7 +41535,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	     Voodoo2 owners now need Mesa beta3.3 from cvs for this to work.
 	     Unfortunately glCopySubTexImage2D is now broken in cvs so I
 	     cant implement this optimisation. The texture probably still
-	     renders inverted, it does on the voodoo2. I dont think there
+	     renders inverted, it does on the Voodoo2. I dont think there
 	     is an opengl trick to reinvert the texture, but I could be
 	     wrong. Possible solutions are to intercept every draw call
 	     and invert these or to copy over from the framebuffer
@@ -41545,14 +41545,14 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	     matrix about the lookat vector) within the driver and
 	     inverting all vertices which are in screen co-ordinates.
 	     I wait for a better suggestion :).
-	    - Lastly Ive destroyed the performance of the opengl procedural
+	   - Lastly Ive destroyed the performance of the opengl procedural
 	     textures, oops, need to investigate this :( Used to get about
 	     70fps with the astext texture alone, this is now down to 10ish
 	     with software textures. This might be Mesa3.3beta.
-	    - dtsimple is updated to demonstrate how to do things with the
-	      cleaner, more consistent interface.
-	    - Added new constructor for csImageMemory
-	    - Fixed typo in memdbg.sh
+	   - dtsimple is updated to demonstrate how to do things with the
+	     cleaner, more consistent interface.
+	   - Added new constructor for csImageMemory.
+	   - Fixed typo in memdbg.sh.
 	- Added csPoly2D::Random() to generate a random convex polygon
 	  (triangles only right now). This is going to be used for
 	  debugging the c-buffer.
