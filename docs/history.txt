@@ -15,6 +15,7 @@ The history order is reversed so that new features are at the top.
 	  csClipInfo blah[100] with the CS_STATIC_* macros and
 	  magically it does no longer segfault at exit in walktest (OpenGL
 	  renderer).
+	- Release of CS 0.94r002.
 14-Apr-2002
 	- Philip Wyett eliminated some minor MSVC compiler warnings
 	  in 3ds2lev. Phil Also improved the memcpy replacement for MSVC
