@@ -14,6 +14,9 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 27-Sep-1999
+	- Fixed bug in splitting of BSP polygons. It could happen that
+	  polygons were split to polygons with only one vertex. This bug
+	  could cause lighting to be very wrong indeed.
 	- Eric Sunshine fixed some "const versus non-const" warnings in
 	  csPolyPlane and TextureTrans which were pointed out by
 	  Petr Kocmid <pkocmid@atlas.cz>.
@@ -24,12 +27,24 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine applied the final tweaks to Andrew's changes from
 	  24-Sep-1999 which actually allows the renderer to work correctly in
 	  24-bit RGBA mode on big-endian hardware.
+26-Sep-1999
+	- Continued work on lighting using octree. It is already working
+	  reasonably well but there are still a few bugs. I also haven't
+	  implemented the quad-tree yet which is essential for the big
+	  speed improvement.
+25-Sep-1999
+	- Initial work on implementing lighting using octree.
+	- Progress bar for lighting is now based on number of lights instead
+	  of sectors. Makes more sense.
 24-Sep-1999
 	- Andrew Zabolotny fixed some problems with the 3D software renderer
 	  which affected 24-bit mode on big-endian machines which use RGBA
 	  (as opposed to ARGB or ABGR).  The renderer was using hard-coded
 	  shift amounts which were incompatible with RGBA.
 23-Sep-1999
+	- Added csLightIt similar to csPolyIt. This means that progress
+	  bar for lighting now moves according to the number of lights
+	  and no longer according to the number of sectors.
 	- Big optimization in sprite drawing. I eliminated 3*num_triangles
 	  divides for every sprite!
 	- Inlined csMath2::Area2() for faster backface culling. This should
