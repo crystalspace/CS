@@ -67,12 +67,12 @@ STDAPI DllInitialize ()
   return TRUE;
 }
 
-void STDAPICALLTYPE ModuleRelease ()
+EXTERN_C void STDAPICALLTYPE ModuleRelease ()
 {
   gRefCount--;
 }
 
-void STDAPICALLTYPE ModuleAddRef ()
+EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
 {
   gRefCount++;
 }

@@ -36,12 +36,12 @@ static DllRegisterData gb_regData=
 };
 
 
-void STDAPICALLTYPE ModuleRelease(void)
+EXTERN_C void STDAPICALLTYPE ModuleRelease(void)
 {
   gb_cRef--;
 }
 
-void STDAPICALLTYPE ModuleAddRef(void)
+EXTERN_C void STDAPICALLTYPE ModuleAddRef(void)
 {
   gb_cRef++;
 }   

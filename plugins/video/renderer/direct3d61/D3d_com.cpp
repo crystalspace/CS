@@ -49,12 +49,12 @@ static DllRegisterData gb_regDataDefault=
 */
 
 
-void _stdcall ModuleAddRef()
+EXTERN_C void _stdcall ModuleAddRef()
 {
   gb_cRef++;
 }
 
-void _stdcall ModuleRelease()
+EXTERN_C void _stdcall ModuleRelease()
 {
   gb_cRef--;
 }

@@ -57,12 +57,12 @@ STDAPI DllInitialize ()
   return TRUE;
 }
 
-void STDAPICALLTYPE ModuleRelease (void)
+EXTERN_C void STDAPICALLTYPE ModuleRelease (void)
 {
   atomic_add(&gRefCount, -1);
 }
 
-void STDAPICALLTYPE ModuleAddRef (void)
+EXTERN_C void STDAPICALLTYPE ModuleAddRef (void)
 {
   atomic_add(&gRefCount, 1);
 }

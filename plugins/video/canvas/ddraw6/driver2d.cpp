@@ -35,12 +35,12 @@ static DllRegisterData gb_reg3dData=
   DLL_NAME
 };
 
-void STDAPICALLTYPE ModuleRelease(void)
+EXTERN_C void STDAPICALLTYPE ModuleRelease(void)
 {
     gb_cRef--;
 }
 
-void STDAPICALLTYPE ModuleAddRef(void)
+EXTERN_C void STDAPICALLTYPE ModuleAddRef(void)
 {
     gb_cRef++;
 }   

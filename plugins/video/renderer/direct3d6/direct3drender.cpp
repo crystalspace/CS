@@ -33,12 +33,12 @@ static DllRegisterData gb_regData=
   DLL_NAME
 };
 
-void _stdcall ModuleAddRef()
+EXTERN_C void _stdcall ModuleAddRef()
 {
   gb_cRef++;
 }
 
-void _stdcall ModuleRelease()
+EXTERN_C void _stdcall ModuleRelease()
 {
   gb_cRef--;
 }
