@@ -205,6 +205,7 @@
         <priority name="sky">
             <level>1</level>
             <sort>NONE</sort>
+	    <camera />
         </priority>
         <priority name="wall">
             <level>2</level>
