@@ -16,6 +16,13 @@ he history order is reversed so that new features are at the top.
 	- Reformatted some new code in genmaze a little bit.
 	- Fixed a bug in the engine in relation with materials without texture
 	  in combination with mixmode settings different from CS_FX_COPY.
+	- Eric Sunshine fixed spoofdir.php so that it now correctly interprets
+	  PHP files within the virtual directories, rather than sending those
+	  files back to the client's browser as raw text.
+	- Eric Sunshine upgraded jobber.pl so that it can now run an optional
+	  post-processing step on files generated for online browsing.  In
+	  particular, it now runs a script which sets up the User's Manual and
+	  the API reference to accept user-annotation.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL
