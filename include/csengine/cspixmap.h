@@ -45,27 +45,36 @@ private:
 public:
   /// Set new location of pixmap image on texture
   void SetTextureRectangle (int x, int y, int w, int h)
-  { tx = x; ty = y; tw = w; th = h; }
+  { tx = x; ty = y; tw = w; th = h;}
 
   /// Initialize the pixmap from a texture.
   csPixmap (iTextureHandle *hTexture)
   {
-    int w,h;
-    hTex = hTexture;
-    hTex->GetMipMapDimensions (0,w,h);
-    SetTextureRectangle (0, 0, w, h);
+    hTex = NULL;
+    if (hTexture)
+    {
+      int w,h;
+      (hTex = hTexture)->IncRef ();
+      hTex->GetMipMapDimensions (0,w,h);
+      SetTextureRectangle (0, 0, w, h);
+    }  
   }
 
   /// Initialize the pixmap from a texture with given rectangle
   csPixmap (iTextureHandle *hTexture, int x, int y, int w, int h)
   {
-    hTex = hTexture;
-    SetTextureRectangle (x, y, w, h);
+    hTex = NULL;
+    if (hTexture)
+    {
+      (hTex = hTexture)->IncRef ();
+      SetTextureRectangle (x, y, w, h);
+    }  
   }
 
   /// Deinitialize the pixmap
   virtual ~csPixmap ()
   {
+    if (hTex) hTex->DecRef ();
   }
 
   /// Return true if pixmap has been initialized okay
@@ -112,7 +121,13 @@ public:
 
   /// Change pixmap texture handle
   void SetTextureHandle (iTextureHandle *hTexture)
-  { hTex = hTexture; }
+  { 
+    if (hTexture)
+    {
+      if (hTex) hTex->DecRef (); 
+      (hTex = hTexture)->IncRef (); 
+    }  
+  }
   /// Query pixmap texture handle
   iTextureHandle *GetTextureHandle ()
   { return hTex; }
