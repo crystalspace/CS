@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 19-Jan-2001
+	- Fixed a 'delete' vs 'new[]' bug in csPolygonSet and csSprite3D.
 	- Fixed the bug which Martin Geisse reported with sprite frames
 	  and actions. They were contained within a csNamedObjVector
 	  which is not right because they are not csObject's.

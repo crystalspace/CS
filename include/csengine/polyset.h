@@ -560,7 +560,7 @@ public:
 
     virtual ~PolyMesh ()
     {
-      delete polygons;
+      delete[] polygons;
     }
 
     csMeshedPolygon* polygons;
