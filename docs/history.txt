@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Sep-2003
+	- Eric Sunshine added a check for the C++ `typename' keyword to
+	  configure.ac.  If not recognized by the compiler, the
+	  CS_USE_FAKE_TYPENAME_KEYWORD macro is emitted to volatile.h, which
+	  csdef.h recognizes in order to fake up a `typename' keyword.
 14-Sep-2003
 	- DeSigna made the following changes:
 	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 

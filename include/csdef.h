@@ -35,11 +35,6 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef CS_USE_NEW_RENDERER
-  #define CS_USE_SHADOW_VOLUMES
-  #define iGraphics3D iGraphics3D
-#endif
-
 // DEPRECATED use "true" instead
 #ifndef TRUE
   #define TRUE 1
@@ -100,6 +95,12 @@
 // `explicit' should define CS_USE_FAKE_EXPLICIT_KEYWORD.
 #if defined(CS_USE_FAKE_EXPLICIT_KEYWORD)
   #define explicit /* nothing */
+#endif
+
+// Platforms with compilers which do not understand the new C++ keyword
+// `typename' should define CS_USE_FAKE_TYPENAME_KEYWORD.
+#if defined(CS_USE_FAKE_TYPENAME_KEYWORD)
+  #define typename /* nothing */
 #endif
 
 // The smallest Z at which 3D clipping occurs

@@ -1820,15 +1820,22 @@ AS_IF([test $cs_cv_sys_socket = yes],
 
 
 #------------------------------------------------------------------------------
-# Check if C++ compiler understands new C++ `explicit' keyword.
+# Check if C++ compiler understands new C++ `explicit' and 'typename' keywords.
 #------------------------------------------------------------------------------
 AC_CACHE_CHECK([for C++ `explicit' keyword], [cs_cv_cxx_explicit],
     [CS_BUILD_IFELSE(
 	[AC_LANG_PROGRAM([class A { public: explicit A(int); };], [])],
 	[], [C++], [cs_cv_cxx_explicit=yes], [cs_cv_cxx_explicit=no])])
-
 AS_IF([test $cs_cv_cxx_explicit = no],
     [CS_HEADER_PROPERTY([CS_USE_FAKE_EXPLICIT_KEYWORD])])
+
+AC_CACHE_CHECK([for C++ `typename' keyword], [cs_cv_cxx_typename],
+    [CS_BUILD_IFELSE(
+	[AC_LANG_PROGRAM(
+	    [template <typename T> class A { public: T a; };], [])],
+	[], [C++], [cs_cv_cxx_typename=yes], [cs_cv_cxx_typename=no])])
+AS_IF([test $cs_cv_cxx_typename = no],
+    [CS_HEADER_PROPERTY([CS_USE_FAKE_TYPENAME_KEYWORD])])
 
 
 
