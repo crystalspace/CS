@@ -292,7 +292,7 @@ csRef<iXmlAttribute> csTinyXmlNode::GetAttribute (const char* name)
   while (it->HasNext ())
   {
     csRef<iXmlAttribute> attr = it->Next ();
-    if (strcmp (name, attr->GetValue ()) == 0)
+    if (strcmp (name, attr->GetName ()) == 0)
       return attr;
   }
   csRef<iXmlAttribute> attr;

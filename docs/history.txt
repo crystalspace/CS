@@ -9,6 +9,16 @@ The history order is reversed so that new features are at the top.
 	- Implemented ParseMatrix() in syntax services for XML.
 	- The OpenGL renderer will now register the effects server with
 	  the object registry after loading it.
+	- Added (empty) unittest implementation for csutil. More specifically
+	  for the XML parsing tools.
+	- Added unittest implementation for syntax services to test the
+	  new XML functions. ParseVector() already seems to work but there
+	  are still a few problems.
+	- Extended unittest app to call the new unittests.
+	- Fixed a stupid bug in iXmlNode::GetAttribute() (for TinyXML parser).
+	- Fixed a bug in iObjectRegistry::Register() where it would accidently
+	  increase the ref count on the object with a given tag if that tag
+	  was already defined.
 8-Aug-2002
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip

@@ -148,7 +148,16 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
   if (!clearing)
   {
     // Don't allow adding an object with an already existing tag.
-    if (tag && Get (tag)) return false;
+    if (tag)
+    {
+      iBase* o = Get (tag);
+      if (o)
+      {
+        // DecRef() o because Get() already increffed it.
+        o->DecRef ();
+        return false;
+      }
+    }
 
     obj->IncRef ();
     registry.Push (obj);

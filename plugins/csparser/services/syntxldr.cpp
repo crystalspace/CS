@@ -19,10 +19,12 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "syntxldr.h"
+#include "csutil/ref.h"
 #include "csutil/cscolor.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/util.h"
+#include "csutil/scfstr.h"
 #include "iutil/xml.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
@@ -45,15 +47,24 @@
 #include "imap/parser.h"
 #include "imap/ldrctxt.h"
 
+// Only used for unit-testing. The parser does not otherwise
+// depend on any specific XML parser.
+#include "csutil/xmltiny.h"
+
 CS_IMPLEMENT_PLUGIN;
 
 SCF_IMPLEMENT_IBASE (csTextSyntaxService)
   SCF_IMPLEMENTS_INTERFACE (iSyntaxService)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTextSyntaxService::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTextSyntaxService::DebugHelper)
+  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTextSyntaxService);
@@ -206,6 +217,7 @@ csTextSyntaxService::csTextSyntaxService (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
 
   reporter = NULL;
   thing_type = NULL;
@@ -1554,5 +1566,70 @@ bool csTextSyntaxService::ParsePoly3d (
 	iThingState* thing_state, int vt_offset)
 {
   return true;
+}
+
+//======== Debugging =======================================================
+
+#define SYN_ASSERT(test,msg) \
+  if (!(test)) \
+  { \
+    csString ss; \
+    ss.Format ("Syntax services failure (%d,%s): %s\n", int(__LINE__), \
+    	#msg, #test); \
+    str.Append (ss); \
+    rc->IncRef (); \
+    return rc; \
+  }
+
+iString* csTextSyntaxService::Debug_UnitTest ()
+{
+  csRef<scfString> rc;
+  rc.Take (new scfString ());
+  csString& str = rc->GetCsString ();
+
+  //==========================================================================
+  // Tests for XML parsing.
+  //==========================================================================
+  csRef<iXmlSystem> xml;
+  xml.Take (new csTinyXmlSystem ());
+  csRef<iXmlDocument> doc = xml->CreateDocument ();
+  const char* error = doc->ParseXML ("\
+    <v x=1 y=2 z=3>\
+    <matrix>\
+      <scale>3</scale>\
+    </matrix>\
+  ");
+  SYN_ASSERT (error == NULL, error);
+
+  csRef<iXmlNodeIterator> it = doc->GetRoot ()->GetNodes ("v");
+  SYN_ASSERT (it != NULL, "it");
+  csRef<iXmlNode> vector_node = it->Next ();
+  SYN_ASSERT (vector_node != NULL, "vector_node");
+
+  csVector3 v;
+  ParseVector (vector_node, v);
+  SYN_ASSERT (v.x == 1, "x");
+  SYN_ASSERT (v.y == 2, "y");
+  SYN_ASSERT (v.z == 3, "z");
+
+  //it = doc->GetRoot ()->GetNodes ("matrix");
+  //SYN_ASSERT (it != NULL, "it");
+  //csRef<iXmlNode> matrix_node = it->Next ();
+  csRef<iXmlNode> matrix_node = doc->GetRoot ()->GetNode ("matrix");
+  SYN_ASSERT (matrix_node != NULL, "matrix_node");
+
+  csMatrix3 m;
+  ParseMatrix (matrix_node, m);
+  SYN_ASSERT (m.m11 == 3, "m");
+  SYN_ASSERT (m.m12 == 0, "m");
+  SYN_ASSERT (m.m13 == 0, "m");
+  SYN_ASSERT (m.m21 == 0, "m");
+  SYN_ASSERT (m.m22 == 3, "m");
+  SYN_ASSERT (m.m23 == 0, "m");
+  SYN_ASSERT (m.m31 == 0, "m");
+  SYN_ASSERT (m.m32 == 0, "m");
+  SYN_ASSERT (m.m33 == 3, "m");
+
+  return NULL;
 }
 

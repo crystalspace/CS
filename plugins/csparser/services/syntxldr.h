@@ -20,14 +20,9 @@
 #define _I_CS_SYNTAX_SERVICE_H_
 
 
-/**
- * This component provides services for other loaders to easily parse
- * properties of standard CS world syntax. This implementation will parse
- * the textual representation.
- */
-
 #include "imap/services.h"
 #include "iutil/comp.h"
+#include "iutil/dbghelp.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
 
@@ -41,6 +36,11 @@ struct iReporter;
 struct iLoader;
 struct iMeshObjectType;
 
+/**
+ * This component provides services for other loaders to easily parse
+ * properties of standard CS world syntax. This implementation will parse
+ * the textual representation.
+ */
 class csTextSyntaxService : public iSyntaxService
 {
 protected:
@@ -134,7 +134,7 @@ public:
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset);
 
- private:
+private:
   /// make it plugable
   struct eiComponent : public iComponent
   {
@@ -143,6 +143,42 @@ public:
     { return scfParent->Initialize (object_reg); }
   }scfiComponent;
   friend struct eiComponent;
+
+public:
+  // Debugging functions.
+  iString* Debug_UnitTest ();
+
+  struct DebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csTextSyntaxService);
+    virtual int GetSupportedTests () const
+    {
+      return CS_DBGHELP_UNITTEST;
+    }
+    virtual iString* UnitTest ()
+    {
+      return scfParent->Debug_UnitTest ();
+    }
+    virtual iString* StateTest ()
+    {
+      return NULL;
+    }
+    virtual csTicks Benchmark (int /*num_iterations*/)
+    {
+      return 0;
+    }
+    virtual iString* Dump ()
+    {
+      return NULL;
+    }
+    virtual void Dump (iGraphics3D* /*g3d*/)
+    {
+    }
+    virtual bool DebugCommand (const char* /*cmd*/)
+    {
+      return false;
+    }
+  } scfiDebugHelper;
 };
 
 #endif

@@ -28,8 +28,10 @@
 #include "iutil/vfs.h"
 #include "cstool/initapp.h"
 #include "csgeom/math3d.h"
+#include "csutil/utiltest.h"
 #include "iengine/viscull.h"
 #include "ivaria/collider.h"
+#include "imap/services.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -140,6 +142,19 @@ int main (int argc, char* argv[])
   csGeomDebugHelper* geomdbghelp = new csGeomDebugHelper ();
   Test (geomdbghelp, "csgeom");
   delete geomdbghelp;
+
+  printf ("================================================================\n");
+
+  csUtilDebugHelper* utildbghelp = new csUtilDebugHelper ();
+  Test (utildbghelp, "csutil");
+  delete utildbghelp;
+
+  printf ("================================================================\n");
+
+  iSyntaxService* syntax = CS_LOAD_PLUGIN (plugmgr,
+	"crystalspace.syntax.loader.service.text", iSyntaxService);
+  Test (syntax, "Syntax Services");
+  if (syntax) syntax->DecRef ();
 
   printf ("================================================================\n");
 
