@@ -115,6 +115,9 @@ csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
 
   smap->Alloc (light, w, h);
 
+  csStatLight *slight = QUERY_OBJECT_TYPE (light, csStatLight);
+  slight->RegisterLightMap (this);
+
   return smap;
 }
 
@@ -193,7 +196,7 @@ struct PolySave
 
 struct LightSave
 {
-  CS_ID id;
+  unsigned long light_id;
 };
 
 struct LightHeader
@@ -304,34 +307,18 @@ bool csLightMap::ReadFromCache (int w, int h,
 
   for (i = 0; i < lh.dyn_cnt; i++)
   {
-    memcpy (&ls.id, d, sizeof (ls.id)); d += sizeof (ls.id);
-    ls.id = convert_endian (ls.id);
+    memcpy (&ls.light_id, d, sizeof (ls.light_id)); d += sizeof (ls.light_id);
+    ls.light_id = convert_endian (ls.light_id);
 
-    light = engine->FindCsLight (ls.id);
+    light = engine->FindCsLight (ls.light_id);
     if (light)
     {
-      csStatLight *slight = QUERY_OBJECT_TYPE (light, csStatLight);
-      if (slight && obj)
-      {
-        // @@@: HACK!!! Curves and Polygon3Ds need a common base class which would
-        //      help this temporary hack out a lot
-        if (isPolygon)
-        {
-          //@@@: is this cast neccessary or should I
-          //     put MakeDynamicDirty() in iLightMap
-          slight->RegisterLightMap ( (csLightMap *)( ((csPolygon3D*)obj )->GetLightMapInfo()->GetLightMap() ) ); 
-        }
-        else
-        {
-          slight->RegisterLightMap ( ((csCurve*)obj )->GetLightMap() );
-        }
-      }
       csShadowMap* smap = NewShadowMap (light, w, h);
       memcpy (smap->map, d, lm_size);
     }
     else
     {
-      CsPrintf (MSG_WARNING, "Warning! Light (%ld) not found!\n", ls.id);
+      CsPrintf (MSG_WARNING, "Warning! Light (%ld) not found!\n", ls.light_id);
     }
     d += lm_size;
   }
@@ -419,8 +406,8 @@ void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
       if (smap->map)
       {
         LightSave ls;
-	ls.id = convert_endian (light->GetID ());
-        cf->Write ((char*)&ls.id, sizeof (ls.id));
+	ls.light_id = convert_endian (light->GetLightID ());
+        cf->Write ((char*)&ls.light_id, sizeof (ls.light_id));
         cf->Write ((char*)(smap->map), lm_size);
       }
       smap = smap->next;

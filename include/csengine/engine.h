@@ -943,9 +943,9 @@ public:
   csStatLight* FindCsLight (float x, float y, float z, float dist);
 
   /**
-   * Find the light with the given object id.
+   * Find the light with the given light id.
    */
-  csStatLight* FindCsLight (CS_ID id);
+  csStatLight* FindCsLight (unsigned long id);
 
   /**
    * Find the light with the given name.

@@ -1427,7 +1427,7 @@ csStatLight* csEngine::FindCsLight (float x, float y, float z, float dist)
   return NULL;
 }
 
-csStatLight* csEngine::FindCsLight (CS_ID id)
+csStatLight* csEngine::FindCsLight (unsigned long light_id)
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1435,7 +1435,7 @@ csStatLight* csEngine::FindCsLight (CS_ID id)
   {
     sn--;
     csSector* s = (csSector*)sectors[sn];
-    l = s->FindLight (id);
+    l = s->FindLight (light_id);
     if (l) return l;
   }
   return NULL;

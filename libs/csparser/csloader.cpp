@@ -444,6 +444,7 @@ iStatLight* csLoader::load_statlight (char* name, char* buf)
     CS_TOKEN_TABLE (DYNAMIC)
     CS_TOKEN_TABLE (COLOR)
     CS_TOKEN_TABLE (HALO)
+    CS_TOKEN_TABLE (KEY)
   CS_TOKEN_TABLE_END
 
   long cmd;
@@ -452,7 +453,8 @@ iStatLight* csLoader::load_statlight (char* name, char* buf)
   Stats->lights_loaded++;
   float x, y, z, dist = 0, r, g, b;
   int cnt;
-  int dyn, attenuation = CS_ATTN_LINEAR;
+  bool dyn;
+  int attenuation = CS_ATTN_LINEAR;
   char str [100];
   struct csHaloDef
   {
@@ -474,12 +476,15 @@ iStatLight* csLoader::load_statlight (char* name, char* buf)
   } halo;
 
   memset (&halo, 0, sizeof (halo));
+  csKeyValuePair* kvp = NULL;
 
   if (strchr (buf, ':'))
   {
     // Still support old format for backwards compatibility.
+    int d;
     ScanStr (buf, "%f,%f,%f:%f,%f,%f,%f,%d",
-          &x, &y, &z, &dist, &r, &g, &b, &dyn);
+          &x, &y, &z, &dist, &r, &g, &b, &d);
+    dyn = bool (d);
   }
   else
   {
@@ -487,7 +492,7 @@ iStatLight* csLoader::load_statlight (char* name, char* buf)
     x = y = z = 0;
     dist = 1;
     r = g = b = 1;
-    dyn = 0;
+    dyn = false;
     while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
     {
       switch (cmd)
@@ -502,7 +507,10 @@ iStatLight* csLoader::load_statlight (char* name, char* buf)
           ScanStr (params, "%f,%f,%f", &r, &g, &b);
           break;
         case CS_TOKEN_DYNAMIC:
-          dyn = 1;
+          dyn = true;
+          break;
+        case CS_TOKEN_KEY:
+          kvp = load_key (params, NULL);
           break;
         case CS_TOKEN_HALO:
 	  str[0] = 0;
@@ -570,6 +578,7 @@ defaulthalo:
       break;
   }
   l->QueryLight ()->SetAttenuation (attenuation);
+  if (kvp) l->QueryObject ()->ObjAdd (kvp);
   return l;
 }
 

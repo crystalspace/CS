@@ -269,13 +269,13 @@ csStatLight* csSector::FindLight (float x, float y, float z, float dist)
   return NULL;
 }
 
-csStatLight* csSector::FindLight (CS_ID id)
+csStatLight* csSector::FindLight (unsigned long id)
 {
   int i;
   for (i = 0 ; i < lights.Length () ; i++)
   {
     csStatLight* l = (csStatLight*)lights[i];
-    if (l->GetID () == id) return l;
+    if (l->GetLightID () == id) return l;
   }
   return NULL;
 }

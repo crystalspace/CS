@@ -42,7 +42,7 @@ class csPixmap;
 class csWireFrameCam;
 class csMeshWrapper;
 class csTerrainWrapper;
-class PhysicsLibrary;
+class csLight;
 class InfiniteMaze;
 class HugeRoom;
 struct iSoundHandle;
@@ -283,6 +283,8 @@ public:
 
   /// A pointer to the terrain for which we animate the dirlight.
   csTerrainWrapper* anim_dirlight;
+  /// A pointer to a pseudo-dynamic light that we're animating.
+  csLight* anim_dynlight;
 
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;
@@ -296,8 +298,6 @@ public:
   /// Some sounds.
   iSoundHandle* wMissile_boom;
   iSoundHandle* wMissile_whoosh;
-
-  PhysicsLibrary *pl;
 
   /// Some flags.
   bool do_fps;

@@ -79,6 +79,12 @@ struct iMeshWrapper;
  */
 class csLight : public csObject
 {
+private:
+  /// ID for this light.
+  unsigned long light_id;
+  /// Last used ID.
+  static unsigned long last_light_id;
+
 protected:
   /// Home sector of the light.
   csSector* sector;
@@ -126,6 +132,9 @@ public:
    * update those lightmaps as that is a time-consuming process.
    */
   virtual ~csLight ();
+
+  /// Get the ID of this light.
+  unsigned long GetLightID () { return light_id; }
 
   /**
    * Set the current sector for this light.

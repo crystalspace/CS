@@ -47,21 +47,6 @@ csFrustumView::csFrustumView () :
   ctxt->SetShadows ((iShadowBlockList*)sbl, false);
 }
 
-#if 0
-csFrustumView::csFrustumView (const csFrustumView &iCopy)
-{
-  // hehe. kind of trick.
-  memcpy (this, &iCopy, sizeof (csFrustumView));
-  //@@@@@@@@@@@@@@@@@
-  CONSTRUCT_IBASE (NULL);
-  // Leave cleanup actions alone to original copy.
-  ctxt = new csFrustumContext ();
-  memcpy (ctxt, iCopy.GetFrustumContext (), sizeof (csFrustumContext));
-  ctxt->SetCleanup (NULL);
-  ctxt->SetShadows (iCopy.GetFrustumContext ()->GetShadows (), true);
-}
-#endif
-
 csFrustumView::~csFrustumView ()
 {
   ctxt->CallCleanups ((iFrustumView*)this);
@@ -122,14 +107,17 @@ IMPLEMENT_IBASE (csShadowBlock)
 IMPLEMENT_IBASE_END
 
 csShadowBlock::csShadowBlock (iSector* sect, int draw_busy,
-	int max_shadows, int delta) : shadows (max_shadows, delta)
+	int max_shadows, int delta) :
+		next (NULL), prev (NULL),
+		shadows (max_shadows, delta)
 {
   CONSTRUCT_IBASE (NULL);
   sector = sect;
-  draw_busy = draw_busy;
+  csShadowBlock::draw_busy = draw_busy;
 }
 
 csShadowBlock::csShadowBlock (int max_shadows, int delta) :
+	next (NULL), prev (NULL),
 	shadows (max_shadows, delta)
 {
   CONSTRUCT_IBASE (NULL);

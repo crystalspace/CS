@@ -122,6 +122,7 @@ WalkTest::WalkTest () :
   LevelLoader = NULL;
   anim_sky = NULL;
   anim_dirlight = NULL;
+  anim_dynlight = NULL;
 
   wf = NULL;
   map_mode = MAP_OFF;
@@ -170,8 +171,6 @@ WalkTest::WalkTest () :
   velocity.Set (0, 0, 0);
   angle.Set (0, 0, 0);
   angle_velocity.Set (0, 0, 0);
-
-//pl=new PhysicsLibrary;
 
   timeFPS = 0.0;
 
@@ -389,6 +388,12 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     csYRotMatrix3 mat (.05* 2. * M_PI * (float)elapsed_time/1000.);
     pos = mat * pos;
     anim_dirlight->GetTerrainObject ()->SetDirLight (pos, col);
+  }
+  // Animate the psuedo-dynamic light if any.
+  if (anim_dynlight)
+  {
+    float t = fmod (float (current_time), 2000.) / 2000.;
+    anim_dynlight->SetColor (csColor (t, 0, 1-t));
   }
 
   // Update all busy entities.

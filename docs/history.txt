@@ -1,9 +1,28 @@
 The history order is reversed so that new features are at the top.
 
+14-May-2001
+	- Fixed a bug in csShadowBlock, why doesn't a compiler warn on stupid
+	  assignments like 'a=a'? There is a very small chance that this
+	  fix may fix the dynamic lighting bug I'm experiencing. Not sure
+	  though.
+	- Put in lots of sanity checks in csShadowBlock and related classes.
+	  Also lots of CS_ASSERT calls.
+	- Added support for KEY keyword in loader for lights.
+	- Added new cmd_AnimateDynLight which will animate a pseudo-dynamic
+	  light.
+	- Added new cmd_AnimateDynLight to flarge to test this.
+	- Added new id's to csLight to solve a problem with lightmap saving
+	  (for pseudo-dynamic lights).
+	- Changed csEngine::FindCsLight() to work with this new ID instead
+	  of the CS_ID. Also changed csSector::FindLight().
+	- The two changes above fix a bug with pseudo-dynamic lights not
+	  loading correctly.
+	- Fixed a bug with pseudo-dynamic lights not setup correctly if
+	  the lighting is recalculated (i.e. not read from lm cache).
 13-May-2001
 	- Added CS_ASSERT to some of the functions in growing arrays to
 	  make sure we catch those kinds of errors early.
-	- Martin Geisse fixed simplep for his changes yesterday.
+	- Norman Kramer fixed simplep for Martin's changes yesterday.
 	- Michael Voase added APPLY_MOTION to spr3dldr.cpp. Modified
 	  walktest.cfg to correctly load motion manager.
 	- Removed all 'friend' declarations (except Dumper) from
@@ -13,6 +32,7 @@ The history order is reversed so that new features are at the top.
 	- Added some CS_ASSERT's to various classes in csgeom.
 	- Added CS_ASSERT to dynamic light calculation code.
 	- Martin Geisse changed bumptest to use the engine as a plugin.
+	- Martin cleaned up the code for csMaterial and csTextureWrapper.
 12-May-2001
 	- Thanks to Philip Wyett I fixed a bad bug in the OpenGL
 	  software clipper. Some arrays were not correctly sized to the

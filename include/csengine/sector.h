@@ -272,7 +272,7 @@ public:
   /**
    * Find the light with the given object id.
    */
-  csStatLight* FindLight (CS_ID id);
+  csStatLight* FindLight (unsigned long id);
 
   //----------------------------------------------------------------------
   // Terrain manipulation functions

@@ -37,6 +37,7 @@
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
+unsigned long csLight::last_light_id = 0;
 
 IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
@@ -56,6 +57,7 @@ csLight::csLight (float x, float y, float z, float d,
   float red, float green, float blue) : csObject()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiLight);
+  light_id = last_light_id++;
   center.x = x;
   center.y = y;
   center.z = z;
@@ -356,7 +358,9 @@ void csStatLight::SetColor (const csColor& col)
   csLight::SetColor (col);
   int i;
   for (i = 0 ; i < num_lightmap ; i++)
+  {
     lightmaps[i]->MakeDirtyDynamicLights ();
+  }
 }
 
 //---------------------------------------------------------------------------

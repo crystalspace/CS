@@ -160,6 +160,7 @@ public:
     for (i = 0 ; i < shadows.Length () ; i++)
     {
       csShadowFrustum* sf = (csShadowFrustum*)shadows[i];
+      CS_ASSERT (sf != NULL);
       sf->DecRef ();
     }
     shadows.DeleteAll ();
@@ -255,7 +256,11 @@ public:
   {
     int i;
     for (i = 0 ; i < shadows.Length () ; i++)
-      ((csShadowFrustum*)shadows[i])->Transform (trans);
+    {
+      csShadowFrustum* sf = (csShadowFrustum*)shadows[i];
+      CS_ASSERT (sf != NULL);
+      sf->Transform (trans);
+    }
   }
 
   /// Get iterator to iterate over all shadows in this block.
@@ -306,6 +311,8 @@ public:
   /// Append a shadow block to this list.
   void AppendShadowBlock (csShadowBlock* slist)
   {
+    CS_ASSERT (slist->prev == NULL && slist->next == NULL);
+    CS_ASSERT ((!!first) == (!!last));
     slist->next = NULL;
     if (!last)
     {
@@ -323,20 +330,40 @@ public:
   /// Remove the last shadow block from this list.
   virtual void RemoveLastShadowBlock ()
   {
+    CS_ASSERT ((!!first) == (!!last));
     if (last)
     {
-      last = last->prev;
+      CS_ASSERT (last->next == NULL);
+      CS_ASSERT (first->prev == NULL);
+      csShadowBlock* old = last;
+      last = old->prev;
       if (last) last->next = NULL;
       else first = NULL;
+      old->prev = old->next = NULL;
     }
   }
 
   /// Clear first and last pointers without deleting anything!
-  void Clear () { first = last = NULL; }
+  void Clear ()
+  {
+    CS_ASSERT ((!!first) == (!!last));
+#   ifdef CS_DEBUG
+    // If we are in debug mode then we additionally set all next/prev
+    // fields in the list to NULL so that our assert's above will work.
+    while (first)
+    {
+      csShadowBlock* old = first;
+      first = old->next;
+      old->prev = old->next = NULL;
+    }
+#   endif
+    last = NULL;
+  }
 
   /// Destroy all shadow lists and shadows in the list.
   virtual void DeleteAllShadows ()
   {
+    CS_ASSERT ((!!first) == (!!last));
     while (first)
     {
       first->DeleteShadows ();

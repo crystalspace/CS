@@ -477,6 +477,14 @@ void WalkTest::ParseKeyCmds (csObject* src)
         anim_dirlight = wrap;
       }
     }
+    else if (!strcmp (kp->GetKey (), "cmd_AnimateDynLight"))
+    {
+      csLight* l = QUERY_OBJECT_TYPE (src, csLight);
+      if (l)
+      {
+        anim_dynlight = l;
+      }
+    }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
       csMeshWrapper *wrap = QUERY_OBJECT_TYPE (src, csMeshWrapper);
@@ -578,6 +586,11 @@ void WalkTest::ParseKeyCmds ()
     {
       csTerrainWrapper* terr = sector->GetTerrain (j);
       ParseKeyCmds (terr);
+    }
+    for (j = 0 ; j < sector->GetNumberLights () ; j++)
+    {
+      csStatLight* l = sector->GetLight (j);
+      ParseKeyCmds (l);
     }
   }
 }

@@ -334,8 +334,10 @@ void csPolyTexture::CreateBoundingTextureBox ()
 
 bool csPolyTexture::RecalculateDynamicLights ()
 {
+  if (!lm) return false;
+
   // first combine the static and pseudo-dynamic lights
-  if (!lm || !lm->UpdateRealLightMap() )
+  if (!lm->UpdateRealLightMap ())
     return false;
 
   //---
@@ -758,7 +760,10 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   {
     smap = lm->FindShadowMap (light);
     if (!smap)
-    { smap = lm->NewShadowMap (light, w, h); first_time = true; }
+    {
+      smap = lm->NewShadowMap (light, w, h);
+      first_time = true;
+    }
     else
       first_time = false;
     mapR = smap->map;
