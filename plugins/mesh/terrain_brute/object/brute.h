@@ -313,6 +313,7 @@ private:
   int polymesh_tri_count;
   csMeshedPolygon* polymesh_polygons;
   void SetupPolyMeshData ();
+  void CleanPolyMeshData ();
   int cd_resolution;
 
   /**

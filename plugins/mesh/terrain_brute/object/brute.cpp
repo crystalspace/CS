@@ -21,6 +21,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
 #include "csgeom/segment.h"
+#include "csgeom/trimesh.h"
+#include "csgeom/trimeshlod.h"
 #include "csgfx/memimage.h"
 #include "csutil/util.h"
 #include "csutil/memfile.h"
@@ -411,7 +413,7 @@ void csTerrBlock::CalcLOD (iRenderView *rview)
   radii.x = radii.x;
   if (cam.SquaredNorm ()<maxradius*maxradius &&
       size > terr->block_minsize)*/
-  float splitdist = size*terr->lod_lcoeff/res;
+  float splitdist = size*terr->lod_lcoeff / float (res);
   if (cambox.SquaredOriginDist()<splitdist*splitdist &&
     size > terr->block_minsize)
   {
@@ -691,6 +693,60 @@ bool csTerrBlock::IsMaterialUsed (int index)
 
 // ---------------------------------------------------------------
 
+static bool EV (const csVector3& v1, const csVector3& v2)
+{
+  if ((v1 * v2) > .95)
+    return true;
+  else
+    return false;
+}
+
+static bool TestEqualNormals (const csVector3* normals,
+    int res, int minx, int miny, int maxx, int maxy)
+{
+  csVector3 center = normals[((maxy-miny)/2+miny)*res + ((maxx-minx)/2+minx)];
+  int x, y;
+  for (y = miny ; y <= maxy ; y++)
+    for (x = minx ; x <= maxx ; x++)
+    {
+      const csVector3& v = normals[y*res + x];
+      if (!EV (v, center)) return false;
+    }
+  return true;
+}
+
+static void TriangulateHeightMap (const csVector3* normals,
+    int res, int minx, int miny, int maxx, int maxy,
+    csTriangle* tris, int& num_tris)
+{
+  if ((minx == maxx-1 && miny == maxy-1) || TestEqualNormals (normals,
+	res, minx, miny, maxx, maxy))
+  {
+    tris[num_tris++].Set (miny*res+minx, maxy*res+minx, miny*res+maxx);
+    tris[num_tris++].Set (miny*res+maxx, maxy*res+minx, maxy*res+maxx);
+    return;
+  }
+  int cx = (maxx-minx)/2+minx;
+  int cy = (maxy-miny)/2+miny;
+  if (minx == maxx-1)
+  {
+    TriangulateHeightMap (normals, res, minx, miny, maxx, cy, tris, num_tris);
+    TriangulateHeightMap (normals, res, minx, cy, maxx, maxy, tris, num_tris);
+  }
+  else if (miny == maxy-1)
+  {
+    TriangulateHeightMap (normals, res, minx, miny, cx, maxy, tris, num_tris);
+    TriangulateHeightMap (normals, res, cx, miny, maxx, maxy, tris, num_tris);
+  }
+  else
+  {
+    TriangulateHeightMap (normals, res, minx, miny, cx, cy, tris, num_tris);
+    TriangulateHeightMap (normals, res, cx, miny, maxx, cy, tris, num_tris);
+    TriangulateHeightMap (normals, res, minx, cy, cx, maxy, tris, num_tris);
+    TriangulateHeightMap (normals, res, cx, cy, maxx, maxy, tris, num_tris);
+  }
+}
+
 void csTerrainObject::SetupPolyMeshData ()
 {
   if (polymesh_valid) return;
@@ -712,8 +768,23 @@ void csTerrainObject::SetupPolyMeshData ()
   polymesh_vertex_count = res * res;
   memcpy (polymesh_vertices, terrasampler->SampleVector3 (vertices_name),
     res * res * sizeof (csVector3));
-  terrasampler->Cleanup ();
 
+  csVector3* normals = new csVector3[res * res];
+  memcpy (normals, terrasampler->SampleVector3 (normals_name),
+    res * res * sizeof (csVector3));
+
+#if 0
+printf ("Maximum triangles %d\n", 2 * (res-1) * (res-1)); fflush (stdout);
+  CS_ALLOC_STACK_ARRAY (csTriangle, tris, 2 * (res-1) * (res-1));
+  polymesh_tri_count = 0;
+  TriangulateHeightMap (normals, res, 0, 0, res-1, res-1, tris,
+      polymesh_tri_count);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+  memcpy (polymesh_triangles, tris, sizeof (csTriangle) * polymesh_tri_count);
+printf ("Final triangles %d\n", polymesh_tri_count); fflush (stdout);
+
+  delete[] normals;
+#else
   polymesh_tri_count = 2 * (res-1) * (res-1);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
 
@@ -728,10 +799,31 @@ void csTerrainObject::SetupPolyMeshData ()
       (tri++)->Set (yr + x+1, yr+res + x, yr+res + x+1);
     }
   }
+#endif
+
+#if 0
+  csTriangleMesh mesh;
+  mesh.SetTriangles (polymesh_triangles, polymesh_tri_count);
+  csTriangleVerticesCost mesh_verts (&mesh, polymesh_vertices,
+      polymesh_vertex_count);
+  @@@@@@@@@@@@@@
+#endif
+  terrasampler->Cleanup ();
+}
+
+void csTerrainObject::CleanPolyMeshData ()
+{
+  delete[] polymesh_vertices;
+  polymesh_vertices = 0;
+  delete[] polymesh_triangles;
+  polymesh_triangles = 0;
+  delete[] polymesh_polygons;
+  polymesh_polygons = 0;
 }
 
 void csTerrainObject::PolyMesh::Cleanup ()
 {
+  terrain->CleanPolyMeshData ();
 }
 
 csMeshedPolygon* csTerrainObject::PolyMesh::GetPolygons ()
@@ -1900,7 +1992,7 @@ void csTerrainFactory::SetSamplerRegion (const csBox2& region)
   // @@@ Add better control over resolution?
   int resolution = (int)(region.MaxX () - region.MinX ());
   // Make the resolution conform to n^2+1
-  resolution = csLog2(resolution);
+  resolution = csLog2 (resolution);
   resolution = ((int) pow(2, resolution)) + 1;
 
   hm_x = hm_y = resolution;
@@ -1915,12 +2007,12 @@ const csBox2& csTerrainFactory::GetSamplerRegion ()
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTerrainObjectType)
-SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObjectType::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTerrainObjectType)
@@ -1942,3 +2034,4 @@ csPtr<iMeshObjectFactory> csTerrainObjectType::NewFactory()
   csTerrainFactory *pFactory = new csTerrainFactory (object_reg, this);
   return csPtr<iMeshObjectFactory> (pFactory);
 }
+
