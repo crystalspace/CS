@@ -12,7 +12,7 @@ $file=$basedir."/$theme.xml";
 $self=$PHP_SELF;
 
 readXMLFile($file);
-print "<a name=\"comments\">\n";
+print "<hr><a name=\"comments\">\n";
 
 if ($action=="") {
     printEntries();
@@ -30,7 +30,7 @@ if ($action=="") {
     $newentry->author=$authorname;
     $newentry->email=$emailname;
     if ($authorname=="" && $emailname=="")
-	die ("Please give name or email!\n");
+	die ("<br><h2>Please give name or email!</h2>\n");
     $newentry->date=time();
     $newentry->text=nl2br($texttext);
     $entries[] = $newentry;
@@ -46,6 +46,7 @@ if ($action=="") {
 		"E-Mail: $emailname\n".
 		"Topic:  $theme\n".
 		"File:   $self\n".
+		"Time:   ".strftime("%a, %d %b %G (%H:%M)")." ($date)\n".
 		"Comment:\n".
 		"$texttext");
     }
@@ -53,16 +54,10 @@ if ($action=="") {
     fclose($h);
     chmod($file, 0666);
     print "<h3>Comment added!</h3>\n";
-    print "<a href=\"$self#comments\">View</a>\n";
-} elseif ($action == "admin") {
-    $fh = fopen ($file, "r");
-    if (!$fh) {
-	die ("Couldn't open file!\n");
-    }
-
-    echo "<form action=\"$self?action=adminchange\n";
-}
-    
+    unset($entries);
+    readXMLFile($file);
+    printEntries();
+}   
 
 class entry
 {
@@ -101,16 +96,22 @@ function printEntries()
 
     foreach ($entries as $e) {
 	print "<table width=\"100%\" bgcolor=\"#88bbff\" celspacing=\"0\" celpadding=\"0\">\n";
-	print "<tr><td>".$e->author."</td>";
+	print "<tr><td>\n";
+	if ($e->author != "") {
+		print $e->author." ";
+	} 
+	if ($e->email != "") {
+		print "<a href=\"mailto:".$e->email."\">".$e->email."</a>";
+	}
+	print "</td>\n";
+
+	print "<td align=\"right\"><b>\n";
 	if ($e->date != 0)
 	{
-	    print "<td align=\"center\">";
-	    print gmdate('d M Y H:i:s', $e->date) . " UTC<br>\n";
-	    print "</td>\n";
+	    print strftime("%a, %d %b %G (%H:%M)", $e->date) . " UTC<br>\n";
 	}
-	print "<td align=\"right\">";
-	print "<a href=\"mailto:".$e->email."\">".$e->email."</a></td></tr>\n";
-	print "</table>";
+	print "</b></td></tr>\n";
+	print "</table>\n";
 	print "<table width=\"100%\" bgcolor=\"#eeeeee\"><tr><td>";
 	print $e->text;
 	print "</td></tr></table>\n";
