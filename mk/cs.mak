@@ -16,9 +16,9 @@ include mk/common.mak
 .SUFFIXES:
 
 #--------------- Several definitions to make this file compiler-independent ---#
-# Flags for C compiler to direct output to the rule target file
+# Flags for C compiler to direct output to the rule target
 CFLAGS.@ = -o $@
-# Flags for linker to direct output to the rule target file
+# Flags for linker to direct output to the rule target
 LFLAGS.@ = -o $@
 # Flags for indicating to linker an additional library path
 LFLAGS.L = -L
@@ -28,6 +28,8 @@ LFLAGS.l = -l
 CFLAGS.D = -D
 # Command-line flag to set include directories
 CFLAGS.I = -I
+# Flags for librarian to direct output to the rule target
+ARFLAGS.@=$@
 # Object file extension
 O=.o
 
@@ -103,7 +105,7 @@ endif
 # Use $(<<) instead of $< to allow system-dependent makefiles to override
 <<=$<
 # Use $(L^) to link with all libraries specified as dependencies
-L^= $(addprefix $(LFLAGS.l),$(subst $(SPACE)$(LIB_PREFIX),$(SPACE),\
+L^=$(addprefix $(LFLAGS.l),$(subst $(SPACE)$(LIB_PREFIX),$(SPACE),\
   $(basename $(notdir $(filter %$(LIB),$+)))))
 
 # How to compile a .c source
@@ -113,7 +115,7 @@ DO.COMPILE.CPP = $(CXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a GAS source
 DO.COMPILE.S = $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to make a static library
-DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $@ $(^^)
+DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 # How to make a dynamic library
 DO.DYNAMIC.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
 # How to link a console executable
@@ -128,10 +130,10 @@ else
 endif
 
 # The sed script used to build dependencies
-SED_DEPEND=-e 's/^\([^ ].*\)/$$\(OUT\)\1/' $(SYS_SED_DEPEND)
+SED_DEPEND=-e "s/^\([^ ].*\)/$$\(OUT\)\1/" $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
-  DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $^ | sed $(SED_DEPEND) >
+  DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $^ | sed $(SED_DEPEND) >$@
 endif
 
 # Directories for output files
