@@ -20,6 +20,10 @@ chronological order.
 	  config options to dynavis.cfg to play with this.
 	- res disabled the 64bit compatibility checks in the VC7 projects for
 	  the 0.98 release.
+	- Jorrit changed csbench to report performance in a format that
+	  is easier to parse using some automated processor.
+	- Jorrit changed csbench to use the fastest clipping setting for the
+	  further tests.
 29-Jun-2004
 	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
 	  didn't work.

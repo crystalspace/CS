@@ -303,7 +303,7 @@ bool CsBench::Initialize (int argc, const char* const argv[],
 
 #define BENCHTIME 2000
 
-void CsBench::BenchMark (const char* name, const char* description, 
+float CsBench::BenchMark (const char* name, const char* description, 
 			 uint drawFlags)
 {
   Report ("================================================================");
@@ -338,8 +338,10 @@ void CsBench::BenchMark (const char* name, const char* description,
       	shotbuf->GetSize ());
     }
   }
-  Report ("Performance is %d frames in %d seconds: %g fps",
-  	cnt, BENCHTIME / 1000, float (cnt * 1000) / float (BENCHTIME));
+  float fps = float (cnt * 1000) / float (BENCHTIME);
+  Report ("PERF:%s:%d:%d:%g: (%d frames in %d seconds: %g fps)",
+  	name, cnt, BENCHTIME / 1000, fps,
+  	cnt, BENCHTIME / 1000, fps);
 
   // Due to some limitation in VFS we cannot let the stdrep plugin write
   // directly to a file in a zip archive. So at this point we copy the
@@ -350,6 +352,7 @@ void CsBench::BenchMark (const char* name, const char* description,
 
   vfs->Sync ();
   fflush (stdout);
+  return fps;
 }
 
 iShaderManager* CsBench::GetShaderManager ()
@@ -449,9 +452,15 @@ void CsBench::PerformTests ()
 #endif
 
   g3d->SetOption ("StencilThreshold", "0");
-  BenchMark ("stencilclip", "Stencil clipping is used");
+  float stencil0 = BenchMark ("stencilclip", "Stencil clipping is used");
   g3d->SetOption ("StencilThreshold", "100000000");
-  BenchMark ("planeclip", "glClipPlane clipping is used");
+  float stencil1 = BenchMark ("planeclip", "glClipPlane clipping is used");
+  // Set back to stencil0 if that method was faster.
+  if (stencil0 > stencil1)
+  {
+    Report ("Switching back to stencil thresshold 0.");
+    g3d->SetOption ("StencilThreshold", "0");
+  }
 
   PerformShaderTest ("/shader/or_lighting.xml", "OR compatibility", 0, 0);
 
