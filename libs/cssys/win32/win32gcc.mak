@@ -91,6 +91,7 @@ PNG_LIBS=$(LFLAGS.l)png
 # Where can the JPG library be found on this system?
 JPG_LIBS=$(LFLAGS.l)jpeg
 
+# Where can the MNG library be found on this system?
 MNG_LIBS=$(LFLAGS.l)mng
 
 # Where can the optional sound libraries be found on this system?
@@ -208,18 +209,18 @@ LINK.PLUGIN=dllwrap
 PLUGIN.POSTFLAGS=-mwindows -mconsole
 
 # How to make a shared AKA dynamic library
-DO.SHARED.PLUGIN.CORE = \
-  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+#DO.SHARED.PLUGIN.CORE = \
+#  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows 
 
 # uncomment the following to enable workaround for dllwrap bug
-#ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
-#  DLLWRAPWRAP = bash libs/cssys/win32/dllwrapwrap.sh
-#else
-#  DLLWRAPWRAP = bin/dllwrapwrap.sh
-#endif
+ifneq (,$(findstring command,$(COMSPEC))$(findstring COMMAND,$(COMSPEC))$(findstring cmd,$(COMSPEC))$(findstring CMD,$(COMSPEC)))
+  DLLWRAPWRAP = bash libs/cssys/win32/dllwrapwrap.sh
+else
+  DLLWRAPWRAP = libs/cssys/win32/dllwrapwrap.sh
+endif
 
-#DO.SHARED.PLUGIN.CORE = \
-#  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+DO.SHARED.PLUGIN.CORE = \
+  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
