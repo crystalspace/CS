@@ -48,18 +48,18 @@ Moment *Moment::stack = 0;
 
 csCollider::csCollider (csPolygonSet *ps)
 {
-  _type = POLYGONSET;
-  _ps = ps;
-  _rm = NULL;
+  m_ColliderType = POLYGONSET;
+  m_pPolygonSet = ps;
+  m_pCollisionModel = NULL;
 
   CD_contact.IncRef ();
 
   int i;
   int tri_count = 0;
   // first, count the number of triangles polyset contains
-  for (i = 0; i < _ps->GetNumPolygons () ; i++)
+  for (i = 0; i < m_pPolygonSet->GetNumPolygons () ; i++)
   {
-    csPolygon3D *p = _ps->GetPolygon3D (i);
+    csPolygon3D *p = m_pPolygonSet->GetPolygon3D (i);
     // Handle solid walls and mirrors.
     if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
       tri_count += p->GetVertices ().GetNumVertices () - 2;
@@ -67,52 +67,59 @@ csCollider::csCollider (csPolygonSet *ps)
 
   if (tri_count)
   {
-    CHK (_rm = new csCdModel (tri_count));
-    if (!_rm)
+    CHK (m_pCollisionModel = new csCdModel (tri_count));
+    if (!m_pCollisionModel)
       return;
     
-    for (i = 0; i < _ps->GetNumPolygons () ; i++)
+    for (i = 0; i < m_pPolygonSet->GetNumPolygons () ; i++)
     {
-      csPolygon3D *p = _ps->GetPolygon3D (i);
+      csPolygon3D *p = m_pPolygonSet->GetPolygon3D (i);
       // Handle solid walls and mirrors.
       if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
       {
         // Collision detection only works with triangles.
         int *vt = p->GetVertices ().GetVertexIndices ();
         for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
-          _rm->AddTriangle (v - 2, _ps->Vwor (vt [v - 1]),
-            _ps->Vwor (vt [v]), _ps->Vwor (vt [0]));
+        {
+          m_pCollisionModel->AddTriangle (v - 2, 
+                                          m_pPolygonSet->Vwor (vt [v - 1]),
+                                          m_pPolygonSet->Vwor (vt [v]), 
+                                          m_pPolygonSet->Vwor (vt [0]));
+        }
       }
     }
-    _rm->build_hierarchy ();
+    m_pCollisionModel->BuildHierarchy ();
   }
 
-  _cd_state = true;
+  m_CollisionDetectionActive = true;
 }
 
 csCollider::csCollider (csSprite3D *sp)
 {
-  _type = SPRITE3D;
-  _sp = sp;
+  m_ColliderType = SPRITE3D;
+  m_pSprite3d    = sp;
 
   CD_contact.IncRef ();
 
-  csTriangleMesh *mesh = _sp->tpl->GetTexelMesh ();
+  csTriangleMesh *mesh = m_pSprite3d->tpl->GetTexelMesh ();
 
   // Pick a frame for now.  This should of course be done for the
   // correct frame (some global CD outline or else we need to do it
   // for every frame which is too expensive.
-  csFrame *cf = _sp->cur_action->GetFrame (_sp->cur_frame);
+  csFrame *cf = m_pSprite3d->cur_action->GetFrame (m_pSprite3d->cur_frame);
 
   // GetObjectVerts returns an array of vertices in object space.
   // It correctly takes care of optional skeletons.
-  csVector3* object_vertices = _sp->GetObjectVerts (cf);
+  csVector3* object_vertices = m_pSprite3d->GetObjectVerts (cf);
 
-  CHK (_rm = new csCdModel (mesh->GetNumTriangles ()));
-  if (!_rm)
-     return;  // Error
-  _rm->b = 0;
-  _rm->num_boxes_alloced = 0;
+  CHK (m_pCollisionModel = new csCdModel (mesh->GetNumTriangles ()));
+  if (!m_pCollisionModel) 
+  {
+    return;  // Error
+  }
+
+  m_pCollisionModel->m_pBoxes          = NULL;
+  m_pCollisionModel->m_NumBoxesAlloced = 0;
 
   for (int i = 0; i < mesh->GetNumTriangles (); i++)
   {
@@ -120,20 +127,21 @@ csCollider::csCollider (csSprite3D *sp)
     v[0] = mesh->GetTriangles () [i].a;
     v[1] = mesh->GetTriangles () [i].b;
     v[2] = mesh->GetTriangles () [i].c;
-    _rm->AddTriangle (i, object_vertices[v [0]], object_vertices[v [1]],
-      object_vertices[v [2]]);
+    m_pCollisionModel->AddTriangle (i, object_vertices[v [0]], 
+                                       object_vertices[v [1]],
+                                       object_vertices[v [2]]);
   }
 
-  _rm->build_hierarchy();
-  _cd_state = true;
+  m_pCollisionModel->BuildHierarchy();
+  m_CollisionDetectionActive = true;
 }
 
 csCollider::~csCollider(void)
 {
-  if (_rm)
+  if (m_pCollisionModel)
   {
-    CHK (delete _rm);
-    _rm = NULL;
+    CHK (delete m_pCollisionModel);
+    m_pCollisionModel = NULL;
   }
 
   CD_contact.DecRef ();
@@ -141,53 +149,61 @@ csCollider::~csCollider(void)
 
 void csCollider::Activate (bool on)
 {
-  _cd_state = on ? 1 : 0;
+  m_CollisionDetectionActive = on;
 }
 
 // Return object's name.
 const char *csCollider::GetName ()
 {
-  if (_type == POLYGONSET) return _ps->GetName ();
-  if (_type == SPRITE3D)   return _sp->GetName ();
+  if (m_ColliderType == POLYGONSET) return m_pPolygonSet->GetName ();
+  if (m_ColliderType == SPRITE3D)   return m_pSprite3d->GetName ();
   return "UNKNOWN";
 }
 
-int csCollider::CollidePair (csCollider *p1, csCollider *p2, csTransform *t1, csTransform *t2)
+int csCollider::CollidePair (csCollider  *pCollider1, 
+                             csCollider  *pCollider2, 
+                             csTransform *pTransform1, 
+                             csTransform *pTransform2)
 {
   // Skip inactive combinations.
-  if (!p1->_cd_state || !p2->_cd_state) return 0;
+  if (!pCollider1->m_CollisionDetectionActive || 
+      !pCollider2->m_CollisionDetectionActive) return 0;
 
-  // JTY: also skip objects with _rm NULL. This fixes
+  // JTY: also skip objects with m_pCollisionModel NULL. This fixes
   // a bug with bezier curves and collision detection.
-  if (!p1->_rm || !p2->_rm) return 0;
+  if (!pCollider1->m_pCollisionModel || 
+      !pCollider2->m_pCollisionModel) return 0;
+
+  // I don't know, why this is commented out. I need to elaborate this
+  // further. thieber 2000-02-19
+  //  csCollider::firstHit = true; 
 
   //call the low level collision detection routine.
-//  csCollider::firstHit = true;
 
-  csCdBBox *b1 = p1->_rm->b;
-  csCdBBox *b2 = p2->_rm->b;
+  csCdBBox *b1 = pCollider1->m_pCollisionModel->m_pBoxes;
+  csCdBBox *b2 = pCollider2->m_pCollisionModel->m_pBoxes;
 
   csMatrix3 R1, R2;
   csVector3 T1 (0, 0, 0), T2 (0, 0, 0);
-  if (t1)
+  if (pTransform1)
   {
-    T1 = t1->GetO2TTranslation ();
-    R1 = t1->GetO2T ();
+    T1 = pTransform1->GetO2TTranslation ();
+    R1 = pTransform1->GetO2T ();
   }
-  if (t2)
+  if (pTransform2)
   {
-    R2 = t2->GetO2T ();
-    T2 = t2->GetO2TTranslation ();
+    R2 = pTransform2->GetO2T ();
+    T2 = pTransform2->GetO2TTranslation ();
   }
 
   // [R1,T1] and [R2,T2] are how the two triangle sets (i.e. models)
   // are positioned in world space. [tR1,tT1] and [tR2,tT2] are
   // how the top level boxes are positioned in world space
 
-  csMatrix3 tR1 = R1 * b1->pR;
-  csVector3 tT1 = (R1 * b1->pT) + T1;
-  csMatrix3 tR2 = R2 * b2->pR;
-  csVector3 tT2 = (R2 * b2->pT) + T2;
+  csMatrix3 tR1 =  R1 * b1->m_Rotation;
+  csVector3 tT1 = (R1 * b1->m_Translation) + T1;
+  csMatrix3 tR2 =  R2 * b2->m_Rotation;
+  csVector3 tT2 = (R2 * b2->m_Translation) + T2;
 
   // [R,T] is the placement of b2's top level box within
   // the coordinate system of b1's top level box.
@@ -212,8 +228,8 @@ int csCollider::CollidePair (csCollider *p1, csCollider *p2, csTransform *t1, cs
   }
   else if (csCollider::numHits != 0)
   {
-    hitv [hits][0] = p1;
-    hitv [hits][1] = p2;
+    hitv [hits][0] = pCollider1;
+    hitv [hits][1] = pCollider2;
     hits++;
     return 1;
   }
@@ -263,9 +279,6 @@ int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
  * result    : returns 1 if the triangles intersect, otherwise 0
  *
  */
-
-#include <math.h>
-#include <stdio.h>
 
 /*
    if USE_EPSILON_TEST is true
@@ -799,21 +812,21 @@ int csCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2, csMatrix3 R, csVec
   if (b2->IsLeaf() || (!b1->IsLeaf() && (b1->GetSize() > b2->GetSize())))
   {
     // here we descend to children of b1.  The transform from
-    // a child of b1 to b1 is stored in [b1->N->pR,b1->N->pT],
+    // a child of b1 to b1 is stored in [b1->N->m_Rotation,b1->N->m_Translation],
     // but we will denote it [B1 T1] for short.
 
     // Here, we compute [B1 T1]'[B T] = [B1'B B1'(T-T1)]
     // for each child, and store the transform into the collision
     // test queue.
 
-    cR = b1->m_pChild[1]->pR.GetTranspose () * R;
-    cT = b1->m_pChild[1]->pR.GetTranspose () * (T - b1->m_pChild[1]->pT);
+    cR = b1->m_pChild[1]->m_Rotation.GetTranspose () * R;
+    cT = b1->m_pChild[1]->m_Rotation.GetTranspose () * (T - b1->m_pChild[1]->m_Translation);
 
     if ((rc = CollideRecursive (b1->m_pChild[1], b2, cR, cT)) != false)
       return rc;
 	
-    cR = b1->m_pChild[0]->pR.GetTranspose () * R;
-    cT = b1->m_pChild[0]->pR.GetTranspose () * (T - b1->m_pChild[0]->pT);
+    cR = b1->m_pChild[0]->m_Rotation.GetTranspose () * R;
+    cT = b1->m_pChild[0]->m_Rotation.GetTranspose () * (T - b1->m_pChild[0]->m_Translation);
 
     if ((rc = CollideRecursive (b1->m_pChild[0], b2, cR, cT)) != false)
       return rc;
@@ -823,14 +836,14 @@ int csCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2, csMatrix3 R, csVec
     // here we descend to the children of b2.  See comments for
     // other 'if' clause for explanation.
 
-    cR = R * b2->m_pChild[1]->pR;
-    cT = ( R * b2->m_pChild[1]->pT) + T;
+    cR = R * b2->m_pChild[1]->m_Rotation;
+    cT = ( R * b2->m_pChild[1]->m_Translation) + T;
 	
     if ((rc = CollideRecursive (b1, b2->m_pChild[1], cR, cT)) != false)
       return rc;
 	
-    cR = R * b2->m_pChild[0]->pR;
-    cT = ( R * b2->m_pChild[0]->pT) + T;
+    cR = R * b2->m_pChild[0]->m_Rotation;
+    cT = ( R * b2->m_pChild[0]->m_Translation) + T;
 
     if ((rc = CollideRecursive (b1, b2->m_pChild[0], cR, cT)) != false)
       return rc;

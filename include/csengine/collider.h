@@ -49,6 +49,7 @@ struct csCdTriangle
   * either be a node or a leaf. A leaf will contain a single polygon, while 
   * a node contains pointers to two other bounding boxes. This means, that 
   * this class in fact represents a tree of hierarchical bounding boxes.
+  * THIS CLASS IS FOR INTERNAL USE OF COLLISION DETECTION
   */
 class csCdBBox
 {
@@ -60,10 +61,10 @@ protected:
   csCdTriangle* m_pTriangle;
 
   // placement in parent's space
-  // box to parent space: x_m = pR*x_b + pT
-  // parent to box space: x_b = pR.T()*(x_m - pT)
-  csMatrix3 pR;
-  csVector3 pT;
+  // box (x_b) to parent (x_m) space: x_m = m_Rotation*x_b + m_Translation
+  // parent (x_m) to box (x_b) space: x_b = m_Rotation.T()*(x_m - m_Translation)
+  csMatrix3 m_Rotation;    
+  csVector3 m_Translation; 
 
   // this is "radius", that is, half the measure of a side length
   csVector3 m_Radius;
@@ -100,7 +101,7 @@ protected:
   bool BuildBBoxTree(int*          TriangleIndices, 
                      int           NumTriangles, 
                      csCdTriangle* Triangles,
-                     csCdBBox*&    box_pool);
+                     csCdBBox*&    pBoxPool);
 
   /**
     * returns true, if this is a leaf bounding box, Maybe, this would be 
@@ -120,35 +121,50 @@ protected:
 public:
 
   /// Construct a default bounding box
-  csCdBBox() : pT(0, 0, 0), m_Radius(0, 0, 0) { }
+  csCdBBox() : m_Translation(0, 0, 0), m_Radius(0, 0, 0) { }
 
   /// returns the "Radius", that is, half the measure of each side's length
   const csVector3& GetRadius() {return m_Radius;}
 
 };
 
+/**
+  * This class organizes a set of triangles for collision detection. This class is
+  * used by csCollider to handle 3D sprites and polygon sets in a uniform way.
+  * This class is also responsible for allocating and freeing memory for the
+  * bounding boxes and the triangles.
+  * THIS CLASS IS FOR INTERNAL USE OF COLLISION DETECTION
+  */
 class csCdModel
 {
   friend class csCollider;
 protected:
+  //- BOXES ----------------
+  /// An array containing all the bounding boxes to be used in this model
+  csCdBBox*     m_pBoxes;
+  /// The number of boxes in this array. (twice the number of triangles...)
+  int           m_NumBoxesAlloced;
+  //------------------------
 
-  // these are only for internal use
-  csCdBBox *b;
-  int num_boxes_alloced;
-
-  csCdTriangle *tris;
-  int num_tris;
-  int num_tris_alloced;
+  //- TRIANGLES ------------
+  /// All triangles that appear in this model
+  csCdTriangle* m_pTriangles;
+  int           m_NumTriangles;
+  int           m_NumTrianglesAllocated;
+  //------------------------
   
-  bool build_hierarchy();
+  /// Build a tree of bounding boxes from the given Triangles
+  bool BuildHierarchy();
 
 public:
 
   /// Create a model object given number of triangles
-  csCdModel (int n_triangles);
+  csCdModel(int NumberOfTriangles);
 
   /// Free the memory allocated for this model
-  ~csCdModel ();
+  ~csCdModel();
+
+  csCdBBox* GetTopLevelBox() {return &m_pBoxes[0];}
 
   /// Add a triangle to the model
   bool AddTriangle (int              id, 
@@ -176,20 +192,23 @@ struct collision_pair
 class csCollider
 {
   /// If true this is an active collision object.
-  int _cd_state;
+  bool m_CollisionDetectionActive;
   /// The internal collision object.
-  csCdModel* _rm;
+  csCdModel* m_pCollisionModel;
 
-public:
   typedef enum { POLYGONSET, SPRITE3D } ColliderType;
-  ColliderType _type;
+  ColliderType m_ColliderType;
   union {
-    csPolygonSet *_ps;
-    csSprite3D *_sp;
+    csPolygonSet* m_pPolygonSet;
+    csSprite3D*   m_pSprite3d;
   };
 
-  /// Global variables
-  /// Matrix, and Vector used for collision testing.
+public:
+
+  /**
+    * Global variables
+    * Matrix, and Vector used for collision testing.
+    */
   static csMatrix3 mR;
   static csVector3 mT;
   /// Statistics, to allow early bailout.
@@ -221,6 +240,26 @@ public:
   /// Get objects name.
   const char* GetName ();
 
+  /**
+   * Get the type of the collider. (should probably be eliminated and be 
+   * replaced by a more general system, based on csobj.
+   */
+  ColliderType  GetType()       {return m_ColliderType;}
+  
+  /**
+   * Get a pointer to the related polygon set, or NULL if the types 
+   * don't match
+   */
+  csPolygonSet* GetPolygonSet() 
+    {return (m_ColliderType==POLYGONSET) ? m_pPolygonSet : NULL;}
+
+  /**
+   * Get a pointer to the related 3D sprite, or NULL if the types 
+   * don't match
+   */
+  csSprite3D*   GetSprite3d()   
+    {return (m_ColliderType==SPRITE3D)   ? m_pSprite3d : NULL;}
+
   /// Delete and free memory of this objects oriented bounding box.
   void DestroyBbox ();
 
@@ -231,7 +270,10 @@ public:
   static void CollideReset ();
 
   /// Test collision detection between two objects.
-  static int CollidePair (csCollider *c1, csCollider *c2, csTransform *t1 =0, csTransform *t2 = 0);
+  static int CollidePair (csCollider  *pCollider1, 
+                             csCollider  *pCollider2, 
+                             csTransform *pTransform1 = NULL, 
+                             csTransform *pTransform2 = NULL);
 
   /// Get the next collision from the queue.  Removes collision from queue.
   static int Report (csCollider **id1, csCollider **id2);
@@ -244,7 +286,7 @@ public:
   csCollider* FindCollision (csCdTriangle **tr1 = 0, csCdTriangle **tr2 = 0);
 
   /// Get top level bounding box.
-  csCdBBox * GetBbox(void) { return _rm->b; }
+  csCdBBox * GetBbox(void) { return m_pCollisionModel->GetTopLevelBox(); }
 
   /// Query the array with collisions (and their count)
   static collision_pair *GetCollisions ();
