@@ -54,8 +54,6 @@
 csGraphicsPipeline::~csGraphicsPipeline ()
 {
   Desync ();
-  if (G2D) G2D->DecRef ();
-  if (G3D) G3D->DecRef ();
 }
 
 void csGraphicsPipeline::Initialize (iObjectRegistry *object_reg)
@@ -66,7 +64,7 @@ void csGraphicsPipeline::Initialize (iObjectRegistry *object_reg)
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (G3D)
   {
-    (G2D = G3D->GetDriver2D ())->IncRef ();
+    G2D = G3D->GetDriver2D ();
   }
   else
   {

@@ -45,16 +45,16 @@ class BumpTest
 {
 public:
   iSector* room;
-  iView* view;
-  iEngine* engine;
-  iDynLight* dynlight;
-  iLight *bumplight;
+  csRef<iView> view;
+  csRef<iEngine> engine;
+  csRef<iDynLight> dynlight;
+  iLight* bumplight;
   iMaterialWrapper* matBump;
-  iLoader *LevelLoader;
-  iGraphics3D *myG3D;
-  iKeyboardDriver* kbd;
-  iObjectRegistry* object_reg;
-  iVirtualClock* vc;
+  csRef<iLoader> LevelLoader;
+  csRef<iGraphics3D> myG3D;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iObjectRegistry> object_reg;
+  csRef<iVirtualClock> vc;
 
   float animli;
   bool going_right;
@@ -63,7 +63,7 @@ public:
   bool InitProcDemo();
 
 public:
-  BumpTest ();
+  BumpTest (iObjectRegistry* object_reg);
   virtual ~BumpTest ();
 
   bool Initialize (int argc, const char* const argv[],

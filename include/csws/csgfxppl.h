@@ -97,9 +97,9 @@ private:
   int FrameWidth, FrameHeight;
 
   // The 2D graphics driver
-  iGraphics2D *G2D;
+  csRef<iGraphics2D> G2D;
   // The 3D graphics driver
-  iGraphics3D *G3D;
+  csRef<iGraphics3D> G3D;
 
   // Do not cache the image of current frame
   bool DontCacheFrame;

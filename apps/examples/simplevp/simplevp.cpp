@@ -248,14 +248,14 @@ bool Simple::Initialize ()
     return false;
   }
 
-	efserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
-	if(efserver == NULL)
-	{
-		csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+  efserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
+  if(efserver == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 			"crystalspace.application.simple2",
 			"No effectsystem to use!");
-		return false;
-	}
+    return false;
+  }
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.

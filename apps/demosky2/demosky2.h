@@ -49,18 +49,18 @@ public:
 
 private:
   iSector* room;
-  iView* view;
-  iEngine* engine;
+  csRef<iView> view;
+  csRef<iEngine> engine;
   iMaterialWrapper* matPlasma;
-  iFont *font;
-  iLoader *LevelLoader;
-  iGraphics2D *myG2D;
-  iGraphics3D *myG3D;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iFont> font;
+  csRef<iLoader> LevelLoader;
+  csRef<iGraphics2D> myG2D;
+  csRef<iGraphics3D> myG3D;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
 
   /// the sky
-  iMeshWrapper *skydome;
+  csRef<iMeshWrapper> skydome;
   float skytime;
 
 public:

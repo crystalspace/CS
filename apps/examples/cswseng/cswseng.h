@@ -53,11 +53,11 @@ class ceCswsEngineApp : public csApp
 public:
   iSector* start_sector;
   csVector3 start_pos;
-  iEngine* engine;
-  iGraphics3D *pG3D;
-  iConsoleOutput *Console;
-  iVFS* VFS;
-  iLoader *LevelLoader;
+  csRef<iEngine> engine;
+  csRef<iGraphics3D> pG3D;
+  csRef<iConsoleOutput> Console;
+  csRef<iVFS> VFS;
+  csRef<iLoader> LevelLoader;
   csVector engine_views;
 
   void SetupDefaultWorld ();
@@ -77,7 +77,7 @@ public:
  */
 class ceEngineView : public csComponent
 {
-  iView *view;
+  csRef<iView> view;
   // A bit mask saying which kind of motion should be done once per frame
   int motion;
 

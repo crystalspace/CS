@@ -50,13 +50,12 @@ private:
   csRef<iView> view;
   iSector* room;
 
-	//effectserver variables
-	iEffectServer* efserver;
-  //csRef<iEffectServer> efserver;
+  //effectserver variables
+  csRef<iEffectServer> efserver;
   iEffectDefinition* effect;
   iEffectTechnique* technique;
   iEffectPass* pass1;
-	iEffectLayer* layer1;
+  iEffectLayer* layer1;
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);

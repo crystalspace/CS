@@ -55,7 +55,7 @@ public:
 
   virtual bool Initialize ();
 
-  iFont *LucidiaFont;
+  csRef<iFont> LucidiaFont;
 };
 
 //csWsTest *cswstest_app;                        // The main Windowing System object
@@ -166,13 +166,10 @@ csWsTest::csWsTest (iObjectRegistry *object_reg, csSkin &Skin)
 {
   int pal = csRegisterPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
   SetPalette (pal);
-  LucidiaFont = NULL;
 }
 
 csWsTest::~csWsTest ()
 {
-  if (LucidiaFont)
-    LucidiaFont->DecRef ();
 }
 
 bool csWsTest::Initialize ()

@@ -80,33 +80,20 @@ CS_IMPLEMENT_APPLICATION
 // the global system driver variable
 BumpTest *bumptest;
 
-BumpTest::BumpTest ()
+BumpTest::BumpTest (iObjectRegistry* object_reg)
 {
-  view = NULL;
-  engine = NULL;
-  dynlight = NULL;
+  BumpTest::object_reg = object_reg;
   prBump = NULL;
   matBump = NULL;
-  LevelLoader = NULL;
   bumplight = NULL;
   animli = 0.0;
   going_right = true;
-  myG3D = NULL;
-  kbd = NULL;
   room = NULL;
-  vc = NULL;
 }
 
 BumpTest::~BumpTest ()
 {
   delete prBump;
-  if (vc) vc->DecRef ();
-  if (view) view->DecRef ();
-  if (engine) engine->DecRef ();
-  if (LevelLoader) LevelLoader->DecRef();
-  if (myG3D) myG3D->DecRef ();
-  if (kbd) kbd->DecRef ();
-  csInitializer::DestroyApplication (object_reg);
 }
 
 void BumpTest::Report (int severity, const char* msg, ...)
@@ -115,9 +102,7 @@ void BumpTest::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.bumptest", msg, arg);
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -290,9 +275,6 @@ static bool BumpEventHandler (iEvent& ev)
 bool BumpTest::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
@@ -469,7 +451,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, myG3D);
+  view = csPtr<iView> (new csView (engine, myG3D));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = myG3D->GetDriver2D ();
@@ -569,13 +551,18 @@ int main (int argc, char* argv[])
 {
   srand (time (NULL));
 
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return -1;
+
   // Create our main class.
-  bumptest = new BumpTest ();
+  bumptest = new BumpTest (object_reg);
 
   if (bumptest->Initialize (argc, argv, "/config/csbumptest.cfg"))
-	bumptest->Start ();
+    bumptest->Start ();
 
   delete bumptest;
+
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }

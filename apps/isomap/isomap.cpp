@@ -66,36 +66,17 @@ IsoMap1 *System;
 
 IsoMap1::IsoMap1 ()
 {
-  vc = NULL;
-  engine = NULL;
-  view = NULL;
-  world = NULL;
-  font = NULL;
   light = NULL;
-  myG2D = NULL;
-  myG3D = NULL;
-  kbd = NULL;
   mouse = NULL;
   player = NULL;
-  loader = NULL;
   lastclick.Set(0,0,0);
   walking = false;
 }
 
 IsoMap1::~IsoMap1 ()
 {
-  if (vc) vc->DecRef ();
   if (player) player->DecRef ();
   if (light) light->DecRef();
-  if (view) view->DecRef();
-  if (myG2D) myG2D->DecRef();
-  if (myG3D) myG3D->DecRef();
-  if (kbd) kbd->DecRef();
-  if (mouse) mouse->DecRef();
-  if (world) world->DecRef();
-  if (engine) engine->DecRef();
-  if (font) font->DecRef();
-  if (loader) loader->DecRef();
 }
 
 void IsoMap1::Report (int severity, const char* msg, ...)

@@ -188,7 +188,7 @@ bool Demo::LoadDemoFile (const char* demofile)
 
   engine->Prepare ();
 
-  view = new csView (engine, myG3D);
+  view = csPtr<iView> (new csView (engine, myG3D));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (
   	  csVector3 (0.0f, 0.0f, -900.0f));

@@ -151,23 +151,23 @@ public:
   /// The object registry.
   iObjectRegistry* object_reg;
   /// The virtual clock.
-  iVirtualClock* vc;
+  csRef<iVirtualClock> vc;
   /// The event queue.
-  iEventQueue* event_queue;
+  csRef<iEventQueue> event_queue;
   /// The plugin manager.
-  iPluginManager* plugin_mgr;
+  csRef<iPluginManager> plugin_mgr;
   /// The virtual file system
-  iVFS *VFS;
+  csRef<iVFS> VFS;
   /// The system configuration
   csConfigAccess config;
   /// The font server
-  iFontServer *FontServer;
+  csRef<iFontServer> FontServer;
   /// The image loader
-  iImageIO *ImageLoader;
+  csRef<iImageIO> ImageLoader;
   /// Keyboard driver
-  iKeyboardDriver* KeyboardDriver;
+  csRef<iKeyboardDriver> KeyboardDriver;
   /// Mouse driver
-  iMouseDriver* MouseDriver;
+  csRef<iMouseDriver> MouseDriver;
   /// Application's adaptive palette
   int Pal [cs_Color_Last];
   /// The component that captured the mouse
@@ -187,7 +187,7 @@ public:
   /// Screen width and height (application can be actually smaller)
   int ScreenWidth, ScreenHeight;
   /// Default font
-  iFont *DefaultFont;
+  csRef<iFont> DefaultFont;
   /// Default font size
   int DefaultFontSize;
 
@@ -352,7 +352,7 @@ public:
   { return *hints; }
 
   /// Load a font and return its handle or NULL
-  iFont *LoadFont (const char *iFontName)
+  csPtr<iFont> LoadFont (const char *iFontName)
   { return FontServer->LoadFont (iFontName); }
 
 /*

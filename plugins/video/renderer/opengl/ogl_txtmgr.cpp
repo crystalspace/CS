@@ -810,7 +810,9 @@ csPtr<iTextureHandle> csTextureManagerOpenGL::RegisterTexture (
     G3D->Report(CS_REPORTER_SEVERITY_BUG,
       "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with NULL image!");
 
-    image = csCreateXORPatternImage(32, 32, 5);
+    csRef<iImage> im (csCreateXORPatternImage (32, 32, 5));
+    image = im;
+    im->IncRef ();	// Prevent smart pointer release.
   }
 
   csTextureHandleOpenGL* txt = new csTextureHandleOpenGL (

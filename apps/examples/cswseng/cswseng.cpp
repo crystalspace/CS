@@ -67,7 +67,7 @@ ceEngineView::ceEngineView (csComponent *iParent, iEngine *Engine,
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (Engine, G3D);
+  view = csPtr<iView> (new csView (Engine, G3D));
   view->GetCamera ()->SetSector (Start);
   view->GetCamera ()->GetTransform ().SetOrigin (start_pos);
 
@@ -79,7 +79,6 @@ ceEngineView::ceEngineView (csComponent *iParent, iEngine *Engine,
 
 ceEngineView::~ceEngineView ()
 {
-  if (view) view->DecRef ();
   ceCswsEngineApp* lapp = (ceCswsEngineApp*)app;
   lapp->engine_views.Delete (lapp->engine_views.Find (this));
 }
@@ -256,19 +255,11 @@ bool ceControlWindow::HandleEvent (iEvent& Event)
 ceCswsEngineApp::ceCswsEngineApp (iObjectRegistry *object_reg, csSkin &skin)
 	: csApp (object_reg, skin)
 {
-  engine = NULL;
-  pG3D = NULL;
-  VFS = NULL;
   start_pos.Set (0, 0, 0);
-  LevelLoader = NULL;
 }
 
 ceCswsEngineApp::~ceCswsEngineApp ()
 {
-  if (pG3D) pG3D->DecRef ();
-  if (VFS) VFS->DecRef ();
-  if (LevelLoader) LevelLoader->DecRef ();
-  if (engine) engine->DecRef ();
 }
 
 void ceCswsEngineApp::SetupDefaultWorld ()
@@ -612,6 +603,7 @@ int main (int argc, char* argv[])
     	"crystalspace.application.cswseng", "Error initializing system!");
 
   delete theApp;
+  g3d = NULL;
   csInitializer::DestroyApplication (object_reg);
 
   return 0;

@@ -63,16 +63,9 @@ IsoTest *System;
 
 IsoTest::IsoTest ()
 {
-  vc = NULL;
-  engine = NULL;
   view = NULL;
   world = NULL;
-  font = NULL;
   light = NULL;
-  myG2D = NULL;
-  myG3D = NULL;
-  kbd = NULL;
-  mouse = NULL;
   player = NULL;
   lastclick.Set(0,0,0);
   walking = false;
@@ -80,17 +73,10 @@ IsoTest::IsoTest ()
 
 IsoTest::~IsoTest ()
 {
-  if (vc) vc->DecRef ();
   if (player) player->DecRef ();
   if (light) light->DecRef();
   if (view) view->DecRef();
-  if (myG2D) myG2D->DecRef();
-  if (myG3D) myG3D->DecRef();
-  if (kbd) kbd->DecRef();
-  if (mouse) mouse->DecRef();
   if (world) world->DecRef();
-  if (engine) engine->DecRef();
-  if (font) font->DecRef();
 }
 
 void IsoTest::Report (int severity, const char* msg, ...)
@@ -431,12 +417,11 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   	"meshFact");
   iMeshObjectFactory *mesh_fact = mesh_wrap->GetMeshObjectFactory ();
 
-  iGeneralFactoryState* cubelook =
-    SCF_QUERY_INTERFACE(mesh_fact, iGeneralFactoryState);
+  csRef<iGeneralFactoryState> cubelook (
+    SCF_QUERY_INTERFACE(mesh_fact, iGeneralFactoryState));
   cubelook->SetMaterialWrapper(math2);
   cubelook->GenerateBox (csBox3 (-.5,-.5,-.5,.5,.5,.5));
   cubelook->CalculateNormals ();
-  cubelook->DecRef();
 
   csRef<iMeshObject> mesh_obj (mesh_fact->NewInstance());
   csRef<iGeneralMeshState> cubestate (
@@ -723,12 +708,9 @@ bool IsoTest::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == '\t'))

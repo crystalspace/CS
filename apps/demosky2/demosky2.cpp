@@ -82,28 +82,11 @@ void DemoSky::Report (int severity, const char* msg, ...)
 
 DemoSky::DemoSky ()
 {
-  vc = NULL;
-  view = NULL;
-  engine = NULL;
-  myG2D = NULL;
-  myG3D = NULL;
-  LevelLoader = NULL;
-  kbd = NULL;
-  skydome = NULL;
   skytime = 0.0;
 }
 
 DemoSky::~DemoSky ()
 {
-  if (skydome) skydome->DecRef ();
-  if (vc) vc->DecRef ();
-  if (view) view->DecRef ();
-  if (font) font->DecRef ();
-  if (LevelLoader) LevelLoader->DecRef ();
-  if (engine) engine->DecRef ();
-  if (myG2D) myG2D->DecRef ();
-  if (myG3D) myG3D->DecRef ();
-  if (kbd) kbd->DecRef ();
 }
 
 void Cleanup ()
@@ -327,7 +310,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, myG3D);
+  view = csPtr<iView> (new csView (engine, myG3D));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());

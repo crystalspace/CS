@@ -56,25 +56,25 @@ public:
 
 private:
   /// the iso engine
-  iIsoEngine *engine;
+  csRef<iIsoEngine> engine;
   /// world to display, the 'level'
-  iIsoWorld *world;
+  csRef<iIsoWorld> world;
   /// view on the world, the 'camera'
-  iIsoView *view;
+  csRef<iIsoView> view;
   /// G2D plugin
-  iGraphics2D *myG2D;
+  csRef<iGraphics2D> myG2D;
   /// G3D plugin
-  iGraphics3D *myG3D;
+  csRef<iGraphics3D> myG3D;
   /// Generic keyboard driver
-  iKeyboardDriver* kbd;
+  csRef<iKeyboardDriver> kbd;
   /// Generic mouse driver
-  iMouseDriver* mouse;
+  csRef<iMouseDriver> mouse;
   /// Virtual clock
-  iVirtualClock* vc;
+  csRef<iVirtualClock> vc;
   /// Iso map loader
-  iIsoLoader *loader;
+  csRef<iIsoLoader> loader;
   /// the font for text display
-  iFont *font;
+  csRef<iFont> font;
   /// the player sprite
   iIsoSprite *player;
   /// the light above the players head

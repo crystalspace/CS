@@ -117,9 +117,7 @@ csApp::csApp (iObjectRegistry *r, csSkin &Skin)
   BackgroundStyle = csabsSolid;
   InsertMode = true;
   VFS = NULL;
-  DefaultFont = NULL;
   InFrame = false;
-  ImageLoader = NULL;
   object_reg = r;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
@@ -160,25 +158,6 @@ csApp::~csApp ()
   if (skin)
     skin->Deinitialize ();
 
-  if (KeyboardDriver != 0)
-    KeyboardDriver->DecRef();
-  if (MouseDriver != 0)
-    MouseDriver->DecRef();
-
-  if (vc)
-    vc->DecRef ();
-  if (event_queue)
-    event_queue->DecRef ();
-  if (plugin_mgr)
-    plugin_mgr->DecRef ();
-  if (VFS)
-    VFS->DecRef ();
-  if (DefaultFont)
-    DefaultFont->DecRef ();
-  if (FontServer)
-    FontServer->DecRef ();
-  if (ImageLoader)
-    ImageLoader->DecRef ();
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
