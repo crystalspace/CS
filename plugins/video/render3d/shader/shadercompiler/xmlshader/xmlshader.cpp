@@ -586,7 +586,7 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
   return true;
 }
 
-bool csXMLShaderTech::ActivatePass (unsigned int number)
+bool csXMLShaderTech::ActivatePass (size_t number)
 {
   if(number>=passesCount)
     return false;

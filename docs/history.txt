@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Sep-2004
+	- dfryer changed "unsigned int" to size_t in csXMLShaderTech::
+	  ActivatePass.  Prototype used size_t; size_t is long unsigned
+	  int under Mac OS X, which is incompatible with unsigned int.
 25-Sep-2004
 	- res copied Matze's change of GLAPI in glextmanager.h (empty instead 
 	  of 'extern') over to the GL extension manager templates.
