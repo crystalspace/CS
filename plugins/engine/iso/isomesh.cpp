@@ -52,7 +52,7 @@ public:
 
   //----- iMovable -------------------------------
   virtual iMovable* GetParent () const {return 0;}
-  virtual void SetParent (iMovable* parent) { return; }
+  virtual void SetParent (iMovable* /*parent*/) { return; }
   virtual void SetSector (iSector* ) { updatenumber++; }
   virtual void ClearSectors () { updatenumber++; }
   virtual void AddSector (iSector* ) { updatenumber++; }
@@ -296,6 +296,9 @@ public:
     else clip_portal = CS_CLIP_NOT;
     /// test if z becomes negative, should never happen
     clip_z_plane = CS_CLIP_NOT;
+    //printf("ClipBBox %g,%g %g,%g gives portal=%d plane=%d z=%d return true\n",
+      //sbox.MinX(), sbox.MinY(), sbox.MaxX(), sbox.MaxY(), clip_portal,
+      //clip_plane, clip_z_plane);
     return true;
   }
 
