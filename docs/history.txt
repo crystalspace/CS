@@ -1,6 +1,26 @@
 The history order has been reversed so that new features are at the top.
 
+2-Aug-2000
+	- Samuel Humphreys did the following:
+     	    - Added emacs fontification friendly comments to some more .inc
+	      files.
+            - Added further options to dtsimple (bots, lights,
+	      portals--on/off).
+            - Print (csRect*) now prints subregions with the software proc
+              textures in 16bit/32bit sharing modes
+            - Rearranged software procs implementation somewhat so that
+	      mip-mapping flags are accessible in the right places. This
+	      has also simplified the code somewhat.
+            - Got rid of the proc texture enum data type in iGraphics2D.
+            - iGraphics2D->CreateOffScreenCanvas arguments changed slightly.
+            - Reduced verbosity of proc texture MSG_STDOUTs
+            - Cleaned out x2d of commented out code
+            - isprotex.h interface changed slightly (internal to proc
+	      textures).
 1-Aug-2000
+	- Norman Kramer fixed a crash scenario in OpenGL renderer: sprite is
+	  textured and has FX_ALPHA set but no vertex colors -> boom, now it
+	  uses flatcolor (1.0) + m_alpha.
 	- Samuel Humphreys did the following:
             - Hand merged relevant parts of Mike Bonds patch into the 
               glx2d/x2d/linex2d drivers. Bar the resizing and change of variable 
