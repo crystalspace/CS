@@ -30,7 +30,7 @@ cp -p "$TEMPLATEDIR/Jamfile.template" "$PROJECTNAME/Jamfile"
 cp -p "$TEMPLATEDIR/Jamrules.template" "$PROJECTNAME/Jamrules"
 cp -p "$TEMPLATEDIR/initjamfile.m4" "$PROJECTNAME/mk/autoconf"
 cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
-cp -p "$TEMPLATEDIR/crystal_jam.m4" "$PROJECTNAME/mk/autoconf"
+cp -p "$CSDIR/scripts/cs-config/crystal.m4" "$PROJECTNAME/mk/autoconf"
 
 # create some simple Jamfile and dummy file in src
 cat > "$PROJECTNAME/src/Jamfile" << __END__
