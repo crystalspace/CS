@@ -481,10 +481,14 @@ awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
   int i;
   char buf[50];
 
-  bool state[lb->ncolumns];
-  iString *str[lb->ncolumns];
+  //bool state[lb->ncolumns];
+  bool *state = new bool [lb->ncolumns];
+  //iString *str[lb->ncolumns];
+  iString **str = new iString* [lb->ncolumns];
 
-  bool usedt[lb->ncolumns], useds[lb->ncolumns];
+  //bool usedt[lb->ncolumns], useds[lb->ncolumns];
+  bool *usedt = new bool [lb->ncolumns];
+  bool *useds = new bool [lb->ncolumns];
 
   for (i=0; i<lb->ncolumns; ++i)
   {
@@ -530,6 +534,10 @@ awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
     }
   }
 
+  delete state;
+  delete str;
+  delete useds;
+  delete usedt;
 }
 
 void 
