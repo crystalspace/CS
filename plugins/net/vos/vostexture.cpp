@@ -103,7 +103,6 @@ void ConstructTextureTask::doTask()
   }
 
 //  texture->Register (txtmgr);
-  texture->GetTextureHandle()->Prepare ();
 
   metatxt->texturewrapper = texture;
 }
@@ -152,7 +151,6 @@ void ConstructMozTextureTask::doTask()
   tf->SetSize(256, 256);
   csRef<iTextureWrapper> tw = tf->Generate();
   tw->Register(txtmgr);
-  tw->GetTextureHandle()->Prepare();
 
   csRef<iMozillaFactory> mozfac = SCF_QUERY_INTERFACE((iTextureFactory*)tf,
                                                       iMozillaFactory);

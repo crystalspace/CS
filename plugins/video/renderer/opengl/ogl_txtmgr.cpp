@@ -361,6 +361,7 @@ csTextureHandleOpenGL::csTextureHandleOpenGL (
   this->bpp = bpp;
   size = 0;
   was_render_target = false;
+  prepared = false;
   DG_TYPE (this, "csTextureHandleOpenGL");
 }
 
@@ -551,6 +552,7 @@ void csTextureHandleOpenGL::ComputeMeanColor (int w, int h, csRGBpixel *src)
 
 bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
+  PrepareInt ();
   if ((size_t)mipmap < vTex.Length ())
   {
     w = vTex[mipmap]->get_width () << txtmgr->texture_downsample;
@@ -560,8 +562,10 @@ bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
   return false;
 }
 
-void csTextureHandleOpenGL::Prepare ()
+void csTextureHandleOpenGL::PrepareInt ()
 {
+  if (prepared) return;
+  prepared = true;
   InitTexture (txtmgr, &txtmgr->pfmt);
 }
 
@@ -841,14 +845,6 @@ void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat const& PixelFormat)
   pfmt = PixelFormat;
   max_tex_size = G3D->Caps.maxTexWidth;
   DetermineStorageSizes ();
-}
-
-void csTextureManagerOpenGL::PrepareTextures ()
-{
-  // Create mipmaps for all textures
-  size_t i;
-  for (i = 0; i < textures.Length (); i++)
-    textures.Get (i)->Prepare ();
 }
 
 csPtr<iTextureHandle> csTextureManagerOpenGL::RegisterTexture (

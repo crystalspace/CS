@@ -129,7 +129,7 @@ public:
   { return !!((csTextureNull *)get_texture (0))->get_alphamap (); }
 
   /// Prepare the texture for usage
-  virtual void Prepare ();
+  void PrepareInt ();
 
   virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
   { return false; }
@@ -174,8 +174,6 @@ public:
   ///
   virtual void Clear ();
 
-  ///
-  virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector*, int, int)

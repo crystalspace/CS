@@ -205,7 +205,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   materials[1] = LoadMaterial ("/lib/std/mystone2.gif");
   materials[2] = LoadMaterial ("/lib/std/andrew_marble4.gif");
   materials[3] = LoadMaterial ("/lib/std/andrew_wood.gif");
-  txtmgr->PrepareTextures ();
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,

@@ -129,7 +129,7 @@ public:
   { return !!((csTextureNull *)get_texture (0))->get_alphamap (); }
 
   /// Prepare the texture for usage
-  void Prepare ();
+  void PrepareInt ();
 
   csAlphaMode::AlphaType GetAlphaType () { return csAlphaMode::alphaNone; }
 
@@ -172,8 +172,6 @@ public:
   ///
   virtual void Clear ();
 
-  ///
-  virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector* image,

@@ -159,9 +159,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
       tex->Register (tm);
-      tex->GetTextureHandle()->Prepare();
       mat->Register (tm);
-      mat->GetMaterialHandle()->Prepare();
     }
     return mat;
   }
@@ -200,9 +198,7 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
       tex->Register (tm);
-      tex->GetTextureHandle()->Prepare();
       mat->Register (tm);
-      mat->GetMaterialHandle()->Prepare();
     }
     return mat;
   }
@@ -339,9 +335,7 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
       tex->Register (tm);
-      tex->GetTextureHandle()->Prepare();
       mat->Register (tm);
-      mat->GetMaterialHandle()->Prepare();
     }
     return mat;
   }
@@ -380,9 +374,7 @@ iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (const char* name,
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
       tex->Register (tm);
-      tex->GetTextureHandle()->Prepare();
       mat->Register (tm);
-      mat->GetMaterialHandle()->Prepare();
     }
     return mat;
   }

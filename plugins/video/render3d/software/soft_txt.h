@@ -98,6 +98,9 @@ protected:
   /// A number that is incremented if the texture is modified (proc texture).
   uint32 update_number;
 
+  /// If true then PrepareInt() has done its job.
+  bool prepared;
+
   /// If true then the palette of the canvas is being initialized.
   bool is_palette_init;
 
@@ -125,6 +128,7 @@ protected:
 
   /// Reference to internal canvas.
   csRef<iGraphics2D> canvas;
+
 public:
   /// Create the mipmapped texture object
   csSoftwareTextureHandle (csSoftwareTextureManager *texman, iImage *image,
@@ -165,10 +169,8 @@ public:
 
   /**
    * Merge this texture into current palette, compute mipmaps and so on.
-   * You should call either Prepare() or iTextureManager::PrepareTextures()
-   * before using any texture.
    */
-  virtual void Prepare ();
+  virtual void PrepareInt ();
 
   /**
    * Indicate the texture is modified (update update_number).
@@ -314,8 +316,6 @@ public:
   ///
   virtual void Clear ();
 
-  ///
-  virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
 

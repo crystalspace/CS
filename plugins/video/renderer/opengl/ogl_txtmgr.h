@@ -72,6 +72,7 @@ protected:
   int bpp;
   /// Reference to internal canvas.
   csRef<iGraphics2D> canvas;
+  bool prepared;
 
   bool FindFormatType ();
   bool transform (iImage *Image, csTextureOpenGL *tex);
@@ -106,6 +107,7 @@ public:
   /// Override from csTextureHandle.
   virtual void GetOriginalDimensions (int& w, int& h)
   {
+    PrepareInt ();
     w = orig_width;
     h = orig_height;
   }
@@ -118,8 +120,8 @@ public:
   virtual void CreateMipmaps ();
 
   /// Prepare the texture for usage
+  void PrepareInt ();
 
-  virtual void Prepare ();
   /**
    * Query if the texture has an alpha channel.<p>
    * This depends both on whenever the original image had an alpha channel
@@ -284,8 +286,6 @@ public:
 
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
-  ///
-  virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector*, int, int)

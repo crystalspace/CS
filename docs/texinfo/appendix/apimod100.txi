@@ -137,3 +137,24 @@ else
   @dots{}
 @}
 @end example
+
+@subheading Texture and Material preparation
+
+Texture and material preparation is now fully automatic. It is no
+longer needed to @emph{prepare} a texture or a material before you can use
+it. It is sufficient to just register the texture or material. This means
+that the following functions are removed (and you can just remove them from
+your applications if you use them):
+
+@itemize
+@item
+@code{iTextureHandle::Prepare()}
+@item
+@code{iMaterialHandle::Prepare()}
+@item
+@code{iTextureManager::PrepareTextures()}
+@item
+@code{iTextureManager::PrepareMaterials()}
+@end itemize
+
+

@@ -328,7 +328,6 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
 
   // Prepare texture and set up keycolour
   txt->SetKeyColor (key.red, key.green, key.blue);
-  txt->Prepare ();
 
   // Create pixmap from texture
   csSimplePixmap *pixmap = new csSimplePixmap (txt);

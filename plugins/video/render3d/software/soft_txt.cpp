@@ -48,6 +48,8 @@ csSoftwareTextureHandle::csSoftwareTextureHandle (
   use_332_palette = false;
   update_number = ~0;
   is_palette_init = false;
+  prepared = false;
+  palette_size = 256;
 }
 
 csSoftwareTextureHandle::~csSoftwareTextureHandle ()
@@ -266,8 +268,10 @@ void csSoftwareTextureHandle::remap_texture ()
   }
 }
 
-void csSoftwareTextureHandle::Prepare ()
+void csSoftwareTextureHandle::PrepareInt ()
 {
+  if (prepared) return;
+  prepared = true;
   CreateMipmaps ();
   remap_texture ();
 }
@@ -569,30 +573,6 @@ uint32 csSoftwareTextureManager::encode_rgb (int r, int g, int b)
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
     ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
     ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift);
-}
-
-void csSoftwareTextureManager::PrepareTextures ()
-{
-  size_t i;
-
-  // Create mipmaps for all textures
-  for (i = 0; i < textures.Length (); i++)
-  {
-    csSoftwareTextureHandle* txt = 
-      (csSoftwareTextureHandle*)((iTextureHandle*)textures.Get (i));
-    if (txt) 
-    {
-      txt->CreateMipmaps ();
-      txt->remap_texture ();
-    }
-  }
-
-  // Remap all textures according to the new colormap.
-  /*for (i = 0; i < textures.Length (); i++)
-  {
-    csSoftwareTextureHandle* txt = (csSoftwareTextureHandle*)textures.Get (i);
-    txt->remap_texture ();
-  }*/
 }
 
 csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,

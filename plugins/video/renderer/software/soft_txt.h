@@ -110,6 +110,9 @@ protected:
   /// Number of used colors in palette
   int palette_size;
 
+  /// If already prepared.
+  bool prepared;
+
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image, bool ismipmap);
 
@@ -168,7 +171,7 @@ public:
    * You should call either Prepare() or iTextureManager::PrepareTextures()
    * before using any texture.
    */
-  virtual void Prepare ();
+  void PrepareInt ();
 
   /**
    * Indicate the texture is modified (update update_number).
@@ -299,8 +302,6 @@ public:
   ///
   virtual void Clear ();
 
-  ///
-  virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector*, int, int)

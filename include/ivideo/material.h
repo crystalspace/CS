@@ -203,14 +203,6 @@ struct iMaterialHandle : public iBase
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
   	float &oReflection) = 0;
-
-  /**
-   * Prepare this material. The material wrapper (remembered during
-   * RegisterMaterial()) is queried again for material parameters
-   * and a new material descriptor (internal to the texture manager)
-   * is associated with given material handle.
-   */
-  virtual void Prepare () = 0;
 };
 
 /** @} */

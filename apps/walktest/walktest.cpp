@@ -929,8 +929,6 @@ void Cleanup ()
 
 void start_console ()
 {
-  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-  txtmgr->PrepareTextures ();
 }
 
 void WalkTest::EndEngine ()

@@ -117,7 +117,6 @@ void ConstructMaterialTask::doTask()
       }
       material->SetMaterial(color);
       material->Register(txtmgr);
-      material->GetMaterialHandle()->Prepare ();
     */
 
     /*
@@ -129,7 +128,6 @@ void ConstructMaterialTask::doTask()
       }
       material->SetMaterial(color);
       material->Register(txtmgr);
-      material->GetMaterialHandle()->Prepare ();
     */
 
 
@@ -142,7 +140,6 @@ void ConstructMaterialTask::doTask()
       txtwrap->SetImageFile(img);
 
       txtwrap->Register(txtmgr);
-      txtwrap->GetTextureHandle()->Prepare ();
 
       imat = engine->CreateBaseMaterial(txtwrap);
     }
@@ -154,7 +151,6 @@ void ConstructMaterialTask::doTask()
       imat);
     if(!material) return;
     material->Register(txtmgr);
-    material->GetMaterialHandle()->Prepare();
 
     metamaterial->materialwrapper = material;
   }
@@ -183,9 +179,7 @@ void csMetaMaterial::CreateCheckerboard()
   tw->SetImageFile(im);
   csRef<iMaterial> mat = engine->CreateBaseMaterial(tw);
   checkerboard = engine->GetMaterialList()->NewMaterial(mat);
-  th->Prepare();
   checkerboard->Register(txtmgr);
-  checkerboard->GetMaterialHandle()->Prepare();
 }
 
   /** Return CS iMaterialWrapper interface for this object */

@@ -124,7 +124,6 @@ void csWSTexture::Refresh ()
     return;
   FixKeyColor ();
   SetKeyColor (HasKey);
-  Handle->Prepare ();
 }
 
 void csWSTexture::SetName (const char *iName)

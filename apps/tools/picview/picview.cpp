@@ -268,7 +268,6 @@ void PicViewApp::LoadNextImage (int idx, int step)
     csRef<iTextureHandle> txt (txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D
     	| CS_TEXTURE_DITHER));
     txt->IncRef ();	// Avoid DecRef from smart pointer.
-    txtmgr->PrepareTextures ();
     csSimplePixmap* pm = new csSimplePixmap (txt);
     image_view->image = pm;
     //int w = pm->Width ();

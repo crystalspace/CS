@@ -260,61 +260,28 @@ bool csRegion::PrepareTextures ()
   iTextureManager *txtmgr = csEngine::current_engine->G3D->GetTextureManager ();
 
   // First register all textures to the texture manager.
+  iter = GetIterator ();
+  while (iter->HasNext ())
   {
-    iter = GetIterator ();
-    while (iter->HasNext ())
+    csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
+        iter->Next (),
+        iTextureWrapper));
+    if (csth)
     {
-      csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
-          iter->Next (),
-          iTextureWrapper));
-      if (csth)
-      {
-        if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
-        if (!csth->KeepImage ()) csth->SetImageFile (0);
-      }
-    }
-  }
-
-  // Prepare all the textures.
-
-  //@@@ Only prepare new textures: txtmgr->PrepareTextures ();
-  {
-    iter = GetIterator ();
-    while (iter->HasNext ())
-    {
-      csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
-          iter->Next (),
-          iTextureWrapper));
-      if (csth)
-        csth->GetTextureHandle ()->Prepare ();
+      if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
+      if (!csth->KeepImage ()) csth->SetImageFile (0);
     }
   }
 
   // Then register all materials to the texture manager.
+  iter->Reset ();
+  while (iter->HasNext ())
   {
-    iter = GetIterator ();
-    while (iter->HasNext ())
-    {
-      csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
-          iter->Next (),
-          iMaterialWrapper));
-      if (csmh)
-        if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
-    }
-  }
-
-  // Prepare all the materials.
-  //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
-  {
-    iter = GetIterator ();
-    while (iter->HasNext ())
-    {
-      csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
-          iter->Next (),
-          iMaterialWrapper));
-      if (csmh)
-        csmh->GetMaterialHandle ()->Prepare ();
-    }
+    csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
+        iter->Next (),
+        iMaterialWrapper));
+    if (csmh)
+      if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
   }
 
   return true;

@@ -2465,7 +2465,6 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   mw = Engine->GetMaterialList ()->NewMaterial (mat);
   mw->QueryObject ()->SetName (name);
   mw->Register (G3D->GetTextureManager ());
-  mw->GetMaterialHandle ()->Prepare ();
   return mw;
 }
 

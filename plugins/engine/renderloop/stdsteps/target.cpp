@@ -197,7 +197,6 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
     tex = engine->CreateBlackTexture (target, newW, newH, 0, 
       CS_TEXTURE_3D);
     tex->Register (g3d->GetTextureManager ());
-    tex->GetTextureHandle()->Prepare();
   }
   if (tex != 0)
   {

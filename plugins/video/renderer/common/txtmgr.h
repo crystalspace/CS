@@ -46,13 +46,11 @@ struct iObjectRegistry;
  * driver clients see just the iTextureHandle interface.
  * <p>
  * The handle is initialized by giving the 3D driver a iImage object.
- * At the time client calls TextureManager::PrepareTextures() the
- * mipmaps and the 2D textures are created, if needed. After this
+ * Later the renderer will create mipmaps and the 2D textures. After this
  * you can call TextureManager::FreeImages() which in turn will call
  * csTextureHandle::FreeImage () for each registered texture and the
  * original texture will be released. This means you will free the
- * memory occupied by the original textures, but it also means you
- * cannot call TextureManager::Prepare() again.
+ * memory occupied by the original textures.
  */
 class csTextureHandle : public iTextureHandle
 {
@@ -98,6 +96,11 @@ public:
   /// Get texture usage flags
   int GetFlags () { return flags; }
 
+  /**
+   * Merge this texture into current palette, compute mipmaps and so on.
+   */
+  virtual void PrepareInt () { }
+
   /// Release the original image (iImage) as given by the engine.
   void FreeImage ();
 
@@ -106,7 +109,10 @@ public:
 
   /// Get the texture at the corresponding mipmap level (0..3)
   csTexture *get_texture (int mipmap)
-  { return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : 0; }
+  {
+    PrepareInt ();
+    return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : 0;
+  }
 
   /**
    * Adjusts the textures size, to ensure some restrictions like
@@ -316,7 +322,7 @@ public:
    * and a new material descriptor (internal to the texture manager)
    * is associated with given material handle.
    */
-  virtual void Prepare ();
+  virtual void PrepareInt ();
 };
 
 /**
@@ -393,12 +399,6 @@ public:
    * to quickly make materials based on a single texture.
    */
   virtual csPtr<iMaterialHandle> RegisterMaterial (iTextureHandle* txthandle);
-
-  /**
-   * Default stub implementation until the
-   * material system is actually working.
-   */
-  virtual void PrepareMaterials ();
 
   /**
    * Default stub implementation until the

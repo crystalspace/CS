@@ -91,6 +91,7 @@ csTextureHandle::~csTextureHandle ()
 void csTextureHandle::FreeImage ()
 {
   if (!image) return;
+  PrepareInt ();
   DG_UNLINK (this, image);
   image = 0;
 }
@@ -284,24 +285,6 @@ iTextureHandle* csMaterialHandle::GetTexture ()
   }
 }
 
-void csMaterialHandle::Prepare ()
-{
-/*  if (material)
-  {
-    if (texture != material->GetTexture())
-    {
-      DG_UNLINK (this, texture);
-      texture = material->GetTexture ();
-      if (texture)
-      {
-	DG_LINK (this, texture);
-      }
-    }
-    material->GetReflection (diffuse, ambient, reflection);
-    material->GetFlatColor (flat_color);
-  }*/
-}
-
 //------------------------------------------------------------ csTexture -----//
 
 void csTexture::compute_masks ()
@@ -379,16 +362,6 @@ void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
   size_t idx = materials.Find (handle);
   if (idx != csArrayItemNotFound) materials.DeleteIndex (idx);
-}
-
-void csTextureManager::PrepareMaterials ()
-{
-  size_t i;
-  for (i = 0; i < materials.Length (); i++)
-  {
-    csMaterialHandle* mat = materials.Get (i);
-    if (mat) mat->Prepare ();
-  }
 }
 
 void csTextureManager::FreeMaterials ()

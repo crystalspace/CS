@@ -149,11 +149,7 @@ struct iTextureManager : public iBase
    * make sure you have called IncRef yourselves.
    *<p>
    * The texture is not converted immediately. Instead, you can make
-   * intermediate calls to iTextureHandle::SetKeyColor (). Finally,
-   * if you want to merge the texture into the current environment, you
-   * should call txt->Prepare(). Alternatively you can call the
-   * PrepareTextures () method to compute a optimal palette and convert
-   * all the textures into the internal format.
+   * intermediate calls to iTextureHandle::SetKeyColor ().
    *<p>
    * This function returns a handle which should be given
    * to the 3D rasterizer or 2D driver when drawing or otherwise using
@@ -169,7 +165,7 @@ struct iTextureManager : public iBase
    * reference to the texture handle is released.
    *<p>
    * Note! This function will NOT scale the texture to fit hardware
-   * restrictions. This is done later when Prepare() is called.
+   * restrictions. This is done later before texture is first used.
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
 
@@ -179,11 +175,7 @@ struct iTextureManager : public iBase
    * make sure you have called IncRef yourselves.
    *<p>
    * The texture is not converted immediately. Instead, you can make
-   * intermediate calls to iTextureHandle::SetKeyColor (). Finally,
-   * if you want to merge the texture into the current environment, you
-   * should call txt->Prepare(). Alternatively you can call the
-   * PrepareTextures () method to compute a optimal palette and convert
-   * all the textures into the internal format.
+   * intermediate calls to iTextureHandle::SetKeyColor ().
    *<p>
    * This function returns a handle which should be given
    * to the 3D rasterizer or 2D driver when drawing or otherwise using
@@ -202,30 +194,16 @@ struct iTextureManager : public iBase
    * found in ivideo/texture.h
    *<p>
    * Note! This function will NOT scale the texture to fit hardware
-   * restrictions. This is done later when Prepare() is called.
+   * restrictions. This is done later before texture is first used.
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
   	int flags, int target) = 0;
 
   /**
-   * After all textures have been added, this function does all
-   * needed calculations (palette, lookup tables, mipmaps, ...).
-   * PrepareTextures () must be able to handle being called twice
-   * or more without ill effects.
-   * Note that it is in this stage that the original image that is
-   * attached to a texture is scaled so that it fits hardware
-   * requirements. So it is important to realize that calling this
-   * function may actually change the images from which you created
-   * the textures!
-   */
-  virtual void PrepareTextures () = 0;
-
-  /**
    * Call this function if you want to release all iImage's as
-   * given to this texture manager. After FreeImages() has been called
-   * it is no longer allowed to call Prepare() again. So the advantage
-   * of calling FreeImages() is that you gain memory (may be a lot)
-   * but the disadvantage is that when you want to add textures later
+   * given to this texture manager. 
+   * The advantage of calling FreeImages() is that you gain memory (may
+   * be a lot) but the disadvantage is that when you want to add textures later
    * you have to reload them all and start all over.
    */
   virtual void FreeImages () = 0;
@@ -250,11 +228,6 @@ struct iTextureManager : public iBase
    */
   virtual csPtr<iMaterialHandle> RegisterMaterial (
   	iTextureHandle* txthandle) = 0;
-
-  /**
-   * Prepare all materials.
-   */
-  virtual void PrepareMaterials () = 0;
 
   /**
    * Call this function if you want to release all iMaterial's as

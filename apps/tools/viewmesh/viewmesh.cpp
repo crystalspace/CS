@@ -985,11 +985,9 @@ bool ViewMesh::Initialize ()
       return false;
     }
     txt->Register (txtmgr);
-    txt->GetTextureHandle()->Prepare ();
     iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (
     	texturename);
     mat->Register (txtmgr);
-    mat->GetMaterialHandle ()->Prepare ();
   }
 
   // Load a sprite template from disk.

@@ -448,8 +448,6 @@ void csApp::PrepareTextures ()
   for (i = 0; i < Textures.Length (); i++)
     Textures.Get (i)->Register (txtmgr);
 
-  // Prepare all the textures.
-  txtmgr->PrepareTextures ();
   // Look in palette for colors we need for windowing system
   SetupPalette ();
   // Finally, set up mouse pointer images

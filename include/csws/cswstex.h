@@ -77,7 +77,7 @@ public:
   void Register (iTextureManager *iTexMan);
   /// Unregister the texture
   void Unregister ();
-  /// Refresh the texture in video memory (do iTexMan->PrepareTexture ())
+  /// Refresh the texture in video memory.
   void Refresh ();
   /// Define texture name
   void SetName (const char *iName);

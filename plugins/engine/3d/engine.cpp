@@ -1265,18 +1265,12 @@ void csEngine::PrepareTextures ()
     if (!csth->KeepImage ()) csth->SetImageFile (0);
   }
 
-  // Prepare all the textures.
-  txtmgr->PrepareTextures ();
-
   // Then register all materials to the texture manager.
   for (i = 0; i < materials->Length (); i++)
   {
     iMaterialWrapper *csmh = materials->Get (i);
     if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
   }
-
-  // Prepare all the materials.
-  txtmgr->PrepareMaterials ();
 }
 
 void csEngine::PrepareMeshes ()

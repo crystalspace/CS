@@ -92,7 +92,7 @@ private:
   /// Mean color used when texture mapping is disabled.
   //csRGBpixel mean_color;
   
-  /// used until Prepare() is called
+  /// Used until Prepare() is called
   csRef<iImageVector> images;
 
   /// Does color 0 mean "transparent" for this texture?
@@ -149,6 +149,8 @@ public:
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
   csRef<iImageVector>& GetImages () { return images; }
   void Unprepare () { prepared = false; }
+  /// Merge this texture into current palette, compute mipmaps and so on.
+  void PrepareInt ();
 
   SCF_DECLARE_IBASE;
 
@@ -254,13 +256,6 @@ public:
   virtual bool GetAlphaMap ();
 
   /**
-   * Merge this texture into current palette, compute mipmaps and so on.
-   * You should call either Prepare() or iTextureManager::PrepareTextures()
-   * before using any texture.
-   */
-  virtual void Prepare ();
-
-  /**
    * Get a canvas instance which is suitable for rendering on this
    * texture. Note that it is not allowed to change the palette of
    * the returned canvas.
@@ -329,14 +324,6 @@ public:
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection);
-
-  /**
-   * Prepare this material. The material wrapper (remembered during
-   * RegisterMaterial()) is queried again for material parameters
-   * and a new material descriptor (internal to the texture manager)
-   * is associated with given material handle.
-   */
-  virtual void Prepare ();
 };
 
 class csGLSuperLightmap;
@@ -519,17 +506,8 @@ public:
   	int flags, int target);
 
   /**
-   * After all textures have been added, this function does all
-   * needed calculations (palette, lookup tables, mipmaps, ...).
-   * PrepareTextures () must be able to handle being called twice
-   * or more without ill effects.
-   */
-  virtual void PrepareTextures ();
-
-  /**
    * Call this function if you want to release all iImage's as
-   * given to this texture manager. After FreeImages() has been called
-   * it is no longer allowed to call Prepare() again. So the advantage
+   * given to this texture manager. So the advantage
    * of calling FreeImages() is that you gain memory (may be a lot)
    * but the disadvantage is that when you want to add textures later
    * you have to reload them all and start all over.
@@ -556,11 +534,6 @@ public:
    */
   virtual csPtr<iMaterialHandle> RegisterMaterial (
   	iTextureHandle* txthandle);
-
-  /**
-   * Prepare all materials.
-   */
-  virtual void PrepareMaterials ();
 
   /**
    * Call this function if you want to release all iMaterial's as

@@ -91,6 +91,7 @@ csTextureHandle::~csTextureHandle ()
 void csTextureHandle::FreeImage ()
 {
   if (!image) return;
+  PrepareInt ();
   DG_UNLINK (this, image);
   image = 0;
 }
@@ -295,7 +296,7 @@ void csMaterialHandle::FreeMaterial ()
   material = 0;
 }
 
-void csMaterialHandle::Prepare ()
+void csMaterialHandle::PrepareInt ()
 {
   if (material)
   {
@@ -382,13 +383,6 @@ void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
   size_t idx = materials.Find (handle);
   if (idx != csArrayItemNotFound) materials.DeleteIndex (idx);
-}
-
-void csTextureManager::PrepareMaterials ()
-{
-  size_t i;
-  for (i = 0; i < materials.Length (); i++)
-    materials.Get (i)->Prepare ();
 }
 
 void csTextureManager::FreeMaterials ()

@@ -426,9 +426,7 @@ void csAVIStreamVideo::makeMaterial ()
   iTextureManager *txtmgr = pG3D->GetTextureManager();
   csRef<iTextureHandle> pFrameTex (
   	txtmgr->RegisterTexture (&memimage, CS_TEXTURE_NOMIPMAPS));
-  pFrameTex->Prepare ();
   pMaterial = txtmgr->RegisterMaterial (pFrameTex);
-  pMaterial->Prepare ();
 }
 
 bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,

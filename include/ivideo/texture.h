@@ -156,18 +156,6 @@ struct iTextureHandle : public iBase
   virtual bool GetAlphaMap () = 0;
 
   /**
-   * Merge this texture into current palette, compute mipmaps and so on.
-   * You should call either Prepare() or iTextureManager::PrepareTextures()
-   * before using any texture.
-   * Note that it is in this stage that the original image that is
-   * attached to a texture is scaled so that it fits hardware
-   * requirements. So it is important to realize that calling this
-   * function may actually change the image from which you created
-   * this texture!
-   */
-  virtual void Prepare () = 0;
-
-  /**
    * Get a canvas instance which is suitable for rendering on this
    * texture. Note that it is not allowed to change the palette of
    * the returned canvas.

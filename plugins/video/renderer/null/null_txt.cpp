@@ -191,7 +191,7 @@ void csTextureHandleNull::remap_texture (csTextureManager *texman)
   }
 }
 
-void csTextureHandleNull::Prepare ()
+void csTextureHandleNull::PrepareInt ()
 {
   CreateMipmaps ();
   remap_texture (texman);
@@ -232,21 +232,6 @@ uint32 csTextureManagerNull::encode_rgb (int r, int g, int b)
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
     ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
     ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift);
-}
-
-void csTextureManagerNull::PrepareTextures ()
-{
-  // Create mipmaps for all textures
-  size_t i;
-  for (i = 0; i < textures.Length (); i++)
-  {
-    csTextureHandle *txt = textures.Get (i);
-    txt->CreateMipmaps ();
-  }
-
-  // Remap all textures according to the new colormap.
-  for (i = 0; i < textures.Length (); i++)
-    ((csTextureHandleNull*)textures[i])->remap_texture (this);
 }
 
 csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,

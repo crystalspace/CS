@@ -19,6 +19,22 @@ chronological order.
 	  images at the end. iEngine->Prepare() already did that but it
 	  was forgotten in iRegion->Prepare(). This can save up a lot of
 	  memory.
+	- Jorrit did a big change and cleanup to the way that the texture
+	  manager works. It is no longer needed to Prepare() textures
+	  or materials. So iTextureHandle->Prepare(),
+	  iMaterialHandle()->Prepare(), iTextureManager->PrepareTextures(),
+	  and iTextureManager->PrepareMaterials() are gone. You don't
+	  need to replace them with anything. This is now fully automatic.
+	  The only thing that must be done when making a new texture or
+	  material is using RegisterTexture() and RegisterMaterial().
+	- Jorrit also reports that in addition to the API cleanup the
+	  register preparation fix also fixes the NR terrain engines so that
+	  they work when used in the context of a region. The NR terrain engine
+	  created internal textures but didn't prepare them as it assumed
+	  they would be prepared later during engine->Prepare(). However, this
+	  failed when regions are used because the textures that are internally
+	  created will not be part of that region and when region->Prepare()
+	  is called those textures will not be prepared.
 26-Jul-2004
 	- Eric Sunshine made the following changes:
 	    - Added 'install' targets to csjava/Jamfile.

@@ -194,6 +194,7 @@ csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle,
   this->target = target;
   csGLTextureHandle::Handle = Handle;
   alphaType = csAlphaMode::alphaNone;
+  prepared = false;
 }
 
 csGLTextureHandle::~csGLTextureHandle()
@@ -224,6 +225,8 @@ void csGLTextureHandle::Clear()
 
 void csGLTextureHandle::FreeImage ()
 {
+  // Prepare before freeing the image.
+  PrepareInt ();
   images = 0;
 }
 
@@ -363,6 +366,7 @@ void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue)
 
 bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
+  PrepareInt ();
   if ((size_t)mipmap < vTex.Length ())
   {
     w = vTex[mipmap]->get_width () << txtmgr->texture_downsample;
@@ -374,6 +378,7 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
+  PrepareInt ();
   mw = orig_width;
   mh = orig_height;
 }
@@ -382,6 +387,7 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh,
 	int &md)
 {
+  PrepareInt ();
   if(cachedata)
   {
     csGLTexture *real_tex = (csGLTexture*) cachedata;
@@ -403,6 +409,7 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh,
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 {
+  PrepareInt ();
   if (images.IsValid() && images->GetImage (0).IsValid())
   {
     mw = images->GetImage (0)->GetWidth();
@@ -411,7 +418,7 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
   }
 }
 
-void csGLTextureHandle::SetTextureTarget(int target)
+void csGLTextureHandle::SetTextureTarget (int target)
 {
   this->target = target;
 }
@@ -441,11 +448,11 @@ bool csGLTextureHandle::GetAlphaMap ()
   return (alphaType != csAlphaMode::alphaNone);
 }
 
-void csGLTextureHandle::Prepare ()
+void csGLTextureHandle::PrepareInt ()
 {
   //@@@ Images may be lost if preparing twice. Some better way of solving it?
-  if (prepared)
-    return;
+  if (!images) return;
+  if (prepared) return;
   prepared = true;
 
   // In opengl all textures, even non-mipmapped textures are required
@@ -769,6 +776,7 @@ void csGLTextureHandle::UpdateTexture ()
 
 GLuint csGLTextureHandle::GetHandle ()
 {
+  PrepareInt ();
   if (Handle)
   {
     return Handle;
@@ -1026,20 +1034,6 @@ void csGLMaterialHandle::GetReflection (float &oDiffuse, float &oAmbient,
   }
 }
 
-void csGLMaterialHandle::Prepare ()
-{
-/*  if (material)
-  {
-    if (texture != material->GetTexture())
-    {
-      texture = material->GetTexture ();
-    }
-    material->GetReflection (diffuse, ambient, reflection);
-    material->GetFlatColor (flat_color);
-  }*/
-}
-
-
 /*
  * New iTextureManager Implementation
  * done by Phil Aumayr (phil@rarebyte.com)
@@ -1279,17 +1273,6 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image,
   return csPtr<iTextureHandle> (txt);
 }
 
-void csGLTextureManager::PrepareTextures ()
-{
-  // Create mipmaps for all textures
-  size_t i;
-  for (i = 0; i < textures.Length (); i++)
-  {
-    csGLTextureHandle* tex = textures[i];
-    if (tex) tex->Prepare ();
-  }
-}
-
 void csGLTextureManager::FreeImages ()
 {
   size_t i;
@@ -1328,16 +1311,6 @@ csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
   //shadman->AddChild (mat->GetMaterial ());
 
   return csPtr<iMaterialHandle> (mat);
-}
-
-void csGLTextureManager::PrepareMaterials ()
-{
-  // csGLMaterialHandle::Prepare() does nothing anyway 
-  /* 
-  int i;
-  for (i = 0; i < materials.Length (); i++)
-    materials.Get (i)->Prepare ();
-    */
 }
 
 void csGLTextureManager::FreeMaterials ()

@@ -1375,7 +1375,7 @@ void csGLGraphics3D::FinishDraw ()
 	tex_mm->UpdateTexture ();
 	//tex_mm->InitTexture (txtmgr, G2D->GetPixelFormat ());
 	tex_mm->Unprepare ();
-	tex_mm->Prepare();
+	tex_mm->PrepareInt();
 	txtcache->Cache (tex_mm);
 
       }

@@ -149,12 +149,10 @@ public:
   /**
    * Do everything needed to initialize this texture.
    * At this stage only will settings like the key color be used.
-   * After Initialize has been called you can call Prepare() on the
-   * texture handle or PrepareTextures. The correct init sequence is:
+   * The correct init sequence is:
    * <ul>
    * <li>csProcTexture::Initialize()
    * <li>iTextureWrapper::Register()
-   * <li>iTextureHandle::Prepare() or iTextureManager::PrepareTextures()
    * <li>csProcTexture::PrepareAnim()
    * </ul>
    * Alternatively you can use Initialize(engine,name) which does all this
@@ -166,8 +164,7 @@ public:
    * Initialize this procedural texture, create a material associated
    * with it, properly register the texture and material and prepare
    * them. This function assumes that the texture manager has already
-   * been set up and PrepareTextures has already been called for the
-   * other loaded textures. It is a convenience function that offers
+   * been set up. It is a convenience function that offers
    * less flexibility but is sufficient for most cases. The texture and
    * material will get the name that is given by this routine.
    */
@@ -175,8 +172,7 @@ public:
       	iTextureManager* txtmgr, const char* name);
 
   /**
-   * Prepare the animation for use. This needs to be done after
-   * the texture has been prepared.
+   * Prepare the animation for use.
    */
   virtual bool PrepareAnim ();
 
