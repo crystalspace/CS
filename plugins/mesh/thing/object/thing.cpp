@@ -1746,16 +1746,14 @@ bool csThing::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
   int i;
-  float r;
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     csPolygon3DStatic *p = static_data->static_polygons.Get (i);
-    if (p->IntersectSegment (start, end, isect, &r))
+    if (p->IntersectSegment (start, end, isect, pr))
     {
-      if (pr) *pr = r;
       return true;
     }
   }

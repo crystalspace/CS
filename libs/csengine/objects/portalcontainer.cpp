@@ -914,10 +914,16 @@ bool csPortalContainer::HitBeamOutline (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr)
 {
   Prepare ();
-  (void)start;
-  (void)end;
-  (void)isect;
-  (void)pr;
+  int i;
+  for (i = 0; i < portals.Length (); i++)
+  {
+    csPortal *p = portals[i];
+    if (p->IntersectSegment (start, end, isect, pr))
+    {
+      return true;
+    }
+  }
+
   return false;
 }
 

@@ -36,11 +36,15 @@ chronological order.
 	  supports the polygon index.
 	- Jorrit made the first portal in flarge (the one from the first
 	  room to the second small room) use the new portal container feature.
-	  Seems to work ok so far.
+	  Seems to work ok so far. Note that this change requires a relight
+	  since the geometry in the first room changed.
 	- Jorrit changed the spider in bugplug to use a weak reference to the
 	  camera to ensure the camera pointer is cleaned up if the camera
 	  is deleted. This fixes a crash bug in bugplug when trying to
 	  select some objects through portals.
+	- Jorrit implemented HitBeamOutline() of portal container. This is
+	  a faster version of HitBeamObject() which stops at the first hit
+	  it finds. Also did a small optimization on thing HitBeamOutline().
 25-Sep-2003
 	- Jorrit removed iCamera->GetHit(). This function is only a very
 	  thin wrapper on top of iSector->HitBeamPortals() so it is not
