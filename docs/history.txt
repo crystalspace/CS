@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 27-Jun-2000
+	- Wyatt Miler updates the Mac project files.
 	- Fixed the bug when that could cause severe problems when
 	  loading a world for which the octree isn't valid anymore. The
 	  partially loaded octree was not cleaned up properly.
