@@ -18,6 +18,8 @@ chronological order.
 	- Jorrit removed inpnames.* again.
 	- Oktal changed the arguments of csInputDefinition::ParseKey so it
 	  can output both raw and cooked codes in the same call.
+	- Oktal fixed a bug in csInputDefinition that caused parsed modifiers
+	  to not be stored ('&=' should have been '|=').
 11-Aug-2004
 	- PK implemented the SaverPlugin in genmesh, spr3dmesh and fixed a
 	  bug in the write down order of the other SaverPlugins.

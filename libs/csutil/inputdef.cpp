@@ -267,7 +267,7 @@ csInputDefinition::csInputDefinition (const char *_s, uint32 mods, bool cook)
 
     csKeyModifierType type;
     csKeyModifierNumType num;
-    if (NameToMod (mod, type, num)) modifiers.modifiers[type] &= (1 << num);
+    if (NameToMod (mod, type, num)) modifiers.modifiers[type] |= (1 << num);
 
     pos = end + 1;
   }
