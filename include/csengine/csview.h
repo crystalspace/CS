@@ -63,7 +63,7 @@ public:
   /// Constructor.
   csView (iEngine *iEngine, iGraphics3D* ig3d);
   /// Destructor.
-  ~csView ();
+  virtual ~csView ();
 
   /// Get engine handle.
   virtual iEngine* GetEngine ();
