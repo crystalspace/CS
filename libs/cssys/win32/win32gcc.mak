@@ -35,7 +35,7 @@ OS=WIN32
 COMP=GCC
 
 # Command to update a target
-UPD=bin\dosupd.bat $@ DEST
+UPD=libs\cssys\win32\winupd.bat $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -219,6 +219,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=bin\win32conf.bat mingw32
+SYSCONFIG=libs\cssys\win32\win32conf.bat mingw32
 
 endif # ifeq ($(ROOTCONFIG),config)

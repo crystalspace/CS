@@ -130,7 +130,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 ifeq ($(ROOTCONFIG),config)
 
 define SYSCONFIG
-  bin/unixconf.sh irix >>config.tmp
+  libs/cssys/unix/unixconf.sh irix >>config.tmp
   echo "Don't forget to set USE_MESA=0 in user.mak"
 endef
 

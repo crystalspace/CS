@@ -105,7 +105,7 @@ mkdir out
 mkdir out/docs
 mkdir out/docs/html
 cd docs/texinfo
-perl ../../bin/texi2html -init_file \
+perl ../../docs/support/texi2html -init_file \
   ../support/texi2html.init -prefix cs \
   -subdir ../../out/docs/html cs-unix.txi
 @end example

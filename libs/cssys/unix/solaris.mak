@@ -139,6 +139,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=bin/unixconf.sh solaris >>config.tmp
+SYSCONFIG=libs/cssys/unix/unixconf.sh solaris >>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)

@@ -152,7 +152,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
 ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
-SYSCONFIG += $(NEWLINE)sh bin/unixconf.sh hurd $(INSTALL_DIR)>>config.tmp
+SYSCONFIG += $(NEWLINE)sh libs/cssys/unix/unixconf.sh hurd $(INSTALL_DIR)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
 

@@ -22,6 +22,24 @@ The history order is reversed so that new features are at the top.
 	  operators are incompatible with those platforms.
 	- Eric Sunshine stripped the "i" prefix off of the following filenames
 	  in the CS/include/iaws directory: iaws.h, iawsdefs.h, iawsparm.h
+	- Eric Sunshine continued his crusade to eliminate monolithicism from
+	  the project, and to promote modularity.  The following platform- and
+	  domain-specific files from the CS/bin directory were relocated:
+	    chkxfree.sh   --> libs/cssys/unix/chkxfree.sh
+	    cygwinconf.sh --> libs/cssys/win32/cygconf.sh
+	    dosconf.bat   --> libs/cssys/djgpp/dosconf.bat
+	    dosconf.var   --> libs/cssys/djgpp/dosconf.var
+	    dosupd.bat    --> libs/cssys/djgpp/dosupd.bat
+	    dosupd.bat    --> libs/cssys/win32/winupd.bat
+	    nodefix.pl    --> docs/support/nodefix.pl
+	    os2conf.cmd   --> libs/cssys/os2/os2conf.cmd
+	    os2link.cmd   --> libs/cssys/os2/os2link.cmd
+	    os2upd.cmd    --> libs/cssys/os2/os2upd.cmd
+	    texi2html     --> docs/support/texi2html
+	    unixconf.sh   --> libs/cssys/unix/unixconf.sh
+	    win32conf.bat --> libs/cssys/win32/winconf.bat
+	    win32conf.mak --> libs/cssys/win32/winconf.mak
+	    win32conf.var --> libs/cssys/win32/winconf.var
 5-Nov-2001
 	- Fixed a bug in bin/chkheadr.sh which caused that test to always
 	  fail with the result that CS_USE_FAKE_SOCKLEN_TYPE would always

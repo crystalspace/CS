@@ -211,6 +211,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG += $(NEWLINE)sh bin/cygwinconf.sh $(INSTALL_DIR)>>config.tmp
+SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/cygconf.sh $(INSTALL_DIR)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)

@@ -42,7 +42,7 @@ than regular @sc{gcc}.
 @cindex @sc{os}/2 @sc{dive}
 
 The current implementation requires @sc{dive}, so the application is compiled
-as a @sc{pm} application.  This is done by default (@file{bin/os2link.cmd}
+as a @sc{pm} application.  This is done by default (@file{os2link.cmd}
 creates automatically a @file{.def} file).  If you want to compile the
 application as a console application, you have to link it with the
 @code{$(DO.LINK.CONSOLE.EXE)} macro (have a look at

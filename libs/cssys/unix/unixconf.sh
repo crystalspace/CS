@@ -13,23 +13,20 @@
 SYSTYPE=$1
 INSTALL_DIR=$2
 
-# Find the directory where script is located
-SCRIPT_NAME=`basename $0`
-SCRIPT_DIR=`expr $0 : "\(.*\)/${SCRIPT_NAME}"`
-[ -z "${SCRIPT_DIR}" ] && SCRIPT_DIR="./"
-SCRIPT_DIR=`(cd ${SCRIPT_DIR} > /dev/null; pwd)` # Convert to absolute path.
+BIN_DIR=bin
+UNIX_DIR=libs/cssys/unix
 
 # find out architecture
-. ${SCRIPT_DIR}/arch.sh
+. ${BIN_DIR}/arch.sh
 
 # Check for compiler
-. ${SCRIPT_DIR}/comptest.sh
+. ${BIN_DIR}/comptest.sh
 
 # Check for tools
-. ${SCRIPT_DIR}/chktools.sh
+. ${BIN_DIR}/chktools.sh
 
 # Analyse system headers
-. ${SCRIPT_DIR}/chkheadr.sh
+. ${BIN_DIR}/chkheadr.sh
 
 # Test for presence of SVGALIB.
 echo "#include <vga.h>" > conftest.cpp
@@ -40,13 +37,13 @@ rm -f conftest.cpp conftest.o
 rm -f conftest.asm conftest.o
 
 # Find the X11 directory
-. ${SCRIPT_DIR}/chkxfree.sh
+. ${UNIX_DIR}/chkxfree.sh
 
 # test for endianess
-. ${SCRIPT_DIR}/endtest.sh
+. ${BIN_DIR}/endtest.sh
 
 # test for phyton
-. ${SCRIPT_DIR}/haspythn.sh
+. ${BIN_DIR}/haspythn.sh
 
 # find install dir
 [ -z "${INSTALL_DIR}" ] && INSTALL_DIR=/usr/local/crystal

@@ -1,6 +1,6 @@
-################################################################################
+###############################################################################
 #                       This is the makefile for DOS/DJGPP
-################################################################################
+###############################################################################
 
 # Friendly names for building environment
 DESCRIPTION.djgpp = DOS/DJGPP
@@ -12,7 +12,7 @@ else
   PLUGINS += video/canvas/dosraw
 endif
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 .SUFFIXES: .exe
@@ -27,11 +27,11 @@ OS=DOS
 COMP=GCC
 
 # The command to update target
-UPD=bin/dosupd.bat $(subst /,\,$@ DEST)
+UPD=libs/cssys/djgpp/dosupd.bat $(subst /,\,$@ DEST)
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#---------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
@@ -140,7 +140,7 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
@@ -148,7 +148,7 @@ DO.SHARED.PLUGIN.CORE = dxe2gen -o $@ $(^^) $(L^) -U -E $(patsubst %.dxe,%,$(not
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
@@ -156,13 +156,13 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
-SYSCONFIG=command /E:8192 /C bin\dosconf.bat
+SYSCONFIG=command /E:8192 /C libs\cssys\djgpp\dosconf.bat
 # Check if "echo" executable is not installed (thus using dumb COMMAND.COM's echo)
 ifeq ($(shell echo ""),"")
-SYSCONFIG += $(NEWLINE)type bin\dosconf.var>>config.tmp
+SYSCONFIG += $(NEWLINE)type libs\cssys\djgpp\dosconf.var>>config.tmp
 endif
 
 endif # rootdefines & config

@@ -140,7 +140,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
 ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
-SYSCONFIG += $(NEWLINE)bin/unixconf.sh freebsd>>config.tmp
+SYSCONFIG += $(NEWLINE)libs/cssys/unix/unixconf.sh freebsd>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
 

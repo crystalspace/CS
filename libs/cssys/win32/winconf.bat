@@ -64,11 +64,11 @@
   rem *** configurations
   echo ### Checking if you use cmd.exe or some fancy shell...
   echo testing>conftest.1
-  make -f bin\win32conf.mak testecho
+  make -f libs\cssys\win32\winconf.mak testecho
   cmp conftest.1 conftest.2
   if not errorlevel 1 goto noremovequote
   echo $$$ O.K. Setting to use cmd.exe settings
-  type bin\win32conf.var >>config.tmp
+  type libs\cssys\win32\win32conf.var >>config.tmp
 
 :noremovequote
   del conftest.* >nul

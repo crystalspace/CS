@@ -38,7 +38,7 @@ SYSMODIFIERS += \
   $(NEWLINE)echo $"  USE_CRTDLL=$(USE_CRTDLL)$"
 
 # The command to update target
-UPD=cmd /c bin\\os2upd.cmd $@ DEST
+UPD=cmd /c libs\\cssys\\os2\\os2upd.cmd $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -217,7 +217,7 @@ endif
 define SYSCONFIG
   @echo USE_OMF = $(USE_OMF)>>config.tmp
   @echo USE_CRTDLL = $(USE_CRTDLL)>>config.tmp
-  @cmd /c bin\\os2conf.cmd SHELL $(SHELL)>>config.tmp
+  @cmd /c libs\\cssys\\os2\\os2conf.cmd SHELL $(SHELL)>>config.tmp
 endef
 
 endif # ifeq ($(ROOTCONFIG),config)
