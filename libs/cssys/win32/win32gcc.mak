@@ -10,6 +10,7 @@ PLUGINS+= cscript/cslua
 PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 PLUGINS+= video/canvas/ddraw8
+PLUGINS+= sound/loader/mp3
 
 # if u have the following line uncommented make sure one  
 # LIBS.OPENGL.SYSTEM is set below or you have a custom 
@@ -17,7 +18,7 @@ PLUGINS+= video/canvas/ddraw8
 PLUGINS+= video/canvas/openglwin video/renderer/opengl
 
 # uncomment the line below to build the sound driver
-#PLUGINS+= sound/driver/waveoutsd
+PLUGINS+= sound/driver/waveoutsd
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

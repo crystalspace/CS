@@ -29,7 +29,10 @@
 # define M_SQRT2	1.41421356237309504880
 
 #define byte unsigned char
-#include "xfermem.h"
+
+#ifndef WIN32
+  #include "xfermem.h"
+#endif
 
 #define         SBLIMIT                 32
 #define         SCALE_BLOCK             12
@@ -52,7 +55,9 @@ struct al_table
   short d;
 };
 
-extern txfermem *buffermem;
+#ifndef WIN32
+  extern txfermem *buffermem;
+#endif
 
 #ifndef NOXFERMEM
 extern void buffer_loop(struct audio_info_struct *ai,sigset_t *oldsigset);

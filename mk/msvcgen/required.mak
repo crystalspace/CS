@@ -46,6 +46,7 @@ MSVC.PLUGINS.REQUIRED =         \
   mesh/impexp/3ds               \
   sound/driver/waveoutsd        \
   sound/loader/mod              \
+  sound/loader/mp3              \
   sound/loader/ogg              \
   sound/renderer/ds3d           \
   sound/renderer/eax            \
