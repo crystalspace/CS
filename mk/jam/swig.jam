@@ -2,13 +2,15 @@
 # Rules for swig
 #============================================================================
 
+SED ?= sed ;
+
 if $(CMD.SWIG)
 {
   ## Swig cppfile : swigfile
   rule Swig
   {
     Depends $(<) : $(>) ;
-    # put the generated cpp files in the source directory. Because probably not
+    # Put the generated cpp files in the source directory. Because probably not
     # all people have swig installed so we want to add these generated files to
     # the sources.
     MakeLocate $(<) : $(SUBDIR) ;
@@ -18,6 +20,9 @@ if $(CMD.SWIG)
   actions Swig
   {
     $(CMD.SWIG) $(SWIG.FLAGS) -o $(<) $(>)
+    $(SED) '/\$Header$(<) > $(<).sed
+    $(RM) $(<)
+    $(MV) $(<).sed $(<)
   }
 
   rule SimpleSwig

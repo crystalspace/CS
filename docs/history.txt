@@ -25,6 +25,11 @@ chronological order.
         - Andreas Busch changed pgtest to use new keyeventhandling.
 	- Eric Sunshine removed an unportable #include <memory.h> from
 	  bitarray.h.  This header is not present on all platforms.
+	- Eric Sunshine augmented the Swig rules in the makefiles and in Jam
+	  so that they filter out $Header: keywords from the generated files.
+	  This will prevent the files from appearing modified to jobber.pl
+	  simply because an element of the header, such as date, is different.
+	  Also added SED variable to makefiles.
 5-Nov-2003
 	- Jorrit optimized the kdtree a bit so that it now does 20 attempts
 	  instead of 10 to find the best split location. Also the cost is

@@ -186,10 +186,10 @@ SED_DEPEND_NEW= \
 ifndef DO.DEP
   ifeq ($(DEPEND_TOOL),cc)
     DO.DEP1 = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE)
-    DO.DEP2 = $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
+    DO.DEP2 = $(filter-out %.asm,$^) | $(SED) $(SED_DEPEND) >$@
     DO.DEP = $(DO.DEP1) $(DO.DEP2)
     DO.DEPEND1 = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE)
-    DO.DEPEND2 = $(filter-out %.asm,$^) | sed $(SED_DEPEND_NEW) >$@
+    DO.DEPEND2 = $(filter-out %.asm,$^) | $(SED) $(SED_DEPEND_NEW) >$@
     DO.DEPEND = $(DO.DEPEND1) $(DO.DEPEND2)
   else
     ifeq ($(DEPEND_TOOL),mkdep)

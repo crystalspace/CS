@@ -146,6 +146,9 @@ else
 $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(OUTDIRS)
 	-$(SWIGBIN) -perl5 -c++ -shadow -const -Iinclude -I$(SRCDIR)/include \
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C.IN) $(SWIG.I)
+	$(SED) '/$(BUCK)Header:/d' < $(SWIG.PERL5.C.IN) > $(SWIG.PERL5.C.IN).sed
+	$(RM) $(SWIG.PERL5.C.IN)
+	$(MV) $(SWIG.PERL5.C.IN).sed $(SWIG.PERL5.C.IN)
 endif
 
 ifeq ($(DO_SWIGPERL5INST),yes)

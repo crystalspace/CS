@@ -61,6 +61,11 @@ CD=cd
 # this command should be suitable for input back into the $(CD) command.
 PWD=pwd
 
+# Sed command.
+ifeq (,$(SED))
+SED=sed
+endif
+
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.o/$$O/g"
 
