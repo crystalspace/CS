@@ -77,7 +77,7 @@ public:
   csModelConverterMD2 (iBase *pBase);
 
   /// destructor
-  ~csModelConverterMD2 ();
+  virtual ~csModelConverterMD2 ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;

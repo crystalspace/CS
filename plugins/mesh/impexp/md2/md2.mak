@@ -38,7 +38,7 @@ endif
 INC.MD2IE = $(wildcard plugins/mesh/impexp/md2/*.h)
 SRC.MD2IE = $(wildcard plugins/mesh/impexp/md2/*.cpp)
 OBJ.MD2IE = $(addprefix $(OUT),$(notdir $(SRC.MD2IE:.cpp=$O)))
-DEP.MD2IE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL
+DEP.MD2IE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += MD2IE
 DSP.MD2IE.NAME = md2ie
