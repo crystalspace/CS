@@ -2691,6 +2691,8 @@ public:
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iLight* FindLight(const char *name);
+  virtual bool CheckDupes () const { return false; }
+  virtual bool CurrentRegionOnly () const { return false; }
 };
 
 SCF_IMPLEMENT_IBASE(EngineLoaderContext);

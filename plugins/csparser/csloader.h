@@ -33,6 +33,7 @@
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
 #include "imap/services.h"
+#include "imap/ldrctxt.h"
 #include "ivaria/engseq.h"
 
 #include "ivideo/effects/efserver.h"
@@ -44,10 +45,11 @@
 class csGenerateImageTexture;
 class csGenerateImageValue;
 class csReversibleTransform;
-struct csRGBcolor;
 class csColor;
+struct csRGBcolor;
 
 struct iImageIO;
+struct iRegion;
 struct iObjectModel;
 struct iSoundLoader;
 struct iEngine;
@@ -260,8 +262,83 @@ enum
 #endif
 };
 
-class StdLoaderContext;
+class csLoader;
 struct csLoaderPluginRec;
+
+/*
+ * Context class for the standard loader.
+ */
+class StdLoaderContext : public iLoaderContext
+{
+private:
+  iEngine* Engine;
+  iRegion* region;
+  csLoader* loader;
+  bool checkDupes;
+  bool resolveOnlyRegion;
+public:
+  StdLoaderContext (iEngine* Engine, bool resolveOnlyRegion,
+    csLoader* loader, bool checkDupes);
+  virtual ~StdLoaderContext ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual iSector* FindSector (const char* name);
+  virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
+  virtual iMeshWrapper* FindMeshObject (const char* name);
+  virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iLight* FindLight (const char *name);
+  virtual bool CheckDupes () const { return checkDupes; }
+  virtual bool CurrentRegionOnly () const { return resolveOnlyRegion; }
+};
+
+/*
+ * Context class for the threaded loader.
+ */
+class ThreadedLoaderContext : public iLoaderContext
+{
+private:
+  iEngine* Engine;
+  iRegion* region;
+  csLoader* loader;
+  bool checkDupes;
+  bool resolveOnlyRegion;
+public:
+  ThreadedLoaderContext (iEngine* Engine, bool resolveOnlyRegion,
+    csLoader* loader, bool checkDupes);
+  virtual ~ThreadedLoaderContext ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual iSector* FindSector (const char* name);
+  virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
+  virtual iMeshWrapper* FindMeshObject (const char* name);
+  virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iLight* FindLight (const char *name);
+  virtual bool CheckDupes () const { return checkDupes; }
+  virtual bool CurrentRegionOnly () const { return resolveOnlyRegion; }
+};
+
+/**
+ * Status class for the threaded loader.
+ */
+class csLoaderStatus : public iLoaderStatus
+{
+private:
+  //csRef<csMutex> mutex;
+  bool ready;
+  bool error;
+
+public:
+  csLoaderStatus ();
+  virtual ~csLoaderStatus () { }
+
+  SCF_DECLARE_IBASE;
+  virtual bool IsReady () { return ready; }
+  virtual bool IsError () { return error; }
+};
 
 /**
  * The loader for Crystal Space maps.
@@ -269,9 +346,8 @@ struct csLoaderPluginRec;
 class csLoader : public iLoader
 {
   friend class StdLoaderContext;
+  friend class ThreadedLoaderContext;
 private:
-  csPtr<iLoaderContext> CreateLoaderContext (
-  	bool resolveOnlyRegion, bool checkDupes);
   csStringHash xmltokens;
 
   /// Parser for common stuff like MixModes, vectors, matrices, ...
@@ -585,6 +661,8 @@ public:
   virtual csPtr<iSoundHandle> LoadSound (const char *fname);
   virtual csPtr<iSoundWrapper> LoadSound (const char *name, const char *fname);
 
+  virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
+	bool resolveOnlyRegion, bool checkDupes);
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
 	bool onlyRegion, bool checkDupes);
   virtual bool LoadLibraryFile (const char* filename);

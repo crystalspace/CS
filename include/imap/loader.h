@@ -39,6 +39,19 @@ struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iSoundWrapper;
 
+SCF_VERSION (iLoaderStatus, 0, 0, 1);
+
+/**
+ * An object to query about the status of the threaded loader.
+ */
+struct iLoaderStatus : public iBase
+{
+  /// Check if the loader is ready.
+  virtual bool IsReady () = 0;
+  /// Check if there was an error during loading.
+  virtual bool IsError () = 0;
+};
+
 SCF_VERSION (iLoader, 0, 0, 8);
 
 /**
@@ -85,6 +98,27 @@ struct iLoader : public iBase
   /// Load a sound file, register the sound and create a wrapper object for it
   virtual csPtr<iSoundWrapper> LoadSound (const char *name,
   	const char *fname) = 0;
+
+  /**
+   * Load a map file in a thread.
+   * If 'resolveOnlyRegion' is true then portals will only connect to the
+   * sectors in the current region, things will only use thing templates
+   * defined in the current region and meshes will only use mesh factories
+   * defined in the current region.
+   * <p>
+   * If you use 'checkDupes' == true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legel for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
+   * <p>
+   * This function returns immediatelly. You can check the iLoaderStatus
+   * instance that is returned to see if the map has finished loading or
+   * if there was an error.
+   */
+  virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
+	bool resolveOnlyRegion = true, bool checkDupes = false) = 0;
 
   /**
    * Load a map file. If 'clearEngine' is true then the current contents

@@ -23,7 +23,7 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed compile errors in proctex (access to private or
 	  protected members from within subclasses).
 	- Philip Wyett added virtual desctructor to 'TextureLoaderContext'
-          and aslo a newline to the end of the file.
+          and also a newline to the end of the file.
 	- Jorrit removed the obsolete coverage buffer from Dynavis. The
 	  tiled coverage buffer works much better and was default anyway.
 	  Additionally removed the toggle_tiled debug command.
@@ -46,6 +46,9 @@ The history order is reversed so that new features are at the top.
 	  is only called if clearEngine is true. The reasoning is that when
 	  clearEngine is false you want to append a map file to an already
 	  loaded map and you don't want to reset engine settings in that case.
+	- Jorrit started initial work on ThreadedLoadMapFile(). Not
+	  operational yet.
+	- Jorrit fixed a bug he introduced in his last commit with the engine.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

@@ -88,33 +88,17 @@
 
 //---------------------------------------------------------------------------
 
-/*
- * Context class for the standard loader.
- */
-class StdLoaderContext : public iLoaderContext
+SCF_IMPLEMENT_IBASE (csLoaderStatus)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderStatus)
+SCF_IMPLEMENT_IBASE_END
+
+csLoaderStatus::csLoaderStatus ()
 {
-private:
-  iEngine* Engine;
-  iRegion* region;
-  csLoader* loader;
-  bool checkDupes;
-  bool resolveOnlyRegion;
-public:
-  StdLoaderContext (iEngine* Engine, bool resolveOnlyRegion,
-    csLoader* loader, bool checkDupes);
-  virtual ~StdLoaderContext ();
+  SCF_CONSTRUCT_IBASE (NULL);
+  //mutex = csMutex::Create (true);
+}
 
-  SCF_DECLARE_IBASE;
-
-  virtual iSector* FindSector (const char* name);
-  virtual iMaterialWrapper* FindMaterial (const char* name);
-  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
-  virtual iMeshWrapper* FindMeshObject (const char* name);
-  virtual iTextureWrapper* FindTexture (const char* name);
-  virtual iLight* FindLight (const char *name);
-  virtual bool CheckDupes () const { return checkDupes; }
-  virtual bool CurrentRegionOnly () const { return resolveOnlyRegion; }
-};
+//---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(StdLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
@@ -209,6 +193,121 @@ iLight* StdLoaderContext::FindLight (const char *name)
 }
 
 iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
+{
+  // @@@ in case the texture is not found a replacement is taken.
+  // however, somehow the location of the errorneous texture name
+  // should be reported. 
+  iTextureWrapper* result;
+  if (region)
+    result = region->FindTexture (name);
+  else
+    result = Engine->GetTextureList ()->FindByName (name);
+
+  if (!result)
+  {
+    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+      name);
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
+    result = rc;
+  }
+  return result;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(ThreadedLoaderContext);
+  SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
+SCF_IMPLEMENT_IBASE_END;
+
+ThreadedLoaderContext::ThreadedLoaderContext (iEngine* Engine,
+	bool resolveOnlyRegion, csLoader* loader,
+	bool checkDupes)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  ThreadedLoaderContext::Engine = Engine;
+  ThreadedLoaderContext::resolveOnlyRegion = resolveOnlyRegion;
+  if (resolveOnlyRegion)
+    region = Engine->GetCurrentRegion ();
+  else
+    region = NULL;
+  ThreadedLoaderContext::loader = loader;
+  ThreadedLoaderContext::checkDupes = checkDupes;
+}
+
+ThreadedLoaderContext::~ThreadedLoaderContext ()
+{
+}
+
+iSector* ThreadedLoaderContext::FindSector (const char* name)
+{
+  return Engine->FindSector (name, region);
+}
+
+iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
+{
+  // @@@ in case the material is not found a replacement is taken.
+  // however, somehow the location of the errorneous material name
+  // should be reported. 
+  iMaterialWrapper* mat = Engine->FindMaterial (name, region);
+  if (mat)
+    return mat;
+
+  loader->ReportNotify ("Could not find material '%s'. "
+    "Creating new material using texture with that name", name);
+  iTextureWrapper* tex = FindTexture (name);
+  if (tex)
+  {
+    // Add a default material with the same name as the texture
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material);
+    // First we have to extract the optional region name from the name:
+    char* n = strchr (name, '/');
+    if (!n) n = (char*)name;
+    else n++;
+    mat->QueryObject()->SetName (n);
+
+    // @@@ should this be done here?
+    iTextureManager *tm;
+    if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
+    {
+      tex->Register (tm);
+      tex->GetTextureHandle()->Prepare();
+      mat->Register (tm);
+      mat->GetMaterialHandle()->Prepare();
+    }
+    return mat;
+  }
+
+  return NULL;
+}
+
+iMeshFactoryWrapper* ThreadedLoaderContext::FindMeshFactory (const char* name)
+{
+  return Engine->FindMeshFactory (name, region);
+}
+
+iMeshWrapper* ThreadedLoaderContext::FindMeshObject (const char* name)
+{
+  return Engine->FindMeshObject (name, region);
+}
+
+iLight* ThreadedLoaderContext::FindLight (const char *name)
+{
+  // This function is necessary because Engine::FindLight returns iStatLight
+  // and not iLight.
+  csRef<iLightIterator> li = Engine->GetLightIterator(region);
+  iLight *light;
+
+  while ((light = li->Fetch ()) != NULL)
+  {
+      if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+	  return light;
+  }
+  return NULL;
+}
+
+iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
 {
   // @@@ in case the texture is not found a replacement is taken.
   // however, somehow the location of the errorneous texture name
@@ -391,12 +490,18 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderContext* ldr_context,
 
 //---------------------------------------------------------------------------
 
+csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* filename,
+	bool /*resolveOnlyRegion*/, bool /*checkDupes*/)
+{
+  return NULL;
+}
+
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   bool onlyRegion, bool checkdupes)
 {
   if (clearEngine) Engine->DeleteAll ();
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext (onlyRegion,
-  	checkdupes);
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, onlyRegion, this, checkdupes));
 
   csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
 
@@ -443,7 +548,8 @@ bool csLoader::LoadLibraryFile (const char* fname)
     return false;
   }
 
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext (false, false);
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, false, this, false));
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
@@ -466,7 +572,8 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 {
   if (!Engine) return NULL;
 
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext (false, false);
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, false, this, false));
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
 
@@ -524,7 +631,8 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
   csRef<iMeshWrapper> mesh;
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext (false, false);
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, false, this, false));
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -613,13 +721,6 @@ csLoader::csLoader (iBase *p)
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
-}
-
-csPtr<iLoaderContext> csLoader::CreateLoaderContext (
-	bool resolveOnlyRegion, bool checkDupes)
-{
-  return csPtr<iLoaderContext> (
-    	new StdLoaderContext (Engine, resolveOnlyRegion, this, checkDupes));
 }
 
 #define GET_PLUGIN(var, intf, msgname)				\
