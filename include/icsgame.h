@@ -377,7 +377,7 @@ struct iEntityClassInformation : public iBase
 SCF_VERSION (iEntityComponentIterator, 0, 1, 0);
 
 /**
- * Allows to iterate across several Attributes
+ * Allows to iterate across several components of an Entity
  */
 struct iEntityComponentIterator : public iBase
 {
@@ -433,7 +433,7 @@ struct iEntity : public iBase
    * - iEntityClassInformation
    * - iEntityEventhandler (But you should use GetComponents instead for this!)
    */
-  virtual void* GetFirstComponent(const char* ScfClassname) = 0;
+  virtual void* GetFirstComponent(const char* ScfClassname, int Version) = 0;
 
   /**
    * Get an iterator, that will return all contained Components that
@@ -444,7 +444,8 @@ struct iEntity : public iBase
    * By using "iBase" as ScfClassname, you can get all contained classes
    * and Query for interface yourself.
    */
-  virtual iEntityComponentIterator* GetComponents(const char* ScfClassname) = 0;
+  virtual iEntityComponentIterator* GetComponents
+            (const char* ScfClassname, int Version) = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -466,9 +467,7 @@ struct iEntityClass : public iBase
   virtual void AddBaseclass(const char* EntityClassname) = 0;
 
   /**
-   * Add a component to this class. That component _must_ support the
-   * iEntityComponent interface as well as all required additional 
-   * interfaces like iEntityCollider or others.
+   * Add a component to this class. 
    * Note, that this call, like AddBaseclass, only adds the information
    * about components, and doesn't try to create an instance of that
    * class. Instantiation will happen only in CreateEntity.
