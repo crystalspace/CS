@@ -25,9 +25,10 @@
 /**
  * \addtogroup engine3d
  * @{ */
- 
+
 #include "cstypes.h"
 #include "csutil/scf.h"
+#include "iutil/object.h"
 
 class csVector3;
 class csSector;
@@ -108,14 +109,14 @@ struct iSector : public iBase
 
   /// Get the last set dynamic ambient light for this sector.
   virtual csColor GetDynamicAmbientLight() const = 0;
-  
+
   /**
    * Calculate the bounding box of all objects in this sector.
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
   virtual void CalculateSectorBBox (csBox3& bbox,
-  	bool do_meshes) const = 0;
+    bool do_meshes) const = 0;
 
   /**
    * Use the specified mesh object as the visibility culler for
@@ -148,7 +149,7 @@ struct iSector : public iBase
    * if a polygon is returned.
    */
   virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& isect) = 0;
+    csVector3& isect) = 0;
 
   /**
    * Follow a beam from start to end and return the first object
@@ -157,7 +158,7 @@ struct iSector : public iBase
    * If polygonPtr is null then the polygon will not be filled in.
    */
   virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& intersect, iPolygon3D** polygonPtr) = 0;
+    csVector3& intersect, iPolygon3D** polygonPtr) = 0;
 
   /**
    * Follow a segment starting at this sector. If the segment intersects
@@ -178,7 +179,7 @@ struct iSector : public iBase
    * collision detection system to test with walls.
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
-  	csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
+    csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
 
   /// Draw the sector with the given render view
   virtual void Draw (iRenderView* rview) = 0;
@@ -196,7 +197,7 @@ struct iSector : public iBase
 
   /// Get the number of sector callbacks.
   virtual int GetSectorCallbackCount () const = 0;
-  
+
   /// Get the specified sector callback.
   virtual iSectorCallback* GetSectorCallback (int idx) const = 0;
 };
