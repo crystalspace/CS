@@ -69,9 +69,9 @@ ImageSGIFile::~ImageSGIFile ()
 
 ImageSGIFile::ImageSGIFile (UByte* ptr, long filesize) : ImageFile ()
 {
+	(void)filesize;
 	status=IFE_BadFormat;
 	RGBPixel *bufPtr=NULL;	//Where the result should go
-	ULong t=filesize;
 	if(readHeader(ptr,3))
 	{
 		set_dimensions(header.XSize,header.YSize);
