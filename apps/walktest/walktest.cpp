@@ -599,7 +599,7 @@ void WalkTest::DrawFrameConsole ()
 }
 
 
-void WalkTest::DrawFrame3D (int drawflags, cs_time current_time)
+void WalkTest::DrawFrame3D (int drawflags, cs_time /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things
   if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | drawflags
@@ -1208,11 +1208,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   const char* p = Config->GetStr ("WalkTest", "COLLDET_PLUGIN",
   	"crystalspace.colldet.rapid");
   collide_system = LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
+  /*
   if (!collide_system)
   {
     Printf (MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
     return false;
   }
+  */
 
   // Initialize the command processor with the engine and camera.
   csCommandProcessor::Initialize (engine, view->GetCamera (), Gfx3D, System->Console, System);
@@ -1506,6 +1508,7 @@ void handler (int sig)
 
 void init_sig ()
 {
+  return;
 #ifndef DO_COREDUMP
   signal (SIGHUP, handler);
   signal (SIGINT, handler);
