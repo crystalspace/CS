@@ -144,4 +144,3 @@ void csTextureManagerInfinite::UnregisterTexture (iTextureHandle* handle)
   int idx = textures.Find (tex_mm);
   if (idx >= 0) textures.Delete (idx);
 }
-

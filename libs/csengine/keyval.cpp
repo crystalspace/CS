@@ -20,89 +20,81 @@
 #include "csengine/keyval.h"
 #include "csengine/sector.h"
 
-
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csKeyValuePair,csObject);
 
-csKeyValuePair::csKeyValuePair(const char* Key, const char* Value)
+csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
 {
-  SetName(Key);
+  SetName (Key);
   m_Value = strnew (Value);
 }
 
-csKeyValuePair::~csKeyValuePair()
+csKeyValuePair::~csKeyValuePair ()
 {
   delete [] m_Value;
 }
 
-const char* csKeyValuePair::GetValue(csObject* pObject, const char* key)
+const char *csKeyValuePair::GetValue (csObject *pObject, const char *key)
 {
-  csKeyValueIterator Iter(pObject);
-  if (Iter.FindKey(key))
-  {
-    return Iter.GetPair()->GetValue();
-  }
-    
+  csKeyValueIterator Iter (pObject);
+  if (Iter.FindKey (key))
+    return Iter.GetPair ()->GetValue ();
   return "";
 }
 
 //---------------------------------------------------------------------------
 
-csKeyValueIterator::csKeyValueIterator(const csObject* pObject)
-  : m_Iterator(csKeyValuePair::Type, *pObject)
+csKeyValueIterator::csKeyValueIterator (const csObject *pObject)
+  : m_Iterator (csKeyValuePair::Type, *pObject)
 {
 }
 
-csKeyValueIterator::~csKeyValueIterator()
+csKeyValueIterator::~csKeyValueIterator ()
 {
 }
 
-void csKeyValueIterator::Reset(const csObject* pObject)
+void csKeyValueIterator::Reset (const csObject* pObject)
 {
-  m_Iterator.Reset(csKeyValuePair::Type, *pObject);
+  m_Iterator.Reset (csKeyValuePair::Type, *pObject);
 }
 
-csKeyValuePair* csKeyValueIterator::GetPair()
+csKeyValuePair *csKeyValueIterator::GetPair ()
 {
-  return (csKeyValuePair*) m_Iterator.GetObj();
+  return (csKeyValuePair *) m_Iterator.GetObj ();
 }
 
-void csKeyValueIterator::Next()
+void csKeyValueIterator::Next ()
 {
-  m_Iterator.Next();
+  m_Iterator.Next ();
 }
 
 bool csKeyValueIterator::IsFinished () const
 {
-  return m_Iterator.IsFinished();
+  return m_Iterator.IsFinished ();
 }
 
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csMapNode,csObject);
 
-csMapNode::csMapNode(const char* Name)
-  : m_Position(0,0,0)
+csMapNode::csMapNode (const char* Name) : m_Position (0, 0, 0)
 {
-  SetName(Name);
+  SetName (Name);
 }
 
-csMapNode::~csMapNode()
+csMapNode::~csMapNode ()
 {
 }
 
-csMapNode* csMapNode::GetNode(csSector*   pSector, 
-                              const char* name, 
-                              const char* classname)
+csMapNode* csMapNode::GetNode (csSector *pSector, const char* name,
+  const char* classname)
 {
-  for (csNodeIterator Iter(pSector, classname); !Iter.IsFinished(); Iter.Next())
+  for (csNodeIterator Iter (pSector, classname); !Iter.IsFinished (); Iter.Next ())
   {
-    csMapNode* pNode = Iter.GetNode();
-    if (strcmp(pNode->GetName(), name)==0)
-    {
+    csMapNode *pNode = Iter.GetNode ();
+    if (strcmp (pNode->GetName (), name) == 0)
       return pNode;
-    }
   }
 
   return NULL;
@@ -110,74 +102,65 @@ csMapNode* csMapNode::GetNode(csSector*   pSector,
 
 //---------------------------------------------------------------------------
 
-csNodeIterator::csNodeIterator(const csSector* pSector, const char* classname)
-  : m_Iterator(csMapNode::Type, *pSector), 
-    m_Classname(classname),
-    m_pCurrentNode(NULL)
+csNodeIterator::csNodeIterator (const csSector* pSector, const char* classname)
+  : m_Iterator (csMapNode::Type, *pSector), m_Classname (classname),
+    m_pCurrentNode (NULL)
 {
-  SkipWrongClassname();
-  if (!m_Iterator.IsFinished())
+  SkipWrongClassname ();
+  if (!m_Iterator.IsFinished ())
   {
-    m_pCurrentNode = (csMapNode*) m_Iterator.GetObj();
-    m_Iterator.Next();
-    SkipWrongClassname();
+    m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
+    m_Iterator.Next ();
+    SkipWrongClassname ();
   }
 }
   
-csNodeIterator::~csNodeIterator()
+csNodeIterator::~csNodeIterator ()
 {
 }
 
-void csNodeIterator::Reset(const csSector* pSector, const char* classname)
+void csNodeIterator::Reset (const csSector *pSector, const char *classname)
 {
-  m_Iterator.Reset(csMapNode::Type, *pSector);
-  m_Classname=classname;
-  SkipWrongClassname();
-  if (m_Iterator.IsFinished())
-  {
+  m_Iterator.Reset (csMapNode::Type, *pSector);
+  m_Classname = classname;
+  SkipWrongClassname ();
+  if (m_Iterator.IsFinished ())
     m_pCurrentNode = NULL;
-  }
   else
   {
-    m_pCurrentNode = (csMapNode*) m_Iterator.GetObj();
-    m_Iterator.Next();
-    SkipWrongClassname();
+    m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
+    m_Iterator.Next ();
+    SkipWrongClassname ();
   }
 }
 
-csMapNode* csNodeIterator::GetNode()
+csMapNode *csNodeIterator::GetNode ()
 {
   return m_pCurrentNode;
 }
 
-void csNodeIterator::Next()
+void csNodeIterator::Next ()
 {
-  m_pCurrentNode = (csMapNode*) m_Iterator.GetObj();
-  m_Iterator.Next();
-  SkipWrongClassname();
+  m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
+  m_Iterator.Next ();
+  SkipWrongClassname ();
 }
 
 bool csNodeIterator::IsFinished () const
 {
-  return m_Iterator.IsFinished();
+  return m_Iterator.IsFinished ();
 }
 
-void csNodeIterator::SkipWrongClassname()
+void csNodeIterator::SkipWrongClassname ()
 {
   if (m_Classname)
-  {
-    while (!m_Iterator.IsFinished())
+    while (!m_Iterator.IsFinished ())
     {
-      csMapNode* pNode = GetNode();
-      const char* Nodeclass = csKeyValuePair::GetValue(pNode, "classname");
-      if (strcmp(Nodeclass, m_Classname) != 0)
-      {
-        m_Iterator.Next();
-      }
+      csMapNode *pNode = GetNode ();
+      const char *Nodeclass = csKeyValuePair::GetValue (pNode, "classname");
+      if (strcmp (Nodeclass, m_Classname) != 0)
+        m_Iterator.Next ();
       else
-      {
         return;
-      }
     }
-  }
 }

@@ -23,6 +23,8 @@
 #include "csengine/dumper.h"
 #include "csengine/halo.h"
 #include "csengine/camera.h"
+#include "csengine/campos.h"
+#include "csengine/keyval.h"
 #include "csengine/light.h"
 #include "csengine/dynlight.h"
 #include "csengine/polyplan.h"
@@ -196,13 +198,12 @@ EXPORT_CLASS_TABLE (engine)
     "Crystal Space 3D Engine", "crystalspace.kernel., crystalspace.graphics3d.")
 EXPORT_CLASS_TABLE_END
 
-csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
+csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   do_lighting_cache = true;
   first_dyn_lights = NULL;
-  start_sector = NULL;
   System = NULL;
   VFS = NULL;
   G3D = NULL;
@@ -331,6 +332,7 @@ void csWorld::Clear ()
   sectors.DeleteAll ();
   particle_systems.DeleteAll ();
   CLights::DeleteAll ();
+  camera_positions.DeleteAll ();
   int i;
   for (i = 0 ; i < planes.Length () ; i++)
   {
@@ -346,7 +348,6 @@ void csWorld::Clear ()
     CHK (delete first_dyn_lights);
     first_dyn_lights = dyn;
   }
-  CHK (delete [] start_sector); start_sector = NULL;
   CHK (delete textures); textures = NULL;
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
@@ -1449,7 +1450,7 @@ void csWorld::DeleteAll ()
   Clear ();
 }
 
-bool csWorld::RegisterTexture (const char *iName, const char *iFileName,
+bool csWorld::CreateTexture (const char *iName, const char *iFileName,
   csColor *iTransp, int iFlags)
 {
   // First of all, load the image file
@@ -1477,7 +1478,12 @@ bool csWorld::RegisterTexture (const char *iName, const char *iFileName,
   delete [] xname;
 
   // Okay, now create the respective texture handle object
-  csTextureHandle *tex = GetTextures ()->NewTexture (ifile);
+  csTextureHandle *tex = GetTextures ()->FindByName (iName);
+  if (tex)
+    tex->SetImageFile (ifile);
+  else
+    tex = GetTextures ()->NewTexture (ifile);
+
   tex->flags = iFlags;
   tex->SetName (iName);
 
@@ -1488,5 +1494,33 @@ bool csWorld::RegisterTexture (const char *iName, const char *iFileName,
     tex->SetTransparent (QInt (iTransp->red * 255.2),
       QInt (iTransp->green * 255.2), QInt (iTransp->blue * 255.2));
 
+  return true;
+}
+
+bool csWorld::CreateCamera (const char *iName, const char *iSector,
+  const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward)
+{
+  csCameraPosition *cp = (csCameraPosition *)camera_positions.FindByName (iName);
+  if (cp)
+    cp->Set (iSector, iPos, iForward, iUpward);
+  else
+    camera_positions.Push (new csCameraPosition (iName, iSector,
+      iPos, iForward, iUpward));
+
+  return true;
+}
+
+bool csWorld::CreateKey (const char *iName, const char *iValue)
+{
+  ObjAdd (new csKeyValuePair (iName, iValue));
+  return true;
+}
+
+bool csWorld::CreatePlane (const char *iName, const csVector3 &iOrigin,
+  const csMatrix3 &iMatrix)
+{
+  csPolyTxtPlane *ppl = new csPolyTxtPlane ();
+  ppl->SetName (iName);
+  ppl->SetTextureSpace (iMatrix, iOrigin);
   return true;
 }

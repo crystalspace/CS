@@ -34,6 +34,14 @@
 #include "iworld.h"
 #include "ivfs.h"
 
+// This character, if encountered, is considered to start either a keyword
+// or a non-quoted string. Having too much symbols here can hurt since these
+// symbols will not be interpreted as terminal symbols, but rather as strings.
+#define FIRST_KEYWORD_CHAR "_/!@$#~"
+// These characters can be in the continuation of a keyword/unquoted string
+// but not at the beginning of it
+#define NEXT_KEYWORD_CHAR ".*+-"
+
 //------------------------------------------------------- Helper functions -----
 
 #define KEYWORD_PREFIX		"KW_"
@@ -185,7 +193,9 @@ bool csStandardLoader::Load (const char *iName)
   if (csw_valid)
   {
     data = vfs->ReadFile (fnw, size);
-    if (!data) csw_valid = false;
+    if (!data
+     || get_le_long (data) != PARSER_VERSION)
+      csw_valid = false;
   }
   if (!csw_valid)
   {
@@ -244,7 +254,7 @@ bool csStandardLoader::Parse (char *iData)
 csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
 {
   csTokenList output = (csTokenList)malloc (oSize = 256);
-  int cur = sizeof (long), prev = -1, prevprev = -1;
+  int cur = sizeof (long) * 2, prev = -1, prevprev = -1;
 
   if (!lineoffs) lineoffs = new csVector ();
   if (!strings) strings = new csStringList ();
@@ -272,7 +282,7 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
       (*iData == 0) ? ltkEOF :
       *iData == '+' || *iData == '-' || *iData == '.' || isdigit (*iData) ? ltkNUMBER :
       *iData == '\'' || *iData == '"' ? ltkSTRING :
-      isalpha (*iData) || *iData == '/' ? ltkKEYWORD :
+      isalpha (*iData) || strchr (FIRST_KEYWORD_CHAR, *iData) ? ltkKEYWORD :
       ltkSYMBOL;
 
     if (token == ltkEOF)
@@ -304,7 +314,8 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
       else if (token == ltkKEYWORD)
       {
         // Check for end of keyword
-        if (!isalnum (*iData) && (*iData != '_') && (*iData != '/') && (*iData != '.'))
+        if (!isalnum (*iData)
+         && !strchr (FIRST_KEYWORD_CHAR NEXT_KEYWORD_CHAR, *iData))
           break;
       }
       else
@@ -468,7 +479,8 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
   }
 
   // Put the string table at the end of token table
-  set_le_long (output, cur);
+  set_le_long (output, PARSER_VERSION);
+  set_le_long (output + sizeof (long), cur);
   for (int i = 0; i < strings->Length (); i++)
   {
     size_t len = strlen (strings->Get (i)) + 1;
@@ -496,9 +508,9 @@ bool csStandardLoader::yyinit (csTokenList iInput, size_t iSize)
   if (!strings) strings = new csStringList ();
 
   // Get the string table
-  size_t stofs = get_le_long (iInput);
-  bytesleft = stofs - sizeof (long);
-  startinput = input = iInput + sizeof (long);
+  size_t stofs = get_le_long (iInput + sizeof (long));
+  bytesleft = stofs - sizeof (long) * 2;
+  startinput = input = iInput + sizeof (long) * 2;
   if (stofs < iSize) iInput [iSize - 1] = 0;
   while (stofs < iSize)
   {
@@ -546,7 +558,7 @@ int csStandardLoader::yylex (void *lval)
 {
   YYSTYPE *yylval = (YYSTYPE *)lval;
   // Remember the position of last token in the case we'll need to display error
-  ofs = input - (startinput - sizeof (long));
+  ofs = input - (startinput - sizeof (long) * 2);
 
   UByte th;
   if (curtoken && curtokencount)
@@ -690,7 +702,111 @@ bool csStandardLoader::CreateTexture ()
   }
 
   // Now tell the engine to register the respective texture
-  return world->RegisterTexture (new_name, storage.tex.filename,
+  return world->CreateTexture (new_name, storage.tex.filename,
     storage.tex.do_transp ? (csColor *)&storage.tex.transp : NULL,
     storage.tex.flags);
+}
+
+void csStandardLoader::InitCamera (char *name)
+{
+  storage.camera.name = name;
+  storage.camera.sector = NULL;
+  storage.camera.pos.Set (0, 0, 0);
+  storage.camera.forward.Set (0, 0, 1);
+  storage.camera.upward.Set (0, 1, 0);
+}
+
+bool csStandardLoader::CreateCamera ()
+{
+  if (!storage.camera.name || !storage.camera.sector)
+  {
+    if (!storage.camera.name)
+      yyerror ("no camera name defined!");
+    if (!storage.camera.sector)
+      yyerror ("no camera sector defined!");
+    return false;
+  }
+
+  return world->CreateCamera (storage.camera.name, storage.camera.sector,
+    (csVector3 &)storage.camera.pos, (csVector3 &)storage.camera.forward,
+    (csVector3 &)storage.camera.upward);
+}
+
+bool csStandardLoader::CreateKey (const char *name, const char *value)
+{
+  if (!name)
+  {
+    yyerror ("no key name defined!");
+    return false;
+  }
+  return world->CreateKey (name, value);
+}
+
+bool csStandardLoader::PlaneMode (csPPlaneMode mode)
+{
+  if ((storage.plane.mode != pmNONE)
+   && (storage.plane.mode != mode)
+   && !(storage.plane.mode == pmFIRSTSECOND && mode == pmVECTORS))
+  {
+    yyerror ("invalid plane definition");
+    return false;
+  }
+  if (storage.plane.mode != mode)
+  {
+    storage.plane.first_len = storage.plane.second_len = 0.0;
+    storage.plane.mode = mode;
+  }
+  return true;
+}
+
+bool csStandardLoader::CreatePlane (const char *name)
+{
+  if (!name)
+  {
+    yyerror ("unnamed planes not allowed in global context");
+    return false;
+  }
+
+  csVector3 &o = (csVector3 &)storage.plane.origin;
+  csVector3 &f = (csVector3 &)storage.plane.first;
+  csVector3 &s = (csVector3 &)storage.plane.second;
+  csMatrix3 &m = (csMatrix3 &)storage.plane.matrix;
+
+  switch (storage.plane.mode)
+  {
+    case pmNONE:
+      yyerror ("empty plane definition");
+      return false;
+    case pmFIRSTSECOND:
+    case pmVECTORS:
+      if (storage.plane.first_len == 0.0)
+      {
+        yyerror ("no FIRST vector defined");
+        return false;
+      }
+      if (storage.plane.second_len == 0.0)
+      {
+        yyerror ("no SECOND vector defined");
+        return false;
+      }
+      if (storage.plane.mode == pmFIRSTSECOND)
+      {
+        f -= o; s -= o;
+        float fact = storage.plane.first_len / f.Norm ();
+        f *= fact;
+        fact = storage.plane.second_len / s.Norm ();
+        s *= fact;
+      }
+      {
+        csVector3 z = f % s;
+        m.Set (f.x, s.x, z.x,
+               f.y, s.y, z.y,
+               f.z, s.z, z.z);
+      }
+      break;
+    case pmMATRIX:
+      break;
+  }
+
+  return world->CreatePlane (name, o, m);
 }

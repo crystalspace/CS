@@ -30,6 +30,7 @@
 #include "csparser/csloader.h"
 #include "csgeom/frustrum.h"
 #include "csengine/dumper.h"
+#include "csengine/campos.h"
 #include "csengine/csview.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
@@ -45,6 +46,7 @@
 #include "csengine/world.h"
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
+#include "csengine/keyval.h"
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
 #include "csengine/collider.h"
@@ -1113,13 +1115,22 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     }
 
     // Look for the start sector in this world.
-    char* strt = (char*)(world->start_sector ? world->start_sector : "room");
-    room = (csSector*)world->sectors.FindByName (strt);
+    csCameraPosition *cp = (csCameraPosition *)world->camera_positions.FindByName ("Start");
+    const char *room_name;
+    if (cp)
+    {
+      room_name = cp->Sector;
+      if (!cp->Load (*view->GetCamera (), world))
+        room_name = "room";
+    }
+    else
+      room_name = "room";
+
+    room = (csSector *)world->sectors.FindByName (room_name);
     if (!room)
     {
-      Printf (MSG_FATAL_ERROR,
-          "World file does not contain a room called '%s' which is used\nas a starting point!\n",
-	  strt);
+      Printf (MSG_FATAL_ERROR,  "World file does not contain a room called '%s'"
+        " which is used\nas a starting point!\n", room_name);
       return false;
     }
   }
@@ -1156,7 +1167,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // Initialize our 3D view.
   view->SetSector (room);
-  view->GetCamera ()->SetPosition (world->start_vec);
   // We use the width and height from the 3D renderer because this
   // can be different from the frame size (rendering in less res than
   // real window for example).

@@ -444,6 +444,3 @@ csGraphics2DInfinite::~csGraphics2DInfinite ()
 {
   Close();
 }
-
-
-

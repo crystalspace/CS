@@ -330,10 +330,6 @@ csSystemDriver::~csSystemDriver ()
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
-  // Increment our reference count to not get dumped when
-  // someone will do an IncRef() and then an DecRef().
-  IncRef ();
-
   // Initialize configuration file
   if (iConfigName)
     CHKB (Config = new csIniFile (ConfigName = strnew (iConfigName)))

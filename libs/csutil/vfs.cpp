@@ -551,7 +551,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
   {
-    if ((fh=Archive->NewFile(NameSuffix, 0, !(Mode & VFS_FILE_UNCOMPRESSED))))
+    if ((fh = Archive->NewFile (NameSuffix, 0, !(Mode & VFS_FILE_UNCOMPRESSED))))
     {
       Error = VFS_STATUS_OK;
       Archive->Writing++;
@@ -1086,11 +1086,12 @@ csVFS::~csVFS ()
   CHK (delete config);
   CHK (delete [] cwd);
   CHK (delete ArchiveCache);
+  if (System) System->DecRef ();
 }
 
 bool csVFS::Initialize (iSystem *iSys)
 {
-  System = iSys;
+  (System = iSys)->IncRef ();
   if (!System->RegisterDriver ("iVFS", this))
     return false;
 
@@ -1390,13 +1391,15 @@ char *csVFS::ReadFile (const char *FileName, size_t &Size)
     return data;
   }
 
-  CHK (data = new char [Size]);
+  CHK (data = new char [Size + 1]);
   if (!data)
   {
     F->DecRef ();
     return NULL;
   }
 
+  // Make the file zero-terminated in the case we'll use it as an ASCIIZ string
+  data [Size] = 0;
   if (F->Read (data, Size) != Size)
   {
     CHK (delete [] data);

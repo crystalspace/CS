@@ -82,7 +82,7 @@ void TextureTrans::compute_texture_space (
   csVector3 v_v = (v2-v_orig) * len2 / l2;
   csVector3 v_w = v_u % v_v;
   compute_texture_space (m, v,
-  	v_orig.x, v_orig.y, v_orig.z,
+	v_orig.x, v_orig.y, v_orig.z,
 	v_u.x, v_u.y, v_u.z,
 	v_v.x, v_v.y, v_v.z,
 	v_w.x, v_w.y, v_w.z);

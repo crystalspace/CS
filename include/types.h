@@ -16,12 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CS_TYPES_H__
+#define __CS_TYPES_H__
+
 #ifndef __SYSDEFS_H__
 #error "sysdef.h must be included in EVERY source file!"
 #endif
-
-#ifndef __CS_TYPES_H
-#define __CS_TYPES_H
 
 #include "platform.h"
 #include <float.h>
@@ -54,4 +54,4 @@ typedef signed int SInt; 	// Signed int value (16..32 bit)
 
 typedef unsigned long CS_ID;    // Used for uniquely generated id numbers 
 
-#endif // __CS_TYPES_H
+#endif // __CS_TYPES_H__

@@ -17,12 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CSBASE_H__
+#define __CSBASE_H__
+
 #ifndef __SYSDEFS_H__
 #error "sysdef.h must be included in EVERY source file!"
 #endif
-
-#ifndef __CSBASE_H__
-#define __CSBASE_H__
 
 /**
  * Base class, all other classes should be derived from this.

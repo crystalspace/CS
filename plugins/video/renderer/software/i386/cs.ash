@@ -27,11 +27,11 @@
 
 ; Define macros for switching to code, data and bss segments
 %ifidni __OUTPUT_FORMAT__,obj
-		segment	TEXT32 use32 align=4 class=CODE
-		segment	DATA32 use32 align=4 class=DATA
-		segment	BSS32  use32 align=4 class=BSS
-		group	FLAT
-		group	DGROUP BSS32 DATA32
+		segment	TEXT32 use32 align=4 class=CODE flat
+		segment	DATA32 use32 align=4 class=DATA flat
+		segment	BSS32  use32 align=4 class=BSS flat
+;		group	FLAT
+;		group	DGROUP BSS32 DATA32
 		%xdefine __TEXT_SECT__	segment TEXT32
 		%xdefine __DATA_SECT__	segment DATA32
 		%xdefine __BSS_SECT__	segment BSS32

@@ -17,12 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __PLANE3_H__
+#define __PLANE3_H__
+
 #ifndef __SYSDEFS_H__
 #error "sysdef.h must be included in EVERY source file!"
 #endif
-
-#ifndef PLANE3_H
-#define PLANE3_H
 
 #if defined(COMP_VC) && defined(DO_ASM)
 #include "csgeom/vc_asm.inc"
@@ -112,4 +112,4 @@ public:
   }
 };
 
-#endif // PLANE3_H
+#endif // __PLANE3_H__

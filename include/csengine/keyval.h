@@ -18,10 +18,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KEYVAL_H
-#define KEYVAL_H
+#ifndef __KEYVAL_H__
+#define __KEYVAL_H__
 
-#include "csgeom/math3d.h"
+#include "csgeom/vector3.h"
 #include "csobject/csobject.h"
 #include "csobject/nobjvec.h"
 
@@ -36,19 +36,19 @@ public:
   /// The constructor. Requires both key and value. Data is being copied!
   csKeyValuePair (const char* Key, const char* Value);
   /// The destructor as usual
-  ~csKeyValuePair ();
+  virtual ~csKeyValuePair ();
 
   /// Get the key string of the pair.
-  const char* GetKey () const { return GetName (); }
+  const char *GetKey () const { return GetName (); }
 
   /// Get the value string of the pair
-  const char* GetValue () const { return m_Value; }
+  const char *GetValue () const { return m_Value; }
 
   /// Get the value of a key in an object. (shortcut)
-  static const char* GetValue (csObject* pObject, const char* key);
+  static const char *GetValue (csObject *pObject, const char *key);
 
 private:
-  char* m_Value;
+  char *m_Value;
   CSOBJTYPE;
 };
 
@@ -64,15 +64,15 @@ public:
   ~csKeyValueIterator ();
 
   /// Reuse the iterator for an other search
-  void Reset (const csObject* pObject);
+  void Reset (const csObject *pObject);
   /// Get the object we are pointing at
-  csKeyValuePair* GetPair ();
+  csKeyValuePair *GetPair ();
   /// Move forward
   void Next ();
   /// Check if there are other keys
   bool IsFinished () const;
   /// Search for a key
-  bool FindKey (const char* Name) { return m_Iterator.FindName(Name); }
+  bool FindKey (const char *Name) { return m_Iterator.FindName (Name); }
 
 protected:
   csObjIterator m_Iterator;
@@ -85,27 +85,26 @@ class csMapNode : public csObject
 {
 public:
   /// The constructor. Requires the Nodes name!
-  csMapNode (const char* Name);
+  csMapNode (const char *Name);
   /// The destructor as usual
-  ~csMapNode ();
+  virtual ~csMapNode ();
 
   ///
-  void      SetPosition (const csVector3& pos) { m_Position = pos; }
+  void SetPosition (const csVector3& pos) { m_Position = pos; }
   ///
   const csVector3& GetPosition () { return m_Position; }
 
   ///
-  void      SetSector (csSector* pSector) { m_pSector = pSector; }
+  void SetSector (csSector *pSector) { m_pSector = pSector; }
   ///
-  csSector* GetSector () { return m_pSector; }
+  csSector *GetSector () { return m_pSector; }
 
   /// Get a node with the given name and a given classname. (shortcut)
-  static csMapNode* GetNode (csSector*   pSector, 
-                             const char* name,
-                             const char* classname=NULL);
+  static csMapNode *GetNode (csSector *pSector, const char *name,
+    const char *classname = NULL);
 
 private:
-  csSector* m_pSector;
+  csSector *m_pSector;
   csVector3 m_Position;
   CSOBJTYPE;
 };
@@ -119,23 +118,23 @@ public:
   /**
    * The constructor. Theorectially, we could handle any csObject, but
    * that doesn't make sense for the current implementation, so we 
-   * restrict it to csObject to abvoid some pitfalls.<p>
-   * 
-   * if a classname is given, search is restricted to nodes, in which
+   * restrict it to csSector to avoid some pitfalls.<p>
+   *
+   * If a classname is given, search is restricted to nodes, in which
    * the key "classname" has the same value as the given classname.
    * the classname string is _not_ duplicated, so the caller is
    * responsible to take care, that the string is available while
    * the Iterator is alive.
    */
-  csNodeIterator (const csSector* pSector, const char* classname=NULL);
-  
+  csNodeIterator (const csSector *pSector, const char *classname = NULL);
+
   /// The destructor as usual
   ~csNodeIterator ();
 
   /// Reuse the iterator for an other search
-  void Reset (const csSector* pSector, const char* classname=NULL);
+  void Reset (const csSector *pSector, const char *classname = NULL);
   /// Get the object we are pointing at
-  csMapNode* GetNode ();
+  csMapNode *GetNode ();
   /// Move forward
   void Next ();
   /// Check if there are other nodes
@@ -145,9 +144,9 @@ protected:
   /// Skip all nodes with wrong classname
   void SkipWrongClassname ();
 
-  csObjIterator   m_Iterator;
-  const char*     m_Classname;
-  csMapNode*      m_pCurrentNode;
+  csObjIterator m_Iterator;
+  const char *m_Classname;
+  csMapNode *m_pCurrentNode;
 };
 
-#endif /*KEYVAL_H*/
+#endif // __KEYVAL_H__

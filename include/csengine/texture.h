@@ -56,6 +56,8 @@ public:
   /// Get the texture handle.
   iTextureHandle* GetTextureHandle () { return handle; }
 
+  /// Change the base iImage
+  void SetImageFile (iImage *Image);
   /// Get the iImage.
   iImage* GetImageFile () { return image; }
 

@@ -24,6 +24,7 @@
 #include "iplugin.h"
 
 class csWorld;
+class csVector3;
 class csColor;
 
 SCF_VERSION (iWorld, 0, 1, 0);
@@ -52,8 +53,16 @@ struct iWorld : public iPlugIn
   virtual void DeleteAll () = 0;
 
   /// Register a texture to be loaded during Prepare()
-  virtual bool RegisterTexture (const char *iName, const char *iFileName,
+  virtual bool CreateTexture (const char *iName, const char *iFileName,
     csColor *iTransp, int iFlags) = 0;
+  /// Create a named camera position object
+  virtual bool CreateCamera (const char *iName, const char *iSector,
+    const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward) = 0;
+  /// Create a key/value pair object
+  virtual bool CreateKey (const char *iName, const char *iValue) = 0;
+  /// Create a texture plane
+  virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
+    const csMatrix3 &iMatrix) = 0;
 };
 
 #endif // __IWORLD_H__

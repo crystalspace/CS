@@ -17,12 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __MATRIX3_H__
+#define __MATRIX3_H__
+
 #ifndef __SYSDEFS_H__
 #error "sysdef.h must be included in EVERY source file!"
 #endif
-
-#ifndef MATRIX3_H
-#define MATRIX3_H
 
 #if defined(COMP_VC) && defined(DO_ASM)
 #include "csgeom/vc_asm.inc"
@@ -46,8 +46,8 @@ public:
 
   /// Construct a matrix and initialize it.
   csMatrix3 (float m11, float m12, float m13,
-  	    float m21, float m22, float m23,
-  	    float m31, float m32, float m33);
+             float m21, float m22, float m23,
+             float m31, float m32, float m33);
 
   /// Get the first row of this matrix as a vector.
   inline csVector3 Row1() const { return csVector3 (m11,m12,m13); }
@@ -228,4 +228,4 @@ public:
   csZScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler) {}
 };
 
-#endif // MATRIX3_H
+#endif // __MATRIX3_H__

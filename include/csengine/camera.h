@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef __CAMERA_H__
+#define __CAMERA_H__
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
@@ -275,4 +275,4 @@ private:
 #define GetICameraFromCamera(a)  &a->m_xCamera
 #define GetCameraFromICamera(a)  ((csCamera*)((size_t)a - offsetof(csCamera, m_xCamera)))
 
-#endif /*CAMERA_H*/
+#endif __CAMERA_H__

@@ -17,12 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __VECTOR3_H__
+#define __VECTOR3_H__
+
 #ifndef __SYSDEFS_H__
 #error "sysdef.h must be included in EVERY source file!"
 #endif
-
-#ifndef VECTOR3_H
-#define VECTOR3_H
 
 #if defined(COMP_VC) && defined(DO_ASM)
 #include "csgeom/vc_asm.inc"
@@ -243,4 +243,4 @@ public:
   void Normalize ();
 };
 
-#endif // VECTOR3_H
+#endif // __VECTOR3_H__

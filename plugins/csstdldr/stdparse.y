@@ -28,10 +28,6 @@
 #include "iworld.h"
 #include "itxtmgr.h"
 
-// Unfortunately we can't make yyparse a member function because of the
-// dumb prototype definition in bison.simple :-(
-//#define yyparse csStandardLoader::yyparse
-
 #define YYPARSE_PARAM ldr
 #define THIS	((csStandardLoader *)ldr)
 #define yyerror THIS->yyerror
@@ -48,6 +44,11 @@
 // More shortcuts
 #define STORAGE		THIS->storage
 #define TEX		THIS->storage.tex
+#define CAMERA		THIS->storage.camera
+#define PLANE		THIS->storage.plane
+
+#define ABORTMSG \
+  { yyerror ("syntax error, loading aborted"); YYABORT; }
 
 %} /* Definition for all tokens */
 
@@ -79,9 +80,9 @@
   // A color
   csPColor color;
   // A 2D point
-  struct { float x, y; } vect2;
+  csPVector2 vect2;
   // A 3D point
-  struct { float x, y, z; } vect;
+  csPVector3 vect;
   // A transformation matrix
   csMatrix3 *matrix;
   // A transformation matrix/vector
@@ -107,8 +108,7 @@
 %token KW_BECOMING_ACTIVE
 %token KW_BECOMING_INACTIVE
 %token KW_BEZIER
-%token KW_CEILING
-%token KW_CEIL_TEXTURE
+%token KW_CAMERA
 %token KW_CENTER
 %token KW_CIRCLE
 %token KW_CLIP
@@ -122,26 +122,20 @@
 %token KW_CURVECONTROL
 %token KW_CURVESCALE
 %token KW_DETAIL
-%token KW_DIM
 %token KW_DITHER
 %token KW_DYNAMIC
 %token KW_F
 %token KW_FILE
-%token KW_FILTER
 %token KW_FIRST
 %token KW_FIRST_LEN
 %token KW_FLATCOL
-%token KW_FLOOR
-%token KW_FLOOR_CEIL
-%token KW_FLOOR_HEIGHT
-%token KW_FLOOR_TEXTURE
 %token KW_FOG
 %token KW_FOR_2D
 %token KW_FOR_3D
+%token KW_FORWARD
 %token KW_FRAME
 %token KW_GOURAUD
 %token KW_HALO
-%token KW_HEIGHT
 %token KW_HEIGHTMAP
 %token KW_IDENTITY
 %token KW_KEY
@@ -172,7 +166,6 @@
 %token KW_PRIMARY_ACTIVE
 %token KW_PRIMARY_INACTIVE
 %token KW_RADIUS
-%token KW_ROOM
 %token KW_ROT
 %token KW_ROT_X
 %token KW_ROT_Y
@@ -187,12 +180,10 @@
 %token KW_SECONDARY_INACTIVE
 %token KW_SECOND_LEN
 %token KW_SECTOR
-%token KW_SIXFACE
 %token KW_SKELETON
 %token KW_SKYDOME
 %token KW_SOUND
 %token KW_SOUNDS
-%token KW_SPLIT
 %token KW_SPRITE
 %token KW_SPRITE2D
 %token KW_START
@@ -216,6 +207,7 @@
 %token KW_TRANSPARENT
 %token KW_TRIANGLE
 %token KW_TRIGGER
+%token KW_UPWARD
 %token KW_UV
 %token KW_UVA
 %token KW_UVEC
@@ -237,6 +229,11 @@
 %token KW_linear
 %token KW_inverse
 %token KW_realistic
+
+/* This should be the last keyword.
+ * It is used to check the version of tokenized binary files
+ */
+%token PARSER_VERSION
 
 /* Terminal symbols not recognized as keywords by yylex() */
 %token <string>	STRING	/* A string ('string' or without quotes) */
@@ -282,28 +279,34 @@ world_op:
   { if (!THIS->RecursiveLoad ($3)) YYABORT; }
 | KW_SOUNDS '(' sounds ')'
   { printf ("SOUNDS\n"); }
-| KW_START '(' start ')'
-  { printf ("START\n"); }
+| KW_START '(' STRING ',' vector ')'
+  {
+    if (!THIS->world->CreateCamera ("Start", $3,
+      (csVector3 &)$5, csVector3 (0, 0, 1), csVector3 (0, 1, 0)))
+      YYABORT;
+  }
+| KW_CAMERA name '('
+  { THIS->InitCamera ($2); }
+  camera_ops ')'
+  { if (!THIS->CreateCamera ()) YYABORT; }
+| KW_PLANE name '('
+  { PLANE.mode = pmNONE; }
+  plane_ops ')'
+  { if (!THIS->CreatePlane ($2)) YYABORT; }
 | KW_SECTOR name '(' sector_ops ')'
   { printf ("SECTOR [%s]\n", $2); }
-| KW_PLANE name '(' plane_ops ')'
-  { printf ("PLANE [%s]\n", $2); }
-| KW_KEY name '(' key ')'
-  { printf ("KEY [%s]\n", $2); }
+| KW_KEY name '(' STRING ')'
+  { if (!THIS->CreateKey ($2, $4)) YYABORT; }
 | KW_COLLECTION name '(' collection_ops ')'
   { printf ("COLLECTION [%s]\n", $2); }
 | KW_SCRIPT name '(' STRING ':' STRING ')'
   { printf ("SCRIPT '%s' (%s: %s)\n", $2, $4, $6); }
-| KW_LIGHTX name '(' lightx ')'
+| KW_LIGHTX name '(' lightx_ops ')'
   { printf ("LIGHTX [%s]\n", $2); }
 | KW_THING name '(' thing_tpl_ops ')'
   { printf ("THING_tpl [%s]\n", $2); }
 | KW_SPRITE name '(' sprite_tpl_ops ')'
   { printf ("SPRITE [%s]\n", $2); }
-| KW_ROOM name '(' room_ops ')'
-  { printf ("ROOM [%s]\n", $2); }
-| KW_SIXFACE name '(' sixface_tpl_ops ')'
-  { printf ("SIXFACE [%s]\n", $2); }
 ;
 
 /*--------*/
@@ -314,10 +317,10 @@ textures:
 ;
 
 texture:
-  KW_TEXTURE name
+  KW_TEXTURE name '('
   { THIS->InitTexture ($2); }
-  '(' texture_ops ')'
-  { if (!THIS->CreateTexture ()) YYABORT; }
+  texture_ops ')'
+  { if (!THIS->CreateTexture ()) ABORTMSG; }
 ;
 
 texture_ops:
@@ -406,8 +409,6 @@ sector_op:
   { printf ("STATBSP ()\n"); }
 | KW_THING name '(' thing_ops ')'
   { printf ("THING '%s' (...)\n", $2); }
-| KW_SIXFACE name '(' sixface_ops ')'
-  { printf ("SIXFACE '%s' (...)\n", $2); }
 | KW_LIGHT name '(' light_ops ')'
   { printf ("LIGHT '%s' (...)\n", $2); }
 | KW_SPRITE name '(' sprite_ops ')'
@@ -459,29 +460,53 @@ plane_ops:
 ;
 
 plane_op:
-  KW_ORIG '(' vect_idx ')'		{ printf ("ORIG (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_FIRST '(' vect_idx ')'		{ printf ("FIRST (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_SECOND '(' vect_idx ')'		{ printf ("SECOND (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_FIRST_LEN '(' NUMBER ')'		{ printf ("FIRST_LEN (%g)\n", $3); }
-| KW_SECOND_LEN '(' NUMBER ')'		{ printf ("SECOND_LEN (%g)\n", $3); }
-| KW_UVEC '(' vector ')'		{ printf ("UVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_VVEC '(' vector ')'		{ printf ("VVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+  KW_ORIG '(' vect_idx ')'
+  {
+    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.origin.Set ($3);
+  }
+| KW_FIRST '(' vect_idx ')'
+  {
+    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.first.Set ($3);
+  }
+| KW_SECOND '(' vect_idx ')'
+  {
+    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.second.Set ($3);
+  }
+| KW_FIRST_LEN '(' NUMBER ')'
+  {
+    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.first_len = $3;
+  }
+| KW_SECOND_LEN '(' NUMBER ')'
+  {
+    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.second_len = $3;
+  }
+| KW_UVEC '(' vector ')'
+  {
+    if (!THIS->PlaneMode (pmVECTORS)) YYABORT;
+    PLANE.first = $3;
+    PLANE.first_len = 1.0;
+  }
+| KW_VVEC '(' vector ')'
+  {
+    if (!THIS->PlaneMode (pmVECTORS)) YYABORT;
+    PLANE.second = $3;
+    PLANE.second_len = 1.0;
+  }
 | KW_MATRIX '(' matrix ')'
   {
-    printf ("MATRIX (\n  %g, %g, %g\n  %g, %g, %g\n  %g, %g, %g\n)\n",
-    $3->m11, $3->m12, $3->m13, $3->m21, $3->m22, $3->m21, $3->m31, $3->m32, $3->m33);
+    if (!THIS->PlaneMode (pmMATRIX)) YYABORT;
+    PLANE.matrix.Set (*$3);
   }
-| KW_V '(' vector ')'			{ printf ("V (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-;
-
-/*--------*/
-
-start:
-;
-
-/*--------*/
-
-key:
+| KW_V '(' vector ')'
+  {
+    if (!THIS->PlaneMode (pmMATRIX)) YYABORT;
+    PLANE.origin.Set ($3);
+  }
 ;
 
 /*--------*/
@@ -506,12 +531,12 @@ collection_op:
 
 /*--------*/
 
-lightx:
+lightx_ops:
   /* empty */
-| lightx lightx_desc
+| lightx_ops lightx_op
 ;
 
-lightx_desc:
+lightx_op:
   KW_ACTIVE '(' NUMBER ')'		{ printf ("ACTIVE (%g)\n", $3); }
 | KW_STATELESS '(' NUMBER ')'		{ printf ("STATELESS (%g)\n", $3); }
 | KW_PRIMARY_ACTIVE '(' NUMBER NUMBER NUMBER NUMBER NUMBER ')'
@@ -663,106 +688,6 @@ sprite_action:
   { printf ("F ('%s', %g)\n", $3, $5); }
 ;
 
-/*--------*/
-
-room_ops:
-  room_op
-| room_ops room_op
-;
-
-room_op:
-  KW_TEXTURE_LIGHTING '(' yesno ')'
-  { printf ("TEXTURE_LIGHTING (%d)\n", $3); }
-| KW_TEXTURE_SCALE '(' NUMBER ')'
-  { printf ("TEXTURE_SCALE (%g)\n", $3); }
-| KW_TEXTURE '(' STRING ')'
-  { printf ("TEXTURE ('%s')\n", $3); }
-| KW_TEX name '(' room_tex_ops ')'
-  { printf ("TEX '%s' (...)\n", $2); }
-| KW_CEIL_TEXTURE '(' STRING ')'
-  { printf ("CEIL_TEXTURE (%s)\n", $3); }
-| KW_FLOOR_TEXTURE '(' STRING ')'
-  { printf ("FLOOR_TEXTURE (%s)\n", $3); }
-| KW_LIGHTX '(' STRING ',' STRING ')'
-  { printf ("LIGHTX ('%s', '%s')\n", $3, $5); }
-| KW_LIGHT '(' light_ops ')'
-  { printf ("LIGHT (...)\n"); }
-| KW_DIM '(' NUMBER NUMBER NUMBER ')'
-  { printf ("DIM (%g, %g, %g)\n", $3, $4, $5); }
-| KW_HEIGHT '(' NUMBER ')'
-  { printf ("HEIGHT (%g)\n", $3); }
-| KW_FLOOR_HEIGHT '(' NUMBER ')'
-  { printf ("FLOOR_HEIGHT (%g)\n", $3); }
-| KW_FLOOR_CEIL '(' '(' vector2 ')' '(' vector2 ')' '(' vector2 ')' '(' vector2 ')' ')'
-  {
-    printf ("FLOOR_CEILING ((%g,%g) (%g,%g) (%g,%g) (%g,%g))\n",
-      $4.x, $4.y, $7.x, $7.y, $10.x, $10.y, $13.x, $13.y);
-  }
-| KW_FLOOR '(' '(' vector ')' '(' vector ')' '(' vector ')' '(' vector ')' ')'
-  {
-    printf ("FLOOR ( (%g,%g,%g) (%g,%g,%g) (%g,%g,%g) (%g,%g,%g) )\n",
-      $4.x, $4.y, $4.z, $7.x, $7.y, $7.z,
-      $10.x, $10.y, $10.z, $13.x, $13.y, $13.z);
-  }
-| KW_CEILING '(' '(' vector ')' '(' vector ')' '(' vector ')' '(' vector ')' ')'
-  { printf ("CEILING ()\n"); }
-| KW_TRIGGER '(' STRING ',' STRING ')'
-  { printf ("TRIGGER (%s, %s)\n", $3, $5); }
-| KW_ACTIVATE '(' STRING ')'
-  { printf ("ACTIVATE (%s)\n", $3); }
-| KW_STATBSP noargs
-  { printf ("STATBSP ()\n"); }
-| KW_MOVE '(' move ')'
-  { printf ("MOVE ()\n"); }
-| KW_SIXFACE name '(' sixface_ops ')'
-  { printf ("SIXFACE [%s]\n", $2); }
-| KW_THING name '(' thing_ops ')'
-  { printf ("THING '%s' (...)\n", $2); }
-| KW_PORTAL '(' room_portal_ops ')'
-  { printf ("PORTAL (...)\n"); }
-| KW_SPLIT '(' STRING ',' STRING '(' split_list ')' ')'
-  { printf ("SPLIT (%s, %s, ...)\n", $3, $5); }
-| KW_SPRITE name '(' sprite_ops ')'
-  { printf ("SPRITE '%s' (...)\n", $2); }
-| KW_FOG '(' color NUMBER ')'
-  { printf ("FOG (%g,%g,%g : %g)\n", $3.red, $3.green, $3.blue, $4); }
-;
-
-room_tex_ops:
-  room_tex_op
-| room_tex_ops room_tex_op
-;
-
-room_tex_op:
-  KW_TEXTURE '(' STRING ')'
-  { printf ("TEXTURE ('%s')\n", $3); }
-| KW_PLANE '(' STRING ')'
-  { printf ("PLANE ('%s')\n", $3); }
-| KW_LEN '(' NUMBER ')'
-  { printf ("LEN ('%g')\n", $3); }
-;
-
-room_portal_ops:
-  room_portal_op
-| room_portal_ops room_portal_op
-;
-
-room_portal_op:
-  KW_POLYGON '(' STRING ')'
-  { printf ("POLYGON ('%s')\n", $3); }
-| KW_SECTOR '(' STRING ')'
-  { printf ("SECTOR ('%s')\n", $3); }
-| KW_ALPHA '(' NUMBER ')'
-  { printf ("ALPHA (%g)\n", $3); }
-| KW_WARP '(' warp_ops ')'
-  { printf ("WARP (...)\n"); }
-;
-
-split_list:
-  /* empty */
-| split_list NUMBER
-;
-
 sprite_ops:
   sprite_op
 | sprite_ops sprite_op
@@ -797,60 +722,20 @@ mixmode_op:
 
 /*--------*/
 
-sixface_tpl_ops:
-  sixface_tpl_op
-| sixface_tpl_ops sixface_tpl_op
+camera_ops:
+  /* empty */
+| camera_ops camera_op
 ;
 
-sixface_tpl_op:
-  KW_MOVE '(' move ')'
-  { printf ("MOVE ()\n"); }
-| KW_TEXTURE_SCALE '(' NUMBER ')'
-  { printf ("TEXTURE_SCALE (%g)\n", $3); }
-| KW_TEXTURE '(' STRING ')'
-  { printf ("TEXTURE (%s)\n", $3); }
-| KW_CEIL_TEXTURE '(' STRING ')'
-  { printf ("CEIL_TEXTURE (%s)\n", $3); }
-| KW_DIM '(' NUMBER NUMBER NUMBER ')'
-  { printf ("DIM (%g, %g, %g)\n", $3, $4, $5); }
-| KW_HEIGHT '(' NUMBER ')'
-  { printf ("HEIGHT (%g)\n", $3); }
-| KW_FLOOR_HEIGHT '(' NUMBER ')'
-  { printf ("FLOOR_HEIGHT (%g)\n", $3); }
-| KW_FLOOR_CEIL '(' '(' vector2 ')' '(' vector2 ')' '(' vector2 ')' '(' vector2 ')' ')'
-  {
-    printf ("FLOOR_CEILING ((%g,%g) (%g,%g) (%g,%g) (%g,%g))\n",
-      $4.x, $4.y, $7.x, $7.y, $10.x, $10.y, $13.x, $13.y);
-  }
-| KW_FLOOR_TEXTURE '(' STRING ')'
-  { printf ("FLOOR_TEXTURE (%s)\n", $3); }
-| KW_FLOOR '(' '(' vector ')' '(' vector ')' '(' vector ')' '(' vector ')' ')'
-  {
-    printf ("FLOOR ( (%g,%g,%g) (%g,%g,%g) (%g,%g,%g) (%g,%g,%g) )\n",
-      $4.x, $4.y, $4.z, $7.x, $7.y, $7.z,
-      $10.x, $10.y, $10.z, $13.x, $13.y, $13.z);
-  }
-| KW_CEILING '(' '(' vector ')' '(' vector ')' '(' vector ')' '(' vector ')' ')'
-  { printf ("CEILING ()\n"); }
-| KW_FOG '(' color NUMBER ')'
-  { printf ("FOG (%g,%g,%g : %g)\n", $3.red, $3.green, $3.blue, $4); }
-| KW_CONVEX noargs
-  { printf ("CONVEX ()\n"); }
-;
-
-sixface_ops:
-  sixface_op
-| sixface_ops sixface_op
-;
-
-sixface_op:
-  sixface_tpl_op
-| KW_TRIGGER '(' STRING ',' STRING ')'
-  { printf ("TRIGGER (%s, %s)\n", $3, $5); }
-| KW_ACTIVATE '(' STRING ')'
-  { printf ("ACTIVATE ('%s')\n", $3); }
-| KW_MOVEABLE noargs
-  { printf ("MOVEABLE ()\n"); }
+camera_op:
+  KW_POSITION '(' vector ')'
+  { CAMERA.pos.Set ($3); }
+| KW_FORWARD '(' vector ')'
+  { CAMERA.forward.Set ($3); }
+| KW_UPWARD '(' vector ')'
+  { CAMERA.upward.Set ($3); }
+| KW_SECTOR '(' STRING ')'
+  { CAMERA.sector = $3;  }
 ;
 
 /*-- General-use non-terminals -----------------------------------------------*/
@@ -882,18 +767,22 @@ color:
 
 /* Simply a vector */
 vector:
-  NUMBER NUMBER NUMBER			{ CSVECTOR3 ($$).Set ($1, $2, $3); }
+  NUMBER NUMBER NUMBER
+  { $$.Set ($1, $2, $3); }
 ;
 
 /* A vector defined either directly or using a vertex index */
 vect_idx:
-  NUMBER				{ $$.x = $$.y = $$.z = 0; }
+  NUMBER
+  /*@@todo*/
+  { $$.x = $$.y = $$.z = 0; }
 | vector
 ;
 
 /* A 2D vector */
 vector2:
-  NUMBER NUMBER				{ CSVECTOR2 ($$).Set ($1, $2); }
+  NUMBER NUMBER
+  { $$.Set ($1, $2); }
 ;
 
 /* A matrix: there are lots of ways to define a matrix */
@@ -949,7 +838,7 @@ noargs:
 | '(' ')'
 ;
 
-/* MOVE ( ... ) operator (used in things/sprites/sixfaces/etc) */
+/* MOVE ( ... ) operator (used in things/sprites/etc) */
 move:
   {
     $$ = &STORAGE;

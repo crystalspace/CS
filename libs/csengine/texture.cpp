@@ -57,6 +57,13 @@ csTextureHandle::~csTextureHandle ()
     image->DecRef ();
 }
 
+void csTextureHandle::SetImageFile (iImage *Image)
+{
+  if (image)
+    image->DecRef ();
+  (image = Image)->IncRef ();
+}
+
 void csTextureHandle::SetTransparent (int red, int green, int blue)
 {
   if (handle)

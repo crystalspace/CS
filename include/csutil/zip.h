@@ -53,47 +53,47 @@ typedef unsigned long  ulg;
 
 typedef struct
 {
- uch version_needed_to_extract[2];
- ush general_purpose_bit_flag;
- ush compression_method;
- ush last_mod_file_time;
- ush last_mod_file_date;
- ulg crc32;
- ulg csize;
- ulg ucsize;
- ush filename_length;
- ush extra_field_length;
+  uch version_needed_to_extract[2];
+  ush general_purpose_bit_flag;
+  ush compression_method;
+  ush last_mod_file_time;
+  ush last_mod_file_date;
+  ulg crc32;
+  ulg csize;
+  ulg ucsize;
+  ush filename_length;
+  ush extra_field_length;
 } ZIP_local_file_header;
 
 typedef struct
 {
- uch version_made_by[2];
- uch version_needed_to_extract[2];
- ush general_purpose_bit_flag;
- ush compression_method;
- ush last_mod_file_time;
- ush last_mod_file_date;
- ulg crc32;
- ulg csize;
- ulg ucsize;
- ush filename_length;
- ush extra_field_length;
- ush file_comment_length;
- ush disk_number_start;
- ush internal_file_attributes;
- ulg external_file_attributes;
- ulg relative_offset_local_header;
+  uch version_made_by[2];
+  uch version_needed_to_extract[2];
+  ush general_purpose_bit_flag;
+  ush compression_method;
+  ush last_mod_file_time;
+  ush last_mod_file_date;
+  ulg crc32;
+  ulg csize;
+  ulg ucsize;
+  ush filename_length;
+  ush extra_field_length;
+  ush file_comment_length;
+  ush disk_number_start;
+  ush internal_file_attributes;
+  ulg external_file_attributes;
+  ulg relative_offset_local_header;
 } ZIP_central_directory_file_header;
 
 typedef struct
 {
- ush number_this_disk;
- ush num_disk_start_cdir;
- ush num_entries_centrl_dir_ths_disk;
- ush total_entries_central_dir;
- ulg size_central_directory;
- ulg offset_start_central_directory;
- ush zipfile_comment_length;
+  ush number_this_disk;
+  ush num_disk_start_cdir;
+  ush num_entries_centrl_dir_ths_disk;
+  ush total_entries_central_dir;
+  ulg size_central_directory;
+  ulg offset_start_central_directory;
+  ush zipfile_comment_length;
 } ZIP_end_central_dir_record;
 
 //--- ZIP_local_file_header layout ---------------------------------------------

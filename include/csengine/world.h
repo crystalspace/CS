@@ -243,6 +243,11 @@ public:
    */
   csNamedObjVector particle_systems;
 
+  /**
+   * The list of all camera position objects.
+   */
+  csNamedObjVector camera_positions;
+
   /// Remember dimensions of display.
   static int frame_width, frame_height;
   /// Remember iSystem interface.
@@ -307,20 +312,6 @@ private:
   bool resize;
 
 public:
-  /**
-   * The starting sector for the camera as specified in the world file.
-   * This is optional. If the world file does not have a starting sector
-   * then this field will be NULL.
-   */
-  char* start_sector;
-
-  /**
-   * The starting vector for the camera as specified in the world file.
-   * This is optional. If the world file does not have a starting vector then
-   * this field will be equal to the 0-vector (i.e. (0,0,0)).
-   */
-  csVector3 start_vec;
-
   /**
    * The current camera for drawing the world.
    */
@@ -692,8 +683,16 @@ public:
   virtual void DeleteAll ();
 
   /// Register a texture to be loaded during Prepare()
-  virtual bool RegisterTexture (const char *iName, const char *iFileName,
+  virtual bool CreateTexture (const char *iName, const char *iFileName,
     csColor *iTransp, int iFlags);
+  /// Create a named camera position object
+  virtual bool CreateCamera (const char *iName, const char *iSector,
+    const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward);
+  /// Create a key/value pair object
+  virtual bool CreateKey (const char *iName, const char *iValue);
+  /// Create a texture plane
+  virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
+    const csMatrix3 &iMatrix);
 
   //--------------------- iConfig interface implementation --------------------
 

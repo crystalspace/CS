@@ -67,7 +67,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   config = new csIniFile ("asciiart.cfg");
 
   // Load settings from config file and setup the aa_defparams structure
-  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", true);
+  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
 
   aa_defparams.width =
   aa_defparams.recwidth = config->GetInt ("Console", "Width", 80);

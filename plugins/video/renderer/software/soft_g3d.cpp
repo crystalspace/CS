@@ -201,9 +201,7 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
-  System = iSys;
-  // @@@ See above in destructor.
-  //(System = iSys)->IncRef ();
+  (System = iSys)->IncRef ();
 
   width = height = -1;
 

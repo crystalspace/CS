@@ -50,7 +50,7 @@ void SysSystemDriver::SetSystemDefaults (csIniFile *config)
   WindowY = config->GetInt ("VideoDriver", "WINDOWY", INT_MIN);
   WindowWidth = config->GetInt ("VideoDriver", "WINDOWWIDTH", -1);
   WindowHeight = config->GetInt ("VideoDriver", "WINDOWHEIGHT", -1);
-  HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", true);
+  HardwareCursor = config->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
 
   const char *val;
   if ((val = GetOptionCL ("winsize")))

@@ -269,7 +269,7 @@ void *csArchive::FindName (const char *name) const
   return dir.Get (idx);
 }
 
-char *csArchive::Read (const char *name, size_t * size)
+char *csArchive::Read (const char *name, size_t *size)
 {
   ArchiveEntry *f = (ArchiveEntry *) FindName (name);
 

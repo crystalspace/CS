@@ -35,9 +35,10 @@ $$$
 
 -*- Whenever possible, enclose strings in quotes. Quotes are accepted
     everywhere, both ' and " quotes are accepted. If the string has no
-    quotes, it is finished as soon as one of non-alphanumeric and not
-    one of '_' '/' '.' characters is encountered. E.g. FILE (/lev/texture.gif)
-    is accepted, but in any case it would be better to write '/lev/texture.gif'.
+    quotes, it can start with any alphabet or "_/!@$#~" characters and
+    can consist of any alphanumeric characters plus one of ".*+-" characters.
+    Thus FILE (/lev/texture.gif) is accepted, but in any case it would be
+    better to write FILE ('/lev/texture.gif').
 
 -*- In general, the syntax requirements are not that strict as before. Since
     tokenizer enforces same set of rules across entire file (e.g. it is not
@@ -55,9 +56,32 @@ $$$
 	- FOG in polygon descriptor
 	- NUM_TEXTURES()
 	- BSP()
-        - TEXTURE() in beziers do not accept any keywords inside brackets.
-          They are unused anyway, and I doubt the old way of describing
-          bezier texture is useful - it has to be done somewhat differently.
+	- TEXTURE() in beziers do not accept any keywords inside brackets.
+	  They are unused anyway, and I doubt the old way of describing
+	  bezier texture is useful - it has to be done somewhat differently.
+	- ROOM and SIXFACE are not supported anymore.
+
+-*- Added CAMERA keyword. The format for this command is:
+
+	CAMERA <camera-name> '(' { <camera-comp> } ')'
+	<camera-comp> ::= <position> | <forward> | <upward> | <camerasec>
+	<position> ::= 'POSITION' '(' <coordinate> ')' 
+	<forward> ::= 'FORWARD' '(' <vector-3d> ')'
+	<upward> ::= 'UPWARD' '(' <vector-3d> ')'
+	<camerasec> ::= 'SECTOR '(' <sector-name> ')'
+
+    CAMERA defines an arbitrary position in the world, all required
+    parameters to be able to rigidly fix the camera at any given position
+    looking into any specific direction. You define the position of the
+    camera, the "forward-looking" vector (which goes from your eyes straight
+    ahead) and the "up" vector, e.g. the vector that goes up along your height.
+
+    Objects of this type are tied to the entire world, they are not
+    object-specific (e.g. you cannot define a CAMERA() inside a SECTOR()).
+
+    The START(room,pos) keyword is equivalent to
+
+	CAMERA 'Start' (SECTOR (room), POSITION (pos))
 
 -*- Improved much template support. Now all options non-related to thing
     instances are useable while before thing templates and thing instances
@@ -78,3 +102,11 @@ $$$
     without automatically clearing the data that is already loaded.
     Thus YOU decide when to clear the world by calling iWorld::DeleteAll()
     method.
+
+-*- The KEY () format has been changed. The old format is:
+
+	'KEY' '(' <key-name> ',' <key-value> ')'
+
+    The new format is:
+
+	'KEY' <key-name> '(' <key-value> ')'

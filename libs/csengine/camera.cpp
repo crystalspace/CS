@@ -116,23 +116,23 @@ void csCamera::LookAt (const csVector3& v, const csVector3& up)
   
   if ( (r=sqrt(v*v)) > SMALL_EPSILON )
   {
-   w3 /= r;
-   w1 = w3 % up;
-   if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
-   {
-     w1 = w3 % csVector3(0,0,-1);
-     if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
-     {
-      w1 = w3 % csVector3(0,-1,0);
-      r = sqrt(w1*w1);
-     }
-   }
-   w1 /= r;
-   w2 = w3 % w1;
+    w3 /= r;
+    w1 = w3 % up;
+    if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
+    {
+      w1 = w3 % csVector3(0,0,-1);
+      if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
+      {
+       w1 = w3 % csVector3(0,-1,0);
+       r = sqrt(w1*w1);
+      }
+    }
+    w1 /= r;
+    w2 = w3 % w1;
 
-   m.m11 = w1.x;  m.m12 = w2.x;  m.m13 = w3.x;
-   m.m21 = w1.y;  m.m22 = w2.y;  m.m23 = w3.y;
-   m.m31 = w1.z;  m.m32 = w2.z;  m.m33 = w3.z;
+    m.m11 = w1.x;  m.m12 = w2.x;  m.m13 = w3.x;
+    m.m21 = w1.y;  m.m22 = w2.y;  m.m23 = w3.y;
+    m.m31 = w1.z;  m.m32 = w2.z;  m.m33 = w3.z;
   }
 
   SetT2O (m);
@@ -158,9 +158,10 @@ void csCamera::Correct (int n)
   w2 = csVector3::Unit(w3 % w1);
   w1 = w2 % w3;
   
-  SetT2O ( csMatrix3 ( w1.x, w2.x, w3.x,
-                             w1.y, w2.y, w3.y,
-                             w1.z, w2.z, w3.z ) );
+  SetT2O (
+    csMatrix3 (w1.x, w2.x, w3.x,
+               w1.y, w2.y, w3.y,
+               w1.z, w2.z, w3.z));
 }
 
 void csCamera::Correct (int n, float* vals[])
@@ -172,9 +173,10 @@ void csCamera::Correct (int n, float* vals[])
   if (vals[1]==NULL) return;
   if (vals[2]!=NULL)
   { 
-   if (*vals[0] < *vals[1])
+    if (*vals[0] < *vals[1])
     { r = *vals[2];  *vals[2] = *vals[0];  *vals[0] = r; }
-   else { r = *vals[2];  *vals[2] = *vals[1];  *vals[1] = r; }
+    else
+    { r = *vals[2];  *vals[2] = *vals[1];  *vals[1] = r; }
   }
   
   angle = atan2 (*vals[1], *vals[0]);

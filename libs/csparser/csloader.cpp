@@ -22,6 +22,7 @@
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
 #include "csengine/cscoll.h"
+#include "csengine/campos.h"
 #include "csengine/triangle.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
@@ -740,9 +741,7 @@ csKeyValuePair* csLoader::load_key (char* buf, csObject* pParent)
   {
     CHK (csKeyValuePair* kvp = new csKeyValuePair(Key, Value));
     if (pParent)
-    {
-      pParent->ObjAdd(kvp);
-    }
+      pParent->ObjAdd (kvp);
     return kvp;
   }
   else
@@ -4084,18 +4083,17 @@ bool csLoader::LoadWorld (char* buf)
           LoadLibraryFile (World, name);
           break;
         case TOKEN_START:
-          {
-            char str[255];
-            ScanStr (params, "%s,%f,%f,%f", str, &World->start_vec.x,
-              &World->start_vec.y, &World->start_vec.z);
-            CHK (delete World->start_sector);
-            CHK (World->start_sector = new char [strlen (str)+1]);
-            strcpy (World->start_sector, str);
-          }
+        {
+          char start_sector [100];
+          csVector3 pos (0, 0, 0);
+          ScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
+          World->camera_positions.Push (new csCameraPosition ("Start",
+            start_sector, pos, csVector3 (0, 0, 1), csVector3 (0, 1, 0)));
           break;
-      case TOKEN_KEY:
-        load_key (params, World);
-        break;
+        }
+        case TOKEN_KEY:
+          load_key (params, World);
+          break;
       }
     }
     if (cmd == PARSERR_TOKENNOTFOUND)

@@ -97,7 +97,7 @@ void SysSystemDriver::SetSystemDefaults (csIniFile *config)
   csSystemDriver::SetSystemDefaults (config);
   SimDepth = Config->GetInt ("VideoDriver", "SIMULATE_DEPTH", 0);
   UseSHM = Config->GetYesNo ("VideoDriver", "XSHM", true);
-  HardwareCursor = Config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", true);
+  HardwareCursor = Config->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
 
   const char *val;
   if ((val = GetOptionCL ("shm")))

@@ -285,4 +285,3 @@ public:
 
 
 #endif // __INF_G3D_H__
-
