@@ -17,8 +17,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-package com.crystalspace.examples;
-
 import com.crystalspace.*;
 
 class EventHandler extends csJEventHandler

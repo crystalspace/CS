@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Jul-2004
+	- Eric Sunshine made the following changes:
+	    - Added 'install' targets to csjava/Jamfile.
+	    - Augmented csjava/Jamfile to properly remove built targets at
+	      'clean' time.
+	    - Changed csjava / Swig rule so that they no longer rely upon the
+	      Swig -outdir option since this option is fairly new, and not all
+	      users have upgraded.
+	    - Changed %ignore csArray<csPluginRequest>::Get(int) to Get(size_t)
+	      in cspace.i to fix problem with Java getting confused over const
+	      and non-const variations of this method.
+	    - Moved SimpleRoom.java from CS/plugins to CS/scripts/java. It is
+	      now installed verbatim in $(datadir)/crystalspace/java to serve
+	      as an example, rather than being compiled into crystalspace.jar.
+	    - Removed legacy csjava/Makefile.
 25-Jul-2004
         - Philip Wyett changed the order of variable initialisation culling a
           compiler warning in chunklod.cpp.

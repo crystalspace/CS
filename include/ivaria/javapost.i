@@ -201,11 +201,15 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	private:
 		jobject my_jobject;
 	};
+%}
+#endif // CS_MINI_SWIG
 
+%inline %{
     iObjectRegistry * theObjectRegistry;
 
 %}
 
+#ifndef CS_MINI_SWIG
 %{
 
 	SCF_IMPLEMENT_IBASE(_csJEventHandler)

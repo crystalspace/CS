@@ -1,0 +1,7 @@
+SubDir TOP scripts java ;
+
+JAVA_DATAFILES = [ Wildcard *.java *.jar ] ;
+if $(JAVA_DATAFILES)
+{
+  InstallData $(JAVA_DATAFILES) : java ;
+}

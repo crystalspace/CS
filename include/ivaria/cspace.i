@@ -811,8 +811,8 @@ TYPEMAP_OUT_csWrapPtr
 %typemap(default) const char * configName;
 %ignore csArray<csPluginRequest>::operator[];
 %ignore csArray<csPluginRequest>::Put;
-%ignore csArray<csPluginRequest>::Get(int); // Non-const.
-%ignore csArray<csPluginRequest>::Top();    // Non-const.
+%ignore csArray<csPluginRequest>::Get(size_t); // Non-const.
+%ignore csArray<csPluginRequest>::Top();       // Non-const.
 %ignore csArray<csPluginRequest>::GetIndex;
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 

@@ -8,9 +8,8 @@
     <property name="description" value="Crystal Space Java wrapper" />
     <property name="version" value="0.1" />
 
-    <property name="src.dir" value="."/>
-    <property name="build.dir" value="build"/>
-    <property name="classes.dir" value="${build.dir}/classes"/>  
+    <property name="src.dir" value="src"/>
+    <property name="classes.dir" value="build"/>  
     <property name="lib.dir" value="."/>
     <property name="cspace.jar" value="crystalspace.jar"/>
     

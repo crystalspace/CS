@@ -16,6 +16,10 @@ W - Wishlist (the build also works without this feature)
     a lot of copy/paste, is difficult to maintain, and is fragile because it
     relies upon internal knowledge of the Plugin rule and the low-level
     platform-specific SystemFoo rules invoked by the Plugin rule.
+[H] The csjava shared library gets the wrong file extension (.csplugin) on
+    MacOS/X. We need to determine the correct file extension expected by Java
+    and use that. (For instance, the CS configure script gleans this sort of
+    information for Python and Perl in order to avoid this same problem.)
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
 [H] msvcgen.jam: Provide rules to copy the generated files back to the source
