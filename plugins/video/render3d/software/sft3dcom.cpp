@@ -3645,10 +3645,9 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
   }
 }
 
-static void DrawTriangle (
-                          csSoftwareGraphics3DCommon* g3d,
+static void DrawTriangle (csSoftwareGraphics3DCommon* g3d,
                           iClipper2D* clipper,
-                          csRenderMesh* mesh,
+                          const csCoreRenderMesh* mesh,
                           G3DPolygonDPFX& poly,
                           const csVector2& pa, const csVector2& pb, const csVector2& pc,
                           int* trivert,
@@ -4169,11 +4168,12 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
   }
 
   SetZMode (mesh.z_buf_mode);
-  DrawMesh (&rmesh, stacks);
+  DrawMesh (&rmesh, rmesh, stacks);
 }
 
-void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
-  const csArray< csArray<csShaderVariable*> > &stacks)
+void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
+    const csRenderMeshModes& modes,
+    const csArray< csArray<csShaderVariable*> > &stacks)
 {
   /*
   iRenderBufferSource* source = mesh->buffersource;
@@ -4191,17 +4191,17 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
   
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)indexbuf;
 
-  CS_ASSERT (("'tex diffuse' SV does not exist.",
+  CS_ASSERT_MSG ("'tex diffuse' SV does not exist.",
     string_texture_diffuse < (csStringID)stacks.Length ()
-      && stacks[string_texture_diffuse].Length () > 0));
+      && stacks[string_texture_diffuse].Length () > 0);
   csShaderVariable* texDiffuseSV = stacks[string_texture_diffuse].Top ();
   iTextureHandle* texh = 0;
   texDiffuseSV->GetValue (texh);
-  CS_ASSERT(("A material has no diffuse texture attached.", texh));
+  CS_ASSERT_MSG ("A material has no diffuse texture attached.", texh);
 
-  CS_ASSERT (("'tex lightmap' SV does not exist.",
+  CS_ASSERT_MSG ("'tex lightmap' SV does not exist.",
     string_texture_lightmap < (csStringID)stacks.Length ()
-      && stacks[string_texture_lightmap].Length () > 0));
+      && stacks[string_texture_lightmap].Length () > 0);
   csShaderVariable* texLightmapSV = stacks[string_texture_lightmap].Top ();
   iTextureHandle* lmh = 0;
   texLightmapSV->GetValue (lmh);
@@ -4248,8 +4248,8 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
   G3DPolygonDP poly;
   poly.use_fog = false;
   poly.do_fullbright = false;
-  poly.mixmode = mesh->mixmode;
-  z_buf_mode = mesh->z_buf_mode;
+  poly.mixmode = modes.mixmode;
+  z_buf_mode = modes.z_buf_mode;
 
   for (i = 0; i < polyRender->polys.Length (); i++)
   {
@@ -4358,12 +4358,13 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
   }*/
 }
 
-void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
-  const csArray< csArray<csShaderVariable*> > &stacks)
+void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
+    const csRenderMeshModes& modes,
+    const csArray< csArray<csShaderVariable*> > &stacks)
 {
   if (mesh->meshtype == CS_MESHTYPE_POLYGON)
   {
-    DrawPolysMesh (mesh, stacks);
+    DrawPolysMesh (mesh, modes, stacks);
     return;
   }
 
@@ -4392,7 +4393,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
 
   //SetObjectToCamera (&mesh->object2camera);
   //z_buf_mode = CS_ZBUF_USE;
-  z_buf_mode = mesh->z_buf_mode;
+  z_buf_mode = modes.z_buf_mode;
 
   const unsigned int numBuffers =
     sizeof (activebuffers) / sizeof (iRenderBuffer*);
@@ -4483,7 +4484,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
   poly.mat_handle = mesh->material->GetMaterialHandle ();
-  poly.mixmode = mesh->mixmode | CS_FX_TILING |
+  poly.mixmode = modes.mixmode | CS_FX_TILING |
     (!work_col ? CS_FX_FLAT : 0);
 
   // Fill flat color if renderer decide to paint it flat-shaded

@@ -65,8 +65,8 @@ void csGLShaderFVP::Deactivate()
 {
 }
 
-void csGLShaderFVP::SetupState (
-  csRenderMesh *mesh, const csShaderVarStack &stacks)
+void csGLShaderFVP::SetupState (const csRenderMesh *mesh, 
+				const csShaderVarStack &stacks)
 {
   int i;
 
@@ -195,7 +195,7 @@ void csGLShaderFVP::SetupState (
       statecache->Enable_GL_TEXTURE_GEN_T ();
       statecache->Enable_GL_TEXTURE_GEN_R ();
 
-      csReversibleTransform *t = &mesh->object2camera;
+      const csReversibleTransform *t = &mesh->object2camera;
       const csMatrix3 &orientation = t->GetO2T();
 
       float mAutoTextureMatrix[16];

@@ -579,7 +579,7 @@ public:
   /**
    * Test if an object is in this set.
    */
-  bool In (const T& object)
+  bool In (const T& object) const
   {
     return map.In (object);
   }

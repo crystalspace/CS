@@ -27,6 +27,7 @@
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csutil/parray.h"
+#include "csutil/cfgacc.h"
 
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -39,6 +40,7 @@
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 
@@ -53,9 +55,12 @@ private:
   csRef<iObjectRegistry> objectreg;
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
+  csRef<iStringSet> strings;
 
   csRefArray<iShader> shaders;
   csRefArray<iShaderCompiler> compilers;
+
+  csConfigAccess config;
 
   int seqnumber;
 
@@ -67,6 +72,16 @@ private:
   csShaderVariableContext svcontext;
   csShaderVarStack shaderVarStack;
 
+  csSet<csStringID> neutralTags;
+  csSet<csStringID> forbiddenTags;
+  csSet<csStringID> requiredTags;
+  struct TagInfo
+  {
+    csShaderTagPresence presence;
+    int priority;
+  };
+  csSet<csStringID>& GetTagSet (csShaderTagPresence presence);
+  csHash<TagInfo, csStringID> tagInfo;
 public:
   SCF_DECLARE_IBASE;
 
@@ -102,6 +117,14 @@ public:
   {
     return shaderVarStack;
   }
+
+  virtual void SetTagOptions (csStringID tag, csShaderTagPresence presence, 
+    int priority = 0);
+  virtual void GetTagOptions (csStringID tag, csShaderTagPresence& presence, 
+    int& priority);
+
+  virtual const csSet<csStringID>& GetTags (csShaderTagPresence presence,
+    int& count);
 
   //=================== iShaderVariableContext ================//
 

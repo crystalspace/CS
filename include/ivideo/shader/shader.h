@@ -21,7 +21,12 @@
 #ifndef __CS_IVIDEO_SHADER_H__
 #define __CS_IVIDEO_SHADER_H__
 
+/**\file
+ * Shader-related interfaces
+ */
+
 #include "csgeom/vector4.h"
+#include "csutil/hash.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
@@ -93,6 +98,28 @@ struct iShaderVariableContext : public iBase
 SCF_VERSION (iShaderManager, 0, 1, 0);
 
 /**
+ * Possible settings regarding a techique tag's presence.
+ */
+enum csShaderTagPresence
+{
+  /**
+   * The tag is neither required nor forbidden. However, it's priority still
+   * contributes to technique selection.
+   */
+  TagNeutral,
+  /**
+   * Techniques were this tag is present are rejected to be loaded.
+   */
+  TagForbidden,
+  /**
+   * Techniques are required to have one such tag. If at least one required 
+   * tag exists and no required tag is present in a technique, it doesn't 
+   * validate. 
+   */
+  TagRequired
+};
+
+/**
  * A manager for all shaders. Will only be one at a given time
  */
 struct iShaderManager : public iShaderVariableContext
@@ -114,6 +141,29 @@ struct iShaderManager : public iShaderVariableContext
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
   virtual csShaderVarStack& GetShaderVariableStack () = 0;
+
+  /**
+   * Set a technique tag's options.
+   * \param tag The ID of the tag.
+   * \param presence Whether the presence of a tag is required, forbidden or
+   *  neither of both.
+   * \param priority The tag's priority. The sum of all tag priorities is 
+   *  decisive when two shader techniques have the same technique priority.
+   */
+  virtual void SetTagOptions (csStringID tag, csShaderTagPresence presence, 
+    int priority = 0) = 0;
+  /**
+   * Get a technique tag's options.
+   * \copydoc SetTagOptions
+   */
+  virtual void GetTagOptions (csStringID tag, csShaderTagPresence& presence, 
+    int& priority) = 0;
+
+  /**
+   * Get the list of all tags with a specific \a presence setting.
+   */
+  virtual const csSet<csStringID>& GetTags (csShaderTagPresence presence,
+    int& count) = 0;
 };
 
 SCF_VERSION (iShaderRenderInterface, 0,0,1);
@@ -125,7 +175,7 @@ struct iShaderRenderInterface : public iBase
   virtual void* GetPrivateObject(const char* name) = 0;
 };
 
-SCF_VERSION (iShader, 0,0,2);
+SCF_VERSION (iShader, 0, 1, 0);
 
 /**
  * Specific shader. Can/will be either render-specific or general
@@ -143,7 +193,8 @@ struct iShader : public iShaderVariableContext
   virtual bool ActivatePass(unsigned int number) = 0;
 
   /// Setup a pass
-  virtual bool SetupPass (csRenderMesh *mesh,
+  virtual bool SetupPass (const csRenderMesh *mesh,
+    csRenderMeshModes& modes,
     const csShaderVarStack &stacks) = 0;
 
   /**

@@ -72,7 +72,7 @@ void csShaderGLCGCommon::Deactivate()
   cgGLDisableProfile (cgGetProgramProfile (program));
 }
 
-void csShaderGLCGCommon::SetupState (csRenderMesh* mesh,
+void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
   const csShaderVarStack &stacks)
 {
   int i;

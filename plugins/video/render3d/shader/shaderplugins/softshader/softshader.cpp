@@ -83,6 +83,8 @@ bool csSoftShader::SupportType(const char* type)
 
 csPtr<iShaderProgram> csSoftShader::CreateProgram(const char* type)
 {
+  if (!enable)
+    return 0;
   if( strcasecmp(type, "vp") == 0)
     return csPtr<iShaderProgram>(new csSoftShader_VP(object_reg));
   else if( strcasecmp(type, "fp") == 0)

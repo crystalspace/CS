@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <shader type="xmlshader" name="or_lighting_detail_add">
     <technique priority="200">
+	<tag>detail texture</tag>
 	<pass>
 	    <buffer name="vertices" destination="position" />
 	    <buffer name="colors" destination="primary color" />
@@ -47,6 +48,38 @@
 		    </layer>
 		</fixedfp>
 	    </fp>
+	</pass>
+    </technique>
+    <technique priority="150">
+	<tag>detail texture</tag>
+	<tag>multipass detail texture</tag>
+	<pass>
+	    <buffer name="vertices" destination="position" />
+	    <buffer name="colors" destination="primary color" />
+	    <buffer name="texture coordinates" destination="texture coordinate 0" />
+	    <texture name="tex diffuse" destination="unit 0" />
+	</pass>
+	<pass>
+	    <mixmode><add /></mixmode>
+	    <zmode><zmesh2 /></zmode>
+	    <buffer name="vertices" destination="position" />
+	    <buffer name="texture coordinates" destination="texture coordinate 0" />
+	    <buffer name="colors" destination="primary color" />
+	    <texture name="tex detail" destination="unit 0" />
+	    <vp plugin="glfixed">
+	      <fixedvp>
+		<texmatrix destination="unit 0">
+		  <scale type="shadervar">detail texture scale</scale>
+		</texmatrix>
+	      </fixedvp>
+	    </vp>
+	</pass>
+	<pass>
+	    <mixmode><multiply2 /></mixmode>
+	    <zmode><zmesh2 /></zmode>
+	    <buffer name="vertices" destination="position" />
+	    <buffer name="lightmap coordinates" destination="texture coordinate 0" />
+	    <texture name="tex lightmap" destination="unit 0" />
 	</pass>
     </technique>
     <technique priority="100">

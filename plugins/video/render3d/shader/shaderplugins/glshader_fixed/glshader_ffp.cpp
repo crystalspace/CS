@@ -441,7 +441,7 @@ void csGLShaderFFP::Deactivate()
   }
 }
 
-void csGLShaderFFP::SetupState (csRenderMesh *mesh, 
+void csGLShaderFFP::SetupState (const csRenderMesh *mesh, 
                                 const csShaderVarStack &stacks)
 {
   if (fog.mode != FogOff)

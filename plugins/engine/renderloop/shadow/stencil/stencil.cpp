@@ -500,6 +500,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   rmesh.variablecontext = shadowCacheEntry->svcontext;
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
 
+  csRenderMeshModes modes (rmesh);
   // probably shouldn't need to check this in general
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
@@ -510,7 +511,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
     shadowCacheEntry->UpdateBuffers ();
     shmgr->PushVariables (stacks);
     shadowCacheEntry->svcontext->PushVariables (stacks);
-    shader->SetupPass(&rmesh, stacks);
+    shader->SetupPass(&rmesh, modes, stacks);
     if (shadowCacheEntry->ShadowCaps())
     {
       rmesh.indexstart = 0;
@@ -519,18 +520,18 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
         @@@ Try to get rid of drawing the mesh twice
        */
       g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
-      g3d->DrawMesh (&rmesh, stacks);
+      g3d->DrawMesh (&rmesh, modes, stacks);
       g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
-      g3d->DrawMesh (&rmesh, stacks);
+      g3d->DrawMesh (&rmesh, modes, stacks);
     }
     else 
     {
       rmesh.indexstart = edge_start;
       rmesh.indexend = index_range;
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
-      g3d->DrawMesh (&rmesh, stacks);
+      g3d->DrawMesh (&rmesh, rmesh, stacks);
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
-      g3d->DrawMesh (&rmesh, stacks);
+      g3d->DrawMesh (&rmesh, rmesh, stacks);
     }
     shader->TeardownPass();
   }

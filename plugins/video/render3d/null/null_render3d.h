@@ -117,7 +117,8 @@ public:
   void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, 
     int count);
   void SetTextureState (int* units, iTextureHandle** textures, int count);
-  void DrawMesh (csRenderMesh* mymesh, 
+  void DrawMesh (const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks);
   void SetWriteMask (bool red, bool green, bool blue, bool alpha);
   void GetWriteMask (bool& red, bool& green, bool& blue, bool& alpha) const;

@@ -53,7 +53,8 @@ public:
   virtual bool ActivatePass (unsigned int number);
 
   /// Setup a pass.
-  virtual bool SetupPass (csRenderMesh *mesh,
+  virtual bool SetupPass (const csRenderMesh *mesh,
+    csRenderMeshModes& modes,
     const csShaderVarStack &stacks);
 
   /**
@@ -199,16 +200,18 @@ private:
   void Report (int severity, const char* msg, ...);
 
   // struct to hold all techniques, until we decide which to use
-  struct techniqueKeeper
+  struct TechniqueKeeper
   {
-    techniqueKeeper(iDocumentNode *n, unsigned int p) : node(n), priority(p)
+    TechniqueKeeper(iDocumentNode *n, unsigned int p) : 
+      node(n), priority(p), tagPriority(0)
     {}
     csRef<iDocumentNode> node;
     unsigned int priority;
+    int tagPriority;
   };
 
-  static int CompareTechniqueKeeper(techniqueKeeper const&,
-				    techniqueKeeper const&);
+  static int CompareTechniqueKeeper(TechniqueKeeper const&,
+				    TechniqueKeeper const&);
   
   // load one technique, and create shader from it
   csPtr<csXMLShader> CompileTechnique (iDocumentNode *node, 
@@ -225,7 +228,7 @@ private:
 	csXMLShader::shaderPass *pass);
 
   // Set reason for failure.
-  void SetFailReason (const char* reason);
+  void SetFailReason (const char* reason, ...);
 
   /// XML Token and management
   csStringHash xmltokens;
@@ -238,9 +241,10 @@ private:
   csRef<iStringSet> strings;
   csRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
+  csRef<iShaderManager> shadermgr;
 
   bool do_verbose;
-  char* fail_reason;
+  csString fail_reason;
 };
 
 #endif

@@ -78,7 +78,7 @@ void csShaderGLCGVP::Deactivate()
   csShaderGLCGCommon::Deactivate();
 }
 
-void csShaderGLCGVP::SetupState (csRenderMesh* mesh,
+void csShaderGLCGVP::SetupState (const csRenderMesh* mesh,
   const csShaderVarStack &stacks)
 {
   if (override.IsValid())

@@ -30,6 +30,7 @@
 #include "csgeom/vector4.h"
 #include "csutil/hashmap.h"
 #include "csutil/xmltiny.h"
+#include "csutil/hashhandlers.h"
 
 #include "iengine/engine.h"
 #include "iengine/texture.h"
@@ -117,6 +118,9 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
 	iPluginManager);
 
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    objectreg, "crystalspace.shared.stringset", iStringSet);
+
   csRef<iStringArray> classlist =
     iSCF::SCF->QueryClassList("crystalspace.graphics3d.shadercompiler.");
   int const nmatches = classlist.IsValid() ? classlist->Length() : 0;
@@ -140,6 +144,53 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   else
   {
     Report (CS_REPORTER_SEVERITY_WARNING, "No shader plugins found!");
+  }
+  
+  config.AddConfig (objectreg, "/config/shadermgr.cfg");
+
+  csString cfgKey;
+  const csString keyPrefix ("Video.ShaderManager.Tags.");
+  csSet<csStrKey, csConstCharHashKeyHandler> knownKeys;
+  csRef<iConfigIterator> it (config->Enumerate (keyPrefix));
+  while (it->Next ())
+  {
+    const char* key = it->GetKey (true);
+    const char* dot = strrchr (key, '.');
+    cfgKey.Clear ();
+    cfgKey.Append (key, dot - key);
+
+    if (knownKeys.In ((const char*)cfgKey)) continue;
+    knownKeys.Add ((const char*)cfgKey);
+
+    const char* tagName = config->GetStr (
+      keyPrefix + cfgKey + ".TagName", cfgKey);
+    const char* tagPresence = config->GetStr (
+      keyPrefix + cfgKey + ".Presence", "Neutral");
+    int tagPriority = config->GetInt (
+      keyPrefix + cfgKey + ".Priority", 0);
+
+    csShaderTagPresence presence;
+    if (strcasecmp (tagPresence, "neutral") == 0)
+    {
+      presence = TagNeutral;
+    }
+    else if (strcasecmp (tagPresence, "forbidden") == 0)
+    {
+      presence = TagForbidden;
+    }
+    else if (strcasecmp (tagPresence, "required") == 0)
+    {
+      presence = TagRequired;
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Unknown shader tag presence '%s' for tag config '%s'",
+	tagPresence, (const char*)cfgKey);
+      continue;
+    }
+    csStringID tagID = strings->Request (tagName);
+    SetTagOptions (tagID, presence, tagPriority);
   }
 
   return true;
@@ -212,3 +263,77 @@ iShaderCompiler* csShaderManager::GetCompiler(const char* name)
   }
   return 0;
 }
+
+csSet<csStringID>& csShaderManager::GetTagSet (csShaderTagPresence presence)
+{
+  switch (presence)
+  {
+    case TagNeutral:
+      return neutralTags;
+    case TagForbidden:
+      return forbiddenTags;
+    case TagRequired:
+      return requiredTags;
+
+    default:
+      return neutralTags;
+  }
+}
+
+void csShaderManager::SetTagOptions (csStringID tag, csShaderTagPresence presence, 
+  int priority)
+{
+  TagInfo* info = tagInfo.GetElementPointer (tag);
+  if (info != 0)
+  {
+    if (info->presence != presence)
+    {
+      GetTagSet (info->presence).Delete (tag);
+      if ((presence == TagNeutral) && (priority == 0))
+      {
+	tagInfo.DeleteAll (tag);
+      }
+      else
+      {
+	GetTagSet (presence).Add (tag);
+	info->priority = priority;
+      }
+    }
+  }
+  else
+  {
+    if ((presence != TagNeutral) || (priority != 0))
+    {
+      TagInfo newInfo;
+      newInfo.presence = presence;
+      newInfo.priority = priority;
+      GetTagSet (presence).Add (tag);
+      tagInfo.Put (tag, newInfo);
+    }
+  }
+}
+
+void csShaderManager::GetTagOptions (csStringID tag, csShaderTagPresence& presence, 
+  int& priority)
+{
+  TagInfo* info = tagInfo.GetElementPointer (tag);
+  if (info == 0) 
+  {
+    presence = TagNeutral;
+    priority = 0;
+    return;
+  }
+
+  presence = info->presence;
+  priority = info->priority;
+}
+
+const csSet<csStringID>& csShaderManager::GetTags (csShaderTagPresence presence,
+    int& count)
+{
+  csSet<csStringID>& set = GetTagSet (presence);
+  count = set.GetSize ();
+  return set;
+}
+
+

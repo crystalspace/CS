@@ -642,10 +642,12 @@ public:
   }
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (csRenderMesh* mymesh,
+  virtual void DrawMesh (const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks);
-  void DrawPolysMesh (csRenderMesh* mesh,
-    const csArray< csArray<csShaderVariable*> > &stack);
+  void DrawPolysMesh (const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes,
+    const csArray< csArray<csShaderVariable*> > &stacks);
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh);
 
   /// Controls shadow drawing

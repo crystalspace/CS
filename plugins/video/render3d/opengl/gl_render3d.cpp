@@ -162,14 +162,7 @@ void csGLGraphics3D::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.graphics3d.opengl", msg, arg);
   va_end (arg);
 }
 
@@ -1639,8 +1632,9 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
   }
 }
 
-void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
-  const csShaderVarStack &stacks)
+void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes,
+    const csArray< csArray<csShaderVariable*> > &stacks)
 {
   SetupProjection ();
 
@@ -1766,7 +1760,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
     SetMirrorMode (mymesh->do_mirror);
 
 
-  const uint mixmode = mymesh->mixmode;
+  const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
   statecache->SetShadeModel (GL_SMOOTH);
 
@@ -1776,7 +1770,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
     if ((mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
       SetMixMode (mixmode);
     else
-      SetAlphaType (mymesh->alphaType);
+      SetAlphaType (modes.alphaType);
 
     if (bugplug)
     {
@@ -1786,10 +1780,11 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
 
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
     {
-      CS_ASSERT ((mymesh->z_buf_mode != CS_ZBUF_MESH) &&
-	(mymesh->z_buf_mode != CS_ZBUF_MESH2));
+      CS_ASSERT_MSG ("Meshes can't have zmesh zmode. You deserve some spanking", 
+	(modes.z_buf_mode != CS_ZBUF_MESH) && 
+	(modes.z_buf_mode != CS_ZBUF_MESH2));
       SetZMode ((current_zmode == CS_ZBUF_MESH2) ? 
-	GetZModePass2 (mymesh->z_buf_mode) : mymesh->z_buf_mode, true);
+	GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode, true);
 /*      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
       {
         SetZMode (mymesh->z_buf_mode, true);
@@ -2229,14 +2224,15 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   }
 
   SetZMode (mesh.z_buf_mode);
+  csRenderMeshModes modes (rmesh);
   for (int p = 0; p < passCount; p++)
   {
     if (mesh.shader != 0)
     {
       mesh.shader->ActivatePass (p);
-      mesh.shader->SetupPass (&rmesh, stacks);
+      mesh.shader->SetupPass (&rmesh, modes, stacks);
     }
-    DrawMesh (&rmesh, stacks);
+    DrawMesh (&rmesh, modes, stacks);
     if (mesh.shader != 0)
     {
       mesh.shader->TeardownPass ();

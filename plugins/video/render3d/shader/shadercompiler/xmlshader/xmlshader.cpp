@@ -47,19 +47,19 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
   init_token_table (xmltokens);
-  fail_reason = 0;
 }
 
 csXMLShaderCompiler::~csXMLShaderCompiler()
 {
-  delete[] fail_reason;
   SCF_DESTRUCT_IBASE();
 }
 
-void csXMLShaderCompiler::SetFailReason (const char* reason)
+void csXMLShaderCompiler::SetFailReason (const char* reason, ...)
 {
-  delete[] fail_reason;
-  fail_reason = csStrNew (reason);
+  va_list args;
+  va_start (args, reason);
+  fail_reason.FormatV (reason, args);
+  va_end (args);
 }
 
 void csXMLShaderCompiler::Report (int severity, const char* msg, ...)
@@ -75,6 +75,9 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 {
   objectreg = object_reg;
 
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
+      object_reg, iPluginManager);
+
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
 
@@ -83,8 +86,6 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
-    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-    	object_reg, iPluginManager);
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.syntax.loader.service.text", iSyntaxService);
     if (!synldr)
@@ -98,7 +99,6 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
-  
 
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
@@ -111,23 +111,24 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 }
 
 int csXMLShaderCompiler::CompareTechniqueKeeper (
-  techniqueKeeper const& t1, techniqueKeeper const& t2)
+  TechniqueKeeper const& t1, TechniqueKeeper const& t2)
 {
-  if (t1.priority < t2.priority)
-    return 1;
-  else if (t1.priority > t2.priority)
-    return -1;
-  return 0;
+  int v = t2.priority - t1.priority;
+  if (v == 0) v = t2.tagPriority - t1.tagPriority;
+  return v;
 }
 
 csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
 {
   if (!ValidateTemplate (templ))
     return 0;
+  
+  shadermgr = CS_QUERY_REGISTRY (objectreg, iShaderManager);
+  CS_ASSERT (shadermgr); // Should be present - loads us, after all
 
   csRef<iDocumentNodeIterator> it = templ->GetNodes();
 
-  csArray<techniqueKeeper> techniquesTmp;
+  csArray<TechniqueKeeper> techniquesTmp;
 
   // Read in the techniques.
   while (it->HasNext ())
@@ -138,7 +139,23 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
     {
       //save it
       unsigned int p = child->GetAttributeValueAsInt ("priority");
-      techniquesTmp.Push (techniqueKeeper (child, p));
+      TechniqueKeeper keeper (child, p);
+      // Compute the tag's priorities.
+      csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");
+      while (tagIt->HasNext ())
+      {
+	csRef<iDocumentNode> tag = tagIt->Next ();
+	csStringID tagID = strings->Request (tag->GetContentsValue ());
+
+	csShaderTagPresence presence;
+	int priority;
+	shadermgr->GetTagOptions (tagID, presence, priority);
+	if (presence == TagNeutral)
+	{
+	  keeper.tagPriority += priority;
+	}
+      }
+      techniquesTmp.Push (keeper);
     }
   }
 
@@ -147,10 +164,10 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
   //now try to load them one in a time, until we are successful
   csRef<csXMLShader> shader;
   const char* shaderName = templ->GetAttributeValue ("name");
-  csArray<techniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
+  csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
   while (techIt.HasNext ())
   {
-    techniqueKeeper tk = techIt.Next();
+    TechniqueKeeper tk = techIt.Next();
     shader = CompileTechnique (tk.node, shaderName, templ);
     if (shader.IsValid())
     {
@@ -166,7 +183,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  "Shader '%s': Technique with priority %d fails. Reason: %s.",
 	  shaderName, tk.priority,
-	  fail_reason);
+	  (const char*)fail_reason);
     }
   }
 
@@ -194,13 +211,46 @@ csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
     return 0;
   }
 
+  int requiredCount;
+  const csSet<csStringID>& requiredTags = shadermgr->GetTags (
+    TagRequired, requiredCount);
+  int forbiddenCount;
+  const csSet<csStringID>& forbiddenTags = shadermgr->GetTags (
+    TagForbidden, forbiddenCount);
+
   csRef<csXMLShader> newShader = csPtr<csXMLShader> (new csXMLShader (g3d));
   newShader->name = csStrNew (shaderName);
 
+  int requiredPresent = 0;
+  csRef<iDocumentNodeIterator> it = node->GetNodes (
+    xmltokens.Request (XMLTOKEN_TAG));
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> tag = it->Next ();
+
+    const char* tagName = tag->GetContentsValue ();
+    csStringID tagID = strings->Request (tagName);
+    if (requiredTags.In (tagID))
+    {
+      requiredPresent++;
+    }
+    else if (forbiddenTags.In (tagID))
+    {
+      if (do_verbose) SetFailReason ("Shader tag '%s' is forbidden", 
+	tagName);
+      return 0;
+    }
+  }
+
+  if ((requiredCount != 0) && (requiredPresent == 0))
+  {
+    if (do_verbose) SetFailReason ("No required shader tag is present");
+    return 0;
+  }
+
   //count passes
   newShader->passesCount = 0;
-  csRef<iDocumentNodeIterator> it = node->GetNodes (
-    xmltokens.Request (XMLTOKEN_PASS));
+  it = node->GetNodes (xmltokens.Request (XMLTOKEN_PASS));
   while(it->HasNext ())
   {
     it->Next ();
@@ -773,8 +823,9 @@ bool csXMLShader::DeactivatePass ()
   return true;
 }
 
-bool csXMLShader::SetupPass (csRenderMesh *mesh, 
-	const csShaderVarStack &stacks)
+bool csXMLShader::SetupPass (const csRenderMesh *mesh, 
+			     csRenderMeshModes& modes,
+			     const csShaderVarStack &stacks)
 {
   if(currentPass>=passesCount)
     return false;
@@ -844,7 +895,7 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
     thispass->textureCount);
   lastTexturesCount = thispass->textureCount;
 
-  // @@@ Is it okay to modify the render mesh here?
+  modes = *mesh;
   if (thispass->alphaMode.autoAlphaMode)
   {
     iTextureHandle* tex = 0;
@@ -862,20 +913,20 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
       }
     }
     if (tex != 0)
-      mesh->alphaType = tex->GetAlphaType ();
+      modes.alphaType = tex->GetAlphaType ();
     else
-      mesh->alphaType = csAlphaMode::alphaNone;
+      modes.alphaType = csAlphaMode::alphaNone;
   }
   else
-    mesh->alphaType = thispass->alphaMode.alphaType;
+    modes.alphaType = thispass->alphaMode.alphaType;
   // Override mixmode, if requested
   if ((thispass->mixMode & CS_FX_MASK_MIXMODE) == CS_FX_MESH)
   {
-    if ((mesh->mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-      mesh->alphaType = csAlphaMode::alphaSmooth;
+    if ((modes.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+      modes.alphaType = csAlphaMode::alphaSmooth;
   }
   else
-    mesh->mixmode = thispass->mixMode;
+    modes.mixmode = thispass->mixMode;
 
   if(thispass->vp) thispass->vp->SetupState (mesh, stacks);
   if(thispass->fp) thispass->fp->SetupState (mesh, stacks);

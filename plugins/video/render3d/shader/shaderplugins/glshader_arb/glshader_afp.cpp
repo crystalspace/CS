@@ -66,7 +66,7 @@ void csShaderGLAFP::Deactivate()
   glDisable (GL_FRAGMENT_PROGRAM_ARB);
 }
 
-void csShaderGLAFP::SetupState (csRenderMesh *mesh, 
+void csShaderGLAFP::SetupState (const csRenderMesh *mesh, 
 	const csShaderVarStack &stacks)
 {
   const csGLExtensionManager* ext = shaderPlug->ext;

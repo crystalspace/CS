@@ -37,7 +37,8 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/polyrender.h"
 
-struct csRenderMesh;
+struct csCoreRenderMesh;
+struct csRenderMeshModes;
 class csMatrix3;
 class csVector4;
 class csVector3;
@@ -715,7 +716,7 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 3, 0);
+SCF_VERSION (iGraphics3D, 5, 4, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -929,7 +930,8 @@ struct iGraphics3D : public iBase
   	int count) = 0;
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (csRenderMesh* mymesh,
+  virtual void DrawMesh (const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks) = 0;
 
   /// Set the masking of color and/or alpha values to framebuffer

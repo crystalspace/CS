@@ -634,11 +634,16 @@ extern void* operator new[] (size_t s, void* filename, int line);
          }
 #    endif
 #  endif
+#  if !defined (CS_ASSERT_MSG)
+#      define  CS_ASSERT_MSG(msg, x) CS_ASSERT(((msg) && (x)))
+#  endif
 #else
 #  undef DEBUG_BREAK
 #  define DEBUG_BREAK
 #  undef CS_ASSERT
 #  define CS_ASSERT(x)
+#  undef CS_ASSERT_MSG
+#  define CS_ASSERT_MSG(m, x)
 #endif
 
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN

@@ -44,10 +44,31 @@ struct iMaterialWrapper;
 struct iMeshFactory;
 struct iPortalContainer;
 
+struct csRenderMeshModes
+{
+  csRenderMeshModes ()
+  {
+    z_buf_mode = CS_ZBUF_NONE;
+    mixmode = CS_FX_COPY;
+    alphaType = csAlphaMode::alphaNone;
+  }
+
+  ~csRenderMeshModes () { }
+
+  /// Z mode to use
+  csZBufMode z_buf_mode;
+
+  /// mixmode to use
+  uint mixmode;
+
+  /// Alpha mode this mesh is drawn.
+  csAlphaMode::AlphaType alphaType;
+};
+
 /**
  * Data required by the renderer to draw a mesh.
  */
-struct csRenderMesh
+struct csCoreRenderMesh
 {
   /**
    * To make debugging easier we add the name of the mesh object
@@ -55,35 +76,18 @@ struct csRenderMesh
    */
   const char* db_mesh_name;
 
-  csRenderMesh () 
+  csCoreRenderMesh () 
   {
-    z_buf_mode = CS_ZBUF_NONE;
-    mixmode = CS_FX_COPY;
     clip_portal = 0;
     clip_plane = 0;
     clip_z_plane = 0;
     do_mirror = false;
     indexstart = indexend = 0;
-    portal = 0;
-    geometryInstance = 0;
-    lastFrame = ~0;
     
     db_mesh_name = "<unknown>";
   }
 
-  ~csRenderMesh () {}
-
-  /**
-   * Number of the frame this rendermesh was used in last. Can be used
-   * to determine whether a rendermesh is currently in use.
-   */
-  uint lastFrame;
-
-  /// Z mode to use
-  csZBufMode z_buf_mode;
-
-  /// mixmode to use
-  uint mixmode;
+  ~csCoreRenderMesh () {}
 
   /// Clipping parameter
   int clip_portal;
@@ -121,20 +125,27 @@ struct csRenderMesh
   /// End of the range of indices to use
   unsigned int indexend;
 
-  /// Material used for this mesh
-  //iMaterialHandle* mathandle;
-  iMaterialWrapper* material;
-
   /// Transform to use for this mesh (object->camera)
   csReversibleTransform object2camera;
-  /// Camera coordinate of the local 0,0,0 point of the object.
-  csVector3 camera_origin;
 
-  /// @@@ Document me.
-  csRef<iShaderVariableContext> variablecontext;
+  /// Material used for this mesh
+  //iMaterialHandle* mathandle;
+  // @@@ FIXME: SW needs it
+  iMaterialWrapper* material;
+};
 
-  /// Alpha mode this mesh is drawn.
-  csAlphaMode::AlphaType alphaType;
+struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
+{
+  csRenderMesh () 
+  {
+    portal = 0;
+    geometryInstance = 0;
+    lastFrame = ~0;
+    
+    db_mesh_name = "<unknown>";
+  }
+
+  ~csRenderMesh () {}
 
   /**
    * Some unique ID for the geometry used to render this mesh
@@ -145,6 +156,18 @@ struct csRenderMesh
 
   /// Pointer to a portalcontainer, if there is any
   iPortalContainer* portal;
+
+  /// @@@ Document me.
+  csRef<iShaderVariableContext> variablecontext;
+
+  /**
+   * Number of the frame this rendermesh was used in last. Can be used
+   * to determine whether a rendermesh is currently in use.
+   */
+  uint lastFrame;
+
+  /// Camera coordinate of the local 0,0,0 point of the object.
+  csVector3 camera_origin;
 };
 
 /** @} */

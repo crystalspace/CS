@@ -54,7 +54,7 @@ public:
   virtual void Deactivate();
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (csRenderMesh* mesh,
+  virtual void SetupState (const csRenderMesh* mesh,
     const csShaderVarStack &stacks);
 
   /// Reset states to original

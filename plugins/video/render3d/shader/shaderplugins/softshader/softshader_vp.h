@@ -68,7 +68,7 @@ public:
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate();
 
-  virtual void SetupState (csRenderMesh* mesh,
+  virtual void SetupState (const csRenderMesh* mesh,
     const csShaderVarStack &stacks) {}
 
   virtual void ResetState () {}

@@ -228,8 +228,10 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       shadervars.PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
-      shader->SetupPass (mesh, stacks);
-      g3d->DrawMesh (mesh, stacks);
+      
+      csRenderMeshModes modes (*mesh);
+      shader->SetupPass (mesh, modes, stacks);
+      g3d->DrawMesh (mesh, modes, stacks);
       shader->TeardownPass ();
       if (mesh->variablecontext)
         mesh->variablecontext->PopVariables (stacks);
