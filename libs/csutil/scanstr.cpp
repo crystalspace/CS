@@ -115,9 +115,17 @@ int ScanStr (char* in, char* format, ...)
 	  {
 	    in++;
 	    char* in2 = strchr (in, '\'');
-	    strncpy (a, in, (int)(in2-in));
-	    a[(int)(in2-in)] = 0;
-	    in = in2+1;
+	    if (in2)
+	    {
+	      strncpy (a, in, (int)(in2-in));
+	      a[(int)(in2-in)] = 0;
+	      in = in2+1;
+	    }
+	    else
+	    {
+	      strcpy (a, in);
+	      in = strchr (in, 0);
+	    }
 	  }
 	  else
 	  {
