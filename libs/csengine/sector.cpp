@@ -504,7 +504,6 @@ void csSector::Draw (csRenderView& rview)
 
       if (nearest < SMALL_Z) nearest = SMALL_Z;
 
-      float distance_available = farthest-nearest;
       float z_step = FOG_PLANE_DIST;
                 
       float real_fog_density = GetFog().density;
