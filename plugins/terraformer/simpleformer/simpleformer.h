@@ -31,6 +31,22 @@ struct iObjectRegistry;
 
 class csSimpleSampler;
 
+struct csIntMap
+{
+  csStringID type;
+  int* data;
+  csIntMap () : data (0) { }
+  ~csIntMap () { delete[] data; }
+};
+
+struct csFloatMap
+{
+  csStringID type;
+  float* data;
+  csFloatMap () : data (0) { }
+  ~csFloatMap () { delete[] data; }
+};
+
 /**
  * This is a simple implementation of a terraformer plugin.
  * It only handles a single heightmap
@@ -43,6 +59,11 @@ private:
 
   /// The heightmap to use
   float *heightData;
+
+  /// Additional int maps.
+  csArray<csIntMap> intmaps;
+  /// Additional float maps.
+  csArray<csFloatMap> floatmaps;
 
   /// Width of the heightmap data array
   unsigned int width;
@@ -93,6 +114,11 @@ public:
   /// Set an offset vector to be used in lookups
   void SetOffset (csVector3 offset);
 
+  /// Set additional integer map.
+  bool SetIntegerMap (csStringID type, iImage* map, int scale, int offset);
+  /// Set additional float map.
+  bool SetFloatMap (csStringID type, iImage* map, float scale, float offset);
+
   // Relays calls to the actual class
   struct SimpleFormerState : public iSimpleFormerState
   {
@@ -101,17 +127,23 @@ public:
     {
       scfParent->SetHeightmap (heightmap);
     }
-
-    /// Set a scaling factor to be used in lookups
     virtual void SetScale (csVector3 scale)
     {
       scfParent->SetScale (scale);
     }
-
-    /// Set an offset vector to be used in lookups
     virtual void SetOffset (csVector3 offset)
     {
       scfParent->SetOffset (offset);
+    }
+    virtual bool SetIntegerMap (csStringID type, iImage* map, int scale = 1,
+  	int offset = 0)
+    {
+      return scfParent->SetIntegerMap (type, map, scale, offset);
+    }
+    virtual bool SetFloatMap (csStringID type, iImage* map, float scale = 1.0,
+  	float offset = 0.0)
+    {
+      return scfParent->SetFloatMap (type, map, scale, offset);
     }
   } scfiSimpleFormerState;
 

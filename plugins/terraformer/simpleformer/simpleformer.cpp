@@ -180,6 +180,145 @@ csSimpleFormer::~csSimpleFormer ()
   SCF_DESTRUCT_IBASE();
 }
 
+bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
+	int scale, int offset)
+{
+  size_t w = map->GetWidth ();
+  size_t h = map->GetHeight ();
+  if (width != w || height != h) return false;
+
+  // First check if we already have an intmap of this type.
+  size_t intmap_idx = (size_t)~0;
+  size_t i = 0;
+  while (i < intmaps.Length ())
+    if (intmaps[i].type == type)
+    {
+      intmap_idx = i;
+      break;
+    }
+    else i++;
+  if (intmap_idx == (size_t)~0)
+    intmap_idx = intmaps.Push (csIntMap ());
+
+  csIntMap& intmap = intmaps[intmap_idx];
+  intmap.type = type;
+
+  // Allocate data
+  delete[] intmap.data;
+  intmap.data = new int[width*height];
+
+  // Check what type of image we got
+  if (map->GetFormat () & CS_IMGFMT_TRUECOLOR)
+  {
+    // We don't support this!
+    intmaps.DeleteIndex (intmap_idx);
+    return false;
+  }
+  else if (map->GetFormat () & CS_IMGFMT_PALETTED8)
+  {
+    // It's a paletted image, so we grab data & palette
+    unsigned char *data = (unsigned char*)map->GetImageData ();
+    csRGBpixel *palette = map->GetPalette ();
+
+    // Keep an index to avoid uneccesary x+y*w calculations
+    // Start at last line, since we're gonna want it reversed in Y later
+    // (negative Y in heightmap image goes to positive Z in terrain)
+    //int idx = (height-1)*width;
+
+    unsigned int x, y;
+    // Loop through the data
+    for (y = 0; y < height; ++y)
+    {
+      for (x = 0; x < width; ++x)
+      {
+        // Grab the intensity as height
+        // We're reversing Y to later get negative Y in heightmap image 
+        // to positive Z in terrain
+        intmap.data[x+(height-y-1)*width] = 
+          int (palette[data[x+y*width]].Intensity ()) * scale + offset;
+      }
+    }
+  }
+
+  return true;
+}
+
+bool csSimpleFormer::SetFloatMap (csStringID type, iImage* map,
+	float scale, float offset)
+{
+  size_t w = map->GetWidth ();
+  size_t h = map->GetHeight ();
+  if (width != w || height != h) return false;
+
+  // First check if we already have an floatmap of this type.
+  size_t floatmap_idx = (size_t)~0;
+  size_t i = 0;
+  while (i < floatmaps.Length ())
+    if (floatmaps[i].type == type)
+    {
+      floatmap_idx = i;
+      break;
+    }
+    else i++;
+  if (floatmap_idx == (size_t)~0)
+    floatmap_idx = floatmaps.Push (csFloatMap ());
+
+  csFloatMap& floatmap = floatmaps[floatmap_idx];
+  floatmap.type = type;
+
+  // Allocate data
+  delete[] floatmap.data;
+  floatmap.data = new float[width*height];
+
+  // Check what type of image we got
+  if (map->GetFormat () & CS_IMGFMT_TRUECOLOR)
+  {
+    // It's a RGBA image
+    csRGBpixel *data = (csRGBpixel *)map->GetImageData ();
+
+    unsigned int x, y;
+    // Loop through the data
+    for (y = 0; y < height; ++y)
+    {
+      for (x = 0; x < width; ++x)
+      {
+        // Grab the intensity as height
+        // We're reversing Y to later get negative Y in heightmap image 
+        // to positive Z in terrain
+        floatmap.data[x+(height-y-1)*width] = 
+          data[x+y*width].Intensity () * scale /255.0 + offset;
+      }
+    }
+  }
+  else if (map->GetFormat () & CS_IMGFMT_PALETTED8)
+  {
+    // It's a paletted image, so we grab data & palette
+    unsigned char *data = (unsigned char*)map->GetImageData ();
+    csRGBpixel *palette = map->GetPalette ();
+
+    // Keep an index to avoid uneccesary x+y*w calculations
+    // Start at last line, since we're gonna want it reversed in Y later
+    // (negative Y in heightmap image goes to positive Z in terrain)
+    //int idx = (height-1)*width;
+
+    unsigned int x, y;
+    // Loop through the data
+    for (y = 0; y < height; ++y)
+    {
+      for (x = 0; x < width; ++x)
+      {
+        // Grab the intensity as height
+        // We're reversing Y to later get negative Y in heightmap image 
+        // to positive Z in terrain
+        floatmap.data[x+(height-y-1)*width] = 
+          palette[data[x+y*width]].Intensity () * scale / 255.0 + offset;
+      }
+    }
+  }
+
+  return true;
+}
+
 void csSimpleFormer::SetHeightmap (iImage *heightmap)
 {
   // Grab dimensions
@@ -287,6 +426,23 @@ bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
       scale.y + offset.y;
     return true;
   }
+  else
+  {
+    // Check if it is one of the float maps.
+    size_t i;
+    for (i = 0 ; i < floatmaps.Length () ; i++)
+      if (floatmaps[i].type == type)
+      {
+        // Transform input coordinates to heightmap space.
+        // See CachePositions for details
+        x = ((x-offset.x)/scale.x+1)*(width/2);
+        z = ((z-offset.z)/scale.z+1)*(height/2);
+
+        // Calculate height and return it
+        value = BiLinearData (floatmaps[i].data, width, height, x, z);
+        return true;
+      }
+  }
   return false;
 }
 
@@ -311,6 +467,22 @@ bool csSimpleFormer::SampleVector3 (csStringID type, float x, float z,
 bool csSimpleFormer::SampleInteger (csStringID type, float x, float z, 
                                     int &value)
 {
+  {
+    // Check if it is one of the int maps.
+    size_t i;
+    for (i = 0 ; i < intmaps.Length () ; i++)
+      if (intmaps[i].type == type)
+      {
+        // Transform input coordinates to heightmap space.
+        // See CachePositions for details
+        x = ((x-offset.x)/scale.x+1)*(width/2);
+        z = ((z-offset.z)/scale.z+1)*(height/2);
+
+        // Calculate height and return it
+        value = intmaps[i].data[int (z) * width + int (x)];
+        return true;
+      }
+  }
   return false;
 }
 

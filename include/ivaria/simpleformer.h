@@ -20,10 +20,11 @@
 #define __CS_IVARIA_SIMPLEFORMER_H__
 
 #include "csgeom/vector3.h"
+#include "csutil/strhash.h"
 
 struct iImage;
 
-SCF_VERSION (iSimpleFormerState, 0, 0, 1);
+SCF_VERSION (iSimpleFormerState, 0, 0, 2);
 
 /**
  * iSimpleFormerState exposes implementation specific methods
@@ -49,6 +50,34 @@ struct iSimpleFormerState : public iBase
    * and height (Y)
    */
   virtual void SetOffset (csVector3 scale) = 0;
+
+  /**
+   * Set a generic additional integer map to be used.
+   * \param type is the ID for this map. To get values of this you
+   *        need to fetch the stringset with tag 'crystalspace.shared.stringset'
+   *        and 'Request()' an ID from that.
+   * \param map is the image from which this map will be made. This must
+   *        be an indexed (palette) image.
+   * \return false on error (bad dimension or image).
+   */
+  virtual bool SetIntegerMap (csStringID type, iImage* map, int scale = 1,
+  	int offset = 0) = 0;
+
+  /**
+   * Set a generic additional float map to be used.
+   * \param type is the ID for this map. To get values of this you
+   *        need to fetch the stringset with tag 'crystalspace.shared.stringset'
+   *        and 'Request()' an ID from that.
+   * \param map is the image from which this map will be made. If this
+   *        is an indexed image then the integer index will be casted
+   *        to float, diviced by 256 and then scaled+offset. If this is
+   *        a 24-bit image then the three color components are averaged
+   *        resulting in a value between 0 and 1 too.
+   * \return false on error (bad dimension or image).
+   */
+  virtual bool SetFloatMap (csStringID type, iImage* map, float scale = 1.0,
+  	float offset = 0.0) = 0;
 };
 
 #endif // __CS_IVARIA_SIMPLEFORMER_H__
+
