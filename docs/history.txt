@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Mar-2005
+	- Eric Sunshine propagated yesterday's csString ShrinkBestFit() and
+	  Empty() additions to iString and scfString for API consistency.
+	- Eric Sunshine removed the csString::AsPadFoo() methods. Use the
+	  nearly equivalent PadFoo() methods instead.
+	- Eric Sunshine deprecated the SetGrowsExponentially() and
+	  GetGrowsExponentially() methods in iString and csString. Use
+	  SetGrowsBy(0) and GetGrowsBy() instead.
+	- Eric Sunshine renamed the following string-related functions:
+	    csFindReplace()         --> csReplaceAll()
+	    csString::FindReplace() --> csString::ReplaceAll()
+	    csString::FindStr()     --> csString::Find()
+	  (The old names are still recognized, though deprecated.)
+	- Eric Sunshine added iString::Find() and iString::ReplaceAll() to
+	  complement like-named methods in csString.
+	- Eric Sunshine re-sanitized csstring.h for gcc's -ansi and -pedantic
+	  options. Some `long long' printf() formatting directives had crept in
+	  with yesterday's changes.
+	- Eric Sunshine updated some outdated documentation in csstring.h and
+	  script/perl.txi.
 13-Mar-2005
 	- res made the following changes to csStringBase:
 	    - Removed static Pad*() methods. Provided nothing that can't 

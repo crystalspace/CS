@@ -535,11 +535,11 @@ TYPEMAP_OUT_csWrapPtr
 %ignore iString::GetCapacity;
 %ignore iString::SetGrowsBy;
 %ignore iString::GetGrowsBy;
-%ignore iString::SetGrowsExponentially;
-%ignore iString::GetGrowsExponentially;
 %ignore iString::Truncate;
 %ignore iString::Reclaim;
+%ignore iString::ShrinkBestFit;
 %ignore iString::Clear;
+%ignore iString::Empty;
 %ignore iString::Clone;
 %ignore iString::GetData (); // Non-const.
 %ignore iString::Length;
@@ -549,11 +549,12 @@ TYPEMAP_OUT_csWrapPtr
 %ignore iString::Insert;
 %ignore iString::Overwrite;
 %ignore iString::Append;
-%ignore iString::Append;
 %ignore iString::Slice;
 %ignore iString::SubString;
 %ignore iString::FindFirst;
 %ignore iString::FindLast;
+%ignore iString::Find;
+%ignore iString::ReplaceAll;
 %ignore iString::Format;
 %ignore iString::FormatV;
 %ignore iString::Replace;
@@ -584,7 +585,9 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csString::Truncate;
 %ignore csString::Free;
 %ignore csString::Reclaim;
+%ignore csString::ShrinkBestFit;
 %ignore csString::Clear;
+%ignore csString::Empty;
 %ignore csString::SetAt;
 %ignore csString::GetAt;
 %ignore csString::DeleteAt;
@@ -597,6 +600,8 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csString::SubString;
 %ignore csString::FindFirst;
 %ignore csString::FindLast;
+%ignore csString::Find;
+%ignore csString::ReplaceAll;
 %ignore csString::Replace;
 %ignore csString::Compare;
 %ignore csString::CompareNoCase;
@@ -608,11 +613,8 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csString::Format;
 %ignore csString::FormatV;
 %ignore csString::PadLeft;
-%ignore csString::AsPadLeft;
 %ignore csString::PadRight;
-%ignore csString::AsPadRight;
 %ignore csString::PadCenter;
-%ignore csString::AsPadCenter;
 %ignore csString::GetData (); // Non-const.
 %ignore csString::Detach;
 %ignore csString::Upcase;

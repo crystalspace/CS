@@ -218,7 +218,7 @@ bool csIsPowerOf2 (int n)
  * But, do not copy 'search', instead replace that with 'replace' string.
  * max is size of dest
 */
-void csFindReplace(char *dest, const char *src, const char *search,
+void csReplaceAll(char *dest, const char *src, const char *search,
   const char *replace, int max)
 {
   const char *found;

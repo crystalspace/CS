@@ -482,7 +482,7 @@ static void StrPrintf (iString* file, const char* msg, ...)
   va_start (args, msg);
   str.FormatV (msg, args);
   va_end (args);
-  file->SetGrowsExponentially(true);
+  file->SetGrowsBy(0);
   file->Append (str);
 }
 

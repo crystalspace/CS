@@ -1,6 +1,6 @@
 /*
-    Crystal Space Shared String Vector class
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space String interface
+    Copyright (C) 1999 by Brandon Ehle (Azverkan)
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -66,19 +66,29 @@ public:
   virtual void SetGrowsBy(size_t);
   /// Get the allocation growth increment.
   virtual size_t GetGrowsBy() const;
-  /// Set exponential allocation growth.  Overrides SetGrowsBy().
-  virtual void SetGrowsExponentially(bool);
-  /// Get exponential growth setting.
-  virtual bool GetGrowsExponentially() const;
 
   /// Truncate the string
   virtual void Truncate (size_t iPos);
 
-  /// Set string maximal capacity to current string length
-  virtual void Reclaim ();
+  /// Set string maximal capacity to current string length.
+  virtual void ShrinkBestFit ();
 
-  /// Clear the string (so that it contains only ending 0 character)
-  virtual void Clear ();
+  /**
+   * Set string maximal capacity to current string length.
+   * \deprecated Use ShrinkBestFit() instead.
+   */
+  CS_DEPRECATED_METHOD virtual void Reclaim ()
+  { ShrinkBestFit(); }
+
+  /// Clear the string (so that it contains only ending 0 character).
+  virtual void Empty ();
+
+  /**
+   * Clear the string (so that it contains only ending 0 character).
+   * \deprecated Use Empty() instead.
+   */
+  /* CS_DEPRECATED_METHOD */ virtual void Clear ()
+  { Empty(); }
 
   /// Get a copy of this string
   virtual csRef<iString> Clone () const;
@@ -88,7 +98,7 @@ public:
 
   /// Get a pointer to null-terminated character data.
   /*CS_DEPRECATED_METHOD*/ 
-    // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
+  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
   virtual char* GetData ();
 
   /// Query string length
@@ -144,6 +154,20 @@ public:
    * If the character cannot be found, this function returns (size_t)-1
    */
   virtual size_t FindLast (const char c, size_t p = (size_t)-1) const;
+
+  /**
+   * Find the first occurrence of \p search in this string starting at \p pos.
+   * \param search String to locate.
+   * \param pos Start position of search (default 0).
+   * \return First position of \p search, or (size_t)-1 if not found.
+   */
+  virtual size_t Find (const char* search, size_t pos = 0) const;
+
+  /**
+   * Find all occurrences of \p search in this string and replace them with
+   * \p replacement.
+   */
+  virtual void ReplaceAll (const char* search, const char* replacement);
 
   /// Format.
   virtual void Format (const char* format, ...) CS_GNUC_PRINTF (2, 3);

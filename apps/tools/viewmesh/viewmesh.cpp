@@ -672,7 +672,8 @@ void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
 
   //Add the plugin tag
   char loadername[128] = "";
-  csFindReplace(loadername, pluginname, ".object.", ".loader.factory.",128);
+  csReplaceAll(loadername, pluginname, ".object.", ".loader.factory.",
+    sizeof(loadername));
 
   if (binary)
     strcat(loadername, ".binary");
@@ -683,7 +684,8 @@ void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
 
   char savername[128] = "";
 
-  csFindReplace(savername, pluginname, ".object.", ".saver.factory.", 128);
+  csReplaceAll(savername, pluginname, ".object.", ".saver.factory.",
+    sizeof(savername));
 
   if (binary)
     strcat(savername, ".binary");

@@ -58,7 +58,7 @@ void csStringBase::SetCapacityInternal (size_t NewSize, bool extraSpace)
 size_t csStringBase::ComputeNewSize (size_t NewSize)
 {
   size_t n;
-  if (!GrowExponentially)
+  if (GrowBy != 0)
     n = (NewSize + GrowBy - 1) & ~(GrowBy - 1);
   else
   {
@@ -100,7 +100,6 @@ public:
   size_t GetTotal() const { return str.Length(); }
 };
 
-
 csStringBase& csStringBase::AppendFmtV (const char* format, va_list args)
 {
   FmtStringWriter writer (*this);
@@ -109,6 +108,18 @@ csStringBase& csStringBase::AppendFmtV (const char* format, va_list args)
     formatter (&reader, args);
   formatter.Format (writer);
   return *this;
+}
+
+// These 'long long' methods are not inline since "%ll" and "%llu" are not
+// compatible with gcc's -ansi and -pedantic options which external projects
+// may employ; thus we can not use them in public headers.
+csStringBase& csStringBase::Append (longlong v)
+{
+  return AppendFmt ("%lld", v);
+}
+csStringBase& csStringBase::Append (ulonglong v)
+{
+  return AppendFmt ("%llu", v);
 }
 
 void csStringBase::ExpandIfNeeded(size_t NewSize)
@@ -125,7 +136,6 @@ void csStringBase::SetGrowsBy (size_t n)
     n = DEFAULT_GROW_BY;
   // Round `n' up to multiple of DEFAULT_GROW_BY.
   GrowBy = (n + DEFAULT_GROW_BY - 1) & ~(DEFAULT_GROW_BY - 1);
-  GrowExponentially = false;
 }
 
 csStringBase &csStringBase::ShrinkBestFit()
@@ -337,7 +347,7 @@ size_t csStringBase::FindLast (char c, size_t pos) const
   return (size_t)-1;
 }
 
-size_t csStringBase::FindStr (const char* str, size_t pos) const
+size_t csStringBase::Find (const char* str, size_t pos) const
 {
   if (pos > Size || Data == 0)
     return (size_t)-1;
@@ -349,7 +359,7 @@ size_t csStringBase::FindStr (const char* str, size_t pos) const
   return tmp - Data;
 }
 
-void csStringBase::FindReplace (const char* str, const char* replaceWith)
+void csStringBase::ReplaceAll (const char* str, const char* replaceWith)
 {
   csStringBase newStr;
 
@@ -358,8 +368,9 @@ void csStringBase::FindReplace (const char* str, const char* replaceWith)
 
   while (true)
   {
-    size_t strPos = FindStr (str, p);
-    if (strPos == (size_t)-1) break;
+    size_t strPos = Find (str, p);
+    if (strPos == (size_t)-1)
+      break;
     newStr.Append (Data + p, strPos - p);
     newStr.Append (replaceWith);
     p = strPos + strLen;
@@ -502,13 +513,6 @@ csStringBase &csStringBase::PadLeft (size_t iNewSize, char iChar)
   return *this;
 }
 
-csStringBase csStringBase::AsPadLeft (size_t iNewSize, char iChar) const
-{
-  csStringBase newStr = Clone ();
-  newStr.PadLeft (iChar, iNewSize);
-  return newStr;
-}
-
 csStringBase& csStringBase::PadRight (size_t iNewSize, char iChar)
 {
   if (iNewSize > Size)
@@ -521,13 +525,6 @@ csStringBase& csStringBase::PadRight (size_t iNewSize, char iChar)
     Data [Size] = '\0';
   }
   return *this;
-}
-
-csStringBase csStringBase::AsPadRight (size_t iNewSize, char iChar) const
-{
-  csStringBase newStr = Clone ();
-  newStr.PadRight (iChar, iNewSize);
-  return newStr;
 }
 
 csStringBase& csStringBase::PadCenter (size_t iNewSize, char iChar)
@@ -549,11 +546,4 @@ csStringBase& csStringBase::PadCenter (size_t iNewSize, char iChar)
     Data [Size] = '\0';
   }
   return *this;
-}
-
-csStringBase csStringBase::AsPadCenter (size_t iNewSize, char iChar) const
-{
-  csStringBase newStr = Clone ();
-  newStr.PadCenter (iChar, iNewSize);
-  return newStr;
 }

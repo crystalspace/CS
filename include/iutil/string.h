@@ -29,7 +29,7 @@
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
-SCF_VERSION (iString, 0, 2, 0);
+SCF_VERSION (iString, 0, 2, 1);
 
 /// This is a SCF-compatible interface for csString.
 struct iString : public iBase
@@ -47,24 +47,24 @@ struct iString : public iBase
   virtual size_t GetCapacity () const = 0;
 
   /**
-   * Advise the string that it should grow by approximately this many bytes
-   * when more space is required.
+   * Advise the string that it should grow its allocated buffer by
+   * approximately this many bytes when more space is required. This is an
+   * optimization to avoid excessive memory reallocation and heap management,
+   * which can be quite slow.
    * \remarks This value is only a suggestion.  The actual value by which it
    *   grows may be rounded up or down to an implementation-dependent
-   *   allocation multiple.  This method turns off exponential growth.
+   *   allocation multiple.
+   * <p>
+   * \remarks If the value is zero, then the internal buffer grows
+   *   exponentially by doubling its size, rather than by fixed increments.
    */
   virtual void SetGrowsBy(size_t) = 0;
-  /// Return the number of bytes by which the string grows.
-  virtual size_t GetGrowsBy() const = 0;
-
   /**
-   * Tell the string to re-size its buffer exponentially as needed.
-   * \remarks If set to true, the GetGrowsBy() setting is ignored.
+   * Return the number of bytes by which the string grows.
+   * \remarks If the return value is zero, then the internal buffer grows
+   *   exponentially by doubling its size, rather than by fixed increments.
    */
-  virtual void SetGrowsExponentially(bool) = 0;
-
-  /// Returns true if exponential growth is enabled.
-  virtual bool GetGrowsExponentially() const = 0;
+  virtual size_t GetGrowsBy() const = 0;
 
   /**
    * Truncate the string.
@@ -85,14 +85,33 @@ struct iString : public iBase
    *   holds the implicit null terminator, or it may free the string's memory
    *   completely.
    */
-  virtual void Reclaim () = 0;
+  virtual void ShrinkBestFit () = 0;
+
+  /**
+   * Set string buffer capacity to hold exactly the current content.
+   * \remarks If the string length is greater than zero, then the buffer's
+   *   capacity will be adjusted to exactly that size.  If the string length is
+   *   zero, then the implementation may shrink the allocation so that it only
+   *   holds the implicit null terminator, or it may free the string's memory
+   *   completely.
+   * \deprecated Use ShrinkBestFit() instead.
+   */
+  CS_DEPRECATED_METHOD virtual void Reclaim () = 0;
 
   /**
    * Clear the string (so that it contains only a null terminator).
    * \remarks This is typically shorthand for Truncate(0), but more idiomatic
    *   in terms of human language.
    */
-  virtual void Clear () = 0;
+  virtual void Empty () = 0;
+
+  /**
+   * Clear the string (so that it contains only a null terminator).
+   * \remarks This is typically shorthand for Truncate(0), but more idiomatic
+   *   in terms of human language.
+   * \deprecated Use Empty() instead.
+   */
+  /* CS_DEPRECATED_METHOD */ virtual void Clear () = 0;
 
   /// Get a copy of this string
   virtual csRef<iString> Clone () const = 0;
@@ -112,7 +131,7 @@ struct iString : public iBase
    * \deprecated Use the 'const' version of GetData() instead.
    */
   /*CS_DEPRECATED_METHOD*/ 
-    // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
+  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
   virtual char* GetData () = 0;
 
   /**
@@ -215,6 +234,20 @@ struct iString : public iBase
    */
   virtual size_t FindLast (const char c, size_t p = (size_t)-1) const = 0;
   
+  /**
+   * Find the first occurrence of \p search in this string starting at \p pos.
+   * \param search String to locate.
+   * \param pos Start position of search (default 0).
+   * \return First position of \p search, or (size_t)-1 if not found.
+   */
+  virtual size_t Find (const char* search, size_t pos = 0) const = 0;
+
+  /**
+   * Find all occurrences of \p search in this string and replace them with
+   * \p replacement.
+   */
+  virtual void ReplaceAll (const char* search, const char* replacement) = 0;
+
   /**
    * Format this string using sprintf()-style formatting directives.
    * \remarks Automatically allocates sufficient memory to hold result.  Newly

@@ -47,32 +47,37 @@
  * <li>When constructed with an explicit null-pointer.
  * <li>When assigned a null-pointer via operator=((char const*)0).
  * <li>After an invocation of Replace((char const*)0).
- * <li>After invocation of csStringBase::Free() or any method which is documented
- *     as invoking Free() as a side-effect, such as Reclaim().
+ * <li>After invocation of csStringBase::Free() or any method which is
+ *     documented as invoking Free() as a side-effect, such as ShrinkBestFit().
  * <li>After invocation of csStringBase::Detach().
  * </ul>
  */
 class CS_CSUTIL_EXPORT csStringBase
 {
 protected:
-  // Default number of bytes by which allocation should grow.
-  // *** IMPORTANT *** This must be a power of two (i.e. 8, 16, 32, 64, etc.).
+  /**
+   * Default number of bytes by which allocation should grow.
+   * *** IMPORTANT *** This must be a power of two (i.e. 8, 16, 32, 64, etc.).
+   */
   enum { DEFAULT_GROW_BY = 64 };
 
-  // String buffer.
+  /// String buffer.
   char* Data;
-  // Length of string; not including null terminator.
+  /// Length of string; not including null terminator.
   size_t Size;
-  // Size in bytes of allocated string buffer.
+  /// Size in bytes of allocated string buffer.
   size_t MaxSize;
-  // Size in bytes by which allocated buffer is increased when needed.
+  /**
+   * Size in bytes by which allocated buffer is increased when needed. If this
+   * value is zero, then growth occurs exponentially by doubling the size.
+   */
   size_t GrowBy;
-  // Controls if allocated buffer grows exponentially (overrides GrowBy).
-  bool GrowExponentially;
 
-  // If necessary, increase the buffer capacity enough to hold NewSize bytes.
-  // Buffer capacity is increased in GrowBy increments or exponentially
-  // depending upon configuration.
+  /**
+   * If necessary, increase the buffer capacity enough to hold \p NewSize
+   * bytes.  Buffer capacity is increased in GrowBy increments or exponentially
+   * depending upon configuration.
+   */
   void ExpandIfNeeded (size_t NewSize);
 
   /**
@@ -80,19 +85,18 @@ protected:
    * the buffer can be larger to reduce the number of allocations needed.
    */
   virtual void SetCapacityInternal (size_t NewSize, bool extraSpace);
-  /**
-   * Compute a new buffer size. Takes GrowBy and GrowExponentially into
-   * consideration.
-   */
+
+  /// Compute a new buffer size. Takes GrowBy into consideration.
   size_t ComputeNewSize (size_t NewSize);
+
 public:
   /**
-   * Advise the string that it should allocate enough space to hold up to
-   * NewSize characters.
+   * Advise the string that it should allocate enough space to hold at least
+   * \p NewSize characters.
    * \remarks After calling this method, the string's capacity will be at least
-   *   NewSize + 1 (one for the implicit null terminator).  Never shrinks
+   *   \p NewSize + 1 (one for the implicit null terminator).  Never shrinks
    *   capacity.  If you need to actually reclaim memory, then use Free() or
-   *   Reclaim().
+   *   ShrinkBestFit().
    */
   void SetCapacity (size_t NewSize);
 
@@ -136,11 +140,16 @@ public:
   csStringBase& Append (bool b) { return Append (b ? "1" : "0"); }
 
   /** @{ */
-  /// Append a string formatted using cs_snprintf()-style formatting directives.
+  /**
+   * Append a string formatted using cs_snprintf()-style formatting directives.
+   */
   csStringBase& AppendFmt (const char* format, ...) CS_GNUC_PRINTF (2, 3);
   csStringBase& AppendFmtV (const char* format, va_list args);
   /** @} */
 
+  // Implementation note: The 'long long' methods are not inline since "%ll"
+  // and "%llu" are not compatible with gcc's -ansi and -pedantic options which
+  // external projects may employ; thus we can not use them in public headers.
   /** @{ */
   /// Append the value, in formatted form, to this string.
   csStringBase& Append (short v) { return AppendFmt ("%hd", v); }
@@ -149,8 +158,8 @@ public:
   csStringBase& Append (unsigned int v) { return AppendFmt ("%u", v); }
   csStringBase& Append (long v) { return AppendFmt ("%ld", v); }
   csStringBase& Append (unsigned long v) { return AppendFmt ("%lu", v); }
-  csStringBase& Append (longlong v) { return AppendFmt ("%lld", v); }
-  csStringBase& Append (ulonglong v) { return AppendFmt ("%llu", v); }
+  csStringBase& Append (longlong);
+  csStringBase& Append (ulonglong);
   csStringBase& Append (float v) { return AppendFmt ("%g", v); }
   csStringBase& Append (double v) { return AppendFmt ("%g", v); }
   /** @} */
@@ -159,16 +168,17 @@ public:
    * Create an empty csStringBase object.
    * \remarks The newly constructed string represents a null-pointer.
    */
-  csStringBase () : Data (0), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
-    GrowExponentially (false) {}
+  csStringBase () : Data (0), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY)
+  {}
 
   /**
-   * Create a csStringBase object and reserve space for at least Length characters.
+   * Create a csStringBase object and reserve space for at least \p Length
+   * characters.
    * \remarks The newly constructed string represents a non-null zero-length
    *   string.
    */
   csStringBase (size_t Length) : Data (0), Size (0), MaxSize (0),
-    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
+    GrowBy (DEFAULT_GROW_BY)
   { SetCapacity (Length); }
 
   /**
@@ -177,7 +187,7 @@ public:
    *   only if the template string represented a null-pointer.
    */
   csStringBase (const csStringBase& copy) : Data (0), Size (0), MaxSize (0),
-    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
+    GrowBy (DEFAULT_GROW_BY)
   { Append (copy); }
 
   /**
@@ -186,45 +196,57 @@ public:
    *   only if the input argument is a null-pointer.
    */
   csStringBase (const char* src) : Data (0), Size (0), MaxSize (0),
-    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
+    GrowBy (DEFAULT_GROW_BY)
   { Append (src); }
 
   /// Create a csStringBase object from a single signed character.
   csStringBase (char c) : Data (0), Size (0), MaxSize (0),
-    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
+    GrowBy (DEFAULT_GROW_BY)
   { Append (c); }
 
   /// Create a csStringBase object from a single unsigned character.
   csStringBase (unsigned char c) : Data(0), Size (0), MaxSize (0),
-    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
+    GrowBy (DEFAULT_GROW_BY)
   { Append ((char) c); }
 
   /// Destroy the csStringBase.
   virtual ~csStringBase ();
 
   /**
-   * Advise the string that it should grow by approximately this many bytes
-   * when more space is required.
+   * Advise the string that it should grow its allocated buffer by
+   * approximately this many bytes when more space is required. This is an
+   * optimization to avoid excessive memory reallocation and heap management,
+   * which can be quite slow.
    * \remarks This value is only a suggestion.  The actual value by which it
    *   grows may be rounded up or down to an implementation-dependent
-   *   allocation multiple.  This method turns off exponential growth.
+   *   allocation multiple.
+   * <p>
+   * \remarks If the value is zero, then the internal buffer grows
+   *   exponentially by doubling its size, rather than by fixed increments.
    */
   void SetGrowsBy(size_t);
 
-  /// Return the number of bytes by which the string grows.
+  /**
+   * Return the number of bytes by which the string grows.
+   * \remarks If the return value is zero, then the internal buffer grows
+   *   exponentially by doubling its size, rather than by fixed increments.
+   */
   size_t GetGrowsBy() const
   { return GrowBy; }
 
   /**
    * Tell the string to re-size its buffer exponentially as needed.
-   * \remarks If set to true, the GetGrowsBy() setting is ignored.
+   * \deprecated Use SetGrowsBy(0) instead.
    */
-  void SetGrowsExponentially(bool b)
-  { GrowExponentially = b; }
+  CS_DEPRECATED_METHOD void SetGrowsExponentially(bool b)
+  { SetGrowsBy(b ? 0 : DEFAULT_GROW_BY); }
 
-  /// Returns true if exponential growth is enabled.
-  bool GetGrowsExponentially() const
-  { return GrowExponentially; }
+  /**
+   * Returns true if exponential growth is enabled.
+   * \deprecated Use GetGrowsBy() instead.
+   */
+  CS_DEPRECATED_METHOD bool GetGrowsExponentially() const
+  { return GetGrowsBy() == 0; }
 
   /**
    * Free the memory allocated for the string.
@@ -244,7 +266,7 @@ public:
    *   which means that Truncate(0) is a handy method of clearing the string,
    *   without the overhead of slow heap management.  This may be important if
    *   you want to re-use the same string many times over.  If you need to
-   *   reclaim memory after truncating the string, then invoke Reclaim().
+   *   reclaim memory after truncating the string, then invoke ShrinkBestFit().
    *   GetData() and 'operator char const*' will return a non-null zero-length
    *   string if you truncate the string to 0 characters, unless the string
    *   had already represented a null-pointer, in which case it will continue
@@ -303,7 +325,7 @@ public:
    * \deprecated Use the 'const' version of GetData() instead.
    */
   /*CS_DEPRECATED_METHOD*/ 
-    // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
+  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
   char* GetData ()
   { return Data; }
 
@@ -466,18 +488,38 @@ public:
   size_t FindLast (char c, size_t pos = (size_t)-1) const;
   
   /**
-   * Find the occurrence of a substring in the string.
-   * \param str String to locate.
+   * Find the first occurrence of \p search in this string starting at \p pos.
+   * \param search String to locate.
    * \param pos Start position of search (default 0).
-   * \return First position of string, or (size_t)-1 if not found.
+   * \return First position of \p search, or (size_t)-1 if not found.
    */
-  size_t FindStr (const char* str, size_t pos = 0) const;
+  size_t Find (const char* search, size_t pos = 0) const;
 
   /**
-   * Find the occurrence of a substring in the string and replace it with
-   * another string.
+   * Find the first occurrence of \p search in this string starting at \p pos.
+   * \param search String to locate.
+   * \param pos Start position of search (default 0).
+   * \return First position of \p search, or (size_t)-1 if not found.
+   * \deprecated Use Find() instead.
    */
-  void FindReplace (const char* str, const char* replaceWith);
+  /* CS_DEPRECATED_METHOD */
+  size_t FindStr (const char* search, size_t pos = 0) const
+  { return Find(search, pos); }
+
+  /**
+   * Find all occurrences of \p search in this string and replace them with
+   * \p replacement.
+   */
+  void ReplaceAll (const char* search, const char* replacement);
+
+  /**
+   * Find all occurrences of \p search in this string and replace them with
+   * \p replacement.
+   * \deprecated Use ReplaceAll() instead.
+   */
+  /* CS_DEPRECATED_METHOD */
+  void FindReplace (const char* search, const char* replacement)
+  { ReplaceAll(search, replacement); }
 
   /**
    * Format this string using cs_snprintf()-style formatting directives.
@@ -672,9 +714,6 @@ public:
    */
   csStringBase& PadLeft (size_t NewSize, char PadChar = ' ');
 
-  /// Return a copy of this string formatted with PadLeft().
-  csStringBase AsPadLeft (size_t NewSize, char PadChar = ' ') const;
-
   /**
    * Pad to a specified size with trailing characters.
    * \param NewSize Size to which the string should grow.
@@ -684,9 +723,6 @@ public:
    *   Length(), nothing happens.
    */
   csStringBase& PadRight (size_t NewSize, char PadChar = ' ');
-
-  /// Return a copy of this string formatted with PadRight().
-  csStringBase AsPadRight (size_t NewSize, char PadChar = ' ') const;
 
   /**
    * Pad to a specified size with leading and trailing characters so as to
@@ -700,9 +736,6 @@ public:
    *   padding.
    */
   csStringBase& PadCenter (size_t NewSize, char PadChar = ' ');
-
-  /// Return a copy of this string formatted with PadCenter().
-  csStringBase AsPadCenter (size_t NewSize, char PadChar = ' ') const;
 
   /**
    * Assign a formatted value to this string.
@@ -848,7 +881,7 @@ inline csStringBase operator + (const csStringBase& iStr1, const char* iStr2)
  * \endcode
  */
 template <typename T>
-inline csStringBase &operator << (csStringBase &s, T v) { return s.Append (v); }
+inline csStringBase &operator <<(csStringBase &s, T v) { return s.Append (v); }
 
 /**
  * Subclass of csStringBase that contains an internal buffer which is faster
@@ -948,27 +981,21 @@ public:
 class csString : public csStringFast<>
 {
 public:
-  /**
-   * Create an empty csString object.
-   */
+  /// Create an empty csString object.
   csString () : csStringFast<> () { }
   /**
-   * Create a csString object and reserve space for at least Length characters.
+   * Create a csString object and reserve space for at least \p Length
+   * characters.
    */
   csString (size_t Length) : csStringFast<> (Length) { }
-  /**
-   * Copy constructor.
-   */
+  /// Copy constructor.
   csString (const csStringBase& copy) : csStringFast<> (copy) { }
-  /**
-   * Create a csString object from a null-terminated C string.
-   */
+  /// Create a csString object from a null-terminated C string.
   csString (const char* src) : csStringFast<> (src) { }
   /// Create a csString object from a single signed character.
   csString (char c) : csStringFast<> (c) { }
   /// Create a csString object from a single unsigned character.
   csString (unsigned char c) : csStringFast<> (c) { }
 };
-
 
 #endif // __CS_CSSTRING_H__

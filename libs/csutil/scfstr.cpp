@@ -36,19 +36,13 @@ void scfString::SetGrowsBy(size_t n)
 size_t scfString::GetGrowsBy() const
 { return s.GetGrowsBy(); }
 
-void scfString::SetGrowsExponentially(bool b)
-{ s.SetGrowsExponentially(b); }
-
-bool scfString::GetGrowsExponentially() const
-{ return s.GetGrowsExponentially(); }
-
 void scfString::Truncate (size_t iPos)
 { s.Truncate (iPos); }
 
-void scfString::Reclaim ()
+void scfString::ShrinkBestFit ()
 { s.Reclaim (); }
 
-void scfString::Clear ()
+void scfString::Empty ()
 { s.Clear (); }
 
 csRef<iString> scfString::Clone () const
@@ -109,6 +103,12 @@ size_t scfString::FindFirst (const char c, size_t p) const
 
 size_t scfString::FindLast (const char c, size_t p) const
 { return s.FindLast(c, p); }
+
+size_t scfString::Find (const char* t, size_t p) const
+{ return s.Find(t, p); }
+
+void scfString::ReplaceAll (const char* search, const char* replacement)
+{ s.ReplaceAll(search, replacement); }
 
 void scfString::Format (const char* format, ...)
 {

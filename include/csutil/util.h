@@ -36,21 +36,21 @@
  * of the strdup() function from string.h (strdup() is not present on some
  * platforms). To free the pointer the caller should call delete[].
  */
-extern CS_CSUTIL_EXPORT char *csStrNew (const char *s);
+CS_CSUTIL_EXPORT char *csStrNew (const char *s);
 /**
  * Allocate a new char [] and copy an UTF-8 version of the string into 
  * the newly allocated storage.
  */
-extern CS_CSUTIL_EXPORT char *csStrNew (const wchar_t *s);
+CS_CSUTIL_EXPORT char *csStrNew (const wchar_t *s);
 /**
  * Allocate a new widechar [] and the string into the newly allocated storage.
  */
-extern CS_CSUTIL_EXPORT wchar_t* csStrNewW (const wchar_t *s);
+CS_CSUTIL_EXPORT wchar_t* csStrNewW (const wchar_t *s);
 /**
  * Allocate a new widechar [] and copy the string converted from UTF-8 into 
  * the newly allocated storage.
  */
-extern CS_CSUTIL_EXPORT wchar_t* csStrNewW (const char *s);
+CS_CSUTIL_EXPORT wchar_t* csStrNewW (const char *s);
 
 /**
  * Perform case-insensitive string comparison. Returns a negative number if \p
@@ -58,7 +58,7 @@ extern CS_CSUTIL_EXPORT wchar_t* csStrNewW (const char *s);
  * \p str1 is greater than \p str2. For best portability, use function rather
  * than strcasecmp() or stricmp().
  */
-extern CS_CSUTIL_EXPORT int csStrCaseCmp(char const* str1, char const* str2);
+CS_CSUTIL_EXPORT int csStrCaseCmp(char const* str1, char const* str2);
 
 /**
  * Perform case-insensitive string comparison of the first \p n characters of
@@ -67,7 +67,7 @@ extern CS_CSUTIL_EXPORT int csStrCaseCmp(char const* str1, char const* str2);
  * if the prefix of \p str1 is greater than \p str2. For best portability, use
  * function rather than strncasecmp() or strnicmp().
  */
-extern CS_CSUTIL_EXPORT int csStrNCaseCmp(char const* str1, char const* str2,
+CS_CSUTIL_EXPORT int csStrNCaseCmp(char const* str1, char const* str2,
   size_t n);
 
 /**
@@ -143,12 +143,12 @@ public:
  * The returned filename is always absolute, i.e. it always starts
  * from root. Return a string allocated with csStrNew().
  */
-extern CS_CSUTIL_EXPORT char *csExpandName (const char *iName);
+CS_CSUTIL_EXPORT char *csExpandName (const char *iName);
 
 /**
  * Split a pathname into separate path and name.
  */
-extern CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath,
+CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath,
   size_t iPathSize, char *oName, size_t iNameSize);
 
 /**
@@ -159,7 +159,7 @@ extern CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath,
  * \remark If you want case-insensitive comparison, convert \p fName and
  *   \p fMask to upper- or lower-case first.
  */
-extern CS_CSUTIL_EXPORT bool csGlobMatches (const char *fName, const char *fMask);
+CS_CSUTIL_EXPORT bool csGlobMatches (const char *fName, const char *fMask);
 
 /**
  * Finds the smallest number that is a power of two and is larger or
@@ -194,8 +194,19 @@ static inline int csLog2 (int n)
  * dest.  But, do not copy \p search, instead replace that with \p replace
  * string.  \p max is size in bytes of \p dest.
  */
-CS_CSUTIL_EXPORT void csFindReplace (char *dest, const char *src,
+CS_CSUTIL_EXPORT void csReplaceAll (char *dest, const char *src,
   const char *search, const char *replace, int max);
+
+/**
+ * Given \p src and \p dest, which are already allocated, copy \p source to \p
+ * dest.  But, do not copy \p search, instead replace that with \p replace
+ * string.  \p max is size in bytes of \p dest.
+ * \deprecated Use csReplaceAll() instead.
+ */
+/* CS_DEPRECATED_METHOD */
+CS_CSUTIL_EXPORT inline void csFindReplace (char *dest, const char *src,
+  const char *search, const char *replace, int max)
+{ csReplaceAll(dest, src, search, replace, max); }
 
 /** @} */
   

@@ -1281,21 +1281,58 @@ the mesh provides them). They are:
 @samp{texture coordinate 0} @result{} @samp{texture coordinate 0}
 @end itemize
 
-@subheading @code{csString} Changes
+@subheading String Changes
 
-The class hierarchy of csString was changed. Most functionality is provided by
-csStringBase, from which csStringFast<> and csString descend. csStringFast<>
-is a templated class that features an internal buffer which is used instead of 
-dynamically allocated memory if its size suffices, and is also faster in this 
-case. csString inherits from csStringFast<> and uses the default size for the 
-internal buffer.
+The class hierarchy of @samp{csString} has changed. Most functionality is now
+provided by the new superclass @samp{csStringBase}. From this,
+@code{csStringFast<>} is subclassed, and @samp{csString} descends from
+@code{csStringFast<>}. @code{csStringFast<>} is a templated class featuring an
+internal character buffer which is used instead of dynamically heap-allocated
+memory when the string length is sufficently short (as controlled by the class
+template argument). This generalization can make @samp{csStringFast<>} (and its
+subclass @samp{csString}) much faster when used as automatic (stack-allocated)
+variables, even when declared inside @samp{for@{@}}-loops, since slow
+heap-allocation often can be avoided.
 
-Several methods have been removed from csStringBase:
+For simplification purposes, several methods have been removed from
+@samp{csString} and @samp{iString} (when present):
+
 @itemize @bullet
 @item
-Static @code{Pad*()} methods 
-@result{} Functionality can be achieved with non-static @code{Pad*()} methods.
+Static @code{PadFoo()} methods. The same functionality can be achieved with
+the remaining instance @code{PadFoo()} methods.
+
 @item
-Static integer and float @code{Format()} routines
-@result{} Functionality can be achieved by utilizing the Replace() or Format() methods.
+@code{AsPadFoo()} instance methods. The same functionality can be achieved with
+the remaining instance @code{PadFoo()} methods.
+
+@item
+Static integer and float @code{Format()} methods.  The same functionality can
+be achieved by utilizing the remaining @code{Replace()} or @code{Format()}
+methods.
+
+@code{SetGrowsExponentially()} and @code{GetGrowsExponentially()}. The same
+functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
+@end itemize
+
+For @sc{api} consistency and uniformity between container classes, the
+following @samp{csString} and @samp{iString} methods (when present) have been
+renamed:
+
+@itemize @bullet
+@item
+@code{Clear()} @result{} @code{Empty()}
+@item
+@code{FindReplace()} @result{} @code{ReplaceAll()}
+@item
+@code{FindStr()} @result{} @code{Find()}
+@item
+@code{Reclaim()} @result{} @code{ShrinkBestFit()}
+@end itemize
+
+Likewise, the following string-related functions have been renamed:
+
+@itemize @bullet
+@item
+@code{csFindReplace()} @result{} @code{csReplaceAll()}
 @end itemize

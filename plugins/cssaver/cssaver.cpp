@@ -301,11 +301,11 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       if (!fact) continue;
 
       csString loadername (fact->QueryClassID());
-      loadername.FindReplace (".type.", ".loader.");
+      loadername.ReplaceAll (".type.", ".loader.");
       CreateValueNode(child, "type", GetPluginName (loadername, "Tex"));
 
       csString savername (fact->QueryClassID());
-      savername.FindReplace (".type.", ".saver.");
+      savername.ReplaceAll (".type.", ".saver.");
 
       //Invoke the iSaverPlugin::WriteDown
       csRef<iSaverPlugin> saver = 
@@ -659,12 +659,12 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
 
     //Add the plugin tag
     char loadername[128] = "";
-    csFindReplace(loadername, pluginname, ".object.", ".loader.factory.",128);
+    csReplaceAll(loadername, pluginname, ".object.", ".loader.factory.",128);
 
     pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Fact"));
 
     char savername[128] = "";
-    csFindReplace(savername, pluginname, ".object.", ".saver.factory.", 128);
+    csReplaceAll(savername, pluginname, ".object.", ".saver.factory.", 128);
 
     //Invoke the iSaverPlugin::WriteDown
     csRef<iSaverPlugin> saver = 
@@ -823,12 +823,12 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
 
         //Add the plugin tag
         char loadername[128] = "";
-        csFindReplace(loadername, pluginname, ".object.", ".loader.", 128);
+        csReplaceAll(loadername, pluginname, ".object.", ".loader.", 128);
 
         pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Mesh"));
 
         char savername[128] = "";
-        csFindReplace(savername, pluginname, ".object.", ".saver.", 128);
+        csReplaceAll(savername, pluginname, ".object.", ".saver.", 128);
 
         //Invoke the iSaverPlugin::WriteDown
         csRef<iSaverPlugin> saver = 

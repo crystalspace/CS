@@ -208,7 +208,7 @@ which accepts a single integer parameter (an array index) and returns a
 
 @subsubheading @code{iEvent}
 
-The overloaded @code{iEvent::Add()} and @code{Find()} methods are
+The overloaded @code{iEvent::Add()} and @code{Retrieve()} methods are
 replaced in Perl with ones given names which explicitly specify the types
 of their parameters (since otherwise Perl would not know which C++ function to
 call):
@@ -237,25 +237,25 @@ call):
 @item
 @code{AddVoidPtr()}
 @item
-@code{FindInt8()}
+@code{RetrieveInt8()}
 @item
-@code{FindInt16()}
+@code{RetrieveInt16()}
 @item
-@code{FindInt32()}
+@code{RetrieveInt32()}
 @item
-@code{FindUInt8()}
+@code{RetrieveUInt8()}
 @item
-@code{FindUInt16()}
+@code{RetrieveUInt16()}
 @item
-@code{FindUInt32()}
+@code{RetrieveUInt32()}
 @item
-@code{FindFloat()}
+@code{RetrieveFloat()}
 @item
-@code{FindDouble()}
+@code{RetrieveDouble()}
 @item
-@code{FindString()}
+@code{RetrieveString()}
 @item
-@code{FindBool()}
+@code{RetrieveBool()}
 @item
-@code{FindVoidPtr()}
+@code{RetrieveVoidPtr()}
 @end itemize
