@@ -1,4 +1,4 @@
-@c -*-texinfo-*-
+c -*-texinfo-*-
 @node HOWTO CS Project, HOWTO Creating External MSVC 6 Application, HOWTO User Objects in Maps, HOWTO
 @subsection Creating an External Crystal Space Application
 @cindex External Crystal Space Application
@@ -41,7 +41,7 @@ incorporate Crystal Space into your project.  For instance, if you invoke
 @file{cs-config} with the @samp{--cxxflags} argument, it will return Crystal
 Space-specific C++ compiler switches with which you should invoke the C++
 compiler.  Likewise, the @samp{--libs} argument will return the Crystal
-Space-specific linker switches and libraries with which you should like your
+Space-specific linker switches and libraries with which you should link your
 program.
 
 @subsubheading Jamtemplate
