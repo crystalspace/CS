@@ -645,6 +645,9 @@ bool csGLGraphics3D::Open ()
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
     return false;
   }
+
+  SetPerspectiveAspect (G2D->GetHeight ());
+  SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);
   
   object_reg->Register( G2D, "iGraphics2D");
 

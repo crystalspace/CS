@@ -30,6 +30,11 @@ chronological order.
 	  Now filenames and makefile targets should be the only remnant of the
 	  stupid "render3d" naming (which was my fault, sorry for that :)
 	  Also added make- & jamfiles for new software renderer.
+	- Anders Stenberg fixed a bug in new renderer where aspect wasn't 
+	  initialized before BeginDraw in WalkTest. Solved by setting default
+	  aspect and center in iGraphics3D::Open based on canvas size. Note
+	  that this isn't really a good solution[TM]. The apps should call 
+	  SetPerspectiveAspect/Center _before_ calls to BeginDraw.
 27-Aug-2003
 	- Eric Sunshine fixed problem in csHash where non-friend classes
 	  csHash::Iterator and GlobalIterator were accessing protected csHash
