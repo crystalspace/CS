@@ -7,6 +7,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no
 	  need to ever create an MSVC project file for it.
+	- Eric Sunshine added an automated check to configure.ac to test for
+	  presence of the Linux joystick API.  The test is based upon a code
+	  fragment provided by Norman Kraemer.  This test obsoletes the
+	  --enable-linux-joystick switch.
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and

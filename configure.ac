@@ -1222,6 +1222,29 @@ CS_CHECK_LIB_WITH([cal3d],
 
 
 #------------------------------------------------------------------------------
+# Check if Linux joystick API is present.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
+    [AC_LANG_PROGRAM(
+	[#include <fcntl.h>
+	@%:@include <linux/joystick.h>],
+	[unsigned char axes;
+	unsigned char buttons;
+	int version;
+	char name[[[128]]];
+	int fd;
+	struct js_event js;
+	(void)js;
+	ioctl(fd, JSIOCGVERSION, &version);
+	ioctl(fd, JSIOCGAXES, &axes);
+	ioctl(fd, JSIOCGBUTTONS, &buttons);
+	ioctl(fd, JSIOCGNAME(128), name);])],
+    [], [],
+    [CS_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if plugin modules must implement main().  This is needed on some
 # platforms to ensure that global constructors and functions which initialize
 # global variables in the plugin module get invoked.
@@ -1601,20 +1624,6 @@ AC_DEFUN([CS_CHECK_QINT],
 CS_CHECK_QINT
 AS_IF([test $cs_cv_cxx_qint_ok = no],
     [CS_HEADER_PROPERTY([CS_QINT_WORKAROUND])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if Linux joystick plugin should be built.
-#------------------------------------------------------------------------------
-AC_MSG_CHECKING([whether to enable Linux joystick support])
-AC_ARG_ENABLE([linux-joystick],
-    [AC_HELP_STRING([--enable-linux-joystick],
-	[enable Linux joystick support (default NO)])],
-    [], [enable_linux_joystick=no])
-AC_MSG_RESULT([$enable_linux_joystick])
-AS_IF([test "$enable_linux_joystick" != no],
-    [CS_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])], [])
 
 
 
