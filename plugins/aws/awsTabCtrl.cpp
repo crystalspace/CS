@@ -403,12 +403,13 @@ void awsTabCtrl::SetTopBottom (bool to_top)
 void awsTabCtrl::DoLayout ()
 {
   size_t i;
+  int j;
   int x = 0;
   csRect r = Frame ();
 
-  for (i = first - 1; i >= 0; i--)
+  for (j = first - 1; j >= 0; i--)
   {
-    awsTab *btn = vTabs.Get (i);
+    awsTab *btn = vTabs.Get (j);
     csRect br =  btn->Frame ();
     btn->Hide ();
     r.xmax = r.xmin - 1;
