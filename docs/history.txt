@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Sep-2003
+	- Philip re-applied the Erics Sunshines Cygwin __argc __argv
+          fix in win32.cpp, which was overwritten by the old version
+          by another dev.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now

@@ -49,8 +49,8 @@
 // Cygwin doesn't understand _argc or _argv, so we define them here.
 // These are borrowed from Mingw32 includes (see stdlib.h)
 // Cygwin Purists, forgive the corruption, Cygwin means Cygnus for Win32.
-extern int _argc;
-extern char** _argv;
+extern int CS_WIN32_ARGC;
+extern char** CS_WIN32_ARGV;
 #endif
 
 void SystemFatalError (const char *s)
