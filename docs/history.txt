@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+15-May-2000
+	- Eric Sunshine cobbled things back together just enough so that the
+	  project can once again be built on Unix following phase one of
+	  Alex's merge of the new terrain code.  For now terrain functionality
+	  is completely disabled.  For Windows, the project file maintainer
+	  will probably need to adjust include paths in the csparser and
+	  csengine projects to refer to libs/csterr.
+	- Eric Sunshine eliminated compilation warnings in octree.cpp.
 14-May-2000
 	- Added csPoly3D::ClassifyXYZ() routines.
 	- Started work on new optimization for PVS.
@@ -66,6 +74,11 @@ The history order has been reversed so that new features are at the top.
 	  determined by Mingw.mak, win32vc.mak, unix.mak, etc.  If you
 	  require that PLUGINS be referenced in user.mak,  then
 	  uncomment PLUGINS references in user.mak, etc.
+	- Eric Sunshine reverted several of the files which Paul committed
+	  since he forgot to commit several supporting files and also
+	  accidentally blasted many useful default values and replaced them
+	  with his own custom settings.
+	- Eric Sunshine removed more obsolete CHK() and CHKB() references.
 	- Big update of terrain engine from Alex Pfaffe. Currently broken
 	  though.
 13-May-2000
