@@ -175,5 +175,4 @@ section:
 
 @subsubheading Progressive @sc{lod}
 
-Todo... @@@
-
+To-Do@dots{} @@@@@@

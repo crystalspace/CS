@@ -217,9 +217,9 @@ you can use a smart-pointer to automate reference counting
 @item void DecRef()
 Call this function to decrement the object's reference count.  When the
 reference count reaches zero, the object is deleted automatically, provided
-that it is not an interface embedded within another object, @ref{SCF Embedded
-Interfaces}.  There should be one matching @code{DecRef()} for each
-@code{IncRef()} invocation.
+that it is not an interface embedded within another object,
+@ref{SCF Embedded Interfaces}.  There should be one matching @code{DecRef()}
+for each @code{IncRef()} invocation.
 
 @item void AddRefOwner(iBase**)
 Call this function to set up a @dfn{weak reference} to the object .  A weak

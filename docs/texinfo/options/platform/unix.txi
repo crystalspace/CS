@@ -14,5 +14,5 @@ $HOME/.crystalspace/MyGames.ClickFrenzy2.cfg
 
 User-specific, application-neutral settings, on the other hand, will be stored
 as @file{$HOME/.crystalspace/CrystalSpace.Global.cfg}.  The configuration file
-format is the described in the configuration file section, @ref{Configuration
-File}.
+format is the described in the configuration file section,
+@ref{Configuration File}.

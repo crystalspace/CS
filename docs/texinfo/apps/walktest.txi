@@ -378,8 +378,8 @@ left and right, only up and down.
 
 Acceleration and maximum speed are configured in the Configuration file, but
 only affect the step (move in direction of view) and strafe (move perpendicular
-to direction of view) commands, not the rotation commands.  @xref{Walktest
-Configuration Files}.
+to direction of view) commands, not the rotation commands.
+@xref{Walktest Configuration Files}.
 
 @table @code
 @item facenorth

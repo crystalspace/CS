@@ -95,8 +95,8 @@ Animated 3D models (3D sprites). @xref{Animation}.
 2D animations.
 
 @item
-Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.  @xref{md32spr
-Tutorial}.
+Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.
+@xref{md32spr Tutorial}.
 
 @item
 The @file{sprcal3d} plugin is able to load Cal3D models.
