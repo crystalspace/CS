@@ -33,7 +33,7 @@
 #include <windowsx.h>
 #include <ddraw.h>
 // Remove this to have a DirectInput Keyboard Support (xtrochu@yahoo.com)
-//#define DO_DINPUT_KEYBOARD
+#define DO_DINPUT_KEYBOARD
 //
 #ifdef DO_DINPUT_KEYBOARD
 #include <dinput.h>
