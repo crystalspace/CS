@@ -51,7 +51,7 @@ public:
 
   // If the folloging counter > 0 then the object will be assumed visible
   // automatically. The counter will be decremented then.
-  int vis_cnt;
+  uint32 vis_cnt;
 
   // When this object was last made visible.
   uint32 history_frame_cnt;

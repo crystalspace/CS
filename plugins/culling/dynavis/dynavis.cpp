@@ -483,10 +483,9 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
   bool vis = true;
 
-  if (do_cull_history && hist->vis_cnt > 0)
+  if (do_cull_history && hist->vis_cnt >= history_frame_cnt)
   {
     hist->reason = VISIBLE_HISTORY;
-    hist->vis_cnt--;
     cnt_node_visible++;
     // Here we do a bitwise and of the frustum mask that we have
     // calculated so far and the frustum mask we remembered.
@@ -497,7 +496,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   if (node_bbox.Contains (pos))
   {
     hist->reason = VISIBLE_INSIDE;
-    hist->vis_cnt = RAND_HISTORY;
+    hist->vis_cnt = history_frame_cnt + RAND_HISTORY;
     hist->history_frustum_mask = frustum_mask;
     cnt_node_visible++;
     goto end;
@@ -573,7 +572,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   }
 
   hist->reason = VISIBLE;
-  hist->vis_cnt = RAND_HISTORY;
+  hist->vis_cnt = history_frame_cnt + RAND_HISTORY;
   hist->history_frustum_mask = frustum_mask;
   cnt_node_visible++;
 
@@ -967,10 +966,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   // Before we do anything else we test history culling (if enabled)
   // and also if the position of the camera is inside the bounding box.
   // Finally we test view frustum culling.
-  if (do_cull_history && hist->vis_cnt > 0)
+  if (do_cull_history && hist->vis_cnt >= history_frame_cnt)
   {
-    obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_vistest_nr,
-		      history_frame_cnt);
+    obj->MarkVisibleForHistory (current_vistest_nr, history_frame_cnt);
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
     cnt_visible++;
     vis = true;
@@ -1311,6 +1309,10 @@ bool csDynaVis::VisTest (iRenderView* rview,
   UpdateObjects ();
   current_vistest_nr++;
   history_frame_cnt++;	// Only for history culling.
+  if (history_frame_cnt > 4000000000)
+  {
+    // Correct for the unlikely event that we have a wrap-arround.
+  }
   cnt_visible = 0;
   cnt_node_visible = 0;
 
@@ -1333,7 +1335,6 @@ bool csDynaVis::VisTest (iRenderView* rview,
       if (visobj_wrap->history->history_frame_cnt == history_frame_cnt-1)
       {
 	visobj_wrap->history->history_frame_cnt = history_frame_cnt;
-        //visobj->SetVisibilityNumber (current_visnr);
         viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh);
       }
     }
@@ -1366,6 +1367,9 @@ bool csDynaVis::VisTest (iRenderView* rview,
   data.frustum[2].Set (trans.GetT2O () * frust[2], - frust[2] * o2tmult);
   data.frustum[3].Set (trans.GetT2O () * frust[3], - frust[3] * o2tmult);
   // @@@ DO z=0 plane too!
+  //csPlane3 pz0 (0, 0, 1, 0);
+  //data.frustum[4] = trans.This2Other (pz0);
+  //uint32 frustum_mask = 0x1f;
   uint32 frustum_mask = 0xf;
 
 # ifdef CS_DEBUG
@@ -2629,7 +2633,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
       	->GetPolygonMeshViscull ();
-      visobj_wrap->history->history_frame_cnt = 0;	//@@@
+      visobj_wrap->history->history_frame_cnt = 0;
       if (polymesh)
       {
         int vispix, totpix;
@@ -2637,7 +2641,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	if (vispix)
 	{
 	  visobj_wrap->last_visible_vistestnr = current_vistest_nr;
-          visobj_wrap->history->history_frame_cnt = history_frame_cnt;	//@@@
+          visobj_wrap->history->history_frame_cnt = history_frame_cnt;
         }
       }
     }

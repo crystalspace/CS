@@ -103,12 +103,18 @@ public:
   void MarkVisible (csVisReason reason, int cnt, uint32 current_vistest_nr,
 		uint32 history_frame_cnt)
   {
-    //visobj->SetVisibilityNumber (current_visnr);
     last_visible_vistestnr = current_vistest_nr;
     history->reason = reason;
-    history->vis_cnt = cnt;
-    if (history_frame_cnt != 0)
-      history->history_frame_cnt = history_frame_cnt;
+    history->vis_cnt = history_frame_cnt+cnt;
+    history->history_frame_cnt = history_frame_cnt;
+  }
+
+  void MarkVisibleForHistory (uint32 current_vistest_nr,
+		uint32 history_frame_cnt)
+  {
+    history->reason = VISIBLE_HISTORY;
+    last_visible_vistestnr = current_vistest_nr;
+    history->history_frame_cnt = history_frame_cnt;
   }
 
   SCF_DECLARE_IBASE;

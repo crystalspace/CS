@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Nov-2003
+	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
+	  could remain visible for longer then expected because the history
+	  counter was only decremented if the object visibility test was
+	  called. So if the node itself is not visible then it would not
+	  get decremented. Solved this by comparing with the global history
+	  frame counter instead.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.
