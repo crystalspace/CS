@@ -117,10 +117,10 @@ chronological order.
 	  MSVC 7.1
 	- Jorrit started work on a small debugging framework for the
 	  PVS visibility culler. Currently empty.
-	- Luca applied a very small fix to the sprite2d plugin so that it is 
-	  possible to change its material on the fly at any time by calling 
-	  SetMaterialWrapper. He also added a little doxygen note to the 
-	 csRenderMesh::indexend about its usage.
+	- Luca applied a very small fix to the sprite2d plugin so that it is
+	  possible to change its material on the fly at any time by calling
+	  SetMaterialWrapper. He also added a little doxygen note to the
+	  csRenderMesh::indexend about its usage.
 20-Mar-2005
 	- Jorrit changed pvsvis so that the required bounding box is now
 	  optional. PVSCalc will calculate the missing bounding box if needed
