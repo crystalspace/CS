@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+2-Feb-2002
+	- Toxe fixed a brand new bug in csMeshWrapper::HitBeam().
 1-Feb-2002
 	- Tobias Brueckner (Toxe) fixed a bug in the OpenGL 3D renderer that
 	  caused it to crash when rendering materials that only had an
