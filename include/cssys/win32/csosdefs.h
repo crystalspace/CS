@@ -255,6 +255,7 @@ char* __WindowsDirectory()
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SOCKETS
+#include <winsock.h>
 #ifndef socklen_t
    typedef int socklen_t;
 #endif
