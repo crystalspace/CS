@@ -145,6 +145,7 @@ class csShadow;
 #define DEBUGCMD_MESH_YPLUS	1061	// Move mesh
 #define DEBUGCMD_MESH_ZMIN	1062	// Move mesh
 #define DEBUGCMD_MESH_ZPLUS	1063	// Move mesh
+#define DEBUGCMD_SAVEMAP	1064	// SaveMap
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0
@@ -410,6 +411,8 @@ private:
 
   /// Send a debug command to a plugin
   void DebugCmd (const char* cmd);
+
+  void SaveMap ();
 public:
   SCF_DECLARE_IBASE;
 

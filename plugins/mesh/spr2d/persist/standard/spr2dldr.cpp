@@ -298,53 +298,66 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  if (obj)
+  csRef<iSprite2DFactoryState> spritefact = SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
+  csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+  if (!spritefact) return false;
+  if (!meshfact) return false;
+
+  //Writedown Material tag
+  iMaterialWrapper* mat = spritefact->GetMaterialWrapper();
+  if (mat)
   {
-    csRef<iSprite2DFactoryState> spritefact = SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
-    csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
-    if (!spritefact) return false;
-    if (!meshfact) return false;
-
-/*
-    //TBD: Writedown UVAnimation tag
-    for (int i=0; i<spritefact->GetUVAnimationCount(); i++)
+    const char* matname = mat->QueryObject()->GetName();
+    if (matname && *matname)
     {
-      iSprite2DUVAnimation* anim = spritefact->GetUVAnimation(i);
-      anim->GetName();
-      for (int j=0; j<anim->GetFrameCount(); j++)
-      {
-        iSprite2DUVAnimationFrame* frame = anim->GetFrame(j);
+      csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      matNode->SetValue("material");
+      matNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(matname);
+    }    
+  }    
 
+  //Writedown Lighting tag
+  synldr->WriteBool(paramsNode, "lighting", spritefact->HasLighting(), true);
+
+  for (int i=0; i<spritefact->GetUVAnimationCount(); i++)
+  {
+    csRef<iDocumentNode> uvaniNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    uvaniNode->SetValue("uvanimation");
+    iSprite2DUVAnimation* anim = spritefact->GetUVAnimation(i);
+    const char* animname = anim->GetName();
+    uvaniNode->SetAttribute("name", animname);
+    for (int j=0; j<anim->GetFrameCount(); j++)
+    {
+      csRef<iDocumentNode> frameNode = uvaniNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      frameNode->SetValue("frame");
+      iSprite2DUVAnimationFrame* frame = anim->GetFrame(j);
+      const char* framename = frame->GetName();
+      frameNode->SetAttribute("name", framename);
+      int duration = frame->GetDuration();
+      csRef<iDocumentNode> durationNode = frameNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      durationNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(duration);
+      for (int i=0; i<frame->GetUVCount(); i++)
+      {
+        csVector2 uv = frame->GetUVCoo(i);
+        csRef<iDocumentNode> vNode = frameNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        vNode->SetValue("v");
+        vNode->SetAttributeAsFloat("u", uv.x);
+        vNode->SetAttributeAsFloat("v", uv.y);
       }
     }
-*/
-    //Writedown Material tag
-    iMaterialWrapper* mat = spritefact->GetMaterialWrapper();
-    if (mat)
-    {
-      const char* matname = mat->QueryObject()->GetName();
-      if (matname && *matname)
-      {
-        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        matnameNode->SetValue(matname);
-      }    
-    }    
-
-    //Writedown Lighting tag
-    synldr->WriteBool(paramsNode, "lighting", spritefact->HasLighting(), true);
-
-    //Writedown Mixmode tag
-    int mixmode = spritefact->GetMixMode();
-    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    mixmodeNode->SetValue("mixmode");
-    synldr->WriteMixmode(mixmodeNode, mixmode, true);
   }
+
+  //Writedown Mixmode tag
+  int mixmode = spritefact->GetMixMode();
+  csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  mixmodeNode->SetValue("mixmode");
+  synldr->WriteMixmode(mixmodeNode, mixmode, true);
+
   return true;
 }
 //---------------------------------------------------------------------------
@@ -543,94 +556,108 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
 bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  if (obj)
+  csRef<iSprite2DState> sprite = SCF_QUERY_INTERFACE (obj, iSprite2DState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if (!sprite) return false;
+  if (!mesh) return false;
+
+  //Writedown Factory tag
+  csRef<iMeshFactoryWrapper> fact = 
+    SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+  if (fact)
   {
-    csRef<iSprite2DState> sprite = SCF_QUERY_INTERFACE (obj, iSprite2DState);
-    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
-    if (!sprite) return false;
-    if (!mesh) return false;
-
-    //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
-    if (fact)
+    const char* factname = fact->QueryObject()->GetName();
+    if (factname && *factname)
     {
-      const char* factname = fact->QueryObject()->GetName();
-      if (factname && *factname)
-      {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        factNode->SetValue("factory");
-        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
-      }    
-    }
-
-    //Writedown vertex tag
-    csColoredVertices vertex = sprite->GetVertices();
-    csColoredVertices::Iterator iter = vertex.GetIterator();
-    while (iter.HasNext())
-    {
-      csSprite2DVertex vertex = iter.Next();
-
-      csRef<iDocumentNode> vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      vNode->SetValue("v");
-      vNode->SetAttributeAsFloat("x", vertex.pos.x);
-      vNode->SetAttributeAsFloat("x", vertex.pos.y);
-    }
-
-    //Writedown uv tag
-    iter.Reset();
-    while (iter.HasNext())
-    {
-      csSprite2DVertex vertex = iter.Next();
-
-      csRef<iDocumentNode> uvNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      uvNode->SetValue("uv");
-      uvNode->SetAttributeAsFloat("u", vertex.u);
-      uvNode->SetAttributeAsFloat("v", vertex.v);
-
-    }
-
-    //Writedown Material tag
-    iMaterialWrapper* mat = sprite->GetMaterialWrapper();
-    if (mat)
-    {
-      const char* matname = mat->QueryObject()->GetName();
-      if (matname && *matname)
-      {
-        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        matnameNode->SetValue(matname);
-      }    
+      csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      factNode->SetValue("factory");
+      factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
     }    
-
-    //Writedown color tag
-    iter.Reset();
-    while (iter.HasNext())
-    {
-      csSprite2DVertex vertex = iter.Next();
-
-      csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      colorNode->SetValue("color");
-      colorNode->SetAttributeAsFloat("red", vertex.color.red);
-      colorNode->SetAttributeAsFloat("green", vertex.color.green);
-      colorNode->SetAttributeAsFloat("blue", vertex.color.blue);
-    }
-
-    //Writedown Lighting tag
-    synldr->WriteBool(paramsNode, "lighting", sprite->HasLighting(), true);
-
-    //TBD: write down animate tag
-
-    //Writedown Mixmode tag
-    int mixmode = sprite->GetMixMode();
-    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    mixmodeNode->SetValue("mixmode");
-    synldr->WriteMixmode(mixmodeNode, mixmode, true);
   }
+
+  //Writedown vertex tag
+  csColoredVertices vertex = sprite->GetVertices();
+  csColoredVertices::Iterator iter = vertex.GetIterator();
+  while (iter.HasNext())
+  {
+    csSprite2DVertex vertex = iter.Next();
+
+    csRef<iDocumentNode> vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    vNode->SetValue("v");
+    vNode->SetAttributeAsFloat("x", vertex.pos.x);
+    vNode->SetAttributeAsFloat("x", vertex.pos.y);
+  }
+
+  //Writedown uv tag
+  iter.Reset();
+  while (iter.HasNext())
+  {
+    csSprite2DVertex vertex = iter.Next();
+
+    csRef<iDocumentNode> uvNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    uvNode->SetValue("uv");
+    uvNode->SetAttributeAsFloat("u", vertex.u);
+    uvNode->SetAttributeAsFloat("v", vertex.v);
+
+  }
+
+  //Writedown Material tag
+  iMaterialWrapper* mat = sprite->GetMaterialWrapper();
+  if (mat)
+  {
+    const char* matname = mat->QueryObject()->GetName();
+    if (matname && *matname)
+    {
+      csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      matNode->SetValue("material");
+      csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+      matnameNode->SetValue(matname);
+    }    
+  }    
+
+  //Writedown color tag
+  iter.Reset();
+  while (iter.HasNext())
+  {
+    csSprite2DVertex vertex = iter.Next();
+
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    colorNode->SetAttributeAsFloat("red", vertex.color.red);
+    colorNode->SetAttributeAsFloat("green", vertex.color.green);
+    colorNode->SetAttributeAsFloat("blue", vertex.color.blue);
+  }
+
+  //Writedown Lighting tag
+  synldr->WriteBool(paramsNode, "lighting", sprite->HasLighting(), true);
+
+  //Write down animate tag
+  for (int i=0; i<sprite->GetUVAnimationCount(); i++)
+  {
+    csRef<iDocumentNode> uvaniNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    uvaniNode->SetValue("animate");
+    bool loop;
+    int style;
+    iSprite2DUVAnimation* anim = sprite->GetUVAnimation(i, style, loop);
+    const char* animname = anim->GetName();
+    uvaniNode->SetAttribute("name", animname);
+    synldr->WriteBool(uvaniNode,"loop",loop,false);
+    csRef<iDocumentNode> styleNode = styleNode->GetNode ("style");
+    styleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(style);
+  }
+
+  //Writedown Mixmode tag
+  int mixmode = sprite->GetMixMode();
+  csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  mixmodeNode->SetValue("mixmode");
+  synldr->WriteMixmode(mixmodeNode, mixmode, true);
+
   return true;
 }

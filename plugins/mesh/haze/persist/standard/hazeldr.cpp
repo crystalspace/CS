@@ -289,49 +289,87 @@ bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#if 0
-
-#define MAXLINE 100 /* max number of chars per line... */
-
-/// write hull to string
-static void WriteHull(csString& str, iHazeHull *hull)
-{
-  char buf[MAXLINE];
-  csVector3 a,b;
-  int nr;
-  float p,q;
-  csRef<iHazeHullBox> ebox (SCF_QUERY_INTERFACE(hull, iHazeHullBox));
-  if(ebox)
-  {
-    ebox->GetSettings(a, b);
-    sprintf(buf, "  HAZEBOX(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
-    str.Append(buf);
-    return;
-  }
-  csRef<iHazeHullCone> econe (SCF_QUERY_INTERFACE(hull, iHazeHullCone));
-  if(econe)
-  {
-    econe->GetSettings(nr, a, b, p, q);
-    sprintf(buf, "  HAZEBOX(%d, %g,%g,%g, %g,%g,%g, %g, %g)\n", nr,
-      a.x,a.y,a.z, b.x,b.y,b.z, p, q);
-    str.Append(buf);
-    return;
-  }
-  printf ("Unknown hazehull type, cannot writedown!\n");
-}
-
-#endif
-//TBD
 bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for haze mesh");
-  paramsNode=0;
-  
+
+  csRef<iHazeFactoryState> haze = SCF_QUERY_INTERFACE (obj, iHazeFactoryState);
+  csRef<iMeshObjectFactory> mesh = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+
+  if (mesh && haze)
+  {
+    //Writedown Material tag
+    iMaterialWrapper* mat = haze->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Directional tag
+    csVector3 direct = haze->GetDirectional();
+    csRef<iDocumentNode> directNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    directNode->SetValue("directional");
+    synldr->WriteVector(directNode, &direct);
+
+    //Writedown Origin tag
+    csVector3 orig = haze->GetOrigin();
+    csRef<iDocumentNode> origNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    origNode->SetValue("origin");
+    synldr->WriteVector(origNode, &orig);
+
+    for (int i=0; i<haze->GetLayerCount(); i++)
+    {
+      csRef<iDocumentNode> layerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      layerNode->SetValue("layer");
+
+      float scale = haze->GetLayerScale(i);
+      csRef<iDocumentNode> scaleNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      scaleNode->SetValue("scale");
+      scaleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(scale);
+
+      iHazeHull* hull = haze->GetLayerHull(i);
+      csRef<iHazeHullBox> hullbox = SCF_QUERY_INTERFACE(hull, iHazeHullBox);
+      csRef<iHazeHullCone> hullcone = SCF_QUERY_INTERFACE(hull, iHazeHullCone);
+      if (hullbox)
+      {
+        csVector3 min, max;
+        hullbox->GetSettings(min, max);
+        csRef<iDocumentNode> boxNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        boxNode->SetValue("hazebox");
+        synldr->WriteBox(boxNode,&csBox3(min, max));
+      }
+      else if (hullcone)
+      {
+        int number;
+        float p, q;
+        csVector3 min, max;
+        hullcone->GetSettings(number, min, max, p, q);
+        csRef<iDocumentNode> coneNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        coneNode->SetValue("hazecone");
+        synldr->WriteBox(coneNode,&csBox3(min, max));
+        coneNode->SetAttributeAsFloat("p", p);
+        coneNode->SetAttributeAsFloat("q", q);
+        coneNode->SetAttributeAsInt("number", number);
+      }
+    }
+ 
+    //Writedown Mixmode tag
+    int mixmode = haze->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
   return true;
 }
 
@@ -476,19 +514,104 @@ csHazeSaver::~csHazeSaver ()
 bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
 {
   csHazeSaver::object_reg = object_reg;
-  return true;
-}
-//TBD
-bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent)
-{
-  if (!parent) return false; //you never know...
-  
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for haze mesh");
-  paramsNode=0;
-  
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
+bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+{
+  if (!parent) return false; //you never know...
+  if (!obj) return false; //you never know...
+  
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
+
+  csRef<iHazeState> haze = SCF_QUERY_INTERFACE (obj, iHazeState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if (mesh && haze)
+  {
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
+      }    
+    }
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = haze->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Directional tag
+    csVector3 direct = haze->GetDirectional();
+    csRef<iDocumentNode> directNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    directNode->SetValue("directional");
+    synldr->WriteVector(directNode, &direct);
+
+    //Writedown Origin tag
+    csVector3 orig = haze->GetOrigin();
+    csRef<iDocumentNode> origNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    origNode->SetValue("origin");
+    synldr->WriteVector(origNode, &orig);
+
+    for (int i=0; i<haze->GetLayerCount(); i++)
+    {
+      csRef<iDocumentNode> layerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      layerNode->SetValue("layer");
+
+      float scale = haze->GetLayerScale(i);
+      csRef<iDocumentNode> scaleNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      scaleNode->SetValue("scale");
+      scaleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(scale);
+
+      iHazeHull* hull = haze->GetLayerHull(i);
+      csRef<iHazeHullBox> hullbox = SCF_QUERY_INTERFACE(hull, iHazeHullBox);
+      csRef<iHazeHullCone> hullcone = SCF_QUERY_INTERFACE(hull, iHazeHullCone);
+      if (hullbox)
+      {
+        csVector3 min, max;
+        hullbox->GetSettings(min, max);
+        csRef<iDocumentNode> boxNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        boxNode->SetValue("hazebox");
+        synldr->WriteBox(boxNode,&csBox3(min, max));
+      }
+      else if (hullcone)
+      {
+        int number;
+        float p, q;
+        csVector3 min, max;
+        hullcone->GetSettings(number, min, max, p, q);
+        csRef<iDocumentNode> coneNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        coneNode->SetValue("hazecone");
+        synldr->WriteBox(coneNode,&csBox3(min, max));
+        coneNode->SetAttributeAsFloat("p", p);
+        coneNode->SetAttributeAsFloat("q", q);
+        coneNode->SetAttributeAsInt("number", number);
+      }
+    }
+ 
+    //Writedown Mixmode tag
+    int mixmode = haze->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
+  return true;
+}

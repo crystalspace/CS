@@ -201,6 +201,10 @@ public:
     {      
       return scfParent->directional;
     }
+    virtual csTicks GetUpdateInterval () const
+    {
+      return 0;
+    }
     virtual void SetUpdateInterval (csTicks value)
     {
       
@@ -408,7 +412,10 @@ public:
     {
       return scfParent->directional;
     }
-
+    virtual csTicks GetUpdateInterval () const
+    {
+      return scfParent->update_interval;
+    }
     virtual void SetUpdateInterval (csTicks value)
     {
       scfParent->update_interval = value;

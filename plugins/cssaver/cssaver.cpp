@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "plugins/cssaver/cssaver.h"
+#include "cssaver.h"
 #include "iutil/vfs.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
@@ -56,6 +56,8 @@
 #include "itexture/itexfact.h"
 #include "itexture/iproctex.h"
 #include "cstool/proctex.h"
+#include "ivaria/engseq.h"
+#include "ivaria/sequence.h"
 
 #define ONE_OVER_256 (1.0/255.0)
 
@@ -824,7 +826,7 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
           float intensity = cross->GetIntensityFactor();
           csRef<iDocumentNode>intensityNode = CreateNode(haloNode, "intensity");
           intensityNode->CreateNodeBefore(CS_NODE_TEXT)
-            ->SetValueAsInt((int)intensity);
+            ->SetValueAsFloat(intensity);
 
           float crossfact = cross->GetCrossFactor();
           csRef<iDocumentNode>crossfactNode = CreateNode(haloNode, "cross");
@@ -958,6 +960,90 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   return true;
 }
 
+bool csSaver::SaveSequence(iDocumentNode *parent)
+{
+#if 0
+  csRef<iEngineSequenceManager> eseqmgr =
+    CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
+  if (!eseqmgr) return false;
+
+  csRef<iDocumentNode> sequencesNode = CreateNode(parent, "sequences");
+
+  for (int i = 0; i < eseqmgr->GetSequenceCount(); i++)
+  {
+    iSequenceWrapper* sequence = eseqmgr->GetSequence(i);
+    csRef<iDocumentNode> sequenceNode = CreateNode(sequencesNode, "sequence");
+    const char* name = sequence->QueryObject()->GetName();
+    sequenceNode->SetAttribute("name", name);
+
+    iEngineSequenceParameters* params = sequence->GetBaseParameterBlock();
+    if (params)
+    {
+      for (int j = 0; j < params->GetParameterCount(); j++)
+      {
+        csRef<iDocumentNode> paramNode = CreateNode(sequenceNode, "???");
+        const char* paramname = params->GetParameterName(j);
+        paramNode->SetAttribute("name", paramname);
+        iBase* param = params->GetParameter(j);
+        if (!param) continue;
+        csRef<iLight> light = SCF_QUERY_INTERFACE(param, iLight);
+
+        if (light)
+        {
+          paramNode->SetValue("light");
+          paramNode->SetAttribute("light", light->QueryObject()->GetName());
+        }
+      }
+    }
+  }
+#endif
+  return true;
+}
+
+bool csSaver::SaveTriggers(iDocumentNode *parent)
+{
+#if 0
+  csRef<iEngineSequenceManager> eseqmgr =
+    CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
+  if (!eseqmgr) return false;
+
+  csRef<iDocumentNode> triggersNode = CreateNode(parent, "triggers");
+
+  for (int i = 0; i < eseqmgr->GetTriggerCount(); i++)
+  {
+    iSequenceTrigger* trigger = eseqmgr->GetTrigger(i);
+    csRef<iDocumentNode> triggerNode = CreateNode(triggersNode, "trigger");
+    const char* name = trigger->QueryObject()->GetName();
+    triggerNode->SetAttribute("name", name);
+
+    iSequenceWrapper* seq = trigger->GetFiredSequence();
+    csRef<iDocumentNode> sequenceNode = CreateNode(triggerNode, "fire");
+    const char* seqname = seq->QueryObject()->GetName();
+    sequenceNode->SetAttribute("name", seqname);
+
+    iEngineSequenceParameters* params = trigger->GetParameters();
+    if (params)
+    {
+      for (int j = 0; j < params->GetParameterCount(); j++)
+      {
+        csRef<iDocumentNode> paramNode = CreateNode(sequenceNode, "???");
+        const char* paramname = params->GetParameterName(j);
+        paramNode->SetAttribute("name", paramname);
+        iBase* param = params->GetParameter(j);
+        csRef<iLight> light = SCF_QUERY_INTERFACE(param, iLight);
+
+        if (light)
+        {
+          paramNode->SetValue("light");
+          paramNode->SetAttribute("light", light->QueryObject()->GetName());
+        }
+      }
+    }
+  }
+#endif
+  return true;
+}
+
 csRef<iString> csSaver::SaveMapFile()
 {
   csRef<iDocumentSystem> xml = 
@@ -967,7 +1053,6 @@ csRef<iString> csSaver::SaveMapFile()
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
-  //TBD: this crashes for me, dunno why, have to look at it more closley.
   if (!SaveTextures(parent)) return 0;
   if (!SaveVariables(parent)) return 0;
   if (!SaveShaders(parent)) return 0;
@@ -975,8 +1060,9 @@ csRef<iString> csSaver::SaveMapFile()
   if (!SaveSettings(parent)) return 0;
   if (!SaveRenderPriorities(parent)) return 0;
   if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return 0;
-  
   if (!SaveSectors(parent)) return 0;
+  if (!SaveSequence(parent)) return 0;
+  if (!SaveTriggers(parent)) return 0;
 
   iString* str = new scfString();
   if (doc->Write(str) != 0)
@@ -1005,11 +1091,16 @@ bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
-  if (!SaveTextures(parent)) return false;
-  if (!SaveShaders(parent)) return false;
-  if (!SaveMaterials(parent)) return false;
-  if (!SaveRenderPriorities(parent)) return false;
+  if (!SaveTextures(parent)) return 0;
+  if (!SaveVariables(parent)) return 0;
+  if (!SaveShaders(parent)) return 0;
+  if (!SaveMaterials(parent)) return 0;
+  if (!SaveSettings(parent)) return 0;
+  if (!SaveRenderPriorities(parent)) return 0;
+  if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return 0;
+  if (!SaveSectors(parent)) return 0;
+  if (!SaveSequence(parent)) return 0;
+  if (!SaveTriggers(parent)) return 0;
 
-  /// TODO: write mesh objects, factories
   return true;
 }

@@ -51,18 +51,21 @@ public:
   static csRef<iDocumentNode> CreateValueNodeAsColor(
     iDocumentNode *parent, const char* name, const csColor &color);
 
-  bool SaveTextures(iDocumentNode *parent);
-  bool SaveMaterials(iDocumentNode *parent);
-  bool SaveShaders(iDocumentNode *parent);
-  bool SaveSettings(iDocumentNode* node);
-  bool SaveRenderPriorities(iDocumentNode* node);
-  bool SaveVariables (iDocumentNode* node);
   bool SaveCameraPositions(iDocumentNode *parent);
-  bool SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent);
+  bool SaveMaterials(iDocumentNode *parent);
+  bool SaveRenderPriorities(iDocumentNode* node);
+  bool SaveSettings(iDocumentNode* node);
   bool SaveSectors(iDocumentNode *parent);
-  bool SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent);
-  bool SaveSectorLights(iSector *s, iDocumentNode *parent);
+  bool SaveSequence(iDocumentNode *parent);
+  bool SaveShaders(iDocumentNode *parent);
+  bool SaveTextures(iDocumentNode *parent);
+  bool SaveTriggers(iDocumentNode *parent);
+  bool SaveVariables (iDocumentNode* node);
+
+  bool SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent);
   bool SavePortals(iPortal *portal, iDocumentNode *parent);
+  bool SaveSectorLights(iSector *s, iDocumentNode *parent);
+  bool SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent);
 
   virtual csRef<iString> SaveMapFile();
   virtual bool SaveMapFile(const char *filename);

@@ -838,14 +838,22 @@ void csSprite2DMeshObject::Sprite2DState::RemoveUVAnimation (
 }
 
 iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
-	const char *name)
+	const char *name) const
 {
   return scfParent->factory->GetUVAnimation (name);
 }
 
 iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
-	int idx)
+	int idx) const
 {
+  return scfParent->factory->GetUVAnimation (idx);
+}
+
+iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
+	int idx, int &style, bool &loop) const
+{
+  style = scfParent->uvani->style;
+  loop = scfParent->uvani->loop;
   return scfParent->factory->GetUVAnimation (idx);
 }
 

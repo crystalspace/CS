@@ -398,7 +398,6 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-//TBD
 bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
@@ -490,10 +489,12 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
     //Writedown Tween tag
     synldr->WriteBool(paramsNode, "tween", spritefact->IsTweeningEnabled(), true);
+
+    //TBD: Writedown Smooth tag
+
   }
   return true;
 }
-
 //---------------------------------------------------------------------------
 csSprite3DLoader::csSprite3DLoader (iBase* pParent)
 {

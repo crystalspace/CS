@@ -704,7 +704,22 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
         ->SetValue("manualcolors");
 
-    if (gfact->IsAutoNormals()) //TBD: check for autonormals here
+    //Writedown AnimationControl tag
+    iGenMeshAnimationControlFactory* aniconfact = 
+      gfact->GetAnimationControlFactory();
+    if (aniconfact)
+    {
+      csRef<iDocumentNode> aniconNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      aniconNode->SetValue("animcontrol");
+      const char* ret = aniconfact->Save(aniconNode);
+      if (ret)
+      {
+        aniconNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue(ret);
+      }
+    }
+
+    if (gfact->IsAutoNormals())
     {
       //Write Autonormals Tag
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("autonormals");

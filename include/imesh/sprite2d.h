@@ -196,12 +196,13 @@ struct iSprite2DFactoryState : public iBase
   /**
    * Get a specific UV animation by name. Returns 0 if not found.
    */
-  virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) = 0;
+  virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const = 0;
 
   /**
    * Get a specific UV animation by index. Returns 0 if not found.
    */
-  virtual iSprite2DUVAnimation *GetUVAnimation (int idx) = 0;
+  virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const = 0;
+
 };
 
 SCF_VERSION (iSprite2DState, 0, 0, 1);
@@ -233,6 +234,22 @@ struct iSprite2DState : public iSprite2DFactoryState
    * false .. after last frame the normal texture is shown
    */
   virtual void SetUVAnimation (const char *name, int style, bool loop) = 0;
+
+  /**
+   * Get a specific UV animation by name. Returns 0 if not found.
+   */
+  virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const = 0;
+
+  /**
+   * Get a specific UV animation by index. Returns 0 if not found.
+   */
+  virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const = 0;
+
+  /**
+   * Get a specific UV animation by index. Returns 0 if not found.
+   */
+  virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style,
+                                                bool &loop) const = 0;
 
   /**
    * Stop the animation and show the <idx>-th frame.

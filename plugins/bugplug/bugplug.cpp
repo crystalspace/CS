@@ -74,6 +74,7 @@
 #include "iengine/rview.h"
 #include "cstool/csview.h"
 #include "cstool/collider.h"
+#include "imap/saver.h"
 #include "csqint.h"
 #include "csqsqrt.h"
 
@@ -533,6 +534,9 @@ void csBugPlug::HideSpider (iCamera* camera)
 	break;
       case DEBUGCMD_SCRSHOT:
         CaptureScreen ();
+	break;
+      case DEBUGCMD_SAVEMAP:
+        SaveMap ();
 	break;
       case DEBUGCMD_DEBUGSECTOR:
 	SwitchDebugSector (camera->GetTransform ());
@@ -1252,6 +1256,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
       case DEBUGCMD_DEBUGSECTOR:
+      case DEBUGCMD_SAVEMAP:
       case DEBUGCMD_SCRSHOT:
         // Set spider on a hunt.
 	UnleashSpider (cmd, args);
@@ -2064,6 +2069,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "ds_right"))	return DEBUGCMD_DS_RIGHT;
   if (!strcmp (cmd, "debugview"))	return DEBUGCMD_DEBUGVIEW;
   if (!strcmp (cmd, "scrshot"))		return DEBUGCMD_SCRSHOT;
+  if (!strcmp (cmd, "savemap"))		return DEBUGCMD_SAVEMAP;
   if (!strcmp (cmd, "fps"))		return DEBUGCMD_FPS;
   if (!strcmp (cmd, "hideselected"))	return DEBUGCMD_HIDESELECTED;
   if (!strcmp (cmd, "undohide"))	return DEBUGCMD_UNDOHIDE;
@@ -2928,6 +2934,37 @@ void csBugPlug::RemoveCounter (const char* countername)
   int i = FindCounter (countername);
   if (i != -1)
     counters.DeleteIndex (i);
+}
+
+void csBugPlug::SaveMap ()
+{
+  int i = 0;
+  char name[CS_MAXPATHLEN];
+
+  bool exists = false;
+  do
+  {
+    cs_snprintf (name, CS_MAXPATHLEN, "/this/world%d.xml", i);
+    if (exists = VFS->Exists (name)) i++;
+  }
+  while ((i < captureFormatNumberMax) && (exists));
+
+  if (i >= captureFormatNumberMax)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Too many screenshot files in current directory");
+    return;
+  }
+
+  csRef<iPluginManager> plugin_mgr = 
+    CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iSaver> saver = 
+    CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.level.saver", iSaver);
+  if (!saver) 
+    saver = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.level.saver", iSaver);
+  if (saver)
+    saver->SaveMapFile(name);
+
 }
 
 //---------------------------------------------------------------------------

@@ -66,6 +66,8 @@ struct iLightningFactoryState : public iBase
   ///
   virtual const csVector3& GetDirectional () = 0;
   ///
+  virtual csTicks GetUpdateInterval () const = 0;
+  ///
   virtual void SetUpdateInterval (csTicks value) = 0;
   ///
   virtual float GetBandWidth () const = 0;

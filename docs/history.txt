@@ -18,6 +18,14 @@ chronological order.
 	  or ZNONE) and render priority (object, alpha, wall, ...) to
 	  mesh factories too. These will be used as defaults when creating
 	  objects from those factories.
+	- PK added SaveMap to bugplug. Press F10 to save the map.
+	- PK added GetUpdateInterval() to imesh/lghtng.h.
+	- PK added GetUVAnimation (int idx, int &style, bool &loop) to 
+	  imesh/sprite2d.h
+	- PK started with SaveSequence() and SaveTriggers() in csSaver.cpp
+	- PK implemented iSaverPlugin for hazemesh.
+	- PK implemented iSaverPlugin for lightningmesh.
+	- PK added the saving of uvanimations to spr2d
 25-Sep-2004
 	- res copied Matze's change of GLAPI in glextmanager.h (empty instead 
 	  of 'extern') over to the GL extension manager templates.

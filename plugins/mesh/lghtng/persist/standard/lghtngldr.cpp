@@ -265,24 +265,82 @@ bool csLightningFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-//TBD
 bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for lightning mesh");
-  paramsNode=0;
-  
+
+  csRef<iLightningState> light = SCF_QUERY_INTERFACE (obj, iLightningState);
+  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+
+  if (mesh && light)
+  {
+    //Writedown Material tag
+    iMaterialWrapper* mat = light->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Directional tag
+    csVector3 direct = light->GetDirectional();
+    csRef<iDocumentNode> directNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    directNode->SetValue("directional");
+    synldr->WriteVector(directNode, &direct);
+
+    //Writedown Origin tag
+    csVector3 orig = light->GetOrigin();
+    csRef<iDocumentNode> origNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    origNode->SetValue("origin");
+    synldr->WriteVector(origNode, &orig);
+
+    //Writedown Vibration tag
+    float vibr = light->GetVibration();
+    csRef<iDocumentNode> vibrNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    vibrNode->SetValue("vibration");
+    vibrNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(vibr);
+
+    //Writedown Length tag
+    float len = light->GetLength();
+    csRef<iDocumentNode> lenNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    lenNode->SetValue("length");
+    lenNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(len);
+
+    //Writedown Wildness tag
+    float wild = light->GetWildness();
+    csRef<iDocumentNode> wildNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    wildNode->SetValue("wildness");
+    wildNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(wild);
+
+    //Writedown PointCount tag
+    int pc = light->GetPointCount();
+    csRef<iDocumentNode> pcNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    pcNode->SetValue("pointcount");
+    pcNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(pc);
+
+    //Writedown Interval tag
+    csTicks ticks = light->GetUpdateInterval();
+    csRef<iDocumentNode> ticksNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    ticksNode->SetValue("interval");
+    ticksNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(ticks);
+
+    //Writedown Mixmode tag
+    int mixmode = light->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
   return true;
-/*
-  csString str;
-  csRef<iLightningFactoryState> Lightningstate (
-        SCF_QUERY_INTERFACE (obj, iLightningFactoryState));
-*/
-  // @@@TODO
 }
 
 //---------------------------------------------------------------------------

@@ -274,8 +274,9 @@ public:
     virtual int GetUVAnimationCount () const;
     virtual iSprite2DUVAnimation *CreateUVAnimation ();
     virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim);
-    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name);
-    virtual iSprite2DUVAnimation *GetUVAnimation (int idx);
+    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const;
+    virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const;
+    virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style, bool &loop) const;
 
   } scfiSprite2DState;
   friend class Sprite2DState;
@@ -429,11 +430,10 @@ public:
     { return scfParent->CreateUVAnimation (); }
     virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim)
     { scfParent->RemoveUVAnimation(anim); }
-    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name)
+    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const
     { return scfParent->GetUVAnimation (name); }
-    virtual iSprite2DUVAnimation *GetUVAnimation (int idx)
+    virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const
     { return scfParent->GetUVAnimation (idx); }
-
   } scfiSprite2DFactoryState;
   friend class Sprite2DFactoryState;
 };

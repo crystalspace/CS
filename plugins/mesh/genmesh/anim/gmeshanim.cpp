@@ -940,6 +940,9 @@ const char* csGenmeshAnimationControlFactory::Load (iDocumentNode* node)
 
 const char* csGenmeshAnimationControlFactory::Save (iDocumentNode* parent)
 {
+  csRef<iFactory> plugin = SCF_QUERY_INTERFACE(type, iFactory);
+  if (!plugin) return "Couldn't get Class ID";
+  parent->SetAttribute("plugin", plugin->QueryClassID());
   return "Not implemented yet!";
 }
 
