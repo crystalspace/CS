@@ -38,6 +38,9 @@ chronological order.
 	  actual content of the generated shell script is provided by a
 	  client-supplied "content creation" rule.  The cs-config script is now
 	  created via this new mechanism.
+	- Jorrit did more API documentation enhancements
+	  (iEngineSequenceManager) and also added a few constants
+	  instead of 0, 1, and 2 for AddConditionLightChange().
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause

@@ -1287,17 +1287,17 @@ void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 }
 
 void csSequenceWrapper::AddOperationSetAmbient (csTicks time,
-	iParameterESM* light, const csColor& color,iSharedVariable *var)
+	iParameterESM* sector, const csColor& color,iSharedVariable *var)
 {
-  OpSetAmbientLight* op = new OpSetAmbientLight (light, color,var);
+  OpSetAmbientLight* op = new OpSetAmbientLight (sector, color, var);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationFadeAmbient (csTicks time,
-	iParameterESM* light, const csColor& color, csTicks duration)
+	iParameterESM* sector, const csColor& color, csTicks duration)
 {
-  OpFadeAmbientLight* op = new OpFadeAmbientLight (light, color, duration,
+  OpFadeAmbientLight* op = new OpFadeAmbientLight (sector, color, duration,
   	eseqmgr);
   sequence->AddOperation (time, op);
   op->DecRef ();
@@ -1546,12 +1546,12 @@ public:
       	->GetGlobalFrameNr ();
     if (framenr != global_framenr)
     {
-      if (operation == 1) // new color less than trigger color
+      if (operation == CS_SEQUENCE_LIGHTCHANGE_LESS) // new color less than trigger color
       {
 	if ( AverageColor (col) >= AverageColor (trigger_color) )
 	  return;
       }
-      else if (operation == 2)
+      else if (operation == CS_SEQUENCE_LIGHTCHANGE_GREATER)
       {
 	if ( AverageColor (col) <= AverageColor (trigger_color) )
 	  return;

@@ -142,9 +142,9 @@ public:
 		  const csColor& color);
   void AddOperationFadeLight (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration);
-  void AddOperationSetAmbient (csTicks time, iParameterESM* light,
+  void AddOperationSetAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color,iSharedVariable *var);
-  void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
+  void AddOperationFadeAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color, csTicks duration);
   void AddOperationRandomDelay(csTicks time,int min, int max);
   void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
@@ -250,15 +250,15 @@ public:
     {
       scfParent->AddOperationFadeLight (time, light, color, duration);
     }
-    virtual void AddOperationSetAmbient (csTicks time, iParameterESM* light,
+    virtual void AddOperationSetAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color, iSharedVariable *colorvar)
     {
-      scfParent->AddOperationSetAmbient (time, light, color, colorvar);
+      scfParent->AddOperationSetAmbient (time, sector, color, colorvar);
     }
-    virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
+    virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color, csTicks duration)
     {
-      scfParent->AddOperationFadeAmbient (time, light, color, duration);
+      scfParent->AddOperationFadeAmbient (time, sector, color, duration);
     }
     virtual void AddOperationRandomDelay (csTicks time,int min, int max)
     {

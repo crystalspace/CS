@@ -38,6 +38,13 @@ class csBox3;
 class csSphere;
 struct iSharedVariable;
 
+/**
+ * Operations for AddConditionLightChange().
+ */
+#define CS_SEQUENCE_LIGHTCHANGE_NONE 0
+#define CS_SEQUENCE_LIGHTCHANGE_LESS 1
+#define CS_SEQUENCE_LIGHTCHANGE_GREATER 2
+
 SCF_VERSION (iParameterESM, 0, 0, 1);
 
 /**
@@ -205,6 +212,7 @@ struct iSequenceWrapper : public iBase
    * Operation: set a variable to a floating point value.
    * If 'dvalue' is not 0 then that will be used instead of the absolute
    * value. In that case 'dvalue' is added.
+   * \param time is the relative time at which this operation will fire.
    * \param var is the variable that will be set by this operation. The
    * value that is set is the 'value' parameter.
    * \param value is the new value for 'var'.
@@ -220,6 +228,11 @@ struct iSequenceWrapper : public iBase
    * value. In that case 'dvalue' is added. 'dvalue' has to be a floating
    * point variable for that to work. 'value' can be any type. The type
    * of 'var' will be set to the type of 'value' in that case.
+   * \param time is the relative time at which this operation will fire.
+   * \param var is the variable that will be set by this operation. The
+   * value that is set is the 'value' parameter.
+   * \param value is the new value for 'var'.
+   * \param dvalue is a difference that is added. Only used if it is not 0.
    */
   virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, iSharedVariable* value,
@@ -227,78 +240,143 @@ struct iSequenceWrapper : public iBase
 
   /**
    * Operation: set a variable to a vector.
+   * \param time is the relative time at which this operation will fire.
+   * \param var is the variable that will be set by this operation.
+   * \param v is the new vector value.
    */
   virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, const csVector3& v) = 0;
 
   /**
    * Operation: set a variable to a color.
+   * \param time is the relative time at which this operation will fire.
+   * \param var is the variable that will be set by this operation.
+   * \param c is the new color value.
    */
   virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, const csColor& c) = 0;
 
   /**
    * Operation: set a material on a mesh.
+   * \param time is the relative time at which this operation will fire.
+   * \param mesh is a parameter that represents a mesh on which the material
+   * should be set. The mesh should support SetMaterialWrapper().
+   * \param mat is a parameter that represents the material to set.
    */
   virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
 		  iParameterESM* mat) = 0;
 
   /**
    * Operation: set a material on a polygon.
+   * \param time is the relative time at which this operation will fire.
+   * \param mesh is a parameter that represents a polygon on which the material
+   * should be set.
+   * \param mat is a parameter that represents the material to set.
    */
   virtual void AddOperationSetPolygonMaterial (csTicks time,
   		  iParameterESM* polygon, iParameterESM* mat) = 0;
 
   /**
    * Operation: set a light color.
+   * \param time is the relative time at which this operation will fire.
+   * \param light is a parameter representing the light which will
+   * be set to the given color.
+   * \param color is the new color value.
    */
   virtual void AddOperationSetLight (csTicks time, iParameterESM* light,
 		  const csColor& color) = 0;
 
   /**
    * Operation: fade a light to some color during some time.
+   * \param time is the relative time at which this operation will fire.
+   * \param light is a parameter representing the light which will
+   * be fade to the given color.
+   * \param color is the final color value.
+   * \param duration is the duration time of the fade. The fade will
+   * start at relative time 'time' and will take 'duration' milliseconds
+   * to go from current color to destination color.
    */
   virtual void AddOperationFadeLight (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration) = 0;
 
   /**
    * Operation: set dynamic ambient light color.
+   * \param time is the relative time at which this operation will fire.
+   * \param sector is a parameter representing the sector which will
+   * have its ambient set.
+   * \param color is the ambient color unless 'colorvar' is not 0.
+   * \param colorvar is the variable containing the desired color. This
+   * will be used instead of 'color' is not 0.
    */
-  virtual void AddOperationSetAmbient (csTicks time, iParameterESM* light,
+  virtual void AddOperationSetAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color, iSharedVariable *colorvar) = 0;
 
   /**
    * Operation: fade dynamic ambient light to some color during some time.
+   * \param time is the relative time at which this operation will fire.
+   * \param sector is a parameter representing the sector which will
+   * have its ambient set.
+   * \param color is the final ambient value.
+   * \param duration is the duration time of the fade. The fade will
+   * start at relative time 'time' and will take 'duration' milliseconds
+   * to go from current ambient to destination ambient.
    */
-  virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
+  virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color, csTicks duration) = 0;
 
   /**
    * Operation: Delay executation of the rest of the script by a random
    * time between min and max msec.
+   * \param time is the relative time at which this operation will fire.
+   * \param min is the minimum time to wait starting with 'time'.
+   * \param max is the maximum time to wait starting with 'time'.
    */
-  virtual void AddOperationRandomDelay(csTicks time,int min, int max) = 0;
+  virtual void AddOperationRandomDelay (csTicks time, int min, int max) = 0;
 
   /**
    * Operation: set a mesh color.
+   * \param time is the relative time at which this operation will fire.
+   * \param mesh is a parameter representing a mesh.
+   * \param color is the color to set this mesh too. Not all meshes
+   * support this.
    */
   virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color) = 0;
 
   /**
    * Operation: fade a mesh to some color during some time.
+   * \param time is the relative time at which this operation will fire.
+   * \param mesh is a parameter representing a mesh.
+   * \param color is the destination color to fase this mesh too.
+   * Not all meshes support this.
+   * \param duration is the duration time of the fade. The fade will
+   * start at relative time 'time' and will take 'duration' milliseconds
+   * to go from current color to destination color.
    */
   virtual void AddOperationFadeMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color, csTicks duration) = 0;
 
   /**
    * Operation: set a fog color and density.
+   * \param time is the relative time at which this operation will fire.
+   * \param sector is a parameter representing the sector which will
+   * have its ambient set.
+   * \param color is the required color value.
+   * \param density is the required density.
    */
   virtual void AddOperationSetFog (csTicks time, iParameterESM* sector,
 		  const csColor& color, float density) = 0;
 
   /**
    * Operation: fade fog to some color/density during some time.
+   * \param time is the relative time at which this operation will fire.
+   * \param sector is a parameter representing the sector which will
+   * have its ambient set.
+   * \param color is the final color value.
+   * \param density is the final density.
+   * \param duration is the duration time of the fade. The fade will
+   * start at relative time 'time' and will take 'duration' milliseconds
+   * to go from current fog settings to destination fog settings.
    */
   virtual void AddOperationFadeFog (csTicks time, iParameterESM* sector,
 		  const csColor& color, float density, csTicks duration) = 0;
@@ -307,6 +385,19 @@ struct iSequenceWrapper : public iBase
    * Operation: rotate object during some time. After the time has elapsed
    * the rotation will be equal to the given angle here.
    * Axis is 0, 1, or 2 for x, y, or z. If axis is -1 it is not used.
+   * \param time is the relative time at which this operation will fire.
+   * \param mesh is a parameter representing a mesh.
+   * \param axis1 is the first rotation axis (-1, 0, 1, or 2).
+   * \param tot_angle1 is the total angle to rotate around axis1.
+   * \param axis2 is the second rotation axis (-1, 0, 1, or 2).
+   * \param tot_angle2 is the total angle to rotate around axis2.
+   * \param axis3 is the third rotation axis (-1, 0, 1, or 2).
+   * \param tot_angle3 is the total angle to rotate around axis3.
+   * \param offset is added to the rotation transformation so you can
+   * rotate an object around a center different from 0,0,0.
+   * \param duration is the duration time of the rotate. The rotate will
+   * start at relative time 'time' and will take 'duration' milliseconds
+   * to go from current orientation to destination orientation.
    */
   virtual void AddOperationRotateDuration (csTicks time, iParameterESM* mesh,
   		int axis1, float tot_angle1,
@@ -318,12 +409,22 @@ struct iSequenceWrapper : public iBase
   /**
    * Operation: move object (mesh or light) during some time. After the time
    * has elapsed the total relative move will be equal to the 'offset'.
+   * \param time is the relative time at which this operation will fire.
+   * \param mesh is a parameter representing a mesh.
+   * \param offset is the relative amount to move.
+   * \param duration is the duration time of the move. The move will
+   * start at relative time 'time' and will take 'duration' milliseconds
+   * to go from current location to destination.
    */
   virtual void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
 		const csVector3& offset, csTicks duration) = 0;
 
   /**
    * Operation: enable/disable a given trigger.
+   * \param time is the relative time at which this operation will fire.
+   * \param trigger is a parameter representing a trigger to enable or
+   * disable.
+   * \param en is true to enable or false to disable.
    */
   virtual void AddOperationTriggerState (csTicks time,
   		  iParameterESM* trigger, bool en) = 0;
@@ -332,6 +433,10 @@ struct iSequenceWrapper : public iBase
    * Operation: enable checking of trigger state every 'delay'
    * milliseconds (or disable with delay == 0). Use this in
    * combination with AddOperationTestTrigger().
+   * \param time is the relative time at which this operation will fire.
+   * \param trigger is a parameter representing a trigger to enable or
+   * disable.
+   * \param delay represents the frequency of checking the trigger.
    */
   virtual void AddOperationCheckTrigger (csTicks time,
   		  iParameterESM* trigger, csTicks delay) = 0;
@@ -341,6 +446,13 @@ struct iSequenceWrapper : public iBase
    * is still valid or another sequence if not (both sequences
    * can be 0 in which case nothing is run).
    * Use in combination with AddOperationCheckTrigger().
+   * \param time is the relative time at which this operation will fire.
+   * \param trigger is a parameter representing a trigger to enable or
+   * disable.
+   * \param trueSequence is the sequence that will be fired
+   * when the trigger succeeds. Can be 0.
+   * \param falseSequence is the sequence that will be fired
+   * when the trigger does not succeed. Can be 0.
    */
   virtual void AddOperationTestTrigger (csTicks time,
   		  iParameterESM* trigger,
@@ -394,9 +506,14 @@ struct iSequenceTrigger : public iBase
    * which fires a sequence when a light gets darker than 
    * a certain value or lighter than a certain value, or
    * whenever a light changes.
+   * \param whichlight represents the light on which we will test.
+   * \param oper is one of #CS_SEQUENCE_LIGHTCHANGE_NONE,
+   * #CS_SEQUENCE_LIGHTCHANGE_LESS, or #CS_SEQUENCE_LIGHTCHANGE_GREATER
+   * depending on the test you want to use.
+   * \param color is the color to compare with.
    */
   virtual void AddConditionLightChange (iLight *whichlight, 
-				        int oper, const csColor& col) = 0;
+				        int oper, const csColor& color) = 0;
 
   /**
    * Condition: manual trigger. Call this to set add a trigger

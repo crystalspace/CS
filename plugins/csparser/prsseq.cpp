@@ -515,11 +515,11 @@ iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
 	  float r,g,b;
 	  const char *operation = child->GetAttributeValue ("operator");
 	  if (!operation)
-	      oper = 0;
+	      oper = CS_SEQUENCE_LIGHTCHANGE_NONE;
 	  else if (!strcmp (operation,"less"))
-	      oper = 1;
+	      oper = CS_SEQUENCE_LIGHTCHANGE_LESS;
 	  else if (!strcmp (operation,"greater"))
-	      oper = 2;
+	      oper = CS_SEQUENCE_LIGHTCHANGE_GREATER;
 	  r = child->GetAttributeValueAsFloat ("red");
 	  g = child->GetAttributeValueAsFloat ("green");
 	  b = child->GetAttributeValueAsFloat ("blue");
