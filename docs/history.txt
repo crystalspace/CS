@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 20-Apr-2003
+	- Micah added a little error handling to the picogui server plugin
 	- Micah updated the .cvsignore files to include flarge's cache and
 	  the completed binaries without a special extension.
 	- Micah fixed some compile errors in the pgserver plugin due to 'or'

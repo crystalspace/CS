@@ -32,6 +32,7 @@
 extern "C"
 {
   #include <pgserver/init.h>
+  #include <pgserver/os.h>
 }
 
 CS_IMPLEMENT_PLUGIN
@@ -66,6 +67,8 @@ csPicoGUIServer::csPicoGUIServer (iBase *parent)
 
 inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
 {
+  g_error e;
+
   csRef<iEventQueue> evq = CS_QUERY_REGISTRY (objreg, iEventQueue);
   if (! evq) return false;
 
@@ -75,7 +78,11 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
   csRef<iFontServer> fsv = CS_QUERY_REGISTRY (objreg, iFontServer);
   if (! fsv) return false;
 
-  if (pgserver_init (PGINIT_NO_COMMANDLINE, 0, NULL) != 0) return false;
+  e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, NULL);
+  if (iserror(e)) {
+    os_show_error(e);
+    return false;
+  }
 
   evq->RegisterListener (& scfiEventHandler, CSMASK_Nothing);
 
