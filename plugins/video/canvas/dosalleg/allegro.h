@@ -24,7 +24,7 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/djgpp/idjgpp.h"
 
-extern const CLSID CLSID_DosAllegGraphics2D;
+extern const CLSID CLSID_DosRawGraphics2D;
 
 /// IGraphics2DFactory interface implementation
 class csGraphics2DFactoryDOSAlleg : public IGraphics2DFactory

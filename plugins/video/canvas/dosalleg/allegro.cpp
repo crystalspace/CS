@@ -30,7 +30,7 @@ BITMAP *_cs_alleg2d;
 
 static DllRegisterData gRegData =
 {
-  &CLSID_DosAllegGraphics2D,
+  &CLSID_DosRawGraphics2D,
   "crystalspace.graphics2d.allegro",
   "Crystal Space 2D graphics driver for DOS/DJGPP using Allegro video library"
 };
