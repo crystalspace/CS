@@ -225,6 +225,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     G3DPolygonDPFX poly;
     memset (&poly, 0, sizeof(poly));
     poly.txt_handle = c->GetTextureHandle ();
+    poly.txt_handle->GetMeanColor (poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
     poly.inv_aspect = csCamera::inv_aspect;
     if (poly.txt_handle == NULL)
     {
