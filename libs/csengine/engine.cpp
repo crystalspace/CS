@@ -413,8 +413,9 @@ IMPLEMENT_FACTORY (csEngine)
 EXPORT_CLASS_TABLE (engine)
   EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.core",
     "Crystal Space 3D Engine",
-      "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphic.image.io.,"
-      "crystalspace.string.server")
+      "crystalspace.kernel., "
+      "crystalspace.graphics3d., "
+      "crystalspace.graphic.image.io.")
 EXPORT_CLASS_TABLE_END
 
 csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)

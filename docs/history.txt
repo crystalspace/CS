@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  fix csVector, but I would need to clear it with Jorrit first since
 	  CS is HEAVILY dependent on csVector. If I break it, there will be a
 	  lot of pieces to keep 8).
+	- Eric Sunshine removed obsolete references to
+	  crystalspace.string.server from several files.
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents

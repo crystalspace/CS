@@ -2711,9 +2711,8 @@ EXPORT_CLASS_TABLE (lvlload)
     "Level and library file loader", "crystalspace.kernel., "
     "crystalspace.sound.loader., crystalspace.image.loader, "
     "crystalspace.mesh.loader., crystalspace.terrain.loader., "
-    "crystalspace.engine.core, crystalspace.string.server, "
-    "crystalspace.graphics3d., crystalspace.sound.render., "
-    "crystalspace.motion.manager.")
+    "crystalspace.engine.core, crystalspace.graphics3d., "
+    "crystalspace.sound.render., crystalspace.motion.manager.")
 EXPORT_CLASS_TABLE_END
 
 csLoader::csLoader(iBase *p)
