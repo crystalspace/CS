@@ -105,7 +105,7 @@ bool csLoader::ParseEffect(iDocumentNode *node, iEffectServer *pParent)
   while(it->HasNext())
   {
     csRef<iDocumentNode> child = it->Next();
-    if(child->GetType() != CS_NODE_ELEMENT) return false;
+    if(child->GetType() != CS_NODE_ELEMENT) continue;
     csStringID id = xmltokens.Request(child->GetValue());
 
     switch(id)
