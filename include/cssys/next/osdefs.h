@@ -53,6 +53,7 @@ static inline char* strdup( char const* s )
 //-----------------------------------------------------------------------------
 #if defined(SYSDEF_GETCWD) || defined(SYSDEF_SOCKETS)
 #include <libc.h>
+typedef int socklen_t;
 #endif
 
 

@@ -63,6 +63,9 @@ Short-term cleanups that need to be done:
 	  complete_pixel_format().  It would go into an infinite loop when
 	  called unnecessarily by some 2D graphics drivers at 8-bit depth with
 	  the red, green, and blue masks set to zero.
+	- Eric Sunshine fixed a problem where a recent change to netsdrv.cpp
+	  caused compilation to fail on OpenStep and NextStep, on account of
+	  the unknown "socklen_t" type.
 5-Aug-1999
 	- Eric Sunshine fixed a compilation warning in djvidsys.cpp where
 	  XModeCount was declared without a type.  It is now declared as int.
