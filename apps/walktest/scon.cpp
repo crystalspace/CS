@@ -54,16 +54,28 @@ SimpleConsole::SimpleConsole ()
 {
   LineMessageMax = config->GetInt ("SimpleConsole", "LINEMAX", 4);
   HistoryMax = config->GetInt ("SimpleConsole", "LINEHISTORY", SIZE_HISTORY);
-  console_colored_bg = config->GetYesNo ("SimpleConsole", "COLOREDBG", 1);
+  console_transparent_bg = config->GetYesNo ("SimpleConsole", "TRANSPBG", 1);
   char *buf = config->GetStr ("SimpleConsole", "CONFG", "255,255,255");
   sscanf (buf, "%d,%d,%d", &console_fg_r, &console_fg_g, &console_fg_b);
   buf = config->GetStr ("SimpleConsole", "CONBG", "0,0,0");
   sscanf (buf, "%d,%d,%d", &console_bg_r, &console_bg_g, &console_bg_b);
   buf = config->GetStr ("SimpleConsole", "CONFONT", "auto");
-  if (!strcasecmp (buf, "auto")) console_font = -1;
-  else if (!strcasecmp (buf, "tiny")) console_font = csFontTiny;
-  else if (!strcasecmp (buf, "courier")) console_font = csFontCourier;
-  else if (!strcasecmp (buf, "police")) console_font = csFontPolice;
+  if (!strcasecmp (buf, "auto"))
+  {
+    long screen_surface = FRAME_WIDTH * FRAME_HEIGHT;
+    if (screen_surface <= 320*200)
+      console_font = csFontTiny;
+    else if (screen_surface <= 640*480)
+      console_font = csFontCourier;
+    else
+      console_font = csFontPolice;
+  }
+  else if (!strcasecmp (buf, "tiny"))
+    console_font = csFontTiny;
+  else if (!strcasecmp (buf, "courier"))
+    console_font = csFontCourier;
+  else if (!strcasecmp (buf, "police"))
+    console_font = csFontPolice;
   else
   {
     System->Printf (MSG_FATAL_ERROR, "Bad value for CONFONT in configuration file.\nUse 'auto', 'tiny', 'courier', or 'police'\n");
@@ -72,25 +84,31 @@ SimpleConsole::SimpleConsole ()
 
   int i;
 
-  LineMax = (FRAME_HEIGHT / 8) - 2;
+  System->piGI->GetTextHeight (i, console_font);
+  i += 2;
+  LineMax = (FRAME_HEIGHT / i) - 2;
   LineSize = (FRAME_WIDTH / 4) + 1;
 
-  if (LineMessageMax <= 0) LineMessageMax = 1;
-  else if (LineMessageMax >= LineMax) LineMessageMax = LineMax-1;
+  if (LineMessageMax <= 0)
+    LineMessageMax = 1;
+  else if (LineMessageMax >= LineMax)
+    LineMessageMax = LineMax-1;
 
-  CHK (LineMessage = new char *[LineMessageMax]);
+  CHK (LineMessage = new char * [LineMessageMax]);
+  CHK (LinesChanged = new bool [LineMessageMax]);
   for (i = 0; i < LineMessageMax; i++)
   {
-    CHK (LineMessage[i] = new char[SIZE_LINE]);
-    LineMessage[i][0] = '\0';
+    CHK (LineMessage [i] = new char [SIZE_LINE]);
+    LineMessage [i][0] = '\0';
+    LinesChanged [i] = true;
   }
   LineMessageCount = 0;
 
-  CHK (Line = new char *[LineMax]);
+  CHK (Line = new char * [LineMax]);
   for (i = 0; i < LineMax; i++)
   {
-    CHK (Line[i] = new char [SIZE_LINE]);
-    Line[i][0] = '\0';
+    CHK (Line [i] = new char [SIZE_LINE]);
+    Line [i][0] = '\0';
   }
   LineCount = 0;
 
@@ -99,7 +117,7 @@ SimpleConsole::SimpleConsole ()
   LineCommandMax = SIZE_LINE - 1;
   LineCommandCount = 0;
 
-  CHK (History = new char *[HistoryMax]);
+  CHK (History = new char * [HistoryMax]);
   for (i = 0; i < HistoryMax; i++)
   {
     CHK (History [i] = new char[SIZE_LINE]);
@@ -109,17 +127,14 @@ SimpleConsole::SimpleConsole ()
   HistoryCurrent = 0;
 
   CHK (buff_text = new char [SIZE_LINE]);
-  buff_text[0] = '\0';
+  buff_text [0] = '\0';
 
   LineTime = System->Time ();
   ConsoleMode = MESSAGE_MODE;
   CursorState = false;
   CursorTime = System->Time ();
 
-  showing_work=current_work_done=0;
-  CHK (LinesChanged = new char [LineMessageMax]);
-  for (i=0; i<LineMessageMax; i++)
-    LinesChanged[i]=1;
+  showing_work = current_work_done = 0;
 }
 
 SimpleConsole::~SimpleConsole ()
@@ -127,7 +142,7 @@ SimpleConsole::~SimpleConsole ()
   int i;
 
   for (i = 0; i < LineMessageMax; i++)
-    CHKB (delete [] LineMessage[i]);
+    CHKB (delete [] LineMessage [i]);
   CHK (delete [] LineMessage);
 
   if (Line)
@@ -145,16 +160,16 @@ SimpleConsole::~SimpleConsole ()
   }
 
   CHK (delete [] LineCommand);
-  CHK (delete[] buff_text);
-  CHK (delete[] LinesChanged);
+  CHK (delete [] buff_text);
+  CHK (delete [] LinesChanged);
 }
 
 void SimpleConsole::SetTransparent (int t)
 {
   if (t == -1)
-    console_colored_bg = config->GetYesNo ("SimpleConsole", "COLOREDBG", 1);
+    console_transparent_bg = config->GetYesNo ("SimpleConsole", "TRANSPBG", 1);
   else
-    console_colored_bg = !t;
+    console_transparent_bg = t;
 }
 
 void SimpleConsole::SetMaxLines (int ml)
@@ -163,28 +178,30 @@ void SimpleConsole::SetMaxLines (int ml)
 
   // First remove the old messages
   for (i = 0; i < LineMessageMax; i++)
-    CHKB (delete[] LineMessage[i]);
-  CHK (delete[] LineMessage);
+    CHKB (delete [] LineMessage[i]);
+  CHK (delete [] LineMessage);
 
-  CHK (delete[] LinesChanged);
+  CHK (delete [] LinesChanged);
 
-  if (ml == -1) LineMessageMax = config->GetInt ("SimpleConsole", "LINEMAX", 4);
-  else LineMessageMax = ml;
-  if (LineMessageMax >= LineMax) LineMessageMax = LineMax-1;
+  if (ml == -1)
+    LineMessageMax = config->GetInt ("SimpleConsole", "LINEMAX", 4);
+  else
+    LineMessageMax = ml;
+  if (LineMessageMax >= LineMax)
+    LineMessageMax = LineMax-1;
 
   // Allocate new messages.
-  CHK (LineMessage = new char *[LineMessageMax]);
+  CHK (LineMessage = new char * [LineMessageMax]);
+  CHK (LinesChanged = new bool [LineMessageMax]);
   for (i = 0; i < LineMessageMax; i++)
   {
-    CHK (LineMessage[i] = new char[SIZE_LINE]);
-    LineMessage[i][0] = '\0';
+    CHK (LineMessage [i] = new char [SIZE_LINE]);
+    LineMessage [i][0] = '\0';
+    LinesChanged[i] = true;
   }
   LineMessageCount = 0;
 
-  showing_work=current_work_done=0;
-  CHK (LinesChanged = new char [LineMessageMax]);
-  for (i=0; i<LineMessageMax; i++)
-    LinesChanged[i]=1;
+  showing_work = current_work_done = 0;
 }
 
 void SimpleConsole::Show ()
@@ -211,14 +228,14 @@ void SimpleConsole::PutMessage (char *str,...)
   {
     for (int i = 1; i < LineMessageMax; i++)
     {
-      strcpy (LineMessage[i - 1], LineMessage[i]);
-      LinesChanged[i-1]=1;
+      strcpy (LineMessage [i - 1], LineMessage [i]);
+      LinesChanged [i - 1] = true;
     }
     LineMessageCount--;
   }
 
-  strncpy (LineMessage[LineMessageCount], buf, SIZE_LINE - 1);
-  LinesChanged[LineMessageCount]=1;
+  strncpy (LineMessage [LineMessageCount], buf, SIZE_LINE - 1);
+  LinesChanged [LineMessageCount] = true;
 
   LineMessageCount++;
   LineTime = System->Time () + 4000;
@@ -238,22 +255,22 @@ void SimpleConsole::ReplaceLastMessage(char *str,...)
   {
     for (int i = 1; i < LineMessageMax; i++)
     {
-      strcpy (LineMessage[i - 1], LineMessage[i]);
-      LinesChanged[i-1]=1;
+      strcpy (LineMessage [i - 1], LineMessage [i]);
+      LinesChanged [i - 1] = true;
     }
     LineMessageCount--;
   }
 
-  strncpy (LineMessage[LineMessageCount], buf, SIZE_LINE - 1);
-  LinesChanged[LineMessageCount]=1;
+  strncpy (LineMessage [LineMessageCount], buf, SIZE_LINE - 1);
+  LinesChanged [LineMessageCount] = true;
 
   LineTime = System->Time () + 4000;
 }
 
-// @@@ Added for progress indicator
-void SimpleConsole::ShowWork(void)
+void SimpleConsole::ShowWork ()
 {
-  char work[]="\\|/-";
+  // all character sets contain IBM PC pseudo-graphics characters ...
+  char *wheel = "Ä\\³/";
 
   if (LineCount >= LineMax)
   {
@@ -262,16 +279,17 @@ void SimpleConsole::ShowWork(void)
     LineCount--;
   }
 
+  size_t wheel_pos = strlen (Line [LineCount]) - 1;
   if (!showing_work)
   {
-    showing_work=1;
-    sprintf(Line[LineCount]+strlen(Line[LineCount]),"%c",work[current_work_done]);
+    showing_work = 1;
+    wheel_pos++;
+    Line [LineCount] [wheel_pos + 1] = 0;
   }
-  else
-    Line[LineCount][strlen(Line[LineCount])-1]=work[current_work_done];
+  Line [LineCount] [wheel_pos] = wheel [current_work_done];
 
-  current_work_done=(current_work_done+1)%((sizeof(work)-1)/sizeof(char));
-  ReplaceLastMessage("%s", Line[LineCount]);
+  current_work_done = (current_work_done + 1) & 3;
+  ReplaceLastMessage ("%s", Line[LineCount]);
 }
 
 void SimpleConsole::PutText (char *str,...)
@@ -361,94 +379,107 @@ void SimpleConsole::Clear ()
 
   for (i = 0; i < LineMessageMax; i++)
   {
-    *LineMessage[i] = 0;
-    LinesChanged[i]=1;
+    *LineMessage [i] = 0;
+    LinesChanged [i] = true;
   }
 }
 
 void SimpleConsole::Print (csRect* area)
 {
   int i;
-  long timeIs = System->Time ();
-  if (area) area->MakeEmpty ();
+  long CurrentTime = System->Time ();
 
-  long screen_surface = FRAME_WIDTH * FRAME_HEIGHT;
-  if (console_font == -1)
-  {
-    if (screen_surface <= 320*200)
-      Gfx2D->SetFontID(csFontTiny);
-    else if (screen_surface <= 640*480)
-      Gfx2D->SetFontID(csFontCourier);
-    else
-      Gfx2D->SetFontID(csFontPolice);
+  Gfx2D->SetFontID (console_font);
+
+#define WRITE(x,y,fc,bc,s)					\
+  {								\
+    Gfx2D->Write (x, y, fc, bc, s);				\
+    if (area)							\
+    {								\
+      int tw, th;						\
+      System->piGI->GetTextWidth (tw, console_font, s);		\
+      area->Union (x, y, x + tw, y + th);			\
+    }								\
   }
-  else Gfx2D->SetFontID(console_font);
+
+#define WRITE2(x,y,fc,bc,s)					\
+  {								\
+    Gfx2D->Write (x + 1, y + 1, bc, -1, s);			\
+    Gfx2D->Write (x, y, fc, -1, s);				\
+    if (area)							\
+    {								\
+      int tw;							\
+      System->piGI->GetTextWidth (tw, console_font, s);		\
+      area->Union (x, y, x + 1 + tw, y + 1 + th);		\
+    }								\
+  }
+
+  // text height
+  int th;
+  System->piGI->GetTextHeight (th, console_font);
+  th += 2;
+
+  bool dblbuff;
+  Gfx2D->GetDoubleBufferState (dblbuff);
 
   switch (ConsoleMode)
   {
     case MESSAGE_MODE:
-      if (timeIs > LineTime)
+      if (CurrentTime > LineTime)
       {
+        // Scroll all lines up once per four seconds
         for (i = 1; i < LineMessageMax; i++)
         {
-          strcpy (LineMessage[i - 1], LineMessage[i]);
-          LinesChanged[i-1]=1;
+          strcpy (LineMessage [i - 1], LineMessage [i]);
+          LinesChanged [i - 1] = true;
         }
-        LinesChanged[i-1]=1;
         if (LineMessageCount > 0)
           LineMessageCount--;
         LineMessage [LineMessageMax - 1][0] = '\0';
+        LinesChanged [LineMessageMax - 1] = true;
         LineTime = System->Time () + 4000;
       }
       for (i = 0; i < LineMessageMax; i++)
       {
-        if(LinesChanged[i])
+        if (LinesChanged [i] || dblbuff)
         {
-          Gfx2D->Write (11, 11 + 8 * i, console_bg, -1, LineMessage[i]);
-          Gfx2D->Write (10, 10 + 8 * i, console_fg, -1, LineMessage[i]);
-	  if (area) area->Union (10, 10+8*i, FRAME_WIDTH-1, 19+8*i);
+          WRITE2 (10, 10 + th * i, console_fg, console_bg, LineMessage [i]);
 
 	  // Only if the area is given do we enable the optimization that
 	  // changed lines should not be redrawn. If area is not given we
 	  // are running for full-screen printing anyway so we can't
 	  // use that optimization.
-          if (area) LinesChanged[i]=0;
+          if (area)
+            LinesChanged [i] = false;
         }
       }
       break;
 
     case CONSOLE_MODE:
-      if (timeIs > CursorTime)
+      if (CurrentTime > CursorTime)
       {
         CursorState = !CursorState;
         CursorTime = System->Time () + 333;
       }
-      if (console_colored_bg)
+
+      char buf [256];
+      sprintf (buf, CursorState ? "cs# %s_" : "cs# %s",  LineCommand);
+
+      if (console_transparent_bg)
+      {
+        for (i = 0; i < LineCount; i++)
+          WRITE2 (1, th * i, console_fg, console_bg, Line [i]);
+        WRITE2 (1, th * LineCount, console_fg, console_bg, buf);
+      }
+      else
       {
         Gfx2D->Clear (console_bg);
+        if (area && dblbuff)
+          area->Union (0, 0, FRAME_WIDTH - 1, FRAME_HEIGHT - 1);
         for (i = 0; i < LineCount; i++)
-	{
-          Gfx2D->Write (1, 8 * i, console_fg, -1, Line[i]);
-	  if (area) area->Union (1, 8*i, FRAME_WIDTH-1, 9+8*i);
-	}
-      } else
-      {
-        for (i = 0; i < LineCount; i++)
-        {
-          Gfx2D->Write (2, 8 * i + 1, console_bg, -1, Line[i]);
-          Gfx2D->Write (1, 8 * i, console_fg, -1, Line[i]);
-	  if (area) area->Union (1, 8*i, FRAME_WIDTH-1, 10+8*i);
-        }
-        GfxWrite (2, 8 * LineCount + 1, console_bg, -1, "cs# %s", LineCommand);
-	if (area) area->Union (1, 8*LineCount, FRAME_WIDTH-1, 10+8*LineCount);
+          WRITE (1, th * i, console_fg, -1, Line [i]);
+        WRITE (1, th * LineCount, console_fg, -1, buf);
       }
-      char *tpl;
-      if (CursorState)
-        tpl = "cs# %s_";
-      else
-        tpl = "cs# %s";
-      GfxWrite (1, 8 * LineCount, console_fg, -1, tpl, LineCommand);
-      if (area) area->Union (1, 8*LineCount, FRAME_WIDTH-1, 9+8*LineCount);
       break;
   }
 }
@@ -500,9 +531,6 @@ void SimpleConsole::AddChar (int c)
 
 void SimpleConsole::SetupColors (ITextureManager* txtmgr)
 {
-//@@@ !!!
-  //console_fg = tex->find_rgb_real (console_fg_r, console_fg_g, console_fg_b);
-  //console_bg = tex->find_rgb_real (console_bg_r, console_bg_g, console_bg_b);
   txtmgr->FindRGB (console_fg_r, console_fg_g, console_fg_b, console_fg);
   txtmgr->FindRGB (console_bg_r, console_bg_g, console_bg_b, console_bg);
 }
