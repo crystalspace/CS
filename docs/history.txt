@@ -10,6 +10,8 @@ The history order has been reversed so that new features are at the top.
 	- Modified makefile system to add an extra 'dyn' or 'stat' in
 	  the 'out' directory to differentiate between dynamic or static
 	  linking.
+	- Fixed an internal compiler error for gcc 2.7.2 in the Crystal
+	  Clear code.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
