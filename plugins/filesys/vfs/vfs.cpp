@@ -1402,7 +1402,7 @@ csRef<iStrVector> csVFS::MountRoot (const char *Path)
       vfs_dir << Path << '/';
       for (int j = 0, k = s.Length(); j < k; j++)
       {
-        char const c = s[j];
+        char const c = s.GetAt(j);
         if (c == '_' || c == '-' || isalnum(c))
 	  vfs_dir << (char)tolower(c);
       }
