@@ -22,6 +22,8 @@
 #include "types.h"
 #include "csgeom/math3d.h"
 
+class csTransform;
+
 /**
  * A frustrum. This consist of a center point (origin),
  * a frustrum polygon in 3D space (relative to center point)
@@ -43,12 +45,20 @@ private:
 
   csPlane* backplane;
 
-  // If true we have a total wide frustrum. A frustrum like
-  // this does not have a polygon defining the planes but it can have
-  // a back plane. The value of this boolean is only used if there
-  // is no polygon. In other words, if the polygon is present in this
-  // frustrum then 'wide' is simply ignored and can have any value.
+  /**
+   * If true we have a total wide frustrum. A frustrum like
+   * this does not have a polygon defining the planes but it can have
+   * a back plane. The value of this boolean is only used if there
+   * is no polygon. In other words, if the polygon is present in this
+   * frustrum then 'wide' is simply ignored and can have any value.
+   */
   bool wide;
+
+  /**
+   * If true we have a mirrored frustrum where the direction of
+   * the polygon is reversed.
+   */
+  bool mirrored;
 
   void Clear ();
 
@@ -57,7 +67,7 @@ private:
 public:
   /// Create a new empty frustrum.
   csFrustrum (csVector3& o) : origin (o), vertices (NULL), num_vertices (0),
-  	max_vertices (0), backplane (NULL), wide (false) { }
+  	max_vertices (0), backplane (NULL), wide (false), mirrored (false) { }
 
   /**
    * Create a frustrum given a polygon and a backplane.
@@ -77,6 +87,12 @@ public:
 
   /// Get the origin of this frustrum.
   csVector3& GetOrigin () { return origin; }
+
+  /// Enable/disable mirroring.
+  void SetMirrored (bool m) { mirrored = m; }
+
+  /// Is this frustrum mirrored?
+  bool IsMirrored () { return mirrored; }
 
   /**
    * Set the back plane of this frustrum.
@@ -112,6 +128,16 @@ public:
   csVector3& GetVertex (int idx) { return vertices[idx]; }
 
   /**
+   * Get the array of vertices.
+   */
+  csVector3* GetVertices () { return vertices; }
+
+  /**
+   * Apply a transformation to this frustrum.
+   */
+  void Transform (csTransform* trans);
+
+  /**
    * Clip this frustrum to the positive side of a plane
    * formed by the origin of this frustum, and the two given vertices.
    * 'v1' and 'v2' are given relative to that origin.
@@ -124,7 +150,7 @@ public:
    * Note that this clips the polygon which forms the frustrum. It does
    * not clip the frustrum itself.
    */
-  void ClipToPlane (csPlane* plane);
+  void ClipPolyToPlane (csPlane* plane);
 
   /**
    * Intersect with another frustrum. The other frustrum
@@ -138,25 +164,28 @@ public:
 
   /**
    * Intersect a convex polygon with this volume. The convex polygon
-   * is given relative to the center point (origin) of this frustrum.
+   * is given relative to the center point (origin) of this frustrum.<p>
+   *
    * Returns a new frustrum which exactly covers the intersection
    * of the polygon with the frustrum (i.e. the smallest frustrum
    * which is part of this frustrum and which 'sees' exactly
-   * the same of the given polygon as this frustrum).
-   * This function returns NULL if there is no intersection.
-   * If 'poly' is NULL it is assumed that it is an infinite frustrum.
-   * Intersection is calculated accordingly.
+   * the same of the given polygon as this frustrum).<p>
+   *
+   * This function returns NULL if there is no intersection.<p>
+   *
+   * Note that the frustrum polygon of the returned csFrustrum is
+   * guaranteed to be coplanar with the given polygon.
    */
   csFrustrum* Intersect (csVector3* poly, int num);
 
   /// Return true if frustrum is empty.
-  bool IsEmpty () { return !wide && vertices == NULL; }
+  bool IsEmpty () const { return !wide && vertices == NULL; }
 
   /// Return true if frustrum is infinite.
-  bool IsInfinite () { return wide && vertices == NULL && backplane == NULL; }
+  bool IsInfinite () const { return wide && vertices == NULL && backplane == NULL; }
 
   /// Return true if frustrum is infinitely wide but it can still have a back plane.
-  bool IsWide () { return wide && vertices == NULL; }
+  bool IsWide () const { return wide && vertices == NULL; }
 
   /**
    * Make the frustrum infinite (i.e. clear the polygon and
