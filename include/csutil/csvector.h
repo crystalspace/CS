@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.      
 */
 
 #ifndef __CSVECTOR_H__
@@ -66,6 +66,8 @@ public:
 
   /// Delete element number 'n' from vector (attention: non virtual!)
   bool Delete (int n);
+  /// Delete a chunk of size at the position 'n' (yeah, non virtual too)
+  bool DeleteChunk (int n,int size);
   /// Delete the given element from vector (attention: non virtual!)
   bool Delete (csSome Item);
 
@@ -85,6 +87,8 @@ public:
 
   /// Insert element 'Item' before element 'n'
   bool Insert (int n, csSome Item);
+  /// Insert a chunk of size at the position 'n'
+  bool InsertChunck (int n, int size, csSome Item);
 };
 
 /**
