@@ -264,7 +264,7 @@ N2D_PROTO(void,focus_changed)( NeXTDelegateHandle2D handle, int focused )
 - (void)flush
     {
     [view flush];
-    DPSFlush();
+    NeXTDriver2D_system_extension( driver, "flushgraphicscontext", 0, 0 );
     }
 
 N2D_PROTO(void,flush)( NeXTDelegateHandle2D handle )

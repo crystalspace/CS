@@ -14,7 +14,7 @@
 //
 //	Objective-C component of the AppKit-based 2D driver for Crystal Space.
 //	This file contains methods which are specific to MacOS/X, MacOS/X
-//	Server 1.0 (Rhapsody), and OpenSTep.  See NeXTDriver2D.cpp for driver
+//	Server 1.0 (Rhapsody), and OpenStep.  See NeXTDriver2D.cpp for driver
 //	code which is shared between MacOS/X, MacOS/X Server 1.0 (Rhapsody),
 //	OpenStep, and NextStep.
 //
@@ -23,7 +23,6 @@
 #include "NeXTView.h"
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
-#import <AppKit/NSDPSContext.h>
 #import <AppKit/NSImage.h>
 #import <AppKit/NSWindow.h>
 
@@ -224,7 +223,7 @@ N2D_PROTO(void,focus_changed)( NeXTDelegateHandle2D handle, int focused )
 - (void)flush
     {
     [view flush];
-    [[NSDPSContext currentContext] flush];
+    NeXTDriver2D_system_extension( driver, "flushgraphicscontext", 0, 0 );
     }
 
 N2D_PROTO(void,flush)( NeXTDelegateHandle2D handle )

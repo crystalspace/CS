@@ -57,6 +57,8 @@
 - (void)showMouse;
 - (void)hideMouse;
 
+- (void)flushGraphicsContext;
+
 - (void)dispatchEvent:    (NXEvent*)p forView:(View*)v;
 - (void)keyDown:          (NXEvent*)p forView:(View*)v;
 - (void)keyUp:            (NXEvent*)p forView:(View*)v;
@@ -88,6 +90,7 @@ ND_PROTO(void,stop_event_loop)( NeXTDelegate );
 ND_PROTO(void,dispatch_event)( NeXTDelegate, NeXTEvent, NeXTView );
 ND_PROTO(void,hide_mouse)( NeXTDelegate );
 ND_PROTO(void,show_mouse)( NeXTDelegate );
+ND_PROTO(void,flush_graphics_context)( NeXTDelegate );
 
 #undef ND_PROTO
 

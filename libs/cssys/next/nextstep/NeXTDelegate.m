@@ -242,6 +242,18 @@ ND_PROTO(void,hide_mouse)( NeXTDelegateHandle handle )
 
 
 //-----------------------------------------------------------------------------
+// flushGraphicsContext
+//-----------------------------------------------------------------------------
+- (void)flushGraphicsContext
+    {
+    DPSFlush();
+    }
+
+ND_PROTO(void,flush_graphics_context)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle flushGraphicsContext]; }
+
+
+//-----------------------------------------------------------------------------
 // quit: -- Target of "Quit" menu item.  Terminate the application.
 //-----------------------------------------------------------------------------
 - (id)quit:(id)sender
@@ -743,8 +755,8 @@ ND_PROTO(NeXTDelegateHandle,startup)( NeXTSystemDriver handle )
     {
     [NXApp setDelegate:0];
     [controller showMouse];
+    [controller flushGraphicsContext]; // Flush any pending `showcursor'.
     [controller free];
-    DPSFlush();	// Flush any pending 'showcursor' if necessary.
     }
 
 ND_PROTO(void,shutdown)( NeXTDelegateHandle handle )
