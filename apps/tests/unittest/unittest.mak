@@ -33,7 +33,6 @@ SRC.UNITTEST = $(wildcard apps/tests/unittest/*.cpp)
 OBJ.UNITTEST = $(addprefix $(OUT),$(notdir $(SRC.UNITTEST:.cpp=$O)))
 DEP.UNITTEST = CSTOOL CSENGINE CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.UNITTEST = $(foreach d,$(DEP.UNITTEST),$($d.LIB))
-CFG.UNITTEST = data/config/unittest.cfg data/config/autoexec.cfg
 
 TO_INSTALL.EXE    += $(UNITTEST.EXE)
 TO_INSTALL.CONFIG += $(CFG.UNITTEST)
