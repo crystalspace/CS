@@ -861,7 +861,7 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
   {
     msgOkMsg = okMsg;
     msgBoxOkChanger = SetWindowsHookEx (WH_CBT,
-      (FARPROC)&CBTProc, ModuleHandle, GetCurrentThreadId());
+      (HOOKPROC)&CBTProc, ModuleHandle, GetCurrentThreadId());
   }
 
   char buf[4096];
