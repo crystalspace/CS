@@ -1,12 +1,36 @@
 The history order has been reversed so that new features are at the top.
 
 16-Aug-2000
+	- Andrew Zabolotny did the following:
+	    - Changed InferInstallPathOf() into GetInstallPath(). Unlike
+	      before, the memory is not allocated inside the routine;
+	      instead you pass a pointer to a buffer and the size of the
+	      buffer; this solves the problem on platforms with different
+	      heaps in different modules.
+	    - Latest changes created the dependency SCF -> cssys which is
+	      bad.  I have fixed that by adding an additional method called
+	      scfAddLibraryPath which should be used to set the directory
+	      where SCF should look for shared libraries. The effect of
+	      scfAddLibraryPath is incremental, that is, you may call it as
+	      many times as you wish; all these directories will be searched
+	      by scfLoadLibrary () to find shared libraries, in the order
+	      they were passed to scfAddLibraryPath ().
+	      The initial contents of this list is system-dependent, but
+	      as a general rule of thumb they will prefer the current
+	      directory first. This is so that any local installation of
+	      CS will override the global one.
 	- Alex Pfaffe fixed texture coordinate generation in the terrain
 	  engine. This makes the terrain look MUCH nicer.
 	- Worked around a compiler bug in Solaris/gcc 2.7.2 with collision
 	  detection and terrain engine.
 	- Wouter Wijngaards fixed a 'make solaris' bug with detection
 	  of XFree86.
+	- Wouter moved a lot of include files to the 'include' directory.
+	  This is to make sure that 'make install' only needs to copy
+	  the include directory.
+	- Wouter removed the reference to the watcom port since that port
+	  has gone away.
+	- Wouter moved imetabal.h to the include dir.
 	- Wyatt Miler fixed a compile error in csSystemDriver header.
 15-Aug-2000
 	- Norman Kramer removed cstools.
