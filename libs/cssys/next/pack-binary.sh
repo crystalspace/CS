@@ -31,7 +31,7 @@ PROGS="walktest mazed blocks metademo"
 DATA="standard.zip flarge.zip maze.zip room.zip MazeD.zip blocks.zip"
 DOCS="blocks.txt config.txt console.txt keys.txt README.NeXT"
 SRCFILES="autoexec.cfg blocks.cfg cryst.cfg softrndr.cfg coord MazeD.cfg \
-	metademo.cfg scf.cfg VFS.cfg"
+	metademo.cfg scf.cfg vfs.cfg"
 READMEFILES="README INSTALL.NeXT-Binary"
 
 AMBIENT=40

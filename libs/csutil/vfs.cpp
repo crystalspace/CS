@@ -1038,7 +1038,7 @@ bool csVFS::Initialize (iSystem *iSys)
     return false;
 
   CHK (csIniFile *vfsconfig = new csIniFile (System->ConfigGetStr ("VFS.Options",
-    "Config", "VFS.cfg")));
+    "Config", "vfs.cfg")));
   return ReadConfig (vfsconfig);
 }
 
