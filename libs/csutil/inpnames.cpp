@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 static struct csKeyModDef
 {
@@ -342,9 +343,7 @@ bool csParseMouseDef(const char* str, int* x, int* y,
   if (x) *x = 0;
   if (y) *y = 0;
   if (button) *button = -1;
-  //@@@ Commented out. Not sure how to fix for real but the
-  // next line doesn't compile.
-  //if (modifiers) modifiers->modifiers = 0;
+  if (modifiers) memset(modifiers->modifiers, 0, sizeof(modifiers->modifiers));
   csKeyModifiers m;
   const char* name = ParseModifiers (str, m);
   if (strncasecmp("mouse", name, 5)) return false;

@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit fixed a compile error introduced with the latest patch
 	  from Bjorn. The fix is incorrect (just commented out the line
 	  that doesn't compile) so a real fix is needed.
+	- Eric Sunshine applied a fix to csParseMouseDef() instead of merely
+	  commenting out the code.
 29-Dec-2003
 	- Eric Sunshine changed user.mak so the old OpenGL renderer is not
 	  built when USE_NEW_RENDERER is 'yes'.
