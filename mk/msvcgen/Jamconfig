@@ -1,0 +1,75 @@
+# This is a Jamconfig which contains definitions for msvcgen
+
+# Target
+PACKAGE.NAME = "crystal" ;
+PACKAGE.VERSION = "0.97" ;
+PACKAGE.STRING = "crystal 0.97" ;
+PACKAGE.BUGREPORT = "crystal-main@lists.sourceforge.net" ;
+PERL = "perl" ;
+TARGET = "msvc" ;
+TARGET.OS = "WIN32" ;
+TARGET.PROCESSOR = "X86" ;
+MODE = "debug" ; # msvcgen will create rules for debug and optimize
+USE_PLUGINS = "yes" ;
+
+# msvcgen flags
+MSVC.DEPEND = ;
+MSVC.LIBRARY = ;
+MSVC.CFLAGS = ;
+MSVC.DEPEND.appcon = ;
+MSVC.LIBRARY.appcon = ;
+MSVC.CFLAGS.appcon = ;
+MSVC.DEPEND.plugin = ;
+MSVC.LIBRARY.plugin = ;
+MSVC.CFLAGS.plugin = ;
+MSVC.DEPEND.library = ;
+MSVC.LIBRARY.library = ;
+MSVC.CFLAGS.library = ;
+
+# common flags (ignored from msvcgen)
+PYTHON.CFLAGS = "" ;
+PYTHON.LFLAGS = "" ;
+
+# Tools (this won't be used in the msvcmakefiles but only for the msvcgen run)
+CMD.MKDIR = "mkdir" ;
+CMD.MKDIRS = "mkdir -p" ;
+NASM.AVAILABLE = "no" ;
+PERL5.AVAILABLE = "no" ;
+PYTHON.AVAILABLE = "no" ;
+
+# Libraries
+PTHREAD.AVAILABLE = "no" ;
+X11.AVAILABLE = "no" ;
+GL.AVAILABLE = "yes" ;
+GL.CFLAGS = "" ;
+GL.LFLAGS = "opengl32 glu32" ;
+GLU.AVAILABLE = "no" ;
+GLX.AVAILABLE = "no" ;
+ZLIB.AVAILABLE = "yes" ;
+ZLIB.LFLAGS = "zlib" ;
+PNG.AVAILABLE = "yes" ;
+PNG.LFLAGS = "libpng" ;
+JPEG.AVAILABLE = "yes" ;
+JPEG.LFLAGS = "libjpeg" ;
+MNG.AVAILABLE = "yes" ;
+MNG.LFLAGS = "libmng zlib libjpeg" ;
+MIKMOD.AVAILABLE = "yes" ;
+MIKMOD.LFLAGS = "mikmod" ;
+VORBISFILE.AVAILABLE = "yes" ;
+VORBISFILE.LFLAGS = "vorbisfile vorbis ogg" ;
+3DS.AVAILABLE = "yes" ;
+3DS.LFLAGS = "lib3ds-120" ;
+ODE.AVAILABLE = "yes" ;
+ODE.LFLAGS = "ode" ;
+OPENAL.AVAILABLE = "yes" ;
+OPENAL.LFLAGS = "openal32 alut" ;
+FT2.AVAILABLE = "yes" ;
+FT2.CFLAGS = "/I \"..\\..\\include\\cssys\\win32\\freetype2\"" ;
+FT2.LFLAGS = "freetype2" ;
+OSS.AVAILABLE = "no" ;
+SOCKET.AVAILABLE = "yes" ;
+SOCKET.LFLAGS = "wsock32" ;
+
+# ok
+JAMCONFIG_READ = "yes" ;
+MSVCGEN_CONFIG = "yes" ;

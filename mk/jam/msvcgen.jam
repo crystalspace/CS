@@ -6,15 +6,15 @@ if $(MSVCGEN_CONFIG)
 {
 
 SHELL = /bin/sh ;
-MSVCGEN = "$(PERL) $(TOP)/experimental/msvcgen/msvcgen.pl" ;
+MSVCGEN = "$(PERL) $(TOP)/mk/msvcgen/msvcgen.pl" ;
 MKVERRES = "$(SHELL) $(TOP)/libs/cssys/win32/mkverres.sh" ;
 MERGERES = "$(SHELL) $(TOP)/libs/cssys/win32/mergeres.sh" ;
 
 MSVC_VERSION ?= 6 ;
 if $(MSVC_VERSION) = 6
 {
-  MSVCGEN_LOCATE_TARGET ?= $(TOP)/experimental/visualc ;
-  MSVCGEN_TEMPLATEDIR ?= $(TOP)/experimental/msvcgen/template ;
+  MSVCGEN_LOCATE_TARGET ?= $(TOP)/mk/visualc ;
+  MSVCGEN_TEMPLATEDIR ?= $(TOP)/mk/msvcgen/template ;
   SSUFPRJ = dsp ;
   SSUFWSP = dsw ;
   SUFPRJ = .dsp ;
@@ -26,8 +26,8 @@ else if $(MSVC_VERSION) = 7
   SUFPRJ = .vcproj ;
   SSUFWSP = sln ;
   SUFWSP = .sln ;
-  MSVCGEN_LOCATE_TARGET ?= $(TOP)/experimental/visualc7 ;
-  MSVCGEN_TEMPLATEDIR ?= $(TOP)/experimental/msvcgen/template7 ;
+  MSVCGEN_LOCATE_TARGET ?= $(TOP)/mk/visualc7 ;
+  MSVCGEN_TEMPLATEDIR ?= $(TOP)/mk/msvcgen/template7 ;
 }
 else
 {
