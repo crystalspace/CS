@@ -512,6 +512,19 @@ static void GetSrcRegname (csPSRegisterType type, int num, uint mods,
   if (mods & CS_PS_RMOD_XYW) str << ".xyw";
 }
 
+void csPixelShaderParser::GetInstructionString (
+  const csPSProgramInstruction& instr, csString& str)
+{
+  str << instrStrings.Request (instr.instruction);
+  if (instr.inst_mods & CS_PS_IMOD_X2) str << "_x2";
+  if (instr.inst_mods & CS_PS_IMOD_X4) str << "_x4";
+  if (instr.inst_mods & CS_PS_IMOD_X8) str << "_x8";
+  if (instr.inst_mods & CS_PS_IMOD_D2) str << "_d2";
+  if (instr.inst_mods & CS_PS_IMOD_D4) str << "_d4";
+  if (instr.inst_mods & CS_PS_IMOD_D8) str << "_d8";
+  if (instr.inst_mods & CS_PS_IMOD_SAT) str << "_sat";
+}
+
 void csPixelShaderParser::WriteProgram (
 	const csArray<csPSProgramInstruction>& instrs, 
 	csString& str)
@@ -520,14 +533,9 @@ void csPixelShaderParser::WriteProgram (
   {
     const csPSProgramInstruction& instr = instrs.Get (i);
 
-    str << instrStrings.Request (instr.instruction);
-    if (instr.inst_mods & CS_PS_IMOD_X2) str << "_x2";
-    if (instr.inst_mods & CS_PS_IMOD_X4) str << "_x4";
-    if (instr.inst_mods & CS_PS_IMOD_X8) str << "_x8";
-    if (instr.inst_mods & CS_PS_IMOD_D2) str << "_d2";
-    if (instr.inst_mods & CS_PS_IMOD_D4) str << "_d4";
-    if (instr.inst_mods & CS_PS_IMOD_D8) str << "_d8";
-    if (instr.inst_mods & CS_PS_IMOD_SAT) str << "_sat";
+    csString instrStr;
+    GetInstructionString (instr, instrStr);
+    str << instrStr;
 
     str << ' ';
     str << GetRegType (instr.dest_reg);

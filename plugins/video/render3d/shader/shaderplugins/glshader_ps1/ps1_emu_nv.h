@@ -85,7 +85,8 @@ private:
 
   bool GetTextureShaderInstructions (
     const csArray<csPSProgramInstruction> &instrs);
-  bool GetNVInstructions (csArray<nv_combiner_stage> &stages,
+  bool GetNVInstructions (csPixelShaderParser& parser,
+    csArray<nv_combiner_stage> &stages,
     const csArray<csPSProgramInstruction> &instrs);
   GLenum GetTexTarget();
 public:

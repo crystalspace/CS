@@ -22,6 +22,7 @@
 #include "csgeom/frustum.h"
 #include "csgeom/trimesh.h"
 #include "csgeom/bsptree.h"
+#include "csgfx/normalmaptools.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -537,6 +538,10 @@ void csGenmeshMeshObject::SetupObject ()
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
     sv->SetAccessor (factory->scfiShaderVariableAccessor);
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::tangent_name);
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::binormal_name);
     sv->SetAccessor (factory->scfiShaderVariableAccessor);
 
     /*sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
@@ -1295,6 +1300,8 @@ csStringID csGenmeshMeshObjectFactory::texel_name = csInvalidStringID;
 csStringID csGenmeshMeshObjectFactory::normal_name = csInvalidStringID;
 csStringID csGenmeshMeshObjectFactory::color_name = csInvalidStringID;
 csStringID csGenmeshMeshObjectFactory::index_name = csInvalidStringID;
+csStringID csGenmeshMeshObjectFactory::tangent_name = csInvalidStringID;
+csStringID csGenmeshMeshObjectFactory::binormal_name = csInvalidStringID;
 
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
       iObjectRegistry* object_reg)
@@ -1354,13 +1361,17 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
     (texel_name == csInvalidStringID) ||
     (normal_name == csInvalidStringID) ||
     (color_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID))
+    (index_name == csInvalidStringID) ||
+    (tangent_name == csInvalidStringID) ||
+    (binormal_name == csInvalidStringID))
   {
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");
     normal_name = strings->Request ("normals");
     color_name = strings->Request ("colors");
     index_name = strings->Request ("indices");
+    tangent_name = strings->Request ("tangents");
+    binormal_name = strings->Request ("binormals");
   }
 
   autonormals = false;
@@ -1369,6 +1380,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   mesh_normals_dirty_flag = false;
   mesh_colors_dirty_flag = false;
   mesh_triangle_dirty_flag = false;
+  mesh_tangents_dirty_flag = false;
 
   buffers_version = 0;
 #endif
@@ -1656,6 +1668,37 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
     var->SetValue(normal_buffer);
     return;
   }
+  if ((var->Name == tangent_name) || (var->Name == binormal_name))
+  {
+    if (mesh_tangents_dirty_flag)
+    {
+      if (!tangent_buffer)
+        tangent_buffer = g3d->CreateRenderBuffer (
+          sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+          CS_BUFCOMP_FLOAT, 3);
+      if (!binormal_buffer)
+        binormal_buffer = g3d->CreateRenderBuffer (
+          sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+          CS_BUFCOMP_FLOAT, 3);
+      mesh_tangents_dirty_flag = false;
+
+      csVector3* tangentData = new csVector3[num_mesh_vertices * 2];
+      csVector3* bitangentData = tangentData + num_mesh_vertices;
+      csNormalMappingTools::CalculateTangents (num_mesh_triangles, 
+	mesh_triangles, num_mesh_vertices, mesh_vertices, mesh_normals, 
+	mesh_texels, tangentData, bitangentData);
+
+      tangent_buffer->CopyToBuffer (tangentData, 
+	sizeof (csVector3) * num_mesh_vertices);
+      binormal_buffer->CopyToBuffer (bitangentData, 
+	sizeof (csVector3) * num_mesh_vertices);
+
+      delete[] tangentData;
+    }
+    var->SetValue((var->Name == tangent_name) ? tangent_buffer : 
+      binormal_buffer);
+    return;
+  }
   /*if (var->Name == color_name)
   {
     if (mesh_colors_dirty_flag)
@@ -1722,6 +1765,7 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
   mesh_colors_dirty_flag = true;
+  mesh_tangents_dirty_flag = true;
 #else
   top_mesh.vertex_fog = new G3DFogInfo [num_mesh_vertices];
 #endif
@@ -2205,6 +2249,7 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   mesh_normals_dirty_flag = true;
   mesh_colors_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
+  mesh_tangents_dirty_flag = true;
 #endif
 }
 

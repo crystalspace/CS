@@ -313,8 +313,9 @@ csVector4 csShaderGLPS1_NV::GetConstantRegisterValue (int reg)
   return csVector4 (0.0f,0.0f,0.0f,0.0f);
 }
 
-bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
-  const csArray<csPSProgramInstruction> &instrs)
+bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
+					  csArray<nv_combiner_stage> &stages,
+					  const csArray<csPSProgramInstruction> &instrs)
 {
   for(int i=0;i<instrs.Length ();i++)
   {
@@ -356,8 +357,12 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
     else if(inst.inst_mods & CS_PS_IMOD_D2) scale = GL_SCALE_BY_ONE_HALF_NV;
     else if(inst.inst_mods)
     {
-      Report(CS_REPORTER_SEVERITY_ERROR,
-        "Register Combiners doesn't support many instruction modifiers.");
+      csString instrStr;
+      parser.GetInstructionString (inst, instrStr);
+      Report(CS_REPORTER_SEVERITY_WARNING,
+        "Register Combiners doesn't support one or more modifiers for '%s' (%d).",
+	instrStr.GetData(), i);
+      return false;
     }
 
     int con_first = -1, con_second = -1;
@@ -491,11 +496,11 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
         case CS_PS_INS_BEM:
           Report(CS_REPORTER_SEVERITY_WARNING,
             "NV_register_combiners does not support the 'bem' instruction");
-          break;
+	  return false;
         case CS_PS_INS_CMP:
           Report(CS_REPORTER_SEVERITY_WARNING,
             "NV_register_combiners does not support the 'cmp' instruction");
-          break;
+	  return false;
         case CS_PS_INS_CND:
           combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
             src[0], mapping[0], component[0]));
@@ -519,7 +524,7 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
         case CS_PS_INS_DP4:
           Report(CS_REPORTER_SEVERITY_WARNING,
             "NV_register_combiners does not support four component dot \
-            products. Skipping PS1 style shader.");
+            products.");
           return false;
         case CS_PS_INS_LRP:
           combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
@@ -617,7 +622,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
   if(!GetTextureShaderInstructions(instrs)) return false;
 
   // Then translate PS instructions into NV_register_combiners info
-  if(!GetNVInstructions(stages, instrs)) return false;
+  if(!GetNVInstructions (parser, stages, instrs)) return false;
 
   if(stages.Length () < 1) return false;
 

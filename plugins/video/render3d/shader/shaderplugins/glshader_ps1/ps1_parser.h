@@ -88,6 +88,8 @@ public:
   const csArray<csPSConstant> &GetConstants ()
   { return program_constants; }
 
+  void GetInstructionString (const csPSProgramInstruction& instr,
+    csString& str);
 #ifdef CS_DEBUG
   void WriteProgram (const csArray<csPSProgramInstruction>& instr, 
     csString& str);

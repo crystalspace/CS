@@ -45,6 +45,12 @@ chronological order.
 	  caused more overhead then it is worth and also considerably cleaned
 	  up the loop for FlushGeneral(). Overall this gives about a 6-8%
 	  speedup on my system.
+	- res made the following changes:
+	    - Added a helper method to calculate tangents and bitangents for
+	      triangle meshes.
+	    - Updated genmesh to also provide tangent and bitangent render 
+	      buffers.
+	    - Improved error handling in the glshader_ps1 plugin a bit.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.

@@ -463,6 +463,7 @@ private:
   bool mesh_normals_dirty_flag;
   bool mesh_colors_dirty_flag;
   bool mesh_triangle_dirty_flag;
+  bool mesh_tangents_dirty_flag;
 
   bool autonormals;
 
@@ -474,6 +475,8 @@ private:
   csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
+  csRef<iRenderBuffer> binormal_buffer;
+  csRef<iRenderBuffer> tangent_buffer;
   
   csAnonRenderBufferManager anon_buffers;
   csArray<csStringID> anon_buffer_names;
@@ -528,7 +531,7 @@ private:
 
 public:
   static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name;
+    index_name, tangent_name, binormal_name;
   uint buffers_version;
 
   bool back2front;
