@@ -34,7 +34,10 @@ struct csDLListItem
 
 
 /**
- * This class implements a doubly-linked list.
+ * This class implements a doubly-linked list. Note that this implementation
+ * builds a circular list, that means to next pointer of the last element
+ * points to the first element.
+ *
  * Nothing in this code affects the objects in the list.
  * They do not get deleted by any of these function calls.
  */
