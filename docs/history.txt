@@ -17,6 +17,9 @@ chronological order.
 	- Eric Sunshine repaired some outdated references to
 	  /usr/local/crystal, the old GNU-make-based installation location, in
 	  the CS manual. Also eliminated TeX 'hbox' warnings.
+	- Eric Sunshine augmented csGetPluginPaths() in generic/pluginpaths.cpp
+	  so that it respects the value of CS_PLUGINDIR if defined, which is
+	  configure's notion of where installed plugins will reside.
 17-Sep-2004
 	- Eric Sunshine fixed a couple methods in odedynam which were returning
 	  a value despite being declared as returning void. Reported by Brendon

@@ -61,6 +61,10 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
     paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     paths->AddOnce (configPath, false, CS_PACKAGE_NAME);
+
+#ifdef CS_PLUGINDIR
+    paths->AddOnce (CS_PLUGINDIR, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+#endif
   }
     
   return paths;
