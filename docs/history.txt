@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Oct-2004
+	- Rhad changed the software renderer to account for the OSS driver
+	  blocking for long periods on calls to UnlockMemory().
 28-Oct-2004
 	- Jorrit did some small work on foliage mesh.
 	- Eric Sunshine removed some redundant assignments from Jamrules which

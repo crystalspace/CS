@@ -383,8 +383,10 @@ void csSoundRenderSoftware::MixingFunction()
     hdl->UpdateCount(NumSamples);
   }
 */
-  SoundDriver->UnlockMemory();
   mixing->Release();
+
+  // UnlockMemory blocks in the OSS driver for linux.  It should not be called with a lock held.
+  SoundDriver->UnlockMemory();
 }
 
 bool csSoundRenderSoftware::HandleEvent (iEvent &e)
@@ -417,14 +419,14 @@ void csSoundRenderSoftware::ThreadedMix ()
   {
     mixing->LockWait ();
     data->Wait (mixing);
-    bool bRelock = false;
+    bool bLocked = true;
     while (bRunning && Sources.Length() != 0)
     {
-      if (bRelock) mixing->LockWait ();
+      // Release any lock we hold here before calling the MixingFunction, since it will obtain the lock as needed itself
+      if (bLocked) mixing->Release ();
       MixingFunction ();
-      mixing->Release ();
-      bRelock = true;
+      bLocked = false;
     }
-    if (!bRelock) mixing->Release ();
+    if (bLocked) mixing->Release ();
   }
 }
