@@ -49,7 +49,8 @@ DEP.SHADERMGR = CSTOOL CSGFX CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.SHADERMGR)
 
-TO_INSTALL.DATA += $(wildcard $(addprefix $(SRCDIR)/data/shader/*.,xml avp))
+TO_INSTALL.DATA += \
+  $(wildcard $(addprefix $(SRCDIR)/data/shader/*.,avp fvp xml))
 
 MSVC.DSP += SHADERMGR
 DSP.SHADERMGR.NAME = shadermgr
