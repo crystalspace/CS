@@ -1,5 +1,5 @@
 Crystal Space VC++ Win32 Development Readme
-This is up to date as of July 30th, 1999
+This is up to date as of January 20th, 2000
 
 Written by Dan Ogles
 Updated by Noote (Nathaniel Saint Martin)
@@ -12,6 +12,7 @@ Contents:
 1.  Quickstart
 2.  Working with the Workspace.
 3.  Frequently Asked Questions.
+4.  Creating own applications
 
 ---------[1] Quickstart - for the impatient -------------
 
@@ -20,32 +21,25 @@ To compile Crystal Space, you'll have to perform the following steps:
 
 1. Load mk/visualc/csall.dsw
 
-2. if you have not installed A3D SDK: unload SoundRenderA3D 
-   (Files tab, right mouse button on SoundRenderA3D)
+2. Make "All Files" you active project.
 
-3. if you have not installed EAX SDK: unload SoundRenderEAX
+3. Select Menu "Build" "Rebuild All"
 
-4. if you have not installed Glide2x SDK: unload Glide2xRender
+4. After a while you should finish with almost no warnings and no errors.
 
-5. Make "All Files" you active project.
-
-6. Select Menu "Build" "Rebuild All"
-
-7. After a while you should finish with almost no warnings and no errors.
-
-8. Change your settings in cryst.cfg (included in the Configuration Files folder
+5. Change your settings in cryst.cfg (included in the Configuration Files folder
    in the CrystalSpace project) to the following (or whatever you like more):
 
      DRIVER = crystalspace.graphics3d.software
-     WORLDFILE = large
+     WORLDFILE = flarge
 
    This will set up CrystalSpace to run in software mode using the worldfile
-   "large". Make sure that you have downloaded a worldfile from the 
+   "flarge". Make sure that you have downloaded a worldfile from the 
    Crystal Space Website before this. These files are in ZIP format and should
    be downloaded to the $/CS/data directory. Do not attempt to extract this 
    archive - Crystal Space decompresses the ZIP file at run time.
 
-9. Open "Project", "Settings", select walktest on the left list. Select the 
+6. Open "Project", "Settings", select walktest on the left list. Select the 
    "Debug" tab in the register, select category "general" and enter the the 
    same directory the exe sits in as workdirectory. If the executable would be 
    in "E:\cvs\Cs\walktest.exe", you should select "E:\cvs\Cs\" as working 
@@ -57,7 +51,7 @@ To compile Crystal Space, you'll have to perform the following steps:
 
    alternatively, you can switch to the windows explorer and call walktest. 
    
-10. Enjoy :-)
+7. Enjoy :-)
 
 (Or see the FAQ section below)
 
@@ -65,7 +59,7 @@ To compile Crystal Space, you'll have to perform the following steps:
 
 The Crystal Space workspace is divided into several projects. They
 all exist as separate project files (*.dsp). All of them are being bound
-together by a workkspace. You can choose either csall.dsw or cssimple.dsw.
+together by a workspace. You can choose either csall.dsw or csexperimental.dsw.
 This workspace will also ensure correct linking between the various projects,
 so you need to use a predefined workspace or, if you create your own,
 you will have to set project dependencies right.
@@ -78,11 +72,10 @@ workspace.)
 
 
 The libraries :
-* Com -- the statically linked library which includes all the
-  definitions for the interface IDs used in all the projects. This is linked
-  into all of the projects.
 * CsWs -- the window manager library (need for Mazed editor)
 * CSpace - the static linked library, which includes the majority of the code
+* csgame - A library intended to make creation of games simpler by providing
+           a more game oriented API of the engine.
 
 The drivers :
 * SoftwareRender - the SoftwareRender DLL, which includes the 3D graphics
@@ -90,7 +83,7 @@ The drivers :
 * Direct3D5Render - the Direct3D Dx5 Render DLL, which includes the 3D graphics
   driver for Direct3D-accelerated rasterization. This is loaded by the
   CrystalSpace EXE.
-* Direct3D6Render - the Direct3D Dx6 Render DLL, which includes the 3D graphics
+* Direct3D61Render - the Direct3D Dx6.1 Render DLL, which includes the 3D graphics
   driver for Direct3D-accelerated rasterization. This is loaded by the
   CrystalSpace EXE.
 * Glide2xRender - the Glide2x Render DLL, which includes the 3D graphics
@@ -106,14 +99,11 @@ The drivers :
 * DirectDraw2D - the DirectDraw Dx3 Graphics DLL, which includes the 2D graphics
   layer for DirectDraw screen devices. This is loaded by the CrystalSpace
   EXE.
-* DirectDraw2D6 - the DirectDraw Dx6 Graphics DLL, which includes the 2D graphics
-  layer for DirectDraw screen devices. This is loaded by the CrystalSpace
-  EXE. it's Dx6 compatible and used by Direct3D Dx6 Render. (Not yet working, 
-  and therefore not included in csall workspace)
+* DirectDraw2D6dx61 - the DirectDraw Dx6.1 Graphics DLL, which includes the 2D 
+  graphics layer for DirectDraw screen devices. This is loaded by the CrystalSpace
+  EXE. it's Dx6.1 compatible and used by Direct3D Dx6.1 Render. 
 
-* SoundDriverNull - A dummy sound driver
 * SoundDriverWaveOut - A simple sound driver
-* SoundRenderNull - A dummy 3D sound render
 * SoundRenderA3D - A special 3D sound render. To use this, you will need
   the according SDK, which I don't have, so I don't know if this project
   will even compile. Normally you will unload that project.
@@ -122,12 +112,8 @@ The drivers :
   will even compile. Normally you will unload that project.
 * SoundRenderDS3D - A DirectX 3D sound driver. 
 
-* NetworkDriverNull - the null network Driver, This is loaded by the CrystalSpace
-  EXE.
 * NetworkDriverSock - the BSD Sockets network Driver, This is loaded by the CrystalSpace
   EXE.
-* NetworkManagerNull - Dummy Network Manager. (The network manager is an layer
-  above simple network services and offers more game oriented functions)
 * NetworkManagerSimple - Dummy Network Manager. (The network manager is an layer
   above simple network services and offers more game oriented functions)
 
@@ -138,8 +124,12 @@ The applications :
 * PrimEdit -- an editor. (No project file inlcuded, because that project
   is dead. You might want to reanmite it anyway.)
 * Simple -- a simple (minimum) CyrstalSpace application.
-
-Note : Direct3DDx6 and Glide3x render currently don't work.
+* map2cs -- a convertor to convert Quake map files to Crystal Space. See 
+            docs\map2cs for details.
+* phyztest -- an application to show some of the abilitites of the 
+              CS physics system.
+* Blocks -- a simple 3D tetris clone.
+* shooter -- a simple first person shooter demo. (using csgame)
 
 ---------[3] FREQUENTLY ASKED QUESTIONS-------------------
 
@@ -164,6 +154,18 @@ If that doesn't work, read on. :-)
 
 I. COMPILATION TIME:
 
+- I get errors like 
+  \..\libs\cs2d/ddraw61/ig2d.h(14) : error C2061: syntax error : 
+  identifier 'LPDIRECTDRAW4' 
+  ..\..\libs\cs2d/ddraw61/ig2d.h(16) : error C2061: syntax error : 
+  identifier 'LPDIRECTDRAWSURFACE4' 
+  What's the matter?
+
+You don't have installed the correct DirectX sdk. (Or have not installed
+it properly, which means manual adjustment of the library and include
+directorys in MSVC.) Either install the SDK correctly or unload the
+DirectX 6.1 related projects.
+
 - Where are those damn zlib.h, png.h or jpeglib.h files?
 
 Those files are not part of the Crystal Space project, but they are required
@@ -186,9 +188,9 @@ download an up to date version from my homepage:
 http://members.xoom.com/thieber/libdlls13.zip
 If everything works alright the files should be in the following places:
 
-CS\libs\libjpeg.dll
-CS\libs\png.dll
-CS\libs\zlib.dll
+CS\libjpeg.dll
+CS\png.dll
+CS\zlib.dll
 CS\include\cssys\win32\jconfig.h
 CS\include\cssys\win32\jerror.h
 CS\include\cssys\win32\jinclude.h
@@ -303,9 +305,11 @@ on all platforms. Sometimes a specific port may even be broken due to
 changes in other ports. Since the introduction of CVS this is usually
 only for a short time, so if you got your version out of CVS, it usually
 pays off, to post a message describing the problems to the Crystal 
-Space Mailing List (crystal@lists.linux.it) describing you problem and
-enclude the exact error messages. If you wait a while, this will probably
-be fixed, or at least be worked around.
+Space Mailing List describing you problem and include the exact error 
+messages. If you wait a while, this will probably be fixed, or at least 
+be worked around.
+Instructions on how to contact the Crystal Space mailinglist can be found
+on the Crystal Space homepage. (http://crystal.linuxgames.com)
 
 - I compile for the first time, and I have a problem that you haven't 
   solved here!
@@ -314,6 +318,64 @@ Mail me at thieber@gmx.net. You can also try to reach Dan Ogles or Noote or
 send a note to Crystal Space Mailing List (crystal@lists.linux.it). 
 Don't forget to tell us if you're not a member of that list so that we can 
 then send you a personal reply.
+
+---------[4] Creating own applications -------------------
+
+After being able to compile and run, many people want to start creating their
+own applications using Crystal Space. (In fact, this is the main intention of
+the Crystal Space project) So here is a step by step explanation, on how to
+setup a project file for a Win32 application, that uses Crystal Space. 
+
+- Load csall.dsw.
+- Select "File"->"New"->"Project"->"Win 32 application"
+- Enter a name for your project. (For example "test")
+- Set the path to "E:\cvs\CS\mk\visualc". (or whereevery you store your CS. 
+  Just make sure it ends with "visualc")
+- Select "Add to current workspace". 
+- Do not select "depenencies".
+- Press "OK"
+- Select "Create an empty project"
+- Select "finish"
+- Select "Project"->"depencencies"->
+- Make "test" depend on "cspace"
+- Make "applications" depend on "test"
+- Add "Cs\libs\cssys\win32\exeentry.cpp" to the "test" project.
+- Add all the remaining files to the project.
+- Open the project settings for "test"
+- Select the "C++" tab
+- Select "Win32 Debug"
+- Set Preprocessor Definitions to "NDEBUG,_WINDOWS,WIN32,WIN32_VOLATILE"
+- Set Runtime Library to "Multithreaded Debug"
+- Select "Win32 Release"
+- Set Preprocessor Definitions to "NDEBUG,_WINDOWS,WIN32,WIN32_VOLATILE"
+- Set Runtime Library to "Multithreaded"
+- Select "All configurations"
+- Set additional include directories to "..\..\include\cssys\win32,
+  ..\..\include,..\..\libs,..\..\support,..\..,..\..\apps"
+- Select the "Linker" tab
+- Select "All configurations"
+- Set "Object/ library modules" to "kernel32.lib user32.lib gdi32.lib 
+  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib 
+  uuid.lib odbc32.lib odbccp32.lib zlib.lib png.lib libjpeg.lib 
+  dinput.lib dxguid.lib"
+- Set "additional library path" to "..\..\libs\cssys\win32\lib"
+- Set "name of output file" to "..\..\test.exe"
+- Select "General" tab.
+- Select "Win32 Debug"
+- Set "Temporary Files" to "Debug\test"
+- Set "Output Files" to "Debug"
+- Select "Win32 Release"
+- Set "Temporary Files" to "Release\test"
+- Set "Output Files" to "Release"
+- Select the "Debug" Tab.
+- Set "Working directory" to "e:\cvs\CS\" (or whereever the exe ends up.)
+
+Save all.
+
+That should be it. Call "Project"->"Build test.exe" and call 
+"Project"->"Debug", "go".
+
+---------------------------------------------------------------------
 
 Hope this helps you!
 
