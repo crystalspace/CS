@@ -73,7 +73,7 @@ csTextureCacheSoftware::~csTextureCacheSoftware ()
 void csTextureCacheSoftware::set_cache_size (long size)
 {
   Clear ();
-  cache_size = size;
+  cache_size = size * texman->pfmt.PixelBytes;
 }
 
 void csTextureCacheSoftware::Clear ()
