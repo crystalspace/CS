@@ -643,7 +643,7 @@ bool csShaderPass::Load(iDocumentNode* node)
             {
               fp->Load(child);
             }
-            SetVertexProgram(fp);
+            SetFragmentProgram(fp);
           }
         }
         break;
