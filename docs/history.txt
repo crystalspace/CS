@@ -35,6 +35,9 @@ The history order has been reversed so that new features are at the top.
 	      for setting debugger breakpoints (e.g. the debugger will
 	      break when that macro will be invoked). It is defined
 	      only in CS_DEBUG mode.
+	- Added experimental spiral particle system. It does not look
+	  nice yet. This is intended for a special spiraling effect.
+	  Added the 'spiral' console command to use it.
 19-Apr-2000
 	- Andrew Zabolotny did a few changes to the windows port to
 	  try to get it working after his large changes from a few

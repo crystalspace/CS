@@ -76,9 +76,9 @@ extern void move_sprite (csSprite3D* sprite, csSector* where,
 	csVector3 const& pos);
 
 //===========================================================================
-// Demo particle system.
+// Demo particle system (explosion).
 //===========================================================================
-void add_particles (csSector* sector, const csVector3& center, char* txtname)
+void add_particles_explosion (csSector* sector, const csVector3& center, char* txtname)
 {
   // First check if the texture exists.
   csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
@@ -100,6 +100,33 @@ void add_particles (csSector* sector, const csVector3& center, char* txtname)
   exp->SetColor( csColor(1,1,0) );
   exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
   exp->AddLight (Sys->world, sector, 1000);
+}
+
+//===========================================================================
+// Demo particle system (spiral).
+//===========================================================================
+void add_particles_spiral (csSector* sector, const csVector3& bottom, char* txtname)
+{
+  // First check if the texture exists.
+  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
+  	FindByName (txtname);
+  if (!txt)
+  {
+    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    return;
+  }
+
+  CHK (csSpiralParticleSystem* exp = new csSpiralParticleSystem (20,
+  	bottom, txt));
+  exp->MoveToSector (sector);
+  //exp->SetSelfDestruct (3000);
+  exp->SetMixmode (CS_FX_SETALPHA (0.50));
+  //exp->SetChangeRotation(5.0);
+  //exp->SetChangeSize (1.25);
+  //exp->SetFadeSprites (500);
+  exp->SetColor( csColor(1,1,0) );
+  //exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
+  //exp->AddLight (Sys->world, sector, 1000);
 }
 
 //===========================================================================
@@ -755,7 +782,7 @@ void HandleDynLight (csDynLight* dyn)
       }
       dyn->Resize (es->radius);
       dyn->Setup ();
-      add_particles (dyn->GetSector (), dyn->GetCenter (), "explo.jpg");
+      add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo.jpg");
       break;
     }
     case DYN_TYPE_RANDOM:

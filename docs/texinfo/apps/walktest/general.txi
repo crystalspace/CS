@@ -237,8 +237,12 @@ depth of 1 will create a root and one layer above. The second argument is
 the width. This is the number of arms for the ghost.
 
 @item explosion
-Add a particle system simulating an explosion. A bit primitive at this
-moment because of lack for a good texture.
+Add a particle system simulating an explosion. The parameter for this
+command is the texture to use for the particles.
+
+@item spiral
+Add a particle system simulating an spiral. The parameter for this
+command is the texture to use for the particles.
 
 @item dumpvis
 This command takes the current view and dumps information for the rendering

@@ -175,8 +175,6 @@ public:
   CSOBJTYPE;
 };
 
-
-
 /**
  * This class has a set of particles that behave with phsyics.
  * They each have a speed and an acceleration.
@@ -212,7 +210,34 @@ public:
   CSOBJTYPE;
 };
 
+/**
+ * This class has a set of particles that act like a spiraling
+ * particle fountain.
+ */
+class csSpiralParticleSystem : public csNewtonianParticleSystem
+{
+protected:
+  int max;
+  time_t time_before_new_particle;
+  csVector3 source;
+  int last_reuse;
+  csTextureHandle* txt;
+  csSector* this_sector;
 
+public:
+  /// Specify max number of particles.
+  csSpiralParticleSystem (int max, const csVector3& source,
+  	csTextureHandle* txt);
+  virtual ~csSpiralParticleSystem ();
+
+  /// Moves the particles depending on their acceleration and speed.
+  virtual void Update (time_t elapsed_time);
+
+  /// Move all particles to a sector, virtual so subclass can move more.
+  virtual void MoveToSector (csSector *sector);
+
+  CSOBJTYPE;
+};
 
 /**
  * An explosive particle system.

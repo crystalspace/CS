@@ -28,6 +28,7 @@
 
 IMPLEMENT_CSOBJTYPE (csParticleSystem, csObject)
 IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
+IMPLEMENT_CSOBJTYPE (csSpiralParticleSystem, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
 IMPLEMENT_IBASE (csParticleSystem)
   IMPLEMENTS_INTERFACE(iParticle)
@@ -181,6 +182,70 @@ void csParticleSystem :: Update(time_t elapsed_time)
     Rotate(anglepersecond * elapsed_seconds);
 }
 
+//---------------------------------------------------------------------
+
+/// helping func. Returns vector of with -1..+1 members. Varying length!
+static csVector3& GetRandomDirection()
+{
+  static csVector3 dir;
+  dir.x = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
+  dir.y = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
+  dir.z = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
+  return dir;
+}
+
+
+//-- csSpiralParticleSystem ------------------------------------------
+
+csSpiralParticleSystem::csSpiralParticleSystem (int max,
+	const csVector3& source, csTextureHandle* txt) : csNewtonianParticleSystem (max)
+{
+  csSpiralParticleSystem::max = max;
+  csSpiralParticleSystem::source = source;
+  csSpiralParticleSystem::txt = txt;
+  time_before_new_particle = 0;
+  last_reuse = 0;
+}
+
+csSpiralParticleSystem::~csSpiralParticleSystem ()
+{
+}
+
+void csSpiralParticleSystem::MoveToSector (csSector *sector)
+{
+  this_sector = sector;
+  csNewtonianParticleSystem::MoveToSector (sector);
+}
+
+void csSpiralParticleSystem::Update (time_t elapsed_time)
+{
+  time_before_new_particle -= elapsed_time;
+  if (time_before_new_particle < 0)
+  {
+    time_before_new_particle = 300;	// @@@ PARAMETER
+    int num = GetNumParticles ();
+    int part_idx;
+    if (num >= max)
+    {
+      part_idx = last_reuse;
+      last_reuse = (last_reuse+1)%max;
+    }
+    else
+    {
+      AppendRegularSprite (6, .2, txt, false);	// @@@ PARAMETER
+      part_idx = GetNumParticles ()-1;
+      GetParticle (part_idx)->MoveToSector (this_sector);
+    }
+    iParticle* part = GetParticle (part_idx);
+    part->SetPosition (source);
+    csVector3 dir;
+    dir = GetRandomDirection ();
+    if (dir.y < 0) dir.y = -dir.y;
+    SetSpeed (part_idx, dir);
+    SetAccel (part_idx, csVector3 (1, 1, 1));
+  }
+  csNewtonianParticleSystem::Update (elapsed_time);
+}
 
 //-- csNewtonianParticleSystem ------------------------------------------
 
@@ -218,17 +283,6 @@ void csNewtonianParticleSystem :: Update(time_t elapsed_time)
 
 
 //-- csParSysExplosion --------------------------------------------------
-
-
-/// helping func. Returns vector of with -1..+1 members. Varying length!
-static csVector3& GetRandomDirection()
-{
-  static csVector3 dir;
-  dir.x = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
-  dir.y = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
-  dir.z = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
-  return dir;
-}
 
 
 csParSysExplosion :: csParSysExplosion(int number_p, 

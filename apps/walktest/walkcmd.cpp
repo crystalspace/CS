@@ -514,14 +514,29 @@ bool CommandHandler (char *cmd, char *arg)
     char txtname[100];
     int cnt = 0;
     if (arg) cnt = ScanStr (arg, "%s", txtname);
-    extern void add_particles (csSector* sector, const csVector3& center,
+    extern void add_particles_explosion (csSector* sector, const csVector3& center,
     	char* txtname);
     if (cnt != 1)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
     }
     else
-      add_particles (Sys->view->GetCamera ()->GetSector (),
+      add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
+    	Sys->view->GetCamera ()->GetOrigin (), txtname);
+  }
+  else if (!strcasecmp (cmd, "spiral"))
+  {
+    char txtname[100];
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s", txtname);
+    extern void add_particles_spiral (csSector* sector, const csVector3& bottom,
+    	char* txtname);
+    if (cnt != 1)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
+    }
+    else
+      add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetOrigin (), txtname);
   }
   else if (!strcasecmp (cmd, "loadsprite"))
