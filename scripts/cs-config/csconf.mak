@@ -39,10 +39,6 @@ all: $(CSCONFIG.EXE)
 csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
 clean: csconfigclean
 
-ifeq ($(LINK.PLUGIN),)
-  LINK.PLUGIN = $(LINK)
-endif
-
 # create out/csconfig.tmp for the makevars that need to be transferred
 $(CSCONFIG.EXE):
 	@echo Generating cs-config script...
@@ -50,12 +46,17 @@ $(CSCONFIG.EXE):
 	@echo $"# Note: automatically generated. $" >> out/csconfig.tmp
 	@echo $"EXE=$(EXE)$" >> out/csconfig.tmp
 	@echo $"DLL=$(DLL)$" >> out/csconfig.tmp
-	@echo $"LFLAGS.DLL=$(LFLAGS.DLL)$" >> out/csconfig.tmp
 	@echo $"LFLAGS.EXE=$(LFLAGS.EXE")$" >> out/csconfig.tmp
 	@echo $"DO.SHARED.PLUGIN.PREAMBLE=$(DO.SHARED.PLUGIN.PREAMBLE)$" >> out/csconfig.tmp
 	@echo $"DO.SHARED.PLUGIN.POSTAMBLE=$(DO.SHARED.PLUGIN.POSTAMBLE)$" >> out/csconfig.tmp
 	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$" >> out/csconfig.tmp
+ifneq ($(LINK.PLUGIN),)
 	@echo $"LINK.PLUGIN=$(LINK.PLUGIN)$" >> out/csconfig.tmp
+	@echo $"LFLAGS.DLL=$(LFLAGS.DLL) \$$@$" >> out/csconfig.tmp
+else
+	@echo $"LINK.PLUGIN=$" >> out/csconfig.tmp
+	@echo $"LFLAGS.DLL=$(LFLAGS.DLL)$" >> out/csconfig.tmp
+endif
 	@echo $"PLUGIN.POSTFLAGS=$(PLUGIN.POSTFLAGS)$" >> out/csconfig.tmp
 
 	scripts/cs-config/genscript.sh "$(INSTALL_DIR)" "$(CXXFLAGS)" \

@@ -46,7 +46,6 @@ PLUGIN.OBJS=$(addsuffix .o, $(basename $(PLUGIN.OBJSRC)))
 CCC=g++ 
 LINK=g++
 RM=rm
-LINK.PLUGIN=$(LINK)
 
 #------
 # Flags for compiler and linker.
@@ -54,6 +53,9 @@ LINK.PLUGIN=$(LINK)
 #------
 CSCONFIG.MAK=csconfig.mak
 -include $(CSCONFIG.MAK)
+ifeq ($(LINK.PLUGIN),)
+  LINK.PLUGIN=$(LINK)
+endif
 CFLAGS = $(shell ./cs-config --cflags)
 CXXFLAGS = $(shell ./cs-config --cxxflags)
 LINKFLAGS = $(shell ./cs-config --libs cstool csutil cssys csgfx csgeom)
