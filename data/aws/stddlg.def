@@ -54,7 +54,7 @@ window "StdDlg"
   component "CancleButton" is "Command Button"
   {
     Frame: (10,220) - (111,241)
-    Caption: "Cancle"
+    Caption: "Cancel"
     connect 
     {
       signalRadButtonClicked -> StdDlg::CancleButton
