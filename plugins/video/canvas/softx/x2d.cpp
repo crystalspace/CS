@@ -330,7 +330,13 @@ bool csGraphics2DXLib::Open(char *Title)
   // Create backing store
   if (!xim)
   {
-    xim = XGetImage (dpy, window, 0, 0, Width, Height, AllPlanes, ZPixmap);
+//    xim = XGetImage (dpy, window, 0, 0, Width, Height, AllPlanes, ZPixmap);
+    int sc = DefaultScreen(dpy);
+    int disp_depth = DefaultDepth(dpy,sc);
+    int bitmap_pad = (disp_depth + 7) / 8;
+        bitmap_pad = (bitmap_pad==3) ? 32 : bitmap_pad*8;
+    xim = XCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, ZPixmap, 0,
+                       NULL, Width, Height, bitmap_pad, 0);
 #   ifdef DO_SHM
     if (do_shm && !XShmQueryExtension (dpy))
     {
@@ -358,6 +364,7 @@ bool csGraphics2DXLib::Open(char *Title)
     else
 #   endif /* DO_SHM */
     {
+      CHK(xim->data = new unsigned char[xim->bytes_per_line*xim->height]);
       real_Memory = (unsigned char*)(xim->data);
     }
 
