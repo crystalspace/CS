@@ -149,7 +149,8 @@ void csTGAImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *)
+iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
+  const char* extraoptions)
 {
   if (!Image || !Image->GetImageData ())
     return NULL;
@@ -239,10 +240,12 @@ iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
   return db;
 }
 
-iDataBuffer *csTGAImageIO::Save (iImage *Image, const char *mime)
+iDataBuffer *csTGAImageIO::Save (iImage *Image, const char *mime,
+  const char* extraoptions)
 {
   if (!strcasecmp (mime, TGA_MIME))
-    return Save (Image, (iImageIO::FileFormatDescription *)NULL);
+    return Save (Image, (iImageIO::FileFormatDescription *)NULL,
+      extraoptions);
   return NULL;
 }
 

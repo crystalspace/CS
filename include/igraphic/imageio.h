@@ -24,7 +24,7 @@ struct iImage;
 struct iDataBuffer;
 class csVector;
 
-SCF_VERSION (iImageIO, 0, 0, 1);
+SCF_VERSION (iImageIO, 1, 0, 0);
 
 /**
  * The iImageIO interface is used to save and load graphic files.
@@ -41,7 +41,7 @@ struct iImageIO : public iBase
     const char *mime;
     /// descriptive format specifier, e.g. "8 bit palettized"
     const char *subtype;
-    /// a combination of CS_IMGAEIO_* flags
+    /// a combination of CS_IMAGEIO_* flags
     int cap;
   };
 
@@ -74,13 +74,15 @@ struct iImageIO : public iBase
   /**
    * Save an image using a prefered format.
    */
-  virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format) = 0;
+  virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format,
+    const char* extraoptions = NULL) = 0;
 
   /**
    * Save an image using format <mime>.
    * If omitted format selection is left to the plugin.
    */
-  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL) = 0;
+  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL,
+    const char* extraoptions = NULL) = 0;
 };
 
 #endif // __IGRAPHIC_IMAGEIO_H__

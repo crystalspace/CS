@@ -43,8 +43,10 @@ class csGIFImageIO : public iImageIO
   virtual const csVector& GetDescription ();
   virtual iImage *Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
-  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL);
-  virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
+  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL,
+    const char* extraoptions = NULL);
+  virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL,
+    const char* extraoptions = NULL);
 
   struct eiComponent : public iComponent
   {

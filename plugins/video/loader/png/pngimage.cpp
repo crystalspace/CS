@@ -119,10 +119,55 @@ void csPNGImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *)
+iDataBuffer *csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
+  const char* extraoptions)
 {
   if (!Image)
     return NULL;
+
+  int compress = 6;
+  bool interlace = false;
+  /*
+     parse output options.
+     options are a comma-separated list and can be either
+     'option' or 'option=value'.
+
+     supported options:
+       compress=#   image compression, 0..100 higher values give smaller files,
+		    but take longer to encode.
+       progressive  interlaced output.
+   */
+  const char *current_opt = extraoptions;
+  while (current_opt && *current_opt)
+  {
+    if (*current_opt == ',') current_opt++;
+
+    const char *opt_end = strchr (current_opt, ',');
+    if (!opt_end) opt_end = strchr (current_opt, 0);
+
+    char *opt_key = new char[opt_end - current_opt + 1];
+    strncpy (opt_key, current_opt, opt_end - current_opt);
+    opt_key[opt_end - current_opt] = 0;
+    current_opt = opt_end;
+
+    char *opt_value = strchr (opt_key, '=');
+    if (opt_value) *opt_value++ = 0;
+
+    if (!strcmp (opt_key, "compress"))
+    {
+      if (opt_value)
+	compress = atoi (opt_value) / 10;
+    }
+    else if (!strcmp (opt_key, "progressive"))
+    {
+      interlace = true;
+    }
+
+    delete opt_key;
+  }
+
+  if (compress < 0) compress = 0;
+  if (compress > 9) compress = 9;
 
   datastore ds;
 
@@ -133,6 +178,8 @@ iDataBuffer *csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
 error1:
     return NULL;
   }
+
+  png_set_compression_level (png, compress);
 
   /* Allocate/initialize the image information data. */
   png_infop info = png_create_info_struct (png);
@@ -186,7 +233,8 @@ error2:
       goto error2;
   } /* endswitch */
   png_set_IHDR (png, info, width, height, 8, colortype,
-    PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+    interlace?PNG_INTERLACE_ADAM7:PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, 
+    PNG_FILTER_TYPE_BASE);
 
   png_colorp palette = NULL;
   /* set the palette if there is one. */
@@ -202,8 +250,6 @@ error2:
       palette [i].blue  = pal [i].blue;
     } /* endfor */
     png_set_PLTE (png, info, palette, 256);
-    // pnglib makes its own copy of the palette
-    //free (palette);
   }/* endif */
 
   /* otherwise, if we are dealing with a color image then */
@@ -227,24 +273,16 @@ error2:
    && !(format & CS_IMGFMT_ALPHA))
     png_set_filler (png, 0xff, PNG_FILLER_AFTER);
 
-  /* The easiest way to write the image (you may have a different memory
-   * layout, however, so choose what fits your needs best).  You need to
-   * use the first method if you aren't handling interlacing yourself.
-   */
+  /* Writing the image. Interlacing is handled automagically. */
   png_bytep *row_pointers = new png_bytep [height];
   uint8 *ImageData = (uint8 *)Image->GetImageData ();
   int i;
   for (i = 0; i < height; i++)
     row_pointers [i] = ImageData + i * rowlen;
-
-  /* One of the following output methods is REQUIRED */
   png_write_image (png, row_pointers);
 
   /* It is REQUIRED to call this to finish writing the rest of the file */
   png_write_end (png, info);
-
-  //if (info->palette)
-  //  free (info->palette);
 
   /* clean up after the write, and free any memory allocated */
   png_destroy_write_struct (&png, &info);
@@ -262,10 +300,12 @@ error2:
   return db;
 }
 
-iDataBuffer *csPNGImageIO::Save (iImage *Image, const char *mime)
+iDataBuffer *csPNGImageIO::Save (iImage *Image, const char *mime,
+  const char* extraoptions)
 {
   if (!strcasecmp (mime, PNG_MIME))
-    return Save (Image, (iImageIO::FileFormatDescription *)NULL);
+    return Save (Image, (iImageIO::FileFormatDescription *)NULL,
+      extraoptions);
   return NULL;
 }
 

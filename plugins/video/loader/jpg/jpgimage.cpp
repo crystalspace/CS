@@ -191,7 +191,8 @@ void csJPGImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*)
+iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
+  const char* extraoptions)
 {
   int format = Image->GetFormat ();
   switch (format & CS_IMGFMT_MASK)
@@ -202,6 +203,56 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*)
       // unknown format
       return NULL;
   } /* endswitch */
+
+  // compression options
+  int quality = 80;
+  bool progressive = false;
+
+  /*
+     parse output options.
+     options are a comma-separated list and can be either
+     'option' or 'option=value'.
+
+     supported options:
+       compress=#   image compression, 0..100 higher values give smaller files
+		    but uglier results.
+       progressive  progressive encoding.
+
+     examples:
+       compress=50
+       progressive,compress=30
+   */
+  const char *current_opt = extraoptions;
+  while (current_opt && *current_opt)
+  {
+    if (*current_opt == ',') current_opt++;
+
+    const char *opt_end = strchr (current_opt, ',');
+    if (!opt_end) opt_end = strchr (current_opt, 0);
+
+    char *opt_key = new char[opt_end - current_opt + 1];
+    strncpy (opt_key, current_opt, opt_end - current_opt);
+    opt_key[opt_end - current_opt] = 0;
+    current_opt = opt_end;
+
+    char *opt_value = strchr (opt_key, '=');
+    if (opt_value) *opt_value++ = 0;
+
+    if (!strcmp (opt_key, "compress"))
+    {
+      if (opt_value)
+	quality = 100 - atoi (opt_value);
+    }
+    else if (!strcmp (opt_key, "progressive"))
+    {
+      progressive = true;
+    }
+
+    delete opt_key;
+  }
+
+  if (quality < 0) quality = 0;
+  if (quality > 100) quality = 100;
 
   csRGBcolor* volatile row = NULL;
   struct jpg_datastore ds;
@@ -227,6 +278,8 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*)
 
   row = new csRGBcolor[cinfo.image_width];
   jpeg_set_defaults (&cinfo);
+  jpeg_set_quality (&cinfo, quality, true);
+  if (progressive) jpeg_simple_progression (&cinfo);
   jpeg_start_compress (&cinfo, true);
 
   JSAMPROW row_pointer[1];
@@ -252,10 +305,12 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*)
   return db;
 }
 
-iDataBuffer *csJPGImageIO::Save (iImage *Image, const char *mime)
+iDataBuffer *csJPGImageIO::Save (iImage *Image, const char *mime,
+  const char* extraoptions)
 {
   if (!strcasecmp (mime, JPG_MIME))
-    return Save (Image, (iImageIO::FileFormatDescription *)NULL);
+    return Save (Image, (iImageIO::FileFormatDescription *)NULL,
+      extraoptions);
   return NULL;
 }
 

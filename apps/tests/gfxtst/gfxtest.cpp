@@ -65,6 +65,8 @@ static struct option long_options[] =
   {"info", no_argument, 0, 'I'},
   {"strip-alpha", no_argument, 0, 'a'},
   {"sharpen", required_argument, 0, 'p'},
+  {"mime", required_argument, 0, 'M'},
+  {"options", required_argument, 0, 'O'},
   {0, no_argument, 0, 0}
 };
 
@@ -104,6 +106,8 @@ static csRGBpixel transpcolor;
 char output_name[512] = "";
 char prefix_name[512] = "";
 char suffix_name[512] = "";
+char output_mime[512] = "image/png";
+char output_opts[512] = "";
 
 static int display_help ()
 {
@@ -121,8 +125,10 @@ static int display_help ()
   printf ("  -V   --version       Display program version\n");
   printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
   printf ("  -p   --sharpen=#     Sharpen the image, strength #\n");
-  printf ("------------------- Output options (reciprocally exclusive): ------------------\n");
-  printf ("  -S   --save[=#]      Output a PNG output image (default)\n");
+  printf ("------------------ Output options (-S, -D, -H are exclusive):  -----------------\n");
+  printf ("  -S   --save[=#]      Output an image (default)\n");
+  printf ("  -M   --mime=#	  Output file mime type (default: image/png)\n");
+  printf ("  -O   --options=#	  Optional output format options (e.g. \"progressive\")\n");
   printf ("  -P   --prefix=#      Add prefix before output filename\n");
   printf ("  -U   --suffix=#      Add suffix after output filename\n");
   printf ("  -D   --display=#,#   Display the image in ASCII format :-)\n");
@@ -184,7 +190,12 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
       while (eol > outname && *eol != '.') eol--;
       if (eol == outname) eol = strchr (outname, 0);
       strcpy (eol, suffix);
-      strcat (eol, ".png");
+      const char* defext =  strchr (output_mime, '/');
+      if (defext)
+      {
+        strcat (eol, ".");
+        strcat (eol, defext + 1); // default ext from mime type
+      }
     }
   }
   if (suffix_name[0])
@@ -195,7 +206,7 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
   printf ("Saving output file %s\n", outname);
 
 #if 1
-  iDataBuffer *db = ImageLoader->Save (ifile, "image/png");
+  iDataBuffer *db = ImageLoader->Save (ifile, output_mime, output_opts);
   FILE *f = fopen (outname, "wb");
   if (f)
     fwrite (db->GetData (), 1, db->GetSize (), f);
@@ -517,7 +528,7 @@ int main (int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S:P:U::H::IhvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S:M:O:P:U::H::IhvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -554,6 +565,20 @@ int main (int argc, char *argv[])
 	if (optarg && sscanf (optarg, "%s", output_name) != 1)
 	{
           printf ("%s: expecting optional <filename> after -S\n", programname);
+          return -1;
+	}
+	break;
+      case 'M':
+	if (optarg && sscanf (optarg, "%s", output_mime) != 1)
+	{
+          printf ("%s: expecting <mime-type> after -M\n", programname);
+          return -1;
+	}
+	break;
+      case 'O':
+	if (optarg && sscanf (optarg, "%s", output_opts) != 1)
+	{
+          printf ("%s: expecting <output-options> after -O\n", programname);
           return -1;
 	}
 	break;
@@ -620,6 +645,12 @@ int main (int argc, char *argv[])
       case 'v':
         opt.verbose = true;
         break;
+      case 'p':
+        if (sscanf (optarg, "%d", &opt.sharpen) != 1)
+        {
+          printf ("%s: expecting <sharpening strength> after -p\n", programname);
+          return -1;
+        }
       case 'V':
         printf ("%s version %s\n\n", programname, programversion);
         printf ("This program is distributed in the hope that it will be useful,\n");
@@ -627,12 +658,6 @@ int main (int argc, char *argv[])
         printf ("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n");
         printf ("GNU Library General Public License for more details.\n");
         return 0;
-      case 'p':
-        if (sscanf (optarg, "%d", &opt.sharpen) != 1)
-        {
-          printf ("%s: expecting <sharpening strength> after -p\n", programname);
-          return -1;
-        }
 	break;
     } /* endswitch */
 

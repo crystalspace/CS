@@ -45,6 +45,7 @@ SCF_EXPORT_CLASS_TABLE (csbmpimg)
 SCF_EXPORT_CLASS_TABLE_END
 
 #define BMP_MIME "image/bmp"
+#define BMP_EXT	 "bmp"
 
 static iImageIO::FileFormatDescription formatlist[] =
 {
@@ -180,7 +181,8 @@ void csBMPImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *)
+iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
+  const char* extraoptions)
 {
   if (!Image || !Image->GetImageData ())
     return NULL;
@@ -266,10 +268,12 @@ iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
   return db;
 }
 
-iDataBuffer *csBMPImageIO::Save (iImage *Image, const char *mime)
+iDataBuffer *csBMPImageIO::Save (iImage *Image, const char *mime,
+  const char* extraoptions)
 {
   if (!strcasecmp (mime, BMP_MIME))
-    return Save (Image, (iImageIO::FileFormatDescription *)NULL);
+    return Save (Image, (iImageIO::FileFormatDescription *)NULL,
+      extraoptions);
   return NULL;
 }
 

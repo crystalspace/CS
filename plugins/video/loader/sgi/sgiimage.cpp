@@ -75,12 +75,14 @@ void csSGIImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csSGIImageIO::Save (iImage *, iImageIO::FileFormatDescription *)
+iDataBuffer *csSGIImageIO::Save (iImage *, iImageIO::FileFormatDescription *,
+  const char* extraoptions)
 {
   return NULL;
 }
 
-iDataBuffer *csSGIImageIO::Save (iImage *, const char *)
+iDataBuffer *csSGIImageIO::Save (iImage *, const char *,
+  const char* extraoptions)
 {
   return NULL;
 }
