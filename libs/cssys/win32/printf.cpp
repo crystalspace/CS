@@ -22,6 +22,7 @@
 #include "cssys/system.h"
 
 #include <windows.h>
+#define WIN32_USECONSOLE 
 
 static bool console_ok = false;
 

@@ -127,7 +127,11 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #endif
   LPDIRECTINPUT lpdi = NULL;
   LPDIRECTINPUTDEVICE lpKbd = NULL; 
+  //Setup for directinput mouse code
+  LPDIRECTINPUTDEVICE lpMouse = NULL; 
+
   HANDLE hEvent [2];
+  HANDLE hevtMouse;
 
   // Use 0x0300 instead of DIRECTINPUT_VERSION
   // to allow the binaries run under NT4 (which has just DX3)
@@ -135,7 +139,29 @@ DWORD WINAPI s_threadroutine (LPVOID param)
   CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, NULL));
   CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard)); 
   CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, NULL),
-    DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
+									  DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
+
+  //Setup for directinput mouse code
+  /*
+  CHK_FAILED(lpdi->CreateDevice (GUID_SysMouse, &lpMouse, NULL));
+  CHK_FAILED(lpMouse->SetDataFormat(&c_dfDIMouse));
+  CHK_FAILED(lpMouse->SetCooperativeLevel(FindWindow (WINDOWCLASSNAME, NULL),
+									  DISCL_EXCLUSIVE | DISCL_FOREGROUND));
+  hevtMouse = CreateEvent(0, 0, 0, 0);
+  CHK_FAILED(lpMouse->SetEventNotification(g_hevtMouse));
+  DIPROPDWORD dipdw =
+      {
+          {
+              sizeof(DIPROPDWORD),        // diph.dwSize
+              sizeof(DIPROPHEADER),       // diph.dwHeaderSize
+              0,                          // diph.dwObj
+              DIPH_DEVICE,                // diph.dwHow
+          },
+          DINPUT_BUFFERSIZE,              // dwData
+      };
+  CHK_FAILED(lpMouse->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph));
+  */
+
 #ifdef DI_USEGETDEVICEDATA
   {
     DIPROPDWORD dpd;
@@ -353,7 +379,8 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   WNDCLASS wc;
   wc.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
   wc.lpfnWndProc   = WindowProc;
-  wc.cbClsExtra    = sizeof(HCURSOR);
+  //wc.cbClsExtra    = sizeof(HCURSOR);
+	wc.cbClsExtra    = 0;
   wc.cbWndExtra    = 0;
   wc.hInstance     = ModuleHandle;
   wc.hIcon         = LoadIcon( NULL, IDI_APPLICATION );
@@ -517,16 +544,6 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     case WM_ACTIVATE:
       if (System)
         System->QueueFocusEvent (LOWORD (wParam) != WA_INACTIVE);
-      break;
-    case WM_SETCURSOR:
-      if (LOWORD(lParam) == HTCLIENT)
-      {
-        SetCursor((HCURSOR)GetWindowLong(hWnd,0));
-        return TRUE;
-      } 
-      break;
-    case WM_CREATE:
-      SetWindowLong (hWnd, 0, (LONG)LoadCursor (NULL, IDC_CROSS));
       break;
     case WM_DESTROY:
       PostQuitMessage (0);

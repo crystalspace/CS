@@ -725,7 +725,7 @@ void csGraphics2DDDraw6::SetRGB(int i, int r, int g, int b)
 bool csGraphics2DDDraw6::SetMouseCursor (csMouseCursorID iShape)
 {
   HCURSOR hCursor;
-
+	
   switch(iShape)
   {
     case csmcNone:     hCursor = NULL; break;
@@ -737,14 +737,19 @@ bool csGraphics2DDDraw6::SetMouseCursor (csMouseCursorID iShape)
     case csmcSizeEW:   hCursor = LoadCursor (NULL, IDC_SIZEWE);   break;
     case csmcStop:     hCursor = LoadCursor (NULL, IDC_NO);       break;
     case csmcWait:     hCursor = LoadCursor (NULL, IDC_WAIT);     break;
-    default: return false;
+    default: hCursor = NULL;		//return false;
   }
-
-	if (hCursor == NULL) return false;
-
-	if (SetWindowLong(m_hWnd,0,(LONG)hCursor))
+	
+	if (hCursor)
+	{
+		SetCursor(hCursor);
 		return true;
-	return false;
+	}
+	else
+	{
+		SetCursor(NULL);
+		return false;
+	}
 }
 
 bool csGraphics2DDDraw6::SetMousePosition (int x, int y)
