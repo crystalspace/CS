@@ -14,7 +14,7 @@
 const bool AWS_COMP_DEBUG=false;
 
 
-awsComponent::awsComponent():wmgr(NULL), win(NULL), parent(NULL), children(NULL), flags(0), signalsrc(this)
+awsComponent::awsComponent():wmgr(NULL), win(NULL), parent(NULL), layout (NULL), children(NULL), flags(0), signalsrc(this)
 {
 }
 

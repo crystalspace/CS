@@ -9,24 +9,6 @@ const int awsGridBagLayout::MAXGRIDSIZE = 512;
 const int awsGridBagLayout::MINSIZE = 1;
 const int awsGridBagLayout::PREFERREDSIZE = 2;
 
-/*
-const int awsGridBagConstraints::RELATIVE = -1;
-const int awsGridBagConstraints::REMAINDER = 0;
-const int awsGridBagConstraints::NONE = 0;
-const int awsGridBagConstraints::BOTH = 1;
-const int awsGridBagConstraints::HORIZONTAL = 2;
-const int awsGridBagConstraints::VERTICAL = 3;
-const int awsGridBagConstraints::CENTER = 10;
-const int awsGridBagConstraints::NORTH = 11;
-const int awsGridBagConstraints::NORTHEAST = 12;
-const int awsGridBagConstraints::EAST = 13;
-const int awsGridBagConstraints::SOUTHEAST = 14;
-const int awsGridBagConstraints::SOUTH = 15;
-const int awsGridBagConstraints::SOUTHWEST = 16;
-const int awsGridBagConstraints::WEST = 17;
-const int awsGridBagConstraints::NORTHWEST = 18;
-*/
-
 const int MAXINT = 0xeffffff;
 
 inline int
