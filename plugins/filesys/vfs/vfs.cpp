@@ -310,7 +310,7 @@ public:
   // Remove a real-world path
   bool RemoveRPath (const char *RealPath);
   // Find all files in a subpath
-  void FindFiles (const char *Suffix, const char *Mask, iStringArray *FileList);
+  void FindFiles(const char *Suffix, const char *Mask, iStringArray *FileList);
   // Find a file and return the appropiate csFile object
   iFile *Open (int Mode, const char *Suffix);
   // Delete a file
@@ -327,7 +327,7 @@ private:
   // Get value of a variable
   const char *GetValue (csVFS *Parent, const char *VarName);
   // Copy a string from src to dst and expand all variables
-  int Expand (csVFS *Parent, char *dst, char *src, int size);
+  csString Expand (csVFS *Parent, char const *src);
   // Find a file either on disk or in archive - in this node only
   bool FindFile (const char *Suffix, char *RealPath, csArchive *&) const;
 };
@@ -975,11 +975,13 @@ VfsNode::~VfsNode ()
 bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
 {
   bool rc = false;
+  csString const expanded_path = Expand(Parent, RealPath);
   // Split rpath into several, separated by commas
-  size_t rpl = strlen (RealPath);
+  size_t rpl = expanded_path.Length();
   char *cur, *src;
-  char *oldsrc = src = csStrNew (RealPath);
+  char *oldsrc = src = csStrNew (expanded_path);
   for (cur = src, rpl++; rpl-- > 0; cur++)
+  {
     if ((rpl == 0) || (*cur == VFS_PATH_DIVIDER))
     {
       *cur = 0;
@@ -997,15 +999,16 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
       rc = true;
       UPathV.Push (src);
 
-      // Now parse and expand this path
+      // Now parse this path
       char rpath [CS_MAXPATHLEN + 1];
-      Expand (Parent, rpath, src, CS_MAXPATHLEN);
+      strncpy(rpath, src, CS_MAXPATHLEN);
+      rpath[CS_MAXPATHLEN] = '\0';
       RPathV.Push (rpath);
       src = cur + 1;
     } /* endif */
+  } /* for */
 
   delete [] oldsrc;
-
   return rc;
 }
 
@@ -1030,10 +1033,12 @@ bool VfsNode::RemoveRPath (const char *RealPath)
   return false;
 }
 
-int VfsNode::Expand (csVFS *Parent, char *dst, char *src, int size)
+csString VfsNode::Expand (csVFS *Parent, char const *source)
 {
-  char *org = dst;
-  while (*src && ((dst - org) < size))
+  csString dst;
+  char *src_start = csStrNew(source);
+  char *src = src_start;
+  while (*src != '\0')
   {
     // Is this a variable reference?
     if (*src == '$')
@@ -1042,25 +1047,26 @@ int VfsNode::Expand (csVFS *Parent, char *dst, char *src, int size)
       src++;
       char *var = src;
       char one_letter_varname [2];
-      if (*src == '(')
+      if (*src == '(' || *src == '{')
       {
         // Parse until the end of variable, skipping pairs of '(' and ')'
         int level = 1;
         src++; var++;
-        while (level && *src)
+        while (level > 0 && *src != '\0')
         {
-          if (*src == '(')
+          if (*src == '(' || *src == '{')
 	  {
             level++;
 	  }
-          else if (*src == ')')
+          else if (*src == ')' || *src == '}')
 	  {
             level--;
 	  }
-	  if (level) src++; // don't skip over the last parenthesis
+	  if (level > 0)
+	    src++; // don't skip over the last parenthesis
         } /* endwhile */
         // Replace closing parenthesis with \0
-        *src++ = 0;
+        *src++ = '\0';
       }
       else
       {
@@ -1071,30 +1077,27 @@ int VfsNode::Expand (csVFS *Parent, char *dst, char *src, int size)
 
       char *alternative = strchr (var, ':');
       if (alternative)
-        *alternative++ = 0;
+        *alternative++ = '\0';
       else
-        alternative = strchr (var, 0);
+        alternative = strchr (var, '\0');
 
       const char *value = GetValue (Parent, var);
       if (!value)
       {
         if (*alternative)
-          dst += Expand (Parent, dst, alternative, size - (dst - org));
+          dst << Expand (Parent, alternative);
       }
       else
       {
-	char *tmp = csStrNew(value);
-	strcpy(tmp, value);
-        dst += Expand (Parent, dst, tmp, size - (dst - org));
-	// @@@ ... circular references may occur ...
-	delete [] tmp;
+	// @@@ FIXME: protect against circular references
+        dst << Expand (Parent, value);
       }
     } /* endif */
     else
-      *dst++ = *src++;
+      dst << *src++;
   } /* endif */
-  *dst = 0;
-  return dst - org;
+  delete[] src_start;
+  return dst;
 }
 
 const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
@@ -1116,7 +1119,8 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   // Now look in "VFS.Alias" section for alias section name
   const char *alias = Config->GetStr ("VFS.Alias." CS_PLATFORM_NAME, 0);
   // If there is one, look into that section too
-  if (alias) {
+  if (alias)
+  {
     Keyname.Clear();
     Keyname << alias << '.' << VarName;
     value = Config->GetStr (Keyname, 0);

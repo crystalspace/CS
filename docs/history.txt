@@ -38,7 +38,13 @@ chronological order.
 	- Jorrit removed the unused csPolygonTree class from csgeom. Odedynam
 	  did have a pointer to instances but it was never used.
 	- res fixed cswinCallStackHelper to pass the correct settings when
-	  stackwalking on the x86_64 platform.
+	  stack-walking on the x86_64 platform.
+	- Eric Sunshine changed VFS so that the following idiom correctly
+	  mounts "/path1", "/path2", and "/path3". Previously, it would
+	  correctly mount "/path1", but then attempt to mount the bogus
+	  "/path2, /path3".
+	    VFS.Mount.foo = $/path1$/, $(FOO)
+	    VFS.Unix.FOO = /path2, /path3
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.

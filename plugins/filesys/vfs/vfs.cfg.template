@@ -24,7 +24,7 @@ VFS.Mount.shader = $(CS_DATADIR)$/shader$/
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library
-VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH1:$.$/), $(TTF_PATH2:$.$/), $(CS_DATADIR)$/ttf-vera.zip
+VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-vera.zip
 
 VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
 VFS.Mount.lev/r3dtest  = $(CS_DATADIR)$/r3dtest$/
@@ -68,8 +68,7 @@ VFS.Unix... = ..
 VFS.Unix.CS_CDROM = /mnt/cdrom
 VFS.Unix.CS_TMP = /tmp
 ; This is true at least for systems using XFree86
-VFS.Unix.TTF_PATH1 = /usr/X11R6/lib/X11/fonts/Truetype/
-VFS.Unix.TTF_PATH2 = /usr/X11R6/lib/X11/fonts/TTF/
+VFS.Unix.TTF_PATH = /usr/X11R6/lib/X11/fonts/Truetype/, /usr/X11R6/lib/X11/fonts/TTF/
 
 VFS.CP/M.. = .
 VFS.CP/M... = ..
@@ -78,4 +77,4 @@ VFS.CP/M.CDROM = x:
 VFS.CP/M.TMP = $(TEMP:$(TMP:$(SYSTEMROOT)$/temp))
 
 ; The standard location of TTF fonts is the X:\Windows\fonts directory
-VFS.Win32.TTF_PATH1 = $(SYSTEMROOT)$/fonts$/
+VFS.Win32.TTF_PATH = $(SYSTEMROOT)$/fonts$/
