@@ -83,7 +83,7 @@ struct csMeshedPolygon
 };
 
 class csVector3;
-class csTriangle;
+struct csTriangle;
 
 SCF_VERSION (iPolygonMesh, 0, 4, 0);
 
