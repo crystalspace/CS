@@ -38,6 +38,8 @@
 #include "csengine/texture.h"
 #include "csengine/curve.h"
 #include "csengine/terrain.h"
+#include "csengine/terrddg.h"
+#include "csengine/terrlod.h"
 #include "csengine/dumper.h"
 #include "csengine/keyval.h"
 #include "csengine/particle.h"
@@ -251,6 +253,7 @@ TOKEN_DEF_START
   TOKEN_DEF (TRIANGLE)
   TOKEN_DEF (TRIGGER)
   TOKEN_DEF (TWEEN)
+  TOKEN_DEF (TYPE)
   TOKEN_DEF (UV)
   TOKEN_DEF (UVA)
   TOKEN_DEF (UVEC)
@@ -4461,6 +4464,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 void csLoader::terrain_process (csSector& sector, char* name, char* buf)
 {
   TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TYPE)
     TOKEN_TABLE (HEIGHTMAP)
     TOKEN_TABLE (DETAIL)
     TOKEN_TABLE (TEXTURE)
@@ -4468,14 +4472,21 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
 
   long cmd;
   char* params;
+  char type[256];		// @@@ Hardcoded.
+  bool lod;
   char heightmapname[256];	// @@@ Hardcoded.
   char texturebasename[256];	// @@@ Hardcoded.
   unsigned int detail = 3000;
 
+  lod = false;
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
+      case TOKEN_TYPE:
+        ScanStr (params, "%s", type);
+	if (!strcasecmp (type, "lod")) lod = true;
+        break;
       case TOKEN_HEIGHTMAP:
         ScanStr (params, "%s", heightmapname);
         break;
@@ -4507,7 +4518,11 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
     fatal_exit (0, false);
   }
 
-  csTerrain* terr = new csTerrain ();
+  csTerrain* terr;
+  if (lod)
+    terr = (csTerrain*)new csLODTerrain ();
+  else
+    terr = (csTerrain*)new csDDGTerrain ();
   terr->SetName (name);
 
   // Otherwise read file, if that fails generate a random map.
@@ -4532,8 +4547,8 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
     first_mat = mat;
     terr->SetMaterial (i, mat);
   }
+  terr->SetDetail (detail);
 
-  terr->SetDetail(detail);
   delete[] heightmap;
   sector.terrains.Push (terr);
 }

@@ -370,7 +370,7 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
   int i;
-  float r;
+  float r, best_r = 2000000000.;
   csVector3 cur_isect;
   csPolygon3D* best_p = NULL;
   // @@@ This routine is not very optimal. Especially for things
@@ -380,14 +380,15 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
     csPolygon3D* p = polygons.Get (i);
     if (p->IntersectSegment (start, end, cur_isect, &r))
     {
-      if (r < *pr)
+      if (r < best_r)
       {
-	*pr = r;
+	best_r = r;
 	best_p = p;
 	isect = cur_isect;
       }
     }
   }
+  if (pr) *pr = best_r;
   return best_p;
 }
 

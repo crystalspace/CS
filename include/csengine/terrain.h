@@ -24,49 +24,16 @@
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
 
-class ddgTBinMesh;
-class ddgTBinTree;
-class ddgHeightMap;
-class ddgVArray;
-class ddgContext;
 class csMaterialWrapper;
 class csVector3;
-typedef int ddgVBIndex;
 
 /**
  * This object encapsulates a terrain surface so that it
- * can be used in a csSector.
+ * can be used in a csSector. It is an abstract class. Specific
+ * implementations of this need to be made.
  */
 class csTerrain : public csObject
 {
-private:
-  ///
-  ddgTBinMesh* mesh;
-  ///
-  ddgHeightMap* heightMap;
-  ///
-  ddgVArray *vbuf;
-  ///
-  ddgContext *context;
-  /// Terrain handle.
-  csMaterialWrapper **_materialMap;
-  /// Texture scale factor.
-  float _texturescale;
-  /// Terrain's location offset in world space.
-  csVector3 _pos;
-  /// Terrain's size in world space.
-  csVector3 _size;
-
-  /**
-   * A direction vector for a directional light hitting
-   * the terrain.
-   */
-  csVector3 dirlight;
-  /// Color for the directional light.
-  csColor dircolor;
-  /// If true then a directional light is used.
-  bool do_dirlight;
-
 public:
   /**
    * Create an empty terrain.
@@ -77,36 +44,24 @@ public:
   virtual ~csTerrain ();
 
   /// Set a directional light.
-  void SetDirLight (const csVector3& dirl, const csColor& dirc);
+  virtual void SetDirLight (const csVector3& dirl, const csColor& dirc) = 0;
   /// Disable directional light.
-  void DisableDirLight () { do_dirlight = false; }
-
-  ///
-  ddgContext* GetContext () { return context; }
-  ///
-  ddgTBinMesh* GetMesh () { return mesh; }
-  ///
-  ddgHeightMap* GetHeightMap () { return heightMap; }
+  virtual void DisableDirLight () = 0;
 
   /// Load the heightmap.
-  bool Initialize (const void* heightMapFile, unsigned long size);
+  virtual bool Initialize (const void* heightMapFile, unsigned long size) = 0;
 
   /**
    * Draw this terrain given a view and transformation.
    */
-  void Draw (csRenderView& rview, bool use_z_buf = true);
+  virtual void Draw (csRenderView& rview, bool use_z_buf = true) = 0;
 
   /// Set a material for this surface.
-  void SetMaterial (int i, csMaterialWrapper *material)
-  {
-    _materialMap[i] = material;
-  }
-  /// Get the number of materials required.
-  int GetNumMaterials ();
+  virtual void SetMaterial (int i, csMaterialWrapper *material) = 0;
+  /// Get the number of materials required/supported.
+  virtual int GetNumMaterials () = 0;
   /// Set the amount of triangles
-  void SetDetail (unsigned int detail);
-  /// Put a triangle into the vertex buffer.
-  bool drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf);
+  virtual void SetDetail (unsigned int detail) = 0;
 
   /**
    * If current transformation puts us below the terrain at the given
@@ -114,7 +69,7 @@ public:
    * be at level of terrain and return 1.  If we are above the terrain we
    * return 0.
    */
-  int CollisionDetect (csTransform *p);
+  virtual int CollisionDetect (csTransform *p) = 0;
 
   CSOBJTYPE;
 };

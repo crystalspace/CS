@@ -51,7 +51,7 @@ all: $(CSENGINE.LIB)
 csengine: $(OUTDIRS) $(CSENGINE.LIB)
 clean: csengineclean
 
-$(OUT)terrain$O: libs/csengine/terrain.cpp
+$(OUT)terrddg$O: libs/csengine/terrddg.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSENGINE)
 
 $(CSENGINE.LIB): $(OBJ.CSENGINE)
