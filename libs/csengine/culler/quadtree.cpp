@@ -136,7 +136,7 @@ void csQuadTree :: CallChildren(int (csQuadTree::*func)(
       default: CsPrintf(MSG_FATAL_ERROR, "QuadTree: Unknown child\n");
     }
     childstate = GetNodeState(childoffset, childnr);
-    retval[childnr] = this->*func(childbox, depth+1, childstate, childoffset, 
+    retval[childnr] = func(childbox, depth+1, childstate, childoffset, 
       childnr, data);
   }
 }
