@@ -26,7 +26,7 @@ class csMatrix3;
 class csThing;
 struct iSector;
 
-SCF_VERSION (iMovable, 0, 0, 4);
+SCF_VERSION (iMovable, 0, 0, 5);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -108,6 +108,12 @@ struct iMovable : public iBase
    * Get the world to object tranformation.
    */
   virtual csReversibleTransform& GetTransform () = 0;
+
+  /**
+   * Construct the full world to object transformation given
+   * this transformation and possible parents transformations.
+   */
+  virtual csReversibleTransform GetFullTransform () = 0;
 
   /**
    * Relative move.

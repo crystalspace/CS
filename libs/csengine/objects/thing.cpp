@@ -712,7 +712,6 @@ void csThing::UpdateInPolygonTrees ()
   csBox3 b;
   GetBoundingBox (b);
 
-  //csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
   csReversibleTransform trans = movable.GetTransform ().GetInverse ();
   tree_bbox.Update (b, trans, this);
 

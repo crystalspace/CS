@@ -844,27 +844,6 @@ void csWorld::SetCuller (int culler)
   }
 }
 
-csSector* csWorld::NewSector ()
-{
-  csSector* s = new csSector (this);
-  s->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
-  sectors.Push (s);
-  return s;
-}
-
-csThing* csWorld::GetThing (const char* name)
-{
-  int i = sectors.Length ();
-  while (i > 0)
-  {
-    i--;
-    csSector* s = (csSector*)sectors[i];
-    csThing* t = s->GetThing (name);
-    if (t) return t;
-  }
-  return NULL;
-}
-
 void csWorld::PrepareTextures ()
 {
   int i;
@@ -1450,6 +1429,20 @@ csStatLight* csWorld::FindLight (CS_ID id)
   return NULL;
 }
 
+csStatLight* csWorld::FindLight (const char* name)
+{
+  csStatLight* l;
+  int sn = sectors.Length ();
+  while (sn > 0)
+  {
+    sn--;
+    csSector* s = (csSector*)sectors[sn];
+    l = (csStatLight*)s->lights.FindByName (name);
+    if (l) return l;
+  }
+  return NULL;
+}
+
 void csWorld::AddDynLight (csDynLight* dyn)
 {
   dyn->SetNext (first_dyn_lights);
@@ -1906,12 +1899,18 @@ bool csWorld::CreatePlane (const char *iName, const csVector3 &iOrigin,
   return true;
 }
 
-iSector* csWorld::CreateSector (const char *iName)
+csSector* csWorld::CreateCsSector (const char *iName)
 {
   csSector* sector = new csSector (this);
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
   sector->SetName (iName);
   sectors.Push (sector);
+  return sector;
+}
+
+iSector* csWorld::CreateSector (const char *iName)
+{
+  csSector* sector = CreateCsSector (iName);
   iSector *s = QUERY_INTERFACE (sector, iSector);
   sector->DecRef ();
   return s;
@@ -1942,7 +1941,7 @@ iSector *csWorld::FindSector (const char *iName)
 
 iThing *csWorld::FindThing (const char *iName)
 {
-  csThing *thing = GetThing (iName);
+  csThing* thing = (csThing*)things.FindByName (iName);
   return thing ? &thing->scfiThing : NULL;
 }
 

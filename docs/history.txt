@@ -13,6 +13,21 @@ The history order has been reversed so that new features are at the top.
 	  new GetMovable().UpdateMove() function was not called which
 	  resulted in the particle systems not being visible in STATBSP
 	  levels.
+	- Added csMovable/iMovable GetFullTransform() which will return
+	  the full transformation with regards to hierarchical
+	  transformations (i.e. it will combine the local transform
+	  with the one from the parents).
+	- Added csWorld::FindLight(char*name) to find a named light.
+	- Changed collection syntax in loader to only allow adding
+	  lights based on the name of the light and not on the sector/index.
+	- Added support for adding sprites to collections in the loader.
+	- Removed csWorld::GetThing since that can now be done by using
+	  the 'things' and 'skies' public vectors
+	  (i.e. world->things.FindByName(name)).
+	- Removed csWorld::NewSector since this is obsoleted by the
+	  newer csWorld::CreateSector or csWorld::CreateCsSector.
+	- Things and skies are now also added to the world by the
+	  loader.
 30-Aug-2000
      	- Andrew Zabolotny:
 	    - Some fixes to MazeD. Now it works, but is unusabled due to

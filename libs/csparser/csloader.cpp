@@ -540,6 +540,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
 {
   TOKEN_TABLE_START(commands)
     TOKEN_TABLE (THING)
+    TOKEN_TABLE (SPRITE)
     TOKEN_TABLE (COLLECTION)
     TOKEN_TABLE (LIGHT)
     TOKEN_TABLE (TRIGGER)
@@ -561,12 +562,13 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
       fatal_exit (0, false);
     }
+    str[0] = 0;
     switch (cmd)
     {
       case TOKEN_THING:
         {
           ScanStr (params, "%s", str);
-          csThing* th = World->GetThing (str);
+          csThing* th = (csThing*)World->things.FindByName (str);
           if (!th)
           {
             CsPrintf (MSG_FATAL_ERROR, "Thing '%s' not found!\n", str);
@@ -575,24 +577,33 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           collection->AddObject ((csObject*)th);
         }
         break;
-      case TOKEN_LIGHT:
+      case TOKEN_SPRITE:
         {
-          int nr;
-          ScanStr (params, "%s,%d", str, &nr);
-          csSector* s = (csSector*)World->sectors.FindByName (str);
-          if (!s)
+          ScanStr (params, "%s", str);
+          csSprite* spr = (csSprite*)World->sprites.FindByName (str);
+          if (!spr)
           {
-            CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found!\n", str);
+            CsPrintf (MSG_FATAL_ERROR, "Sprite '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          csStatLight *l = (csStatLight*)s->lights[nr];
+          collection->AddObject ((csObject*)spr);
+        }
+        break;
+      case TOKEN_LIGHT:
+        {
+          ScanStr (params, "%s", str);
+	  csStatLight* l = World->FindLight (str);
+          if (!l)
+          {
+            CsPrintf (MSG_FATAL_ERROR, "Light '%s' not found!\n", str);
+            fatal_exit (0, false);
+          }
           collection->AddObject ((csObject*)l);
         }
         break;
       case TOKEN_SECTOR:
         {
-          int nr;
-          ScanStr (params, "%s,%d", str, &nr);
+          ScanStr (params, "%s", str);
           csSector* s = (csSector*)World->sectors.FindByName (str);
           if (!s)
           {
@@ -3959,10 +3970,10 @@ csSector* csLoader::load_room (char* secname, char* buf)
         }
         break;
       case TOKEN_SKY:
-        load_thing (name, params, sector, true);
+        World->skies.Push (load_thing (name, params, sector, true));
         break;
       case TOKEN_THING:
-        load_thing (name, params, sector, false);
+        World->things.Push (load_thing (name, params, sector, false));
         break;
       case TOKEN_PORTAL:
         {
@@ -4334,10 +4345,10 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_SKY:
-        load_thing (name, params, sector, true);
+        World->skies.Push (load_thing (name, params, sector, true));
         break;
       case TOKEN_THING:
-        load_thing (name, params, sector, false);
+        World->things.Push (load_thing (name, params, sector, false));
         break;
       case TOKEN_SPRITE:
         {

@@ -376,8 +376,8 @@ public:
 
   /**
    * List of sectors in the world. This vector contains
-   * objects of type csSector*. Use NewSector() to add sectors
-   * to the world.
+   * objects of type csSector*. Use CreateCsSector() or CreateSector()
+   * to add sectors to the world.
    */
   csNamedObjVector sectors;
 
@@ -808,19 +808,6 @@ public:
   void Clear ();
 
   /**
-   * Create a new sector and add it to the world.
-   * @@obsoleted by CreateSector(): should be removed in the long run
-   */
-  csSector* NewSector ();
-
-  /**
-   * Find a thing with a given name. This function will scan all sectors
-   * of the current world and return the first thing that it can find with
-   * the given name.
-   */
-  csThing* GetThing (const char* name);
-
-  /**
    * Return the object managing all loaded textures.
    */
   csTextureList* GetTextures () { return textures; }
@@ -829,6 +816,11 @@ public:
    * Return the object managing all loaded materials.
    */
   csMaterialList* GetMaterials () { return materials; }
+
+  /**
+   * Create a empty sector with given name.
+   */
+  csSector* CreateCsSector (const char *iName);
 
   /**
    * Add a dynamic light to the world.
@@ -935,6 +927,11 @@ public:
    * Find the light with the given object id.
    */
   csStatLight* FindLight (CS_ID id);
+
+  /**
+   * Find the light with the given name.
+   */
+  csStatLight* FindLight (const char* name);
 
   /**
    * Advance the frames of all sprites given the current time.
@@ -1058,9 +1055,9 @@ public:
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
-  /// Create a empty sector with given name
-  iSector *CreateSector (const char *iName);
-  /// Create a empty thing with given name
+  /// Create a empty sector with given name.
+  virtual iSector *CreateSector (const char *iName);
+  /// Create a empty thing with given name.
   virtual iThing *CreateThing (const char *iName, iSector *iParent);
 
   /// Query number of sectors in world

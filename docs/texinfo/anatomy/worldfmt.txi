@@ -334,12 +334,13 @@ Polygon templates:
 A collection object:
 @example
 <col-thing> ::= 'THING' '(' <thing-name> ')'
+<col-sprite> ::= 'SPRITE' '(' <sprite-name> ')'
 <col-collection> ::= 'COLLECTION' '(' <col-name> ')'
-<col-light> ::= 'LIGHT' '(' <sector-name> ',' <light-index> ')'
+<col-light> ::= 'LIGHT' '(' <light-name> ')'
 <col-sector> ::= 'SECTOR' '(' <sector-name> ')'
 
 <collection-comp> ::= <col-thing> | <col-collection> | <col-light> |
-  <col-sector>
+  <col-sector> | <col-sprite>
 <collection> ::= 'COLLECTION' <col-name> '(' { <collection-comp> } ')'
 @end example
 

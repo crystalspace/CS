@@ -251,8 +251,7 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 csSector* HugeRoom::create_huge_world (csWorld* world)
 {
   this->world = world;
-  csSector* room = world->NewSector();
-  room->SetName ("sector");
+  csSector* room = world->CreateCsSector ("sector");
 
   if (seed == 0) seed = rand ();
   srand (seed);

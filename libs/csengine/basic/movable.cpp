@@ -134,6 +134,14 @@ void csMovable::UpdateMove ()
   }
 }
 
+csReversibleTransform csMovable::GetFullTransform ()
+{
+  if (parent == NULL)
+    return GetTransform ();
+  else
+    return GetTransform () * parent->GetFullTransform ();
+}
+
 //--------------------------------------------------------------------------
 
 iMovable* csMovable::eiMovable::GetParent ()

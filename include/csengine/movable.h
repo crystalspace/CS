@@ -156,14 +156,20 @@ public:
   void SetTransform (const csMatrix3& matrix);
 
   /**
-   * Set the world to object tranformation.
+   * Set the local world to object tranformation.
    */
   void SetTransform (const csReversibleTransform& t) { obj = t; }
 
   /**
-   * Get the world to object tranformation.
+   * Get the local world to object tranformation.
    */
   csReversibleTransform& GetTransform () { return obj; }
+
+  /**
+   * Construct the full world to object transformation given
+   * this transformation and possible parents transformations.
+   */
+  csReversibleTransform GetFullTransform ();
 
   /**
    * Relative move.
@@ -224,6 +230,10 @@ public:
     virtual csReversibleTransform& GetTransform ()
     {
       return scfParent->GetTransform ();
+    }
+    virtual csReversibleTransform GetFullTransform ()
+    {
+      return scfParent->GetFullTransform ();
     }
     virtual void MovePosition (const csVector3& v)
     {

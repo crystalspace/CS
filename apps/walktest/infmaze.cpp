@@ -123,8 +123,7 @@ InfRoomData* InfiniteMaze::create_six_room (csWorld* world, int x, int y, int z)
 {
   char buf[50];
   sprintf (buf, "r%d_%d_%d", x, y, z);
-  csSector* room = world->NewSector();
-  room->SetName (buf);
+  csSector* room = world->CreateCsSector (buf);
   float dx, dy, dz;
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
