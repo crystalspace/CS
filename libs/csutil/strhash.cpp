@@ -111,6 +111,11 @@ csStringHashIterator::csStringHashIterator (csStringHash* hash)
   hashIt = new csGlobalHashIterator (&hash->Registry);
 }
 
+csStringHashIterator::~csStringHashIterator ()
+{
+  delete hashIt;
+}
+
 bool csStringHashIterator::HasNext ()
 {
   return hashIt->HasNext();

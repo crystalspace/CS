@@ -32,6 +32,11 @@ The history order is reversed so that new features are at the top.
 	  plugin).  This is not a "clean" solution to the _cspace.so problem,
 	  and it we should devise a better one, but it works well enough for
 	  the interim.
+	- res fixed a memory leak in csPluginPaths::AddOnce().
+	- res fixed a memory leak when using csStringHashIterator - upon 
+	  construction a new csGlobalHashIterator was created, but not deleted 
+	  on destruction (more exactly, csStringHashIterator lacked a 
+	  destructor.)
 9-Jul-2003
 	- Jorrit fixed PlaceMesh() so that it now uses
 	  engine->GetNearbyObjects(). That makes it a lot more efficient

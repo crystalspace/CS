@@ -196,6 +196,7 @@ public:
 	{
 	  paths[i].scanRecursive = scanRecursive;
 	}
+	delete[] paths[i].type;
 	paths[i].type = csStrNew (type);
 	delete[] pathExpanded;
   

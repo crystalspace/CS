@@ -55,6 +55,7 @@ public:
    * open iterators.
    */
   csStringHashIterator (csStringHash* hash);
+  virtual ~csStringHashIterator ();
 
   /// Is there a next element in this iterator?
   bool HasNext ();
