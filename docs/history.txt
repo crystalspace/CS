@@ -33,6 +33,8 @@ chronological order.
 	  class.
 	- Eric Sunshine converted csLight to use csSet<> rather than the
 	  deprecated csHashSet.
+	- Eric Sunshine converted csEngine to use csSet<> rather than the
+	  deprecated csHashSet.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is

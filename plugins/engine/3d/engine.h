@@ -19,16 +19,10 @@
 #ifndef __CS_ENGINE_H__
 #define __CS_ENGINE_H__
 
-#include "plugins/engine/3d/halo.h"
-#include "plugins/engine/3d/meshobj.h"
-#include "plugins/engine/3d/region.h"
-#include "plugins/engine/3d/renderloop.h"
-#include "plugins/engine/3d/rview.h"
-#include "plugins/engine/3d/sharevar.h"
 #include "csgeom/math3d.h"
 #include "csutil/array.h"
 #include "csutil/csobject.h"
-#include "csutil/hashmap.h"
+#include "csutil/hash.h"
 #include "csutil/nobjvec.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
@@ -49,33 +43,38 @@
 #include "iutil/strset.h"
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
+#include "ivaria/bugplug.h"
 #include "ivaria/engseq.h"
 #include "ivaria/reporter.h"
-#include "ivaria/bugplug.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+#include "plugins/engine/3d/halo.h"
+#include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/region.h"
+#include "plugins/engine/3d/renderloop.h"
+#include "plugins/engine/3d/rview.h"
+#include "plugins/engine/3d/sharevar.h"
 
-class csPoly2DPool;
-//class csRadiosity;
-class csRegion;
-class csSector;
-class csMeshWrapper;
-class csTextureList;
-class csMaterialList;
-class csPolygon3D;
 class csCamera;
 class csEngine;
 class csLight;
 class csLightPatchPool;
+class csMaterialList;
+class csMeshWrapper;
+class csPoly2DPool;
+class csPolygon3D;
+class csRegion;
 class csRenderView;
-struct iMaterialWrapper;
-struct iRegion;
-struct iLight;
+class csSector;
+class csTextureList;
 struct iClipper2D;
-struct iProgressMeter;
-struct iObjectRegistry;
 struct iConfigFile;
+struct iLight;
+struct iMaterialWrapper;
+struct iObjectRegistry;
+struct iProgressMeter;
+struct iRegion;
 
 /**
  * Iterator to iterate over all static lights in the engine.
@@ -401,7 +400,7 @@ private:
   iTextureHandle* render_context;
 
   /// Array of objects that want to die next frame (iMeshWrapper*).
-  csHashSet want_to_die;
+  csSet<iMeshWrapper*> want_to_die;
 
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   //csRadiosity* rad_debug;
