@@ -47,7 +47,9 @@ private:
 
 public:
   csPtr (T* p) : obj (p) { }
-  csPtr (csRef<T> const& r) : obj(r) { r->IncRef(); }
+
+  template <class T2>
+  explicit csPtr (csRef<T2> const& r) : obj((T2*)r) { r->IncRef(); }
 
 #ifdef CS_TEST_VOIDPTRUSAGE
   ~csPtr ()
@@ -59,13 +61,15 @@ public:
     // leak and you should fix that.
     CS_ASSERT (obj == (T*)0xffffffff);
   }
+#endif
 
   csPtr (const csPtr<T>& copy)
   {
     obj = copy.obj;
+#ifdef CS_TEST_VOIDPTRUSAGE
     ((csPtr<T>&)copy).obj = (T*)0xffffffff;
-  }
 #endif
+  }
 
 #if !defined(CS_STRICT_SMART_POINTERS)
   operator T* () const { return obj; }

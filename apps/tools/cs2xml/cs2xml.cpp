@@ -2511,7 +2511,9 @@ void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
 
 bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
 {
+printf ("1: conf file '%s'\n", vfspath); fflush (stdout);
   if (!TestCSFile (vfspath)) return false;
+printf ("2: conf file '%s'\n", vfspath); fflush (stdout);
 
   printf ("Trying to convert '%s' ... \n", vfspath); fflush (stdout);
   csRef<iDataBuffer> buf (vfs->ReadFile (vfspath));
@@ -2638,6 +2640,7 @@ void Cs2Xml::Main ()
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   const char* val = cmdline->GetName ();
+  printf ("%s\n", val); fflush (stdout);
   if (!val)
   {
     ReportError ("Please give VFS world file name or name of the zip archive!");

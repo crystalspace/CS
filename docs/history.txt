@@ -3,6 +3,12 @@ The history order is reversed so that new features are at the top.
 18-Sep-2002
 	- Fixed several memory leaks in CS introduced by the new csPtr(csRef)
 	  constructor added yesterday.
+	- Added 'explicit' to the csPtr(csRef) constructor. This avoids
+	  implicit cast from csRef to T* and then from T* to csPtr.
+	- Added copy constructor for csPtr even in optimize mode.
+	- The copy constructor from csRef to csPtr is now templated so that
+	  you can assign csRef<T2> to csPtr<T> with T2 and T different
+	  (but compatible) types.
 	- Eric Sunshine changed next.mak so that it discovers zlib, libpng, and
 	  libjpeg libraries within CS/libs even if those directory names
 	  contain version numbers.  (Previously, it assumed that the directory
