@@ -25,6 +25,8 @@ chronological order.
 	  project to point at Crystal Space's new official domain
 	  crystalspace3d.org.  (We also respond to crystalspace3d.net and
 	  crystalspace3d.com.)
+	- res fixed a crash in OpenGL DrawSimpleMesh() where mesh.dynDomain
+	  wasn't checked for 0.
 27-Nov-2004
 	- Jorrit did a few minor changes to foliage. Nothing significant.
 	- Jorrit submitted a patch from Marc Prussmeier which adds the
