@@ -18,6 +18,7 @@ The history order is reversed so that new features are at the top.
 	- Matze changed plugin linking flags on unix to use -shared instead of
 	  -Wl,-shared as this seems to fix some problems with unresolved
 	  problems on some linux boxes.
+	- Matze fixed a typo in netmtest makefile
 15-Mar-2003
 	- Greg Block fixed lightmap loading and saving on
 	  non-Intel-endian systems.
