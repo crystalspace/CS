@@ -4,6 +4,7 @@ The history order is reversed so that new features are at the top.
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
 	- Fixed a warning in csLightMap.
+	- Fixed a compile error in map2cs.
 22-May-2001
 	- Implemented improved OpenGL lightmap cache. There is now the notion
 	  of a super-lightmap which is a collection of smaller lightmaps.
