@@ -61,6 +61,10 @@ chronological order.
 	  OSXDelegate2D_OpenGL.h which prompted compilation warning.
 	- Eric Sunshine eliminated compilation warnings from old OpenGL
 	  renderer regarding invalid conversion from int* to GLint*.
+	- res added CS_USE_FAKE_WCHAR_TYPE to the list of predefined doxygen
+	  macro names so the documentation for csUnicodeTransform is correct
+	  again.
+	- res updated the example in the csWtoC documentation.
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with

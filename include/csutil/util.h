@@ -57,7 +57,7 @@ extern wchar_t* csStrNewW (const char *s);
  * Use of this helper class is more convenient than an a 
  * csStrNewW() / delete[], but essentially does the same.
  * \code
- *   widechar* wstr = L"Hello World";
+ *   wchar_t* wstr = L"Hello World";
  *    ... 
  *   iNativeWindow* natwin =  ... ;
  *     natwin->SetTitle (csWtoC (wstr));
