@@ -30,7 +30,10 @@
 #include "csengine/rdrprior.h"
 #include "iengine/sector.h"
 #include "ivideo/graph3d.h"
-
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/rndbuf.h"
+#include "ivideo/shader/shader.h"
+#endif
 
 class csEngine;
 class csProgressPulse;
@@ -106,14 +109,16 @@ private:
    */
   csSectorMeshList meshes;
 
+
 #ifdef CS_USE_NEW_RENDERER  
   /// num_objects in this sector
   int num_objects;
 
   /// sorted list of MeshObjects, saved for future render passes
   iMeshWrapper **objects;
-
+  csGrowingArray<csRenderMesh*> draw_objects;
   csRef<iRender3D> r3d;
+  csRef<iShaderManager> shmgr;
 #endif
 
   /**
