@@ -60,6 +60,7 @@ public:
 	virtual int get_state( const real *state_array );  
 	virtual int set_delta_state( real *state_array ); 
 	virtual void set_angular_v( const ctVector3 &pw );
+  virtual void set_v( const ctVector3 &pv );
 	virtual void set_m( real pm );
 
 protected:
