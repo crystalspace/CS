@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Aug-2004
+	- Jorrit fixed a bug added yesterday in the font multiplexor that
+	  would cause crashes at exit.
 19-Aug-2004
 	- Jorrit added support for key/value pairs to materials and textures
 	  in the loader.

@@ -64,7 +64,7 @@ class csFontPlexer : public iFont
 private:
   friend struct csFontLoadOrderEntry;
 
-  csFontServerMultiplexor* parent;
+  csRef<csFontServerMultiplexor> parent;
   char* fontid;
   int size;
   iFont* primaryFont;
