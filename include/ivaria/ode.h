@@ -25,10 +25,10 @@
 #define int32 ode_int32
 #define uint32 ode_uint32
 #include <ode/ode.h>
-#undef ode_uint32
-#undef ode_int32
-#undef ode_uint8
-#undef ode_int8
+#undef uint32
+#undef int32
+#undef uint8
+#undef int8
 
 SCF_VERSION (iODEFrameUpdateCallback, 0, 0, 1);
 

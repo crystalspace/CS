@@ -30,6 +30,14 @@ chronological order.
 	  configure.ac so that it first attempts the -march= variations before
 	  attempting -mcpu=, -mpentiumpro, and -mpentium since the latter flags
 	  are officially deprecated in gcc 3.4.x.
+	- Eric Sunshine fixed bugs in ivaria/ode.h where it was protecting the
+	  types int8, uint8, int32, uint32 by #defining them as ode_int8,
+	  ode_uint8, etc.  before #including <ode/ode.h>, but was then
+	  incorrectly #undefining ode_int8, ode_uint8, when it should actually
+	  have been undefining int8, uint8, etc.  This cause compilation errors
+	  for any use of int8, uint8, etc.  after ivaria/ode.h was included
+	  since the compiler still saw ode_int8, ode_uint8, etc. in their
+	  stead.
 8-Apr-2004
 	- Jorrit committed a patch to map2cs from Aren Blondahl:
 	    - Added Support for "_color" tag in light entities for support
