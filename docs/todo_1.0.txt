@@ -150,6 +150,7 @@ API and Small Feature Additions:
 	[F]  Support iPolygonMesh (for collision detection) in more
 	     mesh objects (like ball, cube, ...).
 	[**] Add iCamera::SetFarPlane().
+	[F]  Add Hide() to iMouseDriver (and check others).
 
 Global Additions and Stuff:
 	[F]  Direct3D8 Renderer.
