@@ -50,7 +50,7 @@ class csHwrBitmap
     : g2d (g2d0), shmid (shmid0) {}
 
   /// Get the CS 2d graphics class stored in this canvas.
-  inline csRef<iGraphics2D> G2D () { return g2d; }
+  inline iGraphics2D * G2D () { return g2d; }
 
   /// Get the "grop render" structure associated with this bitmap.
   inline groprender* Grop () { return & grop; }

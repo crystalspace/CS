@@ -154,6 +154,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
   object_reg = r;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Get the system parameters
+  config.AddConfig (object_reg, "/config/video.cfg");
   Width = width;
   Height = height;
   Depth = depth;

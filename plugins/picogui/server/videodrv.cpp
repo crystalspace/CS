@@ -56,9 +56,9 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
   v->init			= Init;
   v->setmode			= SetMode;
   v->close			= Close;
-  /* v->coord_logicalize		= CoordLogicalize;*/
-  v->update			= Update;
-  /*v->is_rootless		= IsRootless;
+  v->coord_logicalize		= CoordLogicalize;
+  // v->update			= Update;
+  v->is_rootless		= IsRootless;
   v->color_pgtohwr		= ColorPG2CS;
   v->color_hwrtopg		= ColorCS2PG;
   v->pixel			= Pixel;
@@ -67,17 +67,17 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
   v->bar			= Bar;
   v->line			= Line;
   v->rect			= Rect;
-  v->blit			= Blit;*/
+  v->blit			= Blit;
   v->bitmap_load		= Load; 
-  /*v->bitmap_new			= New;
+  v->bitmap_new			= New;
   v->bitmap_free		= Free;
   v->bitmap_getsize		= GetSize;
   v->bitmap_get_groprender	= GetGropRender;
-  v->bitmap_getshm		= GetShareMem;*/
+  v->bitmap_getshm		= GetShareMem;
   v->lxres = v->xres		= Gfx2D->GetWidth ();
   v->lyres = v->yres		= Gfx2D->GetHeight ();
   v->bpp                        = Gfx2D->GetPixelBytes () * 8;
-  //v->grop_render_presetup_hook  = BeginDraw;
+  v->grop_render_presetup_hook  = BeginDraw;
 
   return 0;
 }
@@ -88,9 +88,10 @@ g_error csPGVideoDriver::Init ()
   // @@@ What's responsible for deleting data? /Anders Stenberg
   /*void *data = new char[(vid->bpp>>3)*vid->xres*vid->yres];
   memset (data, 0, (vid->bpp>>3)*vid->xres*vid->yres);
-  csRef<iGraphics2D> canvas = 
-    Gfx2D->CreateOffscreenCanvas (data, vid->xres, vid->yres, vid->bpp, 0);
-  vid->display = (hwrbitmap)new csHwrBitmap (canvas);*/
+  // csRef<iGraphics2D> canvas = 
+  //   Gfx2D->CreateOffscreenCanvas (data, vid->xres, vid->yres, vid->bpp, 0);
+  */
+  vid->display = (hwrbitmap)new csHwrBitmap (Gfx2D);
   vid->display->bits = 0;
   return 0;
 }
@@ -117,7 +118,7 @@ g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp,
   vid->display->bits = new u8[vid->xres*vid->yres*(vid->bpp>>3)];
   vid->display->pitch = vid->xres*(vid->bpp>>3);
 
-  //Gfx2D->Resize (x, y);
+  Gfx2D->Resize (x, y);
   return 0;
 }
 
@@ -331,8 +332,8 @@ void csPGVideoDriver::Blit (hwrbitmap b, int16 x, int16 y, int16 w, int16 h,
 
 g_error csPGVideoDriver::New (hwrbitmap *b, int16 w, int16 h, uint16 bpp)
 {
-  csRef<iGraphics2D> newg2d = Gfx2D->CreateOffscreenCanvas
-    (new char[(bpp / 8) * w * h], w, h, bpp, 0);
+  char * nchar = new char[(bpp / 8) * w * h];
+  csRef<iGraphics2D> newg2d = Gfx2D->CreateOffscreenCanvas (nchar, w, h, bpp, 0);
   SETBMP (b, new csHwrBitmap (newg2d));
   return 0;
 }
