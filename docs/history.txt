@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	  engine sequence manager.
 	- More implementation of the indexed versions of the operations in the
 	  engine sequence manager.
+	- Fixed csdemo to refer to the cs096 dir instead of cs094 for
+	  demodata.zip.
 1-Oct-2002
 	- Added the notion of parameters to the base sequence manager.
 	  A parameter is a generic iBase* parameter which can be any
