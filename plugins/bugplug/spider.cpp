@@ -37,7 +37,7 @@ csSpider::csSpider ()
 
 csSpider::~csSpider ()
 {
-  CS_ASSERT (wrap != NULL);
+  CS_ASSERT (wrap == NULL);
 }
 
 bool csSpider::DrawTest (iRenderView* rview, iMovable*)
