@@ -142,7 +142,7 @@ static bool process_file (const char *fname)
   fseek (f, 0, SEEK_SET);
 
   if (opt.verbose)
-    printf ("Reading %ld bytes from file\n", fsize);
+    printf ("Reading %d bytes from file\n", fsize);
 
   UByte *buffer = new UByte [fsize];
   if (fread (buffer, 1, fsize, f) < fsize)
