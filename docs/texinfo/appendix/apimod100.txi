@@ -157,6 +157,53 @@ them from your applications if you used them):
 @code{iTextureManager::PrepareTextures()}
 @end itemize
 
+@subheading Input Definitions
+
+The file @code{inpnames.h} in @code{csutil} has been renamed to
+@code{inputdef.h} and the following functions have been removed:
+
+@itemize @bullet
+@item
+@code{csTypeOfInputDef}
+@item
+@code{csParseKeyDef}
+@item
+@code{csGetKeyDesc}
+@item
+@code{csParseMouseDef}
+@item
+@code{csGetMouseDesc}
+@item
+@code{csParseJoystickDef}
+@item
+@code{csGetJoystickDesc}
+@end itemize
+
+These functions allowed you to convert a string such as @code{"Ctrl+A"},
+@code{"JoystickX"} or @code{"Alt+Mouse1"} into values describing input events
+and vice versa.
+
+The correct way to do this is now to use @code{csInputDefinition} which is
+defined in @code{inputdef.h}. The preferred way to convert a string to a
+definition is to construct a @code{csInputDefinition} from a
+@code{const char *}, and the preferred way to convert a definition back to a
+string (perhaps constructed some other way) is with the @code{ToString} method.
+
+However, there are static helper methods in @code{csInputDefinition} which
+accept arguments in a similar way to the old functions, which perform the
+work of instantiating the object for you:
+
+@itemize
+@item
+@code{csInputDefinition::ParseKey}
+@item
+@code{csInputDefinition::GetKeyString}
+@item
+@code{csInputDefinition::ParseOther}
+@item
+@code{csInputDefinition::GetOtherString}
+@end itemize
+
 @subheading Pollution Reduction
 
 The following global header files have been renamed in order to avoid possible

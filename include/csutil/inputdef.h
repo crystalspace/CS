@@ -87,14 +87,107 @@ public:
   /// Return a boolean indicating whether the object contains a valid input.
   bool IsValid () const;
 
+  /// Return the event type of the description (a csev... constant).
+  int GetType () const { return containedType; }
+
+  /**
+   * Return the numeric value of the description (button number of a button
+   * event, axis number of an axis event (0 = x, 1 = y)).
+   */
+  int GetNumber () const { return mouseButton; }
+
+  /// Gives the key code of the description, assuming it is a keyboard type.
+  bool GetKeyCode (utf32_char &code, bool &isCooked) const
+    { code = keyboard.code;
+      isCooked = keyboard.isCooked;
+      return containedType == csevKeyboard; }
+
+  /// Return the keyboard modifiers of the description.
+  const csKeyModifiers& GetModifiers () const { return modifiers; }
+
+  /// Set the event type of the description (a csev... constant).
+  void SetType (int t) { containedType = t; }
+
+  /**
+   * Set the numeric value of the description (button number of a button
+   * event, axis number of an axis event (0 = x, 1 = y)).
+   */
+  void SetNumber (int n) { mouseButton = n; }
+
+  /// Set the key code of the description, assuming it is a keyboard type.
+  bool SetKeyCode (utf32_char code)
+    { if (containedType != csevKeyboard) return false;
+      keyboard.code = code;
+      return true; }
+
+  /// Set the keyboard modifiers of the description.
+  void SetModifiers (const csKeyModifiers &mods) { modifiers = mods; }
+
   /// Get the string representation of the description.
-  csString ToString () const;
+  csString ToString (bool distinguishModifiers = true) const;
 
   /// Generate a hash value from the object.
   uint32 ComputeHash () const;
 
   /// Return a boolean indicating whether the definitions are equal.
   bool Compare (csInputDefinition const &) const;
+
+  /**
+   * Helper function to parse a string (eg. "Ctrl+A") into values describing
+   * a keyboard event.
+   * \param iStr The string to parse.
+   * \param oKeyCode Will be set to the code of the parsed description.
+   * \param iUseCookedCode Whether oKeyCode is a cooked code as opposed to raw.
+   * \param oModifiers The modifiers of the description.
+   * \return Whether the string could be successfully parsed.
+   * \remarks Any of the output parameters may be null, in which case they are
+   *   ignored.
+   */
+  static bool ParseKey (const char *iStr, utf32_char *oKeyCode,
+    bool iUseCookedCode, csKeyModifiers *oModifiers);
+
+  /**
+   * Helper function to parse a string (eg. "MouseX", "Alt+Mouse1") into
+   * values describing a non-keyboard event.
+   * \param iStr The string to parse.
+   * \param oType Will be set to the event type of the description
+   *   (a csev... constant).
+   * \param oNumeric For button events, will be set to the button number.
+   *   For axis events, will be set to the axis number (0 = x, 1 = y).
+   * \param oModifiers Will be populated with the modifiers of the description.
+   * \return Whether the string could be successfully parsed.
+   * \remarks Any of the output parameters may be null, in which case they are
+   *   ignored.
+   */
+  static bool ParseOther (const char *iStr, int *oType, int *oNumeric,
+    csKeyModifiers *oModifiers);
+
+  /**
+   * Helper function to return a string (eg. "Ctrl+A") from values
+   * describing a keyboard event.
+   * \param code The key code, treated as a raw code although raw vs. cooked
+   *   doesn't matter here.
+   * \param mods The keyboard modifiers. Will be ignored if 0.
+   * \param distinguishModifiers Whether to output distinguished modifiers
+   *   (eg. "LCtrl" as opposed to just "Ctrl").
+   * \return The description string.
+   */
+  static csString GetKeyString (utf32_char code, const csKeyModifiers *mods,
+    bool distinguishModifiers = true);
+
+  /**
+   * Helper function to return a string (eg. "MouseX", "Alt+Mouse1") from
+   * values describing a non-keyboard event.
+   * \param type The event type of the description (a csev... constant).
+   * \param num For button events, the button number. For axis events, the
+   *   axis number (0 = x, 1 = y).
+   * \param mods The keyboard modifiers. Will be ignored if 0.
+   * \param distinguishModifiers Whether to output distinguished modifiers
+   *   (eg. "LCtrl" as opposed to just "Ctrl").
+   * \return The description string.
+   */
+  static csString GetOtherString (int type, int num, const csKeyModifiers *mods,
+    bool distinguishModifiers = true);
 
   /// Put here to allow this class to be used as a csHash key handler.
   static unsigned int ComputeHash (const csInputDefinition &key)

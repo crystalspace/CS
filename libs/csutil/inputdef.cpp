@@ -274,7 +274,7 @@ csInputDefinition::csInputDefinition (const char *_s, uint32 mods, bool cook)
 
   str.DeleteAt (0, pos);
 
-  if (str.StartsWithNoCase ("Mouse"))
+  if (str.StartsWith ("Mouse", true))
   {
     str.DeleteAt (0, 5);
 
@@ -295,7 +295,7 @@ csInputDefinition::csInputDefinition (const char *_s, uint32 mods, bool cook)
       if (end != str.GetData ()) containedType = csevMouseDown;
     }
   }
-  else if (str.StartsWithNoCase ("Joystick"))
+  else if (str.StartsWith ("Joystick", true))
   {
     str.DeleteAt (0, 8);
 
@@ -332,13 +332,14 @@ bool csInputDefinition::IsValid () const
     return (1 << containedType) & CSMASK_Input;
 }
 
-csString csInputDefinition::ToString () const
+csString csInputDefinition::ToString (bool distinguishMods) const
 {
   csString str;
 
   for (int type = 0; type < csKeyModifierTypeLast; type++)
   {
-    if (modifiers.modifiers[type] & (1 << csKeyModifierNumAny))
+    if ((! distinguishMods && modifiers.modifiers[type] != 0)
+     || modifiers.modifiers[type] & (1 << csKeyModifierNumAny))
     {
       str.Append (ModToName ((csKeyModifierType) type, csKeyModifierNumAny));
       str.Append ("+");
@@ -434,4 +435,44 @@ bool csInputDefinition::Compare (const csInputDefinition &other) const
   }
   else
     return mouseButton == other.mouseButton;
+}
+
+bool csInputDefinition::ParseKey (const char *str, utf32_char *code, bool cook,
+  csKeyModifiers *mods)
+{
+  csInputDefinition def (str, CSMASK_ALLMODIFIERS, cook);
+  if (! def.IsValid ()) return false;
+  if (code) *code = def.keyboard.code;
+  if (mods) *mods = def.modifiers;
+  return true;
+}
+
+bool csInputDefinition::ParseOther (const char *str, int *type, int *num,
+  csKeyModifiers *mods)
+{
+  csInputDefinition def (str, CSMASK_ALLMODIFIERS, true);
+  if (! def.IsValid ()) return false;
+  if (type) *type = def.containedType;
+  if (num) *num = def.mouseButton;
+  if (mods) *mods = def.modifiers;
+  return true;
+}
+
+csString csInputDefinition::GetKeyString (utf32_char code,
+  const csKeyModifiers *mods, bool distinguishModifiers)
+{
+  csInputDefinition def (CSMASK_ALLMODIFIERS, true);
+  def.keyboard.code = code;
+  if (mods) def.modifiers = *mods;
+  return def.ToString (distinguishModifiers);
+}
+
+csString csInputDefinition::GetOtherString (int type, int num,
+  const csKeyModifiers *mods, bool distinguishModifiers)
+{
+  csInputDefinition def (CSMASK_ALLMODIFIERS, true);
+  def.containedType = type;
+  def.mouseButton = num;
+  if (mods) def.modifiers = *mods;
+  return def.ToString (distinguishModifiers);
 }

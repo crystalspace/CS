@@ -61,7 +61,8 @@ bool csInputBinder::HandleEvent (iEvent &ev)
 	((ev.Type == csevKeyboard) && 
 	(csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown));
 
-      BtnCmd *bind = btnHash.Get (csInputDefinition (& ev), 0);
+      BtnCmd *bind = btnHash.Get
+        (csInputDefinition (& ev, CSMASK_ALLMODIFIERS), 0);
       if (! bind) return false;
 
       if (bind->toggle)
@@ -78,13 +79,10 @@ bool csInputBinder::HandleEvent (iEvent &ev)
     {
       for (int axis = 0; axis <= 1; axis++)
       {
-        csInputDefinition def (& ev, axis);
-        AxisCmd *bind = axisHash.Get (def, 0);
-        if (! bind) return false;
+        AxisCmd *bind = axisHash.Get
+          (csInputDefinition (& ev, axis), 0);
 
-        int val = axis ? ev.Mouse.y : ev.Mouse.x;
-
-        bind->val = val;
+        if (bind) bind->val = axis ? ev.Mouse.y : ev.Mouse.x;
       }
 
       return true;

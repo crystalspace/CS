@@ -29,6 +29,18 @@ chronological order.
 	  gcc on Linux/PowerPC.
 	- PK implemented the SaverPlugin in spr2dmesh and fixed a bug in
 	  csSaver::SavePortals.
+	- Oktal replaced csString::StartsWith and ::StartsWithNoCase with a
+	  single StartsWith method that takes a bool ignore_case argument,
+	  and fixed bugs in those methods.
+	- Oktal added getters and setters to csInputDefinition.
+	- Oktal added a bool distinguishModifiers argument to
+	  csInputDefinition::ToString to choose behaviour ("LCtrl" vs "Ctrl").
+	- Oktal added static helper functions to csInputDefinition that
+	  work in a similar way to the old csParseKeyDef and related functions.
+	- Oktal added information about the csInputDefinition changes to
+	  apimod100.txi.
+	- Oktal made a couple of fixes to the input binder so it correctly
+	  handles keyboard modifiers.
 10-Aug-2004
 	- PK implemented the csThingFactorySaver.
 	- Jorrit fixed a few places in CS where a reverse size_t loop was done
@@ -45,7 +57,7 @@ chronological order.
 	  zip file (happened a lot with relight).
 	- Oktal added FindFirst and StartsWith methods to csString.
 	- Oktal fleshed out csInputDefinition and moved it from inpnames.h/cpp
-	  to inputdef.h/cpp.
+	  to inputdef.h/cpp. Also removed csParseKeyDef and related functions.
 	- Oktal added a public SynthesizeCooked(iEvent*) method to the
 	  keyboard driver which fills in the cooked code of an event containing
 	  only a raw code.

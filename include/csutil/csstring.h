@@ -481,56 +481,48 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   /**
    * Check if this string starts with another one.
    * \param iStr Other string.
+   * \param ignore_case Causes the comparison to be case insensitive if true.
    * \return True if they are equal up to the length of iStr; false if not.
-   * \remarks The comparison is case-sensitive.
    */
-  bool StartsWith (const csString& iStr) const
+  bool StartsWith (const csString& iStr, bool ignore_case = false) const
   {
     if (&iStr == this)
       return true;
     size_t const n = iStr.Length();
+    if (n == 0)
+      return true;
     if (n > Size)
       return false;
     if (Size == 0 && n == 0)
       return true;
-    return (memcmp (Data, iStr.GetData (), Size) == 0);
+    if (ignore_case)
+      return (strncasecmp (Data, iStr.GetData (), n) == 0);
+    else
+      return (strncmp (Data, iStr.GetData (), n) == 0);
   }
 
   /**
    * Check if this string starts with a null-terminated C- string.
    * \param iStr Other string.
+   * \param ignore_case Causes the comparison to be case insensitive if true.
    * \return True if they are equal up to the length of iStr; false if not.
-   * \remarks The comparison is case-sensitive.
    */
-  bool StartsWith (const char* iStr) const
-  { return (strncmp (Data ? Data : "", iStr, strlen (iStr)) == 0); }
-
-  /**
-   * Check if this string begins with another one.
-   * \param iStr Other string.
-   * \return True if they are equal up to the length of iStr; false if not.
-   * \remarks The comparison is case-insensitive.
-   */
-  bool StartsWithNoCase (const csString& iStr) const
+  bool StartsWith (const char* iStr, bool ignore_case = false) const
   {
-    if (&iStr == this)
+    if (iStr == 0)
+      return false;
+    size_t const n = strlen (iStr);
+    if (n == 0)
       return true;
-    size_t const n = iStr.Length();
     if (n > Size)
       return false;
     if (Size == 0 && n == 0)
       return true;
-    return (strncasecmp (Data, iStr.GetData (), n) == 0);
+    if (ignore_case)
+      return (strncasecmp (Data, iStr, n) == 0);
+    else
+      return (strncmp (Data, iStr, n) == 0);
   }
-
-  /**
-   * Check if this string starts with a null-terminated C- string.
-   * \param iStr Other string.
-   * \return True if they are equal up to the length of iStr; false if not.
-   * \remarks The comparison is case-insensitive.
-   */
-  bool StartsWithNoCase (const char* iStr) const
-  { return (strncasecmp (Data ? Data : "", iStr, strlen (iStr)) == 0); }
 
   /**
    * Create an empty csString object.
