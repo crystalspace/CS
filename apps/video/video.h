@@ -40,6 +40,7 @@ private:
   iStreamFormat *pVideoFormat;
   iVideoStream *pVStream;
   iLoader *LevelLoader;
+  iGraphics3D *myG3D;
 
   bool InitProcDemo ();
 

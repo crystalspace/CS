@@ -51,6 +51,7 @@ Video::Video ()
   pVStream = NULL;
   pVideoFormat = NULL;
   LevelLoader = NULL;
+  myG3D = NULL;
 }
 
 Video::~Video ()
@@ -63,6 +64,7 @@ Video::~Video ()
   }
   if (view) view->DecRef ();
   if (LevelLoader) LevelLoader->DecRef();
+  if (myG3D) myG3D->DecRef ();
   if (engine) engine->DecRef ();
 }
 
@@ -94,6 +96,13 @@ bool Video::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
+  myG3D = QUERY_PLUGIN (this, iGraphics3D);
+  if (!myG3D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    abort ();
+  }
+
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Video Crystal Space Application"))
   {
@@ -103,7 +112,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   }
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
@@ -213,7 +222,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = engine->CreateView (G3D);
+  view = engine->CreateView (myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
@@ -318,20 +327,20 @@ void Video::NextFrame ()
     view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   view->Draw ();
 
   // Start drawing 2D graphics.
-  if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   if (pVStream)
     pVStream->NextFrame ();
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 bool Video::HandleEvent (iEvent &Event)
