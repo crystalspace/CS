@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+19-Mar-2002
+	- Decreased maximum size of lightmaps for software renderer
+	  again. 16mil is WAY too much as that will not fit in the
+	  texture cache. Now it is set to 2mil which is still two times
+	  as big as it was before.
 18-Mar-2002
 	- Fixed a bug in the octree cacher. The name used for loading
 	  the cache could be different from the name used to writing the

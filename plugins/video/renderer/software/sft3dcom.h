@@ -42,7 +42,7 @@ struct iConfigFile;
 #define MAX_INDEXED_FOG_TABLES	8
 
 // Maximum size of a single lightmap, in pixels
-#define MAX_LIGHTMAP_SIZE	256*256*16*16 //1000000
+#define MAX_LIGHTMAP_SIZE	256*256*16*2 //1000000
 
 /// This structure is used to hold references to all current fog objects.
 struct FogBuffer
