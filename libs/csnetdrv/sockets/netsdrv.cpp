@@ -23,6 +23,12 @@
 #include "isystem.h"
 #include "csutil/util.h"
 
+#if defined(OS_SOLARIS)
+extern unsigned long inet_addr(const char*);
+#elif !defined(OS_BE)
+#include <arpa/inet.h>
+#endif
+
 #if defined(OS_BE)
 #define CS_CLOSESOCKET closesocket
 #elif defined(OS_WIN32)
