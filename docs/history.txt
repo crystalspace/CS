@@ -1,14 +1,21 @@
 The history order is reversed so that new features are at the top.
 
 1-Nov-2001
-	- Fixed a bug in csRenderView::ClipBSphere. The bug was
-	  actually a false CS_ASSERT based on a wrong assumption
-	  that TestBSphere() is perfect which it isn't.
+	- Fixed a bug in csRenderView::ClipBSphere.  The bug was actually a
+	  false CS_ASSERT based on a wrong assumption that TestBSphere() is
+	  perfect which it isn't.
 	- Changed one of csIntersect3::Plane() to return true/false on
 	  intersection.
+	- Eric Sunshine applied a very obvious optimization to csGetTicks() in
+	  CS/libs/cssys/unix/utiming.cpp.  This optimization was modeled
+	  loosely after a suggestion made by Rene Dudfield
+	  <illumen@yahoo.com.au> to cache the value returned by __sysconf(2),
+	  rather than invoking that expensive function each time csGetTicks()
+	  is called.  Note that this modification is untested since I don't
+	  have access to GCC3.
 31-Oct-2001
-	- Removed the windows pen support added by 'res'. I don't have
-	  the needed include files on mingw.
+	- Removed the windows pen support added by 'res'.  I don't have the
+	  needed include files on mingw.
 	- Matze added VFS support to csFileDialog
 	- Jorge Acereda fixed infinite renderer. It failed to overload
 	  iGraphics2D::Write() because it had a different argument list.

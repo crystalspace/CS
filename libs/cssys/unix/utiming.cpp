@@ -21,20 +21,23 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 
-#ifdef COMP_GCC3
-extern "C"
+#if !defined(COMP_GCC3)
+#define cs_clk_tck() (1000 / CLK_TCK)
+#else
+extern "C" long int __sysconf(int);
+inline long int cs_clk_tck()
 {
-  extern long int __sysconf (int);
+  static long int cache = 0;
+  if (cache == 0)
+    cache = 1000 / ((__clock_t)__sysconf(2));
+  return cache;
 }
 #endif
 
 // This function should return milliseconds since some specific time
 csTicks csGetTicks ()
 {
+  // NOTE: times() can return -1 on errors.  Yikes!
   struct tms buf;
-#ifdef COMP_GCC3
-  return times (&buf) * 1000 / ((__clock_t) __sysconf(2));
-#else
-  return times (&buf) * 1000 / CLK_TCK;
-#endif
+  return times (&buf) * cs_clk_tck();
 }
