@@ -4,7 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed the sprite socket vector. FreeItem() casted the item
 	  to delete to the wrong type (csSpriteSocketVector instead
 	  of csSpriteSocket).
-	- Removed a bad DecRef() in the genmesh loader.
+	- Removed a bad DecRef() in the genmesh loader. This fixes the
+	  crash at exit in walktest. Thanks to Daniel Duhprey for finding
+	  this.
 17-Dec-2002
 	- Fixed the fix on reparenting of a mesh object for the culler.
 	- Added 'do_popup' parameter to iStandardReporterListener->
