@@ -363,6 +363,7 @@ void csSoftwareTextureHandle::ChangePaletteEntry (int idx, int r, int g, int b)
 SCF_IMPLEMENT_IBASE_INCREF(csSoftRendererLightmap)					
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csSoftRendererLightmap)				
 SCF_IMPLEMENT_IBASE_REFOWNER(csSoftRendererLightmap)				
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csSoftRendererLightmap)
 SCF_IMPLEMENT_IBASE_QUERY(csSoftRendererLightmap)
 SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
 SCF_IMPLEMENT_IBASE_END

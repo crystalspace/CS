@@ -1267,6 +1267,7 @@ void csGLTextureManager::GetLightmapRendererCoords (int slmWidth, int slmHeight,
 SCF_IMPLEMENT_IBASE_INCREF(csGLRendererLightmap)					
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLRendererLightmap)				
 SCF_IMPLEMENT_IBASE_REFOWNER(csGLRendererLightmap)				
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLRendererLightmap)
 SCF_IMPLEMENT_IBASE_QUERY(csGLRendererLightmap)
   SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
 SCF_IMPLEMENT_IBASE_END
@@ -1379,6 +1380,7 @@ void csGLRendererLightmap::GetMeanColor (float& r, float& g, float& b)
 SCF_IMPLEMENT_IBASE_INCREF(csGLSuperLightmap)					
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLSuperLightmap)				
 SCF_IMPLEMENT_IBASE_REFOWNER(csGLSuperLightmap)				
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLSuperLightmap)
 SCF_IMPLEMENT_IBASE_QUERY(csGLSuperLightmap)
   SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
 SCF_IMPLEMENT_IBASE_END

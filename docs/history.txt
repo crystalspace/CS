@@ -27,6 +27,8 @@ chronological order.
 	  mention the new awstut.cfg file which Andreas Busch added.
 	- res fixed a bug in genmesh where it wasn't lit correctly when an
 	  object was used without localshadows and -relight.
+	- Eric Sunshine added missing SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS()
+	  invocations to render3d/software and render3d/opengl.
 7-Nov-2003
 	- res reverted the behaviour of setting the alpha of keycolored pixels
 	  of textures in GL: just drop the alpha of KCed pixels to 0, but don't
