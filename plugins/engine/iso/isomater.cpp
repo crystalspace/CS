@@ -66,6 +66,11 @@ iTextureHandle *csIsoMaterial::GetTexture ()
   return texture;
 }
 
+iTextureHandle *csIsoMaterial::GetTexture (csStringID)
+{
+  return texture;
+}
+
 void csIsoMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
 {
   oColor = flat_color;

@@ -12,6 +12,7 @@ chronological order.
 	- Jorrit reverted data/shader/vertexlight.avp because with revision
 	  1.8 of that file the new renderer crashes because GetBestTechnique()
 	  returns 0 for some shader.
+	- Jorrit fixed iso engine for latest light and material changes.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

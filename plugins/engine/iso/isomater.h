@@ -23,6 +23,7 @@
 #include "csgfx/rgbpixel.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "iutil/strset.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "iengine/material.h"
@@ -101,6 +102,7 @@ public:
   virtual iEffectDefinition *GetEffect ();
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
+  virtual iTextureHandle* GetTexture (csStringID name);
   /// Number of texture layers.
   virtual int GetTextureLayerCount () { return 0; }
   /// Get a texture layer.

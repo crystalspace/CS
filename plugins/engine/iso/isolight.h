@@ -28,7 +28,8 @@ class csIsoFakeLight;
 /**
  * iso light
 */
-class csIsoLight : public iIsoLight {
+class csIsoLight : public iIsoLight
+{
 private:
   /// the grid the light shines to
   iIsoGrid *grid;
@@ -89,10 +90,13 @@ public:
 
 
 /// class to fake a iLight interface
-class csIsoFakeLight : public iLight {
+class csIsoFakeLight : public iLight
+{
+private:
   csIsoLight *isolight;
   csFlags flags;
   csRefArray<iLightCallback> light_cb_vector;
+  csVector3 attenuationvec;
 
 public:
   SCF_DECLARE_IBASE;
@@ -124,6 +128,18 @@ public:
   virtual iFlareHalo* CreateFlareHalo () {return 0;}
   virtual float GetBrightnessAtDistance (float d)
   { return isolight->GetAttenuation(d); }
+  virtual void SetAttenuationVector (const csVector3& attvec)
+  {
+    attenuationvec = attvec;
+  }
+  virtual const csVector3 &GetAttenuationVector() { return attenuationvec; }
+  virtual void CalculateAttenuationVector (int atttype, float radius = 1.0f,
+    float brightness = 1.0f) { }
+  virtual bool GetDistanceForBrightness (float brightness, float& distance)
+  {
+    return false;
+  }
+
   virtual csFlags& GetFlags () { return flags; }
   virtual bool IsDynamic() const { return false; }
   //----------------------------------------------------------------------
