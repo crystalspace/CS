@@ -128,11 +128,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
   txtmgr->SetPalette ();
 
-  // Initialize the console
-  if (Console != NULL)
-    // Don't let messages before this one appear
-    Console->Clear ();
-
   // Some commercials...
   Printf (MSG_INITIALIZATION,
     "Crystal Space 3D Performance Tester 0.1.\n");
@@ -210,7 +205,12 @@ void PerfTest::NextFrame ()
   if (needs_setup)
   {
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    if (Console) Console->Clear ();
+    iConsoleOutput *Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
+    if (Console)
+    {
+      Console->Clear ();
+      Console->DecRef ();
+    }
     last_time = current_time;
     char desc[255];
     current_tester->Description (desc);
