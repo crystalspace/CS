@@ -186,8 +186,7 @@ bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent,
       Parent()->Layout()->AddComponent(this, settings);
 
     Parent()->AddChild(this);
-		//if(Focusable())
-		 Parent()->AddToTabOrder(this);
+    Parent()->AddToTabOrder(this);
   }
 
   return true;
@@ -769,6 +768,19 @@ iAwsComponent *awsComponent::GetTabComponent(int index)
 	if(index < TabOrder.Length())
 		return ((iAwsComponent *)TabOrder[index]);	
 	else return 0;
+}
+
+iAwsComponent *awsComponent::GetFirstFocusableChild(iAwsComponent *comp)
+{
+  for(int i = 0; i < comp->GetTabLength(); i++)
+  {
+    if(comp->GetTabComponent(i)->Focusable())
+      return comp->GetTabComponent(i);
+    else 
+    if(comp->GetTabComponent(i)->HasChildren())
+      return GetFirstFocusableChild (comp->GetTabComponent(i));
+  }
+  return NULL;
 }
 
 void awsComponent::SetAbove(iAwsComponent* comp)

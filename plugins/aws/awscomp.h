@@ -316,6 +316,9 @@ public:
   /// Returns "index" component from TabOrder, 0 if there is none
   virtual iAwsComponent *GetTabComponent(int index);
 
+  /// Returns first focusable component on this window
+  virtual iAwsComponent *GetFirstFocusableChild(iAwsComponent *comp);
+
   /// Returns true if this component has children
   virtual bool HasChildren ();
 
