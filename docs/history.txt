@@ -1211,7 +1211,7 @@ chronological order.
 	      iEvent passed in by a client was a csEvent or csPoolEvent.
 	    - Corrrected very bizarre code in csEvent::UnflattenCrystal() which
 	      performed a static cast of `this' to csPoolEvent, checked if the
-	      result of the cast of zero (which will never be the case), and
+	      result of the cast was zero (which will never be the case), and
 	      then performed conditional behavior based upon that result.
 	    - Fixed bug in csEvent::UnflattenCrystal().	 When unserializing a
 	      data buffer, it incorrectly assigned CS_DATATYPE_STRING as the
