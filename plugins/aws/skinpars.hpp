@@ -1,5 +1,5 @@
-#ifndef BISON_PLUGINS_AWS_SLP_HPP
-# define BISON_PLUGINS_AWS_SLP_HPP
+#ifndef BISON_PLUGINS_AWS_SKINPARS_HPP
+# define BISON_PLUGINS_AWS_SKINPARS_HPP
 
 #ifndef YYSTYPE
 typedef union {
@@ -27,4 +27,4 @@ typedef union {
 # define	NEG	267
 
 
-#endif /* not BISON_PLUGINS_AWS_SLP_HPP */
+#endif /* not BISON_PLUGINS_AWS_SKINPARS_HPP */

@@ -1,4 +1,4 @@
-/* A Bison parser, made from plugins/aws/skinlang.bsn
+/* A Bison parser, made from plugins/aws/skinpars.yy
    by GNU bison 1.35.  */
 
 #define YYBISON 1  /* Identify Bison output.  */
