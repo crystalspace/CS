@@ -3570,8 +3570,8 @@ chronological order.
 	  because they were incorrect.  Instead, fixed the actual problem (a
 	  misplaced `const') which prompted the 1.3 changes.  (And, yes, the
 	  present changes have been tested. :-)
-	- Eric Sunshine eliminated a few instances of NULL which had creeped
-	  back into the project.
+	- Eric Sunshine eliminated a few instances of NULL which had crept back
+	  into the project.
 	- res made the following changes to the new renderer system:
 	    - Index buffers aren't treated in a special way any more now.
 	      Just your average vertex buffer.
