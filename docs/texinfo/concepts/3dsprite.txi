@@ -9,14 +9,12 @@
 3D @dfn{sprites} are triangle-based models which can be animated by a skeleton
 or pre-calculated vertex animations.  This type of model is well suited for
 detailed models which are not easily represented as heightmapped terrain or
-smooth curves.
+bezier curves.
 
 @menu
 * 3D Sprites Example 1:: A Simple 3D Sprite
 * 3D Sprites Example 2:: Texturing
-* 3D Sprites Example 3:: Shading Problems
-* 3D Sprites Example 4:: A Solution
-* 3D Sprites Optimizations::
+* 3D Sprites Example 3:: Shading
 @end menu
 
 @node 3D Sprites Example 1, 3D Sprites Example 2, 3D Sprites, 3D Sprites
@@ -32,8 +30,8 @@ how artists do things :-).
 
 @end ifnotinfo
 This sprite has 96 triangles.  If we treat each triangle as a seperate
-object, it has 288 vertices.  Think about that.  Every frame each of those
-288 vertices has to be transformed from local coordinates screen space.
+object, it has 288 vertices.  Every frame each of those 288 vertices has
+to be transformed from local coordinates to screen space coordinates.
 
 Each vertex is also consuming some memory.  If each vertex only has
 three 32 bit float coordinates, then the sprite uses 3456 bytes of memory,
@@ -74,31 +72,37 @@ Third Vertex Index
 @node 3D Sprites Example 2, 3D Sprites Example 3, 3D Sprites Example 1, 3D Sprites
 @subsection Texturing
 
-Our next challenge is texturing the sprite .  To apply a two dimensional
+Our next challenge is texturing the sprite.  To apply a two dimensional
 texture to the 3D sprite we need to flatten it.  If we have 288 seperate
 vertices (@pxref{3D Sprites Example 1}), we can flatten the sprite any way we
-want, but when the triangles are sharing vertices we cannot seperate them.
+want, but when the triangles are sharing vertices we cannot seperate them,
+and a flattened cylinder is sometimes difficult to texture.  Either the sides
+will be curved or the ends will be flattened.
 
-The simplest solution to this problem is to duplicate some vertices and
-split up enough triangle edges to flatten the cylinder the way we want it,
-but leave the rest of the the triangles connected, sharing vertices.
 We probably want to texture the sides as a single rectangular area and
-each end as a rough circle.  Seperating the ends doubles the number of
-vertices. Cutting one edge of the sides so it can be unwrapped adds
-two more vertices.
+each end as a rough circle.  So we Seperate the ends from the sides.  This
+doubles the number of vertices.  Cutting one edge of the sides so it can be
+unwrapped adds two more vertices.
 
 @ifnotinfo
 @pictures{concepts,skin}
 
 @end ifnotinfo
-Fortunately, we still have only 98 vertices instead of 288, but can we do
-better than that?  We should not have to duplicate the 3D coordinates just
-because we need more texture coordinates.  We will address this issue
-(@pxref{3D Sprites Example 4}), but first we have to deal with some shading
-problems (@pxref{3D Sprites Example 3}).
+Now we have 98 vertices instead of 48.  This is a big hit, but it may be
+necessary to get the artwork done fast and well.  Fortunately, we still have
+only 98 vertices instead of 288, but can we do better than that? Do we have
+to duplicate the 3D coordinates just because we need more texture coordinates?
 
-@node 3D Sprites Example 3, 3D Sprites Example 4, 3D Sprites Example 2, 3D Sprites
-@subsection Shading Problems
+We experimented with a system where the sprite had a different set of 3D
+coordinates (vertices), texture coordinates (texels) and vertex normals (for
+shading.)  For example: our cylinder could have each triangle connected to
+any 3 of the 48 unique vertices and any 3 of the 98 texels, instead of the
+current system where the triangle has 3 indices used for both vertices and
+texels.  Unfortunately our approach proved ackward, slow and difficult to
+optimize.
+
+@node 3D Sprites Example 3, , 3D Sprites Example 2, 3D Sprites
+@subsection Shading
 
 Seperating the ends of the cylinder sprite for texturing (@pxref{3D Sprites
 Example 2}) has a fortunate side effect.  It seperates the surface normals of
@@ -117,130 +121,29 @@ With the ends seperated, that edge is now sharply defined.
 Unfortunately, we have also split one edge of the cylinder's sides, which
 creates a sharply defined edge where we don't want it.  We could reconnect
 the shared vertices along that edge, but then we would have to texture the
-sides differently. We don't want to texture the sides as a loop that that
-overlaps itself because then part of the surface is textured with a mirror
-image of the texture on another part. We don't want to texture the sides
-as a non-overlapping loop because that is less intuitive and wastes space.
+sides differently - The sides would either curve ackwardly or overlap itself.
 
 We are stuck with an unwanted edge or a difficult texturing job until we
-can find a way to connect vertex normals without connecting skin vertices
-(@pxref{3D Sprites Example 4}).
+can find a way to connect vertex normals without connecting skin vertices.
+One way we might be able to do this is by interfering with vertex normal
+calculation.  We would simply mark certain vertices as needing to be blended
+together during or after vertex normal calculation.  We would still have
+98 vertex normals, but two pairs of them would be averaged together.
 
-@node 3D Sprites Example 4, 3D Sprites Optimizations, 3D Sprites Example 3, 3D Sprites
-@subsection A Solution
-
-Splitting vertices for texturing (@pxref{3D Sprites Example 2}), has a few
-drawbacks.
-
-@itemize @bullet
-@item
-Extra vertices have to be transformed every frame.
-
-@item
-Extra vertices are duplicated for every precalculated vertex animation frame.
-
-@item
-Split edges can have sharp, unwanted seams (@pxref{3D Sprites Example 3}).
-@end itemize
-
-These problems can be solved by removing the one-to-one association between
-texture vertices, 3D coordinates (animation vertices), and vertex normals.
-(hereafter called @dfn{texels}, @dfn{vertices}, and @dfn{normals}) When we
-have a different number of each type of coordinate, we still need to have a
-@dfn{superset} of all coordinate types for 3D hardware compatibility
-@footnote{This author professes to know very little about 3D hardware or the
-@sc{api}s used with them, so I'm making assumptions based on hearsay.} and to
-keep the triangle data simple.
-
-Usually texels are not animated and don't have to be transformed. If a few
-texels that could be merged on the skin are seperated to create a sharp
-edge or so that they can be animated seperately, it doesn't cost much or
-limit the effects which can be created. This makes them a good superset
-of all coordinate types.
-
-Each normal can be associated with one or more texels.  Each vertex can be
-associated with one or more texels.  Each texel is associated with one normal
-and one vertex, so we can use two arrays of indices to map texels to normals
-and vertices.  These arrays are members called @samp{texel_to_normal} and
-@samp{texel_to_vertex} in the @code{csSpriteTemplate} class.
-
-Now let us return to our cylinder sprite (@pxref{3D Sprites Example 1}.) With
-the new system we will have 96 triangles.  Each triangle will have three
-indices.  Each index will point to one of the 98 texels.  The
-@samp{texel_to_vertex} array will have 98 indices to the 48 vertices.  The
-@samp{texel_to_normals} array will have 98 indices to the 96 normals.  Why 96,
-you ask?
-
-If we only merge the minimum number of normals to eliminate the unwanted
-seam we will have 96 normals.  That is a lot of normals to keep track of
-and do transformations on---and many of them will be exactly the same.
-All of the vertices on one end of the cylinder will have the same normal
-values.  both vertices on each end of the long edges of the cylinder sides
-will have the same normal values.  In this sprite there are actually only
-26 unique normals!  Fortunately, our @samp{texel_to_normals} array already
-allows this compression.
-
-Now we have painted ourselves into a corner.  We have a powerful 3D sprite
-system which is not fully supported by any known modeling packages or file
-formats!  (This is how you know we've stumbled onto something good here :-)
-The best way to deal with this problem is to develop a simple, robust
-system for creating optimized 3D sprites which is not tied to any specific
-model format.
-
-We should at least be able to import our cylinder as raw triangles (three
-3D coordinates for each triangle).  This is all of the information we need
-to construct the sprite.  We will call these simple models @dfn{meshes}.
-
-Here are the steps for loading a sprite from model from raw triangle
-models.  Loading from more advanced model formats will be similar, except
-that some of the information may be provided automatically by the format
-and the meshes may be replaced by seperate frames within the model.
-
-@enumerate
-@item
-Load a @dfn{texel} mesh in which the X and Y coordinates are actually
-U and V coordinates for texturing.  The Z coordinate is ignored.
-
-@item
-Load a @dfn{vertex} mesh which gives the cylinder its 3D shape.
-If a 3D sprite needs animation, we can load several of these meshes
-as animation frames.
-
-@item
-If the 3D sprite uses skeletal animation, a special mesh may be
-needed where all seperately animated vertices have been moved apart to
-avoid accidental merging.  Since this mesh will not be seen, its
-exact shape and proportions are not important.
-
-@item
-Load a mesh where the ends of the cylinder have been moved away
-from the sides.  The shape of this model is not important. Wherever
-triangles share vertices in this model, the vertex normals will be
-merged, @dfn{smoothing} the shading between those triangles.
-@end enumerate
+One way we might mark which vertices should be blended this way, would be
+to create a special frame in the 3D Sprite where all of the blended vertices
+are touching.  In the case of our cylinder, the ends would be pulled away
+from the sides but the sides would form a complete loop so that vertices we
+split for texturing would be blended for shading.
 
 @ifnotinfo
 @pictures{concepts,split}
 
 @end ifnotinfo
-Now that the meshes are loaded, we can work out which texels, normals and
-vertices should be merged.  We begin with the texels---the superset of
-all of the coordinates.  If two triangles have an identical vertex in
-every mesh loaded---then their texels should be merged.
 
-Next we look for shared vertices in the vertex meshes---and the special
-mesh which may sometimes be needed with skeletal animation.  This will
-give us the smallest set of vertices.
-
-We only need to check one mesh for shared normals.  However, it should be
-noted, as in the case of the cylinder model, that normals of vertices
-which do not touch are sometimes identical and can be merged. (Care should
-be taken not to merge identical normals which will not be attatched to the
-same bone for skeletal animation.)
-
-@node 3D Sprites Optimizations, , 3D Sprites Example 4, 3D Sprites
-@subheading Optimizations
-
-@c -+----1----+----2----+----3----+----4----+----5----+----6----+----7----+
-
-@emph{FIXME}: Write this section.
+The simplest way to apply the blending would be by averaging the vertex
+normals after vertex normal calculation. It would probably be more accurate
+to re-calculate the vertex normal by averaging the normals of all of the
+triangles connected to both vertices.  Vertex normals can be pre-calculated
+- especially if you are using pre-calculated vertex animation anyway.  So
+the blending effect might only have to be applied once.
