@@ -510,7 +510,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   if (!wc.hIcon) wc.hIcon = LoadIcon (NULL, IDI_APPLICATION);
   wc.lpszMenuName   = NULL;
   wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
-  wc.hbrBackground  = 0;
+  wc.hbrBackground  = ::CreateSolidBrush(RGB(0, 0, 0));
   wc.hInstance      = ModuleHandle;
   wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
   wc.lpfnWndProc    = WindowProc;
