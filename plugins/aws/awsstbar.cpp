@@ -152,14 +152,15 @@ void awsStatusBar::OnDraw (csRect clip)
     // Figure out how much we should draw
     int twidth = status * (float)tw;
 
+    if (twidth<1) return;
+
     g3d->DrawPixmap(barimg, 
 		    inner.xmin, inner.ymin, width, inner.Height(),
-		    0,0,tw,th, 0);
+		    0,0,twidth,th, 0);
   }
-  else
+  else 
     g2d->DrawBox(inner.xmin, inner.ymin, width, inner.Height(), bar_color);
   
-
 
 }
 
