@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Oct-2004
+	- Luca fixed a little comopilation error (in protomesh) that was 
+	  happening on the VisualC++ 6.0 "compiler".
 8-Oct-2004
 	- res added a missing CS_CSTOOL_EXPORT to csProcAnimated.
 	- res added a helper class to quickly write images to disk for

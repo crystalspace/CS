@@ -214,6 +214,8 @@ public:
     }
   } scfiProtoMeshState;
 
+  friend class ProtoMeshState;
+
   //------------------ iShaderVariableAccessor implementation ------------
 #ifdef CS_USE_NEW_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
