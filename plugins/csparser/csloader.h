@@ -57,6 +57,22 @@ struct iReporter;
  */
 class csLoader : public iLoader
 {
+  class csLoaderStats
+  {
+  public:
+    int polygons_loaded;
+    int portals_loaded;
+    int sectors_loaded;
+    int things_loaded;
+    int lights_loaded;
+    int curves_loaded;
+    int meshes_loaded;
+    int sounds_loaded;
+
+    void Init();
+    csLoaderStats();
+  };
+
   class csLoadedPluginVector : public csVector
   {
   private:
@@ -198,6 +214,9 @@ class csLoader : public iLoader
    */
   void TokenError (const char *Object);
 
+  /// Report any error.
+  void ReportError (const char* id, const char* description, ...);
+
 public:
   /********** iLoader implementation **********/
   SCF_DECLARE_IBASE;
@@ -207,7 +226,7 @@ public:
   // virtual file system
   iVFS *VFS;
   // The error reporter
-  iReporter* reporter;
+  iReporter* Reporter;
   // image loader
   iImageIO *ImageLoader;
   // sound loader
