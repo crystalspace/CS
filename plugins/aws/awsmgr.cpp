@@ -23,6 +23,7 @@
 #include "awslistbx.h"
 
 #include "awscmpt.h"
+#include "awscscr.h"
 
 #include <stdio.h>
 
@@ -237,6 +238,17 @@ awsManager::CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, int wi
   return canvas;
 }
 
+iAwsCanvas *
+awsManager::CreateCustomCanvas(iGraphics2D *g2d, iGraphics3D *g3d)
+{
+  iAwsCanvas *canvas = new awsScreenCanvas(g2d, g3d);
+
+  SCF_INC_REF(canvas);
+
+  return canvas;
+}
+
+
 void
 awsManager::Mark(csRect &rect)
 {
@@ -369,19 +381,20 @@ awsManager::Redraw()
    //else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
        
    // check to see if there is anything to redraw.
-   if (dirty.Count() == 0) 
+   if (dirty.Count() == 0 && !(flags & AWSF_AlwaysRedrawWindows)) 
       return;
    
-   /******* The following coawsde is only executed if there is something to redraw *************/
-   
+   /******* The following code is only executed if there is something to redraw *************/
      
    iAwsWindow *curwin=top, *oldwin = 0;
    
-   // check to see if any part of this window needs redrawn
+   // check to see if any part of this window needs redrawn, or if the always draw flag is set
    while(curwin)
    {
-      if ((!curwin->isHidden()) && WindowIsDirty(curwin)) {
+      if ((!curwin->isHidden()) && (WindowIsDirty(curwin) || (flags & AWSF_AlwaysRedrawWindows)))         
+      {
         curwin->SetRedrawTag(redraw_tag);
+        if (flags & AWSF_AlwaysRedrawWindows) Mark(curwin->Frame());
       }
 
       oldwin=curwin;
@@ -467,6 +480,9 @@ awsManager::Redraw()
      }       
    }
 
+   // Clear clipping bounds when done.
+   ptG2D->SetClipRect(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
+
    // This only needs to happen when drawing to the default context.
    ptG3D->FinishDraw ();
 
@@ -496,7 +512,7 @@ awsManager::RedrawWindow(iAwsWindow *win, csRect &dirtyarea)
      //csRect clip(win->Frame());
 
      /// Clip the window to it's intersection with the dirty rectangle
-     //clip.Intersect(dirtyarea);
+     //clip.Intersect(csRect(0,0,G2D()->GetWidth(), G2D()->GetHeight()));
      //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
      /// Tell the window to draw

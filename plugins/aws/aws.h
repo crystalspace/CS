@@ -222,6 +222,9 @@ public:
     virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, 
       int width, int height, const char *name);
 
+    /// Create a canvas that uses custom graphics devices (e.g. the screen)
+    virtual iAwsCanvas *CreateCustomCanvas(iGraphics2D *g2d, iGraphics3D *g3d);
+
     /// Get the iGraphics2D interface so that components can use it.
     virtual iGraphics2D *G2D(); 
  
