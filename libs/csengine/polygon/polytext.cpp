@@ -648,7 +648,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   DB ((MSG_DEBUG_0, "(A,B,C,D)=(%f,%f,%f,%f) txt_(A,B,C,D)=(%f,%f,%f,%f)\n", A, B, C, D, txt_A, txt_B, txt_C, txt_D));
 
-  csVector3 v1, v2;
+  csVector3 v1, v2(0);
 
   int ru, rv;
   float invww, invhh;
