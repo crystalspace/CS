@@ -1,6 +1,6 @@
 The history order is reversed so that new features are at the top.
 
-21-Jan-2003
+22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
 	- Lights (dynamic and static) now keep a real reference to the lighting
@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	  crash at exit if you press L and then quit walktest.
 	  I think this also fixes the crash at exit that sometimes occurs
 	  with Blocks.
+	- Eric Sunshine committed a patch to win32/loadlib.cpp from John Harger
+	  <john_h@selectpath.com> which hopefully will resolve the problem on
+	  Cygwin where vfs.dll failed to load (or any other plugin which has an
+	  implicit dependency upon DLLs in Cygwin's /bin directory).
 21-Jan-2003
 	- Keith Fulton moved the maya2spr converter from the Planeshift
 	  cvs to Crystal Space.

@@ -36,7 +36,11 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
 csLibraryHandle csLoadLibrary (const char* iName)
 {
   csLibraryHandle handle;
-#ifdef __CYGWIN__
+  DWORD errorCode;
+#ifndef __CYGWIN__
+  handle = LoadLibrary (iName);
+  errorCode = GetLastError();
+#else
   // Cygwin wants to have Win32 paths not Unix paths.
   char *tmp=new char[1024];
   if (cygwin_conv_to_win32_path (iName,tmp))
@@ -47,14 +51,38 @@ csLibraryHandle csLoadLibrary (const char* iName)
     return 0;
   }
   handle = LoadLibrary (tmp);
+
+ // A load attempt might fail if the DLL depends implicitly upon some other
+ // DLLs which reside in the Cygwin /bin directory.  To deal with this case, we
+ // add the Cygwin /bin directory to the PATH environment variable and retry.
+ if (handle == NULL)
+ {
+   char *OLD_PATH = new char[4096];
+   char *DLLDIR = new char[1024];
+   GetEnvironmentVariable("PATH", OLD_PATH, 4096);
+   if (cygwin_conv_to_win32_path ("/bin/",DLLDIR))
+   {
+     ErrorMessages.Push(csStrNew(
+       "LoadLibrary() '/bin/' Cygwin/Win32 path conversion failed."));
+     delete[] DLLDIR;
+     delete[] OLD_PATH;
+     delete[] tmp;
+     return 0;
+   }
+   SetEnvironmentVariable("PATH", DLLDIR);
+   handle = LoadLibrary (tmp);
+   errorCode = GetLastError();
+   SetEnvironmentVariable("PATH", OLD_PATH);
+   delete[] OLD_PATH;
+   delete[] OLD_PATH;
+ }
+
   delete[] tmp;
-#else
-  handle = LoadLibrary (iName);
 #endif
+
   if (handle == NULL)
   {
     char *buf;
-    DWORD errorCode = GetLastError();
     FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | 
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -73,7 +101,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
   if (!get_plugin_compiler)
   {
     const char *noPluginCompiler =
-      "%s: DLL doesn't export \"plugin_compiler\".\n";
+      "%s: DLL does not export \"plugin_compiler\".\n";
     char *msg = new char[strlen(noPluginCompiler) + strlen(iName)];
     sprintf (msg, noPluginCompiler, iName);
     ErrorMessages.Push (msg);
@@ -84,7 +112,8 @@ csLibraryHandle csLoadLibrary (const char* iName)
   if (strcmp(plugin_compiler, CS_COMPILER_NAME))
   {
     const char *compilerMismatch =
-      "%s: plugin compiler mismatches app compiler: %s != " CS_COMPILER_NAME "\n";
+      "%s: plugin compiler mismatches app compiler: %s != "
+      CS_COMPILER_NAME "\n";
     char *msg = new char[strlen(compilerMismatch) + strlen(iName) + 
       strlen(plugin_compiler)];
     sprintf (msg, compilerMismatch, iName, plugin_compiler);
@@ -114,7 +143,7 @@ void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
 bool csUnloadLibrary (csLibraryHandle Handle)
 {
 #if defined(CS_EXTENSIVE_MEMDEBUG) && defined(COMP_VC)
-  // why not? - because the source file information
+  // Why not? - Because the source file information
   // for would leaked objects get lost
   return true;
 #else
