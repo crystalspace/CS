@@ -27,6 +27,11 @@ The history order has been reversed so that new features are at the top.
 	  texi2html to fail spectacularly.  This also had the unfortunate
 	  side-effect of crashing the automated Texinfo to HTML conversion.
 	  Also rewrapped ref2.txi to fit within 80-columns.
+	- Eric Sunshine fixed a nasty bug in the way DECLARE_IBASE_EXT() was
+	  used by csSector.  It was passed csSector as the parent class which
+	  resulted in method implementations which looped infinitely, such as
+	  "csSector::IncRef() { csSector::IncRef(); }".  Now properly passes
+	  in csPolygonSet as the parent class.
 27-Apr-2000
 	- Frank O'Connor updated VC project files for NetComm and
 	  the scfTutor apps (zoo, dog, worm).
