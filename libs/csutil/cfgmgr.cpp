@@ -29,16 +29,6 @@ public:
   int Pri;
   csConfigDomain *Prev, *Next;
 
-  csConfigDomain(iConfigFileNew *c, int p) {
-    Cfg = c;
-    if (Cfg) Cfg->IncRef();
-    Pri = p;
-    Prev = Next = NULL;
-  }
-  ~csConfigDomain() {
-    Remove();
-    if (Cfg) Cfg->DecRef();
-  }
   void InsertAfter(csConfigDomain *Where) {
     Next = Where->Next;
     Prev = Where;
@@ -57,6 +47,16 @@ public:
     if (Next) Next->Prev = Prev;
     if (Prev) Prev->Next = Next;
     Prev = Next = NULL;
+  }
+  csConfigDomain(iConfigFileNew *c, int p) {
+    Cfg = c;
+    if (Cfg) Cfg->IncRef();
+    Pri = p;
+    Prev = Next = NULL;
+  }
+  ~csConfigDomain() {
+    Remove();
+    if (Cfg) Cfg->DecRef();
   }
 };
 

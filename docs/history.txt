@@ -25,6 +25,10 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine changed next/csosdefs.h so that it only fakes up the
 	  strdup() function on OpenStep and NextStep.  It is no longer faked
 	  up for MacOS/X or MacOS/X Server 1.0 (Rhapsody).
+	- Eric Sunshine worked around a bug in the OpenStep compiler which was
+	  triggered by cfgmgr.cpp.  The problem is that the compiler creates
+	  unlinkable code when an inline method invokes a second inline method
+	  which the compiler has not yet seen.
 17-Feb-2001
 	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
 	  lib/cssys/beos/beos.mak.
