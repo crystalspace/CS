@@ -2676,7 +2676,7 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
 #ifdef DO_MMX
     case 4: value->v.b = scfParent->do_mmx; break;
 #endif
-    case 5: value->v.f = scfParent->texman->Gamma; break;
+    case 5: value->v.f = scfParent->Gamma / 65536.; break;
     case 6: value->v.b = scfParent->do_gouraud; break;
     case 7: value->v.b = scfParent->do_smaller_rendering; break;
     default: return false;
