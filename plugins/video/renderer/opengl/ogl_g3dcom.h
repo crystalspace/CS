@@ -173,6 +173,7 @@ public:
   }
 };
 
+#define OPENGL_KEYCOLOR_MIN_ALPHA	0.5f // alphafunc is disabled below this
 
 #define OPENGL_CLIP_AUTO		'a'	// Used for auto-detection.
 #define OPENGL_CLIP_NONE		'n'

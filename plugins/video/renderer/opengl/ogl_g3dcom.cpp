@@ -1824,10 +1824,11 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   if (m_renderstate.textured && txt_handle)
   {
     glEnable (GL_TEXTURE_2D);
-    if (txt_mm->GetKeyColor() && !(alpha < 0.8f))
+    if (txt_mm->GetKeyColor() && !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
     {
       glEnable (GL_ALPHA_TEST);
-      glAlphaFunc (GL_GEQUAL, 0.8);
+      glAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
+      SetupBlend (queue.mixmode, 1.0f, false);
     }
     else
     {
@@ -2124,7 +2125,11 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
   iTextureHandle *txt = poly.mat_handle?poly.mat_handle->GetTexture():NULL;
-  bool flatlighting = false;//(txt && txt->GetAlphaMap() && !txt->GetKeyColor() );
+  float alpha = ((poly.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)?
+    (poly.mixmode & CS_FX_MASK_ALPHA)/255.0f:1.0f;
+
+  bool flatlighting = (txt && txt->GetAlphaMap() && 
+    !(txt->GetKeyColor() && (alpha >= OPENGL_KEYCOLOR_MIN_ALPHA) ) );
 
   //========
   // First check if this polygon is different from the current polygons
@@ -2265,6 +2270,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   }
   if (flatlighting)
   {
+    queue.mixmode |= CS_FX_GOURAUD; 
+
     int ir = 255, ig = 255, ib = 255;
     if (lm) lm->GetMeanLighting(ir, ig, ib);
     float lgt_r = ir/128.0f, lgt_g = ig/128.0f, lgt_b = ib/128.0f;
@@ -2274,7 +2281,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
       *glcol++ = lgt_r;
       *glcol++ = lgt_g;
       *glcol++ = lgt_b;
-      *glcol++ = 1.0f;
+      *glcol++ = alpha;
     }
   }
 
@@ -5457,10 +5464,10 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glBindTexture (GL_TEXTURE_2D, texturehandle);
   float alpha = BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
-  if (txt_mm->GetKeyColor() && !(alpha < 0.8f))
+  if (txt_mm->GetKeyColor() && !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
   {
     glEnable (GL_ALPHA_TEST);
-    glAlphaFunc (GL_GEQUAL, 0.8);
+    glAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
   }
   if (ARB_texture_env_combine)
   {
