@@ -217,7 +217,7 @@ csTitleBar *csThemeWindow::GetTitleBar (csComponent *parent, const char *iTitle)
   return tb;
 }
 
-void csTheme::GetBorderSize (csComponent &comp, int FrameStyle, int &bw, int &bh)
+void csTheme::GetBorderSize (csComponent& /*comp*/, int FrameStyle, int &bw, int &bh)
 {
   switch (FrameStyle)
   {

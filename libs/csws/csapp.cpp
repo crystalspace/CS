@@ -98,8 +98,19 @@ bool csApp::csAppPlugIn::HandleEvent (iEvent &Event)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable:4355)
+//Avoid a warning about passing this before the constructor has been called
+#endif
+
 csApp::csApp (iSystem *SysDriver) : csComponent (NULL), scfiPlugIn (this)
 {
+
+#ifdef MSC_VER
+#pragma warning (pop)
+#endif
+
   app = this;			// so that all inserted windows will inherit it
   MouseOwner = NULL;		// no mouse owner
   KeyboardOwner = NULL;		// no keyboard owner
