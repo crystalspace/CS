@@ -13,18 +13,22 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 29-Feb-2000
-	- Norman Kramer fixed a divide by zero bug in glide.
-	- Fixed compilation bug in MazeD.
-	- Updated docs and source to remove dmipmap[123], dyncache,
-	  and subcache commands.
-	- Continued work on PVS. The basic things are all there but it
-	  is still very slow (using bad algorithm) and not working.
-	  So it is disabled right now.
+	- Norman Kramer fixed a divide by zero bug in Glide.
+	- Eric Sunshine fixed a compilation bug in MazeD.
+	- Updated docs and source to remove dmipmap[123], dyncache, and
+	  subcache commands.
+	- Continued work on PVS.  The basic things are all there but it is
+	  still very slow (using bad algorithm) and not working.  So it is
+	  disabled right now.
+	- Eric Sunshine fixed bugs in mdl2spr where it neglected to properly
+	  quote frame names in output file, which caused a parse error later
+	  on when CS tried loading the sprite if the sprite name contained
+	  whitespace.
 28-Feb-2000
-	- Michael Ewert did some more optimization work op csphyzik.
-	  At least another 2x speed increase overall.
-	- Norman Kramer did further fixes on the glide drivers.
-	  Line drawing works again too.
+	- Michael Ewert did some more optimization work op csphyzik.  At least
+	  another 2x speed increase overall.
+	- Norman Kramer did further fixes on the glide drivers.  Line drawing
+	  works again too.
 	- Eric Sunshine rewrote the endian-conversion functions in the BMP
 	  loader to work on platforms (such as Sparc and HPPA) which enforce
 	  strict-alignment.  On such platforms, it is illegal to attempt to
