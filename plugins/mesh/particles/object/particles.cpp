@@ -431,39 +431,29 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       sizeof (csVector2) * bufsize, CS_BUF_DYNAMIC,
       CS_BUFCOMP_FLOAT, 2);
     csVector2 *texcoords = new csVector2 [bufsize];
+    vertex_buffer->SetStride (sizeof(i_vertex));
+    color_buffer->SetStride (sizeof(i_vertex));
+    unsigned int *indices;
+    size_t indices_size;
     if (point_sprites)
     {
-      vertex_buffer->SetStride (sizeof(i_vertex));
-      color_buffer->SetStride (sizeof(i_vertex));
-
-      unsigned int *indices = new unsigned int[buffer_length];
+      indices_size = buffer_length;
+      indices = new unsigned int[indices_size];
       for (size_t i = 0; i < buffer_length; i++)
-      {
         indices[i] = (uint)i;
-      }
-      index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
-        sizeof (unsigned int) * buffer_length, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 0, bufsize - 1);
-      index_buffer->CopyToBuffer(indices, sizeof(unsigned int)*buffer_length);
-      delete [] indices;
     }
     else
     {
-      vertex_buffer->SetStride (sizeof(i_vertex));
-      color_buffer->SetStride (sizeof(i_vertex));
+      indices_size = buffer_length * 6;
       int i;
       for (i = 0; i < bufsize - 4; i += 4)
       {
-        texcoords[i].x = 0;
-        texcoords[i].y = 0;
-        texcoords[i+1].x = 0;
-        texcoords[i+1].y = 1;
-        texcoords[i+2].x = 1;
-        texcoords[i+2].y = 1;
-        texcoords[i+3].x = 1;
-        texcoords[i+3].y = 0;
+        texcoords[i].x = 0; texcoords[i].y = 0;
+        texcoords[i+1].x = 0; texcoords[i+1].y = 1;
+        texcoords[i+2].x = 1; texcoords[i+2].y = 1;
+        texcoords[i+3].x = 1; texcoords[i+3].y = 0;
       }
-      unsigned int *indices = new unsigned int[buffer_length * 6];
+      indices = new unsigned int[indices_size];
       int j;
       for (i = 0, j = 0; i < bufsize-4; i += 4, j += 6)
       {
@@ -476,13 +466,13 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
         indices[j+4] = i + 2;
         indices[j+5] = i + 3;
       }
-      index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
-        sizeof (unsigned int) * buffer_length * 6, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 0, bufsize - 1);
-      index_buffer->CopyToBuffer(
-        indices, sizeof(unsigned int) * buffer_length * 6);
-      delete [] indices;
     }
+    index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
+        sizeof (unsigned int) * indices_size, CS_BUF_STATIC,
+        CS_BUFCOMP_UNSIGNED_INT, 0, bufsize - 1);
+    index_buffer->CopyToBuffer(indices, sizeof(unsigned int)*indices_size);
+    delete [] indices;
+
     texcoord_buffer->CopyToBuffer (texcoords, sizeof(csVector2) * bufsize);
     delete [] texcoords;
   }

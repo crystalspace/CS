@@ -36,6 +36,13 @@ chronological order.
 	  make `GL' redundant, but on MacOS/X, we need the CS_OPENGL_PATH
 	  #define which comes from GL.CFLAGS in order to allow the preprocessor
 	  to locate the OpenGL headers.
+	- Jorrit implemented interleaved buffers for things. This means
+	  that vertices, texels, and lightmap coordinates are now in one
+	  interleaved buffer. This should improve memory usage considerably
+	  since a lot less VBO buffers will be created. This feature can
+	  be quickly reverted by setting INTERLEAVED to 0 in
+	  plugins/video/render3d/opengl/gl_polyrender.cpp.
+	- Jorrit did a small cleanup to particles mesh.
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections

@@ -126,21 +126,46 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       max_vc = MAX (max_vc, pvc);
     }
 
-    vertex_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
+#define INTERLEAVE 1
+#if INTERLEAVE
+    csRefArray<iRenderBuffer> buffers;
+    size_t compsize = sizeof (csVector3) + sizeof (csVector2)
+    	+ sizeof (csVector3);
+    int bufsize = num_verts * compsize;
+    parent->CreateInterleavedRenderBuffers (bufsize, CS_BUF_STATIC, 3, buffers);
+    vertex_buffer = buffers.Get (0);
+    vertex_buffer->SetOffset (0);
+    vertex_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
+    vertex_buffer->SetComponentCount (3);
+    vertex_buffer->SetStride (compsize);
+    texel_buffer = buffers.Get (1);
+    texel_buffer->SetOffset (sizeof(csVector3));
+    texel_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
+    texel_buffer->SetComponentCount (2);
+    texel_buffer->SetStride (compsize);
+    lmcoords_buffer = buffers.Get (2);
+    lmcoords_buffer->SetOffset (sizeof(csVector3) + sizeof(csVector2));
+    lmcoords_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
+    lmcoords_buffer->SetComponentCount (3);
+    lmcoords_buffer->SetStride (compsize);
+    float* interleaved_data = (float*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
+#else
+    vertex_buffer = parent->CreateRenderBuffer (num_verts*sizeof (csVector3), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    texel_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector2), 
+    texel_buffer = parent->CreateRenderBuffer (num_verts*sizeof (csVector2), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+    lmcoords_buffer = parent->CreateRenderBuffer (num_verts*sizeof (csVector2), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock(CS_BUF_LOCK_NORMAL);
+#endif
 
     index_buffer = parent->CreateIndexRenderBuffer (num_indices  * sizeof (int), 
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, num_verts - 1);
     int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-    lmcoords_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector2), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     int vindex = 0, iindex = 0;
     indexStart = rbIndexStart = iindex;
@@ -209,12 +234,24 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       {
         int vidx = static_data->vertices[j];
         const csVector3& vertex = obj_verts[vidx];
+#if INTERLEAVE
+	*interleaved_data++ = vertex.x;
+	*interleaved_data++ = vertex.y;
+	*interleaved_data++ = vertex.z;
+        csVector3 t = object2texture.Other2This (vertex);
+	*interleaved_data++ = t.x;
+	*interleaved_data++ = t.y;
+        csVector3 l = tex2lm.Other2This (t);
+	*interleaved_data++ = l.x;
+	*interleaved_data++ = l.y;
+	*interleaved_data++ = l.z;
+#else
         *vertices++ = vertex;
-
         csVector3 t = object2texture.Other2This (vertex);
         *texels++ = csVector2 (t.x, t.y);
         csVector3 l = tex2lm.Other2This (t);
         *lmcoords++ = csVector2 (l.x, l.y);
+#endif
 
         pvIndices[j] = vindex++;
       }
@@ -242,9 +279,11 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   }
 
   index_buffer->Release ();
-  texel_buffer->Release ();
   vertex_buffer->Release ();
+#if !INTERLEAVE
+  texel_buffer->Release ();
   lmcoords_buffer->Release ();
+#endif
 }
 
 
