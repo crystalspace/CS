@@ -28,6 +28,11 @@ chronological order.
 	  csRef's are not cleared yet at that point)
 	- Steven Geens removed the include to iutil/fontserv.h from 
 	  include/cstool/initapp.h.
+	- res reverted Jorrit's reversion of the Free() removal. Added a note
+	  to the source explaining why calling DestroyApplication() in the
+	  csApplicationFramework destructor is legal.
+	- res fixed include/cstool/initapp.h to correctly #include 
+	  ivideo/fontserv.h.
 10-May-2004
 	- Jorrit added a missing file in the new 3dsmax exporter from Luca
 	  Pancallo. Now it should work.

@@ -34,81 +34,79 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivaria/reporter.h"
 
 /**
-* Application framework class.
-* \remarks
-* This class provides a handy object-oriented wrapper around the Crystal Space
-* initialization and start-up functions. It encapsulates a callback paradigm
-* which provides methods such as OnInitialize() and OnExit() which you can
-* override to customize the framework's behavior. You should also consider
-* using csBaseEventHandler (csutil/csbaseeventh.h), which provides the same
-* sort of object-oriented wrapper for the Crystal Space event mechanism;
-* providing methods such as OnMouseClick(), OnKeyboard(), OnBroadcast(), etc.
-* \par
-* In order to properly use this class, you must derive your own class from it,
-* providing a constructor and implementation for the OnInitialize() and
-* Application() methods. You may only have one csApplicationFramework derived
-* object in existence at any time (and generally, you will only have one such
-* object in your application).  In your source code create a global instance of
-* the overridden object, as follows:
-*
-* \code
-* //--------------------------
-* // Example.h
-* class MyApp : public csApplicationFramework
-* {
-* public:
-*   MyApp();
-*   virtual bool OnInitialize();
-*   virtual bool Application();
-* };
-*
-* //--------------------------
-* // Example.cpp
-* // File scope
-*
-* MyApp::MyApp() : csApplicationFramework()
-* {
-*   SetApplicationName ("my.example.app");
-* }
-*
-* MyApp::OnIntialize()
-* {
-*   // Request plugins, initialize any global non-CS data and structures
-*   return true;
-* }
-* 
-* MyApp::Application()
-* {
-*   // Perform initialization of CS data and structures, set event handler,
-*   // load world, etc.
-*
-*   if (!Open())
-*     return false;
-*
-*   Run();
-*   return true;
-* }
-* 
-* //--------------------------
-* // main.cpp
-* CS_IMPLEMENT_APPLICATION
-* 
-* int main (int argc, char* argv[]) 
-* {
-*   MyApp* myApp = new MyApp();
-*   int result = myApp->Main (argc, argv);
-*   myApp->Free ();
-*   return result;
-* }
-* \endcode
-* \par
-* csApplicationFramework itself is derived from csInitializer for convenience,
-* allowing overridden members to call csInitializer methods without qualifying
-* them with csInitializer::.
-* \par
-* This class is not related to csApp or any other class from the deprecated
-* CSWS library.
-*/
+ * Application framework class.
+ * \remarks
+ * This class provides a handy object-oriented wrapper around the Crystal Space
+ * initialization and start-up functions. It encapsulates a callback paradigm
+ * which provides methods such as OnInitialize() and OnExit() which you can
+ * override to customize the framework's behavior. You should also consider
+ * using csBaseEventHandler (csutil/csbaseeventh.h), which provides the same
+ * sort of object-oriented wrapper for the Crystal Space event mechanism;
+ * providing methods such as OnMouseClick(), OnKeyboard(), OnBroadcast(), etc.
+ * \par
+ * In order to properly use this class, you must derive your own class from it,
+ * providing a constructor and implementation for the OnInitialize() and
+ * Application() methods. You may only have one csApplicationFramework derived
+ * object in existence at any time (and generally, you will only have one such
+ * object in your application).  In your source code create a global instance of
+ * the overridden object, as follows:
+ *
+ * \code
+ * //--------------------------
+ * // Example.h
+ * class MyApp : public csApplicationFramework
+ * {
+ * public:
+ *   MyApp();
+ *   virtual bool OnInitialize();
+ *   virtual bool Application();
+ * };
+ *
+ * //--------------------------
+ * // Example.cpp
+ * // File scope
+ *
+ * MyApp::MyApp() : csApplicationFramework()
+ * {
+ *   SetApplicationName ("my.example.app");
+ * }
+ *
+ * MyApp::OnIntialize()
+ * {
+ *   // Request plugins, initialize any global non-CS data and structures
+ *   return true;
+ * }
+ * 
+ * MyApp::Application()
+ * {
+ *   // Perform initialization of CS data and structures, set event handler,
+ *   // load world, etc.
+ *
+ *   if (!Open())
+ *     return false;
+ *
+ *   Run();
+ *   return true;
+ * }
+ * 
+ * //--------------------------
+ * // main.cpp
+ * CS_IMPLEMENT_APPLICATION
+ * 
+ * int main (int argc, char* argv[]) 
+ * {
+ *   MyApp myApp;
+ *   return myApp.Main (argc, argv);
+ * }
+ * \endcode
+ * \par
+ * csApplicationFramework itself is derived from csInitializer for convenience,
+ * allowing overridden members to call csInitializer methods without qualifying
+ * them with csInitializer::.
+ * \par
+ * This class is not related to csApp or any other class from the deprecated
+ * CSWS library.
+ */
 class CS_CSTOOL_EXPORT csApplicationFramework : public csInitializer
 {
 private:
@@ -153,12 +151,6 @@ protected:
    */
   csApplicationFramework ();
 
-  /**
-   * Destructor
-   * \remarks Protected to force usage of Free().
-   */
-  virtual ~csApplicationFramework ();
-
   /**\internal
    * Initialize the csApplicationFramework class.
    * \param argc number of arguments passed on the command line
@@ -195,20 +187,13 @@ protected:
    */
   static void End ();
 public:
-
   /**
-   * Free the instance of the application object.
-   * 'delete' shouldn't be used as certain tasks should be done *after* the
-   * destruction of the application class. Namely, DestroyApplication(). The
-   * application object could still keep references to interfaces, all of 
-   * which should be released before calling DestroyApplication(). So this
-   * method destroys the application object and then calls 
-   * DestroyApplication().
+   * Destructor
    */
-  void Free ();
+  virtual ~csApplicationFramework ();
 
   /**
-   * Quit running the appliation.
+   * Quit running the application.
    * \remarks
    * This function will send a cscmdQuit event through the event queue. If no
    * queue has been initialized, then it will terminate the program with an

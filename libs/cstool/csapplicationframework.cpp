@@ -43,7 +43,21 @@ csApplicationFramework::csApplicationFramework ()
 
 csApplicationFramework::~csApplicationFramework ()
 {
+  /*
+    On first sight, calling DestroyApplication() here may look fishy. After
+    all, before DestroyApplication() is called, all csRef<>s an application has
+    have to be cleared, but you may wonder, "is that the case here?"
+
+    Yes, it is. The order of destruction is first subclass (ie the application
+    class, derived from csApplicationFramework) and then the superclass 
+    (csApplicationFramework itself). All the subclasses csRef<>s are cleared in
+    the it's destructor, after that the csApplicationFramework destructor is
+    called, and csApplicationFramework itself has no csRef<>s. So it's safe to
+    call DestroyApplication() here.
+   */
+  DestroyApplication (object_reg);
   m_Ptr = 0;
+  object_reg = 0;
 }
 
 
@@ -57,15 +71,6 @@ void csApplicationFramework::End ()
 {
   CS_ASSERT (0 != m_Ptr);
   m_Ptr->OnExit ();
-}
-
-void csApplicationFramework::Free ()
-{
-  iObjectRegistry* object_reg = csApplicationFramework::object_reg;
-  delete this;
-  // Calling DestroyApplication is okay - it's static
-  DestroyApplication (object_reg);
-  object_reg = 0;
 }
 
 void csApplicationFramework::OnExit ()

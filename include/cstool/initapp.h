@@ -43,6 +43,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/fontserv.h"
 
 struct iObjectRegistry;
 struct iEvent;
