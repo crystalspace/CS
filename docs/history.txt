@@ -25,6 +25,10 @@ The history order has been reversed so that new features are at the top.
 	- Added csWorld parameter to csCollection constructor.
 	- Fixed a bug in csWorld::RemoveSky.
 	- Added csWorld::UnlinkCollection and csWorld::RemoveCollection.
+	- Eric Sunshine worked around an instruction scheduling optimization
+	  bug in the MacOS/X Server compiler for PowerPC (Macintosh hardware).
+	  This bug was triggered by code in edgeclip.inc and would cause the
+	  compiler, itself, to hang indefinitely while compiling polyclip.cpp.
 29-Aug-2000
 	- Integrated a new SDL canvas made by George Yohng
 	  <cspace@mmts.nsys.by>.
@@ -1331,14 +1335,15 @@ The history order has been reversed so that new features are at the top.
 	  textured and has FX_ALPHA set but no vertex colors -> boom, now it
 	  uses flatcolor (1.0) + m_alpha.
 	- Samuel Humphreys did the following:
-            - Hand merged relevant parts of Mike Bonds patch into the 
-              glx2d/x2d/linex2d drivers. Bar the resizing and change of variable 
-              names the rest of it had been already fixed last weekend.
-            - Resizing still crashed after patch with x2d. I have partly fixed 
-              this, dtsimple doesnt crash out but gets weird zbuffery like 
-              artifacts, but walktest does...investigating :) 
-            - Walkest now responds to resizing events, so doesnt crash out anymore
-              on resizing.
+            - Hand merged relevant parts of Mike Bonds patch into the
+              glx2d/x2d/linex2d drivers.  Bar the resizing and change of
+              variable names the rest of it had been already fixed last
+              weekend.
+            - Resizing still crashed after patch with x2d.  I have partly
+              fixed this, dtsimple doesnt crash out but gets weird zbuffery
+              like artifacts, but walktest does...investigating :)
+            - Walkest now responds to resizing events, so doesnt crash out
+              anymore on resizing.
 	- Fixed bug in embedded iPolygonMesh in csSprite3D.
 	- Fixed a bug in the rapid CD plugin.
 	- Fixed bug in WalkTest so that walking through CD enabled portals
@@ -1826,26 +1831,28 @@ The history order has been reversed so that new features are at the top.
 	  systems.
 16-Jul-2000
 	- Samuel Humphreys did the following changes..
-            - Added two new procedural textures to dtsimple. This is to complete
-              dtsimple as a test suite for all the current procedural texture 
-              implementations and flags. If you enable both test1 and test2 then
-              all the procedural textures get printed to the screen with DrawPixmap
-              as this uses a different rendering pathway than DrawPixmap to the 
-              texture. These changes highlighted a fundamental bug in the 
-              implementations within the software driver.
-            - Fixed all known bugs in the software and opengl implementations of
-              procedural textures. Cleaned up the code, things are looking much
-              better now, and I don't anticipate needing any further overhauls.
-              Three features remain to be done: mip mapping and the ability to 
-              update sub rectangles of the texture buffer. These changes will be
-              propagated up into the mip map as subrectangles also. Lastly the
-              flag CS_TEXTURE_PROC_MIPMAP_ON_SYNC needs to be implemented.
-	      Then a few optimisations...
-            - Changed the metaball texture so instead of clearing the screen, it
-              prints the bot_view texture as a background...this gives an 
-              unexpected but IMHO seriously cool effect. Check it out :)
-            - Removed the opengl 16bit procedural texture pathway for now. As its
-              very slow on my machine.
+            - Added two new procedural textures to dtsimple.  This is to
+              complete dtsimple as a test suite for all the current procedural
+              texture implementations and flags.  If you enable both test1 and
+              test2 then all the procedural textures get printed to the screen
+              with DrawPixmap as this uses a different rendering pathway than
+              DrawPixmap to the texture.  These changes highlighted a
+              fundamental bug in the implementations within the software
+              driver.
+            - Fixed all known bugs in the software and opengl implementations
+              of procedural textures.  Cleaned up the code, things are looking
+              much better now, and I don't anticipate needing any further
+              overhauls.  Three features remain to be done: mip mapping and
+              the ability to update sub rectangles of the texture buffer.
+              These changes will be propagated up into the mip map as
+              subrectangles also.  Lastly the flag
+              CS_TEXTURE_PROC_MIPMAP_ON_SYNC needs to be implemented.  Then a
+              few optimisations...
+            - Changed the metaball texture so instead of clearing the screen,
+              it prints the bot_view texture as a background...this gives an
+              unexpected but IMHO seriously cool effect.  Check it out :)
+            - Removed the opengl 16bit procedural texture pathway for now.  As
+              its very slow on my machine.
 	    - Added some emacs fontification friendly comments to .inc files
 15-Jul-2000
 	- Wyatt Miler updated the Macintosh project files.
@@ -1961,34 +1968,36 @@ The history order has been reversed so that new features are at the top.
 	- Samuel Humphreys did the following changes:
 	    - Fixed bug in software drivers where if the viewing rectangle was
               set to the window co-ordinates, polys where being unnecessarily
-              clipped. When the clipper clips to x=0,y=0 double precision
-              calculations on occasion gave slight negative values. The software
-              drivers silently rejected these polys. I have added an EPSILON
-              fuzz so vertex +/- EPSILON is tested instead. I notice that the 
-              draw fog polygon member doesnt test at all for the cases where
-              vertices exceed screen dimensions, perhaps its safe now to do away
-              with these tests altogether?
+              clipped.  When the clipper clips to x=0,y=0 double precision
+              calculations on occasion gave slight negative values.  The
+              software drivers silently rejected these polys.  I have added an
+              EPSILON fuzz so vertex +/- EPSILON is tested instead.  I notice
+              that the draw fog polygon member doesnt test at all for the
+              cases where vertices exceed screen dimensions, perhaps its safe
+              now to do away with these tests altogether?
 10-Jul-2000
 	- Samuel Humphreys did the following changes:
             - Added messages to distinguish between backbuffer and software GL
               implementations
             - Cleared out debugging junk I left in.
             - Adjusted Zbuffer clear...
-            - Added new Clear (RGBPixel &colour) function to csImageMemory. This 
-              clears the image to the specified colour.
-	    - Implemented new procedural texture flag: CS_TEXTURE_PROC_PERSISTENT
-              This has been implemented for opengl backbuffer & software versions
-	      aswell as the pure software drivers...see documentation for further
-              details. Only mip-mapping to deal with now.
+            - Added new Clear (RGBPixel &colour) function to csImageMemory.
+              This clears the image to the specified colour.
+	    - Implemented new procedural texture flag:
+              CS_TEXTURE_PROC_PERSISTENT This has been implemented for opengl
+              backbuffer & software versions aswell as the pure software
+              drivers...see documentation for further details.  Only
+              mip-mapping to deal with now.
             - Fixed the software 32bit RGB transpositions problem, I think :)
-              32bit software procedural colours should now be correct. Please 
+              32bit software procedural colours should now be correct.  Please
               people on big endian machines check this!!
-            - Optimised the GL back buffer implementation so it now clears Zbuffer
-              and/or screen with QUADS rather than the whole screen ;).
+            - Optimised the GL back buffer implementation so it now clears
+              Zbuffer and/or screen with QUADS rather than the whole screen.
             - Fixed the garbling which occured on the first frame in opengl.
-            - Various changes to dtsimple. Currently the meta balls texture is 
-              set to be persistent over the top of the squawk background, so the 
-              metaballs smear over the texture rather than being cleared each frame
+            - Various changes to dtsimple.  Currently the meta balls texture
+              is set to be persistent over the top of the squawk background,
+              so the metaballs smear over the texture rather than being
+              cleared each frame
 	- Extended csObject::GetIterator() with a new parameter that indicates
 	  if you want to iterate over derived objects as well. Normally
 	  the iterator that is returned only iterates over the objects of
@@ -2017,27 +2026,29 @@ The history order has been reversed so that new features are at the top.
 	  is the location of the hinge.
 8-Jul-2000
         - Samuel Humphreys did the following changes:
-            - Fixed the opengl back buffer procedural texture so it now displays
-              curves and sprites non-inverted. The back buffer uses an inverted
-              orthographic projection matrix, which was being overwritten by the
-              DrawTriangleMesh routine.
-            - Added emacs friendly comments that these .inc files are really C++
-              files.
-            - Fixed a bug in the shared initialisation and open routines in the 
-              opengl renderer, the backbuffer proc texture looks much better.
+            - Fixed the opengl back buffer procedural texture so it now
+              displays curves and sprites non-inverted.  The back buffer uses
+              an inverted orthographic projection matrix, which was being
+              overwritten by the DrawTriangleMesh routine.
+            - Added emacs friendly comments that these .inc files are really
+              C++ files.
+            - Fixed a bug in the shared initialisation and open routines in
+              the opengl renderer, the backbuffer proc texture looks much
+              better.
             - Cleaned up a little the shared initialisation and open routines
               in the software renderer
-            - Upped the res on the level_texture, and changed the start position 
-              to look at it
-            - The shared open code in the software driver now properly sets the 
-              z_buf_mode variable
-            - Cleaned out all the csCamera->SetPerspective calls from the engine..
-              its now the app writers responsibility to update the camera on
-              context resize events.
-            - Added preliminary documentation for the procedural texture subsystem.
+            - Upped the res on the level_texture, and changed the start
+              position to look at it
+            - The shared open code in the software driver now properly sets
+              the z_buf_mode variable
+            - Cleaned out all the csCamera->SetPerspective calls from the
+              engine..  its now the app writers responsibility to update the
+              camera on context resize events.
+            - Added preliminary documentation for the procedural texture
+              subsystem.
             - Small corrections to some txi files.
-            - Added new flags to itxtmgr which I have written documentation for.
-              Now all I need to do is write the code for it :)
+            - Added new flags to itxtmgr which I have written documentation
+              for.  Now all I need to do is write the code for it :)
 	- Seth Galbraith did some fixes to some of the DOS setup scripts.
 7-Jul-2000
 	- Moved alpha setting from portals to polygons. In most cases this
@@ -2054,22 +2065,23 @@ The history order has been reversed so that new features are at the top.
 	- Samuel Humphreys did the following changes:
             - Removed indentation from bin/dosupd.bat..hope the unix eol stuff
               doesnt break it entirely.
-            - Added the last procedural texture. Now you can watch levels on the 
-              wall. Just execute 'dtsimple flarge' to see flarge. To navigate
-              hold down the control key while cursoring around.
-            - Added a method to LanguageLayer to allow delaying of setting of 
-              camera. This will also allow one to change the camera.
+            - Added the last procedural texture.  Now you can watch levels on
+              the wall.  Just execute 'dtsimple flarge' to see flarge.  To
+              navigate hold down the control key while cursoring around.
+            - Added a method to LanguageLayer to allow delaying of setting of
+              camera.  This will also allow one to change the camera.
             - #ifdefed with OPENGL_1_2 the GL_UNSIGNED_SHORT_5_6_5 data type,
-              which Mesa supports but windows doesn't. The native 16bit display
-              path for procedural textures now works again.
-            - Added a temporary box to the top left corner of dtsimple which should
-              be the same colour which proc textures clear to...this is for 
-              testing...
-            - Clumsily fixed the problem with the 32bit software procedural 
-              textures. From canvas/common/protex2d.cpp:197 I have added byte
-              shuffle code which probably isn't the best way to do it, and 
-              probably not correct for all endianness and frame buffer pixel types.
-              Hopefully Eric or AndyZ will take a look and do it properly :)
+              which Mesa supports but windows doesn't.  The native 16bit
+              display path for procedural textures now works again.
+            - Added a temporary box to the top left corner of dtsimple which
+              should be the same colour which proc textures clear to...this is
+              for testing...
+            - Clumsily fixed the problem with the 32bit software procedural
+              textures.  From canvas/common/protex2d.cpp:197 I have added byte
+              shuffle code which probably isn't the best way to do it, and
+              probably not correct for all endianness and frame buffer pixel
+              types.  Hopefully Eric or AndyZ will take a look and do it
+              properly :)
             - The portal procedural texture now correctly appears.
             - Cleaned up proc texture detection in sftcom3d.cpp.
             - Added more comments to remind myself what Ive done.

@@ -1,6 +1,6 @@
 #==============================================================================
 #
-#	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+#	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # The contents of this file are copyrighted by Eric Sunshine.  This work is
 # distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -14,7 +14,7 @@
 #
 #	Build-time configuration options for the MacOS/X Server platform.
 #
-# *NOTE*
+# BUG *1*
 #	The MacOS/X Server Objective-C++ compiler has a register allocation
 #	bug which causes it to corrupt the virtual-table pointer of classes
 #	whose parent class (and sometimes parent's parent class) have very
@@ -26,9 +26,20 @@
 #	minimal optimization (-O) and force use of inline functions
 #	(-finline-functions) when compiling for debug.
 #
-# *NOTE*
-#	The $(subst) calls in DO.MAKE.VOLATILE work around a bug in GNU make
-#	on MacOS/X Server.  Specifically, make corrupts MAKE_VOLATILE_H (and
+# BUG *2*
+#	The MacOS/X Server Objective-C++ PowerPC compiler has an instruction
+#	scheduling optimization bug which causes it (the compiler) to hang
+#	indefinitely when compiling libs/csgeom/polyclip.cpp.  Specifically,
+#	the compiler chokes on the very first conditional statement which
+#	appears within the master loop in edgeclip.inc; which is included by
+#	boxclip.inc, which in turn is included by polyclip.cpp.  The actual
+#	buggy optimization is 'schedule-insns2', thus we must disable it.
+#	Since this optimization is typically enabled by '-O2', we only need to
+#	disable it manually in NEXT.CFLAGS.OPTIMIZE; not in NEXT.CFLAGS.DEBUG.
+#
+# BUG *3*
+#	The $(subst) calls in DO.MAKE.VOLATILE work around a bug in GNU 'make'
+#	on MacOS/X Server.  Specifically, 'make' corrupts MAKE_VOLATILE_H (and
 #	probably other variables) by truncating values which are appended to
 #	it with +=.  In this case we see instances of volatile.t and
 #	volatile.tm, which is clearly incorrect.  To work around the problem,
@@ -46,8 +57,8 @@ NEXT.ARCHS=i386 ppc
 NEXT.SOURCE_DIRS=macosxs openstep
 NEXT.INCLUDE_DIRS=-FAppKit -FFoundation
 NEXT.CFLAGS.GENERAL=-Wmost
-NEXT.CFLAGS.OPTIMIZE=-O4 -finline-functions
-NEXT.CFLAGS.DEBUG=-finline-functions -O
+NEXT.CFLAGS.OPTIMIZE=-O3 -finline-functions -fno-schedule-insns2
+NEXT.CFLAGS.DEBUG=-O -finline-functions
 NEXT.CFLAGS.DLL=
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
