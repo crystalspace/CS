@@ -29,11 +29,8 @@
  
  */
 
-
 #ifndef __CS_GLEXTENSIONMANAGER_H__
 #define __CS_GLEXTENSIONMANAGER_H__
-
-
 
 /**********************************************************************
  * Begin system-specific stuff.
@@ -62,9 +59,12 @@
 #    define GLAPIENTRY __stdcall
 #  else
 /* non-Windows compilation */
-//#    define GLAPI extern
-#    define GLAPI
-#    define GLAPIENTRY
+/* In most cases, it seems safest to avoid defining these at all. Please report
+ *  if this causes trouble.
+ * #define GLAPI extern
+ * #define GLAPI
+ * #define GLAPIENTRY
+ */
 #  endif /* WIN32 / CYGWIN bracket */
 #endif
 

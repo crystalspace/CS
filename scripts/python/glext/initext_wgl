@@ -2,6 +2,7 @@
   void Init%Name% (HDC hDC)
   {
     if (tested_CS_%Name%) return;
+    if (!extstrWGL) return;
     tested_CS_%Name% = true;
     const char* ext = "%Name%";
     char cfgkey[%Cfglen% + %Namelen% + 1];

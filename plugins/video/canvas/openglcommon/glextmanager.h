@@ -33,11 +33,8 @@
  
  */
 
-
 #ifndef __CS_GLEXTENSIONMANAGER_H__
 #define __CS_GLEXTENSIONMANAGER_H__
-
-
 
 /**********************************************************************
  * Begin system-specific stuff.
@@ -66,12 +63,12 @@
 #    define GLAPIENTRY __stdcall
 #  else
 /* non-Windows compilation */
-/** best is not to define this stuff at all, if this produces problems somewhere
- * please complain!
+/* In most cases, it seems safest to avoid defining these at all. Please report
+ *  if this causes trouble.
+ * #define GLAPI extern
+ * #define GLAPI
+ * #define GLAPIENTRY
  */
-//#    define GLAPI extern
-//#    define GLAPI
-//#    define GLAPIENTRY
 #  endif /* WIN32 / CYGWIN bracket */
 #endif
 
@@ -12857,6 +12854,7 @@ public:
   void InitGL_version_1_2 ()
   {
     if (tested_CS_GL_version_1_2) return;
+    if (!extstrGL) return;
     tested_CS_GL_version_1_2 = true;
     const char* ext = "GL_version_1_2";
     char cfgkey[26 + 14 + 1];
@@ -12886,6 +12884,7 @@ public:
   void InitGL_version_1_3 ()
   {
     if (tested_CS_GL_version_1_3) return;
+    if (!extstrGL) return;
     tested_CS_GL_version_1_3 = true;
     const char* ext = "GL_version_1_3";
     char cfgkey[26 + 14 + 1];
@@ -12957,6 +12956,7 @@ public:
   void InitGL_ARB_imaging ()
   {
     if (tested_CS_GL_ARB_imaging) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_imaging = true;
     const char* ext = "GL_ARB_imaging";
     char cfgkey[26 + 14 + 1];
@@ -13016,6 +13016,7 @@ public:
   void InitGL_ARB_multitexture ()
   {
     if (tested_CS_GL_ARB_multitexture) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_multitexture = true;
     const char* ext = "GL_ARB_multitexture";
     char cfgkey[26 + 19 + 1];
@@ -13075,6 +13076,7 @@ public:
   void InitGL_ARB_transpose_matrix ()
   {
     if (tested_CS_GL_ARB_transpose_matrix) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_transpose_matrix = true;
     const char* ext = "GL_ARB_transpose_matrix";
     char cfgkey[26 + 23 + 1];
@@ -13104,6 +13106,7 @@ public:
   void InitGL_ARB_multisample ()
   {
     if (tested_CS_GL_ARB_multisample) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_multisample = true;
     const char* ext = "GL_ARB_multisample";
     char cfgkey[26 + 18 + 1];
@@ -13130,6 +13133,7 @@ public:
   void InitGL_ARB_texture_env_add ()
   {
     if (tested_CS_GL_ARB_texture_env_add) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_add = true;
     const char* ext = "GL_ARB_texture_env_add";
     char cfgkey[26 + 22 + 1];
@@ -13156,6 +13160,7 @@ public:
   void InitWGL_ARB_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_ARB_extensions_string) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_ARB_extensions_string = true;
     const char* ext = "WGL_ARB_extensions_string";
     char cfgkey[26 + 25 + 1];
@@ -13185,6 +13190,7 @@ public:
   void InitWGL_ARB_buffer_region (HDC hDC)
   {
     if (tested_CS_WGL_ARB_buffer_region) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_ARB_buffer_region = true;
     const char* ext = "WGL_ARB_buffer_region";
     char cfgkey[26 + 21 + 1];
@@ -13217,6 +13223,7 @@ public:
   void InitGL_ARB_texture_cube_map ()
   {
     if (tested_CS_GL_ARB_texture_cube_map) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_cube_map = true;
     const char* ext = "GL_ARB_texture_cube_map";
     char cfgkey[26 + 23 + 1];
@@ -13242,6 +13249,7 @@ public:
   void InitGL_ARB_depth_texture ()
   {
     if (tested_CS_GL_ARB_depth_texture) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_depth_texture = true;
     const char* ext = "GL_ARB_depth_texture";
     char cfgkey[26 + 20 + 1];
@@ -13267,6 +13275,7 @@ public:
   void InitGL_ARB_point_parameters ()
   {
     if (tested_CS_GL_ARB_point_parameters) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_point_parameters = true;
     const char* ext = "GL_ARB_point_parameters";
     char cfgkey[26 + 23 + 1];
@@ -13294,6 +13303,7 @@ public:
   void InitGL_ARB_shadow ()
   {
     if (tested_CS_GL_ARB_shadow) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_shadow = true;
     const char* ext = "GL_ARB_shadow";
     char cfgkey[26 + 13 + 1];
@@ -13319,6 +13329,7 @@ public:
   void InitGL_ARB_shadow_ambient ()
   {
     if (tested_CS_GL_ARB_shadow_ambient) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_shadow_ambient = true;
     const char* ext = "GL_ARB_shadow_ambient";
     char cfgkey[26 + 21 + 1];
@@ -13344,6 +13355,7 @@ public:
   void InitGL_ARB_texture_border_clamp ()
   {
     if (tested_CS_GL_ARB_texture_border_clamp) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_border_clamp = true;
     const char* ext = "GL_ARB_texture_border_clamp";
     char cfgkey[26 + 27 + 1];
@@ -13369,6 +13381,7 @@ public:
   void InitGL_ARB_texture_compression ()
   {
     if (tested_CS_GL_ARB_texture_compression) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_compression = true;
     const char* ext = "GL_ARB_texture_compression";
     char cfgkey[26 + 26 + 1];
@@ -13401,6 +13414,7 @@ public:
   void InitGL_ARB_texture_env_combine ()
   {
     if (tested_CS_GL_ARB_texture_env_combine) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_combine = true;
     const char* ext = "GL_ARB_texture_env_combine";
     char cfgkey[26 + 26 + 1];
@@ -13426,6 +13440,7 @@ public:
   void InitGL_ARB_texture_env_crossbar ()
   {
     if (tested_CS_GL_ARB_texture_env_crossbar) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_crossbar = true;
     const char* ext = "GL_ARB_texture_env_crossbar";
     char cfgkey[26 + 27 + 1];
@@ -13451,6 +13466,7 @@ public:
   void InitGL_ARB_texture_env_dot3 ()
   {
     if (tested_CS_GL_ARB_texture_env_dot3) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_dot3 = true;
     const char* ext = "GL_ARB_texture_env_dot3";
     char cfgkey[26 + 23 + 1];
@@ -13476,6 +13492,7 @@ public:
   void InitGL_ARB_texture_mirrored_repeat ()
   {
     if (tested_CS_GL_ARB_texture_mirrored_repeat) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_mirrored_repeat = true;
     const char* ext = "GL_ARB_texture_mirrored_repeat";
     char cfgkey[26 + 30 + 1];
@@ -13501,6 +13518,7 @@ public:
   void InitGL_ARB_vertex_blend ()
   {
     if (tested_CS_GL_ARB_vertex_blend) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_blend = true;
     const char* ext = "GL_ARB_vertex_blend";
     char cfgkey[26 + 19 + 1];
@@ -13537,6 +13555,7 @@ public:
   void InitGL_ARB_vertex_program ()
   {
     if (tested_CS_GL_ARB_vertex_program) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_program = true;
     const char* ext = "GL_ARB_vertex_program";
     char cfgkey[26 + 21 + 1];
@@ -13624,6 +13643,7 @@ public:
   void InitGL_ARB_window_pos ()
   {
     if (tested_CS_GL_ARB_window_pos) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_window_pos = true;
     const char* ext = "GL_ARB_window_pos";
     char cfgkey[26 + 17 + 1];
@@ -13665,6 +13685,7 @@ public:
   void InitGL_EXT_422_pixels ()
   {
     if (tested_CS_GL_EXT_422_pixels) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_422_pixels = true;
     const char* ext = "GL_EXT_422_pixels";
     char cfgkey[26 + 17 + 1];
@@ -13690,6 +13711,7 @@ public:
   void InitGL_EXT_abgr ()
   {
     if (tested_CS_GL_EXT_abgr) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_abgr = true;
     const char* ext = "GL_EXT_abgr";
     char cfgkey[26 + 11 + 1];
@@ -13715,6 +13737,7 @@ public:
   void InitGL_EXT_bgra ()
   {
     if (tested_CS_GL_EXT_bgra) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_bgra = true;
     const char* ext = "GL_EXT_bgra";
     char cfgkey[26 + 11 + 1];
@@ -13740,6 +13763,7 @@ public:
   void InitGL_EXT_blend_color ()
   {
     if (tested_CS_GL_EXT_blend_color) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_blend_color = true;
     const char* ext = "GL_EXT_blend_color";
     char cfgkey[26 + 18 + 1];
@@ -13766,6 +13790,7 @@ public:
   void InitGL_EXT_blend_func_separate ()
   {
     if (tested_CS_GL_EXT_blend_func_separate) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_blend_func_separate = true;
     const char* ext = "GL_EXT_blend_func_separate";
     char cfgkey[26 + 26 + 1];
@@ -13792,6 +13817,7 @@ public:
   void InitGL_EXT_blend_logic_op ()
   {
     if (tested_CS_GL_EXT_blend_logic_op) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_blend_logic_op = true;
     const char* ext = "GL_EXT_blend_logic_op";
     char cfgkey[26 + 21 + 1];
@@ -13817,6 +13843,7 @@ public:
   void InitGL_EXT_blend_minmax ()
   {
     if (tested_CS_GL_EXT_blend_minmax) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_blend_minmax = true;
     const char* ext = "GL_EXT_blend_minmax";
     char cfgkey[26 + 19 + 1];
@@ -13843,6 +13870,7 @@ public:
   void InitGL_EXT_blend_subtract ()
   {
     if (tested_CS_GL_EXT_blend_subtract) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_blend_subtract = true;
     const char* ext = "GL_EXT_blend_subtract";
     char cfgkey[26 + 21 + 1];
@@ -13868,6 +13896,7 @@ public:
   void InitGL_EXT_clip_volume_hint ()
   {
     if (tested_CS_GL_EXT_clip_volume_hint) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_clip_volume_hint = true;
     const char* ext = "GL_EXT_clip_volume_hint";
     char cfgkey[26 + 23 + 1];
@@ -13893,6 +13922,7 @@ public:
   void InitGL_EXT_color_subtable ()
   {
     if (tested_CS_GL_EXT_color_subtable) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_color_subtable = true;
     const char* ext = "GL_EXT_color_subtable";
     char cfgkey[26 + 21 + 1];
@@ -13920,6 +13950,7 @@ public:
   void InitGL_EXT_compiled_vertex_array ()
   {
     if (tested_CS_GL_EXT_compiled_vertex_array) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_compiled_vertex_array = true;
     const char* ext = "GL_EXT_compiled_vertex_array";
     char cfgkey[26 + 28 + 1];
@@ -13947,6 +13978,7 @@ public:
   void InitGL_EXT_convolution ()
   {
     if (tested_CS_GL_EXT_convolution) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_convolution = true;
     const char* ext = "GL_EXT_convolution";
     char cfgkey[26 + 18 + 1];
@@ -13985,6 +14017,7 @@ public:
   void InitGL_EXT_fog_coord ()
   {
     if (tested_CS_GL_EXT_fog_coord) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_fog_coord = true;
     const char* ext = "GL_EXT_fog_coord";
     char cfgkey[26 + 16 + 1];
@@ -14015,6 +14048,7 @@ public:
   void InitGL_EXT_histogram ()
   {
     if (tested_CS_GL_EXT_histogram) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_histogram = true;
     const char* ext = "GL_EXT_histogram";
     char cfgkey[26 + 16 + 1];
@@ -14050,6 +14084,7 @@ public:
   void InitGL_EXT_multi_draw_arrays ()
   {
     if (tested_CS_GL_EXT_multi_draw_arrays) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_multi_draw_arrays = true;
     const char* ext = "GL_EXT_multi_draw_arrays";
     char cfgkey[26 + 24 + 1];
@@ -14077,6 +14112,7 @@ public:
   void InitGL_EXT_packed_pixels ()
   {
     if (tested_CS_GL_EXT_packed_pixels) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_packed_pixels = true;
     const char* ext = "GL_EXT_packed_pixels";
     char cfgkey[26 + 20 + 1];
@@ -14102,6 +14138,7 @@ public:
   void InitGL_EXT_paletted_texture ()
   {
     if (tested_CS_GL_EXT_paletted_texture) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_paletted_texture = true;
     const char* ext = "GL_EXT_paletted_texture";
     char cfgkey[26 + 23 + 1];
@@ -14132,6 +14169,7 @@ public:
   void InitGL_EXT_point_parameters ()
   {
     if (tested_CS_GL_EXT_point_parameters) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_point_parameters = true;
     const char* ext = "GL_EXT_point_parameters";
     char cfgkey[26 + 23 + 1];
@@ -14159,6 +14197,7 @@ public:
   void InitGL_EXT_polygon_offset ()
   {
     if (tested_CS_GL_EXT_polygon_offset) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_polygon_offset = true;
     const char* ext = "GL_EXT_polygon_offset";
     char cfgkey[26 + 21 + 1];
@@ -14185,6 +14224,7 @@ public:
   void InitGL_EXT_secondary_color ()
   {
     if (tested_CS_GL_EXT_secondary_color) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_secondary_color = true;
     const char* ext = "GL_EXT_secondary_color";
     char cfgkey[26 + 22 + 1];
@@ -14227,6 +14267,7 @@ public:
   void InitGL_EXT_separate_specular_color ()
   {
     if (tested_CS_GL_EXT_separate_specular_color) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_separate_specular_color = true;
     const char* ext = "GL_EXT_separate_specular_color";
     char cfgkey[26 + 30 + 1];
@@ -14252,6 +14293,7 @@ public:
   void InitGL_EXT_shadow_funcs ()
   {
     if (tested_CS_GL_EXT_shadow_funcs) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_shadow_funcs = true;
     const char* ext = "GL_EXT_shadow_funcs";
     char cfgkey[26 + 19 + 1];
@@ -14277,6 +14319,7 @@ public:
   void InitGL_EXT_shared_texture_palette ()
   {
     if (tested_CS_GL_EXT_shared_texture_palette) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_shared_texture_palette = true;
     const char* ext = "GL_EXT_shared_texture_palette";
     char cfgkey[26 + 29 + 1];
@@ -14302,6 +14345,7 @@ public:
   void InitGL_EXT_stencil_two_side ()
   {
     if (tested_CS_GL_EXT_stencil_two_side) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_stencil_two_side = true;
     const char* ext = "GL_EXT_stencil_two_side";
     char cfgkey[26 + 23 + 1];
@@ -14328,6 +14372,7 @@ public:
   void InitGL_EXT_stencil_wrap ()
   {
     if (tested_CS_GL_EXT_stencil_wrap) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_stencil_wrap = true;
     const char* ext = "GL_EXT_stencil_wrap";
     char cfgkey[26 + 19 + 1];
@@ -14353,6 +14398,7 @@ public:
   void InitGL_EXT_subtexture ()
   {
     if (tested_CS_GL_EXT_subtexture) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_subtexture = true;
     const char* ext = "GL_EXT_subtexture";
     char cfgkey[26 + 17 + 1];
@@ -14381,6 +14427,7 @@ public:
   void InitGL_EXT_texture3D ()
   {
     if (tested_CS_GL_EXT_texture3D) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture3D = true;
     const char* ext = "GL_EXT_texture3D";
     char cfgkey[26 + 16 + 1];
@@ -14407,6 +14454,7 @@ public:
   void InitGL_EXT_texture_compression_s3tc ()
   {
     if (tested_CS_GL_EXT_texture_compression_s3tc) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture_compression_s3tc = true;
     const char* ext = "GL_EXT_texture_compression_s3tc";
     char cfgkey[26 + 31 + 1];
@@ -14432,6 +14480,7 @@ public:
   void InitGL_EXT_texture_env_add ()
   {
     if (tested_CS_GL_EXT_texture_env_add) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture_env_add = true;
     const char* ext = "GL_EXT_texture_env_add";
     char cfgkey[26 + 22 + 1];
@@ -14457,6 +14506,7 @@ public:
   void InitGL_EXT_texture_env_combine ()
   {
     if (tested_CS_GL_EXT_texture_env_combine) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture_env_combine = true;
     const char* ext = "GL_EXT_texture_env_combine";
     char cfgkey[26 + 26 + 1];
@@ -14482,6 +14532,7 @@ public:
   void InitGL_EXT_texture_env_dot3 ()
   {
     if (tested_CS_GL_EXT_texture_env_dot3) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture_env_dot3 = true;
     const char* ext = "GL_EXT_texture_env_dot3";
     char cfgkey[26 + 23 + 1];
@@ -14507,6 +14558,7 @@ public:
   void InitGL_EXT_texture_filter_anisotropic ()
   {
     if (tested_CS_GL_EXT_texture_filter_anisotropic) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture_filter_anisotropic = true;
     const char* ext = "GL_EXT_texture_filter_anisotropic";
     char cfgkey[26 + 33 + 1];
@@ -14532,6 +14584,7 @@ public:
   void InitGL_EXT_texture_lod_bias ()
   {
     if (tested_CS_GL_EXT_texture_lod_bias) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture_lod_bias = true;
     const char* ext = "GL_EXT_texture_lod_bias";
     char cfgkey[26 + 23 + 1];
@@ -14557,6 +14610,7 @@ public:
   void InitGL_EXT_texture_object ()
   {
     if (tested_CS_GL_EXT_texture_object) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_texture_object = true;
     const char* ext = "GL_EXT_texture_object";
     char cfgkey[26 + 21 + 1];
@@ -14588,6 +14642,7 @@ public:
   void InitGL_EXT_vertex_array ()
   {
     if (tested_CS_GL_EXT_vertex_array) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_vertex_array = true;
     const char* ext = "GL_EXT_vertex_array";
     char cfgkey[26 + 19 + 1];
@@ -14622,6 +14677,7 @@ public:
   void InitGL_EXT_vertex_shader ()
   {
     if (tested_CS_GL_EXT_vertex_shader) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_vertex_shader = true;
     const char* ext = "GL_EXT_vertex_shader";
     char cfgkey[26 + 20 + 1];
@@ -14689,6 +14745,7 @@ public:
   void InitGL_EXT_vertex_weighting ()
   {
     if (tested_CS_GL_EXT_vertex_weighting) return;
+    if (!extstrGL) return;
     tested_CS_GL_EXT_vertex_weighting = true;
     const char* ext = "GL_EXT_vertex_weighting";
     char cfgkey[26 + 23 + 1];
@@ -14717,6 +14774,7 @@ public:
   void InitGL_HP_occlusion_test ()
   {
     if (tested_CS_GL_HP_occlusion_test) return;
+    if (!extstrGL) return;
     tested_CS_GL_HP_occlusion_test = true;
     const char* ext = "GL_HP_occlusion_test";
     char cfgkey[26 + 20 + 1];
@@ -14742,6 +14800,7 @@ public:
   void InitGL_NV_blend_square ()
   {
     if (tested_CS_GL_NV_blend_square) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_blend_square = true;
     const char* ext = "GL_NV_blend_square";
     char cfgkey[26 + 18 + 1];
@@ -14767,6 +14826,7 @@ public:
   void InitGL_NV_copy_depth_to_color ()
   {
     if (tested_CS_GL_NV_copy_depth_to_color) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_copy_depth_to_color = true;
     const char* ext = "GL_NV_copy_depth_to_color";
     char cfgkey[26 + 25 + 1];
@@ -14792,6 +14852,7 @@ public:
   void InitGL_NV_depth_clamp ()
   {
     if (tested_CS_GL_NV_depth_clamp) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_depth_clamp = true;
     const char* ext = "GL_NV_depth_clamp";
     char cfgkey[26 + 17 + 1];
@@ -14817,6 +14878,7 @@ public:
   void InitGL_NV_evaluators ()
   {
     if (tested_CS_GL_NV_evaluators) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_evaluators = true;
     const char* ext = "GL_NV_evaluators";
     char cfgkey[26 + 16 + 1];
@@ -14851,6 +14913,7 @@ public:
   void InitGL_NV_fence ()
   {
     if (tested_CS_GL_NV_fence) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_fence = true;
     const char* ext = "GL_NV_fence";
     char cfgkey[26 + 11 + 1];
@@ -14883,6 +14946,7 @@ public:
   void InitGL_NV_fog_distance ()
   {
     if (tested_CS_GL_NV_fog_distance) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_fog_distance = true;
     const char* ext = "GL_NV_fog_distance";
     char cfgkey[26 + 18 + 1];
@@ -14908,6 +14972,7 @@ public:
   void InitGL_NV_light_max_exponent ()
   {
     if (tested_CS_GL_NV_light_max_exponent) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_light_max_exponent = true;
     const char* ext = "GL_NV_light_max_exponent";
     char cfgkey[26 + 24 + 1];
@@ -14933,6 +14998,7 @@ public:
   void InitGL_NV_multisample_filter_hint ()
   {
     if (tested_CS_GL_NV_multisample_filter_hint) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_multisample_filter_hint = true;
     const char* ext = "GL_NV_multisample_filter_hint";
     char cfgkey[26 + 29 + 1];
@@ -14958,6 +15024,7 @@ public:
   void InitGL_NV_occlusion_query ()
   {
     if (tested_CS_GL_NV_occlusion_query) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_occlusion_query = true;
     const char* ext = "GL_NV_occlusion_query";
     char cfgkey[26 + 21 + 1];
@@ -14990,6 +15057,7 @@ public:
   void InitGL_NV_packed_depth_stencil ()
   {
     if (tested_CS_GL_NV_packed_depth_stencil) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_packed_depth_stencil = true;
     const char* ext = "GL_NV_packed_depth_stencil";
     char cfgkey[26 + 26 + 1];
@@ -15015,6 +15083,7 @@ public:
   void InitGL_NV_point_sprite ()
   {
     if (tested_CS_GL_NV_point_sprite) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_point_sprite = true;
     const char* ext = "GL_NV_point_sprite";
     char cfgkey[26 + 18 + 1];
@@ -15042,6 +15111,7 @@ public:
   void InitGL_NV_register_combiners ()
   {
     if (tested_CS_GL_NV_register_combiners) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_register_combiners = true;
     const char* ext = "GL_NV_register_combiners";
     char cfgkey[26 + 24 + 1];
@@ -15080,6 +15150,7 @@ public:
   void InitGL_NV_register_combiners2 ()
   {
     if (tested_CS_GL_NV_register_combiners2) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_register_combiners2 = true;
     const char* ext = "GL_NV_register_combiners2";
     char cfgkey[26 + 25 + 1];
@@ -15107,6 +15178,7 @@ public:
   void InitGL_NV_texgen_emboss ()
   {
     if (tested_CS_GL_NV_texgen_emboss) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texgen_emboss = true;
     const char* ext = "GL_NV_texgen_emboss";
     char cfgkey[26 + 19 + 1];
@@ -15132,6 +15204,7 @@ public:
   void InitGL_NV_texgen_reflection ()
   {
     if (tested_CS_GL_NV_texgen_reflection) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texgen_reflection = true;
     const char* ext = "GL_NV_texgen_reflection";
     char cfgkey[26 + 23 + 1];
@@ -15157,6 +15230,7 @@ public:
   void InitGL_NV_texture_compression_vtc ()
   {
     if (tested_CS_GL_NV_texture_compression_vtc) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texture_compression_vtc = true;
     const char* ext = "GL_NV_texture_compression_vtc";
     char cfgkey[26 + 29 + 1];
@@ -15182,6 +15256,7 @@ public:
   void InitGL_NV_texture_env_combine4 ()
   {
     if (tested_CS_GL_NV_texture_env_combine4) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texture_env_combine4 = true;
     const char* ext = "GL_NV_texture_env_combine4";
     char cfgkey[26 + 26 + 1];
@@ -15207,6 +15282,7 @@ public:
   void InitGL_NV_texture_rectangle ()
   {
     if (tested_CS_GL_NV_texture_rectangle) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texture_rectangle = true;
     const char* ext = "GL_NV_texture_rectangle";
     char cfgkey[26 + 23 + 1];
@@ -15232,6 +15308,7 @@ public:
   void InitGL_NV_texture_shader ()
   {
     if (tested_CS_GL_NV_texture_shader) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texture_shader = true;
     const char* ext = "GL_NV_texture_shader";
     char cfgkey[26 + 20 + 1];
@@ -15257,6 +15334,7 @@ public:
   void InitGL_NV_texture_shader2 ()
   {
     if (tested_CS_GL_NV_texture_shader2) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texture_shader2 = true;
     const char* ext = "GL_NV_texture_shader2";
     char cfgkey[26 + 21 + 1];
@@ -15282,6 +15360,7 @@ public:
   void InitGL_NV_texture_shader3 ()
   {
     if (tested_CS_GL_NV_texture_shader3) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_texture_shader3 = true;
     const char* ext = "GL_NV_texture_shader3";
     char cfgkey[26 + 21 + 1];
@@ -15307,6 +15386,7 @@ public:
   void InitGL_NV_vertex_array_range ()
   {
     if (tested_CS_GL_NV_vertex_array_range) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_vertex_array_range = true;
     const char* ext = "GL_NV_vertex_array_range";
     char cfgkey[26 + 24 + 1];
@@ -15336,6 +15416,7 @@ public:
   void InitGL_NV_vertex_array_range2 ()
   {
     if (tested_CS_GL_NV_vertex_array_range2) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_vertex_array_range2 = true;
     const char* ext = "GL_NV_vertex_array_range2";
     char cfgkey[26 + 25 + 1];
@@ -15361,6 +15442,7 @@ public:
   void InitGL_NV_vertex_program ()
   {
     if (tested_CS_GL_NV_vertex_program) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_vertex_program = true;
     const char* ext = "GL_NV_vertex_program";
     char cfgkey[26 + 20 + 1];
@@ -15448,6 +15530,7 @@ public:
   void InitGL_NV_vertex_program1_1 ()
   {
     if (tested_CS_GL_NV_vertex_program1_1) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_vertex_program1_1 = true;
     const char* ext = "GL_NV_vertex_program1_1";
     char cfgkey[26 + 23 + 1];
@@ -15473,6 +15556,7 @@ public:
   void InitGL_ATI_element_array ()
   {
     if (tested_CS_GL_ATI_element_array) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_element_array = true;
     const char* ext = "GL_ATI_element_array";
     char cfgkey[26 + 20 + 1];
@@ -15501,6 +15585,7 @@ public:
   void InitGL_ATI_envmap_bumpmap ()
   {
     if (tested_CS_GL_ATI_envmap_bumpmap) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_envmap_bumpmap = true;
     const char* ext = "GL_ATI_envmap_bumpmap";
     char cfgkey[26 + 21 + 1];
@@ -15530,6 +15615,7 @@ public:
   void InitGL_ATI_fragment_shader ()
   {
     if (tested_CS_GL_ATI_fragment_shader) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_fragment_shader = true;
     const char* ext = "GL_ATI_fragment_shader";
     char cfgkey[26 + 22 + 1];
@@ -15569,6 +15655,7 @@ public:
   void InitGL_ATI_pn_triangles ()
   {
     if (tested_CS_GL_ATI_pn_triangles) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_pn_triangles = true;
     const char* ext = "GL_ATI_pn_triangles";
     char cfgkey[26 + 19 + 1];
@@ -15596,6 +15683,7 @@ public:
   void InitGL_ATI_texture_mirror_once ()
   {
     if (tested_CS_GL_ATI_texture_mirror_once) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_texture_mirror_once = true;
     const char* ext = "GL_ATI_texture_mirror_once";
     char cfgkey[26 + 26 + 1];
@@ -15621,6 +15709,7 @@ public:
   void InitGL_ATI_vertex_array_object ()
   {
     if (tested_CS_GL_ATI_vertex_array_object) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_vertex_array_object = true;
     const char* ext = "GL_ATI_vertex_array_object";
     char cfgkey[26 + 26 + 1];
@@ -15658,6 +15747,7 @@ public:
   void InitGL_ATI_vertex_attrib_array_object ()
   {
     if (tested_CS_GL_ATI_vertex_attrib_array_object) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_vertex_attrib_array_object = true;
     const char* ext = "GL_ATI_vertex_attrib_array_object";
     char cfgkey[26 + 33 + 1];
@@ -15686,6 +15776,7 @@ public:
   void InitGL_ATI_vertex_streams ()
   {
     if (tested_CS_GL_ATI_vertex_streams) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_vertex_streams = true;
     const char* ext = "GL_ATI_vertex_streams";
     char cfgkey[26 + 21 + 1];
@@ -15757,6 +15848,7 @@ public:
   void InitWGL_I3D_image_buffer (HDC hDC)
   {
     if (tested_CS_WGL_I3D_image_buffer) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_I3D_image_buffer = true;
     const char* ext = "WGL_I3D_image_buffer";
     char cfgkey[26 + 20 + 1];
@@ -15790,6 +15882,7 @@ public:
   void InitWGL_I3D_swap_frame_lock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_lock) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_I3D_swap_frame_lock = true;
     const char* ext = "WGL_I3D_swap_frame_lock";
     char cfgkey[26 + 23 + 1];
@@ -15823,6 +15916,7 @@ public:
   void InitWGL_I3D_swap_frame_usage (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_usage) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_I3D_swap_frame_usage = true;
     const char* ext = "WGL_I3D_swap_frame_usage";
     char cfgkey[26 + 24 + 1];
@@ -15855,6 +15949,7 @@ public:
   void InitGL_3DFX_texture_compression_FXT1 ()
   {
     if (tested_CS_GL_3DFX_texture_compression_FXT1) return;
+    if (!extstrGL) return;
     tested_CS_GL_3DFX_texture_compression_FXT1 = true;
     const char* ext = "GL_3DFX_texture_compression_FXT1";
     char cfgkey[26 + 32 + 1];
@@ -15880,6 +15975,7 @@ public:
   void InitGL_IBM_cull_vertex ()
   {
     if (tested_CS_GL_IBM_cull_vertex) return;
+    if (!extstrGL) return;
     tested_CS_GL_IBM_cull_vertex = true;
     const char* ext = "GL_IBM_cull_vertex";
     char cfgkey[26 + 18 + 1];
@@ -15905,6 +16001,7 @@ public:
   void InitGL_IBM_multimode_draw_arrays ()
   {
     if (tested_CS_GL_IBM_multimode_draw_arrays) return;
+    if (!extstrGL) return;
     tested_CS_GL_IBM_multimode_draw_arrays = true;
     const char* ext = "GL_IBM_multimode_draw_arrays";
     char cfgkey[26 + 28 + 1];
@@ -15932,6 +16029,7 @@ public:
   void InitGL_IBM_raster_pos_clip ()
   {
     if (tested_CS_GL_IBM_raster_pos_clip) return;
+    if (!extstrGL) return;
     tested_CS_GL_IBM_raster_pos_clip = true;
     const char* ext = "GL_IBM_raster_pos_clip";
     char cfgkey[26 + 22 + 1];
@@ -15957,6 +16055,7 @@ public:
   void InitGL_IBM_texture_mirrored_repeat ()
   {
     if (tested_CS_GL_IBM_texture_mirrored_repeat) return;
+    if (!extstrGL) return;
     tested_CS_GL_IBM_texture_mirrored_repeat = true;
     const char* ext = "GL_IBM_texture_mirrored_repeat";
     char cfgkey[26 + 30 + 1];
@@ -15982,6 +16081,7 @@ public:
   void InitGL_IBM_vertex_array_lists ()
   {
     if (tested_CS_GL_IBM_vertex_array_lists) return;
+    if (!extstrGL) return;
     tested_CS_GL_IBM_vertex_array_lists = true;
     const char* ext = "GL_IBM_vertex_array_lists";
     char cfgkey[26 + 25 + 1];
@@ -16014,6 +16114,7 @@ public:
   void InitGL_MESA_resize_buffers ()
   {
     if (tested_CS_GL_MESA_resize_buffers) return;
+    if (!extstrGL) return;
     tested_CS_GL_MESA_resize_buffers = true;
     const char* ext = "GL_MESA_resize_buffers";
     char cfgkey[26 + 22 + 1];
@@ -16040,6 +16141,7 @@ public:
   void InitGL_MESA_window_pos ()
   {
     if (tested_CS_GL_MESA_window_pos) return;
+    if (!extstrGL) return;
     tested_CS_GL_MESA_window_pos = true;
     const char* ext = "GL_MESA_window_pos";
     char cfgkey[26 + 18 + 1];
@@ -16089,6 +16191,7 @@ public:
   void InitGL_OML_interlace ()
   {
     if (tested_CS_GL_OML_interlace) return;
+    if (!extstrGL) return;
     tested_CS_GL_OML_interlace = true;
     const char* ext = "GL_OML_interlace";
     char cfgkey[26 + 16 + 1];
@@ -16114,6 +16217,7 @@ public:
   void InitGL_OML_resample ()
   {
     if (tested_CS_GL_OML_resample) return;
+    if (!extstrGL) return;
     tested_CS_GL_OML_resample = true;
     const char* ext = "GL_OML_resample";
     char cfgkey[26 + 15 + 1];
@@ -16139,6 +16243,7 @@ public:
   void InitGL_OML_subsample ()
   {
     if (tested_CS_GL_OML_subsample) return;
+    if (!extstrGL) return;
     tested_CS_GL_OML_subsample = true;
     const char* ext = "GL_OML_subsample";
     char cfgkey[26 + 16 + 1];
@@ -16164,6 +16269,7 @@ public:
   void InitGL_SGIS_generate_mipmap ()
   {
     if (tested_CS_GL_SGIS_generate_mipmap) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_generate_mipmap = true;
     const char* ext = "GL_SGIS_generate_mipmap";
     char cfgkey[26 + 23 + 1];
@@ -16189,6 +16295,7 @@ public:
   void InitGL_SGIS_multisample ()
   {
     if (tested_CS_GL_SGIS_multisample) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_multisample = true;
     const char* ext = "GL_SGIS_multisample";
     char cfgkey[26 + 19 + 1];
@@ -16216,6 +16323,7 @@ public:
   void InitGL_SGIS_pixel_texture ()
   {
     if (tested_CS_GL_SGIS_pixel_texture) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_pixel_texture = true;
     const char* ext = "GL_SGIS_pixel_texture";
     char cfgkey[26 + 21 + 1];
@@ -16245,6 +16353,7 @@ public:
   void InitGL_SGIS_texture_border_clamp ()
   {
     if (tested_CS_GL_SGIS_texture_border_clamp) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_border_clamp = true;
     const char* ext = "GL_SGIS_texture_border_clamp";
     char cfgkey[26 + 28 + 1];
@@ -16270,6 +16379,7 @@ public:
   void InitGL_SGIS_texture_color_mask ()
   {
     if (tested_CS_GL_SGIS_texture_color_mask) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_color_mask = true;
     const char* ext = "GL_SGIS_texture_color_mask";
     char cfgkey[26 + 26 + 1];
@@ -16296,6 +16406,7 @@ public:
   void InitGL_SGIS_texture_edge_clamp ()
   {
     if (tested_CS_GL_SGIS_texture_edge_clamp) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_edge_clamp = true;
     const char* ext = "GL_SGIS_texture_edge_clamp";
     char cfgkey[26 + 26 + 1];
@@ -16321,6 +16432,7 @@ public:
   void InitGL_SGIS_texture_lod ()
   {
     if (tested_CS_GL_SGIS_texture_lod) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_lod = true;
     const char* ext = "GL_SGIS_texture_lod";
     char cfgkey[26 + 19 + 1];
@@ -16346,6 +16458,7 @@ public:
   void InitGL_SGIS_depth_texture ()
   {
     if (tested_CS_GL_SGIS_depth_texture) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIS_depth_texture = true;
     const char* ext = "GL_SGIS_depth_texture";
     char cfgkey[26 + 21 + 1];
@@ -16371,6 +16484,7 @@ public:
   void InitGL_SGIX_fog_offset ()
   {
     if (tested_CS_GL_SGIX_fog_offset) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIX_fog_offset = true;
     const char* ext = "GL_SGIX_fog_offset";
     char cfgkey[26 + 18 + 1];
@@ -16396,6 +16510,7 @@ public:
   void InitGL_SGIX_interlace ()
   {
     if (tested_CS_GL_SGIX_interlace) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIX_interlace = true;
     const char* ext = "GL_SGIX_interlace";
     char cfgkey[26 + 17 + 1];
@@ -16421,6 +16536,7 @@ public:
   void InitGL_SGIX_shadow_ambient ()
   {
     if (tested_CS_GL_SGIX_shadow_ambient) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGIX_shadow_ambient = true;
     const char* ext = "GL_SGIX_shadow_ambient";
     char cfgkey[26 + 22 + 1];
@@ -16446,6 +16562,7 @@ public:
   void InitGL_SGI_color_matrix ()
   {
     if (tested_CS_GL_SGI_color_matrix) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGI_color_matrix = true;
     const char* ext = "GL_SGI_color_matrix";
     char cfgkey[26 + 19 + 1];
@@ -16471,6 +16588,7 @@ public:
   void InitGL_SGI_color_table ()
   {
     if (tested_CS_GL_SGI_color_table) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGI_color_table = true;
     const char* ext = "GL_SGI_color_table";
     char cfgkey[26 + 18 + 1];
@@ -16503,6 +16621,7 @@ public:
   void InitGL_SGI_texture_color_table ()
   {
     if (tested_CS_GL_SGI_texture_color_table) return;
+    if (!extstrGL) return;
     tested_CS_GL_SGI_texture_color_table = true;
     const char* ext = "GL_SGI_texture_color_table";
     char cfgkey[26 + 26 + 1];
@@ -16528,6 +16647,7 @@ public:
   void InitGL_SUN_vertex ()
   {
     if (tested_CS_GL_SUN_vertex) return;
+    if (!extstrGL) return;
     tested_CS_GL_SUN_vertex = true;
     const char* ext = "GL_SUN_vertex";
     char cfgkey[26 + 13 + 1];
@@ -16593,6 +16713,7 @@ public:
   void InitGL_ARB_fragment_program ()
   {
     if (tested_CS_GL_ARB_fragment_program) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_fragment_program = true;
     const char* ext = "GL_ARB_fragment_program";
     char cfgkey[26 + 23 + 1];
@@ -16637,6 +16758,7 @@ public:
   void InitGL_ATI_text_fragment_shader ()
   {
     if (tested_CS_GL_ATI_text_fragment_shader) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_text_fragment_shader = true;
     const char* ext = "GL_ATI_text_fragment_shader";
     char cfgkey[26 + 27 + 1];
@@ -16662,6 +16784,7 @@ public:
   void InitGL_APPLE_client_storage ()
   {
     if (tested_CS_GL_APPLE_client_storage) return;
+    if (!extstrGL) return;
     tested_CS_GL_APPLE_client_storage = true;
     const char* ext = "GL_APPLE_client_storage";
     char cfgkey[26 + 23 + 1];
@@ -16687,6 +16810,7 @@ public:
   void InitGL_APPLE_element_array ()
   {
     if (tested_CS_GL_APPLE_element_array) return;
+    if (!extstrGL) return;
     tested_CS_GL_APPLE_element_array = true;
     const char* ext = "GL_APPLE_element_array";
     char cfgkey[26 + 22 + 1];
@@ -16717,6 +16841,7 @@ public:
   void InitGL_APPLE_fence ()
   {
     if (tested_CS_GL_APPLE_fence) return;
+    if (!extstrGL) return;
     tested_CS_GL_APPLE_fence = true;
     const char* ext = "GL_APPLE_fence";
     char cfgkey[26 + 14 + 1];
@@ -16750,6 +16875,7 @@ public:
   void InitGL_APPLE_vertex_array_object ()
   {
     if (tested_CS_GL_APPLE_vertex_array_object) return;
+    if (!extstrGL) return;
     tested_CS_GL_APPLE_vertex_array_object = true;
     const char* ext = "GL_APPLE_vertex_array_object";
     char cfgkey[26 + 28 + 1];
@@ -16779,6 +16905,7 @@ public:
   void InitGL_APPLE_vertex_array_range ()
   {
     if (tested_CS_GL_APPLE_vertex_array_range) return;
+    if (!extstrGL) return;
     tested_CS_GL_APPLE_vertex_array_range = true;
     const char* ext = "GL_APPLE_vertex_array_range";
     char cfgkey[26 + 27 + 1];
@@ -16808,6 +16935,7 @@ public:
   void InitWGL_ARB_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pixel_format) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_ARB_pixel_format = true;
     const char* ext = "WGL_ARB_pixel_format";
     char cfgkey[26 + 20 + 1];
@@ -16840,6 +16968,7 @@ public:
   void InitWGL_ARB_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_ARB_make_current_read) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_ARB_make_current_read = true;
     const char* ext = "WGL_ARB_make_current_read";
     char cfgkey[26 + 25 + 1];
@@ -16871,6 +17000,7 @@ public:
   void InitWGL_ARB_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pbuffer) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_ARB_pbuffer = true;
     const char* ext = "WGL_ARB_pbuffer";
     char cfgkey[26 + 15 + 1];
@@ -16905,6 +17035,7 @@ public:
   void InitWGL_EXT_swap_control (HDC hDC)
   {
     if (tested_CS_WGL_EXT_swap_control) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_EXT_swap_control = true;
     const char* ext = "WGL_EXT_swap_control";
     char cfgkey[26 + 20 + 1];
@@ -16936,6 +17067,7 @@ public:
   void InitWGL_ARB_render_texture (HDC hDC)
   {
     if (tested_CS_WGL_ARB_render_texture) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_ARB_render_texture = true;
     const char* ext = "WGL_ARB_render_texture";
     char cfgkey[26 + 22 + 1];
@@ -16968,6 +17100,7 @@ public:
   void InitWGL_EXT_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_EXT_extensions_string) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_EXT_extensions_string = true;
     const char* ext = "WGL_EXT_extensions_string";
     char cfgkey[26 + 25 + 1];
@@ -16998,6 +17131,7 @@ public:
   void InitWGL_EXT_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_EXT_make_current_read) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_EXT_make_current_read = true;
     const char* ext = "WGL_EXT_make_current_read";
     char cfgkey[26 + 25 + 1];
@@ -17029,6 +17163,7 @@ public:
   void InitWGL_EXT_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pbuffer) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_EXT_pbuffer = true;
     const char* ext = "WGL_EXT_pbuffer";
     char cfgkey[26 + 15 + 1];
@@ -17063,6 +17198,7 @@ public:
   void InitWGL_EXT_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pixel_format) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_EXT_pixel_format = true;
     const char* ext = "WGL_EXT_pixel_format";
     char cfgkey[26 + 20 + 1];
@@ -17095,6 +17231,7 @@ public:
   void InitWGL_I3D_digital_video_control (HDC hDC)
   {
     if (tested_CS_WGL_I3D_digital_video_control) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_I3D_digital_video_control = true;
     const char* ext = "WGL_I3D_digital_video_control";
     char cfgkey[26 + 29 + 1];
@@ -17126,6 +17263,7 @@ public:
   void InitWGL_I3D_gamma (HDC hDC)
   {
     if (tested_CS_WGL_I3D_gamma) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_I3D_gamma = true;
     const char* ext = "WGL_I3D_gamma";
     char cfgkey[26 + 13 + 1];
@@ -17159,6 +17297,7 @@ public:
   void InitWGL_I3D_genlock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_genlock) return;
+    if (!extstrWGL) return;
     tested_CS_WGL_I3D_genlock = true;
     const char* ext = "WGL_I3D_genlock";
     char cfgkey[26 + 15 + 1];
@@ -17199,6 +17338,7 @@ public:
   void InitGL_ARB_matrix_palette ()
   {
     if (tested_CS_GL_ARB_matrix_palette) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_matrix_palette = true;
     const char* ext = "GL_ARB_matrix_palette";
     char cfgkey[26 + 21 + 1];
@@ -17229,6 +17369,7 @@ public:
   void InitGL_NV_element_array ()
   {
     if (tested_CS_GL_NV_element_array) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_element_array = true;
     const char* ext = "GL_NV_element_array";
     char cfgkey[26 + 19 + 1];
@@ -17259,6 +17400,7 @@ public:
   void InitGL_NV_float_buffer ()
   {
     if (tested_CS_GL_NV_float_buffer) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_float_buffer = true;
     const char* ext = "GL_NV_float_buffer";
     char cfgkey[26 + 18 + 1];
@@ -17284,6 +17426,7 @@ public:
   void InitGL_NV_fragment_program ()
   {
     if (tested_CS_GL_NV_fragment_program) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_fragment_program = true;
     const char* ext = "GL_NV_fragment_program";
     char cfgkey[26 + 22 + 1];
@@ -17319,6 +17462,7 @@ public:
   void InitGL_NV_primitive_restart ()
   {
     if (tested_CS_GL_NV_primitive_restart) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_primitive_restart = true;
     const char* ext = "GL_NV_primitive_restart";
     char cfgkey[26 + 23 + 1];
@@ -17346,6 +17490,7 @@ public:
   void InitGL_NV_vertex_program2 ()
   {
     if (tested_CS_GL_NV_vertex_program2) return;
+    if (!extstrGL) return;
     tested_CS_GL_NV_vertex_program2 = true;
     const char* ext = "GL_NV_vertex_program2";
     char cfgkey[26 + 21 + 1];
@@ -17371,6 +17516,7 @@ public:
   void InitGL_ARB_vertex_buffer_object ()
   {
     if (tested_CS_GL_ARB_vertex_buffer_object) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_buffer_object = true;
     const char* ext = "GL_ARB_vertex_buffer_object";
     char cfgkey[26 + 27 + 1];
@@ -17407,6 +17553,7 @@ public:
   void InitGL_ATI_separate_stencil ()
   {
     if (tested_CS_GL_ATI_separate_stencil) return;
+    if (!extstrGL) return;
     tested_CS_GL_ATI_separate_stencil = true;
     const char* ext = "GL_ATI_separate_stencil";
     char cfgkey[26 + 23 + 1];
@@ -17434,6 +17581,7 @@ public:
   void InitGL_ARB_texture_non_power_of_two ()
   {
     if (tested_CS_GL_ARB_texture_non_power_of_two) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_texture_non_power_of_two = true;
     const char* ext = "GL_ARB_texture_non_power_of_two";
     char cfgkey[26 + 31 + 1];
@@ -17459,6 +17607,7 @@ public:
   void InitGL_ARB_point_sprite ()
   {
     if (tested_CS_GL_ARB_point_sprite) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_point_sprite = true;
     const char* ext = "GL_ARB_point_sprite";
     char cfgkey[26 + 19 + 1];
@@ -17484,6 +17633,7 @@ public:
   void InitGL_ARB_shading_language_100 ()
   {
     if (tested_CS_GL_ARB_shading_language_100) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_shading_language_100 = true;
     const char* ext = "GL_ARB_shading_language_100";
     char cfgkey[26 + 27 + 1];
@@ -17509,6 +17659,7 @@ public:
   void InitGL_ARB_shader_objects ()
   {
     if (tested_CS_GL_ARB_shader_objects) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_shader_objects = true;
     const char* ext = "GL_ARB_shader_objects";
     char cfgkey[26 + 21 + 1];
@@ -17573,6 +17724,7 @@ public:
   void InitGL_ARB_fragment_shader ()
   {
     if (tested_CS_GL_ARB_fragment_shader) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_fragment_shader = true;
     const char* ext = "GL_ARB_fragment_shader";
     char cfgkey[26 + 22 + 1];
@@ -17598,6 +17750,7 @@ public:
   void InitGL_ARB_vertex_shader ()
   {
     if (tested_CS_GL_ARB_vertex_shader) return;
+    if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_shader = true;
     const char* ext = "GL_ARB_vertex_shader";
     char cfgkey[26 + 20 + 1];

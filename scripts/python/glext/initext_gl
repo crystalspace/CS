@@ -1,6 +1,7 @@
   void Init%Name% ()
   {
     if (tested_CS_%Name%) return;
+    if (!extstrGL) return;
     tested_CS_%Name% = true;
     const char* ext = "%Name%";
     char cfgkey[%Cfglen% + %Namelen% + 1];
