@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+9-Jun-2003
+	- Jorrit made a new csStringArray class.
 8-Jun-2003
 	- Eric Sunshine fixed problems in csInitializer::CloseApplication() and
 	  csInitializer::DestroyApplication() where they threw assertion
