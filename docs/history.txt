@@ -11,6 +11,20 @@ The history order is reversed so that new features are at the top.
 	  texture layers). If only one pass is used the overhead of the
 	  queue makes DPFX slightly slower.
 	- Removed OpenGL::RealStartPolygonFX.
+	- Wouter Wijngaards did a zoomy whoomy change of terrain image
+	  generator. Now all the components, textures, functions, blending
+	  can be mixed and matches as you like, to create all sort of nice
+	  effects. Like: splotches of a texture irrespective of terrain
+	  height. (for roads and so on).
+	  Also slopes could be used, perhaps even blended with height-mapped
+	  terrain image.
+	- Fixed csparser so that it works with the new API of the
+	  terrain generator but the new features are not yet supported.
+	- Philip Wyett did a bug fix to the OpenGL Canvas for Windows:
+	  Changed default Window style for windowed apps.
+	  This fixes the seeing of a nasty little 2 pixel black
+	  border at top and right side of window in apps like
+	  csdemo.
 15-May-2001
 	- Philip Wyett added the new cslexan to global build process.
 	  Philip also changed MSVC project file generation process to create

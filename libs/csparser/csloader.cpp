@@ -810,6 +810,9 @@ void csLoader::heightgen_process (char* buf)
   int partw = 64, parth = 64;
   int mw = 1, mh = 1;
   csGenerateTerrainImage* gen = new csGenerateTerrainImage ();
+  csGenerateTerrainImageTextureBlend* tb =
+  	new csGenerateTerrainImageTextureBlend ();
+  gen->SetTexture (tb);
   HeightMapData* data = NULL;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -840,7 +843,11 @@ void csLoader::heightgen_process (char* buf)
   	  data->p = (csRGBpixel*)(img->GetImageData ());
   	  data->hscale = hscale;
   	  data->hshift = hshift;
-  	  gen->SetHeightFunction (HeightMapFunc, (void*)data);
+	  csGenerateTerrainImageValueFunc* vf =
+	  	new csGenerateTerrainImageValueFunc ();
+  	  vf->heightfunc = HeightMapFunc;
+	  vf->userdata = (void*)data;
+	  tb->valuefunc = vf;
 	}
 	break;
       case CS_TOKEN_LAYER:
@@ -852,7 +859,12 @@ void csLoader::heightgen_process (char* buf)
 		&height, imagename, &scale.x, &scale.y,
 		&offset.x, &offset.y);
 	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
-	  gen->AddLayer (height, img, scale, offset);
+	  csGenerateTerrainImageTextureSingle* ts =
+	  	new csGenerateTerrainImageTextureSingle ();
+	  ts->SetImage (img);
+	  ts->scale = scale;
+	  ts->offset = offset;
+	  tb->AddLayer (height, ts);
 	  img->DecRef ();
 	}
         break;
