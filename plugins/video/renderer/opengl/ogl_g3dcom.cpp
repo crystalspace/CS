@@ -65,7 +65,6 @@
 #include "ivideo/effects/efpass.h"
 #include "ivideo/effects/eflayer.h"
 
-
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
 /*=========================================================================
@@ -131,13 +130,10 @@ CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog, ogl_g3dcom_clipped_lightmap_f
 CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_fog_texels, csVector2);
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog_texels, ogl_g3dcom_clipped_lightmap_fog_texels, ())
 
-
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo1, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo2, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo3, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo4, csClipInfo, [100])
-
-
 
 static ogl_g3dcom_tr_verts *tr_verts = NULL;
 static ogl_g3dcom_uv_verts *uv_verts = NULL;
@@ -158,8 +154,6 @@ static ogl_g3dcom_clipped_lightmap_translate *clipped_lightmap_translate = NULL;
 static ogl_g3dcom_clipped_lightmap_texels *clipped_lightmap_texels = NULL;
 static ogl_g3dcom_clipped_lightmap_fog *clipped_lightmap_fog = NULL;
 static ogl_g3dcom_clipped_lightmap_fog_texels *clipped_lightmap_fog_texels = NULL;
-
-
 
 /*=========================================================================
  Method implementations
@@ -490,7 +484,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
     return false;
   }
   
-  G2D->PerformExtension( "getstatecache", &statecache );
+  G2D->PerformExtension("getstatecache", &statecache);
 
   width = height = -1;
 
@@ -524,7 +518,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     return;
 
   SetPerspectiveAspect (height);
-  SetPerspectiveCenter (width/2, height/2);
+  SetPerspectiveCenter (width / 2, height / 2);
 
   G3DTriangleMesh mesh;
   int res = 64;
@@ -559,10 +553,10 @@ void csGraphics3DOGLCommon::PerfTest ()
   int x, y, i, t;
   float fx, fy;
   i = 0;
-  for (y = 0 ; y <= res ; y++)
+  for (y = 0; y <= res; y++)
   {
     fy = float (y) / float (res) - .5;
-    for (x = 0 ; x <= res ; x++)
+    for (x = 0; x <= res; x++)
     {
       fx = float (x) / float (res) - .5;
       vertices[i].Set (10.*fx, 10.*fy, z);
@@ -573,9 +567,9 @@ void csGraphics3DOGLCommon::PerfTest ()
   }
   i = 0;
   t = 0;
-  for (y = 0 ; y < res ; y++)
+  for (y = 0; y < res; y++)
   {
-    for (x = 0 ; x < res ; x++)
+    for (x = 0; x < res; x++)
     {
       mesh.triangles[t].c = i;
       mesh.triangles[t].b = i+1;
@@ -632,7 +626,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     // First test clipping geometry against the outer portal (close
     // to screen boundaries).
     //========
-    for (i = 0 ; i < test_mode_cnt ; i++)
+    for (i = 0; i < test_mode_cnt; i++)
     {
       clip_outer[0] = test_modes[i].mode;
       int cnt = 0;
@@ -663,9 +657,8 @@ void csGraphics3DOGLCommon::PerfTest ()
   {
     if (compute_outer)
     {
-      clip_outer[0] = '0';
-      clip_outer[1] = '0';
-      clip_outer[2] = '0';
+      for (i = 0; i < 3; i++)
+        clip_outer[i] = '0';
     }
   }
 
@@ -683,9 +676,9 @@ void csGraphics3DOGLCommon::PerfTest ()
   zy = -5. / ((dh-asp_center_y) * inv_aspect);
   if (zy > zx) z = zy;
   else z = zx;
-  for (i = 0 ; i < num_vertices ; i++)
+  for (i = 0; i < num_vertices; i++)
     vertices[i].z = z;
-  for (i = 0 ; i < test_mode_cnt ; i++)
+  for (i = 0; i < test_mode_cnt; i++)
   {
     if (test_modes[i].mode == 'z') test_modes[i].mode = 'n';
     else if (test_modes[i].mode == 'Z') test_modes[i].mode = 'N';
@@ -741,19 +734,28 @@ void csGraphics3DOGLCommon::PerfTest ()
     clip_required[0], clip_required[1], clip_required[2]);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "    Video.OpenGL.ClipOptional = %c%c%c",
     clip_optional[0], clip_optional[1], clip_optional[2]);
-  char buf[4]; buf[3] = 0;
-  buf[0] = clip_required[0];
-  buf[1] = clip_required[1];
-  buf[2] = clip_required[2];
-  config->SetStr ("Video.OpenGL.ClipRequired", buf);
-  buf[0] = clip_outer[0];
-  buf[1] = clip_outer[1];
-  buf[2] = clip_outer[2];
-  config->SetStr ("Video.OpenGL.ClipOuter", buf);
-  buf[0] = clip_optional[0];
-  buf[1] = clip_optional[1];
-  buf[2] = clip_optional[2];
-  config->SetStr ("Video.OpenGL.ClipOptional", buf);
+  
+  char buf[3];
+  for (i = 0; i < 3; i++)
+    buf[i] = 0;
+  
+  for (i = 0; i < 3; i++)
+  {
+    buf[i] = clip_required[i];
+    config->SetStr ("Video.OpenGL.ClipRequired", buf);
+  }
+  
+  for (i = 0; i < 3; i++)
+  {
+    buf[i] = clip_outer[i];
+    config->SetStr ("Video.OpenGL.ClipOuter", buf);
+  }
+  
+  for (i = 0; i < 3; i++)
+  {
+    buf[i] = clip_optional[i];
+    config->SetStr ("Video.OpenGL.ClipOptional", buf);
+  }
   config->Save ();
 
   SetClipper (NULL, CS_CLIPPER_NONE);
