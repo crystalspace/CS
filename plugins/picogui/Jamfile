@@ -1,4 +1,0 @@
-SubDir TOP plugins picogui ;
-
-#SubInclude TOP plugins picogui client ;
-SubInclude TOP plugins picogui server ;

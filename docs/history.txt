@@ -75,6 +75,9 @@ chronological order.
 	      rule.  Likewise, converted serveral Jamfiles to utilize the
 	      portable $(DOT) and $(DOTDOT) rather than hardcoding "." and
 	      "..".
+	- Eric Sunshine removed the unused and incomplete PicoGUI plugin and
+	  test program.  For easy revival, they have been tagged in CVS with
+	  PICOGUI_OBSOLETE.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support

@@ -20,7 +20,6 @@ SubInclude TOP plugins motion ;
 SubInclude TOP plugins movierecorder ;
 SubInclude TOP plugins net ;
 SubInclude TOP plugins physics ;
-SubInclude TOP plugins picogui ;
 SubInclude TOP plugins proctex ;
 SubInclude TOP plugins reporter ;
 SubInclude TOP plugins sequence ;

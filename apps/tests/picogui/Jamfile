@@ -1,8 +1,0 @@
-SubDir TOP apps tests picogui ;
-
-if $(PGSERVER.AVAILABLE) = "yes"
-{
-Help pgtesttest : "Crystal Space PicoGUI test" ;
-Application pgtest : pgtest.cpp : noinstall ;
-LinkWith pgtest : csgeom csgfx cstool csutil ;
-}

@@ -1491,18 +1491,6 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for libpgserver (PicoGUI server library).
-# In addition to the standard installed locations,
-# we also search CS/libs/libpgserver*
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([pgserver],
-  [AC_LANG_PROGRAM([[#include <pgserver/g_error.h>]], [g_error e;])],
-  [$srcdir/libs/libpgserver*], [],
-  [CS_EMIT_BUILD_RESULT([cs_cv_libpgserver], [PGSERVER])])
-
-
-
-#------------------------------------------------------------------------------
 # Check for lib3ds.  In addition to the standard installed locations, we also
 # search CS/libs/lib3ds*.
 #------------------------------------------------------------------------------
