@@ -287,6 +287,12 @@ public:
   /// Release the mouse events to go where they normally would.
   virtual void ReleaseMouse()=0;
 
+  /// Set this compoment to be a modal dialog.
+  virtual void SetModal(iAwsComponent *comp)=0;
+
+  /// Set no active modal dialog.
+  virtual void UnSetModal()=0;
+
   /// Dispatches events to the proper components
   virtual bool HandleEvent(iEvent&)=0;
 
