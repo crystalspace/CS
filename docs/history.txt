@@ -34,6 +34,17 @@ The history order is reversed so that new features are at the top.
 	- Matze reverted the namespace stuff as this is creating unexpected
 	  problems when the user declares classes and structs ahead of their
 	  real declaration.
+	- res modified the common GL canvas code to only allocate the 
+	  screenshot buffer the first time a screenshot is requested and not 
+	  allocate/deallocate it everytime.
+	- res made the following changes to the movie recorder:
+	    - Fake clock ticks are stored as float internally to reduce round
+	      off errors.
+	    - The tick count doesn't "jump" any more when the fake clock is
+	      activated/deactivated.
+	    - Waiting when frames can be rendered faster than the movie FPS 
+	      rate requires can now be activated/deactivated via config.
+	- res #ifdef'd out #warnings. MSVC doesn't like them.
 2-Apr-2003
         - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h

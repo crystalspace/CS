@@ -83,7 +83,9 @@ csMovieRecorder::csMovieRecorder (iBase* parent)
   object_reg = NULL;
   initialized = false;
   writer = NULL;
+  ffakeClockTicks = 0;
   fakeClockTicks = 0;
+  fakeClockElapsed = 0;
   paused = false;
 }
 
@@ -170,6 +172,7 @@ void csMovieRecorder::SetupPlugin()
   useLZO = config->GetBool("MovieRecorder.Capture.UseLZO", true);
   useRTJpeg = config->GetBool("MovieRecorder.Capture.UseRTJpeg", false);
   useRGB = config->GetBool("MovieRecorder.Capture.UseRGB", false);
+  throttle = config->GetBool("MovieRecorder.Capture.Throttle", true);
 
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Record", "alt-r"), keyRecord);
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Pause", "alt-p"), keyPause);
@@ -373,7 +376,9 @@ void csMovieRecorder::Start(void)
   int h = recordHeight ? recordHeight : G2D->GetHeight();
 
   movieFile = VFS->Open(movieFileName, VFS_FILE_WRITE | VFS_FILE_UNCOMPRESSED);
-  fakeTicksPerFrame = (csTicks) (1000 / frameRate + 0.5);
+  fakeTicksPerFrame = (1000 / frameRate);
+  ffakeClockTicks = fakeClockTicks;
+
   writer = new NuppelWriter(w, h, &WriterCallback, this, frameRate,
 			    rtjQuality, useRTJpeg, useLZO, useRGB);
 
@@ -408,6 +413,7 @@ void csMovieRecorder::UnPause(void)
   if (!IsRecording())
     return;
   paused = false;
+  ffakeClockTicks = fakeClockTicks;
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder unpaused - %s", movieFileName);
 }
 
@@ -419,19 +425,31 @@ void csMovieRecorder::WriterCallback(const void *data, long bytes, void *extra)
 
 void csMovieRecorder::ClockAdvance ()
 {
+  csTicks lastFakeClockTicks = fakeClockTicks;
   realVirtualClock->Advance();
-  csTicks realTicksPerFrame = realVirtualClock->GetCurrentTicks();
+  csTicks realTicksPerFrame = realVirtualClock->GetElapsedTicks();
 
+  /*
+    To avoid 'jumps' in time when the clock is throttled/unthrottled
+    we keep our own tick counter, which is either increased by the
+    real elapsed time (normal mode) or the required frame time (recording).
+   */
   if (!IsRecording() || IsPaused()) {
-    fakeClockTicks = realTicksPerFrame;
+    fakeClockElapsed = realTicksPerFrame;
+    fakeClockTicks += realTicksPerFrame;
   }
   else {
-    fakeClockTicks += fakeTicksPerFrame;
+    ffakeClockTicks += fakeTicksPerFrame;
+    fakeClockTicks = (csTicks)ffakeClockTicks;
 
+    fakeClockElapsed = fakeClockTicks - 
+      lastFakeClockTicks;
     // If we're rendering slower than real time, there's nothing we can do about it.
     // If we're rendering faster, put in a little delay here.
-    if (realTicksPerFrame < fakeTicksPerFrame)
-      csSleep(fakeTicksPerFrame - realTicksPerFrame);
+    if (throttle && ((fakeClockElapsed > realTicksPerFrame)))
+    {
+      csSleep(fakeClockElapsed - realTicksPerFrame);
+    }
   } 
 }
 
@@ -449,18 +467,12 @@ void csMovieRecorder::ClockResume ()
 
 csTicks csMovieRecorder::ClockGetElapsedTicks () const
 {
-  if (!IsRecording() || IsPaused())
-    return realVirtualClock->GetElapsedTicks();
-  else
-    return fakeTicksPerFrame;
+  return fakeClockElapsed;
 }
 
 csTicks csMovieRecorder::ClockGetCurrentTicks () const
 {
-  if (!IsRecording() || IsPaused())
-    return realVirtualClock->GetCurrentTicks();
-  else
-    return fakeClockTicks;
+  return fakeClockTicks;
 }
 
 /// From Bugplug, for decoding keys in the config file

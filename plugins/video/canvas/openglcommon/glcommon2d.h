@@ -54,6 +54,7 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
   /// Set up current GL RGB color from a packed color format
   void setGLColorfromint (int color);
 
+  uint8 *screen_shot;
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);
 

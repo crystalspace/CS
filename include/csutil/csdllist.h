@@ -21,7 +21,9 @@
 
 #include "cstypes.h"
 
-#warning csDLList is deprecated. Please use csList from csutil/list.h
+#ifndef COMP_VC
+# warning csDLList is deprecated. Please use csList from csutil/list.h
+#endif
 
 /**
  * \internal This structure should not need to be accessed directly.

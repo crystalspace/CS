@@ -19,7 +19,9 @@
 #ifndef __CS_SARRAY_H__
 #define __CS_SARRAY_H__
 
-#warning csStaticArray is DEPRECATED. Use csGrowingArray instead
+#ifndef COMP_VC
+# warning csStaticArray is DEPRECATED. Use csGrowingArray instead
+#endif
 
 /**\file
  */

@@ -38,6 +38,7 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   csGraphics2D (iParent), FontCache (NULL)
 {
   EventOutlet = NULL;
+  screen_shot = NULL;
 }
 
 bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
@@ -69,6 +70,7 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
   Close ();
   
   delete statecache;
+  delete[] screen_shot;
 }
 
 bool csGraphics2DGLCommon::Open ()
@@ -297,6 +299,7 @@ void csGraphics2DGLCommon::DrawPixels (csPixelCoord* pixels,
       glVertex2i (x, Height - y);
     }
   }
+  glEnd ();
   if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
 }
 
@@ -363,7 +366,7 @@ void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
 
 // This variable is usually NULL except when doing a screen shot:
 // in this case it is a temporarily allocated buffer for glReadPixels ()
-static uint8 *screen_shot = NULL;
+//static uint8 *screen_shot = NULL;
 
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
@@ -489,8 +492,8 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 #else
   int screen_width = Width * (pfmt.PixelBytes == 1? 1 : 4);
 #endif
-  screen_shot = new uint8 [screen_width * Height];
-  if (!screen_shot) return NULL;
+  if (!screen_shot) screen_shot = new uint8 [screen_width * Height];
+  //if (!screen_shot) return NULL;
 
   // glPixelStore ()?
   switch (pfmt.PixelBytes)
@@ -566,8 +569,8 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
   memcpy (&pfmt, &oldpfmt, sizeof(csPixelFormat));
 #endif
 
-  delete [] screen_shot;
-  screen_shot = NULL;
+  //delete [] screen_shot;
+  //screen_shot = NULL;
 
   return ss;
 }

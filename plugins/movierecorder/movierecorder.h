@@ -58,10 +58,20 @@ private:
   NuppelWriter *writer;
   csRef<iFile> movieFile;
   csRef<iVirtualClock> realVirtualClock;
-  csTicks fakeClockTicks, fakeTicksPerFrame;
+  /// Number of current ticks since start fake clock started.
+  /// Stored as float here to properly handle all frame rates w/o
+  /// round off errors.
+  float ffakeClockTicks;
+  /// How many ticks per one fake frame
+  float fakeTicksPerFrame;
+  /// Number of current ticks since start fake clock started,
+  /// now as csTicks
+  csTicks fakeClockTicks;
+  /// How many ticks in our fake clocks have elapsed since last advance.
+  csTicks fakeClockElapsed;
   bool paused;
 
-  /// format of the screenshot filename (e.g. "/this/cryst%03d.png")
+  /// format of the movie filename (e.g. "/this/cryst%03d.nuv")
   char* captureFormat;
   int captureFormatNumberMax;
   char movieFileName[CS_MAXPATHLEN];
@@ -70,6 +80,8 @@ private:
   float frameRate, rtjQuality;
   int recordWidth, recordHeight;
   bool useLZO, useRTJpeg, useRGB;
+  /// Throttle clock if frame is drawn faster than required
+  bool throttle;
 
   /// Key bindings
   struct keyBinding {
