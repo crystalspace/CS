@@ -167,7 +167,7 @@ RM=rm -f
 RMDIR=rm -rf
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=
+SYS_SED_DEPEND=-e "s/\.cpp\.o \:/\.o\:/g"
 
 #==================================================
 # Extra operation system dependent options.
