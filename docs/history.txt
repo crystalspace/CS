@@ -13,8 +13,7 @@ The history order is reversed so that new features are at the top.
 	- Moved the initialization of the state cache in the common code
 	  of all OpenGL canvases to before the font cache is created. Otherwise
 	  there would be an access to an uninitialized fields since the font
-	  cache is already trying to use the state cache. Strangely enough
-	  this seems to fix the crash when turning right in flarge!
+	  cache is already trying to use the state cache.
 16-Jan-2003
 	- 'reverse_action' in 3D sprites was not initialized to false.
 	- Fixed odedynam plugin so it compiles again.
