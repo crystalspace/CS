@@ -26,8 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/ogg
-
 ifeq ($(USE_PLUGINS),yes)
   SNDOGG = $(OUTDLL)/sndogg$(DLL)
   LIB.SNDOGG = $(foreach d,$(DEP.SNDOGG),$($d.LIB))
@@ -58,10 +56,11 @@ ifeq ($(MAKESECTION),targets)
 
 sndogg: $(OUTDIRS) $(SNDOGG)
 
-# XXX: not that nice here, should add a test for vorbisfile and libvorbis to
-# configure as well...
 $(SNDOGG): $(OBJ.SNDOGG) $(LIB.SNDOGG)
 	$(DO.PLUGIN) $(VORBISFILE.LFLAGS)
+
+$(OUT)/%$O: plugins/sound/loader/ogg/%.cpp
+	$(DO.COMPILE.CPP) $(VORBISFILE.CFLAGS)
 
 clean: sndoggclean
 sndoggclean:

@@ -27,8 +27,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/3ds2lev
-
 3DS2LEV.EXE = 3ds2lev$(EXE.CONSOLE)
 INC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.h)
 SRC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.cpp)

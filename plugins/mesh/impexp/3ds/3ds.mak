@@ -22,8 +22,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/impexp/3ds
-
 ifeq ($(USE_PLUGINS),yes)
   IE3DS = $(OUTDLL)/ie3ds$(DLL)
   LIB.IE3DS = $(foreach d,$(DEP.IE3DS),$($d.LIB))

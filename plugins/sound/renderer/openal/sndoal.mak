@@ -26,9 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/renderer/openal plugins/sound/renderer/common
-
-LIB.EXTERNAL.sndoal = $(OPENAL.LFLAGS)
+vpath %.cpp plugins/sound/renderer/common
 
 # COMP_GCC Linker assumes static libs have extension '.a'.  Mingw/Cygwin both
 # use libdsound.a (static lib) as the place from which to get MS DirectSound.
@@ -80,7 +78,10 @@ ifeq ($(MAKESECTION),targets)
 sndoal: $(OUTDIRS) $(SNDOAL)
 
 $(SNDOAL): $(OBJ.SNDOAL) $(LIB.SNDOAL)
-	$(DO.PLUGIN) $(LIB.EXTERNAL.sndoal)
+	$(DO.PLUGIN) $(OPENAL.LFLAGS)
+
+$(OUT)/%$O: plugins/sound/renderer/openal/%.cpp
+	$(DO.COMPILE.CPP) $(OPENAL.CFLAGS)
 
 clean: sndoalclean
 sndoalclean:
