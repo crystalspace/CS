@@ -251,8 +251,12 @@ public:
   { GfxPpl->SetClipRect (clip.xmin, clip.ymin, clip.xmax, clip.ymax); }
 
   /// Restore clipping rectangle to (0, 0, ScreenW, ScreenH);
-  void pplRestoreClipRect()
+  void pplRestoreClipRect ()
   { GfxPpl->RestoreClipRect (); }
+
+  /// Draw a 3D polygon
+  void pplPolygon3D (G3DPolygonDPFX &poly, UInt mode)
+  { GfxPpl->Polygon3D (poly, mode); }
 
   /// Return the width of given text using currently selected font
   int TextWidth (const char *text, int Font)

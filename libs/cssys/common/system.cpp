@@ -81,7 +81,7 @@ void (*fatal_exit) (int errorcode, bool canreturn) = default_fatal_exit;
 
 csSystemDriver::csSystemDriver()
 {
-  pprintf_init();
+  console_open ();
   System = this;
   FullScreen = false;
   Mouse = NULL;
@@ -130,6 +130,7 @@ csSystemDriver::~csSystemDriver ()
   csCoUninitialize();
 
   CHK (delete com_options);
+  console_close ();
 }
 
 bool csSystemDriver::Initialize (int argc, char *argv[],
@@ -620,14 +621,14 @@ void csSystemDriver::SetMode (const char* mode)
 
 void csSystemDriver::Alert (const char* msg)
 {
-  pprintf (msg);
-  debugprintf (true, msg);
+  console_out (msg);
+  debug_out (true, msg);
 }
 
 void csSystemDriver::Warn (const char* msg)
 {
-  pprintf (msg);
-  debugprintf (true, msg);
+  console_out (msg);
+  debug_out (true, msg);
 }
 
 void csSystemDriver::Printf (int mode, const char* str, ...)
@@ -647,8 +648,8 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
         System->Alert (buf);
       else
       {
-        pprintf ("%s", buf);
-        debugprintf (true, "%s", buf);
+        console_out (buf);
+        debug_out (true, buf);
       }
       break;
 
@@ -657,14 +658,14 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
         System->Warn (buf);
       else
       {
-        pprintf ("%s", buf);
-        debugprintf (true, "%s", buf);
+        console_out (buf);
+        debug_out (true, buf);
       }
       break;
 
     case MSG_INITIALIZATION:
-      pprintf ("%s", buf);
-      debugprintf (true, "%s", buf);
+      console_out (buf);
+      debug_out (true, buf);
       if (System->DemoReady)
         System->DemoWrite (buf);
       break;
@@ -673,39 +674,39 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
       if (System && System->Console)
         System->Console->PutText ("%s", buf);
       else
-        pprintf ("%s", buf);
+        console_out (buf);
       break;
 
     case MSG_STDOUT:
-      pprintf ("%s", buf);
+      console_out (buf);
       break;
 
     case MSG_DEBUG_0:
-      debugprintf (false, "%s", buf);
+      debug_out (false, buf);
       break;
 
     case MSG_DEBUG_1:
       if (debug_level >= 1)
-        debugprintf (false, "%s", buf);
+        debug_out (false, buf);
       break;
 
     case MSG_DEBUG_2:
       if (debug_level >= 2)
-        debugprintf (false, "%s", buf);
+        debug_out (false, buf);
       break;
 
     case MSG_DEBUG_0F:
-      debugprintf (true, "%s", buf);
+      debug_out (true, buf);
       break;
 
     case MSG_DEBUG_1F:
       if (debug_level >= 1)
-        debugprintf (true, "%s", buf);
+        debug_out (true, buf);
       break;
 
     case MSG_DEBUG_2F:
       if (debug_level >= 2)
-        debugprintf (true, "%s", buf);
+        debug_out (true, buf);
       break;
   } /* endswitch */
 }
@@ -738,21 +739,14 @@ void csSystemDriver::DemoWrite (const char* buf)
 /*
 * Print a message on the console or in stdout/debug.txt.
 */
-void csSystemDriver::debugprintf (bool flush, const char *str, ...)
+void csSystemDriver::debug_out (bool flush, const char *str)
 {
-  char buf[1024];
-  va_list arg;
-
-  va_start (arg, str);
-  vsprintf (buf, str, arg);
-  va_end (arg);
-  
   static FILE *f = NULL;
   if (!f)
     f = fopen ("debug.txt", "a+");
   if (f)
   {
-    fwrite (buf, strlen (buf), 1, f);
+    fputs (str, f);
     if (flush)
       fflush (f);
   }

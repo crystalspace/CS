@@ -1,12 +1,6 @@
 #ifndef _IMAGELDR_H_
 #define _IMAGELDR_H_
 
-extern "C" {
-  #define Byte z_Byte     /* Kludge to avoid conflicting typedef in zconf.h */
-  #include "zlib.h"
-  #undef Byte
-  #include "png.h"
-}
 #include "csgfxldr/gifimage.h"
 #include "csgfxldr/jpgimage.h"
 #include "csgfxldr/pngimage.h"

@@ -1212,7 +1212,6 @@ STDMETHODIMP csTextureManagerSoftware::UnregisterTexture (ITextureHandle* handle
 
 STDMETHODIMP csTextureManagerSoftware::MergeTexture (ITextureHandle* handle)
 {
-  (void)handle;
   csTextureMMSoftware* txt = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
   if (txt->for_3d ()) txt->alloc_mipmaps (this);
   if (txt->for_2d ()) txt->alloc_2dtexture (this);

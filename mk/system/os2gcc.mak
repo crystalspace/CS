@@ -58,13 +58,13 @@ LIB_PREFIX=
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lzdll
+Z_LIBS=-lzdll
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-Llibs/libpng -lpngdll
+PNG_LIBS=-lpngdll
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpegdll
+JPG_LIBS=-ljpegdll
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -146,9 +146,6 @@ OUTDLL=
 
 # The C++ compiler (autodetected)
 #CXX=gcc -c
-
-# The linker.
-LINK=$(CC)
 
 # The Resource Compiler (autodetected)
 #RC=rc

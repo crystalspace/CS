@@ -92,6 +92,4 @@ private:
   bool MouseExists;
 };
 
-extern void printf_Enable (bool Enable);
-
 #endif // WATCOM_H

@@ -233,24 +233,26 @@ void splitpath (const char *iPathName, char *iPath, size_t iPathSize,
         )
     sl--;
 
-  if (sl >= iPathSize)
-  {
-    memcpy (iPath, iPathName, iPathSize - 1);
-    iPath [iPathSize - 1] = 0;
-  }
-  else
-  {
-    memcpy (iPath, iPathName, sl);
-    iPath [sl] = 0;
-  }
+  if (iPathSize)
+    if (sl >= iPathSize)
+    {
+      memcpy (iPath, iPathName, iPathSize - 1);
+      iPath [iPathSize - 1] = 0;
+    }
+    else
+    {
+      memcpy (iPath, iPathName, sl);
+      iPath [sl] = 0;
+    }
 
-  if (maxl - sl >= iNameSize)
-  {
-    memcpy (iName, &iPathName [sl], iNameSize - 1);
-    iName [iNameSize - 1] = 0;
-  }
-  else
-    memcpy (iName, &iPathName [sl], maxl - sl + 1);
+  if (iNameSize)
+    if (maxl - sl >= iNameSize)
+    {
+      memcpy (iName, &iPathName [sl], iNameSize - 1);
+      iName [iNameSize - 1] = 0;
+    }
+    else
+      memcpy (iName, &iPathName [sl], maxl - sl + 1);
 }
 
 bool fnamematches (const char *fName, const char *fMask)

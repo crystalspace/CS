@@ -146,8 +146,8 @@ IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED (SysSystemDriver, DosSystemDriver)
 
 STDMETHODIMP SysSystemDriver::XDosSystemDriver::EnablePrintf (bool Enable)
 {
-  extern void printf_Enable (bool Enable);
-  printf_Enable (Enable);
+  extern void console_Enable (bool Enable);
+  console_Enable (Enable);
   return S_OK;
 }
 

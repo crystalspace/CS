@@ -426,7 +426,7 @@ void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y, int *w, int *h)
       char temp[256];
       if (ScanStr (butdef, "%s %d,%d,%d,%d", &temp, x, y, w, h) < 0)
       {
-        pprintf ("%s: csws.cfg parse error in string: %s\n", id, butdef);
+        CsPrintf (MSG_FATAL_ERROR, "%s: csws.cfg parse error in string: %s\n", id, butdef);
         fatal_exit (0, false);
       }
       break;
@@ -434,7 +434,7 @@ void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y, int *w, int *h)
   } /* endfor */
   if (*x < 0)
   {
-    pprintf ("Cannot find titlebar button definition %s in csws.cfg\n", id);
+    CsPrintf (MSG_FATAL_ERROR, "Cannot find titlebar button definition %s in csws.cfg\n", id);
     fatal_exit (0, false);
   } /* endif */
 }

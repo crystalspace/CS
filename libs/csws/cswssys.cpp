@@ -179,6 +179,7 @@ void appSystemDriver::DemoWrite (const char* buf)
 
 void appSystemDriver::Alert (const char *msg)
 {
+  csSystemDriver::Alert (msg);
   if (DemoReady)
   {
     int oldcolor = textcolor;
@@ -186,12 +187,11 @@ void appSystemDriver::Alert (const char *msg)
     DemoWrite (msg);
     textcolor = oldcolor;
   }
-  else
-    csSystemDriver::Alert (msg);
 }
 
 void appSystemDriver::Warn (const char *msg)
 {
+  csSystemDriver::Warn (msg);
   if (DemoReady)
   {
     int oldcolor = textcolor;
@@ -199,8 +199,6 @@ void appSystemDriver::Warn (const char *msg)
     DemoWrite (msg);
     textcolor = oldcolor;
   }
-  else
-    csSystemDriver::Alert (msg);
 }
 
 void appSystemDriver::NextFrame (long elapsed_time, long current_time)

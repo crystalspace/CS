@@ -25,7 +25,7 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/common/system.h"
 #include "cssys/os2/icsos2.h"
-#include "aalib.h"
+#include <aalib.h>
 
 extern const CLSID CLSID_AAGraphics2D;
 

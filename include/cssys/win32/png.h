@@ -105,10 +105,10 @@ extern "C" {
  */
 
 /* include the compression library's header */
-#include "zlib.h"
+#include <zlib.h>
 
 /* include all user configurable info */
-#include "pngconf.h"
+#include <pngconf.h>
 
 /* This file is arranged in several sections.  The first section contains
  * structure and type definitions.  The second section contains the external

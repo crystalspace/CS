@@ -109,7 +109,7 @@ class csStatic : public csComponent
 
 public:
   /// Create static component object (by default - a label) linked to another
-  csStatic (csComponent *iParent, csComponent *iLink, char *iText,
+  csStatic (csComponent *iParent, csComponent *iLink, const char *iText,
     csStaticStyle iStyle = csscsLabel);
   /// Create static component object without text (by default - a rectangle)
   csStatic (csComponent *iParent, csStaticStyle iStyle = csscsRectangle);

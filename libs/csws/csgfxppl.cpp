@@ -129,9 +129,17 @@ void csGraphicsPipeline::SetClipRect (int xmin, int ymin, int xmax, int ymax)
   pe->ClipRect.ymax = ymax;
 }
 
-void csGraphicsPipeline::RestoreClipRect()
+void csGraphicsPipeline::RestoreClipRect ()
 {
   AllocOp (pipeopRESCLIP);
+}
+
+void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
+{
+  csPipeEntry *pe = AllocOp (pipeopPOLY3D);
+  if (!pe) return;
+  pe->Poly3D.poly = poly;
+  pe->Poly3D.mode = mode;
 }
 
 // Theoretically Update() could contain a kind of optimizer which would
@@ -236,6 +244,15 @@ void csGraphicsPipeline::Flush (int iCurPage)
       case pipeopRESCLIP:
         System->piG2D->SetClipRect (clip_xmin = old_xmin, clip_ymin = old_ymin,
           clip_xmax = old_xmax, clip_ymax = old_ymax);
+        break;
+      case pipeopPOLY3D:
+        if (System->piG3D->BeginDraw (CSDRAW_3DGRAPHICS) != S_OK)
+          return;
+        System->piG3D->StartPolygonFX (op->Poly3D.poly.txt_handle, op->Poly3D.mode);
+        System->piG3D->DrawPolygonFX (op->Poly3D.poly);
+        System->piG3D->FinishPolygonFX ();
+        System->piG3D->FinishDraw ();
+        System->piG3D->BeginDraw (CSDRAW_2DGRAPHICS);
         break;
       default:
         assert ("unknown graphics pipeline operation in Pipeline::Flush()");

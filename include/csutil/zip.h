@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 #define Byte z_Byte	/* Kludge to avoid conflicting typedef in zconf.h */
-#include "zlib.h"
+#include <zlib.h>
 #undef Byte
 
 #ifdef __cplusplus

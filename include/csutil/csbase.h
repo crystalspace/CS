@@ -30,17 +30,18 @@
 extern const GUID IID_IBase;
 
 /// Interface for csBase
-interface IBase:public IUnknown {
+interface IBase : public IUnknown
+{
 };
 
 /// Class csBase
-class csBase:public IBase
+class csBase : public IBase
 {
 public:
   ///
   virtual ~csBase () {}
 
-	DEFAULT_COM(Base);
+  DEFAULT_COM (Base);
 };
 
 #endif // __CSBASE_H__

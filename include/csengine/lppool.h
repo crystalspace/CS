@@ -123,5 +123,4 @@ public:
   }
 };
 
-
 #endif /*LPPOOL_H*/

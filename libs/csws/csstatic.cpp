@@ -23,7 +23,7 @@
 #include "csws/csstatic.h"
 #include "csws/csapp.h"
 
-csStatic::csStatic (csComponent *iParent, csComponent *iLink, char *iText,
+csStatic::csStatic (csComponent *iParent, csComponent *iLink, const char *iText,
   csStaticStyle iStyle) : csComponent (iParent)
 {
   Init (iStyle);

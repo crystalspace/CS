@@ -109,8 +109,8 @@
 #endif // SYSDEF_MKDIR
 
 #ifdef SYSDEF_SOCKETS
-#  include "sys/ioctl.h"
-#  include "sys/so_ioctl.h"
+#  include <sys/ioctl.h>
+#  include <sys/so_ioctl.h>
 typedef int socklen_t;
 #endif
 

@@ -39,6 +39,8 @@
 
 int mTaskSystem, mTaskVersion;
 
+extern void console_Enable (bool Enable);
+
 //== class SysGraphics2D =======================================================
 
 int ColorMask(int MaskSize)
@@ -136,7 +138,7 @@ bool SysGraphics2D::Open(const char *Title)
     DrawSprite = DrawSprite16;
   } /* endif */
 
-  printf_Enable (false);
+  console_Enable (false);
   return true;
 }
 
@@ -145,7 +147,7 @@ void SysGraphics2D::Close(void)
   RestoreVMode ();
   if (Memory)
     free (Memory);
-  printf_Enable (true);
+  console_Enable (true);
 }
 
 void SysGraphics2D::Print(csRect *area)

@@ -25,39 +25,26 @@
 #include "system/sysdef.h"
 #include "system/system.h"
 
-static bool printf_initialized = false;
-
-// to be called before all pprintf() calls
-void csSystemDriver::printf_init(void)
+// to be called before all printf() calls
+void csSystemDriver::console_open (void)
 {
-  printf_initialized = true;
 }
 
 // to be called before shutdown
-void csSystemDriver::printf_close(void)
+void csSystemDriver::console_close (void)
 {
-  printf_initialized = false;
 }
 
 static bool ShutUp = false;
 
-void printf_Enable (bool Enable)
+void console_Enable (bool Enable)
 {
   ShutUp = !Enable;
 }
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-int csSystemDriver::printf(char *str, ...)
+void csSystemDriver::console_out (const char *str)
 {
-  if (ShutUp)
-    return 0;
-
-  va_list arg;
-  char buf[1024];
-
-  va_start (arg, str);
-  vsprintf (buf, str, arg);
-  va_end (arg);
-
-  return ::printf("%s",buf);
+  if (!ShutUp)
+    fputs (str, stdout);
 }

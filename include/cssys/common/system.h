@@ -229,15 +229,15 @@ public:
   static void Printf (int mode, const char* str, ...);
 
   /// Print a string into debug.txt
-  static void debugprintf (bool flush, const char* str, ...);
+  static void debug_out (bool flush, const char* str);
 
   /**
    * Printf version that works on all systems.
-   * Default implementation is in 'def_sys'.
+   * Default implementation is in 'libs/cssys/general/'.
    */
-  static void printf_init ();
-  static void printf_close ();
-  static int printf (const char *str, ...);
+  static void console_open ();
+  static void console_close ();
+  static void console_out (const char *str);
 
 protected:
   /**
@@ -327,9 +327,6 @@ protected:
 #define GetISystemFromSystem(a) (&a->m_xSystem)
 
 // Shortcuts for compatibility
-#define pprintf_init	csSystemDriver::printf_init
-#define pprintf_close	csSystemDriver::printf_close
-#define pprintf		csSystemDriver::printf
 #define SysGetTime	csSystemDriver::Time
 
 // CrystalSpace global variables

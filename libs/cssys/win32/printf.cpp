@@ -16,43 +16,31 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// PRINTF.CPP
-// A printf function that works with Win32
-// written (quickly) by dan
-//
-// 21-Jan-97 19:22
-//	Modified (even quicker) by Robert Blum (r.blum@gmx.net) 
-//	Now there are no buffer overrun problems any more 
-//	However, I think the console should be encapsulated in a
-//	class
-
 #include <stdio.h>
 #include <stdarg.h>
 #include "sysdef.h"
 #include "cssys/common/system.h"
 
 #include <windows.h>
-HANDLE stdout_handle;		// Win32 console stdout handle
 
+static bool console_ok = false;
 
-bool pprintf_initialized=false;
-
-// to be called before all pprintf() calls
-void pprintf_init(void)
+// to be called before all printf() calls
+void csSystemDriver::console_open ()
 {
 #ifdef WIN32_USECONSOLE
   AllocConsole();
-  freopen("CONOUT$","a",stderr); // Redirect stderr to console   
-  freopen("CONOUT$","a",stdout); // Redirect stdout to console   
+  freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
+  freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
 #endif
 
-  pprintf_initialized=true;
+  console_ok = true;
 }
 
 // to be called before shutdown
-void pprintf_close(void)
+void csSystemDriver::console_close ()
 {
-  pprintf_initialized=false;
+  console_ok = false;
 
 #ifdef WIN32_USECONSOLE
   FreeConsole();
@@ -60,16 +48,8 @@ void pprintf_close(void)
 }
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-int pprintf(const char *str, ...)
+void csSystemDriver::console_out (const char *str)
 {
-  va_list arg;
-  int nResult;
- 
-  if(!pprintf_initialized) return -1;
-
-  va_start (arg, str);
-  nResult=vfprintf (stdout, str, arg);
-  va_end (arg);
-
-  return nResult;
+  if (console_ok)
+    fputs (str, stdout);
 }  

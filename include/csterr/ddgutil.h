@@ -29,7 +29,6 @@
 #ifdef WIN32
 #define MAXFLOAT  99999999
 #else
-// Linux defines
 //#include <strstream.h> 
 #include <stdlib.h>
 #define sqrtf	sqrt
@@ -44,6 +43,7 @@
 #define MAXFLOAT 99999999
 #endif
 #endif
+
 #define sq(a) ((a)*(a))
 // Some convenient angle functions.
 // Convert degrees to radians

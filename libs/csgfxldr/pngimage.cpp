@@ -20,9 +20,9 @@
 
 extern "C" {
   #define Byte z_Byte     /* Kludge to avoid conflicting typedef in zconf.h */
-  #include "zlib.h"
+  #include <zlib.h>
   #undef Byte
-  #include "png.h"
+  #include <png.h>
 }
 
 #include "sysdef.h"

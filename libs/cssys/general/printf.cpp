@@ -16,43 +16,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// PRINTF.CPP
-// A printf function that works with Win32
-// written (quickly) by dan. This version contains
-// stubs for non-windows platforms. See the 'win32'
-// directory for the Windows version.
-
 #include <stdarg.h>
 #include <stdio.h>
 
 #include "sysdef.h"
 #include "cssys/common/system.h"
 
-static bool printf_initialized = false;
-
-// to be called before all pprintf() calls
-void csSystemDriver::printf_init(void)
+// to be called before all printf () calls
+void csSystemDriver::console_open ()
 {
-  printf_initialized = true;
 }
 
 // to be called before shutdown
-void csSystemDriver::printf_close(void)
+void csSystemDriver::console_close ()
 {
-  printf_initialized = false;
 }
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-int csSystemDriver::printf(const char *str, ...)
+void csSystemDriver::console_out (const char *str)
 {
-  va_list arg;
-  char buf[1024];
-
-  va_start (arg, str);
-  vsprintf (buf, str, arg);
-  va_end (arg);
-
-  int ret = ::printf("%s", buf);
-  fflush (stdout);
-  return ret;
-}  
+  fputs (str, stdout);
+}

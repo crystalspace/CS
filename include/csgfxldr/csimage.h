@@ -25,6 +25,7 @@
 #include "types.h"
 #include "csgfxldr/rgbpixel.h"
 #include "iimage.h"
+#include "csobject/csobj.h"
 
 interface ISystem;
 
@@ -43,7 +44,7 @@ struct Filter5x5;
  * type supported, a subclass should be created for loading that image
  * type.
  */
-class ImageFile
+class ImageFile : public csObject
 {
 private:
   /// Width of image.

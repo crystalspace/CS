@@ -59,7 +59,8 @@ private:
     pipeopSAVAREA,
     pipeopRESAREA,
     pipeopSETCLIP,
-    pipeopRESCLIP
+    pipeopRESCLIP,
+    pipeopPOLY3D
   };
   /// Graphics pipeline entry
   typedef struct
@@ -104,6 +105,11 @@ private:
      {
        int xmin, ymin, xmax, ymax;
      } ClipRect;
+     struct
+     {
+       G3DPolygonDPFX poly;
+       UInt mode;
+     } Poly3D;
     };
   } csPipeEntry;
 
@@ -165,6 +171,9 @@ private:
 
   /// Restore clipping rectangle to (0, 0, ScreenW, ScreenH);
   void RestoreClipRect();
+
+  /// Draw a 3D polygon using DrawPolygonFX
+  void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
 
   /// Allocate a new slot in graphics pipeline
   csPipeEntry *AllocOp(int pipeOp)

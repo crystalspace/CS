@@ -652,8 +652,8 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
       info.default_texture = info.textures->GetTextureMM (str);
       if (info.default_texture == NULL)
       {
-        CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", str);
-        fatal_exit (0, false);
+        CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+        fatal_exit (0, true);
       }
       break;
     case TOKEN_TEXLEN:
@@ -819,8 +819,8 @@ csThing* csLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
         texture = textures->GetTextureMM (str);
         if (texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         break;
       case TOKEN_TEXTURE_SCALE:
@@ -1102,7 +1102,7 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
           csThingTemplate* t = w->GetThingTemplate (str);
           if (!t)
           {
-            CsPrintf (MSG_FATAL_ERROR, "Can't find template '%s'!\n", str);
+            CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n", str);
             fatal_exit (0, false);
           }
           thing->MergeTemplate (t, info.default_texture, info.default_texlen,
@@ -1222,8 +1222,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         poly3d->SetTexture (tex);
         break;
@@ -1548,8 +1548,8 @@ csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         poly3d->SetTextureHandle (tex);
         break;
@@ -1644,8 +1644,7 @@ ImageFile* csLoader::load_image (const char* name, csWorld* w)
 
   if (!buf || !size)
   {
-    CsPrintf (MSG_FATAL_ERROR,
-      "Cannot read image file \"%s\" from VFS\n", name);
+    CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", name);
     return NULL;
   }
 
@@ -1654,11 +1653,12 @@ ImageFile* csLoader::load_image (const char* name, csWorld* w)
 
   if (ifile && (ifile->get_status () & IFE_Corrupt))
   {
-    CsPrintf(MSG_FATAL_ERROR, "'%s': %s!\n",name,ifile->get_status_mesg());
+    CsPrintf (MSG_WARNING, "'%s': %s!\n",name,ifile->get_status_mesg());
     CHK (delete ifile);
-    ifile = NULL;
+    return NULL;
   }
 
+  csNameObject::AddName (*ifile, name);
   return ifile;
 }
 
@@ -1781,9 +1781,8 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR,
-                    "Couldn't find texture named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         ptemplate->SetTexture (tex);
         break;
@@ -1973,9 +1972,8 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR,
-                    "Couldn't find texture named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         ptemplate->SetTextureHandle (tex);
         break;
@@ -2173,9 +2171,8 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf,
         default_texture = textures->GetTextureMM (str);
         if (default_texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR,
-                    "Couldn't find texture named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         break;
 
@@ -2304,9 +2301,8 @@ csThingTemplate* csLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
         texture = textures->GetTextureMM (str);
         if (texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR,
-                    "Couldn't find texture named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         break;
       case TOKEN_TEXTURE_SCALE:
@@ -2595,9 +2591,8 @@ void load_tex (char** buf, Color* colors, int num_colors, csTextureList* texture
         colors[num_colors].texture = textures->GetTextureMM (str);
         if (colors[num_colors].texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n"
-                    "Make sure that the TEXTURES statement has an entry for this texture.\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         break;
       case TOKEN_PLANE:
@@ -2748,10 +2743,8 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
         texture = textures->GetTextureMM (str);
         if (texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n"
-                    "Make sure that the TEXTURES statement has an entry for"
-                    " this texture.\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         break;
       case TOKEN_TEXTURE_LIGHTING:
@@ -2766,10 +2759,8 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
         colors[num_colors].texture = textures->GetTextureMM (str);
         if (colors[num_colors].texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n"
-                    "Make sure that the TEXTURES statement has an entry "
-                    "for this texture.\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
         }
         strcpy (colors[num_colors].poly,
                 cmd == TOKEN_CEIL_TEXTURE ? "up" : "down");
@@ -4293,8 +4284,8 @@ bool csLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
         tpl = w->GetSpriteTemplate (str);
         if (tpl == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find template named '%s'!\n", str);
-          fatal_exit (0, false);
+          CsPrintf (MSG_WARNING, "Couldn't find sprite template '%s'!\n", str);
+          fatal_exit (0, true);
         }
         spr->SetTemplate (tpl);
         if (tpl->FindAction (str2) != NULL)

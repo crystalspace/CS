@@ -378,7 +378,7 @@ bool PrimScriptRun::step ()
 {
   for (;;)
   {
-    // pprintf ("[%d] Exec cmd [%d]: %d\n", stack_idx, seqr->cur_cmd, seq->cmds[seqr->cur_cmd]);
+    // CsPrintf (MSG_DEBUG, "[%d] Exec cmd [%d]: %d\n", stack_idx, seqr->cur_cmd, seq->cmds[seqr->cur_cmd]);
 
     switch (seq->cmds[seqr->cur_cmd])
     {

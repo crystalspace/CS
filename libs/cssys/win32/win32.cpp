@@ -61,9 +61,9 @@ extern void cleanup();
 
 void sys_fatalerror(char *s)
 {
-  SysSystemDriver::Printf (MSG_FATAL_ERROR, "%s", s);
-  cleanup();
-  exit(1);
+  CsPrintf (MSG_FATAL_ERROR, "%s", s);
+  cleanup ();
+  exit (1);
 }
 
 extern csSystemDriver* System; // Global pointer to system that can be used by event handler
@@ -89,8 +89,8 @@ void SysSystemDriver::Alert (const char* s)
     ChangeDisplaySettings(NULL,0);
   }
 
-  MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
-  debugprintf (true, s);
+  MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
+  debug_out (true, s);
 }
 
 void SysSystemDriver::Warn (const char* s)
@@ -98,8 +98,8 @@ void SysSystemDriver::Warn (const char* s)
   //In windows there is no safe way to display a messagebox and then continue work when
   //you are in fullscreen mode. (If you know some way: You are welcome to change this)
   //For the moment we will display Warning as console messages.
-  Printf(MSG_CONSOLE, "Warning:\n%s", s);
-  debugprintf (true, s);
+  Printf (MSG_CONSOLE, "Warning:\n%s", s);
+  debug_out (true, s);
 }
 
 void SysSystemDriver::Close(void)

@@ -347,8 +347,8 @@ STDMETHODIMP csTextureManagerOpenGL::Prepare ()
   return S_OK;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::RegisterTexture (IImageFile* image, ITextureHandle** handle,
-	bool for3d, bool for2d)
+STDMETHODIMP csTextureManagerOpenGL::RegisterTexture (IImageFile* image,
+  ITextureHandle** handle, bool for3d, bool for2d)
 {
   csTextureMMOpenGL* txt = new_texture (image);
   txt->set_3d2d (for3d, for2d);

@@ -48,9 +48,11 @@ public:
   /// On texture registration: register for 3D operations?
   bool for_3d;
 
-  ///
+  /// Construct a texture handle given a image file
   csTextureHandle (ImageFile* image);
-  ///
+  /// Copy contstructor
+  csTextureHandle (csTextureHandle &th);
+  /// Release texture handle
   virtual ~csTextureHandle ();
 
   /// Get the texture handle.
