@@ -46,6 +46,7 @@ private:
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
   csRef<iMaterialWrapper> matwrap;
+  csRef<iMeshWrapper> mesh;
 
   iSector* room;
 
