@@ -228,7 +228,7 @@ inline bool MemoryMapFile(mmioInfo* info, char const* filename)
       if (mapping != NULL)
       {
 	unsigned char* p =
-	  (unsigned char*)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, sz)
+	  (unsigned char*)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, sz);
 	if (p != NULL)
 	{
 	  info->hMappedFile = file;
