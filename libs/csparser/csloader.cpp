@@ -1970,8 +1970,8 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   image->DecRef ();
 
   if (do_transp)
-    tex->SetTransparent (QInt (transp.red * 255.),
-      QInt (transp.green * 255.), QInt (transp.blue * 255.));
+    tex->SetTransparent (QInt (transp.red * 255.2),
+      QInt (transp.green * 255.2), QInt (transp.blue * 255.2));
 }
 
 //---------------------------------------------------------------------------
