@@ -1,7 +1,4 @@
-#ifndef __CS_AWS_COMMAND_BUTTON_H__
-#define __CS_AWS_COMMAND_BUTTON_H__
-
-/**************************************************************************
+/*
     Copyright (C) 2000-2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
@@ -17,27 +14,33 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*****************************************************************************/
-# include "awsPanel.h"
+*/
+
+#ifndef __CS_AWS_CMDBT_H__
+#define __CS_AWS_CMDBT_H__
+
+#include "awsPanel.h"
 
 class awsCmdButton : public awsPanel
 {
 protected:
-  /// True when button is down, false if up
+  /// True when button is down, false if up.
   bool is_down;
 
-  /// True if the component has the mouse over it
+  /// True if the component has the mouse over it.
   bool mouse_is_over;
 
-  /// True if this acts as a push-button switch (like tool-bar mode)
+  /// True if this acts as a push-button switch (like tool-bar mode).
   bool is_switch;
 
-  /// True if button was down, and button is in switch mode (toggle=yes)
+  /// True if button was down, and button is in switch mode (toggle=yes).
   bool was_down;
 
-  /** Multipurpose: holds the image bitmaps for normal and toolbar buttons, also
-    * holds the normal, highlighted, and clicked images for bitmap buttons.
-    */
+  /**
+   * Multipurpose: holds the image bitmaps for normal and toolbar buttons,
+   * also holds the normal, highlighted, and clicked images for bitmap
+   * buttons.
+   */
   iTextureHandle *tex[3];
 
   /// Icon position
@@ -56,7 +59,7 @@ public:
   awsCmdButton ();
   virtual ~awsCmdButton ();
 
-  /******* Icon Positions *******************/
+  /// Icon positions.
   static const int iconLeft;
   static const int iconRight;
   static const int iconTop;
@@ -64,17 +67,17 @@ public:
 
   /******* Signals **********************/
 
-  /// An up and down motion for the button
+  /// An up and down motion for the button.
   static const int signalClicked;
   static const int signalFocused;
 public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char* name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char* name, void *parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
@@ -88,36 +91,39 @@ public:
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
 
-  /// Triggered when the user presses a mouse button down
+  /// Triggered when the user presses a mouse button down.
   virtual bool OnMouseDown (int button, int x, int y);
 
-  /// Triggered when the user unpresses a mouse button
+  /// Triggered when the user unpresses a mouse button.
   virtual bool OnMouseUp (int button, int x, int y);
 
-  /// Triggered when this component loses mouse focus
+  /// Triggered when this component loses mouse focus.
   virtual bool OnMouseExit ();
 
-  /// Triggered when this component gains mouse focus
+  /// Triggered when this component gains mouse focus.
   virtual bool OnMouseEnter ();
 
   /// Triggered when the user presses a key
   virtual bool OnKeyboard (const csKeyEventData& eventData);
 
-  /// Triggered when this component becomes focused
+  /// Triggered when this component becomes focused.
   virtual void OnSetFocus ();
 };
 
 class awsCmdButtonFactory : public awsComponentFactory
 {
 public:
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with the
+   * window manager.
+   */
   awsCmdButtonFactory (iAws *wmgr);
 
-  /// Does nothing
+  /// Does nothing.
   virtual ~awsCmdButtonFactory ();
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
 
-#endif // __CS_AWS_COMMAND_BUTTON_H__
+#endif // __CS_AWS_CMDBT_H__
