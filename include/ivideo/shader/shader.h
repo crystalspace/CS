@@ -23,9 +23,12 @@
 
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "ivideo/render3d.h"
 
 class csVector3;
 struct iString;
+struct iDataBuffer;
+struct iDocumentNode;
 
 struct iShaderManager;
 struct iShaderRenderInterface;
@@ -43,8 +46,6 @@ SCF_VERSION (iShaderManager, 0,0,1);
  */
 struct iShaderManager : iBase
 {
-  /// Creates a shader from specified file
-  virtual csPtr<iShader> CreateShader(const char* filename) = 0;
   /// Create a empty shader
   virtual csPtr<iShader> CreateShader() = 0;
   /// Get a shader by name
@@ -59,18 +60,13 @@ struct iShaderManager : iBase
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
 
-  /// Create a shaderpgoram from a shaderfile
-  virtual csPtr<iShaderProgram> CreateShaderProgramFromFile(const char* programfile, const char* type) = 0;
-  /// Create a shaderprogram from a string describing it
-  virtual csPtr<iShaderProgram> CreateShaderProgramFromString(const char* programstring, const char* type) = 0;
+  /// Create a shaderprogram
+  virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type) = 0;
 };
 
 SCF_VERSION (iShaderRenderInterface, 0,0,1);
 struct iShaderRenderInterface : iBase
 {
-  /// Create a shaderprogram from a string describing it
-  virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type) = 0;
-
   /// Get a implementationspecific object
   virtual csSome GetObject(const char* name) = 0;
 };
@@ -107,6 +103,15 @@ struct iShader : iBase
 
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
   virtual bool IsValid() = 0;
+
+  /// Loads a shader from buffer
+  virtual bool Load(iDataBuffer* program) = 0;
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node) = 0;
+
+  /// Prepares the shader for usage. Must be called before the shader is assigned to a material
+  virtual bool Prepare() = 0;
 };
 
 SCF_VERSION (iShaderVariable, 0,0,1);
@@ -163,6 +168,15 @@ struct iShaderTechnique : iBase
 
   /// Check if valid
   virtual bool IsValid() = 0;
+
+  /// Loads a technique from buffer
+  virtual bool Load(iDataBuffer* program) = 0;
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node) = 0;
+
+  /// Prepares the technique for usage.
+  virtual bool Prepare() = 0;
 };
 
 SCF_VERSION (iShaderPass, 0,0,1);
@@ -186,8 +200,8 @@ struct iShaderPass : iBase
   /// Check if valid
   virtual bool IsValid() = 0;
 
-  /// Activate the whole pass
-  virtual void Activate() = 0;
+  /// Activate the whole pass for the indicated mesh (which might be NULL)
+  virtual void Activate(csRenderMesh* mesh) = 0;
 
   /// Deactivate the whole pass
   virtual void Deactivate() = 0;
@@ -198,6 +212,15 @@ struct iShaderPass : iBase
   virtual iShaderVariable* GetVariable(const char* string) = 0;
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
+
+  /// Loads pass from buffer
+  virtual bool Load(iDataBuffer* program) = 0;
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node) = 0;
+
+  /// Prepares the pass for usage.
+  virtual bool Prepare() = 0;
 };
 
 SCF_VERSION (iShaderProgram, 0,0,1);
@@ -207,9 +230,11 @@ SCF_VERSION (iShaderProgram, 0,0,1);
  */
 struct iShaderProgram : iBase
 {
+  /// Get a programid for the current program
+  virtual csPtr<iString> GetProgramID() = 0;
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(iShaderPass* current) = 0;
+  virtual void Activate(iShaderPass* current, csRenderMesh* mesh) = 0;
 
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate(iShaderPass* current) = 0;
@@ -236,12 +261,24 @@ struct iShaderProgram : iBase
   virtual iShaderVariable* GetVariable(const char* string) = 0;
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
+
+  /// Check if valid
+  virtual bool IsValid() = 0;
+
+  /// Loads shaderprogram from buffer
+  virtual bool Load(iDataBuffer* program) = 0;
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node) = 0;
+
+  /// Prepares the shaderprogram for usage. Must be called before the shader is assigned to a material
+  virtual bool Prepare() = 0;
 };
 
 SCF_VERSION(iShaderProgramPlugin, 0,0,1);
 struct iShaderProgramPlugin : iBase
 {
-  virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type) = 0  ;
+  virtual csPtr<iShaderProgram> CreateProgram() = 0  ;
   virtual bool SupportType(const char* type) = 0;
   virtual void Open() = 0;
 };
