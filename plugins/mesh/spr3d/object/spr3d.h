@@ -1383,6 +1383,11 @@ public:
 	cur_action->SetReverseAction(reverse);
   }
 
+  bool GetReverseAction () const
+  {
+      return (frame_increment < 0);
+  }
+
   void SetSingleStepAction(bool singlestep)
   { single_step = singlestep; }
 
@@ -1646,6 +1651,10 @@ public:
     virtual void SetReverseAction (bool reverse)
     {
       scfParent->SetReverseAction (reverse);
+    }
+    virtual bool GetReverseAction () const
+    {
+      return scfParent->GetReverseAction ();
     }
     virtual bool SetOverrideAction (const char *name,float speed = 1)
     {

@@ -391,6 +391,9 @@ struct iSprite3DState : public iBase
   /// Get the current action.
   virtual iSpriteAction* GetCurAction () const = 0;
 
+  /// Get whether the current action is reversed or not
+  virtual bool GetReverseAction () const = 0;
+
   /// Enable/disable tweening.
   virtual void EnableTweening (bool en) = 0;
   /// Query state of tweening.
