@@ -268,25 +268,6 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.ballloader.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.ballloader.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
 
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("color", XMLTOKEN_COLOR);
@@ -531,9 +512,8 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-      	    ReportError (reporter,
-		"crystalspace.ballloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", factname);
+      	    synldr->ReportError ("crystalspace.ballloader.parse.unknownfactory",
+		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -546,9 +526,9 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", matname);
+		child, "Couldn't find material '%s'!", matname);
             return NULL;
 	  }
 	  ballstate->SetMaterialWrapper (mat);
@@ -558,17 +538,12 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	  {
-	    ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
-	  	  "Error parsing mixmode!");
 	    return NULL;
-	  }
           ballstate->SetMixMode (mm);
 	}
 	break;
       default:
-	ReportError (reporter, "crystalspace.ballloader.parse",
-	  	  "Unknown token '%s' in ball loader!", value);
+        synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -603,25 +578,6 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.ballsaver.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.ballsaver.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
   return true;
 }
 

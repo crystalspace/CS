@@ -506,9 +506,9 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
   }
   if (!type)
   {
-    ReportError (reporter,
+    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.setup.objecttype",
-		"Could not load the general mesh object plugin!");
+		node, "Could not load the general mesh object plugin!");
     return NULL;
   }
   csRef<iMeshObjectFactory> fact;
@@ -540,9 +540,9 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", matname);
+		child, "Couldn't find material '%s'!", matname);
             return NULL;
 	  }
 	  state->SetMaterialWrapper (mat);
@@ -571,9 +571,9 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  csTriangle* tr = state->GetTriangles ();
 	  if (num_tri >= state->GetTriangleCount ())
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		      "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		      "Too many triangles for a general mesh factory!");
+		      child, "Too many triangles for a general mesh factory!");
 	    return NULL;
 	  }
 	  tr[num_tri].a = child->GetAttributeValueAsInt ("v1");
@@ -587,9 +587,9 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  csVector3* no = state->GetNormals ();
 	  if (num_nor >= state->GetVertexCount ())
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    "Too many normals for a general mesh factory!");
+		    child, "Too many normals for a general mesh factory!");
 	    return NULL;
 	  }
 	  float x, y, z;
@@ -605,9 +605,9 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  csColor* co = state->GetColors ();
 	  if (num_col >= state->GetVertexCount ())
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    "Too many colors for a general mesh factory!");
+		    child, "Too many colors for a general mesh factory!");
 	    return NULL;
 	  }
 	  float r, g, b;
@@ -624,9 +624,9 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  csVector2* te = state->GetTexels ();
 	  if (num_vt >= state->GetVertexCount ())
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    "Too many colors for a general mesh factory!");
+		    child, "Too many colors for a general mesh factory!");
 	    return NULL;
 	  }
 	  float x, y, z, u, v;
@@ -641,9 +641,7 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	}
         break;
       default:
-	ReportError (reporter,
-		    "crystalspace.genmeshfactoryloader.parse",
-		    "Unexpected token '%s' for genmesh!", value);
+	synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -712,25 +710,6 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.genmeshloader.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.genmeshloader.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
 
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -892,9 +871,9 @@ iBase* csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.genmeshloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", factname);
+		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -907,9 +886,9 @@ iBase* csGeneralMeshLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.genmeshloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", matname);
+		child, "Couldn't find material '%s'!", matname);
             return NULL;
 	  }
 	  meshstate->SetMaterialWrapper (mat);
@@ -919,17 +898,12 @@ iBase* csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	  {
-	    ReportError (reporter, "crystalspace.genmeshloader.parse.mixmode",
-	  	  "Error parsing mixmode!");
 	    return NULL;
-	  }
           meshstate->SetMixMode (mm);
 	}
 	break;
       default:
-	ReportError (reporter, "crystalspace.genmeshloader.parse",
-	  	  "Unexpected token '%s' in 'genmesh'!", value);
+        synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -963,25 +937,6 @@ bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.genmeshsaver.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.genmeshsaver.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
   return true;
 }
 

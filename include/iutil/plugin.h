@@ -59,16 +59,17 @@ struct iComponent;
 #define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)			\
   ((Object)->LoadPlugin (ClassID, NULL, 0))
 
-SCF_VERSION (iPluginManager, 0, 0, 3);
+SCF_VERSION (iPluginManager, 0, 1, 0);
 
 /**
  * This is the plugin manager.
  */
 struct iPluginManager : public iBase
 {
-  /// Load a plugin and initialize it.
+  /// Load a plugin and (optionally) initialize it.
   virtual iBase *LoadPlugin (const char *classID,
-    const char *iInterface = NULL, int iVersion = 0) = 0;
+    const char *iInterface = NULL, int iVersion = 0, bool init = true) = 0;
+
   /**
    * Get first of the loaded plugins that supports given interface ID.
    * Warning! Usage of this function is usually not safe since multiple

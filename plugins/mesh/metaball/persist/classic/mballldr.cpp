@@ -126,26 +126,6 @@ SCF_EXPORT_CLASS_TABLE (mballldr)
     "Crystal Space MetaBall Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
-static void ReportError (iReporter* reporter, const char* id,
-	const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
-  va_end (arg);
-}
-
 csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -417,9 +397,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!mp)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'isolevel'!");
+		child, "Please use 'factory' before 'isolevel'!");
 	    return NULL;
 	  }
 	  mp->iso_level = child->GetContentsValueAsFloat ();
@@ -429,9 +409,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!mp)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'charge'!");
+		child, "Please use 'factory' before 'charge'!");
 	    return NULL;
 	  }
 	  mp->charge = child->GetContentsValueAsFloat ();
@@ -441,9 +421,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!ballstate)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'number'!");
+		child, "Please use 'factory' before 'number'!");
 	    return NULL;
 	  }
 	  ballstate->SetMetaBallCount (child->GetContentsValueAsInt ());
@@ -453,9 +433,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!mp)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'rate'!");
+		child, "Please use 'factory' before 'rate'!");
 	    return NULL;
 	  }
 	  mp->rate = child->GetContentsValueAsFloat ();
@@ -465,9 +445,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!ballstate)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'truemap'!");
+		child, "Please use 'factory' before 'truemap'!");
 	    return NULL;
 	  }
 	  bool m;
@@ -480,9 +460,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!ballstate)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'texscale'!");
+		child, "Please use 'factory' before 'texscale'!");
 	    return NULL;
 	  }
 	  ballstate->SetEnvironmentMappingFactor (
@@ -495,9 +475,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Can't find factory '%s'!", factname);
+		child, "Can't find factory '%s'!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -509,18 +489,18 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!ballstate)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'material'!");
+		child, "Please use 'factory' before 'material'!");
 	    return NULL;
 	  }
 	  const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Can't find material '%s'!", matname);
+		child, "Can't find material '%s'!", matname);
             return NULL;
 	  }
 	  ballstate->SetMaterial (mat);
@@ -530,9 +510,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
         {
 	  if (!ballstate)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'mixmode'!");
+		child, "Please use 'factory' before 'mixmode'!");
 	    return NULL;
 	  }
 	  uint mode;
@@ -544,9 +524,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	{
 	  if (!ballstate)
 	  {
-    	    ReportError (reporter,
+    	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
-		"Please use 'factory' before 'lighting'!");
+		child, "Please use 'factory' before 'lighting'!");
 	    return NULL;
 	  }
 	  bool l;
@@ -556,9 +536,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	}
 	break;
       default:
-        ReportError (reporter,
-		"crystalspace.metaballloader.parse",
-		"Unexpected token '%s' in metaball loader!", value);
+	synldr->ReportBadToken (child);
         return NULL;
     }
   }

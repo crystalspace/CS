@@ -8,6 +8,31 @@ The history order is reversed so that new features are at the top.
 	- Fixed a similar bug with SCALE which can be used with
 	  two or one parameter.
 	- Converted partsys to XML. Seems to be working fine now.
+	- Fixed a fundamental problem in the csPluginLoader class. Plugins
+	  used to query for other components in their 'Initialize' routine.
+	  However csPluginLoader calls load+initialize for every plugin
+	  and only registers a plugin after it has been loaded AND
+	  initialized. This means that during the call to Initialize() it
+	  is possible (and even likely) that some other component cannot
+	  yet be found because it wasn't yet loaded and registered. This
+	  bug caused the reporter to be ignored in apps like walktest
+	  and so on. The fix for this is to delay initialization of a
+	  plugin until ALL plugins are loaded and registered. I had to
+	  extend iPluginManager::LoadPlugin() with a new optional parameter
+	  which indicates that no initialization is required.
+	- Greatly improved error reporting in syntax services. There is now
+	  a new ReportError() function there which takes a message id, a
+	  message, and the node that causes the error. From that node it
+	  will construct a path with type of the node and the optional
+	  'name' attribute so that it is easier to locate the error. This
+	  feature is very useful especially since there are no line numbers
+	  to depend on in XML.
+	- Also added ReportBadToken() to syntax services.
+	- All new XML loader plugins now use the new ReportError() and
+	  ReportBadToken() functions.
+	- Csparser no longer reports error that it cannot load a mesh object
+	  factory or mesh object. It is assumed that the mesh object loader
+	  will have reported its own error already.
 20-Aug-2002
 	- Implemented XML version of the spr2d mesh object loader.
 	- Added new ParseBox() in syntax services (for XML).

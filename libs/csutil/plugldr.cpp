@@ -33,6 +33,7 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
+#include "iutil/comp.h"
 
 /**
  * Since every plugin can depend on another one, the plugin loader should be
@@ -340,11 +341,13 @@ bool csPluginLoader::LoadPlugins ()
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)
   {
-    const csPluginLoadRec& r = PluginList.Get(n);
+    csPluginLoadRec& r = PluginList.Get(n);
     // If plugin is VFS then skip if already loaded earlier.
+    r.plugin = NULL;
     if (VFS && r.Tag && strcmp (r.Tag, "iVFS") == 0)
       continue;
-    iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, NULL, 0);
+    iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, NULL, 0, false);
+    r.plugin = plg;
     if (plg)
     {
       if (!object_reg->Register (plg, r.Tag))
@@ -363,6 +366,21 @@ bool csPluginLoader::LoadPlugins ()
         return false;
       }
       plg->DecRef ();
+    }
+  }
+
+  // Initialize all plugins
+  for (n = 0; n < PluginList.Length (); n++)
+  {
+    const csPluginLoadRec& r = PluginList.Get(n);
+    if (r.plugin)
+    {
+      iComponent* comp = SCF_QUERY_INTERFACE (r.plugin, iComponent);
+      if (comp)
+      {
+        comp->Initialize (object_reg);
+	comp->DecRef ();
+      }
     }
   }
 

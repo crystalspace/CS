@@ -124,26 +124,6 @@ SCF_EXPORT_CLASS_TABLE (snowldr)
     "Crystal Space Snow Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
-static void ReportError (iReporter* reporter, const char* id,
-	const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
-  va_end (arg);
-}
-
 csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -451,9 +431,9 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.snowloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", factname);
+		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -467,9 +447,9 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.snowloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", matname);
+		child, "Couldn't find material '%s'!", matname);
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -495,9 +475,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
         snowstate->SetParticleCount (child->GetContentsValueAsInt ());
         break;
       default:
-      	ReportError (reporter,
-		"crystalspace.snowloader.parse.badtoken",
-		"Unexpected token '%s' for snow!", value);
+	synldr->ReportBadToken (child);
         return NULL;
     }
   }

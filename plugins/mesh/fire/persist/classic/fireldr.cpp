@@ -130,26 +130,6 @@ SCF_EXPORT_CLASS_TABLE (fireldr)
     "Crystal Space Fire Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
-static void ReportError (iReporter* reporter, const char* id,
-	const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
-  va_end (arg);
-}
-
 csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -500,9 +480,8 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-      	    ReportError (reporter,
-		"crystalspace.fireloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", factname);
+      	    synldr->ReportError ("crystalspace.fireloader.parse.unknownfactory",
+		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -516,9 +495,9 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.fireloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", matname);
+		child, "Couldn't find material '%s'!", matname);
 	    return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -544,9 +523,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
         firestate->SetParticleCount (child->GetContentsValueAsInt ());
         break;
       default:
-      	ReportError (reporter,
-		"crystalspace.fireloader.parse.badtoken",
-		"Unexpected token '%s' in ball loader!", value);
+      	synldr->ReportBadToken (child);
 	return NULL;
     }
   }

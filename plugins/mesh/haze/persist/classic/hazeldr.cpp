@@ -122,26 +122,6 @@ SCF_EXPORT_CLASS_TABLE (hazeldr)
     "Crystal Space Haze Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
-static void ReportError (iReporter* reporter, const char* id,
-	const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
-  va_end (arg);
-}
-
 csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -228,9 +208,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter* reporter,
         s = child->GetContentsValueAsFloat ();
 	break;
       default:
-      	ReportError (reporter,
-		"crystalspace.hazeloader.parse.badtoken",
-		"Unexpected token '%s' in haze!", value);
+        synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -426,9 +404,9 @@ iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
-		"Could not find material '%s'!", matname);
+		child, "Could not find material '%s'!", matname);
             return NULL;
 	  }
 	  hazefactorystate->SetMaterialWrapper (mat);
@@ -461,9 +439,7 @@ iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
 	}
 	break;
       default:
-      	ReportError (reporter,
-		"crystalspace.hazeloader.parse.badtoken",
-		"Unexpected token '%s' in haze!", value);
+	synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -719,9 +695,9 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badfactory",
-		"Could not find factory '%s'!", factname);
+		child, "Could not find factory '%s'!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -736,9 +712,9 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
-		"Could not find material '%s'!", matname);
+		child, "Could not find material '%s'!", matname);
 	    return NULL;
 	  }
 	  hazestate->SetMaterialWrapper (mat);
@@ -771,9 +747,7 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
 	}
 	break;
       default:
-      	ReportError (reporter,
-		"crystalspace.hazeloader.parse.badtoken",
-		"Unexpected token '%s' in haze!", value);
+	synldr->ReportBadToken (child);
 	return NULL;
     }
   }

@@ -275,9 +275,7 @@ bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node, iReporter* reporte
 		}
 		break;
 	      default:
-		ReportError (reporter,
-		  "crystalspace.sprite2dfactoryloader.parse.badtoken",
-		  "Token '%s' not found while parsing 'frame'!", child_value);
+	        synldr->ReportBadToken (childchild);
 		delete[] verts;
 		return false;
 	    }
@@ -287,9 +285,7 @@ bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node, iReporter* reporte
 	}
 	break;
       default:
-	ReportError (reporter,
-		  "crystalspace.sprite2dfactoryloader.parse.badtoken",
-		  "Token '%s' not found while parsing 'uvanimation'!", value);
+	synldr->ReportBadToken (child);
 	delete[] verts;
 	return false;
     }
@@ -407,9 +403,9 @@ iBase* csSprite2DFactoryLoader::Parse (iDocumentNode* node,
   }
   if (!type)
   {
-    ReportError (reporter,
+    synldr->ReportError (
 		"crystalspace.sprite2dfactoryloader.setup.objecttype",
-		"Could not load the sprite.2d mesh object plugin!");
+		node, "Could not load the sprite.2d mesh object plugin!");
     return NULL;
   }
   csRef<iMeshObjectFactory> fact;
@@ -433,9 +429,9 @@ iBase* csSprite2DFactoryLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		"crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
-		"Couldn't find material named '%s'", matname);
+		child, "Couldn't find material named '%s'", matname);
             return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
@@ -453,9 +449,7 @@ iBase* csSprite2DFactoryLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	  {
 	    return NULL;
-	  }
           spr2dLook->SetMixMode (mm);
 	}
 	break;
@@ -464,9 +458,7 @@ iBase* csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 	  return NULL;
         break;
       default:
-	ReportError (reporter,
-		  "crystalspace.sprite2dfactoryloader.parse.badtoken",
-		  "Token '%s' not found while parsing 'sprite2dfactory'!", value);
+	synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -747,9 +739,9 @@ iBase* csSprite2DLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", factname);
+		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -763,9 +755,9 @@ iBase* csSprite2DLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-      	    ReportError (reporter,
+      	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", matname);
+		child, "Couldn't find material '%s'!", matname);
             return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
@@ -840,17 +832,15 @@ iBase* csSprite2DLoader::Parse (iDocumentNode* node,
 	    spr2dLook->SetUVAnimation (animname, type, loop);
 	  else
     	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.uvanim",
-		"UVAnimation '%s' not found!", animname);
+		child, "UVAnimation '%s' not found!", animname);
 	    return NULL;
 	  }
         }
         break;
       default:
-	ReportError (reporter,
-		  "crystalspace.sprite2dloader.parse.badtoken",
-		  "Token '%s' not found while parsing 'sprite2d'!", value);
+	synldr->ReportBadToken (child);
 	return NULL;
     }
   }

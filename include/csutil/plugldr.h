@@ -29,6 +29,7 @@ struct csPluginLoadRec
 {
   char* Tag;
   char* ClassID;
+  iBase* plugin;
 
   csPluginLoadRec (const char* iTag, const char* iClassID)
   { Tag = csStrNew (iTag); ClassID = csStrNew (iClassID); }

@@ -42,7 +42,7 @@ struct iDocumentNode;
 #define CSTEX_V2 4  // vector2 is given in texture description
 #define CSTEX_UV_SHIFT 8 // explicit (u,v) <-> vertex mapping is given in texture description
 
-SCF_VERSION (iSyntaxService, 1, 1, 2);
+SCF_VERSION (iSyntaxService, 1, 1, 3);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -268,6 +268,19 @@ struct iSyntaxService : public iBase
   			    iEngine* engine, iPolygon3D* poly3d,
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset) = 0;
+
+  /**
+   * Report an error and also gives a path in the XML tree.
+   */
+  virtual void ReportError (const char* msgid, iDocumentNode* errornode,
+	const char* msg, ...) = 0;
+
+  /**
+   * Report a bad token. This is a conveniance function which will
+   * eventually call ReportError().
+   */
+  virtual void ReportBadToken (iDocumentNode* badtokennode) = 0;
 };
 
 #endif
+

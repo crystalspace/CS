@@ -152,26 +152,6 @@ SCF_EXPORT_CLASS_TABLE (emitldr)
     "Crystal Space Emit Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
-static void ReportError (iReporter* reporter, const char* id,
-	const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
-  va_end (arg);
-}
-
 csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -452,9 +432,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
       case XMLTOKEN_WEIGHT:
 	if (weight == NULL)
 	{
-	  ReportError (reporter,
-		"crystalspace.emitloader.parse",
-		"'weight' cannot be given in this context!");
+	  synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "'weight' cannot be given in this context!");
 	  return NULL;
 	}
 	*weight = child->GetContentsValueAsFloat ();
@@ -474,9 +453,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
 	  {
-	    ReportError (reporter,
-		  "crystalspace.emitloader.parse",
-		  "Error parsing box for 'emitbox'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		  child, "Error parsing box for 'emitbox'!");
 	    return NULL;
 	  }
 	  iEmitBox *ebox = fstate->CreateBox ();
@@ -527,9 +505,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
 	  {
-	    ReportError (reporter,
-		  "crystalspace.emitloader.parse",
-		  "Error parsing box for 'emitline'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		  child, "Error parsing box for 'emitline'!");
 	    return NULL;
 	  }
 	  iEmitLine *eline = fstate->CreateLine ();
@@ -542,9 +519,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
 	  {
-	    ReportError (reporter,
-		  "crystalspace.emitloader.parse",
-		  "Error parsing box for 'emitcylinder'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		  child, "Error parsing box for 'emitcylinder'!");
 	    return NULL;
 	  }
 	  p = child->GetAttributeValueAsFloat ("p");
@@ -559,9 +535,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
 	  {
-	    ReportError (reporter,
-		  "crystalspace.emitloader.parse",
-		  "Error parsing box for 'emitcylindertangent'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		  child, "Error parsing box for 'emitcylindertangent'!");
 	    return NULL;
 	  }
 	  p = child->GetAttributeValueAsFloat ("p");
@@ -576,9 +551,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  csRef<iDocumentNode> minnode = child->GetNode ("min");
 	  if (!minnode)
 	  {
-	    ReportError (reporter,
-		"crystalspace.emitloader.parse",
-		"'min' is missing in 'emitspheretangent'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "'min' is missing in 'emitspheretangent'!");
 	    return NULL;
 	  }
 	  a.x = minnode->GetAttributeValueAsFloat ("x");
@@ -592,9 +566,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	}
 	break;
       default:
-	ReportError (reporter,
-		"crystalspace.emitloader.parse",
-		"Unexpected token '%s' for emit loader!", value);
+	synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -804,9 +776,8 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 	  if (!fact)
 	  {
-	    ReportError (reporter,
-		"crystalspace.emitloader.parse",
-		"Cannot find factory '%s' for emit!", factname);
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "Cannot find factory '%s' for emit!", factname);
 	    return NULL;
 	  }
 	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
@@ -822,9 +793,8 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
 	  if (!mat)
 	  {
-	    ReportError (reporter,
-		"crystalspace.emitloader.parse",
-		"Cannot find material '%s' for emit!", matname);
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "Cannot find material '%s' for emit!", matname);
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -876,40 +846,40 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  csRef<iDocumentNode> alphanode = child->GetNode ("alpha");
 	  if (!alphanode)
 	  {
-	    ReportError (reporter, "crystalspace.emitloader.parse",
-		"Missing 'alpha' in 'aging'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "Missing 'alpha' in 'aging'!");
             return NULL;
 	  }
 	  alpha = alphanode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> swirlnode = child->GetNode ("swirl");
 	  if (!swirlnode)
 	  {
-	    ReportError (reporter, "crystalspace.emitloader.parse",
-		"Missing 'swirl' in 'aging'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "Missing 'swirl' in 'aging'!");
             return NULL;
 	  }
 	  swirl = swirlnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
 	  if (!scalenode)
 	  {
-	    ReportError (reporter, "crystalspace.emitloader.parse",
-		"Missing 'scale' in 'aging'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "Missing 'scale' in 'aging'!");
             return NULL;
 	  }
 	  scale = scalenode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> rotspeednode = child->GetNode ("rotspeed");
 	  if (!rotspeednode)
 	  {
-	    ReportError (reporter, "crystalspace.emitloader.parse",
-		"Missing 'rotspeed' in 'aging'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "Missing 'rotspeed' in 'aging'!");
             return NULL;
 	  }
 	  rotspeed = rotspeednode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> timenode = child->GetNode ("time");
 	  if (!timenode)
 	  {
-	    ReportError (reporter, "crystalspace.emitloader.parse",
-		"Missing 'time' in 'aging'!");
+	    synldr->ReportError ("crystalspace.emitloader.parse",
+		child, "Missing 'time' in 'aging'!");
             return NULL;
 	  }
 	  time = timenode->GetContentsValueAsInt ();
@@ -952,8 +922,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	}
 	break;
       default:
-	ReportError (reporter, "crystalspace.emitloader.parse",
-		"Unexpected token '%s' in emit!", value);
+	synldr->ReportBadToken (child);
         return NULL;
     }
   }

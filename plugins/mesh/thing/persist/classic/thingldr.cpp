@@ -250,25 +250,6 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.thingloader.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.thingloader.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
 
   xmltokens.Register ("clone", XMLTOKEN_CLONE);
   xmltokens.Register ("curve", XMLTOKEN_CURVE);
@@ -681,9 +662,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
       case XMLTOKEN_VISTREE:
         if (!isParent)
 	{
-	  ReportError (reporter,
+	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.vistree",
-	    "'vistree' flag only for top-level thing!");
+	    child, "'vistree' flag only for top-level thing!");
 	  return false;
 	}
         else thing_state->GetFlags ().Set (CS_THING_VISTREE);
@@ -691,9 +672,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
       case XMLTOKEN_FASTMESH:
         if (!isParent)
 	{
-	  ReportError (reporter,
+	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.fastmesh",
-	    "'fastmesh' flag only for top-level thing!");
+	    child, "'fastmesh' flag only for top-level thing!");
 	  return false;
 	}
         else thing_state->GetFlags ().Set (CS_THING_FASTMESH);
@@ -701,9 +682,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
       case XMLTOKEN_MOVEABLE:
         if (!isParent)
 	{
-	  ReportError (reporter,
+	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.moveable",
-	    "'moveable' flag only for top-level thing!");
+	    child, "'moveable' flag only for top-level thing!");
 	  return false;
 	}
         else thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
@@ -711,9 +692,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
       case XMLTOKEN_FACTORY:
         if (!isParent)
 	{
-	  ReportError (reporter,
+	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.factory",
-	    "'factory' statement only for top-level thing!");
+	    child, "'factory' statement only for top-level thing!");
 	  return false;
 	}
 	else
@@ -722,9 +703,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
           if (!fact)
           {
-	    ReportError (reporter,
+	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.factory",
-              "Couldn't find thing factory '%s'!", factname);
+              child, "Couldn't find thing factory '%s'!", factname);
             return false;
           }
 	  csRef<iThingState> tmpl_thing_state;
@@ -732,9 +713,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
 	  	fact->GetMeshObjectFactory (), iThingState));
 	  if (!tmpl_thing_state)
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.factory",
-              "Object '%s' is not a thing!", factname);
+              child, "Object '%s' is not a thing!", factname);
             return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
@@ -749,9 +730,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
       case XMLTOKEN_CLONE:
         if (!isParent)
 	{
-	  ReportError (reporter,
+	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.clone",
-	    "CLONE statement only for top-level thing!");
+	    child, "CLONE statement only for top-level thing!");
 	  return false;
 	}
 	else
@@ -760,9 +741,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
 	  iMeshWrapper* wrap = ldr_context->FindMeshObject (meshname);
           if (!wrap)
           {
-	    ReportError (reporter,
+	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.clone",
-              "Couldn't find thing '%s'!", meshname);
+              child, "Couldn't find thing '%s'!", meshname);
             return false;
           }
 
@@ -771,9 +752,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
 	  	wrap->GetMeshObject (), iThingState));
 	  if (!tmpl_thing_state)
 	  {
-	    ReportError (reporter,
+	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.clone",
-              "Object '%s' is not a thing!", meshname);
+              child, "Object '%s' is not a thing!", meshname);
             return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
@@ -800,9 +781,9 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
         }
         break;
       case XMLTOKEN_FOG:
-	ReportError (reporter,
+	synldr->ReportError (
 	      "crystalspace.thingloader.parse.fog",
-      	      "FOG for things is currently not supported!\n\
+      	      child, "FOG for things is currently not supported!\n\
 Nag to Jorrit about this feature if you want it.");
 	return false;
 
@@ -870,9 +851,9 @@ Nag to Jorrit about this feature if you want it.");
           info.default_material = ldr_context->FindMaterial (matname);
           if (info.default_material == NULL)
           {
-	    ReportError (reporter,
+	    synldr->ReportError (
 	        "crystalspace.thingloader.parse.material",
-                "Couldn't find material named '%s'!", matname);
+                child, "Couldn't find material named '%s'!", matname);
             return false;
           }
 	}
@@ -885,9 +866,7 @@ Nag to Jorrit about this feature if you want it.");
         info.use_mat_set = true;
         break;
       default:
-        ReportError (reporter,
-	    "crystalspace.thingloader.parse.badformat",
-	    "Token '%s' not found while parsing a thing!", value);
+        synldr->ReportBadToken (child);
 	return false;
     }
   }
@@ -982,25 +961,6 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.planeloader.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.planeloader.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
 
   xmltokens.Register ("clone", XMLTOKEN_CLONE);
   xmltokens.Register ("orig", XMLTOKEN_ORIG);
@@ -1230,9 +1190,7 @@ iBase* csPlaneLoader::Parse (iDocumentNode* node,
         tx2 += tx_orig;
         break;
       default:
-        ReportError (reporter,
-	    "crystalspace.planeloader.parse.badformat",
-            "Token '%s' not found while parsing a plane!", value);
+        synldr->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -1242,16 +1200,16 @@ iBase* csPlaneLoader::Parse (iDocumentNode* node,
     {
       if (!tx1_len)
       {
-	ReportError (reporter,
+	synldr->ReportError (
 	  "crystalspace.planeloader.parse.badplane",
-          "Bad texture specification for PLANE '%s'", name);
+          node, "Bad texture specification for PLANE '%s'", name);
 	tx1_len = 1;
       }
       if (!tx2_len)
       {
-	ReportError (reporter,
+	synldr->ReportError (
 	  "crystalspace.planeloader.parse.badplane",
-          "Bad texture specification for PLANE '%s'", name);
+          node, "Bad texture specification for PLANE '%s'", name);
 	tx2_len = 1;
       }
       if ((tx1-tx_orig) < SMALL_EPSILON)
@@ -1262,9 +1220,9 @@ iBase* csPlaneLoader::Parse (iDocumentNode* node,
     }
     else
     {
-      ReportError (reporter,
+      synldr->ReportError (
 	  "crystalspace.planeloader.parse.badplane",
-          "Not supported!");
+          node, "Not supported!");
       return NULL;
     }
   else
@@ -1426,6 +1384,8 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
   csRef<iEngine> engine;
   engine.Take (CS_QUERY_REGISTRY (object_reg, iEngine));
   CS_ASSERT (engine != NULL);
+  csRef<iSyntaxService> synldr;
+  synldr.Take (CS_QUERY_REGISTRY (object_reg, iSyntaxService));
 
   iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
 	    iThingEnvironment);
@@ -1453,9 +1413,9 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
           mat = ldr_context->FindMaterial (matname);
           if (mat == NULL)
           {
-	    ReportError (reporter,
+	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.material",
-              "Couldn't find material named '%s'!", matname);
+              child, "Couldn't find material named '%s'!", matname);
             return NULL;
           }
           tmpl->SetMaterial (mat);
@@ -1465,9 +1425,9 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
         {
           if (num_v >= 9)
           {
-	    ReportError (reporter,
+	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.vertices",
-              "Wrong number of vertices to bezier! Should be 9!");
+              child, "Wrong number of vertices to bezier! Should be 9!");
             return NULL;
           }
 	  tmpl->SetVertex (num_v, child->GetContentsValueAsInt ());
@@ -1475,18 +1435,16 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
         }
         break;
       default:
-	ReportError (reporter,
-	  "crystalspace.bezierloader.parse.badformat",
-          "Token '%s' not found while parsing a bezier template!", value);
+	synldr->ReportBadToken (child);
 	return NULL;
     }
   }
   
   if (num_v != 9)
   {
-    ReportError (reporter,
+    synldr->ReportError (
       "crystalspace.bezierloader.parse.vertices",
-      "Wrong number of vertices to bezier! %d should be 9!", num_v);
+      node, "Wrong number of vertices to bezier! %d should be 9!", num_v);
     return NULL;
   }
   return tmpl;

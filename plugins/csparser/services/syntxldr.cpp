@@ -345,7 +345,7 @@ bool csTextSyntaxService::ParseMatrix (csParser *parser, char *buf, csMatrix3 &m
         }
         else
 	{
-	  ReportError (reporter, "crystalspace.syntax.matrix",
+	  ::ReportError (reporter, "crystalspace.syntax.matrix",
 	    "Badly formed rotation: '%s'", params);
 	  return false;
 	}
@@ -370,7 +370,7 @@ bool csTextSyntaxService::ParseMatrix (csParser *parser, char *buf, csMatrix3 &m
 	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
         else
 	{
-	  ReportError (reporter, "crystalspace.syntax.matrix",
+	  ::ReportError (reporter, "crystalspace.syntax.matrix",
 	    "Badly formed scale: '%s'", params);
 	  return false;
 	}
@@ -391,7 +391,7 @@ bool csTextSyntaxService::ParseMatrix (csParser *parser, char *buf, csMatrix3 &m
         list[6], list[7], list[8]);
     else
     {
-      ReportError (reporter, "crystalspace.syntax.matrix",
+      ::ReportError (reporter, "crystalspace.syntax.matrix",
 	"Badly formed matrix '%s'", buf);
       return false;
     }
@@ -410,7 +410,7 @@ bool csTextSyntaxService::ParseVector (csParser*, char *buf, csVector3 &v)
   }
   else
   {
-    ReportError (reporter, "crystalspace.syntax.vector",
+    ::ReportError (reporter, "crystalspace.syntax.vector",
       "Malformed vector parameter");
     return false;
   }
@@ -440,7 +440,7 @@ bool csTextSyntaxService::ParseMixmode (csParser* parser, char *buf, uint &mixmo
   {
     if (!params)
     {
-      ReportError (reporter, "crystalspace.syntax.mixmode",
+      ::ReportError (reporter, "crystalspace.syntax.mixmode",
         "Expected parameters instead of '%s'!", buf);
       return false;
     }
@@ -463,7 +463,7 @@ bool csTextSyntaxService::ParseMixmode (csParser* parser, char *buf, uint &mixmo
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    ReportError (reporter, "crystalspace.syntax.mixmode",
+    ::ReportError (reporter, "crystalspace.syntax.mixmode",
       "Token '%s' (line %d) not recognized while parsing mixmode!",
       parser->GetLastOffender (), parser->GetParserLine ());
     return false;
@@ -502,7 +502,7 @@ bool csTextSyntaxService::ParseShading (csParser* parser, char *buf, int &shadin
     default:
       if (cmd == CS_PARSERR_TOKENNOTFOUND)
       {
-	ReportError (reporter, "crystalspace.syntax.shading",
+	::ReportError (reporter, "crystalspace.syntax.shading",
 	  "Token '%s' (line %d( not found while parsing the shading specification!",
 	  parser->GetLastOffender (), parser->GetParserLine ());
         return false;
@@ -550,7 +550,7 @@ bool csTextSyntaxService::ParseTexture (
   {
     if (!params)
     {
-      ReportError (reporter, "crystalspace.syntax.texture",
+      ::ReportError (reporter, "crystalspace.syntax.texture",
         "Expected parameters instead of '%s'!", buf);
       return false;
     }
@@ -639,14 +639,14 @@ bool csTextSyntaxService::ParseTexture (
   {
     if (!len.y)
     {
-      ReportError (reporter, "crystalspace.syntax.texture",
+      ::ReportError (reporter, "crystalspace.syntax.texture",
         "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
     }
     if (!len.z)
     {
-      ReportError (reporter, "crystalspace.syntax.texture",
+      ::ReportError (reporter, "crystalspace.syntax.texture",
         "Bad texture specification for polygon '%s'", polyname);
       len.z = 1;
       return false;
@@ -656,7 +656,7 @@ bool csTextSyntaxService::ParseTexture (
   {
     if (!len.y)
     {
-      ReportError (reporter, "crystalspace.syntax.texture",
+      ::ReportError (reporter, "crystalspace.syntax.texture",
         "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
@@ -690,7 +690,7 @@ bool csTextSyntaxService::ParseWarp (
   {
     if (!params)
     {
-      ReportError (reporter, "crystalspace.syntax.warp",
+      ::ReportError (reporter, "crystalspace.syntax.warp",
         "Expected parameters instead of '%s'!", buf);
       return false;
     }
@@ -862,7 +862,7 @@ bool csTextSyntaxService::ParsePoly3d (
   {
     if (!params)
     {
-      ReportError (reporter, "crystalspace.syntax.polygon",
+      ::ReportError (reporter, "crystalspace.syntax.polygon",
         "Expected parameters instead of '%s'!", buf);
       te->DecRef ();
       return false;
@@ -874,7 +874,7 @@ bool csTextSyntaxService::ParsePoly3d (
         mat = ldr_context->FindMaterial (str);
         if (mat == NULL)
         {
-          ReportError (reporter, "crystalspace.syntax.polygon",
+          ::ReportError (reporter, "crystalspace.syntax.polygon",
             "Couldn't find material named '%s'!", str);
           te->DecRef ();
           return false;
@@ -1143,7 +1143,7 @@ bool csTextSyntaxService::ParsePoly3d (
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    ReportError (reporter, "crystalspace.syntax.polygon",
+    ::ReportError (reporter, "crystalspace.syntax.polygon",
       "Token '%s' not found while parsing a polygon ('%s')!",
       parser->GetLastOffender (), poly3d->QueryObject()->GetName());
     te->DecRef ();
@@ -1152,7 +1152,7 @@ bool csTextSyntaxService::ParsePoly3d (
 
   if (poly3d->GetVertexCount () < 3)
   {
-    ReportError (reporter, "crystalspace.syntax.polygon",
+    ::ReportError (reporter, "crystalspace.syntax.polygon",
       "Polygon '%s' in line %d contains just %d vertices!",
       poly3d->QueryObject()->GetName(), parser->GetParserLine (),
       poly3d->GetVertexCount ());
@@ -1178,13 +1178,13 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
       {
-        ReportError (reporter, "crystalspace.syntax.polygon",
+        ::ReportError (reporter, "crystalspace.syntax.polygon",
           "Bad texture specification for PLANE '%s'", name);
 	return false;
       }
       else if ((tx2-tx_orig) < SMALL_EPSILON)
       {
-        ReportError (reporter, "crystalspace.syntax.polygon",
+        ::ReportError (reporter, "crystalspace.syntax.polygon",
           "Bad texture specification for PLANE '%s'", name);
 	return false;
       }
@@ -1194,7 +1194,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
       {
-        ReportError (reporter, "crystalspace.syntax.polygon",
+        ::ReportError (reporter, "crystalspace.syntax.polygon",
           "Bad texture specification for PLANE '%s'", name);
 	return false;
       }
@@ -1206,7 +1206,7 @@ bool csTextSyntaxService::ParsePoly3d (
     iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
     if (!pl)
     {
-      ReportError (reporter, "crystalspace.syntax.polygon",
+      ::ReportError (reporter, "crystalspace.syntax.polygon",
         "Can't find plane '%s' for polygon '%s'",
       	plane_name, poly3d->QueryObject ()->GetName ());
       return false;
@@ -1459,6 +1459,8 @@ bool csTextSyntaxService::ParseBool (iDocumentNode* node, bool& result,
   if (!strcasecmp (v, "false")) { result = false; return true; }
   if (!strcasecmp (v, "on"))    { result = true; return true; }
   if (!strcasecmp (v, "off"))   { result = false; return true; }
+  ReportError ("crystalspace.syntax.boolean", node,
+    "Bad boolean value '%s'!", v);
   return false;
 }
 
@@ -1517,8 +1519,7 @@ bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
       case XMLTOKEN_M32: m.m32 = child->GetContentsValueAsFloat (); break;
       case XMLTOKEN_M33: m.m33 = child->GetContentsValueAsFloat (); break;
       default:
-        ReportError (reporter, "crystalspace.syntax.matrix",
-          "Unknown token '%s' for 'matrix'!", value);
+        ReportBadToken (child);
         return false;
     }
   }
@@ -1531,7 +1532,7 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
   csRef<iDocumentNode> minnode = node->GetNode ("min");
   if (!minnode)
   {
-    ReportError (reporter, "crystalspace.syntax.box",
+    ReportError ("crystalspace.syntax.box", node,
       "Expected 'min' node!");
     return false;
   }
@@ -1541,7 +1542,7 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
   csRef<iDocumentNode> maxnode = node->GetNode ("max");
   if (!maxnode)
   {
-    ReportError (reporter, "crystalspace.syntax.box",
+    ReportError ("crystalspace.syntax.box", node,
       "Expected 'max' node!");
     return false;
   }
@@ -1595,8 +1596,7 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
       case XMLTOKEN_KEYCOLOR: mixmode |= CS_FX_KEYCOLOR; break;
       case XMLTOKEN_TILING: mixmode |= CS_FX_TILING; break;
       default:
-        ReportError (reporter, "crystalspace.syntax.mixmode",
-          "Unknown token '%s' for 'mixmode'!", value);
+        ReportBadToken (child);
         return false;
     }
   }
@@ -1716,8 +1716,8 @@ bool csTextSyntaxService::ParseTextureMapping (
 	  csRef<iDocumentNode> spec = child->GetNode ("vt1");
 	  if (!spec)
 	  {
-            ReportError (reporter, "crystalspace.syntax.texture",
-              "Couldn't find 'vt1' node in 'texture/uv'!", value);
+            ReportError ("crystalspace.syntax.texture", child,
+              "Couldn't find 'vt1'!", value);
             return false;
 	  }
 	  idx1 = spec->GetAttributeValueAsInt ("idx");
@@ -1726,8 +1726,8 @@ bool csTextSyntaxService::ParseTextureMapping (
 	  spec = child->GetNode ("vt2");
 	  if (!spec)
 	  {
-            ReportError (reporter, "crystalspace.syntax.texture",
-              "Couldn't find 'vt2' node in 'texture/uv'!", value);
+            ReportError ("crystalspace.syntax.texture", child,
+              "Couldn't find 'vt2'!", value);
             return false;
 	  }
 	  idx2 = spec->GetAttributeValueAsInt ("idx");
@@ -1736,8 +1736,8 @@ bool csTextSyntaxService::ParseTextureMapping (
 	  spec = child->GetNode ("vt3");
 	  if (!spec)
 	  {
-            ReportError (reporter, "crystalspace.syntax.texture",
-              "Couldn't find 'vt3' node in 'texture/uv'!", value);
+            ReportError ("crystalspace.syntax.texture", child,
+              "Couldn't find 'vt3'!", value);
             return false;
 	  }
 	  idx3 = spec->GetAttributeValueAsInt ("idx");
@@ -1746,8 +1746,7 @@ bool csTextSyntaxService::ParseTextureMapping (
 	}
         break;
       default:
-        ReportError (reporter, "crystalspace.syntax.texture",
-          "Unknown token '%s' for 'texture'!", value);
+        ReportBadToken (child);
         return false;
     }
   }
@@ -1756,15 +1755,15 @@ bool csTextSyntaxService::ParseTextureMapping (
   {
     if (!len.y)
     {
-      ReportError (reporter, "crystalspace.syntax.texture",
-        "Bad texture specification for POLYGON '%s'", polyname);
+      ReportError ("crystalspace.syntax.texture", node,
+        "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
     }
     if (!len.z)
     {
-      ReportError (reporter, "crystalspace.syntax.texture",
-        "Bad texture specification for POLYGON '%s'", polyname);
+      ReportError ("crystalspace.syntax.texture", node,
+        "Bad texture specification for polygon '%s'", polyname);
       len.z = 1;
       return false;
     }
@@ -1773,8 +1772,8 @@ bool csTextSyntaxService::ParseTextureMapping (
   {
     if (!len.y)
     {
-      ReportError (reporter, "crystalspace.syntax.texture",
-        "Bad texture specification for POLYGON '%s'", polyname);
+      ReportError ("crystalspace.syntax.texture", node,
+        "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
     }
@@ -1819,11 +1818,7 @@ bool csTextSyntaxService::ParsePortal (
         break;
       case XMLTOKEN_MIRROR:
 	if (!ParseBool (child, mirror, true))
-	{
-          ReportError (reporter, "crystalspace.syntax.portal",
-            "Bad value for 'mirror' in 'portal'!");
 	  return false;
-	}
         break;
       case XMLTOKEN_STATIC:
         flags.Push ((csSome)CS_PORTAL_STATICDEST);
@@ -1854,8 +1849,7 @@ bool csTextSyntaxService::ParsePortal (
 	}
 	break;
       default:
-        ReportError (reporter, "crystalspace.syntax.portal",
-          "Unknown token '%s' for 'portal'!", value);
+	ReportBadToken (child);
         return false;
     }
   }
@@ -1923,7 +1917,7 @@ bool csTextSyntaxService::ParsePoly3d (
         mat = ldr_context->FindMaterial (child->GetContentsValue ());
         if (mat == NULL)
         {
-          ReportError (reporter, "crystalspace.syntax.polygon",
+          ReportError ("crystalspace.syntax.polygon", child,
             "Couldn't find material named '%s'!", str);
           return false;
         }
@@ -1933,11 +1927,7 @@ bool csTextSyntaxService::ParsePoly3d (
         {
           bool do_lighting;
 	  if (!ParseBool (child, do_lighting, true))
-	  {
-            ReportError (reporter, "crystalspace.syntax.portal",
-              "Bad value for 'lighting' in 'polygon'!");
 	    return false;
-	  }
           poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
 	  	do_lighting ? CS_POLY_LIGHTING : 0);
         }
@@ -1952,11 +1942,7 @@ bool csTextSyntaxService::ParsePoly3d (
         {
           bool do_colldet;
 	  if (!ParseBool (child, do_colldet, true))
-	  {
-            ReportError (reporter, "crystalspace.syntax.portal",
-              "Bad value for 'colldet' in 'polygon'!");
 	    return false;
-	  }
 	  if (do_colldet) set_colldet = 1;
 	  else set_colldet = -1;
         }
@@ -2037,7 +2023,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	    shading = POLYTXT_LIGHTMAP;
 	  else
 	  {
-	    ReportError (reporter, "crystalspace.syntax.polygon",
+	    ReportError ("crystalspace.syntax.polygon", child,
 	      "Bad 'shading' specification '%s'!", shad);
             return false;
 	  }
@@ -2113,15 +2099,14 @@ bool csTextSyntaxService::ParsePoly3d (
         break;
 #endif
       default:
-        ReportError (reporter, "crystalspace.syntax.polygon",
-          "Unknown token '%s' for 'polygon'!", value);
+        ReportBadToken (child);
         return false;
     }
   }
 
   if (poly3d->GetVertexCount () < 3)
   {
-    ReportError (reporter, "crystalspace.syntax.polygon",
+    ReportError ("crystalspace.syntax.polygon", node,
       "Polygon '%s' contains just %d vertices!",
       poly3d->QueryObject()->GetName(),
       poly3d->GetVertexCount ());
@@ -2146,13 +2131,13 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
       {
-        ReportError (reporter, "crystalspace.syntax.polygon",
+        ReportError ("crystalspace.syntax.polygon", node,
           "Bad texture specification!");
 	return false;
       }
       else if ((tx2-tx_orig) < SMALL_EPSILON)
       {
-        ReportError (reporter, "crystalspace.syntax.polygon",
+        ReportError ("crystalspace.syntax.polygon", node,
           "Bad texture specification!");
 	return false;
       }
@@ -2162,7 +2147,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
       {
-        ReportError (reporter, "crystalspace.syntax.polygon",
+        ReportError ("crystalspace.syntax.polygon", node,
           "Bad texture specification!");
 	return false;
       }
@@ -2174,7 +2159,7 @@ bool csTextSyntaxService::ParsePoly3d (
     iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
     if (!pl)
     {
-      ReportError (reporter, "crystalspace.syntax.polygon",
+      ReportError ("crystalspace.syntax.polygon", node,
         "Can't find plane '%s' for polygon '%s'",
       	plane_name, poly3d->QueryObject ()->GetName ());
       return false;
@@ -2270,6 +2255,61 @@ bool csTextSyntaxService::ParsePoly3d (
   OptimizePolygon (poly3d);
 
   return true;
+}
+
+void csTextSyntaxService::ReportError (const char* msgid,
+	iDocumentNode* errornode, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  csString errpath;
+  errpath.FormatV (msg, arg);
+  bool first = true;
+
+  csRef<iDocumentNode> n (errornode);
+  while (n)
+  {
+    const char* v = n->GetValue ();
+    const char* name = n->GetAttributeValue ("name");
+    if (name || (v && *v))
+    {
+      if (first) { errpath = "\n" + errpath; first = false; }
+      else errpath = "," + errpath;
+      if (name)
+      {
+        errpath = ")" + errpath;
+        errpath = name + errpath;
+        errpath = "(" + errpath;
+      }
+      if (v && *v)
+      {
+        errpath = v + errpath;
+      }
+    }
+    n = n->GetParent ();
+  }
+
+  if (reporter)
+  {
+    reporter->Report (CS_REPORTER_SEVERITY_ERROR, msgid, "%s",
+    	(const char*)errpath);
+  }
+  else
+  {
+    char buf[2048];
+    sprintf (buf, "%s", (const char*)errpath);
+    csPrintf ("Error ID: %s\n", msgid);
+    csPrintf ("Description: %s\n", buf);
+  }
+
+  va_end (arg);
+}
+
+void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
+{
+  ReportError ("crystalspace.syntax.badtoken",
+  	badtokennode, "Unexpected token '%s'!",
+	badtokennode->GetValue ());
 }
 
 //======== Debugging =======================================================

@@ -138,6 +138,10 @@ public:
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset);
 
+  virtual void ReportError (const char* msgid, iDocumentNode* errornode,
+	const char* msg, ...);
+  virtual void ReportBadToken (iDocumentNode* badtokennode);
+
 private:
   /// make it plugable
   struct eiComponent : public iComponent

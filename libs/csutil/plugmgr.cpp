@@ -136,7 +136,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
 }
 
 iBase *csPluginManager::LoadPlugin (const char *classID,
-  const char *iInterface, int iVersion)
+  const char *iInterface, int iVersion, bool init)
 {
   iComponent *p = SCF_CREATE_INSTANCE (classID, iComponent);
   if (!p)
@@ -168,7 +168,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
       added_here = true;
     }
 
-    if (p->Initialize (object_reg))
+    if ((!init) || p->Initialize (object_reg))
     {
       iBase *ret;
       if (iInterface)
