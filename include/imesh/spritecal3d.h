@@ -25,6 +25,7 @@
 #include "ivideo/graph3d.h"
 
 class csColor;
+class csRandomGen;
 struct iMaterialWrapper;
 struct iSkeleton;
 struct iSkeletonState;
@@ -265,7 +266,7 @@ struct iSpriteCal3DState : public iBase
   /// Returns the number of animations currently loaded for the core model.
   virtual int GetAnimCount() = 0;
 
-  /// Returns the name, from the xml file, of the indexed anim, or NULL if out of bounds.
+  /// Returns the name, from the xml file, of the indexed anim, or 0 if out of bounds.
   virtual const char *GetAnimName(int idx) = 0;
 
   /// Returns the type from the enum above, as specified in the XML.
@@ -332,7 +333,7 @@ struct iSpriteCal3DState : public iBase
    * in velocity to the specified parm "vel".  The calling program is still
    * responsible for actually moving the sprite.
    */
-  virtual bool SetVelocity(float vel,csRandomGen *rng=NULL) = 0;
+  virtual bool SetVelocity(float vel,csRandomGen *rng=0) = 0;
 
   /**
    * This function sets the Level of Detail used by the sprite.  This is used to 
