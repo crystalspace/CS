@@ -13,10 +13,10 @@ PLUGINHELP += \
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: socket
+.PHONY: socket socketclean
 
 all plugins netdrivers: socket
 
@@ -68,7 +68,7 @@ $(SOCKET): $(OBJ.SOCKET) $(DEP.SOCKET)
 	$(DO.PLUGIN) $(LIBS.SOCKET)
 
 socketclean:
-	$(RM) $(SOCKET) $(OBJ.SOCKET)
+	$(RM) $(SOCKET) $(OBJ.SOCKET) $(OUTOS)socket.dep
 
 ifdef DO_DEPEND
 depend: $(OUTOS)socket.dep
