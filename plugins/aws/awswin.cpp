@@ -87,6 +87,10 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   pm->GetInt (settings, "Options", frame_options);
   pm->GetString (settings, "Title", title);
+ 
+  // We have to incref this or else if our title is changed we release the copy in the prefmanager!
+  if (title)
+    title->IncRef();
   pm->LookupIntKey ("TitleBarHeight", title_bar_height);
 
   unsigned char red, green, blue;
@@ -270,7 +274,6 @@ bool awsWindow::SetProperty (const char *name, void *parm)
     {
       title->DecRef ();
       title = new scfString (t->GetData ());
-      title->IncRef ();
 
       Invalidate ();
     }
