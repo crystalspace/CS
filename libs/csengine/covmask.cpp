@@ -337,6 +337,12 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
 	int hor_offs, int ver_offs,
 	int box_dim, int box_shift) const
 {
+#if CS_COV_STATS
+  extern int cnt_GetIndex;
+  extern int cnt_GetIndex_hor;
+  extern int cnt_GetIndex_ver;
+  cnt_GetIndex++;
+#endif
   float fhor_offs = (float)hor_offs;	// Optimal?@@@
   float fver_offs = (float)ver_offs;	// Optimal?@@@
   float fbox_dim = (float)box_dim;	// Optimal?@@@
@@ -352,45 +358,109 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
   csVector2 sta (start.x-fhor_offs, (start.y-1024)+fver_offs);
   csVector2 sto (stop.x-fhor_offs, (stop.y-1024)+fver_offs);
 
+  if (edge.horizontal)
+  {
+#   if CS_COV_STATS
+    cnt_GetIndex_hor++;
+#   endif
+    // Special case for a horizontal edge.
+    f = - sta.y;
+    if (f < 0)
+      if (sto.x > sta.x)
+        return index_inside;
+      else
+        return index_outside;
+    else if (f >= fbox_dim)
+      if (sto.x < sta.x)
+        return index_inside;
+      else
+        return index_outside;
+    else
+    {
+      y_left = QInt (f);
+      if (sta.x < sto.x)
+      {
+        from = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+	to   = from + dimension;
+      }
+      else
+      {
+        to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        from = to + dimension;
+      }
+      return (from<<edge_shift) + to;
+    }
+  }
+  else if (edge.vertical)
+  {
+#   if CS_COV_STATS
+    cnt_GetIndex_ver++;
+#   endif
+    // Special case for a vertical edge.
+    f = sta.x;
+    if (f < 0)
+      if (sto.y > sta.y)
+        return index_inside;
+      else
+        return index_outside;
+    else if (f >= fbox_dim)
+      if (sto.y < sta.y)
+        return index_inside;
+      else
+        return index_outside;
+    else
+    {
+      x_top = QInt (f);
+      if (sta.y > sto.y)
+      {
+        from = ((x_top << dim_shift) >> box_shift);
+        to   = from + dimension;
+      }
+      else
+      {
+        to   = ((x_top << dim_shift) >> box_shift);
+        from = to + dimension;
+      }
+      return (from<<edge_shift) + to;
+    }
+  }
+
+  // General case.
+
   // We're going to create a bitmask with four bits to represent
   // all intersections. The bits are tblr (top, bottom, left,
   // right). For example, if the mask is 1001 then there is an
   // intersection through the top and right edges of the box.
   int mask = 0;
 
-  if (!edge.horizontal)
+  // Top horizontal side.
+  f = -edge.dxdy * (0+sta.y) + sta.x;
+  if (f >= 0 && f < fbox_dim)
   {
-    // Top horizontal side.
-    f = -edge.dxdy * (0+sta.y) + sta.x;
-    if (f >= 0 && f < fbox_dim)
-    {
-      x_top = QInt (f);
-      mask |= 0x8;
-    }
-    // Bottom horizontal side.
-    f = -edge.dxdy * (fbox_dim+sta.y) + sta.x;
-    if (f >= 0 && f < fbox_dim)
-    {
-      x_bot = QInt (f);
-      mask |= 0x4;
-    }
+    x_top = QInt (f);
+    mask |= 0x8;
   }
-  if (!edge.vertical)
+  // Bottom horizontal side.
+  f = -edge.dxdy * (fbox_dim+sta.y) + sta.x;
+  if (f >= 0 && f < fbox_dim)
   {
-    // Left vertical side.
-    f = -edge.dydx * (0-sta.x) - sta.y;
-    if (f >= 0 && f < fbox_dim)
-    {
-      y_left = QInt (f);
-      mask |= 0x2;
-    }
-    // Right vertical side.
-    f = -edge.dydx * (fbox_dim-sta.x) - sta.y;
-    if (f >= 0 && f < fbox_dim)
-    {
-      y_right = QInt (f);
-      mask |= 0x1;
-    }
+    x_bot = QInt (f);
+    mask |= 0x4;
+  }
+
+  // Left vertical side.
+  f = -edge.dydx * (0-sta.x) - sta.y;
+  if (f >= 0 && f < fbox_dim)
+  {
+    y_left = QInt (f);
+    mask |= 0x2;
+  }
+  // Right vertical side.
+  f = -edge.dydx * (fbox_dim-sta.x) - sta.y;
+  if (f >= 0 && f < fbox_dim)
+  {
+    y_right = QInt (f);
+    mask |= 0x1;
   }
 
   // Try all combinations. Also make sure we have

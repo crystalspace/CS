@@ -23,6 +23,9 @@
 #define CS_CM_4x4
 //#define CS_CM_8x8
 
+// Define to 1 to enable statistics about coverage mask tree running.
+#define CS_COV_STATS 0
+
 #if defined(CS_CM_4x4)
 #   define CS_CM_DIM 4
 #   define CS_CM_DIMSHIFT 2

@@ -33,6 +33,35 @@ static csCovMaskLUT* lut = NULL;
 #define NOT_OUTSIDE(omsk) ((omsk & 1) == 0)
 #define PARTIAL(imsk,omsk) ((imsk & 1) == 0 && (omsk & 1) == 0)
 
+#if CS_COV_STATS
+int cnt_TestPolygonNotEmpty;
+int cnt_TestPolygonNotEmpty_loop;
+int cnt_TestPolygonNotEmpty_child;
+int cnt_TestPolygonNotEmpty0;
+int cnt_InsertPolygon;
+int cnt_InsertPolygon_loop;
+int cnt_InsertPolygon_child;
+int cnt_InsertPolygon0;
+int cnt_UpdatePolygon;
+int cnt_UpdatePolygon_loop;
+int cnt_UpdatePolygon_child;
+int cnt_UpdatePolygon0;
+int cnt_UpdatePolygonInverted;
+int cnt_UpdatePolygonInverted_loop;
+int cnt_UpdatePolygonInverted_child;
+int cnt_UpdatePolygonInverted0;
+int cnt_TestPolygon;
+int cnt_TestPolygon_loop;
+int cnt_TestPolygon_child;
+int cnt_TestPolygon0;
+int cnt_GetIndex;
+int cnt_GetIndex_hor;
+int cnt_GetIndex_ver;
+#define COVSTAT(a) cnt#_a#++
+#else
+#define COVSTAT(a)
+#endif
+
 /**
  * This templated class represents a node in the coverage
  * mask tree. It is templated because we don't want to use
@@ -78,6 +107,7 @@ bool TestPolygonNotEmpty (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs) const
 {
+  COVSTAT(TestPolygonNotEmpty);
   csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, edges,
   	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
@@ -106,6 +136,7 @@ bool TestPolygonNotEmpty (csVector2* poly, int num_poly,
   // we need only look at 'out'.
   traverse = ~pol_mask.out;
 
+  COVSTAT(TestPolygonNotEmpty_loop);
   idx = 0;		// Index for computing column/row in mask.
 # if defined(CS_CM_8x8)
   bool looped = false;
@@ -122,6 +153,7 @@ again:
         row = idx >> CS_CM_DIMSHIFT;
         new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
         new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
+	COVSTAT(TestPolygonNotEmpty_child);
         if (children[idx].TestPolygonNotEmpty (poly, num_poly, edges,
 		new_hor_offs, new_ver_offs))
 	  return true;
@@ -157,6 +189,7 @@ bool TestPolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs) const
 {
+  COVSTAT(TestPolygon);
   // Trivial case. If this mask is full then nothing remains to be done.
   if (IsFull ()) return false;
 
@@ -201,6 +234,7 @@ bool TestPolygon (csVector2* poly, int num_poly,
   // or not. We put the bit-mask for this case in 'traverse'.
   traverse = ~(pol_mask.in | pol_mask.out | in | out);
 
+  COVSTAT(TestPolygon_loop);
   idx = 0;		// Index for computing column/row in mask.
 # if defined(CS_CM_8x8)
   bool looped = false;
@@ -213,6 +247,7 @@ again:
     {
       if (traverse_empty & 1)
       {
+	COVSTAT(TestPolygon_child);
         col = idx & CS_CM_DIMMASK;
         row = idx >> CS_CM_DIMSHIFT;
         new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
@@ -223,6 +258,7 @@ again:
       }
       if (traverse & 1)
       {
+	COVSTAT(TestPolygon_child);
         col = idx & CS_CM_DIMMASK;
         row = idx >> CS_CM_DIMSHIFT;
         new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
@@ -266,6 +302,7 @@ bool UpdatePolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
+  COVSTAT(UpdatePolygon);
   // Copy polygon mask to this one.
   Copy (lut->GetTriageMask (poly, num_poly, edges,
   	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
@@ -296,6 +333,7 @@ bool UpdatePolygon (csVector2* poly, int num_poly,
   // If some of the bits are inside then modified will certainly be true.
   bool modified = !!in;
 
+  COVSTAT(UpdatePolygon_loop);
 # if defined(CS_CM_8x8)
   bool looped = false;
 again:
@@ -308,6 +346,7 @@ again:
       // If partial then we traverse to the child to update that.
       if (partial & 1)
       {
+	COVSTAT(UpdatePolygon_child);
         // Partial. Update child.
         col = idx & CS_CM_DIMMASK;
         row = idx >> CS_CM_DIMSHIFT;
@@ -400,6 +439,7 @@ bool UpdatePolygonInverted (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
+  COVSTAT(UpdatePolygonInverted);
   // Copy polygon mask to this one.
   Copy (lut->GetTriageMask (poly, num_poly, edges,
   	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
@@ -433,6 +473,7 @@ bool UpdatePolygonInverted (csVector2* poly, int num_poly,
   // If some of the bits are inside then modified will certainly be true.
   bool modified = !!in;
 
+  COVSTAT(UpdatePolygonInverted_loop);
 # if defined(CS_CM_8x8)
   bool looped = false;
 again:
@@ -445,6 +486,7 @@ again:
       // If partial then we traverse to the child to update that.
       if (partial & 1)
       {
+	COVSTAT(UpdatePolygonInverted_child);
         // Partial. Update child.
         col = idx & CS_CM_DIMMASK;
         row = idx >> CS_CM_DIMSHIFT;
@@ -539,6 +581,7 @@ bool InsertPolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
+  COVSTAT(InsertPolygon);
   // Trivial case. If this mask is full then nothing remains to be done.
   if (IsFull ()) return false;
 
@@ -594,6 +637,7 @@ bool InsertPolygon (csVector2* poly, int num_poly,
   setpartial = 0;
 
   idx = 0;		// Index for computing column/row in mask.
+  COVSTAT(InsertPolygon_loop);
 
 # if defined(CS_CM_8x8)
   bool looped = false;
@@ -606,6 +650,7 @@ again:
     {
       if (update & 1)
       {
+	COVSTAT(InsertPolygon_child);
       	col = idx & CS_CM_DIMMASK;
       	row = idx >> CS_CM_DIMSHIFT;
         new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
@@ -624,6 +669,7 @@ again:
       }
       else if (insert & 1)
       {
+	COVSTAT(InsertPolygon_child);
       	col = idx & CS_CM_DIMMASK;
       	row = idx >> CS_CM_DIMSHIFT;
         new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
@@ -973,6 +1019,7 @@ bool csCovTreeNode0::UpdatePolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
+  COVSTAT(UpdatePolygon0);
   Copy (lut->GetMask (poly, num_poly, edges,
   	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
 
@@ -986,6 +1033,7 @@ bool csCovTreeNode0::UpdatePolygonInverted (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
+  COVSTAT(UpdatePolygonInverted0);
   Copy (lut->GetMask (poly, num_poly, edges,
   	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
   Invert ();
@@ -1000,6 +1048,7 @@ bool csCovTreeNode0::TestPolygonNotEmpty (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs) const
 {
+  COVSTAT(TestPolygonNotEmpty0);
   csCovMask pol_mask = lut->GetMask (poly, num_poly, edges,
   	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
@@ -1014,6 +1063,7 @@ bool csCovTreeNode0::TestPolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs) const
 {
+  COVSTAT(TestPolygon0);
   // Trivial case. If this mask is full then nothing remains to be done.
   if (IsFull ()) return false;
 
@@ -1040,6 +1090,7 @@ bool csCovTreeNode0::InsertPolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
+  COVSTAT(InsertPolygon0);
   // Trivial case. If this mask is full then nothing remains to be done.
   if (IsFull ()) return false;
 
