@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Oct-2003
+	- res fixed a bug in the OR polygon buffers: when two polygons 
+	  subsequently passed into AddPolygon() would have different lightmaps,
+	  they would later not be drawn together, even if they could. But as
+	  distinct polys always have distinct lightmaps, this basically caused
+	  the polybuffers to be ineffective. Now, not the polygon's lightmap,
+	  but the super lightmap it is on is considered, and polys on the 
+	  same SLM will be drawn together.
+	- res updated the OS/X CG2D for the latest keyboard event changes.
 18-Oct-2003
 	- DeSigna:
 	  - Considerable cleanups to the csShaderExpression optimizer pass.

@@ -3855,8 +3855,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     }
     trimesh.triangles = t->triangles.GetArray ();
     trimesh.num_triangles = t->triangles.Length ();
-    GLuint lmtex = t->lmh ? ((csGLRendererLightmap*)
-    	((iRendererLightmap*)t->lmh))->slm->texHandle : 0;
+    GLuint lmtex = t->slmh ? ((csGLSuperLightmap*)
+    	((iSuperLightmap*)t->slmh))->texHandle : 0;
     bool drawn = EffectDrawTriangleMesh (trimesh, false,
       lmtex);
     something_was_drawn |= drawn;
@@ -3893,8 +3893,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     t = polbuf->GetFirst ();
     while (t != 0)
     {
-      GLuint lmtex = t->lmh ? 
-	((csGLRendererLightmap*)((iRendererLightmap*)t->lmh))->slm->texHandle
+      GLuint lmtex = t->slmh ? 
+	((csGLSuperLightmap*)((iSuperLightmap*)t->slmh))->texHandle
 	: 0;
       if (lmtex != 0) 
       {

@@ -148,10 +148,11 @@ class csGLSuperLightmap;
 /**
  * A single lightmap on a super lightmap.
  */
-class csGLRendererLightmap : iRendererLightmap
+class csGLRendererLightmap : public iRendererLightmap
 {
   friend class csGLSuperLightmap;
   friend class csGraphics3DOGLCommon;
+  friend class csTriangleArrayPolygonBuffer;
 
   /// Texture coordinates (in pixels)
   csRect rect;

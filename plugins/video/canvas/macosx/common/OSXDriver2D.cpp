@@ -15,6 +15,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "csver.h"
+#include "csutil/event.h"
 
 #include "OSXDriver2D.h"
 
@@ -77,7 +78,8 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
     // Listen for key down events
     csRef<iEventQueue> queue = CS_QUERY_REGISTRY(reg, iEventQueue);
     if (queue.IsValid())
-        queue->RegisterListener(scfiEventHandler, CSMASK_Broadcast | CSMASK_KeyDown);
+        queue->RegisterListener(scfiEventHandler, 
+	CSMASK_Broadcast | CSMASK_Keyboard);
 
     // Figure out what screen we will be using
     ChooseDisplay();
@@ -162,10 +164,12 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
             handled = true;
         }
     }
-    else if (ev.Type == csevKeyDown)
+    else if ((ev.Type == csevKeyboard) && 
+      (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
     {
-        if ((ev.Key.Code == CSKEY_ENTER) && (ev.Key.Modifiers & CSMASK_ALT))
-            handled = ToggleFullscreen();
+      if ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ENTER) && 
+        (csKeyEventHelper::GetModifiersBits (&ev) & CSMASK_ALT))
+	handled = ToggleFullscreen();
     }
 
     return handled;

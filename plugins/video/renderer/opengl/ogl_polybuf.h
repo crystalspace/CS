@@ -39,7 +39,7 @@ class csTrianglesPerMaterial
 public:
   csTrianglesPerMaterial * next;
   int matIndex;
-  csRef<iRendererLightmap> lmh;
+  csRef<iSuperLightmap> slmh;
 
   // We need a better implementation here
   // We're duplicating info, but we need the number of vertices per
@@ -71,10 +71,10 @@ public:
     if (last == 0) return -1;
     return last->matIndex;
   }
-  iRendererLightmap* GetLastLMHandle ()
+  iSuperLightmap* GetLastLMHandle ()
   {
     if (last == 0) return 0;
-    return last->lmh;
+    return last->slmh;
   }
   void Add (csTrianglesPerMaterial* t);
   csTrianglesPerMaterial* GetLast () { return last; }

@@ -185,8 +185,6 @@ void csTriangleArrayPolygonBuffer::Clear ()
 void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
 	int* verts,
 	csPolyTextureMapping* tmapping,
-	/*csVector2* texcoords,
-	csVector2* lmcoords,*/
 	const csPlane3& poly_normal,
 	int mat_index,
 	iRendererLightmap* lm)
@@ -219,10 +217,12 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
    * the face normal, just add it to the vertex normal and normalize
    */
 
+  iSuperLightmap* slm = lm ? ((csGLRendererLightmap*)lm)->slm : 0;
+
   csTrianglesPerMaterial* pol;
   int last_mat_index = polygons.GetLastMaterial ();
-  iRendererLightmap* last_lmh = polygons.GetLastLMHandle ();
-  if ((last_mat_index != mat_index) || (last_lmh != lm))
+  iSuperLightmap* last_lmh = polygons.GetLastLMHandle ();
+  if ((last_mat_index != mat_index) || (last_lmh != slm))
   {
     // First polygon or material of this polygon is different from
     // last material.
@@ -243,7 +243,7 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
   csTransform obj2tex (m_obj2tex, v_obj2tex);
 
   csTransform tex2lm;
-  if (lm)
+  if (lm && slm)
   {
     struct csPolyLMCoords
     {
@@ -292,53 +292,24 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
   texels.Put (cur_vt_idx, csVector2 (tc.x, tc.y));
   lmc = tex2lm.Other2This (tc);
   lumels.Put (cur_vt_idx, csVector2 (lmc.x, lmc.y));
-  /*texels.Put (cur_vt_idx, texcoords[0]);
-  if (lmcoords)
-  {
-    lumels.Put (cur_vt_idx, lmcoords[0]);
-  }
-  else
-  {
-    lumels.Put (cur_vt_idx, csVector2 (0, 0));
-  }*/
   triangle.a = cur_vt_idx++;
   orig_tri.a = verts[0];
 
   for (i = 1; i < num_verts - 1; i++)
   {
-    //triangle.b = AddSingleVertex (pol, verts, i, uv[i], cur_vt_idx);
     vec_vertices.Put (cur_vt_idx, vertices[verts[i]]);
     tc = obj2tex.Other2This (vertices[verts[i]]);
     texels.Put (cur_vt_idx, csVector2 (tc.x, tc.y));
     lmc = tex2lm.Other2This (tc);
     lumels.Put (cur_vt_idx, csVector2 (lmc.x, lmc.y));
-    /*texels.Put (cur_vt_idx, texcoords[i]);
-    if (lmcoords)
-    {
-      lumels.Put (cur_vt_idx, lmcoords[i]);
-    }
-    else
-    {
-      lumels.Put (cur_vt_idx, csVector2 (0, 0));
-    }*/
     triangle.b = cur_vt_idx++;
     orig_tri.b = verts[i];
 
-    //triangle.c = AddSingleVertex (pol, verts, i+1, uv[i+1], cur_vt_idx);
     vec_vertices.Put (cur_vt_idx, vertices[verts[i+1]]);
     tc = obj2tex.Other2This (vertices[verts[i+1]]);
     texels.Put (cur_vt_idx, csVector2 (tc.x, tc.y));
     lmc = tex2lm.Other2This (tc);
     lumels.Put (cur_vt_idx, csVector2 (lmc.x, lmc.y));
-    /*texels.Put (cur_vt_idx, texcoords[i+1]);
-    if (lmcoords)
-    {
-      lumels.Put (cur_vt_idx, lmcoords[i+1]);
-    }
-    else
-    {
-      lumels.Put (cur_vt_idx, csVector2 (0, 0));
-    }*/
     triangle.c = cur_vt_idx++;
     orig_tri.c = verts[i+1];
 
@@ -347,46 +318,7 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
   }
 
   pol->matIndex = mat_index;
-  pol->lmh = lm;
-
-  //int cur_tri_num = orig_triangles.Length ();
-
-/*  int cur_vt_num = vec_vertices.Length ();
-  int new_vt_num = cur_vt_num + num_verts;
-  vec_vertices.SetLength (new_vt_num);
-  texels.SetLength (new_vt_num);
-  lumels.SetLength (new_vt_num);
-
-  int last_mat_index = polygons.GetLastMaterial ();
-  csLightmapHandle last_lmh = polygons.GetLastLMHandle ();
-  if ((last_mat_index != mat_index) || (last_lmh != lmh))
-  {
-    // First polygon or material of this polygon is different from
-    // last material.
-    csTrianglesPerMaterial* pol = new csTrianglesPerMaterial ();
-    AddTriangles (pol, verts, num_verts, m_obj2tex, v_obj2tex,
-      poly_texture, mat_index, cur_vt_num, lmh);
-    polygons.Add (pol);
-
-    //matCount ++;
-  }
-  else
-  {
-    // We can add the triangles in the last PolygonPerMaterial
-    // as long they share the same material.
-    AddTriangles (polygons.last, verts, num_verts, m_obj2tex,
-      v_obj2tex, poly_texture, mat_index, cur_vt_num, lmh);
-  }
-
-  csTriangle triangle;
-  triangle.a = verts[0];
-  int i;
-  for (i = 1 ; i < num_verts-1 ; i++)
-  {
-    triangle.b = verts[i];
-    triangle.c = verts[i+1];
-    orig_triangles.Push (triangle);
-  }*/
+  pol->slmh = slm;
 }
 
 csTriangleArrayVertexBufferManager::csTriangleArrayVertexBufferManager
