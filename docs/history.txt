@@ -5,6 +5,13 @@ The history order is reversed so that new features are at the top.
 	  the breakage caused by AndyZ's makefile change.  Reverted a patch
 	  which Philip Wyett made to cygwin.mak since the new saner patch
 	  should make the cygwin.mak patch unnecessary.
+	- Matze added DEBUG_BREAK_MSG macro to cssysdef.h in order to avoid the
+	  STR_FATAL macro in csstring.h (perhaps this will also usefull for other apps).
+          Problem here is win32 as I had to use printf (or is there a way to access the
+	  reporter wihtout having a pointer to iObjectRegistry?)
+	- Matze added operator == const char* to csString
+	- Matze added operator = for various types to csString
+	- smaller cleanups for csString - there's still MUCH room for optimisations
 8-Jan-2002
 	- Reverted a change to the png loader plugin (in the saving part)
 	  that 'res' made some time ago. It caused quality degradation when
