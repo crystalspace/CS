@@ -100,6 +100,13 @@ protected:
   /// Z Buffer mode to use while rendering next polygon.
   csZBufMode z_buf_mode;
 
+  /// Values to check if we have to reinit StartPolygonFX.
+  bool dpfx_valid;
+  bool dpfx_use_fog;
+  iMaterialHandle* dpfx_mat_handle;
+  UInt dpfx_mixmode;
+  csZBufMode dpfx_z_buf_mode;
+
   /// Alpha mask used for 16-bit mode.
   UShort alpha_mask;
 
@@ -194,6 +201,10 @@ protected:
 
   /// Build the table used for fog in paletted modes
   unsigned char *BuildIndexedFogTable ();
+
+  /// Start a series of DrawPolygonFX
+  void RealStartPolygonFX (iMaterialHandle* handle, UInt mode,
+  	bool use_fog);
 
 public:
   /**
@@ -319,12 +330,6 @@ public:
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
     float fov, int color);
-
-  /// Start a series of DrawPolygonFX
-  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode);
-
-  /// Finish a series of DrawPolygonFX
-  virtual void FinishPolygonFX ();
 
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);

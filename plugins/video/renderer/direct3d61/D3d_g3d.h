@@ -240,11 +240,11 @@ public:
   /// Draw a Line.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color);
   
-  /// Start a series of DrawPolygonFX
-  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode);
+  /// Start a series of DrawPolygonFX (no longer in iGraphics3D!!!@@@)
+  void StartPolygonFX (iMaterialHandle* handle, UInt mode);
 
-  /// Finish a series of DrawPolygonFX
-  virtual void FinishPolygonFX ();
+  /// Finish a series of DrawPolygonFX (no longer in iGraphics3D!!!@@@)
+  void FinishPolygonFX ();
 
   /// Draw a polygon wit special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);

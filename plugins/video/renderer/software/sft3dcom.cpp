@@ -261,6 +261,8 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   title = NULL;
   is_for_procedural_textures = false;
 
+  dpfx_valid = false;
+
   System = NULL;
 }
 
@@ -1230,6 +1232,8 @@ void csGraphics3DSoftwareCommon::SetClipper (iClipper2D* clip, int cliptype)
 
 bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
 {
+  dpfx_valid = false;
+
   if ((G2D->GetWidth() != display_width) ||
       (G2D->GetHeight() != display_height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
@@ -2621,9 +2625,23 @@ static struct
 
 #define EPS   0.0001
 
-void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
-  UInt mode)
+void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
+  UInt mode, bool use_fog)
 {
+  if (!dpfx_valid ||
+  	use_fog != dpfx_use_fog ||
+	handle != dpfx_mat_handle ||
+	z_buf_mode != dpfx_z_buf_mode ||
+	mode != dpfx_mixmode)
+  {
+    dpfx_valid = true;
+    dpfx_use_fog = use_fog;
+    dpfx_mat_handle = handle;
+    dpfx_z_buf_mode = z_buf_mode;
+    dpfx_mixmode = mode;
+  }
+  else return;
+
   if (!do_gouraud || !do_lighting)
     mode &= ~CS_FX_GOURAUD;
 
@@ -2732,12 +2750,10 @@ zfill_only:
   pqinfo.max_b = (1 << (pfmt.BlueBits  + shift_amount + 8)) - 1;
 }
 
-void csGraphics3DSoftwareCommon::FinishPolygonFX ()
-{
-}
-
 void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
+  RealStartPolygonFX (poly.mat_handle, poly.mixmode, poly.use_fog);
+
   if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
     return;
 

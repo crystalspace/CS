@@ -670,9 +670,7 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   if (do3d)
   {
     Gfx3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
-    Gfx3D->StartPolygonFX (poly.mat_handle, poly.mixmode);
     Gfx3D->DrawPolygonFX (poly);
-    Gfx3D->FinishPolygonFX ();
   }
   else
   {

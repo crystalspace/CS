@@ -387,6 +387,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   // Clipped polygon (assume it cannot have more than 64 vertices)
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
+  poly.mat_handle = mesh.mat_handle;
+  poly.mixmode = mesh.fxmode;
 
   // Fill flat color if renderer decide to paint it flat-shaded
   iTextureHandle* txt_handle = mesh.mat_handle->GetTexture ();
@@ -397,8 +399,6 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   poly.use_fog = mesh.do_fog;
   bool do_clip = false;
   if (clipper && mesh.clip_portal >= CS_CLIP_NEEDED) do_clip = true;
-
-  g3d->StartPolygonFX (mesh.mat_handle, mesh.fxmode);
 
   // Draw all triangles.
   csTriangle* triangles = mesh.triangles;
@@ -613,6 +613,4 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     }
 
   }
-
-  g3d->FinishPolygonFX ();
 }

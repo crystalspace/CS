@@ -251,8 +251,6 @@ DrawPolygon(poly)
 DrawPolygonDebug(poly)
 
 DrawLine(v1,v2,fov,color)
-        oid StartPolygonFX (iTextureHandle* handle, UInt mode);
-        oid FinishPolygonFX ();
         oid DrawPolygonFX (G3DPolygonDPFX& poly);
         
 DrawTriangleMesh(mesh)

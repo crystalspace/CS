@@ -1,10 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+15-May-2001
+	- Philip Wyett added the new cslexan to global build process.
+	  Philip also changed MSVC project file generation process to create
+	  project files with a higher internal VC compiler warning flag.
 14-May-2001
 	- Fixed a bug in csShadowBlock, why doesn't a compiler warn on stupid
 	  assignments like 'a=a'? There is a very small chance that this
 	  fix may fix the dynamic lighting bug I'm experiencing. Not sure
-	  though.
+	  though. UPDATE: it didn't :-(.
 	- Put in lots of sanity checks in csShadowBlock and related classes.
 	  Also lots of CS_ASSERT calls.
 	- Added support for KEY keyword in loader for lights.
@@ -23,6 +27,28 @@ The history order is reversed so that new features are at the top.
 	  finished though.
 	- Worked a bit on the howto section again. Added section about pixmaps.
 	  Completed section about level loading.
+	- Removed StartPolygonFX and FinishPolygonFX completely. Only
+	  the glide and Direct3D renderers are not updated. For now just call
+	  DrawPolygonFX(). That function is itself responsible for testing
+	  it texture information needs to be updated or not.
+	- csEngine::CreateSectorWallsMesh() will put the created mesh in
+	  the 'wall' render priority queue now.
+	- Further updated apimod19.txi.
+	- Added HOWTO on render priorities.
+	- Michael Voasse did the following changes to the motion system:
+	    - Made the motion loader a plugin.
+	    - Fixed a malloc/realloc bug in motion.cpp.
+	    - Fixed a small memory leak in csMotion.
+	    - Did a fix to keep bone transforms.
+	- Martin Geisse did some cleanup of the material wrapper code.
+	- Christopher Nelson updated the lexical analyzer definition,
+	  changed the iString's to csString's since they aren't
+	  interchangeable currently.
+	- Christopher also implemented the lexical analyzer's VM (mostly).
+	  Currently missing features are:
+	    - custom table matching ([a-z] or [bfsf] etc.)
+	    - implementation of push and pop stream currently does nothing.
+	    - implementation of match currently does not call Exec().
 13-May-2001
 	- Added CS_ASSERT to some of the functions in growing arrays to
 	  make sure we catch those kinds of errors early.

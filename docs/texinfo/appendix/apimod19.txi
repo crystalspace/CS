@@ -81,9 +81,48 @@ There are functions to load a map, textures, mesh objects, ...
 @@@ TODO
 PLANE -> ADDON
 THING -> MESHOBJ
+SKY -> MESHOBJ + RENDPRI
 MESHOBJ -> MESHFACT (for factories)
 BEZIER -> ADDON
 MATERIALS
 RENDERPRIORITIES
 PLUGINS
+
+@subheading Sky Objects Gone
+
+@@@ TODO
+
+@subheading Using the Engine as a Plugin
+
+@@@ TODO
+
+@subheading Sectors have no Polygons
+@cindex csSector
+
+Sectors can no longer contain polygons. All geometry is now represented
+with mesh objects (see the section above about how to create csThing
+mesh objects). To create the outer walls of a sector (i.e. the geometry
+that used to go to the sector in 0.18 or earlier) you create a csThing
+mesh object. In a world file this happens like this:
+
+@example
+SECTOR 'room' (
+  MESHOBJ 'walls' (
+    PLUGIN ('crystalspace.mesh.loader.thing')
+    PARAMS (
+      VERTEX (...) ...
+      POLYGON (...) ...
+    )
+    ZFILL ()
+    PRIORITY ('wall')
+  )
+  ...
+)
+@end example
+
+In code you can use @code{iEngine::CreateSectorWallsMesh()} like this:
+
+@example
+  iMeshWrapper* mesh = engine->CreateSectorWallsMesh (sector, "walls");
+@end example
 

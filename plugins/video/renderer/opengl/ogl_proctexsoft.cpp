@@ -393,24 +393,6 @@ void csOpenGLProcSoftware::DrawLine (const csVector3& v1, const csVector3& v2, f
   g3d->DrawLine (v1, v2, fov, color); 
 }
 
-void csOpenGLProcSoftware::StartPolygonFX (iMaterialHandle* handle, UInt mode)
-{ 
-  iTextureHandle *soft_txt_handle;
-  int idx = txts_vector->FindKey ((void*)handle->GetTexture ());
-  if (idx == -1)
-    soft_txt_handle = txts_vector->RegisterAndPrepare (handle->GetTexture ());
-  else
-    soft_txt_handle = (iTextureHandle*)txts_vector->Get (idx)->soft_txt;
-  dummyMaterial dmat;
-  dmat.handle = soft_txt_handle;
-  g3d->StartPolygonFX (&dmat, mode);
-}
-
-void csOpenGLProcSoftware::FinishPolygonFX ()
-{ 
-  g3d->FinishPolygonFX (); 
-}
-
 void csOpenGLProcSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 { 
   dummyMaterial dmat;

@@ -1942,6 +1942,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   thing_fact->DecRef ();
 
   csMeshWrapper* thing_wrap = new csMeshWrapper (this, thing_obj);
+
   thing_obj->DecRef ();
   thing_wrap->SetName (iName);
   meshes.Push (thing_wrap);
@@ -1949,6 +1950,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   thing_wrap->GetMovable ().UpdateMove ();
   thing_wrap->flags.Set (CS_ENTITY_CONVEX);
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
+  thing_wrap->SetRenderPriority (GetWallRenderPriority ());
 
   iMeshWrapper* mesh_wrap = QUERY_INTERFACE (thing_wrap, iMeshWrapper);
   mesh_wrap->DecRef ();

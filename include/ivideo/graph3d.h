@@ -508,7 +508,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 4, 1, 2);
+SCF_VERSION (iGraphics3D, 4, 2, 2);
 
 /**
  * This is the standard 3D graphics interface.
@@ -646,14 +646,8 @@ struct iGraphics3D : public iPlugIn
   virtual void DrawPolygonDebug (G3DPolygonDP& poly) = 0;
 
   /**
-   * Prepare for drawing a series of Polygon FX which all use
-   * the same settings. You must call this function before calling a
-   * series of DrawPolygonFX(). After calling the series you should
-   * call FinishPolygonFX().<p>
-   *
-   * Warning! After calling this function you are not allowed to do
-   * any calls to the 3D rasterizer other than DrawPolygonFX() and
-   * FinishPolygonFX().<p>
+   * Draw a polygon with special effects. This is the most rich and slowest
+   * variant of DrawPolygonXxx. (If you use these features) 
    *
    * Warning! Do not rely on this method to handle Color keying under
    * all circumstances. Color Keying will only work reliable in Mixmodes
@@ -667,24 +661,7 @@ struct iGraphics3D : public iPlugIn
    * There are also some drivers (which I would consider buggy...), that won't
    * display FX_Alpha correctly with Color Keying. I can't provide a valid 
    * workaround for that except using FX_Multiplay and FX_Add, to manually
-   * create the image, but that would be very expensive.<p>
-   * 
-   * parameters:
-   * handle:  The material handle as returned by iTextureManager.
-   * mode:    How shall the new polygon be combined with the current 
-   *          screen content. This is any legal combination of CS_FX_XXX
-   *          flags including alpha value (if CS_FX_ALPHA flag is set)
-   */
-  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode) = 0;
-
-  /**
-   * Finish drawing a series of Polygon FX.
-   */
-  virtual void FinishPolygonFX () = 0;
-
-  /**
-   * Draw a polygon with special effects. This is the most rich and slowest
-   * variant of DrawPolygonXxx. (If you use these features) 
+   * create the image, but that would be very expensive.
    */
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly) = 0;
 

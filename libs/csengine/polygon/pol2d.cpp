@@ -499,11 +499,8 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
     PreparePolygonFX (&g3dpolyfx, vertices, num_vertices,
       orig_triangle, po_colors != NULL);
     g3dpolyfx.mixmode = ns->GetMixMode () | (po_colors ? CS_FX_GOURAUD : 0);
-    rview->GetGraphics3D ()->StartPolygonFX (g3dpolyfx.mat_handle,
-    	g3dpolyfx.mixmode);
     rview->CalculateFogPolygon (g3dpolyfx);
     rview->GetGraphics3D ()->DrawPolygonFX (g3dpolyfx);
-    rview->GetGraphics3D ()->FinishPolygonFX ();
   }
   else
   {

@@ -1685,14 +1685,6 @@ void csGraphics3DOGLCommon::RealStartPolygonFX (iMaterialHandle * handle,
   SetGLZBufferFlags (z_buf_mode);
 }
 
-void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
-{
-}
-
-void csGraphics3DOGLCommon::FinishPolygonFX ()
-{
-}
-
 void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 {
   RealStartPolygonFX (poly.mat_handle, poly.mixmode, poly.use_fog);
@@ -2672,8 +2664,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glDisableClientState (GL_COLOR_ARRAY);
   glDisableClientState (GL_VERTEX_ARRAY);
   glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
-  FinishPolygonFX ();
 
   glMatrixMode (GL_MODELVIEW);
   glPopMatrix ();

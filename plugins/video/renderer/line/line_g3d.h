@@ -136,12 +136,6 @@ public:
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
   	float fov, int color);
 
-  /// Start a series of DrawPolygonFX
-  virtual void StartPolygonFX (iMaterialHandle*, UInt) { }
-
-  /// Finish a series of DrawPolygonFX
-  virtual void FinishPolygonFX () { }
-
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 

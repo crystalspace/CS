@@ -241,9 +241,7 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   }
 
   poly.mixmode = mode;
-  G3D->StartPolygonFX (poly.mat_handle, poly.mixmode);
   G3D->DrawPolygonFX (poly);
-  G3D->FinishPolygonFX ();
 }
 
 void csGraphicsPipeline::ClearZbuffer (int x1, int y1, int x2, int y2)

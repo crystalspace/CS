@@ -227,7 +227,8 @@ struct iEngine : public iPlugIn
   /**
    * Conveniance function to create the thing containing the
    * convex outline of a sector. The thing will be empty but
-   * it will have CS_ZBUF_FILL set. This version creates a mesh wrapper.
+   * it will have CS_ZBUF_FILL set and have 'wall' as render
+   * priority. This version creates a mesh wrapper.
    */
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;

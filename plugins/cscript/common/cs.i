@@ -120,8 +120,6 @@ struct iGraphics3D:public iPlugIn
   void DrawPolygonDebug (G3DPolygonDP& poly);
   void DrawLine (const csVector3& v1, const csVector3& v2,
     float fov, int color);
-//void StartPolygonFX (iTextureHandle* handle, UInt mode);
-//void FinishPolygonFX ();
 //void DrawPolygonFX (G3DPolygonDPFX& poly);
   void DrawTriangleMesh (G3DTriangleMesh& mesh);
   void DrawPolygonMesh (G3DPolygonMesh& mesh);

@@ -114,8 +114,6 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual void DrawPolygonDebug (G3DPolygonDP& poly);
   virtual void DrawLine (const csVector3& v1, const csVector3& v2, 
 			 float fov, int color);
-  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode);
-  virtual void FinishPolygonFX ();
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);

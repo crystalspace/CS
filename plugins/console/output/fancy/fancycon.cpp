@@ -242,10 +242,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   poly.mixmode = CS_FX_SETALPHA (alpha) |
     CS_FX_COPY | (with_color && deco.bgnd.do_keycolor ? CS_FX_GOURAUD : 0);
-  G3D->StartPolygonFX (poly.mat_handle, poly.mixmode);
-
   G3D->DrawPolygonFX (poly);
-  G3D->FinishPolygonFX ();
 
   if (with_color)
     G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true);
@@ -358,9 +355,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
     float alpha = border.do_alpha ? border.alpha : 0.0;
     poly.mixmode = CS_FX_SETALPHA (alpha)
       | (border.do_keycolor ? CS_FX_KEYCOLOR : 0);
-    G3D->StartPolygonFX (poly.mat_handle, poly.mixmode);
     G3D->DrawPolygonFX (poly);
-    G3D->FinishPolygonFX ();
   }
 }
 

@@ -517,7 +517,5 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
 
   /// draw
   dpfx.mixmode = mode;
-  engine.G3D->StartPolygonFX (dpfx.mat_handle, dpfx.mixmode);
   engine.G3D->DrawPolygonFX (dpfx);
-  engine.G3D->FinishPolygonFX ();
 }

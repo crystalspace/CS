@@ -258,9 +258,7 @@ void csAVIStreamVideo::NextFrame ()
 
     polyfx.mat_handle = pMaterial;
     polyfx.mixmode = fxmode;
-    pG3D->StartPolygonFX (polyfx.mat_handle, polyfx.mixmode);
     pG3D->DrawPolygonFX (polyfx);
-    pG3D->FinishPolygonFX ();
 
     pG3D->SetRenderState( G3DRENDERSTATE_ZBUFFERMODE, zbuf );
     pG3D->SetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btex );
