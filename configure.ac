@@ -1535,7 +1535,7 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
 # from binutils and one from gcc.  The binutils version resides in /usr/lib,
 # whereas the gcc version resides in the gcc installation directory.  The gcc
 # version, by default, takes precedence at link time over the binutils version.
-# Unfortunately, the in broken cases, the gcc version of libiberty is missing
+# Unfortunately, in broken cases, the gcc version of libiberty is missing
 # htab_create_alloc() which is required by some libbfd functions.  The
 # extensive secondary check of libbfd catches this anomalous case of broken gcc
 # libiberty.  It turns out that it is possible to make the linker prefer the
