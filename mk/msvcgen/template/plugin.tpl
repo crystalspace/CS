@@ -17,9 +17,9 @@ CFG=%project% - Win32 ExtensiveMemDebug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "%project% - Win32 ExtensiveMemDebug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -131,9 +131,9 @@ PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo M
 
 # Begin Target
 
-# Name "%project% - Win32 Release"
-# Name "%project% - Win32 Debug"
 # Name "%project% - Win32 ExtensiveMemDebug"
+# Name "%project% - Win32 Debug"
+# Name "%project% - Win32 Release"
 %groups%
 # End Target
 # End Project

@@ -17,9 +17,9 @@ CFG=%project% - Win32 ExtensiveMemDebug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "%project% - Win32 ExtensiveMemDebug" (based on "Win32 (x86) Static Library")
+!MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -102,8 +102,8 @@ LIB32=link.exe -lib
 
 # Begin Target
 
-# Name "%project% - Win32 Release"
-# Name "%project% - Win32 Debug"
 # Name "%project% - Win32 ExtensiveMemDebug"
+# Name "%project% - Win32 Debug"
+# Name "%project% - Win32 Release"
 # End Target
 # End Project
