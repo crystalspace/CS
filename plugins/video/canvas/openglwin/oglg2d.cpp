@@ -20,12 +20,14 @@
 #include "cssys/sysfunc.h"
 #include <windows.h>
 #include <gl/gl.h>
+#include <penwin.h>
 
 #include "csutil/scf.h"
 #include "oglg2d.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "cssys/win32/win32.h"
+#include "iutil/cmdline.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -269,6 +271,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   
   Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"Using %d bits per pixel (%d color mode).", Depth, 1 << Depth);
+
   return true;
 }
 
@@ -481,12 +484,19 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
 bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
   HCURSOR hCursor;
+
+  if (!HardwareCursor) {
+    SetCursor(NULL);
+    return false;
+  }
 	
   switch(iShape)
   {
     case csmcNone:     hCursor = NULL; break;
     case csmcArrow:    hCursor = LoadCursor (NULL, IDC_ARROW);    break;
     case csmcMove:     hCursor = LoadCursor (NULL, IDC_SIZEALL);  break;
+    case csmcCross:    hCursor = LoadCursor (NULL, IDC_CROSS);	  break;
+    case csmcPen:      hCursor = LoadCursor (NULL, IDC_PEN);	  break;
     case csmcSizeNWSE: hCursor = LoadCursor (NULL, IDC_SIZENWSE); break;
     case csmcSizeNESW: hCursor = LoadCursor (NULL, IDC_SIZENESW); break;
     case csmcSizeNS:   hCursor = LoadCursor (NULL, IDC_SIZENS);   break;

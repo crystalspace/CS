@@ -448,7 +448,13 @@ bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
   iWin32Assistant* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   CS_ASSERT (winhelper != NULL);
-  bool rc = winhelper->SetCursor (iShape);
+  bool rc;
+  if (!HardwareCursor) {
+    winhelper->SetCursor (csmcNone);
+    rc = false;
+  } else {
+    rc = winhelper->SetCursor (iShape);
+  }
   winhelper->DecRef ();
   return rc;
 }
