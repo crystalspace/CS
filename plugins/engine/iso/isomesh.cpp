@@ -315,20 +315,6 @@ public:
   virtual void SetLastPortal (iPortal*) {}
   virtual int GetRenderRecursionLevel () {return 0;}
   virtual void SetRenderRecursionLevel (int ) {}
-  virtual void AttachRenderContextData (void* key, iBase* data)
-  {
-    (void)key;
-    (void)data;
-  }
-  virtual iBase* FindRenderContextData (void* key)
-  {
-    (void)key;
-    return 0;
-  }
-  virtual void DeleteRenderContextData (void* key)
-  {
-    (void)key;
-  }
   virtual iCamera* GetOriginalCamera () const { return 0; }
 };
 

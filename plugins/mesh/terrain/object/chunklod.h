@@ -272,7 +272,10 @@ public:
   virtual ~csChunkLodTerrainObject ();
 
   /// Returns a point to the factory that made this
-  iMeshObjectFactory* GetFactory () const { return (iMeshObjectFactory*)pFactory; }
+  iMeshObjectFactory* GetFactory () const
+  {
+    return (iMeshObjectFactory*)pFactory;
+  }
 
   virtual csFlags& GetFlags () { return flags; }
 

@@ -38,6 +38,8 @@ chronological order.
 	  returns bounding boxes that have huge floating point values in them.
 	  The visibility cullers (more specifically the kdtree) cannot cope
 	  with that.
+	- Jorrit removed the obsolete render context data system from
+	  iRenderView. Nothing was using it.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 

@@ -100,7 +100,6 @@ csRenderView::~csRenderView ()
     if (ctxt->icamera) ctxt->icamera->DecRef ();
     if (ctxt->iview) ctxt->iview->DecRef ();
     if (ctxt->iview_frustum) ctxt->iview_frustum->DecRef ();
-    DeleteRenderContextData (ctxt);
     delete ctxt;
   }
   if (iengine)
@@ -1165,7 +1164,6 @@ void csRenderView::CreateRenderContext ()
   if (ctxt->icamera) ctxt->icamera->IncRef ();
   if (ctxt->iview) ctxt->iview->IncRef ();
   if (ctxt->iview_frustum) ctxt->iview_frustum->IncRef ();
-  ctxt->rcdata = 0;
   // The camera transform id is copied from the old
   // context. Only when we do space warping on the camera
   // do we have to change it (CreateNewCamera() function).
@@ -1181,7 +1179,6 @@ void csRenderView::RestoreRenderContext (csRenderContext *original)
   if (old_ctxt->icamera) old_ctxt->icamera->DecRef ();
   if (old_ctxt->iview) old_ctxt->iview->DecRef ();
   if (old_ctxt->iview_frustum) old_ctxt->iview_frustum->DecRef ();
-  DeleteRenderContextData (old_ctxt);
   delete old_ctxt;
 }
 
@@ -1194,55 +1191,3 @@ iCamera *csRenderView::CreateNewCamera ()
   return ctxt->icamera;
 }
 
-void csRenderView::DeleteRenderContextData (csRenderContext *rc)
-{
-  if (!rc) return ;
-  while (rc->rcdata)
-  {
-    csRenderContextData *n = (csRenderContextData *) (rc->rcdata);
-    rc->rcdata = n->next;
-    if (n->data) n->data->DecRef ();
-  }
-}
-
-void csRenderView::DeleteRenderContextData (void *key)
-{
-  csRenderContextData **prev = (csRenderContextData **) &(ctxt->rcdata);
-  csRenderContextData *cd = (csRenderContextData *) (ctxt->rcdata);
-  while (cd)
-  {
-    if (cd->key == key)
-    {
-      if (cd->data) cd->data->DecRef ();
-      *prev = cd->next;
-      delete cd;
-      cd = *prev;
-    }
-    else
-    {
-      prev = &(cd->next);
-      cd = cd->next;
-    }
-  }
-}
-
-void csRenderView::AttachRenderContextData (void *key, iBase *data)
-{
-  csRenderContextData *cd = new csRenderContextData ();
-  cd->next = (csRenderContextData *) (ctxt->rcdata);
-  ctxt->rcdata = cd;
-  cd->key = key;
-  cd->data = data;
-}
-
-iBase *csRenderView::FindRenderContextData (void *key)
-{
-  csRenderContextData *cd = (csRenderContextData *) (ctxt->rcdata);
-  while (cd)
-  {
-    if (cd->key == key) return cd->data;
-    cd = cd->next;
-  }
-
-  return 0;
-}

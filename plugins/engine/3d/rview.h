@@ -43,26 +43,6 @@ class csRenderView : public iRenderView
 {
 private:
   /**
-   * A structure to keep data with the render context. All data
-   * that is attached to a render context will be automatically cleaned
-   * up when the render context is deleted (i.e. when a recursion level
-   * is closed).
-   */
-  struct csRenderContextData
-  {
-    /// Next data.
-    csRenderContextData* next;
-
-    /// The key is some value on which we want to retreive the data.
-    void* key;
-    /**
-     * This is the data. When the render context is deleted it will DecRef()
-     * this.
-     */
-    iBase* data;
-  };
-
-  /**
    * The following id is used to populate the context_id in every
    * csRenderContext.
    */
@@ -86,11 +66,6 @@ private:
   float leftx, rightx, topy, boty;
   /// The frustum corresponding with this.
   csRenderContextFrustum* top_frustum;
-
-  /**
-   * Delete all data on the given render context.
-   */
-  void DeleteRenderContextData (csRenderContext* rc);
 
   /**
    * Update the csRenderContextFrustum to the given clipper.
@@ -343,20 +318,6 @@ public:
   {
     ctxt->draw_rec_level = rec;
   }
-
-  /**
-   * Attach data to the current render context.
-   */
-  virtual void AttachRenderContextData (void* key, iBase* data);
-  /**
-   * Look for data on the current render context.
-   */
-  virtual iBase* FindRenderContextData (void* key);
-  /**
-   * Delete all data with the given key on the current render
-   * context.
-   */
-  virtual void DeleteRenderContextData (void* key);
 };
 
 #endif // __CS_RVIEW_H__

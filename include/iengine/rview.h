@@ -116,12 +116,6 @@ class csRenderContext
 {
   friend class csRenderView;
 
-private:
-  /**
-   * All render context data for this recursion level.
-   */
-  void* rcdata;
-
 public:
   /// The current camera.
   iCamera* icamera;
@@ -192,7 +186,7 @@ public:
   uint32 context_id;
 };
 
-SCF_VERSION (iRenderView, 0, 4, 0);
+SCF_VERSION (iRenderView, 0, 5, 0);
 
 /**
  * This interface represents all information needed to render
@@ -390,20 +384,6 @@ struct iRenderView : public iBase
    * Set render recursion level.
    */
   virtual void SetRenderRecursionLevel (int rec) = 0;
-
-  /**
-   * Attach data to the current render context.
-   */
-  virtual void AttachRenderContextData (void* key, iBase* data) = 0;
-  /**
-   * Look for data on the current render context.
-   */
-  virtual iBase* FindRenderContextData (void* key) = 0;
-  /**
-   * Delete all data with the given key on the current render
-   * context.
-   */
-  virtual void DeleteRenderContextData (void* key) = 0;
 
   /**
    * Get the original camera for this render view. This is
