@@ -353,7 +353,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
   iCamera* camera = rview->GetCamera ();
   // calculate distance from camera to mesh
   csBox3 obox;
-  GetWorldBoundingBox (obox);
+  meshobj->GetObjectModel ()->GetObjectBoundingBox (obox, CS_BBOX_MAX);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
   csVector3 wor_center;
   if (movable.IsFullTransformIdentity ())

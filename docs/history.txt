@@ -67,6 +67,10 @@ chronological order.
 	- DeSigna made SCF emit a proper diagnostic error message when
 	  it cannot load a library, not just on symbol-loading
 	  errors. Tested on Linux. 
+	- Jorrit fixed a bug in csMeshWrapper::GetSquaredDistance() (which
+	  was previously in CheckImposterRelevant()). It would not calculate
+	  the distance correctly as it was basing itself on a world space
+	  bbox.
 11-Aug-2003
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing
