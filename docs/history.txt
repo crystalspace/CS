@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 22-Feb-2003
+	- Christian Bayle made change in debian build
+	  Moved config files in /etc and added proper symlink
+	  Added a build dependancy on libode-dev
+	  Now build static lib without -fPIC to respect policy
 	- Philip Wyett removed multiple declerations of csTextureHandleOpenGL,
 	  iTextureHandle and csTxtCacheData from 'FlushDrawPolygon ()'.
 	  Philip Wyett also performed some variable decleration moves to within
@@ -13,7 +17,7 @@ The history order is reversed so that new features are at the top.
 	- Matze Braun added a test for qsqrt. Seems we can detect buggy
 	  compilers by compiling qsqrt with -fPIC (this triggers internal
 	  compiler errors on them)
-  - Philip Wyett fixed xml plugin makefile and errors in make depend.
+	- Philip Wyett fixed xml plugin makefile and errors in make depend.
 21-Feb-2003
   	- Andrew Craig changed iEngine->GetNearbyObjects() to take a bool
           parameter crossPortals. If you want to limit the search to the
