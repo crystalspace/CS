@@ -5,9 +5,7 @@
 DESCRIPTION.cygnus = Windows with Cygnus
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs2d/softx cs3d/software csnetdrv/null csnetdrv/sockets \
-  csnetman/null csnetman/simple cssnddrv/null cssnddrv/oss \
-  cssndrdr/null cssndrdr/software
+DRIVERS+=cs2d/softx cs3d/software cssnddrv/oss cssndrdr/software
 
 # uncomment the following to build SVGALIB 2D driver
 DRIVERS+=cs2d/svgalib

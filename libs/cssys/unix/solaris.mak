@@ -13,14 +13,8 @@ DRIVERS+=cs3d/inf
 # Uncomment the following to build GGI 2D driver
 #DRIVERS+=cs2d/ggi
 
-# Networking manager.
-#DRIVERS+=csnetman/simple
-
 # Uncomment the following to build sound renderer
 #DRIVERS+=cssndrdr/software
-
-# uncomment the following for socket network support
-#DRIVERS+=csnetdrv/sockets
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

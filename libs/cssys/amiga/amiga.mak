@@ -5,9 +5,7 @@
 DESCRIPTION.amiga = Amiga with GCC
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs3d/software cs2d/x2d csnetdrv/null csnetdrv/sockets \
-  csnetman/null csnetman/simple cssnddrv/null cssndrdr/null \
-  cssndrdr/software
+DRIVERS+=cs3d/software cs2d/x2d cssndrdr/software
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

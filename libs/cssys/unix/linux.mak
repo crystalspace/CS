@@ -14,9 +14,6 @@ DRIVERS+=cs3d/inf cs2d/inf
 #DRIVERS+=cs2d/svgalib
 #DRIVERS+=cs2d/ggi 
 
-# For networking:
-#DRIVERS+=csnetdrv/sockets csnetman/simple
-
 # uncomment the following to build sound drivers
 #DRIVERS+=cssnddrv/oss cssndrdr/software
 

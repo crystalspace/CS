@@ -5,9 +5,7 @@
 DESCRIPTION.irix = IRIX
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs2d/softx cs3d/software csnetdrv/null csnetdrv/sockets \
-  csnetman/null csnetman/simple cssnddrv/null \
-  cssndrdr/null cssndrdr/software
+DRIVERS+=cs2d/softx cs3d/software cssndrdr/software
 
 # uncomment the following to build GGI 2D driver
 #DRIVERS+=cs2d/ggi

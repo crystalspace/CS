@@ -6,9 +6,7 @@ DESCRIPTION.cygwin = Win32 with Cygnus GCC
 # Choose which drivers you want to build/use
 # cs2d/ddraw6 cs2d/openglwin cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
 #
-DRIVERS+=cs2d/ddraw cs3d/software \
-  csnetdrv/null csnetman/null csnetman/simple \
-  cssnddrv/null cssndrdr/null cssndrdr/software
+DRIVERS+=cs2d/ddraw cs3d/software cssndrdr/software
 
 # Uncomment the following to get an startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE
