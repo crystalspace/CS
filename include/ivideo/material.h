@@ -51,7 +51,7 @@ struct csTextureLayer
   float ushift, vshift; 
 };
 
-SCF_VERSION (iMaterial, 0, 0, 5);
+SCF_VERSION (iMaterial, 0, 0, 6);
 
 /**
  * This class represents a material as seen from the engine
@@ -92,7 +92,7 @@ struct iMaterial : public iBase
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+  virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean=1) = 0;
   /**
    * Set the flat shading color.
    */

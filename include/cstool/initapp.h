@@ -42,6 +42,8 @@ struct iConfigManager;
   CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
 #define CS_REQUEST_IMAGELOADER \
   CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex", iImageIO)
+#define CS_REQUEST_NULL3D \
+  CS_REQUEST_PLUGIN("crystalspace.graphics3d.null",iGraphics3D)
 #define CS_REQUEST_SOFTWARE3D \
   CS_REQUEST_PLUGIN("crystalspace.graphics3d.software",iGraphics3D)
 #define CS_REQUEST_OPENGL3D \
@@ -50,6 +52,8 @@ struct iConfigManager;
   CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
 #define CS_REQUEST_LEVELLOADER \
   CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
+#define CS_REQUEST_LEVELSAVER \
+  CS_REQUEST_PLUGIN("crystalspace.level.saver", iSaver)
 #define CS_REQUEST_REPORTER \
   CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
 #define CS_REQUEST_REPORTERLISTENER \

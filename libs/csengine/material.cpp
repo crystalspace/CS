@@ -119,10 +119,10 @@ csTextureLayer *csMaterial::GetTextureLayer (int idx)
     return NULL;
 }
 
-void csMaterial::GetFlatColor (csRGBpixel &oColor)
+void csMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
 {
   oColor = flat_color;
-  if (texture)
+  if (texture && useTextureMean)
   {
     iTextureHandle *th = texture->GetTextureHandle ();
     if (th) th->GetMeanColor (oColor.red, oColor.green, oColor.blue);

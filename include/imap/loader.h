@@ -51,7 +51,7 @@ struct iSoundWrapper;
 #define CS_LOADER_NOTRANSFORM	0x00000004
 /** @} */
 
-SCF_VERSION (iLoader, 0, 0, 5);
+SCF_VERSION (iLoader, 0, 0, 6);
 
 /**
  * This interface represents the map loader.
@@ -80,7 +80,7 @@ struct iLoader : public iBase
    * manager.
    */
   virtual csPtr<iTextureHandle> LoadTexture (const char* Filename,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL) = 0;
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL, iImage **image=NULL) = 0;
   /**
    * Load a texture as with LoadTexture() above and register it with the
    * engine. 'Name' is the name that the engine will use for the wrapper.

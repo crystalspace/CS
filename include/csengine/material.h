@@ -116,7 +116,7 @@ public:
   /// Get a texture layer.
   virtual csTextureLayer* GetTextureLayer (int idx);
   /// Get flat color.
-  virtual void GetFlatColor (csRGBpixel &oColor);
+  virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean=1);
   /// Set the flat shading color
   virtual void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
   /// Get reflection values (diffuse, ambient, reflection).

@@ -80,7 +80,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
 }
 
 csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
-	iTextureManager *tm)
+	iTextureManager *tm, iImage **img)
 {
   if (!tm && G3D)
   {
@@ -104,6 +104,8 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
       return NULL;
   }
 
+  if(img) *img=Image;
+
   if (!tm)
     return NULL;
   
@@ -126,13 +128,15 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   if (!Engine)
     return NULL;
 
-  csRef<iTextureHandle> TexHandle (LoadTexture (fname, Flags, tm));
+  iImage *img;
+  csRef<iTextureHandle> TexHandle (LoadTexture (fname, Flags, tm, &img));
   if (!TexHandle)
     return NULL;
 
   iTextureWrapper *TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
+  TexWrapper->SetImageFile(img);
 
   iMaterialWrapper* matwrap = NULL;
   if (create_material)
