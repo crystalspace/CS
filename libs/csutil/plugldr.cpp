@@ -34,34 +34,6 @@
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 
-//---------------------- A private class used to keep a list of plugins -----//
-
-struct csPluginLoadRec
-{
-  char* Tag;
-  char* ClassID;
-
-  csPluginLoadRec (const char* iTag, const char* iClassID)
-  { Tag = csStrNew (iTag); ClassID = csStrNew (iClassID); }
-  ~csPluginLoadRec ()
-  { delete [] ClassID; delete [] Tag; }
-};
-
-class csPluginList : public csVector
-{
-public:
-  virtual ~csPluginList ()
-  { DeleteAll (); }
-  bool Sort (iObjectRegistry* object_reg);
-  csPluginLoadRec &Get (int idx)
-  { return *(csPluginLoadRec *)csVector::Get (idx); }
-  virtual bool FreeItem (csSome Item)
-  { delete (csPluginLoadRec *)Item; return true; }
-private:
-  bool RecurseSort (iObjectRegistry*, int row, int *order, int *loop,
-    bool *matrix);
-};
-
 /**
  * Since every plugin can depend on another one, the plugin loader should be
  * able to sort them by their preferences. Thus, if some plugin A wants some
@@ -329,6 +301,30 @@ bool csPluginLoader::LoadPlugins ()
 
   iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
 
+  // Check all requested plugins and see if there is already
+  // a plugin with that tag present. If not we add it.
+  int i;
+  for (i = 0 ; i < requested_plugins.Length () ; i++)
+  {
+    csPluginLoadRec& req_plugin = requested_plugins.Get (i);
+    int j;
+    bool present = false;
+    for (j = 0 ; j < PluginList.Length () ; j++)
+    {
+      csPluginLoadRec& plugin = PluginList.Get (j);
+      if (plugin.Tag && !strcmp (plugin.Tag, req_plugin.Tag))
+      {
+        present = true;
+	break;
+      }
+    }
+    if (!present)
+    {
+      PluginList.Push (new csPluginLoadRec (req_plugin.Tag,
+      	req_plugin.ClassID));
+    }
+  }
+
   // Sort all plugins by their dependency lists
   if (!PluginList.Sort (object_reg))
   {
@@ -377,19 +373,9 @@ bool csPluginLoader::LoadPlugins ()
   return true;
 }
 
-void csPluginLoader::RequestPlugin (const char *iPluginName,
-	const char* interfaceName)
+void csPluginLoader::RequestPlugin (const char *pluginName,
+	const char* tagName)
 {
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-  char buf[256];
-  strcpy (buf, iPluginName);
-  if (!strchr (buf, ':'))
-  {
-    strcat (buf, ":");
-    strcat (buf, interfaceName);
-  }
-  CommandLine->AddOption ("plugin", buf);
-  CommandLine->DecRef ();
+  requested_plugins.Push (new csPluginLoadRec (tagName, pluginName));
 }
 

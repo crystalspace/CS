@@ -23,6 +23,19 @@ The history order is reversed so that new features are at the top.
 	  changes.
 	- Updated version of CS to 0.90 to indicate the imminent release
 	  of CS 0.90.
+	- Changed the behaviour of csPluginLoader class. This class has
+	  three sources for requesting plugins: commandline (-plugin,
+	  -video, and -canvas options), config file (System.PlugIns....),
+	  and the CS_REQUEST_... options given to
+	  csInitializer::RequestPlugins() (which uses csPluginLoader
+	  internally). In the past the CS_REQUEST_ options had highest
+	  priority, followed by commandline and lastly config. Now this
+	  is different. Commandline has highest priority, followed by
+	  config, and finally the requested plugins. This means that
+	  it is now safe to use CS_REQUEST_SOFTWARE3D in your initialization
+	  of the application so that you know you'll at least get the
+	  software 3D renderer if there is no config file and nothing
+	  specified on the commandline.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
