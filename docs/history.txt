@@ -40,6 +40,10 @@ The history order is reversed so that new features are at the top.
 	  of <goodoccluder> and <badoccluder> in things. Check out
 	  ./levtool -help for more info on how to use these options.
 	- Javier Santos fixed an initialization bug in 3ds2lev.
+	- Javier Santos fixed another bug in 3ds2lev where the
+	  <lighting> option wouldn't be correctly saved to XML.
+	- Fixed a memory leak with texture layers for a material. There
+	  was no DecRef(). I fixed this by using csRef.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.

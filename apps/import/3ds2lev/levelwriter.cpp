@@ -628,7 +628,7 @@ void LevelWriter::WriteFaces(iDocumentNode* paramsnode,
 	lightingnode->SetValue ("lighting");
 	csRef<iDocumentNode> textnode =
 	  lightingnode->CreateNodeBefore (CS_NODE_TEXT);
-	lightingnode->SetValue ("no");
+	textnode->SetValue ("no");
       }
 
       if (outputuv)

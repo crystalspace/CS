@@ -84,8 +84,6 @@ void csMaterial::AddTextureLayer (
   texture_layers[num_texture_layers].ushift = ushift;
   texture_layers[num_texture_layers].vshift = vshift;
   num_texture_layers++;
-
-  txtwrap->IncRef ();
 }
 
 void csMaterial::SetEffect (iEffectDefinition *ed)

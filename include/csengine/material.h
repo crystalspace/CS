@@ -50,7 +50,7 @@ private:
   /// Optional texture layer.
   csTextureLayer texture_layers[4];
   /// Texture wrappers for texture layers.
-  iTextureWrapper* texture_layer_wrappers[4];
+  csRef<iTextureWrapper> texture_layer_wrappers[4];
 
   /// The diffuse reflection value of the material
   float diffuse;
