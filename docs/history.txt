@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+1-Jun-2001
+	- Michael Voasse fixed a couple of additional bugs in motion
+	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to
+	  TYPED_VECTOR_NODELETE. Note, motion manager now throws a compiler
+	  warning, however it is due to the NODELETE typed vector. I could
+	  fix csVector, but I would need to clear it with Jorrit first since
+	  CS is HEAVILY dependent on csVector. If I break it, there will be a
+	  lot of pieces to keep 8).
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents
@@ -38,6 +46,25 @@ The history order is reversed so that new features are at the top.
 	  easier. If they cause problems, it is still possible to use
 	  QueryInterface() directly. Finally, I replaced the csObject-based
 	  RTTI system with SCF in many cases.
+	- Martin Geisse replaced usage of the 'new' RTTI system with SCF in
+	  many cases.
+	- Martin Geisse further worked to replace the pseudo-RTTI system
+	  with SCF: The GET_CHILD_OBJECT and related macros now use SCF. In
+	  addition, there are now two versions of each macro, a fast and a
+	  slow one, with similar differences as the fast and slow versions
+	  of QUERY_INTERFACE.
+	- Martin Geisse removed the now unused 'new' RTTI system and the
+	  string server plug-in.
+	- Martin fixed a problem with the gamecore where it was using the
+	  old SCF functions.
+	- Michael Voasse did the following:
+	    - Added a couple of calls to motion manager ( IsLast & IsFirst ).
+	    - Fixed a couple of bugs in MM.
+	    - Added a general purpose thread safe queue, csQueue, based on
+	      the system event queue and inspired by csVector. Inside are
+	      two macros, DECLARE_TYPED_QUEUE( name, type, queue length ) and
+	      DECLARE_TYPED_QUEUE_BASE( same params ). This isnt wonderfully
+	      user friendly yet, but it is tested and does work.
 30-May-2001
 	- Completely removed Crystal Clear from CS. It is now obsolete
 	  and no longer maintained. This removal was done with the permission
