@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Apr-2004
+	- Eric Sunshine added a blurb to the Unix and MacOS/X build
+	  instructions cautioning about potential problems caused by
+	  carelessness when transfering the project source code from Windows to
+	  Unix, and how not all Unix utilities deal gracefully with Windows
+	  line-terminators.  Also updated quite outdated Unix build
+	  instructions.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.

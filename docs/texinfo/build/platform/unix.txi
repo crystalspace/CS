@@ -6,20 +6,36 @@
 This section covers all of the Unix-style platforms supported by Crystal Space,
 including Linux, FreeBSD, NetBSD, Solaris, etc.
 
-Note that the X11 version of Crystal Space optionally supports the @sc{mit}
-Shared Memory Extension (@sc{mit-shm}). This makes Crystal Space run much
-faster if your server supports it. By default Crystal Space assumes that your
-server supports @sc{mit-shm}. It will automatically auto-detect if your server
-does not support it, so you can safely leave this option enabled.
+Crystal Space's X11 canvas optionally supports the @sc{mit} Shared Memory
+Extension (@sc{mit-shm}).  This makes Crystal Space run much faster if your
+server supports it.  The Crystal Space configuration script will detect this
+extension automatically and use it if present.
+
+A note of caution: Take care when obtaining the Crystal Space source code to
+ensure that the line-terminators are in Unix format (a single linefeed should
+terminate each line).  This is an especially important consideration when
+transporting the code from Windows to Unix.  Although many Unix tools deal
+gracefully with Windows line-terminators (a carriage-return follwed by a
+linefeed), not all tools do so, and may emit apparently inexplicable error
+messages when encountering files with Windows line-terminators.  The official
+distributions of Crystal Space, including the stable releases and the @sc{cvs}
+snapshots, are packaged with Unix line-terminators, which are acceptable on all
+supported platforms.  These virgin packages themselves can be transported
+between Windows and Unix safely
 
 @subsubheading Compiling on Unix
 
 The makefiles require @sc{gnu} make, which is typically named @file{make} on
 most systems. If this is not the case then substitute @file{gmake},
 @file{gnumake} or whatever @sc{gnu} make is called on your system. It is
-@emph{not} possible to build Crystal Space using any other make system.
+@emph{not} possible to build Crystal Space using any other make program. If you
+do not have a suitable make program, then you can instead build the project
+with Jam, which is available from:
 
-You first need to configure the makefiles for your platform.  You do this
+@noindent
+@uref{ftp://ftp.perforce.com/jam}
+
+You first need to configure the project for your platform.  You do this
 by running the configuration script.  For example, from within the @file{CS}
 directory:
 
@@ -34,73 +50,62 @@ instead:
 ./configure --enable-debug
 @end example
 
-By default, the project is configured to build plugin modules, rather than
-linking everything together into a single executable, however, if you would
-like everything linked together (though this is not recommended), you can
-configure with:
-
-@example
-./configure --disable-plugins
-@end example
-
 For a list of useful configuration options, invoke:
 
 @example
 ./configure --help=short
 @end example
 
-You can optionally invoke the @samp{depend} target to make sure that all
-dependencies are correct.  This is only important if you intend to make
-changes to the sources and want to be sure that all files will be recompiled
-that are in need of recompilation.  You can, however, can safely omit this step
-if desired.
+You can optionally invoke the @samp{depend} make target to ensure that all
+build-time dependencies are correct.  This is only important if you intend to
+make changes to the Crystal Space sources and want to be sure that all files
+will be recompiled that are in need of recompilation.  You can, however, can
+safely omit this step if desired.
 
 @example
 make depend
 @end example
 
-Then you need to do the following to actually build the entire project:
+Now, you can actually build the entire project:
 
 @example
 make -k all
 @end example
 
-If you configured for plugins (that is, you did not use
-@samp{--disable-plugins}, then this will generate an executable and plugin
-modules (with extension @file{*.so} on Linux and most Unix platforms) for the
-3D renderers, 2D drivers, and other modules.  If you did not choose to build
-plugin modules, then only the executable is generated and the drivers are
-incorporated in the executable.
+The build process will create an executable for each demonstration program or
+tool, and a dynamic-load-library for each plugin modules (with extension
+@file{*.so} on Linux and most Unix platforms).  Plugin modules include 3D
+renderers, 2D canvases, 3D engine, isometric engine, etc.
 
-Now you can run the executable @file{walktest}.
+You can now run the executable @file{walktest}.
 
 @subsubheading Renderer Selection
+
+The OpenGL renderer is used by default when you run Crystal Space programs.  To
+select a different renderruer, such as the software renderer, you can edit your
+local configuration file @file{$HOME/.crystal/Global.cfg}.  Add the following
+line to select the software renderer for all applications:
+
+@example
+System.Plugins.iGraphics3D = crystalspace.graphics3d.software
+@end example
 
 The software renderer can run with the X11 or SVGAlib drivers.  If the
 @samp{DISPLAY} environment variable is defined it will choose the X11 driver,
 otherwise it will try the @samp{SVGAlib} driver, if SVGAlib is available on
-your platform.  There is no need to recompile the program.
+your platform.
 
-To select another 3D rasterizer you need to edit your local configuration file
-@file{$HOME/.crystal/Global.cfg}.  Add the following line to select OpenGL for
-all applications:
+Alternately, you can choose the software renderer from the command-line:
 
 @example
-System.Plugins.iGraphics3D = crystalspace.graphics3d.opengl
+./walktest -video=software
 @end example
 
-Alternately, you can choose the OpenGL renderer from the command-line:
+Finally, if you want to utilize Crystal Space as a software development kit
+(@sc{sdk}), you can install it and then clean up the detritus of the build
+process:
 
 @example
-walktest -video=opengl
+make install
+make distclean
 @end example
-
-@subsubheading Where are the Object Files?
-
-The build process places all object files and static libraries in the directory
-@file{CS/out}. This directory contains subdirectories for the operating system
-and processor architecture.  For example, if you compile on Linux for Intel
-with optimization then all object files will end up in
-@file{CS/out/UNIX/X86/optimize}.  However if you compile on a Solaris
-system for Sparc with debugging enabled then all objects files end up in
-@file{CS/out/UNIX/SPARC/debug}.

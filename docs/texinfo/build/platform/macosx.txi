@@ -139,6 +139,18 @@ port is also available, @ref{MacOS/X Details}.
 gnutar xfz @var{CS-package-name}.tgz
 @end example
 
+A note of caution: Take care when obtaining the Crystal Space source code to
+ensure that the line-terminators are in Unix format (a single linefeed should
+terminate each line).  This is an especially important consideration when
+transporting the code from Windows to MacOS/X.  Although many MacOS/X tools
+deal gracefully with Windows line-terminators (a carriage-return follwed by a
+linefeed), not all tools do so, and may emit apparently inexplicable error
+messages when encountering files with Windows line-terminators.  The official
+distributions of Crystal Space, including the stable releases and the @sc{cvs}
+snapshots, are packaged with Unix line-terminators, which are acceptable on all
+supported platforms.  These virgin packages themselves can be transported
+between Windows and MacOS/X safely
+
 The Crystal Space project consists of a number of components and example
 programs.  The following commands are all issued from within the top level
 Crystal Space source code directory named @file{CS}.
