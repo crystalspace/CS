@@ -306,6 +306,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
 
   csVector3 texelu = txtu / float(width);
   csVector3 texelv = txtv / float(height);
+  txtorig += 0.5f*(texelu+texelv);
   csVector3 spot, isect;
   for(int y=0; y<height; y++)
     for(int x=0; x<width; x++)
@@ -380,6 +381,7 @@ void csProcSky::MakeIntersectCache(csProcSkyTexture *skytex)
   skytex->GetTextureSpace(txtorig, txtu, txtv);
   csVector3 texelu = txtu / float(width);
   csVector3 texelv = txtv / float(height);
+  txtorig += 0.5f*(texelu+texelv);
   csVector3 spot, isect;
   for(int y=0; y<height; y++)
     for(int x=0; x<height; x++)
