@@ -1,4 +1,4 @@
-@node Rendering Loop
+@node Rendering Loop, Visibility Culling, Space Warping, Concepts
 @section Rendering Loop
 @cindex Rendering Loop
 
@@ -24,7 +24,7 @@ which is called indirectly from within @code{Simple::NextFrame()}. It is
 called indirectly because first we call @code{csView::Draw()} which will then
 call @code{csWorld::Draw()}.
 
-@node Concepts_Render_World
+@node Concepts_Render_World, Concepts_Render_Sector, Rendering Loop, Rendering Loop
 @subsection csWorld::Draw()
 
 This function is located in @file{libs/csengine/world.cpp}.
@@ -73,7 +73,7 @@ After doing this (so now the screen is fully updated) we optionally draw
 halos. Halos are drawn on top of everything else since they are an effect
 in the eyes.
 
-@node Concepts_Render_Sector
+@node Concepts_Render_Sector, Concepts_Render_Polyset, Concepts_Render_World, Rendering Loop
 @subsection csSector::Draw()
 
 This function is located in @file{libs/csengine/sector.cpp}.
@@ -187,7 +187,7 @@ implemented by the software renderer.
 We end @code{csSector::Draw()} by restoring the transformation
 (@code{csPolygonSet::RestoreTransformation()}).
 
-@node Concepts_Render_Polyset
+@node Concepts_Render_Polyset, Concepts_Render_DrawFilled, Concepts_Render_Sector, Rendering Loop
 @subsection csPolygonSet::DrawPolygonArray()
 
 This function is located in @file{libs/csengine/basic/polyset.cpp}.
@@ -259,7 +259,7 @@ which is further explained in the next section.
 
 That's basicly it for this function.
 
-@node Concepts_Render_DrawFilled
+@node Concepts_Render_DrawFilled, , Concepts_Render_Polyset, Rendering Loop
 @subsection csPolygon2D::DrawFilled()
 
 This function is located in @file{libs/csengine/polygon/polygon.cpp}.

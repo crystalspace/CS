@@ -109,6 +109,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * FAQ:: Frequently Asked Questions (@sc{faq})
 * Todo:: To-Do List
 * History::
+* Resources::
 * Index::
 @end menu
 @end ifinfo
@@ -134,7 +135,7 @@ For a list of available topics, see the
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
 
-@node Index, , History, Top
+@node Index, , Resources, Top
 @unnumbered Index
 
 @printindex cp

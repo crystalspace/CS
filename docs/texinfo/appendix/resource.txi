@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Resources
+@node Resources, Index, History, Top
 @appendix Resources
 @cindex Resources
 

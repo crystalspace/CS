@@ -1,4 +1,4 @@
-@node Cameras and Matrices
+@node Cameras and Matrices, Space Warping, Concepts, Concepts
 @section Cameras and Matrices
 @cindex Cameras
 @cindex Matrices

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Sound System
+@node Sound System, , Drivers, Drivers
 @subsection Sound System
 @cindex Sound System
 
@@ -8,7 +8,7 @@ Version 0.03 (22 sept 1999) by NooTe (aka Nathaniel Saint Martin)
 @email{noote@@bigfoot.com}
 @uref{http://www.bigfoot.com/~noote}
 
-@node Sound_OS
+@node Sound_OS, Sound_FF, Sound System, Sound System
 @subsubsection supported operating systems
 
 The CS sound system supports these OSes :
@@ -28,7 +28,7 @@ Someone (sorry I don't know, please give me your name) has done the MacIntosh
 driver
 @end itemize
 
-@node Sound_FF
+@node Sound_FF, Sound_Architecture, Sound_OS, Sound System
 @subsubsection supported file formats
 
 The following file formats are supported :
@@ -56,7 +56,7 @@ Does some one know about @emph{Fibonacci-Delta encoding} compression in
 @file{.8svx}/@file{.iff} format ? Or about G.721 a-Law ADPCM compression ?
 @end itemize
 
-@node Sound_Architecture
+@node Sound_Architecture, Sound_Config, Sound_FF, Sound System
 @subsubsection How does it work ?
 
 Sound System architecture is a bit like Graphics System. There are different
@@ -111,7 +111,7 @@ piSystem->piSoundRender->CreateSource(&source, sounddata);
 soundbuffer->CreateSource->(&source);
 @end example
 
-@node Sound_Config
+@node Sound_Config, Sound_WaveOut, Sound_Architecture, Sound System
 @subsubsection How to configure sound system
 
 In your configuration file (e.g. @file{cryst.cfg}) you might have a
@@ -165,7 +165,7 @@ A software or hardware value, from 0 (empty) to 1 (full), it depends on your
 sound card and/or driver.
 @end table
 
-@node Sound_WaveOut
+@node Sound_WaveOut, Sound_Problems, Sound_Config, Sound System
 @subsubsection waveOut win32 driver configuration
 
 The waveOut win32 driver has its own configuration in addition to general
@@ -206,7 +206,7 @@ stuff yet ;-)), if you get an fps inferior to this refresh value, it can
 crash for function callback or cut sound for thread method !
 @end itemize
 
-@node Sound_Problems
+@node Sound_Problems, , Sound_WaveOut, Sound System
 @subsubsection Problems
 
 If you have problems with the sound output, check this :

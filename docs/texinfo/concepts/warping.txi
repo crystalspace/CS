@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Space Warping
+@node Space Warping, Rendering Loop, Cameras and Matrices, Concepts
 @section Space Warping
 @cindex Space Warping
 

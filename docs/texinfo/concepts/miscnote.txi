@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Misc Notes
+@node Misc Notes, , 3D Sprites, Concepts
 @section Miscallenous notes requiring classification (Jorrit's Brain Dump)
 @cindex General Notes
 
@@ -7,7 +7,7 @@ This is a very general section containing notes and stuff that I should not
 forget. It is in general a mess and not designed as a good and structured
 document. Consider it an expansion of my memory :-)
 
-@node BDump Dynamic Worlds
+@node BDump Dynamic Worlds, BDump MicMac Mapping, Misc Notes, Misc Notes
 @subsection Dynamic Worlds
 
 From: Jorrit @*
@@ -161,7 +161,7 @@ destroyed by a missile or something). You can set the intensity of the
 pseudo-dynamic light to black and then remove it from the world.
 @end itemize
 
-@node BDump MicMac Mapping
+@node BDump MicMac Mapping, BDump 16bit Trucolor TexCache, BDump Dynamic Worlds, Misc Notes
 @subsection Micromapping and Macromapping
 
 From: Dan Ogles @*
@@ -183,7 +183,7 @@ rather than cache a really hi-res texture.
 This doesn't seem like it'd be too hard to implement, except in software
 (Unreal does not support this feature in software). What does everyone think?
 
-@node BDump 16bit Trucolor TexCache
+@node BDump 16bit Trucolor TexCache, BDump Lighting, BDump MicMac Mapping, Misc Notes
 @subsection 16-bit Truecolor Texture Cache
 
 From: Jorrit and Philipp Spoeth @*
@@ -199,7 +199,7 @@ I don't think this is a big problem. We will also be able to remove the
 16-bit private colormap mode as this will then be obsolete.
 
 
-@node BDump Lighting
+@node BDump Lighting, BDump Fog-Volumes, BDump 16bit Trucolor TexCache, Misc Notes
 @subsection Lighting
 
 From: Jorrit @*
@@ -290,7 +290,7 @@ be lighted too much.
 Similar solutions to 2.
 @end enumerate
 
-@node BDump Fog-Volumes
+@node BDump Fog-Volumes, BDump Shared Planes, BDump Lighting, Misc Notes
 @subsection Fog-volumes
 
 From: Jorrit @*
@@ -306,7 +306,7 @@ the fog-volumes would be easy (and could even be done real-time for dynamic
 lights!!!) but how to render them?
 
 
-@node BDump Shared Planes
+@node BDump Shared Planes, BDump OVL-Textures in Cache, BDump Fog-Volumes, Misc Notes
 @subsection Shared plane optimization
 
 From: Jorrit @*
@@ -331,7 +331,7 @@ increases the efficiency of the texture cache and also allows to represent
 concave surfaces. Currently splitting polygons gives a rather large overhead
 because this multiplies the number of calls to @code{DrawPolygon}.
 
-@node BDump OVL-Textures in Cache
+@node BDump OVL-Textures in Cache, BDump REAL Lighting, BDump Shared Planes, Misc Notes
 @subsection Overlay-textures in Cache
 
 From: Jorrit @*
@@ -374,7 +374,7 @@ graffiti
 leaving messages on the wall for other players (that would be nice!)
 @end itemize
 
-@node BDump REAL Lighting
+@node BDump REAL Lighting, , BDump OVL-Textures in Cache, Misc Notes
 @subsection REAL lighting
 
 From: Jorrit @*

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node mdl2spr
+@node mdl2spr, , Squawk, Applications
 @section Quake MDL Converter (@code{mdl2spr})
 @cindex @file{mdl2spr}
 @cindex Applications, @file{mdl2spr}

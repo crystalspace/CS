@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Visibility Culling, 3D Sprites, Concepts, Concepts
+@node Visibility Culling, 3D Sprites, Rendering Loop, Concepts
 @section Visibility Culling In Detail
 @cindex Visibility Culling
 @cindex Culling, Visibility
