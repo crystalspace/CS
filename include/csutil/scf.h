@@ -553,6 +553,21 @@ struct iConfigFile;
 struct iStrVector;
 
 /**
+ * This macro creates a wrapper function around a static variable that
+ * contains the ID number for the given interface. The function
+ * initializes the variable if that has not yet happened. This macro is
+ * required if you want to use QUERY_INTERFACE_FAST ().
+ */
+#define DECLARE_FAST_INTERFACE(Interface)				\
+inline scfGetID_##Interface ()						\
+{									\
+  static scfInterfaceID ID = (scfInterfaceID)-1;			\
+  if (ID == -1)								\
+    ID = iSCF::SCF->GetInterfaceID (#Interface);			\
+  return ID;								\
+}
+
+/**
  * Handy macro to create an instance of a shared class.
  * This is a simple wrapper around scfCreateInstance.
  */
@@ -571,12 +586,12 @@ struct iStrVector;
 /**
  * Shortcut macro to query given interface from given object. This is a
  * wrapper around iBase::QueryInterface method that uses an ID number to
- * identify the requested interface instead of its name. This macro
- * assumes that a variable with the ID number is known (see INTERFACE_ID_VAR
- * and INITIALIZE_INTERFACE_VAR for details).
+ * identify the requested interface instead of its name. To use this
+ * macro, fast access to the interface must be declared with
+ * DECLARE_FAST_INTERFACE ().
  */
 #define QUERY_INTERFACE_FAST(Object,Interface)				\
-  (Interface*)(Object)->QueryInterface (scfID_##Interface, VERSION_##Interface)
+  (Interface*)(Object)->QueryInterface (scfGetID_##Interface (), VERSION_##Interface)
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -586,21 +601,6 @@ struct iStrVector;
 #define QUERY_INTERFACE_SAFE(Object,Interface)				\
   (Interface *)(iBase::QueryInterfaceSafe ((Object),			\
     iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
-
-/**
- * This declares a variable to contain ID numbers for interfaces. The macro
- * can be used just as any variable declaration. For example, prepend 'extern'
- * to put the definition into a header file.
- */
-#define INTERFACE_ID_VAR(iInterface)					\
-  scfInterfaceID scfID_##iInterface;
-
-/**
- * Use this macro to initialize the ID container variables declared with
- * INTERFACE_ID_VAR.
- */
-#define INITIALIZE_INTERFACE_VAR(iInterface)				\
-  scfID_##iInterface = iSCF::SCF->GetInterfaceID (#iInterface);
 
 /**
  * This function should be called to initialize client SCF library.

@@ -37,7 +37,7 @@ struct iObjectIterator;
  * ID variable.
  */
 #define GET_CHILD_OBJECT_FAST(object,Interface)				\
-  ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface))
+  ((Interface*)(object)->GetChild (scfGetID_##Interface (), VERSION_##Interface))
 
 /**
  * You can use this macro to get a child object with the given name and
@@ -53,7 +53,7 @@ struct iObjectIterator;
  * version requires a correctly set-up interface ID variable.
  */
 #define GET_NAMED_CHILD_OBJECT_FAST(object,Interface,name)		\
-  ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface, name))
+  ((Interface*)(object)->GetChild (scfGetID_##Interface (), VERSION_##Interface, name))
 
 /**
  * This is the same as GET_CHILD_OBJECT, but stops at the first object with
@@ -68,7 +68,7 @@ struct iObjectIterator;
  * the given name, even if it does not implement the requested interface.
  */
 #define GET_FIRST_NAMED_CHILD_OBJECT_FAST(object,Interface,name)	\
-  ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface, name, true))
+  ((Interface*)(object)->GetChild (scfGetID_##Interface (), VERSION_##Interface, name, true))
 
 
 SCF_VERSION (iObject, 0, 3, 0);

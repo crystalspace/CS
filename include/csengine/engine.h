@@ -62,35 +62,35 @@ struct iLight;
 struct iImageIO;
 struct iClipper2D;
 
-extern INTERFACE_ID_VAR (iEngine);
-extern INTERFACE_ID_VAR (iSector);
-extern INTERFACE_ID_VAR (iMeshWrapper);
-extern INTERFACE_ID_VAR (iCollection);
-extern INTERFACE_ID_VAR (iMeshFactoryWrapper);
-extern INTERFACE_ID_VAR (iCurveTemplate);
-extern INTERFACE_ID_VAR (iMaterialWrapper);
-extern INTERFACE_ID_VAR (iTextureWrapper);
-extern INTERFACE_ID_VAR (iCameraPosition);
-extern INTERFACE_ID_VAR (iPolyTxtPlane);
-extern INTERFACE_ID_VAR (iStatLight);
-extern INTERFACE_ID_VAR (iDynLight);
-extern INTERFACE_ID_VAR (iMaterialHandle);
-extern INTERFACE_ID_VAR (iTerrainWrapper);
-extern INTERFACE_ID_VAR (iTerrainFactoryWrapper);
-extern INTERFACE_ID_VAR (iKeyValuePair);
-extern INTERFACE_ID_VAR (iMapNode);
+DECLARE_FAST_INTERFACE (iEngine)
+DECLARE_FAST_INTERFACE (iSector)
+DECLARE_FAST_INTERFACE (iMeshWrapper)
+DECLARE_FAST_INTERFACE (iCollection)
+DECLARE_FAST_INTERFACE (iMeshFactoryWrapper)
+DECLARE_FAST_INTERFACE (iCurveTemplate)
+DECLARE_FAST_INTERFACE (iMaterialWrapper)
+DECLARE_FAST_INTERFACE (iTextureWrapper)
+DECLARE_FAST_INTERFACE (iCameraPosition)
+DECLARE_FAST_INTERFACE (iPolyTxtPlane)
+DECLARE_FAST_INTERFACE (iStatLight)
+DECLARE_FAST_INTERFACE (iDynLight)
+DECLARE_FAST_INTERFACE (iMaterialHandle)
+DECLARE_FAST_INTERFACE (iTerrainWrapper)
+DECLARE_FAST_INTERFACE (iTerrainFactoryWrapper)
+DECLARE_FAST_INTERFACE (iKeyValuePair)
+DECLARE_FAST_INTERFACE (iMapNode)
 
-extern INTERFACE_ID_VAR (csPolyTxtPlane);
-extern INTERFACE_ID_VAR (csCollection);
-extern INTERFACE_ID_VAR (csMeshWrapper);
-extern INTERFACE_ID_VAR (csMeshFactoryWrapper);
-extern INTERFACE_ID_VAR (csCurveTemplate);
-extern INTERFACE_ID_VAR (csSector);
-extern INTERFACE_ID_VAR (csTextureWrapper);
-extern INTERFACE_ID_VAR (csMaterialWrapper);
-extern INTERFACE_ID_VAR (csCollider);
-extern INTERFACE_ID_VAR (csRadPoly);
-extern INTERFACE_ID_VAR (csRadCurve);
+DECLARE_FAST_INTERFACE (csPolyTxtPlane)
+DECLARE_FAST_INTERFACE (csCollection)
+DECLARE_FAST_INTERFACE (csMeshWrapper)
+DECLARE_FAST_INTERFACE (csMeshFactoryWrapper)
+DECLARE_FAST_INTERFACE (csCurveTemplate)
+DECLARE_FAST_INTERFACE (csSector)
+DECLARE_FAST_INTERFACE (csTextureWrapper)
+DECLARE_FAST_INTERFACE (csMaterialWrapper)
+DECLARE_FAST_INTERFACE (csCollider)
+DECLARE_FAST_INTERFACE (csRadPoly)
+DECLARE_FAST_INTERFACE (csRadCurve)
 
 /**
  * Iterator to iterate over all static lights in the engine.

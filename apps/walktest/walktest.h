@@ -24,6 +24,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "cssys/sysdriv.h"
+#include "csengine/engine.h"
 #include "csengine/collider.h"
 #include "csengine/light.h"
 #include "csutil/cscolor.h"
@@ -54,17 +55,18 @@ struct iLight;
 struct iPolygon3D;
 
 // type information
-extern INTERFACE_ID_VAR (csWalkEntity);
-extern INTERFACE_ID_VAR (GhostSpriteInfo);
-extern INTERFACE_ID_VAR (csDoor);
-extern INTERFACE_ID_VAR (csRotatingObject);
-extern INTERFACE_ID_VAR (csLightObject);
-extern INTERFACE_ID_VAR (iSoundWrapper);
-extern INTERFACE_ID_VAR (iTerrainWrapper);
-extern INTERFACE_ID_VAR (iLight);
-extern INTERFACE_ID_VAR (iMeshWrapper);
-extern INTERFACE_ID_VAR (iKeyValuePair);
-extern INTERFACE_ID_VAR (iDataObject);
+
+DECLARE_FAST_INTERFACE (csWalkEntity)
+DECLARE_FAST_INTERFACE (GhostSpriteInfo)
+DECLARE_FAST_INTERFACE (csDoor)
+DECLARE_FAST_INTERFACE (csRotatingObject)
+DECLARE_FAST_INTERFACE (csLightObject)
+DECLARE_FAST_INTERFACE (iSoundWrapper)
+//DECLARE_FAST_INTERFACE (iTerrainWrapper)
+DECLARE_FAST_INTERFACE (iLight)
+//DECLARE_FAST_INTERFACE (iMeshWrapper)
+//DECLARE_FAST_INTERFACE (iKeyValuePair)
+DECLARE_FAST_INTERFACE (iDataObject)
 
 // Several map modes.
 #define MAP_OFF 0

@@ -92,18 +92,6 @@ REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
-INTERFACE_ID_VAR (csWalkEntity);
-INTERFACE_ID_VAR (GhostSpriteInfo);
-INTERFACE_ID_VAR (csDoor);
-INTERFACE_ID_VAR (csRotatingObject);
-INTERFACE_ID_VAR (csLightObject);
-INTERFACE_ID_VAR (iSoundWrapper);
-//INTERFACE_ID_VAR (iTerrainWrapper);
-INTERFACE_ID_VAR (iLight);
-//INTERFACE_ID_VAR (iMeshWrapper);
-//INTERFACE_ID_VAR (iKeyValuePair);
-INTERFACE_ID_VAR (iDataObject);
-
 char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
 
@@ -1307,19 +1295,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     return false;
   }
-
-  // initialize interface IDs (for QUERY_INTERFACE_FAST)
-  INITIALIZE_INTERFACE_VAR (csWalkEntity);
-  INITIALIZE_INTERFACE_VAR (GhostSpriteInfo);
-  INITIALIZE_INTERFACE_VAR (csDoor);
-  INITIALIZE_INTERFACE_VAR (csRotatingObject);
-  INITIALIZE_INTERFACE_VAR (csLightObject);
-  INITIALIZE_INTERFACE_VAR (iSoundWrapper);
-  INITIALIZE_INTERFACE_VAR (iTerrainWrapper);
-  INITIALIZE_INTERFACE_VAR (iLight);
-  INITIALIZE_INTERFACE_VAR (iMeshWrapper);
-  INITIALIZE_INTERFACE_VAR (iKeyValuePair);
-  INITIALIZE_INTERFACE_VAR (iDataObject);
 
   // Find the level loader plugin
   LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoader);

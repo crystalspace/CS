@@ -349,36 +349,6 @@ bool csEngine::do_not_force_revis = false;
 bool csEngine::do_force_revis = false;
 bool csEngine::do_rad_debug = false;
 
-INTERFACE_ID_VAR (iEngine);
-INTERFACE_ID_VAR (iSector);
-INTERFACE_ID_VAR (iMeshWrapper);
-INTERFACE_ID_VAR (iCollection);
-INTERFACE_ID_VAR (iMeshFactoryWrapper);
-INTERFACE_ID_VAR (iCurveTemplate);
-INTERFACE_ID_VAR (iMaterialWrapper);
-INTERFACE_ID_VAR (iTextureWrapper);
-INTERFACE_ID_VAR (iCameraPosition);
-INTERFACE_ID_VAR (iPolyTxtPlane);
-INTERFACE_ID_VAR (iStatLight);
-INTERFACE_ID_VAR (iDynLight);
-INTERFACE_ID_VAR (iMaterialHandle);
-INTERFACE_ID_VAR (iTerrainWrapper);
-INTERFACE_ID_VAR (iTerrainFactoryWrapper);
-INTERFACE_ID_VAR (iKeyValuePair);
-INTERFACE_ID_VAR (iMapNode);
-
-INTERFACE_ID_VAR (csPolyTxtPlane);
-INTERFACE_ID_VAR (csCollection);
-INTERFACE_ID_VAR (csMeshWrapper);
-INTERFACE_ID_VAR (csMeshFactoryWrapper);
-INTERFACE_ID_VAR (csCurveTemplate);
-INTERFACE_ID_VAR (csSector);
-INTERFACE_ID_VAR (csTextureWrapper);
-INTERFACE_ID_VAR (csMaterialWrapper);
-INTERFACE_ID_VAR (csCollider);
-INTERFACE_ID_VAR (csRadPoly);
-INTERFACE_ID_VAR (csRadCurve);
-
 IMPLEMENT_IBASE (csEngine)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iEngine)
@@ -481,37 +451,6 @@ bool csEngine::Initialize (iSystem* sys)
 #endif
 
   System = sys;
-
-  // initialize interface IDs (for QUERY_INTERFACE_FAST)
-  INITIALIZE_INTERFACE_VAR (iEngine);
-  INITIALIZE_INTERFACE_VAR (iSector);
-  INITIALIZE_INTERFACE_VAR (iMeshWrapper);
-  INITIALIZE_INTERFACE_VAR (iCollection);
-  INITIALIZE_INTERFACE_VAR (iMeshFactoryWrapper);
-  INITIALIZE_INTERFACE_VAR (iCurveTemplate);
-  INITIALIZE_INTERFACE_VAR (iMaterialWrapper);
-  INITIALIZE_INTERFACE_VAR (iTextureWrapper);
-  INITIALIZE_INTERFACE_VAR (iCameraPosition);
-  INITIALIZE_INTERFACE_VAR (iPolyTxtPlane);
-  INITIALIZE_INTERFACE_VAR (iStatLight);
-  INITIALIZE_INTERFACE_VAR (iDynLight);
-  INITIALIZE_INTERFACE_VAR (iMaterialHandle);
-  INITIALIZE_INTERFACE_VAR (iTerrainWrapper);
-  INITIALIZE_INTERFACE_VAR (iTerrainFactoryWrapper);
-  INITIALIZE_INTERFACE_VAR (iKeyValuePair);
-  INITIALIZE_INTERFACE_VAR (iMapNode);
-
-  INITIALIZE_INTERFACE_VAR (csPolyTxtPlane);
-  INITIALIZE_INTERFACE_VAR (csCollection);
-  INITIALIZE_INTERFACE_VAR (csMeshWrapper);
-  INITIALIZE_INTERFACE_VAR (csMeshFactoryWrapper);
-  INITIALIZE_INTERFACE_VAR (csCurveTemplate);
-  INITIALIZE_INTERFACE_VAR (csSector);
-  INITIALIZE_INTERFACE_VAR (csTextureWrapper);
-  INITIALIZE_INTERFACE_VAR (csMaterialWrapper);
-  INITIALIZE_INTERFACE_VAR (csCollider);
-  INITIALIZE_INTERFACE_VAR (csRadPoly);
-  INITIALIZE_INTERFACE_VAR (csRadCurve);
 
   if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;
