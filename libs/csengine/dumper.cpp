@@ -196,12 +196,14 @@ void Dumper::dump (csSprite3D* s)
   dump (&s->m_obj2world, "Object->world");
   dump (&s->v_obj2world, "Object->world");
   int i;
+#if 0
   CsPrintf (MSG_DEBUG_0, "Last transformed frame:\n");
   for (i = 0 ; i < s->tpl->num_vertices ; i++)
     CsPrintf (MSG_DEBUG_0, "  V%d: tex:(%f,%f) cam:(%f,%f,%f) scr:(%f,%f) vis:%d\n",
     	i, s->tr_frame->GetTexel (i).x, s->tr_frame->GetTexel (i).y,
     	s->tr_frame->GetVertex (i).x, s->tr_frame->GetVertex (i).y, s->tr_frame->GetVertex (i).z,
 	s->persp[i].x, s->persp[i].y, s->visible[i]);
+#endif
 }
 
 void Dumper::dump (csPolyTexture* p, char* name)
