@@ -58,7 +58,7 @@ msg_inform()
 #    Assert that the specified condition is true upon exit from a block.
 #
 # Example: precondition '-n "${CXX}"'
-#    Ensure that CXX has a value before prior to entering a block.
+#    Ensure that CXX has a value prior to entry to a block.
 # Example: postcondition '${X11_OK} -eq 0 -o ${X11_OK} -eq 1'
 #    Ensure that X11_OK is set to 0 or 1 after exit from a block.
 #------------------------------------------------------------------------------
