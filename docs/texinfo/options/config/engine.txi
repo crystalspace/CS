@@ -3,9 +3,7 @@
 @cindex Configuration, Engine
 
 This section describes the configuration keys used by the 3D engine.
-
-All these options belong in the main config file for your application, for
-example @file{CS/data/config/cryst.cfg}.
+The default values are stored in @file{CS/data/config/engine.cfg}.
 
 @subsubheading Lighting Options
 

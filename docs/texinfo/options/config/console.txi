@@ -2,10 +2,8 @@
 @subsection Console Configuration
 @cindex Configuration, Console
 
-The following options can be used to configure the simple console plug-in:
-
-All these options belong in the main config file for your application, for
-example @file{CS/data/config/cryst.cfg}.
+The following options can be used to configure the simple console plug-in.
+The default values are stored in @file{CS/data/config/simpcon.cfg}.
 
 @table @code
 @item SimpleConsole.ConFG = <red>,<green>,<blue>

@@ -10,10 +10,6 @@ with the file extension @file{.cfg} and are typically located within the
 virtual directory @file{/config/} which is most usually mounted at the
 physical location @file{CS/data/config}.
 
-@ignore
-This paragraph belongs to the config manager system which is not yet
-integrated with CS.
-
 When you run an application, all configuration files (those from the plug-in
 modules and the application-specific file) are combined to one big database
 of options. When this happens, options from the application-specific config
@@ -21,7 +17,6 @@ file override options from the plug-in specific config files. Thus you can
 set any option in your application's config file to override options from the
 plug-in config files. When you change the configuration from within your
 application, the changes are always applied to the application-specific file.
-@end ignore
 
 The format of these files is simple. They consist of a number of @dfn{keys},
 each of which consists of a name, a value and an optional comment. Key names

@@ -2,10 +2,8 @@
 @subsection Sound Configuration
 @cindex Configuration, Sound
 
-The following options can be used to configure the sound modules:
-
-All these options belong in the sound configuration file:
-@file{CS/data/config/sound.cfg}.
+The following options can be used to configure the sound modules.
+The default values are stored in @file{CS/data/config/sound.cfg}.
 
 @subsubheading General Sound Configuration
 

@@ -2,11 +2,11 @@
 @subsection System Configuration
 @cindex Configuration, System
 
-This section describes how the system driver can be configured with the
-config file.
+This section describes how the system driver can be configured with the config
+file. The default values are stored in @file{CS/data/config/system.cfg},
+except the list of plug-in modules, for which no default exists.
 
-All these options belong in the main config file for your application, for
-example @file{CS/data/config/cryst.cfg}.
+@subsubheading List of Plug-In Modules
 
 The most important part of the system configuration is the list of plug-in
 modules to load. A plug-in module is loaded with the following line:
@@ -87,3 +87,27 @@ This is a variant of the software renderer.
 @item
 
 @end table
+
+@subsubheading Other System Driver Options
+
+Apart from the list of plug-in modules, the following keys are recognized by
+the system driver:
+
+@table @code
+@item MouseDriver.DoubleClickTime = <number>
+This is the maximum of time (given in milliseconds) which may pass between
+two mouse clicks to recognize a double-click. Default is @code{300}.
+
+@item MouseDriver.DoubleClickDist = <number>
+The maximal distance (given in pixels) that the mouse can move between clicks
+for double click to occur. Default is @code{2}.
+
+@item MouseDriver.MouseSensivity = <float>
+This defines the mouse sensitivity, i.e. the speed of all mouse movement.
+Default is @code{1.0}.
+@emph{Note:} For now this is used only in the DOS/DJGPP port.
+
+@item System.Win32.DebugConsole = <yes/no>
+Default is @code{yes}. @@@@@@ FIXME: What does this option control?
+@end table
+

@@ -7,9 +7,6 @@ Note that most drivers also accept some additional options that are not
 listed here. These options are specific to single drivers. You can have a
 look at the config files for these drivers to find out which options exist.
 
-All these options belong in the main config file for your application, for
-example @file{CS/data/config/cryst.cfg}.
-
 @table @code
 @item Video.ScreenWidth = <width>
 The default width of the display. What the real default is is system
