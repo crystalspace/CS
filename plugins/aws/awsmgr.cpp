@@ -3,6 +3,7 @@
 #include "aws.h"
 #include "awsprefs.h"
 #include "awsfparm.h"
+#include "awsclip.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/engine.h"
 #include "iutil/eventh.h"
@@ -323,7 +324,10 @@ awsManager::Print(iGraphics3D *g3d, uint8 Alpha)
   UpdateStore();
 
   int i;
+  csRect clip(0,0,g3d->GetWidth(),g3d->GetHeight());
 
+  updatestore.ClipTo(clip);
+  
   // Merge erase areas if we have to do both. Otherwise, just update normally.
   if (erase.Count() > 0)
   {
@@ -373,9 +377,11 @@ awsManager::Redraw()
         
 
    redraw_tag++;
+
+   csRect clip(0,0,ptG2D->GetWidth()-1, ptG2D->GetHeight()-1);
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
-   ptG2D->SetClipRect(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
+   ptG2D->SetClipRect(0,0,ptG2D->GetWidth()-1, ptG2D->GetHeight()-1);
       
    //if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
    //else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
@@ -383,6 +389,11 @@ awsManager::Redraw()
    // check to see if there is anything to redraw.
    if (dirty.Count() == 0 && !(flags & AWSF_AlwaysRedrawWindows)) 
       return;
+   else
+   {
+     dirty.ClipTo(clip);
+     erase.ClipTo(clip);
+   }
    
    /******* The following code is only executed if there is something to redraw *************/
      
@@ -470,13 +481,16 @@ awsManager::Redraw()
    // This draws all of the erasure areas.
    if (flags & AWSF_AlwaysEraseWindows)
    {     
+     awsClipper clipper(ptG3D, ptG2D);
+     clipper.SetClipRect(clip);
+
      for(i=0; i<dirty.Count(); ++i)
        erase.Exclude(dirty.RectAt(i));
 
      for(i=0; i<erase.Count(); ++i)
      {
        csRect r(erase.RectAt(i));
-       ptG2D->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(),erasefill);
+       clipper.DrawBox(r.xmin, r.ymin, r.Width(), r.Height(),erasefill);
      }       
    }
 

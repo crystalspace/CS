@@ -1,5 +1,6 @@
 #include "cssysdef.h"
 #include "awswin.h"
+#include "awsclip.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -640,6 +641,8 @@ awsWindow::OnDraw(csRect clip)
   iGraphics2D *g2d = WindowManager()->G2D();
   iGraphics3D *g3d = WindowManager()->G3D();
 
+  awsClipper clipper(g3d, g2d);
+  
   /******************************************
    * When drawing the window, we have to take 
    *  certain things into account.  First, the
@@ -661,6 +664,8 @@ awsWindow::OnDraw(csRect clip)
 
   int tw, th, toff, btw, bth;
   int i;
+
+  clipper.SetClipRect(clip);
 
   if (todraw_dirty)
   {
@@ -702,26 +707,26 @@ awsWindow::OnDraw(csRect clip)
         csRect r(todraw.RectAt(i));
                
         if (btxt==NULL) 
-          g2d->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
+          clipper.DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
         else
-          g3d->DrawPixmap(btxt, 
+          clipper.DrawPixmap(btxt, 
                           r.xmin, r.ymin, r.Width(), r.Height(), 
                           r.xmin-Frame().xmin, r.ymin-Frame().ymin, 
                           r.Width(), r.Height(), 0);
       }
 
       // Draw a beveled border, fill-hi on top and left, black-shadow on bot and right
-      g2d->DrawLine(Frame().xmin, Frame().ymin, Frame().xmax, Frame().ymin, fill);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-1, Frame().ymin+1, hi);
+      clipper.DrawLine(Frame().xmin, Frame().ymin, Frame().xmax, Frame().ymin, fill);
+      clipper.DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-1, Frame().ymin+1, hi);
       
-      g2d->DrawLine(Frame().xmin, Frame().ymin+1, Frame().xmin, Frame().ymax, fill);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+2, Frame().xmin+1, Frame().ymax-1, hi);
+      clipper.DrawLine(Frame().xmin, Frame().ymin+1, Frame().xmin, Frame().ymax, fill);
+      clipper.DrawLine(Frame().xmin+1, Frame().ymin+2, Frame().xmin+1, Frame().ymax-1, hi);
       
-      g2d->DrawLine(Frame().xmin, Frame().ymax, Frame().xmax, Frame().ymax, black);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, lo);
+      clipper.DrawLine(Frame().xmin, Frame().ymax, Frame().xmax, Frame().ymax, black);
+      clipper.DrawLine(Frame().xmin+1, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, lo);
       
-      g2d->DrawLine(Frame().xmax, Frame().ymin, Frame().xmax, Frame().ymax-1, black);
-      g2d->DrawLine(Frame().xmax-1, Frame().ymin+1, Frame().xmax-1, Frame().ymax-2, lo);
+      clipper.DrawLine(Frame().xmax, Frame().ymin, Frame().xmax, Frame().ymax-1, black);
+      clipper.DrawLine(Frame().xmax-1, Frame().ymin+1, Frame().xmax-1, Frame().ymax-2, lo);
    
     }
     else
@@ -750,10 +755,10 @@ awsWindow::OnDraw(csRect clip)
         // start with even border
         for(i=0; i<step; ++i)
         {
-          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
-          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
-          g2d->DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
-          g2d->DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+          clipper.DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
         }
 
         // now add some more fill for the title bar
@@ -761,16 +766,16 @@ awsWindow::OnDraw(csRect clip)
         else                                        titleback=fill;
         
         for(i=step; i<step+th-1; ++i)
-          g2d->DrawLine(Frame().xmin+step, Frame().ymin+i, Frame().xmax-step+1, Frame().ymin+i,  titleback);
+          clipper.DrawLine(Frame().xmin+step, Frame().ymin+i, Frame().xmax-step+1, Frame().ymin+i,  titleback);
         
           
         // finish with an offset top
         for(i=step; i<9; ++i)
         {
-          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i+th-1, Frame().xmax-i, Frame().ymin+i+th-1,  topleft[i]);
-          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i+th-1, Frame().xmin+i, Frame().ymax-i,       topleft[i]);
-          g2d->DrawLine(Frame().xmin+i, Frame().ymax-i,      Frame().xmax-i, Frame().ymax-i,       botright[i]);
-          g2d->DrawLine(Frame().xmax-i, Frame().ymin+i+th-1, Frame().xmax-i, Frame().ymax-i,       botright[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymin+i+th-1, Frame().xmax-i, Frame().ymin+i+th-1,  topleft[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymin+i+th-1, Frame().xmin+i, Frame().ymax-i,       topleft[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymax-i,      Frame().xmax-i, Frame().ymax-i,       botright[i]);
+          clipper.DrawLine(Frame().xmax-i, Frame().ymin+i+th-1, Frame().xmax-i, Frame().ymax-i,       botright[i]);
         } 
 
         if (title)
@@ -795,10 +800,10 @@ awsWindow::OnDraw(csRect clip)
         // create even border all the way around
         for(i=0; i<9; ++i)
         {
-          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
-          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
-          g2d->DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
-          g2d->DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
+          clipper.DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+          clipper.DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
         }
       }  // end else not title
 
@@ -806,12 +811,11 @@ awsWindow::OnDraw(csRect clip)
       {
         //int   x,y;
  
-        g2d->DrawBox(Frame().xmax-grip_size+2,  Frame().ymax-grip_size+2, grip_size-4, grip_size-4, fill);
-        g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size+1, Frame().xmax-7,           Frame().ymax-grip_size+1, hi2);
-        g2d->DrawLine(Frame().xmax-grip_size+1, Frame().ymax-grip_size,   Frame().xmax-grip_size+1, Frame().ymax-7, hi2);
-        g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size,   Frame().xmax-6,           Frame().ymax-grip_size, hi);
-        g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size,   Frame().xmax-grip_size,   Frame().ymax-6, hi);
-
+        clipper.DrawBox(Frame().xmax-grip_size+2,  Frame().ymax-grip_size+2, grip_size-4, grip_size-4, fill);
+        clipper.DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size+1, Frame().xmax-7,           Frame().ymax-grip_size+1, hi2);
+        clipper.DrawLine(Frame().xmax-grip_size+1, Frame().ymax-grip_size,   Frame().xmax-grip_size+1, Frame().ymax-7, hi2);
+        clipper.DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size,   Frame().xmax-6,           Frame().ymax-grip_size, hi);
+        clipper.DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size,   Frame().xmax-grip_size,   Frame().ymax-6, hi);
 
         /*for(x=Frame().xmax-grip_size+4; x<Frame().xmax-4; x+=2)
           for(y=Frame().ymax-grip_size+4; y<Frame().ymax-4; y+=2)
@@ -829,7 +833,7 @@ awsWindow::OnDraw(csRect clip)
           }*/
 
         if (btxt)
-          g3d->DrawPixmap(btxt, 
+          clipper.DrawPixmap(btxt, 
                         Frame().xmax-grip_size, Frame().ymax-grip_size, 
                         7, 7, 
                         Frame().xmax-grip_size-Frame().xmin, Frame().ymax-grip_size-Frame().ymin,
@@ -841,25 +845,25 @@ awsWindow::OnDraw(csRect clip)
       // Overlay the global texture (if there is one) on the frame
       if (btxt)
       {
-        g3d->DrawPixmap(btxt, 
+        clipper.DrawPixmap(btxt, 
                         Frame().xmin, Frame().ymin, 
                         Frame().Width(), title_bar_height+5, 
                         Frame().xmin-Frame().xmin, Frame().ymin-Frame().ymin, 
                         Frame().Width(), title_bar_height+5, alpha_level);
 
-        g3d->DrawPixmap(btxt, 
+        clipper.DrawPixmap(btxt, 
                         Frame().xmin, Frame().ymin+title_bar_height+5, 
                         9, Frame().Height(), 
                         Frame().xmin-Frame().xmin, Frame().ymin+title_bar_height+5-Frame().ymin, 
                         9, Frame().Height(), alpha_level);
 
-        g3d->DrawPixmap(btxt, 
+        clipper.DrawPixmap(btxt, 
                         Frame().xmax-9, Frame().ymin+title_bar_height+5, 
                         9, Frame().Height()-title_bar_height+5, 
                         Frame().xmax-9-Frame().xmin, Frame().ymin+title_bar_height+5-Frame().ymin, 
                         9, Frame().Height()-title_bar_height+5, alpha_level);
 
-        g3d->DrawPixmap(btxt, 
+        clipper.DrawPixmap(btxt, 
                         Frame().xmin+9, Frame().ymax-9, 
                         Frame().Width()-18, 9, 
                         Frame().xmin+9-Frame().xmin, Frame().ymax-9-Frame().ymin, 
