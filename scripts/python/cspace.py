@@ -8009,6 +8009,12 @@ class csGraphics3DCaps(_object):
     __swig_setmethods__["SupportsPointSprites"] = _cspace.csGraphics3DCaps_SupportsPointSprites_set
     __swig_getmethods__["SupportsPointSprites"] = _cspace.csGraphics3DCaps_SupportsPointSprites_get
     if _newclass:SupportsPointSprites = property(_cspace.csGraphics3DCaps_SupportsPointSprites_get, _cspace.csGraphics3DCaps_SupportsPointSprites_set)
+    __swig_setmethods__["DestinationAlpha"] = _cspace.csGraphics3DCaps_DestinationAlpha_set
+    __swig_getmethods__["DestinationAlpha"] = _cspace.csGraphics3DCaps_DestinationAlpha_get
+    if _newclass:DestinationAlpha = property(_cspace.csGraphics3DCaps_DestinationAlpha_get, _cspace.csGraphics3DCaps_DestinationAlpha_set)
+    __swig_setmethods__["StencilShadows"] = _cspace.csGraphics3DCaps_StencilShadows_set
+    __swig_getmethods__["StencilShadows"] = _cspace.csGraphics3DCaps_StencilShadows_get
+    if _newclass:StencilShadows = property(_cspace.csGraphics3DCaps_StencilShadows_get, _cspace.csGraphics3DCaps_StencilShadows_set)
     def __init__(self, *args):
         _swig_setattr(self, csGraphics3DCaps, 'this', _cspace.new_csGraphics3DCaps(*args))
         _swig_setattr(self, csGraphics3DCaps, 'thisown', 1)
