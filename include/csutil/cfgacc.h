@@ -37,13 +37,13 @@ public:
   csConfigAccess();
   /// constructor (also adds a config file)
   csConfigAccess(iSystem *sys, const char *Filename,
-    bool vfs = true, int Priority = iSystem::ConfigPriorityPlugin);
+    bool vfs = true, int Priority = iConfigManager::ConfigPriorityPlugin);
   /// destructor
   ~csConfigAccess();
 
   /// add a config file
   void AddConfig(iSystem *sys, const char *Filename,
-    bool vfs = true, int Priority = iSystem::ConfigPriorityPlugin);
+    bool vfs = true, int Priority = iConfigManager::ConfigPriorityPlugin);
   /// access to system configuration
   iConfigFile *operator->();
   /// access to system configuration

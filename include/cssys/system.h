@@ -365,23 +365,6 @@ public:
   /// Get the installation path.
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 
-  /**
-   * Add a config file to the global config manager (convenience method).
-   * The returned config file is the newly loaded file. You must keep the
-   * pointer to call RemoveConfig() later.
-   */
-  virtual iConfigFile *AddConfig(const char *iFileName,
-    bool iVFS = true, int Priority = ConfigPriorityPlugin);
-  /// Remove a config file that was added with AddConfig()
-  virtual void RemoveConfig(iConfigFile *ConfigFile);
-  /**
-   * Create a new configuration file object which resides on VFS without
-   * adding it to the config manager.
-   */
-  virtual iConfigFile *CreateSeparateConfig (const char *iFileName, bool iVFS = true);
-  /// Save system configuration file if it was changed
-  virtual bool SaveConfig ();
-
   /// Register the plugin to receive specific events
   virtual bool CallOnEvents (iPlugin *iObject, unsigned int iEventMask);
   /// Query current state for given key

@@ -401,7 +401,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   scfiObjectRegistry.Register (Config, "ConfigManager");
   // @@@ Config->DecRef (); uncomment when object reg outside system driver
   cfg->DecRef ();
-  Config->SetDomainPriority(cfg, ConfigPriorityApplication);
+  Config->SetDomainPriority(cfg, iConfigManager::ConfigPriorityApplication);
   VFS = CS_LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
   // Initialize application configuration file
@@ -417,13 +417,13 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     {
       // open the user-specific, application-neutral config domain
       cfg = OpenUserConfig("Global", "User.Global");
-      Config->AddDomain(cfg, ConfigPriorityUserGlobal);
+      Config->AddDomain(cfg, iConfigManager::ConfigPriorityUserGlobal);
       cfg->DecRef();
 
       // open the user-and-application-specific config domain
       cfg = OpenUserConfig(cfgacc->GetStr("System.ApplicationID", "Noname"),
         "User.Application");
-      Config->AddDomain(cfg, ConfigPriorityUserApp);
+      Config->AddDomain(cfg, iConfigManager::ConfigPriorityUserApp);
       Config->SetDynamicDomain(cfg);
       cfg->DecRef();
     }
@@ -945,35 +945,6 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
 
   scfiObjectRegistry.Unregister((iBase *)iObject, NULL);
   return Plugins.Delete (idx);
-}
-
-iConfigFile *csSystemDriver::AddConfig(const char *iFileName, bool iVFS, int Priority)
-{
-  iConfigManager* Config = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
-  	iConfigManager);
-  if (!Config) return NULL;
-  return Config->AddDomain(iFileName, iVFS ? VFS : NULL, Priority);
-}
-
-void csSystemDriver::RemoveConfig(iConfigFile *cfg)
-{
-  iConfigManager* Config = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
-  	iConfigManager);
-  if (!Config) return;
-  Config->RemoveDomain(cfg);
-}
-
-iConfigFile *csSystemDriver::CreateSeparateConfig (const char *iFileName, bool iVFS)
-{
-  return new csConfigFile (iFileName, iVFS ? VFS : NULL);
-}
-
-bool csSystemDriver::SaveConfig ()
-{
-  iConfigManager* Config = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
-  	iConfigManager);
-  if (!Config) return false;
-  return Config->Save ();
 }
 
 bool csSystemDriver::CallOnEvents (iPlugin *iObject, unsigned int iEventMask)

@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 #include "csutil/cfgacc.h"
+#include "isys/plugin.h"
+#include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/objreg.h"
 
@@ -34,15 +36,31 @@ csConfigAccess::csConfigAccess(iSystem *sys, const char *fname,
 
 csConfigAccess::~csConfigAccess()
 {
+  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
+      iConfigManager);
   for (long i=0; i<ConfigFiles.Length(); i++)
-    System->RemoveConfig((iConfigFile*)ConfigFiles.Get(i));
+    cfgmgr->RemoveDomain ((iConfigFile*)ConfigFiles.Get(i));
 }
 
 void csConfigAccess::AddConfig(iSystem *sys, const char *fname,
   bool vfs, int priority)
 {
   System = sys;
-  ConfigFiles.Push(System->AddConfig(fname, vfs, priority));
+  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
+      iConfigManager);
+  iVFS* VFS = NULL;
+  if (vfs)
+  {
+    // @@@ We cannot use CS_QUERY_REGISTRY here to get the pointer
+    // to iVFS since this function is called very early even before
+    // VFS is added to the object registry. In the future we have
+    // to see if we cannot avoid this.
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (
+	System->GetObjectRegistry (), iPluginManager);
+    VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+    //CS_ASSERT (VFS != NULL);
+  }
+  ConfigFiles.Push(cfgmgr->AddDomain (fname, VFS, priority));
 }
 
 iConfigFile *csConfigAccess::operator->()

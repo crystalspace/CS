@@ -1,5 +1,20 @@
 The history order is reversed so that new features are at the top.
 
+3-Jul-2001
+	- Removed iSystem::AddConfig(). Use iConfigManager::AddDomain()
+	  instead.
+	- Removed iSystem::RemoveConfig(). Use iConfigManager::RemoveDomain()
+	  instead.
+	- Removed iSystem::CreateSeperateConfig(). Use a new instance of
+	  csConfigFile instead (like 'new csConfigFile (filename, VFS)').
+	- Removed iSystem::SaveConfig(). Use iConfigManager::Save()
+	  instead.
+	- For all above funtions you can get a pointer to the config
+	  manager by asking the object registry like this:
+	    iConfigManager* cfg = QUERY_REGISTRY (object_reg,
+		iConfigManager);
+	- In addition to the above changes also moved the enum values
+	  ConfigPriority??? from iSystem to iConfigManager.
 2-Jul-2001
 	- Eric Sunshine eliminated a compilation warning about unused variable
 	  in mdltool.cpp.  (In fact, this particular variable was being

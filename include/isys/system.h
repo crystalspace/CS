@@ -34,7 +34,7 @@ struct iConfigFile;
 struct iConfigManager;
 
 
-SCF_VERSION (iSystem, 8, 0, 0);
+SCF_VERSION (iSystem, 9, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -148,39 +148,6 @@ struct iSystem : public iBase
    * Get the global object registry (temporary function).
    */
   virtual iObjectRegistry* GetObjectRegistry () = 0;
-
-  //----------------------- Configuration file interface ---------------------//
-
-  /// Default priority values (you may use other values if you want)
-  enum
-  {
-    // plug-in priority
-    ConfigPriorityPlugin        = iConfigManager::PriorityVeryLow,
-    // application priority
-    ConfigPriorityApplication   = iConfigManager::PriorityLow,
-    // user priority (application-neutral)
-    ConfigPriorityUserGlobal    = iConfigManager::PriorityMedium,
-    // user priority (application-specific)
-    ConfigPriorityUserApp       = iConfigManager::PriorityHigh,
-    // command-line priority
-    ConfigPriorityCmdLine       = iConfigManager::PriorityVeryHigh
-  };
-  /**
-   * Add a config file to the global config manager (convenience method).
-   * The returned config file is the newly loaded file. You must keep the
-   * pointer to call RemoveConfig() later.
-   */
-  virtual iConfigFile *AddConfig(const char *iFileName,
-    bool iVFS = true, int Priority = ConfigPriorityPlugin) = 0;
-  /// Remove a config file that was added with AddConfig()
-  virtual void RemoveConfig(iConfigFile *ConfigFile) = 0;
-  /**
-   * Create a new configuration file object which resides on VFS without
-   * adding it to the config manager.
-   */
-  virtual iConfigFile *CreateSeparateConfig (const char *iFileName, bool iVFS = true) = 0;
-  /// Save system configuration file if it was changed
-  virtual bool SaveConfig () = 0;
 
   //------------------------------ Event manager -----------------------------//
 

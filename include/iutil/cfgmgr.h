@@ -71,6 +71,21 @@ struct iConfigManager : public iConfigFile
     PriorityMax =       +1000000000,
   };
 
+  /// Default priority values (you may use other values if you want)
+  enum
+  {
+    // plug-in priority
+    ConfigPriorityPlugin        = PriorityVeryLow,
+    // application priority
+    ConfigPriorityApplication   = PriorityLow,
+    // user priority (application-neutral)
+    ConfigPriorityUserGlobal    = PriorityMedium,
+    // user priority (application-specific)
+    ConfigPriorityUserApp       = PriorityHigh,
+    // command-line priority
+    ConfigPriorityCmdLine       = PriorityVeryHigh
+  };
+
   /// add a configuration domain
   virtual void AddDomain(iConfigFile*, int priority) = 0;
   /**
