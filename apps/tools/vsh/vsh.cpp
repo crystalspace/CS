@@ -429,14 +429,10 @@ static void cmd_conf (char *args)
     return;
   }
 
-  csRef<iConfigIterator> iter = config->Enumerate ("VFS.Mount.");
-  while (iter->Next ())
-  {
-    const char *rpath = iter->GetKey (true);
-    const char *vpath = iter->GetStr ();
-    if (!VFS->Mount (rpath, vpath))
-      fprintf (stderr, "conf: mount: cannot mount \"%s\" to \"%s\"\n", rpath, vpath);
-  }
+  if (!VFS->LoadMountsFromFile (config))
+    fprintf (stderr, "conf: mount: cannot mount all directories found in "
+	     "config file.\n");
+
 }
 
 static void cmd_sync (char *)

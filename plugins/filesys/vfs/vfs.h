@@ -201,6 +201,8 @@ public:
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName);
+  /// Load a configuration file
+  virtual bool LoadMountsFromFile (iConfigFile* file);
 
   /// Initialize the Virtual File System
   virtual bool Initialize (iObjectRegistry *object_reg);

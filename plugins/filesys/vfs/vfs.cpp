@@ -2019,6 +2019,25 @@ bool csVFS::SaveMounts (const char *FileName)
   return config.Save (FileName);
 }
 
+bool csVFS::LoadMountsFromFile (iConfigFile* file)
+{
+  bool success = true;
+
+  csRef<iConfigIterator> iter = file->Enumerate ("VFS.Mount.");
+  while (iter->Next ())
+  {
+    const char *rpath = iter->GetKey (true);
+    const char *vpath = iter->GetStr ();
+    if (!Mount (rpath, vpath)) {
+      fprintf (stderr, "crystalspace.vfs: cannot mount \"%s\" to \"%s\"\n", 
+	       rpath, vpath);
+      success = false;
+    }
+  }
+
+  return success;
+}
+
 bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const
 {
   if (!FileName)

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jul-2004
+	- Remi Bonnet moved some code from vsh inside vfs to allow other
+	  apps to load mount files at run time (new API func: 
+	  LoadMountsFromFile)
 23-Jul-2004
 	- Jorrit fixed csbench so it first removes the csbench_report.zip.
 	  Not doing that causes corrupted zip files due to bugs in VFS.

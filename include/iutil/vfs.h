@@ -30,6 +30,8 @@
 #include "iutil/databuff.h"
 #include "iutil/stringarray.h"
 
+struct iConfigFile;
+
 /**
  * File time structure - used to query and set
  * the last-modification time of a file.
@@ -340,6 +342,12 @@ struct iVFS : public iBase
    * \return True if the operation succeeded, else false.
    */
   virtual bool SaveMounts (const char *FileName) = 0;
+  /**
+   * Loads mounts from a configuration file
+   * \return True if no error occured, false otherwise.
+   */
+  virtual bool LoadMountsFromFile (iConfigFile* file) = 0;
+
 
   /**
    * Query file date/time.
