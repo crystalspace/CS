@@ -58,6 +58,60 @@
 #include "iutil/databuff.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
+#include "ivaria/reporter.h"
+
+//---------------------------------------------------------------------------
+
+void csEngine::Report (const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (CS_REPORTER_SEVERITY_NOTIFY,
+    	"crystalspace.engine.notify", description, arg);
+  }
+  else
+  {
+    System->PrintfV (CS_MSG_CONSOLE, description, arg);
+  }
+  va_end (arg);
+}
+
+void csEngine::Warn (const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (CS_REPORTER_SEVERITY_WARNING,
+    	"crystalspace.engine.warning", description, arg);
+  }
+  else
+  {
+    System->PrintfV (CS_MSG_WARNING, description, arg);
+  }
+  va_end (arg);
+}
+
+void csEngine::ReportBug (const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (CS_REPORTER_SEVERITY_BUG,
+    	"crystalspace.engine.bug", description, arg);
+  }
+  else
+  {
+    System->PrintfV (CS_MSG_INTERNAL_ERROR, description, arg);
+  }
+  va_end (arg);
+}
 
 //---------------------------------------------------------------------------
 
@@ -384,6 +438,7 @@ csEngine::csEngine (iBase *iParent) : sectors (true), camera_positions (16, 16)
   VFS = NULL;
   G3D = NULL;
   G2D = NULL;
+  Reporter = NULL;
   ImageLoader = NULL;
   textures = NULL;
   materials = NULL;
@@ -425,6 +480,7 @@ csEngine::~csEngine ()
   if (G3D) G3D->DecRef ();
   if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
+  if (Reporter) Reporter->DecRef ();
   delete materials;
   delete textures;
   delete render_pol2d_pool;
@@ -465,7 +521,9 @@ bool csEngine::Initialize (iSystem* sys)
   // don't check for failure; the engine can work without the image loader
   ImageLoader = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
-    CsPrintf (CS_MSG_WARNING, "No image loader. Loading images will fail.\n");
+    Warn ("No image loader. Loading images will fail.");
+
+  Reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
@@ -700,12 +758,12 @@ void csEngine::ResolveEngineMode ()
     if (switch_f2b >= 10)
     {
       engine_mode = CS_ENGINE_FRONT2BACK;
-      CsPrintf (CS_MSG_CONSOLE, "Engine is using front2back mode\n");
+      Report ("Engine is using front2back mode.");
     }
     else
     {
       engine_mode = CS_ENGINE_BACK2FRONT;
-      CsPrintf (CS_MSG_CONSOLE, "Engine is using back2front mode\n");
+      Report ("Engine is using back2front mode.");
     }
   }
 }
@@ -880,19 +938,18 @@ void csEngine::ShineLights (csRegion* region)
         current.radiosity, current.cosinus_factor,
         current.lightmap_size);
       VFS->WriteFile ("precalc_info", data, strlen (data));
-      CsPrintf (CS_MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
+      Report ("Lightmap data is not up to date (reason: %s).", reason);
       do_force_relight = true;
     }
   }
 
   if (do_force_relight)
   {
-    CsPrintf (CS_MSG_INITIALIZATION, "Recalculation of lightmaps forced.\n");
-    CsPrintf (CS_MSG_INITIALIZATION, "  Pseudo-radiosity system %s.\n",
-      csSector::do_radiosity ? "enabled" : "disabled");
-    CsPrintf (CS_MSG_INITIALIZATION,
-      "  Maximum number of visits per sector = %d.\n",
-      csSector::cfg_reflections);
+    Report ("Recalculation of lightmaps forced.");
+    Report ("  Pseudo-radiosity system %s.",
+	csSector::do_radiosity ? "enabled" : "disabled");
+    Report ("  Maximum number of visits per sector = %d.",
+	csSector::cfg_reflections);
   }
   else
   {
@@ -920,8 +977,7 @@ void csEngine::ShineLights (csRegion* region)
 
   if (do_relight)
   {
-    CsPrintf (CS_MSG_INITIALIZATION, "Initializing lighting (%d meshes):\n  ",
-      num_meshes);
+    Report ("Initializing lighting (%d meshes).", num_meshes);
     meter.SetTotal (num_meshes);
     meter.Restart ();
   }
@@ -948,8 +1004,7 @@ void csEngine::ShineLights (csRegion* region)
   start = System->GetTime ();
   if (do_relight)
   {
-    CsPrintf (CS_MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ",
-      light_count);
+    Report ("\nShining lights (%d lights).", light_count);
     meter.SetTotal (light_count);
     meter.Restart ();
   }
@@ -961,8 +1016,7 @@ void csEngine::ShineLights (csRegion* region)
   }
   stop = System->GetTime ();
   if (do_relight)
-    CsPrintf (CS_MSG_INITIALIZATION, "\n(%.4f seconds)",
-      (float)(stop-start)/1000.);
+    Report ("\nTime taken: %.4f seconds.", (float)(stop-start)/1000.);
 
   // Render radiosity
   if (use_new_radiosity && !do_not_force_relight && do_force_relight)
@@ -980,14 +1034,12 @@ void csEngine::ShineLights (csRegion* region)
     }
     stop = System->GetTime ();
     if (do_relight)
-      CsPrintf (CS_MSG_INITIALIZATION, "(%.4f seconds)",
-      	(float)(stop-start)/1000.);
+      Report ("\nTime taken: %.4f seconds.", (float)(stop-start)/1000.);
   }
 
   if (do_relight)
   {
-    CsPrintf (CS_MSG_INITIALIZATION, "\nCaching lighting (%d meshes):\n  ",
-    	num_meshes);
+    Report ("Caching lighting (%d meshes).", num_meshes);
     meter.SetTotal (num_meshes);
     meter.Restart ();
   }
@@ -1012,11 +1064,11 @@ void csEngine::ShineLights (csRegion* region)
   csThing::current_light_frame_number++;
 
   if (do_relight)
-    CsPrintf (CS_MSG_INITIALIZATION, "\nUpdating VFS...\n");
+    Report ("\nUpdating VFS....");
   if (!VFS->Sync ())
-    CsPrintf (CS_MSG_WARNING, "WARNING: error updating lighttable cache!\n");
+    Warn ("Error updating lighttable cache!\n");
   if (do_relight)
-    CsPrintf (CS_MSG_INITIALIZATION, "DONE!\n");
+    Report ("DONE!");
 
   delete lit;
 }
@@ -1039,62 +1091,6 @@ void csEngine::InvalidateLightmaps ()
 
 bool csEngine::CheckConsistency ()
 {
-#if 0
-//@@@ TODO
-  csPolyIt* pit = NewPolyIterator ();
-  bool error = false;
-
-  csPolygon3D* p;
-
-  CsPrintf (CS_MSG_INITIALIZATION, "Validating world...\n");
-  pit->Restart ();
-  while ((p = pit->Fetch ()) != NULL)
-  {
-    if (p->GetVertexCount () < 3)
-    {
-      CsPrintf (CS_MSG_WARNING, "  Polygon with only %d vertices! (id=%d)\n", p->GetVertexCount (), p->GetID ());
-      CsPrintf (CS_MSG_DEBUG_0, "============ Polygon with only %d vertices (id=%d)!\n", p->GetVertexCount (), p->GetID ());
-      //Dumper::dump (p);
-      error = true;
-    }
-    else if (p->GetVertexCount () > 3)
-    {
-      csVector3 poly[3];
-      int i, j;
-      poly[0] = p->Vobj (0);
-      j = 1;
-      for (i = 1 ; i < p->GetVertexCount () ; i++)
-        if (!((poly[j-1] - p->Vobj (i)) < SMALL_EPSILON))
-	{
-	  poly[j] = p->Vobj (i);
-	  j++;
-	  if (j > 2) break;
-	}
-      if (j > 2)
-      {
-        csVector3 normal;
-        float D;
-        csMath3::CalcPlane (poly[0], poly[1], poly[2], normal, D);
-        csPlane3 pl (normal, D);
-        for (i = 3 ; i < p->GetVertexCount () ; i++)
-        {
-          if (ABS (pl.Classify (p->Vobj (i))) > EPSILON)
-	  {
-            CsPrintf (CS_MSG_WARNING, "  Non-coplanar polygon! (id=%d)\n", p->GetID ());
-            CsPrintf (CS_MSG_DEBUG_0, "============ Non-coplanar polygon (id=%d)!\n", p->GetID ());
-            //Dumper::dump (p);
-            error = true;
-	    break;
-	  }
-	}
-      }
-    }
-  }
-
-  delete pit;
-  CsPrintf (CS_MSG_INITIALIZATION, "DONE\n");
-  return error;
-#endif
   return false;
 }
 
@@ -1612,8 +1608,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
   if (!data || !data->GetSize ())
   {
     if (data) data->DecRef ();
-    CsPrintf (CS_MSG_WARNING, "Cannot read image file \"%s\" from VFS\n",
-      iFileName);
+    Warn ("Cannot read image file \"%s\" from VFS.", iFileName);
     return NULL;
   }
 
@@ -1623,7 +1618,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
 
   if (!ifile)
   {
-    CsPrintf (CS_MSG_WARNING, "Unknown image file format: \"%s\"\n", iFileName);
+    Warn ("Unknown image file format: \"%s\".", iFileName);
     return NULL;
   }
 

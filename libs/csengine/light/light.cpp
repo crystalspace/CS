@@ -240,7 +240,6 @@ void curve_light_func (csObject* obj, csFrustumView* lview)
 
 void csStatLight::CalculateLighting ()
 {
-  //CsPrintf (CS_MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
   csLightingInfo& linfo = ctxt->GetLightingInfo ();
@@ -262,7 +261,6 @@ void csStatLight::CalculateLighting ()
 
 void csStatLight::CalculateLighting (iMeshWrapper* th)
 {
-  //CsPrintf (CS_MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
   csLightingInfo& linfo = ctxt->GetLightingInfo ();
@@ -336,7 +334,9 @@ void csStatLight::RegisterLightMap (csLightMap* lmap)
   lightmaps[num_lightmap++] = lmap;
   if (num_lightmap >= MAX_NUM_LIGHTMAP)
   {
-    CsPrintf (CS_MSG_WARNING, "Overflow number of lightmaps for dynamic light!\n");
+    //@@@ BAD CODE! We should not have a max!
+    csEngine::current_engine->Warn (
+    	"Overflow number of lightmaps for dynamic light!\n");
   }
 }
 

@@ -158,21 +158,21 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
   myG2D = CS_QUERY_PLUGIN (this, iGraphics2D);
   if (!myG2D)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     abort ();
   }
 
   iEngine *Engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!Engine)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
   engine = Engine->GetCsEngine ();
@@ -181,7 +181,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
@@ -357,7 +357,7 @@ void Phyztest::NextFrame ()
   // add a chain
   if (GetKeyState (CSKEY_DEL) && !chain_added )
   {
-    // CsPrintf (CS_MSG_DEBUG_0, "adding chain\n");
+    // Printf (CS_MSG_DEBUG_0, "adding chain\n");
     // use box template
 
     csMeshFactoryWrapper* bxtmpl = (csMeshFactoryWrapper*)
@@ -513,7 +513,7 @@ void Phyztest::NextFrame ()
       {
         //  get the position of this link
         new_p = chain[i]->rb->get_pos();
-	//  CsPrintf (CS_MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
+	//  Printf (CS_MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
 	//            i, new_p.x, new_p.y, new_p.z);
         chain[i]->sprt->GetMovable ().SetPosition ( new_p );
         

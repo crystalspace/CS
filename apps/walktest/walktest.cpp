@@ -203,6 +203,35 @@ WalkTest::~WalkTest ()
   if (LevelLoader) LevelLoader->DecRef();
 }
 
+struct WalkTestReporterListener : public iReporterListener
+{
+  SCF_DECLARE_IBASE;
+  WalkTestReporterListener () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual bool Report (iReporter* reporter, int severity, const char* msgId,
+  	const char* description);
+};
+
+SCF_IMPLEMENT_IBASE (WalkTestReporterListener)
+  SCF_IMPLEMENTS_INTERFACE (iReporterListener)
+SCF_IMPLEMENT_IBASE_END
+
+bool WalkTestReporterListener::Report (iReporter* /*reporter*/, int severity,
+	const char* /*msgId*/, const char* description)
+{
+  if (severity == CS_REPORTER_SEVERITY_NOTIFY
+  	|| severity == CS_REPORTER_SEVERITY_WARNING)
+  {
+    int msgType;
+    if (severity == CS_REPORTER_SEVERITY_WARNING)
+      msgType = CS_MSG_WARNING;
+    else
+      msgType = CS_MSG_CONSOLE;
+    Sys->Printf (msgType, "%s\n", description);
+    return true;
+  }
+  return false;
+}
+
 bool WalkTest::CheckErrors ()
 {
   iReporter* reporter = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_REPORTER,
@@ -1245,6 +1274,16 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   myConsole = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
   mySound = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   myMotionMan = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
+
+  iReporter* reporter = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_REPORTER,
+  	iReporter);
+  if (reporter)
+  {
+    WalkTestReporterListener* listener = new WalkTestReporterListener ();
+    reporter->AddReporterListener (listener);
+    listener->DecRef ();
+    reporter->DecRef ();
+  }
 
   // Some commercials...
   Printf (CS_MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);

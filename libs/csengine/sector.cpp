@@ -316,8 +316,6 @@ void csSector::UseCuller (const char* meshname)
     vo->DecRef ();
     culler->RegisterVisObject (vo);
   }
-  
-  CsPrintf (CS_MSG_INITIALIZATION, "DONE!\n");
 }
 
 csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end,

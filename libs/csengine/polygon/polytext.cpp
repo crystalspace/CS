@@ -506,8 +506,8 @@ static void __add_PutPixel (int x, int y, float area, void *arg)
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
-      __FILE__, __LINE__);
+    printf ("Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__); fflush (stdout);
 #endif
     return;
   }
@@ -521,8 +521,8 @@ static void __add_DrawBox (int x, int y, int w, int h, void *arg)
       x + w > cm->width || y + h > cm->height || w < 0 || h < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
-      __FILE__, __LINE__);
+    printf ("Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__); fflush (stdout);
 #endif
     return;
   }
@@ -542,8 +542,8 @@ static void __sub_PutPixel (int x, int y, float area, void *arg)
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
-      __FILE__, __LINE__);
+    printf ("Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__); fflush (stdout);
 #endif
     return;
   }
@@ -557,8 +557,8 @@ static void __sub_DrawBox (int x, int y, int w, int h, void *arg)
       x + w > cm->width || y + h > cm->height || w < 0 || h < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
-      __FILE__, __LINE__);
+    printf ("Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__); fflush (stdout);
 #endif
     return;
   }

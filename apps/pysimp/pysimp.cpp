@@ -83,7 +83,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   iEngine *Engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!Engine)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
   engine = Engine->GetCsEngine ();
@@ -98,7 +98,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 

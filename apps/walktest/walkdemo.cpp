@@ -561,7 +561,7 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
-      CsPrintf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      Sys->Printf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
@@ -796,7 +796,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
-      CsPrintf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      Sys->Printf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();

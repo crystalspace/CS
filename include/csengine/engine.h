@@ -58,6 +58,7 @@ struct iRegion;
 struct iLight;
 struct iImageIO;
 struct iClipper2D;
+struct iReporter;
 
 SCF_DECLARE_FAST_INTERFACE (iEngine)
 SCF_DECLARE_FAST_INTERFACE (iSector)
@@ -256,6 +257,12 @@ public:
    * '\' as path separator, Mac uses ':' and Unix uses '/').
    */
   iVFS *VFS;
+
+  /**
+   * Pointer to an optional reporter that will be used for notification
+   * and warning messages.
+   */
+  iReporter* Reporter;
 
   /**
    * This is a vector which holds objects of type 'csCleanable'.
@@ -493,6 +500,21 @@ public:
    * destroying the engine.
    */
   virtual ~csEngine ();
+
+  /**
+   * Report a notification message.
+   */
+  void Report (const char* description, ...);
+
+  /**
+   * Report a warning.
+   */
+  void Warn (const char* description, ...);
+
+  /**
+   * Report a bug.
+   */
+  void ReportBug (const char* description, ...);
 
   /**
    * Check consistency of the loaded elements which comprise the world.
@@ -1176,8 +1198,5 @@ private:
     SCF_DECLARE_EMBEDDED_IBASE (csEngine);
   } scfiObject;
 };
-
-// This is a global replacement for printf ()
-#define CsPrintf csEngine::System->Printf
 
 #endif // __CS_ENGINE_H__

@@ -53,6 +53,13 @@ csReporter::csReporter (iBase *iParent)
 csReporter::~csReporter ()
 {
   Clear (-1);
+  int i;
+  while (listeners.Length () > 0)
+  {
+    iReporterListener* listener = (iReporterListener*)listeners[0];
+    listener->DecRef ();
+    listeners.Delete (0);
+  }
 }
 
 bool csReporter::Initialize (iSystem *system)
@@ -76,11 +83,26 @@ void csReporter::ReportV (int severity, const char* msgId,
   char buf[1024];
   vsprintf (buf, description, arg);
 
-  csReporterMessage* msg = new csReporterMessage ();
-  msg->severity = severity;
-  msg->id = csStrNew (msgId);
-  msg->description = csStrNew (buf);
-  messages.Push (msg);
+  bool add_msg = true;
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+  {
+    iReporterListener* listener = (iReporterListener*)listeners[i];
+    if (listener->Report (this, severity, msgId, buf))
+    {
+      add_msg = false;
+      break;
+    }
+  }
+
+  if (add_msg)
+  {
+    csReporterMessage* msg = new csReporterMessage ();
+    msg->severity = severity;
+    msg->id = csStrNew (msgId);
+    msg->description = csStrNew (buf);
+    messages.Push (msg);
+  }
 }
 
 void csReporter::Clear (int severity)
@@ -147,6 +169,28 @@ const char* csReporter::GetMessageDescription (int idx) const
   if (idx < 0 || idx >= messages.Length ()) return NULL;
   csReporterMessage* msg = (csReporterMessage*)messages[idx];
   return msg->description;
+}
+
+void csReporter::AddReporterListener (iReporterListener* listener)
+{
+  listeners.Push (listener);
+  listener->IncRef ();
+}
+
+void csReporter::RemoveReporterListener (iReporterListener* listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx != -1)
+  {
+    listeners.Delete (idx);
+    listener->DecRef ();
+  }
+}
+
+bool csReporter::FindReporterListener (iReporterListener* listener)
+{
+  int idx = listeners.Find (listener);
+  return idx != -1;
 }
 
 csReporterMessage::~csReporterMessage ()

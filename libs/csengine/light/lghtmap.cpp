@@ -329,7 +329,8 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
     }
     else
     {
-      CsPrintf (CS_MSG_WARNING, "Warning! Light (%ld) not found!\n", ls.light_id);
+      csEngine::current_engine->Warn (
+      	"Warning! Light (%ld) not found!\n", ls.light_id);
     }
     d += lm_size;
   }

@@ -222,7 +222,7 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* o = (iObject*)copy[i];
-      CsPrintf (CS_MSG_INTERNAL_ERROR, "\
+      csEngine::current_engine->ReportBug ("\
 There is still an object in the array after deleting region contents!\n\
 Object name is '%s'\n",
 	o->GetName () ? o->GetName () : "<NoName>");

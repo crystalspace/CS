@@ -93,10 +93,6 @@ void csRadElement::ComputePriority()
   // priority) are ignored.
   if(num_repeats > 5)
     total_unshot_light = 0.0;
-
-  //CsPrintf(CS_MSG_STDOUT, "RP %s, pri %g, area %g, sum %d, meanval %g ",
-  //  polygon->GetName(), total_unshot_light, area, sum, mean_lightval);
-  //CsPrintf(CS_MSG_STDOUT, "w %d, h %d, size %d\n", width, height, size);
 }
 
 bool csRadElement::DeltaIsZero(int suv, int w, int h)
@@ -777,14 +773,14 @@ csRadElement* csRadList :: PopHighest()
 
 static void print_func( csRadElement *e )
 {
-  CsPrintf(CS_MSG_STDOUT, "csRadList: csRadElement %x, pri %f \n",
+  csEngine::current_engine->Report ("csRadList: csRadElement %x, pri %f ",
     (int)e, e->GetPriority() );
 }
 
 void csRadList :: Print()
 {
   // for debug purposes
-  CsPrintf(CS_MSG_STDOUT, "csRadList Print().\n");
+  csEngine::current_engine->Report ("csRadList Print().");
 
   if (tree) 
   {
@@ -792,10 +788,10 @@ void csRadList :: Print()
   }
   else 
   {
-    CsPrintf(CS_MSG_STDOUT, "csRadList empty.\n");
+    csEngine::current_engine->Report ("csRadList empty.");
   }
 
-  CsPrintf(CS_MSG_STDOUT, "csRadList Print() end.\n");
+  csEngine::current_engine->Report ("csRadList Print() end.");
 }
 
 //--------------- csRadiosity --------------------------------------
@@ -814,7 +810,7 @@ csRadiosity :: csRadiosity(csEngine *current_engine)
 {
 //@@@ TEMPORARILY BROKEN!
 #if 0
-  CsPrintf (CS_MSG_INITIALIZATION, "\nPreparing radiosity...\n");
+  csEngine::current_engine->Report ("Preparing radiosity...");
   iterations = 0;
   engine = current_engine;
   meter = new csProgressMeter(engine->System, 1000);
@@ -933,7 +929,8 @@ bool csRadiosity :: DoRadiosityStep (int steps)
     steps--;
     iterations++;
     // shoot the light off of RadPoly.
-    CsPrintf(CS_MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
+    csEngine::current_engine->Report ("(priority at %f).",
+    	shoot->GetPriority() );
     // prepare to shoot from source (visibility, precompute, etc)
     PrepareShootSource(shoot);
 
@@ -957,9 +954,8 @@ void csRadiosity :: DoRadiosity()
 {
   csRadElement *shoot;
 
-  CsPrintf (CS_MSG_INITIALIZATION, "Calculating radiosity (%d lightmaps):\n",
+  csEngine::current_engine->Report ("Calculating radiosity (%d lightmaps).",
     list->GetElementCount());
-  CsPrintf(CS_MSG_INITIALIZATION, "  ");
   meter->Restart();
   shoot = list->PopHighest();
   if(shoot) {
@@ -976,7 +972,8 @@ void csRadiosity :: DoRadiosity()
   {
     iterations++;
     // shoot the light off of RadPoly.
-    CsPrintf(CS_MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
+    csEngine::current_engine->Report ("(priority at %f).",
+    	shoot->GetPriority() );
     pulse->Step();
     // prepare to shoot from source (visibility, precompute, etc)
     PrepareShootSource(shoot);
@@ -1028,9 +1025,6 @@ csRadElement* csRadiosity :: FetchNext()
 
   int ticks_now = QRound( val * meter->GetTotal());
   
-  //CsPrintf(CS_MSG_STDOUT, "New value %g, ticks at %d / %d\n",
-  //  val, ticks_now, meter->GetTotal());
-  
   while(meter->GetCurrent() < ticks_now)
   {
     meter->Step();
@@ -1069,8 +1063,7 @@ csRadElement* csRadiosity :: FetchNext()
       meter->Step();
     }
 
-    CsPrintf(CS_MSG_INITIALIZATION, "\n");
-    CsPrintf(CS_MSG_INITIALIZATION, "Finished radiosity (%s).\n", reason);
+    csEngine::current_engine->Report ("Finished radiosity (%s).", reason);
     
     if(element) list->InsertElement(element); // to prevent memory leak.
     
@@ -1318,8 +1311,8 @@ void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
 #if 1
   csRadPoly* rp_src = (csRadPoly*)shoot_src;
   csRadPoly* rp_dest = (csRadPoly*)dest;
-  CsPrintf(CS_MSG_STDOUT,
-        "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
+  csEngine::current_engine->Report (
+        "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).",
   	(int)shoot_src, rp_src->GetPolygon3D()->GetName(), 
 	rp_src->GetSector()->GetName(), 
 	shoot_src->GetSize(), 
@@ -1489,7 +1482,6 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   if(totalfactor < 0.0)
   {
-    //CsPrintf(CS_MSG_STDOUT, "totalfactor was %g\n", totalfactor);
     totalfactor = -totalfactor;
   }
 #if 1
@@ -1497,7 +1489,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   //if(totalfactor > 0.001f)
   if( (rand()%100000==0)
      ||(totalfactor > 10.0f) )
-    CsPrintf(CS_MSG_STDOUT, "totalfactor %g = "
+    csEngine::current_engine->Report ("totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
   	totalfactor, cossrcangle, cosdestangle,
@@ -1549,11 +1541,6 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   float gloss = static_specular_amount * 
     FastPow2(val, static_specular_tightness);
   
-#if 0
-    CsPrintf(CS_MSG_STDOUT, "Gloss %g, val=%g, reflect %g,%g,%g\n",
-      gloss, val, reflectdir.x, reflectdir.y, reflectdir.z);
-#endif
-
   // add delta using both gloss and totalfactor
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss*totalfactor,
   //  src_lumel_color);
@@ -1584,12 +1571,6 @@ static void calc_ambient_func(csRadElement *p)
   
   float red, green, blue;
   p->GetDeltaSums(red, green, blue);
-
-#if 0
-  CsPrintf(CS_MSG_STDOUT, "added %x (%g) delta %g, %g, %g.\n",
-   (int)p, p->GetPriority(),
-   red/ p->GetSize(), green/ p->GetSize(), blue/ p->GetSize());
-#endif
 
   total_delta_color_red += red * p->GetOneLumelArea() ;
   total_delta_color_green += green * p->GetOneLumelArea() ;
@@ -1649,7 +1630,7 @@ void csRadiosity :: ApplyDeltaAndAmbient()
   total_delta_color_blue *= mult;
 
   // add in the system ambient light settings.
-  CsPrintf(CS_MSG_INITIALIZATION, "Setting ambient (%g, %g, %g).\n",
+  csEngine::current_engine->Report ("Setting ambient (%g, %g, %g).",
    total_delta_color_red, total_delta_color_green, total_delta_color_blue);
 
   /// then apply ambient to deltamaps

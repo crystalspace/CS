@@ -29,6 +29,15 @@ The history order is reversed so that new features are at the top.
 	      set too low.
 	- Fixed texture mapping of one of the sides of the skybox in csdemo.
 	  Two weeks ago Norman changed this for some reason?
+	- Added iReporterListener interface. Added the notion of listeners
+	  to the reporter. You can now register listeners that will listen
+	  to new messages that arrive with the reporter. The listeners
+	  can handle that message and then let it be discarded.
+	- Changed the engine to use the reporter to tell about loading
+	  progress instead of using CsPrintf. Changed WalkTest to add a
+	  reporter listener which will listen to NOTIFY and WARNING messages
+	  and will display them immediatelly.
+	- Removed CsPrintf() in engine.
 	- Eric Sunshine removed a bunch of Glide references from documentation,
 	  sources, headers, and makefiles.
 4-Jul-2001

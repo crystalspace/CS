@@ -22,6 +22,8 @@
 #include <stdarg.h>
 #include "csutil/scf.h"
 
+struct iReporter;
+
 /**
  * Severity level for iReporter: BUG severity level.
  * This is the worst thing that can happen. It means that some code
@@ -48,8 +50,24 @@
  */
 #define CS_REPORTER_SEVERITY_NOTIFY 3
 
+SCF_VERSION (iReporterListener, 0, 0, 1);
 
-SCF_VERSION (iReporter, 0, 0, 1);
+/**
+ * Implement this interface if you're interested in hearing about
+ * new messages on the reporter.
+ */
+struct iReporterListener : public iBase
+{
+  /**
+   * Something has been reported. If this function returns true
+   * then the report is considered handled and the reporter will not
+   * add it anymore.
+   */
+  virtual bool Report (iReporter* reporter, int severity, const char* msgId,
+  	const char* description) = 0;
+};
+
+SCF_VERSION (iReporter, 0, 0, 2);
 
 /**
  * This is the interface for the error/message reporter plugin.
@@ -104,6 +122,27 @@ struct iReporter : public iBase
    * Get message description. Returns NULL if message doesn't exist.
    */
   virtual const char* GetMessageDescription (int idx) const = 0;
+
+  /**
+   * Add a listener that listens to new reports. Listeners can optionally
+   * remove reports too. This function does not check if the listener
+   * is already there and will add it again if so. The listener will be
+   * IncRef()'ed by this function.
+   */
+  virtual void AddReporterListener (iReporterListener* listener) = 0;
+
+  /**
+   * Remove a listener once. The listener will be DecRef()'ed by this function.
+   * If the listener is on the list multiple times only one occurance
+   * is removed. If the listener cannot be found on the list no DecRef()
+   * will happen.
+   */
+  virtual void RemoveReporterListener (iReporterListener* listener) = 0;
+
+  /**
+   * Check if the listener is already on the list.
+   */
+  virtual bool FindReporterListener (iReporterListener* listener) = 0;
 };
 
 #endif // __IVARIA_REPORTER_H__

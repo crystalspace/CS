@@ -46,6 +46,7 @@ class csReporter : public iReporter
 private:
   iSystem *System;
   csVector messages;
+  csVector listeners;
 
 public:
   SCF_DECLARE_IBASE;
@@ -64,6 +65,9 @@ public:
   virtual int GetMessageSeverity (int idx) const;
   virtual const char* GetMessageId (int idx) const;
   virtual const char* GetMessageDescription (int idx) const;
+  virtual void AddReporterListener (iReporterListener* listener);
+  virtual void RemoveReporterListener (iReporterListener* listener);
+  virtual bool FindReporterListener (iReporterListener* listener);
 
   struct eiPlugin : public iPlugin
   {

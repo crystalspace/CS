@@ -471,7 +471,7 @@ void csThing::BuildStaticTree (int mode)
   if (!csEngine::do_force_revis && w->VFS->Exists ((const char*)str))
   {
     recalc_octree = false;
-    CsPrintf (CS_MSG_INITIALIZATION, "Loading bsp/octree...\n");
+    csEngine::current_engine->Report ("Loading bsp/octree...");
     recalc_octree = !((csOctree*)static_tree)->ReadFromCache (
     	w->VFS, (const char*)str, GetPolygonArray ().GetArray (),
 	GetPolygonArray ().Length ());
@@ -483,19 +483,17 @@ void csThing::BuildStaticTree (int mode)
   }
   if (recalc_octree)
   {
-    CsPrintf (CS_MSG_INITIALIZATION, "Calculate bsp/octree...\n");
+    csEngine::current_engine->Report ("Calculate bsp/octree...");
     static_tree->Build (GetPolygonArray ());
-    CsPrintf (CS_MSG_INITIALIZATION, "Caching bsp/octree...\n");
+    csEngine::current_engine->Report ("Caching bsp/octree...");
     ((csOctree*)static_tree)->Cache (w->VFS, (const char*)str);
   }
-  CsPrintf (CS_MSG_INITIALIZATION, "Compress vertices...\n");
+  csEngine::current_engine->Report ("Compress vertices...");
   CompressVertices ();
-  CsPrintf (CS_MSG_INITIALIZATION, "Build vertex tables...\n");
+  csEngine::current_engine->Report ("Build vertex tables...");
   ((csOctree*)static_tree)->BuildVertexTables ();
 
   static_tree->Statistics ();
-
-  CsPrintf (CS_MSG_INITIALIZATION, "DONE!\n");
 }
 
 csPolygonInt* csThing::GetPolygonInt (int idx)
@@ -1337,7 +1335,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     mesh.use_vertex_color = gouraud;
     if (mesh.mat_handle == NULL)
     {
-      CsPrintf (CS_MSG_STDOUT, "Warning! Curve without material!\n");
+      csEngine::current_engine->Warn ("Warning! Curve without material!");
       continue;
     }
     rview->CalculateFogMesh (obj_cam, mesh);
