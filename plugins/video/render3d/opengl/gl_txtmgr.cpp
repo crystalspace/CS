@@ -470,7 +470,6 @@ void csGLTextureHandle::Prepare ()
   // Determine the format and type of the source we gonna tranform the data to.
   FindFormatType ();
   CreateMipMaps ();
-
 }
 
 void csGLTextureHandle::AdjustSizePo2 ()
@@ -888,6 +887,8 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
   verbose = false;
+
+  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
   pfmt = *iG2D->GetPixelFormat ();
 
