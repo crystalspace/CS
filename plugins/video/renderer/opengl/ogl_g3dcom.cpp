@@ -123,6 +123,7 @@ static const double FOGTABLE_DISTANCESCALE = 1.0 / FOGTABLE_MAXDISTANCE;
 // like clamping textures so we must do it ourself
 static const double FOGTABLE_CLAMPVALUE = 0.85;
 
+static const double FOG_MAXVALUE = FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE;
 /*=========================================================================
  Static growing array declaration for DrawTriangleMesh
 =========================================================================*/
@@ -1272,7 +1273,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     return;
   }
 
-  int i;
+  int i,k;
 
   // Update work tables.
   if (mesh.num_vertices > tr_verts.Limit ())
@@ -1357,16 +1358,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     // to an OpenGL reference for good insight into proper manipulation
     // of the modelview matrix.
 
-    csMatrix3 orientation = o2c.GetO2T();
+    const csMatrix3 &orientation = o2c.GetO2T();
     
-    // this zeroing is probably not needed, but I'm playing it safe in case
-    // this code is changed later... GJH
-    for (i=0; i<16; i++) matrixholder[i] = 0.0;
-
-    matrixholder[0] = 1.0;
-    matrixholder[5] = 1.0;
-    matrixholder[10] = 1.0;
-
     matrixholder[0] = orientation.m11;
     matrixholder[1] = orientation.m21;
     matrixholder[2] = orientation.m31;
@@ -1379,9 +1372,13 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     matrixholder[9] = orientation.m23;
     matrixholder[10] = orientation.m33;
 
+
+    matrixholder[3] = matrixholder[7] = matrixholder[11] = 
+    matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
+
     matrixholder[15] = 1.0;
 
-    csVector3 translation = o2c.GetO2TTranslation();
+    const csVector3 &translation = o2c.GetO2TTranslation();
 
     glMultMatrixf(matrixholder);
 
@@ -1412,19 +1409,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   for (i = 0 ; i < 16 ; i++)
     matrixholder[i] = 0.0;
   
-  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
+  matrixholder[0] = matrixholder[5] = 1.0;
   
-  matrixholder[10] = 0.0;
   matrixholder[11] = +1.0/aspect;
-  matrixholder[14] = -1.0/aspect;
-  matrixholder[15] = 0.0;
+  matrixholder[14] = -matrixholder[11];
 
   glMultMatrixf(matrixholder);
-
-  // Fill flat color if renderer decide to paint it flat-shaded
-  G3DPolygonDPFX poly;
-  mesh.mat_handle[0]->GetTexture ()->GetMeanColor (poly.flat_color_r,
-    poly.flat_color_g, poly.flat_color_b);
 
   if (mesh.do_fog)
   {
@@ -1432,7 +1422,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       // specify fog vertex transparency
       float I = mesh.vertex_fog[i].intensity;
-      if (I > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
+      if (I > FOG_MAXVALUE)
       	I = FOGTABLE_CLAMPVALUE;
       else
 	I = I * FOGTABLE_DISTANCESCALE;
@@ -1448,14 +1438,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   csTriangle *triangles = mesh.triangles;
 
-  float flat_r = 1., flat_g = 1., flat_b = 1.;
-  if (!m_textured)
-  {
-    flat_r = poly.flat_color_r / 255.;
-    flat_g = poly.flat_color_g / 255.;
-    flat_b = poly.flat_color_b / 255.;
-  }
-
   // Draw all triangles.
   StartPolygonFX (mesh.mat_handle[0], mesh.fxmode);
 
@@ -1466,12 +1448,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     // special hack for transparent meshes
     if (mesh.fxmode & CS_FX_ALPHA)
     {
-      for (i=0; i<mesh.num_vertices; i++)
+      for (k=0, i=0; i<mesh.num_vertices; i++)
       {
-        rgba_verts[i*4  ] = work_colors[i].red;
-        rgba_verts[i*4+1] = work_colors[i].green;
-        rgba_verts[i*4+2] = work_colors[i].blue;
-	rgba_verts[i*4+3] = m_alpha;
+        rgba_verts[k++] = work_colors[i].red;
+        rgba_verts[k++] = work_colors[i].green;
+        rgba_verts[k++] = work_colors[i].blue;
+	rgba_verts[k++] = m_alpha;
       }
       glColorPointer(4, GL_FLOAT, 0, &rgba_verts[0]);
     }
@@ -1481,8 +1463,20 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
   }
   else
+  {
+    float flat_r = 1., flat_g = 1., flat_b = 1.;
+    if (!m_textured)
+    {
+      // Fill flat color if renderer decide to paint it flat-shaded
+      UByte r,g,b;
+      mesh.mat_handle[0]->GetTexture ()->GetMeanColor (r, g, b);
+      flat_r = float(r) / 255.;
+      flat_g = float(g) / 255.;
+      flat_b = float(b) / 255.;
+    }
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
-
+  }
+  
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glVertexPointer(3, GL_FLOAT, 0, & work_verts[0]);
@@ -1524,7 +1518,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       glShadeModel (GL_FLAT);
   }
 
-  if (m_gouraud)
+  if (m_gouraud && work_colors)
   {
     glDisableClientState(GL_COLOR_ARRAY);
   }
