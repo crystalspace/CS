@@ -76,7 +76,7 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
     return 1;
   }
 
-  printf("\nmap2cs version 0.97\n");
+  printf("\nmap2cs version " CS_VERSION "\n");
   printf("Copyright (C) 1999-2003 by Thomas Hieber and others\n");
   printf("CrystalSpace version " CS_VERSION "\n");
   printf("Copyright (C) 1999-2003 by Jorrit Tyberghein and others\n\n");

@@ -144,7 +144,8 @@ void CCSWorld::GenerateDefaultsector()
   m_Sectors.Push(pSector);
 }
 
-bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*sourcename*/)
+bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap,
+  const char * /*sourcename*/)
 {
   if (!PrepareData(TEMPWORLD, pMap)) return false;
 
@@ -155,7 +156,7 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   struct tm *now = localtime (&Time);
   char buf[128];
 
-  sprintf (buf, " Created by map2cs 0.97 on "
+  sprintf (buf, " Created by map2cs " CS_VERSION " on "
     "%04d-%02d-%02d %02d:%02d:%02d ", now->tm_year+1900, 
     now->tm_mon, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 
@@ -255,8 +256,8 @@ CMapEntity* CCSWorld::GetWorldspawn()
 
 bool CCSWorld::NeedSkysector()
 {
-  // in future, this should be more elaborate: it should check all polygons, and
-  // return only true, if there is at least one portal to the skysector.
+  // in future, this should be more elaborate: it should check all polygons,
+  // and return only true, if there is at least one portal to the skysector.
   return true;
 }
 
@@ -294,10 +295,10 @@ void CCSWorld::WriteSkysector(csRef<iDocumentNode> node)
   CMapEntity* pEntity = GetWorldspawn();
   if (!pEntity) return;
 
-  // Only write a skydome, if there has been specified a skysector in the mapfile.
-  // There will likely be problems, if you are using sky-portals, but didn't specify
-  // a skysector. (to handle this correctly, you should check if there is a skysector,
-  // when writing portals to it.)
+  // Only write a skydome, if there has been specified a skysector in the
+  // mapfile.  There will likely be problems, if you are using sky-portals, but
+  // didn't specify a skysector.  (to handle this correctly, you should check
+  // if there is a skysector, when writing portals to it.)
   if (pEntity->GetValueOfKey("skybox") ||
       pEntity->GetValueOfKey("skydome"))
   {
@@ -348,16 +349,21 @@ void CCSWorld::WriteSkydome(csRef<iDocumentNode> node)
   
   WriteIndent();
   //fprintf(m_fd, "CIRCLE (0,0,0:%g,0,%g,-12)\n", DomeRadius, DomeRadius);
-  fprintf(m_fd, "<circle>0,0,0:%g,0,%g,-12</circle>\n", DomeRadius, DomeRadius);
+  fprintf(m_fd,
+    "<circle>0,0,0:%g,0,%g,-12</circle>\n", DomeRadius, DomeRadius);
   WriteIndent();
-  fprintf(m_fd, "<material>%s</material><texlen>1</texlen>\n", pTexture->GetTexturename());
+  fprintf(m_fd,
+    "<material>%s</material><texlen>1</texlen>\n", pTexture->GetTexturename());
   WriteIndent();
   // appears to be unsupported now...
-  fprintf(m_fd, "<skydome name=\"up\"><lighting>NO</lighting><radius>%g</radius> "
-                "<vertices>0,1,2,3,4,5,6,7,8,9,10,11</vertices></skydome>\n", DomeRadius);
+  fprintf(m_fd,
+    "<skydome name=\"up\"><lighting>NO</lighting><radius>%g</radius> "
+    "<vertices>0,1,2,3,4,5,6,7,8,9,10,11</vertices></skydome>\n", DomeRadius);
   WriteIndent();
-  fprintf(m_fd, "<skydome name=\"down\"><lighting>NO</lighting><radius>%g</radius> "
-                "<vertices>0,11,10,9,8,7,6,5,4,3,2,1</vertices></skydome>\n", -DomeRadius);*/
+  fprintf(m_fd,
+    "<skydome name=\"down\"><lighting>NO</lighting><radius>%g</radius> "
+    "<vertices>0,11,10,9,8,7,6,5,4,3,2,1</vertices></skydome>\n", -DomeRadius);
+*/
 }
 
 void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
@@ -402,8 +408,8 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     sprintf(name, "%s_%s", BoxName, ThingSides[s].ext);
     ThingSides[s].pTex = pTexMan->GetTexture(name);
 
-    smallest_size = MIN (smallest_size, ThingSides[s].pTex->GetOriginalWidth());
-    smallest_size = MIN (smallest_size, ThingSides[s].pTex->GetOriginalHeight());
+    smallest_size = MIN(smallest_size,ThingSides[s].pTex->GetOriginalWidth());
+    smallest_size = MIN(smallest_size,ThingSides[s].pTex->GetOriginalHeight());
   }
  
   for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
@@ -454,13 +460,14 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
 void CCSWorld::FindAdditionalTextures()
 {
   // Thomas Hieber, 16.05.2001:
-  // Please don't ask me about this function. I didn't create it, nor do I know the
-  // deeper truth about it. All it did was to move the code to a separate function
-  // for better maintainablility. (And I have made the textures really register with
-  // the texture manager, which should really help to get the textures in the zip
-  // file, if map2cs can find them. Also it makes handling of materials much easier,
-  // because I don't have to skip through all entities twice, and it avoids adding
-  // some textures multiple times with the same name.)
+  // Please don't ask me about this function.  I didn't create it, nor do I
+  // know the deeper truth about it.  All I did was to move the code to a
+  // separate function for better maintainablility.  (And I have made the
+  // textures really register with the texture manager, which should really
+  // help to get the textures in the zip file, if map2cs can find them.  Also
+  // it makes handling of materials much easier, because I don't have to skip
+  // through all entities twice, and it avoids adding some textures multiple
+  // times with the same name.)
 
   int j=0;
 
@@ -476,7 +483,8 @@ void CCSWorld::FindAdditionalTextures()
 
         // the texture manager will create a new texture for us, if the given
         // texture is missing
-        CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(basename);
+        CTextureFile* pTexture =
+	  m_pMap->GetTextureManager()->GetTexture(basename);
         assert(pTexture);
 
         const char* keycolor = pEntity->GetValueOfKey("keycolor", "");
@@ -512,7 +520,8 @@ void CCSWorld::FindAdditionalTextures()
         {
           if (pEntity->GetValueOfKey("texture"))
           {
-            CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(modelnamevalue);
+            CTextureFile* pTexture =
+	      m_pMap->GetTextureManager()->GetTexture(modelnamevalue);
             assert(pTexture);
 
             char name[255];
@@ -589,7 +598,8 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
       
       DocNode texture = CreateNode (textures, "texture");
       texture->SetAttribute ("name", pTexture->GetTexturename());
-      CreateNode (texture, "file", newtexfile?newtexfile:pTexture->GetFilename());
+      CreateNode (texture, "file", 
+        newtexfile ? newtexfile : pTexture->GetFilename());
 
       if (pTexture->IsColorKeyed())
       {
@@ -637,12 +647,14 @@ bool CCSWorld::WritePlugins(csRef<iDocumentNode> node)
   DocNode plugin;
   plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.thing");
   plugin->SetAttribute ("name", "thing");
-  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.factory.thing");
+  plugin = CreateNode (plugins, "plugin",
+    "crystalspace.mesh.loader.factory.thing");
   plugin->SetAttribute ("name", "thingFact");
 
   plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.bezier");
   plugin->SetAttribute ("name", "bezier");
-  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.factory.bezier");
+  plugin = CreateNode (plugins, "plugin",
+    "crystalspace.mesh.loader.factory.bezier");
   plugin->SetAttribute ("name", "bezierFact");
 
   return true;
@@ -990,7 +1002,8 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
 
     if (Mirror || !Solid)
     {
-      //We have a special case, where we need to turn this polygon into a portal.
+      // We have a special case, where we need to turn this polygon into a
+      // portal.
       const char* targetsector =
         pEntity->GetValueOfKey("targetsector", pSector->GetName());
 
