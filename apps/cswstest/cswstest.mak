@@ -31,7 +31,7 @@ CSWSTEST.EXE = cswstest$(EXE)
 INC.CSWSTEST = $(wildcard apps/cswstest/*.h)
 SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp)
 OBJ.CSWSTEST = $(addprefix $(OUT),$(notdir $(SRC.CSWSTEST:.cpp=$O)))
-DEP.CSWSTEST = CSWS CSGEOM CSSYS CSGEOM CSUTIL CSFX
+DEP.CSWSTEST = CSWS CSGFX CSGEOM CSSYS CSGEOM CSUTIL CSFX
 LIB.CSWSTEST = $(foreach d,$(DEP.CSWSTEST),$($d.LIB))
 CFG.CSWSTEST = data/config/cswstest.cfg
 

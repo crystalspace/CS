@@ -78,6 +78,13 @@ The history order has been reversed so that new features are at the top.
 	  function protyptes as well.
 	- Eric Sunshine added missing CSGFX dependency to blocks.mak.
 	- Eric Sunshine added missing CSGFX dependency to cctest.mak.
+	- Eric Sunshine added missing CSGFX dependency to csfedit.mak.
+	- Eric Sunshine added missing CSGFX dependency to cswstest.mak.
+	- Eric Sunshine added missing CSGFX dependency to map2cs.mak.  Also
+	  worked around circular reference problem at link time between cssys
+	  and csutil.
+	- Eric Sunshine added missing CSGFX dependency to meta.mak.
+	- Eric Sunshine added missing CSGFX dependency to squawk.mak.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works again.
