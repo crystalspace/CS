@@ -31,12 +31,10 @@
 
 #define PRINTF printf
 
-class csException;
-
 #ifndef NO_EXCEPTIONS
 #define csTHROW(Exception) { throw csException Exception; }
 #else
-#define csTHROW(Exception) { PRINTF((csException Exception).GetMessage()); cleanup(); fatal_exit(0, false); }
+#define csTHROW(Exception) { PRINTF((csException Exception).GetMessage()); exit(1); }
 #endif
 
 #ifndef CHK
@@ -50,6 +48,19 @@ class csException;
 
 #define csSTR csString
 #define csCSTR const csSTR
+
+class csString;
+
+class csException {
+public:
+	const char* Error, *Hint;
+	unsigned long int ErrorVal;
+
+	csException(const char* tError, const char* tHint="", unsigned long int tErrorVal=0)
+		:Error(tError), Hint(tHint), ErrorVal(tErrorVal) {}
+
+	const char* GetMessage();
+};
 
 #ifndef NO_STRING_COM
 #include "cscom/com.h"
@@ -142,21 +153,21 @@ public:
 
 	void SetAt(csSize Pos, const DATA& NewData) { 
 		if(Pos>Size)
-			csTHROW_RANGE("SetAt Past End");
+			csTHROW(("csString: SetAt Past End"));
 
 		Data[Pos]=NewData;
 	}
 
 	DATA& GetAt(csSize Pos) {
 		if(Pos>Size)
-			csTHROW_RANGE("SetAt Past End");
+			csTHROW(("csString: GetAt Past End"));
 
 		return Data[Pos];
 	}
 
 	const DATA& GetAt(csSize Pos) const {
 		if(Pos>Size)
-			csTHROW_RANGE("SetAt Past End");
+			csTHROW(("csString: Overwrite Past End"));
 
 		return Data[Pos];
 	}
@@ -169,7 +180,7 @@ public:
 		}
 
 		if(Pos>Size)
-			csTHROW_RANGE("Insert Past End");
+			csTHROW(("csString: Insert Past End"));
 
 		DATA *Old=Data;
 		csSize NewSize=Size+op.Length()+1;
@@ -193,7 +204,7 @@ public:
 			Append(op);
 			
 		if(Pos>Size)
-			csTHROW_RANGE("Overwrite Past End");
+			csTHROW(("csString: Overwrite Past End"));
 
 		DATA *Old=Data;
 		csSize NewSize=Pos+MAX(Size-Pos, op.Length())+1;
@@ -321,41 +332,18 @@ inline csSTR IntToStr(unsigned long int Value) {
 	return str;
 }
 
-/*
-inline csSTR WideToStr(const unsigned short* str, int n) {
-	csSTR out;
-	out.SetSize(n);
-  wcstombs(out, (const __wchar_t*)str, n);
-	return out;
-}
+inline const char* csException::GetMessage() {
+	csSTR Msg("Exception: ");
+	Msg+=Error;
 
-inline csSTR GuidToStr(const GUID& guid) {
-	unsigned short wszGUID[41];
-  StringFromGUID2(guid, wszGUID, 40);
-	return WideToStr(wszGUID, 40);
-}
-*/
+	if(strlen(Hint))
+		Msg+=csSTR("\nHint: ")+Hint;
 
-class csException {
-public:
-	csSTR Error, Hint;
-	INT64 ErrorVal;
+	if(ErrorVal)
+		Msg+=csSTR("\nErrorValue: ")+IntToStr(ErrorVal);
 
-	csException(const char* tError, const char* tHint="", INT64 tErrorVal=0)
-		:Error(tError), Hint(tHint), ErrorVal(tErrorVal) {}
+	return Msg.GetData();
+}	
 
-	csSTR GetMessage() {
-		csSTR Msg("Exception: ");
-		Msg+=Error;
-
-		if(!Hint.IsNull())
-			Msg+="\nHint: "+Hint;
-
-		if(ErrorVal)
-			Msg+="\nErrorValue: "+IntToStr(ErrorVal);
-
-		return Msg;
-	}	
-};
 
 #endif
