@@ -31,6 +31,7 @@ The history order is reversed so that new features are at the top.
 	    iXmlDocument -> iDocument
 	    iXmlAttributeIterator -> iDocumentAttributeIterator
 	    iXmlNodeIterator -> iDocumentNodeIterator
+	    csTinyXmlSystem -> csTinyDocumentSystem
 	- Renamed iutil/xml.h to iutil/document.h.
 12-Aug-2002
 	- Renamed the XML version of ParseTexture() to ParseTextureMapping()
