@@ -47,6 +47,7 @@ chronological order.
 	  invoked.
 	- Eric Sunshine merged the csappframe library into cstool. Also updated
 	  out-of-date documentation csApplicationFramework documentation.
+	- res added some more documentation to ivideo/rendermesh.h.
 6-May-2004
 	- res fixed the NR GL renderer to handle resize events.
 	- res fixed texture downsampling in the NR GL renderer. It could 

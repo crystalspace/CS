@@ -21,12 +21,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __CS_IVIDEO_RENDERMESH_H__
 
 /** \file 
-* Rendermesh interface
-*/
+ * Rendermesh interface
+ */
 
 /**
-* \addtogroup gfx3d
-* @{ */
+ * \addtogroup gfx3d
+ * @{ */
 
 #include "csutil/strset.h"
 #include "csutil/ref.h"
@@ -44,6 +44,12 @@ struct iMaterialWrapper;
 struct iMeshFactory;
 struct iPortalContainer;
 
+/**
+ * Mesh render mode information. Contains the Z, mix and alpha modes to use
+ * for rendering a mesh. 
+ * \remarks Is separate from csCoreRenderMesh to allow preprocessing steps 
+ *  to modify the mode data. 
+ */
 struct csRenderMeshModes
 {
   csRenderMeshModes ()
@@ -134,6 +140,10 @@ struct csCoreRenderMesh
   iMaterialWrapper* material;
 };
 
+/**
+ * Mesh data as returned by mesh plugins. Contains both the data needed for
+ * rendering as well as some additional data for preprocessing.
+ */
 struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
 {
   csRenderMesh () 
@@ -141,8 +151,6 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
     portal = 0;
     geometryInstance = 0;
     lastFrame = ~0;
-    
-    db_mesh_name = "<unknown>";
   }
 
   ~csRenderMesh () {}
