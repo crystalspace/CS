@@ -73,7 +73,7 @@ SCF_INTERFACE (iBase, 0, 0, 1)
  * to declare the minimal functionality required by iBase interface
  */
 #define DECLARE_IBASE							\
-  DECLARE_EMBEDDED_IBASE (iBase);
+  DECLARE_EMBEDDED_IBASE (iBase)
 
 /**
  * DECLARE_EMBEDDED_IBASE is used to declare the methods of iBase inside

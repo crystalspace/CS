@@ -29,7 +29,7 @@ class scfStrVector : public iStrVector
   csStrVector *v;
 
 public:
-  DECLARE_IBASE
+  DECLARE_IBASE;
 
   /// Create a iStrVector from scratch
   scfStrVector (int iLimit = 16, int iDelta = 16);
