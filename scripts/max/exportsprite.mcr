@@ -59,7 +59,8 @@ rollout Test1 "Export Sprite to CS" width:238 height:345
 
 	on Test1 open do
 	(
-	   edt3.text = "D:\\Luca\\char"
+	   name = selection[1].name
+	   edt3.text = "d:\\Luca\\"+name+".spr"
 	   
 	   edtScale.text = "1"
 	   
@@ -125,7 +126,7 @@ rollout Test1 "Export Sprite to CS" width:238 height:345
 		-- ////////////////////////
 		
 			-- identify main sprite object
-			obj=objects[1]
+			obj=selection[1]
 			objectname = obj.name
 			image = obj.material.maps[2].filename
 			indx = tokenize image "\\"

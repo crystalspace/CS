@@ -26,6 +26,8 @@ count = 0;
 
 tot = objects.count
 longmessage = ""
+message = ""
+unweld = false
 
 for i = 1 to tot do
 (
@@ -38,6 +40,10 @@ for i = 1 to tot do
 
 	format "analizying object % \n" obj.name
 
+	if (obj.numfaces==0) then (
+		format "Object % has 0 faces! \n" obj.name
+		longmessage = longmessage + obj.name + " has 0 faces!\n"
+	)
 
 	for i = 1 to obj.numfaces do 
 	(
@@ -105,6 +111,18 @@ for i = 1 to tot do
 			)
 		)
 
+	) -- end for numfaces
+
+	verts = getNumVerts obj
+	uvVerts = getNumTVerts obj
+	format "% % \n" verts uvVerts
+	if (uvVerts>verts) then (
+	  if (unweld==false) then (
+	    unweld=true
+		longmessage = longmessage + "You have a number of unwelded UV vertexes on object: "+obj.name
+	  ) else (
+	    longmessage = longmessage + ", " +obj.name
+	  )
 	)
 )
 
