@@ -25,17 +25,29 @@ distribution.
 #include "cssysdef.h"
 #include <ctype.h>
 #include "tinyxml.h"
+#include "csutil/scfstr.h"
+
+const char* TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
+{
+  "No error",
+  "Error",
+  "Failed to open file",
+  "Memory allocation failed.",
+  "Error parsing Element.",
+  "Failed to read Element name",
+  "Error reading Element value.",
+  "Error reading Attributes.",
+  "Error: empty tag.",
+  "Error reading end tag.",
+  "Error parsing Unknown.",
+  "Error parsing Comment.",
+  "Error parsing Declaration.",
+  "Error document empty."
+};
 
 bool TiXmlBase::condenseWhiteSpace = true;
 
-void TiXmlBase::PutString( const TIXML_STRING& str, TIXML_OSTREAM* stream )
-{
-  TIXML_STRING buffer;
-  PutString( str, &buffer );
-  (*stream) << buffer;
-}
-
-void TiXmlBase::PutString( const TIXML_STRING& str, TIXML_STRING* outString )
+void TiXmlBase::PutString( const TiXmlString& str, TiXmlString* outString )
 {
   int i=0;
 
@@ -101,24 +113,6 @@ void TiXmlBase::PutString( const TIXML_STRING& str, TIXML_STRING* outString )
     }
   }
 }
-
-
-// <-- Strange class for a bug fix. Search for STL_STRING_BUG
-TiXmlBase::StringToBuffer::StringToBuffer( const TIXML_STRING& str )
-{
-  buffer = new char[ str.length()+1 ];
-  if ( buffer )
-  {
-    strcpy( buffer, str.c_str() );
-  }
-}
-
-
-TiXmlBase::StringToBuffer::~StringToBuffer()
-{
-  delete [] buffer;
-}
-// End strange bug fix. -->
 
 
 TiDocumentNode::TiDocumentNode( )
@@ -188,31 +182,19 @@ TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document, const ch
 
   if ( StringEqual( p, xmlHeader) )
   {
-    #ifdef DEBUG_PARSER
-      TIXML_LOG( "XML parsing Declaration\n" );
-    #endif
     returnNode = new TiXmlDeclaration();
   }
   else if (    isalpha( *(p+1) )
         || *(p+1) == '_' )
   {
-    #ifdef DEBUG_PARSER
-      TIXML_LOG( "XML parsing Element\n" );
-    #endif
     returnNode = document->blk_element.Alloc ();
   }
   else if ( StringEqual ( p, commentHeader) )
   {
-    #ifdef DEBUG_PARSER
-      TIXML_LOG( "XML parsing Comment\n" );
-    #endif
     returnNode = new TiXmlComment();
   }
   else
   {
-    #ifdef DEBUG_PARSER
-      TIXML_LOG( "XML parsing Unknown\n" );
-    #endif
     returnNode = new TiXmlUnknown();
   }
 
@@ -295,7 +277,7 @@ TiDocumentNode* TiDocumentNodeChildren::InsertEndChild( const TiDocumentNode& ad
 
 
 TiDocumentNode* TiDocumentNodeChildren::InsertBeforeChild(
-	TiDocumentNode* beforeThis, const TiDocumentNode& addThis )
+  TiDocumentNode* beforeThis, const TiDocumentNode& addThis )
 {  
   if ( !beforeThis || beforeThis->parent != this )
     return 0;
@@ -322,7 +304,7 @@ TiDocumentNode* TiDocumentNodeChildren::InsertBeforeChild(
 
 
 TiDocumentNode* TiDocumentNodeChildren::InsertAfterChild(
-	TiDocumentNode* afterThis, const TiDocumentNode& addThis )
+  TiDocumentNode* afterThis, const TiDocumentNode& addThis )
 {
   if ( !afterThis || afterThis->parent != this )
     return 0;
@@ -426,7 +408,7 @@ TiDocumentNode* TiDocumentNodeChildren::LastChild( const char * value ) const
 }
 
 TiDocumentNode* TiDocumentNodeChildren::IterateChildren(
-	TiDocumentNode* previous ) const
+  TiDocumentNode* previous ) const
 {
   if ( !previous )
   {
@@ -439,7 +421,7 @@ TiDocumentNode* TiDocumentNodeChildren::IterateChildren(
 }
 
 TiDocumentNode* TiDocumentNodeChildren::IterateChildren(
-	const char * val, TiDocumentNode* previous ) const
+  const char * val, TiDocumentNode* previous ) const
 {
   if ( !previous )
   {
@@ -464,7 +446,7 @@ TiXmlElement* TiDocumentNodeChildren::FirstChildElement() const
 }
 
 TiXmlElement* TiDocumentNodeChildren::FirstChildElement(
-	const char * value ) const
+  const char * value ) const
 {
   TiDocumentNode* node;
 
@@ -615,20 +597,36 @@ void TiXmlElement::SetAttribute (TiDocument* document,
   GetAttributeRegistered (reg_name).SetValue (value);
 }
 
-void TiXmlElement::Print( FILE* cfile, int depth ) const
+static void StrPrintf (iString* file, const char* msg, ...)
+{
+  scfString str;
+  va_list args;
+  va_start (args, msg);
+  str.FormatV (msg, args);
+  va_end (args);
+  file->SetGrowsExponentially(true);
+  file->Append (str);
+}
+
+static void StrPuts (const char* msg, iString* file)
+{
+  file->Append (msg);
+}
+
+void TiXmlElement::Print( iString* cfile, int depth ) const
 {
   int i;
   for ( i=0; i<depth; i++ )
   {
-    fprintf( cfile, "    " );
+    StrPrintf ( cfile, "    " );
   }
 
-  fprintf( cfile, "<%s", value );
+  StrPrintf ( cfile, "<%s", value );
 
   for (i = 0 ; i < attributeSet.set.Length () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
-    fprintf( cfile, " " );
+    StrPrintf ( cfile, " " );
     attrib.Print( cfile, depth );
   }
 
@@ -639,61 +637,30 @@ void TiXmlElement::Print( FILE* cfile, int depth ) const
   TiDocumentNode* node;
   if ( !firstChild )
   {
-    fprintf( cfile, " />" );
+    StrPrintf ( cfile, " />" );
   }
   else if ( firstChild == lastChild && firstChild->ToText() )
   {
-    fprintf( cfile, ">" );
+    StrPrintf ( cfile, ">" );
     firstChild->Print( cfile, depth + 1 );
-    fprintf( cfile, "</%s>", value );
+    StrPrintf ( cfile, "</%s>", value );
   }
   else
   {
-    fprintf( cfile, ">" );
+    StrPrintf ( cfile, ">" );
 
     for ( node = firstChild; node; node=node->NextSibling() )
     {
       if ( !node->ToText() )
       {
-        fprintf( cfile, "\n" );
+        StrPrintf ( cfile, "\n" );
       }
       node->Print( cfile, depth+1 );
     }
-    fprintf( cfile, "\n" );
+    StrPrintf ( cfile, "\n" );
     for( i=0; i<depth; ++i )
-    fprintf( cfile, "    " );
-    fprintf( cfile, "</%s>", value );
-  }
-}
-
-void TiXmlElement::StreamOut( TIXML_OSTREAM * stream ) const
-{
-  (*stream) << "<" << value;
-
-  int i;
-  for (i = 0 ; i < attributeSet.set.Length () ; i++)
-  {
-    const TiDocumentAttribute& attrib = attributeSet.set[i];
-    (*stream) << " ";
-    attrib.StreamOut( stream );
-  }
-
-  // If this node has children, give it a closing tag. Else
-  // make it an empty tag.
-  TiDocumentNode* node;
-  if ( firstChild )
-  {     
-    (*stream) << ">";
-
-    for ( node = firstChild; node; node=node->NextSibling() )
-    {
-      node->StreamOut( stream );
-    }
-    (*stream) << "</" << value << ">";
-  }
-  else
-  {
-    (*stream) << " />";
+    StrPrintf ( cfile, "    " );
+    StrPrintf ( cfile, "</%s>", value );
   }
 }
 
@@ -725,9 +692,9 @@ TiDocumentNode* TiXmlElement::Clone(TiDocument* document) const
 
 
 TiDocument::TiDocument() :
-	strings (3541),
-	blk_element (1000),
-	blk_text (1000)
+  strings (3541),
+  blk_element (1000),
+  blk_text (1000)
 {
   error = false;
   //  ignoreWhiteSpace = true;
@@ -735,9 +702,9 @@ TiDocument::TiDocument() :
 }
 
 TiDocument::TiDocument( const char * documentName ) :
-	strings (3541),
-	blk_element (1000),
-	blk_text (1000)
+  strings (3541),
+  blk_element (1000),
+  blk_text (1000)
 {
   //  ignoreWhiteSpace = true;
   value = documentName;
@@ -751,99 +718,6 @@ TiDocument::~TiDocument ()
   // before 'blk_element' and 'blk_text' are destroyed.
   Clear ();
 }
-
-bool TiDocument::LoadFile()
-{
-  // See STL_STRING_BUG below.
-  StringToBuffer buf( value );
-
-  if ( buf.buffer && LoadFile( buf.buffer ) )
-    return true;
-
-  return false;
-}
-
-
-bool TiDocument::SaveFile() const
-{
-  // See STL_STRING_BUG below.
-  StringToBuffer buf( value );
-
-  if ( buf.buffer && SaveFile( buf.buffer ) )
-    return true;
-
-  return false;
-}
-
-bool TiDocument::LoadFile( const char* filename )
-{
-  // Delete the existing data:
-  Clear();
-
-  // There was a really terrifying little bug here. The code:
-  //    value = filename
-  // in the STL case, cause the assignment method of the std::string to
-  // be called. What is strange, is that the std::string had the same
-  // address as it's c_str() method, and so bad things happen. Looks
-  // like a bug in the Microsoft STL implementation.
-  // See STL_STRING_BUG above.
-  // Fixed with the StringToBuffer class.
-  value = filename;
-
-  FILE* file = fopen( value.c_str (), "r" );
-
-  if ( file )
-  {
-    // Get the file size, so we can pre-allocate the string. HUGE speed impact.
-    long length = 0;
-    fseek( file, 0, SEEK_END );
-    length = ftell( file );
-    fseek( file, 0, SEEK_SET );
-
-    // Strange case, but good to handle up front.
-    if ( length == 0 )
-    {
-      fclose( file );
-      return false;
-    }
-
-    // If we have a file, assume it is all one big XML file, and read it in.
-    // The document parser may decide the document ends sooner than the entire file, however.
-    TIXML_STRING data;
-    data.reserve( length );
-
-    const int BUF_SIZE = 2048;
-    char buf[BUF_SIZE];
-
-    while( fgets( buf, BUF_SIZE, file ) )
-    {
-      data += buf;
-    }
-    fclose( file );
-
-    Parse( this, data.c_str() );
-    if (  !Error() )
-    {
-      return true;
-    }
-  }
-  SetError( TIXML_ERROR_OPENING_FILE );
-  return false;
-}
-
-bool TiDocument::SaveFile( const char * filename ) const
-{
-  // The old c stuff lives on...
-  FILE* fp = fopen( filename, "w" );
-  if ( fp )
-  {
-    Print( fp, 0 );
-    fclose( fp );
-    return true;
-  }
-  return false;
-}
-
 
 TiDocumentNode* TiDocument::Clone(TiDocument* document) const
 {
@@ -864,64 +738,30 @@ TiDocumentNode* TiDocument::Clone(TiDocument* document) const
 }
 
 
-void TiDocument::Print( FILE* cfile, int depth ) const
+void TiDocument::Print( iString* cfile, int depth ) const
 {
   TiDocumentNode* node;
   for ( node=FirstChild(); node; node=node->NextSibling() )
   {
     node->Print( cfile, depth );
-    fprintf( cfile, "\n" );
+    StrPrintf ( cfile, "\n" );
   }
 }
 
-void TiDocument::StreamOut( TIXML_OSTREAM * out ) const
+void TiDocumentAttribute::Print( iString* cfile, int /*depth*/ ) const
 {
-  TiDocumentNode* node;
-  for ( node=FirstChild(); node; node=node->NextSibling() )
-  {
-    node->StreamOut( out );
-
-    // Special rule for streams: stop after the root element.
-    // The stream in code will only read one element, so don't
-    // write more than one.
-    if ( node->ToElement() )
-      break;
-  }
-}
-
-void TiDocumentAttribute::Print( FILE* cfile, int /*depth*/ ) const
-{
-  TIXML_STRING n, v;
+  TiXmlString n, v;
 
   TiXmlBase::PutString( Name(), &n );
   TiXmlBase::PutString( Value(), &v );
 
   char* idx = strchr (value, '\"');
   if (idx == NULL)
-    fprintf (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
+    StrPrintf  (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
   else
-    fprintf (cfile, "%s='%s'", n.c_str(), v.c_str() );
+    StrPrintf  (cfile, "%s='%s'", n.c_str(), v.c_str() );
 }
 
-
-void TiDocumentAttribute::StreamOut( TIXML_OSTREAM * stream ) const
-{
-  char* idx = strchr (value, '\"');
-  if (idx != NULL)
-  {
-    TiXmlBase::PutString( name, stream );
-    (*stream) << "=" << "'";
-    TiXmlBase::PutString( value, stream );
-    (*stream) << "'";
-  }
-  else
-  {
-    TiXmlBase::PutString( name, stream );
-    (*stream) << "=" << "\"";
-    TiXmlBase::PutString( value, stream );
-    (*stream) << "\"";
-  }
-}
 
 void TiDocumentAttribute::SetIntValue( int value )
 {
@@ -947,20 +787,13 @@ const double  TiDocumentAttribute::DoubleValue() const
   return atof (value);
 }
 
-void TiXmlComment::Print( FILE* cfile, int depth ) const
+void TiXmlComment::Print( iString* cfile, int depth ) const
 {
   for ( int i=0; i<depth; i++ )
   {
-    fputs( "    ", cfile );
+    StrPuts ( "    ", cfile );
   }
-  fprintf( cfile, "<!--%s-->", value );
-}
-
-void TiXmlComment::StreamOut( TIXML_OSTREAM * stream ) const
-{
-  (*stream) << "<!--";
-  PutString( value, stream );
-  (*stream) << "-->";
+  StrPrintf ( cfile, "<!--%s-->", value );
 }
 
 TiDocumentNode* TiXmlComment::Clone(TiDocument* document) const
@@ -990,17 +823,11 @@ void TiXmlText::SetValue (const char * name)
   }
 }
 
-void TiXmlText::Print( FILE* cfile, int /*depth*/ ) const
+void TiXmlText::Print( iString* cfile, int /*depth*/ ) const
 {
-  TIXML_STRING buffer;
+  TiXmlString buffer;
   PutString( value, &buffer );
-  fprintf( cfile, "%s", buffer.c_str() );
-}
-
-
-void TiXmlText::StreamOut( TIXML_OSTREAM * stream ) const
-{
-  PutString( value, stream );
+  StrPrintf ( cfile, "%s", buffer.c_str() );
 }
 
 
@@ -1028,42 +855,17 @@ TiXmlDeclaration::TiXmlDeclaration( const char * _version,
 }
 
 
-void TiXmlDeclaration::Print( FILE* cfile, int /*depth*/ ) const
+void TiXmlDeclaration::Print( iString* cfile, int /*depth*/ ) const
 {
-  fprintf (cfile, "<?xml ");
+  StrPrintf  (cfile, "<?xml ");
 
   if ( !version.empty() )
-    fprintf (cfile, "version=\"%s\" ", version.c_str ());
+    StrPrintf  (cfile, "version=\"%s\" ", version.c_str ());
   if ( !encoding.empty() )
-    fprintf (cfile, "encoding=\"%s\" ", encoding.c_str ());
+    StrPrintf  (cfile, "encoding=\"%s\" ", encoding.c_str ());
   if ( !standalone.empty() )
-    fprintf (cfile, "standalone=\"%s\" ", standalone.c_str ());
-  fprintf (cfile, "?>");
-}
-
-void TiXmlDeclaration::StreamOut( TIXML_OSTREAM * stream ) const
-{
-  (*stream) << "<?xml ";
-
-  if ( !version.empty() )
-  {
-    (*stream) << "version=\"";
-    PutString( version, stream );
-    (*stream) << "\" ";
-  }
-  if ( !encoding.empty() )
-  {
-    (*stream) << "encoding=\"";
-    PutString( encoding, stream );
-    (*stream ) << "\" ";
-  }
-  if ( !standalone.empty() )
-  {
-    (*stream) << "standalone=\"";
-    PutString( standalone, stream );
-    (*stream) << "\" ";
-  }
-  (*stream) << "?>";
+    StrPrintf  (cfile, "standalone=\"%s\" ", standalone.c_str ());
+  StrPrintf  (cfile, "?>");
 }
 
 TiDocumentNode* TiXmlDeclaration::Clone(TiDocument* document) const
@@ -1081,16 +883,11 @@ TiDocumentNode* TiXmlDeclaration::Clone(TiDocument* document) const
 }
 
 
-void TiXmlUnknown::Print( FILE* cfile, int depth ) const
+void TiXmlUnknown::Print( iString* cfile, int depth ) const
 {
   for ( int i=0; i<depth; i++ )
-    fprintf( cfile, "    " );
-  fprintf( cfile, "%s", value.c_str() );
-}
-
-void TiXmlUnknown::StreamOut( TIXML_OSTREAM * stream ) const
-{
-  (*stream) << "<" << value << ">";    // Don't use entities hear! It is unknown.
+    StrPrintf ( cfile, "    " );
+  StrPrintf ( cfile, "%s", value.c_str() );
 }
 
 TiDocumentNode* TiXmlUnknown::Clone(TiDocument* document) const
@@ -1125,8 +922,3 @@ int TiDocumentAttributeSet::FindExact (const char * reg_name) const
   return -1;
 }
 
-TIXML_OSTREAM & operator<< (TIXML_OSTREAM & out, const TiDocumentNode & base)
-{
-  base.StreamOut (& out);
-  return out;
-}

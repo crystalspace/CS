@@ -26,8 +26,6 @@ distribution.
 #include "tinyxml.h"
 #include <ctype.h>
 
-//#define DEBUG_PARSER
-
 // Note tha "PutString" hardcodes the same list. This
 // is less flexible than it appears. Changing the entries
 // or order will break putstring.  
@@ -75,7 +73,7 @@ const char* TiXmlBase::ReadName( const char* p, char* name)
 const char* TiXmlBase::GetEntity( const char* p, char* value )
 {
   // Presume an entity, and pull it out.
-  // TIXML_STRING ent;
+  // TiXmlString ent;
   int i;
 
   // Ignore the &#x entities.
@@ -329,7 +327,7 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
   const char* reg_name = document->strings.Request (name_id);
   SetValueRegistered (reg_name);
 
-    TIXML_STRING endTag ("</");
+  TiXmlString endTag ("</");
   endTag += value;
   endTag += ">";
 

@@ -36,70 +36,13 @@ distribution.
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-// >>> JORRIT
-// @@@ This is an EXTREMELY ugly hack.
-// I want to avoid touching the TinyXml sources too much (to ensure we
-// can upgrade easily to new versions of TinyXml). But I need a function
-// to output XML to an iString. So I do this by redefining FILE and
-// all FILE related routines (fprintf) to work on iString instead.
-#include "iutil/string.h"
-#include "csutil/scfstr.h"
-#include "csutil/array.h"
-#include "csutil/blkalloc.h"
-#include "csutil/util.h"
-#include "csutil/strset.h"
-#undef FILE
-#define FILE iString
-#define fprintf new_fprintf
-#define fputs new_fputs
-#define fopen new_fopen
-#define fseek new_fseek
-#define ftell new_ftell
-#define fclose new_fclose
-#define fgets new_fgets
-#ifdef stdout
-#undef stdout
-#endif
-#define stdout NULL
-static void new_fprintf (iString* file, const char* msg, ...)
-{
-  scfString str;
-  va_list args;
-  va_start (args, msg);
-  str.FormatV (msg, args);
-  va_end (args);
-  file->SetGrowsExponentially(true);
-  file->Append (str);
-}
-static void new_fputs (const char* msg, iString* file)
-{
-  file->Append (msg);
-}
-static iString* new_fopen (const char* /*fn*/, const char* /*m*/)
-{ return NULL; }
-static void new_fseek (iString*, int, int) { }
-static long new_ftell (iString*) { return 0; }
-static void new_fclose (iString*) { }
-static int new_fgets (const char*, int, iString*) { return 0; }
-// <<< JORRIT
-
-// Help out windows:
-#if defined( _DEBUG ) && !defined( DEBUG )
-#define DEBUG
-#endif
-
-#if defined( DEBUG ) && defined( _MSC_VER )
-#include <windows.h>
-#define TIXML_LOG OutputDebugString
-#else
-#define TIXML_LOG printf
-#endif
-
+#include <iutil/string.h>
+#include <csutil/util.h>
+#include <csutil/array.h>
+#include <csutil/strset.h>
+#include <csutil/blkalloc.h>
 
 #include "tinystr.h"
-#define TIXML_STRING	TiXmlString
-#define TIXML_OSTREAM	TiXmlOutStream
 
 class TiDocument;
 class TiDocumentNodeChildren;
@@ -111,25 +54,25 @@ class TiXmlText;
 class TiXmlDeclaration;
 class GrowString;
 
-	enum
-	{
-		TIXML_NO_ERROR = 0,
-		TIXML_ERROR,
-		TIXML_ERROR_OPENING_FILE,
-		TIXML_ERROR_OUT_OF_MEMORY,
-		TIXML_ERROR_PARSING_ELEMENT,
-		TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME,
-		TIXML_ERROR_READING_ELEMENT_VALUE,
-		TIXML_ERROR_READING_ATTRIBUTES,
-		TIXML_ERROR_PARSING_EMPTY,
-		TIXML_ERROR_READING_END_TAG,
-		TIXML_ERROR_PARSING_UNKNOWN,
-		TIXML_ERROR_PARSING_COMMENT,
-		TIXML_ERROR_PARSING_DECLARATION,
-		TIXML_ERROR_DOCUMENT_EMPTY,
+enum
+{
+  TIXML_NO_ERROR = 0,
+  TIXML_ERROR,
+  TIXML_ERROR_OPENING_FILE,
+  TIXML_ERROR_OUT_OF_MEMORY,
+  TIXML_ERROR_PARSING_ELEMENT,
+  TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME,
+  TIXML_ERROR_READING_ELEMENT_VALUE,
+  TIXML_ERROR_READING_ATTRIBUTES,
+  TIXML_ERROR_PARSING_EMPTY,
+  TIXML_ERROR_READING_END_TAG,
+  TIXML_ERROR_PARSING_UNKNOWN,
+  TIXML_ERROR_PARSING_COMMENT,
+  TIXML_ERROR_PARSING_DECLARATION,
+  TIXML_ERROR_DOCUMENT_EMPTY,
 
-		TIXML_ERROR_STRING_COUNT
-	};
+  TIXML_ERROR_STRING_COUNT
+};
 
 /**
  * TiXmlBase is a base class for every class in TinyXml.
@@ -140,16 +83,16 @@ class GrowString;
  * other elements and other types of nodes.
  *
  * @verbatim
- * A Document can contain:	Element	(container or leaf)
- *				Comment (leaf)
- *				Unknown (leaf)
- *				Declaration( leaf )
+ * A Document can contain:  Element  (container or leaf)
+ *        Comment (leaf)
+ *        Unknown (leaf)
+ *        Declaration( leaf )
  *
- * An Element can contain:	Element (container or leaf)
- *				Text	(leaf)
- *				Attributes (not on tree)
- *				Comment (leaf)
- *				Unknown (leaf)
+ * An Element can contain:  Element (container or leaf)
+ *        Text  (leaf)
+ *        Attributes (not on tree)
+ *        Comment (leaf)
+ *        Unknown (leaf)
  *
  * A Decleration contains: Attributes (not on tree)
  * @endverbatim
@@ -169,7 +112,7 @@ public:
    * This is a formatted print, and will insert tabs and newlines.
    * (For an unformatted stream, use the << operator.)
    */
-  virtual void Print( FILE* cfile, int depth ) const = 0;
+  virtual void Print( iString* cfile, int depth ) const = 0;
 
   /**
    * The world does not agree on whether white space should be kept or
@@ -198,30 +141,18 @@ public:
    * Reads text. Returns a pointer past the given end tag.
    * Wickedly complex options, but it keeps the (sensitive) code in one place.
    */
-  static const char* ReadText(	const char* in, GrowString& buf,
-				bool ignoreWhiteSpace,
-				const char* endTag);
+  static const char* ReadText(  const char* in, GrowString& buf,
+        bool ignoreWhiteSpace,
+        const char* endTag);
 
   /**
    * Puts a string to a stream, expanding entities as it goes.
    * Note this should not contian the '<', '>', etc, or they will be
    * transformed into entities!
    */
-  static void PutString( const TIXML_STRING& str, TIXML_OSTREAM* out );
-  static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
+  static void PutString( const TiXmlString& str, TiXmlString* out );
 
 protected:
-  // See STL_STRING_BUG
-  // Utility class to overcome a bug.
-  class StringToBuffer
-  {
-  public:
-    StringToBuffer( const TIXML_STRING& str );
-    ~StringToBuffer();
-    char* buffer;
-  };
-
-  virtual void StreamOut (TIXML_OSTREAM *) const = 0;
   virtual const char* Parse( TiDocument* document, const char* p ) = 0;
 
   // If an entity has been found, transform it into a character.
@@ -279,10 +210,6 @@ class TiDocumentNode : public TiXmlBase
   friend class TiXmlElement;
 
 public:
-  // Used internally, not part of the public API.
-  friend TIXML_OSTREAM& operator<< (TIXML_OSTREAM& out,
-  	const TiDocumentNode& base);
-
   /**
    * The types of XML nodes supported by TinyXml. (All the
    * unsupported types are picked up by UNKNOWN.)
@@ -298,11 +225,11 @@ public:
    * The meaning of 'value' changes for the specific type of
    * TiDocumentNode.
    * @verbatim
-   * Document:	filename of the xml file
-   * Element:	name of the element
-   * Comment:	the comment text
-   * Unknown:	the tag contents
-   * Text:		the text string
+   * Document:  filename of the xml file
+   * Element:  name of the element
+   * Comment:  the comment text
+   * Unknown:  the tag contents
+   * Text:    the text string
    * @endverbatim
    * The subclasses will wrap this function.
    */
@@ -355,8 +282,8 @@ public:
   {
     int t = Type ();
     return ( t == DOCUMENT || t == ELEMENT )
-    	? (TiDocumentNodeChildren*) this
-	: 0;
+      ? (TiDocumentNodeChildren*) this
+  : 0;
   }
   TiDocument* ToDocument() const
   { return ( Type () == DOCUMENT ) ? (TiDocument*) this : 0; }
@@ -405,10 +332,10 @@ public:
   /// Returns true if this node has no children.
   bool NoChildren() const { return !firstChild; }
 
-  TiDocumentNode* FirstChild()	const	{ return firstChild; }
+  TiDocumentNode* FirstChild()  const  { return firstChild; }
   TiDocumentNode* FirstChild( const char * value ) const;
 
-  TiDocumentNode* LastChild() const	{ return lastChild; }
+  TiDocumentNode* LastChild() const  { return lastChild; }
   TiDocumentNode* LastChild( const char * value ) const;
 
   /**
@@ -435,7 +362,7 @@ public:
    * 'value'.
    */
   TiDocumentNode* IterateChildren( const char * value,
-  	TiDocumentNode* previous ) const;
+    TiDocumentNode* previous ) const;
 
   /**
    * Add a new node related to this. Adds a child past the LastChild.
@@ -448,27 +375,27 @@ public:
    * Returns a pointer to the new object or NULL if an error occured.
    */
   TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis,
-  	const TiDocumentNode& addThis );
+    const TiDocumentNode& addThis );
 
   /**
    * Add a new node related to this. Adds a child after the specified child.
    * Returns a pointer to the new object or NULL if an error occured.
    */
   TiDocumentNode* InsertAfterChild(  TiDocumentNode* afterThis,
-  	const TiDocumentNode& addThis );
+    const TiDocumentNode& addThis );
 
   /**
    * Replace a child of this node.
    * Returns a pointer to the new object or NULL if an error occured.
    */
   TiDocumentNode* ReplaceChild( TiDocumentNode* replaceThis,
-  	const TiDocumentNode& withThis );
+    const TiDocumentNode& withThis );
 
   /// Delete a child of this node.
   bool RemoveChild( TiDocumentNode* removeThis );
 
   /// Convenience function to get through elements.
-  TiXmlElement* FirstChildElement()	const;
+  TiXmlElement* FirstChildElement()  const;
 
   /// Convenience function to get through elements.
   TiXmlElement* FirstChildElement( const char * value ) const;
@@ -509,7 +436,7 @@ public:
   const int IntValue() const;
   const double DoubleValue() const;
 
-  void SetName( const char* _name )	{ name = _name; }
+  void SetName( const char* _name )  { name = _name; }
   void SetValue( const char* _value )
   {
     delete[] value;
@@ -537,16 +464,14 @@ public:
     return strcmp (name, rhs.name) < 0;
   }
 
-  /*	[internal use]
+  /*  [internal use]
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
   const char* Parse( TiDocument* document, const char* p );
 
   // [internal use]
-  void Print( FILE* cfile, int depth ) const;
-
-  void StreamOut( TIXML_OSTREAM * out ) const;
+  void Print( iString* cfile, int depth ) const;
 
 private:
   const char* name;
@@ -638,7 +563,7 @@ public:
   virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
 
-  virtual void Print( FILE* cfile, int depth ) const;
+  virtual void Print( iString* cfile, int depth ) const;
 
   virtual const char * Value () const { return value; }
   void SetValueRegistered (const char * _value)
@@ -648,16 +573,13 @@ public:
   virtual void SetValue (const char * _value);
 
 protected:
-  // Used to be public [internal use]
-  virtual void StreamOut( TIXML_OSTREAM * out ) const;
-
-  /*	[internal use]
+  /*  [internal use]
    * Attribtue parsing starts: next char past '<'
    * returns: next char past '>'
    */
   virtual const char* Parse( TiDocument* document, const char* p );
 
-  /*	[internal use]
+  /*  [internal use]
    * Reads the "value" of the element -- another element, or text.
    * This should terminate with the current end tag.
    */
@@ -682,7 +604,7 @@ public:
   // [internal use] Creates a new Element and returs it.
   virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
-  virtual void Print( FILE* cfile, int depth ) const;
+  virtual void Print( iString* cfile, int depth ) const;
   virtual const char * Value () const { return value; }
   virtual void SetValue (const char * _value)
   {
@@ -694,9 +616,7 @@ public:
   }
 
 protected:
-  // used to be public
-  virtual void StreamOut( TIXML_OSTREAM * out ) const;
-  /*	[internal use]
+  /*  [internal use]
    * Attribtue parsing starts: at the ! of the !--
    * returns: next char past '>'
    */
@@ -733,11 +653,10 @@ protected :
   // [internal use] Creates a new Element and returns it.
   virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
-  virtual void Print( FILE* cfile, int depth ) const;
-  virtual void StreamOut ( TIXML_OSTREAM * out ) const;
+  virtual void Print( iString* cfile, int depth ) const;
   // [internal use]
-  bool Blank() const;	// returns true if all white space and new lines
-  /*	[internal use]
+  bool Blank() const;  // returns true if all white space and new lines
+  /*  [internal use]
    * Attribtue parsing starts: First char of the text
    * returns: next char past '>'
    */
@@ -787,7 +706,7 @@ public:
 
   /// Construct.
   TiXmlDeclaration (const char * _version,
-		const char * _encoding, const char * _standalone );
+    const char * _encoding, const char * _standalone );
 
   virtual ~TiXmlDeclaration() {}
 
@@ -801,23 +720,21 @@ public:
   // [internal use] Creates a new Element and returs it.
   virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
-  virtual void Print( FILE* cfile, int depth ) const;
+  virtual void Print( iString* cfile, int depth ) const;
   virtual const char * Value () const { return value.c_str (); }
   virtual void SetValue (const char * _value) { value = _value;}
 
 protected:
-  // used to be public
-  virtual void StreamOut ( TIXML_OSTREAM * out) const;
-  //	[internal use]
-  //	Attribtue parsing starts: next char past '<'
-  //					 returns: next char past '>'
+  //  [internal use]
+  //  Attribtue parsing starts: next char past '<'
+  //           returns: next char past '>'
   virtual const char* Parse( TiDocument* document,  const char* p );
 
 private:
-  TIXML_STRING version;
-  TIXML_STRING encoding;
-  TIXML_STRING standalone;
-  TIXML_STRING value;
+  TiXmlString version;
+  TiXmlString encoding;
+  TiXmlString standalone;
+  TiXmlString value;
 };
 
 
@@ -836,19 +753,17 @@ public:
   // [internal use]
   virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
-  virtual void Print( FILE* cfile, int depth ) const;
+  virtual void Print( iString* cfile, int depth ) const;
   virtual const char * Value () const { return value.c_str (); }
   virtual void SetValue (const char * _value) { value = _value;}
 protected:
-  // used to be public
-  virtual void StreamOut ( TIXML_OSTREAM * out ) const;
-  /*	[internal use]
+  /*  [internal use]
    * Attribute parsing starts: First char of the text
    * returns: next char past '>'
    */
   virtual const char* Parse( TiDocument* document,  const char* p );
 
-  TIXML_STRING value;
+  TiXmlString value;
 };
 
 
@@ -894,19 +809,6 @@ public:
   virtual const char * Value () const { return value.c_str (); }
   virtual void SetValue (const char * _value) { value = _value;}
 
-  /**
-   * Load a file using the current document value.
-   * Returns true if successful. Will delete any existing
-   * document data before loading.
-   */
-  bool LoadFile();
-  /// Save a file using the current document value. Returns true if successful.
-  bool SaveFile() const;
-  /// Load a file using the given filename. Returns true if successful.
-  bool LoadFile( const char * filename );
-  /// Save a file using the given filename. Returns true if successful.
-  bool SaveFile( const char * filename ) const;
-
   /// Parse the given null terminated block of xml data.
   virtual const char* Parse( TiDocument* document,  const char* p );
 
@@ -932,13 +834,8 @@ public:
   /// If you have handled the error, it can be reset with this call.
   void ClearError() { error = false; errorId = 0; errorDesc = ""; }
 
-  /**
-   * Dump the document to standard out.
-   */
-  void Print() const { Print( stdout, 0 ); }
-
   // [internal use]
-  virtual void Print( FILE* cfile, int depth = 0 ) const;
+  virtual void Print( iString* cfile, int depth = 0 ) const;
   // [internal use]
   void SetError( int err )
   {
@@ -948,15 +845,14 @@ public:
   }
 
 protected :
-  virtual void StreamOut ( TIXML_OSTREAM * out) const;
   // [internal use]
   virtual TiDocumentNode* Clone(TiDocument* document) const;
 
 private:
   bool error;
   int  errorId;
-  TIXML_STRING errorDesc;
-  TIXML_STRING value;
+  TiXmlString errorDesc;
+  TiXmlString value;
 };
 
 #endif

@@ -201,29 +201,5 @@ class TiXmlString
 
 } ;
 
-/* 
-   TiXmlOutStream is an emulation of std::ostream. It is based on TiXmlString.
-   Only the operators that we need for TinyXML have been developped.
-*/
-class TiXmlOutStream : public TiXmlString
-{
-public :
-    TiXmlOutStream () : TiXmlString () {}
-
-    // TiXmlOutStream << operator. Maps to TiXmlString::append
-    TiXmlOutStream & operator << (const char * in)
-    {
-        append (in);
-        return (* this);
-    }
-
-    // TiXmlOutStream << operator. Maps to TiXmlString::append
-    TiXmlOutStream & operator << (const TiXmlString & in)
-    {
-        append (in . c_str ());
-        return (* this);
-    }
-} ;
-
 #endif	// TIXML_STRING_INCLUDED
 

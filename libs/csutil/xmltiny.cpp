@@ -23,6 +23,7 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
+#include "csutil/scfstr.h"
 #include "xmltinyp.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
