@@ -38,7 +38,7 @@ found in the @file{CS/apps/tutorials} directory. There are also a few
 additional tutorials at that location which are not (yet) covered in the
 documentation.
 
-Before reading this tutorial you should firs read the Tutorial Introduction
+Before reading this tutorial you should first read the Tutorial Introduction
 (@pxref{Tutorial Introduction}).
 
 @menu
