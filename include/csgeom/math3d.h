@@ -103,6 +103,9 @@ public:
   inline friend bool operator> (float f, const csVector3& v)
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f; }
 
+	/// Returns n-th component of the vector
+  inline float operator[](int n) {return !n?x:n&1?y:z;}
+
   /// Add another vector to this vector.
   inline csVector3& operator+= (const csVector3& v)
   {
