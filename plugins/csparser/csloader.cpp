@@ -378,11 +378,8 @@ bool csLoader::LoadMap (char* buf)
 	  }
 	  break;
         case CS_TOKEN_SECTOR:
-          if (!GetLoaderContext ()->FindSector (name))
-	  {
-            if (!ParseSector (name, params))
-	      return false;
-	  }
+          if (!ParseSector (name, params))
+	    return false;
           break;
         case CS_TOKEN_COLLECTION:
           if (!ParseCollection (name, params))
@@ -2938,8 +2935,12 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
   char bspname[100]; *bspname = 0;
   char culplugname[100]; *culplugname = 0;
 
-  iSector *sector = Engine->CreateSector (secname);
-  Stats->sectors_loaded++;
+  iSector* sector = GetLoaderContext ()->FindSector (secname);
+  if (sector == NULL)
+  {
+    sector = Engine->CreateSector (secname);
+    Stats->sectors_loaded++;
+  }
 
   while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {

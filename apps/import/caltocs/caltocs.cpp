@@ -175,7 +175,7 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
     //Grab texcoord if available
     char texcoord[255];
     if(t) {
-      snprintf(texcoord, 255, ":%f,%f", t->u, 1.0f-t->v);
+      sprintf(texcoord, ":%f,%f", t->u, 1.0f-t->v);
     } else {
       texcoord[0]=0;
     }

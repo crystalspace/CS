@@ -1,5 +1,25 @@
 The history order is reversed so that new features are at the top.
 
+17-Jul-2002
+	- Added unittest for RAPID plugin. Extended unittest app so that it
+	  calls this unittest. This test now fails but I don't know why.
+	  Some help would be helpful here.
+	- Added a new version of CreateMeshWrapper() to iEngine. This version
+	  is an easy way to make a mesh wrapper directly from the type
+	  class id. It will first create a factory and if that factory
+	  implements iMeshObject it will return that (useful for things).
+	  If that factory doesn't implement iMeshObject it will call
+	  NewInstance() and return that new mesh object instead.
+	- Added iEngine::CreateThingMesh() which is a conveniance function
+	  that will create a thing mesh, place it in a sector, set ZUSE
+	  z-buffer mode, and 'object' render priority. It is very similar
+	  to CreateSectorWallsMesh() but that will use ZFILL and 'wall'
+	  instead.
+	- Michael O'Shea suggested a modification in csparser which makes
+	  it possible to define a sector in pieces. So if you say SECTOR 'xxx'
+	  with 'xxx' a sector that was previously defined you will just
+	  add objects to that sector without affecting the previous contents.
+	- Changed an snprintf to sprintf in caltocs.
 15-Jul-2002
 	- Fixed a compiler error in spr3d by rearranging the code a little
 	  bit.

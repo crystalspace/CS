@@ -22,6 +22,7 @@
 #include "ivaria/collider.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/dbghelp.h"
 #include "rapcol.h"
 
 /**
@@ -68,11 +69,46 @@ public:
     return csRapidCollider::GetFirstHit ();
   }
 
+  // Debugging functions.
+  iString* Debug_UnitTest ();
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRapidCollideSystem);
     virtual bool Initialize (iObjectRegistry*) { return true; }
   } scfiComponent;
+
+  struct DebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csRapidCollideSystem);
+    virtual int GetSupportedTests () const
+    {
+      return CS_DBGHELP_UNITTEST;
+    }
+    virtual iString* UnitTest ()
+    {
+      return scfParent->Debug_UnitTest ();
+    }
+    virtual iString* StateTest ()
+    {
+      return NULL;
+    }
+    virtual csTicks Benchmark (int)
+    {
+      return 0;
+    }
+    virtual iString* Dump ()
+    {
+      return NULL;
+    }
+    virtual void Dump (iGraphics3D*)
+    {
+    }
+    virtual bool DebugCommand (const char*)
+    {
+      return false;
+    }
+  } scfiDebugHelper;
 };
 
 #endif // _RAPID_H_

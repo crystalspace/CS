@@ -809,20 +809,9 @@ public:
   virtual iTextureList* GetTextureList () const;
   virtual iRegionList* GetRegions ();
 
-  /**
-   * Conveniance function to create the thing containing the
-   * convex outline of a sector. The thing will be empty but
-   * it will have CS_ZBUF_FILL set. This version creates a mesh wrapper.
-   */
-  iMeshWrapper* CreateSectorWallsMesh (csSector* sector, const char* name);
-
-  /**
-   * Conveniance function to create the thing containing the
-   * convex outline of a sector. The thing will be empty but
-   * it will have CS_ZBUF_FILL set. This version creates a mesh wrapper.
-   */
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
       const char* name);
+  virtual iMeshWrapper* CreateThingMesh (iSector* sector, const char* name);
 
   /**
    * Add a dynamic light to the engine.
@@ -1076,6 +1065,10 @@ public:
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create a mesh wrapper for an existing mesh object
   virtual iMeshWrapper* CreateMeshWrapper (iMeshObject*,
+  	const char* name, iSector* sector = NULL,
+	const csVector3& pos = csVector3(0, 0, 0));
+  /// Create a mesh wrapper from a class id.
+  virtual iMeshWrapper* CreateMeshWrapper (const char* classid,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create an uninitialized mesh wrapper

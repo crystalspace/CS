@@ -2374,34 +2374,29 @@ iMaterialWrapper *csEngine::CreateMaterial (
   return wrapper;
 }
 
-iMeshWrapper *csEngine::CreateSectorWallsMesh (
-  csSector *sector,
-  const char *iName)
+iMeshWrapper *csEngine::CreateThingMesh (
+  iSector *sector,
+  const char *name)
 {
-  iMeshObjectType *thing_type = GetThingType ();
-  iMeshObjectFactory *thing_fact = thing_type->NewFactory ();
-  iMeshObject *thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
-  thing_fact->DecRef ();
+  iMeshWrapper* thing_wrap = CreateMeshWrapper (
+  	"crystalspace.mesh.object.thing", name, sector);
+  thing_wrap->SetZBufMode (CS_ZBUF_USE);
+  thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
 
-  csMeshWrapper *thing_wrap = new csMeshWrapper (NULL, thing_obj);
-
-  thing_obj->DecRef ();
-  thing_wrap->SetName (iName);
-  GetMeshes ()->Add (&(thing_wrap->scfiMeshWrapper));
-  thing_wrap->GetMovable ().SetSector (&sector->scfiSector);
-  thing_wrap->GetMovable ().UpdateMove ();
-  thing_wrap->flags.Set (CS_ENTITY_CONVEX);
-  thing_wrap->SetZBufMode (CS_ZBUF_FILL);
-  thing_wrap->SetRenderPriority (GetWallRenderPriority ());
-
-  return &(thing_wrap->scfiMeshWrapper);
+  return thing_wrap;
 }
 
 iMeshWrapper *csEngine::CreateSectorWallsMesh (
   iSector *sector,
-  const char *iName)
+  const char *name)
 {
-  return CreateSectorWallsMesh (sector->GetPrivateObject (), iName);
+  iMeshWrapper* thing_wrap = CreateMeshWrapper (
+  	"crystalspace.mesh.object.thing", name, sector);
+  thing_wrap->GetFlags ().Set (CS_ENTITY_CONVEX);
+  thing_wrap->SetZBufMode (CS_ZBUF_FILL);
+  thing_wrap->SetRenderPriority (GetWallRenderPriority ());
+
+  return thing_wrap;
 }
 
 iSector *csEngine::CreateSector (const char *iName)
@@ -2789,6 +2784,47 @@ iMeshWrapper *csEngine::CreateMeshWrapper (const char *name)
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
   return &meshwrap->scfiMeshWrapper;
+}
+
+iMeshWrapper *csEngine::CreateMeshWrapper (
+  const char *classId,
+  const char *name,
+  iSector *sector,
+  const csVector3 &pos)
+{
+  iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iMeshObjectType *type = CS_QUERY_PLUGIN_CLASS (
+      plugin_mgr,
+      classId,
+      iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
+  plugin_mgr->DecRef ();
+  if (!type) return NULL;
+
+  iMeshObjectFactory *fact = type->NewFactory ();
+  type->DecRef ();
+  if (!fact) return NULL;
+
+  iMeshObject* mo = SCF_QUERY_INTERFACE (fact, iMeshObject);
+  if (!mo)
+  {
+    // The factory is not itself a mesh object. Let's see if the
+    // factory can return a working mesh object.
+    mo = fact->NewInstance ();
+    fact->DecRef ();
+    if (mo)
+    {
+      iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
+      mo->DecRef ();
+      return mw;
+    }
+    return NULL;
+  }
+
+  fact->DecRef ();
+  iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
+  mo->DecRef ();
+  return mw;
 }
 
 bool csEngine::RemoveObject (iBase *object)

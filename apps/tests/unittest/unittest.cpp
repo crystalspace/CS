@@ -29,6 +29,7 @@
 #include "cstool/initapp.h"
 #include "csgeom/math3d.h"
 #include "iengine/viscull.h"
+#include "ivaria/collider.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -119,6 +120,13 @@ int main (int argc, char* argv[])
     csInitializer::DestroyApplication (object_reg);
     return -1;
   }
+
+  printf ("================================================================\n");
+
+  iCollideSystem* cdsys = CS_LOAD_PLUGIN (plugmgr,
+  	"crystalspace.collisiondetection.rapid", iCollideSystem);
+  Test (cdsys, "Rapid");
+  if (cdsys) cdsys->DecRef ();
 
   printf ("================================================================\n");
 

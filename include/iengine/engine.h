@@ -178,7 +178,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 11);
+SCF_VERSION (iEngine, 0, 7, 12);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -318,6 +318,13 @@ struct iEngine : public iBase
    */
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
+  /**
+   * Conveniance function to create a thing mesh in a sector.
+   * This mesh will have CS_ZBUF_USE set (use Z-buffer fully)
+   * and have 'object' as render priority. This means this function
+   * is useful for general objects.
+   */
+  virtual iMeshWrapper* CreateThingMesh (iSector* sector, const char* name) = 0;
 
   /// Get the list of sectors
   virtual iSectorList* GetSectors () = 0;
@@ -599,11 +606,28 @@ struct iEngine : public iBase
   virtual iMeshWrapper* CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
-  /// Create a mesh wrapper for an existing mesh object
+  /**
+   * Create a mesh wrapper for an existing mesh object.
+   */
   virtual iMeshWrapper* CreateMeshWrapper (iMeshObject*,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
-  /// Create an uninitialized mesh wrapper
+  /**
+   * Create a mesh wrapper from a class id.
+   * The type plugin will only be loaded if needed. 'classId' is the
+   * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
+   * This function will first make a factory from the plugin and then
+   * see if that factory itself implements iMeshObject too. This means
+   * this function is useful to create thing mesh objects (which are both 
+   * factory and object at the same time). If that fails this function
+   * will call NewInstance() on the factory and return that object then.
+   */
+  virtual iMeshWrapper* CreateMeshWrapper (const char* classid,
+  	const char* name, iSector* sector = NULL,
+	const csVector3& pos = csVector3(0, 0, 0)) = 0;
+  /**
+   * Create an uninitialized mesh wrapper
+   */
   virtual iMeshWrapper* CreateMeshWrapper (const char* name) = 0;
   /**
    * Conveniance function to load a mesh object from a given loader plugin.
