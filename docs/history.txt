@@ -48,6 +48,12 @@ The history order is reversed so that new features are at the top.
 	  However it could happen that a block containing no shadows
 	  got added to the shadow list. The iterator would fail in this case
 	  because it would stop processing further shadow blocks.
+	- Fixed a bad bug in the Windows key processing routines. Pressing
+	  numpad keys (most frequently '7') could cause CS to crash
+	  horribly. This happens in ALL CS apps. At this moment I only
+	  avoided the crash by adding a test for this but I'm not sure if
+	  this is the good patch actually. The problem is at line 781 of
+	  libs/cssys/win32/win32.cpp.
 29-Apr-2002
 	- Eric Sunshine renamed OSXDelegate2D_CGBLit.h to
 	  OSXDelegate2D_CGBlit.h (notice the case distinction) so that #include

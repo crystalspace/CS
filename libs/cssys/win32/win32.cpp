@@ -776,7 +776,14 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
         {
 	  iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
           outlet->Key (key, wParam, true);
-          LastCharCode [scancode] = (unsigned char) wParam;
+	  if (scancode < MAX_SCANCODE)
+	  {
+	    // @@@@@@@ TEMPORARY bugfix. Maybe the LastCharCode
+	    // table is too small? In anycase this fix is needed.
+	    // Otherwise, pressing numpad numbers crashes CS.
+	    // But maybe this is not the right fix?
+            LastCharCode [scancode] = (unsigned char) wParam;
+	  }
         }
       }
       break;
