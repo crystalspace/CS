@@ -46,9 +46,6 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: csfont csfontclean
 csfont: $(OUTDIRS) $(CSFONT)
 
-#Begin User Defined
-#End User Defined
-
 $(OUT)%$O: plugins/font/renderer/csfont/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSFONT) 
 

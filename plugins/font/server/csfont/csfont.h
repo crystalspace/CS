@@ -21,31 +21,32 @@
 #define _CSFONT_H_
 
 #include "ifntrndr.h"
-#include "police.fnt"
-#include "courier.fnt"	// font (C) Andrew Zabolotny
-#include "tiny.fnt"	// font (C) Andrew Zabolotny
-#include "italic.fnt"	// font (C) Andrew Zabolotny
+
+struct csFontDef
+{
+  char *Name;
+  int Width;
+  int Height;
+  int BytesPerChar;
+  unsigned char *FontBitmap;
+  unsigned char *IndividualWidth;
+};
 
 class csDefaultFontRender : public iFontRender
 {
-  struct FontDef {
-    int Width;
-    int Height;
-    int BytesPerChar;
-    unsigned char *IndividualWidth;
-    unsigned char *FontBitmap;
-  };
+  // The list of registered fonts
+  static csFontDef FontList[];
 
-  static FontDef FontList[];
+  // Number of fonts
+  int FontCount;
 
- protected:
-  int nFonts;
-
- public:
+public:
   DECLARE_IBASE;
 
+  /// Create the plugin object
   csDefaultFontRender (iBase *pParent);
 
+  /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
   /**
@@ -80,8 +81,14 @@ class csDefaultFontRender : public iFontRender
    */
   virtual int GetCharWidth (int fontId, unsigned char c);
 
-  virtual int GetCharHeight (int fontId, unsigned char /*c*/);
+  /**
+   * Get width of a single character
+   */
+  virtual int GetCharHeight (int fontId, unsigned char c);
 
+  /**
+   * Get maximal font height
+   */
   virtual int GetMaximumHeight (int fontId);
 
   /**
@@ -89,7 +96,8 @@ class csDefaultFontRender : public iFontRender
    */
   virtual void GetTextDimensions (int fontId, const char* text, int& width, int& height);
 
-  virtual int GetFontCount (){ return nFonts; }
+  virtual int GetFontCount ()
+  { return FontCount; }
 };
 
 #endif

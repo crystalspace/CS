@@ -20,102 +20,23 @@
 #include "sysdef.h"
 #include "csfont.h"
 
-csDefaultFontRender::FontDef csDefaultFontRender::FontList[] =
-  {
-    {8, 8, 8,	width_Police,	(unsigned char *)font_Police},
-    {8, 8, 8,	NULL,		(unsigned char *)font_Police},
-    {8, 8, 8,	width_Italic,	(unsigned char *)font_Italic},
-    {8, 8, 8,	NULL,		(unsigned char *)font_Italic},
-    {7, 8, 8,	width_Courier,	(unsigned char *)font_Courier},
-    {8, 8, 8,	NULL,		(unsigned char *)font_Courier},
-    {4, 6, 8,	width_Tiny,	(unsigned char *)font_Tiny},
-    {6, 6, 8,	NULL,		(unsigned char *)font_Tiny}
-  };
+#include "police.fnt"
+#include "courier.fnt"	// font (C) Andrew Zabolotny
+#include "tiny.fnt"	// font (C) Andrew Zabolotny
+#include "italic.fnt"	// font (C) Andrew Zabolotny
 
-csDefaultFontRender::csDefaultFontRender (iBase *pParent)
+csFontDef csDefaultFontRender::FontList [] =
 {
-  CONSTRUCT_IBASE (pParent);
-  nFonts=8;
-}
-
-bool csDefaultFontRender::Initialize (iSystem *pSystem)
-{
-  (void)pSystem;
-  return true;
-}
-
-int csDefaultFontRender::LoadFont (const char* name, const char* /*filename*/)
-{
-  int id=-1;
-  if (id<0 && !strcmp (name, "Police")) id=0;
-  if (id<0 && !strcmp (name, "PoliceFixed")) id=1;
-  if (id<0 && !strcmp (name, "Italic")) id=2;
-  if (id<0 && !strcmp (name, "ItalicFixed")) id=3;
-  if (id<0 && !strcmp (name, "Courier")) id=4;
-  if (id<0 && !strcmp (name, "CourierFixed")) id=5;
-  if (id<0 && !strcmp (name, "Tiny")) id=6;
-  if (id<0 && !strcmp (name, "TinyFixed")) id=7;
-  return id;
-}
-
-bool csDefaultFontRender::SetFontProperty (int fontId, CS_FONTPROPERTY propertyId, 
-					   long& property, bool autoApply )
-{
-  (void)fontId;
-  (void)autoApply;
-  bool succ = propertyId == CS_FONTSIZE;
-  if ( succ && property != 1 ) property = 1;
-  return succ;
-}
-
-bool csDefaultFontRender::GetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property)
-{
-  (void)fontId;
-  bool succ = propertyId == CS_FONTSIZE;
-  if ( succ ) property = 1;
-  return succ;
-}
-
-unsigned char* csDefaultFontRender::GetCharBitmap (int fontId, unsigned char c)
-{ 
-  //  printf("%c of font %d\n", c, fontId);
-  return &(FontList[ fontId ].FontBitmap[ c * FontList[ fontId ].BytesPerChar ]); 
-}
-
-int csDefaultFontRender::GetCharWidth (int fontId, unsigned char c)
-{
-  int width;
-  if (FontList[ fontId ].IndividualWidth)
-    width = FontList[ fontId ].IndividualWidth[ c ];
-  else
-    width = FontList[ fontId ].Width;
-
-  return width;
-}
-
-int csDefaultFontRender::GetCharHeight (int fontId, unsigned char /*c*/)
-{ 
-  return FontList[ fontId ].Height; 
-}
-
-int csDefaultFontRender::GetMaximumHeight (int fontId)
-{
-  return FontList[ fontId ].Height; 
-}
-
-void csDefaultFontRender::GetTextDimensions (int fontId, const char* text, int& width, int& height)
-{
-  int i, n=strlen(text);
-  
-  width=0;
-  height=0;
-  
-  if (FontList[ fontId ].IndividualWidth)
-    for (i=0; i<n; i++) width+=FontList[ fontId ].IndividualWidth[ *(unsigned char*)text++ ];
-  else
-    width = n*FontList[ fontId ].Width;
-  height = FontList[ fontId ].Height;
-}
+  { "Police",		8, 8, 8,	font_Police,	width_Police	},
+  { "Police.fixed",	8, 8, 8,	font_Police,	NULL		},
+  { "Italic",		8, 8, 8,	font_Italic,	width_Italic	},
+  { "Italic.fixed",	8, 8, 8,	font_Italic,	NULL		},
+  { "Courier",		7, 8, 8,	font_Courier,	width_Courier	},
+  { "Courier.fixed",	8, 8, 8,	font_Courier,	NULL		},
+  { "Tiny",		4, 6, 8,	font_Tiny,	width_Tiny	},
+  { "Tiny.fixed",	6, 6, 8,	font_Tiny,	NULL		},
+  { NULL }
+};
 
 IMPLEMENT_IBASE (csDefaultFontRender)
   IMPLEMENTS_INTERFACE (iFontRender)
@@ -128,3 +49,84 @@ EXPORT_CLASS_TABLE (csfont)
   EXPORT_CLASS (csDefaultFontRender, "crystalspace.font.render.csfont", 
 		"CrystalSpace default font renderer" )
 EXPORT_CLASS_TABLE_END
+
+csDefaultFontRender::csDefaultFontRender (iBase *pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+  for (FontCount = 1; FontList [FontCount - 1].Name; FontCount++)
+    ;
+}
+
+bool csDefaultFontRender::Initialize (iSystem *pSystem)
+{
+  (void)pSystem;
+  return true;
+}
+
+int csDefaultFontRender::LoadFont (const char* name, const char* /*filename*/)
+{
+  for (int i = 0; FontList [i].Name; i++)
+    if (!strcmp (FontList [i].Name, name))
+      return i;
+  return -1;
+}
+
+bool csDefaultFontRender::SetFontProperty (int fontId,
+  CS_FONTPROPERTY propertyId, long& property, bool autoApply)
+{
+  (void)fontId;
+  (void)autoApply;
+  bool succ = (propertyId == CS_FONTSIZE);
+  if (succ && property != 1) property = 1;
+  return succ;
+}
+
+bool csDefaultFontRender::GetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property)
+{
+  (void)fontId;
+  bool succ = (propertyId == CS_FONTSIZE);
+  if (succ) property = 1;
+  return succ;
+}
+
+unsigned char *csDefaultFontRender::GetCharBitmap (int fontId, unsigned char c)
+{ 
+  // printf("%c of font %d\n", c, fontId);
+  return &(FontList [fontId].FontBitmap [c * FontList [fontId].BytesPerChar]); 
+}
+
+int csDefaultFontRender::GetCharWidth (int fontId, unsigned char c)
+{
+  int width;
+  if (FontList [fontId].IndividualWidth)
+    width = FontList [fontId].IndividualWidth [c];
+  else
+    width = FontList [fontId].Width;
+
+  return width;
+}
+
+int csDefaultFontRender::GetCharHeight (int fontId, unsigned char /*c*/)
+{ 
+  return FontList [fontId].Height; 
+}
+
+int csDefaultFontRender::GetMaximumHeight (int fontId)
+{
+  return FontList [fontId].Height; 
+}
+
+void csDefaultFontRender::GetTextDimensions (int fontId, const char* text, int& width, int& height)
+{
+  int i, n = strlen (text);
+
+  width = 0;
+  height = 0;
+
+  if (FontList [fontId].IndividualWidth)
+    for (i = 0; i < n; i++)
+      width += FontList [fontId].IndividualWidth [*(unsigned char *)text++];
+  else
+    width = n * FontList [fontId].Width;
+  height = FontList [fontId].Height;
+}
