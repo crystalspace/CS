@@ -51,7 +51,6 @@ The basic structure of a map file for Crystal Space is as follows:
     zero or more mesh factories.
   world definition:
     zero or more sectors.
-    zero or more region specifications.
     zero or more collections.
   action section:
     one sequence section.
@@ -617,21 +616,6 @@ contains all wall geometry and a region which contains all moving geometry.
 Usually though, regions represent some area in the world. You can use
 regions to dynamically load/unload parts of the world. This is useful
 if you have really big worlds that don't fit in memory at once.
-
-Usually when you use regions for dynamic loading you would probably
-seperate the map files for every region. But in some cases it might
-be useful to switch the region in the map file itself. This can be done
-by placing the @samp{region} keyword in the @code{<world>} section:
-
-@example
-<region>BlaRegion</region>
-@dots{}
-<sector name=@dots{}>
-  @dots{}
-</sector>
-@dots{}
-<region>OtherRegion</region>
-@end example
 
 @subsubheading Collection Specification
 @cindex collections (Map File)

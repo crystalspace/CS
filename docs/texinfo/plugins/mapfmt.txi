@@ -246,7 +246,6 @@ points forward.
 @production{meshfact-name, @nonterm{name}}@*
 @production{library-name, @nonterm{name}}@*
 @production{file-name, @nonterm{name}}@*
-@production{region-name, @nonterm{name}}@*
 @production{plugin-name, @nonterm{name}}@*
 @production{plugin-shortname, @nonterm{name}}@*
 @production{cache-name, @nonterm{name}}@*
@@ -588,9 +587,6 @@ Same remark as for mesh objects: the stuff that is inside the
     @LP{} [ @nonterm{sound-file} ] @RP{}}@*
 @production{sounds, @token{SOUNDS} @LP{} [ @nonterm{sound} @dots{} ] @RP{}}
 
-@subsubheading Current Region
-@production{region, @token{REGION} @LP{} [ @nonterm{region-name} ] @RP{}}
-
 @subsubheading Render Priorities
 @production{rendpri-value, @nonterm{integer}}@*
 @production{rendpri-setting,
@@ -621,7 +617,6 @@ Same remark as for mesh objects: the stuff that is inside the
     @prodnext{@nonterm{addon}}@*
     @prodnext{@nonterm{material-set}}@*
     @prodnext{@nonterm{sounds}}@*
-    @prodnext{@nonterm{region}}@*
     @prodnext{@nonterm{renderpriorities}}@*
     @prodnext{@nonterm{plugins}}@*
     @prodnext{@nonterm{sector}}@*

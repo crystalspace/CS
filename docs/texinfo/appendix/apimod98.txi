@@ -208,6 +208,38 @@ syntax recognized is a combination of both old @code{<texture>} and
 tags is sufficient to convert a level (apart from fixing the @code{<type>}
 tokens.)
 
+@subheading Regions
+@cindex @code{iRegion}
+@cindex @code{iEngine}
+@cindex @code{iLoader}
+
+Region handling has changed considerably. The engine no longer has the
+concept of a current region. The engine still manages all regions though.
+Objects also no longer register themselves to the current region. It is
+the responsability of the object creator to do that. The standard loader
+has support for adding objects to a region now.
+
+The following functions have been removed from @code{iEngine}:
+
+@itemize
+@item
+@code{SelectRegion()}
+@item
+@code{GetCurrentRegion()}
+@item
+@code{AddToCurrentRegion()}
+@end itemize
+
+There is one new function @code{iEngine->CreateRegion()} which will create
+a new region.
+
+In @code{iLoader} the functions @code{LoadMapFile()} and
+@code{ThreadedLoadMapFile()} now expect an optional pointer to a region
+instead of a boolean to use the current region.
+
+In addition to all these changes the @samp{region} keyword in XML is no
+longer supported.
+
 @subheading Mesh objects/factories and iPolygonMesh
 
 Some mesh factories used to support the querying of the @code{iPolygonMesh}
