@@ -53,6 +53,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (UV)
   CS_TOKEN_DEF (VERTICES)
+  CS_TOKEN_DEF (ANIMATE)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csSprite2DFactoryLoader)
@@ -361,6 +362,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
     CS_TOKEN_TABLE (MIXMODE)
     CS_TOKEN_TABLE (COLORS)
     CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (ANIMATE)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -469,6 +471,18 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	    (*verts)[i].color_init.green = list[i*3+1];
 	    (*verts)[i].color_init.blue = list[i*3+2];
 	  }
+        }
+        break;
+      case CS_TOKEN_ANIMATE:
+        {
+          bool loop;
+	  int type;
+          ScanStr (params, "%s, %d, %b", str, &type, &loop);
+	  iSprite2DUVAnimation *ani = spr2dLook->GetUVAnimation (str);
+	  if (ani)
+	    spr2dLook->SetUVAnimation (str, type, loop);
+	  else
+	    printf ("UVAnimation \'%s\' not found.\n", str);
         }
         break;
     }
