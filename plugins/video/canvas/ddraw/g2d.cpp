@@ -248,6 +248,9 @@ void csGraphics2DDDraw3::Close ()
     m_lpDD = 0;
   }
 
+  if (m_hWnd != 0)
+    DestroyWindow (m_hWnd);
+
   if (!FullScreen)
   {
     // restore the original system palette.
@@ -933,6 +936,9 @@ LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
       // the system produces an ugly beep when switching from fullscreen
       if (wParam == SC_KEYMENU)
         return TRUE;
+      break;
+    case WM_DESTROY:
+      This->m_hWnd = 0;
       break;
   }
   if (cswinIsWinNT ())

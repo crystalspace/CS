@@ -27,6 +27,8 @@ chronological order.
 	- res augmented DrawSimpleMesh() with a 'flags' parameter.
 	- res added a DrawSimpleMesh() flag to specify coordinates in screen
 	  space.
+	- res fixed bug 762021, 'Win32: "Sticky" main window after app quit',
+	  by adding DestroyWindow() calls to the Win32 canvases Close().
 8-Jun-2004
 	- Jorrit fixed a bug in the FindByNameWithChild() function in the
 	  engine. This function would crash if there were unnamed meshes

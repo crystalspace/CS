@@ -645,6 +645,9 @@ void csGraphics2DOpenGL::Close (void)
   DeleteObject (hWndPalette);
   ReleaseDC (m_hWnd, hDC);
 
+  if (m_hWnd != 0)
+    DestroyWindow (m_hWnd);
+
   RestoreDisplayMode ();
 }
 
@@ -872,6 +875,9 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
 	This->Resize (R.right - R.left + 1, R.bottom - R.top + 1);
         }
       }
+      break;
+    case WM_DESTROY:
+      This->m_hWnd = 0;
       break;
   }
   if (IsWindowUnicode (hWnd))
