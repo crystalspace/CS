@@ -523,6 +523,21 @@ struct iEngine : public iPlugIn
   /// @@@ Temporary function until things are moved to a plugin.
   virtual iMeshObjectType* GetThingType () = 0;
 
+  /// @@@ Temporary function until things are moved to a plugin.
+  virtual int GetNumPolyTxtPlanes () = 0;
+  /// @@@ Temporary function until things are moved to a plugin.
+  virtual iPolyTxtPlane* GetPolyTxtPlane (int idx) = 0;
+
+  /// Get the number of collections in the engine
+  virtual int GetNumCollections () = 0;
+  /// Get a collection by its index
+  virtual iCollection* GetCollection (int idx) = 0;
+
+  /// Get the number of camera positions in the engine
+  virtual int GetNumCameraPositions () = 0;
+  /// Get a camera position by its index
+  virtual iCameraPosition* GetCameraPosition (int idx) = 0;
+
   /**
    * Get the list of all textures.
    */

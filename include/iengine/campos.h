@@ -22,6 +22,8 @@
 #include "csutil/scf.h"
 
 struct iObject;
+struct iEngine;
+struct iCamera;
 
 SCF_VERSION (iCameraPosition, 0, 0, 1);
 
@@ -40,7 +42,9 @@ struct iCameraPosition : public iBase
   virtual csVector3 GetUpwardVector() = 0;
   
   virtual csVector3 GetForwardVector() = 0;
-  
+
+  /// Load the camera position into a camera object
+  virtual bool Load (iCamera*, iEngine*) = 0;
 };
 
 #endif

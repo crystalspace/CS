@@ -1224,6 +1224,21 @@ public:
   virtual iKeyValuePair* CreateKeyValuePair (const char* key,
   	const char* value);
 
+  /// @@@ Temporary function until things are moved to a plugin.
+  virtual int GetNumPolyTxtPlanes ();
+  /// @@@ Temporary function until things are moved to a plugin.
+  virtual iPolyTxtPlane* GetPolyTxtPlane (int idx);
+
+  /// Get the number of collections in the engine
+  virtual int GetNumCollections ();
+  /// Get a collection by its index
+  virtual iCollection* GetCollection (int idx);
+
+  /// Get the number of camera positions in the engine
+  virtual int GetNumCameraPositions ();
+  /// Get a camera position by its index
+  virtual iCameraPosition* GetCameraPosition (int idx);
+
   //--------------------- iConfig interface implementation --------------------
 
   csEngineConfig scfiConfig;

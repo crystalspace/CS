@@ -71,16 +71,18 @@ public:
   {
     DECLARE_EMBEDDED_IBASE(csCameraPosition);
 
-    virtual iObject *QueryObject() {return scfParent;}
-	
-	virtual const char *GetSector() { return scfParent->Sector; }
-
-	virtual csVector3 GetPosition() { return scfParent->Position; }
-
-	virtual csVector3 GetUpwardVector() { return scfParent->Upward; }
-	
-	virtual csVector3 GetForwardVector() { return scfParent->Forward; }
-
+    virtual iObject *QueryObject()
+    { return scfParent; }
+    virtual const char *GetSector()
+    { return scfParent->Sector; }
+    virtual csVector3 GetPosition()
+    { return scfParent->Position; }
+    virtual csVector3 GetUpwardVector()
+    { return scfParent->Upward; }
+    virtual csVector3 GetForwardVector()
+    { return scfParent->Forward; }
+    virtual bool Load (iCamera *c, iEngine *e)
+    { return scfParent->Load (c, e); }
   } scfiCameraPosition;
 };
 

@@ -2644,4 +2644,34 @@ iKeyValuePair* csEngine::CreateKeyValuePair (const char* key,
   return ikey;
 }
 
+int csEngine::GetNumPolyTxtPlanes ()
+{
+  return planes.Length ();
+}
+
+iPolyTxtPlane* csEngine::GetPolyTxtPlane (int idx)
+{
+  return &((csPolyTxtPlane*)planes.Get(idx))->scfiPolyTxtPlane;
+}
+
+int csEngine::GetNumCollections ()
+{
+  return collections.Length ();
+}
+
+iCollection* csEngine::GetCollection (int idx)
+{
+  return &((csCollection*)collections.Get(idx))->scfiCollection;
+}
+
+int csEngine::GetNumCameraPositions ()
+{
+  return camera_positions.Length ();
+}
+
+iCameraPosition* csEngine::GetCameraPosition (int idx)
+{
+  return &((csCameraPosition*)camera_positions.Get(idx))->scfiCameraPosition;
+}
+
 //-------------------End-Multi-Context-Support--------------------------------
