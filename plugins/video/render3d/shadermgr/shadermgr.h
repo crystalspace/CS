@@ -414,8 +414,8 @@ private:
   csSymbolTable *symtab;
 
   // Optimization fields for SetupState.
-  static buffercount;
-  static texturecount;
+  static int buffercount;
+  static int texturecount;
   static csVertexAttrib attribs[STREAMMAX*2];
   static iRenderBuffer* buffers[STREAMMAX*2];
   static csStringID buffernames[STREAMMAX*2];

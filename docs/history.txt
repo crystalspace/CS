@@ -22,6 +22,10 @@ chronological order.
 	  functionality again but I'm not sure how to do that.
 	- Jorrit also fixed the perl5 plugin to compile again by removing
 	  CSMASK_KeyUp and CSMASK_KeyDown and replacing with CSMASK_Keyboard.
+	- Jorrit fixed the shader manager. The following construct is illegal:
+		static bla;
+	  Please use:
+		static int bla;
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With
