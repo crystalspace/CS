@@ -39,7 +39,7 @@ LIB.PVIEW = $(foreach d,$(DEP.PVIEW),$($d.LIB))
 #TO_INSTALL.CONFIG += $(CFG.PVIEW)
 
 MSVC.DSP += PVIEW
-DSP.PVIEW.NAME = pviewng
+DSP.PVIEW.NAME = picview
 DSP.PVIEW.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
