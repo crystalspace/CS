@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+14-Mar-2002
+	- Norman Kramer did some fixes on the DOS port.
 13-Mar-2002
 	- Fixed mdl2spr so that it now correctly generates a MESHFACT
 	  keyword instead of MESHOBJ.

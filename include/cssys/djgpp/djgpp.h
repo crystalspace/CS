@@ -24,6 +24,7 @@
 
 #include "csutil/csinput.h"
 #include "iutil/eventh.h"
+#include "iutil/event.h"
 #include "cssys/system.h"
 #include "cssys/djgpp/doshelp.h"
 
@@ -34,7 +35,7 @@ struct iEvent;
 /**
  * Implementation class for iDosHelper.
  */
-class DosHelper : public DosHelper
+class DosHelper : public iDosHelper
 {
 private:
   SysSystemDriver* sys;
