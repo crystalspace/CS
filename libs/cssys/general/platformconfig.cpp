@@ -27,6 +27,34 @@
 #include "csutil/csstring.h"
 #include "cssys/sysfunc.h"
 
+#ifndef S_IRUSR
+#define S_IRUSR 0000400
+#endif
+#ifndef S_IWUSR
+#define S_IWUSR 0000200
+#endif
+#ifndef S_IXUSR
+#define S_IXUSR 0000100
+#endif
+#ifndef S_IRGRP
+#define S_IRGRP 0000040
+#endif
+#ifndef S_IWGRP
+#define S_IWGRP 0000020
+#endif
+#ifndef S_IXGRP
+#define S_IXGRP 0000010
+#endif
+#ifndef S_IROTH
+#define S_IROTH 0000004
+#endif
+#ifndef S_IWOTH
+#define S_IWOTH 0000002
+#endif
+#ifndef S_IXOTH
+#define S_IXOTH 0000001
+#endif
+
 csPtr<iConfigFile> csGetPlatformConfig(const char* key)
 {
   // Is $HOME set? otherwise fallback to standard mode
@@ -44,7 +72,7 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* key)
   if (stat(dir, &stats) != 0)
   {
     mode_t const m =
-      S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IWGRPS_IXGRP|S_IROTH|S_IWOTH|S_IXOTH;
+      S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IWGRP|S_IXGRP|S_IROTH|S_IWOTH|S_IXOTH;
     if (mkdir(dir, m) != 0)
     {
       fprintf(stderr,
