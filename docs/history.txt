@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Feb-2004
+	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
+	  try to allocate a 0 size array in some cases.
+	- Jorrit added support for csArray and csBlockAllocator to the
+	  memory tracker. Unfortunatelly I found no way to convert the
+	  templated type name 'T' to a string I could print out to make
+	  the output more usable. So I'm now using the size of the
+	  item that is in the array or block allocator. That should help
+	  identify which array is using the memory but it is far from perfect.
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().

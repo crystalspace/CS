@@ -25,6 +25,10 @@
 #endif
 #include <new>
 
+#ifdef CS_MEMORY_TRACKER
+#include "csutil/memdebug.h"
+#endif
+
 /// This function prototype is used for Sort()
 typedef int ArraySortCompareFunction (void const* item1,
 	void const* item2);
@@ -141,6 +145,25 @@ private:
   int capacity;
   int threshold;
   T* root;
+# ifdef CS_MEMORY_TRACKER
+  MemTrackerInfo* mti;
+  void UpdateMti (int dn, int curcapacity)
+  {
+    if (!mti)
+    {
+      if (!curcapacity) return;
+      char buf[255];
+      sprintf (buf, "csArray<%d>", sizeof (T));
+      mti = mtiRegisterAlloc (1 * sizeof (T), buf);
+      if (!mti) return;
+      curcapacity--;
+      if (curcapacity)
+        mtiUpdateAmount (mti, curcapacity, curcapacity * sizeof (T));
+
+    }
+    mtiUpdateAmount (mti, dn, dn * sizeof (T));
+  }
+# endif
 
 protected:
   /**
@@ -173,9 +196,19 @@ private:
     {
       n = ((n + threshold - 1) / threshold ) * threshold;
       if (root == 0)
+      {
         root = MemoryAllocator::Alloc (n);
+#	ifdef CS_MEMORY_TRACKER
+	UpdateMti (n, n);
+#	endif
+      }
       else
+      {
         root = MemoryAllocator::Realloc (root, count, capacity, n);
+#	ifdef CS_MEMORY_TRACKER
+	UpdateMti (n-capacity, n);
+#	endif
+      }
       capacity = n;
     }
   }
@@ -202,13 +235,23 @@ public:
    */
   csArray (int icapacity = 0, int ithreshold = 0)
   {
+#   ifdef CS_MEMORY_TRACKER
+    mti = 0;
+#   endif
     count = 0;
     capacity = (icapacity > 0 ? icapacity : 0);
     threshold = (ithreshold > 0 ? ithreshold : 16);
     if (capacity != 0)
+    {
       root = MemoryAllocator::Alloc (capacity);
+#     ifdef CS_MEMORY_TRACKER
+      UpdateMti (capacity, capacity);
+#     endif
+    }
     else
+    {
       root = 0;
+    }
   }
 
   ~csArray ()
@@ -219,6 +262,9 @@ public:
   /// Copy constructor.
   csArray (const csArray& source)
   {
+#   ifdef CS_MEMORY_TRACKER
+    mti = 0;
+#   endif
     root = 0;
     capacity = 0;
     count = 0;
@@ -259,6 +305,10 @@ public:
       destination.count = count;
       destination.capacity = capacity;
       destination.threshold = threshold;
+#     ifdef CS_MEMORY_TRACKER
+      destination.mti = mti;
+      mti = 0;
+#     endif
       root = 0;
       capacity = count = 0;
     }
@@ -533,6 +583,9 @@ public:
       for (i = 0 ; i < count ; i++)
         ElementHandler::Destroy (root + i);
       MemoryAllocator::Free (root);
+#     ifdef CS_MEMORY_TRACKER
+      UpdateMti (-capacity, 0);
+#     endif
       root = 0;
       capacity = count = 0;
     }
@@ -591,6 +644,9 @@ public:
     else if (count != capacity)
     {
       root = MemoryAllocator::Realloc (root, count, capacity, count);
+#     ifdef CS_MEMORY_TRACKER
+      UpdateMti (count-capacity, count);
+#     endif
       capacity = count;
     }
   }

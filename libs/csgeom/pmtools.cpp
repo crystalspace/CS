@@ -541,6 +541,7 @@ void csPolygonMeshTools::Triangulate (iPolygonMesh* polymesh,
 {
   tri_count = 0;
   int pc = polymesh->GetPolygonCount ();
+  if (!pc) { tris = 0; return; }
   csMeshedPolygon* polys = polymesh->GetPolygons ();
   int p;
   for (p = 0 ; p < pc ; p++)

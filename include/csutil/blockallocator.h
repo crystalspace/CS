@@ -27,6 +27,10 @@
 #endif
 #include <new>
 
+#ifdef CS_MEMORY_TRACKER
+#include "csutil/memdebug.h"
+#endif
+
 /**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has NO memory overhead per allocation
@@ -60,7 +64,19 @@ private:
     void* memory;
     csFreeList* firstfree;	// Linked list of free items in this block.
     csBlock () : memory (0) { }
-    ~csBlock () { if (memory) free (memory); }
+    ~csBlock ()
+    {
+      if (memory)
+      {
+#	ifdef CS_MEMORY_TRACKER
+	int32* ptr = ((int32*)memory)-2;
+	mtiRegisterFree ((MemTrackerInfo*)ptr, (size_t)ptr[1]);
+	free (ptr);
+#	else
+        free (memory);
+#	endif
+      }
+    }
   };
 
   csArray<csBlock> blocks;
@@ -105,7 +121,16 @@ private:
     {
       firstfreeblock = blocks.Push (csBlock ());
       csBlock& bl = blocks[firstfreeblock];
+#     ifdef CS_MEMORY_TRACKER
+      char buf[255];
+      sprintf (buf, "csBlockAllocator<%d>", sizeof (T));
+      int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
+      *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
+      *ptr++ = blocksize;
+      bl.memory = (void*)ptr;
+#     else
       bl.memory = (void*)malloc (blocksize);
+#     endif
       bl.firstfree = (csFreeList*)bl.memory;
       bl.firstfree->next = 0;
       bl.firstfree->numfree = size;
@@ -127,7 +152,16 @@ public:
 
     int idx = blocks.Push (csBlock ());
     csBlock& bl = blocks[idx];
+#   ifdef CS_MEMORY_TRACKER
+    char buf[255];
+    sprintf (buf, "csBlockAllocator<%d>", sizeof (T));
+    int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
+    *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
+    *ptr++ = blocksize;
+    bl.memory = (void*)ptr;
+#   else
     bl.memory = (void*)malloc (blocksize);
+#endif
     bl.firstfree = (csFreeList*)bl.memory;
     bl.firstfree->next = 0;
     bl.firstfree->numfree = size;

@@ -37,6 +37,10 @@
 // it's important that cssysdef.h is included AFTER the above #ifdef
 #include "cssysdef.h"
 
+#ifdef CS_MEMORY_TRACKER_IMPLEMENT
+#  define CS_MEMORY_TRACKER
+#endif
+
 #ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 // Select the type of memory debugger to use:
 //#  define MEMDEBUG_EXTENSIVE
@@ -631,29 +635,10 @@ void operator delete[] (void* p)
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 #include "iutil/objreg.h"
+#include "csutil/memdebug.h"
 #include "iutil/memdebug.h"
 
 #undef new
-
-// This structure is used per file to keep track of allocations.
-// ModuleMemTracker maintains an array of them per module.
-struct MemTrackerInfo
-{
-  char* file;
-  size_t max_alloc;
-  size_t current_alloc;
-  int max_count;
-  int current_count;
-  void Init (char* filename)
-  {
-    file = (char*)malloc (strlen (filename)+1);
-    strcpy (file, filename);
-    max_alloc = 0;
-    current_alloc = 0;
-    max_count = 0;
-    current_count = 0;
-  }
-};
 
 // This class is the memory tracker per module or application.
 // MemTrackerRegistry maintains a list of them.
@@ -661,7 +646,7 @@ class MemTrackerModule
 {
 public:
   char* Class;		// Name of class or 0 for application level.
-  MemTrackerInfo* mti_table[2000];
+  MemTrackerInfo* mti_table[10000];
   int mti_table_count;
 
   MemTrackerModule ()
@@ -694,7 +679,6 @@ public:
 
     if (start == end)
     {
-    //@@@@@@@@@@@ IS STRCMP NEEDED?
       int rc = strcmp (filename, mti_table[start]->file);
       if (rc == 0) return mti_table[start];
       if (rc < 0)
@@ -864,8 +848,22 @@ void mtiRegisterFree (MemTrackerInfo* mti, size_t s)
   }
 }
 
+void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize)
+{
+  if (mti)
+  {
+    mti->current_count += dcount;
+    mti->current_alloc += dsize;
+    if (mti->current_count > mti->max_count)
+      mti->max_count = mti->current_count;
+    if (mti->current_alloc > mti->max_alloc)
+      mti->max_alloc = mti->current_alloc;
+  }
+}
+
 void* operator new (size_t s, void* filename, int /*line*/)
 {
+  CS_ASSERT (s > 0);
   uint32* rc = (uint32*)malloc (s+16);
   *rc++ = s;
   *rc++ = 0xbeebbeeb;
@@ -875,6 +873,7 @@ void* operator new (size_t s, void* filename, int /*line*/)
 }
 void* operator new[] (size_t s, void* filename, int /*line*/)
 {
+  CS_ASSERT (s > 0);
   uint32* rc = (uint32*)malloc (s+16);
   *rc++ = s;
   *rc++ = 0xfeedbeef;
