@@ -83,7 +83,13 @@ void R3DTest::SetupFrame ()
   csTicks elapsed_time = vc->GetElapsedTicks ();
 
   // Now rotate the camera according to keyboard state
-
+  static int frame;
+  bool stop = false;
+  if(++frame == 100)
+  {
+    frame=0;
+    stop=true;
+  }
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   int w = r3d->GetDriver2D ()->GetWidth()/2;
@@ -124,6 +130,8 @@ void R3DTest::SetupFrame ()
   view->Draw ();
 
   r3d->FinishDraw ();
+  if(stop)
+    stop=false;
 }
 
 void R3DTest::FinishFrame ()
@@ -286,7 +294,7 @@ bool R3DTest::Initialize ()
   mat->QueryObject ()->SetName ("shadow extruder");
 
   // Change this path to something /Anders Stenberg
-  vfs->Mount ("/lev/testrender", "faerie.zip");
+  vfs->Mount ("/lev/testrender", "testrender.zip");
   vfs->ChDir ("/lev/testrender");
   if (!loader->LoadMapFile ("world", false))
   {
@@ -295,6 +303,8 @@ bool R3DTest::Initialize ()
     	"Couldn't load the test level!\nNote that this application is experimental.\nIf you don't have a test level for this app then you probably don't want to run it.");
     return false;
   }
+  
+  //loader->LoadMapFile("/this/data/test.xml", false);
 
   csRef<iSector> room = engine->FindSector ("room");
 
@@ -314,19 +324,7 @@ bool R3DTest::Initialize ()
     csRef<iShader> shader (shmgr->CreateShader());
     if(shader)
     {
-      csRef<iShaderTechnique> tech (shader->CreateTechnique());
-      if(tech)
-      {
-        tech->SetPriority(100);
-        csRef<iShaderPass> pass (tech->CreatePass());
-        if(pass)
-        {
-          csRef<iShaderProgram> vp (shmgr->CreateShaderProgram("gl_arb_vp"));
-          csRef<iDataBuffer> mybuff(vfs->ReadFile("/shader/vertexlight.avp"));
-          vp->Load(mybuff);
-          pass->SetVertexProgram(vp);
-        }
-      }
+      shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/light.xml")));
       if(shader->Prepare())
       {
         for (int i=0; i<engine->GetMaterialList ()->GetCount (); i++)
@@ -337,19 +335,7 @@ bool R3DTest::Initialize ()
     shader = shmgr->CreateShader();
     if(shader)
     {
-      csRef<iShaderTechnique> tech (shader->CreateTechnique());
-      if(tech)
-      {
-        tech->SetPriority(100);
-        csRef<iShaderPass> pass (tech->CreatePass());
-        if(pass)
-        {
-          csRef<iShaderProgram> vp (shmgr->CreateShaderProgram("gl_arb_vp"));
-          csRef<iDataBuffer> mybuff(vfs->ReadFile("/shader/shadowextrude.avp"));
-          vp->Load(mybuff);
-          pass->SetVertexProgram(vp);
-        }
-      }
+      shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/shadow.xml")));
       if(shader->Prepare())
       {
         engine->FindMaterial ("shadow extruder")->GetMaterial ()->SetShader(shader);

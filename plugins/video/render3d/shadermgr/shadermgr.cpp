@@ -263,6 +263,9 @@ iShader* csShaderManager::GetShader(const char* name)
 csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
 {
   int i;
+
+  if(!type) return NULL;
+
   for(i = 0; i < pluginlist.Length(); ++i)
   {
     if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
@@ -428,6 +431,12 @@ bool csShader::Load(iDocumentNode* node)
   if(node)
   {
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    //get the name, if any. otherwise don't set
+    const char* name = node->GetAttributeValue("name");
+    if(name && strlen(name))
+      SetName(name);
+
+
     while(it->HasNext())
     {
       csRef<iDocumentNode> child = it->Next();
@@ -583,7 +592,7 @@ void csShaderPass::BuildTokenHash()
 
 bool csShaderPass::Load(iDocumentNode* node)
 {
-    if (!node) 
+  if (!node) 
     return false;
 
   BuildTokenHash();
@@ -602,18 +611,18 @@ bool csShaderPass::Load(iDocumentNode* node)
       {
       case XMLTOKEN_VP:
         {
-          csRef<iShaderProgram> vp = shadermgr->CreateShaderProgram(node->GetAttributeValue("type"));
+          csRef<iShaderProgram> vp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
           if(vp)
           {
-            if(node->GetAttribute("file"))
+            if(child->GetAttribute("file"))
             {
               csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
               //load from file
-              vp->Load( csRef<iDataBuffer>(vfs->ReadFile(node->GetAttributeValue("file"))));
+              vp->Load( csRef<iDataBuffer>(vfs->ReadFile(child->GetAttributeValue("file"))));
             }
             else
             {
-              vp->Load(node);
+              vp->Load(child);
             }
             SetVertexProgram(vp);
           }
@@ -621,18 +630,18 @@ bool csShaderPass::Load(iDocumentNode* node)
         break;
       case XMLTOKEN_FP:
         {
-          csRef<iShaderProgram> fp = shadermgr->CreateShaderProgram(node->GetAttributeValue("type"));
+          csRef<iShaderProgram> fp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
           if(fp)
           {
             if(node->GetAttribute("file"))
             {
               csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
               //load from file
-              fp->Load( csRef<iDataBuffer>(vfs->ReadFile(node->GetAttributeValue("file"))));
+              fp->Load( csRef<iDataBuffer>(vfs->ReadFile(child->GetAttributeValue("file"))));
             }
             else
             {
-              fp->Load(node);
+              fp->Load(child);
             }
             SetVertexProgram(fp);
           }
@@ -760,6 +769,7 @@ bool csShaderTechnique::Load(iDocumentNode* node)
   if(node)
   {
     priority = node->GetAttributeValueAsInt("priority");
+    SetPriority(priority);
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while(it->HasNext())
     {

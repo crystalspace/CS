@@ -1,0 +1,9 @@
+
+<shader name="shadowextrude">
+	<technique priority="100">
+		<pass>
+			<vp type="gl_arb_vp" file="/shader/shadowextrude.avp"/>
+		</pass>
+	</technique>
+</shader>
+

@@ -1,0 +1,7 @@
+<shader name="light">
+	<technique priority="100">
+		<pass>
+			<vp type="gl_arb_vp" file="/shader/vertexlight.avp"/>
+		</pass>
+	</technique>
+</shader>
