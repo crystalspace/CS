@@ -35,6 +35,12 @@
 #include "igraph3d.h"
 #include "iparticl.h"
 
+// Set the default lighting quality.
+// See header file for LIGHTING_* definitions.
+//#define DEFAULT_LIGHTING LIGHTING_HQ
+#define DEFAULT_LIGHTING LIGHTING_LQ
+//#define DEFAULT_LIGHTING LIGHTING_FAST
+
 
 //--------------------------------------------------------------------------
 
@@ -774,7 +780,9 @@ void csSprite3D::FixVertexColors ()
 
 csTriangleMesh csSprite3D::mesh;
 float csSprite3D::cfg_lod_detail = 1;
-bool csSprite3D::do_quality_lighting = false;
+
+// Set the default lighting quality.
+int csSprite3D::lighting_quality = DEFAULT_LIGHTING;
 
 int map (int* emerge_from, int idx, int num_verts)
 {
@@ -1269,75 +1277,160 @@ csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
 
 void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 {
-  int i;
-
   defered_num_lights = 0;
 
-  csFrame* this_frame = cur_action->GetFrame (cur_frame);
-  csFrame* next_frame; // next frame for vertex animation interpolation
-  if (cur_frame + 1 < cur_action->GetNumFrames())
-    next_frame = cur_action->GetFrame (cur_frame + 1);
-  else
-    next_frame = cur_action->GetFrame (0);
+  // Make sure the normals are computed
+  tpl->ComputeNormals (cur_action->GetFrame (cur_frame));
+  if (tween_ratio && lighting_quality != LIGHTING_FAST)
+    tpl->ComputeNormals (cur_action->GetNextFrame (cur_frame));
 
-  ResetVertexColors ();
-
-  // this is so that sprite gets blackened if no light strikes it
+  // Make sure that the color array is initialized.
   AddVertexColor (0, csColor (0, 0, 0));
 
-  csSector * sect = movable.GetSector (0);
-  if (sect)
+  if (lighting_quality != LIGHTING_FAST)
   {
-    int r, g, b;
-    sect->GetAmbientColor (r, g, b);
-    csColor ambient_color (r / 128.0, g / 128.0, b / 128.0);
-    for (i = 0 ; i < tpl->GetNumTexels (); i++)
-      AddVertexColor (i, ambient_color);
-  }
-
-  // make sure normals are computed
-  tpl->ComputeNormals (this_frame);
-  if (tween_ratio) tpl->ComputeNormals (next_frame);
-
-  csVector3* work_obj_verts;
-
-  if (do_quality_lighting)
-  {
-    if (tween_ratio)
+    csSector * sect = movable.GetSector (0);
+    if (sect)
     {
-      UpdateWorkTables (tpl->GetNumTexels ()); // make room in obj_verts;
+      int r, g, b;
+      int num_texels = tpl->GetNumTexels();
 
-      int tf_idx = this_frame->GetAnmIndex();
-      int nf_idx = next_frame->GetAnmIndex();
+      sect->GetAmbientColor (r, g, b);
+      float rr = r / 128.0;
+      float gg = g / 128.0;
+      float bb = b / 128.0;
 
-      float remainder = 1 - tween_ratio;
-
-      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-        obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
-          + remainder * tpl->GetVertex (nf_idx, i);
-
-      work_obj_verts = obj_verts.GetArray ();
+      // Reseting all of the vertex_colors to the ambient light.
+      for (int i = 0 ; i < num_texels; i++)
+        vertex_colors [i].Set (rr, gg, bb);
     }
-    else
-      work_obj_verts = GetObjectVerts (this_frame);
-
-    UpdateLightingHQ (lights, num_lights, work_obj_verts);
   }
   else
-    UpdateLightingLQ (lights, num_lights, work_obj_verts);
+    ResetVertexColors();
+
+  switch (lighting_quality)
+  {
+    case LIGHTING_HQ:   UpdateLightingHQ   (lights, num_lights); break;
+    case LIGHTING_LQ:   UpdateLightingLQ   (lights, num_lights); break;
+    case LIGHTING_FAST: UpdateLightingFast (lights, num_lights); break;
+  }
+
+  FixVertexColors ();  // Clamp all vertex colors to 2.0
 }
 
-void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices)
+void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
+{
+  int light_num, j;
+  
+  float cosinus;
+  int num_texels;
+  
+  float light_bright_wor_dist;
+  
+  // convert frame number in current action to absolute frame number
+  int tf_idx = cur_action->GetFrame (cur_frame)->GetAnmIndex();
+
+  csBox3 obox;
+  GetObjectBoundingBox (obox);
+  csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
+  csVector3 wor_center = movable.GetTransform ().This2Other (obj_center);
+  csColor color;
+  
+  csColor light_color;
+  float sq_light_radius;
+  float cosinus_light;
+  float light_color_r;
+  float light_color_g;
+  float light_color_b;
+
+  // ambient colors.
+  int r, g, b;
+  
+  csSector * sect = movable.GetSector (0);
+  sect->GetAmbientColor (r, g, b);
+  float amb_r = r / 128.0;
+  float amb_g = g / 128.0;
+  float amb_b = b / 128.0;
+
+  num_texels = tpl->GetNumTexels();
+
+  for (light_num = 0 ; light_num < num_lights ; light_num++)
+  {
+    light_color = lights [light_num]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
+    sq_light_radius = lights [light_num]->GetSquaredRadius ();
+
+    // Compute light position in object coordinates
+    csVector3 wor_light_pos = lights [light_num]->GetCenter ();
+    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
+    if (wor_sq_dist >= sq_light_radius) continue;
+
+    csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
+    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
+    float obj_dist = FastSqrt (obj_sq_dist);
+    float wor_dist = FastSqrt (wor_sq_dist);
+
+    csVector3 obj_light_dir = (obj_light_pos - obj_center);
+    light_bright_wor_dist = lights[light_num]->GetBrightnessAtDistance (wor_dist);
+
+    color = light_color;
+  
+    // This part of code will hardly ever be called.
+    if (obj_sq_dist < SMALL_EPSILON)
+    {
+      for (j = 0 ; j < num_texels ; j++)
+      {
+        // TODO: need to add the ambient color here.
+        AddVertexColor (j, color);
+      }
+      continue;
+    }
+
+    light_color_r = light_color.red;
+    light_color_g = light_color.green;
+    light_color_b = light_color.blue;
+
+    // NOTE: Doing this to get rid of a divide in the loop.
+    obj_dist = 1 / obj_dist;
+
+    // The first light should have the ambient color added.
+    if(light_num == 0)
+    {
+      for (j = 0 ; j < num_texels ; j++)
+      {
+        // this obj_dist is not the obj_dist, see NOTE above.
+        cosinus = (obj_light_dir * tpl->GetNormal (tf_idx, j)) * obj_dist;
+        cosinus_light = (cosinus * light_bright_wor_dist);
+        vertex_colors[j].Set(light_color_r * cosinus_light + amb_r,
+                             light_color_g * cosinus_light + amb_g,
+                             light_color_b * cosinus_light + amb_b);
+      }
+    }
+    else  // The next lights should have the light color added.
+    {
+      for (j = 0 ; j < num_texels ; j++)
+      {
+        // this obj_dist is not the obj_dist, see NOTE above.
+        cosinus = (obj_light_dir * tpl->GetNormal (tf_idx, j)) * obj_dist;
+        cosinus_light = (cosinus * light_bright_wor_dist);
+        vertex_colors[j].Add(light_color_r * cosinus_light,
+                             light_color_g * cosinus_light,
+                             light_color_b * cosinus_light);
+      }
+    }
+  } // end of light loop.
+}
+
+
+void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights)
 {
   int i, j;
-  csFrame* this_frame = cur_action->GetFrame (cur_frame);
-  csFrame* next_frame;
-  if (cur_frame + 1 < cur_action->GetNumFrames())
-    next_frame = cur_action->GetFrame (cur_frame + 1);
-  else
-    next_frame = cur_action->GetFrame (0);
-  int tf_idx = this_frame->GetAnmIndex();
-  int nf_idx = next_frame->GetAnmIndex();
+
+  int num_texels = tpl->GetNumTexels ();
+  float remainder = 1 - tween_ratio;
+
+  // convert frame number in current action to absolute frame number
+  int tf_idx = cur_action->GetFrame     (cur_frame)->GetAnmIndex ();
+  int nf_idx = cur_action->GetNextFrame (cur_frame)->GetAnmIndex ();
 
   csBox3 obox;
   GetObjectBoundingBox (obox);
@@ -1347,66 +1440,71 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
 
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
-    float sq_light_radius = lights [i]->GetSquaredRadius ();
-
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
-    if (wor_sq_dist >= sq_light_radius) continue;
+    if (wor_sq_dist >= lights[i]->GetSquaredRadius ()) continue;
 
     csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
-    float obj_dist = FastSqrt (obj_sq_dist);
-    float wor_dist = FastSqrt (wor_sq_dist);
+    float in_obj_dist = 1 / FastSqrt (obj_sq_dist);
 
-    csVector3 obj_light_direction = (obj_light_pos - obj_center);
+    csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
-    for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+    csColor light_color = lights[i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL)
+      * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+
+    for (j = 0 ; j < num_texels ; j++)
     {
       csVector3 normal = tpl->GetNormal (tf_idx, j);
       if (tween_ratio)
       {
-        normal = (1 - tween_ratio) * normal
-          + tween_ratio * tpl->GetNormal (nf_idx, j);
+        normal = remainder * normal + tween_ratio * tpl->GetNormal (nf_idx, j);
 	float norm = normal.Norm ();
 	if (ABS (norm) > SMALL_EPSILON)
           normal /= norm;
       }
 
       float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON)
-        cosinus = 1;
-      else
-        cosinus = obj_light_direction * normal;
+      if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
+      else cosinus = obj_light_dir * normal;
 
       if (cosinus > 0)
       {
         color = light_color;
-        if (obj_sq_dist >= SMALL_EPSILON)
-          cosinus /= obj_dist;
-        if (cosinus < 1)
-          color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
+        if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
+        if (cosinus < 1) color *= cosinus;
         AddVertexColor (j, color);
       }
     }
   }
-
-  // Clamp all vertice colors to 2.0
-  FixVertexColors ();
 }
 
-void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* object_vertices)
+void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights)
 {
   int i, j;
-  csFrame* this_frame = cur_action->GetFrame (cur_frame);
-  csFrame* next_frame;
-  if (cur_frame + 1 < cur_action->GetNumFrames())
-    next_frame = cur_action->GetFrame (cur_frame + 1);
+
+  // convert frame number in current action to absolute frame number
+  int tf_idx = cur_action->GetFrame     (cur_frame)->GetAnmIndex ();
+  int nf_idx = cur_action->GetNextFrame (cur_frame)->GetAnmIndex ();
+
+  float remainder = 1 - tween_ratio;
+  int num_texels = tpl->GetNumTexels ();
+
+  // need vertices to calculate distance from light to each vertex
+  csVector3* object_vertices;
+  if (tween_ratio)
+  {
+    UpdateWorkTables (num_texels); // make room in obj_verts;
+
+    for (i = 0 ; i < num_texels ; i++)
+      obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
+                   + remainder   * tpl->GetVertex (nf_idx, i);
+
+    object_vertices = obj_verts.GetArray ();
+  }
   else
-    next_frame = cur_action->GetFrame (0);
-  int tf_idx = this_frame->GetAnmIndex();
-  int nf_idx = next_frame->GetAnmIndex();
+    object_vertices = GetObjectVerts (cur_action->GetFrame (cur_frame));
 
   csColor color;
 
@@ -1419,7 +1517,7 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
 
-    for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+    for (j = 0 ; j < num_texels ; j++)
     {
       csVector3& obj_vertex = object_vertices[j];
       csVector3 wor_vertex = movable.GetTransform ().This2Other (obj_vertex);
@@ -1430,38 +1528,30 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
       // can be optimized somewhat.
       float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
       float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
+      float obj_dist = FastSqrt (obj_sq_dist);
 
       csVector3 normal = tpl->GetNormal (tf_idx, j);
       if (tween_ratio)
       {
-        normal = (1 - tween_ratio) * normal
-          + tween_ratio * tpl->GetNormal (nf_idx, j);
+        normal = remainder * normal + tween_ratio * tpl->GetNormal (nf_idx, j);
 	float norm = normal.Norm ();
 	if (ABS (norm) > SMALL_EPSILON)
           normal /= norm;
       }
 
       float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON)
-        cosinus = 1;
-      else
-        cosinus = (obj_light_pos - obj_vertex) * normal;
-
+      if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
+      else cosinus = (obj_light_pos - obj_vertex) * normal;
 
       if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
       {
         color = light_color;
-        if (obj_sq_dist >= SMALL_EPSILON)
-          cosinus /= FastSqrt (obj_sq_dist);
-        if (cosinus < 1)
-          color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+        if (obj_sq_dist >= SMALL_EPSILON) cosinus /= obj_dist;
+        if (cosinus < 1) color *= cosinus * lights[i]->GetBrightnessAtDistance (obj_dist);
         AddVertexColor (j, color);
       }
     }
   }
-
-  // Clamp all vertice colors to 2.0
-  FixVertexColors ();
 }
 
 bool csSprite3D::HitBeamObject (const csVector3& start, const csVector3& end,

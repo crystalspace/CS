@@ -1489,7 +1489,7 @@ void csWorld::ReadConfig ()
 
   csSector::cfg_reflections = Config->GetInt ("Lighting", "Reflections", csSector::cfg_reflections);
   csPolyTexture::cfg_cosinus_factor = Config->GetFloat ("Lighting", "CosinusFactor", csPolyTexture::cfg_cosinus_factor);
-  csSprite3D::do_quality_lighting = Config->GetYesNo ("Lighting", "SpriteHighQual", csSprite3D::do_quality_lighting);
+  csSprite3D::lighting_quality = Config->GetInt ("Lighting", "LightingQual", csSprite3D::lighting_quality);
   csSector::do_radiosity = Config->GetYesNo ("Lighting", "Radiosity", csSector::do_radiosity);
 
   // radiosity options

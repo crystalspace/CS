@@ -62,6 +62,9 @@ public:
   /// Add another color to this one.
   csColor& operator+= (const csColor& c)
   { red += c.red; green += c.green; blue += c.blue; return *this; }
+  /// Add given R,G,B components to color.
+  void Add (float r, float g, float b)
+  { red += r; green += g; blue += b; }
 };
 
 /// Multiply a color by a scalar value.

@@ -123,6 +123,9 @@ public:
   /// Query the frame number f
   csFrame* GetFrame (int f)
   { return (f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame*)NULL; }
+  /// Returns the looping frame after frame number f
+  csFrame* GetNextFrame (int f)
+  { f++; return (f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame *)frames [0]; }
   /// Get delay for frame number f
   int GetFrameDelay (int f)
   { return (int)delays [f]; }
@@ -603,6 +606,13 @@ public:
   CSOBJTYPE;
 };
 
+/**
+ * Macros for the csSprite3D lighting levels.
+ */
+#define LIGHTING_HQ 0
+#define LIGHTING_LQ 1
+#define LIGHTING_FAST 2
+
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -626,11 +636,10 @@ public:
   static float cfg_lod_detail;
 
   /**
-   * Quality setting for sprite lighting. If true this uses
-   * high quality lighting which is more accurate on the vertices.
-   * Otherwise an approximation is used. This is a lot faster though.
+   * Quality setting for sprite lighting. See the LIGHTING_* macros defined
+   *  in this header file for the different types of lighting.
    */
-  static bool do_quality_lighting;
+  static int lighting_quality;
 
 private:
   /**
@@ -680,14 +689,23 @@ private:
   /**
    * High quality version of UpdateLighting() which recalculates
    * the distance between the light and every vertex.
+   * This version can use tweening of the normals and vertices
    */
-  void UpdateLightingHQ (csLight** lights, int num_lights, csVector3* object_vertices);
+  void UpdateLightingHQ (csLight** lights, int num_lights);
 
   /**
    * Low quality version of UpdateLighting() which only
-   * calculates the distance once (with the center of the sprite).
+   * calculates the distance once (from the center of the sprite.)
+   * This method can use tweening of the normals.
    */
-  void UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices);
+  void UpdateLightingLQ (csLight** lights, int num_lights);
+   
+  /**
+   * Low quality Fast version of UpdateLighting() which only
+   * calculates the distance once (from the center of the sprite.)
+   * This version can NOT use any tweening.
+   */
+  void UpdateLightingFast (csLight** lights, int num_lights);
 
 protected:
   /**
