@@ -14,6 +14,11 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+    csdemo - This is the demo application for crystal space, it reads worlds
+    and scenes with sequences and animation paths from data files allowing
+    to produce generic demos.
 */
 
 #include "cssysdef.h"

@@ -15,6 +15,10 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+    Bumptest: This application shows how to fake bumpmapping by overlapping
+    several texture layers and moving them acoording to the light.
 */
 
 #include "cssysdef.h"

@@ -14,6 +14,11 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+
+    Blocks is a demo game for crystal space. It's a tetris like game with 3d
+    blocks instead of 2d ones.
 */
 
 /*

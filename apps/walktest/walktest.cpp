@@ -14,6 +14,11 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+    walktest - the main Crystal Space test application, used for
+    demonstrating and testing several features of the engine. (Note
+    that walktest code should not be used as an example in most cases :-/)
 */
 #include <stdarg.h>
 
