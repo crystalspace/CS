@@ -85,6 +85,8 @@
 #define CS_FUNCID_VIDEO		"VideoDriver"
 /// Sound renderer
 #define CS_FUNCID_SOUND		"SoundRender"
+/// Font renderer
+#define CS_FUNCID_FONT		"FontRender"
 /// Network driver
 #define CS_FUNCID_NETDRV	"NetDriver"
 /// Network manager
