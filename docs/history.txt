@@ -22,6 +22,25 @@ Short-term cleanups that need to be done:
 	- Norman Kramer did some fixes on the csConsole plygin to cursor
 	  positioning on pageup/down and fixed some code that caused crashes
 	  when the right cursorkey was hit on an empty line.
+	- Removed the mk/bcb4 directory. The project files in there are
+	  very obsolete and Brandon Ehle is working on native makefile
+	  support for BCB4.
+	- Andrew Zabolotny did the folowing change:
+	    - Moved DrawPixmap() (ex-DrawSprite()) from iGraphics2D to
+	      iGraphics3D interface. From now on iGraphics2D interface is
+	      absolutely independent of the 3D driver and can be used separately.
+	      All the mess regarded to getting a pointer to bitmap data has
+	      vanished. Now DrawPixmap() extracts data from texture handle
+	      exactly same way how DrawPolygon, DrawPolygonFX and all others do.
+	      I beg pardon from Direct3D and Glide maintainers since I broke
+	      Direct3D sprites again. I promise to never break it again, at
+	      least in the nearest year :-)
+	      I wrote a related comment in respective files near the
+	      end (g3dglide.cpp and d3d_g3d.cpp) - look there for more
+	      information.
+	      Software driver works and OpenGL driver should work too
+	      (at least it compiles okay).
+	    - Fixed a minor bug with texture transparency in MazeD.
 22-Mar-2000
 	- Continued debugging work on solid BSP. Still not perfect
 	  although I'm getting closer all the time.
