@@ -29,6 +29,8 @@ enum {
   DN_AUTOCONNECTIONS,
   DN_ADDTEXTURES,
   DN_CLEARPRECALC,
+  DN_PRINTLOG,
+  DN_TABLENGTH,
 
   DN_NUM_OPTIONS
 };
@@ -36,9 +38,9 @@ enum {
 /**
  * This is a set of statistics variables. You can get a pointer to the
  * creator's statistics by calling GetStatistics();
+ * NEVER alter the values you get from there!
  */
-class dnStats
-{
+class dnStats : public csBase {
 public:
   long NumAreas,NumAreaTemplates,NumAutoCons;
   char **AreaTemplateNames;
@@ -46,20 +48,24 @@ public:
   long NumDirectCons,NumAngleCons,NumDAngleCons;
 };
 
-SCF_VERSION (iDungeon, 0, 0, 1);
-
 /**
- * This is the randomizer plug-in itself. To use it, first set all options
- * to the values you want, or leave the default values. Then call CreateWorld
- * with the virtual path to the 'dungeon.gen' file (similar to lading a
- * world). After this, don't call SetOption() anymore (if you do, call
- * CreateWorld again. The old world will be invalid). Then call WriteWorld()
- * with the virtual output path as parameter. This path will then be usable
- * as a path to a CS world by your program. Optionally you can then get a
- * pointer to the statistics info.
+ * This is the randomizer plug-in itself. This is how to use it:
+ * 1. Set all options via SetOption. These options SHOULD NOT be changed
+ *    after this (unexpected results).
+ * 2. Call PrepareInput with the path to the main dungeon.gen file as a parameter.
+ *    This will read the necessary data for the randomizer. It will fill the
+ *    NumAreaTemplates and AreaTemplateNames fields of the statistics. Calling this
+ *    function more than once will overwrite the old data. 
+ * 3. Call CreateWorld. This will run the randomizer and create the world, as well
+ *    as fill the remaining fields of the statistics. You can run it again if you
+ *    don't like the result.
+ * 4. Call WriteWorld to save the generated world in CS world format. This will
+ *    first clear the precalculated stuff (optionally), then write the world text
+ *    file into the given virtual directory and finally copy the textures
+ *    (optionally).
  */
-class iDungeon : public iPlugIn
-{
+SCF_VERSION (iDungeon, 2, 0, 0);
+class iDungeon : public iPlugIn {
 public:
   /// plugin initialization
   virtual bool Initialize(iSystem *sys)=0;
@@ -71,12 +77,15 @@ public:
   virtual int GetOption(int opt)=0;
 
   /**
-   * Create a random world. InputDirectory must be a valid VFS directory that
-   * contains at least the main dungeon.gen file. Note : calling
-   * CreateWorld() twice without WriteWorld in between will waste the first
-   * generated world.
+   * Read the main dungeon.gen file from the given virtual directory and prepare
+   * its contents for the dungeon randomizer.
    */
-  virtual void CreateWorld(const char *InputDirectory)=0;
+  virtual void PrepareInput(const char *InputDirectory)=0;
+
+  /**
+   * Create a random world.
+   */
+  virtual void CreateWorld()=0;
 
   /**
    * Write the generated world to a file. OutputDirectory must be a valid VFS
