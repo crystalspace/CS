@@ -73,7 +73,7 @@ rule Wildcard
   return $(files:BSR=$(sdir)) ;
 }
 
-##  Recurse rule : types : [ prefix ]
+##  Recurse rule : types [ : prefix ]
 ##    Recursively scan current directory, $(SUBDIR), for files matching 'types'
 ##    and invoke 'rule' for each file which matches one of the 'types'.
 ##    'types' is a list of file extensions (with the leading dot).  'rule' will
