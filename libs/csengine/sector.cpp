@@ -676,71 +676,9 @@ void csSector::Draw (iRenderView* rview)
     }
   }
 
-  // In some cases this queue will be filled with all visible
-  // meshes.
-  csMeshWrapper** mesh_queue = NULL;
-  int num_mesh_queue = 0;
-  // If the following flag is true the queue is actually used.
-  bool use_object_queue = false;
+  if (rview->AddedFogInfo ())
+    rview->GetFirstFogInfo ()->has_outgoing_plane = false;
 
-  // If we have a visibility culler in this sector we use it here.
-  if (culler)
-  {
-    if (culler->VisTest (rview))
-    {
-      // The visibility culler worked and marked all registered
-      // visible things as visible.
-
-      // Fill the mesh queue for all meshes that were visible.
-      use_object_queue = true;
-      if (meshes.Length () > 0)
-      {
-	// Push all visible meshes in a queue.
-	// @@@ Avoid memory allocation?
-	mesh_queue = new csMeshWrapper* [meshes.Length ()];
-	num_mesh_queue = 0;
-        for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
-        {
-	  csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
-	  if (v)
-	    for (j = 0 ; j < v->Length () ; j++)
-	    {
-              csMeshWrapper* sp = v->Get (j)->GetPrivateObject ();
-	      if (sp->IsVisible ()) mesh_queue[num_mesh_queue++] = sp;
-	    }
-	}
-      }
-    }
-    else
-    {
-      // The visibility culler was either disabled or decided visibility
-      // culling was not useful given some circumstances. In this case
-      // all objects should be considered visible.
-    }
-  }
-
-  // If the queues are not used for things we still fill the queue here
-  // just to make the code below easier.
-  if (!use_object_queue)
-  {
-    num_mesh_queue = 0;
-    if (meshes.Length ())
-    {
-      mesh_queue = new csMeshWrapper* [meshes.Length ()];
-      for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
-      {
-        csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
-	if (v)
-	  for (j = 0 ; j < v->Length () ; j++)
-	  {
-            csMeshWrapper* sp = v->Get (j)->GetPrivateObject ();
-            mesh_queue[num_mesh_queue++] = sp;
-	  }
-      }
-    }
-    else
-      mesh_queue = NULL;
-  }
 
   // Draw meshes.
   // To correctly support meshes in multiple sectors we only draw a
@@ -754,41 +692,46 @@ void csSector::Draw (iRenderView* rview)
   // In those cases we draw the mesh anyway. @@@ Note that we should
   // draw it clipped (in 3D) to the portal polygon. This is currently not
   // done.
-  iSector* previous_sector = rview->GetPreviousSector ();
 
-  int spr_num;
-  if (mesh_queue) spr_num = num_mesh_queue;
-  else spr_num = meshes.Length ();
+  if (meshes.Length () > 0) {
+    // if we use a culler, visible objects are marked now
+    bool UseCuller = (culler && culler->VisTest (rview));
 
-  if (rview->AddedFogInfo ())
-    rview->GetFirstFogInfo ()->has_outgoing_plane = false;
+    // get a pointer to the previous sector
+    iSector *PreviousSector = rview->GetPreviousSector ();
 
-  for (i = 0 ; i < spr_num ; i++)
-  {
-    iMeshWrapper* sp;
-    if (mesh_queue) sp = &(mesh_queue[i]->scfiMeshWrapper);
-    else sp = meshes.Get (i);
+    // look if meshes from the previous sector should be drawn
+    bool DrawMeshesFromPreviousSector = false;
+  
+    if (PreviousSector) DrawMeshesFromPreviousSector =
+      PreviousSector->HasFog () ||
+      rview->GetPortalPolygon ()->IsTransparent () ||
+      rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().
+        Check (CS_PORTAL_WARP);
 
-    if (!previous_sector || sp->GetMovable ()->GetSectors ()->
-    	Find (previous_sector) == -1)
-    {
-      // Mesh is not in the previous sector or there is no previous sector.
-      sp->Draw (rview);
-    }
-    else
-    {
-      if (
-	  previous_sector->HasFog () ||
-	  rview->GetPortalPolygon ()->IsTransparent () ||
-	  rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().
-	  	Check (CS_PORTAL_WARP))
-      {
-	// @@@ Here we should draw clipped to the portal.
-	sp->Draw (rview);
+    // draw the meshes
+    for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++) {
+      csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
+      if (!v) continue;
+
+      for (j = 0 ; j < v->Length () ; j++) {
+        iMeshWrapper* sp = v->Get (j);
+        if (!UseCuller || sp->GetPrivateObject ()->IsVisible ()) {
+          if (!PreviousSector || sp->GetMovable ()->GetSectors ()->
+    	      Find (PreviousSector) == -1)
+	  {
+            // Mesh is not in the previous sector or there is no previous sector.
+            sp->Draw (rview);
+          }
+	  else if (DrawMeshesFromPreviousSector)
+          {
+            // @@@ Here we should draw clipped to the portal.
+            sp->Draw (rview);
+          }
+        }
       }
-    }
+    } 
   }
-  delete [] mesh_queue;
 
   // queue all halos in this sector to be drawn.
   for (i = lights.Length () - 1; i >= 0; i--)
