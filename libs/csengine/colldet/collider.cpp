@@ -105,9 +105,10 @@ csCollider::csCollider (csSprite3D *sp)
   _rm->b = 0;
   _rm->num_boxes_alloced = 0;
 
-  _rm->tris = 0;
-  _rm->num_tris = 0;
-  _rm->num_tris_alloced = 0;
+  //@@@ Why was this added? It is wrong!
+  //_rm->tris = 0;
+  //_rm->num_tris = 0;
+  //_rm->num_tris_alloced = 0;
 
   for (int i = 0; i < mesh->GetNumTriangles (); i++)
   {
