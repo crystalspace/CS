@@ -213,11 +213,11 @@ void csFrustrum::ClipToPlane (csVector3& v1, csVector3& v2)
     Plane_Normal = v1%v2;
 
   // On which side is the first vertex?
-  first_vertex_side = (Plane_Normal*(vertices[num_vertices -1] - v1) > 0);
+  first_vertex_side = (Plane_Normal*vertices[num_vertices -1] > 0);
 
   for (i = 0; i < num_vertices - 1; i++)
   {
-    if ( (Plane_Normal*(vertices[i] - v1) > 0) != first_vertex_side)
+    if ( (Plane_Normal*vertices[i] > 0) != first_vertex_side)
     {
       cw_offset = i;
       break;
@@ -234,7 +234,7 @@ void csFrustrum::ClipToPlane (csVector3& v1, csVector3& v2)
 
   for (ccw_offset = num_vertices -2; ccw_offset >= 0; ccw_offset--)
   {
-    if ((Plane_Normal*(vertices[ccw_offset] - v1) > 0) != first_vertex_side)
+    if ((Plane_Normal*vertices[ccw_offset] > 0) != first_vertex_side)
       break;
   }
 
