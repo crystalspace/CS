@@ -17,61 +17,18 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLSHADER_MTEX_H__
-#define __GLSHADER_MTEX_H__
+#ifndef __GLSHADER_FIXEDFP_H__
+#define __GLSHADER_FIXEDFP_H__
 
 #include "ivideo/shader/shader.h"
 #include "imap/services.h"
-#include "csutil/array.h"
 
 class csGLRender3D;
 
-class csGLShader_MTEX : public iShaderProgramPlugin
+class csGLShaderFFP : public iShaderProgram
 {
 private:
-
-  csGLExtensionManager* ext;
-  csRef<iObjectRegistry> object_reg;
-  csRef<iSyntaxService> SyntaxService;
-
-  bool enable;
-public:
-  SCF_DECLARE_IBASE;
-  
-  csGLShader_MTEX (iBase *parent);
-  virtual ~csGLShader_MTEX ();
-
-
-  
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgramPlugin
-  ////////////////////////////////////////////////////////////////////
-  virtual csPtr<iShaderProgram> CreateProgram(const char* type);
-
-  virtual bool SupportType(const char* type);
-
-  virtual void Open();
-
-  virtual csPtr<iString> GetProgramID(const char* programstring);
-
-  ////////////////////////////////////////////////////////////////////
-  //                          iComponent
-  ////////////////////////////////////////////////////////////////////
-
-  bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLShader_MTEX);
-    virtual bool Initialize (iObjectRegistry* reg)
-      { return scfParent->Initialize (reg); }
-  } scfiComponent;
-};
-
-class csShaderGLMTEX : public iShaderProgram
-{
-private:
-  csRef<iGraphics3D> r3d;
+  csRef<iGraphics3D> g3d;
   iGLTextureCache* txtcache;
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
@@ -82,19 +39,18 @@ private:
   csGLStateCache* statecache;
 
   char* programstring;
-  bool validProgram;
-  
+
   csArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
+
+  csHashMap variables;
+  bool validProgram;
 
   // programloading stuff
   enum
   {
-    XMLTOKEN_GLMTEX = 1,
-    XMLTOKEN_LAYER,
+    XMLTOKEN_LAYER = 1,
     XMLTOKEN_COLORSOURCE,
-    XMLTOKEN_TEXTURESOURCE,
-    XMLTOKEN_TEXCOORDSOURCE,
     XMLTOKEN_ENVIRONMENT,
     XMLTOKEN_ALPHASOURCE,
     XMLTOKEN_COLOROP,
@@ -168,9 +124,7 @@ private:
   };
 
   //array of mtexlayers
-  // @@@: Consider using csPDelArray as there is no cleanup
-  // of the mtexlayer instances here!
-  csArray<mtexlayer*> texlayers;
+  csArray<mtexlayer> texlayers;
 
   //maximum number of layers
   int maxlayers;
@@ -182,12 +136,12 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderGLMTEX(iObjectRegistry* objreg);
+  csGLShaderFFP(iObjectRegistry* objreg, csGLExtensionManager* ext);
 
-  virtual ~csShaderGLMTEX ()
+  virtual ~csGLShaderFFP ()
   {
     Deactivate(0);
-    delete programstring;
+    if(programstring) delete programstring;
   }
 
   ////////////////////////////////////////////////////////////////////
@@ -207,6 +161,22 @@ public:
 
   /// Reset states to original
   virtual void ResetState ();
+
+  /* Propertybag - get property, return false if no such property found
+   * Which properties there is is implementation specific
+   */
+  virtual bool GetProperty(const char* name, iString* string) {return false;};
+  virtual bool GetProperty(const char* name, int* string) {return false;};
+  virtual bool GetProperty(const char* name, csVector3* string) {return false;};
+//  virtual bool GetProperty(const char* name, csVector4* string) {};
+
+  /* Propertybag - set property.
+   * Which properties there is is implementation specific
+   */
+  virtual bool SetProperty(const char* name, iString* string) {return false;};
+  virtual bool SetProperty(const char* name, int* string) {return false;};
+  virtual bool SetProperty(const char* name, csVector3* string) {return false;};
+//  virtual bool SetProperty(const char* name, csVector4* string) {return false;};
 
   virtual void AddChild(iShaderBranch *b) {}
   virtual void AddVariable(csShaderVariable* variable) {}
@@ -236,5 +206,5 @@ public:
 };
 
 
-#endif //__GLSHADER_MTEX_H__
+#endif //__GLSHADER_FIXEDFP_H__
 

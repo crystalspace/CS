@@ -111,7 +111,7 @@ PLUGINS.DYNAMIC += video/render3d/opengl
 PLUGINS.DYNAMIC += video/render3d/shadermgr
 PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb
 PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_cg
-PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_mtex
+PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_fixed
 PLUGINS.DYNAMIC += video/render3d/renderloop/loader
 PLUGINS.DYNAMIC += video/render3d/renderloop/stdsteps
 PLUGINS.DYNAMIC += video/render3d/renderloop/shadow/stencil
@@ -155,9 +155,7 @@ ifeq ($(FT2.AVAILABLE),yes)
 PLUGINS.DYNAMIC += font/server/freefnt2
 endif
 PLUGINS.DYNAMIC += aws
-ifeq ($(PGSERVER.AVAILABLE),yes)
 PLUGINS.DYNAMIC += picogui/server
-endif
 ifeq ($(VORBISFILE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/ogg
 endif

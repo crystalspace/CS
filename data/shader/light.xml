@@ -7,8 +7,8 @@
       <streammapping stream="normals" destination="attribute 2" />
       <streammapping stream="texture coordinates" destination="attribute 3" />
 			<vp type="gl_arb_vp" file="/shader/vertexlight.avp"/>
-      <texturemapping unit="0" layer="0" />
-			<fp type="gl_mtex_fp" file="/shader/modulate.mtex"/>
+      <texturemapping unit="0" name="tex diffuse" />
+			<fp type="gl_fixed_fp" file="/shader/modulate.ffp"/>
 		</pass>
 	</technique>
 </shader>

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csgfx/shadervar.h"
+#include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 
@@ -79,7 +80,13 @@ bool csShaderVariable::GetValue(csRGBpixel& value) const
 
 bool csShaderVariable::GetValue(iTextureHandle*& value) const
 {
-  value = TextureValue;
+  value = TextureHandValue;
+  return true;
+}
+
+bool csShaderVariable::GetValue(iTextureWrapper*& value) const
+{
+  value = TextureWrapValue;
   return true;
 }
 
@@ -145,7 +152,16 @@ bool csShaderVariable::SetValue(const csRGBpixel &value)
 bool csShaderVariable::SetValue(iTextureHandle *value)
 {
   Type = TEXTURE;
-  TextureValue = value;
+  TextureHandValue = value;
+  return true;
+}
+
+bool csShaderVariable::SetValue(iTextureWrapper *value)
+{
+  Type = TEXTURE;
+  TextureWrapValue = value;
+  if (value)
+    TextureHandValue = value->GetTextureHandle ();
   return true;
 }
 

@@ -22,6 +22,9 @@
 #include <stdarg.h>
 #include "csutil/ref.h"
 
+#include "iaws/aws.h"
+#include "iaws/awscnvs.h"
+
 struct iEngine;
 struct iObjectRegistry;
 struct iEvent;
@@ -47,6 +50,8 @@ private:
 
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
+
+  int mdx, mdy;
 
   bool hasfocus;
 

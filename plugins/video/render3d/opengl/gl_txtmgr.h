@@ -247,6 +247,8 @@ public:
    * the returned canvas.
    */
   virtual iGraphics2D* GetCanvas ();
+
+  void UpdateTexture ();
 };
 
 /*

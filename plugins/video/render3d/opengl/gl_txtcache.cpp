@@ -229,8 +229,11 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
           GL_LINEAR : GL_NEAREST);
 
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+        (txt_mm->flags & CS_TEXTURE_NOMIPMAPS)?
+          (!(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR : GL_NEAREST):
+          (!(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST));
 
       if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {

@@ -15,12 +15,13 @@ PARAM mvi[4]	 = { state.matrix.modelview.invtrans };
 PARAM mvp[4]	     = { state.matrix.mvp };
 PARAM lightPos   = program.local[0];
 PARAM lightDiffuse = program.local[1];
+#PARAM lightDiffuse = { 1, 1, 1, 1 };
 PARAM lightSpecular = program.local[2];
 #PARAM lightSpecular = { 1, 1, 1, 1};
 PARAM lightAttenuation = program.local[3];
 #PARAM lightAttenuation = { 1, 0, 0.01, 0 };
 # Per vertex inputs
-ATTRIB iPos		= vertex.attrib[0];
+ATTRIB iPos		= vertex.position;
 ATTRIB iCol0	= vertex.attrib[1];
 ATTRIB iNorm	= vertex.attrib[2];
 ATTRIB iTex0	= vertex.attrib[3];

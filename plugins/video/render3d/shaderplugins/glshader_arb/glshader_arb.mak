@@ -72,7 +72,7 @@ clean: glshader_arbclean
 
 glshader_arb: $(OUTDIRS) $(GLSHADER_ARB)
 
-$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shaderpluginsglshader_arb/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_arb/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(GLSHADER_ARB): $(OBJ.GLSHADER_ARB) $(LIB.GLSHADER_ARB)

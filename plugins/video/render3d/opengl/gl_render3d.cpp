@@ -23,6 +23,9 @@
 
 #include "qint.h"
 
+#include "csgfx/csimgvec.h"
+#include "csgfx/memimage.h"
+
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
@@ -655,6 +658,8 @@ bool csGLRender3D::Open ()
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
+  ext->InitGL_ARB_texture_env_combine ();
+  ext->InitGL_EXT_texture_env_combine ();
   ext->InitGL_ARB_texture_compression ();
   ext->InitGL_EXT_texture_compression_s3tc ();
   ext->InitGL_ARB_vertex_buffer_object ();
@@ -728,6 +733,45 @@ bool csGLRender3D::Open ()
   string_normals = strings->Request ("normals");
   string_colors = strings->Request ("colors");
   string_indices = strings->Request ("indices");
+
+
+  // @@@ These shouldn't be here, I guess.
+  #define CS_FOGTABLE_SIZE 64
+  // Each texel in the fog table holds the fog alpha value at a certain
+  // (distance*density).  The median distance parameter determines the
+  // (distance*density) value represented by the texel at the center of
+  // the fog table.  The fog calculation is:
+  // alpha = 1.0 - exp( -(density*distance) / CS_FOGTABLE_MEDIANDISTANCE)
+  #define CS_FOGTABLE_MEDIANDISTANCE 10.0f
+  #define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
+  #define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
+
+  unsigned char *transientfogdata = new unsigned char[CS_FOGTABLE_SIZE * 4];
+  for (unsigned int fogindex = 0; fogindex < CS_FOGTABLE_SIZE; fogindex++)
+  {
+    transientfogdata[fogindex * 4 + 0] = (unsigned char) 255;
+    transientfogdata[fogindex * 4 + 1] = (unsigned char) 255;
+    transientfogdata[fogindex * 4 + 2] = (unsigned char) 255;
+    double fogalpha = (256 * (1.0 - exp (-float (fogindex)
+      * CS_FOGTABLE_MAXDISTANCE / CS_FOGTABLE_SIZE)));
+    transientfogdata[fogindex * 4 + 3] = (unsigned char) fogalpha;
+  }
+  transientfogdata[(CS_FOGTABLE_SIZE - 1) * 4 + 3] = 0;
+
+  csRef<iImage> img (csPtr<iImage> (new csImageMemory (
+    CS_FOGTABLE_SIZE, 1, transientfogdata, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA)));
+  csRef<iImageVector> imgvec (csPtr<iImageVector> (new csImageVector ()));
+  imgvec->AddImage (img);
+  csRef<iTextureHandle> fogtex = txtmgr->RegisterTexture (
+    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
+    iTextureHandle::CS_TEX_IMG_2D);
+
+  csRef<csShaderVariable> fogvar = 
+    shvar_light_0_attenuation = shadermgr->CreateVariable(
+    strings->Request ("standardtex fog"));
+  fogvar->SetValue (fogtex);
+  shadermgr->AddVariable(fogvar);
 
   return true;
 }
@@ -1024,24 +1068,25 @@ void csGLRender3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fo
 bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
 {
   bool bind = true;
-  if (vertattrib[attrib] == buffer)
+  int att = attrib<100?attrib:attrib-100;
+  if (vertattrib[att] == buffer)
   {
-    if (vertattribenabled[attrib])
+    if (vertattribenabled[att])
       return true;
     //bind = false; //@@@[res]: causes graphical errors in some cases
   }
-  if (bind && vertattrib[attrib])
+  if (bind && vertattrib[att])
   {
-    vertattrib[attrib]->Release ();
-    vertattrib[attrib] = 0;
+    vertattrib[att]->Release ();
+    vertattrib[att] = 0;
   }
   
   void* data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data != (void*)-1)
   {
-    if (ext->glEnableVertexAttribArrayARB)
+    if (ext->glEnableVertexAttribArrayARB && attrib<100)
     {
-      ext->glEnableVertexAttribArrayARB (attrib);
+      ext->glEnableVertexAttribArrayARB (att);
       if (bind)
       {
         if (use_hw_render_buffers)
@@ -1081,46 +1126,47 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
 	break;
       }
     }
-    vertattrib[attrib] = buffer;
-    vertattribenabled[attrib] = true;
+    vertattrib[att] = buffer;
+    vertattribenabled[att] = true;
   }
   return true;
 }
 
 void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
 {
-  if (vertattrib[attrib])
+  int att = attrib<100?attrib:attrib-100;
+  if (ext->glDisableVertexAttribArrayARB && attrib<100) 
   {
-    if (ext->glDisableVertexAttribArrayARB) 
-    {
-      ext->glDisableVertexAttribArrayARB (attrib);
-      if (use_hw_render_buffers)
-        ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+    ext->glDisableVertexAttribArrayARB (attrib);
+    /*if (use_hw_render_buffers)
+      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
 
-      ext->glVertexAttribPointerARB(attrib, 1, GL_FLOAT, true, 0, 0);
-    } else
+    ext->glVertexAttribPointerARB(attrib, 1, GL_FLOAT, true, 0, 0);*/
+  } else
+  {
+    switch (attrib)
     {
-      switch (attrib)
-      {
-      case CS_VATTRIB_POSITION:
-        glDisableClientState (GL_VERTEX_ARRAY);
-        break;
-      case CS_VATTRIB_NORMAL:
-        glDisableClientState (GL_NORMAL_ARRAY);
-        break;
-      case CS_VATTRIB_PRIMARY_COLOR:
-        glDisableClientState (GL_COLOR_ARRAY);
-	break;
-      case CS_VATTRIB_TEXCOORD:
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-	break;
-      default:
-	break;
-      }
+    case CS_VATTRIB_POSITION:
+      glDisableClientState (GL_VERTEX_ARRAY);
+      break;
+    case CS_VATTRIB_NORMAL:
+      glDisableClientState (GL_NORMAL_ARRAY);
+      break;
+    case CS_VATTRIB_PRIMARY_COLOR:
+      glDisableClientState (GL_COLOR_ARRAY);
+      break;
+    case CS_VATTRIB_TEXCOORD:
+      glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+      break;
+    default:
+      break;
     }
-    vertattrib[attrib]->Release ();
-    vertattrib[attrib] = 0;
-    vertattribenabled[attrib] = false;
+  }
+  if (vertattrib[att])
+  {
+    vertattrib[att]->Release ();
+    vertattrib[att] = 0;
+    vertattribenabled[att] = false;
   }
 }
 
@@ -1131,7 +1177,9 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   {
     if (texunitenabled[unit])
       return true;
-    bind = false;
+    // @@@ Doesn't bind sometimes when it should if the following line
+    // is uncommented.
+    //bind = false;
   }
 
   if (bind && texunit[unit])
@@ -1154,14 +1202,14 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   case iTextureHandle::CS_TEX_IMG_1D:
     statecache->Enable_GL_TEXTURE_1D (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_1D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle );
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_2D:
     statecache->Enable_GL_TEXTURE_2D (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle );
     if (ext->CS_GL_EXT_texture_lod_bias)
     {
       glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
@@ -1173,14 +1221,14 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   case iTextureHandle::CS_TEX_IMG_3D:
     statecache->Enable_GL_TEXTURE_3D (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_3D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle );
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_CUBEMAP:
     statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
+      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
@@ -1207,7 +1255,9 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
   {
     if (texunitenabled[unit])
       return true;
-    bind = false;
+    // @@@ Doesn't bind sometimes when it should if the following line
+    // is uncommented.
+    //bind = false;
   }
 
   if (bind && texunit[unit])
@@ -1230,14 +1280,14 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
   case iTextureHandle::CS_TEX_IMG_1D:
     statecache->Enable_GL_TEXTURE_1D (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_1D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle );
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_2D:
     statecache->Enable_GL_TEXTURE_2D (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle );
     if (ext->CS_GL_EXT_texture_lod_bias)
     {
       glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
@@ -1249,14 +1299,14 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
   case iTextureHandle::CS_TEX_IMG_3D:
     statecache->Enable_GL_TEXTURE_3D (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_3D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle );
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_CUBEMAP:
     statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
     if (bind)
-      glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
+      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
@@ -1393,6 +1443,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     if (bugplug)
       bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
 
+    glColor4f (1, 1, 1, 1);
     glDrawElements (
       primitivetype,
       mymesh->indexend - mymesh->indexstart,
@@ -1416,7 +1467,8 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 }
 
 void csGLRender3D::DrawPixmap (iTextureHandle *hTex,
-                                        int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
+  int sx, int sy, int sw, int sh, 
+  int tx, int ty, int tw, int th, uint8 Alpha)
 {
   // If original dimensions are different from current dimensions (because
   // image has been scaled to conform to OpenGL texture size restrictions)
@@ -1491,7 +1543,7 @@ void csGLRender3D::DrawPixmap (iTextureHandle *hTex,
 
   statecache->Enable_GL_TEXTURE_2D ();
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
-  statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
+  ActivateTexture (hTex);
 
   // convert texture coords given above to normalized (0-1.0) texture
   // coordinates
@@ -1580,20 +1632,35 @@ void csGLRender3D::SetClipper (iClipper2D* clipper, int cliptype)
 
 void csGLRender3D::SetLightParameter (int i, int param, csVector3 value)
 {
+  csVector4 v4;
   if(i != 0) return; //not implemented any other light than first yet
   switch (param)
   {
   case CS_LIGHTPARAM_POSITION:
+    v4 = value;
+    v4.w = 1;
+    glLightfv (GL_LIGHT0, GL_POSITION, (float*)&v4);
     value *= object2camera;
     shvar_light_0_pos->SetValue(csVector4(value));
     break;
   case CS_LIGHTPARAM_DIFFUSE:
+    v4 = value;
+    v4.w = 1;
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, (float*)&v4);
     shvar_light_0_diffuse->SetValue(csVector4(value));
     break;
   case CS_LIGHTPARAM_SPECULAR:
+    v4 = value;
+    v4.w = 1;
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, (float*)&v4);
     shvar_light_0_specular->SetValue(csVector4(value));
     break;
   case CS_LIGHTPARAM_ATTENUATION:
+    v4 = value;
+    v4.w = 0;
+    glLightf (GL_LIGHT0, GL_CONSTANT_ATTENUATION, v4.x);
+    glLightf (GL_LIGHT0, GL_LINEAR_ATTENUATION, v4.y);
+    glLightf (GL_LIGHT0, GL_QUADRATIC_ATTENUATION, v4.z);
     shvar_light_0_attenuation->SetValue(csVector4(value));
     break;
   }

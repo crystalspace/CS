@@ -387,8 +387,8 @@ private:
   uint mixmode;
 
   csStringID streammapping[STREAMMAX];
-  int texmappinglayer[TEXMAX];
-  iTextureHandle* texmappingdirect[TEXMAX];
+  bool streammappinggeneric[STREAMMAX];
+  csStringID texmapping[TEXMAX];
 
     //loading related
   enum
@@ -430,8 +430,7 @@ public:
       streammapping[i] = csInvalidStringID;
     for (i=0; i<TEXMAX; i++)
     {
-      texmappinglayer[i] = -1;
-      texmappingdirect[i] = 0;
+      texmapping[i] = csInvalidStringID;
     }
 
     writemaskRed = true;
@@ -448,14 +447,10 @@ public:
   /// Get stream mapping for a certain attribute
   virtual csStringID GetStreamMapping (csVertexAttrib attribute) const;
 
-  /// Add a texture mapping by name
-  virtual void AddTextureMapping (const char* name, int unit);
-  /// Add a texture mapping by material layer
-  virtual void AddTextureMapping (int layer, int unit);
-  /// Get texture mapping for a certain unit as a layer index
-  virtual int GetTextureMappingAsLayer (int unit) const;
-  /// Get texture mapping for a certain unit as a texture name
-  virtual iTextureHandle* GetTextureMappingAsDirect (int unit);
+  /// Add a texture mapping
+  virtual void AddTextureMapping (csStringID name, int unit);
+  /// Get texture mapping for a certain unit
+  virtual csStringID GetTextureMapping (int unit) const;
 
   /// Get mixmode override
   virtual uint GetMixmodeOverride () const

@@ -36,6 +36,35 @@
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
+class csOFSCbOpenGL : public iOffscreenCanvasCallback
+{
+private:
+  csGLTextureHandle* txt;
+
+public:
+  csOFSCbOpenGL (csGLTextureHandle* txt)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    csOFSCbOpenGL::txt = txt;
+  }
+  virtual ~csOFSCbOpenGL ()
+  {
+  }
+  SCF_DECLARE_IBASE;
+  virtual void FinishDraw (iGraphics2D*)
+  {
+    txt->UpdateTexture ();
+  }
+  virtual void SetRGB (iGraphics2D*, int, int, int, int)
+  {
+  }
+};
+
+SCF_IMPLEMENT_IBASE(csOFSCbOpenGL)
+  SCF_IMPLEMENTS_INTERFACE(iOffscreenCanvasCallback)
+SCF_IMPLEMENT_IBASE_END
+
+
 // csGLTexture stuff
 
 csGLTexture::csGLTexture(csGLTextureHandle *p, iImage *Image)
@@ -735,7 +764,22 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 
 iGraphics2D* csGLTextureHandle::GetCanvas ()
 {
-  return R3D->GetDriver2D();
+  if (!canvas)
+  {
+    csOFSCbOpenGL* ofscb = new csOFSCbOpenGL (this);
+    csGLTexture *t = vTex[0];
+    canvas = R3D->GetDriver2D ()->CreateOffscreenCanvas (
+      t->get_image_data (), t->get_width (), t->get_height (), 32,
+      ofscb);
+    ofscb->DecRef ();
+  }
+  return canvas;
+}
+
+void csGLTextureHandle::UpdateTexture ()
+{
+  if (R3D->txtcache)
+    R3D->txtcache->Uncache (this);
 }
 
 /*

@@ -35,7 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/material.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
+#include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "video/canvas/openglcommon/glstates.h"
@@ -45,152 +45,35 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../../common/txtmgr.h"
 #include "../../opengl/gl_txtcache.h"
 
-#include "glshader_mtex.h"
-
-
-CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_FACTORY (csGLShader_MTEX)
-
-
-
-SCF_IMPLEMENT_IBASE(csGLShader_MTEX)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_MTEX::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-csGLShader_MTEX::csGLShader_MTEX(iBase* parent)
-{
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
-  enable = false;
-}
-
-csGLShader_MTEX::~csGLShader_MTEX()
-{
-  printf ("Bye1...\n");
-}
-
-////////////////////////////////////////////////////////////////////
-//                      iShaderProgramPlugin
-////////////////////////////////////////////////////////////////////
-bool csGLShader_MTEX::SupportType(const char* type)
-{
-  if (!enable)
-    return false;
-  if( strcasecmp(type, "gl_mtex_fp") == 0)
-    return true;
-  return false;
-}
-
-csPtr<iShaderProgram> csGLShader_MTEX::CreateProgram(const char* type)
-{
-  return csPtr<iShaderProgram>(new csShaderGLMTEX(object_reg));;
-}
-
-void csGLShader_MTEX::Open()
-{
-  if(!object_reg)
-    return;
-
-  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
-
-  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
-  if (f != 0 && strcmp ("crystalspace.render3d.opengl", 
-    f->QueryClassID ()) == 0)
-    enable = true;
-  else return;
-
-  ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
-
-  ext->InitGL_ARB_texture_env_dot3 ();
-  if (!ext->CS_GL_ARB_texture_env_dot3)
-    ext->InitGL_EXT_texture_env_dot3 ();
-
-  ext->InitGL_ARB_texture_env_combine ();
-  if (!ext->CS_GL_ARB_texture_env_combine)
-    ext->InitGL_EXT_texture_env_combine ();
-
-}
-
-csPtr<iString> csGLShader_MTEX::GetProgramID(const char* programstring)
-{
-  csMD5::Digest d = csMD5::Encode(programstring);
-  scfString* str = new scfString();
-  str->Append((const char*)d.data, 16);
-  return csPtr<iString>(str);
-}
-
-////////////////////////////////////////////////////////////////////
-//                          iComponent
-////////////////////////////////////////////////////////////////////
-bool csGLShader_MTEX::Initialize(iObjectRegistry* reg)
-{
-  object_reg = reg;
-
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
-  SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!SyntaxService)
-  {
-    SyntaxService = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!SyntaxService)
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
-	"crystalspace.render3d.shader.glmtex",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (SyntaxService, "iSyntaxService"))
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
-	"crystalspace.render3d.shader.glmtex",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
-
-  return true;
-}
-
+#include "glshader_ffp.h"
 
 
 ////////////////////////////////////////////////////////////////////
-//                          csShaderGLMTEX
+//                          csGLShaderFFP
 ////////////////////////////////////////////////////////////////////
 
-SCF_IMPLEMENT_IBASE(csShaderGLMTEX)
+SCF_IMPLEMENT_IBASE(csGLShaderFFP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-csShaderGLMTEX::csShaderGLMTEX(iObjectRegistry* objreg)
+csGLShaderFFP::csGLShaderFFP(iObjectRegistry* objreg, csGLExtensionManager* ext)
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  this->object_reg = objreg;
-  this->ext = ext;
+  object_reg = objreg;
+  csGLShaderFFP::ext = ext;
   programstring = 0;
   validProgram = true;
 
   SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 }
 
-void csShaderGLMTEX::BuildTokenHash()
+void csGLShaderFFP::BuildTokenHash()
 {
   xmltokens.Register ("alphaoperation", XMLTOKEN_ALPHAOP);
   xmltokens.Register ("alphasource", XMLTOKEN_ALPHASOURCE);
   xmltokens.Register ("coloroperation", XMLTOKEN_COLOROP);
   xmltokens.Register ("colorsource", XMLTOKEN_COLORSOURCE);
-  xmltokens.Register ("texturesource", XMLTOKEN_TEXTURESOURCE);
   xmltokens.Register ("layer", XMLTOKEN_LAYER);
   xmltokens.Register ("environment", XMLTOKEN_ENVIRONMENT);
 
@@ -224,14 +107,14 @@ void csShaderGLMTEX::BuildTokenHash()
 //                          iShaderProgram
 ////////////////////////////////////////////////////////////////////
 
-bool csShaderGLMTEX::Load(iDocumentNode* node)
+bool csGLShaderFFP::Load(iDocumentNode* node)
 {
   if(!node)
     return false;
 
   BuildTokenHash();
 
-  csRef<iDocumentNode> mtexnode = node->GetNode("mtex");
+  csRef<iDocumentNode> mtexnode = node->GetNode("fixedfp");
   if(mtexnode)
   {
     csRef<iDocumentNodeIterator> it = mtexnode->GetNodes();
@@ -248,7 +131,7 @@ bool csShaderGLMTEX::Load(iDocumentNode* node)
           mtexlayer* ml = new mtexlayer();
           if(!LoadLayer(ml, child))
             return false;
-          texlayers.Push(ml);
+          texlayers.Push (*ml);
         }
         break;
       }
@@ -257,7 +140,7 @@ bool csShaderGLMTEX::Load(iDocumentNode* node)
   return true;
 }
 
-bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
+bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
 {
   if(layer == 0 || node == 0)
     return false;
@@ -272,94 +155,52 @@ bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
     csStringID id = xmltokens.Request(child->GetValue());
     switch (id)
     {
-    case XMLTOKEN_TEXTURESOURCE:
-      {
-        const char* texname = child->GetAttributeValue("name");
-        if (texname)
-        {
-          if (engine)
-            layer->texturehandle = 
-              engine->FindTexture (texname)->GetTextureHandle ();
-        } 
-        
-        if (child->GetAttributeValue ("number"))
-        {
-          int tnum = child->GetAttributeValueAsInt("number");
-          if(tnum < 0) continue;
-          layer->texnum = tnum;
-        }
-      }
-      break;
-    case XMLTOKEN_ENVIRONMENT:
-      {
-        LoadEnvironment(layer, child);
-      }
-      break;
-    }
-  }
-  return true;
-}
-
-bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
-{
-  if(layer == 0 || node == 0)
-    return false;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes();
-
-  while(it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next();
-    if(child->GetType() != CS_NODE_ELEMENT) continue;
-    csStringID id = xmltokens.Request(child->GetValue());
-    switch (id)
-    {
     case XMLTOKEN_COLORSOURCE:
       {
         int num = child->GetAttributeValueAsInt("num");
-        
+
         if(num < 0 || num > 3 )
           continue;
-        
-	const char* str;
-	if ( (str = child->GetAttributeValue("source")) )
-	{
-	  int i = xmltokens.Request(str);
-	  if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
-	  {
-	    layer->colorsource[num] = i;
-	  }
-	  else
-	  {
-	    SyntaxService->Report ("crystalspace.render3d.shader.glmtex",
-	      CS_REPORTER_SEVERITY_WARNING,
-	      child, "Invalid color source: %s", str);
-	  }
-	}
 
-	if ( (str = child->GetAttributeValue("modifier")) )
-	{
+        const char* str;
+        if (str = child->GetAttributeValue("source"))
+        {
+          int i = xmltokens.Request(str);
+          if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+          {
+            layer->colorsource[num] = i;
+          }
+          else
+          {
+            SyntaxService->Report ("crystalspace.render3d.shader.fixed",
+              CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid color source: %s", str);
+          }
+        }
+
+        if (str = child->GetAttributeValue("modifier"))
+        {
           int m = xmltokens.Request(str);
           if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
-	  {
+          {
             layer->colormod[num] = m;
-	  }
-	  else
-	  {
-	    SyntaxService->Report ("crystalspace.render3d.shader.glmtex",
-	      CS_REPORTER_SEVERITY_WARNING,
-	      child, "Invalid color modifier: %s", str);
-	  }
-	}
+          }
+          else
+          {
+            SyntaxService->Report ("crystalspace.render3d.shader.fixed",
+              CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid color modifier: %s", str);
+          }
+        }
       }
       break;
     case XMLTOKEN_ALPHASOURCE:
       {
         int num = child->GetAttributeValueAsInt("num");
-        
+
         if(num < 0 || num > 3 )
           continue;
-        
+
         int i = xmltokens.Request(child->GetAttributeValue("source"));
         if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
           layer->alphasource[num] = i;
@@ -394,7 +235,7 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
   return true;
 }
 
-bool csShaderGLMTEX::Load(iDataBuffer* program)
+bool csGLShaderFFP::Load(iDataBuffer* program)
 {
   csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
@@ -402,24 +243,25 @@ bool csShaderGLMTEX::Load(iDataBuffer* program)
   const char* error = doc->Parse (program);
   if (error != 0)
   { 
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glmtex",
-      "Document error '%s'!", error);
+    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
+      "crystalspace.render3d.shader.fixed", "Document error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());
 }
 
-bool csShaderGLMTEX::Prepare()
+bool csGLShaderFFP::Prepare()
 {
   glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &maxlayers);
 
   //get a statecache
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY(object_reg, iGraphics2D);
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   g2d->PerformExtension("getstatecache", &statecache);
 
   //get extension-object
-  r3d = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r3d, iShaderRenderInterface);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iShaderRenderInterface> sri = 
+    SCF_QUERY_INTERFACE (g3d, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
   txtcache = (iGLTextureCache*) sri->GetPrivateObject("txtcache");
@@ -430,16 +272,17 @@ bool csShaderGLMTEX::Prepare()
   return true;
 }
 
-void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
+void csGLShaderFFP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
   for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
   {
-    mtexlayer* layer = texlayers.Get(i);
+    mtexlayer* layer = &texlayers[i];
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
     ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
 
 
-    if(ext->CS_GL_ARB_texture_env_combine || ext->CS_GL_EXT_texture_env_combine)
+    if(ext->CS_GL_ARB_texture_env_combine || 
+       ext->CS_GL_EXT_texture_env_combine)
     {
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
@@ -481,25 +324,25 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
   }
 }
 
-void csShaderGLMTEX::Deactivate(iShaderPass* current)
+void csGLShaderFFP::Deactivate(iShaderPass* current)
 {
   ext->glActiveTextureARB(GL_TEXTURE0_ARB);
   ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
-void csShaderGLMTEX::SetupState (iShaderPass *curret, csRenderMesh *mesh)
+void csGLShaderFFP::SetupState (iShaderPass *curret, csRenderMesh *mesh)
 {
 }
 
-void csShaderGLMTEX::ResetState ()
+void csGLShaderFFP::ResetState ()
 {
 }
 
-csPtr<iString> csShaderGLMTEX::GetProgramID()
+csPtr<iString> csGLShaderFFP::GetProgramID()
 {
   csMD5::Digest d = csMD5::Encode(programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data, 16);
+  str->Append((const char*)d.data[0], 16);
   return csPtr<iString>(str);
 }

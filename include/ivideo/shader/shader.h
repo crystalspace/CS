@@ -214,14 +214,10 @@ struct iShaderPass : iShaderBranch
   /// Get stream mapping for a certain attribute
   virtual csStringID GetStreamMapping (csVertexAttrib attribute) const = 0;
 
-  /// Add a texture mapping by name
-  virtual void AddTextureMapping (const char* name, int unit) = 0;
-  /// Add a texture mapping by material layer
-  virtual void AddTextureMapping (int layer, int unit) = 0;
-  /// Get texture mapping for a certain unit as a layer index
-  virtual int GetTextureMappingAsLayer (int unit) const = 0;
-  /// Get texture mapping for a certain unit as a texture name
-  virtual iTextureHandle* GetTextureMappingAsDirect (int unit) = 0;
+  /// Add a texture mapping
+  virtual void AddTextureMapping (csStringID name, int unit) = 0;
+  /// Get texture mapping for a certain unit
+  virtual csStringID GetTextureMapping (int unit) const = 0;
 
   /// Get mixmode override
   virtual uint GetMixmodeOverride () const = 0;

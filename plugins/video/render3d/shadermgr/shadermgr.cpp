@@ -496,7 +496,7 @@ void csShaderPass::Deactivate()
   int i;
   for (i=TEXMAX-1; i>=0; i--)
   {
-    if (texmappingdirect[i] || texmappinglayer[i] != -1)
+    if (texmapping[i] != csInvalidStringID)
     {
       r3d->DeactivateTexture (i);
     }
@@ -507,6 +507,7 @@ void csShaderPass::Deactivate()
     if (streammapping[i] != csInvalidStringID)
     {
       r3d->DeactivateBuffer ((csVertexAttrib)i);
+      r3d->DeactivateBuffer ((csVertexAttrib)(i+100));
     }
   }
 }
@@ -514,34 +515,36 @@ void csShaderPass::Deactivate()
 void csShaderPass::SetupState (csRenderMesh *mesh)
 {
   int i;
-  iGraphics3D* myr = r3d;
-
   for (i=0; i<STREAMMAX; i++)
   {
     if (streammapping[i] != csInvalidStringID)
     {
-      iRenderBuffer* buf  = mesh->buffersource->GetRenderBuffer (streammapping[i]);
+      iRenderBuffer* buf  = 
+        mesh->buffersource->GetRenderBuffer (streammapping[i]);
       if (buf)
-        if (myr->ActivateBuffer ((csVertexAttrib)i, buf))
+        if (r3d->ActivateBuffer ((csVertexAttrib)(i+
+          (streammappinggeneric[i]?0:100)), buf))
           continue;
     }
     r3d->DeactivateBuffer ((csVertexAttrib)i);
+    r3d->DeactivateBuffer ((csVertexAttrib)(i+100));
   }
 
   iMaterialHandle* mathandle =
     (mesh->material) ? (mesh->material->GetMaterialHandle()) : 0;
   for (i=0; i<TEXMAX; i++)
   {
-    if (texmappinglayer[i] != -1)
+    if (texmapping[i] != csInvalidStringID)
     {
-      if (texmappinglayer[i] >= 0)
-        if (r3d->ActivateTexture (mathandle, texmappinglayer[i], i))
-          continue;
-    }
-    if (texmappingdirect[i])
-    {
-      r3d->ActivateTexture (texmappingdirect[i], i);
-      continue;
+      csShaderVariable* var = GetVariable (texmapping[i]);
+      if (var)
+      {
+        iTextureHandle* tex;
+        var->GetValue (tex);
+        if (tex)
+          if (r3d->ActivateTexture (tex, i))
+            continue;
+      }
     }
     r3d->DeactivateTexture (i);
   }
@@ -579,36 +582,29 @@ void csShaderPass::ResetState ()
 
 void csShaderPass::AddStreamMapping (csStringID name, csVertexAttrib attribute)
 {
-  streammapping[attribute] = name;
+  int a = attribute<100?attribute:attribute-100;
+  streammapping[a] = name;
+  streammappinggeneric[a] = attribute<100;
 }
 
 csStringID csShaderPass::GetStreamMapping (csVertexAttrib attribute) const
 {
-  return streammapping[attribute];
+  int a = attribute<100?attribute:attribute-100;
+  csStringID s = streammapping[a];
+  if ((attribute<100 && streammappinggeneric[a]) ||
+      (attribute>=100 && !streammappinggeneric[a]))
+    return streammapping[a];
+  else return csInvalidStringID;
 }
 
-void csShaderPass::AddTextureMapping (const char* name, int unit)
+void csShaderPass::AddTextureMapping (csStringID name, int unit)
 {
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (objectreg, iEngine);
-  csRef<iTextureWrapper> tex = engine->FindTexture (name);
-  // @@@ Maybe report error?
-  if (tex != 0)
-    texmappingdirect[unit] = tex->GetTextureHandle ();
+  texmapping[unit] = name;
 }
 
-void csShaderPass::AddTextureMapping (int layer, int unit)
+csStringID csShaderPass::GetTextureMapping (int unit) const
 {
-  texmappinglayer[unit] = layer;
-}
-
-int csShaderPass::GetTextureMappingAsLayer (int unit) const
-{
-  return texmappinglayer[unit];
-}
-
-iTextureHandle* csShaderPass::GetTextureMappingAsDirect (int unit)
-{
-  return texmappingdirect[unit];
+  return texmapping[unit];
 }
 
 void csShaderPass::BuildTokenHash()
@@ -740,10 +736,8 @@ bool csShaderPass::Load(iDocumentNode* node)
         {
           if (child->GetAttribute ("name"))
           {
-            AddTextureMapping (child->GetAttributeValue ("name"),
-              child->GetAttributeValueAsInt ("unit"));
-          } else {
-            AddTextureMapping (child->GetAttributeValueAsInt ("layer"),
+            AddTextureMapping (strings->Request (
+              child->GetAttributeValue ("name")),
               child->GetAttributeValueAsInt ("unit"));
           }
         }

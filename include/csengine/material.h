@@ -119,9 +119,6 @@ private:
   csStringID nameFlatColorParam;
   csStringID nameDiffuseTexture;
 
-  csRefHash<iTextureHandle> texHandles;
-  csRefHash<iTextureWrapper> texWrappers;
-
   csShaderVariable* GetVar (csStringID name, bool create = false);
 #endif
 
@@ -177,7 +174,7 @@ public:
         float uscale, float vscale, float ushift, float vshift);
 #else
   /// Get a texture (if none 0 is returned)
-  iTextureWrapper* GetTextureWrapper (csStringID name) const;
+  iTextureWrapper* GetTextureWrapper (csStringID name);
   /// Set a texture (pass 0 to set no texture)
   void SetTextureWrapper (csStringID name, iTextureWrapper* tex);
 #endif

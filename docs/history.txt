@@ -25,6 +25,30 @@ chronological order.
 	  Jorrit's change to iFont & BitmapMetrics.
 	- Eric Sunshine fixed SDL check in configure.ac so that works correctly
 	  for platforms on which SDL requires pthread.
+	- Anders Stenberg did the following changes to the new renderer:
+	    - Changed materials in to store textures in variables instead, and 
+	      updated to shader manager to fetch the textures as variables 
+	      instead of from the material directly. This allows to specify 
+	      textures at other scopes than the material.
+	    - Updated the new renderer to give an example of the new 
+	      functionality by creating a "standardtex fog" fog lookup 
+	      texture in the shader manager scope. Note that we cannot yet
+	      duplicate the old fog system though.
+	    - Updated texture cache to use the CS_TEXTURE_NOMIPMAPS flag. This
+	      should be done in a nicer way though.
+	    - Updated texture handler to implement GetCanvas correctly for
+	      textures.
+	    - Removed "mtex" shader plugin and added "fixed" instead, which
+	      contains a (slightly cleaned up) copy of mtex fragment program, 
+	      plus a fixed function vertex program. Currently it does nothing,
+	      but will eventually have similar functionality as Quake 3 
+	      shader scripts.
+	    - Updated all shaders to compy to the plugin changes.
+	    - Fixed an error in the glshader_arb makefile.
+	    - Made handling of mixing general and conventional attributes
+	      ("attribute 3" vs "color") in shaders more safe. Note that
+	      since some attribute aliasing properties are undefined in 
+	      the extension specification, shaders should preferably not mix.
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
 	- Luca reverted his latest commit because the cstool library is not

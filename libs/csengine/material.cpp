@@ -287,15 +287,20 @@ void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 
 #else
 
-iTextureWrapper* csMaterial::GetTextureWrapper (csStringID name) const
+iTextureWrapper* csMaterial::GetTextureWrapper (csStringID name)
 {
-  return texWrappers.Get (name);
+  iTextureWrapper* tex;
+  GetVar (name)->GetValue (tex);
+  return tex;
+  //return texWrappers.Get (name);
 }
 
 void csMaterial::SetTextureWrapper (csStringID name, iTextureWrapper* tex)
 {
-  texWrappers.Put (name, tex);
-  texHandles.Put (name, tex ? tex->GetTextureHandle () : 0);
+  csShaderVariable* var = GetVar (name, true);
+  var->SetValue (tex);
+  /*texWrappers.Put (name, tex);
+  texHandles.Put (name, tex ? tex->GetTextureHandle () : 0);*/
 }
 
 #endif
@@ -355,21 +360,30 @@ iTextureHandle *csMaterial::GetTexture ()
 #else
 iTextureHandle *csMaterial::GetTexture ()
 {
-  iTextureHandle* texture = texHandles.Get (nameDiffuseTexture);
-  return texture;
+  iTextureWrapper* tex;
+  GetVar (nameDiffuseTexture)->GetValue (tex);
+  return tex->GetTextureHandle ();
+
+  /*iTextureHandle* texture = texHandles.Get (nameDiffuseTexture);
+  return texture;*/
 }
 #endif
 
 #ifdef CS_USE_NEW_RENDERER
 iTextureHandle* csMaterial::GetTexture (csStringID name)
 {
-  return texHandles.Get (name);
+  iTextureHandle* tex;
+  GetVar (name)->GetValue (tex);
+  return tex;
+  //return texHandles.Get (name);
 }
 
 void csMaterial::SetTexture (csStringID name, iTextureHandle* texture)
 {
-  texWrappers.Put (name, 0);
-  texHandles.Put (name, texture);
+  csShaderVariable* var = GetVar (name, true);
+  var->SetValue (texture);
+  /*texWrappers.Put (name, 0);
+  texHandles.Put (name, texture);*/
 }
 
 #endif
