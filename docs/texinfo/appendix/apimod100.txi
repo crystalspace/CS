@@ -939,19 +939,3 @@ As a side-effect of these changes, the @samp{csImageFile} and
 
 The function @code{iMaterialList::NewMaterial()} now needs an additional
 name parameter. It is not recommended to change the name later.
-
-
-@subheading @samp{csCondition} Changes
-
-@code{csCondition::Wait()} now enforces the restriction that the mutex with
-which it is invoked is non-recursive.  The reason that the mutex must be
-non-recursive is because the implicit unlock performed by @code{Wait()}
-@emph{must} actually release the mutex in order for other threads to be able to
-satisfy the condition. With recursive mutexes, there is no guarantee that
-unlocking the mutex actually releases it since it might have been locked
-multiple times within the same thread. Although many low-level
-platform-specific threading implementations have historically been lax
-regarding the incompatibility between recursive mutexes and conditions, modern
-implementations are beginning to enforce it. Consequently, Crystal Space also
-now enforces this restriction.
-
