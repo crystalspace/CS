@@ -13,6 +13,17 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+12-Dec-1999
+	- Norman Kramer added support for subrenderers for Mesa.
+	- Norman also changed shared object name to match the name
+	  in export_table for the OSS sound driver.
+	- Norman fixed a small typo in system destructor that caused
+	  the 3d and 2d driver not to unregister.
+10-Dec-1999
+	- Thomas Hieber did some small adjustments on the VC project
+	  files and added coverage mask tree files.
+	- Robert Bate made sure covtree_lut is set to NULL when the
+	  world is created.
 9-Dec-1999
 	- Nearly completed coverage mask tree algorithm. A lot still
 	  needs to be done (like fixing the bugs preventing it from
