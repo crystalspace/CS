@@ -21,6 +21,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "csutil/csstring.h"
 
 #ifdef DEBUG
 #  define DLOPEN_MODE 	RTLD_NOW		// handy for debugging
@@ -34,6 +36,7 @@
  */
 csLibraryHandle csLoadLibrary (const char* iName)
 {
+  csString Error;
   csLibraryHandle Handle;
   for (int Try = 0; Try < 4; Try++)
   {
@@ -49,9 +52,12 @@ csLibraryHandle csLoadLibrary (const char* iName)
     strcat (strcat (name, iName), ".so");
     if ((Handle = dlopen (name, DLOPEN_MODE)))
       break;
+    char *t;
+    if((t=dlerror()))
+      Error+=csString("DLERROR: ")+t+"\n";
   }
   if (!Handle)
-    fprintf (stderr, "%s\n", dlerror ());
+    fprintf (stderr, Error);
 
   return Handle;
 }
