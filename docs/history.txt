@@ -19,6 +19,36 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-May-99:
+	- Serguei Narojnyi (Snaar) fixed a Win32 specific bug in the sockets
+	  networking driver.
+	- I fixed the ndrvdemo makefile so that it works on Unix.
+	- Fixed csutil.mak so that it includes the new convertor stuff.
+	- Update to the lightmap precalculator from Denis Dmitriev.
+	- Denis also updated the DX5 renderer to support gouraud shading
+	  in DrawPolygonQuick and fixing lightmap alignment.
+	- Denis fixed the fog routines for correct Z buffer test.
+	- Integrated new 3D sound files from Nathaniel Saint Martin. Lots of
+	  bug fixes and update for EAX from 1.2 to 2.0 sdk.
+24-May-99:
+	- Thomas Hieber added a new mechanism for collision detection to
+	  interface to the rest of the CS engine. He uses the new
+	  object hierarchy system from Ivan Avramovic.
+	- Thomas also moved the logo to the right and reenabled the convertor
+	  class.
+	- Thomas also added range checking for fog to prevent crash.
+	- Thomas renamed GetObject to GetObj to avoid problems with Windows
+	  header files.
+	- Michael Dale Long fixed the ndrvdemo makefile and added workaround
+	  for impexp support in walktest (Windows only right now).
+	- Bruce Williams added a hook for the new convertor system in
+	  WalkTest.
+	- Bruce Williams also split his convertor source files into several
+	  smaller files.
+	- Robert Bate added routines to convert a CS color to a Macintosh
+	  color.
+	- Robert Bate also added console support to the Macintosh OpenGL
+	  2D driver.
 23-May-99:
 	- Added FLATCOL and GOURAUD commands to POLYGON to specify a polygon
 	  which needs gouraud shading instead of texturing.
@@ -49,6 +79,13 @@ Short-term cleanups that need to be done:
 	  with or without gouraud shading. Also started changing spelling
 	  of gouroud to gouraud. Note that gouraud shaded polygon objects
 	  still have a bug. I'm investigating this.
+	- Andrew Zabolotny added 'apps' target to makefile and also did some
+	  other makefile changes.
+	- Andrew also started support for compiling CS on Windows (with VC)
+	  using the standard makefile system. Note that Thomas Hieber removed
+	  some of this work because it broke the Windows port too much.
+	- Andrew also revamped support for SetMouseCursor (Windows).
+	- Andrew fixed the VC assembly routines so that they compile at least.
 20-May-99:
 	- Various changes to the Unix OpenGL 2D driver from Gary Haussmann.
 	  2D text should be much better now. He also added support for drawing
