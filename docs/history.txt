@@ -47,6 +47,7 @@ The history order has been reversed so that new features are at the top.
 	- Added support for CIRCLE command in the thing loader.
 	- Eric Sunshine fixed a silly typographical error in csHashCompute()
 	  which rendered the function almost completely inoperative.
+	- Martin Geisse fixed a bug in csPrefixConfig.
 3-Apr-2001
 	- Norman Kramer fixed a warning about explicit initialization
 	  of iBase in copy constructor of csCamera.
