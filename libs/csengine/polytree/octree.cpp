@@ -1580,12 +1580,6 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
       printf ("!");
       visible = false;
     }
-    else if (occludee->GetSolidMask (csBox3::OtherSide (adjacent_side)) == (UShort)~0 &&
-    	occludee_side.Overlap (leaf_side))
-    {
-      printf ("?");
-      visible = false;
-    }
     else visible = true;
   }
   else if (BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ()))

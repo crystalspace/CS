@@ -76,6 +76,9 @@ The history order has been reversed so that new features are at the top.
 	- Fixed terrain engine so that it renders triangles again. Still
 	  have to work a bit on speed and other issues.
 	- 'Probably' fixed the solid space calculation for real now :-)
+	- Now that solid space calculation works I fixed PVS to use it
+	  in a safe way. Solid space for node boundaries is not reflexive.
+	  Even if node A cannot see B it is still possible that B can see A.
 29-May-2000
 	- Alex Pfaffe did some fixes on terrain engine. He also resynced
 	  with DDG. Various bug fixes and optimizations.
