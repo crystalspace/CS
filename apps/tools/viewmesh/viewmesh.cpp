@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/* ViewMesh: tool for displaying mesh objects (3d sprites) */
+
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
@@ -59,16 +61,20 @@
 
 CS_IMPLEMENT_APPLICATION
 
+#define VIEWMESH_COMMAND_LOADMESH 77701
+
 //-----------------------------------------------------------------------------
 
 ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
     : csApp (object_reg, Skin)
 {
+  SetBackgroundStyle(csabsNothing);
   view = NULL;
   engine = NULL;
   loader = NULL;
   g3d = NULL;
-  kbd = NULL;
+  menu = NULL;
+  dialog = NULL;
 }
 
 ViewMesh::~ViewMesh ()
@@ -77,34 +83,105 @@ ViewMesh::~ViewMesh ()
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
-  if (kbd) kbd->DecRef ();
+  if (menu) delete menu;
+  if (dialog) delete dialog;
 }
 
 bool ViewMesh::HandleEvent (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    SetupFrame ();
-    return true;
+    // display next fram
+    Draw();
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
-  {
-    FinishFrame ();
+    
+  if (csApp::HandleEvent(ev))
     return true;
-  }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+    
+  switch(ev.Type)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q)
-    {
-      q->GetEventOutlet()->Broadcast
-	(cscmdQuit);
-      q->DecRef ();
-    }
-    return true;
+    case csevKeyDown:
+      if (ev.Key.Code == CSKEY_ESC)
+      {
+	iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	if (q)
+	{
+	  q->GetEventOutlet()->Broadcast
+	    (cscmdQuit);
+	  q->DecRef ();
+	}
+	return true;
+      }
+      break;
+    case csevMouseDown:
+    case csevMouseDoubleClick:
+      if (menu) {
+	  delete menu;
+	  menu=NULL;
+	  return true;
+      }
+      // Create a menu
+      menu = new csMenu (this, csmfs3D, 0);
+      (void)new csMenuItem(menu);
+      (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
+      (void)new csMenuItem (menu, "~Quit", cscmdQuit);
+      menu->SetPos(ev.Mouse.x,ev.Mouse.y);
+      return true;
+
+    case csevCommand:
+      switch(ev.Command.Code)
+      {
+	case VIEWMESH_COMMAND_LOADMESH:
+	  {
+	    if (dialog)
+	      delete dialog;
+  	    dialog= csFileDialog (this, "Select Mesg Object");
+  	    StartModal (dialog, NULL);
+  	    return true;
+	  }
+	default:
+	  break;
+      }
+      break;
   }
  
   return false; 
+}
+
+void ViewMesh::Draw()
+{
+  // First get elapsed time from the system driver.
+  csTicks elapsed_time, current_time;
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
+  
+  // Now rotate the camera according to keyboard state
+  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+
+  iCamera* c = view->GetCamera();
+  if (GetKeyState (CSKEY_RIGHT))
+    c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+  if (GetKeyState (CSKEY_LEFT))
+    c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+  if (GetKeyState (CSKEY_PGUP))
+    c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+  if (GetKeyState (CSKEY_PGDN))
+    c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+  if (GetKeyState (CSKEY_UP))
+    c->Move (VEC_FORWARD * 4 * speed);
+  if (GetKeyState (CSKEY_DOWN))
+    c->Move (VEC_BACKWARD * 4 * speed);
+    
+  csApp::Draw();
+  pplBeginDraw(CSDRAW_3DGRAPHICS);
+  view->Draw();
+  pplInvalidate(bound);
+  if (menu) {
+    menu->Invalidate(true);
+  }
+  if (dialog) {
+    dialog->Invalidate(true);
+  }
 }
 
 #define VM_QUERYPLUGIN(var, intf, str)				\
@@ -126,7 +203,6 @@ bool ViewMesh::Initialize ()
 
   VM_QUERYPLUGIN (loader, iLoader, "iLoader");
   VM_QUERYPLUGIN (g3d, iGraphics3D, "iGraphics3D");
-  VM_QUERYPLUGIN (kbd, iKeyboardDriver, "iKeyboardDriver");
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -312,45 +388,6 @@ bool ViewMesh::Initialize ()
   return true;
 }
 
-void ViewMesh::SetupFrame ()
-{
-  // First get elapsed time from the system driver.
-  csTicks elapsed_time, current_time;
-  elapsed_time = vc->GetElapsedTicks ();
-  current_time = vc->GetCurrentTicks ();
-  
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
-
-  iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (VEC_BACKWARD * 4 * speed);
-
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (
-      engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-      return;
-
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
-}
-
-void ViewMesh::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (NULL);
-}
-
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
@@ -424,3 +461,4 @@ int main (int argc, char* argv[])
 
   return 0;
 }
+

@@ -39,18 +39,19 @@ private:
   iEngine* engine;
   iLoader* loader;
   iGraphics3D* g3d;
-  iKeyboardDriver* kbd;
   iSector* room;
   iView* view;
+
+  csMenu *menu;
+  csWindow *dialog;
  
 public:
   ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
   virtual ~ViewMesh ();
 
-  bool Initialize ();
-  bool HandleEvent (iEvent&);
-  void SetupFrame ();
-  void FinishFrame ();
+  virtual bool Initialize ();
+  virtual bool HandleEvent (iEvent&);
+  virtual void Draw();
 };
 
 #endif // __VIEWMESH_H__
