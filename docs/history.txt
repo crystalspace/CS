@@ -16,6 +16,42 @@ Short-term cleanups that need to be done:
 	- Norman Kramer fixed bug in SetRenderState (glide) and added
 	  CS_FX_KEYCOLOR mixmode in Glide.
 	- Moved include/csengine/colldet/rapid.h to include/csengine.
+	- Update from Andrew Zabolotny again:
+	    - Fixed a small bug in simple console - with backspace the
+	      "virtual cursor" has gone one character behind the start of
+	      the string. Thus if you press backspace at the very start of
+	      string, you go to position -1. Then if you type any
+	      character, it won't be displayed (and perhaps will cause
+	      memory corruption).
+	    - Fixed sub-texture optimization bug that caused visible parts
+	      of textures to not be computed in the texture cache.
+	    - Implemented Floyd-Steinberg dithering in csgfxldr library.
+	      Added dithering option (-d) to the gfxtest application.
+	      Added "DITHER_TEXTURES=yes/no" option to soft3d.cfg file.
+	      Note that this option has little effect in most cases (since
+	      most texture fit into 256 colors very well); you can
+	      see the dithering effect mostly on large colorful textures. Also
+	      you can see it on the color wheel in MazeD.
+	    - Fixed mipmap selection. Previously it was a bit erroneous,
+	      especially for almost-horizontal polygons. Now the formula used
+	      is more complex (thus more slow) but it seems absolutely correct.
+	    - Fixed "verynice" mipmap selection. Well, it is like the last
+	      gasp before death. I'm going to remove verynice mode as a
+	      properly implemented "nice" mode looks much better, and is less
+	      expensive in texture cache memory terms. Besides, hardware
+	      renderers do not support verynice mode at all. Thus it
+	      seems useless.
+	    - Tried to fix fog in 32bpp modes for NeXT (TOP8BITS_R8G8B8_USED).
+	      Not sure it works though (can't test).
+	    - Removed the ugly NeXT hack fom MazeD (case Q ...). Hope it will
+	      work without it now.
+	    - Added "reverse selected polygons" ('V') function.
+	    - Started working on texture mapping in MazeD. Very preliminary
+	      though.
+	- Andrew also fixed two texture mapping bugs (one for unlighted
+	  polygons not using the Z buffer and one for unlighted sprites
+	  using the Z buffer). These bugs only appeared on 8-bit display
+	  modes when NASM assembly is used.
 8-Mar-2000
 	- Decreased glOrtho setting in OpenGL renderer from 150 to 10 to
 	  make Z buffering precision better. This breaks the terrain engine
