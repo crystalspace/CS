@@ -35,6 +35,10 @@ struct csEvBind
   void *x, *y;
 };
 
+/**
+ * Bind an input event to a pointer to a variable,
+ * so that that variable will reflect the state of a given key, button or axis.
+ */
 class csInputBinder : public iEventHandler
 {
   private:
@@ -63,12 +67,14 @@ class csInputBinder : public iEventHandler
 
     /**
      * Bind one or two variables to an event.
-     *  Bind one or two 'int's to a csevXXXMove type event.
+     *  Bind one or two 'int's to a csev*Move type event.
      *   You can bind the two axes simultaneously or separately.
      *   If yvar is NULL and the event is a y-axis type, xvar is used as yvar.
-     *  Or bind a button status '(int)bool' to a csevXXXUp/Down type event.
+     *  Or bind a button status '(int)bool' to a csev*Up/Down type event.
      * Will modify the existing binding if any.
      * It is recommended that you use this in conjuction with csParseKeyDef
+     * The axis (either x, y or both) is given by whether ev.*.x is greater
+     * than ev.*.y (x) or visa versa (y) or if they are equal (both).
      */
     void Bind (iEvent *ev, int *xvar = NULL, int *yvar = NULL);
 
