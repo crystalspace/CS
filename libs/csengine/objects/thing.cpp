@@ -629,7 +629,6 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
-//if (po) { printf ("PORTAL\n"); fflush (stdout); }
     if (po->Draw (poly, p, d))
     {
       //@@@@ EDGESif (!d->GetCallback ())
@@ -1658,7 +1657,6 @@ void* csThing::DrawPolygons (csThing* /*thing*/,
 
 bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
 {
-//printf ("%08lx\n", this);fflush (stdout);
   Prepare ();
 
   iCamera* icam = rview->GetCamera ();
@@ -1944,14 +1942,26 @@ bool csThing::VisTest (iRenderView* irview)
       // changed shape fundamentally.
       CheckVisUpdate (vinf);
       iVisibilityObject* vo = vinf->visobj;
-      // If the current viewpoint is inside the bounding box of the
-      // object then we consider the object visible.
-      csBox3 bbox;
-      vo->GetBoundingBox (bbox);
-      if (bbox.In (origin))
-        vo->MarkVisible ();
+
+      iMeshWrapper* mw = QUERY_INTERFACE_FAST (vo, iMeshWrapper);
+      mw->DecRef ();
+      if (mw->GetMeshObject () == &scfiMeshObject)
+      {
+        // If the object represents the object of the culler then
+        // the object is automatically visible.
+	vo->MarkVisible ();
+      }
       else
-        vo->MarkInvisible ();
+      {
+        // If the current viewpoint is inside the bounding box of the
+        // object then we consider the object visible.
+        csBox3 bbox;
+        vo->GetBoundingBox (bbox);
+        if (bbox.In (origin))
+          vo->MarkVisible ();
+        else
+          vo->MarkInvisible ();
+      }
       vinf->bbox->ClearTransform ();
     }
 
