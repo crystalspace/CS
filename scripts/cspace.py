@@ -52,6 +52,32 @@ class iCamera(iCameraPtr):
 
 
 
+class iPolygonSetPtr(iBasePtr):
+    def __init__(self,this):
+        self.this = this
+        self.thisown = 0
+    def __repr__(self):
+        return "<C iPolygonSet instance>"
+class iPolygonSet(iPolygonSetPtr):
+    def __init__(self,this):
+        self.this = this
+
+
+
+
+class iThingPtr(iPolygonSetPtr):
+    def __init__(self,this):
+        self.this = this
+        self.thisown = 0
+    def __repr__(self):
+        return "<C iThing instance>"
+class iThing(iThingPtr):
+    def __init__(self,this):
+        self.this = this
+
+
+
+
 class csVector3Ptr :
     def __init__(self,this):
         self.this = this
@@ -176,29 +202,12 @@ class csPolygonSet(csPolygonSetPtr):
 
 
 
-class csThingPtr(csPolygonSetPtr):
-    def __init__(self,this):
-        self.this = this
-        self.thisown = 0
-    def __del__(self):
-        if self.thisown == 1 :
-            cspacec.delete_csThing(self.this)
-    def __repr__(self):
-        return "<C csThing instance>"
-class csThing(csThingPtr):
-    def __init__(self) :
-        self.this = cspacec.new_csThing()
-        self.thisown = 1
-
-
-
-
 class csSectorPtr(csPolygonSetPtr):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
     def AddThing(self,arg0):
-        val = cspacec.csSector_AddThing(self.this,arg0.this)
+        val = cspacec.csSector_AddThing(self.this,arg0)
         return val
     def __repr__(self):
         return "<C csSector instance>"
@@ -364,16 +373,17 @@ ptradd = cspacec.ptradd
 
 ptrmap = cspacec.ptrmap
 
+def new_csThing():
+    val = cspacec.new_csThing()
+    val = iThingPtr(val)
+    return val
+
 GetMyPtr = cspacec.GetMyPtr
 
 def GetSystem():
     val = cspacec.GetSystem()
     val = iSystemPtr(val)
     return val
-
-GetFrameHeight = cspacec.GetFrameHeight
-
-GetFrameWidth = cspacec.GetFrameWidth
 
 
 

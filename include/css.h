@@ -41,6 +41,12 @@
 #include "cssys/sysdriv.h"
 #endif
 
+//CS Interfaces
+#ifndef NO_CSINTERFACE
+#include "ipolygon.h"
+#include "ithing.h"
+#endif
+
 //CS Geom
 #ifndef NO_CSGEOM
 #include "csgeom/math2d.h"
