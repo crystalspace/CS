@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node WinCVS Tutorial Step 7, WinCVS Tutorial, WinCVS Tutorial Step 6, WinCVS Tutorial
+@node WinCVS Tutorial Step 7, , WinCVS Tutorial Step 6, WinCVS Tutorial
 @subsection Step 7: Updating Crystal Space
 
 @subsubheading Updating Crystal Space with WinCVS - PSERVER
