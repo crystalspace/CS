@@ -40,6 +40,8 @@ chronological order.
 	- Eric Sunshine fixed problem on MacOS/X following the cssys+csutil
 	  merge where .m and .mm source files were making their way into the
 	  OBJ.CSUTIL makefile variable, thus causing make-based builds to fail.
+	- Eric Sunshine fixed bugs in libs/cssys/cssys.mak where it failed to
+	  respect $(SRCDIR) in all cases.
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.
