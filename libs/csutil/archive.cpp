@@ -890,7 +890,7 @@ bool Archive::write_workdir_archive ()
     strcpy (fname, workdir);
     if ((fname[wd_len - 1] == '/') || (fname[wd_len - 1] == PATH_SEPARATOR))
       fname[wd_len - 1] = 0;
-    mkdir (fname);
+    MKDIR (fname);
   }
 
   /* Write all files that were added to archive */
@@ -912,7 +912,7 @@ bool Archive::write_workdir_archive ()
         if ((cur->filename[i] == '/') || (cur->filename[i] == PATH_SEPARATOR))
         {
           fname[wd_len] = 0;
-          mkdir (fname);
+          MKDIR (fname);
         } /* endif */
       } /* endwhile */
       fname[wd_len] = 0;

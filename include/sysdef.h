@@ -39,7 +39,7 @@
       APPEND_SLASH macros.
 
     #define SYSDEF_MKDIR
-      Include definition for mkdir()
+      Include definition for MKDIR()
 
     #define SYSDEF_GETCWD
       Include definition for getcwd()
@@ -177,11 +177,11 @@
 
 #ifdef SYSDEF_MKDIR
 // How to make a directory (not entire path, only the last on the path)
-#  ifndef mkdir
+#  ifndef MKDIR
 #    if defined(OS_WIN32) || (defined(OS_DOS) && !defined(COMP_GCC))
-#      define mkdir(path) _mkdir (path)
+#      define MKDIR(path) _mkdir (path)
 #    else
-#      define mkdir(path) mkdir (path, 0644)
+#      define MKDIR(path) mkdir (path, 0644)
 #    endif
 #  endif
 #endif // SYSDEF_MKDIR
